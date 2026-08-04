@@ -1,18 +1,18 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { fromYesNoEnum } from '../../utils';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep, getTranslationFunction } from '@modules/steps';
+import { getTranslation, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import type { YesNoValue } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'exceptional-hardship',
-  journeyFolder: 'respondToClaim',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.exceptionalHardship),
   stepDir: __dirname,
-  flowConfig,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
   },
   fields: [
     {
@@ -37,14 +37,7 @@ export const step: StepDefinition = createFormStep({
               attributes: {
                 rows: 5,
               },
-              validator: (value: unknown): boolean | string => {
-                if (typeof value !== 'string' || !value.trim()) {
-                  return true;
-                }
-
-                const invalidCharacters = /\p{Emoji_Presentation}|\p{Extended_Pictographic}|\u200D|\uFE0F/u;
-                return !invalidCharacters.test(value) || 'errors.exceptionalHardshipDetailsInvalidCharacters';
-              },
+              labelClasses: 'govuk-label--s',
             },
           },
         },
@@ -57,12 +50,11 @@ export const step: StepDefinition = createFormStep({
   ],
   customTemplate: `${__dirname}/exceptionalHardship.njk`,
   extendGetContent: req => {
-    const t = getTranslationFunction(req, 'exceptional-hardship', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       introParagraph1: t('introParagraph1'),
-      introParagraph2: t('introParagraph2'),
-      introParagraph3: t('introParagraph3'),
+      introParagraph2: getTranslation(t, 'introParagraph2', '') ?? '',
       forExample: t('forExample'),
       bullet1: t('bullet1'),
       bullet2: t('bullet2'),
@@ -71,37 +63,37 @@ export const step: StepDefinition = createFormStep({
     };
   },
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const exceptionalHardshipValue = req.body?.exceptionalHardship as string | undefined;
+    const ccdMapping: Record<string, YesNoValue> = { yes: 'YES', no: 'NO' };
 
-    if (!exceptionalHardshipValue || (exceptionalHardshipValue !== 'yes' && exceptionalHardshipValue !== 'no')) {
-      return;
+    if (exceptionalHardshipValue && ccdMapping[exceptionalHardshipValue]) {
+      response.defendantResponses.householdCircumstances.exceptionalHardship = ccdMapping[exceptionalHardshipValue];
+
+      if (exceptionalHardshipValue === 'yes') {
+        response.defendantResponses.householdCircumstances.exceptionalHardshipDetails = req.body?.[
+          'exceptionalHardship.exceptionalHardshipDetails'
+        ] as string | undefined;
+      } else {
+        delete response.defendantResponses.householdCircumstances.exceptionalHardshipDetails;
+      }
+    } else {
+      delete response.defendantResponses.householdCircumstances.exceptionalHardship;
+      delete response.defendantResponses.householdCircumstances.exceptionalHardshipDetails;
     }
 
-    const ccdMapping: Record<'yes' | 'no', YesNoValue> = { yes: 'YES', no: 'NO' };
-    const exceptionalHardship = ccdMapping[exceptionalHardshipValue];
-    const exceptionalHardshipDetails =
-      exceptionalHardshipValue === 'yes'
-        ? (req.body?.['exceptionalHardship.exceptionalHardshipDetails'] as string | undefined)
-        : undefined;
+    await saveDraftDefendantResponse(
+      req,
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances: {
-          exceptionalHardship,
-          exceptionalHardshipDetails,
-        },
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const householdCircumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const existingAnswer = householdCircumstances?.exceptionalHardship as string | undefined;
-
-    const mapping: Record<string, string> = { Yes: 'yes', No: 'no' };
-    const exceptionalHardshipValue = existingAnswer ? mapping[existingAnswer] : undefined;
+    // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — fromYesNoEnum handles either casing.
+    const exceptionalHardshipValue = fromYesNoEnum(householdCircumstances?.exceptionalHardship);
 
     if (!exceptionalHardshipValue) {
       return {};

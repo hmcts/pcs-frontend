@@ -1,4 +1,8 @@
 {
-  "uploadDocumentsInfo": "The claimant will be able to see any documents you upload and your answers.",
+  "description": "",
+  "completingYourResponse": "",
+  "uploadDocumentsInfo": "",
+  "whatYouWillNeed": "",
+  "provideDetailsInfo": "This service is also available <a href=\"?lang=cy\" class=\"govuk-link language\">in Welsh (Cymraeg)</a>.",
   "hmctsSupportInfo": "If you or the defendant need support to use HMCTS services, like step-free access to a court for the hearing, you can request this after you’ve submitted your response."
 }

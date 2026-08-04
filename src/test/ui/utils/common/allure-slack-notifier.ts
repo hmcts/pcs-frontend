@@ -167,6 +167,18 @@ function ragStatus(summary: AllureSummary): string {
   return '🟢 GREEN';
 }
 
+function inferEnvironment(): string {
+  const explicitEnv =
+    process.env.E2E_TARGET_ENV?.trim() || process.env.ENVIRONMENT?.trim() || process.env.E2E_ENV?.trim();
+  return (
+    explicitEnv ||
+    process.env.TEST_URL?.match(
+      /https?:\/\/(?:[^./]+\.)?pcs(?:-[^./]+)?[.-]([a-z0-9-]+)\.platform\.hmcts\.net/i
+    )?.[1]?.toLowerCase() ||
+    'unknown'
+  );
+}
+
 function latestResultSummary(tests: AllureTestRecord[]): { failed: number; broken: number; pass_rate: number } {
   const latest = latestResultByKey(tests);
   const total = latest.length;
@@ -193,9 +205,11 @@ function buildMessage(
   const reportUrl = buildUrl ? `${buildUrl}${reportSuffix}` : '';
   const platform = (process.env.E2E_PLATFORM ?? 'Linux').trim();
   const browser = (process.env.E2E_BROWSER ?? 'Chrome').trim();
+  const testEnv = inferEnvironment();
   const lines: string[] = [
     `*E2E Test Results* — Build #${buildNumber}  ${rag}`,
     `*Service:* ${serviceName}  |  *Pipeline:* ${pipelineType}`,
+    `*Env:* ${testEnv}`,
     `*Platform:* ${platform}  |  *Browser:* ${browser}`,
     '',
   ];
@@ -268,9 +282,11 @@ function getFallbackMessage(
 ): string {
   const platform = (process.env.E2E_PLATFORM ?? 'Linux').trim();
   const browser = (process.env.E2E_BROWSER ?? 'Chrome').trim();
+  const testEnv = inferEnvironment();
   const lines = [
     `E2E Test Results — Build #${buildNumber}`,
     `*Service:* ${serviceName}  |  *Pipeline:* ${pipelineType}`,
+    `*Env:* ${testEnv}`,
     `*Platform:* ${platform}  |  *Browser:* ${browser}`,
     '',
     'Allure report not available – check build logs.',

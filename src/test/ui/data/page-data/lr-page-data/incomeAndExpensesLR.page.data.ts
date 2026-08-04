@@ -1,0 +1,17 @@
+export const incomeAndExpensesLR = {
+  mainHeader: `Income and expenses`,
+  doesDefendantWantToProvideDetailsHeader: `Does the defendant want to provide details of their income and expenses?`,
+  detailsAboutDefendantIncomeParagraph: `Details about the defendant’s income and expenses can be used by a judge to reach a decision on their case, and also to decide how much they could afford to repay if they have rent arrears.`,
+  providingDetailsParagraph: `Providing details about the defendant’s income and expenses is optional.`,
+  theClaimantWillBeParagraph: `The claimant will be able to see the defendant’s answers.`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  yesRadioOption: `Yes`,
+  noRadioOption: 'No',
+  cymraegLink: `Cymraeg`,
+  backLink: `Back`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `income-and-expenses`,
+  errorValidationHeader: `There is a problem`,
+  selectIfDefendantWantToProvideDetailsErrorMessage: `Select if the defendant wants to provide details of their income and expenses`,
+};

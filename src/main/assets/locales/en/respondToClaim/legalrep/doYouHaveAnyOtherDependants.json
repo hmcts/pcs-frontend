@@ -1,0 +1,11 @@
+{
+  "heading": "Other dependants",
+  "otherDependantsParagraph": "",
+  "dependantQuestion": "Does the defendant have any other dependants?",
+  "otherDependantDetailsLabel": "Give details about their other dependants",
+  "otherDependantDetailsHint": "",
+  "errors": {
+    "otherDependants": "Select if they have any other dependants",
+    "otherDependantDetails": "Give details about their other dependants"
+  }
+}

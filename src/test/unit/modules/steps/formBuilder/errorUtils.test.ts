@@ -1,3 +1,4 @@
+import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import {
@@ -8,6 +9,16 @@ import {
   renderWithErrors,
 } from '@modules/steps/formBuilder/errorUtils';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+
+jest.mock('../../../../../main/modules/i18n', () => ({
+  getRequestLanguage: jest.fn(() => 'en'),
+}));
+jest.mock('../../../../../main/modules/steps/i18n', () => ({
+  getTranslationFunction: jest.fn(() => ((key: string) => key) as TFunction),
+}));
+jest.mock('@routes/dashboard', () => ({
+  getDashboardUrl: jest.fn(() => '/dashboard'),
+}));
 
 describe('errorUtils', () => {
   describe('fieldTypeForErrorKey', () => {
@@ -284,12 +295,42 @@ describe('errorUtils', () => {
   });
 
   describe('renderWithErrors', () => {
-    // Note: renderWithErrors is an integration function that requires
-    // Express request/response objects and various dependencies.
-    // Full integration testing would require setting up Express app context.
-    // This test verifies the function exists and can be called.
-    it('should be a function', () => {
-      expect(typeof renderWithErrors).toBe('function');
+    it('passes validationErrors mirroring the validation map (so templates are not fooled by step i18n errors)', async () => {
+      const mockRender = jest.fn();
+      const mockStatus = jest.fn().mockReturnValue({ render: mockRender });
+      const res = { status: mockStatus } as unknown as Response;
+      const req = {
+        originalUrl: '/respond-to-claim/correspondence-address',
+      } as unknown as Request;
+
+      const fieldValidation: Record<string, FormError> = {
+        correspondenceAddressConfirm: 'Please confirm your address',
+        'correspondenceAddressConfirm.addressLine1': 'Enter address line 1',
+      };
+
+      await renderWithErrors(
+        req,
+        res,
+        'respond-to-claim/correspondence-address/correspondenceAddress.njk',
+        fieldValidation,
+        [],
+        {
+          fields: [],
+          errors: {
+            correspondenceAddressConfirm: 'i18n title key',
+            'correspondenceAddressConfirm.addressLine1': 'i18n duplicate key shape — must not drive field Errors',
+          } as Record<string, unknown>,
+        },
+        'correspondence-address',
+        'respondToClaim',
+        { getBackUrl: jest.fn().mockResolvedValue('/back') }
+      );
+
+      expect(mockStatus).toHaveBeenCalledWith(400);
+      const viewLocals = mockRender.mock.calls[0][1];
+      expect(viewLocals.validationErrors).toEqual(fieldValidation);
+      expect(viewLocals.errors).toEqual(fieldValidation);
+      expect(viewLocals.validationErrors['correspondenceAddressConfirm.addressLine1']).toBe('Enter address line 1');
     });
   });
 });

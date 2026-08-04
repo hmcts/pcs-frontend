@@ -1,5 +1,6 @@
+import { PaymentSessionState } from '@services/paymentSessionService';
 import { type Session, type SessionData } from 'express-session';
-import { type TokenEndpointResponse, type UserInfoResponse } from 'openid-client';
+import { type UserInfoResponse } from 'openid-client';
 import { type Redis } from 'ioredis';
 import { type Environment } from 'nunjucks';
 import { type CcdCase } from '@services/ccdCase.interface';
@@ -7,6 +8,8 @@ import { S2S } from '../main/modules/s2s';
 import { OIDCModule } from '../main/modules/oidc';
 import { type TFunction } from 'i18next';
 import { type CcdCaseModel } from '@services/ccdCaseData.model';
+import { type PaymentSessionState } from '@services/paymentSessionService';
+import { type StepContext } from '../main/modules/steps/stepContext';
 
 export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
@@ -14,13 +17,8 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   refreshToken: string;
 }
 
-export interface AddressLookupSessionData {
-  [stepId: string]: {
-    [fieldNamePrefix: string]: {
-      postcode?: string;
-      addresses?: any[];
-    };
-  };
+export interface ClientContextHeaders {
+  selectedPartyId: string;
 }
 
 interface CustomSessionData extends SessionData {
@@ -29,19 +27,17 @@ interface CustomSessionData extends SessionData {
   user?: UserInfoResponseWithToken;
   returnTo?: string;
   formData?: Record<string, any>;
+  uploadedDocs?: Record<string, Record<string, unknown[]>>;
+  returnToCya?: string;
+  respondToClaimPostSubmitRedirect?: string;
   ccdCase?: CcdCase;
-  caseReference?: string;
-  postcodeLookupResult?: any[];
-  lookupPostcode?: string;
-  lookupError?: { field: string; text: string };
-  _addressLookup?: AddressLookupSessionData;
-  //TODO: currently served from LaunchDarkly flag - remove this once CCD case is implemented
-  defendantName?: string;
-  noticeDate?: string;
-  noticeServed?: boolean;
-  rentarrears?: boolean;
+  genApp?: {
+    applicationId?: string;
+    showDuplicateSubmissionPage?: boolean;
+  };
+  payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
-  returnTo?: string;
+  clientContext?: ClientContextHeaders;
 }
 
 declare module 'express-session' {
@@ -60,6 +56,7 @@ declare module 'express' {
       validatedCase?: CcdCaseModel;
       t?: TFunction;
       lang?: string;
+      step?: StepContext;
     } & Record<string, unknown>;
     csrfToken?: () => string;
   }

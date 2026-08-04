@@ -10,6 +10,7 @@
 {% from "govuk/components/fieldset/macro.njk" import govukFieldset %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
+{% from "macros/fileUploadMoj.njk" import fileUploadMoj %}
 
 {% block pageTitle %}
   {{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
@@ -30,13 +31,19 @@
     <h1 class="govuk-heading-l">{{ title }}</h1>
   {% endif %}
 
+  {% if subheading %}
+    <p class="govuk-heading-m">{{ subheading }}</p>
+  {% endif %}
+
   {% if content %}
     <p class="govuk-body">{{ content | safe }}</p>
   {% endif %}
 
   <form method="post" action="{{ url }}">
-    {# Wrap fields in fieldset with visually-hidden legend for accessibility #}
-    {% if heading %}
+    {# Wrap fields in fieldset with visually-hidden legend for accessibility.
+       Skip for radio/checkbox pages - they create their own fieldset via GOV.UK macros,
+       so wrapping them in an outer fieldset causes screen readers to announce the legend twice. #}
+    {% if heading and not allFieldsHaveOwnFieldset %}
       {% call govukFieldset({
         legend: {
           text: heading,
@@ -59,6 +66,8 @@
               {{ govukCheckboxes(field.component) }}
             {% elif field.componentType == 'dateInput' %}
               {{ govukDateInput(field.component) }}
+            {% elif field.componentType == 'fileUpload' %}
+              {{ fileUploadMoj(field.component, field.component.uploadButtonText, field.component.filesAddedHeading, field.component.value) }}
             {% endif %}
           {% endif %}
         {% endfor %}
@@ -81,6 +90,8 @@
             {{ govukCheckboxes(field.component) }}
           {% elif field.componentType == 'dateInput' %}
             {{ govukDateInput(field.component) }}
+          {% elif field.componentType == 'fileUpload' %}
+            {{ fileUploadMoj(field.component, field.component.uploadButtonText, field.component.filesAddedHeading, field.component.value) }}
           {% endif %}
         {% endif %}
       {% endfor %}

@@ -1,16 +1,14 @@
 import type { Request } from 'express';
 
-import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
+import type { FormBuilderFlowConfig } from './flowConfig';
 
-export type FormFieldType = 'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup';
+import type { DocumentStorage } from '@modules/documents/storage';
+import type { UploadValidationOptions } from '@utils/documentUploadValidation';
+
+export type FormFieldType =
+  'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup' | 'file';
 export type ComponentType =
-  | 'input'
-  | 'textarea'
-  | 'characterCount'
-  | 'radios'
-  | 'checkboxes'
-  | 'dateInput'
-  | 'postcodeLookup';
+  'input' | 'textarea' | 'characterCount' | 'radios' | 'checkboxes' | 'dateInput' | 'postcodeLookup' | 'fileUpload';
 
 export interface FormFieldOption {
   value?: string;
@@ -18,10 +16,21 @@ export interface FormFieldOption {
   divider?: string;
   translationKey?: string;
   label?: string | ((translations: Record<string, string>) => string);
-  hint?: string | ((translations: Record<string, string>) => string);
+  hint?: string;
   conditionalText?: string | ((translations: Record<string, string>) => string);
   // SubFields appear conditionally when this option is selected (e.g., text inputs under "No" radio button)
   subFields?: Record<string, FormFieldConfig>;
+}
+
+// Shape of the built `component` config that the radio macro consumes. Steps reach into this
+// via `formContent.fields.find(f => f.componentType === 'radios')` to mutate heading/legend/hint
+// at render time. Narrowed from FormFieldConfig['component'] which is Record<string, unknown>.
+export interface RadioFormField {
+  component: {
+    label: { text: string };
+    fieldset: { legend: { text: string; isPageHeading?: boolean } };
+    hint?: { text: string };
+  };
 }
 
 export interface FormFieldConfig {
@@ -34,6 +43,8 @@ export interface FormFieldConfig {
   errorMessage?: string;
   label?: string | ((translations: Record<string, string>) => string);
   labelClasses?: string;
+  formGroupClasses?: string;
+  hintClasses?: string;
   hint?: string;
   translationKey?: {
     label?: string;
@@ -48,6 +59,7 @@ export interface FormFieldConfig {
   prefix?: {
     text: string;
   };
+  suffix?: { text: string };
   attributes?: Record<string, unknown>;
   legendClasses?: string;
   // Pre-built component config for Nunjucks template rendering
@@ -67,6 +79,11 @@ export interface FormFieldConfig {
     formData?: Record<string, unknown>,
     allData?: Record<string, unknown>
   ) => boolean | string;
+  // File upload configuration
+  accept?: string;
+  maxFileSize?: number;
+  uploadUrl?: string;
+  deleteUrl?: string;
   // For date fields: prevent future dates from being entered
   noFutureDate?: boolean;
   noCurrentDate?: boolean;
@@ -105,6 +122,7 @@ export interface FormBuilderConfig {
   journeyFolder: string;
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
+  resolveRedirectAfterPost?: (req: Request) => Promise<string | undefined | void>;
   beforeGet?: (req: Request) => Promise<void> | void;
   extendGetContent?: ExtendGetContent;
   // Prepopulates form fields from CCD on GET requests (e.g., when user returns to edit their answer).
@@ -114,8 +132,15 @@ export interface FormBuilderConfig {
   translationKeys?: TranslationKeys;
   customTemplate?: string;
   basePath?: string;
-  flowConfig?: JourneyFlowConfig;
+  flowConfig?: FormBuilderFlowConfig;
   showCancelButton?: boolean;
+  // Storage adapter for upload steps. When set, formBuilder auto-wires uploadUrl/deleteUrl
+  // onto the fileUpload field component from req.originalUrl.
+  documentStorage?: DocumentStorage;
+  // Per-step upload validation. When set, formBuilder auto-wires matching macro params
+  // (caps + translated error messages) onto the fileUpload field component.
+  uploadValidation?: UploadValidationOptions;
+  isAnswered?: (req: Request) => boolean;
 }
 
 export interface ComponentConfig {

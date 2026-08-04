@@ -1,0 +1,12 @@
+{
+  "pageTitle": "A oes gennych gyfreithiwr?",
+  "heading": "A oes gennych gyfreithiwr?",
+  "question": "A oes gennych gyfreithiwr?",
+  "options": {
+    "yes": "Ydy",
+    "no": "Nac ydy"
+  },
+  "errors": {
+    "hasSolicitor": "Dewiswch os oes gennych gyfreithiwr"
+  }
+}

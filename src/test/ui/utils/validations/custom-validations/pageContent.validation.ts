@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { Page } from '@playwright/test';
+import { Page, test } from '@playwright/test';
 
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
 import { takeValidationFailureScreenshot } from '../../common/pft-validation-screenshot';
@@ -36,6 +36,9 @@ export class PageContentValidation implements IValidation {
   private static missingDataFiles = new Set<string>();
   private static testCounter = 0;
   private static pageToHeaderTextMap = new Map<string, string>();
+
+  private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
+  private static readonly PAGE_DATA_LR_DIR = path.join(__dirname, '../../../data/page-data/lr-page-data');
 
   private readonly locatorPatterns = {
     Button: (page: Page, value: string) =>
@@ -125,10 +128,12 @@ export class PageContentValidation implements IValidation {
                     .govuk-list:text-is("${value}")`)
         ),
     List: (page: Page, value: string) =>
-      page.locator(`
+      page.getByText(exactTextWithOptionalWhitespaceRegex(value)).or(
+        page.locator(`
                     li:text-is("${value}"),
                     ul li:text-is("${value}"),
-                    ol li:text-is("${value}")`),
+                    ol li:text-is("${value}")`)
+      ),
     Text: (page: Page, value: string) => page.locator(`:text-is("${value}")`),
     Tab: (page: Page, value: string) => page.getByRole('tab', { name: new RegExp(`^${escapeForRegex(value)}$`) }),
   };
@@ -152,9 +157,11 @@ export class PageContentValidation implements IValidation {
         if (
           key.includes('Input') ||
           key.includes('Hidden') ||
+          key.startsWith('lr') ||
           key.includes('Validation') ||
           key.includes('pageSlug') ||
-          key.includes('ErrorMessage')
+          key.includes('ErrorMessage') ||
+          key.includes('Dynamic')
         ) {
           continue;
         }
@@ -184,20 +191,24 @@ export class PageContentValidation implements IValidation {
 
   private async getPageData(pageName: string): Promise<object | null> {
     const pageData = this.loadPageDataFile(pageName);
-    if (pageName !== 'home') {
+    if (!(pageName === 'home' || pageName === 'claims') && !test.info().title.includes('@LR')) {
       const contactUsData = this.loadSectionDataFile('contactUs');
       if (contactUsData) {
         await performAction('clickSummary', contactUs.contactUsForHelpParagraph);
         return { ...pageData, ...contactUsData };
       }
     }
-
     return pageData;
   }
 
   private loadPageDataFile(fileName: string): object | null {
-    const filePath = path.join(__dirname, '../../../data/page-data', `${fileName}.page.data.ts`);
-    if (!fs.existsSync(filePath)) {
+    const isLR = test.info().title.includes('@LR') || false;
+    const baseDir = isLR ? PageContentValidation.PAGE_DATA_LR_DIR : PageContentValidation.PAGE_DATA_DIR;
+    const filePath = this.resolveDataFilePath(baseDir, `${fileName}${isLR ? '.page.data.lr.ts' : '.page.data.ts'}`);
+
+    if (!filePath || !fs.existsSync(filePath)) {
+      console.warn(`Path not found for the file ${fileName}`);
+      PageContentValidation.missingDataFiles.add(fileName);
       return null;
     }
     try {
@@ -205,6 +216,7 @@ export class PageContentValidation implements IValidation {
       const module = require(filePath);
       return module.default || module[fileName] || module[Object.keys(module)[0]];
     } catch {
+      PageContentValidation.missingDataFiles.add(fileName);
       return null;
     }
   }
@@ -221,6 +233,28 @@ export class PageContentValidation implements IValidation {
     } catch {
       return null;
     }
+  }
+
+  private resolveDataFilePath(baseDir: string, pageName: string): string | null {
+    if (!fs.existsSync(baseDir)) {
+      throw new Error(`Base directory does not exist: ${baseDir}`);
+    }
+
+    const directPath = path.join(baseDir, pageName);
+    if (fs.existsSync(directPath)) {
+      return directPath;
+    }
+
+    const subDirs = fs.readdirSync(baseDir, { withFileTypes: true }).filter(d => d.isDirectory());
+
+    for (const dir of subDirs) {
+      const subDirPath = path.join(baseDir, dir.name, pageName);
+      if (fs.existsSync(subDirPath)) {
+        return subDirPath;
+      }
+    }
+
+    return null;
   }
 
   private async isElementVisible(page: Page, expectedValue: string, elementType: string): Promise<boolean> {

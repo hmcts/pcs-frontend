@@ -1,14 +1,30 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
-import { VERY_SHORT_TIMEOUT } from '../../../../../../playwright.config';
-import { IAction } from '../../interfaces';
+import { SHORT_TIMEOUT, VERY_SHORT_TIMEOUT } from '../../../../../../playwright.config';
+import { IAction, actionRecord } from '../../interfaces';
+
+type ClickLinkParams =
+  | string
+  | {
+      fieldName: string;
+      header?: string;
+      sectionHeader?: string;
+    };
 
 export class ClickLinkAction implements IAction {
-  async execute(page: Page, action: string, fieldName: string, header?: string): Promise<void> {
+  async execute(
+    page: Page,
+    action: string,
+    fieldName: string | actionRecord | ClickLinkParams,
+    header?: string
+  ): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
-      ['clickLink', () => this.clickLink(page, fieldName)],
-      ['clickLinkAndVerifySameTabTitle', () => this.clickLinkAndVerifySameTabTitle(page, fieldName!, header!)],
-      ['clickLinkAndVerifyNewTabTitle', () => this.clickLinkAndVerifyNewTabTitle(page, fieldName!, header!)],
+      ['clickLink', () => this.clickLink(page, fieldName as string)],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        () => this.clickLinkAndVerifySameTabTitle(page, fieldName as string | ClickLinkParams, header!),
+      ],
+      ['clickLinkAndVerifyNewTabTitle', () => this.clickLinkAndVerifyNewTabTitle(page, fieldName as string, header!)],
     ]);
 
     const actionToPerform = actionsMap.get(action);
@@ -19,14 +35,56 @@ export class ClickLinkAction implements IAction {
   }
 
   private async clickLink(page: Page, fieldName: string): Promise<void> {
-    const locator = page.locator(`a:text-is("${fieldName}"), .govuk-details__summary-text:text-is("${fieldName}")`);
+    const linkText = await this.getVisibleLinkText(page, fieldName);
+    const locator = page
+      .locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`)
+      .first();
     await locator.click();
   }
 
-  private async clickLinkAndVerifySameTabTitle(page: Page, fieldName: string, expectedHeader: string): Promise<void> {
-    const link = page.locator(`a:text-is("${fieldName}")`);
+  private async getVisibleLinkText(page: Page, fieldName: string): Promise<string> {
+    const linkTextOptions = Array.from(new Set([fieldName, fieldName.replace(/[.?!]+$/, '')]));
+
+    for (const linkText of linkTextOptions) {
+      const link = page
+        .locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`)
+        .first();
+      if (await link.isVisible({ timeout: SHORT_TIMEOUT }).catch(() => false)) {
+        return linkText;
+      }
+    }
+
+    return fieldName;
+  }
+
+  private async clickLinkAndVerifySameTabTitle(
+    page: Page,
+    fieldName: string | ClickLinkParams,
+    fallbackHeader?: string
+  ): Promise<void> {
+    let name: string;
+    let expectedHeader: string;
+    let sectionHeader: string | undefined;
+    if (typeof fieldName === 'string') {
+      name = fieldName;
+      expectedHeader = fallbackHeader!;
+    } else {
+      name = fieldName.fieldName;
+      expectedHeader = fieldName.header!;
+      sectionHeader = fieldName.sectionHeader;
+    }
+    let link: Locator;
+    if (sectionHeader) {
+      const section = page
+        .locator(`h2:text-is("${sectionHeader}")`)
+        .locator('xpath=following-sibling::ul | following-sibling::nav//ul');
+      link = section.locator(`a:text-is("${name}")`);
+    } else {
+      link = page.locator(`a:text-is("${name}")`).first();
+    }
     await link.waitFor({ state: 'visible', timeout: VERY_SHORT_TIMEOUT });
-    await Promise.all([page.waitForLoadState('domcontentloaded'), link.click()]);
+    await link.click();
+    await page.waitForFunction(() => document.title && document.title.length > 0);
     const pageTitle = await page.title();
     if (!pageTitle.includes(expectedHeader)) {
       throw new Error(

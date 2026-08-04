@@ -1,7 +1,10 @@
+import { Request } from 'express';
+
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { FeeType, getFee } from '@services/feeLookupService';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'do-you-need-help-paying-the-fee',
@@ -16,13 +19,14 @@ export const step: StepDefinition = createFormStep({
       required: true,
       translationKey: { label: 'question' },
       legendClasses: 'govuk-fieldset__legend--m',
+      errorMessage: 'errors.needHelpPayingFee',
       options: [
         {
-          value: 'YES',
+          value: 'yes',
           translationKey: 'options.yes',
         },
         {
-          value: 'NO',
+          value: 'no',
           translationKey: 'options.no',
         },
       ],
@@ -32,5 +36,22 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    itUsuallyCostsToApply: 'itUsuallyCostsToApply',
+    youHaveAlreadyToldTheOtherParty: 'youHaveAlreadyToldTheOtherParty',
+    theyDidNotAgreeToIt: 'theyDidNotAgreeToIt',
+    youWillSeeTheFinalApplicationFee: 'youWillSeeTheFinalApplicationFee',
+    youMayBeAbleToGetHelp: 'youMayBeAbleToGetHelp',
+    areOnCertainBenefits: 'areOnCertainBenefits',
+    haveLittleOrNoSavings: 'haveLittleOrNoSavings',
+    haveLowIncome: 'haveLowIncome',
+  },
+  extendGetContent: async (_req: Request) => {
+    const standardFeePromise = getFee(FeeType.genAppStandardFee);
+    const maxFeePromise = getFee(FeeType.genAppMaxFee);
+    const [standardFee, maxFee] = await Promise.all([standardFeePromise, maxFeePromise]);
+    return {
+      standardFee,
+      maxFee,
+    };
   },
 });

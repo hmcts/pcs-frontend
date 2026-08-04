@@ -1,0 +1,14 @@
+{
+  "pageTitle": "A ydych chi eisoes wedi gwneud cais am help i dalu ffi’r cais?",
+  "caption": "Gwneud cais",
+  "heading": "A ydych chi eisoes wedi gwneud cais am help i dalu ffi’r cais?",
+  "question": "A ydych chi eisoes wedi gwneud cais am help i dalu ffi’r cais?",
+  "revealedHwfQuestion": {
+    "label": "Nodwch eich cyfeirnod Help i Dalu Ffioedd",
+    "hint": "Byddwch wedi cael y rhif hwn pan wnaethoch gais am Help i Dalu Ffioedd. Ni ddylai’r cyfeirnod hwn fod wedi’i ddefnyddio ar gyfer cais blaenorol. Er enghraifft, HWF-A1B-23C"
+  },
+  "errors": {
+    "haveYouAlreadyApplied": "Cadarnhewch a ydych chi eisoes wedi gwneud cais am help i dalu ffi’ch cais",
+    "hwfReference": "Rhaid i chi roi cyfeirnod ar gyfer Help i Dalu Ffioedd"
+  }
+}

@@ -1,0 +1,744 @@
+import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import {
+  checkYourAnswersRTC,
+  confirmationOfNoticeGiven,
+  contactPreferenceEmailOrPost,
+  contactPreferencesTelephone,
+  contactPreferencesTextMessage,
+  correspondenceAddress,
+  counterClaim,
+  counterClaimAbout,
+  counterClaimAgainstWhom,
+  counterClaimFee,
+  counterClaimHaveYouAppliedForHelp,
+  counterClaimSpecificSumOfMoney,
+  counterClaimWhatAreYouClaimingFor,
+  defendantDateOfBirth,
+  defendantNameCapture,
+  defendantNameConfirmation,
+  doAnyOtherAdultsLiveInYourHome,
+  doYouHaveASolicitor,
+  doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
+  doYouWantToUploadFilesToSupportYourCounterclaim,
+  exceptionalHardship,
+  freeLegalAdvice,
+  haveYouAppliedForUniversalCredit,
+  incomeAndExpenses,
+  languageUsed,
+  nonRentArrearsDispute,
+  otherConsiderations,
+  priorityDebtDetails,
+  priorityDebts,
+  rentArrears,
+  repaymentsAgreed,
+  repaymentsMade,
+  startNow,
+  taskList,
+  tenancyDateDetails,
+  tenancyTypeDetails,
+  whatRegularIncomeDoYouReceive,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
+  yourCircumstances,
+} from '../data/page-data';
+import { accessYourCaseErrorValidation } from '../functional/accessYourCase.pft';
+import { checkYourAnswersRTCErrorValidation } from '../functional/checkYourAnswersRTC.pft';
+import { confirmationOfNoticeGivenErrorValidation } from '../functional/confirmationOfNoticeGiven.pft';
+import { contactPreferenceEmailOrPostErrorValidation } from '../functional/contactPreferenceEmailOrPost.pft';
+import { contactPreferencesTelephoneErrorValidation } from '../functional/contactPreferencesTelephone.pft';
+import { contactPreferencesTextMessageErrorValidation } from '../functional/contactPreferencesTextMessage.pft';
+import { counterClaimErrorValidation } from '../functional/counterClaim.pft';
+import { counterClaimAboutErrorValidation } from '../functional/counterClaimAbout.pft';
+import { counterClaimAgainstWhomErrorValidation } from '../functional/counterClaimAgainstWhom.pft';
+import { counterClaimFeeErrorValidation } from '../functional/counterClaimFee.pft';
+import { counterClaimHaveYouAppliedForHelpErrorValidation } from '../functional/counterClaimHaveYouAppliedForHelp.pft';
+import { counterClaimSpecificSumErrorValidation } from '../functional/counterClaimSpecificSumOfMoney.pft';
+import { counterClaimWhatAreYouClaimingForErrorValidation } from '../functional/counterClaimWhatAreYouClaimingFor.pft';
+import { defendantNameCaptureErrorValidation } from '../functional/defendantNameCapture.pft';
+import { defendantNameConfirmationErrorValidation } from '../functional/defendantNameConfirmation.pft';
+import { doAnyOtherAdultsLiveInYourHomeErrorValidation } from '../functional/doAnyOtherAdultsLiveInYourHome.pft';
+import { doYouHaveASolicitorErrorValidation } from '../functional/doYouHaveASolicitor.pft';
+import { doYouHaveAnyDependantChildrenErrorValidation } from '../functional/doYouHaveAnyDependantChildren.pft';
+import { doYouHaveAnyOtherDependantsErrorValidation } from '../functional/doYouHaveAnyOtherDependants.pft';
+import { doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation } from '../functional/doYouWantToUploadFilesToSupportYourCounterclaim.pft';
+import { yourExceptionalHardShipErrorValidation } from '../functional/exceptionalHardship.pft';
+import { freeLegalAdviceErrorValidation } from '../functional/freeLegalAdvice.pft';
+import { haveYouAppliedForUniversalCreditErrorValidation } from '../functional/haveYouAppliedForUniversalCredit.pft';
+import { incomeAndExpensesErrorValidation } from '../functional/incomeAndExpenses.pft';
+import { languageUsedErrorValidation } from '../functional/languageUsed.pft';
+import { nonRentArrearsDisputeErrorValidation } from '../functional/nonRentArrearsDispute.pft';
+import { noticeDateWhenNotProvidedErrorValidation } from '../functional/noticeDateWhenNotProvided.pft';
+import { noticeDateWhenProvidedErrorValidation } from '../functional/noticeDateWhenProvided.pft';
+import { otherConsiderationsErrorValidation } from '../functional/otherConsiderations.pft';
+import { priorityDebtDetailsErrorValidation } from '../functional/priorityDebtDetails.pft';
+import { priorityDebtsErrorValidation } from '../functional/priorityDebts.pft';
+import { rentArrearsErrorValidation } from '../functional/rentArrears.pft';
+import { repaymentsAgreedErrorValidation } from '../functional/repaymentsAgreed.pft';
+import { repaymentsMadeErrorValidation } from '../functional/repaymentsMade.pft';
+import { tenancyDateDetailsErrorValidation } from '../functional/tenancyDateDetails.pft';
+import { tenancyDateUnknownErrorValidation } from '../functional/tenancyDateUnknown.pft';
+import { tenancyTypeDetailsErrorValidation } from '../functional/tenancyTypeDetails.pft';
+import { uploadFilesToSupportYourCounterclaimErrorValidation } from '../functional/uploadFilesToSupportYourCounterclaim.pft';
+import { whatOtherRegularExpensesDoYouHaveErrorValidation } from '../functional/whatOtherRegularExpensesDoYouHave.pft';
+import { whatRegularIncomeDoYouReceiveErrorValidation } from '../functional/whatRegularIncomeDoYouReceive.pft';
+import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation } from '../functional/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.pft';
+import { yourCircumstancesErrorValidation } from '../functional/yourCircumstances.pft';
+import { getRelativeDate } from '../utils/common/date.utils';
+import {
+  assertAllErrorMessageValidations,
+  clearErrorMessageValidationFailures,
+  softErrorMessageValidation,
+} from '../utils/common/error-message-validation-helper';
+import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
+import { test } from '../utils/common/test-with-case-role-cleanup';
+import { initializeExecutor, performAction } from '../utils/controller';
+import { ErrorMessageValidation } from '../utils/validations/custom-validations';
+
+const home_url = process.env.TEST_URL;
+let claimantName: string;
+
+// softErrorMessageValidation(pageName, validationOrReason):
+// - 1st param: journey page key/name (for example 'tenancyTypeDetails').
+// - 2nd param: PFT error-validation function for that page, or a custom string
+//   to explain why ErrorMessageValidation(EMV) is missing/deferred/not applicable.
+
+const NO_EMV_READ_ONLY = 'Read-only / informational screen — no field error validation.';
+// const NO_EMV_PLACEHOLDER_PAGE = 'Placeholder page — ErrorMessageValidation(EMV) is not designed yet.';
+const NO_EMV_MISSING_DESIGN = 'ErrorMessageValidation(EMV) is missing for this page and needs to be designed.';
+
+test.beforeEach(async ({ page }, testInfo) => {
+  initializeExecutor(page);
+  claimantName = submitCaseApiData.submitCasePayload.claimantName;
+  process.env.WALES_POSTCODE = 'NO';
+  process.env.CLAIMANT_NAME = claimantName;
+  process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
+  if (testInfo.title.includes('NoticeServed - No')) {
+    process.env.NOTICE_SERVED = 'NO';
+  } else {
+    process.env.NOTICE_SERVED = 'YES';
+  }
+
+  // Notice date provided
+  if (testInfo.title.includes('NoticeDateProvided - No')) {
+    process.env.NOTICE_DATE_PROVIDED = 'NO';
+  } else if (testInfo.title.includes('NoticeDateProvided - Yes')) {
+    process.env.NOTICE_DATE_PROVIDED = 'YES';
+  }
+
+  // Assign the tenancy type & grounds in the payload
+  const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type =>
+    testInfo.title.includes(type)
+  );
+
+  switch (tenancyKey) {
+    case 'Introductory':
+      process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
+      process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
+      break;
+
+    case 'Demoted':
+      process.env.TENANCY_TYPE = 'DEMOTED_TENANCY';
+      process.env.GROUNDS = 'RENT_ARREARS';
+      break;
+
+    case 'Assured':
+      process.env.TENANCY_TYPE = 'ASSURED_TENANCY';
+      break;
+
+    case 'Secure':
+      process.env.TENANCY_TYPE = 'SECURE_TENANCY';
+      break;
+
+    case 'Flexible':
+      process.env.TENANCY_TYPE = 'FLEXIBLE_TENANCY';
+      break;
+  }
+
+  //Check if No, or I'm not sure is selected on NoticeDetails page - for back link navigation
+  if (testInfo.title.includes('NoticeDetails - No') || testInfo.title.includes('NoticeDetails - Im not sure')) {
+    process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
+  }
+
+  // Tenancy start date logic for noDefendantTest and rentNonRent test
+  if (testInfo.title.includes('NoticeServed - No') && !testInfo.title.includes('@rentNonRent')) {
+    process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
+    process.env.RENT_NON_RENT = 'NO';
+  } else {
+    process.env.RENT_NON_RENT = 'YES';
+  }
+
+  // Check notice date provided for back link navigation
+  if (testInfo.title.includes('NoticeDateProvided - No')) {
+    process.env.NOTICE_DATE_PROVIDED = 'NO';
+  } else if (testInfo.title.includes('NoticeDateProvided - Yes')) {
+    process.env.NOTICE_DATE_PROVIDED = 'YES';
+  }
+
+  //Check if No or Im not sure is selected on NoticeDetails page - for back link navigation
+  if (testInfo.title.includes('NoticeDetails - No') || testInfo.title.includes('NoticeDetails - Im not sure')) {
+    process.env.NOTICE_DETAILS_NO_NOTSURE = 'YES';
+  } else {
+    process.env.NOTICE_DETAILS_NO_NOTSURE = 'NO';
+  }
+
+  //Check if No is selected on RepaymentAgreed page(Rent Arrears) - for back link navigation
+  if (testInfo.title.includes('RentArrears - Demoted')) {
+    process.env.REPAYMENT_AGREED = 'NO';
+  }
+  //Check if No is selected on Installment Payment page(Rent Arrears) - for back link navigation
+  if (testInfo.title.includes('InstallmentPayment - No')) {
+    process.env.INSTALLMENT_PAYMENT = 'NO';
+  }
+
+  // Tenancy start date logic for noDefendantTest
+  if (testInfo.title.includes('NoticeServed - No')) {
+    process.env.TENANCY_START_DATE_KNOWN = testInfo.title.includes('noDefendants') ? 'NO' : 'YES';
+  }
+
+  if (testInfo.title.includes('@noDefendants')) {
+    claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
+    process.env.CLAIMANT_NAME = claimantName;
+    process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+  } else if (testInfo.title.includes('@assured')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
+  } else if (testInfo.title.includes('@secureFlexible')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+    process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
+  } else if (testInfo.title.includes('@other')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadOtherTenancy });
+  } else if (testInfo.title.includes('@rentNonRent')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
+    process.env.TENANCY_START_DATE_KNOWN = 'YES';
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
+  } else {
+    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
+    process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  }
+  console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
+  logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
+  await performAction('fetchPINsAPI');
+  await performAction('createUser', 'citizen', ['citizen']);
+  await performAction('navigateToUrl', home_url);
+  await performAction('login');
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await softErrorMessageValidation('accessYourCase', accessYourCaseErrorValidation);
+  await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
+  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+  await softErrorMessageValidation('startNow', NO_EMV_READ_ONLY);
+  await performAction('clickButton', startNow.startNowButton);
+});
+
+test.afterEach(() => {
+  ErrorMessageValidation.clearResults();
+  clearErrorMessageValidationFailures();
+});
+
+test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly @EMV', () => {
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown', async () => {
+    await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
+    await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+
+    await softErrorMessageValidation('defendantNameConfirmation', defendantNameConfirmationErrorValidation);
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmation.mainHeader,
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
+    });
+
+    await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_MISSING_DESIGN);
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+
+    await softErrorMessageValidation('correspondenceAddress', NO_EMV_MISSING_DESIGN);
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+
+    await softErrorMessageValidation('contactPreferenceEmailOrPost', contactPreferenceEmailOrPostErrorValidation);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
+    });
+
+    await softErrorMessageValidation('contactPreferencesTelephone', contactPreferencesTelephoneErrorValidation);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.noRadioOption,
+    });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+
+    await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+
+    await softErrorMessageValidation('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
+
+    await softErrorMessageValidation('tenancyDateDetails', tenancyDateDetailsErrorValidation);
+    await performAction('selectTenancyStartDateKnown', { option: tenancyDateDetails.yesRadioOption });
+
+    await softErrorMessageValidation('confirmationOfNoticeGiven', confirmationOfNoticeGivenErrorValidation);
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+
+    await softErrorMessageValidation(
+      'confirmation-of-notice-date-when-provided',
+      noticeDateWhenProvidedErrorValidation
+    );
+    await performAction('enterNoticeDateUnknown');
+
+    await softErrorMessageValidation('rentArrears', rentArrearsErrorValidation);
+    await performAction('rentArrears', { option: rentArrears.yesRadioOption });
+
+    await softErrorMessageValidation('counterClaim', counterClaimErrorValidation);
+    await performAction('selectCounterClaim', {
+      option: counterClaim.yesRadioOption,
+    });
+    await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+
+    await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+
+    await softErrorMessageValidation('counterClaimFee', counterClaimFeeErrorValidation);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+
+    await softErrorMessageValidation('counterClaimAgainstWhom', counterClaimAgainstWhomErrorValidation);
+    await performAction('selectClaimAgainstWhom', {
+      question: counterClaimAgainstWhom.mainHeader,
+      options: [claimantName],
+    });
+
+    await softErrorMessageValidation('counterClaimAbout', counterClaimAboutErrorValidation);
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+
+    await softErrorMessageValidation(
+      'doYouWantToUploadFilesToSupportYourCounterclaim',
+      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
+    );
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
+    });
+
+    await softErrorMessageValidation(
+      'uploadFilesToSupportYourCounterclaim',
+      uploadFilesToSupportYourCounterclaimErrorValidation
+    );
+    await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
+
+    await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
+    await performAction('readPaymentInterstitial');
+
+    await softErrorMessageValidation('repaymentsMade', repaymentsMadeErrorValidation);
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+
+    await softErrorMessageValidation('repaymentsAgreed', repaymentsAgreedErrorValidation);
+    await performAction('repaymentsAgreed', {
+      question: repaymentsAgreed.getMainHeader(claimantName),
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
+    });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+
+    await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
+    await performAction('readYourHouseholdAndCircumstances');
+
+    await softErrorMessageValidation('doYouHaveAnyDependantChildren', doYouHaveAnyDependantChildrenErrorValidation);
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+    });
+
+    await softErrorMessageValidation('doYouHaveAnyOtherDependants', doYouHaveAnyOtherDependantsErrorValidation);
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+
+    await softErrorMessageValidation('doAnyOtherAdultsLiveInYourHome', doAnyOtherAdultsLiveInYourHomeErrorValidation);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
+    });
+
+    await softErrorMessageValidation(
+      'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
+      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation
+    );
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
+    });
+
+    await softErrorMessageValidation('yourCircumstances', yourCircumstancesErrorValidation);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+
+    await softErrorMessageValidation('exceptionalHardship', yourExceptionalHardShipErrorValidation);
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+
+    await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+
+    await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatRegularIncomeDoYouReceiveErrorValidation);
+    await performAction('selectWhatRegularIncomeDoYouReceive', {
+      regularIncomeOptions: [
+        [
+          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
+          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.universalCreditParagraph,
+          whatRegularIncomeDoYouReceive.universalCreditTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
+          whatRegularIncomeDoYouReceive.pensionTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
+          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
+          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+        ],
+        [
+          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
+          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
+        ],
+      ],
+    });
+    await softErrorMessageValidation('priorityDebts', priorityDebtsErrorValidation);
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
+    });
+    await softErrorMessageValidation(
+      'what-other-regular-expenses-do-you-have',
+      whatOtherRegularExpensesDoYouHaveErrorValidation
+    );
+    await performAction('selectWhatOtherRegularExpensesDoYouHave');
+
+    await softErrorMessageValidation('otherConsiderations', otherConsiderationsErrorValidation);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+
+    await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
+    await performAction('uploadFiles');
+
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+
+    await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+
+    await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
+
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+
+    assertAllErrorMessageValidations();
+  });
+
+  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible', async () => {
+    await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
+    await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+    await softErrorMessageValidation('doYouHaveASolicitor', doYouHaveASolicitorErrorValidation);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+
+    await softErrorMessageValidation('defendantNameCapture', defendantNameCaptureErrorValidation);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
+    });
+
+    await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_MISSING_DESIGN);
+    await performAction('enterDateOfBirthDetails');
+
+    await softErrorMessageValidation('correspondenceAddress', NO_EMV_MISSING_DESIGN);
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+
+    await softErrorMessageValidation('contactPreferenceEmailOrPost', contactPreferenceEmailOrPostErrorValidation);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
+
+    await softErrorMessageValidation('contactPreferencesTelephone', contactPreferencesTelephoneErrorValidation);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+
+    await softErrorMessageValidation('contactPreferencesTextMessage', contactPreferencesTextMessageErrorValidation);
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+
+    await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
+    await performAction(
+      'disputeClaimInterstitial',
+      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
+    );
+
+    await softErrorMessageValidation('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
+
+    await softErrorMessageValidation('tenancyDateUnknown', tenancyDateUnknownErrorValidation);
+    await performAction('enterTenancyStartDetailsUnKnown', {
+      tsDay: '15',
+      tsMonth: '11',
+      tsYear: '2024',
+    });
+
+    await softErrorMessageValidation('confirmationOfNoticeGiven', confirmationOfNoticeGivenErrorValidation);
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+
+    await softErrorMessageValidation(
+      'confirmation-of-notice-date-when-not-provided',
+      noticeDateWhenNotProvidedErrorValidation
+    );
+    await performAction('enterNoticeDateKnown');
+
+    await softErrorMessageValidation('nonRentArrearsDispute', nonRentArrearsDisputeErrorValidation);
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
+
+    await softErrorMessageValidation('counterClaim', counterClaimErrorValidation);
+    await performAction('selectCounterClaim', {
+      option: counterClaim.yesRadioOption,
+    });
+
+    await softErrorMessageValidation('selectWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+
+    await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumErrorValidation);
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+
+    await softErrorMessageValidation('counterClaimFee', counterClaimFeeErrorValidation);
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+
+    await softErrorMessageValidation(
+      'counterClaimHaveYouAppliedForHelp',
+      counterClaimHaveYouAppliedForHelpErrorValidation
+    );
+    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
+    });
+    await softErrorMessageValidation('counterClaimAbout', counterClaimAboutErrorValidation);
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+
+    await softErrorMessageValidation(
+      'doYouWantToUploadFilesToSupportYourCounterclaim',
+      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
+    );
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
+    });
+
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+
+    await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
+    await performAction('readYourHouseholdAndCircumstances');
+
+    await softErrorMessageValidation('doYouHaveAnyDependantChildren', doYouHaveAnyDependantChildrenErrorValidation);
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+
+    await softErrorMessageValidation('doYouHaveAnyOtherDependants', doYouHaveAnyOtherDependantsErrorValidation);
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
+    });
+
+    await softErrorMessageValidation('doAnyOtherAdultsLiveInYourHome', doAnyOtherAdultsLiveInYourHomeErrorValidation);
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+
+    await softErrorMessageValidation(
+      'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
+      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation
+    );
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(1),
+    });
+
+    await softErrorMessageValidation('yourCircumstances', yourCircumstancesErrorValidation);
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+
+    await softErrorMessageValidation('exceptionalHardship', yourExceptionalHardShipErrorValidation);
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+
+    await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+
+    await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatRegularIncomeDoYouReceiveErrorValidation);
+    await performAction('selectWhatRegularIncomeDoYouReceive');
+    await softErrorMessageValidation(
+      'haveYouAppliedForUniversalCredit',
+      haveYouAppliedForUniversalCreditErrorValidation
+    );
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await softErrorMessageValidation('priorityDebts', priorityDebtsErrorValidation);
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await softErrorMessageValidation('priorityDebtDetails', priorityDebtDetailsErrorValidation);
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
+    await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatOtherRegularExpensesDoYouHaveErrorValidation);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave');
+
+    await softErrorMessageValidation('otherConsiderations', otherConsiderationsErrorValidation);
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+
+    await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
+    await performAction('uploadFiles');
+
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+
+    await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+
+    await softErrorMessageValidation('checkYourAnswersRTC', checkYourAnswersRTCErrorValidation);
+
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    assertAllErrorMessageValidations();
+  });
+});

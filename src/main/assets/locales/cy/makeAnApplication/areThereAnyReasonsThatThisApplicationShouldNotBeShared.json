@@ -1,9 +1,18 @@
 {
-  "pageTitle": "cyAre there any reasons that this application should not be shared with the other parties?",
-  "caption": "cyMake an application",
-  "heading": "cyAre there any reasons that this application should not be shared with the other parties?",
-  "question": "cyAre there any reasons that this application should not be shared with the other parties?",
+  "pageTitle": "A oes yna unrhyw resymau pam na ddylid rhannu'r cais hwn gyda'r partïon eraill?",
+  "caption": "Gwneud cais",
+  "heading": "A oes yna unrhyw resymau pam na ddylid rhannu'r cais hwn gyda'r partïon eraill?",
+  "mainQuestion": "A oes yna unrhyw resymau pam na ddylid rhannu'r cais hwn gyda'r partïon eraill?",
+  "reasonForNotSharingQuestion": "Rhowch reswm pam na ddylid rhannu'r cais hwn gyda'r parti arall",
+  "weUsuallySendACopyOfYourApplication": "Fel arfer rydym yn anfon copi o'ch cais at y partïon eraill (eich landlord, cymdeithas dai neu fenthyciwr morgeisi). Mae hyn yn rhoi cyfle iddynt ymateb iddo.",
+  "inSomeExceptionalCircumstances": "Mewn rhai amgylchiadau eithriadol, bydd y barnwr yn ystyried eich cais heb hysbysu'r parti arall yn gyntaf.",
+  "forExampleIf": "Er enghraifft, os:",
+  "itIsUrgent": "yw mor frys fel nad oes digon o amser i roi gwybod am y cais",
+  "couldUndermineTheOrder": "gall rhoi rhybudd i rywun danseilio'r gorchymyn rydych eisiau i'r llys ei ganiatáu.",
+  "youBelieveYouAreAtRisk": "rydych yn credu eich bod mewn risg gan y parti arall",
+  "weWillAskYouToProvideTheReason": "Byddwn yn gofyn i chi roi'r rheswm. Bydd y llys yn ystyried eich rheswm, ac efallai na fyddwch yn llwyddiannus.",
   "errors": {
-    "typeOfApplication": "cyYou must select whether there are any reasons that this application should not be shared with the other parties"
+    "confirmIfThereIsAReason": "Cadarnhewch p'un a oes yna reswm pam na ddylid rhannu'r cais hwn gyda'r partïon eraill",
+    "provideAReason": "Cadarnhewch pam na ddylid hysbysu'r partïon eraill"
   }
 }

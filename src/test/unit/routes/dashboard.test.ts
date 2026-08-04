@@ -1,15 +1,16 @@
-import type { Application, Response } from 'express';
+import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
 import type { Environment } from 'nunjucks';
 
-import * as caseReferenceMiddleware from '../../../main/middleware/caseReference';
+import { oidcMiddleware } from '../../../main/middleware/oidc';
 import { Logger } from '../../../main/modules/logger';
-import { getDashboardNotifications, getDashboardTaskGroups } from '../../../main/services/pcsApi';
 
 import dashboardRoutes, { getDashboardUrl } from '@routes/dashboard';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('../../../main/modules/logger', () => {
   const errorFn = jest.fn();
-  const loggerInstance = { error: errorFn };
+  const warnFn = jest.fn();
+  const loggerInstance = { error: errorFn, warn: warnFn };
   return {
     Logger: {
       getLogger: jest.fn(() => loggerInstance),
@@ -27,6 +28,26 @@ const mockRouter = {
   use: mockRouterUse,
 };
 
+/** Minimal `Request` for dashboard `/:caseReference` tests (handler only reads `params` + `session`). */
+function dashboardCaseRequest(options: {
+  caseReference: string | undefined;
+  sessionUser: { accessToken?: string } | undefined;
+}): Request {
+  const { caseReference, sessionUser } = options;
+  return {
+    params: caseReference === undefined ? {} : { caseReference },
+    session: { user: sessionUser },
+  } as unknown as Request;
+}
+
+function getDashboardCaseHandler(): RequestHandler {
+  const fn = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference/dashboard')?.[1];
+  if (typeof fn !== 'function') {
+    throw new Error('Dashboard /:caseReference/dashboard handler not registered');
+  }
+  return fn as RequestHandler;
+}
+
 jest.mock('express', () => {
   const actual = jest.requireActual('express');
 
@@ -37,30 +58,9 @@ jest.mock('express', () => {
   };
 });
 
-jest.mock('../../../main/middleware/caseReference', () => ({
-  caseReferenceParamMiddleware: jest.fn((req, res, next, caseReference) => {
-    // Simulate validatedCase being set by middleware so dashboard route can use it
-    res.locals.validatedCase = {
-      id: caseReference,
-      data: {
-        propertyAddress: {
-          AddressLine1: '10 Second Avenue',
-          AddressLine2: '',
-          AddressLine3: '',
-          PostTown: 'London',
-          County: '',
-          PostCode: 'W3 7RX',
-        },
-      },
-    };
-
-    return next();
-  }),
-}));
-
-jest.mock('../../../main/middleware/caseReference');
 jest.mock('config', () => ({
   get: jest.fn(() => 'mock-secret'),
+  has: jest.fn(() => false),
 }));
 jest.mock('jose', () => ({
   decodeJwt: jest.fn(() => ({ exp: 0, sub: 'user-1' })),
@@ -75,52 +75,76 @@ jest.mock('../../../main/middleware/oidc', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
 }));
 
-jest.mock('../../../main/services/pcsApi', () => {
-  const STATUS_MAP = {
-    AVAILABLE: { text: 'Available' },
-    NOT_AVAILABLE: { text: 'Not available' },
-  };
+const MISSING = '__MISSING_TRANSLATION__';
 
-  const TASK_GROUP_MAP = {
-    GROUP_ONE: 'Group one title',
-  };
+jest.mock('@modules/i18n', () => ({
+  getTranslationFunction: jest.fn(() => {
+    const strings: Record<string, string> = {
+      'dashboard:taskGroups.CLAIM': 'Claim section',
+      'dashboard:taskGroups.DOCUMENTS': 'Documents section',
+      'dashboard:tasks.ViewClaim.title': 'View claim title',
+      'dashboard:tasks.UploadDocuments.title': 'Upload docs title',
+      'dashboard:tasks.SubmitResponse.title': 'Submit response title',
+      'dashboard:tasks.RespondToClaim.title': 'Respond to claim title',
+      'dashboard:tasks.ViewResponse.title': 'View response title',
+      'dashboard:tasks.task-1.title': 'Task one title',
+      'dashboard:tasks.statuses.AVAILABLE': 'Available',
+      'dashboard:tasks.statuses.NOT_AVAILABLE': 'Not available',
+      'dashboard:tasks.statuses.COMPLETED': 'Completed',
+      'dashboard:tasks.statuses.IN_PROGRESS': 'In progress',
+      'dashboard:tasks.statuses.NOT_STARTED': 'Not started',
+      'dashboard:notifications.Defendant.CaseIssued.title': 'Case issued title',
+      'dashboard:notifications.Defendant.CaseIssued.body': 'The claim has been issued to you.',
+      'dashboard:notifications.Defendant.ResponseNotStarted.title': 'Your response',
+      'dashboard:notifications.Defendant.ResponseNotStarted.body': 'Start your response',
+    };
+    return ((key: string, opts?: { defaultValue?: string }) =>
+      strings[key] ?? opts?.defaultValue ?? MISSING) as import('i18next').TFunction;
+  }),
+}));
 
-  return {
-    STATUS_MAP,
-    TASK_GROUP_MAP,
-    getDashboardNotifications: jest.fn().mockResolvedValue([]),
-    getDashboardTaskGroups: jest.fn().mockResolvedValue([
-      {
-        groupId: 'GROUP_ONE',
-        tasks: [
-          {
-            templateId: 'task-1',
-            templateValues: { dueDate: '2025-01-01' },
-            status: 'AVAILABLE',
-          },
-          {
-            templateId: 'task-2',
-            templateValues: {},
-            status: 'NOT_AVAILABLE',
-          },
-        ],
-      },
-    ]),
-  };
-});
+jest.mock('@services/ccdCaseService', () => ({
+  ccdCaseService: {
+    getDashboardView: jest.fn(),
+  },
+}));
+
+const mockIsRespondToClaimEnabledForUser = jest.fn().mockResolvedValue(true);
+
+jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
+  isRespondToClaimEnabledForUser: (...args: unknown[]) => mockIsRespondToClaimEnabledForUser(...args),
+}));
 
 describe('Dashboard Routes', () => {
   let app: Application;
-  let logger: { error: jest.Mock };
+  let logger: { error: jest.Mock; warn: jest.Mock };
 
   beforeEach(() => {
     mockRouterGet.mockClear();
     mockRouterParam.mockClear();
     mockRouterUse.mockClear();
-    (getDashboardNotifications as jest.Mock).mockClear();
-    (getDashboardTaskGroups as jest.Mock).mockClear();
+    mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
+    (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValue({
+      notifications: [
+        {
+          templateId: 'Defendant.CaseIssued',
+          templateValues: {},
+        },
+      ],
+      taskGroups: [
+        {
+          groupId: 'CLAIM',
+          tasks: [
+            { templateId: 'ViewClaim', status: 'AVAILABLE' },
+            { templateId: 'SubmitResponse', status: 'NOT_AVAILABLE' },
+          ],
+        },
+      ],
+      propertyAddress: '10 Second Avenue, London, W3 7RX',
+    });
     logger = (Logger.getLogger as jest.Mock)();
     logger.error.mockClear();
+    logger.warn.mockClear();
 
     app = {
       locals: {
@@ -137,116 +161,355 @@ describe('Dashboard Routes', () => {
   });
 
   describe('Router pattern and wiring', () => {
-    it('should create dashboard router with param middleware', () => {
+    it('should mount dashboard router with OIDC middleware only (no caseReference param)', () => {
       dashboardRoutes(app);
 
       expect(mockRouterUse).toHaveBeenCalledTimes(1);
-      expect(mockRouterParam).toHaveBeenCalledWith(
-        'caseReference',
-        caseReferenceMiddleware.caseReferenceParamMiddleware
-      );
-      expect((app.use as jest.Mock).mock.calls[0][0]).toBe('/dashboard');
+      expect(mockRouterUse).toHaveBeenCalledWith(oidcMiddleware);
+      expect(mockRouterParam).not.toHaveBeenCalled();
+      expect((app.use as jest.Mock).mock.calls[0][0]).toBe('/case');
       expect((app.use as jest.Mock).mock.calls[0][1]).toBe(mockRouter);
     });
 
-    it('should render dashboard view with mapped task groups', async () => {
+    it('should render dashboard with notifications, task groups, and property address from getDashboardView', async () => {
       dashboardRoutes(app);
 
-      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        req: any,
-        res: Response
-      ) => Promise<void>;
+      const handler = getDashboardCaseHandler();
 
       const res = {
-        locals: {
-          validatedCase: {
-            id: '1234567890123456',
-            data: {
-              propertyAddress: {
-                AddressLine1: '10 Second Avenue',
-                AddressLine2: '',
-                AddressLine3: '',
-                PostTown: 'London',
-                County: '',
-                PostCode: 'W3 7RX',
-              },
-            },
-          },
-        },
         render: jest.fn(),
       } as unknown as Response;
 
-      await handler({}, res);
+      const next: NextFunction = jest.fn();
 
-      expect(getDashboardNotifications).toHaveBeenCalledWith(1234567890123456);
-      expect(getDashboardTaskGroups).toHaveBeenCalledWith(1234567890123456);
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        next
+      );
+
+      expect(ccdCaseService.getDashboardView).toHaveBeenCalledWith('access-token-1', '1234567890123456');
+      expect(next).not.toHaveBeenCalled();
 
       expect(res.render).toHaveBeenCalledWith(
         'dashboard',
         expect.objectContaining({
           propertyAddress: '10 Second Avenue, London, W3 7RX',
           dashboardCaseReference: '1234 5678 9012 3456',
+          helpSupportLinks: expect.any(Array),
         })
       );
 
       const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        notifications: { title: string; body: string }[];
         taskGroups: {
+          groupId: string;
           title: string;
           tasks: {
             title: { html: string };
-            hint?: { html: string };
             href?: string;
-            status: unknown;
+            status: { tag?: { text: string; classes: string } };
           }[];
         }[];
       };
 
+      expect(renderArgs.notifications).toEqual([
+        {
+          title: 'Case issued title',
+          body: 'The claim has been issued to you.',
+        },
+      ]);
+
       const [firstGroup] = renderArgs.taskGroups;
-      expect(firstGroup.title).toBe('Group one title');
+      expect(firstGroup.groupId).toBe('CLAIM');
+      expect(firstGroup.title).toBe('Claim section');
 
       const [availableTask, notAvailableTask] = firstGroup.tasks;
 
-      expect(availableTask.title.html).toContain('components/taskGroup/group_one/task-1.njk');
-      expect(availableTask.hint?.html).toContain('components/taskGroup/group_one/task-1-hint.njk');
-      expect(availableTask.href).toBe('/dashboard/1234567890123456/group_one/task-1');
+      expect(availableTask.title.html).toBe('View claim title');
+      expect(availableTask.href).toBe('/case/1234567890123456/view-the-claim');
+      expect(availableTask.status.tag?.text).toBe('Available');
+      expect(availableTask.status.tag?.classes).toBe('govuk-tag--blue');
 
-      expect(notAvailableTask.hint).toBeUndefined();
+      expect(notAvailableTask.title.html).toBe('Submit response title');
       expect(notAvailableTask.href).toBeUndefined();
+      expect(notAvailableTask.status).toEqual({});
     });
 
-    it('should log and rethrow when dashboard data fetch fails', async () => {
-      (getDashboardTaskGroups as jest.Mock).mockRejectedValueOnce(new Error('API failure'));
+    it('should use dashboardTaskPaths route pattern for UploadDocuments templateId', async () => {
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
+        notifications: [],
+        taskGroups: [
+          {
+            groupId: 'DOCUMENTS',
+            tasks: [{ templateId: 'UploadDocuments', status: 'AVAILABLE' }],
+          },
+        ],
+        propertyAddress: null,
+      });
 
       dashboardRoutes(app);
 
-      const handler = mockRouterGet.mock.calls.find(call => call[0] === '/:caseReference')?.[1] as (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        req: any,
-        res: Response
-      ) => Promise<void>;
+      const handler = getDashboardCaseHandler();
+
+      const res = { render: jest.fn() } as unknown as Response;
+      const next: NextFunction = jest.fn();
+
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        next
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string }[] }[];
+      };
+      const [configuredTask] = renderArgs.taskGroups[0].tasks;
+
+      expect(configuredTask.href).toBe('/case/1234567890123456/upload-additional-documents/start-evidence-upload');
+    });
+
+    it('should disable href for COMPLETED tasks and use configured href for AVAILABLE view-response', async () => {
+      const configMock = jest.requireMock('config') as { has: jest.Mock; get: jest.Mock };
+
+      configMock.has.mockImplementation((key: string) => key === 'dashboard.taskRoutes');
+      configMock.get.mockImplementation((key: string) =>
+        key === 'dashboard.taskRoutes'
+          ? {
+              'Defendant.RespondToClaim': '/case/:caseReference/respond-to-claim/start-now',
+              'Defendant.ViewResponse': '/case/:caseReference/view-response',
+            }
+          : 'mock-secret'
+      );
+
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
+        notifications: [],
+        taskGroups: [
+          {
+            groupId: 'RESPONSE',
+            tasks: [
+              { templateId: 'RespondToClaim', status: 'COMPLETED' },
+              { templateId: 'ViewResponse', status: 'AVAILABLE' },
+            ],
+          },
+        ],
+        propertyAddress: null,
+      });
+
+      dashboardRoutes(app);
+      const handler = getDashboardCaseHandler();
+
+      const res = { render: jest.fn() } as unknown as Response;
+      const next: NextFunction = jest.fn();
+
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        next
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string }[] }[];
+      };
+
+      const [responseGroup] = renderArgs.taskGroups;
+      const [respondToClaimTask, viewResponseTask] = responseGroup.tasks;
+
+      expect(respondToClaimTask.href).toBeUndefined();
+      expect(viewResponseTask.href).toBe('/case/1234567890123456/view-the-response');
+    });
+
+    it('should fall back to dashboard URL for unmapped task templateId', async () => {
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
+        notifications: [],
+        taskGroups: [
+          {
+            groupId: 'GROUP_ONE',
+            tasks: [{ templateId: 'task-1', status: 'AVAILABLE' }],
+          },
+        ],
+        propertyAddress: null,
+      });
+
+      dashboardRoutes(app);
+
+      const handler = getDashboardCaseHandler();
+
+      const res = { render: jest.fn() } as unknown as Response;
+      const next: NextFunction = jest.fn();
+
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        next
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { href?: string }[] }[];
+      };
+      const [task] = renderArgs.taskGroups[0].tasks;
+
+      expect(task.href).toBe('/dashboard/1234567890123456/group_one/task-1');
+    });
+
+    it('should omit notifications when translation is missing and log a warning', async () => {
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
+        notifications: [{ templateId: 'Defendant.UnknownNotice', templateValues: {} }],
+        taskGroups: [],
+        propertyAddress: null,
+      });
+
+      dashboardRoutes(app);
+
+      const handler = getDashboardCaseHandler();
+
+      const res = { render: jest.fn() } as unknown as Response;
+      const next: NextFunction = jest.fn();
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 't' },
+        }),
+        res,
+        next
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as { notifications: unknown[] };
+      expect(renderArgs.notifications).toEqual([]);
+      expect(logger.warn).toHaveBeenCalledWith(
+        'No dashboard translation for notification templateId=Defendant.UnknownNotice'
+      );
+    });
+
+    it('should pass errors to next when dashboard data fetch fails', async () => {
+      const failure = new Error('API failure');
+      (ccdCaseService.getDashboardView as jest.Mock).mockRejectedValueOnce(failure);
+
+      dashboardRoutes(app);
+
+      const handler = getDashboardCaseHandler();
 
       const res = {
-        locals: {
-          validatedCase: {
-            id: '1234567890123456',
-            data: {},
-          },
-        },
+        render: jest.fn(),
       } as unknown as Response;
 
-      await expect(handler({}, res)).rejects.toThrow('API failure');
+      const next: NextFunction = jest.fn();
 
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 't' },
+        }),
+        res,
+        next
+      );
+
+      expect(next).toHaveBeenCalledWith(failure);
+      expect(res.render).not.toHaveBeenCalled();
       expect(logger.error).toHaveBeenCalledWith(
         'Failed to fetch dashboard data for case 1234567890123456. Error was: Error: API failure'
       );
+    });
+
+    it('should return 404 when case reference is invalid', async () => {
+      dashboardRoutes(app);
+      const handler = getDashboardCaseHandler();
+
+      const next: NextFunction = jest.fn();
+      await handler(
+        dashboardCaseRequest({
+          caseReference: 'not-a-case-ref',
+          sessionUser: { accessToken: 't' },
+        }),
+        { render: jest.fn() } as unknown as Response,
+        next
+      );
+
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Invalid case reference format' }));
+      expect(ccdCaseService.getDashboardView).not.toHaveBeenCalled();
+    });
+
+    it('should return 401 when access token is missing', async () => {
+      dashboardRoutes(app);
+      const handler = getDashboardCaseHandler();
+
+      const next: NextFunction = jest.fn();
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: {},
+        }),
+        { render: jest.fn() } as unknown as Response,
+        next
+      );
+
+      expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Authentication required' }));
+      expect(ccdCaseService.getDashboardView).not.toHaveBeenCalled();
+    });
+
+    it('should hide respond-to-claim task links and notifications when the feature flag is off', async () => {
+      mockIsRespondToClaimEnabledForUser.mockResolvedValueOnce(false);
+
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
+        notifications: [
+          { templateId: 'Defendant.CaseIssued', templateValues: {} },
+          { templateId: 'Defendant.ResponseNotStarted', templateValues: {} },
+        ],
+        taskGroups: [
+          {
+            groupId: 'RESPONSE',
+            tasks: [{ templateId: 'RespondToClaim', status: 'AVAILABLE' }],
+          },
+        ],
+        propertyAddress: null,
+      });
+
+      dashboardRoutes(app);
+      const handler = getDashboardCaseHandler();
+
+      const res = { render: jest.fn() } as unknown as Response;
+      const next: NextFunction = jest.fn();
+
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        next
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        notifications: unknown[];
+        taskGroups: { tasks: { href?: string }[] }[];
+      };
+
+      expect(renderArgs.notifications).toEqual([
+        {
+          title: 'Case issued title',
+          body: 'The claim has been issued to you.',
+        },
+      ]);
+      expect(renderArgs.taskGroups[0].tasks[0].href).toBeUndefined();
     });
   });
 
   describe('getDashboardUrl helper', () => {
     it('should return dashboard URL with valid 16-digit case reference', () => {
       const result = getDashboardUrl('1234567890123456');
-      expect(result).toBe('/dashboard/1234567890123456');
+      expect(result).toBe('/case/1234567890123456/dashboard');
     });
 
     it('should return null for invalid case reference', () => {
@@ -261,7 +524,7 @@ describe('Dashboard Routes', () => {
 
     it('should handle numeric case IDs', () => {
       const result = getDashboardUrl(1771325608502536);
-      expect(result).toBe('/dashboard/1771325608502536');
+      expect(result).toBe('/case/1771325608502536/dashboard');
     });
   });
 });

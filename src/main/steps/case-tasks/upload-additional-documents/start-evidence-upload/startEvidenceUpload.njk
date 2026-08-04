@@ -1,0 +1,67 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
+
+{% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+
+{% block serviceNavigation %}
+  {{ govukServiceNavigation({
+    navigation: [
+      {
+        text: t('logout', 'Sign out'),
+        href: "/logout"
+      }
+    ],
+    navigationLabel: t('navigationLabel', 'Service navigation'),
+    navigationClasses: "pcs-service-navigation-wrapper"
+  }) }}
+{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ title }}</h1>
+
+  <p class="govuk-body">{{ leadParagraph }}</p>
+  <p class="govuk-body">{{ paragraphShare }}</p>
+  <p class="govuk-body">{{ paragraphWithoutNotice }}</p>
+
+  <h2 class="govuk-heading-m">{{ whatYouCanUploadHeading }}</h2>
+  <p class="govuk-body">{{ exampleIntro }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ exampleBullet1 }}</li>
+    <li>{{ exampleBullet2 }}</li>
+    <li>{{ exampleBullet3 }}</li>
+    <li>{{ exampleBullet4 }}</li>
+  </ul>
+
+  <p class="govuk-body">{{ fileTypesIntro }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ fileTypeDoc }}</li>
+    <li>{{ fileTypeXls }}</li>
+    <li>{{ fileTypePpt }}</li>
+    <li>{{ fileTypePdf }}</li>
+    <li>{{ fileTypeRtf }}</li>
+    <li>{{ fileTypeTxt }}</li>
+    <li>{{ fileTypeCsv }}</li>
+    <li>{{ fileTypeJpg }}</li>
+    <li>{{ fileTypePng }}</li>
+    <li>{{ fileTypeBmp }}</li>
+    <li>{{ fileTypeTif }}</li>
+  </ul>
+
+  <p class="govuk-body">{{ restrictions }}</p>
+
+  <form method="post" action="{{ url }}" novalidate>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.startNow', 'Start now'),
+        isStartButton: true
+      }) }}
+    </div>
+    {{ csrfProtection(csrfToken) }}
+  </form>
+{% endblock %}

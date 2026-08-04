@@ -30,15 +30,19 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
-const mockBuildCcdCaseForPossessionClaimResponse = jest.fn();
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
+const mockSaveDraftDefendantResponse = jest.fn();
+const mockBuildDraftDefendantResponse = jest.fn(() => ({
+  defendantResponses: {},
+  defendantContactDetails: { party: {} },
+}));
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: mockBuildDraftDefendantResponse,
+  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
 }));
 
 const t = ((key: string) => {
   const translations: Record<string, string> = {
     pageTitle: 'Instalment payments',
-    caption: 'Respond to a property possession claim',
     heading: 'Instalment offer',
     paragraph1: 'Paragraph one',
     paragraph2: 'Paragraph two',
@@ -60,7 +64,7 @@ const t = ((key: string) => {
     contactUsForHelp: 'Contact us for help',
     contactUsForHelpText: 'You can contact us for help.',
   };
-  return translations[key] || key;
+  return key in translations ? translations[key] : key;
 }) as unknown as (key: string, options?: unknown) => string;
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
@@ -88,7 +92,7 @@ describe('respond-to-claim installment-payments step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
+    mockSaveDraftDefendantResponse.mockResolvedValue(undefined);
   });
 
   it('exposes correct step url and view', () => {
@@ -115,11 +119,14 @@ describe('respond-to-claim installment-payments step', () => {
     }
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(expect.anything(), {
-      defendantResponses: {
-        paymentAgreement: { repayArrearsInstalments: 'YES' },
-      },
-    });
+    expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: expect.objectContaining({
+          paymentAgreement: expect.objectContaining({ repayArrearsInstalments: 'YES' }),
+        }),
+      })
+    );
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });
 });

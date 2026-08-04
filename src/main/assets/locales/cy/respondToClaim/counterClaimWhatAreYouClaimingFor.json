@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Beth yw eich gwrth-hawliad?",
+  "heading": "Beth ydych chi’n ei hawlio?",
+  "options": {
+    "paymentOrCompensation": "Swm o arian neu iawndal",
+    "somethingElse": "Rhywbeth arall",
+    "both": "Y ddau"
+  },
+  "errors": {
+    "claimType": {
+      "required": "Dewiswch os ydych yn hawlio am swm o arian neu iawndal, y ddau neu rywbeth arall"
+    }
+  }
+}

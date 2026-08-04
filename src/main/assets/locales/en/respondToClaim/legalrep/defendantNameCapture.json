@@ -3,6 +3,10 @@
   "pageTitle": "Your client’s name",
   "errors": {
     "firstName": "Enter your client’s first name",
-    "lastName": "Enter your client’s last name"
+    "firstNameMaxLength": "Client’s first name must be 60 characters or less",
+    "firstNameInvalidCharacters": "Client’s first name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
+    "lastName": "Enter your client’s last name",
+    "lastNameMaxLength": "Client’s last name must be 60 characters or less",
+    "lastNameInvalidCharacters": "Client’s last name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
   }
 }

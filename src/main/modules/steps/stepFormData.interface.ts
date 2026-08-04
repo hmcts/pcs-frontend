@@ -1,6 +1,8 @@
-import { RequestHandler } from 'express';
+import { Request, RequestHandler } from 'express';
 
+import type { DocumentStorage } from '@modules/documents/storage';
 import { GetController, type SupportedLang } from '@modules/steps';
+import type { UploadValidationOptions } from '@utils/documentUploadValidation';
 
 export interface ErrorField {
   field: string;
@@ -23,4 +25,14 @@ export interface StepDefinition {
   postController?: { post: RequestHandler };
   middleware?: RequestHandler[];
   showCancelButton?: boolean;
+  // Storage adapter for upload steps — encapsulates where documents are persisted
+  // (CCD draft for respond-to-claim, session for make-an-application).
+  // Absent on every non-upload step. The upload handler refuses requests targeting
+  // a step that does not declare this.
+  documentStorage?: DocumentStorage;
+  // Per-step upload validation. When set, documentProxy applies these on uploads to this step
+  // and formBuilder auto-wires matching macro params for client-side preflight.
+  uploadValidation?: UploadValidationOptions;
+  // Truthy/falsy — consumers coerce. Lets `req => validatedCase?.foo` work without a Boolean(...) wrap.
+  isAnswered?: (req: Request) => unknown;
 }

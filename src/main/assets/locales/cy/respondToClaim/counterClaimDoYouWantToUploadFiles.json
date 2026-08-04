@@ -1,0 +1,9 @@
+{
+  "pageTitle": "Ydych chi eisiau uwchlwytho ffeiliau?",
+  "heading": "Ydych chi eisiau uwchlwytho ffeiliau i gefnogi eich gwrth-hawliad?",
+  "paragraph1": "Nid oes angen uwchlwytho datganiadau tyst ar hyn o bryd, rhoddir cyfarwyddiadau ar gyfer cyfnewid datganiadau tyst yn nes ymlaen.",
+  "paragraph2": "Bydd yr hawlydd yn gallu gweld y ffeiliau hyn.",
+  "errors": {
+    "counterClaimWantToUploadFiles": "Dewiswch os ydych eisiau uwchlwytho ffeiliau i gefnogi eich gwrth-hawliad"
+  }
+}

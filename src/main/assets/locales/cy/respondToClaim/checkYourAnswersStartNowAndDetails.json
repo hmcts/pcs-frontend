@@ -1,0 +1,23 @@
+{
+  "pageTitle": "Gwirio eich atebion",
+  "cardTitle": "Cyngor cyfreithiol am ddim",
+  "rows": {
+    "freeLegalAdvice": {
+      "label": "A ydych wedi cael unrhyw gyngor cyfreithiol am ddim?",
+      "changeHidden": "cyngor cyfreithiol am ddim",
+      "options": {
+        "YES": "Ydy",
+        "NO": "Nac ydy",
+        "PREFER_NOT_TO_SAY": "Mae'n well gen i beidio dweud"
+      }
+    },
+    "hasSolicitor": {
+      "label": "A oes gennych gyfreithiwr?",
+      "changeHidden": "cy do you have a solicitor",
+      "options": {
+        "YES": "Ydy",
+        "NO": "Nac ydy"
+      }
+    }
+  }
+}

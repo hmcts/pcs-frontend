@@ -1,10 +1,8 @@
-import { test } from '@playwright/test';
-import config from 'config';
-
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
-const home_url = config.get('e2e.testUrl') as string;
+const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
@@ -18,7 +16,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Error page to indicate Page Not Found error @nightly', () => {
-  test('Content Validation on Page not found page @PR', async () => {
+  test('Content Validation on Page not found page', async () => {
     await performAction('navigateToUrl', home_url + '/page-not-found');
   });
 

@@ -1,8 +1,8 @@
 export const tenancyTypeDetails = {
   mainHeader: `Tenancy, occupation contract or licence agreement`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   whenTheyMadeClaimHintText: `When they made their claim, ${process.env.CLAIMANT_NAME} had to give details about the type of tenancy, occupation contract or licence agreement you signed to rent your property, and the date it began, if known.`,
-  detailsGivenByClaimantParagraph: `Details given by ${process.env.CLAIMANT_NAME}:`,
+  //Add the missing colon at the end of line 5 when HDPI-7696 BUG is fixed
+  detailsGivenByClaimantParagraph: `Details given by ${process.env.CLAIMANT_NAME}`,
   isTenancyTypeCorrectQuestion: `Is the tenancy, occupation contract or licence agreement type correct?`,
   giveCorrectTenancyTypeHiddenTextLabel: `Give the correct tenancy, occupation contract or licence type`,
   giveCorrectTenancyTypeTextInput: `Short term tenancy`,
@@ -14,6 +14,9 @@ export const tenancyTypeDetails = {
   saveAndContinueButton: `Save and continue`,
   backLink: `Back`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
+  emojiTextInput: `👉 😄`,
+  emojiGiveTheCorrectTenancyTypeErrorMessage: `Give the correct tenancy, occupation contract or licence type must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   selectIfTenancyDetailsErrorMessage: `Select if these tenancy, licence or occupation contract details are correct`,
   enterCorrectTenancyDetailsErrorMessage: `Enter the correct tenancy, licence or occupation contract details`,
+  characterLimitErrorMessage: `Tenancy, occupation contract or licence type must be 60 characters or less`,
 };

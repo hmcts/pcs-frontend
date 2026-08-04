@@ -3,6 +3,7 @@ import type { Environment } from 'nunjucks';
 
 import { buildComponentConfig } from './componentBuilders';
 import { buildConditionalContent, getNestedFieldName } from './conditionalFields';
+import { type FormError, getErrorMessage } from './errorUtils';
 import { getTranslation, normalizeCheckboxValue } from './helpers';
 
 import type { FormFieldConfig, FormFieldOption } from '@modules/steps/formBuilder/formFieldConfig.interface';
@@ -93,7 +94,7 @@ function resolveLabel(
   translations: Record<string, string>,
   fallback: string
 ): string {
-  if (!label) {
+  if (label === undefined) {
     return fallback;
   }
 
@@ -138,7 +139,11 @@ function processOptions(
     // Process conditionalText if provided
     let resolvedConditionalText: string | undefined;
     if (option.conditionalText) {
-      resolvedConditionalText = buildConditionalContent(option.conditionalText, translations);
+      if (typeof option.conditionalText === 'string') {
+        resolvedConditionalText = t(option.conditionalText);
+      } else {
+        resolvedConditionalText = buildConditionalContent(option.conditionalText, translations);
+      }
     }
 
     // Process subFields recursively if they exist
@@ -185,17 +190,14 @@ function processField(
   const fieldName = fieldNameOverride || field.name;
 
   // Resolve label (function or string)
-  let label = resolveLabel(
-    field.label,
-    translations,
-    field.translationKey?.label
-      ? getTranslation(t, field.translationKey.label, undefined, interpolation) || fieldName
-      : fieldName
-  );
+  const translatedFieldLabel = field.translationKey?.label
+    ? getTranslation(t, field.translationKey.label, undefined, interpolation)
+    : undefined;
+  let label = resolveLabel(field.label, translations, translatedFieldLabel ?? fieldName);
 
   // Fallback to translation key or field name if label is still empty
-  if (!label || label === fieldName) {
-    label = getTranslation(t, `${fieldName}Label`, fieldName, interpolation) || fieldName;
+  if (label === fieldName) {
+    label = getTranslation(t, `${fieldName}Label`, fieldName, interpolation) ?? fieldName;
   }
 
   let hint = field.hint;
@@ -223,7 +225,7 @@ export function translateFields(
   fields: FormFieldConfig[],
   t: TFunction,
   fieldValues: Record<string, unknown>,
-  errors: Record<string, string> = {},
+  errors: Record<string, FormError> = {},
   hasTitle = false,
   fieldPrefix = '',
   originalData?: Record<string, unknown>,
@@ -300,11 +302,12 @@ export function translateFields(
     }
 
     // Build translated options for component builder (backward compatible format)
-    const translatedOptions = field.options?.map(option => {
+    const translatedOptions = processedOptionsWithSubFields?.map(option => {
       const text = option.text || (option.translationKey ? t(option.translationKey) : null) || option.value;
+      const hint = option.hint ? getTranslation(t, option.hint, option.hint, interpolation) : undefined;
       const translatedOption = {
         ...option,
-        ...(option.divider ? { divider: t(option.divider, option.divider) } : { text }),
+        ...(option.divider ? { divider: t(option.divider, option.divider) } : { text, hint }),
       };
       return translatedOption;
     });
@@ -313,8 +316,11 @@ export function translateFields(
     const fieldNameForValueLookup =
       fieldPrefix && field.name.includes('.') ? field.name.split('.').pop() || field.name : field.name;
 
-    const hasError = errors[processedField.name] !== undefined;
-    const errorText = errors[processedField.name];
+    const fieldError = errors[processedField.name];
+    const hasError = fieldError !== undefined;
+    const errorText = fieldError !== undefined ? getErrorMessage(fieldError) : undefined;
+    const erroneousParts =
+      fieldError !== undefined && typeof fieldError !== 'string' ? fieldError.erroneousParts : undefined;
     // processedField.label is already resolved to a string by processField
     const resolvedLabel = typeof processedField.label === 'string' ? processedField.label : processedField.name;
     if (!nunjucksEnv) {
@@ -329,6 +335,7 @@ export function translateFields(
       translatedOptions,
       hasError: hasError || false,
       errorText,
+      erroneousParts,
       index,
       hasTitle,
       t,

@@ -1,6 +1,5 @@
 export const contactPreferencesTelephone = {
   mainHeader: `Contact by telephone`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
   weMightNeedToContactParagraph: `We might need to contact you by telephone with urgent updates about your case.`,
   areYouHappyToContactQuestion: `Are you happy to be contacted by telephone?`,

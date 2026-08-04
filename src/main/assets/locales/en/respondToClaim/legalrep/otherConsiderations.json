@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Anything else to tell",
+  "heading": "Other considerations",
+  "question": "Is there anything else the defendant wants to tell the court as part of their response?",
+  "otherConsiderationsDetailsLabel": "Give details about what else the defendant wants to tell the court",
+  "errors": {
+    "otherConsiderations": "Select if there is anything else the defendant wants to tell the court",
+    "otherConsiderationsDetails": "Enter details about what the defendant wants to tell the court",
+    "otherConsiderationsInvalid": "Give details about what else the defendant wants to tell the court must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
+    "otherConsiderationsDetailsMaxLength": "Details about what else the defendant wants to tell the court must be 6400 characters or less"
+  }
+}

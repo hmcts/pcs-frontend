@@ -1,0 +1,54 @@
+{
+  "pageTitle": "Check your answers",
+  "cardTitle": "Your circumstances",
+  "rows": {
+    "dependantChildren": {
+      "label": "Do you have any dependent children?",
+      "changeHidden": "dependent children"
+    },
+    "dependantChildrenDetails": {
+      "label": "Give details about your dependent children",
+      "changeHidden": "dependent children details"
+    },
+    "otherDependants": {
+      "label": "Do you have any other dependants?",
+      "changeHidden": "other dependants"
+    },
+    "otherDependantsDetails": {
+      "label": "Give details about your other dependants",
+      "changeHidden": "other dependants details"
+    },
+    "otherTenants": {
+      "label": "Do any other adults live in your home?",
+      "changeHidden": "other adults in your home"
+    },
+    "otherTenantsDetails": {
+      "label": "Give details about the other adults living in your home",
+      "changeHidden": "other adults details"
+    },
+    "alternativeAccommodation": {
+      "label": "Would you have somewhere else to live if you had to leave your home?",
+      "changeHidden": "alternative accommodation"
+    },
+    "alternativeAccommodationDate": {
+      "label": "When would you be able to move in?",
+      "changeHidden": "alternative accommodation move-in date"
+    },
+    "shareAdditionalCircumstances": {
+      "label": "Would you like to share anything about your circumstances?",
+      "changeHidden": "additional circumstances"
+    },
+    "shareAdditionalCircumstancesDetails": {
+      "label": "Give details about your circumstances",
+      "changeHidden": "additional circumstances details"
+    },
+    "exceptionalHardship": {
+      "label": "Would you experience exceptional hardship if you were asked to leave your home?",
+      "changeHidden": "exceptional hardship"
+    },
+    "exceptionalHardshipDetails": {
+      "label": "Give details about the exceptional hardship you’d experience",
+      "changeHidden": "exceptional hardship details"
+    }
+  }
+}

@@ -13,7 +13,7 @@ import {
   refreshTokenGrant,
 } from 'openid-client';
 
-import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '@modules/oidc';
+import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '../../../../main/modules/oidc';
 
 jest.mock('config');
 jest.mock('jose');
@@ -352,7 +352,7 @@ describe('OIDCModule', () => {
         });
         expect(mockRequest.session).not.toHaveProperty('codeVerifier');
         expect(mockRequest.session).not.toHaveProperty('nonce');
-        expect(mockResponse.redirect).toHaveBeenCalledWith('/');
+        expect(mockResponse.redirect).toHaveBeenCalledWith('/claims');
       });
 
       it('should redirect to returnTo URL when present', async () => {
@@ -450,7 +450,7 @@ describe('OIDCModule', () => {
         const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
         await callbackHandler(mockRequest, mockResponse, mockNext);
 
-        expect(mockResponse.redirect).toHaveBeenCalledWith('/');
+        expect(mockResponse.redirect).toHaveBeenCalledWith('/claims');
       });
 
       it('should handle missing session data', async () => {

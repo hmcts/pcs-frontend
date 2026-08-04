@@ -3,9 +3,14 @@
 @use 'phase-banner';
 @use 'service-navigation';
 @use 'timeout-modal';
+@use 'multi-file-upload';
 
 .section-border {
   border: 1px solid govuk-colour('blue');
+}
+
+.panel-error {
+  background: $govuk-error-colour;
 }
 
 .dashboard-notifications {
@@ -17,6 +22,11 @@
   }
 }
 
+.view-the-response .govuk-summary-list__key,
+.view-the-claim .govuk-summary-list__key {
+  @include govuk-typography-weight-regular($important: true);
+}
+
 .govuk-header__content {
   display: flex;
   align-items: center;
@@ -26,6 +36,16 @@
 .claim-journey-secondary-heading {
   color: $govuk-secondary-text-colour;
   font-weight: 300;
+}
+
+// Priority debt details: "Paid every:" week/month radios (15px gap; GOV.UK default is 10px)
+.priority-debt-details-paid-every-radios .govuk-radios__item {
+  margin-bottom: govuk-spacing(3);
+}
+
+.priority-debt-details-paid-every-radios .govuk-radios__item:last-child,
+.priority-debt-details-paid-every-radios .govuk-radios__item:last-of-type {
+  margin-bottom: 0;
 }
 
 .correspondence-address-form {
@@ -55,5 +75,81 @@
 
   #correspondenceAddress-addressSelectContainer {
     margin-bottom: 30px;
+  }
+}
+
+@include govuk-media-query($until: tablet) {
+  .govuk-footer__meta-item .govuk-footer__link {
+    display: inline-block;
+    line-height: 1.5;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+}
+
+// Hub task-list: keep each row on one line at tablet+ to match the Figma. On
+// mobile we let the default GDS wrapping take over so long titles stay readable.
+@include govuk-media-query($from: tablet) {
+  .pcs-task-list .govuk-task-list__link {
+    white-space: nowrap;
+  }
+}
+
+// Hub task-list dividers: Figma uses GOV.UK link blue for the rules above each
+// column instead of the default grey border colour, and a slightly thicker line.
+.pcs-task-list__divider {
+  border-bottom: 3px solid govuk-colour('blue');
+}
+
+// Document list seperator: mirror the govuk-summary-list row border for each doc listed.
+.pcs-document-list__item {
+  padding-top: govuk-spacing(3);
+  padding-bottom: govuk-spacing(3);
+  border-bottom: 1px solid $govuk-border-colour;
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+}
+
+// Task-list status tags: pinned to the Figma palette, bold per the design.
+.pcs-task-list {
+  .govuk-tag {
+    font-weight: 700;
+  }
+  .govuk-tag--green {
+    color: #005a30;
+    background-color: #cce2d8;
+  }
+  .govuk-tag--blue {
+    color: #144e81;
+    background-color: #d2e2f1;
+  }
+  .govuk-tag--yellow {
+    color: #594d00;
+    background-color: #fff7bf;
+  }
+  .govuk-tag--grey {
+    color: #383f43;
+    background-color: #eeefef;
+  }
+}
+
+// Fee breakdown summary list: Figma uses an even key/value split rather than the
+// default GOV.UK one-third key column, which leaves values too close to labels.
+.pcs-fee-summary-list {
+  @include govuk-media-query($from: tablet) {
+    .govuk-summary-list__key {
+      width: 50%;
+    }
+
+    .govuk-summary-list__value {
+      width: 50%;
+    }
   }
 }

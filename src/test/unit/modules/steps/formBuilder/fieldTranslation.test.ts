@@ -74,4 +74,134 @@ describe('translateFields', () => {
     expect(month.value).toBe('');
     expect(year.value).toBe('');
   });
+
+  it('resolves string conditionalText by calling t(key) directly', () => {
+    mockT = jest.fn((key: string) => (key === 'feeText' ? '<p>Fee info</p>' : key));
+
+    const result = translateFields(
+      [{ name: 'isClaimAmountKnown', type: 'radio', options: [{ value: 'yes', conditionalText: 'feeText' }] }],
+      mockT as unknown as TFunction,
+      {},
+      {},
+      false,
+      '',
+      {},
+      mockNunjucksEnv
+    );
+
+    expect(result[0].options?.[0].conditionalText).toBe('<p>Fee info</p>');
+    expect(mockT).toHaveBeenCalledWith('feeText');
+  });
+
+  it('passes prefix and suffix into input component config', () => {
+    const amountFields: FormFieldConfig[] = [
+      {
+        name: 'amount',
+        type: 'text',
+        translationKey: { label: 'amountLabel' },
+        prefix: { text: '£' },
+        suffix: { text: 'per month' },
+      },
+    ];
+
+    const result = translateFields(
+      amountFields,
+      mockT as unknown as TFunction,
+      { amount: '10.00' },
+      {},
+      false,
+      '',
+      {},
+      mockNunjucksEnv
+    );
+
+    const field = result[0] as FormFieldConfig;
+    const component = field.component as { prefix?: { text: string }; suffix?: { text: string } } | undefined;
+
+    expect(component?.prefix).toEqual({ text: '£' });
+    expect(component?.suffix).toEqual({ text: 'per month' });
+  });
+
+  it('translates option labels and hints for radio items', () => {
+    mockT = jest.fn((key: string) => {
+      const translations: Record<string, string> = {
+        question: 'Have you had free legal advice?',
+        'options.yes': 'Yes',
+        'options.yesHint': 'This includes advice from a solicitor.',
+      };
+      return translations[key] || key;
+    });
+
+    const result = translateFields(
+      [
+        {
+          name: 'hadLegalAdvice',
+          type: 'radio',
+          translationKey: {
+            label: 'question',
+          },
+          options: [{ value: 'yes', translationKey: 'options.yes', hint: 'options.yesHint' }],
+        },
+      ],
+      mockT as unknown as TFunction,
+      {},
+      {},
+      false,
+      '',
+      {},
+      mockNunjucksEnv
+    );
+
+    const items = result[0].component?.items as Record<string, unknown>[];
+    expect(items).toEqual([
+      {
+        value: 'yes',
+        text: 'Yes',
+        hint: { text: 'This includes advice from a solicitor.' },
+        checked: false,
+      },
+    ]);
+  });
+
+  it('preserves an explicit empty field label translation', () => {
+    mockT = jest.fn((key: string) => {
+      const translations: Record<string, string> = {
+        question: '',
+        'options.yes': 'Yes',
+        'options.no': 'No',
+      };
+      return key in translations ? translations[key] : key;
+    });
+
+    const result = translateFields(
+      [
+        {
+          name: 'confirmOtherAdults',
+          type: 'radio',
+          translationKey: {
+            label: 'question',
+          },
+          options: [
+            { value: 'yes', translationKey: 'options.yes' },
+            { value: 'no', translationKey: 'options.no' },
+          ],
+        },
+      ],
+      mockT as unknown as TFunction,
+      {},
+      {},
+      false,
+      '',
+      {},
+      mockNunjucksEnv
+    );
+
+    expect(result[0].component?.fieldset).toEqual({
+      legend: {
+        text: '',
+        isPageHeading: false,
+        classes: 'govuk-fieldset__legend--l',
+      },
+    });
+  });
 });

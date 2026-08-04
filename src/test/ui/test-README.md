@@ -135,9 +135,11 @@ await performValidationGroup(
 - IDAM_SYSTEM_PASSWORD
 - IDAM_SYSTEM_USERNAME
 - IDAM_PCS_USER_PASSWORD
-- CHANGE_ID
 - PCS_API_CHANGE_ID
 - DATA_STORE_URL_BASE
+- PCS_API_URL
+
+For **Jenkins nightly**, pick `E2E_TARGET_ENV` (`aat`, `demo`, `perftest`, or `ithc`). That drives Azure Key Vault `pcs-<env>`, `ENVIRONMENT` for Playwright, `TEST_URL`, and internal `PCS_API_URL` / `DATA_STORE_URL_BASE`. IdAM and S2S URLs are derived in `global-setup.config.ts` from `ENVIRONMENT`.
 
 ```bash
 yarn test:functional
@@ -190,19 +192,32 @@ Missing elements: Submit button, Continue link
 - Error Message Validation
 - Page Navigation tests
 
+### ErrorMessageValidation(EMV) conventions
+
+- Use `softErrorMessageValidation(pageKey, validationOrReason)` in journey specs.
+- Parameter 1 (`pageKey`): first-page key/name in the journey (for example `tenancyTypeDetails`).
+- Parameter 2 (`validationOrReason`): either the PFT error validation function for that page, or a custom string explaining why ErrorMessageValidation(EMV) is not executed yet.
+- Use a custom string when a page is read-only, a placeholder, or ErrorMessageValidation(EMV) design/PFT implementation is still pending.
+
 Please follow this confluence page for detailed instructions and guidelines- https://tools.hmcts.net/confluence/x/14FLd
 
 ## 10. CI Pipeline Stages
 
 ### PR & Master (Jenkinsfile_CNP)
 
-- **PR:** Runs functional tests (`@PR` scope) on Chrome. Optional full functional test if `enable_full_functional_tests` label is added.
-- **Master:** Runs functional tests (`@regression` scope) on Chrome. Sends Slack notification to `#hdp-qa-e2e-test-results` on failure.
+- **PR:** Runs `yarn test:functional` on Chrome.
+- **PR default scope:** `E2E_TEST_SCOPE=@sanity`.
+- **PR Label overrides: `enable_critical_test`:** Runs the critical tests (`E2E_TEST_SCOPE=@PR`) on Chrome.
+- **PR label overrides:**
+  - `e2e-tag:<tag>` sets `E2E_TEST_SCOPE` (for example `e2e-tag:@smoke`).
+  - `e2e-spec:<specFilter>` sets `E2E_SPEC` (spec path filter, case-sensitive).
+- **Important:** Do not add the `enable_full_functional_tests` label when you need `e2e-tag:` / `e2e-spec:` (including any newly added tags) to take effect. That label runs the full functional pipeline instead of the scoped PR run, so those overrides will not apply as intended.
+- **Master:** Keeps `E2E_TEST_SCOPE=@regression`.
 
 ### Nightly (Jenkinsfile_nightly)
 
-- **Schedule:** Mon–Fri at ~07:00.
-- **E2E tests:** Runs per-browser stages (Chrome, Firefox, Safari) with separate Allure reports for each.
-- **Accessibility:** Runs `@accessibility` tests on Chrome.
-- **Slack:** Sends notification to `#hdp-qa-e2e-test-results` with links to all 4 reports (Chrome, Firefox, Safari, Accessibility).
-- **Stage behaviour:** If a browser fails, the stage shows red but the pipeline continues to the next browser. All stages always run.
+- **Runs:** `yarn test:E2e` for each selected browser/device stage.
+- **Tag/scope logic:** `PLAYWRIGHT_GREP_TAG` maps to `E2E_TEST_SCOPE` (`@nightly`, `@smoke`, `@e2e`, or `@regression`).
+- **Spec logic:** `PLAYWRIGHT_SPEC` maps to `E2E_SPEC` (path filter, case-sensitive).
+- **Defaults:** Chrome is enabled by default; other platforms are optional.
+- **Reporting:** Each stage publishes its own Allure report and Slack message. Failed stages do not stop later stages.

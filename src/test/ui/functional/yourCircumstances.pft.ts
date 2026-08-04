@@ -1,9 +1,4 @@
-import {
-  dashboard,
-  feedback,
-  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
-  yourCircumstances,
-} from '../data/page-data';
+import { feedback, wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome, yourCircumstances } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -22,6 +17,13 @@ export async function yourCircumstancesErrorValidation(): Promise<void> {
     header: yourCircumstances.thereIsAProblemErrorMessageHeader,
     message: yourCircumstances.mustBe500CharactersOrFewerErrorMessage,
   });
+  //emoji validation
+  await performAction('inputText', yourCircumstances.giveDetailsHiddenTextLabel, yourCircumstances.emojiTextInput);
+  await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: yourCircumstances.thereIsAProblemErrorMessageHeader,
+    message: yourCircumstances.emojiGiveGiveDetailsAboutYourCircumstancesErrorMessage,
+  });
 }
 
 export async function yourCircumstancesNavigationTests(): Promise<void> {
@@ -35,5 +37,4 @@ export async function yourCircumstancesNavigationTests(): Promise<void> {
     wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader
   );
   await performAction('clickRadioButton', yourCircumstances.noRadioOption);
-  await performValidation('pageNavigation', yourCircumstances.saveForLaterButton, dashboard.mainHeader);
 }

@@ -1,4 +1,4 @@
-import { CcdCase, CcdCaseAddress, YesNoEnum } from '@services/ccdCase.interface';
+import { CcdCase, CcdCaseAddress, YesNoEnum, YesNoNotSureValue } from '@services/ccdCase.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 
 const buildModel = (overrides: Partial<CcdCase> = {}): CcdCaseModel => {
@@ -27,7 +27,7 @@ describe('CcdCaseModel', () => {
 
       expect(model.data).toEqual({});
       expect(model.id).toBe('');
-      expect(model.claimIssueDate).toBe('');
+      expect(model.dateIssued).toBeUndefined();
       expect(model.defendantName).toBe('');
       expect(model.defendantAddress).toBe('');
       expect(model.claimantName).toBe('');
@@ -189,7 +189,6 @@ describe('CcdCaseModel', () => {
       });
 
       expect(model.defendantContactDetailsPartyAddress).toEqual(address);
-      expect(model.hasDefendantContactDetailsPartyAddress).toBe(true);
     });
 
     it('returns undefined when the address is missing or malformed', () => {
@@ -219,9 +218,7 @@ describe('CcdCaseModel', () => {
       });
 
       expect(emptyObjectAddressModel.defendantContactDetailsPartyAddress).toBeUndefined();
-      expect(emptyObjectAddressModel.hasDefendantContactDetailsPartyAddress).toBe(false);
       expect(arrayAddressModel.defendantContactDetailsPartyAddress).toBeUndefined();
-      expect(arrayAddressModel.hasDefendantContactDetailsPartyAddress).toBe(false);
     });
   });
 
@@ -246,12 +243,12 @@ describe('CcdCaseModel', () => {
       expect(model.isDefendantContactByText).toBe(false);
     });
 
-    it('normalizes confirm notice given answers from CCD values', () => {
+    it('normalizes possessionNoticeReceived answers from CCD values', () => {
       const yesModel = buildModel({
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: ' YES ',
+              possessionNoticeReceived: ' YES ' as unknown as YesNoNotSureValue,
             },
           },
         },
@@ -260,7 +257,7 @@ describe('CcdCaseModel', () => {
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: 'no',
+              possessionNoticeReceived: 'no' as unknown as YesNoNotSureValue,
             },
           },
         },
@@ -269,7 +266,7 @@ describe('CcdCaseModel', () => {
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: 'IM_NOT_SURE',
+              possessionNoticeReceived: 'IM_NOT_SURE' as unknown as YesNoNotSureValue,
             },
           },
         },
@@ -278,45 +275,169 @@ describe('CcdCaseModel', () => {
         data: {
           possessionClaimResponse: {
             defendantResponses: {
-              confirmNoticeGiven: '  maybe-later  ',
+              possessionNoticeReceived: '  maybe-later  ' as unknown as YesNoNotSureValue,
             },
           },
         },
       });
       const missingValueModel = buildModel();
 
-      expect(yesModel.defendantResponsesConfirmNoticeGiven).toBe('yes');
-      expect(noModel.defendantResponsesConfirmNoticeGiven).toBe('no');
-      expect(notSureModel.defendantResponsesConfirmNoticeGiven).toBe('imNotSure');
-      expect(customValueModel.defendantResponsesConfirmNoticeGiven).toBe('maybe-later');
-      expect(missingValueModel.defendantResponsesConfirmNoticeGiven).toBeUndefined();
+      expect(yesModel.defendantResponsesPossessionNoticeReceived).toBe('yes');
+      expect(noModel.defendantResponsesPossessionNoticeReceived).toBe('no');
+      expect(notSureModel.defendantResponsesPossessionNoticeReceived).toBe('imNotSure');
+      expect(customValueModel.defendantResponsesPossessionNoticeReceived).toBe('maybe-later');
+      expect(missingValueModel.defendantResponsesPossessionNoticeReceived).toBeUndefined();
+    });
+  });
+
+  describe('simple passthrough getters', () => {
+    it('returns top-level CcdCaseData fields when present', () => {
+      const model = buildModel({
+        data: {
+          rentArrears_Total: '500.00',
+          noticeServed: 'YES',
+          propertyAddress: address,
+          claimGroundSummaries: [{ groundCode: 'X', groundLabel: 'X' } as never],
+          userPcqIdSet: 'YES',
+          legislativeCountry: 'England',
+          tenancy_TypeOfTenancyLicence: 'ASSURED_TENANCY',
+          occupationLicenceTypeWales: 'OTHER',
+          possessionClaimResponse: { defendantResponses: { freeLegalAdvice: 'yes' } },
+          submitDraftAnswers: 'YES',
+          introGrounds_IntroductoryDemotedOrOtherGrounds: ['G1', 'G2'],
+          secureGroundsWales_DiscretionaryGrounds: ['W1'],
+        },
+      });
+
+      expect(model.rentArrears_Total).toBe('500.00');
+      expect(model.noticeServed).toBe('YES');
+      expect(model.propertyAddress).toEqual(address);
+      expect(model.claimGroundSummaries).toHaveLength(1);
+      expect(model.userPcqIdSet).toBe('YES');
+      expect(model.legislativeCountry).toBe('England');
+      expect(model.tenancy_TypeOfTenancyLicence).toBe('ASSURED_TENANCY');
+      expect(model.occupationLicenceTypeWales).toBe('OTHER');
+      expect(model.possessionClaimResponse).toEqual({ defendantResponses: { freeLegalAdvice: 'yes' } });
+      expect(model.submitDraftAnswers).toBe('YES');
+      expect(model.introGroundsIntroductoryDemotedOrOtherGrounds).toEqual(['G1', 'G2']);
+      expect(model.secureGroundsWalesDiscretionaryGrounds).toEqual(['W1']);
+    });
+
+    it('returns undefined / empty arrays when those fields are missing', () => {
+      const model = buildModel();
+
+      expect(model.rentArrears_Total).toBeUndefined();
+      expect(model.noticeServed).toBeUndefined();
+      expect(model.propertyAddress).toBeUndefined();
+      expect(model.claimGroundSummaries).toBeUndefined();
+      expect(model.userPcqIdSet).toBeUndefined();
+      expect(model.legislativeCountry).toBeUndefined();
+      expect(model.tenancy_TypeOfTenancyLicence).toBeUndefined();
+      expect(model.occupationLicenceTypeWales).toBeUndefined();
+      expect(model.possessionClaimResponse).toBeUndefined();
+      expect(model.submitDraftAnswers).toBeUndefined();
+      expect(model.introGroundsIntroductoryDemotedOrOtherGrounds).toEqual([]);
+      expect(model.secureGroundsWalesDiscretionaryGrounds).toEqual([]);
+    });
+
+    it('exposes defendantResponses passthroughs when populated', () => {
+      const model = buildModel({
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: {
+              tenancyStartDateConfirmation: 'YES',
+              tenancyStartDate: '2024-01-15',
+              freeLegalAdvice: 'yes',
+              defendantNameConfirmation: 'YES',
+              dateOfBirth: '1990-04-12',
+              landlordLicensed: 'NO',
+            },
+          },
+        },
+      });
+
+      expect(model.defendantResponsesTenancyStartDateConfirmation).toBe('YES');
+      expect(model.defendantResponsesTenancyStartDate).toBe('2024-01-15');
+      expect(model.defendantResponsesFreeLegalAdvice).toBe('yes');
+      expect(model.defendantResponsesDefendantNameConfirmation).toBe('YES');
+      expect(model.defendantResponsesDateOfBirth).toBe('1990-04-12');
+      expect(model.defendantResponsesLandlordLicensed).toBe('NO');
+    });
+
+    it('returns undefined for defendantResponses passthroughs when responses are missing', () => {
+      const model = buildModel();
+
+      expect(model.defendantResponsesTenancyStartDateConfirmation).toBeUndefined();
+      expect(model.defendantResponsesTenancyStartDate).toBeUndefined();
+      expect(model.defendantResponsesFreeLegalAdvice).toBeUndefined();
+      expect(model.defendantResponsesDefendantNameConfirmation).toBeUndefined();
+      expect(model.defendantResponsesDateOfBirth).toBeUndefined();
+      expect(model.defendantResponsesLandlordLicensed).toBeUndefined();
+    });
+
+    it('exposes defendantContactDetails.party fields when populated', () => {
+      const model = buildModel({
+        data: {
+          possessionClaimResponse: {
+            defendantContactDetails: {
+              party: {
+                emailAddress: 'a@example.com',
+                phoneNumber: '07000000000',
+                nameKnown: 'YES',
+              },
+            },
+          },
+        },
+      });
+
+      expect(model.defendantContactDetailsPartyEmailAddress).toBe('a@example.com');
+      expect(model.defendantContactDetailsPartyPhoneNumber).toBe('07000000000');
+    });
+
+    it('returns undefined / empty for defendantContactDetails.party when missing', () => {
+      const model = buildModel();
+
+      expect(model.defendantContactDetailsPartyEmailAddress).toBeUndefined();
+      expect(model.defendantContactDetailsPartyPhoneNumber).toBeUndefined();
+    });
+  });
+
+  describe('claimantEnteredDefendantDetails — claim-time flags', () => {
+    it('exposes addressKnown and addressSameAsProperty from the claimant snapshot', () => {
+      const model = buildModel({
+        data: {
+          possessionClaimResponse: {
+            claimantEnteredDefendantDetails: {
+              addressKnown: 'YES',
+              addressSameAsProperty: 'YES',
+            },
+          },
+        },
+      });
+
+      expect(model.claimantEnteredDefendantDetailsAddressKnown).toBe('YES');
+      expect(model.claimantEnteredDefendantDetailsAddressSameAsProperty).toBe('YES');
+    });
+
+    it('returns empty when the claimant snapshot is missing', () => {
+      const model = buildModel();
+
+      expect(model.claimantEnteredDefendantDetailsAddressKnown).toBe('');
+      expect(model.claimantEnteredDefendantDetailsAddressSameAsProperty).toBe('');
     });
   });
 
   describe('notice date', () => {
-    it('uses the first available notice date in precedence order', () => {
-      const handedOverModel = buildModel({
-        data: {
-          notice_NoticeHandedOverDateTime: '2024-05-01T09:30:00',
-          notice_NoticePostedDate: '2024-05-02',
-          notice_NoticeOtherElectronicDateTime: '2024-05-03T10:00:00',
-        },
-      });
-      const postedModel = buildModel({
-        data: {
-          notice_NoticePostedDate: '2024-05-02',
-          notice_NoticeOtherElectronicDateTime: '2024-05-03T10:00:00',
-        },
-      });
-      const electronicModel = buildModel({
-        data: {
-          notice_NoticeOtherElectronicDateTime: '2024-05-03T10:00:00',
-        },
-      });
-
-      expect(handedOverModel.noticeDate).toBe('2024-05-01T09:30:00');
-      expect(postedModel.noticeDate).toBe('2024-05-02');
-      expect(electronicModel.noticeDate).toBe('2024-05-03T10:00:00');
+    it.each([
+      ['notice_PostedDate', '2024-05-02', '2024-05-02'],
+      ['notice_DeliveredDate', '2024-05-02', '2024-05-02'],
+      ['notice_HandedOverDateTime', '2024-05-02T14:30:00', '2024-05-02'],
+      ['notice_EmailSentDateTime', '2024-05-02T00:30:00', '2024-05-02'],
+      ['notice_OtherElectronicDateTime', '2024-05-02T23:45:00', '2024-05-02'],
+      ['notice_OtherDateTime', '2024-05-02T12:00:00', '2024-05-02'],
+    ])('returns %s truncated to YYYY-MM-DD', (field, raw, expected) => {
+      const model = buildModel({ data: { [field]: raw } });
+      expect(model.noticeDate).toBe(expected);
     });
 
     it('returns undefined when no notice date exists', () => {

@@ -11,7 +11,7 @@ export const step: StepDefinition = createFormStep({
   customTemplate: `${__dirname}/isTheCourtHearingInTheNext14Days.njk`,
   fields: [
     {
-      name: 'courtHearingInNext14Days',
+      name: 'hearingInNext14Days',
       type: 'radio',
       required: true,
       errorMessage: 'errors.inNext14Days',

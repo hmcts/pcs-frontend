@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Unrhyw beth arall i'w ddweud",
+  "heading": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
+  "otherConsiderationsDetailsLabel": "Rhowch fanylion beth arall rydych eisiau ei ddweud wrth y llys",
+  "errors": {
+    "otherConsiderations": "Dewiswch oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys",
+    "otherConsiderationsDetails": "Rhowch fanylion yr hyn yr ydych am ei ddweud wrth y llys",
+    "otherConsiderationsInvalid": "Rhowch fanylion beth arall yr ydych am ei ddweud wrth y llys i gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod",
+    "otherConsiderationsDetailsMaxLength": "Rhaid i fanylion am beth arall rydych eisiau ei ddweud wrth y llys fod yn 6400 nod neu lai"
+  }
+}

@@ -10,7 +10,7 @@ import type { Environment } from 'nunjucks';
 import { z } from 'zod';
 import { makeZodI18nMap } from 'zod-i18n-map';
 
-import { pluralPossessive } from './formatters';
+import { ordinalDate, pluralPossessive } from './formatters';
 
 import { Logger } from '@modules/logger';
 
@@ -29,12 +29,12 @@ function firstExistingPath(paths: string[]): string | null {
 export async function findLocalesDir(): Promise<string | null> {
   const candidates = [
     process.env.LOCALES_DIR || '',
-    path.resolve(__dirname, '../../public/locales'),
-    path.resolve(__dirname, '../../../public/locales'),
-    path.resolve(process.cwd(), 'src/main/public/locales'),
     path.resolve(__dirname, '../../assets/locales'),
     path.resolve(__dirname, '../../../assets/locales'),
     path.resolve(process.cwd(), 'src/main/assets/locales'),
+    path.resolve(__dirname, '../../public/locales'),
+    path.resolve(__dirname, '../../../public/locales'),
+    path.resolve(process.cwd(), 'src/main/public/locales'),
   ].filter(Boolean);
 
   for (const candidate of candidates) {
@@ -178,7 +178,7 @@ function createI18nextConfig(localesDir: string, namespaces: string[]): InitOpti
     debug: false,
     saveMissing: false,
     interpolation: { escapeValue: false },
-    returnEmptyString: false,
+    returnEmptyString: true,
   };
 }
 
@@ -188,12 +188,12 @@ export class I18n {
   public enableFor(app: Express): void {
     const candidates = [
       process.env.LOCALES_DIR || '',
-      path.resolve(__dirname, '../../public/locales'),
-      path.resolve(__dirname, '../../../public/locales'),
-      path.resolve(process.cwd(), 'src/main/public/locales'),
       path.resolve(__dirname, '../../assets/locales'),
       path.resolve(__dirname, '../../../assets/locales'),
       path.resolve(process.cwd(), 'src/main/assets/locales'),
+      path.resolve(__dirname, '../../public/locales'),
+      path.resolve(__dirname, '../../../public/locales'),
+      path.resolve(process.cwd(), 'src/main/public/locales'),
     ].filter(Boolean);
 
     const localesDir = firstExistingPath(candidates);
@@ -220,6 +220,7 @@ export class I18n {
       });
 
     pluralPossessive(i18next);
+    ordinalDate(i18next);
 
     app.use(i18nextHandle(i18next));
 

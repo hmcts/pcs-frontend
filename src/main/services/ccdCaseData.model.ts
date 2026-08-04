@@ -4,6 +4,8 @@ import {
   CcdCaseData,
   CcdClaimGroundSummaryItem,
   CcdClaimantEnteredDefendantDetails,
+  CcdCollectionItem,
+  CcdCounterClaim,
   CcdDefendantParty,
   CcdDefendantResponses,
   PossessionClaimResponse,
@@ -27,8 +29,8 @@ export class CcdCaseModel {
     return this.validatedCase.id ?? '';
   }
 
-  get claimIssueDate(): string {
-    return this.data.claimIssueDate ?? '';
+  get dateIssued(): Date | undefined {
+    return this.data.dateIssued ? new Date(this.data.dateIssued) : undefined;
   }
 
   get defendantName(): string {
@@ -45,6 +47,10 @@ export class CcdCaseModel {
 
   get noticeServed(): string | undefined {
     return this.data.noticeServed;
+  }
+
+  get walesNoticeServed(): string | undefined {
+    return this.data.walesNoticeServed;
   }
 
   get propertyAddress(): CcdCaseAddress | undefined {
@@ -67,16 +73,28 @@ export class CcdCaseModel {
     return this.data.legislativeCountry;
   }
 
-  get notice_NoticeHandedOverDateTime(): string | undefined {
-    return this.data.notice_NoticeHandedOverDateTime;
+  get notice_HandedOverDateTime(): string | undefined {
+    return this.data.notice_HandedOverDateTime;
   }
 
-  get notice_NoticePostedDate(): string | undefined {
-    return this.data.notice_NoticePostedDate;
+  get notice_PostedDate(): string | undefined {
+    return this.data.notice_PostedDate;
   }
 
-  get notice_NoticeOtherElectronicDateTime(): string | undefined {
-    return this.data.notice_NoticeOtherElectronicDateTime;
+  get notice_OtherElectronicDateTime(): string | undefined {
+    return this.data.notice_OtherElectronicDateTime;
+  }
+
+  get notice_DeliveredDate(): string | undefined {
+    return this.data.notice_DeliveredDate;
+  }
+
+  get notice_EmailSentDateTime(): string | undefined {
+    return this.data.notice_EmailSentDateTime;
+  }
+
+  get notice_OtherDateTime(): string | undefined {
+    return this.data.notice_OtherDateTime;
   }
 
   get tenancy_TypeOfTenancyLicence(): string | undefined {
@@ -127,6 +145,10 @@ export class CcdCaseModel {
       return this.data.claimantName.trim();
     }
 
+    return this.orgName;
+  }
+
+  get orgName(): string {
     return this.data.possessionClaimResponse?.claimantOrganisations?.[0]?.value ?? '';
   }
 
@@ -138,6 +160,14 @@ export class CcdCaseModel {
 
   get claimantEnteredDefendantDetailsNameKnown(): string {
     return this.claimantEnteredDefendantDetails.nameKnown ?? '';
+  }
+
+  get claimantEnteredDefendantDetailsAddressKnown(): string {
+    return this.claimantEnteredDefendantDetails.addressKnown ?? '';
+  }
+
+  get claimantEnteredDefendantDetailsAddressSameAsProperty(): string {
+    return this.claimantEnteredDefendantDetails.addressSameAsProperty ?? '';
   }
 
   get claimantEnteredDefendantDetailsName(): string {
@@ -166,20 +196,12 @@ export class CcdCaseModel {
     return address as CcdCaseAddress;
   }
 
-  get defendantContactDetailsPartyAddressKnown(): string {
-    return this.defendantContactDetailsParty.addressKnown ?? '';
-  }
-
-  get hasDefendantContactDetailsPartyAddress(): boolean {
-    return this.defendantContactDetailsPartyAddressKnown === 'YES' && !!this.defendantContactDetailsPartyAddress;
-  }
-
   get defendantResponses(): CcdDefendantResponses | undefined {
     return this.data.possessionClaimResponse?.defendantResponses ?? undefined;
   }
 
-  get defendantResponsesTenancyStartDateCorrect(): string | undefined {
-    return this.defendantResponses?.tenancyStartDateCorrect ?? undefined;
+  get defendantResponsesTenancyStartDateConfirmation(): string | undefined {
+    return this.defendantResponses?.tenancyStartDateConfirmation ?? undefined;
   }
 
   get defendantResponsesTenancyStartDate(): string | undefined {
@@ -230,12 +252,16 @@ export class CcdCaseModel {
     return this.defendantResponses?.contactByPost ?? undefined;
   }
 
-  get defendantResponsesPreferenceType(): string | undefined {
-    return this.defendantResponses?.preferenceType ?? undefined;
-  }
-
   get defendantResponsesLandlordLicensed(): string | undefined {
     return this.defendantResponses?.landlordLicensed ?? undefined;
+  }
+
+  get defendantResponsesCounterClaimWantToUploadFiles(): string | undefined {
+    return this.defendantResponses?.counterClaimWantToUploadFiles ?? undefined;
+  }
+
+  get defendantResponsesCounterClaim(): CcdCounterClaim | undefined {
+    return this.defendantResponses?.counterClaim ?? undefined;
   }
 
   get introGroundsIntroductoryDemotedOrOtherGrounds(): string[] {
@@ -255,13 +281,9 @@ export class CcdCaseModel {
     return firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || '';
   }
 
-  get defendantContactDetailsPartyNameKnown(): string {
-    return this.defendantContactDetailsParty.nameKnown ?? '';
-  }
-
-  /** User's confirmation of notice given (yes/no/imNotSure). Used for arrears back-navigation after resume. */
-  get defendantResponsesConfirmNoticeGiven(): string | undefined {
-    const raw = this.defendantResponses?.confirmNoticeGiven;
+  /** Defendant's answer to "were you given notice" (normalised to yes/no/imNotSure). Used for arrears back-navigation after resume. */
+  get defendantResponsesPossessionNoticeReceived(): string | undefined {
+    const raw = this.defendantResponses?.possessionNoticeReceived;
     if (raw === undefined || raw === null) {
       return undefined;
     }
@@ -282,24 +304,20 @@ export class CcdCaseModel {
     return String(raw).trim();
   }
 
-  get defendantResponsesNoticeDate(): string | undefined {
-    return this.defendantResponses?.noticeDate ?? undefined;
+  get noticeDate(): string | undefined {
+    const populatedNoticeField = [
+      this.notice_PostedDate,
+      this.notice_DeliveredDate,
+      this.notice_HandedOverDateTime,
+      this.notice_EmailSentDateTime,
+      this.notice_OtherElectronicDateTime,
+      this.notice_OtherDateTime,
+    ].find(Boolean);
+
+    return populatedNoticeField?.slice(0, 10);
   }
 
-  /**
-   * First provided notice date from CCD case data, regardless of channel.
-   *
-   * Order of precedence:
-   * - notice_NoticeHandedOverDateTime (hand delivered)
-   * - notice_NoticePostedDate (posted)
-   * - notice_NoticeOtherElectronicDateTime (electronic)
-   */
-  get noticeDate(): string | undefined {
-    return (
-      this.notice_NoticeHandedOverDateTime ||
-      this.notice_NoticePostedDate ||
-      this.notice_NoticeOtherElectronicDateTime ||
-      undefined
-    );
+  get allLinkedDefendants(): CcdCollectionItem<CcdDefendantParty>[] | undefined {
+    return this.data.allLinkedDefendants;
   }
 }

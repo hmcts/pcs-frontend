@@ -8,7 +8,7 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
     message: contactPreferenceEmailOrPost.selectHowYouWantToReceiveUpdatesErrorMessage,
   });
 
-  await performAction('clickRadioButton', contactPreferenceEmailOrPost.byEmailRadioOption);
+  await performAction('check', contactPreferenceEmailOrPost.byEmailCheckbox);
   await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
@@ -84,6 +84,7 @@ export async function contactPreferenceEmailOrPostErrorValidation(): Promise<voi
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
     message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
   });
+  await performAction('inputText', contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel, 'test@test.com');
 }
 
 export async function contactPreferenceEmailOrPostNavigationTests(): Promise<void> {
@@ -96,16 +97,15 @@ export async function contactPreferenceEmailOrPostNavigationTests(): Promise<voi
     await performValidation(
       'pageNavigation',
       contactPreferenceEmailOrPost.backLink,
-      correspondenceAddress.correspondenceAddressUnKnownMainHeader
+      correspondenceAddress.correspondenceAddressPostalMainHeader
     );
   } else if (process.env.CORRESPONDENCE_ADDRESS === 'KNOWN') {
     await performValidation(
       'pageNavigation',
       contactPreferenceEmailOrPost.backLink,
-      correspondenceAddress.correspondenceAddressKnownMainHeader
+      correspondenceAddress.correspondenceAddressPostalMainHeader
     );
   }
   await performAction('clickRadioButton', contactPreferenceEmailOrPost.byPostRadioOption);
-  await performValidation('pageNavigation', contactPreferenceEmailOrPost.saveForLaterButton, dashboard.mainHeader);
    */
 }

@@ -1,11 +1,87 @@
 {
+  "serviceName": "Possession Claims",
   "caseReferenceLabel": "Case number:",
+  "iWantToHeading": "I want to...",
+  "askCourtToMakeOrder": "Ask the court to make an order (make a general application)",
+  "uploadAdditionalDocuments": "Upload additional documents",
   "helpAndSupportHeading": "Help and support",
+  "helpAndSupportAriaLabel": "Help and support",
   "contactInformationAriaLabel": "Support and contact information",
   "helpWithFees": "Help with fees",
-  "findOutAboutMediation": "Find out about mediation",
   "whatToExpectAtTheHearing": "What to expect at a hearing",
   "representMyselfAtTheHearing": "Represent myself at a hearing",
   "findLegalAdvice": "Find legal advice",
-  "findInformation": "Find information about my court"
+  "getDebtRespite": "Get debt respite (Breathing Space)",
+  "findInformation": "Find information about my court",
+
+  "taskGroups": {
+    "CLAIM": "The claim against you",
+    "HEARING": "Court hearings",
+    "JUDGEMENT": "Judgement from the court",
+    "NOTICE": "Orders and notices from the court",
+    "DOCUMENTS": "Documents",
+    "RESPONSE": "Your response",
+    "APPLICATIONS": "Applications"
+  },
+
+  "notifications": {
+    "Defendant": {
+      "CaseIssued": {
+        "title": "Case issued",
+        "body": "Your case has been issued. <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">View the claim</a>. Respond by {{responseEndDate}}."
+      },
+      "ResponseToClaim": {
+        "title": "Response to claim",
+        "body": "<a class=\"govuk-link\" href=\"{{respondToClaimUrl}}\">{{ctaLabel}}</a>"
+      },
+      "ResponseNotStarted": {
+        "title": "Your response",
+        "body": "You should respond to the claim before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Start your response</a>"
+      },
+      "ResponseInProgress": {
+        "title": "Your response",
+        "body": "You should complete your response before the hearing.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Continue with your response</a>"
+      },
+      "ResponseSubmitted": {
+        "title": "Your response",
+        "body": "You have responded to the claim."
+      },
+      "NoHearingArranged": {
+        "title": "A property possession claim has been made against you",
+        "body": "The court will arrange the hearing and contact you with details."
+      }
+    }
+  },
+
+  "tasks": {
+    "statuses": {
+      "AVAILABLE": "Available",
+      "IN_PROGRESS": "In progress",
+      "COMPLETED": "Completed",
+      "NOT_STARTED": "Not started"
+    },
+    "ViewClaim": { "title": "View the claim" },
+    "RespondToClaim": { "title": "Respond to the claim" },
+    "ViewResponse": { "title": "View the response" },
+    "ViewDocuments": { "title": "View documents" },
+    "ViewHearingDocuments": { "title": "View hearing documents" },
+    "ViewOrdersAndNotices": { "title": "View orders and notices" },
+    "UploadDocuments": { "title": "Upload additional documents" },
+    "ReviewResponse": { "title": "Review the response" },
+    "SubmitResponse": { "title": "Submit the response" },
+    "MakeGeneralApplication": { "title": "Ask the court to make an order (make a general application)" },
+    "ViewAllApplications": { "title": "View all applications" }
+  },
+
+  "viewDocuments": {
+    "pageTitle": "View documents",
+    "noDocuments": "There are no documents to display.",
+    "submittedOn": "Submitted on",
+    "folders": {
+      "statementsOfCase": "Statements of case",
+      "propertyDocuments": "Property documents",
+      "evidence": "Evidence",
+      "correspondence": "Correspondence"
+    }
+  }
 }

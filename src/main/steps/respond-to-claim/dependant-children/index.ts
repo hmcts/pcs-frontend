@@ -1,68 +1,64 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { fromYesNoEnum } from '../../utils';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type {
-  CaseData,
-  HouseholdCircumstances,
-  PossessionClaimResponse,
-  YesNoValue,
-} from '@services/ccdCase.interface';
+import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-you-have-any-dependant-children',
-  journeyFolder: 'respondToClaim',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.dependantChildren),
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/dependantChildren.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    caption: 'caption',
-    paragraph: 'dependantChildrenParagraph',
+    paragraph: 'dependentChildrenParagraph',
+    dependantQuestion: 'dependantQuestion',
   },
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const dependantChildren: string = req.body?.dependantChildren;
-
-    if (!dependantChildren) {
-      return;
-    }
-
-    const enumMapping: Record<string, YesNoValue> = {
-      yes: 'YES',
-      no: 'NO',
-    };
-
+    const enumMapping: Record<string, YesNoValue> = { yes: 'YES', no: 'NO' };
     const dependantChildrenCcd = enumMapping[dependantChildren];
-    if (!dependantChildrenCcd) {
-      return;
+
+    if (dependantChildrenCcd) {
+      response.defendantResponses.householdCircumstances.dependantChildren = dependantChildrenCcd;
+
+      if (dependantChildren === 'yes') {
+        response.defendantResponses.householdCircumstances.dependantChildrenDetails = req.body?.[
+          'dependantChildren.dependantChildrenDetails'
+        ] as string | undefined;
+      } else {
+        delete response.defendantResponses.householdCircumstances.dependantChildrenDetails;
+      }
+    } else {
+      delete response.defendantResponses.householdCircumstances.dependantChildren;
+      delete response.defendantResponses.householdCircumstances.dependantChildrenDetails;
     }
 
-    const dependantChildrenDetails: string | undefined =
-      dependantChildrenCcd === 'YES' ? req.body?.['dependantChildren.dependantChildrenDetails'] : undefined;
+    await saveDraftDefendantResponse(
+      req,
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances: {
-          dependantChildren: dependantChildrenCcd,
-          dependantChildrenDetails: dependantChildrenDetails ?? '',
-        },
-      },
-    };
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
   getInitialFormData: req => {
-    const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
     const householdCircumstances: HouseholdCircumstances | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const dependantChildrenCcd: YesNoValue | undefined = householdCircumstances?.dependantChildren;
+    // CCD round-trips YesOrNo PascalCase ("Yes"/"No") since pcs-api PR #1678, so a strict
+    // `=== 'YES'` compare here would mis-prefill the form as "no" on revisit and
+    // silently overwrite the stored YES on resubmit. fromYesNoEnum handles either casing.
+    const dependantChildrenForm = fromYesNoEnum(householdCircumstances?.dependantChildren);
 
-    if (!dependantChildrenCcd) {
+    if (!dependantChildrenForm) {
       return {};
     }
 
-    if (dependantChildrenCcd === 'YES') {
+    if (dependantChildrenForm === 'yes') {
       const dependantChildrenDetails: string | undefined = householdCircumstances?.dependantChildrenDetails;
       return {
         dependantChildren: 'yes',
@@ -81,7 +77,7 @@ export const step: StepDefinition = createFormStep({
       translationKey: {
         label: 'heading',
       },
-      errorMessage: 'errors.dependantChildren',
+      errorMessage: 'errors.dependentChildren',
       options: [
         {
           value: 'yes',
@@ -93,11 +89,11 @@ export const step: StepDefinition = createFormStep({
               required: true,
               maxLength: 500,
               translationKey: {
-                label: 'dependantChildrenDetailsLabel',
-                hint: 'dependantChildrenDetailsHint',
+                label: 'dependentChildrenDetailsLabel',
+                hint: 'dependentChildrenDetailsHint',
               },
               labelClasses: 'govuk-label--s',
-              errorMessage: 'errors.dependantChildrenDetails',
+              errorMessage: 'errors.dependentChildrenDetails',
             },
           },
         },

@@ -1,0 +1,25 @@
+import { priorityDebts } from '../data/page-data';
+import { performAction, performValidation } from '../utils/controller';
+
+export async function priorityDebtsErrorValidation(): Promise<void> {
+  await performAction('clickButton', priorityDebts.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: priorityDebts.errorValidationHeader,
+    message: priorityDebts.selectIfYouHaveErrorMessage,
+  });
+}
+// Needs to be enabled after counterclaim journey is implemented
+/*
+export async function priorityDebtsNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', priorityDebts.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    pageSlug: priorityDebts.pageSlug,
+  });
+  if (process.env.REGULAR_INCOME === 'UNIVERSAL_CREDIT') {
+    await performValidation('pageNavigation', priorityDebts.backLink, whatRegularIncomeDoYouReceive.mainHeader);
+  } else {
+    await performValidation('pageNavigation', priorityDebts.backLink, haveYouAppliedForUniversalCredit.mainHeader);
+  }
+  await performAction('clickRadioButton', priorityDebts.noRadioOption);
+}
+ */

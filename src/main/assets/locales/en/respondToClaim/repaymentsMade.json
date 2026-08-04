@@ -1,7 +1,6 @@
 {
   "pageTitle": "Payments made",
-  "caption": "Respond to a property possession claim",
-  "question": "Have you paid any money to {{claimantName}} since {{claimIssueDate}}?",
+  "question": "Have you paid any money to {{claimantName}} since {{dateIssued, ordinalDate}}?",
   "options": {
     "yes": "Yes",
     "no": "No"
@@ -10,6 +9,7 @@
   "textAreaHint": "You can enter up to 500 characters",
   "errors": {
     "repaymentsInfo": "Give details about how much you paid and when",
-    "confirmRepaymentsMade": "Select if you’ve paid any money to {{claimantName}} since {{claimIssueDate}}"
+    "repaymentsInfoMaxLength": "Payment details must be 500 characters or less",
+    "confirmRepaymentsMade": "Select if you’ve paid any money to {{claimantName}} since {{dateIssued, ordinalDate}}"
   }
 }

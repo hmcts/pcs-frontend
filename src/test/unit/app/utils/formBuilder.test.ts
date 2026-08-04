@@ -38,6 +38,9 @@ const mockGetNextStepUrl = jest.fn();
 const mockGetBackUrl = jest.fn();
 
 jest.mock('@modules/steps/flow', () => ({
+  // Keep the real getStepUrl so the saveForLater hub-redirect path is exercised
+  // end-to-end; only createStepNavigation needs stubbing for these tests.
+  ...jest.requireActual('@modules/steps/flow'),
   createStepNavigation: jest.fn(() => ({
     getNextStepUrl: (...args: unknown[]) => mockGetNextStepUrl(...args),
     getBackUrl: (...args: unknown[]) => mockGetBackUrl(...args),
@@ -52,7 +55,6 @@ jest.mock('@modules/steps/i18n', () => ({
   getValidatedLanguage: (...args: unknown[]) => mockGetValidatedLanguage(...args),
   getRequestLanguage: (...args: unknown[]) => mockGetRequestLanguage(...args),
   getTranslationFunction: (...args: unknown[]) => mockGetTranslationFunction(...args),
-  getStepNamespace: jest.fn((stepName: string) => stepName),
   loadStepNamespace: jest.fn(),
   getStepTranslations: jest.fn(() => ({})),
 }));
@@ -191,6 +193,52 @@ describe('formBuilder', () => {
       };
       const step = createFormStep(config);
       expect(step.url).toBe('/steps/test-journey/test-step');
+    });
+
+    it('should use configured basePath when flowConfig is resolved from the request', () => {
+      const config: FormBuilderConfig = {
+        ...baseConfig,
+        basePath: '/case/:caseReference/respond-to-claim',
+        flowConfig: () => flowConfig,
+      };
+
+      const step = createFormStep(config);
+
+      expect(step.url).toBe('/case/:caseReference/respond-to-claim/test-step');
+    });
+
+    it('should use request-resolved flow config when loading persisted form data', async () => {
+      const step = createFormStep({
+        ...baseConfig,
+        flowConfig: () => ({
+          ...flowConfig,
+          useSessionFormData: false,
+        }),
+      });
+      const res = {
+        render: jest.fn(),
+        locals: {},
+      } as unknown as Response;
+      const req = createMockRequest({
+        session: {
+          formData: {
+            'test-step': { testField: 'saved value' },
+          },
+        },
+        res,
+      } as unknown as Request);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const controller = (step.getController as any)();
+      await controller.get(req, res);
+
+      expect(mockGetFormData).not.toHaveBeenCalled();
+      expect(res.render).toHaveBeenCalledWith(
+        'formBuilder.njk',
+        expect.objectContaining({
+          fieldValues: { testField: '' },
+        })
+      );
     });
 
     it('should create getController that renders with form content', async () => {
@@ -891,7 +939,50 @@ describe('formBuilder', () => {
         );
 
         expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { testField: 'value' });
-        expect(res.redirect).toHaveBeenCalledWith(303, '/dashboard/1765881343803991');
+        expect(res.redirect).toHaveBeenCalledWith(303, '/case/1765881343803991/dashboard');
+      });
+
+      it('redirects saveForLater to the task-list hub when flowConfig has a hubStepName', async () => {
+        mockValidateForm.mockReturnValueOnce({});
+
+        const step = createFormStep({
+          ...baseConfig,
+          flowConfig: {
+            basePath: '/case/:caseReference/respond-to-claim',
+            hubStepName: 'task-list',
+            stepOrder: [],
+            steps: {},
+          },
+        });
+        const res = {
+          redirect: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          render: jest.fn(),
+          locals: {
+            validatedCase: { id: '1765881343803991' },
+          },
+        } as unknown as Response;
+
+        const req = createMockRequest({
+          body: {
+            action: 'saveForLater',
+            testField: 'value',
+          },
+          session: {
+            ccdCase: { id: '1765881343803991' },
+          },
+          res,
+        } as unknown as Request);
+
+        expect(step.postController?.post).toBeDefined();
+        await step.postController!.post(
+          req as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+          res,
+          jest.fn()
+        );
+
+        // Hub-first: a citizen with a task-list hub lands on the hub, never the dashboard (AC10).
+        expect(res.redirect).toHaveBeenCalledWith(303, '/case/1765881343803991/respond-to-claim/task-list');
       });
 
       it('should redirect to home when ccdId not available for saveForLater', async () => {
@@ -920,7 +1011,7 @@ describe('formBuilder', () => {
         expect(res.redirect).toHaveBeenCalledWith(303, '/');
       });
 
-      it('should show validation errors when saveForLater is clicked with invalid data', async () => {
+      it('bypasses validation on saveForLater and redirects', async () => {
         mockValidateForm.mockReturnValueOnce({ testField: 'This field is required' });
 
         const step = createFormStep(baseConfig);
@@ -951,22 +1042,9 @@ describe('formBuilder', () => {
           jest.fn()
         );
 
-        expect(res.status).toHaveBeenCalledWith(400);
-        expect(res.render).toHaveBeenCalledWith(
-          'formBuilder.njk',
-          expect.objectContaining({
-            errorSummary: expect.objectContaining({
-              errorList: expect.arrayContaining([
-                expect.objectContaining({
-                  href: '#testField',
-                  text: 'This field is required',
-                }),
-              ]),
-            }),
-            ccdId: '1765881343803991',
-          })
-        );
-        expect(res.redirect).not.toHaveBeenCalled();
+        expect(res.status).not.toHaveBeenCalledWith(400);
+        expect(res.render).not.toHaveBeenCalled();
+        expect(res.redirect).toHaveBeenCalledWith(303, '/case/1765881343803991/dashboard');
       });
 
       it('should normalize checkbox field for saveForLater', async () => {

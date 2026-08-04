@@ -1,8 +1,8 @@
 import config from 'config';
 import { Express, NextFunction, Request, Response } from 'express';
 import * as jose from 'jose';
-import * as client from 'openid-client';
 import type { Configuration, TokenEndpointResponse, UserInfoResponse } from 'openid-client';
+import * as client from 'openid-client';
 
 import type { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
@@ -217,7 +217,7 @@ export class OIDCModule {
           delete req.session.codeVerifier;
           delete req.session.nonce;
 
-          const returnTo = req.session.returnTo || '/';
+          const returnTo = req.session.returnTo || '/claims';
           delete req.session.returnTo;
           res.redirect(returnTo);
         });

@@ -8,7 +8,6 @@ export const rentArrears = {
   doYouOweThisQuestion: `Do you owe this amount in rent arrears?`,
   howMuchDoYouBelieveHiddenTextLabel: `How much do you believe you owe in rent arrears?`,
   rentArrearsAreMoneyParagraph: `Rent arrears are money you owe in rent payments.`,
-  theRentStatementParagraph: `The rent statement will have been included in the pack you received in the post letting you know a claim had been made against you, and is also available to view from ‘View the claim’ on your case overview.`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   imNotSureRadioOption: `I’m not sure`,
@@ -22,4 +21,6 @@ export const rentArrears = {
   lessThanBillionErrorMessage: `The amount you believe you owe in rent arrears must be less than £1 billion`,
   doYouOweThisAmountErrorMessage: `Do you owe this amount in rent arrears?`,
   enterAmountInCorrectFormatErrorMessage: `Enter how much you believe you owe in rent arrears, in the correct format (e.g. if you owe £148, please write £148.00)`,
+  whenTheyMadeTheirClaimParagraph: `When they made their claim, ${process.env.CLAIMANT_NAME} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
+  amountYouOweHeader: `Amount you owe in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
 };

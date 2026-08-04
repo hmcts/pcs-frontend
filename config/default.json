@@ -33,6 +33,7 @@
   },
   "ccd": {
     "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal",
+
     "caseTypeId": "PCS"
   },
   "osPostcodeLookup": {
@@ -56,6 +57,30 @@
         "channel": "default",
         "event": "general application",
         "keyword": "GAOnNotice"
+      },
+      "counterClaimFlatFeeFEE0450": {
+        "service": "other",
+        "jurisdiction1": "civil",
+        "jurisdiction2": "civil",
+        "channel": "default",
+        "event": "issue",
+        "keyword": "AnyOtherRemedy"
+      },
+      "counterClaimRanged": {
+        "service": "civil money claims",
+        "jurisdiction1": "civil",
+        "jurisdiction2": "civil",
+        "channel": "default",
+        "event": "issue",
+        "keyword": "CMCCounterRanged"
+      },
+      "counterClaim": {
+        "service": "civil money claims",
+        "jurisdiction1": "civil",
+        "jurisdiction2": "county court",
+        "channel": "default",
+        "event": "issue",
+        "keyword": "counter-claim"
       }
     }
   },
@@ -96,5 +121,24 @@
   },
   "xui": {
     "uri": "https://manage-case.aat.platform.hmcts.net"
+  },
+  "cdam": {
+    "url": "http://ccd-case-document-am-api-aat.service.core-compute-aat.internal"
+  },
+  "documentUpload": {
+    "maxFileSizePerFileMB": 1024,
+    "maxMediaFileSizeMB": 500,
+    "maxTotalFileSizeMB": 4096,
+    "maxDocumentFileSizeMB": 1024,
+    "maxFilenameLength": 255
+  },
+  "redirects": {
+    "manageCaseReturnURL": "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
+  },
+  "payment": {
+    "returnUrl": "https://pcs.aat.platform.hmcts.net/payment/return"
+  },
+  "launchdarkly": {
+    "env": "AAAAAAAA"
   }
 }

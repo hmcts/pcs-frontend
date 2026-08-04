@@ -1,22 +1,19 @@
 import type { Request } from 'express';
 
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
+import type { YesNoNotSureValue } from '@services/ccdCase.interface';
 
 const STEP_NAME = 'written-terms';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  journeyFolder: 'respondToClaim',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.writtenTerms),
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/writtenTerms.njk`,
   translationKeys: {
-    caption: 'caption',
     pageTitle: 'pageTitle',
     introText: 'introText',
   },
@@ -38,23 +35,24 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   getInitialFormData: async req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const writtenTerms = caseData?.possessionClaimResponse?.defendantResponses?.writtenTerms as string | undefined;
     return { writtenTerms };
   },
   beforeRedirect: async (req: Request) => {
+    const response = buildDraftDefendantResponse(req);
     const writtenTerms: YesNoNotSureValue | undefined = req.body?.writtenTerms;
 
-    if (!writtenTerms) {
-      return;
+    if (writtenTerms) {
+      response.defendantResponses.writtenTerms = writtenTerms;
+    } else {
+      delete response.defendantResponses.writtenTerms;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        writtenTerms,
-      },
-    };
+    await saveDraftDefendantResponse(
+      req,
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
 });

@@ -1,6 +1,5 @@
 export const landlordLicensed = {
   mainHeader: `Licensed landlord`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
   youCanCheckIfYourLandlord: `You can check if your landlord is licensed by searching the`,
   isYourLandlordLicensedQuestion: `Is your landlord licensed?`,

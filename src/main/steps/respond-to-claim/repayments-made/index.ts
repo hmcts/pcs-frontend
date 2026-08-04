@@ -1,19 +1,18 @@
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { getClaimantName } from '../../utils/getClaimantName';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CaseData, PaymentAgreement, PossessionClaimResponse, YesNoValue } from '@services/ccdCase.interface';
+import type { CaseData, PaymentAgreement, YesNoValue } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-made',
-  journeyFolder: 'respondToClaim',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.anyPaymentsMade),
   stepDir: __dirname,
-  flowConfig,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
+    heading: 'heading',
+    repaymentsMadeQuestion: 'repaymentsMadeQuestion',
   },
   fields: [
     {
@@ -48,24 +47,25 @@ export const step: StepDefinition = createFormStep({
     },
   ],
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
     const confirmRepaymentsMade: YesNoValue | undefined = req.body?.confirmRepaymentsMade;
-    if (!confirmRepaymentsMade) {
-      return;
+
+    if (confirmRepaymentsMade) {
+      response.defendantResponses.paymentAgreement.anyPaymentsMade = confirmRepaymentsMade;
+
+      if (confirmRepaymentsMade === 'YES') {
+        response.defendantResponses.paymentAgreement.paymentDetails =
+          (req.body?.['confirmRepaymentsMade.repaymentsInfo'] as string | undefined) ?? '';
+      } else {
+        delete response.defendantResponses.paymentAgreement.paymentDetails;
+      }
+    } else {
+      delete response.defendantResponses.paymentAgreement.anyPaymentsMade;
+      delete response.defendantResponses.paymentAgreement.paymentDetails;
     }
 
-    const paymentDetails: string | undefined =
-      confirmRepaymentsMade === 'YES' ? req.body?.['confirmRepaymentsMade.repaymentsInfo'] : undefined;
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        paymentAgreement: {
-          anyPaymentsMade: confirmRepaymentsMade,
-          paymentDetails: paymentDetails ?? '',
-        },
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: req => {
     const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
@@ -88,13 +88,13 @@ export const step: StepDefinition = createFormStep({
     };
   },
   extendGetContent: req => {
-    const validatedCase = req.res?.locals?.validatedCase;
+    const validatedCase = req.res?.locals.validatedCase;
     const claimantName = getClaimantName(req);
-    const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
+    const dateIssued = validatedCase?.dateIssued;
 
     return {
       claimantName,
-      claimIssueDate,
+      dateIssued,
     };
   },
   customTemplate: `${__dirname}/repaymentsMade.njk`,

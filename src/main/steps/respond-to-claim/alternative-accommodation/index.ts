@@ -1,21 +1,20 @@
-import { formatDatePartsToISODate, parseISOToDateParts } from '../../utils';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { formatDatePartsToISODate, fromYesNoNotSureEnum, parseISOToDateParts, toYesNoNotSureEnum } from '../../utils';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
-  journeyFolder: 'respondToClaim',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.alternativeAccommodation),
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/alternativeAccommodation.njk`,
   translationKeys: {
-    caption: 'caption',
     question: 'question',
     pageTitle: 'pageTitle',
+    heading: 'heading',
+    accommodationQuestion: 'accommodationQuestion',
   },
   fields: [
     {
@@ -51,49 +50,58 @@ export const step: StepDefinition = createFormStep({
   ],
   getInitialFormData: req => {
     const caseData =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const existing = caseData?.alternativeAccommodation as string | undefined;
-    const existingDate = caseData?.alternativeAccommodationTransferDate as string | undefined;
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const existing = caseData?.alternativeAccommodation;
+    const existingDate = caseData?.alternativeAccommodationTransferDate;
 
-    const mapping: Record<string, string> = { YES: 'yes', NO: 'no', NOT_SURE: 'notSure' };
-    const formValue = existing ? mapping[existing] : undefined;
+    const formValue = fromYesNoNotSureEnum(existing);
 
     const result: Record<string, unknown> = { confirmAlternativeAccommodation: formValue };
 
     if (existingDate) {
-      result.alternativeAccommodationDate = parseISOToDateParts(existingDate);
+      // Dotted key so the form-builder matches this against the subField inputs
+      // (named confirmAlternativeAccommodation.alternativeAccommodationDate-{day,month,year}).
+      result['confirmAlternativeAccommodation.alternativeAccommodationDate'] = parseISOToDateParts(existingDate);
     }
 
     return result;
   },
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
+    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
     const confirmValue = req.body?.confirmAlternativeAccommodation as string | undefined;
+    const enumValue = toYesNoNotSureEnum(confirmValue);
 
-    const householdCircumstances: Record<string, unknown> = {};
+    if (enumValue) {
+      response.defendantResponses.householdCircumstances.alternativeAccommodation = enumValue;
 
-    if (confirmValue === 'yes') {
-      householdCircumstances.alternativeAccommodation = 'YES';
-      const day =
-        (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-day'] as string | undefined) ?? '';
-      const month =
-        (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-month'] as string | undefined) ?? '';
-      const year =
-        (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-year'] as string | undefined) ?? '';
-      const isoDate = formatDatePartsToISODate(day, month, year);
-      if (isoDate) {
-        householdCircumstances.alternativeAccommodationTransferDate = isoDate;
+      if (confirmValue === 'yes') {
+        const day =
+          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-day'] as string | undefined) ?? '';
+        const month =
+          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-month'] as string | undefined) ??
+          '';
+        const year =
+          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-year'] as string | undefined) ?? '';
+        const isoDate = formatDatePartsToISODate(day, month, year);
+        if (isoDate) {
+          response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate = isoDate;
+        } else {
+          // Optional date cleared on edit - drop it from the cloned draft so it isn't re-sent.
+          delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
+        }
+      } else {
+        delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
       }
-    } else if (confirmValue === 'no') {
-      householdCircumstances.alternativeAccommodation = 'NO';
-    } else if (confirmValue === 'notSure') {
-      householdCircumstances.alternativeAccommodation = 'NOT_SURE';
+    } else {
+      delete response.defendantResponses.householdCircumstances.alternativeAccommodation;
+      delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
     }
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        householdCircumstances,
-      },
-    };
 
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(
+      req,
+
+      response
+    );
   },
 });

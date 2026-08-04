@@ -1,0 +1,76 @@
+{
+  "pageTitle": "Gwirio eich atebion",
+  "cardTitle": "Incwm a chostau",
+  "frequencies": {
+    "WEEKLY": "cy every week",
+    "MONTHLY": "cy every month"
+  },
+  "incomeFrequencies": {
+    "WEEKLY": "cy received every week",
+    "MONTHLY": "cy received every month"
+  },
+  "paymentFrequencies": {
+    "WEEKLY": "cy paid every week",
+    "MONTHLY": "cy paid every month"
+  },
+  "rows": {
+    "shareIncomeExpenseDetails": {
+      "label": "A ydych eisiau darparu manylion am eich incwm a chostau?",
+      "changeHidden": "cy share income and expense details"
+    },
+    "regularIncome": {
+      "label": "cy What regular income do you receive?",
+      "changeHidden": "incwm rheolaidd",
+      "options": {
+        "incomeFromJobs": "Incwm o bob swydd a wneir gennych",
+        "pension": "Pensiwn, y wladwriaeth a phreifat",
+        "universalCredit": "Credyd Cynhwysol",
+        "otherBenefits": "Budd-daliadau a chredydau eraill",
+        "moneyFromElsewhere": "Arian o rywle arall (er enghraifft, taliadau cynhaliaeth plant neu rywun yn eich cartref yn rhoi arian i chi)"
+      }
+    },
+    "hasAppliedForUniversalCredit": {
+      "label": "Ydych chi wedi gwneud cais am Gredyd Cynhwysol?",
+      "changeHidden": "cy applied for Universal Credit"
+    },
+    "universalCreditApplicationDate": {
+      "label": "cy When did you apply for Universal Credit?",
+      "changeHidden": "cy Universal Credit application date"
+    },
+    "priorityDebts": {
+      "label": "A oes gennych chi unrhyw ddyledion blaenoriaeth?",
+      "changeHidden": "dyledion blaenoriaeth"
+    },
+    "priorityDebtTotal": {
+      "label": "Beth yw'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
+      "changeHidden": "cy priority debt total"
+    },
+    "priorityDebtContribution": {
+      "label": "Faint ydych yn ei dalu tuag at eich dyledion blaenoriaeth bob wythnos neu fis?",
+      "changeHidden": "cy priority debt contribution"
+    },
+    "regularExpenses": {
+      "label": "cy What other regular expenses do you have?",
+      "changeHidden": "costau rheolaidd",
+      "options": {
+        "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
+        "loanPayments": "Taliadau benthyciadau",
+        "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/gwraig",
+        "mobilePhone": "Ffôn symudol",
+        "groceryShopping": "Siopa bwyd",
+        "fuelParkingTransport": "Tanwydd, parcio a chludiant",
+        "schoolCosts": "Costau ysgol (er enghraifft, gwisg a chinio ysgol)",
+        "clothing": "Dillad",
+        "otherExpenses": "Arall"
+      }
+    },
+    "otherConsiderations": {
+      "label": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
+      "changeHidden": "cy other considerations"
+    },
+    "otherConsiderationsDetails": {
+      "label": "Rhowch fanylion beth arall rydych eisiau ei ddweud wrth y llys",
+      "changeHidden": "cy other considerations details"
+    }
+  }
+}

@@ -1,8 +1,7 @@
-import path from 'path';
+import * as path from 'path';
 
 import { Page } from '@playwright/test';
 
-import { performAction, performValidation } from '../../controller';
 import { IAction, actionData } from '../../interfaces';
 
 export class UploadFileAction implements IAction {
@@ -10,21 +9,19 @@ export class UploadFileAction implements IAction {
     if (typeof files === 'string') {
       await this.uploadFile(page, files);
     } else if (Array.isArray(files)) {
-      for (const [index, file] of files.entries()) {
+      for (const file of files) {
         await this.uploadFile(page, file);
-        if (index === files.length - 1) {
-          break;
-        }
-        await page.waitForTimeout(5000);
       }
     }
   }
 
   private async uploadFile(page: Page, file: string): Promise<void> {
-    await performAction('clickButton', 'Add new');
-    const fileInput = page.locator('input[type="file"].form-control.bottom-30');
+    const uploadedDocuments = page.locator('input[name="uploadedDocuments[]"]');
+    const uploadedDocumentCount = await uploadedDocuments.count();
+    const fileInput = page.locator('input[type="file"].moj-multi-file-upload__input');
     const filePath = path.resolve(__dirname, '../../../data/inputFiles', file);
+
     await fileInput.last().setInputFiles(filePath);
-    await performValidation('waitUntilElementDisappears', 'Uploading...');
+    await uploadedDocuments.nth(uploadedDocumentCount).waitFor({ state: 'attached' });
   }
 }

@@ -85,6 +85,7 @@ module.exports = defineConfig([
       '@typescript-eslint/no-var-requires': 'off',
       curly: 'error',
       eqeqeq: 'error',
+      'import/no-unresolved': ['error', { ignore: ['^@hmcts-cft/'] }],
       'import/no-duplicates': 'error',
       'import/no-named-as-default': 'error',
       'import/no-named-as-default-member': 'off',
@@ -117,6 +118,8 @@ module.exports = defineConfig([
       'no-console': 'warn',
       'no-prototype-builtins': 'off',
       'no-return-await': 'error',
+      'no-useless-assignment': 'off', // TODO: Remove this rule once we have a better solution for the issue
+      'preserve-caught-error': 'off', // TODO: Remove this rule once we have a better solution for the issue
 
       'no-unneeded-ternary': [
         'error',
@@ -174,6 +177,7 @@ module.exports = defineConfig([
   },
   globalIgnores([
     'src/main/views/govuk/**/*',
+    'src/main/views/moj/**/*',
     '**/jest.*.config.*',
     '**/__mocks__/**/*',
     'dist/*',

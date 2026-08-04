@@ -1,56 +1,43 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { noEmojiValidator } from '../../utils/fieldValidators';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-name-capture',
-  journeyFolder: 'respondToClaim',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantContactDetailsParty?.firstName),
   stepDir: __dirname,
-  flowConfig,
   showCancelButton: false,
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
     const firstName = req.body?.firstName as string | undefined;
     const lastName = req.body?.lastName as string | undefined;
 
-    const party: Record<string, string> = {};
-
-    if (firstName && firstName.trim()) {
-      party.firstName = firstName;
+    if (firstName?.trim()) {
+      response.defendantContactDetails.party.firstName = firstName;
+    } else {
+      delete response.defendantContactDetails.party.firstName;
+    }
+    if (lastName?.trim()) {
+      response.defendantContactDetails.party.lastName = lastName;
+    } else {
+      delete response.defendantContactDetails.party.lastName;
     }
 
-    if (lastName && lastName.trim()) {
-      party.lastName = lastName;
-    }
-
-    if (Object.keys(party).length === 0) {
-      return;
-    }
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantContactDetails: {
-        party,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   translationKeys: {
     // Browser/tab title
     pageTitle: 'pageTitle',
     // On-page H1
     heading: 'heading',
-    caption: 'caption',
     contactUs: 'contactUs',
   },
   getInitialFormData: req => {
-    const { defendantContactDetailsParty: party, claimantEnteredDefendantDetails: claimantEntry } = req.res?.locals
-      .validatedCase ?? {
-      defendantContactDetailsParty: undefined,
-      claimantEnteredDefendantDetails: undefined,
-    };
+    const caseData = req.res?.locals.validatedCase?.data;
+    const party = caseData?.possessionClaimResponse?.defendantContactDetails?.party;
+    const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
 
     const firstName =
       (typeof party?.firstName === 'string' && party.firstName.trim() ? party.firstName : undefined) ||
@@ -86,6 +73,7 @@ export const step: StepDefinition = createFormStep({
         autocomplete: 'given-name',
         spellcheck: false,
       },
+      validator: noEmojiValidator('errors.firstNameInvalidCharacters'),
     },
     {
       name: 'lastName',
@@ -100,6 +88,7 @@ export const step: StepDefinition = createFormStep({
         autocomplete: 'family-name',
         spellcheck: false,
       },
+      validator: noEmojiValidator('errors.lastNameInvalidCharacters'),
     },
   ],
 });

@@ -18,6 +18,12 @@ export async function repaymentsAgreedErrorValidation(): Promise<void> {
     header: repaymentsAgreed.thereIsAProblemErrorMessageHeader,
     message: repaymentsAgreed.mustBe500CharactersOrFewerErrorMessage,
   });
+  await performAction('inputText', repaymentsAgreed.giveDetailsHiddenTextLabel, repaymentsAgreed.emojiTextInput);
+  await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: repaymentsAgreed.thereIsAProblemErrorMessageHeader,
+    message: repaymentsAgreed.emojiErrorMessage,
+  });
 }
 
 //The below method is commented out as we have an open bug - HDPI-5556
@@ -25,6 +31,5 @@ export async function repaymentsAgreedErrorValidation(): Promise<void> {
 export async function repaymentsAgreedNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', repaymentsAgreed.backLink, repaymentsMade.mainHeader);
   await performAction('clickRadioButton', repaymentsAgreed.noRadioOption);
-  await performValidation('pageNavigation', repaymentsAgreed.saveForLaterButton, dashboard.mainHeader);
 }
 */

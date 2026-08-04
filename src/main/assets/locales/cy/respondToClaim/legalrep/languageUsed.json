@@ -1,0 +1,14 @@
+{
+  "languageHeading": "Iaith a ddefnyddiwyd",
+  "heading": "",
+  "question": "Pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn?",
+  "languageUsedHint": "Os yw rhywun arall wedi eich helpu i ateb cwestiwn yn y gwasanaeth hwn, gofynnwch iddynt a wnaethant ateb unrhyw gwestiynau yn Gymraeg. Byddwn yn defnyddio hwn i sicrhau bod eich ymateb yn cael ei brosesu'n gywir",
+  "language": {
+    "english": "Saesneg",
+    "welsh": "Cymraeg",
+    "englishAndWelsh": "Saesneg a Cymraeg"
+  },
+  "errors": {
+    "languageUsed": "Dewiswch pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn"
+  }
+}

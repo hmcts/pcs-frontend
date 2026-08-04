@@ -30,15 +30,19 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
   };
 });
 
-const mockBuildCcdCaseForPossessionClaimResponse = jest.fn();
-jest.mock('../../../../main/steps/utils/populateResponseToClaimPayloadmap', () => ({
-  buildCcdCaseForPossessionClaimResponse: mockBuildCcdCaseForPossessionClaimResponse,
+const mockSaveDraftDefendantResponse = jest.fn();
+const mockBuildDraftDefendantResponse = jest.fn(() => ({
+  defendantResponses: { paymentAgreement: {} },
+  defendantContactDetails: { party: {} },
+}));
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: mockBuildDraftDefendantResponse,
+  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
 }));
 
 const t = ((key: string) => {
   const translations: Record<string, string> = {
     pageTitle: 'Instalments',
-    caption: 'Respond to a property possession claim',
     heading: 'Instalments',
     paragraph1:
       'A decision about the instalments you can afford to pay will be made at the hearing. You’ll be able to tell the judge if your circumstances have changed between now and the hearing.',
@@ -98,7 +102,7 @@ describe('respond-to-claim installments step', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockBuildCcdCaseForPossessionClaimResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
+    mockSaveDraftDefendantResponse.mockResolvedValue({ id: '1234567890123456', data: {} });
   });
 
   it('exposes correct step url and view', () => {
@@ -119,14 +123,12 @@ describe('respond-to-claim installments step', () => {
       expect.objectContaining({
         pageTitle: 'Instalments',
         heading: 'Instalments',
-        caption: 'Respond to a property possession claim',
       })
     );
 
     const viewModel = res.render.mock.calls[0][1] as { fields: Record<string, unknown>[] };
     const amountField = viewModel.fields.find(f => f.name === 'installmentAmount') as
-      | { component?: { prefix?: { text?: string } } }
-      | undefined;
+      { component?: { prefix?: { text?: string } } } | undefined;
     expect(amountField?.component?.prefix?.text).toBe('£');
   });
 
@@ -178,7 +180,7 @@ describe('respond-to-claim installments step', () => {
     }
     await step.postController.post(req, res, next);
 
-    expect(mockBuildCcdCaseForPossessionClaimResponse).toHaveBeenCalledWith(
+    expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
       expect.objectContaining({
         body: expect.objectContaining({
           installmentAmount: '123.45',
@@ -192,6 +194,7 @@ describe('respond-to-claim installments step', () => {
             additionalContributionFrequency: 'monthly',
           },
         },
+        defendantContactDetails: { party: {} },
       }
     );
     expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');

@@ -1,0 +1,16 @@
+{
+  "pageTitle": "Uwchlwytho ffeiliau gwrth-hawliad",
+  "heading": "Uwchlwytho ffeiliau i gefnogi eich gwrth-hawliad",
+  "guidanceText": "Dim ond ffeiliau sy’n berthnasol i’ch gwrth-hawliad y dylech eu huwchlwytho.",
+  "guidanceText2": "Bydd yr hawlydd yn gallu gweld unrhyw ffeiliau fyddwch yn eu huwchlwytho.",
+  "beforeUploadText": "Cyn i chi uwchlwytho’r ffeil, rhowch enw iddi sy’n dweud wrth y llys beth ydyw, er enghraifft ‘Llythyr cynnig swydd’.",
+  "fileTypesText": "Gallwch uwchlwytho'r mathau canlynol o ffeiliau: DOC/DOCX (Word), XLS/XLSM (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.",
+  "uploadLabel": "Uwchlwytho ffeil",
+  "filesAddedHeading": "Ffeiliau wedi eu hychwanegu",
+  "uploadButton": "Uwchlwytho ffeil",
+  "deleteButton": "Dileu",
+  "noFilesUploaded": "Nid oes ffeiliau wedi cael eu huwchlwytho",
+  "errors": {
+    "documents": "Dewiswch ffeil i gefnogi eich gwrth-hawliad"
+  }
+}

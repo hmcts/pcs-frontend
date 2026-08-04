@@ -10,6 +10,13 @@ import type {
   FormFieldConfig,
   FormFieldOption,
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import {
+  ACCEPT_ATTRIBUTE_EXTENSIONS,
+  UPLOAD_MAX_FILENAME_LENGTH,
+  UPLOAD_MAX_FILE_SIZE_MB,
+  UPLOAD_MAX_MEDIA_FILE_SIZE_MB,
+  formatSizeForDisplay,
+} from '@utils/documentUploadValidation';
 
 function createFieldsetLegend(
   label: string,
@@ -26,6 +33,49 @@ function createFieldsetLegend(
   };
 }
 
+export function buildConditionalItemContent(option: FormFieldOption, nunjucksEnv: Environment): string | undefined {
+  const conditionalParts: string[] = [];
+
+  if (option.conditionalText && typeof option.conditionalText === 'string') {
+    conditionalParts.push(option.conditionalText);
+  }
+
+  if (option.subFields) {
+    const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
+    if (subFieldsHTML) {
+      conditionalParts.push(subFieldsHTML);
+    }
+  }
+
+  return conditionalParts.length > 0 ? conditionalParts.join('\n') : undefined;
+}
+
+export function buildSelectionItems(
+  options: FormFieldOption[] | undefined,
+  translatedOptions: { value?: string; text?: string; hint?: string; divider?: string }[] | undefined,
+  isChecked: (option: FormFieldOption) => boolean,
+  nunjucksEnv: Environment
+): Record<string, unknown>[] {
+  return (
+    options?.map((option: FormFieldOption, optionIndex: number) => {
+      if (option.divider) {
+        return translatedOptions?.[optionIndex] || { divider: option.divider };
+      }
+
+      const itemHint = translatedOptions?.[optionIndex]?.hint || option.hint;
+      const conditionalHtml = buildConditionalItemContent(option, nunjucksEnv);
+
+      return {
+        value: option.value,
+        text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
+        checked: isChecked(option),
+        ...(itemHint ? { hint: { text: itemHint } } : {}),
+        ...(conditionalHtml ? { conditional: { html: conditionalHtml } } : {}),
+      };
+    }) || []
+  );
+}
+
 export function buildComponentConfig({
   field,
   label,
@@ -34,6 +84,7 @@ export function buildComponentConfig({
   translatedOptions,
   hasError,
   errorText,
+  erroneousParts,
   index,
   hasTitle,
   t,
@@ -43,9 +94,10 @@ export function buildComponentConfig({
   label: string;
   hint: string | undefined;
   fieldValue: unknown;
-  translatedOptions: { value?: string; text?: string; divider?: string }[] | undefined;
+  translatedOptions: { value?: string; text?: string; hint?: string; divider?: string }[] | undefined;
   hasError: boolean;
   errorText: string | undefined;
+  erroneousParts?: ('day' | 'month' | 'year')[];
   index: number;
   hasTitle: boolean;
   t: TFunction;
@@ -56,7 +108,12 @@ export function buildComponentConfig({
     id: field.name,
     name: field.name,
     label: { text: label, classes: field.labelClasses },
-    hint: hint ? { text: hint } : null,
+    hint: hint
+      ? {
+          ...(hint.includes('<') ? { html: hint } : { text: hint }),
+          ...(field.hintClasses ? { classes: field.hintClasses } : {}),
+        }
+      : null,
     errorMessage: hasError && errorText ? { text: errorText } : null,
     classes: field.classes || (field.type === 'text' ? 'govuk-!-width-three-quarters' : undefined),
     attributes: field.attributes || {},
@@ -69,6 +126,15 @@ export function buildComponentConfig({
       component.value = (fieldValue as string) || '';
       if (field.prefix) {
         component.prefix = field.prefix;
+      }
+      if (field.formGroupClasses) {
+        component.formGroup = {
+          classes: field.formGroupClasses,
+          attributes: {},
+        };
+      }
+      if (field.suffix) {
+        component.suffix = field.suffix;
       }
       componentType = 'input';
       break;
@@ -94,57 +160,35 @@ export function buildComponentConfig({
         classes: field.labelClasses,
       };
 
+      const charCountKeys = [
+        'charactersUnderLimitText',
+        'charactersAtLimitText',
+        'charactersOverLimitText',
+        'wordsUnderLimitText',
+        'wordsAtLimitText',
+        'wordsOverLimitText',
+        'textareaDescriptionText',
+      ] as const;
+
+      for (const key of charCountKeys) {
+        const translation = t(`characterCount.${key}`, { returnObjects: true, defaultValue: '' }) as unknown;
+        if (translation && translation !== '') {
+          component[key] = translation;
+        }
+      }
+
       componentType = 'characterCount';
       break;
     }
     case 'radio': {
       const radioValue = (fieldValue as string) || '';
       component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses, field.isPageHeading);
-
-      // Build items with conditional content and subFields support
-      component.items =
-        field.options?.map((option: FormFieldOption, optionIndex: number) => {
-          if (option.divider) {
-            return translatedOptions?.[optionIndex];
-          }
-
-          const item: Record<string, unknown> = {
-            value: option.value,
-            text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
-            checked: radioValue === option.value,
-          };
-
-          if (option.hint) {
-            item.hint = {
-              text: option.hint,
-            };
-          }
-
-          // Build conditional HTML from conditionalText and subFields
-          const conditionalParts: string[] = [];
-
-          // Add conditional text if provided (already processed in fieldTranslation)
-          if (option.conditionalText && typeof option.conditionalText === 'string') {
-            conditionalParts.push(option.conditionalText);
-          }
-
-          // Build and add subFields HTML
-          if (option.subFields) {
-            const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
-            if (subFieldsHTML) {
-              conditionalParts.push(subFieldsHTML);
-            }
-          }
-
-          // Set conditional HTML if we have any content
-          if (conditionalParts.length > 0) {
-            item.conditional = {
-              html: conditionalParts.join('\n'),
-            };
-          }
-
-          return item;
-        }) || [];
+      component.items = buildSelectionItems(
+        field.options,
+        translatedOptions,
+        option => radioValue === option.value,
+        nunjucksEnv
+      );
 
       componentType = 'radios';
       break;
@@ -154,47 +198,41 @@ export function buildComponentConfig({
       // This ensures checkbox values are always in the correct format for rendering
       const checkboxArray = normalizeCheckboxValue(fieldValue);
       component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses);
-
-      // Build items with conditional content and subFields support
-      component.items =
-        field.options?.map((option: FormFieldOption, optionIndex: number) => {
-          if (option.divider) {
-            return translatedOptions?.[optionIndex];
-          }
-
-          const item: Record<string, unknown> = {
-            value: option.value,
-            text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
-            checked: option.value ? checkboxArray.includes(option.value) : false,
-          };
-
-          // Build conditional HTML from conditionalText and subFields
-          const conditionalParts: string[] = [];
-
-          // Add conditional text if provided (already processed in fieldTranslation)
-          if (option.conditionalText && typeof option.conditionalText === 'string') {
-            conditionalParts.push(option.conditionalText);
-          }
-
-          // Build and add subFields HTML
-          if (option.subFields) {
-            const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
-            if (subFieldsHTML) {
-              conditionalParts.push(subFieldsHTML);
-            }
-          }
-
-          // Set conditional HTML if we have any content
-          if (conditionalParts.length > 0) {
-            item.conditional = {
-              html: conditionalParts.join('\n'),
-            };
-          }
-
-          return item;
-        }) || [];
+      component.items = buildSelectionItems(
+        field.options,
+        translatedOptions,
+        option => (option.value ? checkboxArray.includes(option.value) : false),
+        nunjucksEnv
+      );
 
       componentType = 'checkboxes';
+      break;
+    }
+    case 'file': {
+      component.value = fieldValue || [];
+      component.accept = field.accept || ACCEPT_ATTRIBUTE_EXTENSIONS;
+      component.maxFileSize = field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB;
+      component.maxMediaMB = UPLOAD_MAX_MEDIA_FILE_SIZE_MB;
+      component.maxFilenameLength = UPLOAD_MAX_FILENAME_LENGTH;
+      component.uploadUrl = field.uploadUrl || '';
+      component.deleteUrl = field.deleteUrl || '';
+      component.classes = field.classes || 'govuk-file-upload';
+      component.errorWrongType = t('common:errors.documentUpload.wrongFileTypeDocStore');
+      component.errorFileTooLarge = t('common:errors.documentUpload.fileTooLargeDocStore', {
+        maxSize: formatSizeForDisplay(field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB),
+      });
+      component.errorFileTooLargeMedia = t('common:errors.documentUpload.fileTooLargeMedia', {
+        maxSize: formatSizeForDisplay(UPLOAD_MAX_MEDIA_FILE_SIZE_MB),
+      });
+      component.errorFilenameTooLong = t('common:errors.documentUpload.filenameTooLong', {
+        maxLength: String(UPLOAD_MAX_FILENAME_LENGTH),
+      });
+      component.errorDelete = t('common:errors.documentUpload.fileDeleteFailed');
+      component.errorSummaryTitle = t('common:errors.documentUpload.errorSummaryTitle');
+      component.uploadButtonText = t('uploadButton');
+      component.filesAddedHeading = t('filesAddedHeading');
+      component.deleteButtonText = t('deleteButton');
+      componentType = 'fileUpload';
       break;
     }
     case 'date': {
@@ -206,26 +244,28 @@ export function buildComponentConfig({
       component.namePrefix = field.name;
       component.idPrefix = field.name;
       component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses, field.isPageHeading);
+      const isPartErroneous = (part: 'day' | 'month' | 'year') =>
+        hasError && (erroneousParts === undefined || erroneousParts.includes(part));
       component.items = [
         {
           name: 'day',
           label: t('date.day', 'Day'),
           value: dateValue.day || '',
-          classes: 'govuk-input--width-2',
+          classes: `govuk-input--width-2${isPartErroneous('day') ? ' govuk-input--error' : ''}`,
           attributes: { maxlength: 2, inputmode: 'numeric' },
         },
         {
           name: 'month',
           label: t('date.month', 'Month'),
           value: dateValue.month || '',
-          classes: 'govuk-input--width-2',
+          classes: `govuk-input--width-2${isPartErroneous('month') ? ' govuk-input--error' : ''}`,
           attributes: { maxlength: 2, inputmode: 'numeric' },
         },
         {
           name: 'year',
           label: t('date.year', 'Year'),
           value: dateValue.year || '',
-          classes: 'govuk-input--width-4',
+          classes: `govuk-input--width-4${isPartErroneous('year') ? ' govuk-input--error' : ''}`,
           attributes: { maxlength: 4, inputmode: 'numeric' },
         },
       ];

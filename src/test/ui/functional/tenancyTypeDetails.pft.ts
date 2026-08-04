@@ -1,12 +1,7 @@
-import { dashboard, disputeClaimInterstitial, tenancyTypeDetails, writtenTerms } from '../data/page-data';
+import { disputeClaimInterstitial, tenancyTypeDetails, writtenTerms } from '../data/page-data';
 import { claimantsName } from '../utils/actions/custom-actions';
+import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
-
-let _backNavigationHeader: string | null = null;
-
-export function setTenancyTypeDetailsBackNavigation(header: string): void {
-  _backNavigationHeader = header;
-}
 
 export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
   //mandatory radio button selection
@@ -24,6 +19,24 @@ export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
   await performValidation('errorMessage', {
     header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
     message: tenancyTypeDetails.enterCorrectTenancyDetailsErrorMessage,
+  });
+  //character limit error validation
+  await performAction('inputText', tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel, generateRandomString(61));
+  await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
+    message: tenancyTypeDetails.characterLimitErrorMessage,
+  });
+  //emoji error validation
+  await performAction(
+    'inputText',
+    tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
+    tenancyTypeDetails.emojiTextInput
+  );
+  await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
+    message: tenancyTypeDetails.emojiGiveTheCorrectTenancyTypeErrorMessage,
   });
 }
 
@@ -45,5 +58,4 @@ export async function tenancyTypeDetailsNavigationTests(): Promise<void> {
     question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
     option: tenancyTypeDetails.yesRadioOption,
   });
-  await performValidation('pageNavigation', tenancyTypeDetails.saveForLaterButton, dashboard.mainHeader);
 }

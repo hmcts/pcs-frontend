@@ -1,23 +1,21 @@
-/*import { submitCaseApiData } from '../data/api-data';*/
-import { confirmationOfNoticeGiven, dashboard, feedback, tenancyDateUnknown } from '../data/page-data';
+import { submitCaseApiData } from '../data/api-data';
+import { confirmationOfNoticeGiven, feedback, tenancyDateUnknown } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
-// Regression Bug raised - HDPI-6087, The code related to error validation on the “Notice details” page has been temporarily commented out
-/*let claimantName = '';
-
-if (process.env.CLAIMANT_NAME_OVERRIDDEN === 'YES') {
-  claimantName = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
-} else {
-  claimantName = submitCaseApiData.submitCasePayloadNoDefendants.claimantName;
+function getClaimantName(): string {
+  if (process.env.CLAIMANT_NAME_OVERRIDDEN === 'YES') {
+    return submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
+  }
+  return process.env.CLAIMANT_NAME ?? submitCaseApiData.submitCasePayloadNoDefendants.claimantName;
 }
 
 export async function confirmationOfNoticeGivenErrorValidation(): Promise<void> {
   await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: confirmationOfNoticeGiven.thereIsAProblemErrorMessageHeader,
-    message: confirmationOfNoticeGiven.selectIfNoticeOfIntentionGivenErrorMessage(claimantName),
+    message: confirmationOfNoticeGiven.selectIfNoticeOfIntentionGivenErrorMessage(getClaimantName()),
   });
-}*/
+}
 
 export async function confirmationOfNoticeGivenNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', confirmationOfNoticeGiven.feedbackLink, {
@@ -26,5 +24,4 @@ export async function confirmationOfNoticeGivenNavigationTests(): Promise<void> 
   });
   await performValidation('pageNavigation', confirmationOfNoticeGiven.backLink, tenancyDateUnknown.mainHeader);
   await performAction('clickRadioButton', confirmationOfNoticeGiven.yesRadioOption);
-  await performValidation('pageNavigation', confirmationOfNoticeGiven.saveForLaterButton, dashboard.mainHeader);
 }

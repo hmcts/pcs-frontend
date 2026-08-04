@@ -1,21 +1,21 @@
 import { isEmail } from 'validator';
 
-import { createFormStep } from '../../../modules/steps';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'contact-preferences-email-or-post',
-  journeyFolder: 'respondToClaim',
+  isAnswered: req =>
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.contactByEmail ||
+      req.res?.locals.validatedCase?.defendantResponses?.contactByPost
+    ),
   showCancelButton: false,
   stepDir: __dirname,
-  flowConfig,
 
   translationKeys: {
-    caption: 'caption',
     pageTitle: 'pageTitle',
     title: 'title',
     content: 'content',
@@ -23,7 +23,7 @@ export const step: StepDefinition = createFormStep({
   fields: [
     {
       name: 'contactByEmailOrPost',
-      type: 'radio',
+      type: 'checkbox',
       required: true,
       legendClasses: 'govuk-!-font-weight-bold govuk-!-font-size-24',
       translationKey: {
@@ -64,60 +64,54 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+
   getInitialFormData: req => {
-    const validatedCase = req.res?.locals?.validatedCase;
-    const existingEmail = validatedCase?.defendantContactDetailsPartyEmailAddress;
-    const preferenceType = validatedCase?.defendantResponsesPreferenceType;
+    const caseData = req.res?.locals.validatedCase?.possessionClaimResponse;
+    const defendantResponses = caseData?.defendantResponses;
+    const emailAddress = caseData?.defendantContactDetails?.party?.emailAddress;
 
-    if (
-      preferenceType === 'EMAIL' ||
-      validatedCase?.defendantResponsesContactByEmail === 'YES' ||
-      (typeof existingEmail === 'string' && existingEmail.trim().length > 0)
-    ) {
-      return {
-        contactByEmailOrPost: 'email',
-        ...(existingEmail ? { 'contactByEmailOrPost.email': existingEmail } : {}),
-      };
+    const formData: Record<string, unknown> = {};
+    const selected: string[] = [];
+
+    if (defendantResponses?.contactByEmail === 'YES') {
+      selected.push('email');
+    }
+    if (defendantResponses?.contactByPost === 'YES') {
+      selected.push('post');
     }
 
-    if (preferenceType === 'POST' || validatedCase?.defendantResponsesContactByPost === 'YES') {
-      return {
-        contactByEmailOrPost: 'post',
-      };
+    if (selected.length > 0) {
+      formData.contactByEmailOrPost = selected;
+    }
+    if (selected.includes('email') && emailAddress) {
+      formData['contactByEmailOrPost.email'] = emailAddress;
     }
 
-    return {};
+    return formData;
   },
 
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
     const emailForm = req.body as Record<string, unknown>;
+    const selectedRaw = emailForm.contactByEmailOrPost as string | string[] | undefined;
+    const selected = Array.isArray(selectedRaw) ? selectedRaw : selectedRaw ? [selectedRaw] : [];
+    const emailSelected = selected.includes('email');
+    const postSelected = selected.includes('post');
 
-    const emailSelected = emailForm.contactByEmailOrPost === 'email';
-    const postSelected = emailForm.contactByEmailOrPost === 'post';
+    response.defendantResponses.contactByEmail = emailSelected ? 'YES' : 'NO';
+    response.defendantResponses.contactByPost = postSelected ? 'YES' : 'NO';
 
-    if (!emailSelected && !postSelected) {
-      return;
+    if (emailSelected) {
+      const email = (emailForm['contactByEmailOrPost.email'] as string | undefined)?.trim();
+      if (email) {
+        response.defendantContactDetails.party.emailAddress = email;
+      } else {
+        delete response.defendantContactDetails.party.emailAddress;
+      }
+    } else {
+      delete response.defendantContactDetails.party.emailAddress;
     }
 
-    const existingEmailAddress = req.res?.locals?.validatedCase?.defendantContactDetailsPartyEmailAddress;
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantContactDetails: {
-        party: {
-          emailAddress: emailSelected
-            ? (emailForm['contactByEmailOrPost.email'] as string | undefined)
-            : existingEmailAddress
-              ? ''
-              : undefined,
-        },
-      },
-      defendantResponses: {
-        contactByEmail: emailSelected ? 'YES' : 'NO',
-        contactByPost: postSelected ? 'YES' : 'NO',
-        preferenceType: emailSelected ? 'EMAIL' : postSelected ? 'POST' : undefined,
-      },
-    };
-
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
 });

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from 'config';
 
-import { FeeLookupParams, FeeType, getFee } from '@services/feeLookupService';
+import { FeeLookupParams, FeeType, getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 
 jest.mock('axios');
 jest.mock('config');
@@ -17,6 +17,15 @@ const STANDARD_FEE_LOOKUP_PARAMS: FeeLookupParams = {
   service: 'test service',
 };
 
+const COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS: FeeLookupParams = {
+  channel: 'default',
+  event: 'issue',
+  jurisdiction1: 'civil',
+  jurisdiction2: 'civil',
+  service: 'other',
+  keyword: 'AnyOtherRemedy',
+};
+
 (config.get as jest.Mock).mockImplementation(key => {
   if (key === 'feeService.url') {
     return FEE_SERVICE_URL;
@@ -24,10 +33,16 @@ const STANDARD_FEE_LOOKUP_PARAMS: FeeLookupParams = {
   if (key === 'feeService.lookup.genAppStandardFee') {
     return STANDARD_FEE_LOOKUP_PARAMS;
   }
+  if (key === 'feeService.lookup.counterClaimFlatFeeFEE0450') {
+    return COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS;
+  }
 });
 
 (config.has as jest.Mock).mockImplementation(key => {
   if (key === 'feeService.lookup.genAppStandardFee') {
+    return true;
+  }
+  if (key === 'feeService.lookup.counterClaimFlatFeeFEE0450') {
     return true;
   }
 });
@@ -68,6 +83,47 @@ describe('feeLookupService', () => {
       });
 
       expect(getFee(FeeType.genAppStandardFee)).rejects.toThrow('Error fetching fee');
+    });
+
+    it('should include lookup params for FEE0450 counterclaim flat fee', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          fee_amount: 332,
+        },
+      });
+
+      await getFee(FeeType.counterClaimFlatFeeFEE0450);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${FEE_SERVICE_URL}/fees-register/fees/lookup`,
+        expect.objectContaining({
+          params: COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS,
+        })
+      );
+    });
+  });
+
+  describe('getCounterClaimFeeType', () => {
+    it('returns FEE0450 for SOMETHING_ELSE claim type', () => {
+      expect(getCounterClaimFeeType('SOMETHING_ELSE')).toEqual(FeeType.counterClaimFlatFeeFEE0450);
+    });
+
+    it('returns ranged fee type for amount up to 5,000', () => {
+      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION', '30000')).toEqual(FeeType.counterClaimRanged);
+      expect(getCounterClaimFeeType('BOTH', '500000')).toEqual(FeeType.counterClaimRanged);
+    });
+
+    it('returns counter-claim fee type for amount over 5,000', () => {
+      expect(getCounterClaimFeeType('BOTH', '1000001')).toEqual(FeeType.counterClaim);
+      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION', '20000001')).toEqual(FeeType.counterClaim);
+    });
+
+    it('throws when claim type is unsupported', () => {
+      expect(() => getCounterClaimFeeType('UNKNOWN')).toThrow('Unsupported counterclaim claim type: UNKNOWN');
+    });
+
+    it('falls back to counter-claim fee type when amount is missing for money claim types', () => {
+      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION')).toEqual(FeeType.counterClaim);
     });
   });
 });

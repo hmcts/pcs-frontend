@@ -74,5 +74,23 @@
   },
   "xui": {
     "uri": "XUI_BASE_URI"
+  },
+  "cdam": {
+    "url": "CDAM_URL"
+  },
+  "documentUpload": {
+    "maxMediaFileSizeMB": "DOCUMENT_UPLOAD_MAX_MEDIA_FILE_SIZE_MB",
+    "maxTotalFileSizeMB": "DOCUMENT_UPLOAD_MAX_TOTAL_FILE_SIZE_MB",
+    "maxDocumentFileSizeMB": "DOCUMENT_UPLOAD_MAX_DOCUMENT_FILE_SIZE_MB",
+    "maxFilenameLength": "DOCUMENT_UPLOAD_MAX_FILENAME_LENGTH"
+  },
+  "redirects": {
+    "manageCaseReturnURL": "REDIRECTS_MANAGE_CASE_RETURN_URL"
+  },
+  "payment": {
+    "returnUrl": "PAYMENT_RETURN_URL"
+  },
+  "launchdarkly": {
+    "env": "LAUNCHDARKLY_ENV"
   }
 }

@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-export const LEGAL_REPRESENTATIVE_USER_ROLES = ['solicitor'] as const;
+export const LEGAL_REPRESENTATIVE_USER_ROLES = ['caseworker-pcs-solicitor'] as const;
 
 export type UserType = 'citizen' | 'legalrep';
 
@@ -29,4 +29,12 @@ export function getUserType(req: Request): UserType {
   }
 
   return 'citizen';
+}
+
+export function getUserToken(req: Request): string {
+  const token = req.session?.user?.accessToken;
+  if (!token) {
+    throw new Error('User not authenticated');
+  }
+  return token;
 }

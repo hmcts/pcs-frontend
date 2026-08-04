@@ -1,8 +1,12 @@
 {
-  "heading": "cyWhat is your client’s name?",
-  "pageTitle": "cyYour client’s name",
+  "heading": "Beth yw enw eich cleient?",
+  "pageTitle": "Enw eich cleient",
   "errors": {
-    "firstName": "cyEnter your client’s first name",
-    "lastName": "cyEnter your client’s last name"
+    "firstName": "Nodwch enw cyntaf eich cleient",
+    "firstNameMaxLength": "Rhaid i enw cyntaf y cleient fod yn 60 nod neu lai",
+    "firstNameInvalidCharacters": "Dylai enw cyntaf y cleient ond cynnwys llythrennau a i z, a nodweddion arbennig fel cysylltnod, bylchau a chollnod.",
+    "lastName": "Nodwch cyfenw eich cleient",
+    "lastNameMaxLength": "Rhaid i gyfenw'r cleient fod yn 60 nod neu lai",
+    "lastNameInvalidCharacters": "Rhaid i gyfenw'r cleient ond cynnwys llythrennau a i z, a nodweddion arbennig fel cysylltnod, bylchau a chollnod."
   }
 }

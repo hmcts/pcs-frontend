@@ -1,3 +1,6 @@
+import { Request } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
@@ -20,17 +23,14 @@ export const step: StepDefinition = createFormStep({
         {
           value: 'ADJOURN',
           translationKey: 'options.adjourn.label',
-          // TODO: Hint text translation support to be added as part of HDPI-5208
-          hint: 'You can apply to delay the hearing until a later date.',
+          hint: 'options.adjourn.hint',
         },
         {
           value: 'SET_ASIDE',
           translationKey: 'options.setAside.label',
-          // TODO: Hint text translation support to be added as part of HDPI-5208
-          hint: `You can ask the court to set aside the possession order if you have good reason.
-             For example, if you were unable to attend the court hearing because you were ill.`,
+          hint: 'options.setAside.hint',
         },
-        { value: 'SOMETHING_ELSE', translationKey: 'options.somethingElse.label' },
+        { value: 'SOMETHING_ELSE', translationKey: 'options.somethingElse.label', hint: 'options.somethingElse.hint' },
       ],
     },
   ],
@@ -38,5 +38,18 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    noticeText: 'noticeText',
+    noticeTextByPost: 'noticeTextByPost',
+    readTheGuidance: 'noticeTextList.readTheGuidance',
+    fillInTheForm: 'noticeTextList.fillInTheForm',
+    findYourLocalCourt: 'noticeTextList.findYourLocalCourt',
+    sendTheFormToTheCourt: 'noticeTextList.sendTheFormToTheCourt',
+  },
+  beforeGet: async (req: Request) => {
+    if (!req.session.genApp?.applicationId) {
+      req.session.genApp = {
+        applicationId: uuidv4(),
+      };
+    }
   },
 });

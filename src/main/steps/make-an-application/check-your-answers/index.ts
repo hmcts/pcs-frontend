@@ -1,123 +1,145 @@
-import type { Request, Response } from 'express';
+import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { createGetController, createStepNavigation, getFormData, getTranslationFunction } from '../../../modules/steps';
+import { ApplicationError, ApplicationErrorCode } from '../../../ApplicationError';
+import { createFormStep, getFormData, getTranslationFunction } from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
-import { toYesNoEnum } from '../../utils/yesNoEnum';
-import { MAKE_AN_APPLICATION_ROUTE, flowConfig } from '../flow.config';
+import { toYesNoEnum } from '../../utils';
+import { flowConfig } from '../flow.config';
+
+import { buildSummaryListRows } from './summaryListRowFactory';
+import VisibleFormDataView from './visibleFormDataView';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { CitizenGenAppRequest } from '@services/ccdCase.interface';
+import { CitizenGenAppRequest, GenAppState, GenAppType } from '@services/ccdCase.interface';
+import { PaymentSessionState, clearPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
+import { toCaseReference16 } from '@utils/caseReference';
 
 const STEP_NAME = 'check-your-answers';
-const stepNavigation = createStepNavigation(flowConfig);
 
-function isHearingInNext14Days(req: Request): 'yes' | 'no' | undefined {
-  return getFormData(req, 'is-the-court-hearing-in-the-next-14-days').courtHearingInNext14Days as 'yes' | 'no';
-}
-
-export const step: StepDefinition = {
-  url: `${MAKE_AN_APPLICATION_ROUTE}/check-your-answers`,
-  name: STEP_NAME,
-  view: 'make-an-application/check-your-answers/checkYourAnswers.njk',
+export const step: StepDefinition = createFormStep({
+  stepName: STEP_NAME,
+  journeyFolder: 'makeAnApplication',
   stepDir: __dirname,
-  getController: () => {
-    return createGetController(
-      'make-an-application/check-your-answers/checkYourAnswers.njk',
-      STEP_NAME,
-      stepNavigation,
-      (req: Request) => {
-        const t: TFunction = getTranslationFunction(req, STEP_NAME, ['common']);
-
-        const formData = req.session.formData;
-
-        if (!formData) {
-          throw Error('No existing formData in session');
-        }
-
-        const typeOfApplication = formData['choose-an-application']['typeOfApplication'];
-        const courtHearingInNext14Days = isHearingInNext14Days(req);
-
-        return {
-          summaryData: {
-            rows: [
-              {
-                key: {
-                  text: t('answers.typeOfApplication.label'),
-                },
-                value: {
-                  text: t(`answers.typeOfApplication.options.${typeOfApplication}`),
-                },
-                actions: {
-                  items: [
-                    {
-                      href: './choose-an-application',
-                      text: t('change'),
-                      visuallyHiddenText: t('answers.typeOfApplication.changeHint'),
-                    },
-                  ],
-                },
-              },
-              {
-                key: {
-                  text: t('answers.courtHearingInNext14Days.label'),
-                },
-                value: {
-                  text: t(`options.${courtHearingInNext14Days}`),
-                },
-                actions: {
-                  items: [
-                    {
-                      href: './is-the-court-hearing-in-the-next-14-days',
-                      text: t('change'),
-                      visuallyHiddenText: t('answers.courtHearingInNext14Days.changeHint'),
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        };
+  flowConfig,
+  customTemplate: `${__dirname}/checkYourAnswers.njk`,
+  fields: [
+    {
+      name: 'statementOfTruthAccepted',
+      type: 'checkbox',
+      required: true,
+      errorMessage: 'errors.agreeToTheStatementOfTruth',
+      translationKey: { label: 'statementOfTruth.checkbox.fieldLabel' },
+      legendClasses: 'govuk-visually-hidden',
+      options: [
+        {
+          value: 'yes',
+          translationKey: 'statementOfTruth.checkbox.value',
+        },
+      ],
+    },
+    {
+      name: 'fullName',
+      type: 'text',
+      required: true,
+      maxLength: 100,
+      labelClasses: 'govuk-label--s',
+      errorMessage: 'errors.youMustSignYourName',
+      translationKey: {
+        label: 'statementOfTruth.yourFullName',
       },
-      'makeAnApplication'
-    );
+    },
+  ],
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    caption: 'caption',
+    heading: 'heading',
+    statementOfTruthSubheading: 'statementOfTruth.subheading',
+    theInformationFormsYourApplication: 'statementOfTruth.theInformationFormsYourApplication',
+    whenYouAreSatisfied: 'statementOfTruth.whenYouAreSatisfied',
+    understandProceedings: 'statementOfTruth.understandProceedings',
   },
-  postController: {
-    post: async (req: Request, res: Response) => {
-      const formData = req.session.formData;
+  extendGetContent: async (req: Request) => {
+    const t: TFunction = getTranslationFunction(req);
 
-      const ccdCase = res.locals.validatedCase;
-      if (!ccdCase) {
-        throw Error('No existing case details in session');
-      }
+    const visibleFormData = new VisibleFormDataView(req);
 
-      if (!formData) {
-        throw Error('No existing formData in session');
-      }
+    const feeApplies =
+      visibleFormData.getApplicationTypeField()?.fieldValue !== GenAppType.ADJOURN ||
+      visibleFormData.getHearingInNext14DaysField()?.fieldValue === 'yes';
 
-      const hearingInNext14Days = isHearingInNext14Days(req);
+    const hwfApplies = visibleFormData.getHwfReferenceField()?.fieldValue;
+    const paymentNeeded = feeApplies && !hwfApplies;
 
-      const citizenGenAppRequest: CitizenGenAppRequest = {
-        applicationType: formData['choose-an-application']['typeOfApplication'],
-        within14Days: hearingInNext14Days ? toYesNoEnum(hearingInNext14Days) : undefined,
+    return {
+      summaryData: {
+        rows: buildSummaryListRows(req, t),
+      },
+      buttonLabel: paymentNeeded ? t('buttons.continueToPayment') : t('buttons.submit'),
+    };
+  },
+  beforeRedirect: async (req: Request) => {
+    const ccdCase = req.res?.locals.validatedCase;
+    if (!ccdCase) {
+      throw Error('No existing case details in session');
+    }
+
+    const formData = req.session.formData;
+    if (!formData) {
+      throw Error('No existing formData in session');
+    }
+
+    if (!req.session.genApp?.applicationId) {
+      throw new ApplicationError('No application ID in session', ApplicationErrorCode.noApplicationIdInSession);
+    }
+
+    const cyaFormData = getFormData(req, STEP_NAME);
+    const statementOfTruthAccepted = (cyaFormData.statementOfTruthAccepted as string[])[0] as 'yes' | 'no';
+
+    const visibleFormData = new VisibleFormDataView(req);
+    const uploadedDocs = visibleFormData.getUploadedDocuments();
+
+    const citizenGenAppRequest: CitizenGenAppRequest = {
+      applicationType: visibleFormData.getApplicationTypeField()?.fieldValue,
+      within14Days: toYesNoEnum(visibleFormData.getHearingInNext14DaysField()?.fieldValue),
+      needHwf: toYesNoEnum(visibleFormData.getHelpWithFeesNeededField()?.fieldValue),
+      appliedForHwf: toYesNoEnum(visibleFormData.getAlreadyAppliedForHwfField()?.fieldValue),
+      hwfReference: visibleFormData.getHwfReferenceField()?.fieldValue,
+      otherPartiesAgreed: toYesNoEnum(visibleFormData.getOtherPartiesAgreedField()?.fieldValue),
+      withoutNotice: toYesNoEnum(visibleFormData.getAnyReasonsNotToShareField()?.fieldValue),
+      withoutNoticeReason: visibleFormData.getReasonForNotSharingField()?.fieldValue,
+      languageUsed: visibleFormData.getWhichLanguageField()?.fieldValue,
+      whatOrderWanted: visibleFormData.getWhatOrderWantedField()?.fieldValue,
+      hasSupportingDocuments: toYesNoEnum(visibleFormData.getHasSupportingDocuments()?.fieldValue),
+      uploadedDocuments: uploadedDocs.length > 0 ? uploadedDocs : undefined,
+      sotAccepted: toYesNoEnum(statementOfTruthAccepted),
+      sotFullName: cyaFormData.fullName as string,
+      clientReference: req.session.genApp.applicationId,
+    };
+
+    const makeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
+      id: ccdCase.id,
+      data: {
+        citizenGenAppRequest,
+      },
+    });
+
+    delete req.session.formData;
+    const caseRef = toCaseReference16(req.params?.caseReference);
+    if (caseRef && req.session.uploadedDocs?.[caseRef]) {
+      delete req.session.uploadedDocs[caseRef];
+    }
+    delete req.session.genApp;
+
+    if (makeAnApplicationResponse?.state === GenAppState.PENDING_GEN_APP_ISSUED) {
+      const paymentSessionState: PaymentSessionState = {
+        serviceRequestReference: makeAnApplicationResponse.serviceRequestReference,
+        feeAmount: makeAnApplicationResponse.feeAmount,
       };
 
-      await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
-        id: ccdCase.id,
-        data: {
-          citizenGenAppRequest,
-        },
-      });
-
-      delete req.session.formData;
-
-      const redirectPath = await stepNavigation.getNextStepUrl(req, STEP_NAME, req.body);
-
-      if (!redirectPath) {
-        return res.status(500).send('Unable to determine next step');
-      }
-
-      res.redirect(303, redirectPath);
-    },
+      setPaymentSessionState(req, paymentSessionState);
+    } else {
+      clearPaymentSessionState(req);
+    }
   },
-};
+});

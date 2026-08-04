@@ -13,7 +13,5 @@ export const createCaseApiWalesData = {
     },
     legislativeCountry: 'Wales',
   },
-  createCaseApiEndPoint: `/case-types/PCS${
-    process.env.PCS_API_CHANGE_ID ? '-' + process.env.PCS_API_CHANGE_ID : ''
-  }/cases`,
+  createCaseApiEndPoint: `/case-types/${process.env.CASE_TYPE_ID ?? 'PCS'}/cases`,
 };

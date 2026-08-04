@@ -14,33 +14,35 @@ export function initPostcodeLookup(): void {
   // Helper utilities that work per-container
   const getParts = (container: HTMLElement) => {
     const prefix = container.dataset.namePrefix || 'address';
-    const byId = (id: string) => container.querySelector<HTMLElement>(`#${prefix}-${id}`);
 
-    // Find address fields container
-    const addressForm = byId('addressForm') as HTMLDivElement | null;
-    const addressFieldsContainer = document.querySelector<HTMLDivElement>('[data-address-fields]');
-    const fieldsContainer = addressFieldsContainer || addressForm;
+    const byIdOrName = <T extends HTMLElement>(idOrName: string): T | null => {
+      return (
+        container.querySelector<T>(`#${idOrName}`) ||
+        container.querySelector<T>(`[name="${idOrName}"]`) ||
+        (document.getElementById(idOrName) as T) ||
+        document.querySelector<T>(`[name="${idOrName}"]`)
+      );
+    };
 
     return {
       prefix,
-      byId,
-      postcodeInput: byId('lookupPostcode') as HTMLInputElement | null,
-      findBtn: byId('findAddressBtn') as HTMLButtonElement | null,
-      select: byId('selectedAddress') as HTMLSelectElement | null,
-      selectContainer: byId('addressSelectContainer') as HTMLDivElement | null,
-      selectFormGroup: byId('selectedAddress-form-group') as HTMLDivElement | null,
-      selectErrorMessage: byId('selectedAddress-error') as HTMLParagraphElement | null,
-      lookupErrorMessage: byId('lookup-postcode-error') as HTMLParagraphElement | null,
-      errorMessage: byId('postcode-error') as HTMLParagraphElement | null,
-      postcodeFormGroup: byId('postcode-form-group') as HTMLDivElement | null,
-      addressLine1: byId('addressLine1') as HTMLInputElement | null,
-      addressLine2: byId('addressLine2') as HTMLInputElement | null,
-      town: byId('town') as HTMLInputElement | null,
-      county: byId('county') as HTMLInputElement | null,
-      postcodeOut: byId('postcode') as HTMLInputElement | null,
-      addressForm: fieldsContainer,
-      enterManuallyDetails: byId('enterManuallyDetails') as HTMLDetailsElement | null,
-      addressesFoundFlag: byId('addressesFoundFlag') as HTMLInputElement | null,
+      postcodeInput: byIdOrName<HTMLInputElement>(`${prefix}-lookupPostcode`),
+      findBtn: byIdOrName<HTMLButtonElement>(`${prefix}-findAddressBtn`),
+      select: byIdOrName<HTMLSelectElement>(`${prefix}-selectedAddress`),
+      selectContainer: byIdOrName<HTMLDivElement>(`${prefix}-addressSelectContainer`),
+      selectFormGroup: byIdOrName<HTMLDivElement>(`${prefix}-selectedAddress-form-group`),
+      selectErrorMessage: byIdOrName<HTMLParagraphElement>(`${prefix}-selectedAddress-error`),
+      lookupErrorMessage: byIdOrName<HTMLParagraphElement>(`${prefix}-lookup-postcode-error`),
+      errorMessage: byIdOrName<HTMLParagraphElement>(`${prefix}-postcode-error`),
+      postcodeFormGroup: byIdOrName<HTMLDivElement>(`${prefix}-postcode-form-group`),
+      addressLine1: byIdOrName<HTMLInputElement>(`${prefix}-addressLine1`),
+      addressLine2: byIdOrName<HTMLInputElement>(`${prefix}-addressLine2`),
+      addressLine3: byIdOrName<HTMLInputElement>(`${prefix}-addressLine3`),
+      town: byIdOrName<HTMLInputElement>(`${prefix}-town`),
+      county: byIdOrName<HTMLInputElement>(`${prefix}-county`),
+      postcodeOut: byIdOrName<HTMLInputElement>(`${prefix}-postcode`),
+      enterManuallyDetails: byIdOrName<HTMLDetailsElement>(`${prefix}-enterManuallyDetails`),
+      addressesFoundFlag: byIdOrName<HTMLInputElement>(`${prefix}-addressesFoundFlag`),
     };
   };
 
@@ -89,11 +91,11 @@ export function initPostcodeLookup(): void {
     }
 
     const fieldMappings = [
-      { field: addressLine1, value: selected.dataset.line1, name: 'addressLine1' },
-      { field: addressLine2, value: selected.dataset.line2, name: 'addressLine2' },
-      { field: town, value: selected.dataset.town, name: 'town' },
-      { field: county, value: selected.dataset.county, name: 'county' },
-      { field: postcodeOut, value: selected.dataset.postcode, name: 'postcode' },
+      { field: addressLine1, value: selected.dataset.line1 },
+      { field: addressLine2, value: selected.dataset.line2 },
+      { field: town, value: selected.dataset.town },
+      { field: county, value: selected.dataset.county },
+      { field: postcodeOut, value: selected.dataset.postcode },
     ];
 
     fieldMappings.forEach(({ field, value }) => {
@@ -192,8 +194,8 @@ export function initPostcodeLookup(): void {
 
     // Show the error summary
     if (errorSummary) {
-      errorSummary.hidden = false;
-      errorSummary.style.display = '';
+      errorSummary.removeAttribute('hidden');
+      errorSummary.focus();
       // Focus on error summary (GOV.UK pattern)
       errorSummary.focus();
     }
@@ -215,7 +217,7 @@ export function initPostcodeLookup(): void {
     if (remainingErrors.length === 0) {
       const errorSummary = getErrorSummary();
       if (errorSummary) {
-        errorSummary.hidden = true;
+        errorSummary.setAttribute('hidden', '');
       }
     }
   };
@@ -257,7 +259,7 @@ export function initPostcodeLookup(): void {
     }
 
     // Add error to error summary
-    if (errorMessage?.textContent && input) {
+    if (input?.id && errorMessage?.textContent) {
       const errorText = errorMessage.textContent.replace('Error:', '').trim();
       addErrorToSummary(`${prefix}-postcode-error`, errorText, `#${prefix}-lookupPostcode`);
     }
@@ -380,6 +382,17 @@ export function initPostcodeLookup(): void {
         addErrorToSummary(`${prefix}-lookup-postcode-error`, errorText, `#${prefix}-lookupPostcode`);
       }
 
+      const errorSummary = getErrorSummary();
+      if (errorSummary) {
+        errorSummary.hidden = false;
+        errorSummary.focus();
+        errorSummary.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
+
+      postcodeInput.focus();
       return;
     }
     // Hide blank field error before lookup
@@ -422,6 +435,7 @@ export function initPostcodeLookup(): void {
 
     // Remove error from error summary when user starts typing
     removeErrorFromSummary(`${prefix}-lookup-postcode-error`);
+    removeErrorFromSummary(`${prefix}-postcode-error`);
   });
 
   document.addEventListener('change', evt => {

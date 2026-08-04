@@ -42,7 +42,7 @@ export class ClickButtonAction implements IAction {
   ): Promise<void> {
     const pageElement = page.locator(`h1:has-text("${nextPageElement}")`);
     let attempt = 0;
-    let nextPageElementIsVisible = false;
+    let nextPageElementIsVisible: boolean;
     do {
       attempt++;
       await this.clickButton(page, button);

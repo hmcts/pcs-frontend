@@ -1,5 +1,15 @@
 {
-  "pageTitle": "cyWhich language did you use to complete this service?",
-  "caption": "cyMake an application",
-  "heading": "cyWhich language did you use to complete this service?"
+  "pageTitle": "Pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn?",
+  "caption": "Gwneud cais",
+  "heading": "Pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn?",
+  "question": "Pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn?",
+  "ifSomeoneElseHelpedYou": "Os yw rhywun arall wedi eich helpu i ateb cwestiwn yn y gwasanaeth hwn, gofynnwch iddynt a wnaethant ateb unrhyw gwestiynau yn Gymraeg. Byddwn yn defnyddio hwn i sicrhau bod eich hawliad yn cael ei brosesu'n gywir.",
+  "options": {
+    "ENGLISH": "Saesneg",
+    "WELSH": "Cymraeg",
+    "ENGLISH_AND_WELSH": "Saesneg a Cymraeg"
+  },
+  "errors": {
+    "confirmLanguage": "Cadarnhewch pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn"
+  }
 }

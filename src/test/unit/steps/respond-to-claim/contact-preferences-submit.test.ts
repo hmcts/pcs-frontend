@@ -1,21 +1,23 @@
 import type { Request, Response } from 'express';
 
-import { step as telephoneStep } from '../../../../main/steps/respond-to-claim/contact-preferences-telephone';
-import { step as textStep } from '../../../../main/steps/respond-to-claim/contact-preferences-text-message';
-import * as populateModule from '../../../../main/steps/utils/populateResponseToClaimPayloadmap';
-
-import type { CcdCase } from '@services/ccdCase.interface';
-
 jest.mock('../../../../main/modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => jest.fn((key: string) => key)),
   loadStepNamespace: jest.fn(),
 }));
 
-describe('contact preferences submit-time CCD payloads', () => {
-  const buildCcdSpy = jest
-    .spyOn(populateModule, 'buildCcdCaseForPossessionClaimResponse')
-    .mockResolvedValue({} as CcdCase);
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
+  saveDraftDefendantResponse: jest.fn(),
+}));
 
+import { step as telephoneStep } from '../../../../main/steps/respond-to-claim/contact-preferences-telephone';
+import { step as textStep } from '../../../../main/steps/respond-to-claim/contact-preferences-text-message';
+import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
+
+describe('contact preferences submit-time CCD payloads', () => {
   // Reusable minimal req/res scaffolding for formBuilder steps
   const createBaseReqRes = () => {
     const req = {
@@ -56,7 +58,7 @@ describe('contact preferences submit-time CCD payloads', () => {
   });
 
   describe('contact-preferences-telephone', () => {
-    it('builds CCD payload from current body when user opts in with phone number', async () => {
+    it('builds CCD payload when req.body has telephone data', async () => {
       const { req, res, next } = createBaseReqRes();
 
       req.body = {
@@ -69,25 +71,24 @@ describe('contact preferences submit-time CCD payloads', () => {
 
       await post!(req as unknown as Request, res as unknown as Response, next);
 
-      expect(buildCcdSpy).toHaveBeenCalledWith(
+      expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
         req,
         expect.objectContaining({
-          defendantContactDetails: {
-            party: {
-              phoneNumberProvided: 'YES',
+          defendantContactDetails: expect.objectContaining({
+            party: expect.objectContaining({
               phoneNumber: '07123456789',
-            },
-          },
-          defendantResponses: {
+            }),
+          }),
+          defendantResponses: expect.objectContaining({
             contactByPhone: 'YES',
-          },
+          }),
         })
       );
     });
   });
 
   describe('contact-preferences-text-message', () => {
-    it('builds CCD payload from current body when user opts in to text', async () => {
+    it('builds CCD payload when req.body has text message data', async () => {
       const { req, res, next } = createBaseReqRes();
 
       req.body = {
@@ -99,12 +100,12 @@ describe('contact preferences submit-time CCD payloads', () => {
 
       await post!(req as unknown as Request, res as unknown as Response, next);
 
-      expect(buildCcdSpy).toHaveBeenCalledWith(
+      expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
         req,
         expect.objectContaining({
-          defendantResponses: {
+          defendantResponses: expect.objectContaining({
             contactByText: 'YES',
-          },
+          }),
         })
       );
     });

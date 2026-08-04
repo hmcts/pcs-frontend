@@ -1,15 +1,18 @@
 import type { TFunction } from 'i18next';
 import type { Environment } from 'nunjucks';
 
-import { type FormError, buildErrorSummary, getErrorMessage } from './errorUtils';
+import { type FormError, buildErrorSummary } from './errorUtils';
 import { buildFieldValues, translateFields } from './fieldTranslation';
 import { getTranslation } from './helpers';
 
+import { Logger } from '@modules/logger';
 import type {
   BuiltFormContent,
   FormFieldConfig,
   TranslationKeys,
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
+
+const logger = Logger.getLogger('form-builder-content');
 
 export function buildFormContent(
   fields: FormFieldConfig[],
@@ -24,10 +27,6 @@ export function buildFormContent(
   const fieldValues = buildFieldValues(fields, bodyData);
   const pageTitle =
     getTranslation(t, 'title', undefined, interpolation) || getTranslation(t, 'question', undefined, interpolation);
-  // Convert FormError to string for translateFields (which expects strings for error messages)
-  const stringErrors: Record<string, string> = Object.fromEntries(
-    Object.entries(errors).map(([key, error]) => [key, getErrorMessage(error)])
-  );
   // Pass bodyData as originalData so translateFields can extract nested field values
   const fieldsWithLabels = translateFields(
     fields,
@@ -36,7 +35,7 @@ export function buildFormContent(
 
     fieldValues,
 
-    stringErrors,
+    errors,
 
     !!pageTitle,
 
@@ -56,15 +55,25 @@ export function buildFormContent(
   if (translationKeys) {
     for (const [key, value] of Object.entries(translationKeys)) {
       if (value) {
-        translatedContent[key] = interpolation ? t(value, interpolation) : t(value);
+        const translated = getTranslation(t, value, undefined, interpolation);
+        if (translated !== undefined) {
+          translatedContent[key] = translated;
+        } else {
+          logger.warn(
+            `Missing translation for form content key "${key}" using translation key "${value}". Key will be omitted from template context.`
+          );
+        }
       }
     }
   }
+
+  const allFieldsHaveOwnFieldset = fields.length > 0 && fields.every(f => f.type === 'radio' || f.type === 'checkbox');
 
   return {
     ...bodyData,
     fieldValues,
     fields: fieldsWithLabels,
+    allFieldsHaveOwnFieldset,
     title: pageTitle,
     ...translatedContent,
     showCancelButton,

@@ -1,4 +1,4 @@
-import { defendantNameConfirmation, feedback, freeLegalAdvice } from '../data/page-data';
+import { defendantNameConfirmation, feedback, taskList } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 import { defendantNameCaptureInputValuesPrePopulated } from './defendantNameCapture.pft';
@@ -9,7 +9,7 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
   await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-    messages: defendantNameConfirmation.nameErrorMessage,
+    message: defendantNameConfirmation.nameErrorMessage,
   });
   // Test: Both first name and last name text fields are empty
   await performAction('clickRadioButton', defendantNameConfirmation.noRadioOption);
@@ -44,13 +44,35 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
     message: defendantNameConfirmation.enterFirstNameMaxLengthErrorMessage,
   });
+  //Test: Both first name and last name for emoji
+  await performAction(
+    'inputText',
+    defendantNameConfirmation.firstNameHiddenTextLabel,
+    defendantNameConfirmation.emojiTextInput
+  );
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.emojiFirstNameErrorMessage,
+  });
+  await performAction(
+    'inputText',
+    defendantNameConfirmation.lastNameHiddenTextLabel,
+    defendantNameConfirmation.emojiTextInput
+  );
+  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
+    message: defendantNameConfirmation.emojiLastNameErrorMessage,
+  });
 }
+
 export async function defendantNameConfirmationNavigationTests(): Promise<void> {
   await performValidation('pageNavigation', defendantNameConfirmation.feedbackLink, {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: defendantNameConfirmation.pageSlug,
   });
-  await performValidation('pageNavigation', defendantNameConfirmation.backLink, freeLegalAdvice.mainHeader);
+  await performValidation('pageNavigation', defendantNameConfirmation.backLink, taskList.mainHeader);
   await performAction('clickRadioButton', {
     question: defendantNameConfirmation.mainHeader,
     option: defendantNameConfirmation.noRadioOption,

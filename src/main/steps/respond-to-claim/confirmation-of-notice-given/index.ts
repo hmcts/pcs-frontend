@@ -1,24 +1,22 @@
 import type { Request } from 'express';
 
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { getClaimantName } from '../../utils/getClaimantName';
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { CaseData, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
+import type { CaseData, YesNoNotSureValue } from '@services/ccdCase.interface';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-given',
-  journeyFolder: 'respondToClaim',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.possessionNoticeReceived),
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/confirmationOfNoticeGiven.njk`,
   translationKeys: {
-    caption: 'caption',
     pageTitle: 'pageTitle',
     question: 'question',
     hintText: 'hintText',
+    noticeDateHint: 'noticeDateHint',
   },
   fields: [
     {
@@ -43,19 +41,16 @@ export const step: StepDefinition = createFormStep({
     return possessionNoticeReceived ? { possessionNoticeReceived } : {};
   },
   beforeRedirect: async (req: Request) => {
+    const response = buildDraftDefendantResponse(req);
     const possessionNoticeReceived: YesNoNotSureValue | undefined = req.body?.possessionNoticeReceived;
 
-    if (!possessionNoticeReceived) {
-      return;
+    if (possessionNoticeReceived) {
+      response.defendantResponses.possessionNoticeReceived = possessionNoticeReceived;
+    } else {
+      delete response.defendantResponses.possessionNoticeReceived;
     }
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        possessionNoticeReceived,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+    await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: req => {
     const claimantName = getClaimantName(req);

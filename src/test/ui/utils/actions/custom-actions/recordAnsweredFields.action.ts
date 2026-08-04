@@ -9,6 +9,10 @@ export const FieldsStore = {
     fieldsMap.set(key, value);
   },
 
+  has(key: string): boolean {
+    return fieldsMap.has(key);
+  },
+
   update(key: string, value: string): boolean {
     if (!fieldsMap.has(key)) {
       return false;
@@ -31,6 +35,30 @@ export const FieldsStore = {
 
   delete(key: string): boolean {
     return fieldsMap.delete(key);
+  },
+
+  deleteKeys(keys: string[]): boolean {
+    let deleted = false;
+
+    for (const key of keys) {
+      if (fieldsMap.delete(key)) {
+        deleted = true;
+      }
+    }
+
+    return deleted;
+  },
+
+  rename(oldKey: string, newKey: string): boolean {
+    if (!fieldsMap.has(oldKey) || fieldsMap.has(newKey)) {
+      console.log(`Keys ${oldKey} nor ${newKey} is present`);
+      return false;
+    }
+
+    const value = fieldsMap.get(oldKey)!;
+    fieldsMap.set(newKey, value);
+    fieldsMap.delete(oldKey);
+    return true;
   },
 };
 

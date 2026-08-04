@@ -1,0 +1,10 @@
+{
+  "pageTitle": "Incwm a chostau",
+  "infoParagraph1": "Gall barnwr ddefnyddio manylion am eich incwm a chostau i ddod i benderfyniad ar eich achos, a hefyd i benderfynu faint y gallech fforddio ei ad-dalu os oes gennych ôl-ddyledion rhent.",
+  "infoParagraph2": "Ar ddiwrnod y gwrandawiad, mae'n bosib y bydd yna gynghorydd ar ddyletswydd yn y llys a all roi cyngor i chi a'ch cynrychioli am ddim. Gallant hefyd ddefnyddio'r wybodaeth hon i weld a oes yna unrhyw fudd-daliadau neu gefnogaeth ychwanegol y gallech eu hawlio.",
+  "infoParagraph3": "Bydd yr hawlydd yn gallu gweld eich atebion.",
+  "question": "A ydych eisiau darparu manylion am eich incwm a chostau?",
+  "errors": {
+    "provideFinanceDetails": "Dewiswch a ydych eisiau rhoi manylion eich incwm a chostau"
+  }
+}

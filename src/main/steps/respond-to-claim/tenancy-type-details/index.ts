@@ -1,12 +1,13 @@
 import type { Request } from 'express';
 
-import { createFormStep } from '../../../modules/steps';
-import { buildCcdCaseForPossessionClaimResponse as buildAndSubmitPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { getTranslationFunction } from '../../../modules/steps';
+import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { isLegalRepresentativeUser } from '../../utils/userRole';
+import { createRespondToClaimFormStep } from '../formStep';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCaseData.model';
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -53,19 +54,6 @@ const fieldsConfig: FormFieldConfig[] = [
 
 const STEP_NAME = 'tenancy-type-details';
 
-const TENANCY_TYPE_CONFIRM_TO_CCD: Record<string, YesNoNotSureValue> = {
-  yes: 'YES',
-  no: 'NO',
-  notSure: 'NOT_SURE',
-};
-
-const CCD_TO_TENANCY_TYPE_CONFIRM: Record<Exclude<YesNoNotSureValue, null>, string> = {
-  YES: 'yes',
-  NO: 'no',
-  NOT_SURE: 'notSure',
-};
-
-// TODO: Welsh translations for tenancy type text will be addressed in the next ticket
 const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
   ASSURED_TENANCY: 'an assured',
   SECURE_TENANCY: 'a secure',
@@ -75,14 +63,12 @@ const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
   OTHER: 'other',
 };
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  journeyFolder: 'respondToClaim',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.tenancyTypeConfirmation),
   stepDir: __dirname,
-  flowConfig,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
     heading: 'heading',
     insetText: 'insetText',
     saveAndContinue: 'saveAndContinue',
@@ -94,86 +80,95 @@ export const step: StepDefinition = createFormStep({
   customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
-    const existingTenancyTypeCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyTypeCorrect as
-      | YesNoNotSureValue
-      | undefined;
-    const existingCorrectedTenancyType = caseData?.possessionClaimResponse?.defendantResponses?.tenancyType as
-      | string
-      | undefined;
+    const caseData = req.res?.locals.validatedCase?.data;
+    const existingTenancyTypeConfirmation =
+      caseData?.possessionClaimResponse?.defendantResponses?.tenancyTypeConfirmation;
+    const existingCorrectedTenancyType = caseData?.possessionClaimResponse?.defendantResponses?.tenancyType;
 
-    if (!existingTenancyTypeCorrect) {
-      return {};
-    }
-
-    const formValue = CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeCorrect];
+    const formValue = fromYesNoNotSureEnum(existingTenancyTypeConfirmation);
     if (!formValue) {
       return {};
     }
 
     const initial: Record<string, unknown> = { tenancyTypeConfirm: formValue };
-    if (existingTenancyTypeCorrect === 'NO' && existingCorrectedTenancyType) {
+    if (existingTenancyTypeConfirmation === 'NO' && existingCorrectedTenancyType) {
       initial['tenancyTypeConfirm.correctType'] = existingCorrectedTenancyType;
     }
     return initial;
   },
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
     const tenancyTypeConfirm = req.body?.tenancyTypeConfirm as string | undefined;
-    const tenancyTypeCorrect = tenancyTypeConfirm ? TENANCY_TYPE_CONFIRM_TO_CCD[tenancyTypeConfirm] : undefined;
-    const correctedTenancyTypeText = (
-      (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
-      (req.body?.correctType as string | undefined)
-    )?.trim();
-    const existingCorrectedTenancyType =
-      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.tenancyType;
-    const tenancyType =
-      tenancyTypeConfirm === 'no'
-        ? correctedTenancyTypeText || undefined
-        : existingCorrectedTenancyType
-          ? ''
-          : undefined;
+    const enumValue = toYesNoNotSureEnum(tenancyTypeConfirm);
 
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        tenancyTypeCorrect,
-        tenancyType,
-      },
-    };
+    if (enumValue) {
+      response.defendantResponses.tenancyTypeConfirmation = enumValue;
 
-    await buildAndSubmitPossessionClaimResponse(req, possessionClaimResponse);
+      if (tenancyTypeConfirm === 'no') {
+        const correctedType = (
+          (req.body?.['tenancyTypeConfirm.correctType'] as string | undefined) ||
+          (req.body?.correctType as string | undefined)
+        )?.trim();
+        if (correctedType) {
+          response.defendantResponses.tenancyType = correctedType;
+        } else {
+          delete response.defendantResponses.tenancyType;
+        }
+      } else {
+        delete response.defendantResponses.tenancyType;
+      }
+    } else {
+      delete response.defendantResponses.tenancyTypeConfirmation;
+      delete response.defendantResponses.tenancyType;
+    }
+
+    await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: async (req, formContent) => {
-    const existingTenancyTypeCorrect = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
-      ?.tenancyTypeCorrect as YesNoNotSureValue;
+    const existingTenancyTypeConfirmation =
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.tenancyTypeConfirmation;
     const existingCorrectedTenancyType = req.res?.locals.validatedCase?.data?.possessionClaimResponse
       ?.defendantResponses?.tenancyType as string;
     const tenancyTypeConfirm =
-      (req.body?.tenancyTypeConfirm as string) ||
-      (existingTenancyTypeCorrect ? CCD_TO_TENANCY_TYPE_CONFIRM[existingTenancyTypeCorrect] : '') ||
-      '';
+      (req.body?.tenancyTypeConfirm as string) || fromYesNoNotSureEnum(existingTenancyTypeConfirmation) || '';
     const correctType =
       (req.body?.['tenancyTypeConfirm.correctType'] as string) ||
       (req.body?.correctType as string) ||
       (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : '') ||
       '';
-
-    const orgName = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.claimantOrganisations?.[0]
-      ?.value as string;
-    const tenancyTypeOfTenancyLicence = req.res?.locals.validatedCase?.data?.tenancy_TypeOfTenancyLicence as string;
-    const otherTenancyTypeDetails = req.res?.locals.validatedCase?.data
-      ?.tenancy_DetailsOfOtherTypeOfTenancyLicence as string;
+    const claimantName = req.res?.locals.validatedCase?.claimantName;
+    const caseData = req.res?.locals.validatedCase?.data;
+    const walesProperty = isWalesProperty(caseData);
+    const orgName = req.res?.locals.validatedCase?.orgName;
+    const tenancyTypeOfTenancyLicence = caseData?.tenancy_TypeOfTenancyLicence as string;
+    const occupationLicenceTypeWales = caseData?.occupationLicenceTypeWales;
+    // Wales: flat keys from OccupationLicenceDetailsWales.
+    const otherTenancyTypeDetails = walesProperty
+      ? caseData?.otherLicenceTypeDetails
+      : caseData?.tenancy_DetailsOfOtherTypeOfTenancyLicence;
+    // England: tenancy_* (TenancyLicenceDetails).
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
+    const senderName = isLegalRepresentativeUser(req) ? claimantName : orgName;
 
-    const detailsHeading =
-      typeof formContent.detailsHeading === 'string'
-        ? `${formContent.detailsHeading}${orgName}${':'}`
-        : formContent.detailsHeading;
-    const tenancyType =
-      tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
+    const t = getTranslationFunction(req);
+    let tenancyType: unknown;
+    if (walesProperty) {
+      if (occupationLicenceTypeWales === 'OTHER') {
+        tenancyType = t('tenancyTypeOther', { otherTenancyTypeDetails });
+      } else if (occupationLicenceTypeWales === 'STANDARD_CONTRACT') {
+        tenancyType = t('tenancyTypeWalesStandard');
+      } else if (occupationLicenceTypeWales === 'SECURE_CONTRACT') {
+        tenancyType = t('tenancyTypeWalesSecure');
+      } else {
+        tenancyType = formContent.tenancyType;
+      }
+    } else {
+      tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
+    }
 
     return {
       ...formContent,
-      detailsHeading,
+      senderName,
       tenancyType,
       organisationName: orgName,
       orgname: orgName,

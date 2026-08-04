@@ -142,17 +142,22 @@ export async function renderWithErrors(
   showCancelButton?: boolean
 ): Promise<void> {
   const lang = getRequestLanguage(req);
-  const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+  const t: TFunction = getTranslationFunction(req);
+
+  const navigationBackUrl = await navigation.getBackUrl(req, stepName);
+  const backUrl = typeof formContent.backUrl === 'string' ? formContent.backUrl : navigationBackUrl;
 
   // formContent already includes errorSummary from buildFormContent, so we don't need to rebuild it
   // res.render() sends the response directly and doesn't return a value
   res.status(400).render(viewPath, {
     ...formContent,
     errors,
+    /** Field-level validation only; avoid colliding with step i18n `errors` blobs spread on GET */
+    validationErrors: errors,
     // errorSummary,
     stepName,
     journeyFolder,
-    backUrl: await navigation.getBackUrl(req, stepName),
+    backUrl,
     lang,
     pageUrl: req.originalUrl || '/',
     t,

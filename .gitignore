@@ -9,7 +9,7 @@ node_modules/
 *swp
 *log
 .DS_Store
-
+temp/
 src/main/public/img/lib/*
 src/main/public/js/lib/**/*.js
 src/main/public/stylesheets/lib/*
@@ -25,8 +25,8 @@ npm-debug.log.*
 dist/
 public/
 src/main/views/govuk
+src/main/views/moj
 src/main/views/ui-component-lib
-src/main/assets
 coverage/
 smoke-output/
 functional-output/
@@ -49,6 +49,7 @@ version
 /allure-results/
 /blob-report/
 /playwright/.cache/
+/src/test/ui/.auth/setup-env.json
 /.yarn/cache/
 /.yarn/unplugged/
 /pact/

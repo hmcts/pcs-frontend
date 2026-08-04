@@ -1,43 +1,33 @@
-import { buildCcdCaseForPossessionClaimResponse } from '../../utils/populateResponseToClaimPayloadmap';
-import { flowConfig } from '../flow.config';
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { createRespondToClaimFormStep } from '../formStep';
 
-import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { PossessionClaimResponse } from '@services/ccdCaseData.model';
 
-export const step: StepDefinition = createFormStep({
+export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'free-legal-advice',
-  journeyFolder: 'respondToClaim',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.freeLegalAdvice),
   stepDir: __dirname,
-  flowConfig,
   customTemplate: `${__dirname}/freeLegalAdvice.njk`,
   beforeRedirect: async req => {
+    const response = buildDraftDefendantResponse(req);
     const hadLegalAdvice = req.body?.hadLegalAdvice as string | undefined;
+    const enumMapping: Record<string, string> = { yes: 'YES', no: 'NO', preferNotToSay: 'PREFER_NOT_TO_SAY' };
 
-    if (!hadLegalAdvice) {
-      return;
+    if (hadLegalAdvice && enumMapping[hadLegalAdvice]) {
+      response.defendantResponses.freeLegalAdvice = enumMapping[hadLegalAdvice];
+    } else {
+      delete response.defendantResponses.freeLegalAdvice;
     }
 
-    const enumMapping: Record<string, string> = {
-      yes: 'YES',
-      no: 'NO',
-      preferNotToSay: 'PREFER_NOT_TO_SAY',
-    };
+    await saveDraftDefendantResponse(
+      req,
 
-    const ccdValue = enumMapping[hadLegalAdvice];
-
-    const possessionClaimResponse: PossessionClaimResponse = {
-      defendantResponses: {
-        freeLegalAdvice: ccdValue,
-      },
-    };
-
-    await buildCcdCaseForPossessionClaimResponse(req, possessionClaimResponse);
+      response
+    );
   },
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    caption: 'caption',
     subHeading1: 'subHeading1',
     paragraph1: 'paragraph1',
     listItem1: 'listItem1',
@@ -52,9 +42,7 @@ export const step: StepDefinition = createFormStep({
     paragraph4: 'paragraph4',
   },
   getInitialFormData: req => {
-    const { defendantResponsesFreeLegalAdvice: existingAnswer } = req.res?.locals?.validatedCase ?? {
-      defendantResponsesFreeLegalAdvice: undefined,
-    };
+    const existingAnswer = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.freeLegalAdvice;
 
     // Map CCD enum to frontend value
     const formValue =
