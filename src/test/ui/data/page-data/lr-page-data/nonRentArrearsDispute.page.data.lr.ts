@@ -1,8 +1,7 @@
 import { generateRandomString } from '../../../utils/common/string.utils';
 
-export const nonRentArrearsDisputeLR = {
+export const nonRentArrearsDispute = {
   mainHeader: `${process.env.CLAIMANT_NAME}’s claim`,
-  groundsForPossessionList: `${process.env.CLAIMANT_NAME}’s grounds for possession (their reasons for making the claim)`,
   doYouWantToDisputeQuestion: `Does the defendant dispute any other parts of the claim?`,
   explainPartOfClaimHiddenTextLabel: `Explain which parts of the claim the defendant disputes`,
   explainClaimTextInput: `Example - Do not agree with claim 1`,
@@ -20,4 +19,5 @@ export const nonRentArrearsDisputeLR = {
   selectIfYouWantToDisputeErrorMessage: `Select if the defendant wants to dispute any other parts of the claim`,
   partsOfClaimDoNotAgreeErrorMessage: `Enter the parts of the claim the defendant does not agree with`,
   charLimitErrorMessage: `Explanation must be 6500 characters or less`,
+  pageSlug: `non-rent-arrears-dispute`,
 };

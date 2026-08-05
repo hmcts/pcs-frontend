@@ -1,4 +1,4 @@
-export const counterClaimWhatAreYouClaimingForLR = {
+export const counterClaimWhatAreYouClaimingFor = {
   mainHeader: `What is the defendant claiming for?`,
   sumOfMoneyOrCompensationRadioOption: `A sum of money or compensation`,
   somethingElseRadioOption: `Something else`,

@@ -2,13 +2,13 @@ import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
   correspondenceAddress,
-  counterClaimAboutLR,
-  counterClaimAgainstWhomLR,
-  counterClaimFeeLR,
-  counterClaimLR,
-  counterClaimSpecificSumOfMoneyLR,
-  counterClaimWhatAreYouClaimingForLR,
-  counterclaimDoYouWantToUploadFilesLR,
+  counterClaim,
+  counterClaimAbout,
+  counterClaimAgainstWhom,
+  counterClaimFee,
+  counterClaimSpecificSumOfMoney,
+  counterClaimWhatAreYouClaimingFor,
+  counterclaimDoYouWantToUploadFiles,
   defendantDateOfBirth,
   defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHomeLR,
@@ -19,7 +19,7 @@ import {
   exceptionalHardshipLR,
   incomeAndExpensesLR,
   languageUsedLR,
-  nonRentArrearsDisputeLR,
+  nonRentArrearsDispute,
   otherConsiderationsLR,
   priorityDebtsLR,
   selectDefendant,
@@ -170,36 +170,36 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     });
     await performAction('enterNoticeDateUnknownLR');
     await performAction('disputingOtherPartsOfTheClaimLR', {
-      disputeOption: nonRentArrearsDisputeLR.noRadioOption,
+      disputeOption: nonRentArrearsDispute.noRadioOption,
     });
     await performAction('selectCounterClaimLR', {
-      question: counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(),
-      option: counterClaimLR.yesRadioOption,
+      question: counterClaim.getDoYouWantToMakeACounterclaimQuestion(),
+      option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
-      option: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
-      question: counterClaimSpecificSumOfMoneyLR.mainHeader,
-      option: counterClaimSpecificSumOfMoneyLR.yesRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     await performAction('selectCounterClaimFeeLR', {
-      radioOption: counterClaimFeeLR.defendantDoNotNeedHelpRadioOption,
-      typeOfClaim: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
+      radioOption: counterClaimFee.defendantDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     const pinUser = await getPinUserAt(2);
     await performAction('selectClaimAgainstWhomLR', {
-      question: counterClaimAgainstWhomLR.mainHeader,
+      question: counterClaimAgainstWhom.mainHeader,
       options: [claimantName, `${pinUser.firstName} ${pinUser.lastName}`],
     });
     await performAction('counterClaimAboutLR', {
-      counterClaimFor: counterClaimAboutLR.counterClaimForInput,
-      reasonsInput: counterClaimAboutLR.reasonsForCounterClaimInput,
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
     await performAction('doYouWantToUploadFilesLR', {
-      option: counterclaimDoYouWantToUploadFilesLR.yesRadioOption,
+      option: counterclaimDoYouWantToUploadFiles.yesRadioOption,
     });
     await performAction('uploadFilesToSupportCounterclaimLR', { files: ['rentArrears.pdf'] });
     await performAction('doesTheDependantHaveChildrenLR', {

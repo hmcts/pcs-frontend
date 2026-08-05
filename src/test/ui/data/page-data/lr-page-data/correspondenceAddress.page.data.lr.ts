@@ -26,9 +26,6 @@ export const correspondenceAddress = {
     const postalAddress = process.env.CORRESPONDENCE_ADDRESS === 'UNKNOWN' ? getDefaultPostalAddressLR() : address;
     return `Is the defendant’s postal address ${postalAddress}?`;
   },
-  correspondenceAddressUnKnownMainHeader: `What’s your correspondence address?`,
-  correspondenceAddressUnKnownParagraph: `Your correspondence address is your postal address.`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   correspondenceAddressConfirmHintText: () => `This is the address provided by ${process.env.CLAIMANT_NAME}`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

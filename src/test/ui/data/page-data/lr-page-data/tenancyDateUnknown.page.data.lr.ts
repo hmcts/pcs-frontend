@@ -1,10 +1,9 @@
-export const tenancyDateUnknownLR = {
+export const tenancyDateUnknown = {
   mainHeader: 'Tenancy, occupation contract or licence start date',
   whenDidYourTenancyQuestion: 'What is the tenancy, occupation contract or licence start date? (Optional)',
   getDidNotProvideParagraph: (claimantName: string): string => {
     return `${claimantName} did not provide the start date of the tenancy, licence or occupation contract.`;
   },
-  forExampleHintText: 'For example, 27 9 2022',
   dayTextLabel: 'Day',
   monthTextLabel: 'Month',
   yearTextLabel: 'Year',

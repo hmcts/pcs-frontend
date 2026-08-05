@@ -1,4 +1,4 @@
-export const counterClaimAboutLR = {
+export const counterClaimAbout = {
   mainHeader: `About the defendant’s counterclaim`,
   youWillBeParagraph: `You will be able to upload any evidence the defendant has on the next page.`,
   theClaimantWillBeParagraph: `The claimant will be able to see your answers.`,
@@ -11,7 +11,7 @@ export const counterClaimAboutLR = {
   counterClaimForInput: `services not provided`,
   reasonsForCounterClaimInput: `electricity and windows not repaired`,
   feedbackLink: `feedback`,
-  pageSlug: `counter-claim-against-whom`,
+  pageSlug: `counter-claim-about`,
   /*
   enterWhatYourCounterClaimErrorMessage: `Enter what your counterclaim is for`,
   enterWhatYourReasonsAreForErrorMessage: `Enter what your reasons are for making the counterclaim`,

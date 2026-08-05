@@ -1,4 +1,4 @@
-export const counterClaimSpecificSumOfMoneyLR = {
+export const counterClaimSpecificSumOfMoney = {
   mainHeader: `Is the defendant claiming for a specific sum of money?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

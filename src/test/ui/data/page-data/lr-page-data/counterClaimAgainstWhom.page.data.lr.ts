@@ -1,4 +1,4 @@
-export const counterClaimAgainstWhomLR = {
+export const counterClaimAgainstWhom = {
   mainHeader: `Who is the defendant making a counterclaim against?`,
   selectAllHintText: `Select all that apply`,
   saveAndContinueButton: `Save and continue`,

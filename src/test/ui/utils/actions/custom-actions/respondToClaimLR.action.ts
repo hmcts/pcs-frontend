@@ -2,18 +2,17 @@ import { Page } from '@playwright/test';
 
 import { defendantDateOfBirth, defendantNameConfirmation } from '../../../data/page-data';
 import {
-  confirmationOfNoticeDateWhenNotProvidedLR,
   confirmationOfNoticeGiven,
   correspondenceAddress,
-  counterClaimAboutLR,
-  counterClaimAgainstWhomLR,
-  counterClaimFeeLR,
+  counterClaim,
+  counterClaimAbout,
+  counterClaimAgainstWhom,
+  counterClaimFee,
   counterClaimHaveYouAppliedForHelpLR,
-  counterClaimLR,
   counterClaimOrderOtherThanSumLR,
-  counterClaimSpecificSumOfMoneyLR,
-  counterClaimWhatAreYouClaimingForLR,
-  counterclaimDoYouWantToUploadFilesLR,
+  counterClaimSpecificSumOfMoney,
+  counterClaimWhatAreYouClaimingFor,
+  counterclaimDoYouWantToUploadFiles,
   doAnyOtherAdultsLiveInYourHomeLR,
   doYouHaveAnyDependantChildrenLR,
   doYouHaveAnyOtherDependantsLR,
@@ -22,8 +21,8 @@ import {
   howMuchAffordToPayLR,
   incomeAndExpensesLR,
   instalmentPaymentsLR,
-  nonRentArrearsDisputeLR,
-  noticeDateWhenProvidedLR,
+  nonRentArrearsDispute,
+  noticeDateWhenNotProvided,
   otherConsiderationsLR,
   previousPaymentsLR,
   priorityDebtDetailsLR,
@@ -31,7 +30,7 @@ import {
   rentArrearsLR,
   repaymentsAgreedLR,
   selectDefendant,
-  tenancyDateUnknownLR,
+  tenancyDateUnknown,
   uploadFilesToSupportYourCounterclaimLR,
   whatOtherRegularExpensesDoYouHaveLR,
   whatRegularIncomeDoYouReceiveLR,
@@ -83,10 +82,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         () => this.counterClaimHaveYouAppliedForHelpWithFeeLR(fieldName as actionRecord),
       ],
       ['selectUniversalCreditLR', () => this.selectUniversalCreditLR(fieldName as actionRecord)],
-      [
-        'selectCorrespondenceAddressUnknownLR',
-        () => this.selectCorrespondenceAddressUnknownLR(fieldName as actionRecord),
-      ],
+      ['selectCorrespondenceAddressLR', () => this.selectCorrespondenceAddressLR(fieldName as actionRecord)],
       ['enterNoticeDateKnownLR', () => this.enterNoticeDateKnownLR(fieldName as actionRecord)],
       ['doYouWantToUploadFilesLR', () => this.doYouWantToUploadFilesLR(fieldName as actionRecord)],
       ['uploadFilesToSupportCounterclaimLR', () => this.uploadFilesToSupportCounterclaimLR(fieldName as actionRecord)],
@@ -112,7 +108,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
   }
 
-  private async selectCorrespondenceAddressUnknownLR(addressData: actionRecord) {
+  private async selectCorrespondenceAddressLR(addressData: actionRecord) {
     await performValidation('mainHeader', correspondenceAddress.correspondenceAddressPostalMainHeader);
     await performAction('clickRadioButton', {
       question: correspondenceAddress.correspondenceAddressConfirmHintText(),
@@ -141,50 +137,46 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async enterNoticeDateKnownLR(noticeData: actionRecord): Promise<void> {
-    await performValidation('text', {
-      elementType: 'listItem',
-      text: noticeDateWhenProvidedLR.noticeGivenDateLabel,
-    });
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', noticeDateWhenProvidedLR.dayTextLabel, noticeData.day],
-        ['inputText', noticeDateWhenProvidedLR.monthTextLabel, noticeData.month],
-        ['inputText', noticeDateWhenProvidedLR.yearTextLabel, noticeData.year]
+        ['inputText', noticeDateWhenNotProvided.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateWhenNotProvided.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateWhenNotProvided.yearTextLabel, noticeData.year]
       );
     }
-    await performAction('clickButton', noticeDateWhenProvidedLR.saveAndContinueButton);
+    await performAction('clickButton', noticeDateWhenNotProvided.saveAndContinueButton);
   }
 
   private async enterTenancyStartDetailsUnKnownLR(tenancyStartData: actionRecord) {
-    const getDidNotProvideParagraph = tenancyDateUnknownLR.getDidNotProvideParagraph(`${process.env.CLAIMANT_NAME}`);
+    const getDidNotProvideParagraph = tenancyDateUnknown.getDidNotProvideParagraph(`${process.env.CLAIMANT_NAME}`);
 
     await performValidation('text', { elementType: 'paragraph', text: getDidNotProvideParagraph });
     if (tenancyStartData?.tsDay && tenancyStartData?.tsMonth && tenancyStartData?.tsYear) {
       await performActions(
         'Enter Date',
-        ['inputText', tenancyDateUnknownLR.dayTextLabel, tenancyStartData.tsDay],
-        ['inputText', tenancyDateUnknownLR.monthTextLabel, tenancyStartData.tsMonth],
-        ['inputText', tenancyDateUnknownLR.yearTextLabel, tenancyStartData.tsYear]
+        ['inputText', tenancyDateUnknown.dayTextLabel, tenancyStartData.tsDay],
+        ['inputText', tenancyDateUnknown.monthTextLabel, tenancyStartData.tsMonth],
+        ['inputText', tenancyDateUnknown.yearTextLabel, tenancyStartData.tsYear]
       );
     }
-    await performAction('clickButton', tenancyDateUnknownLR.saveAndContinueButton);
+    await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
   }
 
   private async disputingOtherPartsOfTheClaimLR(doYouWantToDisputeOption: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: nonRentArrearsDisputeLR.doYouWantToDisputeQuestion,
+      question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
       option: doYouWantToDisputeOption.disputeOption,
     });
 
     if (doYouWantToDisputeOption.disputeOption === 'Yes') {
       await performAction(
         'inputText',
-        nonRentArrearsDisputeLR.explainPartOfClaimHiddenTextLabel,
+        nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
         doYouWantToDisputeOption.disputeInfo
       );
     }
-    await performAction('clickButton', nonRentArrearsDisputeLR.saveAndContinueButton);
+    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
   }
 
   private async enterNoticeDateUnknownLR(noticeData: actionRecord): Promise<void> {
@@ -192,17 +184,17 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performValidation('text', { elementType: 'legend', text: noticeDateNotProvidedQuestion });
     await performValidation('text', {
       elementType: 'paragraph',
-      text: confirmationOfNoticeDateWhenNotProvidedLR.didNotProvideNoticeLabel(),
+      text: noticeDateWhenNotProvided.didNotProvideNoticeLabel(),
     });
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', confirmationOfNoticeDateWhenNotProvidedLR.dayTextLabel, noticeData.day],
-        ['inputText', confirmationOfNoticeDateWhenNotProvidedLR.monthTextLabel, noticeData.month],
-        ['inputText', confirmationOfNoticeDateWhenNotProvidedLR.yearTextLabel, noticeData.year]
+        ['inputText', noticeDateWhenNotProvided.dayTextLabel, noticeData.day],
+        ['inputText', noticeDateWhenNotProvided.monthTextLabel, noticeData.month],
+        ['inputText', noticeDateWhenNotProvided.yearTextLabel, noticeData.year]
       );
     }
-    await performAction('clickButton', confirmationOfNoticeDateWhenNotProvidedLR.saveAndContinueButton);
+    await performAction('clickButton', noticeDateWhenNotProvided.saveAndContinueButton);
   }
 
   private async doesTheDependantHaveChildrenLR(dependantChildrenData: actionRecord): Promise<void> {
@@ -524,19 +516,19 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async selectCounterClaimLR(counterClaimOption: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(),
+      question: counterClaim.getDoYouWantToMakeACounterclaimQuestion(),
       option: counterClaimOption.option,
     });
 
-    await performAction('clickButton', counterClaimLR.saveAndContinueButton);
+    await performAction('clickButton', counterClaim.saveAndContinueButton);
   }
 
   private async selectWhatAreYouClaimingForLR(counterClaimingOption: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: counterClaimWhatAreYouClaimingForLR.mainHeader,
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimingOption.option,
     });
-    await performAction('clickButton', counterClaimWhatAreYouClaimingForLR.saveAndContinueButton);
+    await performAction('clickButton', counterClaimWhatAreYouClaimingFor.saveAndContinueButton);
   }
 
   private async counterClaimSpecificSumOfMoneyLR(sumOfMoney: actionRecord): Promise<void> {
@@ -545,21 +537,21 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       option: sumOfMoney.option,
     });
 
-    if (sumOfMoney.option === counterClaimSpecificSumOfMoneyLR.yesRadioOption) {
+    if (sumOfMoney.option === counterClaimSpecificSumOfMoney.yesRadioOption) {
       await performAction(
         'inputText',
-        counterClaimSpecificSumOfMoneyLR.howMuchIsTheDefendantHiddenQuestion,
+        counterClaimSpecificSumOfMoney.howMuchIsTheDefendantHiddenQuestion,
         sumOfMoney.amount
       );
     } else {
       await performAction(
         'inputText',
-        counterClaimSpecificSumOfMoneyLR.maximumValueOfYourClaimHiddenQuestion,
+        counterClaimSpecificSumOfMoney.maximumValueOfYourClaimHiddenQuestion,
         sumOfMoney.amount
       );
     }
 
-    await performAction('clickButton', counterClaimSpecificSumOfMoneyLR.saveAndContinueButton);
+    await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
   }
 
   private async selectCounterClaimFeeLR(counterClaimFeeOption: actionRecord) {
@@ -597,10 +589,10 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     const basedOnInformationParagraph = `Based on the information provided, it will cost the defendant £${counterClaimFeeValue} to make their counterclaim.`;
     await performValidation('text', { elementType: 'paragraph', text: basedOnInformationParagraph });
     await performAction('clickRadioButton', {
-      question: counterClaimFeeLR.doesTheDefendantNeedHelpQuestion,
+      question: counterClaimFee.doesTheDefendantNeedHelpQuestion,
       option: counterClaimFeeOption.radioOption,
     });
-    await performAction('clickButton', counterClaimFeeLR.saveAndContinueButton);
+    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
   }
 
   private async selectClaimAgainstWhomLR(claimAgainstWhom: actionRecord): Promise<void> {
@@ -617,21 +609,21 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         option: claimAgainstWhom.radioOption,
       });
     }
-    await performAction('clickButton', counterClaimAgainstWhomLR.saveAndContinueButton);
+    await performAction('clickButton', counterClaimAgainstWhom.saveAndContinueButton);
   }
 
   private async counterClaimAboutLR(claimAbout: actionRecord): Promise<void> {
-    await performAction('inputText', counterClaimAboutLR.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
-    await performAction('inputText', counterClaimAboutLR.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
-    await performAction('clickButton', counterClaimAboutLR.saveAndContinueButton);
+    await performAction('inputText', counterClaimAbout.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
+    await performAction('inputText', counterClaimAbout.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
+    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
   }
 
   private async doYouWantToUploadFilesLR(uploadOption: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: counterclaimDoYouWantToUploadFilesLR.mainHeader,
+      question: counterclaimDoYouWantToUploadFiles.mainHeader,
       option: uploadOption.option,
     });
-    await performAction('clickButton', counterclaimDoYouWantToUploadFilesLR.saveAndContinueButton);
+    await performAction('clickButton', counterclaimDoYouWantToUploadFiles.saveAndContinueButton);
   }
 
   private async uploadFilesToSupportCounterclaimLR(uploadCounterClaimFiles: actionRecord): Promise<void> {

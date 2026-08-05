@@ -1,6 +1,6 @@
-export const counterClaimLR = {
+export const counterClaim = {
   mainHeader: `Counterclaim`,
-  thereWillBeLinkParagraph: `There will be a link to make a counterclaim once you’ve submitted the response.`,
+  thereWillBeParagraph: `There will be a link to make a counterclaim once you’ve submitted the response.`,
   getDoYouWantToMakeACounterclaimQuestion: (): string => {
     return `Is the defendant planning to make a counterclaim against ${process.env.CLAIMANT_NAME}?`;
   },
@@ -11,6 +11,6 @@ export const counterClaimLR = {
   saveAndContinueButton: `Save and continue`,
   feedbackLink: `feedback`,
   pageSlug: `counter-claim`,
-  // selectIfYouArePlanningToMakeClaimErrorMessage: `Select if you’re planning to make a counterclaim`,
-  // thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfDefendantPlanningToMakeClaimErrorMessage: `Select if the defendant is planning to make a counterclaim`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
 };

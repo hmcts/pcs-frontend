@@ -1,7 +1,7 @@
-export const counterClaimFeeLR = {
+export const counterClaimFee = {
   mainHeader: `Counterclaim fee`,
   helpWithCourtFeesHeader: `Help with court fees`,
-  theDefendantMayBeAbleParagraph: `The defendant may be able to get help with paying the fee if they (one or more of the following):`,
+  theDefendantMayBeAbleParagraph: `The defendant may be able to get help paying the fee if they (one or more of the following):`,
   areOnBenefitList: `are on certain benefits`,
   haveLittleList: `have little or no savings`,
   haveLowIncomeList: `have low income`,

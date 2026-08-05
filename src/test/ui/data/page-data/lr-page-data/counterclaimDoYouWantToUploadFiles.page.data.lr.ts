@@ -1,4 +1,4 @@
-export const counterclaimDoYouWantToUploadFilesLR = {
+export const counterclaimDoYouWantToUploadFiles = {
   mainHeader: `Do you want to upload files to support the counterclaim?`,
   witnessStatementsParagraph: `Witness statements do not need to be uploaded at this stage, directions for the exchange of witness statements will be given later.`,
   theClaimantWillBeParagraph: `The claimant will be able to see these files`,
