@@ -1,7 +1,5 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
-import { purgeCounterClaimDocumentsFromCdam } from '../utils';
-import { flowConfig } from '../flow.config';
 import { purgeUploadedDocumentsFromCdam } from '../utils';
 import { DocumentType } from '../utils/purgeUploadedDocuments';
 
