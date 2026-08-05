@@ -4,7 +4,7 @@ import { handleRespondToClaimDisabled } from './handleRespondToClaimDisabled';
 
 import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
 
-// Feature gate for the CUI Your Support (Reasonable Adjustments) routes. 
+// Feature gate for the CUI Your Support (Reasonable Adjustments) routes.
 export const cuiYourSupportFeatureMiddleware: RequestHandler = async (
   req: Request,
   res: Response,
