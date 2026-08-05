@@ -22,6 +22,9 @@ import type { Request } from 'express';
 import { step } from '../../../../main/steps/respond-to-claim/reasonable-adjustments-triage';
 
 const beforeRedirect = (step as unknown as { beforeRedirect: (req: Request) => Promise<void> }).beforeRedirect;
+const extendGetContent = (
+  step as unknown as { extendGetContent: (req: Request) => Promise<{ cuiYourSupportEnabled: boolean }> }
+).extendGetContent;
 
 const buildReq = (choice: string, caseId?: string): { req: Request; redirect: jest.Mock } => {
   const redirect = jest.fn();
@@ -86,5 +89,23 @@ describe('reasonable-adjustments-triage beforeRedirect', () => {
 
     await expect(beforeRedirect(req)).rejects.toBe(error);
     expect(redirect).not.toHaveBeenCalled();
+  });
+});
+
+describe('reasonable-adjustments-triage extendGetContent', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('exposes cuiYourSupportEnabled=true so the template shows the "Continue to the questions" button', async () => {
+    mockIsCuiYourSupportEnabled.mockResolvedValue(true);
+    const { req } = buildReq('questions', '123');
+
+    await expect(extendGetContent(req)).resolves.toEqual({ cuiYourSupportEnabled: true });
+  });
+
+  it('exposes cuiYourSupportEnabled=false so the template hides the button when the flag is off', async () => {
+    mockIsCuiYourSupportEnabled.mockResolvedValue(false);
+    const { req } = buildReq('questions', '123');
+
+    await expect(extendGetContent(req)).resolves.toEqual({ cuiYourSupportEnabled: false });
   });
 });

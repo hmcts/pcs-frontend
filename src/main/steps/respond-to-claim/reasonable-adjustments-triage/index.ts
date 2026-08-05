@@ -39,6 +39,11 @@ export const step: StepDefinition = createFormStep({
       req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`);
     }
   },
+  // When the Your Support feature flag is off, hide the "Continue to the questions" button so the
+  // page doesn't advertise a microsite that won't launch (beforeRedirect also treats it as skip).
+  extendGetContent: async (req: Request) => ({
+    cuiYourSupportEnabled: await isCuiYourSupportEnabled(req),
+  }),
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
