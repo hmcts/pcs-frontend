@@ -18,4 +18,12 @@ export const user = {
     email: 'pcs-org1-solicitor2@test.com',
     password: process.env.IDAM_PCS_USER_PASSWORD,
   },
+  unauthorizedUser: {
+    email: 'damages-ctsc-admin@justice.gov.uk',
+    password: process.env.IDAM_PCS_USER_PASSWORD,
+  },
+  authenticatedClaimsUser: {
+    email: 'hmcts.civil+organisation.1.solicitor.1@gmail.com',
+    password: 'Password12!',
+  },
 };

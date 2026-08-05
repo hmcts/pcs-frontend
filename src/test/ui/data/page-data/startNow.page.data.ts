@@ -25,4 +25,6 @@ export const startNow = {
   cymraegLink: `Cymraeg`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `start-now`,
+  checkEmailErrorMsg: `Check your email address`,
+  incorrectEmailOrPwdErrorMsg: `Incorrect email or password`,
 };
