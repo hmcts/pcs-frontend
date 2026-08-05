@@ -1,4 +1,4 @@
-export const counterClaimWhatAreYouClaimingForLR = {
+export const counterClaimWhatAreYouClaimingFor = {
   mainHeader: `What is the defendant claiming for?`,
   sumOfMoneyOrCompensationRadioOption: `A sum of money or compensation`,
   somethingElseRadioOption: `Something else`,
@@ -6,7 +6,7 @@ export const counterClaimWhatAreYouClaimingForLR = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   cancelLink: `Cancel`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `counter-claim-what-are-you-claiming-for`,
   backLink: `Back`,
   /*

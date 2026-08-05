@@ -1,4 +1,4 @@
-export const confirmationOfNoticeDateWhenNotProvidedLR = {
+export const noticeDateWhenNotProvided = {
   mainHeader: `Notice date`,
   backLink: `Back`,
   didNotProvideNoticeLabel: () =>
@@ -14,6 +14,6 @@ export const confirmationOfNoticeDateWhenNotProvidedLR = {
   signOutLink: `Sign out`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   theDateYouReceiveNoticeErrorMessage: `The date the defendant received notice must either be today’s date or in the past`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `confirmation-of-notice-date-when-not-provided`,
 };

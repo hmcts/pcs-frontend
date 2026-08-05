@@ -1,4 +1,4 @@
-export const tenancyDateUnknownLR = {
+export const tenancyDateUnknown = {
   mainHeader: 'Tenancy, occupation contract or licence start date',
   whenDidYourTenancyQuestion: 'What is the tenancy, occupation contract or licence start date? (Optional)',
   getDidNotProvideParagraph: (claimantName: string): string => {
@@ -16,6 +16,6 @@ export const tenancyDateUnknownLR = {
   yearMissingErrorMessage: 'Your tenancy start date must include a year',
   realDateErrorMessage: 'Tenancy start date must be a real date',
   backLink: 'Back',
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `tenancy-date-unknown`,
 };
