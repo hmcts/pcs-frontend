@@ -1,6 +1,7 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
-import { purgeCounterClaimDocumentsFromCdam, purgeUploadedDocumentsFromCdam } from '../utils';
+import { purgeUploadedDocumentsFromCdam } from '../utils';
+import { DocumentType } from '../utils/purgeUploadedDocuments';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoValue } from '@services/ccdCase.interface';
@@ -33,8 +34,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     if (resumeResponse === 'NO') {
       response.defendantResponses = {};
-      await purgeUploadedDocumentsFromCdam(req);
-      await purgeCounterClaimDocumentsFromCdam(req);
+      await purgeUploadedDocumentsFromCdam(req, DocumentType.UPLOAD);
+      await purgeUploadedDocumentsFromCdam(req, DocumentType.COUNTER_CLAIM);
     }
 
     await saveDraftDefendantResponse(req, response);
