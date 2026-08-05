@@ -1329,17 +1329,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ioredis/commands@npm:1.10.0":
-  version: 1.10.0
-  resolution: "@ioredis/commands@npm:1.10.0"
-  checksum: 10/2b0322f99d24f11d99ae279b59d977bb129f95f973ed3a31cbee68376e8fad41f974d23d7f9a06151b3d9c140038ef312e0b45d4577048ab0797aa9a6839213d
-  languageName: node
-  linkType: hard
-
 "@ioredis/commands@npm:1.5.0":
   version: 1.5.0
   resolution: "@ioredis/commands@npm:1.5.0"
   checksum: 10/b5a842fde4785c20318b4b26c7ae98bb1f9cbdc1ade3e55a2de07d5db8fb4e9281e590fb08559e5a9027909f0f9f1214688af33e6fb469ce4ff3decc7cfde679
+  languageName: node
+  linkType: hard
+
+"@ioredis/commands@npm:2.0.0":
+  version: 2.0.0
+  resolution: "@ioredis/commands@npm:2.0.0"
+  checksum: 10/03c0e0735ac75dae14380a153e6b330391d3c7fcef47de13d0bfbe7de1f83ad8d617c6629c25b478eb3d4013a95f0b602840acfd047981d8796438f5e7ddffbb
   languageName: node
   linkType: hard
 
@@ -2228,7 +2228,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api-logs@npm:0.221.0":
+"@opentelemetry/api-logs@npm:0.221.0, @opentelemetry/api-logs@npm:^0.221.0":
   version: 0.221.0
   resolution: "@opentelemetry/api-logs@npm:0.221.0"
   dependencies:
@@ -2756,7 +2756,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.68.0, @opentelemetry/instrumentation-redis@npm:^0.68.0":
+"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.69.0":
+  version: 0.69.0
+  resolution: "@opentelemetry/instrumentation-redis@npm:0.69.0"
+  dependencies:
+    "@opentelemetry/instrumentation": "npm:^0.221.0"
+    "@opentelemetry/redis-common": "npm:^0.38.3"
+    "@opentelemetry/semantic-conventions": "npm:^1.27.0"
+  peerDependencies:
+    "@opentelemetry/api": ^1.3.0
+  checksum: 10/a4f7c02cd215114e63cc48cbd82fc4976b91f986a3a17c234fc38e07dec4bdc8f5b59290e24f36810ea7f53f30fc055db5a60d35d04e657586fdc33dcff1cee0
+  languageName: node
+  linkType: hard
+
+"@opentelemetry/instrumentation-redis@npm:^0.68.0":
   version: 0.68.0
   resolution: "@opentelemetry/instrumentation-redis@npm:0.68.0"
   dependencies:
@@ -2794,7 +2807,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-winston@npm:0.64.0, @opentelemetry/instrumentation-winston@npm:^0.64.0":
+"@opentelemetry/instrumentation-winston@npm:0.65.0":
+  version: 0.65.0
+  resolution: "@opentelemetry/instrumentation-winston@npm:0.65.0"
+  dependencies:
+    "@opentelemetry/api-logs": "npm:^0.221.0"
+    "@opentelemetry/instrumentation": "npm:^0.221.0"
+  peerDependencies:
+    "@opentelemetry/api": ^1.3.0
+  checksum: 10/bc72a2991e946aa6d445d8102eb676a7df7de971e3c520b9fe47cc88543896cf91067e360d564ab631a3bcdfdb49308209252bcd2e2cc16b1ab48aac010dd4d3
+  languageName: node
+  linkType: hard
+
+"@opentelemetry/instrumentation-winston@npm:^0.64.0":
   version: 0.64.0
   resolution: "@opentelemetry/instrumentation-winston@npm:0.64.0"
   dependencies:
@@ -8956,18 +8981,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ioredis@npm:5.11.1":
-  version: 5.11.1
-  resolution: "ioredis@npm:5.11.1"
+"ioredis@npm:6.0.0":
+  version: 6.0.0
+  resolution: "ioredis@npm:6.0.0"
   dependencies:
-    "@ioredis/commands": "npm:1.10.0"
+    "@ioredis/commands": "npm:2.0.0"
     cluster-key-slot: "npm:1.1.1"
     debug: "npm:4.4.3"
     denque: "npm:2.1.0"
     redis-errors: "npm:1.2.0"
-    redis-parser: "npm:3.0.0"
     standard-as-callback: "npm:2.1.0"
-  checksum: 10/f27653075b0599a9e8886b28a59bb2e232ca7d91b4a81de699e932cb55dcdcec791fe571fb7d4ebc81fc26f44667a76cf165162ecea57285548190ea0d58f734
+  checksum: 10/afd383b034ff8fdf9d1fed0b4b4524e7d73bc0d0f5cad9ad93d2787d0b70f025ed0170eceab19a4d37f460eb7f2edfc544e86936492779149f1e5ec0e94f0910
   languageName: node
   linkType: hard
 
@@ -11635,7 +11659,7 @@ __metadata:
     "@launchdarkly/node-server-sdk": "npm:9.13.0"
     "@ministryofjustice/frontend": "npm:^10.0.0"
     "@opentelemetry/api": "npm:1.9.1"
-    "@opentelemetry/instrumentation-winston": "npm:0.64.0"
+    "@opentelemetry/instrumentation-winston": "npm:0.65.0"
     "@pact-foundation/pact": "npm:17.0.1"
     "@pact-foundation/pact-cli": "npm:18.1.1"
     "@playwright/test": "npm:1.61.1"
@@ -11694,7 +11718,7 @@ __metadata:
     i18next: "npm:26.3.6"
     i18next-fs-backend: "npm:2.6.7"
     i18next-http-middleware: "npm:3.9.8"
-    ioredis: "npm:5.11.1"
+    ioredis: "npm:6.0.0"
     jest: "npm:30.4.2"
     jest-environment-jsdom: "npm:30.4.1"
     jest-html-reporter: "npm:4.4.0"
@@ -12421,7 +12445,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"redis-parser@npm:3.0.0, redis-parser@npm:^3.0.0":
+"redis-parser@npm:^3.0.0":
   version: 3.0.0
   resolution: "redis-parser@npm:3.0.0"
   dependencies:
