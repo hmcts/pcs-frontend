@@ -1,5 +1,3 @@
-//import type { Request } from 'express';
-
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 import { purgeCounterClaimDocumentsFromCdam, purgeUploadedDocumentsFromCdam } from '../utils';
