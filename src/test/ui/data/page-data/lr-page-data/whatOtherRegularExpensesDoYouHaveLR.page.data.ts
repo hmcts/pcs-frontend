@@ -99,7 +99,7 @@ export const whatOtherRegularExpensesDoYouHaveLR = {
   clothingFrequencyErrorMessage: `Select how frequently the defendant pays for clothing`,
   otherExpensesFrequencyErrorMessage: `Select how frequently the defendant pays for other expenses`,
 
-  invalidFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
+  invalidFormatErrorMessage: `Enter an amount in the correct format, for example 148 or 148.50`,
 
   // Minimum Limit Errors
   householdBillsMinErrorMessage: `The amount the defendant pays for household bills each week or month must be £0.00 or above`,
