@@ -17,7 +17,7 @@ export const noticeDateWhenProvidedLR = {
   signOutLink: `Sign out`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   theDateDefendantReceivedNoticeErrorMessage: `The date the defendant received notice must either be today’s date or in the past`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `confirmation-of-notice-date-when-provided`,
 };
 

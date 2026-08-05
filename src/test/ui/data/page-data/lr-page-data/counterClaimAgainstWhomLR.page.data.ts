@@ -4,7 +4,7 @@ export const counterClaimAgainstWhomLR = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `counter-claim-against-whom`,
   /*
    selectWhoYouAreMakingErrorMessage: `Select who you are making the counterclaim against`,

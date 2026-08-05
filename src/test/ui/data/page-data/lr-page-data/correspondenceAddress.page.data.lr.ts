@@ -58,10 +58,10 @@ export const correspondenceAddress = {
   walesCountyTextInput: `Cardiff`,
   walesPostcodeTextInput: `CF11 6QX`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  pleaseConfirmYourAddressErrorMessage: `Please confirm your address by selecting the options below`,
-  enterValidPostcodeErrorMessage: `Enter a valid UK postcode`,
+  pleaseConfirmDefendantAddressErrorMessage: `Please confirm the defendant’s address by selecting the options below`,
   postCodeNotFoundErrorMessage: `Postcode not found. Please check and try again.`,
   pleaseSelectAnAddressErrorMessage: `Please select an address`,
   enterAddressLine1ErrorMessage: `Enter address line 1, typically the building and street`,
   enterTownOrCityErrorMessage: `Enter town or city`,
+  enterValidUkPostcodeErrorMessage: `Enter a valid UK postcode`,
 };

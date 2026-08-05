@@ -22,6 +22,6 @@ export const exceptionalHardshipLR = {
   emojiGiveDetailsAboutExceptionalHardshipErrorMessage: `Give details about the exceptional hardship the defendant would experience must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   selectExceptionHardshipErrorMessage: `Select if the defendant would experience exceptional hardship if they were asked to leave their home`,
   mustBe500CharactersOrFewerErrorMessage: `Exceptional hardship details must be 500 characters or less`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `exceptional-hardship`,
 };

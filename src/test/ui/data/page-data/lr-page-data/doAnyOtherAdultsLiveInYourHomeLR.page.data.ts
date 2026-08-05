@@ -13,7 +13,7 @@ export const doAnyOtherAdultsLiveInYourHomeLR = {
   selectIfAnyOtherAdultsErrorMessage: `Select if any other adults live in the defendant’s home`,
   giveDetailsAboutOtherAdultsErrorMessage: 'Give details about the other adults living in their home',
   mustBe500ErrorMessage: `Details about other adults must be 500 characters or less`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `do-any-other-adults-live-in-your-home`,
   emojiTextInput: `👉 😄`,
   emojiErrorMessage: `Give details about the other adults living in their home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,

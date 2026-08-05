@@ -85,4 +85,5 @@ export default {
   'response-submitted': 'responseSubmitted',
   'defendant-date-of-birth': 'defendantDateOfBirth',
   'select-defendant': 'selectDefendant',
+  'correspondence-address': 'correspondenceAddress',
 };

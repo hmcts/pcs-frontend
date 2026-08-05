@@ -21,6 +21,6 @@ export const yourCircumstancesLR = {
   giveDetailsAboutDefendantCircumstancesErrorMessage: `Give details about the defendant’s circumstances`,
   selectCircumstancesErrorMessage: `Select if the defendant would like to share anything about their circumstances`,
   mustBe500CharactersOrFewerErrorMessage: `Circumstances details must be 500 characters or less`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `your-circumstances`,
 };

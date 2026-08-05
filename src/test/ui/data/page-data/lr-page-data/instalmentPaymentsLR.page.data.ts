@@ -9,6 +9,6 @@ export const instalmentPaymentsLR = {
   cymraegLink: `Cymraeg`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectWhetherDefendantWouldLikeToOfferErrorMessage: `Select whether the defendant would like to offer to pay off their arrears in instalments`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `installment-payments`,
 };

@@ -15,7 +15,7 @@ export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR = {
   selectIfYouHadAlternativeAccommodationErrorMessage: `Select if the defendant would have somewhere else to live if they had to leave their home`,
   whenWouldTheyBeAbleToMoveInQuestion: `When would they be able to move in? (Optional)`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home`,
   dayMissingErrorMessage: `The date the defendant would be able to move in must include a day`,
   monthMissingErrorMessage: `The date the defendant would be able to move in must include a month`,

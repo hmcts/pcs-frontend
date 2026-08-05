@@ -9,7 +9,7 @@ export const counterClaimLR = {
   backLink: `Back`,
   saveForLaterButton: `Save for later`,
   saveAndContinueButton: `Save and continue`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `counter-claim`,
   // selectIfYouArePlanningToMakeClaimErrorMessage: `Select if you’re planning to make a counterclaim`,
   // thereIsAProblemErrorMessageHeader: `There is a problem`,

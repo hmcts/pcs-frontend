@@ -6,7 +6,7 @@ export const counterClaimWhatAreYouClaimingForLR = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   cancelLink: `Cancel`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `counter-claim-what-are-you-claiming-for`,
   backLink: `Back`,
   /*

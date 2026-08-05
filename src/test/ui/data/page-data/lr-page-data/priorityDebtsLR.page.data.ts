@@ -15,7 +15,7 @@ export const priorityDebtsLR = {
   doesDefendantHaveAnyPriorityDebtsQuestion: `Does the defendant have any priority debts?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `priority-debts`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,

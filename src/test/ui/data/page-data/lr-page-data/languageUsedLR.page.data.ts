@@ -8,7 +8,7 @@ export const languageUsedLR = {
   saveForLaterButton: `Save for later`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   errorHiddenMessage: `Select which language you used to complete this service`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `start-now`,
   backLink: `Back`,
 };

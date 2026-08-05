@@ -31,6 +31,7 @@ import {
   yourCircumstancesLR,
 } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
+import { correspondenceAddressErrorValidation } from '../functional/legalRepresentative-functional/correspondenceAddress.pft.lr';
 import { defendantNameConfirmationErrorValidation } from '../functional/legalRepresentative-functional/defendantNameConfirmation.pft.lr';
 import { selectDefendantErrorValidation } from '../functional/legalRepresentative-functional/selectDefendant.pft.lr';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
@@ -151,6 +152,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       dobYear: defendantDateOfBirth.yearInputText,
     });
 
+    await softErrorMessageValidation('correspondenceAddress', correspondenceAddressErrorValidation);
     await performAction('selectCorrespondenceAddressUnKnownLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
@@ -267,9 +269,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       question: languageUsedLR.mainHeader,
       radioOption: languageUsedLR.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('clickButton', 'Submit');
     assertAllErrorMessageValidations();
   });
-
-  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible', async () => {});
 });

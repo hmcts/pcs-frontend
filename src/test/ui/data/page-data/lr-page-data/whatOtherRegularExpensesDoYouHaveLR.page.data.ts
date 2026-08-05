@@ -130,6 +130,6 @@ export const whatOtherRegularExpensesDoYouHaveLR = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `what-regular-income-do-you-receive`,
 };

@@ -11,7 +11,7 @@ export const counterClaimHaveYouAppliedForHelpLR = {
   helpWithFeeReferenceTextInput: `HWF-A1B-23C`,
   youWillHaveReceivedThisNumberHiddenParagraph: `You (or they) will have received this number when you (or they) applied for Help with Fees. This reference must not have been used for a previous application.`,
   exampleHiddenHintText: `For example, HWF-A1B-23C`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `counter-claim-have-you-applied-for-help`,
   /*
   thereIsAProblemErrorMessageHeader: `There is a problem`,

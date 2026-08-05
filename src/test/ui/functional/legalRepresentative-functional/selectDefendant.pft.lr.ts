@@ -7,5 +7,4 @@ export async function selectDefendantErrorValidation(): Promise<void> {
     header: selectDefendant.thereIsAProblemErrorMessageHeader,
     message: selectDefendant.selectWhoYouAreMakingErrorMessage,
   });
-  console.log(`completed err val`);
 }

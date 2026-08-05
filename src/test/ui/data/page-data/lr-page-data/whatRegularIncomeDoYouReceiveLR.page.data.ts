@@ -51,6 +51,6 @@ export const whatRegularIncomeDoYouReceiveLR = {
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   backLink: `Back`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `what-regular-income-do-you-receive`,
 };

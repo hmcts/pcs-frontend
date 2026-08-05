@@ -16,6 +16,6 @@ export const doYouHaveAnyOtherDependantsLR = {
   emojiErrorMessage: `Give details about their other dependants must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `do-you-have-any-other-dependants`,
 };

@@ -10,7 +10,7 @@ export const incomeAndExpensesLR = {
   noRadioOption: 'No',
   cymraegLink: `Cymraeg`,
   backLink: `Back`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `income-and-expenses`,
   errorValidationHeader: `There is a problem`,
   selectIfDefendantWantToProvideDetailsErrorMessage: `Select if the defendant wants to provide details of their income and expenses`,

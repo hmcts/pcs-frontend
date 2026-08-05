@@ -10,7 +10,7 @@ export const counterClaimAboutLR = {
   backLink: `Back`,
   counterClaimForInput: `services not provided`,
   reasonsForCounterClaimInput: `electricity and windows not repaired`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `counter-claim-against-whom`,
   /*
   enterWhatYourCounterClaimErrorMessage: `Enter what your counterclaim is for`,
