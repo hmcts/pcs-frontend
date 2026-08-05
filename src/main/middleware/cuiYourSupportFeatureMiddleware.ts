@@ -1,8 +1,7 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
-import { handleRespondToClaimDisabled } from './handleRespondToClaimDisabled';
-
 import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
+import { safeRedirect303 } from '@utils/safeRedirect';
 
 // Feature gate for the CUI Your Support (Reasonable Adjustments) routes.
 export const cuiYourSupportFeatureMiddleware: RequestHandler = async (
@@ -13,5 +12,8 @@ export const cuiYourSupportFeatureMiddleware: RequestHandler = async (
   if (await isCuiYourSupportEnabled(req)) {
     return next();
   }
-  return handleRespondToClaimDisabled(req, res);
+  const caseReference = String(req.params.caseReference || '');
+  return safeRedirect303(res, `/case/${caseReference}/respond-to-claim/language-used?nav=1`, `/case/${caseReference}`, [
+    '/case',
+  ]);
 };
