@@ -24,14 +24,14 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url);
 });
 
-test.describe('CUI user role access', async () => {
+test.describe('CUI user role access @PR @nightly', async () => {
   test('Unauthenticated user login', async ({ page }) => {
     await performAction('login', user.unauthorizedUser.email);
     expect(page.url()).toContain('/login');
   });
 
-  test('Authenticated HMCTS User Cannot Access Possession Claims from Money Claims', async ({ page }) => {
-    await performAction('login', user.authenticatedClaimsUser.email);
+  test('Authenticated HMCTS User Cannot Access Possession Claims from Civil Claims', async ({ page }) => {
+    await performAction('login', user.authenticatedCivilUser.email);
     expect(page.url()).toContain('/login');
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
     expect(page.url()).toContain('/login');
