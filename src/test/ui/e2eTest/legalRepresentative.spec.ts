@@ -408,7 +408,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressKnownLR', {
+    await performAction('selectCorrespondenceAddressUnknownLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
