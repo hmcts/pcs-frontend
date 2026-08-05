@@ -1,11 +1,11 @@
 {
-  "title": "cyRespond to a property possession claim online",
-  "saveDraftInfo": "cyYou can save your response as a draft and return to it later. You’ll be able to review and edit your answers before you submit them.",
+  "title": "Ymateb i hawliad i feddiannu eiddo ar-lein",
+  "saveDraftInfo": "Gallwch gadw eich ymateb fel drafft a dychwelyd ato nes ymlaen. Byddwch yn gallu adolygu a golygu eich atebion cyn eu cyflwyno.",
   "description": "",
   "completingYourResponse": "",
   "uploadDocumentsInfo": "",
   "whatYouWillNeed": "",
-  "claimantVisibilityInfo": "cyThe claimant will be able to see any documents you upload and your answers.",
+  "claimantVisibilityInfo": "Bydd yr hawlydd yn gallu gweld unrhyw ddogfennau fyddwch wedi uwchlwytho a'ch atebion.",
   "provideDetailsInfo": "cyThis service is also available <a href=\"?lang=en\" class=\"govuk-link language\">in English</a>.",
   "hmctsSupportInfo": "cyIf you or the defendant need support to use HMCTS services, like step-free access to a court for the hearing, you can request this after you’ve submitted your response."
 }
