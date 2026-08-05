@@ -34,6 +34,8 @@ withPipeline(type, product, component) {
   def githubApi = new GithubAPI(this)
   loadVaultSecrets(secrets)
 
+  syncBranchesWithMaster(['ithc', 'perftest', 'demo'])
+
   env.NODE_CONFIG_ENV = 'test'
   env.PCS_API_URL = "http://pcs-api-aat.service.core-compute-aat.internal"
   env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
