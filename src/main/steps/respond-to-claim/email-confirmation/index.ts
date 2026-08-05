@@ -53,6 +53,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               name: 'emailAddress',
               type: 'text',
               required: true,
+              maxLength: 254,
               translationKey: {
                 label: 'emailLabel',
               },

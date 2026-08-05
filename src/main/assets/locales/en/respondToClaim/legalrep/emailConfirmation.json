@@ -1,19 +1,19 @@
 {
-  "pageTitle": "Defendent’s email address",
-  "heading": "Defendent’s email address",
+  "pageTitle": "Defendant’s email address",
+  "heading": "Defendant’s email address",
 
-  "emailConfirmationLabel": "Do you know the defendent’s email address?",
+  "emailConfirmationLabel": "Do you know the defendant’s email address?",
 
   "options": {
     "yes": "Yes",
     "noOption": "No"
   },
 
-  "emailLabel": "Enter the defendent’s email address",
+  "emailLabel": "Enter the defendant’s email address",
   "errors": {
     "emailConfirmation": "Select if you know the defendant’s email address",
     "emailAddress": {
-      "required": "Enter the defendent’s email address",
+      "required": "Enter the defendant’s email address",
       "invalid": "Enter an email address in the correct format, like name@example.com"
     }
   }
