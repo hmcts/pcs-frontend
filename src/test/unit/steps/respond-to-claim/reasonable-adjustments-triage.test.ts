@@ -12,6 +12,11 @@ jest.mock('@modules/logger', () => ({
   Logger: { getLogger: () => ({ error: jest.fn(), warn: jest.fn(), info: jest.fn() }) },
 }));
 
+const mockIsCuiYourSupportEnabled = jest.fn();
+jest.mock('@utils/isCuiYourSupportEnabled', () => ({
+  isCuiYourSupportEnabled: mockIsCuiYourSupportEnabled,
+}));
+
 import type { Request } from 'express';
 
 import { step } from '../../../../main/steps/respond-to-claim/reasonable-adjustments-triage';
@@ -31,10 +36,23 @@ const buildReq = (choice: string, caseId?: string): { req: Request; redirect: je
 };
 
 describe('reasonable-adjustments-triage beforeRedirect', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockIsCuiYourSupportEnabled.mockResolvedValue(true); // feature on by default
+  });
 
   it('does nothing (skips) when the choice is not "questions"', async () => {
     const { req, redirect } = buildReq('skip', '123');
+
+    await beforeRedirect(req);
+
+    expect(mockStartYourSupport).not.toHaveBeenCalled();
+    expect(redirect).not.toHaveBeenCalled();
+  });
+
+  it('does not launch Your Support when the feature flag is off (falls through like skip)', async () => {
+    mockIsCuiYourSupportEnabled.mockResolvedValue(false);
+    const { req, redirect } = buildReq('questions', '123');
 
     await beforeRedirect(req);
 

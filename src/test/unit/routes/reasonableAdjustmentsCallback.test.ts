@@ -20,6 +20,11 @@ jest.mock('../../../main/middleware/respondToClaimFeatureMiddleware', () => ({
   respondToClaimFeatureMiddleware: mockFeatureMiddleware,
 }));
 
+const mockCuiYsMiddleware = jest.fn((req, res, next) => next());
+jest.mock('../../../main/middleware/cuiYourSupportFeatureMiddleware', () => ({
+  cuiYourSupportFeatureMiddleware: mockCuiYsMiddleware,
+}));
+
 const mockGetPayload = jest.fn();
 jest.mock('@services/cuiRa/cuiRaService', () => ({
   cuiRaService: { getPayload: mockGetPayload },
@@ -90,8 +95,14 @@ describe('reasonableAdjustmentsCallback routes', () => {
     reasonableAdjustmentsCallbackRoutes({ get: mockAppGet } as unknown as Application);
   });
 
-  it('registers the callback route behind oidc and the respond-to-claim feature-flag middleware', () => {
-    expect(mockAppGet).toHaveBeenCalledWith(ROUTE, mockOidcMiddleware, mockFeatureMiddleware, expect.any(Function));
+  it('registers the callback route behind oidc, the respond-to-claim and the Your Support feature-flag middleware', () => {
+    expect(mockAppGet).toHaveBeenCalledWith(
+      ROUTE,
+      mockOidcMiddleware,
+      mockFeatureMiddleware,
+      mockCuiYsMiddleware,
+      expect.any(Function)
+    );
   });
 
   it('redirects to the error page when no S2S service token is available', async () => {

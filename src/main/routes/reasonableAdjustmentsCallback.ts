@@ -1,6 +1,7 @@
 import config from 'config';
 import type { Application, Request, Response } from 'express';
 
+import { cuiYourSupportFeatureMiddleware } from '../middleware/cuiYourSupportFeatureMiddleware';
 import { oidcMiddleware } from '../middleware/oidc';
 import { respondToClaimFeatureMiddleware } from '../middleware/respondToClaimFeatureMiddleware';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../steps/respond-to-claim/draftEvent';
@@ -22,9 +23,9 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
   app.get(
     '/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id',
     oidcMiddleware,
-    // Gate the draft write behind the same respond-to-claim feature flag as every journey page —
-    // otherwise this route stays reachable (and persists flags) when the journey is switched off.
+    // Gate the draft write behind the same respond-to-claim and it's own feature flag
     respondToClaimFeatureMiddleware,
+    cuiYourSupportFeatureMiddleware,
     async (req: Request, res: Response) => {
       const caseReference = String(req.params.caseReference || '');
       const payloadId = String(req.params.id || '');

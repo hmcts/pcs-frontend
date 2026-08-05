@@ -6,6 +6,7 @@ import { Logger } from '@modules/logger';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { startYourSupport } from '@services/cuiRa/startYourSupport';
+import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
 
 const logger = Logger.getLogger('reasonableAdjustmentsTriage');
 
@@ -20,6 +21,11 @@ export const step: StepDefinition = createFormStep({
   beforeRedirect: async (req: Request) => {
     if (req.body.reasonableAdjustmentsChoice !== 'questions') {
       return; // "skip": let the normal next-step flow continue to language-used
+    }
+    // Gate the Your Support launch on the feature flag (pattern A helper). When off, fall through to
+    // the normal next-step flow (as if the citizen had skipped) rather than invoking the microsite.
+    if (!(await isCuiYourSupportEnabled(req))) {
+      return;
     }
     const caseReference = req.res?.locals.validatedCase?.id;
     try {
