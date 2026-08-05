@@ -90,7 +90,10 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['enterNoticeDateKnownLR', () => this.enterNoticeDateKnownLR(fieldName as actionRecord)],
       ['doYouWantToUploadFilesLR', () => this.doYouWantToUploadFilesLR(fieldName as actionRecord)],
       ['uploadFilesToSupportCounterclaimLR', () => this.uploadFilesToSupportCounterclaimLR(fieldName as actionRecord)],
-      ['selectCorrespondenceAddressKnownLR', () => this.selectCorrespondenceAddressKnownLR(fieldName as actionRecord)],
+      [
+        'selectCorrespondenceAddressUnKnownLR',
+        () => this.selectCorrespondenceAddressUnKnownLR(fieldName as actionRecord),
+      ],
       ['confirmDefendantDetailsLR', () => this.confirmDefendantDetailsLR(fieldName as actionRecord)],
       ['enterDateOfBirthDetailsLR', () => this.enterDateOfBirthDetailsLR(fieldName as actionRecord)],
     ]);
@@ -342,7 +345,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
   }
 
-  private async selectCorrespondenceAddressKnownLR(addressData: actionRecord) {
+  private async selectCorrespondenceAddressUnKnownLR(addressData: actionRecord) {
     await performValidation('mainHeader', correspondenceAddress.correspondenceAddressPostalMainHeader);
     await performAction('clickRadioButton', {
       question: correspondenceAddress.correspondenceAddressConfirmHintText(),

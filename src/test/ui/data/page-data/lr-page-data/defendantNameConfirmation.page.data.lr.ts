@@ -15,8 +15,8 @@ export const defendantNameConfirmation = {
   youMustSayErrorMessage(clientFirstName: string, clientLastName: string): string {
     return `You must say if the defendant’s name is ${clientFirstName} ${clientLastName}`;
   },
-  enterYourClientFirstNameErrorMessage: `Enter the defendant’s first name`,
-  enterYourClientLastNameErrorMessage: `Enter the defendant’s first name`,
+  enterDefendantFirstNameErrorMessage: `Enter the defendant’s first name`,
+  enterDefendantLastNameErrorMessage: `Enter the defendant’s last name`,
   defendantFirstNameHiddenTextLabel: `Defendant’s first name`,
   defendantLastNameHiddenTextLabel: `Defendant’s last name`,
   firstNameInputText: `John`,

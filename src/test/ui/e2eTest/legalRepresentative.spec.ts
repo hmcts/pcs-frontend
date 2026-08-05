@@ -1,9 +1,6 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
-  contactPreferenceEmailOrPostLR,
-  contactPreferencesTelephoneLR,
-  contactPreferencesTextMessageLR,
   correspondenceAddress,
   counterClaimAboutLR,
   counterClaimAgainstWhomLR,
@@ -46,7 +43,11 @@ import {
 import { user } from '../data/user-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
-import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
+import {
+  RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS,
+  RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS,
+  logTestEnvAfterBeforeEach,
+} from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -114,11 +115,9 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('getCaseAPI');
-  //await performAction('navigateToUrl', home_url);
-  console.log(`${process.env.CASE_NUMBER}`);
+  logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('login', user.defendantSolicitor.email);
-  //await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
 });
 
@@ -144,7 +143,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressKnownLR', {
+    await performAction('selectCorrespondenceAddressUnKnownLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
@@ -278,7 +277,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressKnownLR', {
+    await performAction('selectCorrespondenceAddressUnKnownLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
@@ -542,7 +541,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressKnownLR', {
+    await performAction('selectCorrespondenceAddressUnKnownLR', {
       radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
@@ -678,7 +677,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressKnownLR', {
+    await performAction('selectCorrespondenceAddressUnKnownLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
@@ -805,13 +804,13 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
 
   test('RentArrears - DemotedTenancy - LR @smoke @regression @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
-    await performAction('confirmDefendantDetails', {
+    await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
       option: defendantNameConfirmation.noRadioOption,
       fName: defendantNameConfirmation.firstNameInputText,
       lName: defendantNameConfirmation.lastNameInputText,
     });
-    await performAction('enterDateOfBirthDetails', {
+    await performAction('enterDateOfBirthDetailsLR', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
@@ -819,15 +818,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressUnknownLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPostLR.byPostCheckbox,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephoneLR.yesRadioOption,
-      phoneNumber: contactPreferencesTelephoneLR.ukPhoneNumberTextInput,
-    });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetailsLR.noRadioOption,
@@ -896,13 +886,13 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @smoke @regression @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
-    await performAction('confirmDefendantDetails', {
+    await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
       option: defendantNameConfirmation.noRadioOption,
       fName: defendantNameConfirmation.firstNameInputText,
       lName: defendantNameConfirmation.lastNameInputText,
     });
-    await performAction('enterDateOfBirthDetails', {
+    await performAction('enterDateOfBirthDetailsLR', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
@@ -910,15 +900,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressUnknownLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPostLR.byPostCheckbox,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephoneLR.yesRadioOption,
-      phoneNumber: contactPreferencesTelephoneLR.ukPhoneNumberTextInput,
-    });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetailsLR.noRadioOption,
@@ -1011,13 +992,13 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @smoke @regression @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
-    await performAction('confirmDefendantDetails', {
+    await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
       option: defendantNameConfirmation.noRadioOption,
       fName: defendantNameConfirmation.firstNameInputText,
       lName: defendantNameConfirmation.lastNameInputText,
     });
-    await performAction('enterDateOfBirthDetails', {
+    await performAction('enterDateOfBirthDetailsLR', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
@@ -1025,15 +1006,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressUnknownLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPostLR.byPostCheckbox,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephoneLR.yesRadioOption,
-      phoneNumber: contactPreferencesTelephoneLR.ukPhoneNumberTextInput,
-    });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetailsLR.noRadioOption,

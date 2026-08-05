@@ -210,7 +210,7 @@ export class ActionRegistry {
     ['midEventRespondPossessionClaimLRAPI', new RespondPossessionClaimLRMidEventAPIAction()],
     ['confirmDefendantDetailsLR', new RespondToClaimLRAction()],
     ['enterDateOfBirthDetailsLR', new RespondToClaimLRAction()],
-    ['selectCorrespondenceAddressKnownLR', new RespondToClaimLRAction()],
+    ['selectCorrespondenceAddressUnKnownLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {

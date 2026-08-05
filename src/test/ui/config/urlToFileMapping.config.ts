@@ -84,4 +84,5 @@ export default {
   'response-and-counter-claim-submitted': 'responseAndCounterClaimSubmitted',
   'response-submitted': 'responseSubmitted',
   'defendant-date-of-birth': 'defendantDateOfBirth',
+  'select-defendant': 'selectDefendant',
 };
