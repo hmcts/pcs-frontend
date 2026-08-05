@@ -72,7 +72,7 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
         }
 
         // The "request sent" confirmation is only correct when cui-ra actually captured a change:
-        // action === 'submit' AND replacementFlags present 
+        // action === 'submit' AND replacementFlags present
         if (payload.action !== 'submit' || !payload.replacementFlags) {
           return safeRedirect303(res, cancelledUrl, fallback, ['/case']);
         }
