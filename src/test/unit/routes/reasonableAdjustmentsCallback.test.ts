@@ -157,32 +157,25 @@ describe('reasonableAdjustmentsCallback routes', () => {
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
   });
 
-  it('falls back to flagsAsSupplied when replacementFlags is absent', async () => {
+  it('routes to the "no request sent" page (no persist) when only flagsAsSupplied is returned — no change was made', async () => {
     const flags = { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] };
     mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', flagsAsSupplied: flags });
     const res = {} as unknown as Response;
 
     await getHandler()(buildReq('s2s-tok'), res);
 
-    expect(mockUpdateDraft).toHaveBeenCalledWith(
-      RESPOND_TO_CLAIM_DRAFT_EVENT,
-      'user-tok',
-      '123',
-      { possessionClaimResponse: { ...expectedDefendantSlice, defendantFlags: flags } },
-      { context: 'x' }
-    );
+    expect(mockUpdateDraft).not.toHaveBeenCalled();
+    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
   });
 
-  it('does not persist when a submit carries no flags, but still confirms', async () => {
+  it('routes to the "no request sent" page (no persist) when a submit carries no flags at all', async () => {
     mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
     const res = {} as unknown as Response;
 
     await getHandler()(buildReq('s2s-tok'), res);
 
-    // The case is still loaded (access check), but with no flags nothing is persisted.
-    expect(mockGetCaseByIdForEvent).toHaveBeenCalled();
     expect(mockUpdateDraft).not.toHaveBeenCalled();
-    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
+    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
   });
 
   it('redirects to the "no request sent" page (and does not persist) when the action is cancel', async () => {

@@ -71,9 +71,9 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
           return safeRedirect303(res, errorUrl, fallback, ['/case']);
         }
 
-        // Only an explicit 'submit' persists flags + shows the "request sent" confirmation; 'cancel'
-        // (or any other value) means nothing was sent → the "No request was sent" page.
-        if (payload.action !== 'submit') {
+        // The "request sent" confirmation is only correct when cui-ra actually captured a change:
+        // action === 'submit' AND replacementFlags present 
+        if (payload.action !== 'submit' || !payload.replacementFlags) {
           return safeRedirect303(res, cancelledUrl, fallback, ['/case']);
         }
 
@@ -81,23 +81,20 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
         // draft-save our journey pages use. The draft-save fully REPLACES the defendant response (and
         // the final submit reads this same draft), so re-send the existing answers — narrowed to the
         // defendant slice — alongside the flags, or a flags-only post would wipe them.
-        const rawFlags = payload.replacementFlags ?? payload.flagsAsSupplied;
-        if (rawFlags) {
-          const defendantFlags = toCcdFlags(rawFlags);
-          const existingResponse = existing.data?.possessionClaimResponse ?? {};
-          const possessionClaimResponse: PossessionClaimResponse = {
-            defendantContactDetails: existingResponse.defendantContactDetails,
-            defendantResponses: existingResponse.defendantResponses,
-            defendantFlags,
-          };
-          await ccdCaseService.updateDraft(
-            RESPOND_TO_CLAIM_DRAFT_EVENT,
-            accessToken,
-            caseReference,
-            { possessionClaimResponse },
-            req.session?.clientContext
-          );
-        }
+        const defendantFlags = toCcdFlags(payload.replacementFlags);
+        const existingResponse = existing.data?.possessionClaimResponse ?? {};
+        const possessionClaimResponse: PossessionClaimResponse = {
+          defendantContactDetails: existingResponse.defendantContactDetails,
+          defendantResponses: existingResponse.defendantResponses,
+          defendantFlags,
+        };
+        await ccdCaseService.updateDraft(
+          RESPOND_TO_CLAIM_DRAFT_EVENT,
+          accessToken,
+          caseReference,
+          { possessionClaimResponse },
+          req.session?.clientContext
+        );
         return safeRedirect303(res, confirmationUrl, fallback, ['/case']);
       } catch (error) {
         logger.error(`Failed to fetch or persist Your Support payload for id ${payloadId}`, error);
