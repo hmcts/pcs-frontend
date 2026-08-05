@@ -1,8 +1,7 @@
 export const tenancyTypeDetails = {
   mainHeader: `Tenancy, occupation contract or licence agreement`,
   whenTheyMadeClaimHintText: `When they made their claim, ${process.env.CLAIMANT_NAME} had to give details about the type of tenancy, occupation contract or licence agreement you signed to rent your property, and the date it began, if known.`,
-  //Add the missing colon at the end of line 5 when HDPI-7696 BUG is fixed
-  detailsGivenByClaimantParagraph: `Details given by ${process.env.CLAIMANT_NAME}`,
+  detailsGivenByClaimantParagraph: `Details given by ${process.env.CLAIMANT_NAME}:`,
   isTenancyTypeCorrectQuestion: `Is the tenancy, occupation contract or licence agreement type correct?`,
   giveCorrectTenancyTypeHiddenTextLabel: `Give the correct tenancy, occupation contract or licence type`,
   giveCorrectTenancyTypeTextInput: `Short term tenancy`,
