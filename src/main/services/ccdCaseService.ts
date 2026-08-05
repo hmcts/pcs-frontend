@@ -45,6 +45,7 @@ import type {
   DashboardRelatedApplication,
   DashboardTaskGroup,
 } from '@services/dashboard.interface';
+import { sanitiseCaseReference } from '@utils/caseReference';
 import {
   formatAddress,
   unwrapNotifications,
@@ -250,10 +251,15 @@ export const ccdCaseService = {
     eventId: string = 'respondPossessionClaim',
     clientContextHeaders?: ClientContextHeaders
   ): Promise<CcdCase> {
-    const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const eventUrl = `${getBaseUrl()}/cases/${safeCaseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
-      logger.info(`Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
+      logger.info(`Validating case access for caseId: ${safeCaseId}, eventId: ${eventId}`);
       const caseHeaders: CaseHeaders = getCaseHeaders(accessToken);
 
       if (clientContextHeaders) {
@@ -261,12 +267,12 @@ export const ccdCaseService = {
       }
 
       const response = await http.get<StartCallbackData>(eventUrl, caseHeaders);
-      logger.info(`Case access validated successfully for caseId: ${caseId}`);
+      logger.info(`Case access validated successfully for caseId: ${safeCaseId}`);
 
       const caseData: CcdCaseData = response.data.case_details?.case_data ?? {};
 
       return {
-        id: caseId,
+        id: safeCaseId,
         data: caseData,
       };
     } catch (error) {
@@ -275,16 +281,21 @@ export const ccdCaseService = {
   },
 
   async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
-    const caseUrl = `${getBaseUrl()}/cases/${caseId}`;
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const caseUrl = `${getBaseUrl()}/cases/${safeCaseId}`;
 
     try {
-      logger.debug(`Fetching case by id for read view: ${caseId}`);
+      logger.debug(`Fetching case by id for read view: ${safeCaseId}`);
       const response = await http.get<CcdCase>(caseUrl, getCaseHeaders(accessToken));
-      logger.debug(`Read case response for ${caseId}: ${JSON.stringify(response.data, null, 2)}`);
+      logger.debug(`Read case response for ${safeCaseId}: ${JSON.stringify(response.data, null, 2)}`);
       const caseData = response.data.data ?? {};
 
       return {
-        id: String(response.data.id ?? caseId),
+        id: String(response.data.id ?? safeCaseId),
         data: caseData,
       };
     } catch (error) {
