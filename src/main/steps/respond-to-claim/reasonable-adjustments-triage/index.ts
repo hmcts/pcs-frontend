@@ -22,8 +22,6 @@ export const step: StepDefinition = createFormStep({
     if (req.body.reasonableAdjustmentsChoice !== 'questions') {
       return; // "skip": let the normal next-step flow continue to language-used
     }
-    // Gate the Your Support launch on the feature flag (pattern A helper). When off, fall through to
-    // the normal next-step flow (as if the citizen had skipped) rather than invoking the microsite.
     if (!(await isCuiYourSupportEnabled(req))) {
       return;
     }
