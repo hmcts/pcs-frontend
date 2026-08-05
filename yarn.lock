@@ -2228,7 +2228,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api-logs@npm:0.221.0":
+"@opentelemetry/api-logs@npm:0.221.0, @opentelemetry/api-logs@npm:^0.221.0":
   version: 0.221.0
   resolution: "@opentelemetry/api-logs@npm:0.221.0"
   dependencies:
@@ -2756,7 +2756,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.68.0, @opentelemetry/instrumentation-redis@npm:^0.68.0":
+"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.69.0":
+  version: 0.69.0
+  resolution: "@opentelemetry/instrumentation-redis@npm:0.69.0"
+  dependencies:
+    "@opentelemetry/instrumentation": "npm:^0.221.0"
+    "@opentelemetry/redis-common": "npm:^0.38.3"
+    "@opentelemetry/semantic-conventions": "npm:^1.27.0"
+  peerDependencies:
+    "@opentelemetry/api": ^1.3.0
+  checksum: 10/a4f7c02cd215114e63cc48cbd82fc4976b91f986a3a17c234fc38e07dec4bdc8f5b59290e24f36810ea7f53f30fc055db5a60d35d04e657586fdc33dcff1cee0
+  languageName: node
+  linkType: hard
+
+"@opentelemetry/instrumentation-redis@npm:^0.68.0":
   version: 0.68.0
   resolution: "@opentelemetry/instrumentation-redis@npm:0.68.0"
   dependencies:
@@ -2794,7 +2807,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-winston@npm:0.64.0, @opentelemetry/instrumentation-winston@npm:^0.64.0":
+"@opentelemetry/instrumentation-winston@npm:0.65.0":
+  version: 0.65.0
+  resolution: "@opentelemetry/instrumentation-winston@npm:0.65.0"
+  dependencies:
+    "@opentelemetry/api-logs": "npm:^0.221.0"
+    "@opentelemetry/instrumentation": "npm:^0.221.0"
+  peerDependencies:
+    "@opentelemetry/api": ^1.3.0
+  checksum: 10/bc72a2991e946aa6d445d8102eb676a7df7de971e3c520b9fe47cc88543896cf91067e360d564ab631a3bcdfdb49308209252bcd2e2cc16b1ab48aac010dd4d3
+  languageName: node
+  linkType: hard
+
+"@opentelemetry/instrumentation-winston@npm:^0.64.0":
   version: 0.64.0
   resolution: "@opentelemetry/instrumentation-winston@npm:0.64.0"
   dependencies:
@@ -11634,7 +11659,7 @@ __metadata:
     "@launchdarkly/node-server-sdk": "npm:9.13.0"
     "@ministryofjustice/frontend": "npm:^10.0.0"
     "@opentelemetry/api": "npm:1.9.1"
-    "@opentelemetry/instrumentation-winston": "npm:0.64.0"
+    "@opentelemetry/instrumentation-winston": "npm:0.65.0"
     "@pact-foundation/pact": "npm:17.0.1"
     "@pact-foundation/pact-cli": "npm:18.1.1"
     "@playwright/test": "npm:1.61.1"
