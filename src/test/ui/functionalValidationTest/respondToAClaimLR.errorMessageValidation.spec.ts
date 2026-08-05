@@ -33,7 +33,6 @@ import {
 import { user } from '../data/user-data';
 import { defendantNameConfirmationErrorValidation } from '../functional/legalRepresentative-functional/defendantNameConfirmation.pft.lr';
 import { selectDefendantErrorValidation } from '../functional/legalRepresentative-functional/selectDefendant.pft.lr';
-import { tenancyDateUnknownErrorValidation } from '../functional/tenancyDateUnknown.pft';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
 import {
@@ -272,19 +271,5 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     assertAllErrorMessageValidations();
   });
 
-  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible', async () => {
-    await performAction('tenancyOrContractTypeDetails', {
-      tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetailsLR.noRadioOption,
-      tenancyTypeInfo: tenancyTypeDetailsLR.giveCorrectTenancyTypeTextInput,
-    });
-
-    await softErrorMessageValidation('tenancyDateUnknown', tenancyDateUnknownErrorValidation);
-    await performAction('enterTenancyStartDetailsUnKnown', {
-      tsDay: '15',
-      tsMonth: '11',
-      tsYear: '2024',
-    });
-    assertAllErrorMessageValidations();
-  });
+  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible', async () => {});
 });

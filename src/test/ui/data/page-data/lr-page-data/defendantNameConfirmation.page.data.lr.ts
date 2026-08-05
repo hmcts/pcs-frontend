@@ -21,8 +21,6 @@ export const defendantNameConfirmation = {
   defendantLastNameHiddenTextLabel: `Defendant’s last name`,
   firstNameInputText: `John`,
   lastNameInputText: `Doe`,
-  enterFirstNameMaxLengthErrorMessage: `First name must be 60 characters or less`,
-  enterLastNameMaxLengthErrorMessage: `Last name must be 60 characters or less`,
   emojiTextInput: `👉 😄`,
   emojiFirstNameErrorMessage: `Defendant’s first name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   emojiLastNameErrorMessage: `Defendant’s last name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,

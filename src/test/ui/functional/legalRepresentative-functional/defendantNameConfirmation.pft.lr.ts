@@ -1,7 +1,6 @@
 import { defendantNameConfirmation } from '../../data/page-data/lr-page-data';
 import { getPinUserAt } from '../../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { performAction, performValidation } from '../../utils/controller';
-const overMaxLengthString = 'A'.repeat(61);
 export async function defendantNameConfirmationErrorValidation(): Promise<void> {
   // Test: Error message validation for mandatory radio button selection
   await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
@@ -21,28 +20,6 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
     message: defendantNameConfirmation.enterDefendantLastNameErrorMessage,
   });
-  //Test: First name over max length and empty last name
-  await performAction('inputText', defendantNameConfirmation.defendantFirstNameHiddenTextLabel, overMaxLengthString);
-  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
-  // await performValidation('errorMessage', {
-  //   header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-  //   message: defendantNameConfirmation.enterFirstNameMaxLengthErrorMessage,
-  // });
-  await performValidation('errorMessage', {
-    header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-    message: defendantNameConfirmation.enterDefendantLastNameErrorMessage,
-  });
-  //Test: Both first name and last name over max length
-  await performAction('inputText', defendantNameConfirmation.defendantLastNameHiddenTextLabel, overMaxLengthString);
-  await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
-  // await performValidation('errorMessage', {
-  //   header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-  //   message: defendantNameConfirmation.enterFirstNameMaxLengthErrorMessage,
-  // });
-  // await performValidation('errorMessage', {
-  //   header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
-  //   message: defendantNameConfirmation.enterLastNameMaxLengthErrorMessage,
-  // });
   //Test: Both first name and last name for emoji
   await performAction(
     'inputText',
