@@ -18,8 +18,7 @@ export enum DocumentType {
 // CDAM failures are logged but never thrown — the normaliser will still strip the
 // metadata from the draft, so the user sees a consistent state.
 export async function purgeUploadedDocumentsFromCdam(req: Request, documentType: DocumentType): Promise<void> {
-  const documentField =
-    documentType === DocumentType.COUNTER_CLAIM ? 'counterClaimDocuments' : 'defendantDocuments';
+  const documentField = documentType === DocumentType.COUNTER_CLAIM ? 'counterClaimDocuments' : 'defendantDocuments';
   const docs: CcdCollectionItem<CcdUploadedDocument>[] | undefined =
     req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.[documentField];
 
