@@ -7,8 +7,15 @@ import { redirectTo } from './navigate';
  * confirmation document. At that point we redirect the user to their dashboard
  * instead of the previous page.
  *
- * A single `popstate` listener is registered for the lifetime of the page so
- * that repeated bfcache restores don't accumulate duplicate listeners.
+ * The guard is armed on `pageshow` rather than synchronously at load. This
+ * covers both the initial display and back/forward-cache restores, and — more
+ * importantly — it defers the `pushState` until after the navigation has
+ * committed. When we arrive via a redirect (e.g. the GOV.UK Pay return 303 on
+ * the payment confirmation pages), a synchronous `pushState` at script-eval
+ * time is dropped by the browser, leaving no entry to catch the first Back.
+ *
+ * A single `popstate` listener is registered for the lifetime of the page; it
+ * re-arms before redirecting so a fast/repeated Back can't slip past.
  */
 export function initRedirectOnBack(): void {
   const marker = document.getElementById('redirect-on-back');
@@ -23,16 +30,11 @@ export function initRedirectOnBack(): void {
   };
 
   window.addEventListener('popstate', () => {
-    // Re-block first so a fast/repeated Back can't slip past before we navigate.
     pushGuard();
     redirectTo(dashboardUrl);
   });
 
-  pushGuard();
-
-  window.addEventListener('pageshow', event => {
-    if (event.persisted) {
-      pushGuard();
-    }
+  window.addEventListener('pageshow', () => {
+    pushGuard();
   });
 }

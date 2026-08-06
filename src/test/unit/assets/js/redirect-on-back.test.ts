@@ -50,9 +50,16 @@ describe('initRedirectOnBack', () => {
     document.body.appendChild(span);
   };
 
+  const pageshow = (persisted = false): void => {
+    const event = new Event('pageshow');
+    Object.defineProperty(event, 'persisted', { value: persisted });
+    window.dispatchEvent(event);
+  };
+
   it('does nothing when the marker is absent', () => {
     initRedirectOnBack();
 
+    pageshow();
     window.dispatchEvent(new PopStateEvent('popstate'));
 
     expect(pushStateSpy).not.toHaveBeenCalled();
@@ -64,16 +71,31 @@ describe('initRedirectOnBack', () => {
 
     initRedirectOnBack();
 
+    pageshow();
     window.dispatchEvent(new PopStateEvent('popstate'));
 
     expect(pushStateSpy).not.toHaveBeenCalled();
     expect(redirectToMock).not.toHaveBeenCalled();
   });
 
-  it('pushes a duplicate history entry and redirects to the dashboard on Back', () => {
+  it('does not arm synchronously — the guard is pushed on pageshow', () => {
+    // Regression guard: a synchronous pushState at load is dropped by the browser
+    // when we arrive via a redirect (e.g. the GOV.UK Pay return 303), so the
+    // guard must be deferred to pageshow.
     addMarker(dashboardUrl);
 
     initRedirectOnBack();
+    expect(pushStateSpy).not.toHaveBeenCalled();
+
+    pageshow();
+    expect(pushStateSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('pushes a duplicate history entry on show and redirects to the dashboard on Back', () => {
+    addMarker(dashboardUrl);
+
+    initRedirectOnBack();
+    pageshow();
 
     expect(pushStateSpy).toHaveBeenCalledTimes(1);
     expect(redirectToMock).not.toHaveBeenCalled();
@@ -87,6 +109,7 @@ describe('initRedirectOnBack', () => {
     addMarker(dashboardUrl);
 
     initRedirectOnBack();
+    pageshow();
     expect(pushStateSpy).toHaveBeenCalledTimes(1);
 
     window.dispatchEvent(new PopStateEvent('popstate'));
@@ -99,47 +122,30 @@ describe('initRedirectOnBack', () => {
     expect(redirectToMock).toHaveBeenNthCalledWith(2, dashboardUrl);
   });
 
-  it('registers a single popstate listener regardless of bfcache re-arms', () => {
+  it('re-arms on both initial and back/forward-cache pageshow events', () => {
     addMarker(dashboardUrl);
 
     initRedirectOnBack();
 
-    const persistedPageshow = (): void => {
-      const pageshow = new Event('pageshow');
-      Object.defineProperty(pageshow, 'persisted', { value: true });
-      window.dispatchEvent(pageshow);
-    };
-    persistedPageshow();
-    persistedPageshow();
+    pageshow(false); // initial display
+    expect(pushStateSpy).toHaveBeenCalledTimes(1);
+
+    pageshow(true); // restored from bfcache
+    expect(pushStateSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('registers a single popstate listener regardless of repeated pageshow re-arms', () => {
+    addMarker(dashboardUrl);
+
+    initRedirectOnBack();
+
+    pageshow(true);
+    pageshow(true);
 
     redirectToMock.mockClear();
     window.dispatchEvent(new PopStateEvent('popstate'));
 
     // A single Back must redirect exactly once — no accumulated listeners.
     expect(redirectToMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('re-arms when the page is restored from the back/forward cache', () => {
-    addMarker(dashboardUrl);
-
-    initRedirectOnBack();
-    expect(pushStateSpy).toHaveBeenCalledTimes(1);
-
-    const pageshow = new Event('pageshow');
-    Object.defineProperty(pageshow, 'persisted', { value: true });
-    window.dispatchEvent(pageshow);
-
-    expect(pushStateSpy).toHaveBeenCalledTimes(2);
-  });
-
-  it('does not re-arm on a normal (non-persisted) pageshow', () => {
-    addMarker(dashboardUrl);
-
-    initRedirectOnBack();
-    expect(pushStateSpy).toHaveBeenCalledTimes(1);
-
-    window.dispatchEvent(new Event('pageshow'));
-
-    expect(pushStateSpy).toHaveBeenCalledTimes(1);
   });
 });
