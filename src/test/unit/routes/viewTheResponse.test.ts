@@ -11,6 +11,11 @@ import viewTheResponseRoute from '@routes/viewTheResponse';
 import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
+
+const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
+  typeof isRespondToClaimEnabledForRelease
+>;
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
@@ -53,8 +58,13 @@ jest.mock('@services/ccdCaseService', () => ({
   },
 }));
 
+jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
+  isRespondToClaimEnabledForRelease: jest.fn(),
+}));
+
 function buildComprehensiveCaseData(): CcdCaseData {
   return {
+    legislativeCountry: 'Wales',
     claimantName: 'Example Claimant Ltd',
     propertyAddress: {
       AddressLine1: '10 Second Avenue',
@@ -128,7 +138,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
         noticeReceivedDate: '2025-12-01',
         rentArrearsAmountConfirmation: 'YES',
         rentArrearsAmount: '125000',
-        landlordRegistered: 'YES',
+        exemptLandlord: 'YES',
         landlordLicensed: 'NO',
         writtenTerms: 'NOT_SURE',
         paymentAgreement: {
@@ -217,7 +227,7 @@ function buildAlternateBranchesCaseData(): CcdCaseData {
         disputeClaim: 'NO',
         tenancyTypeConfirmation: 'NO',
         possessionNoticeReceived: 'NOT_SURE',
-        landlordRegistered: undefined,
+        exemptLandlord: undefined,
         householdCircumstances: {
           incomeFromJobs: 'NO',
           universalCredit: 'NO',
@@ -267,6 +277,7 @@ describe('viewTheResponse route', () => {
       get: jest.fn(),
     } as unknown as Application;
     (getLaunchDarklyFlag as jest.Mock).mockResolvedValue(true);
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -400,19 +411,11 @@ describe('viewTheResponse route', () => {
     expect(renderArgs.responseToClaim.rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.landlordRegistered' },
+          key: { text: 'viewTheResponse:responseToClaim.exemptLandlord' },
           value: { text: 'Yes' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.landlordLicensed' },
-          value: { text: 'No' },
         }),
         expect.objectContaining({
           key: { text: 'viewTheResponse:responseToClaim.rentArrearsAmountConfirmation' },
-          value: { text: 'Yes' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.exemptLandlord' },
           value: { text: 'Yes' },
         }),
         expect.objectContaining({
