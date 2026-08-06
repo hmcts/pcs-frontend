@@ -24,6 +24,9 @@ jest.mock('config', () => ({
 }));
 
 const mockClientContextClearer = jest.fn(req => req);
+jest.mock('@utils/clientContextSessionClearer', () => ({
+  clientContextSessionClearer: mockClientContextClearer,
+}));
 
 import type { Request } from 'express';
 
@@ -134,6 +137,7 @@ describe('respondToClaimFinalSubmit', () => {
 
       expect(result.confirmationPath).toBe('/case/1234567890123456/respond-to-claim/response-submitted');
       expect(mockHttpPost).toHaveBeenCalled();
+      expect(mockClientContextClearer).toHaveBeenCalledWith(req);
     });
 
     it('persists payment session when counterclaim fee payment is required', async () => {
@@ -159,7 +163,6 @@ describe('respondToClaimFinalSubmit', () => {
               id: '1234567890123456',
               data: {
                 possessionClaimResponse: {
-                  currentDefendantPartyId: 'abc',
                   defendantResponses: {
                     makeCounterClaim: 'YES',
                     counterClaim: { claimType: 'KNOWN_AMOUNT', claimAmount: 5000 },
@@ -187,12 +190,6 @@ describe('respondToClaimFinalSubmit', () => {
           caseReference: '1234567890123456',
           serviceRequestReference: '2026-999',
           feeAmount: 11500,
-        })
-      );
-
-      expect(req.session.clientContext).toEqual(
-        expect.objectContaining({
-          selectedPartyId: 'abc',
         })
       );
     });
