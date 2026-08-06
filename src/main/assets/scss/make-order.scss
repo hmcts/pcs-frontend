@@ -275,7 +275,14 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   display: grid;
   grid-template-columns: minmax(0, 22em) auto minmax(0, 20em);
   gap: 0 govuk-spacing(6);
-  align-items: baseline;
+
+  // Each column starts at the top of the row, so the party name stays level with the first line of
+  // the radios however many lines the name itself runs to. `center` also levels them, and reads
+  // better on the placeholder names, but it centres the *whole* column: a name long enough to wrap
+  // then sits 25px above the radios it labels. `baseline`, which this used to be, does not level
+  // them at all — the radio label's baseline sits low inside a 44px-tall flex item, which is where
+  // the 15px of drift came from.
+  align-items: start;
   padding: govuk-spacing(2) 0;
   border-bottom: 1px solid $govuk-border-colour;
 
@@ -289,6 +296,13 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
 // a legend would have had, so nothing changes visually.
 .pcs-attendance__label {
   margin-bottom: 0;
+
+  // Drop the name to sit on the same line as the radio labels beside it. Both are 19px/25px text,
+  // so this is purely the offset govuk-frontend builds into a radio item: 7px of padding on
+  // `.govuk-radios__label`, plus the 2.5px its 25px line box is centred by inside the 44px-tall
+  // item the radio input makes. Neither is reachable from here without restyling stock components,
+  // hence matching it rather than removing it. Measured, not guessed — all five rows land at 0.
+  padding-top: 10px;
 }
 
 // The name field is the last column, so its own bottom margin would only add row height.
