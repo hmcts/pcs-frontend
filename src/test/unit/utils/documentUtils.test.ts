@@ -273,4 +273,157 @@ describe('documentUtils', () => {
       })
     );
   });
+
+  it('extracts notice documents from notice_Documents for draft cases', () => {
+    const documents = extractCaseDocuments({
+      notice_Documents: [
+        {
+          id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+          value: {
+            document_binary_url: 'http://doc-store/draft-notice/binary',
+            document_filename: 'draft-notice.pdf',
+            document_type: 'POSSESSION_NOTICE',
+          },
+        },
+      ],
+    });
+
+    expect(documents).toEqual([
+      {
+        id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        filename: 'draft-notice.pdf',
+        binaryUrl: 'http://doc-store/draft-notice/binary',
+        categoryId: undefined,
+        documentType: 'POSSESSION_NOTICE',
+        sourceField: 'notice_Documents',
+      },
+    ]);
+  });
+
+  it('extracts notice documents from detailsTab_NoticeDetails.noticeDocuments for submitted cases', () => {
+    const documents = extractCaseDocuments({
+      notice_Documents: [],
+      detailsTab_NoticeDetails: {
+        noticeDocuments: [
+          {
+            id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            value: {
+              document_binary_url: 'http://doc-store/submitted-notice/binary',
+              document_filename: 'DocUploaded - Claimant 1.rtf',
+              document_type: 'POSSESSION_NOTICE',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      {
+        id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        filename: 'DocUploaded - Claimant 1.rtf',
+        binaryUrl: 'http://doc-store/submitted-notice/binary',
+        categoryId: undefined,
+        documentType: 'POSSESSION_NOTICE',
+        sourceField: 'detailsTab_NoticeDetails.noticeDocuments',
+      },
+    ]);
+  });
+
+  it('indexes notice documents from both notice_Documents and detailsTab when both are present', () => {
+    const documents = extractCaseDocuments({
+      notice_Documents: [
+        {
+          id: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+          value: {
+            document_binary_url: 'http://doc-store/draft/binary',
+            document_filename: 'draft.pdf',
+          },
+        },
+      ],
+      detailsTab_NoticeDetails: {
+        noticeDocuments: [
+          {
+            id: 'dddddddd-dddd-dddd-dddd-dddddddddddd',
+            value: {
+              document_binary_url: 'http://doc-store/submitted/binary',
+              document_filename: 'submitted.pdf',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents.map(document => document.sourceField)).toEqual([
+      'notice_Documents',
+      'detailsTab_NoticeDetails.noticeDocuments',
+    ]);
+  });
+
+  it('indexes claim-journey documents from the Case Details tab collections', () => {
+    const documents = extractCaseDocuments({
+      detailsTab_TenancyLicenceDetails: {
+        tenancyLicenceDocuments: [
+          {
+            id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+            value: {
+              document_filename: 'tenancy-agreement.pdf',
+              document_binary_url: 'http://doc-store/tenancy/binary',
+            },
+          },
+        ],
+      },
+      detailsTab_RequiredDocumentsDetails: {
+        gasSafetyReports: [
+          {
+            id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            value: {
+              document_filename: 'gas-safety.pdf',
+              document_binary_url: 'http://doc-store/gas/binary',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      expect.objectContaining({
+        id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        filename: 'tenancy-agreement.pdf',
+        binaryUrl: 'http://doc-store/tenancy/binary',
+        sourceField: 'detailsTab_TenancyLicenceDetails.tenancyLicenceDocuments',
+      }),
+      expect.objectContaining({
+        id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        filename: 'gas-safety.pdf',
+        binaryUrl: 'http://doc-store/gas/binary',
+        sourceField: 'detailsTab_RequiredDocumentsDetails.gasSafetyReports',
+      }),
+    ]);
+  });
+
+  it('finds a Case Details tab document by its collection id (View Claim download)', () => {
+    const document = findCaseDocumentById(
+      {
+        detailsTab_NoticeDetails: {
+          noticeDocuments: [
+            {
+              id: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+              value: {
+                document_filename: 'notice-of-seeking-possession.pdf',
+                document_binary_url: 'http://doc-store/notice-doc/binary',
+              },
+            },
+          ],
+        },
+      },
+      'cccccccc-cccc-cccc-cccc-cccccccccccc'
+    );
+
+    expect(document).toEqual(
+      expect.objectContaining({
+        filename: 'notice-of-seeking-possession.pdf',
+        binaryUrl: 'http://doc-store/notice-doc/binary',
+      })
+    );
+  });
 });

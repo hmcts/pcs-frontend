@@ -1,0 +1,16 @@
+export const counterclaimYouNeedToApplyForHelpWithYourFeesLR = {
+  mainHeader: `The defendant needs to apply for help with their counterclaim fee`,
+  backLink: `Back`,
+  saveForLaterButton: `Save for later`,
+  cymraegLink: `Cymraeg`,
+  youNeedToParagraph: `You need to`,
+  applyForHelpWithFeeLink: `apply for Help with Fees on the defendant’s behalf (GOV.UK, opens in new tab)`,
+  beforeYouCanContinueParagraph: `before you can continue with this counterclaim.`,
+  enterTheCourtFormNumberParagraph: `Enter the court form number 'XXX' when asked. This will be one of the first questions when you apply.`,
+  afterYouHaveAppliedParagraph: `After you have applied you will receive a Help with Fees reference number. You should enter the reference number when you return to this counterclaim.`,
+  ifDefendantReceiveAnyBenefit: ` If the defendant receives any benefit that qualifies them for Help with Fees, you must include evidence of it when you apply online for help with their fees.`,
+  ifYouHaveParagraph: `If you have their Help with Fees reference number you can`,
+  helpWithFeesLink: `enter it here`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `counter-claim-you-need-to-apply-for-help-with-your-fees`,
+};
