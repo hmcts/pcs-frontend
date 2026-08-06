@@ -54,5 +54,6 @@ export function getNotificationUrlPlaceholders(caseReference: string): Record<st
     respondToClaimUrl: getDashboardTaskPath('RespondToClaim', caseReference, 'response'),
     viewDocumentsUrl: getDashboardTaskPath('ViewDocuments', caseReference, 'documents'),
     uploadDocumentsUrl: getDashboardTaskPath('UploadDocuments', caseReference, 'documents'),
+    payCounterclaimFeeUrl: `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount?from=dashboard`,
   };
 }
