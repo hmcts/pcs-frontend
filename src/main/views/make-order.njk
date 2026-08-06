@@ -522,25 +522,116 @@
       {{ govukDateInput({
         id: "suspended-by-date",
         namePrefix: "suspended-by-date",
-        fieldset: { legend: { text: "Possession on or before", classes: "govuk-fieldset__legend--s" } }
+        fieldset: { legend: { text: "Possession by", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
+      {#
+        The prototype's label for this is the sentence "Suspended on condition of payment of current
+        rent plus arrears of ... to be paid by", split across two <span>s with the input in the
+        middle and the trailing half left dangling with nothing after it. Reduced to what the field
+        holds, with the condition stated once as the legend of the payment terms below.
+      #}
       {{ govukInput({
         id: "suspended-arrears",
         name: "suspended-arrears",
-        label: { text: "Arrears", classes: "govuk-label--s" },
+        label: { text: "Arrears to be paid, on condition of payment of current rent", classes: "govuk-label--s" },
         classes: "govuk-input--width-5",
         spellcheck: false,
+        inputmode: "numeric",
         prefix: { text: "£" }
       }) }}
 
+      {#
+        One choice, so radios — the prototype uses two independent checkboxes, which let a judge
+        order a single payment and instalments for the same arrears.
+      #}
       {{ govukRadios({
         name: "suspended-payment-type",
         classes: "govuk-radios--small",
-        fieldset: { legend: { text: "Suspended on terms of", classes: "govuk-fieldset__legend--s" } },
+        fieldset: { legend: { text: "Arrears to be paid by", classes: "govuk-fieldset__legend--s" } },
         items: [
-          { value: "one-off", text: "One-off payment" },
-          { value: "instalments", text: "Instalment payments" }
+          {
+            value: "one-off",
+            text: "A single payment",
+            conditional: {
+              html: govukInput({
+                id: "suspended-oneoff-amount",
+                name: "suspended-oneoff-amount",
+                label: { text: "Payment of" },
+                classes: "govuk-input--width-5",
+                spellcheck: false,
+                inputmode: "numeric",
+                prefix: { text: "£" }
+              }) + govukDateInput({
+                id: "suspended-oneoff-date",
+                namePrefix: "suspended-oneoff-date",
+                fieldset: { legend: { text: "On or before", classes: "govuk-fieldset__legend--s" } }
+              })
+            }
+          },
+          {
+            value: "instalments",
+            text: "Instalment payments",
+            conditional: {
+              html: govukInput({
+                id: "suspended-instalment-amount",
+                name: "suspended-instalment-amount",
+                label: { text: "Payments of" },
+                classes: "govuk-input--width-5",
+                spellcheck: false,
+                inputmode: "numeric",
+                prefix: { text: "£" }
+              }) + govukSelect({
+                id: "suspended-instalment-frequency",
+                name: "suspended-instalment-frequency",
+                label: { text: "How often" },
+                items: paymentFrequencies
+              }) + govukDateInput({
+                id: "suspended-instalment-date",
+                namePrefix: "suspended-instalment-date",
+                fieldset: { legend: { text: "First payment by", classes: "govuk-fieldset__legend--s" } }
+              })
+            }
+          }
+        ]
+      }) }}
+
+      {#
+        The prototype's "Suspended on the same terms as above" is permanently disabled, so it can
+        never be ticked and a keyboard user cannot reach it. Left out rather than copied: an option
+        that cannot be chosen is not a field. Worth asking what it was meant to do.
+      #}
+      {{ govukCheckboxes({
+        idPrefix: "suspended-options",
+        name: "suspended-options",
+        classes: "govuk-checkboxes--small",
+        items: [
+          { value: "money-judgment-arrears", text: "Money judgment for the arrears above" },
+          { value: "money-claim-adjourned", text: "Money claim adjourned generally with liberty to restore" },
+          {
+            value: "use-occupation",
+            text: "Damages for unlawful occupation",
+            conditional: {
+              html: govukInput({
+                id: "suspended-use-occupation-rate",
+                name: "suspended-use-occupation-rate",
+                label: { text: "Daily rate" },
+                classes: "govuk-input--width-5",
+                spellcheck: false,
+                inputmode: "decimal",
+                prefix: { text: "£" }
+              }) + govukDateInput({
+                id: "suspended-use-occupation-from-date",
+                namePrefix: "suspended-use-occupation-from-date",
+                fieldset: { legend: { text: "From", classes: "govuk-fieldset__legend--s" } }
+              })
+            }
+          },
+          {
+            value: "warrant-on-notice",
+            text: "Any application for a warrant of eviction must be made and heard on notice to all parties unless the court orders otherwise"
+          },
+          { value: "transfer-high-court", text: "Transfer to High Court" }
         ]
       }) }}
     </div>
