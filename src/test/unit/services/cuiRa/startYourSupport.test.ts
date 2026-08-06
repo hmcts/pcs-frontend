@@ -1,6 +1,7 @@
 import config from 'config';
 import type { Request } from 'express';
 
+import { http } from '@modules/http';
 import { cuiRaService } from '@services/cuiRa/cuiRaService';
 import { startYourSupport } from '@services/cuiRa/startYourSupport';
 
@@ -20,20 +21,23 @@ jest.mock('@modules/logger', () => ({
   Logger: { getLogger: () => ({ error: jest.fn(), warn: jest.fn(), info: jest.fn() }) },
 }));
 
+jest.mock('@modules/http', () => ({
+  http: { getValidS2SToken: jest.fn() },
+}));
+
+const mockGetValidS2SToken = http.getValidS2SToken as jest.Mock;
+
 const configValues: Record<string, string> = {
-  's2s.key': 's2s:service-token',
   'cuiRa.callbackUrl': 'http://frontend/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id',
   'cuiRa.logoutUrl': 'http://frontend/logout',
   'cuiRa.hmctsServiceId': 'AAA3',
   'cuiRa.masterFlagCode': 'RA0001',
 };
 
-function buildReq(overrides: Record<string, unknown> = {}): { req: Request; redisGet: jest.Mock } {
-  const redisGet = jest.fn().mockResolvedValue('s2s-token-value');
+function buildReq(overrides: Record<string, unknown> = {}): { req: Request } {
   const req = {
     body: { reasonableAdjustmentsChoice: 'questions' },
     session: { user: { accessToken: 'idam-access-token' } },
-    app: { locals: { redisClient: { get: redisGet } } },
     res: {
       locals: {
         validatedCase: {
@@ -46,7 +50,7 @@ function buildReq(overrides: Record<string, unknown> = {}): { req: Request; redi
     },
     ...overrides,
   } as unknown as Request;
-  return { req, redisGet };
+  return { req };
 }
 
 describe('startYourSupport', () => {
@@ -54,15 +58,16 @@ describe('startYourSupport', () => {
     jest.clearAllMocks();
     (config.get as jest.Mock).mockImplementation((key: string) => configValues[key]);
     (cuiRaService.invokePayload as jest.Mock).mockResolvedValue('https://cui-ra/microsite/xyz');
+    mockGetValidS2SToken.mockResolvedValue('s2s-token-value');
   });
 
   it('builds the invocation payload from the case and returns the microsite url', async () => {
-    const { req, redisGet } = buildReq();
+    const { req } = buildReq();
 
     const url = await startYourSupport(req);
 
     expect(url).toBe('https://cui-ra/microsite/xyz');
-    expect(redisGet).toHaveBeenCalledWith('s2s:service-token');
+    expect(mockGetValidS2SToken).toHaveBeenCalled();
     expect(cuiRaService.invokePayload).toHaveBeenCalledWith({
       accessToken: 'idam-access-token',
       serviceToken: 's2s-token-value',
@@ -172,7 +177,8 @@ describe('startYourSupport', () => {
   });
 
   it('throws 500 when the S2S service token is unavailable', async () => {
-    const { req } = buildReq({ app: { locals: { redisClient: { get: jest.fn().mockResolvedValue(null) } } } });
+    mockGetValidS2SToken.mockRejectedValue(new Error('No valid S2S token available'));
+    const { req } = buildReq();
 
     await expect(startYourSupport(req)).rejects.toMatchObject({ status: 500 });
     expect(cuiRaService.invokePayload).not.toHaveBeenCalled();

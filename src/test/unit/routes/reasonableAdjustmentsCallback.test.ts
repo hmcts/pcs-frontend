@@ -36,13 +36,9 @@ jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: { updateDraft: mockUpdateDraft, getCaseByIdForEvent: mockGetCaseByIdForEvent },
 }));
 
-jest.mock('config', () => ({
-  get: jest.fn((key: string) => {
-    if (key === 's2s.key') {
-      return 's2s:service-token';
-    }
-    throw new Error(`Unexpected config key: ${key}`);
-  }),
+const mockGetValidS2SToken = jest.fn();
+jest.mock('@modules/http', () => ({
+  http: { getValidS2SToken: mockGetValidS2SToken },
 }));
 
 const mockSafeRedirect303 = jest.fn();
@@ -63,11 +59,10 @@ const errorUrl = '/case/123/respond-to-claim/reasonable-adjustments-error';
 describe('reasonableAdjustmentsCallback routes', () => {
   let mockAppGet: jest.Mock;
 
-  const buildReq = (serviceToken: string | null): Request =>
+  const buildReq = (): Request =>
     ({
       params: { caseReference: '123', id: 'abc-1' },
       session: { user: { accessToken: 'user-tok' }, clientContext: { context: 'x' } },
-      app: { locals: { redisClient: { get: jest.fn().mockResolvedValue(serviceToken) } } },
     }) as unknown as Request;
 
   // The route handler is the last argument registered (after oidc + feature-flag middleware).
@@ -90,6 +85,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetValidS2SToken.mockResolvedValue('s2s-tok');
     mockGetCaseByIdForEvent.mockResolvedValue({ id: '123', data: { possessionClaimResponse: existingResponse } });
     mockAppGet = jest.fn();
     reasonableAdjustmentsCallbackRoutes({ get: mockAppGet } as unknown as Application);
@@ -106,9 +102,10 @@ describe('reasonableAdjustmentsCallback routes', () => {
   });
 
   it('redirects to the error page when no S2S service token is available', async () => {
+    mockGetValidS2SToken.mockRejectedValue(new Error('no valid S2S token'));
     const res = {} as unknown as Response;
 
-    await getHandler()(buildReq(null), res);
+    await getHandler()(buildReq(), res);
 
     expect(mockGetPayload).not.toHaveBeenCalled();
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
@@ -133,7 +130,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
     mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', replacementFlags: flags });
     const res = {} as unknown as Response;
 
-    await getHandler()(buildReq('s2s-tok'), res);
+    await getHandler()(buildReq(), res);
 
     expect(mockGetPayload).toHaveBeenCalledWith('abc-1', 's2s-tok');
     // Loads the in-progress defendant response so the REPLACE-style draft-save doesn't wipe answers.
@@ -173,7 +170,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
     mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', flagsAsSupplied: flags });
     const res = {} as unknown as Response;
 
-    await getHandler()(buildReq('s2s-tok'), res);
+    await getHandler()(buildReq(), res);
 
     expect(mockUpdateDraft).not.toHaveBeenCalled();
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
@@ -183,7 +180,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
     mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
     const res = {} as unknown as Response;
 
-    await getHandler()(buildReq('s2s-tok'), res);
+    await getHandler()(buildReq(), res);
 
     expect(mockUpdateDraft).not.toHaveBeenCalled();
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
@@ -193,7 +190,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
     mockGetPayload.mockResolvedValue({ action: 'cancel', correlationId: '123' });
     const res = {} as unknown as Response;
 
-    await getHandler()(buildReq('s2s-tok'), res);
+    await getHandler()(buildReq(), res);
 
     expect(mockUpdateDraft).not.toHaveBeenCalled();
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
@@ -203,7 +200,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
     mockGetPayload.mockRejectedValue(new Error('boom'));
     const res = {} as unknown as Response;
 
-    await getHandler()(buildReq('s2s-tok'), res);
+    await getHandler()(buildReq(), res);
 
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
   });
@@ -214,7 +211,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
     mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '999', replacementFlags: flags });
     const res = {} as unknown as Response;
 
-    await getHandler()(buildReq('s2s-tok'), res);
+    await getHandler()(buildReq(), res);
 
     // Access check runs first; the mismatch is caught before any persistence.
     expect(mockGetCaseByIdForEvent).toHaveBeenCalled();
@@ -228,7 +225,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
     mockGetCaseByIdForEvent.mockRejectedValue(new Error('case load down'));
     const res = {} as unknown as Response;
 
-    await getHandler()(buildReq('s2s-tok'), res);
+    await getHandler()(buildReq(), res);
 
     expect(mockUpdateDraft).not.toHaveBeenCalled();
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
@@ -240,7 +237,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
     mockUpdateDraft.mockRejectedValue(new Error('ccd down'));
     const res = {} as unknown as Response;
 
-    await getHandler()(buildReq('s2s-tok'), res);
+    await getHandler()(buildReq(), res);
 
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
   });

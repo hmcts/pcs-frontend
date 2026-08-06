@@ -7,6 +7,7 @@ import type { CuiRaFlags, CuiRaInvocationRequest } from './cuiRa.interface';
 import { cuiRaService } from './cuiRaService';
 import { toCuiRaFlags } from './flagMapping';
 
+import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { getValidatedLanguage } from '@modules/steps';
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -44,9 +45,12 @@ export async function startYourSupport(req: Request): Promise<string> {
     throw new HTTPError('Case not available to start Your Support', 400);
   }
 
-  const serviceToken = await req.app.locals.redisClient?.get(config.get<string>('s2s.key'));
-  if (!serviceToken) {
-    logger.error('No S2S service token available to start Your Support');
+  // Source the S2S token because cui-ya want's it set in a custom service-token header
+  let serviceToken: string;
+  try {
+    serviceToken = await http.getValidS2SToken();
+  } catch (error) {
+    logger.error('No S2S service token available to start Your Support', error);
     throw new HTTPError('Service token unavailable', 500);
   }
 

@@ -1,4 +1,3 @@
-import config from 'config';
 import type { Application, Request, Response } from 'express';
 
 import { cuiYourSupportFeatureMiddleware } from '../middleware/cuiYourSupportFeatureMiddleware';
@@ -6,6 +5,7 @@ import { oidcMiddleware } from '../middleware/oidc';
 import { respondToClaimFeatureMiddleware } from '../middleware/respondToClaimFeatureMiddleware';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../steps/respond-to-claim/draftEvent';
 
+import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -34,10 +34,14 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
       const cancelledUrl = `/case/${caseReference}/respond-to-claim/reasonable-adjustments-cancelled`;
       const errorUrl = `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`;
 
-      // GET /api/payload/:id authenticates with the S2S service token only (no idam-token).
-      const serviceToken = await req.app.locals.redisClient?.get(config.get<string>('s2s.key'));
-      if (!serviceToken) {
-        logger.error(`No S2S service token available to fetch Your Support payload for id ${payloadId}`);
+      // GET /api/payload/:id authenticates with the S2S service token only (no idam-token). Source it
+      // from the shared http client (proactively refreshed 30s before expiry), not a direct Redis
+      // read which can return a stale/expired token.
+      let serviceToken: string;
+      try {
+        serviceToken = await http.getValidS2SToken();
+      } catch (error) {
+        logger.error(`No S2S service token available to fetch Your Support payload for id ${payloadId}`, error);
         return safeRedirect303(res, errorUrl, fallback, ['/case']);
       }
 
