@@ -11,6 +11,10 @@ jest.mock('../../../../main/assets/js/navigate', () => ({
 
 const redirectToMock = redirectTo as jest.Mock;
 
+// Number of deferred re-pushes scheduled per arm (setTimeout delays in the SUT),
+// plus the immediate synchronous push.
+const PUSHES_PER_ARM = 5;
+
 describe('initRedirectOnBack', () => {
   const dashboardUrl = '/case/1234567890123456/dashboard';
 
@@ -21,6 +25,7 @@ describe('initRedirectOnBack', () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
+    jest.spyOn(console, 'info').mockImplementation(() => {});
     document.body.innerHTML = '';
     redirectToMock.mockReset();
     addedListeners.length = 0;
@@ -93,9 +98,7 @@ describe('initRedirectOnBack', () => {
     expect(pushStateSpy).toHaveBeenCalledTimes(1); // immediate push
   });
 
-  it('pushes deferred guard entries so a redirect arrival still traps Back', () => {
-    // On a redirect arrival (e.g. the GOV.UK Pay return 303) the synchronous
-    // push can be dropped, so the guard is also pushed on later ticks.
+  it('re-pushes the guard across a window so a redirect arrival still traps Back', () => {
     addMarker(dashboardUrl);
 
     initRedirectOnBack();
@@ -103,7 +106,7 @@ describe('initRedirectOnBack', () => {
     expect(pushStateSpy).toHaveBeenCalledTimes(1); // immediate
 
     jest.runAllTimers();
-    expect(pushStateSpy).toHaveBeenCalledTimes(3); // + setTimeout(0) + setTimeout(500)
+    expect(pushStateSpy).toHaveBeenCalledTimes(PUSHES_PER_ARM); // + deferred re-pushes
   });
 
   it('redirects to the dashboard on Back', () => {
@@ -125,10 +128,9 @@ describe('initRedirectOnBack', () => {
     initRedirectOnBack();
     pageshow();
     jest.runAllTimers();
-    const armedPushes = pushStateSpy.mock.calls.length; // 3
+    const armedPushes = pushStateSpy.mock.calls.length;
 
     window.dispatchEvent(new PopStateEvent('popstate'));
-    // Guard is renewed before redirecting so a subsequent Back is caught too.
     expect(pushStateSpy).toHaveBeenCalledTimes(armedPushes + 1);
     expect(redirectToMock).toHaveBeenCalledTimes(1);
 
@@ -145,11 +147,11 @@ describe('initRedirectOnBack', () => {
 
     pageshow(false); // initial display
     jest.runAllTimers();
-    expect(pushStateSpy).toHaveBeenCalledTimes(3);
+    expect(pushStateSpy).toHaveBeenCalledTimes(PUSHES_PER_ARM);
 
     pageshow(true); // restored from bfcache
     jest.runAllTimers();
-    expect(pushStateSpy).toHaveBeenCalledTimes(6);
+    expect(pushStateSpy).toHaveBeenCalledTimes(PUSHES_PER_ARM * 2);
   });
 
   it('registers a single popstate listener regardless of repeated pageshow re-arms', () => {
