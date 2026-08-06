@@ -23,7 +23,7 @@
       "required": "Nodwch y swm rydych chi'n credu sy'n ddyledus gennych mewn ôl-ddyledion rhent",
       "negativeAmount": "Rhaid i'r swm y credwch sy'n ddyledus gennych mewn ôl-ddyledion rhent fod yn £0.00 neu uwch",
       "largeAmount": "Rhaid i'r swm y credwch sy'n ddyledus gennych mewn ôl-ddyledion rhent fod yn llai nag £1 biliwn",
-      "invalidFormat": "Nodwch faint y credwch sy'n ddyledus gennych mewn ôl-ddyledion rhent, yn y fformat cywir (e.e. os yw £148 yn ddyledus gennych, ysgrifennwch - £148.00)"
+      "invalidFormat": "Nodwch faint y credwch sy'n ddyledus gennych mewn ôl-ddyledion rhent, yn y fformat cywir (e.e. os yw £148 yn ddyledus gennych, ysgrifennwch - 148 neu 148.00)"
     },
     "rentArrears.rentArrearsAmountCorrection": "Nodwch y swm rydych chi'n credu sy'n ddyledus gennych mewn ôl-ddyledion rhent"
   }

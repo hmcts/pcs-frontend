@@ -6,7 +6,7 @@
 /** Maximum income/expense amount: £1 billion in pence */
 export const MAX_AMOUNT = 1_000_000_000;
 
-/** Amount format: up to 10 digits, exactly 2 decimal places */
+/** Amount format: up to 10 digits or 10 digits with exactly 2 decimal places */
 export const AMOUNT_FORMAT_REGEX = /^\d{1,10}(?:\.\d{2})?$/;
 
 type AmountValidationOptions = {
