@@ -1,7 +1,6 @@
-export const counterClaimHaveYouAppliedForHelpLR = {
+export const counterClaimHaveYouAppliedForHelp = {
   mainHeader: `Has the defendant already applied for help with their counterclaim fee?`,
   backLink: `Back`,
-  hasTheDefendantAlreadyAppliedForHelpWithYourCounterclaimFeeQuestion: `Has the defendant already applied for help with their counterclaim fee?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   saveForLaterButton: `Save for later`,
@@ -18,5 +17,5 @@ export const counterClaimHaveYouAppliedForHelpLR = {
   selectIfYouHaveAlreadyAppliedForHelpAdultsErrorMessage: `Select if you have already applied for help with your counterclaim fee?`,
   emojiTextInput: `👉 😄`,
   emojiErrorMessage: `Enter your Help with Fees reference number must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
-   */
+  */
 };

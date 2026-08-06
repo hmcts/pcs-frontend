@@ -1,5 +1,5 @@
-export const doYouHaveAnyDependantChildrenLR = {
-  mainHeader: `Dependent children`,
+export const doYouHaveAnyDependantChildren = {
+  mainHeader: `Dependant children`,
   doesTheDefendantHaveDependantChildrenQuestion: `Does the defendant have any dependant children?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

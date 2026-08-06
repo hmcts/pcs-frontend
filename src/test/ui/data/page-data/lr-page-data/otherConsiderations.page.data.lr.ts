@@ -1,4 +1,4 @@
-export const otherConsiderationsLR = {
+export const otherConsiderations = {
   mainHeader: `Other considerations`,
   isThereAnythingElseParagraph: `Is there anything else the defendant wants to tell the court as part of their response?`,
   yesRadioOption: `Yes`,
@@ -16,4 +16,5 @@ export const otherConsiderationsLR = {
   mustBeUnderCharacterLimitErrorMessage: `Details about what else you want to tell the court must be 6400 characters or less`,
   emojiTextInput: `👉 😄`,
   emojiExplainPartsOfClaimErrorMessage: `Give details about what else the defendant wants to tell the court must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
+  pageSlug: `other-considerations`,
 };

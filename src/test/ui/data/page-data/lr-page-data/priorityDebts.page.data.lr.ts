@@ -1,4 +1,4 @@
-export const priorityDebtsLR = {
+export const priorityDebts = {
   mainHeader: `Priority debts`,
   priorityDebtsAreDebtsParagraph: `Priority debts are debts which could lead to serious consequences if the defendant does not pay them.`,
   excludingRentParagraph: `Excluding rent or mortgage arrears, priority debts are:`,

@@ -1,5 +1,6 @@
-export const languageUsedLR = {
-  mainHeader: `Which language did you use to complete this service?`,
+export const languageUsed = {
+  mainHeader: `Language used`,
+  whichLanguageParagraph: `Which language did you use to complete this service? `,
   ifSomeoneElseHintText: `If someone else helped you to answer a question in this service, ask them if they answered any questions in Welsh. We’ll use this to make sure your response is processed correctly`,
   englishRadioOption: `English`,
   welshRadioOption: `Welsh`,
@@ -9,6 +10,6 @@ export const languageUsedLR = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   errorHiddenMessage: `Select which language you used to complete this service`,
   feedbackLink: `feedback`,
-  pageSlug: `start-now`,
+  pageSlug: `language-used`,
   backLink: `Back`,
 };

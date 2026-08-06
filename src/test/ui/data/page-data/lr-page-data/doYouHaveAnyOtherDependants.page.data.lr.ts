@@ -1,6 +1,6 @@
-export const doYouHaveAnyOtherDependantsLR = {
+export const doYouHaveAnyOtherDependants = {
   mainHeader: `Other dependants`,
-  doesDefendantHaveDependantParagraph: `Does the defendant have any other dependants?.`,
+  doesDefendantHaveDependantParagraph: `Does the defendant have any other dependants?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   giveDetailsHiddenTextLabel: `Give details about their other dependants`,

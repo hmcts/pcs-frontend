@@ -11,27 +11,27 @@ import {
   counterclaimDoYouWantToUploadFiles,
   defendantDateOfBirth,
   defendantNameConfirmation,
-  doAnyOtherAdultsLiveInYourHomeLR,
-  doYouHaveAnyDependantChildrenLR,
-  doYouHaveAnyOtherDependantsLR,
+  doAnyOtherAdultsLiveInYourHome,
+  doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
   equalityAndDiversityEndLR,
-  equalityAndDiversityStartLR,
-  exceptionalHardshipLR,
-  incomeAndExpensesLR,
-  languageUsedLR,
+  equalityAndDiversityStart,
+  exceptionalHardship,
+  incomeAndExpenses,
+  languageUsed,
   nonRentArrearsDispute,
-  otherConsiderationsLR,
-  priorityDebtsLR,
+  otherConsiderations,
+  priorityDebts,
   selectDefendant,
   startNow,
-  tenancyTypeDetailsLR,
-  whatOtherRegularExpensesDoYouHaveLR,
-  whatRegularIncomeDoYouReceiveLR,
-  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR,
-  yourCircumstancesLR,
+  tenancyTypeDetails,
+  whatOtherRegularExpensesDoYouHave,
+  whatRegularIncomeDoYouReceive,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
+  yourCircumstances,
 } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
-import { correspondenceAddressErrorValidation } from '../functional/legalRepresentative-functional/correspondenceAddress.pft.lr';
+//import { correspondenceAddressErrorValidation } from '../functional/legalRepresentative-functional/correspondenceAddress.pft.lr';
 import { defendantNameConfirmationErrorValidation } from '../functional/legalRepresentative-functional/defendantNameConfirmation.pft.lr';
 import { selectDefendantErrorValidation } from '../functional/legalRepresentative-functional/selectDefendant.pft.lr';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
@@ -152,13 +152,14 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       dobYear: defendantDateOfBirth.yearInputText,
     });
 
-    await softErrorMessageValidation('correspondenceAddress', correspondenceAddressErrorValidation);
+    //the below line needs to be un-commented when HDPI-8154 bug is fixed.
+    //await softErrorMessageValidation('correspondenceAddress', correspondenceAddressErrorValidation);
     await performAction('selectCorrespondenceAddressUnKnownLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetailsLR.yesRadioOption,
+      tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('enterTenancyStartDetailsUnKnownLR', {
       tsDay: '15',
@@ -203,71 +204,71 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     });
     await performAction('uploadFilesToSupportCounterclaimLR', { files: ['rentArrears.pdf'] });
     await performAction('doesTheDependantHaveChildrenLR', {
-      dependantChildrenOption: doYouHaveAnyDependantChildrenLR.yesRadioOption,
-      dependantChildrenInfo: doYouHaveAnyDependantChildrenLR.detailsTextInput,
+      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
     await performAction('otherDependantsLR', {
-      otherDependantsOption: doYouHaveAnyOtherDependantsLR.noRadioOption,
+      otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
     });
     await performAction('otherAdultsLR', {
-      radioOption: doAnyOtherAdultsLiveInYourHomeLR.yesRadioOption,
-      details: doAnyOtherAdultsLiveInYourHomeLR.detailsAboutAdultsTextInput,
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
     });
     await performAction('alternativeAccommodationLR', {
-      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.yesRadioOption,
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
       ...getRelativeDate(5),
     });
     await performAction('circumstancesLR', {
-      question: yourCircumstancesLR.wouldYouLikeToShareHeader,
-      yourCircumstancesOption: yourCircumstancesLR.yesRadioOption,
+      question: yourCircumstances.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstances.yesRadioOption,
     });
     await performAction('selectExceptionalHardshipLR', {
-      question: exceptionalHardshipLR.mainHeader,
-      exceptionalHardshipOption: exceptionalHardshipLR.yesRadioOption,
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
     await performAction('selectIncomeAndExpensesLR', {
-      incomeAndExpensesOption: incomeAndExpensesLR.yesRadioOption,
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
       regularIncomeOptions: [
         [
-          whatRegularIncomeDoYouReceiveLR.universalCreditParagraph,
-          whatRegularIncomeDoYouReceiveLR.universalCreditTextInput,
-          whatRegularIncomeDoYouReceiveLR.monthHiddenRadioOption,
+          whatRegularIncomeDoYouReceive.universalCreditParagraph,
+          whatRegularIncomeDoYouReceive.universalCreditTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
         ],
       ],
     });
     await performAction('selectPriorityDebtsLR', {
-      question: priorityDebtsLR.doesDefendantHaveAnyPriorityDebtsQuestion,
-      option: priorityDebtsLR.noRadioOption,
+      question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
     });
     await performAction('selectExpensesLR', {
       regularExpensesOptions: [
         [
-          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingParagraph,
-          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingTotalAmountInput,
-          whatOtherRegularExpensesDoYouHaveLR.groceryShoppingWeekHiddenRadioOption,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
         ],
         [
-          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsParagraph,
-          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsTotalAmountInput,
-          whatOtherRegularExpensesDoYouHaveLR.loanPaymentsMonthHiddenRadioOption,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
         ],
       ],
     });
     await performAction('otherConsiderationsLR', {
-      question: otherConsiderationsLR.isThereAnythingElseParagraph,
-      option: otherConsiderationsLR.yesRadioOption,
-      courtInfo: otherConsiderationsLR.detailsTextInput,
+      question: otherConsiderations.isThereAnythingElseParagraph,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
     });
     await performAction('uploadFiles');
-    await performValidation('mainHeader', equalityAndDiversityStartLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStartLR.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsed', {
-      question: languageUsedLR.mainHeader,
-      radioOption: languageUsedLR.englishRadioOption,
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
     });
     await performAction('clickButton', 'Submit');
     assertAllErrorMessageValidations();

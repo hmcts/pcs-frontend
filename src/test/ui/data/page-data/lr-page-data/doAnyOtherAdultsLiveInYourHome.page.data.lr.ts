@@ -1,4 +1,4 @@
-export const doAnyOtherAdultsLiveInYourHomeLR = {
+export const doAnyOtherAdultsLiveInYourHome = {
   mainHeader: `Other adults`,
   doAnyOtherAdultsParagraph: `Do any other adults live in the defendant’s home?`,
   backLink: `Back`,

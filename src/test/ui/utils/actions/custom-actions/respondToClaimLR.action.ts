@@ -8,34 +8,34 @@ import {
   counterClaimAbout,
   counterClaimAgainstWhom,
   counterClaimFee,
-  counterClaimHaveYouAppliedForHelpLR,
-  counterClaimOrderOtherThanSumLR,
+  counterClaimHaveYouAppliedForHelp,
+  counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   counterclaimDoYouWantToUploadFiles,
-  doAnyOtherAdultsLiveInYourHomeLR,
-  doYouHaveAnyDependantChildrenLR,
-  doYouHaveAnyOtherDependantsLR,
-  exceptionalHardshipLR,
+  doAnyOtherAdultsLiveInYourHome,
+  doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
+  exceptionalHardship,
   haveYouAppliedForUniversalCreditLR,
   howMuchAffordToPayLR,
-  incomeAndExpensesLR,
+  incomeAndExpenses,
   instalmentPaymentsLR,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
-  otherConsiderationsLR,
+  otherConsiderations,
   previousPaymentsLR,
   priorityDebtDetailsLR,
-  priorityDebtsLR,
+  priorityDebts,
   rentArrearsLR,
   repaymentsAgreedLR,
   selectDefendant,
   tenancyDateUnknown,
   uploadFilesToSupportYourCounterclaimLR,
-  whatOtherRegularExpensesDoYouHaveLR,
-  whatRegularIncomeDoYouReceiveLR,
-  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR,
-  yourCircumstancesLR,
+  whatOtherRegularExpensesDoYouHave,
+  whatRegularIncomeDoYouReceive,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
+  yourCircumstances,
 } from '../../../data/page-data/lr-page-data';
 import { formatCurrency } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -199,71 +199,67 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async doesTheDependantHaveChildrenLR(dependantChildrenData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: doYouHaveAnyDependantChildrenLR.doesTheDefendantHaveDependantChildrenQuestion,
+      question: doYouHaveAnyDependantChildren.doesTheDefendantHaveDependantChildrenQuestion,
       option: dependantChildrenData.dependantChildrenOption,
     });
 
     if (dependantChildrenData.dependantChildrenOption === 'Yes') {
       await performAction(
         'inputText',
-        doYouHaveAnyDependantChildrenLR.giveDetailsHiddenTextLabel,
+        doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
         dependantChildrenData.dependantChildrenInfo
       );
     }
-    await performAction('clickButton', doYouHaveAnyDependantChildrenLR.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   }
 
   private async otherDependantsLR(otherDependantsData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: doYouHaveAnyOtherDependantsLR.mainHeader,
+      question: doYouHaveAnyOtherDependants.mainHeader,
       option: otherDependantsData.otherDependantsOption,
     });
 
     if (otherDependantsData.otherDependantsOption === 'Yes') {
       await performAction(
         'inputText',
-        doYouHaveAnyOtherDependantsLR.giveDetailsHiddenTextLabel,
+        doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel,
         otherDependantsData.otherDependantsInfo
       );
     }
-    await performAction('clickButton', doYouHaveAnyOtherDependantsLR.saveAndContinueButton);
+    await performAction('clickButton', doYouHaveAnyOtherDependants.saveAndContinueButton);
   }
 
   private async otherAdultsLR(adultsInHouseDetails: actionRecord) {
     await performAction('clickRadioButton', {
-      question: doAnyOtherAdultsLiveInYourHomeLR.mainHeader,
+      question: doAnyOtherAdultsLiveInYourHome.mainHeader,
       option: adultsInHouseDetails.radioOption,
     });
 
     if (adultsInHouseDetails.radioOption === 'Yes' && adultsInHouseDetails.details) {
       await performAction(
         'inputText',
-        doAnyOtherAdultsLiveInYourHomeLR.giveDetailsAboutOtherAdultsHiddenTextLabel,
+        doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
         adultsInHouseDetails.details
       );
     }
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHomeLR.saveAndContinueButton);
+    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
   }
 
   private async alternativeAccommodationLR(moveInDetails: actionRecord) {
     await performAction('clickRadioButton', {
-      question: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.wouldTheDefendantHaveParagraph,
+      question: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.wouldTheDefendantHaveParagraph,
       option: moveInDetails.radioOption,
     });
 
     if (moveInDetails.radioOption === 'Yes' && moveInDetails?.day && moveInDetails?.month && moveInDetails?.year) {
       await performActions(
         'Enter Date',
-        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.dayHiddenTextLabel, moveInDetails.day],
-        [
-          'inputText',
-          wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.monthHiddenTextLabel,
-          moveInDetails.month,
-        ],
-        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.yearHiddenTextLabel, moveInDetails.year]
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayHiddenTextLabel, moveInDetails.day],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, moveInDetails.month],
+        ['inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, moveInDetails.year]
       );
     }
-    await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR.saveAndContinueButton);
+    await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
   }
 
   private async circumstancesLR(yourCircumstancesData: actionRecord): Promise<void> {
@@ -274,11 +270,11 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     if (yourCircumstancesData.yourCircumstancesOption === 'Yes') {
       await performAction(
         'inputText',
-        yourCircumstancesLR.giveDetailsHiddenTextLabel,
-        yourCircumstancesLR.detailsTextInput
+        yourCircumstances.giveDetailsHiddenTextLabel,
+        yourCircumstances.detailsTextInput
       );
     }
-    await performAction('clickButton', yourCircumstancesLR.saveAndContinueButton);
+    await performAction('clickButton', yourCircumstances.saveAndContinueButton);
   }
 
   private async selectExceptionalHardshipLR(exceptionalHardshipData: actionRecord): Promise<void> {
@@ -289,19 +285,19 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     if (exceptionalHardshipData.exceptionalHardshipOption === 'Yes') {
       await performAction(
         'inputText',
-        exceptionalHardshipLR.giveDetailsHiddenTextLabel,
-        exceptionalHardshipLR.detailsTextInput
+        exceptionalHardship.giveDetailsHiddenTextLabel,
+        exceptionalHardship.detailsTextInput
       );
     }
-    await performAction('clickButton', exceptionalHardshipLR.saveAndContinueButton);
+    await performAction('clickButton', exceptionalHardship.saveAndContinueButton);
   }
 
   private async selectIncomeAndExpensesLR(incomeAndExpenseData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: incomeAndExpensesLR.doesDefendantWantToProvideDetailsHeader,
+      question: incomeAndExpenses.doesDefendantWantToProvideDetailsHeader,
       option: incomeAndExpenseData.incomeAndExpensesOption,
     });
-    await performAction('clickButton', incomeAndExpensesLR.saveAndContinueButton);
+    await performAction('clickButton', incomeAndExpenses.saveAndContinueButton);
   }
 
   private async representationLR(representationOption: actionRecord): Promise<void> {
@@ -367,21 +363,21 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async selectWhatRegularIncomeDoTheyReceiveLR(regularIncome?: actionRecord): Promise<void> {
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
-      await performAction('clickButton', whatRegularIncomeDoYouReceiveLR.saveAndContinueButton);
+      await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
       return;
     }
     for (const income of regularIncome.regularIncomeOptions) {
       const [option, value, frequency] = income;
 
       await performAction('check', {
-        question: whatRegularIncomeDoYouReceiveLR.whatRegularIncomeDoesDefendantReceiveQuestion,
+        question: whatRegularIncomeDoYouReceive.whatRegularIncomeDoesDefendantReceiveQuestion,
         option,
       });
 
-      if (option === whatRegularIncomeDoYouReceiveLR.moneyFromSomewhereElseParagraph) {
+      if (option === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph) {
         await performAction(
           'inputText',
-          whatRegularIncomeDoYouReceiveLR.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
+          whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
           value
         );
         continue;
@@ -391,19 +387,19 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
 
-      await performAction('inputText', whatRegularIncomeDoYouReceiveLR.totalAmountReceivedHiddenTextLabel, value);
+      await performAction('inputText', whatRegularIncomeDoYouReceive.totalAmountReceivedHiddenTextLabel, value);
       await performAction('clickRadioButton', frequency);
     }
 
-    await performAction('clickButton', whatRegularIncomeDoYouReceiveLR.saveAndContinueButton);
+    await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   }
 
   private async selectPriorityDebtsLR(priorityDebtsData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: priorityDebtsLR.doesDefendantHaveAnyPriorityDebtsQuestion,
+      question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
       option: priorityDebtsData.option,
     });
-    await performAction('clickButton', priorityDebtsLR.saveAndContinueButton);
+    await performAction('clickButton', priorityDebts.saveAndContinueButton);
   }
 
   private async enterPriorityDebtDetailsLR(priorityDebtDetailsData: actionRecord): Promise<void> {
@@ -426,14 +422,14 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async selectExpensesLR(regularExpense?: actionRecord): Promise<void> {
     if (!Array.isArray(regularExpense?.regularExpensesOptions)) {
-      await performAction('clickButton', whatOtherRegularExpensesDoYouHaveLR.saveAndContinueButton);
+      await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
       return;
     }
     for (const expense of regularExpense.regularExpensesOptions) {
       const [option, value, frequency] = expense;
 
       await performAction('check', {
-        question: whatOtherRegularExpensesDoYouHaveLR.mainHeader,
+        question: whatOtherRegularExpensesDoYouHave.mainHeader,
         option,
       });
 
@@ -441,10 +437,10 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
 
-      await performAction('inputText', whatOtherRegularExpensesDoYouHaveLR.amountReceivedHiddenTextLabel, value);
+      await performAction('inputText', whatOtherRegularExpensesDoYouHave.amountReceivedHiddenTextLabel, value);
       await performAction('clickRadioButton', frequency);
     }
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHaveLR.saveAndContinueButton);
+    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   }
 
   private async otherConsiderationsLR(otherConsiderationsData: actionRecord): Promise<void> {
@@ -455,11 +451,11 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     if (otherConsiderationsData.option === 'Yes') {
       await performAction(
         'inputText',
-        otherConsiderationsLR.giveDetailsHiddenTextLabel,
+        otherConsiderations.giveDetailsHiddenTextLabel,
         otherConsiderationsData.courtInfo
       );
     }
-    await performAction('clickButton', otherConsiderationsLR.saveAndContinueButton);
+    await performAction('clickButton', otherConsiderations.saveAndContinueButton);
   }
 
   private async rentArrearsLR(rentArrearsInfo: actionRecord): Promise<void> {
@@ -655,31 +651,31 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   private async counterClaimOrderOtherThanSumLR(cliamOtherThanSum: actionRecord): Promise<void> {
     await performAction(
       'inputText',
-      counterClaimOrderOtherThanSumLR.whatOrdersAreTheyAskingLabelText,
+      counterClaimOrderOtherThanSum.whatOrdersAreTheyAskingLabelText,
       cliamOtherThanSum.ordersInput
     );
     await performAction(
       'inputText',
-      counterClaimOrderOtherThanSumLR.whatFactsWouldTheyLikeLabelText,
+      counterClaimOrderOtherThanSum.whatFactsWouldTheyLikeLabelText,
       cliamOtherThanSum.factsInput
     );
-    await performAction('clickButton', counterClaimOrderOtherThanSumLR.saveAndContinueButton);
+    await performAction('clickButton', counterClaimOrderOtherThanSum.saveAndContinueButton);
   }
 
   private async counterClaimHaveYouAppliedForHelpWithFeeLR(helpWithFee: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: counterClaimHaveYouAppliedForHelpLR.mainHeader,
+      question: counterClaimHaveYouAppliedForHelp.mainHeader,
       option: helpWithFee.helpWithFeeOption,
     });
 
     if (helpWithFee.helpWithFeeOption === 'Yes') {
       await performAction(
         'inputText',
-        counterClaimHaveYouAppliedForHelpLR.enterHelpWithFeeReferenceHiddenTextLabel,
+        counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
         helpWithFee.feeReference
       );
     }
-    await performAction('clickButton', counterClaimHaveYouAppliedForHelpLR.saveAndContinueButton);
+    await performAction('clickButton', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
   }
 
   private async selectUniversalCreditLR(universalCreditDateData: actionRecord): Promise<void> {

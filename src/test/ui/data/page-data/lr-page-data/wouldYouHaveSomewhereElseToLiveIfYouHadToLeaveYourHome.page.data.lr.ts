@@ -1,8 +1,7 @@
-export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR = {
+export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome = {
   mainHeader: `Alternative accommodation`,
   wouldTheDefendantHaveParagraph: `Would the defendant have somewhere else to live if they had to leave their home?`,
   backLink: `Back`,
-  whenWouldYouBeableToMoveHiddenTextLabel: `When would you be able to move in (optional)?`,
   dayHiddenTextLabel: 'Day',
   monthHiddenTextLabel: 'Month',
   yearHiddenTextLabel: 'Year',
@@ -13,7 +12,7 @@ export const wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR = {
   cymraegLink: `Cymraeg`,
   saveAndContinueButton: `Save and continue`,
   selectIfYouHadAlternativeAccommodationErrorMessage: `Select if the defendant would have somewhere else to live if they had to leave their home`,
-  whenWouldTheyBeAbleToMoveInQuestion: `When would they be able to move in? (Optional)`,
+  whenWouldTheyBeAbleToMoveInHiddenQuestion: `When would they be able to move in? (Optional)`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   feedbackLink: `feedback`,
   pageSlug: `would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home`,

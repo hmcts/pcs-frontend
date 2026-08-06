@@ -1,6 +1,6 @@
-export const whatOtherRegularExpensesDoYouHaveLR = {
+export const whatOtherRegularExpensesDoYouHave = {
   mainHeader: `Expenses`,
-  whatOtherRegularExpensesQuestion: `What other regular expenses does the defendant have? (Optional)`,
+  whatOtherRegularExpensesQuestion: `What regular monthly expenses does the defendant have? (Optional)`,
   selectAllThatApplyHintText: `Select all that apply. The information the defendant provides must be truthful and accurate.`,
 
   // Household Bills
@@ -131,5 +131,5 @@ export const whatOtherRegularExpensesDoYouHaveLR = {
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   feedbackLink: `feedback`,
-  pageSlug: `what-regular-income-do-you-receive`,
+  pageSlug: `what-other-regular-expenses-do-you-have`,
 };
