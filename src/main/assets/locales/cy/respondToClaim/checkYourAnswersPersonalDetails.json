@@ -16,7 +16,7 @@
     },
     "dateOfBirth": {
       "label": "cy What’s your date of birth?",
-      "changeHidden": "cy date of birth"
+      "changeHidden": "dyddiad geni"
     },
     "correspondenceAddressConfirmation": {
       "label": "cy Is your postal address {{address}}?",
@@ -41,7 +41,7 @@
     },
     "contactByText": {
       "label": "Ydych chi'n hapus i ni gysylltu â chi drwy neges testun?",
-      "changeHidden": "cy contact by text message"
+      "changeHidden": "cysylltu drwy neges testun"
     },
     "contactDetails": {
       "label": "cy Contact details",
