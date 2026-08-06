@@ -24,7 +24,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url);
 });
 
-test.describe('CUI user role access @PR @nightly', async () => {
+test.describe('CUI user role access @nightly', async () => {
   test('Unauthenticated user login', async ({ page }) => {
     await performAction('login', user.unauthorizedUser.email);
     expect(page.url()).toContain('/login');
