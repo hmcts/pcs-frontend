@@ -225,7 +225,7 @@ export interface CcdDefendantResponses {
   contactByText?: YesNoValue;
   rentArrearsAmountConfirmation?: string;
   rentArrearsAmount?: string;
-  landlordRegistered?: YesNoNotSureValue;
+  exemptLandlord?: YesNoNotSureValue;
   landlordLicensed?: YesNoNotSureValue;
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
