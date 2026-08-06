@@ -514,8 +514,12 @@
     }]
   }) }}
 
-  <h2 class="govuk-heading-l govuk-!-margin-top-6">Staff message</h2>
-
+  {#
+    No heading here: the checkbox's own label already says "Staff message", so a heading above it
+    only repeats itself — a screen reader user hears the words twice before reaching the control.
+    The checkbox is a single optional extra rather than a section of the order, which is what the
+    other headings mark.
+  #}
   {{ govukCheckboxes({
     idPrefix: "staff-message",
     name: "staff-message",
