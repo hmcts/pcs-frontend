@@ -12,6 +12,7 @@ import {
   isTenancyStartDateKnown,
   isWalesProperty,
   shouldShowCounterClaimFeePaymentNeededConfirmationStep,
+  shouldShowExemptLandlordStep,
   shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
   shouldShowResponseSubmittedConfirmationStep,
 } from '../utils';
@@ -61,11 +62,8 @@ export const flowConfig: JourneyFlowConfig = {
     'contact-preferences-text-message': {
       showCondition: (req: Request) => req.res?.locals.validatedCase?.isDefendantContactByPhone === true,
     },
-    'landlord-registered': {
-      showCondition: (req: Request) => isWalesProperty(req),
-    },
-    'landlord-licensed': {
-      showCondition: (req: Request) => isWalesProperty(req),
+    'exempt-landlord': {
+      showCondition: (req: Request) => shouldShowExemptLandlordStep(req),
     },
     'written-terms': {
       showCondition: (req: Request) => isWalesProperty(req),
