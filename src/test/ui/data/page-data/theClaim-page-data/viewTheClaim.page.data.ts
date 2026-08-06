@@ -1,4 +1,9 @@
-import { getCurrentFormattedDate } from '../../../utils/common/date.utils';
+const getCurrentClaimDate = (): string =>
+  new Date().toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
 export const viewTheClaim = {
   mainHeader: `View the claim`,
@@ -6,8 +11,8 @@ export const viewTheClaim = {
 
   get dateAndCaseDetails() {
     return {
-      'Date issued': getCurrentFormattedDate(),
-      'Date submitted': getCurrentFormattedDate(),
+      'Date issued': getCurrentClaimDate(),
+      'Date submitted': getCurrentClaimDate(),
       'Property address': '2 Second Avenue, London, W3 7RX',
     };
   },
