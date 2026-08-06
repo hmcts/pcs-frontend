@@ -7,7 +7,8 @@
   "labels": {
     "pba": "cySelect PBA account",
     "customerReferenceHeading": "cyEnter a reference for your PBA account statements",
-    "customerReferenceHint": "cyThis should be your own unique reference to identify the case. It will appear on your statements."
+    "customerReferenceHint": "cyThis should be your own unique reference to identify the case. It will appear on your statements.",
+    "selectPba": "cySelect option"
   },
   "errors": {
     "paymentOptions": "cyYou must select a payment option",

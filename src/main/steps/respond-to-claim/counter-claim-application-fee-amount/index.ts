@@ -1,4 +1,5 @@
 import type { Request } from 'express';
+import { TFunction } from 'i18next';
 
 import { isLegalRepresentativeUser, penceToPounds } from '../../utils';
 import { getCounterClaimAmountInPence } from '../../utils/counterClaimAmount';
@@ -65,7 +66,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
           setPaymentSessionState(req, {
             ...paymentSession,
             customerReference: req.body?.['paymentOptions.customerReference'],
-            pbaAccount: req.body?.['paymentOptions.pbaAccounts'],
+            pbaAccount: req.body?.['paymentOptions.pbaAccount'],
           });
         }
         return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-pba-payment/start` : '#';
@@ -118,7 +119,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     let pbaAccountItems: { value: string; text: string }[] = [];
 
     if (isLegalRepresentative) {
-      pbaAccountItems = await buildPbaAccountsSelections(req);
+      pbaAccountItems = await buildPbaAccountsSelections(req, t);
     }
 
     return {
@@ -159,7 +160,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   fields: legalRepFormFieldConfig,
 });
 
-async function buildPbaAccountsSelections(req: Request): Promise<{ value: string; text: string }[]> {
+async function buildPbaAccountsSelections(req: Request, t: TFunction<'translation', undefined>): Promise<{ value: string; text: string }[]> {
   const pbaAccounts = await getPbaAccounts(req);
 
   const accountOptions = (pbaAccounts ?? []).map(account => ({
@@ -167,7 +168,7 @@ async function buildPbaAccountsSelections(req: Request): Promise<{ value: string
     text: account,
   }));
 
-  return [{ value: '', text: 'labels.selectPba' }, ...accountOptions];
+  return [{ value: '', text: t('labels.selectPba') }, ...accountOptions];
 }
 
 async function getPbaAccounts(req: Request): Promise<string[]> {
