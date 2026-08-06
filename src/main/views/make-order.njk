@@ -1,0 +1,508 @@
+{% extends "template.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "xui-header/macro.njk" import hmctsXuiHeader %}
+{% from "footer/macro.njk" import hmctsUiFooter %}
+
+{# Judicial screen: full-bleed container instead of the 1020px citizen measure. #}
+{% set containerClasses = "pcs-wide" %}
+
+{# Keeps keyboard focus clear of the sticky case-facts panel — see make-order.scss. #}
+{% set htmlClasses = "pcs-make-order" %}
+
+{% block pageTitle %}
+  Make an order - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+{% endblock %}
+
+{% block header %}
+  {% if isLegalRepresentative %}
+    {{ hmctsXuiHeader(headerModel) }}
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
+{% block footer %}
+  {% if isLegalRepresentative %}
+    {{ hmctsUiFooter(footerModel) }}
+  {% else %}
+    {{ super() }}
+  {% endif %}
+{% endblock %}
+
+{#
+  Iteration 1 is a static shell: no data is populated, nothing is posted, and there is no
+  client-side JavaScript beyond stock govuk-frontend (tabs and conditional reveals).
+  Placeholder values below are illustrative only.
+#}
+
+{% set tenancyTypes = [
+  { value: "assured", text: "Assured" },
+  { value: "assured-shorthold", text: "Assured shorthold" },
+  { value: "regulated", text: "Regulated" },
+  { value: "secure", text: "Secure" },
+  { value: "other", text: "Other" }
+] %}
+
+{% set rentFrequencies = [
+  { value: "weekly", text: "Weekly" },
+  { value: "fortnightly", text: "Fortnightly" },
+  { value: "monthly", text: "Monthly" },
+  { value: "yearly", text: "Yearly" }
+] %}
+
+{#
+  Attendance shorthand is kept for scanning density, with the full term in a visually hidden
+  span so assistive technology announces something unambiguous.
+#}
+{% set claimantAttendance = [
+  { value: "counsel", short: "Csl", full: "Counsel" },
+  { value: "solicitor", short: "Sol", full: "Solicitor" },
+  { value: "solicitor-agent", short: "S/A", full: "Solicitor agent" },
+  { value: "housing-officer", short: "H/O", full: "Housing officer" },
+  { value: "litigant-in-person", short: "LiP", full: "Litigant in person" },
+  { value: "letter-only", short: "Ltr", full: "Letter only" },
+  { value: "not-present", short: "Not present", full: "" }
+] %}
+
+{% set defendantAttendance = [
+  { value: "counsel", short: "Csl", full: "Counsel" },
+  { value: "solicitor", short: "Sol", full: "Solicitor" },
+  { value: "solicitor-agent", short: "S/A", full: "Solicitor agent" },
+  { value: "duty-adviser", short: "Duty", full: "Duty adviser" },
+  { value: "litigant-in-person", short: "LiP", full: "Litigant in person" },
+  { value: "letter-only", short: "Ltr", full: "Letter only" },
+  { value: "not-present", short: "Not present", full: "" }
+] %}
+
+{% set attendanceParties = [
+  { id: "claimant-1", label: "Claimant 1: Bristol City Housing", options: claimantAttendance },
+  { id: "defendant-1", label: "Defendant 1: David Patel", options: defendantAttendance },
+  { id: "defendant-2", label: "Defendant 2: Fatima Jones", options: defendantAttendance },
+  { id: "defendant-3", label: "Defendant 3: Andrew Taylor", options: defendantAttendance },
+  { id: "defendant-4", label: "Defendant 4: Rachel Smith", options: defendantAttendance }
+] %}
+
+{% block content %}
+  <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make an order</h1>
+
+  <p class="govuk-body govuk-!-margin-bottom-1">
+    <span class="govuk-!-font-weight-bold">Case reference:</span> 1777-0276-0001-7760
+  </p>
+  <p class="govuk-body govuk-!-margin-bottom-1">22 Victoria Road, Birmingham, Bristol, NN1 2AB</p>
+  <p class="govuk-body govuk-!-font-weight-bold">
+    Bristol City Housing vs David Patel, Fatima Jones, Andrew Taylor, Rachel Smith
+  </p>
+
+  {#
+    Case facts stay pinned while the judge drafts below. Each date is a govukDateInput so the
+    day/month/year inputs are grouped in a fieldset and announced with the field name.
+  #}
+  <section class="pcs-case-facts" aria-labelledby="case-facts-heading">
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-2" id="case-facts-heading">
+      Case facts (tenancy/contract)
+    </h2>
+
+    <div class="pcs-case-facts__layout">
+      <div class="pcs-case-facts__grid">
+        {{ govukDateInput({
+          id: "date-tenancy",
+          namePrefix: "date-tenancy",
+          fieldset: { legend: { text: "Date of tenancy/contract", classes: "govuk-fieldset__legend--s" } }
+        }) }}
+
+        {{ govukSelect({
+          id: "tenancy-type",
+          name: "tenancy-type",
+          label: { text: "Tenancy/contract type", classes: "govuk-label--s" },
+          items: tenancyTypes
+        }) }}
+
+        {{ govukDateInput({
+          id: "date-notice",
+          namePrefix: "date-notice",
+          fieldset: { legend: { text: "Date of service of notice", classes: "govuk-fieldset__legend--s" } }
+        }) }}
+
+        {{ govukInput({
+          id: "arrears-notice",
+          name: "arrears-notice",
+          label: { text: "Arrears at notice", classes: "govuk-label--s" },
+          classes: "govuk-input--width-5",
+          spellcheck: false,
+          prefix: { text: "£" }
+        }) }}
+
+        {{ govukInput({
+          id: "current-rent",
+          name: "current-rent",
+          label: { text: "Current rent", classes: "govuk-label--s" },
+          classes: "govuk-input--width-5",
+          spellcheck: false,
+          prefix: { text: "£" }
+        }) }}
+
+        {{ govukSelect({
+          id: "rent-frequency",
+          name: "rent-frequency",
+          label: { text: "Rent frequency", classes: "govuk-label--s" },
+          items: rentFrequencies
+        }) }}
+
+        {{ govukInput({
+          id: "grounds-pleaded",
+          name: "grounds-pleaded",
+          label: { text: "Grounds pleaded", classes: "govuk-label--s" },
+          classes: "govuk-input--width-10"
+        }) }}
+
+        {{ govukInput({
+          id: "arrears-issue",
+          name: "arrears-issue",
+          label: { text: "Arrears on issue", classes: "govuk-label--s" },
+          classes: "govuk-input--width-5",
+          spellcheck: false,
+          prefix: { text: "£" }
+        }) }}
+
+        {{ govukDateInput({
+          id: "date-last-hearing",
+          namePrefix: "date-last-hearing",
+          fieldset: { legend: { text: "Date of last hearing", classes: "govuk-fieldset__legend--s" } }
+        }) }}
+
+        {{ govukDateInput({
+          id: "date-last-payment",
+          namePrefix: "date-last-payment",
+          fieldset: { legend: { text: "Date last payment made", classes: "govuk-fieldset__legend--s" } }
+        }) }}
+
+        {{ govukInput({
+          id: "last-payment",
+          name: "last-payment",
+          label: { text: "Last payment", classes: "govuk-label--s" },
+          classes: "govuk-input--width-5",
+          spellcheck: false,
+          prefix: { text: "£" }
+        }) }}
+
+        {{ govukInput({
+          id: "arrears-today",
+          name: "arrears-today",
+          label: { text: "Arrears today", classes: "govuk-label--s" },
+          classes: "govuk-input--width-5",
+          spellcheck: false,
+          prefix: { text: "£" }
+        }) }}
+      </div>
+
+      {{ govukTextarea({
+        id: "hearing-notes",
+        name: "hearing-notes",
+        rows: 8,
+        label: { text: "Hearing notes (internal use only)", classes: "govuk-label--s" },
+        formGroup: { classes: "govuk-!-margin-bottom-0" }
+      }) }}
+    </div>
+  </section>
+
+  <h2 class="govuk-heading-l govuk-!-margin-top-6">Attendance</h2>
+
+  {% for party in attendanceParties %}
+    <fieldset class="govuk-fieldset pcs-attendance__row">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ party.label }}</legend>
+
+      <div class="pcs-attendance__controls">
+        <div class="govuk-radios govuk-radios--small govuk-radios--inline" data-module="govuk-radios">
+          {% for option in party.options %}
+            <div class="govuk-radios__item">
+              <input class="govuk-radios__input"
+                     id="{{ party.id }}-{{ option.value }}"
+                     name="{{ party.id }}-attendance"
+                     type="radio"
+                     value="{{ option.value }}">
+              {#
+                Sighted judges scan the abbreviations; assistive technology gets the full term
+                instead. abbr/title is deliberately avoided — screen reader support for title
+                is inconsistent.
+              #}
+              <label class="govuk-label govuk-radios__label" for="{{ party.id }}-{{ option.value }}">
+                {%- if option.full -%}
+                  <span aria-hidden="true">{{ option.short }}</span>
+                  <span class="govuk-visually-hidden">{{ option.full }}</span>
+                {%- else -%}
+                  {{ option.short }}
+                {%- endif -%}
+              </label>
+            </div>
+          {% endfor %}
+        </div>
+
+        {{ govukInput({
+          id: party.id + "-name",
+          name: party.id + "-name",
+          label: { text: "Name" },
+          classes: "govuk-input--width-20",
+          formGroup: { classes: "govuk-!-margin-bottom-0" }
+        }) }}
+      </div>
+    </fieldset>
+  {% endfor %}
+
+  <h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>
+
+  {{ govukCheckboxes({
+    idPrefix: "recitals",
+    name: "recitals",
+    classes: "govuk-checkboxes--small",
+    items: [{
+      value: "yes",
+      text: "Recitals",
+      conditional: {
+        html: govukTextarea({
+          id: "recitals-text",
+          name: "recital",
+          rows: 4,
+          label: { text: "Recital paragraphs" }
+        })
+      }
+    }]
+  }) }}
+
+  <h2 class="govuk-heading-l govuk-!-margin-top-6">Order type</h2>
+
+  {#
+    Tabs are hand-written rather than built through the govukTabs macro so each panel can hold
+    real markup instead of a pre-rendered HTML string. This is the markup govuk-frontend's Tabs
+    component expects; behaviour comes from data-module="govuk-tabs".
+  #}
+  <div class="govuk-tabs" data-module="govuk-tabs">
+    <h3 class="govuk-tabs__title">Contents</h3>
+    <ul class="govuk-tabs__list">
+      <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+        <a class="govuk-tabs__tab" href="#tab-outright">Outright possession</a>
+      </li>
+      <li class="govuk-tabs__list-item">
+        <a class="govuk-tabs__tab" href="#tab-suspended">Suspended possession</a>
+      </li>
+      <li class="govuk-tabs__list-item">
+        <a class="govuk-tabs__tab" href="#tab-adjournment">Adjournment</a>
+      </li>
+      <li class="govuk-tabs__list-item">
+        <a class="govuk-tabs__tab" href="#tab-strike-out">Strike out/dismiss</a>
+      </li>
+      <li class="govuk-tabs__list-item">
+        <a class="govuk-tabs__tab" href="#tab-free-form">Free form</a>
+      </li>
+    </ul>
+
+    <div class="govuk-tabs__panel" id="tab-outright">
+      <h3 class="govuk-heading-m">Outright possession</h3>
+
+      {{ govukRadios({
+        name: "outright-possession",
+        classes: "govuk-radios--small",
+        fieldset: { legend: { text: "Possession", classes: "govuk-fieldset__legend--s" } },
+        items: [
+          { value: "forthwith", text: "Possession forthwith" },
+          {
+            value: "by",
+            text: "Possession on or before",
+            conditional: {
+              html: govukDateInput({
+                id: "outright-by-date",
+                namePrefix: "outright-by-date",
+                fieldset: { legend: { text: "Date possession is ordered by", classes: "govuk-visually-hidden" } }
+              })
+            }
+          }
+        ]
+      }) }}
+
+      {{ govukRadios({
+        name: "outright-grounds-type",
+        classes: "govuk-radios--small govuk-radios--inline",
+        fieldset: { legend: { text: "Grounds", classes: "govuk-fieldset__legend--s" } },
+        items: [
+          { value: "mandatory", text: "Mandatory" },
+          { value: "discretionary", text: "Discretionary" }
+        ]
+      }) }}
+
+      {{ govukInput({
+        id: "outright-grounds-details",
+        name: "outright-grounds-details",
+        label: { text: "Details of grounds (optional)" },
+        classes: "govuk-input--width-20"
+      }) }}
+
+      {{ govukCheckboxes({
+        idPrefix: "outright-options",
+        name: "outright-options",
+        classes: "govuk-checkboxes--small",
+        items: [
+          {
+            value: "money-judgment",
+            text: "Money judgment",
+            conditional: {
+              html: govukInput({
+                id: "outright-arrears",
+                name: "outright-arrears",
+                label: { text: "Judgment for arrears" },
+                classes: "govuk-input--width-5",
+                spellcheck: false,
+                prefix: { text: "£" }
+              })
+            }
+          },
+          {
+            value: "use-occupation",
+            text: "Damages for unlawful occupation",
+            conditional: {
+              html: govukInput({
+                id: "outright-use-occupation-rate",
+                name: "outright-use-occupation-rate",
+                label: { text: "Daily rate" },
+                classes: "govuk-input--width-5",
+                spellcheck: false,
+                prefix: { text: "£" }
+              })
+            }
+          },
+          {
+            value: "transfer-high-court",
+            text: "Transfer to High Court"
+          }
+        ]
+      }) }}
+    </div>
+
+    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="tab-suspended">
+      <h3 class="govuk-heading-m">Suspended possession</h3>
+
+      {{ govukDateInput({
+        id: "suspended-by-date",
+        namePrefix: "suspended-by-date",
+        fieldset: { legend: { text: "Possession on or before", classes: "govuk-fieldset__legend--s" } }
+      }) }}
+
+      {{ govukInput({
+        id: "suspended-arrears",
+        name: "suspended-arrears",
+        label: { text: "Arrears", classes: "govuk-label--s" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        prefix: { text: "£" }
+      }) }}
+
+      {{ govukRadios({
+        name: "suspended-payment-type",
+        classes: "govuk-radios--small",
+        fieldset: { legend: { text: "Suspended on terms of", classes: "govuk-fieldset__legend--s" } },
+        items: [
+          { value: "one-off", text: "One-off payment" },
+          { value: "instalments", text: "Instalment payments" }
+        ]
+      }) }}
+    </div>
+
+    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="tab-adjournment">
+      <h3 class="govuk-heading-m">Adjournment</h3>
+
+      {{ govukRadios({
+        name: "adjournment-type",
+        classes: "govuk-radios--small",
+        fieldset: { legend: { text: "Adjourn", classes: "govuk-fieldset__legend--s" } },
+        items: [
+          { value: "generally", text: "Generally with liberty to restore" },
+          { value: "to-date", text: "To a fixed date" }
+        ]
+      }) }}
+
+      {{ govukTextarea({
+        id: "adjournment-directions",
+        name: "adjournment-directions",
+        rows: 4,
+        label: { text: "Directions", classes: "govuk-label--s" }
+      }) }}
+    </div>
+
+    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="tab-strike-out">
+      <h3 class="govuk-heading-m">Strike out/dismiss</h3>
+
+      {{ govukRadios({
+        name: "strike-claim-outcome",
+        classes: "govuk-radios--small govuk-radios--inline",
+        fieldset: { legend: { text: "Outcome", classes: "govuk-fieldset__legend--s" } },
+        items: [
+          { value: "struck-out", text: "Claim struck out" },
+          { value: "dismissed", text: "Claim dismissed" }
+        ]
+      }) }}
+    </div>
+
+    <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="tab-free-form">
+      <h3 class="govuk-heading-m">Free form</h3>
+
+      {{ govukTextarea({
+        id: "free-form-text",
+        name: "free-form-text",
+        rows: 8,
+        label: { text: "Order wording", classes: "govuk-label--s" }
+      }) }}
+    </div>
+  </div>
+
+  <h2 class="govuk-heading-l govuk-!-margin-top-6">Costs</h2>
+
+  {{ govukCheckboxes({
+    idPrefix: "costs",
+    name: "costs",
+    classes: "govuk-checkboxes--small",
+    items: [{
+      value: "yes",
+      text: "Costs",
+      conditional: {
+        html: govukInput({
+          id: "costs-amount",
+          name: "costs-amount",
+          label: { text: "Amount" },
+          classes: "govuk-input--width-5",
+          spellcheck: false,
+          prefix: { text: "£" }
+        })
+      }
+    }]
+  }) }}
+
+  <h2 class="govuk-heading-l govuk-!-margin-top-6">Staff message</h2>
+
+  {{ govukCheckboxes({
+    idPrefix: "staff-message",
+    name: "staff-message",
+    classes: "govuk-checkboxes--small",
+    items: [{
+      value: "yes",
+      text: "Staff message",
+      conditional: {
+        html: govukTextarea({
+          id: "staff-message-text",
+          name: "staff-message-text",
+          rows: 4,
+          label: { text: "Message for court staff" }
+        })
+      }
+    }]
+  }) }}
+
+  <div class="govuk-button-group govuk-!-margin-top-6">
+    {{ govukButton({ text: "Send order to caseworker for issue", disabled: true }) }}
+    {{ govukButton({ text: "Save as draft", classes: "govuk-button--secondary", disabled: true }) }}
+  </div>
+{% endblock %}

@@ -26,4 +26,5 @@ export const axe_exclusions = [
   '#isClaimAmountKnown-2', //page: claimAmountKnown, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#isClaimAmountKnown', //,page: claimAmountKnown, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#address-country', //page: yourAddress, element: 'Country', element_type: select, reason_for_exclusion: 'aria-expanded' attribute is expected for this select
+  '#outright-possession-2', //page: make-order, element: 'Possession on or before', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
 ];

@@ -1,0 +1,104 @@
+@use 'govuk-frontend' as *;
+
+// Height cap on the sticky case-facts panel. Doubles as the amount of scrollport the browser must
+// keep clear so focus never lands behind the panel, so both uses stay in step.
+$pcs-case-facts-max-height: 60vh;
+
+// Make an order is a judicial screen used on large desktop monitors, so it is laid out edge to
+// edge rather than using the 1020px measure the citizen journeys want for readability. Scoped to
+// a class so govuk-width-container itself is left alone.
+//
+// govuk-width-container centres itself with auto margins once past its max-width; removing the
+// max-width would leave the content flush against the viewport, so restore explicit gutters.
+.pcs-wide {
+  max-width: none;
+  margin-right: govuk-spacing(4);
+  margin-left: govuk-spacing(4);
+
+  @include govuk-media-query($from: tablet) {
+    margin-right: govuk-spacing(6);
+    margin-left: govuk-spacing(6);
+  }
+}
+
+// A sticky panel covers whatever the browser scrolls into view beneath it, so keyboard focus can
+// land behind it (WCAG 2.4.11 Focus Not Obscured). Reserving the panel's height at the top of the
+// scrollport makes the browser scroll far enough that focused fields clear it. The added spacing
+// covers the panel's own padding and borders, which sit outside its max-height.
+//
+// This has to sit on the scrollport itself, which is the root element — scroll-padding on the page
+// wrapper has no effect. Scoped by a class on <html> so the citizen journeys are unaffected.
+//
+// govuk-frontend sets `scroll-padding-top: 0` on `.govuk-template:not(:has(.govuk-exit-this-page))`
+// for its own sticky component, and that outranks a lone class, so match its specificity here.
+.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)) {
+  scroll-padding-top: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(6) * 2});
+
+  // Below desktop the panel is no longer pinned, so nothing needs reserving.
+  @include govuk-media-query($until: desktop) {
+    scroll-padding-top: 0;
+  }
+}
+
+// Case facts stay in view while the judge drafts the order below them.
+.pcs-case-facts {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: govuk-spacing(3) 0;
+  border-top: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
+  background-color: govuk-colour('black', $variant: 'tint-95');
+
+  // Never let the panel dominate the viewport, however far the page is zoomed.
+  max-height: $pcs-case-facts-max-height;
+  overflow-y: auto;
+
+  // Below desktop there isn't the height to spare, so release the pin.
+  @include govuk-media-query($until: desktop) {
+    position: static;
+    max-height: none;
+  }
+}
+
+.pcs-case-facts__layout {
+  display: grid;
+  gap: govuk-spacing(4);
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+
+  @include govuk-media-query($until: desktop) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+// Dense multi-column layout: as many columns as fit, which is four on a judge's monitor. The
+// 240px floor is just above the 232px a govuk-date-input needs before day/month/year wrap onto
+// two lines, so a date field always stays on one line.
+//
+// auto-fit drops columns on its own as space tightens, so this reflows under zoom with no
+// breakpoints to maintain. The prototype used fixed pixel tracks, which is why its grid stayed
+// 833px wide however far you zoomed and forced horizontal scrolling (WCAG 1.4.10). The
+// min(240px, 100%) floor keeps it from overflowing a viewport narrower than a single column.
+.pcs-case-facts__grid {
+  display: grid;
+  gap: 0 govuk-spacing(4);
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+
+.pcs-attendance__row {
+  padding-bottom: govuk-spacing(3);
+  border-bottom: 1px solid $govuk-border-colour;
+
+  & + & {
+    padding-top: govuk-spacing(3);
+  }
+}
+
+// Party attendance options and the representative's name sit on one line at desktop width so a
+// judge can scan the register down the page.
+.pcs-attendance__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: govuk-spacing(4);
+  align-items: flex-end;
+}
