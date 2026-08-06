@@ -8,6 +8,7 @@ export class PdfDocumentValidation implements IValidation {
       name: data.linkText as string,
     });
 
+    console.log('pdf link' +pdfLink);
     await expect(pdfLink).toBeVisible();
 
     const href = await pdfLink.getAttribute('href');
