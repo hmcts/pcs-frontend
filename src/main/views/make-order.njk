@@ -224,44 +224,63 @@
   <h2 class="govuk-heading-l govuk-!-margin-top-6">Attendance</h2>
 
   {% for party in attendanceParties %}
-    <fieldset class="govuk-fieldset pcs-attendance__row">
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ party.label }}</legend>
+    {#
+      role="group" + aria-labelledby rather than fieldset/legend, which is what the rest of this
+      page uses. A fieldset's rendered legend is laid out outside the box holding its other
+      children, so it cannot sit in a grid column beside them — it always takes a line of its own,
+      which is what doubles the height of this section. The usual workarounds (floating the legend,
+      or display: contents on the fieldset) both rely on browser behaviour that is inconsistent in
+      the accessibility tree, and the float demonstrably dropped the grouping here.
 
-      <div class="pcs-attendance__controls">
-        <div class="govuk-radios govuk-radios--small govuk-radios--inline" data-module="govuk-radios">
-          {% for option in party.options %}
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input"
-                     id="{{ party.id }}-{{ option.value }}"
-                     name="{{ party.id }}-attendance"
-                     type="radio"
-                     value="{{ option.value }}">
-              {#
-                Sighted judges scan the abbreviations; assistive technology gets the full term
-                instead. abbr/title is deliberately avoided — screen reader support for title
-                is inconsistent.
-              #}
-              <label class="govuk-label govuk-radios__label" for="{{ party.id }}-{{ option.value }}">
-                {%- if option.full -%}
-                  <span aria-hidden="true">{{ option.short }}</span>
-                  <span class="govuk-visually-hidden">{{ option.full }}</span>
-                {%- else -%}
-                  {{ option.short }}
-                {%- endif -%}
-              </label>
-            </div>
-          {% endfor %}
-        </div>
+      role="group" is the ARIA equivalent of fieldset and carries no layout special-casing, so the
+      party name can simply be the first grid column. The grouping is explicit and verifiable.
+    #}
+    <div class="pcs-attendance__row" role="group" aria-labelledby="{{ party.id }}-label">
+      <span class="govuk-label govuk-label--s pcs-attendance__label" id="{{ party.id }}-label">
+        {{ party.label }}
+      </span>
 
-        {{ govukInput({
-          id: party.id + "-name",
-          name: party.id + "-name",
-          label: { text: "Name" },
-          classes: "govuk-input--width-20",
-          formGroup: { classes: "govuk-!-margin-bottom-0" }
-        }) }}
+      <div class="govuk-radios govuk-radios--small govuk-radios--inline" data-module="govuk-radios">
+        {% for option in party.options %}
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input"
+                   id="{{ party.id }}-{{ option.value }}"
+                   name="{{ party.id }}-attendance"
+                   type="radio"
+                   value="{{ option.value }}">
+            {#
+              Sighted judges scan the abbreviations; assistive technology gets the full term
+              instead. abbr/title is deliberately avoided — screen reader support for title
+              is inconsistent.
+            #}
+            <label class="govuk-label govuk-radios__label" for="{{ party.id }}-{{ option.value }}">
+              {%- if option.full -%}
+                <span aria-hidden="true">{{ option.short }}</span>
+                <span class="govuk-visually-hidden">{{ option.full }}</span>
+              {%- else -%}
+                {{ option.short }}
+              {%- endif -%}
+            </label>
+          </div>
+        {% endfor %}
       </div>
-    </fieldset>
+
+      {#
+        The label is visually hidden: with one row per party the column is self-evident to a
+        sighted judge, and repeating "Name" five times down the page costs a line of height each.
+        Screen reader users still get it, and it names the party so the field is unambiguous when
+        reached out of context.
+      #}
+      {{ govukInput({
+        id: party.id + "-name",
+        name: party.id + "-name",
+        label: {
+          text: "Name of representative for " + party.label,
+          classes: "govuk-visually-hidden"
+        },
+        classes: "govuk-input--width-20"
+      }) }}
+    </div>
   {% endfor %}
 
   <h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>

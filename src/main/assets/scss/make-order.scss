@@ -71,34 +71,62 @@ $pcs-case-facts-max-height: 60vh;
   }
 }
 
-// Dense multi-column layout: as many columns as fit, which is four on a judge's monitor. The
-// 240px floor is just above the 232px a govuk-date-input needs before day/month/year wrap onto
-// two lines, so a date field always stays on one line.
+// Dense multi-column layout: as many columns as fit, which is four on a judge's monitor.
+//
+// The floor is the width a govuk-date-input needs before day/month/year wrap onto two lines,
+// since that is the widest thing in the panel and a wrapped date costs the whole grid a row.
+// Being exact matters: 240px needed 1020px for four tracks, 1013px was available, and the grid
+// silently fell back to three columns and grew an extra row.
+//
+// Day + month + year measure 232px plus a 20px gap after each, including a trailing one on the
+// year. That trailing margin is dead space at the end of a grid track and it is what pushes the
+// requirement to 252px, so it is removed below and the floor is the honest 232px.
 //
 // auto-fit drops columns on its own as space tightens, so this reflows under zoom with no
 // breakpoints to maintain. The prototype used fixed pixel tracks, which is why its grid stayed
 // 833px wide however far you zoomed and forced horizontal scrolling (WCAG 1.4.10). The
-// min(240px, 100%) floor keeps it from overflowing a viewport narrower than a single column.
+// min(232px, 100%) floor keeps it from overflowing a viewport narrower than a single column.
 .pcs-case-facts__grid {
   display: grid;
   gap: 0 govuk-spacing(4);
-  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
-}
+  grid-template-columns: repeat(auto-fit, minmax(min(232px, 100%), 1fr));
 
-.pcs-attendance__row {
-  padding-bottom: govuk-spacing(3);
-  border-bottom: 1px solid $govuk-border-colour;
+  // The default 30px between form groups is tuned for citizens reading one question at a time.
+  // In a dense reference panel it just pushes facts off screen, so halve it.
+  .govuk-form-group {
+    margin-bottom: govuk-spacing(3);
+  }
 
-  & + & {
-    padding-top: govuk-spacing(3);
+  // See above: the gap belongs between the date parts, not after the last one.
+  .govuk-date-input__item:last-child {
+    margin-right: 0;
   }
 }
 
-// Party attendance options and the representative's name sit on one line at desktop width so a
-// judge can scan the register down the page.
-.pcs-attendance__controls {
-  display: flex;
-  flex-wrap: wrap;
-  gap: govuk-spacing(4);
-  align-items: flex-end;
+// One line per party — party name, attendance options, representative's name — so the register
+// reads as a table down the page. Putting the party name in a column instead of on a heading line
+// of its own is what halves the height of this section.
+.pcs-attendance__row {
+  display: grid;
+  grid-template-columns: minmax(0, 22em) auto minmax(0, 20em);
+  gap: 0 govuk-spacing(6);
+  align-items: baseline;
+  padding: govuk-spacing(2) 0;
+  border-bottom: 1px solid $govuk-border-colour;
+
+  // Below desktop there is no room for three columns, so let each part take its own line.
+  @include govuk-media-query($until: desktop) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+// The party name is the first grid column. It carries govuk-label--s for the same weight and size
+// a legend would have had, so nothing changes visually.
+.pcs-attendance__label {
+  margin-bottom: 0;
+}
+
+// The name field is the last column, so its own bottom margin would only add row height.
+.pcs-attendance__row .govuk-form-group {
+  margin-bottom: 0;
 }

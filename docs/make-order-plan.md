@@ -1,8 +1,8 @@
 # Make an order — plan and context
 
 Working notes for the judicial "Make an order" screen. Iteration 1 is on
-`feat/make-order-shell` (commit `6130417`). This document explains what the screen is, who it is
-for, what we decided and why, and what is left.
+`feat/make-order-shell`. This document explains what the screen is, who it is for, what we decided
+and why, and what is left.
 
 ## What this screen is
 
@@ -155,7 +155,8 @@ Given the audience, all of these are reasonable and are kept:
 - the information density itself
 - `govuk-tabs` for order type
 - the wide, full-bleed layout
-- the sticky case-facts panel (measured at 329px, 37% of a 900px viewport)
+- the sticky case-facts panel (392px after the density work, 44% of a 900px viewport, and capped
+  at `60vh` however far the page is zoomed)
 
 ## Decisions
 
@@ -166,20 +167,21 @@ Given the audience, all of these are reasonable and are kept:
 | **Page width**               | Wide, via a scoped **`pcs-wide`** class. Not a global `.govuk-width-container` override — the citizen journeys in this same app want the 1020px measure.                                                                                                                                                                      |
 | **Tabs markup**              | Hand-written to govuk-frontend's own tabs markup rather than via the `govukTabs` macro, because the macro takes each panel as a pre-rendered HTML string. Writing the markup lets each panel hold real Nunjucks. Behaviour still comes from `data-module="govuk-tabs"`.                                                       |
 | **Attendance abbreviations** | Keep `Csl / Sol / S/A / H/O / Duty / LiP / Ltr` for scanning density, but give assistive technology the full term: `<span aria-hidden="true">` for the abbreviation plus `<span class="govuk-visually-hidden">` for the expansion. `<abbr title>` was tried and rejected — screen reader support for `title` is inconsistent. |
+| **Attendance grouping**      | `role="group"` + `aria-labelledby` instead of `fieldset`/`legend`, which is the one place this page departs from the stock pattern. See [Density](#density-matching-the-prototype) — a legend cannot share a row with the fields it labels, and the workarounds are unreliable.                                               |
 | **Breakpoints**              | Large desktop is the primary and only design target. The two `govuk-media-query` blocks exist solely so the layout survives 200–400% zoom. No investment in narrow-width polish beyond "nothing breaks".                                                                                                                      |
 | **Client-side JS**           | **None.** Date quick-fill pills, the case-facts collapse toggle and the not-present/name interlock are all deferred.                                                                                                                                                                                                          |
 | **Content**                  | Hardcoded English for iteration 1. See [Open questions](#open-questions) — this is the one place we diverge from house style.                                                                                                                                                                                                 |
 
 ## What was built
 
-Branch `feat/make-order-shell`, commit `6130417`.
+Branch `feat/make-order-shell`.
 
 | File                                          | Lines |                                                                                                                                           |
 | --------------------------------------------- | ----: | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/main/views/make-order.njk`               |   517 | The shell. Extends `template.njk`, not `stepsTemplate.njk` — the latter forces a two-thirds/one-third grid that fights a wide dense page. |
-| `src/main/assets/scss/make-order.scss`        |   104 | `pcs-`-prefixed, `govuk-spacing()` / `govuk-colour()` / `govuk-media-query()` throughout, no raw values.                                  |
+| `src/main/views/make-order.njk`               |   536 | The shell. Extends `template.njk`, not `stepsTemplate.njk` — the latter forces a two-thirds/one-third grid that fights a wide dense page. |
+| `src/main/assets/scss/make-order.scss`        |   132 | `pcs-`-prefixed, `govuk-spacing()` / `govuk-colour()` / `govuk-media-query()` throughout, no raw values.                                  |
 | `src/main/routes/makeOrder.ts`                |    22 | Auto-registered by the glob in `app.ts`. Builds the xui header/footer models.                                                             |
-| `src/test/unit/routes/makeOrder.test.ts`      |    62 | Registration, render, and header-model-from-roles.                                                                                        |
+| `src/test/unit/routes/makeOrder.test.ts`      |    65 | Registration, render, and header-model-from-roles.                                                                                        |
 | `src/main/constants/caseRoutes.ts`            |    +2 | `MAKE_ORDER_ROUTE`.                                                                                                                       |
 | `src/main/assets/scss/main.scss`              |    +1 | `@use 'make-order';`                                                                                                                      |
 | `src/test/ui/utils/controller.ts`             |    ~1 | Adds `make-order` to the axe audit page gate.                                                                                             |
@@ -215,22 +217,85 @@ template's existing `containerClasses` hook rather than nesting another `div`. B
 `max-width: none` kills `govuk-width-container`'s auto-centring, the gutters have to be restored
 explicitly.
 
+## Density: matching the prototype
+
+Side-by-side against the prototype, the first build was roughly **twice as tall for identical
+content**. For a screen a judge works from during a hearing that is a real usability problem, not a
+cosmetic one — the fewer facts visible at once, the more scrolling between the facts and the order
+being drafted. Three causes, all measured rather than eyeballed:
+
+**1. The case-facts grid was silently one column short.** The intended layout is four columns. The
+track floor was `240px`, so four tracks needed `4 × 240 + 3 × 20 = 1020px`, and only `1013px` was
+available — seven pixels short. `auto-fit` did exactly what it is meant to do and dropped to three
+columns, which added a whole extra row.
+
+The floor exists because a `govuk-date-input` wraps day/month/year onto two lines below a certain
+width, and a wrapped date costs the grid a row. That width is **232px**, not 240 — the original
+figure came from measuring the three inputs without their margins. Each date part also carries a
+trailing `20px` margin, including the last one, which is dead space at the end of a grid track and
+pushed the true requirement to 252px. Removing that trailing margin makes the honest floor 232px,
+and four columns fit with room to spare.
+
+Lesson worth keeping: with `auto-fit`, an off-by-a-few-pixels floor doesn't misalign anything
+visibly, it just quietly changes the column count. It is only findable by measuring.
+
+**2. Form-group spacing tuned for citizens.** The default `30px` between form groups suits a page
+asking one question at a time. Inside a dense reference panel it only pushes facts off screen, so
+it is halved to `15px` within the grid.
+
+**3. Attendance: the party name had its own line.** This is the interesting one. The register wants
+one scannable row per party — name, attendance options, representative — but a `<fieldset>`'s
+rendered `<legend>` is laid out **outside** the box containing the fieldset's other children. It
+therefore cannot be a grid item, and always takes a line of its own. Five parties, five wasted
+lines.
+
+Two standard workarounds exist and both were tried and rejected:
+
+- **`float: left` on the legend.** Works visually. But it strips the legend's special status, and
+  the accessibility tree showed the party name **no longer labelling the radio group** — a WCAG
+  1.3.1 regression, and worse than the height problem it solved.
+- **`display: contents` on the fieldset.** Also works visually, and the DOM stays correct. But
+  `display: contents` on a `<fieldset>` is [known to be handled inconsistently in the accessibility
+  tree across browsers](https://github.com/w3c/csswg-drafts/issues/3226), and no CDP port was
+  exposed to inspect the full tree and prove otherwise. Relying on a quirk that can't be verified
+  is not worth it.
+
+So attendance rows use **`role="group"` + `aria-labelledby`** — the ARIA equivalent of
+fieldset/legend, with no layout special-casing at all. The party name becomes an ordinary first grid
+column, and the grouping is explicit and directly verifiable. Confirmed: all five rows expose
+`role="group"` with the party name as the accessible name, unique ids, and per-party radio `name`
+attributes.
+
+The "Name" label is visually hidden rather than deleted. With one row per party the column is
+self-evident to a sighted judge, and five repetitions cost a line each; screen reader users still
+get it, expanded to "Name of representative for Defendant 1: David Patel" so it is unambiguous when
+reached out of context.
+
+**Result:** case-facts panel **572px → 392px**, attendance rows **136px → 78px** each, page
+**3241px → 2787px**. Dates stay on one line, and the density now matches the prototype.
+
 ## Verification
 
 All at 1600×900 unless noted.
 
 - `yarn lint` (stylelint → eslint → prettier), `yarn tsc --noEmit`, and webpack: all clean, no
   SCSS deprecation warnings.
-- `yarn test:unit`: 195 suites / 2501 tests pass, including the 3 route tests.
-- axe-core 4.10.2 across WCAG 2.0/2.1/2.2 A and AA, **with the xui chrome rendered**:
+- `yarn test:unit`: 195 suites / 2502 tests pass, including the 3 route tests.
+- axe-core 4.11.3 across WCAG 2.0/2.1/2.2 A and AA, **with the xui chrome rendered**:
   **0 violations, 30 passes**, excluding the two non-defects below.
 - All 5 tabs switch correctly — one visible panel each, correct `role` / `aria-selected` /
   `aria-controls` / `aria-labelledby`.
 - xui header renders with judicial branding ("Judicial Case Manager", crest, case reference
   lookup, Sign out) from a `caseworker-pcs-judge` role, and its stylesheet loads.
-- Defect 1 fixed (18 date inputs, 0 `aria-label`, 6 fieldsets with legends).
+- Defect 1 fixed (18 date inputs, 0 `aria-label`, 6 date groups each in a `fieldset` with a
+  `legend`).
 - Defect 2 fixed for our content (`#main-content` `scrollWidth` 280 at a 320px viewport, 0
-  overflowing descendants).
+  overflowing descendants, panel unpinned, grid down to one column).
+- Attendance grouping checked per row: 5 `role="group"` elements, each with a unique
+  `aria-labelledby` target and its own radio `name`.
+
+The last two figures are the ones worth re-running after any layout change — they are what caught
+both the grid-column and the focus-obscured problems.
 
 ### WCAG 2.4.11 Focus Not Obscured — found and fixed during verification
 
@@ -238,8 +303,9 @@ The sticky panel hid keyboard focus. 18 of 62 focusable elements were _fully_ co
 focused — a real failure, introduced by us, not inherited from the prototype.
 
 Fixed with `scroll-padding-top` on the root element, reserving the panel's height so the browser
-scrolls focused fields clear of it. Now **0 of 63 obscured** (63 once the xui header's own controls
-are counted), verified at 1600×900 and at 1440×768 where the panel is also internally scrolling.
+scrolls focused fields clear of it. Now **0 of 97 obscured**, verified at 1600×900 and at 1440×768
+where the panel is also internally scrolling. (97 rather than the original 62 because the density
+work put every attendance radio on screen at once and the xui header's own controls are counted.)
 
 Two non-obvious details, both commented in the SCSS:
 
@@ -267,13 +333,26 @@ Two non-obvious details, both commented in the SCSS:
    Reproduced on a bare, unstyled textarea, and independent of the sticky position and
    `overflow-y`. Actual contrast is black on white, 21:1.
 
-### Not yet verified
+### Running it locally
 
-The page has not been run against the real app (docker + OIDC). Browser verification used a
-throwaway harness rendering the template with the real Nunjucks search paths, the real
-`buildHeaderModel` / `buildFooterModel`, and the component library stylesheet served exactly as
-`app.ts:42-43` does it. So the xui chrome is genuinely exercised, but on a running instance it is
-worth confirming the header menu is the one judges should see for their actual roles.
+Everything above is now verified against the real app — signed in through OIDC at
+`/case/1777027600017760/make-order`, not the throwaway render harness used at first. Two pieces of
+local infrastructure are missing from the cftlib stack and have to be worked around:
+
+- **No S2S provider.** The stack has no `rpe-service-auth-provider`, and the app refuses to boot
+  without a lease (`src/main/modules/s2s/index.ts` throws `Failed to initialize S2S token`). A
+  throwaway stub on `:8489` returning a well-formed unsigned JWT is enough. Kept **outside the
+  repo** so the working tree stays clean.
+- **The IDAM simulator needs the account created first**, or login just 401s:
+
+  ```
+  POST http://localhost:5062/testing-support/accounts
+  { "email": "...", "forename": "...", "surname": "...", "password": "...",
+    "roles": [{ "code": "caseworker-pcs-judge" }, { "code": "caseworker" }] }
+  ```
+
+The header menu is confirmed to be the judicial one for a `caseworker-pcs-judge` role on a real
+signed-in session.
 
 ### One inherited defect found along the way
 
