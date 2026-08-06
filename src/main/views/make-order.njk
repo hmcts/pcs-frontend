@@ -20,20 +20,29 @@
   Make an order - HM Courts &amp; Tribunals Service &ndash; GOV.UK
 {% endblock %}
 
-{% block header %}
-  {% if isLegalRepresentative %}
-    {{ hmctsXuiHeader(headerModel) }}
-  {% else %}
-    {{ super() }}
-  {% endif %}
+{#
+  This page is judges only, so it always uses the xui chrome judges already work in — there is no
+  citizen variant to fall back to, and so no conditional. Other pages in this app serve both
+  audiences and branch on isLegalRepresentative; this one does not.
+#}
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" href="/assets/ui-component-lib/ui-component-lib.css">
 {% endblock %}
 
+{% block header %}
+  {{ hmctsXuiHeader(headerModel) }}
+{% endblock %}
+
+{#
+  The xui header brings its own navigation and beta banner, and this page is English only, so
+  everything template.njk puts above the content is dropped rather than duplicated. No back link
+  either: this is a single page, not a step in a journey.
+#}
+{% block beforeContent %}{% endblock %}
+
 {% block footer %}
-  {% if isLegalRepresentative %}
-    {{ hmctsUiFooter(footerModel) }}
-  {% else %}
-    {{ super() }}
-  {% endif %}
+  {{ hmctsUiFooter(footerModel) }}
 {% endblock %}
 
 {#
