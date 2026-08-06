@@ -15,7 +15,6 @@ export const noticeDateWhenProvidedLR = {
   yearTextLabel: `Year`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  signOutLink: `Sign out`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   theDateDefendantReceivedNoticeErrorMessage: `The date the defendant received notice must either be today’s date or in the past`,
   feedbackLink: `feedback`,
