@@ -20,6 +20,7 @@ describe('initRedirectOnBack', () => {
   const addedListeners: [string, EventListenerOrEventListenerObject][] = [];
 
   beforeEach(() => {
+    jest.useFakeTimers();
     document.body.innerHTML = '';
     redirectToMock.mockReset();
     addedListeners.length = 0;
@@ -37,6 +38,8 @@ describe('initRedirectOnBack', () => {
     for (const [type, listener] of addedListeners) {
       window.removeEventListener(type, listener);
     }
+    jest.clearAllTimers();
+    jest.useRealTimers();
     jest.restoreAllMocks();
   });
 
@@ -60,6 +63,7 @@ describe('initRedirectOnBack', () => {
     initRedirectOnBack();
 
     pageshow();
+    jest.runAllTimers();
     window.dispatchEvent(new PopStateEvent('popstate'));
 
     expect(pushStateSpy).not.toHaveBeenCalled();
@@ -72,32 +76,42 @@ describe('initRedirectOnBack', () => {
     initRedirectOnBack();
 
     pageshow();
+    jest.runAllTimers();
     window.dispatchEvent(new PopStateEvent('popstate'));
 
     expect(pushStateSpy).not.toHaveBeenCalled();
     expect(redirectToMock).not.toHaveBeenCalled();
   });
 
-  it('does not arm synchronously — the guard is pushed on pageshow', () => {
-    // Regression guard: a synchronous pushState at load is dropped by the browser
-    // when we arrive via a redirect (e.g. the GOV.UK Pay return 303), so the
-    // guard must be deferred to pageshow.
+  it('does not arm synchronously at init — it arms on pageshow', () => {
     addMarker(dashboardUrl);
 
     initRedirectOnBack();
     expect(pushStateSpy).not.toHaveBeenCalled();
 
     pageshow();
-    expect(pushStateSpy).toHaveBeenCalledTimes(1);
+    expect(pushStateSpy).toHaveBeenCalledTimes(1); // immediate push
   });
 
-  it('pushes a duplicate history entry on show and redirects to the dashboard on Back', () => {
+  it('pushes deferred guard entries so a redirect arrival still traps Back', () => {
+    // On a redirect arrival (e.g. the GOV.UK Pay return 303) the synchronous
+    // push can be dropped, so the guard is also pushed on later ticks.
+    addMarker(dashboardUrl);
+
+    initRedirectOnBack();
+    pageshow();
+    expect(pushStateSpy).toHaveBeenCalledTimes(1); // immediate
+
+    jest.runAllTimers();
+    expect(pushStateSpy).toHaveBeenCalledTimes(3); // + setTimeout(0) + setTimeout(500)
+  });
+
+  it('redirects to the dashboard on Back', () => {
     addMarker(dashboardUrl);
 
     initRedirectOnBack();
     pageshow();
 
-    expect(pushStateSpy).toHaveBeenCalledTimes(1);
     expect(redirectToMock).not.toHaveBeenCalled();
 
     window.dispatchEvent(new PopStateEvent('popstate'));
@@ -110,14 +124,16 @@ describe('initRedirectOnBack', () => {
 
     initRedirectOnBack();
     pageshow();
-    expect(pushStateSpy).toHaveBeenCalledTimes(1);
+    jest.runAllTimers();
+    const armedPushes = pushStateSpy.mock.calls.length; // 3
 
     window.dispatchEvent(new PopStateEvent('popstate'));
     // Guard is renewed before redirecting so a subsequent Back is caught too.
-    expect(pushStateSpy).toHaveBeenCalledTimes(2);
+    expect(pushStateSpy).toHaveBeenCalledTimes(armedPushes + 1);
+    expect(redirectToMock).toHaveBeenCalledTimes(1);
 
     window.dispatchEvent(new PopStateEvent('popstate'));
-    expect(pushStateSpy).toHaveBeenCalledTimes(3);
+    expect(pushStateSpy).toHaveBeenCalledTimes(armedPushes + 2);
     expect(redirectToMock).toHaveBeenCalledTimes(2);
     expect(redirectToMock).toHaveBeenNthCalledWith(2, dashboardUrl);
   });
@@ -128,10 +144,12 @@ describe('initRedirectOnBack', () => {
     initRedirectOnBack();
 
     pageshow(false); // initial display
-    expect(pushStateSpy).toHaveBeenCalledTimes(1);
+    jest.runAllTimers();
+    expect(pushStateSpy).toHaveBeenCalledTimes(3);
 
     pageshow(true); // restored from bfcache
-    expect(pushStateSpy).toHaveBeenCalledTimes(2);
+    jest.runAllTimers();
+    expect(pushStateSpy).toHaveBeenCalledTimes(6);
   });
 
   it('registers a single popstate listener regardless of repeated pageshow re-arms', () => {
@@ -141,6 +159,7 @@ describe('initRedirectOnBack', () => {
 
     pageshow(true);
     pageshow(true);
+    jest.runAllTimers();
 
     redirectToMock.mockClear();
     window.dispatchEvent(new PopStateEvent('popstate'));

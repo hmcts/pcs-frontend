@@ -2,17 +2,17 @@ import { redirectTo } from './navigate';
 
 /**
  * When the page renders the `#redirect-on-back` marker (set via the
- * `redirectOnBack` step flag), we push a duplicate history entry so that the
- * first Back press pops that duplicate and fires `popstate` without leaving the
- * confirmation document. At that point we redirect the user to their dashboard
- * instead of the previous page.
+ * `redirectOnBack` step flag), we push a duplicate history entry so the first
+ * Back press pops that duplicate and fires `popstate` without leaving the
+ * confirmation document — at which point we redirect the user to their
+ * dashboard instead of the previous page.
  *
- * The guard is armed on `pageshow` rather than synchronously at load. This
- * covers both the initial display and back/forward-cache restores, and — more
- * importantly — it defers the `pushState` until after the navigation has
- * committed. When we arrive via a redirect (e.g. the GOV.UK Pay return 303 on
- * the payment confirmation pages), a synchronous `pushState` at script-eval
- * time is dropped by the browser, leaving no entry to catch the first Back.
+ * We (re)arm on `pageshow`, which covers both the initial display and
+ * back/forward-cache restores. Crucially, when the confirmation page is reached
+ * via a redirect (e.g. the GOV.UK Pay return 303 on the payment pages), the
+ * browser is still settling session history as `pageshow` fires and silently
+ * drops a synchronous `pushState`. We therefore also push on deferred ticks so
+ * a guard reliably lands once the navigation has committed.
  *
  * A single `popstate` listener is registered for the lifetime of the page; it
  * re-arms before redirecting so a fast/repeated Back can't slip past.
@@ -34,7 +34,11 @@ export function initRedirectOnBack(): void {
     redirectTo(dashboardUrl);
   });
 
-  window.addEventListener('pageshow', () => {
+  const arm = (): void => {
     pushGuard();
-  });
+    setTimeout(pushGuard, 0);
+    setTimeout(pushGuard, 500);
+  };
+
+  window.addEventListener('pageshow', arm);
 }
