@@ -66,6 +66,12 @@
   { value: "yearly", text: "Yearly" }
 ] %}
 
+{# Payment plans offer only these two, unlike the rent frequency above. #}
+{% set paymentFrequencies = [
+  { value: "weekly", text: "Weekly" },
+  { value: "monthly", text: "Monthly" }
+] %}
+
 {#
   Attendance shorthand is kept for scanning density, with the full term in a visually hidden
   span so assistive technology announces something unambiguous.
@@ -378,6 +384,101 @@
         formGroup: { classes: "pcs-continues-question" }
       }) }}
 
+      {#
+        Money judgment. The prototype nests conditional reveals four deep here — money judgment
+        reveals "judgment for arrears", which reveals "must be paid by", which reveals the payment
+        plan, which reveals the balance date. Flattened to one level: the sums and the payment terms
+        are shown together once money judgment is ticked.
+
+        Nesting reveals is not a pattern govuk-frontend supports, and the deeper levels are the
+        reason: a judge tabbing through has no way to know that ticking one box has grown three more
+        levels somewhere below, and each level indents further until the fields are off to the right
+        of the panel. Everything here is optional, so nothing is lost by showing it at once.
+      #}
+      {% set outrightMoneyJudgmentHtml %}
+        {{ govukInput({
+          id: "outright-mj-arrears",
+          name: "outright-mj-arrears",
+          label: { text: "Judgment for arrears" },
+          classes: "govuk-input--width-5",
+          spellcheck: false,
+          inputmode: "numeric",
+          prefix: { text: "£" }
+        }) }}
+
+        {{ govukInput({
+          id: "outright-mj-interest",
+          name: "outright-mj-interest",
+          label: { text: "Interest" },
+          classes: "govuk-input--width-5",
+          spellcheck: false,
+          inputmode: "numeric",
+          prefix: { text: "£" }
+        }) }}
+
+        {#
+          The prototype makes the payment plan a pair of checkboxes sharing one name, so a judge can
+          tick both a lump sum and instalments for the same debt. Radios, because it is one choice.
+          "No payment terms" is the third option rather than leaving both unticked, so the answer is
+          always explicit — govuk-frontend has no way to clear a radio group once one is chosen.
+        #}
+        {{ govukRadios({
+          name: "outright-mj-plan",
+          classes: "govuk-radios--small",
+          fieldset: { legend: { text: "The above sums must be paid by", classes: "govuk-fieldset__legend--s" } },
+          items: [
+            {
+              value: "lump",
+              text: "Payment to claimant",
+              conditional: {
+                html: govukInput({
+                  id: "outright-mj-lump-amount",
+                  name: "outright-mj-lump-amount",
+                  label: { text: "Payment of" },
+                  classes: "govuk-input--width-5",
+                  spellcheck: false,
+                  inputmode: "numeric",
+                  prefix: { text: "£" }
+                }) + govukDateInput({
+                  id: "outright-mj-lump-date",
+                  namePrefix: "outright-mj-lump-date",
+                  fieldset: { legend: { text: "To be paid by", classes: "govuk-fieldset__legend--s" } }
+                }) + govukDateInput({
+                  id: "outright-mj-balance-date",
+                  namePrefix: "outright-mj-balance-date",
+                  fieldset: { legend: { text: "And the balance by (optional)", classes: "govuk-fieldset__legend--s" } }
+                })
+              }
+            },
+            {
+              value: "instalments",
+              text: "Instalment payments",
+              conditional: {
+                html: govukInput({
+                  id: "outright-mj-inst-amount",
+                  name: "outright-mj-inst-amount",
+                  label: { text: "Instalment payments of" },
+                  classes: "govuk-input--width-5",
+                  spellcheck: false,
+                  inputmode: "numeric",
+                  prefix: { text: "£" }
+                }) + govukSelect({
+                  id: "outright-mj-inst-freq",
+                  name: "outright-mj-inst-freq",
+                  label: { text: "How often" },
+                  items: paymentFrequencies
+                }) + govukDateInput({
+                  id: "outright-mj-inst-date",
+                  namePrefix: "outright-mj-inst-date",
+                  fieldset: { legend: { text: "First instalment to be paid on or before", classes: "govuk-fieldset__legend--s" } }
+                })
+              }
+            },
+            { value: "none", text: "No payment terms" }
+          ]
+        }) }}
+      {% endset %}
+
       {{ govukCheckboxes({
         idPrefix: "outright-options",
         name: "outright-options",
@@ -386,16 +487,7 @@
           {
             value: "money-judgment",
             text: "Money judgment",
-            conditional: {
-              html: govukInput({
-                id: "outright-arrears",
-                name: "outright-arrears",
-                label: { text: "Judgment for arrears" },
-                classes: "govuk-input--width-5",
-                spellcheck: false,
-                prefix: { text: "£" }
-              })
-            }
+            conditional: { html: outrightMoneyJudgmentHtml }
           },
           {
             value: "use-occupation",
@@ -407,7 +499,12 @@
                 label: { text: "Daily rate" },
                 classes: "govuk-input--width-5",
                 spellcheck: false,
+                inputmode: "decimal",
                 prefix: { text: "£" }
+              }) + govukDateInput({
+                id: "outright-use-occupation-from-date",
+                namePrefix: "outright-use-occupation-from-date",
+                fieldset: { legend: { text: "From", classes: "govuk-fieldset__legend--s" } }
               })
             }
           },
