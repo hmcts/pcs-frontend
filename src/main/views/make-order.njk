@@ -363,11 +363,16 @@
         ]
       }) }}
 
+      {#
+        This field qualifies the Grounds radios above rather than asking anything new, so it is
+        marked as a continuation and no dividing rule is drawn between the two — see make-order.scss.
+      #}
       {{ govukInput({
         id: "outright-grounds-details",
         name: "outright-grounds-details",
         label: { text: "Details of grounds (optional)" },
-        classes: "govuk-input--width-20"
+        classes: "govuk-input--width-20",
+        formGroup: { classes: "pcs-continues-question" }
       }) }}
 
       {{ govukCheckboxes({

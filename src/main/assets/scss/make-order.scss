@@ -186,6 +186,88 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   }
 }
 
+// Dividing rules, all three done the same way: a border on the top of the element that starts each
+// new block, so the line falls in the gap that already exists between blocks.
+//
+// Done in CSS rather than with the `<hr class="govuk-section-break--visible">` elements the
+// prototype uses. An <hr> is a semantic thematic break, so a screen reader announces one — the
+// prototype has four in this one tab panel — for something that carries no meaning a user has not
+// already got from the heading, legend or label that follows it. A border draws the same line and
+// says nothing, which is what a purely decorative divider should do.
+//
+// Each rule sits on `:not(:first-child)` or a sibling combinator, never on every element, so no
+// line is ever stranded above the first block of a group or below the last.
+
+// 1. Page sections: Attendance / Recitals / Order type / Costs / Staff message.
+//
+// The heading keeps its own `govuk-!-margin-top-6`, so the 30px above the line is the margin that
+// was already there and the rule just lands in it. Nothing stacks: the case-facts panel's own
+// bottom border and the tab panel's bottom border are both 30px clear of the next heading's rule.
+.pcs-make-order #main-content > h2 {
+  padding-top: govuk-spacing(4);
+  border-top: 1px solid $govuk-border-colour;
+}
+
+// 2. Questions inside a tab panel, so Possession / Grounds / the checkbox options read as distinct
+//    decisions rather than one long column of controls.
+//
+// The adjacent-sibling selector is also self-maintaining: rules appear between whatever questions
+// the panel happens to contain, with none stranded above the first or below the last, and adding or
+// reordering a question in the template needs no matching change here. The other four panels get
+// the same treatment for free.
+//
+// The exception is `.pcs-continues-question`, for a form group that is a continuation of the one
+// above rather than a question of its own — "Details of grounds (optional)" belongs to the
+// Mandatory/Discretionary radios, so a line between them would announce a decision that isn't
+// there. Only govuk-frontend's own conditional reveal expresses that relationship in markup, and
+// it is the wrong tool here: a reveal hides the field until a radio is picked, and these details
+// apply to either answer. The class is named for the relationship, not for the missing border, so
+// it still reads correctly if the divider is ever drawn some other way.
+//
+// Scoped to this page. main.scss is served to every page in the app, and `.govuk-tabs__panel` is a
+// stock govuk-frontend class, so an unscoped rule here would silently restyle the next page that
+// uses tabs. Make an order is the only one today; the scope is what keeps that true.
+.pcs-make-order .govuk-tabs__panel > .govuk-form-group + .govuk-form-group:not(.pcs-continues-question) {
+  padding-top: govuk-spacing(4);
+  border-top: 1px solid $govuk-border-colour;
+}
+
+// 3. Individual checkbox options, which the rule above cannot reach: Money judgment, Damages and
+//    Transfer to High Court are three items inside ONE govukCheckboxes group, not three form groups.
+//
+// The prototype gets its lines here by making each option a separate checkbox group with an <hr>
+// between. Keeping them as one group is deliberate — they are one set of related options on the same
+// question, and splitting them would present three unrelated questions to assistive technology — so
+// the divider goes on the item instead.
+//
+// `:not(:first-child)` counts conditional reveals too, since a reveal is a sibling of the items. A
+// rule therefore falls after an open reveal rather than between a checkbox and its own reveal, which
+// is what keeps each option and its follow-up reading as a single block.
+//
+// The gap has to be `margin`, and the line a pseudo-element in that margin, rather than the
+// padding + border-top used above. A checkbox item is `position: relative` and govuk-frontend
+// absolutely positions both the real input and the visible box (`label::before`) at `top: 10px`
+// — measured from the item's *padding* box. So padding-top on the item pushes the label text down
+// while leaving the box where it was, knocking the two 8px out of line with each other. Margin
+// sits outside the padding box, so box and text move together and the item stays stock.
+//
+// Tighter gap than the section rules: these are options within one question, not sections, so the
+// line should read as a lighter division than the ones between headings.
+.pcs-make-order .govuk-checkboxes__item:not(:first-child) {
+  margin-top: govuk-spacing(6);
+
+  // Drawn in the middle of the margin. `left: 0; right: 0` spans the item, which is the full width
+  // of the group, so the line matches the ones above it.
+  &::before {
+    content: '';
+    position: absolute;
+    top: -#{govuk-spacing(3)};
+    right: 0;
+    left: 0;
+    border-top: 1px solid $govuk-border-colour;
+  }
+}
+
 // One line per party — party name, attendance options, representative's name — so the register
 // reads as a table down the page. Putting the party name in a column instead of on a heading line
 // of its own is what halves the height of this section.
