@@ -24,6 +24,6 @@ export const priorityDebtDetailsLR = {
   amountDefendantPaysMustBeLessThanBillionErrorMessage: `TThe amount the defendant pays towards their priority debts each week or month must be less than £1 billion`,
   totalAmountNegativeValueErrorMessage: `The total amount the defendant owes for all their priority debts must be £0.00 or above`,
   amountYouPayNegativeValueErrorMessage: `The amount the defendant pays towards their priority debts each week or month must be £0.00 or above`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `priority-debt-details`,
 };

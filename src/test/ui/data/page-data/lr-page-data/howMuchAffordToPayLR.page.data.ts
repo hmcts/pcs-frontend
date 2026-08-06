@@ -20,6 +20,6 @@ export const howMuchAffordToPayLR = {
   enterAmountInTheCorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
   mustBeLessThanBillionErrorMessage: `The amount the defendant could afford to pay in addition to the current rent must be less than £1 billion`,
   negativeValueErrorMessage: `The amount the defendant could afford to pay in addition to the current rent must be £0.00 or above`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `how-much-afford-to-pay`,
 };

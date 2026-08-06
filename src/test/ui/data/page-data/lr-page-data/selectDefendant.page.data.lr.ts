@@ -7,6 +7,6 @@ export const selectDefendant = {
   backLink: `Back`,
   selectWhoYouAreMakingErrorMessage: `You must select a defendant to represent`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `select-defendant`,
 };

@@ -9,7 +9,7 @@ export const haveYouAppliedForUniversalCreditLR = {
   yearHiddenTextLabel: `Year`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `have-you-applied-for-universal-credit`,
   forExampleHiddenHintText: `For example, 27 9 2022`,
   backLink: `Back`,
