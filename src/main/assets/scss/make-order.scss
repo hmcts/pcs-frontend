@@ -86,20 +86,58 @@ $pcs-case-facts-max-height: 60vh;
 // breakpoints to maintain. The prototype used fixed pixel tracks, which is why its grid stayed
 // 833px wide however far you zoomed and forced horizontal scrolling (WCAG 1.4.10). The
 // min(232px, 100%) floor keeps it from overflowing a viewport narrower than a single column.
+// The vertical rhythm here is the grid's own row-gap, not margins on the fields. Margins on the
+// fields also apply to the last row, where the space is below the panel's final row and therefore
+// dead. Same spacing between rows, one less row's worth of panel height.
 .pcs-case-facts__grid {
   display: grid;
-  gap: 0 govuk-spacing(4);
+  gap: govuk-spacing(3) govuk-spacing(4);
   grid-template-columns: repeat(auto-fit, minmax(min(232px, 100%), 1fr));
 
-  // The default 30px between form groups is tuned for citizens reading one question at a time.
-  // In a dense reference panel it just pushes facts off screen, so halve it.
-  .govuk-form-group {
-    margin-bottom: govuk-spacing(3);
+  // See above: spacing is the grid's job, so the fields don't bring their own. The default 30px is
+  // tuned for citizens reading one question at a time and is far too loose for a reference panel.
+  > .govuk-form-group {
+    margin-bottom: 0;
+
+    // 10px under a field's own name is generous when there are twelve of them stacked in a panel.
+    // Halved. The label still clears its control by 5px, which is the same gap govuk-frontend puts
+    // under the day/month/year labels, so nothing looks cramped.
+    > .govuk-label,
+    > .govuk-fieldset > .govuk-fieldset__legend {
+      margin-bottom: govuk-spacing(1);
+    }
   }
 
-  // See above: the gap belongs between the date parts, not after the last one.
+  // Day/month/year sit directly under a legend that already names the field, so they need only
+  // enough separation to read as labels rather than 5px of it, three times per date.
+  //
+  // These labels are kept at their stock 19px. Shrinking them would buy another 8px, and the
+  // prototype went further and omitted them entirely — which is defect 1, the reason a screen
+  // reader user heard "Day, Month, Year" six times with nothing to tell the groups apart. The
+  // remaining height difference against the prototype is almost exactly these labels, and it is
+  // the right trade.
+  .govuk-date-input__label {
+    margin-bottom: 2px;
+  }
+
+  // The column gap belongs between the date parts, not after the last one, where it is dead space
+  // at the end of a grid track — and it is what made the four-column track floor look like 252px.
   .govuk-date-input__item:last-child {
     margin-right: 0;
+  }
+}
+
+// The notes field is the panel's second column, so it is already as tall as the facts grid beside
+// it. Letting the textarea fill that height costs nothing and gives the judge a usefully bigger
+// box. `rows` stays as the floor for when the panel is a single column.
+@include govuk-media-query($from: desktop) {
+  .pcs-case-facts__layout > .govuk-form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pcs-case-facts__layout textarea {
+    flex: 1 1 auto;
   }
 }
 

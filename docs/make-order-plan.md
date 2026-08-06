@@ -155,7 +155,7 @@ Given the audience, all of these are reasonable and are kept:
 - the information density itself
 - `govuk-tabs` for order type
 - the wide, full-bleed layout
-- the sticky case-facts panel (392px after the density work, 44% of a 900px viewport, and capped
+- the sticky case-facts panel (361px after the density work, 40% of a 900px viewport, and capped
   at `60vh` however far the page is zoomed)
 
 ## Decisions
@@ -239,9 +239,29 @@ and four columns fit with room to spare.
 Lesson worth keeping: with `auto-fit`, an off-by-a-few-pixels floor doesn't misalign anything
 visibly, it just quietly changes the column count. It is only findable by measuring.
 
-**2. Form-group spacing tuned for citizens.** The default `30px` between form groups suits a page
-asking one question at a time. Inside a dense reference panel it only pushes facts off screen, so
-it is halved to `15px` within the grid.
+**2. Vertical spacing tuned for citizens, in three places.** The default `30px` between form groups
+suits a page asking one question at a time; inside a dense reference panel it only pushes facts off
+screen. Three separate margins were adding up, and it took a DOM diff against the prototype's panel
+to see which:
+
+| Where                        | Was                 | Now              | Why                                                                                                                                                                                                                                  |
+| ---------------------------- | ------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Between grid rows            | `30px` field margin | `15px` `row-gap` | A margin on the fields also applies to the **last** row, where the space falls below the panel's final row and is dead. Making it the grid's `row-gap` gives the same spacing between rows and one less row's worth of panel height. |
+| Under each field's own label | `10px`              | `5px`            | Generous for one question, loose with twelve stacked. The label still clears its control by 5px — the same gap govuk-frontend uses under day/month/year — so nothing reads as cramped.                                               |
+| Under Day / Month / Year     | `5px`               | `2px`            | These sit directly beneath a legend that already names the field, so they need only enough separation to read as labels — three times per date, six dates.                                                                           |
+
+**The prototype is compact partly because it cheats.** Its rows are 87px against our 97px, and the
+entire difference is that **it has no Day/Month/Year labels at all** — which is
+[defect 1](#1-date-inputs-announce-the-wrong-name--wcag-131), the reason a screen reader user heard
+"Day, Month, Year" six times with nothing to tell the groups apart. Shrinking those labels to 16px
+was measured and would buy another 8px; they are kept at their stock 19px. So full parity with the
+prototype's panel height is not available to us, and shouldn't be: ~10px per date row is the price
+of the labels being there, and it is the right trade.
+
+**Hearing notes fills its column.** The notes field is the panel's second column, so it is already
+as tall as the facts grid beside it — the height was simply going unused below a `rows="8"`
+textarea. Letting it flex costs nothing and gives the judge a bigger box (204px → 234px). `rows`
+stays as the floor for when the panel collapses to one column.
 
 **3. Attendance: the party name had its own line.** This is the interesting one. The register wants
 one scannable row per party — name, attendance options, representative — but a `<fieldset>`'s
@@ -271,8 +291,13 @@ self-evident to a sighted judge, and five repetitions cost a line each; screen r
 get it, expanded to "Name of representative for Defendant 1: David Patel" so it is unambiguous when
 reached out of context.
 
-**Result:** case-facts panel **572px → 392px**, attendance rows **136px → 78px** each, page
-**3241px → 2787px**. Dates stay on one line, and the density now matches the prototype.
+**Result:** case-facts panel **572px → 361px** against the prototype's 329px, attendance rows
+**136px → 78px** each, page **3241px → 2757px**. Four columns, dates on one line, and the remaining
+32px of panel height is the accessible date labels the prototype omits.
+
+**Re-measure, don't eyeball.** Every one of these was invisible in a screenshot and obvious in the
+numbers — the seven-pixel floor especially. Worth re-running `panelH` / `gridTemplateColumns` /
+`gridTemplateRows` after any change to this panel.
 
 ## Verification
 
@@ -291,6 +316,7 @@ All at 1600×900 unless noted.
   `legend`).
 - Defect 2 fixed for our content (`#main-content` `scrollWidth` 280 at a 320px viewport, 0
   overflowing descendants, panel unpinned, grid down to one column).
+- Panel height 361px, grid 4 columns at 1013px, all 6 dates on one line each.
 - Attendance grouping checked per row: 5 `role="group"` elements, each with a unique
   `aria-labelledby` target and its own radio `name`.
 
@@ -303,9 +329,9 @@ The sticky panel hid keyboard focus. 18 of 62 focusable elements were _fully_ co
 focused — a real failure, introduced by us, not inherited from the prototype.
 
 Fixed with `scroll-padding-top` on the root element, reserving the panel's height so the browser
-scrolls focused fields clear of it. Now **0 of 97 obscured**, verified at 1600×900 and at 1440×768
-where the panel is also internally scrolling. (97 rather than the original 62 because the density
-work put every attendance radio on screen at once and the xui header's own controls are counted.)
+scrolls focused fields clear of it. Now **0 of 84 obscured**, verified at 1600×900 and at 1440×768
+where the panel is also internally scrolling. (84 rather than the original 62 because the xui
+header's own controls are counted.)
 
 Two non-obvious details, both commented in the SCSS:
 
