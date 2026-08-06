@@ -358,16 +358,17 @@ comments, and the `order-type-field` / `form-action` hidden inputs that exist to
 
 Each of these is also commented at the point it happens in the template.
 
-| Departure                                                                                                                           | Reason                                                                                                                                                                                                                                                                                                         |
-| ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Conditional reveals flattened to one level.** The prototype's outright money judgment nests them four deep.                       | Nesting reveals is not a pattern govuk-frontend supports. A judge tabbing through has no way to know that ticking one box grew three more levels below, and each level indents further until fields sit off to the right of the panel. Everything there is optional, so nothing is lost by showing it at once. |
-| **Payment plans are radios, not checkboxes sharing a name.**                                                                        | The prototype's markup lets a judge order both a lump sum _and_ instalments for the same debt. It is one choice. "No payment terms" is an explicit third option rather than leaving all unticked, since a radio group cannot be cleared once answered.                                                         |
-| **Reveals nested inside the radio item they belong to** (adjournment), not siblings of the radio group.                             | The prototype's `aria-controls` points forwards out of the fieldset, and it then needs an `<h4>` in each block to say which branch you are looking at. Nested, each block is announced as part of the option that revealed it and the headings become unnecessary.                                             |
-| **One shared adjournment hearing date**, not one per "Adjourned to" option.                                                         | The prototype has three day/month/year triples of which at most one can ever be filled.                                                                                                                                                                                                                        |
-| **Real labels everywhere an `aria-label` was doing the work alone** — e.g. a `Time estimate` fieldset over the amount and its unit. | An `aria-label`-only control has nothing on screen naming it. Verified: 0 `aria-label`-only controls and 0 unlabelled controls on the page.                                                                                                                                                                    |
-| **Costs in one column, not two.**                                                                                                   | The prototype's split falls between "Cl pay Def summary costs" and the three same-terms options, so it does not divide the list by anything, and arrow keys walk the radios in DOM order wherever they are painted. Ordered by who pays, with the conditional ones last.                                       |
-| **Costs amounts as reveals under their radio**, not inline on the radio's line.                                                     | Inline needs the prototype's `data-costs-selects` script (typing in a box selects its radio) to be coherent, and still leaves the box unlabelled on screen.                                                                                                                                                    |
-| **Hearing format stays checkboxes.**                                                                                                | Not a departure so much as a decision worth recording: a hearing genuinely can be more than one format.                                                                                                                                                                                                        |
+| Departure                                                                                                                           | Reason                                                                                                                                                                                                                                                                                                          |
+| ----------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Conditional reveals flattened to one level.** The prototype's outright money judgment nests them four deep.                       | Nesting reveals is not a pattern govuk-frontend supports. A judge tabbing through has no way to know that ticking one box grew three more levels below, and each level indents further until fields sit off to the right of the panel. Everything there is optional, so nothing is lost by showing it at once.  |
+| **Payment plans stay checkboxes sharing a name**, as the prototype has them.                                                        | Not a departure. Recorded because it was first built as radios and that was wrong — see [Payment plans](#payment-plans--a-second-wrong-call-corrected).                                                                                                                                                         |
+| **Revealed fields lay out along the row**, not stacked one per line.                                                                | Matches the prototype's density, which is the point of the screen, but with each field keeping its own `<label>`/`<legend>` — the prototype's hand-written rows of prose are where its date fields lost their accessible names. Flex-wrap and no fixed widths, so it folds under zoom. See `pcs-inline-fields`. |
+| **Reveals nested inside the radio item they belong to** (adjournment), not siblings of the radio group.                             | The prototype's `aria-controls` points forwards out of the fieldset, and it then needs an `<h4>` in each block to say which branch you are looking at. Nested, each block is announced as part of the option that revealed it and the headings become unnecessary.                                              |
+| **One shared adjournment hearing date**, not one per "Adjourned to" option.                                                         | The prototype has three day/month/year triples of which at most one can ever be filled.                                                                                                                                                                                                                         |
+| **Real labels everywhere an `aria-label` was doing the work alone** — e.g. a `Time estimate` fieldset over the amount and its unit. | An `aria-label`-only control has nothing on screen naming it. Verified: 0 `aria-label`-only controls and 0 unlabelled controls on the page.                                                                                                                                                                     |
+| **Costs in one column, not two.**                                                                                                   | The prototype's split falls between "Cl pay Def summary costs" and the three same-terms options, so it does not divide the list by anything, and arrow keys walk the radios in DOM order wherever they are painted. Ordered by who pays, with the conditional ones last.                                        |
+| **Costs amounts as reveals under their radio**, not inline on the radio's line.                                                     | Inline needs the prototype's `data-costs-selects` script (typing in a box selects its radio) to be coherent, and still leaves the box unlabelled on screen.                                                                                                                                                     |
+| **Hearing format stays checkboxes.**                                                                                                | Not a departure so much as a decision worth recording: a hearing genuinely can be more than one format.                                                                                                                                                                                                         |
 
 ### The disabled options — a wrong call, corrected
 
@@ -400,6 +401,41 @@ use or discover, with nothing to say what would unlock them.
 
 **The general lesson:** "the prototype disables this" is a statement about its default markup, not
 about its behaviour. Check the script before concluding a control is dead.
+
+### Payment plans — a second wrong call, corrected
+
+Both payment plans — "The above sums must be paid by" in the outright tab and "Arrears to be paid
+by" in the suspended tab — were first built as radios, on the reasoning that a debt is paid one way
+or the other and the prototype's two checkboxes sharing a name let a judge order a lump sum _and_
+instalments for the same money.
+
+**That was wrong, and the prototype's order preview settles it.** With both boxes ticked it
+generates one suspension term with two sub-paragraphs:
+
+> 2. Execution of the order for possession is suspended as long as the defendant pays (i) the rent
+>    as it falls due plus (ii) the arrears of **£459.00** by:
+>    - a. payment of **£12.00** to the claimant by **20 August 2026**;
+>    - b. payments of **£32.00** to the claimant every month, the first instalment to be paid on or
+>      before **3 September 2026**;
+
+A payment now and the balance by instalments is an ordinary possession order, so these are two
+independent options, not one choice. Both are back to checkboxes sharing a name.
+
+Two things follow, neither of them obvious from the markup alone:
+
+- **There is no "no payment terms" option to add.** It only existed because a radio group cannot be
+  cleared once answered. Leaving both checkboxes unticked already says it.
+- **It shrinks the axe exclusion from twelve controls to eight.** `aria-expanded` is allowed on
+  `role=checkbox` and not on `role=radio`, so a checkbox reveal does not trip `aria-allowed-attr`
+  and does not need excluding. Since an `exclude` drops the element from the scan entirely, four
+  controls that were unaudited are now audited. Verified with axe-core 4.11.3 over the page with
+  every tab and reveal open: 1 violation type, `aria-allowed-attr` on exactly the 8 radios the
+  selector covers, 0 incomplete, 30 passes.
+
+**The general lesson, and it is the same shape as the one above:** the prototype's markup is not its
+model. The disabled options needed reading its script; this needed reading its _output_. When a
+control's cardinality is in doubt, look at what the thing generates — the order wording is the
+requirement, the form is one way of collecting it.
 
 ### Dividers, alignment, and the attendance register
 

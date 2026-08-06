@@ -280,6 +280,59 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   }
 }
 
+// A revealed set of fields laid out along the row rather than stacked down the page: "Payment of
+// £[  ] on or before [D][M][Y]" reads as one term of the order and fits in one line of a panel that
+// is over 1300px wide, where stacked it took four and used the left quarter.
+//
+// Each field keeps its own `<label>`/`<legend>` above its control, so this is a layout change only
+// — nothing here touches how a field is named or grouped. The prototype gets the same shape by
+// hand-writing the row with `<span>`s of prose between the inputs and no labels at all, which is
+// where its date fields lost their accessible names (defect 1). Wrapping stock macros in a flex
+// container gets the density without that trade.
+//
+// `flex-wrap` and no fixed track widths, so the row folds onto as many lines as it needs under zoom
+// and there are no breakpoints to keep in step. The prototype's fixed pixel tracks are what made it
+// scroll sideways at 250% (defect 2).
+.pcs-inline-fields {
+  display: flex;
+  flex-wrap: wrap;
+
+  // Align on the controls, not the tops of the groups: a two-word label wraps where a one-word label
+  // does not, and `flex-start` would then leave that field's input a line below its neighbours'.
+  // `flex-end` puts every input on the same line whatever its label does above it.
+  align-items: flex-end;
+  gap: govuk-spacing(2) govuk-spacing(4);
+
+  // The gap is the row's job. Each field's own bottom margin would otherwise fall inside the row and
+  // push whatever follows the reveal 30px further down.
+  > .govuk-form-group,
+  > .govuk-form-group > .govuk-fieldset > .govuk-fieldset__legend {
+    margin-bottom: 0;
+  }
+
+  // A date input is itself a flex row of three items; the trailing margin after the year is dead
+  // space inside this row, the same as in the case-facts grid.
+  .govuk-date-input__item:last-child {
+    margin-right: 0;
+  }
+
+  .govuk-date-input__item .govuk-form-group {
+    margin-bottom: 0;
+  }
+
+  // The row is one term of the order read left to right — "Payment of £X on or before D M Y" — and
+  // a legend has to name its group, so "On or before" is a legend where "Payment of" is a plain
+  // label. `--s` renders the legend bold, which put one bold phrase mid-sentence between two regular
+  // ones and made the row read as separate questions. Regular weight is the only difference; the
+  // legend is still a legend and still names the date group.
+  //
+  // Deliberately not solved by dropping `--s` in the template: a legend with no size class renders
+  // at 24px, which is further from the label beside it than the weight ever was.
+  > .govuk-form-group > .govuk-fieldset > .govuk-fieldset__legend--s {
+    font-weight: normal;
+  }
+}
+
 // One line per party — party name, attendance options, representative's name — so the register
 // reads as a table down the page. Putting the party name in a column instead of on a heading line
 // of its own is what halves the height of this section.

@@ -31,12 +31,17 @@ export const axe_exclusions = [
   // reveal (radios.mjs), and `aria-expanded` is not an allowed attribute on `role=radio`, so axe
   // flags `aria-allowed-attr` on each one.
   //
-  // A selector rather than an id per radio. Make an order has twelve such radios, and a scan of the
-  // page as first loaded only flags one of them — axe skips hidden elements, and the other eleven
+  // A selector rather than an id per radio. Make an order has eight such radios, and a scan of the
+  // page as first loaded only flags one of them — axe skips hidden elements, and the other seven
   // sit in a closed tab panel or an unopened reveal. So an id list is not just tedious to maintain,
   // it is quietly incomplete: it grows every time a test clicks a tab or ticks a checkbox before the
   // audit runs, and the failure looks like a new accessibility defect rather than the same upstream
-  // one. Twelve ids today, and one more for every reveal added.
+  // one. Eight ids today, and one more for every reveal added.
+  //
+  // Only radios. The page's eighteen *checkbox* reveals carry the same `aria-expanded` and are not
+  // flagged, because the attribute is allowed on `role=checkbox` and not on `role=radio` — so
+  // whenever a set of options is genuinely multi-select, expressing it as checkboxes keeps those
+  // controls in the audit rather than excluded from it. That is what took this from twelve to eight.
   //
   // Scoped by `.pcs-make-order`, the class this page puts on <html>, so it excludes nothing on any
   // other page and the 26 entries above keep covering theirs. `aria-expanded` in the selector keeps

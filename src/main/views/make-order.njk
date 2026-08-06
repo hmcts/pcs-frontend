@@ -396,42 +396,46 @@
         of the panel. Everything here is optional, so nothing is lost by showing it at once.
       #}
       {% set outrightMoneyJudgmentHtml %}
-        {{ govukInput({
-          id: "outright-mj-arrears",
-          name: "outright-mj-arrears",
-          label: { text: "Judgment for arrears" },
-          classes: "govuk-input--width-5",
-          spellcheck: false,
-          inputmode: "numeric",
-          prefix: { text: "£" }
-        }) }}
+        {# The two sums are one row, as in the prototype, rather than a field and then a field. #}
+        <div class="pcs-inline-fields">
+          {{ govukInput({
+            id: "outright-mj-arrears",
+            name: "outright-mj-arrears",
+            label: { text: "Judgment for arrears" },
+            classes: "govuk-input--width-5",
+            spellcheck: false,
+            inputmode: "numeric",
+            prefix: { text: "£" }
+          }) }}
 
-        {{ govukInput({
-          id: "outright-mj-interest",
-          name: "outright-mj-interest",
-          label: { text: "Interest" },
-          classes: "govuk-input--width-5",
-          spellcheck: false,
-          inputmode: "numeric",
-          prefix: { text: "£" }
-        }) }}
+          {{ govukInput({
+            id: "outright-mj-interest",
+            name: "outright-mj-interest",
+            label: { text: "Interest" },
+            classes: "govuk-input--width-5",
+            spellcheck: false,
+            inputmode: "numeric",
+            prefix: { text: "£" }
+          }) }}
+        </div>
 
         {#
-          The prototype makes the payment plan a pair of checkboxes sharing one name, so a judge can
-          tick both a lump sum and instalments for the same debt. Radios, because it is one choice.
-          "No payment terms" is the third option rather than leaving both unticked, so the answer is
-          always explicit — govuk-frontend has no way to clear a radio group once one is chosen.
+          Checkboxes sharing one name, as the prototype has them — a lump sum and instalments can
+          both apply to the same debt (a payment now, the rest over time), so this is two options
+          rather than one choice. Same construct as the suspended tab's payment terms; the reasoning
+          is written out there.
         #}
-        {{ govukRadios({
+        {{ govukCheckboxes({
+          idPrefix: "outright-mj-plan",
           name: "outright-mj-plan",
-          classes: "govuk-radios--small",
+          classes: "govuk-checkboxes--small",
           fieldset: { legend: { text: "The above sums must be paid by", classes: "govuk-fieldset__legend--s" } },
           items: [
             {
               value: "lump",
               text: "Payment to claimant",
               conditional: {
-                html: govukInput({
+                html: '<div class="pcs-inline-fields">' + govukInput({
                   id: "outright-mj-lump-amount",
                   name: "outright-mj-lump-amount",
                   label: { text: "Payment of" },
@@ -447,14 +451,14 @@
                   id: "outright-mj-balance-date",
                   namePrefix: "outright-mj-balance-date",
                   fieldset: { legend: { text: "And the balance by (optional)", classes: "govuk-fieldset__legend--s" } }
-                })
+                }) + '</div>'
               }
             },
             {
               value: "instalments",
               text: "Instalment payments",
               conditional: {
-                html: govukInput({
+                html: '<div class="pcs-inline-fields">' + govukInput({
                   id: "outright-mj-inst-amount",
                   name: "outright-mj-inst-amount",
                   label: { text: "Instalment payments of" },
@@ -471,10 +475,9 @@
                   id: "outright-mj-inst-date",
                   namePrefix: "outright-mj-inst-date",
                   fieldset: { legend: { text: "First instalment to be paid on or before", classes: "govuk-fieldset__legend--s" } }
-                })
+                }) + '</div>'
               }
-            },
-            { value: "none", text: "No payment terms" }
+            }
           ]
         }) }}
       {% endset %}
@@ -493,7 +496,7 @@
             value: "use-occupation",
             text: "Damages for unlawful occupation",
             conditional: {
-              html: govukInput({
+              html: '<div class="pcs-inline-fields">' + govukInput({
                 id: "outright-use-occupation-rate",
                 name: "outright-use-occupation-rate",
                 label: { text: "Daily rate" },
@@ -505,7 +508,7 @@
                 id: "outright-use-occupation-from-date",
                 namePrefix: "outright-use-occupation-from-date",
                 fieldset: { legend: { text: "From", classes: "govuk-fieldset__legend--s" } }
-              })
+              }) + '</div>'
             }
           },
           {
@@ -528,13 +531,19 @@
       {#
         The prototype's label for this is the sentence "Suspended on condition of payment of current
         rent plus arrears of ... to be paid by", split across two <span>s with the input in the
-        middle and the trailing half left dangling with nothing after it. Reduced to what the field
-        holds, with the condition stated once as the legend of the payment terms below.
+        middle and the trailing half left dangling with nothing after it — the "by" is answered by
+        the payment terms below, which are a separate question, so as a label it never finishes.
+
+        The label is what the field holds; the condition it forms part of goes in a hint, worded as
+        the generated order words it ("suspended as long as the defendant pays (i) the rent as it
+        falls due plus (ii) the arrears of £X"). That keeps the whole term on screen without a
+        two-line bold label above a five-character box.
       #}
       {{ govukInput({
         id: "suspended-arrears",
         name: "suspended-arrears",
-        label: { text: "Arrears to be paid, on condition of payment of current rent", classes: "govuk-label--s" },
+        label: { text: "Arrears to be paid", classes: "govuk-label--s" },
+        hint: { text: "Possession is suspended as long as the defendant pays the current rent as it falls due, plus these arrears." },
         classes: "govuk-input--width-5",
         spellcheck: false,
         inputmode: "numeric",
@@ -542,19 +551,27 @@
       }) }}
 
       {#
-        One choice, so radios — the prototype uses two independent checkboxes, which let a judge
-        order a single payment and instalments for the same arrears.
+        Checkboxes, not radios: both can apply to the same arrears. The prototype's order preview
+        renders a single payment of £12 by one date *and* £32 a month from another against one
+        figure of arrears, as sub-paragraphs (a) and (b) of the same suspension term — so a lump sum
+        followed by instalments is a real order and this is two independent options rather than one
+        choice. That also means there is no "no payment terms" option to add: leaving both unticked
+        already says it.
+
+        Each option's fields sit on one row rather than stacked — see `pcs-inline-fields` in
+        make-order.scss.
       #}
-      {{ govukRadios({
-        name: "suspended-payment-type",
-        classes: "govuk-radios--small",
+      {{ govukCheckboxes({
+        idPrefix: "suspended-payment-terms",
+        name: "suspended-payment-terms",
+        classes: "govuk-checkboxes--small",
         fieldset: { legend: { text: "Arrears to be paid by", classes: "govuk-fieldset__legend--s" } },
         items: [
           {
             value: "one-off",
             text: "A single payment",
             conditional: {
-              html: govukInput({
+              html: '<div class="pcs-inline-fields">' + govukInput({
                 id: "suspended-oneoff-amount",
                 name: "suspended-oneoff-amount",
                 label: { text: "Payment of" },
@@ -566,14 +583,14 @@
                 id: "suspended-oneoff-date",
                 namePrefix: "suspended-oneoff-date",
                 fieldset: { legend: { text: "On or before", classes: "govuk-fieldset__legend--s" } }
-              })
+              }) + '</div>'
             }
           },
           {
             value: "instalments",
             text: "Instalment payments",
             conditional: {
-              html: govukInput({
+              html: '<div class="pcs-inline-fields">' + govukInput({
                 id: "suspended-instalment-amount",
                 name: "suspended-instalment-amount",
                 label: { text: "Payments of" },
@@ -590,7 +607,7 @@
                 id: "suspended-instalment-date",
                 namePrefix: "suspended-instalment-date",
                 fieldset: { legend: { text: "First payment by", classes: "govuk-fieldset__legend--s" } }
-              })
+              }) + '</div>'
             }
           }
         ]
@@ -631,7 +648,7 @@
             value: "use-occupation",
             text: "Damages for unlawful occupation",
             conditional: {
-              html: govukInput({
+              html: '<div class="pcs-inline-fields">' + govukInput({
                 id: "suspended-use-occupation-rate",
                 name: "suspended-use-occupation-rate",
                 label: { text: "Daily rate" },
@@ -643,7 +660,7 @@
                 id: "suspended-use-occupation-from-date",
                 namePrefix: "suspended-use-occupation-from-date",
                 fieldset: { legend: { text: "From", classes: "govuk-fieldset__legend--s" } }
-              })
+              }) + '</div>'
             }
           },
           {
