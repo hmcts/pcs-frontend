@@ -1,10 +1,16 @@
 import config from 'config';
 import { Application, Request, Response } from 'express';
 
+import { getUserType } from '../steps/utils';
+
 export default function (app: Application): void {
   app.get('/active', (req: Request, res: Response) => {
     // check session exists
     if (!req.session || !req.session.cookie) {
+      return res.status(401).send('No active session');
+    }
+
+    if (getUserType(req) === 'unauthorised') {
       return res.status(401).send('No active session');
     }
 
