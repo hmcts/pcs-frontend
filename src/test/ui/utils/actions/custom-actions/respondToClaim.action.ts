@@ -32,6 +32,7 @@ import {
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
   exceptionalHardship,
+  exemptLandLord,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
@@ -113,6 +114,7 @@ const rtcSectionByAction = new Map<string, string>([
   ['selectContactByTextMessage', 'personalDetails'],
   ['disputeClaimInterstitial', 'disputeAndTenancy'],
   ['selectLandlordRegistered', 'disputeAndTenancy'],
+  ['exemptLandLord', 'disputeAndTenancy'],
   ['selectLandlordLicensed', 'disputeAndTenancy'],
   ['selectWrittenTerms', 'disputeAndTenancy'],
   ['enterTenancyStartDetailsUnKnown', 'disputeAndTenancy'],
@@ -175,6 +177,7 @@ export class RespondToClaimAction implements IAction {
       ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
       ['repaymentsAgreed', () => this.repaymentsAgreed(fieldName as actionRecord)],
+      ['exemptLandLord', () => this.exemptLandLord(fieldName as actionData)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
@@ -594,6 +597,15 @@ export class RespondToClaimAction implements IAction {
     const mainHeader = disputeClaimInterstitial.getMainHeader(claimantsName);
     await performValidation('text', { elementType: 'heading', text: mainHeader });
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
+  }
+
+  private async exemptLandLord(exemptLandLordAnswer: actionData): Promise<void> {
+    this.recordAnswer(exemptLandLord.isYourLandlordAnExemptSubHeader, exemptLandLordAnswer);
+    await performAction('clickRadioButton', {
+      question: exemptLandLord.isYourLandlordAnExemptSubHeader,
+      option: exemptLandLordAnswer,
+    });
+    await performAction('clickButton', exemptLandLord.saveAndContinueButton);
   }
 
   private async selectLandlordRegistered(registeredData: actionData): Promise<void> {
