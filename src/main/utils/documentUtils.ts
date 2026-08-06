@@ -94,6 +94,7 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   const seen = new Set<string>();
 
   addDocumentsFromCollection(documents, seen, caseData.allDocuments, 'allDocuments');
+  addDocumentsFromCollection(documents, seen, caseData.notice_Documents, 'notice_Documents');
 
   for (const path of CASE_DETAILS_DOCUMENT_PATHS) {
     addDocumentsFromCollection(documents, seen, get(caseData, path), path);
