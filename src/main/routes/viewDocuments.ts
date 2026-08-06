@@ -92,7 +92,7 @@ export default function viewDocumentsRoutes(app: Application): void {
         const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
         const document = findCaseDocumentById((ccdCase.data ?? {}) as Record<string, unknown>, documentId);
         const filename = document?.filename || 'document';
-        const binaryUrl = document?.binaryUrl;
+        const binaryUrl = document?.binaryUrl?.trim();
 
         if (!binaryUrl) {
           return next(new HTTPError('Document not found', 404));
