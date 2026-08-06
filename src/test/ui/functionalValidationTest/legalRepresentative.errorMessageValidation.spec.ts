@@ -154,7 +154,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
 
     //the below line needs to be un-commented when HDPI-8154 bug is fixed.
     //await softErrorMessageValidation('correspondenceAddress', correspondenceAddressErrorValidation);
-    await performAction('selectCorrespondenceAddressUnKnownLR', {
+    await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
