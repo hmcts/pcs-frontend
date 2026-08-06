@@ -2,7 +2,23 @@
 
 // Height cap on the sticky case-facts panel. Doubles as the amount of scrollport the browser must
 // keep clear so focus never lands behind the panel, so both uses stay in step.
-$pcs-case-facts-max-height: 60vh;
+//
+// This has to be a length the panel actually reaches, not a generous ceiling. `scroll-padding-top`
+// makes the browser treat the whole reserved band as out of view, so anything focused inside it
+// gets scrolled clear — including by scrolling *backwards*. At `60vh` on a 1000px-tall window that
+// band was 660px while the panel was only 307px, so clicking any control in the 353px of
+// already-visible page beneath the panel yanked the page up by up to 358px. Keeping the cap close
+// to the panel's real height shrinks that band to a few pixels.
+//
+// `min()` of the two keeps both guarantees: 320px is a height the panel actually reaches, so the
+// reservation stays tight to it, and the 60vh term still stops the panel dominating a short window
+// (a 1600x600 one, or any window at high zoom) the way a bare px cap would not.
+$pcs-case-facts-max-height: min(60vh, 320px);
+
+// The panel's own padding and borders sit outside `max-height` (it is `content-box`), so the
+// reservation has to add them back or it under-reserves and focus lands behind the panel.
+// calc() because the cap is a min() and so cannot be resolved at build time.
+$pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3) * 2 + 2px});
 
 // Make an order is a judicial screen used on large desktop monitors, so it is laid out edge to
 // edge rather than using the 1020px measure the citizen journeys want for readability. Scoped to
@@ -23,8 +39,12 @@ $pcs-case-facts-max-height: 60vh;
 
 // A sticky panel covers whatever the browser scrolls into view beneath it, so keyboard focus can
 // land behind it (WCAG 2.4.11 Focus Not Obscured). Reserving the panel's height at the top of the
-// scrollport makes the browser scroll far enough that focused fields clear it. The added spacing
-// covers the panel's own padding and borders, which sit outside its max-height.
+// scrollport makes the browser scroll far enough that focused fields clear it.
+//
+// Reserve the panel's height and no more. Over-reserving does not just waste space: the browser
+// scrolls anything focused inside the reserved band clear of it in whichever direction is shorter,
+// so a band taller than the panel drags the page backwards when the judge clicks a control that
+// was already perfectly visible. See $pcs-case-facts-reserve.
 //
 // This has to sit on the scrollport itself, which is the root element — scroll-padding on the page
 // wrapper has no effect. Scoped by a class on <html> so the citizen journeys are unaffected.
@@ -32,7 +52,7 @@ $pcs-case-facts-max-height: 60vh;
 // govuk-frontend sets `scroll-padding-top: 0` on `.govuk-template:not(:has(.govuk-exit-this-page))`
 // for its own sticky component, and that outranks a lone class, so match its specificity here.
 .govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)) {
-  scroll-padding-top: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(6) * 2});
+  scroll-padding-top: $pcs-case-facts-reserve;
 
   // Below desktop the panel is no longer pinned, so nothing needs reserving.
   @include govuk-media-query($until: desktop) {
@@ -136,8 +156,9 @@ $pcs-case-facts-max-height: 60vh;
 }
 
 // The notes field is the panel's second column, so it is already as tall as the facts grid beside
-// it. Letting the textarea fill that height costs nothing and gives the judge a usefully bigger
-// box. `rows` stays as the floor for when the panel is a single column.
+// it. Letting the textarea fill that height costs nothing and gives the judge a bigger box, and it
+// lines the bottom of the box up with the bottom of the last row of inputs. `rows` stays as the
+// floor for when the panel is a single column.
 @include govuk-media-query($from: desktop) {
   .pcs-case-facts__layout > .govuk-form-group {
     display: flex;
@@ -146,6 +167,22 @@ $pcs-case-facts-max-height: 60vh;
 
   .pcs-case-facts__layout textarea {
     flex: 1 1 auto;
+
+    // govuk-frontend gives a textarea 30px of bottom margin, for the next question on a citizen
+    // page. Here there is nothing below it, and the margin made this column 30px taller than the
+    // facts grid beside it — so the grid stretched to match and spread the difference across its
+    // three rows, which is why the rows were 78px for 70px of content and the box still stopped
+    // 22px short of the last input. Removing it aligns both columns' bottoms exactly.
+    margin-bottom: 0;
+
+    // The box's height is the layout's job now — it tracks the facts grid beside it. A drag handle
+    // would let the judge break that alignment, and because the panel is capped at 60vh it would
+    // mostly just make the panel scroll internally rather than show more text.
+    //
+    // Only removed at desktop, where the box is already large. Below that the panel is unpinned and
+    // the textarea is back to its `rows` floor, so resizing is still the useful escape hatch it
+    // normally is — which matters at high zoom, where fewer characters fit per line.
+    resize: none;
   }
 }
 

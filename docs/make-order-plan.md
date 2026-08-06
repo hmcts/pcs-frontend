@@ -160,7 +160,7 @@ Given the audience, all of these are reasonable and are kept:
 - the information density itself
 - `govuk-tabs` for order type
 - the wide, full-bleed layout
-- the sticky case-facts panel (331px after the density work, 37% of a 900px viewport, and capped
+- the sticky case-facts panel (307px after the density work, 34% of a 900px viewport, and capped
   at `60vh` however far the page is zoomed)
 
 ## Decisions
@@ -280,10 +280,30 @@ So this is deliberately marked temporary in the SCSS, and the fix is deleting tw
 answers when we come back to it: shorter labels (`D` / `M` / `Y`), a single visible hint like
 `DD MM YYYY` under the group, or accepting the 30px.
 
-**Hearing notes fills its column.** The notes field is the panel's second column, so it is already
-as tall as the facts grid beside it — the height was simply going unused below a `rows="8"`
-textarea. Letting it flex costs nothing and gives the judge a bigger box (204px → 234px). `rows`
-stays as the floor for when the panel collapses to one column.
+**Hearing notes fills its column, and its bottom lines up with the last row of inputs.** The notes
+field is the panel's second column, so it is already as tall as the facts grid beside it — the
+height was going unused below a `rows="8"` textarea. Letting it flex costs nothing and gives the
+judge a bigger box (204px → 210px). `rows` stays as the floor for when the panel collapses to one
+column.
+
+Getting the two columns to end level turned out to be one line, and the cause was worth
+understanding. govuk-frontend gives a textarea `30px` of bottom margin, for the next question on a
+citizen page. Here there is nothing below it, so that margin made the notes column 30px taller than
+the facts grid — the grid then **stretched to match and spread the difference across its three
+rows**, which is why the rows measured 78px for 70px of content while the box still stopped 22px
+short of "Arrears today". Removing the margin aligns both bottoms exactly and takes another 24px off
+the panel.
+
+Worth noting as a shape: a stray margin on one grid item does not just add its own height, it
+changes the row sizing of everything beside it. That is invisible in a screenshot and obvious in
+`gridTemplateRows`.
+
+**No resize handle on the notes box at desktop.** Its height now tracks the facts grid beside it, and
+a drag handle would let the judge break that alignment — and since the panel is capped at `60vh`,
+dragging would mostly just make the panel scroll internally rather than reveal more text. Removed
+only at desktop: below that the panel is unpinned and the textarea is back to its `rows` floor, so
+resizing stays the useful escape hatch it normally is, which matters at high zoom where fewer
+characters fit per line.
 
 **3. Attendance: the party name had its own line.** This is the interesting one. The register wants
 one scannable row per party — name, attendance options, representative — but a `<fieldset>`'s
@@ -313,10 +333,10 @@ self-evident to a sighted judge, and five repetitions cost a line each; screen r
 get it, expanded to "Name of representative for Defendant 1: David Patel" so it is unambiguous when
 reached out of context.
 
-**Result:** case-facts panel **572px → 331px** against the prototype's 329px, attendance rows
-**136px → 78px** each, page **3241px → 2727px**. Four columns, every date on one line, and parity
-with the prototype's density — without its accessibility defect, since the date labels are hidden
-rather than absent.
+**Result:** case-facts panel **572px → 307px** against the prototype's 329px, attendance rows
+**136px → 78px** each, page **3241px → 2703px**. Four columns, every date on one line, the notes box
+ending level with the last row of inputs, and better than parity with the prototype's density —
+without its accessibility defect, since the date labels are hidden rather than absent.
 
 **Re-measure, don't eyeball.** Every one of these was invisible in a screenshot and obvious in the
 numbers — the seven-pixel floor especially. Worth re-running `panelH` / `gridTemplateColumns` /
@@ -339,7 +359,8 @@ All at 1600×900 unless noted.
   `legend`).
 - Defect 2 fixed for our content (`#main-content` `scrollWidth` 280 at a 320px viewport, 0
   overflowing descendants, panel unpinned, grid down to one column).
-- Panel height 331px, grid 4 columns at 1013px, all 4 dates on one line each.
+- Panel height 307px, grid 4 columns at 1013px, all 4 dates on one line each, notes box bottom
+  level with the last row of inputs.
 - Attendance grouping checked per row: 5 `role="group"` elements, each with a unique
   `aria-labelledby` target and its own radio `name`.
 
