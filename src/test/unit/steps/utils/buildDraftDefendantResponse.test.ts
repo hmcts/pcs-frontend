@@ -125,6 +125,56 @@ describe('saveDraftDefendantResponse wrapper', () => {
 
     expect(JSON.stringify(response)).toBe(snapshot);
   });
+
+  it('deep-merges defendantResponses when refreshing validatedCase after draft save', async () => {
+    const req = {
+      session: { user: { accessToken: 'tok' } },
+      res: {
+        locals: {
+          validatedCase: {
+            id: '123',
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  writtenTerms: 'NO',
+                  otherConsiderations: 'NO',
+                },
+                claimantOrganisations: [{ value: 'Claimant Ltd' }],
+              },
+            },
+          },
+        },
+      },
+    } as unknown as Request;
+
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValueOnce({
+      id: '123',
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            exemptLandlord: 'YES',
+          },
+          defendantContactDetails: {
+            party: { phoneNumber: '07123456789' },
+          },
+        },
+      },
+    });
+
+    await saveDraftDefendantResponse(req, {
+      defendantResponses: { exemptLandlord: 'YES', writtenTerms: 'NO' },
+      defendantContactDetails: { party: { phoneNumber: '07123456789' } },
+    });
+
+    expect(req.res?.locals?.validatedCase?.defendantResponses).toEqual({
+      writtenTerms: 'NO',
+      otherConsiderations: 'NO',
+      exemptLandlord: 'YES',
+    });
+    expect(req.res?.locals?.validatedCase?.possessionClaimResponse?.claimantOrganisations).toEqual([
+      { value: 'Claimant Ltd' },
+    ]);
+  });
 });
 
 describe('buildDraftDefendantResponse — any mid-section submission auto-clears section confirmation', () => {
