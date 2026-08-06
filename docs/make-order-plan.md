@@ -183,8 +183,8 @@ Branch `feat/make-order-shell`.
 
 | File                                          | Lines |                                                                                                                                           |
 | --------------------------------------------- | ----: | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/main/views/make-order.njk`               |   536 | The shell. Extends `template.njk`, not `stepsTemplate.njk` — the latter forces a two-thirds/one-third grid that fights a wide dense page. |
-| `src/main/assets/scss/make-order.scss`        |   132 | `pcs-`-prefixed, `govuk-spacing()` / `govuk-colour()` / `govuk-media-query()` throughout, no raw values.                                  |
+| `src/main/views/make-order.njk`               |  1095 | The shell. Extends `template.njk`, not `stepsTemplate.njk` — the latter forces a two-thirds/one-third grid that fights a wide dense page. |
+| `src/main/assets/scss/make-order.scss`        |   356 | `pcs-`-prefixed, `govuk-spacing()` / `govuk-colour()` / `govuk-media-query()` throughout, no raw values.                                  |
 | `src/main/routes/makeOrder.ts`                |    22 | Auto-registered by the glob in `app.ts`. Builds the xui header/footer models.                                                             |
 | `src/test/unit/routes/makeOrder.test.ts`      |    65 | Registration, render, and header-model-from-roles.                                                                                        |
 | `src/main/constants/caseRoutes.ts`            |    +2 | `MAKE_ORDER_ROUTE`.                                                                                                                       |
@@ -342,6 +342,112 @@ without its accessibility defect, since the date labels are hidden rather than a
 numbers — the seven-pixel floor especially. Worth re-running `panelH` / `gridTemplateColumns` /
 `gridTemplateRows` after any change to this panel.
 
+## Filling in every field
+
+The first build scaffolded each tab with a couple of representative fields. It now carries **every
+field the prototype has** — all five order-type panels, the full costs list, and the attendance and
+recitals sections. Still no bespoke JavaScript: reveals and tabs are stock govuk-frontend behaviour.
+
+Coverage was checked by extracting every `id` from the prototype's template and mapping each one to
+ours, rather than by reading down the page. The only prototype fields deliberately absent are the
+ones belonging to excluded features — order preview, the template library, the ProseMirror editor,
+comments, and the `order-type-field` / `form-action` hidden inputs that exist to work around
+[defect 3](#3-hidden-tab-panels-submit-their-inputs).
+
+### Where this departs from the prototype, and why
+
+Each of these is also commented at the point it happens in the template.
+
+| Departure                                                                                                                           | Reason                                                                                                                                                                                                                                                                                                         |
+| ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Conditional reveals flattened to one level.** The prototype's outright money judgment nests them four deep.                       | Nesting reveals is not a pattern govuk-frontend supports. A judge tabbing through has no way to know that ticking one box grew three more levels below, and each level indents further until fields sit off to the right of the panel. Everything there is optional, so nothing is lost by showing it at once. |
+| **Payment plans are radios, not checkboxes sharing a name.**                                                                        | The prototype's markup lets a judge order both a lump sum _and_ instalments for the same debt. It is one choice. "No payment terms" is an explicit third option rather than leaving all unticked, since a radio group cannot be cleared once answered.                                                         |
+| **Reveals nested inside the radio item they belong to** (adjournment), not siblings of the radio group.                             | The prototype's `aria-controls` points forwards out of the fieldset, and it then needs an `<h4>` in each block to say which branch you are looking at. Nested, each block is announced as part of the option that revealed it and the headings become unnecessary.                                             |
+| **One shared adjournment hearing date**, not one per "Adjourned to" option.                                                         | The prototype has three day/month/year triples of which at most one can ever be filled.                                                                                                                                                                                                                        |
+| **Real labels everywhere an `aria-label` was doing the work alone** — e.g. a `Time estimate` fieldset over the amount and its unit. | An `aria-label`-only control has nothing on screen naming it. Verified: 0 `aria-label`-only controls and 0 unlabelled controls on the page.                                                                                                                                                                    |
+| **Costs in one column, not two.**                                                                                                   | The prototype's split falls between "Cl pay Def summary costs" and the three same-terms options, so it does not divide the list by anything, and arrow keys walk the radios in DOM order wherever they are painted. Ordered by who pays, with the conditional ones last.                                       |
+| **Costs amounts as reveals under their radio**, not inline on the radio's line.                                                     | Inline needs the prototype's `data-costs-selects` script (typing in a box selects its radio) to be coherent, and still leaves the box unlabelled on screen.                                                                                                                                                    |
+| **Hearing format stays checkboxes.**                                                                                                | Not a departure so much as a decision worth recording: a hearing genuinely can be more than one format.                                                                                                                                                                                                        |
+
+### The disabled options — a wrong call, corrected
+
+The prototype ships four options `disabled`: three costs orders "payable on the same terms as the
+suspension", and "Suspended on the same terms as above" in the suspended tab. These were first left
+out here, on the reasoning that an option that cannot be chosen is not a field.
+
+**That was wrong, and reading the prototype's script settles it.** Both sets are enabled
+conditionally, not permanently disabled:
+
+- `suspended-mj-same-terms` is enabled once "Money judgment for the arrears above" is ticked
+  (`make-order.js:4750`).
+- The three costs options are enabled while the Suspended tab is the active one
+  (`make-order.js:4683`).
+
+So they are real fields with a dependency. Both are restored, expressed differently in each case
+because the dependencies are different shapes:
+
+- The suspended one is a **conditional reveal** on the checkbox it depends on — the same dependency
+  in markup rather than in script.
+- The three costs ones **cannot** be, because the dependency crosses sections: they hang off which
+  order-type tab is active. That needs script or a server round-trip and there is neither yet, so
+  all eleven costs options are enabled and the three carry a hint saying they need a suspended
+  order. One more combination for the eventual validation to reject, which is honest for a page
+  where nothing is validated yet.
+
+Shipping them `disabled` with no script was never an option: a disabled control is not announced as
+available and cannot be reached by keyboard, so it would put options on the page that no judge could
+use or discover, with nothing to say what would unlock them.
+
+**The general lesson:** "the prototype disables this" is a statement about its default markup, not
+about its behaviour. Check the script before concluding a control is dead.
+
+### Dividers, alignment, and the attendance register
+
+A run of smaller visual fixes, all in `make-order.scss` and all commented there:
+
+- **Section and question dividers are CSS borders, not `<hr>` elements.** An `<hr>` is a semantic
+  thematic break, so a screen reader announces one — the prototype has four in a single tab panel —
+  for something carrying no meaning the following heading has not already given. A border draws the
+  same line silently. Every divider rule sits on `:not(:first-child)` or a sibling combinator, so no
+  line is ever stranded above the first block of a group or below the last.
+- **`Details of grounds (optional)` gets no divider above it.** It qualifies the Grounds radios
+  rather than asking anything new. Marked `.pcs-continues-question` — named for the relationship, so
+  it still reads correctly if the divider is ever drawn another way.
+- **Doubled lines, found by scanning for them rather than by eye.** A general check for near-full-width
+  borders within 50px of each other found three: the reported one under the last attendance row (a
+  defect in our own code — `border-bottom` on every row drew a line below the last, stranded 30px
+  above the Recitals rule) plus two more the screenshot did not show, where a bordered block's own
+  bottom edge sat 30px above a heading's rule. Now 0.
+- **Party names sit level with the radios beside them** via a 10px offset that is derived, not
+  guessed: 7px of padding on `.govuk-radios__label` plus the 2.5px its 25px line box is centred by
+  inside the 44px-tall item the radio input creates. `align-items: start` rather than `center`,
+  because `center` levels the placeholder names but drifts 25px as soon as a party name wraps — and
+  real case data will have longer names than "David Patel".
+- **`Name:` is visible beside the box** rather than above it, the one place this page departs from
+  govuk-frontend's stacked label. Above would cost every row a second line; beside, the row height is
+  unchanged. Safe here because the field is a short, familiar, single-line value with no hint and no
+  error state — it would not be safe on a citizen question where the label carries the explanation.
+  The accessible name stays party-specific ("Name of representative for Claimant 1: …") so the five
+  boxes are distinguishable out of context.
+- **No `Staff message` heading.** The checkbox's own label says it, so a heading above it makes a
+  screen reader user hear the words twice before reaching the control.
+
+### One axe exclusion instead of a growing id list
+
+`axe-exclusions.config.ts` now carries a single page-scoped selector,
+`.pcs-make-order .govuk-radios__input[aria-expanded]`, replacing the `#outright-possession-2` entry.
+
+An id list is not just tedious here, it is **quietly incomplete**. The page has twelve reveal
+radios, but a scan of it as first loaded flags only one: axe skips hidden elements, and the other
+eleven sit in a closed tab panel or an unopened reveal. So the list would grow whenever a test
+clicked a tab or ticked a checkbox before the audit ran, and each new entry would look like a fresh
+accessibility defect rather than the same upstream one.
+
+Worth knowing, and now recorded in that file: an `exclude` drops the element from the scan
+**entirely** rather than waiving the one rule, so those radios are no longer checked for labelling or
+contrast either. That is equally true of the 26 pre-existing entries and was written down nowhere.
+Their labelling is covered by the browser checks on this page instead.
+
 ## Verification
 
 All at 1600×900 unless noted.
@@ -388,13 +494,14 @@ Two non-obvious details, both commented in the SCSS:
 
 ### Two axe results that are not defects in this page
 
-1. **`aria-allowed-attr` / `aria-expanded` on `#outright-possession-2` — upstream
+1. **`aria-allowed-attr` / `aria-expanded` on conditional-reveal radios — upstream
    govuk-frontend.** `radios.mjs:64` sets `aria-expanded` unconditionally on any radio with a
    conditional reveal, and `aria-expanded` is not permitted on `role=radio`. This affects the
    standard GDS conditional-reveal pattern generally — which is why
    `src/test/ui/config/axe-exclusions.config.ts` already carried **26 exclusions for exactly
-   this** before this page existed. Added one more, following the existing convention and comment
-   format.
+   this** before this page existed. Covered here by one page-scoped selector rather than an id per
+   radio; see [above](#one-axe-exclusion-instead-of-a-growing-id-list) for why the id list was the
+   wrong shape.
 
    _An earlier guess that this was caused by nesting a `govukDateInput` inside the conditional was
    wrong; reading `radios.mjs` settles it._
@@ -454,6 +561,14 @@ extracted.
 - **i18n extraction** to `makeOrder.json` (en/cy) once the content settles.
 - **Progressive enhancement** — date quick-fill pills, case-facts collapse toggle,
   not-present/name interlock.
+- **The three "same terms as the suspension" costs options** — currently always enabled with a hint
+  saying they need a suspended order, because the dependency is on which order-type tab is active
+  and there is no script or POST handling yet. Once there is either, this becomes a validation rule
+  (or a reveal, if costs ever moves inside the tabs). See
+  [the disabled options](#the-disabled-options--a-wrong-call-corrected).
+- **Validation generally** — nothing on this page is validated. The field set is now complete, so
+  the combinations that need rejecting are knowable: mutually exclusive order types, sums without
+  payment terms, dates in the past.
 - **Order preview** — generated order wording, template library, review/draft modes. The large
   piece of work, deliberately excluded from iteration 1.
 - **Data population and CCD wiring.**
