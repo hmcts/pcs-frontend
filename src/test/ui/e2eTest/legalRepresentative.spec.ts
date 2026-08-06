@@ -1,7 +1,6 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
-  contactPreferenceEmailOrPostLR,
   contactPreferencesTelephoneLR,
   contactPreferencesTextMessageLR,
   correspondenceAddressLR,
