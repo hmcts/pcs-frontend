@@ -108,16 +108,24 @@ $pcs-case-facts-max-height: 60vh;
     }
   }
 
-  // Day/month/year sit directly under a legend that already names the field, so they need only
-  // enough separation to read as labels rather than 5px of it, three times per date.
+  // TEMPORARY, and to be revisited — see docs/make-order-plan.md.
   //
-  // These labels are kept at their stock 19px. Shrinking them would buy another 8px, and the
-  // prototype went further and omitted them entirely — which is defect 1, the reason a screen
-  // reader user heard "Day, Month, Year" six times with nothing to tell the groups apart. The
-  // remaining height difference against the prototype is almost exactly these labels, and it is
-  // the right trade.
+  // The visible Day/Month/Year labels are the last thing between us and the prototype's panel
+  // height, at roughly 30px per row of dates. Hidden rather than deleted: the prototype deleted
+  // them outright, which is defect 1 — a screen reader user then hears "Day, Month, Year" six
+  // times with nothing to tell the groups apart. Visually hiding keeps each input's accessible
+  // name intact, so this is a visual decision only, not an accessibility regression.
+  //
+  // It is still a real cost to sighted users: field order becomes something you infer from the
+  // input widths (2, 2, 4 characters) rather than read, which is a guess in any locale that writes
+  // dates month-first. Delete these two rules to bring the labels back.
   .govuk-date-input__label {
-    margin-bottom: 2px;
+    @include govuk-visually-hidden;
+  }
+
+  // Nothing above the inputs now, so the date row sits directly under the legend.
+  .govuk-date-input__item .govuk-form-group {
+    margin-bottom: 0;
   }
 
   // The column gap belongs between the date parts, not after the last one, where it is dead space

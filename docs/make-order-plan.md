@@ -110,7 +110,12 @@ apart.
 
 **Fixed.** `govukDateInput` groups each triple in a `fieldset` with a `legend` naming the field;
 day/month/year keep plain `<label>`s; no `aria-label` anywhere. Verified: 18 date inputs, none
-with `aria-label`, all 6 groups in a fieldset with a legend.
+with `aria-label`, all groups in a fieldset with a legend.
+
+The day/month/year labels are currently **visually hidden** for density — see
+[Density](#daymonthyear-labels--visually-hidden-and-to-be-revisited). That keeps the accessible
+names the prototype threw away, so this defect stays fixed; it is a visual trade-off, flagged as
+temporary.
 
 This is exactly the class of bug that creeps in when you hand-write markup instead of using the
 macros, which is why the template uses macros throughout.
@@ -155,7 +160,7 @@ Given the audience, all of these are reasonable and are kept:
 - the information density itself
 - `govuk-tabs` for order type
 - the wide, full-bleed layout
-- the sticky case-facts panel (361px after the density work, 40% of a 900px viewport, and capped
+- the sticky case-facts panel (331px after the density work, 37% of a 900px viewport, and capped
   at `60vh` however far the page is zoomed)
 
 ## Decisions
@@ -244,19 +249,36 @@ suits a page asking one question at a time; inside a dense reference panel it on
 screen. Three separate margins were adding up, and it took a DOM diff against the prototype's panel
 to see which:
 
-| Where                        | Was                 | Now              | Why                                                                                                                                                                                                                                  |
-| ---------------------------- | ------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Between grid rows            | `30px` field margin | `15px` `row-gap` | A margin on the fields also applies to the **last** row, where the space falls below the panel's final row and is dead. Making it the grid's `row-gap` gives the same spacing between rows and one less row's worth of panel height. |
-| Under each field's own label | `10px`              | `5px`            | Generous for one question, loose with twelve stacked. The label still clears its control by 5px — the same gap govuk-frontend uses under day/month/year — so nothing reads as cramped.                                               |
-| Under Day / Month / Year     | `5px`               | `2px`            | These sit directly beneath a legend that already names the field, so they need only enough separation to read as labels — three times per date, six dates.                                                                           |
+| Where                        | Was                 | Now                | Why                                                                                                                                                                                                                                  |
+| ---------------------------- | ------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Between grid rows            | `30px` field margin | `15px` `row-gap`   | A margin on the fields also applies to the **last** row, where the space falls below the panel's final row and is dead. Making it the grid's `row-gap` gives the same spacing between rows and one less row's worth of panel height. |
+| Under each field's own label | `10px`              | `5px`              | Generous for one question, loose with twelve stacked. The label still clears its control by 5px — the same gap govuk-frontend uses under day/month/year — so nothing reads as cramped.                                               |
+| Under Day / Month / Year     | `5px`               | hidden (see below) | These sat directly beneath a legend that already names the field.                                                                                                                                                                    |
 
-**The prototype is compact partly because it cheats.** Its rows are 87px against our 97px, and the
-entire difference is that **it has no Day/Month/Year labels at all** — which is
-[defect 1](#1-date-inputs-announce-the-wrong-name--wcag-131), the reason a screen reader user heard
-"Day, Month, Year" six times with nothing to tell the groups apart. Shrinking those labels to 16px
-was measured and would buy another 8px; they are kept at their stock 19px. So full parity with the
-prototype's panel height is not available to us, and shouldn't be: ~10px per date row is the price
-of the labels being there, and it is the right trade.
+### Day/Month/Year labels — visually hidden, and to be revisited
+
+After the three margins above, the panel was 361px against the prototype's 329px, and the whole
+remaining difference was the visible Day/Month/Year labels — about 30px per row of dates. **The
+prototype has no such labels at all**, which is
+[defect 1](#1-date-inputs-announce-the-wrong-name--wcag-131): with them deleted, a screen reader
+user hears "Day, Month, Year" six times with nothing to tell the groups apart.
+
+The decision was to close that last gap for now. They are **visually hidden, not deleted** — so
+every input keeps its accessible name and its legend, and this is a purely visual change rather than
+a re-introduction of defect 1. Verified after the change: 4 date groups, every input still resolving
+a `Day` / `Month` / `Year` label, no `aria-label` anywhere, axe still clean.
+
+It is not free, though, and the cost falls on sighted users rather than screen reader users:
+
+- Field **order** becomes something you infer from the input widths (2, 2, 4 characters) rather
+  than read. That is a guess, and a wrong one in any locale that writes dates month-first.
+- It leans on a convention judges will learn quickly, which is a fair bet for this audience — but
+  it is still a learned convention rather than a visible one, and date-order errors on a possession
+  order are consequential.
+
+So this is deliberately marked temporary in the SCSS, and the fix is deleting two rules. Better
+answers when we come back to it: shorter labels (`D` / `M` / `Y`), a single visible hint like
+`DD MM YYYY` under the group, or accepting the 30px.
 
 **Hearing notes fills its column.** The notes field is the panel's second column, so it is already
 as tall as the facts grid beside it — the height was simply going unused below a `rows="8"`
@@ -291,9 +313,10 @@ self-evident to a sighted judge, and five repetitions cost a line each; screen r
 get it, expanded to "Name of representative for Defendant 1: David Patel" so it is unambiguous when
 reached out of context.
 
-**Result:** case-facts panel **572px → 361px** against the prototype's 329px, attendance rows
-**136px → 78px** each, page **3241px → 2757px**. Four columns, dates on one line, and the remaining
-32px of panel height is the accessible date labels the prototype omits.
+**Result:** case-facts panel **572px → 331px** against the prototype's 329px, attendance rows
+**136px → 78px** each, page **3241px → 2727px**. Four columns, every date on one line, and parity
+with the prototype's density — without its accessibility defect, since the date labels are hidden
+rather than absent.
 
 **Re-measure, don't eyeball.** Every one of these was invisible in a screenshot and obvious in the
 numbers — the seven-pixel floor especially. Worth re-running `panelH` / `gridTemplateColumns` /
@@ -316,7 +339,7 @@ All at 1600×900 unless noted.
   `legend`).
 - Defect 2 fixed for our content (`#main-content` `scrollWidth` 280 at a 320px viewport, 0
   overflowing descendants, panel unpinned, grid down to one column).
-- Panel height 361px, grid 4 columns at 1013px, all 6 dates on one line each.
+- Panel height 331px, grid 4 columns at 1013px, all 4 dates on one line each.
 - Attendance grouping checked per row: 5 `role="group"` elements, each with a unique
   `aria-labelledby` target and its own radio `name`.
 
@@ -403,6 +426,9 @@ extracted.
 
 ### Next iterations
 
+- **Day/Month/Year labels** — currently visually hidden for density. Decide between short labels
+  (`D` / `M` / `Y`), a single `DD MM YYYY` hint under the group, or restoring them and accepting
+  ~30px per date row. See [Density](#daymonthyear-labels--visually-hidden-and-to-be-revisited).
 - **Order-type submit semantics** — read the active panel server-side. No hidden mirror field.
 - **i18n extraction** to `makeOrder.json` (en/cy) once the content settles.
 - **Progressive enhancement** — date quick-fill pills, case-facts collapse toggle,
