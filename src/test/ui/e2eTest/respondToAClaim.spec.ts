@@ -744,7 +744,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
-    await performAction('enterNoticeDateKnown');
+    await performAction('enterNoticeDateKnown', {
+      showNoticeDocumentLink: true,
+      noticeMethodPayload: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy,
+    });
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -1492,6 +1495,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       day: '25',
       month: '2',
       year: '2020',
+      showNoticeDocumentLink: true,
+      noticeMethodPayload: submitCaseApiData.submitCasePayload,
     });
     await performAction('rentArrears', {
       option: rentArrears.noRadioOption,
