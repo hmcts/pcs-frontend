@@ -597,16 +597,35 @@
       }) }}
 
       {#
-        The prototype's "Suspended on the same terms as above" is permanently disabled, so it can
-        never be ticked and a keyboard user cannot reach it. Left out rather than copied: an option
-        that cannot be chosen is not a field. Worth asking what it was meant to do.
+        "Suspended on the same terms as above" only makes sense once there is a money judgment for it
+        to suspend, so the prototype ships it `disabled` and its script enables it when "Money
+        judgment for the arrears above" is ticked. Here it is a reveal on that option instead, which
+        is the same dependency expressed in markup rather than in script: no field, then the field —
+        rather than a field that is visible but unusable and gives no reason why.
+
+        A disabled control is also not announced as available and cannot be reached by keyboard, so
+        without the script there is nothing to tell a judge what would unlock it. This page has no
+        script yet, which is exactly why it cannot be copied as-is.
       #}
+      {% set suspendedSameTermsHtml %}
+        {{ govukCheckboxes({
+          idPrefix: "suspended-mj-same-terms",
+          name: "suspended-mj-same-terms",
+          classes: "govuk-checkboxes--small",
+          items: [{ value: "yes", text: "Suspended on the same terms as above" }]
+        }) }}
+      {% endset %}
+
       {{ govukCheckboxes({
         idPrefix: "suspended-options",
         name: "suspended-options",
         classes: "govuk-checkboxes--small",
         items: [
-          { value: "money-judgment-arrears", text: "Money judgment for the arrears above" },
+          {
+            value: "money-judgment-arrears",
+            text: "Money judgment for the arrears above",
+            conditional: { html: suspendedSameTermsHtml }
+          },
           { value: "money-claim-adjourned", text: "Money claim adjourned generally with liberty to restore" },
           {
             value: "use-occupation",
@@ -916,6 +935,116 @@
 
   <h2 class="govuk-heading-l govuk-!-margin-top-6">Costs</h2>
 
+  {#
+    One costs order per case, so these are radios sharing `costs-choice`, as in the prototype.
+
+    Three of the ten are "payable on the same terms as the suspension", which only means anything
+    when the order itself is a suspended one. The prototype ships them `disabled` and its script
+    enables them while the Suspended tab is the active one. That cross-section dependency needs
+    either script or a server round-trip, and there is neither yet, so all ten are enabled here and
+    the three carry a hint saying what they require. A disabled radio is not announced as available
+    and cannot be reached by keyboard, so shipping them disabled with no script would put three
+    options on the page that no judge could ever use or find out about.
+
+    Which is also the honest position for iteration 1: nothing is validated yet, so this is one more
+    combination the eventual validation has to reject, not a special case.
+  #}
+  {% set costsSameTermsHint = "Only available with a suspended possession order." %}
+
+  {#
+    The amounts sit under the radio they belong to as a conditional reveal. The prototype puts each
+    one inline on the radio's own line, labelled only by an aria-label, and drives the pairing with
+    a `data-costs-selects` attribute and script — typing in a box selects its radio. Inline is more
+    compact, but it needs the script to be coherent, and it leaves the box unlabelled on screen.
+    Revealed below, the amount appears only when its option is chosen and carries a real label.
+  #}
+  {% set costsChoiceItems = [
+    {
+      value: "def-pay-cl-fixed",
+      text: "Defendant pays claimant's fixed costs",
+      conditional: {
+        html: govukInput({
+          id: "costs-def-pay-cl-fixed-amount",
+          name: "costs-def-pay-cl-fixed-amount",
+          label: { text: "Fixed costs of" },
+          classes: "govuk-input--width-5",
+          spellcheck: false,
+          inputmode: "numeric",
+          prefix: { text: "£" }
+        })
+      }
+    },
+    {
+      value: "def-pay-cl-summary",
+      text: "Defendant pays claimant's summary assessed costs",
+      conditional: {
+        html: govukInput({
+          id: "costs-def-pay-cl-summary-amount",
+          name: "costs-def-pay-cl-summary-amount",
+          label: { text: "Summary assessed costs of" },
+          classes: "govuk-input--width-5",
+          spellcheck: false,
+          inputmode: "numeric",
+          prefix: { text: "£" }
+        })
+      }
+    },
+    {
+      value: "cl-pay-def-summary",
+      text: "Claimant pays defendant's summary assessed costs",
+      conditional: {
+        html: govukInput({
+          id: "costs-cl-pay-def-summary-amount",
+          name: "costs-cl-pay-def-summary-amount",
+          label: { text: "Summary assessed costs of" },
+          classes: "govuk-input--width-5",
+          spellcheck: false,
+          inputmode: "numeric",
+          prefix: { text: "£" }
+        })
+      }
+    },
+    { value: "in-case", text: "Costs in the case" },
+    { value: "reserved", text: "Costs reserved" },
+    { value: "no-order", text: "No order as to costs" },
+    { value: "public-funding", text: "Public funding assessment of the defendant's costs" },
+    {
+      value: "same-terms",
+      text: "Costs payable on the same terms as the suspension",
+      hint: { text: costsSameTermsHint }
+    },
+    {
+      value: "fixed-same-terms",
+      text: "Defendant pays claimant's fixed costs, payable on the same terms as the suspension",
+      hint: { text: costsSameTermsHint }
+    },
+    {
+      value: "summary-same-terms",
+      text: "Defendant pays claimant's summary assessed costs, payable on the same terms as the suspension",
+      hint: { text: costsSameTermsHint }
+    },
+    {
+      value: "other",
+      text: "Other",
+      conditional: {
+        html: govukInput({
+          id: "costs-other-text",
+          name: "costs-other-text",
+          label: { text: "Costs order" },
+          classes: "govuk-input--width-20"
+        })
+      }
+    }
+  ] %}
+
+  {#
+    The prototype splits these across two hand-built columns. One column here: its two are not two
+    kinds of costs order — the split falls between "Cl pay Def summary costs" and the three
+    same-terms options with no relationship to the seven on the left — so reading order down the
+    left column then back up to the right is arbitrary, and a keyboard user's arrow keys walk the
+    radios in DOM order regardless of where they are painted. Grouped by who pays instead, with the
+    conditional ones last, which is an order a judge can predict.
+  #}
   {{ govukCheckboxes({
     idPrefix: "costs",
     name: "costs",
@@ -924,13 +1053,12 @@
       value: "yes",
       text: "Costs",
       conditional: {
-        html: govukInput({
-          id: "costs-amount",
-          name: "costs-amount",
-          label: { text: "Amount" },
-          classes: "govuk-input--width-5",
-          spellcheck: false,
-          prefix: { text: "£" }
+        html: govukRadios({
+          idPrefix: "costs-choice",
+          name: "costs-choice",
+          classes: "govuk-radios--small",
+          fieldset: { legend: { text: "Costs order", classes: "govuk-visually-hidden" } },
+          items: costsChoiceItems
         })
       }
     }]
