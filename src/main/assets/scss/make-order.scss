@@ -306,6 +306,31 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
 }
 
 // The name field is the last column, so its own bottom margin would only add row height.
+//
+// Its label sits beside the box rather than above it, which is the one place this page departs from
+// the stacked label govuk-frontend gives you. Above the box would cost every row a second line and
+// undo the density this layout exists for; beside it, the row height is unchanged. Safe to do here
+// because the field is a name — a short, familiar, single-line value with no hint and no error
+// state. It would not be safe on a citizen question, where the label often carries the explanation.
 .pcs-attendance__row .govuk-form-group {
+  display: flex;
+  align-items: baseline;
+  gap: govuk-spacing(2);
   margin-bottom: 0;
+}
+
+// Baseline alignment on the row above lines the label up with the text the judge types, rather than
+// with the top or middle of the box, so "Name:" and the value sit on one line.
+//
+// The label must not shrink or wrap: it is two words, and a wrapped "Name:" would push the box
+// down and break the row. The input keeps its govuk-input--width-20 as the ceiling but is allowed
+// to shrink below it, so the pair fits the 20em column and still narrows under zoom.
+.pcs-attendance__name-label {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+}
+
+.pcs-attendance__row .govuk-input {
+  flex: 0 1 auto;
+  min-width: 0;
 }

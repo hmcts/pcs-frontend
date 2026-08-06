@@ -266,17 +266,20 @@
       </div>
 
       {#
-        The label is visually hidden: with one row per party the column is self-evident to a
-        sighted judge, and repeating "Name" five times down the page costs a line of height each.
-        Screen reader users still get it, and it names the party so the field is unambiguous when
-        reached out of context.
+        "Name:" is visible, beside the box rather than above it — see make-order.scss. The rest of
+        the label is visually hidden, so the accessible name stays "Name of representative for
+        Claimant 1: ..." and each of the five boxes is unambiguous when reached out of context,
+        while a sighted judge reads the short version the column already implies.
+
+        The colon is aria-hidden for the same reason the attendance abbreviations are: it separates
+        the label from its field visually and is not part of the field's name.
       #}
       {{ govukInput({
         id: party.id + "-name",
         name: party.id + "-name",
         label: {
-          text: "Name of representative for " + party.label,
-          classes: "govuk-visually-hidden"
+          html: 'Name<span aria-hidden="true">:</span><span class="govuk-visually-hidden"> of representative for ' + (party.label | escape) + '</span>',
+          classes: "pcs-attendance__name-label"
         },
         classes: "govuk-input--width-20"
       }) }}
