@@ -62,7 +62,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         label: 'amountQuestion',
         hint: 'amountHint',
       },
-      labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
+      labelClasses: 'govuk-label--m govuk-!-font-weight-bold',
       errorMessage: 'errors.installmentAmount',
       validator: (value: unknown): boolean | string =>
         validateAmount(value, {
@@ -79,7 +79,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         label: 'frequencyQuestion',
       },
       errorMessage: 'errors.installmentFrequency',
-      legendClasses: 'govuk-fieldset__legend--m govuk-!-font-size-19',
+      legendClasses: 'govuk-fieldset__legend--m govuk-!-font-size-24',
       options: [
         { value: 'weekly', translationKey: 'frequencyOptions.weekly' },
         { value: 'every2Weeks', translationKey: 'frequencyOptions.every2Weeks' },
