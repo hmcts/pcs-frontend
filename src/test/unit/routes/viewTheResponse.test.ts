@@ -6,9 +6,14 @@ import { oidcMiddleware } from '../../../main/middleware';
 import viewTheResponseRoute from '@routes/viewTheResponse';
 import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
+}));
+
+jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
+  isRespondToClaimEnabledForRelease: jest.fn(),
 }));
 
 const translationStrings: Record<string, string> = {
@@ -30,11 +35,18 @@ const translationStrings: Record<string, string> = {
   'viewTheResponse:counterclaim.needHelpWithFeesOptions.NO': 'I do not need help paying the fee',
   'viewTheResponse:personsUnknown': 'Persons unknown',
   'viewTheResponse:addressUnknown': 'Address unknown',
+  'viewTheResponse:sections.defendant1Details': 'Defendant 1 details',
+  'viewTheResponse:sections.additionalDefendantDetails': 'Additional defendant {{number}} details',
+  'viewTheResponse:sections.rankedDefendantDetails': 'Defendant {{number}} details',
 };
 
 jest.mock('@modules/i18n', () => ({
   getTranslationFunction: jest.fn(
-    () => ((key: string) => translationStrings[key] ?? key) as import('i18next').TFunction
+    () =>
+      ((key: string, options?: Record<string, unknown>) =>
+        (translationStrings[key] ?? key).replace(/{{(\w+)}}/g, (_match, name) =>
+          String(options?.[name] ?? '')
+        )) as import('i18next').TFunction
   ),
 }));
 
@@ -257,6 +269,7 @@ describe('viewTheResponse route', () => {
     app = {
       get: jest.fn(),
     } as unknown as Application;
+    (isRespondToClaimEnabledForRelease as jest.Mock).mockResolvedValue(false);
   });
 
   afterEach(() => {

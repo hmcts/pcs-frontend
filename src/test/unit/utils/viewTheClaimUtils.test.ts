@@ -58,6 +58,10 @@ const t = ((key: string, options?: Record<string, unknown>) => {
     return `Additional defendant ${options?.number} details`;
   }
 
+  if (key === 'viewTheClaim:sections.rankedDefendantDetails') {
+    return `Defendant ${options?.number ?? ''} details`;
+  }
+
   if (key === 'viewTheClaim:sections.additionalUnderlesseeDetails') {
     return `Additional underlessee or mortgagee ${options?.number} details`;
   }

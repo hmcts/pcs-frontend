@@ -27,6 +27,7 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 
 const logger = Logger.getLogger('viewTheResponse');
 
@@ -233,7 +234,11 @@ function resolveClaimantName(caseData: CcdCaseData): string {
   return new CcdCaseModel({ id: '', data: caseData }).claimantName;
 }
 
-function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildDefendant1Details(
+  t: TFunction,
+  caseData: CcdCaseData,
+  rankedDefendantNumbering: boolean
+): TitledSummarySection {
   const rows: SummaryRow[] = [];
   const party: CcdDefendantParty | undefined = caseData.possessionClaimResponse?.defendantContactDetails?.party;
   const responses = caseData.possessionClaimResponse?.defendantResponses;
@@ -251,7 +256,20 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
   if (!addressUnknown) {
     pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
   }
-  return { rows };
+
+  return { rows, sectionTitle: defendantSectionTitle(t, caseData, rankedDefendantNumbering) };
+}
+
+function defendantSectionTitle(t: TFunction, caseData: CcdCaseData, rankedDefendantNumbering: boolean): string {
+  if (!rankedDefendantNumbering) {
+    return t('viewTheResponse:sections.defendant1Details');
+  }
+
+  const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
+  const currentDefendant = (caseData.allDefendants ?? []).find(defendant => defendant.id === currentDefendantPartyId);
+  const rank = typeof currentDefendant?.value.rank === 'number' ? currentDefendant.value.rank : undefined;
+
+  return t('viewTheResponse:sections.rankedDefendantDetails', { number: rank });
 }
 
 function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): TitledSummarySection[] {
@@ -619,10 +637,12 @@ export default function viewTheResponseRoutes(app: Application): void {
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
       const completedBy = responses?.statementOfTruthCompletedBy;
 
+      const rankedDefendantNumbering = await isRespondToClaimEnabledForRelease(req);
+
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
-        defendant1Details: buildDefendant1Details(t, caseData),
-        additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData),
+        defendant1Details: buildDefendant1Details(t, caseData, rankedDefendantNumbering),
+        additionalDefendantDetails: rankedDefendantNumbering ? [] : buildAdditionalDefendantDetails(t, caseData),
         responseToClaim: buildResponseToClaim(t, caseData),
         paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
