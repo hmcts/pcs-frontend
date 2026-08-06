@@ -118,7 +118,6 @@ export const paymentService = {
       getUserAuthHeaders(accessToken)
     );
     return response.data;
-
   },
 
   async getCardPaymentStatus(accessToken: string, paymentReference: string): Promise<CardPaymentStatusResponse> {
@@ -163,7 +162,7 @@ export const paymentService = {
     return {
       status: paymentResponse.status,
       dateCreated: paymentResponse.dateCreated,
-      paymentReference: paymentResponse.paymentReference
+      paymentReference: paymentResponse.paymentReference,
     };
   },
 };

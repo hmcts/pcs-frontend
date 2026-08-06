@@ -160,7 +160,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   fields: legalRepFormFieldConfig,
 });
 
-async function buildPbaAccountsSelections(req: Request, t: TFunction<'translation', undefined>): Promise<{ value: string; text: string }[]> {
+async function buildPbaAccountsSelections(
+  req: Request,
+  t: TFunction<'translation', undefined>
+): Promise<{ value: string; text: string }[]> {
   const pbaAccounts = await getPbaAccounts(req);
 
   const accountOptions = (pbaAccounts ?? []).map(account => ({

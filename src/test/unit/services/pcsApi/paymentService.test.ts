@@ -133,17 +133,13 @@ describe('paymentService', () => {
     const response = await paymentService.getPbaAccounts('token-123');
 
     expect(response).toEqual(responsePayload);
-    expect(mockHttp.get).toHaveBeenCalledWith(
-      `${testApiBase}/payment/pba-accounts`,
-      {
-        headers: {
-          Authorization: 'Bearer token-123',
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/payment/pba-accounts`, {
+      headers: {
+        Authorization: 'Bearer token-123',
+        'Content-Type': 'application/json',
+      },
+    });
   });
-
 });
 
 describe('payment helpers', () => {

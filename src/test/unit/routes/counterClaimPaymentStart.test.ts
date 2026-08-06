@@ -189,8 +189,7 @@ describe('counterClaimPaymentStart routes', () => {
       })
     );
   });
-}
-);
+});
 
 describe('counter-claim-pba-payment/start route', () => {
   let app: Application;
@@ -218,7 +217,6 @@ describe('counter-claim-pba-payment/start route', () => {
     } as unknown as Application;
     counterClaimPaymentStartRoutes(app);
   });
-
 
   it('registers route with oidc middleware', () => {
     expect(mockGet).toHaveBeenCalledWith(

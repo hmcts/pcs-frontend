@@ -144,4 +144,3 @@ function redirectOnMissingPaymentReturnUrl(res: Response, caseReference: string)
     ['/case']
   );
 }
-
