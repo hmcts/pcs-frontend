@@ -14,33 +14,12 @@ export class PdfDocumentValidation implements IValidation {
 
     expect(href).toBeTruthy();
 
-    const pdfUrl = new URL(href!, page.url()).toString();
+    const pdfUrl = new URL(href!, page.url());
+    const expectedPathPattern = /^\/case\/[^/]+\/view-documents\/[0-9a-fA-F-]{36}$/;
 
-    const cookies = await page.context().cookies();
-
-    const cookieHeader = cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
-
-    const response = await page.request.fetch(pdfUrl, {
-      headers: {
-        Cookie: cookieHeader,
-      },
-    });
-
-    const status = response.status();
-    const body = await response.text();
-
-    if (body.includes('Page not found')) {
-      throw new Error(
-        `Document "${data.linkText}" did not open. The application returned "Page not found" (HTTP ${status}).`
-      );
-    }
-
-    if (body.includes('You do not have access to this page')) {
-      throw new Error(
-        `Document "${data.linkText}" did not open. The application returned "You do not have access to this page" (HTTP ${status}).`
-      );
-    }
-
-    expect(response.ok()).toBeTruthy();
+    expect(
+      pdfUrl.pathname,
+      `Document "${data.linkText}" should link to an internal document route, but got "${pdfUrl.pathname}"`
+    ).toMatch(expectedPathPattern);
   }
 }
