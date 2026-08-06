@@ -26,6 +26,11 @@ redis:
     registry: hmctsprod.azurecr.io
     repository: imported/bitnami/redis
   enabled: true
+  master:
+    readinessProbe:
+      timeoutSeconds: 10
+    livenessProbe:
+      timeoutSeconds: 10
 global:
   security:
     allowInsecureImages: true
