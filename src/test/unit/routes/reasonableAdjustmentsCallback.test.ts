@@ -186,6 +186,20 @@ describe('reasonableAdjustmentsCallback routes', () => {
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
   });
 
+  it('routes to the "no request sent" page (no persist) when replacementFlags is present but its details are empty', async () => {
+    mockGetPayload.mockResolvedValue({
+      action: 'submit',
+      correlationId: '123',
+      replacementFlags: { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] },
+    });
+    const res = {} as unknown as Response;
+
+    await getHandler()(buildReq(), res);
+
+    expect(mockUpdateDraft).not.toHaveBeenCalled();
+    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
+  });
+
   it('redirects to the "no request sent" page (and does not persist) when the action is cancel', async () => {
     mockGetPayload.mockResolvedValue({ action: 'cancel', correlationId: '123' });
     const res = {} as unknown as Response;
@@ -232,7 +246,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
   });
 
   it('redirects to the error page when persisting the flags fails', async () => {
-    const flags = { partyName: 'x', roleOnCase: 'y', details: [] };
+    const flags = { partyName: 'x', roleOnCase: 'y', details: [{ id: 'd1', value: { flagCode: 'RA0001' } }] };
     mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', replacementFlags: flags });
     mockUpdateDraft.mockRejectedValue(new Error('ccd down'));
     const res = {} as unknown as Response;

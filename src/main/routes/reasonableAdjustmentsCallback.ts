@@ -76,9 +76,11 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
           return safeRedirect303(res, errorUrl, fallback, ['/case']);
         }
 
-        // The "request sent" confirmation is only correct when cui-ra actually captured a change:
-        // action === 'submit' AND replacementFlags present
-        if (payload.action !== 'submit' || !payload.replacementFlags) {
+        // Redirect to the "No request was sent" page unless cui-ra captured a real change — an
+        // explicit 'submit' that carries at least one flag in replacementFlags. So bail when the
+        // action is not 'submit', OR replacementFlags is missing/empty (a fall back to
+        // flagsAsSupplied, or an empty collection with no flags).
+        if (payload.action !== 'submit' || !payload.replacementFlags?.details?.length) {
           return safeRedirect303(res, cancelledUrl, fallback, ['/case']);
         }
 
