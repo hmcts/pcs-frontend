@@ -18,8 +18,15 @@ import { buildSectionCyaRows as buildDisputeRows } from '../../../../main/steps/
 // before the P1/P2 refactor. Identity `t` so assertions can match translation keys.
 const t = ((key: string) => key) as unknown as TFunction;
 
-const reqWith = (validatedCase: CcdCaseModel | undefined): Request =>
-  ({ res: { locals: { validatedCase } } }) as unknown as Request;
+const reqWith = (validatedCase: CcdCaseModel | undefined, options: { release12Enabled?: boolean } = {}): Request =>
+  ({
+    res: {
+      locals: {
+        validatedCase,
+        release12Enabled: options.release12Enabled ?? false,
+      },
+    },
+  }) as unknown as Request;
 
 const model = (defendantResponses: Record<string, unknown>, extraData: Record<string, unknown> = {}): CcdCaseModel =>
   new CcdCaseModel({
@@ -318,6 +325,31 @@ describe('section-CYA row builders — characterisation', () => {
   describe('dispute-and-tenancy', () => {
     it('returns no rows when validatedCase is missing', () => {
       expect(buildDisputeRows(reqWith(undefined), t)).toEqual([]);
+    });
+
+    it('renders exempt-landlord row when exemptLandlord is answered and release 1.2 is enabled', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ exemptLandlord: 'NO' }, { legislativeCountry: 'Wales' }), { release12Enabled: true }),
+        t
+      );
+      const row = rows.find(r => r.key.text === 'rows.exemptLandlord.label');
+      expect(row?.value).toEqual({ text: 'options.no' });
+      expect(row?.actions?.items[0].href).toBe(
+        '/case/1234123412341234/respond-to-claim/exempt-landlord?edit=disputeAndTenancy'
+      );
+    });
+
+    it('does not render exempt-landlord row when release 1.2 is disabled', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ exemptLandlord: 'NO' }, { legislativeCountry: 'Wales' }), { release12Enabled: false }),
+        t
+      );
+      expect(rows.some(r => r.key.text === 'rows.exemptLandlord.label')).toBe(false);
+    });
+
+    it('does not render licensed-landlord row', () => {
+      const rows = buildDisputeRows(reqWith(model({ landlordLicensed: 'YES', exemptLandlord: 'YES' })), t);
+      expect(rows.some(r => r.key.text === 'rows.landlordLicensed.label')).toBe(false);
     });
 
     it('renders tenancy-type and counterclaim rows from defendant responses', () => {
