@@ -198,14 +198,26 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
 // Each rule sits on `:not(:first-child)` or a sibling combinator, never on every element, so no
 // line is ever stranded above the first block of a group or below the last.
 
-// 1. Page sections: Attendance / Recitals / Order type / Costs / Staff message.
+// 1. Page sections: Attendance / Recitals / Order type / Costs.
 //
 // The heading keeps its own `govuk-!-margin-top-6`, so the 30px above the line is the margin that
-// was already there and the rule just lands in it. Nothing stacks: the case-facts panel's own
-// bottom border and the tab panel's bottom border are both 30px clear of the next heading's rule.
+// was already there and the rule just lands in it.
 .pcs-make-order #main-content > h2 {
   padding-top: govuk-spacing(4);
   border-top: 1px solid $govuk-border-colour;
+}
+
+// Except after a block that already closes with a line of its own. The case-facts panel is a
+// bordered band and a govuk-tabs panel is a bordered box, so both end in a full-width rule; adding
+// the heading's rule 30px below drew two parallel lines with an empty 30px strip between them.
+//
+// An explicit list of the two, because CSS cannot ask whether the previous sibling has a bottom
+// border — only the elements themselves know they are bordered. The `padding-top` above is kept, so
+// the heading text sits exactly where it does after every other section and only the duplicate line
+// goes. Anything else added to this page that closes with its own rule needs adding here too.
+.pcs-make-order #main-content > .pcs-case-facts + h2,
+.pcs-make-order #main-content > .govuk-tabs + h2 {
+  border-top: 0;
 }
 
 // 2. Questions inside a tab panel, so Possession / Grounds / the checkbox options read as distinct
@@ -284,7 +296,15 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   // the 15px of drift came from.
   align-items: start;
   padding: govuk-spacing(2) 0;
-  border-bottom: 1px solid $govuk-border-colour;
+
+  // Between rows, not below every row. As a `border-bottom` on each row this drew a line under the
+  // last one too, 30px above the rule over the "Recitals" heading — two lines with a gap of blank
+  // page between them and nothing in it. Moving it to the top of every row *after* the first is the
+  // same rule the section and question dividers use, and it is what keeps a group's lines interior
+  // to the group: five rows, four lines, none stranded at either end.
+  & + & {
+    border-top: 1px solid $govuk-border-colour;
+  }
 
   // Below desktop there is no room for three columns, so let each part take its own line.
   @include govuk-media-query($until: desktop) {
