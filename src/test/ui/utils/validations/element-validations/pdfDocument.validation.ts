@@ -31,13 +31,13 @@ export class PdfDocumentValidation implements IValidation {
 
     if (body.includes('Page not found')) {
       throw new Error(
-        `Document "${data.linkText}" did not open. URL: ${pdfUrl}. The application returned "Page not found" (HTTP ${status}).`
+        `Document "${data.linkText}" did not open. The application returned "Page not found" (HTTP ${status}).`
       );
     }
 
     if (body.includes('You do not have access to this page')) {
       throw new Error(
-        `Document "${data.linkText}" did not open. URL: ${pdfUrl}. The application returned "You do not have access to this page" (HTTP ${status}).`
+        `Document "${data.linkText}" did not open. The application returned "You do not have access to this page" (HTTP ${status}).`
       );
     }
 
