@@ -2,7 +2,7 @@
   "pageTitle": "cyResponse submitted. You must pay your counterclaim fee",
   "responseSubmittedCounterClaimFeePaymentNeededParagraph1": "Rydym wedi anfon neges gadarnhau atoch drwy e-bost.",
   "responseSubmittedCounterClaimFeePaymentNeededHeading1": "Beth i'w wneud nesaf",
-  "responseSubmittedCounterClaimFeePaymentNeededListItem1": "cy<a href='{{counterClaimApplicationFeeAmountUrl}}'>Pay your counterclaim fee</a>. If you do not, your counterclaim will not be considered.",
+  "responseSubmittedCounterClaimFeePaymentNeededListItem1": "cy<a href='{{counterClaimApplicationFeeAmountUrl}}' class=\"govuk-link\">Pay your counterclaim fee</a>. If you do not, your counterclaim will not be considered.",
   "responseSubmittedCounterClaimFeePaymentNeededListItem2": "Bydd dyddiad gwrandawiad yn cael ei bennu. Byddwch yn derbyn hysbysiad yn dweud wrthych pan fydd hyn wedi digwydd. Yn y gwrandawiad, bydd barnwr yn gwrando ar y ddwy ochr ac yn gwneud penderfyniad. Dylech ddod i’r gwrandawiad.",
   "responseSubmittedCounterClaimFeePaymentNeededListItem3": "Mae rhai pobl angen cefnogaeth i ddefnyddio gwasanaethau GLlTEF fel mynediad heb risiau i'r llys ar gyfer gwrandawiad. Os ydych angen cefnogaeth a heb ofyn yn barod yn eich ymateb, cysylltwch â ni. Defnyddiwch y ddolen 'Cysylltu â ni am gymorth' ar y dudalen hon.",
   "responseSubmittedCounterClaimFeePaymentNeededHeading2": "Hoffwn gael eich barn",
