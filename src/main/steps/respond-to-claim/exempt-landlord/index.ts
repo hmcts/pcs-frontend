@@ -6,28 +6,30 @@ import { createRespondToClaimFormStep } from '../formStep';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoNotSureValue } from '@services/ccdCase.interface';
 
-const STEP_NAME = 'landlord-registered';
+const STEP_NAME = 'exempt-landlord';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.landlordRegistered),
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.exemptLandlord),
   stepDir: __dirname,
   getInitialFormData: async (req: Request) => {
-    // Pre-populate from the saved draft (CCD + draft merge). Option values are the
-    // backend enum (YES/NO/NOT_SURE), so the stored value maps to the radio directly.
-    const landlordRegistered = req.res?.locals.validatedCase?.defendantResponses?.landlordRegistered;
-    return landlordRegistered ? { landlordRegistered } : {};
+    const caseData = req.res?.locals.validatedCase?.data;
+    const exemptLandlord = caseData?.possessionClaimResponse?.defendantResponses?.exemptLandlord as
+      YesNoNotSureValue | undefined;
+
+    return exemptLandlord ? { exemptLandlord } : {};
   },
-  customTemplate: `${__dirname}/landlordRegistered.njk`,
+  customTemplate: `${__dirname}/exemptLandlord.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     question: 'question',
+    introParagraph1: 'introParagraph1',
+    introParagraph2: 'introParagraph2',
     publicRegisterLinkText: 'publicRegisterLinkText',
-    introText: 'introText',
   },
   fields: [
     {
-      name: 'landlordRegistered',
+      name: 'exemptLandlord',
       type: 'radio',
       required: true,
       translationKey: {
@@ -44,18 +46,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   beforeRedirect: async (req: Request) => {
     const response = buildDraftDefendantResponse(req);
-    const landlordRegistered: YesNoNotSureValue | undefined = req.body?.landlordRegistered;
+    const exemptLandlord: YesNoNotSureValue | undefined = req.body?.exemptLandlord;
 
-    if (landlordRegistered) {
-      response.defendantResponses.landlordRegistered = landlordRegistered;
+    if (exemptLandlord) {
+      response.defendantResponses.exemptLandlord = exemptLandlord;
     } else {
-      delete response.defendantResponses.landlordRegistered;
+      delete response.defendantResponses.exemptLandlord;
     }
 
-    await saveDraftDefendantResponse(
-      req,
-
-      response
-    );
+    await saveDraftDefendantResponse(req, response);
   },
 });
