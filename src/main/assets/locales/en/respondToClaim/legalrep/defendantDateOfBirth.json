@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Your date of birth",
+  "dateOfBirthHint": "For example, 31 3 1980",
+  "dateOfBirthLabel": "Defendant date of birth",
+  "errors": {
+    "date": {
+      "required": "Enter the defendant's date of birth",
+      "missingOne": "The defendant's date of birth must include a {{missingField}}",
+      "missingTwo": "The defendant's date of birth must include a {{first}} and {{second}}"
+    }
+  }
+}
