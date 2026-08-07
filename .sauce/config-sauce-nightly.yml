@@ -18,17 +18,6 @@ sauce:
 defaults:
   timeout: 30m
 
-# Use npm since Sauce uses npm
-preRun:
-  commands:
-    - echo "=== Installing dependencies using npm ==="
-    - npm ci --legacy-peer-deps
-    - echo "=== Installing Playwright browsers ==="
-    - npx playwright install
-    - echo "=== Verifying @launchdarkly/node-server-sdk is installed ==="
-    - npm list @launchdarkly/node-server-sdk || echo "Package not found"
-    - echo "=== Dependencies installation complete ==="
-
 playwright:
   # Use the latest version supported by Sauce Labs
   version: 1.61.1
@@ -37,6 +26,23 @@ playwright:
 nodeVersion: v22
 
 rootDir: ./
+
+# Use npm section to install ALL dependencies from package.json
+# This is the only reliable way to install dependencies in Sauce Labs
+npm:
+  packages:
+    # All dependencies from package.json that are needed for tests
+    - '@playwright/test@1.61.1'
+    - '@launchdarkly/node-server-sdk@9.13.0'
+    - '@hmcts/playwright-common@1.1.3'
+    - 'config@4.4.2'
+    - 'dotenv@17.4.2'
+    - 'ts-node@10.9.2'
+    - 'typescript@6.0.3'
+    - '@axe-core/playwright@4.12.1'
+    - 'allure-playwright@3.10.2'
+    - 'playwright@1.61.1'
+    # Add any other packages your tests import directly
 
 env:
   PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS: 'true'
