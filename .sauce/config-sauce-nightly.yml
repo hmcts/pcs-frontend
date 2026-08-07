@@ -18,21 +18,20 @@ sauce:
 defaults:
   timeout: 30m
 
-# Pre-run commands to install dependencies on Sauce Labs VM
-# This ensures @launchdarkly/node-server-sdk and all other dependencies are available
+# Use npm since Sauce uses npm
 preRun:
   commands:
-    - echo "=== Installing all dependencies from package.json ==="
-    - yarn install --frozen-lockfile
+    - echo "=== Installing dependencies using npm ==="
+    - npm ci --legacy-peer-deps
     - echo "=== Installing Playwright browsers ==="
-    - yarn playwright install
+    - npx playwright install
     - echo "=== Verifying @launchdarkly/node-server-sdk is installed ==="
-    - yarn list --pattern launchdarkly || echo "Package not found"
+    - npm list @launchdarkly/node-server-sdk || echo "Package not found"
     - echo "=== Dependencies installation complete ==="
 
 playwright:
-  # Pin to a version Sauce actually runs (saucectl list). package.json may be newer (e.g. 1.59.x) before Sauce adds it.
-  version: 1.58.2
+  # Match the version in your package.json
+  version: 1.62.1
   configFile: playwright.config.ts
 
 nodeVersion: v22
