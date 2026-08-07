@@ -3,6 +3,7 @@ import { Locator, Page } from '@playwright/test';
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
+  NoticeMethodPayload,
   accessYourCase,
   askYourSolicitorToRespond,
   checkYourAnswersRTC,
@@ -31,6 +32,7 @@ import {
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
   exceptionalHardship,
+  exemptLandLord,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
@@ -42,6 +44,7 @@ import {
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
+  noticeServiceMethodText,
   otherConsiderations,
   paymentDetails,
   paymentInterstitial,
@@ -96,6 +99,9 @@ const rtcCyaLabels = {
   universalCreditApplicationDate: 'When did you apply for Universal Credit?',
 } as const;
 
+const isNoticeMethodPayload = (value: actionData | undefined): value is NoticeMethodPayload =>
+  typeof value === 'object' && !Array.isArray(value) && value !== null && 'notice_ServiceMethod' in value;
+
 const rtcSectionByAction = new Map<string, string>([
   ['selectLegalAdvice', 'startNowAndDetails'],
   ['inputDefendantDetails', 'personalDetails'],
@@ -108,6 +114,7 @@ const rtcSectionByAction = new Map<string, string>([
   ['selectContactByTextMessage', 'personalDetails'],
   ['disputeClaimInterstitial', 'disputeAndTenancy'],
   ['selectLandlordRegistered', 'disputeAndTenancy'],
+  ['exemptLandLord', 'disputeAndTenancy'],
   ['selectLandlordLicensed', 'disputeAndTenancy'],
   ['selectWrittenTerms', 'disputeAndTenancy'],
   ['enterTenancyStartDetailsUnKnown', 'disputeAndTenancy'],
@@ -170,6 +177,7 @@ export class RespondToClaimAction implements IAction {
       ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
       ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
       ['repaymentsAgreed', () => this.repaymentsAgreed(fieldName as actionRecord)],
+      ['exemptLandLord', () => this.exemptLandLord(fieldName as actionData)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
       ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
@@ -591,6 +599,15 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', disputeClaimInterstitial.continueButton);
   }
 
+  private async exemptLandLord(exemptLandLordAnswer: actionData): Promise<void> {
+    this.recordAnswer(exemptLandLord.isYourLandlordAnExemptSubHeader, exemptLandLordAnswer);
+    await performAction('clickRadioButton', {
+      question: exemptLandLord.isYourLandlordAnExemptSubHeader,
+      option: exemptLandLordAnswer,
+    });
+    await performAction('clickButton', exemptLandLord.saveAndContinueButton);
+  }
+
   private async selectLandlordRegistered(registeredData: actionData): Promise<void> {
     this.recordAnswer(landlordRegistered.isYourLandlordRegisteredQuestion, registeredData);
     await performAction('clickRadioButton', {
@@ -784,6 +801,21 @@ export class RespondToClaimAction implements IAction {
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
     await performValidation('text', { elementType: 'listItem', text: noticeDateWhenProvided.noticeGivenDateLabel });
+    if (noticeData?.showNoticeDocumentLink) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: noticeDateWhenProvided.noticeDocumentDynamicLink,
+      });
+      await performValidation('validatePdfDocument', {
+        linkText: noticeDateWhenProvided.noticeDocumentDynamicLink,
+      });
+    }
+    if (isNoticeMethodPayload(noticeData?.noticeMethodPayload)) {
+      await performValidation('text', {
+        elementType: 'listItem',
+        text: noticeServiceMethodText(noticeData.noticeMethodPayload),
+      });
+    }
     this.recordRtcCyaDateFromParts(
       `When did you receive notice from ${claimantsName}?`,
       noticeData?.day,
@@ -944,6 +976,15 @@ export class RespondToClaimAction implements IAction {
       elementType: 'paragraph',
       text: `When they made their claim, ${claimantsName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
     });
+    if (rentArrearsInfo?.showRentDocumentLink) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: rentArrears.rentDocumentDynamicLink,
+      });
+      await performValidation('validatePdfDocument', {
+        linkText: rentArrears.rentDocumentDynamicLink,
+      });
+    }
     const rentArrearsAmount = formatCurrency(`${payload.submitCasePayload.rentArrears_Total}`);
     await performValidation('text', {
       elementType: 'paragraph',
@@ -1001,6 +1042,15 @@ export class RespondToClaimAction implements IAction {
           text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
         });
       }
+    }
+    if (tenancyTypeDetailsInfo?.showTenancyDocumentLink) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: tenancyTypeDetails.tenancyDocumentDynamicLink,
+      });
+      await performValidation('validatePdfDocument', {
+        linkText: tenancyTypeDetails.tenancyDocumentDynamicLink,
+      });
     }
     this.recordAnswer(tenancyTypeDetails.isTenancyTypeCorrectQuestion, tenancyTypeDetailsInfo.tenancyOption);
     await performAction('clickRadioButton', {

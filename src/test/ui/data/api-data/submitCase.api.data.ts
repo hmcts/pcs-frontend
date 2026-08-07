@@ -92,8 +92,8 @@ export const submitCaseApiData = {
       tenancy_TenancyLicenceDocuments: [
         {
           value: {
-            document_url: `${process.env.DM_STORE_URL}/documents/113a0ffe-456d-4960-8c3d-a4f8366c91ca`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/113a0ffe-456d-4960-8c3d-a4f8366c91ca/binary`,
+            document_url: `${process.env.DM_STORE_URL}/documents/01bff0de-53a4-4883-ac6b-a34cbf12a9f9`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/01bff0de-53a4-4883-ac6b-a34cbf12a9f9/binary`,
             document_filename: 'tenancyLicenceDocuments.pdf',
           },
         },
@@ -112,8 +112,8 @@ export const submitCaseApiData = {
       rentArrears_StatementDocuments: [
         {
           value: {
-            document_url: `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f/binary`,
+            document_url: `${process.env.DM_STORE_URL}/documents/98864bc5-edd5-4773-ac98-284ad0a74392`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/98864bc5-edd5-4773-ac98-284ad0a74392/binary`,
             document_filename: 'RentArrearsStatement.pdf',
           },
         },
@@ -125,8 +125,8 @@ export const submitCaseApiData = {
       notice_Documents: [
         {
           value: {
-            document_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503/binary`,
+            document_url: `${process.env.DM_STORE_URL}/documents/b73212c2-1133-4953-9f41-fa40c53112de`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/b73212c2-1133-4953-9f41-fa40c53112de/binary`,
             document_filename: 'rentArrears.pdf',
           },
         },
@@ -598,7 +598,16 @@ export const submitCaseApiData = {
       addAnotherDefendant: 'NO',
       tenancy_TypeOfTenancyLicence: process.env.TENANCY_TYPE,
       tenancy_TenancyLicenceDate: null,
-      tenancy_TenancyLicenceDocuments: [],
+      tenancy_TenancyLicenceDocuments: [
+        {
+          id: 'ecabebc6-2fc0-46a6-9bf0-f2e7aa17b0e4',
+          value: {
+            document_filename: 'tenancyAgreement.pdf',
+            document_url: `${process.env.DM_STORE_URL}/documents/3a5f6cba-2ecd-4960-8859-22f2118da0bf`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/3a5f6cba-2ecd-4960-8859-22f2118da0bf/binary`,
+          },
+        },
+      ],
       secureOrFlexibleDiscretionaryGrounds: ['DOMESTIC_VIOLENCE'],
       secureAntisocialAdditionalGrounds: [],
       secureOrFlexibleMandatoryGroundsAlt: [],
@@ -611,8 +620,16 @@ export const submitCaseApiData = {
       settlementAttempted: 'NO',
       noticeServed: process.env.NOTICE_SERVED,
       notice_PostedDate: '2025-11-10',
-      notice_AbleToUploadDocument: 'No',
-      notice_UnableToUploadReason: 'no documents to upload',
+      notice_AbleToUploadDocument: 'Yes',
+      notice_Documents: [
+        {
+          value: {
+            document_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503/binary`,
+            document_filename: 'rentArrears.pdf',
+          },
+        },
+      ],
       notice_ServiceMethod: 'EMAIL',
       notice_EmailSentDateTime: '2025-11-10T10:11:20',
       notice_EmailAddress: 'test@gmail.com',
