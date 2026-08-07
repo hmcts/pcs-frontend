@@ -82,10 +82,28 @@ export const saveDraftDefendantResponse = async (req: Request, response: Possess
     const existingPCR = existingData.possessionClaimResponse ?? {};
     const updatedPCR = updatedCase.data?.possessionClaimResponse ?? {};
 
+    const mergedDefendantResponses = {
+      ...existingPCR.defendantResponses,
+      ...updatedPCR.defendantResponses,
+    };
+    const mergedDefendantContactDetails = {
+      ...existingPCR.defendantContactDetails,
+      ...updatedPCR.defendantContactDetails,
+      party: {
+        ...existingPCR.defendantContactDetails?.party,
+        ...updatedPCR.defendantContactDetails?.party,
+      },
+    };
+
     const mergedData = {
       ...existingData,
       ...updatedCase.data,
-      possessionClaimResponse: { ...existingPCR, ...updatedPCR },
+      possessionClaimResponse: {
+        ...existingPCR,
+        ...updatedPCR,
+        defendantResponses: mergedDefendantResponses,
+        defendantContactDetails: mergedDefendantContactDetails,
+      },
     };
 
     req.res.locals.validatedCase = new CcdCaseModel({ id: mergedId, data: mergedData });

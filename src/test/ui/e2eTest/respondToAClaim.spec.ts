@@ -739,6 +739,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+      showTenancyDocumentLink: true,
     });
     await performAction('enterTenancyStartDetailsUnKnown', {
       tsDay: '15',
@@ -748,7 +749,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectNoticeDetails', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
-    await performAction('enterNoticeDateKnown');
+    await performAction('enterNoticeDateKnown', {
+      showNoticeDocumentLink: true,
+      noticeMethodPayload: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy,
+    });
     await performAction('disputingOtherPartsOfTheClaim', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -912,6 +916,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+      showTenancyDocumentLink: true,
     });
     await performAction('enterTenancyStartDetailsUnKnown');
     await performAction('selectNoticeDetails', {
@@ -1110,6 +1115,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancyNoticeServedNo.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+      showTenancyDocumentLink: true,
     });
     await performAction('enterTenancyStartDetailsUnKnown');
     await performValidation('mainHeader', nonRentArrearsDispute.mainHeader);
@@ -1299,6 +1305,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('enterNoticeDateUnknown');
     await performAction('rentArrears', {
       option: rentArrears.yesRadioOption,
+      showRentDocumentLink: true,
     });
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
@@ -1501,6 +1508,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       day: '25',
       month: '2',
       year: '2020',
+      showNoticeDocumentLink: true,
+      noticeMethodPayload: submitCaseApiData.submitCasePayload,
     });
     await performAction('rentArrears', {
       option: rentArrears.noRadioOption,
