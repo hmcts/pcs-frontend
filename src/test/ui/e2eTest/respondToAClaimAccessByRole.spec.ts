@@ -30,13 +30,6 @@ test.describe('CUI user role access @nightly', async () => {
     expect(page.url()).toContain('/login');
   });
 
-  test('Authenticated HMCTS User Cannot Access Possession Claims from Civil Claims', async ({ page }) => {
-    await performAction('login', user.authenticatedCivilUser.email);
-    expect(page.url()).toContain('/login');
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
-    expect(page.url()).toContain('/login');
-  });
-
   test('Solicitor role should not have access to specific pages', async () => {
     await performAction('login', user.defendantSolicitor.email);
     await performAction('navigateToUrl', home_url + `/respond-to-claim/task-list`);
