@@ -14,5 +14,5 @@
     }
   ],
   "platformAutomerge": false,
-  "automergeSchedule": ["after 7am and before 8am every weekday"]
+  "automergeSchedule": ["after 7am and before 9am every weekday", "after 5pm and before 7pm every weekday"]
 }
