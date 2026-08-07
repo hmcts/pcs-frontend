@@ -1,0 +1,23 @@
+{# Recitals: the narrative paragraphs that open the order. #}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>
+
+{{ govukCheckboxes({
+  idPrefix: "recitals",
+  name: "recitals",
+  classes: "govuk-checkboxes--small",
+  items: [{
+    value: "yes",
+    text: "Recitals",
+    conditional: {
+      html: govukTextarea({
+        id: "recitals-text",
+        name: "recital",
+        rows: 4,
+        label: { text: "Recital paragraphs" }
+      })
+    }
+  }]
+}) }}

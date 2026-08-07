@@ -165,17 +165,17 @@ Given the audience, all of these are reasonable and are kept:
 
 ## Decisions
 
-| Area                         | Decision and reasoning                                                                                                                                                                                                                                                                                                        |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Sticky case-facts panel**  | **Keep.** A real affordance when drafting an order against the facts. Fluid grid tracks so it reflows under zoom; `max-height` + `overflow-y` so it can never swallow a zoomed viewport; `scroll-padding-top` so it never hides keyboard focus. No collapse toggle in iteration 1.                                            |
-| **Order type**               | **Keep `govuk-tabs`.** Matches what judges have been shown, deep-linkable via `#tab-outright`, lets them flick between order types while deciding. Stock govuk-frontend, no custom JS.                                                                                                                                        |
-| **Page width**               | Wide, via a scoped **`pcs-wide`** class. Not a global `.govuk-width-container` override — the citizen journeys in this same app want the 1020px measure.                                                                                                                                                                      |
-| **Tabs markup**              | Hand-written to govuk-frontend's own tabs markup rather than via the `govukTabs` macro, because the macro takes each panel as a pre-rendered HTML string. Writing the markup lets each panel hold real Nunjucks. Behaviour still comes from `data-module="govuk-tabs"`.                                                       |
-| **Attendance abbreviations** | Keep `Csl / Sol / S/A / H/O / Duty / LiP / Ltr` for scanning density, but give assistive technology the full term: `<span aria-hidden="true">` for the abbreviation plus `<span class="govuk-visually-hidden">` for the expansion. `<abbr title>` was tried and rejected — screen reader support for `title` is inconsistent. |
-| **Attendance grouping**      | `role="group"` + `aria-labelledby` instead of `fieldset`/`legend`, which is the one place this page departs from the stock pattern. See [Density](#density-matching-the-prototype) — a legend cannot share a row with the fields it labels, and the workarounds are unreliable.                                               |
-| **Breakpoints**              | Large desktop is the primary and only design target. The two `govuk-media-query` blocks exist solely so the layout survives 200–400% zoom. No investment in narrow-width polish beyond "nothing breaks".                                                                                                                      |
-| **Client-side JS**           | **None.** Date quick-fill pills, the case-facts collapse toggle and the not-present/name interlock are all deferred.                                                                                                                                                                                                          |
-| **Content**                  | Hardcoded English for iteration 1. See [Open questions](#open-questions) — this is the one place we diverge from house style.                                                                                                                                                                                                 |
+| Area                         | Decision and reasoning                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Sticky case-facts panel**  | **Keep.** A real affordance when drafting an order against the facts. Fluid grid tracks so it reflows under zoom; `max-height` + `overflow-y` so it can never swallow a zoomed viewport; `scroll-padding-top` so it never hides keyboard focus. No collapse toggle in iteration 1.                                                                                                                                                                                                                                                                                                                                   |
+| **Order type**               | **Keep `govuk-tabs`.** Matches what judges have been shown, deep-linkable via `#tab-outright`, lets them flick between order types while deciding. Stock govuk-frontend, no custom JS.                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **Page width**               | Wide, via a scoped **`pcs-wide`** class. Not a global `.govuk-width-container` override — the citizen journeys in this same app want the 1020px measure.                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Tabs markup**              | Hand-written, not the `govukTabs` macro, **for the heading level**. The macro hardcodes its tab-list heading as `<h2>` with no option (6.4.0), which puts "Contents" level with "Order type" while the panel headings under it stay `<h3>`. That heading is `display: none` above tablet, so the broken outline surfaces exactly at ~500px — a judge at 250–400% zoom — and with no JS. `tabs.mjs` owns every `role`, `aria-*` and `tabindex` at runtime, so the markup only has to get class names, `href`/`id` pairing and initial visibility right; one `orderTypeTabs` list drives both the list and the panels. |
+| **Attendance abbreviations** | Keep `Csl / Sol / S/A / H/O / Duty / LiP / Ltr` for scanning density, but give assistive technology the full term: `<span aria-hidden="true">` for the abbreviation plus `<span class="govuk-visually-hidden">` for the expansion. `<abbr title>` was tried and rejected — screen reader support for `title` is inconsistent.                                                                                                                                                                                                                                                                                        |
+| **Attendance grouping**      | `role="group"` + `aria-labelledby` instead of `fieldset`/`legend`, which is the one place this page departs from the stock pattern. See [Density](#density-matching-the-prototype) — a legend cannot share a row with the fields it labels, and the workarounds are unreliable.                                                                                                                                                                                                                                                                                                                                      |
+| **Breakpoints**              | Large desktop is the primary and only design target. The two `govuk-media-query` blocks exist solely so the layout survives 200–400% zoom. No investment in narrow-width polish beyond "nothing breaks".                                                                                                                                                                                                                                                                                                                                                                                                             |
+| **Client-side JS**           | **None.** Date quick-fill pills, the case-facts collapse toggle and the not-present/name interlock are all deferred.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| **Content**                  | Hardcoded English for iteration 1. See [Open questions](#open-questions) — this is the one place we diverge from house style.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 
 ## What was built
 
@@ -183,14 +183,56 @@ Branch `feat/make-order-shell`.
 
 | File                                          | Lines |                                                                                                                                           |
 | --------------------------------------------- | ----: | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/main/views/make-order.njk`               |  1095 | The shell. Extends `template.njk`, not `stepsTemplate.njk` — the latter forces a two-thirds/one-third grid that fights a wide dense page. |
-| `src/main/assets/scss/make-order.scss`        |   356 | `pcs-`-prefixed, `govuk-spacing()` / `govuk-colour()` / `govuk-media-query()` throughout, no raw values.                                  |
-| `src/main/routes/makeOrder.ts`                |    22 | Auto-registered by the glob in `app.ts`. Builds the xui header/footer models.                                                             |
+| `src/main/views/make-order.njk`               |   123 | The shell. Extends `template.njk`, not `stepsTemplate.njk` — the latter forces a two-thirds/one-third grid that fights a wide dense page. |
+| `src/main/views/make-order/`                  |   445 | One partial per section of the screen — see [below](#one-file-per-section).                                                               |
+| `src/main/views/make-order/tabs/`             |   653 | One partial per order type.                                                                                                               |
+| `src/main/assets/scss/make-order.scss`        |   428 | `pcs-`-prefixed, `govuk-spacing()` / `govuk-colour()` / `govuk-media-query()` throughout, no raw values.                                  |
+| `src/main/routes/makeOrder.ts`                |    22 | Auto-registered by the glob in `app.ts`. Requires the judge role and builds the xui header/footer models.                                 |
 | `src/test/unit/routes/makeOrder.test.ts`      |    65 | Registration, render, and header-model-from-roles.                                                                                        |
 | `src/main/constants/caseRoutes.ts`            |    +2 | `MAKE_ORDER_ROUTE`.                                                                                                                       |
 | `src/main/assets/scss/main.scss`              |    +1 | `@use 'make-order';`                                                                                                                      |
 | `src/test/ui/utils/controller.ts`             |    ~1 | Adds `make-order` to the axe audit page gate.                                                                                             |
 | `src/test/ui/config/axe-exclusions.config.ts` |    +1 | One upstream exclusion, see below.                                                                                                        |
+
+### One file per section
+
+The page began as a single 1,112-line template, which made an individual order type impossible to
+review without scrolling past the other four. It is now one file per section of the screen, with the
+five order types under `tabs/`:
+
+```
+views/make-order.njk                    the shell: chrome, section order, the tabs
+views/make-order/_case-summary.njk      reference, property, parties
+views/make-order/_case-facts.njk        the sticky panel
+views/make-order/_attendance.njk        the attendance register
+views/make-order/_recitals.njk
+views/make-order/_costs.njk
+views/make-order/_staff-message.njk
+views/make-order/_payment-frequencies.njk   the one option list shared across tabs
+views/make-order/tabs/_outright.njk
+views/make-order/tabs/_suspended.njk
+views/make-order/tabs/_adjournment.njk
+views/make-order/tabs/_strike-out.njk
+views/make-order/tabs/_free-form.njk
+```
+
+Split **by the sections a judge sees**, not by a generic form schema. A JSON-driven form engine was
+considered and rejected: every one of these sections has a bespoke reason for its markup — the
+attendance register's `role="group"`, the inline field rows, the flattened reveals — and a schema
+general enough to express all of them would be harder to read than the markup it replaced, while
+putting the accessibility decisions somewhere a reviewer cannot see them.
+
+The `_` prefix marks a fragment rather than a page: none of these renders on its own, and only
+`make-order.njk` is a template a route names. Each partial imports the govuk-frontend macros it
+uses, so it can be read without reference to the shell. The one list needed by more than one file
+(`paymentFrequencies`, used by three tabs) is `{% import %}`ed rather than inherited from the
+including context, so a tab states where its options come from; the lists used by a single section
+stay in that section's file.
+
+Refactor only. Verified by rendering the committed 1,112-line template and diffing its normalised
+HTML against the split version: the only differences are the six intentional `pcs-divided-options`
+additions and the one `govuk-checkboxes--inline` removal below. The tabs markup is byte-identical,
+and every form control, id, name and panel class is unchanged.
 
 ### Chrome: the xui header and footer, unconditionally
 
@@ -205,6 +247,9 @@ gates on `LEGAL_REPRESENTATIVE_USER_ROLES`, which is `['caseworker-pcs-solicitor
 not hold that role, so the middleware would leave `headerModel` undefined and the header would
 render empty. The route builds the models directly instead, passing the signed-in user's real roles
 to `buildHeaderModel` so the header renders the right menu for them.
+
+Access is enforced separately by `judgeAccessMiddleware`, using the normalised roles in
+`steps/utils/userRole.ts`. Users without `caseworker-pcs-judge` receive a 404.
 
 Because the chrome is unconditional, three things follow, all of them deletions:
 
@@ -446,6 +491,24 @@ A run of smaller visual fixes, all in `make-order.scss` and all commented there:
   for something carrying no meaning the following heading has not already given. A border draws the
   same line silently. Every divider rule sits on `:not(:first-child)` or a sibling combinator, so no
   line is ever stranded above the first block of a group or below the last.
+- **Dividers between options within one checkbox group are opt-in, via `.pcs-divided-options`.** The
+  section and question rules select stock govuk-frontend classes and are meant to describe every
+  heading and every question, so deriving them from position is what keeps them self-maintaining.
+  This one is not, and as a page-wide `.govuk-checkboxes__item:not(:first-child)` it reached every
+  checkbox group on the page: `Hearing format`'s three short options each picked up a 30px gap and a
+  full-width rule, and a group nested in another group's reveal — `Suspended on the same terms as
+above` — cannot be told apart from its parent by a descendant selector at all. A divider earns its
+  place where options are long or each opens a reveal; between short one-line options it draws a
+  separation that isn't there. Six groups opt in; `Hearing format` and the three single-option
+  groups do not. The child combinator does the rest of the work: `classes` lands on the
+  `.govuk-checkboxes` container, so `>` keeps a divided group's rules off any group revealed within
+  it.
+- **`govuk-checkboxes--inline` removed from `Hearing format`: it does not exist.** govuk-frontend
+  6.4.0 ships `govuk-radios--inline` but has no checkboxes equivalent, so the class compiled to
+  nothing and the three options stacked regardless — a class asserting a layout it could not deliver,
+  and the reason the divider bug above was visible on a supposedly inline group. Found by grepping
+  the compiled CSS for the selector and getting no match. Stacked is the stock presentation, and is
+  now what the template says.
 - **`Details of grounds (optional)` gets no divider above it.** It qualifies the Grounds radios
   rather than asking anything new. Marked `.pcs-continues-question` — named for the relationship, so
   it still reads correctly if the divider is ever drawn another way.

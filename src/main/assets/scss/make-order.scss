@@ -252,6 +252,25 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
 // question, and splitting them would present three unrelated questions to assistive technology — so
 // the divider goes on the item instead.
 //
+// Opt-in by class, unlike rules 1 and 2. Those two describe every section heading and every question
+// in a panel, so deriving them from position is what keeps them self-maintaining. This one does not.
+// A divider earns its place where the options are long, or each opens a reveal, so that without one
+// an option and the previous option's revealed fields run together. Where they are short one-line
+// options — Hearing format's three, or a group holding a single option — a rule between them draws a
+// separation that isn't there, and a group nested inside another group's reveal cannot be told apart
+// from its parent by a descendant selector at all. Naming the intent in the template is also what
+// stops a divider appearing on the next checkboxes added to this page purely because of where they
+// landed.
+//
+// The child combinator matters as well as the class: `classes` on govukCheckboxes lands on the
+// `.govuk-checkboxes` container, and `>` keeps the rule off the items of any group revealed within
+// this one — "Suspended on the same terms as above" hangs off an option of a divided group.
+//
+// No `.pcs-make-order` scope, unlike rules 1 and 2. Those select stock govuk-frontend classes, so
+// they need the page class to stay off every other page; `pcs-divided-options` is ours and selects
+// nothing that is not asking for it, so the class is the scope. That also makes it reusable if a
+// second page ever wants the same treatment, which the two rules above deliberately are not.
+//
 // `:not(:first-child)` counts conditional reveals too, since a reveal is a sibling of the items. A
 // rule therefore falls after an open reveal rather than between a checkbox and its own reveal, which
 // is what keeps each option and its follow-up reading as a single block.
@@ -265,7 +284,7 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
 //
 // Tighter gap than the section rules: these are options within one question, not sections, so the
 // line should read as a lighter division than the ones between headings.
-.pcs-make-order .govuk-checkboxes__item:not(:first-child) {
+.pcs-divided-options > .govuk-checkboxes__item:not(:first-child) {
   margin-top: govuk-spacing(6);
 
   // Drawn in the middle of the margin. `left: 0; right: 0` spans the item, which is the full width

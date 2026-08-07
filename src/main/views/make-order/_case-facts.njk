@@ -1,0 +1,135 @@
+{#
+  Case facts (tenancy/contract): the facts the judge refers back to while drafting, pinned so they
+  stay on screen — see `.pcs-case-facts` in make-order.scss.
+#}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+{% set tenancyTypes = [
+  { value: "assured", text: "Assured" },
+  { value: "assured-shorthold", text: "Assured shorthold" },
+  { value: "regulated", text: "Regulated" },
+  { value: "secure", text: "Secure" },
+  { value: "other", text: "Other" }
+] %}
+
+{% set rentFrequencies = [
+  { value: "weekly", text: "Weekly" },
+  { value: "fortnightly", text: "Fortnightly" },
+  { value: "monthly", text: "Monthly" },
+  { value: "yearly", text: "Yearly" }
+] %}
+
+{#
+  Case facts stay pinned while the judge drafts below. Each date is a govukDateInput so the
+  day/month/year inputs are grouped in a fieldset and announced with the field name.
+#}
+<section class="pcs-case-facts" aria-labelledby="case-facts-heading">
+  <h2 class="govuk-heading-s govuk-!-margin-bottom-2" id="case-facts-heading">
+    Case facts (tenancy/contract)
+  </h2>
+
+  <div class="pcs-case-facts__layout">
+    <div class="pcs-case-facts__grid">
+      {{ govukDateInput({
+        id: "date-tenancy",
+        namePrefix: "date-tenancy",
+        fieldset: { legend: { text: "Date of tenancy/contract", classes: "govuk-fieldset__legend--s" } }
+      }) }}
+
+      {{ govukSelect({
+        id: "tenancy-type",
+        name: "tenancy-type",
+        label: { text: "Tenancy/contract type", classes: "govuk-label--s" },
+        items: tenancyTypes
+      }) }}
+
+      {{ govukDateInput({
+        id: "date-notice",
+        namePrefix: "date-notice",
+        fieldset: { legend: { text: "Date of service of notice", classes: "govuk-fieldset__legend--s" } }
+      }) }}
+
+      {{ govukInput({
+        id: "arrears-notice",
+        name: "arrears-notice",
+        label: { text: "Arrears at notice", classes: "govuk-label--s" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        prefix: { text: "£" }
+      }) }}
+
+      {{ govukInput({
+        id: "current-rent",
+        name: "current-rent",
+        label: { text: "Current rent", classes: "govuk-label--s" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        prefix: { text: "£" }
+      }) }}
+
+      {{ govukSelect({
+        id: "rent-frequency",
+        name: "rent-frequency",
+        label: { text: "Rent frequency", classes: "govuk-label--s" },
+        items: rentFrequencies
+      }) }}
+
+      {{ govukInput({
+        id: "grounds-pleaded",
+        name: "grounds-pleaded",
+        label: { text: "Grounds pleaded", classes: "govuk-label--s" },
+        classes: "govuk-input--width-10"
+      }) }}
+
+      {{ govukInput({
+        id: "arrears-issue",
+        name: "arrears-issue",
+        label: { text: "Arrears on issue", classes: "govuk-label--s" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        prefix: { text: "£" }
+      }) }}
+
+      {{ govukDateInput({
+        id: "date-last-hearing",
+        namePrefix: "date-last-hearing",
+        fieldset: { legend: { text: "Date of last hearing", classes: "govuk-fieldset__legend--s" } }
+      }) }}
+
+      {{ govukDateInput({
+        id: "date-last-payment",
+        namePrefix: "date-last-payment",
+        fieldset: { legend: { text: "Date last payment made", classes: "govuk-fieldset__legend--s" } }
+      }) }}
+
+      {{ govukInput({
+        id: "last-payment",
+        name: "last-payment",
+        label: { text: "Last payment", classes: "govuk-label--s" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        prefix: { text: "£" }
+      }) }}
+
+      {{ govukInput({
+        id: "arrears-today",
+        name: "arrears-today",
+        label: { text: "Arrears today", classes: "govuk-label--s" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        prefix: { text: "£" }
+      }) }}
+    </div>
+
+    {{ govukTextarea({
+      id: "hearing-notes",
+      name: "hearing-notes",
+      rows: 8,
+      label: { text: "Hearing notes (internal use only)", classes: "govuk-label--s" },
+      formGroup: { classes: "govuk-!-margin-bottom-0" }
+    }) }}
+  </div>
+</section>

@@ -1,0 +1,18 @@
+{#
+  Strike out/dismiss: the claim ends without a possession order.
+
+  Panel content only — see the note in _outright.njk.
+#}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+<h3 class="govuk-heading-m">Strike out/dismiss</h3>
+
+{{ govukRadios({
+  name: "strike-claim-outcome",
+  classes: "govuk-radios--small govuk-radios--inline",
+  fieldset: { legend: { text: "Outcome", classes: "govuk-fieldset__legend--s" } },
+  items: [
+    { value: "struck-out", text: "Claim struck out" },
+    { value: "dismissed", text: "Claim dismissed" }
+  ]
+}) }}

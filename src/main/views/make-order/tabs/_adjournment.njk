@@ -1,0 +1,267 @@
+{#
+  Adjournment: either adjourned to a further hearing (when, how long, what format, what each party
+  must file first) or adjourned generally on payment conditions.
+
+  Panel content only — see the note in _outright.njk.
+#}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% import "make-order/_payment-frequencies.njk" as options %}
+
+<h3 class="govuk-heading-m">Adjournment</h3>
+
+{#
+  Adjourned for further hearing: when the next hearing is, how long it needs, in what format,
+  and what each party must file before it.
+#}
+{% set adjournFurtherHearingHtml %}
+  {#
+    One date, whichever option is chosen, so the three options are radios and the date is a
+    single field below them rather than the prototype's three separate date triples — one per
+    radio, of which at most one can ever be filled in.
+  #}
+  {{ govukRadios({
+    idPrefix: "adj-when",
+    name: "adj-when",
+    classes: "govuk-radios--small",
+    fieldset: { legend: { text: "Adjourned to", classes: "govuk-fieldset__legend--s" } },
+    items: [
+      { value: "next-list", text: "Next available possession list after" },
+      { value: "next-date", text: "Next available date, not in a possession list, after" },
+      {
+        value: "specific",
+        text: "A specific date",
+        conditional: {
+          html: govukInput({
+            id: "adj-specific-time",
+            name: "adj-specific-time",
+            label: { text: "Time of hearing" },
+            hint: { text: "For example, 10:30am" },
+            classes: "govuk-input--width-5",
+            spellcheck: false
+          })
+        }
+      }
+    ]
+  }) }}
+
+  {{ govukDateInput({
+    id: "adj-hearing-date",
+    namePrefix: "adj-hearing-date",
+    fieldset: { legend: { text: "Date", classes: "govuk-fieldset__legend--s" } }
+  }) }}
+
+  {#
+    The prototype gives the amount and the unit an aria-label each and no visible label, so
+    neither is announced with the name of the thing being estimated. A fieldset names the pair
+    once and each control keeps its own label.
+  #}
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset" role="group">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Time estimate</legend>
+      {{ govukInput({
+        id: "adj-time-estimate",
+        name: "adj-time-estimate",
+        label: { text: "Length" },
+        classes: "govuk-input--width-3",
+        spellcheck: false,
+        inputmode: "numeric"
+      }) }}
+      {{ govukSelect({
+        id: "adj-time-estimate-unit",
+        name: "adj-time-estimate-unit",
+        label: { text: "Unit" },
+        items: [
+          { value: "minutes", text: "Minutes" },
+          { value: "hours", text: "Hours" }
+        ]
+      }) }}
+    </fieldset>
+  </div>
+
+  {#
+    Checkboxes, as in the prototype: a hearing can be held in more than one format at once,
+    with some parties attending in person and others by video.
+
+    No `--inline` modifier. govuk-frontend ships `govuk-radios--inline` but has no checkboxes
+    equivalent (6.4.0), so the class this carried compiled to nothing and the three options stacked
+    anyway — a class that stated a layout it could not deliver. Stacked is the stock presentation and
+    is what the page now says.
+  #}
+  {{ govukCheckboxes({
+    idPrefix: "adj-format",
+    name: "adj-format",
+    classes: "govuk-checkboxes--small",
+    fieldset: { legend: { text: "Hearing format", classes: "govuk-fieldset__legend--s" } },
+    items: [
+      { value: "in-person", text: "In person" },
+      { value: "video", text: "Video hearing" },
+      { value: "telephone", text: "Telephone" }
+    ]
+  }) }}
+
+  {#
+    Each direction carries its own deadline, so the date belongs inside the reveal rather than
+    beside the checkbox as a fourth column the way the prototype has it.
+  #}
+  {{ govukCheckboxes({
+    idPrefix: "adj-directions",
+    name: "adj-directions",
+    classes: "govuk-checkboxes--small pcs-divided-options",
+    fieldset: { legend: { text: "Directions", classes: "govuk-fieldset__legend--s" } },
+    items: [
+      {
+        value: "defence",
+        text: "The defendant must send a defence",
+        conditional: {
+          html: govukDateInput({
+            id: "adj-defence-date",
+            namePrefix: "adj-defence-date",
+            fieldset: { legend: { text: "By 4pm on", classes: "govuk-fieldset__legend--s" } }
+          })
+        }
+      },
+      {
+        value: "counterclaim",
+        text: "The defendant must send a defence and any counterclaim",
+        conditional: {
+          html: govukDateInput({
+            id: "adj-counterclaim-date",
+            namePrefix: "adj-counterclaim-date",
+            fieldset: { legend: { text: "By 4pm on", classes: "govuk-fieldset__legend--s" } }
+          })
+        }
+      },
+      {
+        value: "claimant-reply",
+        text: "The claimant must send a defence to the counterclaim and any reply",
+        conditional: {
+          html: govukDateInput({
+            id: "adj-claimant-reply-date",
+            namePrefix: "adj-claimant-reply-date",
+            fieldset: { legend: { text: "By 4pm on", classes: "govuk-fieldset__legend--s" } }
+          })
+        }
+      }
+    ]
+  }) }}
+{% endset %}
+
+{# Adjourned generally: the payment conditions attached to the adjournment. #}
+{% set adjournGenerallyHtml %}
+  {{ govukCheckboxes({
+    idPrefix: "adj-gen",
+    name: "adj-gen",
+    classes: "govuk-checkboxes--small pcs-divided-options",
+    fieldset: { legend: { text: "Conditions", classes: "govuk-fieldset__legend--s" } },
+    items: [
+      {
+        value: "current-rent-plus",
+        text: "On payment of current rent plus an additional sum",
+        conditional: {
+          html: govukInput({
+            id: "adj-gen-current-rent-plus-amount",
+            name: "adj-gen-current-rent-plus-amount",
+            label: { text: "Additional sum" },
+            classes: "govuk-input--width-5",
+            spellcheck: false,
+            inputmode: "numeric",
+            prefix: { text: "£" }
+          }) + govukSelect({
+            id: "adj-gen-current-rent-plus-frequency",
+            name: "adj-gen-current-rent-plus-frequency",
+            label: { text: "How often" },
+            items: options.paymentFrequencies
+          }) + govukDateInput({
+            id: "adj-gen-current-rent-plus-date",
+            namePrefix: "adj-gen-current-rent-plus-date",
+            fieldset: { legend: { text: "First payment by", classes: "govuk-fieldset__legend--s" } }
+          })
+        }
+      },
+      {
+        value: "payments",
+        text: "On regular payments",
+        conditional: {
+          html: govukInput({
+            id: "adj-gen-payments-amount",
+            name: "adj-gen-payments-amount",
+            label: { text: "Payments of" },
+            classes: "govuk-input--width-5",
+            spellcheck: false,
+            inputmode: "numeric",
+            prefix: { text: "£" }
+          }) + govukSelect({
+            id: "adj-gen-payments-frequency",
+            name: "adj-gen-payments-frequency",
+            label: { text: "How often" },
+            items: options.paymentFrequencies
+          }) + govukDateInput({
+            id: "adj-gen-payments-date",
+            namePrefix: "adj-gen-payments-date",
+            fieldset: { legend: { text: "First payment by", classes: "govuk-fieldset__legend--s" } }
+          })
+        }
+      },
+      {
+        value: "oneoff",
+        text: "On a single payment",
+        conditional: {
+          html: govukInput({
+            id: "adj-gen-oneoff-amount",
+            name: "adj-gen-oneoff-amount",
+            label: { text: "Payment of" },
+            classes: "govuk-input--width-5",
+            spellcheck: false,
+            inputmode: "numeric",
+            prefix: { text: "£" }
+          }) + govukDateInput({
+            id: "adj-gen-oneoff-date",
+            namePrefix: "adj-gen-oneoff-date",
+            fieldset: { legend: { text: "Payment by", classes: "govuk-fieldset__legend--s" } }
+          })
+        }
+      },
+      {
+        value: "restore",
+        text: "Automatically struck out unless an application to restore is made",
+        conditional: {
+          html: govukDateInput({
+            id: "adj-gen-restore-date",
+            namePrefix: "adj-gen-restore-date",
+            fieldset: { legend: { text: "Application to restore by", classes: "govuk-fieldset__legend--s" } }
+          })
+        }
+      }
+    ]
+  }) }}
+{% endset %}
+
+{#
+  The prototype puts each branch's fields in a reveal that is a sibling of the radios rather
+  than inside the radio item, so `aria-controls` points forwards out of the fieldset and the
+  two blocks also carry their own <h4> headings to say which is which. Nesting them in the
+  item they belong to is what govuk-frontend's conditional reveal is for, and it makes the
+  headings unnecessary: each block is announced as part of the option that revealed it.
+#}
+{{ govukRadios({
+  idPrefix: "adj-type",
+  name: "adj-type",
+  classes: "govuk-radios--small",
+  fieldset: { legend: { text: "Adjournment type", classes: "govuk-fieldset__legend--s" } },
+  items: [
+    {
+      value: "further-hearing",
+      text: "Adjourned for further hearing",
+      conditional: { html: adjournFurtherHearingHtml }
+    },
+    {
+      value: "generally",
+      text: "Adjourned generally",
+      conditional: { html: adjournGenerallyHtml }
+    }
+  ]
+}) }}
