@@ -3,6 +3,7 @@
   "pageTitle": "Rent arrears",
   "insetIntroText": "Rent arrears are money you owe in rent payments.",
   "insetDetailsText": "When they made their claim, {{claimantName}} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.",
+  "rentStatementDocumentLinkText": "View a copy of the rent statement (opens in new tab)",
   "amountOwedHeading": "Amount you owe in rent arrears given by {{claimantName}}:",
   "rentArrearsQuestion": "Do you owe this amount in rent arrears?",
   "rentArrearsOptions": {
