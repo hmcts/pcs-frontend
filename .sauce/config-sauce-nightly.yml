@@ -27,11 +27,6 @@ nodeVersion: v22
 
 rootDir: ./
 
-npm:
-  packages:
-    '@hmcts/playwright-common': '1.1.2'
-    config: '^4.1.1'
-
 env:
   PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS: 'true'
   PLAYWRIGHT_SAUCE_STEP_SCREENSHOTS: 'true'
