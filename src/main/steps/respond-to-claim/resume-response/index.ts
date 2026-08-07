@@ -11,7 +11,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.makeCounterClaim),
   stepDir: __dirname,
   customTemplate: `${__dirname}/resumeResponse.njk`,
-  translationKeys: {},
+  translationKeys: {
+    pageTitle: 'pageTitle',
+    resumeResponseParagraph1: 'resumeResponseParagraph1',
+    resumeResponseListItem1: 'resumeResponseListItem1',
+    resumeResponseListItem2: 'resumeResponseListItem2',
+    resumeResponseParagraph2: 'resumeResponseParagraph2',
+  },
   fields: [
     {
       name: 'resumeResponse',

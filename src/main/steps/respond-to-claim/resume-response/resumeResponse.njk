@@ -13,14 +13,12 @@
 
   <h1 class="govuk-heading-l">{{ title }}</h1>
 
-  {% if resumeResponseParagraph1 %}
-    <p class="govuk-body">{{ resumeResponseParagraph1 }}</p>
-    <ul class="govuk-list govuk-list--bullet">
-      <li>{{ resumeResponseListItem1 }}</li>
-      <li>{{ resumeResponseListItem2 }}</li>
-    </ul>
-    <p class="govuk-body">{{ resumeResponseParagraph2 }}</p>
-  {% endif %}
+  <p class="govuk-body">{{ resumeResponseParagraph1 }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>{{ resumeResponseListItem1 }}</li>
+    <li>{{ resumeResponseListItem2 }}</li>
+  </ul>
+  <p class="govuk-body">{{ resumeResponseParagraph2 }}</p>
 
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
