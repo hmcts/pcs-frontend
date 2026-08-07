@@ -30,8 +30,8 @@ preRun:
     - echo "=== Dependencies installation complete ==="
 
 playwright:
-  # Match the version in your package.json
-  version: 1.62.1
+  # Use the latest version supported by Sauce Labs
+  version: 1.61.1
   configFile: playwright.config.ts
 
 nodeVersion: v22
