@@ -64,7 +64,6 @@ const legalRepStepOrder = [
   'counter-claim-application-fee-amount',
   'counter-claim-payment-successful',
   'response-and-counter-claim-submitted',
-  'end-now',
 ] as const satisfies readonly LegalRepRespondToClaimStepName[];
 
 // Legal-rep journey is a flat, linear stepOrder. It is intentionally NOT sectionalised

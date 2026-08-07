@@ -56,7 +56,7 @@ const ValidateFunctionSchema = z.custom<
 export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
   z.object({
     name: z.string(),
-    type: z.enum(['radio', 'checkbox', 'text', 'date', 'textarea', 'character-count', 'file']),
+    type: z.enum(['radio', 'checkbox', 'text', 'date', 'textarea', 'character-count', 'file', 'select']),
     required: z.union([z.boolean(), RequiredFunctionSchema]).optional(),
     pattern: z.string().optional(),
     maxLength: z.number().optional(),
