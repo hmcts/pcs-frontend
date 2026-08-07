@@ -9,17 +9,6 @@ export class PdfDocumentValidation implements IValidation {
     });
 
     await expect(pdfLink).toBeVisible();
-
-    const href = await pdfLink.getAttribute('href');
-
-    expect(href).toBeTruthy();
-
-    const pdfUrl = new URL(href!, page.url());
-    const expectedPathPattern = /^\/case\/[^/]+\/view-documents\/[0-9a-fA-F-]{36}$/;
-
-    expect(
-      pdfUrl.pathname,
-      `Document "${data.linkText}" should link to an internal document route, but got "${pdfUrl.pathname}"`
-    ).toMatch(expectedPathPattern);
+    await expect(pdfLink).toHaveAttribute('href', /\/case\/[^/]+\/view-documents\/[0-9a-fA-F-]{36}/);
   }
 }
