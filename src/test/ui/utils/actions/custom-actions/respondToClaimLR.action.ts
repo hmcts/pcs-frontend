@@ -16,6 +16,7 @@ import {
   doAnyOtherAdultsLiveInYourHomeLR,
   doYouHaveAnyDependantChildrenLR,
   doYouHaveAnyOtherDependantsLR,
+  emailConfirmation,
   exceptionalHardshipLR,
   haveYouAppliedForUniversalCreditLR,
   howMuchAffordToPayLR,
@@ -89,12 +90,29 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['enterNoticeDateKnownLR', () => this.enterNoticeDateKnownLR(fieldName as actionRecord)],
       ['doYouWantToUploadFilesLR', () => this.doYouWantToUploadFilesLR(fieldName as actionRecord)],
       ['uploadFilesToSupportCounterclaimLR', () => this.uploadFilesToSupportCounterclaimLR(fieldName as actionRecord)],
+      ['emailConfirmationLR', () => this.emailConfirmationLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
       throw new Error(`No action found for '${action}'`);
     }
     await actionToPerform();
+  }
+
+  private async emailConfirmationLR(emailData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: emailConfirmation.doYouKnowDefendantEmailQuestion,
+      option: emailData.radioOption,
+    });
+
+    if (emailData.radioOption === 'Yes') {
+      await performAction(
+        'inputText',
+        emailConfirmation.enterDefendantEmailAddressHiddenTextLabel,
+        emailConfirmation.emailAddressTextInput
+      );
+    }
+    await performAction('clickButton', emailConfirmation.saveAndContinueButton);
   }
 
   private async selectNoticeDetailsLR(noticeGivenData: actionRecord): Promise<void> {
