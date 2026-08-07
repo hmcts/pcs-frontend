@@ -1,4 +1,4 @@
-export const counterClaimSpecificSumOfMoneyLR = {
+export const counterClaimSpecificSumOfMoney = {
   mainHeader: `Is the defendant claiming for a specific sum of money?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
@@ -15,7 +15,7 @@ export const counterClaimSpecificSumOfMoneyLR = {
   enterMaximumValueFEE0508Input: `10000.00`,
   billionTextInput: `1000000000.00`,
   negativeInput: `-1000`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `counter-claim-specific-sum`,
   backLink: `Back`,
   feeHiddenAmount: `35.00`,

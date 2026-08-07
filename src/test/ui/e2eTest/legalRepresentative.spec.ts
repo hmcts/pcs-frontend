@@ -5,18 +5,18 @@ import {
   contactPreferencesTelephoneLR,
   contactPreferencesTextMessageLR,
   correspondenceAddressLR,
+  counterClaim,
   counterClaimAboutLR,
   counterClaimAgainstWhomLR,
-  counterClaimFeeLR,
+  counterClaimFee,
   counterClaimHaveYouAppliedForHelpLR,
-  counterClaimLR,
   counterClaimOrderOtherThanSumLR,
-  counterClaimSpecificSumOfMoneyLR,
-  counterClaimWhatAreYouClaimingForLR,
+  counterClaimSpecificSumOfMoney,
+  counterClaimWhatAreYouClaimingFor,
   counterclaimDoYouWantToUploadFilesLR,
   counterclaimYouNeedToApplyForHelpWithYourFeesLR,
   defendantDateOfBirthLR,
-  defendantNameConfirmationLR,
+  defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHomeLR,
   doYouHaveAnyDependantChildrenLR,
   doYouHaveAnyOtherDependantsLR,
@@ -28,7 +28,7 @@ import {
   incomeAndExpensesLR,
   instalmentPaymentsLR,
   languageUsedLR,
-  nonRentArrearsDisputeLR,
+  nonRentArrearsDispute,
   otherConsiderationsLR,
   previousPaymentsLR,
   priorityDebtDetailsLR,
@@ -37,7 +37,7 @@ import {
   repaymentsAgreedLR,
   selectDefendant,
   startNow,
-  tenancyTypeDetailsLR,
+  tenancyTypeDetails,
   whatOtherRegularExpensesDoYouHaveLR,
   whatRegularIncomeDoYouReceiveLR,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR,
@@ -135,8 +135,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
     });
     await performAction('confirmDefendantDetails', {
-      question: defendantNameConfirmationLR.mainHeader(pin2User.firstName, pin2User.lastName),
-      option: defendantNameConfirmationLR.yesRadioOption,
+      question: defendantNameConfirmation.mainHeader(pin2User.firstName, pin2User.lastName),
+      option: defendantNameConfirmation.yesRadioOption,
     });
     await performAction('enterDateOfBirthDetails', {
       dobDay: defendantDateOfBirthLR.dayInputText,
@@ -158,7 +158,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetailsLR.yesRadioOption,
+      tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('enterTenancyStartDetailsUnKnownLR', {
       tsDay: '15',
@@ -170,24 +170,24 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('enterNoticeDateUnknownLR');
     await performAction('disputingOtherPartsOfTheClaimLR', {
-      disputeOption: nonRentArrearsDisputeLR.noRadioOption,
+      disputeOption: nonRentArrearsDispute.noRadioOption,
     });
     await performAction('selectCounterClaimLR', {
-      question: counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(),
-      option: counterClaimLR.yesRadioOption,
+      question: counterClaim.getDoYouWantToMakeACounterclaimQuestion(),
+      option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
-      option: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
-      question: counterClaimSpecificSumOfMoneyLR.mainHeader,
-      option: counterClaimSpecificSumOfMoneyLR.yesRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     await performAction('selectCounterClaimFeeLR', {
-      radioOption: counterClaimFeeLR.defendantDoNotNeedHelpRadioOption,
-      typeOfClaim: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
+      radioOption: counterClaimFee.defendantDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     const pinUser = await getPinUserAt(2);
     await performAction('selectClaimAgainstWhomLR', {
@@ -292,17 +292,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddressLR.walesTownOrCityTextInput,
       postcode: correspondenceAddressLR.walesPostcodeTextInput,
     });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPostLR.byEmailCheckbox,
-      emailAddress: contactPreferenceEmailOrPostLR.emailAddressTextInput,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephoneLR.noRadioOption,
-    });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetailsLR.yesRadioOption,
+      tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('enterTenancyStartDetailsUnKnownLR', {
       tsDay: '15',
@@ -314,18 +306,18 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('enterNoticeDateUnknownLR');
     await performAction('disputingOtherPartsOfTheClaimLR', {
-      disputeOption: nonRentArrearsDisputeLR.noRadioOption,
+      disputeOption: nonRentArrearsDispute.noRadioOption,
     });
     await performAction('selectCounterClaimLR', {
-      question: counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(),
-      option: counterClaimLR.yesRadioOption,
+      question: counterClaim.getDoYouWantToMakeACounterclaimQuestion(),
+      option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
-      option: counterClaimWhatAreYouClaimingForLR.somethingElseRadioOption,
+      option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     await performAction('selectCounterClaimFeeLR', {
-      radioOption: counterClaimFeeLR.defendantDoNotNeedHelpRadioOption,
-      typeOfClaim: counterClaimWhatAreYouClaimingForLR.somethingElseRadioOption,
+      radioOption: counterClaimFee.defendantDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     const pinUser = await getPinUserAt(2);
     await performAction('selectClaimAgainstWhomLR', {
@@ -443,7 +435,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetailsLR.yesRadioOption,
+      tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('enterTenancyStartDetailsUnKnownLR', {
       tsDay: '15',
@@ -455,18 +447,18 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('enterNoticeDateUnknownLR');
     await performAction('disputingOtherPartsOfTheClaimLR', {
-      disputeOption: nonRentArrearsDisputeLR.noRadioOption,
+      disputeOption: nonRentArrearsDispute.noRadioOption,
     });
     await performAction('selectCounterClaimLR', {
-      question: counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(),
-      option: counterClaimLR.yesRadioOption,
+      question: counterClaim.getDoYouWantToMakeACounterclaimQuestion(),
+      option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
-      option: counterClaimWhatAreYouClaimingForLR.somethingElseRadioOption,
+      option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     await performAction('selectCounterClaimFeeLR', {
-      radioOption: counterClaimFeeLR.defendantNeedHelpRadioOption,
-      typeOfClaim: counterClaimWhatAreYouClaimingForLR.somethingElseRadioOption,
+      radioOption: counterClaimFee.defendantNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelpLR.yesRadioOption,
@@ -585,11 +577,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetailsLR.noRadioOption,
-      tenancyTypeInfo: tenancyTypeDetailsLR.giveCorrectTenancyTypeTextInput,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyTypeDetailsLR.yesRadioOption,
+      option: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('selectNoticeDetailsLR', {
       option: confirmationOfNoticeGiven.yesRadioOption,
@@ -605,24 +597,24 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       rentArrearsTotal: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('disputingOtherPartsOfTheClaimLR', {
-      disputeOption: nonRentArrearsDisputeLR.yesRadioOption,
-      disputeInfo: nonRentArrearsDisputeLR.explainClaimTextInput,
+      disputeOption: nonRentArrearsDispute.yesRadioOption,
+      disputeInfo: nonRentArrearsDispute.explainClaimTextInput,
     });
     await performAction('selectCounterClaimLR', {
-      option: counterClaimLR.yesRadioOption,
+      option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
-      option: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
+      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
-      question: counterClaimSpecificSumOfMoneyLR.mainHeader,
-      option: counterClaimSpecificSumOfMoneyLR.noRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.enterMaximumValueOfYourClaimInput,
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performAction('selectCounterClaimFeeLR', {
-      radioOption: counterClaimFeeLR.defendantDoNotNeedHelpRadioOption,
-      typeOfClaim: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.enterMaximumValueOfYourClaimInput,
+      radioOption: counterClaimFee.defendantDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performAction('counterClaimAboutLR', {
       counterClaimFor: counterClaimAboutLR.counterClaimForInput,
@@ -727,11 +719,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetailsLR.noRadioOption,
-      tenancyTypeInfo: tenancyTypeDetailsLR.giveCorrectTenancyTypeTextInput,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('selectTenancyStartDateKnown', {
-      option: tenancyTypeDetailsLR.yesRadioOption,
+      option: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('selectNoticeDetailsLR', {
       option: confirmationOfNoticeGiven.yesRadioOption,
@@ -747,24 +739,24 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       rentArrearsTotal: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('disputingOtherPartsOfTheClaimLR', {
-      disputeOption: nonRentArrearsDisputeLR.yesRadioOption,
-      disputeInfo: nonRentArrearsDisputeLR.explainClaimTextInput,
+      disputeOption: nonRentArrearsDispute.yesRadioOption,
+      disputeInfo: nonRentArrearsDispute.explainClaimTextInput,
     });
     await performAction('selectCounterClaimLR', {
-      option: counterClaimLR.yesRadioOption,
+      option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
-      option: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
-      question: counterClaimSpecificSumOfMoneyLR.mainHeader,
-      option: counterClaimSpecificSumOfMoneyLR.noRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.enterMaximumValueOfYourClaimInput,
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performAction('selectCounterClaimFeeLR', {
-      radioOption: counterClaimFeeLR.defendantDoNotNeedHelpRadioOption,
-      typeOfClaim: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.enterMaximumValueOfYourClaimInput,
+      radioOption: counterClaimFee.defendantDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performAction('counterClaimAboutLR', {
       counterClaimFor: counterClaimAboutLR.counterClaimForInput,
@@ -874,8 +866,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetailsLR.noRadioOption,
-      tenancyTypeInfo: tenancyTypeDetailsLR.giveCorrectTenancyTypeTextInput,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('enterTenancyStartDetailsUnKnownLR');
     await performAction('selectNoticeDetailsLR', {
@@ -886,7 +878,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('selectCounterClaimLR', {
-      option: counterClaimLR.noRadioOption,
+      option: counterClaim.noRadioOption,
     });
     await performAction('previousPaymentsLR', {
       question: previousPaymentsLR.getMainHeader(),
@@ -965,8 +957,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetailsLR.noRadioOption,
-      tenancyTypeInfo: tenancyTypeDetailsLR.giveCorrectTenancyTypeTextInput,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('enterTenancyStartDetailsUnKnownLR');
     await performAction('selectNoticeDetailsLR', {
@@ -977,20 +969,20 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('selectCounterClaimLR', {
-      option: counterClaimLR.yesRadioOption,
+      option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
-      option: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
+      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
-      question: counterClaimSpecificSumOfMoneyLR.mainHeader,
-      option: counterClaimSpecificSumOfMoneyLR.yesRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     await performAction('selectCounterClaimFeeLR', {
-      radioOption: counterClaimFeeLR.defendantNeedHelpRadioOption,
-      typeOfClaim: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.claimInput,
+      radioOption: counterClaimFee.defendantNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelpLR.yesRadioOption,
@@ -1080,8 +1072,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectContactByTextMessage', contactPreferencesTextMessageLR.yesRadioOption);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
-      tenancyOption: tenancyTypeDetailsLR.noRadioOption,
-      tenancyTypeInfo: tenancyTypeDetailsLR.giveCorrectTenancyTypeTextInput,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
     await performAction('enterTenancyStartDetailsUnKnownLR');
     await performAction('selectNoticeDetailsLR', {
@@ -1092,20 +1084,20 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('selectCounterClaimLR', {
-      option: counterClaimLR.yesRadioOption,
+      option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
-      option: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
+      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
-      question: counterClaimSpecificSumOfMoneyLR.mainHeader,
-      option: counterClaimSpecificSumOfMoneyLR.noRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.enterMaximumValueOfYourClaimInput,
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performAction('selectCounterClaimFeeLR', {
-      radioOption: counterClaimFeeLR.defendantNeedHelpRadioOption,
-      typeOfClaim: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
-      amount: counterClaimSpecificSumOfMoneyLR.enterMaximumValueOfYourClaimInput,
+      radioOption: counterClaimFee.defendantNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelpLR.noRadioOption,

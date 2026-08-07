@@ -1,4 +1,4 @@
-export const counterClaimFeeLR = {
+export const counterClaimFee = {
   mainHeader: `Counterclaim fee`,
   helpWithCourtFeesHeader: `Help with court fees`,
   theDefendantMayBeAbleParagraph: `The defendant may be able to get help with paying the fee if they (one or more of the following):`,
@@ -11,7 +11,7 @@ export const counterClaimFeeLR = {
   defendantDoNotNeedHelpRadioOption: `The defendant does not need help paying the fee`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `counter-claim-fee`,
   /*
   thereIsAProblemErrorMessageHeader: `There is a problem`,

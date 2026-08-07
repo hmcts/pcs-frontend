@@ -1,4 +1,4 @@
-export const defendantNameConfirmationLR = {
+export const defendantNameConfirmation = {
   mainHeader(clientFirstName: string, clientLastName: string): string {
     return `Is your client’s name ${clientFirstName} ${clientLastName}?`;
   },
@@ -22,6 +22,6 @@ export const defendantNameConfirmationLR = {
   emojiTextInput: `👉 😄`,
   emojiFirstNameErrorMessage: `First name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   emojiLastNameErrorMessage: `Last name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `defendant-name-confirmation`,
 };

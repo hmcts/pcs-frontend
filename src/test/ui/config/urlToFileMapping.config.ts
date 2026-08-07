@@ -83,4 +83,6 @@ export default {
   'response-submitted-counter-claim-fee-payment-needed': 'responseSubmittedCounterclaimFeePaymentNeeded',
   'response-and-counter-claim-submitted': 'responseAndCounterClaimSubmitted',
   'response-submitted': 'responseSubmitted',
+  'select-defendant': 'selectDefendant',
+  'counter-claim-what-are-you-claiming-for': 'counterClaimWhatAreYouClaimingFor',
 };
