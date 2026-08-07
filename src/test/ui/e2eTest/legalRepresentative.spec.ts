@@ -2,7 +2,6 @@ import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
   contactPreferencesTelephoneLR,
-  contactPreferencesTextMessageLR,
   correspondenceAddressLR,
   counterClaimAboutLR,
   counterClaimAgainstWhomLR,
@@ -19,6 +18,7 @@ import {
   doAnyOtherAdultsLiveInYourHomeLR,
   doYouHaveAnyDependantChildrenLR,
   doYouHaveAnyOtherDependantsLR,
+  emailConfirmation,
   equalityAndDiversityEndLR,
   equalityAndDiversityStartLR,
   exceptionalHardshipLR,
@@ -147,13 +147,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddressLR.walesTownOrCityTextInput,
       postcode: correspondenceAddressLR.walesPostcodeTextInput,
     });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPostLR.byEmailCheckbox,
-      emailAddress: contactPreferenceEmailOrPostLR.emailAddressTextInput,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephoneLR.noRadioOption,
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.yesRadioOption,
+      emailAddress: emailConfirmation.emailAddressTextInput,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
@@ -291,13 +287,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddressLR.walesTownOrCityTextInput,
       postcode: correspondenceAddressLR.walesPostcodeTextInput,
     });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPostLR.byEmailCheckbox,
-      emailAddress: contactPreferenceEmailOrPostLR.emailAddressTextInput,
-    });
-    await performAction('selectContactByTelephone', {
-      radioOption: contactPreferencesTelephoneLR.noRadioOption,
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
@@ -573,9 +564,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressUnknownLR', {
       radioOption: correspondenceAddressLR.yesRadioOption,
     });
-    await performAction('selectContactPreferenceEmailOrPost', {
-      question: contactPreferenceEmailOrPostLR.howDoYouWantTOReceiveUpdatesQuestion,
-      radioOption: contactPreferenceEmailOrPostLR.byPostCheckbox,
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.yesRadioOption,
+      emailAddress: emailConfirmation.emailAddressTextInput,
     });
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephoneLR.yesRadioOption,
