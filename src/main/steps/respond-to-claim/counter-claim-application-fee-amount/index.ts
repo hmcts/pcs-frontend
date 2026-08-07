@@ -70,8 +70,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
           });
         }
         return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-pba-payment/start` : '#';
-      } else {
-        return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start` : '#';
       }
     }
   },

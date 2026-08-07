@@ -37,10 +37,10 @@
   {% endif %}
 
   {% if isLegalRepresentative %}
-    <form method="post" action="{{ url }}" novalidate>
+    <form method="post" action="{{ url }}" novalidate id="pcs-payment-form">
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
-      {% set pbaAccountlHtml %}
+      {% set pbaAccountHtml %}
         {{ govukSelect({
           id: "pbaAccount",
           name: "paymentOptions.pbaAccount",
@@ -50,61 +50,79 @@
           items: pbaAccountItems,
           value: form.pbaAccounts,
           errorMessage: {
-                   text: fieldErrors['paymentOptions.pbaAccount']
-                 } if fieldErrors['paymentOptions.pbaAccount']
+            text: fieldErrors['paymentOptions.pbaAccount']
+          } if fieldErrors['paymentOptions.pbaAccount']
         }) }}
 
         {{ govukInput({
-              id: 'customerReference',
-              name: 'paymentOptions.customerReference',
-              label: {
-                text: labels.customerReferenceHeading,
-                classes: "govuk-label--m",
-                isPageHeading: true
-              },
-              hint: {
-                text: labels.customerReferenceHint
-              },
-              errorMessage: {
-                   text: fieldErrors['paymentOptions.customerReference']
-                 } if fieldErrors['paymentOptions.customerReference']
-            })
-        }}
+          id: 'customerReference',
+          name: 'paymentOptions.customerReference',
+          label: {
+            text: labels.customerReferenceHeading,
+            classes: "govuk-label--m",
+            isPageHeading: true
+          },
+          hint: {
+            text: labels.customerReferenceHint
+          },
+          errorMessage: {
+            text: fieldErrors['paymentOptions.customerReference']
+          } if fieldErrors['paymentOptions.customerReference']
+        }) }}
       {% endset -%}
 
-    {% for field in fields %}
-      {% if field.componentType == 'radios' %}
-        {% set updatedItems = [] %}
+      {% for field in fields %}
+        {% if field.componentType == 'radios' %}
+          {% set updatedItems = [] %}
 
-        {% for item in field.component.items %}
-          {% if item.value == 'pba' %}
-            {% set updatedItems = (updatedItems.push({
-              value: item.value,
-              text: item.text,
-              checked: item.checked,
-              conditional: {
-                html: pbaAccountlHtml
-              }
-            }), updatedItems) %}
-          {% else %}
-            {% set updatedItems = (updatedItems.push(item), updatedItems) %}
-          {% endif %}
-        {% endfor %}
+          {% for item in field.component.items %}
+            {% if item.value == 'pba' %}
+              {% set updatedItems = (updatedItems.push({
+                value: item.value,
+                text: item.text,
+                checked: item.checked,
+                conditional: {
+                  html: pbaAccountHtml
+                }
+              }), updatedItems) %}
+            {% else %}
+              {% set updatedItems = (updatedItems.push(item), updatedItems) %}
+            {% endif %}
+          {% endfor %}
 
-        {{ govukRadios({
-          name: field.component.name,
-          hint: field.component.hint,
-          errorMessage: field.component.errorMessage,
-          items: updatedItems
-        }) }}
-      {% endif %}
-    {% endfor %}
+          {{ govukRadios({
+            name: field.component.name,
+            hint: field.component.hint,
+            errorMessage: field.component.errorMessage,
+            items: updatedItems
+          }) }}
+        {% endif %}
+      {% endfor %}
 
       {{ govukButton({
         text: payNowButton,
-        disabled: payNowDisabled
+        disabled: payNowDisabled,
+        preventDoubleClick: true
       }) }}
+
     </form>
+
+    <script{% if scriptNonce %} nonce="{{ scriptNonce }}"{% endif %}>
+      document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('pcs-payment-form');
+        var cardStartUrl = '{{ payNowUrl | safe }}';
+
+        if (form) {
+          form.addEventListener('submit', function (e) {
+            var selectedRadio = form.querySelector('input[name="paymentOptions"]:checked');
+            if (selectedRadio && selectedRadio.value === 'card') {
+              e.preventDefault();
+              window.location.href = cardStartUrl;
+            }
+          });
+        }
+      });
+    </script>
   {% else %}
     {{ govukButton({
       text: payNowButton,

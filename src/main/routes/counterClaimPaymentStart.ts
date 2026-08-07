@@ -83,12 +83,6 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
         return redirectOnMissingPaymentSessionData(res, caseReference);
       }
 
-      const paymentReturnUrl = config.get<string>('payment.returnUrl');
-
-      if (!paymentReturnUrl) {
-        return redirectOnMissingPaymentReturnUrl(res, caseReference);
-      }
-
       try {
         const paymentResponse = await paymentService.startPbaPaymentRequest({
           accessToken,
