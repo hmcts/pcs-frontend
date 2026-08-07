@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -76,6 +77,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     detailsHeading: 'detailsHeading',
     tenancyType: 'tenancyType',
     tenancyTypeOther: 'tenancyTypeOther',
+    tenancyAgreementDocumentLinkText: 'tenancyAgreementDocumentLinkText',
   },
   customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
@@ -149,6 +151,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     // England: tenancy_* (TenancyLicenceDetails).
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
     const senderName = isLegalRepresentativeUser(req) ? claimantName : orgName;
+    const release12Enabled = isRelease12Enabled(req);
 
     const t = getTranslationFunction(req);
     let tenancyType: unknown;
@@ -166,6 +169,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
     }
 
+    const tenancyDocument = walesProperty
+      ? (caseData?.detailsTab_OccupationContractLicenceDetails?.documents?.[0] ?? '')
+      : (caseData?.detailsTab_TenancyLicenceDetails?.tenancyLicenceDocuments?.[0] ?? '');
+
     return {
       ...formContent,
       senderName,
@@ -176,6 +183,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyTypeAgreementType,
       tenancyTypeConfirm,
       correctType,
+      tenancyDocument,
+      isRelease12Enabled: release12Enabled,
     };
   },
 });
