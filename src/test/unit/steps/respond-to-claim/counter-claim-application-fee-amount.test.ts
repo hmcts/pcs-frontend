@@ -13,12 +13,23 @@ jest.mock('@services/feeLookupService', () => ({
   getFee: jest.fn(),
 }));
 
+jest.mock('@services/pcsApi/paymentService', () => ({
+  paymentService: {
+    getOutstandingCounterClaimPayment: jest.fn(),
+  },
+}));
+
+jest.mock('@routes/dashboard', () => ({
+  getDashboardUrl: jest.fn((caseReference?: string) => (caseReference ? `/case/${caseReference}/dashboard` : null)),
+}));
+
 import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim-application-fee-amount';
 
 import type { CcdCounterClaim } from '@services/ccdCase.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
+import { paymentService } from '@services/pcsApi/paymentService';
 
 const makeValidatedCase = (counterClaim?: CcdCounterClaim, defendantResponses: Record<string, unknown> = {}) =>
   new CcdCaseModel({
@@ -36,14 +47,16 @@ const makeValidatedCase = (counterClaim?: CcdCounterClaim, defendantResponses: R
 type CounterClaimApplicationFeeAmountStep = {
   extendGetContent: (req: {
     params?: { caseReference?: string };
-    query?: { payment?: string };
+    query?: { payment?: string; from?: string };
     session?: {
+      user?: { accessToken?: string };
       payment?: {
         serviceRequestReference?: string;
         feeAmount?: number;
         counterClaimAmountInPence?: string;
         counterClaimType?: string;
       };
+      save?: (cb: (err?: Error) => void) => void;
     };
     res?: {
       locals?: {
@@ -73,6 +86,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     (getTranslationFunction as jest.Mock).mockReturnValue(tMock);
     (getCounterClaimFeeType as jest.Mock).mockReturnValue(3);
     (getFee as jest.Mock).mockResolvedValue(377);
+    (paymentService.getOutstandingCounterClaimPayment as jest.Mock).mockReset();
   });
 
   it('returns i18n-formatted counterclaim amount and fee from fee register lookup', async () => {
@@ -97,6 +111,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
 
     expect(getCounterClaimFeeType).toHaveBeenCalledWith('PAYMENT_OR_COMPENSATION', '64900');
     expect(getFee).toHaveBeenCalledWith(3, '64900');
+    expect(paymentService.getOutstandingCounterClaimPayment).not.toHaveBeenCalled();
     expect(tMock).toHaveBeenCalledWith('counterClaimAmountDisplay', { counterClaimAmount: 649 });
     expect(tMock).toHaveBeenCalledWith('counterClaimFeeDisplay', { counterClaimFee: 377 });
     expect(tMock).toHaveBeenCalledWith('payNowButton', { counterClaimFee: 377 });
@@ -204,7 +219,79 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     );
   });
 
-  it('throws when counterclaim claim type is missing from session and CCD', async () => {
+  it('rehydrates payment session from outstanding counterclaim payment API', async () => {
+    (paymentService.getOutstandingCounterClaimPayment as jest.Mock).mockResolvedValue({
+      serviceRequestReference: 'SR-OUTSTANDING',
+      feeAmount: '404.00',
+    });
+
+    const session: {
+      user: { accessToken: string };
+      payment?: Record<string, unknown>;
+      save: (cb: (err?: Error) => void) => void;
+    } = {
+      user: { accessToken: 'token-1' },
+      save: cb => cb(),
+    };
+
+    const content = await testedStep.extendGetContent({
+      params: { caseReference: '123' },
+      query: { from: 'dashboard' },
+      res: {
+        locals: {
+          validatedCase: makeValidatedCase(undefined, {}),
+        },
+      },
+      session,
+    });
+
+    expect(paymentService.getOutstandingCounterClaimPayment).toHaveBeenCalledWith('token-1', '123');
+    expect(getFee).not.toHaveBeenCalled();
+    expect(session.payment).toEqual(
+      expect.objectContaining({
+        serviceRequestReference: 'SR-OUTSTANDING',
+        feeAmount: 404,
+      })
+    );
+    expect(content).toEqual(
+      expect.objectContaining({
+        formattedCounterClaimFee: '£404',
+        payNowDisabled: false,
+        backUrl: '/case/123/dashboard',
+      })
+    );
+  });
+
+  it('keeps pay disabled when outstanding payment lookup fails', async () => {
+    (paymentService.getOutstandingCounterClaimPayment as jest.Mock).mockRejectedValue(new Error('not found'));
+
+    const content = await testedStep.extendGetContent({
+      params: { caseReference: '123' },
+      query: { from: 'dashboard' },
+      res: {
+        locals: {
+          validatedCase: makeValidatedCase({
+            claimType: 'PAYMENT_OR_COMPENSATION',
+            isClaimAmountKnown: 'YES',
+            claimAmount: '64900',
+          }),
+        },
+      },
+      session: {
+        user: { accessToken: 'token-1' },
+        save: cb => cb(),
+      },
+    });
+
+    expect(content).toEqual(
+      expect.objectContaining({
+        payNowDisabled: true,
+        backUrl: '/case/123/dashboard',
+      })
+    );
+  });
+
+  it('throws when counterclaim claim type is missing and fee cannot be resolved', async () => {
     await expect(
       testedStep.extendGetContent({
         session: {
