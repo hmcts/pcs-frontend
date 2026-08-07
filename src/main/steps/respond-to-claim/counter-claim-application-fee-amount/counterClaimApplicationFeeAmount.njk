@@ -37,7 +37,7 @@
   {% endif %}
 
   {% if isLegalRepresentative %}
-    <form method="post" novalidate>
+    <form method="post" action="{{ url }}" novalidate>
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
       {% set pbaAccountlHtml %}
