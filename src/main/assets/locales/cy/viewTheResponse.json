@@ -60,10 +60,8 @@
     "noticeReceivedDate": "cyWhen did you receive notice from the claimant?",
     "rentArrearsAmountConfirmation": "cyIs the amount of rent arrears given by the claimant correct?",
     "rentArrearsAmount": "cyAdmitted amount owed in rent arrears",
-    "landlordRegistered": "A yw eich landlord wedi'i gofrestru?",
-    "landlordLicensed": "A yw eich landlord wedi'i drwyddedu?",
-    "writtenTerms": "A yw eich landlord wedi anfon telerau ysgrifenedig atoch o'r contract meddiannaeth?",
-    "makeCounterClaim": "Ydych chi eisiau gwneud gwrth-hawliad?"
+    "writtenTerms": "cyHas your landlord sent you written terms of the occupation contract?",
+    "makeCounterClaim": "cyDo you want to make a counterclaim?"
   },
   "payments": {
     "anyPaymentsMade": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{claimIssueDate}}?",
