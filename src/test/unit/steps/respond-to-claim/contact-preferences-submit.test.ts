@@ -93,6 +93,7 @@ describe('contact preferences submit-time CCD payloads', () => {
 
       req.body = {
         contactByTextMessage: 'yes',
+        'contactByTextMessage.mobileNumber': '07700900982',
       };
 
       const post = textStep.postController?.post;
@@ -103,6 +104,11 @@ describe('contact preferences submit-time CCD payloads', () => {
       expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
         req,
         expect.objectContaining({
+          defendantContactDetails: expect.objectContaining({
+            party: expect.objectContaining({
+              textMessageNumber: '07700900982',
+            }),
+          }),
           defendantResponses: expect.objectContaining({
             contactByText: 'YES',
           }),
