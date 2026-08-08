@@ -4,6 +4,8 @@ import * as jose from 'jose';
 import type { Configuration, TokenEndpointResponse, UserInfoResponse } from 'openid-client';
 import * as client from 'openid-client';
 
+import { hasAllowedUserRole, normaliseRoles } from '../../steps/utils/userRole';
+
 import type { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
@@ -125,6 +127,20 @@ export class OIDCModule {
     }
   }
 
+  private denyAccessAndLogout(req: Request, res: Response, idTokenHint: string): void {
+    const logoutUrl = client.buildEndSessionUrl(this.clientConfig, {
+      post_logout_redirect_uri: OIDCModule.getCurrentUrl(req).origin,
+      id_token_hint: idTokenHint,
+    });
+
+    req.session.destroy((err: unknown) => {
+      if (err) {
+        this.logger.error('Failed to destroy session for user without a permitted role:', err);
+      }
+      res.redirect(logoutUrl.href);
+    });
+  }
+
   public enableFor(app: Express): void {
     // Store OIDC module instance in app.locals for middleware access
     app.locals.oidc = this;
@@ -205,6 +221,14 @@ export class OIDCModule {
 
         const { sub } = claims;
         const user: UserInfoResponse = await client.fetchUserInfo(this.clientConfig, access_token, sub);
+
+        if (!hasAllowedUserRole(normaliseRoles((user as { roles?: unknown }).roles))) {
+          this.logger.warn('Authenticated user has no permitted role; denying access', {
+            event: 'login_denied_no_permitted_role',
+            userId: (user as { uid?: string }).uid,
+          });
+          return this.denyAccessAndLogout(req, res, id_token as string);
+        }
 
         req.session.user = {
           accessToken: access_token,
