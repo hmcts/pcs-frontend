@@ -1,4 +1,5 @@
 import { Locator, Page, expect } from '@playwright/test';
+
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
@@ -242,7 +243,6 @@ export class RespondToClaimAction implements IAction {
       ['counterClaimAbout', () => this.counterClaimAbout(fieldName as actionRecord)],
       ['counterClaimOrderOtherThanSum', () => this.counterClaimOrderOtherThanSum(fieldName as actionRecord)],
       ['selectReasonableAdjustments', () => this.selectReasonableAdjustments(fieldName as actionRecord, page)],
-      
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -1758,15 +1758,15 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async selectReasonableAdjustments(ra: actionRecord, page: Page): Promise<void> {
-    const heading = page.locator('h1#header-question', {hasText: String(ra.header),});
+    const heading = page.locator('h1#header-question', { hasText: String(ra.header) });
     await expect(heading).toContainText(String(ra.header));
     await heading.waitFor({ state: 'visible' });
-   const options = Array.isArray(ra.options) ? ra.options : [ra.option];
+    const options = Array.isArray(ra.options) ? ra.options : [ra.option];
     for (const option of options) {
       await performAction('check', {
         option,
       });
     }
     await performAction('clickButton', ra.button);
-  } 
+  }
 }

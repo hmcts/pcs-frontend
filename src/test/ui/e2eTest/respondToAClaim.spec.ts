@@ -2184,7 +2184,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       message: counterClaimApplicationFeeAmount.paymentFailedDynamicErrorMessage,
     });
   });
-
 });
 
 test.describe('Common Component Your Support Respond to a claim - e2e Journey @nightly', async () => {
@@ -2333,35 +2332,43 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
     await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
     await performAction('selectReasonableAdjustments', {
       header: physicalMentalOrLearningDisability.mainHeader,
-      options: [physicalMentalOrLearningDisability.adjustmentsToGetIntoBuildingCheckbox,
-      physicalMentalOrLearningDisability.documentInAlternativeFormatCheckbox,
-      physicalMentalOrLearningDisability.communicationCheckbox,
-      physicalMentalOrLearningDisability.helpWithFormCheckbox,
-      physicalMentalOrLearningDisability.hearingCheckbox,
-      physicalMentalOrLearningDisability.bringSupportCheckbox,
-      physicalMentalOrLearningDisability.askCertainTypeOfHearingCheckbox],
-      button: physicalMentalOrLearningDisability.continueButton
-    }); 
+      options: [
+        physicalMentalOrLearningDisability.adjustmentsToGetIntoBuildingCheckbox,
+        physicalMentalOrLearningDisability.documentInAlternativeFormatCheckbox,
+        physicalMentalOrLearningDisability.communicationCheckbox,
+        physicalMentalOrLearningDisability.helpWithFormCheckbox,
+        physicalMentalOrLearningDisability.hearingCheckbox,
+        physicalMentalOrLearningDisability.bringSupportCheckbox,
+        physicalMentalOrLearningDisability.askCertainTypeOfHearingCheckbox,
+      ],
+      button: physicalMentalOrLearningDisability.continueButton,
+    });
     await performAction('selectReasonableAdjustments', {
       header: adjustmentToGetIntoBuilding.mainHeader,
-      options: [adjustmentToGetIntoBuilding.accessibleToiletCheckbox,
-      adjustmentToGetIntoBuilding.helpUsingALiftCheckbox,
-      adjustmentToGetIntoBuilding.useOfVenueWheelchairCheckbox],
+      options: [
+        adjustmentToGetIntoBuilding.accessibleToiletCheckbox,
+        adjustmentToGetIntoBuilding.helpUsingALiftCheckbox,
+        adjustmentToGetIntoBuilding.useOfVenueWheelchairCheckbox,
+      ],
       button: adjustmentToGetIntoBuilding.continueButton,
     });
     await performAction('selectReasonableAdjustments', {
       header: documentInAlternativeFormat.mainHeader,
-      options: [documentInAlternativeFormat.audioTranslationOfDocumentsCheckbox,
-      documentInAlternativeFormat.brailleDocumentsCheckbox,
-      documentInAlternativeFormat.informationEmailedToMeCheckbox],
+      options: [
+        documentInAlternativeFormat.audioTranslationOfDocumentsCheckbox,
+        documentInAlternativeFormat.brailleDocumentsCheckbox,
+        documentInAlternativeFormat.informationEmailedToMeCheckbox,
+      ],
       button: documentInAlternativeFormat.continueButton,
     });
     await performAction('selectReasonableAdjustments', {
       header: helpcommunicatingAndUnderstanding.mainHeader,
-      options: [helpcommunicatingAndUnderstanding.extraTimeToThinkAndExplainMyselfCheckbox,
-      helpcommunicatingAndUnderstanding.needToBeCloseToWhoIsSpeakingCheckbox],
+      options: [
+        helpcommunicatingAndUnderstanding.extraTimeToThinkAndExplainMyselfCheckbox,
+        helpcommunicatingAndUnderstanding.needToBeCloseToWhoIsSpeakingCheckbox,
+      ],
       button: helpcommunicatingAndUnderstanding.continueButton,
-    }); 
+    });
     await performAction('selectReasonableAdjustments', {
       header: helpWithForms.mainHeader,
       options: [helpWithForms.noHelpWithFormsCheckbox],
@@ -2369,22 +2376,22 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
     });
     await performAction('selectReasonableAdjustments', {
       header: feelComfortableDuringHearing.mainHeader,
-      options: [feelComfortableDuringHearing.privateWaitingAreaCheckbox,
-      feelComfortableDuringHearing.regularBreaksCheckbox],
+      options: [
+        feelComfortableDuringHearing.privateWaitingAreaCheckbox,
+        feelComfortableDuringHearing.regularBreaksCheckbox,
+      ],
       button: feelComfortableDuringHearing.continueButton,
     });
     await performAction('selectReasonableAdjustments', {
       header: bringSupportToCourtHearing.mainHeader,
-      options: [
-      bringSupportToCourtHearing.noSupportToBringWithMeCheckbox],
+      options: [bringSupportToCourtHearing.noSupportToBringWithMeCheckbox],
       button: bringSupportToCourtHearing.continueButton,
     });
     await performAction('selectReasonableAdjustments', {
       header: requestCertainTypeOfHearing.mainHeader,
-      options: [
-        requestCertainTypeOfHearing.noCertainTypeOfHearingCheckbox],
+      options: [requestCertainTypeOfHearing.noCertainTypeOfHearingCheckbox],
       button: requestCertainTypeOfHearing.continueButton,
-    });/*
+    }); /*
     await performAction('selectReasonableAdjustments', {
       header: welshRequirements.mainHeader,
       options: [welshRequirements.speakWelshAtHearingsCheckbox,
@@ -2410,9 +2417,9 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
        button: askingForSpecialMeasures.continueButton,
     }); */
     await performValidation('mainHeader', reviewSupport.mainHeader);
-    await performAction('clickButton',reviewSupport.submitButton);
+    await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequest.mainHeader);
-    await performAction('clickButton',supportRequest.continueButton);
+    await performAction('clickButton', supportRequest.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -2576,22 +2583,21 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
     await performAction('selectReasonableAdjustments', {
       header: physicalMentalOrLearningDisability.mainHeader,
       options: [
-      physicalMentalOrLearningDisability.bringSupportCheckbox,
-      physicalMentalOrLearningDisability.askCertainTypeOfHearingCheckbox],
-      button: physicalMentalOrLearningDisability.continueButton
-    }); 
+        physicalMentalOrLearningDisability.bringSupportCheckbox,
+        physicalMentalOrLearningDisability.askCertainTypeOfHearingCheckbox,
+      ],
+      button: physicalMentalOrLearningDisability.continueButton,
+    });
     await performAction('selectReasonableAdjustments', {
       header: bringSupportToCourtHearing.mainHeader,
-      options: [
-      bringSupportToCourtHearing.noSupportToBringWithMeCheckbox],
+      options: [bringSupportToCourtHearing.noSupportToBringWithMeCheckbox],
       button: bringSupportToCourtHearing.continueButton,
     });
     await performAction('selectReasonableAdjustments', {
       header: requestCertainTypeOfHearing.mainHeader,
-      options: [
-        requestCertainTypeOfHearing.noCertainTypeOfHearingCheckbox],
+      options: [requestCertainTypeOfHearing.noCertainTypeOfHearingCheckbox],
       button: requestCertainTypeOfHearing.continueButton,
-    });/*
+    }); /*
     await performAction('selectReasonableAdjustments', {
       header: welshRequirements.mainHeader,
       options: [welshRequirements.speakWelshAtHearingsCheckbox,
@@ -2617,9 +2623,9 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
        button: askingForSpecialMeasures.continueButton,
     }); */
     await performValidation('mainHeader', reviewSupport.mainHeader);
-    await performAction('clickButton',reviewSupport.submitButton);
+    await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequestNotSent.mainHeader);
-    await performAction('clickButton',supportRequestNotSent.continueButton);
+    await performAction('clickButton', supportRequestNotSent.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -2636,5 +2642,4 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
     );
     await performValidation('mainHeader', dashboard.mainHeader);
   });
-
 });
