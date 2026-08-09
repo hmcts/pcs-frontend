@@ -1,6 +1,8 @@
 export { isSomethingElseCounterClaim } from './isSomethingElseCounterClaim';
 export { isDefendantNameKnown } from './isDefendantNameKnown';
 export { isWalesProperty } from './isWalesProperty';
+export { isRelease12Enabled } from './isRelease12Enabled';
+export { shouldShowExemptLandlordStep } from './shouldShowExemptLandlordStep';
 export { isNoticeDateProvided } from './isNoticeDateProvided';
 export { isRentArrearsClaim } from './isRentArrearsClaim';
 export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
