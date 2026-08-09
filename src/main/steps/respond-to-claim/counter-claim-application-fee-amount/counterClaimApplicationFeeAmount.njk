@@ -37,11 +37,18 @@
   {% endif %}
 
   {% if isLegalRepresentative %}
-    <form method="post" action="{{ url }}" novalidate id="pcs-payment-form">
+    {# pay button kept outside radio conditionals so it's always visible #}
+    <form
+      method="post"
+      action="{{ url }}"
+      novalidate
+      data-counter-claim-payment-form
+      data-card-payment-url="{{ payNowUrl }}"
+    >
       <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
       {% set pbaAccountHtml %}
-        {{ govukSelect({
+      {{ govukSelect({
           id: "pbaAccount",
           name: "paymentOptions.pbaAccount",
           label: {
@@ -54,7 +61,7 @@
           } if fieldErrors['paymentOptions.pbaAccount']
         }) }}
 
-        {{ govukInput({
+      {{ govukInput({
           id: 'customerReference',
           name: 'paymentOptions.customerReference',
           label: {
@@ -106,23 +113,6 @@
       }) }}
 
     </form>
-
-    <script{% if scriptNonce %} nonce="{{ scriptNonce }}"{% endif %}>
-      document.addEventListener('DOMContentLoaded', function () {
-        var form = document.getElementById('pcs-payment-form');
-        var cardStartUrl = '{{ payNowUrl | safe }}';
-
-        if (form) {
-          form.addEventListener('submit', function (e) {
-            var selectedRadio = form.querySelector('input[name="paymentOptions"]:checked');
-            if (selectedRadio && selectedRadio.value === 'card') {
-              e.preventDefault();
-              window.location.href = cardStartUrl;
-            }
-          });
-        }
-      });
-    </script>
   {% else %}
     {{ govukButton({
       text: payNowButton,

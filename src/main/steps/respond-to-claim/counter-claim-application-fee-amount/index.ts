@@ -57,20 +57,24 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaimApplicationFeeAmount.njk`,
   resolveRedirectAfterPost: async req => {
+    // card should normally GET; this is mainly for PBA POST
+    if (!isLegalRepresentativeUser(req)) {
+      return;
+    }
+
     const caseReference = req.params.caseReference;
-    if (isLegalRepresentativeUser(req)) {
-      const paymentOption = req.body?.paymentOptions as string | undefined;
-      if (paymentOption === 'pba') {
-        const paymentSession = getPaymentSessionState(req);
-        if (paymentSession) {
-          setPaymentSessionState(req, {
-            ...paymentSession,
-            customerReference: req.body?.['paymentOptions.customerReference'],
-            pbaAccount: req.body?.['paymentOptions.pbaAccount'],
-          });
-        }
-        return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-pba-payment/start` : '#';
+    const paymentOption = req.body?.paymentOptions as string | undefined;
+
+    if (paymentOption === 'pba') {
+      const paymentSession = getPaymentSessionState(req);
+      if (paymentSession) {
+        setPaymentSessionState(req, {
+          ...paymentSession,
+          customerReference: req.body?.['paymentOptions.customerReference'],
+          pbaAccount: req.body?.['paymentOptions.pbaAccount'],
+        });
       }
+      return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-pba-payment/start` : '#';
     }
   },
   extendGetContent: async (req, formContent) => {
