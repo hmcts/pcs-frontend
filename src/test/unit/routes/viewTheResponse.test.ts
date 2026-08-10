@@ -1036,6 +1036,7 @@ describe('viewTheResponse route', () => {
           id: 'counterclaim-pdf-id',
           value: {
             document_filename: 'Counterclaim - Defendant 1',
+            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id/binary',
             category_id: 'statementsOfCase',
           },
         },
