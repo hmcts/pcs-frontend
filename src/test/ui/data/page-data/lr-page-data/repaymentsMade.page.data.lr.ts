@@ -1,7 +1,8 @@
+import { getCurrentFormattedDate } from '../../../utils/common/date.utils';
+
 export const repaymentsMade = {
-  mainHeader: `Previous payments`,
-  hasTheDefendantPaidQuestion: (claimantName: string): string => {
-    return `Has the defendant paid any money to ${claimantName} since 20th May 2025?`;
+  getMainHeader: () => {
+    return `Has the defendant paid any money to ${process.env.CLAIMANT_NAME} since ${getCurrentFormattedDate()}?`;
   },
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

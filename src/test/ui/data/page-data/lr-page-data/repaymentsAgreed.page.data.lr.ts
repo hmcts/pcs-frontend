@@ -5,7 +5,7 @@ const claimIssueDate = (): string => {
   return formatDateFromParts(today.day, today.month, today.year) ?? '20 May 2025';
 };
 
-export const repaymentsAgreedLR = {
+export const repaymentsAgreed = {
   mainHeader: 'Repayment agreement',
   hasDefendantComeToAgreementQuestion: (claimantsName: string) =>
     `Have you come to any agreement with ${claimantsName} to repay the arrears since ${claimIssueDate()}?`,
@@ -25,4 +25,5 @@ export const repaymentsAgreedLR = {
   mustBe500CharactersOrFewerErrorMessage: `Repayment agreement details must be 500 characters or less`,
   emojiTextInput: `👉 😄`,
   emojiErrorMessage: `Give details about how much the defendant agreed to pay, how often they will pay and when the agreement was made must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
+  pageSlug: `repayments-agreed`,
 };

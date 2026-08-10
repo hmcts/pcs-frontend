@@ -20,18 +20,18 @@ import {
   equalityAndDiversityEndLR,
   equalityAndDiversityStart,
   exceptionalHardship,
-  haveYouAppliedForUniversalCreditLR,
-  howMuchAffordToPayLR,
+  haveYouAppliedForUniversalCredit,
+  howMuchAffordToPay,
   incomeAndExpenses,
-  instalmentPaymentsLR,
+  instalmentPayments,
   languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
-  previousPaymentsLR,
-  priorityDebtDetailsLR,
+  priorityDebtDetails,
   priorityDebts,
-  rentArrearsLR,
-  repaymentsAgreedLR,
+  rentArrears,
+  repaymentsAgreed,
+  repaymentsMade,
   selectDefendant,
   startNow,
   tenancyTypeDetails,
@@ -570,8 +570,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       year: '2020',
     });
     await performAction('rentArrearsLR', {
-      option: rentArrearsLR.noRadioOption,
-      rentAmount: rentArrearsLR.rentAmountTextInput,
+      option: rentArrears.noRadioOption,
+      rentAmount: rentArrears.rentAmountTextInput,
       rentArrearsTotal: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('disputingOtherPartsOfTheClaimLR', {
@@ -602,16 +602,16 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterclaimDoYouWantToUploadFiles.noRadioOption,
     });
     await performAction('previousPaymentsLR', {
-      question: previousPaymentsLR.getMainHeader(),
-      repaymentOption: previousPaymentsLR.noRadioOption,
+      question: repaymentsMade.getMainHeader(),
+      repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentAgreedLR', {
-      question: repaymentsAgreedLR.giveDetailsHiddenTextLabel,
-      repaymentAgreedOption: repaymentsAgreedLR.noRadioOption,
+      question: repaymentsAgreed.giveDetailsHiddenTextLabel,
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performAction('installmentPayments', {
-      question: instalmentPaymentsLR.wouldDefendantLikeToOfferToPayQuestion,
-      radioOption: instalmentPaymentsLR.noRadioOption,
+      question: instalmentPayments.wouldDefendantLikeToOfferToPayQuestion,
+      radioOption: instalmentPayments.noRadioOption,
     });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -639,8 +639,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR');
     await performAction('selectUniversalCreditLR', {
-      question: haveYouAppliedForUniversalCreditLR.mainHeader,
-      creditRadioOption: haveYouAppliedForUniversalCreditLR.yesRadioOption,
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
       ...getRelativeDate(-3),
     });
     await performAction('selectPriorityDebtsLR', {
@@ -648,10 +648,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: priorityDebts.yesRadioOption,
     });
     await performAction('enterPriorityDebtDetailsLR', {
-      totalAmount: priorityDebtDetailsLR.totalAmountTextInput,
-      payAmount: priorityDebtDetailsLR.amountYouPayTextInput,
-      question: priorityDebtDetailsLR.paidEveryParagraph,
-      option: priorityDebtDetailsLR.weekRadioOption,
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
     });
     await performAction('selectExpensesLR');
     await performAction('otherConsiderationsLR', {
@@ -703,8 +703,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       year: '2020',
     });
     await performAction('rentArrearsLR', {
-      option: rentArrearsLR.noRadioOption,
-      rentAmount: rentArrearsLR.rentAmountTextInput,
+      option: rentArrears.noRadioOption,
+      rentAmount: rentArrears.rentAmountTextInput,
       rentArrearsTotal: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('disputingOtherPartsOfTheClaimLR', {
@@ -735,21 +735,21 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterclaimDoYouWantToUploadFiles.noRadioOption,
     });
     await performAction('previousPaymentsLR', {
-      question: previousPaymentsLR.getMainHeader(),
-      repaymentOption: previousPaymentsLR.noRadioOption,
+      question: repaymentsMade.getMainHeader(),
+      repaymentOption: repaymentsMade.noRadioOption,
     });
     await performAction('repaymentAgreedLR', {
-      question: repaymentsAgreedLR.giveDetailsHiddenTextLabel,
-      repaymentAgreedOption: repaymentsAgreedLR.noRadioOption,
+      question: repaymentsAgreed.giveDetailsHiddenTextLabel,
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performAction('installmentPaymentsLR', {
-      question: instalmentPaymentsLR.wouldDefendantLikeToOfferToPayQuestion,
-      radioOption: instalmentPaymentsLR.yesRadioOption,
+      question: instalmentPayments.wouldDefendantLikeToOfferToPayQuestion,
+      radioOption: instalmentPayments.yesRadioOption,
     });
     await performAction('selectHowMuchAffordToPayLR', {
-      affordToPay: howMuchAffordToPayLR.affordToPayTextInput,
-      question: howMuchAffordToPayLR.howFrequentlyCouldDefendantAffordToPayQuestion,
-      radioOption: howMuchAffordToPayLR.weeklyRadioOption,
+      affordToPay: howMuchAffordToPay.affordToPayTextInput,
+      question: howMuchAffordToPay.howFrequentlyCouldDefendantAffordToPayQuestion,
+      radioOption: howMuchAffordToPay.weeklyRadioOption,
     });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -777,8 +777,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR');
     await performAction('selectUniversalCreditLR', {
-      question: haveYouAppliedForUniversalCreditLR.mainHeader,
-      creditRadioOption: haveYouAppliedForUniversalCreditLR.yesRadioOption,
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
       ...getRelativeDate(-3),
     });
     await performAction('selectPriorityDebtsLR', {
@@ -786,10 +786,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: priorityDebts.yesRadioOption,
     });
     await performAction('enterPriorityDebtDetailsLR', {
-      totalAmount: priorityDebtDetailsLR.totalAmountTextInput,
-      payAmount: priorityDebtDetailsLR.amountYouPayTextInput,
-      question: priorityDebtDetailsLR.paidEveryParagraph,
-      option: priorityDebtDetailsLR.weekRadioOption,
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
     });
     await performAction('selectExpensesLR');
     await performAction('otherConsiderationsLR', {
@@ -834,21 +834,21 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performAction('rentArrearsLR', {
-      option: rentArrearsLR.yesRadioOption,
+      option: rentArrears.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('selectCounterClaimLR', {
       option: counterClaim.noRadioOption,
     });
     await performAction('previousPaymentsLR', {
-      question: previousPaymentsLR.getMainHeader(),
-      repaymentOption: previousPaymentsLR.yesRadioOption,
-      repaymentInfo: previousPaymentsLR.detailsTextInput,
+      question: repaymentsMade.getMainHeader(),
+      repaymentOption: repaymentsMade.yesRadioOption,
+      repaymentInfo: repaymentsMade.detailsTextInput,
     });
     await performAction('repaymentAgreedLR', {
-      question: repaymentsAgreedLR.giveDetailsHiddenTextLabel,
-      repaymentAgreedOption: repaymentsAgreedLR.yesRadioOption,
-      repaymentAgreedInfo: repaymentsAgreedLR.detailsTextInput,
+      question: repaymentsAgreed.giveDetailsHiddenTextLabel,
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -916,7 +916,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performAction('rentArrearsLR', {
-      option: rentArrearsLR.yesRadioOption,
+      option: rentArrears.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('selectCounterClaimLR', {
@@ -947,14 +947,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterclaimDoYouWantToUploadFiles.noRadioOption,
     });
     await performAction('previousPaymentsLR', {
-      question: previousPaymentsLR.getMainHeader(),
-      repaymentOption: previousPaymentsLR.yesRadioOption,
-      repaymentInfo: previousPaymentsLR.detailsTextInput,
+      question: repaymentsMade.getMainHeader(),
+      repaymentOption: repaymentsMade.yesRadioOption,
+      repaymentInfo: repaymentsMade.detailsTextInput,
     });
     await performAction('repaymentAgreedLR', {
-      question: repaymentsAgreedLR.giveDetailsHiddenTextLabel,
-      repaymentAgreedOption: repaymentsAgreedLR.yesRadioOption,
-      repaymentAgreedInfo: repaymentsAgreedLR.detailsTextInput,
+      question: repaymentsAgreed.giveDetailsHiddenTextLabel,
+      repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
+      repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -1022,7 +1022,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: confirmationOfNoticeGiven.noRadioOption,
     });
     await performAction('rentArrearsLR', {
-      option: rentArrearsLR.yesRadioOption,
+      option: rentArrears.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
     });
     await performAction('selectCounterClaimLR', {
@@ -1084,7 +1084,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('enterTenancyStartDetailsUnKnownLR');
     await performAction('rentArrearsLR', {
-      option: rentArrearsLR.yesRadioOption,
+      option: rentArrears.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCaseDefendantAddressKnown.rentArrears_Total,
     });
     await performAction('selectCounterClaimLR', {

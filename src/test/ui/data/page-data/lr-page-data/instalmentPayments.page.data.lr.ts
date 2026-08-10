@@ -1,4 +1,4 @@
-export const instalmentPaymentsLR = {
+export const instalmentPayments = {
   mainHeader: `Instalment payments`,
   wouldDefendantLikeToOfferToPayQuestion: `Would the defendant like to offer to pay off their arrears in instalments?`,
   yesRadioOption: `Yes`,

@@ -1,4 +1,4 @@
-export const howMuchAffordToPayLR = {
+export const howMuchAffordToPay = {
   mainHeader: `Instalments`,
   howMuchCouldDefendantAffordToPayTextLabel: `How much could the defendant afford to pay in addition to the current rent?`,
   howFrequentlyCouldDefendantAffordToPayQuestion: `How frequently could the defendant afford to pay this amount?`,

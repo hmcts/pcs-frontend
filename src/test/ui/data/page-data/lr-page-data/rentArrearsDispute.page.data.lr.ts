@@ -1,4 +1,4 @@
-export const rentArrearsLR = {
+export const rentArrears = {
   mainHeader: `Rent arrears`,
   amountDefendantOwesHeader: `Amount the defendant owes in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
   saveAndContinueButton: `Save and continue`,
@@ -21,4 +21,5 @@ export const rentArrearsLR = {
   theAmountDefendantBelieveErrorMessage: `The amount the defendant believes they owe in rent arrears must be £0.00 or above`,
   lessThanBillionErrorMessage: `The amount the defendant believes they owe in rent arrears must be less than £1 billion`,
   enterAmountInCorrectFormatErrorMessage: `Enter how much the defendant believes they owe in rent arrears, in the correct format (e.g. if the defendant owes £148, please write £148.00)`,
+  pageSlug: `rent-arrears-dispute`,
 };
