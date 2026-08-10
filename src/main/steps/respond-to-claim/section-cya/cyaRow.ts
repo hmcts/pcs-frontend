@@ -106,10 +106,11 @@ export function pushYesNoRow(
   step: string,
   t: TFunction,
   yesNoNotSure: ReturnType<typeof makeYesNoNotSure>,
-  change: ReturnType<typeof makeChange>
+  change: ReturnType<typeof makeChange>,
+  labelOptions?: Record<string, unknown>
 ): SummaryListRow {
   const row: SummaryListRow = {
-    key: { text: t(`${labelKey}.label`) },
+    key: { text: t(`${labelKey}.label`, labelOptions) },
     value: { text: yesNoNotSure(answer) },
     actions: { items: [change(step, `${labelKey}.changeHidden`)] },
   };

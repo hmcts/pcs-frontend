@@ -64,11 +64,11 @@
       "changeHidden": "dispute details"
     },
     "makeCounterClaim": {
-      "label": "Do you want to make a counterclaim?",
+      "label": "Is the defendant planning to make a counterclaim against {{claimantName}}?",
       "changeHidden": "make a counterclaim"
     },
     "counterClaimType": {
-      "label": "What are you claiming for?",
+      "label": "What is the defendant claiming for?",
       "changeHidden": "counterclaim type",
       "options": {
         "PAYMENT_OR_COMPENSATION": "A sum of money or compensation",
@@ -77,51 +77,51 @@
       }
     },
     "isClaimAmountKnown": {
-      "label": "Are you claiming for a specific sum of money?",
+      "label": "Is the defendant claiming for a specific sum of money?",
       "changeHidden": "claim amount known"
     },
     "claimAmount": {
-      "label": "How much are you claiming?",
+      "label": "How much is the defendant claiming?",
       "changeHidden": "claim amount"
     },
     "estimatedMaxClaimAmount": {
-      "label": "What’s the maximum value of your claim?",
+      "label": "What’s the maximum value of their claim?",
       "changeHidden": "estimated maximum claim amount"
     },
     "counterClaimNeedHelpWithFees": {
-      "label": "Do you need help paying the counterclaim fee?",
+      "label": "Does the defendant need help paying the counterclaim fee?",
       "changeHidden": "help paying the counterclaim fee",
       "options": {
-        "YES": "I need help paying the fee",
-        "NO": "I do not need help paying the fee"
+        "YES": "The defendant needs help paying the fee",
+        "NO": "The defendant does not need help paying the fee"
       }
     },
     "counterClaimAppliedForHwf": {
-      "label": "Have you already applied for help with your counterclaim fee?",
+      "label": "Has the defendant already applied for help with their counterclaim fee?",
       "changeHidden": "applied for help with fees"
     },
     "counterClaimHwfReference": {
-      "label": "Enter your Help with Fees reference number",
+      "label": "Enter the defendant’s Help with Fees reference number",
       "changeHidden": "Help with Fees reference number"
     },
     "counterClaimFor": {
-      "label": "What is your counterclaim for?",
+      "label": "What is the defendant’s counterclaim for?",
       "changeHidden": "counterclaim subject"
     },
     "counterClaimReasons": {
-      "label": "What are your reasons for making the counterclaim?",
+      "label": "What are their reasons for making the counterclaim?",
       "changeHidden": "counterclaim reasons"
     },
     "counterClaimAgainst": {
-      "label": "Who are you making the counterclaim against?",
+      "label": "Who is the defendant making a counterclaim against?",
       "changeHidden": "counterclaim against"
     },
     "otherOrderRequestDetails": {
-      "label": "What orders are you asking the court to make?",
+      "label": "What orders are they asking for the court to make?",
       "changeHidden": "orders requested"
     },
     "otherOrderRequestFacts": {
-      "label": "What facts would you like the court to consider when deciding the claim?",
+      "label": "What facts would they like the court to consider when deciding the claim?",
       "changeHidden": "facts for the court"
     },
     "counterClaimWantToUploadFiles": {
