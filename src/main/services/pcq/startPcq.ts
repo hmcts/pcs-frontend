@@ -3,7 +3,7 @@ import config from 'config';
 import type { Request } from 'express';
 import { v4 as uuid } from 'uuid';
 
-import { createToken } from './createToken';
+import { createSecureToken } from './createSecureToken';
 
 import { Logger } from '@modules/logger';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -84,7 +84,7 @@ export async function startPcq(req: Request): Promise<string | null> {
     ccdCaseId: ccdCase.id,
   };
 
-  const token = createToken(params, tokenKey);
+  const secureToken = createSecureToken(params, tokenKey);
 
   const { draftEvent } = journeyRegistry.respondToClaim;
   if (!draftEvent) {
@@ -121,7 +121,9 @@ export async function startPcq(req: Request): Promise<string | null> {
     });
   });
 
-  const qs = new URLSearchParams({ ...params, token }).toString();
+  // `secureToken` contributes token/authTag/iv/salt. URLSearchParams escapes the base64 padding and
+  // '+' characters; PCQ's query parser reverses that, so nothing may be pre-encoded here.
+  const qs = new URLSearchParams({ ...params, ...secureToken }).toString();
   const redirectUrl = `${pcqUrl}${pcqPath}?${qs}`;
   logger.info(`Redirect to PCQ URL : ${redirectUrl}`);
 

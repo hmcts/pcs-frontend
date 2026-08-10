@@ -6,7 +6,7 @@ import { Session } from 'express-session';
 import type { CcdCase } from '@services/ccdCase.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
-import * as createTokenModule from '@services/pcq/createToken';
+import * as createSecureTokenModule from '@services/pcq/createSecureToken';
 import { startPcq } from '@services/pcq/startPcq';
 
 interface CustomSession extends Session {
@@ -34,7 +34,7 @@ jest.mock('@services/ccdCaseService', () => ({
     updateDraft: jest.fn(),
   },
 }));
-jest.mock('@services/pcq/createToken');
+jest.mock('@services/pcq/createSecureToken');
 
 describe('startPcq', () => {
   let mockReq: Partial<Request>;
@@ -96,16 +96,32 @@ describe('startPcq', () => {
       data: { userPcqId: 'mock-pcq-id' },
     });
 
-    (createTokenModule.createToken as jest.Mock).mockReturnValue('mock-token');
+    (createSecureTokenModule.createSecureToken as jest.Mock).mockReturnValue({
+      token: 'mock-token',
+      authTag: 'mock-auth-tag',
+      iv: 'mock-iv',
+      salt: 'mock-salt',
+    });
   });
 
   it('returns the PCQ URL when all conditions are met', async () => {
     const url = await startPcq(mockReq as Request);
 
     expect(axios.get).toHaveBeenCalledWith('https://pcq.test/health');
-    expect(createTokenModule.createToken).toHaveBeenCalled();
+    expect(createSecureTokenModule.createSecureToken).toHaveBeenCalled();
     expect(ccdCaseService.updateDraft).toHaveBeenCalled();
     expect(url).toContain('https://pcq.test/service-endpoint?');
+  });
+
+  it('sends every field PCQ needs to take the secure verification path', async () => {
+    const url = await startPcq(mockReq as Request);
+
+    // PCQ only runs verifySecureToken when authTag, iv AND salt are all present — miss any one and
+    // it silently drops to the legacy fixed-IV scheme, which cannot match our token.
+    expect(url).toContain('token=mock-token');
+    expect(url).toContain('authTag=mock-auth-tag');
+    expect(url).toContain('iv=mock-iv');
+    expect(url).toContain('salt=mock-salt');
   });
 
   it('returns the citizen to the case-scoped next step after PCQ', async () => {
@@ -113,7 +129,7 @@ describe('startPcq', () => {
 
     // Must carry the /case/<ref> prefix or PCQ returns the citizen to a 404, and nav=1 or the
     // access guard bounces the inbound redirect to a mid-section step.
-    expect(createTokenModule.createToken).toHaveBeenCalledWith(
+    expect(createSecureTokenModule.createSecureToken).toHaveBeenCalledWith(
       expect.objectContaining({
         returnUrl: 'http://localhost:3000/case/123456789/respond-to-claim/language-used?nav=1',
       }),
@@ -131,7 +147,7 @@ describe('startPcq', () => {
 
     // The token is computed over the raw value, so PCQ's decrypted params match what it decodes
     // off the query string.
-    expect(createTokenModule.createToken).toHaveBeenCalledWith(
+    expect(createSecureTokenModule.createSecureToken).toHaveBeenCalledWith(
       expect.objectContaining({ partyId: 'user@email.com' }),
       'dummy-token-key'
     );
