@@ -1023,4 +1023,78 @@ describe('viewTheResponse route', () => {
 
     expect(next).toHaveBeenCalledWith(serviceError);
   });
+
+  describe('PDF document links', () => {
+    it('should include counterclaim PDF URL when counterclaim exists', async () => {
+      const caseData = buildComprehensiveCaseData();
+      caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'YES';
+      caseData.possessionClaimResponse!.defendantResponses!.counterClaim = {
+        claimType: 'PAYMENT_OR_COMPENSATION',
+      };
+      caseData.allDocuments = [
+        {
+          id: 'counterclaim-pdf-id',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ];
+
+      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+        id: caseReference,
+        data: caseData,
+      });
+
+      viewTheResponseRoute(app);
+      const handler = getHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        viewTheResponseRequest({
+          caseReference,
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith(
+        'view-the-response',
+        expect.objectContaining({
+          counterclaimPdfUrl: '/case/1234567890123456/view-documents/counterclaim-pdf-id',
+        })
+      );
+    });
+
+    it('should not include counterclaim PDF URL when no counterclaim made', async () => {
+      const caseData = buildComprehensiveCaseData();
+      caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'NO';
+
+      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+        id: caseReference,
+        data: caseData,
+      });
+
+      viewTheResponseRoute(app);
+      const handler = getHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        viewTheResponseRequest({
+          caseReference,
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith(
+        'view-the-response',
+        expect.objectContaining({
+          counterclaimPdfUrl: null,
+        })
+      );
+    });
+  });
 });

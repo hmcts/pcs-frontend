@@ -27,6 +27,7 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
+import { extractCaseDocuments } from '@utils/documentUtils';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 
 const logger = Logger.getLogger('viewTheResponse');
@@ -584,6 +585,23 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
   return { rows };
 }
 
+function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
+  const responses = caseData.possessionClaimResponse?.defendantResponses;
+
+  if (!responses?.counterClaim || isNo(responses.makeCounterClaim)) {
+    return null;
+  }
+
+  const documents = extractCaseDocuments(caseData as Record<string, unknown>);
+  const counterclaimPdf = documents.find(
+    doc =>
+      doc.categoryId === 'statementsOfCase' &&
+      doc.filename?.startsWith('Counterclaim - Defendant')
+  );
+
+  return counterclaimPdf?.id ?? null;
+}
+
 export default function viewTheResponseRoutes(app: Application): void {
   app.get(VIEW_RESPONSE_ROUTE, oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     const rawRef = req.params?.caseReference;
@@ -632,6 +650,11 @@ export default function viewTheResponseRoutes(app: Application): void {
         counterclaim: buildCounterclaim(t, caseData),
       };
 
+      const counterclaimPdfId = findCounterclaimPdfDocument(caseData);
+      const counterclaimPdfUrl = counterclaimPdfId
+        ? `/case/${caseReference}/view-documents/${counterclaimPdfId}`
+        : null;
+
       return res.render('view-the-response', {
         t,
         propertyAddress: formatAddress(caseData.propertyAddress),
@@ -642,6 +665,7 @@ export default function viewTheResponseRoutes(app: Application): void {
         ...sections,
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
+        counterclaimPdfUrl,
       });
     } catch (e) {
       logger.error(`Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`);
