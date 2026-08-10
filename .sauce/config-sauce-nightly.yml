@@ -18,38 +18,6 @@ sauce:
 defaults:
   timeout: 30m
 
-# Pre-run debug commands to check tunnel and environment
-preRun:
-  commands:
-    - echo "========================================="
-    - echo "=== SAUCE TUNNEL DEBUG INFORMATION ==="
-    - echo "========================================="
-    - echo ""
-    - echo "=== SAUCE SPECIFIC VARIABLES ==="
-    - env | grep -E "SAUCE_|TUNNEL" | sort || echo "No Sauce env vars found"
-    - echo ""
-    - echo "=== TEST ENVIRONMENT VARIABLES ==="
-    - env | grep -E "TEST_|PCS_|URL|ENVIRONMENT" | sort || echo "No test env vars found"
-    - echo ""
-    - echo "=== TUNNEL STATUS ==="
-    - echo "SAUCE_TUNNEL_NAME: ${SAUCE_TUNNEL_NAME:-NOT SET}"
-    - echo "SAUCE_REGION: ${SAUCE_REGION:-NOT SET}"
-    - echo "SAUCE_USERNAME: ${SAUCE_USERNAME:-NOT SET}"
-    - echo "SAUCE_ACCESS_KEY: ${SAUCE_ACCESS_KEY:+SET (hidden)}"
-    - echo "ENVIRONMENT: ${ENVIRONMENT:-NOT SET}"
-    - echo "TEST_URL: ${TEST_URL:-NOT SET}"
-    - echo "PCS_API_URL: ${PCS_API_URL:-NOT SET}"
-    - echo "DATA_STORE_URL_BASE: ${DATA_STORE_URL_BASE:-NOT SET}"
-    - echo ""
-    - echo "=== DNS RESOLUTION TEST ==="
-    - nslookup pcs-api-${ENVIRONMENT:-aat}.service.core-compute-${ENVIRONMENT:-aat}.internal || echo "❌ DNS resolution failed"
-    - echo ""
-    - echo "=== CONNECTIVITY TEST ==="
-    - curl -v --connect-timeout 5 http://pcs-api-${ENVIRONMENT:-aat}.service.core-compute-${ENVIRONMENT:-aat}.internal/health || echo "❌ Cannot reach PCS API"
-    - echo ""
-    - echo "=== TUNNEL DEBUG COMPLETE ==="
-    - echo "========================================="
-
 playwright:
   # Use the latest version supported by Sauce Labs
   version: 1.61.1
@@ -97,8 +65,8 @@ env:
   IDAM_PCS_USER_EMAIL: $IDAM_PCS_USER_EMAIL
   IDAM_PCS_USER_PASSWORD: $IDAM_PCS_USER_PASSWORD
   IDAM_PCS_USER_PASSWORD_B64: $IDAM_PCS_USER_PASSWORD_B64
-
-  SAUCE_TUNNEL_NAME: $SAUCE_TUNNEL_NAME
+  SAUCE_TUNNEL_NAME: reformtunnel
+  SAUCE_REGION: eu-central-1
 
 # macOS 14 is not used across all browsers because it requires ARM support, which is not enabled in our Sauce Labs subscription.
 # Using macOS 13 ensures compatibility and prevents job failures, though it runs on Intel rather than Apple Silicon.
