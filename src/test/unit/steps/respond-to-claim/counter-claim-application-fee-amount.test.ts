@@ -61,6 +61,7 @@ type CounterClaimApplicationFeeAmountStep = {
     res?: {
       locals?: {
         validatedCase?: CcdCaseModel;
+        release12Enabled?: boolean;
       };
     };
   }) => Promise<Record<string, string | boolean | undefined>>;
@@ -239,6 +240,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       query: { from: 'dashboard' },
       res: {
         locals: {
+          release12Enabled: true,
           validatedCase: makeValidatedCase(undefined, {}),
         },
       },
@@ -270,6 +272,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       query: { from: 'dashboard' },
       res: {
         locals: {
+          release12Enabled: true,
           validatedCase: makeValidatedCase({
             claimType: 'PAYMENT_OR_COMPENSATION',
             isClaimAmountKnown: 'YES',
@@ -283,6 +286,35 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       },
     });
 
+    expect(content).toEqual(
+      expect.objectContaining({
+        payNowDisabled: true,
+        backUrl: '/case/123/dashboard',
+      })
+    );
+  });
+
+  it('does not call outstanding payment API when release 1.2 is disabled', async () => {
+    const content = await testedStep.extendGetContent({
+      params: { caseReference: '123' },
+      query: { from: 'dashboard' },
+      res: {
+        locals: {
+          release12Enabled: false,
+          validatedCase: makeValidatedCase({
+            claimType: 'PAYMENT_OR_COMPENSATION',
+            isClaimAmountKnown: 'YES',
+            claimAmount: '64900',
+          }),
+        },
+      },
+      session: {
+        user: { accessToken: 'token-1' },
+        save: cb => cb(),
+      },
+    });
+
+    expect(paymentService.getOutstandingCounterClaimPayment).not.toHaveBeenCalled();
     expect(content).toEqual(
       expect.objectContaining({
         payNowDisabled: true,
