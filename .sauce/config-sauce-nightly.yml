@@ -19,13 +19,33 @@ defaults:
   timeout: 30m
 
 playwright:
-  # Pin to a version Sauce actually runs (saucectl list). package.json may be newer (e.g. 1.59.x) before Sauce adds it.
-  version: 1.58.2
+  # Use the latest version supported by Sauce Labs
+  version: 1.61.1
   configFile: playwright.config.ts
 
 nodeVersion: v22
 
 rootDir: ./
+
+# Install dependencies explicitly
+npm:
+  packages:
+    # Core testing dependencies
+    '@playwright/test': '1.61.1'
+    '@launchdarkly/node-server-sdk': '9.13.0'
+    '@hmcts/playwright-common': '1.1.3'
+    'config': '4.4.2'
+    'dotenv': '17.4.2'
+    'ts-node': '10.9.2'
+    'typescript': '6.0.3'
+    # Test frameworks and reporters
+    '@axe-core/playwright': '4.12.1'
+    'allure-playwright': '3.10.2'
+    'playwright': '1.61.1'
+    'playwright-core': '1.61.1'
+    # Type definitions (if needed)
+    '@types/node': '24.13.3'
+    'tsconfig-paths': '4.2.0'
 
 env:
   PLAYWRIGHT_SAUCE_FULL_JOURNEY_ARTIFACTS: 'true'
