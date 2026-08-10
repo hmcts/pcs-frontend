@@ -28,7 +28,7 @@ export const whatRegularIncomeDoYouReceiveLR = {
   universalCreditFrequencyErrorMessage: `Select how frequently you receive Universal Credit`,
   otherBenefitsAndCreditsAmountErrorMessage: `Enter the total amount the defendant receives from other benefits and credits`,
   otherBenefitsAndCreditsFrequencyErrorMessage: `Select how frequently you receive income from other benefits and credits`,
-  incorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
+  incorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148 or 148.50`,
   incorrectFormatTextInput: `1000`,
   negativeTextInput: `-100.00`,
   incomeFromAllJobsNegativeErrorMessage: `The total amount the defendant receives from all jobs they do each week or month must be £0.00 or above`,

@@ -17,7 +17,7 @@ export const howMuchAffordToPayLR = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   enterHowMuchDefendantCouldAffordErrorMessage: `Enter how much the defendant could afford to pay in addition to the current rent`,
   selectHowFrequentlyDefendantCouldAffordErrorMessage: `Select how frequently the defendant could afford to pay this amount`,
-  enterAmountInTheCorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
+  enterAmountInTheCorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148 or 148.50`,
   mustBeLessThanBillionErrorMessage: `The amount the defendant could afford to pay in addition to the current rent must be less than £1 billion`,
   negativeValueErrorMessage: `The amount the defendant could afford to pay in addition to the current rent must be £0.00 or above`,
   feedbackLink: `feedback (opens in new tab)`,
