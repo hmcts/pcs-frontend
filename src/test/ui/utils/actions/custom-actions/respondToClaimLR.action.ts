@@ -100,6 +100,10 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async selectNoticeDetailsLR(noticeGivenData: actionRecord): Promise<void> {
+    this.recordAnswer(
+      confirmationOfNoticeGiven.getDidClaimantGiveYouQuestion(`${process.env.CLAIMANT_NAME}`),
+      noticeGivenData.option
+    );
     await performAction('clickRadioButton', {
       question: confirmationOfNoticeGiven.getDidClaimantGiveYouQuestion(`${process.env.CLAIMANT_NAME}`),
       option: noticeGivenData.option,
@@ -136,10 +140,17 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async enterNoticeDateKnownLR(noticeData: actionRecord): Promise<void> {
+    await performValidation('text', { elementType: 'listItem', text: noticeDateWhenProvidedLR.noticeGivenDateLabel });
     await performValidation('text', {
       elementType: 'listItem',
       text: noticeDateWhenProvidedLR.noticeGivenDateLabel,
     });
+    this.recordRtcCyaDateFromParts(
+      `When did the defendant receive notice from ${process.env.CLAIMANT_NAME}?`,
+      noticeData?.day,
+      noticeData?.month,
+      noticeData?.year
+    );
     if (noticeData?.day && noticeData?.month && noticeData?.year) {
       await performActions(
         'Enter Date',
@@ -167,12 +178,17 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async disputingOtherPartsOfTheClaimLR(doYouWantToDisputeOption: actionRecord): Promise<void> {
+    this.recordAnswer(nonRentArrearsDisputeLR.doYouWantToDisputeQuestion, doYouWantToDisputeOption.disputeOption);
     await performAction('clickRadioButton', {
       question: nonRentArrearsDisputeLR.doYouWantToDisputeQuestion,
       option: doYouWantToDisputeOption.disputeOption,
     });
 
     if (doYouWantToDisputeOption.disputeOption === 'Yes') {
+      this.recordAnswer(
+        nonRentArrearsDisputeLR.explainPartOfClaimHiddenTextLabel,
+        doYouWantToDisputeOption.disputeInfo
+      );
       await performAction(
         'inputText',
         nonRentArrearsDisputeLR.explainPartOfClaimHiddenTextLabel,
@@ -201,6 +217,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async doesTheDependantHaveChildrenLR(dependantChildrenData: actionRecord): Promise<void> {
+    this.recordAnswer(doYouHaveAnyDependantChildrenLR.mainHeader, dependantChildrenData.dependantChildrenOption);
     await performAction('clickRadioButton', {
       question: doYouHaveAnyDependantChildrenLR.doesTheDefendantHaveDependantChildrenQuestion,
       option: dependantChildrenData.dependantChildrenOption,
@@ -422,11 +439,13 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       elementType: 'paragraph',
       text: `${rentArrearsAmount}`,
     });
+    this.recordAnswer(rentArrearsLR.doesDefendantOweThisQuestion, rentArrearsInfo.option);
     await performAction('clickRadioButton', {
       question: rentArrearsLR.doesDefendantOweThisQuestion,
       option: rentArrearsInfo.option,
     });
     if (rentArrearsInfo.option === 'No') {
+      this.recordAnswer(rentArrearsLR.howMuchDoesDefendantBelieveHiddenTextLabel, rentArrearsInfo.rentAmount);
       await performAction(
         'inputText',
         rentArrearsLR.howMuchDoesDefendantBelieveHiddenTextLabel,
@@ -465,6 +484,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async selectCounterClaimLR(counterClaimOption: actionRecord): Promise<void> {
+    this.recordAnswer(counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(), counterClaimOption.option);
     await performAction('clickRadioButton', {
       question: counterClaimLR.getDoYouWantToMakeACounterclaimQuestion(),
       option: counterClaimOption.option,
@@ -474,6 +494,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async selectWhatAreYouClaimingForLR(counterClaimingOption: actionRecord): Promise<void> {
+    this.recordAnswer(String(counterClaimingOption.question), counterClaimingOption.option);
     await performAction('clickRadioButton', {
       question: counterClaimWhatAreYouClaimingForLR.mainHeader,
       option: counterClaimingOption.option,
@@ -482,18 +503,21 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async counterClaimSpecificSumOfMoneyLR(sumOfMoney: actionRecord): Promise<void> {
+    this.recordAnswer(String(sumOfMoney.question), sumOfMoney.option);
     await performAction('clickRadioButton', {
       question: sumOfMoney.question,
       option: sumOfMoney.option,
     });
 
     if (sumOfMoney.option === counterClaimSpecificSumOfMoneyLR.yesRadioOption) {
+      this.recordAnswer(counterClaimSpecificSumOfMoneyLR.howMuchIsTheDefendantHiddenQuestion, sumOfMoney.amount);
       await performAction(
         'inputText',
         counterClaimSpecificSumOfMoneyLR.howMuchIsTheDefendantHiddenQuestion,
         sumOfMoney.amount
       );
     } else {
+      this.recordAnswer(counterClaimSpecificSumOfMoneyLR.maximumValueOfYourClaimHiddenQuestion, sumOfMoney.amount);
       await performAction(
         'inputText',
         counterClaimSpecificSumOfMoneyLR.maximumValueOfYourClaimHiddenQuestion,
@@ -538,6 +562,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     }
     const basedOnInformationParagraph = `Based on the information provided, it will cost the defendant £${counterClaimFeeValue} to make their counterclaim.`;
     await performValidation('text', { elementType: 'paragraph', text: basedOnInformationParagraph });
+    this.recordAnswer(counterClaimFeeLR.doesTheDefendantNeedHelpQuestion, counterClaimFeeOption.radioOption);
     await performAction('clickRadioButton', {
       question: counterClaimFeeLR.doesTheDefendantNeedHelpQuestion,
       option: counterClaimFeeOption.radioOption,
@@ -563,12 +588,15 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async counterClaimAboutLR(claimAbout: actionRecord): Promise<void> {
+    this.recordAnswer(counterClaimAboutLR.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
+    this.recordAnswer(counterClaimAboutLR.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
     await performAction('inputText', counterClaimAboutLR.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
     await performAction('inputText', counterClaimAboutLR.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
     await performAction('clickButton', counterClaimAboutLR.saveAndContinueButton);
   }
 
   private async doYouWantToUploadFilesLR(uploadOption: actionRecord): Promise<void> {
+    this.recordAnswer(counterclaimDoYouWantToUploadFilesLR.mainHeader, uploadOption.option);
     await performAction('clickRadioButton', {
       question: counterclaimDoYouWantToUploadFilesLR.mainHeader,
       option: uploadOption.option,
@@ -617,12 +645,17 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async counterClaimHaveYouAppliedForHelpWithFeeLR(helpWithFee: actionRecord): Promise<void> {
+    this.recordAnswer(counterClaimHaveYouAppliedForHelpLR.mainHeader, helpWithFee.helpWithFeeOption);
     await performAction('clickRadioButton', {
       question: counterClaimHaveYouAppliedForHelpLR.mainHeader,
       option: helpWithFee.helpWithFeeOption,
     });
 
     if (helpWithFee.helpWithFeeOption === 'Yes') {
+      this.recordAnswer(
+        counterClaimHaveYouAppliedForHelpLR.enterHelpWithFeeReferenceHiddenTextLabel,
+        helpWithFee.feeReference
+      );
       await performAction(
         'inputText',
         counterClaimHaveYouAppliedForHelpLR.enterHelpWithFeeReferenceHiddenTextLabel,

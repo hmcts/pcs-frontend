@@ -294,7 +294,7 @@ export class RespondToClaimAction implements IAction {
     this.recordAnswer(label, this.buildRtcCyaFullName(firstName, lastName));
   }
 
-  private recordRtcCyaDateFromParts(label: string, day?: actionData, month?: actionData, year?: actionData): void {
+  protected recordRtcCyaDateFromParts(label: string, day?: actionData, month?: actionData, year?: actionData): void {
     this.recordAnswer(label, this.buildRtcCyaDateValue(day, month, year));
   }
 
@@ -367,7 +367,7 @@ export class RespondToClaimAction implements IAction {
     return normalizedExpected.every((part, index) => part === normalizedActual[index]);
   }
 
-  private recordAnswer(key: string, value: actionData): void {
+  protected recordAnswer(key: string, value: actionData): void {
     const normalizedValue = normalizeValueData(value);
     FieldsStore.set(key, normalizedValue);
     if (!activeRtcSection) {

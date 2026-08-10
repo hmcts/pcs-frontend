@@ -1,4 +1,5 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { checkYourAnswersRTC, dashboard, responseSubmittedCounterclaimFeePaymentNeeded } from '../data/page-data';
 import {
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPostLR,
@@ -177,6 +178,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaimLR.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingForLR.mainHeader,
       option: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -321,6 +323,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaimLR.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingForLR.mainHeader,
       option: counterClaimWhatAreYouClaimingForLR.somethingElseRadioOption,
     });
     await performAction('selectCounterClaimFeeLR', {
@@ -462,6 +465,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaimLR.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingForLR.mainHeader,
       option: counterClaimWhatAreYouClaimingForLR.somethingElseRadioOption,
     });
     await performAction('selectCounterClaimFeeLR', {
@@ -612,6 +616,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaimLR.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingForLR.mainHeader,
       option: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -697,7 +702,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsedLR.mainHeader,
       radioOption: languageUsedLR.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
   test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @smoke @PR @regression @rentNonRent @LR', async () => {
@@ -754,6 +769,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaimLR.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingForLR.mainHeader,
       option: counterClaimWhatAreYouClaimingForLR.sumOfMoneyOrCompensationRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -980,6 +996,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaimLR.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingForLR.mainHeader,
       option: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -1095,6 +1112,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaimLR.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingForLR.mainHeader,
       option: counterClaimWhatAreYouClaimingForLR.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
