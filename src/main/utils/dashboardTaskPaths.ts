@@ -29,6 +29,7 @@ export const RESPOND_TO_CLAIM_DASHBOARD_NOTIFICATION_TEMPLATE_IDS = [
   'Defendant.ResponseToClaim',
   'Defendant.ResponseNotStarted',
   'Defendant.ResponseInProgress',
+  'Defendant.CounterClaimFeeUnpaid',
 ] as const;
 
 export function isRespondToClaimDashboardNotification(templateId: string): boolean {

@@ -2,6 +2,7 @@ import type { Request } from 'express';
 
 import { penceToPounds } from '../../utils';
 import { getCounterClaimAmountInPence } from '../../utils/counterClaimAmount';
+import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { Logger } from '@modules/logger';
@@ -11,10 +12,10 @@ import { getDashboardUrl } from '@routes/dashboard';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 import {
+  type PaymentSessionState,
   getPaymentSessionState,
   persistPaymentSessionState,
   setPaymentSessionState,
-  type PaymentSessionState,
 } from '@services/paymentSessionService';
 import { paymentService } from '@services/pcsApi/paymentService';
 
@@ -42,6 +43,10 @@ async function rehydratePaymentSessionIfNeeded(
     return paymentSession;
   }
 
+  if (!isRelease12Enabled(req)) {
+    return paymentSession;
+  }
+
   const accessToken = req.session?.user?.accessToken;
   if (!accessToken || !caseReference) {
     return paymentSession;
@@ -65,9 +70,7 @@ async function rehydratePaymentSessionIfNeeded(
     await persistPaymentSessionState(req, rehydratedSession);
     return rehydratedSession;
   } catch (error) {
-    logger.warn(
-      `Unable to rehydrate outstanding counterclaim payment for case ${caseReference}: ${String(error)}`
-    );
+    logger.warn(`Unable to rehydrate outstanding counterclaim payment for case ${caseReference}: ${String(error)}`);
     return paymentSession;
   }
 }
