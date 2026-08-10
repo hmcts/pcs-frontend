@@ -61,6 +61,10 @@ export class CcdCaseModel {
     return this.data.claimGroundSummaries;
   }
 
+  get userPcqId(): string | undefined {
+    return this.data.userPcqId;
+  }
+
   get userPcqIdSet(): string | undefined {
     return this.data.userPcqIdSet;
   }
