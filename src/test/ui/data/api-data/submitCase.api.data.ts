@@ -598,7 +598,16 @@ export const submitCaseApiData = {
       addAnotherDefendant: 'NO',
       tenancy_TypeOfTenancyLicence: process.env.TENANCY_TYPE,
       tenancy_TenancyLicenceDate: null,
-      tenancy_TenancyLicenceDocuments: [],
+      tenancy_TenancyLicenceDocuments: [
+        {
+          id: 'ecabebc6-2fc0-46a6-9bf0-f2e7aa17b0e4',
+          value: {
+            document_filename: 'tenancyAgreement.pdf',
+            document_url: `${process.env.DM_STORE_URL}/documents/3a5f6cba-2ecd-4960-8859-22f2118da0bf`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/3a5f6cba-2ecd-4960-8859-22f2118da0bf/binary`,
+          },
+        },
+      ],
       secureOrFlexibleDiscretionaryGrounds: ['DOMESTIC_VIOLENCE'],
       secureAntisocialAdditionalGrounds: [],
       secureOrFlexibleMandatoryGroundsAlt: [],

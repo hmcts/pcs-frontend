@@ -256,7 +256,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
-    await performAction('uploadFiles');
+    await performAction('uploadAdditionalDocumentsLR');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
@@ -387,7 +387,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
-    await performAction('uploadFiles');
+    await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.pdf'] });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
@@ -522,7 +522,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
-    await performAction('uploadFiles');
+    await performAction('uploadAdditionalDocumentsLR');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
@@ -658,7 +658,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: otherConsiderations.isThereAnythingElseParagraph,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('uploadFiles');
+    await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.pdf'] });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
@@ -796,7 +796,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: otherConsiderations.isThereAnythingElseParagraph,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('uploadFiles');
+    await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.pdf'] });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
@@ -878,7 +878,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: otherConsiderations.isThereAnythingElseParagraph,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('uploadFiles');
+    await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.docx'] });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
@@ -984,7 +984,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: otherConsiderations.isThereAnythingElseParagraph,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction('uploadFiles');
+    await performAction('uploadAdditionalDocumentsLR');
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);

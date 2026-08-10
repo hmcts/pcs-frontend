@@ -45,4 +45,5 @@ export * from './counterClaimHaveYouAppliedForHelp.page.data.lr';
 export * from './counterclaimYouNeedToApplyForHelpWithYourFeesLR.page.data';
 export * from './counterClaimOrderOtherThanSum.page.data.lr';
 export * from './counterclaimDoYouWantToUploadFiles.page.data.lr';
+export * from './uploadFiles.page.data.lr';
 export * from './uploadFilesToSupportYourCounterclaimLR.page.data';
