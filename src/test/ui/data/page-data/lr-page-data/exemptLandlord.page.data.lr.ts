@@ -1,0 +1,16 @@
+export const exemptlandlord = {
+  mainHeader: `Exempt landlord`,
+  backLink: `Back`,
+  defendantNotSureRadioOption: `Defendant is not sure`,
+  noRadioOption: `No`,
+  orHintText: `or`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  yesRadioOption: `Yes`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfNoticeOfIntentionGivenErrorMessage(claimantName: string): string {
+    return `Select if ${claimantName} gave the defendant notice of their intention to begin possession proceedings`;
+  },
+  feedbackLink: `feedback`,
+  pageSlug: `confirmation-of-notice-given`,
+};

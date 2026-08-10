@@ -107,6 +107,14 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
   }
 
+  private async exemptLandlordLR(exemptOption: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: confirmationOfNoticeGiven.getDidClaimantGiveYouQuestion(`${process.env.CLAIMANT_NAME}`),
+      option: noticeGivenData.option,
+    });
+    await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
+  }
+
   private async selectCorrespondenceAddressUnknownLR(addressData: actionRecord) {
     await performValidation('mainHeader', correspondenceAddressLR.correspondenceAddressPostalMainHeader);
     await performAction('clickRadioButton', {

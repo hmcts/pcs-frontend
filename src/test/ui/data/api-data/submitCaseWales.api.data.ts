@@ -23,7 +23,7 @@ export const submitCaseApiDataWales = {
     isExemptLandlord: 'YES',
     claimantName: 'Possession Claims Solicitor Org',
     isClaimantNameCorrect: 'YES',
-    claimantNamePossessiveForm: "Possession Claims Solicitor Org's",
+    claimantNamePossessiveForm: 'Possession Claims Solicitor Org\'s',
 
     claimantContactEmail: 'pcs-solicitor1@test.com',
     isCorrectClaimantContactEmail: 'YES',
@@ -427,6 +427,128 @@ export const submitCaseApiDataWales = {
       agreementClaimant: ['BELIEVE_TRUE'],
     },
   },
+
+  submitCaseDefendantSecure: {
+  regionId: '7',
+  caseManagementLocationNumber: '366572',
+  orgNameFound: 'Yes',
+  claimantName: 'Possession Claims Solicitor Org',
+  isClaimantNameCorrect: 'YES',
+  legislativeCountry: 'Wales',
+  claimantType: {
+  value: {
+    code: 'COMMUNITY_LANDLORD',
+      label: 'Community landlord'
+  },
+  list_items: [
+    {
+      code: 'PRIVATE_LANDLORD',
+      label: 'Private landlord'
+    },
+    {
+      code: 'COMMUNITY_LANDLORD',
+      label: 'Community landlord'
+    },
+    {
+      code: 'MORTGAGE_LENDER',
+      label: 'Mortgage lender'
+    },
+    {
+      code: 'OTHER',
+      label: 'Other'
+    }
+  ],
+    valueCode: 'COMMUNITY_LANDLORD'
+},
+  claimAgainstTrespassers: 'NO',
+  isExemptLandlord: 'NO',
+  claimantContactEmail: 'pcs-solicitor1@test.com',
+  isCorrectClaimantContactEmail: 'YES',
+  orgAddressFound: 'Yes',
+  organisationAddress: {
+  AddressLine1: 'Ministry Of Justice',
+    AddressLine2: 'Seventh Floor 102 Petty France',
+    PostTown: 'London',
+    PostCode: 'SW1H 9AJ',
+    Country: 'United Kingdom'
+},
+  formattedClaimantContactAddress: 'Ministry Of Justice<br>Seventh Floor 102 Petty France<br>London<br>SW1H 9AJ',
+  isCorrectClaimantContactAddress: 'YES',
+  claimantProvidePhoneNumber: 'NO',
+  defendant1: {
+  nameKnown: 'YES',
+    firstName: 'Harry',
+    lastName: 'Potter',
+    addressKnown: 'NO',
+},
+  addAnotherDefendant: 'YES',
+  additionalDefendants: [
+  {
+    value: {
+      nameKnown: 'YES',
+      firstName: 'Spider',
+      lastName: 'Man',
+      addressKnown: 'NO',
+    },
+  }
+],
+  occupationLicenceTypeWales: 'SECURE_CONTRACT',
+  licenceStartDate: '2020-05-20',
+  licenceDocuments: [],
+  secureGroundsWales_DiscretionaryGrounds: [
+  'RENT_ARREARS_S157',
+  'ANTISOCIAL_BEHAVIOUR_S157'
+],
+  secureGroundsWales_MandatoryGrounds: [],
+  showASBQuestionsPageWales: 'Yes',
+  walesAntisocialBehaviour: 'NO',
+  walesIllegalPurposesUse: 'NO',
+  walesOtherProhibitedConduct: 'NO',
+  preActionProtocolCompleted: 'YES',
+  mediationAttempted: 'YES',
+  settlementAttempted: 'YES',
+  walesNoticeServed: 'Yes',
+  walesTypeOfNoticeServed: 'RHW20 test',
+  notice_ServiceMethod: 'EMAIL',
+  notice_EmailAddress: 'test@gmail.com',
+  notice_EmailSentDateTime: null,
+  notice_AbleToUploadDocument: 'No',
+  notice_UnableToUploadReason: 'Test',
+  rentDetails_CurrentRent: '100000',
+  rentDetails_Frequency: 'MONTHLY',
+  rentDetails_CalculatedDailyCharge: '3285',
+  rentArrears_StatementDocuments: [
+  {
+    value: {
+      document_url: 'http://dm-store-aat.service.core-compute-aat.internal/documents/0ef459aa-898e-445c-ad0e-76e0452d0fd7',
+      document_binary_url: 'http://dm-store-aat.service.core-compute-aat.internal/documents/0ef459aa-898e-445c-ad0e-76e0452d0fd7/binary',
+      document_filename: 'Screenshot 2026-08-06 at 15.45.49.png',
+    }
+  }
+],
+  rentArrears_Total: '250000',
+  rentArrears_RecoveryAttempted: 'NO',
+  arrearsJudgmentWanted: 'YES',
+  claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
+  claimantCircumstancesSelect: 'NO',
+  hasDefendantCircumstancesInfo: 'NO',
+  prohibitedConductWalesClaim: 'NO',
+  additionalReasonsForPossession: {
+  hasReasons: 'NO'
+},
+  hasUnderlesseeOrMortgagee: 'NO',
+  walesDocs_HasEnergyPerformanceCertificate: 'NO',
+  walesDocs_NoEpcReason: 'test',
+  walesDocs_HasGasSafetyReport: 'NO',
+  walesDocs_NoGasReportReason: 'test',
+  walesDocs_HasElectricalInstallationConditionReport: 'NO',
+  walesDocs_NoEicrReason: 'test',
+  wantToUploadDocuments: 'NO',
+  applicationWithClaim: 'YES',
+  languageUsed: 'ENGLISH',
+  completionNextStep: 'SUBMIT_AND_PAY_NOW',
+  endButtonLabel: null
+},
 
   submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
 };
