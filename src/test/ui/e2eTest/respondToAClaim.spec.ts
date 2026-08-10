@@ -2,7 +2,6 @@ import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   adjustmentToGetIntoBuilding,
   askYourSolicitorToRespond,
-  askingForSpecialMeasures,
   bringSupportToCourtHearing,
   checkYourAnswersRTC,
   confirmationOfNoticeGiven,
@@ -40,7 +39,6 @@ import {
   howMuchAffordToPay,
   incomeAndExpenses,
   installmentPayments,
-  languageInterpreter,
   languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
@@ -56,14 +54,12 @@ import {
   responseSubmitted,
   responseSubmittedCounterclaimFeePaymentNeeded,
   reviewSupport,
-  specialMeasures,
   startNow,
   supportRequest,
   supportRequestNotSent,
   taskList,
   tenancyDateDetails,
   tenancyTypeDetails,
-  welshRequirements,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -2391,31 +2387,7 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
       header: requestCertainTypeOfHearing.mainHeader,
       options: [requestCertainTypeOfHearing.noCertainTypeOfHearingCheckbox],
       button: requestCertainTypeOfHearing.continueButton,
-    }); /*
-    await performAction('selectReasonableAdjustments', {
-      header: welshRequirements.mainHeader,
-      options: [welshRequirements.speakWelshAtHearingsCheckbox,
-      welshRequirements.receiveCommunicationsAndDocumentsInWelshCheckbox],
-       button: welshRequirements.continueButton,
     });
-    await performAction('selectReasonableAdjustments', {
-      header: languageInterpreter.mainHeader,
-      options: [
-      languageInterpreter.noRadioOption],
-       button: languageInterpreter.continueButton,
-    });
-    await performAction('selectReasonableAdjustments', {
-      header: specialMeasures.mainHeader,
-      options: [
-      specialMeasures.yesRadioOption],
-       button: specialMeasures.continueButton,
-    });
-    await performAction('selectReasonableAdjustments', {
-      header: askingForSpecialMeasures.mainHeader,
-      options: [askingForSpecialMeasures.giveEvidenceInPrivateCheckbox,
-      askingForSpecialMeasures.joinTheHearingAndGiveEvidenceByVideoCheckbox],
-       button: askingForSpecialMeasures.continueButton,
-    }); */
     await performValidation('mainHeader', reviewSupport.mainHeader);
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequest.mainHeader);
@@ -2597,31 +2569,7 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
       header: requestCertainTypeOfHearing.mainHeader,
       options: [requestCertainTypeOfHearing.noCertainTypeOfHearingCheckbox],
       button: requestCertainTypeOfHearing.continueButton,
-    }); /*
-    await performAction('selectReasonableAdjustments', {
-      header: welshRequirements.mainHeader,
-      options: [welshRequirements.speakWelshAtHearingsCheckbox,
-      welshRequirements.receiveCommunicationsAndDocumentsInWelshCheckbox],
-       button: welshRequirements.continueButton,
     });
-    await performAction('selectReasonableAdjustments', {
-      header: languageInterpreter.mainHeader,
-      options: [
-      languageInterpreter.noRadioOption],
-       button: languageInterpreter.continueButton,
-    });
-    await performAction('selectReasonableAdjustments', {
-      header: specialMeasures.mainHeader,
-      options: [
-      specialMeasures.yesRadioOption],
-       button: specialMeasures.continueButton,
-    });
-    await performAction('selectReasonableAdjustments', {
-      header: askingForSpecialMeasures.mainHeader,
-      options: [askingForSpecialMeasures.giveEvidenceInPrivateCheckbox,
-      askingForSpecialMeasures.joinTheHearingAndGiveEvidenceByVideoCheckbox],
-       button: askingForSpecialMeasures.continueButton,
-    }); */
     await performValidation('mainHeader', reviewSupport.mainHeader);
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequestNotSent.mainHeader);

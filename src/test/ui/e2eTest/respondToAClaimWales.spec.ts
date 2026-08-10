@@ -1021,31 +1021,7 @@ test.describe('Common Component YS Respond to a claim - e2e Journey @nightly', a
       header: requestCertainTypeOfHearing.mainHeader,
       options: [requestCertainTypeOfHearing.noCertainTypeOfHearingCheckbox],
       button: requestCertainTypeOfHearing.continueButton,
-    }); /*
-        await performAction('selectReasonableAdjustments', {
-          header: welshRequirements.mainHeader,
-          options: [welshRequirements.speakWelshAtHearingsCheckbox,
-          welshRequirements.receiveCommunicationsAndDocumentsInWelshCheckbox],
-           button: welshRequirements.continueButton,
-        });
-        await performAction('selectReasonableAdjustments', {
-          header: languageInterpreter.mainHeader,
-          options: [
-          languageInterpreter.noRadioOption],
-           button: languageInterpreter.continueButton,
-        });
-        await performAction('selectReasonableAdjustments', {
-          header: specialMeasures.mainHeader,
-          options: [
-          specialMeasures.yesRadioOption],
-           button: specialMeasures.continueButton,
-        });
-        await performAction('selectReasonableAdjustments', {
-          header: askingForSpecialMeasures.mainHeader,
-          options: [askingForSpecialMeasures.giveEvidenceInPrivateCheckbox,
-          askingForSpecialMeasures.joinTheHearingAndGiveEvidenceByVideoCheckbox],
-           button: askingForSpecialMeasures.continueButton,
-        }); */
+    });
     await performValidation('mainHeader', reviewSupport.mainHeader);
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequest.mainHeader);
@@ -1273,31 +1249,7 @@ test.describe('Common Component YS Respond to a claim - e2e Journey @nightly', a
       header: requestCertainTypeOfHearing.mainHeader,
       options: [requestCertainTypeOfHearing.noCertainTypeOfHearingCheckbox],
       button: requestCertainTypeOfHearing.continueButton,
-    }); /*
-        await performAction('selectReasonableAdjustments', {
-          header: welshRequirements.mainHeader,
-          options: [welshRequirements.speakWelshAtHearingsCheckbox,
-          welshRequirements.receiveCommunicationsAndDocumentsInWelshCheckbox],
-           button: welshRequirements.continueButton,
-        });
-        await performAction('selectReasonableAdjustments', {
-          header: languageInterpreter.mainHeader,
-          options: [
-          languageInterpreter.noRadioOption],
-           button: languageInterpreter.continueButton,
-        });
-        await performAction('selectReasonableAdjustments', {
-          header: specialMeasures.mainHeader,
-          options: [
-          specialMeasures.yesRadioOption],
-           button: specialMeasures.continueButton,
-        });
-        await performAction('selectReasonableAdjustments', {
-          header: askingForSpecialMeasures.mainHeader,
-          options: [askingForSpecialMeasures.giveEvidenceInPrivateCheckbox,
-          askingForSpecialMeasures.joinTheHearingAndGiveEvidenceByVideoCheckbox],
-           button: askingForSpecialMeasures.continueButton,
-        }); */
+    });
     await performValidation('mainHeader', reviewSupport.mainHeader);
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequestNotSent.mainHeader);
