@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Defendant\u2019s postal address",
+  "legend": "Is the defendant\u2019s postal address {{ formattedAddressStr }}",
+  "labels": {
+    "enterManuallySubText": "You can enter the defendant\u2019s address details in the fields below.",
+    "addressHeading": "What’s the defendant\u2019s postal address?"
+  },
+  "errors": {
+    "correspondenceAddressConfirm": "Please confirm the defendant\u2019s address by selecting the options below"
+  }
+}
