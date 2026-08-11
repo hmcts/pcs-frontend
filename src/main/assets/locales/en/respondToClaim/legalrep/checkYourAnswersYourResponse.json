@@ -125,7 +125,7 @@
       "changeHidden": "facts for the court"
     },
     "counterClaimWantToUploadFiles": {
-      "label": "Do you want to upload files to support your counterclaim?",
+      "label": "Do you want to upload files to support the counterclaim?",
       "changeHidden": "upload files for counterclaim"
     },
     "counterClaimDocuments": {
