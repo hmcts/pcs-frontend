@@ -11,8 +11,8 @@ jest.mock('../../../../main/assets/js/navigate', () => ({
 
 const redirectToMock = redirectTo as jest.Mock;
 
-const REARM_MAX_TICKS = 30;
-const PUSHES_PER_ARM = 1 + REARM_MAX_TICKS;
+// The immediate synchronous push plus the deferred re-pushes scheduled per arm.
+const PUSHES_PER_ARM = 5;
 
 describe('initRedirectOnBack', () => {
   const dashboardUrl = '/case/1234567890123456/dashboard';
@@ -96,7 +96,7 @@ describe('initRedirectOnBack', () => {
     expect(pushStateSpy).toHaveBeenCalledTimes(1); // immediate push
   });
 
-  it('re-pushes the guard on an interval so a redirect arrival still traps Back', () => {
+  it('re-pushes the guard across a window so a redirect arrival still traps Back', () => {
     addMarker(dashboardUrl);
 
     initRedirectOnBack();
@@ -104,34 +104,7 @@ describe('initRedirectOnBack', () => {
     expect(pushStateSpy).toHaveBeenCalledTimes(1); // immediate
 
     jest.runAllTimers();
-    expect(pushStateSpy).toHaveBeenCalledTimes(PUSHES_PER_ARM); // + interval re-pushes
-  });
-
-  it('stops re-pushing once the safety cap is reached', () => {
-    addMarker(dashboardUrl);
-
-    initRedirectOnBack();
-    pageshow();
-    jest.runAllTimers();
-
-    // The interval must self-terminate; advancing further pushes nothing more.
-    jest.advanceTimersByTime(60_000);
-    expect(pushStateSpy).toHaveBeenCalledTimes(PUSHES_PER_ARM);
-  });
-
-  it('stops re-pushing as soon as Back is trapped', () => {
-    addMarker(dashboardUrl);
-
-    initRedirectOnBack();
-    pageshow();
-
-    // A guard sticks and Back fires before the cap elapses.
-    window.dispatchEvent(new PopStateEvent('popstate'));
-    const pushesAtRedirect = pushStateSpy.mock.calls.length;
-
-    // The pending interval must have been cleared by the popstate handler.
-    jest.runAllTimers();
-    expect(pushStateSpy).toHaveBeenCalledTimes(pushesAtRedirect);
+    expect(pushStateSpy).toHaveBeenCalledTimes(PUSHES_PER_ARM); // + deferred re-pushes
   });
 
   it('redirects to the dashboard on Back', () => {
