@@ -250,11 +250,11 @@ export class RespondToClaimAction implements IAction {
     await actionToPerform();
   }
 
-  private getRtcCyaQuestionLabel(question: string): string {
+  protected getRtcCyaQuestionLabel(question: string): string {
     return stripOptionalSuffix(question);
   }
 
-  private getRtcCyaChoiceLabel(choice: actionData): string {
+  protected getRtcCyaChoiceLabel(choice: actionData): string {
     const normalizedChoice = String(choice).trim();
 
     if (normalizedChoice === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph.trim()) {
@@ -264,7 +264,7 @@ export class RespondToClaimAction implements IAction {
     return removeTrailingBracketedSuffix(normalizedChoice);
   }
 
-  private buildRtcCyaAmountAndFrequencyValue(
+  protected buildRtcCyaAmountAndFrequencyValue(
     amount: actionData,
     frequency: actionData,
     descriptor: string = 'every'
@@ -298,7 +298,7 @@ export class RespondToClaimAction implements IAction {
     this.recordAnswer(label, this.buildRtcCyaDateValue(day, month, year));
   }
 
-  private deleteRtcCyaDate(label: string): void {
+  protected deleteRtcCyaDate(label: string): void {
     this.deleteAnswer(label);
   }
 
@@ -311,11 +311,11 @@ export class RespondToClaimAction implements IAction {
     }
   }
 
-  private recordRtcCyaSummaryRow(label: string, values: string[]): void {
+  protected recordRtcCyaSummaryRow(label: string, values: string[]): void {
     this.recordAnswer(label, values.length > 0 ? values.join(', ') : rtcNoAnswerProvidedValue);
   }
 
-  private recordRtcCyaHeadingWithItems(headingLabel: string, itemEntries: [string, string][]): void {
+  protected recordRtcCyaHeadingWithItems(headingLabel: string, itemEntries: [string, string][]): void {
     this.deleteAnswer(headingLabel);
 
     if (itemEntries.length === 0) {
@@ -378,7 +378,7 @@ export class RespondToClaimAction implements IAction {
     rtcSectionAnswers.set(activeRtcSection, sectionAnswers);
   }
 
-  private deleteAnswer(key: string): void {
+  protected deleteAnswer(key: string): void {
     FieldsStore.delete(key);
     rtcSectionAnswers.forEach(sectionAnswers => sectionAnswers.delete(key));
   }

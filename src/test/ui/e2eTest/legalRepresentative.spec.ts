@@ -1,5 +1,4 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { checkYourAnswersRTC, dashboard, responseSubmittedCounterclaimFeePaymentNeeded } from '../data/page-data';
 import {
   confirmationOfNoticeGiven,
   correspondenceAddress,
@@ -18,6 +17,7 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  endOfJourneyCYA,
   equalityAndDiversityEndLR,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -263,14 +263,21 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
+    await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
   });
 
-  test('NonRentArrears - AssuredTenancy - Something else - LR @smoke @regression @nonRent @LR', async () => {
+  test('NonRentArrears - AssuredTenancy - Something else - LR @smoke @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -395,11 +402,18 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
   });
 
   test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @smoke @regression @nonRent @LR', async () => {
@@ -531,14 +545,21 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
   });
 
-  test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @regression @rentNonRent @LR', async () => {
+  test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @rentNonRent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -668,24 +689,21 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
     await performAction('retrieveCYATableDataRTC');
     await performAction('validateCYARTC');
-    await performAction('selectStatementOfTruthRTC', {
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction(
-      'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
-    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @smoke @PR @regression @rentNonRent @LR', async () => {
+  test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @smoke @PR @rentNonRent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -817,14 +835,21 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
   });
 
-  test('RentArrears - DemotedTenancy - LR @smoke @regression @rent @LR', async () => {
+  test('RentArrears - DemotedTenancy - LR @smoke @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -899,14 +924,21 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
   });
 
-  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @smoke @regression @rent @LR', async () => {
+  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @smoke @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -1013,7 +1045,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @smoke @regression @rent @LR', async () => {
+  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @smoke @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -1081,7 +1113,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Defendant address known - No - LR @smoke @regression @defendantAddressKnown @LR', async () => {
+  test('RentArrears - Defendant address known - No - LR @smoke @defendantAddressKnown @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
