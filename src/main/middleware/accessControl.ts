@@ -3,6 +3,7 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { HTTPError } from '../HttpError';
 import { legalrepFlowConfig } from '../steps/respond-to-claim/legalrep.flow.config';
 import { getUserRoles, getUserType } from '../steps/utils';
+import { isAccessControlEnabled } from '../utils/isAccessControlEnabled';
 
 import { oidcMiddleware } from './oidc';
 
@@ -87,3 +88,14 @@ export const authorisationGate: RequestHandler = (req: Request, res: Response, n
   });
   res.redirect('/logout');
 };
+
+// Runs the wrapped handler only when access control is enabled; otherwise passes through so authenticated
+// users reach the route unchanged (previous behaviour). Keeps the gate itself free of feature-flag concerns.
+export const withAccessControlEnabled =
+  (handler: RequestHandler): RequestHandler =>
+  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    if (await isAccessControlEnabled(req)) {
+      return void handler(req, res, next);
+    }
+    next();
+  };

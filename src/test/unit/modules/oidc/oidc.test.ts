@@ -38,6 +38,11 @@ jest.mock('@modules/logger', () => ({
   },
 }));
 
+const mockIsAccessControlEnabled = jest.fn();
+jest.mock('../../../../main/utils/isAccessControlEnabled', () => ({
+  isAccessControlEnabled: (...args: unknown[]) => mockIsAccessControlEnabled(...args),
+}));
+
 describe('OIDCModule', () => {
   let oidcModule: OIDCModule;
   let mockApp: Express;
@@ -69,6 +74,8 @@ describe('OIDCModule', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    mockIsAccessControlEnabled.mockResolvedValue(true);
 
     (config.get as jest.Mock).mockImplementation((key: string) => {
       if (key === 'oidc') {
@@ -386,6 +393,38 @@ describe('OIDCModule', () => {
         expect(mockRequest.session.user).toBeUndefined();
         expect(destroy).toHaveBeenCalled();
         expect(mockResponse.redirect).toHaveBeenCalledWith(mockLogoutUrl);
+      });
+
+      it('allows a user without a permitted role when access control is disabled', async () => {
+        mockIsAccessControlEnabled.mockResolvedValue(false);
+        const mockTokens = {
+          access_token: 'test-token',
+          id_token: 'test-id-token',
+          refresh_token: 'test-refresh-token',
+          claims: jest.fn().mockReturnValue({ sub: 'test-sub' }),
+        };
+        const mockUserInfo = {
+          email: 'test@example.com',
+          roles: ['judge'],
+        };
+
+        (authorizationCodeGrant as jest.Mock).mockResolvedValue(mockTokens);
+        (fetchUserInfo as jest.Mock).mockResolvedValue(mockUserInfo);
+
+        const destroy = jest.fn().mockImplementation(callback => callback(null));
+        mockRequest.session = createMockSession({
+          codeVerifier: 'test-verifier',
+          nonce: 'test-nonce',
+          destroy,
+          save: jest.fn().mockImplementation(callback => callback(null)),
+        });
+
+        oidcModule.enableFor(mockApp);
+        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
+        await callbackHandler(mockRequest, mockResponse, mockNext);
+
+        expect(mockRequest.session.user).toBeDefined();
+        expect(destroy).not.toHaveBeenCalled();
       });
 
       it('should redirect to returnTo URL when present', async () => {

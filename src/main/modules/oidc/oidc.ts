@@ -5,6 +5,7 @@ import type { Configuration, TokenEndpointResponse, UserInfoResponse } from 'ope
 import * as client from 'openid-client';
 
 import { hasAllowedUserRole, normaliseRoles } from '../../steps/utils/userRole';
+import { isAccessControlEnabled } from '../../utils/isAccessControlEnabled';
 
 import type { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
@@ -222,7 +223,10 @@ export class OIDCModule {
         const { sub } = claims;
         const user: UserInfoResponse = await client.fetchUserInfo(this.clientConfig, access_token, sub);
 
-        if (!hasAllowedUserRole(normaliseRoles((user as { roles?: unknown }).roles))) {
+        if (
+          (await isAccessControlEnabled(req)) &&
+          !hasAllowedUserRole(normaliseRoles((user as { roles?: unknown }).roles))
+        ) {
           this.logger.warn('Authenticated user has no permitted role; denying access', {
             event: 'login_denied_no_permitted_role',
             userId: (user as { uid?: string }).uid,
