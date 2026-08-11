@@ -11,9 +11,8 @@ jest.mock('../../../../main/assets/js/navigate', () => ({
 
 const redirectToMock = redirectTo as jest.Mock;
 
-// Number of deferred re-pushes scheduled per arm (setTimeout delays in the SUT),
-// plus the immediate synchronous push.
-const PUSHES_PER_ARM = 5;
+const REARM_MAX_TICKS = 30;
+const PUSHES_PER_ARM = 1 + REARM_MAX_TICKS;
 
 describe('initRedirectOnBack', () => {
   const dashboardUrl = '/case/1234567890123456/dashboard';
@@ -25,7 +24,6 @@ describe('initRedirectOnBack', () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
-    jest.spyOn(console, 'info').mockImplementation(() => {});
     document.body.innerHTML = '';
     redirectToMock.mockReset();
     addedListeners.length = 0;
@@ -98,7 +96,7 @@ describe('initRedirectOnBack', () => {
     expect(pushStateSpy).toHaveBeenCalledTimes(1); // immediate push
   });
 
-  it('re-pushes the guard across a window so a redirect arrival still traps Back', () => {
+  it('re-pushes the guard on an interval so a redirect arrival still traps Back', () => {
     addMarker(dashboardUrl);
 
     initRedirectOnBack();
@@ -106,7 +104,34 @@ describe('initRedirectOnBack', () => {
     expect(pushStateSpy).toHaveBeenCalledTimes(1); // immediate
 
     jest.runAllTimers();
-    expect(pushStateSpy).toHaveBeenCalledTimes(PUSHES_PER_ARM); // + deferred re-pushes
+    expect(pushStateSpy).toHaveBeenCalledTimes(PUSHES_PER_ARM); // + interval re-pushes
+  });
+
+  it('stops re-pushing once the safety cap is reached', () => {
+    addMarker(dashboardUrl);
+
+    initRedirectOnBack();
+    pageshow();
+    jest.runAllTimers();
+
+    // The interval must self-terminate; advancing further pushes nothing more.
+    jest.advanceTimersByTime(60_000);
+    expect(pushStateSpy).toHaveBeenCalledTimes(PUSHES_PER_ARM);
+  });
+
+  it('stops re-pushing as soon as Back is trapped', () => {
+    addMarker(dashboardUrl);
+
+    initRedirectOnBack();
+    pageshow();
+
+    // A guard sticks and Back fires before the cap elapses.
+    window.dispatchEvent(new PopStateEvent('popstate'));
+    const pushesAtRedirect = pushStateSpy.mock.calls.length;
+
+    // The pending interval must have been cleared by the popstate handler.
+    jest.runAllTimers();
+    expect(pushStateSpy).toHaveBeenCalledTimes(pushesAtRedirect);
   });
 
   it('redirects to the dashboard on Back', () => {
