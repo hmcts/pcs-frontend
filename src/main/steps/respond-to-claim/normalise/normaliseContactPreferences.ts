@@ -13,4 +13,14 @@ export function normaliseContactPreferences(response: PossessionClaimResponse): 
   if (normalizeYesNoValue(dr.contactByPhone) !== 'YES') {
     delete dr.contactByText;
   }
+
+  // Drop any stored mobile number once the defendant is no longer opted in to text messages,
+  // so a stale number is not left behind on the party (e.g. text set to NO, or telephone
+  // later changed to NO which also disables text).
+  if (normalizeYesNoValue(dr.contactByText) !== 'YES') {
+    const party = response.defendantContactDetails?.party;
+    if (party) {
+      delete party.textMessageNumber;
+    }
+  }
 }

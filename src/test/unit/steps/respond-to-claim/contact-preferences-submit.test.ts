@@ -14,8 +14,14 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
 }));
 
 import { step as telephoneStep } from '../../../../main/steps/respond-to-claim/contact-preferences-telephone';
-import { step as textStep } from '../../../../main/steps/respond-to-claim/contact-preferences-text-message';
-import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
+import {
+  step as textStep,
+  validateMobileNumber,
+} from '../../../../main/steps/respond-to-claim/contact-preferences-text-message';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
 describe('contact preferences submit-time CCD payloads', () => {
   // Reusable minimal req/res scaffolding for formBuilder steps
@@ -114,6 +120,66 @@ describe('contact preferences submit-time CCD payloads', () => {
           }),
         })
       );
+    });
+
+    it('stores the mobile number as normalised digits, stripping spaces', async () => {
+      const { req, res, next } = createBaseReqRes();
+
+      req.body = {
+        contactByTextMessage: 'yes',
+        'contactByTextMessage.mobileNumber': '07700 900 982',
+      };
+
+      await textStep.postController!.post(req as unknown as Request, res as unknown as Response, next);
+
+      expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
+        req,
+        expect.objectContaining({
+          defendantContactDetails: expect.objectContaining({
+            party: expect.objectContaining({
+              textMessageNumber: '07700900982',
+            }),
+          }),
+        })
+      );
+    });
+
+    it('clears a previously stored mobile number when the answer is No', async () => {
+      const { req, res, next } = createBaseReqRes();
+
+      // Existing draft already has a stored mobile number
+      (buildDraftDefendantResponse as jest.Mock).mockReturnValueOnce({
+        defendantResponses: {},
+        defendantContactDetails: { party: { textMessageNumber: '07700900982' } },
+      });
+
+      req.body = {
+        contactByTextMessage: 'no',
+      };
+
+      await textStep.postController!.post(req as unknown as Request, res as unknown as Response, next);
+
+      const savedResponse = (saveDraftDefendantResponse as jest.Mock).mock.calls[0][1];
+      expect(savedResponse.defendantResponses.contactByText).toBe('NO');
+      expect(savedResponse.defendantContactDetails.party.textMessageNumber).toBeUndefined();
+    });
+  });
+
+  describe('validateMobileNumber', () => {
+    it('accepts a valid UK mobile number', () => {
+      expect(validateMobileNumber('07700900982')).toBe(true);
+    });
+
+    it('accepts a valid UK mobile number containing spaces', () => {
+      expect(validateMobileNumber('07700 900 982')).toBe(true);
+    });
+
+    it('rejects a landline number', () => {
+      expect(validateMobileNumber('01632960001')).toBe('errors.contactByTextMessage.mobileNumber.invalid');
+    });
+
+    it('rejects a spaced value that is not a valid mobile', () => {
+      expect(validateMobileNumber('012 3456')).toBe('errors.contactByTextMessage.mobileNumber.invalid');
     });
   });
 });
