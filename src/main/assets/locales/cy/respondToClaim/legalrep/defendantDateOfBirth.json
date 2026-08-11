@@ -1,7 +1,7 @@
 {
   "pageTitle": "cyDefendant’s date of birth",
   "dateOfBirthHint": "cyFor example, 31 3 1980",
-  "dateOfBirthLabel": "cyDefendant date of birth",
+  "dateOfBirthLabel": "cyDefendant’s date of birth (Optional)",
   "errors": {
     "date": {
       "day": "cyDay",
@@ -10,7 +10,7 @@
       "required": "cyEnter the defendant’s date of birth",
       "notRealDate": "cyDate of birth must be a real date",
       "futureDate": "cyDate of birth must be in the past",
-      "invalidValue": "Date of birth must be a real date",
+      "invalidValue": "cyDate of birth must be a real date",
       "missingOne": "cyThe defendant’s date of birth must include a {{missingField}}",
       "missingTwo": "cyThe defendant’s date of birth must include a {{first}} and {{second}}"
     }
