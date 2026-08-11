@@ -205,10 +205,14 @@ export class ActionRegistry {
     ['selectHowMuchAffordToPayLR', new RespondToClaimLRAction()],
     ['counterClaimOrderOtherThanSumLR', new RespondToClaimLRAction()],
     ['counterClaimHaveYouAppliedForHelpWithFeeLR', new RespondToClaimLRAction()],
+    ['uploadAdditionalDocumentsLR', new RespondToClaimLRAction()],
     ['doYouWantToUploadFilesLR', new RespondToClaimLRAction()],
     ['uploadFilesToSupportCounterclaimLR', new RespondToClaimLRAction()],
     ['submitPossessionClaimResponseLRAPI', new SubmitPossessionClaimResponseAPIAction()],
     ['midEventRespondPossessionClaimLRAPI', new RespondPossessionClaimLRMidEventAPIAction()],
+    ['confirmDefendantDetailsLR', new RespondToClaimLRAction()],
+    ['enterDateOfBirthDetailsLR', new RespondToClaimLRAction()],
+    ['selectCorrespondenceAddressLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {
