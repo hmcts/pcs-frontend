@@ -3,7 +3,7 @@
   "cardTitle": "Personal details",
   "rows": {
     "defendantNameConfirmation": {
-      "label": "Is your client’s name {{defendantName}}?",
+      "label": "Is the defendant’s name {{defendantName}}?",
       "changeHidden": "name"
     },
     "defendantName": {
@@ -15,11 +15,11 @@
       "changeHidden": "name"
     },
     "dateOfBirth": {
-      "label": "What’s your date of birth?",
+      "label": "Defendant's date of birth",
       "changeHidden": "date of birth"
     },
     "correspondenceAddressConfirmation": {
-      "label": "Is your postal address {{address}}?",
+      "label": "Is the defendant's postal address {{address}}?",
       "fallbackLabel": "What’s your postal address?",
       "changeHidden": "postal address"
     },

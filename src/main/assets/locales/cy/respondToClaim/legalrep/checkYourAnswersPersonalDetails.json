@@ -3,7 +3,7 @@
   "cardTitle": "cy Personal details",
   "rows": {
     "defendantNameConfirmation": {
-      "label": "cy Is your client’s name {{defendantName}}?",
+      "label": "cy Is the defendant’s name {{defendantName}}?",
       "changeHidden": "cy name"
     },
     "defendantName": {
@@ -15,11 +15,11 @@
       "changeHidden": "cy name"
     },
     "dateOfBirth": {
-      "label": "cy Date of Birth",
+      "label": "cy Defendant's date of birth",
       "changeHidden": "cy date of birth"
     },
     "correspondenceAddressConfirmation": {
-      "label": "cy Is your postal address {{address}}?",
+      "label": "cy Is the defendant's postal address {{address}}?",
       "fallbackLabel": "cy What’s your postal address?",
       "changeHidden": "cy postal address"
     },
