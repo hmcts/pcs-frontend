@@ -12,5 +12,7 @@
       "allowedVersions": "<7",
       "description": "TypeScript 7 is the native (Go) port which does not yet expose the full compiler API used by @typescript-eslint, ts-jest, ts-loader and ts-node. #1697 auto-merged the v7 bump and broke the lint stage on master (ESLint crash: 'Cannot read properties of undefined (reading Cjs)'). Hold on v6 until the toolchain supports the native port."
     }
-  ]
+  ],
+  "platformAutomerge": false,
+  "automergeSchedule": ["after 7am and before 9am every weekday", "after 5pm and before 7pm every weekday"]
 }

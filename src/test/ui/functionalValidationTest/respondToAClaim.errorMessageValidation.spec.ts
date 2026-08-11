@@ -1,4 +1,6 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
+import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
   checkYourAnswersRTC,
   confirmationOfNoticeGiven,
@@ -22,6 +24,7 @@ import {
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
   exceptionalHardship,
+  exemptLandLord,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
   incomeAndExpenses,
@@ -39,6 +42,7 @@ import {
   tenancyTypeDetails,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
+  writtenTerms,
   yourCircumstances,
 } from '../data/page-data';
 import { accessYourCaseErrorValidation } from '../functional/accessYourCase.pft';
@@ -62,6 +66,7 @@ import { doYouHaveAnyDependantChildrenErrorValidation } from '../functional/doYo
 import { doYouHaveAnyOtherDependantsErrorValidation } from '../functional/doYouHaveAnyOtherDependants.pft';
 import { doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation } from '../functional/doYouWantToUploadFilesToSupportYourCounterclaim.pft';
 import { yourExceptionalHardShipErrorValidation } from '../functional/exceptionalHardship.pft';
+import { exemptLandLordErrorValidation } from '../functional/exemptLandLord.pft';
 import { freeLegalAdviceErrorValidation } from '../functional/freeLegalAdvice.pft';
 import { haveYouAppliedForUniversalCreditErrorValidation } from '../functional/haveYouAppliedForUniversalCredit.pft';
 import { incomeAndExpensesErrorValidation } from '../functional/incomeAndExpenses.pft';
@@ -82,6 +87,7 @@ import { uploadFilesToSupportYourCounterclaimErrorValidation } from '../function
 import { whatOtherRegularExpensesDoYouHaveErrorValidation } from '../functional/whatOtherRegularExpensesDoYouHave.pft';
 import { whatRegularIncomeDoYouReceiveErrorValidation } from '../functional/whatRegularIncomeDoYouReceive.pft';
 import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation } from '../functional/wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.pft';
+import { writtenTermsErrorValidation } from '../functional/writtenTerms.pft';
 import { yourCircumstancesErrorValidation } from '../functional/yourCircumstances.pft';
 import { getRelativeDate } from '../utils/common/date.utils';
 import {
@@ -91,7 +97,7 @@ import {
 } from '../utils/common/error-message-validation-helper';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { initializeExecutor, performAction } from '../utils/controller';
+import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
 
 const home_url = process.env.TEST_URL;
@@ -220,6 +226,13 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.TENANCY_START_DATE_KNOWN = 'YES';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadRentNonRent });
+  } else if (testInfo.title.includes('Wales-specific')) {
+    process.env.WALES_POSTCODE = 'YES';
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+    process.env.OCCUPATION_LICENCE_TYPE = 'SECURE_CONTRACT';
+    submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales = process.env.OCCUPATION_LICENCE_TYPE;
+    await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCasePayload });
   } else {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     process.env.CLAIMANT_NAME_OVERRIDDEN = 'NO';
@@ -738,6 +751,59 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectStatementOfTruthRTC', {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    assertAllErrorMessageValidations();
+  });
+
+  test('Wales-specific page error validation for exempt landlord and written terms @PR', async () => {
+    await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
+    await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+
+    await softErrorMessageValidation('defendantNameCapture', defendantNameCaptureErrorValidation);
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
+    });
+
+    await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_MISSING_DESIGN);
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+
+    await softErrorMessageValidation('correspondenceAddress', NO_EMV_MISSING_DESIGN);
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+
+    await softErrorMessageValidation('contactPreferenceEmailOrPost', contactPreferenceEmailOrPostErrorValidation);
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
+    });
+
+    await softErrorMessageValidation('contactPreferencesTelephone', contactPreferencesTelephoneErrorValidation);
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.noRadioOption,
+    });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+
+    await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
+    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await softErrorMessageValidation('exemptLandLord', exemptLandLordErrorValidation);
+    await performAction('exemptLandLord', exemptLandLord.yesRadioOption);
+    await softErrorMessageValidation('writtenTerms', writtenTermsErrorValidation);
+    await performValidation('mainHeader', writtenTerms.mainHeader);
+    await performAction('selectWrittenTerms', {
+      question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
+      radioOption: writtenTerms.noRadioOption,
     });
     assertAllErrorMessageValidations();
   });
