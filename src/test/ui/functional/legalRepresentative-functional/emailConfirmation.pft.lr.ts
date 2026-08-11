@@ -12,7 +12,7 @@ export async function emailConfirmationErrorValidation(): Promise<void> {
   await performAction('clickButton', emailConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: emailConfirmation.thereIsAProblemErrorMessageHeader,
-    message: emailConfirmation.enterEmailAddressErrorMessage,
+    message: emailConfirmation.enterDefendantEmailAddressErrorMessage,
   });
 
   await performAction('clickRadioButton', emailConfirmation.yesRadioOption);
