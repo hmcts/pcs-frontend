@@ -1030,6 +1030,7 @@ describe('viewTheResponse route', () => {
       caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'YES';
       caseData.possessionClaimResponse!.defendantResponses!.counterClaim = {
         claimType: 'PAYMENT_OR_COMPENSATION',
+        status: 'COUNTER_CLAIM_ISSUED',
       };
       caseData.allDocuments = [
         {
@@ -1071,6 +1072,41 @@ describe('viewTheResponse route', () => {
     it('should not include counterclaim PDF URL when no counterclaim made', async () => {
       const caseData = buildComprehensiveCaseData();
       caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'NO';
+
+      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+        id: caseReference,
+        data: caseData,
+      });
+
+      viewTheResponseRoute(app);
+      const handler = getHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        viewTheResponseRequest({
+          caseReference,
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith(
+        'view-the-response',
+        expect.objectContaining({
+          counterclaimPdfUrl: null,
+        })
+      );
+    });
+
+    it('should not include counterclaim PDF URL when counterclaim is pending (PENDING_COUNTER_CLAIM_ISSUED)', async () => {
+      const caseData = buildComprehensiveCaseData();
+      caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'YES';
+      caseData.possessionClaimResponse!.defendantResponses!.counterClaim = {
+        claimType: 'PAYMENT_OR_COMPENSATION',
+        status: 'PENDING_COUNTER_CLAIM_ISSUED',
+      };
+      caseData.allDocuments = [];
 
       (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
         id: caseReference,
