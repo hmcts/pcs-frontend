@@ -425,12 +425,12 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
+    });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
-    });
-    await performAction('emailConfirmationLR', {
-      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('enterTenancyStartDetailsUnKnownLR', {
       tsDay: '15',
