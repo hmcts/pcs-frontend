@@ -145,7 +145,6 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       question: emailConfirmation.doYouKnowDefendantEmailQuestion,
       option: emailData.radioOption,
     });
-
     if (emailData.radioOption === 'Yes') {
       await performAction(
         'inputText',
