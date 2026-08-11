@@ -116,7 +116,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         ...paymentSession,
         feeAmount,
         counterClaimAmountInPence: claimAmountInPence,
-        counterClaimType: claimType ?? paymentSession.counterClaimType,
+        counterClaimType: claimType,
       });
       paymentSession = getPaymentSessionState(req);
     }
