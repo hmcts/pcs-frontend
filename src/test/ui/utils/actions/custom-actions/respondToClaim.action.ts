@@ -976,6 +976,15 @@ export class RespondToClaimAction implements IAction {
       elementType: 'paragraph',
       text: `When they made their claim, ${claimantsName} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
     });
+    if (rentArrearsInfo?.showRentDocumentLink) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: rentArrears.rentDocumentDynamicLink,
+      });
+      await performValidation('validatePdfDocument', {
+        linkText: rentArrears.rentDocumentDynamicLink,
+      });
+    }
     const rentArrearsAmount = formatCurrency(`${payload.submitCasePayload.rentArrears_Total}`);
     await performValidation('text', {
       elementType: 'paragraph',
@@ -1033,6 +1042,15 @@ export class RespondToClaimAction implements IAction {
           text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
         });
       }
+    }
+    if (tenancyTypeDetailsInfo?.showTenancyDocumentLink) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: tenancyTypeDetails.tenancyDocumentDynamicLink,
+      });
+      await performValidation('validatePdfDocument', {
+        linkText: tenancyTypeDetails.tenancyDocumentDynamicLink,
+      });
     }
     this.recordAnswer(tenancyTypeDetails.isTenancyTypeCorrectQuestion, tenancyTypeDetailsInfo.tenancyOption);
     await performAction('clickRadioButton', {
