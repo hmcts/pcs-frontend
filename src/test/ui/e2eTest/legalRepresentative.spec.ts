@@ -113,11 +113,12 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   if (testInfo.title.includes('@singleDefendant')) {
-    claimantName = submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.claimantName;
+    process.env.TENANCY_TYPE = 'SECURE_TENANCY';
+    claimantName = submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.claimantName;
     process.env.CLAIMANT_NAME = claimantName;
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
   }
 
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
