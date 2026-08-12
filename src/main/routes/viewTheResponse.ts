@@ -594,10 +594,6 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
     return null;
   }
 
-  if (responses.counterClaim.status && responses.counterClaim.status !== 'COUNTER_CLAIM_ISSUED') {
-    return null;
-  }
-
   const documents = extractCaseDocuments(caseData as Record<string, unknown>);
   const counterclaimPdf = documents.find(
     doc => doc.categoryId === 'statementsOfCase' && doc.filename?.startsWith('Counterclaim - Defendant')
