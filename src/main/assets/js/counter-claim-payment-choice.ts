@@ -1,4 +1,4 @@
-// pay btn stays outside the radio conditionals; card just GET-navigates
+// Progressive enhancement: card selection navigates directly instead of posting first.
 export function initCounterClaimPaymentChoice(): void {
   const form = document.querySelector<HTMLFormElement>('[data-counter-claim-payment-form]');
   if (!form) {

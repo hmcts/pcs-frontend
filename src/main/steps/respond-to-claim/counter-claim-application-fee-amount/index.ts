@@ -65,6 +65,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseReference = req.params.caseReference;
     const paymentOption = req.body?.paymentOptions as string | undefined;
 
+    if (paymentOption === 'card') {
+      return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start` : '#';
+    }
+
     if (paymentOption === 'pba') {
       const paymentSession = getPaymentSessionState(req);
       if (paymentSession) {

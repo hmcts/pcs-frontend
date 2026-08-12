@@ -34,6 +34,23 @@ const makeValidatedCase = (counterClaim?: CcdCounterClaim, defendantResponses: R
   });
 
 type CounterClaimApplicationFeeAmountStep = {
+  resolveRedirectAfterPost: (req: {
+    params?: { caseReference?: string };
+    body?: Record<string, unknown>;
+    session?: {
+      user?: {
+        roles?: string[];
+      };
+      payment?: {
+        customerReference?: string;
+        pbaAccount?: string;
+        serviceRequestReference?: string;
+        feeAmount?: number;
+        counterClaimAmountInPence?: string;
+        counterClaimType?: string;
+      };
+    };
+  }) => Promise<string | undefined | void>;
   extendGetContent: (req: {
     params?: { caseReference?: string };
     query?: { payment?: string };
@@ -273,5 +290,49 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     });
 
     expect(content.showPaymentError).toBe(true);
+  });
+
+  it('redirects card payment POSTs to the card payment start route for the no-JS flow', async () => {
+    await expect(
+      testedStep.resolveRedirectAfterPost({
+        params: { caseReference: '123' },
+        body: { paymentOptions: 'card' },
+        session: {
+          user: {
+            roles: ['caseworker-pcs-solicitor'],
+          },
+        },
+      })
+    ).resolves.toBe('/case/123/respond-to-claim/counter-claim-payment/start');
+  });
+
+  it('stores PBA payment details and redirects to the PBA payment start route', async () => {
+    const req = {
+      params: { caseReference: '123' },
+      body: {
+        paymentOptions: 'pba',
+        'paymentOptions.customerReference': 'CUST-001',
+        'paymentOptions.pbaAccount': 'PBA1234567',
+      },
+      session: {
+        user: {
+          roles: ['caseworker-pcs-solicitor'],
+        },
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 377,
+        },
+      },
+    };
+
+    await expect(testedStep.resolveRedirectAfterPost(req)).resolves.toBe(
+      '/case/123/respond-to-claim/counter-claim-pba-payment/start'
+    );
+    expect(req.session.payment).toEqual(
+      expect.objectContaining({
+        customerReference: 'CUST-001',
+        pbaAccount: 'PBA1234567',
+      })
+    );
   });
 });
