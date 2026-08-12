@@ -1,4 +1,4 @@
-const formatDate = (): string =>
+const getCurrentClaimDate = (): string =>
   new Date().toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',
@@ -9,10 +9,12 @@ export const viewTheClaim = {
   mainHeader: `View the claim`,
   theClaimCaption: 'The claim',
 
-  dateAndCaseDetails: {
-    'Date issued': formatDate(),
-    'Date submitted': formatDate(),
-    'Property address': '2 Second Avenue, London, W3 7RX',
+  get dateAndCaseDetails() {
+    return {
+      'Date issued': getCurrentClaimDate(),
+      'Date submitted': getCurrentClaimDate(),
+      'Property address': '2 Second Avenue, London, W3 7RX',
+    };
   },
 
   possessionClaimParagraph: `Possession Claims Solicitor Org has made a property possession claim against you. These are their answers to the questions they were asked when making their claim.`,
