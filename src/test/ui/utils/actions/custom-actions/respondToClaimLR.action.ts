@@ -34,6 +34,7 @@ import {
   selectDefendant,
   startNow,
   tenancyDateUnknownLR,
+  uploadAdditionalDocumentsLR,
   uploadFilesToSupportYourCounterclaimLR,
   whatOtherRegularExpensesDoYouHaveLR,
   whatRegularIncomeDoYouReceiveLR,
@@ -93,6 +94,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         () => this.selectCorrespondenceAddressUnknownLR(fieldName as actionRecord),
       ],
       ['enterNoticeDateKnownLR', () => this.enterNoticeDateKnownLR(fieldName as actionRecord)],
+      ['uploadAdditionalDocumentsLR', () => this.uploadAdditionalDocumentsLR(fieldName as actionRecord)],
       ['doYouWantToUploadFilesLR', () => this.doYouWantToUploadFilesLR(fieldName as actionRecord)],
       ['uploadFilesToSupportCounterclaimLR', () => this.uploadFilesToSupportCounterclaimLR(fieldName as actionRecord)],
     ]);
@@ -664,6 +666,13 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       );
     }
     await performAction('clickButton', counterClaimHaveYouAppliedForHelpLR.saveAndContinueButton);
+  }
+
+  private async uploadAdditionalDocumentsLR(data: actionRecord): Promise<void> {
+    if (data?.files) {
+      await performAction('uploadFile', data.files);
+    }
+    await performAction('clickButton', uploadAdditionalDocumentsLR.saveAndContinueButton);
   }
 
   private async selectUniversalCreditLR(universalCreditDateData: actionRecord): Promise<void> {
