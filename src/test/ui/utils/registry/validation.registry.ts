@@ -41,7 +41,6 @@ export class ValidationRegistry {
     ['pageNavigation', new PageNavigationValidation()],
     ['inputTextValue', new InputTextValueValidation()],
     ['validateDocumentUnderSection', new ValidateDocumentUnderSectionValidation()],
-    ['validatePdfDocument', new PdfDocumentValidation()],
     ['viewClaimOrResponseTable', new ViewClaimOrResponseTableValidation()],
     ['viewClaimHeaderDetails', new ViewClaimHeaderDetailsValidation()],
     ['summaryRow', new CheckYourAnswersSummaryRowValidation()],
