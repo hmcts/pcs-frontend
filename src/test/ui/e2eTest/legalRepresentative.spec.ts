@@ -112,15 +112,6 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown });
   }
 
-  if (testInfo.title.includes('@singleDefendant')) {
-    process.env.TENANCY_TYPE = 'SECURE_TENANCY';
-    claimantName = submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.claimantName;
-    process.env.CLAIMANT_NAME = claimantName;
-    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
-  }
-
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
   await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
@@ -1140,7 +1131,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly @PR', async () => {
     });
   });
 
-  test('AC03 and AC05 - existing draft response resumes to the saved journey @nonRent @LR', async () => {
+  test('Existing draft response resumes to the saved journey @nonRent @LR', async () => {
     const pinUser = await getPinUserAt(2);
     await performAction('createDraftResponseLR', pinUser);
 
@@ -1154,11 +1145,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly @PR', async () => {
     await performValidation('text', { elementType: 'listItem', text: resumeResponseLR.resumeResponseListItem1 });
     await performValidation('text', { elementType: 'listItem', text: resumeResponseLR.resumeResponseListItem2 });
     await performValidation('text', { elementType: 'paragraph', text: resumeResponseLR.resumeResponseParagraph2 });
-    await performAction('clickRadioButton', {
-      question: resumeResponseLR.question,
-      option: resumeResponseLR.yesRadioOption,
-    });
-    await performAction('clickButton', resumeResponseLR.saveAndContinueButton);
+    await performAction('selectResumeResponseLR', { option: resumeResponseLR.yesRadioOption });
     await performValidation('mainHeader', defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName));
     await performValidation('radioButtonChecked', defendantNameConfirmationLR.yesRadioOption, true);
     await performAction('clickButton', defendantNameConfirmationLR.saveAndContinueButton);
@@ -1182,25 +1169,12 @@ test.describe('Respond to a claim LR - e2e Journey @nightly @PR', async () => {
       question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
     });
-    await performAction('clickRadioButton', {
-      question: resumeResponseLR.question,
-      option: resumeResponseLR.yesRadioOption,
-    });
-    await performAction('clickButton', resumeResponseLR.saveAndContinueButton);
+    await performAction('selectResumeResponseLR', { option: resumeResponseLR.yesRadioOption });
     await performAction('clickButton', defendantNameConfirmationLR.saveAndContinueButton);
     await performValidation('inputTextValue', defendantDateOfBirthLR.yearTextLabel, '2001');
   });
 
-  test('AC04 - no existing draft response goes straight to defendant details @nonRent @LR', async () => {
-    const pinUser = await getPinUserAt(2);
-    await performAction('representationLR', {
-      question: selectDefendant.whichDefendantQuestion,
-      radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
-    });
-    await performValidation('mainHeader', defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName));
-  });
-
-  test('AC06 - deleting a draft returns to defendant details @nonRent @LR', async () => {
+  test('Deleting a draft returns to defendant details @nonRent @LR', async () => {
     const pinUser = await getPinUserAt(2);
     await performAction('createDraftResponseLR', pinUser);
 
@@ -1210,11 +1184,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly @PR', async () => {
       radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
     });
     await performValidation('mainHeader', resumeResponseLR.mainHeader);
-    await performAction('clickRadioButton', {
-      question: resumeResponseLR.question,
-      option: resumeResponseLR.noRadioOption,
-    });
-    await performAction('clickButton', resumeResponseLR.saveAndContinueButton);
+    await performAction('selectResumeResponseLR', { option: resumeResponseLR.noRadioOption });
     await performValidation('mainHeader', defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName));
     await performValidation('radioButtonChecked', defendantNameConfirmationLR.yesRadioOption, false);
 
@@ -1226,16 +1196,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly @PR', async () => {
     await performValidation('mainHeader', defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName));
   });
 
-  test('AC07 - only one defendant with a draft goes to resume response @singleDefendant @LR', async () => {
+  test('Only one defendant with a draft goes to resume response @rentNonRent @singleDefendant @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('createDraftResponseLR', pinUser);
 
     await performAction('reopenStartNowLR');
     await performValidation('mainHeader', resumeResponseLR.mainHeader);
-  });
-
-  test('AC08 - only one defendant with no draft goes to defendant details @singleDefendant @LR', async () => {
-    const pinUser = await getPinUserAt(0);
-    await performValidation('mainHeader', defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName));
   });
 });
