@@ -93,7 +93,7 @@ describe('startPcq', () => {
 
     (ccdCaseService.updateDraft as jest.Mock).mockResolvedValue({
       id: '123456789',
-      data: { userPcqId: 'mock-pcq-id' },
+      data: { possessionClaimResponse: { defendantContactDetails: { party: { pcqId: 'mock-pcq-id' } } } },
     });
 
     (createSecureTokenModule.createSecureToken as jest.Mock).mockReturnValue({
@@ -153,12 +153,33 @@ describe('startPcq', () => {
     );
   });
 
-  it('reserves the PcqId against the case before handing off', async () => {
+  it('reserves the PcqId against the defendant party before handing off', async () => {
     await startPcq(mockReq as Request);
 
+    // On the party, not the slice root — that is what maps onto PartyEntity at final submission.
     const [, , , data] = (ccdCaseService.updateDraft as jest.Mock).mock.calls[0];
-    expect(data.userPcqId).toEqual(expect.any(String));
-    expect(mockRes.locals?.validatedCase?.userPcqId).toBe('mock-pcq-id');
+    expect(data.possessionClaimResponse.defendantContactDetails.party.pcqId).toEqual(expect.any(String));
+  });
+
+  it('re-sends the answers already given so the backend REPLACE cannot wipe them', async () => {
+    mockRes.locals!.validatedCase = new CcdCaseModel({
+      id: '123456789',
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: { freeLegalAdvice: 'YES' },
+          defendantContactDetails: { party: { firstName: 'Ada' } },
+        },
+      },
+    });
+
+    await startPcq(mockReq as Request);
+
+    // The draft-save fully replaces the defendant slice, so a pcqId-only post would drop the
+    // citizen's existing answers.
+    const [, , , data] = (ccdCaseService.updateDraft as jest.Mock).mock.calls[0];
+    expect(data.possessionClaimResponse.defendantResponses.freeLegalAdvice).toBe('YES');
+    expect(data.possessionClaimResponse.defendantContactDetails.party.firstName).toBe('Ada');
+    expect(data.possessionClaimResponse.defendantContactDetails.party.pcqId).toEqual(expect.any(String));
   });
 
   it('returns null if PCQ is not enabled', async () => {
@@ -187,11 +208,11 @@ describe('startPcq', () => {
     expect(await startPcq(mockReq as Request)).toBeNull();
   });
 
-  it('returns null if the party already has a userPcqId', async () => {
+  it('returns null if the party already has a pcqId in the draft', async () => {
     mockRes.locals!.validatedCase = new CcdCaseModel({
       id: '123456789',
       data: {
-        userPcqId: 'existing-pcq-id',
+        possessionClaimResponse: { defendantContactDetails: { party: { pcqId: 'existing-pcq-id' } } },
       },
     });
 

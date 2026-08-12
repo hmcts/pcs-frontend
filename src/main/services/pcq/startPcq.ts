@@ -3,12 +3,11 @@ import config from 'config';
 import type { Request } from 'express';
 import { v4 as uuid } from 'uuid';
 
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../steps/utils/buildDraftDefendantResponse';
+
 import { createSecureToken } from './createSecureToken';
 
 import { Logger } from '@modules/logger';
-import { CcdCaseModel } from '@services/ccdCaseData.model';
-import { ccdCaseService } from '@services/ccdCaseService';
-import { journeyRegistry } from '@steps';
 
 const logger = Logger.getLogger('startPcq');
 
@@ -49,8 +48,10 @@ export async function startPcq(req: Request): Promise<string | null> {
 
   // Guard on the PcqId itself: it is written below before we hand off to PCQ, so its presence
   // means this party has already been sent to the questionnaire and must not be sent again.
-  if (ccdCase.userPcqId) {
-    logger.debug('User already has PcqId set');
+  // Read from the defendant slice of the draft — the same source the rest of the journey resumes
+  // from — because the id is party-scoped, not case-scoped.
+  if (ccdCase.data?.possessionClaimResponse?.defendantContactDetails?.party?.pcqId) {
+    logger.debug('Party already has a PcqId');
     return null;
   }
 
@@ -86,25 +87,20 @@ export async function startPcq(req: Request): Promise<string | null> {
 
   const secureToken = createSecureToken(params, tokenKey);
 
-  const { draftEvent } = journeyRegistry.respondToClaim;
-  if (!draftEvent) {
-    logger.warn('draftEvent not configured for respondToClaim journey, skipping PCQ update');
-    return null;
-  }
-
-  // Reserve the PcqId against the case before handing off — PCQ correlates the citizen's answers
-  // back to us by this id, so it has to be persisted before they can possibly answer.
+  // Reserve the PcqId against the defendant's slice before handing off — PCQ correlates the
+  // citizen's answers back to us by this id, so it has to be persisted before they can answer.
+  //
+  // Go through buildDraftDefendantResponse/saveDraftDefendantResponse, the same choke point every
+  // journey page uses. The backend draft-save fully REPLACES the defendant slice, so posting the
+  // id on its own would wipe the answers already given.
   try {
-    const updatedCase = await ccdCaseService.updateDraft(draftEvent, user.accessToken, ccdCase.id, {
-      ...ccdCase.data,
-      userPcqId: pcqId,
-    });
+    const response = buildDraftDefendantResponse(req);
+    response.defendantContactDetails.party.pcqId = pcqId;
 
-    if (req.res) {
-      req.res.locals.validatedCase = new CcdCaseModel(updatedCase);
-    }
+    console.log("THIS IS THE LOG: " + pcqId)
+    await saveDraftDefendantResponse(req, response);
   } catch (err) {
-    logger.error('Failed to update CCD with PCQ ID:', err);
+    logger.error('Failed to persist the PCQ ID to the draft:', err);
     return null;
   }
 

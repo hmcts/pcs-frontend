@@ -167,6 +167,7 @@ export interface CcdDefendantParty {
   addressSameAsProperty?: string;
   phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
+  pcqId?: string;
 }
 
 /** Counter-claim data captured across the counterclaim journey screens. */
