@@ -83,4 +83,9 @@ export default {
   'response-submitted-counter-claim-fee-payment-needed': 'responseSubmittedCounterclaimFeePaymentNeeded',
   'response-and-counter-claim-submitted': 'responseAndCounterClaimSubmitted',
   'response-submitted': 'responseSubmitted',
+  'defendant-date-of-birth': 'defendantDateOfBirth',
+  'select-defendant': 'selectDefendant',
+  'correspondence-address': 'correspondenceAddress',
+  'counter-claim-order-other-than-sum': 'counterClaimOrderOtherThanSum',
+  'email-confirmation': 'emailConfirmation',
 };
