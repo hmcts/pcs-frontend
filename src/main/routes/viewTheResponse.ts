@@ -27,8 +27,10 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
-import { extractCaseDocuments } from '@utils/documentUtils';
+import { extractCaseDocuments, findCaseDocumentById } from '@utils/documentUtils';
+import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
+import { RELEASE_1_2_ENABLED } from '@utils/respondToClaimFlags';
 
 const logger = Logger.getLogger('viewTheResponse');
 
@@ -604,6 +606,18 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
   return counterclaimPdf?.id ?? null;
 }
 
+function resolveResponsePdfUrl(caseData: CcdCaseData, caseReference: string): string | undefined {
+  const documentId = caseData.possessionClaimResponse?.responseDocumentId;
+  if (!documentId) {
+    return undefined;
+  }
+  const document = findCaseDocumentById(caseData as unknown as Record<string, unknown>, documentId);
+  if (!document) {
+    return undefined;
+  }
+  return `${VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference)}/${documentId}`;
+}
+
 export default function viewTheResponseRoutes(app: Application): void {
   app.get(VIEW_RESPONSE_ROUTE, oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     const rawRef = req.params?.caseReference;
@@ -637,6 +651,7 @@ export default function viewTheResponseRoutes(app: Application): void {
       const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
       const completedBy = responses?.statementOfTruthCompletedBy;
+      const responsePdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_2_ENABLED, false);
 
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
@@ -668,6 +683,7 @@ export default function viewTheResponseRoutes(app: Application): void {
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
         counterclaimPdfUrl,
+        responsePdfUrl: responsePdfEnabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
       });
     } catch (e) {
       logger.error(`Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`);
