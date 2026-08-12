@@ -853,12 +853,13 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async uploadAdditionalDocumentsLR(data: actionRecord): Promise<void> {
     if (data?.files) {
-      const uploadedFiles = Array.isArray(data.files) ? data.files.join(', ') : String(data.files);
-      this.recordAnswer(`Uploaded files`, uploadedFiles);
+      // const uploadedFiles = Array.isArray(data.files) ? data.files.join(', ') : String(data.files);
+      // this.recordAnswer(`Uploaded files`, uploadedFiles);
       await performAction('uploadFile', data.files);
-    } else {
-      this.recordAnswer(`Uploaded files`, `No files uploaded`);
     }
+    // else {
+    //   this.recordAnswer(`Uploaded files`, `No files uploaded`);
+    // }
     await performAction('clickButton', uploadAdditionalDocuments.saveAndContinueButton);
   }
 
