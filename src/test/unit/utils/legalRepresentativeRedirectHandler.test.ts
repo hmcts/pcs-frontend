@@ -68,7 +68,7 @@ describe('getCaseManagementUrl', () => {
     const roles = 'roles' in overrides ? overrides.roles : [LEGAL_REP_ROLE];
     return {
       session: { user: { roles } },
-      res: { locals: { validatedCase: { id: CASE_ID } } }
+      res: { locals: { validatedCase: { id: CASE_ID } } },
     } as unknown as Request;
   };
 
