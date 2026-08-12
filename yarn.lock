@@ -9929,17 +9929,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:6.2.8":
+"jose@npm:6.2.8, jose@npm:^6.2.8":
   version: 6.2.8
   resolution: "jose@npm:6.2.8"
   checksum: 10/d1534f56cf693dfbb4b433b72df469c3c858748fe627621e27d9c1e7894716fc1d0225923be3ae98153345b9823a25c0ac376bfccce3ed363a4c032cfd4e2f5b
-  languageName: node
-  linkType: hard
-
-"jose@npm:^6.2.2":
-  version: 6.2.2
-  resolution: "jose@npm:6.2.2"
-  checksum: 10/fd66f24916d2507dbde0ca77ede86377e7d7eae42c7f94db0dfd014b0c6ce5041365dc8e757a44e54cd7606ea5e9c757aa544b51e55cb8a736e83320db1b8258
   languageName: node
   linkType: hard
 
@@ -11150,10 +11143,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oauth4webapi@npm:^3.8.5":
-  version: 3.8.5
-  resolution: "oauth4webapi@npm:3.8.5"
-  checksum: 10/5c39d4dbd95b795438e79444a1d710631b3f8311e8b8913150b385b5815857b32f617a49d4869a4476b2318f614adfbc9d19510360df198719973f6f69a2e75b
+"oauth4webapi@npm:^3.8.7":
+  version: 3.8.7
+  resolution: "oauth4webapi@npm:3.8.7"
+  checksum: 10/a12ade342bbdaff3783cc936ecd1cb91247ec56e35c1badd27dfbbcdd6a6c9ced79b3d7e090628d7f1a570436206b0f245fb5fa4702609d145ff2f866bf487ed
   languageName: node
   linkType: hard
 
@@ -11293,13 +11286,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openid-client@npm:6.8.4":
-  version: 6.8.4
-  resolution: "openid-client@npm:6.8.4"
+"openid-client@npm:6.8.5":
+  version: 6.8.5
+  resolution: "openid-client@npm:6.8.5"
   dependencies:
-    jose: "npm:^6.2.2"
-    oauth4webapi: "npm:^3.8.5"
-  checksum: 10/39402afd4534081d0c9af41aadc916b2b6d41cab1d9eaa9b33f1a3bc3a73ba437f04ccb4b906a4523b41886ee3de716d24c028fd734282b4924cac641d5c5869
+    jose: "npm:^6.2.8"
+    oauth4webapi: "npm:^3.8.7"
+  checksum: 10/7c399e21a6faf94e03f52233254bc9bc227476842bb86804a6ff81550565ca732a4e44d37cef9fd25997c82dc48b8f0349a1039e67d868a4df70caed55e1421e
   languageName: node
   linkType: hard
 
@@ -11622,7 +11615,7 @@ __metadata:
     multer: "npm:^2.1.1"
     nodemon: "npm:3.1.14"
     nunjucks: "npm:3.2.4"
-    openid-client: "npm:6.8.4"
+    openid-client: "npm:6.8.5"
     playwright: "npm:1.62.1"
     playwright-core: "npm:1.62.1"
     postcss: "npm:8.5.26"
