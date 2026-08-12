@@ -631,28 +631,36 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async previousPaymentsLR(repaymentsData: actionRecord): Promise<void> {
     const repaymentsMadeQuestion = repaymentsMade.getMainHeader();
+    this.recordAnswer(repaymentsMadeQuestion, repaymentsData.repaymentOption);
     await performAction('clickRadioButton', {
       question: repaymentsMadeQuestion,
       option: repaymentsData.repaymentOption,
     });
     if (repaymentsData.repaymentOption === 'Yes') {
+      this.recordAnswer(repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
       await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsData.repaymentInfo);
+    } else {
+      this.deleteAnswer(repaymentsMade.giveDetailsHiddenTextLabel);
     }
     await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   }
 
   private async repaymentAgreedLR(repaymentsAgreedData: actionRecord): Promise<void> {
     const repaymentsAgreedQuestion = repaymentsAgreed.giveDetailsHiddenTextLabel;
+    this.recordAnswer(repaymentsAgreedQuestion, repaymentsAgreedData.repaymentAgreedOption);
     await performAction('clickRadioButton', {
       question: repaymentsAgreedQuestion,
       option: repaymentsAgreedData.repaymentAgreedOption,
     });
     if (repaymentsAgreedData.repaymentAgreedOption === 'Yes') {
+      this.recordAnswer(repaymentsAgreed.giveDetailsHiddenTextLabel, repaymentsAgreedData.repaymentAgreedInfo);
       await performAction(
         'inputText',
         repaymentsAgreed.giveDetailsHiddenTextLabel,
         repaymentsAgreedData.repaymentAgreedInfo
       );
+    } else {
+      this.deleteAnswer(repaymentsAgreed.giveDetailsHiddenTextLabel);
     }
     await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
   }
@@ -781,11 +789,13 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async uploadFilesToSupportCounterclaimLR(uploadCounterClaimFiles: actionRecord): Promise<void> {
+    this.recordAnswer(uploadFilesToSupportYourCounterclaim.mainHeader, uploadCounterClaimFiles.option);
     await performAction('uploadFile', uploadCounterClaimFiles.files);
     await performAction('clickButton', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   }
 
   private async installmentPaymentsLR(installmentData: actionRecord): Promise<void> {
+    this.recordAnswer(String(installmentData.question), installmentData.radioOption);
     await performAction('clickRadioButton', {
       question: installmentData.question,
       option: installmentData.radioOption,
