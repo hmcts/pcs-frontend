@@ -3,10 +3,10 @@
   "pageTitle": "Enw eich cleient",
   "errors": {
     "firstName": "Nodwch enw cyntaf eich cleient",
-    "firstNameMaxLength": "cyClient’s first name must be 60 characters or less",
-    "firstNameInvalidCharacters": "cyClient’s first name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
+    "firstNameMaxLength": "Rhaid i enw cyntaf y cleient fod yn 60 nod neu lai",
+    "firstNameInvalidCharacters": "Dylai enw cyntaf y cleient ond cynnwys llythrennau a i z, a nodweddion arbennig fel cysylltnod, bylchau a chollnod.",
     "lastName": "Nodwch cyfenw eich cleient",
-    "lastNameMaxLength": "cyClient’s last name must be 60 characters or less",
-    "lastNameInvalidCharacters": "cyClient’s last name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    "lastNameMaxLength": "Rhaid i gyfenw'r cleient fod yn 60 nod neu lai",
+    "lastNameInvalidCharacters": "Rhaid i gyfenw'r cleient ond cynnwys llythrennau a i z, a nodweddion arbennig fel cysylltnod, bylchau a chollnod."
   }
 }

@@ -154,9 +154,15 @@ export class CitizenDashboardAction implements IAction {
       ],
       ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
     );
+    await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
   }
 
   private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {
+    await performValidation('viewClaimHeaderDetails', '', viewTheClaim.dateAndCaseDetails);
+    await performValidation('viewClaimHeaderDetails', '', {
+      ...viewTheClaim.dateAndCaseDetails,
+      'Case number': process.env.CASE_FID,
+    });
     await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.possessionClaimParagraph });
     await performValidations(
       'View the claim page validation',
@@ -187,11 +193,28 @@ export class CitizenDashboardAction implements IAction {
         viewTheClaim.defendantCircumstancesSubHeader,
         viewTheClaim.defendantCircumstancesDetails,
       ],
-      ['viewClaimOrResponseTable', viewTheClaim.underlesseeSubHeader, viewTheClaim.underlesseeDetails]
-      //['viewClaimOrResponseTable', viewTheClaim.statementOfTruthSubHeader, viewTheClaim.statementOfTruthDetails]
+      ['viewClaimOrResponseTable', viewTheClaim.underlesseeSubHeader, viewTheClaim.underlesseeDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.statementOfTruthSubHeader, viewTheClaim.statementOfTruthDetails]
     );
-    //await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
-    await performValidation('text', { elementType: 'link', text: viewTheClaim.claimPDFLink });
+    await performValidation('validatePdfDocument', '', {
+      linkText: 'RentArrearsStatement - Claimant 1.pdf',
+    });
+    await performValidation('validatePdfDocument', '', {
+      linkText: 'rentArrears - Claimant 1.pdf',
+    });
+    await performValidation('validatePdfDocument', '', {
+      linkText: 'tenancyLicenceDocuments - Claimant 1.pdf',
+    });
+    await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
+    await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
+    await performValidation('text', { elementType: 'subHeader', text: viewTheClaim.downloadPDFSubHeader });
+    await performValidation('validatePdfDocument', '', { linkText: viewTheClaim.claimPDFLink });
+    await performValidation('text', { elementType: 'inlineText', text: viewTheClaim.ifYouCannotFindLink });
+    await performValidation('text', {
+      elementType: 'paragraphWithLink',
+      text: viewTheClaim.allDocumentsUploadedParagraph,
+    });
+    await performValidation('text', { elementType: 'link', text: viewTheClaim.documentsPageLink });
     await performAction('clickButton', viewTheClaim.closeAndReturnButton);
   }
 }

@@ -20,11 +20,22 @@ nodejs:
     XUI_BASE_URI: '${XUI_BASE_URI}'
     REDIRECTS_MANAGE_CASE_RETURN_URL: '${REDIRECTS_MANAGE_CASE_RETURN_URL}'
     PAYMENT_RETURN_URL: 'https://${SERVICE_FQDN}/payment/return'
+    LAUNCHDARKLY_ENV: '${SERVICE_FQDN}'
 redis:
   image:
     registry: hmctsprod.azurecr.io
     repository: imported/bitnami/redis
   enabled: true
+  master:
+    # HDPI-8155: Dynatrace node instrumentation on preview adds ~1s per
+    # spawned process; the chart-default 2s exec-probe budget leaves redis
+    # permanently Running-but-not-Ready (frontends then ECONNREFUSED :6379).
+    # Measured probe wall time under instrumentation: 3.4-4.1s.
+    readinessProbe:
+      timeoutSeconds: 6
+      periodSeconds: 10
+    livenessProbe:
+      timeoutSeconds: 8
 global:
   security:
     allowInsecureImages: true

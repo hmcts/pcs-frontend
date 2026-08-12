@@ -4,6 +4,7 @@ import {
   DocumentsAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   GenAppsAction,
+  LaunchDarklyAction,
   LoginAction,
   NavigateToUrlAction,
   RecordAnswers,
@@ -13,7 +14,9 @@ import {
 } from '../actions/custom-actions';
 import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
 import { LinkSolicitorAPIAction } from '../actions/custom-actions/linkSolicitorAPI.action';
+import { RespondPossessionClaimLRMidEventAPIAction } from '../actions/custom-actions/respondPossessionClaimSolicitorMidEventAPI.action';
 import { RespondToClaimLRAction } from '../actions/custom-actions/respondToClaimLR.action';
+import { SubmitPossessionClaimResponseAPIAction } from '../actions/custom-actions/respondToClaimSubmitAPIForLR.action';
 import {
   CheckAction,
   ClickButtonAction,
@@ -52,6 +55,7 @@ export class ActionRegistry {
     ['updatePaymentAPI', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['skipTestIfLdFlagDisabled', new LaunchDarklyAction()],
 
     //Citizen Dashboard
     ['citizenDashboard', new CitizenDashboardAction()],
@@ -80,6 +84,7 @@ export class ActionRegistry {
     ['readPaymentInterstitial', new RespondToClaimAction()],
     ['repaymentsMade', new RespondToClaimAction()],
     ['selectLandlordRegistered', new RespondToClaimAction()],
+    ['exemptLandLord', new RespondToClaimAction()],
     ['selectWrittenTerms', new RespondToClaimAction()],
     ['enterTenancyStartDetailsUnKnown', new RespondToClaimAction()],
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
@@ -176,7 +181,7 @@ export class ActionRegistry {
     ['otherAdultsLR', new RespondToClaimLRAction()],
     ['alternativeAccommodationLR', new RespondToClaimLRAction()],
     ['circumstancesLR', new RespondToClaimLRAction()],
-    ['exceptionalHardshipLR', new RespondToClaimLRAction()],
+    ['selectExceptionalHardshipLR', new RespondToClaimLRAction()],
     ['selectIncomeAndExpensesLR', new RespondToClaimLRAction()],
     ['representationLR', new RespondToClaimLRAction()],
     ['selectWhatRegularIncomeDoTheyReceiveLR', new RespondToClaimLRAction()],
@@ -190,6 +195,24 @@ export class ActionRegistry {
     ['selectUniversalCreditLR', new RespondToClaimLRAction()],
     ['selectCorrespondenceAddressUnknownLR', new RespondToClaimLRAction()],
     ['enterNoticeDateKnownLR', new RespondToClaimLRAction()],
+    ['selectCounterClaimLR', new RespondToClaimLRAction()],
+    ['selectWhatAreYouClaimingForLR', new RespondToClaimLRAction()],
+    ['counterClaimSpecificSumOfMoneyLR', new RespondToClaimLRAction()],
+    ['selectCounterClaimFeeLR', new RespondToClaimLRAction()],
+    ['selectClaimAgainstWhomLR', new RespondToClaimLRAction()],
+    ['counterClaimAboutLR', new RespondToClaimLRAction()],
+    ['installmentPaymentsLR', new RespondToClaimLRAction()],
+    ['selectHowMuchAffordToPayLR', new RespondToClaimLRAction()],
+    ['counterClaimOrderOtherThanSumLR', new RespondToClaimLRAction()],
+    ['counterClaimHaveYouAppliedForHelpWithFeeLR', new RespondToClaimLRAction()],
+    ['uploadAdditionalDocumentsLR', new RespondToClaimLRAction()],
+    ['doYouWantToUploadFilesLR', new RespondToClaimLRAction()],
+    ['uploadFilesToSupportCounterclaimLR', new RespondToClaimLRAction()],
+    ['submitPossessionClaimResponseLRAPI', new SubmitPossessionClaimResponseAPIAction()],
+    ['midEventRespondPossessionClaimLRAPI', new RespondPossessionClaimLRMidEventAPIAction()],
+    ['confirmDefendantDetailsLR', new RespondToClaimLRAction()],
+    ['enterDateOfBirthDetailsLR', new RespondToClaimLRAction()],
+    ['selectCorrespondenceAddressLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {

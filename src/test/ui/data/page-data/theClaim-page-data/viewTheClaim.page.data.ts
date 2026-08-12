@@ -1,6 +1,21 @@
+const getCurrentClaimDate = (): string =>
+  new Date().toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
 export const viewTheClaim = {
   mainHeader: `View the claim`,
   theClaimCaption: 'The claim',
+
+  get dateAndCaseDetails() {
+    return {
+      'Date issued': getCurrentClaimDate(),
+      'Date submitted': getCurrentClaimDate(),
+      'Property address': '2 Second Avenue, London, W3 7RX',
+    };
+  },
 
   possessionClaimParagraph: `Possession Claims Solicitor Org has made a property possession claim against you. These are their answers to the questions they were asked when making their claim.`,
 
@@ -20,18 +35,22 @@ export const viewTheClaim = {
 
   claimantDetails: {
     Name: 'Possession Claims Solicitor Org',
+    'Address for service': 'Ministry Of JusticeSeventh Floor 102 Petty FranceLondonSW1H 9AJUnited Kingdom',
   },
 
   defendant1Details: {
     Name: 'Test John',
+    'Address for service': '10 Second AvenueLondonW3 7RX',
   },
 
   additionalDefendant1Details: {
     Name: 'Peter Parker',
+    'Address for service': '2 Second AvenueLondonW3 7RX',
   },
 
   additionalDefendant2Details: {
     Name: 'Jen Parker',
+    'Address for service': '2 Second AvenueLondonW3 7RX',
   },
 
   claimDetails: {
@@ -46,6 +65,7 @@ export const viewTheClaim = {
     'Total rent arrears at time of issue': '£2000',
     'Have there been previous steps taken to recover rent arrears?': 'No',
     'Judgment requested for the outstanding arrears?': 'No',
+    'Rent statement': 'RentArrearsStatement - Claimant 1.pdf',
   },
 
   actionTakenDetails: {
@@ -58,13 +78,15 @@ export const viewTheClaim = {
     'Has notice been served?': 'Yes',
     'Method of service': 'By first class post or other service which provides for delivery on the next business day',
     'Date notice was served': '10 November 2025',
-    'Can the claimant upload a copy of the notice served?': 'No',
-    'Why can the claimant not upload a copy of the notice served?': 'no documents to upload',
+    'Can the claimant upload a copy of the notice served?': 'Yes',
+    Notice: 'rentArrears - Claimant 1.pdf',
   },
 
   tenancyDetails: {
     'What type of tenancy, occupation contract or licence is in place, or was in place?': 'Introductory tenancy',
     'Tenancy, occupation contract or licence start date': '10 February 2026',
+    'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?': 'Yes',
+    'Tenancy, occupation contract or licence agreement': 'tenancyLicenceDocuments - Claimant 1.pdf',
   },
 
   claimantCircumstancesDetails: {
@@ -87,8 +109,10 @@ export const viewTheClaim = {
   statementOfTruthParagraph:
     'I believe the facts stated in this claim form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.',
 
-  downloadPDFLink: 'Download a PDF copy of the claim',
+  downloadPDFSubHeader: 'Download a PDF copy of the claim',
   claimPDFLink: 'Claim (PDF)',
   closeAndReturnButton: 'Close and return to case overview',
   ifYouCannotFindLink: 'If you cannot find a document that you are looking for in this section',
+  allDocumentsUploadedParagraph: 'All documents uploaded by you or the claimant are on the Documents page',
+  documentsPageLink: 'Documents page',
 };

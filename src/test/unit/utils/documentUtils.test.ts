@@ -249,6 +249,90 @@ describe('documentUtils', () => {
     ]);
   });
 
+  it('extracts tenancy licence documents from detailsTab_TenancyLicenceDetails.tenancyLicenceDocuments for submitted cases', () => {
+    const documents = extractCaseDocuments({
+      detailsTab_TenancyLicenceDetails: {
+        tenancyLicenceDocuments: [
+          {
+            id: '44444444-4444-4444-4444-444444444444',
+            value: {
+              document_binary_url: 'http://doc-store/submitted-tenancy/binary',
+              document_filename: 'tenancy-agreement.pdf',
+              document_type: 'TENANCY_LICENCE_DOCUMENT',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      {
+        id: '44444444-4444-4444-4444-444444444444',
+        filename: 'tenancy-agreement.pdf',
+        binaryUrl: 'http://doc-store/submitted-tenancy/binary',
+        categoryId: undefined,
+        documentType: 'TENANCY_LICENCE_DOCUMENT',
+        sourceField: 'detailsTab_TenancyLicenceDetails.tenancyLicenceDocuments',
+      },
+    ]);
+  });
+
+  it('extracts rent statement documents from detailsTab_RentArrearsDetails.rentStatement for submitted cases', () => {
+    const documents = extractCaseDocuments({
+      detailsTab_RentArrearsDetails: {
+        rentStatement: [
+          {
+            id: '55555555-5555-5555-5555-555555555555',
+            value: {
+              document_binary_url: 'http://doc-store/submitted-rent-statement/binary',
+              document_filename: 'rent-statement.pdf',
+              document_type: 'RENT_STATEMENT',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      {
+        id: '55555555-5555-5555-5555-555555555555',
+        filename: 'rent-statement.pdf',
+        binaryUrl: 'http://doc-store/submitted-rent-statement/binary',
+        categoryId: undefined,
+        documentType: 'RENT_STATEMENT',
+        sourceField: 'detailsTab_RentArrearsDetails.rentStatement',
+      },
+    ]);
+  });
+
+  it('extracts occupation contract licence documents from detailsTab_OccupationContractLicenceDetails.documents for submitted cases', () => {
+    const documents = extractCaseDocuments({
+      detailsTab_OccupationContractLicenceDetails: {
+        documents: [
+          {
+            id: '66666666-6666-6666-6666-666666666666',
+            value: {
+              document_binary_url: 'http://doc-store/submitted-occupation-contract/binary',
+              document_filename: 'occupation-contract.pdf',
+              document_type: 'OCCUPATION_CONTRACT_LICENCE_DOCUMENT',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      {
+        id: '66666666-6666-6666-6666-666666666666',
+        filename: 'occupation-contract.pdf',
+        binaryUrl: 'http://doc-store/submitted-occupation-contract/binary',
+        categoryId: undefined,
+        documentType: 'OCCUPATION_CONTRACT_LICENCE_DOCUMENT',
+        sourceField: 'detailsTab_OccupationContractLicenceDetails.documents',
+      },
+    ]);
+  });
+
   it('finds documents from allDocuments by id', () => {
     const document = findCaseDocumentById(
       {
@@ -270,6 +354,159 @@ describe('documentUtils', () => {
       expect.objectContaining({
         filename: 'notice.pdf',
         binaryUrl: 'http://doc-store/notice/binary',
+      })
+    );
+  });
+
+  it('extracts notice documents from notice_Documents for draft cases', () => {
+    const documents = extractCaseDocuments({
+      notice_Documents: [
+        {
+          id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+          value: {
+            document_binary_url: 'http://doc-store/draft-notice/binary',
+            document_filename: 'draft-notice.pdf',
+            document_type: 'POSSESSION_NOTICE',
+          },
+        },
+      ],
+    });
+
+    expect(documents).toEqual([
+      {
+        id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        filename: 'draft-notice.pdf',
+        binaryUrl: 'http://doc-store/draft-notice/binary',
+        categoryId: undefined,
+        documentType: 'POSSESSION_NOTICE',
+        sourceField: 'notice_Documents',
+      },
+    ]);
+  });
+
+  it('extracts notice documents from detailsTab_NoticeDetails.noticeDocuments for submitted cases', () => {
+    const documents = extractCaseDocuments({
+      notice_Documents: [],
+      detailsTab_NoticeDetails: {
+        noticeDocuments: [
+          {
+            id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            value: {
+              document_binary_url: 'http://doc-store/submitted-notice/binary',
+              document_filename: 'DocUploaded - Claimant 1.rtf',
+              document_type: 'POSSESSION_NOTICE',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      {
+        id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        filename: 'DocUploaded - Claimant 1.rtf',
+        binaryUrl: 'http://doc-store/submitted-notice/binary',
+        categoryId: undefined,
+        documentType: 'POSSESSION_NOTICE',
+        sourceField: 'detailsTab_NoticeDetails.noticeDocuments',
+      },
+    ]);
+  });
+
+  it('indexes notice documents from both notice_Documents and detailsTab when both are present', () => {
+    const documents = extractCaseDocuments({
+      notice_Documents: [
+        {
+          id: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+          value: {
+            document_binary_url: 'http://doc-store/draft/binary',
+            document_filename: 'draft.pdf',
+          },
+        },
+      ],
+      detailsTab_NoticeDetails: {
+        noticeDocuments: [
+          {
+            id: 'dddddddd-dddd-dddd-dddd-dddddddddddd',
+            value: {
+              document_binary_url: 'http://doc-store/submitted/binary',
+              document_filename: 'submitted.pdf',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents.map(document => document.sourceField)).toEqual([
+      'notice_Documents',
+      'detailsTab_NoticeDetails.noticeDocuments',
+    ]);
+  });
+
+  it('indexes claim-journey documents from the Case Details tab collections', () => {
+    const documents = extractCaseDocuments({
+      detailsTab_TenancyLicenceDetails: {
+        tenancyLicenceDocuments: [
+          {
+            id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+            value: {
+              document_filename: 'tenancy-agreement.pdf',
+              document_binary_url: 'http://doc-store/tenancy/binary',
+            },
+          },
+        ],
+      },
+      detailsTab_RequiredDocumentsDetails: {
+        gasSafetyReports: [
+          {
+            id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+            value: {
+              document_filename: 'gas-safety.pdf',
+              document_binary_url: 'http://doc-store/gas/binary',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(documents).toEqual([
+      expect.objectContaining({
+        id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+        filename: 'tenancy-agreement.pdf',
+        binaryUrl: 'http://doc-store/tenancy/binary',
+        sourceField: 'detailsTab_TenancyLicenceDetails.tenancyLicenceDocuments',
+      }),
+      expect.objectContaining({
+        id: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+        filename: 'gas-safety.pdf',
+        binaryUrl: 'http://doc-store/gas/binary',
+        sourceField: 'detailsTab_RequiredDocumentsDetails.gasSafetyReports',
+      }),
+    ]);
+  });
+
+  it('finds a Case Details tab document by its collection id (View Claim download)', () => {
+    const document = findCaseDocumentById(
+      {
+        detailsTab_NoticeDetails: {
+          noticeDocuments: [
+            {
+              id: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
+              value: {
+                document_filename: 'notice-of-seeking-possession.pdf',
+                document_binary_url: 'http://doc-store/notice-doc/binary',
+              },
+            },
+          ],
+        },
+      },
+      'cccccccc-cccc-cccc-cccc-cccccccccccc'
+    );
+
+    expect(document).toEqual(
+      expect.objectContaining({
+        filename: 'notice-of-seeking-possession.pdf',
+        binaryUrl: 'http://doc-store/notice-doc/binary',
       })
     );
   });

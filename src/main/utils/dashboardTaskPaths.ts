@@ -23,6 +23,18 @@ export const DASHBOARD_TASK_PATH_PATTERNS: Readonly<Record<string, string>> = {
   MakeGeneralApplication: MAKE_GENERAL_APPLICATION_ROUTE,
 };
 
+export const RESPOND_TO_CLAIM_DASHBOARD_TASK_TEMPLATE_ID = 'RespondToClaim';
+
+export const RESPOND_TO_CLAIM_DASHBOARD_NOTIFICATION_TEMPLATE_IDS = [
+  'Defendant.ResponseToClaim',
+  'Defendant.ResponseNotStarted',
+  'Defendant.ResponseInProgress',
+] as const;
+
+export function isRespondToClaimDashboardNotification(templateId: string): boolean {
+  return (RESPOND_TO_CLAIM_DASHBOARD_NOTIFICATION_TEMPLATE_IDS as readonly string[]).includes(templateId);
+}
+
 /**
  * Resolves the same href the dashboard task list uses for a linkable task (canonical `/case/...`
  * when mapped; otherwise legacy `/dashboard/:caseRef/:group/:templateId`).

@@ -137,5 +137,8 @@
   },
   "payment": {
     "returnUrl": "https://pcs.aat.platform.hmcts.net/payment/return"
+  },
+  "launchdarkly": {
+    "env": "AAAAAAAA"
   }
 }
