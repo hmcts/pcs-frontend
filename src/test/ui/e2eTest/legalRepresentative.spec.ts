@@ -90,11 +90,12 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseDefendantAddressKnown });
   } else if (testInfo.title.includes('@singleDefendant')) {
-    claimantName = submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.claimantName;
+    process.env.TENANCY_TYPE = 'SECURE_TENANCY';
+    claimantName = submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.claimantName;
     process.env.CLAIMANT_NAME = claimantName;
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy });
   } else {
     process.env.NOTICE_SERVED = 'YES';
     process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
