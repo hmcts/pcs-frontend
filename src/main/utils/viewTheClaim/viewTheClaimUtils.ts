@@ -1,3 +1,4 @@
+import { format, isValid, parseISO } from 'date-fns';
 import escapeHTML from 'escape-html';
 import type { TFunction } from 'i18next';
 import { DateTime } from 'luxon';
@@ -599,6 +600,16 @@ export function formatDate(value: unknown, locale = 'en-gb'): string | undefined
 
   const date = DateTime.fromISO(text, { zone: 'utc' });
   return date.isValid ? date.setZone('Europe/London').setLocale(locale).toFormat('d LLLL y') : text;
+}
+
+export function formatDateOrdinal(value: unknown): string | undefined {
+  const text = getStringFromValue(value);
+  if (!text) {
+    return undefined;
+  }
+
+  const date = parseISO(text);
+  return isValid(date) ? format(date, 'do LLLL yyyy') : text;
 }
 
 export function formatTime(value: unknown, locale = 'en-gb'): string | undefined {

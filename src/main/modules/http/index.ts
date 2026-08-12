@@ -152,29 +152,29 @@ export class HttpService {
   }
 
   public request<T = unknown, R = AxiosResponse<T>, D = unknown>(config: AxiosRequestConfig<D>): Promise<R> {
-    return this.instance.request<T, R, D>(config);
+    return this.instance.request<T, R, D>(config) as Promise<R>;
   }
 
   public get<T = unknown, R = AxiosResponse<T>, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R> {
-    return this.instance.get<T, R, D>(url, config);
+    return this.instance.get<T, R, D>(url, config) as Promise<R>;
   }
 
   public delete<T = unknown, R = AxiosResponse<T>, D = unknown>(
     url: string,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.delete<T, R, D>(url, config);
+    return this.instance.delete<T, R, D>(url, config) as Promise<R>;
   }
 
   public head<T = unknown, R = AxiosResponse<T>, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R> {
-    return this.instance.head<T, R, D>(url, config);
+    return this.instance.head<T, R, D>(url, config) as Promise<R>;
   }
 
   public options<T = unknown, R = AxiosResponse<T>, D = unknown>(
     url: string,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.options<T, R, D>(url, config);
+    return this.instance.options<T, R, D>(url, config) as Promise<R>;
   }
 
   public post<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -182,7 +182,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.post<T, R, D>(url, data, config);
+    return this.instance.post<T, R, D>(url, data, config) as Promise<R>;
   }
 
   public put<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -190,7 +190,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.put<T, R, D>(url, data, config);
+    return this.instance.put<T, R, D>(url, data, config) as Promise<R>;
   }
 
   public patch<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -198,7 +198,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.patch<T, R, D>(url, data, config);
+    return this.instance.patch<T, R, D>(url, data, config) as Promise<R>;
   }
 
   public postForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -206,7 +206,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.postForm<T, R, D>(url, data, config);
+    return this.instance.postForm<T, R, D>(url, data, config) as Promise<R>;
   }
 
   public putForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -214,7 +214,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.putForm<T, R, D>(url, data, config);
+    return this.instance.putForm<T, R, D>(url, data, config) as Promise<R>;
   }
 
   public patchForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -222,7 +222,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.patchForm<T, R, D>(url, data, config);
+    return this.instance.patchForm<T, R, D>(url, data, config) as Promise<R>;
   }
 
   private resolveRequestUrl(url: string, baseUrl?: string): string {

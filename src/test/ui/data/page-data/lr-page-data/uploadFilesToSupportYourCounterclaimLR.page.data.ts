@@ -10,7 +10,7 @@ export const uploadFilesToSupportYourCounterclaimLR = {
   saveForLaterButton: `Save for later`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectAFileErrorMessage: `Select a file to support your counterclaim`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `counter-claim-upload-files`,
   backLink: `Back`,
 };
