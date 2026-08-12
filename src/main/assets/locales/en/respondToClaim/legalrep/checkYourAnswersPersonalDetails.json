@@ -23,29 +23,13 @@
       "fallbackLabel": "What’s your postal address?",
       "changeHidden": "postal address"
     },
-    "contactByEmailOrPost": {
-      "label": "How do you want to receive updates?",
-      "changeHidden": "how you receive updates",
-      "options": {
-        "email": "By email",
-        "post": "By post",
-        "none": "None"
-      }
+    "emailConfirmation": {
+      "label": "Do you know the defendant’s email address?",
+      "changeHidden": "whether you know the defendant’s email address"
     },
-    "contactByEmailAddress": {
-      "label": "Email"
-    },
-    "contactByPhone": {
-      "label": "Are you happy to be contacted by telephone?",
-      "changeHidden": "contact by phone"
-    },
-    "contactByText": {
-      "label": "Are you happy to be contacted by text message?",
-      "changeHidden": "contact by text message"
-    },
-    "contactDetails": {
-      "label": "Contact details",
-      "changeHidden": "contact details"
+    "emailAddress": {
+      "label": "Defendant’s email address",
+      "changeHidden": "defendant’s email address"
     }
   }
 }

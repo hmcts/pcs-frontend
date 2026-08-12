@@ -37,6 +37,7 @@ const sectionDefs = [
       'defendant-name-capture',
       'defendant-date-of-birth',
       'correspondence-address',
+      'email-confirmation',
       'contact-preferences-email-or-post',
       'contact-preferences-telephone',
       'contact-preferences-text-message',
