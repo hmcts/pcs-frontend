@@ -2,6 +2,7 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { clientContextSessionClearer } from '@utils/clientContextSessionClearer';
+import { getCaseManagementUrl } from '@utils/legalRepresentativeRedirectHandler';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'response-submitted',
@@ -22,6 +23,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     clientContextSessionClearer(req);
     return {
       backUrl: '',
+      closeUrl: getCaseManagementUrl(req),
     };
   },
 });
