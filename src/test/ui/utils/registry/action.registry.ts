@@ -185,6 +185,7 @@ export class ActionRegistry {
     ['selectExceptionalHardshipLR', new RespondToClaimLRAction()],
     ['selectIncomeAndExpensesLR', new RespondToClaimLRAction()],
     ['representationLR', new RespondToClaimLRAction()],
+    ['selectResumeResponseLR', new RespondToClaimLRAction()],
     ['createDraftResponseLR', new RespondToClaimLRAction()],
     ['reopenStartNowLR', new RespondToClaimLRAction()],
     ['selectWhatRegularIncomeDoTheyReceiveLR', new RespondToClaimLRAction()],

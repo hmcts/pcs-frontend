@@ -7,7 +7,7 @@ export const resumeResponseLR = {
   question: `Do you want to resume the response using your saved answers?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
-  saveAndContinueButton: `Save and continue`,
+  saveAndContinueButton: `Continue`,
   backLink: `Back`,
   cymraegLink: `Cymraeg`,
   feedbackLink: `feedback`,

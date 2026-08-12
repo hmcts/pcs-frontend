@@ -37,6 +37,7 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  resumeResponseLR,
   selectDefendant,
   startNow,
   tenancyDateDetails,
@@ -50,11 +51,11 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../../../data/page-data/lr-page-data';
-import { user } from '../../../data/user-data';
 import { formatCurrency, formatPoundsValue, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
+import { pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
 import { RespondToClaimAction } from './respondToClaim.action';
 
 const rtcNoAnswerProvidedValue = 'No answer provided';
@@ -76,6 +77,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['selectExceptionalHardshipLR', () => this.selectExceptionalHardshipLR(fieldName as actionRecord)],
       ['selectIncomeAndExpensesLR', () => this.selectIncomeAndExpensesLR(fieldName as actionRecord)],
       ['representationLR', () => this.representationLR(fieldName as actionRecord)],
+      ['selectResumeResponseLR', () => this.selectResumeResponseLR(fieldName as actionRecord)],
       ['createDraftResponseLR', () => this.createDraftResponseLR(fieldName as actionRecord)],
       ['reopenStartNowLR', () => this.reopenStartNowLR()],
       [
@@ -542,26 +544,30 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('clickButton', selectDefendant.saveAndContinueButton);
   }
 
-  private async createDraftResponseLR(defendant: actionRecord): Promise<void> {
-    await performAction(
-      'navigateToUrl',
-      `${process.env.TEST_URL}/case/${process.env.CASE_NUMBER}/respond-to-claim/select-defendant`
-    );
-    await this.representationLR({
-      question: selectDefendant.whichDefendantQuestion,
-      radioOption: `${defendant.firstName} ${defendant.lastName}`,
+  private async selectResumeResponseLR(resumeResponseData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: resumeResponseLR.question,
+      option: resumeResponseData.option,
     });
+    await performAction('clickButton', resumeResponseLR.saveAndContinueButton);
+  }
+
+  private async createDraftResponseLR(defendant: actionRecord): Promise<void> {
+    if (pinUsers.length > 1) {
+      await this.representationLR({
+        question: selectDefendant.whichDefendantQuestion,
+        radioOption: `${defendant.firstName} ${defendant.lastName}`,
+      });
+    }
     await this.confirmDefendantDetailsLR({
       question: defendantNameConfirmation.mainHeader(String(defendant.firstName), String(defendant.lastName)),
       option: defendantNameConfirmation.yesRadioOption,
     });
-    await performActions(
-      'Defendant Date of Birth Entry',
-      ['inputText', defendantDateOfBirth.dayTextLabel, defendantDateOfBirth.dayInputText],
-      ['inputText', defendantDateOfBirth.monthTextLabel, defendantDateOfBirth.monthInputText],
-      ['inputText', defendantDateOfBirth.yearTextLabel, defendantDateOfBirth.yearInputText]
-    );
-    await performAction('clickButton', defendantDateOfBirth.saveForLaterButton);
+    await this.enterDateOfBirthDetailsLR({
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
   }
 
   private async reopenStartNowLR(): Promise<void> {
@@ -569,7 +575,6 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       'navigateToUrl',
       `${process.env.TEST_URL}/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`
     );
-    await performAction('login', user.defendantSolicitor.email);
     await performAction('clickButton', startNow.startNowButton);
   }
 
