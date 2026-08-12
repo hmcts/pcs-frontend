@@ -14,6 +14,7 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  emailConfirmation,
   equalityAndDiversityEndLR,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -33,6 +34,7 @@ import {
 import { user } from '../data/user-data';
 //import { correspondenceAddressErrorValidation } from '../functional/legalRepresentative-functional/correspondenceAddress.pft.lr';
 import { defendantNameConfirmationErrorValidation } from '../functional/legalRepresentative-functional/defendantNameConfirmation.pft.lr';
+import { emailConfirmationErrorValidation } from '../functional/legalRepresentative-functional/emailConfirmation.pft.lr';
 import { selectDefendantErrorValidation } from '../functional/legalRepresentative-functional/selectDefendant.pft.lr';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
@@ -156,6 +158,10 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     //await softErrorMessageValidation('correspondenceAddress', correspondenceAddressErrorValidation);
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await softErrorMessageValidation('emailConfirmation', emailConfirmationErrorValidation);
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
