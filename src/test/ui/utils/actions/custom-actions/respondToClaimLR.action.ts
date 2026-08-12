@@ -13,6 +13,8 @@ import {
   counterClaimSpecificSumOfMoneyLR,
   counterClaimWhatAreYouClaimingForLR,
   counterclaimDoYouWantToUploadFilesLR,
+  defendantDateOfBirthLR,
+  defendantNameConfirmationLR,
   doAnyOtherAdultsLiveInYourHomeLR,
   doYouHaveAnyDependantChildrenLR,
   doYouHaveAnyOtherDependantsLR,
@@ -30,6 +32,7 @@ import {
   rentArrearsLR,
   repaymentsAgreedLR,
   selectDefendant,
+  startNow,
   tenancyDateUnknownLR,
   uploadFilesToSupportYourCounterclaimLR,
   whatOtherRegularExpensesDoYouHaveLR,
@@ -37,6 +40,7 @@ import {
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeLR,
   yourCircumstancesLR,
 } from '../../../data/page-data/lr-page-data';
+import { user } from '../../../data/user-data';
 import { formatCurrency } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
@@ -57,6 +61,8 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['selectExceptionalHardshipLR', () => this.selectExceptionalHardshipLR(fieldName as actionRecord)],
       ['selectIncomeAndExpensesLR', () => this.selectIncomeAndExpensesLR(fieldName as actionRecord)],
       ['representationLR', () => this.representationLR(fieldName as actionRecord)],
+      ['createDraftResponseLR', () => this.createDraftResponseLR(fieldName as actionRecord)],
+      ['reopenStartNowLR', () => this.reopenStartNowLR(page)],
       [
         'selectWhatRegularIncomeDoTheyReceiveLR',
         () => this.selectWhatRegularIncomeDoTheyReceiveLR(fieldName as actionRecord),
@@ -311,6 +317,36 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       option: representationOption.radioOption,
     });
     await performAction('clickButton', selectDefendant.saveAndContinueButton);
+  }
+
+  private async createDraftResponseLR(defendant: actionRecord): Promise<void> {
+    await performAction(
+      'navigateToUrl',
+      `${process.env.TEST_URL}/case/${process.env.CASE_NUMBER}/respond-to-claim/select-defendant`
+    );
+    await this.representationLR({
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${defendant.firstName} ${defendant.lastName}`,
+    });
+    await performAction('confirmDefendantDetails', {
+      question: defendantNameConfirmationLR.mainHeader(String(defendant.firstName), String(defendant.lastName)),
+      option: defendantNameConfirmationLR.yesRadioOption,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirthLR.dayInputText,
+      dobMonth: defendantDateOfBirthLR.monthInputText,
+      dobYear: defendantDateOfBirthLR.yearInputText,
+    });
+    await performAction('clickButton', defendantDateOfBirthLR.saveForLaterButton);
+  }
+
+  private async reopenStartNowLR(_page: Page): Promise<void> {
+    await performAction(
+      'navigateToUrl',
+      `${process.env.TEST_URL}/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`
+    );
+    await performAction('login', user.defendantSolicitor.email);
+    await performAction('clickButton', startNow.startNowButton);
   }
 
   private async selectWhatRegularIncomeDoTheyReceiveLR(regularIncome?: actionRecord): Promise<void> {
