@@ -97,7 +97,7 @@ export async function startPcq(req: Request): Promise<string | null> {
     const response = buildDraftDefendantResponse(req);
     response.defendantContactDetails.party.pcqId = pcqId;
 
-    console.log("THIS IS THE LOG: " + pcqId)
+    console.log('THIS IS THE LOG: ' + pcqId);
     await saveDraftDefendantResponse(req, response);
   } catch (err) {
     logger.error('Failed to persist the PCQ ID to the draft:', err);
