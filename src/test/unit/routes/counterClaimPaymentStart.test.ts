@@ -17,8 +17,10 @@ jest.mock('../../../main/middleware', () => ({
 
 const mockStartCardPaymentRequest = jest.fn();
 const mockStartPbaPaymentRequest = jest.fn();
+const mockGetPaymentOutcome = jest.fn();
 
 jest.mock('../../../main/services/pcsApi/paymentService', () => ({
+  getPaymentOutcome: mockGetPaymentOutcome,
   paymentService: {
     startCardPaymentRequest: mockStartCardPaymentRequest,
     startPbaPaymentRequest: mockStartPbaPaymentRequest,
@@ -60,6 +62,7 @@ describe('counterClaimPaymentStart routes', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetPaymentOutcome.mockReturnValue('success');
     mockGet = jest.fn();
     app = {
       get: mockGet,
@@ -211,6 +214,7 @@ describe('counter-claim-pba-payment/start route', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetPaymentOutcome.mockReturnValue('success');
     mockGet = jest.fn();
     app = {
       get: mockGet,
@@ -302,6 +306,44 @@ describe('counter-claim-pba-payment/start route', () => {
       })
     );
     expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-payment-successful');
+  });
+
+  it('redirects to payment failed page when PBA payment status is unsuccessful', async () => {
+    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    mockGetPaymentOutcome.mockReturnValue('failure');
+    mockStartPbaPaymentRequest.mockResolvedValue({
+      paymentReference: 'RC-PBA-123',
+      status: 'Failed',
+    });
+
+    const req = {
+      params: { caseReference: '123' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+          customerReference: 'CUST-001',
+          pbaAccount: 'PBA1234567',
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      'Counterclaim PBA payment request for case 123 returned status Failed'
+    );
+    expect(req.session.payment).toEqual(
+      expect.not.objectContaining({
+        paymentReference: 'RC-PBA-123',
+      })
+    );
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/123/respond-to-claim/counter-claim-application-fee-amount?payment=failed'
+    );
   });
 
   it('redirects to payment failed page when PBA service call fails', async () => {

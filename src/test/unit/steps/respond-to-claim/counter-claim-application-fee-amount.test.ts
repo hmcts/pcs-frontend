@@ -335,4 +335,18 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       })
     );
   });
+
+  it('redirects back to the fee amount page when an unexpected payment option is posted', async () => {
+    await expect(
+      testedStep.resolveRedirectAfterPost({
+        params: { caseReference: '123' },
+        body: { paymentOptions: 'unexpected' },
+        session: {
+          user: {
+            roles: ['caseworker-pcs-solicitor'],
+          },
+        },
+      })
+    ).resolves.toBe('/case/123/respond-to-claim/counter-claim-application-fee-amount');
+  });
 });

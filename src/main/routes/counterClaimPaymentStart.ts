@@ -6,7 +6,7 @@ import { oidcMiddleware } from '../middleware';
 
 import { Logger } from '@modules/logger';
 import { persistPaymentSessionState } from '@services/paymentSessionService';
-import { paymentService } from '@services/pcsApi/paymentService';
+import { getPaymentOutcome, paymentService } from '@services/pcsApi/paymentService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('counterClaimPaymentStart');
@@ -91,6 +91,18 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
           pbaAccount,
           customerReference,
         });
+
+        if (getPaymentOutcome(paymentResponse.status) !== 'success') {
+          logger.warn(
+            `Counterclaim PBA payment request for case ${caseReference} returned status ${paymentResponse.status}`
+          );
+          return safeRedirect303(
+            res,
+            `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount?payment=failed`,
+            `/case/${caseReference}`,
+            ['/case']
+          );
+        }
 
         await persistPaymentSessionState(req, {
           ...req.session.payment,

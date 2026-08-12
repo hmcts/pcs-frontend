@@ -67,9 +67,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     if (paymentOption === 'card') {
       return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start` : '#';
-    }
-
-    if (paymentOption === 'pba') {
+    } else if (paymentOption === 'pba') {
       const paymentSession = getPaymentSessionState(req);
       if (paymentSession) {
         setPaymentSessionState(req, {
@@ -79,6 +77,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         });
       }
       return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-pba-payment/start` : '#';
+    } else {
+      return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount` : '#';
     }
   },
   extendGetContent: async (req, formContent) => {
