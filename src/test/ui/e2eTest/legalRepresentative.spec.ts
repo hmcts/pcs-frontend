@@ -35,6 +35,7 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  resumeResponseLR,
   selectDefendant,
   startNow,
   tenancyDateDetails,
@@ -88,6 +89,12 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseDefendantAddressKnown });
+  } else if (testInfo.title.includes('@singleDefendant')) {
+    claimantName = submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.claimantName;
+    process.env.CLAIMANT_NAME = claimantName;
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown });
   } else {
     process.env.NOTICE_SERVED = 'YES';
     process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
@@ -1358,5 +1365,96 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+  });
+
+  test('AC03 and AC05 - existing draft response resumes to the saved journey @nonRent @LR', async () => {
+    const pinUser = await getPinUserAt(2);
+    await performAction('createDraftResponseLR', pinUser);
+
+    await performAction('reopenStartNowLR');
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
+    });
+    await performValidation('mainHeader', resumeResponseLR.mainHeader);
+    await performValidation('text', { elementType: 'paragraph', text: resumeResponseLR.resumeResponseParagraph1 });
+    await performValidation('text', { elementType: 'listItem', text: resumeResponseLR.resumeResponseListItem1 });
+    await performValidation('text', { elementType: 'listItem', text: resumeResponseLR.resumeResponseListItem2 });
+    await performValidation('text', { elementType: 'paragraph', text: resumeResponseLR.resumeResponseParagraph2 });
+    await performAction('clickRadioButton', {
+      question: resumeResponseLR.question,
+      option: resumeResponseLR.yesRadioOption,
+    });
+    await performAction('clickButton', resumeResponseLR.saveAndContinueButton);
+    await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
+    await performValidation('radioButtonChecked', defendantNameConfirmation.yesRadioOption, true);
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+    await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
+    await performValidation('inputTextValue', defendantDateOfBirth.dayTextLabel, defendantDateOfBirth.dayInputText);
+    await performValidation('inputTextValue', defendantDateOfBirth.monthTextLabel, defendantDateOfBirth.monthInputText);
+    await performValidation('inputTextValue', defendantDateOfBirth.yearTextLabel, defendantDateOfBirth.yearInputText);
+    await performAction('inputText', defendantDateOfBirth.yearTextLabel, '2001');
+    await performAction('clickButton', defendantDateOfBirth.saveForLaterButton);
+
+    await performAction('reopenStartNowLR');
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
+    });
+    await performAction('clickRadioButton', {
+      question: resumeResponseLR.question,
+      option: resumeResponseLR.yesRadioOption,
+    });
+    await performAction('clickButton', resumeResponseLR.saveAndContinueButton);
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+    await performValidation('inputTextValue', defendantDateOfBirth.yearTextLabel, '2001');
+  });
+
+  test('AC04 - no existing draft response goes straight to defendant details @nonRent @LR', async () => {
+    const pinUser = await getPinUserAt(2);
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
+    });
+    await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
+  });
+
+  test('AC06 - deleting a draft returns to defendant details @nonRent @LR', async () => {
+    const pinUser = await getPinUserAt(2);
+    await performAction('createDraftResponseLR', pinUser);
+
+    await performAction('reopenStartNowLR');
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
+    });
+    await performValidation('mainHeader', resumeResponseLR.mainHeader);
+    await performAction('clickRadioButton', {
+      question: resumeResponseLR.question,
+      option: resumeResponseLR.noRadioOption,
+    });
+    await performAction('clickButton', resumeResponseLR.saveAndContinueButton);
+    await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
+    await performValidation('radioButtonChecked', defendantNameConfirmation.yesRadioOption, false);
+
+    await performAction('reopenStartNowLR');
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
+    });
+    await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
+  });
+
+  test('AC07 - only one defendant with a draft goes to resume response @singleDefendant @LR', async () => {
+    const pinUser = await getPinUserAt(0);
+    await performAction('createDraftResponseLR', pinUser);
+
+    await performAction('reopenStartNowLR');
+    await performValidation('mainHeader', resumeResponseLR.mainHeader);
+  });
+
+  test('AC08 - only one defendant with no draft goes to defendant details @singleDefendant @LR', async () => {
+    const pinUser = await getPinUserAt(0);
+    await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
   });
 });
