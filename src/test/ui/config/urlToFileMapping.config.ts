@@ -88,4 +88,5 @@ export default {
   'correspondence-address': 'correspondenceAddress',
   'counter-claim-order-other-than-sum': 'counterClaimOrderOtherThanSum',
   'email-confirmation': 'emailConfirmation',
+  'exempt-landlord': 'exemptLandlord',
 };
