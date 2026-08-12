@@ -15,11 +15,11 @@
       "changeHidden": "name"
     },
     "dateOfBirth": {
-      "label": "Defendant's date of birth",
+      "label": "Defendant’s date of birth",
       "changeHidden": "date of birth"
     },
     "correspondenceAddressConfirmation": {
-      "label": "Is the defendant's postal address {{address}}?",
+      "label": "Is the defendant’s postal address {{address}}?",
       "fallbackLabel": "What’s your postal address?",
       "changeHidden": "postal address"
     },

@@ -15,11 +15,11 @@
       "changeHidden": "cy name"
     },
     "dateOfBirth": {
-      "label": "cy Defendant's date of birth",
+      "label": "cy Defendant’s date of birth",
       "changeHidden": "cy date of birth"
     },
     "correspondenceAddressConfirmation": {
-      "label": "cy Is the defendant's postal address {{address}}?",
+      "label": "cy Is the defendant’s postal address {{address}}?",
       "fallbackLabel": "cy What’s your postal address?",
       "changeHidden": "cy postal address"
     },
