@@ -1,15 +1,10 @@
-import config from 'config';
-
-import { isLegalRepresentativeUser } from '../../utils';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { clientContextSessionClearer } from '@utils/clientContextSessionClearer';
-import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
-
-let redirectUrl;
+import { getCaseManagementUrl } from '@utils/legalRepresentativeRedirectHandler';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-payment-successful',
@@ -35,18 +30,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const t = getTranslationFunction(req);
     const caseId = req.res?.locals.validatedCase?.id;
 
-    if (isLegalRepresentativeUser(req)) {
-      const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
-        ? config.get<string>('redirects.manageCaseReturnURL')
-        : null;
-      redirectUrl = buildManageCaseDetailsRedirect(caseDetailsBaseUrl, caseId);
-    } else {
-      redirectUrl = getDashboardUrl(caseId);
-    }
-
     return {
       paymentReferenceLine: paymentReference ? t('paymentReference', { paymentReference }) : undefined,
-      redirectUrl,
+      closeUrl: getCaseManagementUrl(req),
+      dashboardUrl: getDashboardUrl(caseId),
     };
   },
 });
