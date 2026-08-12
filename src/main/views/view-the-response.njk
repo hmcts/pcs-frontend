@@ -94,11 +94,11 @@
             <a href="{{ responsePdfUrl }}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ t('viewTheResponse:pdf.linkText') }}</a>
           {% endif %}
         </p>
-        {% if counterclaimPdfUrl %}
-          <p class="govuk-body">
+        <p class="govuk-body">
+          {% if counterclaimPdfUrl %}
             <a href="{{ counterclaimPdfUrl }}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ t('viewTheResponse:pdf.counterclaimLinkText') }}</a>
-          </p>
-        {% endif %}
+          {% endif %}
+        </p>
       {% endif %}
 
       {{ govukButton({

@@ -1242,7 +1242,7 @@ describe('view-the-response template - response PDF link', () => {
   const templatePath = path.resolve(__dirname, '../../../main/views/view-the-response.njk');
   const templateSource = fs.readFileSync(templatePath, 'utf8');
   const pdfBlockMatch = templateSource.match(
-    /\{%\s*if dateSubmitted\s*%\}[\s\S]*?pdf\.linkText[\s\S]*?\{%\s*endif\s*%\}[\s\S]*?\{%\s*endif\s*%\}/
+    /\{%\s*if dateSubmitted\s*%\}\s*<h2 class="govuk-heading-m">[\s\S]*?pdf\.heading[\s\S]*?<\/h2>\s*<p class="govuk-body">\s*\{%\s*if dateSubmitted and responsePdfUrl\s*%\}[\s\S]*?pdf\.linkText[\s\S]*?\{%\s*endif\s*%\}\s*<\/p>\s*<p class="govuk-body">\s*\{%\s*if counterclaimPdfUrl\s*%\}[\s\S]*?\{%\s*endif\s*%\}\s*<\/p>\s*\{%\s*endif\s*%\}/
   );
 
   const t = (key: string) =>
