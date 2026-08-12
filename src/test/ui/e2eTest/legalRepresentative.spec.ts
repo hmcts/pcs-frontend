@@ -1238,5 +1238,4 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     const pinUser = await getPinUserAt(0);
     await performValidation('mainHeader', defendantNameConfirmationLR.mainHeader(pinUser.firstName, pinUser.lastName));
   });
-
 });
