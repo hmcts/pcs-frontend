@@ -1,5 +1,5 @@
 export const supportRequestNotSent = {
-  mainHeader: `No request was sent to the court`,
+  mainHeader: `Your support request is not updated`,
   backLink: `Back`,
   continueButton: `Continue`,
   saveForLaterButton: `Save for later`,
