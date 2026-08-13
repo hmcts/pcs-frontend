@@ -32,13 +32,13 @@ export function getRentStatementDocumentInfo(validatedCase?: unknown): {
   const allDocsArray = Array.isArray(allDocs) ? allDocs : allDocs ? [allDocs] : [];
   logger.info('[rentArrearsDispute] Inspecting caseData for rent statement document', {
     hasDetailsTabRentStatement: Boolean(detailsTabRentStatement),
+    detailsTabRentArrearsDetails: caseData?.detailsTab_RentArrearsDetails,
+    summaryTabRentArrearsDetails: caseData?.summaryTab_RentArrearsDetails,
     hasRentArrearsStatementDocs: Boolean(rentArrearsStatementDocs),
     hasRentStatementDocs: Boolean(rentStatementDocs),
     hasAllDocs: Boolean(allDocs),
     allDocsCount: allDocsArray.length,
-    allDocsFirstItem: allDocsArray[0] ?? null,
     hasClaimantDocs: Boolean(claimantDocs),
-    caseDataTopLevelKeys: Object.keys(caseData),
   });
 
   const collections = [detailsTabRentStatement, rentArrearsStatementDocs, rentStatementDocs, allDocs, claimantDocs];
