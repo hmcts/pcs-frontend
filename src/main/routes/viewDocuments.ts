@@ -69,13 +69,16 @@ export default function viewDocumentsRoutes(app: Application): void {
     oidcMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
       const caseReference = req.params.caseReference as string;
-      const documentId = sanitiseUUID(req.params.documentId);
+      const rawDocId = typeof req.params.documentId === 'string' ? req.params.documentId.trim() : '';
+      const documentId = sanitiseUUID(rawDocId) || rawDocId.replace(/[^a-zA-Z0-9_-]/g, '');
       const accessToken = req.session.user?.accessToken;
 
       if (!accessToken) {
+        logger.warn('[viewDocuments] Authentication required', { caseReference });
         return next(new HTTPError('Authentication required', 401));
       }
       if (!documentId) {
+        logger.warn('[viewDocuments] Invalid document ID param', { rawDocumentId: req.params.documentId });
         return next(new HTTPError('Document not found', 404));
       }
 
