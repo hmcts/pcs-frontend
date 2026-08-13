@@ -262,7 +262,7 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1] as Record<string, unknown>;
-    expect(renderData.rentStatementDocument).toEqual(rentStatementDocument);
+    expect(renderData.rentStatementDocument).toEqual({ id: '66666666-6666-4666-8666-666666666666' });
   });
 
   it('returns an empty string when detailsTab_RentArrearsDetails exists but rentStatement is empty', async () => {
@@ -298,5 +298,48 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1] as Record<string, unknown>;
     expect(renderData.rentStatementDocument).toEqual('');
+  });
+
+  it('getRentStatementDocumentInfo resolves document from rentArrears_StatementDocuments', () => {
+    const { getRentStatementDocumentInfo } = require('../../../../main/steps/respond-to-claim/rent-arrears-dispute');
+    const result = getRentStatementDocumentInfo({
+      id: '123',
+      data: {
+        rentArrears_StatementDocuments: [
+          {
+            id: 'stmt-id-123',
+            value: {
+              document_url: 'http://dm-store/documents/stmt-id-123',
+              document_filename: 'statement.pdf',
+            },
+          },
+        ],
+      },
+    });
+    expect(result).toEqual({ isDocumentUploaded: true, documentId: 'stmt-id-123' });
+  });
+
+  it('getRentStatementDocumentInfo extracts document UUID from document_url when item id is missing', () => {
+    const { getRentStatementDocumentInfo } = require('../../../../main/steps/respond-to-claim/rent-arrears-dispute');
+    const result = getRentStatementDocumentInfo({
+      id: '123',
+      data: {
+        rentArrears_StatementDocuments: [
+          {
+            value: {
+              document_url: 'http://dm-store/documents/url-uuid-999',
+              document_filename: 'statement.pdf',
+            },
+          },
+        ],
+      },
+    });
+    expect(result).toEqual({ isDocumentUploaded: true, documentId: 'url-uuid-999' });
+  });
+
+  it('getRentStatementDocumentInfo returns isDocumentUploaded false when no document exists', () => {
+    const { getRentStatementDocumentInfo } = require('../../../../main/steps/respond-to-claim/rent-arrears-dispute');
+    const result = getRentStatementDocumentInfo(undefined);
+    expect(result).toEqual({ isDocumentUploaded: false });
   });
 });

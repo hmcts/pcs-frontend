@@ -1,5 +1,6 @@
 import type { Request } from 'express';
 
+import { Logger } from '../../../modules/logger';
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { getTranslation, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, penceToPounds, poundsToPence, toYesNoNotSureEnum } from '../../utils';
@@ -12,6 +13,54 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 // Validation constants
 const MAX_RENT_ARREARS_AMOUNT = 1_000_000_000; // £1 billion maximum
 const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 decimal places
+
+const logger = Logger.getLogger('rentArrearsDispute');
+
+export function getRentStatementDocumentInfo(validatedCase?: unknown): {
+  isDocumentUploaded: boolean;
+  documentId?: string;
+} {
+  const caseData =
+    (validatedCase as { data?: Record<string, unknown> })?.data ?? (validatedCase as Record<string, unknown>) ?? {};
+
+  const detailsTabRentStatement = (caseData?.detailsTab_RentArrearsDetails as Record<string, unknown>)?.rentStatement;
+  const rentArrearsStatementDocs = caseData?.rentArrears_StatementDocuments;
+  const rentStatementDocs = caseData?.rentStatement;
+
+  logger.info('[rentArrearsDispute] Inspecting caseData for rent statement document', {
+    hasDetailsTabRentStatement: Boolean(detailsTabRentStatement),
+    hasRentArrearsStatementDocs: Boolean(rentArrearsStatementDocs),
+    hasRentStatementDocs: Boolean(rentStatementDocs),
+  });
+
+  const collections = [detailsTabRentStatement, rentArrearsStatementDocs, rentStatementDocs];
+
+  for (const collection of collections) {
+    const items = Array.isArray(collection) ? collection : collection ? [collection] : [];
+    for (const item of items) {
+      if (!item || typeof item !== 'object') {
+        continue;
+      }
+      const rec = item as Record<string, unknown>;
+      const val = (rec.value as Record<string, unknown>) ?? rec;
+      const url = (val.document_url || val.document_binary_url || rec.document_url || rec.document_binary_url) as
+        string | undefined;
+      const urlId = url ? url.split('/documents/')[1]?.split('/')[0] : undefined;
+      const id = (rec.id as string) || (val.id as string) || urlId;
+
+      if (id) {
+        logger.info('[rentArrearsDispute] Found uploaded rent statement document ID', {
+          documentId: id,
+          isCollectionArray: Array.isArray(collection),
+        });
+        return { isDocumentUploaded: true, documentId: id };
+      }
+    }
+  }
+
+  logger.info('[rentArrearsDispute] No rent statement document found in caseData');
+  return { isDocumentUploaded: false };
+}
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'rent-arrears-dispute',
@@ -79,7 +128,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
 
-    const rentStatementDocument = caseData?.detailsTab_RentArrearsDetails?.rentStatement?.[0] ?? '';
+    const { isDocumentUploaded, documentId } = getRentStatementDocumentInfo(req.res?.locals.validatedCase);
+    const rentStatementDocument = isDocumentUploaded && documentId ? { id: documentId } : '';
     const release12Enabled = isRelease12Enabled(req);
 
     return {
