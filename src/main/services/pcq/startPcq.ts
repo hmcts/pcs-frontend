@@ -52,7 +52,7 @@ export async function startPcq(req: Request): Promise<string | null> {
   // Read from the defendant slice of the draft — the same source the rest of the journey resumes
   // from — because the id is party-scoped, not case-scoped.
   if (ccdCase.data?.possessionClaimResponse?.defendantContactDetails?.party?.pcqId) {
-    logger.debug('Party already has a PcqId');p
+    logger.debug('Party already has a PcqId');
     return null;
   }
 
