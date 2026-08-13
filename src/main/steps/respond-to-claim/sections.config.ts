@@ -140,7 +140,7 @@ const sectionDefs = [
     // parked out of the live citizen journey while the PCQ integration is still in progress.
     // Their step folders, registry entries and locale files are retained so re-
     // enablement is a one-line restore here. See HDPI-6649 (RA confirmation, parked on a
-    // custom branch). The PCQ hand-off itself is gated by the `cui-pcq-enabled` LaunchDarkly
+    // custom branch). The PCQ hand-off itself is gated by the `release-1.3-enabled` LaunchDarkly
     // flag and fires from the RA triage step, not from these pages.
     steps: [
       'reasonable-adjustments-triage',
