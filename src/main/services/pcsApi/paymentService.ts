@@ -38,6 +38,8 @@ export interface StartCardPaymentRequestResult {
 export interface OutstandingCounterClaimPayment {
   serviceRequestReference: string;
   feeAmount: number;
+  counterClaimAmountInPence?: string;
+  counterClaimType?: string;
 }
 
 function getBaseUrl(): string {

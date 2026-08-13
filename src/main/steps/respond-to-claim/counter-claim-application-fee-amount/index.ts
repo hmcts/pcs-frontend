@@ -64,8 +64,9 @@ async function rehydratePaymentSessionIfNeeded(
       caseReference,
       serviceRequestReference: outstanding.serviceRequestReference,
       feeAmount,
-      counterClaimAmountInPence: claimAmountInPence ?? paymentSession?.counterClaimAmountInPence,
-      counterClaimType: claimType ?? paymentSession?.counterClaimType,
+      counterClaimAmountInPence:
+        outstanding.counterClaimAmountInPence ?? claimAmountInPence ?? paymentSession?.counterClaimAmountInPence,
+      counterClaimType: outstanding.counterClaimType ?? claimType ?? paymentSession?.counterClaimType,
     };
     await persistPaymentSessionState(req, rehydratedSession);
     return rehydratedSession;
@@ -97,10 +98,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const fromDashboard = req.query?.from === 'dashboard';
 
     let paymentSession = getPaymentSessionState(req);
-    const claimType = paymentSession?.counterClaimType ?? counterClaim?.claimType;
-    const claimAmountInPence = paymentSession?.counterClaimAmountInPence ?? getCounterClaimAmountInPence(counterClaim);
+    let claimType = paymentSession?.counterClaimType ?? counterClaim?.claimType;
+    let claimAmountInPence = paymentSession?.counterClaimAmountInPence ?? getCounterClaimAmountInPence(counterClaim);
 
     paymentSession = await rehydratePaymentSessionIfNeeded(req, caseReference, claimType, claimAmountInPence);
+
+    claimType = paymentSession?.counterClaimType ?? claimType;
+    claimAmountInPence = paymentSession?.counterClaimAmountInPence ?? claimAmountInPence;
 
     let feeAmount = paymentSession?.feeAmount;
     if (feeAmount === undefined) {

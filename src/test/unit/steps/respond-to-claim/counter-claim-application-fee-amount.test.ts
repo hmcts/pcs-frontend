@@ -224,6 +224,8 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     (paymentService.getOutstandingCounterClaimPayment as jest.Mock).mockResolvedValue({
       serviceRequestReference: 'SR-OUTSTANDING',
       feeAmount: '404.00',
+      counterClaimAmountInPence: '250000',
+      counterClaimType: 'PAYMENT_OR_COMPENSATION',
     });
 
     const session: {
@@ -253,10 +255,13 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       expect.objectContaining({
         serviceRequestReference: 'SR-OUTSTANDING',
         feeAmount: 404,
+        counterClaimAmountInPence: '250000',
+        counterClaimType: 'PAYMENT_OR_COMPENSATION',
       })
     );
     expect(content).toEqual(
       expect.objectContaining({
+        formattedCounterClaimAmount: '£2500',
         formattedCounterClaimFee: '£404',
         payNowDisabled: false,
         backUrl: '/case/123/dashboard',
