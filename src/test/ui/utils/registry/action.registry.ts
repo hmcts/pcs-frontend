@@ -213,6 +213,7 @@ export class ActionRegistry {
     ['confirmDefendantDetailsLR', new RespondToClaimLRAction()],
     ['enterDateOfBirthDetailsLR', new RespondToClaimLRAction()],
     ['selectCorrespondenceAddressLR', new RespondToClaimLRAction()],
+    ['emailConfirmationLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {
