@@ -69,8 +69,7 @@ export default function viewDocumentsRoutes(app: Application): void {
     oidcMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
       const caseReference = req.params.caseReference as string;
-      const rawDocId = typeof req.params.documentId === 'string' ? req.params.documentId.trim() : '';
-      const documentId = sanitiseUUID(rawDocId) || rawDocId.replace(/[^a-zA-Z0-9_-]/g, '');
+      const documentId = sanitiseUUID(req.params.documentId);
       const accessToken = req.session.user?.accessToken;
 
       if (!accessToken) {
