@@ -282,13 +282,52 @@ describe('cdamService', () => {
       expect(result.stream).toBe(mockStream);
     });
 
-    it('rethrows original CDAM error if 403 fallback also fails', async () => {
+    it('falls back to S2S service headers when DM-Store user token fetch also returns 403 Forbidden', async () => {
+      const mockStream = { pipe: jest.fn(), on: jest.fn() };
+      const cdamError = {
+        response: { status: 403 },
+        message: 'Forbidden',
+      };
+      const userError = {
+        response: { status: 403 },
+        message: 'User forbidden',
+      };
+      mockGet
+        .mockRejectedValueOnce(cdamError)
+        .mockRejectedValueOnce(userError)
+        .mockResolvedValueOnce({
+          data: mockStream,
+          headers: {
+            'content-type': 'application/pdf',
+          },
+        });
+
+      const binaryUrl = 'http://dm-store/documents/test-123/binary';
+      const result = await getDocumentBinary(binaryUrl, userToken);
+
+      expect(mockGet).toHaveBeenNthCalledWith(
+        3,
+        binaryUrl,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'user-id': 'pcs-frontend-service',
+            'user-roles': 'caseworker-civil,caseworker-civil-solicitor,pui-case-manager',
+          }),
+        })
+      );
+      expect(result.stream).toBe(mockStream);
+    });
+
+    it('rethrows original CDAM error if all 403 fallbacks fail', async () => {
       const cdamError = {
         response: { status: 403 },
         message: 'Forbidden',
       };
       const fallbackError = new Error('Fallback failed');
-      mockGet.mockRejectedValueOnce(cdamError).mockRejectedValueOnce(fallbackError);
+      mockGet
+        .mockRejectedValueOnce(cdamError)
+        .mockRejectedValueOnce(fallbackError)
+        .mockRejectedValueOnce(fallbackError);
 
       const binaryUrl = 'http://dm-store/documents/test-123/binary';
       await expect(getDocumentBinary(binaryUrl, userToken)).rejects.toEqual(cdamError);

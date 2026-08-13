@@ -95,8 +95,8 @@ export async function getDocumentBinary(
     });
   } catch (error) {
     const axiosError = error as AxiosError;
-    if (axiosError.response?.status === 403 && binaryUrl && binaryUrl !== requestUrl) {
-      logger.warn('CDAM returned 403 Forbidden, attempting fallback to direct DM-Store binaryUrl', {
+    if (axiosError.response?.status === 403) {
+      logger.warn('CDAM returned 403 Forbidden, attempting fallback to direct DM-Store binaryUrl with user token', {
         requestUrl,
         binaryUrl,
       });
@@ -107,15 +107,31 @@ export async function getDocumentBinary(
           },
           responseType: 'stream',
         });
-        logger.info('Fallback document binary fetch from DM-Store succeeded');
-      } catch (fallbackError) {
-        logger.error('CDAM document binary fetch failed and DM-Store fallback failed', {
-          requestUrl,
+        logger.info('Fallback document binary fetch from DM-Store succeeded with user token');
+      } catch (userFallbackError) {
+        logger.warn('DM-Store with user token failed, attempting S2S service fallback', {
           binaryUrl,
-          cdamStatus: axiosError.response?.status,
-          fallbackError: (fallbackError as AxiosError).message,
+          userError: (userFallbackError as AxiosError).message,
         });
-        throw error;
+        try {
+          response = await http.get(binaryUrl, {
+            headers: {
+              'user-id': 'pcs-frontend-service',
+              'user-roles': 'caseworker-civil,caseworker-civil-solicitor,pui-case-manager',
+            },
+            responseType: 'stream',
+          });
+          logger.info('S2S service fallback fetch from DM-Store succeeded');
+        } catch (s2sFallbackError) {
+          logger.error('All document binary fetch attempts failed (CDAM, DM-Store user token, DM-Store S2S service)', {
+            requestUrl,
+            binaryUrl,
+            cdamError: axiosError.message,
+            userFallbackError: (userFallbackError as AxiosError).message,
+            s2sFallbackError: (s2sFallbackError as AxiosError).message,
+          });
+          throw error;
+        }
       }
     } else {
       logger.error('CDAM document binary fetch failed', {
