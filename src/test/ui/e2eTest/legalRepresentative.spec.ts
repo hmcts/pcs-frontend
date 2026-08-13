@@ -1,4 +1,5 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { checkYourAnswersRTC, responseAndCounterClaimSubmitted,responseSubmitted,responseSubmittedCounterclaimFeePaymentNeeded } from '../data/page-data';
 import {
   confirmationOfNoticeGiven,
   correspondenceAddress,
@@ -270,7 +271,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('NonRentArrears - AssuredTenancy - Something else - LR @smoke @regression @nonRent @LR', async () => {
@@ -404,7 +412,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @smoke @regression @nonRent @LR', async () => {
@@ -542,7 +557,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @regression @rentNonRent @LR', async () => {
@@ -681,7 +703,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @smoke @PR @regression @rentNonRent @LR', async () => {
@@ -822,7 +851,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('RentArrears - DemotedTenancy - LR @smoke @regression @rent @LR', async () => {
@@ -907,7 +943,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmitted.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @smoke @regression @rent @LR', async () => {
@@ -1016,7 +1059,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @smoke @regression @rent @LR', async () => {
