@@ -143,12 +143,34 @@ function addDocumentsFromCollection(
   sourceField: string
 ): void {
   for (const item of asCollection(collection)) {
-    const id = stringValue(item.id);
-    const value = asRecord(item.value);
-    const filename = stringValue(value?.document_filename);
-    const binaryUrl = stringValue(value?.document_binary_url);
+    if (!item || typeof item !== 'object') {
+      continue;
+    }
+    const rec = item as Record<string, unknown>;
+    const val = (rec.value as Record<string, unknown>) ?? rec;
+    const docObj = (val.document as Record<string, unknown>) ?? val;
 
-    if (!id || !filename || !binaryUrl || seen.has(id)) {
+    const url = (docObj.document_url ||
+      docObj.document_binary_url ||
+      val.document_url ||
+      val.document_binary_url ||
+      rec.document_url ||
+      rec.document_binary_url) as string | undefined;
+
+    const binaryUrl = (docObj.document_binary_url ||
+      val.document_binary_url ||
+      rec.document_binary_url ||
+      (url ? `${url}/binary` : undefined)) as string | undefined;
+
+    const filename = (docObj.document_filename ||
+      val.document_filename ||
+      rec.document_filename ||
+      'document') as string;
+
+    const urlId = url ? url.split('/documents/')[1]?.split('/')[0] : undefined;
+    const id = (stringValue(rec.id) || stringValue(val.id) || stringValue(docObj.id) || urlId) as string | undefined;
+
+    if (!id || !binaryUrl || seen.has(id)) {
       continue;
     }
 
@@ -157,19 +179,21 @@ function addDocumentsFromCollection(
       id,
       filename,
       binaryUrl,
-      categoryId: stringValue(value?.category_id),
-      documentType: stringValue(value?.document_type ?? value?.documentType ?? value?.type),
+      categoryId: stringValue(docObj.category_id || val.category_id || rec.category_id),
+      documentType: stringValue(docObj.document_type || val.document_type || rec.document_type),
       sourceField,
     });
   }
 }
 
-function asCollection(value: unknown): { id?: unknown; value?: unknown }[] {
-  return Array.isArray(value) ? (value as { id?: unknown; value?: unknown }[]) : [];
-}
-
-function asRecord(value: unknown): Record<string, unknown> | undefined {
-  return value && typeof value === 'object' && !Array.isArray(value) ? (value as Record<string, unknown>) : undefined;
+function asCollection(value: unknown): Record<string, unknown>[] {
+  if (Array.isArray(value)) {
+    return value as Record<string, unknown>[];
+  }
+  if (value && typeof value === 'object') {
+    return [value as Record<string, unknown>];
+  }
+  return [];
 }
 
 function stringValue(value: unknown): string | undefined {
