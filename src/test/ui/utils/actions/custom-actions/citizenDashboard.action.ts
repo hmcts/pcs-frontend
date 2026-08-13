@@ -154,6 +154,7 @@ export class CitizenDashboardAction implements IAction {
       ],
       ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
     );
+    await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
   }
 
   private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {
@@ -207,7 +208,7 @@ export class CitizenDashboardAction implements IAction {
     await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
     await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
     await performValidation('text', { elementType: 'subHeader', text: viewTheClaim.downloadPDFSubHeader });
-    await performValidation('text', { elementType: 'link', text: viewTheClaim.claimPDFLink });
+    await performValidation('validatePdfDocument', '', { linkText: viewTheClaim.claimPDFLink });
     await performValidation('text', { elementType: 'inlineText', text: viewTheClaim.ifYouCannotFindLink });
     await performValidation('text', {
       elementType: 'paragraphWithLink',
