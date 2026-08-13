@@ -165,15 +165,33 @@ describe('reasonableAdjustmentsCallback routes', () => {
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
   });
 
-  it('routes to the "no request sent" page (no persist) when only flagsAsSupplied is returned — no change was made', async () => {
-    const flags = { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] };
-    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', flagsAsSupplied: flags });
+  it('persists flagsAsSupplied and confirms on a removal (cui-ra sends an empty replacementFlags alongside it)', async () => {
+    // Observed cui-ra behaviour on a pure removal: replacementFlags is present but EMPTY, and
+    // flagsAsSupplied carries the real set (with the removed flag marked Inactive). We must pick the
+    // populated flagsAsSupplied, not the empty replacementFlags, and persist + confirm.
+    const suppliedFlags = {
+      partyName: 'John Doe',
+      roleOnCase: 'Defendant',
+      details: [{ id: 'd1', value: { flagCode: 'RA0042', status: 'Inactive', path: [] } }],
+    };
+    mockGetPayload.mockResolvedValue({
+      action: 'submit',
+      correlationId: '123',
+      replacementFlags: { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] },
+      flagsAsSupplied: suppliedFlags,
+    });
     const res = {} as unknown as Response;
 
     await getHandler()(buildReq(), res);
 
-    expect(mockUpdateDraft).not.toHaveBeenCalled();
-    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
+    expect(mockUpdateDraft).toHaveBeenCalledWith(
+      RESPOND_TO_CLAIM_DRAFT_EVENT,
+      'user-tok',
+      '123',
+      { possessionClaimResponse: { ...expectedDefendantSlice, defendantFlags: suppliedFlags } },
+      { context: 'x' }
+    );
+    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
   });
 
   it('routes to the "no request sent" page (no persist) when a submit carries no flags at all', async () => {

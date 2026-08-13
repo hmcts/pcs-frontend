@@ -76,11 +76,16 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
           return safeRedirect303(res, errorUrl, fallback, ['/case']);
         }
 
-        // Redirect to the "No request was sent" page unless cui-ra captured a real change — an
-        // explicit 'submit' that carries at least one flag in replacementFlags. So bail when the
-        // action is not 'submit', OR replacementFlags is missing/empty (a fall back to
-        // flagsAsSupplied, or an empty collection with no flags).
-        if (payload.action !== 'submit' || !payload.replacementFlags?.details?.length) {
+        // cui-ra returns the updated flag collection in one of two fields: `replacementFlags` when
+        // flags were added (the full updated set, cancellations folded in) and `flagsAsSupplied` when
+        // flags were cancelled/removed (the supplied set with cancelled statuses). Both are real
+        // changes to persist. NOTE: contrary to the docs, on a pure removal cui-ra sends BOTH — an
+        // EMPTY `replacementFlags` ({ details: [] }) alongside the populated `flagsAsSupplied`
+        // Pick whichever collection actually has flags, preferring `replacementFlags`.
+        // "No request was sent" only when microsite was abandoned (action !== 'submit')
+        // or neither collection has any flags.
+        const flags = payload.replacementFlags?.details?.length ? payload.replacementFlags : payload.flagsAsSupplied;
+        if (payload.action !== 'submit' || !flags?.details?.length) {
           return safeRedirect303(res, cancelledUrl, fallback, ['/case']);
         }
 
@@ -88,7 +93,7 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
         // draft-save our journey pages use. The draft-save fully REPLACES the defendant response (and
         // the final submit reads this same draft), so re-send the existing answers — narrowed to the
         // defendant slice — alongside the flags, or a flags-only post would wipe them.
-        const defendantFlags = toCcdFlags(payload.replacementFlags);
+        const defendantFlags = toCcdFlags(flags);
         const existingResponse = existing.data?.possessionClaimResponse ?? {};
         const possessionClaimResponse: PossessionClaimResponse = {
           defendantContactDetails: existingResponse.defendantContactDetails,

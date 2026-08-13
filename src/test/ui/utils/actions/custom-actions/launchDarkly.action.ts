@@ -12,7 +12,7 @@ export class LaunchDarklyAction implements IAction {
     test.skip(!flagOn, `Flag "${flagKey}" is OFF / returned NULL`);
   }
 
-  private async getFlagValue(flagKey: string): Promise<boolean> {
+  async getFlagValue(flagKey: string): Promise<boolean> {
     try {
       if (!ldClient) {
         const sdkKey = process.env.LAUNCHDARKLY_SDK_KEY;
