@@ -46,6 +46,7 @@ import { formatCurrency } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
+import { pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
 import { RespondToClaimAction } from './respondToClaim.action';
 export class RespondToClaimLRAction extends RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
@@ -331,10 +332,13 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async createDraftResponseLR(defendant: actionRecord): Promise<void> {
-    await this.representationLR({
-      question: selectDefendant.whichDefendantQuestion,
-      radioOption: `${defendant.firstName} ${defendant.lastName}`,
-    });
+    const defendantName = `${defendant.firstName} ${defendant.lastName}`;
+    if (pinUsers.length > 1) {
+      await this.representationLR({
+        question: selectDefendant.whichDefendantQuestion,
+        radioOption: defendantName,
+      });
+    }
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmationLR.mainHeader(String(defendant.firstName), String(defendant.lastName)),
       option: defendantNameConfirmationLR.yesRadioOption,
