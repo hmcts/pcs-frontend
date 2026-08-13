@@ -7,6 +7,7 @@ import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../s
 
 import { createSecureToken } from './createSecureToken';
 
+import { getValidatedLanguage } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('startPcq');
@@ -81,7 +82,7 @@ export async function startPcq(req: Request): Promise<string | null> {
     pcqId,
     partyId,
     returnUrl,
-    language: 'en', // TODO: update the language when the translation is implemented
+    language: getValidatedLanguage(req),
     ccdCaseId: ccdCase.id,
   };
 

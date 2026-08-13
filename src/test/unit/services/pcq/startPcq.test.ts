@@ -124,6 +124,18 @@ describe('startPcq', () => {
     expect(url).toContain('salt=mock-salt');
   });
 
+  it('asks PCQ for Welsh when the citizen is reading our pages in Welsh', async () => {
+    (mockReq as Request & { language: string }).language = 'cy';
+
+    const url = await startPcq(mockReq as Request);
+
+    expect(url).toContain('language=cy');
+    expect(createSecureTokenModule.createSecureToken).toHaveBeenCalledWith(
+      expect.objectContaining({ language: 'cy' }),
+      'dummy-token-key'
+    );
+  });
+
   it('returns the citizen to the case-scoped next step after PCQ', async () => {
     await startPcq(mockReq as Request);
 
