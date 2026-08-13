@@ -1388,7 +1388,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     );
     await performValidation('inputTextValue', defendantDateOfBirth.yearTextLabel, defendantDateOfBirth.yearInputText);
     await performAction('inputText', defendantDateOfBirth.yearTextLabel, '2001');
-    await performAction('clickButton', defendantDateOfBirth.saveForLaterButton);
+    await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
 
     await performAction('reopenStartNowLR');
     await performAction('representationLR', {
