@@ -70,6 +70,12 @@ export function getRentStatementDocumentInfo(validatedCase?: unknown): {
 
   // Fallback: check extractCaseDocuments utility
   const caseDocs = extractCaseDocuments(caseData as Record<string, unknown>);
+  logger.info('[rentArrearsDispute] Extracted case documents for fallback check', {
+    docCount: caseDocs.length,
+    filenames: caseDocs.map(d => d.filename),
+    sourceFields: caseDocs.map(d => d.sourceField),
+  });
+
   if (caseDocs.length > 0) {
     const rentDoc =
       caseDocs.find(
@@ -82,6 +88,7 @@ export function getRentStatementDocumentInfo(validatedCase?: unknown): {
     if (rentDoc?.id) {
       logger.info('[rentArrearsDispute] Found rent statement document ID via extractCaseDocuments', {
         documentId: rentDoc.id,
+        filename: rentDoc.filename,
       });
       return { isDocumentUploaded: true, documentId: rentDoc.id };
     }
