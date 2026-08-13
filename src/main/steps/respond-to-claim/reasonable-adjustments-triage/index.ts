@@ -2,9 +2,13 @@ import type { Request } from 'express';
 
 import { flowConfig } from '../flow.config';
 
+import { Logger } from '@modules/logger';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { startYourSupport } from '@services/cuiRa/startYourSupport';
 import { startPcq } from '@services/pcq/startPcq';
+import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
+const logger = Logger.getLogger('reasonableAdjustmentsTriage');
 
 export const step: StepDefinition = createFormStep({
   stepName: 'reasonable-adjustments-triage',
@@ -12,20 +16,42 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/reasonableAdjustmentsTriage.njk`,
-  // Declining support (reasonableAdjustmentsChoice=skip) hands the citizen to PCQ. The
-  // "Continue to the questions" button launches Your Support instead and is wired up separately.
+  // The triage screen forks. "Continue to the questions" (reasonableAdjustmentsChoice=questions)
+  // launches the Your Support microsite; declining support hands the citizen to PCQ instead.
   beforeRedirect: async (req: Request) => {
-    if (req.body?.reasonableAdjustmentsChoice !== 'skip') {
+    if (req.body?.reasonableAdjustmentsChoice !== 'questions') {
+      // Skipping Your Support takes us to PCQ.
+      const redirectUrl = await startPcq(req);
+      if (redirectUrl) {
+        req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
+      }
+      // A null URL means PCQ is unavailable or already answered — fall through to the normal next
+      // step so an optional questionnaire can never block the citizen's response.
       return;
     }
 
-    const redirectUrl = await startPcq(req);
-    if (redirectUrl) {
-      req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
+    if (!(await isCuiYourSupportEnabled(req))) {
+      return;
     }
-    // A null URL means PCQ is unavailable or already answered — fall through to the normal next
-    // step so an optional questionnaire can never block the citizen's response.
+    const caseReference = req.res?.locals.validatedCase?.id;
+    try {
+      const redirectUrl = await startYourSupport(req);
+      req.res?.redirect(303, redirectUrl); // postHandler short-circuits on res.headersSent
+    } catch (error) {
+      // Any failure launching Your Support (cui-ra down, POST error, missing token) must land the
+      // citizen on the context-aware RA error page
+      logger.error(`Failed to launch Your Support for case ${caseReference}`, error);
+      if (!caseReference) {
+        throw error;
+      }
+      req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`);
+    }
   },
+  // When the Your Support feature flag is off, hide the "Continue to the questions" button so the
+  // page doesn't advertise a microsite that won't launch (beforeRedirect also treats it as skip).
+  extendGetContent: async (req: Request) => ({
+    cuiYourSupportEnabled: await isCuiYourSupportEnabled(req),
+  }),
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',

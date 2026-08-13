@@ -255,3 +255,42 @@ describe('buildDraftDefendantResponse — any mid-section submission auto-clears
     expect(draft.defendantResponses.completedSections).toEqual(['PERSONAL_DETAILS', 'PAYMENTS']);
   });
 });
+
+describe('buildDraftDefendantResponse — carries reasonable-adjustment flags forward', () => {
+  const reqWithFlags = (defendantFlags?: unknown): Request =>
+    ({
+      path: '/case/123/respond-to-claim/task-list',
+      body: {},
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { possessionNoticeReceived: 'YES' },
+                ...(defendantFlags ? { defendantFlags } : {}),
+              },
+            },
+          },
+        },
+      },
+    }) as unknown as Request;
+
+  it('re-sends existing defendantFlags so a later REPLACE-style save does not wipe them', () => {
+    const defendantFlags = {
+      partyName: 'John Doe',
+      roleOnCase: 'Defendant',
+      details: [{ id: 'd1', value: { flagCode: 'RA0042', path: [{ id: 'p1', value: 'Reasonable adjustment' }] } }],
+    };
+
+    const draft = buildDraftDefendantResponse(reqWithFlags(defendantFlags));
+
+    expect(draft.defendantFlags).toEqual(defendantFlags);
+    // deep clone, not the same reference
+    expect(draft.defendantFlags).not.toBe(defendantFlags);
+  });
+
+  it('omits defendantFlags entirely when there are none in the existing draft', () => {
+    const draft = buildDraftDefendantResponse(reqWithFlags());
+    expect('defendantFlags' in draft).toBe(false);
+  });
+});

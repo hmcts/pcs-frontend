@@ -25,7 +25,8 @@ describe('respond-to-claim sections config', () => {
     // unmapped here in addition to flowConfig.nonSectionStepOrder.
     const nonSectionStepSlugs = new Set([
       ...(flowConfig.nonSectionStepOrder ?? []),
-      'reasonable-adjustments-triage',
+      'reasonable-adjustments-error',
+      'reasonable-adjustments-cancelled',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
     ]);
