@@ -9,6 +9,7 @@ import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 // Validation constants
 const MAX_RENT_ARREARS_AMOUNT = 1_000_000_000; // £1 billion maximum
@@ -131,7 +132,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return formData;
   },
-  extendGetContent: (req: Request) => {
+  extendGetContent: async (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
     const amountInPence = (caseData?.rentArrears_Total as string | number) || 0;
@@ -145,8 +146,28 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
 
-    const { isDocumentUploaded, documentId } = getRentStatementDocumentInfo(req.res?.locals.validatedCase);
+    let { isDocumentUploaded, documentId } = getRentStatementDocumentInfo(req.res?.locals.validatedCase);
+
+    if (!isDocumentUploaded) {
+      try {
+        const accessToken = req.session?.user?.accessToken;
+        const rawCaseReference = req.params?.caseReference;
+        const caseReference = Array.isArray(rawCaseReference) ? rawCaseReference[0] : rawCaseReference;
+        if (accessToken && caseReference) {
+          const fullCase = await ccdCaseService.getCaseById(accessToken, caseReference);
+          const fullCaseDocInfo = getRentStatementDocumentInfo(fullCase);
+          if (fullCaseDocInfo.isDocumentUploaded && fullCaseDocInfo.documentId) {
+            isDocumentUploaded = true;
+            documentId = fullCaseDocInfo.documentId;
+          }
+        }
+      } catch (err) {
+        logger.warn('[rentArrearsDispute] Failed to fetch full case for rent statement document', { error: err });
+      }
+    }
+
     const rentStatementDocument = isDocumentUploaded && documentId ? { id: documentId } : '';
+
     const release12Enabled = isRelease12Enabled(req);
 
     return {

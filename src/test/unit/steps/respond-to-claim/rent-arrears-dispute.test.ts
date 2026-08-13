@@ -39,6 +39,12 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   saveDraftDefendantResponse: jest.fn(),
 }));
 
+jest.mock('@services/ccdCaseService', () => ({
+  ccdCaseService: {
+    getCaseById: jest.fn(),
+  },
+}));
+
 const t = ((key: string, options?: Record<string, string>) => {
   const translations: Record<string, string> = {
     pageTitle: 'Do you agree with the amount of rent arrears?',
@@ -67,8 +73,14 @@ import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers
 import { getRentStatementDocumentInfo, step } from '../../../../main/steps/respond-to-claim/rent-arrears-dispute';
 import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
+import { ccdCaseService } from '@services/ccdCaseService';
+
 describe('respond-to-claim rent-arrears-dispute step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createReq = (overrides: Record<string, unknown> = {}): any => ({
@@ -231,6 +243,25 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
       },
     };
 
+    // getCaseById returns the full case with detailsTab_RentArrearsDetails populated
+    (ccdCaseService.getCaseById as jest.Mock)
+      .mockResolvedValueOnce({
+        id: '1234567890123456',
+        data: {
+          detailsTab_RentArrearsDetails: {
+            rentStatement: [rentStatementDocument, { id: 'ignored' }],
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        id: '1234567890123456',
+        data: {
+          detailsTab_RentArrearsDetails: {
+            rentStatement: [rentStatementDocument, { id: 'ignored' }],
+          },
+        },
+      });
+
     const req = createReq({
       res: {
         locals: {
@@ -238,9 +269,7 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
             id: '1234567890123456',
             data: {
               rentArrears_Total: '12345',
-              detailsTab_RentArrearsDetails: {
-                rentStatement: [rentStatementDocument, { id: 'ignored' }],
-              },
+              detailsTab_RentArrearsDetails: {},
               possessionClaimResponse: {
                 claimantOrganisations: [{ value: 'Treetops Housing' }],
               },
@@ -266,6 +295,24 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
   });
 
   it('returns an empty string when detailsTab_RentArrearsDetails exists but rentStatement is empty', async () => {
+    (ccdCaseService.getCaseById as jest.Mock)
+      .mockResolvedValueOnce({
+        id: '1234567890123456',
+        data: {
+          detailsTab_RentArrearsDetails: {
+            rentStatement: [],
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        id: '1234567890123456',
+        data: {
+          detailsTab_RentArrearsDetails: {
+            rentStatement: [],
+          },
+        },
+      });
+
     const req = createReq({
       res: {
         locals: {
