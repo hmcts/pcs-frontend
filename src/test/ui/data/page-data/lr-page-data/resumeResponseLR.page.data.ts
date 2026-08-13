@@ -1,0 +1,15 @@
+export const resumeResponseLR = {
+  mainHeader: `Resume response`,
+  resumeResponseParagraph1: `Your previous answers have been saved.  You can either:`,
+  resumeResponseListItem1: `resume your response using your saved answers`,
+  resumeResponseListItem2: `start your response again from the beginning`,
+  resumeResponseParagraph2: `If you resume your response using your saved answers, you must select ’Continue’ at the bottom of each page until you reach the question you’d like to continue your response from.`,
+  question: `Do you want to resume the response using your saved answers?`,
+  yesRadioOption: `Yes`,
+  noRadioOption: `No`,
+  saveAndContinueButton: `Continue`,
+  backLink: `Back`,
+  cymraegLink: `Cymraeg`,
+  feedbackLink: `feedback`,
+  pageSlug: `resume-response`,
+};
