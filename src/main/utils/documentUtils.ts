@@ -86,7 +86,13 @@ const CASE_DETAILS_DOCUMENT_PATHS = [
 ] as const;
 
 export function findCaseDocumentById(caseData: CaseDataRecord, documentId: string): CaseDocumentLookupItem | undefined {
-  return extractCaseDocuments(caseData).find(document => document.id === documentId);
+  return extractCaseDocuments(caseData).find(document => {
+    if (document.id === documentId) {
+      return true;
+    }
+    const urlUuid = document.binaryUrl ? document.binaryUrl.split('/documents/')[1]?.split('/')[0] : undefined;
+    return urlUuid === documentId;
+  });
 }
 
 export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLookupItem[] {
@@ -95,6 +101,13 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
 
   addDocumentsFromCollection(documents, seen, caseData.allDocuments, 'allDocuments');
   addDocumentsFromCollection(documents, seen, caseData.notice_Documents, 'notice_Documents');
+  addDocumentsFromCollection(
+    documents,
+    seen,
+    caseData.rentArrears_StatementDocuments,
+    'rentArrears_StatementDocuments'
+  );
+  addDocumentsFromCollection(documents, seen, caseData.rentStatement, 'rentStatement');
 
   for (const path of CASE_DETAILS_DOCUMENT_PATHS) {
     addDocumentsFromCollection(documents, seen, get(caseData, path), path);
