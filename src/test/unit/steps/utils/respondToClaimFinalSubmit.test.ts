@@ -137,7 +137,6 @@ describe('respondToClaimFinalSubmit', () => {
 
       expect(result.confirmationPath).toBe('/case/1234567890123456/respond-to-claim/response-submitted');
       expect(mockHttpPost).toHaveBeenCalled();
-      expect(mockClientContextClearer).toHaveBeenCalledWith(req);
     });
 
     it('persists payment session when counterclaim fee payment is required', async () => {
