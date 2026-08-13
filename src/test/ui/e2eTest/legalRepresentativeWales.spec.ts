@@ -2,6 +2,7 @@ import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.dat
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
   confirmationOfNoticeGiven,
+  correspondenceAddress,
   counterClaim,
   counterClaimAbout,
   counterClaimAgainstWhom,
@@ -42,6 +43,7 @@ import {
 } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -55,16 +57,18 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.WALES_POSTCODE = 'YES';
   process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
   process.env.CLAIMANT_NAME = submitCaseApiDataWales.submitCasePayload.claimantName;
-  if (testInfo.title.includes('Secure')) {
-    process.env.OCCUPATION_LICENCE_TYPE = 'SECURE_CONTRACT';
-  }
   submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales = process.env.OCCUPATION_LICENCE_TYPE;
   // claimantName = process.env.CLAIMANT_NAME;
   await performAction('createCaseAPI', { data: createCaseApiWalesData.createCasePayload });
-  if (process.env.OCCUPATION_LICENCE_TYPE === 'SECURE_CONTRACT') {
+  if (testInfo.title.includes('Secure')) {
     process.env.RENT_NON_RENT = 'YES';
     await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseDefendantSecure });
     claimantName = submitCaseApiDataWales.submitCaseDefendantSecure.claimantName;
+    process.env.CLAIMANT_NAME = claimantName;
+  } else if (testInfo.title.includes('Other')) {
+    process.env.RENT_NON_RENT = 'YES';
+    await performAction('submitCaseAPI', { data: submitCaseApiDataWales.submitCaseDefendantOther });
+    claimantName = submitCaseApiDataWales.submitCaseDefendantOther.claimantName;
     process.env.CLAIMANT_NAME = claimantName;
   }
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS);
@@ -242,143 +246,103 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  // test('Respond to a claim - Wales - Other contract - Rent Arrears @noDefendants', async () => {
-  //   await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-  //   await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
-  //   await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
-  //   await performAction('validateRTCSectionCYA', 'startNowAndDetails');
-  //   await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-  //   await performAction('taskList', { subSection: taskList.confirmDetailsLink });
-  //   await performAction('inputDefendantDetails', {
-  //     fName: defendantNameCapture.firstNameTextInput,
-  //     lName: defendantNameCapture.lastNameTextInput,
-  //   });
-  //   await performAction('enterDateOfBirthDetails', {
-  //     dobDay: defendantDateOfBirth.dayInputText,
-  //     dobMonth: defendantDateOfBirth.monthInputText,
-  //     dobYear: defendantDateOfBirth.yearInputText,
-  //   });
-  //   await performAction('selectCorrespondenceAddressKnown', {
-  //     radioOption: correspondenceAddress.noRadioOption,
-  //     addressLine1: correspondenceAddress.walesAddressLine1TextInput,
-  //     townOrCity: correspondenceAddress.walesTownOrCityTextInput,
-  //     postcode: correspondenceAddress.walesPostcodeTextInput,
-  //   });
-  //   await performAction('selectContactPreferenceEmailOrPost', {
-  //     question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
-  //     radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
-  //     emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
-  //   });
-  //   await performAction('selectContactByTelephone', {
-  //     radioOption: contactPreferencesTelephone.yesRadioOption,
-  //     phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
-  //   });
-  //   await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
-  //   await performAction('retrieveCYATableDataRTC', 'personalDetails');
-  //   await performAction('validateRTCSectionCYA', 'personalDetails');
-  //   await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-  //   await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
-  //   await performAction(
-  //     'disputeClaimInterstitial',
-  //     submitCaseApiDataWales.submitCaseRentOtherTenancy.isClaimantNameCorrect
-  //   );
-  //   await performAction('exemptLandLord', exemptLandLord.imNotSureRadioOption);
-  //   await performValidation('mainHeader', writtenTerms.mainHeader);
-  //   await performAction('selectWrittenTerms', {
-  //     question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
-  //     radioOption: writtenTerms.noRadioOption,
-  //   });
-  //   await performAction('tenancyOrContractTypeDetails', {
-  //     tenancyType: submitCaseApiDataWales.submitCaseRentOtherTenancy.occupationLicenceTypeWales,
-  //     tenancyOption: tenancyTypeDetails.yesRadioOption,
-  //   });
-  //   await performAction('enterTenancyStartDetailsUnKnown');
-  //   await performAction('selectNoticeDetails', {
-  //     option: confirmationOfNoticeGiven.imNotSureRadioOption,
-  //   });
-  //   await performAction('rentArrears', {
-  //     option: rentArrears.yesRadioOption,
-  //   });
-  //   await performAction('selectCounterClaim', {
-  //     option: counterClaim.noRadioOption,
-  //   });
-  //   await performAction('retrieveCYATableDataRTC', 'disputeAndTenancy');
-  //   await performAction('validateRTCSectionCYA', 'disputeAndTenancy');
-  //   await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-  //   await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
-  //   await performAction('readPaymentInterstitial');
-  //   await performAction('repaymentsMade', {
-  //     question: repaymentsMade.getmainHeader(claimantName),
-  //     repaymentOption: repaymentsMade.noRadioOption,
-  //   });
-  //   await performAction('repaymentsAgreed', {
-  //     repaymentAgreedOption: repaymentsAgreed.noRadioOption,
-  //   });
-  //   await performAction('installmentPayments', {
-  //     question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
-  //     radioOption: installmentPayments.noRadioOption,
-  //   });
-  //   await performAction('retrieveCYATableDataRTC', 'payments');
-  //   await performAction('validateRTCSectionCYA', 'payments');
-  //   await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-  //   await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
-  //   await performAction('readYourHouseholdAndCircumstances');
-  //   await performAction('doYouHaveAnyDependantChildren', {
-  //     dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
-  //   });
-  //   await performAction('doYouHaveAnyOtherDependants', {
-  //     otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
-  //     otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
-  //   });
-  //   await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
-  //     radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
-  //     details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
-  //   });
-  //   await performAction('selectAlternativeAccommodation', {
-  //     radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
-  //   });
-  //   await performAction('yourCircumstances', {
-  //     question: yourCircumstances.wouldYouLikeToShareHeader,
-  //     yourCircumstancesOption: yourCircumstances.noRadioOption,
-  //   });
-  //   await performAction('exceptionalHardship', {
-  //     question: exceptionalHardship.mainHeader,
-  //     exceptionalHardshipOption: exceptionalHardship.noRadioOption,
-  //   });
-  //   await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
-  //   await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
-  //   await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-  //   await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
-  //   await performAction('selectIncomeAndExpenses', {
-  //     incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
-  //   });
-  //   await performAction('otherConsiderations', {
-  //     question: otherConsiderations.mainHeader,
-  //     option: otherConsiderations.noRadioOption,
-  //   });
-  //   await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
-  //   await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
-  //   await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-  //   await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
-  //   await performAction('uploadFiles');
-  //   await performAction('retrieveCYATableDataRTC', 'uploadFiles');
-  //   await performAction('validateRTCSectionCYA', 'uploadFiles');
-  //   await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-  //   await performAction('taskListStatus', {
-  //     subSecArray: [
-  //       taskList.readInformationAboutLink,
-  //       taskList.respondToSpecificPartsOfClaimantsClaimLink,
-  //       taskList.incomeAndExpensesLink,
-  //       taskList.uploadDocumentsLink,
-  //       taskList.confirmDetailsLink,
-  //     ],
-  //     status: 'Done',
-  //   });
-  //   await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-  //   await performAction('languageUsed', {
-  //     question: languageUsed.mainHeader,
-  //     radioOption: languageUsed.englishRadioOption,
-  //   });
-  //   await performAction('clickButton', 'Submit');
-  // });
+  test('Respond to a claim - Wales - Other contract - Rent Arrears', async () => {
+    const pin2User = await getPinUserAt(1);
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
+    });
+    await performAction('confirmDefendantDetailsLR', {
+      question: defendantNameConfirmation.mainHeader(pin2User.firstName, pin2User.lastName),
+      option: defendantNameConfirmation.yesRadioOption,
+    });
+    await performAction('enterDateOfBirthDetailsLR', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressLR', {
+      radioOption: correspondenceAddress.noRadioOption,
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.yesRadioOption,
+      emailAddress: emailConfirmation.emailAddressTextInput,
+    });
+    await performAction('exemptLandlordLR', exemptLandlord.imNotSureRadioOption);
+    await performAction('selectWrittenTermsLR', {
+      question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
+      radioOption: writtenTerms.noRadioOption,
+    });
+    await performAction('tenancyOrContractTypeDetailsLR', {
+      tenancyType: submitCaseApiDataWales.submitCaseDefendantOther.occupationLicenceTypeWales,
+      tenancyOption: tenancyTypeDetails.yesRadioOption,
+    });
+    await performAction('enterTenancyStartDetailsUnKnownLR', {
+      tsDay: '15',
+      tsMonth: '11',
+      tsYear: '2024',
+    });
+    await performAction('selectNoticeDetailsLR', {
+      option: confirmationOfNoticeGiven.defendantNotSureRadioOption,
+    });
+    await performAction('rentArrearsLR', {
+      option: rentArrears.yesRadioOption,
+      rentArrearsTotal: submitCaseApiDataWales.submitCaseDefendantOther.rentArrears_Total,
+    });
+    await performAction('selectCounterClaimLR', {
+      option: counterClaim.noRadioOption,
+    });
+    await performAction('previousPaymentsLR', {
+      question: repaymentsMade.getMainHeader(),
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentAgreedLR', {
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performAction('installmentPaymentsLR', {
+      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+      radioOption: installmentPayments.noRadioOption,
+    });
+    await performAction('doesTheDependantHaveChildrenLR', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('otherDependantsLR', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
+    });
+    await performAction('otherAdultsLR', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('alternativeAccommodationLR', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performAction('circumstancesLR', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('selectExceptionalHardshipLR', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performAction('selectIncomeAndExpensesLR', {
+      incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
+    });
+    await performAction('otherConsiderationsLR', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('uploadAdditionalDocumentsLR');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
+    await performAction('languageUsed', {
+      question: languageUsed.whichLanguageParagraph,
+      radioOption: languageUsed.welshRadioOption,
+    });
+  });
 });

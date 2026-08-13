@@ -20,7 +20,6 @@ export const tenancyDateDetails = {
   yearHiddenTextLabel: `Year`,
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-  signOutLink: `Sign out`,
   cymraegLink: `Cymraeg`,
   errorValidationHeader: `There is a problem`,
   selectIfTheseTenancyDetailsAreCorrectErrorMessage: `Select if the tenancy, licence or occupation contract details are correct`,
