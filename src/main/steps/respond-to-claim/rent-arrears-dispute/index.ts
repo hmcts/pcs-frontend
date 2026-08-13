@@ -38,6 +38,7 @@ export function getRentStatementDocumentInfo(validatedCase?: unknown): {
     allDocsCount: allDocsArray.length,
     allDocsFirstItem: allDocsArray[0] ?? null,
     hasClaimantDocs: Boolean(claimantDocs),
+    caseDataTopLevelKeys: Object.keys(caseData),
   });
 
   const collections = [detailsTabRentStatement, rentArrearsStatementDocs, rentStatementDocs, allDocs, claimantDocs];
