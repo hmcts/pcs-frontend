@@ -572,7 +572,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       tenancyOption: tenancyTypeDetails.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
-    await performAction('selectTenancyStartDateKnown', {
+    await performAction('selectTenancyStartDateKnownLR', {
       option: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('selectNoticeDetailsLR', {
@@ -703,12 +703,12 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('emailConfirmationLR', {
       radioOption: emailConfirmation.noRadioOption,
     });
-    await performAction('tenancyOrContractTypeDetails', {
+    await performAction('tenancyOrContractTypeDetailsLR', {
       tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
-    await performAction('selectTenancyStartDateKnown', {
+    await performAction('selectTenancyStartDateKnownLR', {
       option: tenancyTypeDetails.yesRadioOption,
     });
     await performAction('selectNoticeDetailsLR', {
@@ -844,7 +844,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('emailConfirmationLR', {
       radioOption: emailConfirmation.noRadioOption,
     });
-    await performAction('tenancyOrContractTypeDetails', {
+    await performAction('tenancyOrContractTypeDetailsLR', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
@@ -929,7 +929,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('emailConfirmationLR', {
       radioOption: emailConfirmation.noRadioOption,
     });
-    await performAction('tenancyOrContractTypeDetails', {
+    await performAction('tenancyOrContractTypeDetailsLR', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
@@ -1038,7 +1038,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('emailConfirmationLR', {
       radioOption: emailConfirmation.noRadioOption,
     });
-    await performAction('tenancyOrContractTypeDetails', {
+    await performAction('tenancyOrContractTypeDetailsLR', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
@@ -1106,7 +1106,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('emailConfirmationLR', {
       radioOption: emailConfirmation.noRadioOption,
     });
-    await performAction('tenancyOrContractTypeDetails', {
+    await performAction('tenancyOrContractTypeDetailsLR', {
       tenancyType: submitCaseApiData.submitCaseDefendantAddressKnown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
