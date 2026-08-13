@@ -83,6 +83,10 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
         return redirectOnMissingPaymentSessionData(res, caseReference);
       }
 
+      if (!pbaAccount || !customerReference) {
+        return redirectOnMissingPbaPaymentDetails(res, caseReference);
+      }
+
       try {
         const paymentResponse = await paymentService.startPbaPaymentRequest({
           accessToken,
@@ -133,6 +137,16 @@ function redirectOnMissingAccessToken(caseReference: string, next: NextFunction)
 
 function redirectOnMissingPaymentSessionData(res: Response, caseReference: string) {
   logger.warn(`Missing payment session data for counterclaim payment start case ${caseReference}`);
+  return safeRedirect303(
+    res,
+    `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount`,
+    `/case/${caseReference}`,
+    ['/case']
+  );
+}
+
+function redirectOnMissingPbaPaymentDetails(res: Response, caseReference: string) {
+  logger.warn(`Missing PBA payment details for counterclaim payment start case ${caseReference}`);
   return safeRedirect303(
     res,
     `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount`,

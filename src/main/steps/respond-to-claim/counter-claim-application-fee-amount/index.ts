@@ -39,7 +39,7 @@ const legalRepFormFieldConfig: FormFieldConfig[] = [
             name: 'customerReference',
             type: 'text',
             required: true,
-            translationKey: { label: 'labels.customerReference' },
+            translationKey: { label: 'labels.customerReferenceHeading' },
             errorMessage: 'errors.customerReference',
           },
         },
@@ -187,6 +187,11 @@ async function getPbaAccounts(req: Request): Promise<string[]> {
     return [];
   }
 
-  const pbaAccountsResponse = await paymentService.getPbaAccounts(accessToken);
-  return pbaAccountsResponse.pbaAccounts;
+  try {
+    const pbaAccountsResponse = await paymentService.getPbaAccounts(accessToken);
+    return pbaAccountsResponse.pbaAccounts;
+  } catch (error) {
+    logger.error('Unable to get PBA accounts for user', error);
+    return [];
+  }
 }

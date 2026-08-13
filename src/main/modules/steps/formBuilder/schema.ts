@@ -79,7 +79,7 @@ export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
     // Pre-processed component configuration for template rendering
     component: z.record(z.string(), z.unknown()).optional(),
     componentType: z
-      .enum(['input', 'textarea', 'characterCount', 'radios', 'checkboxes', 'dateInput', 'fileUpload'])
+      .enum(['input', 'textarea', 'characterCount', 'radios', 'checkboxes', 'dateInput', 'fileUpload', 'select'])
       .optional(),
     // Cross-field validation function
     validate: ValidateFunctionSchema.optional(),

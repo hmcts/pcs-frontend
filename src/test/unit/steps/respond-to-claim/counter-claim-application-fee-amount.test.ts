@@ -13,6 +13,24 @@ jest.mock('@services/feeLookupService', () => ({
   getFee: jest.fn(),
 }));
 
+const mockLogger = {
+  error: jest.fn(),
+  warn: jest.fn(),
+  info: jest.fn(),
+};
+jest.mock('@modules/logger', () => ({
+  Logger: {
+    getLogger: jest.fn(() => mockLogger),
+  },
+}));
+
+const mockGetPbaAccounts = jest.fn();
+jest.mock('@services/pcsApi/paymentService', () => ({
+  paymentService: {
+    getPbaAccounts: mockGetPbaAccounts,
+  },
+}));
+
 import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim-application-fee-amount';
 
@@ -55,6 +73,10 @@ type CounterClaimApplicationFeeAmountStep = {
     params?: { caseReference?: string };
     query?: { payment?: string };
     session?: {
+      user?: {
+        roles?: string[];
+        accessToken?: string;
+      };
       payment?: {
         serviceRequestReference?: string;
         feeAmount?: number;
@@ -90,6 +112,7 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     (getTranslationFunction as jest.Mock).mockReturnValue(tMock);
     (getCounterClaimFeeType as jest.Mock).mockReturnValue(3);
     (getFee as jest.Mock).mockResolvedValue(377);
+    mockGetPbaAccounts.mockResolvedValue({ pbaAccounts: ['PBA1234567'] });
   });
 
   it('returns i18n-formatted counterclaim amount and fee from fee register lookup', async () => {
@@ -290,6 +313,36 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     });
 
     expect(content.showPaymentError).toBe(true);
+  });
+
+  it('falls back to an empty PBA account list when account lookup fails', async () => {
+    mockGetPbaAccounts.mockRejectedValue(new Error('PBA unavailable'));
+
+    const content = await testedStep.extendGetContent({
+      params: { caseReference: '123' },
+      res: {
+        locals: {
+          validatedCase: makeValidatedCase({
+            claimType: 'PAYMENT_OR_COMPENSATION',
+            isClaimAmountKnown: 'YES',
+            claimAmount: '250000',
+          }),
+        },
+      },
+      session: {
+        user: {
+          roles: ['caseworker-pcs-solicitor'],
+          accessToken: 'token-1',
+        },
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 35,
+        },
+      },
+    });
+
+    expect(content.pbaAccountItems).toEqual([{ value: '', text: 'labels.selectPba' }]);
+    expect(mockLogger.error).toHaveBeenCalledWith('Unable to get PBA accounts for user', expect.any(Error));
   });
 
   it('redirects card payment POSTs to the card payment start route for the no-JS flow', async () => {

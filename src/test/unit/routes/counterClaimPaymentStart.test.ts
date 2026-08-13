@@ -267,6 +267,27 @@ describe('counter-claim-pba-payment/start route', () => {
     expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
   });
 
+  it('redirects to fee page when PBA account details are missing', async () => {
+    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const req = {
+      params: { caseReference: '123' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(mockStartPbaPaymentRequest).not.toHaveBeenCalled();
+    expect(mockLogger.warn).toHaveBeenCalledWith('Missing PBA payment details for counterclaim payment start case 123');
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
+  });
+
   it('creates PBA payment request and redirects to successful page', async () => {
     const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     mockStartPbaPaymentRequest.mockResolvedValue({
@@ -357,6 +378,7 @@ describe('counter-claim-pba-payment/start route', () => {
           serviceRequestReference: 'SR-1',
           feeAmount: 404,
           pbaAccount: 'PBA1234567',
+          customerReference: 'CUST-001',
         },
       }),
     } as unknown as Request;
