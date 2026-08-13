@@ -23,8 +23,7 @@
     "deadline": 15000
   },
   "api": {
-    // "url": "http://pcs-api-aat.service.core-compute-aat.internal"
-    "url": "https://pcs-api-pr-2308.preview.platform.hmcts.net"
+    "url": "http://pcs-api-aat.service.core-compute-aat.internal"
   },
   "s2s": {
     "microservice": "pcs_frontend",
@@ -33,8 +32,7 @@
     "key": "s2s:service-token"
   },
   "ccd": {
-    // "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal",
-    "url": "https://ccd-data-store-api-pcs-api-pr-2308.preview.platform.hmcts.net",
+    "url": "http://ccd-data-store-api-aat.service.core-compute-aat.internal",
 
     "caseTypeId": "PCS"
   },
@@ -139,14 +137,6 @@
   },
   "payment": {
     "returnUrl": "https://pcs.aat.platform.hmcts.net/payment/return"
-  },
-  "cuiRa": {
-    "url": "https://cui-ra.aat.platform.hmcts.net",
-    "hmctsServiceId": "AAA3",
-    "masterFlagCode": "RA0001",
-    // "callbackUrl": "https://pcs.aat.platform.hmcts.net/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id",
-    "callbackUrl": "http://localhost:3209/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id",
-    "logoutUrl": "https://pcs.aat.platform.hmcts.net/logout"
   },
   "launchdarkly": {
     "env": "AAAAAAAA"
