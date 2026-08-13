@@ -553,10 +553,11 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async createDraftResponseLR(defendant: actionRecord): Promise<void> {
+    const defendantName = `${defendant.firstName} ${defendant.lastName}`;
     if (pinUsers.length > 1) {
       await this.representationLR({
         question: selectDefendant.whichDefendantQuestion,
-        radioOption: `${defendant.firstName} ${defendant.lastName}`,
+        radioOption: defendantName,
       });
     }
     await this.confirmDefendantDetailsLR({
