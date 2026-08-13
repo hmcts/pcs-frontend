@@ -249,6 +249,51 @@ describe('cdamService', () => {
       expect(result.contentDisposition).toBeUndefined();
     });
 
+    it('falls back to direct DM-Store binaryUrl when CDAM returns 403 Forbidden', async () => {
+      const mockStream = { pipe: jest.fn(), on: jest.fn() };
+      const cdamError = {
+        response: { status: 403 },
+        message: 'Forbidden',
+      };
+      mockGet.mockRejectedValueOnce(cdamError).mockResolvedValueOnce({
+        data: mockStream,
+        headers: {
+          'content-type': 'application/pdf',
+        },
+      });
+
+      const binaryUrl = 'http://dm-store/documents/test-123/binary';
+      const result = await getDocumentBinary(binaryUrl, userToken);
+
+      expect(mockGet).toHaveBeenNthCalledWith(
+        1,
+        `${mockCdamUrl}/cases/documents/test-123/binary`,
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: `Bearer ${userToken}` }),
+        })
+      );
+      expect(mockGet).toHaveBeenNthCalledWith(
+        2,
+        binaryUrl,
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: `Bearer ${userToken}` }),
+        })
+      );
+      expect(result.stream).toBe(mockStream);
+    });
+
+    it('rethrows original CDAM error if 403 fallback also fails', async () => {
+      const cdamError = {
+        response: { status: 403 },
+        message: 'Forbidden',
+      };
+      const fallbackError = new Error('Fallback failed');
+      mockGet.mockRejectedValueOnce(cdamError).mockRejectedValueOnce(fallbackError);
+
+      const binaryUrl = 'http://dm-store/documents/test-123/binary';
+      await expect(getDocumentBinary(binaryUrl, userToken)).rejects.toEqual(cdamError);
+    });
+
     it('rethrows fetch errors from CDAM', async () => {
       const error = new Error('boom');
       mockGet.mockRejectedValue(error);
