@@ -95,15 +95,39 @@ export async function getDocumentBinary(
     });
   } catch (error) {
     const axiosError = error as AxiosError;
-    logger.error('CDAM document binary fetch failed', {
-      requestUrl,
-      cdamPath,
-      sourceBinaryUrl: binaryUrl,
-      status: axiosError.response?.status,
-      statusText: axiosError.response?.statusText,
-      errorMessage: axiosError.message,
-    });
-    throw error;
+    if (axiosError.response?.status === 403 && binaryUrl && binaryUrl !== requestUrl) {
+      logger.warn('CDAM returned 403 Forbidden, attempting fallback to direct DM-Store binaryUrl', {
+        requestUrl,
+        binaryUrl,
+      });
+      try {
+        response = await http.get(binaryUrl, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+          responseType: 'stream',
+        });
+        logger.info('Fallback document binary fetch from DM-Store succeeded');
+      } catch (fallbackError) {
+        logger.error('CDAM document binary fetch failed and DM-Store fallback failed', {
+          requestUrl,
+          binaryUrl,
+          cdamStatus: axiosError.response?.status,
+          fallbackError: (fallbackError as AxiosError).message,
+        });
+        throw error;
+      }
+    } else {
+      logger.error('CDAM document binary fetch failed', {
+        requestUrl,
+        cdamPath,
+        sourceBinaryUrl: binaryUrl,
+        status: axiosError.response?.status,
+        statusText: axiosError.response?.statusText,
+        errorMessage: axiosError.message,
+      });
+      throw error;
+    }
   }
 
   const contentType = (response.headers?.['content-type'] as string) || 'application/octet-stream';
