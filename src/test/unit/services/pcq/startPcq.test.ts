@@ -8,6 +8,7 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import * as createSecureTokenModule from '@services/pcq/createSecureToken';
 import { startPcq } from '@services/pcq/startPcq';
+import { isPcqEnabled } from '@utils/isPcqEnabled';
 
 interface CustomSession extends Session {
   user?: {
@@ -35,6 +36,9 @@ jest.mock('@services/ccdCaseService', () => ({
   },
 }));
 jest.mock('@services/pcq/createSecureToken');
+jest.mock('@utils/isPcqEnabled', () => ({
+  isPcqEnabled: jest.fn(),
+}));
 
 describe('startPcq', () => {
   let mockReq: Partial<Request>;
@@ -77,9 +81,10 @@ describe('startPcq', () => {
 
     mockSave.mockImplementation(cb => cb());
 
+    (isPcqEnabled as jest.Mock).mockResolvedValue(true);
+
     (config.get as jest.Mock).mockImplementation((key: string) => {
       const configMap: Record<string, unknown> = {
-        'pcq.enabled': true,
         'pcq.url': 'https://pcq.test',
         'pcq.path': '/service-endpoint',
         'pcq.serviceId': 'PCS',
@@ -194,10 +199,11 @@ describe('startPcq', () => {
     expect(data.possessionClaimResponse.defendantContactDetails.party.pcqId).toEqual(expect.any(String));
   });
 
-  it('returns null if PCQ is not enabled', async () => {
-    (config.get as jest.Mock).mockImplementation(key => (key === 'pcq.enabled' ? false : ''));
+  it('returns null when the LaunchDarkly flag is off', async () => {
+    (isPcqEnabled as jest.Mock).mockResolvedValue(false);
 
     expect(await startPcq(mockReq as Request)).toBeNull();
+    expect(axios.get).not.toHaveBeenCalled();
     expect(ccdCaseService.updateDraft).not.toHaveBeenCalled();
   });
 

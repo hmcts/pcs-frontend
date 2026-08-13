@@ -9,6 +9,7 @@ import { createSecureToken } from './createSecureToken';
 
 import { getValidatedLanguage } from '@modules/i18n';
 import { Logger } from '@modules/logger';
+import { isPcqEnabled } from '@utils/isPcqEnabled';
 
 const logger = Logger.getLogger('startPcq');
 
@@ -26,8 +27,7 @@ const RETURN_STEP = 'language-used?nav=1';
  * journey rather than blocking their response.
  */
 export async function startPcq(req: Request): Promise<string | null> {
-  // TODO: Set pcq.enabled back to TRUE and remove this when we actually onboard with PCQ
-  if (!config.get<boolean>('pcq.enabled')) {
+  if (!(await isPcqEnabled(req))) {
     logger.debug('PCQ is not enabled.');
     return null;
   }
@@ -52,7 +52,7 @@ export async function startPcq(req: Request): Promise<string | null> {
   // Read from the defendant slice of the draft — the same source the rest of the journey resumes
   // from — because the id is party-scoped, not case-scoped.
   if (ccdCase.data?.possessionClaimResponse?.defendantContactDetails?.party?.pcqId) {
-    logger.debug('Party already has a PcqId');
+    logger.debug('Party already has a PcqId');p
     return null;
   }
 
