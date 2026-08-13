@@ -147,7 +147,7 @@ test.afterEach(async () => {
 
 //selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('NonRentArrears - AssuredTenancy - LR @smoke @nonRent @LR', async () => {
+  test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
