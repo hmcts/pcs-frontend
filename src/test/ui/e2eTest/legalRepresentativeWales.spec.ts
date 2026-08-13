@@ -94,7 +94,7 @@ test.afterEach(async () => {
 //Skipping these tests temporarily in @nightly as LR feature will be toggled off in all test environments until the first release HDPI-7531
 //selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @multiDefendant @PR @smoke @regression @LR', async () => {
+  test('Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @multiDefendant @PR @smoke @regression @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -253,7 +253,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Respond to a claim - Wales - Other contract - Rent Arrears @LR', async () => {
+  test('Wales - Other contract - Rent Arrears @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -353,7 +353,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - NonRent - Standard contract - CounterClaim - Defendant need help - LR @standardRNR @smoke @rent @LR', async () => {
+  test('Wales - Standard contract - RentArrears and NonRentArrears - CounterClaim - Defendant need help - @standardRNR @smoke @rent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -478,7 +478,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     // //await performAction('clickButton', 'Submit');
   });
 
-  test('NonRentArrears - Secure - LR @smoke @PR @singleDefendant @LR', async () => {
+  test('Wales - Secure contract - NonRentArrears - LR @smoke @PR @singleDefendant @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
