@@ -224,6 +224,25 @@ export const submitCaseApiData = {
           },
           id: '6b38e3e8-eae8-442f-9355-ca5e479c45e4',
         },
+        {
+          value: {
+            documentType: {
+              value: {
+                code: 'a6c5dea7-9420-446d-b973-d75d95790b7b',
+                label: 'Other document',
+              },
+              valueCode: 'a6c5dea7-9420-446d-b973-d75d95790b7b',
+              valueLabel: 'Other document',
+            },
+            description: 'Other Document',
+            document: {
+              document_url: `${process.env.DM_STORE_URL}/documents/eb94cf9d-2f5f-4f9e-9744-d734ec358652`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/eb94cf9d-2f5f-4f9e-9744-d734ec358652/binary`,
+              document_filename: 'OtherDocument.png',
+            },
+          },
+          id: '4a9c9596-8ffa-43dc-b284-558c1d70a449',
+        },
       ],
       statementOfTruth: {
         completedBy: 'CLAIMANT',
