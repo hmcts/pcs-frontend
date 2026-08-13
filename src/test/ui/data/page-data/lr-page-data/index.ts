@@ -26,7 +26,7 @@ export * from './uploadDocument.page.data.lr';
 export * from './equalityAndDiversityStart.page.data.lr';
 export * from './equalityAndDiversityEnd.page.data.lr';
 export * from './languageUsed.page.data.lr';
-export * from './rentArrearsDispute.page.data.lr';
+export * from './rentArrears.page.data.lr';
 export * from './noticeDateWhenProvided.page.data.lr';
 export * from './repaymentsAgreed.page.data.lr';
 export * from './selectDefendant.page.data.lr';
