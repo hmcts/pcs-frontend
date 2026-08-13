@@ -29,11 +29,14 @@ export function getRentStatementDocumentInfo(validatedCase?: unknown): {
   const allDocs = caseData?.allDocuments;
   const claimantDocs = caseData?.claimantDocuments;
 
+  const allDocsArray = Array.isArray(allDocs) ? allDocs : allDocs ? [allDocs] : [];
   logger.info('[rentArrearsDispute] Inspecting caseData for rent statement document', {
     hasDetailsTabRentStatement: Boolean(detailsTabRentStatement),
     hasRentArrearsStatementDocs: Boolean(rentArrearsStatementDocs),
     hasRentStatementDocs: Boolean(rentStatementDocs),
     hasAllDocs: Boolean(allDocs),
+    allDocsCount: allDocsArray.length,
+    allDocsFirstItem: allDocsArray[0] ?? null,
     hasClaimantDocs: Boolean(claimantDocs),
   });
 
