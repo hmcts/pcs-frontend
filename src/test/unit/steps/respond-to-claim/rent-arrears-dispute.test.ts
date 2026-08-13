@@ -64,7 +64,7 @@ const t = ((key: string, options?: Record<string, string>) => {
 import type { SupportedLang } from '../../../../main/modules/steps';
 import { GetController } from '../../../../main/modules/steps';
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
-import { step } from '../../../../main/steps/respond-to-claim/rent-arrears-dispute';
+import { getRentStatementDocumentInfo, step } from '../../../../main/steps/respond-to-claim/rent-arrears-dispute';
 import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
 describe('respond-to-claim rent-arrears-dispute step', () => {
@@ -301,7 +301,6 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
   });
 
   it('getRentStatementDocumentInfo resolves document from rentArrears_StatementDocuments', () => {
-    const { getRentStatementDocumentInfo } = require('../../../../main/steps/respond-to-claim/rent-arrears-dispute');
     const result = getRentStatementDocumentInfo({
       id: '123',
       data: {
@@ -320,7 +319,6 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
   });
 
   it('getRentStatementDocumentInfo extracts document UUID from document_url when item id is missing', () => {
-    const { getRentStatementDocumentInfo } = require('../../../../main/steps/respond-to-claim/rent-arrears-dispute');
     const result = getRentStatementDocumentInfo({
       id: '123',
       data: {
@@ -338,7 +336,6 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
   });
 
   it('getRentStatementDocumentInfo returns isDocumentUploaded false when no document exists', () => {
-    const { getRentStatementDocumentInfo } = require('../../../../main/steps/respond-to-claim/rent-arrears-dispute');
     const result = getRentStatementDocumentInfo(undefined);
     expect(result).toEqual({ isDocumentUploaded: false });
   });
