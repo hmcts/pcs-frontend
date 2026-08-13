@@ -76,20 +76,15 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
           return safeRedirect303(res, errorUrl, fallback, ['/case']);
         }
 
-        console.log('PAYLOAD ACTION HERE: ' + payload.action);
-        console.log('PAYLOAD Supplied FLAGS:' + JSON.stringify(payload.flagsAsSupplied));
-        console.log('PAYLOAD REPLACEMENT FLAGS:' + JSON.stringify(payload.replacementFlags));
-
         // cui-ra returns the updated flag collection in one of two fields: `replacementFlags` when
         // flags were added (the full updated set, cancellations folded in) and `flagsAsSupplied` when
         // flags were cancelled/removed (the supplied set with cancelled statuses). Both are real
         // changes to persist. NOTE: contrary to the docs, on a pure removal cui-ra sends BOTH — an
-        // EMPTY `replacementFlags` ({ details: [] }) alongside the populated `flagsAsSupplied` — so we
-        // can't use `??` (it wouldn't fall back off an empty object). Pick whichever collection
-        // actually has flags, preferring `replacementFlags`. Bail to "No request was sent" only when
-        // the microsite was abandoned (action !== 'submit') or neither collection has any flags.
+        // EMPTY `replacementFlags` ({ details: [] }) alongside the populated `flagsAsSupplied`
+        // Pick whichever collection actually has flags, preferring `replacementFlags`.
+        // "No request was sent" only when microsite was abandoned (action !== 'submit')
+        // or neither collection has any flags.
         const flags = payload.replacementFlags?.details?.length ? payload.replacementFlags : payload.flagsAsSupplied;
-        console.log('Flags Array after pulling from Vars: ' + JSON.stringify(flags));
         if (payload.action !== 'submit' || !flags?.details?.length) {
           return safeRedirect303(res, cancelledUrl, fallback, ['/case']);
         }
