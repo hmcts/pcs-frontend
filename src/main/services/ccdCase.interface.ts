@@ -223,7 +223,7 @@ export interface CcdDefendantResponses {
   contactByText?: YesNoValue;
   rentArrearsAmountConfirmation?: string;
   rentArrearsAmount?: string;
-  landlordRegistered?: YesNoNotSureValue;
+  exemptLandlord?: YesNoNotSureValue;
   landlordLicensed?: YesNoNotSureValue;
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
@@ -263,6 +263,7 @@ export interface PossessionClaimResponse {
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
+  responseDocumentId?: string;
   claimIssuedDate?: string;
 }
 
@@ -324,6 +325,9 @@ export interface CcdCaseData {
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+  detailsTab_TenancyLicenceDetails?: DetailsTab_TenancyLicenceDetails;
+  detailsTab_RentArrearsDetails?: DetailsTab_RentArrearsDetails;
+  detailsTab_OccupationContractLicenceDetails?: DetailsTab_OccupationContractLicenceDetails;
   detailsTab_NoticeDetails?: {
     noticeDocuments?: CcdCollectionItem<Document>[];
   };
@@ -468,4 +472,28 @@ export interface MakeAnApplicationResponse {
   state?: GenAppState;
   serviceRequestReference?: string;
   feeAmount?: number;
+}
+
+export interface DetailsTab_TenancyLicenceDetails {
+  typeOfTenancyLicence: string;
+  tenancyLicenceDate: string;
+  hasCopyOfTenancyLicence: string;
+  tenancyLicenceDocuments: CcdCollectionItem<CcdCaseDocument>[];
+}
+
+export interface DetailsTab_RentArrearsDetails {
+  rentAmount: string;
+  calculationFrequency: string;
+  dailyRate: string;
+  stepsToRecoverArrears: string;
+  rentStatement: CcdCollectionItem<CcdCaseDocument>[];
+  arrearsTotal: string;
+  judgmentRequested: string;
+}
+
+export interface DetailsTab_OccupationContractLicenceDetails {
+  agreementType: string;
+  agreementTypeDescription: string;
+  agreementStartDate: string;
+  documents: CcdCollectionItem<CcdCaseDocument>[];
 }

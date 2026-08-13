@@ -84,6 +84,7 @@ export class ActionRegistry {
     ['readPaymentInterstitial', new RespondToClaimAction()],
     ['repaymentsMade', new RespondToClaimAction()],
     ['selectLandlordRegistered', new RespondToClaimAction()],
+    ['exemptLandLord', new RespondToClaimAction()],
     ['selectWrittenTerms', new RespondToClaimAction()],
     ['enterTenancyStartDetailsUnKnown', new RespondToClaimAction()],
     ['triggerFunctionalTests', new TriggerPageFunctionalTestsAction()],
@@ -204,10 +205,15 @@ export class ActionRegistry {
     ['selectHowMuchAffordToPayLR', new RespondToClaimLRAction()],
     ['counterClaimOrderOtherThanSumLR', new RespondToClaimLRAction()],
     ['counterClaimHaveYouAppliedForHelpWithFeeLR', new RespondToClaimLRAction()],
+    ['uploadAdditionalDocumentsLR', new RespondToClaimLRAction()],
     ['doYouWantToUploadFilesLR', new RespondToClaimLRAction()],
     ['uploadFilesToSupportCounterclaimLR', new RespondToClaimLRAction()],
     ['submitPossessionClaimResponseLRAPI', new SubmitPossessionClaimResponseAPIAction()],
     ['midEventRespondPossessionClaimLRAPI', new RespondPossessionClaimLRMidEventAPIAction()],
+    ['confirmDefendantDetailsLR', new RespondToClaimLRAction()],
+    ['enterDateOfBirthDetailsLR', new RespondToClaimLRAction()],
+    ['selectCorrespondenceAddressLR', new RespondToClaimLRAction()],
+    ['emailConfirmationLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {
