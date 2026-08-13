@@ -66,7 +66,7 @@ export const submitCaseApiDataWales = {
     // SECURE_CONTRACT = Wales (section 8 Housing (Wales) Act 2014)
     occupationLicenceTypeWales: process.env.OCCUPATION_LICENCE_TYPE,
 
-    licenceStartDate: '2020-05-20',
+    licenceStartDate: '2026-02-10',
     licenceDocuments: [],
 
     // walesLicensed: 'NO',
@@ -204,7 +204,7 @@ export const submitCaseApiDataWales = {
     },
     addAnotherDefendant: 'NO',
     occupationLicenceTypeWales: 'STANDARD_CONTRACT',
-    licenceStartDate: '2020-05-20',
+    licenceStartDate: '2026-02-10',
     licenceDocuments: [],
     possessionGroundsWales_DiscretionaryGrounds: ['RENT_ARREARS_S157'],
     possessionGroundsWales_MandatoryGrounds: ['FAILURE_TO_GIVE_UP_POSSESSION_S170'],
@@ -639,7 +639,7 @@ export const submitCaseApiDataWales = {
       },
     ],
     occupationLicenceTypeWales: 'SECURE_CONTRACT',
-    licenceStartDate: '2020-05-20',
+    licenceStartDate: '2026-02-10',
     licenceDocuments: [],
     secureGroundsWales_DiscretionaryGrounds: ['RENT_ARREARS_S157', 'ANTISOCIAL_BEHAVIOUR_S157'],
     secureGroundsWales_MandatoryGrounds: [],
@@ -768,7 +768,7 @@ export const submitCaseApiDataWales = {
       },
     ],
     occupationLicenceTypeWales: 'STANDARD_CONTRACT',
-    licenceStartDate: '2020-05-20',
+    licenceStartDate: '2026-02-10',
     licenceDocuments: [],
     preActionProtocolCompleted: 'YES',
     possessionGroundsWales_DiscretionaryGrounds: ['RENT_ARREARS_S157'],
