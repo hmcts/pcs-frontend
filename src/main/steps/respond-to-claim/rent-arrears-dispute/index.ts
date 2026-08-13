@@ -3,7 +3,6 @@ import type { Request } from 'express';
 import { Logger } from '../../../modules/logger';
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { getTranslation, getTranslationFunction } from '../../../modules/steps';
-import { extractCaseDocuments } from '../../../utils/documentUtils';
 import { fromYesNoNotSureEnum, penceToPounds, poundsToPence, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
@@ -28,15 +27,17 @@ export function getRentStatementDocumentInfo(validatedCase?: unknown): {
   const rentArrearsStatementDocs = caseData?.rentArrears_StatementDocuments;
   const rentStatementDocs = caseData?.rentStatement;
   const allDocs = caseData?.allDocuments;
+  const claimantDocs = caseData?.claimantDocuments;
 
   logger.info('[rentArrearsDispute] Inspecting caseData for rent statement document', {
     hasDetailsTabRentStatement: Boolean(detailsTabRentStatement),
     hasRentArrearsStatementDocs: Boolean(rentArrearsStatementDocs),
     hasRentStatementDocs: Boolean(rentStatementDocs),
     hasAllDocs: Boolean(allDocs),
+    hasClaimantDocs: Boolean(claimantDocs),
   });
 
-  const collections = [detailsTabRentStatement, rentArrearsStatementDocs, rentStatementDocs, allDocs];
+  const collections = [detailsTabRentStatement, rentArrearsStatementDocs, rentStatementDocs, allDocs, claimantDocs];
 
   for (const collection of collections) {
     const items = Array.isArray(collection) ? collection : collection ? [collection] : [];
@@ -59,48 +60,14 @@ export function getRentStatementDocumentInfo(validatedCase?: unknown): {
       const id = (rec.id as string) || (val.id as string) || (docObj.id as string) || urlId;
 
       if (id) {
-        if (collection === allDocs) {
-          const typeLabel =
-            ((val.documentType as Record<string, unknown>)?.value as Record<string, unknown>)?.label ||
-            (val.documentType as string) ||
-            '';
-          const filename = (docObj.document_filename || val.document_filename || '') as string;
-          const isRentDoc =
-            String(typeLabel).toLowerCase().includes('rent') ||
-            String(filename).toLowerCase().includes('rent') ||
-            String(filename).toLowerCase().includes('statement') ||
-            items.length === 1;
-
-          if (!isRentDoc) {
-            continue;
-          }
-        }
-
         logger.info('[rentArrearsDispute] Found uploaded rent statement document ID', {
           documentId: id,
           urlId,
+          sourceCollection:
+            collection === detailsTabRentStatement ? 'detailsTab' : collection === allDocs ? 'allDocs' : 'other',
         });
         return { isDocumentUploaded: true, documentId: id };
       }
-    }
-  }
-
-  // Fallback: check extractCaseDocuments utility
-  const caseDocs = extractCaseDocuments(caseData as Record<string, unknown>);
-  if (caseDocs.length > 0) {
-    const rentDoc =
-      caseDocs.find(
-        d =>
-          d.sourceField === 'detailsTab_RentArrearsDetails.rentStatement' ||
-          d.filename.toLowerCase().includes('rent') ||
-          d.filename.toLowerCase().includes('statement')
-      ) ?? caseDocs[0];
-
-    if (rentDoc?.id) {
-      logger.info('[rentArrearsDispute] Found rent statement document ID via extractCaseDocuments', {
-        documentId: rentDoc.id,
-      });
-      return { isDocumentUploaded: true, documentId: rentDoc.id };
     }
   }
 
