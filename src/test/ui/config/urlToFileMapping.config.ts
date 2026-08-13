@@ -87,4 +87,5 @@ export default {
   'select-defendant': 'selectDefendant',
   'correspondence-address': 'correspondenceAddress',
   'counter-claim-order-other-than-sum': 'counterClaimOrderOtherThanSum',
+  'email-confirmation': 'emailConfirmation',
 };
