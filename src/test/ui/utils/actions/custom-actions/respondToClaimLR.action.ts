@@ -17,8 +17,8 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
-  endOfJourneyCYA,
   emailConfirmation,
+  endOfJourneyCYA,
   exceptionalHardship,
   haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
@@ -50,6 +50,8 @@ import { IAction, actionData, actionRecord } from '../../interfaces';
 import { RespondToClaimAction } from './respondToClaim.action';
 
 const rtcNoAnswerProvidedValue = 'No answer provided';
+const rtcUploadedDocumentsQuestion = 'Uploaded files';
+const rtcNoDocumentsUploadedValue = 'No files uploaded';
 
 export class RespondToClaimLRAction extends RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
@@ -870,13 +872,12 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async uploadAdditionalDocumentsLR(data: actionRecord): Promise<void> {
     if (data?.files) {
-      // const uploadedFiles = Array.isArray(data.files) ? data.files.join(', ') : String(data.files);
-      // this.recordAnswer(`Uploaded files`, uploadedFiles);
+      const uploadedFiles = Array.isArray(data.files) ? data.files.join(', ') : String(data.files);
+      this.recordAnswer(rtcUploadedDocumentsQuestion, uploadedFiles);
       await performAction('uploadFile', data.files);
+    } else {
+      this.recordAnswer(rtcUploadedDocumentsQuestion, rtcNoDocumentsUploadedValue);
     }
-    // else {
-    //   this.recordAnswer(`Uploaded files`, `No files uploaded`);
-    // }
     await performAction('clickButton', uploadAdditionalDocuments.saveAndContinueButton);
   }
 

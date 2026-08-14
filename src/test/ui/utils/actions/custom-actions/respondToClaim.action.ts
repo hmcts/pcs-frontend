@@ -233,7 +233,7 @@ export class RespondToClaimAction implements IAction {
       ['taskListStatus', () => this.taskListStatus(fieldName as actionRecord)],
       ['resetRTCAnswerStore', () => this.resetRTCAnswerStore()],
       ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page, fieldName as actionData)],
-      ['validateCYARTC', () => this.validateCYARTC()],
+      ['validateCYARTC', () => this.validateCYARTC(fieldName as actionData)],
       ['changeAnswerOnFinalCYA', () => this.changeAnswerOnFinalCYA(page, fieldName as actionData)],
       ['selectStatementOfTruthRTC', () => this.selectStatementOfTruthRTC(fieldName as actionRecord)],
       ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)],
@@ -334,6 +334,10 @@ export class RespondToClaimAction implements IAction {
       .replace(/:/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
+  }
+
+  private escapeRegExp(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   private areRtcCyaValuesEquivalent(expectedValue: string, actualValue: string): boolean {
@@ -1510,7 +1514,13 @@ export class RespondToClaimAction implements IAction {
     const rowsLocator = page.locator('.govuk-summary-list__row:visible');
     await rowsLocator.first().waitFor({ state: 'visible', timeout: 15000 });
     if (FieldsStore.getAll().has(rtcUploadedDocumentsQuestion)) {
-      const uploadedFilesLabel = sectionData ? rtcUploadedDocumentsQuestion : rtcFinalCyaUploadedDocumentsQuestion;
+      const uploadedFilesLabel = sectionData
+        ? rtcUploadedDocumentsQuestion
+        : new RegExp(
+            `^(${[rtcFinalCyaUploadedDocumentsQuestion, rtcUploadedDocumentsQuestion]
+              .map(label => this.escapeRegExp(label))
+              .join('|')})$`
+          );
       await page
         .locator('.govuk-summary-list__row:visible')
         .filter({ has: page.locator('.govuk-summary-list__key', { hasText: uploadedFilesLabel }) })
@@ -1540,7 +1550,8 @@ export class RespondToClaimAction implements IAction {
       const row = rows.nth(j);
       const displayedKeyText = (await row.locator('.govuk-summary-list__key').first().innerText()).trim();
       const keyText =
-        isFinalCya && displayedKeyText === rtcFinalCyaUploadedDocumentsQuestion
+        isFinalCya &&
+        (displayedKeyText === rtcFinalCyaUploadedDocumentsQuestion || displayedKeyText === rtcUploadedDocumentsQuestion)
           ? rtcUploadedDocumentsQuestion
           : displayedKeyText;
       const valueCell = row.locator('.govuk-summary-list__value').first();
@@ -1554,7 +1565,8 @@ export class RespondToClaimAction implements IAction {
     }
   }
 
-  private async validateCYARTC(): Promise<void> {
+  private async validateCYARTC(isLR?: actionData): Promise<void> {
+    const isLRJourney = isLR === true;
     const mismatches: string[] = [];
 
     for (const [expectedKey, expectedValue] of Array.from(FieldsStore.getAll().entries())) {
@@ -1568,8 +1580,10 @@ export class RespondToClaimAction implements IAction {
         continue;
       }
 
+      const expectedLabel =
+        isLRJourney && expectedKey === rtcUploadedDocumentsQuestion ? 'Uploaded files' : expectedKey;
       mismatches.push(
-        `key: "${expectedKey}" -> Expected value containing "${expectedValue}" but the CYA row key was not found`
+        `key: "${expectedLabel}" -> Expected value containing "${expectedValue}" but the CYA row key was not found`
       );
     }
 
