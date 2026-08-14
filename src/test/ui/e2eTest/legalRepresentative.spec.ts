@@ -18,6 +18,7 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   endOfJourneyCYA,
+  emailConfirmation,
   equalityAndDiversityEndLR,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -152,6 +153,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.yesRadioOption,
+      emailAddress: emailConfirmation.emailAddressTextInput,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
@@ -295,6 +300,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
+    });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
@@ -433,6 +441,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
@@ -578,6 +589,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
+    });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
@@ -718,6 +732,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
@@ -865,6 +882,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
+    });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
@@ -953,6 +973,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
@@ -1068,6 +1091,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
+    });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
@@ -1133,6 +1159,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseDefendantAddressKnown.tenancy_TypeOfTenancyLicence,

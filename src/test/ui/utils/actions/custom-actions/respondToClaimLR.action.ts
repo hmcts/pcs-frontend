@@ -18,6 +18,7 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   endOfJourneyCYA,
+  emailConfirmation,
   exceptionalHardship,
   haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
@@ -103,6 +104,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['enterDateOfBirthDetailsLR', () => this.enterDateOfBirthDetailsLR(fieldName as actionRecord)],
       ['languageUsedLR', () => this.languageUsedLR(fieldName as actionRecord)],
       ['selectStatementOfTruthRTCLR', () => this.selectStatementOfTruthRTCLR(fieldName as actionRecord)],
+      ['emailConfirmationLR', () => this.emailConfirmationLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -149,6 +151,21 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       }
     }
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  }
+
+  private async emailConfirmationLR(emailData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: emailConfirmation.doYouKnowDefendantEmailQuestion,
+      option: emailData.radioOption,
+    });
+    if (emailData.radioOption === 'Yes') {
+      await performAction(
+        'inputText',
+        emailConfirmation.enterDefendantEmailAddressHiddenTextLabel,
+        emailConfirmation.emailAddressTextInput
+      );
+    }
+    await performAction('clickButton', emailConfirmation.saveAndContinueButton);
   }
 
   private async enterNoticeDateKnownLR(noticeData: actionRecord): Promise<void> {

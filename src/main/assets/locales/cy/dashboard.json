@@ -100,7 +100,8 @@
       "statementsOfCase": "Datganiadau am yr achos",
       "propertyDocuments": "Dogfennau eiddo",
       "evidence": "Tystiolaeth",
-      "correspondence": "Gohebiaeth"
+      "correspondence": "Gohebiaeth",
+      "uncategorisedDocuments": "cyUncategorised"
     }
   }
 }

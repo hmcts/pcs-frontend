@@ -215,6 +215,7 @@ export class ActionRegistry {
     ['selectCorrespondenceAddressLR', new RespondToClaimLRAction()],
     ['languageUsedLR', new RespondToClaimLRAction()],
     ['selectStatementOfTruthRTCLR', new RespondToClaimLRAction()],
+    ['emailConfirmationLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {
