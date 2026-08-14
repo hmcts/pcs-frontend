@@ -11,6 +11,6 @@ export const counterclaimYouNeedToApplyForHelpWithYourFeesLR = {
   ifDefendantReceiveAnyBenefit: ` If the defendant receives any benefit that qualifies them for Help with Fees, you must include evidence of it when you apply online for help with their fees.`,
   ifYouHaveParagraph: `If you have their Help with Fees reference number you can`,
   helpWithFeesLink: `enter it here`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `counter-claim-you-need-to-apply-for-help-with-your-fees`,
 };
