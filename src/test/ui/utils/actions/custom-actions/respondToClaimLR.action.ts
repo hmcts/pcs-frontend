@@ -919,7 +919,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       universalCreditDateData?.year
     ) {
       this.recordRtcCyaDateFromParts(
-        `When did they apply for universal credit?`,
+        `When did the defendant apply?`,
         universalCreditDateData.day,
         universalCreditDateData.month,
         universalCreditDateData.year
