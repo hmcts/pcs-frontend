@@ -1,0 +1,137 @@
+{
+  "pageTitle": "Check your answers",
+  "cardTitle": "Response",
+  "options": {
+    "yes": "Yes",
+    "no": "No",
+    "imNotSure": "I’m not sure"
+  },
+  "rows": {
+    "landlordRegistered": {
+      "label": "Is the landlord registered?",
+      "changeHidden": "landlord registered"
+    },
+    "landlordLicensed": {
+      "label": "Is the landlord licensed?",
+      "changeHidden": "landlord licensed"
+    },
+    "writtenTerms": {
+      "label": "Has the landlord sent the defendant written terms of the occupation contract?",
+      "changeHidden": "written terms"
+    },
+    "tenancyTypeCorrect": {
+      "label": "Is the tenancy, occupation contract or licence agreement type correct?",
+      "changeHidden": "tenancy type"
+    },
+    "tenancyTypeDetails": {
+      "label": "Give the correct tenancy, occupation contract or licence type",
+      "changeHidden": "corrected tenancy type"
+    },
+    "tenancyStartDate": {
+      "changeHidden": "tenancy start date",
+      "confirm": {
+        "label": "Is the tenancy, licence or occupation contract start date correct?",
+        "changeHidden": "tenancy start date"
+      },
+      "correctDate": {
+        "label": "What is the correct start date?",
+        "changeHidden": "corrected tenancy start date"
+      },
+      "labelEntered": "What is the tenancy, occupation contract or licence start date?"
+    },
+    "possessionNoticeReceived": {
+      "label": "Did {{claimantName}} give the defendant notice of their intention to begin possession proceedings?",
+      "changeHidden": "notice received"
+    },
+    "noticeReceivedDate": {
+      "label": "When did the defendant receive notice from {{claimantName}}?",
+      "changeHidden": "notice received date"
+    },
+    "rentArrearsAmountConfirmation": {
+      "label": "Does the defendant owe this amount in rent arrears?",
+      "changeHidden": "rent arrears amount"
+    },
+    "rentArrearsAmountDetails": {
+      "label": "How much does the defendant believe they owe in rent arrears?",
+      "changeHidden": "rent arrears amount details"
+    },
+    "disputeClaim": {
+      "label": "Does the defendant dispute any other parts of the claim?",
+      "changeHidden": "dispute other parts of the claim"
+    },
+    "disputeClaimDetails": {
+      "label": "Explain which parts of the claim the defendant disputes",
+      "changeHidden": "dispute details"
+    },
+    "makeCounterClaim": {
+      "label": "Is the defendant planning to make a counterclaim against {{claimantName}}?",
+      "changeHidden": "make a counterclaim"
+    },
+    "counterClaimType": {
+      "label": "What is the defendant claiming for?",
+      "changeHidden": "counterclaim type",
+      "options": {
+        "PAYMENT_OR_COMPENSATION": "A sum of money or compensation",
+        "SOMETHING_ELSE": "Something else",
+        "BOTH": "Both"
+      }
+    },
+    "isClaimAmountKnown": {
+      "label": "Is the defendant claiming for a specific sum of money?",
+      "changeHidden": "claim amount known"
+    },
+    "claimAmount": {
+      "label": "How much is the defendant claiming?",
+      "changeHidden": "claim amount"
+    },
+    "estimatedMaxClaimAmount": {
+      "label": "What’s the maximum value of their claim?",
+      "changeHidden": "estimated maximum claim amount"
+    },
+    "counterClaimNeedHelpWithFees": {
+      "label": "Does the defendant need help paying the counterclaim fee?",
+      "changeHidden": "help paying the counterclaim fee",
+      "options": {
+        "YES": "The defendant needs help paying the fee",
+        "NO": "The defendant does not need help paying the fee"
+      }
+    },
+    "counterClaimAppliedForHwf": {
+      "label": "Has the defendant already applied for help with their counterclaim fee?",
+      "changeHidden": "applied for help with fees"
+    },
+    "counterClaimHwfReference": {
+      "label": "Enter the defendant’s Help with Fees reference number",
+      "changeHidden": "Help with Fees reference number"
+    },
+    "counterClaimFor": {
+      "label": "What is the defendant’s counterclaim for?",
+      "changeHidden": "counterclaim subject"
+    },
+    "counterClaimReasons": {
+      "label": "What are their reasons for making the counterclaim?",
+      "changeHidden": "counterclaim reasons"
+    },
+    "counterClaimAgainst": {
+      "label": "Who is the defendant making a counterclaim against?",
+      "changeHidden": "counterclaim against"
+    },
+    "otherOrderRequestDetails": {
+      "label": "What orders are they asking for the court to make?",
+      "changeHidden": "orders requested"
+    },
+    "otherOrderRequestFacts": {
+      "label": "What facts would they like the court to consider when deciding the claim?",
+      "changeHidden": "facts for the court"
+    },
+    "counterClaimWantToUploadFiles": {
+      "label": "Do you want to upload files to support the counterclaim?",
+      "changeHidden": "upload files for counterclaim"
+    },
+    "counterClaimDocuments": {
+      "label": "Uploaded files",
+      "changeHidden": "uploaded files for counterclaim",
+      "none": "No files uploaded"
+    }
+  }
+}

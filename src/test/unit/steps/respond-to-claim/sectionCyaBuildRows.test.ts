@@ -112,25 +112,35 @@ describe('section-CYA row builders — characterisation', () => {
       );
     });
 
-    it('contact-by-email: preference row stands alone; email lives in the Contact details row', () => {
+    it('email-confirmation: renders email confirmation question and detail row for legal representative user', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
           possessionClaimResponse: {
             defendantResponses: { contactByEmail: 'YES' },
-            defendantContactDetails: { party: { emailAddress: 'alice@example.com' } },
+            defendantContactDetails: { party: { emailAddress: 'aa@gmail.com' } },
           },
         },
       });
-      const rows = buildPersonalRows(reqWith(validatedCase), t);
-      const questionRow = rows.find(r => r.key.text === 'rows.contactByEmailOrPost.label');
-      const contactDetailsRow = rows.find(r => r.key.text === 'rows.contactDetails.label');
-      expect(questionRow?.classes).toBeUndefined();
-      expect(contactDetailsRow?.value.html).toContain('<p class="govuk-body">alice@example.com</p>');
-      // Email present: Change link targets the email-or-post step.
-      expect(contactDetailsRow?.actions?.items[0].href).toContain(
-        '/contact-preferences-email-or-post?edit=personalDetails'
-      );
+      const req = reqWith(validatedCase);
+      req.session = {
+        user: {
+          roles: ['caseworker-pcs-solicitor'],
+        },
+      } as unknown as Request['session'];
+
+      const rows = buildPersonalRows(req, t);
+      const questionRow = rows.find(r => r.key.text === 'rows.emailConfirmation.label');
+      const detailRow = rows.find(r => r.key.text === 'rows.emailAddress.label');
+
+      expect(questionRow).toBeDefined();
+      expect(questionRow?.value.text).toBe('options.yes');
+      expect(detailRow).toBeDefined();
+      expect(detailRow?.value.html).toBe('aa@gmail.com');
+
+      expect(rows.find(r => r.key.text === 'rows.contactByEmailOrPost.label')).toBeUndefined();
+      expect(rows.find(r => r.key.text === 'rows.contactByPhone.label')).toBeUndefined();
+      expect(rows.find(r => r.key.text === 'rows.contactByText.label')).toBeUndefined();
     });
 
     it('contact details row: stacks phone and email as separate paragraphs when both are selected', () => {
@@ -353,10 +363,15 @@ describe('section-CYA row builders — characterisation', () => {
     });
 
     it('renders tenancy-type and counterclaim rows from defendant responses', () => {
-      const rows = buildDisputeRows(reqWith(model({ tenancyTypeConfirmation: 'YES', makeCounterClaim: 'NO' })), t);
+      const mockT = jest.fn((key: string, _options?: Record<string, unknown>) => key) as unknown as TFunction;
+      const rows = buildDisputeRows(
+        reqWith(model({ tenancyTypeConfirmation: 'YES', makeCounterClaim: 'NO' }, { claimantName: 'Acme Housing' })),
+        mockT
+      );
       const keys = rows.map(r => r.key.text);
       expect(keys).toContain('rows.tenancyTypeCorrect.label');
       expect(keys).toContain('rows.makeCounterClaim.label');
+      expect(mockT).toHaveBeenCalledWith('rows.makeCounterClaim.label', { claimantName: 'Acme Housing' });
     });
 
     it('tenancy-date row: "known" branch renders the confirmation row plus a grouped corrected-date row when answered No', () => {
