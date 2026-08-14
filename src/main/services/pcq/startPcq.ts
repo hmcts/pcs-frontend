@@ -68,7 +68,6 @@ export async function startPcq(req: Request): Promise<string | null> {
     return null;
   }
 
-
   // Not URL-encoded here: the query string is built with URLSearchParams below, which encodes it.
   // Encoding first would double-encode, and PCQ would store the mangled value (the token is
   // computed over these same params, so integrity still checks out and the fault stays silent).
