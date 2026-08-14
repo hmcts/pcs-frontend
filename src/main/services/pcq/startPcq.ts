@@ -121,7 +121,7 @@ export async function startPcq(req: Request): Promise<string | null> {
   // '+' characters; PCQ's query parser reverses that, so nothing may be pre-encoded here.
   const qs = new URLSearchParams({ ...params, ...secureToken }).toString();
   const redirectUrl = `${pcqUrl}${pcqPath}?${qs}`;
-  logger.info(`Redirecting to PCQ`);
+  logger.info('Redirecting to PCQ');
 
   return redirectUrl;
 }
