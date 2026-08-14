@@ -94,5 +94,5 @@ export * from './equalityAndDiversityLanguage.page.data';
 export * from './equalityAndDiversityHowYouThink.page.data';
 export * from './equalityAndDiversityHealthCondiotion.page.data';
 export * from './equalityAndDiversityEthinicGroup.page.data';
-export * from './equalityAndDiversityDOB.page.data';   
-export * from './equalityAndDiversityAbilityToCarryOutActivity.page.data';      
+export * from './equalityAndDiversityDOB.page.data';
+export * from './equalityAndDiversityAbilityToCarryOutActivity.page.data';

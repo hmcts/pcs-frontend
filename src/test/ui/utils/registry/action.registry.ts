@@ -166,7 +166,7 @@ export class ActionRegistry {
     ['counterClaimAbout', new RespondToClaimAction()],
     ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],
     ['selectReasonableAdjustments', new RespondToClaimAction()],
-    ['selectEqualityAndDiversity', new RespondToClaimAction()], 
+    ['selectEqualityAndDiversity', new RespondToClaimAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
     ['payForApplication', new GenAppsAction()],
     ['inputPaymentDetails', new GenAppsAction()],
@@ -215,7 +215,7 @@ export class ActionRegistry {
     ['confirmDefendantDetailsLR', new RespondToClaimLRAction()],
     ['enterDateOfBirthDetailsLR', new RespondToClaimLRAction()],
     ['selectCorrespondenceAddressLR', new RespondToClaimLRAction()],
-    ['emailConfirmationLR', new RespondToClaimLRAction()], 
+    ['emailConfirmationLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {

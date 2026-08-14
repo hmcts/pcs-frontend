@@ -508,8 +508,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
-        await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-        await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
 
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {

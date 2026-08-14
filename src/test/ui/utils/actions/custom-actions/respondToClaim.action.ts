@@ -241,8 +241,8 @@ export class RespondToClaimAction implements IAction {
       ['selectClaimAgainstWhom', () => this.selectClaimAgainstWhom(fieldName as actionRecord)],
       ['counterClaimAbout', () => this.counterClaimAbout(fieldName as actionRecord)],
       ['counterClaimOrderOtherThanSum', () => this.counterClaimOrderOtherThanSum(fieldName as actionRecord)],
-      ['selectReasonableAdjustments', () => this.selectReasonableAdjustments(fieldName as actionRecord, page)], 
-      ['selectEqualityAndDiversity', () => this.selectEqualityAndDiversity(fieldName as actionRecord)], 
+      ['selectReasonableAdjustments', () => this.selectReasonableAdjustments(fieldName as actionRecord, page)],
+      ['selectEqualityAndDiversity', () => this.selectEqualityAndDiversity(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {

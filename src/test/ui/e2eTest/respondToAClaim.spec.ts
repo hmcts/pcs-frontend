@@ -2432,7 +2432,7 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
       question: equalityAndDiversityDOB.mainHeader,
       radioOption: equalityAndDiversityDOB.preferNotToSayRadioButton,
       button: equalityAndDiversityDOB.continueButton,
-    }); 
+    });
     await performValidation('mainHeader', equalityAndDiversityLanguage.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityLanguage.mainHeader,
@@ -2464,11 +2464,11 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
       button: equalityAndDiversityMarriedOrCivilPartnership.ContinueButton,
     });
     await performValidation('mainHeader', equalityAndDiversityEthinicGroup.mainHeader);
-     await performAction('selectEqualityAndDiversity', {
+    await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityEthinicGroup.mainHeader,
       radioOption: equalityAndDiversityEthinicGroup.preferNotToSayRadioOption,
       button: equalityAndDiversityEthinicGroup.ContinueButton,
-    }); 
+    });
     await performValidation('mainHeader', equalityAndDiversityReligion.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityReligion.mainHeader,
@@ -2492,7 +2492,7 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
       question: equalityAndDiversityPregnancy.mainHeader,
       radioOption: equalityAndDiversityPregnancy.noRadioOption,
       button: equalityAndDiversityPregnancy.ContinueButton,
-    }); 
+    });
     await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
     await performAction('clickButton', equalityAndDiversityEnd.continueButton);
     await performAction('languageUsed', {
@@ -2684,7 +2684,7 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
       question: equalityAndDiversityDOB.mainHeader,
       radioOption: equalityAndDiversityDOB.preferNotToSayRadioButton,
       button: equalityAndDiversityDOB.continueButton,
-    }); 
+    });
     await performValidation('mainHeader', equalityAndDiversityLanguage.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityLanguage.mainHeader,
