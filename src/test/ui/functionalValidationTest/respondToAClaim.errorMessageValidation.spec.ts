@@ -23,6 +23,7 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
+  equalityAndDiversityStart,
   exceptionalHardship,
   exemptLandLord,
   freeLegalAdvice,
@@ -507,6 +508,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+        await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+        await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
 
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
@@ -746,6 +749,8 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
 
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
