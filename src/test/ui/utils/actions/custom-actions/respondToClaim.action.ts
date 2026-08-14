@@ -336,10 +336,6 @@ export class RespondToClaimAction implements IAction {
       .trim();
   }
 
-  private escapeRegExp(value: string): string {
-    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
   private areRtcCyaValuesEquivalent(expectedValue: string, actualValue: string): boolean {
     if (actualValue.includes(expectedValue)) {
       return true;
@@ -1509,25 +1505,23 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async retrieveCYATableDataRTC(page: Page, sectionData?: actionData): Promise<void> {
-    const cyaViewName = sectionData ? String(sectionData) : 'final CYA';
+    const sectionName = typeof sectionData === 'string' ? sectionData : undefined;
+    const isSectionCya = Boolean(sectionName);
+    const isLRJourney = sectionData === true;
+    const cyaViewName = sectionName ?? (isLRJourney ? 'LR final CYA' : 'final CYA');
     rtcCyaMap.clear();
     const rowsLocator = page.locator('.govuk-summary-list__row:visible');
     await rowsLocator.first().waitFor({ state: 'visible', timeout: 15000 });
     if (FieldsStore.getAll().has(rtcUploadedDocumentsQuestion)) {
-      const uploadedFilesLabel = sectionData
-        ? rtcUploadedDocumentsQuestion
-        : new RegExp(
-            `^(${[rtcFinalCyaUploadedDocumentsQuestion, rtcUploadedDocumentsQuestion]
-              .map(label => this.escapeRegExp(label))
-              .join('|')})$`
-          );
+      const uploadedFilesLabel =
+        isSectionCya || isLRJourney ? rtcUploadedDocumentsQuestion : rtcFinalCyaUploadedDocumentsQuestion;
       await page
         .locator('.govuk-summary-list__row:visible')
         .filter({ has: page.locator('.govuk-summary-list__key', { hasText: uploadedFilesLabel }) })
         .first()
         .waitFor({ state: 'visible', timeout: 15000 });
     }
-    const summaryLists = sectionData
+    const summaryLists = isSectionCya
       ? rowsLocator.first().locator('xpath=ancestor::*[contains(@class, "govuk-summary-list")][1]')
       : page.locator('.govuk-summary-list:visible');
     const summaryListCount = await summaryLists.count();
@@ -1537,7 +1531,7 @@ export class RespondToClaimAction implements IAction {
     }
 
     for (let i = 0; i < summaryListCount; i++) {
-      await this.recordRtcCyaRowsFromSummaryList(summaryLists.nth(i), !sectionData);
+      await this.recordRtcCyaRowsFromSummaryList(summaryLists.nth(i), !isSectionCya);
     }
     console.log(`Retrieved RTC CYA rows for ${cyaViewName}`);
   }

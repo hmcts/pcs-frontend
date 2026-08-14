@@ -17,8 +17,8 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
-  endOfJourneyCYA,
   emailConfirmation,
+  endOfJourneyCYA,
   equalityAndDiversityEndLR,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -54,6 +54,7 @@ import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
+const isLR = true;
 let claimantName: string;
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -137,7 +138,6 @@ test.afterEach(async () => {
 //selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
   test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent @LR', async () => {
-    const isLR = true;
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -273,7 +273,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
+    await performAction('retrieveCYATableDataRTC', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -415,8 +415,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
       firstName: endOfJourneyCYA.fullNameTextInput,
@@ -561,8 +561,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
       firstName: endOfJourneyCYA.fullNameTextInput,
@@ -708,8 +708,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
       firstName: endOfJourneyCYA.fullNameTextInput,
@@ -857,8 +857,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
       firstName: endOfJourneyCYA.fullNameTextInput,
@@ -949,8 +949,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
       firstName: endOfJourneyCYA.fullNameTextInput,
@@ -1066,8 +1066,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
       firstName: endOfJourneyCYA.fullNameTextInput,
