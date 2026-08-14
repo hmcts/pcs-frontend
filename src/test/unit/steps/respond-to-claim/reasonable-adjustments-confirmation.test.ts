@@ -24,7 +24,10 @@ describe('reasonable-adjustments-confirmation step', () => {
   });
 
   it('hands the citizen to PCQ on "Save and continue"', async () => {
-    const req = { body: { action: 'continue' }, res: { locals: { validatedCase: { id: '123' } } } } as unknown as Request;
+    const req = {
+      body: { action: 'continue' },
+      res: { locals: { validatedCase: { id: '123' } } },
+    } as unknown as Request;
 
     await testedStep.beforeRedirect(req);
 
