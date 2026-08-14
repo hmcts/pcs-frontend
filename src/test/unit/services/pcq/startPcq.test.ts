@@ -214,6 +214,16 @@ describe('startPcq', () => {
     expect(await startPcq(mockReq as Request)).toBeNull();
   });
 
+  it('reserves no PcqId when the session cannot be saved', async () => {
+    mockSave.mockImplementation(cb => cb(new Error('redis unavailable')));
+
+    await expect(startPcq(mockReq as Request)).rejects.toThrow('redis unavailable');
+
+    // An id committed to the draft but never handed to PCQ would make the guard skip PCQ on every
+    // future visit — the citizen would silently never be asked again.
+    expect(ccdCaseService.updateDraft).not.toHaveBeenCalled();
+  });
+
   it('returns null when the PCQ health check times out', async () => {
     const timeout = Object.assign(new Error('timeout of 3000ms exceeded'), { code: 'ECONNABORTED' });
     (axios.get as jest.Mock).mockRejectedValue(timeout);

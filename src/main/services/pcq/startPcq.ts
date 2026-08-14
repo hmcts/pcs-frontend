@@ -88,8 +88,24 @@ export async function startPcq(req: Request): Promise<string | null> {
 
   const secureToken = createSecureToken(params, tokenKey);
 
+  // The step controller writes this page's form data to the session immediately before calling us,
+  // so flush it explicitly rather than letting the implicit end-of-response save race the citizen's
+  // return leg from PCQ.
+  //
+  // Deliberately ahead of the draft write: this rejects on failure
+  await new Promise<void>((resolve, reject) => {
+    req.session.save(err => {
+      if (err) {
+        logger.error('Failed to save session:', err);
+        return reject(err);
+      }
+      return resolve();
+    });
+  });
+
   // Reserve the PcqId against the defendant's slice before handing off — PCQ correlates the
   // citizen's answers back to us by this id, so it has to be persisted before they can answer.
+  // Last thing before we hand back the URL, so nothing that can fail runs after the commit.
   //
   // Go through buildDraftDefendantResponse/saveDraftDefendantResponse, the same choke point every
   // journey page uses. The backend draft-save fully REPLACES the defendant slice, so posting the
@@ -103,19 +119,6 @@ export async function startPcq(req: Request): Promise<string | null> {
     logger.error('Failed to persist the PCQ ID to the draft:', err);
     return null;
   }
-
-  // The step controller writes this page's form data to the session immediately before calling us,
-  // so flush it explicitly rather than letting the implicit end-of-response save race the citizen's
-  // return leg from PCQ.
-  await new Promise<void>((resolve, reject) => {
-    req.session.save(err => {
-      if (err) {
-        logger.error('Failed to save session:', err);
-        return reject(err);
-      }
-      return resolve();
-    });
-  });
 
   // `secureToken` contributes token/authTag/iv/salt. URLSearchParams escapes the base64 padding and
   // '+' characters; PCQ's query parser reverses that, so nothing may be pre-encoded here.
