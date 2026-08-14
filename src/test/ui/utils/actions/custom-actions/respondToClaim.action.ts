@@ -369,7 +369,14 @@ export class RespondToClaimAction implements IAction {
 
   protected recordAnswer(key: string, value: actionData): void {
     const normalizedValue = normalizeValueData(value);
-    FieldsStore.set(key, normalizedValue);
+    const existingValue = FieldsStore.get(key);
+    const valueToStore =
+      key === rtcUploadedDocumentsQuestion &&
+      existingValue &&
+      !this.areRtcCyaValuesEquivalent(normalizedValue, existingValue)
+        ? `${existingValue}, ${normalizedValue}`
+        : normalizedValue;
+    FieldsStore.set(key, valueToStore);
     if (!activeRtcSection) {
       return;
     }
@@ -1554,7 +1561,12 @@ export class RespondToClaimAction implements IAction {
       const valueText = (innerText || textContent).replace(/\r?\n+/g, ', ').replace(/\s{2,}/g, ' ');
 
       if (keyText) {
-        rtcCyaMap.set(keyText, valueText);
+        const existingValue = rtcCyaMap.get(keyText);
+        const valueToStore =
+          existingValue && !this.areRtcCyaValuesEquivalent(valueText, existingValue)
+            ? `${existingValue}, ${valueText}`
+            : valueText;
+        rtcCyaMap.set(keyText, valueToStore);
       }
     }
   }

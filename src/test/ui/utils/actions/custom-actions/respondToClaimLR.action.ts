@@ -808,7 +808,10 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async uploadFilesToSupportCounterclaimLR(uploadCounterClaimFiles: actionRecord): Promise<void> {
-    this.recordAnswer(uploadFilesToSupportYourCounterclaim.mainHeader, uploadCounterClaimFiles.option);
+    const uploadedFiles = Array.isArray(uploadCounterClaimFiles.files)
+      ? uploadCounterClaimFiles.files.join(', ')
+      : String(uploadCounterClaimFiles.files);
+    this.recordAnswer(rtcUploadedDocumentsQuestion, uploadedFiles);
     await performAction('uploadFile', uploadCounterClaimFiles.files);
     await performAction('clickButton', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   }
