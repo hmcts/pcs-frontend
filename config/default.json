@@ -85,11 +85,8 @@
     }
   },
   "pcq": {
-    "enabled": false,
-    "name": "Equality and Diversity Service",
     "url": "https://pcq.aat.platform.hmcts.net",
     "path": "/service-endpoint",
-    "port": 4000,
     "serviceId": "PCS",
     "actor": "APPLICANT"
   },
