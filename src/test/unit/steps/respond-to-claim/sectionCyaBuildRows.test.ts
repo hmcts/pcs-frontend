@@ -793,6 +793,20 @@ describe('section-CYA row builders — characterisation', () => {
       );
       expect(rows.some(r => r.key.text === 'rows.alternativeAccommodationDate.label')).toBe(false);
     });
+
+    it('alternative accommodation NOT_SURE: renders options.imNotSure for citizen and options.notSure for legal representative', () => {
+      const citizenCase = model({ householdCircumstances: { alternativeAccommodation: 'NOT_SURE' } });
+      const citizenReq = reqWith(citizenCase);
+      const citizenRows = buildSituationRows(citizenReq, t);
+      const citizenRow = citizenRows.find(r => r.key.text === 'rows.alternativeAccommodation.label');
+      expect(citizenRow?.value.text).toBe('options.imNotSure');
+
+      const lrReq = reqWith(citizenCase);
+      lrReq.session = { user: { roles: ['caseworker-pcs-solicitor'] } } as unknown as Request['session'];
+      const lrRows = buildSituationRows(lrReq, t);
+      const lrRow = lrRows.find(r => r.key.text === 'rows.alternativeAccommodation.label');
+      expect(lrRow?.value.text).toBe('options.notSure');
+    });
   });
 
   describe('income-and-expenditure', () => {
