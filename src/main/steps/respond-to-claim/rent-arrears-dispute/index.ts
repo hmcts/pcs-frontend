@@ -10,6 +10,7 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { findCaseDocumentById } from '@utils/documentUtils';
 
 // Validation constants
 const MAX_RENT_ARREARS_AMOUNT = 1_000_000_000; // £1 billion maximum
@@ -65,13 +66,24 @@ export function getRentStatementDocumentInfo(validatedCase?: unknown): {
       const id = (rec.id as string) || (val.id as string) || (docObj.id as string) || urlId;
 
       if (id) {
+        // Only link IDs that /view-documents/:documentId can resolve (needs binaryUrl),
+        // otherwise the new tab 404s.
+        const downloadable = findCaseDocumentById(caseData, id);
+        if (!downloadable?.binaryUrl) {
+          logger.info('[rentArrearsDispute] Skipping document ID not resolvable for download', {
+            documentId: id,
+            urlId,
+          });
+          continue;
+        }
+
         logger.info('[rentArrearsDispute] Found uploaded rent statement document ID', {
-          documentId: id,
+          documentId: downloadable.id,
           urlId,
           sourceCollection:
             collection === detailsTabRentStatement ? 'detailsTab' : collection === allDocs ? 'allDocs' : 'other',
         });
-        return { isDocumentUploaded: true, documentId: id };
+        return { isDocumentUploaded: true, documentId: downloadable.id };
       }
     }
   }
