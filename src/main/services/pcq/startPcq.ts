@@ -58,7 +58,7 @@ export async function startPcq(req: Request): Promise<string | null> {
 
   try {
     logger.info(`Checking Pcq health url: ${healthUrl}`);
-    const health = await axios.get(healthUrl);
+    const health = await axios.get(healthUrl, { timeout: config.get<number>('pcq.healthTimeoutMs') });
     if (health.data.status !== 'UP') {
       logger.warn('PCQ service is not available, skipping');
       return null;
@@ -121,7 +121,7 @@ export async function startPcq(req: Request): Promise<string | null> {
   // '+' characters; PCQ's query parser reverses that, so nothing may be pre-encoded here.
   const qs = new URLSearchParams({ ...params, ...secureToken }).toString();
   const redirectUrl = `${pcqUrl}${pcqPath}?${qs}`;
-  logger.info(`Redirect to PCQ URL : ${redirectUrl}`);
+  logger.info(`Redirecting to PCQ`);
 
   return redirectUrl;
 }

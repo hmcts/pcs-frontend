@@ -89,6 +89,7 @@ describe('startPcq', () => {
         'pcq.path': '/service-endpoint',
         'pcq.serviceId': 'PCS',
         'pcq.actor': 'RESPONDENT',
+        'pcq.healthTimeoutMs': 3000,
         'secrets.pcs.pcs-pcq-token-key': 'dummy-token-key',
       };
       return configMap[key];
@@ -112,7 +113,7 @@ describe('startPcq', () => {
   it('returns the PCQ URL when all conditions are met', async () => {
     const url = await startPcq(mockReq as Request);
 
-    expect(axios.get).toHaveBeenCalledWith('https://pcq.test/health');
+    expect(axios.get).toHaveBeenCalledWith('https://pcq.test/health', { timeout: 3000 });
     expect(createSecureTokenModule.createSecureToken).toHaveBeenCalled();
     expect(ccdCaseService.updateDraft).toHaveBeenCalled();
     expect(url).toContain('https://pcq.test/service-endpoint?');
@@ -211,6 +212,15 @@ describe('startPcq', () => {
     mockRes.locals!.validatedCase = undefined;
 
     expect(await startPcq(mockReq as Request)).toBeNull();
+  });
+
+  it('returns null when the PCQ health check times out', async () => {
+    const timeout = Object.assign(new Error('timeout of 3000ms exceeded'), { code: 'ECONNABORTED' });
+    (axios.get as jest.Mock).mockRejectedValue(timeout);
+
+    // The citizen carries on to language-used rather than waiting on an unresponsive PCQ.
+    expect(await startPcq(mockReq as Request)).toBeNull();
+    expect(ccdCaseService.updateDraft).not.toHaveBeenCalled();
   });
 
   it('returns null if the PCQ health check fails', async () => {

@@ -88,7 +88,8 @@
     "url": "https://pcq.aat.platform.hmcts.net",
     "path": "/service-endpoint",
     "serviceId": "PCS",
-    "actor": "RESPONDENT"
+    "actor": "RESPONDENT",
+    "healthTimeoutMs": 3000
   },
   "secrets": {
     "pcs": {
