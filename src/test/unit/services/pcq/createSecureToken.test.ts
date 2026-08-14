@@ -5,7 +5,7 @@ import { createSecureToken } from '@services/pcq/createSecureToken';
 
 const sampleParams: PcqParameters = {
   serviceId: 'PCS',
-  actor: 'APPLICANT',
+  actor: 'RESPONDENT',
   pcqId: 'abc-123',
   partyId: 'user@email.com',
   returnUrl: 'http://localhost:3000/case/123456789/respond-to-claim/language-used?nav=1',

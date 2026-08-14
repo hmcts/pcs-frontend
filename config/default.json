@@ -88,7 +88,7 @@
     "url": "https://pcq.aat.platform.hmcts.net",
     "path": "/service-endpoint",
     "serviceId": "PCS",
-    "actor": "APPLICANT"
+    "actor": "RESPONDENT"
   },
   "secrets": {
     "pcs": {

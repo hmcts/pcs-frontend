@@ -88,7 +88,7 @@ describe('startPcq', () => {
         'pcq.url': 'https://pcq.test',
         'pcq.path': '/service-endpoint',
         'pcq.serviceId': 'PCS',
-        'pcq.actor': 'APPLICANT',
+        'pcq.actor': 'RESPONDENT',
         'secrets.pcs.pcs-pcq-token-key': 'dummy-token-key',
       };
       return configMap[key];
