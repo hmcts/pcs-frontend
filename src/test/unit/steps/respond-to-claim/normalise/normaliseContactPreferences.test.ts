@@ -55,47 +55,9 @@ describe('normaliseContactPreferences', () => {
     expect(response.defendantResponses).toEqual({ contactByPhone: 'NO' });
   });
 
-  it('clears a stored textMessageNumber when contactByText is not YES', () => {
-    const response: PossessionClaimResponse = {
-      defendantResponses: {
-        contactByPhone: 'YES',
-        contactByText: 'NO',
-      },
-      defendantContactDetails: { party: { textMessageNumber: '07700900982' } },
-    };
-
-    normaliseContactPreferences(response);
-
-    expect(response.defendantContactDetails?.party?.textMessageNumber).toBeUndefined();
-  });
-
-  it('clears a stored textMessageNumber when telephone is changed to NO', () => {
-    const response: PossessionClaimResponse = {
-      defendantResponses: {
-        contactByPhone: 'NO',
-        contactByText: 'YES',
-      },
-      defendantContactDetails: { party: { textMessageNumber: '07700900982' } },
-    };
-
-    normaliseContactPreferences(response);
-
-    expect(response.defendantContactDetails?.party?.textMessageNumber).toBeUndefined();
-  });
-
-  it('keeps a stored textMessageNumber when still opted in to text', () => {
-    const response: PossessionClaimResponse = {
-      defendantResponses: {
-        contactByPhone: 'YES',
-        contactByText: 'YES',
-      },
-      defendantContactDetails: { party: { textMessageNumber: '07700900982' } },
-    };
-
-    normaliseContactPreferences(response);
-
-    expect(response.defendantContactDetails?.party?.textMessageNumber).toBe('07700900982');
-  });
+  // Clearing of the stale party.textMessageNumber is owned by the BE
+  // (ClaimResponseService.saveContactPreferences). Normalisers must not touch
+  // defendantContactDetails.* — see normaliserContract.test.ts.
 
   it('is a no-op on empty response', () => {
     const response = {} as PossessionClaimResponse;
