@@ -3,6 +3,10 @@
   "bulletPointLabel": "Manylion yr hysbysiad a roddwyd gan {{claimantName}}:",
   "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}} roi'r dyddiad pan wnaethant roi'r hysbysiad i'r diffynnydd (y dyddiad cyflwyno).",
   "listItem1": "Gwnaethant gyflwyno hysbysiad i'r diffynnydd yn ceisio meddiant ar {{noticeDate}}",
+  "release12": {
+    "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}} roi'r dyddiad pan wnaethant roi'r hysbysiad i'r diffynnydd (y dyddiad cyflwyno).",
+    "listItem1": "Gwnaethant gyflwyno hysbysiad i'r diffynnydd yn ceisio meddiant ar {{noticeDate}}"
+  },
   "question": "Pryd wnaeth y diffynnydd gael yr hysbysiad gan {{claimantName}} (dewisol)?",
   "noticeDateHint": "Er enghraifft, 27 9 2022",
   "errors": {
