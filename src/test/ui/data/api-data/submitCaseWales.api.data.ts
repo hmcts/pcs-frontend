@@ -89,10 +89,10 @@ export const submitCaseApiDataWales = {
       {
         value: {
           document_url:
-            'http://dm-store-aat.service.core-compute-aat.internal/documents/69a31b98-9de1-49ae-a79c-97d8c521d0f5',
+            `${process.env.DM_STORE_URL}/documents/69a31b98-9de1-49ae-a79c-97d8c521d0f5`,
           document_filename: 'rentArrears.png',
           document_binary_url:
-            'http://dm-store-aat.service.core-compute-aat.internal/documents/69a31b98-9de1-49ae-a79c-97d8c521d0f5/binary',
+            `${process.env.DM_STORE_URL}/documents/69a31b98-9de1-49ae-a79c-97d8c521d0f5/binary`,
         },
         id: 'be255526-1c87-46be-8107-7643ec2a9112',
       },
@@ -521,9 +521,9 @@ export const submitCaseApiDataWales = {
       {
         value: {
           document_url:
-            'http://dm-store-aat.service.core-compute-aat.internal/documents/43841fd8-c041-4135-944e-221abbed7e02',
+            `${process.env.DM_STORE_URL}/documents/43841fd8-c041-4135-944e-221abbed7e02`,
           document_binary_url:
-            'http://dm-store-aat.service.core-compute-aat.internal/documents/43841fd8-c041-4135-944e-221abbed7e02/binary',
+            `${process.env.DM_STORE_URL}/documents/43841fd8-c041-4135-944e-221abbed7e02/binary`,
           document_filename: 'Screenshot 2026-08-12 at 15.42.08.png',
         },
       },
@@ -664,9 +664,9 @@ export const submitCaseApiDataWales = {
       {
         value: {
           document_url:
-            'http://dm-store-aat.service.core-compute-aat.internal/documents/0ef459aa-898e-445c-ad0e-76e0452d0fd7',
+            `${process.env.DM_STORE_URL}/documents/0ef459aa-898e-445c-ad0e-76e0452d0fd7`,
           document_binary_url:
-            'http://dm-store-aat.service.core-compute-aat.internal/documents/0ef459aa-898e-445c-ad0e-76e0452d0fd7/binary',
+            `${process.env.DM_STORE_URL}/documents/0ef459aa-898e-445c-ad0e-76e0452d0fd7/binary`,
           document_filename: 'Screenshot 2026-08-06 at 15.45.49.png',
         },
       },
@@ -787,9 +787,9 @@ export const submitCaseApiDataWales = {
       {
         value: {
           document_url:
-            'http://dm-store-aat.service.core-compute-aat.internal/documents/6a4d6aad-5ef2-44f3-84aa-b3d9087f0522',
+            `${process.env.DM_STORE_URL}/documents/6a4d6aad-5ef2-44f3-84aa-b3d9087f0522`,
           document_binary_url:
-            'http://dm-store-aat.service.core-compute-aat.internal/documents/6a4d6aad-5ef2-44f3-84aa-b3d9087f0522/binary',
+            `${process.env.DM_STORE_URL}/documents/6a4d6aad-5ef2-44f3-84aa-b3d9087f0522/binary`,
           document_filename: 'Screenshot 2026-08-13 at 11.35.20.png',
         },
       },
