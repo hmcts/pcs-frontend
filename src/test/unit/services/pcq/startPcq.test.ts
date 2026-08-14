@@ -16,6 +16,7 @@ interface CustomSession extends Session {
     accessToken: string;
     idToken: string;
     refreshToken: string;
+    uid?: string;
     email?: string;
   };
   ccdCase?: CcdCase;
@@ -75,6 +76,8 @@ describe('startPcq', () => {
           accessToken: 'test-token',
           idToken: 'dummy-id-token',
           refreshToken: 'dummy-refresh-token',
+          uid: 'idam-uid-123',
+          email: 'user@email.com',
         },
       } as unknown as CustomSession,
     };
@@ -149,24 +152,44 @@ describe('startPcq', () => {
     // access guard bounces the inbound redirect to a mid-section step.
     expect(createSecureTokenModule.createSecureToken).toHaveBeenCalledWith(
       expect.objectContaining({
-        returnUrl: 'http://localhost:3000/case/123456789/respond-to-claim/language-used?nav=1',
+        returnUrl: 'localhost:3000/case/123456789/respond-to-claim/language-used?nav=1',
       }),
       'dummy-token-key'
     );
   });
 
-  it('encodes partyId exactly once in the redirect query', async () => {
-    (mockReq.session as unknown as CustomSession).user!.email = 'user@email.com';
+  it('sends the IdAM id as partyId, not the email address', async () => {
+    const url = await startPcq(mockReq as Request);
+
+    // The spec lists the IdAM id first among acceptable values; it is always present, and it keeps
+    // a personal identifier out of a URL that PCQ logs in full on arrival.
+    expect(url).toContain('partyId=idam-uid-123');
+    expect(url).not.toContain('user%40email.com');
+    expect(createSecureTokenModule.createSecureToken).toHaveBeenCalledWith(
+      expect.objectContaining({ partyId: 'idam-uid-123' }),
+      'dummy-token-key'
+    );
+  });
+
+  it('falls back to the subject claim when no uid is present', async () => {
+    delete (mockReq.session as unknown as CustomSession).user!.uid;
 
     const url = await startPcq(mockReq as Request);
 
-    expect(url).toContain('partyId=user%40email.com');
-    expect(url).not.toContain('%2540');
+    expect(url).toContain('partyId=user-123');
+  });
 
-    // The token is computed over the raw value, so PCQ's decrypted params match what it decodes
-    // off the query string.
+  it('encodes partyId exactly once in the redirect query', async () => {
+    (mockReq.session as unknown as CustomSession).user!.uid = 'a+b/c=';
+
+    const url = await startPcq(mockReq as Request);
+
+    // Encoded by URLSearchParams only — pre-encoding would double-encode, and PCQ would store the
+    // mangled value while token verification still passed, leaving the fault silent.
+    expect(url).toContain('partyId=a%2Bb%2Fc%3D');
+    expect(url).not.toContain('%252B');
     expect(createSecureTokenModule.createSecureToken).toHaveBeenCalledWith(
-      expect.objectContaining({ partyId: 'user@email.com' }),
+      expect.objectContaining({ partyId: 'a+b/c=' }),
       'dummy-token-key'
     );
   });
@@ -212,6 +235,16 @@ describe('startPcq', () => {
     mockRes.locals!.validatedCase = undefined;
 
     expect(await startPcq(mockReq as Request)).toBeNull();
+  });
+
+  it('skips PCQ when no party id is available rather than sending one it will reject', async () => {
+    // `email` is not in our OIDC scope, so it is not guaranteed to be on the session. PCQ requires a
+    // non-empty partyId and would bounce the citizen to its /offline page — a dead end mid-journey.
+    delete (mockReq.session as unknown as CustomSession).user!.uid;
+    (mockReq.session as unknown as CustomSession).user!.sub = '';
+
+    expect(await startPcq(mockReq as Request)).toBeNull();
+    expect(ccdCaseService.updateDraft).not.toHaveBeenCalled();
   });
 
   it('reserves no PcqId when the session cannot be saved', async () => {

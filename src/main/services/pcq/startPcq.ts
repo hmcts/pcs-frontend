@@ -68,13 +68,23 @@ export async function startPcq(req: Request): Promise<string | null> {
     return null;
   }
 
-  const pcqId = uuid();
 
   // Not URL-encoded here: the query string is built with URLSearchParams below, which encodes it.
   // Encoding first would double-encode, and PCQ would store the mangled value (the token is
   // computed over these same params, so integrity still checks out and the fault stays silent).
-  const partyId = user.email || ''; //TODO: Might want to change partyId to IDAM ID instead.
-  const returnUrl = `${req.protocol}://${req.get('host')}/case/${ccdCase.id}/respond-to-claim/${RETURN_STEP}`;
+  const partyId = String(user.uid ?? user.sub ?? '');
+
+  // PCQ requires a non-empty partyId and rejects a blank one onto its /offline page, stranding the
+  // citizen mid-journey with no route back. Skip instead, like every other failure path here.
+  if (!partyId) {
+    logger.warn('No party id available for PCQ, skipping');
+    return null;
+  }
+
+  const pcqId = uuid();
+
+  // Deliberately scheme-less: the spec requires the return URL without 'https://'
+  const returnUrl = `${req.get('host')}/case/${ccdCase.id}/respond-to-claim/${RETURN_STEP}`;
 
   const params = {
     serviceId,
