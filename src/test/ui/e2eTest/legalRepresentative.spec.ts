@@ -1,5 +1,11 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  checkYourAnswersRTC,
+  responseAndCounterClaimSubmitted,
+  responseSubmitted,
+  responseSubmittedCounterclaimFeePaymentNeeded,
+} from '../data/page-data';
+import {
   confirmationOfNoticeGiven,
   correspondenceAddress,
   counterClaim,
@@ -17,6 +23,7 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  emailConfirmation,
   equalityAndDiversityEndLR,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -152,6 +159,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.yesRadioOption,
+      emailAddress: emailConfirmation.emailAddressTextInput,
+    });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
@@ -265,7 +276,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('NonRentArrears - AssuredTenancy - Something else - LR @smoke @regression @nonRent @LR', async () => {
@@ -285,6 +303,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
@@ -396,7 +417,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @smoke @regression @nonRent @LR', async () => {
@@ -416,6 +444,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
@@ -531,7 +562,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - NonRentArrears - AssuredTenancy - LR @smoke @PR @regression @rentNonRent @LR', async () => {
@@ -552,6 +587,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
@@ -667,7 +705,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @smoke @PR @regression @rentNonRent @LR', async () => {
@@ -685,6 +730,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
@@ -805,7 +853,14 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('RentArrears - DemotedTenancy - LR @smoke @regression @rent @LR', async () => {
@@ -823,6 +878,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
@@ -887,7 +945,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction('clickButton', responseSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @smoke @regression @rent @LR', async () => {
@@ -905,6 +967,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
@@ -993,7 +1058,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    //await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @smoke @regression @rent @LR', async () => {
@@ -1011,6 +1080,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
@@ -1076,6 +1148,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
     });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCaseDefendantAddressKnown.tenancy_TypeOfTenancyLicence,

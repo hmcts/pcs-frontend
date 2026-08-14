@@ -22,12 +22,14 @@ export const viewDocuments = {
   propertyDocumentsSubHeader: `Property documents`,
   evidenceSubHeader: `Evidence`,
   correspondenceSubHeader: `Correspondence`,
+  uncategorisedSubHeader: `Uncategorised`,
 
   claimFormLink: `Claim - Claimant 1.pdf`,
   noticeServiceJurisdictionLink: `NoticeServiceJurisdiction - Claimant 1.docx`,
   rentStatementLink: `RentStatement - Claimant 1.pdf`,
   witnessStatementLink: `WitnessStatement - Claimant 1.png`,
   certificateOfSuitabilityLink: `CertificateOfSuitability - Claimant 1.xlsx`,
+  otherDocumentLink: `OtherDocument - Claimant 1.png`,
 
   pageSlug: `view-documents`,
 };
