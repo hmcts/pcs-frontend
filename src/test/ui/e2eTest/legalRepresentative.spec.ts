@@ -1082,7 +1082,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFeesLR.mainHeader);
   });
 
-  test('Submitted defendant should not be visible on the representation screen  @nonRent', async () => {
+  test('Submitted defendant should not be visible on the representation screen  @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
