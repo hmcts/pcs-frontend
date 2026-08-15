@@ -144,7 +144,7 @@ test.afterEach(async () => {
 
 //selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent @LR', async () => {
+  test('NonRentArrears - AssuredTenancy - LR @smoke @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -416,7 +416,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @smoke @regression @nonRent @LR', async () => {
+  test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @smoke @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -834,7 +834,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  test('RentArrears - DemotedTenancy - LR @smoke @regression @rent @LR', async () => {
+  test('RentArrears - DemotedTenancy - LR @smoke @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -919,7 +919,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @smoke @regression @rent @LR', async () => {
+  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @smoke @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -1028,7 +1028,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     //await performAction('clickButton', 'Submit');
   });
 
-  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @smoke @regression @rent @LR', async () => {
+  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @smoke @rent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -1098,7 +1098,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - Defendant address known - No - LR @smoke @regression @defendantAddressKnown @LR', async () => {
+  test('RentArrears - Defendant address known - No - LR @smoke @defendantAddressKnown @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
