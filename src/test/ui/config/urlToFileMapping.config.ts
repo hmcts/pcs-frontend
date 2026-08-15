@@ -87,4 +87,5 @@ export default {
   'select-defendant': 'selectDefendant',
   'counter-claim-order-other-than-sum': 'counterClaimOrderOtherThanSum',
   'email-confirmation': 'emailConfirmation',
+  'exempt-landlord': 'exemptLandlord',
 };

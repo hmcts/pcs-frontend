@@ -1024,7 +1024,7 @@ export const submitCaseApiData = {
       },
       addAnotherDefendant: 'NO',
       tenancy_TypeOfTenancyLicence: 'ASSURED_TENANCY',
-      tenancy_TenancyLicenceDate: '2020-05-20',
+      tenancy_TenancyLicenceDate: '2026-02-10',
       tenancy_HasCopyOfTenancyLicence: 'NO',
       tenancy_ReasonsForNoTenancyLicenceDocuments: 'test',
       claimDueToRentArrears: 'Yes',
