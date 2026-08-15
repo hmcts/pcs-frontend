@@ -39,7 +39,7 @@ import {
   tenancyDateUnknown,
   tenancyTypeDetails,
   uploadAdditionalDocuments,
-  uploadFilesToSupportYourCounterclaimLR,
+  uploadFilesToSupportYourCounterclaim,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
@@ -781,7 +781,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async uploadFilesToSupportCounterclaimLR(uploadCounterClaimFiles: actionRecord): Promise<void> {
     await performAction('uploadFile', uploadCounterClaimFiles.files);
-    await performAction('clickButton', uploadFilesToSupportYourCounterclaimLR.saveAndContinueButton);
+    await performAction('clickButton', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   }
 
   private async installmentPaymentsLR(installmentData: actionRecord): Promise<void> {

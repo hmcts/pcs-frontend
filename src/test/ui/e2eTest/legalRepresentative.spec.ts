@@ -11,7 +11,7 @@ import {
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   counterclaimDoYouWantToUploadFiles,
-  counterclaimYouNeedToApplyForHelpWithYourFeesLR,
+  counterclaimYouNeedToApplyForHelpWithYourFees,
   defendantDateOfBirth,
   defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHome,
@@ -1079,7 +1079,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
-    await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFeesLR.mainHeader);
+    await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
   });
 
   test('Submitted defendant should not be visible on the representation screen  @nonRent @LR', async () => {
@@ -1144,7 +1144,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
-    await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFeesLR.mainHeader);
+    await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
   });
 
   test('RentArrears - Verify dynamic link @LR', async () => {
