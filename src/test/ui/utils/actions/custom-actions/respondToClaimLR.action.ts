@@ -611,6 +611,15 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       elementType: 'subHeader',
       text: `Amount the defendant owes in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
     });
+    if (rentArrearsInfo?.showRentDocumentLink) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: rentArrears.rentDocumentDynamicLink,
+      });
+      await performValidation('validatePdfDocument', {
+        linkText: rentArrears.rentDocumentDynamicLink,
+      });
+    }
     const rentArrearsAmount = formatCurrency(rentArrearsInfo.rentArrearsTotal as string);
     await performValidation('text', {
       elementType: 'paragraph',
