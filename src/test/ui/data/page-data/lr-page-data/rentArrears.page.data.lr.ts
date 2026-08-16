@@ -8,7 +8,8 @@ export const rentArrears = {
   billionTextInput: `1000000001.00`,
   doesDefendantOweThisQuestion: `Does the defendant owe this amount in rent arrears?`,
   howMuchDoesDefendantBelieveHiddenTextLabel: `How much does the defendant believe they owe in rent arrears?`,
-  rentArrearsAreMoneyParagraph: `Rent arrears are money you owe in rent payments.`,
+  //Commented due to bug - HDPI-8244
+  //rentArrearsAreMoneyParagraph: `Rent arrears are money you owe in rent payments.`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   defendantNotSureRadioOption: `Defendant is not sure`,
@@ -22,4 +23,5 @@ export const rentArrears = {
   lessThanBillionErrorMessage: `The amount the defendant believes they owe in rent arrears must be less than £1 billion`,
   enterAmountInCorrectFormatErrorMessage: `Enter how much the defendant believes they owe in rent arrears, in the correct format (e.g. if the defendant owes £148, please write £148.00)`,
   pageSlug: `rent-arrears-dispute`,
+  rentDocumentDynamicLink: 'View a copy of the rent statement (opens in new tab)',
 };
