@@ -1,4 +1,4 @@
-export const counterclaimYouNeedToApplyForHelpWithYourFeesLR = {
+export const counterclaimYouNeedToApplyForHelpWithYourFees = {
   mainHeader: `The defendant needs to apply for help with their counterclaim fee`,
   backLink: `Back`,
   saveForLaterButton: `Save for later`,
