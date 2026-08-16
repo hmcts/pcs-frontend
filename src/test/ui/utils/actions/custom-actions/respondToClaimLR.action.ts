@@ -1,5 +1,7 @@
 import { Page } from '@playwright/test';
 
+import { submitCaseApiData } from '../../../data/api-data';
+import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
 import {
   confirmationOfNoticeGiven,
   correspondenceAddress,
@@ -20,6 +22,7 @@ import {
   emailConfirmation,
   endOfJourneyCYA,
   exceptionalHardship,
+  exemptLandlord,
   haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
   incomeAndExpenses,
@@ -35,15 +38,18 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   selectDefendant,
+  tenancyDateDetails,
   tenancyDateUnknown,
+  tenancyTypeDetails,
   uploadAdditionalDocuments,
   uploadFilesToSupportYourCounterclaim,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
+  writtenTerms,
   yourCircumstances,
 } from '../../../data/page-data/lr-page-data';
-import { formatCurrency, formatPoundsValue } from '../../common/string.utils';
+import { formatCurrency, formatPoundsValue, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -107,6 +113,10 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['languageUsedLR', () => this.languageUsedLR(fieldName as actionRecord)],
       ['selectStatementOfTruthRTCLR', () => this.selectStatementOfTruthRTCLR(fieldName as actionRecord)],
       ['emailConfirmationLR', () => this.emailConfirmationLR(fieldName as actionRecord)],
+      ['exemptLandlordLR', () => this.exemptLandlordLR(fieldName as actionRecord)],
+      ['selectWrittenTermsLR', () => this.selectWrittenTermsLR(fieldName as actionRecord)],
+      ['selectTenancyStartDateKnownLR', () => this.selectTenancyStartDateKnownLR(fieldName as actionRecord)],
+      ['tenancyOrContractTypeDetailsLR', () => this.tenancyOrContractTypeDetailsLR(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -125,6 +135,120 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       option: noticeGivenData.option,
     });
     await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
+  }
+
+  private async exemptLandlordLR(exemptOption: actionRecord): Promise<void> {
+    //this.recordAnswer(exemptLandLord.isYourLandlordAnExemptSubHeader, exemptLandLordAnswer);
+    await performAction('clickRadioButton', {
+      question: exemptLandlord.isYourLandlordAnExemptSubHeader,
+      option: exemptOption,
+    });
+    await performAction('clickButton', exemptLandlord.saveAndContinueButton);
+  }
+
+  private async selectWrittenTermsLR(writtenTermsData: actionRecord): Promise<void> {
+    // this.recordAnswer(String(writtenTermsData.question), writtenTermsData.radioOption);
+    await performAction('clickRadioButton', {
+      question: writtenTermsData.question,
+      option: writtenTermsData.radioOption,
+    });
+    await performAction('clickButton', writtenTerms.saveAndContinueButton);
+  }
+
+  private async tenancyOrContractTypeDetailsLR(tenancyTypeDetailsInfo: actionRecord) {
+    const tenancyType = formatTextToLowercaseSeparatedBySpace(tenancyTypeDetailsInfo.tenancyType as string);
+    const article = /^[aeiou]/i.test(tenancyType) ? 'an' : 'a';
+    if (process.env.WALES_POSTCODE === 'YES') {
+      if (tenancyType === 'secure contract') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under a secure occupation contract`,
+        });
+      } else if (tenancyType === 'standard contract') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under a standard occupation contract`,
+        });
+      } else if (tenancyType === 'other') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiDataWales.submitCaseRentOtherTenancy.otherLicenceTypeDetails}`,
+        });
+      }
+    } else {
+      if (
+        tenancyType === 'assured tenancy' ||
+        tenancyType === 'introductory tenancy' ||
+        tenancyType === 'secure tenancy' ||
+        tenancyType === 'flexible tenancy' ||
+        tenancyType === 'demoted tenancy'
+      ) {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The property is let under ${article} ${tenancyType} agreement`,
+        });
+      } else if (tenancyType === 'other') {
+        await performValidation('text', {
+          elementType: 'listItem',
+          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+        });
+      }
+    }
+    if (tenancyTypeDetailsInfo?.showTenancyDocumentLink) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: tenancyTypeDetails.tenancyDocumentDynamicLink,
+      });
+      await performValidation('validatePdfDocument', {
+        linkText: tenancyTypeDetails.tenancyDocumentDynamicLink,
+      });
+    }
+    //this.recordAnswer(tenancyTypeDetails.isTenancyTypeCorrectQuestion, tenancyTypeDetailsInfo.tenancyOption);
+    await performAction('clickRadioButton', {
+      question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
+      option: tenancyTypeDetailsInfo.tenancyOption,
+    });
+    if (tenancyTypeDetailsInfo.tenancyOption === 'No' && tenancyTypeDetailsInfo.tenancyTypeInfo) {
+      //this.recordAnswer(
+      //   tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
+      //   tenancyTypeDetailsInfo.tenancyTypeInfo
+      // );
+      await performAction(
+        'inputText',
+        tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
+        tenancyTypeDetailsInfo.tenancyTypeInfo
+      );
+    } else {
+      //this.deleteAnswer(tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel);
+    }
+    await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  }
+
+  private async selectTenancyStartDateKnownLR(tenancyStartDateData: actionRecord): Promise<void> {
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: tenancyDateDetails.getDetailsGivenByParagraph(),
+    });
+    //this.recordAnswer(tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion, tenancyStartDateData.option);
+    await performAction('clickRadioButton', {
+      question: tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion,
+      option: tenancyStartDateData.option,
+    });
+    if (tenancyStartDateData?.day && tenancyStartDateData?.month && tenancyStartDateData?.year) {
+      // this.recordRtcCyaDateFromParts(
+      //   this.getRtcCyaQuestionLabel(tenancyDateDetails.whatIsTheCorrectStartDateHiddenQuestion),
+      //   tenancyStartDateData.day,
+      //   tenancyStartDateData.month,
+      //   tenancyStartDateData.year
+      // );
+      await performActions(
+        'Enter Date',
+        ['inputText', tenancyDateDetails.dayHiddenTextLabel, tenancyStartDateData.day],
+        ['inputText', tenancyDateDetails.monthHiddenTextLabel, tenancyStartDateData.month],
+        ['inputText', tenancyDateDetails.yearHiddenTextLabel, tenancyStartDateData.year]
+      );
+    }
+    await performAction('clickButton', tenancyDateDetails.saveAndContinueButton);
   }
 
   private async selectCorrespondenceAddressLR(addressData: actionRecord) {
@@ -627,6 +751,15 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       elementType: 'subHeader',
       text: `Amount the defendant owes in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
     });
+    if (rentArrearsInfo?.showRentDocumentLink) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: rentArrears.rentDocumentDynamicLink,
+      });
+      await performValidation('validatePdfDocument', {
+        linkText: rentArrears.rentDocumentDynamicLink,
+      });
+    }
     const rentArrearsAmount = formatCurrency(rentArrearsInfo.rentArrearsTotal as string);
     await performValidation('text', {
       elementType: 'paragraph',

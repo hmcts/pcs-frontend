@@ -216,6 +216,10 @@ export class ActionRegistry {
     ['languageUsedLR', new RespondToClaimLRAction()],
     ['selectStatementOfTruthRTCLR', new RespondToClaimLRAction()],
     ['emailConfirmationLR', new RespondToClaimLRAction()],
+    ['exemptLandlordLR', new RespondToClaimLRAction()],
+    ['selectTenancyStartDateKnownLR', new RespondToClaimLRAction()],
+    ['tenancyOrContractTypeDetailsLR', new RespondToClaimLRAction()],
+    ['selectWrittenTermsLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {
