@@ -138,7 +138,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async exemptLandlordLR(exemptOption: actionRecord): Promise<void> {
-    //this.recordAnswer(exemptLandLord.isYourLandlordAnExemptSubHeader, exemptLandLordAnswer);
+    this.recordAnswer(exemptLandlord.isYourLandlordAnExemptSubHeader, exemptOption);
     await performAction('clickRadioButton', {
       question: exemptLandlord.isYourLandlordAnExemptSubHeader,
       option: exemptOption,
@@ -147,7 +147,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async selectWrittenTermsLR(writtenTermsData: actionRecord): Promise<void> {
-    // this.recordAnswer(String(writtenTermsData.question), writtenTermsData.radioOption);
+    this.recordAnswer(String(writtenTermsData.question), writtenTermsData.radioOption);
     await performAction('clickRadioButton', {
       question: writtenTermsData.question,
       option: writtenTermsData.radioOption,
