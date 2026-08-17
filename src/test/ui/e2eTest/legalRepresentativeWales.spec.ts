@@ -417,6 +417,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -545,6 +546,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
