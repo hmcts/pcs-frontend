@@ -140,10 +140,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
 
 function isPage(actionResult: unknown): actionResult is Page {
   return (
-    typeof actionResult === 'object' &&
-    actionResult !== null &&
-    'locator' in actionResult &&
-    'url' in actionResult
+    typeof actionResult === 'object' && actionResult !== null && 'locator' in actionResult && 'url' in actionResult
   );
 }
 

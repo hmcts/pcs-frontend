@@ -112,9 +112,7 @@ export class ClickLinkAction implements IAction {
 
   private async clickLinkAndSwitchToNewTab(page: Page, fieldName: string): Promise<Page> {
     const linkText = await this.getVisibleLinkText(page, fieldName);
-    const link = page
-      .locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`)
-      .first();
+    const link = page.locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`).first();
     const [newPage] = await Promise.all([page.waitForEvent('popup'), link.click()]);
     await newPage.waitForLoadState('domcontentloaded');
     return newPage;
