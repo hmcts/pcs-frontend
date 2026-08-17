@@ -26,6 +26,33 @@ const makeReq = (): Request =>
     res: { locals: { validatedCase: { id: '123', data: {} } } },
   }) as unknown as Request;
 
+describe('buildDraftDefendantResponse — pcqId carry-forward', () => {
+  const reqWith = (possessionClaimResponse: Record<string, unknown>): Request =>
+    ({
+      path: '/case/123/respond-to-claim/free-legal-advice',
+      body: {},
+      res: { locals: { validatedCase: { id: '123', data: { possessionClaimResponse } } } },
+    }) as unknown as Request;
+
+  it('carries an existing pcqId onto every subsequent save', () => {
+    // The backend REPLACEs the defendant slice on each save, so an id dropped here would be wiped
+    // the next time the citizen moves through the journey — and at final submit, which reads this
+    // same draft. The party object is deep-cloned wholesale, so this comes for free.
+    const result = buildDraftDefendantResponse(
+      reqWith({ defendantContactDetails: { party: { firstName: 'Ada', pcqId: 'pcq-abc-123' } } })
+    );
+
+    expect(result.defendantContactDetails.party.pcqId).toBe('pcq-abc-123');
+    expect(result.defendantContactDetails.party.firstName).toBe('Ada');
+  });
+
+  it('does not invent a pcqId when the draft has none', () => {
+    const result = buildDraftDefendantResponse(reqWith({}));
+
+    expect(result.defendantContactDetails.party.pcqId).toBeUndefined();
+  });
+});
+
 describe('saveDraftDefendantResponse wrapper', () => {
   beforeEach(() => {
     jest.clearAllMocks();
