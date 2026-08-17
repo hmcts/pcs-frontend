@@ -253,6 +253,9 @@ export interface CcdDefendantResponses {
 export interface StatementOfTruth {
   accepted?: YesNoValue;
   fullName?: string;
+  nameOfFirm?: string;
+  positionHeld?: string;
+  hasLegalRepresentation?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {
