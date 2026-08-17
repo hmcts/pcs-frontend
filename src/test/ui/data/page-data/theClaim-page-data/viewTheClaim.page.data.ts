@@ -77,7 +77,7 @@ export const viewTheClaim = {
   noticeDetails: {
     'Has notice been served?': 'Yes',
     'Method of service': 'By first class post or other service which provides for delivery on the next business day',
-    'Date notice was served': '10 November 2025',
+    'Date notice was served': '20 February 2020',
     'Can the claimant upload a copy of the notice served?': 'Yes',
     Notice: 'rentArrears - Claimant 1.pdf',
   },

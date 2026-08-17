@@ -23,7 +23,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
   private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
-
+  private static readonly PAGE_DATA_LR_DIR = path.join(__dirname, '../../../data/page-data/lr-page-data');
   private static pagesTestedInCurrentRun = new Set<string>();
 
   static resetTestedPages(): void {
@@ -53,16 +53,17 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       return;
     }
 
+    const isLR = test.info().title.includes('@LR') || false;
+    const baseDir = isLR
+      ? TriggerPageFunctionalTestsAction.PAGE_DATA_LR_DIR
+      : TriggerPageFunctionalTestsAction.PAGE_DATA_DIR;
+    const pageDataFilePath = this.resolveFilePath(baseDir, `${pageName}${isLR ? '.page.data.lr.ts' : '.page.data.ts'}`);
+
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
       return;
     }
 
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.add(pageName);
-
-    const pageDataFilePath = this.resolveFilePath(
-      TriggerPageFunctionalTestsAction.PAGE_DATA_DIR,
-      `${pageName}.page.data.ts`
-    );
 
     if (enable_content_validation === 'true') {
       if (pageDataFilePath && fs.existsSync(pageDataFilePath)) {
