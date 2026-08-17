@@ -287,7 +287,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: emailConfirmation.yesRadioOption,
       emailAddress: emailConfirmation.emailAddressTextInput,
     });
-    await performAction('exemptLandlordLR', exemptLandlord.imNotSureRadioOption);
+    await performAction('exemptLandlordLR', exemptLandlord.defendantNotSureRadioOption);
     await performAction('selectWrittenTermsLR', {
       question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
       radioOption: writtenTerms.noRadioOption,
