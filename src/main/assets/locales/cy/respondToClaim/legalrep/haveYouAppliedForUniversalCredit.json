@@ -1,7 +1,13 @@
 {
+  "pageTitle": "cyUniversal Credit",
   "question": "A yw'r diffynnydd wedi gwneud cais am Gredyd Cynhwysol?",
   "heading": "Credyd Cynhwysol",
   "dateLabel": "Pryd wnaeth y diffynnydd wneud cais?",
+  "dateHint": "Er enghraifft, 27 9 2022",
+  "options": {
+    "yes": "Ydy",
+    "no": "Nac ydy"
+  },
   "errors": {
     "haveAppliedForUniversalCredit": "Dewiswch os yw'r diffynnydd wedi gwneud cais am Gredyd Cynhwysol neu beidio",
     "date": {

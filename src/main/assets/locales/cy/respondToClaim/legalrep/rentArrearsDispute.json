@@ -5,6 +5,7 @@
   "rentArrearsOptions": {
     "yes": "Ydy",
     "no": "Nac ydy",
+    "or": "neu",
     "notSure": "Diffynnydd ddim yn siŵr"
   },
   "insetIntroText": "",

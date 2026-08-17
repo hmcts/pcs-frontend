@@ -1,8 +1,12 @@
 {
+  "pageTitle": "cyRepayment agreement",
   "heading": "Cytundeb ad-dalu",
   "question": "",
   "repaymentsAgreedQuestion": "A yw'r diffynnydd wedi dod i unrhyw gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
   "options": {
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "or": "neu",
     "imNotSure": "Diffynnydd ddim yn siŵr"
   },
   "textAreaLabel": "Rhowch fanylion faint maent wedi cytuno i'w dalu a phryd",

@@ -13,6 +13,7 @@
   "errors": {
     "exceptionalHardship": "Dewiswch a fyddai'r diffynnydd yn profi caledi eithriadol os gofynnir iddynt adael eu cartref",
     "exceptionalHardshipDetails": "Rhowch fanylion am y caledi eithriadol y byddai'r diffynnydd yn ei brofi",
-    "exceptionalHardshipDetailsInvalidCharacters": "Dylai manylion y caledi eithriadol a brofir gan y diffynnydd ond cynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
+    "exceptionalHardshipDetailsInvalidCharacters": "Dylai manylion y caledi eithriadol a brofir gan y diffynnydd ond cynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod",
+    "exceptionalHardshipDetailsMaxLength": "cyThe details of the exceptional hardship must be 500 characters or less"
   }
 }

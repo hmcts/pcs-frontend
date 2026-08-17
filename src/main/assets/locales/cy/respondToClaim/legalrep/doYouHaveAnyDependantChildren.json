@@ -1,7 +1,7 @@
 {
   "heading": "Plant sy'n ddibynnol",
   "dependentChildrenParagraph": "",
-  "dependentQuestion": "A oes gan y diffynnydd unrhyw blant sy'n ddibynnol arnynt?",
+  "dependantQuestion": "A oes gan y diffynnydd unrhyw blant sy'n ddibynnol arnynt?",
   "dependentChildrenDetailsLabel": "Rhowch fanylion am eu plant dibynnol",
   "dependentChildrenDetailsHint": "",
   "errors": {
