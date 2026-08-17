@@ -5,8 +5,8 @@
   "counterClaimFeesCourtFeesLinkText": "",
   "question": "cyIs the defendant planning to make a counterclaim against {{claimantName}}?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
   "errors": {
     "makeCounterClaim": "cySelect if the defendant is planning to make a counterclaim"
