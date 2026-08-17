@@ -17,9 +17,10 @@ export class ClickLinkAction implements IAction {
     action: string,
     fieldName: string | actionRecord | ClickLinkParams,
     header?: string
-  ): Promise<void> {
-    const actionsMap = new Map<string, () => Promise<void>>([
+  ): Promise<void | Page> {
+    const actionsMap = new Map<string, () => Promise<void | Page>>([
       ['clickLink', () => this.clickLink(page, fieldName as string)],
+      ['clickLinkAndSwitchToNewTab', () => this.clickLinkAndSwitchToNewTab(page, fieldName as string)],
       [
         'clickLinkAndVerifySameTabTitle',
         () => this.clickLinkAndVerifySameTabTitle(page, fieldName as string | ClickLinkParams, header!),
@@ -31,7 +32,7 @@ export class ClickLinkAction implements IAction {
     if (!actionToPerform) {
       throw new Error(`No action found for '${action}'`);
     }
-    await actionToPerform();
+    return actionToPerform();
   }
 
   private async clickLink(page: Page, fieldName: string): Promise<void> {
@@ -107,5 +108,15 @@ export class ClickLinkAction implements IAction {
     }
     await newPage.close();
     await originalPage.bringToFront();
+  }
+
+  private async clickLinkAndSwitchToNewTab(page: Page, fieldName: string): Promise<Page> {
+    const linkText = await this.getVisibleLinkText(page, fieldName);
+    const link = page
+      .locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`)
+      .first();
+    const [newPage] = await Promise.all([page.waitForEvent('popup'), link.click()]);
+    await newPage.waitForLoadState('domcontentloaded');
+    return newPage;
   }
 }

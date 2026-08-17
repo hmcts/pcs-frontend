@@ -292,7 +292,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeeded.mainHeader);
+    await performAction(
+      'clickLinkAndSwitchToNewTab',
+      responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeOpensInNewTabLink
+    );
     await performAction('validateCounterClaimApplicationFee', {
       amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
       fee: counterClaimSpecificSumOfMoney.feeHiddenAmount,
@@ -1087,7 +1091,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeeded.mainHeader);
+    await performAction(
+      'clickLinkAndSwitchToNewTab',
+      responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeOpensInNewTabLink
+    );
     await performAction('validateCounterClaimApplicationFee', {
       amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
       fee: counterClaimSpecificSumOfMoney.feeHiddenAmount,
