@@ -90,7 +90,9 @@
       {% if dateSubmitted %}
         <h2 class="govuk-heading-m">{{ t('viewTheResponse:pdf.heading') }}</h2>
         <p class="govuk-body">
-          <a href="#" class="govuk-link">{{ t('viewTheResponse:pdf.linkText') }}</a>
+          {% if dateSubmitted and responsePdfUrl %}
+            <a href="{{ responsePdfUrl }}" class="govuk-link" target="_blank" rel="noopener noreferrer">{{ t('viewTheResponse:pdf.linkText') }}</a>
+          {% endif %}
         </p>
       {% endif %}
 
