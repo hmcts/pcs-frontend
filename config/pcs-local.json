@@ -25,5 +25,9 @@
   },
   "payment": {
     "returnUrl": "http://localhost:3209/payment/return"
+  },
+  "cuiRa": {
+    "callbackUrl": "http://localhost:3209/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id",
+    "logoutUrl": "http://localhost:3209/logout"
   }
 }
