@@ -21,6 +21,8 @@ nodejs:
     REDIRECTS_MANAGE_CASE_RETURN_URL: '${REDIRECTS_MANAGE_CASE_RETURN_URL}'
     PAYMENT_RETURN_URL: 'https://${SERVICE_FQDN}/payment/return'
     LAUNCHDARKLY_ENV: '${SERVICE_FQDN}'
+    CUI_RA_CALLBACK_URL: 'https://${SERVICE_FQDN}/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id'
+    CUI_RA_LOGOUT_URL: 'https://${SERVICE_FQDN}/logout'
 redis:
   image:
     registry: hmctsprod.azurecr.io
@@ -32,10 +34,10 @@ redis:
     # permanently Running-but-not-Ready (frontends then ECONNREFUSED :6379).
     # Measured probe wall time under instrumentation: 3.4-4.1s.
     readinessProbe:
-      timeoutSeconds: 6
+      timeoutSeconds: 10
       periodSeconds: 10
     livenessProbe:
-      timeoutSeconds: 8
+      timeoutSeconds: 10
 global:
   security:
     allowInsecureImages: true
