@@ -1160,7 +1160,7 @@ export class RespondToClaimAction implements IAction {
       value: `£${String(feeData.fee)}`,
     });
     await performValidation('text', {
-      elementType: 'link',
+      elementType: 'linkOrButton',
       text: counterClaimApplicationFeeAmount.getPayButton(String(feeData.fee)),
     });
   }

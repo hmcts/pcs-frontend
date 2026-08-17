@@ -3,10 +3,10 @@ import {
   checkYourAnswersRTC,
   counterClaimApplicationFeeAmount,
   counterClaimPaymentSuccessful,
-  paymentDetails,
   responseAndCounterClaimSubmitted,
   responseSubmitted,
   responseSubmittedCounterclaimFeePaymentNeeded,
+  serviceRequestPayment,
 } from '../data/page-data';
 import {
   confirmationOfNoticeGiven,
@@ -153,7 +153,7 @@ test.afterEach(async () => {
 
 //selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('NonRentArrears - AssuredTenancy - LR @smoke @nonRent @LR', async () => {
+  test('NonRentArrears - AssuredTenancy - LR @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -301,21 +301,24 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
       fee: counterClaimSpecificSumOfMoney.feeHiddenAmount,
     });
-    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('35.00'));
-    await performValidation('mainHeader', paymentDetails.mainHeader);
-    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.declinedCardNumber });
-    await performValidation('mainHeader', 'Your payment has been declined');
-    await performAction('clickButton', paymentDetails.startDynamicButton);
-    await performValidation('errorMessage', {
-      message: counterClaimApplicationFeeAmount.paymentFailedDynamicErrorMessage,
+    await performAction('selectPaymentOptions', {
+      amountLabel: counterClaimApplicationFeeAmount.counterClaimFeeLabel,
+      expectedAmount: `£${counterClaimSpecificSumOfMoney.feeHiddenAmount}`,
+      payByOption: serviceRequestPayment.payByAccountRadioOption,
+      pbaLabel: serviceRequestPayment.selectPBALabel,
+      pbaValue: serviceRequestPayment.pbaIndex1,
+      referenceLabel: serviceRequestPayment.pbaReferenceLabel,
+      referenceText: serviceRequestPayment.pbaReferenceInputText,
+      button: counterClaimApplicationFeeAmount.getPayButton('35.00'),
     });
-    await performAction(
-      'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: counterClaimPaymentSuccessful.lrPaymentConfirmationParagraph,
+    });
   });
 
-  test('NonRentArrears - AssuredTenancy - Something else - LR @smoke @regression @nonRent @LR', async () => {
+  test('NonRentArrears - AssuredTenancy - Something else - LR @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -450,13 +453,35 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
+    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeeded.mainHeader);
     await performAction(
-      'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+      'clickLinkAndSwitchToNewTab',
+      responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeOpensInNewTabLink
     );
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: counterClaimApplicationFeeAmount.counterClaimAmountNotApplicable,
+      fee: counterClaimApplicationFeeAmount.somethingElseCounterClaimFee,
+    });
+    await performAction('selectPaymentOptions', {
+      amountLabel: counterClaimApplicationFeeAmount.counterClaimFeeLabel,
+      expectedAmount: `£${counterClaimApplicationFeeAmount.somethingElseCounterClaimFee}`,
+      payByOption: serviceRequestPayment.payByAccountRadioOption,
+      pbaLabel: serviceRequestPayment.selectPBALabel,
+      pbaValue: serviceRequestPayment.pbaIndex1,
+      referenceLabel: serviceRequestPayment.pbaReferenceLabel,
+      referenceText: serviceRequestPayment.pbaReferenceInputText,
+      button: counterClaimApplicationFeeAmount.getPayButton(
+        counterClaimApplicationFeeAmount.somethingElseCounterClaimFee
+      ),
+    });
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: counterClaimPaymentSuccessful.lrPaymentConfirmationParagraph,
+    });
   });
 
-  test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @smoke @nonRent @LR', async () => {
+  test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @smoke @regression @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -1091,23 +1116,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeeded.mainHeader);
-    await performAction(
-      'clickLinkAndSwitchToNewTab',
-      responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeOpensInNewTabLink
-    );
-    await performAction('validateCounterClaimApplicationFee', {
-      amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
-      fee: counterClaimSpecificSumOfMoney.feeHiddenAmount,
-    });
-    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('35.00'));
-    await performValidation('mainHeader', paymentDetails.mainHeader);
-    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
-    await performAction('clickButton', paymentDetails.confirmPaymentButton);
-    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('mainHeader', responseAndCounterClaimSubmitted.mainHeader);
     await performValidation('text', {
       elementType: 'paragraph',
-      text: counterClaimPaymentSuccessful.paymentConfirmationParagraph,
+      text: responseAndCounterClaimSubmitted.reviewHwfApplicationParagraph,
     });
   });
 
