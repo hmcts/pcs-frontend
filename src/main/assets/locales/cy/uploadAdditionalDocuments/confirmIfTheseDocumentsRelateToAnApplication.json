@@ -8,7 +8,7 @@
   "applicationOptionSuspend": "cyYes, the documents I’m uploading relate to the application to suspend the eviction - submitted on {{date}}",
   "applicationOptionSetAside": "Ydyn, mae'r dogfennau rwy'n eu huwchlwytho yn ymwneud â'r cais i roi'r gorchymyn o'r neilltu - cyflwynwyd ar {{date}}",
   "applicationOptionGeneric": "Ydyn, mae'r dogfennau rwy'n eu huwchlwytho yn ymwneud â'r cais a gyflwynwyd ar  {{date}}",
-  "optionCounterclaim": "cyNo, the documents I’m uploading relate to the counterclaim",
+  "optionCounterclaim": "Na, mae'r dogfennau rwy'n uwchlwytho yn ymwneud â'r gwrth-hawliad",
   "optionMainClaim": "Na, mae'r dogfennau rwy'n uwchlwytho yn ymwneud â'r prif gais",
   "errors": {
     "title": "Mae yna broblem",
