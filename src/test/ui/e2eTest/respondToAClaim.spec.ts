@@ -2216,7 +2216,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
 });
 
 test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Journey @nightly', async () => {
-  test('YourSupport Request Sent To Court And PCQ Answered NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @regression @assured @nightly', async () => {
+  test('YourSupport Request Sent To Court And PCQ Answered NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured @nightly', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -2510,7 +2510,7 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('YourSupport Request NOT Sent To Court And PCQ Answered NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @regression @assured @nightly', async () => {
+  test('YourSupport Request NOT Sent To Court And PCQ Answered NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured @nightly', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
