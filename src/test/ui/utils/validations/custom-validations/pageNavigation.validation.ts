@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { Page, expect } from '@playwright/test';
+import { Page, expect, test } from '@playwright/test';
 
 import { enable_navigation_tests } from '../../../../../../playwright.config';
 import { takeValidationFailureScreenshot } from '../../common/pft-validation-screenshot';
@@ -31,6 +31,7 @@ export class PageNavigationValidation implements IValidation {
   private static shouldThrowError = true;
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
+  private static readonly LR_PFT_DIR = path.join(__dirname, '../../../functional/legalRepresentative-functional');
   private static currentPageUrl: string = '';
   private static currentSourcePage: string | null = null;
   private static navigationFailed = false;
@@ -406,7 +407,19 @@ export class PageNavigationValidation implements IValidation {
     if (!pageName || pageName === 'home' || pageName === 'Dashboard') {
       return false;
     }
-    const pftPath = path.join(PageNavigationValidation.PFT_DIR, `${pageName}.pft.ts`);
+
+    // Check if current test has @LR tag
+    let isLRTest = false;
+    try {
+      const testInfo = test.info();
+      const title = testInfo?.title || '';
+      isLRTest = title.includes('@LR');
+    } catch {
+      isLRTest = false;
+    }
+
+    const baseDir = isLRTest ? PageNavigationValidation.LR_PFT_DIR : PageNavigationValidation.PFT_DIR;
+    const pftPath = path.join(baseDir, `${pageName}.pft.ts`);
     return fs.existsSync(pftPath);
   }
 
