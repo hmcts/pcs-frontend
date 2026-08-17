@@ -4,16 +4,12 @@
   "options": {
     "yes": "Yes",
     "no": "No",
-    "imNotSure": "I’m not sure"
+    "imNotSure": "Defendant is not sure"
   },
   "rows": {
-    "landlordRegistered": {
-      "label": "Is the landlord registered?",
-      "changeHidden": "landlord registered"
-    },
-    "landlordLicensed": {
-      "label": "Is the landlord licensed?",
-      "changeHidden": "landlord licensed"
+    "exemptLandlord": {
+      "label": "Is the landlord an exempt landlord under Part 1 of the Housing (Wales) Act 2014?",
+      "changeHidden": "exempt landlord"
     },
     "writtenTerms": {
       "label": "Has the landlord sent the defendant written terms of the occupation contract?",
