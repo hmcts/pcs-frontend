@@ -165,6 +165,7 @@ export class ActionRegistry {
     ['selectClaimAgainstWhom', new RespondToClaimAction()],
     ['counterClaimAbout', new RespondToClaimAction()],
     ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],
+    ['selectReasonableAdjustments', new RespondToClaimAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
     ['payForApplication', new GenAppsAction()],
     ['inputPaymentDetails', new GenAppsAction()],
