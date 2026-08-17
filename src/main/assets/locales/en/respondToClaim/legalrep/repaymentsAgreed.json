@@ -1,4 +1,5 @@
 {
+  "pageTitle": "Agreements made",
   "heading": "Repayment agreement",
   "question": "",
   "repaymentsAgreedQuestion": "Has the defendant come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}?",
