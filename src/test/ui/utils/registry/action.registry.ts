@@ -14,6 +14,7 @@ import {
 } from '../actions/custom-actions';
 import { CitizenDashboardAction } from '../actions/custom-actions/citizenDashboard.action';
 import { LinkSolicitorAPIAction } from '../actions/custom-actions/linkSolicitorAPI.action';
+import { PaymentAction } from '../actions/custom-actions/payment.action';
 import { RespondPossessionClaimLRMidEventAPIAction } from '../actions/custom-actions/respondPossessionClaimSolicitorMidEventAPI.action';
 import { RespondToClaimLRAction } from '../actions/custom-actions/respondToClaimLR.action';
 import { SubmitPossessionClaimResponseAPIAction } from '../actions/custom-actions/respondToClaimSubmitAPIForLR.action';
@@ -57,6 +58,7 @@ export class ActionRegistry {
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['skipTestIfLdFlagDisabled', new LaunchDarklyAction()],
+    ['selectPaymentOptions', new PaymentAction()],
 
     //Citizen Dashboard
     ['citizenDashboard', new CitizenDashboardAction()],
