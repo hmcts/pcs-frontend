@@ -2432,7 +2432,7 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
       question: equalityAndDiversityDOB.mainHeader,
       radioOption: equalityAndDiversityDOB.preferNotToSayRadioButton,
       button: equalityAndDiversityDOB.continueButton,
-    }); 
+    });
     await performValidation('mainHeader', equalityAndDiversityLanguage.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityLanguage.mainHeader,
@@ -2684,7 +2684,7 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
       question: equalityAndDiversityDOB.mainHeader,
       radioOption: equalityAndDiversityDOB.preferNotToSayRadioButton,
       button: equalityAndDiversityDOB.continueButton,
-    }); 
+    });
     await performValidation('mainHeader', equalityAndDiversityLanguage.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityLanguage.mainHeader,
