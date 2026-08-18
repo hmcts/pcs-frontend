@@ -48,7 +48,7 @@ describe('Idam Consumer Pact Test', () => {
 
   test('should receive access token from /o/token', async () => {
     const formData = {
-      client_id: 'pt_frontend',
+      client_id: 'pcs_frontend',
       client_secret: 'AAAAAA',
       grant_type: 'authorization_code',
       redirect_uri: 'http://someRedirectURL',
