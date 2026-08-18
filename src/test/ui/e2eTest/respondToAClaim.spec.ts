@@ -2484,7 +2484,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performValidation('mainHeader', equalityAndDiversityAbilityToCarryOutActivity.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityAbilityToCarryOutActivity.mainHeader,
-      radioOption: equalityAndDiversityAbilityToCarryOutActivity.yesALittleRadioOption,
+      radioOption: equalityAndDiversityAbilityToCarryOutActivity.notAtAllRadioOption,
       button: equalityAndDiversityAbilityToCarryOutActivity.ContinueButton,
     });
     await performValidation('mainHeader', equalityAndDiversityPregnancy.mainHeader);
