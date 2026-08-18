@@ -17,6 +17,11 @@
     "languageUsed": "cy Language used"
   },
   "rows": {
+    "uploadedDocuments": {
+      "label": "cy Uploaded files",
+      "changeHidden": "cy uploaded files",
+      "none": "cy No files uploaded"
+    },
     "otherConsiderations": {
       "label": "cy Is there anything else the defendant wants to tell the court as part of their response?"
     },
