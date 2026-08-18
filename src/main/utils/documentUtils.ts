@@ -7,6 +7,7 @@ const DOCUMENT_FOLDER_TITLES = {
   propertyDocuments: 'Property documents',
   evidence: 'Evidence',
   correspondence: 'Correspondence',
+  uncategorisedDocuments: 'Uncategorised',
 } as const;
 
 type DocumentFolderKey = keyof typeof DOCUMENT_FOLDER_TITLES;
@@ -44,18 +45,25 @@ export interface CaseDocumentLookupItem {
 
 interface ExtractViewDocumentOptions {
   folderTitles?: Partial<Record<DocumentFolderKey, string>>;
+  includeUncategorised?: boolean;
 }
 
 export function extractViewDocumentFolders(
   caseData: CaseData,
-  { folderTitles }: ExtractViewDocumentOptions = {}
+  { folderTitles, includeUncategorised = false }: ExtractViewDocumentOptions = {}
 ): ViewDocumentFolder[] {
-  const folders = createFolders(folderTitles);
+  const folders = createFolders(folderTitles, includeUncategorised);
 
   for (const { id, value } of caseData.allDocuments ?? []) {
     const documentId = id?.trim();
 
     if (!documentId || !isDocumentFolderKey(value.category_id)) {
+      continue;
+    }
+
+    // The folder may be absent when its category is feature-flagged off (e.g. Uncategorised).
+    const folder = folders[value.category_id];
+    if (!folder) {
       continue;
     }
 
@@ -65,14 +73,14 @@ export function extractViewDocumentFolders(
       continue;
     }
 
-    folders[value.category_id].documents.push({
+    folder.documents.push({
       id: documentId,
       filename,
       submittedOn: value.upload_timestamp?.trim() || null,
     });
   }
 
-  return Object.values(folders).filter(folder => folder.documents.length > 0);
+  return Object.values(folders).filter((folder): folder is ViewDocumentFolder => (folder?.documents.length ?? 0) > 0);
 }
 
 const CASE_DETAILS_DOCUMENT_PATHS = [
@@ -94,6 +102,7 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   const seen = new Set<string>();
 
   addDocumentsFromCollection(documents, seen, caseData.allDocuments, 'allDocuments');
+  addDocumentsFromCollection(documents, seen, caseData.notice_Documents, 'notice_Documents');
 
   for (const path of CASE_DETAILS_DOCUMENT_PATHS) {
     addDocumentsFromCollection(documents, seen, get(caseData, path), path);
@@ -103,19 +112,27 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
 }
 
 function createFolders(
-  folderTitles?: Partial<Record<DocumentFolderKey, string>>
-): Record<DocumentFolderKey, ViewDocumentFolder> {
+  folderTitles?: Partial<Record<DocumentFolderKey, string>>,
+  includeUncategorised = false
+): Partial<Record<DocumentFolderKey, ViewDocumentFolder>> {
   const titles = {
     ...DOCUMENT_FOLDER_TITLES,
     ...folderTitles,
   };
 
-  return {
+  const folders: Partial<Record<DocumentFolderKey, ViewDocumentFolder>> = {
     statementsOfCase: { title: titles.statementsOfCase, documents: [] },
     propertyDocuments: { title: titles.propertyDocuments, documents: [] },
     evidence: { title: titles.evidence, documents: [] },
     correspondence: { title: titles.correspondence, documents: [] },
   };
+
+  // Added last so the Uncategorised folder renders after the known categories.
+  if (includeUncategorised) {
+    folders.uncategorisedDocuments = { title: titles.uncategorisedDocuments, documents: [] };
+  }
+
+  return folders;
 }
 
 function isDocumentFolderKey(value: unknown): value is DocumentFolderKey {
