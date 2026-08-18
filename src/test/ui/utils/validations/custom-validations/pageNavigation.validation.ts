@@ -408,16 +408,7 @@ export class PageNavigationValidation implements IValidation {
       return false;
     }
 
-    // Check if current test has @LR tag
-    let isLRTest = false;
-    try {
-      const testInfo = test.info();
-      const title = testInfo?.title || '';
-      isLRTest = title.includes('@LR');
-    } catch {
-      isLRTest = false;
-    }
-
+    const isLRTest = test.info().title.includes('@LR');
     const baseDir = isLRTest ? PageNavigationValidation.LR_PFT_DIR : PageNavigationValidation.PFT_DIR;
     const pftPath = path.join(baseDir, `${pageName}.pft.ts`);
     return fs.existsSync(pftPath);
