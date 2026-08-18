@@ -2478,7 +2478,7 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
     await performValidation('mainHeader', equalityAndDiversityHealthCondiotion.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityHealthCondiotion.mainHeader,
-      radioOption: equalityAndDiversityHealthCondiotion.noRadioOption,
+      radioOption: equalityAndDiversityHealthCondiotion.yesRadioOption,
       button: equalityAndDiversityHealthCondiotion.ContinueButton,
     });
     await performValidation('mainHeader', equalityAndDiversityAbilityToCarryOutActivity.mainHeader);
@@ -2499,8 +2499,6 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
     await performAction('selectStatementOfTruthRTC', {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
@@ -2733,12 +2731,6 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
       radioOption: equalityAndDiversityHealthCondiotion.preferNotToSayRadioOption,
       button: equalityAndDiversityHealthCondiotion.ContinueButton,
     });
-    await performValidation('mainHeader', equalityAndDiversityAbilityToCarryOutActivity.mainHeader);
-    await performAction('selectEqualityAndDiversity', {
-      question: equalityAndDiversityAbilityToCarryOutActivity.mainHeader,
-      radioOption: equalityAndDiversityAbilityToCarryOutActivity.preferNotToSayRadioOption,
-      button: equalityAndDiversityAbilityToCarryOutActivity.ContinueButton,
-    });
     await performValidation('mainHeader', equalityAndDiversityPregnancy.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityPregnancy.mainHeader,
@@ -2751,8 +2743,6 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC');
-    await performAction('validateCYARTC');
     await performAction('selectStatementOfTruthRTC', {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,

@@ -1043,7 +1043,6 @@ test.describe('Common Component YS Respond to a claim - e2e Journey @nightly @re
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequest.mainHeader);
     await performAction('clickButton', supportRequest.continueButton);
-    await performAction('clickButton', supportRequest.continueButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityDOB.mainHeader);
