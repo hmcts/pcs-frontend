@@ -18,7 +18,9 @@
   },
   "rows": {
     "uploadedDocuments": {
-      "label": "cy Upload any files that you think are relevant to your response"
+      "label": "cy Upload any files that you think are relevant to your response",
+      "changeHidden": "cy uploaded files",
+      "none": "cy No files uploaded"
     },
     "otherConsiderations": {
       "label": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
