@@ -37,7 +37,6 @@ export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJ
   const tPayments = getTranslationFunction(req, 'checkYourAnswersPaymentsAndAgreements');
   const tCircumstances = getTranslationFunction(req, 'checkYourAnswersYourCircumstances');
   const tIncome = getTranslationFunction(req, 'checkYourAnswersIncomeAndExpenses');
-  const tDocuments = getTranslationFunction(req, 'checkYourAnswersDocuments');
 
   const claimantName = getValidatedCase(req)?.claimantName ?? '';
   const sections: EndOfJourneyCyaSection[] = [];
@@ -96,7 +95,7 @@ export function buildEndOfJourneyCyaSections(req: Request, t: TFunction): EndOfJ
 
   sections.push({
     heading: t('sections.uploadFiles'),
-    rows: buildDocumentsRows(req, tDocuments),
+    rows: buildDocumentsRows(req, t),
   });
 
   sections.push({
