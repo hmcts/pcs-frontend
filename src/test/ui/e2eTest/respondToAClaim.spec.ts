@@ -2215,8 +2215,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 });
 
-test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Journey @nightly', async () => {
-  test('YourSupport Request Sent To Court And PCQ Answered NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured @nightly', async () => {
+test.describe('Common Component Your Support Respond to a claim - e2e Journey @nightly @regression', async () => {
+  test('YourSupport Request Sent To Court NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @regression @assured @nightly', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -2432,7 +2432,7 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
       question: equalityAndDiversityDOB.mainHeader,
       radioOption: equalityAndDiversityDOB.preferNotToSayRadioButton,
       button: equalityAndDiversityDOB.continueButton,
-    });
+    }); 
     await performValidation('mainHeader', equalityAndDiversityLanguage.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityLanguage.mainHeader,
@@ -2466,7 +2466,7 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
     await performValidation('mainHeader', equalityAndDiversityEthinicGroup.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityEthinicGroup.mainHeader,
-      radioOption: equalityAndDiversityEthinicGroup.preferNotToSayRadioOption,
+      radioOption: equalityAndDiversityEthinicGroup.mixedOrMultipleEthnicGroupsRadioOption,
       button: equalityAndDiversityEthinicGroup.ContinueButton,
     });
     await performValidation('mainHeader', equalityAndDiversityReligion.mainHeader);
@@ -2478,13 +2478,13 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
     await performValidation('mainHeader', equalityAndDiversityHealthCondiotion.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityHealthCondiotion.mainHeader,
-      radioOption: equalityAndDiversityHealthCondiotion.yesRadioOption,
+      radioOption: equalityAndDiversityHealthCondiotion.noRadioOption,
       button: equalityAndDiversityHealthCondiotion.ContinueButton,
     });
     await performValidation('mainHeader', equalityAndDiversityAbilityToCarryOutActivity.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityAbilityToCarryOutActivity.mainHeader,
-      radioOption: equalityAndDiversityAbilityToCarryOutActivity.notAtAllRadioOption,
+      radioOption: equalityAndDiversityAbilityToCarryOutActivity.yesALittleRadioOption,
       button: equalityAndDiversityAbilityToCarryOutActivity.ContinueButton,
     });
     await performValidation('mainHeader', equalityAndDiversityPregnancy.mainHeader);
@@ -2499,6 +2499,8 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
     await performAction('selectStatementOfTruthRTC', {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
@@ -2510,7 +2512,7 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('YourSupport Request NOT Sent To Court And PCQ Answered NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured @nightly', async () => {
+  test('YourSupport Request NOT Sent To Court NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @regression @assured @nightly', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -2682,7 +2684,7 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
       question: equalityAndDiversityDOB.mainHeader,
       radioOption: equalityAndDiversityDOB.preferNotToSayRadioButton,
       button: equalityAndDiversityDOB.continueButton,
-    });
+    }); 
     await performValidation('mainHeader', equalityAndDiversityLanguage.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityLanguage.mainHeader,
@@ -2731,6 +2733,12 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
       radioOption: equalityAndDiversityHealthCondiotion.preferNotToSayRadioOption,
       button: equalityAndDiversityHealthCondiotion.ContinueButton,
     });
+    await performValidation('mainHeader', equalityAndDiversityAbilityToCarryOutActivity.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityAbilityToCarryOutActivity.mainHeader,
+      radioOption: equalityAndDiversityAbilityToCarryOutActivity.preferNotToSayRadioOption,
+      button: equalityAndDiversityAbilityToCarryOutActivity.ContinueButton,
+    });
     await performValidation('mainHeader', equalityAndDiversityPregnancy.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityPregnancy.mainHeader,
@@ -2743,6 +2751,8 @@ test.describe('Common Component Your Support And PCQ Respond to a claim - e2e Jo
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
     await performAction('selectStatementOfTruthRTC', {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
