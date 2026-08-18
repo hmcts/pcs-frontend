@@ -3,7 +3,7 @@
   "cardTitle": "cy Upload files",
   "rows": {
     "uploadedDocuments": {
-      "label": "cy Upload any files that you think are relevant to your response",
+      "label": "cy Uploaded files",
       "changeHidden": "cy uploaded files",
       "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     }

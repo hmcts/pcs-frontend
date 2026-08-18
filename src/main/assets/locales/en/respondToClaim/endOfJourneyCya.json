@@ -18,7 +18,9 @@
   },
   "rows": {
     "uploadedDocuments": {
-      "label": "Upload any files that you think are relevant to your response"
+      "label": "Upload any files that you think are relevant to your response",
+      "changeHidden": "uploaded files",
+      "none": "No files uploaded"
     },
     "otherConsiderations": {
       "label": "Is there anything else you want to tell the court as part of your response?",
