@@ -1,6 +1,11 @@
 {
   "pageTitle": "Amgylchiadau",
   "introParagraph": "Defnyddiwch yr adran hon i roi manylion unrhyw ddigwyddiadau neu amgylchiadau sydd wedi effeithio ar achos y diffynnydd y dylai barnwr wybod amdanynt.",
+  "forExample": "Er enghraifft:",
+  "options": {
+    "yes": "Ydy",
+    "no": "Nac ydy"
+  },
   "bullet1": "mae gan rywun yng nghartref y diffynnydd salwch neu anabledd",
   "bullet2": "mae plant yng nghartref y diffynnydd yn mynychu ysgol leol",
   "bullet3": "mae'r diffynnydd yn gweithio oriau afreolaidd, sy'n ei gwneud yn anodd dod o hyd i le newydd i fyw",

@@ -2,8 +2,25 @@
   "pageTitle": "Defendant’s postal address",
   "legend": "Is the defendant’s postal address {{ formattedAddressStr }}",
   "labels": {
+    "yes": "Yes",
+    "no": "No",
+    "enterAddress": "Enter postal address",
+    "enterPostcode": "Enter a UK postcode",
+    "enterManually": "Enter an address manually",
     "enterManuallySubText": "You can enter the defendant’s address details in the fields below.",
-    "addressHeading": "What’s the defendant’s postal address?"
+    "selectAddress": "Select an address",
+    "selectAddressLabel": "Select an address",
+    "addressHeading": "What’s the defendant’s postal address?",
+    "addressLine1": "Address line 1",
+    "addressLine2": "Address line 2 (optional)",
+    "townOrCity": "Town or city",
+    "county": "County (optional)",
+    "postcode": "Postcode"
+  },
+  "buttons": {
+    "findAddress": "Find address",
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later"
   },
   "errors": {
     "correspondenceAddressConfirm": "Please confirm the defendant’s address by selecting the options below"

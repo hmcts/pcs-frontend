@@ -5,8 +5,8 @@
   "emailConfirmationLabel": "cyDo you know the defendant’s email address?",
 
   "options": {
-    "yes": "Ydw",
-    "noOption": "Nac ydw"
+    "yes": "Ydy",
+    "noOption": "Nac ydy"
   },
 
   "emailLabel": "cyEnter the defendant’s email address",

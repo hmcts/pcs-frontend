@@ -1,6 +1,17 @@
 {
   "pageTitle": "Dyledion blaenoriaeth",
   "paragraph1": "Mae dyledion blaenoriaeth yn ddyledion a allai arwain at ganlyniadau difrifol os nad yw'r diffynnydd yn eu talu.",
+  "paragraph2": "Ac eithrio ôl-ddyledion rhent neu forgais, mae dyledion blaenoriaeth yn cynnwys:",
+  "councilTaxArrears": "ôl-ddyledion treth y cyngor",
+  "gasOrElectricityArrears": "ôl-ddyledion nwy neu drydan",
+  "phoneOrInternetArrears": "ôl-ddyledion ffôn neu'r rhyngrwyd",
+  "tvLicenceArrears": "ôl-ddyledion trwydded teledu",
+  "courtFines": "dirwyon llys",
+  "overpaidTaxCredits": "gordaliad credydau treth",
+  "hirePurchaseOrConditionalSalePayments": "taliadau am nwyddau a hurbrynwyd neu werthiant amodol",
+  "unpaidIncomeTaxNationalInsuranceOrVat": "treth incwm, Yswiriant Gwladol neu TAW heb ei dalu",
+  "unpaidChildMaintenance": "cynhaliaeth plant heb ei dalu",
+  "guidanceLinkText": "Darllenwch y canllawiau gan Cyngor ar Bopeth ynglŷn â'r hyn sy'n cyfrif fel dyled blaenoriaeth (yn agor mewn tab newydd)",
   "question": "A oes gan y diffynnydd unrhyw ddyledion blaenoriaeth?",
   "errors": {
     "havePriorityDebts": "Dewiswch os oes gan y diffynnydd unrhyw ddyledion blaenoriaeth"
