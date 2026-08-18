@@ -2466,7 +2466,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performValidation('mainHeader', equalityAndDiversityEthinicGroup.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityEthinicGroup.mainHeader,
-      radioOption: equalityAndDiversityEthinicGroup.mixedOrMultipleEthnicGroupsRadioOption,
+      radioOption: equalityAndDiversityEthinicGroup.preferNotToSayRadioOption,
       button: equalityAndDiversityEthinicGroup.ContinueButton,
     });
     await performValidation('mainHeader', equalityAndDiversityReligion.mainHeader);
