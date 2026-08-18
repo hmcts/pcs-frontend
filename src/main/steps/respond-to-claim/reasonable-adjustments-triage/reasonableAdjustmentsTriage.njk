@@ -59,13 +59,10 @@
 
   <form method="post" action="{{ url }}">
     <div class="govuk-button-group govuk-!-padding-top-6">
-      {% if cuiYourSupportEnabled %}
       {{ govukButton({
           text: raQuestionsButton,
-          name: "reasonableAdjustmentsChoice",
-          value: "questions"
+          type: "button"
       }) }}
-      {% endif %}
         {{ govukButton({
               text: progressButton,
               classes: 'govuk-button--secondary',
