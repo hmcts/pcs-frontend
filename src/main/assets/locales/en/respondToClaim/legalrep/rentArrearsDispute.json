@@ -1,4 +1,6 @@
 {
+  "title": "Rent arrears",
+  "pageTitle": "Rent arrears",
   "amountOwedHeading": "Amount the defendant owes in rent arrears given by {{claimantName}}:",
   "rentArrearsQuestion": "Does the defendant owe this amount in rent arrears?",
   "rentArrearsOptions": {
