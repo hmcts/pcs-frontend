@@ -246,4 +246,5 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('verifyClaimDetailsOnViewTheClaimPage');
     await performValidation('mainHeader', dashboard.mainHeader);
   });
+  // regression
 });
