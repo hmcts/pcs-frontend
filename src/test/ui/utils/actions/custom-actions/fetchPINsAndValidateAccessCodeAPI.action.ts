@@ -3,7 +3,12 @@ import { Page } from '@playwright/test';
 import Axios from 'axios';
 
 import { SHORT_TIMEOUT, VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
-import { createCaseEventTokenApiData, fetchPINsApiData, validateAccessCodeApiData } from '../../../data/api-data';
+import {
+  createCaseEventTokenApiData,
+  fetchPINsApiData,
+  submitCaseApiData,
+  validateAccessCodeApiData,
+} from '../../../data/api-data';
 import { getCaseApiData } from '../../../data/api-data/getCase.api.data';
 import { IAction } from '../../interfaces';
 
@@ -38,6 +43,24 @@ function setSelectedPinUser(pinUser: PinUser | undefined): PinUser | undefined {
 export function getSelectedPinUser(): PinUser | undefined {
   return selectedPinUser;
 }
+
+export const getSelectedDefendantNumber = (): number => {
+  const selectedUser = getSelectedPinUser();
+  if (!selectedUser) {
+    throw new Error('No selected PIN user available');
+  }
+  const payload = submitCaseApiData.submitCasePayload;
+  const defendants = [payload.defendant1, ...(payload.additionalDefendants ?? []).map(defendant => defendant.value)];
+  const defendantIndex = defendants.findIndex(
+    defendant => defendant.firstName === selectedUser.firstName && defendant.lastName === selectedUser.lastName
+  );
+  if (defendantIndex === -1) {
+    throw new Error(
+      `Could not find selected defendant ${selectedUser.firstName} ${selectedUser.lastName} in submitCasePayload`
+    );
+  }
+  return defendantIndex + 1;
+};
 
 export function selectPinUserByDefendantDetails(detailsKnown: boolean): PinUser | undefined {
   const matchingPinUser = pinUsers.find(pinUser => hasKnownDefendantDetails(pinUser) === detailsKnown) ?? pinUsers[0];
