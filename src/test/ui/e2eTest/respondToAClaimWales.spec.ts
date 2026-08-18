@@ -783,8 +783,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 });
 
-test.describe('Common Component YS Respond to a claim - e2e Journey @nightly @regression', async () => {
-  test('Your Support Request Sent to Court Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @nightly', async () => {
+test.describe('Common Component YS And PCQ Respond to a claim - e2e Journey @nightly @regression', async () => {
+  test('Your Support Request Sent to Court And PCQ Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @nightly', async () => {
     //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -1102,7 +1102,7 @@ test.describe('Common Component YS Respond to a claim - e2e Journey @nightly @re
     await performValidation('mainHeader', equalityAndDiversityAbilityToCarryOutActivity.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityAbilityToCarryOutActivity.mainHeader,
-      radioOption: equalityAndDiversityAbilityToCarryOutActivity.yesALittleRadioOption,
+      radioOption: equalityAndDiversityAbilityToCarryOutActivity.preferNotToSayRadioOption,
       button: equalityAndDiversityAbilityToCarryOutActivity.ContinueButton,
     });
     await performValidation('mainHeader', equalityAndDiversityPregnancy.mainHeader);
@@ -1127,7 +1127,7 @@ test.describe('Common Component YS Respond to a claim - e2e Journey @nightly @re
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('Your Support Request NOT Sent to Court Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @nightly', async () => {
+  test('Your Support Request NOT Sent to Court And PCQ Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @nightly', async () => {
     //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
