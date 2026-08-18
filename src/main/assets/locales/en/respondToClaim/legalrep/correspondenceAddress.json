@@ -1,6 +1,7 @@
 {
   "pageTitle": "Defendant’s postal address",
   "legend": "Is the defendant’s postal address {{ formattedAddressStr }}",
+  "legend.hint": "This is the address provided by {{claimantName}}",
   "labels": {
     "yes": "Yes",
     "no": "No",

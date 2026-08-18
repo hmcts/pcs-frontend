@@ -8,5 +8,8 @@
   "whatYouWillNeed": "",
   "claimantVisibilityInfo": "Bydd yr hawlydd yn gallu gweld unrhyw ddogfennau fyddwch wedi uwchlwytho a'ch atebion.",
   "provideDetailsInfo": "Mae'r gwasanaeth hwn hefyd ar gael <a href=\"?lang=en\" class=\"govuk-link language\">yn Saesneg</a>.",
-  "hmctsSupportInfo": "Os ydych chi neu'r diffynnydd angen cymorth i ddefnyddio gwasanaethau GLlTEF, fel mynediad heb risiau i'r llys ar gyfer eich gwrandawiad, gallwch ofyn am hyn ar ôl cyflwyno eich ymateb."
+  "hmctsSupportInfo": "Os ydych chi neu'r diffynnydd angen cymorth i ddefnyddio gwasanaethau GLlTEF, fel mynediad heb risiau i'r llys ar gyfer eich gwrandawiad, gallwch ofyn am hyn ar ôl cyflwyno eich ymateb.",
+  "buttons": {
+    "startNow": "Dechrau nawr"
+  }
 }

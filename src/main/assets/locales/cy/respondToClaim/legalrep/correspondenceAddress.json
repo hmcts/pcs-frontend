@@ -1,6 +1,7 @@
 {
   "pageTitle": "cyDefendant’s postal address",
   "legend": "cyIs the defendant’s postal address {{ formattedAddressStr }}",
+  "legend.hint": "Dyma’r cyfeiriad a ddarparwyd gan {{claimantName}}",
   "labels": {
     "yes": "Ydy",
     "no": "Nac ydy",

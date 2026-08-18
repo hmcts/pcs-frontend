@@ -1,5 +1,5 @@
 {
-  "pageTitle": "Taliadau blaenorol",
+  "pageTitle": "Taliadau a wnaed",
   "heading": "Taliadau blaenorol",
   "question": "",
   "repaymentsMadeQuestion": "A yw'r diffynnydd wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",

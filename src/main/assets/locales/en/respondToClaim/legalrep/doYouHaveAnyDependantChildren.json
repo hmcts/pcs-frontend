@@ -7,6 +7,7 @@
   "dependentChildrenDetailsHint": "",
   "errors": {
     "dependentChildren": "Select if they have any dependant children",
-    "dependentChildrenDetails": "Give details about their dependant children"
+    "dependentChildrenDetails": "Give details about their dependant children",
+    "dependantChildrenDetailsMaxLength": "Dependent children details must be 500 characters or less"
   }
 }
