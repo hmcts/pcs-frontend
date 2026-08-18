@@ -146,21 +146,6 @@ export class HttpService {
     this.tokenRegenerator = regenerator;
   }
 
-  // Returns the current S2S token, regenerating it first if it's missing or within the 30s
-  // pre-expiry buffer. Use this when you need the raw token value for a non-standard header (e.g.
-  // cui-ra's `service-token`); normal requests get a fresh `ServiceAuthorization` attached
-  // automatically. Reuses the same freshness logic as outbound requests, so the value is never
-  // the stale copy a direct Redis read can return.
-  public async getValidS2SToken(): Promise<string> {
-    if (!this.s2sToken || this.isTokenExpired()) {
-      await this.regenerateToken();
-    }
-    if (!this.s2sToken) {
-      throw new Error('No valid S2S token available');
-    }
-    return this.s2sToken;
-  }
-
   // API methods matching Axios signatures exactly
   public getUri(config?: AxiosRequestConfig): string {
     return this.instance.getUri(config);
