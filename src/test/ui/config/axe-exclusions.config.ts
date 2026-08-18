@@ -32,6 +32,7 @@ export const axe_exclusions = [
   '#gender_different-2', // page: gender, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#sexuality-4', // page: sexuality, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#religion-8', // page: religion, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#ethnicity-4', // page: ethnicity, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is not allowed for this radio button
   'html', // accessibility: html-has-lang - <html> element does not have a lang attribute
   'html-has-lang', // accessibility: html-has-lang - <html> element does not have a lang attribute
 ];
