@@ -5,7 +5,7 @@
   "options": {
     "yes": "Do",
     "no": "Naddo",
-    "imNotSure": "Dydy'r Diffynnydd ddim yn siŵr"
+    "imNotSure": "Diffynnydd ddim yn siŵr"
   },
   "noticeDateLabel": "Pryd gafodd y diffynnydd yr hysbysiad gan {{claimantName}}? (Dewisol)",
   "noticeDateHint": "Er enghraifft, 16 4 2021",
