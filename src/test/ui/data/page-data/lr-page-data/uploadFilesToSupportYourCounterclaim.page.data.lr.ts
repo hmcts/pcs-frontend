@@ -1,4 +1,4 @@
-export const uploadFilesToSupportYourCounterclaimLR = {
+export const uploadFilesToSupportYourCounterclaim = {
   mainHeader: `Upload files to support your counterclaim`,
   youShouldOnlyParagraph: `You should only upload files that are relevant to your counterclaim`,
   theClaimantWillBeParagraph: `The claimant will be able to see any files you upload`,
