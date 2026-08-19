@@ -27,4 +27,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     await saveDraftDefendantResponse(req, response);
   },
+  translationKeys: {
+    heading: 'heading',
+    paragraph1: 'paragraph1',
+    buttonContinue: 'buttonContinue',
+    buttonSkip: 'buttonSkip'
+  },
 });
