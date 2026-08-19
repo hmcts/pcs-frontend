@@ -6,6 +6,6 @@
     "addressHeading": "What’s the defendant’s postal address?"
   },
   "errors": {
-    "correspondenceAddressConfirm": "Please confirm the defendant’s address by selecting the options below"
+    "correspondenceAddressConfirm": "Please confirm the defendant’s address by selecting the options below "
   }
 }
