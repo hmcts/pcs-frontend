@@ -11412,13 +11412,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openid-client@npm:6.8.5":
-  version: 6.8.5
-  resolution: "openid-client@npm:6.8.5"
+"openid-client@npm:6.8.6":
+  version: 6.8.6
+  resolution: "openid-client@npm:6.8.6"
   dependencies:
     jose: "npm:^6.2.8"
     oauth4webapi: "npm:^3.8.7"
-  checksum: 10/7c399e21a6faf94e03f52233254bc9bc227476842bb86804a6ff81550565ca732a4e44d37cef9fd25997c82dc48b8f0349a1039e67d868a4df70caed55e1421e
+  checksum: 10/d7222dbc154c2a487f019a1a4fb06a3365765358692f1e97050412f2195138cd3d66ee3f719cc0f350751a16e19ef9f7d7e090074f9efa7522391f6a42888f07
   languageName: node
   linkType: hard
 
@@ -11741,7 +11741,7 @@ __metadata:
     multer: "npm:^2.1.1"
     nodemon: "npm:3.1.14"
     nunjucks: "npm:3.2.4"
-    openid-client: "npm:6.8.5"
+    openid-client: "npm:6.8.6"
     playwright: "npm:1.62.1"
     playwright-core: "npm:1.62.1"
     postcss: "npm:8.5.26"
