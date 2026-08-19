@@ -89,12 +89,12 @@ function resolveStepContext(
   return { stepName: resolvedStepName, journeyFolder: resolvedJourney };
 }
 
-export async function loadStepNamespace(req: Request): Promise<void> {
+export async function loadStepNamespace(req: Request, stepName?: string, journeyFolder?: string): Promise<void> {
   if (!req.i18n) {
     return;
   }
 
-  const context = resolveStepContext(req);
+  const context = resolveStepContext(req, stepName, journeyFolder);
   if (!context) {
     return;
   }
@@ -159,6 +159,10 @@ export async function loadStepNamespace(req: Request): Promise<void> {
       }
     }
   }
+}
+
+export async function loadStepNamespaces(req: Request, stepNames: string[], journeyFolder?: string): Promise<void> {
+  await Promise.all(stepNames.map(stepName => loadStepNamespace(req, stepName, journeyFolder)));
 }
 
 export function getStepTranslations(req: Request, stepName?: string, folder?: string): TranslationContent {

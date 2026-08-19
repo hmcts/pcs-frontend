@@ -1,7 +1,7 @@
 {
   "heading": "cyPrevious payments",
   "question": "",
-  "repaymentsMadeQuestion": "Has the defendant paid any money to {{claimantName}} since {{dateIssued, ordinalDate}}?",
+  "repaymentsMadeQuestion": "cyHas the defendant paid any money to {{claimantName}} since {{dateIssued, ordinalDate}}?",
   "textAreaLabel": "cyGive details about how much the defendant paid and when",
   "errors": {
     "repaymentsInfo": "cyGive details about how much the defendant paid and when",
