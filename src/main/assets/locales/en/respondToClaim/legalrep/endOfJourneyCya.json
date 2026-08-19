@@ -3,6 +3,11 @@
     "yourCircumstances": "Circumstances"
   },
   "rows": {
+    "uploadedDocuments": {
+      "label": "Uploaded files",
+      "changeHidden": "uploaded files",
+      "none": "No files uploaded"
+    },
     "otherConsiderations": {
       "label": "Is there anything else the defendant wants to tell the court as part of their response?"
     },
