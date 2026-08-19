@@ -13,9 +13,7 @@ const legalRepStepOrder = [
   'defendant-name-confirmation',
   'defendant-date-of-birth',
   'correspondence-address',
-  'contact-preferences-email-or-post',
-  'contact-preferences-telephone',
-  'contact-preferences-text-message',
+  'email-confirmation',
   'exempt-landlord',
   'written-terms',
   'tenancy-type-details',
@@ -59,7 +57,11 @@ const legalRepStepOrder = [
   'equality-and-diversity-end',
   'language-used',
   'end-of-journey-cya',
-  'end-now',
+  'response-submitted',
+  'response-submitted-counter-claim-fee-payment-needed',
+  'counter-claim-application-fee-amount',
+  'counter-claim-payment-successful',
+  'response-and-counter-claim-submitted',
 ] as const satisfies readonly LegalRepRespondToClaimStepName[];
 
 // Legal-rep journey is a flat, linear stepOrder. It is intentionally NOT sectionalised

@@ -1,4 +1,4 @@
-export const uploadAdditionalDocumentsLR = {
+export const uploadAdditionalDocuments = {
   mainHeader: `Upload additional documents (Optional)`,
   uploadAnyFilesParagraph: `Upload any documents that you think are relevant to the response. The claimant will be able to see any documents you upload.`,
   beforeYouUploadYourFilesParagraph: `Before you upload your documents`,
