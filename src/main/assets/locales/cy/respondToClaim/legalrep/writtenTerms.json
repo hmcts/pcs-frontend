@@ -5,8 +5,6 @@
   "heading": "Telerau ysgrifenedig",
   "termsQuestion": "A yw'r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth?",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
     "or": "neu",
     "imNotSure": "Diffynnydd ddim yn siŵr"
   },

@@ -2,10 +2,6 @@
   "pageTitle": "Circumstances",
   "introParagraph": "Use this section to give details about any events or circumstances that have impacted the defendant’s case that a judge should know about.",
   "forExample": "For example:",
-  "options": {
-    "yes": "Yes",
-    "no": "No"
-  },
   "bullet1": "someone in the defendant’s household has an illness or disability",
   "bullet2": "children in the defendant’s household attend a local school",
   "bullet3": "the defendant works irregular hours, making it hard to find a new place to live",

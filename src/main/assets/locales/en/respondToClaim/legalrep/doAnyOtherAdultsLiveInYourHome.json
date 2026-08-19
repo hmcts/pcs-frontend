@@ -3,10 +3,6 @@
   "question": "",
   "heading": "Other adults",
   "dependantQuestion": "Do any other adults live in the defendant’s home?",
-  "options": {
-    "yes": "Yes",
-    "no": "No"
-  },
   "textAreaLabel": "Give details about the other adults living in the defendant’s home",
   "textAreaHintText": "",
   "errors": {

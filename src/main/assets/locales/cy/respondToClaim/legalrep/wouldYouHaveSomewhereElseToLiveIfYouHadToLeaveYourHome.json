@@ -5,8 +5,6 @@
   "accommodationQuestion": "A fyddai gan y diffynnydd rywle arall i fyw os byddai'n rhaid iddynt adael eu cartref?",
   "dateLabel": "Pryd fyddent yn gallu symud i mewn? (Dewisol)",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
     "notSure": "Diffynnydd ddim yn siŵr"
   },
   "errors": {
