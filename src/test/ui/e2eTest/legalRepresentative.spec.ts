@@ -300,6 +300,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('validateCounterClaimApplicationFee', {
       amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
       fee: counterClaimSpecificSumOfMoney.feeHiddenAmount,
+      isLegalRepresentative: true,
     });
     await performAction('selectPaymentOptions', {
       amountLabel: counterClaimApplicationFeeAmount.counterClaimFeeLabel,
@@ -309,7 +310,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       pbaValue: serviceRequestPayment.pbaIndex1,
       referenceLabel: serviceRequestPayment.pbaReferenceLabel,
       referenceText: serviceRequestPayment.pbaReferenceInputText,
-      button: counterClaimApplicationFeeAmount.getPayButton('35.00'),
+      button: counterClaimApplicationFeeAmount.getLrPayButton('35.00'),
     });
     await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
     await performValidation('text', {
@@ -461,6 +462,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('validateCounterClaimApplicationFee', {
       amount: counterClaimApplicationFeeAmount.counterClaimAmountNotApplicable,
       fee: counterClaimApplicationFeeAmount.somethingElseCounterClaimFee,
+      isLegalRepresentative: true,
     });
     await performAction('selectPaymentOptions', {
       amountLabel: counterClaimApplicationFeeAmount.counterClaimFeeLabel,
@@ -470,7 +472,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       pbaValue: serviceRequestPayment.pbaIndex1,
       referenceLabel: serviceRequestPayment.pbaReferenceLabel,
       referenceText: serviceRequestPayment.pbaReferenceInputText,
-      button: counterClaimApplicationFeeAmount.getPayButton(
+      button: counterClaimApplicationFeeAmount.getLrPayButton(
         counterClaimApplicationFeeAmount.somethingElseCounterClaimFee
       ),
     });
