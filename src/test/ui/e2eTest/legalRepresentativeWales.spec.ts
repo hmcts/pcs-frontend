@@ -136,7 +136,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('selectNoticeDetailsLR', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
-    await performAction('enterNoticeDateKnownLR');
+    await performAction('enterNoticeDateUnknownLR');
     await performAction('rentArrearsLR', {
       option: rentArrears.yesRadioOption,
       rentArrearsTotal: submitCaseApiDataWales.submitCaseDefendantSecure.rentArrears_Total,
