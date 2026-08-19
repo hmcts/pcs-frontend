@@ -242,6 +242,7 @@ export class RespondToClaimAction implements IAction {
       ['counterClaimAbout', () => this.counterClaimAbout(fieldName as actionRecord)],
       ['counterClaimOrderOtherThanSum', () => this.counterClaimOrderOtherThanSum(fieldName as actionRecord)],
       ['selectReasonableAdjustments', () => this.selectReasonableAdjustments(fieldName as actionRecord, page)],
+      ['selectEqualityAndDiversity', () => this.selectEqualityAndDiversity(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -1767,5 +1768,14 @@ export class RespondToClaimAction implements IAction {
       });
     }
     await performAction('clickButton', ra.button);
+  }
+
+  private async selectEqualityAndDiversity(diversityData: actionRecord): Promise<void> {
+    this.recordAnswer(String(diversityData.question), diversityData.radioOption);
+    await performAction('clickRadioButton', {
+      question: diversityData.question,
+      option: diversityData.radioOption,
+    });
+    await performAction('clickButton', diversityData.button);
   }
 }
