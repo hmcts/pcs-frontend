@@ -89,6 +89,27 @@ function resolveStepContext(
   return { stepName: resolvedStepName, journeyFolder: resolvedJourney };
 }
 
+// Tracks which `${lang}:${namespace}` bundles have had the citizen-base + userType-override
+// merge applied, per i18next instance. We cannot rely on getResourceBundle() as the "already
+// loaded" signal: i18next's fs-backend may lazily populate the SAME namespace with the raw
+// (unmerged) userType file, which would make getResourceBundle truthy and cause the citizen
+// base to be skipped — silently dropping any key not present in the userType file (it then
+// falls back to the English userType bundle). This Set guarantees the merge runs once regardless.
+const mergedStepBundles = new WeakMap<object, Set<string>>();
+
+function isStepBundleMerged(i18n: object, key: string): boolean {
+  return mergedStepBundles.get(i18n)?.has(key) ?? false;
+}
+
+function markStepBundleMerged(i18n: object, key: string): void {
+  let applied = mergedStepBundles.get(i18n);
+  if (!applied) {
+    applied = new Set<string>();
+    mergedStepBundles.set(i18n, applied);
+  }
+  applied.add(key);
+}
+
 export async function loadStepNamespace(req: Request): Promise<void> {
   if (!req.i18n) {
     return;
@@ -103,7 +124,7 @@ export async function loadStepNamespace(req: Request): Promise<void> {
   const stepNamespace = buildStepNamespace(context.stepName, context.journeyFolder, userType);
   const lang = getMainRequestLanguage(req);
 
-  if (req.i18n.getResourceBundle(lang, stepNamespace)) {
+  if (isStepBundleMerged(req.i18n, `${lang}:${stepNamespace}`)) {
     return;
   }
 
@@ -146,11 +167,15 @@ export async function loadStepNamespace(req: Request): Promise<void> {
       return;
     }
 
-    req.i18n.addResourceBundle(lang, stepNamespace, translations, true, true);
-
+    // Let the fs-backend finish any lazy load of the raw namespace file FIRST, then overlay our
+    // merged (citizen base + userType override) bundle on top with deep + overwrite. Doing it in
+    // this order means a late backend read can never clobber the merged result.
     await new Promise<void>((resolve, reject) => {
       req.i18n!.loadNamespaces(stepNamespace, err => (err ? reject(err) : resolve()));
     });
+
+    req.i18n.addResourceBundle(lang, stepNamespace, translations, true, true);
+    markStepBundleMerged(req.i18n, `${lang}:${stepNamespace}`);
   } catch (error) {
     if (isDevelopment) {
       const errorMessage = error instanceof Error ? error.message : String(error);

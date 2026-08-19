@@ -3,10 +3,6 @@
   "question": "",
   "heading": "Oedolion eraill",
   "dependantQuestion": "A oes yna unrhyw oedolion eraill yn byw yng nghartref y diffynnydd?",
-  "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy"
-  },
   "textAreaLabel": "Rhowch fanylion yr oedolion eraill sy'n byw yng nghartref y diffynnydd",
   "textAreaHintText": "",
   "errors": {
