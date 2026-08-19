@@ -6,6 +6,5 @@ export * from './pcqRedirect';
 export * from './pageTrackingUrl';
 export * from './legalRepresentativeHeaders';
 export * from './respondToClaimFeatureMiddleware';
-export * from './cuiYourSupportFeatureMiddleware';
 export * from './handleRespondToClaimDisabled';
 export * from './legalRepresentativeSpecificStepsAccess';
