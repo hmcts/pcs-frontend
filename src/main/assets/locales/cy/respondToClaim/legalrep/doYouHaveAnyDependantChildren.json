@@ -7,6 +7,7 @@
   "dependentChildrenDetailsHint": "",
   "errors": {
     "dependentChildren": "Dewiswch a oes ganddynt unrhyw blant sy'n ddibynnol arnynt",
-    "dependentChildrenDetails": "Rhowch fanylion eu plant dibynnol"
+    "dependentChildrenDetails": "Rhowch fanylion eu plant dibynnol",
+    "dependantChildrenDetailsMaxLength": "Rhaid i fanylion plant dibynnol fod yn 500 o nodau neu lai"
   }
 }

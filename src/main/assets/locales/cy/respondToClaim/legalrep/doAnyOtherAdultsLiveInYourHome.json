@@ -3,11 +3,16 @@
   "question": "",
   "heading": "Oedolion eraill",
   "dependantQuestion": "A oes yna unrhyw oedolion eraill yn byw yng nghartref y diffynnydd?",
+  "options": {
+    "yes": "Ydy",
+    "no": "Nac ydy"
+  },
   "textAreaLabel": "Rhowch fanylion yr oedolion eraill sy'n byw yng nghartref y diffynnydd",
   "textAreaHintText": "",
   "errors": {
     "confirmOtherAdults": "Dewiswch a oes yna unrhyw oedolion eraill yn byw yng nghartref y diffynnydd",
     "otherAdultsDetails": "Rhowch fanylion yr oedolion eraill sy'n byw yn eu cartref",
-    "otherAdultsDetailsInvalidCharacters": "Rhowch fanylion am yr oedolion eraill sy'n byw yn eu cartref, rhaid iddynt gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
+    "otherAdultsDetailsInvalidCharacters": "Rhowch fanylion am yr oedolion eraill sy'n byw yn eu cartref, rhaid iddynt gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod",
+    "otherAdultsDetailsMaxLength": "Rhaid i fanylion am oedolion eraill fod yn 500 o nodau neu lai"
   }
 }

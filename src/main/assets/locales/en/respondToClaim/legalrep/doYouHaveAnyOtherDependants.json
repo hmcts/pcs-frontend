@@ -7,6 +7,7 @@
   "otherDependantDetailsHint": "",
   "errors": {
     "otherDependants": "Select if they have any other dependants",
-    "otherDependantDetails": "Give details about their other dependants"
+    "otherDependantDetails": "Give details about their other dependants",
+    "otherDependantDetailsMaxLength": "Other dependants details must be 500 characters or less"
   }
 }

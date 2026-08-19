@@ -13,6 +13,7 @@
   "textAreaHint": "Rhowch hyd at 500 nod",
   "errors": {
     "repaymentsAgreed": "Dewiswch a yw'r diffynnydd wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}",
-    "repaymentsAgreed.repaymentsAgreedDetails": "Rhowch fanylion faint mae'r diffynnydd wedi cytuno i'w dalu, pa mor aml y bydd y diffynnydd yn talu a phryd wnaed y cytundeb"
+    "repaymentsAgreed.repaymentsAgreedDetails": "Rhowch fanylion faint mae'r diffynnydd wedi cytuno i'w dalu, pa mor aml y bydd y diffynnydd yn talu a phryd wnaed y cytundeb",
+    "repaymentsAgreedDetailsMaxLength": "Rhaid i fanylion y cytundeb ad-dalu fod yn 500 o nodau neu lai"
   }
 }

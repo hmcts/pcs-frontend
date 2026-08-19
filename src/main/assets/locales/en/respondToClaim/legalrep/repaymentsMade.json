@@ -1,5 +1,5 @@
 {
-  "pageTitle": "Previous payments",
+  "pageTitle": "Payments made",
   "heading": "Previous payments",
   "question": "",
   "repaymentsMadeQuestion": "Has the defendant paid any money to {{claimantName}} since {{dateIssued, ordinalDate}}?",
