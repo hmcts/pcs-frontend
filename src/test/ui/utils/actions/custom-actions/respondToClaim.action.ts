@@ -1509,7 +1509,7 @@ export class RespondToClaimAction implements IAction {
     rtcCyaMap.clear();
     const rowsLocator = page.locator('.govuk-summary-list__row:visible');
     await rowsLocator.first().waitFor({ state: 'visible', timeout: 15000 });
-    if (FieldsStore.getAll().has(rtcUploadedDocumentsQuestion)) {
+    if (FieldsStore.getAll().has(rtcUploadedDocumentsQuestion) && (!sectionData || sectionData === 'uploadFiles')) {
       const uploadedFilesLabel = sectionData ? rtcUploadedDocumentsQuestion : rtcFinalCyaUploadedDocumentsQuestion;
       await page
         .locator('.govuk-summary-list__row:visible')
