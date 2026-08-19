@@ -1,10 +1,18 @@
 import config from 'config';
 import { Application, Request, Response } from 'express';
 
+import { getUserType } from '../steps/utils';
+import { isAccessControlEnabled } from '../utils/isAccessControlEnabled';
+
 export default function (app: Application): void {
-  app.get('/active', (req: Request, res: Response) => {
+  app.get('/active', async (req: Request, res: Response) => {
     // check session exists
     if (!req.session || !req.session.cookie) {
+      return res.status(401).send('No active session');
+    }
+
+    // When access control is enabled, users without a permitted role have no active session.
+    if ((await isAccessControlEnabled(req)) && getUserType(req) === 'unauthorised') {
       return res.status(401).send('No active session');
     }
 
