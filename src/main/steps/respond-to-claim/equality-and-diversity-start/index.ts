@@ -31,6 +31,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     heading: 'heading',
     paragraph1: 'paragraph1',
     buttonContinue: 'buttonContinue',
-    buttonSkip: 'buttonSkip'
+    buttonSkip: 'buttonSkip',
   },
 });
