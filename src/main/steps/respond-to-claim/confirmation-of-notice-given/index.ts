@@ -2,6 +2,7 @@ import type { Request } from 'express';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { getClaimantName } from '../../utils/getClaimantName';
+import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -17,6 +18,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     question: 'question',
     hintText: 'hintText',
     noticeDateHint: 'noticeDateHint',
+    insetText: 'insetText',
+    noticeDocumentLinkText: 'noticeDocumentLinkText',
   },
   fields: [
     {
@@ -53,10 +56,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   extendGetContent: req => {
+    const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = getClaimantName(req);
+    const detailsTab = caseData?.detailsTab_NoticeDetails as { noticeDocuments?: Record<string, unknown>[] } | undefined;
+    const noticeDocument = detailsTab?.noticeDocuments?.[0] ?? '';
+    const release12Enabled = isRelease12Enabled(req);
 
     return {
       claimantName,
+      noticeDocument,
+      isRelease12Enabled: release12Enabled,
     };
   },
 });

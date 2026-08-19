@@ -7,6 +7,8 @@
     "imNotSure": "Defendant is not sure"
   },
 
+  "insetText": "When they made their claim, {{claimantName}} had to provide a copy of the notice they served on the defendant.",
+  "noticeDocumentLinkText": "View a copy of the notice (opens in new tab).",
   "noticeDateLabel": "When did the defendant receive notice from {{claimantName}}? (Optional)",
   "noticeDateHint": "For example, 16 4 2021",
   "errors": {
