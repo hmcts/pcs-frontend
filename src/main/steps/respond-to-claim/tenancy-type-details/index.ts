@@ -1,5 +1,6 @@
 import type { Request } from 'express';
 
+import { Logger } from '../../../modules/logger';
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
@@ -9,6 +10,69 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { ccdCaseService } from '@services/ccdCaseService';
+import { findCaseDocumentById } from '@utils/documentUtils';
+
+const logger = Logger.getLogger('tenancyTypeDetails');
+
+export function getTenancyDocumentInfo(validatedCase?: unknown): {
+  isDocumentUploaded: boolean;
+  documentId?: string;
+} {
+  const caseData =
+    (validatedCase as { data?: Record<string, unknown> })?.data ?? (validatedCase as Record<string, unknown>) ?? {};
+
+  const detailsTabTenancyDocs = (caseData?.detailsTab_TenancyLicenceDetails as Record<string, unknown>)
+    ?.tenancyLicenceDocuments;
+  const detailsTabOccupationDocs = (caseData?.detailsTab_OccupationContractLicenceDetails as Record<string, unknown>)
+    ?.documents;
+  const tenancyLicenceDocs = caseData?.tenancy_LicenceDocuments || caseData?.tenancyLicenceDocuments;
+  const occupationDocs = caseData?.occupationContractDocuments || caseData?.occupationLicenceDocuments;
+  const allDocs = caseData?.allDocuments;
+  const claimantDocs = caseData?.claimantDocuments;
+
+  const collections = [
+    detailsTabTenancyDocs,
+    detailsTabOccupationDocs,
+    tenancyLicenceDocs,
+    occupationDocs,
+    allDocs,
+    claimantDocs,
+  ];
+
+  for (const collection of collections) {
+    const items = Array.isArray(collection) ? collection : collection ? [collection] : [];
+    for (const item of items) {
+      if (!item || typeof item !== 'object') {
+        continue;
+      }
+      const rec = item as Record<string, unknown>;
+      const val = (rec.value as Record<string, unknown>) ?? rec;
+      const docObj = (val.document as Record<string, unknown>) ?? val;
+
+      const url = (docObj.document_url ||
+        docObj.document_binary_url ||
+        val.document_url ||
+        val.document_binary_url ||
+        rec.document_url ||
+        rec.document_binary_url) as string | undefined;
+
+      const urlId = url ? url.split('/documents/')[1]?.split('/')[0] : undefined;
+      const id = (rec.id as string) || (val.id as string) || (docObj.id as string) || urlId;
+
+      if (id) {
+        const downloadable = findCaseDocumentById(caseData, id);
+        if (!downloadable?.binaryUrl) {
+          continue;
+        }
+        return { isDocumentUploaded: true, documentId: downloadable.id };
+      }
+    }
+  }
+
+  return { isDocumentUploaded: false };
+}
+
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -169,9 +233,27 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
     }
 
-    const tenancyDocument = walesProperty
-      ? (caseData?.detailsTab_OccupationContractLicenceDetails?.documents?.[0] ?? '')
-      : (caseData?.detailsTab_TenancyLicenceDetails?.tenancyLicenceDocuments?.[0] ?? '');
+    let { isDocumentUploaded, documentId } = getTenancyDocumentInfo(req.res?.locals.validatedCase);
+
+    if (!isDocumentUploaded) {
+      try {
+        const accessToken = req.session?.user?.accessToken;
+        const rawCaseReference = req.params?.caseReference;
+        const caseReference = Array.isArray(rawCaseReference) ? rawCaseReference[0] : rawCaseReference;
+        if (accessToken && caseReference) {
+          const fullCase = await ccdCaseService.getCaseById(accessToken, caseReference);
+          const fullCaseDocInfo = getTenancyDocumentInfo(fullCase);
+          if (fullCaseDocInfo.isDocumentUploaded && fullCaseDocInfo.documentId) {
+            isDocumentUploaded = true;
+            documentId = fullCaseDocInfo.documentId;
+          }
+        }
+      } catch (err) {
+        logger.warn('[tenancyTypeDetails] Failed to fetch full case for tenancy document', { error: err });
+      }
+    }
+
+    const tenancyDocument = isDocumentUploaded && documentId ? { id: documentId } : '';
 
     return {
       ...formContent,

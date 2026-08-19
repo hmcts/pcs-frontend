@@ -101,7 +101,7 @@ describe('confirmation-of-notice-given step', () => {
                 noticeDocuments: [
                   {
                     id: 'notice-doc-123',
-                    value: { document_filename: 'notice.pdf' },
+                    value: { document_filename: 'notice.pdf', document_binary_url: 'http://dm-store/binary' },
                   },
                 ],
               },
@@ -110,7 +110,7 @@ describe('confirmation-of-notice-given step', () => {
         },
       } as unknown as Response;
 
-      const content = testedStep.extendGetContent ? testedStep.extendGetContent(req) : {};
+      const content = testedStep.extendGetContent ? await testedStep.extendGetContent(req) : {};
       expect(content).toEqual(
         expect.objectContaining({
           noticeDocument: expect.objectContaining({ id: 'notice-doc-123' }),
