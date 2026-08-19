@@ -1243,7 +1243,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('rentArrearsLR', {
       option: rentArrears.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCasePayload.rentArrears_Total,
-      //showRentDocumentLink: true,
+      showRentDocumentLink: true,
     });
     await performAction('selectCounterClaimLR', {
       option: counterClaim.yesRadioOption,
