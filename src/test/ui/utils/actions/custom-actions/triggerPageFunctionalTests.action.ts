@@ -22,6 +22,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
   private static readonly LOCK_DIR = path.join(process.cwd(), 'test-results', 'pft-locks');
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
+  private static readonly LR_PFT_DIR = path.join(__dirname, '../../../functional/legalRepresentative-functional');
   private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
   private static readonly PAGE_DATA_LR_DIR = path.join(__dirname, '../../../data/page-data/lr-page-data');
   private static pagesTestedInCurrentRun = new Set<string>();
@@ -74,7 +75,12 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       }
     }
 
-    const pftFilePath = this.resolveFilePath(TriggerPageFunctionalTestsAction.PFT_DIR, `${pageName}.pft.ts`);
+    const isLRForPFT = test.info().title.includes('@LR') || false;
+    const pftBaseDir = isLRForPFT
+      ? TriggerPageFunctionalTestsAction.LR_PFT_DIR
+      : TriggerPageFunctionalTestsAction.PFT_DIR;
+    const pftFilePath = this.resolveFilePath(pftBaseDir, `${pageName}.pft.ts`);
+
     if (!pftFilePath || !fs.existsSync(pftFilePath)) {
       if (enable_error_message_validation === 'true') {
         ErrorMessageValidation.trackMissingEMVFile(pageName);
