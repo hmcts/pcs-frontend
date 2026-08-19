@@ -21,6 +21,13 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   saveDraftDefendantResponse: jest.fn(),
 }));
 
+type ConfirmationOfNoticeGivenStep = {
+  beforeRedirect: (req: Request) => Promise<void>;
+  extendGetContent: (req: Request) => Record<string, unknown>;
+};
+
+const testedStep = step as unknown as ConfirmationOfNoticeGivenStep;
+
 describe('confirmation-of-notice-given step', () => {
   const createBaseReqRes = () => {
     const req = {
@@ -66,7 +73,7 @@ describe('confirmation-of-notice-given step', () => {
       possessionNoticeReceived: 'NOT_SURE',
     };
 
-    const beforeRedirect = (step as any).beforeRedirect;
+    const beforeRedirect = testedStep.beforeRedirect;
     expect(beforeRedirect).toBeDefined();
 
     await beforeRedirect(req);
@@ -103,7 +110,7 @@ describe('confirmation-of-notice-given step', () => {
         },
       } as unknown as Response;
 
-      const content = (step as any).extendGetContent ? (step as any).extendGetContent(req) : {};
+      const content = testedStep.extendGetContent ? testedStep.extendGetContent(req) : {};
       expect(content).toEqual(
         expect.objectContaining({
           noticeDocument: expect.objectContaining({ id: 'notice-doc-123' }),

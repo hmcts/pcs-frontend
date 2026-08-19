@@ -58,7 +58,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: req => {
     const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = getClaimantName(req);
-    const detailsTab = caseData?.detailsTab_NoticeDetails as { noticeDocuments?: Record<string, unknown>[] } | undefined;
+    const detailsTab = caseData?.detailsTab_NoticeDetails as
+      { noticeDocuments?: Record<string, unknown>[] } | undefined;
     const noticeDocument = detailsTab?.noticeDocuments?.[0] ?? '';
     const release12Enabled = isRelease12Enabled(req);
 
