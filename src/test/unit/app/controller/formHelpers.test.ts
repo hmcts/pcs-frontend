@@ -781,7 +781,8 @@ describe('formHelpers', () => {
         validateForm(req, fields);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1', field2: 'value2' }),
-          expect.objectContaining({ field1: 'value1', field2: 'value2' })
+          expect.objectContaining({ field1: 'value1', field2: 'value2' }),
+          req
         );
       });
 
@@ -813,7 +814,8 @@ describe('formHelpers', () => {
         validateForm(req, fields);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1' }),
-          expect.objectContaining({ previousField: 'previousValue', anotherField: 'anotherValue', field1: 'value1' })
+          expect.objectContaining({ previousField: 'previousValue', anotherField: 'anotherValue', field1: 'value1' }),
+          req
         );
       });
 
@@ -865,7 +867,8 @@ describe('formHelpers', () => {
         validateForm(req, fields, undefined, allFormData);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1' }),
-          expect.objectContaining({ customData: 'customValue', field1: 'value1' })
+          expect.objectContaining({ customData: 'customValue', field1: 'value1' }),
+          req
         );
       });
     });
@@ -2338,7 +2341,8 @@ describe('formHelpers', () => {
         validateForm(req, fields);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1', field2: 'value2' }),
-          expect.objectContaining({ field1: 'value1', field2: 'value2' })
+          expect.objectContaining({ field1: 'value1', field2: 'value2' }),
+          req
         );
       });
 
@@ -2370,7 +2374,8 @@ describe('formHelpers', () => {
         validateForm(req, fields);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1' }),
-          expect.objectContaining({ previousField: 'previousValue', anotherField: 'anotherValue', field1: 'value1' })
+          expect.objectContaining({ previousField: 'previousValue', anotherField: 'anotherValue', field1: 'value1' }),
+          req
         );
       });
 
@@ -2422,7 +2427,8 @@ describe('formHelpers', () => {
         validateForm(req, fields, undefined, allFormData);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1' }),
-          expect.objectContaining({ customData: 'customValue', field1: 'value1' })
+          expect.objectContaining({ customData: 'customValue', field1: 'value1' }),
+          req
         );
       });
     });

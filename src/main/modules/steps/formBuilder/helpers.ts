@@ -303,7 +303,7 @@ export function validateForm(
     if (field.required !== undefined) {
       if (typeof field.required === 'function') {
         try {
-          isRequired = field.required(formData, validationAllData);
+          isRequired = field.required(formData, validationAllData, req);
         } catch (err) {
           logger.error(`Error evaluating required function for field ${field.name}:`, err);
           isRequired = false;

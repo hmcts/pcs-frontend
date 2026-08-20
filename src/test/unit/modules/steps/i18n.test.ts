@@ -20,6 +20,7 @@ import {
   getStepTranslations,
   getTranslationFunction,
   loadStepNamespace,
+  loadStepNamespaces,
   validateTranslationKey,
 } from '@modules/steps/i18n';
 
@@ -291,6 +292,48 @@ describe('steps/i18n', () => {
       jest.spyOn(fs, 'access').mockRejectedValue(new Error('ENOENT: no such file'));
 
       await expect(loadStepNamespace(req)).resolves.not.toThrow();
+    });
+  });
+
+  describe('loadStepNamespaces', () => {
+    it('should load multiple namespaces sequentially', async () => {
+      (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
+      (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+
+      const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
+      const addResourceBundle = jest.fn();
+      const getResourceBundle = jest.fn().mockReturnValue(null);
+      const i18n = { getResourceBundle, addResourceBundle, loadNamespaces };
+
+      jest.spyOn(fs, 'access').mockResolvedValue(undefined);
+      jest.spyOn(fs, 'readFile').mockResolvedValue(JSON.stringify({ value: 'mocked' }));
+
+      const req = buildReq({
+        i18n,
+        step: { name: 'cya-page', journey: 'respondToClaim' },
+      });
+
+      await loadStepNamespaces(req, ['stepA', 'stepB'], 'respondToClaim');
+
+      expect(getResourceBundle).toHaveBeenCalledWith('en', 'respondToClaim/stepA');
+      expect(getResourceBundle).toHaveBeenCalledWith('en', 'respondToClaim/stepB');
+      expect(addResourceBundle).toHaveBeenCalledTimes(2);
+      expect(addResourceBundle).toHaveBeenNthCalledWith(
+        1,
+        'en',
+        'respondToClaim/stepA',
+        { value: 'mocked' },
+        true,
+        true
+      );
+      expect(addResourceBundle).toHaveBeenNthCalledWith(
+        2,
+        'en',
+        'respondToClaim/stepB',
+        { value: 'mocked' },
+        true,
+        true
+      );
     });
   });
 
