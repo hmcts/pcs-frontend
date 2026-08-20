@@ -324,8 +324,8 @@ describe('steps/i18n', () => {
 
       await loadStepNamespaces(req, ['stepA', 'stepB'], 'respondToClaim');
 
-      expect(getResourceBundle).toHaveBeenCalledWith('en', 'respondToClaim/stepA');
-      expect(getResourceBundle).toHaveBeenCalledWith('en', 'respondToClaim/stepB');
+      expect(loadNamespaces).toHaveBeenCalledWith('respondToClaim/stepA', expect.any(Function));
+      expect(loadNamespaces).toHaveBeenCalledWith('respondToClaim/stepB', expect.any(Function));
       expect(addResourceBundle).toHaveBeenCalledTimes(2);
       expect(addResourceBundle).toHaveBeenNthCalledWith(
         1,
