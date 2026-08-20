@@ -1,4 +1,5 @@
 {
+  "title": "Ôl-ddyledion rhent",
   "pageTitle": "Ôl-ddyledion rhent",
   "amountOwedHeading": "Swm sy'n ddyledus gan y diffynnydd mewn ôl-ddyledion rhent a roddwyd gan {{claimantName}}:",
   "rentArrearsQuestion": "A yw'r swm hwn yn ddyledus gan y diffynnydd mewn ôl-ddyledion rhent?",
@@ -8,8 +9,9 @@
     "or": "neu",
     "notSure": "Diffynnydd ddim yn siŵr"
   },
-  "insetIntroText": "",
-  "insetDetailsText": "",
+  "insetIntroText": "cyRent arrears are money you owe in rent payments.",
+  "insetDetailsText": "cyWhen they made their claim, {{claimantName}} had to provide a copy of the rent statement for the defendant’s property, showing the total rent arrears the defendant owes.",
+  "rentStatementDocumentLinkText": "cyView a copy of the rent statement (opens in new tab).",
   "rentArrearsAmountCorrection": {
     "label": "Faint mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent?",
     "hint": ""
