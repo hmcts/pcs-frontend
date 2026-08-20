@@ -46,6 +46,7 @@ export * from './counterClaimOrderOtherThanSum.page.data.lr';
 export * from './counterclaimDoYouWantToUploadFiles.page.data.lr';
 export * from './uploadFiles.page.data.lr';
 export * from './uploadFilesToSupportYourCounterclaim.page.data.lr';
+export * from './endOfJourneyCYA.page.data.lr';
 export * from './exemptLandlord.page.data.lr';
 export * from './writtenTerms.page.data.lr';
 export * from './tenancyDateDetails.page.data.lr';
