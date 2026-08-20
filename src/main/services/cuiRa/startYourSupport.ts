@@ -63,11 +63,7 @@ export async function startYourSupport(req: Request): Promise<string> {
   };
 
   // Derive the callback/logout URLs from the request host (like startPcq's returnUrl), NOT a static
-  // config value. The AAT deployment is served on two hosts — the promoted `pcs.aat…` and the
-  // functional-test `pcs-frontend-staging.aat…` — and the session cookie is host-only, so a callback
-  // sent to the wrong host lands unauthenticated and bounces to /login. Using the request host means
-  // the browser always returns to the host it came from (staging, AAT, preview, prod). `:id` is left
-  // as a literal for the microsite to substitute on the return leg.
+  // config value.
   const baseUrl = `${req.protocol}://${req.get('host')}`;
 
   const body: CuiRaInvocationRequest = {

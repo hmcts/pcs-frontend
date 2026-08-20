@@ -3,7 +3,7 @@
   "cardTitle": "cy Personal details",
   "rows": {
     "defendantNameConfirmation": {
-      "label": "cy Is your client’s name {{defendantName}}?",
+      "label": "cy Is the defendant’s name {{defendantName}}?",
       "changeHidden": "cy name"
     },
     "defendantName": {
@@ -15,37 +15,21 @@
       "changeHidden": "cy name"
     },
     "dateOfBirth": {
-      "label": "cy Date of Birth",
+      "label": "cy Defendant’s date of birth",
       "changeHidden": "cy date of birth"
     },
     "correspondenceAddressConfirmation": {
-      "label": "cy Is your postal address {{address}}?",
+      "label": "cy Is the defendant’s postal address {{address}}?",
       "fallbackLabel": "cy What’s your postal address?",
       "changeHidden": "cy postal address"
     },
-    "contactByEmailOrPost": {
-      "label": "cy How do you want to receive updates?",
-      "changeHidden": "cy how you receive updates",
-      "options": {
-        "email": "cy By email",
-        "post": "cy By post",
-        "none": "cy None"
-      }
+    "emailConfirmation": {
+      "label": "cy Do you know the defendant’s email address?",
+      "changeHidden": "cy whether you know the defendant’s email address"
     },
-    "contactByEmailAddress": {
-      "label": "cy Email"
-    },
-    "contactByPhone": {
-      "label": "cy Are you happy to be contacted by telephone?",
-      "changeHidden": "cy contact by phone"
-    },
-    "contactByText": {
-      "label": "cy Are you happy to be contacted by text message?",
-      "changeHidden": "cy contact by text message"
-    },
-    "contactDetails": {
-      "label": "cy Contact details",
-      "changeHidden": "cy contact details"
+    "emailAddress": {
+      "label": "cy Defendant’s email address",
+      "changeHidden": "cy defendant’s email address"
     }
   }
 }
