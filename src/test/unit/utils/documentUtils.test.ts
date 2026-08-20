@@ -614,4 +614,38 @@ describe('documentUtils', () => {
       })
     );
   });
+
+  it('skips invalid items, empty filenames, or non-object collections in extractCaseDocuments', () => {
+    const documents = extractCaseDocuments({
+      allDocuments: [
+        {
+          id: '1',
+          value: {
+            category_id: 'statementsOfCase',
+            document_filename: '   ',
+          },
+        },
+      ],
+      detailsTab_NoticeDetails: {
+        noticeDocuments: [
+          null,
+          'invalid-string-item',
+          {
+            id: 'single-id',
+            value: {
+              document_url: 'http://dm-store/documents/single-uuid',
+              document_filename: 'single.pdf',
+            },
+          },
+        ],
+      },
+    });
+
+    expect(
+      extractViewDocumentFolders({
+        allDocuments: [{ id: '1', value: { category_id: 'statementsOfCase', document_filename: '' } }],
+      })
+    ).toEqual([]);
+    expect(documents.find(d => d.id === 'single-id')).toBeDefined();
+  });
 });
