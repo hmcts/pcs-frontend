@@ -2,7 +2,7 @@
   "secrets": {
     "pcs": {
       "redis-connection-string": "REDIS_CONNECTION_STRING",
-      "app-insights-connection-string": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+      "app-insights-connection-string": "APPLICATION_INSIGHTS_CONNECTION_STRING",
       "pcs-frontend-s2s-secret": "S2S_SECRET",
       "pcs-frontend-idam-secret": "PCS_FRONTEND_IDAM_SECRET",
       "pcs-frontend-idam-system-username": "IDAM_SYSTEM_USERNAME",
@@ -90,10 +90,15 @@
   "payment": {
     "returnUrl": "PAYMENT_RETURN_URL"
   },
+  "pcq": {
+    "url": "PCQ_URL"
+  },
   "cuiRa": {
     "url": "CUI_RA_URL",
     "hmctsServiceId": "CUI_RA_HMCTS_SERVICE_ID",
-    "masterFlagCode": "CUI_RA_MASTER_FLAG_CODE"
+    "masterFlagCode": "CUI_RA_MASTER_FLAG_CODE",
+    "callbackUrl": "CUI_RA_CALLBACK_URL",
+    "logoutUrl": "CUI_RA_LOGOUT_URL"
   },
   "launchdarkly": {
     "env": "LAUNCHDARKLY_ENV"
