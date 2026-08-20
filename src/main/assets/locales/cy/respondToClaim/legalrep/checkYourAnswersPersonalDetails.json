@@ -1,0 +1,35 @@
+{
+  "pageTitle": "cy Check your answers",
+  "cardTitle": "cy Personal details",
+  "rows": {
+    "defendantNameConfirmation": {
+      "label": "cy Is the defendant’s name {{defendantName}}?",
+      "changeHidden": "cy name"
+    },
+    "defendantName": {
+      "label": "cy Name",
+      "changeHidden": "cy corrected name"
+    },
+    "defendantNameCapture": {
+      "label": "cy What is your client’s name?",
+      "changeHidden": "cy name"
+    },
+    "dateOfBirth": {
+      "label": "cy Defendant’s date of birth",
+      "changeHidden": "cy date of birth"
+    },
+    "correspondenceAddressConfirmation": {
+      "label": "cy Is the defendant’s postal address {{address}}?",
+      "fallbackLabel": "cy What’s your postal address?",
+      "changeHidden": "cy postal address"
+    },
+    "emailConfirmation": {
+      "label": "cy Do you know the defendant’s email address?",
+      "changeHidden": "cy whether you know the defendant’s email address"
+    },
+    "emailAddress": {
+      "label": "cy Defendant’s email address",
+      "changeHidden": "cy defendant’s email address"
+    }
+  }
+}
