@@ -85,6 +85,7 @@ export default {
   'response-submitted': 'responseSubmitted',
   'defendant-date-of-birth': 'defendantDateOfBirth',
   'select-defendant': 'selectDefendant',
-  'correspondence-address': 'correspondenceAddress',
   'counter-claim-order-other-than-sum': 'counterClaimOrderOtherThanSum',
+  'email-confirmation': 'emailConfirmation',
+  'exempt-landlord': 'exemptLandlord',
 };
