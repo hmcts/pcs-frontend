@@ -26,12 +26,6 @@ function resolveDefendantPartyName(validatedCase: CcdCaseModel): string {
   );
 }
 
-// `:caseReference` is substituted here; `:id` is left as a literal for the microsite
-// to replace when it redirects back on the return leg
-function applyCaseReference(template: string, caseReference: string): string {
-  return template.replace(':caseReference', caseReference);
-}
-
 // Builds the cui-ra invocation payload from the current request/case and invokes the
 // microsite, returning the URL the browser should be redirected to (the YS questions).
 export async function startYourSupport(req: Request): Promise<string> {
@@ -68,9 +62,17 @@ export async function startYourSupport(req: Request): Promise<string> {
     details: storedFlags ? toCuiRaFlags(storedFlags).details : [],
   };
 
+  // Derive the callback/logout URLs from the request host (like startPcq's returnUrl), NOT a static
+  // config value. The AAT deployment is served on two hosts — the promoted `pcs.aat…` and the
+  // functional-test `pcs-frontend-staging.aat…` — and the session cookie is host-only, so a callback
+  // sent to the wrong host lands unauthenticated and bounces to /login. Using the request host means
+  // the browser always returns to the host it came from (staging, AAT, preview, prod). `:id` is left
+  // as a literal for the microsite to substitute on the return leg.
+  const baseUrl = `${req.protocol}://${req.get('host')}`;
+
   const body: CuiRaInvocationRequest = {
-    callbackUrl: applyCaseReference(config.get<string>('cuiRa.callbackUrl'), caseReference),
-    logoutUrl: applyCaseReference(config.get<string>('cuiRa.logoutUrl'), caseReference),
+    callbackUrl: `${baseUrl}/case/${caseReference}/respond-to-claim/reasonable-adjustments/callback/:id`,
+    logoutUrl: `${baseUrl}/logout`,
     language: getValidatedLanguage(req),
     existingFlags,
     hmctsServiceId: config.get<string>('cuiRa.hmctsServiceId'),
