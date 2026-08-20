@@ -1,4 +1,3 @@
-import { PaymentSessionState } from '@services/paymentSessionService';
 import { type Session, type SessionData } from 'express-session';
 import { type UserInfoResponse } from 'openid-client';
 import { type Redis } from 'ioredis';

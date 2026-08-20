@@ -28,6 +28,7 @@ import {
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
   emailConfirmation,
+  endOfJourneyCYA,
   equalityAndDiversityEndLR,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -64,6 +65,7 @@ import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
+const isLR = true;
 let claimantName: string;
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -196,6 +198,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -284,13 +287,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
+    await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('selectStatementOfTruthRTC', {
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
     await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeeded.mainHeader);
     await performAction(
@@ -361,6 +368,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     await performAction('selectCounterClaimFeeLR', {
@@ -446,13 +454,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('selectStatementOfTruthRTC', {
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
     await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeeded.mainHeader);
     await performAction(
@@ -525,6 +537,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
     });
     await performAction('selectCounterClaimFeeLR', {
@@ -614,13 +627,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('selectStatementOfTruthRTC', {
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
     await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
   });
@@ -676,6 +693,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -757,18 +775,21 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('selectStatementOfTruthRTC', {
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
     await performAction(
       'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @smoke @PR @regression @rentNonRent @LR', async () => {
@@ -819,6 +840,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -905,13 +927,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('selectStatementOfTruthRTC', {
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
     await performAction(
       'clickButton',
@@ -997,15 +1023,19 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('selectStatementOfTruthRTC', {
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction('clickButton', responseSubmitted.closeAndReturnToCaseOverviewButton);
+   await performAction('clickButton', responseSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @smoke @rent @LR', async () => {
@@ -1044,6 +1074,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -1110,13 +1141,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('selectStatementOfTruthRTC', {
-      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
-      input: checkYourAnswersRTC.yourFullNameTextInput,
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
     await performValidation('mainHeader', responseAndCounterClaimSubmitted.mainHeader);
     await performValidation('text', {
@@ -1161,6 +1196,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -1179,7 +1215,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
   });
 
-  test('Submitted defendant should not be visible on the representation screen  @nonRent @LR', async () => {
+  test('Submitted defendant should not be visible on the representation screen @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -1226,6 +1262,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -1281,7 +1318,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('rentArrearsLR', {
       option: rentArrears.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCasePayload.rentArrears_Total,
-      //showRentDocumentLink: true,
+      showRentDocumentLink: true,
     });
     await performAction('selectCounterClaimLR', {
       option: counterClaim.yesRadioOption,

@@ -8348,10 +8348,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:17.9.0":
-  version: 17.9.0
-  resolution: "globals@npm:17.9.0"
-  checksum: 10/8619386d449e8cbb81e242eced8bca0a42e5c3633a3a35996b8b1618beb17ff9fb33bfe703d60d83d4b7f6f8a996dede4faf02f9e966e50ff895e0cf6122ae15
+"globals@npm:17.11.0":
+  version: 17.11.0
+  resolution: "globals@npm:17.11.0"
+  checksum: 10/9cff5b8099b585862ab0d31e8b93dc1c3e7b59239dc58b59447a38709715751df8794ee0d28f434f8e421b01aee3cc10051e2455b5c967d960e79f882e68aa0f
   languageName: node
   linkType: hard
 
@@ -10048,7 +10048,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:6.2.8, jose@npm:^6.2.8":
+"jose@npm:6.2.9":
+  version: 6.2.9
+  resolution: "jose@npm:6.2.9"
+  checksum: 10/297a644db9076337b70e497b16a602961d823928a9035917cd383148ef2b8b27879f41030bddbe8db4dc9c580bdf84df8a6cd3dadbe2f20d2a703c4e1a1ba8da
+  languageName: node
+  linkType: hard
+
+"jose@npm:^6.2.8":
   version: 6.2.8
   resolution: "jose@npm:6.2.8"
   checksum: 10/d1534f56cf693dfbb4b433b72df469c3c858748fe627621e27d9c1e7894716fc1d0225923be3ae98153345b9823a25c0ac376bfccce3ed363a4c032cfd4e2f5b
@@ -10091,13 +10098,13 @@ __metadata:
   linkType: hard
 
 "js-yaml@npm:^5.0.0":
-  version: 5.2.3
-  resolution: "js-yaml@npm:5.2.3"
+  version: 5.3.0
+  resolution: "js-yaml@npm:5.3.0"
   dependencies:
     argparse: "npm:^2.0.1"
   bin:
     js-yaml: bin/js-yaml.mjs
-  checksum: 10/5d2562f2d7e7bc51bd678b43d2dbc3965129ac854222c794157369c8904d249cfc78325dff8fc64becb505a2506242548c54c8fa50cdb24554bb1a557e460004
+  checksum: 10/6c7e8ea8dd5643d9df73f4aa796f3572537284e9b819b74ef919467452bfa4624f8f7477cfc775c91db7e2f32387133b1b6c4e95aef9702be6bb042ae554884a
   languageName: node
   linkType: hard
 
@@ -11405,13 +11412,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openid-client@npm:6.8.5":
-  version: 6.8.5
-  resolution: "openid-client@npm:6.8.5"
+"openid-client@npm:6.8.6":
+  version: 6.8.6
+  resolution: "openid-client@npm:6.8.6"
   dependencies:
     jose: "npm:^6.2.8"
     oauth4webapi: "npm:^3.8.7"
-  checksum: 10/7c399e21a6faf94e03f52233254bc9bc227476842bb86804a6ff81550565ca732a4e44d37cef9fd25997c82dc48b8f0349a1039e67d868a4df70caed55e1421e
+  checksum: 10/d7222dbc154c2a487f019a1a4fb06a3365765358692f1e97050412f2195138cd3d66ee3f719cc0f350751a16e19ef9f7d7e090074f9efa7522391f6a42888f07
   languageName: node
   linkType: hard
 
@@ -11711,7 +11718,7 @@ __metadata:
     express-session: "npm:1.19.0"
     git-rev-sync: "npm:3.0.2"
     glob: "npm:13.0.6"
-    globals: "npm:17.9.0"
+    globals: "npm:17.11.0"
     govuk-frontend: "npm:6.4.0"
     helmet: "npm:8.3.0"
     html-webpack-plugin: "npm:5.6.8"
@@ -11725,7 +11732,7 @@ __metadata:
     jest-environment-jsdom: "npm:30.4.1"
     jest-html-reporter: "npm:4.4.0"
     jest-pact: "npm:0.13.0"
-    jose: "npm:6.2.8"
+    jose: "npm:6.2.9"
     lint-staged: "npm:17.3.0"
     lodash: "npm:4.18.1"
     luxon: "npm:3.7.2"
@@ -11734,7 +11741,7 @@ __metadata:
     multer: "npm:^2.1.1"
     nodemon: "npm:3.1.14"
     nunjucks: "npm:3.2.4"
-    openid-client: "npm:6.8.5"
+    openid-client: "npm:6.8.6"
     playwright: "npm:1.62.1"
     playwright-core: "npm:1.62.1"
     postcss: "npm:8.5.26"
