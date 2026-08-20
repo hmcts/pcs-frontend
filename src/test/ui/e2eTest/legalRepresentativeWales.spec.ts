@@ -18,6 +18,7 @@ import {
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
   emailConfirmation,
+  endOfJourneyCYA,
   equalityAndDiversityEndLR,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -51,6 +52,7 @@ import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;
+const isLR = true;
 let claimantName: string;
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -251,9 +253,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
+    await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
-      radioOption: languageUsed.englishRadioOption,
+      radioOption: languageUsed.welshRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
   });
 
@@ -282,7 +292,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: emailConfirmation.yesRadioOption,
       emailAddress: emailConfirmation.emailAddressTextInput,
     });
-    await performAction('exemptLandlordLR', exemptLandlord.imNotSureRadioOption);
+    await performAction('exemptLandlordLR', exemptLandlord.defendantNotSureRadioOption);
     await performAction('selectWrittenTermsLR', {
       question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
       radioOption: writtenTerms.noRadioOption,
@@ -351,9 +361,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
+    await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.welshRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
   });
 
@@ -404,6 +422,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -475,11 +494,18 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
-      radioOption: languageUsed.englishRadioOption,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
+      radioOption: languageUsed.welshRadioOption,
     });
-    // //await performAction('clickButton', 'Submit');
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
   });
 
   test('Wales - Secure contract - NonRentArrears - LR @smoke @PR @singleDefendant @LR', async () => {
@@ -527,6 +553,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: counterClaim.yesRadioOption,
     });
     await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
     });
     await performAction('counterClaimSpecificSumOfMoneyLR', {
@@ -596,9 +623,17 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
-      radioOption: languageUsed.englishRadioOption,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
+      radioOption: languageUsed.welshRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
   });
 
