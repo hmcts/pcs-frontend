@@ -29,9 +29,6 @@ describe('respond-to-claim sections config', () => {
       'reasonable-adjustments-triage',
       'reasonable-adjustments-error',
       'reasonable-adjustments-cancelled',
-      'reasonable-adjustments-triage',
-      'reasonable-adjustments-error',
-      'reasonable-adjustments-cancelled',
       'equality-and-diversity-start',
       'equality-and-diversity-end',
     ]);
@@ -72,6 +69,7 @@ describe('respond-to-claim sections config', () => {
 
   it('maps end-of-journey steps into final section', () => {
     expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual([
+      'reasonable-adjustments-triage',
       'language-used',
       'end-of-journey-cya',
       'response-submitted',
@@ -84,11 +82,7 @@ describe('respond-to-claim sections config', () => {
 
   // HDPI-6929 — focused navigation test
   describe('HDPI-6929 — navigation contract from upload-document', () => {
-    const PARKED_STEPS = [
-      'reasonable-adjustments-triage',
-      'equality-and-diversity-start',
-      'equality-and-diversity-end',
-    ];
+    const PARKED_STEPS = ['equality-and-diversity-start', 'equality-and-diversity-end'];
 
     const makeReq = (): Request =>
       ({
