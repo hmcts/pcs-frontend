@@ -353,10 +353,15 @@ describe('section-CYA row builders — characterisation', () => {
     });
 
     it('renders tenancy-type and counterclaim rows from defendant responses', () => {
-      const rows = buildDisputeRows(reqWith(model({ tenancyTypeConfirmation: 'YES', makeCounterClaim: 'NO' })), t);
+      const mockT = jest.fn((key: string, _options?: Record<string, unknown>) => key) as unknown as TFunction;
+      const rows = buildDisputeRows(
+        reqWith(model({ tenancyTypeConfirmation: 'YES', makeCounterClaim: 'NO' }, { claimantName: 'Acme Housing' })),
+        mockT
+      );
       const keys = rows.map(r => r.key.text);
       expect(keys).toContain('rows.tenancyTypeCorrect.label');
       expect(keys).toContain('rows.makeCounterClaim.label');
+      expect(mockT).toHaveBeenCalledWith('rows.makeCounterClaim.label', { claimantName: 'Acme Housing' });
     });
 
     it('tenancy-date row: "known" branch renders the confirmation row plus a grouped corrected-date row when answered No', () => {
