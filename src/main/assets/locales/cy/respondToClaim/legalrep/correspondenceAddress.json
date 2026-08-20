@@ -1,5 +1,5 @@
 {
-  "pageTitle": "Defendant’s postal address",
+  "pageTitle": "cyDefendant’s postal address",
   "legend": "cyIs the defendant’s postal address {{ formattedAddressStr }}",
   "labels": {
     "enterManuallySubText": "cyYou can enter the defendant’s address details in the fields below.",
