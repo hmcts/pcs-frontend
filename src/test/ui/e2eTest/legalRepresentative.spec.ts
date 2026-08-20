@@ -4,7 +4,6 @@ import {
   counterClaimPaymentSuccessful,
   responseAndCounterClaimSubmitted,
   responseSubmitted,
-  responseSubmittedCounterclaimFeePaymentNeeded,
   serviceRequestPayment,
 } from '../data/page-data';
 import {
@@ -43,6 +42,7 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  responseSubmittedCounterclaimFeePaymentNeeded as responseSubmittedCounterclaimFeePaymentNeededLR,
   selectDefendant,
   startNow,
   tenancyDateDetails,
@@ -298,10 +298,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeeded.mainHeader);
+    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeededLR.mainHeader);
     await performAction(
       'clickLinkAndSwitchToNewTab',
-      responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeOpensInNewTabLink
+      responseSubmittedCounterclaimFeePaymentNeededLR.payTheCounterclaimFeeOpensInNewTabLink
     );
     await performAction('validateCounterClaimApplicationFee', {
       amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
@@ -465,10 +465,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeeded.mainHeader);
+    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeededLR.mainHeader);
     await performAction(
       'clickLinkAndSwitchToNewTab',
-      responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeOpensInNewTabLink
+      responseSubmittedCounterclaimFeePaymentNeededLR.payTheCounterclaimFeeOpensInNewTabLink
     );
     await performAction('validateCounterClaimApplicationFee', {
       amount: counterClaimApplicationFeeAmount.counterClaimAmountNotApplicable,
@@ -788,7 +788,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction(
       'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+      responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
     );
   });
 
@@ -941,7 +941,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction(
       'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+      responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
     );
   });
 
