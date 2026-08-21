@@ -35,10 +35,24 @@ export const buildCcdCaseForPossessionClaimResponse = async (
 ): Promise<CcdCase> => {
   const existingValidatedCase = req.res?.locals.validatedCase;
   const { id: caseId } = existingValidatedCase ?? { id: '' };
+
+  /**
+   * CCD merges event data into the case one top-level field at a time, and possessionClaimResponse is a single
+   * complex field, so whatever is sent replaces the whole of it. Each step supplies only the answers from its own
+   * page, so those have to be sent merged over the answers already held - otherwise every earlier page's answers
+   * are dropped and pcs-api persists a response containing nothing but the last page.
+   *
+   * The existing answers come from res.locals.validatedCase, which is populated from the respondPossessionClaim
+   * start callback. pcs-api loads the unsubmitted draft into that response, so it is the accumulated draft rather
+   * than only what has already been submitted.
+   */
+  const existingResponse = (existingValidatedCase?.data?.possessionClaimResponse ?? {}) as PlainRecord;
+  const mergedResponse = mergeRecords(existingResponse, possessionClaimResponse as PlainRecord);
+
   const ccdCase: CcdCase = {
     id: caseId,
     data: {
-      possessionClaimResponse,
+      possessionClaimResponse: mergedResponse,
     },
   };
   const updatedCase = await ccdCaseService.updateDraft(

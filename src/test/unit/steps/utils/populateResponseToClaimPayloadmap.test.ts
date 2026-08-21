@@ -141,4 +141,71 @@ describe('buildCcdCaseForPossessionClaimResponse', () => {
     expect(req.res?.locals?.validatedCase?.defendantResponsesDefendantNameConfirmation).toBe('YES');
     expect(req.res?.locals?.validatedCase?.defendantResponsesFreeLegalAdvice).toBe('NO');
   });
+
+  /**
+   * CCD replaces the whole possessionClaimResponse complex field, so what is sent has to already contain the
+   * answers from the earlier pages. This is what stopped the name captured on defendant-name-capture reaching
+   * submission: the very next page sent only its own field and the name went with it (HDPI-7686).
+   */
+  it('sends the answers already on the case alongside the ones from this page', async () => {
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValue({ id: '1773071952538472', data: {} });
+
+    const req = {
+      session: { user: { accessToken: 'token' } },
+      res: {
+        locals: {
+          validatedCase: {
+            id: '1773071952538472',
+            data: {
+              possessionClaimResponse: {
+                defendantContactDetails: { party: { firstName: 'John', lastName: 'Doe' } },
+                defendantResponses: { freeLegalAdvice: 'YES' },
+              },
+            },
+          },
+        },
+      },
+    } as unknown as Request;
+
+    await buildCcdCaseForPossessionClaimResponse(req, {
+      defendantResponses: { dateOfBirth: '1990-01-01' },
+    });
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(expect.anything(), 'token', '1773071952538472', {
+      possessionClaimResponse: {
+        defendantContactDetails: { party: { firstName: 'John', lastName: 'Doe' } },
+        defendantResponses: { freeLegalAdvice: 'YES', dateOfBirth: '1990-01-01' },
+      },
+    });
+  });
+
+  it('sends this page answers over the top of any earlier answer to the same question', async () => {
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValue({ id: '1773071952538472', data: {} });
+
+    const req = {
+      session: { user: { accessToken: 'token' } },
+      res: {
+        locals: {
+          validatedCase: {
+            id: '1773071952538472',
+            data: {
+              possessionClaimResponse: {
+                defendantContactDetails: { party: { firstName: 'John', lastName: 'Doe' } },
+              },
+            },
+          },
+        },
+      },
+    } as unknown as Request;
+
+    await buildCcdCaseForPossessionClaimResponse(req, {
+      defendantContactDetails: { party: { firstName: 'Jane' } },
+    });
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(expect.anything(), 'token', '1773071952538472', {
+      possessionClaimResponse: {
+        defendantContactDetails: { party: { firstName: 'Jane', lastName: 'Doe' } },
+      },
+    });
+  });
 });
