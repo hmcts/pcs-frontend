@@ -4,6 +4,7 @@ import type { TFunction } from 'i18next';
 
 import { formatIsoDate, normalizeYesNoValue } from '../../utils';
 import { formatCcdAddressLines } from '../../utils/ccdAddress';
+import { isLegalRepresentativeUser } from '../../utils/userRole';
 import {
   type BaseRowContext,
   type SummaryListRow,
@@ -28,10 +29,15 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   addNameRow(ctx);
   addDateOfBirthRow(ctx);
   addCorrespondenceAddressRow(ctx);
-  addContactByEmailOrPostRow(ctx);
-  addContactByPhoneRow(ctx);
-  addContactByTextRow(ctx);
-  addContactDetailsRow(ctx);
+
+  if (isLegalRepresentativeUser(req)) {
+    addEmailConfirmationRow(ctx);
+  } else {
+    addContactByEmailOrPostRow(ctx);
+    addContactByPhoneRow(ctx);
+    addContactByTextRow(ctx);
+    addContactDetailsRow(ctx);
+  }
 
   return ctx.rows;
 }
@@ -215,4 +221,35 @@ function addContactDetailsRow({ rows, validatedCase, t, change }: RowContext): v
     value: { html: lines.map(line => `<p class="govuk-body">${escapeHtml(line)}</p>`).join('') },
     actions: { items: [change(changeStep, 'rows.contactDetails.changeHidden')] },
   });
+}
+
+function addEmailConfirmationRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
+  const contactByEmail = validatedCase.defendantResponsesContactByEmail;
+  if (!contactByEmail) {
+    return;
+  }
+
+  const questionRow: SummaryListRow = {
+    key: { text: t('rows.emailConfirmation.label') },
+    value: { text: yesNoNotSure(contactByEmail) },
+    actions: { items: [change('email-confirmation', 'rows.emailConfirmation.changeHidden')] },
+  };
+  rows.push(questionRow);
+
+  if (normalizeYesNoValue(contactByEmail) !== 'YES') {
+    return;
+  }
+
+  const emailAddress = validatedCase.defendantContactDetailsPartyEmailAddress?.trim();
+  if (!emailAddress) {
+    return;
+  }
+
+  const detailRow: SummaryListRow = {
+    key: { text: t('rows.emailAddress.label') },
+    value: { html: escapeHtml(emailAddress) },
+    actions: { items: [change('email-confirmation', 'rows.emailAddress.changeHidden')] },
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
