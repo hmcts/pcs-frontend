@@ -12,6 +12,7 @@ import {
   isTenancyStartDateKnown,
   isWalesProperty,
   shouldShowCounterClaimFeePaymentNeededConfirmationStep,
+  shouldShowExemptLandlordStep,
   shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
   shouldShowResponseSubmittedConfirmationStep,
 } from '../utils';
@@ -44,10 +45,16 @@ export const flowConfig: JourneyFlowConfig = {
   useSessionFormData: false,
   eventId: 'respondPossessionClaim',
   sections: respondToClaimSections,
-  nonSectionStepOrder: ['end-now', 'task-list'],
+  nonSectionStepOrder: ['end-now', 'task-list', 'reasonable-adjustments-confirmation'],
   // First visible step of any section back-links to this hub step.
   hubStepName: 'task-list',
   steps: {
+    'reasonable-adjustments-error': {
+      preventBack: true,
+    },
+    'reasonable-adjustments-cancelled': {
+      preventBack: true,
+    },
     'ask-your-solicitor-to-respond-to-the-claim': {
       showCondition: (req: Request) =>
         req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor === 'YES',
@@ -61,11 +68,8 @@ export const flowConfig: JourneyFlowConfig = {
     'contact-preferences-text-message': {
       showCondition: (req: Request) => req.res?.locals.validatedCase?.isDefendantContactByPhone === true,
     },
-    'landlord-registered': {
-      showCondition: (req: Request) => isWalesProperty(req),
-    },
-    'landlord-licensed': {
-      showCondition: (req: Request) => isWalesProperty(req),
+    'exempt-landlord': {
+      showCondition: (req: Request) => shouldShowExemptLandlordStep(req),
     },
     'written-terms': {
       showCondition: (req: Request) => isWalesProperty(req),

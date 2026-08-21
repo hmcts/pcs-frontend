@@ -1,4 +1,8 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
 import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
+import { Environment } from 'nunjucks';
 
 import { VIEW_RESPONSE_ROUTE } from '../../../main/constants/caseRoutes';
 import { oidcMiddleware } from '../../../main/middleware';
@@ -8,12 +12,12 @@ import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.inter
 import { ccdCaseService } from '@services/ccdCaseService';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 
+const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
+  typeof isRespondToClaimEnabledForRelease
+>;
+
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
-}));
-
-jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
-  isRespondToClaimEnabledForRelease: jest.fn(),
 }));
 
 const translationStrings: Record<string, string> = {
@@ -56,8 +60,13 @@ jest.mock('@services/ccdCaseService', () => ({
   },
 }));
 
+jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
+  isRespondToClaimEnabledForRelease: jest.fn(),
+}));
+
 function buildComprehensiveCaseData(): CcdCaseData {
   return {
+    legislativeCountry: 'Wales',
     claimantName: 'Example Claimant Ltd',
     propertyAddress: {
       AddressLine1: '10 Second Avenue',
@@ -131,7 +140,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
         noticeReceivedDate: '2025-12-01',
         rentArrearsAmountConfirmation: 'YES',
         rentArrearsAmount: '125000',
-        landlordRegistered: 'YES',
+        exemptLandlord: 'YES',
         landlordLicensed: 'NO',
         writtenTerms: 'NOT_SURE',
         paymentAgreement: {
@@ -220,7 +229,7 @@ function buildAlternateBranchesCaseData(): CcdCaseData {
         disputeClaim: 'NO',
         tenancyTypeConfirmation: 'NO',
         possessionNoticeReceived: 'NOT_SURE',
-        landlordRegistered: undefined,
+        exemptLandlord: undefined,
         householdCircumstances: {
           incomeFromJobs: 'NO',
           universalCredit: 'NO',
@@ -269,7 +278,7 @@ describe('viewTheResponse route', () => {
     app = {
       get: jest.fn(),
     } as unknown as Application;
-    (isRespondToClaimEnabledForRelease as jest.Mock).mockResolvedValue(false);
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -375,23 +384,7 @@ describe('viewTheResponse route', () => {
       'viewTheResponse:defendant.address',
       'viewTheResponse:defendant.dateOfBirth',
     ]);
-    expect(renderArgs.additionalDefendantDetails).toHaveLength(1);
-    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant.name' },
-          value: { text: 'Peter Parker' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant.address' },
-          value: { text: '10 Second Avenue, London, W3 7RX' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant.dateOfBirth' },
-          value: { text: '20 July 1985' },
-        }),
-      ])
-    );
+    expect(renderArgs.additionalDefendantDetails).toEqual([]);
     expect(renderArgs.responseToClaim.rows.length).toBeGreaterThan(0);
     expect(renderArgs.paymentsOrAgreements.rows.length).toBeGreaterThan(0);
     expect(renderArgs.householdAndCircumstances.rows.length).toBeGreaterThan(0);
@@ -403,19 +396,11 @@ describe('viewTheResponse route', () => {
     expect(renderArgs.responseToClaim.rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.landlordRegistered' },
+          key: { text: 'viewTheResponse:responseToClaim.exemptLandlord' },
           value: { text: 'Yes' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.landlordLicensed' },
-          value: { text: 'No' },
         }),
         expect.objectContaining({
           key: { text: 'viewTheResponse:responseToClaim.rentArrearsAmountConfirmation' },
-          value: { text: 'Yes' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.exemptLandlord' },
           value: { text: 'Yes' },
         }),
         expect.objectContaining({
@@ -523,6 +508,7 @@ describe('viewTheResponse route', () => {
   });
 
   it('should show persons unknown when additional defendant name is redacted with no name fields', async () => {
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
     mockCaseById({
       propertyAddress: {
         AddressLine1: 'Clapping Gate',
@@ -568,6 +554,7 @@ describe('viewTheResponse route', () => {
   });
 
   it('should show persons unknown for additional defendants when name is not known', async () => {
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
     mockCaseById({
       possessionClaimResponse: {
         currentDefendantPartyId: 'def-1',
@@ -607,6 +594,7 @@ describe('viewTheResponse route', () => {
   });
 
   it('should show other co-defendants as additional defendant sections when viewer is not defendant 1 on the claim', async () => {
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
     mockCaseById({
       possessionClaimResponse: {
         currentDefendantPartyId: 'def-2',
@@ -646,6 +634,7 @@ describe('viewTheResponse route', () => {
   });
 
   it('should omit the viewing defendant from additional defendant sections', async () => {
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
     mockCaseById({
       possessionClaimResponse: {
         currentDefendantPartyId: 'def-1',
@@ -1032,5 +1021,150 @@ describe('viewTheResponse route', () => {
     );
 
     expect(next).toHaveBeenCalledWith(serviceError);
+  });
+
+  async function renderResponse(data: CcdCaseData) {
+    mockCaseById(data);
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+    await handler(
+      viewTheResponseRequest({ caseReference, sessionUser: { accessToken: 'access-token-1' } }),
+      res,
+      jest.fn()
+    );
+    return (res.render as jest.Mock).mock.calls[0][1];
+  }
+
+  it('should build responsePdfUrl when the defence document is present in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'doc-response-1',
+          value: {
+            document_filename: 'Defence - Defendant 2.pdf',
+            document_binary_url: 'http://dm-store/doc-response-1/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        responseDocumentId: 'doc-response-1',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.responsePdfUrl).toBe(`/case/${caseReference}/view-documents/doc-response-1`);
+  });
+
+  it('should not build responsePdfUrl when responseDocumentId does not match a document in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'some-other-doc',
+          value: {
+            document_filename: 'Defence - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/some-other-doc/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        responseDocumentId: 'not-present',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.responsePdfUrl).toBeUndefined();
+  });
+
+  it('should not build responsePdfUrl when the response PDF has not been generated yet', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      possessionClaimResponse: {
+        defendantResponses: {},
+      },
+    } as CcdCaseData);
+
+    expect(renderArgs.responsePdfUrl).toBeUndefined();
+  });
+
+  it('should not build responsePdfUrl when the matching document is missing its binary url', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'doc-response-1',
+          value: {
+            document_filename: 'Defence - Defendant 2.pdf',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        responseDocumentId: 'doc-response-1',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.responsePdfUrl).toBeUndefined();
+  });
+});
+
+describe('view-the-response template - response PDF link', () => {
+  // Render the real PDF-link block from the production template so that a broken
+  // conditional (e.g. a mistyped `{% if dateSubmitted andresponsePdfUrl %}`) fails
+  // this test instead of only surfacing as a 500 at runtime.
+  const templatePath = path.resolve(__dirname, '../../../main/views/view-the-response.njk');
+  const templateSource = fs.readFileSync(templatePath, 'utf8');
+  const pdfBlockMatch = templateSource.match(
+    /\{%\s*if dateSubmitted\s*%\}[\s\S]*?pdf\.linkText[\s\S]*?\{%\s*endif\s*%\}[\s\S]*?\{%\s*endif\s*%\}/
+  );
+
+  const t = (key: string) =>
+    (
+      ({
+        'viewTheResponse:pdf.heading': 'Response PDF',
+        'viewTheResponse:pdf.linkText': 'Download the response',
+      }) as Record<string, string>
+    )[key] ?? key;
+
+  function renderPdfBlock(context: Record<string, unknown>): string {
+    if (!pdfBlockMatch) {
+      throw new Error('Could not locate the response PDF block in view-the-response.njk');
+    }
+    return new Environment(null, { autoescape: true }).renderString(pdfBlockMatch[0], { t, ...context });
+  }
+
+  it('locates the response PDF block in the template', () => {
+    expect(pdfBlockMatch).not.toBeNull();
+  });
+
+  it('renders the PDF link with the resolved url and safe external-link attributes', () => {
+    const html = renderPdfBlock({
+      dateSubmitted: '2026-02-01',
+      responsePdfUrl: '/case/1234567890123456/view-documents/doc-response-1',
+    });
+
+    expect(html).toContain('href="/case/1234567890123456/view-documents/doc-response-1"');
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain('rel="noopener noreferrer"');
+    expect(html).toContain('Download the response');
+  });
+
+  it('renders the heading but no link when the PDF url is not available', () => {
+    const html = renderPdfBlock({ dateSubmitted: '2026-02-01' });
+
+    expect(html).toContain('Response PDF');
+    expect(html).not.toContain('<a ');
+    expect(html).not.toContain('Download the response');
+  });
+
+  it('renders nothing when the response has not been submitted', () => {
+    const html = renderPdfBlock({ responsePdfUrl: '/case/1234567890123456/view-documents/doc-response-1' });
+
+    expect(html.trim()).toBe('');
   });
 });

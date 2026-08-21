@@ -5,7 +5,7 @@ import type { TFunction } from 'i18next';
 import { HTTPError } from '../HttpError';
 import { VIEW_DOCUMENTS_ROUTE, VIEW_RESPONSE_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
-import { normalizeYesNoValue, penceToPounds } from '../steps/utils';
+import { isWalesProperty, normalizeYesNoValue, penceToPounds } from '../steps/utils';
 
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -27,6 +27,7 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
+import { findCaseDocumentById } from '@utils/documentUtils';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 
 const logger = Logger.getLogger('viewTheResponse');
@@ -304,18 +305,13 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
     });
 }
 
-function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLandlord: boolean): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
-  pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNo(t, caseData.isExemptLandlord));
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.landlordRegistered'),
-    yesNoNotSure(t, responses?.landlordRegistered)
-  );
-  pushRow(rows, t('viewTheResponse:responseToClaim.landlordLicensed'), yesNoNotSure(t, responses?.landlordLicensed));
-  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
+  if (showExemptLandlord) {
+    pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNoNotSure(t, responses?.exemptLandlord));
+  }
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.tenancyTypeConfirmation'),
@@ -336,6 +332,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
       formatGdsDate(responses?.tenancyStartDate) ?? ''
     );
   }
+  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
@@ -605,6 +602,18 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
   return { rows };
 }
 
+function resolveResponsePdfUrl(caseData: CcdCaseData, caseReference: string): string | undefined {
+  const documentId = caseData.possessionClaimResponse?.responseDocumentId;
+  if (!documentId) {
+    return undefined;
+  }
+  const document = findCaseDocumentById(caseData as unknown as Record<string, unknown>, documentId);
+  if (!document) {
+    return undefined;
+  }
+  return `${VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference)}/${documentId}`;
+}
+
 export default function viewTheResponseRoutes(app: Application): void {
   app.get(VIEW_RESPONSE_ROUTE, oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     const rawRef = req.params?.caseReference;
@@ -632,18 +641,18 @@ export default function viewTheResponseRoutes(app: Application): void {
       }
 
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
+      const release12Enabled = await isRespondToClaimEnabledForRelease(req);
+      const showExemptLandlord = release12Enabled && isWalesProperty(caseData);
 
       const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
       const completedBy = responses?.statementOfTruthCompletedBy;
 
-      const rankedDefendantNumbering = await isRespondToClaimEnabledForRelease(req);
-
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
-        defendant1Details: buildDefendant1Details(t, caseData, rankedDefendantNumbering),
-        additionalDefendantDetails: rankedDefendantNumbering ? [] : buildAdditionalDefendantDetails(t, caseData),
-        responseToClaim: buildResponseToClaim(t, caseData),
+        defendant1Details: buildDefendant1Details(t, caseData, release12Enabled),
+        additionalDefendantDetails: release12Enabled ? [] : buildAdditionalDefendantDetails(t, caseData),
+        responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord),
         paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
         regularIncome: buildRegularIncome(t, caseData),
@@ -663,6 +672,7 @@ export default function viewTheResponseRoutes(app: Application): void {
         ...sections,
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
+        responsePdfUrl: release12Enabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
       });
     } catch (e) {
       logger.error(`Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`);

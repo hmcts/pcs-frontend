@@ -125,6 +125,56 @@ describe('saveDraftDefendantResponse wrapper', () => {
 
     expect(JSON.stringify(response)).toBe(snapshot);
   });
+
+  it('deep-merges defendantResponses when refreshing validatedCase after draft save', async () => {
+    const req = {
+      session: { user: { accessToken: 'tok' } },
+      res: {
+        locals: {
+          validatedCase: {
+            id: '123',
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  writtenTerms: 'NO',
+                  otherConsiderations: 'NO',
+                },
+                claimantOrganisations: [{ value: 'Claimant Ltd' }],
+              },
+            },
+          },
+        },
+      },
+    } as unknown as Request;
+
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValueOnce({
+      id: '123',
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            exemptLandlord: 'YES',
+          },
+          defendantContactDetails: {
+            party: { phoneNumber: '07123456789' },
+          },
+        },
+      },
+    });
+
+    await saveDraftDefendantResponse(req, {
+      defendantResponses: { exemptLandlord: 'YES', writtenTerms: 'NO' },
+      defendantContactDetails: { party: { phoneNumber: '07123456789' } },
+    });
+
+    expect(req.res?.locals?.validatedCase?.defendantResponses).toEqual({
+      writtenTerms: 'NO',
+      otherConsiderations: 'NO',
+      exemptLandlord: 'YES',
+    });
+    expect(req.res?.locals?.validatedCase?.possessionClaimResponse?.claimantOrganisations).toEqual([
+      { value: 'Claimant Ltd' },
+    ]);
+  });
 });
 
 describe('buildDraftDefendantResponse — any mid-section submission auto-clears section confirmation', () => {
@@ -176,5 +226,44 @@ describe('buildDraftDefendantResponse — any mid-section submission auto-clears
     ]);
     const draft = buildDraftDefendantResponse(req);
     expect(draft.defendantResponses.completedSections).toEqual(['PERSONAL_DETAILS', 'PAYMENTS']);
+  });
+});
+
+describe('buildDraftDefendantResponse — carries reasonable-adjustment flags forward', () => {
+  const reqWithFlags = (defendantFlags?: unknown): Request =>
+    ({
+      path: '/case/123/respond-to-claim/task-list',
+      body: {},
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { possessionNoticeReceived: 'YES' },
+                ...(defendantFlags ? { defendantFlags } : {}),
+              },
+            },
+          },
+        },
+      },
+    }) as unknown as Request;
+
+  it('re-sends existing defendantFlags so a later REPLACE-style save does not wipe them', () => {
+    const defendantFlags = {
+      partyName: 'John Doe',
+      roleOnCase: 'Defendant',
+      details: [{ id: 'd1', value: { flagCode: 'RA0042', path: [{ id: 'p1', value: 'Reasonable adjustment' }] } }],
+    };
+
+    const draft = buildDraftDefendantResponse(reqWithFlags(defendantFlags));
+
+    expect(draft.defendantFlags).toEqual(defendantFlags);
+    // deep clone, not the same reference
+    expect(draft.defendantFlags).not.toBe(defendantFlags);
+  });
+
+  it('omits defendantFlags entirely when there are none in the existing draft', () => {
+    const draft = buildDraftDefendantResponse(reqWithFlags());
+    expect('defendantFlags' in draft).toBe(false);
   });
 });

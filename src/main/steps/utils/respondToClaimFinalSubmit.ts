@@ -7,13 +7,12 @@
 import config from 'config';
 import type { Request } from 'express';
 
-import { http } from '../../modules/http';
-
 import { getCounterClaimAmountInPence } from './counterClaimAmount';
 import { getRespondToClaimSubmitNavigation } from './postSubmissionRouting';
 
+import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
-import type { CcdCase } from '@services/ccdCase.interface';
+import type { CcdCase, PossessionClaimResponse } from '@services/ccdCase.interface';
 import { persistPaymentSessionState } from '@services/paymentSessionService';
 import { clientContextSessionClearer } from '@utils/clientContextSessionClearer';
 
@@ -157,4 +156,29 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
   }
 
   return { confirmationPath };
+}
+
+export function buildStatementOfTruthPayload(
+  body: Record<string, unknown>,
+  isLegalRepresentative: boolean
+): NonNullable<NonNullable<PossessionClaimResponse['defendantResponses']>['statementOfTruth']> {
+  const contempt = body?.statementOfTruthContempt as string[] | undefined;
+  const belief = body?.statementOfTruthBelief as string[] | undefined;
+
+  // Legal reps only sign the belief checkbox; citizens must sign both
+  const bothAccepted = isLegalRepresentative
+    ? belief?.includes('yes')
+    : contempt?.includes('yes') && belief?.includes('yes');
+
+  return {
+    accepted: bothAccepted ? 'YES' : 'NO',
+    fullName: (body?.fullName as string | undefined)?.trim(),
+    ...(isLegalRepresentative
+      ? {
+          nameOfFirm: (body?.nameOfFirm as string | undefined)?.trim(),
+          positionHeld: (body?.positionHeld as string | undefined)?.trim(),
+          hasLegalRepresentation: 'YES',
+        }
+      : {}),
+  };
 }
