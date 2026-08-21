@@ -1,6 +1,7 @@
 import {
   CitizenCreateGenAppAPIAction,
   CreateCaseAPIAction,
+  DefendantNameDivergenceAPIAction,
   DocumentsAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   GenAppsAction,
@@ -66,6 +67,8 @@ export class ActionRegistry {
     ['verifyClaimDetailsOnViewTheClaimPage', new CitizenDashboardAction()],
 
     //Respond to claim
+    ['waitForDefencePackAPI', new DefendantNameDivergenceAPIAction()],
+    ['fetchDefendantNameReportAPI', new DefendantNameDivergenceAPIAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],

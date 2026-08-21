@@ -1,5 +1,6 @@
 import { IValidation } from '../interfaces';
 import {
+  DefendantNameConsistencyValidation,
   ErrorMessageValidation,
   PageContentValidation,
   PageNavigationValidation,
@@ -45,6 +46,7 @@ export class ValidationRegistry {
     ['viewClaimHeaderDetails', new ViewClaimHeaderDetailsValidation()],
     ['summaryRow', new CheckYourAnswersSummaryRowValidation()],
     ['validatePdfDocument', new PdfDocumentValidation()],
+    ['defendantNameConsistency', new DefendantNameConsistencyValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {
