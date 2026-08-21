@@ -1,6 +1,5 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
-  checkYourAnswersRTC,
   responseAndCounterClaimSubmitted,
   responseSubmitted,
   responseSubmittedCounterclaimFeePaymentNeeded,
@@ -444,7 +443,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction(
       'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @smoke @nonRent @LR', async () => {
@@ -741,7 +741,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction(
       'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @smoke @PR @regression @rentNonRent @LR', async () => {
@@ -987,7 +988,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-   await performAction('clickButton', responseSubmitted.closeAndReturnToCaseOverviewButton);
+    await performAction('clickButton', responseSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @smoke @rent @LR', async () => {
@@ -1105,7 +1106,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-   await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
+    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @smoke @rent @LR', async () => {
