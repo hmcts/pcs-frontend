@@ -10,7 +10,6 @@ import { oidcMiddleware } from '../../../main/middleware';
 import viewTheResponseRoute from '@routes/viewTheResponse';
 import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
-import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 
 const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
@@ -19,10 +18,6 @@ const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease 
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
-}));
-
-jest.mock('@utils/getLaunchDarklyFlag', () => ({
-  getLaunchDarklyFlag: jest.fn(),
 }));
 
 const translationStrings: Record<string, string> = {
@@ -44,11 +39,18 @@ const translationStrings: Record<string, string> = {
   'viewTheResponse:counterclaim.needHelpWithFeesOptions.NO': 'I do not need help paying the fee',
   'viewTheResponse:personsUnknown': 'Persons unknown',
   'viewTheResponse:addressUnknown': 'Address unknown',
+  'viewTheResponse:sections.defendant1Details': 'Defendant 1 details',
+  'viewTheResponse:sections.additionalDefendantDetails': 'Additional defendant {{number}} details',
+  'viewTheResponse:sections.rankedDefendantDetails': 'Defendant {{number}} details',
 };
 
 jest.mock('@modules/i18n', () => ({
   getTranslationFunction: jest.fn(
-    () => ((key: string) => translationStrings[key] ?? key) as import('i18next').TFunction
+    () =>
+      ((key: string, options?: Record<string, unknown>) =>
+        (translationStrings[key] ?? key).replace(/{{(\w+)}}/g, (_match, name) =>
+          String(options?.[name] ?? '')
+        )) as import('i18next').TFunction
   ),
 }));
 
@@ -276,7 +278,6 @@ describe('viewTheResponse route', () => {
     app = {
       get: jest.fn(),
     } as unknown as Application;
-    (getLaunchDarklyFlag as jest.Mock).mockResolvedValue(true);
     mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
   });
 
@@ -383,23 +384,7 @@ describe('viewTheResponse route', () => {
       'viewTheResponse:defendant.address',
       'viewTheResponse:defendant.dateOfBirth',
     ]);
-    expect(renderArgs.additionalDefendantDetails).toHaveLength(1);
-    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant.name' },
-          value: { text: 'Peter Parker' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant.address' },
-          value: { text: '10 Second Avenue, London, W3 7RX' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant.dateOfBirth' },
-          value: { text: '20 July 1985' },
-        }),
-      ])
-    );
+    expect(renderArgs.additionalDefendantDetails).toEqual([]);
     expect(renderArgs.responseToClaim.rows.length).toBeGreaterThan(0);
     expect(renderArgs.paymentsOrAgreements.rows.length).toBeGreaterThan(0);
     expect(renderArgs.householdAndCircumstances.rows.length).toBeGreaterThan(0);
@@ -523,6 +508,7 @@ describe('viewTheResponse route', () => {
   });
 
   it('should show persons unknown when additional defendant name is redacted with no name fields', async () => {
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
     mockCaseById({
       propertyAddress: {
         AddressLine1: 'Clapping Gate',
@@ -568,6 +554,7 @@ describe('viewTheResponse route', () => {
   });
 
   it('should show persons unknown for additional defendants when name is not known', async () => {
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
     mockCaseById({
       possessionClaimResponse: {
         currentDefendantPartyId: 'def-1',
@@ -607,6 +594,7 @@ describe('viewTheResponse route', () => {
   });
 
   it('should show other co-defendants as additional defendant sections when viewer is not defendant 1 on the claim', async () => {
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
     mockCaseById({
       possessionClaimResponse: {
         currentDefendantPartyId: 'def-2',
@@ -646,6 +634,7 @@ describe('viewTheResponse route', () => {
   });
 
   it('should omit the viewing defendant from additional defendant sections', async () => {
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
     mockCaseById({
       possessionClaimResponse: {
         currentDefendantPartyId: 'def-1',
