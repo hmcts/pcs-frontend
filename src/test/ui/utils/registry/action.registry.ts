@@ -44,6 +44,8 @@ export class ActionRegistry {
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['createTestCaseAPI', new DefendantNameDivergenceAPIAction()],
+    ['payClaimFeeAPI', new DefendantNameDivergenceAPIAction()],
     ['fetchDefendantNameReportAPI', new DefendantNameDivergenceAPIAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],

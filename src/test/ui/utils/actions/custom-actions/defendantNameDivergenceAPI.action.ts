@@ -4,7 +4,7 @@ import Axios from 'axios';
 
 import { VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
 import { defendantNameDivergenceApiData } from '../../../data/api-data';
-import { IAction } from '../../interfaces';
+import { IAction, actionData, actionRecord } from '../../interfaces';
 
 /** One defendant as reported by pcs-api's HDPI-7686 testing-support endpoint. */
 export interface DefendantNames {
@@ -44,8 +44,10 @@ export function getDefendantNameReport(): CaseNameReport | undefined {
 }
 
 export class DefendantNameDivergenceAPIAction implements IAction {
-  async execute(page: Page, action: string): Promise<void> {
+  async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
+      ['createTestCaseAPI', () => this.createTestCaseAPI(fieldName)],
+      ['payClaimFeeAPI', () => this.payClaimFeeAPI()],
       ['fetchDefendantNameReportAPI', () => this.fetchDefendantNameReportAPI()],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -53,6 +55,58 @@ export class DefendantNameDivergenceAPIAction implements IAction {
       throw new Error(`No action found for '${action}'`);
     }
     await actionToPerform();
+  }
+
+  /**
+   * Creates an issued case with defendant access codes in one call, and publishes the case reference the same
+   * way createCaseAPI does so the rest of the framework is unaffected.
+   */
+  private async createTestCaseAPI(payloadMerge?: actionData | actionRecord): Promise<void> {
+    const api = Axios.create(defendantNameDivergenceApiData.testCaseCreationApiInstance());
+    const merge =
+      payloadMerge && typeof payloadMerge === 'object' && 'data' in payloadMerge
+        ? (payloadMerge as { data: unknown }).data
+        : payloadMerge;
+
+    const response = await api.post<{ caseId: number }>(
+      defendantNameDivergenceApiData.createTestCaseApiEndPoint(),
+      merge ?? {}
+    );
+
+    process.env.CASE_NUMBER = String(response.data.caseId);
+    process.env.CASE_FID = process.env.CASE_NUMBER.replace(/(.{4})(?=.)/g, '$1 ');
+  }
+
+  /**
+   * Confirms the claim fee as CCPay would, which fires claimIssuePayment and moves the case from
+   * PENDING_CASE_ISSUED to CASE_ISSUED - the first state the defendant response event is available from.
+   */
+  private async payClaimFeeAPI(): Promise<void> {
+    const api = Axios.create(defendantNameDivergenceApiData.defendantNameDivergenceApiInstance());
+
+    let feePayment: { serviceRequestReference?: string; amount?: number } | undefined;
+    for (let attempt = 1; attempt <= actionRetries; attempt++) {
+      const response = await api.get<{ serviceRequestReference?: string; amount?: number }[]>(
+        defendantNameDivergenceApiData.feePaymentInfoApiEndPoint()
+      );
+      feePayment = response.data?.find(payment => payment.serviceRequestReference);
+      if (feePayment) {
+        break;
+      }
+      await new Promise(res => setTimeout(res, VERY_SHORT_TIMEOUT));
+    }
+
+    if (!feePayment?.serviceRequestReference) {
+      throw new Error(`No service request reference was created for case ${process.env.CASE_NUMBER}`);
+    }
+
+    await api.put(
+      defendantNameDivergenceApiData.paymentCallbackApiEndPoint,
+      defendantNameDivergenceApiData.paidServiceRequestCallback(
+        feePayment.serviceRequestReference,
+        Number(feePayment.amount ?? 0)
+      )
+    );
   }
 
   private async fetchDefendantNameReportAPI(): Promise<void> {
