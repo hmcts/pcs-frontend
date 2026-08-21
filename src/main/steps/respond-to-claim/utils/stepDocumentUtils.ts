@@ -14,14 +14,13 @@ export interface DocumentInfoResult {
 
 export function extractDocumentIdFromCollections(
   validatedCase: unknown,
-  candidateCollections: unknown[]
+  candidateCollections: (unknown[] | undefined | null)[]
 ): DocumentInfoResult {
   const caseData =
     (validatedCase as { data?: Record<string, unknown> })?.data ?? (validatedCase as Record<string, unknown>) ?? {};
 
   for (const collection of candidateCollections) {
-    const items = Array.isArray(collection) ? collection : collection ? [collection] : [];
-    for (const item of items) {
+    for (const item of collection ?? []) {
       if (!item || typeof item !== 'object') {
         continue;
       }
@@ -56,11 +55,8 @@ export function getNoticeDocumentInfo(validatedCase?: unknown): DocumentInfoResu
     (validatedCase as { data?: Record<string, unknown> })?.data ?? (validatedCase as Record<string, unknown>) ?? {};
 
   return extractDocumentIdFromCollections(validatedCase, [
-    (caseData?.detailsTab_NoticeDetails as Record<string, unknown>)?.noticeDocuments,
-    caseData?.notice_Documents,
-    caseData?.noticeDocuments,
-    caseData?.allDocuments,
-    caseData?.claimantDocuments,
+    (caseData.detailsTab_NoticeDetails as Record<string, unknown> | undefined)?.noticeDocuments as unknown[],
+    caseData.notice_Documents as unknown[],
   ]);
 }
 
@@ -69,14 +65,10 @@ export function getTenancyDocumentInfo(validatedCase?: unknown): DocumentInfoRes
     (validatedCase as { data?: Record<string, unknown> })?.data ?? (validatedCase as Record<string, unknown>) ?? {};
 
   return extractDocumentIdFromCollections(validatedCase, [
-    (caseData?.detailsTab_TenancyLicenceDetails as Record<string, unknown>)?.tenancyLicenceDocuments,
-    (caseData?.detailsTab_OccupationContractLicenceDetails as Record<string, unknown>)?.documents,
-    caseData?.tenancy_LicenceDocuments,
-    caseData?.tenancyLicenceDocuments,
-    caseData?.occupationContractDocuments,
-    caseData?.occupationLicenceDocuments,
-    caseData?.allDocuments,
-    caseData?.claimantDocuments,
+    (caseData.detailsTab_TenancyLicenceDetails as Record<string, unknown> | undefined)
+      ?.tenancyLicenceDocuments as unknown[],
+    (caseData.detailsTab_OccupationContractLicenceDetails as Record<string, unknown> | undefined)
+      ?.documents as unknown[],
   ]);
 }
 
@@ -85,11 +77,9 @@ export function getRentStatementDocumentInfo(validatedCase?: unknown): DocumentI
     (validatedCase as { data?: Record<string, unknown> })?.data ?? (validatedCase as Record<string, unknown>) ?? {};
 
   return extractDocumentIdFromCollections(validatedCase, [
-    (caseData?.detailsTab_RentArrearsDetails as Record<string, unknown>)?.rentStatement,
-    caseData?.rentArrears_StatementDocuments,
-    caseData?.rentStatement,
-    caseData?.allDocuments,
-    caseData?.claimantDocuments,
+    (caseData.detailsTab_RentArrearsDetails as Record<string, unknown> | undefined)?.rentStatement as unknown[],
+    caseData.rentArrears_StatementDocuments as unknown[],
+    caseData.rentStatement as unknown[],
   ]);
 }
 
