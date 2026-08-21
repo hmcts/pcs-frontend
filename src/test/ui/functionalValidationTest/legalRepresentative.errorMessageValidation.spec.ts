@@ -33,10 +33,16 @@ import {
   yourCircumstances,
 } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
-//import { correspondenceAddressErrorValidation } from '../functional/legalRepresentative-functional/correspondenceAddress.pft.lr';
-import { defendantNameConfirmationErrorValidation } from '../functional/legalRepresentative-functional/defendantNameConfirmation.pft.lr';
-import { emailConfirmationErrorValidation } from '../functional/legalRepresentative-functional/emailConfirmation.pft.lr';
-import { selectDefendantErrorValidation } from '../functional/legalRepresentative-functional/selectDefendant.pft.lr';
+import {
+  confirmationOfNoticeGivenErrorValidation,
+  counterClaimAboutErrorValidation,
+  counterClaimAgainstWhomErrorValidation,
+  counterClaimErrorValidation,
+  counterClaimFeeErrorValidation,
+  defendantNameConfirmationErrorValidation,
+  emailConfirmationErrorValidation,
+  selectDefendantErrorValidation,
+} from '../functional/legalRepresentative-functional';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
 import {
@@ -134,7 +140,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nightly @EMV', () => {
-  test('ErrMsg - NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent @LR', async () => {
+  test('ErrMsg - NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent @LR @EMV', async () => {
     await softErrorMessageValidation('selectDefendant', selectDefendantErrorValidation);
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
@@ -173,6 +179,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       tsMonth: '11',
       tsYear: '2024',
     });
+    await softErrorMessageValidation('confirmationOfNoticeGiven', confirmationOfNoticeGivenErrorValidation);
     await performAction('selectNoticeDetailsLR', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
@@ -180,6 +187,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     await performAction('disputingOtherPartsOfTheClaimLR', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
+    await softErrorMessageValidation('counterClaim', counterClaimErrorValidation);
     await performAction('selectCounterClaimLR', {
       question: counterClaim.getDoYouWantToMakeACounterclaimQuestion(),
       option: counterClaim.yesRadioOption,
@@ -192,16 +200,19 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       option: counterClaimSpecificSumOfMoney.yesRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
+    await softErrorMessageValidation('counterClaimFee', counterClaimFeeErrorValidation);
     await performAction('selectCounterClaimFeeLR', {
       radioOption: counterClaimFee.defendantDoNotNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.claimInput,
     });
     const pinUser = await getPinUserAt(2);
+    await softErrorMessageValidation('counterClaimAgainstWhom', counterClaimAgainstWhomErrorValidation);
     await performAction('selectClaimAgainstWhomLR', {
       question: counterClaimAgainstWhom.mainHeader,
       options: [claimantName, `${pinUser.firstName} ${pinUser.lastName}`],
     });
+    await softErrorMessageValidation('counterClaimAbout', counterClaimAboutErrorValidation);
     await performAction('counterClaimAboutLR', {
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
