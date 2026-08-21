@@ -62,7 +62,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performAction('clickLink', checkYourAnswers.changeLink);
     await performAction('clickRadioButton', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
-      option: confirmIfTheseDocumentsRelateToAnApplication.noRadioOption,
+      option: confirmIfTheseDocumentsRelateToAnApplication.noMainClaimRadioOption,
     });
     await performAction('clickButton', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
     await performAction('clickButton', uploadYourDocuments.continueButton);
