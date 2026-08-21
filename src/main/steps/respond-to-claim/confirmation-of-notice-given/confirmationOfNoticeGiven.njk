@@ -14,6 +14,17 @@
 
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
+  {% if insetText %}
+  <div class="govuk-inset-text">
+    <p class="govuk-body">{{ insetText }}</p>
+    {% if (noticeDocument and isRelease12Enabled) %}
+    <p class="govuk-body">
+      <a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ noticeDocument.id }}" target="_blank" rel="noopener noreferrer">{{ noticeDocumentLinkText }}</a>
+    </p>
+    {% endif %}
+  </div>
+  {% endif %}
+
   <form method="post" action="{{ url }}" novalidate>
     {% for field in fields %}
       {% if field.componentType == 'radios' %}
