@@ -1,5 +1,6 @@
 import { IValidation } from '../interfaces';
 import {
+  DefendantNameConsistencyValidation,
   ErrorMessageValidation,
   PageContentValidation,
   PageNavigationValidation,
@@ -32,6 +33,7 @@ export class ValidationRegistry {
     ['autoValidatePageContent', new PageContentValidation()],
     ['pageNavigation', new PageNavigationValidation()],
     ['inputTextValue', new InputTextValueValidation()],
+    ['defendantNameConsistency', new DefendantNameConsistencyValidation()],
   ]);
 
   static getValidation(validationType: string): IValidation {

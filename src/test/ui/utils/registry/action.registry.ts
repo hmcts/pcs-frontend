@@ -1,5 +1,6 @@
 import {
   CreateCaseAPIAction,
+  DefendantNameDivergenceAPIAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   GenAppsAction,
   LoginAction,
@@ -43,6 +44,7 @@ export class ActionRegistry {
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['fetchDefendantNameReportAPI', new DefendantNameDivergenceAPIAction()],
     ['selectLegalAdvice', new RespondToClaimAction()],
     ['inputDefendantDetails', new RespondToClaimAction()],
     ['enterDateOfBirthDetails', new RespondToClaimAction()],
