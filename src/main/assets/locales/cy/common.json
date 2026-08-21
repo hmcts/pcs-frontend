@@ -33,7 +33,8 @@
     "yes": "Ydy",
     "no": "Nac ydy",
     "or": "neu",
-    "imNotSure": "Nid wyf yn siŵr"
+    "imNotSure": "Nid wyf yn siŵr",
+    "notSure": "cyDefendant is not sure"
   },
   "change": "Newid",
   "back": "Yn ôl",
