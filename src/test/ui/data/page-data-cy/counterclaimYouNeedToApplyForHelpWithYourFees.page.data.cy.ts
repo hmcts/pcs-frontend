@@ -1,0 +1,17 @@
+export const counterclaimYouNeedToApplyForHelpWithYourFees = {
+  mainHeader: `Mae arnoch angen gwneud cais am help i dalu ffi eich gwrth-hawliad`,
+  backLink: `Yn ôl`,
+  saveForLaterButton: `Cadw at hwyrach ymlaen`,
+  cymraegLink: `Cymraeg`,
+  youNeedToParagraph: `Mae arnoch angen gwneud cais am`,
+  applyForHelpWithFeeLink: ` Help i Dalu Ffioedd (yn agor mewn tab newydd) `,
+  beforeYouCanContinueParagraph: `cyn y gallwch barhau â'r gwrth-hawliad hwn.`,
+  enterTheCourtFormNumberParagraph: `Nodwch y rhif ffurflen llys 'XXX' pan ofynnir amdano. Dyma fydd un o’r cwestiynau cyntaf pan fyddwch yn gwneud cais am help i dalu ffioedd.`,
+  afterYouHaveAppliedParagraph: `Ar ôl i chi wneud cais, byddwch yn cael cyfeirnod Help i Dalu Ffioedd. Dylech nodi’r cyfeirnod pan fyddwch yn dychwelyd i’r gwrth-hawliad hwn.`,
+  ifYouReceiveAnyBenefit: `Os ydych yn cael unrhyw fudd-dâl sy'n gymwys ar gyfer Help i Dalu Ffioedd, mae'n rhaid i chi gynnwys tystiolaeth pan fyddwch yn gwneud cais ar-lein ar gyfer Help i Dalu Ffioedd.`,
+  ifYouHaveParagraph: `Os oes gennych`,
+  helpWithFeesLink: `gyfeirnod Help gyda Ffioedd`,
+  enterNowParagraph: `, gallwch ei nodi nawr.`,
+  feedbackLink: `adborth (yn agor mewn tab newydd)`,
+  pageSlug: `counter-claim-you-need-to-apply-for-help-with-your-fees`,
+};
