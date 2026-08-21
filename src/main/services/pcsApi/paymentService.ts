@@ -35,6 +35,13 @@ export interface StartCardPaymentRequestResult {
   nextUrl: string;
 }
 
+export interface OutstandingCounterClaimPayment {
+  serviceRequestReference: string;
+  feeAmount: number;
+  counterClaimAmountInPence?: string;
+  counterClaimType?: string;
+}
+
 function getBaseUrl(): string {
   return config.get('api.url');
 }
@@ -103,5 +110,17 @@ export const paymentService = {
       paymentStatus: paymentResponse.status,
       nextUrl: paymentResponse.nextUrl,
     };
+  },
+
+  async getOutstandingCounterClaimPayment(
+    accessToken: string,
+    caseReference: string
+  ): Promise<OutstandingCounterClaimPayment> {
+    const pcsApiURL = getBaseUrl();
+    const response = await http.get<OutstandingCounterClaimPayment>(
+      `${pcsApiURL}/payment/cases/${encodeURIComponent(caseReference)}/counterclaim/outstanding`,
+      getUserAuthHeaders(accessToken)
+    );
+    return response.data;
   },
 };
