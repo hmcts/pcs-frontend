@@ -930,7 +930,6 @@ export const submitCaseApiDataWales = {
       agreementDefendantLegalRep: [],
     },
   },
-
   submitCaseNoticeDateKnown: {
     regionId: '7',
     caseManagementLocationNumber: '366572',
@@ -1206,6 +1205,5 @@ export const submitCaseApiDataWales = {
     completionNextStep: 'SUBMIT_AND_PAY_NOW',
     endButtonLabel: null,
   },
-
   submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
 };
