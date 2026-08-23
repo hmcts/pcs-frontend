@@ -930,6 +930,7 @@ export const submitCaseApiDataWales = {
       agreementDefendantLegalRep: [],
     },
   },
+
   submitCaseNoticeDateKnown: {
     regionId: '7',
     caseManagementLocationNumber: '366572',
@@ -1109,7 +1110,6 @@ export const submitCaseApiDataWales = {
             document_filename: 'WitnessStatement.png',
           },
         },
-        id: '1dcfc731-e227-4ff6-8e9d-7cac99d3766b',
       },
       {
         value: {
@@ -1128,7 +1128,6 @@ export const submitCaseApiDataWales = {
             document_filename: 'RentStatement.pdf',
           },
         },
-        id: '900165ec-9475-40ab-b9af-e1aa00ae03fb',
       },
       {
         value: {
@@ -1147,7 +1146,6 @@ export const submitCaseApiDataWales = {
             document_filename: 'NoticeServiceJurisdiction.docx',
           },
         },
-        id: '6bb963c4-c8d5-4f5e-9559-3cf414cb6483',
       },
       {
         value: {
@@ -1166,7 +1164,6 @@ export const submitCaseApiDataWales = {
             document_filename: 'CertificateOfSuitability.xlsx',
           },
         },
-        id: '6b38e3e8-eae8-442f-9355-ca5e479c45e4',
       },
       {
         value: {
@@ -1185,7 +1182,6 @@ export const submitCaseApiDataWales = {
             document_filename: 'OtherDocument.png',
           },
         },
-        id: '4a9c9596-8ffa-43dc-b284-558c1d70a449',
       },
     ],
     featureFlags: {
