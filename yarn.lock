@@ -4069,10 +4069,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/luxon@npm:3.7.3":
-  version: 3.7.3
-  resolution: "@types/luxon@npm:3.7.3"
-  checksum: 10/f097bd3f7c47ae766928e0fa496ec13fe4d72c42b29afa4bed457775ce4fb4d8574ccccc0c974bf8915d1e6a7e226fa6efb989905786c4c9c1714754f74e8a17
+"@types/luxon@npm:3.7.5":
+  version: 3.7.5
+  resolution: "@types/luxon@npm:3.7.5"
+  checksum: 10/656e6e5c057f5e9769d2f2c0d84795de3d68d461557dca432dbdf6b98d1e57b15f273d99781c1e8d786f1fd15dcc29eeb48496685aa77fc3f14e186b6230ab0e
   languageName: node
   linkType: hard
 
@@ -11683,7 +11683,7 @@ __metadata:
     "@types/glob": "npm:9.0.0"
     "@types/jest": "npm:30.0.0"
     "@types/lodash": "npm:4.17.25"
-    "@types/luxon": "npm:3.7.3"
+    "@types/luxon": "npm:3.7.5"
     "@types/multer": "npm:^2.1.0"
     "@types/node": "npm:24.13.3"
     "@types/nunjucks": "npm:3.2.6"
