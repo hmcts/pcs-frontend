@@ -16,5 +16,4 @@ export const confirmationOfNoticeGiven = {
   },
   feedbackLink: `feedback`,
   pageSlug: `confirmation-of-notice-given`,
-  noticeDocumentDynamicLink: 'View a copy of ',
 };
