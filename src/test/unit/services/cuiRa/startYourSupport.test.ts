@@ -28,8 +28,6 @@ jest.mock('@modules/http', () => ({
 const mockGetValidS2SToken = http.getValidS2SToken as jest.Mock;
 
 const configValues: Record<string, string> = {
-  'cuiRa.callbackUrl': 'http://frontend/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id',
-  'cuiRa.logoutUrl': 'http://frontend/logout',
   'cuiRa.hmctsServiceId': 'AAA3',
   'cuiRa.masterFlagCode': 'RA0001',
 };
@@ -37,6 +35,9 @@ const configValues: Record<string, string> = {
 function buildReq(overrides: Record<string, unknown> = {}): { req: Request } {
   const req = {
     body: { reasonableAdjustmentsChoice: 'questions' },
+    // callback/logout URLs are derived from the request host, so the req must expose protocol + host.
+    protocol: 'https',
+    get: (name: string) => (name.toLowerCase() === 'host' ? 'pcs.aat.platform.hmcts.net' : undefined),
     session: { user: { accessToken: 'idam-access-token' } },
     res: {
       locals: {
@@ -72,8 +73,9 @@ describe('startYourSupport', () => {
       accessToken: 'idam-access-token',
       serviceToken: 's2s-token-value',
       body: {
-        callbackUrl: 'http://frontend/case/1234123412341234/respond-to-claim/reasonable-adjustments/callback/:id',
-        logoutUrl: 'http://frontend/logout',
+        callbackUrl:
+          'https://pcs.aat.platform.hmcts.net/case/1234123412341234/respond-to-claim/reasonable-adjustments/callback/:id',
+        logoutUrl: 'https://pcs.aat.platform.hmcts.net/logout',
         language: 'en',
         existingFlags: { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] },
         hmctsServiceId: 'AAA3',
