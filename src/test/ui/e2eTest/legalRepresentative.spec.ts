@@ -1380,7 +1380,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performValidation('radioButtonChecked', defendantNameConfirmation.yesRadioOption, true);
     await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
     await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
-    await performValidation('inputTextValue', defendantDateOfBirth.dayTextLabel, defendantDateOfBirth.savedDayInputText);
+    await performValidation(
+      'inputTextValue',
+      defendantDateOfBirth.dayTextLabel,
+      defendantDateOfBirth.savedDayInputText
+    );
     await performValidation(
       'inputTextValue',
       defendantDateOfBirth.monthTextLabel,
