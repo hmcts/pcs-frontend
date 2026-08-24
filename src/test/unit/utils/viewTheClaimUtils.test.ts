@@ -236,6 +236,33 @@ describe('viewTheClaimUtils', () => {
     expect(page.sections.some(section => section.title.startsWith('Additional defendant'))).toBe(false);
   });
 
+  it('numbers defendant sections by rank rather than position when ranked numbering is enabled', () => {
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        allDefendants: [
+          {
+            id: 'def-2',
+            value: { rank: 2, nameKnown: 'YES', firstName: 'Bob', lastName: 'Tenant' },
+          },
+          {
+            id: 'def-1',
+            value: { rank: 1, nameKnown: 'YES', firstName: 'Alex', lastName: 'Tenant' },
+          },
+        ],
+      } as never,
+      t,
+      undefined,
+      true
+    );
+
+    const defendantTitles = page.sections.map(section => section.title).filter(title => title.startsWith('Defendant '));
+
+    expect(defendantTitles).toEqual(['Defendant 2 details', 'Defendant 1 details']);
+    expect(rowText(sectionByTitle(page, 'Defendant 2 details'), 'Name')).toBe('Bob Tenant');
+    expect(rowText(sectionByTitle(page, 'Defendant 1 details'), 'Name')).toBe('Alex Tenant');
+  });
+
   it('uses pcs-api returned party collections for claimant and defendant details', () => {
     const page = buildViewTheClaimPageData(
       '1234567890123456',

@@ -1111,6 +1111,43 @@ describe('viewTheResponse route', () => {
 
     expect(renderArgs.responsePdfUrl).toBeUndefined();
   });
+
+  it('should number the defendant section using the rank of the viewing defendant', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDefendants: [
+        { id: 'def-1', value: { rank: 1 } },
+        { id: 'def-2', value: { rank: 2 } },
+      ],
+      possessionClaimResponse: {
+        currentDefendantPartyId: 'def-2',
+        defendantContactDetails: {
+          party: { firstName: 'Bob', lastName: 'Tenant' },
+        },
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.defendant1Details.sectionTitle).toBe('Defendant 2 details');
+  });
+
+  it('should fall back to the legacy defendant title when the release flag is off', async () => {
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
+
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDefendants: [{ id: 'def-2', value: { rank: 2 } }],
+      possessionClaimResponse: {
+        currentDefendantPartyId: 'def-2',
+        defendantContactDetails: {
+          party: { firstName: 'Bob', lastName: 'Tenant' },
+        },
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.defendant1Details.sectionTitle).toBe('Defendant 1 details');
+  });
 });
 
 describe('view-the-response template - response PDF link', () => {
