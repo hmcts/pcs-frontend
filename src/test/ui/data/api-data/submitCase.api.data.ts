@@ -105,7 +105,7 @@ export const submitCaseApiData = {
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
       noticeServed: process.env.NOTICE_SERVED,
-      notice_PostedDate: '2025-11-10',
+      notice_PostedDate: '2020-02-20',
       rentDetails_CurrentRent: '100000',
       rentDetails_Frequency: 'MONTHLY',
       rentDetails_CalculatedDailyCharge: '3285',
@@ -223,6 +223,25 @@ export const submitCaseApiData = {
             },
           },
           id: '6b38e3e8-eae8-442f-9355-ca5e479c45e4',
+        },
+        {
+          value: {
+            documentType: {
+              value: {
+                code: 'a6c5dea7-9420-446d-b973-d75d95790b7b',
+                label: 'Other document',
+              },
+              valueCode: 'a6c5dea7-9420-446d-b973-d75d95790b7b',
+              valueLabel: 'Other document',
+            },
+            description: 'Other Document',
+            document: {
+              document_url: `${process.env.DM_STORE_URL}/documents/eb94cf9d-2f5f-4f9e-9744-d734ec358652`,
+              document_binary_url: `${process.env.DM_STORE_URL}/documents/eb94cf9d-2f5f-4f9e-9744-d734ec358652/binary`,
+              document_filename: 'OtherDocument.png',
+            },
+          },
+          id: '4a9c9596-8ffa-43dc-b284-558c1d70a449',
         },
       ],
       statementOfTruth: {
@@ -619,7 +638,7 @@ export const submitCaseApiData = {
       mediationAttempted: 'NO',
       settlementAttempted: 'NO',
       noticeServed: process.env.NOTICE_SERVED,
-      notice_PostedDate: '2025-11-10',
+      notice_PostedDate: '2020-02-20',
       notice_AbleToUploadDocument: 'Yes',
       notice_Documents: [
         {
@@ -630,9 +649,7 @@ export const submitCaseApiData = {
           },
         },
       ],
-      notice_ServiceMethod: 'EMAIL',
-      notice_EmailSentDateTime: '2025-11-10T10:11:20',
-      notice_EmailAddress: 'test@gmail.com',
+      notice_ServiceMethod: 'FIRST_CLASS_POST',
       claimantCircumstancesSelect: 'NO',
       hasDefendantCircumstancesInfo: 'NO',
       suspensionOfRTB_ShowHousingActsPage: 'NO',
@@ -1005,7 +1022,7 @@ export const submitCaseApiData = {
       },
       addAnotherDefendant: 'NO',
       tenancy_TypeOfTenancyLicence: 'ASSURED_TENANCY',
-      tenancy_TenancyLicenceDate: '2020-05-20',
+      tenancy_TenancyLicenceDate: '2026-02-10',
       tenancy_HasCopyOfTenancyLicence: 'NO',
       tenancy_ReasonsForNoTenancyLicenceDocuments: 'test',
       claimDueToRentArrears: 'Yes',
@@ -1020,7 +1037,7 @@ export const submitCaseApiData = {
       settlementAttempted: 'YES',
       noticeServed: 'Yes',
       notice_ServiceMethod: 'FIRST_CLASS_POST',
-      notice_PostedDate: '2021-05-20',
+      notice_PostedDate: '2020-02-20',
       notice_AbleToUploadDocument: 'No',
       notice_UnableToUploadReason: 'test notes',
       rentDetails_CurrentRent: '50000',

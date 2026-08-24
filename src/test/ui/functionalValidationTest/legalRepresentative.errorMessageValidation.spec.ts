@@ -14,6 +14,8 @@ import {
   doAnyOtherAdultsLiveInYourHome,
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
+  emailConfirmation,
+  endOfJourneyCYA,
   equalityAndDiversityEndLR,
   equalityAndDiversityStart,
   exceptionalHardship,
@@ -33,6 +35,7 @@ import {
 import { user } from '../data/user-data';
 //import { correspondenceAddressErrorValidation } from '../functional/legalRepresentative-functional/correspondenceAddress.pft.lr';
 import { defendantNameConfirmationErrorValidation } from '../functional/legalRepresentative-functional/defendantNameConfirmation.pft.lr';
+import { emailConfirmationErrorValidation } from '../functional/legalRepresentative-functional/emailConfirmation.pft.lr';
 import { selectDefendantErrorValidation } from '../functional/legalRepresentative-functional/selectDefendant.pft.lr';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
@@ -157,6 +160,10 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     await performAction('selectCorrespondenceAddressLR', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
+    await softErrorMessageValidation('emailConfirmation', emailConfirmationErrorValidation);
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
+    });
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
@@ -266,11 +273,16 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('clickButton', 'Submit');
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
     assertAllErrorMessageValidations();
   });
 });
