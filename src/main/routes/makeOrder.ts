@@ -10,9 +10,7 @@ export default function makeOrderRoutes(app: Application): void {
   app.get(MAKE_ORDER_ROUTE, oidcMiddleware, judgeAccessMiddleware, (req: Request, res: Response) => {
     const roles = getUserRoles(req);
 
-    // Judges only, so the xui chrome is unconditional. legalRepresentativeHeaderMiddleware is not
-    // used here: it gates on the solicitor role, which a judge does not have, so it would leave
-    // the header model undefined. The menu the header renders still comes from the user's roles.
+    // Build the judicial menu directly because legalRepresentativeHeaderMiddleware requires a solicitor role.
     const headerModel = buildHeaderModel({
       xuiBaseUrl: config.get('xui.uri'),
       user: { roles },

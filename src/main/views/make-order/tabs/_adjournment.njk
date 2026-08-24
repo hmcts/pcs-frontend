@@ -1,9 +1,3 @@
-{#
-  Adjournment: either adjourned to a further hearing (when, how long, what format, what each party
-  must file first) or adjourned generally on payment conditions.
-
-  Panel content only — see the note in _outright.njk.
-#}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
@@ -13,16 +7,7 @@
 
 <h3 class="govuk-heading-m">Adjournment</h3>
 
-{#
-  Adjourned for further hearing: when the next hearing is, how long it needs, in what format,
-  and what each party must file before it.
-#}
 {% set adjournFurtherHearingHtml %}
-  {#
-    One date, whichever option is chosen, so the three options are radios and the date is a
-    single field below them rather than the prototype's three separate date triples — one per
-    radio, of which at most one can ever be filled in.
-  #}
   {{ govukRadios({
     idPrefix: "adj-when",
     name: "adj-when",
@@ -54,11 +39,6 @@
     fieldset: { legend: { text: "Date", classes: "govuk-fieldset__legend--s" } }
   }) }}
 
-  {#
-    The prototype gives the amount and the unit an aria-label each and no visible label, so
-    neither is announced with the name of the thing being estimated. A fieldset names the pair
-    once and each control keeps its own label.
-  #}
   <div class="govuk-form-group">
     <fieldset class="govuk-fieldset" role="group">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Time estimate</legend>
@@ -82,15 +62,6 @@
     </fieldset>
   </div>
 
-  {#
-    Checkboxes, as in the prototype: a hearing can be held in more than one format at once,
-    with some parties attending in person and others by video.
-
-    No `--inline` modifier. govuk-frontend ships `govuk-radios--inline` but has no checkboxes
-    equivalent (6.4.0), so the class this carried compiled to nothing and the three options stacked
-    anyway — a class that stated a layout it could not deliver. Stacked is the stock presentation and
-    is what the page now says.
-  #}
   {{ govukCheckboxes({
     idPrefix: "adj-format",
     name: "adj-format",
@@ -103,10 +74,6 @@
     ]
   }) }}
 
-  {#
-    Each direction carries its own deadline, so the date belongs inside the reveal rather than
-    beside the checkbox as a fourth column the way the prototype has it.
-  #}
   {{ govukCheckboxes({
     idPrefix: "adj-directions",
     name: "adj-directions",
@@ -150,7 +117,6 @@
   }) }}
 {% endset %}
 
-{# Adjourned generally: the payment conditions attached to the adjournment. #}
 {% set adjournGenerallyHtml %}
   {{ govukCheckboxes({
     idPrefix: "adj-gen",
@@ -240,13 +206,6 @@
   }) }}
 {% endset %}
 
-{#
-  The prototype puts each branch's fields in a reveal that is a sibling of the radios rather
-  than inside the radio item, so `aria-controls` points forwards out of the fieldset and the
-  two blocks also carry their own <h4> headings to say which is which. Nesting them in the
-  item they belong to is what govuk-frontend's conditional reveal is for, and it makes the
-  headings unnecessary: each block is announced as part of the option that revealed it.
-#}
 {{ govukRadios({
   idPrefix: "adj-type",
   name: "adj-type",

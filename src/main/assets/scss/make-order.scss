@@ -1,31 +1,12 @@
 @use 'govuk-frontend' as *;
 
-// Height cap on the sticky case-facts panel. Doubles as the amount of scrollport the browser must
-// keep clear so focus never lands behind the panel, so both uses stay in step.
-//
-// This has to be a length the panel actually reaches, not a generous ceiling. `scroll-padding-top`
-// makes the browser treat the whole reserved band as out of view, so anything focused inside it
-// gets scrolled clear — including by scrolling *backwards*. At `60vh` on a 1000px-tall window that
-// band was 660px while the panel was only 307px, so clicking any control in the 353px of
-// already-visible page beneath the panel yanked the page up by up to 358px. Keeping the cap close
-// to the panel's real height shrinks that band to a few pixels.
-//
-// `min()` of the two keeps both guarantees: 320px is a height the panel actually reaches, so the
-// reservation stays tight to it, and the 60vh term still stops the panel dominating a short window
-// (a 1600x600 one, or any window at high zoom) the way a bare px cap would not.
+// This cap also reserves space so keyboard focus is not obscured by the sticky panel.
 $pcs-case-facts-max-height: min(60vh, 320px);
 
-// The panel's own padding and borders sit outside `max-height` (it is `content-box`), so the
-// reservation has to add them back or it under-reserves and focus lands behind the panel.
-// calc() because the cap is a min() and so cannot be resolved at build time.
+// Include content-box padding and borders in the focus reservation.
 $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3) * 2 + 2px});
 
-// Make an order is a judicial screen used on large desktop monitors, so it is laid out edge to
-// edge rather than using the 1020px measure the citizen journeys want for readability. Scoped to
-// a class so govuk-width-container itself is left alone.
-//
-// govuk-width-container centres itself with auto margins once past its max-width; removing the
-// max-width would leave the content flush against the viewport, so restore explicit gutters.
+// Use the available width without changing the shared citizen-page container.
 .pcs-wide {
   max-width: none;
   margin-right: govuk-spacing(4);
@@ -37,30 +18,15 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   }
 }
 
-// A sticky panel covers whatever the browser scrolls into view beneath it, so keyboard focus can
-// land behind it (WCAG 2.4.11 Focus Not Obscured). Reserving the panel's height at the top of the
-// scrollport makes the browser scroll far enough that focused fields clear it.
-//
-// Reserve the panel's height and no more. Over-reserving does not just waste space: the browser
-// scrolls anything focused inside the reserved band clear of it in whichever direction is shorter,
-// so a band taller than the panel drags the page backwards when the judge clicks a control that
-// was already perfectly visible. See $pcs-case-facts-reserve.
-//
-// This has to sit on the scrollport itself, which is the root element — scroll-padding on the page
-// wrapper has no effect. Scoped by a class on <html> so the citizen journeys are unaffected.
-//
-// govuk-frontend sets `scroll-padding-top: 0` on `.govuk-template:not(:has(.govuk-exit-this-page))`
-// for its own sticky component, and that outranks a lone class, so match its specificity here.
+// Match GOV.UK's selector specificity and reserve the sticky panel on the root scrollport.
 .govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)) {
   scroll-padding-top: $pcs-case-facts-reserve;
 
-  // Below desktop the panel is no longer pinned, so nothing needs reserving.
   @include govuk-media-query($until: desktop) {
     scroll-padding-top: 0;
   }
 }
 
-// Case facts stay in view while the judge drafts the order below them.
 .pcs-case-facts {
   position: sticky;
   top: 0;
@@ -70,11 +36,9 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   border-bottom: 1px solid $govuk-border-colour;
   background-color: govuk-colour('black', $variant: 'tint-95');
 
-  // Never let the panel dominate the viewport, however far the page is zoomed.
   max-height: $pcs-case-facts-max-height;
   overflow-y: auto;
 
-  // Below desktop there isn't the height to spare, so release the pin.
   @include govuk-media-query($until: desktop) {
     position: static;
     max-height: none;
@@ -91,74 +55,36 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   }
 }
 
-// Dense multi-column layout: as many columns as fit, which is four on a judge's monitor.
-//
-// The floor is the width a govuk-date-input needs before day/month/year wrap onto two lines,
-// since that is the widest thing in the panel and a wrapped date costs the whole grid a row.
-// Being exact matters: 240px needed 1020px for four tracks, 1013px was available, and the grid
-// silently fell back to three columns and grew an extra row.
-//
-// Day + month + year measure 232px plus a 20px gap after each, including a trailing one on the
-// year. That trailing margin is dead space at the end of a grid track and it is what pushes the
-// requirement to 252px, so it is removed below and the floor is the honest 232px.
-//
-// auto-fit drops columns on its own as space tightens, so this reflows under zoom with no
-// breakpoints to maintain. The prototype used fixed pixel tracks, which is why its grid stayed
-// 833px wide however far you zoomed and forced horizontal scrolling (WCAG 1.4.10). The
-// min(232px, 100%) floor keeps it from overflowing a viewport narrower than a single column.
-// The vertical rhythm here is the grid's own row-gap, not margins on the fields. Margins on the
-// fields also apply to the last row, where the space is below the panel's final row and therefore
-// dead. Same spacing between rows, one less row's worth of panel height.
+// The 232px floor fits a date input; auto-fit preserves reflow at high zoom.
 .pcs-case-facts__grid {
   display: grid;
   gap: govuk-spacing(3) govuk-spacing(4);
   grid-template-columns: repeat(auto-fit, minmax(min(232px, 100%), 1fr));
 
-  // See above: spacing is the grid's job, so the fields don't bring their own. The default 30px is
-  // tuned for citizens reading one question at a time and is far too loose for a reference panel.
   > .govuk-form-group {
     margin-bottom: 0;
 
-    // 10px under a field's own name is generous when there are twelve of them stacked in a panel.
-    // Halved. The label still clears its control by 5px, which is the same gap govuk-frontend puts
-    // under the day/month/year labels, so nothing looks cramped.
     > .govuk-label,
     > .govuk-fieldset > .govuk-fieldset__legend {
       margin-bottom: govuk-spacing(1);
     }
   }
 
-  // TEMPORARY, and to be revisited — see docs/make-order-plan.md.
-  //
-  // The visible Day/Month/Year labels are the last thing between us and the prototype's panel
-  // height, at roughly 30px per row of dates. Hidden rather than deleted: the prototype deleted
-  // them outright, which is defect 1 — a screen reader user then hears "Day, Month, Year" six
-  // times with nothing to tell the groups apart. Visually hiding keeps each input's accessible
-  // name intact, so this is a visual decision only, not an accessibility regression.
-  //
-  // It is still a real cost to sighted users: field order becomes something you infer from the
-  // input widths (2, 2, 4 characters) rather than read, which is a guess in any locale that writes
-  // dates month-first. Delete these two rules to bring the labels back.
+  // Temporary density trade-off: retain accessible names while hiding visual D/M/Y labels.
   .govuk-date-input__label {
     @include govuk-visually-hidden;
   }
 
-  // Nothing above the inputs now, so the date row sits directly under the legend.
   .govuk-date-input__item .govuk-form-group {
     margin-bottom: 0;
   }
 
-  // The column gap belongs between the date parts, not after the last one, where it is dead space
-  // at the end of a grid track — and it is what made the four-column track floor look like 252px.
   .govuk-date-input__item:last-child {
     margin-right: 0;
   }
 }
 
-// The notes field is the panel's second column, so it is already as tall as the facts grid beside
-// it. Letting the textarea fill that height costs nothing and gives the judge a bigger box, and it
-// lines the bottom of the box up with the bottom of the last row of inputs. `rows` stays as the
-// floor for when the panel is a single column.
+// Match the notes field to the facts grid on desktop.
 @include govuk-media-query($from: desktop) {
   .pcs-case-facts__layout > .govuk-form-group {
     display: flex;
@@ -168,127 +94,35 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   .pcs-case-facts__layout textarea {
     flex: 1 1 auto;
 
-    // govuk-frontend gives a textarea 30px of bottom margin, for the next question on a citizen
-    // page. Here there is nothing below it, and the margin made this column 30px taller than the
-    // facts grid beside it — so the grid stretched to match and spread the difference across its
-    // three rows, which is why the rows were 78px for 70px of content and the box still stopped
-    // 22px short of the last input. Removing it aligns both columns' bottoms exactly.
     margin-bottom: 0;
 
-    // The box's height is the layout's job now — it tracks the facts grid beside it. A drag handle
-    // would let the judge break that alignment, and because the panel is capped at 60vh it would
-    // mostly just make the panel scroll internally rather than show more text.
-    //
-    // Only removed at desktop, where the box is already large. Below that the panel is unpinned and
-    // the textarea is back to its `rows` floor, so resizing is still the useful escape hatch it
-    // normally is — which matters at high zoom, where fewer characters fit per line.
+    // Resizing remains available below desktop where the field no longer tracks the grid.
     resize: none;
   }
 }
 
-// Dividing rules, all three done the same way: a border on the top of the element that starts each
-// new block, so the line falls in the gap that already exists between blocks.
-//
-// Done in CSS rather than with the `<hr class="govuk-section-break--visible">` elements the
-// prototype uses. An <hr> is a semantic thematic break, so a screen reader announces one — the
-// prototype has four in this one tab panel — for something that carries no meaning a user has not
-// already got from the heading, legend or label that follows it. A border draws the same line and
-// says nothing, which is what a purely decorative divider should do.
-//
-// Each rule sits on `:not(:first-child)` or a sibling combinator, never on every element, so no
-// line is ever stranded above the first block of a group or below the last.
-
-// 1. Page sections: Attendance / Recitals / Order type / Costs.
-//
-// The heading keeps its own `govuk-!-margin-top-6`, so the 30px above the line is the margin that
-// was already there and the rule just lands in it.
+// Decorative borders divide sections without adding semantic <hr> elements.
 .pcs-make-order #main-content > h2 {
   padding-top: govuk-spacing(4);
   border-top: 1px solid $govuk-border-colour;
 }
 
-// Except after a block that already closes with a line of its own. The case-facts panel is a
-// bordered band and a govuk-tabs panel is a bordered box, so both end in a full-width rule; adding
-// the heading's rule 30px below drew two parallel lines with an empty 30px strip between them.
-//
-// An explicit list of the two, because CSS cannot ask whether the previous sibling has a bottom
-// border — only the elements themselves know they are bordered. The `padding-top` above is kept, so
-// the heading text sits exactly where it does after every other section and only the duplicate line
-// goes. Anything else added to this page that closes with its own rule needs adding here too.
+// Avoid a second divider after elements that already have a bottom border.
 .pcs-make-order #main-content > .pcs-case-facts + h2,
 .pcs-make-order #main-content > .govuk-tabs + h2 {
   border-top: 0;
 }
 
-// 2. Questions inside a tab panel, so Possession / Grounds / the checkbox options read as distinct
-//    decisions rather than one long column of controls.
-//
-// The adjacent-sibling selector is also self-maintaining: rules appear between whatever questions
-// the panel happens to contain, with none stranded above the first or below the last, and adding or
-// reordering a question in the template needs no matching change here. The other four panels get
-// the same treatment for free.
-//
-// The exception is `.pcs-continues-question`, for a form group that is a continuation of the one
-// above rather than a question of its own — "Details of grounds (optional)" belongs to the
-// Mandatory/Discretionary radios, so a line between them would announce a decision that isn't
-// there. Only govuk-frontend's own conditional reveal expresses that relationship in markup, and
-// it is the wrong tool here: a reveal hides the field until a radio is picked, and these details
-// apply to either answer. The class is named for the relationship, not for the missing border, so
-// it still reads correctly if the divider is ever drawn some other way.
-//
-// Scoped to this page. main.scss is served to every page in the app, and `.govuk-tabs__panel` is a
-// stock govuk-frontend class, so an unscoped rule here would silently restyle the next page that
-// uses tabs. Make an order is the only one today; the scope is what keeps that true.
+// Divide distinct tab questions, excluding fields that continue the previous question.
 .pcs-make-order .govuk-tabs__panel > .govuk-form-group + .govuk-form-group:not(.pcs-continues-question) {
   padding-top: govuk-spacing(4);
   border-top: 1px solid $govuk-border-colour;
 }
 
-// 3. Individual checkbox options, which the rule above cannot reach: Money judgment, Damages and
-//    Transfer to High Court are three items inside ONE govukCheckboxes group, not three form groups.
-//
-// The prototype gets its lines here by making each option a separate checkbox group with an <hr>
-// between. Keeping them as one group is deliberate — they are one set of related options on the same
-// question, and splitting them would present three unrelated questions to assistive technology — so
-// the divider goes on the item instead.
-//
-// Opt-in by class, unlike rules 1 and 2. Those two describe every section heading and every question
-// in a panel, so deriving them from position is what keeps them self-maintaining. This one does not.
-// A divider earns its place where the options are long, or each opens a reveal, so that without one
-// an option and the previous option's revealed fields run together. Where they are short one-line
-// options — Hearing format's three, or a group holding a single option — a rule between them draws a
-// separation that isn't there, and a group nested inside another group's reveal cannot be told apart
-// from its parent by a descendant selector at all. Naming the intent in the template is also what
-// stops a divider appearing on the next checkboxes added to this page purely because of where they
-// landed.
-//
-// The child combinator matters as well as the class: `classes` on govukCheckboxes lands on the
-// `.govuk-checkboxes` container, and `>` keeps the rule off the items of any group revealed within
-// this one — "Suspended on the same terms as above" hangs off an option of a divided group.
-//
-// No `.pcs-make-order` scope, unlike rules 1 and 2. Those select stock govuk-frontend classes, so
-// they need the page class to stay off every other page; `pcs-divided-options` is ours and selects
-// nothing that is not asking for it, so the class is the scope. That also makes it reusable if a
-// second page ever wants the same treatment, which the two rules above deliberately are not.
-//
-// `:not(:first-child)` counts conditional reveals too, since a reveal is a sibling of the items. A
-// rule therefore falls after an open reveal rather than between a checkbox and its own reveal, which
-// is what keeps each option and its follow-up reading as a single block.
-//
-// The gap has to be `margin`, and the line a pseudo-element in that margin, rather than the
-// padding + border-top used above. A checkbox item is `position: relative` and govuk-frontend
-// absolutely positions both the real input and the visible box (`label::before`) at `top: 10px`
-// — measured from the item's *padding* box. So padding-top on the item pushes the label text down
-// while leaving the box where it was, knocking the two 8px out of line with each other. Margin
-// sits outside the padding box, so box and text move together and the item stays stock.
-//
-// Tighter gap than the section rules: these are options within one question, not sections, so the
-// line should read as a lighter division than the ones between headings.
+// Opt-in dividers use margin so GOV.UK's absolutely positioned checkbox remains aligned.
 .pcs-divided-options > .govuk-checkboxes__item:not(:first-child) {
   margin-top: govuk-spacing(6);
 
-  // Drawn in the middle of the margin. `left: 0; right: 0` spans the item, which is the full width
-  // of the group, so the line matches the ones above it.
   &::before {
     content: '';
     position: absolute;
@@ -299,38 +133,19 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   }
 }
 
-// A revealed set of fields laid out along the row rather than stacked down the page: "Payment of
-// £[  ] on or before [D][M][Y]" reads as one term of the order and fits in one line of a panel that
-// is over 1300px wide, where stacked it took four and used the left quarter.
-//
-// Each field keeps its own `<label>`/`<legend>` above its control, so this is a layout change only
-// — nothing here touches how a field is named or grouped. The prototype gets the same shape by
-// hand-writing the row with `<span>`s of prose between the inputs and no labels at all, which is
-// where its date fields lost their accessible names (defect 1). Wrapping stock macros in a flex
-// container gets the density without that trade.
-//
-// `flex-wrap` and no fixed track widths, so the row folds onto as many lines as it needs under zoom
-// and there are no breakpoints to keep in step. The prototype's fixed pixel tracks are what made it
-// scroll sideways at 250% (defect 2).
+// Keep related revealed fields on one wrapping row without changing their labels or grouping.
 .pcs-inline-fields {
   display: flex;
   flex-wrap: wrap;
 
-  // Align on the controls, not the tops of the groups: a two-word label wraps where a one-word label
-  // does not, and `flex-start` would then leave that field's input a line below its neighbours'.
-  // `flex-end` puts every input on the same line whatever its label does above it.
   align-items: flex-end;
   gap: govuk-spacing(2) govuk-spacing(4);
 
-  // The gap is the row's job. Each field's own bottom margin would otherwise fall inside the row and
-  // push whatever follows the reveal 30px further down.
   > .govuk-form-group,
   > .govuk-form-group > .govuk-fieldset > .govuk-fieldset__legend {
     margin-bottom: 0;
   }
 
-  // A date input is itself a flex row of three items; the trailing margin after the year is dead
-  // space inside this row, the same as in the case-facts grid.
   .govuk-date-input__item:last-child {
     margin-right: 0;
   }
@@ -339,71 +154,38 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
     margin-bottom: 0;
   }
 
-  // The row is one term of the order read left to right — "Payment of £X on or before D M Y" — and
-  // a legend has to name its group, so "On or before" is a legend where "Payment of" is a plain
-  // label. `--s` renders the legend bold, which put one bold phrase mid-sentence between two regular
-  // ones and made the row read as separate questions. Regular weight is the only difference; the
-  // legend is still a legend and still names the date group.
-  //
-  // Deliberately not solved by dropping `--s` in the template: a legend with no size class renders
-  // at 24px, which is further from the label beside it than the weight ever was.
+  // Match legends to adjacent labels without losing their small-size class.
   > .govuk-form-group > .govuk-fieldset > .govuk-fieldset__legend--s {
     font-weight: normal;
   }
 }
 
-// One line per party — party name, attendance options, representative's name — so the register
-// reads as a table down the page. Putting the party name in a column instead of on a heading line
-// of its own is what halves the height of this section.
+// Present each party, attendance choice and representative name on one row.
 .pcs-attendance__row {
   display: grid;
   grid-template-columns: minmax(0, 22em) auto minmax(0, 20em);
   gap: 0 govuk-spacing(6);
 
-  // Each column starts at the top of the row, so the party name stays level with the first line of
-  // the radios however many lines the name itself runs to. `center` also levels them, and reads
-  // better on the placeholder names, but it centres the *whole* column: a name long enough to wrap
-  // then sits 25px above the radios it labels. `baseline`, which this used to be, does not level
-  // them at all — the radio label's baseline sits low inside a 44px-tall flex item, which is where
-  // the 15px of drift came from.
   align-items: start;
   padding: govuk-spacing(2) 0;
 
-  // Between rows, not below every row. As a `border-bottom` on each row this drew a line under the
-  // last one too, 30px above the rule over the "Recitals" heading — two lines with a gap of blank
-  // page between them and nothing in it. Moving it to the top of every row *after* the first is the
-  // same rule the section and question dividers use, and it is what keeps a group's lines interior
-  // to the group: five rows, four lines, none stranded at either end.
   & + & {
     border-top: 1px solid $govuk-border-colour;
   }
 
-  // Below desktop there is no room for three columns, so let each part take its own line.
   @include govuk-media-query($until: desktop) {
     grid-template-columns: minmax(0, 1fr);
   }
 }
 
-// The party name is the first grid column. It carries govuk-label--s for the same weight and size
-// a legend would have had, so nothing changes visually.
 .pcs-attendance__label {
   margin-bottom: 0;
 
-  // Drop the name to sit on the same line as the radio labels beside it. Both are 19px/25px text,
-  // so this is purely the offset govuk-frontend builds into a radio item: 7px of padding on
-  // `.govuk-radios__label`, plus the 2.5px its 25px line box is centred by inside the 44px-tall
-  // item the radio input makes. Neither is reachable from here without restyling stock components,
-  // hence matching it rather than removing it. Measured, not guessed — all five rows land at 0.
+  // Match GOV.UK's radio-label offset.
   padding-top: 10px;
 }
 
-// The name field is the last column, so its own bottom margin would only add row height.
-//
-// Its label sits beside the box rather than above it, which is the one place this page departs from
-// the stacked label govuk-frontend gives you. Above the box would cost every row a second line and
-// undo the density this layout exists for; beside it, the row height is unchanged. Safe to do here
-// because the field is a name — a short, familiar, single-line value with no hint and no error
-// state. It would not be safe on a citizen question, where the label often carries the explanation.
+// Keep the short representative-name label inline to preserve register density.
 .pcs-attendance__row .govuk-form-group {
   display: flex;
   align-items: baseline;
@@ -411,12 +193,6 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   margin-bottom: 0;
 }
 
-// Baseline alignment on the row above lines the label up with the text the judge types, rather than
-// with the top or middle of the box, so "Name:" and the value sit on one line.
-//
-// The label must not shrink or wrap: it is two words, and a wrapped "Name:" would push the box
-// down and break the row. The input keeps its govuk-input--width-20 as the ceiling but is allowed
-// to shrink below it, so the pair fits the 20em column and still narrows under zoom.
 .pcs-attendance__name-label {
   flex: 0 0 auto;
   margin-bottom: 0;

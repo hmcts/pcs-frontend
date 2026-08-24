@@ -1,13 +1,6 @@
-{# A note that travels with the order to court staff rather than forming part of it. #}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 
-{#
-  No heading here: the checkbox's own label already says "Staff message", so a heading above it
-  only repeats itself — a screen reader user hears the words twice before reaching the control.
-  The checkbox is a single optional extra rather than a section of the order, which is what the
-  other headings mark.
-#}
 {{ govukCheckboxes({
   idPrefix: "staff-message",
   name: "staff-message",

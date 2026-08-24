@@ -1,9 +1,3 @@
-{#
-  Suspended possession: possession ordered but suspended so long as the defendant keeps to payment
-  terms, plus the money judgment options that go with it.
-
-  Panel content only — see the note in _outright.njk.
-#}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
@@ -18,17 +12,6 @@
   fieldset: { legend: { text: "Possession by", classes: "govuk-fieldset__legend--s" } }
 }) }}
 
-{#
-  The prototype's label for this is the sentence "Suspended on condition of payment of current
-  rent plus arrears of ... to be paid by", split across two <span>s with the input in the
-  middle and the trailing half left dangling with nothing after it — the "by" is answered by
-  the payment terms below, which are a separate question, so as a label it never finishes.
-
-  The label is what the field holds; the condition it forms part of goes in a hint, worded as
-  the generated order words it ("suspended as long as the defendant pays (i) the rent as it
-  falls due plus (ii) the arrears of £X"). That keeps the whole term on screen without a
-  two-line bold label above a five-character box.
-#}
 {{ govukInput({
   id: "suspended-arrears",
   name: "suspended-arrears",
@@ -40,17 +23,7 @@
   prefix: { text: "£" }
 }) }}
 
-{#
-  Checkboxes, not radios: both can apply to the same arrears. The prototype's order preview
-  renders a single payment of £12 by one date *and* £32 a month from another against one
-  figure of arrears, as sub-paragraphs (a) and (b) of the same suspension term — so a lump sum
-  followed by instalments is a real order and this is two independent options rather than one
-  choice. That also means there is no "no payment terms" option to add: leaving both unticked
-  already says it.
-
-  Each option's fields sit on one row rather than stacked — see `pcs-inline-fields` in
-  make-order.scss.
-#}
+{# A single payment and instalments may both apply to the same arrears. #}
 {{ govukCheckboxes({
   idPrefix: "suspended-payment-terms",
   name: "suspended-payment-terms",
@@ -103,17 +76,7 @@
   ]
 }) }}
 
-{#
-  "Suspended on the same terms as above" only makes sense once there is a money judgment for it
-  to suspend, so the prototype ships it `disabled` and its script enables it when "Money
-  judgment for the arrears above" is ticked. Here it is a reveal on that option instead, which
-  is the same dependency expressed in markup rather than in script: no field, then the field —
-  rather than a field that is visible but unusable and gives no reason why.
-
-  A disabled control is also not announced as available and cannot be reached by keyboard, so
-  without the script there is nothing to tell a judge what would unlock it. This page has no
-  script yet, which is exactly why it cannot be copied as-is.
-#}
+{# Same terms is only available when the money-judgment option reveals it. #}
 {% set suspendedSameTermsHtml %}
   {{ govukCheckboxes({
     idPrefix: "suspended-mj-same-terms",

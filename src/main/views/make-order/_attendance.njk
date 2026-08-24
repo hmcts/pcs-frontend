@@ -1,12 +1,6 @@
-{#
-  Attendance: who appeared for each party, and the name of the representative.
-#}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{#
-  Attendance shorthand is kept for scanning density, with the full term in a visually hidden
-  span so assistive technology announces something unambiguous.
-#}
+{# Expose full attendance terms to assistive technology while displaying compact abbreviations. #}
 {% set claimantAttendance = [
   { value: "counsel", short: "Csl", full: "Counsel" },
   { value: "solicitor", short: "Sol", full: "Solicitor" },
@@ -38,17 +32,7 @@
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Attendance</h2>
 
 {% for party in attendanceParties %}
-  {#
-    role="group" + aria-labelledby rather than fieldset/legend, which is what the rest of this
-    page uses. A fieldset's rendered legend is laid out outside the box holding its other
-    children, so it cannot sit in a grid column beside them — it always takes a line of its own,
-    which is what doubles the height of this section. The usual workarounds (floating the legend,
-    or display: contents on the fieldset) both rely on browser behaviour that is inconsistent in
-    the accessibility tree, and the float demonstrably dropped the grouping here.
-
-    role="group" is the ARIA equivalent of fieldset and carries no layout special-casing, so the
-    party name can simply be the first grid column. The grouping is explicit and verifiable.
-  #}
+  {# A labelled ARIA group allows the party name to occupy the first grid column. #}
   <div class="pcs-attendance__row" role="group" aria-labelledby="{{ party.id }}-label">
     <span class="govuk-label govuk-label--s pcs-attendance__label" id="{{ party.id }}-label">
       {{ party.label }}
@@ -62,11 +46,6 @@
                  name="{{ party.id }}-attendance"
                  type="radio"
                  value="{{ option.value }}">
-          {#
-            Sighted judges scan the abbreviations; assistive technology gets the full term
-            instead. abbr/title is deliberately avoided — screen reader support for title
-            is inconsistent.
-          #}
           <label class="govuk-label govuk-radios__label" for="{{ party.id }}-{{ option.value }}">
             {%- if option.full -%}
               <span aria-hidden="true">{{ option.short }}</span>
@@ -79,15 +58,7 @@
       {% endfor %}
     </div>
 
-    {#
-      "Name:" is visible, beside the box rather than above it — see make-order.scss. The rest of
-      the label is visually hidden, so the accessible name stays "Name of representative for
-      Claimant 1: ..." and each of the five boxes is unambiguous when reached out of context,
-      while a sighted judge reads the short version the column already implies.
-
-      The colon is aria-hidden for the same reason the attendance abbreviations are: it separates
-      the label from its field visually and is not part of the field's name.
-    #}
+    {# Keep each repeated name field unambiguous to assistive technology. #}
     {{ govukInput({
       id: party.id + "-name",
       name: party.id + "-name",

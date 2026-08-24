@@ -1,7 +1,3 @@
-{#
-  Case facts (tenancy/contract): the facts the judge refers back to while drafting, pinned so they
-  stay on screen — see `.pcs-case-facts` in make-order.scss.
-#}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
@@ -22,10 +18,6 @@
   { value: "yearly", text: "Yearly" }
 ] %}
 
-{#
-  Case facts stay pinned while the judge drafts below. Each date is a govukDateInput so the
-  day/month/year inputs are grouped in a fieldset and announced with the field name.
-#}
 <section class="pcs-case-facts" aria-labelledby="case-facts-heading">
   <h2 class="govuk-heading-s govuk-!-margin-bottom-2" id="case-facts-heading">
     Case facts (tenancy/contract)

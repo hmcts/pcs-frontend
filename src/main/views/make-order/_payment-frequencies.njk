@@ -1,13 +1,4 @@
-{#
-  The one option list used by more than one section: three of the tabs offer a payment plan and all
-  three must offer the same frequencies, so it lives here rather than being repeated in each.
-
-  Imported (`{% import %}`) rather than inherited from the including template's context, so a tab
-  partial states where its options come from and can be read on its own. The option lists used by a
-  single section stay in that section's file.
-
-  Payment plans offer only these two, unlike the rent frequency in _case-facts.njk.
-#}
+{# Shared by every order type that offers a payment plan. #}
 {% set paymentFrequencies = [
   { value: "weekly", text: "Weekly" },
   { value: "monthly", text: "Monthly" }

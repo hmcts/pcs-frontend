@@ -1,33 +1,12 @@
-{# Costs: who pays whose costs, and how much. #}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Costs</h2>
 
-{#
-  One costs order per case, so these are radios sharing `costs-choice`, as in the prototype.
-
-  Three of the ten are "payable on the same terms as the suspension", which only means anything
-  when the order itself is a suspended one. The prototype ships them `disabled` and its script
-  enables them while the Suspended tab is the active one. That cross-section dependency needs
-  either script or a server round-trip, and there is neither yet, so all ten are enabled here and
-  the three carry a hint saying what they require. A disabled radio is not announced as available
-  and cannot be reached by keyboard, so shipping them disabled with no script would put three
-  options on the page that no judge could ever use or find out about.
-
-  Which is also the honest position for iteration 1: nothing is validated yet, so this is one more
-  combination the eventual validation has to reject, not a special case.
-#}
+{# Same-terms options remain enabled until the order-type dependency can be validated. #}
 {% set costsSameTermsHint = "Only available with a suspended possession order." %}
 
-{#
-  The amounts sit under the radio they belong to as a conditional reveal. The prototype puts each
-  one inline on the radio's own line, labelled only by an aria-label, and drives the pairing with
-  a `data-costs-selects` attribute and script — typing in a box selects its radio. Inline is more
-  compact, but it needs the script to be coherent, and it leaves the box unlabelled on screen.
-  Revealed below, the amount appears only when its option is chosen and carries a real label.
-#}
 {% set costsChoiceItems = [
   {
     value: "def-pay-cl-fixed",
@@ -107,14 +86,6 @@
   }
 ] %}
 
-{#
-  The prototype splits these across two hand-built columns. One column here: its two are not two
-  kinds of costs order — the split falls between "Cl pay Def summary costs" and the three
-  same-terms options with no relationship to the seven on the left — so reading order down the
-  left column then back up to the right is arbitrary, and a keyboard user's arrow keys walk the
-  radios in DOM order regardless of where they are painted. Grouped by who pays instead, with the
-  conditional ones last, which is an order a judge can predict.
-#}
 {{ govukCheckboxes({
   idPrefix: "costs",
   name: "costs",

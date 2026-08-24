@@ -4,21 +4,14 @@
 {% from "xui-header/macro.njk" import hmctsXuiHeader %}
 {% from "footer/macro.njk" import hmctsUiFooter %}
 
-{# Judicial screen: full-bleed container instead of the 1020px citizen measure. #}
 {% set containerClasses = "pcs-wide" %}
 
-{# Keeps keyboard focus clear of the sticky case-facts panel — see make-order.scss. #}
 {% set htmlClasses = "pcs-make-order" %}
 
 {% block pageTitle %}
   Make an order - HM Courts &amp; Tribunals Service &ndash; GOV.UK
 {% endblock %}
 
-{#
-  This page is judges only, so it always uses the xui chrome judges already work in — there is no
-  citizen variant to fall back to, and so no conditional. Other pages in this app serve both
-  audiences and branch on isLegalRepresentative; this one does not.
-#}
 {% block head %}
   {{ super() }}
   <link rel="stylesheet" href="/assets/ui-component-lib/ui-component-lib.css">
@@ -28,27 +21,12 @@
   {{ hmctsXuiHeader(headerModel) }}
 {% endblock %}
 
-{#
-  The xui header brings its own navigation and beta banner, and this page is English only, so
-  everything template.njk puts above the content is dropped rather than duplicated. No back link
-  either: this is a single page, not a step in a journey.
-#}
 {% block beforeContent %}{% endblock %}
 
 {% block footer %}
   {{ hmctsUiFooter(footerModel) }}
 {% endblock %}
 
-{#
-  Iteration 1 is a static shell: no data is populated, nothing is posted, and there is no
-  client-side JavaScript beyond stock govuk-frontend (tabs and conditional reveals).
-  Placeholder values in the partials below are illustrative only.
-
-  One file per section of the screen, under make-order/. The split is by the sections a judge sees
-  and by order type, not by any generic form schema, so each order type can be read and reviewed
-  without scrolling past the other four. `_`-prefixed because none of them is a page: they are
-  fragments that only render inside this one.
-#}
 {% block content %}
   {% include "make-order/_case-summary.njk" %}
   {% include "make-order/_case-facts.njk" %}
@@ -57,11 +35,7 @@
 
   <h2 class="govuk-heading-l govuk-!-margin-top-6">Order type</h2>
 
-  {#
-    One list, driving both the tab list and the panels below it, so a tab can never point at a panel
-    that does not exist and no panel can be left unreachable. `template` is the partial holding that
-    order type's fields; the file is named for the tab so the two are easy to keep together.
-  #}
+  {# One list drives both the tabs and their panels. #}
   {% set orderTypeTabs = [
     { id: "tab-outright", label: "Outright possession", template: "make-order/tabs/_outright.njk" },
     { id: "tab-suspended", label: "Suspended possession", template: "make-order/tabs/_suspended.njk" },
@@ -70,27 +44,8 @@
     { id: "tab-free-form", label: "Free form", template: "make-order/tabs/_free-form.njk" }
   ] %}
 
-  {#
-    This is the markup govuk-frontend's Tabs component expects, written out rather than built through
-    the `govukTabs` macro, and the heading level is the whole reason.
-
-    The macro hardcodes its tab-list heading as `<h2>` with no option to change it (govuk-frontend
-    6.4.0). Here that puts "Contents" level with "Order type" — the heading it belongs under — while
-    the panel headings it introduces are `<h3>`, so the outline reads as a sibling section that
-    contains the five it is meant to sit above. That heading is `display: none` above tablet, so it
-    is exposed exactly where it does the most harm: at a ~500px viewport, which is a judge at 250–400%
-    zoom, and with JavaScript unavailable. Zoom is the accommodation this page is most likely to meet
-    (see the reflow note in docs/make-order-plan.md), so a broken outline there is not a cosmetic
-    trade.
-
-    Writing five lines of `<li>` costs little, because the macro owns less than it appears to:
-    `tabs.mjs` sets every `role`, `aria-controls`, `aria-selected`, `aria-labelledby` and `tabindex`
-    at runtime and manages the selected state from there. What the markup has to get right is the
-    class names, the `href`-to-`id` pairing, and which panel starts visible — all three driven by the
-    list above. Behaviour still comes entirely from `data-module="govuk-tabs"`.
-  #}
+  {# The macro hardcodes an h2 tab-list heading, so use its markup directly to preserve heading order. #}
   <div class="govuk-tabs" data-module="govuk-tabs">
-    {# `h3`, under the `h2` above it, which is the level the macro cannot express. #}
     <h3 class="govuk-tabs__title">Contents</h3>
 
     <ul class="govuk-tabs__list">
@@ -101,11 +56,7 @@
       {% endfor %}
     </ul>
 
-    {#
-      Every panel after the first starts hidden, which is the state the component expects to be
-      handed before its script runs — and is what keeps the other four panels' inputs out of the
-      no-JS render (see defect 3 in the plan doc).
-    #}
+    {# govuk-frontend expects every panel after the first to start hidden. #}
     {% for tab in orderTypeTabs %}
       <div class="govuk-tabs__panel {%- if not loop.first %} govuk-tabs__panel--hidden{% endif %}" id="{{ tab.id }}">
         {% include tab.template %}

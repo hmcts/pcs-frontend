@@ -1,10 +1,3 @@
-{#
-  Outright possession: the date possession is ordered by, the grounds, and any money judgment.
-
-  Panel content only. The `.govuk-tabs__panel` wrapper, its id and its initial hidden state come from
-  the tab list in make-order.njk, which includes this file — so nothing here needs to know which tab
-  it is or whether that tab starts open.
-#}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
@@ -44,10 +37,7 @@
   ]
 }) }}
 
-{#
-  This field qualifies the Grounds radios above rather than asking anything new, so it is
-  marked as a continuation and no dividing rule is drawn between the two — see make-order.scss.
-#}
+{# This field continues the Grounds question, so it has no divider. #}
 {{ govukInput({
   id: "outright-grounds-details",
   name: "outright-grounds-details",
@@ -56,19 +46,8 @@
   formGroup: { classes: "pcs-continues-question" }
 }) }}
 
-{#
-  Money judgment. The prototype nests conditional reveals four deep here — money judgment
-  reveals "judgment for arrears", which reveals "must be paid by", which reveals the payment
-  plan, which reveals the balance date. Flattened to one level: the sums and the payment terms
-  are shown together once money judgment is ticked.
-
-  Nesting reveals is not a pattern govuk-frontend supports, and the deeper levels are the
-  reason: a judge tabbing through has no way to know that ticking one box has grown three more
-  levels somewhere below, and each level indents further until the fields are off to the right
-  of the panel. Everything here is optional, so nothing is lost by showing it at once.
-#}
+{# Keep the money-judgment fields in one reveal rather than nesting conditional controls. #}
 {% set outrightMoneyJudgmentHtml %}
-  {# The two sums are one row, as in the prototype, rather than a field and then a field. #}
   <div class="pcs-inline-fields">
     {{ govukInput({
       id: "outright-mj-arrears",
@@ -91,12 +70,7 @@
     }) }}
   </div>
 
-  {#
-    Checkboxes sharing one name, as the prototype has them — a lump sum and instalments can
-    both apply to the same debt (a payment now, the rest over time), so this is two options
-    rather than one choice. Same construct as the suspended tab's payment terms; the reasoning
-    is written out there.
-  #}
+  {# A lump sum and instalments may both apply to the same debt. #}
   {{ govukCheckboxes({
     idPrefix: "outright-mj-plan",
     name: "outright-mj-plan",
