@@ -1,6 +1,4 @@
 export * from './confirmationOfNoticeGiven.pft.lr';
-export * from './contactPreferencesTextMessage.pft.lr';
-export * from './contactPreferencesTelephone.pft.lr';
 export * from './correspondenceAddress.pft.lr';
 export * from './counterClaim.pft.lr';
 export * from './counterClaimAbout.pft.lr';

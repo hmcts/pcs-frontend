@@ -20,7 +20,7 @@ export const counterClaim = {
   theAmountYouPaidParagraph: `The amount you pay depends on what you’re claiming. If it’s a claim for an amount of money, the fee depends on the value of your claim. If your claim is about something else, the fee is £387.`,
   findOutAboutCourtFeeLink: `Find out about court fees (opens in new tab)`,
   doYouWantToMakeACounterclaim: `Do you want to make a counterclaim?`,
-  selectIfYouArePlanningToMakeClaimErrorMessage: `Select if you’re planning to make a counterclaim`,
+  selectIfYouArePlanningToMakeClaimErrorMessage: `Select if the defendant is planning to make a counterclaim`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,

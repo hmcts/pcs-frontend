@@ -12,7 +12,7 @@ export const counterClaimAbout = {
   reasonsForCounterClaimInput: `electricity and windows not repaired`,
   feedbackLink: `feedback`,
   pageSlug: `counter-claim-about`,
-  enterWhatYourCounterClaimErrorMessage: `Enter what the defendant's counterclaim is for`,
-  enterWhatYourReasonsAreForErrorMessage: `Enter what the defendant's reasons are for making the counterclaim`,
+  enterWhatYourCounterClaimErrorMessage: `Enter what the defendant’s counterclaim is for`,
+  enterWhatYourReasonsAreForErrorMessage: `Enter what the defendant’s reasons are for making the counterclaim`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
 };
