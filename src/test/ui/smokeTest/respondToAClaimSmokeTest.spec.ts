@@ -1,8 +1,37 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { freeLegalAdvice, startNow } from '../data/page-data';
+import {
+  checkYourAnswersRTC,
+  contactPreferenceEmailOrPost,
+  contactPreferencesTelephone,
+  correspondenceAddress,
+  counterClaim,
+  dashboard,
+  defendantDateOfBirth,
+  defendantNameConfirmation,
+  doAnyOtherAdultsLiveInYourHome,
+  doYouHaveASolicitor,
+  doYouHaveAnyDependantChildren,
+  doYouHaveAnyOtherDependants,
+  exceptionalHardship,
+  freeLegalAdvice,
+  incomeAndExpenses,
+  languageUsed,
+  otherConsiderations,
+  reasonableAdjustmentsTriage,
+  rentArrears,
+  repaymentsAgreed,
+  repaymentsMade,
+  responseSubmittedCounterclaimFeePaymentNeeded,
+  startNow,
+  taskList,
+  tenancyDateDetails,
+  tenancyTypeDetails,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
+  yourCircumstances,
+} from '../data/page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { initializeExecutor, performAction } from '../utils/controller';
+import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const claimantName = submitCaseApiData.submitCasePayload.claimantName;
 const home_url = process.env.TEST_URL;
@@ -34,8 +63,10 @@ test.describe('Respond to a claim - smoke test @health', async () => {
 
   test('Respond to a claim E2E Journey @crossbrowser @sanity', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    // Below steps will be unskipped once HDPI-5407 and HDPI-5350 are done
-    /*await performAction('confirmDefendantDetails', {
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
     });
@@ -54,6 +85,8 @@ test.describe('Respond to a claim - smoke test @health', async () => {
     await performAction('selectContactByTelephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('tenancyOrContractTypeDetails', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
@@ -71,6 +104,8 @@ test.describe('Respond to a claim - smoke test @health', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.noRadioOption,
     });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
     await performAction('readPaymentInterstitial');
     await performAction('repaymentsMade', {
       question: repaymentsMade.getmainHeader(submitCaseApiData.submitCasePayload.claimantName),
@@ -80,6 +115,8 @@ test.describe('Respond to a claim - smoke test @health', async () => {
       question: repaymentsAgreed.getMainHeader(submitCaseApiData.submitCasePayload.claimantName),
       repaymentAgreedOption: repaymentsAgreed.amNotSureRadioOption,
     });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -103,6 +140,8 @@ test.describe('Respond to a claim - smoke test @health', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.noRadioOption,
     });
@@ -110,15 +149,24 @@ test.describe('Respond to a claim - smoke test @health', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
-    await performAction('clickButton', supportNeeds.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
-    });*/
+    });
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 });
