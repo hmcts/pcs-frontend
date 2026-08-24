@@ -2,12 +2,13 @@
   "pageTitle": "Cytundeb rhentu",
   "heading": "Tenantiaeth, contract meddiannaeth neu gytundeb trwydded",
   "insetText": "Pan wnaethant wneud eu hawliad, roedd yn rhaid i {{orgname}} roi manylion am y math o denantiaeth, contract meddiannaeth neu gytundeb trwydded a lofnodwyd gennych i rentu eich eiddo, a'r dyddiad dechrau, os yn hysbys.",
-  "detailsHeading": "Manylion a roddwyd gan",
+  "detailsHeading": "Manylion a roddwyd gan:",
   "tenancyType": "Caiff yr eiddo ei osod o dan gytundeb tenantiaeth {{tenancyTypeAgreementType}}",
   "tenancyTypeWalesStandard": "Caiff yr eiddo ei osod o dan gontract meddiannaeth safonol",
   "tenancyTypeWalesSecure": "Caiff yr eiddo ei osod o dan gontract meddiannaeth diogel",
   "tenancyTypeWales": "Caiff yr eiddo ei osod o dan gontract meddiannaeth {{welshTenancyTypeAgreementType}}",
   "tenancyTypeOther": "Darparodd yr hawlydd yr wybodaeth ganlynol am eich tenantiaeth, contract meddiannaeth neu fath o gytundeb trwydded: {{otherTenancyTypeDetails}}",
+  "tenancyAgreementDocumentLinkText": "cyView a copy of the tenancy, occupation contract or licence agreement (opens in new tab)",
   "legend": "A yw'r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?",
   "yes": "Ydy",
   "no": "Nac ydy",
@@ -17,6 +18,6 @@
     "tenancyTypeConfirm": "Dewiswch ydy, nac ydy neu ddim yn siŵr",
     "tenancyDetails.correctType": "Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded",
     "requiredText": "Rhowch y manylion cywir ar gyfer y denantiaeth, drwydded neu gontract meddiannaeth",
-    "defaultMaxLength": "cyTenancy, occupation contract or licence type must be 60 characters or less"
+    "defaultMaxLength": "Rhaid i'r math cywir o denantiaeth, contract meddiannaeth neu drwydded fod yn 60 nod neu lai"
   }
 }

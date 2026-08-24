@@ -6,6 +6,13 @@
       "matchPackageNames": ["copy-webpack-plugin"],
       "allowedVersions": "<=10",
       "description": "https://canary.discord.com/channels/226791405589233664/1019534554073157642 and https://github.com/webpack-contrib/copy-webpack-plugin/issues/643 doesn't work even though issue closed"
+    },
+    {
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7",
+      "description": "TypeScript 7 is the native (Go) port which does not yet expose the full compiler API used by @typescript-eslint, ts-jest, ts-loader and ts-node. #1697 auto-merged the v7 bump and broke the lint stage on master (ESLint crash: 'Cannot read properties of undefined (reading Cjs)'). Hold on v6 until the toolchain supports the native port."
     }
-  ]
+  ],
+  "platformAutomerge": false,
+  "automergeSchedule": ["after 7am and before 9am every weekday", "after 5pm and before 7pm every weekday"]
 }

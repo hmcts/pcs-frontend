@@ -154,6 +154,7 @@ export class CitizenDashboardAction implements IAction {
       ],
       ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
     );
+    await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
   }
 
   private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {
@@ -195,10 +196,19 @@ export class CitizenDashboardAction implements IAction {
       ['viewClaimOrResponseTable', viewTheClaim.underlesseeSubHeader, viewTheClaim.underlesseeDetails],
       ['viewClaimOrResponseTable', viewTheClaim.statementOfTruthSubHeader, viewTheClaim.statementOfTruthDetails]
     );
+    await performValidation('validatePdfDocument', '', {
+      linkText: 'RentArrearsStatement - Claimant 1.pdf',
+    });
+    await performValidation('validatePdfDocument', '', {
+      linkText: 'rentArrears - Claimant 1.pdf',
+    });
+    await performValidation('validatePdfDocument', '', {
+      linkText: 'tenancyLicenceDocuments - Claimant 1.pdf',
+    });
     await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
     await performValidation('text', { elementType: 'paragraph', text: viewTheClaim.statementOfTruthParagraph });
     await performValidation('text', { elementType: 'subHeader', text: viewTheClaim.downloadPDFSubHeader });
-    await performValidation('text', { elementType: 'link', text: viewTheClaim.claimPDFLink });
+    await performValidation('validatePdfDocument', '', { linkText: viewTheClaim.claimPDFLink });
     await performValidation('text', { elementType: 'inlineText', text: viewTheClaim.ifYouCannotFindLink });
     await performValidation('text', {
       elementType: 'paragraphWithLink',
