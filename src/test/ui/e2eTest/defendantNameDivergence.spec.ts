@@ -1,9 +1,12 @@
 import {
+  checkYourAnswersRTC,
   defendantDateOfBirth,
   defendantNameCapture,
   defendantNameConfirmation,
+  doYouHaveASolicitor,
   freeLegalAdvice,
   startNow,
+  taskList,
 } from '../data/page-data';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -29,16 +32,6 @@ const home_url = process.env.TEST_URL;
  * back from the case; pcs-api exposes the resolved names through /testing-support/defendant-name-divergence,
  * and the check also asserts against any pack already dispatched when bulk print is enabled.
  */
-
-/**
- * The citizen check-your-answers page is still a placeholder with no submit control, so the response is
- * completed through the development final-submit page (src/main/routes/finalSubmit.ts), which fires the same
- * respondPossessionClaim CCD event the real journey will.
- */
-const finalSubmitPage = {
-  mainHeader: 'Submit Response',
-  submitButton: 'Submit',
-};
 
 /** Both name pages capture this name, so it is what the coversheet and the defence form should both carry. */
 const suppliedName = `${defendantNameCapture.firstNameTextInput} ${defendantNameCapture.lastNameTextInput}`;
@@ -70,6 +63,17 @@ const defendantNotNamedByClaimant = { defendant1: { nameKnown: 'NO', firstName: 
  */
 
 /**
+ * Everything between "Start now" and the name page: the free-legal-advice and solicitor questions, that
+ * section's check-your-answers, then the task list link into the details section where the name is captured.
+ */
+async function startNowAndDetailsSection(): Promise<void> {
+  await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+  await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
+  await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+  await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+}
+
+/**
  * The date-of-birth page is the first page after both name pages. A date has to be supplied because the step
  * only saves a draft when day, month and year are all present.
  */
@@ -81,10 +85,14 @@ async function enterDateOfBirth(): Promise<void> {
   });
 }
 
+/**
+ * Fires the respondPossessionClaim event as the citizen, rather than driving the rest of the journey to
+ * unlock "Check your answers and submit" on the task list. The name is already captured in the draft by the
+ * browser steps above, and it is the submit callback that writes it back to the party record - which is the
+ * behaviour under test. Everything after the name page is irrelevant to the coversheet.
+ */
 async function submitResponse(): Promise<void> {
-  await performAction('navigateToUrl', `${home_url}/case/${process.env.CASE_NUMBER}/final-submit`);
-  await performValidation('mainHeader', finalSubmitPage.mainHeader);
-  await performAction('clickButton', finalSubmitPage.submitButton);
+  await performAction('respondPossessionClaimAPI', { type: 'submit' });
 }
 
 test.beforeEach(async ({ page }, testInfo) => {
@@ -124,7 +132,7 @@ test.afterEach(async () => {
 
 test.describe('Defendant name on the defence pack coversheet @hdpi7686', async () => {
   test('Coversheet shows the name the defendant gave when the claimant did not know it @nameUnknown @hdpi7686 @PR', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await startNowAndDetailsSection();
     // The claimant supplied no name, so the defendant is asked for one outright.
     await performAction('inputDefendantDetails', {
       fName: defendantNameCapture.firstNameTextInput,
@@ -140,7 +148,7 @@ test.describe('Defendant name on the defence pack coversheet @hdpi7686', async (
   });
 
   test('Coversheet shows the corrected name when the defendant disputes the claimant name @nameDisputed @hdpi7686 @PR', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await startNowAndDetailsSection();
     // The claimant named this defendant Jane Roe; they say it is wrong and supply their own name.
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
