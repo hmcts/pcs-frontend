@@ -107,9 +107,13 @@ test.beforeEach(async ({ page }, testInfo) => {
   console.log(`Case created with case number: ${process.env.CASE_NUMBER}`);
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  // Link the citizen to the claim through the UI rather than the validate-access-code API: the API call
+  // grants the CCD case role but leaves the browser session without it, so respond-to-claim then renders
+  // "You do not have access to this page".
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('clickButton', startNow.startNowButton);
 });
