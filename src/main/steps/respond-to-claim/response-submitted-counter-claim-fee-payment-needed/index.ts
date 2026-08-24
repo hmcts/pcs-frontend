@@ -28,6 +28,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return {
       backUrl: '',
+      redirectOnBack: true,
       responseSubmittedCounterClaimFeePaymentNeededListItem1: t(
         'responseSubmittedCounterClaimFeePaymentNeededListItem1',
         {
