@@ -96,3 +96,4 @@ export * from './equalityAndDiversityHealthCondiotion.page.data';
 export * from './equalityAndDiversityEthinicGroup.page.data';
 export * from './equalityAndDiversityDOB.page.data';
 export * from './equalityAndDiversityAbilityToCarryOutActivity.page.data';
+export * from './statementOfTruth.page.data';

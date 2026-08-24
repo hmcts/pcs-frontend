@@ -2499,6 +2499,8 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
     await performAction('selectStatementOfTruthRTC', {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
@@ -2743,6 +2745,8 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('validateCYARTC');
     await performAction('selectStatementOfTruthRTC', {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,

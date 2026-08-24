@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Gwirio eich atebion",
+  "cardTitle": "cy Upload files",
+  "rows": {
+    "uploadedDocuments": {
+      "label": "cy Uploaded files",
+      "changeHidden": "cy uploaded files",
+      "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
+    }
+  }
+}

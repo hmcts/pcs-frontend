@@ -233,7 +233,7 @@ export class RespondToClaimAction implements IAction {
       ['taskListStatus', () => this.taskListStatus(fieldName as actionRecord)],
       ['resetRTCAnswerStore', () => this.resetRTCAnswerStore()],
       ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page, fieldName as actionData)],
-      ['validateCYARTC', () => this.validateCYARTC()],
+      ['validateCYARTC', () => this.validateCYARTC(fieldName as actionData)],
       ['changeAnswerOnFinalCYA', () => this.changeAnswerOnFinalCYA(page, fieldName as actionData)],
       ['selectStatementOfTruthRTC', () => this.selectStatementOfTruthRTC(fieldName as actionRecord)],
       ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)],
@@ -252,11 +252,11 @@ export class RespondToClaimAction implements IAction {
     await actionToPerform();
   }
 
-  private getRtcCyaQuestionLabel(question: string): string {
+  protected getRtcCyaQuestionLabel(question: string): string {
     return stripOptionalSuffix(question);
   }
 
-  private getRtcCyaChoiceLabel(choice: actionData): string {
+  protected getRtcCyaChoiceLabel(choice: actionData): string {
     const normalizedChoice = String(choice).trim();
 
     if (normalizedChoice === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph.trim()) {
@@ -266,7 +266,7 @@ export class RespondToClaimAction implements IAction {
     return removeTrailingBracketedSuffix(normalizedChoice);
   }
 
-  private buildRtcCyaAmountAndFrequencyValue(
+  protected buildRtcCyaAmountAndFrequencyValue(
     amount: actionData,
     frequency: actionData,
     descriptor: string = 'every'
@@ -296,11 +296,11 @@ export class RespondToClaimAction implements IAction {
     this.recordAnswer(label, this.buildRtcCyaFullName(firstName, lastName));
   }
 
-  private recordRtcCyaDateFromParts(label: string, day?: actionData, month?: actionData, year?: actionData): void {
+  protected recordRtcCyaDateFromParts(label: string, day?: actionData, month?: actionData, year?: actionData): void {
     this.recordAnswer(label, this.buildRtcCyaDateValue(day, month, year));
   }
 
-  private deleteRtcCyaDate(label: string): void {
+  protected deleteRtcCyaDate(label: string): void {
     this.deleteAnswer(label);
   }
 
@@ -313,11 +313,11 @@ export class RespondToClaimAction implements IAction {
     }
   }
 
-  private recordRtcCyaSummaryRow(label: string, values: string[]): void {
+  protected recordRtcCyaSummaryRow(label: string, values: string[]): void {
     this.recordAnswer(label, values.length > 0 ? values.join(', ') : rtcNoAnswerProvidedValue);
   }
 
-  private recordRtcCyaHeadingWithItems(headingLabel: string, itemEntries: [string, string][]): void {
+  protected recordRtcCyaHeadingWithItems(headingLabel: string, itemEntries: [string, string][]): void {
     this.deleteAnswer(headingLabel);
 
     if (itemEntries.length === 0) {
@@ -369,9 +369,16 @@ export class RespondToClaimAction implements IAction {
     return normalizedExpected.every((part, index) => part === normalizedActual[index]);
   }
 
-  private recordAnswer(key: string, value: actionData): void {
+  protected recordAnswer(key: string, value: actionData): void {
     const normalizedValue = normalizeValueData(value);
-    FieldsStore.set(key, normalizedValue);
+    const existingValue = FieldsStore.get(key);
+    const valueToStore =
+      key === rtcUploadedDocumentsQuestion &&
+      existingValue &&
+      !this.areRtcCyaValuesEquivalent(normalizedValue, existingValue)
+        ? `${existingValue}, ${normalizedValue}`
+        : normalizedValue;
+    FieldsStore.set(key, valueToStore);
     if (!activeRtcSection) {
       return;
     }
@@ -380,7 +387,7 @@ export class RespondToClaimAction implements IAction {
     rtcSectionAnswers.set(activeRtcSection, sectionAnswers);
   }
 
-  private deleteAnswer(key: string): void {
+  protected deleteAnswer(key: string): void {
     FieldsStore.delete(key);
     rtcSectionAnswers.forEach(sectionAnswers => sectionAnswers.delete(key));
   }
@@ -1507,19 +1514,23 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async retrieveCYATableDataRTC(page: Page, sectionData?: actionData): Promise<void> {
-    const cyaViewName = sectionData ? String(sectionData) : 'final CYA';
+    const sectionName = typeof sectionData === 'string' ? sectionData : undefined;
+    const isSectionCya = Boolean(sectionName);
+    const isLRJourney = sectionData === true;
+    const cyaViewName = sectionName ?? (isLRJourney ? 'LR final CYA' : 'final CYA');
     rtcCyaMap.clear();
     const rowsLocator = page.locator('.govuk-summary-list__row:visible');
     await rowsLocator.first().waitFor({ state: 'visible', timeout: 15000 });
-    if (FieldsStore.getAll().has(rtcUploadedDocumentsQuestion)) {
-      const uploadedFilesLabel = sectionData ? rtcUploadedDocumentsQuestion : rtcFinalCyaUploadedDocumentsQuestion;
+    if (FieldsStore.getAll().has(rtcUploadedDocumentsQuestion) && (!isSectionCya || sectionName === 'uploadFiles')) {
+      const uploadedFilesLabel =
+        isSectionCya || isLRJourney ? rtcUploadedDocumentsQuestion : rtcFinalCyaUploadedDocumentsQuestion;
       await page
         .locator('.govuk-summary-list__row:visible')
         .filter({ has: page.locator('.govuk-summary-list__key', { hasText: uploadedFilesLabel }) })
         .first()
         .waitFor({ state: 'visible', timeout: 15000 });
     }
-    const summaryLists = sectionData
+    const summaryLists = isSectionCya
       ? rowsLocator.first().locator('xpath=ancestor::*[contains(@class, "govuk-summary-list")][1]')
       : page.locator('.govuk-summary-list:visible');
     const summaryListCount = await summaryLists.count();
@@ -1529,7 +1540,7 @@ export class RespondToClaimAction implements IAction {
     }
 
     for (let i = 0; i < summaryListCount; i++) {
-      await this.recordRtcCyaRowsFromSummaryList(summaryLists.nth(i), !sectionData);
+      await this.recordRtcCyaRowsFromSummaryList(summaryLists.nth(i), !isSectionCya);
     }
     console.log(`Retrieved RTC CYA rows for ${cyaViewName}`);
   }
@@ -1542,7 +1553,8 @@ export class RespondToClaimAction implements IAction {
       const row = rows.nth(j);
       const displayedKeyText = (await row.locator('.govuk-summary-list__key').first().innerText()).trim();
       const keyText =
-        isFinalCya && displayedKeyText === rtcFinalCyaUploadedDocumentsQuestion
+        isFinalCya &&
+        (displayedKeyText === rtcFinalCyaUploadedDocumentsQuestion || displayedKeyText === rtcUploadedDocumentsQuestion)
           ? rtcUploadedDocumentsQuestion
           : displayedKeyText;
       const valueCell = row.locator('.govuk-summary-list__value').first();
@@ -1551,12 +1563,18 @@ export class RespondToClaimAction implements IAction {
       const valueText = (innerText || textContent).replace(/\r?\n+/g, ', ').replace(/\s{2,}/g, ' ');
 
       if (keyText) {
-        rtcCyaMap.set(keyText, valueText);
+        const existingValue = rtcCyaMap.get(keyText);
+        const valueToStore =
+          existingValue && !this.areRtcCyaValuesEquivalent(valueText, existingValue)
+            ? `${existingValue}, ${valueText}`
+            : valueText;
+        rtcCyaMap.set(keyText, valueToStore);
       }
     }
   }
 
-  private async validateCYARTC(): Promise<void> {
+  private async validateCYARTC(isLR?: actionData): Promise<void> {
+    const isLRJourney = isLR === true;
     const mismatches: string[] = [];
 
     for (const [expectedKey, expectedValue] of Array.from(FieldsStore.getAll().entries())) {
@@ -1570,8 +1588,10 @@ export class RespondToClaimAction implements IAction {
         continue;
       }
 
+      const expectedLabel =
+        isLRJourney && expectedKey === rtcUploadedDocumentsQuestion ? 'Uploaded files' : expectedKey;
       mismatches.push(
-        `key: "${expectedKey}" -> Expected value containing "${expectedValue}" but the CYA row key was not found`
+        `key: "${expectedLabel}" -> Expected value containing "${expectedValue}" but the CYA row key was not found`
       );
     }
 
