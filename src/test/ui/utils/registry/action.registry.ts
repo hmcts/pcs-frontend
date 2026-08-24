@@ -165,6 +165,7 @@ export class ActionRegistry {
     ['selectClaimAgainstWhom', new RespondToClaimAction()],
     ['counterClaimAbout', new RespondToClaimAction()],
     ['counterClaimOrderOtherThanSum', new RespondToClaimAction()],
+    ['selectReasonableAdjustments', new RespondToClaimAction()],
     ['uploadFilesGenApps', new GenAppsAction()],
     ['payForApplication', new GenAppsAction()],
     ['inputPaymentDetails', new GenAppsAction()],
@@ -213,7 +214,13 @@ export class ActionRegistry {
     ['confirmDefendantDetailsLR', new RespondToClaimLRAction()],
     ['enterDateOfBirthDetailsLR', new RespondToClaimLRAction()],
     ['selectCorrespondenceAddressLR', new RespondToClaimLRAction()],
+    ['languageUsedLR', new RespondToClaimLRAction()],
+    ['selectStatementOfTruthRTCLR', new RespondToClaimLRAction()],
     ['emailConfirmationLR', new RespondToClaimLRAction()],
+    ['exemptLandlordLR', new RespondToClaimLRAction()],
+    ['selectTenancyStartDateKnownLR', new RespondToClaimLRAction()],
+    ['tenancyOrContractTypeDetailsLR', new RespondToClaimLRAction()],
+    ['selectWrittenTermsLR', new RespondToClaimLRAction()],
   ]);
 
   static getAction(actionName: string): IAction {

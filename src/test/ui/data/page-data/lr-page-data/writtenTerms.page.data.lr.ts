@@ -1,0 +1,15 @@
+export const writtenTerms = {
+  mainHeader: `Written terms`,
+  backLink: `Back`,
+  itIsRequiredUnderTheRentingParagraph: `It is required under the Renting Homes Wales Act 2016 for a landlord to send the defendant written terms of the occupation contract.`,
+  hasYourLandlordSentYouWrittenTermsQuestion: `Has the landlord sent the defendant written terms of the occupation contract?`,
+  yesRadioOption: `Yes`,
+  noRadioOption: `No`,
+  iamNotSureRadioOption: `Defendant is not sure`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  cymraegLink: `Cymraeg`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfTheLandlordHasSentYouWrittenTermsOfTheOccupationContractErrorMessage: `Select if the landlord has sent the defendant written terms of the occupation contract`,
+  pageSlug: `written-terms`,
+};
