@@ -828,6 +828,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('enterTenancyStartDetailsUnKnownLR');
     await performAction('selectNoticeDetailsLR', {
       option: confirmationOfNoticeGiven.yesRadioOption,
+      showNoticeDocumentLink: true,
     });
     await performAction('enterNoticeDateKnownLR');
     await performAction('rentArrearsLR', {
