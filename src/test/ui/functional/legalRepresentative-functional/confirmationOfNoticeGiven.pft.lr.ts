@@ -1,11 +1,8 @@
 import { submitCaseApiData } from '../../data/api-data';
-import { confirmationOfNoticeGiven, feedback, tenancyDateUnknown } from '../../data/page-data';
+import { confirmationOfNoticeGiven } from '../../data/page-data/lr-page-data';
 import { performAction, performValidation } from '../../utils/controller';
 
 function getClaimantName(): string {
-  if (process.env.CLAIMANT_NAME_OVERRIDDEN === 'YES') {
-    return submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
-  }
   return process.env.CLAIMANT_NAME ?? submitCaseApiData.submitCasePayloadNoDefendants.claimantName;
 }
 
@@ -15,13 +12,4 @@ export async function confirmationOfNoticeGivenErrorValidation(): Promise<void> 
     header: confirmationOfNoticeGiven.thereIsAProblemErrorMessageHeader,
     message: confirmationOfNoticeGiven.selectIfNoticeOfIntentionGivenErrorMessage(getClaimantName()),
   });
-}
-
-export async function confirmationOfNoticeGivenNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', confirmationOfNoticeGiven.feedbackLink, {
-    element: feedback.tellUsWhatYouThinkParagraph,
-    pageSlug: confirmationOfNoticeGiven.pageSlug,
-  });
-  await performValidation('pageNavigation', confirmationOfNoticeGiven.backLink, tenancyDateUnknown.mainHeader);
-  await performAction('clickRadioButton', confirmationOfNoticeGiven.yesRadioOption);
 }
