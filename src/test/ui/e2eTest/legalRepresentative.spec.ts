@@ -1,6 +1,5 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
-  checkYourAnswersRTC,
   responseAndCounterClaimSubmitted,
   responseSubmitted,
   responseSubmittedCounterclaimFeePaymentNeeded,
