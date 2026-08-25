@@ -1,3 +1,4 @@
+import { step as emailConfirmation } from './email-confirmation';
 import { step as selectDefendant } from './select-defendant';
 import { stepRegistry } from './stepRegistry';
 
@@ -7,6 +8,7 @@ export const legalRepStepRegistry = {
   ...stepRegistry,
 
   'select-defendant': selectDefendant,
+  'email-confirmation': emailConfirmation,
 } satisfies Record<string, StepDefinition>;
 
 export type LegalRepRespondToClaimStepName = keyof typeof legalRepStepRegistry;

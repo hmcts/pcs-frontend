@@ -1,5 +1,7 @@
 import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
 
+import type { CcdFlags } from './cuiRa/cuiRa.interface';
+
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export enum YesNoEnum {
@@ -251,6 +253,9 @@ export interface CcdDefendantResponses {
 export interface StatementOfTruth {
   accepted?: YesNoValue;
   fullName?: string;
+  nameOfFirm?: string;
+  positionHeld?: string;
+  hasLegalRepresentation?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {
@@ -263,7 +268,10 @@ export interface PossessionClaimResponse {
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
+  responseDocumentId?: string;
   claimIssuedDate?: string;
+
+  defendantFlags?: CcdFlags;
 }
 
 export type CaseData = CcdCaseData;
@@ -324,6 +332,9 @@ export interface CcdCaseData {
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+  detailsTab_TenancyLicenceDetails?: DetailsTab_TenancyLicenceDetails;
+  detailsTab_RentArrearsDetails?: DetailsTab_RentArrearsDetails;
+  detailsTab_OccupationContractLicenceDetails?: DetailsTab_OccupationContractLicenceDetails;
   detailsTab_NoticeDetails?: {
     noticeDocuments?: CcdCollectionItem<Document>[];
   };
@@ -468,4 +479,28 @@ export interface MakeAnApplicationResponse {
   state?: GenAppState;
   serviceRequestReference?: string;
   feeAmount?: number;
+}
+
+export interface DetailsTab_TenancyLicenceDetails {
+  typeOfTenancyLicence: string;
+  tenancyLicenceDate: string;
+  hasCopyOfTenancyLicence: string;
+  tenancyLicenceDocuments: CcdCollectionItem<CcdCaseDocument>[];
+}
+
+export interface DetailsTab_RentArrearsDetails {
+  rentAmount: string;
+  calculationFrequency: string;
+  dailyRate: string;
+  stepsToRecoverArrears: string;
+  rentStatement: CcdCollectionItem<CcdCaseDocument>[];
+  arrearsTotal: string;
+  judgmentRequested: string;
+}
+
+export interface DetailsTab_OccupationContractLicenceDetails {
+  agreementType: string;
+  agreementTypeDescription: string;
+  agreementStartDate: string;
+  documents: CcdCollectionItem<CcdCaseDocument>[];
 }
