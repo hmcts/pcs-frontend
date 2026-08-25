@@ -4,10 +4,7 @@ import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { defendantNameConfirmation, selectDefendant, startNow } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
-import {
-  RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS,
-  logTestEnvAfterBeforeEach,
-} from '../utils/common/log-test-env';
+import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -204,16 +201,8 @@ test.describe('Legal representative organisation access after Notice of Change @
       question: defendantNameConfirmation.mainHeader('Test', 'John'),
       option: defendantNameConfirmation.noRadioOption,
     });
-    await performAction(
-      'inputText',
-      defendantNameConfirmation.defendantFirstNameHiddenTextLabel,
-      'Old'
-    );
-    await performAction(
-      'inputText',
-      defendantNameConfirmation.defendantLastNameHiddenTextLabel,
-      'Draft'
-    );
+    await performAction('inputText', defendantNameConfirmation.defendantFirstNameHiddenTextLabel, 'Old');
+    await performAction('inputText', defendantNameConfirmation.defendantLastNameHiddenTextLabel, 'Draft');
     await performAction('clickButton', defendantNameConfirmation.saveForLaterButton);
 
     await performAction('linkDefendantToSolicitorForCaseAPI', {

@@ -21,8 +21,7 @@ export class LinkSolicitorAPIAction implements IAction {
   async execute(_page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['linkSolicitorAPI', () => this.linkSolicitorAPI(fieldName as string | undefined)],
-      ['linkDefendantToSolicitorForCaseAPI', () =>
-        this.linkDefendantToSolicitorForCaseAPI(fieldName as actionRecord)],
+      ['linkDefendantToSolicitorForCaseAPI', () => this.linkDefendantToSolicitorForCaseAPI(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -48,7 +47,9 @@ export class LinkSolicitorAPIAction implements IAction {
 
     for (const defendant of defendantsToLink) {
       process.env.Defendant_ID = defendant.id;
-      console.log(`Linking solicitor ${email} to defendant ${this.getDefendantName(defendant)} with id ${defendant.id}`);
+      console.log(
+        `Linking solicitor ${email} to defendant ${this.getDefendantName(defendant)} with id ${defendant.id}`
+      );
 
       await this.linkSolicitorAPI(email);
     }
