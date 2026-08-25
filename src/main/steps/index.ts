@@ -118,7 +118,8 @@ export function findStep(slug: string, stepName: string, variant: JourneyVariant
   if (!journey) {
     return undefined;
   }
-  return journey[variant]?.stepRegistry[stepName];
+  const resolved = journey[variant] ?? journey.default;
+  return resolved?.stepRegistry[stepName];
 }
 
 function getJourneyConfigForRequest(journeyName: string, req?: Request): ResolvedJourneyConfig | undefined {
