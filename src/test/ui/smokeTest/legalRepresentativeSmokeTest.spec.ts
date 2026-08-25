@@ -64,7 +64,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim LR - Smoke Journey @health', async () => {
-  test('NonRentArrears - AssuredTenancy - LR @smoke @nonRent @LR', async () => {
+  test('NonRentArrears - AssuredTenancy - LR @smoke @crossbrowser @nonRent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
