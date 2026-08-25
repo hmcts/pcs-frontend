@@ -1,0 +1,22 @@
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+{{ govukCheckboxes({
+  idPrefix: "preview-order",
+  name: "preview-order",
+  classes: "govuk-checkboxes--small",
+  formGroup: { classes: "govuk-!-margin-top-6" },
+  items: [{
+    value: "yes",
+    text: "Preview order",
+    label: { classes: "govuk-label--l" },
+    conditional: {
+      html: govukTextarea({
+        id: "preview-order-text",
+        name: "preview-order-text",
+        rows: 10,
+        label: { text: "Order preview", classes: "govuk-visually-hidden" }
+      })
+    }
+  }]
+}) }}
