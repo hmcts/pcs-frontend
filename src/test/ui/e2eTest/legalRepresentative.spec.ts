@@ -35,7 +35,7 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
-  resumeResponseLR,
+  resumeResponse,
   selectDefendant,
   startNow,
   tenancyDateDetails,
@@ -1370,12 +1370,12 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
     });
-    await performValidation('mainHeader', resumeResponseLR.mainHeader);
-    await performValidation('text', { elementType: 'paragraph', text: resumeResponseLR.resumeResponseParagraph1 });
-    await performValidation('text', { elementType: 'listItem', text: resumeResponseLR.resumeResponseListItem1 });
-    await performValidation('text', { elementType: 'listItem', text: resumeResponseLR.resumeResponseListItem2 });
-    await performValidation('text', { elementType: 'paragraph', text: resumeResponseLR.resumeResponseParagraph2 });
-    await performAction('selectResumeResponseLR', { option: resumeResponseLR.yesRadioOption });
+    await performValidation('mainHeader', resumeResponse.mainHeader);
+    await performValidation('text', { elementType: 'paragraph', text: resumeResponse.resumeResponseParagraph1 });
+    await performValidation('text', { elementType: 'listItem', text: resumeResponse.resumeResponseListItem1 });
+    await performValidation('text', { elementType: 'listItem', text: resumeResponse.resumeResponseListItem2 });
+    await performValidation('text', { elementType: 'paragraph', text: resumeResponse.resumeResponseParagraph2 });
+    await performAction('selectResumeResponseLR', { option: resumeResponse.yesRadioOption });
     await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
     await performValidation('radioButtonChecked', defendantNameConfirmation.yesRadioOption, true);
     await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
@@ -1399,7 +1399,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
     });
-    await performAction('selectResumeResponseLR', { option: resumeResponseLR.yesRadioOption });
+    await performAction('selectResumeResponseLR', { option: resumeResponse.yesRadioOption });
     await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
     await performValidation('inputTextValue', defendantDateOfBirth.yearTextLabel, '2001');
   });
@@ -1413,8 +1413,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
     });
-    await performValidation('mainHeader', resumeResponseLR.mainHeader);
-    await performAction('selectResumeResponseLR', { option: resumeResponseLR.noRadioOption });
+    await performValidation('mainHeader', resumeResponse.mainHeader);
+    await performAction('selectResumeResponseLR', { option: resumeResponse.noRadioOption });
     await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
     await performValidation('radioButtonChecked', defendantNameConfirmation.yesRadioOption, false);
 
@@ -1431,6 +1431,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('createDraftResponseLR', pinUser);
 
     await performAction('reopenStartNowLR');
-    await performValidation('mainHeader', resumeResponseLR.mainHeader);
+    await performValidation('mainHeader', resumeResponse.mainHeader);
   });
 });

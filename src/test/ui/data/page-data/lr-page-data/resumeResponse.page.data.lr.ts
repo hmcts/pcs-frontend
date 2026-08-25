@@ -1,4 +1,4 @@
-export const resumeResponseLR = {
+export const resumeResponse = {
   mainHeader: `Resume response`,
   resumeResponseParagraph1: `Your previous answers have been saved.  You can either:`,
   resumeResponseListItem1: `resume your response using your saved answers`,
