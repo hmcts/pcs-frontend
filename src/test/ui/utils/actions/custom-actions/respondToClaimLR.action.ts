@@ -37,7 +37,7 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
-  resumeResponseLR,
+  resumeResponse,
   selectDefendant,
   startNow,
   tenancyDateDetails,
@@ -546,10 +546,10 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async selectResumeResponseLR(resumeResponseData: actionRecord): Promise<void> {
     await performAction('clickRadioButton', {
-      question: resumeResponseLR.question,
+      question: resumeResponse.question,
       option: resumeResponseData.option,
     });
-    await performAction('clickButton', resumeResponseLR.saveAndContinueButton);
+    await performAction('clickButton', resumeResponse.saveAndContinueButton);
   }
 
   private async createDraftResponseLR(defendant: actionRecord): Promise<void> {
