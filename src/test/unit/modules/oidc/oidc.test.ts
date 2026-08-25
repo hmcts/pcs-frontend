@@ -82,8 +82,13 @@ describe('OIDCModule', () => {
       if (key === 'secrets.pcs.pcs-frontend-idam-secret') {
         return 'test-secret';
       }
+      if (key === 'xui.uri') {
+        return 'https://manage-case.aat.platform.hmcts.net';
+      }
       return undefined;
     });
+
+    (config.has as jest.Mock).mockImplementation((key: string) => key === 'xui.uri');
 
     (discovery as jest.Mock).mockResolvedValue({
       serverMetadata: () => ({
@@ -551,6 +556,28 @@ describe('OIDCModule', () => {
           })
         );
         expect(mockResponse.redirect).toHaveBeenCalledWith(mockLogoutUrl);
+      });
+
+      it('should redirect directly to XUI logout URL for legal representative users', async () => {
+        mockRequest.session = createMockSession({
+          user: {
+            idToken: 'test-id-token',
+            roles: ['caseworker-pcs-solicitor'],
+          },
+          destroy: jest.fn().mockImplementation(function (callback) {
+            callback(null);
+          }),
+        });
+
+        oidcModule.enableFor(mockApp);
+        const logoutHandler = (mockApp.get as jest.Mock).mock.calls[2][1];
+        await logoutHandler(mockRequest, mockResponse, mockNext);
+
+        expect(buildEndSessionUrl).not.toHaveBeenCalled();
+        expect(mockRequest.session.destroy).toHaveBeenCalled();
+        expect(mockResponse.redirect).toHaveBeenCalledWith(
+          'https://manage-case.aat.platform.hmcts.net/auth/logout'
+        );
       });
     });
 

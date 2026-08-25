@@ -6,6 +6,7 @@ import * as client from 'openid-client';
 
 import type { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
+import { isLegalRepresentativeUser } from '../../steps/utils/userRole';
 
 export interface RefreshTokenResult {
   accessToken: string;
@@ -246,6 +247,24 @@ export class OIDCModule {
     app.get('/logout', (req: Request, res: Response) => {
       // build the logout url
       const callbackUrl = OIDCModule.getCurrentUrl(req);
+
+      // For Legal Representative users, redirect directly to XUI /auth/logout.
+      // This clears the XUI session and XUI handles the IDAM end session itself.
+      // PCS session is destroyed below, so the user is fully logged out of both.
+      if (isLegalRepresentativeUser(req) && config.has('xui.uri')) {
+        const xuiUri: string = config.get('xui.uri');
+        if (xuiUri) {
+          const xuiLogoutUrl = `${xuiUri.replace(/\/+$/, '')}/auth/logout`;
+          req.session.destroy((err: unknown) => {
+            if (err) {
+              this.logger.error('Session destroyed error:', err);
+            }
+            res.redirect(xuiLogoutUrl);
+          });
+          return;
+        }
+      }
+
       const logoutUrl = client.buildEndSessionUrl(this.clientConfig, {
         post_logout_redirect_uri: callbackUrl.origin,
         id_token_hint: req.session.user?.idToken as string,
