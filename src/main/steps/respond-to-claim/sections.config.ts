@@ -5,6 +5,8 @@ import { hasAnyRentArrearsGround } from '../utils';
 
 import type { RespondToClaimStepName } from './stepRegistry';
 
+import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
+
 // Visual groups on the task-list page. Section order within a group follows declaration order below.
 export const RESPOND_TO_CLAIM_SECTION_GROUPS = [
   { id: 'checkBeforeYouStart', titleKey: 'taskList.groups.checkBeforeYouStart' },
@@ -118,6 +120,16 @@ const sectionDefs = [
     ],
   },
   {
+    // Your Support (Reasonable Adjustments) — last row under "Your response". Reached only from the
+    // task list (the row links to its first step, the triage page); hidden when the feature flag is
+    // off. See reasonable-adjustments-triage for the triage/microsite behaviour.
+    id: 'yourSupport',
+    groupId: 'yourResponse',
+    titleKey: 'taskList.yourSupport',
+    steps: ['reasonable-adjustments-triage'],
+    isApplicable: async (req: Request) => isCuiYourSupportEnabled(req),
+  },
+  {
     id: 'uploadFiles',
     groupId: 'provideEvidence',
     titleKey: 'taskList.uploadFiles',
@@ -144,7 +156,6 @@ const sectionDefs = [
     // enablement is a one-line restore here. See HDPI-6649
     // PCQ tie-in tracked in config/default.json (`pcq.enabled`).
     steps: [
-      'reasonable-adjustments-triage',
       'language-used',
       'end-of-journey-cya',
       'response-submitted',
@@ -178,6 +189,7 @@ export const RESPOND_TO_CLAIM_SECTION_ENUMS = [
   'PAYMENTS',
   'SITUATION_AND_CIRCUMSTANCES',
   'INCOME_AND_EXPENDITURE',
+  'YOUR_SUPPORT',
   'UPLOAD_FILES',
   'CHECK_YOUR_ANSWERS_AND_SUBMIT',
 ] as const;

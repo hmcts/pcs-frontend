@@ -25,6 +25,10 @@ const beforeRedirect = (step as unknown as { beforeRedirect: (req: Request) => P
 const extendGetContent = (
   step as unknown as { extendGetContent: (req: Request) => Promise<{ cuiYourSupportEnabled: boolean }> }
 ).extendGetContent;
+const isAnswered = (step as unknown as { isAnswered: (req: Request) => unknown }).isAnswered;
+const resolveRedirectAfterPost = (
+  step as unknown as { resolveRedirectAfterPost: (req: Request) => Promise<string | undefined> }
+).resolveRedirectAfterPost;
 
 const buildReq = (choice: string, caseId?: string): { req: Request; redirect: jest.Mock } => {
   const redirect = jest.fn();
@@ -107,5 +111,39 @@ describe('reasonable-adjustments-triage extendGetContent', () => {
     const { req } = buildReq('questions', '123');
 
     await expect(extendGetContent(req)).resolves.toEqual({ cuiYourSupportEnabled: false });
+  });
+});
+
+describe('reasonable-adjustments-triage isAnswered (drives the task-list "Your support" row status)', () => {
+  const reqWith = (possessionClaimResponse?: unknown): Request =>
+    ({ res: { locals: { validatedCase: { id: '123', possessionClaimResponse } } } }) as unknown as Request;
+
+  it('is truthy once the defendant has captured adjustments (defendantFlags.details present)', () => {
+    const req = reqWith({ defendantFlags: { details: [{ id: 'f1', value: { name: 'Language interpreter' } }] } });
+
+    expect(Boolean(isAnswered(req))).toBe(true);
+  });
+
+  it('is falsy when there are no defendantFlags', () => {
+    expect(Boolean(isAnswered(reqWith(undefined)))).toBe(false);
+    expect(Boolean(isAnswered(reqWith({})))).toBe(false);
+  });
+
+  it('is falsy when defendantFlags has an empty details list', () => {
+    expect(Boolean(isAnswered(reqWith({ defendantFlags: { details: [] } })))).toBe(false);
+  });
+});
+
+describe('reasonable-adjustments-triage resolveRedirectAfterPost (skip returns to the task list)', () => {
+  it('returns the task-list url when a case reference is present', async () => {
+    const req = { res: { locals: { validatedCase: { id: '123' } } } } as unknown as Request;
+
+    await expect(resolveRedirectAfterPost(req)).resolves.toBe('/case/123/respond-to-claim/task-list');
+  });
+
+  it('returns undefined when there is no case reference (postHandler then falls back to flow nav)', async () => {
+    const req = { res: { locals: { validatedCase: undefined } } } as unknown as Request;
+
+    await expect(resolveRedirectAfterPost(req)).resolves.toBeUndefined();
   });
 });
