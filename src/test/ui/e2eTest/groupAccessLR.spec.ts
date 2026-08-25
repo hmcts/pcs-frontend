@@ -84,7 +84,7 @@ test.afterEach(async () => {
   finaliseAllValidations();
 });
 
-test.describe('Legal representative organisation access after Notice of Change @nightly', async () => {
+test.describe('Legal representative organisation access after Notice of Change @nightly @PR', async () => {
   test('All representatives in the linked organisation can respond for a multi-defendant case @LR', async ({
     page,
     context,
