@@ -250,12 +250,9 @@ describe('PostHandler - Save for Later Fix', () => {
 
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
-      // Base URL comes from config (REDIRECTS_MANAGE_CASE_RETURN_URL), which Jenkins overrides when
-      // the PR carries a pcs-api-pr: label — assert against the resolved config value, not a fixed host.
-      const expectedUrl = buildManageCaseDetailsRedirect(
-        config.get<string>('redirects.manageCaseReturnURL'),
-        '1771325608502536'
-      );
+      const expectedUrl =
+        buildManageCaseDetailsRedirect(config.get<string>('redirects.manageCaseReturnURL'), '1771325608502536') ??
+        '/case/1771325608502536/dashboard';
 
       expect(mockResponse.redirect).toHaveBeenCalledWith(303, expectedUrl);
     });
