@@ -575,9 +575,7 @@ describe('OIDCModule', () => {
 
         expect(buildEndSessionUrl).not.toHaveBeenCalled();
         expect(mockRequest.session.destroy).toHaveBeenCalled();
-        expect(mockResponse.redirect).toHaveBeenCalledWith(
-          'https://manage-case.aat.platform.hmcts.net/auth/logout'
-        );
+        expect(mockResponse.redirect).toHaveBeenCalledWith('https://manage-case.aat.platform.hmcts.net/auth/logout');
       });
     });
 
