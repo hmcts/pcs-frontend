@@ -125,11 +125,7 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   return documents;
 }
 
-function addDocumentsFromGenApps(
-  documents: CaseDocumentLookupItem[],
-  seen: Set<string>,
-  genApps: unknown
-): void {
+function addDocumentsFromGenApps(documents: CaseDocumentLookupItem[], seen: Set<string>, genApps: unknown): void {
   for (const item of asCollection(genApps)) {
     if (!item || typeof item !== 'object') {
       continue;
