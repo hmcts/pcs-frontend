@@ -655,6 +655,14 @@ describe('documentUtils', () => {
     );
   });
 
+  it('skips invalid general application document entries', () => {
+    const documents = extractCaseDocuments({
+      genApps: [null, 'invalid-string-item'],
+    });
+
+    expect(documents).toEqual([]);
+  });
+
   it('skips invalid items, empty filenames, or non-object collections in extractCaseDocuments', () => {
     const documents = extractCaseDocuments({
       allDocuments: [
