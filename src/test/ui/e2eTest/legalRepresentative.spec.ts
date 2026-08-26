@@ -1,5 +1,10 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  responseAndCounterClaimSubmitted,
+  responseSubmitted,
+  responseSubmittedCounterclaimFeePaymentNeeded,
+} from '../data/page-data';
+import {
   confirmationOfNoticeGiven,
   correspondenceAddress,
   counterClaim,
@@ -290,6 +295,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('NonRentArrears - AssuredTenancy - Something else - LR @regression @nonRent @LR', async () => {
@@ -432,6 +441,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @nonRent @LR', async () => {
@@ -578,6 +591,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
+    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - NonRentArrears - AssuredTenancy - LR @PR @regression @rentNonRent @LR', async () => {
@@ -725,6 +739,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @PR @regression @rentNonRent @LR', async () => {
@@ -874,6 +892,10 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
   });
 
   test('RentArrears - DemotedTenancy - LR @rent @LR', async () => {
@@ -966,6 +988,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
+    await performAction('clickButton', responseSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @rent @LR', async () => {
@@ -1083,6 +1106,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
+    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @rent @LR', async () => {
