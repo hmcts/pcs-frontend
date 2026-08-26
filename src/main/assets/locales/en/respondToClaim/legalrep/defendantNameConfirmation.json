@@ -1,4 +1,5 @@
 {
+  "pageTitle": "Your name",
   "nameConfirmationLabel": "Is the defendant’s name {{defendantName}}?",
   "firstNameLabel": "Defendant’s first name",
   "lastNameLabel": "Defendant’s last name",
