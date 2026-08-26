@@ -2,6 +2,8 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { clientContextSessionClearer } from '@utils/clientContextSessionClearer';
+import { getCaseManagementUrl } from '@utils/legalRepresentativeRedirectHandler';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-payment-successful',
@@ -21,11 +23,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     closeAndReturnToCaseOverview: 'closeAndReturnToCaseOverview',
   },
   extendGetContent: req => {
+    clientContextSessionClearer(req);
+
     const paymentReference = req.session.payment?.paymentReference;
     const t = getTranslationFunction(req);
 
     return {
       paymentReferenceLine: paymentReference ? t('paymentReference', { paymentReference }) : undefined,
+      closeUrl: getCaseManagementUrl(req),
     };
   },
 });
