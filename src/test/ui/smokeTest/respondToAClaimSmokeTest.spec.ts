@@ -28,7 +28,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Respond to a claim - smoke test @health', async () => {
-  test('Respond to a claim E2E Journey @crossbrowser @sanity', async () => {
+  test('Respond to a claim E2E Journey @sanity', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
   });
 });
