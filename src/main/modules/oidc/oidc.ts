@@ -4,9 +4,10 @@ import * as jose from 'jose';
 import type { Configuration, TokenEndpointResponse, UserInfoResponse } from 'openid-client';
 import * as client from 'openid-client';
 
+import { isLegalRepresentativeUser } from '../../steps/utils/userRole';
+
 import type { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
-import { isLegalRepresentativeUser } from '../../steps/utils/userRole';
 
 export interface RefreshTokenResult {
   accessToken: string;
