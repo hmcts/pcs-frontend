@@ -417,6 +417,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
@@ -433,8 +436,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -597,6 +598,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles', { files: ['rentArrears.pdf'] });
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
@@ -613,8 +617,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -850,6 +852,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
@@ -866,8 +871,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1049,6 +1052,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
@@ -1065,8 +1071,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1233,6 +1237,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
@@ -1249,8 +1256,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1439,6 +1444,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
@@ -1455,8 +1463,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1629,6 +1635,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
@@ -1645,8 +1654,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1812,6 +1819,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
@@ -1828,8 +1838,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1965,6 +1973,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
@@ -1981,8 +1992,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -2135,6 +2144,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
@@ -2151,8 +2163,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -2183,7 +2193,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
 });
 
 test.describe('Common Component Your Support Respond to a claim - e2e Journey @nightly', async () => {
-  test('YourSupport Request Sent To Court NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @regression @assured @nightly', async () => {
+  test('YourSupport Request Sent To Court NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured @nightly', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -2308,22 +2318,7 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
-    await performAction('uploadFiles', { files: ['rentArrears.pdf'] });
-    await performAction('retrieveCYATableDataRTC', 'uploadFiles');
-    await performAction('validateRTCSectionCYA', 'uploadFiles');
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
-      status: 'Done',
-    });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
     await performAction('selectReasonableAdjustments', {
@@ -2392,6 +2387,24 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequest.mainHeader);
     await performAction('clickButton', supportRequest.continueButton);
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+    await performAction('uploadFiles', { files: ['rentArrears.pdf'] });
+    await performAction('retrieveCYATableDataRTC', 'uploadFiles');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+        taskList.yourSupportLink,
+      ],
+      status: 'Done',
+    });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -2409,7 +2422,7 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('YourSupport Request NOT Sent To Court NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @regression @assured @nightly', async () => {
+  test('YourSupport Request NOT Sent To Court NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @assured @nightly', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -2534,22 +2547,7 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
     await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
     await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
-    await performAction('uploadFiles', { files: ['rentArrears.pdf'] });
-    await performAction('retrieveCYATableDataRTC', 'uploadFiles');
-    await performAction('validateRTCSectionCYA', 'uploadFiles');
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
-      status: 'Done',
-    });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
     await performAction('selectReasonableAdjustments', {
@@ -2574,6 +2572,22 @@ test.describe('Common Component Your Support Respond to a claim - e2e Journey @n
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequestNotSent.mainHeader);
     await performAction('clickButton', supportRequestNotSent.continueButton);
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+    await performAction('uploadFiles', { files: ['rentArrears.pdf'] });
+    await performAction('retrieveCYATableDataRTC', 'uploadFiles');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
