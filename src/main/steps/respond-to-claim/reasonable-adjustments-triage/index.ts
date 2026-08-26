@@ -16,6 +16,10 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/reasonableAdjustmentsTriage.njk`,
+  // Drives the task-list "Your support" row status: DONE once the defendant has captured
+  // adjustments (defendantFlags persisted in draft), AVAILABLE otherwise.
+  isAnswered: (req: Request) =>
+    Boolean(req.res?.locals.validatedCase?.possessionClaimResponse?.defendantFlags?.details?.length),
   // "Continue to the questions" (reasonableAdjustmentsChoice=questions) launches the Your Support
   // microsite;
   beforeRedirect: async (req: Request) => {
@@ -38,6 +42,14 @@ export const step: StepDefinition = createFormStep({
       }
       req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`);
     }
+  },
+  // The "I do not need any support at this time" button (and the flag-off fall-through) lands here.
+  // Your Support is now an optional task launched from the task list, so return the citizen there
+  // rather than walking forward into the next section. The "questions" path 303s to the microsite
+  // inside beforeRedirect (postHandler short-circuits on headersSent) and never reaches this hook.
+  resolveRedirectAfterPost: async (req: Request) => {
+    const caseReference = req.res?.locals.validatedCase?.id;
+    return caseReference ? `/case/${caseReference}/respond-to-claim/task-list` : undefined;
   },
   // When the Your Support feature flag is off, hide the "Continue to the questions" button so the
   // page doesn't advertise a microsite that won't launch (beforeRedirect also treats it as skip).

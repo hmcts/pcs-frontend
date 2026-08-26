@@ -15,9 +15,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     whatHappensNextParagraph1: 'whatHappensNextParagraph1',
     whatHappensNextParagraph2: 'whatHappensNextParagraph2',
   },
-  // "Save and continue" returns the citizen to their response journey at language-used.
+  // "Save and continue" returns the the task list.
   resolveRedirectAfterPost: async req => {
     const caseReference = req.res?.locals.validatedCase?.id;
-    return caseReference ? `/case/${caseReference}/respond-to-claim/language-used?nav=1` : undefined;
+    return caseReference ? `/case/${caseReference}/respond-to-claim/task-list` : undefined;
   },
 });
