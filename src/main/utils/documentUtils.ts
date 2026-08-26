@@ -108,6 +108,7 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   const seen = new Set<string>();
 
   addDocumentsFromCollection(documents, seen, caseData.allDocuments, 'allDocuments');
+  addDocumentsFromGenApps(documents, seen, caseData.genApps);
   addDocumentsFromCollection(documents, seen, caseData.notice_Documents, 'notice_Documents');
   addDocumentsFromCollection(
     documents,
@@ -122,6 +123,24 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   }
 
   return documents;
+}
+
+function addDocumentsFromGenApps(
+  documents: CaseDocumentLookupItem[],
+  seen: Set<string>,
+  genApps: unknown
+): void {
+  for (const item of asCollection(genApps)) {
+    if (!item || typeof item !== 'object') {
+      continue;
+    }
+
+    const genApp = ((item as Record<string, unknown>).value as Record<string, unknown>) ?? item;
+    const sourceField = 'genApps';
+
+    addDocumentsFromCollection(documents, seen, genApp.submissionDocument, `${sourceField}.submissionDocument`);
+    addDocumentsFromCollection(documents, seen, genApp.supportingDocuments, `${sourceField}.supportingDocuments`);
+  }
 }
 
 function createFolders(

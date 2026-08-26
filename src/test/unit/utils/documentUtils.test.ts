@@ -615,6 +615,46 @@ describe('documentUtils', () => {
     );
   });
 
+  it('finds a general application supporting document by its collection id', () => {
+    const document = findCaseDocumentById(
+      {
+        genApps: [
+          {
+            id: 'gen-app-1',
+            value: {
+              submissionDocument: {
+                id: '11111111-1111-1111-1111-111111111111',
+                document: {
+                  document_filename: 'General Application GA1.pdf',
+                  document_binary_url: 'http://doc-store/documents/submission-doc/binary',
+                },
+              },
+              supportingDocuments: [
+                {
+                  id: '22222222-2222-2222-2222-222222222222',
+                  value: {
+                    document_filename: 'supporting-evidence.pdf',
+                    document_binary_url: 'http://doc-store/documents/supporting-doc/binary',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+      '22222222-2222-2222-2222-222222222222'
+    );
+
+    expect(document).toEqual(
+      expect.objectContaining({
+        id: '22222222-2222-2222-2222-222222222222',
+        filename: 'supporting-evidence.pdf',
+        binaryUrl: 'http://doc-store/documents/supporting-doc/binary',
+        sourceField: 'genApps.supportingDocuments',
+      })
+    );
+  });
+
   it('skips invalid items, empty filenames, or non-object collections in extractCaseDocuments', () => {
     const documents = extractCaseDocuments({
       allDocuments: [
