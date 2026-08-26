@@ -14,7 +14,6 @@ import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import type { CcdCase, PossessionClaimResponse } from '@services/ccdCase.interface';
 import { persistPaymentSessionState } from '@services/paymentSessionService';
-import { clientContextSessionClearer } from '@utils/clientContextSessionClearer';
 
 const logger = Logger.getLogger('respondToClaimFinalSubmit');
 
@@ -105,7 +104,11 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
   if (!userAccessToken) {
     throw new RespondToClaimFinalSubmitError('No user access token in session');
   }
-  const selectedPartyId = req.session?.clientContext?.selectedPartyId;
+
+  const selectedPartyId = validatedCase.data.possessionClaimResponse?.currentDefendantPartyId;
+  req.session.clientContext = {
+    selectedPartyId: String(selectedPartyId),
+  };
 
   logger.info(`Submitting response to claim for case ${caseId}`);
 
@@ -149,10 +152,6 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
       counterClaimAmountInPence: getCounterClaimAmountInPence(counterClaim),
       counterClaimType: counterClaim?.claimType ?? paymentPayload?.counterClaimType,
     });
-  }
-
-  if (selectedPartyId) {
-    clientContextSessionClearer(req);
   }
 
   return { confirmationPath };
