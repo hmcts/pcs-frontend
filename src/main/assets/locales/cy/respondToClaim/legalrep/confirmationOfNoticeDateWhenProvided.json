@@ -2,10 +2,10 @@
   "pageTitle": "Dyddiad yr hysbysiad",
   "bulletPointLabel": "Manylion yr hysbysiad a roddwyd gan {{claimantName}}:",
   "hintText": "cyWhen making the claim, {{claimantName}} had to say the date they gave the defendant notice (the date of service).",
-  "listItem1": "cyThey served the defendant with a notice seeking possession on {{noticeDate}}",
+  "listItem1": "cythey served the defendant with a notice seeking possession on {{noticeDate}}",
   "release12": {
     "hintText": "cyWhen making the claim, {{claimantName}} had to say the date they gave the defendant notice (the date of service).",
-    "listItem1": "cyThey served the defendant with a notice seeking possession on {{noticeDate}}"
+    "listItem1": "cythey served the defendant with a notice seeking possession on {{noticeDate}}"
   },
   "question": "cyWhen did the defendant receive notice from {{claimantName}} (optional)?",
   "noticeDateHint": "Er enghraifft, 27 9 2022",

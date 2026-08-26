@@ -4,7 +4,7 @@ import { submitCaseApiData } from '../../api-data';
 export const noticeDateWhenProvided = {
   mainHeader: `Notice date`,
   backLink: `Back`,
-  noticeGivenDateLabel: `They served the defendant with a notice seeking possession on ${convertDateFormat(submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.notice_PostedDate)}`,
+  noticeGivenDateLabel: `they served the defendant with a notice seeking possession on ${convertDateFormat(submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.notice_PostedDate)}`,
   whenMakingClaimHintText: () =>
     `When making the claim, ${process.env.CLAIMANT_NAME} had to say the date they gave the defendant notice (the date of service).`,
   noticeDetailsGivenLabel: () => `Notice details given by ${process.env.CLAIMANT_NAME}:`,
