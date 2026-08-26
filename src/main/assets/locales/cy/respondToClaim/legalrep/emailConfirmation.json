@@ -1,16 +1,16 @@
 {
-  "pageTitle": "cyDefendant’s email address",
-  "heading": "cyDefendant’s email address",
-  "emailConfirmationLabel": "cyDo you know the defendant’s email address?",
+  "pageTitle": "Cyfeiriad e-bost yr hawlydd",
+  "heading": "Cyfeiriad e-bost yr hawlydd",
+  "emailConfirmationLabel": "Ydych chi'n gwybod cyfeiriad e-bost y diffynnydd?",
   "options": {
     "yes": "Ydy",
     "noOption": "Nac ydy"
   },
-  "emailLabel": "cyEnter the defendant’s email address",
+  "emailLabel": "Rhowch gyfeiriad e-bost y diffynnydd",
   "errors": {
     "emailConfirmation": "Dewiswch a ydych chi'n gwybod cyfeiriad e-bost y diffynnydd",
     "emailAddress": {
-      "required": "cyEnter the defendant’s email address",
+      "required": "Rhowch gyfeiriad e-bost y diffynnydd",
       "invalid": "Rhowch gyfeiriad e-bost yn y fformat cywir, er enghraifft enw@enghraifft.com"
     }
   }

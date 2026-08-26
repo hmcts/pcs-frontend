@@ -11,7 +11,7 @@
       "changeHidden": "manylion talu"
     },
     "repaymentPlanAgreed": {
-      "label": "cy Has the defendant come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}?",
+      "label": "A yw'r diffynnydd wedi dod i unrhyw gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
       "changeHidden": "cytundeb ad-dalu"
     },
     "repaymentAgreedDetails": {

@@ -3,7 +3,7 @@
   "cardTitle": "Manylion personol",
   "rows": {
     "defendantNameConfirmation": {
-      "label": "cy Is the defendant’s name {{defendantName}}?",
+      "label": "Ai enw eich cleient yw {{defendantName}}?",
       "changeHidden": "enw"
     },
     "defendantName": {
@@ -15,7 +15,7 @@
       "changeHidden": "enw"
     },
     "dateOfBirth": {
-      "label": "cy Defendant’s date of birth",
+      "label": "Dyddiad geni",
       "changeHidden": "dyddiad geni"
     },
     "correspondenceAddressConfirmation": {
