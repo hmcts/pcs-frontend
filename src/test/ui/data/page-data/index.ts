@@ -85,3 +85,4 @@ export * from './requestCertainTypeOfHearing.page.data';
 export * from './reviewSupport.page.data';
 export * from './supportRequest.page.data';
 export * from './supportRequestNotSent.page.data';
+export * from './statementOfTruth.page.data';

@@ -4,16 +4,12 @@
   "options": {
     "yes": "cy Yes",
     "no": "cy No",
-    "imNotSure": "cy I’m not sure"
+    "imNotSure": "cy Defendant is not sure"
   },
   "rows": {
-    "landlordRegistered": {
-      "label": "cy Is the landlord registered?",
-      "changeHidden": "cy landlord registered"
-    },
-    "landlordLicensed": {
-      "label": "cy Is the landlord licensed?",
-      "changeHidden": "cy landlord licensed"
+    "exemptLandlord": {
+      "label": "cy Is the landlord an exempt landlord under Part 1 of the Housing (Wales) Act 2014?",
+      "changeHidden": "cy exempt landlord"
     },
     "writtenTerms": {
       "label": "cy Has the landlord sent the defendant written terms of the occupation contract?",
@@ -125,7 +121,7 @@
       "changeHidden": "cy facts for the court"
     },
     "counterClaimWantToUploadFiles": {
-      "label": "cy Do you want to upload files to support your counterclaim?",
+      "label": "cy Do you want to upload files to support the counterclaim?",
       "changeHidden": "cy upload files for counterclaim"
     },
     "counterClaimDocuments": {
