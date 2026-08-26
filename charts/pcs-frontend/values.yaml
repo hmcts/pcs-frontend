@@ -40,4 +40,8 @@ nodejs:
     FEE_SERVICE_URL: 'http://fees-register-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
     REDIRECTS_MANAGE_CASE_RETURN_URL: 'https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net/cases/case-details/PCS/PCS'
     PAYMENT_RETURN_URL: 'https://pcs.{{ .Values.global.environment }}.platform.hmcts.net/payment/return'
+    # TODO: prod uses a different cui-ra host (manage-your-support-for-hmcts-services.service.gov.uk),
+    # not the cui-ra.<env>.platform.hmcts.net pattern below — prod needs an explicit CUI_RA_URL
+    # override.
+    CUI_RA_URL: 'https://cui-ra.{{ .Values.global.environment }}.platform.hmcts.net'
     LAUNCHDARKLY_ENV: '{{ .Values.global.environment }}'
