@@ -155,6 +155,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       type: 'radio',
       required: true,
       classes: 'priority-debt-details-paid-every-radios',
+      legendClasses: 'govuk-fieldset__legend--m',
       translationKey: { label: 'frequencyQuestion' },
       errorMessage: 'errors.priorityDebtContributionFrequency',
       options: [

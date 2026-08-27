@@ -15,12 +15,33 @@
     "otherExpenses": "Other"
   },
   "subFields": {
-    "amount": "Amount paid",
-    "frequency": "Paid every:"
+    "amount": "Amount paid"
+  },
+  "subFieldsLegend": {
+    "householdBills": "Household bills details",
+    "loanPayments": "Loan payment details",
+    "childSpousalMaintenance": "Child or spousal maintenance details",
+    "mobilePhone": "Mobile phone details",
+    "groceryShopping": "Grocery shopping details",
+    "fuelParkingTransport": "Fuel, parking and transport details",
+    "schoolCosts": "School costs details",
+    "clothing": "Clothing details",
+    "otherExpenses": "Other expenses details"
+  },
+  "frequencyLegend": {
+    "householdBills": "How often do you pay household bills?",
+    "loanPayments": "How often do you pay loan payments?",
+    "childSpousalMaintenance": "How often do you pay child or spousal maintenance?",
+    "mobilePhone": "How often do you pay for a mobile phone?",
+    "groceryShopping": "How often do you pay for grocery shopping?",
+    "fuelParkingTransport": "How often do you pay for fuel, parking and transport?",
+    "schoolCosts": "How often do you pay school costs?",
+    "clothing": "How often do you pay for clothing?",
+    "otherExpenses": "How often do you pay for other expenses?"
   },
   "frequency": {
-    "week": "Week",
-    "month": "Month"
+    "week": "Paid every week",
+    "month": "Paid every month"
   },
   "errors": {
     "householdBillsAmount": {

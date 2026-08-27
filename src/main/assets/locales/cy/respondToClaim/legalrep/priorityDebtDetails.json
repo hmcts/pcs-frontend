@@ -3,6 +3,7 @@
   "caption": "Ymateb i hawliad i feddiannu eiddo",
   "totalQuestion": "cyWhat is the total amount the defendant owes for all their priority debts?",
   "contributionQuestion": "cyHow much does the defendant pay towards their priority debts each week or month?",
+  "frequencyQuestion": "cyHow often does the defendant pay towards their priority debts?",
   "errors": {
     "priorityDebtTotal": "cyEnter the total amount the defendant owes for all their priority debts",
     "priorityDebtTotalMin": "cyThe total amount the defendant owes for all their priority debts must be £0.00 or above",

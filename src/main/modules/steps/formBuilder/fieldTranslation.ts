@@ -172,6 +172,9 @@ function processOptions(
       text: optionLabel,
       conditionalText: resolvedConditionalText,
       subFields: processedSubFields,
+      subFieldsLegend: option.subFieldsLegendKey
+        ? getTranslation(t, option.subFieldsLegendKey, undefined, interpolation)
+        : undefined,
     };
   });
 }
