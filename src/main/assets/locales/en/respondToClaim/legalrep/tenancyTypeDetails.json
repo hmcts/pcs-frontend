@@ -1,5 +1,11 @@
 {
+  "pageTitle": "Rental agreement",
+  "heading": "Tenancy, occupation contract or licence agreement",
   "insetText": "When they made their claim, {{orgname}} had to give details about the type of tenancy, occupation contract or licence agreement the defendant signed to rent their property, and the date it began, if known.",
-  "notSure": "Defendant is not sure",
-  "tenancyTypeOther": "The claimant provided the following information about the defendant’s tenancy, occupation contract or licence agreement type: {{otherTenancyTypeDetails}}"
+  "tenancyTypeOther": "The claimant provided the following information about the defendant’s tenancy, occupation contract or licence agreement type: {{otherTenancyTypeDetails}}",
+  "legend": "Is the tenancy, occupation contract or licence agreement type correct?",
+  "yes": "Yes",
+  "no": "No",
+  "correctTypeLabel": "Give the correct tenancy, occupation contract or licence type",
+  "notSure": "Defendant is not sure"
 }
