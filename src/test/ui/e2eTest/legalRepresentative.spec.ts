@@ -40,6 +40,7 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  resumeResponse,
   selectDefendant,
   startNow,
   tenancyDateDetails,
@@ -1382,5 +1383,78 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+  });
+
+  test('Existing draft response resumes to the saved journey @nonRent @LR', async () => {
+    const pinUser = await getPinUserAt(2);
+    await performAction('createDraftResponseLR', pinUser);
+
+    await performAction('reopenStartNowLR');
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
+    });
+    await performValidation('mainHeader', resumeResponse.mainHeader);
+    await performValidation('text', { elementType: 'paragraph', text: resumeResponse.resumeResponseParagraph1 });
+    await performValidation('text', { elementType: 'listItem', text: resumeResponse.resumeResponseListItem1 });
+    await performValidation('text', { elementType: 'listItem', text: resumeResponse.resumeResponseListItem2 });
+    await performValidation('text', { elementType: 'paragraph', text: resumeResponse.resumeResponseParagraph2 });
+    await performAction('selectResumeResponseLR', { option: resumeResponse.yesRadioOption });
+    await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
+    await performValidation('radioButtonChecked', defendantNameConfirmation.yesRadioOption, true);
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+    await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
+    await performValidation(
+      'inputTextValue',
+      defendantDateOfBirth.dayTextLabel,
+      defendantDateOfBirth.savedDayInputText
+    );
+    await performValidation(
+      'inputTextValue',
+      defendantDateOfBirth.monthTextLabel,
+      defendantDateOfBirth.savedMonthInputText
+    );
+    await performValidation('inputTextValue', defendantDateOfBirth.yearTextLabel, defendantDateOfBirth.yearInputText);
+    await performAction('inputText', defendantDateOfBirth.yearTextLabel, '2001');
+    await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
+
+    await performAction('reopenStartNowLR');
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
+    });
+    await performAction('selectResumeResponseLR', { option: resumeResponse.yesRadioOption });
+    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+    await performValidation('inputTextValue', defendantDateOfBirth.yearTextLabel, '2001');
+  });
+
+  test('Deleting a draft returns to defendant details @nonRent @LR', async () => {
+    const pinUser = await getPinUserAt(2);
+    await performAction('createDraftResponseLR', pinUser);
+
+    await performAction('reopenStartNowLR');
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
+    });
+    await performValidation('mainHeader', resumeResponse.mainHeader);
+    await performAction('selectResumeResponseLR', { option: resumeResponse.noRadioOption });
+    await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
+    await performValidation('radioButtonChecked', defendantNameConfirmation.yesRadioOption, false);
+
+    await performAction('reopenStartNowLR');
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
+    });
+    await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
+  });
+
+  test('Only one defendant with a draft goes to resume response @rentNonRent @singleDefendant @LR', async () => {
+    const pinUser = await getPinUserAt(0);
+    await performAction('createDraftResponseLR', pinUser);
+
+    await performAction('reopenStartNowLR');
+    await performValidation('mainHeader', resumeResponse.mainHeader);
   });
 });
