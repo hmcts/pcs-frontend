@@ -25,6 +25,19 @@ import {
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
   documentInAlternativeFormat,
+  equalityAndDiversityAbilityToCarryOutActivity,
+  equalityAndDiversityDOB,
+  equalityAndDiversityEnd,
+  equalityAndDiversityEthinicGroup,
+  equalityAndDiversityHealthCondiotion,
+  equalityAndDiversityHowYouThink,
+  equalityAndDiversityLanguage,
+  equalityAndDiversityMarriedOrCivilPartnership,
+  equalityAndDiversityPregnancy,
+  equalityAndDiversityReligion,
+  equalityAndDiversitySameGender,
+  equalityAndDiversityStart,
+  equalityAndDiversityYourSex,
   exceptionalHardship,
   exemptLandLord,
   feelComfortableDuringHearing,
@@ -316,6 +329,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -590,6 +605,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -766,8 +783,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
   });
 });
 
-test.describe('Common Component YS Respond to a claim - e2e Journey @nightly', async () => {
-  test('Your Support Request Sent to Court Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @nightly', async () => {
+test.describe('Common Component YS And PCQ Respond to a claim - e2e Journey @nightly ', async () => {
+  test('Your Support Request Sent to Court And PCQ Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @nightly', async () => {
     //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -1026,6 +1043,77 @@ test.describe('Common Component YS Respond to a claim - e2e Journey @nightly', a
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequest.mainHeader);
     await performAction('clickButton', supportRequest.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityDOB.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityDOB.mainHeader,
+      radioOption: equalityAndDiversityDOB.preferNotToSayRadioButton,
+      button: equalityAndDiversityDOB.continueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityLanguage.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityLanguage.mainHeader,
+      radioOption: equalityAndDiversityLanguage.englishRadioOption,
+      button: equalityAndDiversityLanguage.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityYourSex.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityYourSex.mainHeader,
+      radioOption: equalityAndDiversityYourSex.femaleRadioOption,
+      button: equalityAndDiversityYourSex.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversitySameGender.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversitySameGender.mainHeader,
+      radioOption: equalityAndDiversitySameGender.yesRadioOption,
+      button: equalityAndDiversitySameGender.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityHowYouThink.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityHowYouThink.mainHeader,
+      radioOption: equalityAndDiversityHowYouThink.hetroRadioOption,
+      button: equalityAndDiversityHowYouThink.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityMarriedOrCivilPartnership.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityMarriedOrCivilPartnership.mainHeader,
+      radioOption: equalityAndDiversityMarriedOrCivilPartnership.preferNotToSayRadioOption,
+      button: equalityAndDiversityMarriedOrCivilPartnership.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityEthinicGroup.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityEthinicGroup.mainHeader,
+      radioOption: equalityAndDiversityEthinicGroup.preferNotToSayRadioOption,
+      button: equalityAndDiversityEthinicGroup.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityReligion.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityReligion.mainHeader,
+      radioOption: equalityAndDiversityReligion.sikhRadioOption,
+      button: equalityAndDiversityReligion.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityHealthCondiotion.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityHealthCondiotion.mainHeader,
+      radioOption: equalityAndDiversityHealthCondiotion.yesRadioOption,
+      button: equalityAndDiversityHealthCondiotion.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityAbilityToCarryOutActivity.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityAbilityToCarryOutActivity.mainHeader,
+      radioOption: equalityAndDiversityAbilityToCarryOutActivity.preferNotToSayRadioOption,
+      button: equalityAndDiversityAbilityToCarryOutActivity.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityPregnancy.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityPregnancy.mainHeader,
+      radioOption: equalityAndDiversityPregnancy.noRadioOption,
+      button: equalityAndDiversityPregnancy.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -1254,6 +1342,8 @@ test.describe('Common Component YS Respond to a claim - e2e Journey @nightly', a
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequestNotSent.mainHeader);
     await performAction('clickButton', supportRequestNotSent.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
