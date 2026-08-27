@@ -136,13 +136,12 @@ const sectionDefs = [
       'incomeAndExpenditure',
       'uploadFiles',
     ],
-
-    // 'equality-and-diversity-start' and
-    // 'equality-and-diversity-end' are intentionally parked out of the live citizen
-    // journey while PCQ integration is still in progress.
+    // 'equality-and-diversity-start' and 'equality-and-diversity-end' are intentionally
+    // parked out of the live citizen journey.
     // Their step folders, registry entries and locale files are retained so re-
-    // enablement is a one-line restore here. See HDPI-6649
-    // PCQ tie-in tracked in config/default.json (`pcq.enabled`).
+    // enablement is a one-line restore here. The PCQ hand-off itself is gated by the
+    // `release-1.3-enabled` and `cui-pcq-enabled` LaunchDarkly flags, and fires from the
+    // RA triage step, not from these pages.
     steps: [
       'reasonable-adjustments-triage',
       'language-used',
