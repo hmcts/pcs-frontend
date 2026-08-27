@@ -42,6 +42,30 @@ export interface OutstandingCounterClaimPayment {
   counterClaimType?: string;
 }
 
+export interface PbaAccountsResponse {
+  pbaAccounts: string[];
+}
+
+export interface StartPbaPaymentRequestInput {
+  accessToken: string;
+  serviceRequestReference: string;
+  amount: number;
+  pbaAccount?: string;
+  customerReference?: string;
+}
+
+export interface CreatePbaPaymentRequest {
+  amount: number;
+  pbaAccount: string;
+  customerReference: string;
+}
+
+export interface PbaPaymentResponse {
+  paymentReference: string;
+  status: string;
+  dateCreated: string;
+}
+
 function getBaseUrl(): string {
   return config.get('api.url');
 }
@@ -89,6 +113,20 @@ export const paymentService = {
     return response.data;
   },
 
+  async createPbaPaymentRequest(
+    accessToken: string,
+    serviceRequestReference: string,
+    payload: CreatePbaPaymentRequest
+  ): Promise<PbaPaymentResponse> {
+    const pcsApiURL = getBaseUrl();
+    const response = await http.post<PbaPaymentResponse>(
+      `${pcsApiURL}/payment/service-request/${encodeURIComponent(serviceRequestReference)}/pba`,
+      payload,
+      getUserAuthHeaders(accessToken)
+    );
+    return response.data;
+  },
+
   async getCardPaymentStatus(accessToken: string, paymentReference: string): Promise<CardPaymentStatusResponse> {
     const pcsApiURL = getBaseUrl();
     const response = await http.get<CardPaymentStatusResponse>(
@@ -122,5 +160,28 @@ export const paymentService = {
       getUserAuthHeaders(accessToken)
     );
     return response.data;
+  },
+
+  async getPbaAccounts(accessToken: string): Promise<PbaAccountsResponse> {
+    const pcsApiURL = getBaseUrl();
+    const response = await http.get<PbaAccountsResponse>(
+      `${pcsApiURL}/payment/pba-accounts`,
+      getUserAuthHeaders(accessToken)
+    );
+    return response.data;
+  },
+
+  async startPbaPaymentRequest(input: StartPbaPaymentRequestInput): Promise<PbaPaymentResponse> {
+    const paymentResponse = await this.createPbaPaymentRequest(input.accessToken, input.serviceRequestReference, {
+      amount: input.amount,
+      pbaAccount: input.pbaAccount,
+      customerReference: input.customerReference,
+    });
+
+    return {
+      status: paymentResponse.status,
+      dateCreated: paymentResponse.dateCreated,
+      paymentReference: paymentResponse.paymentReference,
+    };
   },
 };
