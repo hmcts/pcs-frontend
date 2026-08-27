@@ -55,3 +55,6 @@ version
 /pact/
 /src/test/java/build/
 /src/test/java/.gradle/
+
+# Local Welsh-translation helper scripts (not part of the app)
+scripts/
