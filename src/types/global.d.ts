@@ -17,7 +17,7 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
 }
 
 export interface ClientContextHeaders {
-  selectedPartyId: string;
+  selectedPartyId?: string;
 }
 
 interface CustomSessionData extends SessionData {
