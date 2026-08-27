@@ -74,6 +74,7 @@ export * from './responseSubmitted.page.data';
 export * from './responseSubmittedCounterclaimFeePaymentNeeded.page.data';
 export * from './viewTheResponse.page.data';
 export * from './paymentDetails.page.data';
+export * from './serviceRequestPayment.page.data';
 export * from './physicalMentalOrLearningDisability.page.data';
 export * from './adjustmentToGetIntoBuilding.page.data';
 export * from './documentInAlternativeFormat.page.data';
