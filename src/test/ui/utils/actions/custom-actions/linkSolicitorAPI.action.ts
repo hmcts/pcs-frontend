@@ -173,8 +173,8 @@ export class LinkSolicitorAPIAction implements IAction {
       username,
       password,
       grantType: 'password',
-      clientId: 'pcs-api',
-      clientSecret: process.env.PCS_API_IDAM_SECRET as string,
+      clientId: 'pcs-frontend',
+      clientSecret: process.env.PCS_FRONTEND_IDAM_SECRET as string,
       scope: 'profile openid roles',
     });
   }
