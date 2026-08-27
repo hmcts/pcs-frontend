@@ -258,11 +258,15 @@ export class RespondToClaimAction implements IAction {
   protected getRtcCyaChoiceLabel(choice: actionData): string {
     const normalizedChoice = String(choice).trim();
 
-    if (normalizedChoice === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph.trim()) {
+    const moneyFromSomewhereElseLabels = [
+      whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph.trim(),
+      `Money from somewhere else (for example, child maintenance payments or someone in the defendant’s household gives them money)`.trim(),
+    ];
+    if (moneyFromSomewhereElseLabels.includes(normalizedChoice)) {
       return normalizedChoice;
+    } else {
+      return removeTrailingBracketedSuffix(normalizedChoice);
     }
-
-    return removeTrailingBracketedSuffix(normalizedChoice);
   }
 
   protected buildRtcCyaAmountAndFrequencyValue(
