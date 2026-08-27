@@ -12,7 +12,11 @@ describe('subFields.njk conditional reveal wrapper', () => {
     loanPaymentsAmount: {
       name: 'regularExpenses.loanPaymentsAmount',
       type: 'text',
-      component: { id: 'regularExpenses.loanPaymentsAmount', name: 'regularExpenses.loanPaymentsAmount', label: { text: 'Amount paid' } },
+      component: {
+        id: 'regularExpenses.loanPaymentsAmount',
+        name: 'regularExpenses.loanPaymentsAmount',
+        label: { text: 'Amount paid' },
+      },
       componentType: 'input',
     },
     loanPaymentsFrequency: {
@@ -34,7 +38,9 @@ describe('subFields.njk conditional reveal wrapper', () => {
   it('wraps subfields in a fieldset with visually hidden legend when legend is provided', () => {
     const html = buildSubFieldsHTML(subFields, nunjucksEnv, 'Loan payment details');
 
-    expect(html).toContain('<legend class="govuk-fieldset__legend govuk-visually-hidden">Loan payment details</legend>');
+    expect(html).toContain(
+      '<legend class="govuk-fieldset__legend govuk-visually-hidden">Loan payment details</legend>'
+    );
     expect(html).toContain('regularExpenses.loanPaymentsAmount');
     expect(html).toContain('regularExpenses.loanPaymentsFrequency');
     expect(html).toContain('How often do you pay loan payments?');
