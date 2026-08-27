@@ -1032,11 +1032,11 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('inputText', endOfJourneyCYA.fullNameTextLabel, sot.firstName);
     await performAction('inputText', endOfJourneyCYA.nameOfFirmTextLabel, sot.firmName);
     await performAction('inputText', endOfJourneyCYA.positionOrOfficeHeldTextLabel, sot.position);
-
-    await performAction('clickButton', endOfJourneyCYA.submitButton);
+    await page.getByRole('button', { name: 'Submit', exact: true }).click({
+      noWaitAfter: true,
+    });
     await page.locator('h1.govuk-panel__title').waitFor({
       state: 'visible',
-
       timeout: 30000,
     });
   }
