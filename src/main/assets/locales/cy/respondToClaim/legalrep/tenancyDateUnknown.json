@@ -1,19 +1,7 @@
 {
-  "pageTitle": "cyRental agreement start",
-  "heading": "cyTenancy, occupation contract or licence start date",
-  "question": "cyWhat is the tenancy, occupation contract or licence start date? (Optional)",
-  "hint": "",
-  "paragraph": "cy{{claimantName}} did not provide the start date of the tenancy, licence or occupation contract.",
-  "errors": {
-    "date": {
-      "day": "cyDay",
-      "month": "cyMonth",
-      "year": "cyYear",
-      "required": "cyYour tenancy start date must include a day, month and year",
-      "notRealDate": "cyTenancy start date must be a real date",
-      "futureDate": "cyTenancy start date must be in the past",
-      "missingOne": "cyYour tenancy start date must include a {{missingField}}",
-      "missingTwo": "cyYour tenancy start date must include a {{first}} and {{second}}"
-    }
-  }
+  "pageTitle": "Dechrau cytundeb rhent",
+  "heading": "Dyddiad dechrau tenantiaeth, contract meddiannaeth neu drwydded",
+  "question": "Beth yw dyddiad dechrau'r denantiaeth, contract meddiannaeth neu drwydded? (Dewisol)",
+  "paragraph": "Ni wnaeth {{claimantName}} ddarparu dyddiad dechrau tenantiaeth, contract meddiannaeth neu drwydded.",
+  "hint": ""
 }
