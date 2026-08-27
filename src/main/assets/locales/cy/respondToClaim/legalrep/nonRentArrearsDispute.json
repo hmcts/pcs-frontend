@@ -1,9 +1,9 @@
 {
   "pageTitle": "Gwrthwynebu’r hawliad",
-  "heading": "cy{{claimantName}}’s claim",
-  "disputeOtherPartsQuestion": "cyDoes the defendant dispute any other parts of the claim?",
+  "heading": "hawliad {{claimantName}}",
+  "disputeOtherPartsQuestion": "A ydy'r diffynnydd yn gwrthwynebu unrhyw rannau eraill o'r hawliad?",
   "disputeDetails": {
-    "label": "cyExplain which parts of the claim the defendant does not agree with"
+    "label": "Eglurwch pa rannau o'r hawliad nad yw'r diffynnydd yn cytuno â nhw"
   },
   "disputeOtherPartsOptions": {
     "yes": "Ydy",
@@ -15,10 +15,10 @@
   "includesBullet2": "",
   "includesBullet3": "",
   "errors": {
-    "disputeOtherParts": "cySelect if the defendant wants to dispute any other parts of the claim",
+    "disputeOtherParts": "Dewiswch a yw'r diffynnydd eisiau gwrthwynebu unrhyw rannau eraill o'r hawliad",
     "disputeDetails": {
-      "required": "cyEnter the parts of the claim the defendant disputes"
+      "required": "Rhowch y rhannau o'r hawliad mae'r diffynnydd yn eu gwrthwynebu"
     },
-    "disputeDetailsMaxLength": "Rhaid i’r disgrifiad fod yn 6500 llythyren neu lai"
+    "disputeDetailsMaxLength": "Rhaid i’r eglurhad fod yn 6500 o nodau neu lai"
   }
 }
