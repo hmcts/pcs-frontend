@@ -6,8 +6,8 @@
   "amountHint": "Enter total amount in pounds and pence, for example £148.00 or £148.50",
   "frequencyQuestion": "How often does the defendant pay towards their priority debts?",
   "frequency": {
-    "week": "Week",
-    "month": "Month"
+    "week": "Paid every week",
+    "month": "Paid every month"
   },
   "errors": {
     "priorityDebtTotal": "Enter the total amount the defendant owes for all their priority debts",
