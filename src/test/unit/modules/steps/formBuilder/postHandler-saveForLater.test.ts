@@ -250,9 +250,10 @@ describe('PostHandler - Save for Later Fix', () => {
 
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
-      const expectedUrl =
-        buildManageCaseDetailsRedirect(config.get<string>('redirects.manageCaseReturnURL'), '1771325608502536') ??
-        '/case/1771325608502536/dashboard';
+      const expectedUrl = buildManageCaseDetailsRedirect(
+        config.get<string>('redirects.manageCaseReturnURL'),
+        '1771325608502536'
+      );
 
       expect(mockResponse.redirect).toHaveBeenCalledWith(303, expectedUrl);
     });
