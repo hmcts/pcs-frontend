@@ -57,7 +57,11 @@ import {
   clearErrorMessageValidationFailures,
   softErrorMessageValidation,
 } from '../utils/common/error-message-validation-helper';
-import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
+import {
+  RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS,
+  RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS,
+  logTestEnvAfterBeforeEach,
+} from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
@@ -97,6 +101,20 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown });
+  } else if (testInfo.title.includes('@defendantAddressKnown')) {
+    claimantName = submitCaseApiData.submitCaseDefendantAddressKnown.claimantName;
+    process.env.CLAIMANT_NAME = claimantName;
+    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseDefendantAddressKnown });
+  } else {
+    process.env.NOTICE_SERVED = 'YES';
+    process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
+    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
+    claimantName = submitCaseApiData.submitCasePayload.claimantName;
+    process.env.CLAIMANT_NAME = claimantName;
+    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   }
 
   if (testInfo.title.includes('Instalments')) {
@@ -135,7 +153,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('getCaseAPI');
-  console.log(`${process.env.CASE_NUMBER}`);
+  logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('login', user.defendantSolicitor.email);
   await performAction('clickButton', startNow.startNowButton);
