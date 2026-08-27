@@ -1,11 +1,13 @@
 {
-  "heading": "Plant dibynnol",
+  "pageTitle": "Plant dibynnol",
+  "heading": "Plant sy'n ddibynnol",
   "dependentChildrenParagraph": "",
-  "dependentQuestion": "cyDoes the defendant have any dependant children?",
-  "dependentChildrenDetailsLabel": "cyGive details about their dependant children",
+  "dependantQuestion": "A oes gan y diffynnydd unrhyw blant sy'n ddibynnol arnynt?",
+  "dependentChildrenDetailsLabel": "Rhowch fanylion am eu plant dibynnol",
   "dependentChildrenDetailsHint": "",
   "errors": {
-    "dependentChildren": "cySelect if they have any dependant children",
-    "dependentChildrenDetails": "cyGive details about their dependant children"
+    "dependentChildren": "Dewiswch a oes ganddynt unrhyw blant sy'n ddibynnol arnynt",
+    "dependentChildrenDetails": "Rhowch fanylion eu plant dibynnol",
+    "dependantChildrenDetailsMaxLength": "Rhaid i fanylion plant dibynnol fod yn 500 o nodau neu lai"
   }
 }
