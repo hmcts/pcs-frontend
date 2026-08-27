@@ -1,11 +1,11 @@
 {
   "pageTitle": "Dyddiad yr hysbysiad",
   "bulletPointLabel": "Manylion yr hysbysiad a roddwyd gan {{claimantName}}:",
-  "hintText": "cyWhen making the claim, {{claimantName}} had to say the date they gave the defendant notice (the date of service).",
-  "listItem1": "cythey served the defendant with a notice seeking possession on {{noticeDate}}",
+  "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}} roi'r dyddiad pan wnaethant roi'r hysbysiad i'r diffynnydd (y dyddiad cyflwyno).",
+  "listItem1": "Gwnaethant gyflwyno hysbysiad i'r diffynnydd yn ceisio meddiant ar {{noticeDate}}",
   "release12": {
-    "hintText": "cyWhen making the claim, {{claimantName}} had to say the date they gave the defendant notice (the date of service).",
-    "listItem1": "cythey served the defendant with a notice seeking possession on {{noticeDate}}"
+    "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}} roi'r dyddiad pan wnaethant roi'r hysbysiad i'r diffynnydd (y dyddiad cyflwyno).",
+    "listItem1": "Gwnaethant gyflwyno hysbysiad i'r diffynnydd yn ceisio meddiant ar {{noticeDate}}"
   },
   "methodOfService": {
     "PERSONALLY_HANDED": "cythe notice was served by personally handing it to or leaving it with {{name}}",
