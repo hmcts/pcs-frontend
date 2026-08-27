@@ -1,8 +1,10 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  counterClaimApplicationFeeAmount,
+  counterClaimPaymentSuccessful,
   responseAndCounterClaimSubmitted,
   responseSubmitted,
-  responseSubmittedCounterclaimFeePaymentNeeded,
+  serviceRequestPayment,
 } from '../data/page-data';
 import {
   confirmationOfNoticeGiven,
@@ -41,6 +43,7 @@ import {
   repaymentsAgreed,
   repaymentsMade,
   resumeResponse,
+  responseSubmittedCounterclaimFeePaymentNeeded as responseSubmittedCounterclaimFeePaymentNeededLR,
   selectDefendant,
   startNow,
   tenancyDateDetails,
@@ -296,10 +299,31 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
+    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeededLR.mainHeader);
     await performAction(
-      'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+      'clickLinkAndSwitchToNewTab',
+      responseSubmittedCounterclaimFeePaymentNeededLR.payTheCounterclaimFeeOpensInNewTabLink
     );
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
+      fee: counterClaimSpecificSumOfMoney.feeHiddenAmount,
+      isLegalRepresentative: true,
+    });
+    await performAction('selectPaymentOptions', {
+      amountLabel: counterClaimApplicationFeeAmount.counterClaimFeeLabel,
+      expectedAmount: `£${counterClaimSpecificSumOfMoney.feeHiddenAmount}`,
+      payByOption: serviceRequestPayment.payByAccountRadioOption,
+      pbaLabel: serviceRequestPayment.selectPBALabel,
+      pbaValue: serviceRequestPayment.pbaIndex1,
+      referenceLabel: serviceRequestPayment.pbaReferenceLabel,
+      referenceText: serviceRequestPayment.pbaReferenceInputText,
+      button: counterClaimApplicationFeeAmount.getLrPayButton('35.00'),
+    });
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: counterClaimPaymentSuccessful.lrPaymentConfirmationParagraph,
+    });
   });
 
   test('NonRentArrears - AssuredTenancy - Something else - LR @nonRent @LR', async () => {
@@ -442,10 +466,33 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
+    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeededLR.mainHeader);
     await performAction(
-      'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+      'clickLinkAndSwitchToNewTab',
+      responseSubmittedCounterclaimFeePaymentNeededLR.payTheCounterclaimFeeOpensInNewTabLink
     );
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: counterClaimApplicationFeeAmount.counterClaimAmountNotApplicable,
+      fee: counterClaimApplicationFeeAmount.somethingElseCounterClaimFee,
+      isLegalRepresentative: true,
+    });
+    await performAction('selectPaymentOptions', {
+      amountLabel: counterClaimApplicationFeeAmount.counterClaimFeeLabel,
+      expectedAmount: `£${counterClaimApplicationFeeAmount.somethingElseCounterClaimFee}`,
+      payByOption: serviceRequestPayment.payByAccountRadioOption,
+      pbaLabel: serviceRequestPayment.selectPBALabel,
+      pbaValue: serviceRequestPayment.pbaIndex1,
+      referenceLabel: serviceRequestPayment.pbaReferenceLabel,
+      referenceText: serviceRequestPayment.pbaReferenceInputText,
+      button: counterClaimApplicationFeeAmount.getLrPayButton(
+        counterClaimApplicationFeeAmount.somethingElseCounterClaimFee
+      ),
+    });
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: counterClaimPaymentSuccessful.lrPaymentConfirmationParagraph,
+    });
   });
 
   test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @nonRent @LR', async () => {
@@ -742,7 +789,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction(
       'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+      responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
     );
   });
 
@@ -895,7 +942,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction(
       'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+      responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
     );
   });
 
@@ -1107,7 +1154,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
+    await performValidation('mainHeader', responseAndCounterClaimSubmitted.mainHeader);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: responseAndCounterClaimSubmitted.reviewHwfApplicationParagraph,
+    });
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @rent @LR', async () => {
