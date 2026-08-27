@@ -1,12 +1,12 @@
 {
-  "pageTitle": "cyExpenses",
-  "heading": "cyExpenses",
-  "expenseQuestion": "cyWhat regular monthly expenses does the defendant have? (Optional)",
-  "hintText": "cySelect all that apply. The information the defendant provides must be truthful and accurate.",
+  "pageTitle": "Treuliau",
+  "heading": "Treuliau",
+  "expenseQuestion": "Pa dreuliau misol rheolaidd sydd gan y diffynnydd?  (Dewisol)",
+  "hintText": "Dewiswch bopeth sy'n berthnasol. Rhaid i’r wybodaeth a ddarperir gan y diffynnydd fod yn wir ac yn gywir.",
   "options": {
     "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
     "loanPayments": "Taliadau benthyciadau",
-    "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/gwraig",
+    "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/wraig",
     "mobilePhone": "Ffôn symudol",
     "groceryShopping": "Siopa bwyd",
     "fuelParkingTransport": "Tanwydd, parcio a chludiant",
@@ -34,76 +34,76 @@
   },
   "errors": {
     "householdBillsAmount": {
-      "required": "cyEnter the amount the defendant pays for household bills",
-      "negative": "cyThe amount the defendant pays for household bills each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount the defendant pays for household bills each week or month must be less than £1 billion"
+      "required": "Nodwch faint mae'r diffynnydd yn dalu am filiau'r cartref",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am filiau'r cartref bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am filiau'r cartref bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "householdBillsFrequency": {
-      "required": "cySelect how frequently the defendant pays household bills"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu biliau'r cartref"
     },
     "loanPaymentsAmount": {
-      "required": "cyEnter the amount the defendant pays for loan payments",
-      "negative": "cyThe amount the defendant pays for loan payments each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount the defendant pays for loan payments each week or month must be less than £1 billion"
+      "required": "Nodwch faint mae'r diffynnydd yn dalu am daliadau benthyciadau",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am daliadau benthyciadau bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i'r swm a delir am daliadau benthyciadau bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "loanPaymentsFrequency": {
-      "required": "cySelect how frequently the defendant makes loan payments"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn gwneud taliadau benthyciadau"
     },
     "childSpousalMaintenanceAmount": {
-      "required": "cyEnter the amount the defendant pays for child or spousal maintenance",
-      "negative": "cyThe amount the defendant pays for child or spousal maintenance each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount the defendant pays for child or spousal maintenance each week or month must be less than £1 billion"
+      "required": "Nodwch faint mae'r diffynnydd yn dalu am gynhaliaeth plant neu gynhaliaeth briod",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am gynhaliaeth plant neu gynhaliaeth briod bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am gynhaliaeth plant neu ŵr/gwraig bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "childSpousalMaintenanceFrequency": {
-      "required": "cySelect how frequently the defendant pays child or spousal maintenance"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu cynhaliaeth plant neu gynhaliaeth briod"
     },
     "mobilePhoneAmount": {
-      "required": "cyEnter the amount the defendant pays for a mobile phone",
-      "negative": "cyThe amount the defendant pays for a mobile phone each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount the defendant pays for a mobile phone each week or month must be less than £1 billion"
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am ffôn symudol",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am ffôn symudol bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am ffôn symudol bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "mobilePhoneFrequency": {
-      "required": "cySelect how frequently the defendant pays for a mobile phone"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu am ffôn symudol"
     },
     "groceryShoppingAmount": {
-      "required": "cyEnter the amount the defendant pays for grocery shopping",
-      "negative": "cyThe amount the defendant pays for grocery shopping each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount the defendant pays for grocery shopping each week or month must be less than £1 billion"
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am siopa bwyd",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am siopa bwyd bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am siopa bwyd bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "groceryShoppingFrequency": {
-      "required": "cySelect how frequently the defendant pays for grocery shopping"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu am siopa bwyd"
     },
     "fuelParkingTransportAmount": {
-      "required": "cyEnter the amount the defendant pays for fuel, parking and transport",
-      "negative": "cyThe amount the defendant pays for fuel, parking and transport each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount the defendant pays for fuel, parking and transport each week or month must be less than £1 billion"
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am danwydd, parcio a chludiant",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am danwydd, parcio a chludiant bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am danwydd, parcio a chludiant bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "fuelParkingTransportFrequency": {
-      "required": "cySelect how frequently the defendant pays for fuel, parking and transport"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu am danwydd, parcio a chludiant"
     },
     "schoolCostsAmount": {
-      "required": "cyEnter the amount the defendant pays for school costs",
-      "negative": "cyThe amount the defendant pays for school costs each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount the defendant pays for school costs each week or month must be less than £1 billion"
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am gostau ysgol",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am gostau ysgol bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am gostau ysgol bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "schoolCostsFrequency": {
-      "required": "cySelect how frequently the defendant pays school costs"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu costau ysgol"
     },
     "clothingAmount": {
-      "required": "cyEnter the amount the defendant pays for clothing",
-      "negative": "cyThe amount the defendant pays for clothing each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount the defendant pays for clothing each week or month must be less than £1 billion"
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am ddillad",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am ddillad bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am ddillad bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "clothingFrequency": {
-      "required": "cySelect how frequently the defendant pays for clothing"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu am ddillad"
     },
     "otherExpensesAmount": {
-      "required": "cyEnter the amount the defendant pays for other regular expenses",
-      "negative": "cyThe amount the defendant pays for other expenses each week or month must be £0.00 or above",
-      "largeAmount": "cyThe amount the defendant pays for other expenses each week or month must be less than £1 billion"
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am gostau rheolaidd eraill",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am gostau eraill bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am gostau eraill bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "otherExpensesFrequency": {
-      "required": "cySelect how frequently the defendant pays for other expenses"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu am unrhyw gostau eraill"
     },
     "amount": {
       "invalidFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"

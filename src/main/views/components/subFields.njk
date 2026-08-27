@@ -4,7 +4,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
-
+{% from "govuk/components/select/macro.njk" import govukSelect %}
 
 {% if legend %}
 <fieldset class="govuk-fieldset">
@@ -23,7 +23,9 @@
     {% elif subField.componentType == 'checkboxes' %}
       {{ govukCheckboxes(subField.component) }}
     {% elif subField.componentType == 'dateInput' %}
-      {{ govukDateInput(subField.component) }}  
+      {{ govukDateInput(subField.component) }}
+    {% elif subField.componentType == 'select' %}
+      {{ govukSelect(subField.component) }}      
     {% elif subField.componentType == 'postcodeLookup' %}
       {% include "components/postcodeLookup.njk" %}
     {% else %}

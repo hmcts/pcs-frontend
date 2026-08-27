@@ -95,7 +95,7 @@ test.afterEach(async () => {
 
 //selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @multiDefendant @PR @smoke @regression @LR', async () => {
+  test('Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @multiDefendant @PR @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -370,7 +370,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Wales - Standard contract - RentArrears and NonRentArrears - CounterClaim - Defendant need help - @standardRNR @smoke @rent @LR', async () => {
+  test('Wales - Standard contract - RentArrears and NonRentArrears - CounterClaim - Defendant need help - @standardRNR @rent @LR', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -503,7 +503,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Wales - Secure contract - NonRentArrears - LR @smoke @PR @singleDefendant @LR', async () => {
+  test('Wales - Secure contract - NonRentArrears - LR @PR @singleDefendant @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
