@@ -6,7 +6,12 @@ import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig
 import { buildSubFieldsHTML } from '@modules/steps/formBuilder/subFieldsRenderer';
 
 describe('subFields.njk conditional reveal wrapper', () => {
-  const nunjucksEnv = nunjucks.configure([path.join(__dirname, '../../../../../main/views')], { autoescape: true });
+  const govukFrontendPath = path.dirname(require.resolve('govuk-frontend/dist/govuk/template.njk'));
+  const govukFrontendRoot = path.resolve(govukFrontendPath, '..');
+
+  const nunjucksEnv = nunjucks.configure([path.join(__dirname, '../../../../../main/views'), govukFrontendRoot], {
+    autoescape: true,
+  });
 
   const subFields: Record<string, FormFieldConfig> = {
     loanPaymentsAmount: {
