@@ -60,9 +60,9 @@ describe('legalRepresentativeAccessMiddleware', () => {
     expect(next).toHaveBeenCalled();
   });
 
-  it('allows legalrep users to access event paths', () => {
+  it('allows legalrep users to access case event paths', () => {
     mockIsLegalRepresentativeUser.mockReturnValue(true);
-    const req = { path: '/cases/1234567890123456/event/respond' } as unknown as Request;
+    const req = { path: '/cases/1234567890123456/event/123' } as unknown as Request;
 
     invokeMiddleware(req);
 
