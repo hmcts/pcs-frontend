@@ -5251,6 +5251,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"allure-js-commons@npm:3.11.0":
+  version: 3.11.0
+  resolution: "allure-js-commons@npm:3.11.0"
+  dependencies:
+    md5: "npm:^2.3.0"
+  peerDependencies:
+    allure-playwright: 3.11.0
+  peerDependenciesMeta:
+    allure-playwright:
+      optional: true
+  checksum: 10/b1367c35475219c7f2c3ba470a68d91c38170290c4af853bf534b8ea1f00ffb1443fe7749e6c9fb4f0bfeed4a97b6a3b05d15cf845b1d588af0341bdff5a6f28
+  languageName: node
+  linkType: hard
+
 "allure-playwright@npm:3.10.2":
   version: 3.10.2
   resolution: "allure-playwright@npm:3.10.2"
@@ -11695,7 +11709,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:8.68.0"
     "@typescript-eslint/parser": "npm:8.68.0"
     allure-commandline: "npm:2.43.0"
-    allure-js-commons: "npm:3.10.2"
+    allure-js-commons: "npm:3.11.0"
     allure-playwright: "npm:3.10.2"
     axios: "npm:1.19.0"
     body-parser: "npm:2.3.0"
