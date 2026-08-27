@@ -1162,6 +1162,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
     await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
+    await performAction('clickLink', counterclaimYouNeedToApplyForHelpWithYourFees.signOutLink);
   });
 
   test('Submitted defendant should not be visible on the representation screen @nonRent @LR', async () => {
@@ -1178,6 +1179,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       elementType: 'text',
       text: `${submittedUser.firstName} ${submittedUser.lastName}`,
     });
+    await performAction('clickLink', selectDefendant.signOutLink);
   });
 
   test('RentArrears - Defendant address known - No - LR @smoke @defendantAddressKnown @LR', async () => {
