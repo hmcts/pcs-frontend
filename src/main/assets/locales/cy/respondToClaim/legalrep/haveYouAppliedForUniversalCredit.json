@@ -1,15 +1,18 @@
 {
-  "question": "cyHas the defendant applied for Universal Credit?",
+  "pageTitle": "Credyd Cynhwysol",
+  "caption": "",
+  "question": "A yw'r diffynnydd wedi gwneud cais am Gredyd Cynhwysol?",
   "heading": "Credyd Cynhwysol",
-  "dateLabel": "cyWhen did the defendant apply?",
+  "dateLabel": "Pryd wnaeth y diffynnydd wneud cais?",
+  "dateHint": "Er enghraifft, 27 9 2022",
   "errors": {
-    "haveAppliedForUniversalCredit": "cySelect if the defendant has applied for Universal Credit",
+    "haveAppliedForUniversalCredit": "Dewiswch os yw'r diffynnydd wedi gwneud cais am Gredyd Cynhwysol neu beidio",
     "date": {
-      "required": "cyEnter the date the defendant applied for Universal Credit",
-      "missingOne": "cyThe date the defendant applied for Universal Credit must include a {{missingField}}",
-      "missingTwo": "cyThe date the defendant applied for Universal Credit must include a {{first}} and {{second}}",
-      "notRealDate": "cyThe date the defendant applied for Universal Credit must be a real date",
-      "futureDate": "cyThe date the defendant applied for Universal Credit must must either be today’s date or in the past"
+      "required": "Rhowch y dyddiad wnaeth y diffynnydd wneud cais am Gredyd Cynhwysol",
+      "missingOne": "Rhaid i'r dyddiad pan wnaeth y diffynnydd gais am Gredyd Cynhwysol gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i'r dyddiad pan wnaeth y diffynnydd gais am Gredyd Cynhwysol gynnwys {{first}} ac {{second}}",
+      "notRealDate": "Rhaid i’r dyddiad pan wnaeth y diffynnydd gais am Gredyd Cynhwysol fod yn ddyddiad go iawn",
+      "futureDate": "Rhaid i'r dyddiad pan wnaeth y diffynnydd gais am Gredyd Cynhwysol fod naill ai'n ddyddiad heddiw neu yn y gorffennol"
     }
   }
 }
