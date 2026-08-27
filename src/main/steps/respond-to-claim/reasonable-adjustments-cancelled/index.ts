@@ -4,6 +4,8 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
+// Shown when the citizen cancelled in the microsite (payload action = 'cancel')
+
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'reasonable-adjustments-cancelled',
   stepDir: __dirname,

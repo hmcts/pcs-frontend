@@ -98,6 +98,48 @@ describe('paymentService', () => {
       }
     );
   });
+
+  it('creates a pba payment request with encoded service request reference', async () => {
+    const responsePayload = { paymentReference: 'RC-123', status: 'Created', dateCreated: '11-11-2025' };
+    mockHttp.post.mockResolvedValue({ data: responsePayload });
+
+    const response = await paymentService.createPbaPaymentRequest('token-123', 'SR 123', {
+      amount: 10.99,
+      pbaAccount: 'PBA123',
+      customerReference: 'customerRef',
+    });
+
+    expect(response).toEqual(responsePayload);
+    expect(mockHttp.post).toHaveBeenCalledWith(
+      `${testApiBase}/payment/service-request/SR%20123/pba`,
+      {
+        amount: 10.99,
+        pbaAccount: 'PBA123',
+        customerReference: 'customerRef',
+      },
+      {
+        headers: {
+          Authorization: 'Bearer token-123',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+  });
+
+  it('gets a pba accounts request', async () => {
+    const responsePayload = { pbaAccounts: ['pba123', 'pba321'] };
+    mockHttp.get.mockResolvedValue({ data: responsePayload });
+
+    const response = await paymentService.getPbaAccounts('token-123');
+
+    expect(response).toEqual(responsePayload);
+    expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/payment/pba-accounts`, {
+      headers: {
+        Authorization: 'Bearer token-123',
+        'Content-Type': 'application/json',
+      },
+    });
+  });
 });
 
 describe('payment helpers', () => {

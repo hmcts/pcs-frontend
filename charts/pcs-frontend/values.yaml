@@ -32,6 +32,7 @@ nodejs:
     OIDC_REDIRECT_URI: 'https://pcs.{{ .Values.global.environment }}.platform.hmcts.net/oauth2/callback'
     CCD_URL: 'http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
     OIDC_ISSUER: 'https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o'
+    # TODO: confirm the prod PCQ host before release. May need explicit override.
     PCQ_URL: 'https://pcq.{{ .Values.global.environment }}.platform.hmcts.net'
     OTEL_SERVICE_NAME: 'pcs-frontend'
     OTEL_ENABLED: true
