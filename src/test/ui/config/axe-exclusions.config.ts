@@ -27,4 +27,12 @@ export const axe_exclusions = [
   '#isClaimAmountKnown', //,page: claimAmountKnown, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#address-country', //page: yourAddress, element: 'Country', element_type: select, reason_for_exclusion: 'aria-expanded' attribute is expected for this select
   '#emailConfirmation', //page:emailConfirmation, element: 'Yes', element_type: radioOption,reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#dob_provided', // page: dateOfBirth, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#language_main-3', // page: mainLanguage, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#gender_different-2', // page: gender, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#sexuality-4', // page: sexuality, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#religion-8', // page: religion, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#ethnicity-4', // page: ethnicity, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is not allowed for this radio button
+  'html', // accessibility: html-has-lang - <html> element does not have a lang attribute
+  'html-has-lang', // accessibility: html-has-lang - <html> element does not have a lang attribute
 ];
