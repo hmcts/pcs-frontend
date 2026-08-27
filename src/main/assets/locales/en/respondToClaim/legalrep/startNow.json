@@ -1,8 +1,15 @@
 {
+  "pageTitle": "Respond to a claim",
+  "title": "Respond to a property possession claim online",
+  "saveDraftInfo": "You can save your response as a draft and return to it later. You’ll be able to review and edit your answers before you submit them.",
   "description": "",
   "completingYourResponse": "",
   "uploadDocumentsInfo": "",
   "whatYouWillNeed": "",
+  "claimantVisibilityInfo": "The claimant will be able to see any documents you upload and your answers.",
   "provideDetailsInfo": "This service is also available <a href=\"?lang=cy\" class=\"govuk-link language\">in Welsh (Cymraeg)</a>.",
-  "hmctsSupportInfo": "If you or the defendant need support to use HMCTS services, like step-free access to a court for the hearing, you can request this after you’ve submitted your response."
+  "hmctsSupportInfo": "If you or the defendant need support to use HMCTS services, like step-free access to a court for the hearing, you can request this after you’ve submitted your response.",
+  "buttons": {
+    "startNow": "Start now"
+  }
 }

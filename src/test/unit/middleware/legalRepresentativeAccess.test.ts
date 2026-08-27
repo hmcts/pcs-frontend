@@ -49,9 +49,20 @@ describe('legalRepresentativeAccessMiddleware', () => {
     expect(next).toHaveBeenCalled();
   });
 
-  it('allows legalrep users to access postcode lookup api', () => {
+  it('allows legalrep users to access view-documents paths', () => {
     mockIsLegalRepresentativeUser.mockReturnValue(true);
-    const req = { path: '/api/postcode-lookup' } as unknown as Request;
+    const req = {
+      path: '/case/1234567890123456/view-documents/c94fb947-7998-4beb-89a4-b3e6f71a3428',
+    } as unknown as Request;
+
+    invokeMiddleware(req);
+
+    expect(next).toHaveBeenCalled();
+  });
+
+  it('allows legalrep users to access case event paths', () => {
+    mockIsLegalRepresentativeUser.mockReturnValue(true);
+    const req = { path: '/cases/1234567890123456/event/123' } as unknown as Request;
 
     invokeMiddleware(req);
 

@@ -1,5 +1,7 @@
 import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
 
+import type { CcdFlags } from './cuiRa/cuiRa.interface';
+
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export enum YesNoEnum {
@@ -168,6 +170,7 @@ export interface CcdDefendantParty {
   phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
   textMessageNumber?: string;
+  pcqId?: string;
 }
 
 /** Counter-claim data captured across the counterclaim journey screens. */
@@ -252,6 +255,9 @@ export interface CcdDefendantResponses {
 export interface StatementOfTruth {
   accepted?: YesNoValue;
   fullName?: string;
+  nameOfFirm?: string;
+  positionHeld?: string;
+  hasLegalRepresentation?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {
@@ -266,6 +272,8 @@ export interface PossessionClaimResponse {
   currentDefendantPartyId?: string;
   responseDocumentId?: string;
   claimIssuedDate?: string;
+
+  defendantFlags?: CcdFlags;
 }
 
 export type CaseData = CcdCaseData;

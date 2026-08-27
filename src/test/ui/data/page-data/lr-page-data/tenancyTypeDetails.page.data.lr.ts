@@ -19,4 +19,5 @@ export const tenancyTypeDetails = {
   enterCorrectTenancyDetailsErrorMessage: `Enter the correct tenancy, licence or occupation contract details`,
   characterLimitErrorMessage: `Tenancy, occupation contract or licence type must be 60 characters or less`,
   pageSlug: `tenancy-type-details`,
+  tenancyDocumentDynamicLink: 'View a copy of the tenancy, occupation contract or licence agreement (opens in new tab)',
 };

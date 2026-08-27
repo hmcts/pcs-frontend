@@ -1,28 +1,31 @@
 {
+  "title": "Ôl-ddyledion rhent",
   "pageTitle": "Ôl-ddyledion rhent",
-  "amountOwedHeading": "cyAmount the defendant owes in rent arrears given by {{claimantName}}:",
-  "rentArrearsQuestion": "cyDoes the defendant owe this amount in rent arrears?",
+  "amountOwedHeading": "Swm sy'n ddyledus gan y diffynnydd mewn ôl-ddyledion rhent a roddwyd gan {{claimantName}}:",
+  "rentArrearsQuestion": "A yw'r swm hwn yn ddyledus gan y diffynnydd mewn ôl-ddyledion rhent?",
   "rentArrearsOptions": {
     "yes": "Ydy",
     "no": "Nac ydy",
-    "notSure": "cyDefendant is not sure"
+    "or": "neu",
+    "notSure": "Diffynnydd ddim yn siŵr"
   },
-  "insetIntroText": "",
-  "insetDetailsText": "",
+  "insetIntroText": "cyRent arrears are money you owe in rent payments.",
+  "insetDetailsText": "cyWhen they made their claim, {{claimantName}} had to provide a copy of the rent statement for the defendant’s property, showing the total rent arrears the defendant owes.",
+  "rentStatementDocumentLinkText": "cyView a copy of the rent statement (opens in new tab).",
   "rentArrearsAmountCorrection": {
-    "label": "cyHow much does the defendant believe they owe in rent arrears?",
+    "label": "Faint mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent?",
     "hint": ""
   },
   "errors": {
     "rentArrears": {
-      "required": "cySelect if the defendant owes this amount in rent arrears"
+      "required": "Dewiswch a yw'r swm hwn yn ddyledus gan y diffynnydd mewn ôl-ddyledion rhent"
     },
     "rentArrearsAmountCorrection": {
-      "required": "cyEnter the amount the defendant believes they owe in rent arrears",
-      "negativeAmount": "cyThe amount the defendant believes they owe in rent arrears must be £0.00 or above",
-      "largeAmount": "cyThe amount the defendant believes they owe in rent arrears must be less than £1 billion",
-      "invalidFormat": "cyEnter how much the defendant believes they owe in rent arrears, in the correct format (e.g. if the defendant owes £148, please write £148.00)"
+      "required": "Nodwch y swm mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent",
+      "negativeAmount": "Rhaid i'r swm mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i'r swm mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent fod yn llai nag £1 biliwn",
+      "invalidFormat": "Nodwch faint mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent, yn y fformat cywir (e.e. os yw £148 yn ddyledus gan y diffynnydd, ysgrifennwch - £148.00)"
     },
-    "rentArrears.rentArrearsAmountCorrection": "cyHow much does the defendant believe they owe in rent arrears?"
+    "rentArrears.rentArrearsAmountCorrection": "Faint mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent?"
   }
 }
