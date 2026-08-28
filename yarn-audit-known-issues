@@ -1,1 +1,0 @@
-{"value":"body-parser","children":{"ID":1123976,"Issue":"body-parser vulnerable to denial of service when invalid limit value silently disables size enforcement","URL":"https://github.com/advisories/GHSA-v422-hmwv-36x6","Severity":"low","Vulnerable Versions":">=2.0.0 <2.3.0","Tree Versions":["2.2.2"],"Dependents":["express@npm:5.2.1"]}}
