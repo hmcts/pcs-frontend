@@ -7,8 +7,12 @@ import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { createRespondToClaimFormStep } from '../formStep';
 
+import { Logger } from '@modules/logger';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+
+const logger = Logger.getLogger('tenancyType');
+
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -151,6 +155,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     // England: tenancy_* (TenancyLicenceDetails).
     const tenancyTypeAgreementType =
       TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence] + '[' + tenancyTypeOfTenancyLicence + ']';
+    logger.error('case data', caseData);
     const senderName = isLegalRepresentativeUser(req) ? claimantName : orgName;
     const release12Enabled = isRelease12Enabled(req);
 
