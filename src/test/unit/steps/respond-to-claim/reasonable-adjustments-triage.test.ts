@@ -46,53 +46,60 @@ describe('reasonable-adjustments-triage beforeRedirect', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockIsCuiYourSupportEnabled.mockResolvedValue(true); // feature on by default
-  });
-
-  it('does nothing (skips) when the choice is not "questions"', async () => {
-    const { req, redirect } = buildReq('skip', '123');
-
-    await beforeRedirect(req);
-
-    expect(mockStartYourSupport).not.toHaveBeenCalled();
-    expect(redirect).not.toHaveBeenCalled();
-  });
-
-  it('does not launch Your Support when the feature flag is off (falls through like skip)', async () => {
-    mockIsCuiYourSupportEnabled.mockResolvedValue(false);
-    const { req, redirect } = buildReq('questions', '123');
-
-    await beforeRedirect(req);
-
-    expect(mockStartYourSupport).not.toHaveBeenCalled();
-    expect(redirect).not.toHaveBeenCalled();
-  });
-
-  it('launches Your Support and 303-redirects to the microsite url on "questions"', async () => {
     mockStartYourSupport.mockResolvedValue('https://cui-ra/microsite/xyz');
-    const { req, redirect } = buildReq('questions', '123');
-
-    await beforeRedirect(req);
-
-    expect(mockStartYourSupport).toHaveBeenCalledWith(req);
-    expect(redirect).toHaveBeenCalledWith(303, 'https://cui-ra/microsite/xyz');
   });
 
-  it('redirects to the RA error page when launching Your Support fails', async () => {
-    mockStartYourSupport.mockRejectedValue(new Error('cui-ra down'));
-    const { req, redirect } = buildReq('questions', '123');
+  describe('declining support returns to the task list', () => {
+    it('is a no-op on "I do not need any support" — no Your Support launch, no redirect', async () => {
+      const { req, redirect } = buildReq('skip', '123');
 
-    await beforeRedirect(req);
+      await beforeRedirect(req);
 
-    expect(redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/reasonable-adjustments-error');
+      // Your Support is an optional task: beforeRedirect does nothing on skip and the citizen is
+      // returned to the task list by resolveRedirectAfterPost (covered below). PCQ is no longer
+      // fired from here — it now fires on entry to language-used.
+      expect(mockStartYourSupport).not.toHaveBeenCalled();
+      expect(redirect).not.toHaveBeenCalled();
+    });
   });
 
-  it('rethrows (never silently continues) when there is no case reference to build the error page', async () => {
-    const error = new Error('cui-ra down');
-    mockStartYourSupport.mockRejectedValue(error);
-    const { req, redirect } = buildReq('questions', undefined);
+  describe('continuing to the questions launches Your Support', () => {
+    it('303-redirects to the microsite url', async () => {
+      const { req, redirect } = buildReq('questions', '123');
 
-    await expect(beforeRedirect(req)).rejects.toBe(error);
-    expect(redirect).not.toHaveBeenCalled();
+      await beforeRedirect(req);
+
+      expect(mockStartYourSupport).toHaveBeenCalledWith(req);
+      expect(redirect).toHaveBeenCalledWith(303, 'https://cui-ra/microsite/xyz');
+    });
+
+    it('does not launch Your Support when the feature flag is off (falls through like skip)', async () => {
+      mockIsCuiYourSupportEnabled.mockResolvedValue(false);
+      const { req, redirect } = buildReq('questions', '123');
+
+      await beforeRedirect(req);
+
+      expect(mockStartYourSupport).not.toHaveBeenCalled();
+      expect(redirect).not.toHaveBeenCalled();
+    });
+
+    it('redirects to the RA error page when launching Your Support fails', async () => {
+      mockStartYourSupport.mockRejectedValue(new Error('cui-ra down'));
+      const { req, redirect } = buildReq('questions', '123');
+
+      await beforeRedirect(req);
+
+      expect(redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/reasonable-adjustments-error');
+    });
+
+    it('rethrows (never silently continues) when there is no case reference to build the error page', async () => {
+      const error = new Error('cui-ra down');
+      mockStartYourSupport.mockRejectedValue(error);
+      const { req, redirect } = buildReq('questions', undefined);
+
+      await expect(beforeRedirect(req)).rejects.toBe(error);
+      expect(redirect).not.toHaveBeenCalled();
+    });
   });
 });
 

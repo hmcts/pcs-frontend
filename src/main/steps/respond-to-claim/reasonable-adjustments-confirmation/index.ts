@@ -15,7 +15,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     whatHappensNextParagraph1: 'whatHappensNextParagraph1',
     whatHappensNextParagraph2: 'whatHappensNextParagraph2',
   },
-  // "Save and continue" returns the the task list.
+  // Your Support is an optional task launched from the task list, so "Save and continue" returns the
+  // citizen there.
   resolveRedirectAfterPost: async req => {
     const caseReference = req.res?.locals.validatedCase?.id;
     return caseReference ? `/case/${caseReference}/respond-to-claim/task-list` : undefined;

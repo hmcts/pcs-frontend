@@ -7,7 +7,6 @@ import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { startYourSupport } from '@services/cuiRa/startYourSupport';
 import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
-
 const logger = Logger.getLogger('reasonableAdjustmentsTriage');
 
 export const step: StepDefinition = createFormStep({
@@ -23,9 +22,12 @@ export const step: StepDefinition = createFormStep({
   // "Continue to the questions" (reasonableAdjustmentsChoice=questions) launches the Your Support
   // microsite;
   beforeRedirect: async (req: Request) => {
-    if (req.body.reasonableAdjustmentsChoice !== 'questions') {
-      return; // "skip": let the normal next-step flow continue to language-used
+    if (req.body?.reasonableAdjustmentsChoice !== 'questions') {
+      // Your Support is an optional task, so
+      // resolveRedirectAfterPost returns the citizen to the task list.
+      return;
     }
+
     if (!(await isCuiYourSupportEnabled(req))) {
       return;
     }
