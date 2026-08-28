@@ -23,7 +23,6 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
-  equalityAndDiversityStart,
   exceptionalHardship,
   exemptLandLord,
   freeLegalAdvice,
