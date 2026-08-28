@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 
+import { doesDefendantHaveDraftResponse } from '../utils';
+
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig as citizenFlowConfig } from './flow.config';
 import { hasSingleLinkedDefendant } from './flowConditions';
 import { legalRepRespondToClaimSections } from './legalrep.sections.config';
@@ -10,9 +12,11 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 const legalRepStepOrder = [
   'start-now',
   'select-defendant',
+  'resume-response',
   'defendant-name-confirmation',
   'defendant-date-of-birth',
   'correspondence-address',
+  'email-confirmation',
   'exempt-landlord',
   'written-terms',
   'tenancy-type-details',
@@ -56,6 +60,11 @@ const legalRepStepOrder = [
   'equality-and-diversity-end',
   'language-used',
   'end-of-journey-cya',
+  'response-submitted',
+  'response-submitted-counter-claim-fee-payment-needed',
+  'counter-claim-application-fee-amount',
+  'counter-claim-payment-successful',
+  'response-and-counter-claim-submitted',
   'end-now',
 ] as const satisfies readonly LegalRepRespondToClaimStepName[];
 
@@ -74,6 +83,10 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     ...citizenFlowConfig.steps,
     'select-defendant': {
       showCondition: (req: Request) => !hasSingleLinkedDefendant(req),
+    },
+
+    'resume-response': {
+      showCondition: (req: Request) => doesDefendantHaveDraftResponse(req),
     },
 
     'defendant-name-confirmation': {

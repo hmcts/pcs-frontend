@@ -1,11 +1,29 @@
 {
-  "pageTitle": "Defendant\u2019s postal address",
-  "legend": "cyIs the defendant\u2019s postal address {{ formattedAddressStr }}",
+  "pageTitle": "cyDefendant’s postal address",
+  "legend": "cyIs the defendant’s postal address {{ formattedAddressStr }}",
+  "legend.hint": "Dyma’r cyfeiriad a ddarparwyd gan {{claimantName}}",
   "labels": {
-    "enterManuallySubText": "cyYou can enter the defendant\u2019s address details in the fields below.",
-    "addressHeading": "cyWhat’s the defendant\u2019s postal address?"
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "enterAddress": "Rhowch gyfeiriad gohebiaeth",
+    "enterPostcode": "Nodwch god post yn y DU",
+    "enterManually": "Teipiwch gyfeiriad â llaw",
+    "enterManuallySubText": "cyYou can enter the defendant’s address details in the fields below.",
+    "selectAddress": "Dewiswch gyfeiriad",
+    "selectAddressLabel": "Dewiswch gyfeiriad",
+    "addressHeading": "cyWhat’s the defendant’s postal address?",
+    "addressLine1": "Llinell cyfeiriad 1",
+    "addressLine2": "Llinell cyfeiriad 2 (dewisol)",
+    "townOrCity": "Tref neu ddinas",
+    "county": "Sir (dewisol)",
+    "postcode": "Cod post"
+  },
+  "buttons": {
+    "findAddress": "Dod o hyd i gyfeiriad",
+    "saveAndContinue": "Cadw a pharhau",
+    "saveForLater": "Cadw at hwyrach ymlaen"
   },
   "errors": {
-    "correspondenceAddressConfirm": "cyPlease confirm the defendant\u2019s address by selecting the options below"
+    "correspondenceAddressConfirm": "cyPlease confirm the defendant’s address by selecting the options below"
   }
 }

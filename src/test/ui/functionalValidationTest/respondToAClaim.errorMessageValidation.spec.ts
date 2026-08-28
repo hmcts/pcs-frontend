@@ -23,6 +23,7 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
+  equalityAndDiversityStart,
   exceptionalHardship,
   exemptLandLord,
   freeLegalAdvice,
@@ -33,6 +34,7 @@ import {
   otherConsiderations,
   priorityDebtDetails,
   priorityDebts,
+  reasonableAdjustmentsTriage,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
@@ -504,6 +506,11 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
 
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
+
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
@@ -739,6 +746,11 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
 
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
