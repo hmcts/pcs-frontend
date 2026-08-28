@@ -149,7 +149,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ? caseData?.otherLicenceTypeDetails
       : caseData?.tenancy_DetailsOfOtherTypeOfTenancyLicence;
     // England: tenancy_* (TenancyLicenceDetails).
-    const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
+    const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence] + 'testtest';
     const senderName = isLegalRepresentativeUser(req) ? claimantName : orgName;
     const release12Enabled = isRelease12Enabled(req);
 
