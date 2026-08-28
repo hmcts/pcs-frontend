@@ -1,4 +1,5 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
+import { responseAndCounterClaimSubmitted } from '../data/page-data';
 import {
   confirmationOfNoticeGiven,
   correspondenceAddress,
@@ -7,9 +8,11 @@ import {
   counterClaimAgainstWhom,
   counterClaimFee,
   counterClaimHaveYouAppliedForHelp,
+  counterClaimOrderOtherThanSum,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   counterclaimDoYouWantToUploadFiles,
+  counterclaimYouNeedToApplyForHelpWithYourFees,
   defendantDateOfBirth,
   defendantNameConfirmation,
   doAnyOtherAdultsLiveInYourHome,
@@ -45,7 +48,15 @@ import {
   counterClaimAgainstWhomErrorValidation,
   counterClaimErrorValidation,
   counterClaimFeeErrorValidation,
+  counterClaimHaveYouAppliedForHelpErrorValidation,
+  counterClaimOrderOtherThanSumErrorValidation,
+  counterClaimSpecificSumOfMoneyErrorValidation,
+  counterClaimWhatAreYouClaimingForErrorValidation,
+  counterclaimYouNeedToApplyForHelpWithYourFeesErrorValidation,
   defendantNameConfirmationErrorValidation,
+  doAnyOtherAdultsLiveInYourHomeErrorValidation,
+  doYouHaveAnyDependantChildrenErrorValidation,
+  doYouHaveAnyOtherDependantsErrorValidation,
   doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation,
   emailConfirmationErrorValidation,
   selectDefendantErrorValidation,
@@ -77,6 +88,8 @@ const NO_EMV_READ_ONLY = 'Read-only / informational screen — no field error va
 
 const home_url = process.env.TEST_URL;
 let claimantName: string;
+const isLR = true;
+
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
   await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-lr-enabled');
@@ -322,6 +335,156 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     assertAllErrorMessageValidations();
   });
 
+  test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @nonRent @LR', async () => {
+    const pin2User = await getPinUserAt(1);
+    await performAction('representationLR', {
+      question: selectDefendant.whichDefendantQuestion,
+      radioOption: `${pin2User.firstName} ${pin2User.lastName}`,
+    });
+    await softErrorMessageValidation('defendantNameConfirmation', defendantNameConfirmationErrorValidation);
+    await performAction('confirmDefendantDetailsLR', {
+      question: defendantNameConfirmation.mainHeader(pin2User.firstName, pin2User.lastName),
+      option: defendantNameConfirmation.yesRadioOption,
+    });
+    await performAction('enterDateOfBirthDetailsLR', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressLR', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
+    });
+    await performAction('tenancyOrContractTypeDetailsLR', {
+      tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.yesRadioOption,
+    });
+    await performAction('enterTenancyStartDetailsUnKnownLR', {
+      tsDay: '15',
+      tsMonth: '11',
+      tsYear: '2024',
+    });
+    await performAction('selectNoticeDetailsLR', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateUnknownLR');
+    await performAction('disputingOtherPartsOfTheClaimLR', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
+    await performAction('selectCounterClaimLR', {
+      question: counterClaim.getDoYouWantToMakeACounterclaimQuestion(),
+      option: counterClaim.yesRadioOption,
+    });
+    await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+    });
+    await performAction('selectCounterClaimFeeLR', {
+      radioOption: counterClaimFee.defendantNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.somethingElseRadioOption,
+    });
+    await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
+    });
+    const pinUser = await getPinUserAt(2);
+    await performAction('selectClaimAgainstWhomLR', {
+      question: counterClaimAgainstWhom.mainHeader,
+      options: [claimantName, `${pinUser.firstName} ${pinUser.lastName}`],
+    });
+    await performAction('counterClaimAboutLR', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await softErrorMessageValidation('counterClaimOrderOtherThanSum', counterClaimOrderOtherThanSumErrorValidation);
+    await performAction('counterClaimOrderOtherThanSumLR', {
+      ordersInput: counterClaimOrderOtherThanSum.whatOrdersInput,
+      factsInput: counterClaimOrderOtherThanSum.whatFactsInput,
+    });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFiles.noRadioOption,
+    });
+    await performAction('doesTheDependantHaveChildrenLR', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
+      dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
+    });
+    await performAction('otherDependantsLR', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.noRadioOption,
+    });
+    await softErrorMessageValidation('doAnyOtherAdultsLiveInYourHome', doAnyOtherAdultsLiveInYourHomeErrorValidation);
+    await performAction('otherAdultsLR', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('alternativeAccommodationLR', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
+      ...getRelativeDate(5),
+    });
+    await performAction('circumstancesLR', {
+      question: yourCircumstances.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstances.yesRadioOption,
+    });
+    await performAction('selectExceptionalHardshipLR', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
+    });
+    await performAction('selectIncomeAndExpensesLR', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
+      regularIncomeOptions: [
+        [
+          whatRegularIncomeDoYouReceive.universalCreditParagraph,
+          whatRegularIncomeDoYouReceive.universalCreditTextInput,
+          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
+        ],
+      ],
+    });
+    await performAction('selectPriorityDebtsLR', {
+      question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.noRadioOption,
+    });
+    await performAction('selectExpensesLR', {
+      regularExpensesOptions: [
+        [
+          whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
+        ],
+        [
+          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
+        ],
+      ],
+    });
+    await performAction('otherConsiderationsLR', {
+      question: otherConsiderations.isThereAnythingElseParagraph,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
+    await performAction('uploadAdditionalDocumentsLR');
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
+    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
+  });
+
   test('RentArrears - Verify dynamic link @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('representationLR', {
@@ -368,16 +531,25 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
       option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
     });
+    await softErrorMessageValidation('counterClaimSpecificSumOfMoney', counterClaimSpecificSumOfMoneyErrorValidation);
     await performAction('counterClaimSpecificSumOfMoneyLR', {
       question: counterClaimSpecificSumOfMoney.mainHeader,
       option: counterClaimSpecificSumOfMoney.noRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueFEE0508Input,
     });
+    await softErrorMessageValidation(
+      'counterClaimWhatAreYouClaimingFor',
+      counterClaimWhatAreYouClaimingForErrorValidation
+    );
     await performAction('selectCounterClaimFeeLR', {
       radioOption: counterClaimFee.defendantNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueFEE0508Input,
     });
+    await softErrorMessageValidation(
+      'counterClaimHaveYouAppliedForHelp',
+      counterClaimHaveYouAppliedForHelpErrorValidation
+    );
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
       feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
@@ -407,10 +579,12 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
+    await softErrorMessageValidation('doYouHaveAnyDependantChildren', doYouHaveAnyDependantChildrenErrorValidation);
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
       dependantChildrenInfo: doYouHaveAnyDependantChildren.detailsTextInput,
     });
+    await softErrorMessageValidation('doYouHaveAnyOtherDependants', doYouHaveAnyOtherDependantsErrorValidation);
     await performAction('otherDependantsLR', {
       otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
       otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
@@ -479,4 +653,63 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       radioOption: languageUsed.englishRadioOption,
     });
   });
+});
+
+test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @rent @LR', async () => {
+  const pinUser = await getPinUserAt(0);
+  await performAction('confirmDefendantDetailsLR', {
+    question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
+    option: defendantNameConfirmation.noRadioOption,
+    fName: defendantNameConfirmation.firstNameInputText,
+    lName: defendantNameConfirmation.lastNameInputText,
+  });
+  await performAction('enterDateOfBirthDetailsLR', {
+    dobDay: defendantDateOfBirth.dayInputText,
+    dobMonth: defendantDateOfBirth.monthInputText,
+    dobYear: defendantDateOfBirth.yearInputText,
+  });
+  await performAction('selectCorrespondenceAddressLR', {
+    radioOption: correspondenceAddress.yesRadioOption,
+  });
+  await performAction('emailConfirmationLR', {
+    radioOption: emailConfirmation.noRadioOption,
+  });
+  await performAction('tenancyOrContractTypeDetailsLR', {
+    tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
+    tenancyOption: tenancyTypeDetails.noRadioOption,
+    tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+  });
+  await performAction('enterTenancyStartDetailsUnKnownLR');
+  await performAction('selectNoticeDetailsLR', {
+    option: confirmationOfNoticeGiven.noRadioOption,
+  });
+  await performAction('rentArrearsLR', {
+    option: rentArrears.yesRadioOption,
+    rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
+  });
+  await performAction('selectCounterClaimLR', {
+    option: counterClaim.yesRadioOption,
+  });
+  await performAction('selectWhatAreYouClaimingForLR', {
+    question: counterClaimWhatAreYouClaimingFor.mainHeader,
+    option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+  });
+  await performAction('counterClaimSpecificSumOfMoneyLR', {
+    question: counterClaimSpecificSumOfMoney.mainHeader,
+    option: counterClaimSpecificSumOfMoney.noRadioOption,
+    amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+  });
+  await performAction('selectCounterClaimFeeLR', {
+    radioOption: counterClaimFee.defendantNeedHelpRadioOption,
+    typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+    amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+  });
+  await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
+    helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
+  });
+  await softErrorMessageValidation(
+    'counterclaimYouNeedToApplyForHelpWithYourFees',
+    counterclaimYouNeedToApplyForHelpWithYourFeesErrorValidation
+  );
+  await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
 });
