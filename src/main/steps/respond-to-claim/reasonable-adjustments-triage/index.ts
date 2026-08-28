@@ -6,7 +6,6 @@ import { Logger } from '@modules/logger';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { startYourSupport } from '@services/cuiRa/startYourSupport';
-import { redirectToPcq } from '@services/pcq/redirectToPcq';
 import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
 const logger = Logger.getLogger('reasonableAdjustmentsTriage');
 
@@ -24,9 +23,8 @@ export const step: StepDefinition = createFormStep({
   // microsite;
   beforeRedirect: async (req: Request) => {
     if (req.body?.reasonableAdjustmentsChoice !== 'questions') {
-      // Skipping Your Support takes us to PCQ. If it is unavailable or already answered, fall
-      // through to the normal next step — an optional questionnaire must never block the response.
-      await redirectToPcq(req);
+      // Your Support is an optional task, so
+      // resolveRedirectAfterPost returns the citizen to the task list.
       return;
     }
 
