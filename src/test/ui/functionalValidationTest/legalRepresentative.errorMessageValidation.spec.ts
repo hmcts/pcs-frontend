@@ -16,8 +16,6 @@ import {
   doYouHaveAnyOtherDependants,
   emailConfirmation,
   endOfJourneyCYA,
-  equalityAndDiversityEndLR,
-  equalityAndDiversityStart,
   exceptionalHardship,
   incomeAndExpenses,
   languageUsed,
@@ -46,7 +44,7 @@ import {
 } from '../utils/common/error-message-validation-helper';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { initializeExecutor, performAction, performValidation } from '../utils/controller';
+import { initializeExecutor, performAction } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
 
 // softErrorMessageValidation(pageName, validationOrReason):
@@ -269,10 +267,6 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       courtInfo: otherConsiderations.detailsTextInput,
     });
     await performAction('uploadFiles');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
