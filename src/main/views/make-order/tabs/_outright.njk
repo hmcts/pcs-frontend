@@ -12,14 +12,16 @@
   classes: "govuk-radios--small",
   fieldset: { legend: { text: "Possession", classes: "govuk-fieldset__legend--s" } },
   items: [
-    { value: "forthwith", text: "Possession forthwith" },
+    { value: "forthwith", text: "Possession forthwith", checked: draftChecked("outright-possession", "forthwith") },
     {
       value: "by",
       text: "Possession on or before",
+      checked: draftChecked("outright-possession", "by"),
       conditional: {
         html: govukDateInput({
           id: "outright-by-date",
           namePrefix: "outright-by-date",
+          items: draftDate("outright-by-date"),
           fieldset: { legend: { text: "Date possession is ordered by", classes: "govuk-visually-hidden" } }
         })
       }
@@ -32,8 +34,8 @@
   classes: "govuk-radios--small govuk-radios--inline",
   fieldset: { legend: { text: "Grounds", classes: "govuk-fieldset__legend--s" } },
   items: [
-    { value: "mandatory", text: "Mandatory" },
-    { value: "discretionary", text: "Discretionary" }
+    { value: "mandatory", text: "Mandatory", checked: draftChecked("outright-grounds-type", "mandatory") },
+    { value: "discretionary", text: "Discretionary", checked: draftChecked("outright-grounds-type", "discretionary") }
   ]
 }) }}
 
@@ -43,7 +45,8 @@
   name: "outright-grounds-details",
   label: { text: "Details of grounds (optional)" },
   classes: "govuk-input--width-20",
-  formGroup: { classes: "pcs-continues-question" }
+  formGroup: { classes: "pcs-continues-question" },
+  value: draftValue("outright-grounds-details")
 }) }}
 
 {# Keep the money-judgment fields in one reveal rather than nesting conditional controls. #}
@@ -55,6 +58,7 @@
       label: { text: "Judgment for arrears" },
       classes: "govuk-input--width-5",
       spellcheck: false,
+      value: draftValue("outright-mj-arrears"),
       inputmode: "numeric",
       prefix: { text: "£" }
     }) }}
@@ -65,6 +69,7 @@
       label: { text: "Interest" },
       classes: "govuk-input--width-5",
       spellcheck: false,
+      value: draftValue("outright-mj-interest"),
       inputmode: "numeric",
       prefix: { text: "£" }
     }) }}
@@ -80,6 +85,7 @@
       {
         value: "lump",
         text: "Payment to claimant",
+        checked: draftChecked("outright-mj-plan", "lump"),
         conditional: {
           html: '<div class="pcs-inline-fields">' + govukInput({
             id: "outright-mj-lump-amount",
@@ -87,15 +93,18 @@
             label: { text: "Payment of" },
             classes: "govuk-input--width-5",
             spellcheck: false,
+            value: draftValue("outright-mj-lump-amount"),
             inputmode: "numeric",
             prefix: { text: "£" }
           }) + govukDateInput({
             id: "outright-mj-lump-date",
             namePrefix: "outright-mj-lump-date",
+            items: draftDate("outright-mj-lump-date"),
             fieldset: { legend: { text: "To be paid by", classes: "govuk-fieldset__legend--s" } }
           }) + govukDateInput({
             id: "outright-mj-balance-date",
             namePrefix: "outright-mj-balance-date",
+            items: draftDate("outright-mj-balance-date"),
             fieldset: { legend: { text: "And the balance by (optional)", classes: "govuk-fieldset__legend--s" } }
           }) + '</div>'
         }
@@ -103,6 +112,7 @@
       {
         value: "instalments",
         text: "Instalment payments",
+        checked: draftChecked("outright-mj-plan", "instalments"),
         conditional: {
           html: '<div class="pcs-inline-fields">' + govukInput({
             id: "outright-mj-inst-amount",
@@ -110,16 +120,18 @@
             label: { text: "Instalment payments of" },
             classes: "govuk-input--width-5",
             spellcheck: false,
+            value: draftValue("outright-mj-inst-amount"),
             inputmode: "numeric",
             prefix: { text: "£" }
           }) + govukSelect({
             id: "outright-mj-inst-freq",
             name: "outright-mj-inst-freq",
             label: { text: "How often" },
-            items: options.paymentFrequencies
+            items: draftSelect(options.paymentFrequencies, "outright-mj-inst-freq")
           }) + govukDateInput({
             id: "outright-mj-inst-date",
             namePrefix: "outright-mj-inst-date",
+            items: draftDate("outright-mj-inst-date"),
             fieldset: { legend: { text: "First instalment to be paid on or before", classes: "govuk-fieldset__legend--s" } }
           }) + '</div>'
         }
@@ -136,11 +148,13 @@
     {
       value: "money-judgment",
       text: "Money judgment",
+      checked: draftChecked("outright-options", "money-judgment"),
       conditional: { html: outrightMoneyJudgmentHtml }
     },
     {
       value: "use-occupation",
       text: "Damages for unlawful occupation",
+      checked: draftChecked("outright-options", "use-occupation"),
       conditional: {
         html: '<div class="pcs-inline-fields">' + govukInput({
           id: "outright-use-occupation-rate",
@@ -148,18 +162,21 @@
           label: { text: "Daily rate" },
           classes: "govuk-input--width-5",
           spellcheck: false,
+          value: draftValue("outright-use-occupation-rate"),
           inputmode: "decimal",
           prefix: { text: "£" }
         }) + govukDateInput({
           id: "outright-use-occupation-from-date",
           namePrefix: "outright-use-occupation-from-date",
+          items: draftDate("outright-use-occupation-from-date"),
           fieldset: { legend: { text: "From", classes: "govuk-fieldset__legend--s" } }
         }) + '</div>'
       }
     },
     {
       value: "transfer-high-court",
-      text: "Transfer to High Court"
+      text: "Transfer to High Court",
+      checked: draftChecked("outright-options", "transfer-high-court")
     }
   ]
 }) }}

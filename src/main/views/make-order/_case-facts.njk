@@ -28,6 +28,7 @@
       {{ govukDateInput({
         id: "date-tenancy",
         namePrefix: "date-tenancy",
+        items: draftDate("date-tenancy"),
         fieldset: { legend: { text: "Date of tenancy/contract", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
@@ -35,12 +36,13 @@
         id: "tenancy-type",
         name: "tenancy-type",
         label: { text: "Tenancy/contract type", classes: "govuk-label--s" },
-        items: tenancyTypes
+        items: draftSelect(tenancyTypes, "tenancy-type")
       }) }}
 
       {{ govukDateInput({
         id: "date-notice",
         namePrefix: "date-notice",
+        items: draftDate("date-notice"),
         fieldset: { legend: { text: "Date of service of notice", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
@@ -50,6 +52,7 @@
         label: { text: "Arrears at notice", classes: "govuk-label--s" },
         classes: "govuk-input--width-5",
         spellcheck: false,
+        value: draftValue("arrears-notice"),
         prefix: { text: "£" }
       }) }}
 
@@ -59,6 +62,7 @@
         label: { text: "Current rent", classes: "govuk-label--s" },
         classes: "govuk-input--width-5",
         spellcheck: false,
+        value: draftValue("current-rent"),
         prefix: { text: "£" }
       }) }}
 
@@ -66,14 +70,15 @@
         id: "rent-frequency",
         name: "rent-frequency",
         label: { text: "Rent frequency", classes: "govuk-label--s" },
-        items: rentFrequencies
+        items: draftSelect(rentFrequencies, "rent-frequency")
       }) }}
 
       {{ govukInput({
         id: "grounds-pleaded",
         name: "grounds-pleaded",
         label: { text: "Grounds pleaded", classes: "govuk-label--s" },
-        classes: "govuk-input--width-10"
+        classes: "govuk-input--width-10",
+        value: draftValue("grounds-pleaded")
       }) }}
 
       {{ govukInput({
@@ -82,18 +87,21 @@
         label: { text: "Arrears on issue", classes: "govuk-label--s" },
         classes: "govuk-input--width-5",
         spellcheck: false,
+        value: draftValue("arrears-issue"),
         prefix: { text: "£" }
       }) }}
 
       {{ govukDateInput({
         id: "date-last-hearing",
         namePrefix: "date-last-hearing",
+        items: draftDate("date-last-hearing"),
         fieldset: { legend: { text: "Date of last hearing", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
       {{ govukDateInput({
         id: "date-last-payment",
         namePrefix: "date-last-payment",
+        items: draftDate("date-last-payment"),
         fieldset: { legend: { text: "Date last payment made", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
@@ -103,6 +111,7 @@
         label: { text: "Last payment", classes: "govuk-label--s" },
         classes: "govuk-input--width-5",
         spellcheck: false,
+        value: draftValue("last-payment"),
         prefix: { text: "£" }
       }) }}
 
@@ -112,6 +121,7 @@
         label: { text: "Arrears today", classes: "govuk-label--s" },
         classes: "govuk-input--width-5",
         spellcheck: false,
+        value: draftValue("arrears-today"),
         prefix: { text: "£" }
       }) }}
     </div>
@@ -120,6 +130,7 @@
       id: "hearing-notes",
       name: "hearing-notes",
       rows: 8,
+      value: draftValue("hearing-notes"),
       label: { text: "Hearing notes (internal use only)", classes: "govuk-label--s" },
       formGroup: { classes: "govuk-!-margin-bottom-0" }
     }) }}

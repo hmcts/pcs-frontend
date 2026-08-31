@@ -1,8 +1,10 @@
 {% extends "template.njk" %}
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "xui-header/macro.njk" import hmctsXuiHeader %}
 {% from "footer/macro.njk" import hmctsUiFooter %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
 {% set containerClasses = "pcs-wide" %}
 
@@ -28,6 +30,18 @@
 {% endblock %}
 
 {% block content %}
+  {% if saved %}
+    {{ govukNotificationBanner({ type: "success", text: "Order draft saved" }) }}
+  {% endif %}
+  {% if submitted %}
+    {{ govukNotificationBanner({ type: "success", text: "Order sent to a caseworker for review" }) }}
+  {% endif %}
+
+  <form method="post" novalidate>
+  <input type="hidden" name="orderId" value="{{ order.id }}">
+  <input type="hidden" name="orderVersion" value="{{ order.version }}">
+  {{ csrfProtection(csrfToken) }}
+
   {% include "make-order/_case-summary.njk" %}
   {% include "make-order/_case-facts.njk" %}
   {% include "make-order/_attendance.njk" %}
@@ -69,7 +83,8 @@
   {% include "make-order/_staff-message.njk" %}
 
   <div class="govuk-button-group govuk-!-margin-top-6">
-    {{ govukButton({ text: "Send order to caseworker for issue", disabled: true }) }}
-    {{ govukButton({ text: "Save as draft", classes: "govuk-button--secondary", disabled: true }) }}
+    {{ govukButton({ text: "Send order to caseworker for issue", name: "action", value: "SUBMIT_FOR_REVIEW" }) }}
+    {{ govukButton({ text: "Save as draft", name: "action", value: "SAVE_DRAFT", classes: "govuk-button--secondary" }) }}
   </div>
+  </form>
 {% endblock %}

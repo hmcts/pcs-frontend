@@ -8,11 +8,13 @@
   items: [{
     value: "yes",
     text: "Staff message",
+    checked: draftChecked("staff-message", "yes"),
     conditional: {
       html: govukTextarea({
         id: "staff-message-text",
         name: "staff-message-text",
         rows: 4,
+        value: draftValue("staff-message-text"),
         label: { text: "Message for court staff" }
       })
     }

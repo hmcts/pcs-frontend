@@ -9,12 +9,14 @@
   items: [{
     value: "yes",
     text: "Preview order",
+    checked: draftChecked("preview-order", "yes"),
     label: { classes: "govuk-label--l" },
     conditional: {
       html: govukTextarea({
         id: "preview-order-text",
         name: "preview-order-text",
         rows: 10,
+        value: draftValue("preview-order-text"),
         label: { text: "Order preview", classes: "govuk-visually-hidden" }
       })
     }

@@ -323,6 +323,7 @@ export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
+  makeOrderPayload?: string;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
   detailsTab_NoticeDetails?: {
     noticeDocuments?: CcdCollectionItem<Document>[];

@@ -9,6 +9,7 @@
 {{ govukDateInput({
   id: "suspended-by-date",
   namePrefix: "suspended-by-date",
+  items: draftDate("suspended-by-date"),
   fieldset: { legend: { text: "Possession by", classes: "govuk-fieldset__legend--s" } }
 }) }}
 
@@ -19,6 +20,7 @@
   hint: { text: "Possession is suspended as long as the defendant pays the current rent as it falls due, plus these arrears." },
   classes: "govuk-input--width-5",
   spellcheck: false,
+  value: draftValue("suspended-arrears"),
   inputmode: "numeric",
   prefix: { text: "£" }
 }) }}
@@ -33,6 +35,7 @@
     {
       value: "one-off",
       text: "A single payment",
+      checked: draftChecked("suspended-payment-terms", "one-off"),
       conditional: {
         html: '<div class="pcs-inline-fields">' + govukInput({
           id: "suspended-oneoff-amount",
@@ -40,11 +43,13 @@
           label: { text: "Payment of" },
           classes: "govuk-input--width-5",
           spellcheck: false,
+          value: draftValue("suspended-oneoff-amount"),
           inputmode: "numeric",
           prefix: { text: "£" }
         }) + govukDateInput({
           id: "suspended-oneoff-date",
           namePrefix: "suspended-oneoff-date",
+          items: draftDate("suspended-oneoff-date"),
           fieldset: { legend: { text: "On or before", classes: "govuk-fieldset__legend--s" } }
         }) + '</div>'
       }
@@ -52,6 +57,7 @@
     {
       value: "instalments",
       text: "Instalment payments",
+      checked: draftChecked("suspended-payment-terms", "instalments"),
       conditional: {
         html: '<div class="pcs-inline-fields">' + govukInput({
           id: "suspended-instalment-amount",
@@ -59,16 +65,18 @@
           label: { text: "Payments of" },
           classes: "govuk-input--width-5",
           spellcheck: false,
+          value: draftValue("suspended-instalment-amount"),
           inputmode: "numeric",
           prefix: { text: "£" }
         }) + govukSelect({
           id: "suspended-instalment-frequency",
           name: "suspended-instalment-frequency",
           label: { text: "How often" },
-          items: options.paymentFrequencies
+          items: draftSelect(options.paymentFrequencies, "suspended-instalment-frequency")
         }) + govukDateInput({
           id: "suspended-instalment-date",
           namePrefix: "suspended-instalment-date",
+          items: draftDate("suspended-instalment-date"),
           fieldset: { legend: { text: "First payment by", classes: "govuk-fieldset__legend--s" } }
         }) + '</div>'
       }
@@ -82,7 +90,7 @@
     idPrefix: "suspended-mj-same-terms",
     name: "suspended-mj-same-terms",
     classes: "govuk-checkboxes--small",
-    items: [{ value: "yes", text: "Suspended on the same terms as above" }]
+    items: [{ value: "yes", text: "Suspended on the same terms as above", checked: draftChecked("suspended-mj-same-terms", "yes") }]
   }) }}
 {% endset %}
 
@@ -94,12 +102,14 @@
     {
       value: "money-judgment-arrears",
       text: "Money judgment for the arrears above",
+      checked: draftChecked("suspended-options", "money-judgment-arrears"),
       conditional: { html: suspendedSameTermsHtml }
     },
-    { value: "money-claim-adjourned", text: "Money claim adjourned generally with liberty to restore" },
+    { value: "money-claim-adjourned", text: "Money claim adjourned generally with liberty to restore", checked: draftChecked("suspended-options", "money-claim-adjourned") },
     {
       value: "use-occupation",
       text: "Damages for unlawful occupation",
+      checked: draftChecked("suspended-options", "use-occupation"),
       conditional: {
         html: '<div class="pcs-inline-fields">' + govukInput({
           id: "suspended-use-occupation-rate",
@@ -107,19 +117,22 @@
           label: { text: "Daily rate" },
           classes: "govuk-input--width-5",
           spellcheck: false,
+          value: draftValue("suspended-use-occupation-rate"),
           inputmode: "decimal",
           prefix: { text: "£" }
         }) + govukDateInput({
           id: "suspended-use-occupation-from-date",
           namePrefix: "suspended-use-occupation-from-date",
+          items: draftDate("suspended-use-occupation-from-date"),
           fieldset: { legend: { text: "From", classes: "govuk-fieldset__legend--s" } }
         }) + '</div>'
       }
     },
     {
       value: "warrant-on-notice",
-      text: "Any application for a warrant of eviction must be made and heard on notice to all parties unless the court orders otherwise"
+      text: "Any application for a warrant of eviction must be made and heard on notice to all parties unless the court orders otherwise",
+      checked: draftChecked("suspended-options", "warrant-on-notice")
     },
-    { value: "transfer-high-court", text: "Transfer to High Court" }
+    { value: "transfer-high-court", text: "Transfer to High Court", checked: draftChecked("suspended-options", "transfer-high-court") }
   ]
 }) }}

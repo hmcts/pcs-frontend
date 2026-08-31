@@ -10,11 +10,13 @@
   items: [{
     value: "yes",
     text: "Recitals",
+    checked: draftChecked("recitals", "yes"),
     conditional: {
       html: govukTextarea({
         id: "recitals-text",
         name: "recital",
         rows: 4,
+        value: draftValue("recital"),
         label: { text: "Recital paragraphs" }
       })
     }

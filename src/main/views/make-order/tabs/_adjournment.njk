@@ -14,11 +14,12 @@
     classes: "govuk-radios--small",
     fieldset: { legend: { text: "Adjourned to", classes: "govuk-fieldset__legend--s" } },
     items: [
-      { value: "next-list", text: "Next available possession list after" },
-      { value: "next-date", text: "Next available date, not in a possession list, after" },
+      { value: "next-list", text: "Next available possession list after", checked: draftChecked("adj-when", "next-list") },
+      { value: "next-date", text: "Next available date, not in a possession list, after", checked: draftChecked("adj-when", "next-date") },
       {
         value: "specific",
         text: "A specific date",
+        checked: draftChecked("adj-when", "specific"),
         conditional: {
           html: govukInput({
             id: "adj-specific-time",
@@ -26,7 +27,8 @@
             label: { text: "Time of hearing" },
             hint: { text: "For example, 10:30am" },
             classes: "govuk-input--width-5",
-            spellcheck: false
+            spellcheck: false,
+            value: draftValue("adj-specific-time")
           })
         }
       }
@@ -36,6 +38,7 @@
   {{ govukDateInput({
     id: "adj-hearing-date",
     namePrefix: "adj-hearing-date",
+    items: draftDate("adj-hearing-date"),
     fieldset: { legend: { text: "Date", classes: "govuk-fieldset__legend--s" } }
   }) }}
 
@@ -48,16 +51,17 @@
         label: { text: "Length" },
         classes: "govuk-input--width-3",
         spellcheck: false,
+        value: draftValue("adj-time-estimate"),
         inputmode: "numeric"
       }) }}
       {{ govukSelect({
         id: "adj-time-estimate-unit",
         name: "adj-time-estimate-unit",
         label: { text: "Unit" },
-        items: [
+        items: draftSelect([
           { value: "minutes", text: "Minutes" },
           { value: "hours", text: "Hours" }
-        ]
+        ], "adj-time-estimate-unit")
       }) }}
     </fieldset>
   </div>
@@ -68,9 +72,9 @@
     classes: "govuk-checkboxes--small",
     fieldset: { legend: { text: "Hearing format", classes: "govuk-fieldset__legend--s" } },
     items: [
-      { value: "in-person", text: "In person" },
-      { value: "video", text: "Video hearing" },
-      { value: "telephone", text: "Telephone" }
+      { value: "in-person", text: "In person", checked: draftChecked("adj-format", "in-person") },
+      { value: "video", text: "Video hearing", checked: draftChecked("adj-format", "video") },
+      { value: "telephone", text: "Telephone", checked: draftChecked("adj-format", "telephone") }
     ]
   }) }}
 
@@ -83,10 +87,12 @@
       {
         value: "defence",
         text: "The defendant must send a defence",
+        checked: draftChecked("adj-directions", "defence"),
         conditional: {
           html: govukDateInput({
             id: "adj-defence-date",
             namePrefix: "adj-defence-date",
+            items: draftDate("adj-defence-date"),
             fieldset: { legend: { text: "By 4pm on", classes: "govuk-fieldset__legend--s" } }
           })
         }
@@ -94,10 +100,12 @@
       {
         value: "counterclaim",
         text: "The defendant must send a defence and any counterclaim",
+        checked: draftChecked("adj-directions", "counterclaim"),
         conditional: {
           html: govukDateInput({
             id: "adj-counterclaim-date",
             namePrefix: "adj-counterclaim-date",
+            items: draftDate("adj-counterclaim-date"),
             fieldset: { legend: { text: "By 4pm on", classes: "govuk-fieldset__legend--s" } }
           })
         }
@@ -105,10 +113,12 @@
       {
         value: "claimant-reply",
         text: "The claimant must send a defence to the counterclaim and any reply",
+        checked: draftChecked("adj-directions", "claimant-reply"),
         conditional: {
           html: govukDateInput({
             id: "adj-claimant-reply-date",
             namePrefix: "adj-claimant-reply-date",
+            items: draftDate("adj-claimant-reply-date"),
             fieldset: { legend: { text: "By 4pm on", classes: "govuk-fieldset__legend--s" } }
           })
         }
@@ -127,6 +137,7 @@
       {
         value: "current-rent-plus",
         text: "On payment of current rent plus an additional sum",
+        checked: draftChecked("adj-gen", "current-rent-plus"),
         conditional: {
           html: govukInput({
             id: "adj-gen-current-rent-plus-amount",
@@ -134,16 +145,18 @@
             label: { text: "Additional sum" },
             classes: "govuk-input--width-5",
             spellcheck: false,
+            value: draftValue("adj-gen-current-rent-plus-amount"),
             inputmode: "numeric",
             prefix: { text: "£" }
           }) + govukSelect({
             id: "adj-gen-current-rent-plus-frequency",
             name: "adj-gen-current-rent-plus-frequency",
             label: { text: "How often" },
-            items: options.paymentFrequencies
+            items: draftSelect(options.paymentFrequencies, "adj-gen-current-rent-plus-frequency")
           }) + govukDateInput({
             id: "adj-gen-current-rent-plus-date",
             namePrefix: "adj-gen-current-rent-plus-date",
+            items: draftDate("adj-gen-current-rent-plus-date"),
             fieldset: { legend: { text: "First payment by", classes: "govuk-fieldset__legend--s" } }
           })
         }
@@ -151,6 +164,7 @@
       {
         value: "payments",
         text: "On regular payments",
+        checked: draftChecked("adj-gen", "payments"),
         conditional: {
           html: govukInput({
             id: "adj-gen-payments-amount",
@@ -158,16 +172,18 @@
             label: { text: "Payments of" },
             classes: "govuk-input--width-5",
             spellcheck: false,
+            value: draftValue("adj-gen-payments-amount"),
             inputmode: "numeric",
             prefix: { text: "£" }
           }) + govukSelect({
             id: "adj-gen-payments-frequency",
             name: "adj-gen-payments-frequency",
             label: { text: "How often" },
-            items: options.paymentFrequencies
+            items: draftSelect(options.paymentFrequencies, "adj-gen-payments-frequency")
           }) + govukDateInput({
             id: "adj-gen-payments-date",
             namePrefix: "adj-gen-payments-date",
+            items: draftDate("adj-gen-payments-date"),
             fieldset: { legend: { text: "First payment by", classes: "govuk-fieldset__legend--s" } }
           })
         }
@@ -175,6 +191,7 @@
       {
         value: "oneoff",
         text: "On a single payment",
+        checked: draftChecked("adj-gen", "oneoff"),
         conditional: {
           html: govukInput({
             id: "adj-gen-oneoff-amount",
@@ -182,11 +199,13 @@
             label: { text: "Payment of" },
             classes: "govuk-input--width-5",
             spellcheck: false,
+            value: draftValue("adj-gen-oneoff-amount"),
             inputmode: "numeric",
             prefix: { text: "£" }
           }) + govukDateInput({
             id: "adj-gen-oneoff-date",
             namePrefix: "adj-gen-oneoff-date",
+            items: draftDate("adj-gen-oneoff-date"),
             fieldset: { legend: { text: "Payment by", classes: "govuk-fieldset__legend--s" } }
           })
         }
@@ -194,10 +213,12 @@
       {
         value: "restore",
         text: "Automatically struck out unless an application to restore is made",
+        checked: draftChecked("adj-gen", "restore"),
         conditional: {
           html: govukDateInput({
             id: "adj-gen-restore-date",
             namePrefix: "adj-gen-restore-date",
+            items: draftDate("adj-gen-restore-date"),
             fieldset: { legend: { text: "Application to restore by", classes: "govuk-fieldset__legend--s" } }
           })
         }
@@ -215,11 +236,13 @@
     {
       value: "further-hearing",
       text: "Adjourned for further hearing",
+      checked: draftChecked("adj-type", "further-hearing"),
       conditional: { html: adjournFurtherHearingHtml }
     },
     {
       value: "generally",
       text: "Adjourned generally",
+      checked: draftChecked("adj-type", "generally"),
       conditional: { html: adjournGenerallyHtml }
     }
   ]
