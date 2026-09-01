@@ -39,7 +39,7 @@ const makeOrderEnvelope = {
     draftPayload: {
       version: 1,
       orderType: 'OUTRIGHT_POSSESSION',
-      fields: { 'hearing-notes': 'Saved note' },
+      formData: { 'hearing-notes': 'Saved note' },
       documents: {},
     },
   },
@@ -117,7 +117,106 @@ describe('make order route', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('saves posted form data by submitting the makeOrder event', async () => {
+  it('creates a draft before rendering when none exists', async () => {
+    jest
+      .mocked(ccdCaseService.getCaseByIdForEvent)
+      .mockResolvedValueOnce({
+        id: '1777027600017760',
+        data: {
+          makeOrderPayload: JSON.stringify({
+            ...makeOrderEnvelope,
+            order: { ...makeOrderEnvelope.order, id: null, version: 0 },
+          }),
+        },
+      })
+      .mockResolvedValueOnce({
+        id: '1777027600017760',
+        data: { makeOrderPayload: JSON.stringify(makeOrderEnvelope) },
+      });
+    makeOrderRoute(app);
+    const handler = (app.get as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        query: {},
+        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+      } as unknown as Request,
+      res,
+      jest.fn()
+    );
+
+    expect(ccdCaseService.submitCaseEvent).toHaveBeenCalledWith('token', '1777027600017760', 'ext:makeOrder', {
+      makeOrderPayload: JSON.stringify({
+        action: 'START_DRAFT',
+        order: {
+          id: null,
+          version: 0,
+          draftPayload: {
+            version: 1,
+            orderType: 'OUTRIGHT_POSSESSION',
+            formData: {},
+            documents: {},
+          },
+        },
+      }),
+    });
+    expect(ccdCaseService.getCaseByIdForEvent).toHaveBeenCalledTimes(2);
+    expect(res.render).toHaveBeenCalledWith('make-order', expect.objectContaining({ order: makeOrderEnvelope.order }));
+  });
+
+  it('rejects an XUI launch for a different signed-in user from the main page', async () => {
+    makeOrderRoute(app);
+    const handler = (app.get as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const next = jest.fn();
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        query: { expected_sub: 'xui-user' },
+        session: { user: { accessToken: 'token', sub: 'different-user', roles: ['caseworker-pcs-judge'] } },
+      } as unknown as Request,
+      {} as Response,
+      next
+    );
+
+    expect(ccdCaseService.getCaseByIdForEvent).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 403 }));
+  });
+
+  it('redirects the XUI event route to the main page and preserves expected_sub', () => {
+    makeOrderRoute(app);
+    const handler = (app.get as jest.Mock).mock.calls[1][1] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => void;
+    const res = { redirect: jest.fn() } as unknown as Response;
+
+    handler(
+      {
+        params: { caseReference: '1777027600017760', eventId: 'ext:makeOrder' },
+        query: { expected_sub: 'user+id' },
+      } as unknown as Request,
+      res,
+      jest.fn()
+    );
+
+    expect(res.redirect).toHaveBeenCalledWith('/case/1777027600017760/make-order?expected_sub=user%2Bid');
+    expect(ccdCaseService.getCaseByIdForEvent).not.toHaveBeenCalled();
+    expect(ccdCaseService.submitCaseEvent).not.toHaveBeenCalled();
+  });
+
+  it('saves posted form data and returns to Manage Case', async () => {
     makeOrderRoute(app);
     const handler = (app.post as jest.Mock).mock.calls[0][3] as (
       req: Request,
@@ -153,13 +252,13 @@ describe('make order route', () => {
           draftPayload: {
             version: 1,
             orderType: 'OUTRIGHT_POSSESSION',
-            fields: { 'hearing-notes': 'Updated note' },
+            formData: { 'hearing-notes': 'Updated note' },
             documents: {},
           },
         },
       }),
     });
-    expect(res.redirect).toHaveBeenCalledWith('/case/1777027600017760/make-order?saved=true');
+    expect(res.redirect).toHaveBeenCalledWith('https://manage-case.example.com/cases/case-details/1777027600017760');
   });
 
   it('submits an outright possession document for review and returns to Manage Case', async () => {
@@ -205,7 +304,7 @@ describe('make order route', () => {
           draftPayload: {
             version: 1,
             orderType: 'OUTRIGHT_POSSESSION',
-            fields: { 'hearing-notes': 'Final note' },
+            formData: { 'hearing-notes': 'Final note' },
             documents: { OUTRIGHT_POSSESSION: orderDocument },
           },
         },

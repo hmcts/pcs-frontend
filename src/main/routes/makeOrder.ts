@@ -26,7 +26,7 @@ type MakeOrderType =
 interface MakeOrderDraftPayload {
   version: 1;
   orderType: MakeOrderType;
-  fields: Record<string, unknown>;
+  formData: Record<string, unknown>;
   documents: Partial<Record<MakeOrderType, OrderEditorDocument>>;
 }
 
@@ -47,7 +47,7 @@ interface MakeOrderEnvelope {
 }
 
 function emptyDraftPayload(): MakeOrderDraftPayload {
-  return { version: 1, orderType: 'OUTRIGHT_POSSESSION', fields: {}, documents: {} };
+  return { version: 1, orderType: 'OUTRIGHT_POSSESSION', formData: {}, documents: {} };
 }
 
 function parseEnvelope(payload: unknown): MakeOrderEnvelope {
@@ -62,10 +62,10 @@ async function loadMakeOrderEnvelope(accessToken: string, caseReference: string)
   return parseEnvelope(ccdCase.data.makeOrderPayload);
 }
 
-async function startDraftIfRequired(accessToken: string, caseReference: string): Promise<void> {
+async function loadOrStartDraft(accessToken: string, caseReference: string): Promise<MakeOrderEnvelope> {
   const envelope = await loadMakeOrderEnvelope(accessToken, caseReference);
   if (envelope.order.id) {
-    return;
+    return envelope;
   }
 
   await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, {
@@ -78,6 +78,7 @@ async function startDraftIfRequired(accessToken: string, caseReference: string):
       },
     }),
   });
+  return loadMakeOrderEnvelope(accessToken, caseReference);
 }
 
 function formatAddress(address?: Record<string, string | undefined>): string {
@@ -121,7 +122,7 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
   });
   headerModel.assetsPath = '/assets/ui-component-lib';
   const draftPayload = envelope.order.draftPayload ?? emptyDraftPayload();
-  const draft = draftPayload.fields ?? {};
+  const draft = draftPayload.formData ?? {};
   const draftValue = (name: string): unknown => draft[name];
   const draftChecked = (name: string, value: string): boolean => {
     const savedValue = draft[name];
@@ -166,7 +167,13 @@ export default function makeOrderRoutes(app: Application): void {
       }
 
       try {
-        const envelope = await loadMakeOrderEnvelope(accessToken, req.params.caseReference as string);
+        const expectedSub = typeof req.query.expected_sub === 'string' ? req.query.expected_sub : undefined;
+        const signedInUserId = String(user.uid ?? user.id ?? user.sub);
+        if (expectedSub && expectedSub !== signedInUserId) {
+          throw new HTTPError('The signed-in user does not match the XUI session', 403);
+        }
+
+        const envelope = await loadOrStartDraft(accessToken, req.params.caseReference as string);
         return res.render('make-order', buildPageModel(req, envelope));
       } catch (error) {
         return next(error);
@@ -186,7 +193,7 @@ export default function makeOrderRoutes(app: Application): void {
       }
 
       const caseReference = req.params.caseReference as string;
-      const { _csrf, action, orderId, orderVersion, orderType, orderDocument, ...fields } = req.body as Record<
+      const { _csrf, action, orderId, orderVersion, orderType, orderDocument, ...formData } = req.body as Record<
         string,
         unknown
       >;
@@ -195,7 +202,7 @@ export default function makeOrderRoutes(app: Application): void {
       try {
         const orderAction = action ?? 'START_DRAFT';
         if (orderAction === 'START_DRAFT') {
-          await startDraftIfRequired(accessToken, caseReference);
+          await loadOrStartDraft(accessToken, caseReference);
           return res.redirect(req.originalUrl.split('?')[0]);
         }
         const selectedOrderType = orderType as MakeOrderType;
@@ -213,7 +220,7 @@ export default function makeOrderRoutes(app: Application): void {
         const draftPayload: MakeOrderDraftPayload = {
           version: 1,
           orderType: selectedOrderType,
-          fields,
+          formData,
           documents: outrightDocument ? { OUTRIGHT_POSSESSION: outrightDocument } : {},
         };
         await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, {
@@ -226,7 +233,7 @@ export default function makeOrderRoutes(app: Application): void {
             },
           }),
         });
-        if (orderAction === 'SUBMIT_FOR_REVIEW') {
+        if (orderAction === 'SAVE_DRAFT' || orderAction === 'SUBMIT_FOR_REVIEW') {
           const manageCaseUrl = buildManageCaseDetailsRedirect(
             config.get<string>('redirects.manageCaseReturnURL'),
             caseReference
@@ -243,34 +250,15 @@ export default function makeOrderRoutes(app: Application): void {
     }
   );
 
-  app.get(
-    XUI_EVENT_ROUTE,
-    oidcMiddleware,
-    judgeAccessMiddleware,
-    async (req: Request, res: Response, next: NextFunction) => {
-      if (req.params.eventId !== MAKE_ORDER_EVENT_ID) {
-        return next();
-      }
-
-      const user = req.session?.user;
-      const accessToken = user?.accessToken;
-      if (!accessToken) {
-        return next(new HTTPError('Authentication required', 401));
-      }
-
-      const expectedSub = typeof req.query.expected_sub === 'string' ? req.query.expected_sub : undefined;
-      const signedInUserId = String(user.uid ?? user.id ?? user.sub);
-      if (expectedSub && expectedSub !== signedInUserId) {
-        return next(new HTTPError('The signed-in user does not match the XUI session', 403));
-      }
-
-      const caseReference = req.params.caseReference as string;
-      try {
-        await startDraftIfRequired(accessToken, caseReference);
-        return res.redirect(MAKE_ORDER_ROUTE.replace(':caseReference', caseReference));
-      } catch (error) {
-        return next(error);
-      }
+  app.get(XUI_EVENT_ROUTE, (req: Request, res: Response, next: NextFunction) => {
+    if (req.params.eventId !== MAKE_ORDER_EVENT_ID) {
+      return next();
     }
-  );
+
+    const expectedSub = typeof req.query.expected_sub === 'string' ? req.query.expected_sub : undefined;
+    const caseReference = req.params.caseReference as string;
+    const makeOrderUrl = MAKE_ORDER_ROUTE.replace(':caseReference', caseReference);
+    const query = expectedSub ? `?expected_sub=${encodeURIComponent(expectedSub)}` : '';
+    return res.redirect(`${makeOrderUrl}${query}`);
+  });
 }
