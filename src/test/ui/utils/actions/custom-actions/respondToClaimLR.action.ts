@@ -37,7 +37,9 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  resumeResponse,
   selectDefendant,
+  startNow,
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
@@ -53,6 +55,7 @@ import { formatCurrency, formatPoundsValue, formatTextToLowercaseSeparatedBySpac
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
+import { pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
 import { RespondToClaimAction } from './respondToClaim.action';
 
 const rtcNoAnswerProvidedValue = 'No answer provided';
@@ -74,6 +77,9 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['selectExceptionalHardshipLR', () => this.selectExceptionalHardshipLR(fieldName as actionRecord)],
       ['selectIncomeAndExpensesLR', () => this.selectIncomeAndExpensesLR(fieldName as actionRecord)],
       ['representationLR', () => this.representationLR(fieldName as actionRecord)],
+      ['selectResumeResponseLR', () => this.selectResumeResponseLR(fieldName as actionRecord)],
+      ['createDraftResponseLR', () => this.createDraftResponseLR(fieldName as actionRecord)],
+      ['reopenStartNowLR', () => this.reopenStartNowLR()],
       [
         'selectWhatRegularIncomeDoTheyReceiveLR',
         () => this.selectWhatRegularIncomeDoTheyReceiveLR(fieldName as actionRecord),
@@ -536,6 +542,41 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       option: representationOption.radioOption,
     });
     await performAction('clickButton', selectDefendant.saveAndContinueButton);
+  }
+
+  private async selectResumeResponseLR(resumeResponseData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: resumeResponse.question,
+      option: resumeResponseData.option,
+    });
+    await performAction('clickButton', resumeResponse.saveAndContinueButton);
+  }
+
+  private async createDraftResponseLR(defendant: actionRecord): Promise<void> {
+    const defendantName = `${defendant.firstName} ${defendant.lastName}`;
+    if (pinUsers.length > 1) {
+      await this.representationLR({
+        question: selectDefendant.whichDefendantQuestion,
+        radioOption: defendantName,
+      });
+    }
+    await this.confirmDefendantDetailsLR({
+      question: defendantNameConfirmation.mainHeader(String(defendant.firstName), String(defendant.lastName)),
+      option: defendantNameConfirmation.yesRadioOption,
+    });
+    await this.enterDateOfBirthDetailsLR({
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+  }
+
+  private async reopenStartNowLR(): Promise<void> {
+    await performAction(
+      'navigateToUrl',
+      `${process.env.TEST_URL}/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`
+    );
+    await performAction('clickButton', startNow.startNowButton);
   }
 
   private async confirmDefendantDetailsLR(defendantData: actionRecord) {
