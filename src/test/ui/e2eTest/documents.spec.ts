@@ -12,6 +12,7 @@ import {
   confirmDocumentsRelateToApplicationErrorValidation,
   uploadYourDocumentsErrorValidation,
 } from '../functional/documents-functional';
+import { getSelectedDefendantNumber } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { softErrorMessageValidation } from '../utils/common/error-message-validation-helper';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
@@ -61,7 +62,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performAction('clickLink', checkYourAnswers.changeLink);
     await performAction('clickRadioButton', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
-      option: confirmIfTheseDocumentsRelateToAnApplication.noRadioOption,
+      option: confirmIfTheseDocumentsRelateToAnApplication.noMainClaimRadioOption,
     });
     await performAction('clickButton', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
     await performAction('clickButton', uploadYourDocuments.continueButton);
@@ -74,7 +75,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('Upload documents when GenApps not submitted @regression', async () => {
+  test('Upload documents when GenApps not submitted', async () => {
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
@@ -93,9 +94,25 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performAction('clickButton', checkYourAnswers.submitButton);
     await performAction('clickLink', documentsUploaded.closeAndReturnToCaseOverviewLink);
     await performValidation('mainHeader', dashboard.mainHeader);
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
+    await performAction('validateViewDocuments', {
+      caseNumber: viewDocuments.getCaseNumber(),
+      documents: [
+        {
+          sectionHeader: viewDocuments.uncategorisedSubHeader,
+          documentName: `uploadYourDocuments - Defendant ${getSelectedDefendantNumber()}.ppt`,
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
+        {
+          sectionHeader: viewDocuments.uncategorisedSubHeader,
+          documentName: `uploadYourDocuments - Defendant ${getSelectedDefendantNumber()}.docx`,
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
+      ],
+    });
   });
 
-  test('View documents submitted through make a claim @regression', async () => {
+  test('View documents submitted through make a claim', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
     await performAction('validateViewDocuments', {
       caseNumber: viewDocuments.getCaseNumber(),
@@ -125,6 +142,11 @@ test.describe('Documents - e2e Journey @nightly', async () => {
           documentName: viewDocuments.certificateOfSuitabilityLink,
           submittedDate: viewDocuments.getSubmittedDate(),
         },
+        {
+          sectionHeader: viewDocuments.uncategorisedSubHeader,
+          documentName: viewDocuments.otherDocumentLink,
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
       ],
     });
   });
@@ -150,9 +172,8 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', uploadYourDocuments.mainHeader);
     await performAction('clickLink', 'Back');
     await performValidation('mainHeader', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
-    //skipping below lines as we have bug HDPI-7411
-    /*await performAction('clickLink', 'Back');
-    await performValidation('mainHeader', startEvidenceUpload.mainHeader);*/
+    await performAction('clickLink', 'Back');
+    await performValidation('mainHeader', startEvidenceUpload.mainHeader);
     // SOMETHING_ELSE + default YES
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,

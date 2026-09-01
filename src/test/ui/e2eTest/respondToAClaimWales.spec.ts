@@ -1,6 +1,8 @@
 import { createCaseApiWalesData } from '../data/api-data/createCaseWales.api.data';
 import { submitCaseApiDataWales } from '../data/api-data/submitCaseWales.api.data';
 import {
+  adjustmentToGetIntoBuilding,
+  bringSupportToCourtHearing,
   checkYourAnswersRTC,
   confirmationOfNoticeGiven,
   contactPreferenceEmailOrPost,
@@ -22,21 +24,44 @@ import {
   doYouHaveAnyDependantChildren,
   doYouHaveAnyOtherDependants,
   doYouWantToUploadFilesToSupportYourCounterclaim,
+  documentInAlternativeFormat,
+  equalityAndDiversityAbilityToCarryOutActivity,
+  equalityAndDiversityDOB,
+  equalityAndDiversityEnd,
+  equalityAndDiversityEthinicGroup,
+  equalityAndDiversityHealthCondiotion,
+  equalityAndDiversityHowYouThink,
+  equalityAndDiversityLanguage,
+  equalityAndDiversityMarriedOrCivilPartnership,
+  equalityAndDiversityPregnancy,
+  equalityAndDiversityReligion,
+  equalityAndDiversitySameGender,
+  equalityAndDiversityStart,
+  equalityAndDiversityYourSex,
   exceptionalHardship,
   exemptLandLord,
+  feelComfortableDuringHearing,
   freeLegalAdvice,
   haveYouAppliedForUniversalCredit,
+  helpWithForms,
+  helpcommunicatingAndUnderstanding,
   incomeAndExpenses,
   installmentPayments,
   languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
+  physicalMentalOrLearningDisability,
   priorityDebtDetails,
   priorityDebts,
+  reasonableAdjustmentsTriage,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  requestCertainTypeOfHearing,
+  reviewSupport,
   startNow,
+  supportRequest,
+  supportRequestNotSent,
   taskList,
   tenancyDateDetails,
   tenancyTypeDetails,
@@ -109,7 +134,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to a claim - e2e Journey @nightly', async () => {
-  test('Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @PR @smoke @regression', async () => {
+  test('Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @PR @smoke', async () => {
     //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -302,6 +327,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -441,7 +470,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
-  test('Respond to a claim - Wales - Other contract - Rent Arrears @noDefendants', async () => {
+  test('Respond to a claim - Wales - Other contract - Rent Arrears @noDefendants @regression', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -574,6 +603,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       status: 'Done',
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
@@ -581,7 +614,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('clickButton', 'Submit');
   });
 
-  test('Respond to a claim - Wales - Standard contract - NonRentArrears - SelectCounterClaim - No @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Standard contract - NonRentArrears - SelectCounterClaim - No @noDefendants', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -669,7 +702,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', yourCircumstances.mainHeader);
   });
 
-  test('Respond to a claim - Wales - Standard contract - NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp - SomethingElse @noDefendants @regression', async () => {
+  test('Respond to a claim - Wales - Standard contract - NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp - SomethingElse @noDefendants', async () => {
     //Single named party - Something else - iDoNotNeedHelp
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -747,5 +780,580 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
     await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
+  });
+});
+
+test.describe('Common Component YS And PCQ Respond to a claim - e2e Journey @nightly ', async () => {
+  test('Your Support Request Sent to Court And PCQ Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @nightly', async () => {
+    //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
+    await performAction('validateRTCSectionCYA', 'startNowAndDetails');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('retrieveCYATableDataRTC', 'personalDetails');
+    await performAction('validateRTCSectionCYA', 'personalDetails');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
+    await performAction('exemptLandLord', exemptLandLord.yesRadioOption);
+    await performValidation('mainHeader', writtenTerms.mainHeader);
+    await performAction('selectWrittenTerms', {
+      question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
+      radioOption: writtenTerms.noRadioOption,
+    });
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
+    await performAction('selectTenancyStartDateKnown', {
+      option: tenancyDateDetails.noRadioOption,
+      day: '01',
+      month: '12',
+      year: '2025',
+    });
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown');
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption,
+    });
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
+    await performAction('selectCounterClaim', {
+      option: counterClaim.yesRadioOption,
+    });
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
+    });
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
+    });
+    await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performAction('installmentPayments', {
+      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+      radioOption: installmentPayments.noRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', 'payments');
+    await performAction('validateRTCSectionCYA', 'payments');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    });
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
+    await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoYouReceive');
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
+    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave', {
+      regularIncomeOptions: [
+        [
+          whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
+        ],
+      ],
+    });
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
+    await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
+    await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+    await performAction('uploadFiles');
+    await performAction('retrieveCYATableDataRTC', 'uploadFiles');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
+    await performAction('selectReasonableAdjustments', {
+      header: physicalMentalOrLearningDisability.mainHeader,
+      options: [
+        physicalMentalOrLearningDisability.adjustmentsToGetIntoBuildingCheckbox,
+        physicalMentalOrLearningDisability.documentInAlternativeFormatCheckbox,
+        physicalMentalOrLearningDisability.communicationCheckbox,
+        physicalMentalOrLearningDisability.helpWithFormCheckbox,
+        physicalMentalOrLearningDisability.hearingCheckbox,
+        physicalMentalOrLearningDisability.bringSupportCheckbox,
+        physicalMentalOrLearningDisability.askCertainTypeOfHearingCheckbox,
+      ],
+      button: physicalMentalOrLearningDisability.continueButton,
+    });
+    await performAction('selectReasonableAdjustments', {
+      header: adjustmentToGetIntoBuilding.mainHeader,
+      options: [
+        adjustmentToGetIntoBuilding.accessibleToiletCheckbox,
+        adjustmentToGetIntoBuilding.helpUsingALiftCheckbox,
+        adjustmentToGetIntoBuilding.useOfVenueWheelchairCheckbox,
+      ],
+      button: adjustmentToGetIntoBuilding.continueButton,
+    });
+    await performAction('selectReasonableAdjustments', {
+      header: documentInAlternativeFormat.mainHeader,
+      options: [
+        documentInAlternativeFormat.audioTranslationOfDocumentsCheckbox,
+        documentInAlternativeFormat.brailleDocumentsCheckbox,
+        documentInAlternativeFormat.informationEmailedToMeCheckbox,
+      ],
+      button: documentInAlternativeFormat.continueButton,
+    });
+    await performAction('selectReasonableAdjustments', {
+      header: helpcommunicatingAndUnderstanding.mainHeader,
+      options: [
+        helpcommunicatingAndUnderstanding.extraTimeToThinkAndExplainMyselfCheckbox,
+        helpcommunicatingAndUnderstanding.needToBeCloseToWhoIsSpeakingCheckbox,
+      ],
+      button: helpcommunicatingAndUnderstanding.continueButton,
+    });
+    await performAction('selectReasonableAdjustments', {
+      header: helpWithForms.mainHeader,
+      options: [helpWithForms.noHelpWithFormsCheckbox],
+      button: helpWithForms.continueButton,
+    });
+    await performAction('selectReasonableAdjustments', {
+      header: feelComfortableDuringHearing.mainHeader,
+      options: [
+        feelComfortableDuringHearing.privateWaitingAreaCheckbox,
+        feelComfortableDuringHearing.regularBreaksCheckbox,
+      ],
+      button: feelComfortableDuringHearing.continueButton,
+    });
+    await performAction('selectReasonableAdjustments', {
+      header: bringSupportToCourtHearing.mainHeader,
+      options: [bringSupportToCourtHearing.noSupportToBringWithMeCheckbox],
+      button: bringSupportToCourtHearing.continueButton,
+    });
+    await performAction('selectReasonableAdjustments', {
+      header: requestCertainTypeOfHearing.mainHeader,
+      options: [requestCertainTypeOfHearing.noCertainTypeOfHearingCheckbox],
+      button: requestCertainTypeOfHearing.continueButton,
+    });
+    await performValidation('mainHeader', reviewSupport.mainHeader);
+    await performAction('clickButton', reviewSupport.submitButton);
+    await performValidation('mainHeader', supportRequest.mainHeader);
+    await performAction('clickButton', supportRequest.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityDOB.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityDOB.mainHeader,
+      radioOption: equalityAndDiversityDOB.preferNotToSayRadioButton,
+      button: equalityAndDiversityDOB.continueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityLanguage.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityLanguage.mainHeader,
+      radioOption: equalityAndDiversityLanguage.englishRadioOption,
+      button: equalityAndDiversityLanguage.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityYourSex.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityYourSex.mainHeader,
+      radioOption: equalityAndDiversityYourSex.femaleRadioOption,
+      button: equalityAndDiversityYourSex.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversitySameGender.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversitySameGender.mainHeader,
+      radioOption: equalityAndDiversitySameGender.yesRadioOption,
+      button: equalityAndDiversitySameGender.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityHowYouThink.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityHowYouThink.mainHeader,
+      radioOption: equalityAndDiversityHowYouThink.hetroRadioOption,
+      button: equalityAndDiversityHowYouThink.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityMarriedOrCivilPartnership.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityMarriedOrCivilPartnership.mainHeader,
+      radioOption: equalityAndDiversityMarriedOrCivilPartnership.preferNotToSayRadioOption,
+      button: equalityAndDiversityMarriedOrCivilPartnership.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityEthinicGroup.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityEthinicGroup.mainHeader,
+      radioOption: equalityAndDiversityEthinicGroup.preferNotToSayRadioOption,
+      button: equalityAndDiversityEthinicGroup.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityReligion.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityReligion.mainHeader,
+      radioOption: equalityAndDiversityReligion.sikhRadioOption,
+      button: equalityAndDiversityReligion.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityHealthCondiotion.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityHealthCondiotion.mainHeader,
+      radioOption: equalityAndDiversityHealthCondiotion.yesRadioOption,
+      button: equalityAndDiversityHealthCondiotion.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityAbilityToCarryOutActivity.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityAbilityToCarryOutActivity.mainHeader,
+      radioOption: equalityAndDiversityAbilityToCarryOutActivity.preferNotToSayRadioOption,
+      button: equalityAndDiversityAbilityToCarryOutActivity.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityPregnancy.mainHeader);
+    await performAction('selectEqualityAndDiversity', {
+      question: equalityAndDiversityPregnancy.mainHeader,
+      radioOption: equalityAndDiversityPregnancy.noRadioOption,
+      button: equalityAndDiversityPregnancy.ContinueButton,
+    });
+    await performValidation('mainHeader', equalityAndDiversityEnd.mainHeader);
+    await performAction('clickButton', equalityAndDiversityEnd.continueButton);
+
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction('clickButton', 'Close and return to case overview');
+    await performValidation('mainHeader', dashboard.mainHeader);
+  });
+
+  test('Your Support Request NOT Sent to Court Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @nightly', async () => {
+    //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
+    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
+    await performAction('validateRTCSectionCYA', 'startNowAndDetails');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performAction('inputDefendantDetails', {
+      fName: defendantNameCapture.firstNameTextInput,
+      lName: defendantNameCapture.lastNameTextInput,
+    });
+    await performAction('enterDateOfBirthDetails', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressKnown', {
+      radioOption: correspondenceAddress.noRadioOption,
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('selectContactPreferenceEmailOrPost', {
+      question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
+      radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
+      emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
+    });
+    await performAction('selectContactByTelephone', {
+      radioOption: contactPreferencesTelephone.yesRadioOption,
+      phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
+    });
+    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('retrieveCYATableDataRTC', 'personalDetails');
+    await performAction('validateRTCSectionCYA', 'personalDetails');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction('disputeClaimInterstitial', submitCaseApiDataWales.submitCasePayload.isClaimantNameCorrect);
+    await performAction('exemptLandLord', exemptLandLord.yesRadioOption);
+    await performValidation('mainHeader', writtenTerms.mainHeader);
+    await performAction('selectWrittenTerms', {
+      question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
+      radioOption: writtenTerms.noRadioOption,
+    });
+    await performAction('tenancyOrContractTypeDetails', {
+      tenancyType: submitCaseApiDataWales.submitCasePayload.occupationLicenceTypeWales,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
+    await performAction('selectTenancyStartDateKnown', {
+      option: tenancyDateDetails.noRadioOption,
+      day: '01',
+      month: '12',
+      year: '2025',
+    });
+    await performAction('selectNoticeDetails', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnown');
+    await performAction('rentArrears', {
+      option: rentArrears.yesRadioOption,
+    });
+    await performAction('disputingOtherPartsOfTheClaim', {
+      disputeOption: nonRentArrearsDispute.noRadioOption,
+    });
+    await performAction('selectCounterClaim', {
+      option: counterClaim.yesRadioOption,
+    });
+    await performAction('selectWhatAreYouClaimingFor', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoney', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.yesRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+    await performAction('selectCounterClaimFee', {
+      radioOption: counterClaimFee.iNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+      amount: counterClaimSpecificSumOfMoney.claimInput,
+    });
+    await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
+      feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
+    });
+    await performAction('counterClaimAbout', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('doYouWantToUploadFiles', {
+      option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
+    });
+    await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
+    await performAction('readPaymentInterstitial');
+    await performAction('repaymentsMade', {
+      question: repaymentsMade.getmainHeader(claimantName),
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentsAgreed', {
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performAction('installmentPayments', {
+      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
+      radioOption: installmentPayments.noRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', 'payments');
+    await performAction('validateRTCSectionCYA', 'payments');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('readYourHouseholdAndCircumstances');
+    await performAction('doYouHaveAnyDependantChildren', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('doYouHaveAnyOtherDependants', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performAction('selectIfAnyOtherAdultsLiveInYourHouse', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.yesRadioOption,
+      details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
+    });
+    await performAction('selectAlternativeAccommodation', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.iamNotSureRadioOption,
+    });
+    await performAction('yourCircumstances', {
+      question: yourCircumstances.mainHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('exceptionalHardship', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', 'situationAndCircumstances');
+    await performAction('validateRTCSectionCYA', 'situationAndCircumstances');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performAction('selectIncomeAndExpenses', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoYouReceive');
+    await performAction('selectUniversalCredit', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
+    });
+    await performAction('selectPriorityDebts', {
+      question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetails', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
+    await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
+    await performAction('selectWhatOtherRegularExpensesDoYouHave', {
+      regularIncomeOptions: [
+        [
+          whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
+        ],
+      ],
+    });
+    await performAction('otherConsiderations', {
+      question: otherConsiderations.mainHeader,
+      option: otherConsiderations.yesRadioOption,
+      courtInfo: otherConsiderations.detailsTextInput,
+    });
+    await performAction('retrieveCYATableDataRTC', 'incomeAndExpenditure');
+    await performAction('validateRTCSectionCYA', 'incomeAndExpenditure');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+    await performAction('uploadFiles');
+    await performAction('retrieveCYATableDataRTC', 'uploadFiles');
+    await performAction('validateRTCSectionCYA', 'uploadFiles');
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskListStatus', {
+      subSecArray: [
+        taskList.readInformationAboutLink,
+        taskList.respondToSpecificPartsOfClaimantsClaimLink,
+        taskList.incomeAndExpensesLink,
+        taskList.uploadDocumentsLink,
+        taskList.confirmDetailsLink,
+      ],
+      status: 'Done',
+    });
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
+    await performAction('selectReasonableAdjustments', {
+      header: physicalMentalOrLearningDisability.mainHeader,
+      options: [
+        physicalMentalOrLearningDisability.bringSupportCheckbox,
+        physicalMentalOrLearningDisability.askCertainTypeOfHearingCheckbox,
+      ],
+      button: physicalMentalOrLearningDisability.continueButton,
+    });
+    await performAction('selectReasonableAdjustments', {
+      header: bringSupportToCourtHearing.mainHeader,
+      options: [bringSupportToCourtHearing.noSupportToBringWithMeCheckbox],
+      button: bringSupportToCourtHearing.continueButton,
+    });
+    await performAction('selectReasonableAdjustments', {
+      header: requestCertainTypeOfHearing.mainHeader,
+      options: [requestCertainTypeOfHearing.noCertainTypeOfHearingCheckbox],
+      button: requestCertainTypeOfHearing.continueButton,
+    });
+    await performValidation('mainHeader', reviewSupport.mainHeader);
+    await performAction('clickButton', reviewSupport.submitButton);
+    await performValidation('mainHeader', supportRequestNotSent.mainHeader);
+    await performAction('clickButton', supportRequestNotSent.continueButton);
+    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
+    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
+    await performAction('languageUsed', {
+      question: languageUsed.mainHeader,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC');
+    await performAction('selectStatementOfTruthRTC', {
+      options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
+      input: checkYourAnswersRTC.yourFullNameTextInput,
+    });
+    await performAction('clickButton', 'Close and return to case overview');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 });
