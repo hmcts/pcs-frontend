@@ -8,7 +8,7 @@ function field(form: HTMLFormElement, name: string): string {
 }
 
 function selected(form: HTMLFormElement, name: string, value: string): boolean {
-  return new FormData(form).getAll(name).some(entry => entry === value);
+  return new FormData(form).getAll(name).includes(value);
 }
 
 function date(form: HTMLFormElement, prefix: string): string {
