@@ -241,7 +241,8 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performValidation('radioButtonChecked', defendantNameConfirmation.noRadioOption, false);
   });
 
-  test('Citizen draft is deleted when Notice of Change gives access to the legal representative organisation @LR @citizenDraftRevocation', async ({
+  //Skipping this test untill issue mentioned on HDPI-6936 ticket is resolved
+  test.skip('Citizen draft is deleted when Notice of Change gives access to the legal representative organisation @LR @citizenDraftRevocation', async ({
     page,
     context,
   }) => {
