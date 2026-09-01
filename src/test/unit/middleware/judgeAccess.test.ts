@@ -16,7 +16,7 @@ describe('judgeAccessMiddleware', () => {
   });
 
   it('allows judge users through', () => {
-    const req = { session: { user: { roles: ['Caseworker-PCS-Judge'] } } } as unknown as Request;
+    const req = { session: { user: { roles: ['Caseworker-Civil-Judge'] } } } as unknown as Request;
 
     judgeAccessMiddleware(req, res as Response, next);
 

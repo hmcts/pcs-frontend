@@ -106,7 +106,7 @@ describe('make order route', () => {
       {
         params: { caseReference: '1777027600017760' },
         query: {},
-        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        session: { user: { accessToken: 'token', roles: ['caseworker-civil-judge'] } },
       } as unknown as Request,
       res,
       next
@@ -167,7 +167,7 @@ describe('make order route', () => {
       {
         params: { caseReference: '1777027600017760' },
         query: {},
-        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        session: { user: { accessToken: 'token', roles: ['caseworker-civil-judge'] } },
       } as unknown as Request,
       res,
       jest.fn()
@@ -205,7 +205,7 @@ describe('make order route', () => {
       {
         params: { caseReference: '1777027600017760' },
         query: { expected_sub: 'xui-user' },
-        session: { user: { accessToken: 'token', sub: 'different-user', roles: ['caseworker-pcs-judge'] } },
+        session: { user: { accessToken: 'token', sub: 'different-user', roles: ['caseworker-civil-judge'] } },
       } as unknown as Request,
       {} as Response,
       next
@@ -272,7 +272,7 @@ describe('make order route', () => {
       {
         params: { caseReference: '1777027600017760' },
         originalUrl: '//malicious.example',
-        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        session: { user: { accessToken: 'token', roles: ['caseworker-civil-judge'] } },
         body: { action: 'START_DRAFT' },
       } as unknown as Request,
       res,
@@ -295,7 +295,7 @@ describe('make order route', () => {
       {
         params: { caseReference: '1777027600017760' },
         originalUrl: '/case/1777027600017760/make-order',
-        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        session: { user: { accessToken: 'token', roles: ['caseworker-civil-judge'] } },
         body: {
           _csrf: 'csrf',
           action: 'SAVE_DRAFT',
@@ -346,7 +346,7 @@ describe('make order route', () => {
       {
         params: { caseReference: '1777027600017760' },
         originalUrl: '/case/1777027600017760/make-order',
-        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        session: { user: { accessToken: 'token', roles: ['caseworker-civil-judge'] } },
         body: {
           _csrf: 'csrf',
           action: 'SUBMIT_FOR_REVIEW',
