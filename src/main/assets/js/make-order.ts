@@ -40,6 +40,32 @@ function money(value: string): string {
     : '[amount not provided]';
 }
 
+export function initDatePills(form: HTMLFormElement): void {
+  form.addEventListener('click', event => {
+    const pill =
+      event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-date-pill-days]') : null;
+    const dateControl = pill?.closest<HTMLElement>('.pcs-date-with-pills');
+    const days = Number(pill?.dataset.datePillDays);
+    if (!pill || !dateControl || !Number.isInteger(days)) {
+      return;
+    }
+
+    const day = dateControl.querySelector<HTMLInputElement>('input[name$="-day"]');
+    const month = dateControl.querySelector<HTMLInputElement>('input[name$="-month"]');
+    const year = dateControl.querySelector<HTMLInputElement>('input[name$="-year"]');
+    if (!day || !month || !year) {
+      return;
+    }
+
+    const value = new Date();
+    value.setDate(value.getDate() + days);
+    day.value = String(value.getDate()).padStart(2, '0');
+    month.value = String(value.getMonth() + 1).padStart(2, '0');
+    year.value = String(value.getFullYear());
+    day.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+}
+
 function attendanceParagraphs(form: HTMLFormElement): { id: string; text: string }[] {
   const heard: string[] = [];
   const paragraphs: { id: string; text: string }[] = [];
@@ -206,13 +232,17 @@ function buildOutrightOrder(form: HTMLFormElement) {
 
 export function initMakeOrder(): void {
   const form = document.querySelector<HTMLFormElement>('#make-order-form');
+  if (!form) {
+    return;
+  }
+  initDatePills(form);
   const mount = document.querySelector<HTMLElement>('#order-editor');
   const documentField = document.querySelector<HTMLTextAreaElement>('#order-document');
   const orderTypeField = document.querySelector<HTMLInputElement>('#order-type');
   const editorRegion = document.querySelector<HTMLElement>('#order-preview-editor');
   const unavailable = document.querySelector<HTMLElement>('#order-preview-unavailable');
   const submit = document.querySelector<HTMLButtonElement>('#submit-order-for-review');
-  if (!form || !mount || !documentField || !orderTypeField || !editorRegion || !unavailable || !submit) {
+  if (!mount || !documentField || !orderTypeField || !editorRegion || !unavailable || !submit) {
     return;
   }
 

@@ -1,12 +1,12 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% import "make-order/_date-input.njk" as dateInput %}
 {% import "make-order/_payment-frequencies.njk" as options %}
 
 <h3 class="govuk-heading-m">Suspended possession</h3>
 
-{{ govukDateInput({
+{{ dateInput.withPills({
   id: "suspended-by-date",
   namePrefix: "suspended-by-date",
   items: draftDate("suspended-by-date"),
@@ -46,7 +46,7 @@
           value: draftValue("suspended-oneoff-amount"),
           inputmode: "numeric",
           prefix: { text: "£" }
-        }) + govukDateInput({
+        }) + dateInput.withPills({
           id: "suspended-oneoff-date",
           namePrefix: "suspended-oneoff-date",
           items: draftDate("suspended-oneoff-date"),
@@ -73,7 +73,7 @@
           name: "suspended-instalment-frequency",
           label: { text: "How often" },
           items: draftSelect(options.paymentFrequencies, "suspended-instalment-frequency")
-        }) + govukDateInput({
+        }) + dateInput.withPills({
           id: "suspended-instalment-date",
           namePrefix: "suspended-instalment-date",
           items: draftDate("suspended-instalment-date"),
@@ -120,7 +120,7 @@
           value: draftValue("suspended-use-occupation-rate"),
           inputmode: "decimal",
           prefix: { text: "£" }
-        }) + govukDateInput({
+        }) + dateInput.withPills({
           id: "suspended-use-occupation-from-date",
           namePrefix: "suspended-use-occupation-from-date",
           items: draftDate("suspended-use-occupation-from-date"),

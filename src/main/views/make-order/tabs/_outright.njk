@@ -1,8 +1,8 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% import "make-order/_date-input.njk" as dateInput %}
 {% import "make-order/_payment-frequencies.njk" as options %}
 
 <h3 class="govuk-heading-m">Outright possession</h3>
@@ -18,7 +18,7 @@
       text: "Possession on or before",
       checked: draftChecked("outright-possession", "by"),
       conditional: {
-        html: govukDateInput({
+        html: dateInput.withPills({
           id: "outright-by-date",
           namePrefix: "outright-by-date",
           items: draftDate("outright-by-date"),
@@ -96,12 +96,12 @@
             value: draftValue("outright-mj-lump-amount"),
             inputmode: "numeric",
             prefix: { text: "£" }
-          }) + govukDateInput({
+          }) + dateInput.withPills({
             id: "outright-mj-lump-date",
             namePrefix: "outright-mj-lump-date",
             items: draftDate("outright-mj-lump-date"),
             fieldset: { legend: { text: "To be paid by", classes: "govuk-fieldset__legend--s" } }
-          }) + govukDateInput({
+          }) + dateInput.withPills({
             id: "outright-mj-balance-date",
             namePrefix: "outright-mj-balance-date",
             items: draftDate("outright-mj-balance-date"),
@@ -128,7 +128,7 @@
             name: "outright-mj-inst-freq",
             label: { text: "How often" },
             items: draftSelect(options.paymentFrequencies, "outright-mj-inst-freq")
-          }) + govukDateInput({
+          }) + dateInput.withPills({
             id: "outright-mj-inst-date",
             namePrefix: "outright-mj-inst-date",
             items: draftDate("outright-mj-inst-date"),
@@ -165,7 +165,7 @@
           value: draftValue("outright-use-occupation-rate"),
           inputmode: "decimal",
           prefix: { text: "£" }
-        }) + govukDateInput({
+        }) + dateInput.withPills({
           id: "outright-use-occupation-from-date",
           namePrefix: "outright-use-occupation-from-date",
           items: draftDate("outright-use-occupation-from-date"),

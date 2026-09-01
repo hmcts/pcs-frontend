@@ -1,8 +1,8 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% import "make-order/_date-input.njk" as dateInput %}
 {% import "make-order/_payment-frequencies.njk" as options %}
 
 <h3 class="govuk-heading-m">Adjournment</h3>
@@ -35,7 +35,7 @@
     ]
   }) }}
 
-  {{ govukDateInput({
+  {{ dateInput.withPills({
     id: "adj-hearing-date",
     namePrefix: "adj-hearing-date",
     items: draftDate("adj-hearing-date"),
@@ -89,7 +89,7 @@
         text: "The defendant must send a defence",
         checked: draftChecked("adj-directions", "defence"),
         conditional: {
-          html: govukDateInput({
+          html: dateInput.withPills({
             id: "adj-defence-date",
             namePrefix: "adj-defence-date",
             items: draftDate("adj-defence-date"),
@@ -102,7 +102,7 @@
         text: "The defendant must send a defence and any counterclaim",
         checked: draftChecked("adj-directions", "counterclaim"),
         conditional: {
-          html: govukDateInput({
+          html: dateInput.withPills({
             id: "adj-counterclaim-date",
             namePrefix: "adj-counterclaim-date",
             items: draftDate("adj-counterclaim-date"),
@@ -115,7 +115,7 @@
         text: "The claimant must send a defence to the counterclaim and any reply",
         checked: draftChecked("adj-directions", "claimant-reply"),
         conditional: {
-          html: govukDateInput({
+          html: dateInput.withPills({
             id: "adj-claimant-reply-date",
             namePrefix: "adj-claimant-reply-date",
             items: draftDate("adj-claimant-reply-date"),
@@ -153,7 +153,7 @@
             name: "adj-gen-current-rent-plus-frequency",
             label: { text: "How often" },
             items: draftSelect(options.paymentFrequencies, "adj-gen-current-rent-plus-frequency")
-          }) + govukDateInput({
+          }) + dateInput.withPills({
             id: "adj-gen-current-rent-plus-date",
             namePrefix: "adj-gen-current-rent-plus-date",
             items: draftDate("adj-gen-current-rent-plus-date"),
@@ -180,7 +180,7 @@
             name: "adj-gen-payments-frequency",
             label: { text: "How often" },
             items: draftSelect(options.paymentFrequencies, "adj-gen-payments-frequency")
-          }) + govukDateInput({
+          }) + dateInput.withPills({
             id: "adj-gen-payments-date",
             namePrefix: "adj-gen-payments-date",
             items: draftDate("adj-gen-payments-date"),
@@ -202,7 +202,7 @@
             value: draftValue("adj-gen-oneoff-amount"),
             inputmode: "numeric",
             prefix: { text: "£" }
-          }) + govukDateInput({
+          }) + dateInput.withPills({
             id: "adj-gen-oneoff-date",
             namePrefix: "adj-gen-oneoff-date",
             items: draftDate("adj-gen-oneoff-date"),
@@ -215,7 +215,7 @@
         text: "Automatically struck out unless an application to restore is made",
         checked: draftChecked("adj-gen", "restore"),
         conditional: {
-          html: govukDateInput({
+          html: dateInput.withPills({
             id: "adj-gen-restore-date",
             namePrefix: "adj-gen-restore-date",
             items: draftDate("adj-gen-restore-date"),

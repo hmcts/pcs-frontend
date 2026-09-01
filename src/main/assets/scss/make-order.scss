@@ -160,6 +160,58 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   }
 }
 
+// Quick-fill helpers set their linked date to today plus the selected number of days.
+.pcs-date-with-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: govuk-spacing(2) govuk-spacing(4);
+  margin-bottom: govuk-spacing(6);
+
+  > .govuk-form-group {
+    margin-bottom: 0;
+  }
+}
+
+.pcs-inline-fields > .pcs-date-with-pills {
+  margin-bottom: 0;
+}
+
+.pcs-date-pills {
+  display: flex;
+  align-items: center;
+  gap: govuk-spacing(2);
+  padding-bottom: 2px;
+}
+
+.pcs-date-pill {
+  @include govuk-font($size: 16);
+
+  padding: govuk-spacing(1) govuk-spacing(3);
+  border: 2px solid $govuk-border-colour;
+  border-radius: 18px;
+  color: $govuk-text-colour;
+  background: govuk-colour('white');
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: govuk-colour('black', $variant: 'tint-95');
+  }
+
+  &:active {
+    border-color: $govuk-link-colour;
+    color: govuk-colour('white');
+    background: $govuk-link-colour;
+  }
+
+  &:focus {
+    outline: 3px solid $govuk-focus-colour;
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px;
+  }
+}
+
 // Present each party, attendance choice and representative name on one row.
 .pcs-attendance__row {
   display: grid;
