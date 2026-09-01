@@ -127,7 +127,7 @@ function caseFactsToFormData(caseFacts?: MakeOrderCaseFacts): Record<string, unk
     }
   };
   const addValue = (name: string, value: unknown): void => {
-    if (value !== undefined && value !== null) {
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
       formData[name] = String(value);
     }
   };
@@ -167,7 +167,7 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
   const draftPayload = envelope.order.draftPayload ?? emptyDraftPayload();
   const draft = {
     ...caseFactsToFormData(envelope.caseContext.caseFacts),
-    ...(draftPayload.formData ?? {}),
+    ...draftPayload.formData,
   };
   const draftValue = (name: string): unknown => draft[name];
   const draftChecked = (name: string, value: string): boolean => {
@@ -214,7 +214,8 @@ export default function makeOrderRoutes(app: Application): void {
 
       try {
         const expectedSub = typeof req.query.expected_sub === 'string' ? req.query.expected_sub : undefined;
-        const signedInUserId = String(user.uid ?? user.id ?? user.sub);
+        const userId = user.uid ?? user.id ?? user.sub;
+        const signedInUserId = typeof userId === 'string' ? userId : undefined;
         if (expectedSub && expectedSub !== signedInUserId) {
           throw new HTTPError('The signed-in user does not match the XUI session', 403);
         }
@@ -243,11 +244,15 @@ export default function makeOrderRoutes(app: Application): void {
         return next(new HTTPError('Invalid case reference format', 404));
       }
       const makeOrderUrl = MAKE_ORDER_ROUTE.replace(':caseReference', caseReference);
-      const { _csrf, action, orderId, orderVersion, orderType, orderDocument, ...formData } = req.body as Record<
-        string,
-        unknown
-      >;
-      void _csrf;
+      const {
+        _csrf: _ignoredCsrf,
+        action,
+        orderId,
+        orderVersion,
+        orderType,
+        orderDocument,
+        ...formData
+      } = req.body as Record<string, unknown>;
 
       try {
         const orderAction = action ?? 'START_DRAFT';
