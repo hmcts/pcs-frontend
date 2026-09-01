@@ -15,6 +15,15 @@ jest.mock('@hmcts-cft/cft-ui-component-lib', () => ({
   buildFooterModel: jest.fn(() => ({ footer: true })),
 }));
 
+jest.mock('config', () => ({
+  get: jest.fn((key: string) => {
+    if (key === 'redirects.manageCaseReturnURL') {
+      return 'https://manage-case.example.com/cases/case-details/';
+    }
+    return '';
+  }),
+}));
+
 jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
     getCaseByIdForEvent: jest.fn(),
@@ -27,7 +36,12 @@ const makeOrderEnvelope = {
     id: 'e4414c3c-8de8-40b1-92cb-8b15858406af',
     state: 'DRAFT',
     version: 2,
-    draftPayload: { 'hearing-notes': 'Saved note' },
+    draftPayload: {
+      version: 1,
+      orderType: 'OUTRIGHT_POSSESSION',
+      fields: { 'hearing-notes': 'Saved note' },
+      documents: {},
+    },
   },
   caseContext: {
     caseReference: 1777027600017760,
@@ -122,6 +136,7 @@ describe('make order route', () => {
           action: 'SAVE_DRAFT',
           orderId: makeOrderEnvelope.order.id,
           orderVersion: '2',
+          orderType: 'OUTRIGHT_POSSESSION',
           'hearing-notes': 'Updated note',
         },
       } as unknown as Request,
@@ -135,10 +150,67 @@ describe('make order route', () => {
         order: {
           id: makeOrderEnvelope.order.id,
           version: 2,
-          draftPayload: { 'hearing-notes': 'Updated note' },
+          draftPayload: {
+            version: 1,
+            orderType: 'OUTRIGHT_POSSESSION',
+            fields: { 'hearing-notes': 'Updated note' },
+            documents: {},
+          },
         },
       }),
     });
     expect(res.redirect).toHaveBeenCalledWith('/case/1777027600017760/make-order?saved=true');
+  });
+
+  it('submits an outright possession document for review and returns to Manage Case', async () => {
+    makeOrderRoute(app);
+    const handler = (app.post as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const orderDocument = {
+      schema: 'docweave-document',
+      version: 1,
+      current: { type: 'doc', content: [] },
+      generated: { type: 'doc', content: [] },
+    };
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        originalUrl: '/case/1777027600017760/make-order',
+        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        body: {
+          _csrf: 'csrf',
+          action: 'SUBMIT_FOR_REVIEW',
+          orderId: makeOrderEnvelope.order.id,
+          orderVersion: '2',
+          orderType: 'OUTRIGHT_POSSESSION',
+          orderDocument: JSON.stringify(orderDocument),
+          'hearing-notes': 'Final note',
+        },
+      } as unknown as Request,
+      res,
+      jest.fn()
+    );
+
+    expect(ccdCaseService.submitCaseEvent).toHaveBeenCalledWith('token', '1777027600017760', 'ext:makeOrder', {
+      makeOrderPayload: JSON.stringify({
+        action: 'SUBMIT_FOR_REVIEW',
+        order: {
+          id: makeOrderEnvelope.order.id,
+          version: 2,
+          draftPayload: {
+            version: 1,
+            orderType: 'OUTRIGHT_POSSESSION',
+            fields: { 'hearing-notes': 'Final note' },
+            documents: { OUTRIGHT_POSSESSION: orderDocument },
+          },
+        },
+      }),
+    });
+    expect(res.redirect).toHaveBeenCalledWith('https://manage-case.example.com/cases/case-details/1777027600017760');
   });
 });

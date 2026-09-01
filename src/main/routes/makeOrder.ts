@@ -1,4 +1,5 @@
 import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
+import type { OrderEditorDocument } from '@hmcts-cft/docweave';
 import config from 'config';
 import { Application, NextFunction, Request, Response } from 'express';
 
@@ -7,6 +8,7 @@ import { MAKE_ORDER_ROUTE } from '../constants/caseRoutes';
 import { judgeAccessMiddleware, oidcMiddleware } from '../middleware';
 import { getUserRoles } from '../steps/utils';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
+import { buildManageCaseDetailsRedirect } from '../utils/manageCaseRedirect';
 
 import { ccdCaseService } from '@services/ccdCaseService';
 
@@ -18,13 +20,23 @@ interface MakeOrderParty {
   name: string;
 }
 
+type MakeOrderType =
+  'OUTRIGHT_POSSESSION' | 'SUSPENDED_POSSESSION' | 'ADJOURNMENT' | 'STRIKE_OUT_DISMISSAL' | 'FREE_FORM';
+
+interface MakeOrderDraftPayload {
+  version: 1;
+  orderType: MakeOrderType;
+  fields: Record<string, unknown>;
+  documents: Partial<Record<MakeOrderType, OrderEditorDocument>>;
+}
+
 interface MakeOrderEnvelope {
   action?: 'START_DRAFT' | 'SAVE_DRAFT' | 'SUBMIT_FOR_REVIEW';
   order: {
     id?: string;
     state: 'DRAFT' | 'SUBMITTED_FOR_REVIEW' | 'ISSUED';
     version: number;
-    draftPayload: Record<string, unknown>;
+    draftPayload: MakeOrderDraftPayload;
   };
   caseContext: {
     caseReference: number;
@@ -32,6 +44,10 @@ interface MakeOrderEnvelope {
     claimants: MakeOrderParty[];
     defendants: MakeOrderParty[];
   };
+}
+
+function emptyDraftPayload(): MakeOrderDraftPayload {
+  return { version: 1, orderType: 'OUTRIGHT_POSSESSION', fields: {}, documents: {} };
 }
 
 function parseEnvelope(payload: unknown): MakeOrderEnvelope {
@@ -58,7 +74,7 @@ async function startDraftIfRequired(accessToken: string, caseReference: string):
       order: {
         id: null,
         version: 0,
-        draftPayload: {},
+        draftPayload: emptyDraftPayload(),
       },
     }),
   });
@@ -68,14 +84,15 @@ function formatAddress(address?: Record<string, string | undefined>): string {
   if (!address) {
     return '';
   }
+  const field = (camelCase: string, ccdCase: string): string | undefined => address[camelCase] ?? address[ccdCase];
   return [
-    address.addressLine1,
-    address.addressLine2,
-    address.addressLine3,
-    address.postTown,
-    address.county,
-    address.postCode,
-    address.country,
+    field('addressLine1', 'AddressLine1'),
+    field('addressLine2', 'AddressLine2'),
+    field('addressLine3', 'AddressLine3'),
+    field('postTown', 'PostTown'),
+    field('county', 'County'),
+    field('postCode', 'PostCode'),
+    field('country', 'Country'),
   ]
     .filter(Boolean)
     .join(', ');
@@ -103,7 +120,8 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
     user: { roles },
   });
   headerModel.assetsPath = '/assets/ui-component-lib';
-  const draft = envelope.order.draftPayload ?? {};
+  const draftPayload = envelope.order.draftPayload ?? emptyDraftPayload();
+  const draft = draftPayload.fields ?? {};
   const draftValue = (name: string): unknown => draft[name];
   const draftChecked = (name: string, value: string): boolean => {
     const savedValue = draft[name];
@@ -119,6 +137,8 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
     footerModel: buildFooterModel(),
     order: envelope.order,
     draft,
+    draftOrderType: draftPayload.orderType,
+    orderDocumentJson: JSON.stringify(draftPayload.documents?.OUTRIGHT_POSSESSION ?? null),
     draftValue,
     draftChecked,
     draftDate,
@@ -166,7 +186,10 @@ export default function makeOrderRoutes(app: Application): void {
       }
 
       const caseReference = req.params.caseReference as string;
-      const { _csrf, action, orderId, orderVersion, ...draftPayload } = req.body as Record<string, unknown>;
+      const { _csrf, action, orderId, orderVersion, orderType, orderDocument, ...fields } = req.body as Record<
+        string,
+        unknown
+      >;
       void _csrf;
 
       try {
@@ -175,19 +198,45 @@ export default function makeOrderRoutes(app: Application): void {
           await startDraftIfRequired(accessToken, caseReference);
           return res.redirect(req.originalUrl.split('?')[0]);
         }
+        const selectedOrderType = orderType as MakeOrderType;
+        if (orderAction === 'SUBMIT_FOR_REVIEW' && selectedOrderType !== 'OUTRIGHT_POSSESSION') {
+          throw new HTTPError('Only outright possession orders can be submitted for review', 400);
+        }
+        let outrightDocument: OrderEditorDocument | undefined;
+        if (typeof orderDocument === 'string' && orderDocument) {
+          try {
+            outrightDocument = JSON.parse(orderDocument) as OrderEditorDocument;
+          } catch {
+            throw new HTTPError('The order document is not valid JSON', 400);
+          }
+        }
+        const draftPayload: MakeOrderDraftPayload = {
+          version: 1,
+          orderType: selectedOrderType,
+          fields,
+          documents: outrightDocument ? { OUTRIGHT_POSSESSION: outrightDocument } : {},
+        };
         await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, {
           makeOrderPayload: JSON.stringify({
             action: orderAction,
             order: {
               id: orderId || null,
               version: Number(orderVersion),
-              draftPayload: orderAction === 'START_DRAFT' ? {} : draftPayload,
+              draftPayload,
             },
           }),
         });
-        const outcome =
-          orderAction === 'SUBMIT_FOR_REVIEW' ? '?submitted=true' : orderAction === 'SAVE_DRAFT' ? '?saved=true' : '';
-        return res.redirect(`${req.originalUrl.split('?')[0]}${outcome}`);
+        if (orderAction === 'SUBMIT_FOR_REVIEW') {
+          const manageCaseUrl = buildManageCaseDetailsRedirect(
+            config.get<string>('redirects.manageCaseReturnURL'),
+            caseReference
+          );
+          if (!manageCaseUrl) {
+            throw new HTTPError('The Manage Case return URL is not configured', 500);
+          }
+          return res.redirect(manageCaseUrl);
+        }
+        return res.redirect(`${req.originalUrl.split('?')[0]}?saved=true`);
       } catch (error) {
         return next(error);
       }

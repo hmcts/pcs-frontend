@@ -37,9 +37,13 @@
     {{ govukNotificationBanner({ type: "success", text: "Order sent to a caseworker for review" }) }}
   {% endif %}
 
-  <form method="post" novalidate>
+  <form method="post" novalidate id="make-order-form"
+        data-property-address="{{ propertyAddressDisplay }}"
+        data-claimants="{{ claimantNames }}"
+        data-defendants="{{ defendantNames }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
+  <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
   {{ csrfProtection(csrfToken) }}
 
   {% include "make-order/_case-summary.njk" %}
@@ -51,11 +55,11 @@
 
   {# One list drives both the tabs and their panels. #}
   {% set orderTypeTabs = [
-    { id: "tab-outright", label: "Outright possession", template: "make-order/tabs/_outright.njk" },
-    { id: "tab-suspended", label: "Suspended possession", template: "make-order/tabs/_suspended.njk" },
-    { id: "tab-adjournment", label: "Adjournment", template: "make-order/tabs/_adjournment.njk" },
-    { id: "tab-strike-out", label: "Strike out/dismiss", template: "make-order/tabs/_strike-out.njk" },
-    { id: "tab-free-form", label: "Free form", template: "make-order/tabs/_free-form.njk" }
+    { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk" },
+    { id: "tab-suspended", type: "SUSPENDED_POSSESSION", label: "Suspended possession", template: "make-order/tabs/_suspended.njk" },
+    { id: "tab-adjournment", type: "ADJOURNMENT", label: "Adjournment", template: "make-order/tabs/_adjournment.njk" },
+    { id: "tab-strike-out", type: "STRIKE_OUT_DISMISSAL", label: "Strike out/dismiss", template: "make-order/tabs/_strike-out.njk" },
+    { id: "tab-free-form", type: "FREE_FORM", label: "Free form", template: "make-order/tabs/_free-form.njk" }
   ] %}
 
   {# The macro hardcodes an h2 tab-list heading, so use its markup directly to preserve heading order. #}
@@ -64,15 +68,15 @@
 
     <ul class="govuk-tabs__list">
       {% for tab in orderTypeTabs %}
-        <li class="govuk-tabs__list-item {%- if loop.first %} govuk-tabs__list-item--selected{% endif %}">
-          <a class="govuk-tabs__tab" href="#{{ tab.id }}">{{ tab.label }}</a>
+        <li class="govuk-tabs__list-item {%- if tab.type == draftOrderType %} govuk-tabs__list-item--selected{% endif %}">
+          <a class="govuk-tabs__tab" href="#{{ tab.id }}" data-order-type="{{ tab.type }}">{{ tab.label }}</a>
         </li>
       {% endfor %}
     </ul>
 
     {# govuk-frontend expects every panel after the first to start hidden. #}
     {% for tab in orderTypeTabs %}
-      <div class="govuk-tabs__panel {%- if not loop.first %} govuk-tabs__panel--hidden{% endif %}" id="{{ tab.id }}">
+      <div class="govuk-tabs__panel {%- if tab.type != draftOrderType %} govuk-tabs__panel--hidden{% endif %}" id="{{ tab.id }}">
         {% include tab.template %}
       </div>
     {% endfor %}
@@ -83,7 +87,13 @@
   {% include "make-order/_staff-message.njk" %}
 
   <div class="govuk-button-group govuk-!-margin-top-6">
-    {{ govukButton({ text: "Send order to caseworker for issue", name: "action", value: "SUBMIT_FOR_REVIEW" }) }}
+    {{ govukButton({
+      text: "Send order to caseworker for review",
+      name: "action",
+      value: "SUBMIT_FOR_REVIEW",
+      attributes: { id: "submit-order-for-review" },
+      disabled: draftOrderType != "OUTRIGHT_POSSESSION"
+    }) }}
     {{ govukButton({ text: "Save as draft", name: "action", value: "SAVE_DRAFT", classes: "govuk-button--secondary" }) }}
   </div>
   </form>
