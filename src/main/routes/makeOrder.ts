@@ -16,6 +16,7 @@ import { safeRedirect303 } from '@utils/safeRedirect';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
 const XUI_EVENT_ROUTE = '/cases/:caseReference/event/:eventId';
+const STUBBED_MAKE_ORDER_ROUTE = '/dev/make-order';
 
 interface MakeOrderParty {
   id: string;
@@ -61,6 +62,44 @@ interface MakeOrderEnvelope {
 
 function emptyDraftPayload(): MakeOrderDraftPayload {
   return { version: 1, orderType: 'OUTRIGHT_POSSESSION', formData: {}, documents: {} };
+}
+
+function stubbedMakeOrderEnvelope(formData: Record<string, unknown> = {}): MakeOrderEnvelope {
+  return {
+    order: {
+      id: 'local-make-order-draft',
+      state: 'DRAFT',
+      version: 1,
+      draftPayload: {
+        version: 1,
+        orderType: 'OUTRIGHT_POSSESSION',
+        formData: {
+          'outright-options': ['money-judgment'],
+          'outright-mj-sections': ['arrears', 'payment-plan'],
+          'outright-mj-plan': ['lump', 'instalments'],
+          'outright-mj-balance': 'yes',
+          'outright-mj-inst-freq': 'monthly',
+          ...formData,
+        },
+        documents: {},
+      },
+    },
+    caseContext: {
+      caseReference: 1777027600017760,
+      propertyAddress: { addressLine1: '10 Test Street', postTown: 'Bristol', postCode: 'BS1 1AA' },
+      claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
+      defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
+      caseFacts: {
+        tenancyStartDate: '2024-01-09',
+        tenancyType: 'Assured tenancy',
+        noticeDate: '2025-06-12',
+        currentRent: 750,
+        rentFrequency: 'Monthly',
+        groundsPleaded: 'Ground 8, Ground 10',
+        arrearsOnIssue: 2400,
+      },
+    },
+  };
 }
 
 function parseEnvelope(payload: unknown): MakeOrderEnvelope {
@@ -201,6 +240,15 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
 }
 
 export default function makeOrderRoutes(app: Application): void {
+  if (process.env.USE_STUBBED_DEPS === 'true') {
+    app.get(STUBBED_MAKE_ORDER_ROUTE, (req: Request, res: Response) =>
+      res.render('make-order', buildPageModel(req, stubbedMakeOrderEnvelope()))
+    );
+    app.post(STUBBED_MAKE_ORDER_ROUTE, (req: Request, res: Response) =>
+      res.render('make-order', buildPageModel(req, stubbedMakeOrderEnvelope(req.body as Record<string, unknown>)))
+    );
+  }
+
   app.get(
     MAKE_ORDER_ROUTE,
     oidcMiddleware,

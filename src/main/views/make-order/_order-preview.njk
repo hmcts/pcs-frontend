@@ -4,16 +4,6 @@
     Order preview is not available for this order type yet. You can still save it as a draft.
   </p>
   <div id="order-preview-editor"{% if draftOrderType != "OUTRIGHT_POSSESSION" %} hidden{% endif %}>
-    <div class="order-editor-toolbar" id="order-editor-toolbar" aria-label="Order editor formatting">
-      <button type="button" class="govuk-button govuk-button--secondary order-editor-toolbar__button" data-editor-command="undo" aria-label="Undo">&#8630;</button>
-      <button type="button" class="govuk-button govuk-button--secondary order-editor-toolbar__button" data-editor-command="redo" aria-label="Redo">&#8631;</button>
-      <span class="order-editor-toolbar__separator" aria-hidden="true"></span>
-      <button type="button" class="govuk-button govuk-button--secondary order-editor-toolbar__button" data-editor-command="bold" aria-label="Bold"><strong>B</strong></button>
-      <button type="button" class="govuk-button govuk-button--secondary order-editor-toolbar__button" data-editor-command="italic" aria-label="Italic"><em>I</em></button>
-      <button type="button" class="govuk-button govuk-button--secondary order-editor-toolbar__button" data-editor-command="numbered" aria-label="Numbered clause">1.</button>
-      <button type="button" class="govuk-button govuk-button--secondary order-editor-toolbar__button" data-editor-command="outdent" aria-label="Outdent paragraph">&#8592;</button>
-      <button type="button" class="govuk-button govuk-button--secondary order-editor-toolbar__button" data-editor-command="indent" aria-label="Indent paragraph">&#8594;</button>
-    </div>
     <div id="order-editor"></div>
   </div>
   <textarea hidden id="order-document" name="orderDocument">{{ orderDocumentJson }}</textarea>

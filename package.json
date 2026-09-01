@@ -16,6 +16,7 @@
     "createIdamUser": "./bin/dev/createIdamUser.sh",
     "start:watch": "yarn deps:up && nodemon --config nodemon.json",
     "start:watch:pcs-local": "USE_VAULT=false NODE_CONFIG_ENV=pcs-local yarn start:watch",
+    "start:watch:stubbed": "USE_VAULT=false NODE_CONFIG_ENV=pcs-local USE_STUBBED_DEPS=true yarn start:watch",
     "docker:dev": "docker compose up",
     "docker:dev:ssl": "COMMAND='yarn start:dev:ssl' docker compose up --build",
     "lint": "stylelint **/*.scss -v -q && eslint . --ext .js,.ts && prettier --check .",

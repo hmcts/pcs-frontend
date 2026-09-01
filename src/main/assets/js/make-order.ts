@@ -111,6 +111,8 @@ function buildOutrightOrder(form: HTMLFormElement) {
   const defendants = form.dataset.defendants || 'the defendant(s)';
   const options = new FormData(form).getAll('outright-options').map(String);
   const hasMoneyJudgment = options.includes('money-judgment');
+  const hasMoneyJudgmentArrears = hasMoneyJudgment && selected(form, 'outright-mj-sections', 'arrears');
+  const hasMoneyJudgmentPaymentPlan = hasMoneyJudgment && selected(form, 'outright-mj-sections', 'payment-plan');
 
   return buildOrder(order => {
     attendanceParagraphs(form).forEach(paragraph => order.paragraph(paragraph.id, paragraph.text));
@@ -141,7 +143,7 @@ function buildOutrightOrder(form: HTMLFormElement) {
           .generatedText('details', field(form, 'outright-grounds-details') || '[grounds not provided]')
           .text('.');
       });
-      if (hasMoneyJudgment) {
+      if (hasMoneyJudgmentArrears) {
         list.item('money-judgment', content => {
           const arrears = Number(field(form, 'outright-mj-arrears').split(',').join(''));
           const interestText = field(form, 'outright-mj-interest');
@@ -190,7 +192,7 @@ function buildOutrightOrder(form: HTMLFormElement) {
         list.item('costs', costs[choice] || '[costs order not provided]');
       }
       if (
-        hasMoneyJudgment &&
+        hasMoneyJudgmentPaymentPlan &&
         (selected(form, 'outright-mj-plan', 'lump') || selected(form, 'outright-mj-plan', 'instalments'))
       ) {
         list.item('payment-terms', content => {
@@ -201,7 +203,7 @@ function buildOutrightOrder(form: HTMLFormElement) {
               .generatedText('lump-amount', money(field(form, 'outright-mj-lump-amount')))
               .text(' by ')
               .generatedText('lump-date', date(form, 'outright-mj-lump-date'));
-            if (field(form, 'outright-mj-balance-date-day')) {
+            if (selected(form, 'outright-mj-balance', 'yes')) {
               content
                 .text(' and the balance by ')
                 .generatedText('balance-date', date(form, 'outright-mj-balance-date'));
@@ -254,7 +256,6 @@ export function initMakeOrder(): void {
   }
   const editor = createOrderEditor({
     mount,
-    toolbar: '#order-editor-toolbar',
     initialDocument,
     onChange: value => {
       documentField.value = JSON.stringify(value);

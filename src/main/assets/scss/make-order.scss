@@ -160,12 +160,19 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   }
 }
 
+// Align sentence fragments with their adjacent form controls in the compact order wording rows.
+.pcs-inline-copy {
+  margin-bottom: govuk-spacing(2);
+}
+
 // Quick-fill helpers set their linked date to today plus the selected number of days.
 .pcs-date-with-pills {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   gap: govuk-spacing(2) govuk-spacing(4);
+  width: fit-content;
+  max-width: 100%;
   margin-bottom: govuk-spacing(6);
 
   > .govuk-form-group {
@@ -181,6 +188,7 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   display: flex;
   align-items: center;
   gap: govuk-spacing(2);
+  margin-left: auto;
   padding-bottom: 2px;
 }
 
