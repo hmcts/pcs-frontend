@@ -18,15 +18,16 @@ const findSection = (id: string) => respondToClaimSections.find(section => secti
 
 describe('respond-to-claim sections config', () => {
   it('maps every sectioned flow step to exactly one section', () => {
-    // 'reasonable-adjustments-triage', 'equality-and-diversity-start'
-    // and 'equality-and-diversity-end' are intentionally parked out of the live
-    // section flow (see sections.config.ts). They remain in the registry so direct
-    // URL access and re-enablement still work, so marking them as intentionally
-    // unmapped here in addition to flowConfig.nonSectionStepOrder.
+    // Steps that intentionally belong to no section. 'equality-and-diversity-*' are parked out of
+    // the live flow pending their own work; the RA error/cancelled pages and 'email-confirmation'
+    // are orphans reached only by redirect. All remain in the registry so direct URL access still
+    // works, so they are exempted here in addition to flowConfig.nonSectionStepOrder.
+    //
+    // 'reasonable-adjustments-triage' is deliberately NOT exempt — it leads the
+    // checkYourAnswersAndSubmit section, and this assertion is what proves it stays mapped.
     const nonSectionStepSlugs = new Set([
       ...(flowConfig.nonSectionStepOrder ?? []),
       'email-confirmation',
-      'reasonable-adjustments-triage',
       'reasonable-adjustments-error',
       'reasonable-adjustments-cancelled',
       'equality-and-diversity-start',
