@@ -4,18 +4,21 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 
 {% set tenancyTypes = [
-  { value: "assured", text: "Assured" },
-  { value: "assured-shorthold", text: "Assured shorthold" },
-  { value: "regulated", text: "Regulated" },
-  { value: "secure", text: "Secure" },
-  { value: "other", text: "Other" }
+  { value: "ASSURED_TENANCY", text: "Assured tenancy" },
+  { value: "SECURE_TENANCY", text: "Secure tenancy" },
+  { value: "INTRODUCTORY_TENANCY", text: "Introductory tenancy" },
+  { value: "FLEXIBLE_TENANCY", text: "Flexible tenancy" },
+  { value: "DEMOTED_TENANCY", text: "Demoted tenancy" },
+  { value: "SECURE_CONTRACT", text: "Secure contract" },
+  { value: "STANDARD_CONTRACT", text: "Standard contract" },
+  { value: "OTHER", text: "Other" }
 ] %}
 
 {% set rentFrequencies = [
-  { value: "weekly", text: "Weekly" },
-  { value: "fortnightly", text: "Fortnightly" },
-  { value: "monthly", text: "Monthly" },
-  { value: "yearly", text: "Yearly" }
+  { value: "WEEKLY", text: "Weekly" },
+  { value: "FORTNIGHTLY", text: "Fortnightly" },
+  { value: "MONTHLY", text: "Monthly" },
+  { value: "OTHER", text: "Other" }
 ] %}
 
 <section class="pcs-case-facts" aria-labelledby="case-facts-heading">

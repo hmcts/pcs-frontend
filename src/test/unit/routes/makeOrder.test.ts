@@ -39,7 +39,7 @@ const makeOrderEnvelope = {
     draftPayload: {
       version: 1,
       orderType: 'OUTRIGHT_POSSESSION',
-      formData: { 'hearing-notes': 'Saved note' },
+      formData: { 'current-rent': '800', 'hearing-notes': 'Saved note' },
       documents: {},
     },
   },
@@ -48,6 +48,15 @@ const makeOrderEnvelope = {
     propertyAddress: { addressLine1: '10 Test Street', postTown: 'Bristol', postCode: 'BS1 1AA' },
     claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
     defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
+    caseFacts: {
+      tenancyStartDate: '2024-01-09',
+      tenancyType: 'ASSURED_TENANCY',
+      noticeDate: '2025-06-12',
+      currentRent: 750,
+      rentFrequency: 'MONTHLY',
+      groundsPleaded: 'Ground 8, Ground 10',
+      arrearsOnIssue: 2400,
+    },
   },
 };
 
@@ -111,7 +120,20 @@ describe('make order route', () => {
         propertyAddressDisplay: '10 Test Street, Bristol, BS1 1AA',
         claimantNames: 'Example Housing',
         defendantNames: 'Alex Example',
-        draft: { 'hearing-notes': 'Saved note' },
+        draft: {
+          'date-tenancy-day': '9',
+          'date-tenancy-month': '1',
+          'date-tenancy-year': '2024',
+          'tenancy-type': 'ASSURED_TENANCY',
+          'date-notice-day': '12',
+          'date-notice-month': '6',
+          'date-notice-year': '2025',
+          'current-rent': '800',
+          'rent-frequency': 'MONTHLY',
+          'grounds-pleaded': 'Ground 8, Ground 10',
+          'arrears-issue': '2400',
+          'hearing-notes': 'Saved note',
+        },
       })
     );
     expect(next).not.toHaveBeenCalled();

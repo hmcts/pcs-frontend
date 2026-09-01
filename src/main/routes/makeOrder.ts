@@ -20,6 +20,16 @@ interface MakeOrderParty {
   name: string;
 }
 
+interface MakeOrderCaseFacts {
+  tenancyStartDate?: string;
+  tenancyType?: string;
+  noticeDate?: string;
+  currentRent?: number | string;
+  rentFrequency?: string;
+  groundsPleaded?: string;
+  arrearsOnIssue?: number | string;
+}
+
 type MakeOrderType =
   'OUTRIGHT_POSSESSION' | 'SUSPENDED_POSSESSION' | 'ADJOURNMENT' | 'STRIKE_OUT_DISMISSAL' | 'FREE_FORM';
 
@@ -43,6 +53,7 @@ interface MakeOrderEnvelope {
     propertyAddress?: Record<string, string | undefined>;
     claimants: MakeOrderParty[];
     defendants: MakeOrderParty[];
+    caseFacts?: MakeOrderCaseFacts;
   };
 }
 
@@ -99,6 +110,36 @@ function formatAddress(address?: Record<string, string | undefined>): string {
     .join(', ');
 }
 
+function caseFactsToFormData(caseFacts?: MakeOrderCaseFacts): Record<string, unknown> {
+  if (!caseFacts) {
+    return {};
+  }
+
+  const formData: Record<string, unknown> = {};
+  const addDate = (prefix: string, value?: string): void => {
+    const match = value?.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (match) {
+      formData[`${prefix}-day`] = String(Number(match[3]));
+      formData[`${prefix}-month`] = String(Number(match[2]));
+      formData[`${prefix}-year`] = match[1];
+    }
+  };
+  const addValue = (name: string, value: unknown): void => {
+    if (value !== undefined && value !== null) {
+      formData[name] = String(value);
+    }
+  };
+
+  addDate('date-tenancy', caseFacts.tenancyStartDate);
+  addDate('date-notice', caseFacts.noticeDate);
+  addValue('tenancy-type', caseFacts.tenancyType);
+  addValue('current-rent', caseFacts.currentRent);
+  addValue('rent-frequency', caseFacts.rentFrequency);
+  addValue('grounds-pleaded', caseFacts.groundsPleaded);
+  addValue('arrears-issue', caseFacts.arrearsOnIssue);
+  return formData;
+}
+
 function buildAttendanceParties(envelope: MakeOrderEnvelope): { id: string; label: string; type: string }[] {
   return [
     ...envelope.caseContext.claimants.map((party, index) => ({
@@ -122,7 +163,10 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
   });
   headerModel.assetsPath = '/assets/ui-component-lib';
   const draftPayload = envelope.order.draftPayload ?? emptyDraftPayload();
-  const draft = draftPayload.formData ?? {};
+  const draft = {
+    ...caseFactsToFormData(envelope.caseContext.caseFacts),
+    ...(draftPayload.formData ?? {}),
+  };
   const draftValue = (name: string): unknown => draft[name];
   const draftChecked = (name: string, value: string): boolean => {
     const savedValue = draft[name];
