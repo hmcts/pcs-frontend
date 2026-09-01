@@ -233,9 +233,53 @@ describe('make order route', () => {
       jest.fn()
     );
 
-    expect(res.redirect).toHaveBeenCalledWith('/case/1777027600017760/make-order?expected_sub=user%2Bid');
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/1777027600017760/make-order?expected_sub=user%2Bid');
     expect(ccdCaseService.getCaseByIdForEvent).not.toHaveBeenCalled();
     expect(ccdCaseService.submitCaseEvent).not.toHaveBeenCalled();
+  });
+
+  it('rejects an invalid case reference on the XUI event route', () => {
+    makeOrderRoute(app);
+    const handler = (app.get as jest.Mock).mock.calls[1][1] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => void;
+    const next = jest.fn();
+
+    handler(
+      {
+        params: { caseReference: 'not-a-case-reference', eventId: 'ext:makeOrder' },
+        query: {},
+      } as unknown as Request,
+      {} as Response,
+      next
+    );
+
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 404 }));
+  });
+
+  it('uses the canonical local URL when starting a draft', async () => {
+    makeOrderRoute(app);
+    const handler = (app.post as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const res = { redirect: jest.fn() } as unknown as Response;
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        originalUrl: '//malicious.example',
+        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        body: { action: 'START_DRAFT' },
+      } as unknown as Request,
+      res,
+      jest.fn()
+    );
+
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/1777027600017760/make-order');
   });
 
   it('saves posted form data and returns to Manage Case', async () => {

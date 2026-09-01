@@ -11,6 +11,8 @@ import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 import { buildManageCaseDetailsRedirect } from '../utils/manageCaseRedirect';
 
 import { ccdCaseService } from '@services/ccdCaseService';
+import { sanitiseCaseReference } from '@utils/caseReference';
+import { safeRedirect303 } from '@utils/safeRedirect';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
 const XUI_EVENT_ROUTE = '/cases/:caseReference/event/:eventId';
@@ -236,7 +238,11 @@ export default function makeOrderRoutes(app: Application): void {
         return next(new HTTPError('Authentication required', 401));
       }
 
-      const caseReference = req.params.caseReference as string;
+      const caseReference = sanitiseCaseReference(req.params.caseReference as string);
+      if (!caseReference) {
+        return next(new HTTPError('Invalid case reference format', 404));
+      }
+      const makeOrderUrl = MAKE_ORDER_ROUTE.replace(':caseReference', caseReference);
       const { _csrf, action, orderId, orderVersion, orderType, orderDocument, ...formData } = req.body as Record<
         string,
         unknown
@@ -247,7 +253,7 @@ export default function makeOrderRoutes(app: Application): void {
         const orderAction = action ?? 'START_DRAFT';
         if (orderAction === 'START_DRAFT') {
           await loadOrStartDraft(accessToken, caseReference);
-          return res.redirect(req.originalUrl.split('?')[0]);
+          return safeRedirect303(res, makeOrderUrl, '/', ['/case/']);
         }
         const selectedOrderType = orderType as MakeOrderType;
         if (orderAction === 'SUBMIT_FOR_REVIEW' && selectedOrderType !== 'OUTRIGHT_POSSESSION') {
@@ -287,7 +293,7 @@ export default function makeOrderRoutes(app: Application): void {
           }
           return res.redirect(manageCaseUrl);
         }
-        return res.redirect(`${req.originalUrl.split('?')[0]}?saved=true`);
+        return safeRedirect303(res, `${makeOrderUrl}?saved=true`, '/', ['/case/']);
       } catch (error) {
         return next(error);
       }
@@ -300,9 +306,13 @@ export default function makeOrderRoutes(app: Application): void {
     }
 
     const expectedSub = typeof req.query.expected_sub === 'string' ? req.query.expected_sub : undefined;
-    const caseReference = req.params.caseReference as string;
+    const caseReference = sanitiseCaseReference(req.params.caseReference as string);
+    if (!caseReference) {
+      return next(new HTTPError('Invalid case reference format', 404));
+    }
     const makeOrderUrl = MAKE_ORDER_ROUTE.replace(':caseReference', caseReference);
-    const query = expectedSub ? `?expected_sub=${encodeURIComponent(expectedSub)}` : '';
-    return res.redirect(`${makeOrderUrl}${query}`);
+    // safeRedirect303 decodes the target once while validating it, so encode the query value for that pass too.
+    const query = expectedSub ? `?expected_sub=${encodeURIComponent(encodeURIComponent(expectedSub))}` : '';
+    return safeRedirect303(res, `${makeOrderUrl}${query}`, '/', ['/case/']);
   });
 }
