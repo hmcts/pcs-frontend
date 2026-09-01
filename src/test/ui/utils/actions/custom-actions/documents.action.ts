@@ -99,7 +99,7 @@ export class DocumentsAction implements IAction {
     }
 
     // 3rd radio -> noOption (always visible)
-    expectedOptions.push(confirmIfTheseDocumentsRelateToAnApplication.noRadioOption);
+    expectedOptions.push(confirmIfTheseDocumentsRelateToAnApplication.noMainClaimRadioOption);
 
     console.log('Expected radio order:', expectedOptions);
 
@@ -123,7 +123,7 @@ Actual: "${actualText}"`
     }
 
     const selectOption =
-      confirmDocumentData.option === confirmIfTheseDocumentsRelateToAnApplication.noRadioOption
+      confirmDocumentData.option === confirmIfTheseDocumentsRelateToAnApplication.noMainClaimRadioOption
         ? confirmDocumentData.option
         : `${confirmDocumentData.option} ${formattedDate}`;
 

@@ -108,17 +108,15 @@ export function journeyForSlug(slug: string): JourneyConfig | undefined {
   return Object.values(journeyRegistry).find(journey => journey.slug === slug);
 }
 
-// Variant-scoped step lookup. Variant is required (no default) to force every
-// caller to think about citizen vs legalrep — a silent default would let a
-// caller miss a legalrep-only step the day the registries diverge. Today the
-// citizen and legalrep stepRegistries are the same imported object, so both
-// variants resolve to the same step.
+// Variant-scoped step lookup. Resolves the step definition for the specified variant,
+// falling back to journey.default if a variant-specific stepRegistry is not defined for the journey.
 export function findStep(slug: string, stepName: string, variant: JourneyVariant): StepDefinition | undefined {
   const journey = journeyForSlug(slug);
   if (!journey) {
     return undefined;
   }
-  return journey[variant]?.stepRegistry[stepName];
+  const resolved = journey[variant] ?? journey.default;
+  return resolved?.stepRegistry[stepName];
 }
 
 function getJourneyConfigForRequest(journeyName: string, req?: Request): ResolvedJourneyConfig | undefined {
