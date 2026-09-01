@@ -134,7 +134,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nightly @EMV', () => {
-  test('ErrMsg - NonRentArrears - AssuredTenancy - LR @smoke @regression @nonRent @LR', async () => {
+  test('ErrMsg - NonRentArrears - AssuredTenancy - LR @smoke @nonRent @LR', async () => {
     await softErrorMessageValidation('selectDefendant', selectDefendantErrorValidation);
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {

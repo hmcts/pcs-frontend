@@ -10,6 +10,8 @@ export interface PaymentSessionState {
   successRedirectUrl?: string;
   failureRedirectUrl?: string;
   pendingRedirectUrl?: string;
+  customerReference?: string;
+  pbaAccount?: string;
 }
 
 function saveSession(req: Request): Promise<void> {

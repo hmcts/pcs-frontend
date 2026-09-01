@@ -62,7 +62,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performAction('clickLink', checkYourAnswers.changeLink);
     await performAction('clickRadioButton', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
-      option: confirmIfTheseDocumentsRelateToAnApplication.noRadioOption,
+      option: confirmIfTheseDocumentsRelateToAnApplication.noMainClaimRadioOption,
     });
     await performAction('clickButton', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
     await performAction('clickButton', uploadYourDocuments.continueButton);
@@ -75,7 +75,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('Upload documents when GenApps not submitted @regression', async () => {
+  test('Upload documents when GenApps not submitted', async () => {
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
@@ -112,7 +112,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
   });
 
-  test('View documents submitted through make a claim @regression', async () => {
+  test('View documents submitted through make a claim', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
     await performAction('validateViewDocuments', {
       caseNumber: viewDocuments.getCaseNumber(),

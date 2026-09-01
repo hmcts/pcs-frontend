@@ -1,9 +1,9 @@
 export * from './startNow.page.data.lr';
+export * from './resumeResponse.page.data.lr';
 export * from './defendantNameConfirmation.page.data.lr';
 export * from './defendantDateOfBirth.page.data.lr';
 export * from './correspondenceAddress.page.data.lr';
 export * from './emailConfirmation.page.data.lr';
-export * from './contactPreferencesTelephoneLR.page.data';
 export * from './tenancyTypeDetails.page.data.lr';
 export * from './tenancyDateUnknown.page.data.lr';
 export * from './confirmationOfNoticeGiven.page.data.lr';
@@ -52,3 +52,4 @@ export * from './writtenTerms.page.data.lr';
 export * from './tenancyDateDetails.page.data.lr';
 export * from './installmentPayments.page.data.lr';
 export * from './doYouWantToUploadFilesToSupportYourCounterclaim.page.data.lr';
+export * from './responseSubmittedCounterclaimFeePaymentNeeded.page.data.lr';
