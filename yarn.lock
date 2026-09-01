@@ -3363,9 +3363,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact@npm:17.1.2":
-  version: 17.1.2
-  resolution: "@pact-foundation/pact@npm:17.1.2"
+"@pact-foundation/pact@npm:17.1.3":
+  version: 17.1.3
+  resolution: "@pact-foundation/pact@npm:17.1.3"
   dependencies:
     "@pact-foundation/pact-core": "npm:^20.1.0"
     "@scarf/scarf": "npm:^1.4.0"
@@ -3383,7 +3383,7 @@ __metadata:
     randexp: "npm:^0.5.3"
     router: "npm:^2.2.0"
     stack-utils: "npm:^2.0.6"
-  checksum: 10/a883121c18b3ca4b1296d706e408108587fb814f7636544b43efda4a86e664e3367bd5b7a0fe60fd1607ca99755340a22fdb485a6c3a1af2d976f44c06d565d8
+  checksum: 10/47b92f7d0f492c1857bce14828daa8406d88fc3b9a2aeed52d9ab7a6632ba65a1337c52ce942a53834040786ab267409196431f8d38ac4e6289a66fc2a038ac8
   languageName: node
   linkType: hard
 
@@ -5248,6 +5248,20 @@ __metadata:
     allure-playwright:
       optional: true
   checksum: 10/afb8a946c1c9a36abf3b3493d669fa671743880ba9aa41bc8b5c152273569d3f657f88e072cd9eb2fa60b17eb6552fa794fd93ccf6bd3286855ddb25b56702d7
+  languageName: node
+  linkType: hard
+
+"allure-js-commons@npm:3.11.0":
+  version: 3.11.0
+  resolution: "allure-js-commons@npm:3.11.0"
+  dependencies:
+    md5: "npm:^2.3.0"
+  peerDependencies:
+    allure-playwright: 3.11.0
+  peerDependenciesMeta:
+    allure-playwright:
+      optional: true
+  checksum: 10/b1367c35475219c7f2c3ba470a68d91c38170290c4af853bf534b8ea1f00ffb1443fe7749e6c9fb4f0bfeed4a97b6a3b05d15cf845b1d588af0341bdff5a6f28
   languageName: node
   linkType: hard
 
@@ -7385,9 +7399,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest@npm:29.16.1":
-  version: 29.16.1
-  resolution: "eslint-plugin-jest@npm:29.16.1"
+"eslint-plugin-jest@npm:29.16.2":
+  version: 29.16.2
+  resolution: "eslint-plugin-jest@npm:29.16.2"
   dependencies:
     "@typescript-eslint/utils": "npm:^8.0.0"
   peerDependencies:
@@ -7402,7 +7416,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10/c13741296e115c757f11f912712b49ad35eac1c09323c65a88a75898244ae4c42e9b5046c0e48263321a048701d891a0a887ae7a3650752873d22e86c9d564f8
+  checksum: 10/fa9688bdb0086e36287feb677d26e8a54321db824c18bfd1e68dd5c3650fdd63ee0c251bd35b276ab38e5e1e95b0e98e3b8de3a3bb221f50a456b9dbc702d179
   languageName: node
   linkType: hard
 
@@ -11669,7 +11683,7 @@ __metadata:
     "@ministryofjustice/frontend": "npm:^10.0.0"
     "@opentelemetry/api": "npm:1.9.1"
     "@opentelemetry/instrumentation-winston": "npm:0.65.0"
-    "@pact-foundation/pact": "npm:17.1.2"
+    "@pact-foundation/pact": "npm:17.1.3"
     "@pact-foundation/pact-cli": "npm:18.1.1"
     "@playwright/test": "npm:1.62.1"
     "@types/body-parser": "npm:1.19.6"
@@ -11695,7 +11709,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:8.68.0"
     "@typescript-eslint/parser": "npm:8.68.0"
     allure-commandline: "npm:2.43.0"
-    allure-js-commons: "npm:3.10.2"
+    allure-js-commons: "npm:3.11.0"
     allure-playwright: "npm:3.10.2"
     axios: "npm:1.19.0"
     body-parser: "npm:2.3.0"
@@ -11713,7 +11727,7 @@ __metadata:
     eslint-config-prettier: "npm:10.1.8"
     eslint-import-resolver-typescript: "npm:4.4.5"
     eslint-plugin-import: "npm:2.32.0"
-    eslint-plugin-jest: "npm:29.16.1"
+    eslint-plugin-jest: "npm:29.16.2"
     express: "npm:5.2.1"
     express-session: "npm:1.19.0"
     git-rev-sync: "npm:3.0.2"
