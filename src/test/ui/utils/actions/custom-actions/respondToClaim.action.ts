@@ -1161,7 +1161,15 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async validateCounterClaimApplicationFee(feeData: actionRecord): Promise<void> {
-    await performValidation('mainHeader', counterClaimApplicationFeeAmount.mainHeader);
+    const isLegalRepresentativeJourney = feeData.isLegalRepresentative === true;
+    const mainHeader = isLegalRepresentativeJourney
+      ? counterClaimApplicationFeeAmount.lrMainHeader
+      : counterClaimApplicationFeeAmount.mainHeader;
+    const payButtonText = isLegalRepresentativeJourney
+      ? counterClaimApplicationFeeAmount.getLrPayButton(String(feeData.fee))
+      : counterClaimApplicationFeeAmount.getPayButton(String(feeData.fee));
+
+    await performValidation('mainHeader', mainHeader);
     await performValidation('summaryListValue', counterClaimApplicationFeeAmount.counterClaimAmountLabel, {
       value: feeData.amount ?? '',
     });
@@ -1169,8 +1177,8 @@ export class RespondToClaimAction implements IAction {
       value: `£${String(feeData.fee)}`,
     });
     await performValidation('text', {
-      elementType: 'link',
-      text: counterClaimApplicationFeeAmount.getPayButton(String(feeData.fee)),
+      elementType: 'linkOrButton',
+      text: payButtonText,
     });
   }
 
