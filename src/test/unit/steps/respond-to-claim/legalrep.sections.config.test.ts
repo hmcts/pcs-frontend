@@ -8,6 +8,7 @@ describe('legal rep respond-to-claim sections config', () => {
     expect(legalRepRespondToClaimSections.map(section => section.id)).toEqual([
       'startNowAndDetails',
       'selectDefendant',
+      'resumeResponse',
       'personalDetails',
       'disputeAndTenancy',
       'payments',
