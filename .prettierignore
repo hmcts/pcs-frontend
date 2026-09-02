@@ -5,3 +5,7 @@ src/main/public/main*.js
 .pnp.*
 src/main/views/govuk
 .yarn/
+
+# ACR build task template: prettier reflows the `build: >` block scalars and would
+# corrupt the {{CI_IMAGE_TAG}} / {{REGISTRY_NAME}} placeholder substitution.
+acb.tpl.yaml
