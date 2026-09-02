@@ -21,12 +21,19 @@
   { value: "OTHER", text: "Other" }
 ] %}
 
-<section class="pcs-case-facts" aria-labelledby="case-facts-heading">
-  <h2 class="govuk-heading-s govuk-!-margin-bottom-2" id="case-facts-heading">
-    Case facts (tenancy/contract)
-  </h2>
+<section class="pcs-case-facts" aria-labelledby="case-facts-heading" data-case-facts>
+  <div class="pcs-case-facts__header">
+    <h2 class="govuk-heading-s" id="case-facts-heading">Case facts (tenancy/contract)</h2>
+    <button
+      type="button"
+      class="pcs-case-facts__toggle"
+      aria-expanded="true"
+      aria-controls="case-facts-content"
+      data-case-facts-toggle
+    >Hide case facts</button>
+  </div>
 
-  <div class="pcs-case-facts__layout">
+  <div class="pcs-case-facts__layout" id="case-facts-content">
     <div class="pcs-case-facts__grid">
       {{ govukDateInput({
         id: "date-tenancy",

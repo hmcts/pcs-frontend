@@ -135,6 +135,24 @@ export function initDatePills(form: HTMLFormElement): void {
   });
 }
 
+export function initCaseFactsToggle(form: HTMLFormElement): void {
+  const caseFacts = form.querySelector<HTMLElement>('[data-case-facts]');
+  const toggle = caseFacts?.querySelector<HTMLButtonElement>('[data-case-facts-toggle]');
+  const contentId = toggle?.getAttribute('aria-controls');
+  const content = contentId ? document.getElementById(contentId) : null;
+  if (!caseFacts || !toggle || !content) {
+    return;
+  }
+
+  toggle.addEventListener('click', () => {
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    toggle.textContent = expanded ? 'Show case facts' : 'Hide case facts';
+    content.hidden = expanded;
+    caseFacts.classList.toggle('pcs-case-facts--collapsed', expanded);
+  });
+}
+
 interface AttendanceFact {
   id: string;
   sourceId?: string;
@@ -1109,6 +1127,7 @@ export function initMakeOrder(): void {
     return;
   }
   initDatePills(form);
+  initCaseFactsToggle(form);
   defaultDate(form, 'suspended-by-date', 14);
   const mount = document.querySelector<HTMLElement>('#order-editor');
   const documentField = document.querySelector<HTMLTextAreaElement>('#order-document');

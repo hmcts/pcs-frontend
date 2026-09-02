@@ -5,6 +5,7 @@ $pcs-case-facts-max-height: min(60vh, 320px);
 
 // Include content-box padding and borders in the focus reservation.
 $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3) * 2 + 2px});
+$pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
 
 // Use the available width without changing the shared citizen-page container.
 .pcs-wide {
@@ -27,6 +28,10 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   }
 }
 
+.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)):has(.pcs-case-facts--collapsed) {
+  scroll-padding-top: $pcs-case-facts-collapsed-reserve;
+}
+
 .pcs-case-facts {
   position: sticky;
   top: 0;
@@ -45,6 +50,39 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   }
 }
 
+.pcs-case-facts--collapsed {
+  max-height: none;
+  overflow: visible;
+}
+
+.pcs-case-facts__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: govuk-spacing(3);
+  margin-bottom: govuk-spacing(2);
+
+  .govuk-heading-s {
+    margin-bottom: 0;
+  }
+}
+
+.pcs-case-facts--collapsed .pcs-case-facts__header {
+  margin-bottom: 0;
+}
+
+.pcs-case-facts__toggle {
+  @include govuk-link-common;
+  @include govuk-link-style-default;
+  @include govuk-font($size: 16);
+
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
 .pcs-case-facts__layout {
   display: grid;
   gap: govuk-spacing(4);
@@ -53,6 +91,10 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   @include govuk-media-query($until: desktop) {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.pcs-case-facts__layout[hidden] {
+  display: none;
 }
 
 // The 232px floor fits a date input; auto-fit preserves reflow at high zoom.

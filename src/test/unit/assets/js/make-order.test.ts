@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import { initDatePills, initMakeOrder } from '../../../../main/assets/js/make-order';
+import { initCaseFactsToggle, initDatePills, initMakeOrder } from '../../../../main/assets/js/make-order';
 
 interface OrderDocument {
   generated: Record<string, unknown>;
@@ -232,6 +232,47 @@ describe('make order date pills', () => {
       expect(document.querySelector<HTMLInputElement>('#possession-date-month')?.value).toBe('');
       expect(document.querySelector<HTMLInputElement>('#possession-date-year')?.value).toBe('');
     }
+  });
+});
+
+describe('case facts toggle', () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <form id="make-order-form">
+        <section data-case-facts>
+          <button type="button" aria-expanded="true" aria-controls="case-facts-content" data-case-facts-toggle>
+            Hide case facts
+          </button>
+          <div id="case-facts-content">Case facts</div>
+        </section>
+      </form>
+    `;
+  });
+
+  it('collapses and expands the sticky case facts panel', () => {
+    const form = document.querySelector<HTMLFormElement>('#make-order-form')!;
+    const caseFacts = form.querySelector<HTMLElement>('[data-case-facts]')!;
+    const toggle = form.querySelector<HTMLButtonElement>('[data-case-facts-toggle]')!;
+    const content = document.querySelector<HTMLElement>('#case-facts-content')!;
+    initCaseFactsToggle(form);
+
+    toggle.click();
+
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(toggle.textContent).toBe('Show case facts');
+    expect(content.hidden).toBe(true);
+    expect(caseFacts.classList.contains('pcs-case-facts--collapsed')).toBe(true);
+
+    toggle.click();
+
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(toggle.textContent).toBe('Hide case facts');
+    expect(content.hidden).toBe(false);
+    expect(caseFacts.classList.contains('pcs-case-facts--collapsed')).toBe(false);
+  });
+
+  it('does nothing when the toggle markup is incomplete', () => {
+    expect(() => initCaseFactsToggle(document.createElement('form'))).not.toThrow();
   });
 });
 
