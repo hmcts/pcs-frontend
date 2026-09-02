@@ -931,5 +931,275 @@ export const submitCaseApiDataWales = {
     },
   },
 
+  submitCaseNoticeDateKnown: {
+    regionId: '7',
+    caseManagementLocationNumber: '366572',
+    orgNameFound: 'Yes',
+    claimantName: 'Possession Claim Service Org1',
+    isClaimantNameCorrect: 'YES',
+    legislativeCountry: 'Wales',
+    claimantType: {
+      value: {
+        code: 'COMMUNITY_LANDLORD',
+        label: 'Community landlord',
+      },
+      list_items: [
+        {
+          code: 'PRIVATE_LANDLORD',
+          label: 'Private landlord',
+        },
+        {
+          code: 'COMMUNITY_LANDLORD',
+          label: 'Community landlord',
+        },
+        {
+          code: 'MORTGAGE_LENDER',
+          label: 'Mortgage lender',
+        },
+        {
+          code: 'OTHER',
+          label: 'Other',
+        },
+      ],
+      valueCode: 'COMMUNITY_LANDLORD',
+    },
+    claimAgainstTrespassers: 'NO',
+    isExemptLandlord: 'YES',
+    claimantContactEmail: 'pcs-org1-solicitor2@test.com',
+    isCorrectClaimantContactEmail: 'YES',
+    orgAddressFound: 'Yes',
+    organisationAddress: {
+      AddressLine1: 'Ministry Of Justice',
+      AddressLine2: 'Seventh Floor 102 Petty France',
+      PostTown: 'London',
+      PostCode: 'SW1H 9AJ',
+      Country: 'United Kingdom',
+    },
+    formattedClaimantContactAddress: 'Ministry Of Justice<br>Seventh Floor 102 Petty France<br>London<br>SW1H 9AJ',
+    isCorrectClaimantContactAddress: 'YES',
+    claimantProvidePhoneNumber: 'NO',
+    defendant1: {
+      nameKnown: 'YES',
+      firstName: 'Test',
+      lastName: 'Mark',
+      addressKnown: 'NO',
+    },
+    addAnotherDefendant: 'YES',
+    additionalDefendants: [
+      {
+        value: {
+          nameKnown: 'YES',
+          firstName: 'Test',
+          lastName: 'Leo',
+          addressKnown: 'NO',
+        },
+      },
+    ],
+    occupationLicenceTypeWales: 'STANDARD_CONTRACT',
+    licenceStartDate: null,
+    licenceDocuments: [
+      {
+        value: {
+          document_url: `${process.env.DM_STORE_URL}/documents/dc9ae874-f1d2-4fba-b99d-c3a0ca977847`,
+          document_binary_url: `${process.env.DM_STORE_URL}/documents/dc9ae874-f1d2-4fba-b99d-c3a0ca977847/binary`,
+          document_filename: 'Screenshot 2026-08-19 at 11.18.50.png',
+        },
+      },
+    ],
+    possessionGroundsWales_DiscretionaryGrounds: ['RENT_ARREARS_S157'],
+    possessionGroundsWales_MandatoryGrounds: [],
+    preActionProtocolCompleted: 'YES',
+    mediationAttempted: 'YES',
+    settlementAttempted: 'YES',
+    walesNoticeServed: 'Yes',
+    walesTypeOfNoticeServed: 'RHW20',
+    notice_ServiceMethod: 'EMAIL',
+    notice_EmailAddress: 'test@mail.com',
+    notice_EmailSentDateTime: '2020-02-20T10:10:10',
+    notice_AbleToUploadDocument: 'Yes',
+    notice_Documents: [
+      {
+        value: {
+          document_url: `${process.env.DM_STORE_URL}/documents/eebbfdd4-4314-4005-a9c7-bd886784fea1`,
+          document_binary_url: `${process.env.DM_STORE_URL}/documents/eebbfdd4-4314-4005-a9c7-bd886784fea1/binary`,
+          document_filename: 'Screenshot 2026-08-19 at 10.07.38.png',
+        },
+      },
+      {
+        value: {
+          document_url: `${process.env.DM_STORE_URL}/documents/d727d3fc-68a4-4c6b-a364-54c699ed32da`,
+          document_binary_url: `${process.env.DM_STORE_URL}/documents/d727d3fc-68a4-4c6b-a364-54c699ed32da/binary`,
+          document_filename: 'Screenshot 2026-08-18 at 09.21.49.png',
+        },
+      },
+    ],
+    rentDetails_CurrentRent: '70000',
+    rentDetails_Frequency: 'MONTHLY',
+    rentDetails_CalculatedDailyCharge: '2300',
+    rentArrears_StatementDocuments: [
+      {
+        value: {
+          document_url: `${process.env.DM_STORE_URL}/documents/b1063121-321b-43ac-8972-9bb501329858`,
+          document_binary_url: `${process.env.DM_STORE_URL}/documents/b1063121-321b-43ac-8972-9bb501329858/binary`,
+          document_filename: 'Screenshot 2026-08-18 at 12.15.33.png',
+        },
+      },
+    ],
+    rentArrears_Total: '100000',
+    rentArrears_RecoveryAttempted: 'NO',
+    arrearsJudgmentWanted: 'YES',
+    claimantNamePossessiveForm: 'Possession Claim Service Org1’s',
+    claimantCircumstancesSelect: 'NO',
+    hasDefendantCircumstancesInfo: 'NO',
+    prohibitedConductWalesClaim: 'NO',
+    additionalReasonsForPossession: {
+      hasReasons: 'NO',
+    },
+    hasUnderlesseeOrMortgagee: 'YES',
+    underlesseeOrMortgagee1: {
+      nameKnown: 'NO',
+      addressKnown: 'NO',
+    },
+    addAdditionalUnderlesseeOrMortgagee: 'NO',
+    walesDocs_HasEnergyPerformanceCertificate: 'YES',
+    walesDocs_EnergyPerformance: [
+      {
+        value: {
+          document_url: `${process.env.DM_STORE_URL}/documents/b9fb042a-8e6f-4bf2-a44e-5ac9b8af7c1f`,
+          document_binary_url: `${process.env.DM_STORE_URL}/documents/b9fb042a-8e6f-4bf2-a44e-5ac9b8af7c1f/binary`,
+          document_filename: 'Screenshot 2026-08-18 at 09.37.56.png',
+        },
+      },
+    ],
+    walesDocs_HasGasSafetyReport: 'YES',
+    walesDocs_GasSafetyReport: [
+      {
+        value: {
+          document_url: `${process.env.DM_STORE_URL}/documents/ac13ddc2-6402-41ad-8878-cf19c6f7b04a`,
+          document_binary_url: `${process.env.DM_STORE_URL}/documents/ac13ddc2-6402-41ad-8878-cf19c6f7b04a/binary`,
+          document_filename: 'Screenshot 2026-08-18 at 09.37.56.png',
+        },
+      },
+    ],
+    walesDocs_HasElectricalInstallationConditionReport: 'YES',
+    walesDocs_ElectricalInstallation: [
+      {
+        value: {
+          document_url: `${process.env.DM_STORE_URL}/documents/e6bcd7a5-5220-4e0c-9bc8-2665757db872`,
+          document_binary_url: `${process.env.DM_STORE_URL}/documents/e6bcd7a5-5220-4e0c-9bc8-2665757db872/binary`,
+          document_filename: 'Screenshot 2026-08-18 at 12.38.21.png',
+        },
+      },
+    ],
+    wantToUploadDocuments: 'YES',
+    additionalDocuments: [
+      {
+        value: {
+          documentType: {
+            value: {
+              code: '8bc45a2f-f2e7-40dd-9857-20582cc1c4dd',
+              label: 'Witness statement',
+            },
+            valueCode: '8bc45a2f-f2e7-40dd-9857-20582cc1c4dd',
+            valueLabel: 'Witness statement',
+          },
+          description: 'Witness Document',
+          document: {
+            document_url: `${process.env.DM_STORE_URL}/documents/92d43d06-eeae-4040-a701-cab327ff51f4`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/92d43d06-eeae-4040-a701-cab327ff51f4/binary`,
+            document_filename: 'WitnessStatement.png',
+          },
+        },
+      },
+      {
+        value: {
+          documentType: {
+            value: {
+              code: 'fdc09fcb-45ce-461b-9819-63186c34755a',
+              label: 'Rent statement',
+            },
+            valueCode: 'fdc09fcb-45ce-461b-9819-63186c34755a',
+            valueLabel: 'Rent statement',
+          },
+          description: 'Rent Document',
+          document: {
+            document_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78/binary`,
+            document_filename: 'RentStatement.pdf',
+          },
+        },
+      },
+      {
+        value: {
+          documentType: {
+            value: {
+              code: 'c0dab8bc-9264-4814-af67-b363af60c646',
+              label: 'Notice for service out of the jurisdiction',
+            },
+            valueCode: 'c0dab8bc-9264-4814-af67-b363af60c646',
+            valueLabel: 'Notice for service out of the jurisdiction',
+          },
+          description: 'Notice Document',
+          document: {
+            document_url: `${process.env.DM_STORE_URL}/documents/1fd71cc5-9a91-4d86-85b8-652636cb9b88`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/1fd71cc5-9a91-4d86-85b8-652636cb9b88/binary`,
+            document_filename: 'NoticeServiceJurisdiction.docx',
+          },
+        },
+      },
+      {
+        value: {
+          documentType: {
+            value: {
+              code: 'e4983a7d-1430-4c6b-ac50-94669e757248',
+              label: 'Certificate of suitability as litigation friend',
+            },
+            valueCode: 'e4983a7d-1430-4c6b-ac50-94669e757248',
+            valueLabel: 'Certificate of suitability as litigation friend',
+          },
+          description: 'Certificate of Suitability',
+          document: {
+            document_url: `${process.env.DM_STORE_URL}/documents/5a5ecc30-321d-4a86-8487-059ff04ec480`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/5a5ecc30-321d-4a86-8487-059ff04ec480/binary`,
+            document_filename: 'CertificateOfSuitability.xlsx',
+          },
+        },
+      },
+      {
+        value: {
+          documentType: {
+            value: {
+              code: 'a6c5dea7-9420-446d-b973-d75d95790b7b',
+              label: 'Other document',
+            },
+            valueCode: 'a6c5dea7-9420-446d-b973-d75d95790b7b',
+            valueLabel: 'Other document',
+          },
+          description: 'Other Document',
+          document: {
+            document_url: `${process.env.DM_STORE_URL}/documents/eb94cf9d-2f5f-4f9e-9744-d734ec358652`,
+            document_binary_url: `${process.env.DM_STORE_URL}/documents/eb94cf9d-2f5f-4f9e-9744-d734ec358652/binary`,
+            document_filename: 'OtherDocument.png',
+          },
+        },
+      },
+    ],
+    featureFlags: {
+      release1dot2Enabled: 'YES',
+      release1dot3Enabled: 'YES',
+      caseWorkerEventsEnabled: 'YES',
+      walesMakeAClaimEnabled: 'YES',
+    },
+    applicationWithClaim: 'YES',
+    documentsYouveUploaded: [
+      'WRITTEN_TERMS_OF_OCCUPATION_CONTRACT',
+      'CURRENT_GAS_SAFETY_REPORT',
+      'ENERGY_PERFORMANCE_CERTIFICATE',
+      'NOTICE_SERVED',
+    ],
+    languageUsed: 'WELSH',
+    completionNextStep: 'SUBMIT_AND_PAY_NOW',
+    endButtonLabel: null,
+  },
   submitCaseApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/events`,
 };

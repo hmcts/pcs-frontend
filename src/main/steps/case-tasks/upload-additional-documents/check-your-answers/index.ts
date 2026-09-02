@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
-import { flowConfig, uploadYourDocumentsStep } from '../flow.config';
+import { MAIN_CLAIM_OPTION_VALUE, flowConfig, uploadYourDocumentsStep } from '../flow.config';
 
 import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
@@ -82,9 +82,7 @@ export const step: StepDefinition = {
       const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
       const relatedApplicationId = confirmData?.relatedApplicationId as string | undefined;
       const selectedRelatedApplicationId =
-        relatedApplicationId && relatedApplicationId !== 'MAIN_CLAIM_OR_COUNTERCLAIM'
-          ? relatedApplicationId
-          : undefined;
+        relatedApplicationId && relatedApplicationId !== MAIN_CLAIM_OPTION_VALUE ? relatedApplicationId : undefined;
 
       try {
         await ccdCaseService.submitUploadDocuments(req.session?.user?.accessToken, {
