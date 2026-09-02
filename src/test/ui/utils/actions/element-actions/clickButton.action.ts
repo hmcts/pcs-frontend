@@ -30,7 +30,6 @@ export class ClickButtonAction implements IAction {
 
   private async clickButton(page: Page, button: Locator): Promise<void> {
     await button.click();
-    await page.waitForLoadState();
   }
 
   private async clickButtonAndVerifyPageNavigation(
