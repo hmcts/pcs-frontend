@@ -190,6 +190,57 @@ describe('make order route', () => {
     );
   });
 
+  it('loads the document for a saved adjournment order', async () => {
+    const adjournmentDocument = {
+      schema: 'docweave-document',
+      version: 1,
+      current: { type: 'doc', content: [] },
+      generated: { type: 'doc', content: [] },
+    };
+    jest.mocked(ccdCaseService.getCaseByIdForEvent).mockResolvedValue({
+      id: '1777027600017760',
+      data: {
+        makeOrderPayload: JSON.stringify({
+          ...makeOrderEnvelope,
+          order: {
+            ...makeOrderEnvelope.order,
+            draftPayload: {
+              version: 1,
+              orderType: 'ADJOURNMENT',
+              formData: { 'adj-type': 'generally' },
+              documents: { ADJOURNMENT: adjournmentDocument },
+            },
+          },
+        }),
+      },
+    });
+    makeOrderRoute(app);
+    const handler = (app.get as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        query: {},
+        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+      } as unknown as Request,
+      res,
+      jest.fn()
+    );
+
+    expect(res.render).toHaveBeenCalledWith(
+      'make-order',
+      expect.objectContaining({
+        draftOrderType: 'ADJOURNMENT',
+        orderDocumentJson: JSON.stringify(adjournmentDocument),
+      })
+    );
+  });
+
   it('creates a draft before rendering when none exists', async () => {
     jest
       .mocked(ccdCaseService.getCaseByIdForEvent)
@@ -498,6 +549,110 @@ describe('make order route', () => {
       }),
     });
     expect(res.redirect).toHaveBeenCalledWith('https://manage-case.example.com/cases/case-details/1777027600017760');
+  });
+
+  it('submits an adjournment document for review under its order type', async () => {
+    makeOrderRoute(app);
+    const handler = (app.post as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const orderDocument = {
+      schema: 'docweave-document',
+      version: 1,
+      current: { type: 'doc', content: [] },
+      generated: { type: 'doc', content: [] },
+    };
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        originalUrl: '/case/1777027600017760/make-order',
+        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        body: {
+          action: 'SUBMIT_FOR_REVIEW',
+          orderId: makeOrderEnvelope.order.id,
+          orderVersion: '2',
+          orderType: 'ADJOURNMENT',
+          orderDocument: JSON.stringify(orderDocument),
+          'adj-type': 'further-hearing',
+          'adj-when': 'specific',
+          'adj-hearing-date-day': '21',
+          'adj-hearing-date-month': '5',
+          'adj-hearing-date-year': '2026',
+          'adj-specific-time': '10:30am',
+          'adj-time-estimate': '20',
+          'adj-time-estimate-unit': 'minutes',
+          'adj-format': 'in-person',
+        },
+      } as unknown as Request,
+      res,
+      jest.fn()
+    );
+
+    expect(ccdCaseService.submitCaseEvent).toHaveBeenCalledWith('token', '1777027600017760', 'ext:makeOrder', {
+      makeOrderPayload: JSON.stringify({
+        action: 'SUBMIT_FOR_REVIEW',
+        order: {
+          id: makeOrderEnvelope.order.id,
+          version: 2,
+          draftPayload: {
+            version: 1,
+            orderType: 'ADJOURNMENT',
+            formData: {
+              'adj-type': 'further-hearing',
+              'adj-when': 'specific',
+              'adj-hearing-date-day': '21',
+              'adj-hearing-date-month': '5',
+              'adj-hearing-date-year': '2026',
+              'adj-specific-time': '10:30am',
+              'adj-time-estimate': '20',
+              'adj-time-estimate-unit': 'minutes',
+              'adj-format': 'in-person',
+            },
+            documents: { ADJOURNMENT: orderDocument },
+          },
+        },
+      }),
+    });
+    expect(res.redirect).toHaveBeenCalledWith('https://manage-case.example.com/cases/case-details/1777027600017760');
+  });
+
+  it('rejects an incomplete adjournment submission', async () => {
+    makeOrderRoute(app);
+    const handler = (app.post as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const next = jest.fn();
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        body: {
+          action: 'SUBMIT_FOR_REVIEW',
+          orderType: 'ADJOURNMENT',
+          'adj-type': 'further-hearing',
+          'adj-when': 'specific',
+          'adj-hearing-date-day': '31',
+          'adj-hearing-date-month': '2',
+          'adj-hearing-date-year': '2026',
+          'adj-time-estimate': '0',
+          'adj-time-estimate-unit': 'minutes',
+        },
+      } as unknown as Request,
+      {} as Response,
+      next
+    );
+
+    expect(ccdCaseService.submitCaseEvent).not.toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({ status: 400, message: 'The adjournment order has incomplete or invalid terms' })
+    );
   });
 
   it('rejects suspended same-terms costs without an amount', async () => {

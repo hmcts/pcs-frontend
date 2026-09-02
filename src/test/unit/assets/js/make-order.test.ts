@@ -50,6 +50,8 @@ function renderCompleteForm(initialDocument = '', orderType = 'OUTRIGHT_POSSESSI
       <input name="outright-grounds-details" value="Ground 8">
 
       <input type="checkbox" name="outright-options" value="money-judgment" checked>
+      <input type="checkbox" name="outright-mj-sections" value="arrears" checked>
+      <input type="checkbox" name="outright-mj-sections" value="payment-plan" checked>
       <input type="checkbox" name="outright-options" value="use-occupation" checked>
       <input type="checkbox" name="outright-options" value="transfer-high-court" checked>
       <input name="outright-mj-arrears" value="1,200">
@@ -228,8 +230,32 @@ describe('make order preview', () => {
     expect(document.querySelector<HTMLTextAreaElement>('#order-document')?.value).toBe(beforeEditorEvent);
   });
 
-  it('shows unavailable order types and switches back to the outright editor', () => {
-    renderCompleteForm('not-json', 'SUSPENDED_POSSESSION');
+  it('renders an adjournment document with the real editor', () => {
+    renderCompleteForm('', 'ADJOURNMENT');
+    document.querySelector('#make-order-form')?.insertAdjacentHTML(
+      'beforeend',
+      `
+        <input name="adj-type" value="further-hearing">
+        <input name="adj-when" value="next-date">
+        <input name="adj-hearing-date-day" value="21">
+        <input name="adj-hearing-date-month" value="5">
+        <input name="adj-hearing-date-year" value="2026">
+        <input name="adj-time-estimate" value="1">
+        <input name="adj-time-estimate-unit" value="hours">
+      `
+    );
+
+    initMakeOrder();
+
+    expect(document.querySelector<HTMLElement>('#order-preview-editor')?.hidden).toBe(false);
+    expect(document.querySelector<HTMLButtonElement>('#submit-order-for-review')?.disabled).toBe(false);
+    expect(generatedOrderText()).toContain('next available date (non-possession list) after');
+    expect(generatedOrderText()).toContain('21 May 2026');
+    expect(generatedOrderText()).toContain('1 hour');
+  });
+
+  it('shows unsupported order types and switches back to the outright editor', () => {
+    renderCompleteForm('not-json', 'STRIKE_OUT_DISMISSAL');
     initMakeOrder();
 
     const editorRegion = document.querySelector<HTMLElement>('#order-preview-editor');

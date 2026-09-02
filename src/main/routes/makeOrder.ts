@@ -36,7 +36,7 @@ interface MakeOrderCaseFacts {
 type MakeOrderType =
   'OUTRIGHT_POSSESSION' | 'SUSPENDED_POSSESSION' | 'ADJOURNMENT' | 'STRIKE_OUT_DISMISSAL' | 'FREE_FORM';
 
-const REVIEWABLE_ORDER_TYPES = new Set<MakeOrderType>(['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION']);
+const REVIEWABLE_ORDER_TYPES = new Set<MakeOrderType>(['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION', 'ADJOURNMENT']);
 
 interface MakeOrderDraftPayload {
   version: 1;
@@ -230,6 +230,69 @@ function validateSuspendedSubmission(formData: Record<string, unknown>): void {
   }
 }
 
+function validateAdjournmentSubmission(formData: Record<string, unknown>): void {
+  const value = (name: string): string => String(formData[name] ?? '').trim();
+  const values = (name: string): string[] => {
+    const raw = formData[name];
+    return (Array.isArray(raw) ? raw : raw === undefined ? [] : [raw]).map(String);
+  };
+  const validMoney = (name: string): boolean => /^\d+(\.\d{1,2})?$/.test(value(name).split(',').join(''));
+  const validDate = (prefix: string): boolean => {
+    const day = Number(value(`${prefix}-day`));
+    const month = Number(value(`${prefix}-month`));
+    const year = Number(value(`${prefix}-year`));
+    const parsed = new Date(Date.UTC(year, month - 1, day));
+    return (
+      day > 0 &&
+      month > 0 &&
+      year > 0 &&
+      parsed.getUTCDate() === day &&
+      parsed.getUTCMonth() === month - 1 &&
+      parsed.getUTCFullYear() === year
+    );
+  };
+  const type = value('adj-type');
+  let valid = type === 'further-hearing' || type === 'generally';
+  if (type === 'further-hearing') {
+    const directions = values('adj-directions');
+    valid =
+      valid &&
+      ['next-list', 'next-date', 'specific'].includes(value('adj-when') || 'next-list') &&
+      validDate('adj-hearing-date') &&
+      /^[1-9]\d*$/.test(value('adj-time-estimate')) &&
+      ['minutes', 'hours'].includes(value('adj-time-estimate-unit')) &&
+      (value('adj-when') !== 'specific' || Boolean(value('adj-specific-time'))) &&
+      (!directions.includes('defence') || validDate('adj-defence-date')) &&
+      (!directions.includes('counterclaim') || validDate('adj-counterclaim-date')) &&
+      (!directions.includes('claimant-reply') || validDate('adj-claimant-reply-date')) &&
+      !(directions.includes('defence') && directions.includes('counterclaim'));
+  }
+  if (type === 'generally') {
+    const conditions = values('adj-gen');
+    const validPayment = (option: string, prefix: string): boolean =>
+      !conditions.includes(option) || (validMoney(`${prefix}-amount`) && validDate(`${prefix}-date`));
+    valid =
+      valid &&
+      validPayment('current-rent-plus', 'adj-gen-current-rent-plus') &&
+      validPayment('payments', 'adj-gen-payments') &&
+      validPayment('oneoff', 'adj-gen-oneoff') &&
+      !(conditions.includes('current-rent-plus') && conditions.includes('payments')) &&
+      (!conditions.includes('restore') || validDate('adj-gen-restore-date'));
+  }
+  if (value('costs') === 'yes') {
+    const amountFields: Record<string, string> = {
+      'def-pay-cl-fixed': 'costs-def-pay-cl-fixed-amount',
+      'def-pay-cl-summary': 'costs-def-pay-cl-summary-amount',
+      'cl-pay-def-summary': 'costs-cl-pay-def-summary-amount',
+    };
+    const amountField = amountFields[value('costs-choice')];
+    valid = valid && (!amountField || validMoney(amountField));
+  }
+  if (!valid) {
+    throw new HTTPError('The adjournment order has incomplete or invalid terms', 400);
+  }
+}
+
 function buildAttendanceParties(envelope: MakeOrderEnvelope): { id: string; label: string; type: string }[] {
   return [
     ...envelope.caseContext.claimants.map((party, index) => ({
@@ -365,10 +428,13 @@ export default function makeOrderRoutes(app: Application): void {
         }
         const selectedOrderType = orderType as MakeOrderType;
         if (orderAction === 'SUBMIT_FOR_REVIEW' && !REVIEWABLE_ORDER_TYPES.has(selectedOrderType)) {
-          throw new HTTPError('Only outright and suspended possession orders can be submitted for review', 400);
+          throw new HTTPError('This order type cannot be submitted for review', 400);
         }
         if (orderAction === 'SUBMIT_FOR_REVIEW' && selectedOrderType === 'SUSPENDED_POSSESSION') {
           validateSuspendedSubmission(formData);
+        }
+        if (orderAction === 'SUBMIT_FOR_REVIEW' && selectedOrderType === 'ADJOURNMENT') {
+          validateAdjournmentSubmission(formData);
         }
         let selectedDocument: OrderEditorDocument | undefined;
         if (typeof orderDocument === 'string' && orderDocument) {

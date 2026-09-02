@@ -14,7 +14,7 @@
     classes: "govuk-radios--small",
     fieldset: { legend: { text: "Adjourned to", classes: "govuk-fieldset__legend--s" } },
     items: [
-      { value: "next-list", text: "Next available possession list after", checked: draftChecked("adj-when", "next-list") },
+      { value: "next-list", text: "Next available possession list after", checked: draftChecked("adj-when", "next-list") or not draftValue("adj-when") },
       { value: "next-date", text: "Next available date, not in a possession list, after", checked: draftChecked("adj-when", "next-date") },
       {
         value: "specific",
@@ -61,7 +61,7 @@
         items: draftSelect([
           { value: "minutes", text: "Minutes" },
           { value: "hours", text: "Hours" }
-        ], "adj-time-estimate-unit")
+        ], "adj-time-estimate-unit", "minutes")
       }) }}
     </fieldset>
   </div>
@@ -72,7 +72,7 @@
     classes: "govuk-checkboxes--small",
     fieldset: { legend: { text: "Hearing format", classes: "govuk-fieldset__legend--s" } },
     items: [
-      { value: "in-person", text: "In person", checked: draftChecked("adj-format", "in-person") },
+      { value: "in-person", text: "In person", checked: draftChecked("adj-format", "in-person") or not draftValue("adj-format") },
       { value: "video", text: "Video hearing", checked: draftChecked("adj-format", "video") },
       { value: "telephone", text: "Telephone", checked: draftChecked("adj-format", "telephone") }
     ]
@@ -152,7 +152,7 @@
             id: "adj-gen-current-rent-plus-frequency",
             name: "adj-gen-current-rent-plus-frequency",
             label: { text: "How often" },
-            items: draftSelect(options.paymentFrequencies, "adj-gen-current-rent-plus-frequency")
+            items: draftSelect(options.paymentFrequencies, "adj-gen-current-rent-plus-frequency", "monthly")
           }) + dateInput.withPills({
             id: "adj-gen-current-rent-plus-date",
             namePrefix: "adj-gen-current-rent-plus-date",
@@ -179,7 +179,7 @@
             id: "adj-gen-payments-frequency",
             name: "adj-gen-payments-frequency",
             label: { text: "How often" },
-            items: draftSelect(options.paymentFrequencies, "adj-gen-payments-frequency")
+            items: draftSelect(options.paymentFrequencies, "adj-gen-payments-frequency", "monthly")
           }) + dateInput.withPills({
             id: "adj-gen-payments-date",
             namePrefix: "adj-gen-payments-date",

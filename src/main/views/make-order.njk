@@ -94,7 +94,7 @@
       name: "action",
       value: "SUBMIT_FOR_REVIEW",
       attributes: { id: "submit-order-for-review" },
-      disabled: draftOrderType != "OUTRIGHT_POSSESSION" and draftOrderType != "SUSPENDED_POSSESSION"
+      disabled: draftOrderType != "OUTRIGHT_POSSESSION" and draftOrderType != "SUSPENDED_POSSESSION" and draftOrderType != "ADJOURNMENT"
     }) }}
     {{ govukButton({ text: "Save as draft", name: "action", value: "SAVE_DRAFT", classes: "govuk-button--secondary" }) }}
   </div>

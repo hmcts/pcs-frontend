@@ -457,6 +457,185 @@ export function buildSuspendedOrder(form: HTMLFormElement): ReturnType<typeof bu
   });
 }
 
+function adjournmentTimeEstimate(form: HTMLFormElement): string {
+  const amount = field(form, 'adj-time-estimate');
+  const unit = field(form, 'adj-time-estimate-unit');
+  if (!amount || (unit !== 'minutes' && unit !== 'hours')) {
+    return '[time not provided]';
+  }
+  if (amount === '1') {
+    return unit === 'hours' ? '1 hour' : '1 minute';
+  }
+  return `${amount} ${unit}`;
+}
+
+function adjournmentHearingFormat(form: HTMLFormElement): string {
+  const formats = new FormData(form).getAll('adj-format').map(String);
+  const labels: Record<string, string> = {
+    'in-person': 'in person',
+    video: 'by video hearing',
+    telephone: 'by telephone',
+  };
+  const methods = formats.map(format => labels[format]).filter(Boolean);
+  return joinList(methods.length ? methods : ['in person']);
+}
+
+function addAdjournmentOneOffTerm(content: InlineBuilder, form: HTMLFormElement, claimant: string): void {
+  content
+    .text(`a payment to ${claimant} of £`)
+    .generatedText('adjournment-one-off-amount', money(field(form, 'adj-gen-oneoff-amount')))
+    .text(' by ')
+    .generatedText('adjournment-one-off-date', date(form, 'adj-gen-oneoff-date'));
+}
+
+function addAdjournmentInstalmentTerm(
+  content: InlineBuilder,
+  form: HTMLFormElement,
+  claimant: string,
+  option: 'current-rent-plus' | 'payments'
+): void {
+  const prefix = option === 'current-rent-plus' ? 'adj-gen-current-rent-plus' : 'adj-gen-payments';
+  const frequency = field(form, `${prefix}-frequency`) === 'weekly' ? 'week' : 'month';
+  content
+    .text(`instalment payments to ${claimant} of £`)
+    .generatedText(`adjournment-${option}-amount`, money(field(form, `${prefix}-amount`)))
+    .text(` every ${frequency}, the first instalment to be paid on or before `)
+    .generatedText(`adjournment-${option}-date`, date(form, `${prefix}-date`));
+}
+
+export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof buildOrder> {
+  const type = field(form, 'adj-type');
+  const { claimant, defendant, defendantVerb } = partyLabels(form);
+  const directions = new FormData(form).getAll('adj-directions').map(String);
+  const conditions = new FormData(form).getAll('adj-gen').map(String);
+
+  return buildOrder(order => {
+    addPreamble(order, form);
+    if (!type) {
+      return;
+    }
+    order.orderedList('adjournment-clauses', list => {
+      if (type === 'further-hearing') {
+        const when = field(form, 'adj-when') || 'next-list';
+        list.item('adjournment-listing', content => {
+          if (when === 'next-list') {
+            content.text('The claim shall be adjourned to be heard on the next available possession list after ');
+          } else if (when === 'next-date') {
+            content.text(
+              'The claim shall be adjourned to be heard on the next available date (non-possession list) after '
+            );
+          } else {
+            content.text('The claim shall be adjourned to be heard on ');
+          }
+          content.generatedText('adjournment-hearing-date', date(form, 'adj-hearing-date'));
+          if (when === 'specific') {
+            content
+              .text(' at ')
+              .generatedText(
+                'adjournment-hearing-time',
+                field(form, 'adj-specific-time') || '[hearing time not provided]'
+              );
+          }
+          content
+            .text(' with a time estimate of ')
+            .generatedText('adjournment-time-estimate', adjournmentTimeEstimate(form));
+          if (when === 'specific') {
+            content.text(`. Such hearing shall be ${adjournmentHearingFormat(form)}.`);
+          } else {
+            content.text('. Further details of the hearing will be provided by the court.');
+          }
+        });
+        if (directions.includes('defence')) {
+          list.item('adjournment-defence', content => {
+            content
+              .text(`${sentenceCase(defendant)} must by 4pm on `)
+              .generatedText('adjournment-defence-date', date(form, 'adj-defence-date'))
+              .text(' send to the court and all other parties a defence.');
+          });
+        }
+        if (directions.includes('counterclaim')) {
+          list.item('adjournment-counterclaim', content => {
+            content
+              .text(`${sentenceCase(defendant)} must by 4pm on `)
+              .generatedText('adjournment-counterclaim-date', date(form, 'adj-counterclaim-date'))
+              .text(
+                ' send to the court and all other parties a defence and any counterclaim, having paid any court fees which are due.'
+              );
+          });
+        }
+        if (directions.includes('claimant-reply')) {
+          list.item('adjournment-claimant-reply', content => {
+            content
+              .text(`${sentenceCase(claimant)} must by 4pm on `)
+              .generatedText('adjournment-claimant-reply-date', date(form, 'adj-claimant-reply-date'))
+              .text(' send to the court and all other parties a defence to the counterclaim and any reply.');
+          });
+        }
+      } else {
+        const paymentOption = conditions.includes('current-rent-plus')
+          ? 'current-rent-plus'
+          : conditions.includes('payments')
+            ? 'payments'
+            : undefined;
+        const hasPaymentTerms = Boolean(paymentOption || conditions.includes('oneoff'));
+        const hasRestore = conditions.includes('restore');
+        if (hasPaymentTerms) {
+          list.item(
+            'adjournment-condition',
+            `The claim is adjourned generally on condition that ${defendant} ${defendantVerb('makes', 'make')} payment of current rent as it falls due together with the following payments towards any arrears:`,
+            item => {
+              item.orderedList('adjournment-payment-terms', terms => {
+                if (conditions.includes('oneoff')) {
+                  terms.item('adjournment-one-off', content => {
+                    addAdjournmentOneOffTerm(content, form, claimant);
+                    content.text(';');
+                  });
+                }
+                if (paymentOption) {
+                  terms.item('adjournment-instalments', content => {
+                    addAdjournmentInstalmentTerm(content, form, claimant, paymentOption);
+                    content.text(';');
+                  });
+                }
+              });
+            }
+          );
+          list.item(
+            'adjournment-restore-right',
+            `${sentenceCase(claimant)} may apply to restore the claim if there is a breach of such condition or conditions. This application shall be made on notice to all parties. ${sentenceCase(claimant)} shall set out in such application details of the alleged breach or breaches and attach any evidence relied upon in support.`
+          );
+          if (hasRestore) {
+            list.item('adjournment-strike-out', content => {
+              content
+                .text('If no application to restore the claim is made by ')
+                .generatedText('adjournment-restore-date', date(form, 'adj-gen-restore-date'))
+                .text(' the claim shall stand as struck out without further application or order of the court.');
+            });
+          }
+        } else {
+          list.item('adjournment-generally', content => {
+            content.text(
+              'This claim is adjourned generally with liberty to restore by application by any party on notice to all other parties.'
+            );
+            if (hasRestore) {
+              content
+                .text(' If no application is made by 4pm on ')
+                .generatedText('adjournment-restore-date', date(form, 'adj-gen-restore-date'))
+                .text(
+                  ' the claim shall automatically be struck out without the need for any further application or order.'
+                );
+            }
+          });
+        }
+      }
+      const costsText = caseManCostsText(form, claimant, defendant);
+      if (costsText) {
+        list.item('adjournment-costs', costsText);
+      }
+    });
+  });
+}
+
 export function initSuspendedMoneyOptions(form: HTMLFormElement): void {
   const moneyJudgment = form.querySelector<HTMLInputElement>(
     'input[name="suspended-options"][value="money-judgment-arrears"]'
@@ -591,6 +770,97 @@ function validateSuspendedOrder(form: HTMLFormElement): OrderError[] {
   return errors;
 }
 
+function validateAdjournmentOrder(form: HTMLFormElement): OrderError[] {
+  const errors: OrderError[] = [];
+  const add = (valid: boolean, id: string, message: string): void => {
+    if (!valid) {
+      errors.push({ id, message });
+    }
+  };
+  const type = field(form, 'adj-type');
+  add(
+    type === 'further-hearing' || type === 'generally',
+    'adj-type',
+    'Select adjourned for further hearing or adjourned generally'
+  );
+
+  if (type === 'further-hearing') {
+    const when = field(form, 'adj-when') || 'next-list';
+    add(hasValidDate(form, 'adj-hearing-date'), 'adj-hearing-date-day', 'Enter a valid adjournment date');
+    add(
+      /^\d+$/.test(field(form, 'adj-time-estimate')) && Number(field(form, 'adj-time-estimate')) > 0,
+      'adj-time-estimate',
+      'Enter the time estimate as a whole number'
+    );
+    add(
+      ['minutes', 'hours'].includes(field(form, 'adj-time-estimate-unit')),
+      'adj-time-estimate-unit',
+      'Select minutes or hours for the time estimate'
+    );
+    if (when === 'specific') {
+      add(Boolean(field(form, 'adj-specific-time')), 'adj-specific-time', 'Enter the time of hearing');
+    }
+    if (selected(form, 'adj-directions', 'defence')) {
+      add(hasValidDate(form, 'adj-defence-date'), 'adj-defence-date-day', 'Enter a valid defence date');
+    }
+    if (selected(form, 'adj-directions', 'counterclaim')) {
+      add(hasValidDate(form, 'adj-counterclaim-date'), 'adj-counterclaim-date-day', 'Enter a valid counterclaim date');
+    }
+    if (selected(form, 'adj-directions', 'claimant-reply')) {
+      add(
+        hasValidDate(form, 'adj-claimant-reply-date'),
+        'adj-claimant-reply-date-day',
+        'Enter a valid counterclaim reply date'
+      );
+    }
+    add(
+      !(selected(form, 'adj-directions', 'defence') && selected(form, 'adj-directions', 'counterclaim')),
+      'adj-directions',
+      'Select either defence or defence and any counterclaim, not both'
+    );
+  }
+
+  if (type === 'generally') {
+    const conditions = new FormData(form).getAll('adj-gen').map(String);
+    const validatePayment = (option: string, prefix: string): void => {
+      if (!conditions.includes(option)) {
+        return;
+      }
+      add(hasValidMoney(form, `${prefix}-amount`), `${prefix}-amount`, 'Enter a valid payment amount');
+      add(hasValidDate(form, `${prefix}-date`), `${prefix}-date-day`, 'Enter a valid payment date');
+    };
+    validatePayment('current-rent-plus', 'adj-gen-current-rent-plus');
+    validatePayment('payments', 'adj-gen-payments');
+    validatePayment('oneoff', 'adj-gen-oneoff');
+    add(
+      !(conditions.includes('current-rent-plus') && conditions.includes('payments')),
+      'adj-gen',
+      'Select either current rent plus instalments or instalment payments, not both'
+    );
+    if (conditions.includes('restore')) {
+      add(
+        hasValidDate(form, 'adj-gen-restore-date'),
+        'adj-gen-restore-date-day',
+        'Enter a valid restore application date'
+      );
+    }
+  }
+
+  if (selected(form, 'costs', 'yes')) {
+    const costsChoice = field(form, 'costs-choice');
+    const amountFields: Record<string, string> = {
+      'def-pay-cl-fixed': 'costs-def-pay-cl-fixed-amount',
+      'def-pay-cl-summary': 'costs-def-pay-cl-summary-amount',
+      'cl-pay-def-summary': 'costs-cl-pay-def-summary-amount',
+    };
+    const amountField = amountFields[costsChoice];
+    if (amountField) {
+      add(hasValidMoney(form, amountField), amountField, 'Enter a valid costs amount');
+    }
+  }
+  return errors;
+}
+
 function showOrderErrors(form: HTMLFormElement, errors: OrderError[]): void {
   form.querySelector('#make-order-error-summary')?.remove();
   form.querySelectorAll('.govuk-input--error').forEach(input => input.classList.remove('govuk-input--error'));
@@ -660,12 +930,18 @@ export function initMakeOrder(): void {
       documentField.value = '';
     }
   };
+  const builders: Partial<Record<OrderType, (value: HTMLFormElement) => ReturnType<typeof buildOrder>>> = {
+    OUTRIGHT_POSSESSION: buildOutrightOrder,
+    SUSPENDED_POSSESSION: buildSuspendedOrder,
+    ADJOURNMENT: buildAdjournmentOrder,
+  };
   const render = (): void => {
     const type = orderTypeField.value as OrderType;
-    if (!editor || editorType !== type || (type !== 'OUTRIGHT_POSSESSION' && type !== 'SUSPENDED_POSSESSION')) {
+    const builder = builders[type];
+    if (!editor || editorType !== type || !builder) {
       return;
     }
-    editor.render(type === 'SUSPENDED_POSSESSION' ? buildSuspendedOrder(form) : buildOutrightOrder(form));
+    editor.render(builder(form));
     persistEditor();
   };
   const selectOrderType = (type: OrderType): void => {
@@ -677,7 +953,7 @@ export function initMakeOrder(): void {
     }
     orderTypeField.value = type;
     syncSuspendedOnlyCosts(form, type);
-    const previewAvailable = type === 'OUTRIGHT_POSSESSION' || type === 'SUSPENDED_POSSESSION';
+    const previewAvailable = Boolean(builders[type]);
     editorRegion.hidden = !previewAvailable;
     unavailable.hidden = previewAvailable;
     submit.disabled = !previewAvailable;
@@ -717,12 +993,13 @@ export function initMakeOrder(): void {
   form.addEventListener('submit', event => {
     persistEditor();
     const submitter = event instanceof SubmitEvent ? event.submitter : null;
-    if (
-      submitter instanceof HTMLButtonElement &&
-      submitter.value === 'SUBMIT_FOR_REVIEW' &&
-      orderTypeField.value === 'SUSPENDED_POSSESSION'
-    ) {
-      const errors = validateSuspendedOrder(form);
+    if (submitter instanceof HTMLButtonElement && submitter.value === 'SUBMIT_FOR_REVIEW') {
+      const errors =
+        orderTypeField.value === 'SUSPENDED_POSSESSION'
+          ? validateSuspendedOrder(form)
+          : orderTypeField.value === 'ADJOURNMENT'
+            ? validateAdjournmentOrder(form)
+            : [];
       showOrderErrors(form, errors);
       if (errors.length) {
         event.preventDefault();
