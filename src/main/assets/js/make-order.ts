@@ -9,11 +9,12 @@ import {
 type OrderType = 'OUTRIGHT_POSSESSION' | 'SUSPENDED_POSSESSION' | 'ADJOURNMENT' | 'STRIKE_OUT_DISMISSAL' | 'FREE_FORM';
 
 function field(form: HTMLFormElement, name: string): string {
-  return String(new FormData(form).get(name) ?? '').trim();
+  const value = new FormData(form).get(name);
+  return typeof value === 'string' ? value.trim() : '';
 }
 
 function selected(form: HTMLFormElement, name: string, value: string): boolean {
-  return new FormData(form).getAll(name).map(String).includes(value);
+  return new FormData(form).getAll(name).includes(value);
 }
 
 function date(form: HTMLFormElement, prefix: string): string {
@@ -199,8 +200,8 @@ function buildOutrightOrder(form: HTMLFormElement) {
   const address = form.dataset.propertyAddress || '[property address not provided]';
   const claimants = form.dataset.claimants || 'the claimant(s)';
   const defendants = form.dataset.defendants || 'the defendant(s)';
-  const options = new FormData(form).getAll('outright-options').map(String);
-  const hasMoneyJudgment = options.includes('money-judgment');
+  const options = new Set(new FormData(form).getAll('outright-options').filter(entry => typeof entry === 'string'));
+  const hasMoneyJudgment = options.has('money-judgment');
   const hasMoneyJudgmentArrears = hasMoneyJudgment && selected(form, 'outright-mj-sections', 'arrears');
   const hasMoneyJudgmentPaymentPlan = hasMoneyJudgment && selected(form, 'outright-mj-sections', 'payment-plan');
 
@@ -241,7 +242,7 @@ function buildOutrightOrder(form: HTMLFormElement) {
             .text('.');
         });
       }
-      if (options.includes('use-occupation')) {
+      if (options.has('use-occupation')) {
         list.item('use-occupation', content => {
           content
             .generatedText('defendants', defendants)
@@ -305,7 +306,7 @@ function buildOutrightOrder(form: HTMLFormElement) {
           content.text('.');
         });
       }
-      if (options.includes('transfer-high-court')) {
+      if (options.has('transfer-high-court')) {
         list.item(
           'high-court-transfer',
           'The order for possession is transferred to the High Court solely for the purpose of enforcement.'
