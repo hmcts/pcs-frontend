@@ -221,3 +221,5 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 - **Spec logic:** `PLAYWRIGHT_SPEC` maps to `E2E_SPEC` (path filter, case-sensitive).
 - **Defaults:** Chrome is enabled by default; other platforms are optional.
 - **Reporting:** Each stage publishes its own Allure report and Slack message. Failed stages do not stop later stages.
+
+<!-- HDPI-8713 measurement baseline: unmodified E2E behaviour. DO NOT MERGE. -->
