@@ -1,42 +1,29 @@
-# ACR Build Task template for pcs-frontend.
+# ACR build task for pcs-frontend, run by cnp-jenkins-library in place of the
+# default `az acr build`. The library renders this to acb.yaml, substituting
+# {{CI_IMAGE_TAG}} (e.g. pcs/frontend:pr-1234) and {{REGISTRY_NAME}}.
+# Reference: https://learn.microsoft.com/azure/container-registry/container-registry-tasks-reference-yaml
 #
-# The Jenkins library (cnp-jenkins-library, sectionBuildAndTest.groovy) looks for
-# this file; when present it renders it to `acb.yaml` — substituting {{CI_IMAGE_TAG}}
-# (e.g. `pcs/frontend:pr-1234`) and {{REGISTRY_NAME}} — and runs that instead of a
-# plain `az acr build`. See docs at:
-#   https://learn.microsoft.com/azure/container-registry/container-registry-tasks-reference-yaml
+# It buys two things over the default build: `--target runtime` so unused stages
+# are skipped, and `--cache-from` so `yarn install` is reused between builds.
 #
-# Why this exists rather than relying on the default `az acr build`:
+# ACR Tasks runs the legacy non-BuildKit builder, which builds stages in file
+# order until it reaches --target. Any stage declared above `runtime` in the
+# Dockerfile is therefore built even if nothing depends on it — keep non-production
+# stages below it.
 #
-#  1. ACR Tasks uses the LEGACY (non-BuildKit) docker builder, which builds every
-#     stage it encounters up to `--target`, whether or not the target depends on it.
-#     The default build has no `--target`, so it built all stages including the
-#     (now-deleted) `development` stage and threw the result away. Pinning
-#     `--target runtime` means only the stages runtime actually needs are built.
-#     NOTE: because the legacy builder walks stages in file order, any stage added
-#     to the Dockerfile AFTER `runtime` is skipped, but one added BEFORE it is still
-#     built. Keep non-production stages below `runtime`.
-#
-#  2. `--cache-from` lets a build reuse layers from the previous build's pushed
-#     images. The expensive layer is `yarn install` in the `dependencies` stage
-#     (~44s of a ~113s cold build); it only changes when package.json / yarn.lock /
-#     .yarnrc.yml change, so most builds can reuse it.
-#
-# pcs-frontend is deployed to AKS on amd64 only, so — unlike the multi-arch CCD
-# templates this is modelled on — there is no arm64 half and no manifest juggling.
+# amd64 only, so unlike the multi-arch CCD templates this is based on there is no
+# arm64 half or manifest to assemble.
 
 version: 1.0-preview-1
 steps:
-  # Pull the shared HMCTS node base image up front so a transient registry blip
-  # gets retried here rather than failing the build outright.
   - id: pull-hmcts-base
     cmd: docker pull --platform linux/amd64 hmctsprod.azurecr.io/base/node:20-alpine
     when: ["-"]
     retries: 3
     retryDelay: 5
 
-  # Previous builds' cache images. `|| true` so the very first build (and any build
-  # after a registry purge) proceeds with a cold cache instead of failing.
+  # Cache images from the previous build. `|| true` so a cold cache — first build,
+  # or after a registry purge — is not a failure.
   - id: pull-base-cache
     cmd: docker pull --platform linux/amd64 {{REGISTRY_NAME}}.azurecr.io/pcs/frontend/base:amd64 || true
     when: ["-"]
@@ -63,7 +50,7 @@ steps:
     retries: 3
     retryDelay: 5
 
-  # Built as its own tag purely so `yarn install` can be cached across builds.
+  # Tagged separately only so `yarn install` can be cached across builds.
   - id: dependencies
     build: >
       -t {{REGISTRY_NAME}}.azurecr.io/pcs/frontend/dependencies:amd64
@@ -79,7 +66,7 @@ steps:
     retries: 3
     retryDelay: 5
 
-  # The deployable image. Stops at `runtime`, so `development` is never built.
+  # The deployable image.
   - id: runtime
     build: >
       -t {{REGISTRY_NAME}}.azurecr.io/{{CI_IMAGE_TAG}}
@@ -95,8 +82,8 @@ steps:
     retries: 3
     retryDelay: 5
 
-  # Push the cache tags alongside the deployable image so the next build can reuse
-  # them. The runtime image tag is what Flux/Helm deploys.
+  # Cache tags are pushed alongside the deployable image so the next build can pull
+  # them back.
   - id: push-images
     push:
       - "{{REGISTRY_NAME}}.azurecr.io/pcs/frontend/base:amd64"

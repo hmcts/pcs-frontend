@@ -38,9 +38,8 @@ RUN yarn build:prod && \
 RUN yarn build:server
 
 # ---- Production dependencies image ----
-# Prunes the full dependency tree down to production-only. Runs here rather than
-# in `runtime` so that the yarn cache (~190MB, needed to resolve packages
-# offline) stays in this throwaway stage and never lands in a runtime layer.
+# Pruned here rather than in `runtime` so the ~190MB yarn cache it needs stays in
+# this throwaway stage.
 FROM dependencies AS prod-deps
 
 WORKDIR /app
@@ -59,24 +58,16 @@ USER hmcts
 # Copy package files
 COPY --chown=hmcts:hmcts package.json yarn.lock .yarnrc.yml ./
 
-# The base image CMD is `yarn start`, so yarn must be resolvable at runtime.
-# Only `.yarn/releases` (the binary `yarnrc.yml`'s `yarnPath` points at) is needed
-# — copying the whole `.yarn` tree would also ship `.yarn/cache` (~190MB).
-# Pre-create and chown the directory as root so the copy target, and any
-# `install-state.gz` yarn writes at runtime, are writable by hmcts.
+# CMD is `yarn start`, so yarn has to resolve offline. That needs the release that
+# yarnPath points at *and* corepack's cache, because `packageManager` makes `yarn` a
+# corepack shim that downloads the pinned version when it is missing. Copying all of
+# .yarn instead would drag in the ~190MB package cache.
 USER root
 RUN mkdir -p /app/.yarn && chown -R hmcts:hmcts /app/.yarn
 USER hmcts
 COPY --chown=hmcts:hmcts .yarn/releases ./.yarn/releases
-
-# `packageManager` in package.json makes the `yarn` on PATH a corepack shim, which
-# resolves the pinned yarn from corepack's own cache and tries to DOWNLOAD it if
-# absent. Previously that cache was populated as a side effect of running yarn in
-# this stage; now that dependency resolution happens in prod-deps, carry the cache
-# over explicitly (~3.6MB) so the container never needs network access to start.
 COPY --from=prod-deps --chown=hmcts:hmcts /home/hmcts/.cache/node/corepack /home/hmcts/.cache/node/corepack
 
-# Production dependencies, resolved offline in the prod-deps stage
 COPY --from=prod-deps --chown=hmcts:hmcts /app/node_modules ./node_modules
 
 ENV NODE_ENV=production

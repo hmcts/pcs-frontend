@@ -19,8 +19,7 @@
 !src/types/**
 !bin/**
 
-# The ACR build is driven by acb.yaml (generated from acb.tpl.yaml by the Jenkins
-# library). `az acr run` reads it from inside the uploaded context tarball, so it
-# must survive the `*` exclusion above or the remote build fails to start.
+# ACR reads both of these from inside the uploaded context tarball, so the `*`
+# rule above must not exclude them or the remote build cannot start.
 !acb.yaml
 !Dockerfile
