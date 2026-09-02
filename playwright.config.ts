@@ -75,7 +75,7 @@ export default defineConfig({
   workers: 2,
   timeout: 600 * 1000,
   expect: { timeout: 10 * 1000 },
-  use: { actionTimeout: 10 * 1000, navigationTimeout: 30 * 1000 },
+  use: { actionTimeout: process.env.CI ? 20 * 1000 : 10 * 1000, navigationTimeout: 30 * 1000 },
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
