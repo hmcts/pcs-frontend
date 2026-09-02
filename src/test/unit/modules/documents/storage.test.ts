@@ -119,8 +119,21 @@ describe('createCcdDraftStorage', () => {
       const req = makeReq();
       const result = await storage.readFresh(req);
 
-      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith('test-token', VALID_CASE_REF, EVENT.id);
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith('test-token', VALID_CASE_REF, EVENT.id, undefined);
       expect(result).toEqual([doc1, doc2]);
+    });
+
+    it('passes clientContext to getCaseByIdForEvent when present in session', async () => {
+      mockGetCaseByIdForEvent.mockResolvedValue({
+        id: VALID_CASE_REF,
+        data: {},
+      });
+
+      const clientContext = { selectedPartyId: 'party-123' };
+      const req = makeReq({ session: { user: { accessToken: 'test-token' }, clientContext } });
+      await storage.readFresh(req);
+
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith('test-token', VALID_CASE_REF, EVENT.id, clientContext);
     });
 
     it('returns empty array when path not present in fresh response', async () => {
@@ -150,11 +163,35 @@ describe('createCcdDraftStorage', () => {
       const req = makeReq();
       await storage.save(req, [doc1, doc2]);
 
-      expect(mockUpdateDraft).toHaveBeenCalledWith(EVENT, 'test-token', VALID_CASE_REF, {
-        possessionClaimResponse: {
-          defendantResponses: { defendantDocuments: [doc1, doc2] },
+      expect(mockUpdateDraft).toHaveBeenCalledWith(
+        EVENT,
+        'test-token',
+        VALID_CASE_REF,
+        {
+          possessionClaimResponse: {
+            defendantResponses: { defendantDocuments: [doc1, doc2] },
+          },
         },
-      });
+        undefined
+      );
+    });
+
+    it('passes clientContext to updateDraft when present in session', async () => {
+      const clientContext = { selectedPartyId: 'party-123' };
+      const req = makeReq({ session: { user: { accessToken: 'test-token' }, clientContext } });
+      await storage.save(req, [doc1]);
+
+      expect(mockUpdateDraft).toHaveBeenCalledWith(
+        EVENT,
+        'test-token',
+        VALID_CASE_REF,
+        {
+          possessionClaimResponse: {
+            defendantResponses: { defendantDocuments: [doc1] },
+          },
+        },
+        clientContext
+      );
     });
 
     it('throws when user has no access token', async () => {
