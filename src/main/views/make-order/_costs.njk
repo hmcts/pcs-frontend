@@ -4,8 +4,6 @@
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Costs</h2>
 
-{% set costsSameTermsHint = "Only available with a suspended possession order." %}
-
 {% set costsChoiceItems = [
   {
     value: "def-pay-cl-fixed",
@@ -63,18 +61,33 @@
   { value: "no-order", text: "No order as to costs", checked: draftChecked("costs-choice", "no-order") },
   { value: "public-funding", text: "Public funding assessment of the defendant's costs", checked: draftChecked("costs-choice", "public-funding") },
   {
+    value: "other",
+    text: "Other",
+    checked: draftChecked("costs-choice", "other"),
+    conditional: {
+      html: govukInput({
+        id: "costs-other-text",
+        name: "costs-other-text",
+        label: { text: "Costs order" },
+        classes: "govuk-input--width-20",
+        value: draftValue("costs-other-text")
+      })
+    }
+  }
+] %}
+
+{% set suspendedCostsChoiceItems = [
+  {
     value: "same-terms",
     text: "Costs payable on the same terms as the suspension",
     checked: draftChecked("costs-choice", "same-terms"),
-    disabled: draftOrderType != "SUSPENDED_POSSESSION",
-    hint: { text: costsSameTermsHint }
+    disabled: draftOrderType != "SUSPENDED_POSSESSION"
   },
   {
     value: "fixed-same-terms",
     text: "Defendant pays claimant's fixed costs, payable on the same terms as the suspension",
     checked: draftChecked("costs-choice", "fixed-same-terms"),
     disabled: draftOrderType != "SUSPENDED_POSSESSION",
-    hint: { text: costsSameTermsHint },
     conditional: {
       html: govukInput({
         id: "costs-fixed-same-terms-amount",
@@ -93,7 +106,6 @@
     text: "Defendant pays claimant's summary assessed costs, payable on the same terms as the suspension",
     checked: draftChecked("costs-choice", "summary-same-terms"),
     disabled: draftOrderType != "SUSPENDED_POSSESSION",
-    hint: { text: costsSameTermsHint },
     conditional: {
       html: govukInput({
         id: "costs-summary-same-terms-amount",
@@ -106,22 +118,30 @@
         prefix: { text: "£" }
       })
     }
-  },
-  {
-    value: "other",
-    text: "Other",
-    checked: draftChecked("costs-choice", "other"),
-    conditional: {
-      html: govukInput({
-        id: "costs-other-text",
-        name: "costs-other-text",
-        label: { text: "Costs order" },
-        classes: "govuk-input--width-20",
-        value: draftValue("costs-other-text")
-      })
-    }
   }
 ] %}
+
+{% set costsChoicesHtml %}
+  <fieldset class="govuk-fieldset">
+    <legend class="govuk-fieldset__legend govuk-visually-hidden">Costs order</legend>
+    <div class="pcs-costs-columns">
+      {{ govukRadios({
+        idPrefix: "costs-choice",
+        name: "costs-choice",
+        classes: "govuk-radios--small",
+        items: costsChoiceItems
+      }) }}
+      <div data-suspended-costs-column{% if draftOrderType != "SUSPENDED_POSSESSION" %} hidden{% endif %}>
+        {{ govukRadios({
+          idPrefix: "suspended-costs-choice",
+          name: "costs-choice",
+          classes: "govuk-radios--small",
+          items: suspendedCostsChoiceItems
+        }) }}
+      </div>
+    </div>
+  </fieldset>
+{% endset %}
 
 {{ govukCheckboxes({
   idPrefix: "costs",
@@ -132,13 +152,7 @@
     text: "Costs",
     checked: draftChecked("costs", "yes"),
     conditional: {
-      html: govukRadios({
-        idPrefix: "costs-choice",
-        name: "costs-choice",
-        classes: "govuk-radios--small",
-        fieldset: { legend: { text: "Costs order", classes: "govuk-visually-hidden" } },
-        items: costsChoiceItems
-      })
+      html: costsChoicesHtml
     }
   }]
 }) }}

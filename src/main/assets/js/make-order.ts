@@ -494,11 +494,16 @@ export function initSuspendedMoneyOptions(form: HTMLFormElement): void {
 const SAME_TERMS_COSTS = new Set(['same-terms', 'fixed-same-terms', 'summary-same-terms']);
 
 export function syncSuspendedOnlyCosts(form: HTMLFormElement, type: OrderType): void {
+  const suspendedColumn = form.querySelector<HTMLElement>('[data-suspended-costs-column]');
+  const hidden = type !== 'SUSPENDED_POSSESSION';
+  if (suspendedColumn) {
+    suspendedColumn.hidden = hidden;
+  }
   form.querySelectorAll<HTMLInputElement>('input[name="costs-choice"]').forEach(choice => {
     if (!SAME_TERMS_COSTS.has(choice.value)) {
       return;
     }
-    choice.disabled = type !== 'SUSPENDED_POSSESSION';
+    choice.disabled = hidden;
     if (choice.disabled) {
       choice.checked = false;
     }

@@ -176,19 +176,24 @@ describe('suspended money choices', () => {
   it('clears and disables same-terms costs outside suspended possession', () => {
     document.body.innerHTML = `
       <form>
+        <div data-suspended-costs-column>
         <input type="radio" name="costs-choice" value="same-terms" checked>
+        </div>
         <input type="radio" name="costs-choice" value="reserved">
       </form>
     `;
     const form = document.querySelector<HTMLFormElement>('form')!;
     const sameTerms = form.querySelector<HTMLInputElement>('input[value="same-terms"]')!;
+    const suspendedColumn = form.querySelector<HTMLElement>('[data-suspended-costs-column]')!;
 
     syncSuspendedOnlyCosts(form, 'OUTRIGHT_POSSESSION');
     expect(sameTerms.disabled).toBe(true);
     expect(sameTerms.checked).toBe(false);
+    expect(suspendedColumn.hidden).toBe(true);
 
     syncSuspendedOnlyCosts(form, 'SUSPENDED_POSSESSION');
     expect(sameTerms.disabled).toBe(false);
+    expect(suspendedColumn.hidden).toBe(false);
   });
 });
 

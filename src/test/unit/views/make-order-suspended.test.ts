@@ -62,6 +62,20 @@ describe('suspended possession order fields', () => {
 
     expect(document.querySelector<HTMLInputElement>('#costs-fixed-same-terms-amount')?.value).toBe('125');
     expect(document.querySelector<HTMLInputElement>('#costs-summary-same-terms-amount')?.value).toBe('175');
+    expect(document.querySelector('[data-suspended-costs-column]')?.hasAttribute('hidden')).toBe(false);
+    expect(document.querySelector('.pcs-costs-columns')?.children).toHaveLength(2);
+  });
+
+  it('hides suspended-only costs for an outright order', () => {
+    document.body.innerHTML = environment.render('make-order/_costs.njk', {
+      draftOrderType: 'OUTRIGHT_POSSESSION',
+      draftValue: () => undefined,
+      draftChecked: () => false,
+    });
+
+    expect(document.querySelector('[data-suspended-costs-column]')?.hasAttribute('hidden')).toBe(true);
+    expect(document.querySelector<HTMLInputElement>('[value="same-terms"]')?.disabled).toBe(true);
+    expect(document.body.textContent).not.toContain('Only available with a suspended possession order.');
   });
 
   it('restores payment choices and only enables same terms for a money judgment', () => {
