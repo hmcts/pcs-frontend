@@ -1083,6 +1083,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('inputText', endOfJourneyCYA.fullNameTextLabel, sot.firstName);
     await performAction('inputText', endOfJourneyCYA.nameOfFirmTextLabel, sot.firmName);
     await performAction('inputText', endOfJourneyCYA.positionOrOfficeHeldTextLabel, sot.position);
+
     await page.getByRole('button', { name: 'Submit', exact: true }).click({
       noWaitAfter: true,
     });
