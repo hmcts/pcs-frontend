@@ -37,8 +37,7 @@ export class InputTextAction implements IAction {
       )
       .first();
 
-    // `count()` does not retry, so on a freshly navigated page it can read the previous DOM and
-    // pick the branch that cannot resolve here. Wait for either shape before probing.
+    // Wait for whichever shape this page uses before the count() probe below.
     await waitForInteractive(anyOf(roleLocator, fallbackLocator));
 
     if ((await roleLocator.count()) > 0) {

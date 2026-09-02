@@ -4,8 +4,7 @@ import { IAction } from '../../interfaces';
 
 export class ClickSummaryAction implements IAction {
   async execute(page: Page, action: string, summaryText: string): Promise<void> {
-    // `.first()` keeps this strict-mode safe when a page repeats the same summary text.
-    const summary = page.locator(`summary:has-text("${summaryText}")`).first();
+    const summary = page.locator(`summary:has-text("${summaryText}")`);
     await summary.click();
   }
 }

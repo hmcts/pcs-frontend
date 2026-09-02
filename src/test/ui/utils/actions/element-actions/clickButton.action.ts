@@ -29,10 +29,7 @@ export class ClickButtonAction implements IAction {
   }
 
   private async clickButton(page: Page, button: Locator): Promise<void> {
-    // `click()` auto-waits for actionability, so no pre-click sleep is needed.
     await button.click();
-    // Kept as a cheap barrier: the app is server-rendered, so this lets a document
-    // navigation triggered by the click reach `load` before the next action probes the DOM.
     await page.waitForLoadState();
   }
 
@@ -47,9 +44,8 @@ export class ClickButtonAction implements IAction {
     do {
       attempt++;
       await this.clickButton(page, button);
-      // Wait for the next page rather than sleeping a fixed period: this returns as soon as the
-      // heading appears but still allows the same per-attempt budget before retrying the click.
-      // The retry loop is kept as a safety net for the app behaving abnormally.
+      // Returns as soon as the heading appears, but allows the same budget as the previous
+      // fixed sleep before the click is retried.
       nextPageElementIsVisible = await pageElement
         .first()
         .waitFor({ state: 'visible', timeout: waitForPageRedirectionTimeout })
@@ -68,7 +64,6 @@ export class ClickButtonAction implements IAction {
   }
 
   private async verifyPageAndClickButton(page: Page, currentPageHeader: string, button: Locator): Promise<void> {
-    // `textContent()` auto-waits for the heading, which is the readiness signal here.
     if ((await page.locator('h1,h1.govuk-heading-xl, h1.govuk-heading-l').textContent()) === currentPageHeader) {
       await this.clickButton(page, button);
     }
