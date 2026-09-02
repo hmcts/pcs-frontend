@@ -71,6 +71,41 @@ function defaultDate(form: HTMLFormElement, prefix: string, daysFromToday: numbe
 }
 
 export function initDatePills(form: HTMLFormElement): void {
+  form.addEventListener('input', event => {
+    if (!(event.target instanceof HTMLInputElement) || !event.target.name.endsWith('-day')) {
+      return;
+    }
+
+    const shorthand = /^(\d+)\s*([dwm])$/i.exec(event.target.value.trim());
+    if (!shorthand) {
+      return;
+    }
+
+    const amount = Number(shorthand[1]);
+    const unit = shorthand[2].toLowerCase();
+    const prefix = event.target.name.slice(0, -'-day'.length);
+    const month = form.querySelector<HTMLInputElement>(`input[name="${prefix}-month"]`);
+    const year = form.querySelector<HTMLInputElement>(`input[name="${prefix}-year"]`);
+    if (!Number.isSafeInteger(amount) || !month || !year) {
+      return;
+    }
+
+    const value = new Date();
+    if (unit === 'm') {
+      const dayOfMonth = value.getDate();
+      value.setDate(1);
+      value.setMonth(value.getMonth() + amount);
+      const lastDayOfMonth = new Date(value.getFullYear(), value.getMonth() + 1, 0).getDate();
+      value.setDate(Math.min(dayOfMonth, lastDayOfMonth));
+    } else {
+      value.setDate(value.getDate() + amount * (unit === 'w' ? 7 : 1));
+    }
+
+    event.target.value = String(value.getDate()).padStart(2, '0');
+    month.value = String(value.getMonth() + 1).padStart(2, '0');
+    year.value = String(value.getFullYear());
+  });
+
   form.addEventListener('click', event => {
     const pill =
       event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-date-pill-days]') : null;

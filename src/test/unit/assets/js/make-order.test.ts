@@ -168,6 +168,48 @@ describe('make order date pills', () => {
 
     expect(document.querySelector<HTMLInputElement>('#possession-date-day')?.value).toBe('');
   });
+
+  it.each([
+    ['14d', '03', '01', '2027'],
+    ['2w', '03', '01', '2027'],
+    ['2m', '20', '02', '2027'],
+  ])('expands the %s date shorthand relative to today', (shorthand, expectedDay, expectedMonth, expectedYear) => {
+    initDatePills(document.querySelector<HTMLFormElement>('#make-order-form')!);
+    const day = document.querySelector<HTMLInputElement>('#possession-date-day')!;
+
+    day.value = shorthand;
+    day.dispatchEvent(new Event('input', { bubbles: true }));
+
+    expect(day.value).toBe(expectedDay);
+    expect(document.querySelector<HTMLInputElement>('#possession-date-month')?.value).toBe(expectedMonth);
+    expect(document.querySelector<HTMLInputElement>('#possession-date-year')?.value).toBe(expectedYear);
+  });
+
+  it('clamps month shorthand to the last valid day of the target month', () => {
+    jest.setSystemTime(new Date(2027, 0, 31, 12));
+    initDatePills(document.querySelector<HTMLFormElement>('#make-order-form')!);
+    const day = document.querySelector<HTMLInputElement>('#possession-date-day')!;
+
+    day.value = '1m';
+    day.dispatchEvent(new Event('input', { bubbles: true }));
+
+    expect(day.value).toBe('28');
+    expect(document.querySelector<HTMLInputElement>('#possession-date-month')?.value).toBe('02');
+    expect(document.querySelector<HTMLInputElement>('#possession-date-year')?.value).toBe('2027');
+  });
+
+  it('leaves ordinary and invalid day input unchanged', () => {
+    initDatePills(document.querySelector<HTMLFormElement>('#make-order-form')!);
+    const day = document.querySelector<HTMLInputElement>('#possession-date-day')!;
+
+    for (const value of ['12', 'tomorrow', '2y']) {
+      day.value = value;
+      day.dispatchEvent(new Event('input', { bubbles: true }));
+      expect(day.value).toBe(value);
+      expect(document.querySelector<HTMLInputElement>('#possession-date-month')?.value).toBe('');
+      expect(document.querySelector<HTMLInputElement>('#possession-date-year')?.value).toBe('');
+    }
+  });
 });
 
 describe('make order preview', () => {
