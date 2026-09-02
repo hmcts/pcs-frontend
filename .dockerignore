@@ -18,3 +18,8 @@
 !webpack.config.js
 !src/types/**
 !bin/**
+
+# ACR reads both of these from inside the uploaded context tarball, so the `*`
+# rule above must not exclude them or the remote build cannot start.
+!acb.yaml
+!Dockerfile
