@@ -262,7 +262,7 @@ test.afterEach(() => {
 });
 
 test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly @EMV', () => {
-  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown', async () => {
+  test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown temp - @regression', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
@@ -529,7 +529,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     assertAllErrorMessageValidations();
   });
 
-  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible', async () => {
+  test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible temp- @regression', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
     await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
     await softErrorMessageValidation('doYouHaveASolicitor', doYouHaveASolicitorErrorValidation);
