@@ -19,19 +19,19 @@ function renderCompleteForm(initialDocument = '', orderType = 'OUTRIGHT_POSSESSI
       <a href="#outright" data-order-type="OUTRIGHT_POSSESSION">Outright</a>
       <a href="#suspended" data-order-type="SUSPENDED_POSSESSION">Suspended</a>
 
-      <div data-attendance-row data-party-kind="claimant" data-party-label="the first claimant">
+      <div id="claimant-1-attendance" data-attendance-row data-party-kind="claimant" data-party-label="the first claimant">
         <input type="radio" name="attendance-1" value="counsel" checked>
         <input type="text" value="Alex Counsel">
       </div>
-      <div data-attendance-row data-party-kind="defendant" data-party-label="the first defendant">
+      <div id="defendant-1-attendance" data-attendance-row data-party-kind="defendant" data-party-label="the first defendant">
         <input type="radio" name="attendance-2" value="solicitor" checked>
         <input type="text" value="Sam Solicitor">
       </div>
-      <div data-attendance-row data-party-kind="defendant" data-party-label="the second defendant">
+      <div id="defendant-2-attendance" data-attendance-row data-party-kind="defendant" data-party-label="the second defendant">
         <input type="radio" name="attendance-3" value="letter-only" checked>
         <input type="text" value="Taylor Defendant">
       </div>
-      <div data-attendance-row data-party-kind="defendant" data-party-label="the third defendant">
+      <div id="defendant-3-attendance" data-attendance-row data-party-kind="defendant" data-party-label="the third defendant">
         <input type="radio" name="attendance-4" value="not-present" checked>
         <input type="text">
       </div>
@@ -41,47 +41,57 @@ function renderCompleteForm(initialDocument = '', orderType = 'OUTRIGHT_POSSESSI
       </div>
 
       <input type="radio" name="recitals" value="yes" checked>
-      <textarea name="recital">First recital\n\nSecond recital</textarea>
+      <textarea id="recitals-text" name="recital">First recital\n\nSecond recital</textarea>
       <input type="radio" name="outright-possession" value="by-date" checked>
-      <input name="outright-by-date-day" value="12">
-      <input name="outright-by-date-month" value="6">
-      <input name="outright-by-date-year" value="2027">
-      <input name="outright-grounds-type" value="mandatory">
-      <input name="outright-grounds-details" value="Ground 8">
+      <div id="outright-by-date">
+        <input name="outright-by-date-day" value="12">
+        <input name="outright-by-date-month" value="6">
+        <input name="outright-by-date-year" value="2027">
+      </div>
+      <input id="outright-grounds-type" name="outright-grounds-type" value="mandatory">
+      <input id="outright-grounds-details" name="outright-grounds-details" value="Ground 8">
 
       <input type="checkbox" name="outright-options" value="money-judgment" checked>
       <input type="checkbox" name="outright-mj-sections" value="arrears" checked>
       <input type="checkbox" name="outright-mj-sections" value="payment-plan" checked>
       <input type="checkbox" name="outright-options" value="use-occupation" checked>
       <input type="checkbox" name="outright-options" value="transfer-high-court" checked>
-      <input name="outright-mj-arrears" value="1,200">
-      <input name="outright-mj-interest" value="50">
-      <input name="outright-use-occupation-rate" value="12.50">
-      <input name="outright-use-occupation-from-date-day" value="1">
-      <input name="outright-use-occupation-from-date-month" value="7">
-      <input name="outright-use-occupation-from-date-year" value="2027">
+      <div id="outright-mj-amounts">
+        <input name="outright-mj-arrears" value="1,200">
+        <input name="outright-mj-interest" value="50">
+      </div>
+      <input id="outright-use-occupation-rate" name="outright-use-occupation-rate" value="12.50">
+      <div id="outright-use-occupation-from-date">
+        <input name="outright-use-occupation-from-date-day" value="1">
+        <input name="outright-use-occupation-from-date-month" value="7">
+        <input name="outright-use-occupation-from-date-year" value="2027">
+      </div>
 
       <input type="radio" name="costs" value="yes" checked>
-      <input name="costs-choice" value="def-pay-cl-fixed">
-      <input name="costs-def-pay-cl-fixed-amount" value="355">
+      <input id="costs-choice" name="costs-choice" value="def-pay-cl-fixed">
+      <input id="costs-def-pay-cl-fixed-amount" name="costs-def-pay-cl-fixed-amount" value="355">
       <input name="costs-def-pay-cl-summary-amount" value="400">
       <input name="costs-cl-pay-def-summary-amount" value="250">
       <input name="costs-other-text" value="Each party bears its own costs">
 
       <input type="checkbox" name="outright-mj-plan" value="lump" checked>
       <input type="checkbox" name="outright-mj-plan" value="instalments" checked>
-      <input name="outright-mj-lump-amount" value="500">
-      <input name="outright-mj-lump-date-day" value="20">
-      <input name="outright-mj-lump-date-month" value="7">
-      <input name="outright-mj-lump-date-year" value="2027">
+      <input id="outright-mj-lump-amount" name="outright-mj-lump-amount" value="500">
+      <div id="outright-mj-lump-date">
+        <input name="outright-mj-lump-date-day" value="20">
+        <input name="outright-mj-lump-date-month" value="7">
+        <input name="outright-mj-lump-date-year" value="2027">
+      </div>
       <input name="outright-mj-balance-date-day" value="20">
       <input name="outright-mj-balance-date-month" value="8">
       <input name="outright-mj-balance-date-year" value="2027">
-      <input name="outright-mj-inst-amount" value="100">
-      <input name="outright-mj-inst-freq" value="month">
-      <input name="outright-mj-inst-date-day" value="1">
-      <input name="outright-mj-inst-date-month" value="8">
-      <input name="outright-mj-inst-date-year" value="2027">
+      <input id="outright-mj-inst-amount" name="outright-mj-inst-amount" value="100">
+      <input id="outright-mj-inst-freq" name="outright-mj-inst-freq" value="month">
+      <div id="outright-mj-inst-date">
+        <input name="outright-mj-inst-date-day" value="1">
+        <input name="outright-mj-inst-date-month" value="8">
+        <input name="outright-mj-inst-date-year" value="2027">
+      </div>
 
       <div id="order-editor-toolbar"></div>
       <section id="order-preview-editor"><div id="order-editor"></div></section>
@@ -96,7 +106,20 @@ function currentOrder(): OrderDocument {
 }
 
 function generatedOrderText(): string {
-  return JSON.stringify(currentOrder().generated);
+  const text = (node: unknown): string => {
+    if (!node || typeof node !== 'object') {
+      return '';
+    }
+    const value = node as { attrs?: { text?: unknown }; content?: unknown[]; text?: unknown };
+    if (typeof value.text === 'string') {
+      return value.text;
+    }
+    if (typeof value.attrs?.text === 'string') {
+      return value.attrs.text;
+    }
+    return value.content?.map(text).join('') ?? '';
+  };
+  return text(currentOrder().generated);
 }
 
 describe('make order date pills', () => {
@@ -254,6 +277,25 @@ describe('make order preview', () => {
     expect(generatedOrderText()).toEqual(expect.stringContaining('by a payment of £'));
     expect(generatedOrderText()).toEqual(expect.stringContaining('by instalment payments of £'));
     expect(generatedOrderText()).toEqual(expect.stringContaining('transferred to the High Court'));
+  });
+
+  it('links every form-derived fact back to its source control', () => {
+    renderCompleteForm();
+    document.querySelectorAll<HTMLElement>('[id]').forEach(element => {
+      element.scrollIntoView = jest.fn();
+    });
+
+    initMakeOrder();
+
+    const facts = Array.from(document.querySelectorAll<HTMLElement>('[data-generated-text]'));
+    const factsWithoutSources = facts
+      .filter(fact => fact.getAttribute('role') !== 'link')
+      .map(fact => fact.textContent);
+    expect(factsWithoutSources).toEqual(['10 Test Street', 'Alex Example', 'Example Housing']);
+
+    const grounds = facts.find(fact => fact.textContent === 'Ground 8');
+    grounds?.click();
+    expect(document.activeElement).toBe(document.querySelector('#outright-grounds-details'));
   });
 
   it('refreshes the generated order for changes outside the editor', () => {

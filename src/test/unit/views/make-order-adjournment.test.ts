@@ -34,6 +34,9 @@ describe('adjournment order fields', () => {
     expect(document.querySelector<HTMLInputElement>('input[name="adj-when"][value="next-list"]')?.checked).toBe(true);
     expect(document.querySelector<HTMLSelectElement>('#adj-time-estimate-unit')?.value).toBe('minutes');
     expect(document.querySelector<HTMLInputElement>('input[name="adj-format"][value="in-person"]')?.checked).toBe(true);
+    expect(document.querySelector('#adj-hearing-date #adj-hearing-date-day')).not.toBeNull();
+    expect(document.querySelector('#adj-time-estimate-group #adj-time-estimate-unit')).not.toBeNull();
+    expect(document.querySelector('#adj-format-group input[name="adj-format"]')).not.toBeNull();
     expect(document.querySelector<HTMLSelectElement>('#adj-gen-current-rent-plus-frequency')?.value).toBe('monthly');
     expect(document.querySelector<HTMLSelectElement>('#adj-gen-payments-frequency')?.value).toBe('monthly');
   });

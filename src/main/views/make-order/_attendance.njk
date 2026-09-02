@@ -26,7 +26,7 @@
 {% for party in attendanceParties %}
   {% set attendanceOptions = claimantAttendance if party.type == "claimant" else defendantAttendance %}
   {# A labelled ARIA group allows the party name to occupy the first grid column. #}
-  <div class="pcs-attendance__row" role="group" aria-labelledby="{{ party.id }}-label"
+  <div id="{{ party.id }}-attendance" class="pcs-attendance__row" role="group" aria-labelledby="{{ party.id }}-label"
        data-attendance-row data-party-kind="{{ party.type }}" data-party-label="{{ party.label }}">
     <span class="govuk-label govuk-label--s pcs-attendance__label" id="{{ party.id }}-label">
       {{ party.label }}

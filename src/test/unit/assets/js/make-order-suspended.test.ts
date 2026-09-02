@@ -13,7 +13,7 @@ jest.mock('@hmcts-cft/docweave', () => {
         text += value;
         return builder;
       },
-      generatedText: (_id: string, value: string) => {
+      fact: (_id: string, value: string) => {
         text += value;
         return builder;
       },
@@ -215,7 +215,7 @@ describe('suspended tab selection', () => {
     const render = jest.fn();
     jest.mocked(createOrderEditor).mockReturnValue({
       render,
-      getDocument: jest.fn(() => ({ schema: 'docweave-document' })),
+      getSnapshot: jest.fn(() => ({ schema: 'docweave-document' })),
     } as never);
 
     initMakeOrder();
@@ -244,9 +244,9 @@ describe('suspended tab selection', () => {
     `;
     const outrightEdited = { schema: 'docweave-document', current: { type: 'doc', tab: 'outright' } };
     const suspendedEdited = { schema: 'docweave-document', current: { type: 'doc', tab: 'suspended' } };
-    const first = { render: jest.fn(), getDocument: jest.fn(() => outrightEdited), destroy: jest.fn() };
-    const second = { render: jest.fn(), getDocument: jest.fn(() => suspendedEdited), destroy: jest.fn() };
-    const third = { render: jest.fn(), getDocument: jest.fn(() => outrightEdited), destroy: jest.fn() };
+    const first = { render: jest.fn(), getSnapshot: jest.fn(() => outrightEdited), destroy: jest.fn() };
+    const second = { render: jest.fn(), getSnapshot: jest.fn(() => suspendedEdited), destroy: jest.fn() };
+    const third = { render: jest.fn(), getSnapshot: jest.fn(() => outrightEdited), destroy: jest.fn() };
     jest
       .mocked(createOrderEditor)
       .mockReturnValueOnce(first as never)
@@ -259,8 +259,8 @@ describe('suspended tab selection', () => {
 
     expect(first.destroy).toHaveBeenCalled();
     expect(second.destroy).toHaveBeenCalled();
-    expect(jest.mocked(createOrderEditor).mock.calls[1][0].initialDocument).toBeUndefined();
-    expect(jest.mocked(createOrderEditor).mock.calls[2][0].initialDocument).toBe(outrightEdited);
+    expect(jest.mocked(createOrderEditor).mock.calls[1][0].initialSnapshot).toBeUndefined();
+    expect(jest.mocked(createOrderEditor).mock.calls[2][0].initialSnapshot).toBe(outrightEdited);
     expect(JSON.parse(document.querySelector<HTMLTextAreaElement>('#order-document')!.value)).toEqual(outrightEdited);
     window.history.replaceState(null, '', window.location.pathname);
   });

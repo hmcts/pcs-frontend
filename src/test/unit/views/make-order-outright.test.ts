@@ -54,11 +54,13 @@ describe('outright possession money judgment', () => {
     expect(controlledPanel(moneyJudgment).contains(arrears)).toBe(true);
     expect(controlledPanel(moneyJudgment).contains(paymentPlan)).toBe(true);
     expect(controlledPanel(arrears).contains(document.getElementById('outright-mj-arrears'))).toBe(true);
+    expect(document.querySelector('#outright-mj-amounts #outright-mj-interest')).not.toBeNull();
     expect(controlledPanel(paymentPlan).contains(lumpPayment)).toBe(true);
     expect(controlledPanel(paymentPlan).contains(instalments)).toBe(true);
     expect(controlledPanel(lumpPayment).contains(balance)).toBe(true);
     expect(controlledPanel(balance).contains(document.getElementById('outright-mj-balance-date'))).toBe(true);
     expect(controlledPanel(instalments).contains(document.getElementById('outright-mj-inst-date'))).toBe(true);
+    expect(document.querySelector('#outright-mj-inst-date #outright-mj-inst-date-day')).not.toBeNull();
   });
 
   it('defaults instalment frequency to monthly', () => {

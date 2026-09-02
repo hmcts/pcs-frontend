@@ -13,7 +13,7 @@ jest.mock('@hmcts-cft/docweave', () => {
         text += value;
         return builder;
       },
-      generatedText: (_id: string, value: string) => {
+      fact: (_id: string, value: string) => {
         text += value;
         return builder;
       },
@@ -206,7 +206,7 @@ describe('adjournment submission validation', () => {
     jest.mocked(createOrderEditor).mockReset();
     jest.mocked(createOrderEditor).mockReturnValue({
       render: jest.fn(),
-      getDocument: jest.fn(() => ({ schema: 'docweave-document' })),
+      getSnapshot: jest.fn(() => ({ schema: 'docweave-document' })),
       destroy: jest.fn(),
     } as never);
   });

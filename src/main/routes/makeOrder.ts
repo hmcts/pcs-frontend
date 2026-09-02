@@ -1,5 +1,5 @@
 import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
-import type { OrderEditorDocument } from '@hmcts-cft/docweave';
+import type { DocWeaveSnapshot } from '@hmcts-cft/docweave';
 import config from 'config';
 import { Application, NextFunction, Request, Response } from 'express';
 
@@ -42,7 +42,7 @@ interface MakeOrderDraftPayload {
   version: 1;
   orderType: MakeOrderType;
   formData: Record<string, unknown>;
-  documents: Partial<Record<MakeOrderType, OrderEditorDocument>>;
+  documents: Partial<Record<MakeOrderType, DocWeaveSnapshot>>;
 }
 
 interface MakeOrderEnvelope {
@@ -436,10 +436,10 @@ export default function makeOrderRoutes(app: Application): void {
         if (orderAction === 'SUBMIT_FOR_REVIEW' && selectedOrderType === 'ADJOURNMENT') {
           validateAdjournmentSubmission(formData);
         }
-        let selectedDocument: OrderEditorDocument | undefined;
+        let selectedDocument: DocWeaveSnapshot | undefined;
         if (typeof orderDocument === 'string' && orderDocument) {
           try {
-            selectedDocument = JSON.parse(orderDocument) as OrderEditorDocument;
+            selectedDocument = JSON.parse(orderDocument) as DocWeaveSnapshot;
           } catch {
             throw new HTTPError('The order document is not valid JSON', 400);
           }

@@ -58,7 +58,7 @@
   "dependencies": {
     "@azure/monitor-opentelemetry": "1.19.0",
     "@hmcts-cft/cft-ui-component-lib": "0.1.0-alpha.4",
-    "@hmcts-cft/docweave": "0.1.0-alpha.2",
+    "@hmcts-cft/docweave": "0.1.0-alpha.3",
     "@hmcts/info-provider": "1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
     "@hmcts/properties-volume": "1.4.1",

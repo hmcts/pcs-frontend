@@ -1,7 +1,7 @@
 import {
+  type DocWeaveSnapshot,
   type InlineBuilder,
   type OrderBuilder,
-  type OrderEditorDocument,
   buildOrder,
   createOrderEditor,
 } from '@hmcts-cft/docweave';
@@ -15,6 +15,10 @@ function field(form: HTMLFormElement, name: string): string {
 
 function selected(form: HTMLFormElement, name: string, value: string): boolean {
   return new FormData(form).getAll(name).includes(value);
+}
+
+function selectedControlId(form: HTMLFormElement, name: string): string {
+  return form.querySelector<HTMLInputElement>(`[name="${name}"]:checked`)?.id ?? name;
 }
 
 function date(form: HTMLFormElement, prefix: string): string {
@@ -131,9 +135,15 @@ export function initDatePills(form: HTMLFormElement): void {
   });
 }
 
-function attendanceParagraphs(form: HTMLFormElement): { id: string; text: string }[] {
-  const heard: string[] = [];
-  const paragraphs: { id: string; text: string }[] = [];
+interface AttendanceFact {
+  id: string;
+  sourceId?: string;
+  text: string;
+}
+
+function attendanceFacts(form: HTMLFormElement): { heard: AttendanceFact[]; paragraphs: AttendanceFact[] } {
+  const heard: AttendanceFact[] = [];
+  const paragraphs: AttendanceFact[] = [];
   form.querySelectorAll<HTMLElement>('[data-attendance-row]').forEach((row, index) => {
     const choice = row.querySelector<HTMLInputElement>('input[type="radio"]:checked')?.value;
     const name = row.querySelector<HTMLInputElement>('input[type="text"]')?.value.trim();
@@ -142,13 +152,19 @@ function attendanceParagraphs(form: HTMLFormElement): { id: string; text: string
     if (!choice) {
       return;
     }
+    const sourceId = row.id;
     if (choice === 'letter-only') {
-      paragraphs.push({ id: `attendance-letter-${index}`, text: `The Court read a letter from ${name || label}.` });
+      paragraphs.push({
+        id: `attendance-letter-${index}`,
+        sourceId,
+        text: `The Court read a letter from ${name || label}.`,
+      });
       return;
     }
     if (choice === 'not-present') {
       paragraphs.push({
         id: `attendance-absent-${index}`,
+        sourceId,
         text: `The ${label} did not attend the hearing, but the Court was satisfied they had received notice of the hearing, and it was reasonable to proceed in their absence.`,
       });
       return;
@@ -161,22 +177,43 @@ function attendanceParagraphs(form: HTMLFormElement): { id: string; text: string
       'duty-adviser': `the duty adviser on behalf of ${party}`,
       'litigant-in-person': `${party} acting in person`,
     };
-    heard.push(name ? `${name}, ${roles[choice]}` : roles[choice]);
+    heard.push({
+      id: `attendance-heard-${index}`,
+      sourceId,
+      text: name ? `${name}, ${roles[choice]}` : roles[choice],
+    });
   });
-  if (heard.length) {
-    const register = heard.length === 1 ? heard[0] : `${heard.slice(0, -1).join(', ')} and ${heard[heard.length - 1]}`;
-    paragraphs.unshift({ id: 'attendance-heard', text: `The Court heard from ${register}.` });
-  }
-  return paragraphs;
+  return { heard, paragraphs };
 }
 
 function addPreamble(order: OrderBuilder, form: HTMLFormElement): void {
-  attendanceParagraphs(form).forEach(paragraph => order.paragraph(paragraph.id, paragraph.text));
+  const attendance = attendanceFacts(form);
+  if (attendance.heard.length) {
+    order.paragraph('attendance-heard', content => {
+      content.text('The Court heard from ');
+      attendance.heard.forEach((entry, index) => {
+        if (index > 0) {
+          content.text(index === attendance.heard.length - 1 ? ' and ' : ', ');
+        }
+        content.fact(entry.id, entry.text, entry.sourceId ? { sourceId: entry.sourceId } : undefined);
+      });
+      content.text('.');
+    });
+  }
+  attendance.paragraphs.forEach(paragraph =>
+    order.paragraph(paragraph.id, content => {
+      content.fact('attendance', paragraph.text, paragraph.sourceId ? { sourceId: paragraph.sourceId } : undefined);
+    })
+  );
   if (selected(form, 'recitals', 'yes')) {
     field(form, 'recital')
       .split(/\n\s*\n/)
       .filter(Boolean)
-      .forEach((text, index) => order.paragraph(`recital-${index}`, text));
+      .forEach((text, index) =>
+        order.paragraph(`recital-${index}`, content => {
+          content.fact('text', text, { sourceId: 'recitals-text' });
+        })
+      );
   }
   order.paragraph('ordered-that', 'IT IS ORDERED THAT:');
 }
@@ -210,25 +247,114 @@ function partyLabels(form: HTMLFormElement): {
   };
 }
 
-function caseManCostsText(form: HTMLFormElement, claimant: string, defendant: string): string {
+const CASE_MAN_COST_CHOICES = new Set([
+  'def-pay-cl-fixed',
+  'def-pay-cl-summary',
+  'cl-pay-def-summary',
+  'in-case',
+  'reserved',
+  'no-order',
+  'public-funding',
+  'same-terms',
+  'fixed-same-terms',
+  'summary-same-terms',
+]);
+
+function hasCaseManCosts(form: HTMLFormElement): boolean {
   if (!selected(form, 'costs', 'yes')) {
-    return '';
+    return false;
   }
   const choice = field(form, 'costs-choice');
-  const costs: Record<string, string> = {
-    'def-pay-cl-fixed': `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs of the claim in the fixed sum of £${money(field(form, 'costs-def-pay-cl-fixed-amount'))}.`,
-    'def-pay-cl-summary': `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs in the summarily assessed sum of £${money(field(form, 'costs-def-pay-cl-summary-amount'))}.`,
-    'cl-pay-def-summary': `${sentenceCase(claimant)} shall pay ${possessive(defendant)} costs in the summarily assessed sum of £${money(field(form, 'costs-cl-pay-def-summary-amount'))}.`,
+  return choice === 'other' ? Boolean(field(form, 'costs-other-text')) : CASE_MAN_COST_CHOICES.has(choice);
+}
+
+function addCaseManCosts(content: InlineBuilder, form: HTMLFormElement, claimant: string, defendant: string): void {
+  const choice = field(form, 'costs-choice');
+  const sourceId = selectedControlId(form, 'costs-choice');
+  const amountCosts: Record<string, { amountId: string; prefix: string }> = {
+    'def-pay-cl-fixed': {
+      amountId: 'costs-def-pay-cl-fixed-amount',
+      prefix: `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs of the claim in the fixed sum of £`,
+    },
+    'def-pay-cl-summary': {
+      amountId: 'costs-def-pay-cl-summary-amount',
+      prefix: `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs in the summarily assessed sum of £`,
+    },
+    'cl-pay-def-summary': {
+      amountId: 'costs-cl-pay-def-summary-amount',
+      prefix: `${sentenceCase(claimant)} shall pay ${possessive(defendant)} costs in the summarily assessed sum of £`,
+    },
+    'fixed-same-terms': {
+      amountId: 'costs-fixed-same-terms-amount',
+      prefix: `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs of the claim in the fixed sum of £`,
+    },
+    'summary-same-terms': {
+      amountId: 'costs-summary-same-terms-amount',
+      prefix: `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs in the summarily assessed sum of £`,
+    },
+  };
+  const fixedCosts: Record<string, string> = {
     'in-case': 'Costs in the case.',
     reserved: 'Costs reserved.',
     'no-order': 'No order as to costs.',
     'public-funding': `There be a detailed assessment of ${possessive(defendant)} publicly funded costs.`,
     'same-terms': `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs.`,
-    'fixed-same-terms': `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs of the claim in the fixed sum of £${money(field(form, 'costs-fixed-same-terms-amount'))}.`,
-    'summary-same-terms': `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs in the summarily assessed sum of £${money(field(form, 'costs-summary-same-terms-amount'))}.`,
-    other: field(form, 'costs-other-text'),
   };
-  return costs[choice] ?? '';
+  const amountCost = amountCosts[choice];
+  if (amountCost) {
+    content
+      .fact('choice', amountCost.prefix, { sourceId })
+      .fact('amount', money(field(form, amountCost.amountId)), { sourceId: amountCost.amountId })
+      .text('.');
+  } else if (choice === 'other') {
+    content.fact('other', field(form, 'costs-other-text'), { sourceId: 'costs-other-text' });
+  } else {
+    content.fact('choice', fixedCosts[choice] ?? '', { sourceId });
+  }
+}
+
+function addOutrightCosts(content: InlineBuilder, form: HTMLFormElement): void {
+  const choice = field(form, 'costs-choice');
+  const sourceId = selectedControlId(form, 'costs-choice');
+  const amountCosts: Record<string, { amountId: string; prefix: string }> = {
+    'def-pay-cl-fixed': {
+      amountId: 'costs-def-pay-cl-fixed-amount',
+      prefix: "The defendant(s) must pay the claimant(s)' fixed costs of £",
+    },
+    'def-pay-cl-summary': {
+      amountId: 'costs-def-pay-cl-summary-amount',
+      prefix: "The defendant(s) must pay the claimant(s)' costs, summarily assessed at £",
+    },
+    'cl-pay-def-summary': {
+      amountId: 'costs-cl-pay-def-summary-amount',
+      prefix: "The claimant(s) must pay the defendant(s)' costs, summarily assessed at £",
+    },
+  };
+  const fixedCosts: Record<string, string> = {
+    'in-case': 'Costs in the case.',
+    reserved: 'Costs reserved.',
+    'no-order': 'There is no order as to costs.',
+    'public-funding':
+      "The defendant(s)' costs are to be subject to detailed assessment under the public funding regulations.",
+    'same-terms': 'Costs are payable on the same terms as the suspension.',
+    'fixed-same-terms':
+      "The defendant(s) must pay the claimant(s)' fixed costs, payable on the same terms as the suspension.",
+    'summary-same-terms':
+      "The defendant(s) must pay the claimant(s)' summary assessed costs, payable on the same terms as the suspension.",
+  };
+  const amountCost = amountCosts[choice];
+  if (amountCost) {
+    content
+      .fact('choice', amountCost.prefix, { sourceId })
+      .fact('amount', money(field(form, amountCost.amountId)), { sourceId: amountCost.amountId })
+      .text('.');
+  } else if (choice === 'other') {
+    content.fact('other', field(form, 'costs-other-text') || '[costs order not provided]', {
+      sourceId: 'costs-other-text',
+    });
+  } else {
+    content.fact('choice', fixedCosts[choice] || '[costs order not provided]', { sourceId });
+  }
 }
 
 function buildOutrightOrder(form: HTMLFormElement) {
@@ -246,20 +372,27 @@ function buildOutrightOrder(form: HTMLFormElement) {
       list.item('possession', content => {
         content
           .text('The defendant(s) must give up possession of ')
-          .generatedText('address', address)
+          .fact('address', address)
           .text(' to the claimant(s) ');
         if (field(form, 'outright-possession') === 'forthwith') {
-          content.generatedText('deadline', 'forthwith').text('.');
+          content.fact('deadline', 'forthwith', { sourceId: 'outright-possession' }).text('.');
         } else {
-          content.text('on or before ').generatedText('deadline', date(form, 'outright-by-date')).text('.');
+          content
+            .text('on or before ')
+            .fact('deadline', date(form, 'outright-by-date'), { sourceId: 'outright-by-date' })
+            .text('.');
         }
       });
       list.item('grounds', content => {
         content
           .text('This order for possession was made on ')
-          .generatedText('type', field(form, 'outright-grounds-type') || '[grounds type not provided]')
+          .fact('type', field(form, 'outright-grounds-type') || '[grounds type not provided]', {
+            sourceId: 'outright-grounds-type',
+          })
           .text(' grounds, namely ')
-          .generatedText('details', field(form, 'outright-grounds-details') || '[grounds not provided]')
+          .fact('details', field(form, 'outright-grounds-details') || '[grounds not provided]', {
+            sourceId: 'outright-grounds-details',
+          })
           .text('.');
       });
       if (hasMoneyJudgmentArrears) {
@@ -273,42 +406,29 @@ function buildOutrightOrder(form: HTMLFormElement) {
               : field(form, 'outright-mj-arrears');
           content
             .text(`Judgment for the claimant(s) in the ${interestText ? 'total ' : ''}sum of £`)
-            .generatedText('amount', money(total))
+            .fact('amount', money(total), { sourceId: 'outright-mj-amounts' })
             .text('.');
         });
       }
       if (options.has('use-occupation')) {
         list.item('use-occupation', content => {
           content
-            .generatedText('defendants', defendants)
+            .fact('defendants', defendants)
             .text(' must pay to ')
-            .generatedText('claimants', claimants)
+            .fact('claimants', claimants)
             .text(' £')
-            .generatedText('rate', money(field(form, 'outright-use-occupation-rate')))
+            .fact('rate', money(field(form, 'outright-use-occupation-rate')), {
+              sourceId: 'outright-use-occupation-rate',
+            })
             .text(' per day for damages for unlawful occupation from ')
-            .generatedText('date', date(form, 'outright-use-occupation-from-date'))
+            .fact('date', date(form, 'outright-use-occupation-from-date'), {
+              sourceId: 'outright-use-occupation-from-date',
+            })
             .text(` until possession of the property is given to ${claimants}.`);
         });
       }
       if (selected(form, 'costs', 'yes')) {
-        const choice = field(form, 'costs-choice');
-        const costs: Record<string, string> = {
-          'def-pay-cl-fixed': `The defendant(s) must pay the claimant(s)' fixed costs of £${money(field(form, 'costs-def-pay-cl-fixed-amount'))}.`,
-          'def-pay-cl-summary': `The defendant(s) must pay the claimant(s)' costs, summarily assessed at £${money(field(form, 'costs-def-pay-cl-summary-amount'))}.`,
-          'cl-pay-def-summary': `The claimant(s) must pay the defendant(s)' costs, summarily assessed at £${money(field(form, 'costs-cl-pay-def-summary-amount'))}.`,
-          'in-case': 'Costs in the case.',
-          reserved: 'Costs reserved.',
-          'no-order': 'There is no order as to costs.',
-          'public-funding':
-            "The defendant(s)' costs are to be subject to detailed assessment under the public funding regulations.",
-          'same-terms': 'Costs are payable on the same terms as the suspension.',
-          'fixed-same-terms':
-            "The defendant(s) must pay the claimant(s)' fixed costs, payable on the same terms as the suspension.",
-          'summary-same-terms':
-            "The defendant(s) must pay the claimant(s)' summary assessed costs, payable on the same terms as the suspension.",
-          other: field(form, 'costs-other-text') || '[costs order not provided]',
-        };
-        list.item('costs', costs[choice] || '[costs order not provided]');
+        list.item('costs', content => addOutrightCosts(content, form));
       }
       if (
         hasMoneyJudgmentPaymentPlan &&
@@ -319,13 +439,17 @@ function buildOutrightOrder(form: HTMLFormElement) {
           if (selected(form, 'outright-mj-plan', 'lump')) {
             content
               .text('by a payment of £')
-              .generatedText('lump-amount', money(field(form, 'outright-mj-lump-amount')))
+              .fact('lump-amount', money(field(form, 'outright-mj-lump-amount')), {
+                sourceId: 'outright-mj-lump-amount',
+              })
               .text(' by ')
-              .generatedText('lump-date', date(form, 'outright-mj-lump-date'));
+              .fact('lump-date', date(form, 'outright-mj-lump-date'), {
+                sourceId: 'outright-mj-lump-date',
+              });
             if (selected(form, 'outright-mj-balance', 'yes')) {
-              content
-                .text(' and the balance by ')
-                .generatedText('balance-date', date(form, 'outright-mj-balance-date'));
+              content.text(' and the balance by ').fact('balance-date', date(form, 'outright-mj-balance-date'), {
+                sourceId: 'outright-mj-balance-date',
+              });
             }
           }
           if (selected(form, 'outright-mj-plan', 'lump') && selected(form, 'outright-mj-plan', 'instalments')) {
@@ -334,9 +458,17 @@ function buildOutrightOrder(form: HTMLFormElement) {
           if (selected(form, 'outright-mj-plan', 'instalments')) {
             content
               .text('by instalment payments of £')
-              .generatedText('instalment-amount', money(field(form, 'outright-mj-inst-amount')))
-              .text(` every ${field(form, 'outright-mj-inst-freq') || '[frequency not provided]'}, first payment by `)
-              .generatedText('instalment-date', date(form, 'outright-mj-inst-date'));
+              .fact('instalment-amount', money(field(form, 'outright-mj-inst-amount')), {
+                sourceId: 'outright-mj-inst-amount',
+              })
+              .text(' every ')
+              .fact('instalment-frequency', field(form, 'outright-mj-inst-freq') || '[frequency not provided]', {
+                sourceId: 'outright-mj-inst-freq',
+              })
+              .text(', first payment by ')
+              .fact('instalment-date', date(form, 'outright-mj-inst-date'), {
+                sourceId: 'outright-mj-inst-date',
+              });
           }
           content.text('.');
         });
@@ -354,18 +486,28 @@ function buildOutrightOrder(form: HTMLFormElement) {
 function addSuspendedOneOffTerm(content: InlineBuilder, form: HTMLFormElement, claimant: string): void {
   content
     .text('payment of £')
-    .generatedText('suspended-one-off-amount', money(field(form, 'suspended-oneoff-amount')))
+    .fact('suspended-one-off-amount', money(field(form, 'suspended-oneoff-amount')), {
+      sourceId: 'suspended-oneoff-amount',
+    })
     .text(` to ${claimant} by `)
-    .generatedText('suspended-one-off-date', date(form, 'suspended-oneoff-date'));
+    .fact('suspended-one-off-date', date(form, 'suspended-oneoff-date'), {
+      sourceId: 'suspended-oneoff-date',
+    });
 }
 
 function addSuspendedInstalmentTerm(content: InlineBuilder, form: HTMLFormElement, claimant: string): void {
   const frequency = field(form, 'suspended-instalment-frequency') === 'weekly' ? 'week' : 'month';
   content
     .text('payments of £')
-    .generatedText('suspended-instalment-amount', money(field(form, 'suspended-instalment-amount')))
-    .text(` to ${claimant} every ${frequency}, the first instalment to be paid on or before `)
-    .generatedText('suspended-instalment-date', date(form, 'suspended-instalment-date'));
+    .fact('suspended-instalment-amount', money(field(form, 'suspended-instalment-amount')), {
+      sourceId: 'suspended-instalment-amount',
+    })
+    .text(` to ${claimant} every `)
+    .fact('suspended-instalment-frequency', frequency, { sourceId: 'suspended-instalment-frequency' })
+    .text(', the first instalment to be paid on or before ')
+    .fact('suspended-instalment-date', date(form, 'suspended-instalment-date'), {
+      sourceId: 'suspended-instalment-date',
+    });
 }
 
 export function buildSuspendedOrder(form: HTMLFormElement): ReturnType<typeof buildOrder> {
@@ -381,9 +523,9 @@ export function buildSuspendedOrder(form: HTMLFormElement): ReturnType<typeof bu
       list.item('suspended-possession', content => {
         content
           .text(`${sentenceCase(defendant)} must give up possession of `)
-          .generatedText('suspended-address', address)
+          .fact('suspended-address', address)
           .text(` to ${claimant} on or before `)
-          .generatedText('suspended-deadline', date(form, 'suspended-by-date'))
+          .fact('suspended-deadline', date(form, 'suspended-by-date'), { sourceId: 'suspended-by-date' })
           .text('.');
       });
 
@@ -393,23 +535,28 @@ export function buildSuspendedOrder(form: HTMLFormElement): ReturnType<typeof bu
         list.item('suspended-money-judgment', content => {
           content
             .text('Judgment for the claimant in the sum of £')
-            .generatedText('suspended-money-judgment-amount', money(field(form, 'suspended-arrears')))
+            .fact('suspended-money-judgment-amount', money(field(form, 'suspended-arrears')), {
+              sourceId: 'suspended-arrears',
+            })
             .text('.');
         });
       }
 
-      const costsText = caseManCostsText(form, claimant, defendant);
-      if (costsText) {
-        list.item('suspended-costs', costsText);
+      if (hasCaseManCosts(form)) {
+        list.item('suspended-costs', content => addCaseManCosts(content, form, claimant, defendant));
       }
 
       if (options.includes('use-occupation')) {
         list.item('suspended-use-occupation', content => {
           content
             .text(`${sentenceCase(defendant)} must pay to ${claimant} £`)
-            .generatedText('suspended-use-occupation-rate', money(field(form, 'suspended-use-occupation-rate')))
+            .fact('suspended-use-occupation-rate', money(field(form, 'suspended-use-occupation-rate')), {
+              sourceId: 'suspended-use-occupation-rate',
+            })
             .text(' per day for damages for unlawful occupation from ')
-            .generatedText('suspended-use-occupation-date', date(form, 'suspended-use-occupation-from-date'))
+            .fact('suspended-use-occupation-date', date(form, 'suspended-use-occupation-from-date'), {
+              sourceId: 'suspended-use-occupation-from-date',
+            })
             .text(` until possession of the property is given to ${claimant}.`);
         });
       }
@@ -427,7 +574,9 @@ export function buildSuspendedOrder(form: HTMLFormElement): ReturnType<typeof bu
         list.item('suspended-condition', content => {
           content
             .text(conditionStart)
-            .generatedText('suspended-arrears', money(field(form, 'suspended-arrears')))
+            .fact('suspended-arrears', money(field(form, 'suspended-arrears')), {
+              sourceId: 'suspended-arrears',
+            })
             .text(' by ');
           if (paymentTerms[0] === 'one-off') {
             addSuspendedOneOffTerm(content, form, claimant);
@@ -442,7 +591,9 @@ export function buildSuspendedOrder(form: HTMLFormElement): ReturnType<typeof bu
           content => {
             content
               .text(conditionStart)
-              .generatedText('suspended-arrears', money(field(form, 'suspended-arrears')))
+              .fact('suspended-arrears', money(field(form, 'suspended-arrears')), {
+                sourceId: 'suspended-arrears',
+              })
               .text(' by:');
           },
           item => {
@@ -518,9 +669,13 @@ function adjournmentHearingFormat(form: HTMLFormElement): string {
 function addAdjournmentOneOffTerm(content: InlineBuilder, form: HTMLFormElement, claimant: string): void {
   content
     .text(`a payment to ${claimant} of £`)
-    .generatedText('adjournment-one-off-amount', money(field(form, 'adj-gen-oneoff-amount')))
+    .fact('adjournment-one-off-amount', money(field(form, 'adj-gen-oneoff-amount')), {
+      sourceId: 'adj-gen-oneoff-amount',
+    })
     .text(' by ')
-    .generatedText('adjournment-one-off-date', date(form, 'adj-gen-oneoff-date'));
+    .fact('adjournment-one-off-date', date(form, 'adj-gen-oneoff-date'), {
+      sourceId: 'adj-gen-oneoff-date',
+    });
 }
 
 function addAdjournmentInstalmentTerm(
@@ -533,9 +688,13 @@ function addAdjournmentInstalmentTerm(
   const frequency = field(form, `${prefix}-frequency`) === 'weekly' ? 'week' : 'month';
   content
     .text(`instalment payments to ${claimant} of £`)
-    .generatedText(`adjournment-${option}-amount`, money(field(form, `${prefix}-amount`)))
-    .text(` every ${frequency}, the first instalment to be paid on or before `)
-    .generatedText(`adjournment-${option}-date`, date(form, `${prefix}-date`));
+    .fact(`adjournment-${option}-amount`, money(field(form, `${prefix}-amount`)), {
+      sourceId: `${prefix}-amount`,
+    })
+    .text(' every ')
+    .fact(`adjournment-${option}-frequency`, frequency, { sourceId: `${prefix}-frequency` })
+    .text(', the first instalment to be paid on or before ')
+    .fact(`adjournment-${option}-date`, date(form, `${prefix}-date`), { sourceId: `${prefix}-date` });
 }
 
 export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof buildOrder> {
@@ -562,20 +721,26 @@ export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof 
           } else {
             content.text('The claim shall be adjourned to be heard on ');
           }
-          content.generatedText('adjournment-hearing-date', date(form, 'adj-hearing-date'));
+          content.fact('adjournment-hearing-date', date(form, 'adj-hearing-date'), {
+            sourceId: 'adj-hearing-date',
+          });
           if (when === 'specific') {
             content
               .text(' at ')
-              .generatedText(
-                'adjournment-hearing-time',
-                field(form, 'adj-specific-time') || '[hearing time not provided]'
-              );
+              .fact('adjournment-hearing-time', field(form, 'adj-specific-time') || '[hearing time not provided]', {
+                sourceId: 'adj-specific-time',
+              });
           }
-          content
-            .text(' with a time estimate of ')
-            .generatedText('adjournment-time-estimate', adjournmentTimeEstimate(form));
+          content.text(' with a time estimate of ').fact('adjournment-time-estimate', adjournmentTimeEstimate(form), {
+            sourceId: 'adj-time-estimate-group',
+          });
           if (when === 'specific') {
-            content.text(`. Such hearing shall be ${adjournmentHearingFormat(form)}.`);
+            content
+              .text('. Such hearing shall be ')
+              .fact('adjournment-hearing-format', adjournmentHearingFormat(form), {
+                sourceId: 'adj-format-group',
+              })
+              .text('.');
           } else {
             content.text('. Further details of the hearing will be provided by the court.');
           }
@@ -584,7 +749,9 @@ export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof 
           list.item('adjournment-defence', content => {
             content
               .text(`${sentenceCase(defendant)} must by 4pm on `)
-              .generatedText('adjournment-defence-date', date(form, 'adj-defence-date'))
+              .fact('adjournment-defence-date', date(form, 'adj-defence-date'), {
+                sourceId: 'adj-defence-date',
+              })
               .text(' send to the court and all other parties a defence.');
           });
         }
@@ -592,7 +759,9 @@ export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof 
           list.item('adjournment-counterclaim', content => {
             content
               .text(`${sentenceCase(defendant)} must by 4pm on `)
-              .generatedText('adjournment-counterclaim-date', date(form, 'adj-counterclaim-date'))
+              .fact('adjournment-counterclaim-date', date(form, 'adj-counterclaim-date'), {
+                sourceId: 'adj-counterclaim-date',
+              })
               .text(
                 ' send to the court and all other parties a defence and any counterclaim, having paid any court fees which are due.'
               );
@@ -602,7 +771,9 @@ export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof 
           list.item('adjournment-claimant-reply', content => {
             content
               .text(`${sentenceCase(claimant)} must by 4pm on `)
-              .generatedText('adjournment-claimant-reply-date', date(form, 'adj-claimant-reply-date'))
+              .fact('adjournment-claimant-reply-date', date(form, 'adj-claimant-reply-date'), {
+                sourceId: 'adj-claimant-reply-date',
+              })
               .text(' send to the court and all other parties a defence to the counterclaim and any reply.');
           });
         }
@@ -643,7 +814,9 @@ export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof 
             list.item('adjournment-strike-out', content => {
               content
                 .text('If no application to restore the claim is made by ')
-                .generatedText('adjournment-restore-date', date(form, 'adj-gen-restore-date'))
+                .fact('adjournment-restore-date', date(form, 'adj-gen-restore-date'), {
+                  sourceId: 'adj-gen-restore-date',
+                })
                 .text(' the claim shall stand as struck out without further application or order of the court.');
             });
           }
@@ -655,7 +828,9 @@ export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof 
             if (hasRestore) {
               content
                 .text(' If no application is made by 4pm on ')
-                .generatedText('adjournment-restore-date', date(form, 'adj-gen-restore-date'))
+                .fact('adjournment-restore-date', date(form, 'adj-gen-restore-date'), {
+                  sourceId: 'adj-gen-restore-date',
+                })
                 .text(
                   ' the claim shall automatically be struck out without the need for any further application or order.'
                 );
@@ -663,9 +838,8 @@ export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof 
           });
         }
       }
-      const costsText = caseManCostsText(form, claimant, defendant);
-      if (costsText) {
-        list.item('adjournment-costs', costsText);
+      if (hasCaseManCosts(form)) {
+        list.item('adjournment-costs', content => addCaseManCosts(content, form, claimant, defendant));
       }
     });
   });
@@ -946,9 +1120,9 @@ export function initMakeOrder(): void {
     return;
   }
 
-  let documents: Partial<Record<OrderType, OrderEditorDocument>> = {};
+  let documents: Partial<Record<OrderType, DocWeaveSnapshot>> = {};
   try {
-    const parsed = JSON.parse(documentField.value) as OrderEditorDocument | null;
+    const parsed = JSON.parse(documentField.value) as DocWeaveSnapshot | null;
     if (parsed) {
       documents[orderTypeField.value as OrderType] = parsed;
     }
@@ -959,7 +1133,7 @@ export function initMakeOrder(): void {
   let editorType: OrderType | undefined;
   const persistEditor = (): void => {
     if (editor && editorType) {
-      documents[editorType] = editor.getDocument();
+      documents[editorType] = editor.getSnapshot();
       documentField.value = JSON.stringify(documents[editorType]);
     } else {
       documentField.value = '';
@@ -998,7 +1172,7 @@ export function initMakeOrder(): void {
         editorType = type;
         editor = createOrderEditor({
           mount,
-          initialDocument: documents[type],
+          initialSnapshot: documents[type],
           onChange: value => {
             documents[type] = value;
             documentField.value = JSON.stringify(value);

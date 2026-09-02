@@ -45,6 +45,7 @@ describe('suspended possession order fields', () => {
     expect(text).not.toContain('A single payment');
     expect(text).not.toContain('Instalment payments');
     expect(document.querySelector<HTMLSelectElement>('#suspended-instalment-frequency')?.value).toBe('monthly');
+    expect(document.querySelector('#suspended-by-date #suspended-by-date-day')).not.toBeNull();
     expect(document.querySelector('#suspended-oneoff-amount')?.closest('[hidden]')).toBeNull();
     expect(document.querySelector('label[for="suspended-payment-terms"]')?.textContent).toContain('a one-off amount');
   });

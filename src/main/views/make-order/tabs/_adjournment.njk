@@ -42,7 +42,7 @@
     fieldset: { legend: { text: "Date", classes: "govuk-fieldset__legend--s" } }
   }) }}
 
-  <div class="govuk-form-group">
+  <div id="adj-time-estimate-group" class="govuk-form-group">
     <fieldset class="govuk-fieldset" role="group">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Time estimate</legend>
       {{ govukInput({
@@ -66,17 +66,19 @@
     </fieldset>
   </div>
 
-  {{ govukCheckboxes({
-    idPrefix: "adj-format",
-    name: "adj-format",
-    classes: "govuk-checkboxes--small",
-    fieldset: { legend: { text: "Hearing format", classes: "govuk-fieldset__legend--s" } },
-    items: [
-      { value: "in-person", text: "In person", checked: draftChecked("adj-format", "in-person") or not draftValue("adj-format") },
-      { value: "video", text: "Video hearing", checked: draftChecked("adj-format", "video") },
-      { value: "telephone", text: "Telephone", checked: draftChecked("adj-format", "telephone") }
-    ]
-  }) }}
+  <div id="adj-format-group">
+    {{ govukCheckboxes({
+      idPrefix: "adj-format",
+      name: "adj-format",
+      classes: "govuk-checkboxes--small",
+      fieldset: { legend: { text: "Hearing format", classes: "govuk-fieldset__legend--s" } },
+      items: [
+        { value: "in-person", text: "In person", checked: draftChecked("adj-format", "in-person") or not draftValue("adj-format") },
+        { value: "video", text: "Video hearing", checked: draftChecked("adj-format", "video") },
+        { value: "telephone", text: "Telephone", checked: draftChecked("adj-format", "telephone") }
+      ]
+    }) }}
+  </div>
 
   {{ govukCheckboxes({
     idPrefix: "adj-directions",
