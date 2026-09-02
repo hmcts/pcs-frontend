@@ -207,16 +207,7 @@ function attendanceFacts(form: HTMLFormElement): { heard: AttendanceFact[]; para
 function addPreamble(order: OrderBuilder, form: HTMLFormElement): void {
   const attendance = attendanceFacts(form);
   if (attendance.heard.length) {
-    order.paragraph('attendance-heard', content => {
-      content.text('The Court heard from ');
-      attendance.heard.forEach((entry, index) => {
-        if (index > 0) {
-          content.text(index === attendance.heard.length - 1 ? ' and ' : ', ');
-        }
-        content.fact(entry.id, entry.text, entry.sourceId ? { sourceId: entry.sourceId } : undefined);
-      });
-      content.text('.');
-    });
+    order.paragraph('attendance-heard', `The Court heard from ${joinList(attendance.heard.map(entry => entry.text))}.`);
   }
   attendance.paragraphs.forEach(paragraph =>
     order.paragraph(paragraph.id, content => {

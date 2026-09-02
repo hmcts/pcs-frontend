@@ -355,6 +355,18 @@ describe('make order preview', () => {
     expect(document.querySelector<HTMLTextAreaElement>('#order-document')?.value).toBe(beforeEditorEvent);
   });
 
+  it('regenerates the attendance sentence when an attending party becomes absent', () => {
+    renderCompleteForm();
+    initMakeOrder();
+    const defendantAttendance = document.querySelector<HTMLInputElement>('[name="attendance-2"]')!;
+    defendantAttendance.value = 'not-present';
+
+    expect(() => defendantAttendance.dispatchEvent(new Event('change', { bubbles: true }))).not.toThrow();
+
+    expect(generatedOrderText()).toContain('The Court heard from Alex Counsel, counsel for the claimant.');
+    expect(generatedOrderText()).not.toContain('Sam Solicitor, solicitor for the defendant');
+  });
+
   it('renders an adjournment document with the real editor', () => {
     renderCompleteForm('', 'ADJOURNMENT');
     document.querySelector('#make-order-form')?.insertAdjacentHTML(
