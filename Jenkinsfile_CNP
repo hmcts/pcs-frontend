@@ -113,7 +113,7 @@ withPipeline(type, product, component) {
 
   onMaster() {
     env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS = 'false'
-    env.E2E_TEST_SCOPE = '@regression'
+    env.E2E_TEST_SCOPE = '@healthCheck'
     env.TEST_URL = "https://pcs.aat.platform.hmcts.net/"
     enablePactAs([
       AppPipelineDsl.PactRoles.CONSUMER,

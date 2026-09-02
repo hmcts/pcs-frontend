@@ -43,7 +43,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Documents - e2e Journey @nightly', async () => {
-  test('Upload documents when GenApps submitted @smoke @regression @crossbrowser', async () => {
+  test('Upload documents when GenApps submitted @smoke @regression @crossbrowser @healthCheck', async () => {
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
     await performAction(
       'navigateToUrl',
@@ -75,7 +75,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('Upload documents when GenApps not submitted', async () => {
+  test('Upload documents when GenApps not submitted @regression', async () => {
     await performAction(
       'navigateToUrl',
       home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
@@ -112,7 +112,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     });
   });
 
-  test('View documents submitted through make a claim', async () => {
+  test('View documents submitted through make a claim @regression', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
     await performAction('validateViewDocuments', {
       caseNumber: viewDocuments.getCaseNumber(),
