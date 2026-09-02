@@ -2,7 +2,13 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { formatIsoDate, isTenancyStartDateKnown, normalizeYesNoValue, penceToPounds } from '../../utils';
+import {
+  formatIsoDate,
+  isTenancyStartDateKnown,
+  normalizeYesNoValue,
+  penceToPounds,
+  shouldShowExemptLandlordStep,
+} from '../../utils';
 import { isNoticeDateConfirmedAndNotProvided, isNoticeDateConfirmedAndProvided } from '../flowConditions';
 import {
   type BaseRowContext,
@@ -39,11 +45,10 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     req,
   };
 
-  addLandlordRegisteredRow(ctx);
-  addLandlordLicensedRow(ctx);
-  addWrittenTermsRow(ctx);
+  addExemptLandlordRow(ctx);
   addTenancyTypeRow(ctx);
   addTenancyStartDateRow(ctx);
+  addWrittenTermsRow(ctx);
   addPossessionNoticeReceivedRow(ctx);
   addNoticeReceivedDateRow(ctx);
   addRentArrearsRow(ctx);
@@ -54,26 +59,11 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   return ctx.rows;
 }
 
-function addLandlordRegisteredRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
-  if (!responses.landlordRegistered) {
+function addExemptLandlordRow({ rows, responses, t, change, yesNoNotSure, req }: RowContext): void {
+  if (!shouldShowExemptLandlordStep(req) || !responses.exemptLandlord) {
     return;
   }
-  pushYesNoRow(
-    rows,
-    'rows.landlordRegistered',
-    responses.landlordRegistered,
-    'landlord-registered',
-    t,
-    yesNoNotSure,
-    change
-  );
-}
-
-function addLandlordLicensedRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
-  if (!responses.landlordLicensed) {
-    return;
-  }
-  pushYesNoRow(rows, 'rows.landlordLicensed', responses.landlordLicensed, 'landlord-licensed', t, yesNoNotSure, change);
+  pushYesNoRow(rows, 'rows.exemptLandlord', responses.exemptLandlord, 'exempt-landlord', t, yesNoNotSure, change);
 }
 
 function addWrittenTermsRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
@@ -249,11 +239,13 @@ function addDisputeClaimRows({ rows, responses, t, change, yesNoNotSure }: RowCo
   rows.push(detailRow);
 }
 
-function addCounterClaimRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
+function addCounterClaimRow({ rows, responses, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   if (!responses.makeCounterClaim) {
     return;
   }
-  pushYesNoRow(rows, 'rows.makeCounterClaim', responses.makeCounterClaim, 'counter-claim', t, yesNoNotSure, change);
+  pushYesNoRow(rows, 'rows.makeCounterClaim', responses.makeCounterClaim, 'counter-claim', t, yesNoNotSure, change, {
+    claimantName: validatedCase.claimantName,
+  });
 }
 
 function addCounterClaimDetailsRows(ctx: RowContext): void {

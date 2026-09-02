@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Payment successful",
+  "paragraph1": "The counterclaim fee has been paid and the counterclaim has been submitted.",
+  "paragraph2": "We’ve sent you a confirmation email.",
+  "paymentReference": "The payment reference number is: {{paymentReference}}",
+  "heading1": "What to do next",
+  "listItem1": "If you’re representing more than one defendant in this case, you must submit a separate response for each one.",
+  "listItem2": "Some people need <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"noreferrer noopener\">support to use HMCTS services (opens in new tab)</a>, like step-free access to a court for a hearing. If you or the defendant need support, you should request this now.",
+  "heading2": "",
+  "surveyParagraph": "",
+  "closeAndReturnToCaseOverview": "Close and return to case overview"
+}

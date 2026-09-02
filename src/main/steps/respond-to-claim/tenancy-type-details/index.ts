@@ -3,11 +3,16 @@ import type { Request } from 'express';
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { createRespondToClaimFormStep } from '../formStep';
+import { getTenancyDocumentInfo, resolveStepDocumentId } from '../utils/stepDocumentUtils';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+
+export { getTenancyDocumentInfo };
+
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -76,6 +81,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     detailsHeading: 'detailsHeading',
     tenancyType: 'tenancyType',
     tenancyTypeOther: 'tenancyTypeOther',
+    tenancyAgreementDocumentLinkText: 'tenancyAgreementDocumentLinkText',
   },
   customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
@@ -149,6 +155,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     // England: tenancy_* (TenancyLicenceDetails).
     const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
     const senderName = isLegalRepresentativeUser(req) ? claimantName : orgName;
+    const release12Enabled = isRelease12Enabled(req);
 
     const t = getTranslationFunction(req);
     let tenancyType: unknown;
@@ -166,6 +173,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
     }
 
+    const documentId = await resolveStepDocumentId(req, getTenancyDocumentInfo, 'tenancyTypeDetails');
+    const tenancyDocument = documentId ? { id: documentId } : '';
+
     return {
       ...formContent,
       senderName,
@@ -176,6 +186,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyTypeAgreementType,
       tenancyTypeConfirm,
       correctType,
+      tenancyDocument,
+      isRelease12Enabled: release12Enabled,
     };
   },
 });

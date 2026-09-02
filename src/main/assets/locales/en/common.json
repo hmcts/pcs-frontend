@@ -33,7 +33,8 @@
     "yes": "Yes",
     "no": "No",
     "or": "or",
-    "imNotSure": "I’m not sure"
+    "imNotSure": "I’m not sure",
+    "notSure": "Defendant is not sure"
   },
   "change": "Change",
   "back": "Back",
