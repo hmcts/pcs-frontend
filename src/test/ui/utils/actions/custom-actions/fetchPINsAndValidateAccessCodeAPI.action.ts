@@ -44,6 +44,58 @@ export function getSelectedPinUser(): PinUser | undefined {
   return selectedPinUser;
 }
 
+const INITIAL_BACKOFF_MS = 200;
+const MAX_BACKOFF_MS = 2000;
+
+type Poller = {
+  readonly maxAttempts: number;
+  waitBeforeRetry(attempt: number, reason?: string): Promise<void>;
+  logIfSlow(attempt: number): void;
+};
+
+/**
+ * Builds an exponentially growing (capped) list of retry delays.
+ * The schedule keeps growing until it covers `totalBudgetMs` of waiting AND provides at least
+ * `minDelays` retries, so overall tolerance for a slow backend is never below the flat-delay
+ * behaviour it replaces - it is just front-loaded so a fast backend is not made to wait a full tick.
+ */
+function buildBackoffSchedule(totalBudgetMs: number, minDelays: number): number[] {
+  const delays: number[] = [];
+  let scheduled = 0;
+  let delay = INITIAL_BACKOFF_MS;
+  while (scheduled < totalBudgetMs || delays.length < minDelays) {
+    delays.push(delay);
+    scheduled += delay;
+    delay = Math.min(delay * 2, MAX_BACKOFF_MS);
+  }
+  return delays;
+}
+
+/**
+ * Condition-based poller: exponential backoff plus attempt/elapsed logging so a slow
+ * backend shows up in the Jenkins console instead of being silently absorbed.
+ */
+function createPoller(label: string, totalBudgetMs: number, minAttempts: number): Poller {
+  const delays = buildBackoffSchedule(totalBudgetMs, Math.max(minAttempts - 1, 0));
+  const startedAt = Date.now();
+  return {
+    maxAttempts: delays.length + 1,
+    async waitBeforeRetry(attempt: number, reason?: string): Promise<void> {
+      const delayMs = delays[attempt - 1] ?? MAX_BACKOFF_MS;
+      const suffix = reason ? ` (${reason})` : '';
+      console.info(
+        `[poll] ${label}: attempt ${attempt}/${delays.length + 1} unsuccessful after ${Date.now() - startedAt}ms${suffix}, retrying in ${delayMs}ms`
+      );
+      await new Promise(res => setTimeout(res, delayMs));
+    },
+    logIfSlow(attempt: number): void {
+      if (attempt > 1) {
+        console.info(`[poll] ${label}: succeeded on attempt ${attempt} after ${Date.now() - startedAt}ms`);
+      }
+    },
+  };
+}
+
 export const getSelectedDefendantNumber = (): number => {
   const selectedUser = getSelectedPinUser();
   if (!selectedUser) {
@@ -86,8 +138,8 @@ export async function getPinUserAt(index: number, timeoutMs = 5000): Promise<Pin
 
 async function waitUntilCaseIssued(): Promise<void> {
   const getCaseApi = Axios.create(createCaseEventTokenApiData.createCaseApiInstance());
-  const maxRetries = actionRetries;
-  const delayMs = SHORT_TIMEOUT;
+  const poller = createPoller('waitUntilCaseIssued', (actionRetries - 1) * SHORT_TIMEOUT, actionRetries);
+  const maxRetries = poller.maxAttempts;
   let caseStatus = '';
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -95,6 +147,7 @@ async function waitUntilCaseIssued(): Promise<void> {
     caseStatus = String(response?.data?.state).trim().toUpperCase();
 
     if (caseStatus === 'CASE_ISSUED') {
+      poller.logIfSlow(attempt);
       return;
     }
 
@@ -102,7 +155,7 @@ async function waitUntilCaseIssued(): Promise<void> {
       throw new Error(`Case is not ISSUED. Last observed status: ${caseStatus || 'UNKNOWN'}`);
     }
 
-    await new Promise(res => setTimeout(res, delayMs));
+    await poller.waitBeforeRetry(attempt, `state=${caseStatus || 'UNKNOWN'}`);
   }
 }
 
@@ -123,8 +176,8 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
     const fetchPinsApi = Axios.create(fetchPINsApiData.fetchPINSApiInstance());
     await waitUntilCaseIssued();
 
-    const maxRetries = actionRetries;
-    const delayMs = SHORT_TIMEOUT;
+    const poller = createPoller('fetchPINsAPI', (actionRetries - 1) * SHORT_TIMEOUT, actionRetries);
+    const maxRetries = poller.maxAttempts;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       const response = await fetchPinsApi.get(fetchPINsApiData.fetchPINsApiEndPoint());
       const fetchedPins = Object.keys(response.data);
@@ -152,9 +205,12 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
           };
         });
         getDefaultPinUser();
+        poller.logIfSlow(attempt);
         return;
       }
-      await new Promise(res => setTimeout(res, delayMs));
+      if (attempt < maxRetries) {
+        await poller.waitBeforeRetry(attempt, 'no PINs yet');
+      }
     }
     throw new Error('PINs were not generated after multiple retries once case reached CASE_ISSUED');
   }
@@ -180,16 +236,19 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
     if (!accessCode) {
       throw new Error('No access code available for validation');
     }
-    const maxRetries = actionRetries;
-    const delayMs = VERY_SHORT_TIMEOUT;
+    const poller = createPoller('validateAccessCodeAPI', (actionRetries - 1) * VERY_SHORT_TIMEOUT, actionRetries);
+    const maxRetries = poller.maxAttempts;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      let failureReason = 'non-200 response';
       try {
         const response = await validateApi.post(validateAccessCodeApiData.validateAccessCodeApiEndPoint(), {
           accessCode,
         });
         if (response.status === 200) {
+          poller.logIfSlow(attempt);
           return;
         }
+        failureReason = `status=${response.status}`;
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
@@ -197,8 +256,11 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
           }
           throw new Error('Validate access code failed unexpectedly after retries.');
         }
+        failureReason = error instanceof Error ? error.message : 'request failed';
       }
-      await new Promise(res => setTimeout(res, delayMs));
+      if (attempt < maxRetries) {
+        await poller.waitBeforeRetry(attempt, failureReason);
+      }
     }
     throw new Error('Validate access code API failed after multiple retries');
   }
