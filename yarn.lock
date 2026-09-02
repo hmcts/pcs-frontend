@@ -3363,9 +3363,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact@npm:17.1.2":
-  version: 17.1.2
-  resolution: "@pact-foundation/pact@npm:17.1.2"
+"@pact-foundation/pact@npm:17.1.3":
+  version: 17.1.3
+  resolution: "@pact-foundation/pact@npm:17.1.3"
   dependencies:
     "@pact-foundation/pact-core": "npm:^20.1.0"
     "@scarf/scarf": "npm:^1.4.0"
@@ -3383,7 +3383,7 @@ __metadata:
     randexp: "npm:^0.5.3"
     router: "npm:^2.2.0"
     stack-utils: "npm:^2.0.6"
-  checksum: 10/a883121c18b3ca4b1296d706e408108587fb814f7636544b43efda4a86e664e3367bd5b7a0fe60fd1607ca99755340a22fdb485a6c3a1af2d976f44c06d565d8
+  checksum: 10/47b92f7d0f492c1857bce14828daa8406d88fc3b9a2aeed52d9ab7a6632ba65a1337c52ce942a53834040786ab267409196431f8d38ac4e6289a66fc2a038ac8
   languageName: node
   linkType: hard
 
@@ -5237,28 +5237,42 @@ __metadata:
   languageName: node
   linkType: hard
 
-"allure-js-commons@npm:3.10.2":
-  version: 3.10.2
-  resolution: "allure-js-commons@npm:3.10.2"
+"allure-js-commons@npm:3.11.0":
+  version: 3.11.0
+  resolution: "allure-js-commons@npm:3.11.0"
   dependencies:
     md5: "npm:^2.3.0"
   peerDependencies:
-    allure-playwright: 3.10.2
+    allure-playwright: 3.11.0
   peerDependenciesMeta:
     allure-playwright:
       optional: true
-  checksum: 10/afb8a946c1c9a36abf3b3493d669fa671743880ba9aa41bc8b5c152273569d3f657f88e072cd9eb2fa60b17eb6552fa794fd93ccf6bd3286855ddb25b56702d7
+  checksum: 10/b1367c35475219c7f2c3ba470a68d91c38170290c4af853bf534b8ea1f00ffb1443fe7749e6c9fb4f0bfeed4a97b6a3b05d15cf845b1d588af0341bdff5a6f28
   languageName: node
   linkType: hard
 
-"allure-playwright@npm:3.10.2":
-  version: 3.10.2
-  resolution: "allure-playwright@npm:3.10.2"
+"allure-js-commons@npm:3.11.1":
+  version: 3.11.1
+  resolution: "allure-js-commons@npm:3.11.1"
   dependencies:
-    allure-js-commons: "npm:3.10.2"
+    md5: "npm:^2.3.0"
+  peerDependencies:
+    allure-playwright: 3.11.1
+  peerDependenciesMeta:
+    allure-playwright:
+      optional: true
+  checksum: 10/51d305cce6ac70137e12e80a509d0e5dd5eb85ba7d4d84cb6bba53c303a354af65528c175ff4bf6b20630b336c0ded31d7e0388b00eb9633a270427b52a6102c
+  languageName: node
+  linkType: hard
+
+"allure-playwright@npm:3.11.1":
+  version: 3.11.1
+  resolution: "allure-playwright@npm:3.11.1"
+  dependencies:
+    allure-js-commons: "npm:3.11.1"
   peerDependencies:
     "@playwright/test": ">=1.53.0"
-  checksum: 10/e7270965dc888f439648a72ec0aaaaeddda0f0738942e9bea6001c0c440d60db6dd9057a6454121c25e1184780944fd311f415e64e9eea359fbc7407e9448d5b
+  checksum: 10/593ea3141a4798461553146fcaf88fd05b4d8f4dab005f4e7c04a08507c1ca4e9e1209717d0cc6b497e38c0c6d872304f6574b17ec86b01fda148a81be382b04
   languageName: node
   linkType: hard
 
@@ -5546,15 +5560,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.19.0":
-  version: 1.19.0
-  resolution: "axios@npm:1.19.0"
+"axios@npm:1.20.0":
+  version: 1.20.0
+  resolution: "axios@npm:1.20.0"
   dependencies:
     follow-redirects: "npm:^1.16.0"
     form-data: "npm:^4.0.6"
     https-proxy-agent: "npm:^5.0.1"
     proxy-from-env: "npm:^2.1.0"
-  checksum: 10/d27e263b003f2dc1e6d0e2ab062dbc7c2b15668c25723e1e2072f139505c1fbd1f8cffef77d5ec05bb8e3cefa6fc5325c6446e747669fd95d85519529fa0db0b
+  checksum: 10/0376b6178baecbe0f5d36088f5b5f6c21362ce301e0731f77172f9c89be740bdee20d8ae6ab186340d7cb752020c6a4f1381290e5a5cd10f6f9003941615ac77
   languageName: node
   linkType: hard
 
@@ -6519,9 +6533,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"css-loader@npm:7.1.4":
-  version: 7.1.4
-  resolution: "css-loader@npm:7.1.4"
+"css-loader@npm:7.1.5":
+  version: 7.1.5
+  resolution: "css-loader@npm:7.1.5"
   dependencies:
     icss-utils: "npm:^5.1.0"
     postcss: "npm:^8.4.40"
@@ -6539,7 +6553,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10/4a37f3bd5db6d7d13a71f6ffff6d7afc3b243d4e2105c98dd1df9c1ae719cf95c3b46c47aeb6c5fd3675caf60bdb144e9baeba979a432df0906613e8f07b7623
+  checksum: 10/f7e75f19336eab641a5bacf9e4fa6a5d0a7cba660efc2902d07d5017931413541608117d5c582cce2f9aba96a6974cceae5f61ac21c43bb69e6dd3fb5245897d
   languageName: node
   linkType: hard
 
@@ -7385,9 +7399,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jest@npm:29.16.1":
-  version: 29.16.1
-  resolution: "eslint-plugin-jest@npm:29.16.1"
+"eslint-plugin-jest@npm:29.16.6":
+  version: 29.16.6
+  resolution: "eslint-plugin-jest@npm:29.16.6"
   dependencies:
     "@typescript-eslint/utils": "npm:^8.0.0"
   peerDependencies:
@@ -7402,7 +7416,7 @@ __metadata:
       optional: true
     typescript:
       optional: true
-  checksum: 10/c13741296e115c757f11f912712b49ad35eac1c09323c65a88a75898244ae4c42e9b5046c0e48263321a048701d891a0a887ae7a3650752873d22e86c9d564f8
+  checksum: 10/080eb1b22e583c06ac881963f7cf8aa52448ef015d743fd7fe519853ff7a6ebac05d55001f64e4d7298af006d5d7e636186e83a6850695b3f901d7e62acfe77b
   languageName: node
   linkType: hard
 
@@ -11669,7 +11683,7 @@ __metadata:
     "@ministryofjustice/frontend": "npm:^10.0.0"
     "@opentelemetry/api": "npm:1.9.1"
     "@opentelemetry/instrumentation-winston": "npm:0.65.0"
-    "@pact-foundation/pact": "npm:17.1.2"
+    "@pact-foundation/pact": "npm:17.1.3"
     "@pact-foundation/pact-cli": "npm:18.1.1"
     "@playwright/test": "npm:1.62.1"
     "@types/body-parser": "npm:1.19.6"
@@ -11695,9 +11709,9 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:8.68.0"
     "@typescript-eslint/parser": "npm:8.68.0"
     allure-commandline: "npm:2.43.0"
-    allure-js-commons: "npm:3.10.2"
-    allure-playwright: "npm:3.10.2"
-    axios: "npm:1.19.0"
+    allure-js-commons: "npm:3.11.0"
+    allure-playwright: "npm:3.11.1"
+    axios: "npm:1.20.0"
     body-parser: "npm:2.3.0"
     chokidar: "npm:5.0.0"
     config: "npm:4.4.2"
@@ -11705,7 +11719,7 @@ __metadata:
     cookie-parser: "npm:1.4.7"
     copy-webpack-plugin: "npm:13.0.1"
     csrf-sync: "npm:4.2.1"
-    css-loader: "npm:7.1.4"
+    css-loader: "npm:7.1.5"
     date-fns: "npm:4.4.0"
     dotenv: "npm:17.4.2"
     escape-html: "npm:1.0.3"
@@ -11713,7 +11727,7 @@ __metadata:
     eslint-config-prettier: "npm:10.1.8"
     eslint-import-resolver-typescript: "npm:4.4.5"
     eslint-plugin-import: "npm:2.32.0"
-    eslint-plugin-jest: "npm:29.16.1"
+    eslint-plugin-jest: "npm:29.16.6"
     express: "npm:5.2.1"
     express-session: "npm:1.19.0"
     git-rev-sync: "npm:3.0.2"
@@ -12298,13 +12312,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qs@npm:^6.14.2":
-  version: 6.15.3
-  resolution: "qs@npm:6.15.3"
+"qs@npm:^6.16.0":
+  version: 6.16.0
+  resolution: "qs@npm:6.16.0"
   dependencies:
     es-define-property: "npm:^1.0.1"
     side-channel: "npm:^1.1.1"
-  checksum: 10/1cbb4b050872a19ba8a311445be29babb8f66ea5d6462b3c48c6efb2c95187cd286b69734cd4caea1878cca3b9d1f0e9b49335336be9e999a7d8d7cf137ba60d
+  checksum: 10/7fbf9c2eb9c9bbd8997700caecc4b057ac259635873deefd5027fb26d06d79426cf468da55da87ffd147a24e93d3641352d8ac6664bd84688ad5b2f0b8d04828
   languageName: node
   linkType: hard
 
