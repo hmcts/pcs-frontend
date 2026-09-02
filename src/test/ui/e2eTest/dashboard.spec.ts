@@ -179,7 +179,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
   });
 
-  test('Validate notification and response status @crossbrowser @healthCheck', async () => {
+  test('Validate notification and response status @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
     await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
