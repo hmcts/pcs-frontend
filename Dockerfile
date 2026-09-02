@@ -37,26 +37,15 @@ RUN yarn build:prod && \
 # Compile TypeScript to JavaScript
 RUN yarn build:server
 
-# ---- Development image ----
-FROM dependencies AS development
+# ---- Production dependencies image ----
+# Prunes the full dependency tree down to production-only. Runs here rather than
+# in `runtime` so that the yarn cache (~190MB, needed to resolve packages
+# offline) stays in this throwaway stage and never lands in a runtime layer.
+FROM dependencies AS prod-deps
 
 WORKDIR /app
-# Install bash for development
-USER root
-RUN apk add --no-cache \
-    bash=~5
-USER hmcts
-
-# Copy all source files
-COPY --chown=hmcts:hmcts . .
-
-# Make the SSL generation script executable
-USER root
-RUN chmod +x /app/bin/generate-ssl-options.sh
-USER hmcts
-
-# Set environment variables
-ENV NODE_ENV=development
+ENV NODE_ENV=production
+RUN yarn workspaces focus --production --all
 
 # ---- Runtime image ----
 FROM base AS runtime
@@ -69,11 +58,28 @@ USER hmcts
 
 # Copy package files
 COPY --chown=hmcts:hmcts package.json yarn.lock .yarnrc.yml ./
-COPY --chown=hmcts:hmcts .yarn ./.yarn
 
-# Install only production dependencies
+# The base image CMD is `yarn start`, so yarn must be resolvable at runtime.
+# Only `.yarn/releases` (the binary `yarnrc.yml`'s `yarnPath` points at) is needed
+# — copying the whole `.yarn` tree would also ship `.yarn/cache` (~190MB).
+# Pre-create and chown the directory as root so the copy target, and any
+# `install-state.gz` yarn writes at runtime, are writable by hmcts.
+USER root
+RUN mkdir -p /app/.yarn && chown -R hmcts:hmcts /app/.yarn
+USER hmcts
+COPY --chown=hmcts:hmcts .yarn/releases ./.yarn/releases
+
+# `packageManager` in package.json makes the `yarn` on PATH a corepack shim, which
+# resolves the pinned yarn from corepack's own cache and tries to DOWNLOAD it if
+# absent. Previously that cache was populated as a side effect of running yarn in
+# this stage; now that dependency resolution happens in prod-deps, carry the cache
+# over explicitly (~3.6MB) so the container never needs network access to start.
+COPY --from=prod-deps --chown=hmcts:hmcts /home/hmcts/.cache/node/corepack /home/hmcts/.cache/node/corepack
+
+# Production dependencies, resolved offline in the prod-deps stage
+COPY --from=prod-deps --chown=hmcts:hmcts /app/node_modules ./node_modules
+
 ENV NODE_ENV=production
-RUN yarn workspaces focus --production --all
 
 # Copy only compiled code and necessary assets
 COPY --from=build /app/dist ./dist
@@ -83,9 +89,6 @@ COPY --from=build /app/src/main/steps ./dist/main/steps
 COPY --from=build /app/config ./config
 
 RUN chmod +x /app/dist/main/server.js
-
-# Set environment variables
-ENV NODE_ENV=production
 
 # Expose the application port
 EXPOSE 3209
