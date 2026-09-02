@@ -66,12 +66,29 @@ const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
 const e2eTag = process.env.E2E_TEST_SCOPE ?? '';
 const projectTagFilter = e2eTag ? { grep: new RegExp(e2eTag) } : {};
 
+/**
+ * Scopes cheap enough that one retry is worth paying for: the PR defaults plus the smoke/health
+ * runs. An empty scope is included because `test:smoke` clears E2E_TEST_SCOPE and greps @health.
+ * Anything not listed here (@nightly, @regression, @EMV, ad-hoc feature tags, …) is treated as a
+ * broad label-expanded run.
+ */
+const RETRY_WORTHY_SCOPES = ['', '@sanity', '@PR', '@smoke', '@health'];
+
+/**
+ * Retries only help when a failure is plausibly a one-off transient and the re-run is cheap.
+ * On broad runs it is neither: in pcs-frontend PR-1971 #31 (`e2e-tag:@nightly`, 25 tests) all 5
+ * failures also failed on `(retry #1)` — 0 tests recovered for roughly 14 extra minutes of wall
+ * clock. On a small @PR/@sanity/@smoke run the retry costs ~1 test, so we keep it there.
+ * Local (non-CI) runs never retry, as before.
+ */
+const retryCount = process.env.CI && RETRY_WORTHY_SCOPES.includes(e2eTag) ? 1 : 0;
+
 export default defineConfig({
   testDir: './src/test/ui',
   ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  retries: retryCount,
   workers: 2,
   timeout: 600 * 1000,
   expect: { timeout: 10 * 1000 },
