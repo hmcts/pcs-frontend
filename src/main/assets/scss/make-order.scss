@@ -165,6 +165,23 @@ $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3)
   margin-bottom: govuk-spacing(2);
 }
 
+// Place short visible date labels beside inputs; the date fieldset keeps a hidden legend.
+.pcs-inline-date {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: govuk-spacing(2) govuk-spacing(4);
+  margin-bottom: govuk-spacing(6);
+
+  > .pcs-inline-date__label {
+    margin-bottom: govuk-spacing(2);
+  }
+
+  > .pcs-date-with-pills {
+    margin-bottom: 0;
+  }
+}
+
 // Quick-fill helpers set their linked date to today plus the selected number of days.
 .pcs-date-with-pills {
   display: flex;

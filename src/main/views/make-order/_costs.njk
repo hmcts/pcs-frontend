@@ -4,7 +4,6 @@
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Costs</h2>
 
-{# Same-terms options remain enabled until the order-type dependency can be validated. #}
 {% set costsSameTermsHint = "Only available with a suspended possession order." %}
 
 {% set costsChoiceItems = [
@@ -67,19 +66,46 @@
     value: "same-terms",
     text: "Costs payable on the same terms as the suspension",
     checked: draftChecked("costs-choice", "same-terms"),
+    disabled: draftOrderType != "SUSPENDED_POSSESSION",
     hint: { text: costsSameTermsHint }
   },
   {
     value: "fixed-same-terms",
     text: "Defendant pays claimant's fixed costs, payable on the same terms as the suspension",
     checked: draftChecked("costs-choice", "fixed-same-terms"),
-    hint: { text: costsSameTermsHint }
+    disabled: draftOrderType != "SUSPENDED_POSSESSION",
+    hint: { text: costsSameTermsHint },
+    conditional: {
+      html: govukInput({
+        id: "costs-fixed-same-terms-amount",
+        name: "costs-fixed-same-terms-amount",
+        label: { text: "Fixed costs of" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        value: draftValue("costs-fixed-same-terms-amount"),
+        inputmode: "numeric",
+        prefix: { text: "£" }
+      })
+    }
   },
   {
     value: "summary-same-terms",
     text: "Defendant pays claimant's summary assessed costs, payable on the same terms as the suspension",
     checked: draftChecked("costs-choice", "summary-same-terms"),
-    hint: { text: costsSameTermsHint }
+    disabled: draftOrderType != "SUSPENDED_POSSESSION",
+    hint: { text: costsSameTermsHint },
+    conditional: {
+      html: govukInput({
+        id: "costs-summary-same-terms-amount",
+        name: "costs-summary-same-terms-amount",
+        label: { text: "Summary assessed costs of" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        value: draftValue("costs-summary-same-terms-amount"),
+        inputmode: "numeric",
+        prefix: { text: "£" }
+      })
+    }
   },
   {
     value: "other",

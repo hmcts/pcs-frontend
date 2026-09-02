@@ -40,7 +40,9 @@
   <form method="post" novalidate id="make-order-form"
         data-property-address="{{ propertyAddressDisplay }}"
         data-claimants="{{ claimantNames }}"
-        data-defendants="{{ defendantNames }}">
+        data-defendants="{{ defendantNames }}"
+        data-claimant-count="{{ claimantCount }}"
+        data-defendant-count="{{ defendantCount }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
   <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
@@ -92,7 +94,7 @@
       name: "action",
       value: "SUBMIT_FOR_REVIEW",
       attributes: { id: "submit-order-for-review" },
-      disabled: draftOrderType != "OUTRIGHT_POSSESSION"
+      disabled: draftOrderType != "OUTRIGHT_POSSESSION" and draftOrderType != "SUSPENDED_POSSESSION"
     }) }}
     {{ govukButton({ text: "Save as draft", name: "action", value: "SAVE_DRAFT", classes: "govuk-button--secondary" }) }}
   </div>

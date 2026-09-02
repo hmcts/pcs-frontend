@@ -36,6 +36,8 @@ interface MakeOrderCaseFacts {
 type MakeOrderType =
   'OUTRIGHT_POSSESSION' | 'SUSPENDED_POSSESSION' | 'ADJOURNMENT' | 'STRIKE_OUT_DISMISSAL' | 'FREE_FORM';
 
+const REVIEWABLE_ORDER_TYPES = new Set<MakeOrderType>(['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION']);
+
 interface MakeOrderDraftPayload {
   version: 1;
   orderType: MakeOrderType;
@@ -181,6 +183,53 @@ function caseFactsToFormData(caseFacts?: MakeOrderCaseFacts): Record<string, unk
   return formData;
 }
 
+function validateSuspendedSubmission(formData: Record<string, unknown>): void {
+  const value = (name: string): string => String(formData[name] ?? '').trim();
+  const values = (name: string): string[] => {
+    const raw = formData[name];
+    return (Array.isArray(raw) ? raw : raw === undefined ? [] : [raw]).map(String);
+  };
+  const validMoney = (name: string): boolean => /^\d+(\.\d{1,2})?$/.test(value(name).split(',').join(''));
+  const validDate = (prefix: string): boolean => {
+    const day = Number(value(`${prefix}-day`));
+    const month = Number(value(`${prefix}-month`));
+    const year = Number(value(`${prefix}-year`));
+    const parsed = new Date(Date.UTC(year, month - 1, day));
+    return (
+      day > 0 &&
+      month > 0 &&
+      year > 0 &&
+      parsed.getUTCDate() === day &&
+      parsed.getUTCMonth() === month - 1 &&
+      parsed.getUTCFullYear() === year
+    );
+  };
+  const terms = values('suspended-payment-terms');
+  const options = values('suspended-options');
+  const costsChoice = value('costs-choice');
+  const costsAmountFields: Record<string, string> = {
+    'def-pay-cl-fixed': 'costs-def-pay-cl-fixed-amount',
+    'def-pay-cl-summary': 'costs-def-pay-cl-summary-amount',
+    'cl-pay-def-summary': 'costs-cl-pay-def-summary-amount',
+    'fixed-same-terms': 'costs-fixed-same-terms-amount',
+    'summary-same-terms': 'costs-summary-same-terms-amount',
+  };
+  const costsAmountField = costsAmountFields[costsChoice];
+  const valid =
+    validDate('suspended-by-date') &&
+    validMoney('suspended-arrears') &&
+    terms.some(term => term === 'one-off' || term === 'instalments') &&
+    (!terms.includes('one-off') || (validMoney('suspended-oneoff-amount') && validDate('suspended-oneoff-date'))) &&
+    (!terms.includes('instalments') ||
+      (validMoney('suspended-instalment-amount') && validDate('suspended-instalment-date'))) &&
+    (!options.includes('use-occupation') ||
+      (validMoney('suspended-use-occupation-rate') && validDate('suspended-use-occupation-from-date'))) &&
+    (value('costs') !== 'yes' || !costsAmountField || validMoney(costsAmountField));
+  if (!valid) {
+    throw new HTTPError('The suspended possession order has incomplete or invalid payment terms', 400);
+  }
+}
+
 function buildAttendanceParties(envelope: MakeOrderEnvelope): { id: string; label: string; type: string }[] {
   return [
     ...envelope.caseContext.claimants.map((party, index) => ({
@@ -215,8 +264,12 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
   };
   const draftDate = (prefix: string): { name: string; value: unknown }[] =>
     ['day', 'month', 'year'].map(name => ({ name, value: draft[`${prefix}-${name}`] }));
-  const draftSelect = (items: Record<string, unknown>[], name: string): Record<string, unknown>[] =>
-    items.map(item => ({ ...item, selected: item.value === draft[name] }));
+  const draftSelect = (
+    items: Record<string, unknown>[],
+    name: string,
+    defaultValue?: string
+  ): Record<string, unknown>[] =>
+    items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) }));
 
   return {
     headerModel,
@@ -224,7 +277,7 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
     order: envelope.order,
     draft,
     draftOrderType: draftPayload.orderType,
-    orderDocumentJson: JSON.stringify(draftPayload.documents?.OUTRIGHT_POSSESSION ?? null),
+    orderDocumentJson: JSON.stringify(draftPayload.documents?.[draftPayload.orderType] ?? null),
     draftValue,
     draftChecked,
     draftDate,
@@ -233,6 +286,8 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
     propertyAddressDisplay: formatAddress(envelope.caseContext.propertyAddress),
     claimantNames: envelope.caseContext.claimants.map(party => party.name).join(', '),
     defendantNames: envelope.caseContext.defendants.map(party => party.name).join(', '),
+    claimantCount: envelope.caseContext.claimants.length,
+    defendantCount: envelope.caseContext.defendants.length,
     attendanceParties: buildAttendanceParties(envelope),
     saved: req.query.saved === 'true',
     submitted: req.query.submitted === 'true',
@@ -304,13 +359,16 @@ export default function makeOrderRoutes(app: Application): void {
           return safeRedirect303(res, makeOrderUrl, '/', ['/case/']);
         }
         const selectedOrderType = orderType as MakeOrderType;
-        if (orderAction === 'SUBMIT_FOR_REVIEW' && selectedOrderType !== 'OUTRIGHT_POSSESSION') {
-          throw new HTTPError('Only outright possession orders can be submitted for review', 400);
+        if (orderAction === 'SUBMIT_FOR_REVIEW' && !REVIEWABLE_ORDER_TYPES.has(selectedOrderType)) {
+          throw new HTTPError('Only outright and suspended possession orders can be submitted for review', 400);
         }
-        let outrightDocument: OrderEditorDocument | undefined;
+        if (orderAction === 'SUBMIT_FOR_REVIEW' && selectedOrderType === 'SUSPENDED_POSSESSION') {
+          validateSuspendedSubmission(formData);
+        }
+        let selectedDocument: OrderEditorDocument | undefined;
         if (typeof orderDocument === 'string' && orderDocument) {
           try {
-            outrightDocument = JSON.parse(orderDocument) as OrderEditorDocument;
+            selectedDocument = JSON.parse(orderDocument) as OrderEditorDocument;
           } catch {
             throw new HTTPError('The order document is not valid JSON', 400);
           }
@@ -319,7 +377,10 @@ export default function makeOrderRoutes(app: Application): void {
           version: 1,
           orderType: selectedOrderType,
           formData,
-          documents: outrightDocument ? { OUTRIGHT_POSSESSION: outrightDocument } : {},
+          documents:
+            selectedDocument && REVIEWABLE_ORDER_TYPES.has(selectedOrderType)
+              ? { [selectedOrderType]: selectedDocument }
+              : {},
         };
         await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, {
           makeOrderPayload: JSON.stringify({

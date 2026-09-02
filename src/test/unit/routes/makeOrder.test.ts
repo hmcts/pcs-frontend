@@ -139,6 +139,57 @@ describe('make order route', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
+  it('loads the document for the saved suspended order type', async () => {
+    const suspendedDocument = {
+      schema: 'docweave-document',
+      version: 1,
+      current: { type: 'doc', content: [] },
+      generated: { type: 'doc', content: [] },
+    };
+    jest.mocked(ccdCaseService.getCaseByIdForEvent).mockResolvedValue({
+      id: '1777027600017760',
+      data: {
+        makeOrderPayload: JSON.stringify({
+          ...makeOrderEnvelope,
+          order: {
+            ...makeOrderEnvelope.order,
+            draftPayload: {
+              version: 1,
+              orderType: 'SUSPENDED_POSSESSION',
+              formData: {},
+              documents: { SUSPENDED_POSSESSION: suspendedDocument },
+            },
+          },
+        }),
+      },
+    });
+    makeOrderRoute(app);
+    const handler = (app.get as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        query: {},
+        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+      } as unknown as Request,
+      res,
+      jest.fn()
+    );
+
+    expect(res.render).toHaveBeenCalledWith(
+      'make-order',
+      expect.objectContaining({
+        draftOrderType: 'SUSPENDED_POSSESSION',
+        orderDocumentJson: JSON.stringify(suspendedDocument),
+      })
+    );
+  });
+
   it('creates a draft before rendering when none exists', async () => {
     jest
       .mocked(ccdCaseService.getCaseByIdForEvent)
@@ -377,5 +428,112 @@ describe('make order route', () => {
       }),
     });
     expect(res.redirect).toHaveBeenCalledWith('https://manage-case.example.com/cases/case-details/1777027600017760');
+  });
+
+  it('submits a suspended possession document for review under its order type', async () => {
+    makeOrderRoute(app);
+    const handler = (app.post as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const orderDocument = {
+      schema: 'docweave-document',
+      version: 1,
+      current: { type: 'doc', content: [] },
+      generated: { type: 'doc', content: [] },
+    };
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        originalUrl: '/case/1777027600017760/make-order',
+        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        body: {
+          _csrf: 'csrf',
+          action: 'SUBMIT_FOR_REVIEW',
+          orderId: makeOrderEnvelope.order.id,
+          orderVersion: '2',
+          orderType: 'SUSPENDED_POSSESSION',
+          orderDocument: JSON.stringify(orderDocument),
+          'suspended-arrears': '234',
+          'suspended-by-date-day': '15',
+          'suspended-by-date-month': '9',
+          'suspended-by-date-year': '2026',
+          'suspended-payment-terms': 'one-off',
+          'suspended-oneoff-amount': '234',
+          'suspended-oneoff-date-day': '30',
+          'suspended-oneoff-date-month': '9',
+          'suspended-oneoff-date-year': '2026',
+        },
+      } as unknown as Request,
+      res,
+      jest.fn()
+    );
+
+    expect(ccdCaseService.submitCaseEvent).toHaveBeenCalledWith('token', '1777027600017760', 'ext:makeOrder', {
+      makeOrderPayload: JSON.stringify({
+        action: 'SUBMIT_FOR_REVIEW',
+        order: {
+          id: makeOrderEnvelope.order.id,
+          version: 2,
+          draftPayload: {
+            version: 1,
+            orderType: 'SUSPENDED_POSSESSION',
+            formData: {
+              'suspended-arrears': '234',
+              'suspended-by-date-day': '15',
+              'suspended-by-date-month': '9',
+              'suspended-by-date-year': '2026',
+              'suspended-payment-terms': 'one-off',
+              'suspended-oneoff-amount': '234',
+              'suspended-oneoff-date-day': '30',
+              'suspended-oneoff-date-month': '9',
+              'suspended-oneoff-date-year': '2026',
+            },
+            documents: { SUSPENDED_POSSESSION: orderDocument },
+          },
+        },
+      }),
+    });
+    expect(res.redirect).toHaveBeenCalledWith('https://manage-case.example.com/cases/case-details/1777027600017760');
+  });
+
+  it('rejects suspended same-terms costs without an amount', async () => {
+    makeOrderRoute(app);
+    const handler = (app.post as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const next = jest.fn();
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        body: {
+          action: 'SUBMIT_FOR_REVIEW',
+          orderType: 'SUSPENDED_POSSESSION',
+          'suspended-arrears': '234',
+          'suspended-by-date-day': '15',
+          'suspended-by-date-month': '9',
+          'suspended-by-date-year': '2026',
+          'suspended-payment-terms': 'one-off',
+          'suspended-oneoff-amount': '234',
+          'suspended-oneoff-date-day': '30',
+          'suspended-oneoff-date-month': '9',
+          'suspended-oneoff-date-year': '2026',
+          costs: 'yes',
+          'costs-choice': 'fixed-same-terms',
+        },
+      } as unknown as Request,
+      {} as Response,
+      next
+    );
+
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 400 }));
+    expect(ccdCaseService.submitCaseEvent).not.toHaveBeenCalled();
   });
 });
