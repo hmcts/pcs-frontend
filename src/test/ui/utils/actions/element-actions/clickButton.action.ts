@@ -31,8 +31,6 @@ export class ClickButtonAction implements IAction {
   private async clickButton(page: Page, button: Locator): Promise<void> {
     await page.waitForTimeout(VERY_SHORT_TIMEOUT);
     await button.click();
-    await page.waitForLoadState();
-    await page.locator('.spinner-container').waitFor({ state: 'detached' });
   }
 
   private async clickButtonAndVerifyPageNavigation(
@@ -62,7 +60,6 @@ export class ClickButtonAction implements IAction {
   }
 
   private async verifyPageAndClickButton(page: Page, currentPageHeader: string, button: Locator): Promise<void> {
-    await page.locator('.spinner-container').waitFor({ state: 'detached' });
     if ((await page.locator('h1,h1.govuk-heading-xl, h1.govuk-heading-l').textContent()) === currentPageHeader) {
       await this.clickButton(page, button);
     }
