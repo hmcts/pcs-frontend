@@ -25,7 +25,7 @@ export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION |
 export const enable_visibility_validation = process.env.ENABLE_VISIBILITY_VALIDATION || 'false';
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
-export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'false';
+export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
 const is_smoke_run = process.env.npm_lifecycle_event === 'test:smoke';
 const junit_result_output =
   process.env.PLAYWRIGHT_JUNIT_OUTPUT ||
@@ -66,12 +66,29 @@ const e2eSpecTestMatch = testMatchFromE2eSpec(process.env.E2E_SPEC);
 const e2eTag = process.env.E2E_TEST_SCOPE ?? '';
 const projectTagFilter = e2eTag ? { grep: new RegExp(e2eTag) } : {};
 
+/**
+ * Scopes cheap enough that one retry is worth paying for: the PR defaults plus the smoke/health
+ * runs. An empty scope is included because `test:smoke` clears E2E_TEST_SCOPE and greps @health.
+ * Anything not listed here (@nightly, @regression, @EMV, ad-hoc feature tags, …) is treated as a
+ * broad label-expanded run.
+ */
+const RETRY_WORTHY_SCOPES = ['', '@sanity', '@PR', '@smoke', '@health'];
+
+/**
+ * Retries only help when a failure is plausibly a one-off transient and the re-run is cheap.
+ * On broad runs it is neither: in pcs-frontend PR-1971 #31 (`e2e-tag:@nightly`, 25 tests) all 5
+ * failures also failed on `(retry #1)` — 0 tests recovered for roughly 14 extra minutes of wall
+ * clock. On a small @PR/@sanity/@smoke run the retry costs ~1 test, so we keep it there.
+ * Local (non-CI) runs never retry, as before.
+ */
+const retryCount = process.env.CI && RETRY_WORTHY_SCOPES.includes(e2eTag) ? 1 : 0;
+
 export default defineConfig({
   testDir: './src/test/ui',
   ...(e2eSpecTestMatch?.length ? { testMatch: e2eSpecTestMatch } : {}),
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
+  retries: retryCount,
   workers: 2,
   timeout: 600 * 1000,
   expect: { timeout: 10 * 1000 },
