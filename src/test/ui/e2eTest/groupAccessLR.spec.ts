@@ -111,7 +111,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await validateSolicitorCannotAccessCase(page, context, user.defendantSolicitor3.email);
   });
 
-  test('All representatives in the linked organisation can respond for a single-defendant case @LR @singleDefendant @healthCheck', async ({
+  test('All representatives in the linked organisation can respond for a single-defendant case @LR @singleDefendant', async ({
     page,
     context,
   }) => {
