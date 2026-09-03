@@ -1432,10 +1432,19 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
     await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
+    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('Existing draft response resumes to the saved journey @nonRent @LR', async () => {
