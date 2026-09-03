@@ -144,13 +144,13 @@ withPipeline(type, product, component) {
     setPerftestEnvVars()
   }
 
-  afterSuccess('akschartsinstall') {
+  afterSuccess('checkout') {
     onPerftest {
       runPerftestSmokeTests(yarnBuilder, secrets)
     }
   }
 
-  afterAlways('akschartsinstall') {
+  afterAlways('checkout') {
     onPerftest {
       archiveSmokeTestReports()
     }
