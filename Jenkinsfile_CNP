@@ -2,6 +2,7 @@
 
 @Library("Infrastructure@2.4.9")
 
+import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
 
@@ -138,7 +139,24 @@ withPipeline(type, product, component) {
       archiveArtifacts artifacts: 'yarn-audit*issues*', allowEmptyArchive: true
     }
   }
+
+
+onPerftest {
+  setPerftestEnvVars()
 }
+
+afterSuccess('akschartsinstall') {
+  onPerftest {
+    runPerftestSmokeTests(yarnBuilder, secrets)
+  }
+}
+
+afterAlways('akschartsinstall') {
+  onPerftest {
+    archiveSmokeTestReports()
+  }
+}
+
 
 /** First PR label matching prefix → value after prefix (e.g. e2e-tag:@smoke → @smoke) */
 def prLabelSuffix(githubApi, String prefix) {
@@ -152,6 +170,21 @@ def archiveFunctionalTestReports() {
 
 def archiveSmokeTestReports() {
   archiveAllureReport('Frontend Smoke Test Report')
+}
+
+def runPerftestSmokeTests(builder, Map secrets) {
+  def vaultConfig = new AppPipelineConfig()
+  vaultConfig.vaultSecrets = secrets
+
+  withTeamSecrets(vaultConfig, 'perftest', 'pcs') {
+    withEnv([
+      "TEST_URL=https://pcs-perftest.platform.hmcts.net/",
+      "ENVIRONMENT_NAME=perftest"
+    ]) {
+      echo "Running smoke tests against ${env.TEST_URL}"
+      yarnBuilder.smokeTest()
+    }
+  }
 }
 
 def archiveAllureReport(String reportName) {
