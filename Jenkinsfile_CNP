@@ -140,20 +140,20 @@ withPipeline(type, product, component) {
     }
   }
 
-
-onPerftest {
-  setPerftestEnvVars()
-}
-
-afterSuccess('akschartsinstall') {
   onPerftest {
-    runPerftestSmokeTests(yarnBuilder, secrets)
+    setPerftestEnvVars()
   }
-}
 
-afterAlways('akschartsinstall') {
-  onPerftest {
-    archiveSmokeTestReports()
+  afterSuccess('akschartsinstall') {
+    onPerftest {
+      runPerftestSmokeTests(yarnBuilder, secrets)
+    }
+  }
+
+  afterAlways('akschartsinstall') {
+    onPerftest {
+      archiveSmokeTestReports()
+    }
   }
 }
 
