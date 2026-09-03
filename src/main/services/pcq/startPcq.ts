@@ -13,10 +13,11 @@ import { isPcqEnabled } from '@utils/isPcqEnabled';
 
 const logger = Logger.getLogger('startPcq');
 
-// Where PCQ returns the citizen once they finish the questionnaire. PCQ interrupts the journey at
-// the RA triage step, so we resume at triage's normal next step. `nav=1` marks the arrival as
-// internal navigation — without it the access guard bounces a direct GET of a mid-section step
-// back to the start of the section.
+// PCQ returns the citizen once they finish the questionnaire. It is offered on entry to the
+// language-used step, so we resume there — on return the reserved
+// PcqId makes the middleware a no-op and the language screen renders. `nav=1` marks the arrival as
+// internal navigation — without it the access guard bounces a direct GET of a mid-section step back
+// to the start of the section.
 const RETURN_STEP = 'language-used?nav=1';
 
 /**
