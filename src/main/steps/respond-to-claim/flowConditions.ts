@@ -103,9 +103,7 @@ export function shouldShowCounterClaimNeedToApplyStep(req: Request): boolean {
 }
 
 export function shouldShowCounterClaimAgainstWhoStep(req: Request): boolean {
-  return (
-    hasMultipleParties(req)
-  );
+  return hasMultipleParties(req);
 }
 
 export function shouldShowCounterClaimAboutStep(req: Request): boolean {
