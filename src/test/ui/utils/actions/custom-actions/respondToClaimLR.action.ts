@@ -37,7 +37,9 @@ import {
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  resumeResponse,
   selectDefendant,
+  startNow,
   tenancyDateDetails,
   tenancyDateUnknown,
   tenancyTypeDetails,
@@ -53,12 +55,12 @@ import { formatCurrency, formatPoundsValue, formatTextToLowercaseSeparatedBySpac
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
+import { pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
 import { RespondToClaimAction } from './respondToClaim.action';
 
 const rtcNoAnswerProvidedValue = 'No answer provided';
 const rtcUploadedDocumentsQuestion = 'Uploaded files';
 const rtcNoDocumentsUploadedValue = 'No files uploaded';
-
 export class RespondToClaimLRAction extends RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
@@ -74,6 +76,9 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['selectExceptionalHardshipLR', () => this.selectExceptionalHardshipLR(fieldName as actionRecord)],
       ['selectIncomeAndExpensesLR', () => this.selectIncomeAndExpensesLR(fieldName as actionRecord)],
       ['representationLR', () => this.representationLR(fieldName as actionRecord)],
+      ['selectResumeResponseLR', () => this.selectResumeResponseLR(fieldName as actionRecord)],
+      ['createDraftResponseLR', () => this.createDraftResponseLR(fieldName as actionRecord)],
+      ['reopenStartNowLR', () => this.reopenStartNowLR()],
       [
         'selectWhatRegularIncomeDoTheyReceiveLR',
         () => this.selectWhatRegularIncomeDoTheyReceiveLR(fieldName as actionRecord),
@@ -111,7 +116,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['confirmDefendantDetailsLR', () => this.confirmDefendantDetailsLR(fieldName as actionRecord)],
       ['enterDateOfBirthDetailsLR', () => this.enterDateOfBirthDetailsLR(fieldName as actionRecord)],
       ['languageUsedLR', () => this.languageUsedLR(fieldName as actionRecord)],
-      ['selectStatementOfTruthRTCLR', () => this.selectStatementOfTruthRTCLR(fieldName as actionRecord)],
+      ['selectStatementOfTruthRTCLR', () => this.selectStatementOfTruthRTCLR(page, fieldName as actionRecord)],
       ['emailConfirmationLR', () => this.emailConfirmationLR(fieldName as actionRecord)],
       ['exemptLandlordLR', () => this.exemptLandlordLR(fieldName as actionRecord)],
       ['selectWrittenTermsLR', () => this.selectWrittenTermsLR(fieldName as actionRecord)],
@@ -203,23 +208,23 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         linkText: tenancyTypeDetails.tenancyDocumentDynamicLink,
       });
     }
-    //this.recordAnswer(tenancyTypeDetails.isTenancyTypeCorrectQuestion, tenancyTypeDetailsInfo.tenancyOption);
+    this.recordAnswer(tenancyTypeDetails.isTenancyTypeCorrectQuestion, tenancyTypeDetailsInfo.tenancyOption);
     await performAction('clickRadioButton', {
       question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
       option: tenancyTypeDetailsInfo.tenancyOption,
     });
     if (tenancyTypeDetailsInfo.tenancyOption === 'No' && tenancyTypeDetailsInfo.tenancyTypeInfo) {
-      //this.recordAnswer(
-      //   tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
-      //   tenancyTypeDetailsInfo.tenancyTypeInfo
-      // );
+      this.recordAnswer(
+        tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
+        tenancyTypeDetailsInfo.tenancyTypeInfo
+      );
       await performAction(
         'inputText',
         tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
         tenancyTypeDetailsInfo.tenancyTypeInfo
       );
     } else {
-      //this.deleteAnswer(tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel);
+      this.deleteAnswer(tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel);
     }
     await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
   }
@@ -229,18 +234,18 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       elementType: 'paragraph',
       text: tenancyDateDetails.getDetailsGivenByParagraph(),
     });
-    //this.recordAnswer(tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion, tenancyStartDateData.option);
+    this.recordAnswer(tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion, tenancyStartDateData.option);
     await performAction('clickRadioButton', {
       question: tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion,
       option: tenancyStartDateData.option,
     });
     if (tenancyStartDateData?.day && tenancyStartDateData?.month && tenancyStartDateData?.year) {
-      // this.recordRtcCyaDateFromParts(
-      //   this.getRtcCyaQuestionLabel(tenancyDateDetails.whatIsTheCorrectStartDateHiddenQuestion),
-      //   tenancyStartDateData.day,
-      //   tenancyStartDateData.month,
-      //   tenancyStartDateData.year
-      // );
+      this.recordRtcCyaDateFromParts(
+        this.getRtcCyaQuestionLabel(tenancyDateDetails.whatIsTheCorrectStartDateHiddenQuestion),
+        tenancyStartDateData.day,
+        tenancyStartDateData.month,
+        tenancyStartDateData.year
+      );
       await performActions(
         'Enter Date',
         ['inputText', tenancyDateDetails.dayHiddenTextLabel, tenancyStartDateData.day],
@@ -313,6 +318,15 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         ['inputText', noticeDateWhenProvided.monthTextLabel, noticeData.month],
         ['inputText', noticeDateWhenProvided.yearTextLabel, noticeData.year]
       );
+    }
+    if (noticeData?.showNoticeDocumentLink) {
+      await performValidation('text', {
+        elementType: 'link',
+        text: noticeDateWhenProvided.noticeDocumentDynamicLink,
+      });
+      await performValidation('validatePdfDocument', {
+        linkText: noticeDateWhenProvided.noticeDocumentDynamicLink,
+      });
     }
     await performAction('clickButton', noticeDateWhenNotProvided.saveAndContinueButton);
   }
@@ -538,6 +552,41 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('clickButton', selectDefendant.saveAndContinueButton);
   }
 
+  private async selectResumeResponseLR(resumeResponseData: actionRecord): Promise<void> {
+    await performAction('clickRadioButton', {
+      question: resumeResponse.question,
+      option: resumeResponseData.option,
+    });
+    await performAction('clickButton', resumeResponse.saveAndContinueButton);
+  }
+
+  private async createDraftResponseLR(defendant: actionRecord): Promise<void> {
+    const defendantName = `${defendant.firstName} ${defendant.lastName}`;
+    if (pinUsers.length > 1) {
+      await this.representationLR({
+        question: selectDefendant.whichDefendantQuestion,
+        radioOption: defendantName,
+      });
+    }
+    await this.confirmDefendantDetailsLR({
+      question: defendantNameConfirmation.mainHeader(String(defendant.firstName), String(defendant.lastName)),
+      option: defendantNameConfirmation.yesRadioOption,
+    });
+    await this.enterDateOfBirthDetailsLR({
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+  }
+
+  private async reopenStartNowLR(): Promise<void> {
+    await performAction(
+      'navigateToUrl',
+      `${process.env.TEST_URL}/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`
+    );
+    await performAction('clickButton', startNow.startNowButton);
+  }
+
   private async confirmDefendantDetailsLR(defendantData: actionRecord) {
     this.recordAnswer(String(defendantData.question), defendantData.option);
     await performAction('clickRadioButton', {
@@ -619,7 +668,10 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         option,
       });
 
-      if (option === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph) {
+      if (
+        option ===
+        `Money from somewhere else (for example, child maintenance payments or someone in the defendant’s household gives them money)`
+      ) {
         await performAction(
           'inputText',
           whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
@@ -632,7 +684,6 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       if (!value || !frequency) {
         throw new Error(`Amount and frequency are required for option: ${option}`);
       }
-
       await performAction('inputText', whatRegularIncomeDoYouReceive.totalAmountReceivedHiddenTextLabel, value);
       await performAction('clickRadioButton', frequency);
       selectedRegularIncomeEntries.push([
@@ -1026,14 +1077,20 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('clickButton', languageUsed.saveAndContinueButton);
   }
 
-  private async selectStatementOfTruthRTCLR(sot: actionRecord): Promise<void> {
+  private async selectStatementOfTruthRTCLR(page: Page, sot: actionRecord): Promise<void> {
     await performValidation('elementToBeVisible', endOfJourneyCYA.contemptOfCourtParagraph);
     await performAction('check', sot.checkBox);
     await performAction('inputText', endOfJourneyCYA.fullNameTextLabel, sot.firstName);
     await performAction('inputText', endOfJourneyCYA.nameOfFirmTextLabel, sot.firmName);
     await performAction('inputText', endOfJourneyCYA.positionOrOfficeHeldTextLabel, sot.position);
 
-    await performAction('clickButton', endOfJourneyCYA.submitButton);
+    await page.getByRole('button', { name: 'Submit', exact: true }).click({
+      noWaitAfter: true,
+    });
+    await page.locator('h1.govuk-panel__title').waitFor({
+      state: 'visible',
+      timeout: 30000,
+    });
   }
 
   private async selectUniversalCreditLR(universalCreditDateData: actionRecord): Promise<void> {

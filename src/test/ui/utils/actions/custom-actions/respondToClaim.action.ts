@@ -242,6 +242,7 @@ export class RespondToClaimAction implements IAction {
       ['counterClaimAbout', () => this.counterClaimAbout(fieldName as actionRecord)],
       ['counterClaimOrderOtherThanSum', () => this.counterClaimOrderOtherThanSum(fieldName as actionRecord)],
       ['selectReasonableAdjustments', () => this.selectReasonableAdjustments(fieldName as actionRecord, page)],
+      ['selectEqualityAndDiversity', () => this.selectEqualityAndDiversity(fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -257,12 +258,15 @@ export class RespondToClaimAction implements IAction {
 
   protected getRtcCyaChoiceLabel(choice: actionData): string {
     const normalizedChoice = String(choice).trim();
-
-    if (normalizedChoice === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph.trim()) {
+    const moneyFromSomewhereElseLabels = [
+      whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph.trim(),
+      `Money from somewhere else (for example, child maintenance payments or someone in the defendant’s household gives them money)`.trim(),
+    ];
+    if (moneyFromSomewhereElseLabels.includes(normalizedChoice)) {
       return normalizedChoice;
+    } else {
+      return removeTrailingBracketedSuffix(normalizedChoice);
     }
-
-    return removeTrailingBracketedSuffix(normalizedChoice);
   }
 
   protected buildRtcCyaAmountAndFrequencyValue(
@@ -1160,7 +1164,15 @@ export class RespondToClaimAction implements IAction {
   }
 
   private async validateCounterClaimApplicationFee(feeData: actionRecord): Promise<void> {
-    await performValidation('mainHeader', counterClaimApplicationFeeAmount.mainHeader);
+    const isLegalRepresentativeJourney = feeData.isLegalRepresentative === true;
+    const mainHeader = isLegalRepresentativeJourney
+      ? counterClaimApplicationFeeAmount.lrMainHeader
+      : counterClaimApplicationFeeAmount.mainHeader;
+    const payButtonText = isLegalRepresentativeJourney
+      ? counterClaimApplicationFeeAmount.getLrPayButton(String(feeData.fee))
+      : counterClaimApplicationFeeAmount.getPayButton(String(feeData.fee));
+
+    await performValidation('mainHeader', mainHeader);
     await performValidation('summaryListValue', counterClaimApplicationFeeAmount.counterClaimAmountLabel, {
       value: feeData.amount ?? '',
     });
@@ -1168,8 +1180,8 @@ export class RespondToClaimAction implements IAction {
       value: `£${String(feeData.fee)}`,
     });
     await performValidation('text', {
-      elementType: 'link',
-      text: counterClaimApplicationFeeAmount.getPayButton(String(feeData.fee)),
+      elementType: 'linkOrButton',
+      text: payButtonText,
     });
   }
 
@@ -1787,5 +1799,14 @@ export class RespondToClaimAction implements IAction {
       });
     }
     await performAction('clickButton', ra.button);
+  }
+
+  private async selectEqualityAndDiversity(diversityData: actionRecord): Promise<void> {
+    this.recordAnswer(String(diversityData.question), diversityData.radioOption);
+    await performAction('clickRadioButton', {
+      question: diversityData.question,
+      option: diversityData.radioOption,
+    });
+    await performAction('clickButton', diversityData.button);
   }
 }

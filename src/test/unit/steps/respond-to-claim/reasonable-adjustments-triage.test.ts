@@ -3,6 +3,11 @@ jest.mock('../../../../main/modules/steps', () => ({
   getTranslationFunction: jest.fn(),
 }));
 
+const mockStartPcq = jest.fn();
+jest.mock('@services/pcq/startPcq', () => ({
+  startPcq: mockStartPcq,
+}));
+
 const mockStartYourSupport = jest.fn();
 jest.mock('@services/cuiRa/startYourSupport', () => ({
   startYourSupport: mockStartYourSupport,
@@ -42,53 +47,83 @@ describe('reasonable-adjustments-triage beforeRedirect', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockIsCuiYourSupportEnabled.mockResolvedValue(true); // feature on by default
-  });
-
-  it('does nothing (skips) when the choice is not "questions"', async () => {
-    const { req, redirect } = buildReq('skip', '123');
-
-    await beforeRedirect(req);
-
-    expect(mockStartYourSupport).not.toHaveBeenCalled();
-    expect(redirect).not.toHaveBeenCalled();
-  });
-
-  it('does not launch Your Support when the feature flag is off (falls through like skip)', async () => {
-    mockIsCuiYourSupportEnabled.mockResolvedValue(false);
-    const { req, redirect } = buildReq('questions', '123');
-
-    await beforeRedirect(req);
-
-    expect(mockStartYourSupport).not.toHaveBeenCalled();
-    expect(redirect).not.toHaveBeenCalled();
-  });
-
-  it('launches Your Support and 303-redirects to the microsite url on "questions"', async () => {
+    mockStartPcq.mockResolvedValue('https://pcq.test/service-endpoint?token=abc');
     mockStartYourSupport.mockResolvedValue('https://cui-ra/microsite/xyz');
-    const { req, redirect } = buildReq('questions', '123');
-
-    await beforeRedirect(req);
-
-    expect(mockStartYourSupport).toHaveBeenCalledWith(req);
-    expect(redirect).toHaveBeenCalledWith(303, 'https://cui-ra/microsite/xyz');
   });
 
-  it('redirects to the RA error page when launching Your Support fails', async () => {
-    mockStartYourSupport.mockRejectedValue(new Error('cui-ra down'));
-    const { req, redirect } = buildReq('questions', '123');
+  describe('declining support hands the citizen to PCQ', () => {
+    it('redirects to PCQ', async () => {
+      const { req, redirect } = buildReq('skip', '123');
 
-    await beforeRedirect(req);
+      await beforeRedirect(req);
 
-    expect(redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/reasonable-adjustments-error');
+      expect(mockStartPcq).toHaveBeenCalledWith(req);
+      expect(redirect).toHaveBeenCalledWith(303, 'https://pcq.test/service-endpoint?token=abc');
+    });
+
+    it('never launches Your Support, which the citizen has just declined', async () => {
+      const { req, redirect } = buildReq('skip', '123');
+
+      await beforeRedirect(req);
+
+      // Regression guard: without an early return the PCQ branch falls through into the Your
+      // Support launch, creating a cui-ra payload for a citizen who said no and firing a second
+      // redirect on an already-sent response.
+      expect(mockStartYourSupport).not.toHaveBeenCalled();
+      expect(redirect).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls through to the normal next step when PCQ is unavailable', async () => {
+      mockStartPcq.mockResolvedValue(null);
+      const { req, redirect } = buildReq('skip', '123');
+
+      await beforeRedirect(req);
+
+      // No redirect issued, so the step controller carries on to language-used — an optional
+      // questionnaire must never block the citizen's response.
+      expect(redirect).not.toHaveBeenCalled();
+      expect(mockStartYourSupport).not.toHaveBeenCalled();
+    });
   });
 
-  it('rethrows (never silently continues) when there is no case reference to build the error page', async () => {
-    const error = new Error('cui-ra down');
-    mockStartYourSupport.mockRejectedValue(error);
-    const { req, redirect } = buildReq('questions', undefined);
+  describe('continuing to the questions launches Your Support', () => {
+    it('303-redirects to the microsite url and does not invoke PCQ', async () => {
+      const { req, redirect } = buildReq('questions', '123');
 
-    await expect(beforeRedirect(req)).rejects.toBe(error);
-    expect(redirect).not.toHaveBeenCalled();
+      await beforeRedirect(req);
+
+      expect(mockStartYourSupport).toHaveBeenCalledWith(req);
+      expect(redirect).toHaveBeenCalledWith(303, 'https://cui-ra/microsite/xyz');
+      expect(mockStartPcq).not.toHaveBeenCalled();
+    });
+
+    it('does not launch Your Support when the feature flag is off (falls through like skip)', async () => {
+      mockIsCuiYourSupportEnabled.mockResolvedValue(false);
+      const { req, redirect } = buildReq('questions', '123');
+
+      await beforeRedirect(req);
+
+      expect(mockStartYourSupport).not.toHaveBeenCalled();
+      expect(redirect).not.toHaveBeenCalled();
+    });
+
+    it('redirects to the RA error page when launching Your Support fails', async () => {
+      mockStartYourSupport.mockRejectedValue(new Error('cui-ra down'));
+      const { req, redirect } = buildReq('questions', '123');
+
+      await beforeRedirect(req);
+
+      expect(redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/reasonable-adjustments-error');
+    });
+
+    it('rethrows (never silently continues) when there is no case reference to build the error page', async () => {
+      const error = new Error('cui-ra down');
+      mockStartYourSupport.mockRejectedValue(error);
+      const { req, redirect } = buildReq('questions', undefined);
+
+      await expect(beforeRedirect(req)).rejects.toBe(error);
+      expect(redirect).not.toHaveBeenCalled();
+    });
   });
 });
 
