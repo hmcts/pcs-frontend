@@ -49,8 +49,17 @@ describe('legalRepresentativeHeaderMiddleware', () => {
     expect(res.locals?.footerModel).toBeUndefined();
   });
 
-  it('sets legalrep header mode and appends header/footer locals for legalrep users', () => {
-    const headerModel = { name: 'header', assetsPath: '' };
+  it('sets legalrep header mode and transforms sign-out action into /logout link for legalrep users', () => {
+    const headerModel = {
+      name: 'header',
+      assetsPath: '',
+      accountNav: {
+        items: [
+          { id: 'sign-out', text: 'Sign out', action: 'sign-out' },
+          { id: 'other-item', text: 'Other', href: '/other' },
+        ],
+      },
+    };
     const footerModel = { name: 'footer' };
     mockIsLegalRepresentativeUser.mockReturnValue(true);
     mockBuildHeaderModel.mockReturnValue(headerModel);
@@ -61,7 +70,16 @@ describe('legalRepresentativeHeaderMiddleware', () => {
 
     expect(next).toHaveBeenCalled();
     expect(res.locals?.isLegalRepresentative).toBe(true);
-    expect(res.locals?.headerModel).toEqual(headerModel);
+    expect(res.locals?.headerModel).toEqual({
+      name: 'header',
+      assetsPath: '/assets/ui-component-lib',
+      accountNav: {
+        items: [
+          { id: 'sign-out', text: 'Sign out', href: '/logout' },
+          { id: 'other-item', text: 'Other', href: '/other' },
+        ],
+      },
+    });
     expect(res.locals?.footerModel).toEqual(footerModel);
   });
 });
