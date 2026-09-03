@@ -1,6 +1,6 @@
 import { Locator, Page } from '@playwright/test';
 
-import { VERY_SHORT_TIMEOUT, actionRetries, waitForPageRedirectionTimeout } from '../../../../../../playwright.config';
+import { actionRetries, waitForPageRedirectionTimeout } from '../../../../../../playwright.config';
 import { IAction } from '../../interfaces';
 
 export class ClickButtonAction implements IAction {
@@ -29,10 +29,8 @@ export class ClickButtonAction implements IAction {
   }
 
   private async clickButton(page: Page, button: Locator): Promise<void> {
-    await page.waitForTimeout(VERY_SHORT_TIMEOUT);
     await button.click();
     await page.waitForLoadState();
-    await page.locator('.spinner-container').waitFor({ state: 'detached' });
   }
 
   private async clickButtonAndVerifyPageNavigation(
@@ -46,9 +44,13 @@ export class ClickButtonAction implements IAction {
     do {
       attempt++;
       await this.clickButton(page, button);
-      //Adding sleep to slow down execution when the application behaves abnormally
-      await page.waitForTimeout(waitForPageRedirectionTimeout);
-      nextPageElementIsVisible = await pageElement.isVisible();
+      // Returns as soon as the heading appears, but allows the same budget as the previous
+      // fixed sleep before the click is retried.
+      nextPageElementIsVisible = await pageElement
+        .first()
+        .waitFor({ state: 'visible', timeout: waitForPageRedirectionTimeout })
+        .then(() => true)
+        .catch(() => false);
     } while (!nextPageElementIsVisible && attempt < actionRetries);
     if (!nextPageElementIsVisible) {
       throw new Error(`Navigation to "${nextPageElement}" page/element failed after ${attempt} attempts`);
@@ -62,7 +64,6 @@ export class ClickButtonAction implements IAction {
   }
 
   private async verifyPageAndClickButton(page: Page, currentPageHeader: string, button: Locator): Promise<void> {
-    await page.locator('.spinner-container').waitFor({ state: 'detached' });
     if ((await page.locator('h1,h1.govuk-heading-xl, h1.govuk-heading-l').textContent()) === currentPageHeader) {
       await this.clickButton(page, button);
     }
