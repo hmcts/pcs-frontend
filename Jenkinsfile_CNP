@@ -172,6 +172,17 @@ def archiveSmokeTestReports() {
   archiveAllureReport('Frontend Smoke Test Report')
 }
 
+def setPerftestEnvVars() {
+  env.ENVIRONMENT = "perftest"
+  env.NODE_CONFIG_ENV = 'test'
+  env.PCS_API_URL = "http://pcs-api-perftest.service.core-compute-perftest.internal"
+  env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-perftest.service.core-compute-perftest.internal"
+  env.CDAM_URL = "http://ccd-case-document-am-api-perftest.service.core-compute-perftest.internal"
+  env.XUI_BASE_URI = "https://manage-case.perftest.platform.hmcts.net"
+  env.REDIRECTS_MANAGE_CASE_RETURN_URL = "https://manage-case.perftest.platform.hmcts.net/cases/case-details/PCS/PCS"
+  env.CASE_TYPE_ID = "PCS"
+}
+
 def runPerftestSmokeTests(builder, Map secrets) {
   def vaultConfig = new AppPipelineConfig()
   vaultConfig.vaultSecrets = secrets
@@ -182,7 +193,7 @@ def runPerftestSmokeTests(builder, Map secrets) {
       "ENVIRONMENT_NAME=perftest"
     ]) {
       echo "Running smoke tests against ${env.TEST_URL}"
-      yarnBuilder.smokeTest()
+      builder.smokeTest()
     }
   }
 }
