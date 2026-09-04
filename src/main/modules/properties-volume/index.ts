@@ -21,10 +21,7 @@ export class PropertiesVolume {
         await propertiesVolume.addFromAzureVault(config, {
           pathToHelmChart: path.resolve(__dirname, '../../../../charts/pcs-frontend/values.yaml'),
           env: process.env.VAULT_ENV ?? 'aat',
-          // AAT Redis isn't reachable from a dev laptop; keep the local default.
-          // LOCAL ONLY — do not commit: pointing PCQ at demo, so take the token key from
-          // .env (PCQ_TOKEN_KEY) instead of letting the AAT vault value overwrite it.
-          omit: ['redis-connection-string', 'pcs-pcq-token-key'],
+          omit: ['redis-connection-string'],
         });
       } catch (err) {
         logger.warn(
