@@ -22,7 +22,9 @@ export class PropertiesVolume {
           pathToHelmChart: path.resolve(__dirname, '../../../../charts/pcs-frontend/values.yaml'),
           env: process.env.VAULT_ENV ?? 'aat',
           // AAT Redis isn't reachable from a dev laptop; keep the local default.
-          omit: ['redis-connection-string'],
+          // LOCAL ONLY — do not commit: pointing PCQ at demo, so take the token key from
+          // .env (PCQ_TOKEN_KEY) instead of letting the AAT vault value overwrite it.
+          omit: ['redis-connection-string', 'pcs-pcq-token-key'],
         });
       } catch (err) {
         logger.warn(
