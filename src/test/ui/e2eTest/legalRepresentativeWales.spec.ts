@@ -765,10 +765,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadAdditionalDocumentsLR');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.welshRadioOption,
@@ -930,10 +926,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadAdditionalDocumentsLR');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.welshRadioOption,
