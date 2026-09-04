@@ -29,5 +29,4 @@ export async function isPcqEnabled(req: Request): Promise<boolean> {
   ]);
 
   return releaseEnabled && featureEnabled;
-  // return true && true
 }
