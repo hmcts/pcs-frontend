@@ -263,7 +263,7 @@ Make sure you have those values set correctly for your application.
 ### Healthcheck endpoint
 
 The application exposes a health endpoint (http://localhost:3209/health), created with the use of
-[Nodejs Healthcheck](https://github.com/hmcts/nodejs-healthcheck) library. This endpoint is defined
+[Nodejs Healthcheck](https://github.com/hmcts/nodejs-healthcheck) library. This endpoint is defined.
 in [health.ts](src/main/routes/health.ts) file and currently checks the following components:
 
 - Redis
