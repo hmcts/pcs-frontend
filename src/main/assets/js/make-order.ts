@@ -685,17 +685,6 @@ function adjournmentTimeEstimate(form: HTMLFormElement): string {
   return `${amount} ${unit}`;
 }
 
-function adjournmentHearingFormat(form: HTMLFormElement): string {
-  const formats = new FormData(form).getAll('adj-format').map(String);
-  const labels: Record<string, string> = {
-    'in-person': 'in person',
-    video: 'by video hearing',
-    telephone: 'by telephone',
-  };
-  const methods = formats.map(format => labels[format]).filter(Boolean);
-  return joinList(methods.length ? methods : ['in person']);
-}
-
 function addAdjournmentOneOffTerm(content: InlineBuilder, form: HTMLFormElement, claimant: string): void {
   content
     .text(`a payment to ${claimant} of £`)
@@ -764,15 +753,10 @@ export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof 
           content.text(' with a time estimate of ').fact('adjournment-time-estimate', adjournmentTimeEstimate(form), {
             sourceId: 'adj-time-estimate-group',
           });
-          if (when === 'specific') {
-            content
-              .text('. Such hearing shall be ')
-              .fact('adjournment-hearing-format', adjournmentHearingFormat(form), {
-                sourceId: 'adj-format-group',
-              })
-              .text('.');
-          } else {
+          if (when !== 'specific') {
             content.text('. Further details of the hearing will be provided by the court.');
+          } else {
+            content.text('.');
           }
         });
         if (directions.includes('defence')) {
