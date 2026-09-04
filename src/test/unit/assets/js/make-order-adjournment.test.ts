@@ -101,7 +101,7 @@ describe('adjournment order generation', () => {
     ]);
   });
 
-  it('generates a specific hearing with singular duration and combined formats', () => {
+  it('generates a specific hearing with singular duration and no hearing format wording', () => {
     const form = renderForm(`
       <input name="adj-type" value="further-hearing">
       <input name="adj-when" value="specific">
@@ -117,7 +117,7 @@ describe('adjournment order generation', () => {
     const generated = buildAdjournmentOrder(form) as unknown as CapturedDocument;
 
     expect(generated.lists[0].items[0].text).toBe(
-      'The claim shall be adjourned to be heard on 25 May 2026 at 10:30am with a time estimate of 1 hour. Such hearing shall be in person, by video hearing and by telephone.'
+      'The claim shall be adjourned to be heard on 25 May 2026 at 10:30am with a time estimate of 1 hour.'
     );
   });
 
