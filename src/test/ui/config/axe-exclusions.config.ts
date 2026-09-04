@@ -36,4 +36,7 @@ export const axe_exclusions = [
   '#ethnicity-4', // page: ethnicity, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is not allowed for this radio button
   'html', // accessibility: html-has-lang - <html> element does not have a lang attribute
   'html-has-lang', // accessibility: html-has-lang - <html> element does not have a lang attribute
+  // govuk-frontend adds aria-expanded to conditional-reveal radios, which axe rejects for role=radio.
+  // Scope the exclusion to affected radios on this page; checkbox reveals remain in the audit.
+  '.pcs-make-order .govuk-radios__input[aria-expanded]',
 ];

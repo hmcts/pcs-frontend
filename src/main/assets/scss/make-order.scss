@@ -1,0 +1,336 @@
+@use 'govuk-frontend' as *;
+
+// This cap also reserves space so keyboard focus is not obscured by the sticky panel.
+$pcs-case-facts-max-height: min(60vh, 320px);
+
+// Include content-box padding and borders in the focus reservation.
+$pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3) * 2 + 2px});
+$pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
+
+// Use the available width without changing the shared citizen-page container.
+.pcs-wide {
+  max-width: none;
+  margin-right: govuk-spacing(4);
+  margin-left: govuk-spacing(4);
+
+  @include govuk-media-query($from: tablet) {
+    margin-right: govuk-spacing(6);
+    margin-left: govuk-spacing(6);
+  }
+}
+
+// Match GOV.UK's selector specificity and reserve the sticky panel on the root scrollport.
+.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)) {
+  scroll-padding-top: $pcs-case-facts-reserve;
+
+  @include govuk-media-query($until: desktop) {
+    scroll-padding-top: 0;
+  }
+}
+
+.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)):has(.pcs-case-facts--collapsed) {
+  scroll-padding-top: $pcs-case-facts-collapsed-reserve;
+}
+
+.pcs-case-facts {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: govuk-spacing(3) 0;
+  border-top: 1px solid $govuk-border-colour;
+  border-bottom: 1px solid $govuk-border-colour;
+  background-color: govuk-colour('black', $variant: 'tint-95');
+
+  max-height: $pcs-case-facts-max-height;
+  overflow-y: auto;
+
+  @include govuk-media-query($until: desktop) {
+    position: static;
+    max-height: none;
+  }
+}
+
+.pcs-case-facts--collapsed {
+  max-height: none;
+  overflow: visible;
+}
+
+.pcs-case-facts__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: govuk-spacing(3);
+  margin-bottom: govuk-spacing(2);
+
+  .govuk-heading-s {
+    margin-bottom: 0;
+  }
+}
+
+.pcs-case-facts--collapsed .pcs-case-facts__header {
+  margin-bottom: 0;
+}
+
+.pcs-case-facts__toggle {
+  @include govuk-link-common;
+  @include govuk-link-style-default;
+  @include govuk-font($size: 16);
+
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pcs-case-facts__layout {
+  display: grid;
+  gap: govuk-spacing(4);
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+
+  @include govuk-media-query($until: desktop) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pcs-case-facts__layout[hidden] {
+  display: none;
+}
+
+// The 232px floor fits a date input; auto-fit preserves reflow at high zoom.
+.pcs-case-facts__grid {
+  display: grid;
+  gap: govuk-spacing(3) govuk-spacing(4);
+  grid-template-columns: repeat(auto-fit, minmax(min(232px, 100%), 1fr));
+
+  > .govuk-form-group {
+    margin-bottom: 0;
+
+    > .govuk-label,
+    > .govuk-fieldset > .govuk-fieldset__legend {
+      margin-bottom: govuk-spacing(1);
+    }
+  }
+
+  // Temporary density trade-off: retain accessible names while hiding visual D/M/Y labels.
+  .govuk-date-input__label {
+    @include govuk-visually-hidden;
+  }
+
+  .govuk-date-input__item .govuk-form-group {
+    margin-bottom: 0;
+  }
+
+  .govuk-date-input__item:last-child {
+    margin-right: 0;
+  }
+}
+
+// Match the notes field to the facts grid on desktop.
+@include govuk-media-query($from: desktop) {
+  .pcs-case-facts__layout > .govuk-form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pcs-case-facts__layout textarea {
+    flex: 1 1 auto;
+
+    margin-bottom: 0;
+
+    // Resizing remains available below desktop where the field no longer tracks the grid.
+    resize: none;
+  }
+}
+
+// Decorative borders divide sections without adding semantic <hr> elements.
+.pcs-make-order #main-content > h2 {
+  padding-top: govuk-spacing(4);
+  border-top: 1px solid $govuk-border-colour;
+}
+
+// Avoid a second divider after elements that already have a bottom border.
+.pcs-make-order #main-content > .pcs-case-facts + h2,
+.pcs-make-order #main-content > .govuk-tabs + h2 {
+  border-top: 0;
+}
+
+// Divide distinct tab questions, excluding fields that continue the previous question.
+.pcs-make-order .govuk-tabs__panel > .govuk-form-group + .govuk-form-group:not(.pcs-continues-question) {
+  padding-top: govuk-spacing(4);
+  border-top: 1px solid $govuk-border-colour;
+}
+
+.pcs-costs-columns {
+  display: grid;
+  gap: govuk-spacing(6);
+
+  @include govuk-media-query($from: desktop) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  > .govuk-form-group {
+    margin-bottom: 0;
+  }
+}
+
+// Opt-in dividers use margin so GOV.UK's absolutely positioned checkbox remains aligned.
+.pcs-divided-options > .govuk-checkboxes__item:not(:first-child) {
+  margin-top: govuk-spacing(6);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -#{govuk-spacing(3)};
+    right: 0;
+    left: 0;
+    border-top: 1px solid $govuk-border-colour;
+  }
+}
+
+// Keep related revealed fields on one wrapping row without changing their labels or grouping.
+.pcs-inline-fields {
+  display: flex;
+  flex-wrap: wrap;
+
+  align-items: flex-end;
+  gap: govuk-spacing(2) govuk-spacing(4);
+
+  > .govuk-form-group,
+  > .govuk-form-group > .govuk-fieldset > .govuk-fieldset__legend {
+    margin-bottom: 0;
+  }
+
+  .govuk-date-input__item:last-child {
+    margin-right: 0;
+  }
+
+  .govuk-date-input__item .govuk-form-group {
+    margin-bottom: 0;
+  }
+
+  // Match legends to adjacent labels without losing their small-size class.
+  > .govuk-form-group > .govuk-fieldset > .govuk-fieldset__legend--s {
+    font-weight: normal;
+  }
+}
+
+// Align sentence fragments with their adjacent form controls in the compact order wording rows.
+.pcs-inline-copy {
+  margin-bottom: govuk-spacing(2);
+}
+
+// Place short visible date labels beside inputs; the date fieldset keeps a hidden legend.
+.pcs-inline-date {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: govuk-spacing(2) govuk-spacing(4);
+  margin-bottom: govuk-spacing(6);
+
+  > .pcs-inline-date__label {
+    margin-bottom: govuk-spacing(2);
+  }
+
+  > .pcs-date-with-pills {
+    margin-bottom: 0;
+  }
+}
+
+// Quick-fill helpers set their linked date to today plus the selected number of days.
+.pcs-date-with-pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: govuk-spacing(2) govuk-spacing(4);
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: govuk-spacing(6);
+
+  > .govuk-form-group {
+    margin-bottom: 0;
+  }
+}
+
+.pcs-inline-fields > .pcs-date-with-pills {
+  margin-bottom: 0;
+}
+
+.pcs-date-pills {
+  display: flex;
+  align-items: center;
+  gap: govuk-spacing(2);
+  margin-left: auto;
+  padding-bottom: 2px;
+}
+
+.pcs-date-pill {
+  @include govuk-font($size: 16);
+
+  padding: govuk-spacing(1) govuk-spacing(3);
+  border: 2px solid $govuk-border-colour;
+  border-radius: 18px;
+  color: $govuk-text-colour;
+  background: govuk-colour('white');
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: govuk-colour('black', $variant: 'tint-95');
+  }
+
+  &:active {
+    border-color: $govuk-link-colour;
+    color: govuk-colour('white');
+    background: $govuk-link-colour;
+  }
+
+  &:focus {
+    outline: 3px solid $govuk-focus-colour;
+    outline-offset: 0;
+    box-shadow: inset 0 0 0 2px;
+  }
+}
+
+// Present each party, attendance choice and representative name on one row.
+.pcs-attendance__row {
+  display: grid;
+  grid-template-columns: minmax(0, 22em) auto minmax(0, 20em);
+  gap: 0 govuk-spacing(6);
+
+  align-items: start;
+  padding: govuk-spacing(2) 0;
+
+  & + & {
+    border-top: 1px solid $govuk-border-colour;
+  }
+
+  @include govuk-media-query($until: desktop) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.pcs-attendance__label {
+  margin-bottom: 0;
+
+  // Match GOV.UK's radio-label offset.
+  padding-top: 10px;
+}
+
+// Keep the short representative-name label inline to preserve register density.
+.pcs-attendance__row .govuk-form-group {
+  display: flex;
+  align-items: baseline;
+  gap: govuk-spacing(2);
+  margin-bottom: 0;
+}
+
+.pcs-attendance__name-label {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+}
+
+.pcs-attendance__row .govuk-input {
+  flex: 0 1 auto;
+  min-width: 0;
+}

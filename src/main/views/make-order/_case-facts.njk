@@ -1,0 +1,148 @@
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+{% set tenancyTypes = [
+  { value: "ASSURED_TENANCY", text: "Assured tenancy" },
+  { value: "SECURE_TENANCY", text: "Secure tenancy" },
+  { value: "INTRODUCTORY_TENANCY", text: "Introductory tenancy" },
+  { value: "FLEXIBLE_TENANCY", text: "Flexible tenancy" },
+  { value: "DEMOTED_TENANCY", text: "Demoted tenancy" },
+  { value: "SECURE_CONTRACT", text: "Secure contract" },
+  { value: "STANDARD_CONTRACT", text: "Standard contract" },
+  { value: "OTHER", text: "Other" }
+] %}
+
+{% set rentFrequencies = [
+  { value: "WEEKLY", text: "Weekly" },
+  { value: "FORTNIGHTLY", text: "Fortnightly" },
+  { value: "MONTHLY", text: "Monthly" },
+  { value: "OTHER", text: "Other" }
+] %}
+
+<section class="pcs-case-facts" aria-labelledby="case-facts-heading" data-case-facts>
+  <div class="pcs-case-facts__header">
+    <h2 class="govuk-heading-s" id="case-facts-heading">Case facts (tenancy/contract)</h2>
+    <button
+      type="button"
+      class="pcs-case-facts__toggle"
+      aria-expanded="true"
+      aria-controls="case-facts-content"
+      data-case-facts-toggle
+    >Hide case facts</button>
+  </div>
+
+  <div class="pcs-case-facts__layout" id="case-facts-content">
+    <div class="pcs-case-facts__grid">
+      {{ govukDateInput({
+        id: "date-tenancy",
+        namePrefix: "date-tenancy",
+        items: draftDate("date-tenancy"),
+        fieldset: { legend: { text: "Date of tenancy/contract", classes: "govuk-fieldset__legend--s" } }
+      }) }}
+
+      {{ govukSelect({
+        id: "tenancy-type",
+        name: "tenancy-type",
+        label: { text: "Tenancy/contract type", classes: "govuk-label--s" },
+        items: draftSelect(tenancyTypes, "tenancy-type")
+      }) }}
+
+      {{ govukDateInput({
+        id: "date-notice",
+        namePrefix: "date-notice",
+        items: draftDate("date-notice"),
+        fieldset: { legend: { text: "Date of service of notice", classes: "govuk-fieldset__legend--s" } }
+      }) }}
+
+      {{ govukInput({
+        id: "arrears-notice",
+        name: "arrears-notice",
+        label: { text: "Arrears at notice", classes: "govuk-label--s" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        value: draftValue("arrears-notice"),
+        prefix: { text: "£" }
+      }) }}
+
+      {{ govukInput({
+        id: "current-rent",
+        name: "current-rent",
+        label: { text: "Current rent", classes: "govuk-label--s" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        value: draftValue("current-rent"),
+        prefix: { text: "£" }
+      }) }}
+
+      {{ govukSelect({
+        id: "rent-frequency",
+        name: "rent-frequency",
+        label: { text: "Rent frequency", classes: "govuk-label--s" },
+        items: draftSelect(rentFrequencies, "rent-frequency")
+      }) }}
+
+      {{ govukInput({
+        id: "grounds-pleaded",
+        name: "grounds-pleaded",
+        label: { text: "Grounds pleaded", classes: "govuk-label--s" },
+        classes: "govuk-input--width-10",
+        value: draftValue("grounds-pleaded")
+      }) }}
+
+      {{ govukInput({
+        id: "arrears-issue",
+        name: "arrears-issue",
+        label: { text: "Arrears on issue", classes: "govuk-label--s" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        value: draftValue("arrears-issue"),
+        prefix: { text: "£" }
+      }) }}
+
+      {{ govukDateInput({
+        id: "date-last-hearing",
+        namePrefix: "date-last-hearing",
+        items: draftDate("date-last-hearing"),
+        fieldset: { legend: { text: "Date of last hearing", classes: "govuk-fieldset__legend--s" } }
+      }) }}
+
+      {{ govukDateInput({
+        id: "date-last-payment",
+        namePrefix: "date-last-payment",
+        items: draftDate("date-last-payment"),
+        fieldset: { legend: { text: "Date last payment made", classes: "govuk-fieldset__legend--s" } }
+      }) }}
+
+      {{ govukInput({
+        id: "last-payment",
+        name: "last-payment",
+        label: { text: "Last payment", classes: "govuk-label--s" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        value: draftValue("last-payment"),
+        prefix: { text: "£" }
+      }) }}
+
+      {{ govukInput({
+        id: "arrears-today",
+        name: "arrears-today",
+        label: { text: "Arrears today", classes: "govuk-label--s" },
+        classes: "govuk-input--width-5",
+        spellcheck: false,
+        value: draftValue("arrears-today"),
+        prefix: { text: "£" }
+      }) }}
+    </div>
+
+    {{ govukTextarea({
+      id: "hearing-notes",
+      name: "hearing-notes",
+      rows: 8,
+      value: draftValue("hearing-notes"),
+      label: { text: "Hearing notes (internal use only)", classes: "govuk-label--s" },
+      formGroup: { classes: "govuk-!-margin-bottom-0" }
+    }) }}
+  </div>
+</section>

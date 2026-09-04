@@ -1,0 +1,11 @@
+<section class="govuk-!-margin-top-6" aria-labelledby="order-preview-heading">
+  <h2 class="govuk-heading-l" id="order-preview-heading">Order preview</h2>
+  {% set previewAvailable = draftOrderType == "OUTRIGHT_POSSESSION" or draftOrderType == "SUSPENDED_POSSESSION" or draftOrderType == "ADJOURNMENT" %}
+  <p class="govuk-body" id="order-preview-unavailable"{% if previewAvailable %} hidden{% endif %}>
+    Order preview is not available for this order type yet. You can still save it as a draft.
+  </p>
+  <div id="order-preview-editor"{% if not previewAvailable %} hidden{% endif %}>
+    <div id="order-editor"></div>
+  </div>
+  <textarea hidden id="order-document" name="orderDocument">{{ orderDocumentJson }}</textarea>
+</section>

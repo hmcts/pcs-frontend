@@ -1,0 +1,11 @@
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+<h3 class="govuk-heading-m">Free form</h3>
+
+{{ govukTextarea({
+  id: "free-form-text",
+  name: "free-form-text",
+  rows: 8,
+  value: draftValue("free-form-text"),
+  label: { text: "Order wording", classes: "govuk-label--s" }
+}) }}

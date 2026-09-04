@@ -4,7 +4,7 @@ module.exports = {
   moduleFileExtensions: ['ts', 'js', 'json'],
   testEnvironment: 'node',
   transform: {
-    '^.+\\.ts?$': 'ts-jest',
+    '^.+\\.[tj]s$': ['ts-jest', { tsconfig: { allowJs: true } }],
   },
   moduleNameMapper: {
     '^openid-client$': '<rootDir>/src/test/unit/modules/oidc/__mocks__/openid-client.ts',
@@ -21,5 +21,5 @@ module.exports = {
   },
   testPathIgnorePatterns: ['/__mocks__/'],
   coverageProvider: 'v8',
-  transformIgnorePatterns: ['node_modules/(?!(jose|@panva|oidc-token-hash)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(jose|@panva|oidc-token-hash|@hmcts-cft/docweave)/)'],
 };

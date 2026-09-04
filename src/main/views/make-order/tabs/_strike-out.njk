@@ -1,0 +1,13 @@
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+<h3 class="govuk-heading-m">Strike out/dismiss</h3>
+
+{{ govukRadios({
+  name: "strike-claim-outcome",
+  classes: "govuk-radios--small govuk-radios--inline",
+  fieldset: { legend: { text: "Outcome", classes: "govuk-fieldset__legend--s" } },
+  items: [
+    { value: "struck-out", text: "Claim struck out", checked: draftChecked("strike-claim-outcome", "struck-out") },
+    { value: "dismissed", text: "Claim dismissed", checked: draftChecked("strike-claim-outcome", "dismissed") }
+  ]
+}) }}

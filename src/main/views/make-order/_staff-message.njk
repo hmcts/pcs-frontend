@@ -1,0 +1,22 @@
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+{{ govukCheckboxes({
+  idPrefix: "staff-message",
+  name: "staff-message",
+  classes: "govuk-checkboxes--small",
+  items: [{
+    value: "yes",
+    text: "Staff message",
+    checked: draftChecked("staff-message", "yes"),
+    conditional: {
+      html: govukTextarea({
+        id: "staff-message-text",
+        name: "staff-message-text",
+        rows: 4,
+        value: draftValue("staff-message-text"),
+        label: { text: "Message for court staff" }
+      })
+    }
+  }]
+}) }}

@@ -16,6 +16,7 @@
     "createIdamUser": "./bin/dev/createIdamUser.sh",
     "start:watch": "yarn deps:up && nodemon --config nodemon.json",
     "start:watch:pcs-local": "USE_VAULT=false NODE_CONFIG_ENV=pcs-local yarn start:watch",
+    "start:watch:stubbed": "USE_VAULT=false NODE_CONFIG_ENV=pcs-local USE_STUBBED_DEPS=true yarn start:watch",
     "docker:dev": "docker compose up",
     "docker:dev:ssl": "COMMAND='yarn start:dev:ssl' docker compose up --build",
     "lint": "stylelint **/*.scss -v -q && eslint . --ext .js,.ts && prettier --check .",
@@ -57,6 +58,7 @@
   "dependencies": {
     "@azure/monitor-opentelemetry": "1.19.0",
     "@hmcts-cft/cft-ui-component-lib": "0.1.0-alpha.4",
+    "@hmcts-cft/docweave": "0.1.0-alpha.3",
     "@hmcts/info-provider": "1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
     "@hmcts/properties-volume": "1.4.1",

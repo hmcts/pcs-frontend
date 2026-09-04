@@ -1,0 +1,16 @@
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+
+{% macro withPills(params) %}
+  <div id="{{ params.id }}" class="pcs-date-with-pills">
+    {{ govukDateInput(params) }}
+    <div class="pcs-date-pills" role="group" aria-label="Quick date for {{ params.fieldset.legend.text | lower }}">
+      {% for days in [14, 28, 42] %}
+        <button
+          type="button"
+          class="pcs-date-pill"
+          data-date-pill-days="{{ days }}"
+        >{{ days }} days</button>
+      {% endfor %}
+    </div>
+  </div>
+{% endmacro %}
