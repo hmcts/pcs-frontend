@@ -2,7 +2,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
-{% import "make-order/_date-input.njk" as dateInput %}
+{% import "make-order/_compact.njk" as compact %}
 
 <h3 class="govuk-heading-m">Outright possession</h3>
 
@@ -17,11 +17,11 @@
       text: "Possession on or before",
       checked: draftChecked("outright-possession", "by"),
       conditional: {
-        html: dateInput.withPills({
+        html: compact.date({
           id: "outright-by-date",
-          namePrefix: "outright-by-date",
           items: draftDate("outright-by-date"),
-          fieldset: { legend: { text: "Date possession is ordered by", classes: "govuk-visually-hidden" } }
+          legend: "Date possession is ordered by",
+          legendHidden: true
         })
       }
     }
@@ -49,63 +49,51 @@
 }) }}
 
 {% set outrightMoneyJudgmentArrearsHtml %}
-  <div id="outright-mj-amounts" class="pcs-inline-fields">
-    <span class="pcs-inline-copy">Arrears</span>
-    {{ govukInput({
+  {% call compact.row({ id: "outright-mj-amounts" }) %}
+    {{ compact.copy("Arrears") }}
+    {{ compact.money({
       id: "outright-mj-arrears",
-      name: "outright-mj-arrears",
-      label: { text: "Arrears", classes: "govuk-visually-hidden" },
-      classes: "govuk-input--width-5",
-      spellcheck: false,
-      value: draftValue("outright-mj-arrears"),
-      inputmode: "numeric",
-      prefix: { text: "£" }
+      label: "Arrears",
+      labelHidden: true,
+      value: draftValue("outright-mj-arrears")
     }) }}
 
-    <span class="pcs-inline-copy">Interest</span>
-    {{ govukInput({
+    {{ compact.copy("Interest") }}
+    {{ compact.money({
       id: "outright-mj-interest",
-      name: "outright-mj-interest",
-      label: { text: "Interest", classes: "govuk-visually-hidden" },
-      classes: "govuk-input--width-5",
-      spellcheck: false,
-      value: draftValue("outright-mj-interest"),
-      inputmode: "numeric",
-      prefix: { text: "£" }
+      label: "Interest",
+      labelHidden: true,
+      value: draftValue("outright-mj-interest")
     }) }}
-  </div>
+  {% endcall %}
 {% endset %}
 
 {% set outrightMoneyJudgmentBalanceHtml %}
-  {{ dateInput.withPills({
+  {{ compact.date({
     id: "outright-mj-balance-date",
-    namePrefix: "outright-mj-balance-date",
     items: draftDate("outright-mj-balance-date"),
-    fieldset: { legend: { text: "Balance payment deadline", classes: "govuk-visually-hidden" } }
+    legend: "Balance payment deadline",
+    legendHidden: true
   }) }}
 {% endset %}
 
 {% set outrightMoneyJudgmentLumpHtml %}
-  <div class="pcs-inline-fields">
-    <span class="pcs-inline-copy">Payment of</span>
-    {{ govukInput({
+  {% call compact.row() %}
+    {{ compact.copy("Payment of") }}
+    {{ compact.money({
       id: "outright-mj-lump-amount",
-      name: "outright-mj-lump-amount",
-      label: { text: "Payment amount", classes: "govuk-visually-hidden" },
-      classes: "govuk-input--width-5",
-      spellcheck: false,
-      value: draftValue("outright-mj-lump-amount"),
-      inputmode: "numeric",
-      prefix: { text: "£" }
+      label: "Payment amount",
+      labelHidden: true,
+      value: draftValue("outright-mj-lump-amount")
     }) }}
-    <span class="pcs-inline-copy">by</span>
-    {{ dateInput.withPills({
+    {{ compact.copy("by") }}
+    {{ compact.date({
       id: "outright-mj-lump-date",
-      namePrefix: "outright-mj-lump-date",
       items: draftDate("outright-mj-lump-date"),
-      fieldset: { legend: { text: "Payment deadline", classes: "govuk-visually-hidden" } }
+      legend: "Payment deadline",
+      legendHidden: true
     }) }}
-  </div>
+  {% endcall %}
 
   {{ govukCheckboxes({
     idPrefix: "outright-mj-balance",
@@ -123,17 +111,13 @@
 {% endset %}
 
 {% set outrightMoneyJudgmentInstalmentsHtml %}
-  <div class="pcs-inline-fields">
-    <span class="pcs-inline-copy">Instalment payments of</span>
-    {{ govukInput({
+  {% call compact.row() %}
+    {{ compact.copy("Instalment payments of") }}
+    {{ compact.money({
       id: "outright-mj-inst-amount",
-      name: "outright-mj-inst-amount",
-      label: { text: "Instalment amount", classes: "govuk-visually-hidden" },
-      classes: "govuk-input--width-5",
-      spellcheck: false,
-      value: draftValue("outright-mj-inst-amount"),
-      inputmode: "numeric",
-      prefix: { text: "£" }
+      label: "Instalment amount",
+      labelHidden: true,
+      value: draftValue("outright-mj-inst-amount")
     }) }}
     {{ govukSelect({
       id: "outright-mj-inst-freq",
@@ -144,14 +128,14 @@
         { value: "monthly", text: "Monthly", selected: draftValue("outright-mj-inst-freq") != "weekly" }
       ]
     }) }}
-    <span class="pcs-inline-copy">the first instalment to be paid on or before</span>
-    {{ dateInput.withPills({
+    {{ compact.copy("the first instalment to be paid on or before") }}
+    {{ compact.date({
       id: "outright-mj-inst-date",
-      namePrefix: "outright-mj-inst-date",
       items: draftDate("outright-mj-inst-date"),
-      fieldset: { legend: { text: "First instalment deadline", classes: "govuk-visually-hidden" } }
+      legend: "First instalment deadline",
+      legendHidden: true
     }) }}
-  </div>
+  {% endcall %}
 {% endset %}
 
 {% set outrightMoneyJudgmentPaymentPlanHtml %}
@@ -199,6 +183,24 @@
   }) }}
 {% endset %}
 
+{% set outrightUseOccupationHtml %}
+  {% call compact.row() %}
+    {{ compact.money({
+      id: "outright-use-occupation-rate",
+      label: "Daily rate",
+      inputmode: "decimal",
+      value: draftValue("outright-use-occupation-rate")
+    }) }}
+    {{ compact.copy("From") }}
+    {{ compact.date({
+      id: "outright-use-occupation-from-date",
+      items: draftDate("outright-use-occupation-from-date"),
+      legend: "Damages start date",
+      legendHidden: true
+    }) }}
+  {% endcall %}
+{% endset %}
+
 {{ govukCheckboxes({
   idPrefix: "outright-options",
   name: "outright-options",
@@ -214,23 +216,7 @@
       value: "use-occupation",
       text: "Damages for unlawful occupation",
       checked: draftChecked("outright-options", "use-occupation"),
-      conditional: {
-        html: '<div class="pcs-inline-fields">' + govukInput({
-          id: "outright-use-occupation-rate",
-          name: "outright-use-occupation-rate",
-          label: { text: "Daily rate" },
-          classes: "govuk-input--width-5",
-          spellcheck: false,
-          value: draftValue("outright-use-occupation-rate"),
-          inputmode: "decimal",
-          prefix: { text: "£" }
-        }) + '<span class="pcs-inline-copy">From</span>' + dateInput.withPills({
-          id: "outright-use-occupation-from-date",
-          namePrefix: "outright-use-occupation-from-date",
-          items: draftDate("outright-use-occupation-from-date"),
-          fieldset: { legend: { text: "Damages start date", classes: "govuk-visually-hidden" } }
-        }) + '</div>'
-      }
+      conditional: { html: outrightUseOccupationHtml }
     },
     {
       value: "transfer-high-court",

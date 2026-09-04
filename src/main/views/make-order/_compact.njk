@@ -1,0 +1,49 @@
+{#
+  Compact form components for the make an order screen, which is used by judges
+  during a hearing and so puts related fields on one row rather than stacking
+  them. Matching classes live in make-order.scss.
+#}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% import "make-order/_date-input.njk" as dateInput %}
+
+{# Row of related controls on one (wrapping) line. Use with {% call %}. #}
+{% macro row(params={}) %}
+  <div{% if params.id %} id="{{ params.id }}"{% endif %} class="pcs-inline-fields{% if params.classes %} {{ params.classes }}{% endif %}">
+    {{ caller() }}
+  </div>
+{% endmacro %}
+
+{# Sentence fragment between controls, for example "to be paid by". #}
+{% macro copy(text) %}<span class="pcs-inline-copy">{{ text }}</span>{% endmacro %}
+
+{% macro money(params={}) %}
+  {{ govukInput({
+    id: params.id,
+    name: params.id,
+    label: {
+      text: params.label,
+      classes: "govuk-visually-hidden" if params.labelHidden else params.labelClasses
+    },
+    classes: "govuk-input--width-5",
+    formGroup: { classes: params.formGroupClasses },
+    spellcheck: false,
+    value: params.value,
+    inputmode: params.inputmode or "numeric",
+    prefix: { text: "£" }
+  }) }}
+{% endmacro %}
+
+{# Date with quick-fill pills. #}
+{% macro date(params={}) %}
+  {{ dateInput.withPills({
+    id: params.id,
+    namePrefix: params.id,
+    items: params.items,
+    fieldset: {
+      legend: {
+        text: params.legend,
+        classes: "govuk-visually-hidden" if params.legendHidden else "govuk-fieldset__legend--s"
+      }
+    }
+  }) }}
+{% endmacro %}

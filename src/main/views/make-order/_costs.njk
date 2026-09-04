@@ -1,6 +1,7 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% import "make-order/_compact.njk" as compact %}
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Costs</h2>
 
@@ -10,15 +11,10 @@
     text: "Defendant pays claimant's fixed costs",
     checked: draftChecked("costs-choice", "def-pay-cl-fixed"),
     conditional: {
-      html: govukInput({
+      html: compact.money({
         id: "costs-def-pay-cl-fixed-amount",
-        name: "costs-def-pay-cl-fixed-amount",
-        label: { text: "Fixed costs of" },
-        classes: "govuk-input--width-5",
-        spellcheck: false,
-        value: draftValue("costs-def-pay-cl-fixed-amount"),
-        inputmode: "numeric",
-        prefix: { text: "£" }
+        label: "Fixed costs of",
+        value: draftValue("costs-def-pay-cl-fixed-amount")
       })
     }
   },
@@ -27,15 +23,10 @@
     text: "Defendant pays claimant's summary assessed costs",
     checked: draftChecked("costs-choice", "def-pay-cl-summary"),
     conditional: {
-      html: govukInput({
+      html: compact.money({
         id: "costs-def-pay-cl-summary-amount",
-        name: "costs-def-pay-cl-summary-amount",
-        label: { text: "Summary assessed costs of" },
-        classes: "govuk-input--width-5",
-        spellcheck: false,
-        value: draftValue("costs-def-pay-cl-summary-amount"),
-        inputmode: "numeric",
-        prefix: { text: "£" }
+        label: "Summary assessed costs of",
+        value: draftValue("costs-def-pay-cl-summary-amount")
       })
     }
   },
@@ -44,15 +35,10 @@
     text: "Claimant pays defendant's summary assessed costs",
     checked: draftChecked("costs-choice", "cl-pay-def-summary"),
     conditional: {
-      html: govukInput({
+      html: compact.money({
         id: "costs-cl-pay-def-summary-amount",
-        name: "costs-cl-pay-def-summary-amount",
-        label: { text: "Summary assessed costs of" },
-        classes: "govuk-input--width-5",
-        spellcheck: false,
-        value: draftValue("costs-cl-pay-def-summary-amount"),
-        inputmode: "numeric",
-        prefix: { text: "£" }
+        label: "Summary assessed costs of",
+        value: draftValue("costs-cl-pay-def-summary-amount")
       })
     }
   },
@@ -89,15 +75,10 @@
     checked: draftChecked("costs-choice", "fixed-same-terms"),
     disabled: draftOrderType != "SUSPENDED_POSSESSION",
     conditional: {
-      html: govukInput({
+      html: compact.money({
         id: "costs-fixed-same-terms-amount",
-        name: "costs-fixed-same-terms-amount",
-        label: { text: "Fixed costs of" },
-        classes: "govuk-input--width-5",
-        spellcheck: false,
-        value: draftValue("costs-fixed-same-terms-amount"),
-        inputmode: "numeric",
-        prefix: { text: "£" }
+        label: "Fixed costs of",
+        value: draftValue("costs-fixed-same-terms-amount")
       })
     }
   },
@@ -107,15 +88,10 @@
     checked: draftChecked("costs-choice", "summary-same-terms"),
     disabled: draftOrderType != "SUSPENDED_POSSESSION",
     conditional: {
-      html: govukInput({
+      html: compact.money({
         id: "costs-summary-same-terms-amount",
-        name: "costs-summary-same-terms-amount",
-        label: { text: "Summary assessed costs of" },
-        classes: "govuk-input--width-5",
-        spellcheck: false,
-        value: draftValue("costs-summary-same-terms-amount"),
-        inputmode: "numeric",
-        prefix: { text: "£" }
+        label: "Summary assessed costs of",
+        value: draftValue("costs-summary-same-terms-amount")
       })
     }
   }

@@ -2,6 +2,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% import "make-order/_compact.njk" as compact %}
 
 {% set tenancyTypes = [
   { value: "ASSURED_TENANCY", text: "Assured tenancy" },
@@ -56,24 +57,18 @@
         fieldset: { legend: { text: "Date of service of notice", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
-      {{ govukInput({
+      {{ compact.money({
         id: "arrears-notice",
-        name: "arrears-notice",
-        label: { text: "Arrears at notice", classes: "govuk-label--s" },
-        classes: "govuk-input--width-5",
-        spellcheck: false,
-        value: draftValue("arrears-notice"),
-        prefix: { text: "£" }
+        label: "Arrears at notice",
+        labelClasses: "govuk-label--s",
+        value: draftValue("arrears-notice")
       }) }}
 
-      {{ govukInput({
+      {{ compact.money({
         id: "current-rent",
-        name: "current-rent",
-        label: { text: "Current rent", classes: "govuk-label--s" },
-        classes: "govuk-input--width-5",
-        spellcheck: false,
-        value: draftValue("current-rent"),
-        prefix: { text: "£" }
+        label: "Current rent",
+        labelClasses: "govuk-label--s",
+        value: draftValue("current-rent")
       }) }}
 
       {{ govukSelect({
@@ -91,14 +86,11 @@
         value: draftValue("grounds-pleaded")
       }) }}
 
-      {{ govukInput({
+      {{ compact.money({
         id: "arrears-issue",
-        name: "arrears-issue",
-        label: { text: "Arrears on issue", classes: "govuk-label--s" },
-        classes: "govuk-input--width-5",
-        spellcheck: false,
-        value: draftValue("arrears-issue"),
-        prefix: { text: "£" }
+        label: "Arrears on issue",
+        labelClasses: "govuk-label--s",
+        value: draftValue("arrears-issue")
       }) }}
 
       {{ govukDateInput({
@@ -115,24 +107,18 @@
         fieldset: { legend: { text: "Date last payment made", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
-      {{ govukInput({
+      {{ compact.money({
         id: "last-payment",
-        name: "last-payment",
-        label: { text: "Last payment", classes: "govuk-label--s" },
-        classes: "govuk-input--width-5",
-        spellcheck: false,
-        value: draftValue("last-payment"),
-        prefix: { text: "£" }
+        label: "Last payment",
+        labelClasses: "govuk-label--s",
+        value: draftValue("last-payment")
       }) }}
 
-      {{ govukInput({
+      {{ compact.money({
         id: "arrears-today",
-        name: "arrears-today",
-        label: { text: "Arrears today", classes: "govuk-label--s" },
-        classes: "govuk-input--width-5",
-        spellcheck: false,
-        value: draftValue("arrears-today"),
-        prefix: { text: "£" }
+        label: "Arrears today",
+        labelClasses: "govuk-label--s",
+        value: draftValue("arrears-today")
       }) }}
     </div>
 

@@ -174,9 +174,10 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   }
 }
 
-// Keep both adjournment types on the first row and let either conditional panel
-// use the full width beneath them.
-.pcs-adjournment-type {
+// Radios on one row with their conditional reveal spanning the full width beneath.
+// GOV.UK advises against conditional reveals on inline radios; this deviates for
+// the judge-facing order screen. Keep to two short options.
+.pcs-inline-radios {
   @include govuk-media-query($from: tablet) {
     display: flex;
     flex-wrap: wrap;

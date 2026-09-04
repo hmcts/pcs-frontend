@@ -1,36 +1,31 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
-{% import "make-order/_date-input.njk" as dateInput %}
+{% import "make-order/_compact.njk" as compact %}
 {% import "make-order/_payment-frequencies.njk" as options %}
 
 <h3 class="govuk-heading-m">Suspended possession</h3>
 
 <div class="pcs-inline-date">
   <span class="govuk-label govuk-label--s pcs-inline-date__label" aria-hidden="true">Possession by</span>
-  {{ dateInput.withPills({
+  {{ compact.date({
     id: "suspended-by-date",
-    namePrefix: "suspended-by-date",
     items: draftDate("suspended-by-date"),
-    fieldset: { legend: { text: "Possession by", classes: "govuk-visually-hidden" } }
+    legend: "Possession by",
+    legendHidden: true
   }) }}
 </div>
 
-<div class="govuk-form-group pcs-inline-fields">
-  <span class="pcs-inline-copy">Suspended on condition of payment of current rent plus arrears of</span>
-  {{ govukInput({
+{% call compact.row({ classes: "govuk-form-group" }) %}
+  {{ compact.copy("Suspended on condition of payment of current rent plus arrears of") }}
+  {{ compact.money({
     id: "suspended-arrears",
-    name: "suspended-arrears",
-    label: { text: "Arrears", classes: "govuk-visually-hidden" },
-    classes: "govuk-input--width-5",
-    formGroup: { classes: "govuk-!-margin-bottom-0" },
-    spellcheck: false,
-    value: draftValue("suspended-arrears"),
-    inputmode: "numeric",
-    prefix: { text: "£" }
+    label: "Arrears",
+    labelHidden: true,
+    formGroupClasses: "govuk-!-margin-bottom-0",
+    value: draftValue("suspended-arrears")
   }) }}
-  <span class="pcs-inline-copy">to be paid by</span>
-</div>
+  {{ compact.copy("to be paid by") }}
+{% endcall %}
 
 {# A single payment and instalments may both apply; CaseMan keeps both rows visible. #}
 <div class="govuk-checkboxes govuk-checkboxes--small pcs-divided-options" data-module="govuk-checkboxes">
@@ -38,39 +33,30 @@
     <input class="govuk-checkboxes__input" id="suspended-payment-terms" name="suspended-payment-terms" type="checkbox" value="one-off"{% if draftChecked("suspended-payment-terms", "one-off") %} checked{% endif %}>
     <label class="govuk-label govuk-checkboxes__label" for="suspended-payment-terms">Payment of<span class="govuk-visually-hidden"> a one-off amount</span></label>
   </div>
-  <div class="pcs-inline-fields govuk-!-margin-left-7">
-    {{ govukInput({
+  {% call compact.row({ classes: "govuk-!-margin-left-7" }) %}
+    {{ compact.money({
       id: "suspended-oneoff-amount",
-      name: "suspended-oneoff-amount",
-      label: { text: "One-off payment amount", classes: "govuk-visually-hidden" },
-      classes: "govuk-input--width-5",
-      spellcheck: false,
-      value: draftValue("suspended-oneoff-amount"),
-      inputmode: "numeric",
-      prefix: { text: "£" }
+      label: "One-off payment amount",
+      labelHidden: true,
+      value: draftValue("suspended-oneoff-amount")
     }) }}
-    {{ dateInput.withPills({
+    {{ compact.date({
       id: "suspended-oneoff-date",
-      namePrefix: "suspended-oneoff-date",
       items: draftDate("suspended-oneoff-date"),
-      fieldset: { legend: { text: "On or before", classes: "govuk-fieldset__legend--s" } }
+      legend: "On or before"
     }) }}
-  </div>
+  {% endcall %}
 
   <div class="govuk-checkboxes__item">
     <input class="govuk-checkboxes__input" id="suspended-payment-terms-2" name="suspended-payment-terms" type="checkbox" value="instalments"{% if draftChecked("suspended-payment-terms", "instalments") %} checked{% endif %}>
     <label class="govuk-label govuk-checkboxes__label" for="suspended-payment-terms-2">Payments of<span class="govuk-visually-hidden"> instalments</span></label>
   </div>
-  <div class="pcs-inline-fields govuk-!-margin-left-7">
-    {{ govukInput({
+  {% call compact.row({ classes: "govuk-!-margin-left-7" }) %}
+    {{ compact.money({
       id: "suspended-instalment-amount",
-      name: "suspended-instalment-amount",
-      label: { text: "Instalment amount", classes: "govuk-visually-hidden" },
-      classes: "govuk-input--width-5",
-      spellcheck: false,
-      value: draftValue("suspended-instalment-amount"),
-      inputmode: "numeric",
-      prefix: { text: "£" }
+      label: "Instalment amount",
+      labelHidden: true,
+      value: draftValue("suspended-instalment-amount")
     }) }}
     {{ govukSelect({
       id: "suspended-instalment-frequency",
@@ -78,13 +64,12 @@
       label: { text: "Instalment frequency", classes: "govuk-visually-hidden" },
       items: draftSelect(options.paymentFrequencies, "suspended-instalment-frequency", "monthly")
     }) }}
-    {{ dateInput.withPills({
+    {{ compact.date({
       id: "suspended-instalment-date",
-      namePrefix: "suspended-instalment-date",
       items: draftDate("suspended-instalment-date"),
-      fieldset: { legend: { text: "with the first payment by", classes: "govuk-fieldset__legend--s" } }
+      legend: "with the first payment by"
     }) }}
-  </div>
+  {% endcall %}
 </div>
 
 {# Same terms is only available when the money-judgment option reveals it. #}
@@ -100,6 +85,22 @@
       disabled: not draftChecked("suspended-options", "money-judgment-arrears")
     }]
   }) }}
+{% endset %}
+
+{% set suspendedUseOccupationHtml %}
+  {% call compact.row() %}
+    {{ compact.money({
+      id: "suspended-use-occupation-rate",
+      label: "Daily rate",
+      inputmode: "decimal",
+      value: draftValue("suspended-use-occupation-rate")
+    }) }}
+    {{ compact.date({
+      id: "suspended-use-occupation-from-date",
+      items: draftDate("suspended-use-occupation-from-date"),
+      legend: "From"
+    }) }}
+  {% endcall %}
 {% endset %}
 
 {{ govukCheckboxes({
@@ -118,23 +119,7 @@
       value: "use-occupation",
       text: "Damages for unlawful occupation",
       checked: draftChecked("suspended-options", "use-occupation"),
-      conditional: {
-        html: '<div class="pcs-inline-fields">' + govukInput({
-          id: "suspended-use-occupation-rate",
-          name: "suspended-use-occupation-rate",
-          label: { text: "Daily rate" },
-          classes: "govuk-input--width-5",
-          spellcheck: false,
-          value: draftValue("suspended-use-occupation-rate"),
-          inputmode: "decimal",
-          prefix: { text: "£" }
-        }) + dateInput.withPills({
-          id: "suspended-use-occupation-from-date",
-          namePrefix: "suspended-use-occupation-from-date",
-          items: draftDate("suspended-use-occupation-from-date"),
-          fieldset: { legend: { text: "From", classes: "govuk-fieldset__legend--s" } }
-        }) + '</div>'
-      }
+      conditional: { html: suspendedUseOccupationHtml }
     },
     {
       value: "warrant-on-notice",
