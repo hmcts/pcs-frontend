@@ -2,6 +2,7 @@
 
 @Library("Infrastructure@2.4.9")
 
+import uk.gov.hmcts.contino.AppPipelineConfig
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
 
@@ -138,6 +139,22 @@ withPipeline(type, product, component) {
       archiveArtifacts artifacts: 'yarn-audit*issues*', allowEmptyArchive: true
     }
   }
+  onPerftest {
+    setPerftestEnvVars()
+  }
+
+  afterSuccess('checkout') {
+    onPerftest {
+      runPerftestSmokeTests(yarnBuilder, secrets)
+    }
+  }
+
+  afterAlways('checkout') {
+    onPerftest {
+      archiveSmokeTestReports()
+    }
+  }
+
 }
 
 /** First PR label matching prefix → value after prefix (e.g. e2e-tag:@smoke → @smoke) */
@@ -152,6 +169,29 @@ def archiveFunctionalTestReports() {
 
 def archiveSmokeTestReports() {
   archiveAllureReport('Frontend Smoke Test Report')
+}
+
+def setPerftestEnvVars() {
+  env.ENVIRONMENT = 'perftest'
+  env.TEST_URL = "https://pcs.perftest.platform.hmcts.net/"
+  env.PCS_API_URL = "http://pcs-api-perftest.service.core-compute-perftest.internal"
+  env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-perftest.service.core-compute-perftest.internal"
+}
+
+def runPerftestSmokeTests(yarnBuilder, Map secrets) {
+  def vaultConfig = new AppPipelineConfig()
+  vaultConfig.vaultSecrets = secrets
+
+  withTeamSecrets(vaultConfig, 'perftest', 'pcs') {
+    withEnv([
+      "TEST_URL=https://pcs.perftest.platform.hmcts.net/",
+      "PCS_API_URL=http://pcs-api-perftest.service.core-compute-perftest.internal",
+      "DATA_STORE_URL_BASE=http://ccd-data-store-api-perftest.service.core-compute-perftest.internal",
+    ]) {
+      echo "Running smoke tests against ${env.TEST_URL}"
+      yarnBuilder.yarn('test:smoke')
+    }
+  }
 }
 
 def archiveAllureReport(String reportName) {
