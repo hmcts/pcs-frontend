@@ -52,7 +52,7 @@ jest.mock('@hmcts-cft/docweave', () => {
 
 import { createOrderEditor } from '@hmcts-cft/docweave';
 
-import { buildAdjournmentOrder, initMakeOrder } from '../../../../main/assets/js/make-order';
+import { buildAdjournmentOrder, initMakeOrder, initOptionRows } from '../../../../main/assets/js/make-order';
 
 interface CapturedItem {
   id: string;
@@ -79,7 +79,7 @@ describe('adjournment order generation', () => {
     const form = renderForm(`
       <input name="adj-type" value="further-hearing">
       <input name="adj-when" value="next-list">
-      ${dateInputs('adj-hearing-date', '21', '5', '2026')}
+      ${dateInputs('adj-hearing-date-next-list', '21', '5', '2026')}
       <input name="adj-time-estimate" value="20">
       <input name="adj-time-estimate-unit" value="minutes">
       <input type="checkbox" name="adj-directions" value="defence" checked>
@@ -105,7 +105,7 @@ describe('adjournment order generation', () => {
     const form = renderForm(`
       <input name="adj-type" value="further-hearing">
       <input name="adj-when" value="specific">
-      ${dateInputs('adj-hearing-date', '25', '5', '2026')}
+      ${dateInputs('adj-hearing-date-specific', '25', '5', '2026')}
       <input name="adj-specific-time" value="10:30am">
       <input name="adj-time-estimate" value="1">
       <input name="adj-time-estimate-unit" value="hours">
@@ -125,7 +125,7 @@ describe('adjournment order generation', () => {
     const form = renderForm(`
       <input name="adj-type" value="further-hearing">
       <input name="adj-when" value="next-date">
-      ${dateInputs('adj-hearing-date', '24', '5', '2026')}
+      ${dateInputs('adj-hearing-date-next-date', '24', '5', '2026')}
       <input name="adj-time-estimate" value="2">
       <input name="adj-time-estimate-unit" value="hours">
       <input type="checkbox" name="adj-directions" value="counterclaim" checked>
@@ -221,7 +221,7 @@ describe('adjournment submission validation', () => {
         <p id="order-preview-unavailable"></p>
         <input id="adj-type" name="adj-type" value="further-hearing">
         <input name="adj-when" value="specific">
-        ${dateInputs('adj-hearing-date', '', '', '')}
+        ${dateInputs('adj-hearing-date-specific', '', '', '')}
         <input id="adj-specific-time" name="adj-specific-time">
         <input id="adj-time-estimate" name="adj-time-estimate">
         <select id="adj-time-estimate-unit" name="adj-time-estimate-unit"><option value="minutes">minutes</option></select>
@@ -245,12 +245,57 @@ describe('adjournment submission validation', () => {
     expect(document.querySelector('#make-order-error-summary')?.textContent).toContain('Enter the time of hearing');
 
     ['day', 'month', 'year'].forEach((part, index) => {
-      document.querySelector<HTMLInputElement>(`[name="adj-hearing-date-${part}"]`)!.value = ['21', '5', '2026'][index];
+      document.querySelector<HTMLInputElement>(`[name="adj-hearing-date-specific-${part}"]`)!.value = [
+        '21',
+        '5',
+        '2026',
+      ][index];
     });
     document.querySelector<HTMLInputElement>('#adj-time-estimate')!.value = '20';
     document.querySelector<HTMLInputElement>('#adj-specific-time')!.value = '10:30am';
     expect(submitForm()).toBe(true);
 
     expect(document.querySelector('#make-order-error-summary')).toBeNull();
+  });
+});
+
+describe('adjournment option rows', () => {
+  const renderRows = (): HTMLFormElement => {
+    document.body.innerHTML = `
+      <form>
+        <div data-option-row>
+          <input type="radio" name="adj-when" value="next-list" checked>
+          <div class="pcs-option-row__fields"><input name="adj-hearing-date-next-list-day"></div>
+        </div>
+        <div data-option-row>
+          <input type="radio" name="adj-when" value="specific">
+          <div class="pcs-option-row__fields"><input name="adj-hearing-date-specific-day"></div>
+        </div>
+      </form>
+    `;
+    const form = document.querySelector('form')!;
+    initOptionRows(form);
+    return form;
+  };
+
+  it('selects the option whose fields are being filled in', () => {
+    renderRows();
+    const input = document.querySelector<HTMLInputElement>('[name="adj-hearing-date-specific-day"]')!;
+
+    input.value = '21';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+
+    expect(document.querySelector<HTMLInputElement>('input[value="specific"]')?.checked).toBe(true);
+    expect(document.querySelector<HTMLInputElement>('input[value="next-list"]')?.checked).toBe(false);
+  });
+
+  it('leaves the selection alone when its own fields are filled in', () => {
+    renderRows();
+    const input = document.querySelector<HTMLInputElement>('[name="adj-hearing-date-next-list-day"]')!;
+
+    input.value = '21';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+
+    expect(document.querySelector<HTMLInputElement>('input[value="next-list"]')?.checked).toBe(true);
   });
 });

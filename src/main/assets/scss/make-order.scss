@@ -317,18 +317,51 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   border-top: 1px solid $govuk-border-colour;
 }
 
-// Fields that qualify the option chosen above sit indented to the radio labels, so
-// they read as part of that choice without a nested conditional reveal. The row
-// itself wraps rather than scrolls, so it still reflows at 400% zoom (WCAG 1.4.10).
-.pcs-option-fields {
+// Put each radio and its own fields on one row for judges working through an order
+// during a hearing. GOV.UK advises against fields beside radio labels; this deviates
+// for the expert-facing screen. The grid gives the three rows a shared field column
+// so their dates line up, and collapses to stacked rows on smaller viewports so the
+// layout still reflows at 400% zoom (WCAG 1.4.10).
+.pcs-option-rows > .pcs-option-row + .pcs-option-row {
   margin-top: govuk-spacing(3);
+}
 
-  // Match GOV.UK's radio label offset so the fields line up under the option text.
-  margin-left: 40px;
+.pcs-option-row {
+  display: grid;
+  gap: govuk-spacing(2) govuk-spacing(4);
+  grid-template-columns: minmax(0, 26em) auto;
 
-  @include govuk-media-query($until: tablet) {
-    margin-left: 0;
+  align-items: end;
+
+  @include govuk-media-query($until: desktop) {
+    grid-template-columns: minmax(0, 1fr);
   }
+}
+
+.pcs-option-row__choice {
+  // Align the option label with the baseline of the adjacent field labels.
+  margin-bottom: govuk-spacing(1);
+}
+
+.pcs-option-row__fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: govuk-spacing(2) govuk-spacing(4);
+
+  > .pcs-date-with-pills,
+  > .govuk-form-group {
+    margin-bottom: 0;
+  }
+}
+
+// The pills belong to their own row's date rather than the far edge of the row.
+.pcs-option-row .pcs-date-pills {
+  margin-left: 0;
+}
+
+.pcs-option-row__time > .govuk-hint {
+  margin-bottom: govuk-spacing(1);
 }
 
 // Present each party, attendance choice and representative name on one row.
