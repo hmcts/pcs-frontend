@@ -1,18 +1,18 @@
 {
-  "pageTitle": "cyDefendant’s date of birth",
+  "pageTitle": "Dyddiad geni'r Diffynnydd:",
   "dateOfBirthHint": "Er enghraifft, 31 3 1980",
-  "dateOfBirthLabel": "cyDefendant’s date of birth (Optional)",
+  "dateOfBirthLabel": "Dyddiad geni'r diffynnydd (Dewisol)",
   "errors": {
     "date": {
-      "day": "cyDay",
-      "month": "cyMonth",
-      "year": "cyYear",
-      "required": "cyEnter the defendant’s date of birth",
-      "notRealDate": "cyDate of birth must be a real date",
-      "futureDate": "cyDate of birth must be in the past",
-      "invalidValue": "cyDate of birth must be a real date",
-      "missingOne": "cyThe defendant’s date of birth must include a {{missingField}}",
-      "missingTwo": "cyThe defendant’s date of birth must include a {{first}} and {{second}}"
+      "day": "Diwrnod",
+      "month": "Mis",
+      "year": "Blwyddyn",
+      "required": "Nodwch ddyddiad geni’r diffynnydd",
+      "notRealDate": "Rhaid i’r dyddiad geni fod yn ddyddiad dilys",
+      "futureDate": "Rhaid i’r dyddiad geni fod yn y gorffennol",
+      "invalidValue": "Rhaid i’r dyddiad geni fod yn ddyddiad dilys",
+      "missingOne": "Rhaid i ddyddiad geni'r diffynnydd gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i ddyddiad geni'r diffynnydd gynnwys {{first}} a {{second}}"
     }
   }
 }
