@@ -8,7 +8,7 @@ import { ENABLE_CUI_PCQ, RELEASE_1_3_ENABLED } from './respondToClaimFlags';
 /**
  * Gates the PCQ (Equality and Diversity questionnaire) hand-off.
  *
- * Legal representatives are never sent. 
+ * Legal representatives are never sent.
  *
  * Citizen is only sent when BOTH the shared release flag (`release-1.3-enabled`) and
  * the feature flag (`cui-pcq-enabled`) are on. The release flag keeps PCQ off until 1.3 ships; the
@@ -27,7 +27,6 @@ export async function isPcqEnabled(req: Request): Promise<boolean> {
     getLaunchDarklyFlag(req, RELEASE_1_3_ENABLED, false),
     getLaunchDarklyFlag(req, ENABLE_CUI_PCQ, false),
   ]);
-
 
   return releaseEnabled && featureEnabled;
   // return true && true
