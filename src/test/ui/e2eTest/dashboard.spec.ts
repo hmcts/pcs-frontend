@@ -38,7 +38,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
-  test('Validate address, case number and links on the dashboard @smoke @regression @crossbrowser', async () => {
+  test('Validate address, case number and links on the dashboard @smoke @regression @crossbrowser @healthCheck', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
     await performActions(
@@ -227,7 +227,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
   });
 
   // This test will be skipped until the bugs HDPI-7401 & HDPI-7360 get fixed
-  test.skip('Validate View the response page data @crossbrowser', async () => {
+  test.skip('Validate View the response page data @regression @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performAction('reloadPage');
     await performAction('respondPossessionClaimAPI', {
@@ -240,7 +240,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('verifyResponseDetailsOnViewTheResponsePage');
   });
 
-  test('Validate View the claim page data @crossbrowser', async () => {
+  test('Validate View the claim page data @regression @crossbrowser', async () => {
     await performAction('clickLink', dashboard.viewTheClaimLink);
     await performValidation('mainHeader', viewTheClaim.mainHeader);
     await performAction('verifyClaimDetailsOnViewTheClaimPage');
