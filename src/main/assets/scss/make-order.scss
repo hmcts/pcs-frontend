@@ -174,6 +174,23 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   }
 }
 
+// Keep both adjournment types on the first row and let either conditional panel
+// use the full width beneath them.
+.pcs-adjournment-type {
+  @include govuk-media-query($from: tablet) {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: govuk-spacing(6);
+
+    // Push whichever panel is revealed below both radios, at full width.
+    > .govuk-radios__conditional {
+      order: 1;
+      width: 100%;
+      margin-top: govuk-spacing(4);
+    }
+  }
+}
+
 // Opt-in dividers use margin so GOV.UK's absolutely positioned checkbox remains aligned.
 .pcs-divided-options > .govuk-checkboxes__item:not(:first-child) {
   margin-top: govuk-spacing(6);
