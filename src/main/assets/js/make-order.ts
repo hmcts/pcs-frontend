@@ -6,7 +6,11 @@ import {
   createOrderEditor,
 } from '@hmcts-cft/docweave';
 
-type OrderType = 'OUTRIGHT_POSSESSION' | 'SUSPENDED_POSSESSION' | 'ADJOURNMENT' | 'STRIKE_OUT_DISMISSAL' | 'FREE_FORM';
+import {
+  type MakeOrderValidationIssue as OrderError,
+  type MakeOrderType as OrderType,
+  validateMakeOrder,
+} from '../../utils/makeOrderValidation';
 
 function field(form: HTMLFormElement, name: string): string {
   const value = new FormData(form).get(name);
@@ -44,20 +48,11 @@ function date(form: HTMLFormElement, prefix: string): string {
   }).format(value);
 }
 
-function hasValidDate(form: HTMLFormElement, prefix: string): boolean {
-  return date(form, prefix) !== '[date not provided]';
-}
-
 function money(value: string): string {
   const amount = Number(value.split(',').join(''));
   return value && Number.isFinite(amount)
     ? amount.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     : '[amount not provided]';
-}
-
-function hasValidMoney(form: HTMLFormElement, name: string): boolean {
-  const value = field(form, name).split(',').join('');
-  return /^\d+(\.\d{1,2})?$/.test(value) && Number(value) >= 0;
 }
 
 function defaultDate(form: HTMLFormElement, prefix: string, daysFromToday: number): void {
@@ -716,6 +711,23 @@ function addAdjournmentInstalmentTerm(
     .fact(`adjournment-${option}-date`, date(form, `${prefix}-date`), { sourceId: `${prefix}-date` });
 }
 
+// Free form wording is the judge's own, so it is emitted as plain paragraphs rather
+// than the numbered clauses the structured order types use. Blank lines separate them.
+export function buildFreeFormOrder(form: HTMLFormElement): ReturnType<typeof buildOrder> {
+  return buildOrder(order => {
+    addPreamble(order, form);
+    field(form, 'free-form-text')
+      .split(/\n\s*\n/)
+      .map(text => text.trim())
+      .filter(Boolean)
+      .forEach((text, index) =>
+        order.paragraph(`free-form-${index}`, content => {
+          content.fact('text', text, { sourceId: 'free-form-text' });
+        })
+      );
+  });
+}
+
 export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof buildOrder> {
   const type = field(form, 'adj-type');
   const { claimant, defendant, defendantVerb } = partyLabels(form);
@@ -912,182 +924,41 @@ export function syncSuspendedOnlyCosts(form: HTMLFormElement, type: OrderType): 
   });
 }
 
-interface OrderError {
-  id: string;
-  message: string;
-}
-
-function validateSuspendedOrder(form: HTMLFormElement): OrderError[] {
-  const errors: OrderError[] = [];
-  const add = (valid: boolean, id: string, message: string): void => {
-    if (!valid) {
-      errors.push({ id, message });
+function formValues(form: HTMLFormElement): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
+  new FormData(form).forEach((entry, name) => {
+    if (typeof entry !== 'string') {
+      return;
     }
-  };
-  const oneOff = selected(form, 'suspended-payment-terms', 'one-off');
-  const instalments = selected(form, 'suspended-payment-terms', 'instalments');
-  add(hasValidDate(form, 'suspended-by-date'), 'suspended-by-date-day', 'Enter a valid possession date');
-  add(hasValidMoney(form, 'suspended-arrears'), 'suspended-arrears', 'Enter valid arrears');
-  add(oneOff || instalments, 'suspended-payment-terms', 'Select a one-off payment or instalments');
-  if (oneOff) {
-    add(
-      hasValidMoney(form, 'suspended-oneoff-amount'),
-      'suspended-oneoff-amount',
-      'Enter a valid one-off payment amount'
-    );
-    add(hasValidDate(form, 'suspended-oneoff-date'), 'suspended-oneoff-date-day', 'Enter a valid one-off payment date');
-  }
-  if (instalments) {
-    add(
-      hasValidMoney(form, 'suspended-instalment-amount'),
-      'suspended-instalment-amount',
-      'Enter a valid instalment amount'
-    );
-    add(
-      hasValidDate(form, 'suspended-instalment-date'),
-      'suspended-instalment-date-day',
-      'Enter a valid first instalment date'
-    );
-  }
-  if (selected(form, 'suspended-options', 'use-occupation')) {
-    add(
-      hasValidMoney(form, 'suspended-use-occupation-rate'),
-      'suspended-use-occupation-rate',
-      'Enter a valid daily rate for use and occupation'
-    );
-    add(
-      hasValidDate(form, 'suspended-use-occupation-from-date'),
-      'suspended-use-occupation-from-date-day',
-      'Enter a valid start date for use and occupation'
-    );
-  }
-  if (selected(form, 'costs', 'yes')) {
-    const costsChoice = field(form, 'costs-choice');
-    const amountFields: Record<string, { id: string; message: string }> = {
-      'def-pay-cl-fixed': {
-        id: 'costs-def-pay-cl-fixed-amount',
-        message: 'Enter a valid fixed costs amount',
-      },
-      'def-pay-cl-summary': {
-        id: 'costs-def-pay-cl-summary-amount',
-        message: 'Enter a valid summary assessed costs amount',
-      },
-      'cl-pay-def-summary': {
-        id: 'costs-cl-pay-def-summary-amount',
-        message: 'Enter a valid summary assessed costs amount',
-      },
-      'fixed-same-terms': {
-        id: 'costs-fixed-same-terms-amount',
-        message: 'Enter a valid fixed costs amount',
-      },
-      'summary-same-terms': {
-        id: 'costs-summary-same-terms-amount',
-        message: 'Enter a valid summary assessed costs amount',
-      },
-    };
-    const amountField = amountFields[costsChoice];
-    if (amountField) {
-      add(hasValidMoney(form, amountField.id), amountField.id, amountField.message);
-    }
-  }
-  return errors;
-}
-
-function validateAdjournmentOrder(form: HTMLFormElement): OrderError[] {
-  const errors: OrderError[] = [];
-  const add = (valid: boolean, id: string, message: string): void => {
-    if (!valid) {
-      errors.push({ id, message });
-    }
-  };
-  const type = field(form, 'adj-type');
-  add(
-    type === 'further-hearing' || type === 'generally',
-    'adj-type',
-    'Select adjourned for further hearing or adjourned generally'
-  );
-
-  if (type === 'further-hearing') {
-    const when = field(form, 'adj-when') || 'next-list';
-    const hearingDate = `adj-hearing-date-${when}`;
-    add(hasValidDate(form, hearingDate), `${hearingDate}-day`, 'Enter a valid adjournment date');
-    add(
-      /^\d+$/.test(field(form, 'adj-time-estimate')) && Number(field(form, 'adj-time-estimate')) > 0,
-      'adj-time-estimate',
-      'Enter the time estimate as a whole number'
-    );
-    add(
-      ['minutes', 'hours'].includes(field(form, 'adj-time-estimate-unit')),
-      'adj-time-estimate-unit',
-      'Select minutes or hours for the time estimate'
-    );
-    if (when === 'specific') {
-      add(Boolean(field(form, 'adj-specific-time')), 'adj-specific-time', 'Enter the time of hearing');
-    }
-    if (selected(form, 'adj-directions', 'defence')) {
-      add(hasValidDate(form, 'adj-defence-date'), 'adj-defence-date-day', 'Enter a valid defence date');
-    }
-    if (selected(form, 'adj-directions', 'counterclaim')) {
-      add(hasValidDate(form, 'adj-counterclaim-date'), 'adj-counterclaim-date-day', 'Enter a valid counterclaim date');
-    }
-    if (selected(form, 'adj-directions', 'claimant-reply')) {
-      add(
-        hasValidDate(form, 'adj-claimant-reply-date'),
-        'adj-claimant-reply-date-day',
-        'Enter a valid counterclaim reply date'
-      );
-    }
-    add(
-      !(selected(form, 'adj-directions', 'defence') && selected(form, 'adj-directions', 'counterclaim')),
-      'adj-directions',
-      'Select either defence or defence and any counterclaim, not both'
-    );
-  }
-
-  if (type === 'generally') {
-    const conditions = new FormData(form).getAll('adj-gen').map(String);
-    const validatePayment = (option: string, prefix: string): void => {
-      if (!conditions.includes(option)) {
-        return;
-      }
-      add(hasValidMoney(form, `${prefix}-amount`), `${prefix}-amount`, 'Enter a valid payment amount');
-      add(hasValidDate(form, `${prefix}-date`), `${prefix}-date-day`, 'Enter a valid payment date');
-    };
-    validatePayment('current-rent-plus', 'adj-gen-current-rent-plus');
-    validatePayment('payments', 'adj-gen-payments');
-    validatePayment('oneoff', 'adj-gen-oneoff');
-    add(
-      !(conditions.includes('current-rent-plus') && conditions.includes('payments')),
-      'adj-gen',
-      'Select either current rent plus instalments or instalment payments, not both'
-    );
-    if (conditions.includes('restore')) {
-      add(
-        hasValidDate(form, 'adj-gen-restore-date'),
-        'adj-gen-restore-date-day',
-        'Enter a valid restore application date'
-      );
-    }
-  }
-
-  if (selected(form, 'costs', 'yes')) {
-    const costsChoice = field(form, 'costs-choice');
-    const amountFields: Record<string, string> = {
-      'def-pay-cl-fixed': 'costs-def-pay-cl-fixed-amount',
-      'def-pay-cl-summary': 'costs-def-pay-cl-summary-amount',
-      'cl-pay-def-summary': 'costs-cl-pay-def-summary-amount',
-    };
-    const amountField = amountFields[costsChoice];
-    if (amountField) {
-      add(hasValidMoney(form, amountField), amountField, 'Enter a valid costs amount');
-    }
-  }
-  return errors;
+    const existing = result[name];
+    result[name] = existing === undefined ? entry : Array.isArray(existing) ? [...existing, entry] : [existing, entry];
+  });
+  return result;
 }
 
 function showOrderErrors(form: HTMLFormElement, errors: OrderError[]): void {
+  const generatedErrorIds = new Set(
+    Array.from(form.querySelectorAll<HTMLElement>('[data-make-order-error]'))
+      .map(error => error.id)
+      .filter(Boolean)
+  );
   form.querySelector('#make-order-error-summary')?.remove();
-  form.querySelectorAll('.govuk-input--error').forEach(input => input.classList.remove('govuk-input--error'));
+  form.querySelectorAll('[data-make-order-error]').forEach(error => error.remove());
+  form.querySelectorAll('.govuk-form-group--error').forEach(group => group.classList.remove('govuk-form-group--error'));
+  form.querySelectorAll<HTMLElement>('[aria-describedby]').forEach(control => {
+    const remaining = (control.getAttribute('aria-describedby') ?? '')
+      .split(/\s+/)
+      .filter(id => id && !generatedErrorIds.has(id))
+      .join(' ');
+    if (remaining) {
+      control.setAttribute('aria-describedby', remaining);
+    } else {
+      control.removeAttribute('aria-describedby');
+    }
+  });
+  form.querySelectorAll('.govuk-input--error, .govuk-select--error, .govuk-textarea--error').forEach(control => {
+    control.classList.remove('govuk-input--error', 'govuk-select--error', 'govuk-textarea--error');
+  });
   if (!errors.length) {
     return;
   }
@@ -1110,7 +981,34 @@ function showOrderErrors(form: HTMLFormElement, errors: OrderError[]): void {
     link.textContent = error.message;
     item.append(link);
     list.append(item);
-    document.getElementById(error.id)?.classList.add('govuk-input--error');
+    const control = document.getElementById(error.id);
+    const group = control?.closest<HTMLElement>('.govuk-form-group');
+    if (!control || !group) {
+      return;
+    }
+    const message = document.createElement('p');
+    message.id = `${error.id}-error`;
+    message.className = 'govuk-error-message';
+    message.dataset.makeOrderError = 'true';
+    const hidden = document.createElement('span');
+    hidden.className = 'govuk-visually-hidden';
+    hidden.textContent = 'Error:';
+    message.append(hidden, ` ${error.message}`);
+    const controls =
+      control.closest<HTMLElement>('.govuk-date-input, .govuk-radios, .govuk-checkboxes, .govuk-input__wrapper') ??
+      control;
+    controls.parentElement?.insertBefore(message, controls);
+    group.classList.add('govuk-form-group--error');
+    if (control instanceof HTMLTextAreaElement) {
+      control.classList.add('govuk-textarea--error');
+    } else if (control instanceof HTMLSelectElement) {
+      control.classList.add('govuk-select--error');
+    } else if (control instanceof HTMLInputElement && !['checkbox', 'radio'].includes(control.type)) {
+      control.classList.add('govuk-input--error');
+    }
+    const describedBy = new Set((control.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean));
+    describedBy.add(message.id);
+    control.setAttribute('aria-describedby', [...describedBy].join(' '));
   });
   body.append(list);
   summary.append(title, body);
@@ -1118,10 +1016,13 @@ function showOrderErrors(form: HTMLFormElement, errors: OrderError[]): void {
   summary.focus();
 }
 
-export function initMakeOrder(): void {
+// Returns a teardown so a module reload can dispose the editor. Without it a second
+// editor is created over the same mount, which DocWeave rejects.
+export function initMakeOrder(): () => void {
+  const noop = (): void => undefined;
   const form = document.querySelector<HTMLFormElement>('#make-order-form');
   if (!form) {
-    return;
+    return noop;
   }
   initDatePills(form);
   initOptionRows(form);
@@ -1134,7 +1035,7 @@ export function initMakeOrder(): void {
   const unavailable = document.querySelector<HTMLElement>('#order-preview-unavailable');
   const submit = document.querySelector<HTMLButtonElement>('#submit-order-for-review');
   if (!mount || !documentField || !orderTypeField || !editorRegion || !unavailable || !submit) {
-    return;
+    return noop;
   }
 
   let documents: Partial<Record<OrderType, DocWeaveSnapshot>> = {};
@@ -1160,6 +1061,7 @@ export function initMakeOrder(): void {
     OUTRIGHT_POSSESSION: buildOutrightOrder,
     SUSPENDED_POSSESSION: buildSuspendedOrder,
     ADJOURNMENT: buildAdjournmentOrder,
+    FREE_FORM: buildFreeFormOrder,
   };
   const render = (): void => {
     const type = orderTypeField.value as OrderType;
@@ -1220,12 +1122,7 @@ export function initMakeOrder(): void {
     persistEditor();
     const submitter = event instanceof SubmitEvent ? event.submitter : null;
     if (submitter instanceof HTMLButtonElement && submitter.value === 'SUBMIT_FOR_REVIEW') {
-      const errors =
-        orderTypeField.value === 'SUSPENDED_POSSESSION'
-          ? validateSuspendedOrder(form)
-          : orderTypeField.value === 'ADJOURNMENT'
-            ? validateAdjournmentOrder(form)
-            : [];
+      const errors = validateMakeOrder(orderTypeField.value as OrderType, formValues(form));
       showOrderErrors(form, errors);
       if (errors.length) {
         event.preventDefault();
@@ -1234,4 +1131,11 @@ export function initMakeOrder(): void {
   });
   const linkedTab = Array.from(orderTabs).find(tab => tab.getAttribute('href') === window.location.hash);
   selectOrderType((linkedTab?.dataset.orderType as OrderType | undefined) ?? (orderTypeField.value as OrderType));
+
+  return () => {
+    persistEditor();
+    editor?.destroy();
+    editor = undefined;
+    editorType = undefined;
+  };
 }

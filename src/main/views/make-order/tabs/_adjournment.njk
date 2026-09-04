@@ -25,7 +25,8 @@
         id: "adj-hearing-date-" + params.value,
         items: draftDate("adj-hearing-date-" + params.value),
         legend: params.text,
-        legendHidden: true
+        legendHidden: true,
+        errorMessage: validationErrors["adj-hearing-date-" + params.value + "-day"]
       }) }}
       {{ params.extraHtml | safe if params.extraHtml }}
     </div>
@@ -42,7 +43,8 @@
     classes: "govuk-input--width-5",
     formGroup: { classes: "pcs-option-row__time" },
     spellcheck: false,
-    value: draftValue("adj-specific-time")
+    value: draftValue("adj-specific-time"),
+    errorMessage: validationErrors["adj-specific-time"]
   }) }}
 {% endset %}
 
@@ -85,7 +87,8 @@
           classes: "govuk-input--width-3",
           spellcheck: false,
           value: draftValue("adj-time-estimate"),
-          inputmode: "numeric"
+          inputmode: "numeric",
+          errorMessage: validationErrors["adj-time-estimate"]
         }) }}
         {{ govukSelect({
           id: "adj-time-estimate-unit",
@@ -94,7 +97,8 @@
           items: draftSelect([
             { value: "minutes", text: "Minutes" },
             { value: "hours", text: "Hours" }
-          ], "adj-time-estimate-unit", "minutes")
+          ], "adj-time-estimate-unit", "minutes"),
+          errorMessage: validationErrors["adj-time-estimate-unit"]
         }) }}
       {% endcall %}
     </fieldset>
@@ -120,6 +124,7 @@
     classes: "govuk-checkboxes--small pcs-divided-options",
     formGroup: { classes: "pcs-section-break" },
     fieldset: { legend: { text: "Directions", classes: "govuk-fieldset__legend--s" } },
+    errorMessage: validationErrors["adj-directions"],
     items: [
       {
         value: "defence",
@@ -129,7 +134,8 @@
           html: compact.date({
             id: "adj-defence-date",
             items: draftDate("adj-defence-date"),
-            legend: "By 4pm on"
+            legend: "By 4pm on",
+            errorMessage: validationErrors["adj-defence-date-day"]
           })
         }
       },
@@ -141,7 +147,8 @@
           html: compact.date({
             id: "adj-counterclaim-date",
             items: draftDate("adj-counterclaim-date"),
-            legend: "By 4pm on"
+            legend: "By 4pm on",
+            errorMessage: validationErrors["adj-counterclaim-date-day"]
           })
         }
       },
@@ -153,7 +160,8 @@
           html: compact.date({
             id: "adj-claimant-reply-date",
             items: draftDate("adj-claimant-reply-date"),
-            legend: "By 4pm on"
+            legend: "By 4pm on",
+            errorMessage: validationErrors["adj-claimant-reply-date-day"]
           })
         }
       }
@@ -166,7 +174,8 @@
     {{ compact.money({
       id: "adj-gen-current-rent-plus-amount",
       label: "Additional sum",
-      value: draftValue("adj-gen-current-rent-plus-amount")
+      value: draftValue("adj-gen-current-rent-plus-amount"),
+      errorMessage: validationErrors["adj-gen-current-rent-plus-amount"]
     }) }}
     {{ govukSelect({
       id: "adj-gen-current-rent-plus-frequency",
@@ -177,7 +186,8 @@
     {{ compact.date({
       id: "adj-gen-current-rent-plus-date",
       items: draftDate("adj-gen-current-rent-plus-date"),
-      legend: "First payment by"
+      legend: "First payment by",
+      errorMessage: validationErrors["adj-gen-current-rent-plus-date-day"]
     }) }}
   {% endcall %}
 {% endset %}
@@ -187,7 +197,8 @@
     {{ compact.money({
       id: "adj-gen-payments-amount",
       label: "Payments of",
-      value: draftValue("adj-gen-payments-amount")
+      value: draftValue("adj-gen-payments-amount"),
+      errorMessage: validationErrors["adj-gen-payments-amount"]
     }) }}
     {{ govukSelect({
       id: "adj-gen-payments-frequency",
@@ -198,7 +209,8 @@
     {{ compact.date({
       id: "adj-gen-payments-date",
       items: draftDate("adj-gen-payments-date"),
-      legend: "First payment by"
+      legend: "First payment by",
+      errorMessage: validationErrors["adj-gen-payments-date-day"]
     }) }}
   {% endcall %}
 {% endset %}
@@ -208,12 +220,14 @@
     {{ compact.money({
       id: "adj-gen-oneoff-amount",
       label: "Payment of",
-      value: draftValue("adj-gen-oneoff-amount")
+      value: draftValue("adj-gen-oneoff-amount"),
+      errorMessage: validationErrors["adj-gen-oneoff-amount"]
     }) }}
     {{ compact.date({
       id: "adj-gen-oneoff-date",
       items: draftDate("adj-gen-oneoff-date"),
-      legend: "Payment by"
+      legend: "Payment by",
+      errorMessage: validationErrors["adj-gen-oneoff-date-day"]
     }) }}
   {% endcall %}
 {% endset %}
@@ -224,6 +238,7 @@
     name: "adj-gen",
     classes: "govuk-checkboxes--small pcs-divided-options",
     fieldset: { legend: { text: "Conditions", classes: "govuk-fieldset__legend--s" } },
+    errorMessage: validationErrors["adj-gen"],
     items: [
       {
         value: "current-rent-plus",
@@ -251,7 +266,8 @@
           html: compact.date({
             id: "adj-gen-restore-date",
             items: draftDate("adj-gen-restore-date"),
-            legend: "Application to restore by"
+            legend: "Application to restore by",
+            errorMessage: validationErrors["adj-gen-restore-date-day"]
           })
         }
       }
@@ -264,6 +280,7 @@
   name: "adj-type",
   classes: "govuk-radios--small pcs-inline-radios",
   fieldset: { legend: { text: "Adjournment type", classes: "govuk-fieldset__legend--s" } },
+  errorMessage: validationErrors["adj-type"],
   items: [
     {
       value: "further-hearing",

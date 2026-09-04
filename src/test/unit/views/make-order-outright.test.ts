@@ -13,7 +13,7 @@ const environment = new Environment(
   { autoescape: true }
 );
 
-function renderOutright(draft: Draft = {}): void {
+function renderOutright(draft: Draft = {}, validationErrors: Record<string, { text: string }> = {}): void {
   document.body.innerHTML = environment.render('make-order/tabs/_outright.njk', {
     draftValue: (name: string) => draft[name],
     draftChecked: (name: string, value: string) => {
@@ -23,6 +23,7 @@ function renderOutright(draft: Draft = {}): void {
     draftDate: (prefix: string) => ['day', 'month', 'year'].map(name => ({ name, value: draft[`${prefix}-${name}`] })),
     draftSelect: (items: Record<string, unknown>[], name: string) =>
       items.map(item => ({ ...item, selected: item.value === draft[name] })),
+    validationErrors,
   });
 }
 
@@ -80,5 +81,23 @@ describe('outright possession money judgment', () => {
     expect(checkbox('outright-mj-sections', 'arrears').checked).toBe(false);
     expect(checkbox('outright-mj-sections', 'payment-plan').checked).toBe(false);
     expect(checkbox('outright-mj-balance', 'yes').checked).toBe(false);
+  });
+
+  it('renders GOV.UK errors against the relevant outright controls', () => {
+    renderOutright(
+      {},
+      {
+        'outright-possession': { text: 'Select when the defendant must give up possession' },
+        'outright-grounds-type': { text: 'Select mandatory or discretionary grounds' },
+      }
+    );
+
+    expect(document.querySelector('#outright-possession-error')?.textContent).toContain(
+      'Select when the defendant must give up possession'
+    );
+    expect(document.querySelector('#outright-grounds-type-error')?.textContent).toContain(
+      'Select mandatory or discretionary grounds'
+    );
+    expect(document.querySelectorAll('.govuk-form-group--error')).toHaveLength(2);
   });
 });

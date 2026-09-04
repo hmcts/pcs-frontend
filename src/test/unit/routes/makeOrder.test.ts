@@ -456,6 +456,8 @@ describe('make order route', () => {
           orderVersion: '2',
           orderType: 'OUTRIGHT_POSSESSION',
           orderDocument: JSON.stringify(orderDocument),
+          'outright-possession': 'forthwith',
+          'outright-grounds-type': 'mandatory',
           'hearing-notes': 'Final note',
         },
       } as unknown as Request,
@@ -472,13 +474,60 @@ describe('make order route', () => {
           draftPayload: {
             version: 1,
             orderType: 'OUTRIGHT_POSSESSION',
-            formData: { 'hearing-notes': 'Final note' },
+            formData: {
+              'outright-possession': 'forthwith',
+              'outright-grounds-type': 'mandatory',
+              'hearing-notes': 'Final note',
+            },
             documents: { OUTRIGHT_POSSESSION: orderDocument },
           },
         },
       }),
     });
     expect(res.redirect).toHaveBeenCalledWith('https://manage-case.example.com/cases/case-details/1777027600017760');
+  });
+
+  it('re-renders an incomplete outright possession order with field errors', async () => {
+    makeOrderRoute(app);
+    const handler = (app.post as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      render: jest.fn(),
+    } as unknown as Response;
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        query: {},
+        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        body: {
+          action: 'SUBMIT_FOR_REVIEW',
+          orderType: 'OUTRIGHT_POSSESSION',
+        },
+      } as unknown as Request,
+      res,
+      jest.fn()
+    );
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.render).toHaveBeenCalledWith(
+      'make-order',
+      expect.objectContaining({
+        validationErrors: expect.objectContaining({
+          'outright-possession': expect.objectContaining({
+            text: 'Select when the defendant must give up possession',
+          }),
+          'outright-grounds-type': expect.objectContaining({
+            text: 'Select mandatory or discretionary grounds',
+          }),
+        }),
+      })
+    );
+    expect(ccdCaseService.submitCaseEvent).not.toHaveBeenCalled();
   });
 
   it('submits a suspended possession document for review under its order type', async () => {
@@ -628,6 +677,10 @@ describe('make order route', () => {
       next: NextFunction
     ) => Promise<void>;
     const next = jest.fn();
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      render: jest.fn(),
+    } as unknown as Response;
 
     await handler(
       {
@@ -645,14 +698,26 @@ describe('make order route', () => {
           'adj-time-estimate-unit': 'minutes',
         },
       } as unknown as Request,
-      {} as Response,
+      res,
       next
     );
 
     expect(ccdCaseService.submitCaseEvent).not.toHaveBeenCalled();
-    expect(next).toHaveBeenCalledWith(
-      expect.objectContaining({ status: 400, message: 'The adjournment order has incomplete or invalid terms' })
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.render).toHaveBeenCalledWith(
+      'make-order',
+      expect.objectContaining({
+        draftOrderType: 'ADJOURNMENT',
+        errorSummary: expect.objectContaining({
+          errorList: expect.arrayContaining([
+            { text: 'Enter a valid adjournment date', href: '#adj-hearing-date-specific-day' },
+            { text: 'Enter the time estimate as a whole number', href: '#adj-time-estimate' },
+            { text: 'Enter the time of hearing', href: '#adj-specific-time' },
+          ]),
+        }),
+      })
     );
+    expect(next).not.toHaveBeenCalled();
   });
 
   it('rejects suspended same-terms costs without an amount', async () => {
@@ -663,6 +728,10 @@ describe('make order route', () => {
       next: NextFunction
     ) => Promise<void>;
     const next = jest.fn();
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      render: jest.fn(),
+    } as unknown as Response;
 
     await handler(
       {
@@ -684,11 +753,65 @@ describe('make order route', () => {
           'costs-choice': 'fixed-same-terms',
         },
       } as unknown as Request,
-      {} as Response,
+      res,
       next
     );
 
-    expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 400 }));
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.render).toHaveBeenCalledWith(
+      'make-order',
+      expect.objectContaining({
+        validationErrors: expect.objectContaining({
+          'costs-fixed-same-terms-amount': expect.objectContaining({
+            text: 'Enter a valid fixed costs amount',
+          }),
+        }),
+      })
+    );
+    expect(next).not.toHaveBeenCalled();
+    expect(ccdCaseService.submitCaseEvent).not.toHaveBeenCalled();
+  });
+
+  it('re-renders an empty free-form order with its submitted values and field error', async () => {
+    makeOrderRoute(app);
+    const handler = (app.post as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      render: jest.fn(),
+    } as unknown as Response;
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        query: {},
+        session: { user: { accessToken: 'token', roles: ['caseworker-pcs-judge'] } },
+        body: {
+          action: 'SUBMIT_FOR_REVIEW',
+          orderType: 'FREE_FORM',
+          'free-form-text': '   ',
+          'hearing-notes': 'Keep this note',
+        },
+      } as unknown as Request,
+      res,
+      jest.fn()
+    );
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.render).toHaveBeenCalledWith(
+      'make-order',
+      expect.objectContaining({
+        draftOrderType: 'FREE_FORM',
+        validationErrors: expect.objectContaining({
+          'free-form-text': expect.objectContaining({ text: 'Enter the order wording' }),
+        }),
+      })
+    );
+    const model = jest.mocked(res.render).mock.calls[0][1] as unknown as Record<string, unknown>;
+    expect((model.draftValue as (name: string) => unknown)('hearing-notes')).toBe('Keep this note');
     expect(ccdCaseService.submitCaseEvent).not.toHaveBeenCalled();
   });
 });

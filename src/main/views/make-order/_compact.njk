@@ -29,7 +29,8 @@
     spellcheck: false,
     value: params.value,
     inputmode: params.inputmode or "numeric",
-    prefix: { text: "£" }
+    prefix: { text: "£" },
+    errorMessage: params.errorMessage
   }) }}
 {% endmacro %}
 
@@ -44,6 +45,7 @@
         text: params.legend,
         classes: "govuk-visually-hidden" if params.legendHidden else "govuk-fieldset__legend--s"
       }
-    }
+    },
+    errorMessage: params.errorMessage
   }) }}
 {% endmacro %}
