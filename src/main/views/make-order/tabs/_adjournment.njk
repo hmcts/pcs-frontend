@@ -7,21 +7,33 @@
 
 <h3 class="govuk-heading-m">Adjournment</h3>
 
+{#
+  One shared hearing date sits directly beneath the options, indented to the radio
+  labels, so it reads as part of the choice above without a nested conditional reveal.
+  A single field also stops unselected options leaving stale dates in the draft.
+#}
 {% set adjournFurtherHearingHtml %}
-  {{ govukRadios({
-    idPrefix: "adj-when",
-    name: "adj-when",
-    classes: "govuk-radios--small",
-    fieldset: { legend: { text: "Adjourned to", classes: "govuk-fieldset__legend--s" } },
-    items: [
-      { value: "next-list", text: "Next available possession list after", checked: draftChecked("adj-when", "next-list") or not draftValue("adj-when") },
-      { value: "next-date", text: "Next available date, not in a possession list, after", checked: draftChecked("adj-when", "next-date") },
-      {
-        value: "specific",
-        text: "A specific date",
-        checked: draftChecked("adj-when", "specific"),
-        conditional: {
-          html: govukInput({
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset" role="group">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Adjourned for further hearing conditions</legend>
+      {{ govukRadios({
+        idPrefix: "adj-when",
+        name: "adj-when",
+        classes: "govuk-radios--small",
+        items: [
+          { value: "next-list", text: "Adjourned to next available possession list after", checked: draftChecked("adj-when", "next-list") or not draftValue("adj-when") },
+          { value: "next-date", text: "Adjourned to next available date (non-possession list) after", checked: draftChecked("adj-when", "next-date") },
+          { value: "specific", text: "Adjourned to specific date", checked: draftChecked("adj-when", "specific") }
+        ]
+      }) }}
+      <div class="pcs-option-fields">
+        {% call compact.row() %}
+          {{ compact.date({
+            id: "adj-hearing-date",
+            items: draftDate("adj-hearing-date"),
+            legend: "Hearing date"
+          }) }}
+          {{ govukInput({
             id: "adj-specific-time",
             name: "adj-specific-time",
             label: { text: "Time of hearing" },
@@ -29,43 +41,39 @@
             classes: "govuk-input--width-5",
             spellcheck: false,
             value: draftValue("adj-specific-time")
-          })
-        }
-      }
-    ]
-  }) }}
-
-  {{ compact.date({
-    id: "adj-hearing-date",
-    items: draftDate("adj-hearing-date"),
-    legend: "Date"
-  }) }}
-
-  <div id="adj-time-estimate-group" class="govuk-form-group">
-    <fieldset class="govuk-fieldset" role="group">
-      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Time estimate</legend>
-      {{ govukInput({
-        id: "adj-time-estimate",
-        name: "adj-time-estimate",
-        label: { text: "Length" },
-        classes: "govuk-input--width-3",
-        spellcheck: false,
-        value: draftValue("adj-time-estimate"),
-        inputmode: "numeric"
-      }) }}
-      {{ govukSelect({
-        id: "adj-time-estimate-unit",
-        name: "adj-time-estimate-unit",
-        label: { text: "Unit" },
-        items: draftSelect([
-          { value: "minutes", text: "Minutes" },
-          { value: "hours", text: "Hours" }
-        ], "adj-time-estimate-unit", "minutes")
-      }) }}
+          }) }}
+        {% endcall %}
+      </div>
     </fieldset>
   </div>
 
-  <div id="adj-format-group">
+  <div id="adj-time-estimate-group" class="govuk-form-group pcs-section-break">
+    <fieldset class="govuk-fieldset" role="group">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Time estimate</legend>
+      {% call compact.row() %}
+        {{ govukInput({
+          id: "adj-time-estimate",
+          name: "adj-time-estimate",
+          label: { text: "Length", classes: "govuk-visually-hidden" },
+          classes: "govuk-input--width-3",
+          spellcheck: false,
+          value: draftValue("adj-time-estimate"),
+          inputmode: "numeric"
+        }) }}
+        {{ govukSelect({
+          id: "adj-time-estimate-unit",
+          name: "adj-time-estimate-unit",
+          label: { text: "Unit", classes: "govuk-visually-hidden" },
+          items: draftSelect([
+            { value: "minutes", text: "Minutes" },
+            { value: "hours", text: "Hours" }
+          ], "adj-time-estimate-unit", "minutes")
+        }) }}
+      {% endcall %}
+    </fieldset>
+  </div>
+
+  <div id="adj-format-group" class="pcs-section-break">
     {{ govukCheckboxes({
       idPrefix: "adj-format",
       name: "adj-format",
@@ -83,6 +91,7 @@
     idPrefix: "adj-directions",
     name: "adj-directions",
     classes: "govuk-checkboxes--small pcs-divided-options",
+    formGroup: { classes: "pcs-section-break" },
     fieldset: { legend: { text: "Directions", classes: "govuk-fieldset__legend--s" } },
     items: [
       {
