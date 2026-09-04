@@ -1,23 +1,6 @@
 {
-  "pageTitle": "cyRental agreement",
-  "heading": "cyTenancy, occupation contract or licence agreement",
-  "insetText": "cyWhen they made their claim, {{orgname}} had to give details about the type of tenancy, occupation contract or licence agreement the defendant signed to rent their property, and the date it began, if known.",
-  "detailsHeading": "cyDetails given by {{senderName}}:",
-  "notSure": "cyDefendant is not sure",
-  "tenancyTypeOther": "cyThe claimant provided the following information about the defendant’s tenancy, occupation contract or licence agreement type: {{otherTenancyTypeDetails}}",
-  "tenancyType": "cyThe property is let under {{tenancyTypeAgreementType}} tenancy agreement",
-  "tenancyTypeWalesStandard": "cyThe property is let under a standard occupation contract",
-  "tenancyTypeWalesSecure": "cyThe property is let under a secure occupation contract",
-  "tenancyTypeWales": "cyThe property is let under {{welshTenancyTypeAgreementType}} occupation contract",
-  "tenancyAgreementDocumentLinkText": "cyView a copy of the tenancy, occupation contract or licence agreement (opens in new tab)",
-  "legend": "cyIs the tenancy, occupation contract or licence agreement type correct?",
-  "yes": "cyYes",
-  "no": "cyNo",
-  "correctTypeLabel": "cyGive the correct tenancy, occupation contract or licence type",
-  "errors": {
-    "tenancyTypeConfirm": "cySelect if these tenancy, licence or occupation contract details are correct",
-    "tenancyDetails.correctType": "cyEnter the correct tenancy, occupation contract or licence type",
-    "requiredText": "cyEnter the correct tenancy, licence or occupation contract details",
-    "defaultMaxLength": "cyTenancy, occupation contract or licence type must be 60 characters or less"
-  }
+  "pageTitle": "Cytundeb rhentu",
+  "insetText": "Pan wnaethant wneud eu hawliad, roedd yn rhaid i {{orgname}} roi manylion am y math o denantiaeth, contract meddiannaeth neu gytundeb trwydded a lofnodwyd gan y diffynnydd i rentu eu heiddo, a'r dyddiad dechrau, os yn hysbys.",
+  "notSure": "Diffynnydd ddim yn siŵr",
+  "tenancyTypeOther": "cyThe claimant provided the following information about the defendant’s tenancy, occupation contract or licence agreement type: {{otherTenancyTypeDetails}}"
 }
