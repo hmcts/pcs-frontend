@@ -64,6 +64,8 @@ export function formatOrdinalDate(value: unknown, lng?: string, options?: Ordina
 }
 
 export const ordinalDate = (i18n: typeof i18next): void => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore - i18next formatter is not typed
   i18n.services?.formatter?.add(
     'ordinalDate',
     (value: unknown, lng: string | undefined, options: OrdinalDateOptions): string =>
