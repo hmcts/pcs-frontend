@@ -569,7 +569,9 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
 
     await softErrorMessageValidation('contactPreferencesTextMessage', contactPreferencesTextMessageErrorValidation);
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('selectContactByTextMessage', {
+      radioOption: contactPreferencesTextMessage.noRadioOption,
+    });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
