@@ -12,6 +12,7 @@ import { buildManageCaseDetailsRedirect } from '../utils/manageCaseRedirect';
 
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
+import { type MakeOrderType, type MakeOrderValidationIssue, validateMakeOrder } from '@utils/makeOrderValidation';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
@@ -33,10 +34,12 @@ interface MakeOrderCaseFacts {
   arrearsOnIssue?: number | string;
 }
 
-type MakeOrderType =
-  'OUTRIGHT_POSSESSION' | 'SUSPENDED_POSSESSION' | 'ADJOURNMENT' | 'STRIKE_OUT_DISMISSAL' | 'FREE_FORM';
-
-const REVIEWABLE_ORDER_TYPES = new Set<MakeOrderType>(['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION', 'ADJOURNMENT']);
+const REVIEWABLE_ORDER_TYPES = new Set<MakeOrderType>([
+  'OUTRIGHT_POSSESSION',
+  'SUSPENDED_POSSESSION',
+  'ADJOURNMENT',
+  'FREE_FORM',
+]);
 
 interface MakeOrderDraftPayload {
   version: 1;
@@ -183,116 +186,6 @@ function caseFactsToFormData(caseFacts?: MakeOrderCaseFacts): Record<string, unk
   return formData;
 }
 
-function validateSuspendedSubmission(formData: Record<string, unknown>): void {
-  const value = (name: string): string => String(formData[name] ?? '').trim();
-  const values = (name: string): string[] => {
-    const raw = formData[name];
-    return (Array.isArray(raw) ? raw : raw === undefined ? [] : [raw]).map(String);
-  };
-  const validMoney = (name: string): boolean => /^\d+(\.\d{1,2})?$/.test(value(name).split(',').join(''));
-  const validDate = (prefix: string): boolean => {
-    const day = Number(value(`${prefix}-day`));
-    const month = Number(value(`${prefix}-month`));
-    const year = Number(value(`${prefix}-year`));
-    const parsed = new Date(Date.UTC(year, month - 1, day));
-    return (
-      day > 0 &&
-      month > 0 &&
-      year > 0 &&
-      parsed.getUTCDate() === day &&
-      parsed.getUTCMonth() === month - 1 &&
-      parsed.getUTCFullYear() === year
-    );
-  };
-  const terms = values('suspended-payment-terms');
-  const options = values('suspended-options');
-  const costsChoice = value('costs-choice');
-  const costsAmountFields: Record<string, string> = {
-    'def-pay-cl-fixed': 'costs-def-pay-cl-fixed-amount',
-    'def-pay-cl-summary': 'costs-def-pay-cl-summary-amount',
-    'cl-pay-def-summary': 'costs-cl-pay-def-summary-amount',
-    'fixed-same-terms': 'costs-fixed-same-terms-amount',
-    'summary-same-terms': 'costs-summary-same-terms-amount',
-  };
-  const costsAmountField = costsAmountFields[costsChoice];
-  const valid =
-    validDate('suspended-by-date') &&
-    validMoney('suspended-arrears') &&
-    terms.some(term => term === 'one-off' || term === 'instalments') &&
-    (!terms.includes('one-off') || (validMoney('suspended-oneoff-amount') && validDate('suspended-oneoff-date'))) &&
-    (!terms.includes('instalments') ||
-      (validMoney('suspended-instalment-amount') && validDate('suspended-instalment-date'))) &&
-    (!options.includes('use-occupation') ||
-      (validMoney('suspended-use-occupation-rate') && validDate('suspended-use-occupation-from-date'))) &&
-    (value('costs') !== 'yes' || !costsAmountField || validMoney(costsAmountField));
-  if (!valid) {
-    throw new HTTPError('The suspended possession order has incomplete or invalid payment terms', 400);
-  }
-}
-
-function validateAdjournmentSubmission(formData: Record<string, unknown>): void {
-  const value = (name: string): string => String(formData[name] ?? '').trim();
-  const values = (name: string): string[] => {
-    const raw = formData[name];
-    return (Array.isArray(raw) ? raw : raw === undefined ? [] : [raw]).map(String);
-  };
-  const validMoney = (name: string): boolean => /^\d+(\.\d{1,2})?$/.test(value(name).split(',').join(''));
-  const validDate = (prefix: string): boolean => {
-    const day = Number(value(`${prefix}-day`));
-    const month = Number(value(`${prefix}-month`));
-    const year = Number(value(`${prefix}-year`));
-    const parsed = new Date(Date.UTC(year, month - 1, day));
-    return (
-      day > 0 &&
-      month > 0 &&
-      year > 0 &&
-      parsed.getUTCDate() === day &&
-      parsed.getUTCMonth() === month - 1 &&
-      parsed.getUTCFullYear() === year
-    );
-  };
-  const type = value('adj-type');
-  let valid = type === 'further-hearing' || type === 'generally';
-  if (type === 'further-hearing') {
-    const directions = values('adj-directions');
-    valid =
-      valid &&
-      ['next-list', 'next-date', 'specific'].includes(value('adj-when') || 'next-list') &&
-      validDate(`adj-hearing-date-${value('adj-when') || 'next-list'}`) &&
-      /^[1-9]\d*$/.test(value('adj-time-estimate')) &&
-      ['minutes', 'hours'].includes(value('adj-time-estimate-unit')) &&
-      (value('adj-when') !== 'specific' || Boolean(value('adj-specific-time'))) &&
-      (!directions.includes('defence') || validDate('adj-defence-date')) &&
-      (!directions.includes('counterclaim') || validDate('adj-counterclaim-date')) &&
-      (!directions.includes('claimant-reply') || validDate('adj-claimant-reply-date')) &&
-      !(directions.includes('defence') && directions.includes('counterclaim'));
-  }
-  if (type === 'generally') {
-    const conditions = values('adj-gen');
-    const validPayment = (option: string, prefix: string): boolean =>
-      !conditions.includes(option) || (validMoney(`${prefix}-amount`) && validDate(`${prefix}-date`));
-    valid =
-      valid &&
-      validPayment('current-rent-plus', 'adj-gen-current-rent-plus') &&
-      validPayment('payments', 'adj-gen-payments') &&
-      validPayment('oneoff', 'adj-gen-oneoff') &&
-      !(conditions.includes('current-rent-plus') && conditions.includes('payments')) &&
-      (!conditions.includes('restore') || validDate('adj-gen-restore-date'));
-  }
-  if (value('costs') === 'yes') {
-    const amountFields: Record<string, string> = {
-      'def-pay-cl-fixed': 'costs-def-pay-cl-fixed-amount',
-      'def-pay-cl-summary': 'costs-def-pay-cl-summary-amount',
-      'cl-pay-def-summary': 'costs-cl-pay-def-summary-amount',
-    };
-    const amountField = amountFields[value('costs-choice')];
-    valid = valid && (!amountField || validMoney(amountField));
-  }
-  if (!valid) {
-    throw new HTTPError('The adjournment order has incomplete or invalid terms', 400);
-  }
-}
-
 function buildAttendanceParties(envelope: MakeOrderEnvelope): { id: string; label: string; type: string }[] {
   return [
     ...envelope.caseContext.claimants.map((party, index) => ({
@@ -308,7 +201,16 @@ function buildAttendanceParties(envelope: MakeOrderEnvelope): { id: string; labe
   ];
 }
 
-function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<string, unknown> {
+function buildPageModel(
+  req: Request,
+  envelope: MakeOrderEnvelope,
+  submitted?: {
+    orderType: MakeOrderType;
+    formData: Record<string, unknown>;
+    orderDocumentJson: string;
+    validationIssues: MakeOrderValidationIssue[];
+  }
+): Record<string, unknown> {
   const roles = getUserRoles(req);
   const headerModel = buildHeaderModel({
     xuiBaseUrl: config.get('xui.uri'),
@@ -318,7 +220,7 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
   const draftPayload = envelope.order.draftPayload ?? emptyDraftPayload();
   const draft = {
     ...caseFactsToFormData(envelope.caseContext.caseFacts),
-    ...draftPayload.formData,
+    ...(submitted?.formData ?? draftPayload.formData),
   };
   const draftValue = (name: string): unknown => draft[name];
   const draftChecked = (name: string, value: string): boolean => {
@@ -339,8 +241,9 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
     footerModel: buildFooterModel(),
     order: envelope.order,
     draft,
-    draftOrderType: draftPayload.orderType,
-    orderDocumentJson: JSON.stringify(draftPayload.documents?.[draftPayload.orderType] ?? null),
+    draftOrderType: submitted?.orderType ?? draftPayload.orderType,
+    orderDocumentJson:
+      submitted?.orderDocumentJson ?? JSON.stringify(draftPayload.documents?.[draftPayload.orderType] ?? null),
     draftValue,
     draftChecked,
     draftDate,
@@ -352,8 +255,24 @@ function buildPageModel(req: Request, envelope: MakeOrderEnvelope): Record<strin
     claimantCount: envelope.caseContext.claimants.length,
     defendantCount: envelope.caseContext.defendants.length,
     attendanceParties: buildAttendanceParties(envelope),
-    saved: req.query.saved === 'true',
-    submitted: req.query.submitted === 'true',
+    saved: req.query?.saved === 'true',
+    submitted: req.query?.submitted === 'true',
+    validationErrors: Object.fromEntries(
+      (submitted?.validationIssues ?? []).map(issue => [
+        issue.id,
+        {
+          text: issue.message,
+          attributes: { 'data-make-order-error': 'true' },
+        },
+      ])
+    ),
+    errorSummary: submitted?.validationIssues.length
+      ? {
+          titleText: 'There is a problem',
+          errorList: submitted.validationIssues.map(issue => ({ text: issue.message, href: `#${issue.id}` })),
+          attributes: { id: 'make-order-error-summary' },
+        }
+      : undefined,
   };
 }
 
@@ -430,11 +349,19 @@ export default function makeOrderRoutes(app: Application): void {
         if (orderAction === 'SUBMIT_FOR_REVIEW' && !REVIEWABLE_ORDER_TYPES.has(selectedOrderType)) {
           throw new HTTPError('This order type cannot be submitted for review', 400);
         }
-        if (orderAction === 'SUBMIT_FOR_REVIEW' && selectedOrderType === 'SUSPENDED_POSSESSION') {
-          validateSuspendedSubmission(formData);
-        }
-        if (orderAction === 'SUBMIT_FOR_REVIEW' && selectedOrderType === 'ADJOURNMENT') {
-          validateAdjournmentSubmission(formData);
+        const validationIssues =
+          orderAction === 'SUBMIT_FOR_REVIEW' ? validateMakeOrder(selectedOrderType, formData) : [];
+        if (validationIssues.length) {
+          const envelope = await loadMakeOrderEnvelope(accessToken, caseReference);
+          return res.status(400).render(
+            'make-order',
+            buildPageModel(req, envelope, {
+              orderType: selectedOrderType,
+              formData,
+              orderDocumentJson: typeof orderDocument === 'string' ? orderDocument : '',
+              validationIssues,
+            })
+          );
         }
         let selectedDocument: DocWeaveSnapshot | undefined;
         if (typeof orderDocument === 'string' && orderDocument) {

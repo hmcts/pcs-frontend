@@ -2,6 +2,7 @@
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "xui-header/macro.njk" import hmctsXuiHeader %}
 {% from "footer/macro.njk" import hmctsUiFooter %}
 {% from "macros/csrf.njk" import csrfProtection %}
@@ -11,7 +12,7 @@
 {% set htmlClasses = "pcs-make-order" %}
 
 {% block pageTitle %}
-  Make an order - HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {% if errorSummary %}Error: {% endif %}Make an order - HM Courts &amp; Tribunals Service &ndash; GOV.UK
 {% endblock %}
 
 {% block head %}
@@ -30,6 +31,10 @@
 {% endblock %}
 
 {% block content %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
   {% if saved %}
     {{ govukNotificationBanner({ type: "success", text: "Order draft saved" }) }}
   {% endif %}

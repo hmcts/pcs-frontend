@@ -13,7 +13,7 @@ const environment = new Environment(
   { autoescape: true }
 );
 
-function renderSuspended(draft: Draft = {}): void {
+function renderSuspended(draft: Draft = {}, validationErrors: Record<string, { text: string }> = {}): void {
   document.body.innerHTML = environment.render('make-order/tabs/_suspended.njk', {
     draftValue: (name: string) => draft[name],
     draftChecked: (name: string, value: string) => {
@@ -23,6 +23,7 @@ function renderSuspended(draft: Draft = {}): void {
     draftDate: (prefix: string) => ['day', 'month', 'year'].map(name => ({ name, value: draft[`${prefix}-${name}`] })),
     draftSelect: (items: Record<string, unknown>[], name: string, defaultValue?: string) =>
       items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) })),
+    validationErrors,
   });
 }
 
@@ -65,6 +66,22 @@ describe('suspended possession order fields', () => {
     expect(document.querySelector<HTMLInputElement>('#costs-summary-same-terms-amount')?.value).toBe('175');
     expect(document.querySelector('[data-suspended-costs-column]')?.hasAttribute('hidden')).toBe(false);
     expect(document.querySelector('.pcs-costs-columns')?.children).toHaveLength(2);
+  });
+
+  it('renders field-level GOV.UK errors', () => {
+    renderSuspended(
+      {},
+      {
+        'suspended-arrears': { text: 'Enter valid arrears' },
+        'suspended-payment-terms': { text: 'Select a one-off payment or instalments' },
+      }
+    );
+
+    expect(document.querySelector('#suspended-arrears')?.classList).toContain('govuk-input--error');
+    expect(document.querySelector('#suspended-arrears-error')?.textContent).toContain('Enter valid arrears');
+    expect(document.querySelector('#suspended-payment-terms-error')?.textContent).toContain(
+      'Select a one-off payment or instalments'
+    );
   });
 
   it('hides suspended-only costs for an outright order', () => {

@@ -10,6 +10,7 @@
   name: "outright-possession",
   classes: "govuk-radios--small",
   fieldset: { legend: { text: "Possession", classes: "govuk-fieldset__legend--s" } },
+  errorMessage: validationErrors["outright-possession"],
   items: [
     { value: "forthwith", text: "Possession forthwith", checked: draftChecked("outright-possession", "forthwith") },
     {
@@ -21,7 +22,8 @@
           id: "outright-by-date",
           items: draftDate("outright-by-date"),
           legend: "Date possession is ordered by",
-          legendHidden: true
+          legendHidden: true,
+          errorMessage: validationErrors["outright-by-date-day"]
         })
       }
     }
@@ -32,6 +34,7 @@
   name: "outright-grounds-type",
   classes: "govuk-radios--small govuk-radios--inline",
   fieldset: { legend: { text: "Grounds", classes: "govuk-fieldset__legend--s" } },
+  errorMessage: validationErrors["outright-grounds-type"],
   items: [
     { value: "mandatory", text: "Mandatory", checked: draftChecked("outright-grounds-type", "mandatory") },
     { value: "discretionary", text: "Discretionary", checked: draftChecked("outright-grounds-type", "discretionary") }
@@ -55,7 +58,8 @@
       id: "outright-mj-arrears",
       label: "Arrears",
       labelHidden: true,
-      value: draftValue("outright-mj-arrears")
+      value: draftValue("outright-mj-arrears"),
+      errorMessage: validationErrors["outright-mj-arrears"]
     }) }}
 
     {{ compact.copy("Interest") }}
@@ -63,7 +67,8 @@
       id: "outright-mj-interest",
       label: "Interest",
       labelHidden: true,
-      value: draftValue("outright-mj-interest")
+      value: draftValue("outright-mj-interest"),
+      errorMessage: validationErrors["outright-mj-interest"]
     }) }}
   {% endcall %}
 {% endset %}
@@ -73,7 +78,8 @@
     id: "outright-mj-balance-date",
     items: draftDate("outright-mj-balance-date"),
     legend: "Balance payment deadline",
-    legendHidden: true
+    legendHidden: true,
+    errorMessage: validationErrors["outright-mj-balance-date-day"]
   }) }}
 {% endset %}
 
@@ -84,14 +90,16 @@
       id: "outright-mj-lump-amount",
       label: "Payment amount",
       labelHidden: true,
-      value: draftValue("outright-mj-lump-amount")
+      value: draftValue("outright-mj-lump-amount"),
+      errorMessage: validationErrors["outright-mj-lump-amount"]
     }) }}
     {{ compact.copy("by") }}
     {{ compact.date({
       id: "outright-mj-lump-date",
       items: draftDate("outright-mj-lump-date"),
       legend: "Payment deadline",
-      legendHidden: true
+      legendHidden: true,
+      errorMessage: validationErrors["outright-mj-lump-date-day"]
     }) }}
   {% endcall %}
 
@@ -117,7 +125,8 @@
       id: "outright-mj-inst-amount",
       label: "Instalment amount",
       labelHidden: true,
-      value: draftValue("outright-mj-inst-amount")
+      value: draftValue("outright-mj-inst-amount"),
+      errorMessage: validationErrors["outright-mj-inst-amount"]
     }) }}
     {{ govukSelect({
       id: "outright-mj-inst-freq",
@@ -126,14 +135,16 @@
       items: [
         { value: "weekly", text: "Weekly", selected: draftValue("outright-mj-inst-freq") == "weekly" },
         { value: "monthly", text: "Monthly", selected: draftValue("outright-mj-inst-freq") != "weekly" }
-      ]
+      ],
+      errorMessage: validationErrors["outright-mj-inst-freq"]
     }) }}
     {{ compact.copy("the first instalment to be paid on or before") }}
     {{ compact.date({
       id: "outright-mj-inst-date",
       items: draftDate("outright-mj-inst-date"),
       legend: "First instalment deadline",
-      legendHidden: true
+      legendHidden: true,
+      errorMessage: validationErrors["outright-mj-inst-date-day"]
     }) }}
   {% endcall %}
 {% endset %}
@@ -144,6 +155,7 @@
     idPrefix: "outright-mj-plan",
     name: "outright-mj-plan",
     classes: "govuk-checkboxes--small",
+    errorMessage: validationErrors["outright-mj-plan"],
     items: [
       {
         value: "lump",
@@ -166,6 +178,7 @@
     idPrefix: "outright-mj-sections",
     name: "outright-mj-sections",
     classes: "govuk-checkboxes--small",
+    errorMessage: validationErrors["outright-mj-sections"],
     items: [
       {
         value: "arrears",
@@ -189,14 +202,16 @@
       id: "outright-use-occupation-rate",
       label: "Daily rate",
       inputmode: "decimal",
-      value: draftValue("outright-use-occupation-rate")
+      value: draftValue("outright-use-occupation-rate"),
+      errorMessage: validationErrors["outright-use-occupation-rate"]
     }) }}
     {{ compact.copy("From") }}
     {{ compact.date({
       id: "outright-use-occupation-from-date",
       items: draftDate("outright-use-occupation-from-date"),
       legend: "Damages start date",
-      legendHidden: true
+      legendHidden: true,
+      errorMessage: validationErrors["outright-use-occupation-from-date-day"]
     }) }}
   {% endcall %}
 {% endset %}

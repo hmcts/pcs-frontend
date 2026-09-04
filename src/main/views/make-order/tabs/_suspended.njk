@@ -11,7 +11,8 @@
     id: "suspended-by-date",
     items: draftDate("suspended-by-date"),
     legend: "Possession by",
-    legendHidden: true
+    legendHidden: true,
+    errorMessage: validationErrors["suspended-by-date-day"]
   }) }}
 </div>
 
@@ -22,15 +23,25 @@
     label: "Arrears",
     labelHidden: true,
     formGroupClasses: "govuk-!-margin-bottom-0",
-    value: draftValue("suspended-arrears")
+    value: draftValue("suspended-arrears"),
+    errorMessage: validationErrors["suspended-arrears"]
   }) }}
   {{ compact.copy("to be paid by") }}
 {% endcall %}
 
 {# A single payment and instalments may both apply; CaseMan keeps both rows visible. #}
+<div class="govuk-form-group{% if validationErrors['suspended-payment-terms'] %} govuk-form-group--error{% endif %}">
+  {% if validationErrors["suspended-payment-terms"] %}
+    {% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
+    {{ govukErrorMessage({
+      id: "suspended-payment-terms-error",
+      text: validationErrors["suspended-payment-terms"].text,
+      attributes: validationErrors["suspended-payment-terms"].attributes
+    }) }}
+  {% endif %}
 <div class="govuk-checkboxes govuk-checkboxes--small pcs-divided-options" data-module="govuk-checkboxes">
   <div class="govuk-checkboxes__item">
-    <input class="govuk-checkboxes__input" id="suspended-payment-terms" name="suspended-payment-terms" type="checkbox" value="one-off"{% if draftChecked("suspended-payment-terms", "one-off") %} checked{% endif %}>
+    <input class="govuk-checkboxes__input" id="suspended-payment-terms" name="suspended-payment-terms" type="checkbox" value="one-off"{% if validationErrors["suspended-payment-terms"] %} aria-describedby="suspended-payment-terms-error"{% endif %}{% if draftChecked("suspended-payment-terms", "one-off") %} checked{% endif %}>
     <label class="govuk-label govuk-checkboxes__label" for="suspended-payment-terms">Payment of<span class="govuk-visually-hidden"> a one-off amount</span></label>
   </div>
   {% call compact.row({ classes: "govuk-!-margin-left-7" }) %}
@@ -38,12 +49,14 @@
       id: "suspended-oneoff-amount",
       label: "One-off payment amount",
       labelHidden: true,
-      value: draftValue("suspended-oneoff-amount")
+      value: draftValue("suspended-oneoff-amount"),
+      errorMessage: validationErrors["suspended-oneoff-amount"]
     }) }}
     {{ compact.date({
       id: "suspended-oneoff-date",
       items: draftDate("suspended-oneoff-date"),
-      legend: "On or before"
+      legend: "On or before",
+      errorMessage: validationErrors["suspended-oneoff-date-day"]
     }) }}
   {% endcall %}
 
@@ -56,7 +69,8 @@
       id: "suspended-instalment-amount",
       label: "Instalment amount",
       labelHidden: true,
-      value: draftValue("suspended-instalment-amount")
+      value: draftValue("suspended-instalment-amount"),
+      errorMessage: validationErrors["suspended-instalment-amount"]
     }) }}
     {{ govukSelect({
       id: "suspended-instalment-frequency",
@@ -67,9 +81,11 @@
     {{ compact.date({
       id: "suspended-instalment-date",
       items: draftDate("suspended-instalment-date"),
-      legend: "with the first payment by"
+      legend: "with the first payment by",
+      errorMessage: validationErrors["suspended-instalment-date-day"]
     }) }}
   {% endcall %}
+</div>
 </div>
 
 {# Same terms is only available when the money-judgment option reveals it. #}
@@ -93,12 +109,14 @@
       id: "suspended-use-occupation-rate",
       label: "Daily rate",
       inputmode: "decimal",
-      value: draftValue("suspended-use-occupation-rate")
+      value: draftValue("suspended-use-occupation-rate"),
+      errorMessage: validationErrors["suspended-use-occupation-rate"]
     }) }}
     {{ compact.date({
       id: "suspended-use-occupation-from-date",
       items: draftDate("suspended-use-occupation-from-date"),
-      legend: "From"
+      legend: "From",
+      errorMessage: validationErrors["suspended-use-occupation-from-date-day"]
     }) }}
   {% endcall %}
 {% endset %}

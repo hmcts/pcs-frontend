@@ -257,6 +257,50 @@ describe('adjournment submission validation', () => {
 
     expect(document.querySelector('#make-order-error-summary')).toBeNull();
   });
+
+  it('removes a corrected checkbox error from aria-describedby', () => {
+    document.body.innerHTML = `
+      <form id="make-order-form" data-claimant-count="1" data-defendant-count="1">
+        <input id="order-type" value="ADJOURNMENT">
+        <textarea id="order-document">null</textarea>
+        <a href="#tab-adjournment" data-order-type="ADJOURNMENT">Adjournment</a>
+        <div id="order-preview-editor"><div id="order-editor"></div></div>
+        <p id="order-preview-unavailable"></p>
+        <input id="adj-type" name="adj-type" value="further-hearing">
+        <input name="adj-when" value="next-list">
+        ${dateInputs('adj-hearing-date-next-list', '21', '5', '2026')}
+        <input id="adj-time-estimate" name="adj-time-estimate" value="20">
+        <select id="adj-time-estimate-unit" name="adj-time-estimate-unit"><option value="minutes">minutes</option></select>
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset">
+            <legend class="govuk-fieldset__legend">Directions</legend>
+            <div class="govuk-checkboxes">
+              <input id="adj-directions" type="checkbox" name="adj-directions" value="defence" checked>
+              <input id="adj-directions-2" type="checkbox" name="adj-directions" value="counterclaim" checked>
+            </div>
+          </fieldset>
+        </div>
+        ${dateInputs('adj-defence-date', '22', '5', '2026')}
+        ${dateInputs('adj-counterclaim-date', '23', '5', '2026')}
+        <button id="submit-order-for-review" type="submit" value="SUBMIT_FOR_REVIEW">Submit</button>
+      </form>
+    `;
+    initMakeOrder();
+    const form = document.querySelector<HTMLFormElement>('form')!;
+    const submit = document.querySelector<HTMLButtonElement>('#submit-order-for-review')!;
+    const directions = document.querySelector<HTMLInputElement>('#adj-directions')!;
+    const counterclaim = document.querySelector<HTMLInputElement>('#adj-directions-2')!;
+    const submitForm = (): boolean =>
+      form.dispatchEvent(new SubmitEvent('submit', { bubbles: true, cancelable: true, submitter: submit }));
+
+    expect(submitForm()).toBe(false);
+    expect(directions.getAttribute('aria-describedby')).toContain('adj-directions-error');
+
+    counterclaim.checked = false;
+    expect(submitForm()).toBe(true);
+    expect(document.querySelector('#adj-directions-error')).toBeNull();
+    expect(directions.hasAttribute('aria-describedby')).toBe(false);
+  });
 });
 
 describe('adjournment option rows', () => {

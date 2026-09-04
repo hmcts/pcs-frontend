@@ -13,7 +13,7 @@ const environment = new Environment(
   { autoescape: true }
 );
 
-function renderAdjournment(draft: Draft = {}): void {
+function renderAdjournment(draft: Draft = {}, validationErrors: Record<string, { text: string }> = {}): void {
   document.body.innerHTML = environment.render('make-order/tabs/_adjournment.njk', {
     draftValue: (name: string) => draft[name],
     draftChecked: (name: string, value: string) => {
@@ -23,6 +23,7 @@ function renderAdjournment(draft: Draft = {}): void {
     draftDate: (prefix: string) => ['day', 'month', 'year'].map(name => ({ name, value: draft[`${prefix}-${name}`] })),
     draftSelect: (items: Record<string, unknown>[], name: string, defaultValue?: string) =>
       items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) })),
+    validationErrors,
   });
 }
 
@@ -64,5 +65,38 @@ describe('adjournment order fields', () => {
     );
     expect(document.querySelector<HTMLInputElement>('input[name="adj-format"][value="video"]')?.checked).toBe(true);
     expect(document.querySelector<HTMLSelectElement>('#adj-gen-current-rent-plus-frequency')?.value).toBe('weekly');
+  });
+
+  it('renders errors on the relevant grouped and individual controls', () => {
+    renderAdjournment(
+      {},
+      {
+        'adj-type': { text: 'Select an adjournment type' },
+        'adj-time-estimate': { text: 'Enter the time estimate as a whole number' },
+      }
+    );
+
+    expect(document.querySelector('#adj-type-error')?.textContent).toContain('Select an adjournment type');
+    expect(document.querySelector('#adj-time-estimate')?.classList).toContain('govuk-input--error');
+    expect(document.querySelector('#adj-time-estimate-error')?.textContent).toContain(
+      'Enter the time estimate as a whole number'
+    );
+  });
+
+  it('renders a directions conflict against directions rather than hearing format', () => {
+    renderAdjournment(
+      {},
+      {
+        'adj-directions': { text: 'Select either defence or defence and any counterclaim, not both' },
+      }
+    );
+
+    expect(document.querySelector('#adj-directions-error')?.textContent).toContain(
+      'Select either defence or defence and any counterclaim, not both'
+    );
+    expect(document.querySelector('#adj-directions-error')?.closest('.govuk-form-group')?.textContent).toContain(
+      'Directions'
+    );
+    expect(document.querySelector('#adj-format-error')).toBeNull();
   });
 });

@@ -42,7 +42,7 @@ function renderCompleteForm(initialDocument = '', orderType = 'OUTRIGHT_POSSESSI
 
       <input type="radio" name="recitals" value="yes" checked>
       <textarea id="recitals-text" name="recital">First recital\n\nSecond recital</textarea>
-      <input type="radio" name="outright-possession" value="by-date" checked>
+      <input type="radio" name="outright-possession" value="by" checked>
       <div id="outright-by-date">
         <input name="outright-by-date-day" value="12">
         <input name="outright-by-date-month" value="6">
@@ -86,7 +86,7 @@ function renderCompleteForm(initialDocument = '', orderType = 'OUTRIGHT_POSSESSI
       <input name="outright-mj-balance-date-month" value="8">
       <input name="outright-mj-balance-date-year" value="2027">
       <input id="outright-mj-inst-amount" name="outright-mj-inst-amount" value="100">
-      <input id="outright-mj-inst-freq" name="outright-mj-inst-freq" value="month">
+      <input id="outright-mj-inst-freq" name="outright-mj-inst-freq" value="monthly">
       <div id="outright-mj-inst-date">
         <input name="outright-mj-inst-date-day" value="1">
         <input name="outright-mj-inst-date-month" value="8">
@@ -96,7 +96,7 @@ function renderCompleteForm(initialDocument = '', orderType = 'OUTRIGHT_POSSESSI
       <div id="order-editor-toolbar"></div>
       <section id="order-preview-editor"><div id="order-editor"></div></section>
       <section id="order-preview-unavailable"></section>
-      <button id="submit-order-for-review" type="submit">Continue</button>
+      <button id="submit-order-for-review" type="submit" value="SUBMIT_FOR_REVIEW">Continue</button>
     </form>
   `;
 }
@@ -307,6 +307,27 @@ describe('make order preview', () => {
     );
     expect(generatedOrderText()).toEqual(expect.stringContaining('Alex Counsel, counsel for the claimant'));
     expect(generatedOrderText()).toEqual(expect.stringContaining('Sam Solicitor, solicitor for the defendant'));
+  });
+
+  it('blocks Send for review when required outright fields are missing', () => {
+    renderCompleteForm();
+    document.querySelector<HTMLInputElement>('[name="outright-possession"]')!.checked = false;
+    document.querySelector<HTMLInputElement>('[name="outright-grounds-type"]')!.value = '';
+    initMakeOrder();
+    const form = document.querySelector<HTMLFormElement>('#make-order-form')!;
+    const submit = document.querySelector<HTMLButtonElement>('#submit-order-for-review')!;
+
+    const submitted = form.dispatchEvent(
+      new SubmitEvent('submit', { bubbles: true, cancelable: true, submitter: submit })
+    );
+
+    expect(submitted).toBe(false);
+    expect(document.querySelector('#make-order-error-summary')?.textContent).toContain(
+      'Select when the defendant must give up possession'
+    );
+    expect(document.querySelector('#make-order-error-summary')?.textContent).toContain(
+      'Select mandatory or discretionary grounds'
+    );
     expect(generatedOrderText()).toEqual(expect.stringContaining('The Court read a letter from Taylor Defendant'));
     expect(generatedOrderText()).toEqual(expect.stringContaining('the third defendant did not attend the hearing'));
     expect(generatedOrderText()).toEqual(expect.stringContaining('First recital'));
