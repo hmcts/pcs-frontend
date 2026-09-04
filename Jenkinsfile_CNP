@@ -139,19 +139,15 @@ withPipeline(type, product, component) {
       archiveArtifacts artifacts: 'yarn-audit*issues*', allowEmptyArchive: true
     }
   }
-  onPerftest {
-    setPerftestEnvVars()
-  }
-
+  // On perftest there is no infrastructure/ folder and no enableDbMigration, and every stage
+  // after Checkout sits inside onPathToLive (PR/master/preview only). So Checkout is the only
+  // callback available to hang the smoke run off. Checkout runs on the aat agent - the primary
+  // agent is derived from nonProdName for any non-PR branch - and the aat managed identity has
+  // no access policy on the pcs-perftest vault, so withTeamSecrets must be run from an agent
+  // that does. withEnvironmentAgent hops to ubuntu-perftest, whose MI is on the vault.
   afterSuccess('checkout') {
     onPerftest {
-      runPerftestSmokeTests(yarnBuilder, secrets)
-    }
-  }
-
-  afterAlways('checkout') {
-    onPerftest {
-      archiveSmokeTestReports()
+      runPerftestSmokeTests(yarnBuilder, secrets, product)
     }
   }
 }
@@ -170,25 +166,30 @@ def archiveSmokeTestReports() {
   archiveAllureReport('Frontend Smoke Test Report')
 }
 
-def setPerftestEnvVars() {
-  env.ENVIRONMENT = 'perftest'
-  env.TEST_URL = "https://pcs.perftest.platform.hmcts.net/"
-  env.PCS_API_URL = "http://pcs-api-perftest.service.core-compute-perftest.internal"
-  env.DATA_STORE_URL_BASE = "http://ccd-data-store-api-perftest.service.core-compute-perftest.internal"
-}
-
-def runPerftestSmokeTests(yarnBuilder, Map secrets) {
+def runPerftestSmokeTests(yarnBuilder, Map secrets, String product) {
   def vaultConfig = new AppPipelineConfig()
   vaultConfig.vaultSecrets = secrets
 
-  withTeamSecrets(vaultConfig, 'perftest', 'pcs') {
-    withEnv([
-      "TEST_URL=https://pcs.perftest.platform.hmcts.net/",
-      "PCS_API_URL=http://pcs-api-perftest.service.core-compute-perftest.internal",
-      "DATA_STORE_URL_BASE=http://ccd-data-store-api-perftest.service.core-compute-perftest.internal",
-    ]) {
-      echo "Running smoke tests against ${env.TEST_URL}"
-      yarnBuilder.yarn('test:smoke')
+  stageWithEnvironmentAgent('Smoke Test - perftest', product, 'perftest') {
+    withTeamSecrets(vaultConfig, 'perftest', product) {
+      // ENVIRONMENT drives the IdAM/S2S/DM-store URLs the suite derives for itself in
+      // src/test/ui/config/global-setup.config.ts, so it must be set alongside the rest.
+      // withEnv rather than env.X = keeps the perftest URLs out of any later stage.
+      withEnv([
+        "ENVIRONMENT=perftest",
+        "TEST_URL=https://pcs.perftest.platform.hmcts.net/",
+        "PCS_API_URL=http://pcs-api-perftest.service.core-compute-perftest.internal",
+        "DATA_STORE_URL_BASE=http://ccd-data-store-api-perftest.service.core-compute-perftest.internal",
+        "CASE_TYPE_ID=PCS",
+        "NODE_CONFIG_ENV=test"
+      ]) {
+        echo "Running smoke tests against ${env.TEST_URL}"
+        try {
+          yarnBuilder.yarn('test:smoke')
+        } finally {
+          archiveSmokeTestReports()
+        }
+      }
     }
   }
 }
