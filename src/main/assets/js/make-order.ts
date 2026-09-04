@@ -135,6 +135,27 @@ export function initDatePills(form: HTMLFormElement): void {
   });
 }
 
+// Typing a date in a row implies choosing that row's option, so select it rather than
+// leaving the judge with a date recorded against an unselected radio. Selection is on
+// input, not focus, so tabbing through the rows does not silently change the answer.
+export function initOptionRows(form: HTMLFormElement): void {
+  form.addEventListener('input', event => {
+    const target = event.target;
+    if (!(target instanceof HTMLInputElement) && !(target instanceof HTMLSelectElement)) {
+      return;
+    }
+    const radio = target
+      .closest('.pcs-option-row__fields')
+      ?.closest('[data-option-row]')
+      ?.querySelector<HTMLInputElement>('input[type="radio"]');
+    if (!radio || radio.checked) {
+      return;
+    }
+    radio.checked = true;
+    radio.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+}
+
 export function initCaseFactsToggle(form: HTMLFormElement): void {
   const caseFacts = form.querySelector<HTMLElement>('[data-case-facts]');
   const toggle = caseFacts?.querySelector<HTMLButtonElement>('[data-case-facts-toggle]');
@@ -730,8 +751,8 @@ export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof 
           } else {
             content.text('The claim shall be adjourned to be heard on ');
           }
-          content.fact('adjournment-hearing-date', date(form, 'adj-hearing-date'), {
-            sourceId: 'adj-hearing-date',
+          content.fact('adjournment-hearing-date', date(form, `adj-hearing-date-${when}`), {
+            sourceId: `adj-hearing-date-${when}`,
           });
           if (when === 'specific') {
             content
@@ -1004,7 +1025,8 @@ function validateAdjournmentOrder(form: HTMLFormElement): OrderError[] {
 
   if (type === 'further-hearing') {
     const when = field(form, 'adj-when') || 'next-list';
-    add(hasValidDate(form, 'adj-hearing-date'), 'adj-hearing-date-day', 'Enter a valid adjournment date');
+    const hearingDate = `adj-hearing-date-${when}`;
+    add(hasValidDate(form, hearingDate), `${hearingDate}-day`, 'Enter a valid adjournment date');
     add(
       /^\d+$/.test(field(form, 'adj-time-estimate')) && Number(field(form, 'adj-time-estimate')) > 0,
       'adj-time-estimate',
@@ -1118,6 +1140,7 @@ export function initMakeOrder(): void {
     return;
   }
   initDatePills(form);
+  initOptionRows(form);
   initCaseFactsToggle(form);
   defaultDate(form, 'suspended-by-date', 14);
   const mount = document.querySelector<HTMLElement>('#order-editor');

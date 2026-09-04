@@ -8,41 +8,68 @@
 <h3 class="govuk-heading-m">Adjournment</h3>
 
 {#
-  One shared hearing date sits directly beneath the options, indented to the radio
-  labels, so it reads as part of the choice above without a nested conditional reveal.
-  A single field also stops unselected options leaving stale dates in the draft.
+  Each listing option carries its own date on the same row as its radio, so a judge
+  can fill the date in one movement rather than selecting an option and then moving
+  to a shared field. Typing in a row selects that row's radio (initOptionRows in
+  make-order.ts), and only the selected option's date is read into the order.
+  Hidden legends keep every control named for assistive technology.
 #}
+{% macro adjournWhenRow(params) %}
+  <div class="pcs-option-row" data-option-row>
+    <div class="govuk-radios__item pcs-option-row__choice">
+      <input class="govuk-radios__input" id="{{ params.id }}" name="adj-when" type="radio" value="{{ params.value }}"{% if params.checked %} checked{% endif %}>
+      <label class="govuk-label govuk-radios__label" for="{{ params.id }}">{{ params.text }}</label>
+    </div>
+    <div class="pcs-option-row__fields">
+      {{ compact.date({
+        id: "adj-hearing-date-" + params.value,
+        items: draftDate("adj-hearing-date-" + params.value),
+        legend: params.text,
+        legendHidden: true
+      }) }}
+      {{ params.extraHtml | safe if params.extraHtml }}
+    </div>
+  </div>
+{% endmacro %}
+
+{# Only a specific date has a time; the other options are listed by the court. #}
+{% set adjournSpecificTimeHtml %}
+  {{ govukInput({
+    id: "adj-specific-time",
+    name: "adj-specific-time",
+    label: { text: "Time of hearing" },
+    hint: { text: "For example, 10:30am" },
+    classes: "govuk-input--width-5",
+    formGroup: { classes: "pcs-option-row__time" },
+    spellcheck: false,
+    value: draftValue("adj-specific-time")
+  }) }}
+{% endset %}
+
 {% set adjournFurtherHearingHtml %}
   <div class="govuk-form-group">
     <fieldset class="govuk-fieldset" role="group">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Adjourned for further hearing conditions</legend>
-      {{ govukRadios({
-        idPrefix: "adj-when",
-        name: "adj-when",
-        classes: "govuk-radios--small",
-        items: [
-          { value: "next-list", text: "Adjourned to next available possession list after", checked: draftChecked("adj-when", "next-list") or not draftValue("adj-when") },
-          { value: "next-date", text: "Adjourned to next available date (non-possession list) after", checked: draftChecked("adj-when", "next-date") },
-          { value: "specific", text: "Adjourned to specific date", checked: draftChecked("adj-when", "specific") }
-        ]
-      }) }}
-      <div class="pcs-option-fields">
-        {% call compact.row() %}
-          {{ compact.date({
-            id: "adj-hearing-date",
-            items: draftDate("adj-hearing-date"),
-            legend: "Hearing date"
-          }) }}
-          {{ govukInput({
-            id: "adj-specific-time",
-            name: "adj-specific-time",
-            label: { text: "Time of hearing" },
-            hint: { text: "For example, 10:30am" },
-            classes: "govuk-input--width-5",
-            spellcheck: false,
-            value: draftValue("adj-specific-time")
-          }) }}
-        {% endcall %}
+      <div class="govuk-radios govuk-radios--small pcs-option-rows">
+        {{ adjournWhenRow({
+          id: "adj-when",
+          value: "next-list",
+          text: "Adjourned to next available possession list after",
+          checked: draftChecked("adj-when", "next-list") or not draftValue("adj-when")
+        }) }}
+        {{ adjournWhenRow({
+          id: "adj-when-2",
+          value: "next-date",
+          text: "Adjourned to next available date (non-possession list) after",
+          checked: draftChecked("adj-when", "next-date")
+        }) }}
+        {{ adjournWhenRow({
+          id: "adj-when-3",
+          value: "specific",
+          text: "Adjourned to specific date",
+          checked: draftChecked("adj-when", "specific"),
+          extraHtml: adjournSpecificTimeHtml
+        }) }}
       </div>
     </fieldset>
   </div>

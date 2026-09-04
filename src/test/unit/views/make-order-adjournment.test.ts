@@ -34,7 +34,9 @@ describe('adjournment order fields', () => {
     expect(document.querySelector<HTMLInputElement>('input[name="adj-when"][value="next-list"]')?.checked).toBe(true);
     expect(document.querySelector<HTMLSelectElement>('#adj-time-estimate-unit')?.value).toBe('minutes');
     expect(document.querySelector<HTMLInputElement>('input[name="adj-format"][value="in-person"]')?.checked).toBe(true);
-    expect(document.querySelector('#adj-hearing-date #adj-hearing-date-day')).not.toBeNull();
+    expect(document.querySelector('#adj-hearing-date-next-list #adj-hearing-date-next-list-day')).not.toBeNull();
+    expect(document.querySelector('#adj-hearing-date-next-date #adj-hearing-date-next-date-day')).not.toBeNull();
+    expect(document.querySelector('#adj-hearing-date-specific #adj-hearing-date-specific-day')).not.toBeNull();
     expect(document.querySelector('#adj-time-estimate-group #adj-time-estimate-unit')).not.toBeNull();
     expect(document.querySelector('#adj-format-group input[name="adj-format"]')).not.toBeNull();
     expect(document.querySelector<HTMLSelectElement>('#adj-gen-current-rent-plus-frequency')?.value).toBe('monthly');
@@ -45,7 +47,7 @@ describe('adjournment order fields', () => {
     renderAdjournment({
       'adj-type': 'further-hearing',
       'adj-when': 'specific',
-      'adj-hearing-date-day': '21',
+      'adj-hearing-date-specific-day': '21',
       'adj-time-estimate-unit': 'hours',
       'adj-format': ['video', 'telephone'],
       'adj-gen-current-rent-plus-frequency': 'weekly',
@@ -55,7 +57,7 @@ describe('adjournment order fields', () => {
       true
     );
     expect(document.querySelector<HTMLInputElement>('input[name="adj-when"][value="specific"]')?.checked).toBe(true);
-    expect(document.querySelector<HTMLInputElement>('#adj-hearing-date-day')?.value).toBe('21');
+    expect(document.querySelector<HTMLInputElement>('#adj-hearing-date-specific-day')?.value).toBe('21');
     expect(document.querySelector<HTMLSelectElement>('#adj-time-estimate-unit')?.value).toBe('hours');
     expect(document.querySelector<HTMLInputElement>('input[name="adj-format"][value="in-person"]')?.checked).toBe(
       false

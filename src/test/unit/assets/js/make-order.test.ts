@@ -374,9 +374,9 @@ describe('make order preview', () => {
       `
         <input name="adj-type" value="further-hearing">
         <input name="adj-when" value="next-date">
-        <input name="adj-hearing-date-day" value="21">
-        <input name="adj-hearing-date-month" value="5">
-        <input name="adj-hearing-date-year" value="2026">
+        <input name="adj-hearing-date-next-date-day" value="21">
+        <input name="adj-hearing-date-next-date-month" value="5">
+        <input name="adj-hearing-date-next-date-year" value="2026">
         <input name="adj-time-estimate" value="1">
         <input name="adj-time-estimate-unit" value="hours">
       `

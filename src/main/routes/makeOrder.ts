@@ -258,7 +258,7 @@ function validateAdjournmentSubmission(formData: Record<string, unknown>): void 
     valid =
       valid &&
       ['next-list', 'next-date', 'specific'].includes(value('adj-when') || 'next-list') &&
-      validDate('adj-hearing-date') &&
+      validDate(`adj-hearing-date-${value('adj-when') || 'next-list'}`) &&
       /^[1-9]\d*$/.test(value('adj-time-estimate')) &&
       ['minutes', 'hours'].includes(value('adj-time-estimate-unit')) &&
       (value('adj-when') !== 'specific' || Boolean(value('adj-specific-time'))) &&
