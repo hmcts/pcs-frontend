@@ -100,7 +100,7 @@ test.afterEach(async () => {
 
 //selectNoticeDetails= defendant not sure, repaymentsAgreed - no - InstalmentPayments - Yes, Instalments
 test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
-  test('Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @multiDefendant @PR @LR', async () => {
+  test('Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @multiDefendant @PR @LR @regression', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -267,7 +267,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Wales - Other contract - Rent Arrears @LR', async () => {
+  test('Wales - Other contract - Rent Arrears @LR @regression', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -508,7 +508,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Wales - Secure contract - NonRentArrears - LR @PR @singleDefendant @LR', async () => {
+  test('Wales - Secure contract - NonRentArrears - LR @PR @singleDefendant @LR @regression', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -801,7 +801,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - NoticeDetails - Yes - NoticeDate - Known @LR @noticeDetailsNo', async () => {
+  test('RentArrears - NoticeDetails - Yes - NoticeDate - Known @LR @noticeDetailsNo @regression', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
