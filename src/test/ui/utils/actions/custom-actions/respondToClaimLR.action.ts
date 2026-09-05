@@ -116,7 +116,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       ['confirmDefendantDetailsLR', () => this.confirmDefendantDetailsLR(fieldName as actionRecord)],
       ['enterDateOfBirthDetailsLR', () => this.enterDateOfBirthDetailsLR(fieldName as actionRecord)],
       ['languageUsedLR', () => this.languageUsedLR(fieldName as actionRecord)],
-      ['selectStatementOfTruthRTCLR', () => this.selectStatementOfTruthRTCLR(fieldName as actionRecord)],
+      ['selectStatementOfTruthRTCLR', () => this.selectStatementOfTruthRTCLR(page, fieldName as actionRecord)],
       ['emailConfirmationLR', () => this.emailConfirmationLR(fieldName as actionRecord)],
       ['exemptLandlordLR', () => this.exemptLandlordLR(fieldName as actionRecord)],
       ['selectWrittenTermsLR', () => this.selectWrittenTermsLR(fieldName as actionRecord)],
@@ -177,7 +177,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       } else if (tenancyType === 'other') {
         await performValidation('text', {
           elementType: 'listItem',
-          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiDataWales.submitCaseRentOtherTenancy.otherLicenceTypeDetails}`,
+          text: `The claimant provided the following information about the defendant’s tenancy, occupation contract or licence agreement type: ${submitCaseApiDataWales.submitCaseRentOtherTenancy.otherLicenceTypeDetails}`,
         });
       }
     } else {
@@ -195,7 +195,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       } else if (tenancyType === 'other') {
         await performValidation('text', {
           elementType: 'listItem',
-          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+          text: `The claimant provided the following information about the defendant’s tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
         });
       }
     }
@@ -1077,14 +1077,20 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
     await performAction('clickButton', languageUsed.saveAndContinueButton);
   }
 
-  private async selectStatementOfTruthRTCLR(sot: actionRecord): Promise<void> {
+  private async selectStatementOfTruthRTCLR(page: Page, sot: actionRecord): Promise<void> {
     await performValidation('elementToBeVisible', endOfJourneyCYA.contemptOfCourtParagraph);
     await performAction('check', sot.checkBox);
     await performAction('inputText', endOfJourneyCYA.fullNameTextLabel, sot.firstName);
     await performAction('inputText', endOfJourneyCYA.nameOfFirmTextLabel, sot.firmName);
     await performAction('inputText', endOfJourneyCYA.positionOrOfficeHeldTextLabel, sot.position);
 
-    await performAction('clickButton', endOfJourneyCYA.submitButton);
+    await page.getByRole('button', { name: 'Submit', exact: true }).click({
+      noWaitAfter: true,
+    });
+    await page.locator('h1.govuk-panel__title').waitFor({
+      state: 'visible',
+      timeout: 30000,
+    });
   }
 
   private async selectUniversalCreditLR(universalCreditDateData: actionRecord): Promise<void> {

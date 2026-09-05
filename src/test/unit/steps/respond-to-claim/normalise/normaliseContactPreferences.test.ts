@@ -55,6 +55,10 @@ describe('normaliseContactPreferences', () => {
     expect(response.defendantResponses).toEqual({ contactByPhone: 'NO' });
   });
 
+  // Clearing of the stale party.textMessageNumber is owned by the BE
+  // (ClaimResponseService.saveContactPreferences). Normalisers must not touch
+  // defendantContactDetails.* — see normaliserContract.test.ts.
+
   it('is a no-op on empty response', () => {
     const response = {} as PossessionClaimResponse;
     normaliseContactPreferences(response);

@@ -27,8 +27,6 @@ import {
   doYouWantToUploadFilesToSupportYourCounterclaim,
   emailConfirmation,
   endOfJourneyCYA,
-  equalityAndDiversityEndLR,
-  equalityAndDiversityStart,
   exceptionalHardship,
   haveYouAppliedForUniversalCredit,
   howMuchAffordToPay,
@@ -283,10 +281,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       courtInfo: otherConsiderations.detailsTextInput,
     });
     await performAction('uploadAdditionalDocumentsLR');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
@@ -326,7 +320,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('NonRentArrears - AssuredTenancy - Something else - LR @nonRent @LR', async () => {
+  test('NonRentArrears - AssuredTenancy - Something else - LR @nonRent @LR @regression', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -450,10 +444,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       courtInfo: otherConsiderations.detailsTextInput,
     });
     await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.pdf'] });
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
@@ -495,7 +485,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @nonRent @LR', async () => {
+  test('NonRentArrears - AssuredTenancy - CounterClaim - Something else - Defendant need help - LR @nonRent @LR @regression', async () => {
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -623,10 +613,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       courtInfo: otherConsiderations.detailsTextInput,
     });
     await performAction('uploadAdditionalDocumentsLR');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
@@ -771,10 +757,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.pdf'] });
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
@@ -793,7 +775,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     );
   });
 
-  test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @PR @rentNonRent @LR', async () => {
+  test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @PR @rentNonRent @LR @regression @healthCheck', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -924,10 +906,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.pdf'] });
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
@@ -1020,10 +998,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.docx'] });
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
@@ -1138,10 +1112,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadAdditionalDocumentsLR');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
@@ -1161,7 +1131,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
   });
 
-  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @rent @LR', async () => {
+  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @rent @LR @regression', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -1214,6 +1184,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
     await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
+    await performAction('clickLink', counterclaimYouNeedToApplyForHelpWithYourFees.signOutLink);
   });
 
   test('Submitted defendant should not be visible on the representation screen @nonRent @LR', async () => {
@@ -1230,6 +1201,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       elementType: 'text',
       text: `${submittedUser.firstName} ${submittedUser.lastName}`,
     });
+    await performAction('clickLink', selectDefendant.signOutLink);
   });
 
   test('RentArrears - Defendant address known - No - LR @smoke @defendantAddressKnown @LR', async () => {
@@ -1426,14 +1398,19 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadAdditionalDocumentsLR');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
-    await performAction('languageUsed', {
-      question: languageUsed.mainHeader,
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
+    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('Existing draft response resumes to the saved journey @nonRent @LR', async () => {
@@ -1501,7 +1478,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
   });
 
-  test('Only one defendant with a draft goes to resume response @rentNonRent @singleDefendant @LR', async () => {
+  test('Only one defendant with a draft goes to resume response @rentNonRent @singleDefendant @LR @regression', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('createDraftResponseLR', pinUser);
 

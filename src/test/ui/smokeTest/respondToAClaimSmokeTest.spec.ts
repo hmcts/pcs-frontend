@@ -27,7 +27,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('clickButton', startNow.startNowButton);
 });
 
-test.describe('Respond to a claim - smoke test @health', async () => {
+test.describe('Respond to a claim - smoke test @sanity', async () => {
   test('Respond to a claim E2E Journey @sanity', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
   });

@@ -26,4 +26,5 @@ export const defendantNameConfirmation = {
   emojiLastNameErrorMessage: `Defendant’s last name must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   feedbackLink: `feedback`,
   pageSlug: `defendant-name-confirmation`,
+  signOutLink: `Sign out`,
 };
