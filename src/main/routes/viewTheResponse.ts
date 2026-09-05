@@ -27,7 +27,7 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
-import { findCaseDocumentById } from '@utils/documentUtils';
+import { extractCaseDocuments, findCaseDocumentById } from '@utils/documentUtils';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 import { RELEASE_1_2_ENABLED } from '@utils/respondToClaimFlags';
@@ -587,6 +587,21 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
   return { rows };
 }
 
+function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
+  const responses = caseData.possessionClaimResponse?.defendantResponses;
+
+  if (!responses?.counterClaim || isNo(responses.makeCounterClaim)) {
+    return null;
+  }
+
+  const documents = extractCaseDocuments(caseData as Record<string, unknown>);
+  const counterclaimPdf = documents.find(
+    doc => doc.categoryId === 'statementsOfCase' && doc.filename?.startsWith('Counterclaim - Defendant')
+  );
+
+  return counterclaimPdf?.id ?? null;
+}
+
 function resolveResponsePdfUrl(caseData: CcdCaseData, caseReference: string): string | undefined {
   const documentId = caseData.possessionClaimResponse?.responseDocumentId;
   if (!documentId) {
@@ -648,6 +663,11 @@ export default function viewTheResponseRoutes(app: Application): void {
         counterclaim: buildCounterclaim(t, caseData),
       };
 
+      const counterclaimPdfId = findCounterclaimPdfDocument(caseData);
+      const counterclaimPdfUrl = counterclaimPdfId
+        ? `/case/${caseReference}/view-documents/${counterclaimPdfId}`
+        : null;
+
       return res.render('view-the-response', {
         t,
         propertyAddress: formatAddress(caseData.propertyAddress),
@@ -658,6 +678,7 @@ export default function viewTheResponseRoutes(app: Application): void {
         ...sections,
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
+        counterclaimPdfUrl,
         responsePdfUrl: responsePdfEnabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
       });
     } catch (e) {
