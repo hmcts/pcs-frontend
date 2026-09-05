@@ -4,10 +4,10 @@
   "totalQuestion": "Beth yw'r cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth?",
   "contributionQuestion": "Faint mae'r diffynnydd yn ei dalu tuag at eu dyledion blaenoriaeth bob wythnos neu fis?",
   "amountHint": "Rhowch y cyfanswm mewn punnoedd a cheiniogau, er enghraifft £148.00 neu £148.50",
-  "frequencyQuestion": "Talu pob:",
+  "frequencyQuestion": "cyHow often does the defendant pay towards their priority debts?",
   "frequency": {
-    "week": "Wythnos",
-    "month": "Mis"
+    "week": "cyPaid every week",
+    "month": "cyPaid every month"
   },
   "errors": {
     "priorityDebtTotal": "Rhowch y cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth",
