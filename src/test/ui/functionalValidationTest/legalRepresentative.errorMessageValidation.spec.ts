@@ -341,7 +341,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
-      //showTenancyDocumentLink: true,
+      showTenancyDocumentLink: true,
     });
     await performAction('selectTenancyStartDateKnownLR', {
       option: tenancyDateDetails.yesRadioOption,
@@ -464,10 +464,6 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       option: otherConsiderations.noRadioOption,
     });
     await performAction('uploadAdditionalDocumentsLR');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsed', {
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
