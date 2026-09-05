@@ -68,7 +68,7 @@
     "body-parser": "2.3.0",
     "compression": "^1.8.1",
     "config": "4.4.2",
-    "connect-redis": "8.1.0",
+    "connect-redis": "10.0.0",
     "cookie-parser": "1.4.7",
     "csrf-sync": "4.2.1",
     "date-fns": "4.4.0",
