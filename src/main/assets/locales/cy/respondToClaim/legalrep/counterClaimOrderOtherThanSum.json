@@ -1,15 +1,15 @@
 {
-  "pageTitle": "cyClaim for something else",
-  "heading": "cyCounterclaim for an order other than a sum of money",
-  "infoParagraph1": "cyYou will be able to upload any evidence the defendant has on the next page.",
-  "infoParagraph2": "cyThe claimant will be able to see your answers.",
-  "characterCountHint": "cyFor example, \u2018for the landlord to conduct remedial works\u2019",
-  "otherOrderRequestFactsLabel": "cyWhat facts would they like the court to consider when deciding the claim?",
-  "otherOrderRequestDetailsLabel": "cyWhat orders are they asking for the court to make?",
+  "pageTitle": "Hawliad ar gyfer rhywbeth arall",
+  "heading": "Gwrth-hawliad am orchymyn heblaw swm o arian",
+  "infoParagraph1": "Byddwch yn gallu uwchlwytho unrhyw dystiolaeth sydd gan y diffynnydd ar y dudalen nesaf.",
+  "infoParagraph2": "Bydd yr hawlydd yn gallu gweld eich atebion.",
+  "characterCountHint": "Er enghraifft, 'i'r landlord wneud gwaith adfer'",
+  "otherOrderRequestFactsLabel": "Pa ffeithiau hoffen nhw i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
+  "otherOrderRequestDetailsLabel": "Pa orchymyn ydyn nhw'n gofyn i’r llys ei wneud?",
   "errors": {
-    "otherOrderRequestDetailsRequired": "cyEnter what orders they are asking the court to make",
-    "otherOrderRequestDetailsMaxLength": "cyWhat orders they are asking the court to make must be 6800 characters or less",
-    "otherOrderRequestFactsRequired": "cyEnter what facts they would like the court to consider when deciding the claim",
-    "otherOrderRequestFactsMaxLength": "cyWhat facts they would like the court to consider must be 6800 characters or less"
+    "otherOrderRequestDetailsRequired": "Nodwch pa orchmynion maent yn gofyn i’r llys eu gwneud",
+    "otherOrderRequestDetailsMaxLength": "Rhaid i unrhyw orchmynion maen nhw'n gofyn i'r llys eu gwneud fod yn 6800 nod neu lai",
+    "otherOrderRequestFactsRequired": "Nodwch pa ffeithiau hoffen nhw i'r llys eu hystyried wrth benderfynu ar yr hawliad",
+    "otherOrderRequestFactsMaxLength": "Rhaid i ba ffeithiau y dymunant i'r llys eu hystyried fod yn 6800 nod neu lai"
   }
 }
