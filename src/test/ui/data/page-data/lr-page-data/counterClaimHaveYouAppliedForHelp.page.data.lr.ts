@@ -12,10 +12,8 @@ export const counterClaimHaveYouAppliedForHelp = {
   exampleHiddenHintText: `For example, HWF-A1B-23C`,
   feedbackLink: `feedback`,
   pageSlug: `counter-claim-have-you-applied-for-help`,
-  /*
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfYouHaveAlreadyAppliedForHelpAdultsErrorMessage: `Select if you have already applied for help with your counterclaim fee?`,
   emojiTextInput: `👉 😄`,
   emojiErrorMessage: `Enter your Help with Fees reference number must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
-  */
 };
