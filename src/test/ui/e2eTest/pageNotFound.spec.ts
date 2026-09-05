@@ -6,6 +6,10 @@ const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
+  await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-enabled');
+  process.env.NOTICE_SERVED = 'YES';
+  process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
+  process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('navigateToUrl', home_url);
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('login');
@@ -20,21 +24,23 @@ test.describe('Error page to indicate Page Not Found error @nightly', () => {
     await performAction('navigateToUrl', home_url + '/page-not-found');
   });
 
-  // This test was written as part of the story HDPI-3883. A new story will update the error message screen with a “Contact Us” link.
-  // Keeping this here for reference only — please do not enable it.
-  test.skip('Invalid caseId validation', async () => {
-    await performAction('navigateToUrl', home_url + '/case/1234567891234567/respond-to-claim/start-now');
-    await performValidation('mainHeader', 'Sorry, we’re having technical problems');
-    await performValidation('text', { text: 'Please try again in a few minutes.', elementType: 'paragraph' });
+  test('Invalid caseId validation', async () => {
+    await performAction('navigateToUrl', home_url + '/case/1234567891234567/dashboard');
+    await performValidation('mainHeader', 'You do not have access to this page');
+    await performValidation('text', {
+      text: 'Contact us if you think you should have access, or if you need help with your case.',
+      elementType: 'paragraph',
+    });
   });
 
-  // This test was written as part of the story HDPI-3883. A new story will update the error message screen with a “Contact Us” link.
-  // Keeping this here for reference only — please do not enable it.
-  test.skip('Valid unmapped caseId validation', async () => {
+  test('Valid unmapped caseId validation', async () => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-    await performValidation('mainHeader', 'Sorry, we’re having technical problems');
-    await performValidation('text', { text: 'Please try again in a few minutes.', elementType: 'paragraph' });
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
+    await performValidation('mainHeader', 'You do not have access to this page');
+    await performValidation('text', {
+      text: 'Contact us if you think you should have access, or if you need help with your case.',
+      elementType: 'paragraph',
+    });
   });
 });
