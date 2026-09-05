@@ -21,7 +21,6 @@ export class PropertiesVolume {
         await propertiesVolume.addFromAzureVault(config, {
           pathToHelmChart: path.resolve(__dirname, '../../../../charts/pcs-frontend/values.yaml'),
           env: process.env.VAULT_ENV ?? 'aat',
-          // AAT Redis isn't reachable from a dev laptop; keep the local default.
           omit: ['redis-connection-string'],
         });
       } catch (err) {
