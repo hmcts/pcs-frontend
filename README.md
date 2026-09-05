@@ -6,7 +6,7 @@
 
 Running the application requires the following tools to be installed in your environment:
 
-- [Node.js](https://nodejs.org/) v22.0.0 or later
+- [Node.js](https://nodejs.org/) v22.0.0 or laterr
 - [yarn](https://yarnpkg.com/)
 - [Docker](https://www.docker.com)
 

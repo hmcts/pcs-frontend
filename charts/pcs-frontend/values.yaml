@@ -33,7 +33,7 @@ nodejs:
     CCD_URL: 'http://ccd-data-store-api-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal'
     OIDC_ISSUER: 'https://idam-web-public.{{ .Values.global.environment }}.platform.hmcts.net/o'
     # TODO: confirm the prod PCQ host before release. May need explicit override.
-    PCQ_URL: 'https://pcq.{{ .Values.global.environment }}.platform.hmcts.net'
+    PCQ_URL: 'https://pcq.demo.platform.hmcts.net'
     OTEL_SERVICE_NAME: 'pcs-frontend'
     OTEL_ENABLED: true
     XUI_BASE_URI: 'https://manage-case.{{ .Values.global.environment }}.platform.hmcts.net'
