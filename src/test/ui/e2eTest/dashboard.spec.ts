@@ -233,8 +233,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
     );
-    await performAction('reloadPage');
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 5000));
     await performAction('reloadPage');
     await performAction('verifyRespondToClaimNotificationAndTag', {
       notificationText: dashboard.respondedToClaimParagraph,
