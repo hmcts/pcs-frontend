@@ -309,6 +309,39 @@ describe('make order preview', () => {
     expect(generatedOrderText()).toEqual(expect.stringContaining('Sam Solicitor, solicitor for the defendant'));
   });
 
+  it('uses grammatical wording for monthly outright instalments', () => {
+    renderCompleteForm();
+
+    initMakeOrder();
+
+    expect(generatedOrderText()).toContain(
+      'by instalment payments of £100.00 every month, the first instalment to be paid on or before 1 August 2027'
+    );
+    expect(generatedOrderText()).not.toContain('every monthly');
+  });
+
+  it('uses grammatical wording for weekly outright instalments', () => {
+    renderCompleteForm();
+    document.querySelector<HTMLInputElement>('#outright-mj-inst-freq')!.value = 'weekly';
+
+    initMakeOrder();
+
+    expect(generatedOrderText()).toContain(
+      'by instalment payments of £100.00 every week, the first instalment to be paid on or before 1 August 2027'
+    );
+  });
+
+  it('omits the grounds details wording when no details are provided', () => {
+    renderCompleteForm();
+    document.querySelector<HTMLInputElement>('[name="outright-grounds-details"]')!.value = '';
+
+    initMakeOrder();
+
+    expect(generatedOrderText()).toContain('This order for possession was made on mandatory grounds.');
+    expect(generatedOrderText()).not.toContain('grounds, namely');
+    expect(generatedOrderText()).not.toContain('[grounds not provided]');
+  });
+
   it('blocks Send for review when required outright fields are missing', () => {
     renderCompleteForm();
     document.querySelector<HTMLInputElement>('[name="outright-possession"]')!.checked = false;
@@ -450,7 +483,7 @@ describe('make order preview', () => {
     initMakeOrder();
 
     expect(generatedOrderText()).toEqual(expect.stringContaining('[grounds type not provided]'));
-    expect(generatedOrderText()).toEqual(expect.stringContaining('[grounds not provided]'));
+    expect(generatedOrderText()).not.toEqual(expect.stringContaining('[grounds not provided]'));
     expect(generatedOrderText()).toEqual(expect.stringContaining('forthwith'));
     expect(generatedOrderText()).toEqual(expect.stringContaining('[date not provided]'));
     expect(generatedOrderText()).toEqual(expect.stringContaining('[amount not provided]'));

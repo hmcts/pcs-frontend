@@ -409,16 +409,19 @@ function buildOutrightOrder(form: HTMLFormElement) {
         }
       });
       list.item('grounds', content => {
+        const groundsDetails = field(form, 'outright-grounds-details');
         content
           .text('This order for possession was made on ')
           .fact('type', field(form, 'outright-grounds-type') || '[grounds type not provided]', {
             sourceId: 'outright-grounds-type',
           })
-          .text(' grounds, namely ')
-          .fact('details', field(form, 'outright-grounds-details') || '[grounds not provided]', {
+          .text(' grounds');
+        if (groundsDetails) {
+          content.text(', namely ').fact('details', groundsDetails, {
             sourceId: 'outright-grounds-details',
-          })
-          .text('.');
+          });
+        }
+        content.text('.');
       });
       if (hasMoneyJudgmentArrears) {
         list.item('money-judgment', content => {
@@ -481,16 +484,17 @@ function buildOutrightOrder(form: HTMLFormElement) {
             content.text(', and ');
           }
           if (selected(form, 'outright-mj-plan', 'instalments')) {
+            const frequency = field(form, 'outright-mj-inst-freq') === 'weekly' ? 'week' : 'month';
             content
               .text('by instalment payments of £')
               .fact('instalment-amount', money(field(form, 'outright-mj-inst-amount')), {
                 sourceId: 'outright-mj-inst-amount',
               })
               .text(' every ')
-              .fact('instalment-frequency', field(form, 'outright-mj-inst-freq') || '[frequency not provided]', {
+              .fact('instalment-frequency', frequency, {
                 sourceId: 'outright-mj-inst-freq',
               })
-              .text(', first payment by ')
+              .text(', the first instalment to be paid on or before ')
               .fact('instalment-date', date(form, 'outright-mj-inst-date'), {
                 sourceId: 'outright-mj-inst-date',
               });
