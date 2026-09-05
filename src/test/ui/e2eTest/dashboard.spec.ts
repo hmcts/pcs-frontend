@@ -234,6 +234,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
     );
     await performAction('reloadPage');
+    await performAction('reloadPage');
     await performAction('verifyRespondToClaimNotificationAndTag', {
       notificationText: dashboard.respondedToClaimParagraph,
       respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
