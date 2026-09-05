@@ -231,7 +231,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
 
   private async selectTenancyStartDateKnownLR(tenancyStartDateData: actionRecord): Promise<void> {
     await performValidation('text', {
-      elementType: 'paragraph',
+      elementType: 'subHeader',
       text: tenancyDateDetails.getDetailsGivenByParagraph(),
     });
     this.recordAnswer(tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion, tenancyStartDateData.option);

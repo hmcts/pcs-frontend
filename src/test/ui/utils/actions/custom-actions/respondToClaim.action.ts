@@ -781,7 +781,7 @@ export class RespondToClaimAction implements IAction {
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
     await performValidation('text', {
-      elementType: 'paragraph',
+      elementType: 'subHeader',
       text: tenancyDateDetails.getDetailsGivenByParagraph(),
     });
     this.recordAnswer(tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion, tenancyStartDateData.option);
