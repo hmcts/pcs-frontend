@@ -1,5 +1,6 @@
 import { IValidation } from '../interfaces';
 import {
+  DefendantNameConsistencyValidation,
   ErrorMessageValidation,
   PageContentValidation,
   PageNavigationValidation,
@@ -40,6 +41,7 @@ export class ValidationRegistry {
     ['autoValidatePageContent', new PageContentValidation()],
     ['pageNavigation', new PageNavigationValidation()],
     ['inputTextValue', new InputTextValueValidation()],
+    ['defendantNameConsistency', new DefendantNameConsistencyValidation()],
     ['validateDocumentUnderSection', new ValidateDocumentUnderSectionValidation()],
     ['viewClaimOrResponseTable', new ViewClaimOrResponseTableValidation()],
     ['viewClaimHeaderDetails', new ViewClaimHeaderDetailsValidation()],
