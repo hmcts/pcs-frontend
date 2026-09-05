@@ -177,7 +177,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       } else if (tenancyType === 'other') {
         await performValidation('text', {
           elementType: 'listItem',
-          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiDataWales.submitCaseRentOtherTenancy.otherLicenceTypeDetails}`,
+          text: `The claimant provided the following information about the defendant’s tenancy, occupation contract or licence agreement type: ${submitCaseApiDataWales.submitCaseRentOtherTenancy.otherLicenceTypeDetails}`,
         });
       }
     } else {
@@ -195,7 +195,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       } else if (tenancyType === 'other') {
         await performValidation('text', {
           elementType: 'listItem',
-          text: `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
+          text: `The claimant provided the following information about the defendant’s tenancy, occupation contract or licence agreement type: ${submitCaseApiData.submitCasePayloadOtherTenancy.tenancy_DetailsOfOtherTypeOfTenancyLicence}`,
         });
       }
     }
