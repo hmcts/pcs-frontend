@@ -2,7 +2,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
-{% import "make-order/_compact.njk" as compact %}
+{% import "make-order/_compact.njk" as compact with context %}
 
 {% set tenancyTypes = [
   { value: "ASSURED_TENANCY", text: "Assured tenancy" },
@@ -60,15 +60,13 @@
       {{ compact.money({
         id: "arrears-notice",
         label: "Arrears at notice",
-        labelClasses: "govuk-label--s",
-        value: draftValue("arrears-notice")
+        labelClasses: "govuk-label--s"
       }) }}
 
       {{ compact.money({
         id: "current-rent",
         label: "Current rent",
-        labelClasses: "govuk-label--s",
-        value: draftValue("current-rent")
+        labelClasses: "govuk-label--s"
       }) }}
 
       {{ govukSelect({
@@ -89,8 +87,7 @@
       {{ compact.money({
         id: "arrears-issue",
         label: "Arrears on issue",
-        labelClasses: "govuk-label--s",
-        value: draftValue("arrears-issue")
+        labelClasses: "govuk-label--s"
       }) }}
 
       {{ govukDateInput({
@@ -110,15 +107,13 @@
       {{ compact.money({
         id: "last-payment",
         label: "Last payment",
-        labelClasses: "govuk-label--s",
-        value: draftValue("last-payment")
+        labelClasses: "govuk-label--s"
       }) }}
 
       {{ compact.money({
         id: "arrears-today",
         label: "Arrears today",
-        labelClasses: "govuk-label--s",
-        value: draftValue("arrears-today")
+        labelClasses: "govuk-label--s"
       }) }}
     </div>
 

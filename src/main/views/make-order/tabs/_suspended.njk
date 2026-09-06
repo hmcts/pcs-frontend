@@ -1,6 +1,6 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
-{% import "make-order/_compact.njk" as compact %}
+{% import "make-order/_compact.njk" as compact with context %}
 {% import "make-order/_payment-frequencies.njk" as options %}
 
 <h3 class="govuk-heading-m">Suspended possession</h3>
@@ -9,10 +9,8 @@
   <span class="govuk-label govuk-label--s pcs-inline-date__label" aria-hidden="true">Possession by</span>
   {{ compact.date({
     id: "suspended-by-date",
-    items: draftDate("suspended-by-date"),
     legend: "Possession by",
-    legendHidden: true,
-    errorMessage: validationErrors["suspended-by-date-day"]
+    legendHidden: true
   }) }}
 </div>
 
@@ -22,9 +20,7 @@
     id: "suspended-arrears",
     label: "Arrears",
     labelHidden: true,
-    formGroupClasses: "govuk-!-margin-bottom-0",
-    value: draftValue("suspended-arrears"),
-    errorMessage: validationErrors["suspended-arrears"]
+    formGroupClasses: "govuk-!-margin-bottom-0"
   }) }}
   {{ compact.copy("to be paid by") }}
 {% endcall %}
@@ -48,15 +44,11 @@
     {{ compact.money({
       id: "suspended-oneoff-amount",
       label: "One-off payment amount",
-      labelHidden: true,
-      value: draftValue("suspended-oneoff-amount"),
-      errorMessage: validationErrors["suspended-oneoff-amount"]
+      labelHidden: true
     }) }}
     {{ compact.date({
       id: "suspended-oneoff-date",
-      items: draftDate("suspended-oneoff-date"),
-      legend: "On or before",
-      errorMessage: validationErrors["suspended-oneoff-date-day"]
+      legend: "On or before"
     }) }}
   {% endcall %}
 
@@ -68,9 +60,7 @@
     {{ compact.money({
       id: "suspended-instalment-amount",
       label: "Instalment amount",
-      labelHidden: true,
-      value: draftValue("suspended-instalment-amount"),
-      errorMessage: validationErrors["suspended-instalment-amount"]
+      labelHidden: true
     }) }}
     {{ govukSelect({
       id: "suspended-instalment-frequency",
@@ -80,9 +70,7 @@
     }) }}
     {{ compact.date({
       id: "suspended-instalment-date",
-      items: draftDate("suspended-instalment-date"),
-      legend: "with the first payment by",
-      errorMessage: validationErrors["suspended-instalment-date-day"]
+      legend: "with the first payment by"
     }) }}
   {% endcall %}
 </div>
@@ -108,15 +96,11 @@
     {{ compact.money({
       id: "suspended-use-occupation-rate",
       label: "Daily rate",
-      inputmode: "decimal",
-      value: draftValue("suspended-use-occupation-rate"),
-      errorMessage: validationErrors["suspended-use-occupation-rate"]
+      inputmode: "decimal"
     }) }}
     {{ compact.date({
       id: "suspended-use-occupation-from-date",
-      items: draftDate("suspended-use-occupation-from-date"),
-      legend: "From",
-      errorMessage: validationErrors["suspended-use-occupation-from-date-day"]
+      legend: "From"
     }) }}
   {% endcall %}
 {% endset %}
