@@ -116,6 +116,21 @@
     }) }}
   </div>
 
+  {% set directionItems = [] %}
+  {% for direction in [
+    { value: "defence", text: "The defendant must send a defence" },
+    { value: "counterclaim", text: "The defendant must send a defence and any counterclaim" },
+    { value: "claimant-reply", text: "The claimant must send a defence to the counterclaim and any reply" }
+  ] %}
+    {% set directionItems = directionItems.concat([{
+      value: direction.value,
+      text: direction.text,
+      checked: draftChecked("adj-directions", direction.value),
+      conditional: {
+        html: compact.date({ id: "adj-" + direction.value + "-date", legend: "By 4pm on" })
+      }
+    }]) %}
+  {% endfor %}
   {{ govukCheckboxes({
     idPrefix: "adj-directions",
     name: "adj-directions",
@@ -123,94 +138,28 @@
     formGroup: { classes: "pcs-section-break" },
     fieldset: { legend: { text: "Directions", classes: "govuk-fieldset__legend--s" } },
     errorMessage: validationErrors["adj-directions"],
-    items: [
-      {
-        value: "defence",
-        text: "The defendant must send a defence",
-        checked: draftChecked("adj-directions", "defence"),
-        conditional: {
-          html: compact.date({
-            id: "adj-defence-date",
-            legend: "By 4pm on"
-          })
-        }
-      },
-      {
-        value: "counterclaim",
-        text: "The defendant must send a defence and any counterclaim",
-        checked: draftChecked("adj-directions", "counterclaim"),
-        conditional: {
-          html: compact.date({
-            id: "adj-counterclaim-date",
-            legend: "By 4pm on"
-          })
-        }
-      },
-      {
-        value: "claimant-reply",
-        text: "The claimant must send a defence to the counterclaim and any reply",
-        checked: draftChecked("adj-directions", "claimant-reply"),
-        conditional: {
-          html: compact.date({
-            id: "adj-claimant-reply-date",
-            legend: "By 4pm on"
-          })
-        }
-      }
-    ]
+    items: directionItems
   }) }}
 {% endset %}
 
-{% set adjournGenCurrentRentPlusHtml %}
+{% macro paymentFields(option, amountLabel, instalments=true) %}
+  {% set prefix = "adj-gen-" + option %}
   {% call compact.row() %}
-    {{ compact.money({
-      id: "adj-gen-current-rent-plus-amount",
-      label: "Additional sum"
-    }) }}
-    {{ govukSelect({
-      id: "adj-gen-current-rent-plus-frequency",
-      name: "adj-gen-current-rent-plus-frequency",
-      label: { text: "How often" },
-      items: draftSelect(options.paymentFrequencies, "adj-gen-current-rent-plus-frequency", "monthly")
-    }) }}
+    {{ compact.money({ id: prefix + "-amount", label: amountLabel }) }}
+    {% if instalments %}
+      {{ govukSelect({
+        id: prefix + "-frequency",
+        name: prefix + "-frequency",
+        label: { text: "How often" },
+        items: draftSelect(options.paymentFrequencies, prefix + "-frequency", "monthly")
+      }) }}
+    {% endif %}
     {{ compact.date({
-      id: "adj-gen-current-rent-plus-date",
-      legend: "First payment by"
+      id: prefix + "-date",
+      legend: "First payment by" if instalments else "Payment by"
     }) }}
   {% endcall %}
-{% endset %}
-
-{% set adjournGenPaymentsHtml %}
-  {% call compact.row() %}
-    {{ compact.money({
-      id: "adj-gen-payments-amount",
-      label: "Payments of"
-    }) }}
-    {{ govukSelect({
-      id: "adj-gen-payments-frequency",
-      name: "adj-gen-payments-frequency",
-      label: { text: "How often" },
-      items: draftSelect(options.paymentFrequencies, "adj-gen-payments-frequency", "monthly")
-    }) }}
-    {{ compact.date({
-      id: "adj-gen-payments-date",
-      legend: "First payment by"
-    }) }}
-  {% endcall %}
-{% endset %}
-
-{% set adjournGenOneoffHtml %}
-  {% call compact.row() %}
-    {{ compact.money({
-      id: "adj-gen-oneoff-amount",
-      label: "Payment of"
-    }) }}
-    {{ compact.date({
-      id: "adj-gen-oneoff-date",
-      legend: "Payment by"
-    }) }}
-  {% endcall %}
-{% endset %}
+{% endmacro %}
 
 {% set adjournGenerallyHtml %}
   {{ govukCheckboxes({
@@ -224,19 +173,19 @@
         value: "current-rent-plus",
         text: "On payment of current rent plus an additional sum",
         checked: draftChecked("adj-gen", "current-rent-plus"),
-        conditional: { html: adjournGenCurrentRentPlusHtml }
+        conditional: { html: paymentFields("current-rent-plus", "Additional sum") }
       },
       {
         value: "payments",
         text: "On regular payments",
         checked: draftChecked("adj-gen", "payments"),
-        conditional: { html: adjournGenPaymentsHtml }
+        conditional: { html: paymentFields("payments", "Payments of") }
       },
       {
         value: "oneoff",
         text: "On a single payment",
         checked: draftChecked("adj-gen", "oneoff"),
-        conditional: { html: adjournGenOneoffHtml }
+        conditional: { html: paymentFields("oneoff", "Payment of", false) }
       },
       {
         value: "restore",
