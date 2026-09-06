@@ -261,8 +261,6 @@ function buildPageModel(
     propertyAddressDisplay: formatAddress(envelope.caseContext.propertyAddress),
     claimantNames: envelope.caseContext.claimants.map(party => party.name).join(', '),
     defendantNames: envelope.caseContext.defendants.map(party => party.name).join(', '),
-    claimantCount: envelope.caseContext.claimants.length,
-    defendantCount: envelope.caseContext.defendants.length,
     attendanceParties: buildAttendanceParties(envelope),
     saved: req.query?.saved === 'true',
     submitted: req.query?.submitted === 'true',
