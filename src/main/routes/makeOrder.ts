@@ -189,15 +189,21 @@ function caseFactsToFormData(caseFacts?: MakeOrderCaseFacts): Record<string, unk
   return formData;
 }
 
-function buildAttendanceParties(envelope: MakeOrderEnvelope): { id: string; label: string; type: string }[] {
+function buildAttendanceParties(
+  envelope: MakeOrderEnvelope
+): { id: string; partyId: string; name: string; label: string; type: string }[] {
   return [
     ...envelope.caseContext.claimants.map((party, index) => ({
       id: `claimant-${party.id}`,
+      partyId: party.id,
+      name: party.name,
       label: `Claimant ${index + 1}: ${party.name}`,
       type: 'claimant',
     })),
     ...envelope.caseContext.defendants.map((party, index) => ({
       id: `defendant-${party.id}`,
+      partyId: party.id,
+      name: party.name,
       label: `Defendant ${index + 1}: ${party.name}`,
       type: 'defendant',
     })),

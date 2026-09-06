@@ -2,40 +2,37 @@
  * @jest-environment jsdom
  */
 
-import {
-  buildSuspendedOrder,
-  initSuspendedMoneyOptions,
-  syncSuspendedOnlyCosts,
-} from '../../../../main/assets/js/make-order';
+import { initSuspendedMoneyOptions, syncSuspendedOnlyCosts } from '../../../../main/assets/js/make-order';
+import { buildSuspendedOrder } from '../../../../main/assets/js/make-order/wording/suspended';
 
-import { childTexts, findNode } from './docweaveTestUtils';
+import { childTexts, findNode, makeOrderData } from './docweaveTestUtils';
 
-function suspendedForm(paymentTerms: string[]): HTMLFormElement {
-  document.body.innerHTML = `
-    <form data-property-address="10 Test Street" data-claimant-count="1" data-defendant-count="1">
-      <input name="suspended-by-date-day" value="13">
-      <input name="suspended-by-date-month" value="5">
-      <input name="suspended-by-date-year" value="2026">
-      <input name="suspended-arrears" value="234">
-      <input type="checkbox" name="suspended-payment-terms" value="one-off" ${paymentTerms.includes('one-off') ? 'checked' : ''}>
-      <input name="suspended-oneoff-amount" value="234">
-      <input name="suspended-oneoff-date-day" value="27">
-      <input name="suspended-oneoff-date-month" value="5">
-      <input name="suspended-oneoff-date-year" value="2026">
-      <input type="checkbox" name="suspended-payment-terms" value="instalments" ${paymentTerms.includes('instalments') ? 'checked' : ''}>
-      <input name="suspended-instalment-amount" value="25">
-      <select name="suspended-instalment-frequency"><option value="monthly" selected>Monthly</option></select>
-      <input name="suspended-instalment-date-day" value="3">
-      <input name="suspended-instalment-date-month" value="6">
-      <input name="suspended-instalment-date-year" value="2026">
-    </form>
-  `;
-  return document.querySelector('form')!;
+function suspendedData(paymentTerms: string[], additionalAnswers: Record<string, string | string[]> = {}) {
+  return makeOrderData(
+    {
+      'suspended-by-date-day': '13',
+      'suspended-by-date-month': '5',
+      'suspended-by-date-year': '2026',
+      'suspended-arrears': '234',
+      'suspended-payment-terms': paymentTerms,
+      'suspended-oneoff-amount': '234',
+      'suspended-oneoff-date-day': '27',
+      'suspended-oneoff-date-month': '5',
+      'suspended-oneoff-date-year': '2026',
+      'suspended-instalment-amount': '25',
+      'suspended-instalment-frequency': 'monthly',
+      'suspended-instalment-date-day': '3',
+      'suspended-instalment-date-month': '6',
+      'suspended-instalment-date-year': '2026',
+      ...additionalAnswers,
+    },
+    { selectedControlIds: { 'costs-choice': 'costs-choice' } }
+  );
 }
 
 describe('suspended possession order generation', () => {
   it('rolls a single payment into the suspension clause', () => {
-    const generated = buildSuspendedOrder(suspendedForm(['one-off']));
+    const generated = buildSuspendedOrder(suspendedData(['one-off']));
     const suspension = findNode(generated, 'item:suspended-condition');
 
     expect(suspension.firstChild?.textContent).toContain(
@@ -48,7 +45,7 @@ describe('suspended possession order generation', () => {
   });
 
   it('uses nested lettered terms when both payment methods are selected', () => {
-    const generated = buildSuspendedOrder(suspendedForm(['one-off', 'instalments']));
+    const generated = buildSuspendedOrder(suspendedData(['one-off', 'instalments']));
     const suspension = findNode(generated, 'item:suspended-condition');
 
     expect(suspension.firstChild?.textContent).toMatch(/arrears of £234\.00 by:$/);
@@ -59,19 +56,23 @@ describe('suspended possession order generation', () => {
   });
 
   it('only suspends costs selected as payable on the same terms', () => {
-    const form = suspendedForm(['one-off']);
-    form.insertAdjacentHTML(
-      'beforeend',
-      '<input type="checkbox" name="costs" value="yes" checked><input id="costs-choice" type="radio" name="costs-choice" value="def-pay-cl-fixed" checked><input name="costs-def-pay-cl-fixed-amount" value="100">'
+    let generated = buildSuspendedOrder(
+      suspendedData(['one-off'], {
+        costs: 'yes',
+        'costs-choice': 'def-pay-cl-fixed',
+        'costs-def-pay-cl-fixed-amount': '100',
+      })
     );
-
-    let generated = buildSuspendedOrder(form);
     let suspension = findNode(generated, 'item:suspended-condition');
     expect(suspension.firstChild?.textContent).toMatch(/^Execution of the order for possession is suspended/);
 
-    form.querySelector<HTMLInputElement>('input[name="costs-choice"]')!.value = 'fixed-same-terms';
-    form.insertAdjacentHTML('beforeend', '<input name="costs-fixed-same-terms-amount" value="125">');
-    generated = buildSuspendedOrder(form);
+    generated = buildSuspendedOrder(
+      suspendedData(['one-off'], {
+        costs: 'yes',
+        'costs-choice': 'fixed-same-terms',
+        'costs-fixed-same-terms-amount': '125',
+      })
+    );
     suspension = findNode(generated, 'item:suspended-condition');
     expect(suspension.firstChild?.textContent).toMatch(
       /^Execution of the order for possession and enforcement of any order for costs are suspended/

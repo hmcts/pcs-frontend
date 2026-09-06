@@ -14,9 +14,12 @@ initPostcodeSelection();
 initPostcodeLookup();
 initSessionTimeout();
 initMultiFileUpload();
-initMakeOrder();
+const disposeMakeOrder = initMakeOrder();
 initCounterClaimPaymentChoice();
 
 if (module.hot) {
+  // Dispose the order editor first, otherwise the reloaded module mounts a second
+  // editor over the same element.
+  module.hot.dispose(() => disposeMakeOrder());
   module.hot.accept();
 }

@@ -15,13 +15,27 @@ describe('make order attendance fields', () => {
   it('gives each attendance row a stable fact-navigation target', () => {
     document.body.innerHTML = environment.render('make-order/_attendance.njk', {
       attendanceParties: [
-        { id: 'claimant-1', label: 'First claimant', type: 'claimant' },
-        { id: 'defendant-1', label: 'First defendant', type: 'defendant' },
+        {
+          id: 'claimant-1',
+          partyId: 'claimant-party-id',
+          name: 'Example Housing',
+          label: 'First claimant',
+          type: 'claimant',
+        },
+        {
+          id: 'defendant-1',
+          partyId: 'defendant-party-id',
+          name: 'Alex Example',
+          label: 'First defendant',
+          type: 'defendant',
+        },
       ],
       draft: {},
     });
 
     expect(document.querySelector('#claimant-1-attendance input[name="claimant-1-attendance"]')).not.toBeNull();
     expect(document.querySelector('#defendant-1-attendance input[name="defendant-1-attendance"]')).not.toBeNull();
+    expect(document.querySelector('#claimant-1-attendance')?.getAttribute('data-party-id')).toBe('claimant-party-id');
+    expect(document.querySelector('#claimant-1-attendance')?.getAttribute('data-party-name')).toBe('Example Housing');
   });
 });
