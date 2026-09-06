@@ -98,8 +98,7 @@
       text: "Send order to caseworker for review",
       name: "action",
       value: "SUBMIT_FOR_REVIEW",
-      attributes: { id: "submit-order-for-review" },
-      disabled: draftOrderType != "OUTRIGHT_POSSESSION" and draftOrderType != "SUSPENDED_POSSESSION" and draftOrderType != "ADJOURNMENT"
+      attributes: { id: "submit-order-for-review" }
     }) }}
     {{ govukButton({ text: "Save as draft", name: "action", value: "SAVE_DRAFT", classes: "govuk-button--secondary" }) }}
   </div>

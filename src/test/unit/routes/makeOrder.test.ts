@@ -429,7 +429,33 @@ describe('make order route', () => {
     expect(res.redirect).toHaveBeenCalledWith('https://manage-case.example.com/cases/case-details/1777027600017760');
   });
 
-  it('submits an outright possession document for review and returns to Manage Case', async () => {
+  it('rejects an unknown posted order type', async () => {
+    makeOrderRoute(app);
+    const handler = (app.post as jest.Mock).mock.calls[0][3] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
+    const next = jest.fn();
+
+    await handler(
+      {
+        params: { caseReference: '1777027600017760' },
+        session: { user: { accessToken: 'token', roles: ['caseworker-civil-judge'] } },
+        body: {
+          action: 'SAVE_DRAFT',
+          orderType: 'UNKNOWN',
+        },
+      } as unknown as Request,
+      {} as Response,
+      next
+    );
+
+    expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 400, message: 'The order type is invalid' }));
+    expect(ccdCaseService.submitCaseEvent).not.toHaveBeenCalled();
+  });
+
+  it('submits a strike-out/dismissal document for review and returns to Manage Case', async () => {
     makeOrderRoute(app);
     const handler = (app.post as jest.Mock).mock.calls[0][3] as (
       req: Request,
@@ -454,10 +480,8 @@ describe('make order route', () => {
           action: 'SUBMIT_FOR_REVIEW',
           orderId: makeOrderEnvelope.order.id,
           orderVersion: '2',
-          orderType: 'OUTRIGHT_POSSESSION',
+          orderType: 'STRIKE_OUT_DISMISSAL',
           orderDocument: JSON.stringify(orderDocument),
-          'outright-possession': 'forthwith',
-          'outright-grounds-type': 'mandatory',
           'hearing-notes': 'Final note',
         },
       } as unknown as Request,
@@ -473,13 +497,11 @@ describe('make order route', () => {
           version: 2,
           draftPayload: {
             version: 1,
-            orderType: 'OUTRIGHT_POSSESSION',
+            orderType: 'STRIKE_OUT_DISMISSAL',
             formData: {
-              'outright-possession': 'forthwith',
-              'outright-grounds-type': 'mandatory',
               'hearing-notes': 'Final note',
             },
-            documents: { OUTRIGHT_POSSESSION: orderDocument },
+            documents: { STRIKE_OUT_DISMISSAL: orderDocument },
           },
         },
       }),

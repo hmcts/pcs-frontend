@@ -445,25 +445,24 @@ describe('make order preview', () => {
     expect(generatedOrderText()).toContain('1 hour');
   });
 
-  it('shows unsupported order types and switches back to the outright editor', () => {
+  it('renders a blank strike-out document and switches back to the outright editor', () => {
     renderCompleteForm('not-json', 'STRIKE_OUT_DISMISSAL');
     initMakeOrder();
 
     const editorRegion = document.querySelector<HTMLElement>('#order-preview-editor');
-    const unavailable = document.querySelector<HTMLElement>('#order-preview-unavailable');
     const submit = document.querySelector<HTMLButtonElement>('#submit-order-for-review');
-    expect(editorRegion?.hidden).toBe(true);
-    expect(unavailable?.hidden).toBe(false);
-    expect(submit?.disabled).toBe(true);
-    expect(submit?.getAttribute('aria-disabled')).toBe('true');
+    expect(editorRegion?.hidden).toBe(false);
+    expect(submit?.disabled).toBe(false);
+    expect(currentOrder().generated).toEqual({
+      type: 'doc',
+      content: [{ type: 'paragraph', attrs: { id: 'paragraph:strike-out-dismissal' } }],
+    });
 
     document.querySelector<HTMLAnchorElement>('[data-order-type="OUTRIGHT_POSSESSION"]')?.click();
 
     expect(document.querySelector<HTMLInputElement>('#order-type')?.value).toBe('OUTRIGHT_POSSESSION');
     expect(editorRegion?.hidden).toBe(false);
-    expect(unavailable?.hidden).toBe(true);
     expect(submit?.disabled).toBe(false);
-    expect(submit?.getAttribute('aria-disabled')).toBe('false');
     expect(generatedOrderText()).toEqual(expect.stringContaining('IT IS ORDERED THAT'));
   });
 
