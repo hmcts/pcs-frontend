@@ -95,7 +95,6 @@ function renderCompleteForm(initialDocument = '', orderType = 'OUTRIGHT_POSSESSI
 
       <div id="order-editor-toolbar"></div>
       <section id="order-preview-editor"><div id="order-editor"></div></section>
-      <section id="order-preview-unavailable"></section>
       <button id="submit-order-for-review" type="submit" value="SUBMIT_FOR_REVIEW">Continue</button>
     </form>
   `;
