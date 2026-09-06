@@ -10,28 +10,25 @@ interface OrderDocument {
 
 function renderCompleteForm(initialDocument = '', orderType = 'OUTRIGHT_POSSESSION'): void {
   document.body.innerHTML = `
-    <form id="make-order-form"
-      data-property-address="10 Test Street"
-      data-claimants="Example Housing"
-      data-defendants="Alex Example">
+    <form id="make-order-form" data-property-address="10 Test Street">
       <input id="order-type" name="order-type" value="${orderType}">
       <textarea id="order-document">${initialDocument}</textarea>
       <a href="#outright" data-order-type="OUTRIGHT_POSSESSION">Outright</a>
       <a href="#suspended" data-order-type="SUSPENDED_POSSESSION">Suspended</a>
 
-      <div id="claimant-1-attendance" data-attendance-row data-party-kind="claimant" data-party-label="the first claimant">
+      <div id="claimant-1-attendance" data-attendance-row data-party-kind="claimant" data-party-id="claimant-1" data-party-name="Example Housing" data-party-label="the first claimant">
         <input type="radio" name="attendance-1" value="counsel" checked>
         <input type="text" value="Alex Counsel">
       </div>
-      <div id="defendant-1-attendance" data-attendance-row data-party-kind="defendant" data-party-label="the first defendant">
+      <div id="defendant-1-attendance" data-attendance-row data-party-kind="defendant" data-party-id="defendant-1" data-party-name="Alex Example" data-party-label="the first defendant">
         <input type="radio" name="attendance-2" value="solicitor" checked>
         <input type="text" value="Sam Solicitor">
       </div>
-      <div id="defendant-2-attendance" data-attendance-row data-party-kind="defendant" data-party-label="the second defendant">
+      <div id="defendant-2-attendance" data-attendance-row data-party-kind="defendant" data-party-id="defendant-2" data-party-name="Taylor Defendant" data-party-label="the second defendant">
         <input type="radio" name="attendance-3" value="letter-only" checked>
         <input type="text" value="Taylor Defendant">
       </div>
-      <div id="defendant-3-attendance" data-attendance-row data-party-kind="defendant" data-party-label="the third defendant">
+      <div id="defendant-3-attendance" data-attendance-row data-party-kind="defendant" data-party-id="defendant-3" data-party-name="Jordan Defendant" data-party-label="the third defendant">
         <input type="radio" name="attendance-4" value="not-present" checked>
         <input type="text">
       </div>
@@ -371,7 +368,11 @@ describe('make order preview', () => {
     const factsWithoutSources = facts
       .filter(fact => fact.getAttribute('role') !== 'link')
       .map(fact => fact.textContent);
-    expect(factsWithoutSources).toEqual(['10 Test Street', 'Alex Example', 'Example Housing']);
+    expect(factsWithoutSources).toEqual([
+      '10 Test Street',
+      'Alex Example, Taylor Defendant, Jordan Defendant',
+      'Example Housing',
+    ]);
 
     const grounds = facts.find(fact => fact.textContent === 'Ground 8');
     grounds?.click();

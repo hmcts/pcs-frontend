@@ -43,11 +43,7 @@
   {% endif %}
 
   <form method="post" novalidate id="make-order-form"
-        data-property-address="{{ propertyAddressDisplay }}"
-        data-claimants="{{ claimantNames }}"
-        data-defendants="{{ defendantNames }}"
-        data-claimant-count="{{ claimantCount }}"
-        data-defendant-count="{{ defendantCount }}">
+        data-property-address="{{ propertyAddressDisplay }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
   <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">

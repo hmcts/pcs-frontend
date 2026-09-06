@@ -2,36 +2,36 @@
  * @jest-environment jsdom
  */
 
-import { buildAdjournmentOrder, initOptionRows } from '../../../../main/assets/js/make-order';
+import { initOptionRows } from '../../../../main/assets/js/make-order';
+import { buildAdjournmentOrder } from '../../../../main/assets/js/make-order/wording/adjournment';
 
-import { childTexts, findNode } from './docweaveTestUtils';
-
-function renderForm(body: string, claimantCount = 1, defendantCount = 1): HTMLFormElement {
-  document.body.innerHTML = `<form data-claimant-count="${claimantCount}" data-defendant-count="${defendantCount}">${body}</form>`;
-  return document.querySelector('form')!;
-}
-
-function dateInputs(prefix: string, day: string, month: string, year: string): string {
-  return `<input name="${prefix}-day" value="${day}"><input name="${prefix}-month" value="${month}"><input name="${prefix}-year" value="${year}">`;
-}
+import { childTexts, findNode, makeOrderData } from './docweaveTestUtils';
 
 describe('adjournment order generation', () => {
   it('generates a further-hearing listing, directions and costs', () => {
-    const form = renderForm(`
-      <input name="adj-type" value="further-hearing">
-      <input name="adj-when" value="next-list">
-      ${dateInputs('adj-hearing-date-next-list', '21', '5', '2026')}
-      <input name="adj-time-estimate" value="20">
-      <input name="adj-time-estimate-unit" value="minutes">
-      <input type="checkbox" name="adj-directions" value="defence" checked>
-      ${dateInputs('adj-defence-date', '22', '5', '2026')}
-      <input type="checkbox" name="adj-directions" value="claimant-reply" checked>
-      ${dateInputs('adj-claimant-reply-date', '23', '5', '2026')}
-      <input type="checkbox" name="costs" value="yes" checked>
-      <input name="costs-choice" value="reserved">
-    `);
-
-    const generated = buildAdjournmentOrder(form);
+    const generated = buildAdjournmentOrder(
+      makeOrderData(
+        {
+          'adj-type': 'further-hearing',
+          'adj-when': 'next-list',
+          'adj-hearing-date-next-list-day': '21',
+          'adj-hearing-date-next-list-month': '5',
+          'adj-hearing-date-next-list-year': '2026',
+          'adj-time-estimate': '20',
+          'adj-time-estimate-unit': 'minutes',
+          'adj-directions': ['defence', 'claimant-reply'],
+          'adj-defence-date-day': '22',
+          'adj-defence-date-month': '5',
+          'adj-defence-date-year': '2026',
+          'adj-claimant-reply-date-day': '23',
+          'adj-claimant-reply-date-month': '5',
+          'adj-claimant-reply-date-year': '2026',
+          costs: 'yes',
+          'costs-choice': 'reserved',
+        },
+        { selectedControlIds: { 'costs-choice': 'costs-choice' } }
+      )
+    );
 
     expect(childTexts(findNode(generated, 'ordered-list:adjournment-clauses'))).toEqual([
       'The claim shall be adjourned to be heard on the next available possession list after 21 May 2026 with a time estimate of 20 minutes. Further details of the hearing will be provided by the court.',
@@ -42,19 +42,19 @@ describe('adjournment order generation', () => {
   });
 
   it('generates a specific hearing with singular duration and no hearing format wording', () => {
-    const form = renderForm(`
-      <input name="adj-type" value="further-hearing">
-      <input name="adj-when" value="specific">
-      ${dateInputs('adj-hearing-date-specific', '25', '5', '2026')}
-      <input name="adj-specific-time" value="10:30am">
-      <input name="adj-time-estimate" value="1">
-      <input name="adj-time-estimate-unit" value="hours">
-      <input type="checkbox" name="adj-format" value="in-person" checked>
-      <input type="checkbox" name="adj-format" value="video" checked>
-      <input type="checkbox" name="adj-format" value="telephone" checked>
-    `);
-
-    const generated = buildAdjournmentOrder(form);
+    const generated = buildAdjournmentOrder(
+      makeOrderData({
+        'adj-type': 'further-hearing',
+        'adj-when': 'specific',
+        'adj-hearing-date-specific-day': '25',
+        'adj-hearing-date-specific-month': '5',
+        'adj-hearing-date-specific-year': '2026',
+        'adj-specific-time': '10:30am',
+        'adj-time-estimate': '1',
+        'adj-time-estimate-unit': 'hours',
+        'adj-format': ['in-person', 'video', 'telephone'],
+      })
+    );
 
     expect(findNode(generated, 'item:adjournment-listing').textContent).toBe(
       'The claim shall be adjourned to be heard on 25 May 2026 at 10:30am with a time estimate of 1 hour.'
@@ -62,17 +62,21 @@ describe('adjournment order generation', () => {
   });
 
   it('generates non-possession listing and counterclaim direction wording', () => {
-    const form = renderForm(`
-      <input name="adj-type" value="further-hearing">
-      <input name="adj-when" value="next-date">
-      ${dateInputs('adj-hearing-date-next-date', '24', '5', '2026')}
-      <input name="adj-time-estimate" value="2">
-      <input name="adj-time-estimate-unit" value="hours">
-      <input type="checkbox" name="adj-directions" value="counterclaim" checked>
-      ${dateInputs('adj-counterclaim-date', '26', '5', '2026')}
-    `);
-
-    const generated = buildAdjournmentOrder(form);
+    const generated = buildAdjournmentOrder(
+      makeOrderData({
+        'adj-type': 'further-hearing',
+        'adj-when': 'next-date',
+        'adj-hearing-date-next-date-day': '24',
+        'adj-hearing-date-next-date-month': '5',
+        'adj-hearing-date-next-date-year': '2026',
+        'adj-time-estimate': '2',
+        'adj-time-estimate-unit': 'hours',
+        'adj-directions': 'counterclaim',
+        'adj-counterclaim-date-day': '26',
+        'adj-counterclaim-date-month': '5',
+        'adj-counterclaim-date-year': '2026',
+      })
+    );
 
     expect(findNode(generated, 'item:adjournment-listing').textContent).toContain(
       'next available date (non-possession list) after 24 May 2026'
@@ -83,24 +87,27 @@ describe('adjournment order generation', () => {
   });
 
   it('generates conditional general-adjournment terms with plural parties and strike-out wording', () => {
-    const form = renderForm(
-      `
-        <input name="adj-type" value="generally">
-        <input type="checkbox" name="adj-gen" value="current-rent-plus" checked>
-        <input name="adj-gen-current-rent-plus-amount" value="50">
-        <input name="adj-gen-current-rent-plus-frequency" value="weekly">
-        ${dateInputs('adj-gen-current-rent-plus-date', '3', '6', '2026')}
-        <input type="checkbox" name="adj-gen" value="oneoff" checked>
-        <input name="adj-gen-oneoff-amount" value="100">
-        ${dateInputs('adj-gen-oneoff-date', '4', '6', '2026')}
-        <input type="checkbox" name="adj-gen" value="restore" checked>
-        ${dateInputs('adj-gen-restore-date', '5', '6', '2026')}
-      `,
-      2,
-      2
+    const generated = buildAdjournmentOrder(
+      makeOrderData(
+        {
+          'adj-type': 'generally',
+          'adj-gen': ['current-rent-plus', 'oneoff', 'restore'],
+          'adj-gen-current-rent-plus-amount': '50',
+          'adj-gen-current-rent-plus-frequency': 'weekly',
+          'adj-gen-current-rent-plus-date-day': '3',
+          'adj-gen-current-rent-plus-date-month': '6',
+          'adj-gen-current-rent-plus-date-year': '2026',
+          'adj-gen-oneoff-amount': '100',
+          'adj-gen-oneoff-date-day': '4',
+          'adj-gen-oneoff-date-month': '6',
+          'adj-gen-oneoff-date-year': '2026',
+          'adj-gen-restore-date-day': '5',
+          'adj-gen-restore-date-month': '6',
+          'adj-gen-restore-date-year': '2026',
+        },
+        { claimantCount: 2, defendantCount: 2 }
+      )
     );
-
-    const generated = buildAdjournmentOrder(form);
 
     expect(findNode(generated, 'item:adjournment-condition').firstChild?.textContent).toContain(
       'the defendants make payment of current rent'
@@ -119,11 +126,13 @@ describe('adjournment order generation', () => {
 
   it('generates liberty-to-restore and automatic strike-out wording without payment conditions', () => {
     const generated = buildAdjournmentOrder(
-      renderForm(`
-        <input name="adj-type" value="generally">
-        <input type="checkbox" name="adj-gen" value="restore" checked>
-        ${dateInputs('adj-gen-restore-date', '5', '6', '2026')}
-      `)
+      makeOrderData({
+        'adj-type': 'generally',
+        'adj-gen': 'restore',
+        'adj-gen-restore-date-day': '5',
+        'adj-gen-restore-date-month': '6',
+        'adj-gen-restore-date-year': '2026',
+      })
     );
 
     expect(findNode(generated, 'item:adjournment-generally').textContent).toBe(
@@ -133,13 +142,15 @@ describe('adjournment order generation', () => {
 
   it('uses regular payments as the instalment condition', () => {
     const generated = buildAdjournmentOrder(
-      renderForm(`
-        <input name="adj-type" value="generally">
-        <input type="checkbox" name="adj-gen" value="payments" checked>
-        <input name="adj-gen-payments-amount" value="75">
-        <input name="adj-gen-payments-frequency" value="monthly">
-        ${dateInputs('adj-gen-payments-date', '6', '6', '2026')}
-      `)
+      makeOrderData({
+        'adj-type': 'generally',
+        'adj-gen': 'payments',
+        'adj-gen-payments-amount': '75',
+        'adj-gen-payments-frequency': 'monthly',
+        'adj-gen-payments-date-day': '6',
+        'adj-gen-payments-date-month': '6',
+        'adj-gen-payments-date-year': '2026',
+      })
     );
 
     expect(findNode(generated, 'item:adjournment-instalments').textContent).toBe(
