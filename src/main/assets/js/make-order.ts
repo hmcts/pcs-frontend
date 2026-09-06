@@ -245,7 +245,6 @@ export function initMakeOrder(): () => void {
       return;
     }
     editor.render(builders[type](readOrderData(form)));
-    persistEditor();
   };
   const selectOrderType = (type: OrderType): void => {
     if (editorType !== type) {
