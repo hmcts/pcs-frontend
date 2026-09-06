@@ -2,7 +2,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
-{% import "make-order/_compact.njk" as compact %}
+{% import "make-order/_compact.njk" as compact with context %}
 
 <h3 class="govuk-heading-m">Outright possession</h3>
 
@@ -20,10 +20,8 @@
       conditional: {
         html: compact.date({
           id: "outright-by-date",
-          items: draftDate("outright-by-date"),
           legend: "Date possession is ordered by",
-          legendHidden: true,
-          errorMessage: validationErrors["outright-by-date-day"]
+          legendHidden: true
         })
       }
     }
@@ -57,18 +55,14 @@
     {{ compact.money({
       id: "outright-mj-arrears",
       label: "Arrears",
-      labelHidden: true,
-      value: draftValue("outright-mj-arrears"),
-      errorMessage: validationErrors["outright-mj-arrears"]
+      labelHidden: true
     }) }}
 
     {{ compact.copy("Interest") }}
     {{ compact.money({
       id: "outright-mj-interest",
       label: "Interest",
-      labelHidden: true,
-      value: draftValue("outright-mj-interest"),
-      errorMessage: validationErrors["outright-mj-interest"]
+      labelHidden: true
     }) }}
   {% endcall %}
 {% endset %}
@@ -76,10 +70,8 @@
 {% set outrightMoneyJudgmentBalanceHtml %}
   {{ compact.date({
     id: "outright-mj-balance-date",
-    items: draftDate("outright-mj-balance-date"),
     legend: "Balance payment deadline",
-    legendHidden: true,
-    errorMessage: validationErrors["outright-mj-balance-date-day"]
+    legendHidden: true
   }) }}
 {% endset %}
 
@@ -89,17 +81,13 @@
     {{ compact.money({
       id: "outright-mj-lump-amount",
       label: "Payment amount",
-      labelHidden: true,
-      value: draftValue("outright-mj-lump-amount"),
-      errorMessage: validationErrors["outright-mj-lump-amount"]
+      labelHidden: true
     }) }}
     {{ compact.copy("by") }}
     {{ compact.date({
       id: "outright-mj-lump-date",
-      items: draftDate("outright-mj-lump-date"),
       legend: "Payment deadline",
-      legendHidden: true,
-      errorMessage: validationErrors["outright-mj-lump-date-day"]
+      legendHidden: true
     }) }}
   {% endcall %}
 
@@ -124,9 +112,7 @@
     {{ compact.money({
       id: "outright-mj-inst-amount",
       label: "Instalment amount",
-      labelHidden: true,
-      value: draftValue("outright-mj-inst-amount"),
-      errorMessage: validationErrors["outright-mj-inst-amount"]
+      labelHidden: true
     }) }}
     {{ govukSelect({
       id: "outright-mj-inst-freq",
@@ -141,10 +127,8 @@
     {{ compact.copy("the first instalment to be paid on or before") }}
     {{ compact.date({
       id: "outright-mj-inst-date",
-      items: draftDate("outright-mj-inst-date"),
       legend: "First instalment deadline",
-      legendHidden: true,
-      errorMessage: validationErrors["outright-mj-inst-date-day"]
+      legendHidden: true
     }) }}
   {% endcall %}
 {% endset %}
@@ -201,17 +185,13 @@
     {{ compact.money({
       id: "outright-use-occupation-rate",
       label: "Daily rate",
-      inputmode: "decimal",
-      value: draftValue("outright-use-occupation-rate"),
-      errorMessage: validationErrors["outright-use-occupation-rate"]
+      inputmode: "decimal"
     }) }}
     {{ compact.copy("From") }}
     {{ compact.date({
       id: "outright-use-occupation-from-date",
-      items: draftDate("outright-use-occupation-from-date"),
       legend: "Damages start date",
-      legendHidden: true,
-      errorMessage: validationErrors["outright-use-occupation-from-date-day"]
+      legendHidden: true
     }) }}
   {% endcall %}
 {% endset %}

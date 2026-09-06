@@ -2,7 +2,7 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
-{% import "make-order/_compact.njk" as compact %}
+{% import "make-order/_compact.njk" as compact with context %}
 {% import "make-order/_payment-frequencies.njk" as options %}
 
 <h3 class="govuk-heading-m">Adjournment</h3>
@@ -23,10 +23,8 @@
     <div class="pcs-option-row__fields">
       {{ compact.date({
         id: "adj-hearing-date-" + params.value,
-        items: draftDate("adj-hearing-date-" + params.value),
         legend: params.text,
-        legendHidden: true,
-        errorMessage: validationErrors["adj-hearing-date-" + params.value + "-day"]
+        legendHidden: true
       }) }}
       {{ params.extraHtml | safe if params.extraHtml }}
     </div>
@@ -133,9 +131,7 @@
         conditional: {
           html: compact.date({
             id: "adj-defence-date",
-            items: draftDate("adj-defence-date"),
-            legend: "By 4pm on",
-            errorMessage: validationErrors["adj-defence-date-day"]
+            legend: "By 4pm on"
           })
         }
       },
@@ -146,9 +142,7 @@
         conditional: {
           html: compact.date({
             id: "adj-counterclaim-date",
-            items: draftDate("adj-counterclaim-date"),
-            legend: "By 4pm on",
-            errorMessage: validationErrors["adj-counterclaim-date-day"]
+            legend: "By 4pm on"
           })
         }
       },
@@ -159,9 +153,7 @@
         conditional: {
           html: compact.date({
             id: "adj-claimant-reply-date",
-            items: draftDate("adj-claimant-reply-date"),
-            legend: "By 4pm on",
-            errorMessage: validationErrors["adj-claimant-reply-date-day"]
+            legend: "By 4pm on"
           })
         }
       }
@@ -173,9 +165,7 @@
   {% call compact.row() %}
     {{ compact.money({
       id: "adj-gen-current-rent-plus-amount",
-      label: "Additional sum",
-      value: draftValue("adj-gen-current-rent-plus-amount"),
-      errorMessage: validationErrors["adj-gen-current-rent-plus-amount"]
+      label: "Additional sum"
     }) }}
     {{ govukSelect({
       id: "adj-gen-current-rent-plus-frequency",
@@ -185,9 +175,7 @@
     }) }}
     {{ compact.date({
       id: "adj-gen-current-rent-plus-date",
-      items: draftDate("adj-gen-current-rent-plus-date"),
-      legend: "First payment by",
-      errorMessage: validationErrors["adj-gen-current-rent-plus-date-day"]
+      legend: "First payment by"
     }) }}
   {% endcall %}
 {% endset %}
@@ -196,9 +184,7 @@
   {% call compact.row() %}
     {{ compact.money({
       id: "adj-gen-payments-amount",
-      label: "Payments of",
-      value: draftValue("adj-gen-payments-amount"),
-      errorMessage: validationErrors["adj-gen-payments-amount"]
+      label: "Payments of"
     }) }}
     {{ govukSelect({
       id: "adj-gen-payments-frequency",
@@ -208,9 +194,7 @@
     }) }}
     {{ compact.date({
       id: "adj-gen-payments-date",
-      items: draftDate("adj-gen-payments-date"),
-      legend: "First payment by",
-      errorMessage: validationErrors["adj-gen-payments-date-day"]
+      legend: "First payment by"
     }) }}
   {% endcall %}
 {% endset %}
@@ -219,15 +203,11 @@
   {% call compact.row() %}
     {{ compact.money({
       id: "adj-gen-oneoff-amount",
-      label: "Payment of",
-      value: draftValue("adj-gen-oneoff-amount"),
-      errorMessage: validationErrors["adj-gen-oneoff-amount"]
+      label: "Payment of"
     }) }}
     {{ compact.date({
       id: "adj-gen-oneoff-date",
-      items: draftDate("adj-gen-oneoff-date"),
-      legend: "Payment by",
-      errorMessage: validationErrors["adj-gen-oneoff-date-day"]
+      legend: "Payment by"
     }) }}
   {% endcall %}
 {% endset %}
@@ -265,9 +245,7 @@
         conditional: {
           html: compact.date({
             id: "adj-gen-restore-date",
-            items: draftDate("adj-gen-restore-date"),
-            legend: "Application to restore by",
-            errorMessage: validationErrors["adj-gen-restore-date-day"]
+            legend: "Application to restore by"
           })
         }
       }
