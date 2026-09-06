@@ -732,6 +732,12 @@ export function buildFreeFormOrder(form: HTMLFormElement): ReturnType<typeof bui
   });
 }
 
+export function buildStrikeOutDismissalOrder(): ReturnType<typeof buildOrder> {
+  return buildOrder(order => {
+    order.paragraph('strike-out-dismissal', () => undefined);
+  });
+}
+
 export function buildAdjournmentOrder(form: HTMLFormElement): ReturnType<typeof buildOrder> {
   const type = field(form, 'adj-type');
   const { claimant, defendant, defendantVerb } = partyLabels(form);
@@ -1036,9 +1042,7 @@ export function initMakeOrder(): () => void {
   const documentField = document.querySelector<HTMLTextAreaElement>('#order-document');
   const orderTypeField = document.querySelector<HTMLInputElement>('#order-type');
   const editorRegion = document.querySelector<HTMLElement>('#order-preview-editor');
-  const unavailable = document.querySelector<HTMLElement>('#order-preview-unavailable');
-  const submit = document.querySelector<HTMLButtonElement>('#submit-order-for-review');
-  if (!mount || !documentField || !orderTypeField || !editorRegion || !unavailable || !submit) {
+  if (!mount || !documentField || !orderTypeField || !editorRegion) {
     return noop;
   }
 
@@ -1061,16 +1065,17 @@ export function initMakeOrder(): () => void {
       documentField.value = '';
     }
   };
-  const builders: Partial<Record<OrderType, (value: HTMLFormElement) => ReturnType<typeof buildOrder>>> = {
+  const builders: Record<OrderType, (value: HTMLFormElement) => ReturnType<typeof buildOrder>> = {
     OUTRIGHT_POSSESSION: buildOutrightOrder,
     SUSPENDED_POSSESSION: buildSuspendedOrder,
     ADJOURNMENT: buildAdjournmentOrder,
+    STRIKE_OUT_DISMISSAL: buildStrikeOutDismissalOrder,
     FREE_FORM: buildFreeFormOrder,
   };
   const render = (): void => {
     const type = orderTypeField.value as OrderType;
     const builder = builders[type];
-    if (!editor || editorType !== type || !builder) {
+    if (!editor || editorType !== type) {
       return;
     }
     editor.render(builder(form));
@@ -1085,27 +1090,18 @@ export function initMakeOrder(): () => void {
     }
     orderTypeField.value = type;
     syncSuspendedOnlyCosts(form, type);
-    const previewAvailable = Boolean(builders[type]);
-    editorRegion.hidden = !previewAvailable;
-    unavailable.hidden = previewAvailable;
-    submit.disabled = !previewAvailable;
-    submit.setAttribute('aria-disabled', String(!previewAvailable));
-    if (previewAvailable) {
-      if (!editor) {
-        editorType = type;
-        editor = createOrderEditor({
-          mount,
-          initialSnapshot: documents[type],
-          onChange: value => {
-            documents[type] = value;
-            documentField.value = JSON.stringify(value);
-          },
-        });
-      }
-      render();
-    } else {
-      persistEditor();
+    if (!editor) {
+      editorType = type;
+      editor = createOrderEditor({
+        mount,
+        initialSnapshot: documents[type],
+        onChange: value => {
+          documents[type] = value;
+          documentField.value = JSON.stringify(value);
+        },
+      });
     }
+    render();
   };
 
   initSuspendedMoneyOptions(form);

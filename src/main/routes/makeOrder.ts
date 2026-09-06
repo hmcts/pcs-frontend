@@ -34,13 +34,6 @@ interface MakeOrderCaseFacts {
   arrearsOnIssue?: number | string;
 }
 
-const REVIEWABLE_ORDER_TYPES = new Set<MakeOrderType>([
-  'OUTRIGHT_POSSESSION',
-  'SUSPENDED_POSSESSION',
-  'ADJOURNMENT',
-  'FREE_FORM',
-]);
-
 interface MakeOrderDraftPayload {
   version: 1;
   orderType: MakeOrderType;
@@ -63,6 +56,16 @@ interface MakeOrderEnvelope {
     defendants: MakeOrderParty[];
     caseFacts?: MakeOrderCaseFacts;
   };
+}
+
+function isMakeOrderType(value: unknown): value is MakeOrderType {
+  return (
+    value === 'OUTRIGHT_POSSESSION' ||
+    value === 'SUSPENDED_POSSESSION' ||
+    value === 'ADJOURNMENT' ||
+    value === 'STRIKE_OUT_DISMISSAL' ||
+    value === 'FREE_FORM'
+  );
 }
 
 function emptyDraftPayload(): MakeOrderDraftPayload {
@@ -345,10 +348,10 @@ export default function makeOrderRoutes(app: Application): void {
           await loadOrStartDraft(accessToken, caseReference);
           return safeRedirect303(res, makeOrderUrl, '/', ['/case/']);
         }
-        const selectedOrderType = orderType as MakeOrderType;
-        if (orderAction === 'SUBMIT_FOR_REVIEW' && !REVIEWABLE_ORDER_TYPES.has(selectedOrderType)) {
-          throw new HTTPError('This order type cannot be submitted for review', 400);
+        if (!isMakeOrderType(orderType)) {
+          throw new HTTPError('The order type is invalid', 400);
         }
+        const selectedOrderType = orderType;
         const validationIssues =
           orderAction === 'SUBMIT_FOR_REVIEW' ? validateMakeOrder(selectedOrderType, formData) : [];
         if (validationIssues.length) {
@@ -375,10 +378,7 @@ export default function makeOrderRoutes(app: Application): void {
           version: 1,
           orderType: selectedOrderType,
           formData,
-          documents:
-            selectedDocument && REVIEWABLE_ORDER_TYPES.has(selectedOrderType)
-              ? { [selectedOrderType]: selectedDocument }
-              : {},
+          documents: selectedDocument ? { [selectedOrderType]: selectedDocument } : {},
         };
         await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, {
           makeOrderPayload: JSON.stringify({
