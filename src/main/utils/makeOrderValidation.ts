@@ -35,110 +35,67 @@ function hasValidDate(formData: Record<string, unknown>, prefix: string): boolea
   );
 }
 
-function validateCosts(
-  formData: Record<string, unknown>,
-  amountFields: Partial<Record<string, MakeOrderValidationIssue>>
-): MakeOrderValidationIssue[] {
-  if (!values(formData, 'costs').includes('yes')) {
-    return [];
-  }
-
-  const amountField = amountFields[value(formData, 'costs-choice')];
-  if (!amountField) {
-    return [];
-  }
-
-  return hasValidMoney(formData, amountField.id) ? [] : [amountField];
-}
-
-function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+function validation(formData: Record<string, unknown>) {
   const issues: MakeOrderValidationIssue[] = [];
   const add = (valid: boolean, id: string, message: string): void => {
     if (!valid) {
       issues.push({ id, message });
     }
   };
+  return {
+    issues,
+    add,
+    money: (id: string, message: string): void => add(hasValidMoney(formData, id), id, message),
+    date: (prefix: string, message: string): void => add(hasValidDate(formData, prefix), `${prefix}-day`, message),
+  };
+}
+
+function validateCosts(formData: Record<string, unknown>, suspended: boolean): MakeOrderValidationIssue[] {
+  const amountTypes: Partial<Record<string, string>> = {
+    'def-pay-cl-fixed': 'fixed',
+    'def-pay-cl-summary': 'summary assessed',
+    'cl-pay-def-summary': 'summary assessed',
+    ...(suspended ? { 'fixed-same-terms': 'fixed', 'summary-same-terms': 'summary assessed' } : {}),
+  };
+  const choice = value(formData, 'costs-choice');
+  const amountType = amountTypes[choice];
+  const id = `costs-${choice}-amount`;
+  if (!values(formData, 'costs').includes('yes') || !amountType || hasValidMoney(formData, id)) {
+    return [];
+  }
+  return [{ id, message: suspended ? `Enter a valid ${amountType} costs amount` : 'Enter a valid costs amount' }];
+}
+
+function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const { issues, add, money, date } = validation(formData);
   const terms = values(formData, 'suspended-payment-terms');
   const options = values(formData, 'suspended-options');
 
-  add(hasValidDate(formData, 'suspended-by-date'), 'suspended-by-date-day', 'Enter a valid possession date');
-  add(hasValidMoney(formData, 'suspended-arrears'), 'suspended-arrears', 'Enter valid arrears');
+  date('suspended-by-date', 'Enter a valid possession date');
+  money('suspended-arrears', 'Enter valid arrears');
   add(
     terms.includes('one-off') || terms.includes('instalments'),
     'suspended-payment-terms',
     'Select a one-off payment or instalments'
   );
   if (terms.includes('one-off')) {
-    add(
-      hasValidMoney(formData, 'suspended-oneoff-amount'),
-      'suspended-oneoff-amount',
-      'Enter a valid one-off payment amount'
-    );
-    add(
-      hasValidDate(formData, 'suspended-oneoff-date'),
-      'suspended-oneoff-date-day',
-      'Enter a valid one-off payment date'
-    );
+    money('suspended-oneoff-amount', 'Enter a valid one-off payment amount');
+    date('suspended-oneoff-date', 'Enter a valid one-off payment date');
   }
   if (terms.includes('instalments')) {
-    add(
-      hasValidMoney(formData, 'suspended-instalment-amount'),
-      'suspended-instalment-amount',
-      'Enter a valid instalment amount'
-    );
-    add(
-      hasValidDate(formData, 'suspended-instalment-date'),
-      'suspended-instalment-date-day',
-      'Enter a valid first instalment date'
-    );
+    money('suspended-instalment-amount', 'Enter a valid instalment amount');
+    date('suspended-instalment-date', 'Enter a valid first instalment date');
   }
   if (options.includes('use-occupation')) {
-    add(
-      hasValidMoney(formData, 'suspended-use-occupation-rate'),
-      'suspended-use-occupation-rate',
-      'Enter a valid daily rate for use and occupation'
-    );
-    add(
-      hasValidDate(formData, 'suspended-use-occupation-from-date'),
-      'suspended-use-occupation-from-date-day',
-      'Enter a valid start date for use and occupation'
-    );
+    money('suspended-use-occupation-rate', 'Enter a valid daily rate for use and occupation');
+    date('suspended-use-occupation-from-date', 'Enter a valid start date for use and occupation');
   }
 
-  return [
-    ...issues,
-    ...validateCosts(formData, {
-      'def-pay-cl-fixed': {
-        id: 'costs-def-pay-cl-fixed-amount',
-        message: 'Enter a valid fixed costs amount',
-      },
-      'def-pay-cl-summary': {
-        id: 'costs-def-pay-cl-summary-amount',
-        message: 'Enter a valid summary assessed costs amount',
-      },
-      'cl-pay-def-summary': {
-        id: 'costs-cl-pay-def-summary-amount',
-        message: 'Enter a valid summary assessed costs amount',
-      },
-      'fixed-same-terms': {
-        id: 'costs-fixed-same-terms-amount',
-        message: 'Enter a valid fixed costs amount',
-      },
-      'summary-same-terms': {
-        id: 'costs-summary-same-terms-amount',
-        message: 'Enter a valid summary assessed costs amount',
-      },
-    }),
-  ];
+  return [...issues, ...validateCosts(formData, true)];
 }
 
 function validateOutright(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const issues: MakeOrderValidationIssue[] = [];
-  const add = (valid: boolean, id: string, message: string): void => {
-    if (!valid) {
-      issues.push({ id, message });
-    }
-  };
+  const { issues, add, money, date } = validation(formData);
   const possession = value(formData, 'outright-possession');
   const options = values(formData, 'outright-options');
 
@@ -148,7 +105,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
     'Select when the defendant must give up possession'
   );
   if (possession === 'by') {
-    add(hasValidDate(formData, 'outright-by-date'), 'outright-by-date-day', 'Enter a valid possession date');
+    date('outright-by-date', 'Enter a valid possession date');
   }
   add(
     ['mandatory', 'discretionary'].includes(value(formData, 'outright-grounds-type')),
@@ -164,11 +121,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
       'Select what the money judgment covers'
     );
     if (sections.includes('arrears')) {
-      add(
-        hasValidMoney(formData, 'outright-mj-arrears'),
-        'outright-mj-arrears',
-        'Enter a valid arrears amount'
-      );
+      money('outright-mj-arrears', 'Enter a valid arrears amount');
       add(
         !value(formData, 'outright-mj-interest') || hasValidMoney(formData, 'outright-mj-interest'),
         'outright-mj-interest',
@@ -183,67 +136,34 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
         'Select payment to claimant or instalment payments'
       );
       if (plans.includes('lump')) {
-        add(
-          hasValidMoney(formData, 'outright-mj-lump-amount'),
-          'outright-mj-lump-amount',
-          'Enter a valid payment amount'
-        );
-        add(
-          hasValidDate(formData, 'outright-mj-lump-date'),
-          'outright-mj-lump-date-day',
-          'Enter a valid payment date'
-        );
+        money('outright-mj-lump-amount', 'Enter a valid payment amount');
+        date('outright-mj-lump-date', 'Enter a valid payment date');
         if (values(formData, 'outright-mj-balance').includes('yes')) {
-          add(
-            hasValidDate(formData, 'outright-mj-balance-date'),
-            'outright-mj-balance-date-day',
-            'Enter a valid balance payment date'
-          );
+          date('outright-mj-balance-date', 'Enter a valid balance payment date');
         }
       }
       if (plans.includes('instalments')) {
-        add(
-          hasValidMoney(formData, 'outright-mj-inst-amount'),
-          'outright-mj-inst-amount',
-          'Enter a valid instalment amount'
-        );
+        money('outright-mj-inst-amount', 'Enter a valid instalment amount');
         add(
           ['weekly', 'monthly'].includes(value(formData, 'outright-mj-inst-freq')),
           'outright-mj-inst-freq',
           'Select weekly or monthly instalments'
         );
-        add(
-          hasValidDate(formData, 'outright-mj-inst-date'),
-          'outright-mj-inst-date-day',
-          'Enter a valid first instalment date'
-        );
+        date('outright-mj-inst-date', 'Enter a valid first instalment date');
       }
     }
   }
 
   if (options.includes('use-occupation')) {
-    add(
-      hasValidMoney(formData, 'outright-use-occupation-rate'),
-      'outright-use-occupation-rate',
-      'Enter a valid daily rate for use and occupation'
-    );
-    add(
-      hasValidDate(formData, 'outright-use-occupation-from-date'),
-      'outright-use-occupation-from-date-day',
-      'Enter a valid start date for use and occupation'
-    );
+    money('outright-use-occupation-rate', 'Enter a valid daily rate for use and occupation');
+    date('outright-use-occupation-from-date', 'Enter a valid start date for use and occupation');
   }
 
   return issues;
 }
 
 function validateAdjournment(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const issues: MakeOrderValidationIssue[] = [];
-  const add = (valid: boolean, id: string, message: string): void => {
-    if (!valid) {
-      issues.push({ id, message });
-    }
-  };
+  const { issues, add, money, date } = validation(formData);
   const type = value(formData, 'adj-type');
 
   add(
@@ -255,7 +175,7 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
     const when = value(formData, 'adj-when') || 'next-list';
     const hearingDate = `adj-hearing-date-${when}`;
     const directions = values(formData, 'adj-directions');
-    add(hasValidDate(formData, hearingDate), `${hearingDate}-day`, 'Enter a valid adjournment date');
+    date(hearingDate, 'Enter a valid adjournment date');
     add(
       /^\d+$/.test(value(formData, 'adj-time-estimate')) && Number(value(formData, 'adj-time-estimate')) > 0,
       'adj-time-estimate',
@@ -270,21 +190,13 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
       add(Boolean(value(formData, 'adj-specific-time')), 'adj-specific-time', 'Enter the time of hearing');
     }
     if (directions.includes('defence')) {
-      add(hasValidDate(formData, 'adj-defence-date'), 'adj-defence-date-day', 'Enter a valid defence date');
+      date('adj-defence-date', 'Enter a valid defence date');
     }
     if (directions.includes('counterclaim')) {
-      add(
-        hasValidDate(formData, 'adj-counterclaim-date'),
-        'adj-counterclaim-date-day',
-        'Enter a valid counterclaim date'
-      );
+      date('adj-counterclaim-date', 'Enter a valid counterclaim date');
     }
     if (directions.includes('claimant-reply')) {
-      add(
-        hasValidDate(formData, 'adj-claimant-reply-date'),
-        'adj-claimant-reply-date-day',
-        'Enter a valid counterclaim reply date'
-      );
+      date('adj-claimant-reply-date', 'Enter a valid counterclaim reply date');
     }
     add(
       !(directions.includes('defence') && directions.includes('counterclaim')),
@@ -296,8 +208,8 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
     const conditions = values(formData, 'adj-gen');
     const validatePayment = (option: string, prefix: string): void => {
       if (conditions.includes(option)) {
-        add(hasValidMoney(formData, `${prefix}-amount`), `${prefix}-amount`, 'Enter a valid payment amount');
-        add(hasValidDate(formData, `${prefix}-date`), `${prefix}-date-day`, 'Enter a valid payment date');
+        money(`${prefix}-amount`, 'Enter a valid payment amount');
+        date(`${prefix}-date`, 'Enter a valid payment date');
       }
     };
     validatePayment('current-rent-plus', 'adj-gen-current-rent-plus');
@@ -309,31 +221,11 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
       'Select either current rent plus instalments or instalment payments, not both'
     );
     if (conditions.includes('restore')) {
-      add(
-        hasValidDate(formData, 'adj-gen-restore-date'),
-        'adj-gen-restore-date-day',
-        'Enter a valid restore application date'
-      );
+      date('adj-gen-restore-date', 'Enter a valid restore application date');
     }
   }
 
-  return [
-    ...issues,
-    ...validateCosts(formData, {
-      'def-pay-cl-fixed': {
-        id: 'costs-def-pay-cl-fixed-amount',
-        message: 'Enter a valid costs amount',
-      },
-      'def-pay-cl-summary': {
-        id: 'costs-def-pay-cl-summary-amount',
-        message: 'Enter a valid costs amount',
-      },
-      'cl-pay-def-summary': {
-        id: 'costs-cl-pay-def-summary-amount',
-        message: 'Enter a valid costs amount',
-      },
-    }),
-  ];
+  return [...issues, ...validateCosts(formData, false)];
 }
 
 export function validateMakeOrder(
