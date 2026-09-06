@@ -24,89 +24,101 @@ function defaultDate(form: HTMLFormElement, prefix: string, daysFromToday: numbe
   inputs[2]!.value = String(value.getFullYear());
 }
 
-export function initDatePills(form: HTMLFormElement): void {
-  form.addEventListener('input', event => {
-    if (!(event.target instanceof HTMLInputElement) || !event.target.name.endsWith('-day')) {
-      return;
-    }
+export function initDatePills(form: HTMLFormElement, signal?: AbortSignal): void {
+  form.addEventListener(
+    'input',
+    event => {
+      if (!(event.target instanceof HTMLInputElement) || !event.target.name.endsWith('-day')) {
+        return;
+      }
 
-    const shorthand = /^(\d+)\s*([dwm])$/i.exec(event.target.value.trim());
-    if (!shorthand) {
-      return;
-    }
+      const shorthand = /^(\d+)\s*([dwm])$/i.exec(event.target.value.trim());
+      if (!shorthand) {
+        return;
+      }
 
-    const amount = Number(shorthand[1]);
-    const unit = shorthand[2].toLowerCase();
-    const prefix = event.target.name.slice(0, -'-day'.length);
-    const month = form.querySelector<HTMLInputElement>(`input[name="${prefix}-month"]`);
-    const year = form.querySelector<HTMLInputElement>(`input[name="${prefix}-year"]`);
-    if (!Number.isSafeInteger(amount) || !month || !year) {
-      return;
-    }
+      const amount = Number(shorthand[1]);
+      const unit = shorthand[2].toLowerCase();
+      const prefix = event.target.name.slice(0, -'-day'.length);
+      const month = form.querySelector<HTMLInputElement>(`input[name="${prefix}-month"]`);
+      const year = form.querySelector<HTMLInputElement>(`input[name="${prefix}-year"]`);
+      if (!Number.isSafeInteger(amount) || !month || !year) {
+        return;
+      }
 
-    const value = new Date();
-    if (unit === 'm') {
-      const dayOfMonth = value.getDate();
-      value.setDate(1);
-      value.setMonth(value.getMonth() + amount);
-      const lastDayOfMonth = new Date(value.getFullYear(), value.getMonth() + 1, 0).getDate();
-      value.setDate(Math.min(dayOfMonth, lastDayOfMonth));
-    } else {
-      value.setDate(value.getDate() + amount * (unit === 'w' ? 7 : 1));
-    }
+      const value = new Date();
+      if (unit === 'm') {
+        const dayOfMonth = value.getDate();
+        value.setDate(1);
+        value.setMonth(value.getMonth() + amount);
+        const lastDayOfMonth = new Date(value.getFullYear(), value.getMonth() + 1, 0).getDate();
+        value.setDate(Math.min(dayOfMonth, lastDayOfMonth));
+      } else {
+        value.setDate(value.getDate() + amount * (unit === 'w' ? 7 : 1));
+      }
 
-    event.target.value = String(value.getDate()).padStart(2, '0');
-    month.value = String(value.getMonth() + 1).padStart(2, '0');
-    year.value = String(value.getFullYear());
-  });
+      event.target.value = String(value.getDate()).padStart(2, '0');
+      month.value = String(value.getMonth() + 1).padStart(2, '0');
+      year.value = String(value.getFullYear());
+    },
+    { signal }
+  );
 
-  form.addEventListener('click', event => {
-    const pill =
-      event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-date-pill-days]') : null;
-    const dateControl = pill?.closest<HTMLElement>('.pcs-date-with-pills');
-    const days = Number(pill?.dataset.datePillDays);
-    if (!pill || !dateControl || !Number.isInteger(days)) {
-      return;
-    }
+  form.addEventListener(
+    'click',
+    event => {
+      const pill =
+        event.target instanceof Element ? event.target.closest<HTMLButtonElement>('[data-date-pill-days]') : null;
+      const dateControl = pill?.closest<HTMLElement>('.pcs-date-with-pills');
+      const days = Number(pill?.dataset.datePillDays);
+      if (!pill || !dateControl || !Number.isInteger(days)) {
+        return;
+      }
 
-    const day = dateControl.querySelector<HTMLInputElement>('input[name$="-day"]');
-    const month = dateControl.querySelector<HTMLInputElement>('input[name$="-month"]');
-    const year = dateControl.querySelector<HTMLInputElement>('input[name$="-year"]');
-    if (!day || !month || !year) {
-      return;
-    }
+      const day = dateControl.querySelector<HTMLInputElement>('input[name$="-day"]');
+      const month = dateControl.querySelector<HTMLInputElement>('input[name$="-month"]');
+      const year = dateControl.querySelector<HTMLInputElement>('input[name$="-year"]');
+      if (!day || !month || !year) {
+        return;
+      }
 
-    const value = new Date();
-    value.setDate(value.getDate() + days);
-    day.value = String(value.getDate()).padStart(2, '0');
-    month.value = String(value.getMonth() + 1).padStart(2, '0');
-    year.value = String(value.getFullYear());
-    day.dispatchEvent(new Event('input', { bubbles: true }));
-  });
+      const value = new Date();
+      value.setDate(value.getDate() + days);
+      day.value = String(value.getDate()).padStart(2, '0');
+      month.value = String(value.getMonth() + 1).padStart(2, '0');
+      year.value = String(value.getFullYear());
+      day.dispatchEvent(new Event('input', { bubbles: true }));
+    },
+    { signal }
+  );
 }
 
 // Typing a date in a row implies choosing that row's option, so select it rather than
 // leaving the judge with a date recorded against an unselected radio. Selection is on
 // input, not focus, so tabbing through the rows does not silently change the answer.
-export function initOptionRows(form: HTMLFormElement): void {
-  form.addEventListener('input', event => {
-    const target = event.target;
-    if (!(target instanceof HTMLInputElement) && !(target instanceof HTMLSelectElement)) {
-      return;
-    }
-    const radio = target
-      .closest('.pcs-option-row__fields')
-      ?.closest('[data-option-row]')
-      ?.querySelector<HTMLInputElement>('input[type="radio"]');
-    if (!radio || radio.checked) {
-      return;
-    }
-    radio.checked = true;
-    radio.dispatchEvent(new Event('change', { bubbles: true }));
-  });
+export function initOptionRows(form: HTMLFormElement, signal?: AbortSignal): void {
+  form.addEventListener(
+    'input',
+    event => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement) && !(target instanceof HTMLSelectElement)) {
+        return;
+      }
+      const radio = target
+        .closest('.pcs-option-row__fields')
+        ?.closest('[data-option-row]')
+        ?.querySelector<HTMLInputElement>('input[type="radio"]');
+      if (!radio || radio.checked) {
+        return;
+      }
+      radio.checked = true;
+      radio.dispatchEvent(new Event('change', { bubbles: true }));
+    },
+    { signal }
+  );
 }
 
-export function initCaseFactsToggle(form: HTMLFormElement): void {
+export function initCaseFactsToggle(form: HTMLFormElement, signal?: AbortSignal): void {
   const caseFacts = form.querySelector<HTMLElement>('[data-case-facts]');
   const toggle = caseFacts?.querySelector<HTMLButtonElement>('[data-case-facts-toggle]');
   const contentId = toggle?.getAttribute('aria-controls');
@@ -115,16 +127,20 @@ export function initCaseFactsToggle(form: HTMLFormElement): void {
     return;
   }
 
-  toggle.addEventListener('click', () => {
-    const expanded = toggle.getAttribute('aria-expanded') === 'true';
-    toggle.setAttribute('aria-expanded', String(!expanded));
-    toggle.textContent = expanded ? 'Show case facts' : 'Hide case facts';
-    content.hidden = expanded;
-    caseFacts.classList.toggle('pcs-case-facts--collapsed', expanded);
-  });
+  toggle.addEventListener(
+    'click',
+    () => {
+      const expanded = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      toggle.textContent = expanded ? 'Show case facts' : 'Hide case facts';
+      content.hidden = expanded;
+      caseFacts.classList.toggle('pcs-case-facts--collapsed', expanded);
+    },
+    { signal }
+  );
 }
 
-export function initSuspendedMoneyOptions(form: HTMLFormElement): void {
+export function initSuspendedMoneyOptions(form: HTMLFormElement, signal?: AbortSignal): void {
   const moneyJudgment = form.querySelector<HTMLInputElement>(
     'input[name="suspended-options"][value="money-judgment-arrears"]'
   );
@@ -153,8 +169,8 @@ export function initSuspendedMoneyOptions(form: HTMLFormElement): void {
     conditional?.classList.toggle('govuk-checkboxes__conditional--hidden', !moneyJudgment.checked);
     moneyJudgment.setAttribute('aria-expanded', String(moneyJudgment.checked));
   };
-  moneyJudgment.addEventListener('change', () => sync(moneyJudgment));
-  moneyClaimAdjourned.addEventListener('change', () => sync(moneyClaimAdjourned));
+  moneyJudgment.addEventListener('change', () => sync(moneyJudgment), { signal });
+  moneyClaimAdjourned.addEventListener('change', () => sync(moneyClaimAdjourned), { signal });
   sync();
 }
 
@@ -183,16 +199,18 @@ export function initMakeOrder(): () => void {
   if (!form) {
     return noop;
   }
-  initDatePills(form);
-  initOptionRows(form);
-  initCaseFactsToggle(form);
+  const listenerController = new AbortController();
+  const { signal } = listenerController;
+  initDatePills(form, signal);
+  initOptionRows(form, signal);
+  initCaseFactsToggle(form, signal);
   defaultDate(form, 'suspended-by-date', 14);
   const mount = document.querySelector<HTMLElement>('#order-editor');
   const documentField = document.querySelector<HTMLTextAreaElement>('#order-document');
   const orderTypeField = document.querySelector<HTMLInputElement>('#order-type');
   const editorRegion = document.querySelector<HTMLElement>('#order-preview-editor');
   if (!mount || !documentField || !orderTypeField || !editorRegion) {
-    return noop;
+    return () => listenerController.abort();
   }
 
   let documents: Partial<Record<OrderType, DocWeaveSnapshot>> = {};
@@ -252,11 +270,11 @@ export function initMakeOrder(): () => void {
     render();
   };
 
-  initSuspendedMoneyOptions(form);
+  initSuspendedMoneyOptions(form, signal);
 
   const orderTabs = form.querySelectorAll<HTMLAnchorElement>('[data-order-type]');
   orderTabs.forEach(tab => {
-    tab.addEventListener('click', () => selectOrderType(tab.dataset.orderType as OrderType));
+    tab.addEventListener('click', () => selectOrderType(tab.dataset.orderType as OrderType), { signal });
   });
   const renderForFormControl = (event: Event): void => {
     if (event.target instanceof Node && editorRegion.contains(event.target)) {
@@ -264,13 +282,14 @@ export function initMakeOrder(): () => void {
     }
     render();
   };
-  form.addEventListener('input', renderForFormControl);
-  form.addEventListener('change', renderForFormControl);
-  form.addEventListener('submit', persistEditor);
+  form.addEventListener('input', renderForFormControl, { signal });
+  form.addEventListener('change', renderForFormControl, { signal });
+  form.addEventListener('submit', persistEditor, { signal });
   const linkedTab = Array.from(orderTabs).find(tab => tab.getAttribute('href') === window.location.hash);
   selectOrderType((linkedTab?.dataset.orderType as OrderType | undefined) ?? (orderTypeField.value as OrderType));
 
   return () => {
+    listenerController.abort();
     persistEditor();
     editor?.destroy();
     editor = undefined;

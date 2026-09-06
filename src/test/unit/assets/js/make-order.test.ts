@@ -452,6 +452,20 @@ describe('make order preview', () => {
     expect(generatedOrderText()).toEqual(expect.stringContaining('IT IS ORDERED THAT'));
   });
 
+  it('removes page listeners when the editor is disposed', () => {
+    renderCompleteForm();
+    const dispose = initMakeOrder();
+    const orderType = document.querySelector<HTMLInputElement>('#order-type')!;
+    const documentField = document.querySelector<HTMLTextAreaElement>('#order-document')!;
+
+    dispose();
+    const disposedSnapshot = documentField.value;
+    document.querySelector<HTMLAnchorElement>('[data-order-type="SUSPENDED_POSSESSION"]')?.click();
+
+    expect(orderType.value).toBe('OUTRIGHT_POSSESSION');
+    expect(documentField.value).toBe(disposedSnapshot);
+  });
+
   it('uses safe fallback text for incomplete amounts, dates and order details', () => {
     renderCompleteForm();
     document.querySelector<HTMLInputElement>('[name="outright-grounds-type"]')!.value = '';
