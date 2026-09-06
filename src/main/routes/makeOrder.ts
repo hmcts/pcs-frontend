@@ -265,7 +265,6 @@ function buildPageModel(
         issue.id,
         {
           text: issue.message,
-          attributes: { 'data-make-order-error': 'true' },
         },
       ])
     ),

@@ -308,6 +308,24 @@ describe('make order preview', () => {
     expect(generatedOrderText()).toEqual(expect.stringContaining('Sam Solicitor, solicitor for the defendant'));
   });
 
+  it('captures the current editor snapshot before submitting', () => {
+    renderCompleteForm();
+    initMakeOrder();
+    const form = document.querySelector<HTMLFormElement>('#make-order-form')!;
+    const documentField = document.querySelector<HTMLTextAreaElement>('#order-document')!;
+    const submit = document.querySelector<HTMLButtonElement>('#submit-order-for-review')!;
+    documentField.value = '';
+
+    const submitted = form.dispatchEvent(
+      new SubmitEvent('submit', { bubbles: true, cancelable: true, submitter: submit })
+    );
+
+    expect(submitted).toBe(true);
+    expect(JSON.parse(documentField.value)).toEqual(
+      expect.objectContaining({ schema: 'docweave-document', version: 1 })
+    );
+  });
+
   it('uses grammatical wording for monthly outright instalments', () => {
     renderCompleteForm();
 
@@ -339,38 +357,6 @@ describe('make order preview', () => {
     expect(generatedOrderText()).toContain('This order for possession was made on mandatory grounds.');
     expect(generatedOrderText()).not.toContain('grounds, namely');
     expect(generatedOrderText()).not.toContain('[grounds not provided]');
-  });
-
-  it('blocks Send for review when required outright fields are missing', () => {
-    renderCompleteForm();
-    document.querySelector<HTMLInputElement>('[name="outright-possession"]')!.checked = false;
-    document.querySelector<HTMLInputElement>('[name="outright-grounds-type"]')!.value = '';
-    initMakeOrder();
-    const form = document.querySelector<HTMLFormElement>('#make-order-form')!;
-    const submit = document.querySelector<HTMLButtonElement>('#submit-order-for-review')!;
-
-    const submitted = form.dispatchEvent(
-      new SubmitEvent('submit', { bubbles: true, cancelable: true, submitter: submit })
-    );
-
-    expect(submitted).toBe(false);
-    expect(document.querySelector('#make-order-error-summary')?.textContent).toContain(
-      'Select when the defendant must give up possession'
-    );
-    expect(document.querySelector('#make-order-error-summary')?.textContent).toContain(
-      'Select mandatory or discretionary grounds'
-    );
-    expect(generatedOrderText()).toEqual(expect.stringContaining('The Court read a letter from Taylor Defendant'));
-    expect(generatedOrderText()).toEqual(expect.stringContaining('the third defendant did not attend the hearing'));
-    expect(generatedOrderText()).toEqual(expect.stringContaining('First recital'));
-    expect(generatedOrderText()).toEqual(expect.stringContaining('10 Test Street'));
-    expect(generatedOrderText()).toEqual(expect.stringContaining('12 June 2027'));
-    expect(generatedOrderText()).toEqual(expect.stringContaining('1,250.00'));
-    expect(generatedOrderText()).toEqual(expect.stringContaining('12.50'));
-    expect(generatedOrderText()).toEqual(expect.stringContaining('fixed costs of £355.00'));
-    expect(generatedOrderText()).toEqual(expect.stringContaining('by a payment of £'));
-    expect(generatedOrderText()).toEqual(expect.stringContaining('by instalment payments of £'));
-    expect(generatedOrderText()).toEqual(expect.stringContaining('transferred to the High Court'));
   });
 
   it('links every form-derived fact back to its source control', () => {

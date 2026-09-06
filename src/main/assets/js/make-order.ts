@@ -6,11 +6,7 @@ import {
   createOrderEditor,
 } from '@hmcts-cft/docweave';
 
-import {
-  type MakeOrderValidationIssue as OrderError,
-  type MakeOrderType as OrderType,
-  validateMakeOrder,
-} from '../../utils/makeOrderValidation';
+import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
 function field(form: HTMLFormElement, name: string): string {
   const value = new FormData(form).get(name);
@@ -934,98 +930,6 @@ export function syncSuspendedOnlyCosts(form: HTMLFormElement, type: OrderType): 
   });
 }
 
-function formValues(form: HTMLFormElement): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  new FormData(form).forEach((entry, name) => {
-    if (typeof entry !== 'string') {
-      return;
-    }
-    const existing = result[name];
-    result[name] = existing === undefined ? entry : Array.isArray(existing) ? [...existing, entry] : [existing, entry];
-  });
-  return result;
-}
-
-function showOrderErrors(form: HTMLFormElement, errors: OrderError[]): void {
-  const generatedErrorIds = new Set(
-    Array.from(form.querySelectorAll<HTMLElement>('[data-make-order-error]'))
-      .map(error => error.id)
-      .filter(Boolean)
-  );
-  form.querySelector('#make-order-error-summary')?.remove();
-  form.querySelectorAll('[data-make-order-error]').forEach(error => error.remove());
-  form.querySelectorAll('.govuk-form-group--error').forEach(group => group.classList.remove('govuk-form-group--error'));
-  form.querySelectorAll<HTMLElement>('[aria-describedby]').forEach(control => {
-    const remaining = (control.getAttribute('aria-describedby') ?? '')
-      .split(/\s+/)
-      .filter(id => id && !generatedErrorIds.has(id))
-      .join(' ');
-    if (remaining) {
-      control.setAttribute('aria-describedby', remaining);
-    } else {
-      control.removeAttribute('aria-describedby');
-    }
-  });
-  form.querySelectorAll('.govuk-input--error, .govuk-select--error, .govuk-textarea--error').forEach(control => {
-    control.classList.remove('govuk-input--error', 'govuk-select--error', 'govuk-textarea--error');
-  });
-  if (!errors.length) {
-    return;
-  }
-  const summary = document.createElement('div');
-  summary.id = 'make-order-error-summary';
-  summary.className = 'govuk-error-summary';
-  summary.setAttribute('role', 'alert');
-  summary.tabIndex = -1;
-  const title = document.createElement('h2');
-  title.className = 'govuk-error-summary__title';
-  title.textContent = 'There is a problem';
-  const body = document.createElement('div');
-  body.className = 'govuk-error-summary__body';
-  const list = document.createElement('ul');
-  list.className = 'govuk-list govuk-error-summary__list';
-  errors.forEach(error => {
-    const item = document.createElement('li');
-    const link = document.createElement('a');
-    link.href = `#${error.id}`;
-    link.textContent = error.message;
-    item.append(link);
-    list.append(item);
-    const control = document.getElementById(error.id);
-    const group = control?.closest<HTMLElement>('.govuk-form-group');
-    if (!control || !group) {
-      return;
-    }
-    const message = document.createElement('p');
-    message.id = `${error.id}-error`;
-    message.className = 'govuk-error-message';
-    message.dataset.makeOrderError = 'true';
-    const hidden = document.createElement('span');
-    hidden.className = 'govuk-visually-hidden';
-    hidden.textContent = 'Error:';
-    message.append(hidden, ` ${error.message}`);
-    const controls =
-      control.closest<HTMLElement>('.govuk-date-input, .govuk-radios, .govuk-checkboxes, .govuk-input__wrapper') ??
-      control;
-    controls.parentElement?.insertBefore(message, controls);
-    group.classList.add('govuk-form-group--error');
-    if (control instanceof HTMLTextAreaElement) {
-      control.classList.add('govuk-textarea--error');
-    } else if (control instanceof HTMLSelectElement) {
-      control.classList.add('govuk-select--error');
-    } else if (control instanceof HTMLInputElement && !['checkbox', 'radio'].includes(control.type)) {
-      control.classList.add('govuk-input--error');
-    }
-    const describedBy = new Set((control.getAttribute('aria-describedby') ?? '').split(/\s+/).filter(Boolean));
-    describedBy.add(message.id);
-    control.setAttribute('aria-describedby', [...describedBy].join(' '));
-  });
-  body.append(list);
-  summary.append(title, body);
-  form.prepend(summary);
-  summary.focus();
-}
-
 // Returns a teardown so a module reload can dispose the editor. Without it a second
 // editor is created over the same mount, which DocWeave rejects.
 export function initMakeOrder(): () => void {
@@ -1118,17 +1022,7 @@ export function initMakeOrder(): () => void {
   };
   form.addEventListener('input', renderForFormControl);
   form.addEventListener('change', renderForFormControl);
-  form.addEventListener('submit', event => {
-    persistEditor();
-    const submitter = event instanceof SubmitEvent ? event.submitter : null;
-    if (submitter instanceof HTMLButtonElement && submitter.value === 'SUBMIT_FOR_REVIEW') {
-      const errors = validateMakeOrder(orderTypeField.value as OrderType, formValues(form));
-      showOrderErrors(form, errors);
-      if (errors.length) {
-        event.preventDefault();
-      }
-    }
-  });
+  form.addEventListener('submit', persistEditor);
   const linkedTab = Array.from(orderTabs).find(tab => tab.getAttribute('href') === window.location.hash);
   selectOrderType((linkedTab?.dataset.orderType as OrderType | undefined) ?? (orderTypeField.value as OrderType));
 
