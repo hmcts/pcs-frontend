@@ -1,30 +1,18 @@
 {% from "govuk/components/input/macro.njk" import govukInput %}
 
-{# Expose full attendance terms to assistive technology while displaying compact abbreviations. #}
-{% set claimantAttendance = [
-  { value: "counsel", short: "Csl", full: "Counsel" },
-  { value: "solicitor", short: "Sol", full: "Solicitor" },
-  { value: "solicitor-agent", short: "S/A", full: "Solicitor agent" },
-  { value: "housing-officer", short: "H/O", full: "Housing officer" },
-  { value: "litigant-in-person", short: "LiP", full: "Litigant in person" },
-  { value: "letter-only", short: "Ltr", full: "Letter only" },
-  { value: "not-present", short: "Not present", full: "" }
-] %}
-
-{% set defendantAttendance = [
-  { value: "counsel", short: "Csl", full: "Counsel" },
-  { value: "solicitor", short: "Sol", full: "Solicitor" },
-  { value: "solicitor-agent", short: "S/A", full: "Solicitor agent" },
-  { value: "duty-adviser", short: "Duty", full: "Duty adviser" },
-  { value: "litigant-in-person", short: "LiP", full: "Litigant in person" },
-  { value: "letter-only", short: "Ltr", full: "Letter only" },
-  { value: "not-present", short: "Not present", full: "" }
-] %}
-
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Attendance</h2>
 
 {% for party in attendanceParties %}
-  {% set attendanceOptions = claimantAttendance if party.type == "claimant" else defendantAttendance %}
+  {# Full terms remain accessible while the register displays compact abbreviations. #}
+  {% set attendanceOptions = [
+    { value: "counsel", short: "Csl", full: "Counsel" },
+    { value: "solicitor", short: "Sol", full: "Solicitor" },
+    { value: "solicitor-agent", short: "S/A", full: "Solicitor agent" },
+    { value: "housing-officer", short: "H/O", full: "Housing officer" } if party.type == "claimant" else { value: "duty-adviser", short: "Duty", full: "Duty adviser" },
+    { value: "litigant-in-person", short: "LiP", full: "Litigant in person" },
+    { value: "letter-only", short: "Ltr", full: "Letter only" },
+    { value: "not-present", short: "Not present", full: "" }
+  ] %}
   {# A labelled ARIA group allows the party name to occupy the first grid column. #}
   <div id="{{ party.id }}-attendance" class="pcs-attendance__row" role="group" aria-labelledby="{{ party.id }}-label"
        data-attendance-row data-party-kind="{{ party.type }}" data-party-id="{{ party.partyId }}"

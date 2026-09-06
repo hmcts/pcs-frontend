@@ -143,18 +143,6 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   }
 }
 
-// Decorative borders divide sections without adding semantic <hr> elements.
-.pcs-make-order #main-content > h2 {
-  padding-top: govuk-spacing(4);
-  border-top: 1px solid $govuk-border-colour;
-}
-
-// Avoid a second divider after elements that already have a bottom border.
-.pcs-make-order #main-content > .pcs-case-facts + h2,
-.pcs-make-order #main-content > .govuk-tabs + h2 {
-  border-top: 0;
-}
-
 // Divide distinct tab questions, excluding fields that continue the previous question.
 .pcs-make-order .govuk-tabs__panel > .govuk-form-group + .govuk-form-group:not(.pcs-continues-question) {
   padding-top: govuk-spacing(4);
