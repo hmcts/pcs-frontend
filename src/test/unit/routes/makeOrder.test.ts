@@ -805,6 +805,12 @@ describe('make order route', () => {
       status: jest.fn().mockReturnThis(),
       render: jest.fn(),
     } as unknown as Response;
+    const orderDocument = JSON.stringify({
+      schema: 'docweave-document',
+      version: 1,
+      current: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Edited wording' }] }] },
+      generated: { type: 'doc', content: [] },
+    });
 
     await handler(
       {
@@ -816,6 +822,7 @@ describe('make order route', () => {
           orderType: 'FREE_FORM',
           'free-form-text': '   ',
           'hearing-notes': 'Keep this note',
+          orderDocument,
         },
       } as unknown as Request,
       res,
@@ -827,6 +834,7 @@ describe('make order route', () => {
       'make-order',
       expect.objectContaining({
         draftOrderType: 'FREE_FORM',
+        orderDocumentJson: orderDocument,
         validationErrors: expect.objectContaining({
           'free-form-text': expect.objectContaining({ text: 'Enter the order wording' }),
         }),
