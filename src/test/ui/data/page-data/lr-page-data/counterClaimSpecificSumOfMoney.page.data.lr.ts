@@ -21,7 +21,7 @@ export const counterClaimSpecificSumOfMoney = {
   feeHiddenAmount: `35.00`,
   enterHowMuchYouAreClaimingErrorMessage: `Enter how much you are claiming for`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  specificSumRequiredErrorMessage: `Select if you are claiming for a specific sum of money`,
+  specificSumRequiredErrorMessage: `Select if the defendant is claiming for a specific sum of money`,
   enterMaxValueErrorMessage: `Enter the maximum value of your claim`,
   billionClaimErrorMessage: `The amount you are claiming for must be less than £1 billion`,
   negativeClaimInputErrorMessage: `The amount you are claiming for must be £0.00 or above`,
