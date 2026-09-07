@@ -1,12 +1,12 @@
 {
   "pageTitle": "Uwchlwytho dogfennau",
-  "heading": "cy Upload additional documents (Optional)",
-  "guidanceText": "cy Upload any documents that you think are relevant to the response. The claimant will be able to see any documents you upload.",
-  "beforeUploadHeading": "cy Before you upload your documents",
-  "beforeUploadText": "cy Give your document a name that explains what it is.",
-  "uploadLabel": "cy Upload a document",
-  "filesAddedHeading": "cy Documents added",
-  "uploadButton": "cy Upload document",
-  "deleteButton": "cy Remove",
-  "noFilesUploaded": "cy No documents uploaded"
+  "heading": "Llwytho dogfennau ychwanegol (Dewisol)",
+  "guidanceText": "Uwchlwythwch unrhyw ffeiliau rydych yn meddwl sy'n berthnasol i'r ymateb. Bydd yr hawlydd yn gallu gweld unrhyw ddogfennau fyddwch yn eu huwchlwytho.",
+  "beforeUploadHeading": "Cyn ichi lwytho eich dogfennau",
+  "beforeUploadText": "Rhowch enw i'ch dogfen sy'n egluro beth ydyw.",
+  "uploadLabel": "Uwchlwytho dogfen",
+  "filesAddedHeading": "Dogfennau wedi'u hychwanegu",
+  "uploadButton": "Uwchlwytho dogfen",
+  "deleteButton": "Dileu",
+  "noFilesUploaded": "Dim dogfennau wedi eu huwchlwytho"
 }
