@@ -302,7 +302,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactPreferencesTelephone.yesRadioOption,
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
+    await performAction('selectContactByTextMessage', {
+      radioOption: contactPreferencesTextMessage.yesRadioOption,
+      mobileNumber: contactPreferencesTextMessage.ukMobileNumberTextInput,
+    });
     await performAction('retrieveCYATableDataRTC', 'personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -445,9 +448,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
@@ -520,7 +524,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactPreferencesTelephone.yesRadioOption,
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('selectContactByTextMessage', {
+      radioOption: contactPreferencesTextMessage.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -627,9 +633,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
@@ -681,7 +688,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactPreferencesTelephone.yesRadioOption,
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('selectContactByTextMessage', {
+      radioOption: contactPreferencesTextMessage.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -754,7 +763,9 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       radioOption: contactPreferencesTelephone.yesRadioOption,
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('selectContactByTextMessage', {
+      radioOption: contactPreferencesTextMessage.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -882,9 +893,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
@@ -1083,9 +1095,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
@@ -1269,9 +1282,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
@@ -1477,9 +1491,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
@@ -1669,9 +1684,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
@@ -1854,9 +1870,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
@@ -2009,9 +2026,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
@@ -2181,9 +2199,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
     await performAction('languageUsed', {
@@ -2249,7 +2268,9 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       radioOption: contactPreferencesTelephone.yesRadioOption,
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('selectContactByTextMessage', {
+      radioOption: contactPreferencesTextMessage.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -2356,7 +2377,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
     await performAction('selectReasonableAdjustments', {
@@ -2425,6 +2446,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequest.mainHeader);
     await performAction('clickButton', supportRequest.continueButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityDOB.mainHeader);
@@ -2543,7 +2565,9 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       radioOption: contactPreferencesTelephone.yesRadioOption,
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('selectContactByTextMessage', {
+      radioOption: contactPreferencesTextMessage.noRadioOption,
+    });
     await performAction('retrieveCYATableDataRTC', 'personalDetails');
     await performAction('validateRTCSectionCYA', 'personalDetails');
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
@@ -2650,7 +2674,8 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       ],
       status: 'Done',
     });
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    //
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
     await performAction('selectReasonableAdjustments', {
@@ -2675,6 +2700,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequestNotSent.mainHeader);
     await performAction('clickButton', supportRequestNotSent.continueButton);
+    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
     await performValidation('mainHeader', equalityAndDiversityDOB.mainHeader);

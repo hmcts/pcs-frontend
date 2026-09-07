@@ -6,7 +6,13 @@ import {
 } from '../data/api-data';
 import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
 import { dashboard } from '../data/index.selector';
-import { taskList } from '../data/page-data';
+import {
+  counterClaimApplicationFeeAmount,
+  counterClaimPaymentSuccessful,
+  paymentDetails,
+  responseSubmittedCounterclaimFeePaymentNeeded,
+  taskList,
+} from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
 import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-page-data';
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
@@ -216,6 +222,18 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       data: respondPossessionClaimApiData.respondPossessionClaimPayload,
       type: 'submit',
     });
+    await performAction('reloadPage');
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
+    await performAction('clickButton', paymentDetails.confirmPaymentButton);
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+    await new Promise(resolve => setTimeout(resolve, 5000));
     await performAction('reloadPage');
     await performAction('verifyRespondToClaimNotificationAndTag', {
       notificationText: dashboard.respondedToClaimParagraph,
