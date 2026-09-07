@@ -5,7 +5,7 @@ export const contactPreferencesTextMessage = {
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   saveAndContinueButton: `Save and continue`,
-  ukMobileNumberTextLabel: `UK mobile number`,
+  ukMobileNumberHiddenTextLabel: `UK mobile number`,
   ukMobileNumberTextInput: `07459444434`,
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,

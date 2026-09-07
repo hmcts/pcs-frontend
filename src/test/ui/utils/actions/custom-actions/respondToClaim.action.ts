@@ -599,7 +599,11 @@ export class RespondToClaimAction implements IAction {
     });
 
     if (contactData.radioOption === 'Yes') {
-      await performAction('inputText', contactPreferencesTextMessage.ukMobileNumberTextLabel, contactData.mobileNumber);
+      await performAction(
+        'inputText',
+        contactPreferencesTextMessage.ukMobileNumberHiddenTextLabel,
+        contactData.mobileNumber
+      );
     }
     await performAction('clickButton', contactPreferencesTextMessage.saveAndContinueButton);
   }
