@@ -1,10 +1,11 @@
 {
-  "heading": "cyPrevious payments",
+  "pageTitle": "Taliadau a wnaed",
+  "heading": "Taliadau blaenorol",
   "question": "",
-  "repaymentsMadeQuestion": "Has the defendant paid any money to {{claimantName}} since {{dateIssued, ordinalDate}}?",
-  "textAreaLabel": "cyGive details about how much the defendant paid and when",
+  "repaymentsMadeQuestion": "A yw'r diffynnydd wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
+  "textAreaLabel": "Rhowch fanylion faint wnaeth y diffynnydd ei dalu a phryd",
   "errors": {
-    "repaymentsInfo": "cyGive details about how much the defendant paid and when",
-    "confirmRepaymentsMade": "cySelect if the defendant has paid any money to {{claimantName}} since {{dateIssued, ordinalDate}}"
+    "repaymentsInfo": "Rhowch fanylion faint wnaeth y diffynnydd ei dalu a phryd",
+    "confirmRepaymentsMade": "Dewiswch a yw'r diffynnydd wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}"
   }
 }

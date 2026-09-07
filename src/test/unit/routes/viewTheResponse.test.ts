@@ -1,4 +1,8 @@
+import * as fs from 'fs';
+import * as path from 'path';
+
 import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
+import { Environment } from 'nunjucks';
 
 import { VIEW_RESPONSE_ROUTE } from '../../../main/constants/caseRoutes';
 import { oidcMiddleware } from '../../../main/middleware';
@@ -6,9 +10,19 @@ import { oidcMiddleware } from '../../../main/middleware';
 import viewTheResponseRoute from '@routes/viewTheResponse';
 import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
+
+const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
+  typeof isRespondToClaimEnabledForRelease
+>;
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
+}));
+
+jest.mock('@utils/getLaunchDarklyFlag', () => ({
+  getLaunchDarklyFlag: jest.fn(),
 }));
 
 const translationStrings: Record<string, string> = {
@@ -21,13 +35,15 @@ const translationStrings: Record<string, string> = {
   'viewTheResponse:incomeFrequencies.MONTHLY': 'received every month',
   'viewTheResponse:paymentFrequencies.WEEKLY': 'paid every week',
   'viewTheResponse:paymentFrequencies.MONTHLY': 'paid every month',
-  'viewTheResponse:defendant1.freeLegalAdviceOptions.YES': 'Yes',
-  'viewTheResponse:defendant1.freeLegalAdviceOptions.NO': 'No',
-  'viewTheResponse:defendant1.freeLegalAdviceOptions.PREFER_NOT_TO_SAY': 'Prefer not to say',
+  'viewTheResponse:defendant.freeLegalAdviceOptions.YES': 'Yes',
+  'viewTheResponse:defendant.freeLegalAdviceOptions.NO': 'No',
+  'viewTheResponse:defendant.freeLegalAdviceOptions.PREFER_NOT_TO_SAY': 'Prefer not to say',
   'viewTheResponse:counterclaim.claimTypeOptions.PAYMENT_OR_COMPENSATION': 'A sum of money or compensation',
   'viewTheResponse:counterclaim.claimTypeOptions.SOMETHING_ELSE': 'Something else',
   'viewTheResponse:counterclaim.claimTypeOptions.BOTH': 'Both',
   'viewTheResponse:counterclaim.needHelpWithFeesOptions.NO': 'I do not need help paying the fee',
+  'viewTheResponse:personsUnknown': 'Persons unknown',
+  'viewTheResponse:addressUnknown': 'Address unknown',
 };
 
 jest.mock('@modules/i18n', () => ({
@@ -42,8 +58,13 @@ jest.mock('@services/ccdCaseService', () => ({
   },
 }));
 
+jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
+  isRespondToClaimEnabledForRelease: jest.fn(),
+}));
+
 function buildComprehensiveCaseData(): CcdCaseData {
   return {
+    legislativeCountry: 'Wales',
     claimantName: 'Example Claimant Ltd',
     propertyAddress: {
       AddressLine1: '10 Second Avenue',
@@ -117,7 +138,7 @@ function buildComprehensiveCaseData(): CcdCaseData {
         noticeReceivedDate: '2025-12-01',
         rentArrearsAmountConfirmation: 'YES',
         rentArrearsAmount: '125000',
-        landlordRegistered: 'YES',
+        exemptLandlord: 'YES',
         landlordLicensed: 'NO',
         writtenTerms: 'NOT_SURE',
         paymentAgreement: {
@@ -206,7 +227,7 @@ function buildAlternateBranchesCaseData(): CcdCaseData {
         disputeClaim: 'NO',
         tenancyTypeConfirmation: 'NO',
         possessionNoticeReceived: 'NOT_SURE',
-        landlordRegistered: undefined,
+        exemptLandlord: undefined,
         householdCircumstances: {
           incomeFromJobs: 'NO',
           universalCredit: 'NO',
@@ -255,6 +276,8 @@ describe('viewTheResponse route', () => {
     app = {
       get: jest.fn(),
     } as unknown as Application;
+    (getLaunchDarklyFlag as jest.Mock).mockResolvedValue(true);
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -355,17 +378,25 @@ describe('viewTheResponse route', () => {
     );
     expect(renderArgs.defendant1Details.rows.length).toBeGreaterThan(0);
     expect(renderArgs.defendant1Details.rows.map((row: { key: { text: string } }) => row.key.text)).toEqual([
-      'viewTheResponse:defendant1.name',
-      'viewTheResponse:defendant1.phone',
-      'viewTheResponse:defendant1.address',
-      'viewTheResponse:defendant1.dateOfBirth',
+      'viewTheResponse:defendant.name',
+      'viewTheResponse:defendant.phone',
+      'viewTheResponse:defendant.address',
+      'viewTheResponse:defendant.dateOfBirth',
     ]);
     expect(renderArgs.additionalDefendantDetails).toHaveLength(1);
     expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          key: { text: 'viewTheResponse:defendant1.name' },
+          key: { text: 'viewTheResponse:defendant.name' },
           value: { text: 'Peter Parker' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.address' },
+          value: { text: '10 Second Avenue, London, W3 7RX' },
+        }),
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.dateOfBirth' },
+          value: { text: '20 July 1985' },
         }),
       ])
     );
@@ -380,19 +411,11 @@ describe('viewTheResponse route', () => {
     expect(renderArgs.responseToClaim.rows).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.landlordRegistered' },
+          key: { text: 'viewTheResponse:responseToClaim.exemptLandlord' },
           value: { text: 'Yes' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.landlordLicensed' },
-          value: { text: 'No' },
         }),
         expect.objectContaining({
           key: { text: 'viewTheResponse:responseToClaim.rentArrearsAmountConfirmation' },
-          value: { text: 'Yes' },
-        }),
-        expect.objectContaining({
-          key: { text: 'viewTheResponse:responseToClaim.exemptLandlord' },
           value: { text: 'Yes' },
         }),
         expect.objectContaining({
@@ -534,8 +557,12 @@ describe('viewTheResponse route', () => {
     const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
     expect(renderArgs.additionalDefendantDetails[0].rows).toEqual([
       expect.objectContaining({
-        key: { text: 'viewTheResponse:defendant1.name' },
-        value: { text: 'viewTheResponse:personsUnknown' },
+        key: { text: 'viewTheResponse:defendant.name' },
+        value: { text: 'Persons unknown' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
       }),
     ]);
   });
@@ -569,8 +596,12 @@ describe('viewTheResponse route', () => {
     const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
     expect(renderArgs.additionalDefendantDetails[0].rows).toEqual([
       expect.objectContaining({
-        key: { text: 'viewTheResponse:defendant1.name' },
-        value: { text: 'viewTheResponse:personsUnknown' },
+        key: { text: 'viewTheResponse:defendant.name' },
+        value: { text: 'Persons unknown' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
       }),
     ]);
   });
@@ -604,8 +635,12 @@ describe('viewTheResponse route', () => {
     expect(additionalDefendantDetails).toHaveLength(1);
     expect(additionalDefendantDetails[0].rows).toEqual([
       expect.objectContaining({
-        key: { text: 'viewTheResponse:defendant1.name' },
+        key: { text: 'viewTheResponse:defendant.name' },
         value: { text: 'Jane Defendant' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
       }),
     ]);
   });
@@ -639,8 +674,12 @@ describe('viewTheResponse route', () => {
     expect(additionalDefendantDetails).toHaveLength(1);
     expect(additionalDefendantDetails[0].rows).toEqual([
       expect.objectContaining({
-        key: { text: 'viewTheResponse:defendant1.name' },
+        key: { text: 'viewTheResponse:defendant.name' },
         value: { text: 'Peter Parker' },
+      }),
+      expect.objectContaining({
+        key: { text: 'viewTheResponse:defendant.address' },
+        value: { text: 'Address unknown' },
       }),
     ]);
   });
@@ -993,5 +1032,150 @@ describe('viewTheResponse route', () => {
     );
 
     expect(next).toHaveBeenCalledWith(serviceError);
+  });
+
+  async function renderResponse(data: CcdCaseData) {
+    mockCaseById(data);
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+    await handler(
+      viewTheResponseRequest({ caseReference, sessionUser: { accessToken: 'access-token-1' } }),
+      res,
+      jest.fn()
+    );
+    return (res.render as jest.Mock).mock.calls[0][1];
+  }
+
+  it('should build responsePdfUrl when the defence document is present in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'doc-response-1',
+          value: {
+            document_filename: 'Defence - Defendant 2.pdf',
+            document_binary_url: 'http://dm-store/doc-response-1/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        responseDocumentId: 'doc-response-1',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.responsePdfUrl).toBe(`/case/${caseReference}/view-documents/doc-response-1`);
+  });
+
+  it('should not build responsePdfUrl when responseDocumentId does not match a document in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'some-other-doc',
+          value: {
+            document_filename: 'Defence - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/some-other-doc/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        responseDocumentId: 'not-present',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.responsePdfUrl).toBeUndefined();
+  });
+
+  it('should not build responsePdfUrl when the response PDF has not been generated yet', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      possessionClaimResponse: {
+        defendantResponses: {},
+      },
+    } as CcdCaseData);
+
+    expect(renderArgs.responsePdfUrl).toBeUndefined();
+  });
+
+  it('should not build responsePdfUrl when the matching document is missing its binary url', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'doc-response-1',
+          value: {
+            document_filename: 'Defence - Defendant 2.pdf',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        responseDocumentId: 'doc-response-1',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.responsePdfUrl).toBeUndefined();
+  });
+});
+
+describe('view-the-response template - response PDF link', () => {
+  // Render the real PDF-link block from the production template so that a broken
+  // conditional (e.g. a mistyped `{% if dateSubmitted andresponsePdfUrl %}`) fails
+  // this test instead of only surfacing as a 500 at runtime.
+  const templatePath = path.resolve(__dirname, '../../../main/views/view-the-response.njk');
+  const templateSource = fs.readFileSync(templatePath, 'utf8');
+  const pdfBlockMatch = templateSource.match(
+    /\{%\s*if dateSubmitted\s*%\}[\s\S]*?pdf\.linkText[\s\S]*?\{%\s*endif\s*%\}[\s\S]*?\{%\s*endif\s*%\}/
+  );
+
+  const t = (key: string) =>
+    (
+      ({
+        'viewTheResponse:pdf.heading': 'Response PDF',
+        'viewTheResponse:pdf.linkText': 'Download the response',
+      }) as Record<string, string>
+    )[key] ?? key;
+
+  function renderPdfBlock(context: Record<string, unknown>): string {
+    if (!pdfBlockMatch) {
+      throw new Error('Could not locate the response PDF block in view-the-response.njk');
+    }
+    return new Environment(null, { autoescape: true }).renderString(pdfBlockMatch[0], { t, ...context });
+  }
+
+  it('locates the response PDF block in the template', () => {
+    expect(pdfBlockMatch).not.toBeNull();
+  });
+
+  it('renders the PDF link with the resolved url and safe external-link attributes', () => {
+    const html = renderPdfBlock({
+      dateSubmitted: '2026-02-01',
+      responsePdfUrl: '/case/1234567890123456/view-documents/doc-response-1',
+    });
+
+    expect(html).toContain('href="/case/1234567890123456/view-documents/doc-response-1"');
+    expect(html).toContain('target="_blank"');
+    expect(html).toContain('rel="noopener noreferrer"');
+    expect(html).toContain('Download the response');
+  });
+
+  it('renders the heading but no link when the PDF url is not available', () => {
+    const html = renderPdfBlock({ dateSubmitted: '2026-02-01' });
+
+    expect(html).toContain('Response PDF');
+    expect(html).not.toContain('<a ');
+    expect(html).not.toContain('Download the response');
+  });
+
+  it('renders nothing when the response has not been submitted', () => {
+    const html = renderPdfBlock({ responsePdfUrl: '/case/1234567890123456/view-documents/doc-response-1' });
+
+    expect(html.trim()).toBe('');
   });
 });

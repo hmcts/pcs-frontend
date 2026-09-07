@@ -5,7 +5,7 @@ import type { TFunction } from 'i18next';
 import { HTTPError } from '../HttpError';
 import { VIEW_DOCUMENTS_ROUTE, VIEW_RESPONSE_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
-import { normalizeYesNoValue, penceToPounds } from '../steps/utils';
+import { isWalesProperty, normalizeYesNoValue, penceToPounds } from '../steps/utils';
 
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -27,6 +27,10 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
+import { findCaseDocumentById } from '@utils/documentUtils';
+import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
+import { RELEASE_1_2_ENABLED } from '@utils/respondToClaimFlags';
 
 const logger = Logger.getLogger('viewTheResponse');
 
@@ -47,12 +51,6 @@ interface SummarySection {
 
 interface TitledSummarySection extends SummarySection {
   sectionTitle: string;
-}
-
-interface AdditionalDefendantParty {
-  firstName?: string;
-  lastName?: string;
-  nameKnown?: string;
 }
 
 function formatGdsDate(value: string | undefined | null): string | null {
@@ -150,19 +148,40 @@ function joinName(firstName?: string, lastName?: string): string {
   return [firstName, lastName].filter(Boolean).join(' ').trim();
 }
 
-function resolveAdditionalDefendantName(t: TFunction, party: AdditionalDefendantParty): string {
-  if (isNo(party.nameKnown)) {
+function resolveAdditionalDefendantName(t: TFunction, party: CcdParty | undefined): string {
+  if (!party || Object.keys(party).length === 0 || isNo(party.nameKnown)) {
     return t('viewTheResponse:personsUnknown');
   }
-  const name = joinName(party.firstName, party.lastName);
-  return name || t('viewTheResponse:personsUnknown');
+
+  if (party.firstName === 'Person unknown' && party.lastName === 'Person unknown') {
+    return t('viewTheResponse:personsUnknown');
+  }
+
+  return joinName(party.firstName, party.lastName) || t('viewTheResponse:personsUnknown');
 }
 
-function addressToString(address: CcdCaseAddress | Record<string, never> | undefined): string {
+function resolveDefendantPostalAddress(
+  t: TFunction,
+  party: CcdDefendantParty | CcdParty | undefined,
+  propertyAddress?: CcdCaseAddress
+): string {
+  if (isNo(party?.addressKnown)) {
+    return t('viewTheResponse:addressUnknown');
+  }
+
+  if (isYes(party?.addressSameAsProperty)) {
+    return formatAddress(propertyAddress) ?? t('viewTheResponse:addressUnknown');
+  }
+
+  const addressText = addressToString(party?.address);
+  return addressText || t('viewTheResponse:addressUnknown');
+}
+
+function addressToString(address: CcdCaseAddress | undefined): string {
   if (!address || Object.keys(address).length === 0) {
     return '';
   }
-  return formatAddress(address as CcdCaseAddress) ?? '';
+  return formatAddress(address) ?? '';
 }
 
 function pushRow(rows: SummaryRow[], label: string, value: string | null | undefined): void {
@@ -222,13 +241,20 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
   const rows: SummaryRow[] = [];
   const party: CcdDefendantParty | undefined = caseData.possessionClaimResponse?.defendantContactDetails?.party;
   const responses = caseData.possessionClaimResponse?.defendantResponses;
+  const addressUnknown = isNo(party?.addressKnown);
 
-  pushRow(rows, t('viewTheResponse:defendant1.name'), joinName(party?.firstName, party?.lastName));
-  if (isYes(party?.phoneNumberProvided)) {
-    pushRow(rows, t('viewTheResponse:defendant1.phone'), party?.phoneNumber);
+  pushRow(rows, t('viewTheResponse:defendant.name'), joinName(party?.firstName, party?.lastName));
+  if (!addressUnknown && isYes(party?.phoneNumberProvided)) {
+    pushRow(rows, t('viewTheResponse:defendant.phone'), party?.phoneNumber);
   }
-  pushRow(rows, t('viewTheResponse:defendant1.address'), addressToString(party?.address));
-  pushRow(rows, t('viewTheResponse:defendant1.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
+  pushRow(
+    rows,
+    t('viewTheResponse:defendant.address'),
+    resolveDefendantPostalAddress(t, party, caseData.propertyAddress)
+  );
+  if (!addressUnknown) {
+    pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
+  }
   return { rows };
 }
 
@@ -243,10 +269,19 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
   return defendants
     .filter(defendant => !currentDefendantPartyId || defendant.id !== currentDefendantPartyId)
     .map((defendant, index) => {
-      const party = defendant.value as AdditionalDefendantParty;
+      const party = defendant.value;
       const rows: SummaryRow[] = [];
+      const addressUnknown = isNo(party.addressKnown);
 
-      pushRow(rows, t('viewTheResponse:defendant1.name'), resolveAdditionalDefendantName(t, party));
+      pushRow(rows, t('viewTheResponse:defendant.name'), resolveAdditionalDefendantName(t, party));
+      pushRow(
+        rows,
+        t('viewTheResponse:defendant.address'),
+        resolveDefendantPostalAddress(t, party, caseData.propertyAddress)
+      );
+      if (!addressUnknown) {
+        pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(party.dateOfBirth) ?? '');
+      }
 
       return {
         sectionTitle: t('viewTheResponse:sections.additionalDefendantDetails', { number: index + 1 }),
@@ -255,18 +290,13 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
     });
 }
 
-function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLandlord: boolean): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
-  pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNo(t, caseData.isExemptLandlord));
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.landlordRegistered'),
-    yesNoNotSure(t, responses?.landlordRegistered)
-  );
-  pushRow(rows, t('viewTheResponse:responseToClaim.landlordLicensed'), yesNoNotSure(t, responses?.landlordLicensed));
-  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
+  if (showExemptLandlord) {
+    pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNoNotSure(t, responses?.exemptLandlord));
+  }
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.tenancyTypeConfirmation'),
@@ -287,6 +317,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData): SummarySecti
       formatGdsDate(responses?.tenancyStartDate) ?? ''
     );
   }
+  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
@@ -556,6 +587,18 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
   return { rows };
 }
 
+function resolveResponsePdfUrl(caseData: CcdCaseData, caseReference: string): string | undefined {
+  const documentId = caseData.possessionClaimResponse?.responseDocumentId;
+  if (!documentId) {
+    return undefined;
+  }
+  const document = findCaseDocumentById(caseData as unknown as Record<string, unknown>, documentId);
+  if (!document) {
+    return undefined;
+  }
+  return `${VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference)}/${documentId}`;
+}
+
 export default function viewTheResponseRoutes(app: Application): void {
   app.get(VIEW_RESPONSE_ROUTE, oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     const rawRef = req.params?.caseReference;
@@ -583,16 +626,19 @@ export default function viewTheResponseRoutes(app: Application): void {
       }
 
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
+      const release12Enabled = await isRespondToClaimEnabledForRelease(req);
+      const showExemptLandlord = release12Enabled && isWalesProperty(caseData);
 
       const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
       const completedBy = responses?.statementOfTruthCompletedBy;
+      const responsePdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_2_ENABLED, false);
 
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
         defendant1Details: buildDefendant1Details(t, caseData),
         additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData),
-        responseToClaim: buildResponseToClaim(t, caseData),
+        responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord),
         paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
         regularIncome: buildRegularIncome(t, caseData),
@@ -612,6 +658,7 @@ export default function viewTheResponseRoutes(app: Application): void {
         ...sections,
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
+        responsePdfUrl: responsePdfEnabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
       });
     } catch (e) {
       logger.error(`Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`);

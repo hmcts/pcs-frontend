@@ -1,10 +1,10 @@
 {
-  "pageTitle": "cyResponse submitted",
-  "responseSubmittedParagraph1": "cyWe’ve sent you a confirmation email.",
-  "responseSubmittedHeading1": "cyWhat to do next",
-  "responseSubmittedListItem1": "cyA hearing date will be scheduled. You’ll get a notification telling you when this has happened. At the hearing, a judge will listen to both sides and make a decision. You should come to the hearing.",
+  "pageTitle": "Ymateb wedi'i gyflwyno",
+  "responseSubmittedParagraph1": "Rydym wedi anfon neges gadarnhau atoch drwy e-bost.",
+  "responseSubmittedHeading1": "Beth i'w wneud nesaf",
+  "responseSubmittedListItem1": "Bydd dyddiad gwrandawiad yn cael ei bennu. Byddwch yn derbyn hysbysiad yn dweud wrthych pan fydd hyn wedi digwydd. Yn y gwrandawiad, bydd barnwr yn gwrando ar y ddwy ochr ac yn gwneud penderfyniad. Dylech ddod i’r gwrandawiad.",
   "responseSubmittedListItem2": "cySome people need support to use HMCTS services, like step-free access to a court for a hearing. If you need support and have not already asked for it in your response, contact us. Use the ‘Contact us for help’ link on this page.</a>.",
-  "responseSubmittedHeading2": "cyWe’d like to hear your thoughts",
-  "responseSubmittedParagraph2": "cy<a href='https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession' rel=\"noopener\" class=\"govuk-link\" target='_blank'>Complete this short survey to help us improve this service (opens in new tab)</a> (usually takes 5 minutes).",
-  "closeAndReturnToCaseOverview": "cyClose and return to case overview"
+  "responseSubmittedHeading2": "Hoffwn gael eich barn",
+  "responseSubmittedParagraph2": "<a href='https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession' rel=\"noopener\" class=\"govuk-link\" target='_blank'>Llenwch yr arolwg byr hwn i'n helpu i wella'r gwasanaeth hwn (yn agor mewn tab newydd)</a> (fel arfer yn cymryd 5 munud).",
+  "closeAndReturnToCaseOverview": "Cau a dychwelyd i drosolwg o’r achos"
 }

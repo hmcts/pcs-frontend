@@ -1,13 +1,13 @@
 {
-  "pageTitle": "cyResponse and counterclaim submitted",
-  "responseAndCounterClaimSubmittedParagraph1": "cyWe’ve sent you a confirmation email.",
-  "responseAndCounterClaimSubmittedParagraph2": "cyBefore the court can send the counterclaim to the other parties or a judge can consider it, the court must review the Help With Fees application linked to the counterclaim.",
-  "responseAndCounterClaimSubmittedParagraph3": "cyIf the court does not approve your Help With Fees application, you might need to pay all or part of the counterclaim fee.",
-  "responseAndCounterClaimSubmittedParagraph4": "cyWe’ll notify you of the outcome of your Help With Fees application.",
-  "responseAndCounterClaimSubmittedHeading1": "cyWhat to do next",
-  "responseAndCounterClaimSubmittedListItem1": "cyA hearing date will be scheduled. You’ll get a notification telling you when this has happened. At the hearing, a judge will listen to both sides and make a decision. You should come to the hearing.",
-  "responseAndCounterClaimSubmittedListItem2": "cySome people need support to use HMCTS services, like step-free access to a court for a hearing. If you need support and have not already asked for it in your response, contact us. Use the ‘Contact us for help’ link on this page.",
-  "responseAndCounterClaimSubmittedHeading2": "cyWe’d like to hear your thoughts",
-  "responseAndCounterClaimSubmittedParagraph5": "cy<a href='https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession' rel=\"noopener\" class=\"govuk-link\" target='_blank'>Complete this short survey to help us improve this service (opens in new tab)</a> (usually takes 5 minutes).",
-  "closeAndReturnToCaseOverview": "cyClose and return to case overview"
+  "pageTitle": "Ymateb a gwrth-hawliad wedi'i gyflwyno",
+  "responseAndCounterClaimSubmittedParagraph1": "Rydym wedi anfon neges gadarnhau atoch drwy e-bost.",
+  "responseAndCounterClaimSubmittedParagraph2": "Cyn y gall y llys anfon y gwrth-hawliad at y partion eraill neu y gall barnwr ei ystyried, rhaid i'r llys adolygu'r cais Help Gyda Ffioedd sy'n gysylltiedig â'r gwrth-hawliad.",
+  "responseAndCounterClaimSubmittedParagraph3": "Os nad yw'r llys yn cymeradwyo eich cais Help Gyda Ffioedd, efallai y byddwch angen talu'r cyfan neu ran o'r ffi gwrth-hawliad.",
+  "responseAndCounterClaimSubmittedParagraph4": "Byddwn yn eich hysbysu am ganlyniad eich cais Help Gyda Ffioedd.",
+  "responseAndCounterClaimSubmittedHeading1": "Beth i'w wneud nesaf",
+  "responseAndCounterClaimSubmittedListItem1": "Bydd dyddiad gwrandawiad yn cael ei bennu. Byddwch yn derbyn hysbysiad yn dweud wrthych pan fydd hyn wedi digwydd. Yn y gwrandawiad, bydd barnwr yn gwrando ar y ddwy ochr ac yn gwneud penderfyniad. Dylech ddod i’r gwrandawiad.",
+  "responseAndCounterClaimSubmittedListItem2": "Mae rhai pobl angen cefnogaeth i ddefnyddio gwasanaethau GLlTEF fel mynediad heb risiau i'r llys ar gyfer gwrandawiad. Os ydych angen cefnogaeth a heb ofyn yn barod yn eich ymateb, cysylltwch â ni. Defnyddiwch y ddolen 'Cysylltu â ni am gymorth' ar y dudalen hon.",
+  "responseAndCounterClaimSubmittedHeading2": "Hoffwn gael eich barn",
+  "responseAndCounterClaimSubmittedParagraph5": "<a href='https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession' rel=\"noopener\" class=\"govuk-link\" target='_blank'>Llenwch yr arolwg byr hwn i'n helpu i wella'r gwasanaeth hwn (yn agor mewn tab newydd)</a> (fel arfer yn cymryd 5 munud).",
+  "closeAndReturnToCaseOverview": "Cau a dychwelyd i drosolwg o’r achos"
 }

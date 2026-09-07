@@ -1,6 +1,5 @@
 export const otherConsiderations = {
   mainHeader: `Is there anything else you want to tell the court as part of your response?`,
-  lrHiddenMainHeader: `Is there anything else the defendant wants to tell the court as part of their response?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   detailsTextInput: `Court details`,

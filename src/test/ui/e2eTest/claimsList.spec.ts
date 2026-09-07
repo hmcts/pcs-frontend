@@ -7,6 +7,7 @@ const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
+  await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-enabled');
   process.env.NOTICE_SERVED = 'YES';
   process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadNoDefendants.overriddenClaimantName;
   process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';

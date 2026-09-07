@@ -20,7 +20,7 @@
     },
     "regularIncome": {
       "label": "cy What regular income do you receive?",
-      "changeHidden": "cy regular income",
+      "changeHidden": "incwm rheolaidd",
       "options": {
         "incomeFromJobs": "Incwm o bob swydd a wneir gennych",
         "pension": "Pensiwn, y wladwriaeth a phreifat",
@@ -30,7 +30,7 @@
       }
     },
     "hasAppliedForUniversalCredit": {
-      "label": "cy Have you applied for Universal Credit?",
+      "label": "Ydych chi wedi gwneud cais am Gredyd Cynhwysol?",
       "changeHidden": "cy applied for Universal Credit"
     },
     "universalCreditApplicationDate": {
@@ -38,20 +38,20 @@
       "changeHidden": "cy Universal Credit application date"
     },
     "priorityDebts": {
-      "label": "cy Do you have any priority debts?",
-      "changeHidden": "cy priority debts"
+      "label": "A oes gennych chi unrhyw ddyledion blaenoriaeth?",
+      "changeHidden": "dyledion blaenoriaeth"
     },
     "priorityDebtTotal": {
-      "label": "cy What is the total amount you owe for all your priority debts?",
+      "label": "Beth yw'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
       "changeHidden": "cy priority debt total"
     },
     "priorityDebtContribution": {
-      "label": "cy How much do you pay towards your priority debts each week or month?",
+      "label": "Faint ydych yn ei dalu tuag at eich dyledion blaenoriaeth bob wythnos neu fis?",
       "changeHidden": "cy priority debt contribution"
     },
     "regularExpenses": {
       "label": "cy What other regular expenses do you have?",
-      "changeHidden": "cy regular expenses",
+      "changeHidden": "costau rheolaidd",
       "options": {
         "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
         "loanPayments": "Taliadau benthyciadau",
@@ -65,11 +65,11 @@
       }
     },
     "otherConsiderations": {
-      "label": "cy Is there anything else you want to tell the court as part of your response?",
+      "label": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
       "changeHidden": "cy other considerations"
     },
     "otherConsiderationsDetails": {
-      "label": "cy Give details about what else you want to tell the court",
+      "label": "Rhowch fanylion beth arall rydych eisiau ei ddweud wrth y llys",
       "changeHidden": "cy other considerations details"
     }
   }

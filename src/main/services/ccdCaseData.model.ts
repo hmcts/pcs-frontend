@@ -97,6 +97,26 @@ export class CcdCaseModel {
     return this.data.notice_OtherDateTime;
   }
 
+  get notice_ServiceMethod(): string | undefined {
+    return this.data.notice_ServiceMethod;
+  }
+
+  get notice_PersonName(): string | undefined {
+    return this.data.notice_PersonName;
+  }
+
+  get notice_EmailAddress(): string | undefined {
+    return this.data.notice_EmailAddress;
+  }
+
+  get notice_OtherExplanation(): string | undefined {
+    return this.data.notice_OtherExplanation;
+  }
+
+  get notice_OtherElectronicExplanation(): string | undefined {
+    return this.data.notice_OtherElectronicExplanation;
+  }
+
   get tenancy_TypeOfTenancyLicence(): string | undefined {
     return this.data.tenancy_TypeOfTenancyLicence;
   }

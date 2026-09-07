@@ -1,0 +1,19 @@
+{
+  "pageTitle": "Counterclaim fee",
+  "counterClaimFeeHeading": "Help with court fees",
+  "counterClaimFeeCostParagraph": "Based on the information provided, it will cost the defendant {{counterClaimFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} to make their counterclaim.",
+  "counterClaimFeeHelpParagraph": "The defendant may be able to get help paying the fee if they (one or more of the following):",
+  "counterClaimFeeBulletBenefits": "are on certain benefits",
+  "counterClaimFeeBulletLowSavings": "have little or no savings",
+  "counterClaimFeeBulletLowIncome": "have low income",
+  "counterClaimFeeHeading2": "Does the defendant need help paying the counterclaim fee?",
+  "counterClaimFeeOptions": {
+    "iNeedHelpWithPayingFee": "The defendant needs help paying the fee",
+    "iDoNotNeedHelpWithPayingFee": "The defendant does not need help paying the fee"
+  },
+  "errors": {
+    "counterClaimFee": {
+      "required": "Select if the defendant needs help paying the counterclaim fee"
+    }
+  }
+}

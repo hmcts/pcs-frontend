@@ -1,0 +1,10 @@
+{
+  "pageTitle": "Gwrth-hawliad",
+  "whatCounterClaimIsHeading": "",
+  "counterClaimFeesParagraph2": "Bydd dolen i wneud gwrth-hawliad unwaith y byddwch wedi cyflwyno'r ymateb.",
+  "counterClaimFeesCourtFeesLinkText": "",
+  "question": "A yw'r diffynnydd yn cynllunio i wneud gwrth-hawliad yn erbyn {{claimantName}}?",
+  "errors": {
+    "makeCounterClaim": "Dewiswch a yw'r diffynnydd yn bwriadu gwneud gwrth-hawliad"
+  }
+}

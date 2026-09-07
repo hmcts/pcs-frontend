@@ -6,9 +6,7 @@ export const rentArrears = {
   negativeTextInput: `-100.00`,
   billionTextInput: `1000000001.00`,
   doYouOweThisQuestion: `Do you owe this amount in rent arrears?`,
-  lrHiddenDoesDefendantOweQuestion: `Does the defendant owe this amount in rent arrears?`,
   howMuchDoYouBelieveHiddenTextLabel: `How much do you believe you owe in rent arrears?`,
-  lrHiddenHowMuchDoesDefendantBelieveTextLabel: `How much does the defendant believe they owe in rent arrears?`,
   rentArrearsAreMoneyParagraph: `Rent arrears are money you owe in rent payments.`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
@@ -25,4 +23,5 @@ export const rentArrears = {
   enterAmountInCorrectFormatErrorMessage: `Enter how much you believe you owe in rent arrears, in the correct format (e.g. if you owe £148, please write £148.00)`,
   whenTheyMadeTheirClaimParagraph: `When they made their claim, ${process.env.CLAIMANT_NAME} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
   amountYouOweHeader: `Amount you owe in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
+  rentDocumentDynamicLink: 'View a copy of the rent statement (opens in new tab)',
 };

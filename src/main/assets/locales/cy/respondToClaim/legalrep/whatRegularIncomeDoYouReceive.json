@@ -1,66 +1,66 @@
 {
-  "pageTitle": "cyRegular income",
-  "heading": "cyIncome",
-  "incomeQuestion": "cyWhat regular income does the defendant receive? (Optional)",
-  "groupName": "cyRegular income options",
-  "hintText": "cySelect all that apply. The information the defendant provides must be truthful and accurate.",
+  "pageTitle": "Incwm rheolaidd",
+  "heading": "Incwm",
+  "incomeQuestion": "Pa incwm rheolaidd mae'r diffynnydd yn ei dderbyn? (Dewisol)",
+  "groupName": "Dewisiadau incwm rheolaidd",
+  "hintText": "Dewiswch bopeth sy'n berthnasol. Rhaid i’r wybodaeth a ddarperir gan y diffynnydd fod yn wir ac yn gywir.",
   "options": {
-    "incomeFromJobs": "cyIncome from all jobs they do",
-    "pension": "cyPension – state and private",
-    "universalCredit": "cyUniversal Credit",
-    "otherBenefits": "cyOther benefits and credits",
-    "moneyFromElsewhere": "cyMoney from somewhere else (for example, child maintenance payments or someone in the defendant's household gives them money)"
+    "incomeFromJobs": "Incwm o bob swydd a wneir ganddynt",
+    "pension": "Pensiwn - y wladwriaeth a phreifat",
+    "universalCredit": "Credyd Cynhwysol",
+    "otherBenefits": "Budd-daliadau a chredydau eraill",
+    "moneyFromElsewhere": "Arian o rywle arall (er enghraifft, taliadau cynhaliaeth plant neu rywun yng nghartref y diffynnydd yn rhoi arian iddynt)"
   },
   "subFields": {
-    "amount": "cyTotal amount received",
-    "frequency": "cyReceived every:",
-    "moneyFromElsewhereDetailsLabel": "cyGive details",
-    "moneyFromElsewhereDetailsHint": "cyGive details about the other sources of income and how much the defendant usually receives a month"
+    "amount": "Cyfanswm a dderbynnir",
+    "frequency": "Derbynnir bob:",
+    "moneyFromElsewhereDetailsLabel": "Rhowch fanylion",
+    "moneyFromElsewhereDetailsHint": "Rhowch fanylion y ffynonellau eraill o incwm a faint mae'r diffynnydd fel arfer yn ei dderbyn y mis"
   },
   "frequency": {
-    "week": "cyWeek",
-    "month": "cyMonth"
+    "week": "Wythnos",
+    "month": "Mis"
   },
   "errors": {
     "incomeFromJobsAmount": {
-      "required": "cyEnter the total amount the defendant receives from all jobs they do",
-      "negative": "cyThe total amount the defendant receives from all jobs they do each week or month must be £0.00 or above",
-      "largeAmount": "cyThe total amount the defendant receives from all jobs you do each week or month must be less than £1 billion"
+      "required": "Nodwch y cyfanswm mae'r diffynnydd yn ei gael o'r holl swyddi a wneir ganddynt",
+      "negative": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o'r holl swyddi a wneir ganddynt bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o'r holl swyddi a wneir bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "incomeFromJobsFrequency": {
-      "required": "cySelect how frequently the defendant receives income from all jobs they do"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn cael incwm o’r holl swyddi a wneir ganddynt"
     },
     "pensionAmount": {
-      "required": "cyEnter the total amount the defendant receives from a state or private pension",
-      "negative": "cyThe total amount the defendant receives from pension (state and private) each week or month must be £0.00 or above",
-      "largeAmount": "cyThe total amount the defendant receives from pension (state and private) each week or month must be less than £1 billion"
+      "required": "Nodwch faint mae'r diffynnydd yn ei gael o bensiwn gwladol neu breifat",
+      "negative": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "pensionFrequency": {
-      "required": "cySelect how frequently the defendant receives income from a state or private pension"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn cael incwm o bensiwn gwladol neu breifat"
     },
     "universalCreditAmount": {
-      "required": "cyEnter the total amount the defendant receives from Universal Credit",
-      "negative": "cyThe total amount the defendant receives from Universal Credit each week or month must be £0.00 or above",
-      "largeAmount": "cyThe total amount the defendsnt receives from Universal Credit each week or month must be less than £1 billion"
+      "required": "Nodwch faint o Gredyd Cynhwysol mae'r diffynnydd yn ei gael",
+      "negative": "Rhaid i faint o Gredyd Cynhwysol mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i faint o Gredyd Cynhwysol mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "universalCreditFrequency": {
-      "required": "cySelect how frequently the defendant receives Universal Credit"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn cael Credyd Cynhwysol"
     },
     "otherBenefitsAmount": {
-      "required": "cyEnter the total amount the defendant receives from other benefits and credits",
-      "negative": "cyThe total amount the defendant receives from other benefits and credit each week or month must be £0.00 or above",
-      "largeAmount": "cyThe total amount the defendant receives from other benefits and credit each week or month must be less than £1 billion"
+      "required": "Nodwch faint o fudd-daliadau a chredydau eraill mae'r diffynnydd yn ei gael",
+      "negative": "Rhaid i faint o fudd-daliadau a chredydau eraill mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i faint o fudd-daliadau a chredydau eraill mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "otherBenefitsFrequency": {
-      "required": "cySelect how frequently the defendant receives income from other benefits and credits"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn cael incwm o fudd-daliadau a chredydau eraill"
     },
-    "moneyFromElsewhereDetailsMaxLength": "cyDetails of money from somewhere else must be 500 characters or less",
+    "moneyFromElsewhereDetailsMaxLength": "Rhaid i fanylion arian o rhywle arall fod yn 500 o nodau neu lai",
     "moneyFromElsewhereDetails": {
-      "required": "cyEnter details about the money the defendant received from somewhere else and how much the defendant usually receives",
-      "invalidCharacters": "cyGive details about the other sources of income and how much the defendant usually receives must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+      "required": "Rhowch fanylion yr arian mae'r diffynnydd yn ei gael o rywle arall a faint mae'r diffynnydd fel arfer yn ei gael",
+      "invalidCharacters": "Rhowch fanylion am y ffynonellau eraill o incwm a faint mae'r diffynnydd fel arfer yn ei gael - dylai gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
     },
     "amount": {
-      "invalidFormat": "cyEnter an amount in the correct format, for example 148.00 or 148.50"
+      "invalidFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"
     }
   }
 }

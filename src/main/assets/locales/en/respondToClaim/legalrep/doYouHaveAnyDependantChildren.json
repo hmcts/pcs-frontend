@@ -1,11 +1,13 @@
 {
+  "pageTitle": "Dependent children",
   "heading": "Dependant children",
   "dependantQuestion": "Does the defendant have any dependant children?",
-  "dependantChildrenParagraph": "",
+  "dependentChildrenParagraph": "",
   "dependentChildrenDetailsLabel": "Give details about their dependant children",
   "dependentChildrenDetailsHint": "",
   "errors": {
     "dependentChildren": "Select if they have any dependant children",
-    "dependentChildrenDetails": "Give details about their dependant children"
+    "dependentChildrenDetails": "Give details about their dependant children",
+    "dependantChildrenDetailsMaxLength": "Dependent children details must be 500 characters or less"
   }
 }

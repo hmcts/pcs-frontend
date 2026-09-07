@@ -1,11 +1,11 @@
 {
-  "pageTitle": "cyAnything else to tell",
-  "heading": "cyIs there anything else you want to tell the court as part of your response?",
-  "otherConsiderationsDetailsLabel": "cyGive details about what else you want to tell the court",
+  "pageTitle": "Unrhyw beth arall i'w ddweud",
+  "heading": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
+  "otherConsiderationsDetailsLabel": "Rhowch fanylion beth arall rydych eisiau ei ddweud wrth y llys",
   "errors": {
-    "otherConsiderations": "cySelect if there is anything else you want to tell the court",
-    "otherConsiderationsDetails": "cyEnter details about what you want to tell the court",
-    "otherConsiderationsInvalid": "cyGive details about what else you want to tell the court must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
-    "otherConsiderationsDetailsMaxLength": "cyDetails about what else you want to tell the court must be 6400 characters or less"
+    "otherConsiderations": "Dewiswch oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys",
+    "otherConsiderationsDetails": "Rhowch fanylion yr hyn yr ydych am ei ddweud wrth y llys",
+    "otherConsiderationsInvalid": "Rhowch fanylion beth arall yr ydych am ei ddweud wrth y llys i gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod",
+    "otherConsiderationsDetailsMaxLength": "Rhaid i fanylion am beth arall rydych eisiau ei ddweud wrth y llys fod yn 6400 nod neu lai"
   }
 }

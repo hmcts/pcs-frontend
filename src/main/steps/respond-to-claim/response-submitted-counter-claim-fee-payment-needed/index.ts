@@ -2,6 +2,7 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { getCaseManagementUrl } from '@utils/legalRepresentativeRedirectHandler';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'response-submitted-counter-claim-fee-payment-needed',
@@ -28,6 +29,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return {
       backUrl: '',
+      closeUrl: getCaseManagementUrl(req),
       responseSubmittedCounterClaimFeePaymentNeededListItem1: t(
         'responseSubmittedCounterClaimFeePaymentNeededListItem1',
         {

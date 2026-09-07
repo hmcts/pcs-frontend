@@ -44,6 +44,7 @@ jest.mock('@routes/dashboard', () => ({
 import type { Request, Response } from 'express';
 
 import { step } from '../../../../../main/steps/case-tasks/upload-additional-documents/check-your-answers';
+import { MAIN_CLAIM_OPTION_VALUE } from '../../../../../main/steps/case-tasks/upload-additional-documents/flow.config';
 
 import { sessionDocs } from '@modules/documents/storage';
 import { getFormData } from '@modules/steps';
@@ -107,8 +108,8 @@ describe('upload-additional-documents check-your-answers GET viewmodel', () => {
 });
 
 describe('upload-additional-documents check-your-answers POST', () => {
-  it('omits selectedRelatedApplicationId when the sentinel was chosen', async () => {
-    mockGetFormData.mockReturnValue({ relatedApplicationId: 'MAIN_CLAIM_OR_COUNTERCLAIM' });
+  it('omits selectedRelatedApplicationId when the main claim was chosen', async () => {
+    mockGetFormData.mockReturnValue({ relatedApplicationId: MAIN_CLAIM_OPTION_VALUE });
 
     await step.postController!.post!(buildReq(), buildRes(), jest.fn());
 
@@ -116,6 +117,17 @@ describe('upload-additional-documents check-your-answers POST', () => {
     const [, payload] = mockSubmit.mock.calls[0];
     expect(payload.data.selectedRelatedApplicationId).toBeUndefined();
     expect(payload.data.uploadedAdditionalDocuments).toHaveLength(1);
+  });
+
+  it('includes selectedRelatedApplicationId when the counterclaim was chosen', async () => {
+    const counterClaimId = '33333333-3333-3333-3333-333333333333';
+    mockGetFormData.mockReturnValue({ relatedApplicationId: counterClaimId });
+
+    await step.postController!.post!(buildReq(), buildRes(), jest.fn());
+
+    expect(mockSubmit).toHaveBeenCalledTimes(1);
+    const [, payload] = mockSubmit.mock.calls[0];
+    expect(payload.data.selectedRelatedApplicationId).toBe(counterClaimId);
   });
 
   it('includes selectedRelatedApplicationId when a gen-app was chosen', async () => {

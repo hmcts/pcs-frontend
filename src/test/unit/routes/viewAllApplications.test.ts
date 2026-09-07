@@ -58,13 +58,6 @@ describe('View All Application Route', () => {
       session: {
         user: { uid: currentUserId, accessToken: 'access-token-1' },
       },
-      res: {
-        locals: {
-          validatedCase: {
-            id: caseReference,
-          },
-        },
-      },
     } as unknown as Request;
 
     const res = {
@@ -152,6 +145,107 @@ describe('View All Application Route', () => {
         ],
       })
     );
+  });
+
+  it('should exclude the submission document from the supporting documents list', async () => {
+    const submissionDocumentId = 'shared-doc-id-1';
+    (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+      data: {
+        genApps: [
+          {
+            id: 'genapp-with-supporting',
+            value: {
+              applicationType: 'ADJOURN',
+              party: {
+                id: 'party-1',
+                idamId: '355fe639-be35-3723-b802-c91d3a9372e7',
+                firstName: 'Cyndi',
+                lastName: 'Edwardson',
+              },
+              submittedOn: '2026-05-03T17:29:33.301528',
+              submissionDocument: {
+                id: submissionDocumentId,
+                document: {
+                  document_url: 'http://dm/documents/aaa',
+                  document_filename: 'General Application GA2 - Defendant 1.pdf',
+                  document_binary_url: 'http://dm/documents/aaa/binary',
+                },
+              },
+              supportingDocuments: [
+                {
+                  id: 'real-supporting-doc',
+                  value: {
+                    document_url: 'http://dm/documents/bbb',
+                    document_filename: 'sample-5 GA2 - Defendant 1.pdf',
+                    document_binary_url: 'http://dm/documents/bbb/binary',
+                  },
+                },
+                {
+                  id: submissionDocumentId,
+                  value: {
+                    document_url: 'http://dm/documents/aaa',
+                    document_filename: 'General Application GA2 - Defendant 1.pdf',
+                    document_binary_url: 'http://dm/documents/aaa/binary',
+                  },
+                },
+              ],
+            },
+          },
+          {
+            id: 'genapp-no-supporting',
+            value: {
+              applicationType: 'ADJOURN',
+              party: {
+                id: 'party-1',
+                idamId: '355fe639-be35-3723-b802-c91d3a9372e7',
+                firstName: 'Cyndi',
+                lastName: 'Edwardson',
+              },
+              submittedOn: '2026-05-04T17:29:33.301528',
+              submissionDocument: {
+                id: 'shared-doc-id-2',
+                document: {
+                  document_url: 'http://dm/documents/ccc',
+                  document_filename: 'General Application GA1 - Defendant 1.pdf',
+                  document_binary_url: 'http://dm/documents/ccc/binary',
+                },
+              },
+              supportingDocuments: [
+                {
+                  id: 'shared-doc-id-2',
+                  value: {
+                    document_url: 'http://dm/documents/ccc',
+                    document_filename: 'General Application GA1 - Defendant 1.pdf',
+                    document_binary_url: 'http://dm/documents/ccc/binary',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    viewAllApplicationsRoutes(app);
+    const handler = getConfiguredRequestHandler(app);
+
+    const req = {
+      params: { caseReference: '1234567890123456' },
+      session: {
+        user: { uid: '355fe639-be35-3723-b802-c91d3a9372e7', accessToken: 'access-token-1' },
+      },
+    } as unknown as Request;
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(req, res, jest.fn());
+
+    const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+    const [withSupporting, noSupporting] = renderArgs.userGenApps;
+
+    expect(withSupporting.supportingDocuments).toEqual([
+      { documentId: 'real-supporting-doc', filename: 'sample-5 GA2 - Defendant 1.pdf' },
+    ]);
+    expect(noSupporting.supportingDocuments).toEqual([]);
   });
 
   it('should throw error when no access token in session', async () => {

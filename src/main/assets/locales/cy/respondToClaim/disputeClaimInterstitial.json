@@ -2,12 +2,12 @@
   "pageTitle": "Hawliad yr hawlydd",
   "heading": "Hawliad {{claimantName, pluralPossessive}}",
   "secondaryHeading": "Ymateb i hawliad i feddiannu eiddo",
-  "paragraph1": "cyYou will now be asked to respond to specific parts of {{claimantName, pluralPossessive}} claim.",
-  "paragraph2": "cyWhen they made their claim, they had to give information about:",
+  "paragraph1": "Gofynnir ichi nawr ymateb i rannau penodol o hawliad {{claimantName, pluralPossessive}}.",
+  "paragraph2": "Pan wnaethant wneud eu hawliad, roedd yn rhaid iddynt roi gwybodaeth am:",
   "listItem1": "cythe tenancy, occupation contract or licence agreement you signed to rent your property",
   "listItem2": "yr hysbysiad o'u bwriad i ddechrau achos meddiannu, os gwnaethant gyflwyno un i chi",
   "listItem3": "eu seiliau dros feddiannu (eu rhesymau dros wneud yr hawliad)",
-  "paragraph3": "cyIf any of the information they’ve given is not correct, you can correct it.",
-  "paragraph4": "cyYou will also be asked if you want to make a counterclaim against {{claimantName}}. If you do, you will need to explain what your counterclaim is and why you’re making it. You will also need to pay a fee.",
+  "paragraph3": "Os bydd unrhyw wybodaeth a roddwyd ganddynt yn anghywir, gallwch ei chywiro.",
+  "paragraph4": "Gofynnir i chi hefyd os ydych eisiau gwneud gwrth-hawliad yn erbyn {{claimantName}}. Os ydych, byddwch angen egluro beth yw eich gwrth-hawliad a pham eich bod yn ei wneud. Bydd rhaid i chi dalu ffi hefyd.",
   "paragraph5": "Bydd yr hawlydd yn gallu gweld eich atebion."
 }

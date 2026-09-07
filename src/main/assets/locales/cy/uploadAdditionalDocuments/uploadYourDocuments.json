@@ -1,14 +1,14 @@
 {
-  "pageTitle": "cyUpload your documents",
-  "heading": "cyUpload your documents",
+  "pageTitle": "Uwchlwythwch eich dogfennau",
+  "heading": "Uwchlwythwch eich dogfennau",
   "guidanceText": "cyYou should only upload documents that are relevant to the claim.",
   "beforeUploadText": "cyBefore you upload the document, give it a name that tells the court what it is, for example ‘witness statement’, or ‘tenancy agreement’.",
-  "fileTypesText": "cyYou can upload the following file types: DOC/DOCX (Word), XLS/XLSM (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.",
-  "uploadLabel": "cyUpload a file",
-  "filesAddedHeading": "cyFiles added",
-  "uploadButton": "cyUpload file",
-  "deleteButton": "cyRemove",
-  "noFilesUploaded": "cyNo files uploaded",
+  "fileTypesText": "Gallwch uwchlwytho'r mathau canlynol o ffeiliau: DOC/DOCX (Word), XLS/XLSM (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.",
+  "uploadLabel": "Uwchlwytho ffeil",
+  "filesAddedHeading": "Ffeiliau wedi eu hychwanegu",
+  "uploadButton": "Uwchlwytho ffeil",
+  "deleteButton": "Dileu",
+  "noFilesUploaded": "Nid oes ffeiliau wedi cael eu huwchlwytho",
   "errors": {
     "documents": {
       "required": "cySelect a file"

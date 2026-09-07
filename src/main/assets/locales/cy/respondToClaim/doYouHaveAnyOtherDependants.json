@@ -7,6 +7,6 @@
   "errors": {
     "otherDependants": "Nodwch a oes gennych chi unrhyw un arall yn ddibynnol arnoch",
     "otherDependantDetails": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnoch",
-    "otherDependantDetailsMaxLength": "cyOther dependants details must be 500 characters or less"
+    "otherDependantDetailsMaxLength": "Rhaid i fanylion dibynyddion eraill fod yn 500 o nodau neu lai"
   }
 }

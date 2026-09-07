@@ -4,12 +4,12 @@
   "heading": "Gwirio eich atebion",
   "buttons": {
     "submit": "Cyflwyno",
-    "continueToPayment": "cyContinue to payment"
+    "continueToPayment": "Parhau i dalu"
   },
   "answers": {
     "typeOfApplication": {
       "label": "Beth ydych chi eisiau gwneud cais amdano?",
-      "changeHint": "cyChange what you want to apply for",
+      "changeHint": "Newid beth rydych eisiau gwneud cais amdano",
       "options": {
         "ADJOURN": "Gofyn i ohirio'r gwrandawiad (ei symud i amser neu ddyddiad diweddarach)",
         "SET_ASIDE": "Gofyn i'r llys roi penderfyniad a wnaed gan y llys o'r neilltu (canslo)",
@@ -33,12 +33,12 @@
       "changeHint": "Newid a ydych chi eisoes wedi gwneud cais am help i dalu ffi’r cais"
     },
     "hwfReference": {
-      "label": "cyWhat is your Help with Fees reference number?",
+      "label": "Beth yw eich cyfeirnod Help i Dalu Ffioedd?",
       "changeHint": "Newid eich cyfeirnod Help i Dalu Ffioedd"
     },
     "uploadedDocuments": {
       "label": "Uwchlwytho dogfennau",
-      "changeHint": "cyChange uploaded documents"
+      "changeHint": "Newid dogfennau wedi eu huwchlwytho"
     },
     "otherPartiesAgreed": {
       "label": "A yw'r partïon eraill wedi cydsynio i'r cais hwn?",
@@ -54,11 +54,11 @@
     },
     "whatOrderWanted": {
       "label": "Pa orchymyn ydych chi eisiau i’r llys ei wneud, a pham?",
-      "changeHint": "cyChange what order do you want the court to make and why"
+      "changeHint": "Newid pa orchymyn ydych chi eisiau i’r llys ei wneud a pham"
     },
     "hasSupportingDocuments": {
       "label": "Ydych chi eisiau uwchlwytho dogfennau i gefnogi eich cais?",
-      "changeHint": "cyChange whether you want to upload documents to support your application"
+      "changeHint": "Newid pa un a ydych eisiau uwchlwytho dogfennau i gefnogi eich cais"
     },
     "whichLanguage": {
       "label": "Pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn?",
@@ -71,19 +71,19 @@
     }
   },
   "statementOfTruth": {
-    "subheading": "cyStatement of truth",
-    "theInformationFormsYourApplication": "cyThe information on this page forms your application.",
-    "whenYouAreSatisfied": "cyWhen you’re satisfied that your answers are correct, you should tick the box below and write your name to “sign” this statement of truth.",
+    "subheading": "Datganiad gwirionedd",
+    "theInformationFormsYourApplication": "Mae’r wybodaeth ar y dudalen hon yn ffurfio eich cais.",
+    "whenYouAreSatisfied": "Pan fyddwch yn fodlon bod eich atebion yn gywir, dylech roi tic yn y blwch isod ac ysgrifennu eich enw i \"lofnodi'r\" datganiad gwirionedd hwn.",
     "checkbox": {
-      "fieldLabel": "cyStatement of truth",
-      "value": "cyI believe that the facts stated in this form are true."
+      "fieldLabel": "Datganiad gwirionedd",
+      "value": "Credaf fod y ffeithiau a nodir yn y ffurflen hon yn wir."
     },
     "understandProceedings": "Deallaf y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu'n onest ei fod yn wir.",
-    "yourFullName": "cyYour full name"
+    "yourFullName": "Eich enw llawn"
   },
   "errors": {
-    "agreeToTheStatementOfTruth": "cyAgree to the statement of truth",
-    "youMustSignYourName": "cyYou must sign your name",
-    "fullNameMaxLength": "cyYour full name must be 100 characters or fewer"
+    "agreeToTheStatementOfTruth": "Cytuno i'r datganiad gwirionedd",
+    "youMustSignYourName": "Mae’n rhaid ichi lofnodi eich enw",
+    "fullNameMaxLength": "Rhaid i'ch enw llawn fod yn 100 nod neu lai"
   }
 }

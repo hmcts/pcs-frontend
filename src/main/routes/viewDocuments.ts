@@ -2,19 +2,17 @@ import { Application, NextFunction, Request, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
 import { oidcMiddleware } from '../middleware';
+import { Logger } from '../modules/logger';
 
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getDocumentBinary } from '@services/cdamService';
-import { extractViewDocumentFolders } from '@utils/documentUtils';
+import { extractCaseDocuments, extractViewDocumentFolders, findCaseDocumentById } from '@utils/documentUtils';
 import { asHeaderString } from '@utils/httpHeaders';
+import { isUncategorisedDocumentsEnabled } from '@utils/isUncategorisedDocumentsEnabled';
 import { sanitiseUUID } from '@utils/uuid';
 
-// view-documents is a read-only display, so we fetch the case directly via
-// CCD's plain GET /cases/{id} (which enforces access — 403/404 if the user
-// doesn't have permission). No event token is needed; requireEventAccess is
-// reserved for write journeys (e.g. finalSubmit) where we want to fail-fast
-// before the user fills in a long form.
+const logger = Logger.getLogger('viewDocuments');
 
 function toFilename(value: string): string {
   const filename = value.trim();
@@ -47,17 +45,22 @@ export default function viewDocumentsRoutes(app: Application): void {
 
       try {
         const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
+        const uncategorisedEnabled = await isUncategorisedDocumentsEnabled(req);
 
         res.render('view-documents', {
           dashboardUrl: getDashboardUrl(caseReference),
           backUrl: getDashboardUrl(caseReference),
           caseReference,
           documentFolders: extractViewDocumentFolders((ccdCase.data ?? {}) as Record<string, unknown>, {
+            includeUncategorised: uncategorisedEnabled,
             folderTitles: {
               statementsOfCase: req.t('dashboard:viewDocuments.folders.statementsOfCase'),
               propertyDocuments: req.t('dashboard:viewDocuments.folders.propertyDocuments'),
               evidence: req.t('dashboard:viewDocuments.folders.evidence'),
               correspondence: req.t('dashboard:viewDocuments.folders.correspondence'),
+              ...(uncategorisedEnabled && {
+                uncategorisedDocuments: req.t('dashboard:viewDocuments.folders.uncategorisedDocuments'),
+              }),
             },
           }),
         });
@@ -76,23 +79,41 @@ export default function viewDocumentsRoutes(app: Application): void {
       const accessToken = req.session.user?.accessToken;
 
       if (!accessToken) {
+        logger.warn('[viewDocuments] Authentication required', { caseReference });
         return next(new HTTPError('Authentication required', 401));
       }
       if (!documentId) {
+        logger.warn('[viewDocuments] Invalid document ID param', { rawDocumentId: req.params.documentId });
         return next(new HTTPError('Document not found', 404));
       }
 
       try {
+        logger.info('[viewDocuments] Document view request received', {
+          caseReference,
+          rawDocumentId: req.params.documentId,
+          documentId,
+        });
         const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
-        const allDocuments = (ccdCase.data?.allDocuments ?? []) as {
-          id?: string;
-          value?: { document_filename?: string; document_binary_url?: string };
-        }[];
-        const document = allDocuments.find(item => item.id === documentId)?.value;
-        const filename = document?.document_filename?.trim() || 'document';
-        const binaryUrl = document?.document_binary_url?.trim();
+
+        const extractedDocs = extractCaseDocuments((ccdCase.data ?? {}) as Record<string, unknown>);
+        logger.info('[viewDocuments] Extracted case documents', {
+          count: extractedDocs.length,
+          extractedDocIds: extractedDocs.map(doc => doc.id),
+          extractedSourceFields: extractedDocs.map(doc => doc.sourceField),
+        });
+
+        const document = findCaseDocumentById((ccdCase.data ?? {}) as Record<string, unknown>, documentId);
+        const filename = document?.filename || 'document';
+        const binaryUrl = document?.binaryUrl?.trim();
+
+        logger.info('[viewDocuments] Document lookup result', {
+          documentFound: Boolean(document),
+          filename,
+          binaryUrl,
+        });
 
         if (!binaryUrl) {
+          logger.warn('[viewDocuments] Document not found or missing binaryUrl', { caseReference, documentId });
           return next(new HTTPError('Document not found', 404));
         }
 

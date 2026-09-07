@@ -1,0 +1,15 @@
+{
+  "pageTitle": "Hawliad ar gyfer rhywbeth arall",
+  "heading": "Gwrth-hawliad am orchymyn heblaw swm o arian",
+  "infoParagraph1": "Byddwch yn gallu uwchlwytho unrhyw dystiolaeth sydd gan y diffynnydd ar y dudalen nesaf.",
+  "infoParagraph2": "Bydd yr hawlydd yn gallu gweld eich atebion.",
+  "characterCountHint": "Er enghraifft, 'i'r landlord wneud gwaith adfer'",
+  "otherOrderRequestFactsLabel": "Pa ffeithiau hoffen nhw i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
+  "otherOrderRequestDetailsLabel": "Pa orchymyn ydyn nhw'n gofyn i’r llys ei wneud?",
+  "errors": {
+    "otherOrderRequestDetailsRequired": "Nodwch pa orchmynion maent yn gofyn i’r llys eu gwneud",
+    "otherOrderRequestDetailsMaxLength": "Rhaid i unrhyw orchmynion maen nhw'n gofyn i'r llys eu gwneud fod yn 6800 nod neu lai",
+    "otherOrderRequestFactsRequired": "Nodwch pa ffeithiau hoffen nhw i'r llys eu hystyried wrth benderfynu ar yr hawliad",
+    "otherOrderRequestFactsMaxLength": "Rhaid i ba ffeithiau y dymunant i'r llys eu hystyried fod yn 6800 nod neu lai"
+  }
+}

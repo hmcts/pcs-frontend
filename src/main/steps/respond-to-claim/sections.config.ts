@@ -5,6 +5,8 @@ import { hasAnyRentArrearsGround } from '../utils';
 
 import type { RespondToClaimStepName } from './stepRegistry';
 
+import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
+
 // Visual groups on the task-list page. Section order within a group follows declaration order below.
 export const RESPOND_TO_CLAIM_SECTION_GROUPS = [
   { id: 'checkBeforeYouStart', titleKey: 'taskList.groups.checkBeforeYouStart' },
@@ -49,8 +51,7 @@ const sectionDefs = [
     titleKey: 'taskList.disputeAndTenancy',
     steps: [
       'dispute-claim-interstitial',
-      'landlord-registered',
-      'landlord-licensed',
+      'exempt-landlord',
       'written-terms',
       'tenancy-type-details',
       'tenancy-date-details',
@@ -119,6 +120,16 @@ const sectionDefs = [
     ],
   },
   {
+    // Your Support (Reasonable Adjustments) — last row under "Your response". Reached only from the
+    // task list (the row links to its first step, the triage page); hidden when the feature flag is
+    // off. See reasonable-adjustments-triage for the triage/microsite behaviour.
+    id: 'yourSupport',
+    groupId: 'yourResponse',
+    titleKey: 'taskList.yourSupport',
+    steps: ['reasonable-adjustments-triage'],
+    isApplicable: async (req: Request) => isCuiYourSupportEnabled(req),
+  },
+  {
     id: 'uploadFiles',
     groupId: 'provideEvidence',
     titleKey: 'taskList.uploadFiles',
@@ -137,13 +148,12 @@ const sectionDefs = [
       'incomeAndExpenditure',
       'uploadFiles',
     ],
-    // 'reasonable-adjustments-triage', 'equality-and-diversity-start' and
-    // 'equality-and-diversity-end' are intentionally parked out of the live citizen
-    // journey while RA / Your Support and PCQ integrations are still in progress.
+    // 'equality-and-diversity-start' and 'equality-and-diversity-end' are intentionally
+    // parked out of the live citizen journey.
     // Their step folders, registry entries and locale files are retained so re-
-    // enablement is a one-line restore here. See HDPI-3793 (RA triage), HDPI-6649
-    // (RA confirmation, parked on a custom branch) and the PCQ tie-in tracked in
-    // config/default.json (`pcq.enabled`).
+    // enablement is a one-line restore here. The PCQ hand-off itself is gated by the
+    // `release-1.3-enabled` and `cui-pcq-enabled` LaunchDarkly flags, and fires from the
+    // RA triage step, not from these pages.
     steps: [
       'language-used',
       'end-of-journey-cya',
@@ -178,6 +188,7 @@ export const RESPOND_TO_CLAIM_SECTION_ENUMS = [
   'PAYMENTS',
   'SITUATION_AND_CIRCUMSTANCES',
   'INCOME_AND_EXPENDITURE',
+  'YOUR_SUPPORT',
   'UPLOAD_FILES',
   'CHECK_YOUR_ANSWERS_AND_SUBMIT',
 ] as const;

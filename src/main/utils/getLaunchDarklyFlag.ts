@@ -1,4 +1,5 @@
 import * as LDClient from '@launchdarkly/node-server-sdk';
+import config from 'config';
 import type { Request } from 'express';
 
 import { Logger } from '@modules/logger';
@@ -9,6 +10,8 @@ export const getLaunchDarklyFlag = async <T>(req: Request, flagName: string, def
   const ldClient = (req.app?.locals?.launchDarklyClient as LDClient.LDClient | undefined) ?? undefined;
 
   let result: T = defaultValue;
+  const environment = config.get<string>('launchdarkly.env');
+
   try {
     const context: LDClient.LDContext = {
       kind: 'user',
@@ -20,6 +23,7 @@ export const getLaunchDarklyFlag = async <T>(req: Request, flagName: string, def
       custom: {
         roles: req.session?.user?.roles ?? [],
       },
+      environment,
     };
 
     result = (await ldClient?.variation(flagName, context, defaultValue)) ?? defaultValue;

@@ -1,0 +1,14 @@
+{
+  "pageTitle": "What is the defendant claiming for?",
+  "heading": "What is the defendant claiming for?",
+  "options": {
+    "paymentOrCompensation": "A sum of money or compensation",
+    "somethingElse": "Something else",
+    "both": "Both"
+  },
+  "errors": {
+    "claimType": {
+      "required": "Select if the defendant is claiming for a sum of money or compensation, both or something else"
+    }
+  }
+}

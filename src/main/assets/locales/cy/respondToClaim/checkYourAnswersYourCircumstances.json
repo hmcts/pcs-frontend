@@ -3,16 +3,16 @@
   "cardTitle": "Eich amgylchiadau",
   "rows": {
     "dependantChildren": {
-      "label": "cy Do you have any dependent children?",
-      "changeHidden": "cy dependent children"
+      "label": "A oes gennych chi unrhyw blant sy'n ddibynnol arnoch?",
+      "changeHidden": "plant dibynnol"
     },
     "dependantChildrenDetails": {
-      "label": "cy Give details about your dependent children",
+      "label": "Rhowch fanylion eich plant dibynnol",
       "changeHidden": "cy dependent children details"
     },
     "otherDependants": {
       "label": "A oes gennych chi unrhyw un arall sy'n ddibynnol arnoch?",
-      "changeHidden": "cy other dependants"
+      "changeHidden": "dibynyddion eraill"
     },
     "otherDependantsDetails": {
       "label": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnoch",
@@ -44,7 +44,7 @@
     },
     "exceptionalHardship": {
       "label": "A fyddech yn profi caledi eithriadol os gofynnir i chi adael eich cartref?",
-      "changeHidden": "cy exceptional hardship"
+      "changeHidden": "caledi eithriadol"
     },
     "exceptionalHardshipDetails": {
       "label": "Rhowch fanylion am y caledi eithriadol y byddech yn ei brofi",

@@ -34,17 +34,17 @@ import { step as defendantNameCapture } from './defendant-name-capture';
 import { step as defendantNameConfirmation } from './defendant-name-confirmation';
 import { step as doYouHaveAnyDependantChildren } from './dependant-children';
 import { step as disputeClaimInterstitial } from './dispute-claim-interstitial';
+import { step as emailConfirmation } from './email-confirmation';
 import { step as endNow } from './end-now';
 import { step as endOfJourneyCya } from './end-of-journey-cya';
 import { step as equalityAndDiversityEnd } from './equality-and-diversity-end';
 import { step as equalityAndDiversityStart } from './equality-and-diversity-start';
 import { step as exceptionalHardship } from './exceptional-hardship';
+import { step as exemptLandlord } from './exempt-landlord';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as howMuchAffordToPay } from './how-much-afford-to-pay';
 import { step as incomeAndExpenses } from './income-and-expenditure';
 import { step as installmentPayments } from './installment-payments';
-import { step as landlordLicensed } from './landlord-licensed';
-import { step as landlordRegistered } from './landlord-registered';
 import { step as languageUsed } from './language-used';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
@@ -52,6 +52,9 @@ import { step as otherConsiderations } from './other-considerations';
 import { step as paymentInterstitial } from './payment-interstitial';
 import { step as priorityDebtDetails } from './priority-debt-details';
 import { step as priorityDebts } from './priority-debts';
+import { step as reasonableAdjustmentsCancelled } from './reasonable-adjustments-cancelled';
+import { step as reasonableAdjustmentsConfirmation } from './reasonable-adjustments-confirmation';
+import { step as reasonableAdjustmentsError } from './reasonable-adjustments-error';
 import { step as reasonableAdjustmentsTriage } from './reasonable-adjustments-triage';
 import { step as regularExpenses } from './regular-expenses';
 import { step as whatRegularIncomeDoYouReceive } from './regular-income';
@@ -83,6 +86,7 @@ export const stepRegistry = {
   'defendant-name-confirmation': defendantNameConfirmation,
   'defendant-name-capture': defendantNameCapture,
   'defendant-date-of-birth': defendantDateOfBirth,
+  'email-confirmation': emailConfirmation,
   'contact-preferences-email-or-post': contactPreferencesEmailOrPost,
   'contact-preferences-telephone': contactPreferencesTelephone,
   'contact-preferences-text-message': contactPreferencesTextMessage,
@@ -96,8 +100,7 @@ export const stepRegistry = {
   'check-your-answers-your-circumstances': checkYourAnswersYourCircumstances,
   'check-your-answers-income-and-expenses': checkYourAnswersIncomeAndExpenses,
   'check-your-answers-documents': checkYourAnswersDocuments,
-  'landlord-registered': landlordRegistered,
-  'landlord-licensed': landlordLicensed,
+  'exempt-landlord': exemptLandlord,
   'written-terms': writtenTerms,
   'tenancy-type-details': tenancyTypeDetails,
   'tenancy-date-details': tenancyDateDetails,
@@ -142,6 +145,9 @@ export const stepRegistry = {
   'what-other-regular-expenses-do-you-have': regularExpenses,
   'other-considerations': otherConsiderations,
   'reasonable-adjustments-triage': reasonableAdjustmentsTriage,
+  'reasonable-adjustments-confirmation': reasonableAdjustmentsConfirmation,
+  'reasonable-adjustments-error': reasonableAdjustmentsError,
+  'reasonable-adjustments-cancelled': reasonableAdjustmentsCancelled,
   'equality-and-diversity-start': equalityAndDiversityStart,
   'equality-and-diversity-end': equalityAndDiversityEnd,
   'language-used': languageUsed,

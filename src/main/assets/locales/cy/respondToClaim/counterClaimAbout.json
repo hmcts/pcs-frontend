@@ -1,14 +1,14 @@
 {
-  "pageTitle": "cyAbout your counterclaim",
-  "heading": "cyAbout your counterclaim",
-  "infoParagraph1": "cyYou will be able to upload any evidence you have on the next page.",
+  "pageTitle": "Ynglŷn â'ch gwrth-hawliad",
+  "heading": "Ynglŷn â'ch gwrth-hawliad",
+  "infoParagraph1": "Byddwch yn gallu uwchlwytho unrhyw dystiolaeth sydd gennych ar y dudalen nesaf.",
   "infoParagraph2": "Bydd yr hawlydd yn gallu gweld eich atebion.",
-  "counterClaimForLabel": "cyWhat is your counterclaim for?",
-  "counterClaimReasonsLabel": "cyWhat are your reasons for making the counterclaim?",
+  "counterClaimForLabel": "Ar gyfer beth mae eich gwrth-hawliad?",
+  "counterClaimReasonsLabel": "Beth yw eich rhesymau dros wneud y gwrth-hawliad?",
   "errors": {
-    "counterClaimForRequired": "cyEnter what your counterclaim is for",
-    "counterClaimForMaxLength": "cyWhat your counterclaim is for must be 6800 characters or less",
-    "counterClaimReasonsRequired": "cyEnter what your reasons are for making the counterclaim",
-    "counterClaimReasonsMaxLength": "cyWhat your reasons are for making the counterclaim must be 6800 characters or less"
+    "counterClaimForRequired": "Nodwch ar gyfer beth mae eich gwrth-hawliad",
+    "counterClaimForMaxLength": "Dylai beth mae eich gwrth-hawliad am fod yn 6800 nod neu lai",
+    "counterClaimReasonsRequired": "Nodwch beth yw eich rhesymau dros wneud y gwrth-hawliad",
+    "counterClaimReasonsMaxLength": "Dylai eich rhesymau dros wneud gwrth-hawliad fod yn 6800 nod neu lai"
   }
 }

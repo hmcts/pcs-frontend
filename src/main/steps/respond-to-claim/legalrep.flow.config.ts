@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 
+import { doesDefendantHaveDraftResponse } from '../utils';
+
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig as citizenFlowConfig } from './flow.config';
 import { hasSingleLinkedDefendant } from './flowConditions';
 import { legalRepRespondToClaimSections } from './legalrep.sections.config';
@@ -10,14 +12,12 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 const legalRepStepOrder = [
   'start-now',
   'select-defendant',
+  'resume-response',
   'defendant-name-confirmation',
   'defendant-date-of-birth',
   'correspondence-address',
-  'contact-preferences-email-or-post',
-  'contact-preferences-telephone',
-  'contact-preferences-text-message',
-  'landlord-registered',
-  'landlord-licensed',
+  'email-confirmation',
+  'exempt-landlord',
   'written-terms',
   'tenancy-type-details',
   'tenancy-date-details',
@@ -28,6 +28,16 @@ const legalRepStepOrder = [
   'rent-arrears-dispute',
   'non-rent-arrears-dispute',
   'counter-claim',
+  'counter-claim-what-are-you-claiming-for',
+  'counter-claim-specific-sum',
+  'counter-claim-fee',
+  'counter-claim-have-you-applied-for-help',
+  'counter-claim-you-need-to-apply-for-help-with-your-fees',
+  'counter-claim-against-whom',
+  'counter-claim-about',
+  'counter-claim-order-other-than-sum',
+  'counter-claim-do-you-want-to-upload-files',
+  'counter-claim-upload-files',
   'repayments-made',
   'repayments-agreed',
   'installment-payments',
@@ -46,10 +56,13 @@ const legalRepStepOrder = [
   'what-other-regular-expenses-do-you-have',
   'other-considerations',
   'upload-document',
-  'equality-and-diversity-start',
-  'equality-and-diversity-end',
   'language-used',
   'end-of-journey-cya',
+  'response-submitted',
+  'response-submitted-counter-claim-fee-payment-needed',
+  'counter-claim-application-fee-amount',
+  'counter-claim-payment-successful',
+  'response-and-counter-claim-submitted',
   'end-now',
 ] as const satisfies readonly LegalRepRespondToClaimStepName[];
 
@@ -68,6 +81,10 @@ export const legalrepFlowConfig: JourneyFlowConfig = {
     ...citizenFlowConfig.steps,
     'select-defendant': {
       showCondition: (req: Request) => !hasSingleLinkedDefendant(req),
+    },
+
+    'resume-response': {
+      showCondition: (req: Request) => doesDefendantHaveDraftResponse(req),
     },
 
     'defendant-name-confirmation': {

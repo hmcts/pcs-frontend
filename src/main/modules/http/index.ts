@@ -146,35 +146,50 @@ export class HttpService {
     this.tokenRegenerator = regenerator;
   }
 
+  // Returns the current S2S token, regenerating it first if it's missing or within the 30s
+  // pre-expiry buffer. Use this when you need the raw token value for a non-standard header (e.g.
+  // cui-ra's `service-token`); normal requests get a fresh `ServiceAuthorization` attached
+  // automatically. Reuses the same freshness logic as outbound requests, so the value is never
+  // the stale copy a direct Redis read can return.
+  public async getValidS2SToken(): Promise<string> {
+    if (!this.s2sToken || this.isTokenExpired()) {
+      await this.regenerateToken();
+    }
+    if (!this.s2sToken) {
+      throw new Error('No valid S2S token available');
+    }
+    return this.s2sToken;
+  }
+
   // API methods matching Axios signatures exactly
   public getUri(config?: AxiosRequestConfig): string {
     return this.instance.getUri(config);
   }
 
   public request<T = unknown, R = AxiosResponse<T>, D = unknown>(config: AxiosRequestConfig<D>): Promise<R> {
-    return this.instance.request<T, R, D>(config);
+    return this.instance.request<T, R, D>(config) as Promise<R>;
   }
 
   public get<T = unknown, R = AxiosResponse<T>, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R> {
-    return this.instance.get<T, R, D>(url, config);
+    return this.instance.get<T, R, D>(url, config) as Promise<R>;
   }
 
   public delete<T = unknown, R = AxiosResponse<T>, D = unknown>(
     url: string,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.delete<T, R, D>(url, config);
+    return this.instance.delete<T, R, D>(url, config) as Promise<R>;
   }
 
   public head<T = unknown, R = AxiosResponse<T>, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R> {
-    return this.instance.head<T, R, D>(url, config);
+    return this.instance.head<T, R, D>(url, config) as Promise<R>;
   }
 
   public options<T = unknown, R = AxiosResponse<T>, D = unknown>(
     url: string,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.options<T, R, D>(url, config);
+    return this.instance.options<T, R, D>(url, config) as Promise<R>;
   }
 
   public post<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -182,7 +197,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.post<T, R, D>(url, data, config);
+    return this.instance.post<T, R, D>(url, data, config) as Promise<R>;
   }
 
   public put<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -190,7 +205,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.put<T, R, D>(url, data, config);
+    return this.instance.put<T, R, D>(url, data, config) as Promise<R>;
   }
 
   public patch<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -198,7 +213,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.patch<T, R, D>(url, data, config);
+    return this.instance.patch<T, R, D>(url, data, config) as Promise<R>;
   }
 
   public postForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -206,7 +221,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.postForm<T, R, D>(url, data, config);
+    return this.instance.postForm<T, R, D>(url, data, config) as Promise<R>;
   }
 
   public putForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -214,7 +229,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.putForm<T, R, D>(url, data, config);
+    return this.instance.putForm<T, R, D>(url, data, config) as Promise<R>;
   }
 
   public patchForm<T = unknown, R = AxiosResponse<T>, D = unknown>(
@@ -222,7 +237,7 @@ export class HttpService {
     data?: D,
     config?: AxiosRequestConfig<D>
   ): Promise<R> {
-    return this.instance.patchForm<T, R, D>(url, data, config);
+    return this.instance.patchForm<T, R, D>(url, data, config) as Promise<R>;
   }
 
   private resolveRequestUrl(url: string, baseUrl?: string): string {

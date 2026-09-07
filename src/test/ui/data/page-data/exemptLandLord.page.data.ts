@@ -1,0 +1,17 @@
+export const exemptLandLord = {
+  mainHeader: `Exempt landlord`,
+  backLink: `Back`,
+  underTheHousingParagraph: `Under the Housing (Wales) Act 2014, most private landlords must be registered and licensed. Registered community landlords are exempt from requirements to be registered and licensed.`,
+  youCanCheckYourLandlordParagraph: `You can check your landlord’s registration status by searching Rent Smart Wales’ Public Register (opens in new tab).`,
+  isYourLandlordAnExemptSubHeader: `Is your landlord an exempt landlord under Part 1 of the Housing (Wales) Act 2014?`,
+  yesRadioOption: `Yes`,
+  noRadioOption: `No`,
+  imNotSureRadioOption: `I’m not sure`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  cymraegLink: `Cymraeg`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectIfYouAgreeWithExemptLandLordErrorMessage: `Select whether your landlord is an exempt landlord under Part 1 of the Housing (Wales) Act 2014`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `exempt-landlord`,
+};

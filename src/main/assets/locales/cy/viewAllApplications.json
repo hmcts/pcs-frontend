@@ -1,10 +1,10 @@
 {
-  "title": "cyView all applications",
-  "heading": "cyView all applications",
+  "title": "Gweld yr holl geisiadau",
+  "heading": "Gweld yr holl geisiadau",
   "caseReferenceLabel": "Rhif yr achos:",
-  "yourApplications": "cyYour applications",
-  "applicationsMadeBy": "cyApplications made by",
-  "submittedOn": "cySubmitted on",
-  "youDoNotHaveAnyApplicationsYet": "cyYou do not have any applications yet",
-  "followingDocumentsAlsoIncluded": "cyThe following documents were also included with this application"
+  "yourApplications": "Eich ceisiadau",
+  "applicationsMadeBy": "Ceisiadau a wnaed gan",
+  "submittedOn": "Cyflwynwyd ar",
+  "youDoNotHaveAnyApplicationsYet": "Nid oes gennych unrhyw geisiadau eto",
+  "followingDocumentsAlsoIncluded": "Roedd y dogfennau canlynol wedi eu cynnwys gyda'r cais hwn hefyd"
 }

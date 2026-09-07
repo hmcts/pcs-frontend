@@ -10,7 +10,7 @@
   "errors": {
     "confirmOtherAdults": "Dewiswch a oes yna unrhyw oedolion eraill yn byw yn eich cartref",
     "confirmOtherAdults.otherAdultsDetails": "Rhowch fanylion yr oedolion eraill sy'n byw yn eich cartref",
-    "otherAdultsDetailsMaxLength": "cyDetails about other adults must be 500 characters or less",
-    "otherAdultsDetailsInvalidCharacters": "cyGive details about the other adults living in your home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    "otherAdultsDetailsMaxLength": "Rhaid i fanylion am oedolion eraill fod yn 500 o nodau neu lai",
+    "otherAdultsDetailsInvalidCharacters": "Rhowch fanylion am yr oedolion eraill sy'n byw yn eich cartref i gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
   }
 }

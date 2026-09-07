@@ -1,5 +1,19 @@
 {
+  "pageTitle": "Rental agreement start",
+  "heading": "Tenancy, occupation contract or licence start date",
   "question": "What is the tenancy, occupation contract or licence start date? (Optional)",
+  "hint": "",
   "paragraph": "{{claimantName}} did not provide the start date of the tenancy, licence or occupation contract.",
-  "hint": ""
+  "errors": {
+    "date": {
+      "day": "Day",
+      "month": "Month",
+      "year": "Year",
+      "required": "Your tenancy start date must include a day, month and year",
+      "notRealDate": "Tenancy start date must be a real date",
+      "futureDate": "Tenancy start date must be in the past",
+      "missingOne": "Your tenancy start date must include a {{missingField}}",
+      "missingTwo": "Your tenancy start date must include a {{first}} and {{second}}"
+    }
+  }
 }
