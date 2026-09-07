@@ -40,7 +40,7 @@ const legalRepStepOrder = [
   'counter-claim-upload-files',
   'repayments-made',
   'repayments-agreed',
-  'installment-payments',
+  'instalment-payments',
   'how-much-afford-to-pay',
   'do-you-have-any-dependant-children',
   'do-you-have-any-other-dependants',

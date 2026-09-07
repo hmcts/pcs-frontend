@@ -77,5 +77,5 @@ export async function getPreviousStepForYourHouseholdAndCircumstances(req: Reque
     return 'how-much-afford-to-pay';
   }
 
-  return 'installment-payments';
+  return 'instalment-payments';
 }

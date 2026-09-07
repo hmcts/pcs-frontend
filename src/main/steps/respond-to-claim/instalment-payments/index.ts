@@ -18,7 +18,7 @@ function repayArrearsInstalmentsFromConfirmOffer(value: string | undefined): Yes
 }
 
 export const step: StepDefinition = createRespondToClaimFormStep({
-  stepName: 'installment-payments',
+  stepName: 'instalment-payments',
   isAnswered: req =>
     Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.repayArrearsInstalments),
   stepDir: __dirname,
