@@ -41,7 +41,8 @@ import {
   tenancyTypeDetails,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
-  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome, yourCircumstances,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
+  yourCircumstances,
 } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
 import {
