@@ -2,7 +2,32 @@
  * @jest-environment jsdom
  */
 
-import { initCaseFactsToggle, initDatePills, initMakeOrder } from '../../../../main/assets/js/make-order';
+import {
+  initCaseFactsToggle,
+  initDatePills,
+  initMakeOrder as initialiseMakeOrder,
+} from '../../../../main/assets/js/make-order';
+
+const disposers: (() => void)[] = [];
+
+function initMakeOrder(): () => void {
+  const dispose = initialiseMakeOrder();
+  disposers.push(dispose);
+  return dispose;
+}
+
+afterEach(() => {
+  disposers
+    .splice(0)
+    .reverse()
+    .forEach(dispose => dispose());
+  window.history.replaceState(null, '', '/');
+});
+
+function navigateToTab(hash: string): void {
+  window.history.replaceState(null, '', hash);
+  window.dispatchEvent(new HashChangeEvent('hashchange'));
+}
 
 interface OrderDocument {
   generated: Record<string, unknown>;
@@ -444,12 +469,22 @@ describe('make order preview', () => {
       content: [{ type: 'paragraph', attrs: { id: 'paragraph:strike-out-dismissal' } }],
     });
 
-    document.querySelector<HTMLAnchorElement>('[data-order-type="OUTRIGHT_POSSESSION"]')?.click();
+    navigateToTab('#outright');
 
     expect(document.querySelector<HTMLInputElement>('#order-type')?.value).toBe('OUTRIGHT_POSSESSION');
     expect(editorRegion?.hidden).toBe(false);
     expect(submit?.disabled).toBe(false);
     expect(generatedOrderText()).toEqual(expect.stringContaining('IT IS ORDERED THAT'));
+  });
+
+  it('preserves a field fragment when restoring the saved order type', () => {
+    renderCompleteForm();
+    window.history.replaceState(null, '', '#outright-grounds-details');
+
+    initMakeOrder();
+
+    expect(window.location.hash).toBe('#outright-grounds-details');
+    expect(document.querySelector<HTMLInputElement>('#order-type')?.value).toBe('OUTRIGHT_POSSESSION');
   });
 
   it('removes page listeners when the editor is disposed', () => {
@@ -460,7 +495,7 @@ describe('make order preview', () => {
 
     dispose();
     const disposedSnapshot = documentField.value;
-    document.querySelector<HTMLAnchorElement>('[data-order-type="SUSPENDED_POSSESSION"]')?.click();
+    navigateToTab('#suspended');
 
     expect(orderType.value).toBe('OUTRIGHT_POSSESSION');
     expect(documentField.value).toBe(disposedSnapshot);
