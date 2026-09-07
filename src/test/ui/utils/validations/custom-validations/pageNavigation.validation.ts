@@ -62,7 +62,7 @@ export class PageNavigationValidation implements IValidation {
 
     try {
       if (isFeedbackLink) {
-        await this.validateFeedbackLinkHref(page, navigateButton);
+        await this.validateFeedbackLinkHref(page, navigateButton, fieldName);
         return;
       }
 
@@ -96,7 +96,7 @@ export class PageNavigationValidation implements IValidation {
     });
   }
 
-  private async validateFeedbackLinkHref(page: Page, linkText: string): Promise<void> {
+  private async validateFeedbackLinkHref(page: Page, linkText: string, fieldName?: validationRecord): Promise<void> {
     const locatorByName = page.getByRole('link', { name: linkText, exact: true });
     const locatorByHref = page.locator('a[href*="smartsurvey.co.uk/s/Poss_feedback/"]').first();
 
@@ -116,14 +116,26 @@ export class PageNavigationValidation implements IValidation {
       throw new Error(`Feedback link "${linkText}" does not exist or does not have an href attribute`);
     }
 
+    let parsedHref: URL;
     try {
-      const parsedHref = new URL(href, page.url());
-      const host = parsedHref.hostname.toLowerCase();
-      if (!(host === 'smartsurvey.co.uk' || host.endsWith('.smartsurvey.co.uk'))) {
-        throw new Error(`Feedback link "${linkText}" does not point to SmartSurvey: ${href}`);
-      }
+      parsedHref = new URL(href, page.url());
     } catch {
       throw new Error(`Feedback link "${linkText}" does not point to SmartSurvey: ${href}`);
+    }
+
+    const host = parsedHref.hostname.toLowerCase();
+    if (!(host === 'smartsurvey.co.uk' || host.endsWith('.smartsurvey.co.uk'))) {
+      throw new Error(`Feedback link "${linkText}" does not point to SmartSurvey: ${href}`);
+    }
+
+    const expectedPageUrl = fieldName?.feedbackPageUrl;
+    if (typeof expectedPageUrl === 'string') {
+      const actualPageUrl = parsedHref.searchParams.get('pageurl');
+      if (actualPageUrl !== expectedPageUrl) {
+        throw new Error(
+          `Feedback link "${linkText}" has incorrect pageurl. Expected: ${expectedPageUrl}, Actual: ${actualPageUrl}`
+        );
+      }
     }
   }
 
@@ -410,8 +422,8 @@ export class PageNavigationValidation implements IValidation {
 
     const isLRTest = test.info().title.includes('@LR');
     const baseDir = isLRTest ? PageNavigationValidation.LR_PFT_DIR : PageNavigationValidation.PFT_DIR;
-    const pftPath = path.join(baseDir, `${pageName}.pft.ts`);
-    return fs.existsSync(pftPath);
+    const candidates = isLRTest ? [`${pageName}.pft.lr.ts`, `${pageName}.pft.ts`] : [`${pageName}.pft.ts`];
+    return candidates.some(candidate => fs.existsSync(path.join(baseDir, candidate)));
   }
 
   private static async getPageNameFromUrl(url: string, page?: Page): Promise<string> {

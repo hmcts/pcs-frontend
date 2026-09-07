@@ -79,7 +79,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     const pftBaseDir = isLRForPFT
       ? TriggerPageFunctionalTestsAction.LR_PFT_DIR
       : TriggerPageFunctionalTestsAction.PFT_DIR;
-    const pftFilePath = this.resolveFilePath(pftBaseDir, `${pageName}.pft.ts`);
+    const pftFilePath = this.resolvePftFilePath(pftBaseDir, pageName, isLRForPFT);
 
     if (!pftFilePath || !fs.existsSync(pftFilePath)) {
       if (enable_error_message_validation === 'true') {
@@ -163,6 +163,19 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       const subDirPath = path.join(baseDir, dir.name, pageName);
       if (fs.existsSync(subDirPath)) {
         return subDirPath;
+      }
+    }
+
+    return null;
+  }
+
+  private resolvePftFilePath(baseDir: string, pageName: string, isLR: boolean): string | null {
+    const candidates = isLR ? [`${pageName}.pft.lr.ts`, `${pageName}.pft.ts`] : [`${pageName}.pft.ts`];
+
+    for (const candidate of candidates) {
+      const resolved = this.resolveFilePath(baseDir, candidate);
+      if (resolved) {
+        return resolved;
       }
     }
 
