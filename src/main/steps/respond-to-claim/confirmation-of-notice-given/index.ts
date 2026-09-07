@@ -2,10 +2,14 @@ import type { Request } from 'express';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { getClaimantName } from '../../utils/getClaimantName';
+import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
+import { getNoticeDocumentInfo, resolveStepDocumentId } from '../utils/stepDocumentUtils';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, YesNoNotSureValue } from '@services/ccdCase.interface';
+
+export { getNoticeDocumentInfo };
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-given',
@@ -17,6 +21,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     question: 'question',
     hintText: 'hintText',
     noticeDateHint: 'noticeDateHint',
+    insetText: 'insetText',
+    noticeDocumentLinkText: 'noticeDocumentLinkText',
   },
   fields: [
     {
@@ -52,11 +58,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     await saveDraftDefendantResponse(req, response);
   },
-  extendGetContent: req => {
+  extendGetContent: async (req: Request) => {
     const claimantName = getClaimantName(req);
+    const documentId = await resolveStepDocumentId(req, getNoticeDocumentInfo, 'confirmationOfNoticeGiven');
+    const noticeDocument = documentId ? { id: documentId } : '';
+    const release12Enabled = isRelease12Enabled(req);
 
     return {
       claimantName,
+      noticeDocument,
+      isRelease12Enabled: release12Enabled,
     };
   },
 });

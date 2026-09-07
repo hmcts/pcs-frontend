@@ -1,96 +1,20 @@
 import type { Request } from 'express';
 
-import { Logger } from '../../../modules/logger';
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { getTranslation, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, penceToPounds, poundsToPence, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
+import { getRentStatementDocumentInfo, resolveStepDocumentId } from '../utils/stepDocumentUtils';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { ccdCaseService } from '@services/ccdCaseService';
-import { findCaseDocumentById } from '@utils/documentUtils';
+
+export { getRentStatementDocumentInfo };
 
 // Validation constants
 const MAX_RENT_ARREARS_AMOUNT = 1_000_000_000; // £1 billion maximum
 const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 decimal places
-
-const logger = Logger.getLogger('rentArrearsDispute');
-
-export function getRentStatementDocumentInfo(validatedCase?: unknown): {
-  isDocumentUploaded: boolean;
-  documentId?: string;
-} {
-  const caseData =
-    (validatedCase as { data?: Record<string, unknown> })?.data ?? (validatedCase as Record<string, unknown>) ?? {};
-
-  const detailsTabRentStatement = (caseData?.detailsTab_RentArrearsDetails as Record<string, unknown>)?.rentStatement;
-  const rentArrearsStatementDocs = caseData?.rentArrears_StatementDocuments;
-  const rentStatementDocs = caseData?.rentStatement;
-  const allDocs = caseData?.allDocuments;
-  const claimantDocs = caseData?.claimantDocuments;
-
-  const allDocsArray = Array.isArray(allDocs) ? allDocs : allDocs ? [allDocs] : [];
-  logger.info('[rentArrearsDispute] Inspecting caseData for rent statement document', {
-    hasDetailsTabRentStatement: Boolean(detailsTabRentStatement),
-    detailsTabRentArrearsDetails: caseData?.detailsTab_RentArrearsDetails,
-    summaryTabRentArrearsDetails: caseData?.summaryTab_RentArrearsDetails,
-    hasRentArrearsStatementDocs: Boolean(rentArrearsStatementDocs),
-    hasRentStatementDocs: Boolean(rentStatementDocs),
-    hasAllDocs: Boolean(allDocs),
-    allDocsCount: allDocsArray.length,
-    hasClaimantDocs: Boolean(claimantDocs),
-  });
-
-  const collections = [detailsTabRentStatement, rentArrearsStatementDocs, rentStatementDocs, allDocs, claimantDocs];
-
-  for (const collection of collections) {
-    const items = Array.isArray(collection) ? collection : collection ? [collection] : [];
-    for (const item of items) {
-      if (!item || typeof item !== 'object') {
-        continue;
-      }
-      const rec = item as Record<string, unknown>;
-      const val = (rec.value as Record<string, unknown>) ?? rec;
-      const docObj = (val.document as Record<string, unknown>) ?? val;
-
-      const url = (docObj.document_url ||
-        docObj.document_binary_url ||
-        val.document_url ||
-        val.document_binary_url ||
-        rec.document_url ||
-        rec.document_binary_url) as string | undefined;
-
-      const urlId = url ? url.split('/documents/')[1]?.split('/')[0] : undefined;
-      const id = (rec.id as string) || (val.id as string) || (docObj.id as string) || urlId;
-
-      if (id) {
-        // Only link IDs that /view-documents/:documentId can resolve (needs binaryUrl),
-        // otherwise the new tab 404s.
-        const downloadable = findCaseDocumentById(caseData, id);
-        if (!downloadable?.binaryUrl) {
-          logger.info('[rentArrearsDispute] Skipping document ID not resolvable for download', {
-            documentId: id,
-            urlId,
-          });
-          continue;
-        }
-
-        logger.info('[rentArrearsDispute] Found uploaded rent statement document ID', {
-          documentId: downloadable.id,
-          urlId,
-          sourceCollection:
-            collection === detailsTabRentStatement ? 'detailsTab' : collection === allDocs ? 'allDocs' : 'other',
-        });
-        return { isDocumentUploaded: true, documentId: downloadable.id };
-      }
-    }
-  }
-
-  logger.info('[rentArrearsDispute] No rent statement document found in caseData');
-  return { isDocumentUploaded: false };
-}
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'rent-arrears-dispute',
@@ -158,27 +82,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
 
-    let { isDocumentUploaded, documentId } = getRentStatementDocumentInfo(req.res?.locals.validatedCase);
-
-    if (!isDocumentUploaded) {
-      try {
-        const accessToken = req.session?.user?.accessToken;
-        const rawCaseReference = req.params?.caseReference;
-        const caseReference = Array.isArray(rawCaseReference) ? rawCaseReference[0] : rawCaseReference;
-        if (accessToken && caseReference) {
-          const fullCase = await ccdCaseService.getCaseById(accessToken, caseReference);
-          const fullCaseDocInfo = getRentStatementDocumentInfo(fullCase);
-          if (fullCaseDocInfo.isDocumentUploaded && fullCaseDocInfo.documentId) {
-            isDocumentUploaded = true;
-            documentId = fullCaseDocInfo.documentId;
-          }
-        }
-      } catch (err) {
-        logger.warn('[rentArrearsDispute] Failed to fetch full case for rent statement document', { error: err });
-      }
-    }
-
-    const rentStatementDocument = isDocumentUploaded && documentId ? { id: documentId } : '';
+    const documentId = await resolveStepDocumentId(req, getRentStatementDocumentInfo, 'rentArrearsDispute');
+    const rentStatementDocument = documentId ? { id: documentId } : '';
 
     const release12Enabled = isRelease12Enabled(req);
 

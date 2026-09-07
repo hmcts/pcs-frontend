@@ -10,8 +10,11 @@ jest.mock('../../../main/utils/getLaunchDarklyFlag', () => ({
 const mockFlags = (flags: Record<string, boolean>) =>
   (getLaunchDarklyFlag as jest.Mock).mockImplementation((_req, name: string) => Promise.resolve(flags[name] ?? false));
 
+// `getUserType` reads roles straight off the session, so build the request rather than mocking it.
+const reqWithRoles = (roles: string[]) => ({ session: { user: { roles } } }) as unknown as Request;
+
 describe('isPcqEnabled', () => {
-  const req = {} as Request;
+  const req = reqWithRoles([]);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -44,5 +47,34 @@ describe('isPcqEnabled', () => {
     mockFlags({});
 
     await expect(isPcqEnabled(req)).resolves.toBe(false);
+  });
+
+  it('is off for a legal representative even with both flags on', async () => {
+    // PCQ asks about the answering user's own characteristics, so a solicitor must never be
+    // sent — their answers would be filed against the defendant's party id.
+    mockFlags({ 'release-1.3-enabled': true, 'cui-pcq-enabled': true });
+
+    await expect(isPcqEnabled(reqWithRoles(['caseworker-pcs-solicitor']))).resolves.toBe(false);
+  });
+
+  it('short-circuits for a legal representative without reading the flags', async () => {
+    mockFlags({ 'release-1.3-enabled': true, 'cui-pcq-enabled': true });
+
+    await isPcqEnabled(reqWithRoles(['caseworker-pcs-solicitor']));
+
+    expect(getLaunchDarklyFlag).not.toHaveBeenCalled();
+  });
+
+  it('still sends a citizen who holds other roles', async () => {
+    // Only the solicitor role gates PCQ; an unrelated role must not block the questionnaire.
+    mockFlags({ 'release-1.3-enabled': true, 'cui-pcq-enabled': true });
+
+    await expect(isPcqEnabled(reqWithRoles(['citizen']))).resolves.toBe(true);
+  });
+
+  it('treats a missing session as a citizen', async () => {
+    mockFlags({ 'release-1.3-enabled': true, 'cui-pcq-enabled': true });
+
+    await expect(isPcqEnabled({} as Request)).resolves.toBe(true);
   });
 });

@@ -185,7 +185,10 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       radioOption: contactPreferencesTelephone.yesRadioOption,
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
+    await performAction('selectContactByTextMessage', {
+      radioOption: contactPreferencesTextMessage.yesRadioOption,
+      mobileNumber: contactPreferencesTextMessage.ukMobileNumberTextInput,
+    });
     await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(

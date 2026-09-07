@@ -1,20 +1,20 @@
 {
-  "pageTitle": "cy Check your answers",
-  "heading": "cy Check your answers",
+  "pageTitle": "Gwiriwch eich atebion",
+  "heading": "Gwiriwch eich atebion",
   "sections": {
-    "legalAdvice": "cy Legal advice",
-    "personalDetails": "cy Personal details",
-    "claimantsClaim": "cy {{claimantName, pluralPossessive}} claim",
-    "dependantsAndOtherResidents": "cy Dependants and other residents",
-    "yourCircumstances": "cy Circumstances",
-    "incomeAndExpenses": "cy Income and expenses",
-    "regularIncome": "cy Regular income",
-    "universalCredit": "cy Universal credit",
-    "priorityDebts": "cy Priority debts",
-    "regularExpenses": "cy Regular expenses",
-    "uploadFiles": "cy Upload files",
-    "otherConsiderations": "cy Other considerations",
-    "languageUsed": "cy Language used"
+    "legalAdvice": "Cyngor cyfreithiol",
+    "personalDetails": "Manylion personol",
+    "claimantsClaim": "Hawliad {{claimantName, pluralPossessive}}",
+    "dependantsAndOtherResidents": "Dibynyddion a phreswylwyr eraill",
+    "yourCircumstances": "Amgylchiadau",
+    "incomeAndExpenses": "Incwm a chostau",
+    "regularIncome": "Incwm rheolaidd",
+    "universalCredit": "Credyd Cynhwysol",
+    "priorityDebts": "Dyledion blaenoriaeth",
+    "regularExpenses": "Costau rheolaidd",
+    "uploadFiles": "Uwchlwytho ffeiliau",
+    "otherConsiderations": "Ystyriaethau eraill",
+    "languageUsed": "Iaith a ddefnyddiwyd"
   },
   "rows": {
     "uploadedDocuments": {
@@ -23,27 +23,27 @@
       "none": "cy No files uploaded"
     },
     "otherConsiderations": {
-      "label": "cy Is there anything else the defendant wants to tell the court as part of their response?"
+      "label": "Oes yna unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fel rhan o'u hymateb?"
     },
     "otherConsiderationsDetails": {
-      "label": "cy Give details about what else the defendant wants to tell the court"
+      "label": "Rhowch fanylion beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys"
     },
     "languageUsed": {
-      "label": "cy Which language did you use to complete this service?"
+      "label": "Pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn?"
     }
   },
   "statementOfTruth": {
-    "heading": "cy Statement of truth",
+    "heading": "Datganiad gwirionedd",
     "hint": "",
-    "contemptOption": "cy I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
-    "beliefOption": "cy The defendant believes that the facts stated in this defence form are true. I am authorised by the defendant to submit this statement.",
-    "fullNameLabel": "cy Full name",
-    "nameOfFirmLabel": "cy Name of firm",
-    "positionHeldLabel": "cy Position or office held"
+    "contemptOption": "Deallaf y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu'n onest ei fod yn wir.",
+    "beliefOption": "Creda'r diffynnydd bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir. Fe’m hawdurdodir gan y diffynnydd i lofnodi’r datganiad hwn.",
+    "fullNameLabel": "Enw llawn",
+    "nameOfFirmLabel": "Enw’r cwmni",
+    "positionHeldLabel": "Safle neu swydd a ddelir"
   },
   "errors": {
-    "statementOfTruthBelief": "cy Select if the defendant believes that the facts stated in this defence form are true",
-    "nameOfFirm": "cy Enter the name of firm",
-    "positionHeld": "cy Enter your position or office held"
+    "statementOfTruthBelief": "Dewiswch os ydych yn credu bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir",
+    "nameOfFirm": "Nodwch enw'r cwmni",
+    "positionHeld": "Nodwch eich swydd neu safle a ddelir"
   }
 }

@@ -212,12 +212,12 @@ Please follow this confluence page for detailed instructions and guidelines- htt
   - `e2e-tag:<tag>` sets `E2E_TEST_SCOPE` (for example `e2e-tag:@smoke`).
   - `e2e-spec:<specFilter>` sets `E2E_SPEC` (spec path filter, case-sensitive).
 - **Important:** Do not add the `enable_full_functional_tests` label when you need `e2e-tag:` / `e2e-spec:` (including any newly added tags) to take effect. That label runs the full functional pipeline instead of the scoped PR run, so those overrides will not apply as intended.
-- **Master:** Keeps `E2E_TEST_SCOPE=@regression`.
+- **Master:** Keeps `E2E_TEST_SCOPE=@healthCheck`.
 
 ### Nightly (Jenkinsfile_nightly)
 
 - **Runs:** `yarn test:E2e` for each selected browser/device stage.
-- **Tag/scope logic:** `PLAYWRIGHT_GREP_TAG` maps to `E2E_TEST_SCOPE` (`@nightly`, `@smoke`, `@e2e`, or `@regression`).
+- **Tag/scope logic:** `PLAYWRIGHT_GREP_TAG` maps to `E2E_TEST_SCOPE` (`@nightly`, `@smoke`, `@e2e`, `@regression`, or `@healthCheck`).
 - **Spec logic:** `PLAYWRIGHT_SPEC` maps to `E2E_SPEC` (path filter, case-sensitive).
 - **Defaults:** Chrome is enabled by default; other platforms are optional.
 - **Reporting:** Each stage publishes its own Allure report and Slack message. Failed stages do not stop later stages.

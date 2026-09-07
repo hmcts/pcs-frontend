@@ -25,6 +25,17 @@ export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
     // Override default assetsPath
     headerModel.assetsPath = '/assets/ui-component-lib';
 
+    if (headerModel?.accountNav?.items) {
+      headerModel.accountNav.items = headerModel.accountNav.items.map(item => {
+        if (item.id === 'sign-out' || item.action === 'sign-out') {
+          const newItem = { ...item, href: '/logout' };
+          delete newItem.action;
+          return newItem;
+        }
+        return item;
+      });
+    }
+
     const footerModel = buildFooterModel();
 
     res.locals.headerModel = headerModel;

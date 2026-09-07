@@ -1,5 +1,6 @@
 {
   "pageTitle": "Who the counterclaim is against",
+  "checkboxHint": "Select all that apply",
   "heading": "Who is the defendant making a counterclaim against?",
   "errors": {
     "counterClaimAgainst": {

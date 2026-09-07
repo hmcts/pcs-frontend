@@ -1,27 +1,27 @@
 {
-  "pageTitle": "cy Check your answers",
-  "cardTitle": "cy Personal details",
+  "pageTitle": "Gwiriwch eich atebion",
+  "cardTitle": "Manylion personol",
   "rows": {
     "defendantNameConfirmation": {
-      "label": "cy Is the defendant’s name {{defendantName}}?",
-      "changeHidden": "cy name"
+      "label": "Ai enw eich cleient yw {{defendantName}}?",
+      "changeHidden": "enw"
     },
     "defendantName": {
-      "label": "cy Name",
-      "changeHidden": "cy corrected name"
+      "label": "Enw",
+      "changeHidden": "enw wedi'i gywiro"
     },
     "defendantNameCapture": {
-      "label": "cy What is your client’s name?",
-      "changeHidden": "cy name"
+      "label": "Beth yw enw eich cleient?",
+      "changeHidden": "enw"
     },
     "dateOfBirth": {
-      "label": "cy Defendant’s date of birth",
-      "changeHidden": "cy date of birth"
+      "label": "Dyddiad geni",
+      "changeHidden": "dyddiad geni"
     },
     "correspondenceAddressConfirmation": {
       "label": "cy Is the defendant’s postal address {{address}}?",
-      "fallbackLabel": "cy What’s your postal address?",
-      "changeHidden": "cy postal address"
+      "fallbackLabel": "Beth yw eu cyfeiriad?",
+      "changeHidden": "cyfeiriad post"
     },
     "emailConfirmation": {
       "label": "cy Do you know the defendant’s email address?",

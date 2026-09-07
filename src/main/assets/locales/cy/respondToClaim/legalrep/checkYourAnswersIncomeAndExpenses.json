@@ -1,76 +1,76 @@
 {
-  "pageTitle": "cy Check your answers",
-  "cardTitle": "cy Income and expenses",
+  "pageTitle": "Gwiriwch eich atebion",
+  "cardTitle": "Incwm a chostau",
   "frequencies": {
-    "WEEKLY": "cy every week",
-    "MONTHLY": "cy every month"
+    "WEEKLY": "pob wythnos",
+    "MONTHLY": "pob mis"
   },
   "incomeFrequencies": {
-    "WEEKLY": "cy received every week",
-    "MONTHLY": "cy received every month"
+    "WEEKLY": "derbynnir bob wythnos",
+    "MONTHLY": "derbynnir bob mis"
   },
   "paymentFrequencies": {
-    "WEEKLY": "cy paid every week",
-    "MONTHLY": "cy paid every month"
+    "WEEKLY": "telir bob wythnos",
+    "MONTHLY": "telir bob mis"
   },
   "rows": {
     "shareIncomeExpenseDetails": {
-      "label": "cy Does the defendant want to provide details of their income and expenses?",
-      "changeHidden": "cy share income and expense details"
+      "label": "Ydy'r diffynnydd eisiau rhoi manylion eu hincwm a threuliau?",
+      "changeHidden": "rhannu manylion incwm a threuliau"
     },
     "regularIncome": {
-      "label": "cy What regular income does the defendant receive?",
-      "changeHidden": "cy regular income",
+      "label": "Pa incwm rheolaidd mae'r diffynnydd yn ei dderbyn?",
+      "changeHidden": "incwm rheolaidd",
       "options": {
-        "incomeFromJobs": "cy Income from all jobs they do",
-        "pension": "cy Pension – state and private",
-        "universalCredit": "cy Universal Credit",
-        "otherBenefits": "cy Other benefits and credits",
-        "moneyFromElsewhere": "cy Money from somewhere else (for example, child maintenance payments or someone in the defendant’s household gives them money)"
+        "incomeFromJobs": "Incwm o bob swydd a wneir ganddynt",
+        "pension": "Pensiwn - y wladwriaeth a phreifat",
+        "universalCredit": "Credyd Cynhwysol",
+        "otherBenefits": "Budd-daliadau a chredydau eraill",
+        "moneyFromElsewhere": "Arian o rywle arall (er enghraifft, taliadau cynhaliaeth plant neu rywun yng nghartref y diffynnydd yn rhoi arian iddynt)"
       }
     },
     "hasAppliedForUniversalCredit": {
-      "label": "cy Has the defendant applied for Universal Credit?",
-      "changeHidden": "cy applied for Universal Credit"
+      "label": "A yw'r diffynnydd wedi gwneud cais am Gredyd Cynhwysol?",
+      "changeHidden": "wedi gwneud cais am Gredyd Cynhwysol"
     },
     "universalCreditApplicationDate": {
-      "label": "cy When did the defendant apply?",
-      "changeHidden": "cy Universal Credit application date"
+      "label": "Pryd wnaeth y diffynnydd wneud cais?",
+      "changeHidden": "Dyddiad y cais Credyd Cynhwysol"
     },
     "priorityDebts": {
-      "label": "cy Does the defendant have any priority debts?",
-      "changeHidden": "cy priority debts"
+      "label": "A oes gan y diffynnydd unrhyw ddyledion blaenoriaeth?",
+      "changeHidden": "dyledion blaenoriaeth"
     },
     "priorityDebtTotal": {
-      "label": "cy What is the total amount the defendant owes for all their priority debts?",
-      "changeHidden": "cy priority debt total"
+      "label": "Beth yw'r cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth?",
+      "changeHidden": "cyfanswm dyled flaenoriaeth"
     },
     "priorityDebtContribution": {
-      "label": "cy How much does the defendant pay towards their priority debts each week or month?",
-      "changeHidden": "cy priority debt contribution"
+      "label": "Faint mae'r diffynnydd yn ei dalu tuag at eu dyledion blaenoriaeth bob wythnos neu fis?",
+      "changeHidden": "cyfraniad dyled flaenoriaeth"
     },
     "regularExpenses": {
-      "label": "cy What regular monthly expenses does the defendant have?",
-      "changeHidden": "cy regular expenses",
+      "label": "Pa dreuliau misol rheolaidd sydd gan y diffynnydd?",
+      "changeHidden": "costau rheolaidd",
       "options": {
-        "householdBills": "cy Household bills (for example, council tax, gas, electricity, water, internet)",
-        "loanPayments": "cy Loan payments",
-        "childSpousalMaintenance": "cy Child or spousal maintenance",
-        "mobilePhone": "cy Mobile phone",
-        "groceryShopping": "cy Grocery shopping",
-        "fuelParkingTransport": "cy Fuel, parking and transport",
-        "schoolCosts": "cy School costs (for example, uniform and school dinners)",
-        "clothing": "cy Clothing",
-        "otherExpenses": "cy Other"
+        "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
+        "loanPayments": "Taliadau benthyciadau",
+        "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/wraig",
+        "mobilePhone": "Ffôn symudol",
+        "groceryShopping": "Siopa bwyd",
+        "fuelParkingTransport": "Tanwydd, parcio a chludiant",
+        "schoolCosts": "Costau ysgol (er enghraifft, gwisg a chinio ysgol)",
+        "clothing": "Dillad",
+        "otherExpenses": "Arall"
       }
     },
     "otherConsiderations": {
-      "label": "cy Is there anything else the defendant wants to tell the court as part of their response",
-      "changeHidden": "cy other considerations"
+      "label": "Oes yna unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fel rhan o'u hymateb?",
+      "changeHidden": "ystyriaethau eraill"
     },
     "otherConsiderationsDetails": {
-      "label": "cy Give details about what else the defendant wants to tell the court",
-      "changeHidden": "cy other considerations details"
+      "label": "Rhowch fanylion beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys",
+      "changeHidden": "manylion ystyriaethau eraill"
     }
   }
 }

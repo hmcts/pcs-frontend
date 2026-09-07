@@ -39,4 +39,5 @@ export const axe_exclusions = [
   // govuk-frontend adds aria-expanded to conditional-reveal radios, which axe rejects for role=radio.
   // Scope the exclusion to affected radios on this page; checkbox reveals remain in the audit.
   '.pcs-make-order .govuk-radios__input[aria-expanded]',
+  '#contactByTextMessage', // page: contactPreferenceTextMessage, element: radioOption, element: 'Yes', reason_for_exclusion: 'aria-expanded' attribute is not allowed for this radio button
 ];

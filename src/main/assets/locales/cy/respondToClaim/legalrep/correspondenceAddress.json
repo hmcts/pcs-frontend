@@ -1,6 +1,6 @@
 {
   "pageTitle": "cyDefendant’s postal address",
-  "legend": "cyIs the defendant’s postal address {{ formattedAddressStr }}",
+  "legend": "Ai {{ formattedAddressStr }} yw cyfeiriad post y diffynnydd?",
   "legend.hint": "Dyma’r cyfeiriad a ddarparwyd gan {{claimantName}}",
   "labels": {
     "yes": "Ydy",
@@ -8,10 +8,10 @@
     "enterAddress": "Rhowch gyfeiriad gohebiaeth",
     "enterPostcode": "Nodwch god post yn y DU",
     "enterManually": "Teipiwch gyfeiriad â llaw",
-    "enterManuallySubText": "cyYou can enter the defendant’s address details in the fields below.",
+    "enterManuallySubText": "Gallwch roi manylion cyfeiriad y diffynnydd yn y blychau isod.",
     "selectAddress": "Dewiswch gyfeiriad",
     "selectAddressLabel": "Dewiswch gyfeiriad",
-    "addressHeading": "cyWhat’s the defendant’s postal address?",
+    "addressHeading": "Beth yw cyfeiriad post y diffynnydd?",
     "addressLine1": "Llinell cyfeiriad 1",
     "addressLine2": "Llinell cyfeiriad 2 (dewisol)",
     "townOrCity": "Tref neu ddinas",
@@ -24,6 +24,6 @@
     "saveForLater": "Cadw at hwyrach ymlaen"
   },
   "errors": {
-    "correspondenceAddressConfirm": "cyPlease confirm the defendant’s address by selecting the options below"
+    "correspondenceAddressConfirm": "Cadarnhewch gyfeiriad y diffynnydd drwy ddewis yr opsiynau isod"
   }
 }

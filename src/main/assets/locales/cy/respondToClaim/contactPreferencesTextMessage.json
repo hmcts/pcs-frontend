@@ -7,12 +7,14 @@
     "yes": "Ydy",
     "no": "Nac ydy"
   },
-  "phoneNumberLabel": "Rhif ffôn yn y DU",
+  "mobileNumberLabel": "Rhif ffôn symudol yn y DU",
   "buttons": {
     "saveAndContinue": "Cadw a pharhau",
     "saveForLater": "Cadw at hwyrach ymlaen"
   },
   "errors": {
-    "contactByTextMessage": "Dewiswch a ydych chi eisiau i ni gysylltu â chi drwy neges testun."
+    "contactByTextMessage": "Dewiswch a ydych chi eisiau i ni gysylltu â chi drwy neges testun.",
+    "contactByTextMessage.mobileNumber": "Nodwch rif ffôn symudol yn y DU",
+    "contactByTextMessage.mobileNumber.invalid": "Nodwch rif ffôn symudol yn y DU, fel 07700 900 982"
   }
 }

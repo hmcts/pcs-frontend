@@ -1,10 +1,10 @@
 {
-  "pageTitle": "cyCounterclaim",
+  "pageTitle": "Gwrth-hawliad",
   "whatCounterClaimIsHeading": "",
-  "counterClaimFeesParagraph2": "cyThere will be a link to make a counterclaim once you’ve submitted the response.",
+  "counterClaimFeesParagraph2": "Bydd dolen i wneud gwrth-hawliad unwaith y byddwch wedi cyflwyno'r ymateb.",
   "counterClaimFeesCourtFeesLinkText": "",
-  "question": "cyIs the defendant planning to make a counterclaim against {{claimantName}}?",
+  "question": "A yw'r diffynnydd yn cynllunio i wneud gwrth-hawliad yn erbyn {{claimantName}}?",
   "errors": {
-    "makeCounterClaim": "cySelect if the defendant is planning to make a counterclaim"
+    "makeCounterClaim": "Dewiswch a yw'r diffynnydd yn bwriadu gwneud gwrth-hawliad"
   }
 }

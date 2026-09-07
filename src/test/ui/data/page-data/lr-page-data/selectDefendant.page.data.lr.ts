@@ -8,4 +8,5 @@ export const selectDefendant = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   feedbackLink: `feedback`,
   pageSlug: `select-defendant`,
+  signOutLink: `Sign out`,
 };

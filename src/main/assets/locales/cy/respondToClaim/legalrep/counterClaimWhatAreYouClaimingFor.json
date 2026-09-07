@@ -1,14 +1,14 @@
 {
-  "pageTitle": "cyWhat is the defendant claiming for?",
-  "heading": "cyWhat is the defendant claiming for?",
+  "pageTitle": "Am beth mae'r diffynnydd yn ei hawlio?",
+  "heading": "Am beth mae'r diffynnydd yn ei hawlio?",
   "options": {
-    "paymentOrCompensation": "cyA sum of money or compensation",
-    "somethingElse": "cySomething else",
-    "both": "cyBoth"
+    "paymentOrCompensation": "Swm o arian neu iawndal",
+    "somethingElse": "Rhywbeth arall",
+    "both": "Y ddau"
   },
   "errors": {
     "claimType": {
-      "required": "cySelect if the defendant is claiming for a sum of money or compensation, both or something else"
+      "required": "Dewiswch os yw'r diffynnydd yn hawlio am swm o arian neu iawndal, y ddau neu rywbeth arall"
     }
   }
 }
