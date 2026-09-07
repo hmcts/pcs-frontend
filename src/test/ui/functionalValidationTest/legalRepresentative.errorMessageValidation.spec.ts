@@ -22,22 +22,26 @@ import {
   emailConfirmation,
   endOfJourneyCYA,
   exceptionalHardship,
+  haveYouAppliedForUniversalCredit,
+  howMuchAffordToPay,
   incomeAndExpenses,
+  instalmentPayments,
   languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
+  priorityDebtDetails,
   priorityDebts,
   rentArrears,
   repaymentsAgreed,
   repaymentsMade,
+  responseSubmittedCounterclaimFeePaymentNeeded as responseSubmittedCounterclaimFeePaymentNeededLR,
   selectDefendant,
   startNow,
   tenancyDateDetails,
   tenancyTypeDetails,
   whatOtherRegularExpensesDoYouHave,
   whatRegularIncomeDoYouReceive,
-  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
-  yourCircumstances,
+  wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome, yourCircumstances,
 } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
 import {
@@ -56,6 +60,12 @@ import {
   doYouHaveAnyOtherDependantsErrorValidation,
   doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation,
   emailConfirmationErrorValidation,
+  exceptionalHardshipErrorValidation,
+  haveYouAppliedForUniversalCreditErrorValidation,
+  howMuchAffordToPayErrorValidation,
+  incomeAndExpensesErrorValidation,
+  instalmentPaymentsErrorValidation,
+  languageUsedErrorValidation,
   selectDefendantErrorValidation,
 } from '../functional/legalRepresentative-functional';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
@@ -275,6 +285,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       question: yourCircumstances.wouldYouLikeToShareHeader,
       yourCircumstancesOption: yourCircumstances.yesRadioOption,
     });
+    await softErrorMessageValidation('exceptionalHardship', exceptionalHardshipErrorValidation);
     await performAction('selectExceptionalHardshipLR', {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
@@ -315,6 +326,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       courtInfo: otherConsiderations.detailsTextInput,
     });
     await performAction('uploadFiles');
+    await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
@@ -472,6 +484,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
     await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
+    assertAllErrorMessageValidations();
   });
 
   test('RentArrears - Verify dynamic link @LR', async () => {
@@ -637,6 +650,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       question: languageUsed.mainHeader,
       radioOption: languageUsed.englishRadioOption,
     });
+    assertAllErrorMessageValidations();
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @rent @LR', async () => {
@@ -692,5 +706,311 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
     await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
+    assertAllErrorMessageValidations();
+  });
+
+  test('RentArrears - NonRentArrears - AssuredTenancy - LR @PR @rentNonRent @LR', async () => {
+    const pinUser = await getPinUserAt(0);
+    await performAction('confirmDefendantDetailsLR', {
+      question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetailsLR', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressLR', {
+      radioOption: correspondenceAddress.noRadioOption,
+      addressLine1: correspondenceAddress.walesAddressLine1TextInput,
+      townOrCity: correspondenceAddress.walesTownOrCityTextInput,
+      postcode: correspondenceAddress.walesPostcodeTextInput,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
+    });
+    await performAction('tenancyOrContractTypeDetailsLR', {
+      tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
+    await performAction('selectTenancyStartDateKnownLR', {
+      option: tenancyDateDetails.yesRadioOption,
+    });
+    await performAction('selectNoticeDetailsLR', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnownLR', {
+      day: '25',
+      month: '2',
+      year: '2020',
+    });
+    await performAction('rentArrearsLR', {
+      option: rentArrears.noRadioOption,
+      rentAmount: rentArrears.rentAmountTextInput,
+      rentArrearsTotal: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.rentArrears_Total,
+    });
+    await performAction('disputingOtherPartsOfTheClaimLR', {
+      disputeOption: nonRentArrearsDispute.yesRadioOption,
+      disputeInfo: nonRentArrearsDispute.explainClaimTextInput,
+    });
+    await performAction('selectCounterClaimLR', {
+      option: counterClaim.yesRadioOption,
+    });
+    await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoneyLR', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performAction('selectCounterClaimFeeLR', {
+      radioOption: counterClaimFee.defendantDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performAction('counterClaimAboutLR', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFiles.noRadioOption,
+    });
+    await performAction('previousPaymentsLR', {
+      question: repaymentsMade.getMainHeader(),
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentAgreedLR', {
+      question: repaymentsAgreed.giveDetailsHiddenTextLabel,
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await softErrorMessageValidation('instalmentPayments', instalmentPaymentsErrorValidation);
+    await performAction('installmentPayments', {
+      question: instalmentPayments.wouldDefendantLikeToOfferToPayQuestion,
+      radioOption: instalmentPayments.noRadioOption,
+    });
+    await performAction('doesTheDependantHaveChildrenLR', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('otherDependantsLR', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performAction('otherAdultsLR', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
+    });
+    await performAction('alternativeAccommodationLR', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.defendantNotSureRadioOption,
+    });
+    await performAction('circumstancesLR', {
+      question: yourCircumstances.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('selectExceptionalHardshipLR', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await performAction('selectIncomeAndExpensesLR', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoTheyReceiveLR');
+    await softErrorMessageValidation(
+      'haveYouAppliedForUniversalCredit',
+      haveYouAppliedForUniversalCreditErrorValidation
+    );
+    await performAction('selectUniversalCreditLR', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
+      ...getRelativeDate(-3),
+    });
+    await performAction('selectPriorityDebtsLR', {
+      question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetailsLR', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
+    await performAction('selectExpensesLR');
+    await performAction('otherConsiderationsLR', {
+      question: otherConsiderations.isThereAnythingElseParagraph,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.pdf'] });
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
+    );
+    assertAllErrorMessageValidations();
+  });
+
+  test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @PR @rentNonRent @LR @regression @healthCheck', async () => {
+    const pinUser = await getPinUserAt(0);
+    await performAction('confirmDefendantDetailsLR', {
+      question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetailsLR', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressLR', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
+    });
+    await performAction('tenancyOrContractTypeDetailsLR', {
+      tenancyType: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
+    await performAction('selectTenancyStartDateKnownLR', {
+      option: tenancyTypeDetails.yesRadioOption,
+    });
+    await performAction('selectNoticeDetailsLR', {
+      option: confirmationOfNoticeGiven.yesRadioOption,
+    });
+    await performAction('enterNoticeDateKnownLR', {
+      day: '25',
+      month: '2',
+      year: '2020',
+    });
+    await performAction('rentArrearsLR', {
+      option: rentArrears.noRadioOption,
+      rentAmount: rentArrears.rentAmountTextInput,
+      rentArrearsTotal: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.rentArrears_Total,
+    });
+    await performAction('disputingOtherPartsOfTheClaimLR', {
+      disputeOption: nonRentArrearsDispute.yesRadioOption,
+      disputeInfo: nonRentArrearsDispute.explainClaimTextInput,
+    });
+    await performAction('selectCounterClaimLR', {
+      option: counterClaim.yesRadioOption,
+    });
+    await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoneyLR', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performAction('selectCounterClaimFeeLR', {
+      radioOption: counterClaimFee.defendantDoNotNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performAction('counterClaimAboutLR', {
+      counterClaimFor: counterClaimAbout.counterClaimForInput,
+      reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
+    });
+    await performAction('doYouWantToUploadFilesLR', {
+      option: counterclaimDoYouWantToUploadFiles.noRadioOption,
+    });
+    await performAction('previousPaymentsLR', {
+      question: repaymentsMade.getMainHeader(),
+      repaymentOption: repaymentsMade.noRadioOption,
+    });
+    await performAction('repaymentAgreedLR', {
+      question: repaymentsAgreed.giveDetailsHiddenTextLabel,
+      repaymentAgreedOption: repaymentsAgreed.noRadioOption,
+    });
+    await performAction('installmentPaymentsLR', {
+      question: instalmentPayments.wouldDefendantLikeToOfferToPayQuestion,
+      radioOption: instalmentPayments.yesRadioOption,
+    });
+    await softErrorMessageValidation('howMuchAffordToPay', howMuchAffordToPayErrorValidation);
+    await performAction('selectHowMuchAffordToPayLR', {
+      affordToPay: howMuchAffordToPay.affordToPayTextInput,
+      question: howMuchAffordToPay.howFrequentlyCouldDefendantAffordToPayQuestion,
+      radioOption: howMuchAffordToPay.weeklyRadioOption,
+    });
+    await performAction('doesTheDependantHaveChildrenLR', {
+      dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
+    });
+    await performAction('otherDependantsLR', {
+      otherDependantsOption: doYouHaveAnyOtherDependants.yesRadioOption,
+      otherDependantsInfo: doYouHaveAnyOtherDependants.detailsTextInput,
+    });
+    await performAction('otherAdultsLR', {
+      radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
+    });
+    await performAction('alternativeAccommodationLR', {
+      radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.defendantNotSureRadioOption,
+    });
+    await performAction('circumstancesLR', {
+      question: yourCircumstances.wouldYouLikeToShareHeader,
+      yourCircumstancesOption: yourCircumstances.noRadioOption,
+    });
+    await performAction('selectExceptionalHardshipLR', {
+      question: exceptionalHardship.mainHeader,
+      exceptionalHardshipOption: exceptionalHardship.noRadioOption,
+    });
+    await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
+    await performAction('selectIncomeAndExpensesLR', {
+      incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
+    });
+    await performAction('selectWhatRegularIncomeDoTheyReceiveLR');
+    await performAction('selectUniversalCreditLR', {
+      question: haveYouAppliedForUniversalCredit.mainHeader,
+      creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
+      ...getRelativeDate(-3),
+    });
+    await performAction('selectPriorityDebtsLR', {
+      question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
+      option: priorityDebts.yesRadioOption,
+    });
+    await performAction('enterPriorityDebtDetailsLR', {
+      totalAmount: priorityDebtDetails.totalAmountTextInput,
+      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      question: priorityDebtDetails.paidEveryParagraph,
+      option: priorityDebtDetails.weekRadioOption,
+    });
+    await performAction('selectExpensesLR');
+    await performAction('otherConsiderationsLR', {
+      question: otherConsiderations.isThereAnythingElseParagraph,
+      option: otherConsiderations.noRadioOption,
+    });
+    await performAction('uploadAdditionalDocumentsLR', { files: ['rentArrears.pdf'] });
+    await performAction('languageUsedLR', {
+      question: languageUsed.whichLanguageParagraph,
+      radioOption: languageUsed.englishRadioOption,
+    });
+    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('validateCYARTC', isLR);
+    await performAction('selectStatementOfTruthRTCLR', {
+      checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
+      firstName: endOfJourneyCYA.fullNameTextInput,
+      firmName: endOfJourneyCYA.nameOfFirmTextInput,
+      position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
+    );
+    assertAllErrorMessageValidations();
   });
 });
