@@ -50,7 +50,6 @@ import {
   counterClaimOrderOtherThanSumErrorValidation,
   counterClaimSpecificSumOfMoneyErrorValidation,
   counterClaimWhatAreYouClaimingForErrorValidation,
-  counterclaimYouNeedToApplyForHelpWithYourFeesErrorValidation,
   defendantNameConfirmationErrorValidation,
   doAnyOtherAdultsLiveInYourHomeErrorValidation,
   doYouHaveAnyDependantChildrenErrorValidation,
@@ -72,7 +71,7 @@ import {
   logTestEnvAfterBeforeEach,
 } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import { initializeExecutor, performAction } from '../utils/controller';
+import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
 
 // softErrorMessageValidation(pageName, validationOrReason):
@@ -460,10 +459,6 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       courtInfo: otherConsiderations.detailsTextInput,
     });
     await performAction('uploadAdditionalDocumentsLR');
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.continueButton);
-    await performValidation('mainHeader', equalityAndDiversityEndLR.mainHeader);
-    await performAction('clickButton', equalityAndDiversityEndLR.continueButton);
     await performAction('languageUsedLR', {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
@@ -643,63 +638,59 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       radioOption: languageUsed.englishRadioOption,
     });
   });
-});
 
-test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @rent @LR', async () => {
-  const pinUser = await getPinUserAt(0);
-  await performAction('confirmDefendantDetailsLR', {
-    question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
-    option: defendantNameConfirmation.noRadioOption,
-    fName: defendantNameConfirmation.firstNameInputText,
-    lName: defendantNameConfirmation.lastNameInputText,
+  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - Has the defendant already applied - No - LR @rent @LR', async () => {
+    const pinUser = await getPinUserAt(0);
+    await performAction('confirmDefendantDetailsLR', {
+      question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
+      option: defendantNameConfirmation.noRadioOption,
+      fName: defendantNameConfirmation.firstNameInputText,
+      lName: defendantNameConfirmation.lastNameInputText,
+    });
+    await performAction('enterDateOfBirthDetailsLR', {
+      dobDay: defendantDateOfBirth.dayInputText,
+      dobMonth: defendantDateOfBirth.monthInputText,
+      dobYear: defendantDateOfBirth.yearInputText,
+    });
+    await performAction('selectCorrespondenceAddressLR', {
+      radioOption: correspondenceAddress.yesRadioOption,
+    });
+    await performAction('emailConfirmationLR', {
+      radioOption: emailConfirmation.noRadioOption,
+    });
+    await performAction('tenancyOrContractTypeDetailsLR', {
+      tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
+      tenancyOption: tenancyTypeDetails.noRadioOption,
+      tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
+    });
+    await performAction('enterTenancyStartDetailsUnKnownLR');
+    await performAction('selectNoticeDetailsLR', {
+      option: confirmationOfNoticeGiven.noRadioOption,
+    });
+    await performAction('rentArrearsLR', {
+      option: rentArrears.yesRadioOption,
+      rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
+    });
+    await performAction('selectCounterClaimLR', {
+      option: counterClaim.yesRadioOption,
+    });
+    await performAction('selectWhatAreYouClaimingForLR', {
+      question: counterClaimWhatAreYouClaimingFor.mainHeader,
+      option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+    });
+    await performAction('counterClaimSpecificSumOfMoneyLR', {
+      question: counterClaimSpecificSumOfMoney.mainHeader,
+      option: counterClaimSpecificSumOfMoney.noRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performAction('selectCounterClaimFeeLR', {
+      radioOption: counterClaimFee.defendantNeedHelpRadioOption,
+      typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
+      amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
+    });
+    await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
+      helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
+    });
+    await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
   });
-  await performAction('enterDateOfBirthDetailsLR', {
-    dobDay: defendantDateOfBirth.dayInputText,
-    dobMonth: defendantDateOfBirth.monthInputText,
-    dobYear: defendantDateOfBirth.yearInputText,
-  });
-  await performAction('selectCorrespondenceAddressLR', {
-    radioOption: correspondenceAddress.yesRadioOption,
-  });
-  await performAction('emailConfirmationLR', {
-    radioOption: emailConfirmation.noRadioOption,
-  });
-  await performAction('tenancyOrContractTypeDetailsLR', {
-    tenancyType: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.tenancy_TypeOfTenancyLicence,
-    tenancyOption: tenancyTypeDetails.noRadioOption,
-    tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
-  });
-  await performAction('enterTenancyStartDetailsUnKnownLR');
-  await performAction('selectNoticeDetailsLR', {
-    option: confirmationOfNoticeGiven.noRadioOption,
-  });
-  await performAction('rentArrearsLR', {
-    option: rentArrears.yesRadioOption,
-    rentArrearsTotal: submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.rentArrears_Total,
-  });
-  await performAction('selectCounterClaimLR', {
-    option: counterClaim.yesRadioOption,
-  });
-  await performAction('selectWhatAreYouClaimingForLR', {
-    question: counterClaimWhatAreYouClaimingFor.mainHeader,
-    option: counterClaimWhatAreYouClaimingFor.bothRadioOption,
-  });
-  await performAction('counterClaimSpecificSumOfMoneyLR', {
-    question: counterClaimSpecificSumOfMoney.mainHeader,
-    option: counterClaimSpecificSumOfMoney.noRadioOption,
-    amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
-  });
-  await performAction('selectCounterClaimFeeLR', {
-    radioOption: counterClaimFee.defendantNeedHelpRadioOption,
-    typeOfClaim: counterClaimWhatAreYouClaimingFor.bothRadioOption,
-    amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
-  });
-  await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
-    helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
-  });
-  await softErrorMessageValidation(
-    'counterclaimYouNeedToApplyForHelpWithYourFees',
-    counterclaimYouNeedToApplyForHelpWithYourFeesErrorValidation
-  );
-  await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
 });

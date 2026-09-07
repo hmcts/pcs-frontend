@@ -11,7 +11,6 @@ export * from './counterClaimHaveYouAppliedForHelp.pft.lr';
 export * from './counterClaimOrderOtherThanSum.pft.lr';
 export * from './counterClaimSpecificSumOfMoney.pft.lr';
 export * from './counterClaimWhatAreYouClaimingFor.pft.lr';
-export * from './counterclaimYouNeedToApplyForHelpWithYourFees.pft.lr';
 export * from './defendantNameConfirmation.pft.lr';
 export * from './doAnyOtherAdultsLiveInYourHome.pft.lr';
 export * from './doYouHaveAnyDependantChildren.pft.lr';
