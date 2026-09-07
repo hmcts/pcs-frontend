@@ -19,7 +19,7 @@ export const counterClaimSpecificSumOfMoney = {
   pageSlug: `counter-claim-specific-sum`,
   backLink: `Back`,
   feeHiddenAmount: `35.00`,
-  enterHowMuchYouAreClaimingErrorMessage: `Enter how much you are claiming for`,
+  enterHowMuchYouAreClaimingErrorMessage: `Enter how much the defendant is claiming for`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   specificSumRequiredErrorMessage: `Select if the defendant is claiming for a specific sum of money`,
   enterMaxValueErrorMessage: `Enter the maximum value of your claim`,
