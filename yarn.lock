@@ -2236,12 +2236,12 @@ __metadata:
   linkType: hard
 
 "@ministryofjustice/frontend@npm:^11.0.0":
-  version: 11.0.0
-  resolution: "@ministryofjustice/frontend@npm:11.0.0"
+  version: 11.0.1
+  resolution: "@ministryofjustice/frontend@npm:11.0.1"
   peerDependencies:
     govuk-frontend: ^6.0.0
     moment: 2.30.1
-  checksum: 10/0ba6498f1cb1a682e458b6088a9c03b594f40399f3e8e72c0fec9f0084efdea3217598907010efe4c4a47cde048590cf96aedc08e4d702ddc4e478980a60b7e0
+  checksum: 10/35482eeadc9bbc5b727abfe30097b48e8a8ebe47a1a7e868bc232d306c09911d0fb94dca9203d5034b5e9b9ae517b59876e691f1afd14639e5b8267bd2699fe4
   languageName: node
   linkType: hard
 
