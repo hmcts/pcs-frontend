@@ -271,10 +271,16 @@ export function initMakeOrder(): () => void {
 
   initSuspendedMoneyOptions(form, signal);
 
-  const orderTabs = form.querySelectorAll<HTMLAnchorElement>('[data-order-type]');
-  orderTabs.forEach(tab => {
-    tab.addEventListener('click', () => selectOrderType(tab.dataset.orderType as OrderType), { signal });
-  });
+  const orderTabs = Array.from(form.querySelectorAll<HTMLAnchorElement>('[data-order-type]'));
+  const linkedTab = (): HTMLAnchorElement | undefined => orderTabs.find(tab => tab.hash === window.location.hash);
+  const syncOrderType = (): void => {
+    const type = linkedTab()?.dataset.orderType as OrderType | undefined;
+    if (type && type !== editorType) {
+      selectOrderType(type);
+    }
+  };
+  // GOV.UK tabs update the hash for clicks, arrow keys and browser history.
+  window.addEventListener('hashchange', syncOrderType, { signal });
   const renderForFormControl = (event: Event): void => {
     if (event.target instanceof Node && editorRegion.contains(event.target)) {
       return;
@@ -283,9 +289,22 @@ export function initMakeOrder(): () => void {
   };
   form.addEventListener('input', renderForFormControl, { signal });
   form.addEventListener('change', renderForFormControl, { signal });
-  form.addEventListener('submit', persistEditor, { signal });
-  const linkedTab = Array.from(orderTabs).find(tab => tab.getAttribute('href') === window.location.hash);
-  selectOrderType((linkedTab?.dataset.orderType as OrderType | undefined) ?? (orderTypeField.value as OrderType));
+  form.addEventListener(
+    'submit',
+    () => {
+      syncOrderType();
+      persistEditor();
+    },
+    { signal }
+  );
+  selectOrderType((linkedTab()?.dataset.orderType as OrderType | undefined) ?? (orderTypeField.value as OrderType));
+  const selectedTab = orderTabs.find(tab => tab.dataset.orderType === orderTypeField.value);
+  if (!window.location.hash && selectedTab) {
+    // GOV.UK initially opens its first tab when there is no fragment. Restore the
+    // saved selection without adding a browser history entry.
+    window.history.replaceState(window.history.state, '', selectedTab.hash);
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+  }
 
   return () => {
     listenerController.abort();
