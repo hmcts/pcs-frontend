@@ -1,54 +1,54 @@
 {
-  "pageTitle": "cy Check your answers",
-  "cardTitle": "cy Your circumstances",
+  "pageTitle": "Gwiriwch eich atebion",
+  "cardTitle": "Eich amgylchiadau",
   "rows": {
     "dependantChildren": {
-      "label": "cy Does the defendant have any dependant children?",
-      "changeHidden": "cy dependent children"
+      "label": "A oes gan y diffynnydd unrhyw blant sy'n ddibynnol arnynt?",
+      "changeHidden": "plant sy'n ddibynnol"
     },
     "dependantChildrenDetails": {
-      "label": "cy Give details about their dependant children",
-      "changeHidden": "cy dependent children details"
+      "label": "Rhowch fanylion eu plant dibynnol",
+      "changeHidden": "manylion plant sy'n ddibynnol"
     },
     "otherDependants": {
-      "label": "cy Does the defendant have any other dependants?",
-      "changeHidden": "cy other dependants"
+      "label": "A oes gan y diffynnydd unrhyw un arall sy'n ddibynnol arnynt?",
+      "changeHidden": "dibynyddion eraill"
     },
     "otherDependantsDetails": {
-      "label": "cy Give details about their other dependants",
-      "changeHidden": "cy other dependants details"
+      "label": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnynt",
+      "changeHidden": "manylion eraill sy'n ddibynnol"
     },
     "otherTenants": {
-      "label": "cy Do any other adults live in the defendant’s home?",
-      "changeHidden": "cy other adults in your home"
+      "label": "A oes yna unrhyw oedolion eraill yn byw yng nghartref y diffynnydd?",
+      "changeHidden": "oedolion eraill sy'n byw yn eich cartref"
     },
     "otherTenantsDetails": {
-      "label": "cy Give details about the other adults living in the defendant’s home",
-      "changeHidden": "cy other adults details"
+      "label": "Rhowch fanylion yr oedolion eraill sy'n byw yng nghartref y diffynnydd",
+      "changeHidden": "manylion oedolion eraill"
     },
     "alternativeAccommodation": {
-      "label": "cy Would the defendant have somewhere else to live if they had to leave their home?",
-      "changeHidden": "cy alternative accommodation"
+      "label": "A fyddai gan y diffynnydd rywle arall i fyw os byddai'n rhaid iddynt adael eu cartref?",
+      "changeHidden": "llety amgen"
     },
     "alternativeAccommodationDate": {
-      "label": "cy When would they be able to move in?",
-      "changeHidden": "cy alternative accommodation move-in date"
+      "label": "Pryd fyddent yn gallu symud i mewn?",
+      "changeHidden": "dyddiad symud i mewn i lety amgen"
     },
     "shareAdditionalCircumstances": {
-      "label": "cy Would you like to share anything about the defendant’s circumstances?",
-      "changeHidden": "cy additional circumstances"
+      "label": "Hoffech chi rannu unrhyw beth am amgylchiadau'r diffynnydd?",
+      "changeHidden": "amgylchiadau ychwanegol"
     },
     "shareAdditionalCircumstancesDetails": {
-      "label": "cy Give details about the defendant’s circumstances",
-      "changeHidden": "cy additional circumstances details"
+      "label": "Rhowch fanylion am amgylchiadau'r diffynnydd",
+      "changeHidden": "manylion amgylchiadau ychwanegol"
     },
     "exceptionalHardship": {
-      "label": "cy Would the defendant experience exceptional hardship if they were asked to leave their home?",
-      "changeHidden": "cy exceptional hardship"
+      "label": "A fyddai'r diffynnydd yn profi caledi eithriadol os gofynnir iddynt adael eu cartref?",
+      "changeHidden": "caledi eithriadol"
     },
     "exceptionalHardshipDetails": {
-      "label": "cy Give details about the exceptional hardship the defendant would experience",
-      "changeHidden": "cy exceptional hardship details"
+      "label": "Rhowch fanylion am y caledi eithriadol y byddai'r diffynnydd yn ei brofi",
+      "changeHidden": "manylion caledi eithriadol"
     }
   }
 }

@@ -169,6 +169,7 @@ export interface CcdDefendantParty {
   addressSameAsProperty?: string;
   phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
+  textMessageNumber?: string;
   pcqId?: string;
 }
 
