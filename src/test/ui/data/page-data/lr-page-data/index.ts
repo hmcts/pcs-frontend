@@ -23,8 +23,6 @@ export * from './whatOtherRegularExpensesDoYouHave.page.data.lr';
 export * from './priorityDebtDetails.page.data.lr';
 export * from './otherConsiderations.page.data.lr';
 export * from './uploadDocument.page.data.lr';
-export * from './equalityAndDiversityStart.page.data.lr';
-export * from './equalityAndDiversityEnd.page.data.lr';
 export * from './languageUsed.page.data.lr';
 export * from './rentArrears.page.data.lr';
 export * from './noticeDateWhenProvided.page.data.lr';
