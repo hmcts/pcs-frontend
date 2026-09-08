@@ -184,7 +184,8 @@
     "js-yaml": "^5.0.0",
     "protobufjs": "^8.0.0",
     "semver": "^7.5.2",
-    "uuid": "14.0.2"
+    "uuid": "14.0.2",
+    "@hmcts-cft/docweave": "portal:../dtsse-ccd-config-generator/frontend/docweave"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
