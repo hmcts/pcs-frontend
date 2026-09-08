@@ -81,7 +81,12 @@ import {
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
-import { getSelectedPinUser, pins, selectPinUserByDefendantDetails } from './fetchPINsAndValidateAccessCodeAPI.action';
+import {
+  getSelectedPinUser,
+  pins,
+  selectPinUserByDefendantDetails,
+  selectPinUserByIndex,
+} from './fetchPINsAndValidateAccessCodeAPI.action';
 import { FieldsStore } from './recordAnsweredFields.action';
 
 const rtcCyaMap = new Map<string, string>();
@@ -1694,7 +1699,7 @@ export class RespondToClaimAction implements IAction {
     let pin: string | undefined;
 
     if (typeof accessCode.pinIndex === 'number') {
-      pin = pins[accessCode.pinIndex];
+      pin = selectPinUserByIndex(accessCode.pinIndex)?.pin;
     } else if (typeof defendantDetailsKnown === 'boolean') {
       pin = selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin;
     } else {

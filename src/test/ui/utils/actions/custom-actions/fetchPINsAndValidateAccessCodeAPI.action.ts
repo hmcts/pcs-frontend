@@ -67,6 +67,10 @@ export function selectPinUserByDefendantDetails(detailsKnown: boolean): PinUser 
   return setSelectedPinUser(matchingPinUser);
 }
 
+export function selectPinUserByIndex(index: number): PinUser | undefined {
+  return setSelectedPinUser(pinUsers[index]);
+}
+
 function getDefaultPinUser(): PinUser | undefined {
   const hasUnknownDefendant = pinUsers.some(pinUser => !hasKnownDefendantDetails(pinUser));
   return hasUnknownDefendant ? selectPinUserByDefendantDetails(false) : setSelectedPinUser(pinUsers[0]);
