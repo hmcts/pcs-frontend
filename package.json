@@ -144,7 +144,7 @@
     "husky": "9.1.7",
     "jest": "30.5.1",
     "jest-environment-jsdom": "30.5.1",
-    "jest-html-reporter": "4.4.0",
+    "jest-html-reporter": "4.4.2",
     "jest-pact": "0.13.0",
     "lint-staged": "17.4.1",
     "mini-css-extract-plugin": "2.10.2",
