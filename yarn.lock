@@ -1251,9 +1251,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts-cft/docweave@npm:0.1.0-alpha.4":
-  version: 0.1.0-alpha.4
-  resolution: "@hmcts-cft/docweave@npm:0.1.0-alpha.4"
+"@hmcts-cft/docweave@portal:../dtsse-ccd-config-generator/frontend/docweave::locator=pcs-frontend%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@hmcts-cft/docweave@portal:../dtsse-ccd-config-generator/frontend/docweave::locator=pcs-frontend%40workspace%3A."
   dependencies:
     prosemirror-commands: "npm:1.7.2"
     prosemirror-dropcursor: "npm:1.8.3"
@@ -1270,9 +1270,8 @@ __metadata:
   peerDependenciesMeta:
     express:
       optional: true
-  checksum: 10/084c1962a81b4f17b1b4c8771795d87fcb2ef4d4caa6d72c8ea420ef2fb8473aeb4d156f1a7493ec69e6a2c2b5272fea0e8bb7cac5a33b3abee61bb7f4b14078
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@hmcts/info-provider@npm:1.4.0":
   version: 1.4.0
