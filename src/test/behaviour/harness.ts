@@ -160,6 +160,7 @@ export interface Page {
 
 /** Loads served HTML into jsdom and starts the page's JavaScript, as a browser would. */
 export async function openPage(html: string): Promise<Page> {
+  window.history.replaceState(null, '', '/');
   document.open();
   document.write(html);
   document.close();
@@ -193,13 +194,15 @@ export function control<T extends HTMLElement = HTMLInputElement>(selector: stri
   return element;
 }
 
-export function check(name: string, value: string): void {
+export function check(name: string, value: string, checked = true): void {
   const input = control(`input[name="${name}"][value="${value}"]`);
-  input.click();
-  if (!input.checked) {
-    input.checked = true;
-    input.dispatchEvent(new Event('change', { bubbles: true }));
+  if (input.checked !== checked) {
+    input.click();
   }
+}
+
+export function uncheck(name: string, value: string): void {
+  check(name, value, false);
 }
 
 export function type(name: string, value: string): void {
@@ -213,4 +216,20 @@ export function typeDate(prefix: string, day: string, month: string, year: strin
   type(`${prefix}-day`, day);
   type(`${prefix}-month`, month);
   type(`${prefix}-year`, year);
+}
+
+/** Switches order type the way GOV.UK tabs do: by changing the fragment. */
+export function selectTab(id: string): void {
+  window.location.hash = `#${id}`;
+  window.dispatchEvent(new HashChangeEvent('hashchange'));
+}
+
+export function futureDate(days: number): { day: string; month: string; year: string } {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  return {
+    day: String(date.getDate()).padStart(2, '0'),
+    month: String(date.getMonth() + 1).padStart(2, '0'),
+    year: String(date.getFullYear()),
+  };
 }
