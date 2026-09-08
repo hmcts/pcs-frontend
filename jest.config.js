@@ -6,6 +6,7 @@ module.exports = {
   transform: {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: { allowJs: true } }],
   },
+  setupFiles: ['<rootDir>/src/test/unit/setup.ts'],
   moduleNameMapper: {
     '^openid-client$': '<rootDir>/src/test/unit/modules/oidc/__mocks__/openid-client.ts',
     '^glob$': '<rootDir>/src/test/unit/modules/nunjucks/__mocks__/glob.ts',
@@ -19,7 +20,7 @@ module.exports = {
     '^jose$': '<rootDir>/src/test/unit/modules/s2s/__mocks__/jose.ts',
     '^uuid$': '<rootDir>/src/test/unit/__mocks__/uuid.ts',
   },
-  testPathIgnorePatterns: ['/__mocks__/'],
+  testPathIgnorePatterns: ['/__mocks__/', '/setup\\.ts$', '/docweaveTestUtils\\.ts$'],
   coverageProvider: 'v8',
   transformIgnorePatterns: ['node_modules/(?!(jose|@panva|oidc-token-hash|@hmcts-cft/docweave)/)'],
 };

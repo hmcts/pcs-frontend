@@ -41,6 +41,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Serve CFT UI component lib assets directly from node_modules
 const cftStylesPath = path.dirname(require.resolve('@hmcts-cft/cft-ui-component-lib/styles/ui-component-lib.css'));
 app.use('/assets/ui-component-lib', express.static(cftStylesPath));
+const docweaveStylesPath = path.dirname(require.resolve('@hmcts-cft/docweave/styles/docweave.css'));
+app.use('/assets/docweave', express.static(docweaveStylesPath));
 app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate, no-store');
   next();

@@ -1,8 +1,7 @@
-import type { DocWeaveDocument } from '@hmcts-cft/docweave';
+import type { DocWeaveClause, DocWeaveDocument } from '@hmcts-cft/docweave';
 
 import { type OrderData } from '../../../../main/assets/js/make-order/data';
 
-type DocWeaveNode = DocWeaveDocument['node'];
 type AnswerValue = string | readonly string[];
 
 export function makeOrderData(
@@ -33,23 +32,14 @@ export function makeOrderData(
   };
 }
 
-export function findNode(document: DocWeaveDocument, id: string): DocWeaveNode {
-  let result: DocWeaveNode | undefined;
-  document.node.descendants(node => {
-    if (node.attrs.id === id) {
-      result = node;
-      return false;
-    }
-    return true;
-  });
+export function findNode(document: DocWeaveDocument, id: string): DocWeaveClause {
+  const result = document.getClause(id) ?? document.getClause(id.replace(/^[^:]+:/, ''));
   if (!result) {
     throw new Error(`Docweave node not found: ${id}`);
   }
   return result;
 }
 
-export function childTexts(node: DocWeaveNode): string[] {
-  const texts: string[] = [];
-  node.forEach(child => texts.push(child.textContent));
-  return texts;
+export function childTexts(node: Pick<DocWeaveDocument, 'children'> | DocWeaveClause): string[] {
+  return node.children.map(child => child.textContent);
 }
