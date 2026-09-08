@@ -3391,66 +3391,66 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-core-darwin-arm64@npm:20.1.0":
-  version: 20.1.0
-  resolution: "@pact-foundation/pact-core-darwin-arm64@npm:20.1.0"
+"@pact-foundation/pact-core-darwin-arm64@npm:20.1.1":
+  version: 20.1.1
+  resolution: "@pact-foundation/pact-core-darwin-arm64@npm:20.1.1"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-core-darwin-x64@npm:20.1.0":
-  version: 20.1.0
-  resolution: "@pact-foundation/pact-core-darwin-x64@npm:20.1.0"
+"@pact-foundation/pact-core-darwin-x64@npm:20.1.1":
+  version: 20.1.1
+  resolution: "@pact-foundation/pact-core-darwin-x64@npm:20.1.1"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-core-linux-arm64-glibc@npm:20.1.0":
-  version: 20.1.0
-  resolution: "@pact-foundation/pact-core-linux-arm64-glibc@npm:20.1.0"
+"@pact-foundation/pact-core-linux-arm64-glibc@npm:20.1.1":
+  version: 20.1.1
+  resolution: "@pact-foundation/pact-core-linux-arm64-glibc@npm:20.1.1"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-core-linux-arm64-musl@npm:20.1.0":
-  version: 20.1.0
-  resolution: "@pact-foundation/pact-core-linux-arm64-musl@npm:20.1.0"
+"@pact-foundation/pact-core-linux-arm64-musl@npm:20.1.1":
+  version: 20.1.1
+  resolution: "@pact-foundation/pact-core-linux-arm64-musl@npm:20.1.1"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-core-linux-x64-glibc@npm:20.1.0":
-  version: 20.1.0
-  resolution: "@pact-foundation/pact-core-linux-x64-glibc@npm:20.1.0"
+"@pact-foundation/pact-core-linux-x64-glibc@npm:20.1.1":
+  version: 20.1.1
+  resolution: "@pact-foundation/pact-core-linux-x64-glibc@npm:20.1.1"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-core-linux-x64-musl@npm:20.1.0":
-  version: 20.1.0
-  resolution: "@pact-foundation/pact-core-linux-x64-musl@npm:20.1.0"
+"@pact-foundation/pact-core-linux-x64-musl@npm:20.1.1":
+  version: 20.1.1
+  resolution: "@pact-foundation/pact-core-linux-x64-musl@npm:20.1.1"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-core-windows-x64@npm:20.1.0":
-  version: 20.1.0
-  resolution: "@pact-foundation/pact-core-windows-x64@npm:20.1.0"
+"@pact-foundation/pact-core-windows-x64@npm:20.1.1":
+  version: 20.1.1
+  resolution: "@pact-foundation/pact-core-windows-x64@npm:20.1.1"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact-core@npm:^20.1.0":
-  version: 20.1.0
-  resolution: "@pact-foundation/pact-core@npm:20.1.0"
+"@pact-foundation/pact-core@npm:^20.1.1":
+  version: 20.1.1
+  resolution: "@pact-foundation/pact-core@npm:20.1.1"
   dependencies:
-    "@pact-foundation/pact-core-darwin-arm64": "npm:20.1.0"
-    "@pact-foundation/pact-core-darwin-x64": "npm:20.1.0"
-    "@pact-foundation/pact-core-linux-arm64-glibc": "npm:20.1.0"
-    "@pact-foundation/pact-core-linux-arm64-musl": "npm:20.1.0"
-    "@pact-foundation/pact-core-linux-x64-glibc": "npm:20.1.0"
-    "@pact-foundation/pact-core-linux-x64-musl": "npm:20.1.0"
-    "@pact-foundation/pact-core-windows-x64": "npm:20.1.0"
+    "@pact-foundation/pact-core-darwin-arm64": "npm:20.1.1"
+    "@pact-foundation/pact-core-darwin-x64": "npm:20.1.1"
+    "@pact-foundation/pact-core-linux-arm64-glibc": "npm:20.1.1"
+    "@pact-foundation/pact-core-linux-arm64-musl": "npm:20.1.1"
+    "@pact-foundation/pact-core-linux-x64-glibc": "npm:20.1.1"
+    "@pact-foundation/pact-core-linux-x64-musl": "npm:20.1.1"
+    "@pact-foundation/pact-core-windows-x64": "npm:20.1.1"
     check-types: "npm:11.2.3"
     detect-libc: "npm:^2.0.3"
     node-gyp-build: "npm:^4.6.0"
@@ -3472,16 +3472,16 @@ __metadata:
       optional: true
     "@pact-foundation/pact-core-windows-x64":
       optional: true
-  checksum: 10/0cb77c898354a61fcff7b349bca7f483963602deb79818d0f36235ee6fa55b02a4d9c5654ee5d43b75cfb2b8f04eaf973675883b462f7cffd1941973c23c0e2f
+  checksum: 10/d21aba7e767f0c5a075c451d9a4b5808714f2bf41766f0a93cc6de015c19da4d33149a793e7acd35a8ee8e7edc121e5b64c6dc6aaeeff835f4f03e01770cddce
   conditions: (os=darwin | os=linux | os=win32) & (cpu=x64 | cpu=ia32 | cpu=arm64)
   languageName: node
   linkType: hard
 
-"@pact-foundation/pact@npm:17.1.3":
-  version: 17.1.3
-  resolution: "@pact-foundation/pact@npm:17.1.3"
+"@pact-foundation/pact@npm:17.1.4":
+  version: 17.1.4
+  resolution: "@pact-foundation/pact@npm:17.1.4"
   dependencies:
-    "@pact-foundation/pact-core": "npm:^20.1.0"
+    "@pact-foundation/pact-core": "npm:^20.1.1"
     "@scarf/scarf": "npm:^1.4.0"
     axios: "npm:^1.12.2"
     body-parser: "npm:^2.2.0"
@@ -3497,7 +3497,7 @@ __metadata:
     randexp: "npm:^0.5.3"
     router: "npm:^2.2.0"
     stack-utils: "npm:^2.0.6"
-  checksum: 10/47b92f7d0f492c1857bce14828daa8406d88fc3b9a2aeed52d9ab7a6632ba65a1337c52ce942a53834040786ab267409196431f8d38ac4e6289a66fc2a038ac8
+  checksum: 10/d6cae0f7641cbe28525232f666b05c15527f640d1a47067726e1ae8cf9663ff93c0b803c2c248d024951d61769b27acbd93a5dc0bc0ca06112e05f43627054b4
   languageName: node
   linkType: hard
 
@@ -12043,7 +12043,7 @@ __metadata:
     "@ministryofjustice/frontend": "npm:^11.0.0"
     "@opentelemetry/api": "npm:1.9.1"
     "@opentelemetry/instrumentation-winston": "npm:0.66.0"
-    "@pact-foundation/pact": "npm:17.1.3"
+    "@pact-foundation/pact": "npm:17.1.4"
     "@pact-foundation/pact-cli": "npm:18.1.1"
     "@playwright/test": "npm:1.62.1"
     "@types/body-parser": "npm:1.19.6"
