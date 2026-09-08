@@ -1,5 +1,11 @@
-export type MakeOrderType =
-  'OUTRIGHT_POSSESSION' | 'SUSPENDED_POSSESSION' | 'ADJOURNMENT' | 'STRIKE_OUT_DISMISSAL' | 'FREE_FORM';
+export const MAKE_ORDER_TYPES = [
+  'OUTRIGHT_POSSESSION',
+  'SUSPENDED_POSSESSION',
+  'ADJOURNMENT',
+  'STRIKE_OUT_DISMISSAL',
+  'FREE_FORM',
+] as const;
+export type MakeOrderType = (typeof MAKE_ORDER_TYPES)[number];
 
 export interface MakeOrderValidationIssue {
   id: string;
