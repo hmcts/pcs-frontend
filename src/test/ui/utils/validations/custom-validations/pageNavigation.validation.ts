@@ -34,8 +34,9 @@ export class PageNavigationValidation implements IValidation {
   private static readonly LR_PFT_DIR = path.join(__dirname, '../../../functional/legalRepresentative-functional');
   private static currentPageUrl: string = '';
   private static currentSourcePage: string | null = null;
+  private static currentSourceIsLR = false;
   private static navigationFailed = false;
-  private static readonly criticalBackNavigationPages = new Set([
+  private static readonly respondToClaimCriticalBackNavigationPages = new Set([
     'startNow',
     'freeLegalAdvice',
     'defendantNameCapture',
@@ -43,13 +44,27 @@ export class PageNavigationValidation implements IValidation {
     'counterClaim',
     'uploadFilesToSupportYourCounterclaim',
   ]);
+  private static readonly lrCriticalBackNavigationPages = new Set([
+    'rentArrears',
+    'nonRentArrearsDispute',
+    'counterClaim',
+    'counterClaimFee',
+    'counterClaimAbout',
+    'counterClaimAgainstWhom',
+    'counterClaimWhatAreYouClaimingFor',
+    'doYouWantToUploadFilesToSupportYourCounterclaim',
+    'uploadFilesToSupportYourCounterclaim',
+    'counterclaimYouNeedToApplyForHelpWithYourFees',
+  ]);
 
-  static setSourcePage(pageName: string): void {
+  static setSourcePage(pageName: string, isLR = false): void {
     PageNavigationValidation.currentSourcePage = pageName;
+    PageNavigationValidation.currentSourceIsLR = isLR;
   }
 
   static clearSourcePage(): void {
     PageNavigationValidation.currentSourcePage = null;
+    PageNavigationValidation.currentSourceIsLR = false;
   }
 
   async validate(page: Page, _validation: string, navigateButton: string, fieldName: validationRecord): Promise<void> {
@@ -85,7 +100,10 @@ export class PageNavigationValidation implements IValidation {
 
   private static isCriticalPage(): boolean {
     const pageName = PageNavigationValidation.currentSourcePage || '';
-    return PageNavigationValidation.criticalBackNavigationPages.has(pageName);
+    const criticalPages = PageNavigationValidation.currentSourceIsLR
+      ? PageNavigationValidation.lrCriticalBackNavigationPages
+      : PageNavigationValidation.respondToClaimCriticalBackNavigationPages;
+    return criticalPages.has(pageName);
   }
 
   private async validateLinkHref(page: Page, linkText: string): Promise<void> {
@@ -665,6 +683,7 @@ export class PageNavigationValidation implements IValidation {
     PageNavigationValidation.missingNavigationFiles.clear();
     PageNavigationValidation.currentPageUrl = '';
     PageNavigationValidation.currentSourcePage = null;
+    PageNavigationValidation.currentSourceIsLR = false;
     PageNavigationValidation.navigationFailed = false;
   }
 }

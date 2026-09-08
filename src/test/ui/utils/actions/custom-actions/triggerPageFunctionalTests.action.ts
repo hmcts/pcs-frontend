@@ -114,7 +114,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       if (enable_navigation_tests === 'true' && !skipNavigationForTaskListSpec) {
         await test.step(`Navigation tests triggered for page - ${pageName}`, async () => {
           try {
-            await this.runNavigationTests(page, pageName, pftFilePath);
+            await this.runNavigationTests(page, pageName, pftFilePath, isLRForPFT);
           } catch (error) {
             PageNavigationValidation.trackNavigationFailure(pageName, error);
             navigationTestsFailed = true;
@@ -232,7 +232,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
   }
 
-  private async runNavigationTests(page: Page, pageName: string, pftFilePath: string): Promise<void> {
+  private async runNavigationTests(page: Page, pageName: string, pftFilePath: string, isLR: boolean): Promise<void> {
     delete require.cache[require.resolve(pftFilePath)];
     const pftModule = require(pftFilePath);
 
@@ -241,9 +241,12 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
     if (typeof navigationFunction === 'function') {
       PageNavigationValidation.trackPageWithNavigation(pageName);
-      PageNavigationValidation.setSourcePage(pageName);
-      await navigationFunction(page);
-      PageNavigationValidation.clearSourcePage();
+      PageNavigationValidation.setSourcePage(pageName, isLR);
+      try {
+        await navigationFunction(page);
+      } finally {
+        PageNavigationValidation.clearSourcePage();
+      }
       PageNavigationValidation.trackPagePassed(pageName);
     } else {
       PageNavigationValidation.trackMissingNavigationMethod(pageName);
