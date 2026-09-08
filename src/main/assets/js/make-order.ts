@@ -191,6 +191,20 @@ export function syncSuspendedOnlyCosts(form: HTMLFormElement, type: OrderType): 
   });
 }
 
+const builders: Record<OrderType, (data: ReturnType<typeof readOrderData>) => DocWeaveDocument> = {
+  OUTRIGHT_POSSESSION: buildOutrightOrder,
+  SUSPENDED_POSSESSION: buildSuspendedOrder,
+  ADJOURNMENT: buildAdjournmentOrder,
+  STRIKE_OUT_DISMISSAL: buildStrikeOutDismissalOrder,
+  FREE_FORM: buildFreeFormOrder,
+};
+
+/** The generated order for the form's current answers and selected order type. */
+export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
+  const type = form.querySelector<HTMLInputElement>('#order-type')?.value as OrderType;
+  return builders[type](readOrderData(form));
+}
+
 // Returns a teardown so a module reload can dispose the editor. Without it a second
 // editor is created over the same mount, which DocWeave rejects.
 export function initMakeOrder(): () => void {
@@ -232,19 +246,11 @@ export function initMakeOrder(): () => void {
       documentField.value = '';
     }
   };
-  const builders: Record<OrderType, (data: ReturnType<typeof readOrderData>) => DocWeaveDocument> = {
-    OUTRIGHT_POSSESSION: buildOutrightOrder,
-    SUSPENDED_POSSESSION: buildSuspendedOrder,
-    ADJOURNMENT: buildAdjournmentOrder,
-    STRIKE_OUT_DISMISSAL: buildStrikeOutDismissalOrder,
-    FREE_FORM: buildFreeFormOrder,
-  };
   const render = (): void => {
-    const type = orderTypeField.value as OrderType;
-    if (!editor || editorType !== type) {
+    if (!editor || editorType !== orderTypeField.value) {
       return;
     }
-    editor.render(builders[type](readOrderData(form)));
+    editor.render(buildOrderDocument(form));
   };
   const selectOrderType = (type: OrderType): void => {
     if (editorType !== type) {
