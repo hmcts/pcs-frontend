@@ -8,11 +8,11 @@ describe('free form order generation', () => {
       makeOrderData({ 'free-form-text': 'The claim is transferred to the County Court at Leeds.' })
     );
 
-    expect(childTexts(generated.node)).toEqual([
+    expect(childTexts(generated)).toEqual([
       'IT IS ORDERED THAT:',
       'The claim is transferred to the County Court at Leeds.',
     ]);
-    expect(generated.node.childCount).toBe(2);
+    expect(generated.children).toHaveLength(2);
   });
 
   it('splits wording into a paragraph per blank-line separated block', () => {
@@ -20,13 +20,13 @@ describe('free form order generation', () => {
       makeOrderData({ 'free-form-text': 'First direction.\n\n  \n Second direction. \n\n' })
     );
 
-    expect(childTexts(generated.node)).toEqual(['IT IS ORDERED THAT:', 'First direction.', 'Second direction.']);
+    expect(childTexts(generated)).toEqual(['IT IS ORDERED THAT:', 'First direction.', 'Second direction.']);
   });
 
   it('generates only the preamble when no wording has been entered', () => {
     const generated = buildFreeFormOrder(makeOrderData({ 'free-form-text': '   ' }));
 
-    expect(childTexts(generated.node)).toEqual(['IT IS ORDERED THAT:']);
+    expect(childTexts(generated)).toEqual(['IT IS ORDERED THAT:']);
   });
 
   it('preserves the original row index in attendance paragraph IDs', () => {

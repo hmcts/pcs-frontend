@@ -35,11 +35,11 @@ describe('suspended possession order generation', () => {
     const generated = buildSuspendedOrder(suspendedData(['one-off']));
     const suspension = findNode(generated, 'item:suspended-condition');
 
-    expect(suspension.firstChild?.textContent).toContain(
+    expect(suspension.textContent).toContain(
       'Execution of the order for possession is suspended as long as the defendant pays (i) the rent as it falls due plus (ii) the arrears of £234.00 by payment of £234.00 to the claimant by 27 May 2026.'
     );
-    expect(suspension.childCount).toBe(1);
-    expect(childTexts(findNode(generated, 'ordered-list:suspended-clauses'))).toContain(
+    expect(suspension.children).toHaveLength(0);
+    expect(findNode(generated, 'suspended-payment-priority').textContent).toBe(
       'Payment of the above instalments made to the claimant shall be applied first to any arrears prior to any order for costs.'
     );
   });
@@ -48,8 +48,8 @@ describe('suspended possession order generation', () => {
     const generated = buildSuspendedOrder(suspendedData(['one-off', 'instalments']));
     const suspension = findNode(generated, 'item:suspended-condition');
 
-    expect(suspension.firstChild?.textContent).toMatch(/arrears of £234\.00 by:$/);
-    expect(childTexts(findNode(generated, 'ordered-list:suspended-payment-terms'))).toEqual([
+    expect(suspension.textContent).toMatch(/arrears of £234\.00 by:$/);
+    expect(childTexts(suspension)).toEqual([
       'payment of £234.00 to the claimant by 27 May 2026;',
       'payments of £25.00 to the claimant every month, the first instalment to be paid on or before 3 June 2026;',
     ]);
@@ -64,7 +64,7 @@ describe('suspended possession order generation', () => {
       })
     );
     let suspension = findNode(generated, 'item:suspended-condition');
-    expect(suspension.firstChild?.textContent).toMatch(/^Execution of the order for possession is suspended/);
+    expect(suspension.textContent).toMatch(/^Execution of the order for possession is suspended/);
 
     generated = buildSuspendedOrder(
       suspendedData(['one-off'], {
@@ -74,7 +74,7 @@ describe('suspended possession order generation', () => {
       })
     );
     suspension = findNode(generated, 'item:suspended-condition');
-    expect(suspension.firstChild?.textContent).toMatch(
+    expect(suspension.textContent).toMatch(
       /^Execution of the order for possession and enforcement of any order for costs are suspended/
     );
     expect(findNode(generated, 'item:suspended-costs').textContent).toContain('£125.00');

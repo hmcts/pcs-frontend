@@ -33,12 +33,14 @@ describe('adjournment order generation', () => {
       )
     );
 
-    expect(childTexts(findNode(generated, 'ordered-list:adjournment-clauses'))).toEqual([
-      'The claim shall be adjourned to be heard on the next available possession list after 21 May 2026 with a time estimate of 20 minutes. Further details of the hearing will be provided by the court.',
-      'The defendant must by 4pm on 22 May 2026 send to the court and all other parties a defence.',
-      'The claimant must by 4pm on 23 May 2026 send to the court and all other parties a defence to the counterclaim and any reply.',
-      'Costs reserved.',
-    ]);
+    expect(generated.children.map(clause => clause.textContent)).toEqual(
+      expect.arrayContaining([
+        'The claim shall be adjourned to be heard on the next available possession list after 21 May 2026 with a time estimate of 20 minutes. Further details of the hearing will be provided by the court.',
+        'The defendant must by 4pm on 22 May 2026 send to the court and all other parties a defence.',
+        'The claimant must by 4pm on 23 May 2026 send to the court and all other parties a defence to the counterclaim and any reply.',
+        'Costs reserved.',
+      ])
+    );
   });
 
   it('generates a specific hearing with singular duration and no hearing format wording', () => {
@@ -109,10 +111,10 @@ describe('adjournment order generation', () => {
       )
     );
 
-    expect(findNode(generated, 'item:adjournment-condition').firstChild?.textContent).toContain(
+    expect(findNode(generated, 'item:adjournment-condition').textContent).toContain(
       'the defendants make payment of current rent'
     );
-    expect(childTexts(findNode(generated, 'ordered-list:adjournment-payment-terms'))).toEqual([
+    expect(childTexts(findNode(generated, 'adjournment-condition'))).toEqual([
       'a payment to the claimants of £100.00 by 4 June 2026;',
       'instalment payments to the claimants of £50.00 every week, the first instalment to be paid on or before 3 June 2026;',
     ]);

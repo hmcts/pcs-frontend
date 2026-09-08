@@ -260,6 +260,10 @@ export function initMakeOrder(): () => void {
       editor = createOrderEditor({
         mount,
         initialSnapshot: documents[type],
+        templates: {
+          url: '/docweave/templates',
+          csrfToken: () => form.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value,
+        },
         onChange: value => {
           documents[type] = value;
           documentField.value = JSON.stringify(value);
