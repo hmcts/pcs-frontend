@@ -55,12 +55,14 @@ import {
   counterClaimOrderOtherThanSumErrorValidation,
   counterClaimSpecificSumOfMoneyErrorValidation,
   counterClaimWhatAreYouClaimingForErrorValidation,
+  counterclaimDoYouWantToUploadFilesErrorValidation,
   defendantNameConfirmationErrorValidation,
   doAnyOtherAdultsLiveInYourHomeErrorValidation,
   doYouHaveAnyDependantChildrenErrorValidation,
   doYouHaveAnyOtherDependantsErrorValidation,
   doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation,
   emailConfirmationErrorValidation,
+  endOfJourneyCYAErrorValidation,
   exceptionalHardshipErrorValidation,
   haveYouAppliedForUniversalCreditErrorValidation,
   howMuchAffordToPayErrorValidation,
@@ -263,6 +265,10 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
+    await softErrorMessageValidation(
+      'counterclaimDoYouWantToUploadFiles',
+      counterclaimDoYouWantToUploadFilesErrorValidation
+    );
     await performAction('doYouWantToUploadFilesLR', {
       option: counterclaimDoYouWantToUploadFiles.yesRadioOption,
     });
@@ -332,6 +338,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
+    await softErrorMessageValidation('endOfJourneyCYA', endOfJourneyCYAErrorValidation);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
       firstName: endOfJourneyCYA.fullNameTextInput,
