@@ -1,10 +1,20 @@
 {#
-  Compact form components for the make an order screen, which is used by judges
-  during a hearing and so puts related fields on one row rather than stacking
-  them. Matching classes live in make-order.scss.
+  Form controls for the make an order screen. Imported with context: the wrappers fill in
+  saved answers (draftChecked, draftValue, draftDate, draftSelect) and validation errors
+  themselves, so the tab partials only describe the question. The screen is used by judges
+  during a hearing, so related fields sit on one row; matching classes live in make-order.scss.
 #}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
-{% import "make-order/_date-input.njk" as dateInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+
+{% set paymentFrequencies = [
+  { value: "weekly", text: "Weekly" },
+  { value: "monthly", text: "Monthly" }
+] %}
 
 {# Row of related controls on one (wrapping) line. Use with {% call %}. #}
 {% macro row(params={}) %}
@@ -16,7 +26,92 @@
 {# Sentence fragment between controls, for example "to be paid by". #}
 {% macro copy(text) %}<span class="pcs-inline-copy">{{ text }}</span>{% endmacro %}
 
-{# Imported with context: field IDs also locate saved answers and validation errors. #}
+
+{% macro radios(name, params) %}
+  {% set items = [] %}
+  {% for item in params.items %}
+    {% set items = items.concat([{
+      value: item.value,
+      text: item.text,
+      html: item.html,
+      conditional: item.conditional,
+      checked: draftChecked(name, item.value) or (item.value == params.default and not draftValue(name))
+    }]) %}
+  {% endfor %}
+  {{ govukRadios({
+    idPrefix: params.idPrefix or name,
+    name: name,
+    classes: params.classes,
+    fieldset: { legend: { text: params.legend, classes: "govuk-fieldset__legend--s" } } if params.legend,
+    errorMessage: validationErrors[name],
+    items: items
+  }) }}
+{% endmacro %}
+
+{% macro checkboxes(name, params) %}
+  {% set items = [] %}
+  {% for item in params.items %}
+    {% set items = items.concat([{
+      value: item.value,
+      text: item.text,
+      conditional: item.conditional,
+      disabled: item.disabled,
+      checked: draftChecked(name, item.value) or (item.value == params.default and not draftValue(name))
+    }]) %}
+  {% endfor %}
+  {{ govukCheckboxes({
+    idPrefix: params.idPrefix or name,
+    name: name,
+    classes: "govuk-checkboxes--small" + (" " + params.classes if params.classes else ""),
+    fieldset: { legend: { text: params.legend, classes: "govuk-fieldset__legend--s" } } if params.legend,
+    formGroup: params.formGroup,
+    errorMessage: validationErrors[name],
+    items: items
+  }) }}
+{% endmacro %}
+
+{# A single "yes" checkbox that reveals more fields. #}
+{% macro reveal(name, text, html) %}
+  {{ checkboxes(name, { items: [{ value: "yes", text: text, conditional: { html: html } }] }) }}
+{% endmacro %}
+
+{% macro select(id, params) %}
+  {{ govukSelect({
+    id: id,
+    name: id,
+    label: { text: params.label, classes: "govuk-visually-hidden" if params.labelHidden else params.labelClasses },
+    items: draftSelect(params.items, id, params.default),
+    errorMessage: validationErrors[id]
+  }) }}
+{% endmacro %}
+
+{% macro text(id, params) %}
+  {{ govukInput({
+    id: id,
+    name: id,
+    label: { text: params.label, classes: "govuk-visually-hidden" if params.labelHidden else params.labelClasses },
+    hint: { text: params.hint } if params.hint,
+    classes: params.classes or "govuk-input--width-20",
+    formGroup: { classes: params.formGroupClasses },
+    spellcheck: params.spellcheck,
+    inputmode: params.inputmode,
+    value: draftValue(id),
+    errorMessage: validationErrors[id]
+  }) }}
+{% endmacro %}
+
+{% macro textarea(id, params) %}
+  {{ govukTextarea({
+    id: id,
+    name: params.name or id,
+    rows: params.rows or 4,
+    label: { text: params.label, classes: params.labelClasses },
+    formGroup: { classes: params.formGroupClasses },
+    value: draftValue(params.name or id),
+    errorMessage: validationErrors[id]
+  }) }}
+{% endmacro %}
+
 {% macro money(params={}) %}
   {{ govukInput({
     id: params.id,
@@ -37,16 +132,24 @@
 
 {# Date with quick-fill pills. #}
 {% macro date(params={}) %}
-  {{ dateInput.withPills({
-    id: params.id,
-    namePrefix: params.id,
-    items: draftDate(params.id),
-    fieldset: {
-      legend: {
-        text: params.legend,
-        classes: "govuk-visually-hidden" if params.legendHidden else "govuk-fieldset__legend--s"
-      }
-    },
-    errorMessage: validationErrors[params.id + "-day"]
-  }) }}
+  {# Suffixed: govukDateInput derives its item ids from params.id, so it keeps that id. #}
+  <div id="{{ params.id }}-pills" class="pcs-date-with-pills">
+    {{ govukDateInput({
+      id: params.id,
+      namePrefix: params.id,
+      items: draftDate(params.id),
+      fieldset: {
+        legend: {
+          text: params.legend,
+          classes: "govuk-visually-hidden" if params.legendHidden else "govuk-fieldset__legend--s"
+        }
+      },
+      errorMessage: validationErrors[params.id + "-day"]
+    }) }}
+    <div class="pcs-date-pills" role="group" aria-label="Quick date for {{ params.legend | lower }}">
+      {% for days in [14, 28, 42] %}
+        <button type="button" class="pcs-date-pill" data-date-pill-days="{{ days }}">{{ days }} days</button>
+      {% endfor %}
+    </div>
+  </div>
 {% endmacro %}

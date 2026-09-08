@@ -1,222 +1,104 @@
-{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/select/macro.njk" import govukSelect %}
 {% import "make-order/_compact.njk" as compact with context %}
 
 <h3 class="govuk-heading-m">Outright possession</h3>
 
-{{ govukRadios({
-  name: "outright-possession",
+{% set byDateHtml %}
+  {{ compact.date({ id: "outright-by-date", legend: "Date possession is ordered by", legendHidden: true }) }}
+{% endset %}
+{{ compact.radios("outright-possession", {
+  legend: "Possession",
   classes: "govuk-radios--small",
-  fieldset: { legend: { text: "Possession", classes: "govuk-fieldset__legend--s" } },
-  errorMessage: validationErrors["outright-possession"],
   items: [
-    { value: "forthwith", text: "Possession forthwith", checked: draftChecked("outright-possession", "forthwith") },
-    {
-      value: "by",
-      text: "Possession on or before",
-      checked: draftChecked("outright-possession", "by"),
-      conditional: {
-        html: compact.date({
-          id: "outright-by-date",
-          legend: "Date possession is ordered by",
-          legendHidden: true
-        })
-      }
-    }
+    { value: "forthwith", text: "Possession forthwith" },
+    { value: "by", text: "Possession on or before", conditional: { html: byDateHtml } }
   ]
 }) }}
 
-{{ govukRadios({
-  name: "outright-grounds-type",
+{{ compact.radios("outright-grounds-type", {
+  legend: "Grounds",
   classes: "govuk-radios--small govuk-radios--inline",
-  fieldset: { legend: { text: "Grounds", classes: "govuk-fieldset__legend--s" } },
-  errorMessage: validationErrors["outright-grounds-type"],
   items: [
-    { value: "mandatory", text: "Mandatory", checked: draftChecked("outright-grounds-type", "mandatory") },
-    { value: "discretionary", text: "Discretionary", checked: draftChecked("outright-grounds-type", "discretionary") }
+    { value: "mandatory", text: "Mandatory" },
+    { value: "discretionary", text: "Discretionary" }
   ]
 }) }}
 
 {# This field continues the Grounds question, so it has no divider. #}
-{{ govukInput({
-  id: "outright-grounds-details",
-  name: "outright-grounds-details",
-  label: { text: "Details of grounds (optional)" },
-  classes: "govuk-input--width-20",
-  formGroup: { classes: "pcs-continues-question" },
-  value: draftValue("outright-grounds-details")
+{{ compact.text("outright-grounds-details", {
+  label: "Details of grounds (optional)",
+  formGroupClasses: "pcs-continues-question"
 }) }}
 
-{% set outrightMoneyJudgmentArrearsHtml %}
+{% set arrearsHtml %}
   {% call compact.row({ id: "outright-mj-amounts" }) %}
     {{ compact.copy("Arrears") }}
-    {{ compact.money({
-      id: "outright-mj-arrears",
-      label: "Arrears",
-      labelHidden: true
-    }) }}
-
+    {{ compact.money({ id: "outright-mj-arrears", label: "Arrears", labelHidden: true }) }}
     {{ compact.copy("Interest") }}
-    {{ compact.money({
-      id: "outright-mj-interest",
-      label: "Interest",
-      labelHidden: true
-    }) }}
+    {{ compact.money({ id: "outright-mj-interest", label: "Interest", labelHidden: true }) }}
   {% endcall %}
 {% endset %}
 
-{% set outrightMoneyJudgmentBalanceHtml %}
-  {{ compact.date({
-    id: "outright-mj-balance-date",
-    legend: "Balance payment deadline",
-    legendHidden: true
-  }) }}
+{% set balanceHtml %}
+  {{ compact.date({ id: "outright-mj-balance-date", legend: "Balance payment deadline", legendHidden: true }) }}
 {% endset %}
 
-{% set outrightMoneyJudgmentLumpHtml %}
+{% set lumpHtml %}
   {% call compact.row() %}
     {{ compact.copy("Payment of") }}
-    {{ compact.money({
-      id: "outright-mj-lump-amount",
-      label: "Payment amount",
-      labelHidden: true
-    }) }}
+    {{ compact.money({ id: "outright-mj-lump-amount", label: "Payment amount", labelHidden: true }) }}
     {{ compact.copy("by") }}
-    {{ compact.date({
-      id: "outright-mj-lump-date",
-      legend: "Payment deadline",
-      legendHidden: true
-    }) }}
+    {{ compact.date({ id: "outright-mj-lump-date", legend: "Payment deadline", legendHidden: true }) }}
   {% endcall %}
-
-  {{ govukCheckboxes({
-    idPrefix: "outright-mj-balance",
-    name: "outright-mj-balance",
-    classes: "govuk-checkboxes--small",
-    items: [
-      {
-        value: "yes",
-        text: "and the balance by",
-        checked: draftChecked("outright-mj-balance", "yes"),
-        conditional: { html: outrightMoneyJudgmentBalanceHtml }
-      }
-    ]
-  }) }}
+  {{ compact.reveal("outright-mj-balance", "and the balance by", balanceHtml) }}
 {% endset %}
 
-{% set outrightMoneyJudgmentInstalmentsHtml %}
+{% set instalmentsHtml %}
   {% call compact.row() %}
     {{ compact.copy("Instalment payments of") }}
-    {{ compact.money({
-      id: "outright-mj-inst-amount",
-      label: "Instalment amount",
-      labelHidden: true
-    }) }}
-    {{ govukSelect({
-      id: "outright-mj-inst-freq",
-      name: "outright-mj-inst-freq",
-      label: { text: "Instalment frequency", classes: "govuk-visually-hidden" },
-      items: [
-        { value: "weekly", text: "Weekly", selected: draftValue("outright-mj-inst-freq") == "weekly" },
-        { value: "monthly", text: "Monthly", selected: draftValue("outright-mj-inst-freq") != "weekly" }
-      ],
-      errorMessage: validationErrors["outright-mj-inst-freq"]
+    {{ compact.money({ id: "outright-mj-inst-amount", label: "Instalment amount", labelHidden: true }) }}
+    {{ compact.select("outright-mj-inst-freq", {
+      label: "Instalment frequency",
+      labelHidden: true,
+      items: compact.paymentFrequencies,
+      default: "monthly"
     }) }}
     {{ compact.copy("the first instalment to be paid on or before") }}
-    {{ compact.date({
-      id: "outright-mj-inst-date",
-      legend: "First instalment deadline",
-      legendHidden: true
-    }) }}
+    {{ compact.date({ id: "outright-mj-inst-date", legend: "First instalment deadline", legendHidden: true }) }}
   {% endcall %}
 {% endset %}
 
-{% set outrightMoneyJudgmentPaymentPlanHtml %}
-  {# A lump sum and instalments may both apply to the same debt. #}
-  {{ govukCheckboxes({
-    idPrefix: "outright-mj-plan",
-    name: "outright-mj-plan",
-    classes: "govuk-checkboxes--small",
-    errorMessage: validationErrors["outright-mj-plan"],
+{# A lump sum and instalments may both apply to the same debt. #}
+{% set paymentPlanHtml %}
+  {{ compact.checkboxes("outright-mj-plan", {
     items: [
-      {
-        value: "lump",
-        text: "Payment to claimant",
-        checked: draftChecked("outright-mj-plan", "lump"),
-        conditional: { html: outrightMoneyJudgmentLumpHtml }
-      },
-      {
-        value: "instalments",
-        text: "Instalment payments",
-        checked: draftChecked("outright-mj-plan", "instalments"),
-        conditional: { html: outrightMoneyJudgmentInstalmentsHtml }
-      }
+      { value: "lump", text: "Payment to claimant", conditional: { html: lumpHtml } },
+      { value: "instalments", text: "Instalment payments", conditional: { html: instalmentsHtml } }
     ]
   }) }}
 {% endset %}
 
-{% set outrightMoneyJudgmentHtml %}
-  {{ govukCheckboxes({
-    idPrefix: "outright-mj-sections",
-    name: "outright-mj-sections",
-    classes: "govuk-checkboxes--small",
-    errorMessage: validationErrors["outright-mj-sections"],
+{% set moneyJudgmentHtml %}
+  {{ compact.checkboxes("outright-mj-sections", {
     items: [
-      {
-        value: "arrears",
-        text: "Judgment for arrears",
-        checked: draftChecked("outright-mj-sections", "arrears"),
-        conditional: { html: outrightMoneyJudgmentArrearsHtml }
-      },
-      {
-        value: "payment-plan",
-        text: "The above sums must be paid by",
-        checked: draftChecked("outright-mj-sections", "payment-plan"),
-        conditional: { html: outrightMoneyJudgmentPaymentPlanHtml }
-      }
+      { value: "arrears", text: "Judgment for arrears", conditional: { html: arrearsHtml } },
+      { value: "payment-plan", text: "The above sums must be paid by", conditional: { html: paymentPlanHtml } }
     ]
   }) }}
 {% endset %}
 
-{% set outrightUseOccupationHtml %}
+{% set useOccupationHtml %}
   {% call compact.row() %}
-    {{ compact.money({
-      id: "outright-use-occupation-rate",
-      label: "Daily rate",
-      inputmode: "decimal"
-    }) }}
+    {{ compact.money({ id: "outright-use-occupation-rate", label: "Daily rate", inputmode: "decimal" }) }}
     {{ compact.copy("From") }}
-    {{ compact.date({
-      id: "outright-use-occupation-from-date",
-      legend: "Damages start date",
-      legendHidden: true
-    }) }}
+    {{ compact.date({ id: "outright-use-occupation-from-date", legend: "Damages start date", legendHidden: true }) }}
   {% endcall %}
 {% endset %}
 
-{{ govukCheckboxes({
-  idPrefix: "outright-options",
-  name: "outright-options",
-  classes: "govuk-checkboxes--small pcs-divided-options",
+{{ compact.checkboxes("outright-options", {
+  classes: "pcs-divided-options",
   items: [
-    {
-      value: "money-judgment",
-      text: "Money judgment",
-      checked: draftChecked("outright-options", "money-judgment"),
-      conditional: { html: outrightMoneyJudgmentHtml }
-    },
-    {
-      value: "use-occupation",
-      text: "Damages for unlawful occupation",
-      checked: draftChecked("outright-options", "use-occupation"),
-      conditional: { html: outrightUseOccupationHtml }
-    },
-    {
-      value: "transfer-high-court",
-      text: "Transfer to High Court",
-      checked: draftChecked("outright-options", "transfer-high-court")
-    }
+    { value: "money-judgment", text: "Money judgment", conditional: { html: moneyJudgmentHtml } },
+    { value: "use-occupation", text: "Damages for unlawful occupation", conditional: { html: useOccupationHtml } },
+    { value: "transfer-high-court", text: "Transfer to High Court" }
   ]
 }) }}

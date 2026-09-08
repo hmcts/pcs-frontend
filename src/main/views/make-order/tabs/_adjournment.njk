@@ -1,9 +1,4 @@
-{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
-{% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/select/macro.njk" import govukSelect %}
 {% import "make-order/_compact.njk" as compact with context %}
-{% import "make-order/_payment-frequencies.njk" as options %}
 
 <h3 class="govuk-heading-m">Adjournment</h3>
 
@@ -14,62 +9,41 @@
   make-order.ts), and only the selected option's date is read into the order.
   Hidden legends keep every control named for assistive technology.
 #}
-{% macro adjournWhenRow(params) %}
+{% macro whenRow(id, value, text, checked, extraHtml) %}
   <div class="pcs-option-row" data-option-row>
     <div class="govuk-radios__item pcs-option-row__choice">
-      <input class="govuk-radios__input" id="{{ params.id }}" name="adj-when" type="radio" value="{{ params.value }}"{% if params.checked %} checked{% endif %}>
-      <label class="govuk-label govuk-radios__label" for="{{ params.id }}">{{ params.text }}</label>
+      <input class="govuk-radios__input" id="{{ id }}" name="adj-when" type="radio" value="{{ value }}"{% if checked %} checked{% endif %}>
+      <label class="govuk-label govuk-radios__label" for="{{ id }}">{{ text }}</label>
     </div>
     <div class="pcs-option-row__fields">
-      {{ compact.date({
-        id: "adj-hearing-date-" + params.value,
-        legend: params.text,
-        legendHidden: true
-      }) }}
-      {{ params.extraHtml | safe if params.extraHtml }}
+      {{ compact.date({ id: "adj-hearing-date-" + value, legend: text, legendHidden: true }) }}
+      {{ extraHtml | safe if extraHtml }}
     </div>
   </div>
 {% endmacro %}
 
 {# Only a specific date has a time; the other options are listed by the court. #}
-{% set adjournSpecificTimeHtml %}
-  {{ govukInput({
-    id: "adj-specific-time",
-    name: "adj-specific-time",
-    label: { text: "Time of hearing" },
-    hint: { text: "For example, 10:30am" },
+{% set specificTimeHtml %}
+  {{ compact.text("adj-specific-time", {
+    label: "Time of hearing",
+    hint: "For example, 10:30am",
     classes: "govuk-input--width-5",
-    formGroup: { classes: "pcs-option-row__time" },
-    spellcheck: false,
-    value: draftValue("adj-specific-time"),
-    errorMessage: validationErrors["adj-specific-time"]
+    formGroupClasses: "pcs-option-row__time",
+    spellcheck: false
   }) }}
 {% endset %}
 
-{% set adjournFurtherHearingHtml %}
+{% set furtherHearingHtml %}
   <div class="govuk-form-group">
     <fieldset class="govuk-fieldset" role="group">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Adjourned for further hearing conditions</legend>
       <div class="govuk-radios govuk-radios--small pcs-option-rows">
-        {{ adjournWhenRow({
-          id: "adj-when",
-          value: "next-list",
-          text: "Adjourned to next available possession list after",
-          checked: draftChecked("adj-when", "next-list") or not draftValue("adj-when")
-        }) }}
-        {{ adjournWhenRow({
-          id: "adj-when-2",
-          value: "next-date",
-          text: "Adjourned to next available date (non-possession list) after",
-          checked: draftChecked("adj-when", "next-date")
-        }) }}
-        {{ adjournWhenRow({
-          id: "adj-when-3",
-          value: "specific",
-          text: "Adjourned to specific date",
-          checked: draftChecked("adj-when", "specific"),
-          extraHtml: adjournSpecificTimeHtml
-        }) }}
+        {{ whenRow("adj-when", "next-list", "Adjourned to next available possession list after",
+          draftChecked("adj-when", "next-list") or not draftValue("adj-when")) }}
+        {{ whenRow("adj-when-2", "next-date", "Adjourned to next available date (non-possession list) after",
+          draftChecked("adj-when", "next-date")) }}
+        {{ whenRow("adj-when-3", "specific", "Adjourned to specific date",
+          draftChecked("adj-when", "specific"), specificTimeHtml) }}
       </div>
     </fieldset>
   </div>
@@ -78,40 +52,31 @@
     <fieldset class="govuk-fieldset" role="group">
       <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Time estimate</legend>
       {% call compact.row() %}
-        {{ govukInput({
-          id: "adj-time-estimate",
-          name: "adj-time-estimate",
-          label: { text: "Length", classes: "govuk-visually-hidden" },
+        {{ compact.text("adj-time-estimate", {
+          label: "Length",
+          labelHidden: true,
           classes: "govuk-input--width-3",
           spellcheck: false,
-          value: draftValue("adj-time-estimate"),
-          inputmode: "numeric",
-          errorMessage: validationErrors["adj-time-estimate"]
+          inputmode: "numeric"
         }) }}
-        {{ govukSelect({
-          id: "adj-time-estimate-unit",
-          name: "adj-time-estimate-unit",
-          label: { text: "Unit", classes: "govuk-visually-hidden" },
-          items: draftSelect([
-            { value: "minutes", text: "Minutes" },
-            { value: "hours", text: "Hours" }
-          ], "adj-time-estimate-unit", "minutes"),
-          errorMessage: validationErrors["adj-time-estimate-unit"]
+        {{ compact.select("adj-time-estimate-unit", {
+          label: "Unit",
+          labelHidden: true,
+          items: [{ value: "minutes", text: "Minutes" }, { value: "hours", text: "Hours" }],
+          default: "minutes"
         }) }}
       {% endcall %}
     </fieldset>
   </div>
 
   <div id="adj-format-group" class="pcs-section-break">
-    {{ govukCheckboxes({
-      idPrefix: "adj-format",
-      name: "adj-format",
-      classes: "govuk-checkboxes--small",
-      fieldset: { legend: { text: "Hearing format", classes: "govuk-fieldset__legend--s" } },
+    {{ compact.checkboxes("adj-format", {
+      legend: "Hearing format",
+      default: "in-person",
       items: [
-        { value: "in-person", text: "In person", checked: draftChecked("adj-format", "in-person") or not draftValue("adj-format") },
-        { value: "video", text: "Video hearing", checked: draftChecked("adj-format", "video") },
-        { value: "telephone", text: "Telephone", checked: draftChecked("adj-format", "telephone") }
+        { value: "in-person", text: "In person" },
+        { value: "video", text: "Video hearing" },
+        { value: "telephone", text: "Telephone" }
       ]
     }) }}
   </div>
@@ -125,19 +90,13 @@
     {% set directionItems = directionItems.concat([{
       value: direction.value,
       text: direction.text,
-      checked: draftChecked("adj-directions", direction.value),
-      conditional: {
-        html: compact.date({ id: "adj-" + direction.value + "-date", legend: "By 4pm on" })
-      }
+      conditional: { html: compact.date({ id: "adj-" + direction.value + "-date", legend: "By 4pm on" }) }
     }]) %}
   {% endfor %}
-  {{ govukCheckboxes({
-    idPrefix: "adj-directions",
-    name: "adj-directions",
-    classes: "govuk-checkboxes--small pcs-divided-options",
+  {{ compact.checkboxes("adj-directions", {
+    legend: "Directions",
+    classes: "pcs-divided-options",
     formGroup: { classes: "pcs-section-break" },
-    fieldset: { legend: { text: "Directions", classes: "govuk-fieldset__legend--s" } },
-    errorMessage: validationErrors["adj-directions"],
     items: directionItems
   }) }}
 {% endset %}
@@ -147,79 +106,38 @@
   {% call compact.row() %}
     {{ compact.money({ id: prefix + "-amount", label: amountLabel }) }}
     {% if instalments %}
-      {{ govukSelect({
-        id: prefix + "-frequency",
-        name: prefix + "-frequency",
-        label: { text: "How often" },
-        items: draftSelect(options.paymentFrequencies, prefix + "-frequency", "monthly")
-      }) }}
+      {{ compact.select(prefix + "-frequency", { label: "How often", items: compact.paymentFrequencies, default: "monthly" }) }}
     {% endif %}
-    {{ compact.date({
-      id: prefix + "-date",
-      legend: "First payment by" if instalments else "Payment by"
-    }) }}
+    {{ compact.date({ id: prefix + "-date", legend: "First payment by" if instalments else "Payment by" }) }}
   {% endcall %}
 {% endmacro %}
 
-{% set adjournGenerallyHtml %}
-  {{ govukCheckboxes({
-    idPrefix: "adj-gen",
-    name: "adj-gen",
-    classes: "govuk-checkboxes--small pcs-divided-options",
-    fieldset: { legend: { text: "Conditions", classes: "govuk-fieldset__legend--s" } },
-    errorMessage: validationErrors["adj-gen"],
+{% set generallyHtml %}
+  {{ compact.checkboxes("adj-gen", {
+    legend: "Conditions",
+    classes: "pcs-divided-options",
     items: [
       {
         value: "current-rent-plus",
         text: "On payment of current rent plus an additional sum",
-        checked: draftChecked("adj-gen", "current-rent-plus"),
         conditional: { html: paymentFields("current-rent-plus", "Additional sum") }
       },
-      {
-        value: "payments",
-        text: "On regular payments",
-        checked: draftChecked("adj-gen", "payments"),
-        conditional: { html: paymentFields("payments", "Payments of") }
-      },
-      {
-        value: "oneoff",
-        text: "On a single payment",
-        checked: draftChecked("adj-gen", "oneoff"),
-        conditional: { html: paymentFields("oneoff", "Payment of", false) }
-      },
+      { value: "payments", text: "On regular payments", conditional: { html: paymentFields("payments", "Payments of") } },
+      { value: "oneoff", text: "On a single payment", conditional: { html: paymentFields("oneoff", "Payment of", false) } },
       {
         value: "restore",
         text: "Automatically struck out unless an application to restore is made",
-        checked: draftChecked("adj-gen", "restore"),
-        conditional: {
-          html: compact.date({
-            id: "adj-gen-restore-date",
-            legend: "Application to restore by"
-          })
-        }
+        conditional: { html: compact.date({ id: "adj-gen-restore-date", legend: "Application to restore by" }) }
       }
     ]
   }) }}
 {% endset %}
 
-{{ govukRadios({
-  idPrefix: "adj-type",
-  name: "adj-type",
+{{ compact.radios("adj-type", {
+  legend: "Adjournment type",
   classes: "govuk-radios--small pcs-inline-radios",
-  fieldset: { legend: { text: "Adjournment type", classes: "govuk-fieldset__legend--s" } },
-  errorMessage: validationErrors["adj-type"],
   items: [
-    {
-      value: "further-hearing",
-      text: "Adjourned for further hearing",
-      checked: draftChecked("adj-type", "further-hearing"),
-      conditional: { html: adjournFurtherHearingHtml }
-    },
-    {
-      value: "generally",
-      text: "Adjourned generally",
-      checked: draftChecked("adj-type", "generally"),
-      conditional: { html: adjournGenerallyHtml }
-    }
+    { value: "further-hearing", text: "Adjourned for further hearing", conditional: { html: furtherHearingHtml } },
+    { value: "generally", text: "Adjourned generally", conditional: { html: generallyHtml } }
   ]
 }) }}
