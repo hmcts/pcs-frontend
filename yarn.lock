@@ -5601,6 +5601,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"allure-js-commons@npm:3.12.0":
+  version: 3.12.0
+  resolution: "allure-js-commons@npm:3.12.0"
+  dependencies:
+    md5: "npm:^2.3.0"
+  peerDependencies:
+    allure-playwright: 3.12.0
+  peerDependenciesMeta:
+    allure-playwright:
+      optional: true
+  checksum: 10/5ba9c4b9ee79c96e5fbe57d4efd11aab3333aea28414be3002a58b5a0e845e6b8334f90e45933c29e68a067dac482a84f835d7c2445fc441361acc63419b4b3f
+  languageName: node
+  linkType: hard
+
 "allure-playwright@npm:3.11.1":
   version: 3.11.1
   resolution: "allure-playwright@npm:3.11.1"
@@ -10035,9 +10049,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-html-reporter@npm:4.4.0":
-  version: 4.4.0
-  resolution: "jest-html-reporter@npm:4.4.0"
+"jest-html-reporter@npm:4.4.2":
+  version: 4.4.2
+  resolution: "jest-html-reporter@npm:4.4.2"
   dependencies:
     "@jest/reporters": "npm:^30.0.2"
     "@jest/test-result": "npm:^30.0.2"
@@ -10048,7 +10062,7 @@ __metadata:
     xmlbuilder: "npm:15.0.0"
   peerDependencies:
     jest: 19.x - 30.x
-  checksum: 10/6d3b8c3f0658f9614c437bfda96826aa02e5d3fedca5221602edd4148aba4b306195a9a6e87befe47e5853692f3bd9d256ac31675d3a89506fd87911172fc822
+  checksum: 10/007fce90e5d7b800c9cb42de6b3b1e7a233d6713a0845b08f8237ee4936b8f5b76f629d4a869f46d62d209838a082604782e5c4156a1d87f537b6315cb0f8c9c
   languageName: node
   linkType: hard
 
@@ -11452,12 +11466,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nanoid@npm:^3.3.17":
-  version: 3.3.17
-  resolution: "nanoid@npm:3.3.17"
+"nanoid@npm:^3.3.18":
+  version: 3.3.18
+  resolution: "nanoid@npm:3.3.18"
   bin:
     nanoid: bin/nanoid.cjs
-  checksum: 10/54c3238ba6ea31c173ccf70922481814892075dbf1b4636abec249d0b34d5594fc9a8892c04872068674010a11fa3d18316dc06e59e700def131ff9d8e740426
+  checksum: 10/1b3b4fdac831b92b56d1dbe8b1e63a372432faf86ea383134e3b53141ef8108a60b7f84343b5cefecac9550bb74edf8164da93ea07d1c4f757039bc75d8a5d9e
   languageName: node
   linkType: hard
 
@@ -12064,7 +12078,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:8.69.0"
     "@typescript-eslint/parser": "npm:8.69.0"
     allure-commandline: "npm:2.43.0"
-    allure-js-commons: "npm:3.11.1"
+    allure-js-commons: "npm:3.12.0"
     allure-playwright: "npm:3.11.1"
     axios: "npm:1.20.0"
     body-parser: "npm:2.3.0"
@@ -12099,7 +12113,7 @@ __metadata:
     ioredis: "npm:6.0.0"
     jest: "npm:30.5.1"
     jest-environment-jsdom: "npm:30.5.1"
-    jest-html-reporter: "npm:4.4.0"
+    jest-html-reporter: "npm:4.4.2"
     jest-pact: "npm:0.13.0"
     jose: "npm:6.2.10"
     lint-staged: "npm:17.4.1"
@@ -12113,7 +12127,7 @@ __metadata:
     openid-client: "npm:6.8.7"
     playwright: "npm:1.62.1"
     playwright-core: "npm:1.62.1"
-    postcss: "npm:8.5.26"
+    postcss: "npm:8.5.28"
     prettier: "npm:3.9.6"
     sass: "npm:1.103.1"
     sass-loader: "npm:17.0.1"
@@ -12437,14 +12451,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.5.26":
-  version: 8.5.26
-  resolution: "postcss@npm:8.5.26"
+"postcss@npm:8.5.28":
+  version: 8.5.28
+  resolution: "postcss@npm:8.5.28"
   dependencies:
-    nanoid: "npm:^3.3.17"
+    nanoid: "npm:^3.3.18"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.1"
-  checksum: 10/842a624f822f77cb37264cc24f0cf97c0a69dd8d6f7b4a6d76b5a8dc95355899dd044f33a2d4e890da858293de570fce18dff453f3b629ff14cac67a3591895a
+  checksum: 10/c34814c1da499f370cd3b02a085a2d866989a966629b7bd4025f4a2a10d538a2ec83dc3181e1008550edb4cf44e49a0c40ec82332b08d9600877e6841240ad05
   languageName: node
   linkType: hard
 
