@@ -13,6 +13,6 @@ export const counterClaimOrderOtherThanSum = {
   whatFactsInput: `electricity and windows not repaired`,
   pageSlug: `counter-claim-order-other-than-sum`,
   enterWhatFactsErrorMessage: `Enter what facts they would like the court to consider when deciding the claim`,
-  enterWhatOrdersErrorMessage: `Enter what orders you are asking the court to make`,
+  enterWhatOrdersErrorMessage: `Enter what orders they are asking the court to make`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
 };

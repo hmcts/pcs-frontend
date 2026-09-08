@@ -15,23 +15,35 @@ export async function counterClaimSpecificSumOfMoneyErrorValidation(): Promise<v
     message: counterClaimSpecificSumOfMoney.enterHowMuchYouAreClaimingErrorMessage,
   });
 
+  await performAction(
+    'inputText',
+    counterClaimSpecificSumOfMoney.enterHowMuchYouAreClaimingErrorMessage,
+    counterClaimSpecificSumOfMoney.billionTextInput
+  );
   await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: counterClaimSpecificSumOfMoney.thereIsAProblemErrorMessageHeader,
     message: counterClaimSpecificSumOfMoney.billionClaimErrorMessage,
   });
 
+  await performAction(
+    'inputText',
+    counterClaimSpecificSumOfMoney.enterHowMuchYouAreClaimingErrorMessage,
+    counterClaimSpecificSumOfMoney.negativeInput
+  );
   await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: counterClaimSpecificSumOfMoney.thereIsAProblemErrorMessageHeader,
     message: counterClaimSpecificSumOfMoney.negativeClaimInputErrorMessage,
   });
+
   await performAction('clickRadioButton', counterClaimSpecificSumOfMoney.noRadioOption);
   await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: counterClaimSpecificSumOfMoney.thereIsAProblemErrorMessageHeader,
     message: counterClaimSpecificSumOfMoney.enterMaxValueErrorMessage,
   });
+
   await performAction(
     'inputText',
     counterClaimSpecificSumOfMoney.maximumValueOfYourClaimHiddenQuestion,
@@ -42,6 +54,7 @@ export async function counterClaimSpecificSumOfMoneyErrorValidation(): Promise<v
     header: counterClaimSpecificSumOfMoney.thereIsAProblemErrorMessageHeader,
     message: counterClaimSpecificSumOfMoney.maximumValueBillionErrorMessage,
   });
+
   await performAction(
     'inputText',
     counterClaimSpecificSumOfMoney.maximumValueOfYourClaimHiddenQuestion,

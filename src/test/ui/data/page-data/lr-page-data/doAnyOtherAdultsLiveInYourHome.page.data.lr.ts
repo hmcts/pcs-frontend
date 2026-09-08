@@ -16,5 +16,5 @@ export const doAnyOtherAdultsLiveInYourHome = {
   feedbackLink: `feedback`,
   pageSlug: `do-any-other-adults-live-in-your-home`,
   emojiTextInput: `👉 😄`,
-  emojiErrorMessage: `Give details about the other adults living in the defendant's home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
+  emojiErrorMessage: `Give details about the other adults living in the defendant’s home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
 };
