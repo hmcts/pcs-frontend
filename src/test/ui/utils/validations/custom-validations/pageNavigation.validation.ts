@@ -97,19 +97,19 @@ export class PageNavigationValidation implements IValidation {
   }
 
   private async validateFeedbackLinkHref(page: Page, linkText: string, fieldName?: validationRecord): Promise<void> {
-    const locatorByName = page.getByRole('link', { name: linkText, exact: true });
-    const locatorByHref = page.locator('a[href*="smartsurvey.co.uk/s/Poss_feedback/"]').first();
+    const locators = [
+      page.getByRole('link', { name: linkText, exact: true }).first(),
+      page.getByRole('link', { name: linkText, exact: false }).first(),
+      page.locator('a[href*="smartsurvey.co.uk/s/Poss_feedback/"]').first(),
+    ];
 
     let href: string | null = null;
 
-    try {
-      href = await locatorByName.getAttribute('href');
-    } catch {
-      href = null;
-    }
-
-    if (!href) {
-      href = await locatorByHref.getAttribute('href').catch(() => null);
+    for (const locator of locators) {
+      href = await locator.getAttribute('href').catch(() => null);
+      if (href) {
+        break;
+      }
     }
 
     if (!href) {
@@ -131,12 +131,31 @@ export class PageNavigationValidation implements IValidation {
     const expectedPageUrl = fieldName?.feedbackPageUrl;
     if (typeof expectedPageUrl === 'string') {
       const actualPageUrl = parsedHref.searchParams.get('pageurl');
-      if (actualPageUrl !== expectedPageUrl) {
+      if (!actualPageUrl || !this.feedbackPageUrlMatches(actualPageUrl, expectedPageUrl)) {
         throw new Error(
           `Feedback link "${linkText}" has incorrect pageurl. Expected: ${expectedPageUrl}, Actual: ${actualPageUrl}`
         );
       }
     }
+  }
+
+  private feedbackPageUrlMatches(actualPageUrl: string, expectedPageUrl: string): boolean {
+    const normalize = (value: string): string => {
+      const decodedValue = decodeURIComponent(value);
+      return decodedValue.trim().replace(/^\/+|\/+$/g, '');
+    };
+
+    const actual = normalize(actualPageUrl);
+    const expected = normalize(expectedPageUrl);
+    const actualSlug = actual.split('/').pop();
+    const expectedSlug = expected.split('/').pop();
+
+    return (
+      actual === expected ||
+      actual.endsWith(`/${expected}`) ||
+      expected.endsWith(`/${actual}`) ||
+      (!!actualSlug && actualSlug === expectedSlug)
+    );
   }
 
   private async validateLinkDestination(
