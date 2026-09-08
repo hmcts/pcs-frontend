@@ -1,0 +1,95 @@
+# ACR build task for pcs-frontend, run by cnp-jenkins-library in place of the
+# default `az acr build`. The library renders this to acb.yaml, substituting
+# {{CI_IMAGE_TAG}} (e.g. pcs/frontend:pr-1234) and {{REGISTRY_NAME}}.
+# Reference: https://learn.microsoft.com/azure/container-registry/container-registry-tasks-reference-yaml
+#
+# It buys two things over the default build: `--target runtime` so unused stages
+# are skipped, and `--cache-from` so `yarn install` is reused between builds.
+#
+# ACR Tasks runs the legacy non-BuildKit builder, which builds stages in file
+# order until it reaches --target. Any stage declared above `runtime` in the
+# Dockerfile is therefore built even if nothing depends on it — keep non-production
+# stages below it.
+#
+# amd64 only, so unlike the multi-arch CCD templates this is based on there is no
+# arm64 half or manifest to assemble.
+
+version: 1.0-preview-1
+steps:
+  - id: pull-hmcts-base
+    cmd: docker pull --platform linux/amd64 hmctsprod.azurecr.io/base/node:20-alpine
+    when: ["-"]
+    retries: 3
+    retryDelay: 5
+
+  # Cache images from the previous build. `|| true` so a cold cache — first build,
+  # or after a registry purge — is not a failure.
+  - id: pull-base-cache
+    cmd: docker pull --platform linux/amd64 {{REGISTRY_NAME}}.azurecr.io/pcs/frontend/base:amd64 || true
+    when: ["-"]
+    retries: 3
+    retryDelay: 5
+
+  - id: pull-dependencies-cache
+    cmd: docker pull --platform linux/amd64 {{REGISTRY_NAME}}.azurecr.io/pcs/frontend/dependencies:amd64 || true
+    when: ["-"]
+    retries: 3
+    retryDelay: 5
+
+  - id: base
+    build: >
+      -t {{REGISTRY_NAME}}.azurecr.io/pcs/frontend/base:amd64
+      --cache-from {{REGISTRY_NAME}}.azurecr.io/pcs/frontend/base:amd64
+      --platform linux/amd64
+      --target base
+      .
+    when:
+      - pull-hmcts-base
+      - pull-base-cache
+    timeout: 7200
+    retries: 3
+    retryDelay: 5
+
+  # Tagged separately only so `yarn install` can be cached across builds.
+  - id: dependencies
+    build: >
+      -t {{REGISTRY_NAME}}.azurecr.io/pcs/frontend/dependencies:amd64
+      --cache-from {{REGISTRY_NAME}}.azurecr.io/pcs/frontend/base:amd64
+      --cache-from {{REGISTRY_NAME}}.azurecr.io/pcs/frontend/dependencies:amd64
+      --platform linux/amd64
+      --target dependencies
+      .
+    when:
+      - base
+      - pull-dependencies-cache
+    timeout: 7200
+    retries: 3
+    retryDelay: 5
+
+  # The deployable image.
+  - id: runtime
+    build: >
+      -t {{REGISTRY_NAME}}.azurecr.io/{{CI_IMAGE_TAG}}
+      --cache-from {{REGISTRY_NAME}}.azurecr.io/pcs/frontend/base:amd64
+      --cache-from {{REGISTRY_NAME}}.azurecr.io/pcs/frontend/dependencies:amd64
+      --platform linux/amd64
+      --target runtime
+      .
+    when:
+      - base
+      - dependencies
+    timeout: 7200
+    retries: 3
+    retryDelay: 5
+
+  # Cache tags are pushed alongside the deployable image so the next build can pull
+  # them back.
+  - id: push-images
+    push:
+      - "{{REGISTRY_NAME}}.azurecr.io/pcs/frontend/base:amd64"
+      - "{{REGISTRY_NAME}}.azurecr.io/pcs/frontend/dependencies:amd64"
+      - "{{REGISTRY_NAME}}.azurecr.io/{{CI_IMAGE_TAG}}"
+    when:
+      - runtime
+    retries: 3
+    retryDelay: 5

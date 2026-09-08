@@ -19,4 +19,5 @@ export const noticeDateWhenProvided = {
   theDateDefendantReceivedNoticeErrorMessage: `The date the defendant received notice must either be today’s date or in the past`,
   feedbackLink: `feedback`,
   pageSlug: `confirmation-of-notice-date-when-provided`,
+  noticeDocumentDynamicLink: 'View a copy of the notice (opens in new tab)',
 };

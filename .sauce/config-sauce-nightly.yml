@@ -52,6 +52,8 @@ env:
   PLAYWRIGHT_SAUCE_STEP_SCREENSHOTS: 'true'
   PLAYWRIGHT_SKIP_ALLURE: 'true'
   CI: 'true'
+  # Set explicitly because the playwright.config default is now 'false' (PR builds skip axe).
+  ENABLE_AXE_AUDIT: 'true'
   NODE_CONFIG_ENV: test
 
   TEST_URL: $TEST_URL

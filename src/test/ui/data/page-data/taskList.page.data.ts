@@ -29,4 +29,5 @@ export const taskList = {
   uploadDocumentsLink: `Upload documents`,
   checkYourAnswersAndSubmitHiddenLink: `Check your answers and submit`,
   declareRecentPaymentsHiddenLink: `Declare recent payments or agreements made`,
+  yourSupportLink: `Your support`,
 };

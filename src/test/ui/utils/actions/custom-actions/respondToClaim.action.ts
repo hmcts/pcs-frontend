@@ -167,7 +167,7 @@ export class RespondToClaimAction implements IAction {
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
       ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
       ['selectContactByTelephone', () => this.selectContactByTelephone(fieldName as actionRecord)],
-      ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName as actionData)],
+      ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName as actionRecord)],
       ['selectTenancyStartDateKnown', () => this.selectTenancyStartDateKnown(fieldName as actionRecord)],
       ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
@@ -258,12 +258,15 @@ export class RespondToClaimAction implements IAction {
 
   protected getRtcCyaChoiceLabel(choice: actionData): string {
     const normalizedChoice = String(choice).trim();
-
-    if (normalizedChoice === whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph.trim()) {
+    const moneyFromSomewhereElseLabels = [
+      whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph.trim(),
+      `Money from somewhere else (for example, child maintenance payments or someone in the defendant’s household gives them money)`.trim(),
+    ];
+    if (moneyFromSomewhereElseLabels.includes(normalizedChoice)) {
       return normalizedChoice;
+    } else {
+      return removeTrailingBracketedSuffix(normalizedChoice);
     }
-
-    return removeTrailingBracketedSuffix(normalizedChoice);
   }
 
   protected buildRtcCyaAmountAndFrequencyValue(
@@ -588,12 +591,20 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
   }
 
-  private async selectContactByTextMessage(contactData: actionData): Promise<void> {
-    this.recordAnswer(contactPreferencesTextMessage.contactByTextMessageQuestion, contactData);
+  private async selectContactByTextMessage(contactData: actionRecord): Promise<void> {
+    this.recordAnswer(contactPreferencesTextMessage.contactByTextMessageQuestion, contactData.radioOption);
     await performAction('clickRadioButton', {
       question: contactPreferencesTextMessage.contactByTextMessageQuestion,
-      option: contactData,
+      option: contactData.radioOption,
     });
+
+    if (contactData.radioOption === 'Yes') {
+      await performAction(
+        'inputText',
+        contactPreferencesTextMessage.ukMobileNumberHiddenTextLabel,
+        contactData.mobileNumber
+      );
+    }
     await performAction('clickButton', contactPreferencesTextMessage.saveAndContinueButton);
   }
 
