@@ -78,10 +78,31 @@ describe('counterClaimPaymentStart routes', () => {
     );
   });
 
+  it('returns 404 via error middleware when the case reference is not 16 digits', async () => {
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const req = {
+      params: { caseReference: '../../evil.example.com' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(new HTTPError('Invalid case reference format', 404));
+    expect(mockStartCardPaymentRequest).not.toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
   it('returns 401 via error middleware when access token is missing', async () => {
     const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     const req = {
-      params: { caseReference: '123' },
+      params: { caseReference: '1234567890123456' },
       session: {
         payment: {
           serviceRequestReference: 'SR-1',
@@ -101,7 +122,7 @@ describe('counterClaimPaymentStart routes', () => {
   it('redirects to fee page when service request reference is missing', async () => {
     const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     const req = {
-      params: { caseReference: '123' },
+      params: { caseReference: '1234567890123456' },
       session: {
         user: { accessToken: 'token-1' },
         payment: {},
@@ -112,7 +133,10 @@ describe('counterClaimPaymentStart routes', () => {
 
     await handler(req, res, next);
 
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/1234567890123456/respond-to-claim/counter-claim-application-fee-amount'
+    );
   });
 
   it('creates card payment and redirects to gov pay nextUrl', async () => {
@@ -125,7 +149,7 @@ describe('counterClaimPaymentStart routes', () => {
 
     const req = {
       language: 'en',
-      params: { caseReference: '123' },
+      params: { caseReference: '1234567890123456' },
       session: createSession({
         payment: {
           serviceRequestReference: 'SR-1',
@@ -168,7 +192,7 @@ describe('counterClaimPaymentStart routes', () => {
 
     const req = {
       language: 'en',
-      params: { caseReference: '123' },
+      params: { caseReference: '1234567890123456' },
       session: createSession({
         payment: {
           serviceRequestReference: 'SR-1',
@@ -188,7 +212,8 @@ describe('counterClaimPaymentStart routes', () => {
         paymentReference: 'RC-1',
         counterClaimType: 'PAYMENT_OR_COMPENSATION',
         counterClaimAmountInPence: '64900',
-        failureRedirectUrl: '/case/123/respond-to-claim/counter-claim-application-fee-amount?payment=failed',
+        failureRedirectUrl:
+          '/case/1234567890123456/respond-to-claim/counter-claim-application-fee-amount?payment=failed',
       })
     );
   });
@@ -230,10 +255,33 @@ describe('counter-claim-pba-payment/start route', () => {
     );
   });
 
+  it('returns 404 via error middleware when the case reference is not 16 digits', async () => {
+    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const req = {
+      params: { caseReference: '../../evil.example.com' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+          customerReference: 'CUST-001',
+          pbaAccount: 'PBA1234567',
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(new HTTPError('Invalid case reference format', 404));
+    expect(mockStartPbaPaymentRequest).not.toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
   it('returns 401 via error middleware when access token is missing', async () => {
     const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     const req = {
-      params: { caseReference: '123' },
+      params: { caseReference: '1234567890123456' },
       session: {
         payment: {
           serviceRequestReference: 'SR-1',
@@ -253,7 +301,7 @@ describe('counter-claim-pba-payment/start route', () => {
   it('redirects to fee page when service request reference is missing', async () => {
     const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     const req = {
-      params: { caseReference: '123' },
+      params: { caseReference: '1234567890123456' },
       session: {
         user: { accessToken: 'token-1' },
         payment: {},
@@ -264,13 +312,16 @@ describe('counter-claim-pba-payment/start route', () => {
 
     await handler(req, res, next);
 
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/1234567890123456/respond-to-claim/counter-claim-application-fee-amount'
+    );
   });
 
   it('redirects to fee page when PBA account details are missing', async () => {
     const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     const req = {
-      params: { caseReference: '123' },
+      params: { caseReference: '1234567890123456' },
       session: createSession({
         payment: {
           serviceRequestReference: 'SR-1',
@@ -284,8 +335,13 @@ describe('counter-claim-pba-payment/start route', () => {
     await handler(req, res, next);
 
     expect(mockStartPbaPaymentRequest).not.toHaveBeenCalled();
-    expect(mockLogger.warn).toHaveBeenCalledWith('Missing PBA payment details for counterclaim payment start case 123');
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      'Missing PBA payment details for counterclaim payment start case 1234567890123456'
+    );
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/1234567890123456/respond-to-claim/counter-claim-application-fee-amount'
+    );
   });
 
   it('creates PBA payment request and redirects to successful page', async () => {
@@ -296,7 +352,7 @@ describe('counter-claim-pba-payment/start route', () => {
     });
 
     const req = {
-      params: { caseReference: '123' },
+      params: { caseReference: '1234567890123456' },
       session: createSession({
         payment: {
           serviceRequestReference: 'SR-1',
@@ -320,13 +376,16 @@ describe('counter-claim-pba-payment/start route', () => {
     });
     expect(req.session.payment).toEqual(
       expect.objectContaining({
-        caseReference: '123',
+        caseReference: '1234567890123456',
         serviceRequestReference: 'SR-1',
         feeAmount: 404,
         paymentReference: 'RC-PBA-123',
       })
     );
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-payment-successful');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/1234567890123456/respond-to-claim/counter-claim-payment-successful'
+    );
   });
 
   it('redirects to payment failed page when PBA payment status is unsuccessful', async () => {
@@ -338,7 +397,7 @@ describe('counter-claim-pba-payment/start route', () => {
     });
 
     const req = {
-      params: { caseReference: '123' },
+      params: { caseReference: '1234567890123456' },
       session: createSession({
         payment: {
           serviceRequestReference: 'SR-1',
@@ -354,7 +413,7 @@ describe('counter-claim-pba-payment/start route', () => {
     await handler(req, res, next);
 
     expect(mockLogger.warn).toHaveBeenCalledWith(
-      'Counterclaim PBA payment request for case 123 returned status Failed'
+      'Counterclaim PBA payment request for case 1234567890123456 returned status Failed'
     );
     expect(req.session.payment).toEqual(
       expect.not.objectContaining({
@@ -363,7 +422,7 @@ describe('counter-claim-pba-payment/start route', () => {
     );
     expect(res.redirect).toHaveBeenCalledWith(
       303,
-      '/case/123/respond-to-claim/counter-claim-application-fee-amount?payment=failed'
+      '/case/1234567890123456/respond-to-claim/counter-claim-application-fee-amount?payment=failed'
     );
   });
 
@@ -372,7 +431,7 @@ describe('counter-claim-pba-payment/start route', () => {
     mockStartPbaPaymentRequest.mockRejectedValue(new Error('PBA Account Error'));
 
     const req = {
-      params: { caseReference: '123' },
+      params: { caseReference: '1234567890123456' },
       session: createSession({
         payment: {
           serviceRequestReference: 'SR-1',
@@ -388,12 +447,12 @@ describe('counter-claim-pba-payment/start route', () => {
     await handler(req, res, next);
 
     expect(mockLogger.error).toHaveBeenCalledWith(
-      'Failed to create counterclaim PBA payment request for case 123',
+      'Failed to create counterclaim PBA payment request for case 1234567890123456',
       expect.any(Error)
     );
     expect(res.redirect).toHaveBeenCalledWith(
       303,
-      '/case/123/respond-to-claim/counter-claim-application-fee-amount?payment=failed'
+      '/case/1234567890123456/respond-to-claim/counter-claim-application-fee-amount?payment=failed'
     );
   });
 });
