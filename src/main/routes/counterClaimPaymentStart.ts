@@ -116,7 +116,12 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
           paymentReference: paymentResponse.paymentReference,
         });
 
-        return res.redirect(303, `/case/${caseReference}/respond-to-claim/counter-claim-payment-successful`);
+        return safeRedirect303(
+          res,
+          `/case/${caseReference}/respond-to-claim/counter-claim-payment-successful`,
+          `/case/${caseReference}`,
+          ['/case']
+        );
       } catch (error) {
         logger.error(`Failed to create counterclaim PBA payment request for case ${caseReference}`, error);
         return safeRedirect303(
