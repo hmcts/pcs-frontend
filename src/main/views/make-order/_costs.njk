@@ -1,5 +1,3 @@
-{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
-{% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% import "make-order/_compact.njk" as compact with context %}
 
@@ -29,13 +27,7 @@
       {% if choice.amountLabel %}
         {{ compact.money({ id: "costs-" + choice.value + "-amount", label: choice.amountLabel }) }}
       {% elif choice.value == "other" %}
-        {{ govukInput({
-          id: "costs-other-text",
-          name: "costs-other-text",
-          label: { text: "Costs order" },
-          classes: "govuk-input--width-20",
-          value: draftValue("costs-other-text")
-        }) }}
+        {{ compact.text("costs-other-text", { label: "Costs order" }) }}
       {% endif %}
     {% endset %}
     {% set items = items.concat([{
@@ -46,12 +38,7 @@
       conditional: { html: fields } if choice.amountLabel or choice.value == "other"
     }]) %}
   {% endfor %}
-  {{ govukRadios({
-    idPrefix: idPrefix,
-    name: "costs-choice",
-    classes: "govuk-radios--small",
-    items: items
-  }) }}
+  {{ govukRadios({ idPrefix: idPrefix, name: "costs-choice", classes: "govuk-radios--small", items: items }) }}
 {% endmacro %}
 
 {% set costsChoicesHtml %}
@@ -66,14 +53,4 @@
   </fieldset>
 {% endset %}
 
-{{ govukCheckboxes({
-  idPrefix: "costs",
-  name: "costs",
-  classes: "govuk-checkboxes--small",
-  items: [{
-    value: "yes",
-    text: "Costs",
-    checked: draftChecked("costs", "yes"),
-    conditional: { html: costsChoicesHtml }
-  }]
-}) }}
+{{ compact.reveal("costs", "Costs", costsChoicesHtml) }}
