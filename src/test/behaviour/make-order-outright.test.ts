@@ -21,6 +21,13 @@ describe('make an order: outright possession', () => {
     expect((await app.get(PAGE)).status).toBe(404);
   });
 
+  it('is launched from the Manage Case event link', async () => {
+    app = await bootApp();
+    const launch = await app.get(`/cases/${CASE_REFERENCE}/event/ext:makeOrder?expected_sub=judge-uid`);
+    expect(launch.status).toBe(303);
+    expect(launch.location).toBe(PAGE);
+  });
+
   it('starts a blank draft, builds the order from the form and sends it for review', async () => {
     app = await bootApp();
     const response = await app.get(PAGE);

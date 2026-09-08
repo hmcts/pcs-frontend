@@ -1,7 +1,7 @@
 import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import type { DocWeaveSnapshot } from '@hmcts-cft/docweave';
 import config from 'config';
-import { Application, NextFunction, Request, Response } from 'express';
+import { Application, Request, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
 import { MAKE_ORDER_ROUTE } from '../constants/caseRoutes';
@@ -11,38 +11,33 @@ import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 import { buildManageCaseDetailsRedirect } from '../utils/manageCaseRedirect';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { sanitiseCaseReference } from '@utils/caseReference';
-import { type MakeOrderType, type MakeOrderValidationIssue, validateMakeOrder } from '@utils/makeOrderValidation';
+import {
+  MAKE_ORDER_TYPES,
+  type MakeOrderType,
+  type MakeOrderValidationIssue,
+  validateMakeOrder,
+} from '@utils/makeOrderValidation';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
-const XUI_EVENT_ROUTE = '/cases/:caseReference/event/:eventId';
 const STUBBED_MAKE_ORDER_ROUTE = '/dev/make-order';
+
+type FormData = Record<string, unknown>;
 
 interface MakeOrderParty {
   id: string;
   name: string;
 }
 
-interface MakeOrderCaseFacts {
-  tenancyStartDate?: string;
-  tenancyType?: string;
-  noticeDate?: string;
-  currentRent?: number | string;
-  rentFrequency?: string;
-  groundsPleaded?: string;
-  arrearsOnIssue?: number | string;
-}
-
 interface MakeOrderDraftPayload {
   version: 1;
   orderType: MakeOrderType;
-  formData: Record<string, unknown>;
+  formData: FormData;
   documents: Partial<Record<MakeOrderType, DocWeaveSnapshot>>;
 }
 
+/** The make order event's case field, as the backend stores and returns it. */
 interface MakeOrderEnvelope {
-  action?: 'START_DRAFT' | 'SAVE_DRAFT' | 'SUBMIT_FOR_REVIEW';
   order: {
     id?: string;
     state: 'DRAFT' | 'SUBMITTED_FOR_REVIEW' | 'ISSUED';
@@ -54,375 +49,235 @@ interface MakeOrderEnvelope {
     propertyAddress?: Record<string, string | undefined>;
     claimants: MakeOrderParty[];
     defendants: MakeOrderParty[];
-    caseFacts?: MakeOrderCaseFacts;
+    caseFacts?: Record<string, unknown>;
   };
 }
 
-function isMakeOrderType(value: unknown): value is MakeOrderType {
-  return (
-    value === 'OUTRIGHT_POSSESSION' ||
-    value === 'SUSPENDED_POSSESSION' ||
-    value === 'ADJOURNMENT' ||
-    value === 'STRIKE_OUT_DISMISSAL' ||
-    value === 'FREE_FORM'
-  );
-}
+const emptyDraftPayload = (): MakeOrderDraftPayload => ({
+  version: 1,
+  orderType: 'OUTRIGHT_POSSESSION',
+  formData: {},
+  documents: {},
+});
 
-function emptyDraftPayload(): MakeOrderDraftPayload {
-  return { version: 1, orderType: 'OUTRIGHT_POSSESSION', formData: {}, documents: {} };
-}
-
-function stubbedMakeOrderEnvelope(formData: Record<string, unknown> = {}): MakeOrderEnvelope {
-  return {
-    order: {
-      id: 'local-make-order-draft',
-      state: 'DRAFT',
-      version: 1,
-      draftPayload: {
-        version: 1,
-        orderType: 'OUTRIGHT_POSSESSION',
-        formData: {
-          'outright-options': ['money-judgment'],
-          'outright-mj-sections': ['arrears', 'payment-plan'],
-          'outright-mj-plan': ['lump', 'instalments'],
-          'outright-mj-balance': 'yes',
-          'outright-mj-inst-freq': 'monthly',
-          ...formData,
-        },
-        documents: {},
-      },
-    },
-    caseContext: {
-      caseReference: 1777027600017760,
-      propertyAddress: { addressLine1: '10 Test Street', postTown: 'Bristol', postCode: 'BS1 1AA' },
-      claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
-      defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
-      caseFacts: {
-        tenancyStartDate: '2024-01-09',
-        tenancyType: 'Assured tenancy',
-        noticeDate: '2025-06-12',
-        currentRent: 750,
-        rentFrequency: 'Monthly',
-        groundsPleaded: 'Ground 8, Ground 10',
-        arrearsOnIssue: 2400,
-      },
-    },
-  };
-}
-
-function parseEnvelope(payload: unknown): MakeOrderEnvelope {
-  if (typeof payload !== 'string' || !payload) {
+async function loadEnvelope(accessToken: string, caseReference: string): Promise<MakeOrderEnvelope> {
+  const ccdCase = await ccdCaseService.getCaseByIdForEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID);
+  const payload = ccdCase.data.makeOrderPayload;
+  if (!payload) {
     throw new HTTPError('The make order event did not return order data', 500);
   }
   return JSON.parse(payload) as MakeOrderEnvelope;
 }
 
-async function loadMakeOrderEnvelope(accessToken: string, caseReference: string): Promise<MakeOrderEnvelope> {
-  const ccdCase = await ccdCaseService.getCaseByIdForEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID);
-  return parseEnvelope(ccdCase.data.makeOrderPayload);
+function submitOrderEvent(
+  accessToken: string,
+  caseReference: string,
+  action: string,
+  order: { id: string | null; version: number; draftPayload: MakeOrderDraftPayload }
+): Promise<unknown> {
+  return ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, {
+    makeOrderPayload: JSON.stringify({ action, order }),
+  });
 }
 
 async function loadOrStartDraft(accessToken: string, caseReference: string): Promise<MakeOrderEnvelope> {
-  const envelope = await loadMakeOrderEnvelope(accessToken, caseReference);
+  const envelope = await loadEnvelope(accessToken, caseReference);
   if (envelope.order.id) {
     return envelope;
   }
-
-  await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, {
-    makeOrderPayload: JSON.stringify({
-      action: 'START_DRAFT',
-      order: {
-        id: null,
-        version: 0,
-        draftPayload: emptyDraftPayload(),
-      },
-    }),
+  await submitOrderEvent(accessToken, caseReference, 'START_DRAFT', {
+    id: null,
+    version: 0,
+    draftPayload: emptyDraftPayload(),
   });
-  return loadMakeOrderEnvelope(accessToken, caseReference);
+  return loadEnvelope(accessToken, caseReference);
 }
 
-function formatAddress(address?: Record<string, string | undefined>): string {
-  if (!address) {
-    return '';
-  }
-  const field = (camelCase: string, ccdCase: string): string | undefined => address[camelCase] ?? address[ccdCase];
-  return [
-    field('addressLine1', 'AddressLine1'),
-    field('addressLine2', 'AddressLine2'),
-    field('addressLine3', 'AddressLine3'),
-    field('postTown', 'PostTown'),
-    field('county', 'County'),
-    field('postCode', 'PostCode'),
-    field('country', 'Country'),
-  ]
+/** Case context addresses arrive with CCD (PascalCase) or JSON (camelCase) keys. */
+function formatAddress(address: Record<string, string | undefined> = {}): string {
+  return ['addressLine1', 'addressLine2', 'addressLine3', 'postTown', 'county', 'postCode', 'country']
+    .map(key => address[key] ?? address[key[0].toUpperCase() + key.slice(1)])
     .filter(Boolean)
     .join(', ');
 }
 
-function caseFactsToFormData(caseFacts?: MakeOrderCaseFacts): Record<string, unknown> {
-  if (!caseFacts) {
-    return {};
+/** Pre-fills the case facts fields from the claim, in the form's field names. */
+function caseFactsFormData(caseFacts: Record<string, unknown> = {}): FormData {
+  const formData: FormData = {};
+  const fields: Record<string, string> = {
+    tenancyType: 'tenancy-type',
+    currentRent: 'current-rent',
+    rentFrequency: 'rent-frequency',
+    groundsPleaded: 'grounds-pleaded',
+    arrearsOnIssue: 'arrears-issue',
+  };
+  const dates: Record<string, string> = { tenancyStartDate: 'date-tenancy', noticeDate: 'date-notice' };
+  for (const [fact, field] of Object.entries(fields)) {
+    if (caseFacts[fact] !== undefined && caseFacts[fact] !== null) {
+      formData[field] = String(caseFacts[fact]);
+    }
   }
-
-  const formData: Record<string, unknown> = {};
-  const addDate = (prefix: string, value?: string): void => {
-    const match = value?.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (match) {
-      formData[`${prefix}-day`] = String(Number(match[3]));
-      formData[`${prefix}-month`] = String(Number(match[2]));
-      formData[`${prefix}-year`] = match[1];
+  for (const [fact, field] of Object.entries(dates)) {
+    const [year, month, day] = String(caseFacts[fact] ?? '').split('-');
+    if (day) {
+      Object.assign(formData, { [`${field}-day`]: String(Number(day)), [`${field}-month`]: String(Number(month)) });
+      formData[`${field}-year`] = year;
     }
-  };
-  const addValue = (name: string, value: unknown): void => {
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      formData[name] = String(value);
-    }
-  };
-
-  addDate('date-tenancy', caseFacts.tenancyStartDate);
-  addDate('date-notice', caseFacts.noticeDate);
-  addValue('tenancy-type', caseFacts.tenancyType);
-  addValue('current-rent', caseFacts.currentRent);
-  addValue('rent-frequency', caseFacts.rentFrequency);
-  addValue('grounds-pleaded', caseFacts.groundsPleaded);
-  addValue('arrears-issue', caseFacts.arrearsOnIssue);
+  }
   return formData;
 }
 
-function buildAttendanceParties(
-  envelope: MakeOrderEnvelope
-): { id: string; partyId: string; name: string; label: string; type: string }[] {
-  return [
-    ...envelope.caseContext.claimants.map((party, index) => ({
-      id: `claimant-${party.id}`,
+function attendanceParties({ caseContext }: MakeOrderEnvelope): Record<string, string>[] {
+  const parties = (type: 'claimant' | 'defendant', list: MakeOrderParty[]): Record<string, string>[] =>
+    list.map((party, index) => ({
+      id: `${type}-${party.id}`,
       partyId: party.id,
       name: party.name,
-      label: `Claimant ${index + 1}: ${party.name}`,
-      type: 'claimant',
-    })),
-    ...envelope.caseContext.defendants.map((party, index) => ({
-      id: `defendant-${party.id}`,
-      partyId: party.id,
-      name: party.name,
-      label: `Defendant ${index + 1}: ${party.name}`,
-      type: 'defendant',
-    })),
-  ];
+      label: `${type[0].toUpperCase()}${type.slice(1)} ${index + 1}: ${party.name}`,
+      type,
+    }));
+  return [...parties('claimant', caseContext.claimants), ...parties('defendant', caseContext.defendants)];
 }
 
-function buildPageModel(
-  req: Request,
-  envelope: MakeOrderEnvelope,
-  submitted?: {
-    orderType: MakeOrderType;
-    formData: Record<string, unknown>;
-    orderDocumentJson: string;
-    validationIssues: MakeOrderValidationIssue[];
-  }
-): Record<string, unknown> {
-  const roles = getUserRoles(req);
-  const headerModel = buildHeaderModel({
-    xuiBaseUrl: config.get('xui.uri'),
-    user: { roles },
-  });
+interface Submission {
+  orderType: MakeOrderType;
+  formData: FormData;
+  orderDocumentJson: string;
+  validationIssues: MakeOrderValidationIssue[];
+}
+
+function pageModel(req: Request, envelope: MakeOrderEnvelope, submission?: Submission): Record<string, unknown> {
+  const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles: getUserRoles(req) } });
   headerModel.assetsPath = '/assets/ui-component-lib';
+  const { caseContext } = envelope;
   const draftPayload = envelope.order.draftPayload ?? emptyDraftPayload();
-  const draft = {
-    ...caseFactsToFormData(envelope.caseContext.caseFacts),
-    ...(submitted?.formData ?? draftPayload.formData),
+  const draft: FormData = {
+    ...caseFactsFormData(caseContext.caseFacts),
+    ...(submission?.formData ?? draftPayload.formData),
   };
-  const draftValue = (name: string): unknown => draft[name];
-  const draftChecked = (name: string, value: string): boolean => {
-    const savedValue = draft[name];
-    return Array.isArray(savedValue) ? savedValue.includes(value) : savedValue === value;
-  };
-  const draftDate = (prefix: string): { name: string; value: unknown }[] =>
-    ['day', 'month', 'year'].map(name => ({ name, value: draft[`${prefix}-${name}`] }));
-  const draftSelect = (
-    items: Record<string, unknown>[],
-    name: string,
-    defaultValue?: string
-  ): Record<string, unknown>[] =>
-    items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) }));
+  const issues = submission?.validationIssues ?? [];
+  const orderType = submission?.orderType ?? draftPayload.orderType;
 
   return {
     headerModel,
     footerModel: buildFooterModel(),
     order: envelope.order,
     draft,
-    draftOrderType: submitted?.orderType ?? draftPayload.orderType,
-    orderDocumentJson:
-      submitted?.orderDocumentJson ?? JSON.stringify(draftPayload.documents?.[draftPayload.orderType] ?? null),
-    draftValue,
-    draftChecked,
-    draftDate,
-    draftSelect,
-    caseReferenceDisplay: caseNumberFormatter(envelope.caseContext.caseReference),
-    propertyAddressDisplay: formatAddress(envelope.caseContext.propertyAddress),
-    claimantNames: envelope.caseContext.claimants.map(party => party.name).join(', '),
-    defendantNames: envelope.caseContext.defendants.map(party => party.name).join(', '),
-    attendanceParties: buildAttendanceParties(envelope),
+    draftOrderType: orderType,
+    orderDocumentJson: submission?.orderDocumentJson ?? JSON.stringify(draftPayload.documents?.[orderType] ?? null),
+    draftValue: (name: string): unknown => draft[name],
+    draftChecked: (name: string, value: string): boolean => {
+      const saved = draft[name];
+      return Array.isArray(saved) ? saved.includes(value) : saved === value;
+    },
+    draftDate: (prefix: string) => ['day', 'month', 'year'].map(name => ({ name, value: draft[`${prefix}-${name}`] })),
+    draftSelect: (items: Record<string, unknown>[], name: string, defaultValue?: string) =>
+      items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) })),
+    caseReferenceDisplay: caseNumberFormatter(caseContext.caseReference),
+    propertyAddressDisplay: formatAddress(caseContext.propertyAddress),
+    claimantNames: caseContext.claimants.map(party => party.name).join(', '),
+    defendantNames: caseContext.defendants.map(party => party.name).join(', '),
+    attendanceParties: attendanceParties(envelope),
     saved: req.query?.saved === 'true',
     submitted: req.query?.submitted === 'true',
-    validationErrors: Object.fromEntries(
-      (submitted?.validationIssues ?? []).map(issue => [
-        issue.id,
-        {
-          text: issue.message,
-        },
-      ])
-    ),
-    errorSummary: submitted?.validationIssues.length
+    validationErrors: Object.fromEntries(issues.map(issue => [issue.id, { text: issue.message }])),
+    errorSummary: issues.length
       ? {
           titleText: 'There is a problem',
-          errorList: submitted.validationIssues.map(issue => ({ text: issue.message, href: `#${issue.id}` })),
+          errorList: issues.map(issue => ({ text: issue.message, href: `#${issue.id}` })),
           attributes: { id: 'make-order-error-summary' },
         }
       : undefined,
   };
 }
 
+function stubbedEnvelope(formData: FormData = {}): MakeOrderEnvelope {
+  return {
+    order: {
+      id: 'local-make-order-draft',
+      state: 'DRAFT',
+      version: 1,
+      draftPayload: { ...emptyDraftPayload(), formData },
+    },
+    caseContext: {
+      caseReference: 1777027600017760,
+      propertyAddress: { addressLine1: '10 Test Street', postTown: 'Bristol', postCode: 'BS1 1AA' },
+      claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
+      defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
+      caseFacts: { tenancyStartDate: '2024-01-09', noticeDate: '2025-06-12', currentRent: 750, arrearsOnIssue: 2400 },
+    },
+  };
+}
+
+function parseDocument(orderDocument: unknown): DocWeaveSnapshot | undefined {
+  if (typeof orderDocument !== 'string' || !orderDocument) {
+    return undefined;
+  }
+  try {
+    return JSON.parse(orderDocument) as DocWeaveSnapshot;
+  } catch {
+    throw new HTTPError('The order document is not valid JSON', 400);
+  }
+}
+
 export default function makeOrderRoutes(app: Application): void {
   if (process.env.USE_STUBBED_DEPS === 'true') {
-    app.get(STUBBED_MAKE_ORDER_ROUTE, (req: Request, res: Response) =>
-      res.render('make-order', buildPageModel(req, stubbedMakeOrderEnvelope()))
-    );
-    app.post(STUBBED_MAKE_ORDER_ROUTE, (req: Request, res: Response) =>
-      res.render('make-order', buildPageModel(req, stubbedMakeOrderEnvelope(req.body as Record<string, unknown>)))
+    app.get(STUBBED_MAKE_ORDER_ROUTE, (req, res) => res.render('make-order', pageModel(req, stubbedEnvelope())));
+    app.post(STUBBED_MAKE_ORDER_ROUTE, (req, res) =>
+      res.render('make-order', pageModel(req, stubbedEnvelope(req.body as FormData)))
     );
   }
 
-  app.get(
-    MAKE_ORDER_ROUTE,
-    oidcMiddleware,
-    judgeAccessMiddleware,
-    async (req: Request, res: Response, next: NextFunction) => {
-      const user = req.session?.user;
-      const accessToken = user?.accessToken;
-      if (!accessToken) {
-        return next(new HTTPError('Authentication required', 401));
-      }
-
-      try {
-        const expectedSub = typeof req.query.expected_sub === 'string' ? req.query.expected_sub : undefined;
-        const userId = user.uid ?? user.id ?? user.sub;
-        const signedInUserId = typeof userId === 'string' ? userId : undefined;
-        if (expectedSub && expectedSub !== signedInUserId) {
-          throw new HTTPError('The signed-in user does not match the XUI session', 403);
-        }
-
-        const envelope = await loadOrStartDraft(accessToken, req.params.caseReference as string);
-        return res.render('make-order', buildPageModel(req, envelope));
-      } catch (error) {
-        return next(error);
-      }
+  app.get(MAKE_ORDER_ROUTE, oidcMiddleware, judgeAccessMiddleware, async (req: Request, res: Response, next) => {
+    try {
+      const envelope = await loadOrStartDraft(req.session.user!.accessToken, req.params.caseReference as string);
+      res.render('make-order', pageModel(req, envelope));
+    } catch (error) {
+      next(error);
     }
-  );
+  });
 
-  app.post(
-    MAKE_ORDER_ROUTE,
-    oidcMiddleware,
-    judgeAccessMiddleware,
-    async (req: Request, res: Response, next: NextFunction) => {
-      const user = req.session?.user;
-      const accessToken = user?.accessToken;
-      if (!accessToken) {
-        return next(new HTTPError('Authentication required', 401));
-      }
-
-      const caseReference = sanitiseCaseReference(req.params.caseReference as string);
-      if (!caseReference) {
-        return next(new HTTPError('Invalid case reference format', 404));
-      }
-      const makeOrderUrl = MAKE_ORDER_ROUTE.replace(':caseReference', caseReference);
-      const {
-        _csrf: _ignoredCsrf,
-        action,
-        orderId,
-        orderVersion,
-        orderType,
-        orderDocument,
-        ...formData
-      } = req.body as Record<string, unknown>;
-
-      try {
-        const orderAction = action ?? 'START_DRAFT';
-        if (orderAction === 'START_DRAFT') {
-          await loadOrStartDraft(accessToken, caseReference);
-          return safeRedirect303(res, makeOrderUrl, '/', ['/case/']);
-        }
-        if (!isMakeOrderType(orderType)) {
-          throw new HTTPError('The order type is invalid', 400);
-        }
-        const selectedOrderType = orderType;
-        const validationIssues =
-          orderAction === 'SUBMIT_FOR_REVIEW' ? validateMakeOrder(selectedOrderType, formData) : [];
-        if (validationIssues.length) {
-          const envelope = await loadMakeOrderEnvelope(accessToken, caseReference);
-          return res.status(400).render(
-            'make-order',
-            buildPageModel(req, envelope, {
-              orderType: selectedOrderType,
-              formData,
-              orderDocumentJson: typeof orderDocument === 'string' ? orderDocument : '',
-              validationIssues,
-            })
-          );
-        }
-        let selectedDocument: DocWeaveSnapshot | undefined;
-        if (typeof orderDocument === 'string' && orderDocument) {
-          try {
-            selectedDocument = JSON.parse(orderDocument) as DocWeaveSnapshot;
-          } catch {
-            throw new HTTPError('The order document is not valid JSON', 400);
-          }
-        }
-        const draftPayload: MakeOrderDraftPayload = {
-          version: 1,
-          orderType: selectedOrderType,
-          formData,
-          documents: selectedDocument ? { [selectedOrderType]: selectedDocument } : {},
-        };
-        await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, {
-          makeOrderPayload: JSON.stringify({
-            action: orderAction,
-            order: {
-              id: orderId || null,
-              version: Number(orderVersion),
-              draftPayload,
-            },
-          }),
-        });
-        if (orderAction === 'SAVE_DRAFT' || orderAction === 'SUBMIT_FOR_REVIEW') {
-          const manageCaseUrl = buildManageCaseDetailsRedirect(
-            config.get<string>('redirects.manageCaseReturnURL'),
-            caseReference
-          );
-          if (!manageCaseUrl) {
-            throw new HTTPError('The Manage Case return URL is not configured', 500);
-          }
-          return res.redirect(manageCaseUrl);
-        }
-        return safeRedirect303(res, `${makeOrderUrl}?saved=true`, '/', ['/case/']);
-      } catch (error) {
-        return next(error);
-      }
-    }
-  );
-
-  app.get(XUI_EVENT_ROUTE, (req: Request, res: Response, next: NextFunction) => {
-    if (req.params.eventId !== MAKE_ORDER_EVENT_ID) {
-      return next();
-    }
-
-    const expectedSub = typeof req.query.expected_sub === 'string' ? req.query.expected_sub : undefined;
-    const caseReference = sanitiseCaseReference(req.params.caseReference as string);
-    if (!caseReference) {
-      return next(new HTTPError('Invalid case reference format', 404));
-    }
+  app.post(MAKE_ORDER_ROUTE, oidcMiddleware, judgeAccessMiddleware, async (req: Request, res: Response, next) => {
+    const accessToken = req.session.user!.accessToken;
+    const caseReference = req.params.caseReference as string;
     const makeOrderUrl = MAKE_ORDER_ROUTE.replace(':caseReference', caseReference);
-    // safeRedirect303 decodes the target once while validating it, so encode the query value for that pass too.
-    const query = expectedSub ? `?expected_sub=${encodeURIComponent(encodeURIComponent(expectedSub))}` : '';
-    return safeRedirect303(res, `${makeOrderUrl}${query}`, '/', ['/case/']);
+    const { _csrf, action = 'START_DRAFT', orderId, orderVersion, orderType, orderDocument, ...formData } = req.body;
+
+    try {
+      if (action === 'START_DRAFT') {
+        await loadOrStartDraft(accessToken, caseReference);
+        return safeRedirect303(res, makeOrderUrl, '/', ['/case/']);
+      }
+      if (!MAKE_ORDER_TYPES.includes(orderType)) {
+        throw new HTTPError('The order type is invalid', 400);
+      }
+      const validationIssues = action === 'SUBMIT_FOR_REVIEW' ? validateMakeOrder(orderType, formData) : [];
+      if (validationIssues.length) {
+        const envelope = await loadEnvelope(accessToken, caseReference);
+        const orderDocumentJson = typeof orderDocument === 'string' ? orderDocument : '';
+        return res
+          .status(400)
+          .render('make-order', pageModel(req, envelope, { orderType, formData, orderDocumentJson, validationIssues }));
+      }
+      const document = parseDocument(orderDocument);
+      await submitOrderEvent(accessToken, caseReference, action, {
+        id: orderId || null,
+        version: Number(orderVersion),
+        draftPayload: { version: 1, orderType, formData, documents: document ? { [orderType]: document } : {} },
+      });
+      if (action === 'SAVE_DRAFT' || action === 'SUBMIT_FOR_REVIEW') {
+        const manageCaseUrl = buildManageCaseDetailsRedirect(
+          config.get('redirects.manageCaseReturnURL'),
+          caseReference
+        );
+        if (!manageCaseUrl) {
+          throw new HTTPError('The Manage Case return URL is not configured', 500);
+        }
+        return res.redirect(manageCaseUrl);
+      }
+      return safeRedirect303(res, `${makeOrderUrl}?saved=true`, '/', ['/case/']);
+    } catch (error) {
+      return next(error);
+    }
   });
 }

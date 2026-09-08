@@ -92,14 +92,21 @@ export async function bootApp(options: { judge?: boolean } = {}): Promise<TestAp
   process.env.REDIRECTS_MANAGE_CASE_RETURN_URL = MANAGE_CASE_URL.slice(0, MANAGE_CASE_URL.lastIndexOf('/'));
 
   // config reads the environment when first loaded, so import the application after setting it.
-  const [{ Nunjucks }, { http: httpService }, { default: makeOrderRoutes }, { setupErrorHandlers }, middleware] =
-    await Promise.all([
-      import('../../main/modules/nunjucks'),
-      import('../../main/modules/http'),
-      import('../../main/routes/makeOrder'),
-      import('../../main/modules/error-handler'),
-      import('../../main/middleware'),
-    ]);
+  const [
+    { Nunjucks },
+    { http: httpService },
+    { default: makeOrderRoutes },
+    { default: decentralisedEventRoutes },
+    { setupErrorHandlers },
+    middleware,
+  ] = await Promise.all([
+    import('../../main/modules/nunjucks'),
+    import('../../main/modules/http'),
+    import('../../main/routes/makeOrder'),
+    import('../../main/routes/decentralisedEvent'),
+    import('../../main/modules/error-handler'),
+    import('../../main/middleware'),
+  ]);
   httpService.setToken('s2s-token', Date.now() + 60 * 60 * 1000);
 
   const app = express();
@@ -119,6 +126,7 @@ export async function bootApp(options: { judge?: boolean } = {}): Promise<TestAp
   });
   app.param('caseReference', middleware.caseReferenceParamMiddleware);
   makeOrderRoutes(app);
+  decentralisedEventRoutes(app);
   setupErrorHandlers(app, 'test');
   const server = await listen(app);
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
