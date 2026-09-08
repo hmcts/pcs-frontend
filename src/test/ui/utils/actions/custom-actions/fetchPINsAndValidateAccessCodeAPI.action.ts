@@ -71,6 +71,15 @@ export function selectPinUserByIndex(index: number): PinUser | undefined {
   return setSelectedPinUser(pinUsers[index]);
 }
 
+export function selectPinUserByName(firstNameValue: string, lastNameValue: string): PinUser | undefined {
+  const matchingPinUser = pinUsers.find(
+    pinUser =>
+      pinUser.firstName?.trim().toLowerCase() === firstNameValue.trim().toLowerCase() &&
+      pinUser.lastName?.trim().toLowerCase() === lastNameValue.trim().toLowerCase()
+  );
+  return setSelectedPinUser(matchingPinUser);
+}
+
 function getDefaultPinUser(): PinUser | undefined {
   const hasUnknownDefendant = pinUsers.some(pinUser => !hasKnownDefendantDetails(pinUser));
   return hasUnknownDefendant ? selectPinUserByDefendantDetails(false) : setSelectedPinUser(pinUsers[0]);

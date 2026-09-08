@@ -9,11 +9,7 @@ import {
 } from '../data/page-data';
 import { defendantNameConfirmation, selectDefendant, startNow } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
-import {
-  getPinUserAt,
-  getSelectedDefendantNumber,
-  getSelectedPinUser,
-} from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
+import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -249,7 +245,6 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performValidation('radioButtonChecked', defendantNameConfirmation.noRadioOption, false);
   });
 
-  //Skipping this test untill issue mentioned on HDPI-6936 ticket is resolved
   test('Citizen draft is deleted when Notice of Change gives access to the legal representative organisation @LR @citizenDraftRevocation', async ({
     page,
     context,
@@ -258,9 +253,11 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performAction('navigateToUrl', home_url);
     await performAction('login');
     await performAction('navigateToUrl', home_url + `/access-your-case`);
-    await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER, pinIndex: 0 });
-    const selectedCitizenDefendant = getSelectedPinUser();
-    const selectedDefendantIndex = getSelectedDefendantNumber() - 1;
+    await performAction('accessYourCase', {
+      caseNumber: process.env.CASE_NUMBER,
+      defendantFirstName: 'Test',
+      defendantLastName: 'John',
+    });
     await page.goto(home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await page.getByRole('button', { name: citizenStartNow.startNowButton }).click();
     await page.waitForLoadState();
@@ -274,7 +271,7 @@ test.describe('Legal representative organisation access after Notice of Change @
       req: 'Link Solicitor',
       email: user.defendantSolicitor.email,
       password: user.defendantSolicitor.password,
-      defendantIndex: selectedDefendantIndex,
+      defendantIndex: 0,
     });
 
     await validateCitizenCannotAccessCase(page, context);
@@ -283,13 +280,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
     await performAction('clickButton', startNow.startNowButton);
-    await performValidation(
-      'mainHeader',
-      defendantNameConfirmation.mainHeader(
-        selectedCitizenDefendant?.firstName ?? 'Test',
-        selectedCitizenDefendant?.lastName ?? 'John'
-      )
-    );
+    await performValidation('mainHeader', defendantNameConfirmation.mainHeader('Test', 'John'));
     await performValidation('radioButtonChecked', defendantNameConfirmation.noRadioOption, false);
   });
 });
