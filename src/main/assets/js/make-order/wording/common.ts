@@ -1,12 +1,7 @@
 import { type InlineBuilder, type OrderBuilder } from '@hmcts-cft/docweave';
 
+import { formatDate, formatMoney, parseDate } from '../../../../utils/makeOrderFormat';
 import { type AttendanceEntry, type OrderData, type OrderParty } from '../data';
-
-interface AttendanceFact {
-  id: string;
-  sourceId: string;
-  text: string;
-}
 
 export function value(data: OrderData, name: string): string {
   return data.answers[name]?.[0]?.trim() ?? '';
@@ -25,33 +20,17 @@ export function selectedControlId(data: OrderData, name: string): string {
 }
 
 export function date(data: OrderData, prefix: string): string {
-  const day = Number(value(data, `${prefix}-day`));
-  const month = Number(value(data, `${prefix}-month`));
-  const year = Number(value(data, `${prefix}-year`));
-  const parsed = new Date(Date.UTC(year, month - 1, day));
-  if (
-    !day ||
-    !month ||
-    !year ||
-    parsed.getUTCDate() !== day ||
-    parsed.getUTCMonth() !== month - 1 ||
-    parsed.getUTCFullYear() !== year
-  ) {
-    return '[date not provided]';
-  }
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(parsed);
+  const parsed = parseDate(value(data, `${prefix}-day`), value(data, `${prefix}-month`), value(data, `${prefix}-year`));
+  return parsed ? formatDate(parsed) : '[date not provided]';
 }
 
 export function money(raw: string): string {
   const amount = Number(raw.split(',').join(''));
-  return raw && Number.isFinite(amount)
-    ? amount.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    : '[amount not provided]';
+  return raw && Number.isFinite(amount) ? formatMoney(amount) : '[amount not provided]';
+}
+
+export function frequency(data: OrderData, name: string): string {
+  return value(data, name) === 'weekly' ? 'week' : 'month';
 }
 
 export function sentenceCase(text: string): string {
@@ -87,60 +66,45 @@ export function partyLabels(data: OrderData): {
   };
 }
 
-function attendanceFacts(entries: readonly AttendanceEntry[]): {
-  heard: AttendanceFact[];
-  paragraphs: AttendanceFact[];
-} {
-  const heard: AttendanceFact[] = [];
-  const paragraphs: AttendanceFact[] = [];
-  entries.forEach(entry => {
-    const party = entry.partyKind === 'claimant' ? 'the claimant' : 'the defendant';
+const ATTENDANCE_ROLES: Record<string, (party: string) => string> = {
+  counsel: party => `counsel for ${party}`,
+  solicitor: party => `solicitor for ${party}`,
+  'solicitor-agent': party => `solicitor's agent for ${party}`,
+  'housing-officer': party => `the housing officer on behalf of ${party}`,
+  'duty-adviser': party => `the duty adviser on behalf of ${party}`,
+  'litigant-in-person': party => `${party} acting in person`,
+};
+
+export function addPreamble(order: OrderBuilder, data: OrderData): void {
+  const heard: string[] = [];
+  const paragraphs: { id: string; entry: AttendanceEntry; text: string }[] = [];
+  for (const entry of data.attendance) {
+    const party = `the ${entry.partyKind}`;
+    const role = ATTENDANCE_ROLES[entry.choice];
     if (entry.choice === 'letter-only') {
       paragraphs.push({
         id: `attendance-letter-${entry.rowIndex}`,
-        sourceId: entry.sourceId,
+        entry,
         text: `The Court read a letter from ${entry.representativeName || entry.partyLabel}.`,
       });
-      return;
-    }
-    if (entry.choice === 'not-present') {
+    } else if (entry.choice === 'not-present') {
       paragraphs.push({
         id: `attendance-absent-${entry.rowIndex}`,
-        sourceId: entry.sourceId,
+        entry,
         text: `The ${entry.partyLabel} did not attend the hearing, but the Court was satisfied they had received notice of the hearing, and it was reasonable to proceed in their absence.`,
       });
-      return;
+    } else if (role) {
+      heard.push(entry.representativeName ? `${entry.representativeName}, ${role(party)}` : role(party));
     }
-    const roles: Record<string, string> = {
-      counsel: `counsel for ${party}`,
-      solicitor: `solicitor for ${party}`,
-      'solicitor-agent': `solicitor's agent for ${party}`,
-      'housing-officer': `the housing officer on behalf of ${party}`,
-      'duty-adviser': `the duty adviser on behalf of ${party}`,
-      'litigant-in-person': `${party} acting in person`,
-    };
-    const role = roles[entry.choice];
-    if (role) {
-      heard.push({
-        id: `attendance-heard-${entry.rowIndex}`,
-        sourceId: entry.sourceId,
-        text: entry.representativeName ? `${entry.representativeName}, ${role}` : role,
-      });
-    }
-  });
-  return { heard, paragraphs };
-}
-
-export function addPreamble(order: OrderBuilder, data: OrderData): void {
-  const attendance = attendanceFacts(data.attendance);
-  if (attendance.heard.length) {
-    order.paragraph('attendance-heard', `The Court heard from ${joinList(attendance.heard.map(entry => entry.text))}.`);
   }
-  attendance.paragraphs.forEach(paragraph =>
+  if (heard.length) {
+    order.paragraph('attendance-heard', `The Court heard from ${joinList(heard)}.`);
+  }
+  for (const paragraph of paragraphs) {
     order.paragraph(paragraph.id, content => {
-      content.fact('attendance', paragraph.text, { sourceId: paragraph.sourceId });
-    })
-  );
+      content.fact('attendance', paragraph.text, { sourceId: paragraph.entry.sourceId });
+    });
+  }
   if (selected(data, 'recitals', 'yes')) {
     value(data, 'recital')
       .split(/\n\s*\n/)
@@ -154,70 +118,95 @@ export function addPreamble(order: OrderBuilder, data: OrderData): void {
   order.paragraph('ordered-that', 'IT IS ORDERED THAT:');
 }
 
+export interface PaymentTerm {
+  kind: 'one-off' | 'instalments';
+  /** Text before the amount, for example "payment of £". */
+  lead: string;
+  /** Text between the amount and the date or frequency, for example " to the claimant". */
+  afterAmount?: string;
+  /** Form field id prefix: `${prefix}-amount`, `${prefix}-date` and `${prefix}-frequency`. */
+  fields: { amount: string; date: string; frequency?: string };
+  /** Fact id prefix within the clause. */
+  facts: string;
+}
+
+/** "payment of £X [to the claimant] by DATE" or "payments of £X every week, the first instalment to be paid on or before DATE". */
+export function addPaymentTerm(content: InlineBuilder, data: OrderData, term: PaymentTerm): void {
+  content
+    .text(term.lead)
+    .fact(`${term.facts}-amount`, money(value(data, term.fields.amount)), { sourceId: term.fields.amount })
+    .text(term.afterAmount ?? '');
+  if (term.kind === 'one-off') {
+    content.text(' by ');
+  } else {
+    content
+      .text(' every ')
+      .fact(`${term.facts}-frequency`, frequency(data, term.fields.frequency ?? ''), {
+        sourceId: term.fields.frequency,
+      })
+      .text(', the first instalment to be paid on or before ');
+  }
+  content.fact(`${term.facts}-date`, date(data, term.fields.date), { sourceId: term.fields.date });
+}
+
 export const SAME_TERMS_COSTS = new Set(['same-terms', 'fixed-same-terms', 'summary-same-terms']);
 
-const CASE_MAN_COST_CHOICES = new Set([
-  'def-pay-cl-fixed',
-  'def-pay-cl-summary',
-  'cl-pay-def-summary',
-  'in-case',
-  'reserved',
-  'no-order',
-  'public-funding',
-  'same-terms',
-  'fixed-same-terms',
-  'summary-same-terms',
-]);
+export interface CostsWording {
+  /** Choices followed by an amount: the text before "£". */
+  amounts: Record<string, string>;
+  /** Choices that are a complete sentence. */
+  fixed: Record<string, string>;
+  /** Shown when nothing usable was chosen; omit to add nothing. */
+  missing?: string;
+}
 
-export function hasCaseManCosts(data: OrderData): boolean {
+/** The CaseMan-style costs wording used by suspended possession and adjournment orders. */
+export function caseManCosts(claimant: string, defendant: string): CostsWording {
+  const defendantPays = `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs`;
+  return {
+    amounts: {
+      'def-pay-cl-fixed': `${defendantPays} of the claim in the fixed sum of £`,
+      'def-pay-cl-summary': `${defendantPays} in the summarily assessed sum of £`,
+      'cl-pay-def-summary': `${sentenceCase(claimant)} shall pay ${possessive(defendant)} costs in the summarily assessed sum of £`,
+      'fixed-same-terms': `${defendantPays} of the claim in the fixed sum of £`,
+      'summary-same-terms': `${defendantPays} in the summarily assessed sum of £`,
+    },
+    fixed: {
+      'in-case': 'Costs in the case.',
+      reserved: 'Costs reserved.',
+      'no-order': 'No order as to costs.',
+      'public-funding': `There be a detailed assessment of ${possessive(defendant)} publicly funded costs.`,
+      'same-terms': `${defendantPays}.`,
+    },
+  };
+}
+
+/** Whether the costs answers produce a clause under the given wording. */
+export function hasCosts(data: OrderData, wording: CostsWording): boolean {
   if (!selected(data, 'costs', 'yes')) {
     return false;
   }
   const choice = value(data, 'costs-choice');
-  return choice === 'other' ? Boolean(value(data, 'costs-other-text')) : CASE_MAN_COST_CHOICES.has(choice);
+  return (
+    wording.missing !== undefined ||
+    choice in wording.amounts ||
+    choice in wording.fixed ||
+    (choice === 'other' && Boolean(value(data, 'costs-other-text')))
+  );
 }
 
-export function addCaseManCosts(content: InlineBuilder, data: OrderData, claimant: string, defendant: string): void {
+export function addCosts(content: InlineBuilder, data: OrderData, wording: CostsWording): void {
   const choice = value(data, 'costs-choice');
   const sourceId = selectedControlId(data, 'costs-choice');
-  const amountCosts: Record<string, { amountId: string; prefix: string }> = {
-    'def-pay-cl-fixed': {
-      amountId: 'costs-def-pay-cl-fixed-amount',
-      prefix: `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs of the claim in the fixed sum of £`,
-    },
-    'def-pay-cl-summary': {
-      amountId: 'costs-def-pay-cl-summary-amount',
-      prefix: `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs in the summarily assessed sum of £`,
-    },
-    'cl-pay-def-summary': {
-      amountId: 'costs-cl-pay-def-summary-amount',
-      prefix: `${sentenceCase(claimant)} shall pay ${possessive(defendant)} costs in the summarily assessed sum of £`,
-    },
-    'fixed-same-terms': {
-      amountId: 'costs-fixed-same-terms-amount',
-      prefix: `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs of the claim in the fixed sum of £`,
-    },
-    'summary-same-terms': {
-      amountId: 'costs-summary-same-terms-amount',
-      prefix: `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs in the summarily assessed sum of £`,
-    },
-  };
-  const fixedCosts: Record<string, string> = {
-    'in-case': 'Costs in the case.',
-    reserved: 'Costs reserved.',
-    'no-order': 'No order as to costs.',
-    'public-funding': `There be a detailed assessment of ${possessive(defendant)} publicly funded costs.`,
-    'same-terms': `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs.`,
-  };
-  const amountCost = amountCosts[choice];
-  if (amountCost) {
+  const amountId = `costs-${choice}-amount`;
+  if (choice in wording.amounts) {
     content
-      .fact('choice', amountCost.prefix, { sourceId })
-      .fact('amount', money(value(data, amountCost.amountId)), { sourceId: amountCost.amountId })
+      .fact('choice', wording.amounts[choice], { sourceId })
+      .fact('amount', money(value(data, amountId)), { sourceId: amountId })
       .text('.');
   } else if (choice === 'other') {
-    content.fact('other', value(data, 'costs-other-text'), { sourceId: 'costs-other-text' });
+    content.fact('other', value(data, 'costs-other-text') || wording.missing || '', { sourceId: 'costs-other-text' });
   } else {
-    content.fact('choice', fixedCosts[choice] ?? '', { sourceId });
+    content.fact('choice', wording.fixed[choice] || wording.missing || '', { sourceId });
   }
 }

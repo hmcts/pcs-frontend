@@ -1,3 +1,5 @@
+import { parseDate, parseMoney } from './makeOrderFormat';
+
 export const MAKE_ORDER_TYPES = [
   'OUTRIGHT_POSSESSION',
   'SUSPENDED_POSSESSION',
@@ -22,22 +24,16 @@ function values(formData: Record<string, unknown>, name: string): string[] {
 }
 
 function hasValidMoney(formData: Record<string, unknown>, name: string): boolean {
-  const amount = value(formData, name).split(',').join('');
-  return /^\d+(\.\d{1,2})?$/.test(amount) && Number(amount) >= 0;
+  return parseMoney(value(formData, name)) !== undefined;
 }
 
 function hasValidDate(formData: Record<string, unknown>, prefix: string): boolean {
-  const day = Number(value(formData, `${prefix}-day`));
-  const month = Number(value(formData, `${prefix}-month`));
-  const year = Number(value(formData, `${prefix}-year`));
-  const parsed = new Date(Date.UTC(year, month - 1, day));
   return (
-    day > 0 &&
-    month > 0 &&
-    year > 0 &&
-    parsed.getUTCDate() === day &&
-    parsed.getUTCMonth() === month - 1 &&
-    parsed.getUTCFullYear() === year
+    parseDate(
+      value(formData, `${prefix}-day`),
+      value(formData, `${prefix}-month`),
+      value(formData, `${prefix}-year`)
+    ) !== undefined
   );
 }
 
