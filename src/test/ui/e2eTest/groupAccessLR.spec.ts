@@ -249,14 +249,16 @@ test.describe('Legal representative organisation access after Notice of Change @
     page,
     context,
   }) => {
+    const selectedDefendant = submitCaseApiData.submitCasePayload.defendant1;
+
     await performAction('createUser', 'citizen', ['citizen']);
     await performAction('navigateToUrl', home_url);
     await performAction('login');
     await performAction('navigateToUrl', home_url + `/access-your-case`);
     await performAction('accessYourCase', {
       caseNumber: process.env.CASE_NUMBER,
-      defendantFirstName: 'Test',
-      defendantLastName: 'John',
+      defendantFirstName: selectedDefendant.firstName,
+      defendantLastName: selectedDefendant.lastName,
     });
     await page.goto(home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await page.getByRole('button', { name: citizenStartNow.startNowButton }).click();
@@ -280,7 +282,10 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
     await performAction('clickButton', startNow.startNowButton);
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader('Test', 'John'));
+    await performValidation(
+      'mainHeader',
+      defendantNameConfirmation.mainHeader(selectedDefendant.firstName, selectedDefendant.lastName)
+    );
     await performValidation('radioButtonChecked', defendantNameConfirmation.noRadioOption, false);
   });
 });
