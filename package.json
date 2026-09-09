@@ -59,7 +59,7 @@
   "dependencies": {
     "@azure/monitor-opentelemetry": "1.19.0",
     "@hmcts-cft/cft-ui-component-lib": "0.1.0-alpha.4",
-    "@hmcts-cft/docweave": "0.1.0-alpha.4",
+    "@hmcts-cft/docweave": "0.1.0-alpha.5",
     "@hmcts/info-provider": "1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
     "@hmcts/properties-volume": "1.4.1",
@@ -185,8 +185,7 @@
     "js-yaml": "^5.0.0",
     "protobufjs": "^8.0.0",
     "semver": "^7.5.2",
-    "uuid": "14.0.2",
-    "@hmcts-cft/docweave": "portal:../dtsse-ccd-config-generator/frontend/docweave"
+    "uuid": "14.0.2"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix",
