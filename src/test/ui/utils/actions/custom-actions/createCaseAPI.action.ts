@@ -13,7 +13,6 @@ import {
 import { getCaseApiData } from '../../../data/api-data/getCase.api.data';
 import { paymentApiData } from '../../../data/api-data/payment.api.data';
 import { user } from '../../../data/user-data';
-import { logApiFailure, pollApi } from '../../common/apiRetry.utils';
 import { performAction } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -35,28 +34,37 @@ export class CreateCaseAPIAction implements IAction {
 
   private async createCaseAPI(caseData: actionData): Promise<void> {
     const createCaseApi = Axios.create(createCaseEventTokenApiData.createCaseApiInstance());
-    const createCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
-
-    const createResponse = await pollApi(
-      async () => {
+    const maxRetries = actionRetries;
+    const delayMs = VERY_SHORT_TIMEOUT;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
         const tokenResponse = await createCaseApi.get(createCaseEventTokenApiData.createCaseEventTokenApiEndPoint);
-        return createCaseApi.post(createCaseApiData.createCaseApiEndPoint, {
+        if (tokenResponse.status !== 200) {
+          throw new Error('Failed to get create case token');
+        }
+        const CREATE_EVENT_TOKEN = tokenResponse.data.token;
+        const createCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
+        const createResponse = await createCaseApi.post(createCaseApiData.createCaseApiEndPoint, {
           data: createCasePayloadData,
           event: { id: createCaseApiData.createCaseEventName },
-          event_token: tokenResponse.data.token,
+          event_token: CREATE_EVENT_TOKEN,
         });
-      },
-      {
-        description: `POST ${createCaseApiData.createCaseApiEndPoint} (create case)`,
-        isReady: response => response.status === 200 || response.status === 201,
-        describeNotReady: response => `Last observed status: ${response?.status ?? 'UNKNOWN'}`,
-        maxAttempts: actionRetries,
+        if (createResponse.status === 200 || createResponse.status === 201) {
+          process.env.CASE_NUMBER = createResponse.data.id;
+          process.env.CASE_FID = createResponse.data.id.replace(/(.{4})(?=.)/g, '$1 ');
+          return;
+        }
+      } catch (error: unknown) {
+        if (attempt === maxRetries) {
+          if (Axios.isAxiosError(error)) {
+            throw error;
+          }
+          throw new Error('Create case failed unexpectedly.');
+        }
       }
-    );
-
-    const caseId = String(createResponse.data.id);
-    process.env.CASE_NUMBER = caseId;
-    process.env.CASE_FID = caseId.replace(/(.{4})(?=.)/g, '$1 ');
+      await new Promise(res => setTimeout(res, delayMs));
+    }
+    throw new Error('Create case API failed after multiple retries');
   }
 
   private async getCaseAPI(): Promise<void> {
@@ -64,10 +72,7 @@ export class CreateCaseAPIAction implements IAction {
 
     //process.env.CREATE_EVENT_TOKEN = (await getCaseApi.get(createCaseEventTokenApiData.createCaseEventTokenApiEndPoint)).data.token;
     try {
-      const createResponse = await pollApi(() => getCaseApi.get(getCaseApiData.getCaseApiEndPoint()), {
-        description: `GET ${getCaseApiData.getCaseApiEndPoint()} (read case)`,
-        maxAttempts: actionRetries,
-      });
+      const createResponse = await getCaseApi.get(getCaseApiData.getCaseApiEndPoint());
       await this.generateSolicitorAccessToken();
       const allDefendants = createResponse.data.data.allDefendants;
       const defendantIds = allDefendants.map((d: any) => d.id);
@@ -83,13 +88,22 @@ export class CreateCaseAPIAction implements IAction {
       console.log(`\n✅ GET DEFENDANT ID SUCCESSFUL : STATUS ${createResponse.status}`);
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
-        logApiFailure('getCaseAPI', error);
+        const status = error.response?.status;
+        const responseBody = error.response?.data;
+
+        console.error('=== ERROR RESPONSE ===');
+        console.error('HTTP Status:', status);
+        console.error('Exception:', responseBody?.exception);
+        console.error('Error:', responseBody?.error);
+        console.error('Message:', responseBody?.message);
+        console.error('Path:', responseBody?.path);
+        console.error('Timestamp:', responseBody?.timestamp);
+        console.error('Full response body:', JSON.stringify(responseBody, null, 2));
+
         throw error;
       }
 
-      throw error instanceof Error
-        ? error
-        : new Error(`Defendant id not retrieved due to an unexpected error: ${String(error)}`);
+      throw new Error('Defendant id not retrieved due to an unexpected error.');
     }
   }
 
@@ -107,24 +121,35 @@ export class CreateCaseAPIAction implements IAction {
 
   private async submitCaseAPI(caseData: actionData): Promise<void> {
     const submitCaseApi = Axios.create(submitCaseEventTokenApiData.createCaseApiInstance());
-    const submitCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
-
-    await pollApi(
-      async () => {
+    const maxRetries = actionRetries;
+    const delayMs = VERY_SHORT_TIMEOUT;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
         const tokenResponse = await submitCaseApi.get(submitCaseEventTokenApiData.submitCaseEventTokenApiEndPoint());
-        return submitCaseApi.post(submitCaseApiData.submitCaseApiEndPoint(), {
+        if (tokenResponse.status !== 200) {
+          throw new Error('Failed to get submit token');
+        }
+        const SUBMIT_EVENT_TOKEN = tokenResponse.data.token;
+        const submitCasePayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
+        const response = await submitCaseApi.post(submitCaseApiData.submitCaseApiEndPoint(), {
           data: submitCasePayloadData,
           event: { id: submitCaseApiData.submitCaseEventName },
-          event_token: tokenResponse.data.token,
+          event_token: SUBMIT_EVENT_TOKEN,
         });
-      },
-      {
-        description: `POST ${submitCaseApiData.submitCaseApiEndPoint()} (submit case)`,
-        isReady: response => response.status === 200 || response.status === 201,
-        describeNotReady: response => `Last observed status: ${response?.status ?? 'UNKNOWN'}`,
-        maxAttempts: actionRetries,
+        if (response.status === 200 || response.status === 201) {
+          return;
+        }
+      } catch (error: unknown) {
+        if (attempt === maxRetries) {
+          if (Axios.isAxiosError(error)) {
+            throw error;
+          }
+          throw new Error('Submit case failed unexpectedly.');
+        }
       }
-    );
+      await new Promise(res => setTimeout(res, delayMs));
+    }
+    throw new Error('Submit case API failed after multiple retries');
   }
 
   private async updatePaymentAPI(): Promise<void> {

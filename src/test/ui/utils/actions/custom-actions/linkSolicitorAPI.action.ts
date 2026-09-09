@@ -7,7 +7,6 @@ import { createCaseEventTokenApiData } from '../../../data/api-data';
 import { getCaseApiData } from '../../../data/api-data/getCase.api.data';
 import { linkSolicitorTokenApiData } from '../../../data/api-data/linkSolicitorEventToken.api.data';
 import { user } from '../../../data/user-data';
-import { pollApi } from '../../common/apiRetry.utils';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 type DefendantCollectionItem = {
@@ -60,10 +59,7 @@ export class LinkSolicitorAPIAction implements IAction {
   private async getCase() {
     const getCaseApi = Axios.create(createCaseEventTokenApiData.createCaseApiInstance());
     try {
-      return await pollApi(() => getCaseApi.get(getCaseApiData.getCaseApiEndPoint()), {
-        description: `GET ${getCaseApiData.getCaseApiEndPoint()} (read case for defendant ids)`,
-        maxAttempts: actionRetries,
-      });
+      return await getCaseApi.get(getCaseApiData.getCaseApiEndPoint());
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
         const status = error.response?.status;
@@ -86,7 +82,7 @@ export class LinkSolicitorAPIAction implements IAction {
         );
       }
 
-      throw new Error(`Defendant id not retrieved: ${error instanceof Error ? error.message : 'unexpected error.'}`);
+      throw new Error('Defendant id not retrieved due to an unexpected error.');
     }
   }
 

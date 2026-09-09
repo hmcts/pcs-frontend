@@ -10,7 +10,6 @@ import {
   validateAccessCodeApiData,
 } from '../../../data/api-data';
 import { getCaseApiData } from '../../../data/api-data/getCase.api.data';
-import { pollApi } from '../../common/apiRetry.utils';
 import { IAction } from '../../interfaces';
 
 export type PinUser = {
@@ -98,23 +97,26 @@ export async function getPinUserAt(index: number, timeoutMs = 5000): Promise<Pin
   return pinUsers[index] as PinUser;
 }
 
-function readCaseState(response: { data?: { state?: unknown } } | undefined): string {
-  return String(response?.data?.state ?? '')
-    .trim()
-    .toUpperCase();
-}
-
 async function waitUntilCaseIssued(): Promise<void> {
   const getCaseApi = Axios.create(createCaseEventTokenApiData.createCaseApiInstance());
+  const maxRetries = actionRetries;
+  const delayMs = SHORT_TIMEOUT;
+  let caseStatus = '';
 
-  await pollApi(() => getCaseApi.get(getCaseApiData.getCaseApiEndPoint()), {
-    description: `GET ${getCaseApiData.getCaseApiEndPoint()} (wait for CASE_ISSUED)`,
-    isReady: response => readCaseState(response) === 'CASE_ISSUED',
-    describeNotReady: response => `Case is not ISSUED. Last observed status: ${readCaseState(response) || 'UNKNOWN'}`,
-    maxAttempts: actionRetries,
-    initialDelayMs: SHORT_TIMEOUT,
-    maxDelayMs: SHORT_TIMEOUT,
-  });
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const response = await getCaseApi.get(getCaseApiData.getCaseApiEndPoint());
+    caseStatus = String(response?.data?.state).trim().toUpperCase();
+
+    if (caseStatus === 'CASE_ISSUED') {
+      return;
+    }
+
+    if (attempt === maxRetries) {
+      throw new Error(`Case is not ISSUED. Last observed status: ${caseStatus || 'UNKNOWN'}`);
+    }
+
+    await new Promise(res => setTimeout(res, delayMs));
+  }
 }
 
 export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
@@ -134,38 +136,40 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
     const fetchPinsApi = Axios.create(fetchPINsApiData.fetchPINSApiInstance());
     await waitUntilCaseIssued();
 
-    const response = await pollApi(() => fetchPinsApi.get(fetchPINsApiData.fetchPINsApiEndPoint()), {
-      description: `GET ${fetchPINsApiData.fetchPINsApiEndPoint()} (fetch PINs)`,
-      isReady: pinsResponse => Object.keys(pinsResponse.data ?? {}).length > 0,
-      describeNotReady: () => 'PINs were not generated once case reached CASE_ISSUED.',
-      maxAttempts: actionRetries,
-      initialDelayMs: SHORT_TIMEOUT,
-      maxDelayMs: SHORT_TIMEOUT,
-    });
-
-    pins = Object.keys(response.data);
-    pinUsers = pins.map(pin => {
-      const pinData = response.data[pin];
-      const addressObj = pinData.address;
-      let formattedAddress = '';
-      if (addressObj) {
-        const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode } = addressObj;
-        formattedAddress = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode]
-          .filter(value => value && typeof value === 'string' && value.trim() !== '')
-          .join(', ');
+    const maxRetries = actionRetries;
+    const delayMs = SHORT_TIMEOUT;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      const response = await fetchPinsApi.get(fetchPINsApiData.fetchPINsApiEndPoint());
+      const fetchedPins = Object.keys(response.data);
+      if (fetchedPins.length > 0) {
+        pins = fetchedPins;
+        pinUsers = pins.map(pin => {
+          const pinData = response.data[pin];
+          const addressObj = pinData.address;
+          let formattedAddress = '';
+          if (addressObj) {
+            const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode } = addressObj;
+            formattedAddress = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode]
+              .filter(value => value && typeof value === 'string' && value.trim() !== '')
+              .join(', ');
+          }
+          return {
+            pin,
+            nameKnown:
+              typeof pinData.nameKnown === 'string'
+                ? pinData.nameKnown === 'YES'
+                : Boolean(pinData.firstName || pinData.lastName),
+            firstName: pinData.firstName,
+            lastName: pinData.lastName,
+            address: formattedAddress,
+          };
+        });
+        getDefaultPinUser();
+        return;
       }
-      return {
-        pin,
-        nameKnown:
-          typeof pinData.nameKnown === 'string'
-            ? pinData.nameKnown === 'YES'
-            : Boolean(pinData.firstName || pinData.lastName),
-        firstName: pinData.firstName,
-        lastName: pinData.lastName,
-        address: formattedAddress,
-      };
-    });
-    getDefaultPinUser();
+      await new Promise(res => setTimeout(res, delayMs));
+    }
+    throw new Error('PINs were not generated after multiple retries once case reached CASE_ISSUED');
   }
 
   private async validateAccessCodeAPI(): Promise<void> {
@@ -189,12 +193,26 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
     if (!accessCode) {
       throw new Error('No access code available for validation');
     }
-    await pollApi(() => validateApi.post(validateAccessCodeApiData.validateAccessCodeApiEndPoint(), { accessCode }), {
-      description: `POST ${validateAccessCodeApiData.validateAccessCodeApiEndPoint()} (validate access code)`,
-      isReady: response => response.status === 200,
-      describeNotReady: response => `Last observed status: ${response?.status ?? 'UNKNOWN'}`,
-      maxAttempts: actionRetries,
-      initialDelayMs: VERY_SHORT_TIMEOUT,
-    });
+    const maxRetries = actionRetries;
+    const delayMs = VERY_SHORT_TIMEOUT;
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const response = await validateApi.post(validateAccessCodeApiData.validateAccessCodeApiEndPoint(), {
+          accessCode,
+        });
+        if (response.status === 200) {
+          return;
+        }
+      } catch (error: unknown) {
+        if (attempt === maxRetries) {
+          if (Axios.isAxiosError(error)) {
+            throw error;
+          }
+          throw new Error('Validate access code failed unexpectedly after retries.');
+        }
+      }
+      await new Promise(res => setTimeout(res, delayMs));
+    }
+    throw new Error('Validate access code API failed after multiple retries');
   }
 }
