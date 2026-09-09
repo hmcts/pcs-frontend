@@ -187,7 +187,7 @@ export async function openPage(html: string): Promise<Page> {
   }
   return {
     form,
-    orderText: () => buildOrderDocument(form).toText(),
+    orderText: () => buildOrderDocument(form).textContent,
     body: () => {
       const body = new URLSearchParams();
       new FormData(form).forEach((value, name) => body.append(name, String(value)));
