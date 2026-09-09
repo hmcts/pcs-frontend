@@ -19,6 +19,7 @@ describe('make an order: outright possession', () => {
   it('is only available to judges', async () => {
     app = await bootApp({ judge: false });
     expect((await app.get(PAGE)).status).toBe(404);
+    expect((await app.get('/docweave/templates')).status).toBe(404);
   });
 
   it('is launched from the Manage Case event link', async () => {
@@ -57,6 +58,13 @@ describe('make an order: outright possession', () => {
     typeDate('outright-mj-inst-date', '8', '10', '2026');
     check('costs', 'yes');
     check('costs-choice', 'def-pay-cl-fixed');
+
+    // A costs order with no amount is not ready for review.
+    const incomplete = page.body();
+    incomplete.set('action', 'SUBMIT_FOR_REVIEW');
+    const rejected = await app.post(PAGE, incomplete);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Enter a valid costs amount');
     type('costs-def-pay-cl-fixed-amount', '300');
 
     expect(page.orderText()).toBe(
