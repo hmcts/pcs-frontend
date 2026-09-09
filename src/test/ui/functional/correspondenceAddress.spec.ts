@@ -93,6 +93,10 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       correspondenceAddress.enterUKPostcodeHiddenTextLabel,
       correspondenceAddress.englandPostcodeTextInput
     );
+    // Below lines are added to by pass the bug HDPI-8779, once the bug is fixed, these lines can be removed till 99line code
+    await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, '');
+    await performAction('inputText', correspondenceAddress.townOrCityHiddenTextLabel, '');
+    await performAction('inputText', correspondenceAddress.postcodeHiddenTextLabel, '');
     await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     await performAction('inputErrorValidation', {
