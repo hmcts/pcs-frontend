@@ -20,6 +20,6 @@ module.exports = {
     '^@services/(.*)$': '<rootDir>/src/main/services/$1',
     '^@utils/(.*)$': '<rootDir>/src/main/utils/$1',
   },
-  // jose ships ESM only; compile it rather than mock it.
-  transformIgnorePatterns: ['node_modules/(?!(jose)/)'],
+  // These dependencies ship ESM only; compile them rather than mock them.
+  transformIgnorePatterns: ['node_modules/(?!(jose|@hmcts-cft/docweave)/)'],
 };
