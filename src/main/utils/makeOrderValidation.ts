@@ -161,7 +161,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
     date('outright-use-occupation-from-date', 'Enter a valid start date for use and occupation');
   }
 
-  return issues;
+  return [...issues, ...validateCosts(formData, false)];
 }
 
 function validateAdjournment(formData: Record<string, unknown>): MakeOrderValidationIssue[] {

@@ -97,6 +97,7 @@ export async function bootApp(options: { judge?: boolean } = {}): Promise<TestAp
     { http: httpService },
     { default: makeOrderRoutes },
     { default: decentralisedEventRoutes },
+    { default: docweaveTemplateRoutes },
     { setupErrorHandlers },
     middleware,
   ] = await Promise.all([
@@ -104,6 +105,7 @@ export async function bootApp(options: { judge?: boolean } = {}): Promise<TestAp
     import('../../main/modules/http'),
     import('../../main/routes/makeOrder'),
     import('../../main/routes/decentralisedEvent'),
+    import('../../main/routes/docweaveTemplates'),
     import('../../main/modules/error-handler'),
     import('../../main/middleware'),
   ]);
@@ -127,6 +129,7 @@ export async function bootApp(options: { judge?: boolean } = {}): Promise<TestAp
   app.param('caseReference', middleware.caseReferenceParamMiddleware);
   makeOrderRoutes(app);
   decentralisedEventRoutes(app);
+  docweaveTemplateRoutes(app);
   setupErrorHandlers(app, 'test');
   const server = await listen(app);
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
