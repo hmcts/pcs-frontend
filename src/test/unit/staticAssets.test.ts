@@ -11,6 +11,7 @@ import {
   REVALIDATE_CACHE_CONTROL,
   buildAssetHandler,
   isFingerprintedAsset,
+  setupStaticAssets,
 } from '../../main/staticAssets';
 
 interface RawResponse {
@@ -61,22 +62,18 @@ describe('isFingerprintedAsset', () => {
     expect(isFingerprintedAsset(filePath)).toBe(false);
   });
 
-  it('matches the names the production build actually emits', () => {
-    const publicDir = path.join(__dirname, '../../main/public');
-    if (!fs.existsSync(publicDir)) {
-      return;
-    }
+  it('matches the govuk-frontend asset names the build copies into public', () => {
+    const govukAssets = path.join(path.dirname(require.resolve('govuk-frontend')), 'assets');
 
-    const bundles = fs.readdirSync(publicDir).filter(name => /^main\..+\.(js|css)$/.test(name));
-    expect(bundles.length).toBeGreaterThan(0);
-    bundles.forEach(name => expect(isFingerprintedAsset(name)).toBe(true));
-
-    const fontsDir = path.join(publicDir, 'assets/fonts');
-    const fonts = fs.existsSync(fontsDir) ? fs.readdirSync(fontsDir) : [];
+    const fonts = fs.readdirSync(path.join(govukAssets, 'fonts'));
     expect(fonts.length).toBeGreaterThan(0);
     fonts.forEach(name => expect(isFingerprintedAsset(name)).toBe(true));
 
-    expect(isFingerprintedAsset('assets/manifest.json')).toBe(false);
+    const images = fs.readdirSync(path.join(govukAssets, 'images'));
+    expect(images.length).toBeGreaterThan(0);
+    images.forEach(name => expect(isFingerprintedAsset(name)).toBe(false));
+
+    expect(isFingerprintedAsset('manifest.json')).toBe(false);
   });
 });
 
@@ -177,5 +174,58 @@ describe('static asset serving', () => {
 
     expect(page.headers['set-cookie']).toStrictEqual(['pcs_session=abc; Path=/']);
     expect(sessionCalls).toStrictEqual(['/page']);
+  });
+});
+
+describe('setupStaticAssets', () => {
+  let server: http.Server;
+  let port: number;
+  let downstreamCalls: string[];
+
+  beforeAll(async () => {
+    downstreamCalls = [];
+    const app = express();
+    setupStaticAssets(app);
+    app.use((req, res, next) => {
+      downstreamCalls.push(req.path);
+      res.setHeader('Set-Cookie', 'pcs_session=abc; Path=/');
+      next();
+    });
+    app.get('/page', (_req, res) => res.send('page'));
+
+    server = await new Promise<http.Server>(resolve => {
+      const created = app.listen(0, () => resolve(created));
+    });
+    port = (server.address() as { port: number }).port;
+  });
+
+  afterAll(async () => {
+    await new Promise(resolve => server.close(resolve));
+  });
+
+  it('serves the cft component lib stylesheet with revalidating cache headers', async () => {
+    const res = await request(port, '/assets/ui-component-lib/ui-component-lib.css');
+
+    expect(res.status).toBe(200);
+    expect(res.headers['content-type']).toContain('text/css');
+    expect(Number(res.headers['content-length'])).toBeGreaterThan(0);
+    expect(res.headers['cache-control']).toBe(REVALIDATE_CACHE_CONTROL);
+    expect(res.headers['x-content-type-options']).toBe('nosniff');
+    expect(res.headers['set-cookie']).toBeUndefined();
+  });
+
+  it('does not cache the un-fingerprinted cft fonts immutably', async () => {
+    const res = await request(port, '/assets/ui-component-lib/fonts/gds-transport-bold.woff2');
+
+    expect(res.status).toBe(200);
+    expect(res.headers['cache-control']).toBe(REVALIDATE_CACHE_CONTROL);
+  });
+
+  it('falls through to the application when the asset does not exist', async () => {
+    const res = await request(port, '/page');
+
+    expect(res.status).toBe(200);
+    expect(res.body.toString()).toBe('page');
+    expect(downstreamCalls).toStrictEqual(['/page']);
   });
 });

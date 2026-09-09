@@ -2,6 +2,9 @@ import type { Express, RequestHandler } from 'express';
 
 const mountedBy: string[] = [];
 
+jest.mock('serve-favicon', () => () => (_req: unknown, _res: unknown, next: () => void) => next());
+jest.mock('../../main/development', () => ({ setupDev: jest.fn() }));
+
 jest.mock('../../main/staticAssets', () => ({
   setupStaticAssets: (app: Express) => {
     app.use(((_req, _res, next) => next()) as RequestHandler);
