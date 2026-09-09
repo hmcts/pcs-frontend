@@ -13,6 +13,7 @@ import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValida
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
+import { resolveIdamPassword } from '../utils/idamPassword';
 
 const home_url = process.env.TEST_URL;
 
@@ -41,8 +42,11 @@ async function validateSolicitorCannotAccessCase(
 
 async function validateCitizenCannotAccessCase(page: Page, context: BrowserContext): Promise<void> {
   await clearBrowserSession(page, context);
-  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('login');
+  await page.goto(home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+  await page.getByLabel('Email address').fill(process.env.IDAM_PCS_USER_EMAIL as string);
+  await page.getByLabel('Password').fill(resolveIdamPassword());
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.waitForLoadState();
   await performValidation('mainHeader', 'You do not have access to this page');
 }
 
@@ -245,14 +249,20 @@ test.describe('Legal representative organisation access after Notice of Change @
     page,
     context,
   }) => {
-    await performAction('createUser', 'citizen', ['citizen']);
-    await performAction('validateAccessCodeAPI');
+    const selectedDefendant = submitCaseApiData.submitCasePayload.defendant1;
 
-    await clearBrowserSession(page, context);
+    await performAction('createUser', 'citizen', ['citizen']);
     await performAction('navigateToUrl', home_url);
     await performAction('login');
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-    await performAction('clickButton', citizenStartNow.startNowButton);
+    await performAction('navigateToUrl', home_url + `/access-your-case`);
+    await performAction('accessYourCase', {
+      caseNumber: process.env.CASE_NUMBER,
+      defendantFirstName: selectedDefendant.firstName,
+      defendantLastName: selectedDefendant.lastName,
+    });
+    await page.goto(home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+    await page.getByRole('button', { name: citizenStartNow.startNowButton }).click();
+    await page.waitForLoadState();
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -272,7 +282,10 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
     await performAction('clickButton', startNow.startNowButton);
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader('Test', 'John'));
+    await performValidation(
+      'mainHeader',
+      defendantNameConfirmation.mainHeader(selectedDefendant.firstName, selectedDefendant.lastName)
+    );
     await performValidation('radioButtonChecked', defendantNameConfirmation.noRadioOption, false);
   });
 });

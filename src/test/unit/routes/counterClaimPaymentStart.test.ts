@@ -329,6 +329,33 @@ describe('counter-claim-pba-payment/start route', () => {
     expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-payment-successful');
   });
 
+  it('rejects a path-manipulated case reference through safeRedirect303 instead of redirecting to it', async () => {
+    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    mockStartPbaPaymentRequest.mockResolvedValue({
+      paymentReference: 'RC-PBA-123',
+      status: 'Success',
+    });
+
+    const req = {
+      params: { caseReference: '../..' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+          customerReference: 'CUST-001',
+          pbaAccount: 'PBA1234567',
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(mockLogger.warn).toHaveBeenCalledWith('safeRedirect303: Prefix not allowed', expect.anything());
+    expect(res.redirect).not.toHaveBeenCalledWith(303, '/case/../../respond-to-claim/counter-claim-payment-successful');
+  });
+
   it('redirects to payment failed page when PBA payment status is unsuccessful', async () => {
     const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
     mockGetPaymentOutcome.mockReturnValue('failure');
