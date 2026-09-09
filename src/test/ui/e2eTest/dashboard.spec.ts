@@ -185,7 +185,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
   });
 
-  test('Validate notification and response status @crossbrowser', async () => {
+  test('Validate notification and response status @crossbrowser', async ({ page }) => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
     await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
@@ -233,8 +233,19 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
     );
-    await new Promise(resolve => setTimeout(resolve, 5000));
-    await performAction('reloadPage');
+    for (let i = 0; i < 12; i++) {
+      await performAction('reloadPage');
+      const respondedNotification = page.locator('p.govuk-body', {
+        hasText: String(dashboard.respondedToClaimParagraph),
+      });
+      if (await respondedNotification.isVisible().catch(() => false)) {
+        break;
+      }
+      if (i === 11) {
+        throw new Error(`Notification "${dashboard.respondedToClaimParagraph}" was not visible after 60 seconds`);
+      }
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
     await performAction('verifyRespondToClaimNotificationAndTag', {
       notificationText: dashboard.respondedToClaimParagraph,
       respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,

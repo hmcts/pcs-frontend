@@ -20,6 +20,7 @@ dependencies {
 }
 
 tasks.register('fortifyScan', JavaExec) {
+  workingDir = file('../../..')
   mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
