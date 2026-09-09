@@ -53,6 +53,7 @@ async function validateCitizenCannotAccessCase(page: Page, context: BrowserConte
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
   await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-lr-enabled');
+  await performAction('resetRTCAnswerStore');
 
   const isSingleDefendantTest = testInfo.title.includes('@singleDefendant');
   const isMixedOrganisationTest = testInfo.title.includes('@mixedOrganisation');
