@@ -35,6 +35,7 @@
     "**/codecept.conf.ts",
     "**/__mocks__/*",
     "src/test/ui/**/*",
+    "src/test/unit/ui-utils/**/*",
     "src/test/functional/**/*",
     "src/test/contract/**/*",
     "src/test/java/**/*",
