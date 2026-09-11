@@ -5601,17 +5601,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"allure-js-commons@npm:3.12.0":
-  version: 3.12.0
-  resolution: "allure-js-commons@npm:3.12.0"
+"allure-js-commons@npm:3.12.1":
+  version: 3.12.1
+  resolution: "allure-js-commons@npm:3.12.1"
   dependencies:
     md5: "npm:^2.3.0"
   peerDependencies:
-    allure-playwright: 3.12.0
+    allure-playwright: 3.12.1
   peerDependenciesMeta:
     allure-playwright:
       optional: true
-  checksum: 10/5ba9c4b9ee79c96e5fbe57d4efd11aab3333aea28414be3002a58b5a0e845e6b8334f90e45933c29e68a067dac482a84f835d7c2445fc441361acc63419b4b3f
+  checksum: 10/7b5eb56dc325bd10dbd647c7b36ab0c492bca64356785ee16be2f413fbbb0e8021cad5072ed81cea3c46b488a18272bb7ef9c2e0c820a724641b0c22d37096f3
   languageName: node
   linkType: hard
 
@@ -9140,17 +9140,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-fs-backend@npm:2.6.7":
-  version: 2.6.7
-  resolution: "i18next-fs-backend@npm:2.6.7"
-  checksum: 10/9d449c880f2e617cbb1534b2478210ded4e501557c9cee81d44c150bfc0a41470e68fd7539c82f71cd313dd17071bdd34165f14853bcce0b643d0d233bc4a509
+"i18next-fs-backend@npm:2.6.8":
+  version: 2.6.8
+  resolution: "i18next-fs-backend@npm:2.6.8"
+  checksum: 10/cf9b44fef8b6b49435e16b5396d32b2725f86d32dc5149de553f3dbd442038090d2353f69414e891464b722ac8dddc1304bb6f9e1aa7e40da1856dab7e161176
   languageName: node
   linkType: hard
 
-"i18next-http-middleware@npm:3.9.8":
-  version: 3.9.8
-  resolution: "i18next-http-middleware@npm:3.9.8"
-  checksum: 10/0d7d1cac9e5dcbc04ee5b2b1927acb83096f2082d0cb1cf8926df8f9164f20f90213fdb745b3fbf0ce496892ef97cc776cf660849eaecae0ddffb17eb27abf86
+"i18next-http-middleware@npm:3.9.9":
+  version: 3.9.9
+  resolution: "i18next-http-middleware@npm:3.9.9"
+  checksum: 10/cf7328df38d9e1825bbaf34275ca670473806f7229dc270a54aa87296ef0e66b909b8b299358439a15ebb8ba98be5009810b8fddd3f43b8df98caca6a75094f4
   languageName: node
   linkType: hard
 
@@ -12078,7 +12078,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:8.69.0"
     "@typescript-eslint/parser": "npm:8.69.0"
     allure-commandline: "npm:2.43.0"
-    allure-js-commons: "npm:3.12.0"
+    allure-js-commons: "npm:3.12.1"
     allure-playwright: "npm:3.11.1"
     axios: "npm:1.20.0"
     body-parser: "npm:2.3.0"
@@ -12108,8 +12108,8 @@ __metadata:
     http-terminator: "npm:3.2.0"
     husky: "npm:9.1.7"
     i18next: "npm:26.4.2"
-    i18next-fs-backend: "npm:2.6.7"
-    i18next-http-middleware: "npm:3.9.8"
+    i18next-fs-backend: "npm:2.6.8"
+    i18next-http-middleware: "npm:3.9.9"
     ioredis: "npm:6.0.0"
     jest: "npm:30.5.1"
     jest-environment-jsdom: "npm:30.5.1"
