@@ -13,4 +13,5 @@ export const counterclaimYouNeedToApplyForHelpWithYourFees = {
   helpWithFeesLink: `enter it here`,
   feedbackLink: `feedback`,
   pageSlug: `counter-claim-you-need-to-apply-for-help-with-your-fees`,
+  signOutLink: `Sign out`,
 };

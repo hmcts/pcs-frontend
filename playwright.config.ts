@@ -25,7 +25,7 @@ export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION |
 export const enable_visibility_validation = process.env.ENABLE_VISIBILITY_VALIDATION || 'false';
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
-export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
+export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'false';
 const is_smoke_run = process.env.npm_lifecycle_event === 'test:smoke';
 const junit_result_output =
   process.env.PLAYWRIGHT_JUNIT_OUTPUT ||

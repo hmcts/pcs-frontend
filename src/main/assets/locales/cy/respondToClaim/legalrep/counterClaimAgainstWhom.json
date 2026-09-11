@@ -1,10 +1,10 @@
 {
   "pageTitle": "Yn erbyn pwy mae'r gwrth-hawliad",
-  "checkboxHint": "cySelect all that apply",
-  "heading": "cyWho is the defendant making a counterclaim against?",
+  "checkboxHint": "Dewiswch bob un sy'n berthnasol",
+  "heading": "Pwy mae'r diffynnydd yn gwneud gwrth-hawliad yn erbyn? ",
   "errors": {
     "counterClaimAgainst": {
-      "required": "cySelect who the defendant is making a counterclaim against"
+      "required": "Dewiswch pwy mae'r diffynnydd yn gwneud gwrth-hawliad yn erbyn"
     }
   }
 }
