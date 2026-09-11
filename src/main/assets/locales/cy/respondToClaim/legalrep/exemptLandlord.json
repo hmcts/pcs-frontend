@@ -1,13 +1,13 @@
 {
-  "pageTitle": "cyExempt landlord",
-  "introParagraph1": "cyUnder the Housing (Wales) Act 2014, most private landlords must be registered and licensed. Registered community landlords are exempt from requirements to be registered and licensed.",
-  "introParagraph2": "cyYou can check if the landlord is registered by searching",
-  "publicRegisterLinkText": "cyRent Smart Wales’ Public Register (opens in new tab)",
-  "question": "cyIs the landlord an exempt landlord under Part 1 of the Housing (Wales) Act 2014?",
+  "pageTitle": "Landlord wedi'i eithrio",
+  "introParagraph1": "O dan Deddf Tai (Cymru) 2014, mae'n rhaid i'r rhan fwyaf o landlordiaid preifat fod wedi eu cofrestru a'u trwyddedu. Mae landlordiaid cymunedol cofrestredig wedi eu heithrio o ofynion i fod wedi'u cofrestru a'u trwyddedu.",
+  "introParagraph2": "Gallwch wirio a yw'r landlord yn gofrestredig drwy chwilio",
+  "publicRegisterLinkText": "Cofrestr Gyhoeddus Rhentu Doeth Cymru",
+  "question": "A yw'r landlord yn landlord wedi'i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
   "errors": {
-    "exemptLandlord": "cySelect whether the landlord is an exempt landlord under Part 1 of the Housing (Wales) Act 2014"
+    "exemptLandlord": "Dewiswch a yw'r landlord yn landlord wedi'i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014"
   },
   "options": {
-    "imNotSure": "cyDefendant is not sure"
+    "imNotSure": "Diffynnydd ddim yn siŵr"
   }
 }
