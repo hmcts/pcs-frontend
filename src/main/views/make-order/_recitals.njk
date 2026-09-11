@@ -1,0 +1,5 @@
+{% import "make-order/_compact.njk" as compact with context %}
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>
+
+{{ compact.reveal("recitals", "Recitals", compact.textarea("recitals-text", { name: "recital", label: "Recital paragraphs" })) }}

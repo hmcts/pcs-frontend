@@ -1,0 +1,143 @@
+{% import "make-order/_compact.njk" as compact with context %}
+
+<h3 class="govuk-heading-m">Adjournment</h3>
+
+{#
+  Each listing option carries its own date on the same row as its radio, so a judge
+  can fill the date in one movement rather than selecting an option and then moving
+  to a shared field. Typing in a row selects that row's radio (initOptionRows in
+  make-order.ts), and only the selected option's date is read into the order.
+  Hidden legends keep every control named for assistive technology.
+#}
+{% macro whenRow(id, value, text, checked, extraHtml) %}
+  <div class="pcs-option-row" data-option-row>
+    <div class="govuk-radios__item pcs-option-row__choice">
+      <input class="govuk-radios__input" id="{{ id }}" name="adj-when" type="radio" value="{{ value }}"{% if checked %} checked{% endif %}>
+      <label class="govuk-label govuk-radios__label" for="{{ id }}">{{ text }}</label>
+    </div>
+    <div class="pcs-option-row__fields">
+      {{ compact.date({ id: "adj-hearing-date-" + value, legend: text, legendHidden: true }) }}
+      {{ extraHtml | safe if extraHtml }}
+    </div>
+  </div>
+{% endmacro %}
+
+{# Only a specific date has a time; the other options are listed by the court. #}
+{% set specificTimeHtml %}
+  {{ compact.text("adj-specific-time", {
+    label: "Time of hearing",
+    hint: "For example, 10:30am",
+    classes: "govuk-input--width-5",
+    formGroupClasses: "pcs-option-row__time",
+    spellcheck: false
+  }) }}
+{% endset %}
+
+{% set furtherHearingHtml %}
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset" role="group">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Adjourned for further hearing conditions</legend>
+      <div class="govuk-radios govuk-radios--small pcs-option-rows">
+        {{ whenRow("adj-when", "next-list", "Adjourned to next available possession list after",
+          draftChecked("adj-when", "next-list") or not draftValue("adj-when")) }}
+        {{ whenRow("adj-when-2", "next-date", "Adjourned to next available date (non-possession list) after",
+          draftChecked("adj-when", "next-date")) }}
+        {{ whenRow("adj-when-3", "specific", "Adjourned to specific date",
+          draftChecked("adj-when", "specific"), specificTimeHtml) }}
+      </div>
+    </fieldset>
+  </div>
+
+  <div id="adj-time-estimate-group" class="govuk-form-group pcs-section-break">
+    <fieldset class="govuk-fieldset" role="group">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Time estimate</legend>
+      {% call compact.row() %}
+        {{ compact.text("adj-time-estimate", {
+          label: "Length",
+          labelHidden: true,
+          classes: "govuk-input--width-3",
+          spellcheck: false,
+          inputmode: "numeric"
+        }) }}
+        {{ compact.select("adj-time-estimate-unit", {
+          label: "Unit",
+          labelHidden: true,
+          items: [{ value: "minutes", text: "Minutes" }, { value: "hours", text: "Hours" }],
+          default: "minutes"
+        }) }}
+      {% endcall %}
+    </fieldset>
+  </div>
+
+  <div id="adj-format-group" class="pcs-section-break">
+    {{ compact.checkboxes("adj-format", {
+      legend: "Hearing format",
+      default: "in-person",
+      items: [
+        { value: "in-person", text: "In person" },
+        { value: "video", text: "Video hearing" },
+        { value: "telephone", text: "Telephone" }
+      ]
+    }) }}
+  </div>
+
+  {% set directionItems = [] %}
+  {% for direction in [
+    { value: "defence", text: "The defendant must send a defence" },
+    { value: "counterclaim", text: "The defendant must send a defence and any counterclaim" },
+    { value: "claimant-reply", text: "The claimant must send a defence to the counterclaim and any reply" }
+  ] %}
+    {% set directionItems = directionItems.concat([{
+      value: direction.value,
+      text: direction.text,
+      conditional: { html: compact.date({ id: "adj-" + direction.value + "-date", legend: "By 4pm on" }) }
+    }]) %}
+  {% endfor %}
+  {{ compact.checkboxes("adj-directions", {
+    legend: "Directions",
+    classes: "pcs-divided-options",
+    formGroup: { classes: "pcs-section-break" },
+    items: directionItems
+  }) }}
+{% endset %}
+
+{% macro paymentFields(option, amountLabel, instalments=true) %}
+  {% set prefix = "adj-gen-" + option %}
+  {% call compact.row() %}
+    {{ compact.money({ id: prefix + "-amount", label: amountLabel }) }}
+    {% if instalments %}
+      {{ compact.select(prefix + "-frequency", { label: "How often", items: compact.paymentFrequencies, default: "monthly" }) }}
+    {% endif %}
+    {{ compact.date({ id: prefix + "-date", legend: "First payment by" if instalments else "Payment by" }) }}
+  {% endcall %}
+{% endmacro %}
+
+{% set generallyHtml %}
+  {{ compact.checkboxes("adj-gen", {
+    legend: "Conditions",
+    classes: "pcs-divided-options",
+    items: [
+      {
+        value: "current-rent-plus",
+        text: "On payment of current rent plus an additional sum",
+        conditional: { html: paymentFields("current-rent-plus", "Additional sum") }
+      },
+      { value: "payments", text: "On regular payments", conditional: { html: paymentFields("payments", "Payments of") } },
+      { value: "oneoff", text: "On a single payment", conditional: { html: paymentFields("oneoff", "Payment of", false) } },
+      {
+        value: "restore",
+        text: "Automatically struck out unless an application to restore is made",
+        conditional: { html: compact.date({ id: "adj-gen-restore-date", legend: "Application to restore by" }) }
+      }
+    ]
+  }) }}
+{% endset %}
+
+{{ compact.radios("adj-type", {
+  legend: "Adjournment type",
+  classes: "govuk-radios--small pcs-inline-radios",
+  items: [
+    { value: "further-hearing", text: "Adjourned for further hearing", conditional: { html: furtherHearingHtml } },
+    { value: "generally", text: "Adjourned generally", conditional: { html: generallyHtml } }
+  ]
+}) }}
