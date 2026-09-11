@@ -105,6 +105,12 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       inputArray: correspondenceAddress.errorValidationField.errorTextField3,
       header: correspondenceAddress.errorValidationHeader,
     });
+    await performAction(
+      'inputText',
+      correspondenceAddress.enterUKPostcodeHiddenTextLabel,
+      correspondenceAddress.englandPostcodeTextInput
+    );
+    await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
     await performAction('select', correspondenceAddress.addressSelectHiddenLabel, correspondenceAddress.addressIndex);
     await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, '');
     await performAction('inputText', correspondenceAddress.townOrCityHiddenTextLabel, '');
