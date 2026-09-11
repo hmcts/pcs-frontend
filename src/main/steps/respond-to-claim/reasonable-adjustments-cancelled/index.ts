@@ -3,7 +3,6 @@ import type { Request } from 'express';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { redirectToPcq } from '@services/pcq/redirectToPcq';
 
 // Shown when the citizen cancelled in the microsite (payload action = 'cancel')
 
@@ -17,13 +16,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     heading: 'heading',
     continueButton: 'continueButton',
   },
-  // Cancelling Your Support leads to PCQ
-  beforeRedirect: async (req: Request) => {
-    await redirectToPcq(req);
-  },
-  // "Continue" returns the citizen to their response journey at language-used.
-  resolveRedirectAfterPost: async req => {
+  // Shown when the citizen cancelled / made no changes in the microsite (payload action = 'cancel').
+  extendGetContent: (req: Request) => {
     const caseReference = req.res?.locals.validatedCase?.id;
-    return caseReference ? `/case/${caseReference}/respond-to-claim/language-used?nav=1` : undefined;
+    return { taskListUrl: `/case/${caseReference}/respond-to-claim/task-list` };
   },
 });
