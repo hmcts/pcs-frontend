@@ -498,6 +498,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
@@ -506,8 +510,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
 
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
 
@@ -567,7 +569,9 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
 
     await softErrorMessageValidation('contactPreferencesTextMessage', contactPreferencesTextMessageErrorValidation);
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.noRadioOption);
+    await performAction('selectContactByTextMessage', {
+      radioOption: contactPreferencesTextMessage.noRadioOption,
+    });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
@@ -739,6 +743,10 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
 
+    await performAction('taskList', { subSection: taskList.yourSupportLink });
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
@@ -747,8 +755,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
 
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
 
