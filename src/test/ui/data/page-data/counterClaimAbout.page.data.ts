@@ -14,5 +14,5 @@ export const counterClaimAbout = {
   counterClaimForInput: `services not provided`,
   reasonsForCounterClaimInput: `electricity and windows not repaired`,
   feedbackLink: `feedback (opens in new tab)`,
-  pageSlug: `counter-claim-against-whom`,
+  pageSlug: `counter-claim-about`,
 };
