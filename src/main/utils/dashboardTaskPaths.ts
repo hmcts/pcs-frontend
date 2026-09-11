@@ -17,6 +17,7 @@ export const DASHBOARD_TASK_PATH_PATTERNS: Readonly<Record<string, string>> = {
   ViewClaim: VIEW_THE_CLAIM_ROUTE,
   RespondToClaim: `${RESPOND_TO_CLAIM_ROUTE}/task-list`,
   ViewResponse: VIEW_RESPONSE_ROUTE,
+  YourSupport: `${RESPOND_TO_CLAIM_ROUTE}/reasonable-adjustments-triage`,
   ViewHearingDocuments: VIEW_HEARING_DOCUMENTS_ROUTE,
   ViewOrdersAndNotices: VIEW_ORDERS_AND_NOTICES_ROUTE,
   ViewAllApplications: VIEW_ALL_APPLICATIONS_ROUTE,
@@ -24,6 +25,8 @@ export const DASHBOARD_TASK_PATH_PATTERNS: Readonly<Record<string, string>> = {
 };
 
 export const RESPOND_TO_CLAIM_DASHBOARD_TASK_TEMPLATE_ID = 'RespondToClaim';
+
+export const YOUR_SUPPORT_DASHBOARD_TASK_TEMPLATE_ID = 'YourSupport';
 
 export const RESPOND_TO_CLAIM_DASHBOARD_NOTIFICATION_TEMPLATE_IDS = [
   'Defendant.ResponseToClaim',
