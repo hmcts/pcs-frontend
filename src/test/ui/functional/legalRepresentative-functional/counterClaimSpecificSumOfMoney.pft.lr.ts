@@ -28,7 +28,7 @@ export async function counterClaimSpecificSumOfMoneyErrorValidation(): Promise<v
 
   await performAction(
     'inputText',
-    counterClaimSpecificSumOfMoney.enterHowMuchYouAreClaimingErrorMessage,
+    counterClaimSpecificSumOfMoney.howMuchIsTheDefendantHiddenQuestion,
     counterClaimSpecificSumOfMoney.negativeInput
   );
   await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
