@@ -26,6 +26,33 @@ const makeReq = (): Request =>
     res: { locals: { validatedCase: { id: '123', data: {} } } },
   }) as unknown as Request;
 
+describe('buildDraftDefendantResponse — pcqId carry-forward', () => {
+  const reqWith = (possessionClaimResponse: Record<string, unknown>): Request =>
+    ({
+      path: '/case/123/respond-to-claim/free-legal-advice',
+      body: {},
+      res: { locals: { validatedCase: { id: '123', data: { possessionClaimResponse } } } },
+    }) as unknown as Request;
+
+  it('carries an existing pcqId onto every subsequent save', () => {
+    // The backend REPLACEs the defendant slice on each save, so an id dropped here would be wiped
+    // the next time the citizen moves through the journey — and at final submit, which reads this
+    // same draft. The party object is deep-cloned wholesale, so this comes for free.
+    const result = buildDraftDefendantResponse(
+      reqWith({ defendantContactDetails: { party: { firstName: 'Ada', pcqId: 'pcq-abc-123' } } })
+    );
+
+    expect(result.defendantContactDetails.party.pcqId).toBe('pcq-abc-123');
+    expect(result.defendantContactDetails.party.firstName).toBe('Ada');
+  });
+
+  it('does not invent a pcqId when the draft has none', () => {
+    const result = buildDraftDefendantResponse(reqWith({}));
+
+    expect(result.defendantContactDetails.party.pcqId).toBeUndefined();
+  });
+});
+
 describe('saveDraftDefendantResponse wrapper', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -226,5 +253,44 @@ describe('buildDraftDefendantResponse — any mid-section submission auto-clears
     ]);
     const draft = buildDraftDefendantResponse(req);
     expect(draft.defendantResponses.completedSections).toEqual(['PERSONAL_DETAILS', 'PAYMENTS']);
+  });
+});
+
+describe('buildDraftDefendantResponse — carries reasonable-adjustment flags forward', () => {
+  const reqWithFlags = (defendantFlags?: unknown): Request =>
+    ({
+      path: '/case/123/respond-to-claim/task-list',
+      body: {},
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { possessionNoticeReceived: 'YES' },
+                ...(defendantFlags ? { defendantFlags } : {}),
+              },
+            },
+          },
+        },
+      },
+    }) as unknown as Request;
+
+  it('re-sends existing defendantFlags so a later REPLACE-style save does not wipe them', () => {
+    const defendantFlags = {
+      partyName: 'John Doe',
+      roleOnCase: 'Defendant',
+      details: [{ id: 'd1', value: { flagCode: 'RA0042', path: [{ id: 'p1', value: 'Reasonable adjustment' }] } }],
+    };
+
+    const draft = buildDraftDefendantResponse(reqWithFlags(defendantFlags));
+
+    expect(draft.defendantFlags).toEqual(defendantFlags);
+    // deep clone, not the same reference
+    expect(draft.defendantFlags).not.toBe(defendantFlags);
+  });
+
+  it('omits defendantFlags entirely when there are none in the existing draft', () => {
+    const draft = buildDraftDefendantResponse(reqWithFlags());
+    expect('defendantFlags' in draft).toBe(false);
   });
 });

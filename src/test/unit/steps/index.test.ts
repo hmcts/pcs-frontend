@@ -82,6 +82,13 @@ describe('findStep', () => {
     expect(step?.name).toBe('counter-claim');
   });
 
+  it('falls back to default variant when legalrep variant is not defined for a journey', () => {
+    const step = findStep('upload-additional-documents', 'upload-your-documents', 'legalrep');
+
+    expect(step).toBeDefined();
+    expect(step?.name).toBe('upload-your-documents');
+  });
+
   it('returns undefined when slug is known but stepName is unknown', () => {
     expect(findStep('respond-to-claim', 'this-step-does-not-exist', 'default')).toBeUndefined();
   });

@@ -1,0 +1,17 @@
+{
+  "pageTitle": "Cyfeiriad e-bost y diffynnydd",
+  "heading": "Cyfeiriad e-bost y diffynnydd",
+  "emailConfirmationLabel": "Ydych chi'n gwybod cyfeiriad e-bost y diffynnydd?",
+  "options": {
+    "yes": "Ydy",
+    "noOption": "Nac ydy"
+  },
+  "emailLabel": "Rhowch gyfeiriad e-bost y diffynnydd",
+  "errors": {
+    "emailConfirmation": "Dewiswch a ydych chi'n gwybod cyfeiriad e-bost y diffynnydd",
+    "emailAddress": {
+      "required": "Rhowch gyfeiriad e-bost y diffynnydd",
+      "invalid": "Rhowch gyfeiriad e-bost yn y fformat cywir, er enghraifft enw@enghraifft.com"
+    }
+  }
+}

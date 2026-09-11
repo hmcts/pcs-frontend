@@ -244,6 +244,39 @@ describe('componentBuilders', () => {
       });
     });
 
+    describe('select field', () => {
+      it('should build select component with translated options and selected value', () => {
+        const field: FormFieldConfig = {
+          name: 'pbaAccount',
+          type: 'select',
+          options: [{ value: '' }, { value: 'PBA1234567' }],
+        };
+
+        const result = buildComponentConfig(
+          buildArgs(field, {
+            label: 'PBA account',
+            fieldValue: 'PBA1234567',
+            translatedOptions: [
+              { value: '', text: 'Select a PBA account' },
+              { value: 'PBA1234567', text: 'PBA1234567' },
+            ],
+          })
+        );
+
+        expect(result.componentType).toBe('select');
+        expect(result.component).toMatchObject({
+          id: 'pbaAccount',
+          name: 'pbaAccount',
+          label: { text: 'PBA account' },
+          value: 'PBA1234567',
+          items: [
+            { value: '', text: 'Select a PBA account', selected: false },
+            { value: 'PBA1234567', text: 'PBA1234567', selected: true },
+          ],
+        });
+      });
+    });
+
     it('passes hintClasses onto the GOV.UK hint object for text inputs', () => {
       const field: FormFieldConfig = {
         name: 'amount',

@@ -1,4 +1,5 @@
 {
+  "pageTitle": "Notice details",
   "hintText": "",
   "question": "Did {{claimantName}} give the defendant notice of their intention to begin possession proceedings?",
   "options": {
@@ -7,6 +8,7 @@
     "imNotSure": "Defendant is not sure"
   },
 
+  "insetText": "When they made their claim, {{claimantName}} had to provide a copy of the notice they served on the defendant.",
   "noticeDateLabel": "When did the defendant receive notice from {{claimantName}}? (Optional)",
   "noticeDateHint": "For example, 16 4 2021",
   "errors": {

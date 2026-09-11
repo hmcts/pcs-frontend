@@ -1,0 +1,35 @@
+{
+  "pageTitle": "Check your answers",
+  "cardTitle": "Personal details",
+  "rows": {
+    "defendantNameConfirmation": {
+      "label": "Is the defendant’s name {{defendantName}}?",
+      "changeHidden": "name"
+    },
+    "defendantName": {
+      "label": "Name",
+      "changeHidden": "corrected name"
+    },
+    "defendantNameCapture": {
+      "label": "What is your client’s name?",
+      "changeHidden": "name"
+    },
+    "dateOfBirth": {
+      "label": "Defendant’s date of birth",
+      "changeHidden": "date of birth"
+    },
+    "correspondenceAddressConfirmation": {
+      "label": "Is the defendant’s postal address {{address}}?",
+      "fallbackLabel": "What’s your postal address?",
+      "changeHidden": "postal address"
+    },
+    "emailConfirmation": {
+      "label": "Do you know the defendant’s email address?",
+      "changeHidden": "whether you know the defendant’s email address"
+    },
+    "emailAddress": {
+      "label": "Defendant’s email address",
+      "changeHidden": "defendant’s email address"
+    }
+  }
+}

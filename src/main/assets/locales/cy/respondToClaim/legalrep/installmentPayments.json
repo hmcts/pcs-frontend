@@ -1,16 +1,16 @@
 {
-  "pageTitle": "cyInstalment payments",
-  "heading": "cyInstalment payments",
-  "question": "cyWould the defendant like to offer to pay off their arrears in instalments?",
+  "pageTitle": "Taliadau mewn rhandaliadau",
+  "heading": "Taliadau mewn rhandaliadau",
+  "question": "A hoffai'r diffynnydd gynnig talu ôl-ddyledion mewn rhandaliadau?",
   "paragraph1": "",
   "paragraph2": "",
   "paragraph3": "",
   "paragraph4": "",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy"
+    "yes": "Byddai",
+    "no": "Na fyddai"
   },
   "errors": {
-    "confirmInstallmentOffer": "cySelect whether the defendant would like to offer to pay off their arrears in instalments"
+    "confirmInstallmentOffer": "Dewiswch a hoffai'r diffynnydd gynnig talu eu hôl-ddyledion mewn rhandaliadau"
   }
 }

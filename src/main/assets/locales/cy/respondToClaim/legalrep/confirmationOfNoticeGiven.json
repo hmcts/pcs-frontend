@@ -1,25 +1,26 @@
 {
   "pageTitle": "Manylion yr hysbysiad",
-  "question": "cyDid {{claimantName}} give the defendant notice of their intention to begin possession proceedings?",
+  "question": "A wnaeth {{claimantName}} hysbysu'r diffynnydd am eu bwriad i ddechrau achos meddiannu?",
   "hintText": "",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
-    "imNotSure": "cyDefendant is not sure"
+    "yes": "Do",
+    "no": "Naddo",
+    "imNotSure": "Diffynnydd ddim yn siŵr"
   },
+  "insetText": "cyWhen they made their claim, {{claimantName}} had to provide a copy of the notice they served on the defendant.",
   "noticeDateLabel": "cyWhen did the defendant receive notice from {{claimantName}}? (Optional)",
   "noticeDateHint": "Er enghraifft, 16 4 2021",
   "errors": {
-    "possessionNoticeReceived": "cySelect if {{claimantName}} gave the defendant notice of their intention to begin possession proceedings",
+    "possessionNoticeReceived": "Dewiswch a wnaeth {{claimantName}} hysbysu'r diffynnydd am eu bwriad i ddechrau achos meddiannu",
     "date": {
       "day": "Diwrnod",
       "month": "Mis",
       "year": "Blwyddyn",
-      "required": "cyThe date must include a day, month and year",
-      "notRealDate": "cyThe date must be a real date",
-      "futureDate": "cyThe date must be in the past",
-      "missingOne": "cyThe date must include a {{missingField}}",
-      "missingTwo": "cyThe date must include a {{first}} and {{second}}"
+      "required": "Rhaid i’r dyddiad gynnwys diwrnod, mis a blwyddyn",
+      "notRealDate": "Rhaid i'r dyddiad fod yn ddyddiad go iawn",
+      "futureDate": "Rhaid i'r dyddiad fod yn y gorffennol",
+      "missingOne": "Rhaid i'r dyddiad gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i'r dyddiad gynnwys {{first}} a {{second}}"
     }
   }
 }

@@ -1,9 +1,11 @@
+import config from 'config';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import {
   RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY,
+  buildStatementOfTruthPayload,
   getEndOfJourneyCyaSubmitErrorPath,
   submitRespondToClaimResponse,
 } from '../../utils/respondToClaimFinalSubmit';
@@ -12,10 +14,11 @@ import { sectionIdToBackendEnum } from '../sections.config';
 
 import { buildEndOfJourneyCyaSections } from './buildEndOfJourneyCyaRows';
 
-import { getTranslationFunction } from '@modules/steps';
+import { getTranslationFunction, loadStepNamespaces } from '@modules/steps';
 import { buildErrorSummary } from '@modules/steps/formBuilder/errorUtils';
 import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { getDashboardUrl } from '@routes/dashboard';
 
 const STEP_NAME = 'end-of-journey-cya';
 
@@ -36,7 +39,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     {
       name: 'statementOfTruthContempt',
       type: 'checkbox',
-      required: true,
+      required: (_formData, _allData, req) => req?.res?.locals.isLegalRepresentative !== true,
       errorMessage: 'errors.statementOfTruthContempt',
       translationKey: { label: 'statementOfTruth.contemptFieldLabel' },
       legendClasses: 'govuk-visually-hidden',
@@ -59,34 +62,71 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       errorMessage: 'errors.fullName',
       translationKey: { label: 'statementOfTruth.fullNameLabel' },
     },
+    {
+      name: 'nameOfFirm',
+      type: 'text',
+      required: (_formData, _allData, req) => req?.res?.locals.isLegalRepresentative === true,
+      maxLength: 100,
+      errorMessage: 'errors.nameOfFirm',
+      translationKey: { label: 'statementOfTruth.nameOfFirmLabel' },
+    },
+    {
+      name: 'positionHeld',
+      type: 'text',
+      required: (_formData, _allData, req) => req?.res?.locals.isLegalRepresentative === true,
+      maxLength: 100,
+      errorMessage: 'errors.positionHeld',
+      translationKey: { label: 'statementOfTruth.positionHeldLabel' },
+    },
   ],
   getInitialFormData: (req: Request) => {
     const sot = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.statementOfTruth;
     const accepted = sot?.accepted === 'YES';
     const fullName = sot?.fullName;
+    const nameOfFirm = sot?.nameOfFirm;
+    const positionHeld = sot?.positionHeld;
     return {
       ...(accepted ? { statementOfTruthContempt: ['yes'], statementOfTruthBelief: ['yes'] } : {}),
       ...(fullName ? { fullName } : {}),
+      ...(nameOfFirm ? { nameOfFirm } : {}),
+      ...(positionHeld ? { positionHeld } : {}),
     };
   },
-  extendGetContent: async (req: Request) => {
-    await req.i18n?.loadNamespaces([
-      'respondToClaim/checkYourAnswersStartNowAndDetails',
-      'respondToClaim/checkYourAnswersPersonalDetails',
-      'respondToClaim/checkYourAnswersYourResponse',
-      'respondToClaim/checkYourAnswersPaymentsAndAgreements',
-      'respondToClaim/checkYourAnswersYourCircumstances',
-      'respondToClaim/checkYourAnswersIncomeAndExpenses',
-      'respondToClaim/checkYourAnswersDocuments',
-      'respondToClaim/checkYourAnswers',
-    ]);
+  extendGetContent: async (req: Request, _formContent) => {
+    await loadStepNamespaces(
+      req,
+      [
+        'checkYourAnswersStartNowAndDetails',
+        'checkYourAnswersPersonalDetails',
+        'checkYourAnswersYourResponse',
+        'checkYourAnswersPaymentsAndAgreements',
+        'checkYourAnswersYourCircumstances',
+        'checkYourAnswersIncomeAndExpenses',
+        'checkYourAnswersDocuments',
+        'checkYourAnswers',
+      ],
+      'respondToClaim'
+    );
     const t: TFunction = getTranslationFunction(req, ['common']);
     const sections = buildEndOfJourneyCyaSections(req, t);
     const status = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.status;
     const submitDisabled = status === 'SUBMITTED';
+    const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
+
+    const caseId = req.res?.locals.validatedCase?.id;
+    let dashboardUrl = getDashboardUrl(caseId);
+
+    if (isLegalRepresentative && caseId) {
+      const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
+        ? config.get<string>('redirects.manageCaseReturnURL')
+        : null;
+      if (caseDetailsBaseUrl) {
+        dashboardUrl = `${caseDetailsBaseUrl}/${caseId}`;
+      }
+    }
 
     if (req.query.submitError !== 'failed') {
-      return { sections, submitDisabled };
+      return { sections, submitDisabled, isLegalRepresentative, dashboardUrl };
     }
 
     const tError = getTranslationFunction(req, ['respondToClaim/checkYourAnswers', 'common']);
@@ -98,18 +138,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const errorSummary = buildErrorSummary({ submitResponse: message }, submitResponseErrorFields, tError);
 
-    return { sections, submitDisabled, ...(errorSummary ? { errorSummary } : {}) };
+    return { sections, submitDisabled, isLegalRepresentative, dashboardUrl, ...(errorSummary ? { errorSummary } : {}) };
   },
   beforeRedirect: async (req: Request) => {
     const draft = buildDraftDefendantResponse(req);
+    const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
 
-    const contempt = req.body?.statementOfTruthContempt as string[] | undefined;
-    const belief = req.body?.statementOfTruthBelief as string[] | undefined;
-    const bothAccepted = contempt?.includes('yes') && belief?.includes('yes');
-    draft.defendantResponses.statementOfTruth = {
-      accepted: bothAccepted ? 'YES' : 'NO',
-      fullName: (req.body?.fullName as string | undefined)?.trim(),
-    };
+    draft.defendantResponses.statementOfTruth = buildStatementOfTruthPayload(req.body, isLegalRepresentative);
 
     const enumValue = sectionIdToBackendEnum('checkYourAnswersAndSubmit');
     const current = draft.defendantResponses.completedSections ?? [];

@@ -1,10 +1,10 @@
 {
   "pageTitle": "Incwm a chostau",
-  "infoParagraph1": "cyDetails about the defendant’s income and expenses can be used by a judge to reach a decision on their case, and also to decide how much they could afford to repay if they have rent arrears.",
-  "infoParagraph2": "cyProviding details about the defendant’s income and expenses is optional.",
-  "infoParagraph3": "cyThe claimant will be able to see the defendant’s answers.",
-  "question": "cyDoes the defendant want to provide details of their income and expenses?",
+  "infoParagraph1": "Gall barnwr ddefnyddio manylion am incwm a chostau'r diffynnydd i ddod i benderfyniad ar eu hachos, a hefyd i benderfynu faint y gallent fforddio ei ad-dalu os oes ganddynt ôl-ddyledion rhent.",
+  "infoParagraph2": "Mae darparu manylion am incwm a threuliau'r diffynnydd yn ddewisol.",
+  "infoParagraph3": "Bydd yr hawlydd yn gallu gweld atebion y diffynnydd.",
+  "question": "Ydy'r diffynnydd eisiau rhoi manylion eu hincwm a threuliau?",
   "errors": {
-    "provideFinanceDetails": "cySelect if the defendant wants to provide details of their income and expenses"
+    "provideFinanceDetails": "Dewiswch a yw'r diffynnydd eisiau rhoi manylion eu hincwm a threuliau"
   }
 }

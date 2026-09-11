@@ -1,4 +1,5 @@
 {
+  "pageTitle": "Ymateb i hawliad",
   "title": "Ymateb i hawliad i feddiannu eiddo ar-lein",
   "saveDraftInfo": "Gallwch gadw eich ymateb fel drafft a dychwelyd ato nes ymlaen. Byddwch yn gallu adolygu a golygu eich atebion cyn eu cyflwyno.",
   "description": "",
@@ -6,6 +7,9 @@
   "uploadDocumentsInfo": "",
   "whatYouWillNeed": "",
   "claimantVisibilityInfo": "Bydd yr hawlydd yn gallu gweld unrhyw ddogfennau fyddwch wedi uwchlwytho a'ch atebion.",
-  "provideDetailsInfo": "cyThis service is also available <a href=\"?lang=en\" class=\"govuk-link language\">in English</a>.",
-  "hmctsSupportInfo": "cyIf you or the defendant need support to use HMCTS services, like step-free access to a court for the hearing, you can request this after you’ve submitted your response."
+  "provideDetailsInfo": "Mae'r gwasanaeth hwn hefyd ar gael <a href=\"?lang=en\" class=\"govuk-link language\">yn Saesneg</a>.",
+  "hmctsSupportInfo": "Os ydych chi neu'r diffynnydd angen cymorth i ddefnyddio gwasanaethau GLlTEF, fel mynediad heb risiau i'r llys ar gyfer eich gwrandawiad, gallwch ofyn am hyn ar ôl cyflwyno eich ymateb.",
+  "buttons": {
+    "startNow": "Dechrau nawr"
+  }
 }

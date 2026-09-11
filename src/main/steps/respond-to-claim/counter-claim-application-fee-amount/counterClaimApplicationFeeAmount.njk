@@ -2,10 +2,14 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
 
 {% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block mainContent %}
+  {% set fieldErrors = validationErrors or {} %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
@@ -32,9 +36,87 @@
     <p class="govuk-error-message">{{ paymentError }}</p>
   {% endif %}
 
-  {{ govukButton({
-    text: payNowButton,
-    href: payNowUrl,
-    disabled: payNowDisabled
-  }) }}
+  {% if isLegalRepresentative %}
+    {# pay button kept outside radio conditionals so it's always visible #}
+    <form
+      method="post"
+      action="{{ url }}"
+      novalidate
+      data-counter-claim-payment-form
+      data-card-payment-url="{{ payNowUrl }}"
+    >
+      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+      {% set pbaAccountHtml %}
+      {{ govukSelect({
+          id: "pbaAccount",
+          name: "paymentOptions.pbaAccount",
+          label: {
+            text: labels.pba
+          },
+          items: pbaAccountItems,
+          value: form.pbaAccounts,
+          errorMessage: {
+            text: fieldErrors['paymentOptions.pbaAccount']
+          } if fieldErrors['paymentOptions.pbaAccount']
+        }) }}
+
+      {{ govukInput({
+          id: 'customerReference',
+          name: 'paymentOptions.customerReference',
+          label: {
+            text: labels.customerReferenceHeading,
+            classes: "govuk-label--m"
+          },
+          hint: {
+            text: labels.customerReferenceHint
+          },
+          errorMessage: {
+            text: fieldErrors['paymentOptions.customerReference']
+          } if fieldErrors['paymentOptions.customerReference']
+        }) }}
+      {% endset -%}
+
+      {% for field in fields %}
+        {% if field.componentType == 'radios' %}
+          {% set updatedItems = [] %}
+
+          {% for item in field.component.items %}
+            {% if item.value == 'pba' %}
+              {% set updatedItems = (updatedItems.push({
+                value: item.value,
+                text: item.text,
+                checked: item.checked,
+                conditional: {
+                  html: pbaAccountHtml
+                }
+              }), updatedItems) %}
+            {% else %}
+              {% set updatedItems = (updatedItems.push(item), updatedItems) %}
+            {% endif %}
+          {% endfor %}
+
+          {{ govukRadios({
+            name: field.component.name,
+            hint: field.component.hint,
+            errorMessage: field.component.errorMessage,
+            items: updatedItems
+          }) }}
+        {% endif %}
+      {% endfor %}
+
+      {{ govukButton({
+        text: payNowButton,
+        disabled: payNowDisabled,
+        preventDoubleClick: true
+      }) }}
+
+    </form>
+  {% else %}
+    {{ govukButton({
+      text: payNowButton,
+      href: payNowUrl,
+      disabled: payNowDisabled
+    }) }}
+  {% endif %}
 {% endblock %}

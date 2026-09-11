@@ -45,10 +45,16 @@ export const flowConfig: JourneyFlowConfig = {
   useSessionFormData: false,
   eventId: 'respondPossessionClaim',
   sections: respondToClaimSections,
-  nonSectionStepOrder: ['end-now', 'task-list'],
+  nonSectionStepOrder: ['end-now', 'task-list', 'reasonable-adjustments-confirmation'],
   // First visible step of any section back-links to this hub step.
   hubStepName: 'task-list',
   steps: {
+    'reasonable-adjustments-error': {
+      preventBack: true,
+    },
+    'reasonable-adjustments-cancelled': {
+      preventBack: true,
+    },
     'ask-your-solicitor-to-respond-to-the-claim': {
       showCondition: (req: Request) =>
         req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor === 'YES',

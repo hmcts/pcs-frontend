@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Response submitted. <br> You must pay the counterclaim fee",
+  "responseSubmittedCounterClaimFeePaymentNeededParagraph1": "We’ve sent you a confirmation email.",
+  "responseSubmittedCounterClaimFeePaymentNeededHeading1": "What to do next",
+  "responseSubmittedCounterClaimFeePaymentNeededListItem1": "<a href='{{counterClaimApplicationFeeAmountUrl}}' class=\"govuk-link\" target=\"_blank\">Pay the counterclaim fee (opens in new tab)</a>. The counterclaim fee must be paid otherwise the counterclaim will not be considered.",
+  "responseSubmittedCounterClaimFeePaymentNeededListItem2": "If you’re representing more than one defendant in this case, you must submit a separate response for each one.",
+  "responseSubmittedCounterClaimFeePaymentNeededListItem3": "Some people need <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"noreferrer noopener\">support to use HMCTS services (opens in new tab)</a>, like step-free access to a court for a hearing. If you or the defendant need support, you should request this now.",
+  "responseSubmittedCounterClaimFeePaymentNeededHeading2": "",
+  "responseSubmittedCounterClaimFeePaymentNeededParagraph2": "",
+  "closeAndReturnToCaseOverview": "Close and return to case overview"
+}

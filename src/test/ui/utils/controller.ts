@@ -138,6 +138,12 @@ async function validatePageIfNavigated(action: string): Promise<void> {
   }
 }
 
+function isPage(actionResult: unknown): actionResult is Page {
+  return (
+    typeof actionResult === 'object' && actionResult !== null && 'locator' in actionResult && 'url' in actionResult
+  );
+}
+
 export async function performAction(
   action: string,
   fieldName?: actionData | actionRecord,
@@ -175,10 +181,13 @@ export async function performAction(
   }`;
 
   await test.step(stepText, async () => {
-    await actionInstance.execute(executor.page, action, fieldName, value);
+    const actionResult = await actionInstance.execute(executor.page, action, fieldName, value);
+    if (isPage(actionResult)) {
+      testExecutor.page = actionResult;
+    }
   });
   await validatePageIfNavigated(action);
-  await attachSauceJourneyStepScreenshot(executor.page);
+  await attachSauceJourneyStepScreenshot(getExecutor().page);
 }
 
 export async function performValidation(

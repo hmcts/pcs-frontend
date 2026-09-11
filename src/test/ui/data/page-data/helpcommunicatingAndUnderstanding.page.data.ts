@@ -1,0 +1,15 @@
+export const helpcommunicatingAndUnderstanding = {
+  mainHeader: `I need help communicating and understanding`,
+  backLink: `Back`,
+  continueButton: `Continue`,
+  cancelLink: `Cancel`,
+  explanationOfCourtOrTribunalAndWhosInTheRoomCheckbox: `Explanation of the court or tribunal and who’s in the room at the hearing`,
+  extraTimeToThinkAndExplainMyselfCheckbox: `Extra time to think and explain myself`,
+  hearingEnhancementSystemCheckbox: `Hearing Enhancement System (Hearing/Induction Loop, Infrared Receiver)`,
+  intermediaryCheckbox: `Intermediary`,
+  needToBeCloseToWhoIsSpeakingCheckbox: `Need to be close to who is speaking`,
+  signLanguageInterpreterCheckbox: `Sign Language Interpreter`,
+  visitToCourtOrTribunalBeforeTheHearingCheckbox: `Visit to court or tribunal before the hearing`,
+  otherCheckbox: `Other`,
+  noHelpCommunicatingAndUnderstandingCheckbox: `I do not need help with communicating and understanding at this time`,
+};
