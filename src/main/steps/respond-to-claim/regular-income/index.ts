@@ -248,6 +248,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'incomeFromJobs',
           translationKey: 'options.incomeFromJobs',
+          subFieldsLegendKey: 'subFieldsLegend.incomeFromJobs',
           subFields: {
             incomeFromJobsAmount: {
               name: 'incomeFromJobsAmount',
@@ -272,8 +273,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.incomeFromJobsFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.incomeFromJobs',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -286,6 +288,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'pension',
           translationKey: 'options.pension',
+          subFieldsLegendKey: 'subFieldsLegend.pension',
           subFields: {
             pensionAmount: {
               name: 'pensionAmount',
@@ -310,8 +313,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.pensionFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.pension',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -324,6 +328,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'universalCredit',
           translationKey: 'options.universalCredit',
+          subFieldsLegendKey: 'subFieldsLegend.universalCredit',
           subFields: {
             universalCreditAmount: {
               name: 'universalCreditAmount',
@@ -348,8 +353,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.universalCreditFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.universalCredit',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -362,6 +368,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'otherBenefits',
           translationKey: 'options.otherBenefits',
+          subFieldsLegendKey: 'subFieldsLegend.otherBenefits',
           subFields: {
             otherBenefitsAmount: {
               name: 'otherBenefitsAmount',
@@ -386,8 +393,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.otherBenefitsFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.otherBenefits',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -400,6 +408,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'moneyFromElsewhere',
           translationKey: 'options.moneyFromElsewhere',
+          subFieldsLegendKey: 'subFieldsLegend.moneyFromElsewhere',
           subFields: {
             moneyFromElsewhereDetails: {
               name: 'moneyFromElsewhereDetails',

@@ -3,11 +3,11 @@
   "caption": "Ymateb i hawliad i feddiannu eiddo",
   "totalQuestion": "Beth yw'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
   "contributionQuestion": "Faint ydych yn ei dalu tuag at eich dyledion blaenoriaeth bob wythnos neu fis?",
-  "frequencyQuestion": "Talu pob:",
+  "frequencyQuestion": "cyHow often do you pay towards your priority debts?",
   "amountHint": "Rhowch y cyfanswm mewn punnoedd a cheiniogau, er enghraifft £148.00 neu £148.50",
   "frequency": {
-    "week": "Wythnos",
-    "month": "Mis"
+    "week": "cyPaid every week",
+    "month": "cyPaid every month"
   },
   "errors": {
     "priorityDebtTotal": "Rhowch y cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth",

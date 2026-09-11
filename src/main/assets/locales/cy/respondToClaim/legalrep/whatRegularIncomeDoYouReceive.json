@@ -13,13 +13,18 @@
   },
   "subFields": {
     "amount": "Cyfanswm a dderbynnir",
-    "frequency": "Derbynnir bob:",
     "moneyFromElsewhereDetailsLabel": "Rhowch fanylion",
     "moneyFromElsewhereDetailsHint": "Rhowch fanylion y ffynonellau eraill o incwm a faint mae'r diffynnydd fel arfer yn ei dderbyn y mis"
   },
+  "frequencyLegend": {
+    "incomeFromJobs": "cyHow often does the defendant receive income from all jobs they do?",
+    "pension": "cyHow often does the defendant receive income from a state or private pension?",
+    "universalCredit": "cyHow often does the defendant receive Universal Credit?",
+    "otherBenefits": "cyHow often does the defendant receive income from other benefits and credits?"
+  },
   "frequency": {
-    "week": "Wythnos",
-    "month": "Mis"
+    "week": "cyReceived every week",
+    "month": "cyReceived every month"
   },
   "errors": {
     "incomeFromJobsAmount": {

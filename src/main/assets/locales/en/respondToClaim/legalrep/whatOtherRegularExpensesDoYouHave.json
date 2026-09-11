@@ -15,12 +15,22 @@
     "otherExpenses": "Other"
   },
   "subFields": {
-    "amount": "Amount paid",
-    "frequency": "Paid every:"
+    "amount": "Amount paid"
+  },
+  "frequencyLegend": {
+    "householdBills": "How often does the defendant pay household bills?",
+    "loanPayments": "How often does the defendant pay loan payments?",
+    "childSpousalMaintenance": "How often does the defendant pay child or spousal maintenance?",
+    "mobilePhone": "How often does the defendant pay for a mobile phone?",
+    "groceryShopping": "How often does the defendant pay for grocery shopping?",
+    "fuelParkingTransport": "How often does the defendant pay for fuel, parking and transport?",
+    "schoolCosts": "How often does the defendant pay school costs?",
+    "clothing": "How often does the defendant pay for clothing?",
+    "otherExpenses": "How often does the defendant pay for other expenses?"
   },
   "frequency": {
-    "week": "Week",
-    "month": "Month"
+    "week": "Paid every week",
+    "month": "Paid every month"
   },
   "errors": {
     "householdBillsAmount": {
