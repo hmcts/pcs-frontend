@@ -166,7 +166,8 @@
   },
   "pdf": {
     "heading": "cyDownload a PDF copy of the response",
-    "linkText": "cyResponse (PDF)"
+    "linkText": "cyResponse (PDF)",
+    "counterclaimLinkText": "cyCounterclaim (PDF)"
   },
   "closeAndReturn": "Cau a dychwelyd i drosolwg o’r achos",
   "accordion": {

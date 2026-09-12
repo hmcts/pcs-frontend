@@ -175,6 +175,7 @@ export interface CcdDefendantParty {
 
 /** Counter-claim data captured across the counterclaim journey screens. */
 export interface CcdCounterClaim {
+  status?: string;
   needHelpWithFees?: YesNoValue;
   appliedForHwf?: YesNoValue;
   hwfReferenceNumber?: string;

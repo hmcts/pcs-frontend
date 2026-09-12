@@ -1034,6 +1034,117 @@ describe('viewTheResponse route', () => {
     expect(next).toHaveBeenCalledWith(serviceError);
   });
 
+  describe('PDF document links', () => {
+    it('should include counterclaim PDF URL when counterclaim exists', async () => {
+      const caseData = buildComprehensiveCaseData();
+      caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'YES';
+      caseData.possessionClaimResponse!.defendantResponses!.counterClaim = {
+        claimType: 'PAYMENT_OR_COMPENSATION',
+        status: 'COUNTER_CLAIM_ISSUED',
+      };
+      caseData.allDocuments = [
+        {
+          id: 'counterclaim-pdf-id',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1',
+            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ];
+
+      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+        id: caseReference,
+        data: caseData,
+      });
+
+      viewTheResponseRoute(app);
+      const handler = getHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        viewTheResponseRequest({
+          caseReference,
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith(
+        'view-the-response',
+        expect.objectContaining({
+          counterclaimPdfUrl: '/case/1234567890123456/view-documents/counterclaim-pdf-id',
+        })
+      );
+    });
+
+    it('should not include counterclaim PDF URL when no counterclaim made', async () => {
+      const caseData = buildComprehensiveCaseData();
+      caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'NO';
+
+      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+        id: caseReference,
+        data: caseData,
+      });
+
+      viewTheResponseRoute(app);
+      const handler = getHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        viewTheResponseRequest({
+          caseReference,
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith(
+        'view-the-response',
+        expect.objectContaining({
+          counterclaimPdfUrl: null,
+        })
+      );
+    });
+
+    it('should not include counterclaim PDF URL when counterclaim is pending (PENDING_COUNTER_CLAIM_ISSUED)', async () => {
+      const caseData = buildComprehensiveCaseData();
+      caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'YES';
+      caseData.possessionClaimResponse!.defendantResponses!.counterClaim = {
+        claimType: 'PAYMENT_OR_COMPENSATION',
+        status: 'PENDING_COUNTER_CLAIM_ISSUED',
+      };
+      caseData.allDocuments = [];
+
+      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+        id: caseReference,
+        data: caseData,
+      });
+
+      viewTheResponseRoute(app);
+      const handler = getHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        viewTheResponseRequest({
+          caseReference,
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith(
+        'view-the-response',
+        expect.objectContaining({
+          counterclaimPdfUrl: null,
+        })
+      );
+    });
+  });
+
   async function renderResponse(data: CcdCaseData) {
     mockCaseById(data);
     viewTheResponseRoute(app);
@@ -1131,7 +1242,7 @@ describe('view-the-response template - response PDF link', () => {
   const templatePath = path.resolve(__dirname, '../../../main/views/view-the-response.njk');
   const templateSource = fs.readFileSync(templatePath, 'utf8');
   const pdfBlockMatch = templateSource.match(
-    /\{%\s*if dateSubmitted\s*%\}[\s\S]*?pdf\.linkText[\s\S]*?\{%\s*endif\s*%\}[\s\S]*?\{%\s*endif\s*%\}/
+    /\{%\s*if dateSubmitted\s*%\}\s*<h2 class="govuk-heading-m">[\s\S]*?pdf\.heading[\s\S]*?<\/h2>\s*<p class="govuk-body">\s*\{%\s*if dateSubmitted and responsePdfUrl\s*%\}[\s\S]*?pdf\.linkText[\s\S]*?\{%\s*endif\s*%\}\s*<\/p>\s*<p class="govuk-body">\s*\{%\s*if counterclaimPdfUrl\s*%\}[\s\S]*?\{%\s*endif\s*%\}\s*<\/p>\s*\{%\s*endif\s*%\}/
   );
 
   const t = (key: string) =>
