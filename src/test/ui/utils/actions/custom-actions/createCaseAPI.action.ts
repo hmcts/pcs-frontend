@@ -2,7 +2,7 @@ import { Page } from '@playwright/test';
 // eslint-disable-next-line import/no-named-as-default
 import Axios from 'axios';
 
-import { VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
+import { SHORT_TIMEOUT, VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
 import {
   caseUserRoleDeletionApiData,
   createCaseApiData,
@@ -24,6 +24,7 @@ export class CreateCaseAPIAction implements IAction {
       ['updatePaymentAPI', () => this.updatePaymentAPI()],
       ['deleteCaseRole', () => this.deleteCaseRole(fieldName)],
       ['getCaseAPI', () => this.getCaseAPI()],
+      ['pollRespondEventTriggerAPI', () => this.pollRespondEventTriggerAPI()],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -168,35 +169,44 @@ export class CreateCaseAPIAction implements IAction {
 
   private async updatePaymentAPI(): Promise<void> {
     const paymentApi = Axios.create(paymentApiData.paymentApiInstance());
-    const maxRetries = actionRetries;
-    const delayMs = VERY_SHORT_TIMEOUT;
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    // Poll until payment information is present and the update is accepted.
+    // 24 attempts x 5 s = 120 s ceiling; the approach merged for the pcs-api suite in pull request 2608.
+    // Nightly 585 on 10 September 2026 exhausted the previous 10 attempt, 1 s window against AAT.
+    const maxPollAttempts = 24;
+    const pollIntervalMs = SHORT_TIMEOUT; // 5 000 ms
+    const startedAt = Date.now();
+    let lastOutcome = 'not attempted';
+
+    for (let attempt = 1; attempt <= maxPollAttempts; attempt++) {
       try {
         const response = await paymentApi.get(paymentApiData.getFeePaymentInfoApiEndPoint());
-        const paymentInfo = response.data;
-        if (!paymentInfo?.length) {
-          throw new Error('No payment information found.');
-        }
-        const requestReference = paymentInfo[0].serviceRequestReference;
-        const updateResponse = await paymentApi.put(
-          paymentApiData.updatePaymentApiEndPoint,
-          paymentApiData.paymentUpdatePayload(requestReference)
-        );
-        if (updateResponse.status === 200 || updateResponse.status === 204) {
-          return;
-        }
-        throw new Error(`Payment update failed with status ${updateResponse.status}`);
-      } catch (error: unknown) {
-        if (attempt === maxRetries) {
-          if (Axios.isAxiosError(error)) {
-            throw new Error(`Payment API failed after retries: ${error.response?.status}`);
+        const paymentInfo: unknown = response.data;
+        if (!Array.isArray(paymentInfo) || paymentInfo.length === 0) {
+          lastOutcome = `payment info empty (HTTP ${response.status})`;
+        } else {
+          const requestReference = (paymentInfo as { serviceRequestReference: string }[])[0].serviceRequestReference;
+          const updateResponse = await paymentApi.put(
+            paymentApiData.updatePaymentApiEndPoint,
+            paymentApiData.paymentUpdatePayload(requestReference)
+          );
+          if (updateResponse.status === 200 || updateResponse.status === 204) {
+            return;
           }
-          throw new Error('Payment API failed unexpectedly after retries.');
+          lastOutcome = `payment update HTTP ${updateResponse.status}`;
         }
-        await new Promise(res => setTimeout(res, delayMs));
+      } catch (error: unknown) {
+        lastOutcome = Axios.isAxiosError(error)
+          ? `HTTP ${error.response?.status ?? 'no response'} from ${error.config?.url ?? 'payment API'}`
+          : `error: ${error instanceof Error ? error.message : String(error)}`;
+      }
+      if (attempt < maxPollAttempts) {
+        await new Promise(res => setTimeout(res, pollIntervalMs));
       }
     }
-    throw new Error('Payment API failed after multiple retries');
+    const elapsed = Math.round((Date.now() - startedAt) / 1000);
+    throw new Error(
+      `Payment API failed after ${maxPollAttempts} attempts over ${elapsed}s; last outcome: ${lastOutcome}`
+    );
   }
 
   private async deleteCaseRole(roleData: actionData): Promise<void> {
@@ -229,5 +239,76 @@ export class CreateCaseAPIAction implements IAction {
         console.warn(`Case user removal failed with status ${status}.`);
       }
     }
+  }
+
+  /**
+   * Polls GET /cases/{caseRef}/event-triggers/respondPossessionClaim until the CCD data store
+   * returns HTTP 200 or the 60-second window (12 attempts x 5 s) elapses.
+   *
+   * This guards against the propagation race documented in the triage of 10 September 2026
+   * (F3): pcs-api's about-to-start authorisation returns 403 when the solicitor link has just
+   * been granted and the role assignment has not yet propagated through CCD's cache. CCD retries
+   * the callback three times over four seconds and returns 502 to the test.
+   *
+   * Non-fatal: logs a warning and returns on timeout so that the subsequent UI step surfaces
+   * the real Playwright error if the trigger is still unavailable.
+   *
+   * Call site (proposed, for the QA team to adopt): after getCaseAPI and before navigateToUrl
+   * in legalRepresentative.spec.ts beforeEach.
+   */
+  private async pollRespondEventTriggerAPI(): Promise<void> {
+    const caseRef = process.env.CASE_NUMBER;
+    const dataStoreBase = process.env.DATA_STORE_URL_BASE;
+    const solicitorToken = process.env.SOLICITOR_ACCESS_TOKEN;
+    const s2sToken = process.env.SERVICE_AUTH_TOKEN;
+
+    if (!caseRef || !dataStoreBase || !solicitorToken || !s2sToken) {
+      console.warn(
+        'pollRespondEventTriggerAPI: one or more required env vars (CASE_NUMBER, DATA_STORE_URL_BASE, ' +
+          'SOLICITOR_ACCESS_TOKEN, SERVICE_AUTH_TOKEN) are not set; skipping poll'
+      );
+      return;
+    }
+
+    const triggerUrl = `/cases/${caseRef}/event-triggers/respondPossessionClaim?ignore-warning=false`;
+    const pollApi = Axios.create({
+      baseURL: dataStoreBase,
+      headers: {
+        Authorization: `Bearer ${solicitorToken}`,
+        ServiceAuthorization: `Bearer ${s2sToken}`,
+        'Content-Type': 'application/json',
+        experimental: 'experimental',
+        Accept: '*/*',
+      },
+    });
+
+    const maxAttempts = 12; // 12 x 5 s = 60 s ceiling
+    const intervalMs = SHORT_TIMEOUT; // 5 000 ms
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const res = await pollApi.get(triggerUrl);
+        if (res.status === 200) {
+          console.log(
+            `\n✅ pollRespondEventTriggerAPI: respondPossessionClaim trigger ready after ${attempt} attempt(s)`
+          );
+          return;
+        }
+      } catch (error: unknown) {
+        const status = Axios.isAxiosError(error) ? error.response?.status : undefined;
+        console.warn(
+          `pollRespondEventTriggerAPI: attempt ${attempt}/${maxAttempts}: status ${status ?? 'no response'}`
+        );
+      }
+
+      if (attempt < maxAttempts) {
+        await new Promise(res => setTimeout(res, intervalMs));
+      }
+    }
+
+    console.warn(
+      'pollRespondEventTriggerAPI: respondPossessionClaim trigger not ready after 60 s; ' +
+        'continuing so that the UI step surfaces the real error'
+    );
   }
 }
