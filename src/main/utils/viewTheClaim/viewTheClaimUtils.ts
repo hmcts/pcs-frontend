@@ -79,16 +79,18 @@ export interface ViewTheClaimCopy {
   personsUnknown: string;
   addressUnknown: string;
   locale: string;
+  rankedDefendantNumbering: boolean;
 }
 
 export function buildViewTheClaimPageData(
   caseReference: string,
   caseData: CcdCaseData,
   t: TFunction,
-  language?: string
+  language?: string,
+  rankedDefendantNumbering = false
 ): ViewTheClaimPageData {
   const locale = toDateLocale(language);
-  const copy = createViewTheClaimCopy(t, locale);
+  const copy = createViewTheClaimCopy(t, locale, rankedDefendantNumbering);
   const data = caseData as UnknownRecord;
   const documents = extractCaseDocuments(data);
   const propertyAddress = data.propertyAddress;
@@ -143,7 +145,7 @@ export function buildViewTheClaimPageData(
   };
 }
 
-function createViewTheClaimCopy(t: TFunction, locale: string): ViewTheClaimCopy {
+function createViewTheClaimCopy(t: TFunction, locale: string, rankedDefendantNumbering: boolean): ViewTheClaimCopy {
   return {
     section: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:sections.${key}`, options),
     label: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:labels.${key}`, options),
@@ -151,6 +153,7 @@ function createViewTheClaimCopy(t: TFunction, locale: string): ViewTheClaimCopy 
     personsUnknown: t('viewTheClaim:personsUnknown'),
     addressUnknown: t('viewTheClaim:addressUnknown'),
     locale,
+    rankedDefendantNumbering,
   };
 }
 
@@ -388,7 +391,7 @@ export function additionalDefendantName(
   index: number,
   copy: ViewTheClaimCopy
 ): string {
-  if (!defendant || Object.keys(defendant).length === 0) {
+  if (!defendant || Object.keys(defendant).every(key => key === 'rank')) {
     return copy.personsUnknown;
   }
 

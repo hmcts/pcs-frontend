@@ -28,9 +28,7 @@ import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
 import { findCaseDocumentById } from '@utils/documentUtils';
-import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
-import { RELEASE_1_2_ENABLED } from '@utils/respondToClaimFlags';
 
 const logger = Logger.getLogger('viewTheResponse');
 
@@ -237,7 +235,11 @@ function resolveClaimantName(caseData: CcdCaseData): string {
   return new CcdCaseModel({ id: '', data: caseData }).claimantName;
 }
 
-function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildDefendant1Details(
+  t: TFunction,
+  caseData: CcdCaseData,
+  rankedDefendantNumbering: boolean
+): TitledSummarySection {
   const rows: SummaryRow[] = [];
   const party: CcdDefendantParty | undefined = caseData.possessionClaimResponse?.defendantContactDetails?.party;
   const responses = caseData.possessionClaimResponse?.defendantResponses;
@@ -255,7 +257,20 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
   if (!addressUnknown) {
     pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
   }
-  return { rows };
+
+  return { rows, sectionTitle: defendantSectionTitle(t, caseData, rankedDefendantNumbering) };
+}
+
+function defendantSectionTitle(t: TFunction, caseData: CcdCaseData, rankedDefendantNumbering: boolean): string {
+  if (!rankedDefendantNumbering) {
+    return t('viewTheResponse:sections.defendant1Details');
+  }
+
+  const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
+  const currentDefendant = (caseData.allDefendants ?? []).find(defendant => defendant.id === currentDefendantPartyId);
+  const rank = typeof currentDefendant?.value.rank === 'number' ? currentDefendant.value.rank : undefined;
+
+  return t('viewTheResponse:sections.rankedDefendantDetails', { number: rank });
 }
 
 function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): TitledSummarySection[] {
@@ -632,12 +647,11 @@ export default function viewTheResponseRoutes(app: Application): void {
       const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
       const completedBy = responses?.statementOfTruthCompletedBy;
-      const responsePdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_2_ENABLED, false);
 
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
-        defendant1Details: buildDefendant1Details(t, caseData),
-        additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData),
+        defendant1Details: buildDefendant1Details(t, caseData, release12Enabled),
+        additionalDefendantDetails: release12Enabled ? [] : buildAdditionalDefendantDetails(t, caseData),
         responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord),
         paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
@@ -658,7 +672,7 @@ export default function viewTheResponseRoutes(app: Application): void {
         ...sections,
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
-        responsePdfUrl: responsePdfEnabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
+        responsePdfUrl: release12Enabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
       });
     } catch (e) {
       logger.error(`Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`);
