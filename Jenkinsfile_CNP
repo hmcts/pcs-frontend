@@ -43,6 +43,7 @@ withPipeline(type, product, component) {
   env.XUI_BASE_URI = "https://manage-case.aat.platform.hmcts.net"
   env.REDIRECTS_MANAGE_CASE_RETURN_URL = "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
   env.CASE_TYPE_ID = "PCS"
+  env.RTC_UPLOAD_FILES = 'NO'
   onPR() {
     env.ENABLE_AXE_AUDIT = 'false'
     env.E2E_TEST_SCOPE = '@sanity'
