@@ -34,7 +34,8 @@ withPipeline(type, product, component) {
   def githubApi = new GithubAPI(this)
   loadVaultSecrets(secrets)
 
-  syncBranchesWithMaster(['ithc', 'perftest'])
+  //disabling sync with demo/perftest during SIT testing/DB migration
+  syncBranchesWithMaster(['ithc'])
 
   env.NODE_CONFIG_ENV = 'test'
   env.PCS_API_URL = "http://pcs-api-aat.service.core-compute-aat.internal"
