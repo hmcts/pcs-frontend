@@ -30,10 +30,8 @@ export class RespondToClaimFinalSubmitError extends Error {
   }
 }
 
-/** Error code pcs-api puts at the front of its callback error when the draft changed after review (HDPI-8866 W05). */
 export const DRAFT_CHANGED_ERROR_CODE = 'DRAFT_CHANGED';
 
-/** The stored draft moved on after the review page rendered: nothing was persisted, review and consent again. */
 export class RespondToClaimDraftChangedError extends Error {
   constructor(message = 'Draft changed after review') {
     super(message);
@@ -45,10 +43,7 @@ export function getEndOfJourneyCyaDraftChangedPath(caseId: string): string {
   return `/case/${caseId}/respond-to-claim/end-of-journey-cya?draftChanged=1`;
 }
 
-/**
- * True for the draft-changed rejection whichever layer surfaced it: our own typed error, an HTTPError built by
- * ccdCaseService from the mid-event callback errors, or a raw axios error from the CCD submit call.
- */
+// Recognises the DRAFT_CHANGED refusal from any layer: typed error, HTTPError message, or raw CCD response.
 export function isDraftChangedError(error: unknown): boolean {
   if (error instanceof RespondToClaimDraftChangedError) {
     return true;
@@ -151,8 +146,6 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
   const eventToken = startResponse.data.token;
 
   const submitUrl = `${getBaseUrl()}/cases/${caseId}/events`;
-  // The draft version the statement of truth was saved against; pcs-api refuses the submit if the stored draft
-  // has moved on since, so the declaration can never be attached to answers the citizen did not review.
   const draftVersion = validatedCase.data.possessionClaimResponse?.draftVersion;
   const payload = {
     data: {

@@ -271,7 +271,6 @@ export interface PossessionClaimResponse {
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
   responseDocumentId?: string;
-  /** Version of the stored draft these answers came from; echoed back with the statement of truth (HDPI-8866 W05). */
   draftVersion?: number;
   claimIssuedDate?: string;
 

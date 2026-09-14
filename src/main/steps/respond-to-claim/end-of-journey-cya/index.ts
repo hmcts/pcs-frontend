@@ -27,10 +27,7 @@ const STEP_NAME = 'end-of-journey-cya';
 // Field config override for the submit error when submitting the response fails
 const submitResponseErrorFields: FormFieldConfig[] = [{ name: 'submitResponse', type: 'text' }];
 
-/**
- * Pre-fills the statement of truth from a saved draft. After a draft-changed rejection the citizen must
- * consent again, so the declaration checkboxes are never pre-ticked on that re-render (HDPI-8866 W05).
- */
+// After a draft-changed rejection the citizen must consent again, so the declaration is not pre-ticked.
 export function getStatementOfTruthInitialFormData(req: Request): Record<string, unknown> {
   const sot = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.statementOfTruth;
   const accepted = sot?.accepted === 'YES' && req.query?.draftChanged !== '1';
@@ -133,7 +130,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       }
     }
 
-    // Rendered as a hidden field and posted back with the statement of truth (HDPI-8866 W05).
     const draftVersion = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.draftVersion ?? '';
     const base = { sections, submitDisabled, isLegalRepresentative, dashboardUrl, draftVersion };
 
@@ -170,8 +166,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     try {
       await saveDraftDefendantResponse(req, draft);
     } catch (error) {
-      // The stored draft changed after this review page rendered: nothing was saved, show the current answers
-      // and ask for review and consent again (HDPI-8866 W05). Anything else keeps its existing handling.
       if (caseId && isDraftChangedError(error)) {
         req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaDraftChangedPath(caseId);
         return;
