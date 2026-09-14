@@ -1,4 +1,4 @@
-import { type InlineBuilder, type OrderBuilder } from '@hmcts-cft/docweave';
+import { type DocBuilder, type InlineBuilder } from '@hmcts-cft/docweave';
 
 import { formatDate, formatMoney, parseDate } from '../../../../utils/makeOrderFormat';
 import { type AttendanceEntry, type OrderData, type OrderParty } from '../data';
@@ -75,7 +75,7 @@ const ATTENDANCE_ROLES: Record<string, (party: string) => string> = {
   'litigant-in-person': party => `${party} acting in person`,
 };
 
-export function addPreamble(order: OrderBuilder, data: OrderData): void {
+export function addPreamble(order: DocBuilder, data: OrderData): void {
   const heard: string[] = [];
   const paragraphs: { id: string; entry: AttendanceEntry; text: string }[] = [];
   for (const entry of data.attendance) {

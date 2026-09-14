@@ -1,11 +1,11 @@
-import { buildOrder } from '@hmcts-cft/docweave';
+import { buildDoc } from '@hmcts-cft/docweave';
 
 import { type OrderData } from '../data';
 
 import { addPreamble, value } from './common';
 
-export function buildFreeFormOrder(data: OrderData): ReturnType<typeof buildOrder> {
-  return buildOrder(order => {
+export function buildFreeFormOrder(data: OrderData): ReturnType<typeof buildDoc> {
+  return buildDoc(order => {
     addPreamble(order, data);
     value(data, 'free-form-text')
       .split(/\n\s*\n/)

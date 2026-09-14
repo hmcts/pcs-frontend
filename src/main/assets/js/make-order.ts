@@ -1,4 +1,4 @@
-import { type DocWeaveDocument, type DocWeaveSnapshot, createOrderEditor } from '@hmcts-cft/docweave';
+import { type DocWeaveDocument, type DocWeaveSnapshot, createDocEditor } from '@hmcts-cft/docweave';
 
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
@@ -206,7 +206,7 @@ export function initMakeOrder(): () => void {
   } catch {
     // A document that does not parse is regenerated from the form.
   }
-  let editor: ReturnType<typeof createOrderEditor> | undefined;
+  let editor: ReturnType<typeof createDocEditor> | undefined;
   let editorType: OrderType | undefined;
   const store = (type: OrderType, snapshot: DocWeaveSnapshot): void => {
     documents[type] = snapshot;
@@ -231,14 +231,14 @@ export function initMakeOrder(): () => void {
     orderTypeField.value = type;
     editorType = type;
     syncSuspendedOnlyCosts(form, type);
-    editor = createOrderEditor({
+    editor = createDocEditor({
       mount,
+      label: 'Order',
       initialSnapshot: documents[type],
       templates: {
         url: '/docweave/templates',
         csrfToken: () => form.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value,
       },
-      onChange: snapshot => store(type, snapshot),
     });
     render();
   };

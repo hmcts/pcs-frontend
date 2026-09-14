@@ -1251,28 +1251,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts-cft/docweave@npm:0.1.0-alpha.5":
-  version: 0.1.0-alpha.5
-  resolution: "@hmcts-cft/docweave@npm:0.1.0-alpha.5"
+"@hmcts-cft/docweave@portal:../../frontend/docweave::locator=pcs-frontend%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "@hmcts-cft/docweave@portal:../../frontend/docweave::locator=pcs-frontend%40workspace%3A."
   dependencies:
     prosemirror-commands: "npm:1.7.2"
     prosemirror-dropcursor: "npm:1.8.3"
     prosemirror-gapcursor: "npm:1.4.1"
     prosemirror-history: "npm:1.5.0"
+    prosemirror-inputrules: "npm:1.5.1"
     prosemirror-keymap: "npm:1.2.3"
     prosemirror-model: "npm:1.25.11"
     prosemirror-schema-basic: "npm:1.2.4"
     prosemirror-schema-list: "npm:1.5.1"
     prosemirror-state: "npm:1.4.4"
+    prosemirror-transform: "npm:1.12.1"
     prosemirror-view: "npm:1.42.3"
   peerDependencies:
     express: ">=5"
   peerDependenciesMeta:
     express:
       optional: true
-  checksum: 10/4bdd07a30a73b8ae538f8818f714b1fb8a9a5f08c34dc5df522984a0ef72af3f9e0790d354a3b0a96f55bd68d30e7f027fa38703dba504ce029641e05c999e94
   languageName: node
-  linkType: hard
+  linkType: soft
 
 "@hmcts/info-provider@npm:1.4.0":
   version: 1.4.0
@@ -12079,7 +12080,7 @@ __metadata:
     "@eslint/js": "npm:10.0.1"
     "@eslint/plugin-kit": "npm:0.7.3"
     "@hmcts-cft/cft-ui-component-lib": "npm:0.1.0-alpha.4"
-    "@hmcts-cft/docweave": "npm:0.1.0-alpha.5"
+    "@hmcts-cft/docweave": "portal:../../frontend/docweave"
     "@hmcts/info-provider": "npm:1.4.0"
     "@hmcts/nodejs-healthcheck": "npm:1.8.6"
     "@hmcts/playwright-common": "npm:1.1.5"
@@ -12673,6 +12674,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prosemirror-inputrules@npm:1.5.1":
+  version: 1.5.1
+  resolution: "prosemirror-inputrules@npm:1.5.1"
+  dependencies:
+    prosemirror-state: "npm:^1.0.0"
+    prosemirror-transform: "npm:^1.0.0"
+  checksum: 10/81f08415a39ad795a2a097c8667eb86e4473eca1389c793139d6bacbb69be740732e8ff8f21b2808130bacd7f53a1b0b7621b48a22ff44d902995b41654e4b80
+  languageName: node
+  linkType: hard
+
 "prosemirror-keymap@npm:1.2.3, prosemirror-keymap@npm:^1.0.0":
   version: 1.2.3
   resolution: "prosemirror-keymap@npm:1.2.3"
@@ -12720,6 +12731,15 @@ __metadata:
     prosemirror-transform: "npm:^1.0.0"
     prosemirror-view: "npm:^1.27.0"
   checksum: 10/90e66cbc49f2eceeb174f5184ed94df432a8b83866ab74ef602d21555dd151eb1ff9a0794b12d98384981601ebaa885d930f6c667165ff969874944a2f9e2488
+  languageName: node
+  linkType: hard
+
+"prosemirror-transform@npm:1.12.1":
+  version: 1.12.1
+  resolution: "prosemirror-transform@npm:1.12.1"
+  dependencies:
+    prosemirror-model: "npm:^1.21.0"
+  checksum: 10/d98d989ae381eca043fca40afb7ca5932494a900e91dd5e4e93b1a7e42ad7108e2cfcce5bc6d661cb64f08b42353c02047cd8b6648dc91d5648d9504dd5b1a46
   languageName: node
   linkType: hard
 
