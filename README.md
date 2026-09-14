@@ -1,6 +1,6 @@
 # PCS-Frontend
 
-## Getting Startedd
+## Getting Started
 
 ### Prerequisites
 
