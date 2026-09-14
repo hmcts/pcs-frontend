@@ -39,7 +39,6 @@ export class RespondToClaimDraftChangedError extends Error {
   }
 }
 
-/** pcs-api refused the submit with validation messages (for example an invalid correspondence address). */
 export class RespondToClaimSubmitRejectedError extends Error {
   constructor(public readonly messages: string[]) {
     super(messages.join('; '));
@@ -51,7 +50,6 @@ export const RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY = 'respondToClaimSubm
 
 export type SubmitRejectionReason = 'correspondenceAddress' | 'other';
 
-// The review page shows a translated message per reason; pcs-api's own text is only logged.
 export function submitRejectionReason(messages: string[]): SubmitRejectionReason {
   return messages.some(message => /correspondence address/i.test(message)) ? 'correspondenceAddress' : 'other';
 }
