@@ -29,7 +29,7 @@ interface CustomSessionData extends SessionData {
   uploadedDocs?: Record<string, Record<string, unknown[]>>;
   returnToCya?: string;
   respondToClaimPostSubmitRedirect?: string;
-  respondToClaimSubmitErrors?: string[];
+  respondToClaimSubmitRejection?: string;
   ccdCase?: CcdCase;
   genApp?: {
     applicationId?: string;

@@ -2,6 +2,7 @@
   "pageTitle": "Check your answers",
   "errors": {
     "submitResponseFailed": "Failed to submit response. Please try again.",
-    "draftChanged": "Your answers have changed since you reviewed them. Check them and confirm again."
+    "draftChanged": "Your answers have changed since you reviewed them. Check them and confirm again.",
+    "correspondenceAddressRejected": "Check the correspondence address you entered and try again."
   }
 }

@@ -37,6 +37,7 @@ import {
   getEndOfJourneyCyaSubmitErrorPath,
   isDraftChangedError,
   parseSubmitPaymentPayload,
+  submitRejectionReason,
   submitRespondToClaimResponse,
 } from '../../../../main/steps/utils/respondToClaimFinalSubmit';
 
@@ -295,5 +296,16 @@ describe('getEndOfJourneyCyaDraftChangedPath', () => {
     expect(getEndOfJourneyCyaDraftChangedPath('123')).toBe(
       '/case/123/respond-to-claim/end-of-journey-cya?draftChanged=1'
     );
+  });
+});
+
+describe('submitRejectionReason', () => {
+  it('maps a correspondence-address refusal to the address reason', () => {
+    expect(submitRejectionReason(['Enter a valid postcode for correspondence address'])).toBe('correspondenceAddress');
+  });
+
+  it('maps anything else to other', () => {
+    expect(submitRejectionReason(['Invalid submission: missing response data'])).toBe('other');
+    expect(submitRejectionReason([])).toBe('other');
   });
 });

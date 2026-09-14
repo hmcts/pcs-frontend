@@ -211,7 +211,7 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
     );
   });
 
-  it('keeps the pcs-api validation messages for the review page when the submit is refused', async () => {
+  it('records the rejection reason for the review page when pcs-api refuses the submit', async () => {
     mockSubmitRespondToClaimResponse.mockRejectedValueOnce(
       new RespondToClaimSubmitRejectedError(['Enter a valid postcode for correspondence address'])
     );
@@ -222,9 +222,7 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
     await step.postController!.post(req, res, jest.fn());
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    expect((req as any).session.respondToClaimSubmitErrors).toEqual([
-      'Enter a valid postcode for correspondence address',
-    ]);
+    expect((req as any).session.respondToClaimSubmitRejection).toBe('correspondenceAddress');
     expect(res.redirect).toHaveBeenCalledWith(
       303,
       `/case/${CASE_REF}/respond-to-claim/end-of-journey-cya?submitError=failed`

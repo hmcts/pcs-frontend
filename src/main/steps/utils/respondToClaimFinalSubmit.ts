@@ -47,7 +47,14 @@ export class RespondToClaimSubmitRejectedError extends Error {
   }
 }
 
-export const RESPOND_TO_CLAIM_SUBMIT_ERRORS_SESSION_KEY = 'respondToClaimSubmitErrors';
+export const RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY = 'respondToClaimSubmitRejection';
+
+export type SubmitRejectionReason = 'correspondenceAddress' | 'other';
+
+// The review page shows a translated message per reason; pcs-api's own text is only logged.
+export function submitRejectionReason(messages: string[]): SubmitRejectionReason {
+  return messages.some(message => /correspondence address/i.test(message)) ? 'correspondenceAddress' : 'other';
+}
 
 export function callbackErrorMessages(error: unknown): string[] {
   const responseData = (error as { response?: { data?: { callbackErrors?: unknown; errors?: unknown } } })?.response
