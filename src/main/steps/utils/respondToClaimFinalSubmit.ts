@@ -43,7 +43,6 @@ export function getEndOfJourneyCyaDraftChangedPath(caseId: string): string {
   return `/case/${caseId}/respond-to-claim/end-of-journey-cya?draftChanged=1`;
 }
 
-// Recognises the DRAFT_CHANGED refusal from any layer: typed error, HTTPError message, or raw CCD response.
 export function isDraftChangedError(error: unknown): boolean {
   if (error instanceof RespondToClaimDraftChangedError) {
     return true;

@@ -73,7 +73,6 @@ export const saveDraftDefendantResponse = async (req: Request, response: Possess
   const accessToken = req.session?.user?.accessToken || '';
   const caseId = req.res?.locals.validatedCase?.id || '';
 
-  // Only the review page posts draftVersion; pcs-api checks it before saving the statement of truth.
   const reviewedDraftVersion = parseDraftVersion(req.body?.draftVersion);
 
   const updatedCase = await ccdCaseService.updateDraft(

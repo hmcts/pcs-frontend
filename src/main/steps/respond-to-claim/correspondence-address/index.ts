@@ -13,7 +13,7 @@ import type {
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-// Full UK postcode, outward + inward code; an outward code alone ("W5") is not an address.
+// Full UK postcode (outward + inward code).
 const UK_POSTCODE_REGEX = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
 
 export function isFullUkPostcode(value: string): boolean {
@@ -28,8 +28,7 @@ const ADDRESS_FIELD_NAMES = {
   postcode: 'correspondenceAddressConfirm.postcode',
 } as const;
 
-// Manual address input values from the form builder's content: the posted body on a POST, getFormData on a
-// GET. A posted empty string stays empty; the saved address only fills fields that were not posted.
+// Posted values win; the saved address only fills fields that were not posted.
 export function buildAddressFieldValues(
   req: Pick<Request, 'method'>,
   formContent: Record<string, unknown>,

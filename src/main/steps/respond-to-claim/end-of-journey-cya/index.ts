@@ -27,7 +27,6 @@ const STEP_NAME = 'end-of-journey-cya';
 // Field config override for the submit error when submitting the response fails
 const submitResponseErrorFields: FormFieldConfig[] = [{ name: 'submitResponse', type: 'text' }];
 
-// After a draft-changed rejection the citizen must consent again, so the declaration is not pre-ticked.
 export function getStatementOfTruthInitialFormData(req: Request): Record<string, unknown> {
   const sot = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.statementOfTruth;
   const accepted = sot?.accepted === 'YES' && req.query?.draftChanged !== '1';
