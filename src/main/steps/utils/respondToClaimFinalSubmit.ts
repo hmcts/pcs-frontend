@@ -30,6 +30,40 @@ export class RespondToClaimFinalSubmitError extends Error {
   }
 }
 
+/** Error code pcs-api puts at the front of its callback error when the draft changed after review (HDPI-8866 W05). */
+export const DRAFT_CHANGED_ERROR_CODE = 'DRAFT_CHANGED';
+
+/** The stored draft moved on after the review page rendered: nothing was persisted, review and consent again. */
+export class RespondToClaimDraftChangedError extends Error {
+  constructor(message = 'Draft changed after review') {
+    super(message);
+    this.name = 'RespondToClaimDraftChangedError';
+  }
+}
+
+export function getEndOfJourneyCyaDraftChangedPath(caseId: string): string {
+  return `/case/${caseId}/respond-to-claim/end-of-journey-cya?draftChanged=1`;
+}
+
+/**
+ * True for the draft-changed rejection whichever layer surfaced it: our own typed error, an HTTPError built by
+ * ccdCaseService from the mid-event callback errors, or a raw axios error from the CCD submit call.
+ */
+export function isDraftChangedError(error: unknown): boolean {
+  if (error instanceof RespondToClaimDraftChangedError) {
+    return true;
+  }
+  if (error instanceof Error && error.message.includes(DRAFT_CHANGED_ERROR_CODE)) {
+    return true;
+  }
+  const responseData = (error as { response?: { data?: { callbackErrors?: unknown; errors?: unknown } } })?.response
+    ?.data;
+  const messages = [responseData?.callbackErrors, responseData?.errors]
+    .flatMap(value => (Array.isArray(value) ? value : []))
+    .filter((value): value is string => typeof value === 'string');
+  return messages.some(message => message.startsWith(DRAFT_CHANGED_ERROR_CODE));
+}
+
 interface ParsedSubmitPaymentPayload {
   serviceRequestReference: string;
   feeAmount?: number;
@@ -117,9 +151,14 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
   const eventToken = startResponse.data.token;
 
   const submitUrl = `${getBaseUrl()}/cases/${caseId}/events`;
+  // The draft version the statement of truth was saved against; pcs-api refuses the submit if the stored draft
+  // has moved on since, so the declaration can never be attached to answers the citizen did not review.
+  const draftVersion = validatedCase.data.possessionClaimResponse?.draftVersion;
   const payload = {
     data: {
-      possessionClaimResponse: {},
+      possessionClaimResponse: {
+        ...(draftVersion !== undefined && draftVersion !== null && { draftVersion }),
+      },
       ...(selectedPartyId !== null && { currentRepresentedPartyId: selectedPartyId }),
     },
     event: {
@@ -131,8 +170,17 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
     ignore_warning: false,
   };
 
-  const submitResponse = await http.post<CcdCase>(submitUrl, payload, getCaseHeaders(userAccessToken));
-  const submittedCase = submitResponse.data;
+  let submittedCase: CcdCase;
+  try {
+    const submitResponse = await http.post<CcdCase>(submitUrl, payload, getCaseHeaders(userAccessToken));
+    submittedCase = submitResponse.data;
+  } catch (error) {
+    if (isDraftChangedError(error)) {
+      logger.warn(`Submit refused for case ${caseId}: draft changed after review`);
+      throw new RespondToClaimDraftChangedError();
+    }
+    throw error;
+  }
 
   logger.info(`Response submitted successfully for case ${caseId}`);
 

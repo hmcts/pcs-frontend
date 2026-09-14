@@ -81,7 +81,8 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   saveDraftDefendantResponse: (...args: unknown[]) => mockSaveDraftDefendantResponse(...args),
 }));
 
-import { step } from '../../../../main/steps/respond-to-claim/end-of-journey-cya';
+import { getStatementOfTruthInitialFormData, step } from '../../../../main/steps/respond-to-claim/end-of-journey-cya';
+import { RespondToClaimDraftChangedError } from '../../../../main/steps/utils/respondToClaimFinalSubmit';
 
 const CASE_REF = '1234567890123456';
 const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
@@ -159,5 +160,109 @@ describe('respond-to-claim end-of-journey-cya step', () => {
     expect(mockSaveDraftDefendantResponse).toHaveBeenCalled();
     expect(mockSubmitRespondToClaimResponse).toHaveBeenCalledWith(req);
     expect(res.redirect).toHaveBeenCalledWith(303, `/case/${CASE_REF}/respond-to-claim/response-submitted`);
+  });
+});
+
+// HDPI-8866 W05 — a draft that changed after the review page rendered must never be signed and submitted.
+describe('respond-to-claim end-of-journey-cya step — draft changed after review', () => {
+  const completeStatementOfTruth = {
+    statementOfTruthContempt: ['yes'],
+    statementOfTruthBelief: ['yes'],
+    fullName: 'Jane Defendant',
+    draftVersion: '4',
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockSaveDraftDefendantResponse.mockResolvedValue(undefined);
+  });
+
+  it('does not submit and returns to the review page when the statement-of-truth save is refused', async () => {
+    mockSaveDraftDefendantResponse.mockRejectedValueOnce(
+      new Error('CCD callback rejected request: DRAFT_CHANGED: Your answers have changed since you reviewed them.')
+    );
+    const req = createReq({ body: completeStatementOfTruth });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = { redirect: jest.fn() } as any;
+
+    await step.postController!.post(req, res, jest.fn());
+
+    expect(mockSubmitRespondToClaimResponse).not.toHaveBeenCalled();
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      `/case/${CASE_REF}/respond-to-claim/end-of-journey-cya?draftChanged=1`
+    );
+  });
+
+  it('returns to the review page when the submit itself is refused as DRAFT_CHANGED', async () => {
+    mockSubmitRespondToClaimResponse.mockRejectedValueOnce(new RespondToClaimDraftChangedError());
+    const req = createReq({ body: completeStatementOfTruth });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = { redirect: jest.fn() } as any;
+
+    await step.postController!.post(req, res, jest.fn());
+
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      `/case/${CASE_REF}/respond-to-claim/end-of-journey-cya?draftChanged=1`
+    );
+  });
+
+  it('keeps the generic submit error for any other submit failure', async () => {
+    mockSubmitRespondToClaimResponse.mockRejectedValueOnce(new Error('boom'));
+    const req = createReq({ body: completeStatementOfTruth });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = { redirect: jest.fn() } as any;
+
+    await step.postController!.post(req, res, jest.fn());
+
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      `/case/${CASE_REF}/respond-to-claim/end-of-journey-cya?submitError=failed`
+    );
+  });
+
+  it('does not pre-tick the declaration when re-rendering after a draft change', () => {
+    const req = createReq({
+      query: { lang: 'en', draftChanged: '1' },
+      res: {
+        locals: {
+          validatedCase: {
+            id: CASE_REF,
+            data: {},
+            possessionClaimResponse: {
+              defendantResponses: { statementOfTruth: { accepted: 'YES', fullName: 'Jane Defendant' } },
+            },
+          },
+        },
+      },
+    });
+
+    const initial = getStatementOfTruthInitialFormData(req);
+
+    expect(initial.statementOfTruthBelief).toBeUndefined();
+    expect(initial.statementOfTruthContempt).toBeUndefined();
+    expect(initial.fullName).toBe('Jane Defendant');
+  });
+
+  it('still pre-ticks the declaration from a saved draft on a normal render', () => {
+    const req = createReq({
+      res: {
+        locals: {
+          validatedCase: {
+            id: CASE_REF,
+            data: {},
+            possessionClaimResponse: {
+              defendantResponses: { statementOfTruth: { accepted: 'YES', fullName: 'Jane Defendant' } },
+            },
+          },
+        },
+      },
+    });
+
+    const initial = getStatementOfTruthInitialFormData(req);
+
+    expect(initial.statementOfTruthBelief).toEqual(['yes']);
+    expect(initial.statementOfTruthContempt).toEqual(['yes']);
   });
 });

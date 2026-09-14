@@ -26,6 +26,8 @@
 
   <form method="post" action="{{ url }}" novalidate>
     {{ csrfProtection(csrfToken) }}
+    {# Version of the draft this review page shows; pcs-api refuses the submit if the draft changed since #}
+    <input type="hidden" name="draftVersion" value="{{ draftVersion }}">
 
     <h2 class="govuk-heading-m">{{ statementOfTruthHeading }}</h2>
     {% if statementOfTruthHint %}

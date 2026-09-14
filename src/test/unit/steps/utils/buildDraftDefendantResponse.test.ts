@@ -294,3 +294,48 @@ describe('buildDraftDefendantResponse — carries reasonable-adjustment flags fo
     expect('defendantFlags' in draft).toBe(false);
   });
 });
+
+// HDPI-8866 W05 — the review page posts the draft version it rendered; the save forwards it so pcs-api can check it.
+describe('saveDraftDefendantResponse — reviewed draft version', () => {
+  const reqWithBody = (body: Record<string, unknown>): Request =>
+    ({
+      body,
+      session: { user: { accessToken: 'tok' } },
+      res: { locals: { validatedCase: { id: '123', data: {} } } },
+    }) as unknown as Request;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('forwards the draftVersion posted by the review page as a number', async () => {
+    await saveDraftDefendantResponse(reqWithBody({ draftVersion: '4' }), { defendantResponses: {} });
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      expect.anything(),
+      'tok',
+      '123',
+      { possessionClaimResponse: { defendantResponses: {}, draftVersion: 4 } },
+      undefined
+    );
+  });
+
+  it('omits draftVersion when the form did not post one (ordinary steps)', async () => {
+    await saveDraftDefendantResponse(reqWithBody({}), { defendantResponses: {} });
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      expect.anything(),
+      'tok',
+      '123',
+      { possessionClaimResponse: { defendantResponses: {} } },
+      undefined
+    );
+  });
+
+  it('ignores a draftVersion that is not a whole number', async () => {
+    await saveDraftDefendantResponse(reqWithBody({ draftVersion: 'abc' }), { defendantResponses: {} });
+
+    const [, , , payload] = (ccdCaseService.updateDraft as jest.Mock).mock.calls[0];
+    expect(payload.possessionClaimResponse).not.toHaveProperty('draftVersion');
+  });
+});

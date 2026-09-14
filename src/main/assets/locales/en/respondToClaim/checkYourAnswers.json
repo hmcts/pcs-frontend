@@ -1,6 +1,7 @@
 {
   "pageTitle": "Check your answers",
   "errors": {
-    "submitResponseFailed": "Failed to submit response. Please try again."
+    "submitResponseFailed": "Failed to submit response. Please try again.",
+    "draftChanged": "Your answers have changed since you reviewed them. Check them and confirm again."
   }
 }

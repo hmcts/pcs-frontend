@@ -31,7 +31,10 @@ jest.mock('@utils/clientContextSessionClearer', () => ({
 import type { Request } from 'express';
 
 import {
+  RespondToClaimDraftChangedError,
+  getEndOfJourneyCyaDraftChangedPath,
   getEndOfJourneyCyaSubmitErrorPath,
+  isDraftChangedError,
   parseSubmitPaymentPayload,
   submitRespondToClaimResponse,
 } from '../../../../main/steps/utils/respondToClaimFinalSubmit';
@@ -192,5 +195,93 @@ describe('respondToClaimFinalSubmit', () => {
         })
       );
     });
+  });
+});
+
+// HDPI-8866 W05 — the submit carries the reviewed draft version and surfaces a DRAFT_CHANGED refusal distinctly.
+describe('submitRespondToClaimResponse — reviewed draft version', () => {
+  const reqWithDraftVersion = (draftVersion?: number): Request =>
+    ({
+      session: { user: { accessToken: 'mock-token' } },
+      res: {
+        locals: {
+          validatedCase: {
+            id: '1234567890123456',
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { makeCounterClaim: 'NO' },
+                ...(draftVersion !== undefined && { draftVersion }),
+              },
+            },
+          },
+        },
+      },
+    }) as unknown as Request;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockHttpGet.mockResolvedValue({ data: { token: 'event-token' } });
+  });
+
+  it('sends the draft version the review page was rendered from', async () => {
+    mockHttpPost.mockResolvedValue({ data: {} });
+
+    await submitRespondToClaimResponse(reqWithDraftVersion(5));
+
+    const [, payload] = mockHttpPost.mock.calls[0];
+    expect(payload.data.possessionClaimResponse).toEqual({ draftVersion: 5 });
+  });
+
+  it('sends no draft version when the case carries none', async () => {
+    mockHttpPost.mockResolvedValue({ data: {} });
+
+    await submitRespondToClaimResponse(reqWithDraftVersion());
+
+    const [, payload] = mockHttpPost.mock.calls[0];
+    expect(payload.data.possessionClaimResponse).toEqual({});
+  });
+
+  it('maps a DRAFT_CHANGED refusal from CCD to RespondToClaimDraftChangedError', async () => {
+    mockHttpPost.mockRejectedValue({
+      response: { status: 422, data: { callbackErrors: ['DRAFT_CHANGED: Your answers have changed'] } },
+    });
+
+    await expect(submitRespondToClaimResponse(reqWithDraftVersion(5))).rejects.toBeInstanceOf(
+      RespondToClaimDraftChangedError
+    );
+  });
+
+  it('rethrows any other CCD error unchanged', async () => {
+    const boom = new Error('boom');
+    mockHttpPost.mockRejectedValue(boom);
+
+    await expect(submitRespondToClaimResponse(reqWithDraftVersion(5))).rejects.toBe(boom);
+  });
+});
+
+describe('isDraftChangedError', () => {
+  it.each([
+    ['the typed error', new RespondToClaimDraftChangedError()],
+    ['an HTTPError built from mid-event callback errors', new Error('CCD callback rejected request: DRAFT_CHANGED: x')],
+    ['an axios error carrying callbackErrors', { response: { data: { callbackErrors: ['DRAFT_CHANGED: x'] } } }],
+    ['an axios error carrying errors', { response: { data: { errors: ['DRAFT_CHANGED: x'] } } }],
+  ])('recognises %s', (_label, error) => {
+    expect(isDraftChangedError(error)).toBe(true);
+  });
+
+  it.each([
+    ['a plain error', new Error('boom')],
+    ['an axios error with unrelated callback errors', { response: { data: { callbackErrors: ['Other'] } } }],
+    ['undefined', undefined],
+  ])('rejects %s', (_label, error) => {
+    expect(isDraftChangedError(error)).toBe(false);
+  });
+});
+
+describe('getEndOfJourneyCyaDraftChangedPath', () => {
+  it('returns the review page with the draftChanged marker', () => {
+    expect(getEndOfJourneyCyaDraftChangedPath('123')).toBe(
+      '/case/123/respond-to-claim/end-of-journey-cya?draftChanged=1'
+    );
   });
 });
