@@ -1,4 +1,4 @@
-import { type InlineBuilder, buildOrder } from '@hmcts-cft/docweave';
+import { type InlineBuilder, buildDoc } from '@hmcts-cft/docweave';
 
 import { type OrderData } from '../data';
 
@@ -20,7 +20,7 @@ import {
   values,
 } from './common';
 
-export function buildSuspendedOrder(data: OrderData): ReturnType<typeof buildOrder> {
+export function buildSuspendedOrder(data: OrderData): ReturnType<typeof buildDoc> {
   const address = data.propertyAddress || '[property address not provided]';
   const { claimant, defendant, defendantVerb } = partyLabels(data);
   const options = values(data, 'suspended-options');
@@ -47,7 +47,7 @@ export function buildSuspendedOrder(data: OrderData): ReturnType<typeof buildOrd
     },
   };
 
-  return buildOrder(order => {
+  return buildDoc(order => {
     addPreamble(order, data);
     order.orderedList('suspended-clauses', list => {
       list.item('suspended-possession', content => {

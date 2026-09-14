@@ -1,4 +1,4 @@
-import { buildOrder } from '@hmcts-cft/docweave';
+import { buildDoc } from '@hmcts-cft/docweave';
 
 import { type OrderData } from '../data';
 
@@ -42,7 +42,7 @@ const DIRECTIONS: Record<string, { party: 'claimant' | 'defendant'; text: string
   },
 };
 
-export function buildAdjournmentOrder(data: OrderData): ReturnType<typeof buildOrder> {
+export function buildAdjournmentOrder(data: OrderData): ReturnType<typeof buildDoc> {
   const type = value(data, 'adj-type');
   const labels = partyLabels(data);
   const { claimant, defendant, defendantVerb } = labels;
@@ -50,7 +50,7 @@ export function buildAdjournmentOrder(data: OrderData): ReturnType<typeof buildO
   const conditions = values(data, 'adj-gen');
   const costs = caseManCosts(claimant, defendant);
 
-  return buildOrder(order => {
+  return buildDoc(order => {
     addPreamble(order, data);
     if (!type) {
       return;

@@ -1,4 +1,4 @@
-import { buildOrder } from '@hmcts-cft/docweave';
+import { buildDoc } from '@hmcts-cft/docweave';
 
 import { type OrderData } from '../data';
 
@@ -36,7 +36,7 @@ const OUTRIGHT_COSTS: CostsWording = {
   missing: '[costs order not provided]',
 };
 
-export function buildOutrightOrder(data: OrderData): ReturnType<typeof buildOrder> {
+export function buildOutrightOrder(data: OrderData): ReturnType<typeof buildDoc> {
   const address = data.propertyAddress || '[property address not provided]';
   const claimants = partyNames(data.claimants, 'the claimant(s)');
   const defendants = partyNames(data.defendants, 'the defendant(s)');
@@ -44,7 +44,7 @@ export function buildOutrightOrder(data: OrderData): ReturnType<typeof buildOrde
   const sections = options.includes('money-judgment') ? values(data, 'outright-mj-sections') : [];
   const plans = sections.includes('payment-plan') ? values(data, 'outright-mj-plan') : [];
 
-  return buildOrder(order => {
+  return buildDoc(order => {
     addPreamble(order, data);
     order.orderedList('outright-clauses', list => {
       list.item('possession', content => {
