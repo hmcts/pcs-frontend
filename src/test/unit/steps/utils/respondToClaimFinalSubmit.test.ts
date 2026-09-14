@@ -32,6 +32,7 @@ import type { Request } from 'express';
 
 import {
   RespondToClaimDraftChangedError,
+  RespondToClaimSubmitRejectedError,
   getEndOfJourneyCyaDraftChangedPath,
   getEndOfJourneyCyaSubmitErrorPath,
   isDraftChangedError,
@@ -249,6 +250,17 @@ describe('submitRespondToClaimResponse — reviewed draft version', () => {
     await expect(submitRespondToClaimResponse(reqWithDraftVersion(5))).rejects.toBeInstanceOf(
       RespondToClaimDraftChangedError
     );
+  });
+
+  it('maps a validation refusal from pcs-api to RespondToClaimSubmitRejectedError carrying the messages', async () => {
+    mockHttpPost.mockRejectedValue({
+      response: { status: 422, data: { callbackErrors: ['Enter a valid postcode for correspondence address'] } },
+    });
+
+    const rejection = await submitRespondToClaimResponse(reqWithDraftVersion(5)).catch(error => error);
+
+    expect(rejection).toBeInstanceOf(RespondToClaimSubmitRejectedError);
+    expect(rejection.messages).toEqual(['Enter a valid postcode for correspondence address']);
   });
 
   it('rethrows any other CCD error unchanged', async () => {

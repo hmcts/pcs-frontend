@@ -82,7 +82,10 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
 }));
 
 import { getStatementOfTruthInitialFormData, step } from '../../../../main/steps/respond-to-claim/end-of-journey-cya';
-import { RespondToClaimDraftChangedError } from '../../../../main/steps/utils/respondToClaimFinalSubmit';
+import {
+  RespondToClaimDraftChangedError,
+  RespondToClaimSubmitRejectedError,
+} from '../../../../main/steps/utils/respondToClaimFinalSubmit';
 
 const CASE_REF = '1234567890123456';
 const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
@@ -205,6 +208,26 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
     expect(res.redirect).toHaveBeenCalledWith(
       303,
       `/case/${CASE_REF}/respond-to-claim/end-of-journey-cya?draftChanged=1`
+    );
+  });
+
+  it('keeps the pcs-api validation messages for the review page when the submit is refused', async () => {
+    mockSubmitRespondToClaimResponse.mockRejectedValueOnce(
+      new RespondToClaimSubmitRejectedError(['Enter a valid postcode for correspondence address'])
+    );
+    const req = createReq({ body: completeStatementOfTruth });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = { redirect: jest.fn() } as any;
+
+    await step.postController!.post(req, res, jest.fn());
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((req as any).session.respondToClaimSubmitErrors).toEqual([
+      'Enter a valid postcode for correspondence address',
+    ]);
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      `/case/${CASE_REF}/respond-to-claim/end-of-journey-cya?submitError=failed`
     );
   });
 

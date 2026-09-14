@@ -39,6 +39,24 @@ export class RespondToClaimDraftChangedError extends Error {
   }
 }
 
+/** pcs-api refused the submit with validation messages (for example an invalid correspondence address). */
+export class RespondToClaimSubmitRejectedError extends Error {
+  constructor(public readonly messages: string[]) {
+    super(messages.join('; '));
+    this.name = 'RespondToClaimSubmitRejectedError';
+  }
+}
+
+export const RESPOND_TO_CLAIM_SUBMIT_ERRORS_SESSION_KEY = 'respondToClaimSubmitErrors';
+
+export function callbackErrorMessages(error: unknown): string[] {
+  const responseData = (error as { response?: { data?: { callbackErrors?: unknown; errors?: unknown } } })?.response
+    ?.data;
+  return [responseData?.callbackErrors, responseData?.errors]
+    .flatMap(value => (Array.isArray(value) ? value : []))
+    .filter((value): value is string => typeof value === 'string');
+}
+
 export function getEndOfJourneyCyaDraftChangedPath(caseId: string): string {
   return `/case/${caseId}/respond-to-claim/end-of-journey-cya?draftChanged=1`;
 }
@@ -50,12 +68,7 @@ export function isDraftChangedError(error: unknown): boolean {
   if (error instanceof Error && error.message.includes(DRAFT_CHANGED_ERROR_CODE)) {
     return true;
   }
-  const responseData = (error as { response?: { data?: { callbackErrors?: unknown; errors?: unknown } } })?.response
-    ?.data;
-  const messages = [responseData?.callbackErrors, responseData?.errors]
-    .flatMap(value => (Array.isArray(value) ? value : []))
-    .filter((value): value is string => typeof value === 'string');
-  return messages.some(message => message.startsWith(DRAFT_CHANGED_ERROR_CODE));
+  return callbackErrorMessages(error).some(message => message.startsWith(DRAFT_CHANGED_ERROR_CODE));
 }
 
 interface ParsedSubmitPaymentPayload {
@@ -170,6 +183,11 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
     if (isDraftChangedError(error)) {
       logger.warn(`Submit refused for case ${caseId}: draft changed after review`);
       throw new RespondToClaimDraftChangedError();
+    }
+    const messages = callbackErrorMessages(error);
+    if (messages.length > 0) {
+      logger.warn(`Submit refused for case ${caseId}: ${messages.join('; ')}`);
+      throw new RespondToClaimSubmitRejectedError(messages);
     }
     throw error;
   }

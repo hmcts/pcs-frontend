@@ -5,6 +5,8 @@ import type { TFunction } from 'i18next';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import {
   RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY,
+  RESPOND_TO_CLAIM_SUBMIT_ERRORS_SESSION_KEY,
+  RespondToClaimSubmitRejectedError,
   buildStatementOfTruthPayload,
   getEndOfJourneyCyaDraftChangedPath,
   getEndOfJourneyCyaSubmitErrorPath,
@@ -39,6 +41,13 @@ export function getStatementOfTruthInitialFormData(req: Request): Record<string,
     ...(nameOfFirm ? { nameOfFirm } : {}),
     ...(positionHeld ? { positionHeld } : {}),
   };
+}
+
+// Address refusals link back to the address page; anything else stays on the review page.
+function rejectionHref(message: string, caseId: string | undefined): string {
+  return caseId && /correspondence address/i.test(message)
+    ? `/case/${caseId}/respond-to-claim/correspondence-address`
+    : '#';
 }
 
 export const step: StepDefinition = createRespondToClaimFormStep({
@@ -138,6 +147,18 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     const tError = getTranslationFunction(req, ['respondToClaim/checkYourAnswers', 'common']);
+
+    const rejectionMessages = req.session[RESPOND_TO_CLAIM_SUBMIT_ERRORS_SESSION_KEY] as string[] | undefined;
+    delete req.session[RESPOND_TO_CLAIM_SUBMIT_ERRORS_SESSION_KEY];
+    if (!draftChanged && rejectionMessages?.length) {
+      const title = tError('errors.title');
+      const errorSummary = {
+        titleText: title && title !== 'errors.title' ? title : 'There is a problem',
+        errorList: rejectionMessages.map(text => ({ text, href: rejectionHref(text, caseId) })),
+      };
+      return { ...base, errorSummary };
+    }
+
     const errorKey = draftChanged ? 'errors.draftChanged' : 'errors.submitResponseFailed';
     const fallback = draftChanged
       ? 'Your answers have changed since you reviewed them. Check them and confirm again.'
@@ -183,6 +204,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       const { confirmationPath } = await submitRespondToClaimResponse(req);
       req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = confirmationPath;
     } catch (error) {
+      if (error instanceof RespondToClaimSubmitRejectedError) {
+        req.session[RESPOND_TO_CLAIM_SUBMIT_ERRORS_SESSION_KEY] = error.messages;
+      }
       req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = isDraftChangedError(error)
         ? getEndOfJourneyCyaDraftChangedPath(caseId)
         : getEndOfJourneyCyaSubmitErrorPath(caseId);

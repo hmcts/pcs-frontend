@@ -339,3 +339,21 @@ describe('saveDraftDefendantResponse — reviewed draft version', () => {
     expect(payload.possessionClaimResponse).not.toHaveProperty('draftVersion');
   });
 });
+
+describe('saveDraftDefendantResponse — draft version returned by the save', () => {
+  it('carries the version pcs-api echoes into validatedCase so the submit posts it', async () => {
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValueOnce({
+      id: '123',
+      data: { possessionClaimResponse: { defendantResponses: {}, draftVersion: 5 } },
+    });
+    const req = {
+      body: { draftVersion: '4' },
+      session: { user: { accessToken: 'tok' } },
+      res: { locals: { validatedCase: { id: '123', data: { possessionClaimResponse: { draftVersion: 4 } } } } },
+    } as unknown as Request;
+
+    await saveDraftDefendantResponse(req, { defendantResponses: {} });
+
+    expect(req.res?.locals.validatedCase?.data?.possessionClaimResponse?.draftVersion).toBe(5);
+  });
+});
