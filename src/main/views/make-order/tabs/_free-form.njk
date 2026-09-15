@@ -1,0 +1,5 @@
+{% import "make-order/_compact.njk" as compact with context %}
+
+<h3 class="govuk-heading-m">Free form</h3>
+
+{{ compact.textarea("free-form-text", { label: "Order wording", labelClasses: "govuk-label--s", rows: 8 }) }}
