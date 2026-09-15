@@ -11,5 +11,6 @@ export const writtenTerms = {
   cymraegLink: `Cymraeg`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfTheLandlordHasSentYouWrittenTermsOfTheOccupationContractErrorMessage: `Select if the landlord has sent the defendant written terms of the occupation contract`,
+  feedbackLink: `feedback`,
   pageSlug: `written-terms`,
 };
