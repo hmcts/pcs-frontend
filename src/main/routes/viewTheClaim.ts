@@ -7,6 +7,7 @@ import { getRequestLanguage, getTranslationFunction } from '../modules/i18n';
 
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 import { buildViewTheClaimPageData } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 export default function viewTheClaimRoutes(app: Application): void {
@@ -23,9 +24,10 @@ export default function viewTheClaimRoutes(app: Application): void {
       const dashboardUrl = getDashboardUrl(caseReference);
       const t = getTranslationFunction(req, ['common', 'dashboard', 'viewTheClaim']);
       const language = getRequestLanguage(req);
+      const rankedDefendantNumbering = await isRespondToClaimEnabledForRelease(req);
 
       res.render('view-the-claim', {
-        ...buildViewTheClaimPageData(caseReference, ccdCase.data, t, language),
+        ...buildViewTheClaimPageData(caseReference, ccdCase.data, t, language, rankedDefendantNumbering),
         dashboardUrl,
         backUrl: dashboardUrl,
       });

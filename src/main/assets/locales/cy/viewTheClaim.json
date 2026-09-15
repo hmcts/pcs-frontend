@@ -22,6 +22,7 @@
     "claimantDetails": "cyClaimant details",
     "defendantDetails": "cyDefendant 1 details",
     "additionalDefendantDetails": "cyAdditional defendant {{number}} details",
+    "rankedDefendantDetails": "cyDefendant {{number}} details",
     "claimDetails": "cyClaim details",
     "asb": "cyAlleged antisocial behaviour and illegal or prohibited conduct",
     "rentArrears": "cyDetails of rent arrears",

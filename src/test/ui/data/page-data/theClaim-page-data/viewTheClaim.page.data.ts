@@ -21,8 +21,8 @@ export const viewTheClaim = {
 
   claimantDetailsSubHeader: 'Claimant details',
   defendant1SubHeader: 'Defendant 1 details',
-  additionalDefendant1SubHeader: 'Additional defendant 1 details',
-  additionalDefendant2SubHeader: 'Additional defendant 2 details',
+  defendant2SubHeader: 'Defendant 2 details',
+  defendant3SubHeader: 'Defendant 3 details',
   claimDetailsSubHeader: 'Claim details',
   rentArrearsSubHeader: 'Details of rent arrears',
   actionTakenSubHeader: 'Action already taken by the claimant',
@@ -43,12 +43,12 @@ export const viewTheClaim = {
     'Address for service': '10 Second AvenueLondonW3 7RX',
   },
 
-  additionalDefendant1Details: {
+  defendant2Details: {
     Name: 'Peter Parker',
     'Address for service': '2 Second AvenueLondonW3 7RX',
   },
 
-  additionalDefendant2Details: {
+  defendant3Details: {
     Name: 'Jen Parker',
     'Address for service': '2 Second AvenueLondonW3 7RX',
   },
