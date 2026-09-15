@@ -13,13 +13,25 @@
   },
   "subFields": {
     "amount": "Cyfanswm a dderbynnir",
-    "frequency": "Derbynnir bob:",
     "moneyFromElsewhereDetailsLabel": "Rhowch fanylion",
     "moneyFromElsewhereDetailsHint": "Rhowch fanylion y ffynonellau eraill o incwm a faint rydych fel arfer yn ei gael"
   },
+  "subFieldsLegend": {
+    "incomeFromJobs": "cyIncome from jobs details",
+    "pension": "cyPension details",
+    "universalCredit": "cyUniversal Credit details",
+    "otherBenefits": "cyOther benefits and credits details",
+    "moneyFromElsewhere": "cyMoney from somewhere else details"
+  },
+  "frequencyLegend": {
+    "incomeFromJobs": "cyHow often do you receive income from all jobs you do?",
+    "pension": "cyHow often do you receive income from a state or private pension?",
+    "universalCredit": "cyHow often do you receive Universal Credit?",
+    "otherBenefits": "cyHow often do you receive income from other benefits and credits?"
+  },
   "frequency": {
-    "week": "Pob wythnos",
-    "month": "Mis"
+    "week": "cyReceived every week",
+    "month": "cyReceived every month"
   },
   "errors": {
     "incomeFromJobsAmount": {
