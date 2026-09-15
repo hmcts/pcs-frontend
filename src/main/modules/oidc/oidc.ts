@@ -77,6 +77,28 @@ export class OIDCModule {
     return this.setupClient();
   }
 
+  /**
+   * Session state behind an auth request, for diagnosing a PKCE verifier that went
+   * missing between /login and the callback. The three cases look different here:
+   * no cookie presented (it expired, or the browser withheld it), a cookie presented
+   * that no longer matches the session (the store had dropped it), or a matching
+   * session with the verifier gone (a replayed callback, or a concurrent write).
+   */
+  private describeAuthSession(req: Request): Record<string, unknown> {
+    const cookie = req.cookies?.[config.get<string>('session.cookieName')];
+    // express-session signs the cookie as `s:<sessionId>.<signature>`.
+    const presentedSessionId = typeof cookie === 'string' ? cookie.replace(/^s:/, '').split('.')[0] : undefined;
+
+    return {
+      sessionCookiePresented: presentedSessionId !== undefined,
+      sessionMatchesCookie: presentedSessionId === req.sessionID,
+      hasCodeVerifier: Boolean(req.session?.codeVerifier),
+      hasNonce: Boolean(req.session?.nonce),
+      alreadyAuthenticated: Boolean(req.session?.user),
+      sessionKeys: req.session ? Object.keys(req.session) : [],
+    };
+  }
+
   public static getCurrentUrl(req: Request): URL {
     const protocol = req.protocol;
     const host = req.get('host');
@@ -170,6 +192,11 @@ export class OIDCModule {
             return next(new OIDCAuthenticationError('Failed to initiate authentication'));
           }
 
+          this.logger.info('Stored PKCE code verifier and redirecting to IDAM', {
+            event: 'authorization_request',
+            ...this.describeAuthSession(req),
+          });
+
           res.redirect(redirectTo.href);
         });
       } catch (error) {
@@ -180,9 +207,21 @@ export class OIDCModule {
 
     // Callback route
     app.get('/oauth2/callback', async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        const { codeVerifier, nonce } = req.session;
+      const { codeVerifier, nonce } = req.session;
 
+      // openid-client drops code_verifier from the token request altogether when the
+      // verifier is undefined, so IDAM rejects the exchange with invalid_grant
+      // ("code_verifier parameter required") instead of us seeing that the session is
+      // the problem. Start the login again rather than making a request that cannot work.
+      if (!codeVerifier) {
+        this.logger.error('Callback reached with no PKCE code verifier in session', {
+          event: 'pkce_verifier_missing',
+          ...this.describeAuthSession(req),
+        });
+        return res.redirect('/login');
+      }
+
+      try {
         const callbackUrl = OIDCModule.getCurrentUrl(req);
 
         const authorizationChecks: Parameters<typeof client.authorizationCodeGrant>[2] = {
@@ -239,6 +278,7 @@ export class OIDCModule {
           redirectUri: this.oidcConfig.redirectUri,
           issuer: this.oidcConfig.issuer,
           clientId: this.oidcConfig.clientId,
+          ...this.describeAuthSession(req),
         });
         next(new OIDCCallbackError('Failed to complete authentication'));
       }
