@@ -44,7 +44,7 @@ import { step as exemptLandlord } from './exempt-landlord';
 import { step as freeLegalAdvice } from './free-legal-advice';
 import { step as howMuchAffordToPay } from './how-much-afford-to-pay';
 import { step as incomeAndExpenses } from './income-and-expenditure';
-import { step as installmentPayments } from './installment-payments';
+import { step as instalmentPayments } from './instalment-payments';
 import { step as languageUsed } from './language-used';
 import { step as nonRentArrearsDispute } from './non-rent-arrears-dispute';
 import { step as doAnyOtherAdultsLiveInYourHome } from './other-adults';
@@ -127,7 +127,7 @@ export const stepRegistry = {
   'payment-interstitial': paymentInterstitial,
   'repayments-made': repaymentsMade,
   'repayments-agreed': repaymentsAgreed,
-  'installment-payments': installmentPayments,
+  'instalment-payments': instalmentPayments,
   'how-much-afford-to-pay': howMuchAffordToPay,
   'your-household-and-circumstances': yourHouseholdAndCircumstances,
   'do-you-have-any-dependant-children': doYouHaveAnyDependantChildren,
