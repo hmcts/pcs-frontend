@@ -82,10 +82,7 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
 }));
 
 import { getStatementOfTruthInitialFormData, step } from '../../../../main/steps/respond-to-claim/end-of-journey-cya';
-import {
-  RespondToClaimDraftChangedError,
-  RespondToClaimSubmitRejectedError,
-} from '../../../../main/steps/utils/respondToClaimFinalSubmit';
+import { RespondToClaimSubmitRejectedError } from '../../../../main/steps/utils/respondToClaimFinalSubmit';
 
 const CASE_REF = '1234567890123456';
 const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
@@ -198,7 +195,9 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
   });
 
   it('returns to the review page when the submit itself is refused as DRAFT_CHANGED', async () => {
-    mockSubmitRespondToClaimResponse.mockRejectedValueOnce(new RespondToClaimDraftChangedError());
+    mockSubmitRespondToClaimResponse.mockRejectedValueOnce({
+      response: { status: 422, data: { callbackErrors: ['DRAFT_CHANGED: Your answers have changed'] } },
+    });
     const req = createReq({ body: completeStatementOfTruth });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { redirect: jest.fn() } as any;

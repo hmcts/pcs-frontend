@@ -31,7 +31,6 @@ jest.mock('@utils/clientContextSessionClearer', () => ({
 import type { Request } from 'express';
 
 import {
-  RespondToClaimDraftChangedError,
   RespondToClaimSubmitRejectedError,
   getEndOfJourneyCyaDraftChangedPath,
   getEndOfJourneyCyaSubmitErrorPath,
@@ -243,14 +242,16 @@ describe('submitRespondToClaimResponse — reviewed draft version', () => {
     expect(payload.data.possessionClaimResponse).toEqual({});
   });
 
-  it('maps a DRAFT_CHANGED refusal from CCD to RespondToClaimDraftChangedError', async () => {
-    mockHttpPost.mockRejectedValue({
+  it('rethrows a DRAFT_CHANGED refusal from CCD unchanged so the caller can detect it', async () => {
+    const refusal = {
       response: { status: 422, data: { callbackErrors: ['DRAFT_CHANGED: Your answers have changed'] } },
-    });
+    };
+    mockHttpPost.mockRejectedValue(refusal);
 
-    await expect(submitRespondToClaimResponse(reqWithDraftVersion(5))).rejects.toBeInstanceOf(
-      RespondToClaimDraftChangedError
-    );
+    const rejection = await submitRespondToClaimResponse(reqWithDraftVersion(5)).catch(error => error);
+
+    expect(rejection).toBe(refusal);
+    expect(isDraftChangedError(rejection)).toBe(true);
   });
 
   it('maps a validation refusal from pcs-api to RespondToClaimSubmitRejectedError carrying the messages', async () => {
@@ -274,10 +275,8 @@ describe('submitRespondToClaimResponse — reviewed draft version', () => {
 
 describe('isDraftChangedError', () => {
   it.each([
-    ['the typed error', new RespondToClaimDraftChangedError()],
     ['an HTTPError built from mid-event callback errors', new Error('CCD callback rejected request: DRAFT_CHANGED: x')],
     ['an axios error carrying callbackErrors', { response: { data: { callbackErrors: ['DRAFT_CHANGED: x'] } } }],
-    ['an axios error carrying errors', { response: { data: { errors: ['DRAFT_CHANGED: x'] } } }],
   ])('recognises %s', (_label, error) => {
     expect(isDraftChangedError(error)).toBe(true);
   });

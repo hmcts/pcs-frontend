@@ -30,14 +30,7 @@ export class RespondToClaimFinalSubmitError extends Error {
   }
 }
 
-export const DRAFT_CHANGED_ERROR_CODE = 'DRAFT_CHANGED';
-
-export class RespondToClaimDraftChangedError extends Error {
-  constructor(message = 'Draft changed after review') {
-    super(message);
-    this.name = 'RespondToClaimDraftChangedError';
-  }
-}
+const DRAFT_CHANGED_ERROR_CODE = 'DRAFT_CHANGED';
 
 export class RespondToClaimSubmitRejectedError extends Error {
   constructor(public readonly messages: string[]) {
@@ -48,18 +41,16 @@ export class RespondToClaimSubmitRejectedError extends Error {
 
 export const RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY = 'respondToClaimSubmitRejection';
 
-export type SubmitRejectionReason = 'correspondenceAddress' | 'other';
-
-export function submitRejectionReason(messages: string[]): SubmitRejectionReason {
+export function submitRejectionReason(messages: string[]): 'correspondenceAddress' | 'other' {
   return messages.some(message => /correspondence address/i.test(message)) ? 'correspondenceAddress' : 'other';
 }
 
 export function callbackErrorMessages(error: unknown): string[] {
-  const responseData = (error as { response?: { data?: { callbackErrors?: unknown; errors?: unknown } } })?.response
-    ?.data;
-  return [responseData?.callbackErrors, responseData?.errors]
-    .flatMap(value => (Array.isArray(value) ? value : []))
-    .filter((value): value is string => typeof value === 'string');
+  const callbackErrors = (error as { response?: { data?: { callbackErrors?: unknown } } })?.response?.data
+    ?.callbackErrors;
+  return Array.isArray(callbackErrors)
+    ? callbackErrors.filter((value): value is string => typeof value === 'string')
+    : [];
 }
 
 export function getEndOfJourneyCyaDraftChangedPath(caseId: string): string {
@@ -67,9 +58,6 @@ export function getEndOfJourneyCyaDraftChangedPath(caseId: string): string {
 }
 
 export function isDraftChangedError(error: unknown): boolean {
-  if (error instanceof RespondToClaimDraftChangedError) {
-    return true;
-  }
   if (error instanceof Error && error.message.includes(DRAFT_CHANGED_ERROR_CODE)) {
     return true;
   }
@@ -187,7 +175,7 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
   } catch (error) {
     if (isDraftChangedError(error)) {
       logger.warn(`Submit refused for case ${caseId}: draft changed after review`);
-      throw new RespondToClaimDraftChangedError();
+      throw error;
     }
     const messages = callbackErrorMessages(error);
     if (messages.length > 0) {
