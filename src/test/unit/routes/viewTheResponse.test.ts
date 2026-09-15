@@ -522,6 +522,107 @@ describe('viewTheResponse route', () => {
     );
   });
 
+  it('shows a citizen-supplied phone when contact-by-phone is Yes even if phoneNumberProvided is NO', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        claimIssuedDate: '2026-02-05',
+        defendantContactDetails: {
+          party: {
+            firstName: 'Jane',
+            lastName: 'Defendant',
+            phoneNumberProvided: 'NO',
+            phoneNumber: '07700900444',
+            addressKnown: 'YES',
+            address: {
+              AddressLine1: '2 Defendant Road',
+              PostTown: 'London',
+              PostCode: 'N1 1AA',
+            },
+          },
+        },
+        defendantResponses: {
+          contactByPhone: 'YES',
+          dateOfBirth: '1990-05-15',
+        },
+      },
+    });
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+    const next: NextFunction = jest.fn();
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      next
+    );
+
+    expect(next).not.toHaveBeenCalled();
+    const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderArgs.defendant1Details.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.phone' },
+          value: { text: '07700900444' },
+        }),
+      ])
+    );
+  });
+
+  it('does not show a phone number when contact-by-phone is No', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        claimIssuedDate: '2026-02-05',
+        defendantContactDetails: {
+          party: {
+            firstName: 'Jane',
+            lastName: 'Defendant',
+            phoneNumberProvided: 'YES',
+            phoneNumber: '07700900444',
+            addressKnown: 'YES',
+            address: {
+              AddressLine1: '2 Defendant Road',
+              PostTown: 'London',
+              PostCode: 'N1 1AA',
+            },
+          },
+        },
+        defendantResponses: {
+          contactByPhone: 'NO',
+          dateOfBirth: '1990-05-15',
+        },
+      },
+    });
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+    const next: NextFunction = jest.fn();
+
+    await handler(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      next
+    );
+
+    expect(next).not.toHaveBeenCalled();
+    const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderArgs.defendant1Details.rows).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.phone' },
+        }),
+      ])
+    );
+  });
+
   it('should show persons unknown when additional defendant name is redacted with no name fields', async () => {
     mockCaseById({
       propertyAddress: {
