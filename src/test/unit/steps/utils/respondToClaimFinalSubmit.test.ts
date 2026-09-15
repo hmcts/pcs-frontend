@@ -244,7 +244,7 @@ describe('submitRespondToClaimResponse — reviewed draft version', () => {
 
   it('rethrows a DRAFT_CHANGED refusal from CCD unchanged so the caller can detect it', async () => {
     const refusal = {
-      response: { status: 422, data: { callbackErrors: ['DRAFT_CHANGED: Your answers have changed'] } },
+      response: { status: 422, data: { callbackErrors: ['DRAFT_CHANGED'] } },
     };
     mockHttpPost.mockRejectedValue(refusal);
 
@@ -275,8 +275,8 @@ describe('submitRespondToClaimResponse — reviewed draft version', () => {
 
 describe('isDraftChangedError', () => {
   it.each([
-    ['an HTTPError built from mid-event callback errors', new Error('CCD callback rejected request: DRAFT_CHANGED: x')],
-    ['an axios error carrying callbackErrors', { response: { data: { callbackErrors: ['DRAFT_CHANGED: x'] } } }],
+    ['an HTTPError built from mid-event callback errors', new Error('CCD callback rejected request: DRAFT_CHANGED')],
+    ['an axios error carrying callbackErrors', { response: { data: { callbackErrors: ['DRAFT_CHANGED'] } } }],
   ])('recognises %s', (_label, error) => {
     expect(isDraftChangedError(error)).toBe(true);
   });

@@ -178,9 +178,7 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
   });
 
   it('does not submit and returns to the review page when the statement-of-truth save is refused', async () => {
-    mockSaveDraftDefendantResponse.mockRejectedValueOnce(
-      new Error('CCD callback rejected request: DRAFT_CHANGED: Your answers have changed since you reviewed them.')
-    );
+    mockSaveDraftDefendantResponse.mockRejectedValueOnce(new Error('CCD callback rejected request: DRAFT_CHANGED'));
     const req = createReq({ body: completeStatementOfTruth });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { redirect: jest.fn() } as any;
@@ -196,7 +194,7 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
 
   it('returns to the review page when the submit itself is refused as DRAFT_CHANGED', async () => {
     mockSubmitRespondToClaimResponse.mockRejectedValueOnce({
-      response: { status: 422, data: { callbackErrors: ['DRAFT_CHANGED: Your answers have changed'] } },
+      response: { status: 422, data: { callbackErrors: ['DRAFT_CHANGED'] } },
     });
     const req = createReq({ body: completeStatementOfTruth });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

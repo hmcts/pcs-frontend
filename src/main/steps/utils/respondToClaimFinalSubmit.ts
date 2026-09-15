@@ -61,7 +61,7 @@ export function isDraftChangedError(error: unknown): boolean {
   if (error instanceof Error && error.message.includes(DRAFT_CHANGED_ERROR_CODE)) {
     return true;
   }
-  return callbackErrorMessages(error).some(message => message.startsWith(DRAFT_CHANGED_ERROR_CODE));
+  return callbackErrorMessages(error).some(message => message === DRAFT_CHANGED_ERROR_CODE);
 }
 
 interface ParsedSubmitPaymentPayload {
