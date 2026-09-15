@@ -5,6 +5,8 @@
 
 {% set backUrl = '/' %}
 
+{% block pageTitle %}{{ t('dashboard:pageTitle') }} - GOV.UK{% endblock %}
+
 {% block serviceNavigation %}
   {{ govukServiceNavigation({
     serviceName: t('dashboard:serviceName'),
