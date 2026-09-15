@@ -1,0 +1,18 @@
+export const counterClaimFee = {
+  mainHeader: `Ffi gwrth-hawliad`,
+  helpWithCourtFeesHeader: `Help gyda ffioedd llys`,
+  youMayBeAbleParagraph: `Efallai y gallwch gael help i dalu'r ffi os ydych chi (os yw un neu fwy o’r canlynol yn berthnasol):`,
+  areOnBenefitList: `yn cael budd-daliadau penodol`,
+  haveLittleList: `gyda dim ond ychydig neu dim cynilion`,
+  haveLowIncomeList: `ar incwm isel`,
+  doYouNeedHelpPayingCounterClaimQuestion: `Ydych chi angen help i dalu'r ffi gwrth-hawliad?`,
+  backLink: `Yn ôl`,
+  iNeedHelpRadioOption: `Rwyf angen help i dalu’r ffi`,
+  iDoNotNeedHelpRadioOption: `Nid wyf angen help i dalu’r ffi`,
+  thereIsAProblemErrorMessageHeader: `Mae yna broblem`,
+  selectIfYouNeedHelpErrorMessage: `Dewiswch os oes arnoch angen help i dalu’r ffi gwrth-hawliad`,
+  saveAndContinueButton: `Cadw a pharhau`,
+  saveForLaterButton: `Cadw at hwyrach ymlaen`,
+  feedbackLink: `adborth (yn agor mewn tab newydd)`,
+  pageSlug: `counter-claim-fee`,
+};
