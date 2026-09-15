@@ -55,7 +55,7 @@ function clearSectionCompletionOnEdit(req: Request, draft: PossessionClaimRespon
   );
 }
 
-function parseDraftVersion(value: unknown): number | undefined {
+export function parseDraftVersion(value: unknown): number | undefined {
   if (typeof value === 'number' && Number.isInteger(value)) {
     return value;
   }

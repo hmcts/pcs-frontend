@@ -74,6 +74,7 @@ jest.mock('../../../../main/steps/utils/respondToClaimFinalSubmit', () => {
 
 const mockSaveDraftDefendantResponse = jest.fn().mockResolvedValue(undefined);
 jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  ...jest.requireActual('../../../../main/steps/utils/buildDraftDefendantResponse'),
   buildDraftDefendantResponse: jest.fn(() => ({
     defendantResponses: { completedSections: [] },
     defendantContactDetails: { party: {} },
@@ -81,7 +82,11 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   saveDraftDefendantResponse: (...args: unknown[]) => mockSaveDraftDefendantResponse(...args),
 }));
 
-import { getStatementOfTruthInitialFormData, step } from '../../../../main/steps/respond-to-claim/end-of-journey-cya';
+import {
+  getEndOfJourneyCyaContent,
+  getStatementOfTruthInitialFormData,
+  step,
+} from '../../../../main/steps/respond-to-claim/end-of-journey-cya';
 import { RespondToClaimSubmitRejectedError } from '../../../../main/steps/utils/respondToClaimFinalSubmit';
 
 const CASE_REF = '1234567890123456';
@@ -150,6 +155,7 @@ describe('respond-to-claim end-of-journey-cya step', () => {
         statementOfTruthContempt: ['yes'],
         statementOfTruthBelief: ['yes'],
         fullName: 'Jane Defendant',
+        draftVersion: '4',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -202,6 +208,39 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
 
     await step.postController!.post(req, res, jest.fn());
 
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      `/case/${CASE_REF}/respond-to-claim/end-of-journey-cya?draftChanged=1`
+    );
+  });
+
+  it('shows the correspondence-address link even though formBuilder calls extendGetContent twice', async () => {
+    const req = createReq({
+      query: { lang: 'en', submitError: 'failed' },
+      session: {
+        formData: {},
+        user: { accessToken: 'mock-token' },
+        respondToClaimSubmitRejection: 'correspondenceAddress',
+      },
+    });
+    await getEndOfJourneyCyaContent(req, {} as never);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const content = (await getEndOfJourneyCyaContent(req, {} as never)) as any;
+
+    expect(content.errorSummary.errorList[0].href).toBe(`/case/${CASE_REF}/respond-to-claim/correspondence-address`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    expect((req as any).session.respondToClaimSubmitRejection).toBeUndefined();
+  });
+
+  it('does not save the declaration when the reviewed draft version is missing from the post', async () => {
+    const req = createReq({ body: { ...completeStatementOfTruth, draftVersion: undefined } });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = { redirect: jest.fn() } as any;
+
+    await step.postController!.post(req, res, jest.fn());
+
+    expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
+    expect(mockSubmitRespondToClaimResponse).not.toHaveBeenCalled();
     expect(res.redirect).toHaveBeenCalledWith(
       303,
       `/case/${CASE_REF}/respond-to-claim/end-of-journey-cya?draftChanged=1`

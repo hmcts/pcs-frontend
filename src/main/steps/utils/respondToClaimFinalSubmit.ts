@@ -1,8 +1,7 @@
 /**
  * Shared CCD final-submit for respond-to-claim (citizen).
  *
- * Used by the end-of-journey CYA step (after SOT validation) and the legacy
- * POST /case/:caseReference/final-submit route.
+ * Used by the end-of-journey CYA step after the statement of truth is validated.
  */
 import config from 'config';
 import type { Request } from 'express';
