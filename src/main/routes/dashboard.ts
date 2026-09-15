@@ -5,6 +5,7 @@ import type { TFunction } from 'i18next';
 import { HTTPError } from '../HttpError';
 import { MAKE_GENERAL_APPLICATION_ROUTE, UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware/oidc';
+import { getUserType } from '../steps/utils';
 
 import { getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -13,10 +14,12 @@ import type { DashboardTaskGroup } from '@services/dashboard.interface';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import {
   RESPOND_TO_CLAIM_DASHBOARD_TASK_TEMPLATE_ID,
+  YOUR_SUPPORT_DASHBOARD_TASK_TEMPLATE_ID,
   getDashboardTaskPath,
   isRespondToClaimDashboardNotification,
 } from '@utils/dashboardTaskPaths';
 import { getTagClasses, isLinkableStatus } from '@utils/dashboardTaskStatus';
+import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
 import { isRespondToClaimEnabledForUser } from '@utils/isRespondToClaimEnabledForUser';
 import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboardTemplates';
 import { safeRedirect303 } from '@utils/safeRedirect';
@@ -98,7 +101,8 @@ export default function dashboardRoutes(app: Application): void {
     tg: DashboardTaskGroup,
     t: TFunction,
     caseReference: string,
-    showRespondToClaimLinks: boolean
+    showRespondToClaimLinks: boolean,
+    showYourSupportTask: boolean
   ): MappedTaskGroup {
     const groupIdLower = tg.groupId.toLowerCase();
     const groupTitle = lookup(t, `dashboard:taskGroups.${tg.groupId}`);
@@ -110,6 +114,9 @@ export default function dashboardRoutes(app: Application): void {
       groupId: tg.groupId,
       title: groupTitle ?? tg.groupId,
       tasks: tg.tasks
+        // Your Support is removed outright (not just unlinked) when its feature is off or the user is a
+        // legal representative, so the dashboard never advertises a journey the user cannot start.
+        .filter(task => showYourSupportTask || task.templateId !== YOUR_SUPPORT_DASHBOARD_TASK_TEMPLATE_ID)
         .map((task): MappedTask | null => {
           const resolved = resolveTask(t, task.templateId);
           if (!resolved) {
@@ -169,6 +176,7 @@ export default function dashboardRoutes(app: Application): void {
       const dashboardData = await ccdCaseService.getDashboardView(accessToken, caseReference);
 
       const showRespondToClaimLinks = await isRespondToClaimEnabledForUser(req);
+      const showYourSupportTask = getUserType(req) !== 'legalrep' && (await isCuiYourSupportEnabled(req));
 
       const t = getTranslationFunction(req, ['dashboard', 'common']);
 
@@ -191,7 +199,7 @@ export default function dashboardRoutes(app: Application): void {
         .filter((x): x is NonNullable<typeof x> => x !== null);
 
       const taskGroups = dashboardData.taskGroups.map(tg =>
-        mapTaskGroup(tg, t, caseReference, showRespondToClaimLinks)
+        mapTaskGroup(tg, t, caseReference, showRespondToClaimLinks, showYourSupportTask)
       );
 
       const propertyAddress = dashboardData.propertyAddress ?? null;
