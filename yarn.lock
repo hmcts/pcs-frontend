@@ -2870,16 +2870,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.69.0":
-  version: 0.69.0
-  resolution: "@opentelemetry/instrumentation-redis@npm:0.69.0"
+"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.70.0":
+  version: 0.70.0
+  resolution: "@opentelemetry/instrumentation-redis@npm:0.70.0"
   dependencies:
-    "@opentelemetry/instrumentation": "npm:^0.221.0"
+    "@opentelemetry/instrumentation": "npm:^0.222.0"
     "@opentelemetry/redis-common": "npm:^0.38.3"
     "@opentelemetry/semantic-conventions": "npm:^1.27.0"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/a4f7c02cd215114e63cc48cbd82fc4976b91f986a3a17c234fc38e07dec4bdc8f5b59290e24f36810ea7f53f30fc055db5a60d35d04e657586fdc33dcff1cee0
+  checksum: 10/f19b2e6453b9a5eab346a68236bf5b5d465c1dd08ddbbae2b5fc2e276eea58993ff440aa61156ceb2c199450ada12d03576cd8ee00f8c7985c0fc5944027f4a2
   languageName: node
   linkType: hard
 
