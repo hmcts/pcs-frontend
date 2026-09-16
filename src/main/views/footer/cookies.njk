@@ -1,7 +1,7 @@
 {% extends "footer/layout.njk" %}
 
 {% block pageTitle %}
-  Cookie Policy - HM Courts & Tribunals Service - GOV.UK
+  Cookie Policy - HM Courts &amp; Tribunals Service - GOV.UK
 {% endblock %}
 
 {% block mainContent %}
@@ -30,6 +30,16 @@
           </tr>
       </thead>
       <tbody>
+         <tr scope="col" class="govuk-table__row">
+              <td class="govuk-table__cell">lang</td>
+              <td class="govuk-table__cell">Remembers user UI language preference.</td>
+              <td class="govuk-table__cell">1 year</td>
+          </tr>
+          <tr scope="col" class="govuk-table__row">
+              <td class="govuk-table__cell">pcs_session</td>
+              <td class="govuk-table__cell">User session token.</td>
+              <td class="govuk-table__cell">Session ends</td>
+          </tr>
           <tr scope="col" class="govuk-table__row">
               <td class="govuk-table__cell">dtCookie</td>
               <td class="govuk-table__cell">Tracks a visit across multiple requests.</td>
@@ -61,72 +71,6 @@
               <td class="govuk-table__cell">rxVisitor</td>
               <td class="govuk-table__cell">Generated user ID for usage tracking (Dynatrace)</td>
               <td class="govuk-table__cell">1 year</td>
-          </tr>
-          <tr scope="col" class="govuk-table__row">
-              <td class="govuk-table__cell">ai_user</td>
-              <td class="govuk-table__cell">Generated user ID for usage tracking (Application Insights)</td>
-              <td class="govuk-table__cell">6 months</td>
-          </tr>
-          <tr scope="col" class="govuk-table__row">
-              <td class="govuk-table__cell">ai_session</td>
-              <td class="govuk-table__cell">Generated session ID for usage tracking (Application Insights)</td>
-              <td class="govuk-table__cell">6 months</td>
-          </tr>
-      </tbody>
-  </table>
-  <h3 id="4-to-identify-you-when-you-come-back-to-the-service" class="govuk-heading-m">
-      To identify you when you come back to the service
-  </h3>
-  <p>We use authentication cookies to identify you when you return to the service.</p>
-  <table class="govuk-table">
-      <thead class="govuk-table__head">
-          <tr class="govuk-table__row">
-              <th class="govuk-table__header">Name</th>
-              <th class="govuk-table__header">Purpose</th>
-              <th class="govuk-table__header">Expires</th>
-          </tr>
-      </thead>
-      <tbody>
-          <tr class="govuk-table__row">
-              <td class="govuk-table__cell">__userid__</td>
-              <td class="govuk-table__cell">Your user ID</td>
-              <td class="govuk-table__cell">When you close your browser</td>
-          </tr>
-      </tbody>
-  </table>
-  <h3 id="5-to-make-the-service-more-secure" class="govuk-heading-m">To make the service more secure</h3>
-  <p>
-      We set cookies which prevent attackers from modifying the contents of our pages and which prevent unauthorised
-      access to the service. This makes the service more secure and protects your personal information.
-  </p>
-  <table class="govuk-table">
-      <thead class="govuk-table__head">
-          <tr class="govuk-table__row">
-              <th class="govuk-table__header">Name</th>
-              <th class="govuk-table__header">Purpose</th>
-              <th class="govuk-table__header">Expires</th>
-          </tr>
-      </thead>
-      <tbody>
-          <tr class="govuk-table__row">
-              <td class="govuk-table__cell">xui-webapp</td>
-              <td class="govuk-table__cell">Used to secure communications with HMCTS data services</td>
-              <td class="govuk-table__cell">8 hours</td>
-          </tr>
-          <tr class="govuk-table__row">
-              <td class="govuk-table__cell">_oauth2_proxy</td>
-              <td class="govuk-table__cell">Used to protect your login session</td>
-              <td class="govuk-table__cell">4 hours</td>
-          </tr>
-          <tr class="govuk-table__row">
-              <td class="govuk-table__cell">__auth__</td>
-              <td class="govuk-table__cell">Information about your current system authorisations</td>
-              <td class="govuk-table__cell">When you close your browser</td>
-          </tr>
-          <tr class="govuk-table__row">
-              <td class="govuk-table__cell">XSRF-TOKEN</td>
-              <td class="govuk-table__cell">Used to protect your session against cross site scripting attacks</td>
-              <td class="govuk-table__cell">When you close your browser</td>
           </tr>
       </tbody>
   </table>
