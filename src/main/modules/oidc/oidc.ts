@@ -25,7 +25,10 @@ export class OIDCModule {
   private readonly logger = Logger.getLogger('oidc');
 
   constructor() {
-    this.setupClient();
+    // A failed discovery must not reject unhandled: server.ts treats that as fatal and exits,
+    // which turns a brief IDAM blip during boot into a crash loop. setupClient has already
+    // logged the failure, and the middleware in enableFor retries on the next request.
+    void this.setupClient().catch(() => undefined);
   }
 
   private async setupClient(): Promise<Configuration> {
@@ -52,7 +55,12 @@ export class OIDCModule {
         this.clientConfig = await client.discovery(issuer, clientId, clientSecret, undefined, discoveryOptions);
         return this.clientConfig;
       } catch (error) {
-        this.logger.error('Failed to setup OIDC client:', error);
+        this.logger.error('Failed to setup OIDC client', {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          issuer: this.oidcConfig.issuer,
+          ...OIDCModule.describeErrorChain(error),
+        });
         this.clientConfigPromise = null;
         throw new OIDCAuthenticationError('Failed to initialize OIDC client');
       }
@@ -75,6 +83,28 @@ export class OIDCModule {
       return this.clientConfig;
     }
     return this.setupClient();
+  }
+
+  // undici reports every transport failure as `TypeError: fetch failed`, and openid-client
+  // passes it straight through. The reason (ECONNRESET, ETIMEDOUT, ENOTFOUND, …) is only on
+  // the cause chain, and JSON.stringify renders a nested Error as `{}`, so it has to be
+  // flattened to be logged at all.
+  private static describeErrorChain(error: unknown): Record<string, unknown> {
+    const chain: { name?: string; message?: string; code?: string }[] = [];
+
+    let current: unknown = error;
+    while (current instanceof Error && chain.length < 5) {
+      chain.push({
+        name: current.name,
+        message: current.message,
+        code: (current as { code?: string }).code,
+      });
+
+      const aggregated = (current as { errors?: unknown[] }).errors;
+      current = (current as { cause?: unknown }).cause ?? (Array.isArray(aggregated) ? aggregated[0] : undefined);
+    }
+
+    return { errorChain: chain };
   }
 
   private describeAuthSession(req: Request): Record<string, unknown> {
@@ -136,6 +166,7 @@ export class OIDCModule {
         error: error instanceof Error ? error.message : String(error),
         code: (error as { code?: string }).code,
         name: (error as { name?: string }).name,
+        ...OIDCModule.describeErrorChain(error),
       });
       throw new OIDCAuthenticationError('Failed to refresh access token');
     }
@@ -266,6 +297,7 @@ export class OIDCModule {
           redirectUri: this.oidcConfig.redirectUri,
           issuer: this.oidcConfig.issuer,
           clientId: this.oidcConfig.clientId,
+          ...OIDCModule.describeErrorChain(error),
           ...this.describeAuthSession(req),
         });
         next(new OIDCCallbackError('Failed to complete authentication'));

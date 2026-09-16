@@ -132,6 +132,19 @@ describe('OIDCModule', () => {
       expect(oidcModule).toBeInstanceOf(OIDCModule);
       expect(discovery).toHaveBeenCalled();
     });
+
+    it('should not leave the discovery failure unhandled when discovery fails during construction', async () => {
+      const unhandled = jest.fn();
+      process.on('unhandledRejection', unhandled);
+      (discovery as jest.Mock).mockRejectedValue(new Error('Discovery failed'));
+
+      const instance = new OIDCModule();
+      await new Promise(resolve => setImmediate(resolve));
+      process.off('unhandledRejection', unhandled);
+
+      expect(instance).toBeInstanceOf(OIDCModule);
+      expect(unhandled).not.toHaveBeenCalled();
+    });
   });
 
   describe('getCurrentUrl', () => {
@@ -178,6 +191,26 @@ describe('OIDCModule', () => {
       oidcModule['clientConfigPromise'] = null;
 
       await expect(oidcModule['setupClient']()).rejects.toThrow(OIDCAuthenticationError);
+    });
+
+    it('should log the transport reason when discovery fails without an HTTP response', async () => {
+      const logger = Logger.getLogger('oidc');
+      const dnsError = Object.assign(new Error('getaddrinfo EAI_AGAIN idam-web-public'), { code: 'EAI_AGAIN' });
+      (discovery as jest.Mock).mockRejectedValue(Object.assign(new TypeError('fetch failed'), { cause: dnsError }));
+      oidcModule['clientConfig'] = undefined as unknown as (typeof oidcModule)['clientConfig'];
+      oidcModule['clientConfigPromise'] = null;
+
+      await expect(oidcModule['setupClient']()).rejects.toThrow(OIDCAuthenticationError);
+
+      expect(logger.error).toHaveBeenCalledWith(
+        'Failed to setup OIDC client',
+        expect.objectContaining({
+          errorChain: [
+            { name: 'TypeError', message: 'fetch failed', code: undefined },
+            { name: 'Error', message: 'getaddrinfo EAI_AGAIN idam-web-public', code: 'EAI_AGAIN' },
+          ],
+        })
+      );
     });
   });
 
@@ -434,6 +467,73 @@ describe('OIDCModule', () => {
         await callbackHandler(mockRequest, mockResponse, mockNext);
 
         expect(mockNext).toHaveBeenCalledWith(expect.any(OIDCCallbackError));
+      });
+
+      it('should log the transport reason when the userinfo call never gets a response', async () => {
+        const logger = Logger.getLogger('oidc');
+        const mockTokens = {
+          access_token: 'test-token',
+          id_token: 'test-id-token',
+          refresh_token: 'test-refresh-token',
+          claims: jest.fn().mockReturnValue({ sub: 'test-sub' }),
+        };
+        const socketError = Object.assign(new Error('read ECONNRESET'), { code: 'ECONNRESET' });
+
+        (authorizationCodeGrant as jest.Mock).mockResolvedValue(mockTokens);
+        (fetchUserInfo as jest.Mock).mockRejectedValue(
+          Object.assign(new TypeError('fetch failed'), { cause: socketError })
+        );
+
+        mockRequest.session = createMockSession({
+          codeVerifier: 'test-verifier',
+          nonce: 'test-nonce',
+        });
+
+        oidcModule.enableFor(mockApp);
+        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
+        await callbackHandler(mockRequest, mockResponse, mockNext);
+
+        expect(logger.error).toHaveBeenCalledWith(
+          'Authentication error details:',
+          expect.objectContaining({
+            errorChain: [
+              { name: 'TypeError', message: 'fetch failed', code: undefined },
+              { name: 'Error', message: 'read ECONNRESET', code: 'ECONNRESET' },
+            ],
+          })
+        );
+      });
+
+      it('should follow the aggregate list when undici reports one failure per address', async () => {
+        const logger = Logger.getLogger('oidc');
+        const mockTokens = {
+          access_token: 'test-token',
+          id_token: 'test-id-token',
+          refresh_token: 'test-refresh-token',
+          claims: jest.fn().mockReturnValue({ sub: 'test-sub' }),
+        };
+        const connectError = Object.assign(new Error('connect ETIMEDOUT 10.0.0.1:443'), { code: 'ETIMEDOUT' });
+
+        (authorizationCodeGrant as jest.Mock).mockResolvedValue(mockTokens);
+        (fetchUserInfo as jest.Mock).mockRejectedValue(
+          Object.assign(new TypeError('fetch failed'), { errors: [connectError] })
+        );
+
+        mockRequest.session = createMockSession({
+          codeVerifier: 'test-verifier',
+          nonce: 'test-nonce',
+        });
+
+        oidcModule.enableFor(mockApp);
+        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
+        await callbackHandler(mockRequest, mockResponse, mockNext);
+
+        expect(logger.error).toHaveBeenCalledWith(
+          'Authentication error details:',
+          expect.objectContaining({
+            errorChain: expect.arrayContaining([expect.objectContaining({ code: 'ETIMEDOUT' })]),
+          })
+        );
       });
 
       it('should handle session save errors', async () => {
