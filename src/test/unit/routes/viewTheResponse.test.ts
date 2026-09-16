@@ -380,9 +380,18 @@ describe('viewTheResponse route', () => {
     expect(renderArgs.defendant1Details.rows.map((row: { key: { text: string } }) => row.key.text)).toEqual([
       'viewTheResponse:defendant.name',
       'viewTheResponse:defendant.phone',
+      'viewTheResponse:defendant.email',
       'viewTheResponse:defendant.address',
       'viewTheResponse:defendant.dateOfBirth',
     ]);
+    expect(renderArgs.defendant1Details.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.email' },
+          value: { text: 'jane.defendant@example.com' },
+        }),
+      ])
+    );
     expect(renderArgs.additionalDefendantDetails).toHaveLength(1);
     expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
       expect.arrayContaining([
@@ -621,6 +630,52 @@ describe('viewTheResponse route', () => {
         }),
       ])
     );
+  });
+
+  it('should omit defendant email when they did not opt in', async () => {
+    const data = buildComprehensiveCaseData();
+    data.possessionClaimResponse!.defendantResponses!.contactByEmail = 'NO';
+    mockCaseById(data);
+
+    viewTheResponseRoute(app);
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await getHandler()(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      jest.fn()
+    );
+
+    const rowKeys = (res.render as jest.Mock).mock.calls[0][1].defendant1Details.rows.map(
+      (row: { key: { text: string } }) => row.key.text
+    );
+    expect(rowKeys).not.toContain('viewTheResponse:defendant.email');
+  });
+
+  it('should omit defendant email when opted in but no address was entered', async () => {
+    const data = buildComprehensiveCaseData();
+    data.possessionClaimResponse!.defendantContactDetails!.party!.emailAddress = '   ';
+    mockCaseById(data);
+
+    viewTheResponseRoute(app);
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await getHandler()(
+      viewTheResponseRequest({
+        caseReference,
+        sessionUser: { accessToken: 'access-token-1' },
+      }),
+      res,
+      jest.fn()
+    );
+
+    const rowKeys = (res.render as jest.Mock).mock.calls[0][1].defendant1Details.rows.map(
+      (row: { key: { text: string } }) => row.key.text
+    );
+    expect(rowKeys).not.toContain('viewTheResponse:defendant.email');
   });
 
   it('should show persons unknown when additional defendant name is redacted with no name fields', async () => {
