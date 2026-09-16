@@ -19,14 +19,22 @@ export async function rentArrearsErrorValidation(): Promise<void> {
     message: rentArrears.enterAmountDefendantBelievesBelieveErrorMessage,
   });
   //amount exceeding max allowed value
-  await performAction('inputText', rentArrears.howMuchDoesDefendantBelieveHiddenTextLabel, rentArrears.billionTextInput);
+  await performAction(
+    'inputText',
+    rentArrears.howMuchDoesDefendantBelieveHiddenTextLabel,
+    rentArrears.billionTextInput
+  );
   await performAction('clickButton', rentArrears.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: rentArrears.thereIsAProblemErrorMessageHeader,
     message: rentArrears.lessThanBillionErrorMessage,
   });
   //negative value entered
-  await performAction('inputText', rentArrears.howMuchDoesDefendantBelieveHiddenTextLabel, rentArrears.negativeTextInput);
+  await performAction(
+    'inputText',
+    rentArrears.howMuchDoesDefendantBelieveHiddenTextLabel,
+    rentArrears.negativeTextInput
+  );
   await performAction('clickButton', rentArrears.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: rentArrears.thereIsAProblemErrorMessageHeader,

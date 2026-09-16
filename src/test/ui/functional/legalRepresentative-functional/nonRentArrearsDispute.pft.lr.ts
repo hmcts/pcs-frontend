@@ -1,6 +1,4 @@
-import {
-  nonRentArrearsDispute,
-} from '../../data/page-data/lr-page-data';
+import { nonRentArrearsDispute } from '../../data/page-data/lr-page-data';
 import { generateRandomString } from '../../utils/common/string.utils';
 import { performAction, performValidation } from '../../utils/controller';
 
