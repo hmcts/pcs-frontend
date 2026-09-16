@@ -1,0 +1,36 @@
+{% from "govuk/components/footer/macro.njk" import govukFooter %}
+{% from "footer/macro.njk" import hmctsUiFooter %}
+
+{% macro pcsFooter(isLegalRepresentative, footerModel) %}
+  {% if isLegalRepresentative %}
+    {{ hmctsUiFooter(footerModel) }}
+  {% else %}
+    {{ govukFooter({
+      meta: {
+        visuallyHiddenTitle: "Support links",
+        items: [
+          {
+            text: "Accessibility",
+            href: "/accessibility"
+          },
+          {
+            text: "Cookies",
+            href: "/cookies"
+          },
+          {
+            text: "Privacy policy",
+            href: "/privacy-policy"
+          },
+          {
+            text: "Terms and conditions",
+            href: "/terms-and-conditions"
+          },
+          {
+            text: "Get help",
+            href: "/get-help"
+          }
+        ]
+      }
+    }) }}
+  {% endif %}
+{% endmacro %}
