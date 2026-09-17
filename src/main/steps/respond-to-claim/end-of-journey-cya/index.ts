@@ -2,11 +2,20 @@ import config from 'config';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  parseDraftVersion,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import {
   RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY,
+  RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY,
+  RespondToClaimSubmitRejectedError,
   buildStatementOfTruthPayload,
+  getEndOfJourneyCyaDraftChangedPath,
   getEndOfJourneyCyaSubmitErrorPath,
+  isDraftChangedError,
+  submitRejectionReason,
   submitRespondToClaimResponse,
 } from '../../utils/respondToClaimFinalSubmit';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -24,6 +33,107 @@ const STEP_NAME = 'end-of-journey-cya';
 
 // Field config override for the submit error when submitting the response fails
 const submitResponseErrorFields: FormFieldConfig[] = [{ name: 'submitResponse', type: 'text' }];
+
+// formBuilder calls extendGetContent twice per request, so the session key is read once and kept on res.locals.
+function takeSubmitRejection(req: Request): string | undefined {
+  const locals = req.res?.locals as Record<string, unknown> | undefined;
+  const rejection =
+    (locals?.[RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY] as string | undefined) ??
+    req.session[RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY];
+  if (locals) {
+    locals[RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY] = rejection;
+  }
+  delete req.session[RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY];
+  return rejection;
+}
+
+export function getStatementOfTruthInitialFormData(req: Request): Record<string, unknown> {
+  const sot = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.statementOfTruth;
+  const accepted = sot?.accepted === 'YES' && req.query?.draftChanged !== '1';
+  const fullName = sot?.fullName;
+  const nameOfFirm = sot?.nameOfFirm;
+  const positionHeld = sot?.positionHeld;
+  return {
+    ...(accepted ? { statementOfTruthContempt: ['yes'], statementOfTruthBelief: ['yes'] } : {}),
+    ...(fullName ? { fullName } : {}),
+    ...(nameOfFirm ? { nameOfFirm } : {}),
+    ...(positionHeld ? { positionHeld } : {}),
+  };
+}
+
+export async function getEndOfJourneyCyaContent(req: Request, _formContent: unknown): Promise<Record<string, unknown>> {
+  await loadStepNamespaces(
+    req,
+    [
+      'checkYourAnswersStartNowAndDetails',
+      'checkYourAnswersPersonalDetails',
+      'checkYourAnswersYourResponse',
+      'checkYourAnswersPaymentsAndAgreements',
+      'checkYourAnswersYourCircumstances',
+      'checkYourAnswersIncomeAndExpenses',
+      'checkYourAnswersDocuments',
+      'checkYourAnswers',
+    ],
+    'respondToClaim'
+  );
+  const t: TFunction = getTranslationFunction(req, ['common']);
+  const sections = buildEndOfJourneyCyaSections(req, t);
+  const status = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.status;
+  const submitDisabled = status === 'SUBMITTED';
+  const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
+
+  const caseId = req.res?.locals.validatedCase?.id;
+  let dashboardUrl = getDashboardUrl(caseId);
+
+  if (isLegalRepresentative && caseId) {
+    const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
+      ? config.get<string>('redirects.manageCaseReturnURL')
+      : null;
+    if (caseDetailsBaseUrl) {
+      dashboardUrl = `${caseDetailsBaseUrl}/${caseId}`;
+    }
+  }
+
+  const draftVersion = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.draftVersion ?? '';
+  const base = { sections, submitDisabled, isLegalRepresentative, dashboardUrl, draftVersion };
+
+  const draftChanged = req.query.draftChanged === '1';
+  if (req.query.submitError !== 'failed' && !draftChanged) {
+    return base;
+  }
+
+  const tError = getTranslationFunction(req, ['respondToClaim/checkYourAnswers', 'common']);
+
+  const rejection = takeSubmitRejection(req);
+  if (!draftChanged && rejection === 'correspondenceAddress' && caseId) {
+    const title = tError('errors.title');
+    const text = tError('errors.correspondenceAddressRejected');
+    const errorSummary = {
+      titleText: title && title !== 'errors.title' ? title : 'There is a problem',
+      errorList: [
+        {
+          text:
+            text && text !== 'errors.correspondenceAddressRejected'
+              ? text
+              : 'Check the correspondence address you entered and try again.',
+          href: `/case/${caseId}/respond-to-claim/correspondence-address`,
+        },
+      ],
+    };
+    return { ...base, errorSummary };
+  }
+
+  const errorKey = draftChanged ? 'errors.draftChanged' : 'errors.submitResponseFailed';
+  const fallback = draftChanged
+    ? 'Your answers have changed since you reviewed them. Check them and confirm again.'
+    : 'Failed to submit response. Please try again.';
+  const translated = tError(errorKey);
+  const message = translated && translated !== errorKey ? translated : fallback;
+
+  const errorSummary = buildErrorSummary({ submitResponse: message }, submitResponseErrorFields, tError);
+
+  return { ...base, ...(errorSummary ? { errorSummary } : {}) };
+}
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
@@ -79,67 +189,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       translationKey: { label: 'statementOfTruth.positionHeldLabel' },
     },
   ],
-  getInitialFormData: (req: Request) => {
-    const sot = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.statementOfTruth;
-    const accepted = sot?.accepted === 'YES';
-    const fullName = sot?.fullName;
-    const nameOfFirm = sot?.nameOfFirm;
-    const positionHeld = sot?.positionHeld;
-    return {
-      ...(accepted ? { statementOfTruthContempt: ['yes'], statementOfTruthBelief: ['yes'] } : {}),
-      ...(fullName ? { fullName } : {}),
-      ...(nameOfFirm ? { nameOfFirm } : {}),
-      ...(positionHeld ? { positionHeld } : {}),
-    };
-  },
-  extendGetContent: async (req: Request, _formContent) => {
-    await loadStepNamespaces(
-      req,
-      [
-        'checkYourAnswersStartNowAndDetails',
-        'checkYourAnswersPersonalDetails',
-        'checkYourAnswersYourResponse',
-        'checkYourAnswersPaymentsAndAgreements',
-        'checkYourAnswersYourCircumstances',
-        'checkYourAnswersIncomeAndExpenses',
-        'checkYourAnswersDocuments',
-        'checkYourAnswers',
-      ],
-      'respondToClaim'
-    );
-    const t: TFunction = getTranslationFunction(req, ['common']);
-    const sections = buildEndOfJourneyCyaSections(req, t);
-    const status = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.status;
-    const submitDisabled = status === 'SUBMITTED';
-    const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
-
-    const caseId = req.res?.locals.validatedCase?.id;
-    let dashboardUrl = getDashboardUrl(caseId);
-
-    if (isLegalRepresentative && caseId) {
-      const caseDetailsBaseUrl = config.has('redirects.manageCaseReturnURL')
-        ? config.get<string>('redirects.manageCaseReturnURL')
-        : null;
-      if (caseDetailsBaseUrl) {
-        dashboardUrl = `${caseDetailsBaseUrl}/${caseId}`;
-      }
-    }
-
-    if (req.query.submitError !== 'failed') {
-      return { sections, submitDisabled, isLegalRepresentative, dashboardUrl };
-    }
-
-    const tError = getTranslationFunction(req, ['respondToClaim/checkYourAnswers', 'common']);
-    const translated = tError('errors.submitResponseFailed');
-    const message =
-      translated && translated !== 'errors.submitResponseFailed'
-        ? translated
-        : 'Failed to submit response. Please try again.';
-
-    const errorSummary = buildErrorSummary({ submitResponse: message }, submitResponseErrorFields, tError);
-
-    return { sections, submitDisabled, isLegalRepresentative, dashboardUrl, ...(errorSummary ? { errorSummary } : {}) };
-  },
+  getInitialFormData: getStatementOfTruthInitialFormData,
+  extendGetContent: getEndOfJourneyCyaContent,
   beforeRedirect: async (req: Request) => {
     const draft = buildDraftDefendantResponse(req);
     const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
@@ -151,9 +202,23 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     if (!current.includes(enumValue)) {
       draft.defendantResponses.completedSections = [...current, enumValue];
     }
-    await saveDraftDefendantResponse(req, draft);
-
     const caseId = req.res?.locals.validatedCase?.id;
+
+    if (caseId && parseDraftVersion(req.body?.draftVersion) === undefined) {
+      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaDraftChangedPath(caseId);
+      return;
+    }
+
+    try {
+      await saveDraftDefendantResponse(req, draft);
+    } catch (error) {
+      if (caseId && isDraftChangedError(error)) {
+        req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaDraftChangedPath(caseId);
+        return;
+      }
+      throw error;
+    }
+
     if (!caseId) {
       req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaSubmitErrorPath(
         String(req.params?.caseReference ?? '')
@@ -164,8 +229,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     try {
       const { confirmationPath } = await submitRespondToClaimResponse(req);
       req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = confirmationPath;
-    } catch {
-      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaSubmitErrorPath(caseId);
+    } catch (error) {
+      if (error instanceof RespondToClaimSubmitRejectedError) {
+        req.session[RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY] = submitRejectionReason(error.messages);
+      }
+      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = isDraftChangedError(error)
+        ? getEndOfJourneyCyaDraftChangedPath(caseId)
+        : getEndOfJourneyCyaSubmitErrorPath(caseId);
     }
   },
   resolveRedirectAfterPost: async (req: Request) => {
