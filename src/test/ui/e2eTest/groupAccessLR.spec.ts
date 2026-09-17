@@ -1,4 +1,4 @@
-import type { BrowserContext, Page } from '@playwright/test';
+import { type BrowserContext, type Page, expect } from '@playwright/test';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
@@ -31,13 +31,25 @@ async function clearBrowserSession(page: Page, context: BrowserContext): Promise
 
 async function validateSolicitorCannotAccessCase(
   page: Page,
-  context: BrowserContext,
   solicitorEmail: string
 ): Promise<void> {
-  await clearBrowserSession(page, context);
-  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('login', solicitorEmail);
-  await performValidation('mainHeader', 'You do not have access to this page');
+  const browser = page.context().browser();
+  if (!browser) {
+    throw new Error('Browser is required to validate access with an isolated session');
+  }
+
+  const isolatedContext = await browser.newContext();
+  const isolatedPage = await isolatedContext.newPage();
+
+  try {
+    await isolatedPage.goto(home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+    await isolatedPage.getByLabel('Email address').fill(solicitorEmail);
+    await isolatedPage.getByLabel('Password').fill(resolveIdamPassword());
+    await isolatedPage.getByRole('button', { name: 'Sign in' }).click();
+    await expect(isolatedPage.getByRole('heading', { name: 'You do not have access to this page' })).toBeVisible();
+  } finally {
+    await isolatedContext.close();
+  }
 }
 
 async function validateCitizenCannotAccessCase(page: Page, context: BrowserContext): Promise<void> {
@@ -112,7 +124,7 @@ test.describe('Legal representative organisation access after Notice of Change @
       radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
     });
 
-    await validateSolicitorCannotAccessCase(page, context, user.defendantSolicitor3.email);
+    await validateSolicitorCannotAccessCase(page, user.defendantSolicitor3.email);
   });
 
   test('All representatives in the linked organisation can respond for a single-defendant case @LR @singleDefendant', async ({
@@ -123,7 +135,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
     await performAction('clickButton', startNow.startNowButton);
-    await validateSolicitorCannotAccessCase(page, context, user.defendantSolicitor3.email);
+    await validateSolicitorCannotAccessCase(page, user.defendantSolicitor3.email);
   });
 
   test('Representatives can only respond for defendants linked to their organisation @LR @mixedOrganisation', async ({
@@ -189,7 +201,7 @@ test.describe('Legal representative organisation access after Notice of Change @
       defendantIndex: 0,
     });
 
-    await validateSolicitorCannotAccessCase(page, context, user.defendantSolicitor2.email);
+    await validateSolicitorCannotAccessCase(page, user.defendantSolicitor2.email);
 
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
@@ -201,7 +213,7 @@ test.describe('Legal representative organisation access after Notice of Change @
       option: defendantNameConfirmation.yesRadioOption,
     });
 
-    await validateSolicitorCannotAccessCase(page, context, user.defendantSolicitor2.email);
+    await validateSolicitorCannotAccessCase(page, user.defendantSolicitor2.email);
   });
 
   test('Further Notice of Change removes the previous organisation draft for that defendant @LR @draftRevocation', async ({
@@ -235,7 +247,7 @@ test.describe('Legal representative organisation access after Notice of Change @
       defendantIndex: 0,
     });
 
-    await validateSolicitorCannotAccessCase(page, context, user.defendantSolicitor2.email);
+    await validateSolicitorCannotAccessCase(page, user.defendantSolicitor2.email);
 
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
