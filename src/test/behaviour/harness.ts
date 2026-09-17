@@ -134,7 +134,7 @@ export async function bootApp(options: { judge?: boolean } = {}): Promise<TestAp
   const server = await listen(app);
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 
-  const request = (method: string, path: string, body?: string): Promise<HttpResponse> =>
+  const requestOnce = (method: string, path: string, body?: string): Promise<HttpResponse> =>
     new Promise((resolve, reject) => {
       const req = http.request(
         `${baseUrl}${path}`,
@@ -149,6 +149,21 @@ export async function bootApp(options: { judge?: boolean } = {}): Promise<TestAp
       req.on('error', reject);
       req.end(body);
     });
+
+  // On a busy CI host the loopback connection to this test's own server can be
+  // reset before it completes (ECONNRESET), independent of the application's
+  // behaviour; a single retry absorbs that without masking a real failure,
+  // which would still surface as a wrong status, body or a repeat of the reset.
+  const request = async (method: string, path: string, body?: string): Promise<HttpResponse> => {
+    try {
+      return await requestOnce(method, path, body);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException)?.code !== 'ECONNRESET') {
+        throw error;
+      }
+      return requestOnce(method, path, body);
+    }
+  };
 
   return {
     get: path => request('GET', path),
