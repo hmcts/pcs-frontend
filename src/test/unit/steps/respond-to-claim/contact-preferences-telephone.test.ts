@@ -40,15 +40,15 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
 }));
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
-import { step } from '../../../../main/steps/respond-to-claim/priority-debt-details';
+import { step } from '../../../../main/steps/respond-to-claim/contact-preferences-telephone';
 
-describe('respond-to-claim priority-debt-details step', () => {
+describe('respond-to-claim contact-preferences-telephone step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createReq = (overrides: Record<string, unknown> = {}): any => ({
     body: {},
-    originalUrl: '/case/1234567890123456/respond-to-claim/priority-debt-details',
+    originalUrl: '/case/1234567890123456/respond-to-claim/contact-preferences-telephone',
     query: { lang: 'en' },
     params: { caseReference: '1234567890123456' },
     session: {
@@ -66,14 +66,13 @@ describe('respond-to-claim priority-debt-details step', () => {
     mockSaveDraftDefendantResponse.mockResolvedValue(undefined);
   });
 
-  it('maps amounts to pence and normalizes frequency', async () => {
+  it('sets phoneNumberProvided Yes when the citizen supplies a phone number', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
     const req = createReq({
       body: {
         action: 'continue',
-        priorityDebtTotal: '148.50',
-        priorityDebtContribution: '20.00',
-        priorityDebtContributionFrequency: 'weekly',
+        contactByTelephone: 'yes',
+        'contactByTelephone.phoneNumber': '07700900444',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -90,44 +89,12 @@ describe('respond-to-claim priority-debt-details step', () => {
       expect.anything(),
       expect.objectContaining({
         defendantResponses: expect.objectContaining({
-          householdCircumstances: expect.objectContaining({
-            debtTotal: '14850',
-            debtContribution: '2000',
-            debtContributionFrequency: 'WEEKLY',
-          }),
+          contactByPhone: 'YES',
         }),
-      })
-    );
-  });
-
-  it('stores comma-formatted amounts as pence instead of deleting them', async () => {
-    (validateForm as jest.Mock).mockReturnValue({});
-    const req = createReq({
-      body: {
-        action: 'continue',
-        priorityDebtTotal: '1,234.56',
-        priorityDebtContribution: '1,000.00',
-        priorityDebtContributionFrequency: 'weekly',
-      },
-    });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { redirect: jest.fn() } as any;
-    const next = jest.fn();
-
-    if (!step.postController) {
-      throw new Error('expected postController');
-    }
-
-    await step.postController.post(req, res, next);
-
-    expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        defendantResponses: expect.objectContaining({
-          householdCircumstances: expect.objectContaining({
-            debtTotal: '123456',
-            debtContribution: '100000',
-            debtContributionFrequency: 'WEEKLY',
+        defendantContactDetails: expect.objectContaining({
+          party: expect.objectContaining({
+            phoneNumber: '07700900444',
+            phoneNumberProvided: 'YES',
           }),
         }),
       })
