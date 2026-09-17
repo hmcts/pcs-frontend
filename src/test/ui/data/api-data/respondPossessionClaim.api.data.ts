@@ -3,7 +3,7 @@ export const respondPossessionClaimApiData = {
   respondPossessionClaimPayload: {
     possessionClaimResponse: {
       defendantResponses: {
-        receivedFreeLegalAdvice: 'YES',
+        freeLegalAdvice: 'YES',
       },
     },
   },
