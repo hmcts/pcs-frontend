@@ -11,26 +11,48 @@
         items: [
           {
             text: "Accessibility",
-            href: "/accessibility"
+            href: "/accessibility",
+            attributes: {
+              target: "_blank",
+              rel: "noopener noreferrer"
+            }
           },
           {
             text: "Cookies",
-            href: "/cookies"
+            href: "/cookies",
+            attributes: {
+              target: "_blank",
+              rel: "noopener noreferrer"
+            }
           },
           {
             text: "Privacy policy",
-            href: "/privacy-policy"
+            href: "/privacy-policy",
+            attributes: {
+              target: "_blank",
+              rel: "noopener noreferrer"
+            }
           },
           {
             text: "Terms and conditions",
-            href: "/terms-and-conditions"
+            href: "/terms-and-conditions",
+            attributes: {
+              target: "_blank",
+              rel: "noopener noreferrer"
+            }
           },
           {
             text: "Get help",
-            href: "/get-help"
+            href: "/get-help",
+            attributes: {
+              target: "_blank",
+              rel: "noopener noreferrer"
+            }
           }
         ]
       }
     }) }}
+  {% else %}
+    {{ govukFooter() }}
   {% endif %}
 {% endmacro %}
