@@ -168,7 +168,7 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
     const fetchPinsApi = Axios.create(fetchPINsApiData.fetchPINSApiInstance());
     await waitUntilCaseIssued();
 
-    const maxRetries = actionRetries * 2;
+    const maxRetries = actionRetries * 2 + 4;
     const delayMs = SHORT_TIMEOUT;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       const response = await fetchPinsApi.get(fetchPINsApiData.fetchPINsApiEndPoint());
