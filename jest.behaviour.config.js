@@ -11,6 +11,10 @@ module.exports = {
     '^.+\\.[tj]s$': ['ts-jest', { tsconfig: { allowJs: true, isolatedModules: true } }],
   },
   setupFiles: ['<rootDir>/src/test/behaviour/setup.ts'],
+  // Coverage instrumentation adds real weight to each bootApp() call, which
+  // pulls in the full express app and Docweave's compiled bundle; give these
+  // slower boots headroom over Jest's 5s default rather than racing it.
+  testTimeout: 30000,
   moduleNameMapper: {
     '^@steps$': '<rootDir>/src/main/steps',
     '^@app/(.*)$': '<rootDir>/src/main/app/$1',
