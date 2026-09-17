@@ -29,10 +29,7 @@ async function clearBrowserSession(page: Page, context: BrowserContext): Promise
   });
 }
 
-async function validateSolicitorCannotAccessCase(
-  page: Page,
-  solicitorEmail: string
-): Promise<void> {
+async function validateSolicitorCannotAccessCase(page: Page, solicitorEmail: string): Promise<void> {
   const browser = page.context().browser();
   if (!browser) {
     throw new Error('Browser is required to validate access with an isolated session');
