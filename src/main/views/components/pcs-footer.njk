@@ -1,10 +1,10 @@
 {% from "govuk/components/footer/macro.njk" import govukFooter %}
 {% from "footer/macro.njk" import hmctsUiFooter %}
 
-{% macro pcsFooter(isLegalRepresentative, footerModel) %}
+{% macro pcsFooter(isLegalRepresentative, footerModel, release1dot3Enabled) %}
   {% if isLegalRepresentative %}
     {{ hmctsUiFooter(footerModel) }}
-  {% else %}
+  {% elif release1dot3Enabled %}
     {{ govukFooter({
       meta: {
         visuallyHiddenTitle: "Support links",
