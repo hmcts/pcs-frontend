@@ -6,6 +6,7 @@ import { ClientContextHeaders } from '../../../types/global';
 import { http } from '@modules/http';
 import { CcdCase, CitizenGenAppRequest, GenAppState, GenAppType } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import type { CcdFlags } from '@services/cuiRa/cuiRa.interface';
 
 jest.mock('config');
 jest.mock('@modules/http');
@@ -512,6 +513,89 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.submitGeneralApplication(accessToken, ccdData)).rejects.toThrow(
         'No confirmation body found in response data'
       );
+    });
+  });
+
+  describe('getDefendantSupport', () => {
+    const supportFlags = { partyName: 'Jo Bloggs', roleOnCase: 'Defendant', details: [] } as unknown as CcdFlags;
+
+    it('starts requestSupport and returns the defendant party id and its support flags', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          token: 'support-token',
+          case_details: { case_data: { partySupport: [{ id: 'party-1', value: { supportFlags } }] } },
+        },
+      });
+
+      const result = await ccdCaseService.getDefendantSupport(accessToken, caseId);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/requestSupport?ignore-warning=false`,
+        expect.objectContaining({ headers: expect.objectContaining({ Authorization: `Bearer ${accessToken}` }) })
+      );
+      expect(result).toEqual({ partyId: 'party-1', supportFlags });
+    });
+
+    it('throws 403 when the user owns no defendant party on the case', async () => {
+      mockGet.mockResolvedValue({
+        data: { token: 'support-token', case_details: { case_data: { partySupport: [] } } },
+      });
+
+      await expect(ccdCaseService.getDefendantSupport(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
+    });
+
+    it('throws 404 for an invalid case reference without calling CCD', async () => {
+      await expect(ccdCaseService.getDefendantSupport(accessToken, 'not-a-case')).rejects.toMatchObject({
+        status: 404,
+      });
+      expect(mockGet).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('submitDefendantSupportFlags', () => {
+    const existingSupport = { partyName: 'Jo Bloggs', roleOnCase: 'Defendant', details: [] };
+    const supportFlags = {
+      partyName: 'Jo Bloggs',
+      roleOnCase: 'Defendant',
+      details: [{ id: 'f1', value: { flagCode: 'RA0042', path: [] } }],
+    } as unknown as CcdFlags;
+
+    it('submits the flags under the defendant party via the requestSupport event', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          token: 'support-token',
+          case_details: {
+            case_data: { partySupport: [{ id: 'party-1', value: { supportFlags: existingSupport } }] },
+          },
+        },
+      });
+      mockPost.mockResolvedValue({ data: { id: caseId, data: {} } });
+
+      const result = await ccdCaseService.submitDefendantSupportFlags(accessToken, caseId, supportFlags);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/requestSupport?ignore-warning=false`,
+        expect.anything()
+      );
+      expect(mockPost).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/events`,
+        expect.objectContaining({
+          event: expect.objectContaining({ id: 'requestSupport' }),
+          event_token: 'support-token',
+          data: { partySupport: [{ id: 'party-1', value: { supportFlags } }] },
+        }),
+        expect.objectContaining({ headers: expect.objectContaining({ Authorization: `Bearer ${accessToken}` }) })
+      );
+      expect(result).toEqual({ id: caseId, data: {} });
+    });
+
+    it('does not submit when the START phase finds no eligible party', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'support-token', case_details: { case_data: {} } } });
+
+      await expect(ccdCaseService.submitDefendantSupportFlags(accessToken, caseId, supportFlags)).rejects.toMatchObject(
+        { status: 403 }
+      );
+      expect(mockPost).not.toHaveBeenCalled();
     });
   });
 

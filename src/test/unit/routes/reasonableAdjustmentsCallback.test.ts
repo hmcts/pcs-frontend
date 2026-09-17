@@ -32,8 +32,13 @@ jest.mock('@services/cuiRa/cuiRaService', () => ({
 
 const mockUpdateDraft = jest.fn();
 const mockGetCaseByIdForEvent = jest.fn();
+const mockSubmitDefendantSupportFlags = jest.fn();
 jest.mock('@services/ccdCaseService', () => ({
-  ccdCaseService: { updateDraft: mockUpdateDraft, getCaseByIdForEvent: mockGetCaseByIdForEvent },
+  ccdCaseService: {
+    updateDraft: mockUpdateDraft,
+    getCaseByIdForEvent: mockGetCaseByIdForEvent,
+    submitDefendantSupportFlags: mockSubmitDefendantSupportFlags,
+  },
 }));
 
 const mockGetValidS2SToken = jest.fn();
@@ -162,6 +167,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
       },
       { context: 'x' }
     );
+    expect(mockSubmitDefendantSupportFlags).not.toHaveBeenCalled();
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
   });
 
@@ -272,5 +278,45 @@ describe('reasonableAdjustmentsCallback routes', () => {
     await getHandler()(buildReq(), res);
 
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
+  });
+
+  describe('after the response has been submitted', () => {
+    // Post-submit the respondPossessionClaim START returns only the SUBMITTED marker: the draft has
+    // been deleted, so there is nothing to re-send and the flags must go to the party instead.
+    const submittedResponse = { defendantResponses: { status: 'SUBMITTED' } };
+    const flags = {
+      partyName: 'John Doe',
+      roleOnCase: 'Defendant',
+      details: [{ id: 'd1', value: { flagCode: 'RA0042', path: [{ id: 'p1', name: 'Reasonable adjustment' }] } }],
+    };
+
+    beforeEach(() => {
+      mockGetCaseByIdForEvent.mockResolvedValue({ id: '123', data: { possessionClaimResponse: submittedResponse } });
+      mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', replacementFlags: flags });
+    });
+
+    it('writes the flags to the party through requestSupport instead of the respond draft', async () => {
+      const res = {} as unknown as Response;
+
+      await getHandler()(buildReq(), res);
+
+      expect(mockSubmitDefendantSupportFlags).toHaveBeenCalledWith('user-tok', '123', {
+        partyName: 'John Doe',
+        roleOnCase: 'Defendant',
+        details: [{ id: 'd1', value: { flagCode: 'RA0042', path: [{ id: 'p1', value: 'Reasonable adjustment' }] } }],
+      });
+      expect(mockUpdateDraft).not.toHaveBeenCalled();
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
+    });
+
+    it('redirects to the error page when the requestSupport write fails', async () => {
+      mockSubmitDefendantSupportFlags.mockRejectedValue(new Error('ccd down'));
+      const res = {} as unknown as Response;
+
+      await getHandler()(buildReq(), res);
+
+      expect(mockUpdateDraft).not.toHaveBeenCalled();
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
+    });
   });
 });

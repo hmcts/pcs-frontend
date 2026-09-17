@@ -5601,17 +5601,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"allure-js-commons@npm:3.12.0":
-  version: 3.12.0
-  resolution: "allure-js-commons@npm:3.12.0"
+"allure-js-commons@npm:3.12.1":
+  version: 3.12.1
+  resolution: "allure-js-commons@npm:3.12.1"
   dependencies:
     md5: "npm:^2.3.0"
   peerDependencies:
-    allure-playwright: 3.12.0
+    allure-playwright: 3.12.1
   peerDependenciesMeta:
     allure-playwright:
       optional: true
-  checksum: 10/5ba9c4b9ee79c96e5fbe57d4efd11aab3333aea28414be3002a58b5a0e845e6b8334f90e45933c29e68a067dac482a84f835d7c2445fc441361acc63419b4b3f
+  checksum: 10/7b5eb56dc325bd10dbd647c7b36ab0c492bca64356785ee16be2f413fbbb0e8021cad5072ed81cea3c46b488a18272bb7ef9c2e0c820a724641b0c22d37096f3
   languageName: node
   linkType: hard
 
@@ -9140,17 +9140,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-fs-backend@npm:2.6.7":
-  version: 2.6.7
-  resolution: "i18next-fs-backend@npm:2.6.7"
-  checksum: 10/9d449c880f2e617cbb1534b2478210ded4e501557c9cee81d44c150bfc0a41470e68fd7539c82f71cd313dd17071bdd34165f14853bcce0b643d0d233bc4a509
+"i18next-fs-backend@npm:2.6.8":
+  version: 2.6.8
+  resolution: "i18next-fs-backend@npm:2.6.8"
+  checksum: 10/cf9b44fef8b6b49435e16b5396d32b2725f86d32dc5149de553f3dbd442038090d2353f69414e891464b722ac8dddc1304bb6f9e1aa7e40da1856dab7e161176
   languageName: node
   linkType: hard
 
-"i18next-http-middleware@npm:3.9.8":
-  version: 3.9.8
-  resolution: "i18next-http-middleware@npm:3.9.8"
-  checksum: 10/0d7d1cac9e5dcbc04ee5b2b1927acb83096f2082d0cb1cf8926df8f9164f20f90213fdb745b3fbf0ce496892ef97cc776cf660849eaecae0ddffb17eb27abf86
+"i18next-http-middleware@npm:3.9.9":
+  version: 3.9.9
+  resolution: "i18next-http-middleware@npm:3.9.9"
+  checksum: 10/cf7328df38d9e1825bbaf34275ca670473806f7229dc270a54aa87296ef0e66b909b8b299358439a15ebb8ba98be5009810b8fddd3f43b8df98caca6a75094f4
   languageName: node
   linkType: hard
 
@@ -10450,17 +10450,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:6.2.10":
-  version: 6.2.10
-  resolution: "jose@npm:6.2.10"
-  checksum: 10/232fccd0d98105242fa5455b729a40048932e2dd697442d934c39d83f4d9b4e331b5f1905971fccdacb51c0d3594fc7864a38af8d02b23cf7182317d6f38e220
-  languageName: node
-  linkType: hard
-
-"jose@npm:^6.2.8":
-  version: 6.2.8
-  resolution: "jose@npm:6.2.8"
-  checksum: 10/d1534f56cf693dfbb4b433b72df469c3c858748fe627621e27d9c1e7894716fc1d0225923be3ae98153345b9823a25c0ac376bfccce3ed363a4c032cfd4e2f5b
+"jose@npm:6.2.12, jose@npm:^6.2.12":
+  version: 6.2.12
+  resolution: "jose@npm:6.2.12"
+  checksum: 10/42ef7b598d22fe4ed0a4d0407f9dd9ae9f56dabd31cbad6cb4f67e296953a46b5d63603f8a599a3ee4c5659bf29bb14e846237f0381ea679116520b53e71e4ea
   languageName: node
   linkType: hard
 
@@ -11657,10 +11650,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oauth4webapi@npm:^3.8.7":
-  version: 3.8.7
-  resolution: "oauth4webapi@npm:3.8.7"
-  checksum: 10/a12ade342bbdaff3783cc936ecd1cb91247ec56e35c1badd27dfbbcdd6a6c9ced79b3d7e090628d7f1a570436206b0f245fb5fa4702609d145ff2f866bf487ed
+"oauth4webapi@npm:^3.8.8":
+  version: 3.8.8
+  resolution: "oauth4webapi@npm:3.8.8"
+  checksum: 10/7a212e4ed119dff57b44b81b0b36bd2d1f3bf3b152e201a6a864c854abad7cb5d20ada33f12e64ca544f1ea18ff0dc4b20ee847a680d5c33cb519e30f19b9045
   languageName: node
   linkType: hard
 
@@ -11800,13 +11793,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openid-client@npm:6.8.7":
-  version: 6.8.7
-  resolution: "openid-client@npm:6.8.7"
+"openid-client@npm:6.8.8":
+  version: 6.8.8
+  resolution: "openid-client@npm:6.8.8"
   dependencies:
-    jose: "npm:^6.2.8"
-    oauth4webapi: "npm:^3.8.7"
-  checksum: 10/13e06f7e0752cb0ca3980c105c50e4c862bb12ce12fefe5ef46374a0669ee6693e0309fc859528274f0d7498a772c893185468fbf655bc8e0117b19c48403be5
+    jose: "npm:^6.2.12"
+    oauth4webapi: "npm:^3.8.8"
+  checksum: 10/0a8601e3b8baf910801a76c268295317b6e72ac512cf39f8d220bdb49fab3c8ed978a0717be589900982191c0fd74209d15109b50f4f4be502ff6c713f28d94e
   languageName: node
   linkType: hard
 
@@ -12078,7 +12071,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:8.69.0"
     "@typescript-eslint/parser": "npm:8.69.0"
     allure-commandline: "npm:2.43.0"
-    allure-js-commons: "npm:3.12.0"
+    allure-js-commons: "npm:3.12.1"
     allure-playwright: "npm:3.11.1"
     axios: "npm:1.20.0"
     body-parser: "npm:2.3.0"
@@ -12108,14 +12101,14 @@ __metadata:
     http-terminator: "npm:3.2.0"
     husky: "npm:9.1.7"
     i18next: "npm:26.4.2"
-    i18next-fs-backend: "npm:2.6.7"
-    i18next-http-middleware: "npm:3.9.8"
+    i18next-fs-backend: "npm:2.6.8"
+    i18next-http-middleware: "npm:3.9.9"
     ioredis: "npm:6.0.0"
     jest: "npm:30.5.1"
     jest-environment-jsdom: "npm:30.5.1"
     jest-html-reporter: "npm:4.4.2"
     jest-pact: "npm:0.13.0"
-    jose: "npm:6.2.10"
+    jose: "npm:6.2.12"
     lint-staged: "npm:17.4.1"
     lodash: "npm:4.18.1"
     luxon: "npm:3.7.2"
@@ -12124,7 +12117,7 @@ __metadata:
     multer: "npm:^2.3.0"
     nodemon: "npm:3.1.14"
     nunjucks: "npm:3.2.4"
-    openid-client: "npm:6.8.7"
+    openid-client: "npm:6.8.8"
     playwright: "npm:1.62.1"
     playwright-core: "npm:1.62.1"
     postcss: "npm:8.5.28"

@@ -8,6 +8,7 @@ import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../steps/respond-to-claim/draftEve
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
+import { isDefendantResponseSubmitted } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { cuiRaService } from '@services/cuiRa/cuiRaService';
 import { toCcdFlags } from '@services/cuiRa/flagMapping';
@@ -16,7 +17,8 @@ import { safeRedirect303 } from '@utils/safeRedirect';
 const logger = Logger.getLogger('reasonableAdjustmentsCallback');
 
 // Return leg from the CUI Your Support (cui-ra) microsite.
-// On a 'submit' — persist the returned flags to the case DRAFT
+// On a 'submit' — persist the returned flags: to the case DRAFT while the response is still being
+// prepared, or straight to the defendant's party (requestSupport event) once it has been submitted.
 // On a 'cancel' → the "no request sent" page;
 // a retrieval failure → the RA error page.
 export default function reasonableAdjustmentsCallbackRoutes(app: Application): void {
@@ -89,11 +91,16 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
           return safeRedirect303(res, cancelledUrl, fallback, ['/case']);
         }
 
-        // Persist the returned flags to the case DRAFT via the same citizen respondPossessionClaim
-        // draft-save our journey pages use. The draft-save fully REPLACES the defendant response (and
-        // the final submit reads this same draft), so re-send the existing answers — narrowed to the
-        // defendant slice — alongside the flags, or a flags-only post would wipe them.
         const defendantFlags = toCcdFlags(flags);
+
+        if (isDefendantResponseSubmitted(existing.data)) {
+          // Write flags straight to the defendant's party through the requestSupport event
+          await ccdCaseService.submitDefendantSupportFlags(accessToken, caseReference, defendantFlags);
+          return safeRedirect303(res, confirmationUrl, fallback, ['/case']);
+        }
+
+        // The draft-save fully REPLACES the defendant response, re-send the existing
+        // answers — narrowed to the defendant slice — alongside the flags
         const existingResponse = existing.data?.possessionClaimResponse ?? {};
         const possessionClaimResponse: PossessionClaimResponse = {
           defendantContactDetails: existingResponse.defendantContactDetails,
