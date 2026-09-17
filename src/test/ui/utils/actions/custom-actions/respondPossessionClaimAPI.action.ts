@@ -25,9 +25,8 @@ export class respondPossessionClaimAPIAction implements IAction {
       respondPossessionClaimEventTokenApiData.respondPossessionClaimApiInstance()
     );
 
-    const RESPONDCLAIM_EVENT_TOKEN = (
-      await respondPossessionClaimApi.get(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiEndPoint())
-    ).data.token;
+    // Starting the event creates the draft that the mid-event save writes to.
+    await respondPossessionClaimApi.get(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiEndPoint());
 
     const type = typeof caseData === 'object' && caseData !== null && 'type' in caseData ? caseData.type : 'both';
 
@@ -37,14 +36,14 @@ export class respondPossessionClaimAPIAction implements IAction {
         break;
 
       case 'submit':
-        await this.submitRespondPossessionClaim(respondPossessionClaimApi, RESPONDCLAIM_EVENT_TOKEN);
+        await this.submitRespondPossessionClaim(respondPossessionClaimApi);
         break;
 
       case 'both':
       default:
         await this.respondPossessionClaimMidEvent(respondPossessionClaimApi);
 
-        await this.submitRespondPossessionClaim(respondPossessionClaimApi, RESPONDCLAIM_EVENT_TOKEN);
+        await this.submitRespondPossessionClaim(respondPossessionClaimApi);
     }
   }
 
@@ -85,11 +84,23 @@ export class respondPossessionClaimAPIAction implements IAction {
   }
 
   private async submitRespondPossessionClaim(
-    respondPossessionClaimApi: ReturnType<typeof Axios.create>,
-    eventToken: string
+    respondPossessionClaimApi: ReturnType<typeof Axios.create>
   ): Promise<void> {
+    // Start the event after any draft save: pcs-api rejects a submit whose draftVersion isn't the stored one.
+    const startEvent = (
+      await respondPossessionClaimApi.get(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiEndPoint())
+    ).data;
+    const eventToken = startEvent.token;
+    const draftVersion = startEvent.case_details?.case_data?.possessionClaimResponse?.draftVersion;
+
+    const { possessionClaimResponse } = respondPossessionClaimApiData.respondPossessionClaimPayload;
     const submitRequest = {
-      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+      data: {
+        possessionClaimResponse: {
+          ...possessionClaimResponse,
+          ...(draftVersion !== undefined && draftVersion !== null && { draftVersion }),
+        },
+      },
 
       event: {
         id: respondPossessionClaimApiData.respondPossessionClaimEventName,

@@ -4,7 +4,7 @@ export const respondPossessionClaimApiData = {
     submitDraftAnswers: 'YES',
     possessionClaimResponse: {
       defendantResponses: {
-        receivedFreeLegalAdvice: 'YES',
+        freeLegalAdvice: 'YES',
       },
     },
   },
