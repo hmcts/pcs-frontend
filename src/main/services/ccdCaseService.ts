@@ -273,7 +273,7 @@ async function startDefendantSupport(userToken: string, caseId: string): Promise
       throw new HTTPError('No defendant party eligible for support on this case', 403);
     }
     if (partySupport.length > 1) {
-      //TODO confirm whether LR can use this, because if their firm represents multiple, the first is picked. 
+      //TODO confirm whether LR can use this, because if their firm represents multiple, the first is picked.
       logger.warn(`Case ${caseId}: user owns ${partySupport.length} support parties, using ${party.id}`);
     }
 
@@ -434,7 +434,7 @@ export const ccdCaseService = {
 
   /**
    * The logged-in defendant's party id and current external ("support") flags, read through the
-   * requestSupport START callback. 
+   * requestSupport START callback.
    */
   async getDefendantSupport(accessToken: string | undefined, caseId: string): Promise<DefendantSupport> {
     const safeCaseId = sanitiseCaseReference(caseId);
