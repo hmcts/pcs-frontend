@@ -1,93 +1,68 @@
 {% extends "footer/layout.njk" %}
 
 {% block pageTitle %}
-  Accessibility Statement - HM Courts &amp; Tribunals Service - GOV.UK
+  {{ t('footer/accessibility:pageTitle') }}
 {% endblock %}
 
 {% block mainContent %}
-  <h1 class="govuk-heading-xl">Accessibility Statement</h1>
-  <p class="govuk-body">
-    This accessibility statement applies to Possession Claim Service (Frontend). 
-  </p>
-  <p class="govuk-body">
-    This website is run by HM Courts &amp; Tribunals Service. We want as many people as possible to be able to use this website. For example, that means you should be able to: 
-  </p>
+  <h1 class="govuk-heading-xl">{{ t('footer/accessibility:accessibilityStatement.title') }}</h1>
+  <p class="govuk-body">{{ t('footer/accessibility:accessibilityStatement.description1') }}</p>
+  <p class="govuk-body">{{ t('footer/accessibility:accessibilityStatement.description2') }}</p>
   <ul class="govuk-list govuk-list--bullet">
-      <li>change colours, contrast levels and fonts</li>
-      <li>zoom in up to 400% without the text spilling off the screen </li>
-      <li>navigate most of the website using just a keyboard </li>
-      <li>navigate most of the website using speech recognition software</li>
-      <li>listen to most of the website using a screen reader (including the most recent versions of JAWS, NVDA and VoiceOver)</li>
+      <li>{{ t('footer/accessibility:accessibilityStatement.list.item1') }}</li>
+      <li>{{ t('footer/accessibility:accessibilityStatement.list.item2') }}</li>
+      <li>{{ t('footer/accessibility:accessibilityStatement.list.item3') }}</li>
+      <li>{{ t('footer/accessibility:accessibilityStatement.list.item4') }}</li>
+      <li>{{ t('footer/accessibility:accessibilityStatement.list.item5') }}</li>
   </ul>
+  <p class="govuk-body">{{ t('footer/accessibility:accessibilityStatement.description3') }}</p>
   <p class="govuk-body">
-    We've also made the website text as simple as possible to understand. 
-  </p>
-  <p class="govuk-body">
-    <a href="https://mcmw.abilitynet.org.uk/" target="_blank">AbilityNet (opens in a new tab)</a> has advice on making your device easier to use if you have a disability. 
+    {{ t('footer/accessibility:accessibilityStatement.description4') | safe }}
   </p>
 
-  <h2 class="govuk-heading-l">Enforcement procedure</h2>
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:enforcementProcedure.title') }}</h2>
   <p class="govuk-body">
-    The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the 'accessibility regulations'). If you're not happy with how we respond to your complaint, 
-    <a href="https://www.equalityadvisoryservice.com/" target="_blank">contact the Equality Advisory and Support Service (opens in a new tab)</a>
+    {{ t('footer/accessibility:enforcementProcedure.description1') | safe }}
   </p>
 
-  <h2 class="govuk-heading-l">Feedback and contact information</h2>
-  <p class="govuk-body">
-     If you find any problems not listed on this page or think we’re not meeting accessibility requirements or, you need information on this website in a different format like accessible PDF, large print, easy read, audio recording or braille, contact: 
-  </p>
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:feedbackAndContactInformation.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:feedbackAndContactInformation.description1') }}</p>
   <ul class="govuk-list govuk-list--bullet">
-      <li>email: <a href="mailto:possession-no-reply@justice.gov.uk">possession-no-reply@justice.gov.uk</a></li>
-      <li>call: 0300 123 5577</li>
+      <li>{{ t('footer/accessibility:feedbackAndContactInformation.list.item1') | safe }}</li>
+      <li>{{ t('footer/accessibility:feedbackAndContactInformation.list.item2') }}</li>
   </ul>
-  <p class="govuk-body">
-    We'll consider your request and get back to you in 5 days. 
-  </p>
+  <p class="govuk-body">{{ t('footer/accessibility:feedbackAndContactInformation.description2') }}</p>
 
-  <h2 class="govuk-heading-l">Technical information about this website’s accessibility</h2>
-  <p class="govuk-body">
-    HM Courts and Tribunals Service is committed to making its web applications accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018. 
-  </p>
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:technicalInformationAboutThisWebsitesAccessibility.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:technicalInformationAboutThisWebsitesAccessibility.description1') }}</p>
 
-  <h2 class="govuk-heading-l">Compliance status</h2>
-  <p class="govuk-body">
-    This online service is partially compliant with the Web Content Accessibility Guidelines version 2.2 AA standard, due to the non-compliances listed below.
-  </p>
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:complianceStatus.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:complianceStatus.description1') }}</p>
 
-  <h2 class="govuk-heading-l">Non-accessible content</h2>
-  <p class="govuk-body">
-    The content listed below is non-accessible for the following reasons: 
-  </p>
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:non-accessibleContent.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:non-accessibleContent.description1') }}</p>
   <ul class="govuk-list govuk-list--bullet">
-      <li><span class="govuk-!-font-weight-bold">Hidden formatting rules:</span> Input formatting requirements (like forcing decimals for whole numbers 000.00) are not stated upfront, causing validation failures. This fails WCAG success criterion 3.3.2 Labels or Instructions (Level A).</li>
-      <li><span class="govuk-!-font-weight-bold">Generic page title and links not explaining when opening new tab:</span> Give no clear explanation of a page’s purpose or the behaviour on page load. This fails WCAG success criterion 2.4.2 Page Titled (Level A).</li>
-      <li><span class="govuk-!-font-weight-bold">Missing back-navigation:</span> No clear navigation exists to return to the 'respond to claim' task list without re-running the entire process. This fails WCAG success criterion 2.4.5 Multiple Ways (Level AA).</li>
-      <li><span class="govuk-!-font-weight-bold">Erratic focus order:</span> After the "Remove" button, focus drops off-page to an unselected file upload input before returning to the "Choose files" button. This fails WCAG success criteria 2.4.3: Focus Order (Level A) and 2.4.7 Focus Visible (Level AA).</li>
-      <li><span class="govuk-!-font-weight-bold">Redundant links:</span>  The 'Check answers' section contains adjacent 'change' links with identical hidden names that target the same destination. This fails WCAG success criteria 2.4.4 Link Purpose (In Context) (Level A).</li>
-      <li><span class="govuk-!-font-weight-bold"Generic form groupings:</span>  Form groups apply a generic <legend> markup instead of associating radio options to monetary inputs, relying instead on generic, repeated legends. This fails WCAG success criteria 1.3.1 Info and Relationships (Level A) and 3.3.2 Labels or Instructions (Level A).</li>
-      <li><span class="govuk-!-font-weight-bold">Inconsistent heading implementation:</span> Identical "Details given by..." sections are inconsistently marked up across pages (some as h2, some as h3, and some not as headings at all). This fails WCAG success criteria 1.3.1 Info and Relationships (Level A).</li>
-      <li><span class="govuk-!-font-weight-bold">Duplicate regions:</span> The page contains duplicate "Case issued" regions, with the second region failing to match the purpose of its underlying notification. This fails WCAG success criteria 1.3.1 Info and Relationships (Level A) and 4.1.2 Name, Role, Value (Level A).</li>
-      <li><span class="govuk-!-font-weight-bold">Accessible name for task list items includes the status tag:</span>  Voice control users may be impacted attempting to click on task list items as they are required to announce the status as it is added as hidden text. This fails WCAG success criteria 2.5.3 Label in Name (Level A).</li>
-      <li><span class="govuk-!-font-weight-bold">Translation failure:</span>  The Welsh version of the page fails to translate the text content, and the language attribute (lang) remains incorrectly set to English. This fails WCAG success criteria 3.1.1 Language of Page (Level A).</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item1') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item2') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item3') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item4') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item5') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item6') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item7') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item8') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item9') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item10') | safe }}</li>
   </ul>
 
-  <h2 class="govuk-heading-l">What we are doing to improve accessibility</h2>
-  <p class="govuk-body">
-    We are actively working to review and improve accessibility on our service.  
-  </p>
-   <p class="govuk-body">
-    We continually run automated tests using aXe core as part of development practices and frequently complete easy checks using assistive technology. 
-  </p>
-   <p class="govuk-body">
-    We frequently engage with the accessibility team to ensure yearly accessibility audits are conducted. 
-  </p>
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:whatWeAreDoingToImproveAccessibility.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:whatWeAreDoingToImproveAccessibility.description1') }}</p>
+   <p class="govuk-body">{{ t('footer/accessibility:whatWeAreDoingToImproveAccessibility.description2') }}</p>
+   <p class="govuk-body">{{ t('footer/accessibility:whatWeAreDoingToImproveAccessibility.description3') }}</p>
 
-  <h2 class="govuk-heading-l">Preparation of this accessibility statement</h2>
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:preparationOfThisAccessibilityStatement.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:preparationOfThisAccessibilityStatement.description1') }}</p>
   <p class="govuk-body">
-    This statement was prepared on 8th Sept 2026 following an evaluation of the web application to which it applies. The assessment was conducted by internal teams within the HM Courts &amp; Tribunals Service organisation and associated IT suppliers.   
-  </p>
-   <p class="govuk-body">
-    The statement was last reviewed on 16<sup>th</sup> Sept 2026. 
+   {{ t('footer/accessibility:preparationOfThisAccessibilityStatement.description2') | safe }}
   </p>
   
 {% endblock %}

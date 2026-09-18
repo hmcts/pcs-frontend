@@ -9,11 +9,11 @@ jest.mock('../../../main/middleware', () => ({
 }));
 
 const footerPages = [
-  ['/accessibility', 'footer/accessibility', 'Accessibility Statement'],
-  ['/privacy-policy', 'footer/privacy-policy', 'Privacy Policy'],
-  ['/cookies', 'footer/cookies', 'Cookies'],
-  ['/terms-and-conditions', 'footer/terms-and-conditions', 'Terms and Conditions'],
-  ['/get-help', 'footer/get-help', 'Get Help'],
+  ['/accessibility', 'footer/accessibility'],
+  ['/privacy-policy', 'footer/privacy-policy'],
+  ['/cookies', 'footer/cookies'],
+  ['/terms-and-conditions', 'footer/terms-and-conditions'],
+  ['/get-help', 'footer/get-help'],
 ] as const;
 
 function buildApp(): Application {
@@ -35,10 +35,11 @@ describe('footer page routes', () => {
     );
   });
 
-  it.each(footerPages)('renders %s', (path, template, title) => {
+  it.each(footerPages)('renders %s', async (path, template) => {
     const app = buildApp();
     const translate = jest.fn((key: string) => `translated:${key}`);
-    const req = { i18n: { t: translate } } as unknown as Request;
+    const loadNamespaces = jest.fn().mockResolvedValue(undefined);
+    const req = { i18n: { t: translate, loadNamespaces } } as unknown as Request;
     const res = { locals: { isLegalRepresentative: true }, render: jest.fn() } as unknown as Response;
     const fallbackRes = { locals: { isLegalRepresentative: true }, render: jest.fn() } as unknown as Response;
 
@@ -46,19 +47,20 @@ describe('footer page routes', () => {
 
     const route = (app.get as jest.Mock).mock.calls.find(([registeredPath]) => registeredPath === path);
     const handler = route[1] as RequestHandler;
-    handler(req, res, jest.fn());
+    await handler(req, res, jest.fn());
+
+    expect(loadNamespaces).toHaveBeenCalledWith([template]);
 
     expect(res.render).toHaveBeenCalledWith(template, {
-      title,
       t: translate,
     });
 
-    handler({} as Request, fallbackRes, jest.fn());
+    await handler({} as Request, fallbackRes, jest.fn());
     const viewModel = (fallbackRes.render as jest.Mock).mock.calls[0][1];
     expect(viewModel.t('footer.example')).toBe('footer.example');
   });
 
-  it('renders the citizen footer when the user is not a legal representative', () => {
+  it('renders the citizen footer when the user is not a legal representative', async () => {
     const app = buildApp();
     const req = {} as Request;
     const res = { locals: { release1dot3Enabled: true }, render: jest.fn() } as unknown as Response;
@@ -75,17 +77,16 @@ describe('footer page routes', () => {
     middleware(req, res, next);
 
     const handler = (app.get as jest.Mock).mock.calls[0][1] as RequestHandler;
-    handler(req, res, next);
+    await handler(req, res, next);
 
     expect(res.locals.isLegalRepresentative).toBe(false);
     expect(res.locals.footerModel).toBeUndefined();
     expect(res.render).toHaveBeenCalledWith('footer/accessibility', {
-      title: 'Accessibility Statement',
       t: expect.any(Function),
     });
   });
 
-  it('returns not found for citizens when release 1.3 is disabled', () => {
+  it('returns not found for citizens when release 1.3 is disabled', async () => {
     const app = buildApp();
     const req = {} as Request;
     const render = jest.fn();
@@ -98,7 +99,7 @@ describe('footer page routes', () => {
     footerPagesRoutes(app);
 
     const handler = (app.get as jest.Mock).mock.calls[0][1] as RequestHandler;
-    handler(req, res, jest.fn());
+    await handler(req, res, jest.fn());
 
     expect(status).toHaveBeenCalledWith(404);
     expect(render).toHaveBeenCalledWith('not-found');

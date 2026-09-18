@@ -1,36 +1,28 @@
 {% extends "footer/layout.njk" %}
 
 {% block pageTitle %}
-  Get Help &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {{ t('footer/get-help:pageTitle') }}
 {% endblock %}
 
 {% block mainContent %}
-  <h1 class="govuk-heading-xl">Get help</h1>
-  <p class="govuk-body">When contacting us, you should provide:</p>
+  <h1 class="govuk-heading-xl">{{ t('footer/get-help:getHelp.title') }}</h1>
+  <p class="govuk-body">{{ t('footer/get-help:getHelp.description1') }}</p>
   <ul class="govuk-list govuk-list--bullet">
-      <li>your user ID (email address)</li>
-      <li>your organisation name (if applicable)</li>
-      <li>the URL you're trying to access</li>
-      <li>a brief description of the problem</li>
-      <li>a screenshot of the problem (if emailing)</li>
+      <li>{{ t('footer/get-help:getHelp.list.item1') }}</li>
+      <li>{{ t('footer/get-help:getHelp.list.item2') }}</li>
+      <li>{{ t('footer/get-help:getHelp.list.item3') }}</li>
+      <li>{{ t('footer/get-help:getHelp.list.item4') }}</li>
+      <li>{{ t('footer/get-help:getHelp.list.item5') }}</li>
   </ul>
 
   {% if isLegalRepresentative %}
-    <h3 class="govuk-heading-m govuk-!-margin-bottom-2">MyHMCTS services</h3>
-    <p class="govuk-body">
-      <span class="govuk-!-font-weight-bold">Email: </span><a href="mailto:MyHMCTSsupport@justice.gov.uk">MyHMCTSsupport@justice.gov.uk</a><br>
-      Contact us for help with registering your organisation or managing your account.
-    </p>
+    <h3 class="govuk-heading-m govuk-!-margin-bottom-2">{{ t('footer/get-help:myHMCTSContactDetails.title') }}</h3>
+    <p class="govuk-body">{{ t('footer/get-help:myHMCTSContactDetails.description1') | safe }}</p>
   {% endif %}
 
-  <h3 class="govuk-heading-m govuk-!-margin-bottom-2">Possessions Claim</h3>
-  <p class="govuk-body">
-      Contact the local court dealing with the claim <a href="https://www.find-court-tribunal.service.gov.uk/" target="_blank">Find a Court or Tribunal - GOV.UK (opens in a new tab)</a>
-  </p>
+  <h3 class="govuk-heading-m govuk-!-margin-bottom-2">{{ t('footer/get-help:possessionsClaimContactDetails.title') }}</h3>
+  <p class="govuk-body">{{ t('footer/get-help:possessionsClaimContactDetails.description1') | safe }}</p>
 
-  <h3 class="govuk-heading-m govuk-!-margin-bottom-2">National Contact Centre for Civil &amp; Family Court</h3>
-  <p class="govuk-body">
-    <span class="govuk-!-font-weight-bold">Phone: </span> 0300 123 5577<br>
-    <span class="govuk-!-font-weight-bold">Opening times: </span>Monday to Friday, 8:30am to 5pm (excluding public holidays)
-  </p>
+  <h3 class="govuk-heading-m govuk-!-margin-bottom-2">{{ t('footer/get-help:nationalContactCentreForCivilFamilyCourtContactDetails.title') }}</h3>
+  <p class="govuk-body">{{ t('footer/get-help:nationalContactCentreForCivilFamilyCourtContactDetails.description1') | safe }}</p>
 {% endblock %}

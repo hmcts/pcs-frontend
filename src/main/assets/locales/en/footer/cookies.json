@@ -1,0 +1,65 @@
+{
+  "pageTitle": "Cookie Policy - HM Courts & Tribunals Service - GOV.UK",
+  "cookies": {
+    "title": "Cookies",
+    "description1": "A cookie is a small piece of data that’s stored on your computer, tablet, or phone when you visit a website. Most websites need cookies to work properly.",
+    "description2": "This service uses them to:",
+    "description3": "Find out more about <a target=\"_blank\" href=\"http://www.aboutcookies.org/\">how to manage cookies</a>.",
+    "list": {
+      "item1": "measure how you use the service so it can be improved",
+      "item2": "remember the notifications you’ve seen so that you’re not shown them again",
+      "item3": "temporarily store the answers you give"
+    }
+  },
+  "howCookiesAreUsedInThisService": {
+    "title": "How cookies are used in this service",
+    "description1": "We use third party services to perform visitor analytics"
+  },
+  "cookieTable": {
+    "header": {
+      "name": "Name",
+      "purpose": "Purpose",
+      "expires": "Expires"
+    },
+    "row1": {
+      "name": "lang",
+      "purpose": "Remembers user UI language preference.",
+      "expires": "1 year"
+    },
+    "row2": {
+      "name": "pcs_session",
+      "purpose": "User session token.",
+      "expires": "Session ends"
+    },
+    "row3": {
+      "name": "dtCookie",
+      "purpose": "Tracks a visit across multiple requests.",
+      "expires": "Session ends"
+    },
+    "row4": {
+      "name": "dtLatC",
+      "purpose": "Measures server latency for performance monitoring.",
+      "expires": "Session ends"
+    },
+    "row5": {
+      "name": "dtPC",
+      "purpose": "Required to identify proper endpoints for beacon transmission; includes session ID for correlation.",
+      "expires": "Session ends"
+    },
+    "row6": {
+      "name": "dtSa",
+      "purpose": "Intermediate store for page-spanning actions",
+      "expires": "Session ends"
+    },
+    "row7": {
+      "name": "rxvt",
+      "purpose": "Session timeout",
+      "expires": "Session ends"
+    },
+    "row8": {
+      "name": "rxVisitor",
+      "purpose": "Generated user ID for usage tracking (Dynatrace)",
+      "expires": "1 year"
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "pageTitle": "cyCookie Policy - HM Courts & Tribunals Service - GOV.UK",
+  "cookies": {
+    "title": "cyCookies",
+    "description1": "cyA cookie is a small piece of data that’s stored on your computer, tablet, or phone when you visit a website. Most websites need cookies to work properly.",
+    "description2": "cyThis service uses them to:",
+    "description3": "cyFind out more about <a target=\"_blank\" href=\"http://www.aboutcookies.org/\">how to manage cookies</a>.",
+    "list": {
+      "item1": "cymeasure how you use the service so it can be improved",
+      "item2": "cyremember the notifications you’ve seen so that you’re not shown them again",
+      "item3": "cytemporarily store the answers you give"
+    }
+  },
+  "howCookiesAreUsedInThisService": {
+    "title": "cyHow cookies are used in this service",
+    "description1": "cyWe use third party services to perform visitor analytics"
+  },
+  "cookieTable": {
+    "header": {
+      "name": "cyName",
+      "purpose": "cyPurpose",
+      "expires": "cyExpires"
+    },
+    "row1": {
+      "name": "cylang",
+      "purpose": "cyRemembers user UI language preference.",
+      "expires": "cy1 year"
+    },
+    "row2": {
+      "name": "cypcs_session",
+      "purpose": "cyUser session token.",
+      "expires": "cySession ends"
+    },
+    "row3": {
+      "name": "cydtCookie",
+      "purpose": "cyTracks a visit across multiple requests.",
+      "expires": "cySession ends"
+    },
+    "row4": {
+      "name": "cydtLatC",
+      "purpose": "cyMeasures server latency for performance monitoring.",
+      "expires": "cySession ends"
+    },
+    "row5": {
+      "name": "cydtPC",
+      "purpose": "cyRequired to identify proper endpoints for beacon transmission; includes session ID for correlation.",
+      "expires": "cySession ends"
+    },
+    "row6": {
+      "name": "cydtSa",
+      "purpose": "cyIntermediate store for page-spanning actions",
+      "expires": "cySession ends"
+    },
+    "row7": {
+      "name": "cyrxvt",
+      "purpose": "cySession timeout",
+      "expires": "cySession ends"
+    },
+    "row8": {
+      "name": "cyrxVisitor",
+      "purpose": "cyGenerated user ID for usage tracking (Dynatrace)",
+      "expires": "cy1 year"
+    }
+  }
+}
