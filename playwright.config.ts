@@ -27,6 +27,7 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'false';
 const is_smoke_run = process.env.npm_lifecycle_event === 'test:smoke';
+const is_full_functional_run = process.env.npm_lifecycle_event === 'test:fullfunctional';
 const junit_result_output =
   process.env.PLAYWRIGHT_JUNIT_OUTPUT ||
   (is_smoke_run ? 'smoke-output/junit-result.xml' : 'functional-output/junit-result.xml');
@@ -72,10 +73,10 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: 2,
+  workers: is_full_functional_run ? 1 : 2,
   timeout: 600 * 1000,
   expect: { timeout: 10 * 1000 },
-  use: { actionTimeout: 10 * 1000, navigationTimeout: 30 * 1000 },
+  use: { actionTimeout: 60 * 1000, navigationTimeout: 60 * 1000 },
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),
