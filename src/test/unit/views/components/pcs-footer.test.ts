@@ -3,7 +3,8 @@ import path from 'path';
 import nunjucks from 'nunjucks';
 
 const viewsRoot = path.resolve(__dirname, '../../../../main/views');
-const govukRoot = path.dirname(require.resolve('govuk-frontend/dist/govuk/template.njk'));
+const govukTemplatePath = require.resolve('govuk-frontend/dist/govuk/template.njk');
+const govukRoot = path.resolve(path.dirname(govukTemplatePath), '..');
 const cftMacroPath = path.dirname(require.resolve('@hmcts-cft/cft-ui-component-lib/nunjucks/xui-header/macro.njk'));
 const cftRoot = path.resolve(cftMacroPath, '..');
 
