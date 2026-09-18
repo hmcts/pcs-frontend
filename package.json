@@ -108,7 +108,7 @@
     "@eslint/plugin-kit": "0.7.3",
     "@hmcts/playwright-common": "1.1.5",
     "@pact-foundation/pact": "17.1.4",
-    "@pact-foundation/pact-cli": "18.1.1",
+    "@pact-foundation/pact-cli": "18.1.2",
     "@playwright/test": "1.62.1",
     "@types/body-parser": "1.19.6",
     "@types/cookie-parser": "1.4.10",
