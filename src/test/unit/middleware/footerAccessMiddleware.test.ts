@@ -17,14 +17,14 @@ describe('footerAccessMiddleware', () => {
   let next: NextFunction;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockGetLaunchDarklyFlag.mockReset();
     req = {} as Request;
     res = { locals: {} } as Response;
     next = jest.fn();
   });
 
   it.each([true, false])('exposes release 1.3 as %s to rendered views', async enabled => {
-    mockGetLaunchDarklyFlag.mockResolvedValue(enabled);
+    mockGetLaunchDarklyFlag.mockResolvedValueOnce(enabled);
 
     await footerAccessMiddleware(req, res, next);
 
