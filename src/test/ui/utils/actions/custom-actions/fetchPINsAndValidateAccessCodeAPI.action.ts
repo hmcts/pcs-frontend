@@ -85,10 +85,42 @@ function getDefaultPinUser(): PinUser | undefined {
   return hasUnknownDefendant ? selectPinUserByDefendantDetails(false) : setSelectedPinUser(pinUsers[0]);
 }
 
-export async function getPinUserAt(index: number, timeoutMs = 5000): Promise<PinUser> {
-  const pollInterval = 200;
+function updatePinUsers(responseData: Record<string, any>): void {
+  pins = Object.keys(responseData);
+  pinUsers = pins.map(pin => {
+    const pinData = responseData[pin];
+    const addressObj = pinData.address;
+    let formattedAddress = '';
+    if (addressObj) {
+      const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode } = addressObj;
+      formattedAddress = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode]
+        .filter(value => value && typeof value === 'string' && value.trim() !== '')
+        .join(', ');
+    }
+    return {
+      pin,
+      nameKnown:
+        typeof pinData.nameKnown === 'string'
+          ? pinData.nameKnown === 'YES'
+          : Boolean(pinData.firstName || pinData.lastName),
+      firstName: pinData.firstName,
+      lastName: pinData.lastName,
+      address: formattedAddress,
+    };
+  });
+  getDefaultPinUser();
+}
+
+export async function getPinUserAt(index: number, timeoutMs = SHORT_TIMEOUT * actionRetries): Promise<PinUser> {
+  const fetchPinsApi = Axios.create(fetchPINsApiData.fetchPINSApiInstance());
+  const pollInterval = SHORT_TIMEOUT;
   const start = Date.now();
   while (pinUsers.length <= index && Date.now() - start < timeoutMs) {
+    const response = await fetchPinsApi.get(fetchPINsApiData.fetchPINsApiEndPoint());
+    updatePinUsers(response.data);
+    if (pinUsers.length > index) {
+      break;
+    }
     await new Promise(res => setTimeout(res, pollInterval));
   }
   if (pinUsers.length <= index) {
@@ -136,35 +168,12 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
     const fetchPinsApi = Axios.create(fetchPINsApiData.fetchPINSApiInstance());
     await waitUntilCaseIssued();
 
-    const maxRetries = actionRetries;
+    const maxRetries = actionRetries * 2 + 4;
     const delayMs = SHORT_TIMEOUT;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       const response = await fetchPinsApi.get(fetchPINsApiData.fetchPINsApiEndPoint());
-      const fetchedPins = Object.keys(response.data);
-      if (fetchedPins.length > 0) {
-        pins = fetchedPins;
-        pinUsers = pins.map(pin => {
-          const pinData = response.data[pin];
-          const addressObj = pinData.address;
-          let formattedAddress = '';
-          if (addressObj) {
-            const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode } = addressObj;
-            formattedAddress = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode]
-              .filter(value => value && typeof value === 'string' && value.trim() !== '')
-              .join(', ');
-          }
-          return {
-            pin,
-            nameKnown:
-              typeof pinData.nameKnown === 'string'
-                ? pinData.nameKnown === 'YES'
-                : Boolean(pinData.firstName || pinData.lastName),
-            firstName: pinData.firstName,
-            lastName: pinData.lastName,
-            address: formattedAddress,
-          };
-        });
-        getDefaultPinUser();
+      if (Object.keys(response.data).length > 0) {
+        updatePinUsers(response.data);
         return;
       }
       await new Promise(res => setTimeout(res, delayMs));
