@@ -184,7 +184,8 @@
 
   "pdf": {
     "heading": "Download a PDF copy of the response",
-    "linkText": "Response (PDF)"
+    "linkText": "Response (PDF)",
+    "counterclaimLinkText": "Counterclaim (PDF)"
   },
 
   "closeAndReturn": "Close and return to case overview",
