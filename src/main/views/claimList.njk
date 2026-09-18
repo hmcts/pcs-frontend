@@ -20,6 +20,8 @@
       ],
       rows: tableRows
     }) }}
+  {% elif claimsUnavailable %}
+    <p class="govuk-body">{{ t('claimList:claimsUnavailable') }}</p>
   {% else %}
     <p class="govuk-body">{{ t('claimList:noClaimsFound') }}</p>
   {% endif %}

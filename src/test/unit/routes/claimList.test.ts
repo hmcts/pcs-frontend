@@ -176,9 +176,8 @@ describe('claimList route', () => {
     );
   });
 
-  it('propagates error to next when getCitizenClaims throws', async () => {
-    const error = new Error('API failure');
-    (getCitizenClaims as jest.Mock).mockRejectedValue(error);
+  it('renders claimList with an unavailable notice when getCitizenClaims throws', async () => {
+    (getCitizenClaims as jest.Mock).mockRejectedValue(new Error('API failure'));
 
     const app = buildApp();
     claimListRoutes(app);
@@ -188,8 +187,11 @@ describe('claimList route', () => {
 
     await getHandler(app)(req, res, next);
 
-    expect(next).toHaveBeenCalledWith(error);
-    expect(res.render).not.toHaveBeenCalled();
+    expect(res.render).toHaveBeenCalledWith(
+      'claimList',
+      expect.objectContaining({ tableRows: [], claimsUnavailable: true })
+    );
+    expect(next).not.toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
   });
 });

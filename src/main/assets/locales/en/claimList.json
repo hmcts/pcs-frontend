@@ -10,5 +10,6 @@
     "actions": "Actions",
     "viewClaim": "View claim"
   },
-  "noClaimsFound": "There are no claims against you."
+  "noClaimsFound": "There are no claims against you.",
+  "claimsUnavailable": "We could not retrieve your claims just now. Refresh this page or try again in a few minutes."
 }
