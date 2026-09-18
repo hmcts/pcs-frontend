@@ -17,6 +17,10 @@ export default function footerPagesRoutes(app: Application): void {
 
   footerPages.forEach(page => {
     app.get(page.path, (req: Request, res: Response) => {
+      if (!res.locals.isLegalRepresentative && !res.locals.release1dot3Enabled) {
+        return res.status(404).render('not-found');
+      }
+
       res.render(page.view, {
         title: page.title,
         t: req.i18n?.t || ((key: string) => key),
