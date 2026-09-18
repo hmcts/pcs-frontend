@@ -1,0 +1,26 @@
+{
+  "pageTitle": "cyGet Help - HM Courts & Tribunals Service - GOV.UK",
+  "myHMCTSContactDetails": {
+    "title": "cyMyHMCTS services",
+    "description1": "cy<span class=\"govuk-!-font-weight-bold\">Email: </span><a href=\"mailto:MyHMCTSsupport@justice.gov.uk\">MyHMCTSsupport@justice.gov.uk</a><br> Contact us for help with registering your organisation or managing your account."
+  },
+  "possessionsClaimContactDetails": {
+    "title": "cyPossessions Claim",
+    "description1": "cyContact the local court dealing with the claim <a href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\">Find a Court or Tribunal - GOV.UK (opens in a new tab)</a>"
+  },
+  "nationalContactCentreForCivilFamilyCourtContactDetails": {
+    "title": "cyNational Contact Centre for Civil & Family Court",
+    "description1": "cy<span class=\"govuk-!-font-weight-bold\">Phone: </span> 0300 123 5577<br> <span class=\"govuk-!-font-weight-bold\">Opening times: </span>Monday to Friday, 8:30am to 5pm (excluding public holidays)"
+  },
+  "getHelp": {
+    "title": "cyGet help",
+    "description1": "cyWhen contacting us, you should provide:",
+    "list": {
+      "item1": "cyyour user ID (email address)",
+      "item2": "cyyour organisation name (if applicable)",
+      "item3": "cythe URL you're trying to access",
+      "item4": "cya brief description of the problem",
+      "item5": "cya screenshot of the problem (if emailing)"
+    }
+  }
+}

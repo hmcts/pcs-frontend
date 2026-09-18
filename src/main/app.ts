@@ -9,6 +9,7 @@ import favicon from 'serve-favicon';
 import { setupDev } from './development';
 import {
   caseReferenceParamMiddleware,
+  footerAccessMiddleware,
   legalRepresentativeAccessMiddleware,
   pageTrackingUrlMiddleware,
 } from './middleware';
@@ -47,6 +48,7 @@ app.use((req, res, next) => {
 });
 
 app.use(pageTrackingUrlMiddleware);
+app.use(footerAccessMiddleware);
 app.use(legalRepresentativeAccessMiddleware);
 
 // param middleware for caseReference
