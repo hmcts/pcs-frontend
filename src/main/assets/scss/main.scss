@@ -7,8 +7,7 @@
 
 // HDPI-3039: Override EXUI's legacy 'nta' font-family declarations.
 // The EXUI wrapper (rpx-xui-webapp) sets font-family: 'nta' on body and
-// several form selectors. 'nta' is a retired GOV.UK font alias that no longer
-// resolves, causing the browser to fall back to Arial instead of GDS Transport.
+// several form selectors.
 // Until this is fixed upstream in rpx-xui-webapp, we correct it here.
 body,
 .form-hint,
