@@ -31,7 +31,7 @@ const mockRouter = {
 /** Minimal `Request` for dashboard `/:caseReference` tests (handler only reads `params` + `session`). */
 function dashboardCaseRequest(options: {
   caseReference: string | undefined;
-  sessionUser: { accessToken?: string } | undefined;
+  sessionUser: { accessToken?: string; roles?: string[] } | undefined;
 }): Request {
   const { caseReference, sessionUser } = options;
   return {
@@ -87,6 +87,7 @@ jest.mock('@modules/i18n', () => ({
       'dashboard:tasks.SubmitResponse.title': 'Submit response title',
       'dashboard:tasks.RespondToClaim.title': 'Respond to claim title',
       'dashboard:tasks.ViewResponse.title': 'View response title',
+      'dashboard:tasks.YourSupport.title': 'Your support title',
       'dashboard:tasks.task-1.title': 'Task one title',
       'dashboard:tasks.statuses.AVAILABLE': 'Available',
       'dashboard:tasks.statuses.NOT_AVAILABLE': 'Not available',
@@ -118,6 +119,12 @@ jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
   isRespondToClaimEnabledForUser: (...args: unknown[]) => mockIsRespondToClaimEnabledForUser(...args),
 }));
 
+const mockIsCuiYourSupportEnabled = jest.fn().mockResolvedValue(true);
+
+jest.mock('@utils/isCuiYourSupportEnabled', () => ({
+  isCuiYourSupportEnabled: (...args: unknown[]) => mockIsCuiYourSupportEnabled(...args),
+}));
+
 describe('Dashboard Routes', () => {
   let app: Application;
   let logger: { error: jest.Mock; warn: jest.Mock };
@@ -127,6 +134,7 @@ describe('Dashboard Routes', () => {
     mockRouterParam.mockClear();
     mockRouterUse.mockClear();
     mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
+    mockIsCuiYourSupportEnabled.mockResolvedValue(true);
     (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValue({
       notifications: [
         {
@@ -545,6 +553,76 @@ describe('Dashboard Routes', () => {
           body: 'The claim has been issued to you.',
         },
       ]);
+    });
+  });
+
+  describe('Your Support task', () => {
+    const yourSupportDashboardData = (status: string) => ({
+      notifications: [],
+      taskGroups: [
+        {
+          groupId: 'RESPONSE',
+          tasks: [
+            { templateId: 'ViewResponse', status },
+            { templateId: 'YourSupport', status },
+          ],
+        },
+      ],
+      propertyAddress: null,
+    });
+
+    async function renderResponseTasks(roles?: string[]): Promise<{ title: { html: string }; href?: string }[]> {
+      dashboardRoutes(app);
+      const handler = getDashboardCaseHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1', roles },
+        }),
+        res,
+        jest.fn()
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        taskGroups: { tasks: { title: { html: string }; href?: string }[] }[];
+      };
+      return renderArgs.taskGroups[0].tasks;
+    }
+
+    it('should show Your Support unlinked while it is not yet available', async () => {
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce(yourSupportDashboardData('NOT_AVAILABLE'));
+
+      const tasks = await renderResponseTasks();
+
+      expect(tasks.map(task => task.title.html)).toEqual(['View response title', 'Your support title']);
+      expect(tasks[1].href).toBeUndefined();
+    });
+
+    it('should link Your Support to the reasonable adjustments triage once it is available', async () => {
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce(yourSupportDashboardData('AVAILABLE'));
+
+      const tasks = await renderResponseTasks();
+
+      expect(tasks[1].href).toBe('/case/1234567890123456/respond-to-claim/reasonable-adjustments-triage');
+    });
+
+    it('should remove the Your Support task when its feature flag is off', async () => {
+      mockIsCuiYourSupportEnabled.mockResolvedValueOnce(false);
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce(yourSupportDashboardData('AVAILABLE'));
+
+      const tasks = await renderResponseTasks();
+
+      expect(tasks.map(task => task.title.html)).toEqual(['View response title']);
+    });
+
+    it('should remove the Your Support task for legal representative users', async () => {
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce(yourSupportDashboardData('AVAILABLE'));
+
+      const tasks = await renderResponseTasks(['caseworker-pcs-solicitor']);
+
+      expect(tasks.map(task => task.title.html)).toEqual(['View response title']);
     });
   });
 
