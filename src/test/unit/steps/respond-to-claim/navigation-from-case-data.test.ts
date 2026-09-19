@@ -208,16 +208,14 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(rentArrearsReq, 'repayments-agreed', flowConfig, {})).resolves.toBe(
-      'installment-payments'
-    );
+    await expect(getNextStep(rentArrearsReq, 'repayments-agreed', flowConfig, {})).resolves.toBe('instalment-payments');
 
     await expect(getNextStep(noArrearsReq, 'repayments-agreed', flowConfig, {})).resolves.toBe(
       'your-household-and-circumstances'
     );
   });
 
-  it('routes installment-payments forward from CCD state', async () => {
+  it('routes instalment-payments forward from CCD state', async () => {
     const req = createReq({
       data: {
         ...rentArrearsData,
@@ -229,14 +227,14 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
+    await expect(getNextStep(req, 'instalment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
 
-    await expect(getNextStep(createReq({}), 'installment-payments', flowConfig, {})).resolves.toBe(
+    await expect(getNextStep(createReq({}), 'instalment-payments', flowConfig, {})).resolves.toBe(
       'your-household-and-circumstances'
     );
   });
 
-  it('routes installment-payments forward when repayArrearsInstalments is stored at possessionClaimResponse.paymentAgreement', async () => {
+  it('routes instalment-payments forward when repayArrearsInstalments is stored at possessionClaimResponse.paymentAgreement', async () => {
     const req = createReq({
       data: {
         ...rentArrearsData,
@@ -246,14 +244,14 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
+    await expect(getNextStep(req, 'instalment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
   });
 
-  it('routes installment-payments forward from the submitted answer before CCD state is refreshed', async () => {
+  it('routes instalment-payments forward from the submitted answer before CCD state is refreshed', async () => {
     const req = createReq({ data: rentArrearsData });
     req.body = { confirmInstallmentOffer: 'yes' };
 
-    await expect(getNextStep(req, 'installment-payments', flowConfig, {}, req.body)).resolves.toBe(
+    await expect(getNextStep(req, 'instalment-payments', flowConfig, {}, req.body)).resolves.toBe(
       'how-much-afford-to-pay'
     );
   });
