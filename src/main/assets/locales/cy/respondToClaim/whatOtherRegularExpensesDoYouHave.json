@@ -15,12 +15,33 @@
     "otherExpenses": "Arall"
   },
   "subFields": {
-    "amount": "Swm a dalwyd",
-    "frequency": "Ei dalu:"
+    "amount": "Swm a dalwyd"
+  },
+  "subFieldsLegend": {
+    "householdBills": "cyHousehold bills details",
+    "loanPayments": "cyLoan payment details",
+    "childSpousalMaintenance": "cyChild or spousal maintenance details",
+    "mobilePhone": "cyMobile phone details",
+    "groceryShopping": "cyGrocery shopping details",
+    "fuelParkingTransport": "cyFuel, parking and transport details",
+    "schoolCosts": "cySchool costs details",
+    "clothing": "cyClothing details",
+    "otherExpenses": "cyOther expenses details"
+  },
+  "frequencyLegend": {
+    "householdBills": "cyHow often do you pay household bills?",
+    "loanPayments": "cyHow often do you pay loan payments?",
+    "childSpousalMaintenance": "cyHow often do you pay child or spousal maintenance?",
+    "mobilePhone": "cyHow often do you pay for a mobile phone?",
+    "groceryShopping": "cyHow often do you pay for grocery shopping?",
+    "fuelParkingTransport": "cyHow often do you pay for fuel, parking and transport?",
+    "schoolCosts": "cyHow often do you pay school costs?",
+    "clothing": "cyHow often do you pay for clothing?",
+    "otherExpenses": "cyHow often do you pay for other expenses?"
   },
   "frequency": {
-    "week": "Pob wythnos",
-    "month": "Mis"
+    "week": "cyPaid every week",
+    "month": "cyPaid every month"
   },
   "errors": {
     "householdBillsAmount": {
