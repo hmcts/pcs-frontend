@@ -11,6 +11,7 @@ export const counterClaimOrderOtherThanSum = {
   backLink: `Back`,
   whatOrdersInput: `for the landlord to conduct remedial works`,
   whatFactsInput: `electricity and windows not repaired`,
+  feedbackLink: `feedback`,
   pageSlug: `counter-claim-order-other-than-sum`,
   /*
   enterWhatFactsErrorMessage: `Enter what facts you would like the court to consider when deciding the claim`,
