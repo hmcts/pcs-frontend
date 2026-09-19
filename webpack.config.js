@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 const sourcePath = path.resolve(__dirname, 'src/main/assets/js');
 const govukFrontend = require(path.resolve(__dirname, 'webpack/govukFrontend'));
@@ -12,6 +13,13 @@ const locales = path.resolve(__dirname, 'src/main/assets/locales');
 const devMode = process.env.NODE_ENV !== 'production';
 const fileNameSuffix = devMode ? '-dev' : '.[contenthash]';
 const filename = `[name]${fileNameSuffix}.js`;
+
+const precompressAssets = new CompressionPlugin({
+  algorithm: 'gzip',
+  test: /\.(?:js|css|svg)$/i,
+  threshold: 1024,
+  compressionOptions: { level: 9 },
+});
 
 const appEntry = path.resolve(sourcePath, 'index.ts');
 const entry = devMode
@@ -26,7 +34,7 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [{ from: locales, to: 'locales' }],
     }),
-    ...(devMode ? [new webpack.HotModuleReplacementPlugin()] : []),
+    ...(devMode ? [new webpack.HotModuleReplacementPlugin()] : [precompressAssets]),
   ],
   entry,
   mode: devMode ? 'development' : 'production',
