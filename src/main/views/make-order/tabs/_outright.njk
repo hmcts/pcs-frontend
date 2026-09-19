@@ -1,0 +1,104 @@
+{% import "make-order/_compact.njk" as compact with context %}
+
+<h3 class="govuk-heading-m">Outright possession</h3>
+
+{% set byDateHtml %}
+  {{ compact.date({ id: "outright-by-date", legend: "Date possession is ordered by", legendHidden: true }) }}
+{% endset %}
+{{ compact.radios("outright-possession", {
+  legend: "Possession",
+  classes: "govuk-radios--small",
+  items: [
+    { value: "forthwith", text: "Possession forthwith" },
+    { value: "by", text: "Possession on or before", conditional: { html: byDateHtml } }
+  ]
+}) }}
+
+{{ compact.radios("outright-grounds-type", {
+  legend: "Grounds",
+  classes: "govuk-radios--small govuk-radios--inline",
+  items: [
+    { value: "mandatory", text: "Mandatory" },
+    { value: "discretionary", text: "Discretionary" }
+  ]
+}) }}
+
+{# This field continues the Grounds question, so it has no divider. #}
+{{ compact.text("outright-grounds-details", {
+  label: "Details of grounds (optional)",
+  formGroupClasses: "pcs-continues-question"
+}) }}
+
+{% set arrearsHtml %}
+  {% call compact.row({ id: "outright-mj-amounts" }) %}
+    {{ compact.copy("Arrears") }}
+    {{ compact.money({ id: "outright-mj-arrears", label: "Arrears", labelHidden: true }) }}
+    {{ compact.copy("Interest") }}
+    {{ compact.money({ id: "outright-mj-interest", label: "Interest", labelHidden: true }) }}
+  {% endcall %}
+{% endset %}
+
+{% set balanceHtml %}
+  {{ compact.date({ id: "outright-mj-balance-date", legend: "Balance payment deadline", legendHidden: true }) }}
+{% endset %}
+
+{% set lumpHtml %}
+  {% call compact.row() %}
+    {{ compact.copy("Payment of") }}
+    {{ compact.money({ id: "outright-mj-lump-amount", label: "Payment amount", labelHidden: true }) }}
+    {{ compact.copy("by") }}
+    {{ compact.date({ id: "outright-mj-lump-date", legend: "Payment deadline", legendHidden: true }) }}
+  {% endcall %}
+  {{ compact.reveal("outright-mj-balance", "and the balance by", balanceHtml) }}
+{% endset %}
+
+{% set instalmentsHtml %}
+  {% call compact.row() %}
+    {{ compact.copy("Instalment payments of") }}
+    {{ compact.money({ id: "outright-mj-inst-amount", label: "Instalment amount", labelHidden: true }) }}
+    {{ compact.select("outright-mj-inst-freq", {
+      label: "Instalment frequency",
+      labelHidden: true,
+      items: compact.paymentFrequencies,
+      default: "monthly"
+    }) }}
+    {{ compact.copy("the first instalment to be paid on or before") }}
+    {{ compact.date({ id: "outright-mj-inst-date", legend: "First instalment deadline", legendHidden: true }) }}
+  {% endcall %}
+{% endset %}
+
+{# A lump sum and instalments may both apply to the same debt. #}
+{% set paymentPlanHtml %}
+  {{ compact.checkboxes("outright-mj-plan", {
+    items: [
+      { value: "lump", text: "Payment to claimant", conditional: { html: lumpHtml } },
+      { value: "instalments", text: "Instalment payments", conditional: { html: instalmentsHtml } }
+    ]
+  }) }}
+{% endset %}
+
+{% set moneyJudgmentHtml %}
+  {{ compact.checkboxes("outright-mj-sections", {
+    items: [
+      { value: "arrears", text: "Judgment for arrears", conditional: { html: arrearsHtml } },
+      { value: "payment-plan", text: "The above sums must be paid by", conditional: { html: paymentPlanHtml } }
+    ]
+  }) }}
+{% endset %}
+
+{% set useOccupationHtml %}
+  {% call compact.row() %}
+    {{ compact.money({ id: "outright-use-occupation-rate", label: "Daily rate", inputmode: "decimal" }) }}
+    {{ compact.copy("From") }}
+    {{ compact.date({ id: "outright-use-occupation-from-date", legend: "Damages start date", legendHidden: true }) }}
+  {% endcall %}
+{% endset %}
+
+{{ compact.checkboxes("outright-options", {
+  classes: "pcs-divided-options",
+  items: [
+    { value: "money-judgment", text: "Money judgment", conditional: { html: moneyJudgmentHtml } },
+    { value: "use-occupation", text: "Damages for unlawful occupation", conditional: { html: useOccupationHtml } },
+    { value: "transfer-high-court", text: "Transfer to High Court" }
+  ]
+}) }}
