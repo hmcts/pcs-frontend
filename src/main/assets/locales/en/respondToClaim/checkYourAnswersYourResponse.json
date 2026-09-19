@@ -94,7 +94,7 @@
     },
     "counterClaimAppliedForHwf": {
       "label": "Have you already applied for help with your counterclaim fee?",
-      "changeHidden": "applied for help with fees"
+      "changeHidden": "applied for Help with Fees"
     },
     "counterClaimHwfReference": {
       "label": "Enter your Help with Fees reference number",
