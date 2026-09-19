@@ -39,7 +39,7 @@ export function buildManageCaseDetailsRedirect(caseDetailsBaseUrl: string | null
     url.hash = '';
     return url.toString();
   } catch {
-    logger.warn('Unable to build Manage Case redirect: malformed case details base URL');
+    logger.warn('Unable to build Manage Case redirect: malformed case details base URL ' + caseDetailsBaseUrl);
     return undefined;
   }
 }
