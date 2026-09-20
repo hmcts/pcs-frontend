@@ -1,7 +1,6 @@
 {% extends "template.njk" %}
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
-{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "xui-header/macro.njk" import hmctsXuiHeader %}
 {% from "footer/macro.njk" import hmctsUiFooter %}
@@ -18,7 +17,6 @@
 {% block head %}
   {{ super() }}
   <link rel="stylesheet" href="/assets/ui-component-lib/ui-component-lib.css">
-  <link rel="stylesheet" href="/assets/docweave/docweave.css">
 {% endblock %}
 
 {% block header %}
@@ -34,13 +32,6 @@
 {% block content %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
-  {% endif %}
-
-  {% if saved %}
-    {{ govukNotificationBanner({ type: "success", text: "Order draft saved" }) }}
-  {% endif %}
-  {% if submitted %}
-    {{ govukNotificationBanner({ type: "success", text: "Order sent to a caseworker for review" }) }}
   {% endif %}
 
   <form method="post" novalidate id="make-order-form"

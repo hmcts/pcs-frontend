@@ -1,4 +1,4 @@
-import { buildDoc } from '@hmcts-cft/docweave';
+import { type DocWeaveDocument, buildDoc } from '@hmcts-cft/docweave';
 
 import { type OrderData } from '../data';
 
@@ -42,7 +42,7 @@ const DIRECTIONS: Record<string, { party: 'claimant' | 'defendant'; text: string
   },
 };
 
-export function buildAdjournmentOrder(data: OrderData): ReturnType<typeof buildDoc> {
+export function buildAdjournmentOrder(data: OrderData): DocWeaveDocument {
   const type = value(data, 'adj-type');
   const labels = partyLabels(data);
   const { claimant, defendant, defendantVerb } = labels;

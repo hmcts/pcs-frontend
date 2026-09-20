@@ -1,5 +1,6 @@
-import { buildDoc } from '@hmcts-cft/docweave';
+import { type DocWeaveDocument, buildDoc } from '@hmcts-cft/docweave';
 
+import { formatMoney, parseMoney } from '../../../../utils/makeOrderFormat';
 import { type OrderData } from '../data';
 
 import {
@@ -8,6 +9,7 @@ import {
   addPaymentTerm,
   addPreamble,
   date,
+  hasCosts,
   money,
   partyNames,
   selected,
@@ -27,16 +29,11 @@ const OUTRIGHT_COSTS: CostsWording = {
     'no-order': 'There is no order as to costs.',
     'public-funding':
       "The defendant(s)' costs are to be subject to detailed assessment under the public funding regulations.",
-    'same-terms': 'Costs are payable on the same terms as the suspension.',
-    'fixed-same-terms':
-      "The defendant(s) must pay the claimant(s)' fixed costs, payable on the same terms as the suspension.",
-    'summary-same-terms':
-      "The defendant(s) must pay the claimant(s)' summary assessed costs, payable on the same terms as the suspension.",
   },
   missing: '[costs order not provided]',
 };
 
-export function buildOutrightOrder(data: OrderData): ReturnType<typeof buildDoc> {
+export function buildOutrightOrder(data: OrderData): DocWeaveDocument {
   const address = data.propertyAddress || '[property address not provided]';
   const claimants = partyNames(data.claimants, 'the claimant(s)');
   const defendants = partyNames(data.defendants, 'the defendant(s)');
@@ -76,16 +73,16 @@ export function buildOutrightOrder(data: OrderData): ReturnType<typeof buildDoc>
       });
       if (sections.includes('arrears')) {
         list.item('money-judgment', content => {
-          const arrears = Number(value(data, 'outright-mj-arrears').split(',').join(''));
+          const arrears = parseMoney(value(data, 'outright-mj-arrears'));
           const interestText = value(data, 'outright-mj-interest');
-          const interest = Number(interestText.split(',').join(''));
+          const interest = parseMoney(interestText);
           const total =
-            Number.isFinite(arrears) && interestText && Number.isFinite(interest)
-              ? String(arrears + interest)
-              : value(data, 'outright-mj-arrears');
+            arrears !== undefined && interest !== undefined
+              ? formatMoney(arrears + interest)
+              : money(value(data, 'outright-mj-arrears'));
           content
             .text(`Judgment for the claimant(s) in the ${interestText ? 'total ' : ''}sum of £`)
-            .fact('amount', money(total), { sourceId: 'outright-mj-amounts' })
+            .fact('amount', total, { sourceId: 'outright-mj-amounts' })
             .text('.');
         });
       }
@@ -106,7 +103,7 @@ export function buildOutrightOrder(data: OrderData): ReturnType<typeof buildDoc>
             .text(` until possession of the property is given to ${claimants}.`);
         });
       }
-      if (selected(data, 'costs', 'yes')) {
+      if (hasCosts(data, OUTRIGHT_COSTS)) {
         list.item('costs', content => addCosts(content, data, OUTRIGHT_COSTS));
       }
       if (plans.includes('lump') || plans.includes('instalments')) {

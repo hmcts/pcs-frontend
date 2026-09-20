@@ -4,7 +4,6 @@ export interface OrderParty {
 }
 
 export interface AttendanceEntry {
-  id: string;
   sourceId: string;
   rowIndex: number;
   partyKind: 'claimant' | 'defendant';
@@ -53,7 +52,6 @@ export function readOrderData(form: HTMLFormElement): OrderData {
       return;
     }
     attendance.push({
-      id: row.id,
       sourceId: row.id,
       rowIndex,
       partyKind,

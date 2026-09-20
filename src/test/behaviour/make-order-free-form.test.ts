@@ -13,7 +13,7 @@ describe('make an order: free form and strike out', () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-free-form');
     check('recitals', 'yes');
-    type('recital', 'UPON hearing the parties');
+    type('recitals-text', 'UPON hearing the parties');
 
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');

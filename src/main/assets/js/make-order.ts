@@ -2,7 +2,7 @@ import { type DocWeaveDocument, type DocWeaveSnapshot, createDocEditor } from '@
 
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
-import { readOrderData } from './make-order/data';
+import { type OrderData, readOrderData } from './make-order/data';
 import { buildAdjournmentOrder } from './make-order/wording/adjournment';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildFreeFormOrder } from './make-order/wording/free-form';
@@ -152,7 +152,7 @@ export function syncSuspendedOnlyCosts(form: HTMLFormElement, type: OrderType): 
   });
 }
 
-const builders: Record<OrderType, (data: ReturnType<typeof readOrderData>) => DocWeaveDocument> = {
+const builders: Record<OrderType, (data: OrderData) => DocWeaveDocument> = {
   OUTRIGHT_POSSESSION: buildOutrightOrder,
   SUSPENDED_POSSESSION: buildSuspendedOrder,
   ADJOURNMENT: buildAdjournmentOrder,

@@ -2,6 +2,7 @@ import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-
 import type { DocWeaveSnapshot } from '@hmcts-cft/docweave';
 import config from 'config';
 import { Application, Request, Response } from 'express';
+import { DateTime } from 'luxon';
 
 import { HTTPError } from '../HttpError';
 import { MAKE_ORDER_ROUTE } from '../constants/caseRoutes';
@@ -17,7 +18,6 @@ import {
   type MakeOrderValidationIssue,
   validateMakeOrder,
 } from '@utils/makeOrderValidation';
-import { safeRedirect303 } from '@utils/safeRedirect';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
 const STUBBED_MAKE_ORDER_ROUTE = '/dev/make-order';
@@ -118,10 +118,11 @@ function caseFactsFormData(caseFacts: Record<string, unknown> = {}): FormData {
     }
   }
   for (const [fact, field] of Object.entries(dates)) {
-    const [year, month, day] = String(caseFacts[fact] ?? '').split('-');
-    if (day) {
-      Object.assign(formData, { [`${field}-day`]: String(Number(day)), [`${field}-month`]: String(Number(month)) });
-      formData[`${field}-year`] = year;
+    const date = DateTime.fromISO(String(caseFacts[fact] ?? ''));
+    if (date.isValid) {
+      formData[`${field}-day`] = String(date.day);
+      formData[`${field}-month`] = String(date.month);
+      formData[`${field}-year`] = String(date.year);
     }
   }
   return formData;
@@ -178,8 +179,6 @@ function pageModel(req: Request, envelope: MakeOrderEnvelope, submission?: Submi
     claimantNames: caseContext.claimants.map(party => party.name).join(', '),
     defendantNames: caseContext.defendants.map(party => party.name).join(', '),
     attendanceParties: attendanceParties(envelope),
-    saved: req.query?.saved === 'true',
-    submitted: req.query?.submitted === 'true',
     validationErrors: Object.fromEntries(issues.map(issue => [issue.id, { text: issue.message }])),
     errorSummary: issues.length
       ? {
@@ -240,13 +239,11 @@ export default function makeOrderRoutes(app: Application): void {
   app.post(MAKE_ORDER_ROUTE, oidcMiddleware, judgeAccessMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
-    const makeOrderUrl = MAKE_ORDER_ROUTE.replace(':caseReference', caseReference);
-    const { _csrf, action = 'START_DRAFT', orderId, orderVersion, orderType, orderDocument, ...formData } = req.body;
+    const { _csrf, action, orderId, orderVersion, orderType, orderDocument, ...formData } = req.body;
 
     try {
-      if (action === 'START_DRAFT') {
-        await loadOrStartDraft(accessToken, caseReference);
-        return safeRedirect303(res, makeOrderUrl, '/', ['/case/']);
+      if (action !== 'SAVE_DRAFT' && action !== 'SUBMIT_FOR_REVIEW') {
+        throw new HTTPError('The action is invalid', 400);
       }
       if (!MAKE_ORDER_TYPES.includes(orderType)) {
         throw new HTTPError('The order type is invalid', 400);
@@ -265,17 +262,11 @@ export default function makeOrderRoutes(app: Application): void {
         version: Number(orderVersion),
         draftPayload: { version: 1, orderType, formData, documents: document ? { [orderType]: document } : {} },
       });
-      if (action === 'SAVE_DRAFT' || action === 'SUBMIT_FOR_REVIEW') {
-        const manageCaseUrl = buildManageCaseDetailsRedirect(
-          config.get('redirects.manageCaseReturnURL'),
-          caseReference
-        );
-        if (!manageCaseUrl) {
-          throw new HTTPError('The Manage Case return URL is not configured', 500);
-        }
-        return res.redirect(manageCaseUrl);
+      const manageCaseUrl = buildManageCaseDetailsRedirect(config.get('redirects.manageCaseReturnURL'), caseReference);
+      if (!manageCaseUrl) {
+        throw new HTTPError('The Manage Case return URL is not configured', 500);
       }
-      return safeRedirect303(res, `${makeOrderUrl}?saved=true`, '/', ['/case/']);
+      return res.redirect(manageCaseUrl);
     } catch (error) {
       return next(error);
     }
