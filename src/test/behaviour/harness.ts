@@ -181,7 +181,6 @@ export interface Page {
   orderText(): string;
   /** The form as the browser would submit it. */
   body(): URLSearchParams;
-  dispose(): void;
 }
 
 /** Loads served HTML into jsdom and starts the page's JavaScript, as a browser would. */
@@ -195,7 +194,7 @@ export async function openPage(html: string): Promise<Page> {
   // The template's inline script adds these; jsdom does not run it.
   document.body.classList.add('js-enabled', 'govuk-frontend-supported');
   initAll();
-  const dispose = initMakeOrder();
+  initMakeOrder();
   const form = document.querySelector<HTMLFormElement>('#make-order-form');
   if (!form) {
     throw new Error('The make order form is not on the page');
@@ -208,7 +207,6 @@ export async function openPage(html: string): Promise<Page> {
       new FormData(form).forEach((value, name) => body.append(name, String(value)));
       return body;
     },
-    dispose,
   };
 }
 

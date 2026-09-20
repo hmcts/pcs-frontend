@@ -29,7 +29,6 @@ describe('make an order: drafting', () => {
     body.set('action', 'SUBMIT_FOR_REVIEW');
     const rejected = await app.post(PAGE, body);
     expect(rejected.status).toBe(400);
-    page.dispose();
     await openPage(rejected.text);
     const summary = control('#make-order-error-summary').textContent;
     expect(summary).toContain('Select when the defendant must give up possession');
@@ -48,7 +47,6 @@ describe('make an order: drafting', () => {
     expect(restored.orderText()).toContain(
       'The order for possession is transferred to the High Court solely for the purpose of enforcement.'
     );
-    restored.dispose();
   });
 
   it('remembers the selected order type and its document', async () => {
@@ -63,7 +61,6 @@ describe('make an order: drafting', () => {
     const body = page.body();
     body.set('action', 'SAVE_DRAFT');
     expect((await app.post(PAGE, body)).status).toBe(302);
-    page.dispose();
 
     await openPage((await app.get(PAGE)).text);
     expect(control('#order-type').value).toBe('SUSPENDED_POSSESSION');
@@ -73,7 +70,7 @@ describe('make an order: drafting', () => {
   });
 
   it('offers quick dates and a collapsible case facts panel', async () => {
-    const page = await openPage((await app.get(PAGE)).text);
+    await openPage((await app.get(PAGE)).text);
     check('outright-possession', 'by');
     control<HTMLButtonElement>('#outright-by-date-pills [data-date-pill-days="28"]').click();
     const inFourWeeks = futureDate(28);
@@ -92,6 +89,5 @@ describe('make an order: drafting', () => {
     expect(control('#case-facts-content').hidden).toBe(true);
     toggle.click();
     expect(control('#case-facts-content').hidden).toBe(false);
-    page.dispose();
   });
 });
