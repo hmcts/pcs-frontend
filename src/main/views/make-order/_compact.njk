@@ -103,11 +103,11 @@
 {% macro textarea(id, params) %}
   {{ govukTextarea({
     id: id,
-    name: params.name or id,
+    name: id,
     rows: params.rows or 4,
     label: { text: params.label, classes: params.labelClasses },
     formGroup: { classes: params.formGroupClasses },
-    value: draftValue(params.name or id),
+    value: draftValue(id),
     errorMessage: validationErrors[id]
   }) }}
 {% endmacro %}

@@ -1,7 +1,7 @@
 /** Parsing and formatting of the money and date answers on the make order form (server and browser). */
 
 export function parseMoney(raw: string): number | undefined {
-  const amount = raw.trim().split(',').join('');
+  const amount = raw.trim().replace(/,/g, '');
   return /^\d+(\.\d{1,2})?$/.test(amount) ? Number(amount) : undefined;
 }
 

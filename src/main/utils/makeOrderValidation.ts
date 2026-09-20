@@ -230,21 +230,18 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
   return [...issues, ...validateCosts(formData, false)];
 }
 
+const validators: Record<MakeOrderType, (formData: Record<string, unknown>) => MakeOrderValidationIssue[]> = {
+  OUTRIGHT_POSSESSION: validateOutright,
+  SUSPENDED_POSSESSION: validateSuspended,
+  ADJOURNMENT: validateAdjournment,
+  STRIKE_OUT_DISMISSAL: () => [],
+  FREE_FORM: formData =>
+    value(formData, 'free-form-text') ? [] : [{ id: 'free-form-text', message: 'Enter the order wording' }],
+};
+
 export function validateMakeOrder(
   orderType: MakeOrderType,
   formData: Record<string, unknown>
 ): MakeOrderValidationIssue[] {
-  if (orderType === 'OUTRIGHT_POSSESSION') {
-    return validateOutright(formData);
-  }
-  if (orderType === 'SUSPENDED_POSSESSION') {
-    return validateSuspended(formData);
-  }
-  if (orderType === 'ADJOURNMENT') {
-    return validateAdjournment(formData);
-  }
-  if (orderType === 'FREE_FORM' && !value(formData, 'free-form-text')) {
-    return [{ id: 'free-form-text', message: 'Enter the order wording' }];
-  }
-  return [];
+  return validators[orderType](formData);
 }

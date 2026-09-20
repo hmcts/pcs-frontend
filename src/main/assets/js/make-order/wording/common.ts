@@ -1,6 +1,6 @@
 import { type DocBuilder, type InlineBuilder } from '@hmcts-cft/docweave';
 
-import { formatDate, formatMoney, parseDate } from '../../../../utils/makeOrderFormat';
+import { formatDate, formatMoney, parseDate, parseMoney } from '../../../../utils/makeOrderFormat';
 import { type AttendanceEntry, type OrderData, type OrderParty } from '../data';
 
 export function value(data: OrderData, name: string): string {
@@ -25,8 +25,16 @@ export function date(data: OrderData, prefix: string): string {
 }
 
 export function money(raw: string): string {
-  const amount = Number(raw.split(',').join(''));
-  return raw && Number.isFinite(amount) ? formatMoney(amount) : '[amount not provided]';
+  const amount = parseMoney(raw);
+  return amount === undefined ? '[amount not provided]' : formatMoney(amount);
+}
+
+/** Blank lines separate the paragraphs of a free text answer. */
+export function splitParagraphs(text: string): string[] {
+  return text
+    .split(/\n\s*\n/)
+    .map(paragraph => paragraph.trim())
+    .filter(Boolean);
 }
 
 export function frequency(data: OrderData, name: string): string {
@@ -106,14 +114,11 @@ export function addPreamble(order: DocBuilder, data: OrderData): void {
     });
   }
   if (selected(data, 'recitals', 'yes')) {
-    value(data, 'recital')
-      .split(/\n\s*\n/)
-      .filter(Boolean)
-      .forEach((text, index) =>
-        order.paragraph(`recital-${index}`, content => {
-          content.fact('text', text, { sourceId: 'recitals-text' });
-        })
-      );
+    splitParagraphs(value(data, 'recitals-text')).forEach((text, index) =>
+      order.paragraph(`recital-${index}`, content => {
+        content.fact('text', text, { sourceId: 'recitals-text' });
+      })
+    );
   }
   order.paragraph('ordered-that', 'IT IS ORDERED THAT:');
 }
