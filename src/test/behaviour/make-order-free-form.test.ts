@@ -25,7 +25,6 @@ describe('make an order: free form and strike out', () => {
     expect(page.orderText()).toBe(
       ['UPON hearing the parties', 'IT IS ORDERED THAT:', 'The claim is stayed.', 'Liberty to apply.'].join('\n')
     );
-    page.dispose();
   });
 
   it('records the strike out or dismissal outcome', async () => {
@@ -38,6 +37,5 @@ describe('make an order: free form and strike out', () => {
     body.set('action', 'SUBMIT_FOR_REVIEW');
     expect((await app.post(PAGE, body)).status).toBe(302);
     expect(control('[name="strike-claim-outcome"][value="dismissed"]').checked).toBe(true);
-    page.dispose();
   });
 });

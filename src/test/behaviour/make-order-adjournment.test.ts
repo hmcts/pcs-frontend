@@ -50,7 +50,6 @@ describe('make an order: adjournment', () => {
     body.set('action', 'SUBMIT_FOR_REVIEW');
     const rejected = await app.post(PAGE, body);
     expect(rejected.status).toBe(400);
-    page.dispose();
     await openPage(rejected.text);
     expect(control('#make-order-error-summary').textContent).toContain(
       'Select either defence or defence and any counterclaim, not both'
@@ -85,6 +84,5 @@ describe('make an order: adjournment', () => {
     expect(page.orderText()).toContain(
       'This claim is adjourned generally with liberty to restore by application by any party on notice to all other parties. If no application is made by 4pm on 1 March 2027 the claim shall automatically be struck out without the need for any further application or order.'
     );
-    page.dispose();
   });
 });

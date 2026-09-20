@@ -76,7 +76,6 @@ describe('make an order: suspended possession', () => {
     const submitted = await app.post(PAGE, body);
     expect(submitted.status).toBe(302);
     expect(submitted.location).toBe(MANAGE_CASE_URL);
-    page.dispose();
   });
 
   it('treats a money judgment and an adjourned money claim as alternatives', async () => {
@@ -97,6 +96,5 @@ describe('make an order: suspended possession', () => {
     expect(sameTerms.disabled).toBe(true);
     expect(sameTerms.checked).toBe(false);
     expect(page.orderText()).toContain('The money claim is adjourned generally with liberty to restore.');
-    page.dispose();
   });
 });

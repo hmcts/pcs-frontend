@@ -41,7 +41,7 @@ function monthsFromToday(months: number): Date {
 }
 
 /** Quick dates: "14 days" pills, and shorthand such as 2w or 3m typed into the day field. */
-export function initDatePills(form: HTMLFormElement, signal?: AbortSignal): void {
+export function initDatePills(form: HTMLFormElement): void {
   form.addEventListener(
     'input',
     event => {
@@ -57,8 +57,7 @@ export function initDatePills(form: HTMLFormElement, signal?: AbortSignal): void
       const amount = Number(shorthand[1]);
       const unit = shorthand[2].toLowerCase();
       setDate(parts, unit === 'm' ? monthsFromToday(amount) : daysFromToday(amount * (unit === 'w' ? 7 : 1)));
-    },
-    { signal }
+    }
   );
 
   form.addEventListener(
@@ -73,15 +72,14 @@ export function initDatePills(form: HTMLFormElement, signal?: AbortSignal): void
       }
       setDate(parts, daysFromToday(Number(pill.dataset.datePillDays)));
       parts[0].dispatchEvent(new Event('input', { bubbles: true }));
-    },
-    { signal }
+    }
   );
 }
 
 // Typing a date in a row implies choosing that row's option, so select it rather than
 // leaving the judge with a date recorded against an unselected radio. Selection is on
 // input, not focus, so tabbing through the rows does not silently change the answer.
-export function initOptionRows(form: HTMLFormElement, signal?: AbortSignal): void {
+export function initOptionRows(form: HTMLFormElement): void {
   form.addEventListener(
     'input',
     event => {
@@ -94,12 +92,11 @@ export function initOptionRows(form: HTMLFormElement, signal?: AbortSignal): voi
         radio.checked = true;
         radio.dispatchEvent(new Event('change', { bubbles: true }));
       }
-    },
-    { signal }
+    }
   );
 }
 
-export function initCaseFactsToggle(form: HTMLFormElement, signal?: AbortSignal): void {
+export function initCaseFactsToggle(form: HTMLFormElement): void {
   const caseFacts = form.querySelector<HTMLElement>('[data-case-facts]');
   const toggle = caseFacts?.querySelector<HTMLButtonElement>('[data-case-facts-toggle]');
   const content = document.getElementById(toggle?.getAttribute('aria-controls') ?? '');
@@ -114,13 +111,12 @@ export function initCaseFactsToggle(form: HTMLFormElement, signal?: AbortSignal)
       toggle.textContent = collapse ? 'Show case facts' : 'Hide case facts';
       content.hidden = collapse;
       caseFacts.classList.toggle('pcs-case-facts--collapsed', collapse);
-    },
-    { signal }
+    }
   );
 }
 
 /** A money judgment and an adjourned money claim are alternatives; same terms only applies to a judgment. */
-export function initSuspendedMoneyOptions(form: HTMLFormElement, signal?: AbortSignal): void {
+export function initSuspendedMoneyOptions(form: HTMLFormElement): void {
   const option = (value: string): HTMLInputElement | null =>
     form.querySelector<HTMLInputElement>(`input[name="suspended-options"][value="${value}"]`);
   const judgment = option('money-judgment-arrears');
@@ -136,8 +132,8 @@ export function initSuspendedMoneyOptions(form: HTMLFormElement, signal?: AbortS
     sameTerms.disabled = !judgment.checked;
     sameTerms.checked = sameTerms.checked && judgment.checked;
   };
-  judgment.addEventListener('change', () => sync(judgment, adjourned), { signal });
-  adjourned.addEventListener('change', () => sync(adjourned, judgment), { signal });
+  judgment.addEventListener('change', () => sync(judgment, adjourned));
+  adjourned.addEventListener('change', () => sync(adjourned, judgment));
   sync(judgment, adjourned);
 }
 
@@ -170,19 +166,15 @@ export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
   return builders[type](readOrderData(form));
 }
 
-// Returns a teardown so a module reload can dispose the editor. Without it a second
-// editor is created over the same mount, which DocWeave rejects.
-export function initMakeOrder(): () => void {
+export function initMakeOrder(): void {
   const form = document.querySelector<HTMLFormElement>('#make-order-form');
   if (!form) {
-    return () => undefined;
+    return;
   }
-  const listeners = new AbortController();
-  const { signal } = listeners;
-  initDatePills(form, signal);
-  initOptionRows(form, signal);
-  initCaseFactsToggle(form, signal);
-  initSuspendedMoneyOptions(form, signal);
+  initDatePills(form);
+  initOptionRows(form);
+  initCaseFactsToggle(form);
+  initSuspendedMoneyOptions(form);
   const suspendedBy = dateParts(form, 'suspended-by-date');
   if (suspendedBy && !suspendedBy.some(part => part.value)) {
     setDate(suspendedBy, daysFromToday(14));
@@ -193,7 +185,7 @@ export function initMakeOrder(): () => void {
   const orderTypeField = document.querySelector<HTMLInputElement>('#order-type');
   const editorRegion = document.querySelector<HTMLElement>('#order-preview-editor');
   if (!mount || !documentField || !orderTypeField || !editorRegion) {
-    return () => listeners.abort();
+    return;
   }
 
   // One document per order type, so switching tabs and back keeps any edits.
@@ -253,21 +245,20 @@ export function initMakeOrder(): () => void {
       selectOrderType(type);
     }
   };
-  window.addEventListener('hashchange', followTab, { signal });
+  window.addEventListener('hashchange', followTab);
   const renderForFormControl = (event: Event): void => {
     if (!(event.target instanceof Node && editorRegion.contains(event.target))) {
       render();
     }
   };
-  form.addEventListener('input', renderForFormControl, { signal });
-  form.addEventListener('change', renderForFormControl, { signal });
+  form.addEventListener('input', renderForFormControl);
+  form.addEventListener('change', renderForFormControl);
   form.addEventListener(
     'submit',
     () => {
       followTab();
       persist();
-    },
-    { signal }
+    }
   );
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
@@ -277,12 +268,4 @@ export function initMakeOrder(): () => void {
     window.history.replaceState(window.history.state, '', savedTab.hash);
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   }
-
-  return () => {
-    listeners.abort();
-    persist();
-    editor?.destroy();
-    editor = undefined;
-    editorType = undefined;
-  };
 }

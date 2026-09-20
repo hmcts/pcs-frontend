@@ -85,6 +85,5 @@ describe('make an order: outright possession', () => {
     const submitted = await app.post(PAGE, body);
     expect(submitted.status).toBe(302);
     expect(submitted.location).toBe(MANAGE_CASE_URL);
-    page.dispose();
   });
 });
