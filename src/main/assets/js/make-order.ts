@@ -42,58 +42,49 @@ function monthsFromToday(months: number): Date {
 
 /** Quick dates: "14 days" pills, and shorthand such as 2w or 3m typed into the day field. */
 export function initDatePills(form: HTMLFormElement): void {
-  form.addEventListener(
-    'input',
-    event => {
-      const day = event.target;
-      if (!(day instanceof HTMLInputElement) || !day.name.endsWith('-day')) {
-        return;
-      }
-      const shorthand = /^(\d+)\s*([dwm])$/i.exec(day.value.trim());
-      const parts = shorthand && dateParts(form, day.name.slice(0, -'-day'.length));
-      if (!shorthand || !parts || !Number.isSafeInteger(Number(shorthand[1]))) {
-        return;
-      }
-      const amount = Number(shorthand[1]);
-      const unit = shorthand[2].toLowerCase();
-      setDate(parts, unit === 'm' ? monthsFromToday(amount) : daysFromToday(amount * (unit === 'w' ? 7 : 1)));
+  form.addEventListener('input', event => {
+    const day = event.target;
+    if (!(day instanceof HTMLInputElement) || !day.name.endsWith('-day')) {
+      return;
     }
-  );
+    const shorthand = /^(\d+)\s*([dwm])$/i.exec(day.value.trim());
+    const parts = shorthand && dateParts(form, day.name.slice(0, -'-day'.length));
+    if (!shorthand || !parts || !Number.isSafeInteger(Number(shorthand[1]))) {
+      return;
+    }
+    const amount = Number(shorthand[1]);
+    const unit = shorthand[2].toLowerCase();
+    setDate(parts, unit === 'm' ? monthsFromToday(amount) : daysFromToday(amount * (unit === 'w' ? 7 : 1)));
+  });
 
-  form.addEventListener(
-    'click',
-    event => {
-      const pill = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-date-pill-days]') : null;
-      const control = pill?.closest<HTMLElement>('.pcs-date-with-pills');
-      const day = control?.querySelector<HTMLInputElement>('input[name$="-day"]');
-      const parts = day && dateParts(control!, day.name.slice(0, -'-day'.length));
-      if (!pill || !parts) {
-        return;
-      }
-      setDate(parts, daysFromToday(Number(pill.dataset.datePillDays)));
-      parts[0].dispatchEvent(new Event('input', { bubbles: true }));
+  form.addEventListener('click', event => {
+    const pill = event.target instanceof Element ? event.target.closest<HTMLElement>('[data-date-pill-days]') : null;
+    const control = pill?.closest<HTMLElement>('.pcs-date-with-pills');
+    const day = control?.querySelector<HTMLInputElement>('input[name$="-day"]');
+    const parts = day && dateParts(control!, day.name.slice(0, -'-day'.length));
+    if (!pill || !parts) {
+      return;
     }
-  );
+    setDate(parts, daysFromToday(Number(pill.dataset.datePillDays)));
+    parts[0].dispatchEvent(new Event('input', { bubbles: true }));
+  });
 }
 
 // Typing a date in a row implies choosing that row's option, so select it rather than
 // leaving the judge with a date recorded against an unselected radio. Selection is on
 // input, not focus, so tabbing through the rows does not silently change the answer.
 export function initOptionRows(form: HTMLFormElement): void {
-  form.addEventListener(
-    'input',
-    event => {
-      const target = event.target as Element | null;
-      const radio = target
-        ?.closest('.pcs-option-row__fields')
-        ?.closest('[data-option-row]')
-        ?.querySelector<HTMLInputElement>('input[type="radio"]');
-      if (radio && !radio.checked) {
-        radio.checked = true;
-        radio.dispatchEvent(new Event('change', { bubbles: true }));
-      }
+  form.addEventListener('input', event => {
+    const target = event.target as Element | null;
+    const radio = target
+      ?.closest('.pcs-option-row__fields')
+      ?.closest('[data-option-row]')
+      ?.querySelector<HTMLInputElement>('input[type="radio"]');
+    if (radio && !radio.checked) {
+      radio.checked = true;
+      radio.dispatchEvent(new Event('change', { bubbles: true }));
     }
-  );
+  });
 }
 
 export function initCaseFactsToggle(form: HTMLFormElement): void {
@@ -103,16 +94,13 @@ export function initCaseFactsToggle(form: HTMLFormElement): void {
   if (!caseFacts || !toggle || !content) {
     return;
   }
-  toggle.addEventListener(
-    'click',
-    () => {
-      const collapse = toggle.getAttribute('aria-expanded') === 'true';
-      toggle.setAttribute('aria-expanded', String(!collapse));
-      toggle.textContent = collapse ? 'Show case facts' : 'Hide case facts';
-      content.hidden = collapse;
-      caseFacts.classList.toggle('pcs-case-facts--collapsed', collapse);
-    }
-  );
+  toggle.addEventListener('click', () => {
+    const collapse = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!collapse));
+    toggle.textContent = collapse ? 'Show case facts' : 'Hide case facts';
+    content.hidden = collapse;
+    caseFacts.classList.toggle('pcs-case-facts--collapsed', collapse);
+  });
 }
 
 /** A money judgment and an adjourned money claim are alternatives; same terms only applies to a judgment. */
