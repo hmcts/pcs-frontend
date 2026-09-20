@@ -4,9 +4,14 @@ import * as propertiesVolume from '@hmcts/properties-volume';
 import config from 'config';
 import { get, set } from 'lodash';
 
-import { Logger } from '@modules/logger';
-
-const logger = Logger.getLogger('properties-volume');
+// Deliberately not imported at module scope: this module is loaded from bootstrap.ts before
+// initializeTelemetry() runs, and OpenTelemetry can only instrument winston if it is required
+// after telemetry is initialised. Importing the logger here loads winston too early, which
+// silently stops every logger.error() from reaching App Insights (HDPI-8954).
+const warn = async (message: string): Promise<void> => {
+  const { Logger } = await import('@modules/logger');
+  Logger.getLogger('properties-volume').warn(message);
+};
 
 export class PropertiesVolume {
   constructor(public developmentMode: boolean) {
@@ -25,7 +30,7 @@ export class PropertiesVolume {
           omit: ['redis-connection-string'],
         });
       } catch (err) {
-        logger.warn(
+        await warn(
           `Could not load secrets from Azure Key Vault: ${(err as Error).message}. ` +
             'Falling back to values from .env / process.env. Run `az login` or set USE_VAULT=false to silence.'
         );
