@@ -18,20 +18,13 @@ export interface RefreshTokenResult {
 
 import { Logger } from '@modules/logger';
 
-/**
- * Summarises an Error's `cause` for logging. Node's fetch reports every network failure as
- * "fetch failed" and puts the actual reason on `cause`, so without this a failed token
- * exchange tells us nothing about why it failed.
- */
+// Node's fetch reports every network failure as "fetch failed" and puts the real reason on `cause`.
 function describeCause(cause: unknown): string | undefined {
-  if (!cause) {
-    return undefined;
+  if (!(cause instanceof Error)) {
+    return cause ? String(cause) : undefined;
   }
-  if (cause instanceof Error) {
-    const code = (cause as NodeJS.ErrnoException).code;
-    return code ? `${cause.name}: ${cause.message} (${code})` : `${cause.name}: ${cause.message}`;
-  }
-  return String(cause);
+  const { code } = cause as NodeJS.ErrnoException;
+  return [cause.name, ': ', cause.message, code ? ` (${code})` : ''].join('');
 }
 
 export class OIDCModule {
@@ -274,8 +267,6 @@ export class OIDCModule {
         this.logger.error('Authentication error details:', {
           description: error.error_description || 'Authentication error details',
           error: error.message,
-          // Node's fetch throws a generic "fetch failed" TypeError and puts the real reason
-          // (ECONNRESET, ETIMEDOUT, DNS failure) on error.cause, so log that too (HDPI-8954).
           cause: describeCause(error.cause),
           code: error.code,
           status: error.status,

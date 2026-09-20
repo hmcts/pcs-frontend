@@ -4,10 +4,8 @@ import * as propertiesVolume from '@hmcts/properties-volume';
 import config from 'config';
 import { get, set } from 'lodash';
 
-// Deliberately not imported at module scope: this module is loaded from bootstrap.ts before
-// initializeTelemetry() runs, and OpenTelemetry can only instrument winston if it is required
-// after telemetry is initialised. Importing the logger here loads winston too early, which
-// silently stops every logger.error() from reaching App Insights (HDPI-8954).
+// Loaded lazily: bootstrap imports this module before initializeTelemetry(), and winston can only
+// be instrumented if it is required after telemetry starts (HDPI-8954).
 const warn = async (message: string): Promise<void> => {
   const { Logger } = await import('@modules/logger');
   Logger.getLogger('properties-volume').warn(message);
