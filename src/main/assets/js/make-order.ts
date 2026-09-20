@@ -183,8 +183,7 @@ export function initMakeOrder(): void {
   const mount = document.querySelector<HTMLElement>('#order-editor');
   const documentField = document.querySelector<HTMLTextAreaElement>('#order-document');
   const orderTypeField = document.querySelector<HTMLInputElement>('#order-type');
-  const editorRegion = document.querySelector<HTMLElement>('#order-preview-editor');
-  if (!mount || !documentField || !orderTypeField || !editorRegion) {
+  if (!mount || !documentField || !orderTypeField) {
     return;
   }
 
@@ -198,40 +197,30 @@ export function initMakeOrder(): void {
   } catch {
     // A document that does not parse is regenerated from the form.
   }
-  let editor: ReturnType<typeof createDocEditor> | undefined;
-  let editorType: OrderType | undefined;
-  const store = (type: OrderType, snapshot: DocWeaveSnapshot): void => {
-    documents[type] = snapshot;
-    documentField.value = JSON.stringify(snapshot);
-  };
-  const persist = (): void => {
-    if (editor && editorType) {
-      store(editorType, editor.getSnapshot());
-    }
-  };
-  const render = (): void => {
-    if (editor && editorType === orderTypeField.value) {
-      editor.render(buildOrderDocument(form));
-    }
-  };
+  let orderType: OrderType | undefined;
+  const editor = createDocEditor({
+    mount,
+    label: 'Order',
+    templates: {
+      url: '/docweave/templates',
+      csrfToken: () => form.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value,
+    },
+    onChange: snapshot => {
+      if (orderType) {
+        documents[orderType] = snapshot;
+        documentField.value = JSON.stringify(snapshot);
+      }
+    },
+  });
+  const render = (): void => editor.render(buildOrderDocument(form));
   const selectOrderType = (type: OrderType): void => {
-    if (editorType === type) {
+    if (orderType === type) {
       return;
     }
-    persist();
-    editor?.destroy();
+    orderType = type;
     orderTypeField.value = type;
-    editorType = type;
     syncSuspendedOnlyCosts(form, type);
-    editor = createDocEditor({
-      mount,
-      label: 'Order',
-      initialSnapshot: documents[type],
-      templates: {
-        url: '/docweave/templates',
-        csrfToken: () => form.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value,
-      },
-    });
+    editor.load(documents[type]);
     render();
   };
 
@@ -246,20 +235,9 @@ export function initMakeOrder(): void {
     }
   };
   window.addEventListener('hashchange', followTab);
-  const renderForFormControl = (event: Event): void => {
-    if (!(event.target instanceof Node && editorRegion.contains(event.target))) {
-      render();
-    }
-  };
-  form.addEventListener('input', renderForFormControl);
-  form.addEventListener('change', renderForFormControl);
-  form.addEventListener(
-    'submit',
-    () => {
-      followTab();
-      persist();
-    }
-  );
+  form.addEventListener('input', render);
+  form.addEventListener('change', render);
+  form.addEventListener('submit', followTab);
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
   const savedTab = tabs.find(tab => tab.dataset.orderType === orderTypeField.value);
