@@ -29,14 +29,6 @@ export function money(raw: string): string {
   return amount === undefined ? '[amount not provided]' : formatMoney(amount);
 }
 
-/** Blank lines separate the paragraphs of a free text answer. */
-export function splitParagraphs(text: string): string[] {
-  return text
-    .split(/\n\s*\n/)
-    .map(paragraph => paragraph.trim())
-    .filter(Boolean);
-}
-
 export function frequency(data: OrderData, name: string): string {
   return value(data, name) === 'weekly' ? 'week' : 'month';
 }
@@ -114,11 +106,7 @@ export function addPreamble(order: DocBuilder, data: OrderData): void {
     });
   }
   if (selected(data, 'recitals', 'yes')) {
-    splitParagraphs(value(data, 'recitals-text')).forEach((text, index) =>
-      order.paragraph(`recital-${index}`, content => {
-        content.fact('text', text, { sourceId: 'recitals-text' });
-      })
-    );
+    order.text('recital', value(data, 'recitals-text'), { sourceId: 'recitals-text' });
   }
   order.paragraph('ordered-that', 'IT IS ORDERED THAT:');
 }
