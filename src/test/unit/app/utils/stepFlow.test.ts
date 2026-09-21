@@ -933,7 +933,11 @@ describe('stepFlow', () => {
         path: '/steps/test-journey/step2',
         session: {
           formData: {
-            step1: 'value',
+            default: {
+              default: {
+                step1: 'value',
+              },
+            },
           },
         },
       } as unknown as Request;

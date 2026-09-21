@@ -12,6 +12,7 @@ import { hydrateUploadedDocumentsFromBody, wireFileUploadOnPostError } from './f
 import { type FormBuilderFlowConfig, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import {
+  getAllFormData,
   getCustomErrorTranslations,
   getTranslationErrors,
   normalizeCheckboxFields,
@@ -86,9 +87,7 @@ export function createPostHandler(
       const resolvedFlowConfig = await resolveFormBuilderFlowConfig(req, flowConfig);
 
       const allFormData = shouldUseSessionFormData(resolvedFlowConfig)
-        ? req.session.formData
-          ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
-          : {}
+        ? Object.values(getAllFormData(req)).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
         : {};
 
       // Normalize checkbox fields BEFORE validation to ensure checkbox values are arrays
