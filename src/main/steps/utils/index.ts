@@ -1,5 +1,6 @@
 export { isSomethingElseCounterClaim } from './isSomethingElseCounterClaim';
 export { isDefendantNameKnown } from './isDefendantNameKnown';
+export { doesDefendantHaveDraftResponse } from './doesDefendantHaveDraftResponse';
 export { isWalesProperty } from './isWalesProperty';
 export { isRelease12Enabled } from './isRelease12Enabled';
 export { shouldShowExemptLandlordStep } from './shouldShowExemptLandlordStep';
@@ -14,6 +15,7 @@ export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export { isPriorityDebtsSelected } from './isPriorityDebtsSelected';
 export { hasSelectedPriorityDebts } from './hasSelectedPriorityDebts';
+export { hasMandatoryPriorityDebtDetailFields } from './hasMandatoryPriorityDebtDetailFields';
 export {
   getFirstStepInSection,
   getSectionCoverage,
@@ -32,11 +34,7 @@ export {
   shouldRouteToPriorityDebtDetails,
   shouldRouteToOtherRegularExpenses,
 } from './respondToClaimRouteConditions';
-export {
-  poundsStringToPence,
-  ccdPenceToPoundsString,
-  additionalRentContributionToPoundsString,
-} from './moneyAmountTransforms';
+export { ccdPenceToPoundsString, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export {
   LEGAL_REPRESENTATIVE_USER_ROLES,

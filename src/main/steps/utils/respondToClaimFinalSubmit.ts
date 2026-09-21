@@ -1,21 +1,18 @@
 /**
  * Shared CCD final-submit for respond-to-claim (citizen).
  *
- * Used by the end-of-journey CYA step (after SOT validation) and the legacy
- * POST /case/:caseReference/final-submit route.
+ * Used by the end-of-journey CYA step after the statement of truth is validated.
  */
 import config from 'config';
 import type { Request } from 'express';
 
-import { http } from '../../modules/http';
-
 import { getCounterClaimAmountInPence } from './counterClaimAmount';
 import { getRespondToClaimSubmitNavigation } from './postSubmissionRouting';
 
+import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
-import type { CcdCase } from '@services/ccdCase.interface';
+import type { CcdCase, PossessionClaimResponse } from '@services/ccdCase.interface';
 import { persistPaymentSessionState } from '@services/paymentSessionService';
-import { clientContextSessionClearer } from '@utils/clientContextSessionClearer';
 
 const logger = Logger.getLogger('respondToClaimFinalSubmit');
 
@@ -30,6 +27,40 @@ export class RespondToClaimFinalSubmitError extends Error {
     super(message);
     this.name = 'RespondToClaimFinalSubmitError';
   }
+}
+
+const DRAFT_CHANGED_ERROR_CODE = 'DRAFT_CHANGED';
+
+export class RespondToClaimSubmitRejectedError extends Error {
+  constructor(public readonly messages: string[]) {
+    super(messages.join('; '));
+    this.name = 'RespondToClaimSubmitRejectedError';
+  }
+}
+
+export const RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY = 'respondToClaimSubmitRejection';
+
+export function submitRejectionReason(messages: string[]): 'correspondenceAddress' | 'other' {
+  return messages.some(message => /correspondence address/i.test(message)) ? 'correspondenceAddress' : 'other';
+}
+
+export function callbackErrorMessages(error: unknown): string[] {
+  const callbackErrors = (error as { response?: { data?: { callbackErrors?: unknown } } })?.response?.data
+    ?.callbackErrors;
+  return Array.isArray(callbackErrors)
+    ? callbackErrors.filter((value): value is string => typeof value === 'string')
+    : [];
+}
+
+export function getEndOfJourneyCyaDraftChangedPath(caseId: string): string {
+  return `/case/${caseId}/respond-to-claim/end-of-journey-cya?draftChanged=1`;
+}
+
+export function isDraftChangedError(error: unknown): boolean {
+  if (error instanceof Error && error.message.includes(DRAFT_CHANGED_ERROR_CODE)) {
+    return true;
+  }
+  return callbackErrorMessages(error).some(message => message === DRAFT_CHANGED_ERROR_CODE);
 }
 
 interface ParsedSubmitPaymentPayload {
@@ -106,7 +137,11 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
   if (!userAccessToken) {
     throw new RespondToClaimFinalSubmitError('No user access token in session');
   }
-  const selectedPartyId = req.session?.clientContext?.selectedPartyId;
+
+  const selectedPartyId = validatedCase.data.possessionClaimResponse?.currentDefendantPartyId;
+  req.session.clientContext = {
+    selectedPartyId: String(selectedPartyId),
+  };
 
   logger.info(`Submitting response to claim for case ${caseId}`);
 
@@ -115,9 +150,12 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
   const eventToken = startResponse.data.token;
 
   const submitUrl = `${getBaseUrl()}/cases/${caseId}/events`;
+  const draftVersion = validatedCase.data.possessionClaimResponse?.draftVersion;
   const payload = {
     data: {
-      possessionClaimResponse: {},
+      possessionClaimResponse: {
+        ...(draftVersion !== undefined && draftVersion !== null && { draftVersion }),
+      },
       ...(selectedPartyId !== null && { currentRepresentedPartyId: selectedPartyId }),
     },
     event: {
@@ -129,8 +167,22 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
     ignore_warning: false,
   };
 
-  const submitResponse = await http.post<CcdCase>(submitUrl, payload, getCaseHeaders(userAccessToken));
-  const submittedCase = submitResponse.data;
+  let submittedCase: CcdCase;
+  try {
+    const submitResponse = await http.post<CcdCase>(submitUrl, payload, getCaseHeaders(userAccessToken));
+    submittedCase = submitResponse.data;
+  } catch (error) {
+    if (isDraftChangedError(error)) {
+      logger.warn(`Submit refused for case ${caseId}: draft changed after review`);
+      throw error;
+    }
+    const messages = callbackErrorMessages(error);
+    if (messages.length > 0) {
+      logger.warn(`Submit refused for case ${caseId}: ${messages.join('; ')}`);
+      throw new RespondToClaimSubmitRejectedError(messages);
+    }
+    throw error;
+  }
 
   logger.info(`Response submitted successfully for case ${caseId}`);
 
@@ -152,9 +204,30 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
     });
   }
 
-  if (selectedPartyId) {
-    clientContextSessionClearer(req);
-  }
-
   return { confirmationPath };
+}
+
+export function buildStatementOfTruthPayload(
+  body: Record<string, unknown>,
+  isLegalRepresentative: boolean
+): NonNullable<NonNullable<PossessionClaimResponse['defendantResponses']>['statementOfTruth']> {
+  const contempt = body?.statementOfTruthContempt as string[] | undefined;
+  const belief = body?.statementOfTruthBelief as string[] | undefined;
+
+  // Legal reps only sign the belief checkbox; citizens must sign both
+  const bothAccepted = isLegalRepresentative
+    ? belief?.includes('yes')
+    : contempt?.includes('yes') && belief?.includes('yes');
+
+  return {
+    accepted: bothAccepted ? 'YES' : 'NO',
+    fullName: (body?.fullName as string | undefined)?.trim(),
+    ...(isLegalRepresentative
+      ? {
+          nameOfFirm: (body?.nameOfFirm as string | undefined)?.trim(),
+          positionHeld: (body?.positionHeld as string | undefined)?.trim(),
+          hasLegalRepresentation: 'YES',
+        }
+      : {}),
+  };
 }

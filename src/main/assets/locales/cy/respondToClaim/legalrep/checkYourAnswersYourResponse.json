@@ -1,0 +1,133 @@
+{
+  "pageTitle": "Gwiriwch eich atebion",
+  "cardTitle": "Ymateb",
+  "options": {
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "imNotSure": "cy Defendant is not sure"
+  },
+  "rows": {
+    "exemptLandlord": {
+      "label": "cy Is the landlord an exempt landlord under Part 1 of the Housing (Wales) Act 2014?",
+      "changeHidden": "cy exempt landlord"
+    },
+    "writtenTerms": {
+      "label": "A yw'r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth?",
+      "changeHidden": "telerau ysgrifenedig"
+    },
+    "tenancyTypeCorrect": {
+      "label": "A yw'r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?",
+      "changeHidden": "math o denantiaeth"
+    },
+    "tenancyTypeDetails": {
+      "label": "Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded",
+      "changeHidden": "math o denantiaeth wedi'i gywiro"
+    },
+    "tenancyStartDate": {
+      "changeHidden": "dyddiad dechrau'r denantiaeth",
+      "confirm": {
+        "label": "A yw dyddiad dechrau'r denantiaeth, drwydded neu gontract meddiannaeth yn gywir?",
+        "changeHidden": "dyddiad dechrau'r denantiaeth"
+      },
+      "correctDate": {
+        "label": "Beth yw'r dyddiad dechrau cywir?",
+        "changeHidden": "dyddiad dechrau tenantiaeth cywir"
+      },
+      "labelEntered": "Beth yw dyddiad dechrau'r denantiaeth, contract meddiannaeth neu drwydded?"
+    },
+    "possessionNoticeReceived": {
+      "label": "A wnaeth {{ claimantName }} hysbysu'r diffynnydd am eu bwriad i ddechrau achos meddiannu?",
+      "changeHidden": "wedi derbyn hysbysiad"
+    },
+    "noticeReceivedDate": {
+      "label": "Pryd gafodd y diffynnydd yr hysbysiad gan {{claimantName}}?",
+      "changeHidden": "dyddiad derbyn hysbysiad"
+    },
+    "rentArrearsAmountConfirmation": {
+      "label": "A yw'r swm hwn yn ddyledus gan y diffynnydd mewn ôl-ddyledion rhent?",
+      "changeHidden": "swm ôl-ddyledion rhent"
+    },
+    "rentArrearsAmountDetails": {
+      "label": "Faint mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent?",
+      "changeHidden": "manylion y swm ôl-ddyledion rhent"
+    },
+    "disputeClaim": {
+      "label": "A ydy'r diffynnydd yn gwrthwynebu unrhyw rannau eraill o'r hawliad?",
+      "changeHidden": "gwrthwynebu rhannau eraill o'r hawliad"
+    },
+    "disputeClaimDetails": {
+      "label": "Esboniwch y rhannau o'r hawliad mae'r diffynnydd yn eu gwrthwynebu",
+      "changeHidden": "manylion y gwrthwynebiad"
+    },
+    "makeCounterClaim": {
+      "label": "cy Is the defendant planning to make a counterclaim against {{claimantName}}?",
+      "changeHidden": "gwneud gwrth-hawliad"
+    },
+    "counterClaimType": {
+      "label": "cy What is the defendant claiming for?",
+      "changeHidden": "math o wrth-hawliad",
+      "options": {
+        "PAYMENT_OR_COMPENSATION": "Swm o arian neu iawndal",
+        "SOMETHING_ELSE": "Rhywbeth arall",
+        "BOTH": "Y ddau"
+      }
+    },
+    "isClaimAmountKnown": {
+      "label": "cy Is the defendant claiming for a specific sum of money?",
+      "changeHidden": "swm yr hawliad yn hysbys"
+    },
+    "claimAmount": {
+      "label": "cy How much is the defendant claiming?",
+      "changeHidden": "swm yr hawliad"
+    },
+    "estimatedMaxClaimAmount": {
+      "label": "cy What’s the maximum value of their claim?",
+      "changeHidden": "amcangyfrif o uchafswm swm yr hawliad"
+    },
+    "counterClaimNeedHelpWithFees": {
+      "label": "cy Does the defendant need help paying the counterclaim fee?",
+      "changeHidden": "help i dalu'r ffi gwrth-hawliad",
+      "options": {
+        "YES": "cy The defendant needs help paying the fee",
+        "NO": "cy The defendant does not need help paying the fee"
+      }
+    },
+    "counterClaimAppliedForHwf": {
+      "label": "cy Has the defendant already applied for help with their counterclaim fee?",
+      "changeHidden": "wedi gwneud cais am help i dalu ffioedd"
+    },
+    "counterClaimHwfReference": {
+      "label": "cy Enter the defendant’s Help with Fees reference number",
+      "changeHidden": "Cyfeirnod Help i Dalu Ffioedd"
+    },
+    "counterClaimFor": {
+      "label": "cy What is the defendant’s counterclaim for?",
+      "changeHidden": "testun y gwrth-hawliad"
+    },
+    "counterClaimReasons": {
+      "label": "cy What are their reasons for making the counterclaim?",
+      "changeHidden": "rhesymau dros y gwrth-hawliad"
+    },
+    "counterClaimAgainst": {
+      "label": "cy Who is the defendant making a counterclaim against?",
+      "changeHidden": "gwrth-hawliad yn erbyn"
+    },
+    "otherOrderRequestDetails": {
+      "label": "cy What orders are they asking for the court to make?",
+      "changeHidden": "gorchmynion a geisiwyd"
+    },
+    "otherOrderRequestFacts": {
+      "label": "cy What facts would they like the court to consider when deciding the claim?",
+      "changeHidden": "ffeithiau i'r llys"
+    },
+    "counterClaimWantToUploadFiles": {
+      "label": "cy Do you want to upload files to support the counterclaim?",
+      "changeHidden": "uwchlwytho ffeiliau ar gyfer gwrth-hawliad"
+    },
+    "counterClaimDocuments": {
+      "label": "Ffeiliau wedi’u huwchlwytho",
+      "changeHidden": "ffeiliau wedi'u huwchlwytho ar gyfer gwrth-hawliad",
+      "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
+    }
+  }
+}

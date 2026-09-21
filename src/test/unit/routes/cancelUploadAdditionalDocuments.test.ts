@@ -39,14 +39,19 @@ describe('cancelUploadJourney', () => {
     expect(redirect).toHaveBeenCalledWith(302, '/dashboard/1234567890123456');
   });
 
-  it('clears journey form data for all upload-additional-documents steps', () => {
+  it('clears the upload-additional-documents form data for the case only', () => {
     const req = buildReq({
       session: {
         formData: {
-          'confirm-if-these-documents-relate-to-an-application': { relatedApplicationId: 'abc' },
-          'upload-your-documents': { documents: ['a.pdf'] },
-          'check-your-answers': { something: true },
-          'other-journey-step': { keepMe: true },
+          uploadAdditionalDocuments: {
+            '1234567890123456': {
+              'confirm-if-these-documents-relate-to-an-application': { relatedApplicationId: 'abc' },
+              'upload-your-documents': { documents: ['a.pdf'] },
+              'check-your-answers': { something: true },
+            },
+            '9999999999999999': { 'check-your-answers': { keepMe: true } },
+          },
+          otherJourney: { '1234567890123456': { 'check-your-answers': { keepMe: true } } },
         },
       } as unknown as Request['session'],
     });
@@ -54,10 +59,13 @@ describe('cancelUploadJourney', () => {
 
     cancelUploadJourney(req, res);
 
-    expect(req.session.formData?.['confirm-if-these-documents-relate-to-an-application']).toBeUndefined();
-    expect(req.session.formData?.['upload-your-documents']).toBeUndefined();
-    expect(req.session.formData?.['check-your-answers']).toBeUndefined();
-    expect(req.session.formData?.['other-journey-step']).toEqual({ keepMe: true });
+    expect(req.session.formData?.uploadAdditionalDocuments?.['1234567890123456']).toBeUndefined();
+    expect(req.session.formData?.uploadAdditionalDocuments?.['9999999999999999']).toEqual({
+      'check-your-answers': { keepMe: true },
+    });
+    expect(req.session.formData?.otherJourney?.['1234567890123456']).toEqual({
+      'check-your-answers': { keepMe: true },
+    });
     expect(redirect).toHaveBeenCalledWith(302, '/dashboard/1234567890123456');
   });
 

@@ -46,6 +46,10 @@
         "title": "Your response",
         "body": "You have responded to the claim."
       },
+      "CounterClaimFeeUnpaid": {
+        "title": "Your response",
+        "body": "You have not paid the counter claim fee of {{feeAmount, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}}.<br><br>Your counterclaim will not progress until this fee has been paid.<br><br><a class=\"govuk-link\" href=\"{{payCounterclaimFeeUrl}}\">Pay your counterclaim fee</a>"
+      },
       "NoHearingArranged": {
         "title": "A property possession claim has been made against you",
         "body": "The court will arrange the hearing and contact you with details."
@@ -81,7 +85,8 @@
       "statementsOfCase": "Statements of case",
       "propertyDocuments": "Property documents",
       "evidence": "Evidence",
-      "correspondence": "Correspondence"
+      "correspondence": "Correspondence",
+      "uncategorisedDocuments": "Uncategorised"
     }
   }
 }

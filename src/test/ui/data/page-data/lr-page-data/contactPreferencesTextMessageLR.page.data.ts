@@ -10,6 +10,6 @@ export const contactPreferencesTextMessageLR = {
   backLink: `Back`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfYouWantErrorMessage: `Select if you want to be contacted by text message.`,
-  feedbackLink: `feedback (opens in new tab)`,
+  feedbackLink: `feedback`,
   pageSlug: `contact-preferences-text-message`,
 };
