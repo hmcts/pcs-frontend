@@ -22,6 +22,10 @@ nodejs:
     REDIRECTS_MANAGE_CASE_RETURN_URL: '${REDIRECTS_MANAGE_CASE_RETURN_URL}'
     PAYMENT_RETURN_URL: 'https://${SERVICE_FQDN}/payment/return'
     LAUNCHDARKLY_ENV: '${SERVICE_FQDN}'
+    # TEMPORARY - REMOVE BEFORE MERGE (HDPI-8953): previews do not send telemetry by default.
+    # Turn it on so this PR's preview reports into the pcs-aat App Insights under its own role name.
+    OTEL_ENABLED: true
+    OTEL_SERVICE_NAME: 'pcs-frontend-pr-2107'
     CUI_RA_CALLBACK_URL: 'https://${SERVICE_FQDN}/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id'
     CUI_RA_LOGOUT_URL: 'https://${SERVICE_FQDN}/logout'
 redis:
