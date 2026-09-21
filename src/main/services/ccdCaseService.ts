@@ -138,7 +138,11 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   logger.error(`Error in ${context}: ${axiosError.message}`);
   if (responseData) {
-    logger.error(`Error response data: ${JSON.stringify(responseData, null, 2)}`);
+    // CCD error bodies can carry case data, so log only the parts that identify the failure (HDPI-8953).
+    logger.error(
+      `Error response from CCD in ${context}: status=${status ?? 'unknown'} ` +
+        `message=${responseData.message ?? 'none'} exception=${responseData.exception ?? 'none'}`
+    );
   }
 
   if (status === 403) {
@@ -190,7 +194,6 @@ async function getEventToken(userToken: string, url: string): Promise<string> {
   try {
     logger.info(`Calling getEventToken with URL: ${url}`);
     const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data.token;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'getEventToken');
@@ -234,10 +237,8 @@ async function submitEvent(
   };
 
   try {
-    logger.info(`Calling submitEvent with URL: ${url}`);
-    logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
+    logger.info(`Calling submitEvent with URL: ${url}, eventId: ${eventId}`);
     const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'submitEvent');

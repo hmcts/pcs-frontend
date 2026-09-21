@@ -1,5 +1,5 @@
 import { shutdownAzureMonitor, useAzureMonitor } from '@azure/monitor-opentelemetry';
-import { SpanStatusCode } from '@opentelemetry/api';
+import { type Span, SpanStatusCode } from '@opentelemetry/api';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import type { WinstonInstrumentationConfig } from '@opentelemetry/instrumentation-winston';
 import config from 'config';
@@ -10,6 +10,7 @@ const ignoredIncomingUrlPattern = /\/assets\/|\.js(?:$|\?)|\.css(?:$|\?)/;
 
 interface HttpTelemetryConfig {
   enabled: boolean;
+  applyCustomAttributesOnSpan: (span: Span) => void;
   ignoreIncomingRequestHook: (request: { method?: string; url?: string }) => boolean;
   ignoreOutgoingRequestHook: (options: { path?: string }) => boolean;
 }
@@ -101,8 +102,29 @@ const winstonTelemetryConfig: WinstonInstrumentationConfig = {
   },
 };
 
+// Query strings can carry secrets (the OS Places lookup passes its API key as `key=`), and the
+// HTTP instrumentation records the full URL, so redact them before the span is exported (HDPI-8953).
+const SECRET_QUERY_PARAMS = ['key', 'code', 'token', 'client_secret'];
+
+export function redactSecretQueryParams(url: string): string {
+  return SECRET_QUERY_PARAMS.reduce(
+    (redacted, param) => redacted.replace(new RegExp(`([?&]${param}=)[^&\\s]+`, 'gi'), '$1***'),
+    url
+  );
+}
+
+const redactSpanUrlAttributes = (span: Span): void => {
+  for (const attribute of ['http.url', 'url.full', 'http.target', 'url.query']) {
+    const value = (span as unknown as { attributes?: Record<string, unknown> }).attributes?.[attribute];
+    if (typeof value === 'string' && value.includes('=')) {
+      span.setAttribute(attribute, redactSecretQueryParams(value));
+    }
+  }
+};
+
 const httpTelemetryConfig: HttpTelemetryConfig = {
   enabled: true,
+  applyCustomAttributesOnSpan: redactSpanUrlAttributes,
   ignoreIncomingRequestHook: request => {
     if (request.method === 'OPTIONS') {
       return true;

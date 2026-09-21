@@ -23,6 +23,7 @@ interface TelemetryConfig {
   };
   instrumentationOptions: {
     http: {
+      applyCustomAttributesOnSpan: (span: MockSpan) => void;
       ignoreIncomingRequestHook: (request: { method?: string; url?: string }) => boolean;
       ignoreOutgoingRequestHook: (options: { path?: string }) => boolean;
     };
@@ -36,6 +37,8 @@ interface TelemetryConfig {
 interface MockSpan {
   recordException: jest.Mock;
   setStatus: jest.Mock;
+  setAttribute?: jest.Mock;
+  attributes?: Record<string, unknown>;
 }
 
 const getTelemetryModule = async () => {
@@ -194,6 +197,44 @@ describe('opentelemetry module', () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to flush telemetry cleanly', shutdownError);
     consoleErrorSpy.mockRestore();
+  });
+
+  describe('secret redaction in span URLs (HDPI-8953)', () => {
+    it('replaces secret query parameter values, leaving the rest of the URL intact', async () => {
+      const { redactSecretQueryParams } = await getTelemetryModule();
+
+      expect(redactSecretQueryParams('https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123')).toBe(
+        'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=***'
+      );
+      expect(redactSecretQueryParams('https://idam/o/token?code=xyz&client_secret=shh&scope=openid')).toBe(
+        'https://idam/o/token?code=***&client_secret=***&scope=openid'
+      );
+      expect(redactSecretQueryParams('https://ccd/cases/123?ignore-warning=false')).toBe(
+        'https://ccd/cases/123?ignore-warning=false'
+      );
+    });
+
+    it('redacts the URL attributes recorded on the span', async () => {
+      const telemetryConfig = await initializeAndGetTelemetryConfig();
+      const setAttribute = jest.fn();
+      const span = {
+        recordException: jest.fn(),
+        setStatus: jest.fn(),
+        setAttribute,
+        attributes: {
+          'http.url': 'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123',
+          'http.method': 'GET',
+        },
+      };
+
+      telemetryConfig.instrumentationOptions.http.applyCustomAttributesOnSpan(span);
+
+      expect(setAttribute).toHaveBeenCalledWith(
+        'http.url',
+        'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=***'
+      );
+      expect(setAttribute).not.toHaveBeenCalledWith('http.method', expect.anything());
+    });
   });
 
   it('times out flush when shutdown does not settle', async () => {
