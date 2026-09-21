@@ -1,5 +1,7 @@
 import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
 
+import type { CcdFlags } from './cuiRa/cuiRa.interface';
+
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export enum YesNoEnum {
@@ -167,6 +169,8 @@ export interface CcdDefendantParty {
   addressSameAsProperty?: string;
   phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
+  textMessageNumber?: string;
+  pcqId?: string;
 }
 
 /** Counter-claim data captured across the counterclaim journey screens. */
@@ -252,6 +256,9 @@ export interface CcdDefendantResponses {
 export interface StatementOfTruth {
   accepted?: YesNoValue;
   fullName?: string;
+  nameOfFirm?: string;
+  positionHeld?: string;
+  hasLegalRepresentation?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {
@@ -265,7 +272,10 @@ export interface PossessionClaimResponse {
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
   responseDocumentId?: string;
+  draftVersion?: number;
   claimIssuedDate?: string;
+
+  defendantFlags?: CcdFlags;
 }
 
 export type CaseData = CcdCaseData;
@@ -346,10 +356,11 @@ export type DocumentUploadCategoryCode =
   | 'SUSPEND_EVICTION_APPLICATION'
   | 'SET_ASIDE_ORDER_APPLICATION'
   | 'GENERAL_APPLICATION'
-  | 'MAIN_CLAIM_OR_COUNTERCLAIM';
+  | 'COUNTERCLAIM';
 
 export interface RelatedApplicationOption {
   genAppId?: string;
+  counterClaimId?: string;
   category: DocumentUploadCategoryCode;
   submittedDate?: string;
 }

@@ -33,6 +33,19 @@ export class TextValidation implements IValidation {
         await expect(locator).toContainText(data.text as string);
         return;
       }
+      case 'linkOrButton': {
+        const text = String(data.text);
+        const locator = page
+          .getByRole('link', { name: text, exact: true })
+          .or(page.getByRole('button', { name: text, exact: true }))
+          .first();
+        if (validation === 'textNotVisible') {
+          await expect(locator).toHaveCount(0);
+          return;
+        }
+        await expect(locator).toHaveText(new RegExp(`^\\s*${escapeForRegex(text)}\\s*$`));
+        return;
+      }
       case 'inlineText':
         data.elementType = 'span';
         break;

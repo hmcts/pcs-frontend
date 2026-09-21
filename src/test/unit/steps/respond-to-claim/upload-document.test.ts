@@ -6,10 +6,12 @@ jest.mock('../../../../main/modules/steps', () => ({
 jest.mock('../../../../main/services/ccdCaseService', () => ({
   ccdCaseService: {
     getCaseById: jest.fn(),
+    getCaseByIdForEvent: jest.fn(),
     updateDraft: jest.fn(),
   },
 }));
 
+import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import { step } from '../../../../main/steps/respond-to-claim/upload-document';
 
 type UploadDocumentStep = {
@@ -157,6 +159,39 @@ describe('upload-document step', () => {
     it('handles missing validatedCase gracefully', async () => {
       const result = await testedStep.getInitialFormData({ res: { locals: {} }, session: {}, params: {} });
       expect(result).toEqual({ documents: [] });
+    });
+  });
+
+  describe('documentStorage.readFresh', () => {
+    it('passes req.session.clientContext into ccdCaseService.getCaseByIdForEvent', async () => {
+      const mockGetCaseByIdForEvent = ccdCaseService.getCaseByIdForEvent as jest.Mock;
+      mockGetCaseByIdForEvent.mockResolvedValue({
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: {
+              defendantDocuments: [{ id: 'doc-1', value: {} }],
+            },
+          },
+        },
+      });
+
+      const clientContext = { selectedPartyId: 'party-123' };
+      const req = {
+        params: { caseReference: '1234567890123456' },
+        session: { user: { accessToken: 'test-token' }, clientContext },
+      } as unknown as Request;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const storage = (step as any).documentStorage;
+      const docs = await storage.readFresh(req);
+
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(
+        'test-token',
+        '1234567890123456',
+        'respondPossessionClaim',
+        clientContext
+      );
+      expect(docs).toEqual([{ id: 'doc-1', value: {} }]);
     });
   });
 });

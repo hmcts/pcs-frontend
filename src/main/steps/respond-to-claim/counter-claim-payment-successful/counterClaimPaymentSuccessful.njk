@@ -26,12 +26,14 @@
     <li>{{ listItem2 | safe }}</li>
   </ol>
 
-  <h2 class="govuk-heading-s">{{ heading2 }}</h2>
-  <p class="govuk-body">{{ surveyParagraph | safe }}</p>
+  {% if heading2 %}
+    <h2 class="govuk-heading-s">{{ heading2 }}</h2>
+    <p class="govuk-body">{{ surveyParagraph | safe }}</p>
+  {% endif %}
 
   {{ govukButton({
     text: closeAndReturnToCaseOverview,
-    href: dashboardUrl,
+    href: closeUrl or dashboardUrl,
     classes: "govuk-!-margin-top-6"
   }) }}
 {% endblock %}

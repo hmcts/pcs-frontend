@@ -6,9 +6,13 @@ import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../u
 import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { createRespondToClaimFormStep } from '../formStep';
+import { getTenancyDocumentInfo, resolveStepDocumentId } from '../utils/stepDocumentUtils';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+
+export { getTenancyDocumentInfo };
+
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -169,9 +173,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
     }
 
-    const tenancyDocument = walesProperty
-      ? (caseData?.detailsTab_OccupationContractLicenceDetails?.documents?.[0] ?? '')
-      : (caseData?.detailsTab_TenancyLicenceDetails?.tenancyLicenceDocuments?.[0] ?? '');
+    const documentId = await resolveStepDocumentId(req, getTenancyDocumentInfo, 'tenancyTypeDetails');
+    const tenancyDocument = documentId ? { id: documentId } : '';
 
     return {
       ...formContent,
