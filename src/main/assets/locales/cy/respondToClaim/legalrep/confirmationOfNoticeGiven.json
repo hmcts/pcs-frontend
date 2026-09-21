@@ -7,7 +7,8 @@
     "no": "Naddo",
     "imNotSure": "Diffynnydd ddim yn siŵr"
   },
-  "noticeDateLabel": "Pryd gafodd y diffynnydd yr hysbysiad gan {{claimantName}}? (Dewisol)",
+  "insetText": "cyWhen they made their claim, {{claimantName}} had to provide a copy of the notice they served on the defendant.",
+  "noticeDateLabel": "cyWhen did the defendant receive notice from {{claimantName}}? (Optional)",
   "noticeDateHint": "Er enghraifft, 16 4 2021",
   "errors": {
     "possessionNoticeReceived": "Dewiswch a wnaeth {{claimantName}} hysbysu'r diffynnydd am eu bwriad i ddechrau achos meddiannu",

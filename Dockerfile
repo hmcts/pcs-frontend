@@ -37,26 +37,14 @@ RUN yarn build:prod && \
 # Compile TypeScript to JavaScript
 RUN yarn build:server
 
-# ---- Development image ----
-FROM dependencies AS development
+# ---- Production dependencies image ----
+# Pruned here rather than in `runtime` so the ~190MB yarn cache it needs stays in
+# this throwaway stage.
+FROM dependencies AS prod-deps
 
 WORKDIR /app
-# Install bash for development
-USER root
-RUN apk add --no-cache \
-    bash=~5
-USER hmcts
-
-# Copy all source files
-COPY --chown=hmcts:hmcts . .
-
-# Make the SSL generation script executable
-USER root
-RUN chmod +x /app/bin/generate-ssl-options.sh
-USER hmcts
-
-# Set environment variables
-ENV NODE_ENV=development
+ENV NODE_ENV=production
+RUN yarn workspaces focus --production --all
 
 # ---- Runtime image ----
 FROM base AS runtime
@@ -69,11 +57,20 @@ USER hmcts
 
 # Copy package files
 COPY --chown=hmcts:hmcts package.json yarn.lock .yarnrc.yml ./
-COPY --chown=hmcts:hmcts .yarn ./.yarn
 
-# Install only production dependencies
+# CMD is `yarn start`, so yarn has to resolve offline. That needs the release that
+# yarnPath points at *and* corepack's cache, because `packageManager` makes `yarn` a
+# corepack shim that downloads the pinned version when it is missing. Copying all of
+# .yarn instead would drag in the ~190MB package cache.
+USER root
+RUN mkdir -p /app/.yarn && chown -R hmcts:hmcts /app/.yarn
+USER hmcts
+COPY --chown=hmcts:hmcts .yarn/releases ./.yarn/releases
+COPY --from=prod-deps --chown=hmcts:hmcts /home/hmcts/.cache/node/corepack /home/hmcts/.cache/node/corepack
+
+COPY --from=prod-deps --chown=hmcts:hmcts /app/node_modules ./node_modules
+
 ENV NODE_ENV=production
-RUN yarn workspaces focus --production --all
 
 # Copy only compiled code and necessary assets
 COPY --from=build /app/dist ./dist
@@ -83,9 +80,6 @@ COPY --from=build /app/src/main/steps ./dist/main/steps
 COPY --from=build /app/config ./config
 
 RUN chmod +x /app/dist/main/server.js
-
-# Set environment variables
-ENV NODE_ENV=production
 
 # Expose the application port
 EXPOSE 3209

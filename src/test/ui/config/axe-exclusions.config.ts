@@ -36,4 +36,5 @@ export const axe_exclusions = [
   '#ethnicity-4', // page: ethnicity, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is not allowed for this radio button
   'html', // accessibility: html-has-lang - <html> element does not have a lang attribute
   'html-has-lang', // accessibility: html-has-lang - <html> element does not have a lang attribute
+  '#contactByTextMessage', // page: contactPreferenceTextMessage, element: radioOption, element: 'Yes', reason_for_exclusion: 'aria-expanded' attribute is not allowed for this radio button
 ];
