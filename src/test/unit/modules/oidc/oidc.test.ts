@@ -614,7 +614,8 @@ describe('OIDCModule', () => {
         mockRequest.session = createMockSession({
           user: {
             idToken: 'test-id-token',
-            roles: ['caseworker-pcs-solicitor'],
+            roles: [],
+            isDefendantSolicitor: true,
           },
           destroy: jest.fn().mockImplementation(function (callback) {
             callback(null);

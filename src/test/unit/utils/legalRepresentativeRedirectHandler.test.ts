@@ -7,7 +7,6 @@ jest.mock('config');
 
 const MANAGE_CASE_BASE_URL = 'https://manage-case.platform.hmcts.net/cases/case-details/PCS/PCS';
 const CASE_ID = '1771325608502536';
-const LEGAL_REP_ROLE = 'caseworker-pcs-solicitor';
 
 describe('redirectToCaseManagement', () => {
   let mockResponse: Partial<Response>;
@@ -65,9 +64,9 @@ describe('getCaseManagementUrl', () => {
   type ReqOverrides = { roles?: unknown; caseId?: unknown; withRes?: boolean };
 
   const createReq = (overrides: ReqOverrides = {}): Request => {
-    const roles = 'roles' in overrides ? overrides.roles : [LEGAL_REP_ROLE];
+    const isDefendantSolicitor = !('roles' in overrides);
     return {
-      session: { user: { roles } },
+      session: { user: { roles: overrides.roles ?? [], isDefendantSolicitor } },
       res: { locals: { validatedCase: { id: CASE_ID } } },
     } as unknown as Request;
   };
