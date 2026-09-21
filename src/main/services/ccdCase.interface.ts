@@ -169,6 +169,8 @@ export interface CcdDefendantParty {
   addressSameAsProperty?: string;
   phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
+  textMessageNumber?: string;
+  pcqId?: string;
 }
 
 /** Counter-claim data captured across the counterclaim journey screens. */
@@ -269,6 +271,7 @@ export interface PossessionClaimResponse {
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
   responseDocumentId?: string;
+  draftVersion?: number;
   claimIssuedDate?: string;
 
   defendantFlags?: CcdFlags;
@@ -352,10 +355,11 @@ export type DocumentUploadCategoryCode =
   | 'SUSPEND_EVICTION_APPLICATION'
   | 'SET_ASIDE_ORDER_APPLICATION'
   | 'GENERAL_APPLICATION'
-  | 'MAIN_CLAIM_OR_COUNTERCLAIM';
+  | 'COUNTERCLAIM';
 
 export interface RelatedApplicationOption {
   genAppId?: string;
+  counterClaimId?: string;
   category: DocumentUploadCategoryCode;
   submittedDate?: string;
 }

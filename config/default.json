@@ -85,13 +85,11 @@
     }
   },
   "pcq": {
-    "enabled": false,
-    "name": "Equality and Diversity Service",
     "url": "https://pcq.aat.platform.hmcts.net",
     "path": "/service-endpoint",
-    "port": 4000,
     "serviceId": "PCS",
-    "actor": "APPLICANT"
+    "actor": "RESPONDENT",
+    "healthTimeoutMs": 3000
   },
   "secrets": {
     "pcs": {
@@ -141,11 +139,13 @@
   "cuiRa": {
     "url": "https://cui-ra.aat.platform.hmcts.net",
     "hmctsServiceId": "AAA3",
-    "masterFlagCode": "RA0001",
-    "callbackUrl": "https://pcs.aat.platform.hmcts.net/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id",
-    "logoutUrl": "https://pcs.aat.platform.hmcts.net/logout"
+    "masterFlagCode": "RA0001"
   },
   "launchdarkly": {
     "env": "AAAAAAAA"
+  },
+  "decentralisedEventRoutes": {
+    "ext:respondPossessionClaim": "/case/:caseReference/respond-to-claim/start-now",
+    "ext:resumeResponse": "/case/:caseReference/respond-to-claim/start-now"
   }
 }

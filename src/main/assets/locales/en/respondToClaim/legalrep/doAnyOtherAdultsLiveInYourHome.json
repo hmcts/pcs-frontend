@@ -1,4 +1,5 @@
 {
+  "pageTitle": "Other adults",
   "question": "",
   "heading": "Other adults",
   "dependantQuestion": "Do any other adults live in the defendant’s home?",
@@ -7,6 +8,7 @@
   "errors": {
     "confirmOtherAdults": "Select if any other adults live in the defendant’s home",
     "otherAdultsDetails": "Give details about the other adults living in their home",
-    "otherAdultsDetailsInvalidCharacters": "Give details about the other adults living in their home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
+    "otherAdultsDetailsInvalidCharacters": "Give details about the other adults living in their home must only include letters a to z, and special characters such as hyphens, spaces and apostrophes",
+    "otherAdultsDetailsMaxLength": "Details about other adults must be 500 characters or less"
   }
 }

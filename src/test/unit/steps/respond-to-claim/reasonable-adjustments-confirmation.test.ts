@@ -12,10 +12,10 @@ describe('reasonable-adjustments-confirmation step', () => {
     resolveRedirectAfterPost: (req: Request) => Promise<string | undefined | void>;
   };
 
-  it('redirects "Save and continue" to language-used with nav=1 (bypasses the mid-section access guard)', async () => {
+  it('redirects "Save and continue" to the task list (Your Support is an optional task)', async () => {
     const req = { res: { locals: { validatedCase: { id: '1234123412341234' } } } } as unknown as Request;
     await expect(testedStep.resolveRedirectAfterPost(req)).resolves.toBe(
-      '/case/1234123412341234/respond-to-claim/language-used?nav=1'
+      '/case/1234123412341234/respond-to-claim/task-list'
     );
   });
 

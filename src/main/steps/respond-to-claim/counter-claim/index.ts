@@ -2,7 +2,8 @@ import type { Request } from 'express';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
-import { purgeCounterClaimDocumentsFromCdam } from '../utils';
+import { purgeUploadedDocumentsFromCdam } from '../utils';
+import { DocumentType } from '../utils/purgeUploadedDocuments';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { YesNoEnum } from '@services/ccdCase.interface';
@@ -71,7 +72,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     // previously uploaded counter-claim documents are now orphaned. Purge them
     // from CDAM; the normaliser will strip the metadata from the saved draft.
     if (makeCounterClaim !== YesNoEnum.YES) {
-      await purgeCounterClaimDocumentsFromCdam(req);
+      await purgeUploadedDocumentsFromCdam(req, DocumentType.COUNTER_CLAIM);
     }
 
     await saveDraftDefendantResponse(req, response);
