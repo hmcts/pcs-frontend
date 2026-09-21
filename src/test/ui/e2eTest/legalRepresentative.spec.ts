@@ -68,6 +68,7 @@ let claimantName: string;
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
   await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-lr-enabled');
+  await performAction('resetRTCAnswerStore');
   process.env.NOTICE_SERVED = 'YES';
   if (testInfo.title.includes('@nonRent')) {
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadAssuredTenancy.claimantName;
@@ -1013,7 +1014,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', responseSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
-  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @rent @LR', async () => {
+  test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @rent @LR @crossbrowser', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
