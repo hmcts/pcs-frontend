@@ -24,23 +24,37 @@ jest.mock('@utils/isCuiYourSupportEnabled', () => ({
   isCuiYourSupportEnabled: mockIsCuiYourSupportEnabled,
 }));
 
+jest.mock('@routes/dashboard', () => ({
+  getDashboardUrl: jest.fn((caseReference?: string) => (caseReference ? `/case/${caseReference}/dashboard` : null)),
+}));
+
 import type { Request } from 'express';
 
 import { step } from '../../../../main/steps/respond-to-claim/reasonable-adjustments-triage';
 
 const beforeRedirect = (step as unknown as { beforeRedirect: (req: Request) => Promise<void> }).beforeRedirect;
+const beforeGet = (step as unknown as { beforeGet: (req: Request) => Promise<void> }).beforeGet;
 const extendGetContent = (
-  step as unknown as { extendGetContent: (req: Request) => Promise<{ cuiYourSupportEnabled: boolean }> }
+  step as unknown as {
+    extendGetContent: (req: Request) => Promise<{ cuiYourSupportEnabled: boolean; backUrl?: string }>;
+  }
 ).extendGetContent;
 const isAnswered = (step as unknown as { isAnswered: (req: Request) => unknown }).isAnswered;
 const resolveRedirectAfterPost = (
   step as unknown as { resolveRedirectAfterPost: (req: Request) => Promise<string | undefined> }
 ).resolveRedirectAfterPost;
 
-const buildReq = (choice: string, caseId?: string, validatedCase?: unknown): { req: Request; redirect: jest.Mock } => {
+const buildReq = (
+  choice: string,
+  caseId?: string,
+  validatedCase?: unknown,
+  extras: { session?: Record<string, unknown>; query?: Record<string, unknown> } = {}
+): { req: Request; redirect: jest.Mock } => {
   const redirect = jest.fn();
   const req = {
     body: { reasonableAdjustmentsChoice: choice },
+    query: extras.query ?? {},
+    session: extras.session ?? {},
     res: {
       locals: { validatedCase: validatedCase ?? (caseId === undefined ? undefined : { id: caseId }) },
       redirect,
@@ -162,6 +176,24 @@ describe('reasonable-adjustments-triage beforeRedirect', () => {
   });
 });
 
+describe('reasonable-adjustments-triage beforeGet (remembers where Your Support was launched from)', () => {
+  it("records 'dashboard' when reached with ?from=dashboard", async () => {
+    const { req } = buildReq('questions', '123', undefined, { query: { from: 'dashboard' } });
+
+    await beforeGet(req);
+
+    expect(req.session.yourSupportReturnTo).toBe('dashboard');
+  });
+
+  it("records 'task-list' otherwise", async () => {
+    const { req } = buildReq('questions', '123');
+
+    await beforeGet(req);
+
+    expect(req.session.yourSupportReturnTo).toBe('task-list');
+  });
+});
+
 describe('reasonable-adjustments-triage extendGetContent', () => {
   beforeEach(() => jest.clearAllMocks());
 
@@ -169,14 +201,30 @@ describe('reasonable-adjustments-triage extendGetContent', () => {
     mockIsCuiYourSupportEnabled.mockResolvedValue(true);
     const { req } = buildReq('questions', '123');
 
-    await expect(extendGetContent(req)).resolves.toEqual({ cuiYourSupportEnabled: true });
+    await expect(extendGetContent(req)).resolves.toEqual({
+      cuiYourSupportEnabled: true,
+      backUrl: '/case/123/respond-to-claim/task-list',
+    });
   });
 
   it('exposes cuiYourSupportEnabled=false so the template hides the button when the flag is off', async () => {
     mockIsCuiYourSupportEnabled.mockResolvedValue(false);
     const { req } = buildReq('questions', '123');
 
-    await expect(extendGetContent(req)).resolves.toEqual({ cuiYourSupportEnabled: false });
+    await expect(extendGetContent(req)).resolves.toEqual({
+      cuiYourSupportEnabled: false,
+      backUrl: '/case/123/respond-to-claim/task-list',
+    });
+  });
+
+  it('points the back link at the dashboard when Your Support was launched from there', async () => {
+    mockIsCuiYourSupportEnabled.mockResolvedValue(true);
+    const { req } = buildReq('questions', '123', undefined, { session: { yourSupportReturnTo: 'dashboard' } });
+
+    await expect(extendGetContent(req)).resolves.toEqual({
+      cuiYourSupportEnabled: true,
+      backUrl: '/case/123/dashboard',
+    });
   });
 });
 
@@ -212,8 +260,20 @@ describe('reasonable-adjustments-triage isAnswered (drives the task-list "Your s
   });
 });
 
-describe('reasonable-adjustments-triage resolveRedirectAfterPost (skip returns to the task list)', () => {
-  it('returns the task-list url when a case reference is present', async () => {
+describe('reasonable-adjustments-triage resolveRedirectAfterPost (skip returns to where Your Support was launched from)', () => {
+  it('returns the task-list url when Your Support was launched from the task list', async () => {
+    const { req } = buildReq('skip', '123', undefined, { session: { yourSupportReturnTo: 'task-list' } });
+
+    await expect(resolveRedirectAfterPost(req)).resolves.toBe('/case/123/respond-to-claim/task-list');
+  });
+
+  it('returns the dashboard url when Your Support was launched from the dashboard', async () => {
+    const { req } = buildReq('skip', '123', undefined, { session: { yourSupportReturnTo: 'dashboard' } });
+
+    await expect(resolveRedirectAfterPost(req)).resolves.toBe('/case/123/dashboard');
+  });
+
+  it('falls back to the task-list url when no origin was recorded before submission', async () => {
     const req = { res: { locals: { validatedCase: { id: '123' } } } } as unknown as Request;
 
     await expect(resolveRedirectAfterPost(req)).resolves.toBe('/case/123/respond-to-claim/task-list');

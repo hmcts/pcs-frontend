@@ -31,6 +31,8 @@ interface CustomSessionData extends SessionData {
   returnToCya?: string;
   respondToClaimPostSubmitRedirect?: string;
   respondToClaimSubmitRejection?: string;
+  // Where the citizen launched Your Support from; set on every triage GET (see yourSupportSection.ts).
+  yourSupportReturnTo?: 'dashboard' | 'task-list';
   ccdCase?: CcdCase;
   // Generated application ID for the make-an-application journey, keyed by case reference.
   applicationIds?: Record<string, string>;

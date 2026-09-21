@@ -605,7 +605,9 @@ describe('Dashboard Routes', () => {
 
       const tasks = await renderResponseTasks();
 
-      expect(tasks[1].href).toBe('/case/1234567890123456/respond-to-claim/reasonable-adjustments-triage');
+      expect(tasks[1].href).toBe(
+        '/case/1234567890123456/respond-to-claim/reasonable-adjustments-triage?from=dashboard'
+      );
     });
 
     it('should remove the Your Support task when its feature flag is off', async () => {
