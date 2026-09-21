@@ -26,6 +26,7 @@
 
   <form method="post" action="{{ url }}" novalidate>
     {{ csrfProtection(csrfToken) }}
+    <input type="hidden" name="draftVersion" value="{{ draftVersion }}">
 
     <h2 class="govuk-heading-m">{{ statementOfTruthHeading }}</h2>
     {% if statementOfTruthHint %}

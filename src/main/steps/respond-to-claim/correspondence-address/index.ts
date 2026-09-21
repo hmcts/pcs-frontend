@@ -1,5 +1,4 @@
 import type { Request } from 'express';
-import isPostalCode from 'validator/lib/isPostalCode';
 
 import { getTranslationFunction } from '../../../modules/steps';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
@@ -7,8 +6,57 @@ import { buildCcdAddressFromFormParts, formatCcdAddress } from '../../utils/ccdA
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import type { FormFieldConfig, RadioFormField } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type {
+  BuiltFormContent,
+  FormFieldConfig,
+  RadioFormField,
+} from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+
+// Full UK postcode (outward + inward code).
+const UK_POSTCODE_REGEX = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
+
+export function isFullUkPostcode(value: string): boolean {
+  return UK_POSTCODE_REGEX.test(value.trim());
+}
+
+const ADDRESS_FIELD_NAMES = {
+  addressLine1: 'correspondenceAddressConfirm.addressLine1',
+  addressLine2: 'correspondenceAddressConfirm.addressLine2',
+  townOrCity: 'correspondenceAddressConfirm.townOrCity',
+  county: 'correspondenceAddressConfirm.county',
+  postcode: 'correspondenceAddressConfirm.postcode',
+} as const;
+
+// Posted values win; the saved address only fills fields that were not posted.
+export function buildAddressFieldValues(
+  req: Pick<Request, 'method'>,
+  formContent: Record<string, unknown>,
+  savedAddress:
+    { AddressLine1?: string; AddressLine2?: string; PostTown?: string; County?: string; PostCode?: string } | undefined
+): {
+  correspondenceAddressLine1: string;
+  correspondenceAddressLine2: string;
+  correspondenceTownOrCity: string;
+  correspondenceCounty: string;
+  correspondencePostcode: string;
+} {
+  const isPost = req.method === 'POST';
+  const value = (fieldName: string, saved: string | undefined): string => {
+    const formValue = formContent[fieldName];
+    if (formValue !== undefined && formValue !== null) {
+      return String(formValue);
+    }
+    return isPost ? '' : (saved ?? '');
+  };
+  return {
+    correspondenceAddressLine1: value(ADDRESS_FIELD_NAMES.addressLine1, savedAddress?.AddressLine1),
+    correspondenceAddressLine2: value(ADDRESS_FIELD_NAMES.addressLine2, savedAddress?.AddressLine2),
+    correspondenceTownOrCity: value(ADDRESS_FIELD_NAMES.townOrCity, savedAddress?.PostTown),
+    correspondenceCounty: value(ADDRESS_FIELD_NAMES.county, savedAddress?.County),
+    correspondencePostcode: value(ADDRESS_FIELD_NAMES.postcode, savedAddress?.PostCode),
+  };
+}
 
 // Define fields array separately so we can reference it
 const fieldsConfig: FormFieldConfig[] = [
@@ -86,7 +134,7 @@ const fieldsConfig: FormFieldConfig[] = [
               autocomplete: 'postal-code',
             },
             validator: (value): boolean | string => {
-              if (typeof value === 'string' && value.trim() && !isPostalCode(value.trim(), 'GB')) {
+              if (typeof value === 'string' && value.trim() && !isFullUkPostcode(value)) {
                 return 'errors.correspondenceAddressConfirm.postcode';
               }
               return true;
@@ -186,7 +234,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return result;
   },
-  extendGetContent: async (req, formContent) => {
+  extendGetContent: async (req, formContent: BuiltFormContent) => {
     const t = getTranslationFunction(req);
     const possessionClaimResponse = req.res?.locals?.validatedCase?.possessionClaimResponse;
     const partyAddress = possessionClaimResponse?.defendantContactDetails?.party?.address;
@@ -255,14 +303,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         postcodeNotFound: t('errors.postcodeNotFound'),
         selectAddress: t('errors.selectAddress'),
       },
-      // Extract nested field values for easy template access (only on POST with errors)
-      correspondenceAddressLine1:
-        req.body?.['correspondenceAddressConfirm.addressLine1'] || addressSource?.AddressLine1 || '',
-      correspondenceAddressLine2:
-        req.body?.['correspondenceAddressConfirm.addressLine2'] || addressSource?.AddressLine2 || '',
-      correspondenceTownOrCity: req.body?.['correspondenceAddressConfirm.townOrCity'] || addressSource?.PostTown || '',
-      correspondenceCounty: req.body?.['correspondenceAddressConfirm.county'] || addressSource?.County || '',
-      correspondencePostcode: req.body?.['correspondenceAddressConfirm.postcode'] || addressSource?.PostCode || '',
+      ...buildAddressFieldValues(req, formContent, addressSource),
     };
   },
 

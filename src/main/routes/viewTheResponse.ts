@@ -244,8 +244,13 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
   const addressUnknown = isNo(party?.addressKnown);
 
   pushRow(rows, t('viewTheResponse:defendant.name'), joinName(party?.firstName, party?.lastName));
-  if (!addressUnknown && isYes(party?.phoneNumberProvided)) {
-    pushRow(rows, t('viewTheResponse:defendant.phone'), party?.phoneNumber);
+  const phoneNumber = isYes(responses?.contactByPhone) ? party?.phoneNumber?.trim() : undefined;
+  if (!addressUnknown && phoneNumber) {
+    pushRow(rows, t('viewTheResponse:defendant.phone'), phoneNumber);
+  }
+  const emailAddress = isYes(responses?.contactByEmail) ? party?.emailAddress?.trim() : undefined;
+  if (emailAddress) {
+    pushRow(rows, t('viewTheResponse:defendant.email'), emailAddress);
   }
   pushRow(
     rows,
