@@ -1,6 +1,7 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
+import { getUserRoles, getUserType, isLegalRepresentativeUser } from '../steps/utils/userRole';
 
 import { Logger } from '@modules/logger';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -33,6 +34,16 @@ export function requireEventAccess(eventId: string): RequestHandler {
         req.session?.clientContext
       );
       res.locals.validatedCase = new CcdCaseModel(validatedCase);
+
+      // PCS-ROLE-DIAG [temp, HDPI-7333]: the frontend's verdict for the same request pcs-api just
+      // logged, so the two can be compared. Remove with this preview branch.
+      logger.info('PCS-ROLE-DIAG', {
+        caseReference,
+        userType: getUserType(req),
+        isLegalRepresentative: isLegalRepresentativeUser(req),
+        idamRoles: getUserRoles(req),
+      });
+
       return next();
     } catch (error) {
       const httpError = error instanceof HTTPError ? error : new HTTPError('Internal server error', 500);
