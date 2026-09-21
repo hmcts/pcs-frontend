@@ -7,7 +7,7 @@ import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 export const YOUR_SUPPORT_SECTION_ENUM: RespondToClaimSectionEnum = sectionIdToBackendEnum('yourSupport');
 
 /**
- * Marks Your Support complete. 
+ * Marks Your Support complete.
  */
 export function addYourSupportToCompletedSections(
   completed: readonly RespondToClaimSectionEnum[] | undefined
