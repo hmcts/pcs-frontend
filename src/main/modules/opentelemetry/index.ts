@@ -10,7 +10,10 @@ const ignoredIncomingUrlPattern = /\/assets\/|\.js(?:$|\?)|\.css(?:$|\?)/;
 
 interface HttpTelemetryConfig {
   enabled: boolean;
-  applyCustomAttributesOnSpan: (span: Span, request?: { path?: string; url?: string; host?: string; protocol?: string }) => void;
+  applyCustomAttributesOnSpan: (
+    span: Span,
+    request?: { path?: string; url?: string; host?: string; protocol?: string }
+  ) => void;
   ignoreIncomingRequestHook: (request: { method?: string; url?: string }) => boolean;
   ignoreOutgoingRequestHook: (options: { path?: string }) => boolean;
 }
