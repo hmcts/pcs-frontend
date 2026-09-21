@@ -81,7 +81,13 @@ import {
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
-import { getSelectedPinUser, pins, selectPinUserByDefendantDetails } from './fetchPINsAndValidateAccessCodeAPI.action';
+import {
+  getSelectedPinUser,
+  pins,
+  selectPinUserByDefendantDetails,
+  selectPinUserByIndex,
+  selectPinUserByName,
+} from './fetchPINsAndValidateAccessCodeAPI.action';
 import { FieldsStore } from './recordAnsweredFields.action';
 
 const rtcCyaMap = new Map<string, string>();
@@ -167,7 +173,7 @@ export class RespondToClaimAction implements IAction {
       ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
       ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
       ['selectContactByTelephone', () => this.selectContactByTelephone(fieldName as actionRecord)],
-      ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName as actionData)],
+      ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName as actionRecord)],
       ['selectTenancyStartDateKnown', () => this.selectTenancyStartDateKnown(fieldName as actionRecord)],
       ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
       ['enterNoticeDateKnown', () => this.enterNoticeDateKnown(fieldName as actionRecord)],
@@ -591,12 +597,20 @@ export class RespondToClaimAction implements IAction {
     await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
   }
 
-  private async selectContactByTextMessage(contactData: actionData): Promise<void> {
-    this.recordAnswer(contactPreferencesTextMessage.contactByTextMessageQuestion, contactData);
+  private async selectContactByTextMessage(contactData: actionRecord): Promise<void> {
+    this.recordAnswer(contactPreferencesTextMessage.contactByTextMessageQuestion, contactData.radioOption);
     await performAction('clickRadioButton', {
       question: contactPreferencesTextMessage.contactByTextMessageQuestion,
-      option: contactData,
+      option: contactData.radioOption,
     });
+
+    if (contactData.radioOption === 'Yes') {
+      await performAction(
+        'inputText',
+        contactPreferencesTextMessage.ukMobileNumberHiddenTextLabel,
+        contactData.mobileNumber
+      );
+    }
     await performAction('clickButton', contactPreferencesTextMessage.saveAndContinueButton);
   }
 
@@ -1682,11 +1696,16 @@ export class RespondToClaimAction implements IAction {
       typeof accessCode.defendantType === 'string' ? accessCode.defendantType === 'known' : undefined;
 
     const defendantDetailsKnown = explicitDefendantDetailsKnown ?? explicitDefendantTypeKnown;
+    const firstNameValue =
+      typeof accessCode.defendantFirstName === 'string' ? accessCode.defendantFirstName : undefined;
+    const lastNameValue = typeof accessCode.defendantLastName === 'string' ? accessCode.defendantLastName : undefined;
 
     let pin: string | undefined;
 
-    if (typeof accessCode.pinIndex === 'number') {
-      pin = pins[accessCode.pinIndex];
+    if (firstNameValue && lastNameValue) {
+      pin = selectPinUserByName(firstNameValue, lastNameValue)?.pin;
+    } else if (typeof accessCode.pinIndex === 'number') {
+      pin = selectPinUserByIndex(accessCode.pinIndex)?.pin;
     } else if (typeof defendantDetailsKnown === 'boolean') {
       pin = selectPinUserByDefendantDetails(defendantDetailsKnown)?.pin;
     } else {
@@ -1694,7 +1713,11 @@ export class RespondToClaimAction implements IAction {
     }
 
     if (!pin) {
-      throw new Error(`PIN is not available for index ${accessCode.pinIndex}`);
+      throw new Error(
+        firstNameValue && lastNameValue
+          ? `PIN is not available for defendant ${firstNameValue} ${lastNameValue}`
+          : `PIN is not available for index ${accessCode.pinIndex}`
+      );
     }
 
     await performAction('inputText', accessYourCase.enterYourClaimNumberLabel, accessCode.caseNumber);
