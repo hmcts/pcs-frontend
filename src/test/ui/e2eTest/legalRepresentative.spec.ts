@@ -1,3 +1,5 @@
+import { test } from '@playwright/test';
+
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   counterClaimApplicationFeeAmount,
@@ -59,7 +61,6 @@ import {
   RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS,
   logTestEnvAfterBeforeEach,
 } from '../utils/common/log-test-env';
-import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;

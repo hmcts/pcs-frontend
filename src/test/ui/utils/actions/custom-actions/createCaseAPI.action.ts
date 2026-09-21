@@ -4,7 +4,6 @@ import Axios from 'axios';
 
 import { VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
 import {
-  caseUserRoleDeletionApiData,
   createCaseApiData,
   createCaseEventTokenApiData,
   submitCaseApiData,
@@ -22,7 +21,6 @@ export class CreateCaseAPIAction implements IAction {
       ['createCaseAPI', () => this.createCaseAPI(fieldName)],
       ['submitCaseAPI', () => this.submitCaseAPI(fieldName)],
       ['updatePaymentAPI', () => this.updatePaymentAPI()],
-      ['deleteCaseRole', () => this.deleteCaseRole(fieldName)],
       ['getCaseAPI', () => this.getCaseAPI()],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -197,37 +195,5 @@ export class CreateCaseAPIAction implements IAction {
       }
     }
     throw new Error('Payment API failed after multiple retries');
-  }
-
-  private async deleteCaseRole(roleData: actionData): Promise<void> {
-    const userId = user.claimantSolicitor.uid;
-    const caseId = (process.env.CASE_NUMBER ?? '').replace(/-/g, '');
-    const caseRole = typeof roleData === 'string' ? roleData : String(roleData);
-    if (!caseId) {
-      console.warn('No case ID available for case user removal.');
-      return;
-    }
-    if (!userId) {
-      console.warn('No user ID available for case user removal.');
-      return;
-    }
-    const deleteCaseUsersApi = Axios.create(caseUserRoleDeletionApiData.deleteCaseUsersApiInstance());
-    try {
-      const payload = caseUserRoleDeletionApiData.deleteCaseUsersPayload(caseId, userId, caseRole);
-      await deleteCaseUsersApi.delete(caseUserRoleDeletionApiData.deleteCaseUsersApiEndPoint, { data: payload });
-      console.log(`\n✅ CASE USER CLEANUP:`);
-      console.log(`   Successfully removed case user with role ${caseRole}`);
-    } catch (error: unknown) {
-      const status = Axios.isAxiosError(error) ? error.response?.status : undefined;
-      if (status === 404) {
-        console.warn('Case user removal failed: case or user not found (404).');
-      } else if (status === 403) {
-        console.warn('Case user removal failed: insufficient permissions (403).');
-      } else if (!status) {
-        console.warn('Case user removal failed: no response from server.');
-      } else {
-        console.warn(`Case user removal failed with status ${status}.`);
-      }
-    }
   }
 }
