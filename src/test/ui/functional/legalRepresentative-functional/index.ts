@@ -21,7 +21,6 @@ export * from './exemptLandLord.pft.lr';
 export * from './haveYouAppliedForUniversalCredit.pft.lr';
 export * from './howMuchAffordToPay.pft.lr';
 export * from './incomeAndExpenses.pft.lr';
-export * from './installmentPayments.pft.lr';
 export * from './instalmentPayments.pft.lr';
 export * from './languageUsed.pft.lr';
 export * from './selectDefendant.pft.lr';

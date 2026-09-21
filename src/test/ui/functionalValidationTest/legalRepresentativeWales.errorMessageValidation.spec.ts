@@ -21,7 +21,7 @@ import {
   exemptLandlord,
   haveYouAppliedForUniversalCredit,
   incomeAndExpenses,
-  installmentPayments,
+  instalmentPayments,
   languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
@@ -40,10 +40,7 @@ import {
   yourCircumstances,
 } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
-import {
-  exemptLandLordErrorValidation,
-  installmentPaymentsErrorValidation,
-} from '../functional/legalRepresentative-functional';
+import { exemptLandLordErrorValidation } from '../functional/legalRepresentative-functional';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import {
   assertAllErrorMessageValidations,
@@ -195,10 +192,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('repaymentAgreedLR', {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
-    await softErrorMessageValidation('installmentPayments', installmentPaymentsErrorValidation);
     await performAction('installmentPaymentsLR', {
-      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
-      radioOption: installmentPayments.noRadioOption,
+      question: instalmentPayments.wouldDefendantLikeToOfferToPayQuestion,
+      radioOption: instalmentPayments.noRadioOption,
     });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
