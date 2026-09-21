@@ -280,7 +280,8 @@ export class RespondToClaimAction implements IAction {
     frequency: actionData,
     descriptor: string = 'every'
   ): string {
-    return `${formatPoundsValue(String(amount))} ${descriptor} ${normalizeLowercaseText(frequency)}`;
+    const unit = this.extractFrequencyUnit(String(frequency));
+    return `${formatPoundsValue(String(amount))} ${descriptor} ${normalizeLowercaseText(unit)}`;
   }
 
   private buildRtcCyaDateValue(
@@ -780,13 +781,19 @@ export class RespondToClaimAction implements IAction {
 
       selectedRegularIncomeEntries.push([
         this.getRtcCyaChoiceLabel(option),
-        this.buildRtcCyaAmountAndFrequencyValue(value, frequency, 'received every'),
+        this.buildRtcCyaAmountAndFrequencyValue(value, this.extractFrequencyUnit(String(frequency)), 'received every'),
       ]);
     }
 
     this.recordRtcCyaHeadingWithItems(regularIncomeQuestionLabel, selectedRegularIncomeEntries);
 
     await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  }
+
+  extractFrequencyUnit(frequencyLabel: string): string {
+    // Strips a leading "Paid every " or "Received every " (case-insensitive) from a radio label,
+    // leaving just the unit, e.g. "month" or "week".
+    return frequencyLabel.replace(/^(paid|received)\s+every\s+/i, '').trim();
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
@@ -1328,11 +1335,10 @@ export class RespondToClaimAction implements IAction {
       priorityDebtDetails.howMuchDoYouPayQuestion,
       this.buildRtcCyaAmountAndFrequencyValue(
         priorityDebtDetailsData.payAmount,
-        priorityDebtDetailsData.option,
+        this.extractFrequencyUnit(String(priorityDebtDetailsData.option)),
         'paid every'
       )
     );
-    this.deleteAnswer(priorityDebtDetails.paidEveryParagraph);
     await performAction(
       'inputText',
       priorityDebtDetails.whatIsTheTotalAmountQuestion,
@@ -1340,7 +1346,6 @@ export class RespondToClaimAction implements IAction {
     );
     await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetailsData.payAmount);
     await performAction('clickRadioButton', {
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetailsData.option,
     });
     await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
@@ -1382,7 +1387,10 @@ export class RespondToClaimAction implements IAction {
         option === whatOtherRegularExpensesDoYouHave.otherExpensesParagraph
           ? 'Other expenses'
           : this.getRtcCyaChoiceLabel(option);
-      selectedRegularExpenseEntries.push([mappedCyaLabel, this.buildRtcCyaAmountAndFrequencyValue(value, frequency)]);
+      selectedRegularExpenseEntries.push([
+        mappedCyaLabel,
+        this.buildRtcCyaAmountAndFrequencyValue(value, this.extractFrequencyUnit(String(frequency))),
+      ]);
     }
 
     this.recordRtcCyaHeadingWithItems(regularExpensesQuestionLabel, selectedRegularExpenseEntries);
