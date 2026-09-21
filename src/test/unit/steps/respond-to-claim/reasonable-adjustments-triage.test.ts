@@ -8,6 +8,13 @@ jest.mock('@services/cuiRa/startYourSupport', () => ({
   startYourSupport: mockStartYourSupport,
 }));
 
+const mockBuildDraftDefendantResponse = jest.fn();
+const mockSaveDraftDefendantResponse = jest.fn();
+jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
+  buildDraftDefendantResponse: mockBuildDraftDefendantResponse,
+  saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
+}));
+
 jest.mock('@modules/logger', () => ({
   Logger: { getLogger: () => ({ error: jest.fn(), warn: jest.fn(), info: jest.fn() }) },
 }));
@@ -30,16 +37,21 @@ const resolveRedirectAfterPost = (
   step as unknown as { resolveRedirectAfterPost: (req: Request) => Promise<string | undefined> }
 ).resolveRedirectAfterPost;
 
-const buildReq = (choice: string, caseId?: string): { req: Request; redirect: jest.Mock } => {
+const buildReq = (choice: string, caseId?: string, validatedCase?: unknown): { req: Request; redirect: jest.Mock } => {
   const redirect = jest.fn();
   const req = {
     body: { reasonableAdjustmentsChoice: choice },
     res: {
-      locals: { validatedCase: caseId === undefined ? undefined : { id: caseId } },
+      locals: { validatedCase: validatedCase ?? (caseId === undefined ? undefined : { id: caseId }) },
       redirect,
     },
   } as unknown as Request;
   return { req, redirect };
+};
+
+const submittedCase = {
+  id: '123',
+  data: { possessionClaimResponse: { defendantResponses: { status: 'SUBMITTED' } } },
 };
 
 describe('reasonable-adjustments-triage beforeRedirect', () => {
@@ -47,30 +59,77 @@ describe('reasonable-adjustments-triage beforeRedirect', () => {
     jest.clearAllMocks();
     mockIsCuiYourSupportEnabled.mockResolvedValue(true); // feature on by default
     mockStartYourSupport.mockResolvedValue('https://cui-ra/microsite/xyz');
+    mockBuildDraftDefendantResponse.mockReturnValue({
+      defendantContactDetails: { party: {} },
+      defendantResponses: {},
+    });
   });
 
   describe('declining support returns to the task list', () => {
-    it('is a no-op on "I do not need any support" — no Your Support launch, no redirect', async () => {
+    it('records "no support needed" on the draft (YOUR_SUPPORT in completedSections) without launching Your Support', async () => {
+      mockBuildDraftDefendantResponse.mockReturnValue({
+        defendantContactDetails: { party: {} },
+        defendantResponses: { completedSections: ['PERSONAL_DETAILS'] },
+      });
       const { req, redirect } = buildReq('skip', '123');
 
       await beforeRedirect(req);
 
-      // Your Support is an optional task: beforeRedirect does nothing on skip and the citizen is
-      // returned to the task list by resolveRedirectAfterPost (covered below). PCQ is no longer
-      // fired from here — it now fires on entry to language-used.
+      // The citizen is returned to the task list by resolveRedirectAfterPost (covered below); the draft
+      // write is what turns the "Your support" row Done.
+      expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
+        req,
+        expect.objectContaining({
+          defendantResponses: { completedSections: ['PERSONAL_DETAILS', 'YOUR_SUPPORT'] },
+        })
+      );
       expect(mockStartYourSupport).not.toHaveBeenCalled();
       expect(redirect).not.toHaveBeenCalled();
+    });
+
+    it('does not duplicate the marker when Your Support is already complete', async () => {
+      mockBuildDraftDefendantResponse.mockReturnValue({
+        defendantContactDetails: { party: {} },
+        defendantResponses: { completedSections: ['YOUR_SUPPORT'] },
+      });
+      const { req } = buildReq('skip', '123');
+
+      await beforeRedirect(req);
+
+      expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
+        req,
+        expect.objectContaining({ defendantResponses: { completedSections: ['YOUR_SUPPORT'] } })
+      );
+    });
+
+    it('writes nothing once the response has been submitted (there is no draft any more)', async () => {
+      const { req, redirect } = buildReq('skip', undefined, submittedCase);
+
+      await beforeRedirect(req);
+
+      expect(mockBuildDraftDefendantResponse).not.toHaveBeenCalled();
+      expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
+      expect(mockStartYourSupport).not.toHaveBeenCalled();
+      expect(redirect).not.toHaveBeenCalled();
+    });
+
+    it('propagates a failed draft save so the citizen sees an error rather than a false Done', async () => {
+      mockSaveDraftDefendantResponse.mockRejectedValueOnce(new Error('ccd down'));
+      const { req } = buildReq('skip', '123');
+
+      await expect(beforeRedirect(req)).rejects.toThrow('ccd down');
     });
   });
 
   describe('continuing to the questions launches Your Support', () => {
-    it('303-redirects to the microsite url', async () => {
+    it('303-redirects to the microsite url without touching the draft', async () => {
       const { req, redirect } = buildReq('questions', '123');
 
       await beforeRedirect(req);
 
       expect(mockStartYourSupport).toHaveBeenCalledWith(req);
       expect(redirect).toHaveBeenCalledWith(303, 'https://cui-ra/microsite/xyz');
+      expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
     });
 
     it('does not launch Your Support when the feature flag is off (falls through like skip)', async () => {
@@ -138,6 +197,18 @@ describe('reasonable-adjustments-triage isAnswered (drives the task-list "Your s
 
   it('is falsy when defendantFlags has an empty details list', () => {
     expect(Boolean(isAnswered(reqWith({ defendantFlags: { details: [] } })))).toBe(false);
+  });
+
+  it('is truthy once the defendant has said no support is needed (YOUR_SUPPORT in completedSections)', () => {
+    const req = reqWith({ defendantResponses: { completedSections: ['YOUR_SUPPORT'] } });
+
+    expect(Boolean(isAnswered(req))).toBe(true);
+  });
+
+  it('is falsy when other sections are complete but Your Support is not', () => {
+    const req = reqWith({ defendantResponses: { completedSections: ['PERSONAL_DETAILS'] } });
+
+    expect(Boolean(isAnswered(req))).toBe(false);
   });
 });
 

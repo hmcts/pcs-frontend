@@ -1,13 +1,30 @@
 import type { Request } from 'express';
 
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
+import { addYourSupportToCompletedSections, isYourSupportSectionComplete } from '../yourSupportSection';
 
 import { Logger } from '@modules/logger';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { isDefendantResponseSubmitted } from '@services/ccdCaseData.model';
 import { startYourSupport } from '@services/cuiRa/startYourSupport';
 import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
+
 const logger = Logger.getLogger('reasonableAdjustmentsTriage');
+
+// "I do not need any support at this time" is an explicit answer. Record it on the draft
+async function recordNoSupportNeeded(req: Request): Promise<void> {
+  if (isDefendantResponseSubmitted(req.res?.locals.validatedCase?.data)) {
+    return;
+  }
+
+  const draft = buildDraftDefendantResponse(req);
+  draft.defendantResponses.completedSections = addYourSupportToCompletedSections(
+    draft.defendantResponses.completedSections
+  );
+  await saveDraftDefendantResponse(req, draft);
+}
 
 export const step: StepDefinition = createFormStep({
   stepName: 'reasonable-adjustments-triage',
@@ -15,16 +32,19 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/reasonableAdjustmentsTriage.njk`,
-  // Drives the task-list "Your support" row status: DONE once the defendant has captured
-  // adjustments (defendantFlags persisted in draft), AVAILABLE otherwise.
-  isAnswered: (req: Request) =>
-    Boolean(req.res?.locals.validatedCase?.possessionClaimResponse?.defendantFlags?.details?.length),
+  // Drives the task-list "Your support" row status: DONE once the defendant has captured adjustments
+  // (defendantFlags persisted in draft) or explicitly said none are needed (recordNoSupportNeeded, or a
+  // trip through the microsite that changed nothing); AVAILABLE otherwise. A cancel in the microsite
+  // writes nothing, so it leaves the status as it was.
+  isAnswered: (req: Request) => {
+    const response = req.res?.locals.validatedCase?.possessionClaimResponse;
+    return Boolean(response?.defendantFlags?.details?.length) || isYourSupportSectionComplete(response);
+  },
   // "Continue to the questions" (reasonableAdjustmentsChoice=questions) launches the Your Support
   // microsite;
   beforeRedirect: async (req: Request) => {
     if (req.body?.reasonableAdjustmentsChoice !== 'questions') {
-      // Your Support is an optional task, so
-      // resolveRedirectAfterPost returns the citizen to the task list.
+      await recordNoSupportNeeded(req);
       return;
     }
 

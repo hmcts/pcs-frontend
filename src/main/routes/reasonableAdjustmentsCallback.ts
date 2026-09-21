@@ -4,6 +4,7 @@ import { cuiYourSupportFeatureMiddleware } from '../middleware/cuiYourSupportFea
 import { oidcMiddleware } from '../middleware/oidc';
 import { respondToClaimFeatureMiddleware } from '../middleware/respondToClaimFeatureMiddleware';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../steps/respond-to-claim/draftEvent';
+import { addYourSupportToCompletedSections } from '../steps/respond-to-claim/yourSupportSection';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
@@ -16,10 +17,25 @@ import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('reasonableAdjustmentsCallback');
 
+// The draft-save fully REPLACES the defendant response, so re-send the existing answers and any flags
+// already captured alongside the completed-section marker.
+function defendantSliceWithNoSupportNeeded(existingResponse: PossessionClaimResponse): PossessionClaimResponse {
+  return {
+    defendantContactDetails: existingResponse.defendantContactDetails,
+    defendantResponses: {
+      ...existingResponse.defendantResponses,
+      completedSections: addYourSupportToCompletedSections(existingResponse.defendantResponses?.completedSections),
+    },
+    ...(existingResponse.defendantFlags ? { defendantFlags: existingResponse.defendantFlags } : {}),
+  };
+}
+
 // Return leg from the CUI Your Support (cui-ra) microsite.
 // On a 'submit' — persist the returned flags: to the case DRAFT while the response is still being
 // prepared, or straight to the defendant's party (requestSupport event) once it has been submitted.
-// On a 'cancel' → the "no request sent" page;
+// On a 'submit' with nothing added or changed → record "no support needed" on the draft (task-list row
+// Done), then the "not changed" page.
+// On a 'cancel' → the "not changed" page, nothing written;
 // a retrieval failure → the RA error page.
 export default function reasonableAdjustmentsCallbackRoutes(app: Application): void {
   app.get(
@@ -84,16 +100,33 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
         // changes to persist. NOTE: contrary to the docs, on a pure removal cui-ra sends BOTH — an
         // EMPTY `replacementFlags` ({ details: [] }) alongside the populated `flagsAsSupplied`
         // Pick whichever collection actually has flags, preferring `replacementFlags`.
-        // "No request was sent" only when microsite was abandoned (action !== 'submit')
-        // or neither collection has any flags.
         const flags = payload.replacementFlags?.details?.length ? payload.replacementFlags : payload.flagsAsSupplied;
-        if (payload.action !== 'submit' || !flags?.details?.length) {
+        if (payload.action !== 'submit') {
+          // Cancelled in the microsite: nothing changes, including the task-list row status.
+          return safeRedirect303(res, cancelledUrl, fallback, ['/case']);
+        }
+
+        const responseSubmitted = isDefendantResponseSubmitted(existing.data);
+        const existingResponse = existing.data?.possessionClaimResponse ?? {};
+
+        if (!flags?.details?.length) {
+          // Submitted the microsite without adding or changing anything: an explicit "no support needed".
+          // Record it on the draft so the task-list row turns Done
+          if (!responseSubmitted) {
+            await ccdCaseService.updateDraft(
+              RESPOND_TO_CLAIM_DRAFT_EVENT,
+              accessToken,
+              caseReference,
+              { possessionClaimResponse: defendantSliceWithNoSupportNeeded(existingResponse) },
+              req.session?.clientContext
+            );
+          }
           return safeRedirect303(res, cancelledUrl, fallback, ['/case']);
         }
 
         const defendantFlags = toCcdFlags(flags);
 
-        if (isDefendantResponseSubmitted(existing.data)) {
+        if (responseSubmitted) {
           // Write flags straight to the defendant's party through the requestSupport event
           await ccdCaseService.submitDefendantSupportFlags(accessToken, caseReference, defendantFlags);
           return safeRedirect303(res, confirmationUrl, fallback, ['/case']);
@@ -101,7 +134,6 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
 
         // The draft-save fully REPLACES the defendant response, re-send the existing
         // answers — narrowed to the defendant slice — alongside the flags
-        const existingResponse = existing.data?.possessionClaimResponse ?? {};
         const possessionClaimResponse: PossessionClaimResponse = {
           defendantContactDetails: existingResponse.defendantContactDetails,
           defendantResponses: existingResponse.defendantResponses,
