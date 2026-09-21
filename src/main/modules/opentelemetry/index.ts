@@ -10,7 +10,7 @@ const ignoredIncomingUrlPattern = /\/assets\/|\.js(?:$|\?)|\.css(?:$|\?)/;
 
 interface HttpTelemetryConfig {
   enabled: boolean;
-  applyCustomAttributesOnSpan: (span: Span) => void;
+  applyCustomAttributesOnSpan: (span: Span, request?: { path?: string; url?: string; host?: string; protocol?: string }) => void;
   ignoreIncomingRequestHook: (request: { method?: string; url?: string }) => boolean;
   ignoreOutgoingRequestHook: (options: { path?: string }) => boolean;
 }
@@ -113,12 +113,38 @@ export function redactSecretQueryParams(url: string): string {
   );
 }
 
-const redactSpanUrlAttributes = (span: Span): void => {
-  for (const attribute of ['http.url', 'url.full', 'http.target', 'url.query']) {
-    const value = (span as unknown as { attributes?: Record<string, unknown> }).attributes?.[attribute];
-    if (typeof value === 'string' && value.includes('=')) {
+const URL_SPAN_ATTRIBUTES = ['http.url', 'url.full', 'http.target', 'url.query'];
+const secretQueryParamPattern = new RegExp(`[?&](${SECRET_QUERY_PARAMS.join('|')})=`, 'i');
+
+// The hook receives the ClientRequest (outgoing) or IncomingMessage (incoming) alongside the span.
+interface HttpRequestLike {
+  path?: string;
+  url?: string;
+  host?: string;
+  protocol?: string;
+}
+
+const redactSpanUrlAttributes = (span: Span, request?: HttpRequestLike): void => {
+  // Spans created by the SDK expose the attributes recorded so far; rewrite any that hold a secret.
+  const attributes = (span as unknown as { attributes?: Record<string, unknown> }).attributes ?? {};
+  for (const attribute of URL_SPAN_ATTRIBUTES) {
+    const value = attributes[attribute];
+    if (typeof value === 'string' && secretQueryParamPattern.test(value)) {
       span.setAttribute(attribute, redactSecretQueryParams(value));
     }
+  }
+
+  // Fall back to the request itself, so redaction does not depend on that non-public field.
+  const target = request?.path ?? request?.url;
+  if (typeof target !== 'string' || !secretQueryParamPattern.test(target)) {
+    return;
+  }
+  const redactedTarget = redactSecretQueryParams(target);
+  span.setAttribute('http.target', redactedTarget);
+  if (request?.host) {
+    const fullUrl = `${request.protocol ?? 'https:'}//${request.host}${redactedTarget}`;
+    span.setAttribute('http.url', fullUrl);
+    span.setAttribute('url.full', fullUrl);
   }
 };
 

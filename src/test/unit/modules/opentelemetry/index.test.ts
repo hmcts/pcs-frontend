@@ -23,7 +23,10 @@ interface TelemetryConfig {
   };
   instrumentationOptions: {
     http: {
-      applyCustomAttributesOnSpan: (span: MockSpan) => void;
+      applyCustomAttributesOnSpan: (
+        span: MockSpan,
+        request?: { path?: string; url?: string; host?: string; protocol?: string }
+      ) => void;
       ignoreIncomingRequestHook: (request: { method?: string; url?: string }) => boolean;
       ignoreOutgoingRequestHook: (options: { path?: string }) => boolean;
     };
@@ -234,6 +237,46 @@ describe('opentelemetry module', () => {
         'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=***'
       );
       expect(setAttribute).not.toHaveBeenCalledWith('http.method', expect.anything());
+    });
+
+    it('falls back to the request when the span does not expose its attributes', async () => {
+      const telemetryConfig = await initializeAndGetTelemetryConfig();
+      const setAttribute = jest.fn();
+      const span = { recordException: jest.fn(), setStatus: jest.fn(), setAttribute };
+
+      telemetryConfig.instrumentationOptions.http.applyCustomAttributesOnSpan(span, {
+        path: '/search/places/v1/postcode?postcode=W37RX&key=abc123',
+        host: 'api.os.uk',
+        protocol: 'https:',
+      });
+
+      expect(setAttribute).toHaveBeenCalledWith('http.target', '/search/places/v1/postcode?postcode=W37RX&key=***');
+      expect(setAttribute).toHaveBeenCalledWith(
+        'http.url',
+        'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=***'
+      );
+      expect(setAttribute).toHaveBeenCalledWith(
+        'url.full',
+        'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=***'
+      );
+    });
+
+    it('leaves spans alone when nothing carries a secret', async () => {
+      const telemetryConfig = await initializeAndGetTelemetryConfig();
+      const setAttribute = jest.fn();
+      const span = {
+        recordException: jest.fn(),
+        setStatus: jest.fn(),
+        setAttribute,
+        attributes: { 'http.url': 'http://ccd-data-store/cases/123?ignore-warning=false' },
+      };
+
+      telemetryConfig.instrumentationOptions.http.applyCustomAttributesOnSpan(span, {
+        path: '/cases/123?ignore-warning=false',
+        host: 'ccd-data-store',
+      });
+
+      expect(setAttribute).not.toHaveBeenCalled();
     });
   });
 
