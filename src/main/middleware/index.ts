@@ -9,3 +9,4 @@ export * from './cuiYourSupportFeatureMiddleware';
 export * from './handleRespondToClaimDisabled';
 export * from './legalRepresentativeSpecificStepsAccess';
 export * from './judgeAccess';
+export * from './judgeXuiRedirect';
