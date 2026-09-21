@@ -4,8 +4,7 @@ import * as propertiesVolume from '@hmcts/properties-volume';
 import config from 'config';
 import { get, set } from 'lodash';
 
-// Loaded lazily: bootstrap imports this module before initializeTelemetry(), and winston can only
-// be instrumented if it is required after telemetry starts (HDPI-8954).
+// Lazy: winston must not load before initializeTelemetry() or it is never instrumented (HDPI-8954).
 const warn = async (message: string): Promise<void> => {
   const { Logger } = await import('@modules/logger');
   Logger.getLogger('properties-volume').warn(message);
