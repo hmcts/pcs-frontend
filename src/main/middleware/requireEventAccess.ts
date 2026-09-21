@@ -35,12 +35,20 @@ export function requireEventAccess(eventId: string): RequestHandler {
       );
       res.locals.validatedCase = new CcdCaseModel(validatedCase);
 
+      // Group Access decides the journey, and pcs-api derived it for this case. Stored on the
+      // session so the gates that run without a case in scope - the global access middleware and
+      // logout - keep working after the first case is opened.
+      if (req.session.user) {
+        req.session.user.isDefendantSolicitor = validatedCase.data?.currentUserGroupRole === 'defendant-solicitor';
+      }
+
       // PCS-ROLE-DIAG [temp, HDPI-7333]: the frontend's verdict for the same request pcs-api just
       // logged, so the two can be compared. Remove with this preview branch.
       logger.info('PCS-ROLE-DIAG', {
         caseReference,
         userType: getUserType(req),
         isLegalRepresentative: isLegalRepresentativeUser(req),
+        groupRole: validatedCase.data?.currentUserGroupRole,
         idamRoles: getUserRoles(req),
       });
 

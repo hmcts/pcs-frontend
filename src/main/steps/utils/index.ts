@@ -36,13 +36,7 @@ export {
 } from './respondToClaimRouteConditions';
 export { ccdPenceToPoundsString, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
 export { penceToPounds, poundsToPence } from './currencyConversion';
-export {
-  LEGAL_REPRESENTATIVE_USER_ROLES,
-  getUserRoles,
-  getUserToken,
-  getUserType,
-  isLegalRepresentativeUser,
-} from './userRole';
+export { getUserRoles, getUserToken, getUserType, isLegalRepresentativeUser } from './userRole';
 export { getPreviousStepForCounterClaimAbout } from './getPreviousStepForCounterClaimAbout';
 export { formatDatePartsToISODate, formatIsoDate, parseISOToDateParts } from './dateUtils';
 export { toYesNoEnum, fromYesNoEnum, toYesNoNotSureEnum, fromYesNoNotSureEnum } from './yesNoEnum';
