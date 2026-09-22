@@ -13,11 +13,8 @@ const locales = path.resolve(__dirname, 'src/main/assets/locales');
 
 const devMode = process.env.NODE_ENV !== 'production';
 const fileNameSuffix = devMode ? '-dev' : '.[contenthash]';
-// Hashed output is emitted under bundles/ so it can be mounted separately and cached immutably.
 const filename = `bundles/[name]${fileNameSuffix}.js`;
 
-// Anchored to bundles/ so it only ever sees this build's own output. An unanchored test also
-// matches the govuk components copied to ../views/govuk, which nothing can serve.
 const precompressAssets = new CompressionPlugin({
   test: /^bundles\/.*\.(?:js|css|svg)$/i,
   threshold: 1024,

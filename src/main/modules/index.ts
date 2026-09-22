@@ -12,5 +12,4 @@ export * from './properties-volume';
 export { Csrf } from './csrf';
 
 // this is used to register the modules with the app in a certain order
-// Helmet is registered directly in app.ts, ahead of the static asset mounts
 export const modules = ['Session', 'I18n', 'Nunjucks', 'S2S', 'OIDCModule', 'LaunchDarkly', 'Csrf'];

@@ -26,7 +26,6 @@ app.locals.ENV = env;
 
 setupDev(app, developmentMode);
 
-// Must precede the static mounts so asset responses carry the security headers.
 new modules.Helmet(developmentMode).enableFor(app);
 
 setupStaticAssets(app);

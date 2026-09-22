@@ -6,10 +6,8 @@ import expressStaticGzip from 'express-static-gzip';
 const ONE_YEAR = '1y';
 const ONE_WEEK = '7d';
 
-// express-static-gzip sets Content-Encoding/Vary before delegating and never unsets them, so
-// anything it will not ultimately answer has to be kept away from it: non-GET methods, the
-// compressed siblings themselves, and percent-encoded paths (which hit its index but miss its
-// mime lookup, producing `Content-Type: false`).
+// express-static-gzip sets Content-Encoding before it knows whether it will answer, and never
+// unsets it, so requests it cannot serve must not reach it.
 const onlyPlainBundleReads =
   (handler: RequestHandler): RequestHandler =>
   (req, res, next) => {
