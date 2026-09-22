@@ -34,9 +34,7 @@ export function requireEventAccess(eventId: string): RequestHandler {
       );
       res.locals.validatedCase = new CcdCaseModel(validatedCase);
 
-      // Group Access decides the journey, and pcs-api derived it for this case. Stored on the
-      // session so the gates that run without a case in scope - the global access middleware and
-      // logout - keep working after the first case is opened.
+      // Persist group-access journey for caseless gates (access middleware, logout).
       if (req.session.user) {
         req.session.user.isDefendantSolicitor = validatedCase.data?.currentUserGroupRole === 'defendant-solicitor';
       }

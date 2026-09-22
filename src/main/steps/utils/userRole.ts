@@ -15,15 +15,7 @@ export function getUserRoles(req: Request): string[] {
     .filter(Boolean);
 }
 
-/**
- * A legal representative here has only ever meant the *defendant's* legal representative: the LR
- * journey is the defence, and claimants make claims in XUI.
- *
- * <p>Derived by pcs-api from Group Access - the caller's organisation being the active
- * representative of a defendant on this case - and carried on the case payload. Not inferred from
- * IDAM roles: the group roles never appear there, and the IDAM role this once keyed on was a CCD
- * access-control artefact that HDPI-7333 removes.
- */
+/** Defendant solicitor on this case (`session.user.isDefendantSolicitor`), not an IDAM role. */
 export function isLegalRepresentativeUser(req: Request): boolean {
   return req.session?.user?.isDefendantSolicitor === true;
 }

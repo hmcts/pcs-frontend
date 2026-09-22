@@ -14,10 +14,7 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
   idToken: string;
   refreshToken: string;
-  /**
-   * Whether the caller's organisation is the active legal representative of a defendant on the
-   * case last opened, as pcs-api derived it from Group Access. Undefined until a case is opened.
-   */
+  /** True when the last opened case named the caller as defendant-solicitor. */
   isDefendantSolicitor?: boolean;
 }
 

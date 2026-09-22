@@ -109,9 +109,6 @@ describe('requireEventAccess', () => {
     });
   });
 
-  // The legal-rep journey turns entirely on this one comparison against a string pcs-api owns
-  // (UserRole.GA_DEFENDANT_SOLICITOR). Nothing else asserts it, so a rename on either side would
-  // compile, pass CI, and silently drop every defendant solicitor into the citizen journey.
   describe('group role to legal-rep mapping', () => {
     const runWithGroupRole = async (currentUserGroupRole?: string) => {
       mockGetCaseByIdForEvent.mockResolvedValue({

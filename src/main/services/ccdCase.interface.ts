@@ -281,10 +281,7 @@ export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
-  /**
-   * The Group Access role the caller holds on this case, as pcs-api derived it:
-   * 'claimant' | 'claimant-solicitor' | 'defendant-solicitor', absent for a citizen.
-   */
+  /** Group Access role on this case: claimant | claimant-solicitor | defendant-solicitor. */
   currentUserGroupRole?: string;
   dateIssued?: string;
   claimIssueDate?: string;
