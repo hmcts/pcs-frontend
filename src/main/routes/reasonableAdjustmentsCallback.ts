@@ -1,5 +1,6 @@
 import type { Application, Request, Response } from 'express';
 
+import { citizenOnlyStepsAccessMiddleware } from '../middleware/citizenOnlyStepsAccess';
 import { cuiYourSupportFeatureMiddleware } from '../middleware/cuiYourSupportFeatureMiddleware';
 import { oidcMiddleware } from '../middleware/oidc';
 import { respondToClaimFeatureMiddleware } from '../middleware/respondToClaimFeatureMiddleware';
@@ -41,7 +42,8 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
   app.get(
     '/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id',
     oidcMiddleware,
-    // Gate the draft write behind the same respond-to-claim and it's own feature flag
+    // Your Support is citizen-only (see citizenOnlyStepsAccess); then the respond-to-claim and Your Support flags.
+    citizenOnlyStepsAccessMiddleware,
     respondToClaimFeatureMiddleware,
     cuiYourSupportFeatureMiddleware,
     async (req: Request, res: Response) => {

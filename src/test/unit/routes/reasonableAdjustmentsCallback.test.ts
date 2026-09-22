@@ -15,6 +15,11 @@ jest.mock('../../../main/middleware/oidc', () => ({
   oidcMiddleware: mockOidcMiddleware,
 }));
 
+const mockCitizenOnlyMiddleware = jest.fn((req, res, next) => next());
+jest.mock('../../../main/middleware/citizenOnlyStepsAccess', () => ({
+  citizenOnlyStepsAccessMiddleware: mockCitizenOnlyMiddleware,
+}));
+
 const mockFeatureMiddleware = jest.fn((req, res, next) => next());
 jest.mock('../../../main/middleware/respondToClaimFeatureMiddleware', () => ({
   respondToClaimFeatureMiddleware: mockFeatureMiddleware,
@@ -96,10 +101,11 @@ describe('reasonableAdjustmentsCallback routes', () => {
     reasonableAdjustmentsCallbackRoutes({ get: mockAppGet } as unknown as Application);
   });
 
-  it('registers the callback route behind oidc, the respond-to-claim and the Your Support feature-flag middleware', () => {
+  it('registers the callback route behind oidc, the citizen-only guard, the respond-to-claim and the Your Support feature-flag middleware', () => {
     expect(mockAppGet).toHaveBeenCalledWith(
       ROUTE,
       mockOidcMiddleware,
+      mockCitizenOnlyMiddleware,
       mockFeatureMiddleware,
       mockCuiYsMiddleware,
       expect.any(Function)
