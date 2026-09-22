@@ -1,18 +1,18 @@
 {
-  "pageTitle": "cyAre there any reasons that this application should not be shared with the other parties?",
-  "caption": "cyMake an application",
-  "heading": "cyAre there any reasons that this application should not be shared with the other parties?",
-  "mainQuestion": "cyAre there any reasons that this application should not be shared with the other parties?",
-  "reasonForNotSharingQuestion": "cyProvide a reason this application should not be shared with the other party",
-  "weUsuallySendACopyOfYourApplication": "cyWe usually send a copy of your application to the other parties (your landlord, housing association or mortgage lender). This gives them the opportunity to respond to it.",
-  "inSomeExceptionalCircumstances": "cyIn some exceptional circumstances, the judge will consider your application without telling the other party first.",
-  "forExampleIf": "cyFor example, if:",
-  "itIsUrgent": "cyit is so urgent that there is not enough time to give notice",
-  "couldUndermineTheOrder": "cygiving someone notice could undermine the order you want the court to grant.",
-  "youBelieveYouAreAtRisk": "cyyou believe you are at risk from the other party",
-  "weWillAskYouToProvideTheReason": "cyWe will ask you to provide the reason. The court will consider your reason, and you may not be successful.",
+  "pageTitle": "A oes yna unrhyw resymau pam na ddylid rhannu'r cais hwn gyda'r partïon eraill?",
+  "caption": "Gwneud cais",
+  "heading": "A oes yna unrhyw resymau pam na ddylid rhannu'r cais hwn gyda'r partïon eraill?",
+  "mainQuestion": "A oes yna unrhyw resymau pam na ddylid rhannu'r cais hwn gyda'r partïon eraill?",
+  "reasonForNotSharingQuestion": "Rhowch reswm pam na ddylid rhannu'r cais hwn gyda'r parti arall",
+  "weUsuallySendACopyOfYourApplication": "Fel arfer rydym yn anfon copi o'ch cais at y partïon eraill (eich landlord, cymdeithas dai neu fenthyciwr morgeisi). Mae hyn yn rhoi cyfle iddynt ymateb iddo.",
+  "inSomeExceptionalCircumstances": "Mewn rhai amgylchiadau eithriadol, bydd y barnwr yn ystyried eich cais heb hysbysu'r parti arall yn gyntaf.",
+  "forExampleIf": "Er enghraifft, os:",
+  "itIsUrgent": "yw mor frys fel nad oes digon o amser i roi gwybod am y cais",
+  "couldUndermineTheOrder": "gall rhoi rhybudd i rywun danseilio'r gorchymyn rydych eisiau i'r llys ei ganiatáu.",
+  "youBelieveYouAreAtRisk": "rydych yn credu eich bod mewn risg gan y parti arall",
+  "weWillAskYouToProvideTheReason": "Byddwn yn gofyn i chi roi'r rheswm. Bydd y llys yn ystyried eich rheswm, ac efallai na fyddwch yn llwyddiannus.",
   "errors": {
-    "confirmIfThereIsAReason": "cyConfirm whether there is a reason why this application should not be shared with the other parties",
-    "provideAReason": "cyConfirm why the other parties should not be informed"
+    "confirmIfThereIsAReason": "Cadarnhewch p'un a oes yna reswm pam na ddylid rhannu'r cais hwn gyda'r partïon eraill",
+    "provideAReason": "Cadarnhewch pam na ddylid hysbysu'r partïon eraill"
   }
 }

@@ -1,0 +1,102 @@
+{
+  "pageTitle": "Treuliau",
+  "heading": "Treuliau",
+  "expenseQuestion": "Pa dreuliau misol rheolaidd sydd gan y diffynnydd?  (Dewisol)",
+  "hintText": "Dewiswch bopeth sy'n berthnasol. Rhaid i’r wybodaeth a ddarperir gan y diffynnydd fod yn wir ac yn gywir.",
+  "options": {
+    "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
+    "loanPayments": "Taliadau benthyciadau",
+    "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/wraig",
+    "mobilePhone": "Ffôn symudol",
+    "groceryShopping": "Siopa bwyd",
+    "fuelParkingTransport": "Tanwydd, parcio a chludiant",
+    "schoolCosts": "Costau ysgol (er enghraifft, gwisg a chinio ysgol)",
+    "clothing": "Dillad",
+    "otherExpenses": "Arall"
+  },
+  "subFields": {
+    "amount": "Swm a dalwyd",
+    "frequency": "Talu pob:"
+  },
+  "frequency": {
+    "week": "Wythnos",
+    "month": "Mis"
+  },
+  "errors": {
+    "householdBillsAmount": {
+      "required": "Nodwch faint mae'r diffynnydd yn dalu am filiau'r cartref",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am filiau'r cartref bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am filiau'r cartref bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "householdBillsFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu biliau'r cartref"
+    },
+    "loanPaymentsAmount": {
+      "required": "Nodwch faint mae'r diffynnydd yn dalu am daliadau benthyciadau",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am daliadau benthyciadau bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i'r swm a delir am daliadau benthyciadau bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "loanPaymentsFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn gwneud taliadau benthyciadau"
+    },
+    "childSpousalMaintenanceAmount": {
+      "required": "Nodwch faint mae'r diffynnydd yn dalu am gynhaliaeth plant neu gynhaliaeth briod",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am gynhaliaeth plant neu gynhaliaeth briod bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am gynhaliaeth plant neu ŵr/gwraig bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "childSpousalMaintenanceFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu cynhaliaeth plant neu gynhaliaeth briod"
+    },
+    "mobilePhoneAmount": {
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am ffôn symudol",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am ffôn symudol bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am ffôn symudol bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "mobilePhoneFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu am ffôn symudol"
+    },
+    "groceryShoppingAmount": {
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am siopa bwyd",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am siopa bwyd bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am siopa bwyd bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "groceryShoppingFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu am siopa bwyd"
+    },
+    "fuelParkingTransportAmount": {
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am danwydd, parcio a chludiant",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am danwydd, parcio a chludiant bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am danwydd, parcio a chludiant bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "fuelParkingTransportFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu am danwydd, parcio a chludiant"
+    },
+    "schoolCostsAmount": {
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am gostau ysgol",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am gostau ysgol bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am gostau ysgol bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "schoolCostsFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu costau ysgol"
+    },
+    "clothingAmount": {
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am ddillad",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am ddillad bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am ddillad bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "clothingFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu am ddillad"
+    },
+    "otherExpensesAmount": {
+      "required": "Nodwch faint mae'r diffynnydd yn ei dalu am gostau rheolaidd eraill",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am gostau eraill bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am gostau eraill bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "otherExpensesFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu am unrhyw gostau eraill"
+    },
+    "amount": {
+      "invalidFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"
+    }
+  }
+}

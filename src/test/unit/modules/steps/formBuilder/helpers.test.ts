@@ -39,6 +39,15 @@ describe('formBuilder helpers', () => {
       const result = getTranslation(mockT, 'nonexistent.key');
       expect(result).toBeUndefined();
     });
+
+    it('should preserve an explicit empty translation', () => {
+      const mockT = jest.fn((key: string) => (key === 'empty.key' ? '' : key)) as unknown as TFunction;
+
+      const result = getTranslation(mockT, 'empty.key', 'Fallback Text');
+
+      expect(result).toBe('');
+      expect(mockT).toHaveBeenCalledWith('empty.key', { returnObjects: true, returnEmptyString: true });
+    });
   });
 
   describe('processFieldData', () => {
@@ -478,8 +487,12 @@ describe('formBuilder helpers', () => {
       const req = {
         session: {
           formData: {
-            step1: {
-              field1: 'value1',
+            default: {
+              default: {
+                step1: {
+                  field1: 'value1',
+                },
+              },
             },
           },
         },
@@ -525,7 +538,7 @@ describe('formBuilder helpers', () => {
       };
 
       setFormData(req, 'step1', data);
-      expect((req.session as { formData?: Record<string, unknown> }).formData?.['step1']).toEqual(data);
+      expect(req.session.formData?.default?.default?.['step1']).toEqual(data);
     });
 
     it('should create formData object if it does not exist', () => {
@@ -538,15 +551,19 @@ describe('formBuilder helpers', () => {
       };
 
       setFormData(req, 'step1', data);
-      expect((req.session as { formData?: Record<string, unknown> }).formData?.['step1']).toEqual(data);
+      expect(req.session.formData?.default?.default?.['step1']).toEqual(data);
     });
 
     it('should overwrite existing step data', () => {
       const req = {
         session: {
           formData: {
-            step1: {
-              field1: 'oldValue',
+            default: {
+              default: {
+                step1: {
+                  field1: 'oldValue',
+                },
+              },
             },
           },
         },
@@ -557,7 +574,7 @@ describe('formBuilder helpers', () => {
       };
 
       setFormData(req, 'step1', data);
-      expect((req.session as { formData?: Record<string, unknown> }).formData?.['step1']).toEqual(data);
+      expect(req.session.formData?.default?.default?.['step1']).toEqual(data);
     });
   });
 
@@ -566,7 +583,7 @@ describe('formBuilder helpers', () => {
       return {
         body,
         session: {
-          formData: sessionFormData,
+          formData: { default: { default: sessionFormData } },
         },
       } as unknown as Request;
     };
@@ -1516,6 +1533,105 @@ describe('formBuilder helpers', () => {
 
         const errors = validateForm(req, fields, translations);
         expect(errors['contactMethod.emailAddress']).toBe('Email address is required');
+      });
+
+      it('should pass plain-text XSS-style payload unchanged in nested radio subField (xss spike gap)', () => {
+        const req = createMockRequest({
+          tenancyTypeConfirm: 'no',
+          'tenancyTypeConfirm.correctType': '" onfocus="alert(1)',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'tenancyTypeConfirm',
+            type: 'radio',
+            required: true,
+            options: [
+              { value: 'yes' },
+              {
+                value: 'no',
+                subFields: {
+                  correctType: {
+                    name: 'correctType',
+                    type: 'text',
+                    required: true,
+                  },
+                },
+              },
+              { value: 'notSure' },
+            ],
+          },
+        ];
+
+        const errors = validateForm(req, fields, {});
+
+        expect(errors['tenancyTypeConfirm.correctType']).toBeUndefined();
+        expect(req.body['tenancyTypeConfirm.correctType']).toBe('" onfocus="alert(1)');
+      });
+
+      it('should strip HTML tags silently in nested radio subField and write back to req.body', () => {
+        const req = createMockRequest({
+          tenancyTypeConfirm: 'no',
+          'tenancyTypeConfirm.correctType': '<script>alert(1)</script>hello',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'tenancyTypeConfirm',
+            type: 'radio',
+            required: true,
+            options: [
+              { value: 'yes' },
+              {
+                value: 'no',
+                subFields: {
+                  correctType: {
+                    name: 'correctType',
+                    type: 'text',
+                    required: true,
+                  },
+                },
+              },
+              { value: 'notSure' },
+            ],
+          },
+        ];
+
+        const errors = validateForm(req, fields, {});
+
+        expect(errors['tenancyTypeConfirm.correctType']).toBeUndefined();
+        expect(req.body['tenancyTypeConfirm.correctType']).toBe('hello');
+      });
+
+      it('should fail validation if required field becomes empty after stripping HTML tags', () => {
+        const req = createMockRequest({
+          tenancyTypeConfirm: 'no',
+          'tenancyTypeConfirm.correctType': '<script>alert(1)</script>',
+        });
+        const fields: FormFieldConfig[] = [
+          {
+            name: 'tenancyTypeConfirm',
+            type: 'radio',
+            required: true,
+            options: [
+              { value: 'yes' },
+              {
+                value: 'no',
+                subFields: {
+                  correctType: {
+                    name: 'correctType',
+                    type: 'text',
+                    required: true,
+                  },
+                },
+              },
+              { value: 'notSure' },
+            ],
+          },
+        ];
+
+        const errors = validateForm(req, fields, {});
+
+        expect(errors['tenancyTypeConfirm.correctType']).toBeDefined();
+        expect(req.body['tenancyTypeConfirm.correctType']).toBe('');
       });
     });
 

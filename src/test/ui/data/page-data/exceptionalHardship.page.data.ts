@@ -1,11 +1,9 @@
 export const exceptionalHardship = {
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   mainHeader: `Exceptional hardship`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   exceptionalHardshipMeansParagraph: `Exceptional hardship means experiencing serious difficulties that go beyond the normal difficulty of losing your home.`,
-  ifThisAppliesToYouParagraph: `If this applies to you, a judge might allow you to stay in your home for longer.`,
-  anyDetailsYouProvideParagraph: `Any details you provide will be considered by a judge when making their decision, but it is up to them to decide if exceptional hardship applies in your case.`,
+  anyDetailsYouProvideParagraph: `Any details you provide will be considered by a judge. If  they decide that exceptional hardship applies in your case, they might consider whether you can stay in your home for longer.`,
   forExampleParagraph: `For example, you might have:`,
   goneThroughDivorceOrSeparationList: `gone through a divorce or separation`,
   lostJobOrBeenMadeRedundantList: `lost your job or been made redundant`,
@@ -23,7 +21,7 @@ export const exceptionalHardship = {
   emojiTextInput: `👉 😄`,
   emojiGiveDetailsAboutExceptionalHardshipErrorMessage: `Give details about the exceptional hardship you’d experience must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   selectExceptionHardshipErrorMessage: `Select if you’d experience exceptional hardship if you were asked to leave your home`,
-  mustBe500CharactersOrFewerErrorMessage: `Must be 500 characters or fewer`,
+  mustBe500CharactersOrFewerErrorMessage: `Exceptional hardship details must be 500 characters or less`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `exceptional-hardship`,
 };

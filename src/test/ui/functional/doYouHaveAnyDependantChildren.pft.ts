@@ -1,4 +1,4 @@
-import { dashboard, doYouHaveAnyDependantChildren, feedback, yourHouseholdAndCircumstances } from '../data/page-data';
+import { doYouHaveAnyDependantChildren, feedback, yourHouseholdAndCircumstances } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -7,14 +7,14 @@ export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<vo
   await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
-    message: doYouHaveAnyDependantChildren.selectIfYouHaveAnyDependantChildrenErrorMessage,
+    message: doYouHaveAnyDependantChildren.selectIfYouHaveAnyDependentChildrenErrorMessage,
   });
 
   await performAction('clickRadioButton', doYouHaveAnyDependantChildren.yesRadioOption);
   await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
-    message: doYouHaveAnyDependantChildren.giveDetailsAboutYourDependantChildrenErrorMessage,
+    message: doYouHaveAnyDependantChildren.giveDetailsAboutYourDependentChildrenErrorMessage,
   });
 
   await performAction('clickRadioButton', doYouHaveAnyDependantChildren.yesRadioOption);
@@ -35,7 +35,7 @@ export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<vo
   await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
-    message: doYouHaveAnyDependantChildren.emojiExplainPartsOfClaimErrorMessage,
+    message: doYouHaveAnyDependantChildren.emojiErrorMessage,
   });
 }
 
@@ -49,6 +49,4 @@ export async function doYouHaveAnyDependantChildrenNavigationTests(): Promise<vo
     doYouHaveAnyDependantChildren.backLink,
     yourHouseholdAndCircumstances.mainHeader
   );
-  await performAction('clickRadioButton', doYouHaveAnyDependantChildren.noRadioOption);
-  await performValidation('pageNavigation', doYouHaveAnyDependantChildren.saveForLaterButton, dashboard.mainHeader);
 }

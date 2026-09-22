@@ -7,6 +7,8 @@ import { S2S } from '../main/modules/s2s';
 import { OIDCModule } from '../main/modules/oidc';
 import { type TFunction } from 'i18next';
 import { type CcdCaseModel } from '@services/ccdCaseData.model';
+import { type PaymentSessionState } from '@services/paymentSessionService';
+import { type StepContext } from '../main/modules/steps/stepContext';
 
 export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
@@ -14,18 +16,27 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   refreshToken: string;
 }
 
+export interface ClientContextHeaders {
+  selectedPartyId?: string;
+}
+
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
   user?: UserInfoResponseWithToken;
   returnTo?: string;
-  formData?: Record<string, any>;
+  // Step form data keyed by journey name, then case reference (or 'default'), then step name.
+  formData?: Record<string, Record<string, Record<string, any>>>;
+  uploadedDocs?: Record<string, Record<string, unknown[]>>;
+  returnToCya?: string;
+  respondToClaimPostSubmitRedirect?: string;
+  respondToClaimSubmitRejection?: string;
   ccdCase?: CcdCase;
-  genApp?: {
-    applicationId?: string;
-    showDuplicateSubmissionPage?: boolean;
-  };
+  // Generated application ID for the make-an-application journey, keyed by case reference.
+  applicationIds?: Record<string, string>;
+  payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
+  clientContext?: ClientContextHeaders;
 }
 
 declare module 'express-session' {
@@ -44,6 +55,7 @@ declare module 'express' {
       validatedCase?: CcdCaseModel;
       t?: TFunction;
       lang?: string;
+      step?: StepContext;
     } & Record<string, unknown>;
     csrfToken?: () => string;
   }

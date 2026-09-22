@@ -1,0 +1,13 @@
+{% extends "stepsTemplate.njk" %}
+
+{% block pageTitle %}{{ pageTitle }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  <p class="govuk-body">{{ paragraph1 }}</p>
+
+  <p class="govuk-body">
+    <a href="{{ taskListUrl }}" class="govuk-button">{{ closeAndReturnToTaskList }}</a>
+  </p>
+{% endblock %}

@@ -8,7 +8,7 @@ import type { Request } from 'express';
  * confirmation page or a capture page to the defendant.
  */
 export const isDefendantNameKnown = (req: Request): boolean => {
-  const { claimantEnteredDefendantDetailsNameKnown } = req.res?.locals?.validatedCase ?? {
+  const { claimantEnteredDefendantDetailsNameKnown } = req.res?.locals.validatedCase ?? {
     claimantEnteredDefendantDetailsNameKnown: '',
   };
 

@@ -9,7 +9,7 @@ node_modules/
 *swp
 *log
 .DS_Store
-
+temp/
 src/main/public/img/lib/*
 src/main/public/js/lib/**/*.js
 src/main/public/stylesheets/lib/*
@@ -27,7 +27,6 @@ public/
 src/main/views/govuk
 src/main/views/moj
 src/main/views/ui-component-lib
-src/main/assets
 coverage/
 smoke-output/
 functional-output/
@@ -56,3 +55,10 @@ version
 /pact/
 /src/test/java/build/
 /src/test/java/.gradle/
+
+# Fortify scan working files (fortify-client writes these relative to the repo root)
+/Fortify Scan/
+/lib/
+
+# Local Welsh-translation helper scripts (not part of the app)
+scripts/

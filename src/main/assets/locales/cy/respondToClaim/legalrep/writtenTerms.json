@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Telerau ysgrifenedig",
+  "introText": "Mae'n ofynnol o dan y Ddeddf Rhentu Cartrefi (Cymru) 2016 i landlord anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth.",
+  "question": "A yw'r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth?",
+  "heading": "Telerau ysgrifenedig",
+  "termsQuestion": "A yw'r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth?",
+  "options": {
+    "or": "neu",
+    "imNotSure": "Diffynnydd ddim yn siŵr"
+  },
+  "errors": {
+    "writtenTerms": "Dewiswch a yw'r landlord wedi anfon telerau ysgrifenedig y contract meddiannaeth at y diffynnydd"
+  }
+}

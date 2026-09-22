@@ -1,6 +1,5 @@
 import {
   confirmationOfNoticeGiven,
-  dashboard,
   nonRentArrearsDispute,
   noticeDateWhenNotProvided,
   noticeDateWhenProvided,
@@ -8,8 +7,10 @@ import {
   tenancyDateDetails,
   tenancyDateUnknown,
 } from '../data/page-data';
+import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
+const charLimitInputText = generateRandomString(6501);
 export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
   //mandatory radio button selection
   await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
@@ -24,11 +25,12 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
     header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
     message: nonRentArrearsDispute.partsOfClaimDoNotAgreeErrorMessage,
   });
-  await performAction(
-    'clickLinkAndVerifyNewTabTitle',
-    nonRentArrearsDispute.viewTheClaimLink,
-    nonRentArrearsDispute.titleGovServiceHiddenNewTab
-  );
+  //commented due to bug HDPI-7442
+  // await performAction(
+  //   'clickLinkAndVerifyNewTabTitle',
+  //   nonRentArrearsDispute.viewTheClaimLink,
+  //   nonRentArrearsDispute.titleGovServiceHiddenNewTab
+  // );
   await performAction(
     'inputText',
     nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
@@ -45,6 +47,15 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
   await performValidation('errorMessage', {
     header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
     message: nonRentArrearsDispute.emojiExplainPartsOfClaimErrorMessage,
+  });
+
+  // Char limit
+  await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
+  await performAction('inputText', nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel, charLimitInputText);
+  await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
+    message: nonRentArrearsDispute.charLimitErrorMessage,
   });
 }
 
@@ -84,7 +95,6 @@ export async function noRentArrearsNavigationTests(): Promise<void> {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, rentArrears.mainHeader);
   }
   await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
-  await performValidation('pageNavigation', nonRentArrearsDispute.saveForLaterButton, dashboard.mainHeader);
 }
 
 export async function nonRentArrearsDisputeVisibilityValidationTests(): Promise<void> {

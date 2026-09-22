@@ -1,12 +1,12 @@
 {
-  "pageTitle": "cyDependant children",
-  "caption": "cyRespond to a property possession claim",
-  "heading": "cyDo you have any dependant children?",
-  "dependantChildrenParagraph": "cyDependant children are children you look after financially.",
-  "dependantChildrenDetailsLabel": "cyGive details about your dependant children",
-  "dependantChildrenDetailsHint": "cyYou should include details about how many dependant children you have and how old they are",
+  "pageTitle": "Plant dibynnol",
+  "heading": "A oes gennych chi unrhyw blant sy'n ddibynnol arnoch?",
+  "dependentChildrenParagraph": "Mae plant sy'n ddibynnol yn blant rydych chi'n gofalu amdanynt yn ariannol.",
+  "dependentChildrenDetailsLabel": "Rhowch fanylion eich plant dibynnol",
+  "dependentChildrenDetailsHint": "Dylech gynnwys manylion am faint o blant dibynnol sydd gennych a faint yw eu hoed",
   "errors": {
-    "dependantChildren": "cySelect if you have any dependant children",
-    "dependantChildrenDetails": "cyGive details about your dependant children"
+    "dependentChildren": "Dewiswch a oes gennych chi unrhyw blant sy'n ddibynnol arnoch",
+    "dependentChildrenDetails": "Rhowch fanylion eich plant dibynnol",
+    "dependantChildrenDetailsMaxLength": "Rhaid i fanylion plant dibynnol fod yn 500 o nodau neu lai"
   }
 }

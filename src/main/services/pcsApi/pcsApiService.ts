@@ -1,6 +1,7 @@
 import config from 'config';
 
 import { http } from '@modules/http';
+import type { ClaimSummary } from '@services/ccdCase.interface';
 
 function getBaseUrl(): string {
   return config.get('api.url');
@@ -12,27 +13,61 @@ export const getRootGreeting = async (): Promise<string> => {
   return response.data;
 };
 
-export const validateAccessCode = async (accessToken: string, caseId: string, accessCode: string): Promise<boolean> => {
+export type AccessCodeValidationError = 'not_found' | 'expired' | 'already_used' | 'mismatch' | 'unknown';
+export type AccessCodeValidationResult = { valid: true } | { valid: false; error: AccessCodeValidationError };
+
+export const validateAccessCode = async (
+  accessToken: string,
+  caseId: string,
+  accessCode: string
+): Promise<AccessCodeValidationResult> => {
   const pcsApiURL = getBaseUrl();
+  const normalizedCaseId = caseId.trim().replace(/-/g, '');
+  if (!/^\d{16,20}$/.test(normalizedCaseId)) {
+    return { valid: false, error: 'not_found' };
+  }
+  const encodedCaseId = encodeURIComponent(normalizedCaseId);
   try {
     const response = await http.post(
-      `${pcsApiURL}/cases/${caseId}/validate-access-code`,
+      `${pcsApiURL}/cases/${encodedCaseId}/validate-access-code`,
       { accessCode },
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
         },
+        validateStatus: () => true,
       }
     );
 
-    // Verify successful response status (2xx)
     if (response.status >= 200 && response.status < 300) {
-      return true;
+      return { valid: true };
     }
 
-    return false;
+    switch (response.status) {
+      case 404:
+        return { valid: false, error: 'not_found' };
+      case 410:
+        return { valid: false, error: 'expired' };
+      case 409:
+        return { valid: false, error: 'already_used' };
+      case 422:
+      case 400:
+        return { valid: false, error: 'mismatch' };
+      default:
+        return { valid: false, error: 'unknown' };
+    }
   } catch {
-    return false;
+    return { valid: false, error: 'unknown' };
   }
+};
+
+export const getCitizenClaims = async (accessToken: string): Promise<ClaimSummary[]> => {
+  const response = await http.get<ClaimSummary[]>(`${getBaseUrl()}/cases/citizen-claims`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!Array.isArray(response.data)) {
+    throw new Error('Unexpected response from citizen-claims endpoint');
+  }
+  return response.data;
 };

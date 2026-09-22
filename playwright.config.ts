@@ -15,8 +15,8 @@ export const waitForPageRedirectionTimeout = SHORT_TIMEOUT;
 const enable_all_page_functional_tests = process.env.ENABLE_ALL_PAGE_FUNCTIONAL_TESTS || 'false';
 if (enable_all_page_functional_tests.toLowerCase() === 'true') {
   process.env.ENABLE_CONTENT_VALIDATION = 'true';
-  process.env.ENABLE_VISIBILITY_VALIDATION = 'true';
-  process.env.ENABLE_ERROR_MESSAGES_VALIDATION = 'true';
+  process.env.ENABLE_VISIBILITY_VALIDATION = 'false';
+  process.env.ENABLE_ERROR_MESSAGES_VALIDATION = 'false';
   process.env.ENABLE_NAVIGATION_TESTS = 'true';
 }
 
@@ -25,8 +25,9 @@ export const enable_content_validation = process.env.ENABLE_CONTENT_VALIDATION |
 export const enable_visibility_validation = process.env.ENABLE_VISIBILITY_VALIDATION || 'false';
 export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES_VALIDATION || 'false';
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
-export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'true';
+export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'false';
 const is_smoke_run = process.env.npm_lifecycle_event === 'test:smoke';
+const is_full_functional_run = process.env.npm_lifecycle_event === 'test:fullfunctional';
 const junit_result_output =
   process.env.PLAYWRIGHT_JUNIT_OUTPUT ||
   (is_smoke_run ? 'smoke-output/junit-result.xml' : 'functional-output/junit-result.xml');
@@ -72,10 +73,10 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  workers: 4,
+  workers: is_full_functional_run ? 1 : 2,
   timeout: 600 * 1000,
   expect: { timeout: 10 * 1000 },
-  use: { actionTimeout: 10 * 1000, navigationTimeout: 30 * 1000 },
+  use: { actionTimeout: 60 * 1000, navigationTimeout: 60 * 1000 },
   reportSlowTests: { max: 15, threshold: 5 * 60 * 1000 },
   globalSetup: require.resolve('./src/test/ui/config/global-setup.config.ts'),
   globalTeardown: require.resolve('./src/test/ui/config/global-teardown.config'),

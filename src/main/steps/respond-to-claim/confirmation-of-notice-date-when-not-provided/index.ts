@@ -14,12 +14,13 @@ const logger = Logger.getLogger('confirmation-of-notice-date-when-not-provided')
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-date-when-not-provided',
+  isAnswered: () => true,
   stepDir: __dirname,
   customTemplate: `${__dirname}/confirmationOfNoticeDateWhenNotProvided.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    caseNumber: 'caseNumber',
     subTitle: 'subTitle',
-    caption: 'caption',
     question: 'question',
     paragraph: 'paragraph',
   },
@@ -90,7 +91,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: req => {
     const claimantName = getClaimantName(req);
 
-    const t = getTranslationFunction(req, 'confirmation-of-notice-date-when-not-provided', ['common']);
+    const t = getTranslationFunction(req);
 
     const paragraph = t('paragraph', { returnObjects: true, claimantName });
 

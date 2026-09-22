@@ -61,7 +61,7 @@ export class S2S {
       let serviceToken: string | null = await serviceConfig.redisClient.get(serviceConfig.key);
 
       if (!serviceToken) {
-        const { otp } = TOTP.generate(serviceConfig.secret);
+        const { otp } = await TOTP.generate(serviceConfig.secret);
 
         const params = {
           microservice: serviceConfig.microservice,

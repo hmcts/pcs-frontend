@@ -15,6 +15,9 @@ export type { FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConf
 
 // Export form builder helpers (for use in custom step implementations)
 export {
+  clearFormData,
+  getAllFormData,
+  getCaseReference,
   getFormData,
   setFormData,
   validateForm,
@@ -37,13 +40,17 @@ export {
 
 // Export step-specific i18n utilities
 export {
-  getStepNamespace,
   getStepTranslationPath,
   loadStepNamespace,
+  loadStepNamespaces,
   getStepTranslations,
   getTranslationFunction,
   validateTranslationKey,
 } from './i18n';
+
+// Export step request-context helpers
+export { withStepContext } from './stepContext';
+export type { StepContext } from './stepContext';
 
 // Re-export language utilities from main i18n module for convenience
 export { getRequestLanguage, getValidatedLanguage } from '../i18n';

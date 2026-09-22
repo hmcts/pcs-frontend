@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Help with counterclaim fee",
+  "heading": "Has the defendant already applied for help with their counterclaim fee?",
+  "question": "Has the defendant already applied for help with their counterclaim fee?",
+  "revealedHwfQuestionLabel": "Enter the defendant\u2019s Help with Fees reference number",
+  "revealedHwfQuestionHint": "<span class=\"govuk-body govuk-!-display-block govuk-!-margin-bottom-1\">You (or they) will have received this number when you (or they) applied for Help with Fees. This reference must not have been used for a previous application.</span>For example, HWF-A1B-23C",
+  "errors": {
+    "alreadyAppliedForHelp": "Select if the defendant has already applied for help with their counterclaim fee?",
+    "hwfReference": "Enter the defendant\u2019s Help with Fees reference number",
+    "hwfReferenceMaxLength": "The defendant\u2019s Help with Fees reference number must be 60 characters or fewer"
+  }
+}

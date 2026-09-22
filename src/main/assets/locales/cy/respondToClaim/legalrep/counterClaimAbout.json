@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Ynghylch gwrth-hawliad y diffynnydd/diffynyddion",
+  "heading": "Ynghylch gwrth-hawliad y diffynnydd/diffynyddion",
+  "infoParagraph1": "Byddwch yn gallu uwchlwytho unrhyw dystiolaeth sydd gan y diffynnydd ar y dudalen nesaf.",
+  "infoParagraph2": "Bydd yr hawlydd yn gallu gweld eich atebion.",
+  "counterClaimForLabel": "Am beth mae gwrth-hawliad y diffynnydd?",
+  "counterClaimReasonsLabel": "Beth yw eu rhesymau dros wneud y gwrth-hawliad?",
+  "errors": {
+    "counterClaimForRequired": "Nodwch ar gyfer beth mae gwrth-hawliad y diffynnydd",
+    "counterClaimForMaxLength": "Dylai beth mae gwrth-hawliad y diffynnydd yn ei gylch fod yn 6800 nod neu lai",
+    "counterClaimReasonsRequired": "Nodwch beth yw rhesymau'r diffynnydd dros wneud y gwrth-hawliad",
+    "counterClaimReasonsMaxLength": "Dylai rhesymau'r diffynnydd dros wneud gwrth-hawliad fod yn 6800 nod neu lai"
+  }
+}

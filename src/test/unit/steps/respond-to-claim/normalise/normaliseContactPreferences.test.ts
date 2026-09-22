@@ -55,6 +55,10 @@ describe('normaliseContactPreferences', () => {
     expect(response.defendantResponses).toEqual({ contactByPhone: 'NO' });
   });
 
+  // Clearing of the stale party.textMessageNumber is owned by the BE
+  // (ClaimResponseService.saveContactPreferences). Normalisers must not touch
+  // defendantContactDetails.* — see normaliserContract.test.ts.
+
   it('is a no-op on empty response', () => {
     const response = {} as PossessionClaimResponse;
     normaliseContactPreferences(response);
@@ -70,5 +74,18 @@ describe('normaliseContactPreferences', () => {
     const afterOnce = JSON.stringify(response);
     normaliseContactPreferences(response);
     expect(JSON.stringify(response)).toBe(afterOnce);
+  });
+
+  // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — keep contactByText when
+  // contactByPhone comes back as "Yes" instead of "YES".
+  it('treats PascalCase "Yes" on contactByPhone the same as "YES"', () => {
+    const response = {
+      // Cast simulates BE returning out-of-type casing — the static type is 'YES'/'NO'.
+      defendantResponses: { contactByPhone: 'Yes' as 'YES', contactByText: 'YES' },
+    } as PossessionClaimResponse;
+
+    normaliseContactPreferences(response);
+
+    expect(response.defendantResponses?.contactByText).toBe('YES');
   });
 });

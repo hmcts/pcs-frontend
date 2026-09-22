@@ -5,6 +5,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'free-legal-advice',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.freeLegalAdvice),
   stepDir: __dirname,
   customTemplate: `${__dirname}/freeLegalAdvice.njk`,
   beforeRedirect: async req => {
@@ -27,7 +28,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    caption: 'caption',
     subHeading1: 'subHeading1',
     paragraph1: 'paragraph1',
     listItem1: 'listItem1',
@@ -42,7 +42,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     paragraph4: 'paragraph4',
   },
   getInitialFormData: req => {
-    const existingAnswer = req.res?.locals?.validatedCase?.possessionClaimResponse?.defendantResponses?.freeLegalAdvice;
+    const existingAnswer = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.freeLegalAdvice;
 
     // Map CCD enum to frontend value
     const formValue =

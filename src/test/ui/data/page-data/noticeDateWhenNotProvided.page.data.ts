@@ -2,7 +2,6 @@
 
 export const noticeDateWhenNotProvided = {
   mainHeader: `Notice date`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
   didNotProvideNoticeLabel: () => `${process.env.CLAIMANT_NAME} did not provide the date they served you notice.`,
   getWhenDidYouReceiveNoticeQuestion: () => `When did you receive notice from ${process.env.CLAIMANT_NAME} (optional)?`,

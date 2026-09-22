@@ -6,10 +6,12 @@ jest.mock('../../../../main/modules/steps', () => ({
 jest.mock('../../../../main/services/ccdCaseService', () => ({
   ccdCaseService: {
     getCaseById: jest.fn(),
+    getCaseByIdForEvent: jest.fn(),
     updateDraft: jest.fn(),
   },
 }));
 
+import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import { step } from '../../../../main/steps/respond-to-claim/upload-document';
 
 type UploadDocumentStep = {
@@ -57,8 +59,23 @@ describe('upload-document step', () => {
       );
     });
 
-    it('does not have beforeRedirect - documents saved on upload/delete', () => {
-      expect(testedStep.beforeRedirect).toBeUndefined();
+    it('has a beforeRedirect that triggers the section-completion clear on Continue', () => {
+      expect(typeof testedStep.beforeRedirect).toBe('function');
+    });
+
+    it('has an isAnswered that returns true once defendantDocuments has been touched (undefined → [])', () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const isAnswered = (step as any).isAnswered as (req: unknown) => boolean;
+      const makeReq = (defendantDocuments: unknown) => ({
+        res: { locals: { validatedCase: { defendantResponses: { defendantDocuments } } } },
+      });
+
+      // Fresh case — field absent: not answered.
+      expect(isAnswered(makeReq(undefined))).toBe(false);
+      // Citizen submitted without uploading: empty array is the "touched" marker.
+      expect(isAnswered(makeReq([]))).toBe(true);
+      // Citizen has uploaded at least one document.
+      expect(isAnswered(makeReq([{ id: 'doc-1' }]))).toBe(true);
     });
 
     it('carries a documentStorage adapter with read, readFresh, save', () => {
@@ -142,6 +159,39 @@ describe('upload-document step', () => {
     it('handles missing validatedCase gracefully', async () => {
       const result = await testedStep.getInitialFormData({ res: { locals: {} }, session: {}, params: {} });
       expect(result).toEqual({ documents: [] });
+    });
+  });
+
+  describe('documentStorage.readFresh', () => {
+    it('passes req.session.clientContext into ccdCaseService.getCaseByIdForEvent', async () => {
+      const mockGetCaseByIdForEvent = ccdCaseService.getCaseByIdForEvent as jest.Mock;
+      mockGetCaseByIdForEvent.mockResolvedValue({
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: {
+              defendantDocuments: [{ id: 'doc-1', value: {} }],
+            },
+          },
+        },
+      });
+
+      const clientContext = { selectedPartyId: 'party-123' };
+      const req = {
+        params: { caseReference: '1234567890123456' },
+        session: { user: { accessToken: 'test-token' }, clientContext },
+      } as unknown as Request;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const storage = (step as any).documentStorage;
+      const docs = await storage.readFresh(req);
+
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(
+        'test-token',
+        '1234567890123456',
+        'respondPossessionClaim',
+        clientContext
+      );
+      expect(docs).toEqual([{ id: 'doc-1', value: {} }]);
     });
   });
 });

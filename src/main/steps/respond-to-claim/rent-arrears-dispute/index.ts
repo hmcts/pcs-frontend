@@ -1,12 +1,16 @@
 import type { Request } from 'express';
 
 import { currency } from '../../../modules/nunjucks/filters/currency';
-import { getTranslationFunction } from '../../../modules/steps';
+import { getTranslation, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, penceToPounds, poundsToPence, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
+import { getRentStatementDocumentInfo, resolveStepDocumentId } from '../utils/stepDocumentUtils';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+
+export { getRentStatementDocumentInfo };
 
 // Validation constants
 const MAX_RENT_ARREARS_AMOUNT = 1_000_000_000; // £1 billion maximum
@@ -14,11 +18,12 @@ const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 d
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'rent-arrears-dispute',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.rentArrearsAmountConfirmation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'captionHeading',
+    rentStatementDocumentLinkText: 'rentStatementDocumentLinkText',
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
@@ -46,7 +51,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     await saveDraftDefendantResponse(req, response);
   },
   getInitialFormData: (req: Request) => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const response = caseData?.possessionClaimResponse?.defendantResponses;
     const formValue = fromYesNoNotSureEnum(response?.rentArrearsAmountConfirmation);
 
@@ -63,27 +68,33 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return formData;
   },
-  extendGetContent: (req: Request) => {
+  extendGetContent: async (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
     const amountInPence = (caseData?.rentArrears_Total as string | number) || 0;
     const amountInPounds = typeof amountInPence === 'string' ? parseFloat(amountInPence) / 100 : amountInPence / 100;
     const rentArrearsAmount = currency(amountInPounds);
 
-    const t = getTranslationFunction(req, 'rent-arrears-dispute', ['common']);
+    const t = getTranslationFunction(req);
 
-    const insetIntroText = t('insetIntroText');
-    const insetDetailsText = t('insetDetailsText', { claimantName });
-    const insetConditionalYesText = t('insetConditionalYesText');
+    const insetIntroText = getTranslation(t, 'insetIntroText', '') ?? '';
+    const insetDetailsText = getTranslation(t, 'insetDetailsText', '', { claimantName }) ?? '';
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
+
+    const documentId = await resolveStepDocumentId(req, getRentStatementDocumentInfo, 'rentArrearsDispute');
+    const rentStatementDocument = documentId ? { id: documentId } : '';
+
+    const release12Enabled = isRelease12Enabled(req);
+
     return {
       insetIntroText,
       insetDetailsText,
-      insetConditionalYesText,
       amountOwedHeading,
       rentArrearsAmount,
       rentArrearsAmountCorrection,
+      rentStatementDocument,
+      isRelease12Enabled: release12Enabled,
     };
   },
   fields: [

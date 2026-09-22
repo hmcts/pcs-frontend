@@ -1,0 +1,9 @@
+{
+  "pageTitle": "Payment unsuccessful",
+  "yourPaymentWasUnsuccessful": "Your payment was unsuccessful",
+  "whatHappensNext": "What happens next",
+  "youCanTryToMakeACardPayment": "You can try to <a href=\"{{ payForYourApplicationUrl }}\" class=\"govuk-link\">make a card payment</a> again.",
+  "buttons": {
+    "closeAndReturnToCaseOverview": "Close and return to case overview"
+  }
+}

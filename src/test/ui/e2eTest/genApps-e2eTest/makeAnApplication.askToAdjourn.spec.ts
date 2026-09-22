@@ -1,14 +1,16 @@
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
+import { dashboard } from '../../data/page-data';
 import {
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   askToAdjournTheCourtHearing,
   checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
-  doYouWantToUploadDocumentToSupportYourApplication,
+  doYouWantToUploadDocumentsToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
+  paymentDetails,
   uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
@@ -24,15 +26,19 @@ test.beforeEach(async ({ page }) => {
   FieldsStore.clear();
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadDefault });
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
-  await performAction(
-    'navigateToUrl',
-    home_url + `/case/${process.env.CASE_NUMBER}/make-an-application/choose-an-application`
-  );
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', {
+    caseNumber: process.env.CASE_NUMBER,
+    defendantDetailsKnown: false,
+  });
+  await performValidation('mainHeader', dashboard.mainHeader);
+  await performAction('clickLink', dashboard.askTheCourtToMakeAnOrderLink);
+  await performValidation('mainHeader', chooseAnApplication.mainHeader);
 });
 
 test.afterEach(async () => {
@@ -40,7 +46,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Make an Application - e2e Journey @nightly', async () => {
-  test('Select an Application - Ask to Adjourn journey - Court hearing in 14 days[Yes] @regression @smoke', async () => {
+  test('Select an Application - Ask to Adjourn journey - Court hearing in 14 days[Yes] @regression @smoke @healthCheck', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.adjournTheHearingRadioOption,
@@ -73,12 +79,12 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
       input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
     });
-    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
-    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.yesRadioOption);
-    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
+    await performAction('confirmDocumentToUpload', {
+      question: doYouWantToUploadDocumentsToSupportYourApplication.doYouWantToUploadDocumentQuestion,
+      option: doYouWantToUploadDocumentsToSupportYourApplication.yesRadioOption,
+    });
     await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
-    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
+    await performAction('uploadFilesGenApps', { files: ['genApps.ppt'] });
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
@@ -99,9 +105,11 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: checkYourAnswersGenApps.yourFullNameTextLabel,
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
+    await performAction('verifyApplicationSubmitted');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 
-  test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No] @regression', async () => {
+  test('Select an Application - Ask to Adjourn journey - Court hearing 14 days[No]', async () => {
     await performAction('chooseAnApplication', {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.adjournTheHearingRadioOption,
@@ -129,10 +137,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
       input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
     });
-    await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
-    await performAction('clickRadioButton', doYouWantToUploadDocumentToSupportYourApplication.noRadioOption);
-    await performAction('clickButton', doYouWantToUploadDocumentToSupportYourApplication.continueButton);
-    await performValidation('mainHeader', whichLanguageDidYouUseToCompleteThisService.mainHeader);
+    await performAction('confirmDocumentToUpload', {
+      question: doYouWantToUploadDocumentsToSupportYourApplication.doYouWantToUploadDocumentQuestion,
+      option: doYouWantToUploadDocumentsToSupportYourApplication.noRadioOption,
+    });
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
@@ -152,5 +160,31 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: checkYourAnswersGenApps.yourFullNameTextLabel,
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
+    await performAction('payForApplication');
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputPaymentDetails', {
+      question: paymentDetails.mainHeader,
+      cardNumberLabel: paymentDetails.cardNumberTextLabel,
+      cardNumber: paymentDetails.cardNumberTextInput,
+      monthLabel: paymentDetails.monthTextLabel,
+      month: paymentDetails.monthTextInput,
+      yearLabel: paymentDetails.yearTextLabel,
+      year: paymentDetails.yearTextInput,
+      nameOnCardLabel: paymentDetails.nameOnCardTextLabel,
+      nameOnCard: paymentDetails.nameOnCardTextInput,
+      cardSecurityCodeLabel: paymentDetails.cardSecurityCodeTextLabel,
+      cardSecurityCode: paymentDetails.cardSecurityCodeTextInput,
+      addressLine1Label: paymentDetails.addressLine1TextLabel,
+      addressLine1: paymentDetails.addressLine1TextInput,
+      townOrCityLabel: paymentDetails.townOrCityTextLabel,
+      townOrCity: paymentDetails.townOrCityTextInput,
+      postcodeLabel: paymentDetails.postcodeTextLabel,
+      postcode: paymentDetails.postcodeTextInput,
+      emailLabel: paymentDetails.emailTextLabel,
+      email: paymentDetails.emailTextInput,
+    });
+    await performAction('confirmPayment');
+    await performAction('verifyApplicationSubmitted');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 });

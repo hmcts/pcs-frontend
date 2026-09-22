@@ -43,7 +43,6 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
 const t = ((key: string) => {
   const translations: Record<string, string> = {
     pageTitle: 'Instalment payments',
-    caption: 'Respond to a property possession claim',
     heading: 'Instalment offer',
     paragraph1: 'Paragraph one',
     paragraph2: 'Paragraph two',
@@ -65,7 +64,7 @@ const t = ((key: string) => {
     contactUsForHelp: 'Contact us for help',
     contactUsForHelpText: 'You can contact us for help.',
   };
-  return translations[key] || key;
+  return key in translations ? translations[key] : key;
 }) as unknown as (key: string, options?: unknown) => string;
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';

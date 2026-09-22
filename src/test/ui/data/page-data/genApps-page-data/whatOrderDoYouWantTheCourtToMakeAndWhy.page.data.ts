@@ -15,7 +15,7 @@ export const whatOrderDoYouWantTheCourtToMakeAndWhy = {
   errorValidationField: {
     errorTextField: [
       { type: 'empty', input: 'EMPTY', errMessage: 'Confirm the order you want the court to make, and why' },
-      { type: 'moreThanMax', input: 6900, errMessage: 'Must be 6800 characters or fewer' },
+      { type: 'moreThanMax', input: 6900, errMessage: 'Must be 6800 characters or less' },
     ],
   },
 };

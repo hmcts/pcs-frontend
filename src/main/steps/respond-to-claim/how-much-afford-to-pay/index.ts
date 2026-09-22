@@ -6,6 +6,8 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'how-much-afford-to-pay',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.additionalRentContribution),
   stepDir: __dirname,
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
@@ -33,12 +35,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
     heading: 'heading',
   },
   getInitialFormData: req => {
     const paymentAgreement =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
     const amountInPounds = penceToPounds(paymentAgreement?.additionalRentContribution as string | number | undefined);
     const installmentFrequency = paymentAgreement?.additionalContributionFrequency;
 
@@ -60,7 +61,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         label: 'amountQuestion',
         hint: 'amountHint',
       },
-      labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
+      labelClasses: 'govuk-label--m govuk-!-font-weight-bold',
       errorMessage: 'errors.installmentAmount',
       validator: value => {
         const amountString = String(value).trim();
@@ -90,7 +91,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         label: 'frequencyQuestion',
       },
       errorMessage: 'errors.installmentFrequency',
-      legendClasses: 'govuk-fieldset__legend--m govuk-!-font-size-19',
+      legendClasses: 'govuk-fieldset__legend--m govuk-!-font-size-24',
       options: [
         { value: 'weekly', translationKey: 'frequencyOptions.weekly' },
         { value: 'every2Weeks', translationKey: 'frequencyOptions.every2Weeks' },

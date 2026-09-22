@@ -1,3 +1,5 @@
+import { normalizeYesNoValue } from '../../utils';
+
 import type { HouseholdCircumstances, PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export function normaliseHouseholdFinance(response: PossessionClaimResponse): void {
@@ -7,14 +9,27 @@ export function normaliseHouseholdFinance(response: PossessionClaimResponse): vo
   }
 
   // Defendant declined to share finance details → entire finance branch is skipped
-  if (hc.shareIncomeExpenseDetails !== 'YES') {
+  if (normalizeYesNoValue(hc.shareIncomeExpenseDetails) !== 'YES') {
     dropEntireFinanceBranch(hc);
     return;
   }
 
-  // Universal credit not claimed → UC application date is not asked
-  if (hc.universalCredit !== 'YES') {
+  // Already on Universal Credit → "have-you-applied-for-universal-credit" page is skipped
+  if (normalizeYesNoValue(hc.universalCredit) === 'YES') {
+    delete hc.hasAppliedForUniversalCredit;
     delete hc.ucApplicationDate;
+  }
+
+  // Defendant didn't apply for Universal Credit → application date isn't asked
+  if (normalizeYesNoValue(hc.hasAppliedForUniversalCredit) !== 'YES') {
+    delete hc.ucApplicationDate;
+  }
+
+  // No priority debts → priority-debt-details page is skipped
+  if (normalizeYesNoValue(hc.priorityDebts) !== 'YES') {
+    delete hc.debtTotal;
+    delete hc.debtContribution;
+    delete hc.debtContributionFrequency;
   }
 }
 
@@ -28,12 +43,17 @@ const dropEntireFinanceBranch = (hc: HouseholdCircumstances): void => {
   delete hc.universalCredit;
   delete hc.universalCreditAmount;
   delete hc.universalCreditFrequency;
+  delete hc.hasAppliedForUniversalCredit;
   delete hc.ucApplicationDate;
   delete hc.otherBenefits;
   delete hc.otherBenefitsAmount;
   delete hc.otherBenefitsFrequency;
   delete hc.moneyFromElsewhere;
   delete hc.moneyFromElsewhereDetails;
+  delete hc.priorityDebts;
+  delete hc.debtTotal;
+  delete hc.debtContribution;
+  delete hc.debtContributionFrequency;
   delete hc.householdBills;
   delete hc.loanPayments;
   delete hc.childSpousalMaintenance;

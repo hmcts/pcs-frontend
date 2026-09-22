@@ -10,7 +10,13 @@ import type {
   FormFieldConfig,
   FormFieldOption,
 } from '@modules/steps/formBuilder/formFieldConfig.interface';
-import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
+import {
+  ACCEPT_ATTRIBUTE_EXTENSIONS,
+  UPLOAD_MAX_FILENAME_LENGTH,
+  UPLOAD_MAX_FILE_SIZE_MB,
+  UPLOAD_MAX_MEDIA_FILE_SIZE_MB,
+  formatSizeForDisplay,
+} from '@utils/documentUploadValidation';
 
 function createFieldsetLegend(
   label: string,
@@ -102,7 +108,12 @@ export function buildComponentConfig({
     id: field.name,
     name: field.name,
     label: { text: label, classes: field.labelClasses },
-    hint: hint ? { text: hint } : null,
+    hint: hint
+      ? {
+          ...(hint.includes('<') ? { html: hint } : { text: hint }),
+          ...(field.hintClasses ? { classes: field.hintClasses } : {}),
+        }
+      : null,
     errorMessage: hasError && errorText ? { text: errorText } : null,
     classes: field.classes || (field.type === 'text' ? 'govuk-!-width-three-quarters' : undefined),
     attributes: field.attributes || {},
@@ -115,6 +126,12 @@ export function buildComponentConfig({
       component.value = (fieldValue as string) || '';
       if (field.prefix) {
         component.prefix = field.prefix;
+      }
+      if (field.formGroupClasses) {
+        component.formGroup = {
+          classes: field.formGroupClasses,
+          attributes: {},
+        };
       }
       if (field.suffix) {
         component.suffix = field.suffix;
@@ -129,6 +146,18 @@ export function buildComponentConfig({
       component.maxlength = field.maxLength || null;
       component.attributes = textareaAttributes;
       componentType = 'textarea';
+      break;
+    }
+    case 'select': {
+      const selectValue = (fieldValue as string) || '';
+      component.value = selectValue;
+      component.items =
+        field.options?.map((option, optionIndex) => ({
+          value: option.value,
+          text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
+          selected: selectValue === option.value,
+        })) || [];
+      componentType = 'select';
       break;
     }
     case 'character-count': {
@@ -195,12 +224,20 @@ export function buildComponentConfig({
       component.value = fieldValue || [];
       component.accept = field.accept || ACCEPT_ATTRIBUTE_EXTENSIONS;
       component.maxFileSize = field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB;
+      component.maxMediaMB = UPLOAD_MAX_MEDIA_FILE_SIZE_MB;
+      component.maxFilenameLength = UPLOAD_MAX_FILENAME_LENGTH;
       component.uploadUrl = field.uploadUrl || '';
       component.deleteUrl = field.deleteUrl || '';
       component.classes = field.classes || 'govuk-file-upload';
       component.errorWrongType = t('common:errors.documentUpload.wrongFileTypeDocStore');
       component.errorFileTooLarge = t('common:errors.documentUpload.fileTooLargeDocStore', {
-        maxSize: String(field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB),
+        maxSize: formatSizeForDisplay(field.maxFileSize ?? UPLOAD_MAX_FILE_SIZE_MB),
+      });
+      component.errorFileTooLargeMedia = t('common:errors.documentUpload.fileTooLargeMedia', {
+        maxSize: formatSizeForDisplay(UPLOAD_MAX_MEDIA_FILE_SIZE_MB),
+      });
+      component.errorFilenameTooLong = t('common:errors.documentUpload.filenameTooLong', {
+        maxLength: String(UPLOAD_MAX_FILENAME_LENGTH),
       });
       component.errorDelete = t('common:errors.documentUpload.fileDeleteFailed');
       component.errorSummaryTitle = t('common:errors.documentUpload.errorSummaryTitle');

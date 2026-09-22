@@ -9,7 +9,7 @@ import { LanguageDetector, handle as i18nextHandle } from 'i18next-http-middlewa
 import { z } from 'zod';
 import { makeZodI18nMap } from 'zod-i18n-map';
 
-import { pluralPossessive } from './formatters';
+import { ordinalDate, pluralPossessive } from './formatters';
 
 import { Logger } from '@modules/logger';
 
@@ -167,7 +167,7 @@ function createI18nextConfig(localesDir: string, namespaces: string[]): InitOpti
     debug: false,
     saveMissing: false,
     interpolation: { escapeValue: false },
-    returnEmptyString: false,
+    returnEmptyString: true,
   };
 }
 
@@ -209,6 +209,7 @@ export class I18n {
       });
 
     pluralPossessive(i18next);
+    ordinalDate(i18next);
 
     app.use(i18nextHandle(i18next));
 

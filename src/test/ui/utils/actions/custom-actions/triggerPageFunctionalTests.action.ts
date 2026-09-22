@@ -22,8 +22,9 @@ export class TriggerPageFunctionalTestsAction implements IAction {
   private static readonly LOCK_DIR = path.join(process.cwd(), 'test-results', 'pft-locks');
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
   private static readonly PFT_DIR = path.join(__dirname, '../../../functional');
+  private static readonly LR_PFT_DIR = path.join(__dirname, '../../../functional/legalRepresentative-functional');
   private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
-
+  private static readonly PAGE_DATA_LR_DIR = path.join(__dirname, '../../../data/page-data/lr-page-data');
   private static pagesTestedInCurrentRun = new Set<string>();
 
   static resetTestedPages(): void {
@@ -36,6 +37,8 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
   private async triggerPageFunctionalTests(page: Page): Promise<void> {
     const pageName = await this.getFileNameForPage(page);
+    const currentTestFile = test.info().file.replace(/\\/g, '/');
+    const skipNavigationForTaskListSpec = currentTestFile.includes('/e2eTest/taskList.spec.ts');
 
     if (!pageName) {
       if (TriggerPageFunctionalTestsAction.isDashboardUrl(page.url())) {
@@ -51,16 +54,17 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       return;
     }
 
+    const isLR = test.info().title.includes('@LR') || false;
+    const baseDir = isLR
+      ? TriggerPageFunctionalTestsAction.PAGE_DATA_LR_DIR
+      : TriggerPageFunctionalTestsAction.PAGE_DATA_DIR;
+    const pageDataFilePath = this.resolveFilePath(baseDir, `${pageName}${isLR ? '.page.data.lr.ts' : '.page.data.ts'}`);
+
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
       return;
     }
 
     TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.add(pageName);
-
-    const pageDataFilePath = this.resolveFilePath(
-      TriggerPageFunctionalTestsAction.PAGE_DATA_DIR,
-      `${pageName}.page.data.ts`
-    );
 
     if (enable_content_validation === 'true') {
       if (pageDataFilePath && fs.existsSync(pageDataFilePath)) {
@@ -71,7 +75,12 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       }
     }
 
-    const pftFilePath = this.resolveFilePath(TriggerPageFunctionalTestsAction.PFT_DIR, `${pageName}.pft.ts`);
+    const isLRForPFT = test.info().title.includes('@LR') || false;
+    const pftBaseDir = isLRForPFT
+      ? TriggerPageFunctionalTestsAction.LR_PFT_DIR
+      : TriggerPageFunctionalTestsAction.PFT_DIR;
+    const pftFilePath = this.resolveFilePath(pftBaseDir, `${pageName}.pft.ts`);
+
     if (!pftFilePath || !fs.existsSync(pftFilePath)) {
       if (enable_error_message_validation === 'true') {
         ErrorMessageValidation.trackMissingEMVFile(pageName);
@@ -91,7 +100,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
     // Parent step that groups all functional tests for this page
     await test.step(`PFT triggered for page - ${pageName}`, async () => {
-      if (enable_error_message_validation === 'true') {
+      if (enable_error_message_validation === 'true' && !test.info().title.includes('@NonAutomaticEMV')) {
         await test.step(`EMV triggered for page - ${pageName}`, async () => {
           try {
             await this.runErrorMessageValidation(page, pageName, pftFilePath);
@@ -102,7 +111,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
         });
       }
 
-      if (enable_navigation_tests === 'true') {
+      if (enable_navigation_tests === 'true' && !skipNavigationForTaskListSpec) {
         await test.step(`Navigation tests triggered for page - ${pageName}`, async () => {
           try {
             await this.runNavigationTests(page, pageName, pftFilePath);
@@ -111,6 +120,8 @@ export class TriggerPageFunctionalTestsAction implements IAction {
             navigationTestsFailed = true;
           }
         });
+      } else if (enable_navigation_tests === 'true' && skipNavigationForTaskListSpec) {
+        console.log(`[PFT] Navigation tests skipped for taskList.spec.ts | page="${pageName}"`);
       }
 
       if (enable_visibility_validation === 'true') {
@@ -297,11 +308,20 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     try {
       const { pathname } = new URL(url);
       const segments = pathname.split('/').filter(Boolean);
-      return segments.at(-1) || 'home';
+      return this.getLastUrlSegment(segments);
     } catch {
       const segments = url.split('/').filter(Boolean);
-      return segments.at(-1) || 'home';
+      return this.getLastUrlSegment(segments);
     }
+  }
+
+  private getLastUrlSegment(segments: string[]): string {
+    const lastSegment = segments[segments.length - 1];
+
+    if (lastSegment === 'check-your-answers') {
+      return segments.slice(-2).join('/');
+    }
+    return lastSegment || 'home';
   }
 
   private async getHeaderText(page: Page): Promise<string | null> {

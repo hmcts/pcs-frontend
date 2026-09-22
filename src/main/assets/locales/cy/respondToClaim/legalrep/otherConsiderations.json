@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Unrhyw beth arall i'w ddweud",
+  "heading": "Ystyriaethau eraill",
+  "question": "Oes yna unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fel rhan o'u hymateb?",
+  "otherConsiderationsDetailsLabel": "Rhowch fanylion beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys",
+  "errors": {
+    "otherConsiderations": "Dewiswch os oes unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys",
+    "otherConsiderationsDetails": "Rhowch fanylion yr hyn mae'r diffynnydd am ei ddweud wrth y llys",
+    "otherConsiderationsInvalid": "Rhowch fanylion beth arall mae'r diffynnydd am ei ddweud wrth y llys, ac rhaid iddo gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod",
+    "otherConsiderationsDetailsMaxLength": "Rhaid i fanylion am beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fod yn 6400 o nodau neu lai"
+  }
+}

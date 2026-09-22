@@ -1,0 +1,10 @@
+{
+  "pageTitle": "Incwm a chostau",
+  "infoParagraph1": "Gall barnwr ddefnyddio manylion am incwm a chostau'r diffynnydd i ddod i benderfyniad ar eu hachos, a hefyd i benderfynu faint y gallent fforddio ei ad-dalu os oes ganddynt ôl-ddyledion rhent.",
+  "infoParagraph2": "Mae darparu manylion am incwm a threuliau'r diffynnydd yn ddewisol.",
+  "infoParagraph3": "Bydd yr hawlydd yn gallu gweld atebion y diffynnydd.",
+  "question": "Ydy'r diffynnydd eisiau rhoi manylion eu hincwm a threuliau?",
+  "errors": {
+    "provideFinanceDetails": "Dewiswch a yw'r diffynnydd eisiau rhoi manylion eu hincwm a threuliau"
+  }
+}

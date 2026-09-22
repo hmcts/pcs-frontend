@@ -67,19 +67,43 @@ describe('resolveDashboardTemplates', () => {
         body: 'Case ref in body: 999',
       });
     });
+
+    it('parses feeAmount as a number and includes payCounterclaimFeeUrl for unpaid counterclaim notification', () => {
+      const t = jest.fn((key: string, opts?: Record<string, unknown>) => {
+        if (key === 'dashboard:notifications.Defendant.CounterClaimFeeUnpaid.title') {
+          return 'Your response';
+        }
+        if (key === 'dashboard:notifications.Defendant.CounterClaimFeeUnpaid.body') {
+          return `Fee ${String(opts?.feeAmount)} link ${String(opts?.payCounterclaimFeeUrl)}`;
+        }
+        return MISSING;
+      }) as unknown as TFunction;
+
+      expect(resolveNotification(t, 'Defendant.CounterClaimFeeUnpaid', { feeAmount: '404.00' }, '1234')).toEqual({
+        title: 'Your response',
+        body: 'Fee 404 link /case/1234/respond-to-claim/counter-claim-application-fee-amount?from=dashboard',
+      });
+      expect(t).toHaveBeenCalledWith(
+        'dashboard:notifications.Defendant.CounterClaimFeeUnpaid.body',
+        expect.objectContaining({
+          feeAmount: 404,
+          payCounterclaimFeeUrl: '/case/1234/respond-to-claim/counter-claim-application-fee-amount?from=dashboard',
+        })
+      );
+    });
   });
 
   describe('resolveTask', () => {
     it('returns null when task title key is missing', () => {
       const t = createT({});
-      expect(resolveTask(t, 'Defendant.MissingTask')).toBeNull();
+      expect(resolveTask(t, 'MissingTask')).toBeNull();
     });
 
     it('returns title when task translation exists', () => {
       const t = createT({
-        'dashboard:tasks.Defendant.ViewClaim.title': 'View the claim',
+        'dashboard:tasks.ViewClaim.title': 'View the claim',
       });
-      expect(resolveTask(t, 'Defendant.ViewClaim')).toEqual({ title: 'View the claim' });
+      expect(resolveTask(t, 'ViewClaim')).toEqual({ title: 'View the claim' });
     });
   });
 });

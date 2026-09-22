@@ -1,0 +1,16 @@
+{
+  "pageTitle": "Access your case",
+  "description": "Access and manage your case using your claim number and access code. These will be in the letter, email or pack sent by the court.",
+  "claimNumber": {
+    "label": "Enter your claim number",
+    "hint": "This is a 16-digit number"
+  },
+  "accessCode": {
+    "label": "Enter your access code",
+    "hint": "This has 12 characters"
+  },
+  "errorPrefix": "Error:",
+  "errors": {
+    "respondToClaimUnavailable": "The option to respond to a claim is not available at the moment."
+  }
+}

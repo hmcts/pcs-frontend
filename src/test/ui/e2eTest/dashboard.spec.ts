@@ -1,7 +1,20 @@
-import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import { dashboard } from '../data/page-data';
+import {
+  citizenCreateGenAppApiData,
+  createCaseApiData,
+  respondPossessionClaimApiData,
+  submitCaseApiData,
+} from '../data/api-data';
+import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
+import { dashboard } from '../data/index.selector';
+import {
+  counterClaimApplicationFeeAmount,
+  counterClaimPaymentSuccessful,
+  paymentDetails,
+  responseSubmittedCounterclaimFeePaymentNeeded,
+  taskList,
+} from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
-import { uploadAdditionalDocuments } from '../data/page-data/documents-page-data';
+import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-page-data';
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
@@ -13,56 +26,253 @@ const home_url = process.env.TEST_URL;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
-  process.env.NOTICE_SERVED = 'NO';
+  await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-enabled');
+  process.env.NOTICE_SERVED = 'YES';
   process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
-  await performAction('navigateToUrl', home_url + `/dashboard/${process.env.CASE_NUMBER}`);
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
+  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
 });
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
-  test('Validate address, case number and links on the dashboard @regression', async () => {
+  test('Validate address, case number and links on the dashboard @smoke @regression @crossbrowser @healthCheck', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
-    await performValidation('text', { elementType: 'subHeader', text: dashboard.iWantToHeader });
     await performActions(
       'Validate I want to... links',
-      ['clickLinkAndVerifySameTabTitle', dashboard.askTheCourtToMakeAnOrderLink, chooseAnApplication.mainHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.uploadAdditionalDocumentsLink, uploadAdditionalDocuments.mainHeader]
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.iWantToHeader,
+          fieldName: dashboard.askTheCourtToMakeAnOrderLink,
+          header: chooseAnApplication.mainHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.iWantToHeader,
+          fieldName: dashboard.uploadAdditionalDocumentsLink,
+          header: startEvidenceUpload.mainHeader,
+        },
+      ]
     );
-    await performValidation('text', { elementType: 'subHeader', text: dashboard.helpAndSupportHeader });
     await performActions(
       'Validate Help and Support links',
-      ['clickLinkAndVerifySameTabTitle', dashboard.helpWithFeesLink, dashboard.getHelpPayingCourtFeesHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.whatToExpectAtHearingLink, dashboard.whatToExpectComingCourtHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.representMyselfAtHearingLink, dashboard.representYourselfHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.findLegalAdviceLink, dashboard.findLegalAdviceHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.getDebtRespiteLink, dashboard.breathingSpaceHeader],
-      ['clickLinkAndVerifySameTabTitle', dashboard.findInfoAboutMyCourtLink, dashboard.findACourtOrTribunalHeader]
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.helpWithFeesLink,
+          header: dashboard.getHelpPayingCourtFeesHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.whatToExpectAtHearingLink,
+          header: dashboard.whatToExpectComingCourtHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.representMyselfAtHearingLink,
+          header: dashboard.representYourselfHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.findLegalAdviceLink,
+          header: dashboard.findLegalAdviceHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.getDebtRespiteLink,
+          header: dashboard.breathingSpaceHeader,
+        },
+      ],
+      [
+        'clickLinkAndVerifySameTabTitle',
+        {
+          sectionHeader: dashboard.helpAndSupportHeader,
+          fieldName: dashboard.findInfoAboutMyCourtLink,
+          header: dashboard.findACourtOrTribunalHeader,
+        },
+      ]
     );
     await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.theClaimSubHeader,
       fieldName: dashboard.viewTheClaimLink,
       header: viewTheClaim.mainHeader,
-      sectionHeader: dashboard.theClaimSubHeader,
     });
-    await performValidation('text', { elementType: 'subHeader', text: dashboard.courtHearingSubHeader });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.documentsSubHeader,
+      fieldName: dashboard.uploadAdditionalDocumentsLink,
+      header: startEvidenceUpload.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.documentsSubHeader,
+      fieldName: dashboard.viewDocumentsLink,
+      header: viewDocuments.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.courtHearingSubHeader,
+      fieldName: dashboard.viewHearingDocumentsLink,
+      header: viewHearingDocuments.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.ordersNoticesFromCourtSubHeader,
+      fieldName: dashboard.viewOrdersAndNoticesLink,
+      header: viewOrdersAndNotices.mainHeader,
+    });
+    await performAction('clickLinkAndVerifySameTabTitle', {
+      sectionHeader: dashboard.applicationsSubHeader,
+      fieldName: dashboard.askTheCourtToMakeAnOrderLink,
+      header: chooseAnApplication.mainHeader,
+    });
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
+    await performAction('reloadPage');
+    await performAction('validateViewAllApplications');
+  });
+
+  test('View all applications should be disabled when another defendant has withoutNotice = YES', async () => {
+    await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
+    await performAction('reloadPage');
+    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
+    await performAction('clickLink', 'Sign out');
+    await performAction('createUser', 'citizen', ['citizen']);
+    await performAction('navigateToUrl', home_url);
+    await performAction('login');
+    await performAction('navigateToUrl', home_url + `/access-your-case`);
+    await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER, pinIndex: 1 });
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
+    await performValidation('textNotVisible', {
+      elementType: 'link',
+      text: dashboard.viewAllApplicationsLink,
+    });
+  });
+
+  test('View all applications should be enabled when another defendant has withoutNotice = NO', async () => {
+    await performAction('citizenCreateGenAppAPI', {
+      data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
+    });
+    await performAction('reloadPage');
+    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
+    await performAction('clickLink', 'Sign out');
+    await performAction('createUser', 'citizen', ['citizen']);
+    await performAction('navigateToUrl', home_url);
+    await performAction('login');
+    await performAction('navigateToUrl', home_url + `/access-your-case`);
+    await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER, pinIndex: 1 });
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
+    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
+  });
+
+  test('Validate notification and response status @crossbrowser', async ({ page }) => {
+    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
+    await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
+    await performValidation('text', { elementType: 'subHeader', text: dashboard.yourResponseSubHeader });
+    await performAction('verifyRespondToClaimNotificationAndTag', {
+      notificationText: dashboard.respondToClaimBeforeHearingParagraph,
+      responseLink: dashboard.startYourResponseLink,
+      respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
+      viewResponseHeader: dashboard.viewTheResponseSubHeader,
+      tag: dashboard.notStartedTag,
+      nextPageHeader: taskList.mainHeader,
+    });
+    await performAction('verifyNavigationFromNotificationLink', {
+      responseLink: dashboard.startYourResponseLink,
+      nextPageHeader: taskList.mainHeader,
+    });
+    await performAction('respondPossessionClaimAPI', {
+      data: respondPossessionClaimMidEventApiData.respondPossessionClaimPayload,
+      type: 'midEvent',
+    });
+    await performAction('reloadPage');
+    await performAction('verifyRespondToClaimNotificationAndTag', {
+      notificationText: dashboard.completeClaimBeforeHearingParagraph,
+      responseLink: dashboard.continueYourResponseLink,
+      respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
+      viewResponseHeader: dashboard.viewTheResponseSubHeader,
+      tag: dashboard.inProgressTag,
+    });
+    await performAction('verifyNavigationFromNotificationLink', {
+      responseLink: dashboard.continueYourResponseLink,
+      nextPageHeader: taskList.mainHeader,
+    });
+    await performAction('respondPossessionClaimAPI', {
+      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+      type: 'submit',
+    });
+    await performAction('reloadPage');
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
+    await performAction('clickButton', paymentDetails.confirmPaymentButton);
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
     await performAction(
-      'clickLinkAndVerifySameTabTitle',
-      dashboard.viewHearingDocumentsLink,
-      viewHearingDocuments.mainHeader
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
     );
-    await performValidation('text', { elementType: 'subHeader', text: dashboard.ordersNoticesFromCourtSubHeader });
-    await performAction(
-      'clickLinkAndVerifySameTabTitle',
-      dashboard.viewOrdersAndNoticesLink,
-      viewOrdersAndNotices.mainHeader
-    );
+    for (let i = 0; i < 12; i++) {
+      await performAction('reloadPage');
+      const respondedNotification = page.locator('p.govuk-body', {
+        hasText: String(dashboard.respondedToClaimParagraph),
+      });
+      if (await respondedNotification.isVisible().catch(() => false)) {
+        break;
+      }
+      if (i === 11) {
+        throw new Error(`Notification "${dashboard.respondedToClaimParagraph}" was not visible after 60 seconds`);
+      }
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
+    await performAction('verifyRespondToClaimNotificationAndTag', {
+      notificationText: dashboard.respondedToClaimParagraph,
+      respondToTheClaimHeader: dashboard.respondToTheClaimSubHeader,
+      viewResponseHeader: dashboard.viewTheResponseSubHeader,
+      tag: dashboard.completedTag,
+      viewResponseTag: dashboard.availableTag,
+    });
+  });
+
+  // This test will be skipped until the bugs HDPI-7401 & HDPI-7360 get fixed
+  test.skip('Validate View the response page data @regression @crossbrowser', async () => {
+    await performValidation('mainHeader', dashboard.mainHeader);
+    await performAction('reloadPage');
+    await performAction('respondPossessionClaimAPI', {
+      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+      type: 'both',
+    });
+    await performAction('reloadPage');
+    await performAction('clickButton', dashboard.viewTheResponseSubHeader);
+    await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
+    await performAction('verifyResponseDetailsOnViewTheResponsePage');
+  });
+
+  test('Validate View the claim page data @regression @crossbrowser', async () => {
+    await performAction('clickLink', dashboard.viewTheClaimLink);
+    await performValidation('mainHeader', viewTheClaim.mainHeader);
+    await performAction('verifyClaimDetailsOnViewTheClaimPage');
+    await performValidation('mainHeader', dashboard.mainHeader);
   });
 });

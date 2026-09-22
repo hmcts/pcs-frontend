@@ -1,0 +1,19 @@
+{
+  "pageTitle": "Caledi eithriadol",
+  "introParagraph1": "Gallwch ddefnyddio'r adran hon i egluro unrhyw galedi eithriadol a brofir gan y diffynnydd os gofynnir iddynt adael eu cartref.",
+  "introParagraph2": "",
+  "introParagraph3": "Caiff unrhyw fanylion a ddarperir gan y diffynnydd eu hystyried gan farnwr wrth wneud eu penderfyniad, ond eu dewis nhw yw penderfynu a yw caledi eithriadol yn berthnasol.",
+  "forExample": "Er enghraifft, efallai bod y diffynnydd wedi:",
+  "bullet1": "mynd drwy ysgariad neu wahanu",
+  "bullet2": "colli eu swydd neu wedi cael eu diswyddo",
+  "bullet3": "profi galar neu salwch hirdymor",
+  "bullet4": "cael eu datgan yn fethdalwr",
+  "question": "A fyddai'r diffynnydd yn profi caledi eithriadol os gofynnir iddynt adael eu cartref?",
+  "textAreaLabel": "Rhowch fanylion am y caledi eithriadol y byddai'r diffynnydd yn ei brofi",
+  "errors": {
+    "exceptionalHardship": "Dewiswch a fyddai'r diffynnydd yn profi caledi eithriadol os gofynnir iddynt adael eu cartref",
+    "exceptionalHardshipDetails": "Rhowch fanylion am y caledi eithriadol y byddai'r diffynnydd yn ei brofi",
+    "exceptionalHardshipDetailsInvalidCharacters": "Dylai manylion y caledi eithriadol a brofir gan y diffynnydd ond cynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod",
+    "exceptionalHardshipDetailsMaxLength": "Rhaid i fanylion caledi eithriadol fod yn 500 o nodau neu lai"
+  }
+}

@@ -103,13 +103,14 @@ describe('normaliseHouseholdFinance', () => {
     });
   });
 
-  it('keeps the full finance branch when shareIncomeExpenseDetails is YES and universalCredit is YES', () => {
+  it('drops hasAppliedForUniversalCredit and ucApplicationDate when universalCredit is YES (have-you-applied page is skipped)', () => {
     const response: PossessionClaimResponse = {
       defendantResponses: {
         householdCircumstances: {
           shareIncomeExpenseDetails: 'YES',
           universalCredit: 'YES',
           universalCreditAmount: '1000',
+          hasAppliedForUniversalCredit: 'YES',
           ucApplicationDate: '2024-01-01',
         },
       },
@@ -121,7 +122,51 @@ describe('normaliseHouseholdFinance', () => {
       shareIncomeExpenseDetails: 'YES',
       universalCredit: 'YES',
       universalCreditAmount: '1000',
-      ucApplicationDate: '2024-01-01',
+    });
+  });
+
+  it('drops debt detail fields when priorityDebts is NO (priority-debt-details page is skipped)', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        householdCircumstances: {
+          shareIncomeExpenseDetails: 'YES',
+          priorityDebts: 'NO',
+          debtTotal: '50000',
+          debtContribution: '2000',
+          debtContributionFrequency: 'WEEKLY',
+        },
+      },
+    };
+
+    normaliseHouseholdFinance(response);
+
+    expect(response.defendantResponses?.householdCircumstances).toEqual({
+      shareIncomeExpenseDetails: 'YES',
+      priorityDebts: 'NO',
+    });
+  });
+
+  it('keeps debt detail fields when priorityDebts is YES', () => {
+    const response: PossessionClaimResponse = {
+      defendantResponses: {
+        householdCircumstances: {
+          shareIncomeExpenseDetails: 'YES',
+          priorityDebts: 'YES',
+          debtTotal: '50000',
+          debtContribution: '2000',
+          debtContributionFrequency: 'WEEKLY',
+        },
+      },
+    };
+
+    normaliseHouseholdFinance(response);
+
+    expect(response.defendantResponses?.householdCircumstances).toEqual({
+      shareIncomeExpenseDetails: 'YES',
+      priorityDebts: 'YES',
+      debtTotal: '50000',
+      debtContribution: '2000',
+      debtContributionFrequency: 'WEEKLY',
     });
   });
 
@@ -152,5 +197,31 @@ describe('normaliseHouseholdFinance', () => {
     const afterOnce = JSON.stringify(response);
     normaliseHouseholdFinance(response);
     expect(JSON.stringify(response)).toBe(afterOnce);
+  });
+
+  // CCD's @Primary ObjectMapper echoes YesOrNo PascalCase ("Yes"/"No") since pcs-api
+  // PR #1678. validatedCase is hydrated from that response and re-sent on the next save,
+  // so the normaliser must treat casing variants as equivalent — otherwise the strict
+  // compare would silently wipe persisted finance fields.
+  it('treats PascalCase "Yes" on shareIncomeExpenseDetails the same as "YES"', () => {
+    const response = {
+      defendantResponses: {
+        householdCircumstances: {
+          // Cast simulates BE returning out-of-type casing — the static type is 'YES'/'NO'.
+          shareIncomeExpenseDetails: 'Yes' as 'YES',
+          incomeFromJobs: 'YES',
+          incomeFromJobsAmount: '5000',
+          incomeFromJobsFrequency: 'WEEKLY',
+        },
+      },
+    } as PossessionClaimResponse;
+
+    normaliseHouseholdFinance(response);
+
+    expect(response.defendantResponses?.householdCircumstances).toMatchObject({
+      incomeFromJobs: 'YES',
+      incomeFromJobsAmount: '5000',
+      incomeFromJobsFrequency: 'WEEKLY',
+    });
   });
 });

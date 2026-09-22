@@ -11,12 +11,12 @@ const STEP_NAME = 'tenancy-date-unknown';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.tenancyStartDate),
   stepDir: __dirname,
   customTemplate: `${__dirname}/tenancyDateUnknown.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    caption: 'caption',
     question: 'question',
     hint: 'hint',
     paragraph: 'paragraph',
@@ -36,7 +36,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: req => {
-    const tenancyStartDateRaw = req.res?.locals?.validatedCase?.defendantResponsesTenancyStartDate;
+    const tenancyStartDateRaw = req.res?.locals.validatedCase?.defendantResponsesTenancyStartDate;
 
     if (!tenancyStartDateRaw) {
       return {};
@@ -77,12 +77,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     );
   },
   extendGetContent: async req => {
-    const claimantNameFromValidatedCase = req.res?.locals?.validatedCase?.data?.possessionClaimResponse
+    const claimantNameFromValidatedCase = req.res?.locals.validatedCase?.data?.possessionClaimResponse
       ?.claimantOrganisations?.[0]?.value as string | undefined;
     const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
     const claimantName = claimantNameFromValidatedCase || claimantNameFromSession || 'Treetops Housing';
 
-    const t = getTranslationFunction(req, STEP_NAME, ['common']);
+    const t = getTranslationFunction(req);
     const paragraph = t('paragraph', { claimantName });
 
     return {
