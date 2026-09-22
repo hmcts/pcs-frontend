@@ -19,7 +19,7 @@ export const haveYouAppliedForUniversalCredit = {
   enterTheDateErrorMessage: `Enter the date the defendant applied for Universal Credit`,
   realDateErrorMessage: `The date the defendant applied for Universal Credit must be a real date`,
   dayMissingErrorMessage: `The date the defendant applied for Universal Credit must include a day`,
-  monthMissingErrorMessage: `The date he defendant applied for Universal Credit must include a month`,
-  yearMissingErrorMessage: `The date he defendant applied for Universal Credit must include a year`,
-  futureDateErrorMessage: `The date he defendant applied for Universal Credit must must either be today’s date or in the past`,
+  monthMissingErrorMessage: `The date the defendant applied for Universal Credit must include a month`,
+  yearMissingErrorMessage: `The date the defendant applied for Universal Credit must include a year`,
+  futureDateErrorMessage: `The date the defendant applied for Universal Credit must must either be today’s date or in the past`,
 };
