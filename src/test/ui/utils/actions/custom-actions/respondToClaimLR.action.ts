@@ -51,7 +51,12 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../../../data/page-data/lr-page-data';
-import { formatCurrency, formatPoundsValue, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
+import {
+  extractFrequencyUnit,
+  formatCurrency,
+  formatPoundsValue,
+  formatTextToLowercaseSeparatedBySpace,
+} from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -688,7 +693,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       await performAction('clickRadioButton', frequency);
       selectedRegularIncomeEntries.push([
         this.getRtcCyaChoiceLabel(option),
-        this.buildRtcCyaAmountAndFrequencyValue(value, this.extractFrequencyUnit(String(frequency)), 'received every'),
+        this.buildRtcCyaAmountAndFrequencyValue(value, extractFrequencyUnit(String(frequency)), 'received every'),
       ]);
     }
     this.recordRtcCyaHeadingWithItems(regularIncomeQuestionLabel, selectedRegularIncomeEntries);
@@ -772,7 +777,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
           : this.getRtcCyaChoiceLabel(option);
       selectedRegularExpenseEntries.push([
         mappedCyaLabel,
-        this.buildRtcCyaAmountAndFrequencyValue(value, this.extractFrequencyUnit(String(frequency))),
+        this.buildRtcCyaAmountAndFrequencyValue(value, extractFrequencyUnit(String(frequency))),
       ]);
     }
     this.recordRtcCyaHeadingWithItems(regularExpensesQuestionLabel, selectedRegularExpenseEntries);
