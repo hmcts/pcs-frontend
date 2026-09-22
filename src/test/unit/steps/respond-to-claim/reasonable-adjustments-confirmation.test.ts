@@ -14,6 +14,7 @@ import { step } from '../../../../main/steps/respond-to-claim/reasonable-adjustm
 describe('reasonable-adjustments-confirmation step', () => {
   const testedStep = step as unknown as {
     resolveRedirectAfterPost: (req: Request) => Promise<string | undefined | void>;
+    resolveSaveForLaterRedirect: (req: Request) => Promise<string | undefined | void>;
   };
 
   const reqWith = (origin?: 'dashboard' | 'task-list'): Request =>
@@ -37,6 +38,15 @@ describe('reasonable-adjustments-confirmation step', () => {
 
   it('falls back to the task list when no origin was recorded before submission', async () => {
     await expect(testedStep.resolveRedirectAfterPost(reqWith())).resolves.toBe(
+      '/case/1234123412341234/respond-to-claim/task-list'
+    );
+  });
+
+  it('sends "Save for later" to the same place as "Save and continue"', async () => {
+    await expect(testedStep.resolveSaveForLaterRedirect(reqWith('dashboard'))).resolves.toBe(
+      '/case/1234123412341234/dashboard'
+    );
+    await expect(testedStep.resolveSaveForLaterRedirect(reqWith('task-list'))).resolves.toBe(
       '/case/1234123412341234/respond-to-claim/task-list'
     );
   });

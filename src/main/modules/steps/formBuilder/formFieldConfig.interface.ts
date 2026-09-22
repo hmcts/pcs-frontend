@@ -132,6 +132,9 @@ export interface FormBuilderConfig {
   fields: FormFieldConfig[];
   beforeRedirect?: (req: Request) => Promise<void> | void;
   resolveRedirectAfterPost?: (req: Request) => Promise<string | undefined | void>;
+  // Where "Save for later" goes for this step. Returning nothing keeps the default (the journey's hub
+  // step when it has one, otherwise the dashboard). Legal representatives are still sent to Manage Case.
+  resolveSaveForLaterRedirect?: (req: Request) => Promise<string | undefined | void>;
   beforeGet?: (req: Request) => Promise<void> | void;
   extendGetContent?: ExtendGetContent;
   // Prepopulates form fields from CCD on GET requests (e.g., when user returns to edit their answer).
