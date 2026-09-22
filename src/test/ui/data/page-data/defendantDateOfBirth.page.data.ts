@@ -14,7 +14,6 @@ const randomDOB = getRandomDateOfBirth();
 
 export const defendantDateOfBirth = {
   mainHeader: `What’s your date of birth? (Optional)`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   forExampleParagraph: `For example, 31 3 1980`,
   dayTextLabel: `Day`,
   monthTextLabel: `Month`,

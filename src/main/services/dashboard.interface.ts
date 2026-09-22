@@ -1,3 +1,5 @@
+import { GenAppType } from './ccdCase.interface';
+
 export interface DashboardNotification {
   templateId: string;
   templateValues: {
@@ -11,8 +13,14 @@ export interface DashboardTask {
 }
 
 export interface DashboardTaskGroup {
-  groupId: 'CLAIM' | 'HEARING' | 'JUDGEMENT' | 'NOTICE' | 'RESPONSE' | 'APPLICATIONS';
+  groupId: 'CLAIM' | 'HEARING' | 'JUDGEMENT' | 'NOTICE' | 'RESPONSE' | 'APPLICATIONS' | 'DOCUMENTS';
   tasks: DashboardTask[];
+}
+
+export interface DashboardRelatedApplication {
+  id: string;
+  type: GenAppType;
+  applicationSubmittedDate?: string;
 }
 
 export type TaskStatus = 'AVAILABLE' | 'IN_PROGRESS' | 'COMPLETED' | 'NOT_STARTED' | 'NOT_AVAILABLE';

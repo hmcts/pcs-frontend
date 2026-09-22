@@ -1,6 +1,5 @@
 export const doYouHaveAnyOtherDependants = {
   mainHeader: `Do you have any other dependants?`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   dependantArePeopleParagraph: `Dependants are people you look after financially, like elderly relatives.`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
@@ -13,7 +12,9 @@ export const doYouHaveAnyOtherDependants = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfYouHaveAnyOtherDependantsErrorMessage: `Select if you have any other dependants`,
   giveDetailsAboutYourOtherDependantsErrorMessage: `Give details about your other dependants`,
-  mustBeUnderCharacterLimitErrorMessage: `Must be 500 characters or fewer`,
+  mustBeUnderCharacterLimitErrorMessage: `Other dependants details must be 500 characters or less`,
+  emojiTextInput: `👉 😄`,
+  emojiErrorMessage: `Give details about your other dependants must only include letters a to z, and special characters such as hyphens, spaces and apostrophes`,
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,

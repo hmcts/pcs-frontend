@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Ynglŷn â'ch gwrth-hawliad",
+  "heading": "Ynglŷn â'ch gwrth-hawliad",
+  "infoParagraph1": "Byddwch yn gallu uwchlwytho unrhyw dystiolaeth sydd gennych ar y dudalen nesaf.",
+  "infoParagraph2": "Bydd yr hawlydd yn gallu gweld eich atebion.",
+  "counterClaimForLabel": "Ar gyfer beth mae eich gwrth-hawliad?",
+  "counterClaimReasonsLabel": "Beth yw eich rhesymau dros wneud y gwrth-hawliad?",
+  "errors": {
+    "counterClaimForRequired": "Nodwch ar gyfer beth mae eich gwrth-hawliad",
+    "counterClaimForMaxLength": "Dylai beth mae eich gwrth-hawliad am fod yn 6800 nod neu lai",
+    "counterClaimReasonsRequired": "Nodwch beth yw eich rhesymau dros wneud y gwrth-hawliad",
+    "counterClaimReasonsMaxLength": "Dylai eich rhesymau dros wneud gwrth-hawliad fod yn 6800 nod neu lai"
+  }
+}

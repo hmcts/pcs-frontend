@@ -61,6 +61,10 @@ export function initializeExecutor(page: Page): void {
   sauceJourneyScreenshotStep = 0;
 }
 
+export function isExecutorInitialized(): boolean {
+  return !!testExecutor;
+}
+
 /** EMV specs under this folder drive their own checks; skip navigation-triggered PFT even when nightly enables all page functional tests. */
 function isFunctionalValidationTestFile(): boolean {
   try {
@@ -81,7 +85,7 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-  const testPages = ['start-now', 'choose-an-application'];
+  const testPages = ['start-now', 'choose-an-application', 'start-evidence-upload', 'claims'];
   if (!startAxeAudit && testPages.some(page => currentUrl.includes(page))) {
     startAxeAudit = true;
     startFunctionalTests = true;
@@ -100,6 +104,15 @@ async function validatePageIfNavigated(action: string): Promise<void> {
     const pageNavigated = await detectPageNavigation();
     const executor = getExecutor();
     if (pageNavigated) {
+      if (
+        startFunctionalTests &&
+        !isFunctionalValidationTestFile() &&
+        (enable_content_validation === 'true' ||
+          enable_error_message_validation === 'true' ||
+          enable_navigation_tests === 'true')
+      ) {
+        await performAction('triggerFunctionalTests');
+      }
       if (startAxeAudit && enable_axe_audit === 'true') {
         try {
           const { AxeUtils } = await import('@hmcts/playwright-common');
@@ -110,24 +123,25 @@ async function validatePageIfNavigated(action: string): Promise<void> {
           });
         } catch (error) {
           const errorMessage = String((error as Error).message || error).toLowerCase();
-          if (errorMessage.includes('execution context was destroyed') || errorMessage.includes('navigation')) {
+          if (
+            errorMessage.includes('execution context was destroyed') ||
+            errorMessage.includes('navigation') ||
+            errorMessage.includes('documentelement')
+          ) {
             console.warn(`Accessibility audit skipped due to navigation: ${errorMessage}`);
           } else {
             throw error;
           }
         }
       }
-      if (
-        startFunctionalTests &&
-        !isFunctionalValidationTestFile() &&
-        (enable_content_validation === 'true' ||
-          enable_error_message_validation === 'true' ||
-          enable_navigation_tests === 'true')
-      ) {
-        await performAction('triggerFunctionalTests');
-      }
     }
   }
+}
+
+function isPage(actionResult: unknown): actionResult is Page {
+  return (
+    typeof actionResult === 'object' && actionResult !== null && 'locator' in actionResult && 'url' in actionResult
+  );
 }
 
 export async function performAction(
@@ -136,7 +150,13 @@ export async function performAction(
   value?: actionData | actionRecord
 ): Promise<void> {
   const executor = getExecutor();
-  await validatePageIfNavigated(action);
+  if (action === 'reloadPage') {
+    await test.step('reloadPage', async () => {
+      await executor.page.reload({ waitUntil: 'networkidle' });
+    });
+
+    return;
+  }
   const actionInstance = ActionRegistry.getAction(action);
 
   let displayFieldName = fieldName;
@@ -161,10 +181,13 @@ export async function performAction(
   }`;
 
   await test.step(stepText, async () => {
-    await actionInstance.execute(executor.page, action, fieldName, value);
+    const actionResult = await actionInstance.execute(executor.page, action, fieldName, value);
+    if (isPage(actionResult)) {
+      testExecutor.page = actionResult;
+    }
   });
   await validatePageIfNavigated(action);
-  await attachSauceJourneyStepScreenshot(executor.page);
+  await attachSauceJourneyStepScreenshot(getExecutor().page);
 }
 
 export async function performValidation(

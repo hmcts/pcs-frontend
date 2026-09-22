@@ -244,6 +244,76 @@ describe('componentBuilders', () => {
       });
     });
 
+    describe('select field', () => {
+      it('should build select component with translated options and selected value', () => {
+        const field: FormFieldConfig = {
+          name: 'pbaAccount',
+          type: 'select',
+          options: [{ value: '' }, { value: 'PBA1234567' }],
+        };
+
+        const result = buildComponentConfig(
+          buildArgs(field, {
+            label: 'PBA account',
+            fieldValue: 'PBA1234567',
+            translatedOptions: [
+              { value: '', text: 'Select a PBA account' },
+              { value: 'PBA1234567', text: 'PBA1234567' },
+            ],
+          })
+        );
+
+        expect(result.componentType).toBe('select');
+        expect(result.component).toMatchObject({
+          id: 'pbaAccount',
+          name: 'pbaAccount',
+          label: { text: 'PBA account' },
+          value: 'PBA1234567',
+          items: [
+            { value: '', text: 'Select a PBA account', selected: false },
+            { value: 'PBA1234567', text: 'PBA1234567', selected: true },
+          ],
+        });
+      });
+    });
+
+    it('passes hintClasses onto the GOV.UK hint object for text inputs', () => {
+      const field: FormFieldConfig = {
+        name: 'amount',
+        type: 'text',
+        translationKey: { label: 'amount' },
+        hintClasses: 'govuk-!-margin-bottom-1',
+      };
+
+      const result = buildComponentConfig(
+        buildArgs(field, {
+          hint: 'Enter a number',
+        })
+      );
+
+      expect(result.component.hint).toEqual({
+        text: 'Enter a number',
+        classes: 'govuk-!-margin-bottom-1',
+      });
+    });
+
+    it('falls back to input component type for unknown field types', () => {
+      const field = {
+        name: 'legacy',
+        type: 'postcodeLookup',
+        translationKey: { label: 'legacy' },
+      } as unknown as FormFieldConfig;
+
+      const result = buildComponentConfig(buildArgs(field, { label: 'Legacy input', fieldValue: 'AB1 2CD' }));
+
+      expect(result.componentType).toBe('input');
+      expect(result.component.value).toBeUndefined();
+      expect(result.component.label).toEqual({
+        text: 'Legacy input',
+        classes: undefined,
+      });
+    });
+
     describe('character-count field', () => {
       it('should build character count component with maxlength', () => {
         const field: FormFieldConfig = {

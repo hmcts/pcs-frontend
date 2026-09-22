@@ -14,13 +14,44 @@ jest.mock('../../../../main/services/ccdCaseService', () => ({
 }));
 
 import { ccdCaseService } from '../../../../main/services/ccdCaseService';
-import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../../../main/steps/utils/buildDraftDefendantResponse';
+import { ClientContextHeaders } from '../../../../types/global';
 
 const makeReq = (): Request =>
   ({
     session: { user: { accessToken: 'tok' } },
     res: { locals: { validatedCase: { id: '123', data: {} } } },
   }) as unknown as Request;
+
+describe('buildDraftDefendantResponse — pcqId carry-forward', () => {
+  const reqWith = (possessionClaimResponse: Record<string, unknown>): Request =>
+    ({
+      path: '/case/123/respond-to-claim/free-legal-advice',
+      body: {},
+      res: { locals: { validatedCase: { id: '123', data: { possessionClaimResponse } } } },
+    }) as unknown as Request;
+
+  it('carries an existing pcqId onto every subsequent save', () => {
+    // The backend REPLACEs the defendant slice on each save, so an id dropped here would be wiped
+    // the next time the citizen moves through the journey — and at final submit, which reads this
+    // same draft. The party object is deep-cloned wholesale, so this comes for free.
+    const result = buildDraftDefendantResponse(
+      reqWith({ defendantContactDetails: { party: { firstName: 'Ada', pcqId: 'pcq-abc-123' } } })
+    );
+
+    expect(result.defendantContactDetails.party.pcqId).toBe('pcq-abc-123');
+    expect(result.defendantContactDetails.party.firstName).toBe('Ada');
+  });
+
+  it('does not invent a pcqId when the draft has none', () => {
+    const result = buildDraftDefendantResponse(reqWith({}));
+
+    expect(result.defendantContactDetails.party.pcqId).toBeUndefined();
+  });
+});
 
 describe('saveDraftDefendantResponse wrapper', () => {
   beforeEach(() => {
@@ -42,7 +73,8 @@ describe('saveDraftDefendantResponse wrapper', () => {
       '123',
       {
         possessionClaimResponse: response, // Uses mocked normaliser return
-      }
+      },
+      undefined
     );
   });
 
@@ -66,7 +98,8 @@ describe('saveDraftDefendantResponse wrapper', () => {
       '123',
       {
         possessionClaimResponse: normalisedResponse, // Normalised version sent
-      }
+      },
+      undefined
     );
   });
 
@@ -83,7 +116,28 @@ describe('saveDraftDefendantResponse wrapper', () => {
       { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
       'custom-token',
       'custom-case-id',
-      expect.any(Object)
+      expect.any(Object),
+      undefined
+    );
+  });
+
+  it('extracts calls with client context headers correctly', async () => {
+    const clientContextHeaders: ClientContextHeaders = { selectedPartyId: 'abc' };
+
+    const req = {
+      session: { user: { accessToken: 'custom-token' }, clientContext: clientContextHeaders },
+      res: { locals: { validatedCase: { id: 'custom-case-id', data: {} } } },
+    } as unknown as Request;
+    const response = { defendantResponses: {} };
+
+    await saveDraftDefendantResponse(req, response);
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' },
+      'custom-token',
+      'custom-case-id',
+      expect.any(Object),
+      clientContextHeaders
     );
   });
 
@@ -97,5 +151,209 @@ describe('saveDraftDefendantResponse wrapper', () => {
     await saveDraftDefendantResponse(req, response);
 
     expect(JSON.stringify(response)).toBe(snapshot);
+  });
+
+  it('deep-merges defendantResponses when refreshing validatedCase after draft save', async () => {
+    const req = {
+      session: { user: { accessToken: 'tok' } },
+      res: {
+        locals: {
+          validatedCase: {
+            id: '123',
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: {
+                  writtenTerms: 'NO',
+                  otherConsiderations: 'NO',
+                },
+                claimantOrganisations: [{ value: 'Claimant Ltd' }],
+              },
+            },
+          },
+        },
+      },
+    } as unknown as Request;
+
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValueOnce({
+      id: '123',
+      data: {
+        possessionClaimResponse: {
+          defendantResponses: {
+            exemptLandlord: 'YES',
+          },
+          defendantContactDetails: {
+            party: { phoneNumber: '07123456789' },
+          },
+        },
+      },
+    });
+
+    await saveDraftDefendantResponse(req, {
+      defendantResponses: { exemptLandlord: 'YES', writtenTerms: 'NO' },
+      defendantContactDetails: { party: { phoneNumber: '07123456789' } },
+    });
+
+    expect(req.res?.locals?.validatedCase?.defendantResponses).toEqual({
+      writtenTerms: 'NO',
+      otherConsiderations: 'NO',
+      exemptLandlord: 'YES',
+    });
+    expect(req.res?.locals?.validatedCase?.possessionClaimResponse?.claimantOrganisations).toEqual([
+      { value: 'Claimant Ltd' },
+    ]);
+  });
+});
+
+describe('buildDraftDefendantResponse — any mid-section submission auto-clears section confirmation', () => {
+  const reqFor = (path: string, action: string | undefined, confirmed: string[]): Request =>
+    ({
+      path,
+      body: action === undefined ? {} : { action },
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { completedSections: [...confirmed] },
+              },
+            },
+          },
+        },
+      },
+    }) as unknown as Request;
+
+  it('removes the current step’s section from completedSections on Save for later', () => {
+    const req = reqFor('/case/123/respond-to-claim/defendant-name-confirmation', 'saveForLater', [
+      'PERSONAL_DETAILS',
+      'PAYMENTS',
+    ]);
+    const draft = buildDraftDefendantResponse(req);
+    expect(draft.defendantResponses.completedSections).toEqual(['PAYMENTS']);
+  });
+
+  it('removes the current step’s section from completedSections on Save and continue', () => {
+    const req = reqFor('/case/123/respond-to-claim/defendant-name-confirmation', undefined, [
+      'PERSONAL_DETAILS',
+      'PAYMENTS',
+    ]);
+    const draft = buildDraftDefendantResponse(req);
+    expect(draft.defendantResponses.completedSections).toEqual(['PAYMENTS']);
+  });
+
+  it('is a no-op when the step is not part of any section', () => {
+    const req = reqFor('/case/123/respond-to-claim/task-list', 'saveForLater', ['PERSONAL_DETAILS']);
+    const draft = buildDraftDefendantResponse(req);
+    expect(draft.defendantResponses.completedSections).toEqual(['PERSONAL_DETAILS']);
+  });
+
+  it('is a no-op when the step is a section CYA — the CYA postController owns the flag', () => {
+    const req = reqFor('/case/123/respond-to-claim/check-your-answers-personal-details', 'saveForLater', [
+      'PERSONAL_DETAILS',
+      'PAYMENTS',
+    ]);
+    const draft = buildDraftDefendantResponse(req);
+    expect(draft.defendantResponses.completedSections).toEqual(['PERSONAL_DETAILS', 'PAYMENTS']);
+  });
+});
+
+describe('buildDraftDefendantResponse — carries reasonable-adjustment flags forward', () => {
+  const reqWithFlags = (defendantFlags?: unknown): Request =>
+    ({
+      path: '/case/123/respond-to-claim/task-list',
+      body: {},
+      res: {
+        locals: {
+          validatedCase: {
+            data: {
+              possessionClaimResponse: {
+                defendantResponses: { possessionNoticeReceived: 'YES' },
+                ...(defendantFlags ? { defendantFlags } : {}),
+              },
+            },
+          },
+        },
+      },
+    }) as unknown as Request;
+
+  it('re-sends existing defendantFlags so a later REPLACE-style save does not wipe them', () => {
+    const defendantFlags = {
+      partyName: 'John Doe',
+      roleOnCase: 'Defendant',
+      details: [{ id: 'd1', value: { flagCode: 'RA0042', path: [{ id: 'p1', value: 'Reasonable adjustment' }] } }],
+    };
+
+    const draft = buildDraftDefendantResponse(reqWithFlags(defendantFlags));
+
+    expect(draft.defendantFlags).toEqual(defendantFlags);
+    // deep clone, not the same reference
+    expect(draft.defendantFlags).not.toBe(defendantFlags);
+  });
+
+  it('omits defendantFlags entirely when there are none in the existing draft', () => {
+    const draft = buildDraftDefendantResponse(reqWithFlags());
+    expect('defendantFlags' in draft).toBe(false);
+  });
+});
+
+// HDPI-8866 W05 — the review page posts the draft version it rendered; the save forwards it so pcs-api can check it.
+describe('saveDraftDefendantResponse — reviewed draft version', () => {
+  const reqWithBody = (body: Record<string, unknown>): Request =>
+    ({
+      body,
+      session: { user: { accessToken: 'tok' } },
+      res: { locals: { validatedCase: { id: '123', data: {} } } },
+    }) as unknown as Request;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('forwards the draftVersion posted by the review page as a number', async () => {
+    await saveDraftDefendantResponse(reqWithBody({ draftVersion: '4' }), { defendantResponses: {} });
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      expect.anything(),
+      'tok',
+      '123',
+      { possessionClaimResponse: { defendantResponses: {}, draftVersion: 4 } },
+      undefined
+    );
+  });
+
+  it('omits draftVersion when the form did not post one (ordinary steps)', async () => {
+    await saveDraftDefendantResponse(reqWithBody({}), { defendantResponses: {} });
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      expect.anything(),
+      'tok',
+      '123',
+      { possessionClaimResponse: { defendantResponses: {} } },
+      undefined
+    );
+  });
+
+  it('ignores a draftVersion that is not a whole number', async () => {
+    await saveDraftDefendantResponse(reqWithBody({ draftVersion: 'abc' }), { defendantResponses: {} });
+
+    const [, , , payload] = (ccdCaseService.updateDraft as jest.Mock).mock.calls[0];
+    expect(payload.possessionClaimResponse).not.toHaveProperty('draftVersion');
+  });
+});
+
+describe('saveDraftDefendantResponse — draft version returned by the save', () => {
+  it('carries the version pcs-api echoes into validatedCase so the submit posts it', async () => {
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValueOnce({
+      id: '123',
+      data: { possessionClaimResponse: { defendantResponses: {}, draftVersion: 5 } },
+    });
+    const req = {
+      body: { draftVersion: '4' },
+      session: { user: { accessToken: 'tok' } },
+      res: { locals: { validatedCase: { id: '123', data: { possessionClaimResponse: { draftVersion: 4 } } } } },
+    } as unknown as Request;
+
+    await saveDraftDefendantResponse(req, { defendantResponses: {} });
+
+    expect(req.res?.locals.validatedCase?.data?.possessionClaimResponse?.draftVersion).toBe(5);
   });
 });

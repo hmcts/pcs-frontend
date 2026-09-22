@@ -56,7 +56,7 @@ const ValidateFunctionSchema = z.custom<
 export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
   z.object({
     name: z.string(),
-    type: z.enum(['radio', 'checkbox', 'text', 'date', 'textarea', 'character-count', 'file']),
+    type: z.enum(['radio', 'checkbox', 'text', 'date', 'textarea', 'character-count', 'file', 'select']),
     required: z.union([z.boolean(), RequiredFunctionSchema]).optional(),
     pattern: z.string().optional(),
     maxLength: z.number().optional(),
@@ -64,6 +64,8 @@ export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
     // Label can be string or function
     label: LabelFunctionSchema.optional(),
     labelClasses: z.string().optional(),
+    formGroupClasses: z.string().optional(),
+    hintClasses: z.string().optional(),
     hint: z.string().optional(),
     translationKey: z
       .object({
@@ -77,7 +79,7 @@ export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
     // Pre-processed component configuration for template rendering
     component: z.record(z.string(), z.unknown()).optional(),
     componentType: z
-      .enum(['input', 'textarea', 'characterCount', 'radios', 'checkboxes', 'dateInput', 'fileUpload'])
+      .enum(['input', 'textarea', 'characterCount', 'radios', 'checkboxes', 'dateInput', 'fileUpload', 'select'])
       .optional(),
     // Cross-field validation function
     validate: ValidateFunctionSchema.optional(),

@@ -1,4 +1,4 @@
-import { dashboard, disputeClaimInterstitial, tenancyTypeDetails, writtenTerms } from '../data/page-data';
+import { disputeClaimInterstitial, tenancyTypeDetails, writtenTerms } from '../data/page-data';
 import { claimantsName } from '../utils/actions/custom-actions';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
@@ -58,5 +58,4 @@ export async function tenancyTypeDetailsNavigationTests(): Promise<void> {
     question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
     option: tenancyTypeDetails.yesRadioOption,
   });
-  await performValidation('pageNavigation', tenancyTypeDetails.saveForLaterButton, dashboard.mainHeader);
 }

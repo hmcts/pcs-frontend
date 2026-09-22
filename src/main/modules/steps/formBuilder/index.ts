@@ -7,7 +7,8 @@ import { createGetController } from '../controller';
 import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
-import { getStaticBasePath, resolveFormBuilderFlowConfig } from './flowConfig';
+import { wireFileUploadUrls } from './fileUploadUtils';
+import { getStaticBasePath, getStaticEntryStepId, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
@@ -17,6 +18,37 @@ import type { BuiltFormContent, FormBuilderConfig } from '@modules/steps/formBui
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
+import { type UploadValidationOptions, bytesToMb } from '@utils/documentUploadValidation';
+
+export function applyUploadValidationToComponent(
+  component: Record<string, unknown>,
+  opts: UploadValidationOptions | undefined,
+  t: TFunction
+): void {
+  if (!opts) {
+    return;
+  }
+  if (opts.maxFilenameLength !== undefined) {
+    component.maxFilenameLength = opts.maxFilenameLength;
+    component.errorFilenameTooLong = t('common:errors.documentUpload.filenameTooLong', {
+      maxLength: opts.maxFilenameLength,
+    });
+  }
+  if (opts.maxDocumentBytes !== undefined) {
+    const maxDocumentMB = bytesToMb(opts.maxDocumentBytes);
+    component.maxDocumentMB = maxDocumentMB;
+    component.errorFileTooLargeDocument = t('common:errors.documentUpload.fileTooLargeDocument', {
+      maxSize: maxDocumentMB,
+    });
+  }
+  if (opts.maxMediaBytes !== undefined) {
+    const maxMediaMB = bytesToMb(opts.maxMediaBytes);
+    component.maxMediaMB = maxMediaMB;
+    component.errorFileTooLargeMedia = t('common:errors.documentUpload.fileTooLargeMedia', {
+      maxSize: maxMediaMB,
+    });
+  }
+}
 
 export type { FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
@@ -48,6 +80,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     journeyFolder,
     fields,
     beforeRedirect,
+    resolveRedirectAfterPost,
     beforeGet,
     extendGetContent,
     getInitialFormData,
@@ -58,6 +91,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     customTemplate,
     basePath: configuredBasePath,
     documentStorage,
+    uploadValidation,
+    isAnswered,
   } = config;
 
   if (!flowConfig) {
@@ -67,20 +102,23 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const journeyPath = camelToKebabCase(journeyFolder);
   const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = getStaticBasePath(flowConfig, configuredBasePath || `/steps/${journeyPath}`);
-  const stepNavigation = createStepNavigation(req => resolveFormBuilderFlowConfig(req, flowConfig));
+  const stepNavigation = createStepNavigation(flowConfig);
+  const stepUrl = getStaticEntryStepId(flowConfig) === stepName ? basePath : path.join(basePath, stepName);
 
   return {
-    url: path.join(basePath, stepName),
+    url: stepUrl,
     name: stepName,
     view: viewPath,
     stepDir,
     showCancelButton,
     documentStorage,
+    uploadValidation,
+    isAnswered,
     getController: () => {
       return createGetController(viewPath, stepName, stepNavigation, async req => {
-        await loadStepNamespace(req, stepName, journeyFolder);
+        await loadStepNamespace(req);
 
-        const t: TFunction = getTranslationFunction(req, stepName, ['common']);
+        const t: TFunction = getTranslationFunction(req);
 
         const nunjucksEnv = req.app.locals.nunjucksEnv;
         if (!nunjucksEnv) {
@@ -105,28 +143,32 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           interpolationValues as Record<string, unknown>
         ) as BuiltFormContent;
 
-        // Auto-wire upload/delete URLs for upload steps — identical in every upload step,
-        // so handled once here instead of duplicating extendGetContent on each step.
+        wireFileUploadUrls(formContent, req, documentStorage);
         if (documentStorage) {
-          const urlBase = req.originalUrl.split('?')[0];
           const fileField = formContent.fields?.find(f => f.componentType === 'fileUpload');
           if (fileField?.component) {
-            fileField.component.uploadUrl = `${urlBase}/upload`;
-            fileField.component.deleteUrl = `${urlBase}/delete`;
+            applyUploadValidationToComponent(fileField.component, uploadValidation, t);
           }
         }
 
         const extraContent = extendGetContent ? await extendGetContent(req, formContent) : undefined;
         const result = extraContent ? { ...formContent, ...extraContent } : formContent;
+        const navigationBackUrl = await stepNavigation.getBackUrl(req, stepName);
+        const resultProps = result as Record<string, unknown>;
+        const backUrl = typeof resultProps.backUrl === 'string' ? resultProps.backUrl : navigationBackUrl;
+        const dashboardUrl =
+          typeof resultProps.dashboardUrl === 'string'
+            ? resultProps.dashboardUrl
+            : getDashboardUrl(req.res?.locals.validatedCase?.id);
         return {
           ...result,
           ccdId: req.res?.locals.validatedCase?.id,
           caseReference: req.res?.locals.validatedCase?.id,
-          dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+          dashboardUrl,
           stepName,
           journeyFolder,
           languageToggle: t('languageToggle'),
-          backUrl: await stepNavigation.getBackUrl(req, stepName),
+          backUrl,
           showCancelButton,
           url: req.originalUrl, // Form action URL - POST to current page
         };
@@ -141,7 +183,9 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       beforeRedirect,
       translationKeys,
       showCancelButton,
-      extendGetContent
+      extendGetContent,
+      documentStorage,
+      resolveRedirectAfterPost
     ),
   };
 }

@@ -1,3 +1,4 @@
+import { AxiosError } from 'axios';
 import config from 'config';
 import FormData from 'form-data';
 
@@ -67,18 +68,92 @@ export async function deleteDocument(documentUrl: string, userToken: string): Pr
 export async function getDocumentBinary(
   binaryUrl: string,
   userToken: string
-): Promise<{ stream: NodeJS.ReadableStream; contentType: string }> {
+): Promise<{
+  stream: NodeJS.ReadableStream;
+  contentType: string;
+  contentLength?: string;
+  contentDisposition?: string;
+}> {
   const cdamUrl = getCdamUrl();
   const documentsIndex = binaryUrl.lastIndexOf('/documents');
   const cdamPath = documentsIndex >= 0 ? `/cases${binaryUrl.slice(documentsIndex)}` : binaryUrl;
-  const response = await http.get(`${cdamUrl}${cdamPath}`, {
-    headers: {
-      Authorization: `Bearer ${userToken}`,
-    },
-    responseType: 'stream',
+  const requestUrl = `${cdamUrl}${cdamPath}`;
+
+  logger.debug('Fetching document binary from CDAM', {
+    requestUrl,
+    cdamPath,
+    sourceBinaryUrl: binaryUrl,
   });
 
-  const contentType = (response.headers?.['content-type'] as string) || 'application/octet-stream';
+  let response;
+  try {
+    response = await http.get(requestUrl, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+      responseType: 'stream',
+    });
+  } catch (error) {
+    const axiosError = error as AxiosError;
+    if (axiosError.response?.status === 403) {
+      logger.warn('CDAM returned 403 Forbidden, attempting fallback to direct DM-Store binaryUrl with user token', {
+        requestUrl,
+        binaryUrl,
+      });
+      try {
+        response = await http.get(binaryUrl, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+          responseType: 'stream',
+        });
+        logger.info('Fallback document binary fetch from DM-Store succeeded with user token');
+      } catch (userFallbackError) {
+        logger.warn('DM-Store with user token failed, attempting S2S service fallback', {
+          binaryUrl,
+          userError: (userFallbackError as AxiosError).message,
+        });
+        try {
+          response = await http.get(binaryUrl, {
+            headers: {
+              'user-id': 'pcs-frontend-service',
+              'user-roles': 'caseworker-civil,caseworker-civil-solicitor,pui-case-manager',
+            },
+            responseType: 'stream',
+          });
+          logger.info('S2S service fallback fetch from DM-Store succeeded');
+        } catch (s2sFallbackError) {
+          logger.error('All document binary fetch attempts failed (CDAM, DM-Store user token, DM-Store S2S service)', {
+            requestUrl,
+            binaryUrl,
+            cdamError: axiosError.message,
+            userFallbackError: (userFallbackError as AxiosError).message,
+            s2sFallbackError: (s2sFallbackError as AxiosError).message,
+          });
+          throw error;
+        }
+      }
+    } else {
+      logger.error('CDAM document binary fetch failed', {
+        requestUrl,
+        cdamPath,
+        sourceBinaryUrl: binaryUrl,
+        status: axiosError.response?.status,
+        statusText: axiosError.response?.statusText,
+        errorMessage: axiosError.message,
+      });
+      throw error;
+    }
+  }
 
-  return { stream: response.data as NodeJS.ReadableStream, contentType };
+  const contentType = (response.headers?.['content-type'] as string) || 'application/octet-stream';
+  const contentLength = response.headers?.['content-length'] as string | undefined;
+  const contentDisposition = response.headers?.['content-disposition'] as string | undefined;
+
+  return {
+    stream: response.data as NodeJS.ReadableStream,
+    contentType,
+    contentLength,
+    contentDisposition,
+  };
 }

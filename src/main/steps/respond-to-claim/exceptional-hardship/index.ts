@@ -1,16 +1,18 @@
+import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
-import { getTranslationFunction } from '@modules/steps';
+import { getTranslation, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'exceptional-hardship',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.exceptionalHardship),
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
   },
   fields: [
     {
@@ -35,6 +37,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               attributes: {
                 rows: 5,
               },
+              labelClasses: 'govuk-label--s',
             },
           },
         },
@@ -47,12 +50,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   customTemplate: `${__dirname}/exceptionalHardship.njk`,
   extendGetContent: req => {
-    const t = getTranslationFunction(req, 'exceptional-hardship', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       introParagraph1: t('introParagraph1'),
-      introParagraph2: t('introParagraph2'),
-      introParagraph3: t('introParagraph3'),
+      introParagraph2: getTranslation(t, 'introParagraph2', '') ?? '',
       forExample: t('forExample'),
       bullet1: t('bullet1'),
       bullet2: t('bullet2'),
@@ -88,12 +90,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     );
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const householdCircumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const existingAnswer = householdCircumstances?.exceptionalHardship as string | undefined;
-
-    const mapping: Record<string, string> = { YES: 'yes', NO: 'no' };
-    const exceptionalHardshipValue = existingAnswer ? mapping[existingAnswer] : undefined;
+    // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — fromYesNoEnum handles either casing.
+    const exceptionalHardshipValue = fromYesNoEnum(householdCircumstances?.exceptionalHardship);
 
     if (!exceptionalHardshipValue) {
       return {};

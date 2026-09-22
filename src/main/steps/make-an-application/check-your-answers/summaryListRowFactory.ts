@@ -217,6 +217,27 @@ export function buildSummaryListRows(req: Request, t: TFunction): SummaryListRow
     );
   }
 
+  const uploadedDocuments = visibleFormData.getUploadedDocuments();
+  if (hasSupportingDocumentsField?.fieldValue === 'yes' && uploadedDocuments.length > 0) {
+    summaryListRows.push({
+      key: {
+        text: t('answers.uploadedDocuments.label'),
+      },
+      value: {
+        html: uploadedDocuments.map(document => document.value.document.document_filename).join('<br>'),
+      },
+      actions: {
+        items: [
+          {
+            href: './upload-documents-to-support-your-application',
+            text: t('change'),
+            visuallyHiddenText: t('answers.uploadedDocuments.changeHint'),
+          },
+        ],
+      },
+    });
+  }
+
   const whichLanguageField = visibleFormData.getWhichLanguageField();
   if (whichLanguageField) {
     summaryListRows.push(

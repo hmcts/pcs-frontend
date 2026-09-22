@@ -1,6 +1,5 @@
 export const landlordRegistered = {
   mainHeader: `Registered landlord`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
   youCheckIfYourLandlordIsRegisteredParagraph: `You can check if your landlord is registered by searching the`,
   publicRegisterLink: `Public Register (opens in new tab)`,

@@ -14,8 +14,12 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  {% if caption %}
-    <span class="govuk-caption-xl">{{ caption }}</span>
+  {% if heading %}
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+  {% endif %}
+
+  {% if repaymentsMadeQuestion %}
+    <h2 class="govuk-heading-m">{{ repaymentsMadeQuestion }}</h2>
   {% endif %}
 
    <form method="post" action="{{ url }}" novalidate>

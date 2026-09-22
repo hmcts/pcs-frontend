@@ -1,17 +1,23 @@
-import type { Request } from 'express';
+import type { Request, RequestHandler } from 'express';
 
+import { flowConfig as uploadAdditionalDocumentsFlowConfig } from './case-tasks/upload-additional-documents/flow.config';
+import { stepRegistry as uploadAdditionalDocumentsStepRegistry } from './case-tasks/upload-additional-documents/stepRegistry';
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
 import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
+import { respondToClaimAccessGuard } from './respond-to-claim/accessGuard';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from './respond-to-claim/draftEvent';
 import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.config';
 import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
+import { legalRepStepRegistry as respondToClaimLegalRepStepRegistry } from './respond-to-claim/legalrep.stepRegistry';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
 import { getUserType } from './utils';
 
 import type { CcdDraftEvent } from '@modules/documents/storage';
 import { Logger } from '@modules/logger';
+import { getStepOrder } from '@modules/steps/flow';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { validateSectionConfig } from '@services/sectionStatus';
 
 const logger = Logger.getLogger('steps');
 
@@ -26,6 +32,8 @@ export interface JourneyConfig {
   draftEvent?: CcdDraftEvent;
   default: ResolvedJourneyConfig;
   legalrep?: ResolvedJourneyConfig;
+  // Stacked onto the journey's :caseReference param callback (see registerAllJourneys).
+  routeMiddleware?: RequestHandler[];
 }
 
 // JourneyVariant intentionally diverges from UserType ('citizen' | 'legalrep').
@@ -46,8 +54,9 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
     },
     legalrep: {
       flowConfig: respondToClaimLegalrepFlowConfig,
-      stepRegistry: respondToClaimStepRegistry,
+      stepRegistry: respondToClaimLegalRepStepRegistry,
     },
+    routeMiddleware: [respondToClaimAccessGuard()],
   },
   makeAnApplication: {
     name: 'makeAnApplication',
@@ -58,6 +67,14 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
     default: {
       flowConfig: makeAnApplicationFlowConfig,
       stepRegistry: makeAnApplicationStepRegistry,
+    },
+  },
+  uploadAdditionalDocuments: {
+    name: 'uploadAdditionalDocuments',
+    slug: 'upload-additional-documents',
+    default: {
+      flowConfig: uploadAdditionalDocumentsFlowConfig,
+      stepRegistry: uploadAdditionalDocumentsStepRegistry,
     },
   },
 };
@@ -71,6 +88,13 @@ export function validateJourneyRegistry(registry: Record<string, JourneyConfig>)
       throw new Error(`Duplicate journey slug "${journey.slug}" in journeyRegistry`);
     }
     seenSlugs.add(journey.slug);
+
+    // Sectionalised flows must have an acyclic dependsOn graph with valid refs.
+    // No-op for flows without sections (legalrep, gen-app).
+    validateSectionConfig(journey.default.flowConfig);
+    if (journey.legalrep) {
+      validateSectionConfig(journey.legalrep.flowConfig);
+    }
   }
 }
 
@@ -84,17 +108,15 @@ export function journeyForSlug(slug: string): JourneyConfig | undefined {
   return Object.values(journeyRegistry).find(journey => journey.slug === slug);
 }
 
-// Variant-scoped step lookup. Variant is required (no default) to force every
-// caller to think about citizen vs legalrep — a silent default would let a
-// caller miss a legalrep-only step the day the registries diverge. Today the
-// citizen and legalrep stepRegistries are the same imported object, so both
-// variants resolve to the same step.
+// Variant-scoped step lookup. Resolves the step definition for the specified variant,
+// falling back to journey.default if a variant-specific stepRegistry is not defined for the journey.
 export function findStep(slug: string, stepName: string, variant: JourneyVariant): StepDefinition | undefined {
   const journey = journeyForSlug(slug);
   if (!journey) {
     return undefined;
   }
-  return journey[variant]?.stepRegistry[stepName];
+  const resolved = journey[variant] ?? journey.default;
+  return resolved?.stepRegistry[stepName];
 }
 
 function getJourneyConfigForRequest(journeyName: string, req?: Request): ResolvedJourneyConfig | undefined {
@@ -110,9 +132,9 @@ function getJourneyConfigForRequest(journeyName: string, req?: Request): Resolve
 
 function getRegistrationStepNames(journey: JourneyConfig): string[] {
   const stepNames = new Set<string>([
-    ...journey.default.flowConfig.stepOrder,
+    ...getStepOrder(journey.default.flowConfig),
     ...Object.keys(journey.default.stepRegistry),
-    ...(journey.legalrep?.flowConfig.stepOrder ?? []),
+    ...(journey.legalrep ? getStepOrder(journey.legalrep.flowConfig) : []),
     ...Object.keys(journey.legalrep?.stepRegistry ?? {}),
   ]);
 
@@ -135,7 +157,7 @@ export function getStepsForJourney(journeyName: string, req?: Request): StepDefi
   }
 
   const activeJourney = getJourneyConfigForRequest(journeyName, req);
-  const stepNames = req && activeJourney ? activeJourney.flowConfig.stepOrder : getRegistrationStepNames(journey);
+  const stepNames = req && activeJourney ? getStepOrder(activeJourney.flowConfig) : getRegistrationStepNames(journey);
 
   return stepNames
     .map(stepName => {

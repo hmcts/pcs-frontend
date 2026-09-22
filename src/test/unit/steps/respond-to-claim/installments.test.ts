@@ -43,7 +43,6 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
 const t = ((key: string) => {
   const translations: Record<string, string> = {
     pageTitle: 'Instalments',
-    caption: 'Respond to a property possession claim',
     heading: 'Instalments',
     paragraph1:
       'A decision about the instalments you can afford to pay will be made at the hearing. You’ll be able to tell the judge if your circumstances have changed between now and the hearing.',
@@ -124,14 +123,12 @@ describe('respond-to-claim installments step', () => {
       expect.objectContaining({
         pageTitle: 'Instalments',
         heading: 'Instalments',
-        caption: 'Respond to a property possession claim',
       })
     );
 
     const viewModel = res.render.mock.calls[0][1] as { fields: Record<string, unknown>[] };
     const amountField = viewModel.fields.find(f => f.name === 'installmentAmount') as
-      | { component?: { prefix?: { text?: string } } }
-      | undefined;
+      { component?: { prefix?: { text?: string } } } | undefined;
     expect(amountField?.component?.prefix?.text).toBe('£');
   });
 

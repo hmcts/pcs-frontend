@@ -1,3 +1,5 @@
+// Needs to be enabled after counterclaim journey is implemented
+/*
 import {
   contactPreferencesTelephone,
   contactPreferencesTextMessage,
@@ -27,3 +29,4 @@ export async function disputeClaimInterstitialNavigationTests(): Promise<void> {
   }
   await performValidation('pageNavigation', disputeClaimInterstitial.cancelLink, dashboard.mainHeader);
 }
+ */

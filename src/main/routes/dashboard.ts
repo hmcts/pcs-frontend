@@ -1,9 +1,9 @@
-import config from 'config';
 import { Router } from 'express';
 import type { Application, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../HttpError';
+import { MAKE_GENERAL_APPLICATION_ROUTE, UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { getTranslationFunction } from '@modules/i18n';
@@ -11,7 +11,13 @@ import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
 import type { DashboardTaskGroup } from '@services/dashboard.interface';
 import { sanitiseCaseReference } from '@utils/caseReference';
+import {
+  RESPOND_TO_CLAIM_DASHBOARD_TASK_TEMPLATE_ID,
+  getDashboardTaskPath,
+  isRespondToClaimDashboardNotification,
+} from '@utils/dashboardTaskPaths';
 import { getTagClasses, isLinkableStatus } from '@utils/dashboardTaskStatus';
+import { isRespondToClaimEnabledForUser } from '@utils/isRespondToClaimEnabledForUser';
 import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboardTemplates';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -29,8 +35,6 @@ interface MappedTaskGroup {
   tasks: MappedTask[];
 }
 
-export const DASHBOARD_ROUTE = '/dashboard';
-
 const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   { key: 'helpWithFees', href: 'https://www.gov.uk/get-help-with-court-fees' },
   {
@@ -47,40 +51,31 @@ function getIWantToLinks(caseId: string): { key: string; href: string }[] {
   return [
     {
       key: 'askCourtToMakeOrder',
-      href: `/case/${caseId}/make-an-application/choose-an-application`,
+      href: MAKE_GENERAL_APPLICATION_ROUTE.replace(':caseReference', caseId),
     },
     {
       key: 'uploadAdditionalDocuments',
-      href: `/case/${caseId}/upload-additional-documents`,
+      href: UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', caseId),
     },
   ];
-}
-
-function getDashboardTaskRoutes(): Record<string, string> {
-  if (!config.has('dashboard.taskRoutes')) {
-    return {};
-  }
-  const taskRoutes = config.get('dashboard.taskRoutes');
-  if (taskRoutes && typeof taskRoutes === 'object') {
-    return taskRoutes as Record<string, string>;
-  }
-  return {};
 }
 
 function getTaskUrl(
   templateId: string,
   taskStatus: string,
   caseReference: string,
-  taskGroupId: string
+  taskGroupId: string,
+  showRespondToClaimLinks: boolean
 ): string | undefined {
   if (taskStatus === 'NOT_AVAILABLE') {
     return undefined;
   }
-  const pattern = getDashboardTaskRoutes()[templateId];
-  if (pattern) {
-    return pattern.replace(/:caseReference/g, caseReference);
+
+  if (templateId === RESPOND_TO_CLAIM_DASHBOARD_TASK_TEMPLATE_ID && !showRespondToClaimLinks) {
+    return undefined;
   }
-  return `/dashboard/${caseReference}/${taskGroupId}/${templateId}`;
+
+  return getDashboardTaskPath(templateId, caseReference, taskGroupId);
 }
 
 export const getDashboardUrl = (caseReference?: string | number): string | null => {
@@ -93,13 +88,18 @@ export const getDashboardUrl = (caseReference?: string | number): string | null 
     return null;
   }
 
-  return `${DASHBOARD_ROUTE}/${sanitised}`;
+  return `/case/${sanitised}/dashboard`;
 };
 
 export default function dashboardRoutes(app: Application): void {
   const logger = Logger.getLogger('dashboard');
 
-  function mapTaskGroup(tg: DashboardTaskGroup, t: TFunction, caseReference: string): MappedTaskGroup {
+  function mapTaskGroup(
+    tg: DashboardTaskGroup,
+    t: TFunction,
+    caseReference: string,
+    showRespondToClaimLinks: boolean
+  ): MappedTaskGroup {
     const groupIdLower = tg.groupId.toLowerCase();
     const groupTitle = lookup(t, `dashboard:taskGroups.${tg.groupId}`);
     if (!groupTitle) {
@@ -123,7 +123,9 @@ export default function dashboardRoutes(app: Application): void {
 
           return {
             title: { html: resolved.title },
-            href: linkable ? getTaskUrl(task.templateId, task.status, caseReference, groupIdLower) : undefined,
+            href: linkable
+              ? getTaskUrl(task.templateId, task.status, caseReference, groupIdLower, showRespondToClaimLinks)
+              : undefined,
             status: tagText && classes ? { tag: { text: tagText, classes } } : {},
           };
         })
@@ -143,8 +145,8 @@ export default function dashboardRoutes(app: Application): void {
     return safeRedirect303(res, '/', '/', ['/']);
   });
 
-  // Route: /dashboard/:caseReference (main dashboard page)
-  dashboardRouter.get('/:caseReference', async (req: Request, res: Response, next) => {
+  // Route: /case/:caseReference/dashboard
+  dashboardRouter.get('/:caseReference/dashboard', async (req: Request, res: Response, next) => {
     const rawCaseReference = req.params.caseReference;
     const caseReference =
       typeof rawCaseReference === 'string' || typeof rawCaseReference === 'number'
@@ -166,9 +168,14 @@ export default function dashboardRoutes(app: Application): void {
     try {
       const dashboardData = await ccdCaseService.getDashboardView(accessToken, caseReference);
 
+      const showRespondToClaimLinks = await isRespondToClaimEnabledForUser(req);
+
       const t = getTranslationFunction(req, ['dashboard', 'common']);
 
       const notifications = dashboardData.notifications
+        .filter(
+          notification => showRespondToClaimLinks || !isRespondToClaimDashboardNotification(notification.templateId)
+        )
         .map(n => {
           const resolved = resolveNotification(
             t,
@@ -183,7 +190,9 @@ export default function dashboardRoutes(app: Application): void {
         })
         .filter((x): x is NonNullable<typeof x> => x !== null);
 
-      const taskGroups = dashboardData.taskGroups.map(tg => mapTaskGroup(tg, t, caseReference));
+      const taskGroups = dashboardData.taskGroups.map(tg =>
+        mapTaskGroup(tg, t, caseReference, showRespondToClaimLinks)
+      );
 
       const propertyAddress = dashboardData.propertyAddress ?? null;
 
@@ -192,6 +201,7 @@ export default function dashboardRoutes(app: Application): void {
         taskGroups,
         propertyAddress,
         dashboardCaseReference,
+        dashboardUrl: getDashboardUrl(caseReference),
         iWantToLinks: getIWantToLinks(caseReference),
         helpSupportLinks: HELP_SUPPORT_LINKS,
       });
@@ -201,6 +211,6 @@ export default function dashboardRoutes(app: Application): void {
     }
   });
 
-  // Mount the dashboard router at /dashboard
-  app.use('/dashboard', dashboardRouter);
+  // Mount the dashboard router at /case
+  app.use('/case', dashboardRouter);
 }

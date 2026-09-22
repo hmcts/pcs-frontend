@@ -1,11 +1,12 @@
 export const contactPreferencesTextMessage = {
   mainHeader: `Contact by text message`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   contactByTextMessageParagraph: `We might also send updates about your case by text message.`,
   contactByTextMessageQuestion: `Are you happy to be contacted by text message?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   saveAndContinueButton: `Save and continue`,
+  ukMobileNumberHiddenTextLabel: `UK mobile number`,
+  ukMobileNumberTextInput: `07459444434`,
   saveForLaterButton: `Save for later`,
   cymraegLink: `Cymraeg`,
   backLink: `Back`,

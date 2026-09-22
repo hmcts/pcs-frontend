@@ -1,14 +1,19 @@
 import type { Request } from 'express';
 
+import { isWalesProperty } from './isWalesProperty';
+import { normalizeYesNoValue } from './normalizeYesNoValue';
+
 /**
  * Checks if notice was served from CCD case data.
  *
- * Uses noticeServed field from CCD case data.
- * Returns true if noticeServed is "Yes" (case-insensitive), false otherwise.
+ * The served-notice flag is country-specific: England claims store it in `noticeServed`,
+ * Wales claims in `walesNoticeServed` (pcs-api NoticeOfPossessionView splits by
+ * legislativeCountry). Select the field by country and normalise the value to handle
+ * any casing ("Yes"/"YES"/"yes").
  */
 export const isNoticeServed = (req: Request): boolean => {
-  const { noticeServed } = req.res?.locals?.validatedCase ?? { noticeServed: '' };
+  const validatedCase = req.res?.locals.validatedCase;
+  const value = isWalesProperty(req) ? validatedCase?.walesNoticeServed : validatedCase?.noticeServed;
 
-  // Case-insensitive comparison to handle "Yes", "YES", "yes", etc.
-  return noticeServed?.toUpperCase() === 'YES';
+  return normalizeYesNoValue(value) === 'YES';
 };

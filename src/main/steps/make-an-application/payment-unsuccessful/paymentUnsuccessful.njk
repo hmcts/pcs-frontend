@@ -1,0 +1,25 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+
+  <div class="govuk-panel govuk-panel--confirmation panel-error">
+    <h1 class="govuk-panel__title">
+      {{ yourPaymentWasUnsuccessful }}
+    </h1>
+  </div>
+
+  {% if payForYourApplicationUrl %}
+  <h2 class="govuk-heading-m">{{ whatHappensNext }}</h2>
+  <p class="govuk-body">
+   {{ youCanTryToMakeACardPayment | safe }}
+  </p>
+  {% endif %}
+
+  <a href="{{ dashboardUrl }}" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+      {{ closeAndReturnToCaseOverview }}
+  </a>
+
+{% endblock %}

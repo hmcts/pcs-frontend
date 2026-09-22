@@ -2,6 +2,8 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 import _ from 'lodash';
 
+import { stripHtmlTags } from '../../../steps/utils/fieldValidators';
+
 import { getNestedFieldName, isOptionSelected } from './conditionalFields';
 import { getDateTranslationKey, validateDateField } from './dateValidation';
 import type { FormError } from './errorUtils';
@@ -18,7 +20,7 @@ export function getTranslation(
   fallback?: string,
   interpolation?: Record<string, unknown>
 ): string | undefined {
-  const options = { returnObjects: true, ...interpolation };
+  const options = { returnObjects: true, returnEmptyString: true, ...interpolation };
   const result = t(key, options) as unknown;
   if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
     return result;
@@ -249,15 +251,48 @@ export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig
   return stepSpecificErrors;
 }
 
+export interface FormDataScope {
+  journey: string;
+  caseReference: string;
+}
+
+// Bucket used when a request has no step context (journey) or no case reference.
+export const DEFAULT_FORM_DATA_SCOPE = 'default';
+
+export function getCaseReference(req: Request): string {
+  const caseReference = req.res?.locals.validatedCase?.id ?? req.params?.caseReference;
+  if (!caseReference) {
+    throw new Error('No case reference available on request');
+  }
+  return String(caseReference);
+}
+
+// Form data is stored per journey and per case so that two journeys (which may share
+// step names such as check-your-answers) or two cases never see each other's answers.
+export function getFormDataScope(req: Request): FormDataScope {
+  const caseReference = req.res?.locals.validatedCase?.id ?? req.params?.caseReference;
+  return {
+    journey: req.res?.locals.step?.journey ?? DEFAULT_FORM_DATA_SCOPE,
+    caseReference: caseReference ? String(caseReference) : DEFAULT_FORM_DATA_SCOPE,
+  };
+}
+
+export const getAllFormData = (req: Request, scope = getFormDataScope(req)): Record<string, StepFormData> => {
+  return req.session?.formData?.[scope.journey]?.[scope.caseReference] ?? {};
+};
+
 export const getFormData = (req: Request, stepName: string): StepFormData => {
-  return req.session.formData?.[stepName] || {};
+  return getAllFormData(req)[stepName] || {};
 };
 
 export const setFormData = (req: Request, stepName: string, data: StepFormData): void => {
-  if (!req.session.formData) {
-    req.session.formData = {};
-  }
-  req.session.formData[stepName] = data;
+  const { journey, caseReference } = getFormDataScope(req);
+  const journeyFormData = ((req.session.formData ??= {})[journey] ??= {});
+  (journeyFormData[caseReference] ??= {})[stepName] = data;
+};
+
+export const clearFormData = (req: Request, scope = getFormDataScope(req)): void => {
+  delete req.session.formData?.[scope.journey]?.[scope.caseReference];
 };
 
 export function validateForm(
@@ -273,10 +308,7 @@ export function validateForm(
 
   // Merge allFormData if provided, otherwise get from session
   const mergedAllData: Record<string, unknown> =
-    allFormData ||
-    (req.session.formData
-      ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
-      : {});
+    allFormData || Object.values(getAllFormData(req)).reduce((acc, stepData) => ({ ...acc, ...stepData }), {});
 
   // Merge current form data into all data for validation context
   const validationAllData = { ...mergedAllData, ...formData };
@@ -301,7 +333,7 @@ export function validateForm(
     if (field.required !== undefined) {
       if (typeof field.required === 'function') {
         try {
-          isRequired = field.required(formData, validationAllData);
+          isRequired = field.required(formData, validationAllData, req);
         } catch (err) {
           logger.error(`Error evaluating required function for field ${field.name}:`, err);
           isRequired = false;
@@ -390,6 +422,20 @@ export function validateForm(
         }
       }
     } else {
+      // Sanitise text fields before required/validator checks so that input that
+      // reduces to empty after stripping (e.g. '<script>...</script>') is correctly
+      // treated as missing rather than silently accepted.
+      if (
+        typeof value === 'string' &&
+        (field.type === 'character-count' || field.type === 'text' || field.type === 'textarea')
+      ) {
+        const sanitizedText = stripHtmlTags(value.trim());
+        if (sanitizedText !== value.trim()) {
+          value = sanitizedText;
+          req.body[fieldName] = sanitizedText;
+        }
+      }
+
       const isMissing =
         field.type === 'checkbox'
           ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && !value.trim())
@@ -479,11 +525,8 @@ export function validateForm(
             if (!errors[fieldName]) {
               const translationLabelKey =
                 typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
-
               const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
-
               const displayName = resolvedLabel ?? toSentenceCase(fieldName);
-
               const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace(
                 '{fieldName}',
                 displayName
@@ -501,7 +544,9 @@ export function validateForm(
             const customError = field.validate(value, formData, validationAllData);
             if (customError) {
               if (!errors[fieldName]) {
-                errors[fieldName] = customError;
+                errors[fieldName] = customError.startsWith('errors.')
+                  ? translations?.[customError.replace('errors.', '')] || customError
+                  : customError;
               }
             }
           } catch (err) {
@@ -514,7 +559,9 @@ export function validateForm(
           const customError = field.validate(value, formData, validationAllData);
           if (customError) {
             if (!errors[fieldName]) {
-              errors[fieldName] = customError;
+              errors[fieldName] = customError.startsWith('errors.')
+                ? translations?.[customError.replace('errors.', '')] || customError
+                : customError;
             }
           }
         } catch (err) {

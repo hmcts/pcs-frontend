@@ -1,0 +1,29 @@
+{
+  "pageTitle": "Upload additional documents",
+  "title": "Upload additional documents",
+  "leadParagraph": "You can upload a document to support an application, or to show proof that you have done something.",
+  "paragraphShare": "We usually share anything you upload with the other party, for example your landlord, housing association or mortgage provider.",
+  "paragraphWithoutNotice": "If your application is ‘without notice’ (where you have asked us to consider your application without telling the other party) we will not share anything with them.",
+  "whatYouCanUploadHeading": "What you can upload",
+  "exampleIntro": "For example, you can share:",
+  "exampleBullet1": "evidence that a judge has asked for, like bank statements showing your rent payments",
+  "exampleBullet2": "photographs of the property in a state of disrepair, like damp in the bathroom",
+  "exampleBullet3": "a report from an electrician or a plumber, showing evidence of a repair that needs to be done",
+  "exampleBullet4": "emails or letters from the claimant (your landlord, housing association, or mortgage lender)",
+  "fileTypesIntro": "You can upload the following file types:",
+  "fileTypeDoc": "DOC/DOCX (Word)",
+  "fileTypeXls": "XLS/XLSM (Excel)",
+  "fileTypePpt": "PPT/PPTX (PowerPoint)",
+  "fileTypePdf": "PDF",
+  "fileTypeRtf": "RTF",
+  "fileTypeTxt": "TXT",
+  "fileTypeCsv": "CSV",
+  "fileTypeJpg": "JPG/JPEG",
+  "fileTypePng": "PNG",
+  "fileTypeBmp": "BMP",
+  "fileTypeTif": "TIF/TIFF",
+  "restrictions": "You cannot upload video or audio files.",
+  "buttons": {
+    "startNow": "Start now"
+  }
+}

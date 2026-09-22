@@ -46,7 +46,7 @@ function registerFatalTelemetryHandlers(): void {
 
 registerFatalTelemetryHandlers();
 
-let server: https.Server | ReturnType<typeof app.listen> | null = null;
+let server: https.Server | ReturnType<typeof app.listen>;
 let httpTerminator: HttpTerminator | null = null;
 // used by shutdownCheck in readinessChecks
 app.locals.shutdown = false;

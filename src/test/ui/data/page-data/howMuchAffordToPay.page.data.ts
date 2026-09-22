@@ -1,6 +1,5 @@
 export const howMuchAffordToPay = {
   mainHeader: `Instalments`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   howMuchCouldYouAffordToPayTextLabel: `How much could you afford to pay in addition to the current rent?`,
   forExampleHintText: `For example, £148.00 or £148.50`,
   howFrequentlyCouldYouAffordToPayQuestion: `How frequently could you afford to pay this amount?`,

@@ -11,10 +11,6 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  {% if caption %}
-    <span class="govuk-caption-l">{{ caption }}</span>
-  {% endif %}
-
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
   {% if infoParagraph1 %}
@@ -23,6 +19,10 @@
 
   {% if infoParagraph2 %}
     <p class="govuk-body">{{ infoParagraph2 }}</p>
+  {% endif %}
+
+  {% if infoParagraph3 %}
+    <p class="govuk-body">{{ infoParagraph3 }}</p>
   {% endif %}
 
   <form method="post" action="{{ url }}" novalidate>

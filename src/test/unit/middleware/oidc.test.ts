@@ -113,6 +113,7 @@ describe('oidcMiddleware', () => {
     };
     mockResponse = {
       redirect: jest.fn(),
+      locals: {},
     };
     nextFunction = jest.fn();
   });
@@ -141,10 +142,7 @@ describe('oidcMiddleware', () => {
     expect(nextFunction).toHaveBeenCalled();
     expect(mockResponse.redirect).not.toHaveBeenCalled();
     expect(mockOidcModule.refreshUserTokens).not.toHaveBeenCalled();
-    expect(mockRequest.app?.locals.nunjucksEnv.addGlobal).toHaveBeenCalledWith(
-      'user',
-      (mockRequest.session as CustomSession).user
-    );
+    expect(mockResponse.locals?.user).toBe((mockRequest.session as CustomSession).user);
   });
 
   it('should redirect to /login when user is not present in session', async () => {

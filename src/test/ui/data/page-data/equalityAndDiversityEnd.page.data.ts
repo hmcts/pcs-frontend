@@ -1,5 +1,4 @@
 export const equalityAndDiversityEnd = {
-  mainHeader: `Equality and diversity end (placeholder)`,
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
-  continueButton: `continue`,
+  mainHeader: `You have answered the equality questions`,
+  continueButton: `Continue to the next steps`,
 };

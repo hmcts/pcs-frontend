@@ -1,5 +1,16 @@
-import type { CcdCollectionItem, CcdDashboardNotification, CcdDashboardTaskGroup } from '@services/ccdCase.interface';
-import { formatAddress, unwrapNotifications, unwrapTaskGroups } from '@utils/ccdDashboardUtils';
+import {
+  type CcdCollectionItem,
+  type CcdDashboardNotification,
+  type CcdDashboardTaskGroup,
+  type CcdRelatedApplication,
+  GenAppType,
+} from '@services/ccdCase.interface';
+import {
+  formatAddress,
+  unwrapNotifications,
+  unwrapRelatedApplications,
+  unwrapTaskGroups,
+} from '@utils/ccdDashboardUtils';
 
 describe('ccdDashboardUtils', () => {
   describe('formatAddress', () => {
@@ -63,7 +74,7 @@ describe('ccdDashboardUtils', () => {
             tasks: [
               {
                 id: 't1',
-                value: { templateId: 'Defendant.ViewClaim', status: 'AVAILABLE' },
+                value: { templateId: 'ViewClaim', status: 'AVAILABLE' },
               },
             ],
           },
@@ -73,7 +84,51 @@ describe('ccdDashboardUtils', () => {
       expect(unwrapTaskGroups(raw)).toEqual([
         {
           groupId: 'CLAIM',
-          tasks: [{ templateId: 'Defendant.ViewClaim', status: 'AVAILABLE' }],
+          tasks: [{ templateId: 'ViewClaim', status: 'AVAILABLE' }],
+        },
+      ]);
+    });
+  });
+
+  describe('unwrapRelatedApplications', () => {
+    it('returns empty array when raw is undefined', () => {
+      expect(unwrapRelatedApplications(undefined)).toEqual([]);
+    });
+
+    it('filters out items missing id or type and maps to flat shape', () => {
+      const raw: CcdCollectionItem<CcdRelatedApplication>[] = [
+        {
+          id: 'a1',
+          value: {
+            id: 'APP-1',
+            type: GenAppType.SOMETHING_ELSE,
+            applicationSubmittedDate: '2026-05-01',
+          },
+        },
+        {
+          id: 'a2',
+          value: { id: '', type: GenAppType.ADJOURN },
+        },
+        {
+          id: 'a3',
+          value: { id: 'APP-3', type: undefined },
+        },
+        {
+          id: 'a4',
+          value: { id: 'APP-4', type: GenAppType.SET_ASIDE },
+        },
+      ];
+
+      expect(unwrapRelatedApplications(raw)).toEqual([
+        {
+          id: 'APP-1',
+          type: GenAppType.SOMETHING_ELSE,
+          applicationSubmittedDate: '2026-05-01',
+        },
+        {
+          id: 'APP-4',
+          type: GenAppType.SET_ASIDE,
+          applicationSubmittedDate: undefined,
         },
       ]);
     });

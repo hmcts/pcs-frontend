@@ -1,0 +1,16 @@
+export const uploadFilesToSupportYourCounterclaim = {
+  mainHeader: `Upload files to support your counterclaim`,
+  youShouldOnlyParagraph: `You should only upload files that are relevant to your counterclaim`,
+  theClaimantWillBeParagraph: `The claimant will be able to see any files you upload`,
+  beforeYouUploadParagraph: `Before you upload the files give it a name that tells the court what it is, for example ‘Job offer letter’`,
+  eachFileMustBeParagraph: `Each file must be less than 100MB. You can upload the following file types: DOC/DOCX (Word), XLS/XLSM (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.`,
+  uploadFileParagraph: `Upload a file`,
+  chooseFileButton: `Choose files`,
+  saveAndContinueButton: `Save and continue`,
+  saveForLaterButton: `Save for later`,
+  thereIsAProblemErrorMessageHeader: `There is a problem`,
+  selectAFileErrorMessage: `Select a file to support your counterclaim`,
+  feedbackLink: `feedback (opens in new tab)`,
+  pageSlug: `counter-claim-upload-files`,
+  backLink: `Back`,
+};

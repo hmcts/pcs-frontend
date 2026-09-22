@@ -6,11 +6,10 @@ import type { Express, NextFunction, Request, Response } from 'express';
 import i18next, { type InitOptions, type TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
 import { LanguageDetector, handle as i18nextHandle } from 'i18next-http-middleware';
-import type { Environment } from 'nunjucks';
 import { z } from 'zod';
 import { makeZodI18nMap } from 'zod-i18n-map';
 
-import { pluralPossessive } from './formatters';
+import { ordinalDate, pluralPossessive } from './formatters';
 
 import { Logger } from '@modules/logger';
 
@@ -149,16 +148,6 @@ export function populateCommonTranslations(req: Request, res: Response, t: TFunc
   }
 }
 
-/** Sets up Nunjucks globals for i18n. */
-export function setupNunjucksGlobals(env: Environment | undefined, globals: Record<string, unknown>): void {
-  if (!env) {
-    return;
-  }
-  for (const [key, value] of Object.entries(globals)) {
-    env.addGlobal(key, value);
-  }
-}
-
 /** Creates i18next configuration. */
 function createI18nextConfig(localesDir: string, namespaces: string[]): InitOptions {
   return {
@@ -178,7 +167,7 @@ function createI18nextConfig(localesDir: string, namespaces: string[]): InitOpti
     debug: false,
     saveMissing: false,
     interpolation: { escapeValue: false },
-    returnEmptyString: false,
+    returnEmptyString: true,
   };
 }
 
@@ -220,6 +209,7 @@ export class I18n {
       });
 
     pluralPossessive(i18next);
+    ordinalDate(i18next);
 
     app.use(i18nextHandle(i18next));
 
@@ -234,8 +224,6 @@ export class I18n {
 
       res.locals.lang = lang;
       res.locals.t = t;
-
-      setupNunjucksGlobals(req.app.locals?.nunjucksEnv, { lang, t });
 
       next();
     });

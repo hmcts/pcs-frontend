@@ -1,5 +1,4 @@
 export const paymentInterstitial = {
-  respondToAPropertyPossessionParagraph: `Respond to a property possession claim`,
   mainHeader: `Payments or agreements since the claim was made`,
   youWillNowBeAskedParagraph: () =>
     `You will now be asked questions about any payments or agreements you’ve made since ${process.env.CLAIMANT_NAME} made their claim.`,

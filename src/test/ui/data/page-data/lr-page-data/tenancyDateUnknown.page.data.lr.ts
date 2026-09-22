@@ -1,0 +1,20 @@
+export const tenancyDateUnknown = {
+  mainHeader: 'Tenancy, occupation contract or licence start date',
+  whenDidYourTenancyQuestion: 'What is the tenancy, occupation contract or licence start date? (Optional)',
+  getDidNotProvideParagraph: (claimantName: string): string => {
+    return `${claimantName} did not provide the start date of the tenancy, licence or occupation contract.`;
+  },
+  dayTextLabel: 'Day',
+  monthTextLabel: 'Month',
+  yearTextLabel: 'Year',
+  saveForLaterButton: 'Save for later',
+  saveAndContinueButton: 'Save and continue',
+  thereIsAProblemErrorMessageHeader: 'There is a problem',
+  dayMissingErrorMessage: 'Your tenancy start date must include a day',
+  monthMissingErrorMessage: 'Your tenancy start date must include a month',
+  yearMissingErrorMessage: 'Your tenancy start date must include a year',
+  realDateErrorMessage: 'Tenancy start date must be a real date',
+  backLink: 'Back',
+  feedbackLink: `feedback`,
+  pageSlug: `tenancy-date-unknown`,
+};

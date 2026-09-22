@@ -1,7 +1,6 @@
-export enum CaseState {
-  DRAFT = 'Draft',
-  SUBMITTED = 'Submitted',
-}
+import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
+
+import type { CcdFlags } from './cuiRa/cuiRa.interface';
 
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
@@ -10,6 +9,7 @@ export enum YesNoEnum {
   NO = 'NO',
   PREFER_NOT_TO_SAY = 'PREFER_NOT_TO_SAY',
 }
+export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export enum LanguageUsed {
   ENGLISH = 'ENGLISH',
   WELSH = 'WELSH',
@@ -18,7 +18,6 @@ export enum LanguageUsed {
 
 export type EqualityAndDiversityQuestionsChoice = 'CONTINUE' | 'SKIP' | null;
 
-export type FrequencyValue = 'WEEKLY' | 'MONTHLY';
 export type PenceAmount = string;
 
 export interface IncomeExpenseDetails {
@@ -48,14 +47,19 @@ export interface HouseholdCircumstances {
   pensionAmount?: PenceAmount;
   pensionFrequency?: FrequencyValue;
   universalCredit?: YesNoValue;
-  universalCreditAmount?: PenceAmount;
-  universalCreditFrequency?: FrequencyValue;
-  ucApplicationDate?: string;
+  hasAppliedForUniversalCredit?: YesNoValue;
+  universalCreditAmount?: PenceAmount | null;
+  universalCreditFrequency?: FrequencyValue | null;
+  ucApplicationDate?: string | null;
   otherBenefits?: YesNoValue;
   otherBenefitsAmount?: PenceAmount;
   otherBenefitsFrequency?: FrequencyValue;
   moneyFromElsewhere?: YesNoValue;
   moneyFromElsewhereDetails?: string;
+  priorityDebts?: YesNoValue;
+  debtTotal?: string;
+  debtContribution?: string;
+  debtContributionFrequency?: FrequencyValue;
   householdBills?: IncomeExpenseDetails;
   loanPayments?: IncomeExpenseDetails;
   childSpousalMaintenance?: IncomeExpenseDetails;
@@ -77,20 +81,6 @@ export type PaymentAgreement = {
   additionalContributionFrequency?: string;
 };
 
-export interface CcdUserCase {
-  id: string;
-  state: CaseState;
-  jurisdiction: string;
-  case_type_id: string;
-  case_data: Record<string, unknown>;
-}
-
-export interface CcdUserCases {
-  total: number;
-  cases: CcdUserCase[];
-}
-
-/** Address shape used in CCD case data (property, defendant, etc.). */
 export interface CcdCaseAddress {
   AddressLine1?: string;
   AddressLine2?: string;
@@ -115,10 +105,47 @@ export interface CcdClaimGroundSummaryItem {
   id: string;
 }
 
+export interface Party {
+  id: string;
+  idamId: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface Document {
+  document_url: string;
+  document_filename: string;
+  document_binary_url: string;
+}
+
+export interface DocumentWithId {
+  id: string;
+  document: Document;
+}
+
+export interface GenApp {
+  applicationType: GenAppType;
+  party: Party;
+  submittedOn: string;
+  submissionDocument: DocumentWithId;
+  supportingDocuments: CcdCollectionItem<Document>[];
+}
 /** Claimant organisation item in possessionClaimResponse.claimantOrganisations. */
 export interface CcdClaimantOrganisation {
   value: string;
   id: string;
+}
+
+/** Parties involved in the claim  */
+export interface CcdParty {
+  firstName?: string;
+  lastName?: string;
+  orgName?: string;
+  nameKnown?: string;
+  address?: CcdCaseAddress;
+  addressKnown?: string;
+  addressSameAsProperty?: string;
+  dateOfBirth?: string;
 }
 
 /** Claimant-entered defendant details captured when the claim was created. */
@@ -126,8 +153,9 @@ export interface CcdClaimantEnteredDefendantDetails {
   nameKnown?: YesNoValue;
   firstName?: string;
   lastName?: string;
-  address?: CcdCaseAddress | Record<string, never>;
+  address?: CcdCaseAddress;
   addressKnown?: YesNoValue;
+  addressSameAsProperty?: YesNoValue;
 }
 
 /** Defendant party contact details (name/address known flags and values). */
@@ -136,11 +164,29 @@ export interface CcdDefendantParty {
   lastName?: string;
   nameKnown?: string;
   emailAddress?: string;
-  address?: CcdCaseAddress | Record<string, never>;
+  address?: CcdCaseAddress;
   addressKnown?: string;
   addressSameAsProperty?: string;
   phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
+  textMessageNumber?: string;
+  pcqId?: string;
+}
+
+/** Counter-claim data captured across the counterclaim journey screens. */
+export interface CcdCounterClaim {
+  needHelpWithFees?: YesNoValue;
+  appliedForHwf?: YesNoValue;
+  hwfReferenceNumber?: string;
+  claimType?: string;
+  isClaimAmountKnown?: string;
+  claimAmount?: PenceAmount;
+  estimatedMaxClaimAmount?: PenceAmount;
+  counterClaimAgainst?: CcdCollectionItem<CcdParty>[];
+  counterClaimFor?: string;
+  counterClaimReasons?: string;
+  otherOrderRequestDetails?: string;
+  otherOrderRequestFacts?: string;
 }
 
 /** CCD SDK Document type -- flat reference with URLs. */
@@ -150,6 +196,7 @@ export interface CcdDocumentReference {
   document_filename: string;
   document_hash?: string;
   category_id?: string;
+  upload_timestamp?: string;
 }
 
 /** Wraps CCD Document with metadata fields (matches backend UploadedDocument). */
@@ -166,10 +213,11 @@ export interface CcdCollectionItem<T> {
 
 export interface CcdDefendantResponses {
   correspondenceAddressConfirmation?: YesNoValue;
-  tenancyTypeCorrect?: YesNoNotSureValue;
+  propertyAddressConfirmation?: YesNoValue;
+  tenancyTypeConfirmation?: YesNoNotSureValue;
   tenancyType?: string;
   freeLegalAdvice?: string;
-  tenancyStartDateCorrect?: string;
+  tenancyStartDateConfirmation?: YesNoNotSureValue;
   tenancyStartDate?: string;
   defendantNameConfirmation?: string;
   dateOfBirth?: string;
@@ -179,14 +227,14 @@ export interface CcdDefendantResponses {
   contactByText?: YesNoValue;
   rentArrearsAmountConfirmation?: string;
   rentArrearsAmount?: string;
-  landlordRegistered?: YesNoNotSureValue;
+  exemptLandlord?: YesNoNotSureValue;
   landlordLicensed?: YesNoNotSureValue;
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
   disputeClaimDetails?: string;
+  counterClaim?: CcdCounterClaim;
   paymentAgreement?: PaymentAgreement;
   householdCircumstances?: HouseholdCircumstances;
-  counterClaim?: CcdCounterClaim;
   possessionNoticeReceived?: YesNoNotSureValue;
   noticeReceivedDate?: string;
   defendantDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
@@ -196,51 +244,75 @@ export interface CcdDefendantResponses {
   otherConsiderations?: YesNoValue;
   otherConsiderationsDetails?: string;
   makeCounterClaim?: YesNoValue;
+  statementOfTruth?: StatementOfTruth;
+  hasSolicitor?: YesNoValue;
+  counterClaimWantToUploadFiles?: YesNoValue;
+  statementOfTruthCompletedBy?: string;
+  completedSections?: RespondToClaimSectionEnum[];
+  status?: 'SUBMITTED' | 'CREATED';
 }
 
-/** Counter-claim data captured across the counterclaim journey screens. */
-export interface CcdCounterClaim {
-  claimType?: string;
-  isClaimAmountKnown?: string;
-  claimAmount?: PenceAmount;
-  estimatedMaxClaimAmount?: PenceAmount;
+export interface StatementOfTruth {
+  accepted?: YesNoValue;
+  fullName?: string;
+  nameOfFirm?: string;
+  positionHeld?: string;
+  hasLegalRepresentation?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {
   claimantOrganisations?: CcdClaimantOrganisation[];
+  claimantName?: string;
+  claimantServiceAddress?: CcdCaseAddress;
   defendantContactDetails?: {
     party?: CcdDefendantParty;
   };
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
+  currentDefendantPartyId?: string;
+  responseDocumentId?: string;
+  draftVersion?: number;
+  claimIssuedDate?: string;
+
+  defendantFlags?: CcdFlags;
 }
 
 export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
+  dateIssued?: string;
   claimIssueDate?: string;
+  dateSubmitted?: string;
   claimantName?: string;
   isClaimantNameCorrect?: YesNoValue;
   overriddenClaimantName?: string;
   defendantName?: string;
   defendantAddress?: string;
   rentArrears_Total?: string;
+  isExemptLandlord?: YesNoValue;
   introGrounds_IntroductoryDemotedOrOtherGrounds?: string[];
   secureGroundsWales_DiscretionaryGrounds?: string[];
   noticeServed?: string;
+  walesNoticeServed?: string;
   propertyAddress?: CcdCaseAddress;
   claimGroundSummaries?: CcdClaimGroundSummaryItem[];
   userPcqId?: string;
   userPcqIdSet?: string;
   tenancy_TenancyLicenceDate?: string;
   legislativeCountry?: string;
-  notice_NoticeHandedOverDateTime?: string;
-  notice_NoticePostedDate?: string;
-  notice_NoticeDeliveredDate?: string;
-  notice_NoticeEmailSentDateTime?: string;
-  notice_NoticeOtherElectronicDateTime?: string;
-  notice_NoticeOtherDateTime?: string;
+  notice_HandedOverDateTime?: string;
+  notice_PostedDate?: string;
+  notice_DeliveredDate?: string;
+  notice_EmailSentDateTime?: string;
+  notice_OtherElectronicDateTime?: string;
+  notice_OtherDateTime?: string;
+  notice_ServiceMethod?: string;
+  notice_PersonName?: string;
+  notice_EmailAddress?: string;
+  notice_OtherExplanation?: string;
+  notice_OtherElectronicExplanation?: string;
+  notice_Documents?: CcdCollectionItem<Document>[];
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
@@ -248,17 +320,58 @@ export interface CcdCaseData {
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
   submitDraftAnswers?: string;
+  genApps?: CcdCollectionItem<GenApp>[];
+  allClaimants?: CcdCollectionItem<CcdParty>[];
+  allDefendants?: CcdCollectionItem<CcdParty>[];
+  allLinkedDefendants?: CcdCollectionItem<CcdDefendantParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
+  uploadedAdditionalDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
+  // Populated by the uploadDocuments START handler (@JsonUnwrapped on PCSCase).
+  showRelatedApplicationsPage?: YesNoValue;
+  relatedApplicationOptions?: CcdCollectionItem<RelatedApplicationOption>[];
+  selectedRelatedApplicationId?: string;
   // Gen-apps applicant fields written at create-case time
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
+  allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+  detailsTab_TenancyLicenceDetails?: DetailsTab_TenancyLicenceDetails;
+  detailsTab_RentArrearsDetails?: DetailsTab_RentArrearsDetails;
+  detailsTab_OccupationContractLicenceDetails?: DetailsTab_OccupationContractLicenceDetails;
+  detailsTab_NoticeDetails?: {
+    noticeDocuments?: CcdCollectionItem<Document>[];
+  };
+}
+
+export interface CcdCaseDocument {
+  document_binary_url?: string;
+  document_filename?: string;
+  upload_timestamp?: string;
+  category_id?: string;
+}
+
+export type DocumentUploadCategoryCode =
+  | 'ADJOURN_HEARING_APPLICATION'
+  | 'SUSPEND_EVICTION_APPLICATION'
+  | 'SET_ASIDE_ORDER_APPLICATION'
+  | 'GENERAL_APPLICATION'
+  | 'COUNTERCLAIM';
+
+export interface RelatedApplicationOption {
+  genAppId?: string;
+  counterClaimId?: string;
+  category: DocumentUploadCategoryCode;
+  submittedDate?: string;
 }
 
 /** Case representation used by services: id + case_data. */
 export interface CcdCase {
   id: string;
   data: CcdCaseData;
+  after_submit_callback_response?: {
+    confirmation_header?: string | null;
+    confirmation_body?: string | null;
+  };
 }
 
 /** Links object in CCD START callback response. */
@@ -321,10 +434,16 @@ export interface CcdDashboardData {
   propertyAddress?: CcdCaseAddress;
   notifications?: CcdCollectionItem<CcdDashboardNotification>[];
   taskGroups?: CcdCollectionItem<CcdDashboardTaskGroup>[];
+  relatedApplications?: CcdCollectionItem<CcdRelatedApplication>[];
+}
+
+export interface CcdRelatedApplication {
+  id?: string;
+  type?: GenAppType;
+  applicationSubmittedDate?: string;
 }
 
 export enum GenAppType {
-  SUSPEND = 'SUSPEND',
   ADJOURN = 'ADJOURN',
   SET_ASIDE = 'SET_ASIDE',
   SOMETHING_ELSE = 'SOMETHING_ELSE',
@@ -341,7 +460,51 @@ export interface CitizenGenAppRequest {
   withoutNoticeReason?: string;
   languageUsed?: LanguageUsed;
   whatOrderWanted?: string;
+  hasSupportingDocuments?: YesNoValue;
+  uploadedDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   sotAccepted?: YesNoValue;
   sotFullName?: string;
   clientReference?: string;
+}
+
+/** Claim summary returned by GET /cases/defendant-claims on pcs-api. */
+export interface ClaimSummary {
+  caseReference?: string;
+  claimantName?: string;
+  propertyPostcode?: string;
+}
+
+export enum GenAppState {
+  PENDING_GEN_APP_ISSUED = 'PENDING_GEN_APP_ISSUED',
+  GEN_APP_ISSUED = 'GEN_APP_ISSUED',
+}
+
+export interface MakeAnApplicationResponse {
+  state?: GenAppState;
+  serviceRequestReference?: string;
+  feeAmount?: number;
+}
+
+export interface DetailsTab_TenancyLicenceDetails {
+  typeOfTenancyLicence: string;
+  tenancyLicenceDate: string;
+  hasCopyOfTenancyLicence: string;
+  tenancyLicenceDocuments: CcdCollectionItem<CcdCaseDocument>[];
+}
+
+export interface DetailsTab_RentArrearsDetails {
+  rentAmount: string;
+  calculationFrequency: string;
+  dailyRate: string;
+  stepsToRecoverArrears: string;
+  rentStatement: CcdCollectionItem<CcdCaseDocument>[];
+  arrearsTotal: string;
+  judgmentRequested: string;
+}
+
+export interface DetailsTab_OccupationContractLicenceDetails {
+  agreementType: string;
+  agreementTypeDescription: string;
+  agreementStartDate: string;
+  documents: CcdCollectionItem<CcdCaseDocument>[];
 }

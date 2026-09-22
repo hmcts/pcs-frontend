@@ -55,6 +55,8 @@ export const oidcMiddleware: RequestHandler = async (req, res, next): Promise<vo
     const setReturnToAndRedirectToLogin = (): void => {
       if (req.session && !req.session.returnTo) {
         req.session.returnTo = req.originalUrl;
+        req.session.save(() => res.redirect('/login'));
+        return;
       }
       res.redirect('/login');
     };
@@ -72,7 +74,7 @@ export const oidcMiddleware: RequestHandler = async (req, res, next): Promise<vo
     }
 
     if (!shouldRefreshAccessToken(accessToken)) {
-      req.app.locals.nunjucksEnv.addGlobal('user', req.session.user);
+      res.locals.user = req.session.user;
       return next();
     }
 
@@ -160,7 +162,8 @@ export const oidcMiddleware: RequestHandler = async (req, res, next): Promise<vo
       return setReturnToAndRedirectToLogin();
     }
 
-    req.app.locals.nunjucksEnv.addGlobal('user', req.session.user);
+    // Token is valid; expose user to templates via per-request res.locals
+    res.locals.user = req.session.user;
     next();
   } catch (error) {
     logger.error('Unexpected error in oidcMiddleware', {

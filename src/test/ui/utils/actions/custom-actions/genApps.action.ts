@@ -1,20 +1,27 @@
+import path from 'path';
+
 import { Page, expect, test } from '@playwright/test';
 
 import {
+  applicationSubmitted,
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   checkYourAnswersGenApps,
   chooseAnApplication,
   doYouNeedHelpPayingTheFee,
-  doYouWantToUploadDocumentToSupportYourApplication,
+  doYouWantToUploadDocumentsToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
+  payForYourApplication,
+  paymentDetails,
+  uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../../data/page-data/genApps-page-data';
+import { confirmYourPayment } from '../../../data/page-data/genApps-page-data/confirmYourPayment.page.data';
 import { compareMaps } from '../../common/compareMaps.util';
 import { generateRandomString, stringToCamelCase } from '../../common/string.utils';
-import { performAction, performValidation } from '../../controller';
+import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 import { defaultJourney, journeys } from '../../journeyMappingGenApps';
 
@@ -36,12 +43,18 @@ export class GenAppsAction implements IAction {
         () => this.reasonsApplicationShouldNotBeShared(fieldName as actionRecord),
       ],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
+      ['confirmDocumentToUpload', () => this.confirmDocumentToUpload(fieldName as actionRecord)],
+      ['uploadFilesGenApps', () => this.uploadFilesGenApps(page, fieldName as actionRecord)],
       ['selectStatementOfTruth', () => this.selectStatementOfTruth(fieldName as actionRecord)],
       ['inputErrorValidationGenApp', () => this.inputErrorValidationGenApp(fieldName as actionRecord)],
       ['retrieveCYATableData', () => this.retrieveCYATableData(page)],
       ['validateCYA', () => this.validateCYA()],
       ['reviewCYA', () => this.reviewCYA(page, fieldName as actionData)],
       ['reviewAndUpdateCYA', () => this.reviewAndUpdateCYA(page, fieldName as actionRecord)],
+      ['payForApplication', () => this.payForApplication()],
+      ['inputPaymentDetails', () => this.inputPaymentDetails(fieldName as actionRecord)],
+      ['confirmPayment', () => this.confirmPayment()],
+      ['verifyApplicationSubmitted', () => this.verifyApplicationSubmitted()],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -136,6 +149,29 @@ export class GenAppsAction implements IAction {
     await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
   }
 
+  private async confirmDocumentToUpload(confirmUpload: actionRecord) {
+    await performAction('recordUserEntry', confirmUpload);
+    await performAction('clickRadioButton', {
+      question: confirmUpload.question,
+      option: confirmUpload.option,
+    });
+    await performAction('clickButton', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
+  }
+
+  private async uploadFilesGenApps(page: Page, uploadDocs: actionRecord): Promise<void> {
+    const fileUploadSuccessMessage = page.locator('.moj-multi-file-upload__message');
+    await performAction('recordUserEntry', uploadDocs);
+    if (uploadDocs.files) {
+      await performAction('uploadFile', uploadDocs.files);
+      const file = Array.isArray(uploadDocs.files) ? uploadDocs.files[0] : uploadDocs.files;
+      const fileName = path.basename(String(file));
+      await expect(fileUploadSuccessMessage).toBeVisible();
+      await expect(fileUploadSuccessMessage).toHaveText(`${fileName} has been uploaded`);
+      FieldsStore.set('Upload documents', fileName);
+    }
+    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
+  }
+
   private async selectLanguageUsedToComplete(selectLanguageData: actionRecord) {
     await performAction('recordUserEntry', selectLanguageData);
     await performAction('clickRadioButton', {
@@ -152,16 +188,49 @@ export class GenAppsAction implements IAction {
     });
     await performAction('inputText', sot.label, sot.input);
 
-    const key = isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string;
+    const key = haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion as string;
+    const key1 = isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion as string;
 
-    const isKeyPresent = FieldsStore.has(key);
-    const value = isKeyPresent ? FieldsStore.get(key) : undefined;
+    const value = FieldsStore.has(key) ? FieldsStore.get(key) : undefined;
+    const value1 = FieldsStore.has(key1) ? FieldsStore.get(key1) : undefined;
 
-    const button =
-      isKeyPresent && value === 'No'
-        ? checkYourAnswersGenApps.submitHiddenButton
-        : checkYourAnswersGenApps.continueToPaymentHiddenButton;
+    const payOrSubmit = value === 'Yes' || value1 === 'No';
+
+    const button = payOrSubmit
+      ? checkYourAnswersGenApps.submitHiddenButton
+      : checkYourAnswersGenApps.continueToPaymentHiddenButton;
+
     await performAction('clickButton', button);
+  }
+
+  private async payForApplication() {
+    await performAction('clickButton', payForYourApplication.continueToPaymentButton);
+  }
+
+  private async inputPaymentDetails(inputDetails: actionRecord) {
+    await performActions(
+      'Enter details',
+      ['inputText', inputDetails.cardNumberLabel, inputDetails.cardNumber],
+      ['inputText', inputDetails.monthLabel, inputDetails.month],
+      ['inputText', inputDetails.yearLabel, inputDetails.year],
+      ['inputText', inputDetails.nameOnCardLabel, inputDetails.nameOnCard],
+      ['inputText', inputDetails.cardSecurityCodeLabel, inputDetails.cardSecurityCode],
+      ['inputText', inputDetails.addressLine1Label, inputDetails.addressLine1],
+      ['inputText', inputDetails.townOrCityLabel, inputDetails.townOrCity],
+      ['inputText', inputDetails.postcodeLabel, inputDetails.postcode],
+      ['inputText', inputDetails.emailLabel, inputDetails.email]
+    );
+    await performAction('clickButton', paymentDetails.continueButton);
+  }
+
+  private async confirmPayment() {
+    await performValidation('mainHeader', confirmYourPayment.mainHeader);
+    await performAction('clickButton', confirmYourPayment.confirmPaymentButton);
+  }
+
+  private async verifyApplicationSubmitted(): Promise<void> {
+    await performValidation('mainHeader', applicationSubmitted.mainHeader);
+    await performAction('clickButton', applicationSubmitted.closeAndReturnToCaseOverviewButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
@@ -385,7 +454,7 @@ export class GenAppsAction implements IAction {
           label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
           input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
         });
-        await performValidation('mainHeader', doYouWantToUploadDocumentToSupportYourApplication.mainHeader);
+        await performValidation('mainHeader', doYouWantToUploadDocumentsToSupportYourApplication.mainHeader);
         break;
       }
       case 'haveYouAlreadyAppliedForHelpWithYourApplicationFee': {
@@ -417,7 +486,7 @@ export class GenAppsAction implements IAction {
       const expectedPage = allowedPages[i];
       const onAllowedPage = currentUrl.includes(expectedPage);
 
-      expect(onAllowedPage, `Unexpected page. Expected: ${expectedPage}, Actual: ${currentUrl}`).toBeTruthy();
+      expect(onAllowedPage, `Expected: ${expectedPage}, Actual: ${currentUrl}`).toBeTruthy();
 
       const navButton = !currentUrl.includes('ask') ? 'Continue' : 'Start now';
       await performAction('clickButton', navButton);

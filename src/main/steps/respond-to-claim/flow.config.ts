@@ -1,14 +1,20 @@
 import { type Request } from 'express';
 
 import {
+  counterClaimUploadWanted,
   hasAnyRentArrearsGround,
   hasMadeCounterClaim,
   hasOnlyRentArrearsGrounds,
   hasSkippedEqualityAndDiversityQuestions,
   isDefendantNameKnown,
   isNoticeServed,
+  isSomethingElseCounterClaim,
   isTenancyStartDateKnown,
   isWalesProperty,
+  shouldShowCounterClaimFeePaymentNeededConfirmationStep,
+  shouldShowExemptLandlordStep,
+  shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
+  shouldShowResponseSubmittedConfirmationStep,
 } from '../utils';
 
 import {
@@ -16,12 +22,19 @@ import {
   hasProvidedFinanceDetails,
   isNoticeDateConfirmedAndNotProvided,
   isNoticeDateConfirmedAndProvided,
+  shouldShowCounterClaimAboutStep,
+  shouldShowCounterClaimAgainstWhoStep,
+  shouldShowCounterClaimHelpWithFeesStep,
+  shouldShowCounterClaimNeedToApplyStep,
   shouldShowInstallmentPaymentsStep,
+  shouldShowPriorityDebtDetailsStep,
   shouldShowUniversalCreditStep,
 } from './flowConditions';
+import { respondToClaimSections } from './sections.config';
+import type { RespondToClaimStepName } from './stepRegistry';
 import { isMoneyCounterClaim } from './utils';
 
-import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
+import type { JourneyFlowConfig, StepConfig } from '@modules/steps/stepFlow.interface';
 
 export const RESPOND_TO_CLAIM_ROUTE = '/case/:caseReference/respond-to-claim';
 
@@ -30,60 +43,22 @@ export const flowConfig: JourneyFlowConfig = {
   journeyName: 'respondToClaim',
   useShowConditions: true,
   useSessionFormData: false,
-  stepOrder: [
-    'start-now',
-    'free-legal-advice',
-    'defendant-name-confirmation',
-    'defendant-name-capture',
-    'defendant-date-of-birth',
-    'correspondence-address',
-    'contact-preferences-email-or-post',
-    'contact-preferences-telephone',
-    'contact-preferences-text-message',
-    'dispute-claim-interstitial',
-    'landlord-registered',
-    'landlord-licensed',
-    'written-terms',
-    'tenancy-type-details',
-    'tenancy-date-details',
-    'tenancy-date-unknown',
-    'confirmation-of-notice-given',
-    'confirmation-of-notice-date-when-provided',
-    'confirmation-of-notice-date-when-not-provided',
-    'rent-arrears-dispute',
-    'non-rent-arrears-dispute',
-    'counter-claim',
-    'counter-claim-what-are-you-claiming-for',
-    'counter-claim-specific-sum',
-    'counter-claim-fee',
-    'payment-interstitial',
-    'repayments-made',
-    'repayments-agreed',
-    'installment-payments',
-    'how-much-afford-to-pay',
-    'your-household-and-circumstances',
-    'do-you-have-any-dependant-children',
-    'do-you-have-any-other-dependants',
-    'do-any-other-adults-live-in-your-home',
-    'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
-    'your-circumstances',
-    'exceptional-hardship',
-    'income-and-expenses',
-    'what-regular-income-do-you-receive',
-    'have-you-applied-for-universal-credit',
-    'priority-debts',
-    'priority-debt-details',
-    'what-other-regular-expenses-do-you-have',
-    'other-considerations',
-    'upload-document',
-    'support-needs',
-    'equality-and-diversity-start',
-    'equality-and-diversity-end',
-    'language-used',
-    'check-your-answers',
-    'end-now',
-  ],
+  eventId: 'respondPossessionClaim',
+  sections: respondToClaimSections,
+  nonSectionStepOrder: ['end-now', 'task-list', 'reasonable-adjustments-confirmation'],
+  // First visible step of any section back-links to this hub step.
+  hubStepName: 'task-list',
   steps: {
+    'reasonable-adjustments-error': {
+      preventBack: true,
+    },
+    'reasonable-adjustments-cancelled': {
+      preventBack: true,
+    },
+    'ask-your-solicitor-to-respond-to-the-claim': {
+      showCondition: (req: Request) =>
+        req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor === 'YES',
+    },
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),
     },
@@ -91,13 +66,10 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => !isDefendantNameKnown(req),
     },
     'contact-preferences-text-message': {
-      showCondition: (req: Request) => req.res?.locals?.validatedCase?.isDefendantContactByPhone === true,
+      showCondition: (req: Request) => req.res?.locals.validatedCase?.isDefendantContactByPhone === true,
     },
-    'landlord-registered': {
-      showCondition: (req: Request) => isWalesProperty(req),
-    },
-    'landlord-licensed': {
-      showCondition: (req: Request) => isWalesProperty(req),
+    'exempt-landlord': {
+      showCondition: (req: Request) => shouldShowExemptLandlordStep(req),
     },
     'written-terms': {
       showCondition: (req: Request) => isWalesProperty(req),
@@ -111,7 +83,6 @@ export const flowConfig: JourneyFlowConfig = {
     'confirmation-of-notice-given': {
       showCondition: (req: Request) => isNoticeServed(req),
     },
-
     'confirmation-of-notice-date-when-provided': {
       showCondition: (req: Request) => isNoticeDateConfirmedAndProvided(req),
     },
@@ -132,6 +103,27 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'counter-claim-fee': {
       showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-do-you-want-to-upload-files': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req),
+    },
+    'counter-claim-upload-files': {
+      showCondition: (req: Request) => hasMadeCounterClaim(req) && counterClaimUploadWanted(req),
+    },
+    'counter-claim-have-you-applied-for-help': {
+      showCondition: (req: Request) => shouldShowCounterClaimHelpWithFeesStep(req),
+    },
+    'counter-claim-you-need-to-apply-for-help-with-your-fees': {
+      showCondition: (req: Request) => shouldShowCounterClaimNeedToApplyStep(req),
+    },
+    'counter-claim-against-whom': {
+      showCondition: (req: Request) => shouldShowCounterClaimAgainstWhoStep(req),
+    },
+    'counter-claim-about': {
+      showCondition: (req: Request) => shouldShowCounterClaimAboutStep(req),
+    },
+    'counter-claim-order-other-than-sum': {
+      showCondition: (req: Request) => isSomethingElseCounterClaim(req),
     },
     'payment-interstitial': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
@@ -158,7 +150,7 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
     'priority-debt-details': {
-      showCondition: (req: Request) => hasProvidedFinanceDetails(req),
+      showCondition: (req: Request) => shouldShowPriorityDebtDetailsStep(req),
     },
     'what-other-regular-expenses-do-you-have': {
       showCondition: (req: Request) => hasProvidedFinanceDetails(req),
@@ -166,5 +158,25 @@ export const flowConfig: JourneyFlowConfig = {
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
     },
-  },
+    'response-submitted': {
+      showCondition: (req: Request) =>
+        shouldShowResponseSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'response-submitted-counter-claim-fee-payment-needed': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'counter-claim-application-fee-amount': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'counter-claim-payment-successful': {
+      showCondition: (req: Request) =>
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+    'response-and-counter-claim-submitted': {
+      showCondition: (req: Request) =>
+        shouldShowResponseAndCounterClaimSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
+    },
+  } satisfies Partial<Record<RespondToClaimStepName, StepConfig>>,
 };

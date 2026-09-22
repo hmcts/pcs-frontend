@@ -1,19 +1,23 @@
-import { flowConfig as citizenFlowConfig } from './flow.config';
+import type { Request } from 'express';
+
+import { doesDefendantHaveDraftResponse } from '../utils';
+
+import { RESPOND_TO_CLAIM_ROUTE, flowConfig as citizenFlowConfig } from './flow.config';
+import { hasSingleLinkedDefendant } from './flowConditions';
+import { legalRepRespondToClaimSections } from './legalrep.sections.config';
+import { LegalRepRespondToClaimStepName } from './legalrep.stepRegistry';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
-const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
+const legalRepStepOrder = [
   'start-now',
+  'select-defendant',
+  'resume-response',
   'defendant-name-confirmation',
-  'defendant-name-capture',
   'defendant-date-of-birth',
   'correspondence-address',
-  'contact-preferences-email-or-post',
-  'contact-preferences-telephone',
-  'contact-preferences-text-message',
-  'dispute-claim-interstitial',
-  'landlord-registered',
-  'landlord-licensed',
+  'email-confirmation',
+  'exempt-landlord',
   'written-terms',
   'tenancy-type-details',
   'tenancy-date-details',
@@ -27,33 +31,64 @@ const legalrepStepOrder: JourneyFlowConfig['stepOrder'] = [
   'counter-claim-what-are-you-claiming-for',
   'counter-claim-specific-sum',
   'counter-claim-fee',
-  'payment-interstitial',
+  'counter-claim-have-you-applied-for-help',
+  'counter-claim-you-need-to-apply-for-help-with-your-fees',
+  'counter-claim-against-whom',
+  'counter-claim-about',
+  'counter-claim-order-other-than-sum',
+  'counter-claim-do-you-want-to-upload-files',
+  'counter-claim-upload-files',
   'repayments-made',
   'repayments-agreed',
   'installment-payments',
   'how-much-afford-to-pay',
-  'your-household-and-circumstances',
   'do-you-have-any-dependant-children',
   'do-you-have-any-other-dependants',
   'do-any-other-adults-live-in-your-home',
   'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
   'your-circumstances',
   'exceptional-hardship',
-  'income-and-expenditure',
+  'income-and-expenses',
   'what-regular-income-do-you-receive',
   'have-you-applied-for-universal-credit',
   'priority-debts',
   'priority-debt-details',
   'what-other-regular-expenses-do-you-have',
-  'equality-and-diversity-start',
-  'equality-and-diversity-end',
+  'other-considerations',
+  'upload-document',
   'language-used',
-  'check-your-answers',
+  'end-of-journey-cya',
+  'response-submitted',
+  'response-submitted-counter-claim-fee-payment-needed',
+  'counter-claim-application-fee-amount',
+  'counter-claim-payment-successful',
+  'response-and-counter-claim-submitted',
   'end-now',
-];
+] as const satisfies readonly LegalRepRespondToClaimStepName[];
 
+// Legal-rep journey is a flat, linear stepOrder. It is intentionally NOT sectionalised
+// (citizen is). Construct explicitly instead of spreading citizenFlowConfig so we don't
+// silently inherit `sections` / `nonSectionStepOrder` and have the engine pick
+// section-traversal over our linear stepOrder.
 export const legalrepFlowConfig: JourneyFlowConfig = {
-  ...citizenFlowConfig,
+  basePath: RESPOND_TO_CLAIM_ROUTE,
   journeyName: 'respondToClaimLegalrep',
-  stepOrder: legalrepStepOrder,
+  useShowConditions: true,
+  useSessionFormData: false,
+  stepOrder: legalRepStepOrder,
+  sections: legalRepRespondToClaimSections,
+  steps: {
+    ...citizenFlowConfig.steps,
+    'select-defendant': {
+      showCondition: (req: Request) => !hasSingleLinkedDefendant(req),
+    },
+
+    'resume-response': {
+      showCondition: (req: Request) => doesDefendantHaveDraftResponse(req),
+    },
+
+    'defendant-name-confirmation': {
+      showCondition: () => true,
+    },
+  },
 };

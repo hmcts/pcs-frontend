@@ -94,7 +94,7 @@ function resolveLabel(
   translations: Record<string, string>,
   fallback: string
 ): string {
-  if (!label) {
+  if (label === undefined) {
     return fallback;
   }
 
@@ -103,6 +103,28 @@ function resolveLabel(
   }
 
   return label;
+}
+
+/**
+ * Resolves an option's display text with graceful fallback so a missing or bespoke
+ * translation key
+ */
+function resolveOptionText(t: TFunction, option: FormFieldOption, interpolation?: Record<string, unknown>): string {
+  if (option.text) {
+    return option.text;
+  }
+
+  if (option.translationKey) {
+    const genericKey = `options.${option.translationKey.split('.').pop()}`;
+    return (
+      getTranslation(t, option.translationKey, undefined, interpolation) ??
+      getTranslation(t, genericKey, undefined, interpolation) ??
+      option.value ??
+      ''
+    );
+  }
+
+  return option.value ?? '';
 }
 
 /**
@@ -125,16 +147,7 @@ function processOptions(
     }
 
     // Resolve label (function or string)
-    const optionLabel = resolveLabel(
-      option.label,
-      translations,
-      option.text ||
-        (option.translationKey
-          ? interpolation
-            ? t(option.translationKey, interpolation)
-            : t(option.translationKey)
-          : (option.value ?? ''))
-    );
+    const optionLabel = resolveLabel(option.label, translations, resolveOptionText(t, option, interpolation));
 
     // Process conditionalText if provided
     let resolvedConditionalText: string | undefined;
@@ -190,17 +203,14 @@ function processField(
   const fieldName = fieldNameOverride || field.name;
 
   // Resolve label (function or string)
-  let label = resolveLabel(
-    field.label,
-    translations,
-    field.translationKey?.label
-      ? getTranslation(t, field.translationKey.label, undefined, interpolation) || fieldName
-      : fieldName
-  );
+  const translatedFieldLabel = field.translationKey?.label
+    ? getTranslation(t, field.translationKey.label, undefined, interpolation)
+    : undefined;
+  let label = resolveLabel(field.label, translations, translatedFieldLabel ?? fieldName);
 
   // Fallback to translation key or field name if label is still empty
-  if (!label || label === fieldName) {
-    label = getTranslation(t, `${fieldName}Label`, fieldName, interpolation) || fieldName;
+  if (label === fieldName) {
+    label = getTranslation(t, `${fieldName}Label`, fieldName, interpolation) ?? fieldName;
   }
 
   let hint = field.hint;
@@ -306,13 +316,16 @@ export function translateFields(
 
     // Build translated options for component builder (backward compatible format)
     const translatedOptions = processedOptionsWithSubFields?.map(option => {
-      const text = option.text || (option.translationKey ? t(option.translationKey) : null) || option.value;
       const hint = option.hint ? getTranslation(t, option.hint, option.hint, interpolation) : undefined;
-      const translatedOption = {
-        ...option,
-        ...(option.divider ? { divider: t(option.divider, option.divider) } : { text, hint }),
-      };
-      return translatedOption;
+      if (option.divider) {
+        // Same graceful fallback as option text: page-specific key -> generic common key -> raw divider string
+        const genericKey = `options.${option.divider.split('.').pop()}`;
+        const divider =
+          getTranslation(t, option.divider, undefined, interpolation) ??
+          getTranslation(t, genericKey, option.divider, interpolation);
+        return { ...option, divider };
+      }
+      return { ...option, text: resolveOptionText(t, option, interpolation), hint };
     });
     // For nested fields (subFields), extract simple name to look up values
     // field.name might be nested (e.g., "parent.subField") but fieldValues is keyed by simple names

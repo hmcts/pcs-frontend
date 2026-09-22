@@ -1,7 +1,15 @@
 {
-  "listItemName": "cyyour client's name",
-  "listItemDateOfBirth": "cyyour client’s date of birth",
-  "listItemCircumstances": "cyyour client's circumstances and any exceptional hardship they would experience if they had to leave their home",
-  "listItemIncomeExpenses": "cyyour client's income and expenses",
-  "financialSituationInfo": "cyYou do not have to answer questions about your client's financial situation, but sharing this information can help a judge understand your client's circumstances."
+  "pageTitle": "Ymateb i hawliad",
+  "title": "Ymateb i hawliad i feddiannu eiddo ar-lein",
+  "saveDraftInfo": "Gallwch gadw eich ymateb fel drafft a dychwelyd ato nes ymlaen. Byddwch yn gallu adolygu a golygu eich atebion cyn eu cyflwyno.",
+  "description": "",
+  "completingYourResponse": "",
+  "uploadDocumentsInfo": "",
+  "whatYouWillNeed": "",
+  "claimantVisibilityInfo": "Bydd yr hawlydd yn gallu gweld unrhyw ddogfennau fyddwch wedi uwchlwytho a'ch atebion.",
+  "provideDetailsInfo": "Mae'r gwasanaeth hwn hefyd ar gael <a href=\"?lang=en\" class=\"govuk-link language\">yn Saesneg</a>.",
+  "hmctsSupportInfo": "Os ydych chi neu'r diffynnydd angen cymorth i ddefnyddio gwasanaethau GLlTEF, fel mynediad heb risiau i'r llys ar gyfer eich gwrandawiad, gallwch ofyn am hyn ar ôl cyflwyno eich ymateb.",
+  "buttons": {
+    "startNow": "Dechrau nawr"
+  }
 }
