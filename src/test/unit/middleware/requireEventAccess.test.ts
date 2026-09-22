@@ -29,6 +29,7 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 interface MockSession {
   user?: {
     accessToken?: string;
+    isDefendantSolicitor?: boolean;
   };
 }
 
@@ -105,6 +106,38 @@ describe('requireEventAccess', () => {
         'makeAnApplication',
         undefined
       );
+    });
+  });
+
+  // The legal-rep journey turns entirely on this one comparison against a string pcs-api owns
+  // (UserRole.GA_DEFENDANT_SOLICITOR). Nothing else asserts it, so a rename on either side would
+  // compile, pass CI, and silently drop every defendant solicitor into the citizen journey.
+  describe('group role to legal-rep mapping', () => {
+    const runWithGroupRole = async (currentUserGroupRole?: string) => {
+      mockGetCaseByIdForEvent.mockResolvedValue({
+        id: validCaseRef,
+        data: currentUserGroupRole === undefined ? {} : { currentUserGroupRole },
+      });
+
+      await requireEventAccess(eventId)(mockReq as Request, mockRes as Response, next);
+
+      return (mockReq.session as MockSession).user?.isDefendantSolicitor;
+    };
+
+    it('should treat defendant-solicitor as the legal representative', async () => {
+      await expect(runWithGroupRole('defendant-solicitor')).resolves.toBe(true);
+    });
+
+    it('should not treat claimant-solicitor as the legal representative', async () => {
+      await expect(runWithGroupRole('claimant-solicitor')).resolves.toBe(false);
+    });
+
+    it('should not treat claimant as the legal representative', async () => {
+      await expect(runWithGroupRole('claimant')).resolves.toBe(false);
+    });
+
+    it('should fail closed when pcs-api serves no group role', async () => {
+      await expect(runWithGroupRole()).resolves.toBe(false);
     });
   });
 

@@ -1,7 +1,6 @@
 import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
-import { getUserRoles, getUserType, isLegalRepresentativeUser } from '../steps/utils/userRole';
 
 import { Logger } from '@modules/logger';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -41,16 +40,6 @@ export function requireEventAccess(eventId: string): RequestHandler {
       if (req.session.user) {
         req.session.user.isDefendantSolicitor = validatedCase.data?.currentUserGroupRole === 'defendant-solicitor';
       }
-
-      // PCS-ROLE-DIAG [temp, HDPI-7333]: the frontend's verdict for the same request pcs-api just
-      // logged, so the two can be compared. Remove with this preview branch.
-      logger.info('PCS-ROLE-DIAG', {
-        caseReference,
-        userType: getUserType(req),
-        isLegalRepresentative: isLegalRepresentativeUser(req),
-        groupRole: validatedCase.data?.currentUserGroupRole,
-        idamRoles: getUserRoles(req),
-      });
 
       return next();
     } catch (error) {
