@@ -400,4 +400,90 @@ describe('oidcMiddleware', () => {
     expect((mockRequest.session as CustomSession).user?.accessToken).toBe(freshToken);
     expect(nextFunction).toHaveBeenCalled();
   });
+
+  it('persists the refreshed tokens before releasing the lock', async () => {
+    const { withRedisLock } = jest.requireMock('@modules/redisLock');
+    const newAccessToken = createValidToken(3600);
+    (mockRequest.session as CustomSession).user = {
+      sub: '123',
+      uid: 'test-uid',
+      accessToken: createValidToken(-60),
+      idToken: 'id-token',
+      refreshToken: 'refresh-token',
+    };
+
+    (jose.decodeJwt as jest.Mock).mockReturnValue({ exp: Math.floor(Date.now() / 1000) - 60, sub: 'test-user' });
+    (mockOidcModule.refreshUserTokens as jest.Mock).mockResolvedValue({
+      accessToken: newAccessToken,
+      refreshToken: 'new-refresh-token',
+    });
+
+    // Record whether the session had been written to the store by the time the
+    // lock body returned — releasing first would let the next holder read stale
+    // tokens and refresh again with an already-rotated refresh token.
+    let savedBeforeRelease = false;
+    (withRedisLock as jest.Mock).mockImplementationOnce(
+      async (_redis: unknown, _key: string, _options: unknown, fn: () => Promise<unknown>) => {
+        await fn();
+        savedBeforeRelease = ((mockRequest.session as CustomSession).save as jest.Mock).mock.calls.length > 0;
+      }
+    );
+
+    await oidcMiddleware(
+      mockRequest as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+      mockResponse as Response,
+      nextFunction
+    );
+
+    expect(savedBeforeRelease).toBe(true);
+    expect((mockRequest.session as CustomSession).user?.accessToken).toBe(newAccessToken);
+  });
+
+  it('proceeds with the current token instead of signing out when the lock wait times out', async () => {
+    const { withRedisLock, RedisLockTimeoutError } = jest.requireMock('@modules/redisLock');
+    const currentToken = createValidToken(-60);
+    (mockRequest.session as CustomSession).user = {
+      sub: '123',
+      uid: 'test-uid',
+      accessToken: currentToken,
+      idToken: 'id-token',
+      refreshToken: 'refresh-token',
+    };
+
+    (jose.decodeJwt as jest.Mock).mockReturnValue({ exp: Math.floor(Date.now() / 1000) - 60, sub: 'test-user' });
+    (withRedisLock as jest.Mock).mockRejectedValueOnce(new RedisLockTimeoutError('lock timed out'));
+
+    await oidcMiddleware(
+      mockRequest as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+      mockResponse as Response,
+      nextFunction
+    );
+
+    expect(nextFunction).toHaveBeenCalled();
+    expect(mockResponse.redirect).not.toHaveBeenCalled();
+    expect((mockRequest.session as CustomSession).user?.accessToken).toBe(currentToken);
+  });
+
+  it('signs the user out when the refresh itself fails', async () => {
+    const { withRedisLock } = jest.requireMock('@modules/redisLock');
+    (mockRequest.session as CustomSession).user = {
+      sub: '123',
+      uid: 'test-uid',
+      accessToken: createValidToken(-60),
+      idToken: 'id-token',
+      refreshToken: 'refresh-token',
+    };
+
+    (jose.decodeJwt as jest.Mock).mockReturnValue({ exp: Math.floor(Date.now() / 1000) - 60, sub: 'test-user' });
+    (withRedisLock as jest.Mock).mockRejectedValueOnce(new Error('IDAM rejected the refresh token'));
+
+    await oidcMiddleware(
+      mockRequest as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },
+      mockResponse as Response,
+      nextFunction
+    );
+
+    expect((mockRequest.session as CustomSession).user).toBeUndefined();
+    expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
+  });
 });

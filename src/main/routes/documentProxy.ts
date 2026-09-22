@@ -172,8 +172,13 @@ const CASE_LOCK_TTL_MS = 30_000;
 const CASE_LOCK_WAIT_TIMEOUT_MS = 15_000;
 
 function caseLock<T>(req: Request, caseId: string, fn: () => Promise<T>): Promise<T> {
+  const redis = req.app.locals.redisClient;
+  if (!redis) {
+    logger.error('redisClient missing on app.locals; cannot serialise document collection writes');
+    throw new HTTPError('Internal server error', 500);
+  }
   return withRedisLock(
-    req.app.locals.redisClient,
+    redis,
     `pcs:case-documents:${caseId}`,
     { ttlMs: CASE_LOCK_TTL_MS, waitTimeoutMs: CASE_LOCK_WAIT_TIMEOUT_MS },
     fn

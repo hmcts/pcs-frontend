@@ -1085,6 +1085,7 @@ describe('documentProxyRoutes', () => {
       const baseReq = {
         session: { user: { accessToken: 'token' } },
         params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document' },
+        app: { locals: { redisClient: {} } },
         t: mockT,
         res: { locals: {} },
       };
