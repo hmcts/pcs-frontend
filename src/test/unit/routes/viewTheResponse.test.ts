@@ -1191,8 +1191,9 @@ describe('viewTheResponse route', () => {
   });
 
   describe('PDF document links', () => {
-    it('should include counterclaim PDF URL when counterclaim exists', async () => {
+    it('should include counterclaim PDF URL when counterclaim exists for first defendant', async () => {
       const caseData = buildComprehensiveCaseData();
+      caseData.possessionClaimResponse!.currentDefendantPartyId = 'def-1';
       caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'YES';
       caseData.possessionClaimResponse!.defendantResponses!.counterClaim = {
         claimType: 'PAYMENT_OR_COMPENSATION',
@@ -1296,6 +1297,59 @@ describe('viewTheResponse route', () => {
         'view-the-response',
         expect.objectContaining({
           counterclaimPdfUrl: null,
+        })
+      );
+    });
+
+    it('should include correct counterclaim PDF URL for second defendant when multiple defendants exist', async () => {
+      const caseData = buildComprehensiveCaseData();
+      caseData.possessionClaimResponse!.currentDefendantPartyId = 'def-2';
+      caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'YES';
+      caseData.possessionClaimResponse!.defendantResponses!.counterClaim = {
+        claimType: 'PAYMENT_OR_COMPENSATION',
+        status: 'COUNTER_CLAIM_ISSUED',
+      };
+      caseData.allDocuments = [
+        {
+          id: 'counterclaim-pdf-id-1',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1',
+            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id-1/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+        {
+          id: 'counterclaim-pdf-id-2',
+          value: {
+            document_filename: 'Counterclaim - Defendant 2',
+            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id-2/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ];
+
+      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
+        id: caseReference,
+        data: caseData,
+      });
+
+      viewTheResponseRoute(app);
+      const handler = getHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        viewTheResponseRequest({
+          caseReference,
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith(
+        'view-the-response',
+        expect.objectContaining({
+          counterclaimPdfUrl: '/case/1234567890123456/view-documents/counterclaim-pdf-id-2',
         })
       );
     });

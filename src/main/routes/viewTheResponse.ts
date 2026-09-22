@@ -599,9 +599,17 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
     return null;
   }
 
+  const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
+  const allDefendants = caseData.allDefendants ?? [];
+
+  const defendantIndex = allDefendants.findIndex(defendant => defendant.id === currentDefendantPartyId);
+  const defendantNumber = defendantIndex >= 0 ? defendantIndex + 1 : 1;
+
   const documents = extractCaseDocuments(caseData as Record<string, unknown>);
   const counterclaimPdf = documents.find(
-    doc => doc.categoryId === 'statementsOfCase' && doc.filename?.startsWith('Counterclaim - Defendant')
+    doc =>
+      doc.categoryId === 'statementsOfCase' &&
+      doc.filename === `Counterclaim - Defendant ${defendantNumber}`
   );
 
   return counterclaimPdf?.id ?? null;
