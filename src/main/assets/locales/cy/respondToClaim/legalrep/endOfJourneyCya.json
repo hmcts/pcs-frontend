@@ -1,0 +1,49 @@
+{
+  "pageTitle": "Gwiriwch eich atebion",
+  "heading": "Gwiriwch eich atebion",
+  "sections": {
+    "legalAdvice": "Cyngor cyfreithiol",
+    "personalDetails": "Manylion personol",
+    "claimantsClaim": "Hawliad {{claimantName, pluralPossessive}}",
+    "dependantsAndOtherResidents": "Dibynyddion a phreswylwyr eraill",
+    "yourCircumstances": "Amgylchiadau",
+    "incomeAndExpenses": "Incwm a chostau",
+    "regularIncome": "Incwm rheolaidd",
+    "universalCredit": "Credyd Cynhwysol",
+    "priorityDebts": "Dyledion blaenoriaeth",
+    "regularExpenses": "Costau rheolaidd",
+    "uploadFiles": "Uwchlwytho ffeiliau",
+    "otherConsiderations": "Ystyriaethau eraill",
+    "languageUsed": "Iaith a ddefnyddiwyd"
+  },
+  "rows": {
+    "uploadedDocuments": {
+      "label": "cy Uploaded files",
+      "changeHidden": "cy uploaded files",
+      "none": "cy No files uploaded"
+    },
+    "otherConsiderations": {
+      "label": "Oes yna unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fel rhan o'u hymateb?"
+    },
+    "otherConsiderationsDetails": {
+      "label": "Rhowch fanylion beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys"
+    },
+    "languageUsed": {
+      "label": "Pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn?"
+    }
+  },
+  "statementOfTruth": {
+    "heading": "Datganiad gwirionedd",
+    "hint": "",
+    "contemptOption": "Deallaf y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu'n onest ei fod yn wir.",
+    "beliefOption": "Creda'r diffynnydd bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir. Fe’m hawdurdodir gan y diffynnydd i lofnodi’r datganiad hwn.",
+    "fullNameLabel": "Enw llawn",
+    "nameOfFirmLabel": "Enw’r cwmni",
+    "positionHeldLabel": "Safle neu swydd a ddelir"
+  },
+  "errors": {
+    "statementOfTruthBelief": "Dewiswch os ydych yn credu bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir",
+    "nameOfFirm": "Nodwch enw'r cwmni",
+    "positionHeld": "Nodwch eich swydd neu safle a ddelir"
+  }
+}

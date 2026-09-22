@@ -16,7 +16,7 @@ export const checkYourAnswers = {
 
   getRelatedApplicationAdjournValue: () =>
     `Yes, the documents I’m uploading relate to the application to adjourn the hearing - submitted on ${getFormattedDate()}`,
-  relatedApplicationNoValue: 'No, the documents I’m uploading relate to the main claim or counterclaim',
+  relatedApplicationNoValue: 'No, the documents I’m uploading relate to the main claim',
 
   changeLink: 'Change',
   submitButton: 'Submit',

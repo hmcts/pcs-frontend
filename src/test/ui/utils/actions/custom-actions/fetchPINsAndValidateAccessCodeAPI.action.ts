@@ -3,7 +3,12 @@ import { Page } from '@playwright/test';
 import Axios from 'axios';
 
 import { SHORT_TIMEOUT, VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
-import { createCaseEventTokenApiData, fetchPINsApiData, validateAccessCodeApiData } from '../../../data/api-data';
+import {
+  createCaseEventTokenApiData,
+  fetchPINsApiData,
+  submitCaseApiData,
+  validateAccessCodeApiData,
+} from '../../../data/api-data';
 import { getCaseApiData } from '../../../data/api-data/getCase.api.data';
 import { IAction } from '../../interfaces';
 
@@ -39,8 +44,39 @@ export function getSelectedPinUser(): PinUser | undefined {
   return selectedPinUser;
 }
 
+export const getSelectedDefendantNumber = (): number => {
+  const selectedUser = getSelectedPinUser();
+  if (!selectedUser) {
+    throw new Error('No selected PIN user available');
+  }
+  const payload = submitCaseApiData.submitCasePayload;
+  const defendants = [payload.defendant1, ...(payload.additionalDefendants ?? []).map(defendant => defendant.value)];
+  const defendantIndex = defendants.findIndex(
+    defendant => defendant.firstName === selectedUser.firstName && defendant.lastName === selectedUser.lastName
+  );
+  if (defendantIndex === -1) {
+    throw new Error(
+      `Could not find selected defendant ${selectedUser.firstName} ${selectedUser.lastName} in submitCasePayload`
+    );
+  }
+  return defendantIndex + 1;
+};
+
 export function selectPinUserByDefendantDetails(detailsKnown: boolean): PinUser | undefined {
   const matchingPinUser = pinUsers.find(pinUser => hasKnownDefendantDetails(pinUser) === detailsKnown) ?? pinUsers[0];
+  return setSelectedPinUser(matchingPinUser);
+}
+
+export function selectPinUserByIndex(index: number): PinUser | undefined {
+  return setSelectedPinUser(pinUsers[index]);
+}
+
+export function selectPinUserByName(firstNameValue: string, lastNameValue: string): PinUser | undefined {
+  const matchingPinUser = pinUsers.find(
+    pinUser =>
+      pinUser.firstName?.trim().toLowerCase() === firstNameValue.trim().toLowerCase() &&
+      pinUser.lastName?.trim().toLowerCase() === lastNameValue.trim().toLowerCase()
+  );
   return setSelectedPinUser(matchingPinUser);
 }
 
@@ -49,10 +85,42 @@ function getDefaultPinUser(): PinUser | undefined {
   return hasUnknownDefendant ? selectPinUserByDefendantDetails(false) : setSelectedPinUser(pinUsers[0]);
 }
 
-export async function getPinUserAt(index: number, timeoutMs = 5000): Promise<PinUser> {
-  const pollInterval = 200;
+function updatePinUsers(responseData: Record<string, any>): void {
+  pins = Object.keys(responseData);
+  pinUsers = pins.map(pin => {
+    const pinData = responseData[pin];
+    const addressObj = pinData.address;
+    let formattedAddress = '';
+    if (addressObj) {
+      const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode } = addressObj;
+      formattedAddress = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode]
+        .filter(value => value && typeof value === 'string' && value.trim() !== '')
+        .join(', ');
+    }
+    return {
+      pin,
+      nameKnown:
+        typeof pinData.nameKnown === 'string'
+          ? pinData.nameKnown === 'YES'
+          : Boolean(pinData.firstName || pinData.lastName),
+      firstName: pinData.firstName,
+      lastName: pinData.lastName,
+      address: formattedAddress,
+    };
+  });
+  getDefaultPinUser();
+}
+
+export async function getPinUserAt(index: number, timeoutMs = SHORT_TIMEOUT * actionRetries): Promise<PinUser> {
+  const fetchPinsApi = Axios.create(fetchPINsApiData.fetchPINSApiInstance());
+  const pollInterval = SHORT_TIMEOUT;
   const start = Date.now();
   while (pinUsers.length <= index && Date.now() - start < timeoutMs) {
+    const response = await fetchPinsApi.get(fetchPINsApiData.fetchPINsApiEndPoint());
+    updatePinUsers(response.data);
+    if (pinUsers.length > index) {
+      break;
+    }
     await new Promise(res => setTimeout(res, pollInterval));
   }
   if (pinUsers.length <= index) {
@@ -100,35 +168,12 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
     const fetchPinsApi = Axios.create(fetchPINsApiData.fetchPINSApiInstance());
     await waitUntilCaseIssued();
 
-    const maxRetries = actionRetries;
+    const maxRetries = actionRetries * 2 + 4;
     const delayMs = SHORT_TIMEOUT;
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       const response = await fetchPinsApi.get(fetchPINsApiData.fetchPINsApiEndPoint());
-      const fetchedPins = Object.keys(response.data);
-      if (fetchedPins.length > 0) {
-        pins = fetchedPins;
-        pinUsers = pins.map(pin => {
-          const pinData = response.data[pin];
-          const addressObj = pinData.address;
-          let formattedAddress = '';
-          if (addressObj) {
-            const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode } = addressObj;
-            formattedAddress = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode]
-              .filter(value => value && typeof value === 'string' && value.trim() !== '')
-              .join(', ');
-          }
-          return {
-            pin,
-            nameKnown:
-              typeof pinData.nameKnown === 'string'
-                ? pinData.nameKnown === 'YES'
-                : Boolean(pinData.firstName || pinData.lastName),
-            firstName: pinData.firstName,
-            lastName: pinData.lastName,
-            address: formattedAddress,
-          };
-        });
-        getDefaultPinUser();
+      if (Object.keys(response.data).length > 0) {
+        updatePinUsers(response.data);
         return;
       }
       await new Promise(res => setTimeout(res, delayMs));

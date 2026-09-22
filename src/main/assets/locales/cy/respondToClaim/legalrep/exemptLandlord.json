@@ -1,0 +1,13 @@
+{
+  "pageTitle": "Landlord wedi'i eithrio",
+  "introParagraph1": "O dan Deddf Tai (Cymru) 2014, mae'n rhaid i'r rhan fwyaf o landlordiaid preifat fod wedi eu cofrestru a'u trwyddedu. Mae landlordiaid cymunedol cofrestredig wedi eu heithrio o ofynion i fod wedi'u cofrestru a'u trwyddedu.",
+  "introParagraph2": "Gallwch wirio a yw'r landlord yn gofrestredig drwy chwilio",
+  "publicRegisterLinkText": "Cofrestr Gyhoeddus Rhentu Doeth Cymru",
+  "question": "A yw'r landlord yn landlord wedi'i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
+  "errors": {
+    "exemptLandlord": "Dewiswch a yw'r landlord yn landlord wedi'i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014"
+  },
+  "options": {
+    "imNotSure": "Diffynnydd ddim yn siŵr"
+  }
+}

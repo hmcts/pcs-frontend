@@ -1,0 +1,54 @@
+{
+  "pageTitle": "Gwiriwch eich atebion",
+  "cardTitle": "Eich amgylchiadau",
+  "rows": {
+    "dependantChildren": {
+      "label": "A oes gan y diffynnydd unrhyw blant sy'n ddibynnol arnynt?",
+      "changeHidden": "plant sy'n ddibynnol"
+    },
+    "dependantChildrenDetails": {
+      "label": "Rhowch fanylion eu plant dibynnol",
+      "changeHidden": "manylion plant sy'n ddibynnol"
+    },
+    "otherDependants": {
+      "label": "A oes gan y diffynnydd unrhyw un arall sy'n ddibynnol arnynt?",
+      "changeHidden": "dibynyddion eraill"
+    },
+    "otherDependantsDetails": {
+      "label": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnynt",
+      "changeHidden": "manylion eraill sy'n ddibynnol"
+    },
+    "otherTenants": {
+      "label": "A oes yna unrhyw oedolion eraill yn byw yng nghartref y diffynnydd?",
+      "changeHidden": "oedolion eraill sy'n byw yn eich cartref"
+    },
+    "otherTenantsDetails": {
+      "label": "Rhowch fanylion yr oedolion eraill sy'n byw yng nghartref y diffynnydd",
+      "changeHidden": "manylion oedolion eraill"
+    },
+    "alternativeAccommodation": {
+      "label": "A fyddai gan y diffynnydd rywle arall i fyw os byddai'n rhaid iddynt adael eu cartref?",
+      "changeHidden": "llety amgen"
+    },
+    "alternativeAccommodationDate": {
+      "label": "Pryd fyddent yn gallu symud i mewn?",
+      "changeHidden": "dyddiad symud i mewn i lety amgen"
+    },
+    "shareAdditionalCircumstances": {
+      "label": "Hoffech chi rannu unrhyw beth am amgylchiadau'r diffynnydd?",
+      "changeHidden": "amgylchiadau ychwanegol"
+    },
+    "shareAdditionalCircumstancesDetails": {
+      "label": "Rhowch fanylion am amgylchiadau'r diffynnydd",
+      "changeHidden": "manylion amgylchiadau ychwanegol"
+    },
+    "exceptionalHardship": {
+      "label": "A fyddai'r diffynnydd yn profi caledi eithriadol os gofynnir iddynt adael eu cartref?",
+      "changeHidden": "caledi eithriadol"
+    },
+    "exceptionalHardshipDetails": {
+      "label": "Rhowch fanylion am y caledi eithriadol y byddai'r diffynnydd yn ei brofi",
+      "changeHidden": "manylion caledi eithriadol"
+    }
+  }
+}
