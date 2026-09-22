@@ -28,5 +28,4 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       closeUrl: getCaseManagementUrl(req),
     };
   },
-
 });
