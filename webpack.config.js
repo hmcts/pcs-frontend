@@ -7,16 +7,19 @@ const sourcePath = path.resolve(__dirname, 'src/main/assets/js');
 const govukFrontend = require(path.resolve(__dirname, 'webpack/govukFrontend'));
 const scss = require(path.resolve(__dirname, 'webpack/scss'));
 const HtmlWebpack = require(path.resolve(__dirname, 'webpack/htmlWebpack'));
+const cftUiComponentLib = require(path.resolve(__dirname, 'webpack/cftUiComponentLib'));
 
 const locales = path.resolve(__dirname, 'src/main/assets/locales');
 
 const devMode = process.env.NODE_ENV !== 'production';
 const fileNameSuffix = devMode ? '-dev' : '.[contenthash]';
-const filename = `[name]${fileNameSuffix}.js`;
+// Hashed output is emitted under bundles/ so it can be mounted separately and cached immutably.
+const filename = `bundles/[name]${fileNameSuffix}.js`;
 
+// Anchored to bundles/ so it only ever sees this build's own output. An unanchored test also
+// matches the govuk components copied to ../views/govuk, which nothing can serve.
 const precompressAssets = new CompressionPlugin({
-  algorithm: 'gzip',
-  test: /\.(?:js|css|svg)$/i,
+  test: /^bundles\/.*\.(?:js|css|svg)$/i,
   threshold: 1024,
   compressionOptions: { level: 9 },
 });
@@ -31,6 +34,7 @@ module.exports = {
     ...govukFrontend.plugins,
     ...scss.plugins,
     ...HtmlWebpack.plugins,
+    ...cftUiComponentLib.plugins,
     new CopyWebpackPlugin({
       patterns: [{ from: locales, to: 'locales' }],
     }),
@@ -59,5 +63,7 @@ module.exports = {
     path: path.resolve(__dirname, 'src/main/public/'),
     publicPath: '/',
     filename,
+    chunkFilename: filename,
+    clean: true,
   },
 };

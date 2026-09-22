@@ -6,13 +6,7 @@ import { gzipSync } from 'zlib';
 
 import express from 'express';
 
-import {
-  IMMUTABLE_CACHE_CONTROL,
-  REVALIDATE_CACHE_CONTROL,
-  buildAssetHandler,
-  isFingerprintedAsset,
-  setupStaticAssets,
-} from '../../main/staticAssets';
+import { setupStaticAssets } from '../../main/staticAssets';
 
 interface RawResponse {
   status: number;
@@ -20,9 +14,14 @@ interface RawResponse {
   body: Buffer;
 }
 
-const request = (port: number, urlPath: string, headers: http.OutgoingHttpHeaders = {}): Promise<RawResponse> =>
+const request = (
+  port: number,
+  urlPath: string,
+  headers: http.OutgoingHttpHeaders = {},
+  method = 'GET'
+): Promise<RawResponse> =>
   new Promise((resolve, reject) => {
-    const req = http.request({ port, path: urlPath, headers }, res => {
+    const req = http.request({ port, path: urlPath, headers, method }, res => {
       const chunks: Buffer[] = [];
       res.on('data', (chunk: Buffer) => chunks.push(chunk));
       res.on('end', () =>
@@ -33,165 +32,37 @@ const request = (port: number, urlPath: string, headers: http.OutgoingHttpHeader
     req.end();
   });
 
-describe('isFingerprintedAsset', () => {
-  it.each([
-    'main.d3bd85ff37217eccffa7.js',
-    'main.d3bd85ff37217eccffa7.css',
-    'main.d3bd85ff37217eccffa7.js.gz',
-    'main.d3bd85ff37217eccffa7.js.LICENSE.txt',
-    '/public/assets/fonts/bold-b542beb274-v2.woff2',
-    '/public/assets/fonts/light-f591b13f7d-v2.woff',
-  ])('treats %s as fingerprinted', filePath => {
-    expect(isFingerprintedAsset(filePath)).toBe(true);
-  });
-
-  it.each([
-    '/public/assets/manifest.json',
-    '/public/assets/images/favicon.ico',
-    '/public/assets/images/govuk-crest.svg',
-    '/public/assets/images/govuk-crest.svg.gz',
-    '/public/locales/en/common.json',
-    '/public/index.html',
-    'ui-component-lib.css',
-    'xui-header-shadow.css',
-    'gds-transport-bold.woff2',
-    'main-dev.js',
-    'main-dev.css',
-    '0.css',
-  ])('treats %s as mutable', filePath => {
-    expect(isFingerprintedAsset(filePath)).toBe(false);
-  });
-
-  it('matches the govuk-frontend asset names the build copies into public', () => {
-    const govukAssets = path.join(path.dirname(require.resolve('govuk-frontend')), 'assets');
-
-    const fonts = fs.readdirSync(path.join(govukAssets, 'fonts'));
-    expect(fonts.length).toBeGreaterThan(0);
-    fonts.forEach(name => expect(isFingerprintedAsset(name)).toBe(true));
-
-    const images = fs.readdirSync(path.join(govukAssets, 'images'));
-    expect(images.length).toBeGreaterThan(0);
-    images.forEach(name => expect(isFingerprintedAsset(name)).toBe(false));
-
-    expect(isFingerprintedAsset('manifest.json')).toBe(false);
-  });
-});
-
-describe('static asset serving', () => {
-  const bundleBody = 'console.log("bundle");'.repeat(200);
-  let root: string;
-  let server: http.Server;
-  let port: number;
-  let sessionCalls: string[];
-
-  beforeAll(async () => {
-    root = fs.mkdtempSync(path.join(os.tmpdir(), 'pcs-static-'));
-    fs.mkdirSync(path.join(root, 'assets'), { recursive: true });
-    fs.writeFileSync(path.join(root, 'main.d3bd85ff37217eccffa7.js'), bundleBody);
-    fs.writeFileSync(path.join(root, 'main.d3bd85ff37217eccffa7.js.gz'), gzipSync(Buffer.from(bundleBody)));
-    fs.writeFileSync(path.join(root, 'assets/manifest.json'), '{"icons":[]}');
-    fs.writeFileSync(path.join(root, 'assets/uncompressed.css'), 'body{color:red}');
-
-    sessionCalls = [];
-    const app = express();
-    app.use(buildAssetHandler(root));
-    app.use((req, res, next) => {
-      sessionCalls.push(req.path);
-      res.setHeader('Set-Cookie', 'pcs_session=abc; Path=/');
-      next();
-    });
-    app.get('/page', (_req, res) => res.send('page'));
-
-    server = await new Promise<http.Server>(resolve => {
-      const created = app.listen(0, () => resolve(created));
-    });
-    port = (server.address() as { port: number }).port;
-  });
-
-  afterAll(async () => {
-    await new Promise(resolve => server.close(resolve));
-    fs.rmSync(root, { recursive: true, force: true });
-  });
-
-  it('serves the precompressed bundle with a real Content-Length', async () => {
-    const res = await request(port, '/main.d3bd85ff37217eccffa7.js', { 'Accept-Encoding': 'gzip' });
-    const gzSize = fs.statSync(path.join(root, 'main.d3bd85ff37217eccffa7.js.gz')).size;
-
-    expect(res.status).toBe(200);
-    expect(res.headers['content-encoding']).toBe('gzip');
-    expect(res.headers['content-length']).toBe(String(gzSize));
-    expect(res.headers['transfer-encoding']).toBeUndefined();
-    expect(res.body).toHaveLength(gzSize);
-    expect(res.headers['content-type']?.toLowerCase()).toBe('text/javascript; charset=utf-8');
-    expect(res.headers['vary']).toBe('Accept-Encoding');
-    expect(res.headers['cache-control']).toBe(IMMUTABLE_CACHE_CONTROL);
-  });
-
-  it('serves the identity bundle when gzip is not accepted', async () => {
-    const res = await request(port, '/main.d3bd85ff37217eccffa7.js', { 'Accept-Encoding': 'identity' });
-
-    expect(res.status).toBe(200);
-    expect(res.headers['content-encoding']).toBeUndefined();
-    expect(res.headers['content-length']).toBe(String(Buffer.byteLength(bundleBody)));
-    expect(res.headers['content-type']?.toLowerCase()).toBe('text/javascript; charset=utf-8');
-    expect(res.body.toString()).toBe(bundleBody);
-    expect(res.headers['cache-control']).toBe(IMMUTABLE_CACHE_CONTROL);
-  });
-
-  it('falls back to the plain file when no precompressed sibling exists', async () => {
-    const res = await request(port, '/assets/uncompressed.css', { 'Accept-Encoding': 'gzip, deflate, br' });
-
-    expect(res.status).toBe(200);
-    expect(res.headers['content-encoding']).toBeUndefined();
-    expect(res.headers['content-length']).toBe('15');
-    expect(res.body.toString()).toBe('body{color:red}');
-  });
-
-  it('does not cache a mutable resource immutably', async () => {
-    const res = await request(port, '/assets/manifest.json', { 'Accept-Encoding': 'gzip' });
-
-    expect(res.status).toBe(200);
-    expect(res.headers['cache-control']).toBe(REVALIDATE_CACHE_CONTROL);
-    expect(res.headers['cache-control']).not.toContain('immutable');
-  });
-
-  it('keeps the security headers Helmet would otherwise have set', async () => {
-    const res = await request(port, '/main.d3bd85ff37217eccffa7.js', { 'Accept-Encoding': 'gzip' });
-
-    expect(res.headers['x-content-type-options']).toBe('nosniff');
-    expect(res.headers['content-security-policy']).toBe("default-src 'none'");
-  });
-
-  it('does not run the session middleware for asset requests', async () => {
-    const bundle = await request(port, '/main.d3bd85ff37217eccffa7.js', { 'Accept-Encoding': 'gzip' });
-    const manifest = await request(port, '/assets/manifest.json');
-
-    expect(bundle.headers['set-cookie']).toBeUndefined();
-    expect(manifest.headers['set-cookie']).toBeUndefined();
-    expect(sessionCalls).toStrictEqual([]);
-
-    const page = await request(port, '/page');
-
-    expect(page.headers['set-cookie']).toStrictEqual(['pcs_session=abc; Path=/']);
-    expect(sessionCalls).toStrictEqual(['/page']);
-  });
-});
+const BUNDLE = '/bundles/main.d3bd85ff37217eccffa7.js';
+const IMMUTABLE = 'public, max-age=31536000, immutable';
 
 describe('setupStaticAssets', () => {
-  let server: http.Server;
+  const bundleBody = 'console.log("bundle");'.repeat(200);
+  let root: string;
+  let server: http.Server | undefined;
   let port: number;
   let downstreamCalls: string[];
 
   beforeAll(async () => {
+    root = fs.mkdtempSync(path.join(os.tmpdir(), 'pcs-static-'));
+    fs.mkdirSync(path.join(root, 'bundles'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'assets/ui-component-lib'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'locales'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'bundles/main.d3bd85ff37217eccffa7.js'), bundleBody);
+    fs.writeFileSync(path.join(root, 'bundles/main.d3bd85ff37217eccffa7.js.gz'), gzipSync(Buffer.from(bundleBody)));
+    fs.writeFileSync(path.join(root, 'assets/manifest.json'), '{"icons":[]}');
+    fs.writeFileSync(path.join(root, 'assets/ui-component-lib/ui-component-lib.css'), 'body{color:red}');
+    fs.writeFileSync(path.join(root, 'locales/en.json'), '{"hello":"world"}');
+
     downstreamCalls = [];
     const app = express();
-    setupStaticAssets(app);
+    setupStaticAssets(app, root);
     app.use((req, res, next) => {
       downstreamCalls.push(req.path);
       res.setHeader('Set-Cookie', 'pcs_session=abc; Path=/');
       next();
     });
     app.get('/page', (_req, res) => res.send('page'));
+    app.use((_req, res) => res.status(404).type('html').send('<p>not found</p>'));
 
     server = await new Promise<http.Server>(resolve => {
       const created = app.listen(0, () => resolve(created));
@@ -200,32 +71,110 @@ describe('setupStaticAssets', () => {
   });
 
   afterAll(async () => {
-    await new Promise(resolve => server.close(resolve));
+    if (server) {
+      await new Promise(resolve => server?.close(resolve));
+    }
+    fs.rmSync(root, { recursive: true, force: true });
   });
 
-  it('serves the cft component lib stylesheet with revalidating cache headers', async () => {
-    const res = await request(port, '/assets/ui-component-lib/ui-component-lib.css');
+  it('serves the precompressed bundle with a real Content-Length', async () => {
+    const res = await request(port, BUNDLE, { 'Accept-Encoding': 'gzip' });
+    const gzSize = fs.statSync(path.join(root, 'bundles/main.d3bd85ff37217eccffa7.js.gz')).size;
 
     expect(res.status).toBe(200);
-    expect(res.headers['content-type']).toContain('text/css');
-    expect(Number(res.headers['content-length'])).toBeGreaterThan(0);
-    expect(res.headers['cache-control']).toBe(REVALIDATE_CACHE_CONTROL);
-    expect(res.headers['x-content-type-options']).toBe('nosniff');
-    expect(res.headers['set-cookie']).toBeUndefined();
+    expect(res.headers['content-encoding']).toBe('gzip');
+    expect(res.headers['content-length']).toBe(String(gzSize));
+    expect(res.headers['transfer-encoding']).toBeUndefined();
+    expect(res.headers['content-type']?.toLowerCase()).toBe('text/javascript; charset=utf-8');
+    expect(res.headers['vary']).toBe('Accept-Encoding');
+    expect(res.headers['cache-control']).toBe(IMMUTABLE);
   });
 
-  it('does not cache the un-fingerprinted cft fonts immutably', async () => {
-    const res = await request(port, '/assets/ui-component-lib/fonts/gds-transport-bold.woff2');
+  it('serves the identity bundle when gzip is not accepted', async () => {
+    const res = await request(port, BUNDLE, { 'Accept-Encoding': 'identity' });
 
     expect(res.status).toBe(200);
-    expect(res.headers['cache-control']).toBe(REVALIDATE_CACHE_CONTROL);
+    expect(res.headers['content-encoding']).toBeUndefined();
+    expect(res.headers['content-length']).toBe(String(Buffer.byteLength(bundleBody)));
+    expect(res.body.toString()).toBe(bundleBody);
+    expect(res.headers['cache-control']).toBe(IMMUTABLE);
   });
 
-  it('falls through to the application when the asset does not exist', async () => {
+  it.each(['POST', 'PUT', 'DELETE', 'OPTIONS'])(
+    'does not leave encoding headers on a %s to a bundle path',
+    async method => {
+      const res = await request(port, BUNDLE, { 'Accept-Encoding': 'gzip' }, method);
+
+      expect(res.status).toBe(404);
+      expect(res.headers['content-encoding']).toBeUndefined();
+      expect(res.headers['vary']).toBeUndefined();
+      expect(res.headers['content-type']).toContain('text/html');
+    }
+  );
+
+  it('does not serve the compressed sibling as its own immutable URL', async () => {
+    const res = await request(port, `${BUNDLE}.gz`, { 'Accept-Encoding': 'gzip' });
+
+    expect(res.status).toBe(404);
+    expect(res.headers['cache-control'] ?? '').not.toContain('immutable');
+  });
+
+  it('does not answer a percent-encoded bundle path', async () => {
+    const res = await request(port, '/bundles/main%2Ed3bd85ff37217eccffa7%2Ejs', { 'Accept-Encoding': 'gzip' });
+
+    expect(res.status).toBe(404);
+    expect(res.headers['content-type']).toContain('text/html');
+    expect(res.headers['content-encoding']).toBeUndefined();
+  });
+
+  it('leaves malformed urls to the application', async () => {
+    const res = await request(port, '/%ZZ');
+
+    expect(res.status).toBe(404);
+    expect(res.body.toString()).toBe('<p>not found</p>');
+  });
+
+  it('does not redirect a directory request', async () => {
+    const res = await request(port, '/assets');
+
+    expect(res.status).toBe(404);
+    expect(res.headers['location']).toBeUndefined();
+  });
+
+  it('caches build-time assets for a week rather than immutably', async () => {
+    const manifest = await request(port, '/assets/manifest.json');
+    const componentLib = await request(port, '/assets/ui-component-lib/ui-component-lib.css');
+
+    expect(manifest.status).toBe(200);
+    expect(manifest.headers['cache-control']).toBe('public, max-age=604800');
+    expect(componentLib.status).toBe(200);
+    expect(componentLib.headers['content-type']).toContain('text/css');
+    expect(componentLib.headers['cache-control']).toBe('public, max-age=604800');
+  });
+
+  it('serves locale files', async () => {
+    const res = await request(port, '/locales/en.json');
+
+    expect(res.status).toBe(200);
+    expect(res.body.toString()).toBe('{"hello":"world"}');
+  });
+
+  it('does not run the session middleware for asset requests', async () => {
+    const before = [...downstreamCalls];
+    const bundle = await request(port, BUNDLE, { 'Accept-Encoding': 'gzip' });
+    const manifest = await request(port, '/assets/manifest.json');
+
+    expect(bundle.headers['set-cookie']).toBeUndefined();
+    expect(manifest.headers['set-cookie']).toBeUndefined();
+    expect(downstreamCalls).toStrictEqual(before);
+  });
+
+  it('falls through to the application for non-asset paths', async () => {
     const res = await request(port, '/page');
 
     expect(res.status).toBe(200);
     expect(res.body.toString()).toBe('page');
-    expect(downstreamCalls).toStrictEqual(['/page']);
+    expect(res.headers['set-cookie']).toStrictEqual(['pcs_session=abc; Path=/']);
+    expect(downstreamCalls).toContain('/page');
   });
 });
