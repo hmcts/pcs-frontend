@@ -7,12 +7,9 @@ import i18next, { type InitOptions, type TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
 import { LanguageDetector, handle as i18nextHandle } from 'i18next-http-middleware';
 import type { Environment } from 'nunjucks';
-import { z } from 'zod';
-import { makeZodI18nMap } from 'zod-i18n-map';
 
 import { ordinalDate, pluralPossessive } from './formatters';
 
-import { getRequestT, runWithRequestI18n } from '@modules/i18nContext';
 import { Logger } from '@modules/logger';
 
 function firstExistingPath(paths: string[]): string | null {
@@ -239,23 +236,7 @@ export class I18n {
 
       setupNunjucksGlobals(req.app.locals?.nunjucksEnv, { lang, t });
 
-      // Expose `t`/`lang` via AsyncLocalStorage so code paths that can't be
-      // reached through `req` (e.g. the global Zod error map) can resolve
-      // the request-scoped translation function instead of the boot-time
-      // i18next default.
-      runWithRequestI18n({ t, lang }, () => next());
+      next();
     });
-
-    // Zod has a single process-global error map. Closing over `i18next.t`
-    // here would bind to whatever language the most recent
-    // `i18next.changeLanguage` call (made by i18next-http-middleware on
-    // every request) had set — racy across concurrent requests. Instead,
-    // resolve the request-bound `t` lazily from AsyncLocalStorage at the
-    // moment an error is rendered.
-    const requestScopedZodErrorMap = ((...args: unknown[]) =>
-      (makeZodI18nMap({ t: getRequestT() }) as (...a: unknown[]) => unknown)(...args)) as Parameters<
-      typeof z.setErrorMap
-    >[0];
-    z.setErrorMap(requestScopedZodErrorMap);
   }
 }
