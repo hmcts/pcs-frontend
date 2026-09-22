@@ -200,8 +200,12 @@ export function createPostHandler(
           }
         }
         const customSaveForLaterPath = resolveSaveForLaterRedirect ? await resolveSaveForLaterRedirect(req) : undefined;
-        return safeRedirect303(res, customSaveForLaterPath || defaultSaveForLaterRedirect(req, resolvedFlowConfig),
-          '/',['/']);
+        return safeRedirect303(
+          res,
+          customSaveForLaterPath || defaultSaveForLaterRedirect(req, resolvedFlowConfig),
+          '/',
+          ['/']
+        );
       }
 
       if (resolveRedirectAfterPost) {
