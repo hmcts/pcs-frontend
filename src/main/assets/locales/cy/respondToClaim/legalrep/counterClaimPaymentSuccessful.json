@@ -2,7 +2,7 @@
   "pageTitle": "cyPayment successful",
   "paragraph1": "cyThe counterclaim fee has been paid and the counterclaim has been submitted.",
   "paragraph2": "cyWe’ve sent you a confirmation email.",
-  "paymentReference": "",
+  "paymentReference": "cyThe payment reference number is: {{paymentReference}}",
   "heading1": "cyWhat to do next",
   "listItem1": "cyIf you’re representing more than one defendant in this case, you must submit a separate response for each one.",
   "listItem2": "cySome people need <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"noreferrer noopener\">support to use HMCTS services (opens in new tab)</a>, like step-free access to a court for a hearing. If you or the defendant need support, you should request this now.",

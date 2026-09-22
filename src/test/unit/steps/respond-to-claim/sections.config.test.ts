@@ -18,15 +18,13 @@ const findSection = (id: string) => respondToClaimSections.find(section => secti
 
 describe('respond-to-claim sections config', () => {
   it('maps every sectioned flow step to exactly one section', () => {
-    // 'reasonable-adjustments-triage', 'equality-and-diversity-start'
-    // and 'equality-and-diversity-end' are intentionally parked out of the live
-    // section flow (see sections.config.ts). They remain in the registry so direct
-    // URL access and re-enablement still work, so marking them as intentionally
-    // unmapped here in addition to flowConfig.nonSectionStepOrder.
+    // 'equality-and-diversity-start'/'equality-and-diversity-end' are intentionally parked out of the
+    // live section flow (see sections.config.ts); the RA error/cancelled pages and email-confirmation
+    // are redirect-only non-section steps. They remain in the registry so direct URL access and
+    // re-enablement still work, so they're excluded here in addition to flowConfig.nonSectionStepOrder.
     const nonSectionStepSlugs = new Set([
       ...(flowConfig.nonSectionStepOrder ?? []),
       'email-confirmation',
-      'reasonable-adjustments-triage',
       'reasonable-adjustments-error',
       'reasonable-adjustments-cancelled',
       'equality-and-diversity-start',
@@ -67,9 +65,8 @@ describe('respond-to-claim sections config', () => {
     expect(findSection('uploadFiles')?.steps).toEqual(['upload-document', 'check-your-answers-documents']);
   });
 
-  it('maps end-of-journey steps into final section', () => {
+  it('maps end-of-journey steps into final section (triage moved out to yourSupport)', () => {
     expect(findSection('checkYourAnswersAndSubmit')?.steps).toEqual([
-      'reasonable-adjustments-triage',
       'language-used',
       'end-of-journey-cya',
       'response-submitted',
@@ -78,6 +75,31 @@ describe('respond-to-claim sections config', () => {
       'counter-claim-payment-successful',
       'response-and-counter-claim-submitted',
     ]);
+  });
+
+  describe('yourSupport section (Your Support / Reasonable Adjustments task-list row)', () => {
+    it('is the last row of the "Your response" group, immediately after incomeAndExpenditure', () => {
+      const ids = respondToClaimSections.map(section => section.id);
+      expect(ids.indexOf('yourSupport')).toBe(ids.indexOf('incomeAndExpenditure') + 1);
+
+      const yourResponseIds = respondToClaimSections
+        .filter(section => section.groupId === 'yourResponse')
+        .map(section => section.id);
+      expect(yourResponseIds[yourResponseIds.length - 1]).toBe('yourSupport');
+    });
+
+    it('owns only the reasonable-adjustments-triage step', () => {
+      expect(findSection('yourSupport')?.steps).toEqual(['reasonable-adjustments-triage']);
+      expect(findSectionIdForStep('reasonable-adjustments-triage')).toBe('yourSupport');
+    });
+
+    it('is feature-flag gated via isApplicable', () => {
+      expect(typeof findSection('yourSupport')?.isApplicable).toBe('function');
+    });
+
+    it('is not a dependency of checkYourAnswersAndSubmit (optional — must never block submission)', () => {
+      expect(findSection('checkYourAnswersAndSubmit')?.dependsOn).not.toContain('yourSupport');
+    });
   });
 
   // HDPI-6929 — focused navigation test
@@ -167,6 +189,7 @@ describe('respond-to-claim sections config', () => {
         payments: 'PAYMENTS',
         situationAndCircumstances: 'SITUATION_AND_CIRCUMSTANCES',
         incomeAndExpenditure: 'INCOME_AND_EXPENDITURE',
+        yourSupport: 'YOUR_SUPPORT',
         uploadFiles: 'UPLOAD_FILES',
         checkYourAnswersAndSubmit: 'CHECK_YOUR_ANSWERS_AND_SUBMIT',
       };

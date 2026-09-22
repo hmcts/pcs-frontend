@@ -171,7 +171,9 @@ describe('PostHandler - Save for Later Fix', () => {
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       expect(
-        (mockRequest.session as { formData?: Record<string, unknown> } | undefined)?.formData?.['free-legal-advice']
+        (mockRequest.session as Request['session'] | undefined)?.formData?.default?.['1771325608502536']?.[
+          'free-legal-advice'
+        ]
       ).toBeUndefined();
       expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/next-step');
     });
@@ -221,7 +223,9 @@ describe('PostHandler - Save for Later Fix', () => {
 
       // Should save to session
       expect(
-        (mockRequest.session as { formData?: Record<string, unknown> } | undefined)?.formData?.['free-legal-advice']
+        (mockRequest.session as Request['session'] | undefined)?.formData?.default?.['1771325608502536']?.[
+          'free-legal-advice'
+        ]
       ).toEqual({
         hadLegalAdvice: 'yes',
       });
@@ -250,8 +254,6 @@ describe('PostHandler - Save for Later Fix', () => {
 
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
-      // Base URL comes from config (REDIRECTS_MANAGE_CASE_RETURN_URL), which Jenkins overrides when
-      // the PR carries a pcs-api-pr: label — assert against the resolved config value, not a fixed host.
       const expectedUrl = buildManageCaseDetailsRedirect(
         config.get<string>('redirects.manageCaseReturnURL'),
         '1771325608502536'

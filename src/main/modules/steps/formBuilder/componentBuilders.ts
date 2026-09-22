@@ -148,6 +148,18 @@ export function buildComponentConfig({
       componentType = 'textarea';
       break;
     }
+    case 'select': {
+      const selectValue = (fieldValue as string) || '';
+      component.value = selectValue;
+      component.items =
+        field.options?.map((option, optionIndex) => ({
+          value: option.value,
+          text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
+          selected: selectValue === option.value,
+        })) || [];
+      componentType = 'select';
+      break;
+    }
     case 'character-count': {
       const charCountAttributes = field.attributes || {};
       component.value = (fieldValue as string) || '';
