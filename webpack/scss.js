@@ -2,13 +2,11 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const devMode = process.env.NODE_ENV !== 'production';
 const fileNameSuffix = devMode ? '-dev' : '.[contenthash]';
-const filename = `[name]${fileNameSuffix}.css`;
+const filename = `bundles/[name]${fileNameSuffix}.css`;
 
 const miniCss = new MiniCssExtractPlugin({
-  // Options similar to the same options in webpackOptions.output
-  // both options are optional
   filename,
-  chunkFilename: '[id].css',
+  chunkFilename: `bundles/[id]${fileNameSuffix}.css`,
 });
 
 module.exports = {

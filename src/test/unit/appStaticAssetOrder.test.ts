@@ -13,19 +13,20 @@ jest.mock('../../main/staticAssets', () => ({
 }));
 
 jest.mock('../../main/modules', () => {
+  const record = (name: string) => (app: Express) => {
+    app.use(((_req, _res, next) => next()) as RequestHandler);
+    mountedBy.push(name);
+  };
+  class Helmet {
+    enableFor = record('helmet');
+  }
   class Session {
-    enableFor(app: Express): void {
-      app.use(((_req, _res, next) => next()) as RequestHandler);
-      mountedBy.push('session');
-    }
+    enableFor = record('session');
   }
   class Csrf {
-    enableFor(app: Express): void {
-      app.use(((_req, _res, next) => next()) as RequestHandler);
-      mountedBy.push('csrf');
-    }
+    enableFor = record('csrf');
   }
-  return { Session, Csrf, modules: ['Session', 'Csrf'] };
+  return { Helmet, Session, Csrf, modules: ['Session', 'Csrf'] };
 });
 
 jest.mock('../../main/modules/error-handler', () => ({ setupErrorHandlers: jest.fn() }));
@@ -37,9 +38,9 @@ jest.mock('../../main/middleware', () => ({
 }));
 
 describe('app static asset ordering', () => {
-  it('mounts static assets before the session and csrf modules', async () => {
+  it('mounts helmet before the static assets, and both before session and csrf', async () => {
     await import('../../main/app');
 
-    expect(mountedBy).toStrictEqual(['staticAssets', 'session', 'csrf']);
+    expect(mountedBy).toStrictEqual(['helmet', 'staticAssets', 'session', 'csrf']);
   });
 });

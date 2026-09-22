@@ -26,6 +26,8 @@ app.locals.ENV = env;
 
 setupDev(app, developmentMode);
 
+new modules.Helmet(developmentMode).enableFor(app);
+
 setupStaticAssets(app);
 
 app.use(cookieParser());

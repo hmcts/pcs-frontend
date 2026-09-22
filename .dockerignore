@@ -14,6 +14,7 @@
 !tsconfig.json
 !webpack/**
 !src/main/**
+src/main/public
 !config/**
 config/fortify-client.properties
 !webpack.config.js
