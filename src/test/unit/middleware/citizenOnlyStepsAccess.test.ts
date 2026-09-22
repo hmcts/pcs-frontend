@@ -71,6 +71,21 @@ describe('citizenOnlyStepsAccessMiddleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
+  // Express serves these variants of the same routes, so the guard must treat them the same way.
+  const ROUTE_VARIANTS = YOUR_SUPPORT_PATHS.flatMap(path => [
+    `${path}/`,
+    path.replace('reasonable-adjustments', 'Reasonable-Adjustments'),
+  ]);
+
+  it.each(ROUTE_VARIANTS)('bounces legal representatives from route variants Express also serves: %s', path => {
+    mockIsLegalRepresentativeUser.mockReturnValue(true);
+
+    invoke(path);
+
+    expect(mockHandleRespondToClaimDisabled).toHaveBeenCalledTimes(1);
+    expect(next).not.toHaveBeenCalled();
+  });
+
   it('does not match look-alike paths outside the Your Support pages', () => {
     mockIsLegalRepresentativeUser.mockReturnValue(true);
 

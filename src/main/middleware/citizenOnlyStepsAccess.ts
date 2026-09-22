@@ -18,7 +18,9 @@ export const citizenOnlyStepsAccessMiddleware: RequestHandler = (
     return next();
   }
 
-  const isCitizenOnlyPath = CITIZEN_ONLY_PATHS.some(pattern => pattern.test(req.path));
+  //normalise path before matching
+  const path = req.path.replace(/\/+$/, '').toLowerCase();
+  const isCitizenOnlyPath = CITIZEN_ONLY_PATHS.some(pattern => pattern.test(path));
   if (!isCitizenOnlyPath) {
     return next();
   }
