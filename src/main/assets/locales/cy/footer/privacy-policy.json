@@ -109,7 +109,7 @@
     },
     "howToComplain": {
       "title": "cyHow to complain",
-      "description1": "cySee our <a href=\"https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service/about/complaints-procedure\" >complaints procedure</a > if you want to complain about how we've handled your personal data.",
+      "description1": "cySee our <a href=\"https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service/about/complaints-procedure\" >complaints procedure</a > if you want to complain about how we’ve handled your personal data.",
       "description2": "cyWrite to: Data Protection Team, Ministry of Justice, 11th Floor, Post Point 11.52, 102 Petty France, London SW1H 9AJ",
       "description3": "cyEmail: <a href=\"mailto:DataProtection@justice.gov.uk\">DataProtection@justice.gov.uk</a>",
       "description4": "cyYou can also complain to the <a href=\"https://ico.org.uk/global/contact-us\">Information Commissioner’s Office</a> if you’re not satisfied with our response or believe we are not processing your personal data lawfully."
@@ -208,7 +208,7 @@
       "description1": "cyWhile processing your claim or application, another government department, agency or organisation might be involved and we may share your data with them.",
       "description2": "cyAny data you provide which needs to be printed will be shared with Xerox (UK) Ltd. For example, the divorce application will be printed so that it can be sent to the respondent by post.",
       "description3": "cyAny data which is posted in to support a divorce application will be shared with Exela Technologies Limited. For example, a posted marriage certificate will be received by Exela and sent to the court as a scanned image.",
-      "description4": "cyIf you contact us and ask for help with the service you're using, your personal data may be shared with the Good Things Foundation. This is a company who we have partnered with to offer face to face support.",
+      "description4": "cyIf you contact us and ask for help with the service you’re using, your personal data may be shared with the Good Things Foundation. This is a company who we have partnered with to offer face to face support.",
       "description5": "cyIn some circumstances we may share your data for example, to prevent or detect crime, or to produce anonymised statistics."
     }
   },
@@ -320,9 +320,9 @@
       "title": "cyWhat is the personal data that we collect",
       "description1": "cyWhen you use the Family Public Law service, we collect the following personal data:",
       "list1": {
-        "item1": "cythe applicant's name, address, job role and contact details",
-        "item2": "cythe Local Authority solicitor's name, address and contact details",
-        "item3": "cythe social worker's name, address and contact details",
+        "item1": "cythe applicant’s name, address, job role and contact details",
+        "item2": "cythe Local Authority solicitor’s name, address and contact details",
+        "item3": "cythe social worker’s name, address and contact details",
         "item4": "cyname, date of birth, gender, and address of children in the case",
         "item5": "cyname, date of birth, gender, address and contact details of respondents in the case",
         "item6": "cyname, address and contact details of other parties in the case, for example witnesses",

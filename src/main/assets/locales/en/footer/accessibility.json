@@ -4,7 +4,7 @@
     "title": "Accessibility Statement",
     "description1": "This accessibility statement applies to Possession Claim Service (Frontend).",
     "description2": "This website is run by HM Courts & Tribunals Service. We want as many people as possible to be able to use this website. For example, that means you should be able to:",
-    "description3": "We've also made the website text as simple as possible to understand.",
+    "description3": "We’ve also made the website text as simple as possible to understand.",
     "description4": "<a href=\"https://mcmw.abilitynet.org.uk/\" target=\"_blank\">AbilityNet (opens in a new tab)</a> has advice on making your device easier to use if you have a disability.",
     "list": {
       "item1": "change colours, contrast levels and fonts",
@@ -16,12 +16,12 @@
   },
   "enforcementProcedure": {
     "title": "Enforcement procedure",
-    "description1": "The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the 'accessibility regulations'). If you're not happy with how we respond to your complaint, <a href=\"https://www.equalityadvisoryservice.com/\" target=\"_blank\">contact the Equality Advisory and Support Service (opens in a new tab)</a>"
+    "description1": "The Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ’accessibility regulations’). If you’re not happy with how we respond to your complaint, <a href=\"https://www.equalityadvisoryservice.com/\" target=\"_blank\">contact the Equality Advisory and Support Service (opens in a new tab)</a>"
   },
   "feedbackAndContactInformation": {
     "title": "Feedback and contact information",
     "description1": "If you find any problems not listed on this page or think we’re not meeting accessibility requirements or, you need information on this website in a different format like accessible PDF, large print, easy read, audio recording or braille, contact:",
-    "description2": "We'll consider your request and get back to you in 5 days.",
+    "description2": "We’ll consider your request and get back to you in 5 days.",
     "list": {
       "item1": "email: <a href=\"mailto:possession-no-reply@justice.gov.uk\">possession-no-reply@justice.gov.uk</a>",
       "item2": "call: 0300 123 5577"
@@ -41,9 +41,9 @@
     "list": {
       "item1": "<span class=\"govuk-!-font-weight-bold\">Hidden formatting rules:</span> Input formatting requirements (like forcing decimals for whole numbers 000.00) are not stated upfront, causing validation failures. This fails WCAG success criterion 3.3.2 Labels or Instructions (Level A).",
       "item2": "<span class=\"govuk-!-font-weight-bold\">Generic page title and links not explaining when opening new tab:</span> Give no clear explanation of a page’s purpose or the behaviour on page load. This fails WCAG success criterion 2.4.2 Page Titled (Level A).",
-      "item3": "<span class=\"govuk-!-font-weight-bold\">Missing back-navigation:</span> No clear navigation exists to return to the 'respond to claim' task list without re-running the entire process. This fails WCAG success criterion 2.4.5 Multiple Ways (Level AA).",
+      "item3": "<span class=\"govuk-!-font-weight-bold\">Missing back-navigation:</span> No clear navigation exists to return to the ’respond to claim’ task list without re-running the entire process. This fails WCAG success criterion 2.4.5 Multiple Ways (Level AA).",
       "item4": "<span class=\"govuk-!-font-weight-bold\">Erratic focus order:</span> After the \"Remove\" button, focus drops off-page to an unselected file upload input before returning to the \"Choose files\" button. This fails WCAG success criteria 2.4.3: Focus Order (Level A) and 2.4.7 Focus Visible (Level AA).",
-      "item5": "<span class=\"govuk-!-font-weight-bold\">Redundant links:</span> The 'Check answers' section contains adjacent 'change' links with identical hidden names that target the same destination. This fails WCAG success criteria 2.4.4 Link Purpose (In Context) (Level A).",
+      "item5": "<span class=\"govuk-!-font-weight-bold\">Redundant links:</span> The ’Check answers’ section contains adjacent ’change’ links with identical hidden names that target the same destination. This fails WCAG success criteria 2.4.4 Link Purpose (In Context) (Level A).",
       "item6": "<span class=\"govuk-!-font-weight-bold\">Generic form groupings:</span> Form groups apply a generic &lt;legend&gt; markup instead of associating radio options to monetary inputs, relying instead on generic, repeated legends. This fails WCAG success criteria 1.3.1 Info and Relationships (Level A) and 3.3.2 Labels or Instructions (Level A).",
       "item7": "<span class=\"govuk-!-font-weight-bold\">Inconsistent heading implementation:</span> Identical \"Details given by...\" sections are inconsistently marked up across pages (some as h2, some as h3, and some not as headings at all). This fails WCAG success criteria 1.3.1 Info and Relationships (Level A).",
       "item8": "<span class=\"govuk-!-font-weight-bold\">Duplicate regions:</span> The page contains duplicate \"Case issued\" regions, with the second region failing to match the purpose of its underlying notification. This fails WCAG success criteria 1.3.1 Info and Relationships (Level A) and 4.1.2 Name, Role, Value (Level A).",
