@@ -23,27 +23,27 @@
     },
     "row1": {
       "name": "lang",
-      "purpose": "Remembers user UI language preference.",
+      "purpose": "Remembers user UI language preference",
       "expires": "1 year"
     },
     "row2": {
       "name": "pcs_session",
-      "purpose": "User session token.",
+      "purpose": "User session token",
       "expires": "Session ends"
     },
     "row3": {
       "name": "dtCookie",
-      "purpose": "Tracks a visit across multiple requests.",
+      "purpose": "Tracks a visit across multiple requests",
       "expires": "Session ends"
     },
     "row4": {
       "name": "dtLatC",
-      "purpose": "Measures server latency for performance monitoring.",
+      "purpose": "Measures server latency for performance monitoring",
       "expires": "Session ends"
     },
     "row5": {
       "name": "dtPC",
-      "purpose": "Required to identify proper endpoints for beacon transmission; includes session ID for correlation.",
+      "purpose": "Required to identify proper endpoints for beacon transmission; includes session ID for correlation",
       "expires": "Session ends"
     },
     "row6": {
@@ -52,14 +52,14 @@
       "expires": "Session ends"
     },
     "row7": {
-      "name": "rxvt",
-      "purpose": "Session timeout",
+      "name": "rxVisitor",
+      "purpose": "Generated user ID for usage tracking (Dynatrace)",
       "expires": "Session ends"
     },
     "row8": {
-      "name": "rxVisitor",
-      "purpose": "Generated user ID for usage tracking (Dynatrace)",
-      "expires": "1 year"
+      "name": "rxvt",
+      "purpose": "Session timeout",
+      "expires": "Session ends"
     }
   }
 }

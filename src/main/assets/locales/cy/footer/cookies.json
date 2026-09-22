@@ -52,14 +52,15 @@
       "expires": "cySession ends"
     },
     "row7": {
-      "name": "cyrxvt",
-      "purpose": "cySession timeout",
+      "name": "cyrxVisitor",
+      "purpose": "cyGenerated user ID for usage tracking (Dynatrace)",
       "expires": "cySession ends"
     },
     "row8": {
-      "name": "cyrxVisitor",
-      "purpose": "cyGenerated user ID for usage tracking (Dynatrace)",
-      "expires": "cy1 year"
+      "name": "cyrxvt",
+      "purpose": "cySession timeout",
+      "expires": "cySession ends"
     }
+    
   }
 }
