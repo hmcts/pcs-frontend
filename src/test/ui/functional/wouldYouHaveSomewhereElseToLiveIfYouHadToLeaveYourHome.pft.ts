@@ -1,10 +1,9 @@
 import {
-  dashboard,
   doAnyOtherAdultsLiveInYourHome,
   feedback,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
 } from '../data/page-data';
-import { getRelativeDate } from '../utils/common/string.utils';
+import { getRelativeDate } from '../utils/common/date.utils';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation(): Promise<void> {
@@ -90,9 +89,4 @@ export async function wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeNavi
     question: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader,
     option: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
   });
-  await performValidation(
-    'pageNavigation',
-    wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveForLaterButton,
-    dashboard.mainHeader
-  );
 }

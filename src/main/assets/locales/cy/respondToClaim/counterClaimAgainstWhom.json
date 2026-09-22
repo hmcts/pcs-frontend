@@ -1,0 +1,10 @@
+{
+  "pageTitle": "Yn erbyn pwy mae'r gwrth-hawliad",
+  "heading": "Yn erbyn pwy ydych chi'n gwneud y gwrth-hawliad?",
+  "checkboxHint": "Dewiswch bob un sy'n berthnasol",
+  "errors": {
+    "counterClaimAgainst": {
+      "required": "Dewiswch pwy ydych chi'n gwneud y gwrth-hawliad yn ei erbyn"
+    }
+  }
+}

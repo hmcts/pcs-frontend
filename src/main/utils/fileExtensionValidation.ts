@@ -1,5 +1,7 @@
 export const BLOCKED_EXTENSIONS = new Set(['.mp3', '.m4a', '.mp4', '.mpeg', '.mpg']);
 
+export const MEDIA_EXTENSIONS = new Set<string>(['.jpg', '.jpeg', '.png', '.bmp', '.tif', '.tiff']);
+
 export const ALLOWED_EXTENSIONS = new Set([
   '.doc',
   '.dot',
@@ -41,4 +43,8 @@ export function isBlockedExtension(filename: string): boolean {
 
 export function isAllowedExtension(filename: string): boolean {
   return ALLOWED_EXTENSIONS.has(getFileExtensionLower(filename));
+}
+
+export function isMediaExtension(filename: string): boolean {
+  return MEDIA_EXTENSIONS.has(getFileExtensionLower(filename));
 }

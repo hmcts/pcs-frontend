@@ -1,0 +1,62 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "macros/csrf.njk" import csrfProtection %}
+
+
+{% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <h1 class="govuk-heading-l">{{ t('heading') }}</h1>
+
+  {# role="list" preserves list semantics in VoiceOver — govuk-summary-list uses
+     display: table on the <ul>, which can otherwise strip them. #}
+  <ul class="govuk-summary-list" role="list">
+    {% if hasRelatedApplication %}
+    <li class="govuk-summary-list__row">
+      <div class="govuk-summary-list__key">{{ t('relatedApplicationLabel') }}</div>
+      <div class="govuk-summary-list__value">{{ relatedApplicationText }}</div>
+      <div class="govuk-summary-list__actions">
+        <a class="govuk-link" href="./confirm-if-these-documents-relate-to-an-application">
+          {{ t('change', { ns: 'common' }) }}<span class="govuk-visually-hidden"> {{ t('relatedApplicationLabel') | lower }}</span>
+        </a>
+      </div>
+    </li>
+    {% endif %}
+    <li class="govuk-summary-list__row">
+      <div class="govuk-summary-list__key">{{ t('documentsLabel') }}</div>
+      <div class="govuk-summary-list__value">
+        {% if documents.length > 0 %}
+          <ul class="govuk-list">
+            {% for d in documents %}<li>{{ d.document_filename }}</li>{% endfor %}
+          </ul>
+        {% else %}
+          {{ t('documentsNone') }}
+        {% endif %}
+      </div>
+      <div class="govuk-summary-list__actions">
+        <a class="govuk-link" href="./upload-your-documents">
+          {{ t('change', { ns: 'common' }) }}<span class="govuk-visually-hidden"> {{ t('documentsLabel') | lower }}</span>
+        </a>
+      </div>
+    </li>
+  </ul>
+
+  <form method="post" action="{{ url }}" novalidate>
+    <div class="govuk-button-group">
+      {{ govukButton({
+        text: t('buttons.submit', { ns: 'common' }),
+        attributes: { type: 'submit', id: 'submit' }
+      }) }}
+      <p class="govuk-body">
+        <a href="{{ cancelUrl }}" class="govuk-link">{{ t('buttons.cancel', { ns: 'common' }) }}</a>
+      </p>
+    </div>
+    {{ csrfProtection(csrfToken) }}
+  </form>
+{% endblock %}

@@ -1,0 +1,19 @@
+{
+  "pageTitle": "Ffi gwrth-hawliad",
+  "counterClaimFeeHeading": "Help i dalu ffioedd llys",
+  "counterClaimFeeCostParagraph": "Yn seiliedig ar yr wybodaeth a ddarparwyd, bydd yn costio'r diffynnydd {{counterClaimFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}}  i wneud eu gwrth-hawliad.",
+  "counterClaimFeeHelpParagraph": "Efallai gall y diffynnydd gael help i dalu'r ffi os ydynt (un neu fwy o’r canlynol yn berthnasol):",
+  "counterClaimFeeBulletBenefits": "cyare on certain benefits",
+  "counterClaimFeeBulletLowSavings": "cyhave little or no savings",
+  "counterClaimFeeBulletLowIncome": "cyhave low income",
+  "counterClaimFeeHeading2": "A yw'r diffynnydd angen help i dalu ffi'r gwrth-hawliad?",
+  "counterClaimFeeOptions": {
+    "iNeedHelpWithPayingFee": "Mae'r diffynnydd angen help i dalu'r ffi",
+    "iDoNotNeedHelpWithPayingFee": "Nid yw'r diffynnydd angen help i dalu’r ffi"
+  },
+  "errors": {
+    "counterClaimFee": {
+      "required": "Dewiswch os yw'r diffynnydd angen help i dalu ffi'r gwrth-hawliad"
+    }
+  }
+}

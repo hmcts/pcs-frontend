@@ -1,10 +1,17 @@
 import { Application, IRouter, Request, Router } from 'express';
 import type { RequestHandler } from 'express';
 
-import { caseReferenceParamMiddleware, legalRepresentativeHeaderMiddleware, oidcMiddleware } from '../middleware';
+import {
+  caseReferenceParamMiddleware,
+  legalRepresentativeHeaderMiddleware,
+  legalRepresentativeSpecificStepsAccessMiddleware,
+  oidcMiddleware,
+  requireEventAccess,
+  respondToClaimFeatureMiddleware,
+} from '../middleware';
 
 import { Logger } from '@modules/logger';
-import { getValidatedLanguage, stepDependencyCheckMiddleware } from '@modules/steps';
+import { getValidatedLanguage, stepDependencyCheckMiddleware, withStepContext } from '@modules/steps';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getFlowConfigForJourney, getStepForJourney, getStepsForJourney, journeyRegistry } from '@steps';
@@ -39,14 +46,30 @@ function getJourneysToRegister(specificJourney?: string): [string, (typeof journ
 function buildGetMiddleware(
   requiresAuth: boolean,
   flowConfig: JourneyFlowConfig | ((req: Request) => JourneyFlowConfig),
+  stepContext: RequestHandler,
   stepMiddleware?: RequestHandler[]
 ): RequestHandler[] {
   const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
   const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);
 
   return stepMiddleware
-    ? [...authMiddlewares, dependencyCheck, ...stepMiddleware, legalRepresentativeHeaderMiddleware]
-    : [...authMiddlewares, dependencyCheck, legalRepresentativeHeaderMiddleware];
+    ? [
+        stepContext,
+        ...authMiddlewares,
+        dependencyCheck,
+        ...stepMiddleware,
+        legalRepresentativeSpecificStepsAccessMiddleware,
+        legalRepresentativeHeaderMiddleware,
+        respondToClaimFeatureMiddleware,
+      ]
+    : [
+        stepContext,
+        ...authMiddlewares,
+        dependencyCheck,
+        legalRepresentativeSpecificStepsAccessMiddleware,
+        legalRepresentativeHeaderMiddleware,
+        respondToClaimFeatureMiddleware,
+      ];
 }
 
 /**
@@ -90,17 +113,26 @@ function registerStepRoutes(
   const stepConfig = flowConfig.steps[step.name];
   const requiresAuth = stepConfig?.requiresAuth !== false;
   const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
+  const stepContext = withStepContext({ name: step.name, journey: journeyName });
 
   if (step.getController) {
-    const allGetMiddleware = buildGetMiddleware(requiresAuth, flowConfigResolver, step.middleware);
+    const allGetMiddleware = buildGetMiddleware(requiresAuth, flowConfigResolver, stepContext, step.middleware);
     router.get(step.url, ...allGetMiddleware, createGetHandler(step, journeyName));
   }
 
   if (step.postController?.post) {
-    router.post(step.url, ...authMiddlewares, (req, res, next) => {
-      const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
-      return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();
-    });
+    router.post(
+      step.url,
+      stepContext,
+      ...authMiddlewares,
+      legalRepresentativeSpecificStepsAccessMiddleware,
+      legalRepresentativeHeaderMiddleware,
+      respondToClaimFeatureMiddleware,
+      (req, res, next) => {
+        const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
+        return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();
+      }
+    );
   }
 
   stats.totalSteps++;
@@ -164,13 +196,29 @@ export function registerSteps(router: IRouter, specificJourney?: string): void {
 export function registerAllJourneys(app: Application): void {
   logger.info('Auto-registering all journeys from registry');
 
-  for (const [journeyName] of Object.entries(journeyRegistry)) {
+  for (const [journeyName, journey] of Object.entries(journeyRegistry)) {
     // Create a dedicated router for this journey with param merging enabled
     const journeyRouter = Router({ mergeParams: true });
+
+    const eventId = journey.default.flowConfig.eventId;
+    const basePath = journey.default.flowConfig.basePath;
+    if (!eventId) {
+      throw new Error(`Journey '${journeyName}' is missing required flowConfig.eventId`);
+    }
+    if (!basePath) {
+      throw new Error(`Journey '${journeyName}' is missing required flowConfig.basePath`);
+    }
 
     // Apply journey-specific middleware
     // Note: Auto-save is handled via formBuilder's beforeRedirect, not middleware
     journeyRouter.param('caseReference', caseReferenceParamMiddleware);
+    journeyRouter.use(basePath, requireEventAccess(eventId));
+
+    // Stacked onto the :caseReference param callback so handlers fire after
+    // validatedCase loads, before per-step middleware. Mounting via .use() would fire too early.
+    for (const handler of journey.routeMiddleware ?? []) {
+      journeyRouter.param('caseReference', (req, res, next) => handler(req, res, next));
+    }
 
     // Register all steps for this journey on the journey router
     registerSteps(journeyRouter, journeyName);

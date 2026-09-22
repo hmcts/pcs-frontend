@@ -1,6 +1,6 @@
-import { Page } from '@playwright/test';
+import { Locator, Page } from '@playwright/test';
 
-import { VERY_SHORT_TIMEOUT } from '../../../../../../playwright.config';
+import { SHORT_TIMEOUT, VERY_SHORT_TIMEOUT } from '../../../../../../playwright.config';
 import { IAction, actionRecord } from '../../interfaces';
 
 type ClickLinkParams =
@@ -17,9 +17,10 @@ export class ClickLinkAction implements IAction {
     action: string,
     fieldName: string | actionRecord | ClickLinkParams,
     header?: string
-  ): Promise<void> {
-    const actionsMap = new Map<string, () => Promise<void>>([
+  ): Promise<void | Page> {
+    const actionsMap = new Map<string, () => Promise<void | Page>>([
       ['clickLink', () => this.clickLink(page, fieldName as string)],
+      ['clickLinkAndSwitchToNewTab', () => this.clickLinkAndSwitchToNewTab(page, fieldName as string)],
       [
         'clickLinkAndVerifySameTabTitle',
         () => this.clickLinkAndVerifySameTabTitle(page, fieldName as string | ClickLinkParams, header!),
@@ -31,12 +32,30 @@ export class ClickLinkAction implements IAction {
     if (!actionToPerform) {
       throw new Error(`No action found for '${action}'`);
     }
-    await actionToPerform();
+    return actionToPerform();
   }
 
   private async clickLink(page: Page, fieldName: string): Promise<void> {
-    const locator = page.locator(`a:text-is("${fieldName}"), .govuk-details__summary-text:text-is("${fieldName}")`);
+    const linkText = await this.getVisibleLinkText(page, fieldName);
+    const locator = page
+      .locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`)
+      .first();
     await locator.click();
+  }
+
+  private async getVisibleLinkText(page: Page, fieldName: string): Promise<string> {
+    const linkTextOptions = Array.from(new Set([fieldName, fieldName.replace(/[.?!]+$/, '')]));
+
+    for (const linkText of linkTextOptions) {
+      const link = page
+        .locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`)
+        .first();
+      if (await link.isVisible({ timeout: SHORT_TIMEOUT }).catch(() => false)) {
+        return linkText;
+      }
+    }
+
+    return fieldName;
   }
 
   private async clickLinkAndVerifySameTabTitle(
@@ -55,9 +74,11 @@ export class ClickLinkAction implements IAction {
       expectedHeader = fieldName.header!;
       sectionHeader = fieldName.sectionHeader;
     }
-    let link;
+    let link: Locator;
     if (sectionHeader) {
-      const section = page.locator(`h2:text-is("${sectionHeader}") + ul`);
+      const section = page
+        .locator(`h2:text-is("${sectionHeader}")`)
+        .locator('xpath=following-sibling::ul | following-sibling::nav//ul');
       link = section.locator(`a:text-is("${name}")`);
     } else {
       link = page.locator(`a:text-is("${name}")`).first();
@@ -87,5 +108,11 @@ export class ClickLinkAction implements IAction {
     }
     await newPage.close();
     await originalPage.bringToFront();
+  }
+
+  private async clickLinkAndSwitchToNewTab(page: Page, fieldName: string): Promise<Page> {
+    const [newPage] = await Promise.all([page.waitForEvent('popup'), this.clickLink(page, fieldName)]);
+    await newPage.waitForLoadState('domcontentloaded');
+    return newPage;
   }
 }

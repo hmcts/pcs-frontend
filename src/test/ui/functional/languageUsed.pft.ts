@@ -1,4 +1,4 @@
-import { equalityAndDiversityEnd, languageUsed } from '../data/page-data';
+import { languageUsed, taskList } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function languageUsedErrorValidation(): Promise<void> {
@@ -10,5 +10,5 @@ export async function languageUsedErrorValidation(): Promise<void> {
 }
 
 export async function languageUsedNavigationTests(): Promise<void> {
-  await performValidation('pageNavigation', languageUsed.backLink, equalityAndDiversityEnd.mainHeader);
+  await performValidation('pageNavigation', languageUsed.backLink, taskList.mainHeader);
 }

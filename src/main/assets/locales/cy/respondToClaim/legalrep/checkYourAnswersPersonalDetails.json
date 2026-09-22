@@ -1,0 +1,35 @@
+{
+  "pageTitle": "Gwiriwch eich atebion",
+  "cardTitle": "Manylion personol",
+  "rows": {
+    "defendantNameConfirmation": {
+      "label": "Ai enw eich cleient yw {{defendantName}}?",
+      "changeHidden": "enw"
+    },
+    "defendantName": {
+      "label": "Enw",
+      "changeHidden": "enw wedi'i gywiro"
+    },
+    "defendantNameCapture": {
+      "label": "Beth yw enw eich cleient?",
+      "changeHidden": "enw"
+    },
+    "dateOfBirth": {
+      "label": "Dyddiad geni",
+      "changeHidden": "dyddiad geni"
+    },
+    "correspondenceAddressConfirmation": {
+      "label": "cy Is the defendant’s postal address {{address}}?",
+      "fallbackLabel": "Beth yw eu cyfeiriad?",
+      "changeHidden": "cyfeiriad post"
+    },
+    "emailConfirmation": {
+      "label": "cy Do you know the defendant’s email address?",
+      "changeHidden": "cy whether you know the defendant’s email address"
+    },
+    "emailAddress": {
+      "label": "cy Defendant’s email address",
+      "changeHidden": "cy defendant’s email address"
+    }
+  }
+}

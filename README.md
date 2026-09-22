@@ -1,4 +1,4 @@
-# pcs-frontend
+# PCS-Frontend
 
 ## Getting Started
 

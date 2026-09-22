@@ -113,6 +113,35 @@ describe('HttpService', () => {
     mockAxiosInstance.patchForm.mockResolvedValue(successResponse);
   });
 
+  describe('getValidS2SToken', () => {
+    it('returns the current token when it is valid and not near expiry (no regeneration)', async () => {
+      testHttp.setToken('valid-token', Math.floor(Date.now() / 1000) + 3600);
+      const regenerator = jest.fn();
+      testHttp.setTokenRegenerator(regenerator);
+
+      await expect(testHttp.getValidS2SToken()).resolves.toBe('valid-token');
+      expect(regenerator).not.toHaveBeenCalled();
+    });
+
+    it('regenerates and returns the fresh token when the current one is expired', async () => {
+      testHttp.setToken('old-token', Math.floor(Date.now() / 1000) - 10); // already expired
+      const regenerator = jest.fn().mockImplementation(async () => {
+        testHttp.setToken('fresh-token', Math.floor(Date.now() / 1000) + 3600);
+      });
+      testHttp.setTokenRegenerator(regenerator);
+
+      await expect(testHttp.getValidS2SToken()).resolves.toBe('fresh-token');
+      expect(regenerator).toHaveBeenCalled();
+    });
+
+    it('throws when there is no token and no regenerator', async () => {
+      testHttp.setToken('', 0);
+      testHttp.setTokenRegenerator(null);
+
+      await expect(testHttp.getValidS2SToken()).rejects.toThrow();
+    });
+  });
+
   describe('token management', () => {
     it('should set token and expiry', async () => {
       const token = 'test-token';

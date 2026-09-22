@@ -1,15 +1,15 @@
 {
-  "pageTitle": "cyPayments made",
-  "caption": "cyRespond to a property possession claim",
-  "question": "cyHave you paid any money to {{claimantName}} since {{claimIssueDate}}?",
+  "pageTitle": "Taliadau a wnaed",
+  "question": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
   "options": {
-    "yes": "cyYes",
-    "no": "cyNo"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
-  "textAreaLabel": "cyGive details about how much you paid and when",
-  "textAreaHint": "cyYou can enter up to 500 characters",
+  "textAreaLabel": "Rhowch fanylion faint rydych wedi’i dalu a phryd",
+  "textAreaHint": "Gallwch nodi hyd at 500 o nodau.",
   "errors": {
-    "repaymentsInfo": "cyGive details about how much you paid and when",
-    "confirmRepaymentsMade": "cySelect if you’ve paid any money to {{claimantName}} since {{claimIssueDate}}"
+    "repaymentsInfo": "Rhowch fanylion faint rydych wedi’i dalu a phryd",
+    "repaymentsInfoMaxLength": "Rhaid i’r manylion talu fod yn 500 nod neu lai",
+    "confirmRepaymentsMade": "Dewiswch a ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}"
   }
 }

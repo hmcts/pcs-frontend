@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 
+import { anyOf, waitForInteractive } from '../../common/locator.utils';
 import { IAction, actionRecord } from '../../interfaces';
 
 export class InputTextAction implements IAction {
@@ -25,12 +26,7 @@ export class InputTextAction implements IAction {
 
   private async getStringFieldLocator(page: Page, fieldParams: string) {
     const roleLocator = page.getByRole('textbox', { name: fieldParams, exact: true });
-
-    if ((await roleLocator.count()) > 0) {
-      return roleLocator.first();
-    }
-
-    return page
+    const fallbackLocator = page
       .locator(
         `
       :has-text("${fieldParams}") ~ input:visible:enabled,
@@ -40,5 +36,14 @@ export class InputTextAction implements IAction {
     `
       )
       .first();
+
+    // Wait for whichever shape this page uses before the count() probe below.
+    await waitForInteractive(anyOf(roleLocator, fallbackLocator));
+
+    if ((await roleLocator.count()) > 0) {
+      return roleLocator.first();
+    }
+
+    return fallbackLocator;
   }
 }

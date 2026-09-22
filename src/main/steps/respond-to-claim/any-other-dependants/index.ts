@@ -1,3 +1,4 @@
+import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -6,13 +7,15 @@ import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccd
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-you-have-any-other-dependants',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.otherDependants),
   stepDir: __dirname,
   customTemplate: `${__dirname}/anyOtherDependants.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
     heading: 'heading',
-    caption: 'caption',
     paragraph: 'otherDependantsParagraph',
+    dependantQuestion: 'dependantQuestion',
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
@@ -43,16 +46,19 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     );
   },
   getInitialFormData: req => {
-    const caseData: CaseData | undefined = req.res?.locals?.validatedCase?.data;
+    const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
     const householdCircumstances: HouseholdCircumstances | undefined =
       caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const otherDependantsCcd: YesNoValue | undefined = householdCircumstances?.otherDependants;
+    // CCD round-trips YesOrNo PascalCase ("Yes"/"No") since pcs-api PR #1678, so a strict
+    // `=== 'YES'` compare here would mis-prefill the form as "no" on revisit and the
+    // textarea pre-fill below would never run. fromYesNoEnum handles either casing.
+    const otherDependantsForm = fromYesNoEnum(householdCircumstances?.otherDependants);
 
-    if (!otherDependantsCcd) {
+    if (!otherDependantsForm) {
       return {};
     }
 
-    if (otherDependantsCcd === 'YES') {
+    if (otherDependantsForm === 'yes') {
       const otherDependantDetails: string | undefined = householdCircumstances?.otherDependantDetails;
       return {
         otherDependants: 'yes',

@@ -1,7 +1,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
- 
+
 {% set contactInformation %}
-  <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+  <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
     {{ t('contactUsDetailsEmailHeading', 'Email') }}
   </h3>
 
@@ -9,7 +9,7 @@
     {{ t('contactUsDetailsEmailIntroPrefix', 'Use the') }}
     <a
       class="govuk-link"
-      href="https://www.find-court-tribunal.service.gov.uk/"
+      href="https://www.gov.uk/find-court-tribunal"
       target="_blank"
       rel="noopener noreferrer">
       {{ t(
@@ -30,14 +30,17 @@
     ) }}
   </p>
 
-  <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+  <h3 class="govuk-heading-s govuk-!-margin-bottom-4">
     {{ t('contactUsDetailsTelephoneHeading', 'Telephone') }}
   </h3>
 
-  <p class="govuk-body">
-    {{ t('contactUsDetailsTelephoneNumber', '0300 123 7050') }}<br>
-    {{ t('contactUsDetailsTelephoneHours', 'Monday to Friday, 8.30am to 5pm.') }}
-  </p>
+<p class="govuk-body">
+  {{ t('contactUsDetailsTelephoneNumber', '0300 123 7050') }}
+</p>
+
+<p class="govuk-body">
+  {{ t('contactUsDetailsTelephoneHours', 'Monday to Friday, 8.30am to 5pm.') }}
+</p>
 
   <p class="govuk-body">
     <a

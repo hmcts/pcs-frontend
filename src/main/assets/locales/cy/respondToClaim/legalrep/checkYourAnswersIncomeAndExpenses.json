@@ -1,0 +1,76 @@
+{
+  "pageTitle": "Gwiriwch eich atebion",
+  "cardTitle": "Incwm a chostau",
+  "frequencies": {
+    "WEEKLY": "pob wythnos",
+    "MONTHLY": "pob mis"
+  },
+  "incomeFrequencies": {
+    "WEEKLY": "derbynnir bob wythnos",
+    "MONTHLY": "derbynnir bob mis"
+  },
+  "paymentFrequencies": {
+    "WEEKLY": "telir bob wythnos",
+    "MONTHLY": "telir bob mis"
+  },
+  "rows": {
+    "shareIncomeExpenseDetails": {
+      "label": "Ydy'r diffynnydd eisiau rhoi manylion eu hincwm a threuliau?",
+      "changeHidden": "rhannu manylion incwm a threuliau"
+    },
+    "regularIncome": {
+      "label": "Pa incwm rheolaidd mae'r diffynnydd yn ei dderbyn?",
+      "changeHidden": "incwm rheolaidd",
+      "options": {
+        "incomeFromJobs": "Incwm o bob swydd a wneir ganddynt",
+        "pension": "Pensiwn - y wladwriaeth a phreifat",
+        "universalCredit": "Credyd Cynhwysol",
+        "otherBenefits": "Budd-daliadau a chredydau eraill",
+        "moneyFromElsewhere": "Arian o rywle arall (er enghraifft, taliadau cynhaliaeth plant neu rywun yng nghartref y diffynnydd yn rhoi arian iddynt)"
+      }
+    },
+    "hasAppliedForUniversalCredit": {
+      "label": "A yw'r diffynnydd wedi gwneud cais am Gredyd Cynhwysol?",
+      "changeHidden": "wedi gwneud cais am Gredyd Cynhwysol"
+    },
+    "universalCreditApplicationDate": {
+      "label": "Pryd wnaeth y diffynnydd wneud cais?",
+      "changeHidden": "Dyddiad y cais Credyd Cynhwysol"
+    },
+    "priorityDebts": {
+      "label": "A oes gan y diffynnydd unrhyw ddyledion blaenoriaeth?",
+      "changeHidden": "dyledion blaenoriaeth"
+    },
+    "priorityDebtTotal": {
+      "label": "Beth yw'r cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth?",
+      "changeHidden": "cyfanswm dyled flaenoriaeth"
+    },
+    "priorityDebtContribution": {
+      "label": "Faint mae'r diffynnydd yn ei dalu tuag at eu dyledion blaenoriaeth bob wythnos neu fis?",
+      "changeHidden": "cyfraniad dyled flaenoriaeth"
+    },
+    "regularExpenses": {
+      "label": "Pa dreuliau misol rheolaidd sydd gan y diffynnydd?",
+      "changeHidden": "costau rheolaidd",
+      "options": {
+        "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
+        "loanPayments": "Taliadau benthyciadau",
+        "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/wraig",
+        "mobilePhone": "Ffôn symudol",
+        "groceryShopping": "Siopa bwyd",
+        "fuelParkingTransport": "Tanwydd, parcio a chludiant",
+        "schoolCosts": "Costau ysgol (er enghraifft, gwisg a chinio ysgol)",
+        "clothing": "Dillad",
+        "otherExpenses": "Arall"
+      }
+    },
+    "otherConsiderations": {
+      "label": "Oes yna unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fel rhan o'u hymateb?",
+      "changeHidden": "ystyriaethau eraill"
+    },
+    "otherConsiderationsDetails": {
+      "label": "Rhowch fanylion beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys",
+      "changeHidden": "manylion ystyriaethau eraill"
+    }
+  }
+}

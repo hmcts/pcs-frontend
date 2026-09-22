@@ -1,0 +1,66 @@
+{
+  "pageTitle": "Incwm rheolaidd",
+  "heading": "Incwm",
+  "incomeQuestion": "Pa incwm rheolaidd mae'r diffynnydd yn ei dderbyn? (Dewisol)",
+  "groupName": "Dewisiadau incwm rheolaidd",
+  "hintText": "Dewiswch bopeth sy'n berthnasol. Rhaid i’r wybodaeth a ddarperir gan y diffynnydd fod yn wir ac yn gywir.",
+  "options": {
+    "incomeFromJobs": "Incwm o bob swydd a wneir ganddynt",
+    "pension": "Pensiwn - y wladwriaeth a phreifat",
+    "universalCredit": "Credyd Cynhwysol",
+    "otherBenefits": "Budd-daliadau a chredydau eraill",
+    "moneyFromElsewhere": "Arian o rywle arall (er enghraifft, taliadau cynhaliaeth plant neu rywun yng nghartref y diffynnydd yn rhoi arian iddynt)"
+  },
+  "subFields": {
+    "amount": "Cyfanswm a dderbynnir",
+    "frequency": "Derbynnir bob:",
+    "moneyFromElsewhereDetailsLabel": "Rhowch fanylion",
+    "moneyFromElsewhereDetailsHint": "Rhowch fanylion y ffynonellau eraill o incwm a faint mae'r diffynnydd fel arfer yn ei dderbyn y mis"
+  },
+  "frequency": {
+    "week": "Wythnos",
+    "month": "Mis"
+  },
+  "errors": {
+    "incomeFromJobsAmount": {
+      "required": "Nodwch y cyfanswm mae'r diffynnydd yn ei gael o'r holl swyddi a wneir ganddynt",
+      "negative": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o'r holl swyddi a wneir ganddynt bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o'r holl swyddi a wneir bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "incomeFromJobsFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn cael incwm o’r holl swyddi a wneir ganddynt"
+    },
+    "pensionAmount": {
+      "required": "Nodwch faint mae'r diffynnydd yn ei gael o bensiwn gwladol neu breifat",
+      "negative": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i'r cyfanswm mae'r diffynnydd yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "pensionFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn cael incwm o bensiwn gwladol neu breifat"
+    },
+    "universalCreditAmount": {
+      "required": "Nodwch faint o Gredyd Cynhwysol mae'r diffynnydd yn ei gael",
+      "negative": "Rhaid i faint o Gredyd Cynhwysol mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i faint o Gredyd Cynhwysol mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "universalCreditFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn cael Credyd Cynhwysol"
+    },
+    "otherBenefitsAmount": {
+      "required": "Nodwch faint o fudd-daliadau a chredydau eraill mae'r diffynnydd yn ei gael",
+      "negative": "Rhaid i faint o fudd-daliadau a chredydau eraill mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn £0.00 neu fwy",
+      "largeAmount": "Rhaid i faint o fudd-daliadau a chredydau eraill mae'r diffynnydd yn ei gael bob wythnos neu bob mis fod yn llai nag £1 biliwn"
+    },
+    "otherBenefitsFrequency": {
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn cael incwm o fudd-daliadau a chredydau eraill"
+    },
+    "moneyFromElsewhereDetailsMaxLength": "Rhaid i fanylion arian o rhywle arall fod yn 500 o nodau neu lai",
+    "moneyFromElsewhereDetails": {
+      "required": "Rhowch fanylion yr arian mae'r diffynnydd yn ei gael o rywle arall a faint mae'r diffynnydd fel arfer yn ei gael",
+      "invalidCharacters": "Rhowch fanylion am y ffynonellau eraill o incwm a faint mae'r diffynnydd fel arfer yn ei gael - dylai gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
+    },
+    "amount": {
+      "invalidFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"
+    }
+  }
+}

@@ -30,3 +30,7 @@ export function toCaseReference16(value: unknown): string | null {
   const strValue = String(value).trim();
   return /^\d{16}$/.test(strValue) ? strValue : null;
 }
+
+export function formatCaseReferenceForDisplay(caseReference: string): string {
+  return caseReference.replace(/(\d{4})(?=\d)/g, '$1 ');
+}

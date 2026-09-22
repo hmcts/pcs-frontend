@@ -7,6 +7,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-date-of-birth',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.dateOfBirth),
   stepDir: __dirname,
   showCancelButton: false,
   beforeRedirect: async req => {
@@ -43,7 +44,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
   },
   getInitialFormData: req => {
     const caseData = req.res?.locals.validatedCase?.data;
@@ -68,6 +68,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   fields: [
     {
+      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--l govuk-!-margin-bottom-9',
       name: 'dateOfBirth',
       type: 'date',

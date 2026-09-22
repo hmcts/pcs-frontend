@@ -1,0 +1,40 @@
+{
+  "pageTitle": "Gwirio eich atebion",
+  "cardTitle": "cy Payments and agreements",
+  "rows": {
+    "anyPaymentsMade": {
+      "label": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
+      "changeHidden": "taliadau a wnaed"
+    },
+    "paymentDetails": {
+      "label": "Rhowch fanylion faint rydych wedi’i dalu a phryd",
+      "changeHidden": "cy payment details"
+    },
+    "repaymentPlanAgreed": {
+      "label": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
+      "changeHidden": "cy repayment agreement"
+    },
+    "repaymentAgreedDetails": {
+      "label": "Rhowch fanylion faint rydych wedi cytuno i'w dalu, pa mor aml y byddwch yn talu a phryd wnaed y cytundeb",
+      "changeHidden": "cy repayment details"
+    },
+    "repayArrearsInstalments": {
+      "label": "A hoffech chi gynnig talu eich ôl-ddyledion mewn rhandaliadau?",
+      "changeHidden": "cy offer to pay in instalments"
+    },
+    "installmentAmount": {
+      "label": "Faint allwch chi fforddio’i dalu ar ben eich rhent cyfredol?",
+      "changeHidden": "cy instalment amount"
+    },
+    "installmentFrequency": {
+      "label": "Pa mor aml allech chi fforddio talu'r swm hwn?",
+      "changeHidden": "cy instalment frequency",
+      "frequencies": {
+        "weekly": "Pob wythnos",
+        "every2Weeks": "Pob 2 wythnos",
+        "every4Weeks": "Pob 4 wythnos",
+        "monthly": "Pob mis"
+      }
+    }
+  }
+}

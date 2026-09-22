@@ -27,6 +27,10 @@ export interface DocumentStorage {
 }
 
 export function toDisplayDocuments(docs: CcdCollectionItem<CcdUploadedDocument>[]): DisplayDocument[] {
+  if (!Array.isArray(docs)) {
+    return [];
+  }
+
   return docs.map((item, index) => ({
     index,
     id: item.id,
@@ -43,7 +47,7 @@ export function createCcdDraftStorage(opts: {
 }): DocumentStorage {
   return {
     async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-      const data = (req.res?.locals?.validatedCase?.data ?? {}) as CcdCaseData;
+      const data = (req.res?.locals.validatedCase?.data ?? {}) as CcdCaseData;
       return opts.getDocs(data) ?? [];
     },
 
@@ -53,7 +57,7 @@ export function createCcdDraftStorage(opts: {
       if (!caseId) {
         throw new HTTPError('Invalid case reference format', 404);
       }
-      const fresh = await ccdCaseService.getCaseById(token, caseId, opts.event.id);
+      const fresh = await ccdCaseService.getCaseByIdForEvent(token, caseId, opts.event.id, req.session?.clientContext);
       return opts.getDocs((fresh.data ?? {}) as CcdCaseData) ?? [];
     },
 
@@ -63,39 +67,48 @@ export function createCcdDraftStorage(opts: {
       if (!caseId) {
         throw new HTTPError('Invalid case reference format', 404);
       }
-      await ccdCaseService.updateDraft(opts.event, token, caseId, opts.setDocs(docs));
+      await ccdCaseService.updateDraft(opts.event, token, caseId, opts.setDocs(docs), req.session?.clientContext);
     },
   };
 }
 
-export function sessionDocs(opts: { stepName: string; fieldName?: string }): DocumentStorage {
-  const fieldName = opts.fieldName ?? 'documents';
+// Documents live in their own session bucket (not under `formData[step]`) so the
+// form-builder POST handler — which replaces `formData[step]` wholesale with the
+// submitted body — cannot wipe the upload collection. The bucket is keyed by
+// `[caseReference][stepName]` so docs uploaded against one case can never leak
+// into another case the same user is also working on.
+export function sessionDocs(opts: { stepName: string }): DocumentStorage {
+  const readFromSession = (req: Request): CcdCollectionItem<CcdUploadedDocument>[] => {
+    const caseRef = toCaseReference16(req.params?.caseReference);
+    if (!caseRef) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+    const docs = req.session.uploadedDocs?.[caseRef]?.[opts.stepName];
+    return Array.isArray(docs) ? (docs as CcdCollectionItem<CcdUploadedDocument>[]) : [];
+  };
+
   return {
     async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-      return (
-        ((req.session.formData?.[opts.stepName] as Record<string, unknown>)?.[
-          fieldName
-        ] as CcdCollectionItem<CcdUploadedDocument>[]) ?? []
-      );
+      return readFromSession(req);
     },
 
     async readFresh(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
       await new Promise<void>((resolve, reject) => req.session.reload(err => (err ? reject(err) : resolve())));
-      return (
-        ((req.session.formData?.[opts.stepName] as Record<string, unknown>)?.[
-          fieldName
-        ] as CcdCollectionItem<CcdUploadedDocument>[]) ?? []
-      );
+      return readFromSession(req);
     },
 
     async save(req: Request, docs: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void> {
-      if (!req.session.formData) {
-        req.session.formData = {};
+      const caseRef = toCaseReference16(req.params?.caseReference);
+      if (!caseRef) {
+        throw new HTTPError('Invalid case reference format', 404);
       }
-      if (!req.session.formData[opts.stepName]) {
-        req.session.formData[opts.stepName] = {};
+      if (!req.session.uploadedDocs) {
+        req.session.uploadedDocs = {};
       }
-      (req.session.formData[opts.stepName] as Record<string, unknown>)[fieldName] = docs;
+      if (!req.session.uploadedDocs[caseRef]) {
+        req.session.uploadedDocs[caseRef] = {} as Record<string, unknown[]>;
+      }
+      (req.session.uploadedDocs[caseRef] as Record<string, unknown[]>)[opts.stepName] = docs;
       await new Promise<void>((resolve, reject) => req.session.save(err => (err ? reject(err) : resolve())));
     },
   };

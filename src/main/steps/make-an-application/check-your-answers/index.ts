@@ -2,16 +2,25 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { ApplicationError, ApplicationErrorCode } from '../../../ApplicationError';
-import { createFormStep, getFormData, getTranslationFunction } from '../../../modules/steps';
+import {
+  clearFormData,
+  createFormStep,
+  getAllFormData,
+  getFormData,
+  getTranslationFunction,
+} from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { toYesNoEnum } from '../../utils';
 import { flowConfig } from '../flow.config';
+import { clearApplicationId, getApplicationId } from '../session';
 
 import { buildSummaryListRows } from './summaryListRowFactory';
 import VisibleFormDataView from './visibleFormDataView';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { CitizenGenAppRequest, GenAppType } from '@services/ccdCase.interface';
+import { CitizenGenAppRequest, GenAppState, GenAppType } from '@services/ccdCase.interface';
+import { PaymentSessionState, clearPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
+import { toCaseReference16 } from '@utils/caseReference';
 
 const STEP_NAME = 'check-your-answers';
 
@@ -58,7 +67,7 @@ export const step: StepDefinition = createFormStep({
     understandProceedings: 'statementOfTruth.understandProceedings',
   },
   extendGetContent: async (req: Request) => {
-    const t: TFunction = getTranslationFunction(req, STEP_NAME, ['common']);
+    const t: TFunction = getTranslationFunction(req);
 
     const visibleFormData = new VisibleFormDataView(req);
 
@@ -66,11 +75,14 @@ export const step: StepDefinition = createFormStep({
       visibleFormData.getApplicationTypeField()?.fieldValue !== GenAppType.ADJOURN ||
       visibleFormData.getHearingInNext14DaysField()?.fieldValue === 'yes';
 
+    const hwfApplies = visibleFormData.getHwfReferenceField()?.fieldValue;
+    const paymentNeeded = feeApplies && !hwfApplies;
+
     return {
       summaryData: {
         rows: buildSummaryListRows(req, t),
       },
-      buttonLabel: feeApplies ? t('buttons.continueToPayment') : t('buttons.submit'),
+      buttonLabel: paymentNeeded ? t('buttons.continueToPayment') : t('buttons.submit'),
     };
   },
   beforeRedirect: async (req: Request) => {
@@ -79,12 +91,13 @@ export const step: StepDefinition = createFormStep({
       throw Error('No existing case details in session');
     }
 
-    const formData = req.session.formData;
-    if (!formData) {
+    const formData = getAllFormData(req);
+    if (Object.keys(formData).length === 0) {
       throw Error('No existing formData in session');
     }
 
-    if (!req.session.genApp?.applicationId) {
+    const applicationId = getApplicationId(req);
+    if (!applicationId) {
       throw new ApplicationError('No application ID in session', ApplicationErrorCode.noApplicationIdInSession);
     }
 
@@ -92,6 +105,7 @@ export const step: StepDefinition = createFormStep({
     const statementOfTruthAccepted = (cyaFormData.statementOfTruthAccepted as string[])[0] as 'yes' | 'no';
 
     const visibleFormData = new VisibleFormDataView(req);
+    const uploadedDocs = visibleFormData.getUploadedDocuments();
 
     const citizenGenAppRequest: CitizenGenAppRequest = {
       applicationType: visibleFormData.getApplicationTypeField()?.fieldValue,
@@ -104,19 +118,36 @@ export const step: StepDefinition = createFormStep({
       withoutNoticeReason: visibleFormData.getReasonForNotSharingField()?.fieldValue,
       languageUsed: visibleFormData.getWhichLanguageField()?.fieldValue,
       whatOrderWanted: visibleFormData.getWhatOrderWantedField()?.fieldValue,
+      hasSupportingDocuments: toYesNoEnum(visibleFormData.getHasSupportingDocuments()?.fieldValue),
+      uploadedDocuments: uploadedDocs.length > 0 ? uploadedDocs : undefined,
       sotAccepted: toYesNoEnum(statementOfTruthAccepted),
       sotFullName: cyaFormData.fullName as string,
-      clientReference: req.session.genApp.applicationId,
+      clientReference: applicationId,
     };
 
-    await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
+    const makeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
       id: ccdCase.id,
       data: {
         citizenGenAppRequest,
       },
     });
 
-    delete req.session.formData;
-    delete req.session.genApp;
+    clearFormData(req);
+    const caseRef = toCaseReference16(req.params?.caseReference);
+    if (caseRef && req.session.uploadedDocs?.[caseRef]) {
+      delete req.session.uploadedDocs[caseRef];
+    }
+    clearApplicationId(req);
+
+    if (makeAnApplicationResponse?.state === GenAppState.PENDING_GEN_APP_ISSUED) {
+      const paymentSessionState: PaymentSessionState = {
+        serviceRequestReference: makeAnApplicationResponse.serviceRequestReference,
+        feeAmount: makeAnApplicationResponse.feeAmount,
+      };
+
+      setPaymentSessionState(req, paymentSessionState);
+    } else {
+      clearPaymentSessionState(req);
+    }
   },
 });

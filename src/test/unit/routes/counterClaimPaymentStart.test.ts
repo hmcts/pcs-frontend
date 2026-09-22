@@ -1,0 +1,426 @@
+const mockLogger = {
+  error: jest.fn(),
+  warn: jest.fn(),
+  info: jest.fn(),
+};
+
+jest.mock('@modules/logger', () => ({
+  Logger: {
+    getLogger: jest.fn(() => mockLogger),
+  },
+}));
+
+const mockOidcMiddleware = jest.fn((req, res, next) => next());
+jest.mock('../../../main/middleware', () => ({
+  oidcMiddleware: mockOidcMiddleware,
+}));
+
+const mockStartCardPaymentRequest = jest.fn();
+const mockStartPbaPaymentRequest = jest.fn();
+const mockGetPaymentOutcome = jest.fn();
+
+jest.mock('../../../main/services/pcsApi/paymentService', () => ({
+  getPaymentOutcome: mockGetPaymentOutcome,
+  paymentService: {
+    startCardPaymentRequest: mockStartCardPaymentRequest,
+    startPbaPaymentRequest: mockStartPbaPaymentRequest,
+  },
+}));
+
+jest.mock('config', () => ({
+  get: jest.fn((key: string) => {
+    if (key === 'payment.returnUrl') {
+      return 'https://pcs.aat.platform.hmcts.net/payment/return';
+    }
+
+    throw new Error(`Unexpected config key: ${key}`);
+  }),
+}));
+
+import type { Application, NextFunction, Request, Response } from 'express';
+
+import { HTTPError } from '../../../main/HttpError';
+import counterClaimPaymentStartRoutes from '../../../main/routes/counterClaimPaymentStart';
+
+describe('counterClaimPaymentStart routes', () => {
+  let app: Application;
+  let mockGet: jest.Mock;
+
+  const createSession = (overrides: Record<string, unknown> = {}) => {
+    const session = {
+      user: { accessToken: 'token-1' },
+      ...overrides,
+    } as Record<string, unknown>;
+
+    session.save = jest.fn(callback => {
+      callback?.(undefined);
+      return session;
+    });
+
+    return session;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetPaymentOutcome.mockReturnValue('success');
+    mockGet = jest.fn();
+    app = {
+      get: mockGet,
+    } as unknown as Application;
+    counterClaimPaymentStartRoutes(app);
+  });
+
+  it('registers route with oidc middleware', () => {
+    expect(mockGet).toHaveBeenCalledWith(
+      '/case/:caseReference/respond-to-claim/counter-claim-payment/start',
+      mockOidcMiddleware,
+      expect.any(Function)
+    );
+  });
+
+  it('returns 401 via error middleware when access token is missing', async () => {
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const req = {
+      params: { caseReference: '123' },
+      session: {
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+        },
+      },
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(new HTTPError('Authentication required', 401));
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
+  it('redirects to fee page when service request reference is missing', async () => {
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const req = {
+      params: { caseReference: '123' },
+      session: {
+        user: { accessToken: 'token-1' },
+        payment: {},
+      },
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
+  });
+
+  it('creates card payment and redirects to gov pay nextUrl', async () => {
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    mockStartCardPaymentRequest.mockResolvedValue({
+      paymentReference: 'RC-1',
+      paymentStatus: 'Created',
+      nextUrl: 'https://pay.example/next',
+    });
+
+    const req = {
+      language: 'en',
+      params: { caseReference: '123' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(mockStartCardPaymentRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accessToken: 'token-1',
+        serviceRequestReference: 'SR-1',
+        amount: 404,
+        requestLanguage: 'en',
+        returnUrl: 'https://pcs.aat.platform.hmcts.net/payment/return',
+      })
+    );
+    expect(req.session.payment).toEqual(
+      expect.objectContaining({
+        paymentReference: 'RC-1',
+        serviceRequestReference: 'SR-1',
+        feeAmount: 404,
+      })
+    );
+    expect(req.session.save).toHaveBeenCalled();
+    expect(res.redirect).toHaveBeenCalledWith(303, 'https://pay.example/next');
+  });
+
+  it('preserves submit-time counterclaim snapshot when starting gov pay', async () => {
+    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    mockStartCardPaymentRequest.mockResolvedValue({
+      paymentReference: 'RC-1',
+      paymentStatus: 'Created',
+      nextUrl: 'https://pay.example/next',
+    });
+
+    const req = {
+      language: 'en',
+      params: { caseReference: '123' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+          counterClaimType: 'PAYMENT_OR_COMPENSATION',
+          counterClaimAmountInPence: '64900',
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(req.session.payment).toEqual(
+      expect.objectContaining({
+        paymentReference: 'RC-1',
+        counterClaimType: 'PAYMENT_OR_COMPENSATION',
+        counterClaimAmountInPence: '64900',
+        failureRedirectUrl: '/case/123/respond-to-claim/counter-claim-application-fee-amount?payment=failed',
+      })
+    );
+  });
+});
+
+describe('counter-claim-pba-payment/start route', () => {
+  let app: Application;
+  let mockGet: jest.Mock;
+
+  const createSession = (overrides: Record<string, unknown> = {}) => {
+    const session = {
+      user: { accessToken: 'token-1' },
+      ...overrides,
+    } as Record<string, unknown>;
+
+    session.save = jest.fn(callback => {
+      callback?.(undefined);
+      return session;
+    });
+
+    return session;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockGetPaymentOutcome.mockReturnValue('success');
+    mockGet = jest.fn();
+    app = {
+      get: mockGet,
+    } as unknown as Application;
+    counterClaimPaymentStartRoutes(app);
+  });
+
+  it('registers route with oidc middleware', () => {
+    expect(mockGet).toHaveBeenCalledWith(
+      '/case/:caseReference/respond-to-claim/counter-claim-pba-payment/start',
+      mockOidcMiddleware,
+      expect.any(Function)
+    );
+  });
+
+  it('returns 401 via error middleware when access token is missing', async () => {
+    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const req = {
+      params: { caseReference: '123' },
+      session: {
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+        },
+      },
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(next).toHaveBeenCalledWith(new HTTPError('Authentication required', 401));
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
+  it('redirects to fee page when service request reference is missing', async () => {
+    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const req = {
+      params: { caseReference: '123' },
+      session: {
+        user: { accessToken: 'token-1' },
+        payment: {},
+      },
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
+  });
+
+  it('redirects to fee page when PBA account details are missing', async () => {
+    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const req = {
+      params: { caseReference: '123' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(mockStartPbaPaymentRequest).not.toHaveBeenCalled();
+    expect(mockLogger.warn).toHaveBeenCalledWith('Missing PBA payment details for counterclaim payment start case 123');
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
+  });
+
+  it('creates PBA payment request and redirects to successful page', async () => {
+    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    mockStartPbaPaymentRequest.mockResolvedValue({
+      paymentReference: 'RC-PBA-123',
+      status: 'Success',
+    });
+
+    const req = {
+      params: { caseReference: '123' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+          customerReference: 'CUST-001',
+          pbaAccount: 'PBA1234567',
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(mockStartPbaPaymentRequest).toHaveBeenCalledWith({
+      accessToken: 'token-1',
+      serviceRequestReference: 'SR-1',
+      amount: 404,
+      pbaAccount: 'PBA1234567',
+      customerReference: 'CUST-001',
+    });
+    expect(req.session.payment).toEqual(
+      expect.objectContaining({
+        caseReference: '123',
+        serviceRequestReference: 'SR-1',
+        feeAmount: 404,
+        paymentReference: 'RC-PBA-123',
+      })
+    );
+    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-payment-successful');
+  });
+
+  it('rejects a path-manipulated case reference through safeRedirect303 instead of redirecting to it', async () => {
+    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    mockStartPbaPaymentRequest.mockResolvedValue({
+      paymentReference: 'RC-PBA-123',
+      status: 'Success',
+    });
+
+    const req = {
+      params: { caseReference: '../..' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+          customerReference: 'CUST-001',
+          pbaAccount: 'PBA1234567',
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(mockLogger.warn).toHaveBeenCalledWith('safeRedirect303: Prefix not allowed', expect.anything());
+    expect(res.redirect).not.toHaveBeenCalledWith(303, '/case/../../respond-to-claim/counter-claim-payment-successful');
+  });
+
+  it('redirects to payment failed page when PBA payment status is unsuccessful', async () => {
+    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    mockGetPaymentOutcome.mockReturnValue('failure');
+    mockStartPbaPaymentRequest.mockResolvedValue({
+      paymentReference: 'RC-PBA-123',
+      status: 'Failed',
+    });
+
+    const req = {
+      params: { caseReference: '123' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+          customerReference: 'CUST-001',
+          pbaAccount: 'PBA1234567',
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      'Counterclaim PBA payment request for case 123 returned status Failed'
+    );
+    expect(req.session.payment).toEqual(
+      expect.not.objectContaining({
+        paymentReference: 'RC-PBA-123',
+      })
+    );
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/123/respond-to-claim/counter-claim-application-fee-amount?payment=failed'
+    );
+  });
+
+  it('redirects to payment failed page when PBA service call fails', async () => {
+    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    mockStartPbaPaymentRequest.mockRejectedValue(new Error('PBA Account Error'));
+
+    const req = {
+      params: { caseReference: '123' },
+      session: createSession({
+        payment: {
+          serviceRequestReference: 'SR-1',
+          feeAmount: 404,
+          pbaAccount: 'PBA1234567',
+          customerReference: 'CUST-001',
+        },
+      }),
+    } as unknown as Request;
+    const res = { redirect: jest.fn() } as unknown as Response;
+    const next = jest.fn();
+
+    await handler(req, res, next);
+
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      'Failed to create counterclaim PBA payment request for case 123',
+      expect.any(Error)
+    );
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/123/respond-to-claim/counter-claim-application-fee-amount?payment=failed'
+    );
+  });
+});

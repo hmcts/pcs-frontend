@@ -4,6 +4,7 @@
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/csrf.njk" import csrfProtection %}
+
 {% block pageTitle %}
   {{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
 {% endblock %}
@@ -12,15 +13,17 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  {% if caption %}
-    <span class="govuk-caption-l">{{ caption }}</span>
-  {% endif %}
-
   <h1 class="govuk-heading-l">{{ pageTitle }}</h1>
 
   <p class="govuk-body">{{ introParagraph1 }}</p>
-  <p class="govuk-body">{{ introParagraph2 }}</p>
-  <p class="govuk-body">{{ introParagraph3 }}</p>
+  {% if introParagraph2 %}
+    <p class="govuk-body">{{ introParagraph2 }}</p>
+  {% endif %}
+  
+  {% if introParagraph3 %}
+    <p class="govuk-body">{{ introParagraph3 }}</p>
+  {% endif %}
+
   <p class="govuk-body">{{ forExample }}</p>
 
   <ul class="govuk-list govuk-list--bullet">

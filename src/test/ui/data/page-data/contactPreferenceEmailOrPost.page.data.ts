@@ -1,6 +1,5 @@
 export const contactPreferenceEmailOrPost = {
   mainHeader: `Contact preference`,
-  respondToClaimParagraph: `Respond to a property possession claim`,
   backLink: `Back`,
   importantDocumentSentByPostParagraph: `Important documents like orders will always be sent by post.`,
   youCanChooseToReceiveUpdatesParagraph: `You can choose to receive updates about your case by post or email. For example, when a hearing has been scheduled or a document is ready to view online.`,

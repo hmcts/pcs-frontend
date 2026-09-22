@@ -1,3 +1,4 @@
+import { fromYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -7,10 +8,12 @@ import type { YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'your-circumstances',
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.shareAdditionalCircumstances),
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
+    circumstanceQuestion: 'circumstanceQuestion',
   },
   fields: [
     {
@@ -35,6 +38,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               attributes: {
                 rows: 5,
               },
+              labelClasses: 'govuk-label--s',
             },
           },
         },
@@ -47,7 +51,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   customTemplate: `${__dirname}/currentCircumstances.njk`,
   extendGetContent: req => {
-    const t = getTranslationFunction(req, 'your-circumstances', ['common']);
+    const t = getTranslationFunction(req);
 
     return {
       introParagraph: t('introParagraph'),
@@ -85,12 +89,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     );
   },
   getInitialFormData: req => {
-    const caseData = req.res?.locals?.validatedCase?.data;
+    const caseData = req.res?.locals.validatedCase?.data;
     const circumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
-    const existingAnswer = circumstances?.shareAdditionalCircumstances as string | undefined;
-
-    const mapping: Record<string, string> = { YES: 'yes', NO: 'no' };
-    const shareCircumstances = existingAnswer ? mapping[existingAnswer] : undefined;
+    // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — fromYesNoEnum handles either casing.
+    const shareCircumstances = fromYesNoEnum(circumstances?.shareAdditionalCircumstances);
 
     if (!shareCircumstances) {
       return {};

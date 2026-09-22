@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Taliadau a wnaed",
+  "heading": "Taliadau blaenorol",
+  "question": "",
+  "repaymentsMadeQuestion": "A yw'r diffynnydd wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
+  "textAreaLabel": "Rhowch fanylion faint wnaeth y diffynnydd ei dalu a phryd",
+  "errors": {
+    "repaymentsInfo": "Rhowch fanylion faint wnaeth y diffynnydd ei dalu a phryd",
+    "confirmRepaymentsMade": "Dewiswch a yw'r diffynnydd wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}"
+  }
+}

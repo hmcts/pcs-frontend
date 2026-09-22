@@ -29,6 +29,8 @@ export const oidcMiddleware: RequestHandler = async (
     const setReturnToAndRedirectToLogin = (): void => {
       if (req.session && !req.session.returnTo) {
         req.session.returnTo = req.originalUrl;
+        req.session.save(() => res.redirect('/login'));
+        return;
       }
       res.redirect('/login');
     };

@@ -1,11 +1,13 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
+  checkYourAnswersRTC,
   correspondenceAddress,
-  dashboard,
   defendantDateOfBirth,
   defendantNameConfirmation,
+  doYouHaveASolicitor,
   freeLegalAdvice,
   startNow,
+  taskList,
 } from '../data/page-data';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -23,17 +25,24 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
   if (testInfo.title.includes('@noDefendants')) {
+    process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
   } else {
+    process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
   }
+  await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
   await performAction('createUser', 'citizen', ['citizen']);
-  await performAction('validateAccessCodeAPI');
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  await performAction('navigateToUrl', home_url + `/access-your-case`);
+  await performAction('accessYourCase', {
+    caseNumber: process.env.CASE_NUMBER,
+    defendantDetailsKnown: !testInfo.title.includes('@noDefendants'),
+  });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   console.log('caseId', process.env.CASE_NUMBER);
   await performAction('clickButton', startNow.startNowButton);
@@ -43,6 +52,9 @@ test.beforeEach(async ({ page }, testInfo) => {
 test.describe('Correspondence Address - functional test @nightly', async () => {
   test('Correspondent Address Known - Error messages - save for later Validations', async () => {
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
@@ -57,7 +69,7 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       validationReq: correspondenceAddress.errorValidation,
       validationType: correspondenceAddress.errorValidationType.radio,
       inputArray: correspondenceAddress.errorValidationField.errorRadioMsg,
-      question: correspondenceAddress.correspondenceAddressKnownMainHeader,
+      question: correspondenceAddress.correspondenceAddressPostalMainHeader,
       header: correspondenceAddress.errorValidationHeader,
     });
     await performAction('clickRadioButton', correspondenceAddress.noRadioOption);
@@ -81,6 +93,10 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       correspondenceAddress.enterUKPostcodeHiddenTextLabel,
       correspondenceAddress.englandPostcodeTextInput
     );
+    // Below lines are added to by pass the bug HDPI-8779, once the bug is fixed, these lines can be removed till 99line code
+    await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, '');
+    await performAction('inputText', correspondenceAddress.townOrCityHiddenTextLabel, '');
+    await performAction('inputText', correspondenceAddress.postcodeHiddenTextLabel, '');
     await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
     await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
     await performAction('inputErrorValidation', {
@@ -89,6 +105,12 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       inputArray: correspondenceAddress.errorValidationField.errorTextField3,
       header: correspondenceAddress.errorValidationHeader,
     });
+    await performAction(
+      'inputText',
+      correspondenceAddress.enterUKPostcodeHiddenTextLabel,
+      correspondenceAddress.englandPostcodeTextInput
+    );
+    await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
     await performAction('select', correspondenceAddress.addressSelectHiddenLabel, correspondenceAddress.addressIndex);
     await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, '');
     await performAction('inputText', correspondenceAddress.townOrCityHiddenTextLabel, '');
@@ -120,6 +142,6 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
     });
     await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
     await performAction('clickButton', correspondenceAddress.saveForLaterButton);
-    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('mainHeader', taskList.mainHeader);
   });
 });

@@ -1,3 +1,5 @@
+import { normalizeYesNoValue } from '../../utils';
+
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 
 export function normaliseRepaymentAgreement(response: PossessionClaimResponse): void {
@@ -7,7 +9,7 @@ export function normaliseRepaymentAgreement(response: PossessionClaimResponse): 
   }
 
   // Plan agreed (or unsure) → instalment-payments page is skipped
-  if (pa.repaymentPlanAgreed !== 'NO') {
+  if (normalizeYesNoValue(pa.repaymentPlanAgreed) !== 'NO') {
     delete pa.repayArrearsInstalments;
     delete pa.additionalRentContribution;
     delete pa.additionalContributionFrequency;
@@ -15,7 +17,7 @@ export function normaliseRepaymentAgreement(response: PossessionClaimResponse): 
   }
 
   // Instalments not offered → how-much-afford-to-pay page is skipped
-  if (pa.repayArrearsInstalments !== 'YES') {
+  if (normalizeYesNoValue(pa.repayArrearsInstalments) !== 'YES') {
     delete pa.additionalRentContribution;
     delete pa.additionalContributionFrequency;
   }

@@ -5,7 +5,6 @@ const t = ((key: string) => {
     // Step translations
     pageTitle: 'Your name',
     heading: 'Whats your name?',
-    caption: 'Respond to a property possession claim',
     contactUs: 'Contact us for help',
     firstNameLabel: 'First name',
     lastNameLabel: 'Last name',
@@ -104,7 +103,6 @@ describe('respond-to-claim defendant-name-capture step', () => {
       expect.objectContaining({
         pageTitle: 'Your name',
         heading: 'Whats your name?',
-        caption: 'Respond to a property possession claim',
         dashboardUrl: null,
         cancel: 'Cancel',
         backUrl: '/previous-step',
@@ -114,11 +112,9 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
     const viewModel = res.render.mock.calls[0][1] as { fields: Record<string, unknown>[] };
     const firstNameField = viewModel.fields.find(f => f.name === 'firstName') as
-      | { component?: { label?: { classes?: string }; attributes?: Record<string, unknown> } }
-      | undefined;
+      { component?: { label?: { classes?: string }; attributes?: Record<string, unknown> } } | undefined;
     const lastNameField = viewModel.fields.find(f => f.name === 'lastName') as
-      | { component?: { label?: { classes?: string }; attributes?: Record<string, unknown> } }
-      | undefined;
+      { component?: { label?: { classes?: string }; attributes?: Record<string, unknown> } } | undefined;
 
     expect(firstNameField?.component?.label?.classes).toBe('govuk-label--s');
     expect(firstNameField?.component?.attributes).toEqual(

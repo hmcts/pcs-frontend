@@ -1,13 +1,14 @@
 import config from 'config';
 
 import { http } from '@modules/http';
-import { deleteDocument, uploadDocument } from '@services/cdamService';
+import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cdamService';
 
 jest.mock('config');
 jest.mock('@modules/http');
 
 const mockPost = http.post as jest.Mock;
 const mockDelete = http.delete as jest.Mock;
+const mockGet = http.get as jest.Mock;
 
 const mockCdamUrl = 'http://cdam.example.com';
 const mockCaseTypeId = 'PCS';
@@ -199,6 +200,144 @@ describe('cdamService', () => {
           }),
         })
       );
+    });
+  });
+
+  describe('getDocumentBinary', () => {
+    it('rewrites dm-store binary URL and returns stream plus headers', async () => {
+      const mockStream = { pipe: jest.fn(), on: jest.fn() };
+      mockGet.mockResolvedValue({
+        data: mockStream,
+        headers: {
+          'content-type': 'application/pdf',
+          'content-length': '256',
+          'content-disposition': 'inline; filename="doc.pdf"',
+        },
+      });
+      const uuid = 'dc1e8cec-d2b0-494f-8c2a-d18ece6b3e6d';
+
+      const result = await getDocumentBinary(`http://dm-store/documents/${uuid}/binary`, userToken);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockCdamUrl}/cases/documents/${uuid}/binary`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${userToken}`,
+          }),
+          responseType: 'stream',
+        })
+      );
+      expect(result).toEqual({
+        stream: mockStream,
+        contentType: 'application/pdf',
+        contentLength: '256',
+        contentDisposition: 'inline; filename="doc.pdf"',
+      });
+    });
+
+    it('uses fallback content type when response headers are missing', async () => {
+      const mockStream = { pipe: jest.fn(), on: jest.fn() };
+      mockGet.mockResolvedValue({
+        data: mockStream,
+        headers: {},
+      });
+
+      const result = await getDocumentBinary('http://some-url/binary', userToken);
+
+      expect(result.contentType).toBe('application/octet-stream');
+      expect(result.contentLength).toBeUndefined();
+      expect(result.contentDisposition).toBeUndefined();
+    });
+
+    it('falls back to direct DM-Store binaryUrl when CDAM returns 403 Forbidden', async () => {
+      const mockStream = { pipe: jest.fn(), on: jest.fn() };
+      const cdamError = {
+        response: { status: 403 },
+        message: 'Forbidden',
+      };
+      mockGet.mockRejectedValueOnce(cdamError).mockResolvedValueOnce({
+        data: mockStream,
+        headers: {
+          'content-type': 'application/pdf',
+        },
+      });
+
+      const binaryUrl = 'http://dm-store/documents/test-123/binary';
+      const result = await getDocumentBinary(binaryUrl, userToken);
+
+      expect(mockGet).toHaveBeenNthCalledWith(
+        1,
+        `${mockCdamUrl}/cases/documents/test-123/binary`,
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: `Bearer ${userToken}` }),
+        })
+      );
+      expect(mockGet).toHaveBeenNthCalledWith(
+        2,
+        binaryUrl,
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: `Bearer ${userToken}` }),
+        })
+      );
+      expect(result.stream).toBe(mockStream);
+    });
+
+    it('falls back to S2S service headers when DM-Store user token fetch also returns 403 Forbidden', async () => {
+      const mockStream = { pipe: jest.fn(), on: jest.fn() };
+      const cdamError = {
+        response: { status: 403 },
+        message: 'Forbidden',
+      };
+      const userError = {
+        response: { status: 403 },
+        message: 'User forbidden',
+      };
+      mockGet
+        .mockRejectedValueOnce(cdamError)
+        .mockRejectedValueOnce(userError)
+        .mockResolvedValueOnce({
+          data: mockStream,
+          headers: {
+            'content-type': 'application/pdf',
+          },
+        });
+
+      const binaryUrl = 'http://dm-store/documents/test-123/binary';
+      const result = await getDocumentBinary(binaryUrl, userToken);
+
+      expect(mockGet).toHaveBeenNthCalledWith(
+        3,
+        binaryUrl,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'user-id': 'pcs-frontend-service',
+            'user-roles': 'caseworker-civil,caseworker-civil-solicitor,pui-case-manager',
+          }),
+        })
+      );
+      expect(result.stream).toBe(mockStream);
+    });
+
+    it('rethrows original CDAM error if all 403 fallbacks fail', async () => {
+      const cdamError = {
+        response: { status: 403 },
+        message: 'Forbidden',
+      };
+      const fallbackError = new Error('Fallback failed');
+      mockGet
+        .mockRejectedValueOnce(cdamError)
+        .mockRejectedValueOnce(fallbackError)
+        .mockRejectedValueOnce(fallbackError);
+
+      const binaryUrl = 'http://dm-store/documents/test-123/binary';
+      await expect(getDocumentBinary(binaryUrl, userToken)).rejects.toEqual(cdamError);
+    });
+
+    it('rethrows fetch errors from CDAM', async () => {
+      const error = new Error('boom');
+      mockGet.mockRejectedValue(error);
+
+      await expect(getDocumentBinary('http://dm-store/documents/test/binary', userToken)).rejects.toThrow('boom');
     });
   });
 });

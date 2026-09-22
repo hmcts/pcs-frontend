@@ -7,10 +7,12 @@ import type { CaseData, PaymentAgreement, YesNoValue } from '@services/ccdCase.i
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-made',
+  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.anyPaymentsMade),
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
-    caption: 'caption',
+    heading: 'heading',
+    repaymentsMadeQuestion: 'repaymentsMadeQuestion',
   },
   fields: [
     {
@@ -86,13 +88,13 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     };
   },
   extendGetContent: req => {
-    const validatedCase = req.res?.locals?.validatedCase;
+    const validatedCase = req.res?.locals.validatedCase;
     const claimantName = getClaimantName(req);
-    const claimIssueDate = validatedCase?.claimIssueDate || '16th June 2025';
+    const dateIssued = validatedCase?.dateIssued;
 
     return {
       claimantName,
-      claimIssueDate,
+      dateIssued,
     };
   },
   customTemplate: `${__dirname}/repaymentsMade.njk`,
