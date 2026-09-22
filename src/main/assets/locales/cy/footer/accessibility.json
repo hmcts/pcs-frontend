@@ -5,7 +5,7 @@
     "description1": "cyThis accessibility statement applies to Possession Claim Service (Frontend).",
     "description2": "cyThis website is run by HM Courts & Tribunals Service. We want as many people as possible to be able to use this website. For example, that means you should be able to:",
     "description3": "cyWe’ve also made the website text as simple as possible to understand.",
-    "description4": "cy<a href=\"https://mcmw.abilitynet.org.uk/\" target=\"_blank\">AbilityNet (opens in a new tab)</a> has advice on making your device easier to use if you have a disability.",
+    "description4": "cy<a class=\"govuk-link\" href=\"https://mcmw.abilitynet.org.uk/\" target=\"_blank\">AbilityNet (opens in a new tab)</a> has advice on making your device easier to use if you have a disability.",
     "list": {
       "item1": "cychange colours, contrast levels and fonts",
       "item2": "cyzoom in up to 400% without the text spilling off the screen",
@@ -16,14 +16,14 @@
   },
   "enforcementProcedure": {
     "title": "cyEnforcement procedure",
-    "description1": "cyThe Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ’accessibility regulations’). If you’re not happy with how we respond to your complaint, <a href=\"https://www.equalityadvisoryservice.com/\" target=\"_blank\">contact the Equality Advisory and Support Service (opens in a new tab)</a>"
+    "description1": "cyThe Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ’accessibility regulations’). If you’re not happy with how we respond to your complaint, <a class=\"govuk-link\" href=\"https://www.equalityadvisoryservice.com/\" target=\"_blank\">contact the Equality Advisory and Support Service (opens in a new tab)</a>."
   },
   "feedbackAndContactInformation": {
     "title": "cyFeedback and contact information",
     "description1": "cyIf you find any problems not listed on this page or think we’re not meeting accessibility requirements or, you need information on this website in a different format like accessible PDF, large print, easy read, audio recording or braille, contact:",
     "description2": "cyWe’ll consider your request and get back to you in 5 days.",
     "list": {
-      "item1": "cyemail: <a href=\"mailto:possession-no-reply@justice.gov.uk\">possession-no-reply@justice.gov.uk</a>",
+      "item1": "cyemail: <a class=\"govuk-link\" href=\"mailto:possession-no-reply@justice.gov.uk\">possession-no-reply@justice.gov.uk</a>",
       "item2": "cycall: 0300 123 5577"
     }
   },

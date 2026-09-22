@@ -4,7 +4,7 @@
     "title": "Cookies",
     "description1": "A cookie is a small piece of data that’s stored on your computer, tablet, or phone when you visit a website. Most websites need cookies to work properly.",
     "description2": "This service uses them to:",
-    "description3": "Find out more about <a target=\"_blank\" href=\"http://www.aboutcookies.org/\">how to manage cookies</a>.",
+    "description3": "Find out more about <a class=\"govuk-link\" target=\"_blank\" href=\"http://www.aboutcookies.org/\">how to manage cookies</a>.",
     "list": {
       "item1": "measure how you use the service so it can be improved",
       "item2": "remember the notifications you’ve seen so that you’re not shown them again",

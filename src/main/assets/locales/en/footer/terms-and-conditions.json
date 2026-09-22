@@ -2,7 +2,7 @@
   "pageTitle": "Terms and Conditions - HM Courts & Tribunals Service - GOV.UK",
   "termsAndConditions": {
     "title": "Terms and conditions",
-    "description1": "By accessing this service (‘the Service’), you’re agreeing to the following terms of use. This includes the <a href=\"/privacy-policy\">privacy policy</a>.",
+    "description1": "By accessing this service (‘the Service’), you’re agreeing to the following terms of use. This includes the <a class=\"govuk-link\" href=\"/privacy-policy\">privacy policy</a>.",
     "description2": "The use of the Service includes the Manage Organisation and Manage Cases applications (sometimes known as ‘MyHMCTS’) and Judicial Case Manager (JCM).",
     "description3": "The term ‘you’ includes yourself and all users of the Service in your organisation. The terms ‘we’ and ‘us’ refer to His Majesty’s Courts and Tribunals Service.",
     "description4": "You also agree that you have a legitimate need to use the Service."

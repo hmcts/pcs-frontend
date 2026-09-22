@@ -2,11 +2,11 @@
   "pageTitle": "cyGet Help - HM Courts & Tribunals Service - GOV.UK",
   "myHMCTSContactDetails": {
     "title": "cyMyHMCTS services",
-    "description1": "cy<span class=\"govuk-!-font-weight-bold\">Email: </span><a href=\"mailto:MyHMCTSsupport@justice.gov.uk\">MyHMCTSsupport@justice.gov.uk</a><br> Contact us for help with registering your organisation or managing your account."
+    "description1": "cy<span class=\"govuk-!-font-weight-bold\">Email: </span><a class=\"govuk-link\" href=\"mailto:MyHMCTSsupport@justice.gov.uk\">MyHMCTSsupport@justice.gov.uk</a><br> Contact us for help with registering your organisation or managing your account."
   },
   "possessionsClaimContactDetails": {
     "title": "cyPossessions Claim",
-    "description1": "cyContact the local court dealing with the claim <a href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\">Find a Court or Tribunal - GOV.UK (opens in a new tab)</a>"
+    "description1": "cyContact the local court dealing with the claim <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\">Find a Court or Tribunal - GOV.UK (opens in a new tab)</a>"
   },
   "nationalContactCentreForCivilFamilyCourtContactDetails": {
     "title": "cyNational Contact Centre for Civil & Family Court",

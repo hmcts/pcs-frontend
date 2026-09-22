@@ -3,25 +3,25 @@
   "privacyPolicy": {
     "title": "Privacy policy",
     "list": {
-      "item1": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-1\" href=\"/privacy-policy#tabs-1\">Overview</a>",
-      "item2": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-4\" href=\"/privacy-policy#tabs-4\">Appeal a benefit decision service </a>",
-      "item3": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-3\" href=\"/privacy-policy#tabs-3\">Apply for divorce service</a >",
-      "item4": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-5\" href=\"/privacy-policy#tabs-5\">Apply for probate service</a >",
-      "item5": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-2\" href=\"/privacy-policy#tabs-2\">Money claims service</a>",
-      "item6": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-6\" href=\"/privacy-policy#tabs-6\">Family public law service</a >",
-      "item7": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-7\" href=\"/privacy-policy#tabs-7\">Appeal an immigration or asylum decision service</a >",
-      "item8": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-8\" href=\"/privacy-policy#tabs-8\">Possession claims service</a >"
+      "item1": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-1\" href=\"/privacy-policy#tabs-1\">Overview</a>",
+      "item2": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-4\" href=\"/privacy-policy#tabs-4\">Appeal a benefit decision service </a>",
+      "item3": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-3\" href=\"/privacy-policy#tabs-3\">Apply for divorce service</a >",
+      "item4": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-5\" href=\"/privacy-policy#tabs-5\">Apply for probate service</a >",
+      "item5": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-2\" href=\"/privacy-policy#tabs-2\">Money claims service</a>",
+      "item6": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-6\" href=\"/privacy-policy#tabs-6\">Family public law service</a >",
+      "item7": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-7\" href=\"/privacy-policy#tabs-7\">Appeal an immigration or asylum decision service</a >",
+      "item8": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-8\" href=\"/privacy-policy#tabs-8\">Possession claims service</a >"
     }
   },
   "overview": {
     "overview": {
       "title": "Overview",
-      "description1": "This privacy policy explains why we collect your personal data, what we do with it, and your rights. More information about using this service is in the&nbsp;<a routerlink=\"/terms-and-conditions\" href=\"/terms-and-conditions\" >terms and conditions</a >."
+      "description1": "This privacy policy explains why we collect your personal data, what we do with it, and your rights. More information about using this service is in the&nbsp;<a class=\"govuk-link\" routerlink=\"/terms-and-conditions\" href=\"/terms-and-conditions\" >terms and conditions</a >."
     },
     "whoManagesThisService": {
       "title": "Who manages this service",
       "description1": "This service is managed by Her Majesty’s Courts and Tribunals Service (HMCTS) and we’re responsible for protecting the personal data you provide.",
-      "description2": "HMCTS is an executive agency of the Ministry of Justice (MoJ). The MoJ is the data controller and their <a href=\"https://www.gov.uk/government/organisations/ministry-of-justice/about/personal-information-charter\" >personal information charter</a > explains more about how they process personal data.",
+      "description2": "HMCTS is an executive agency of the Ministry of Justice (MoJ). The MoJ is the data controller and their <a class=\"govuk-link\" href=\"https://www.gov.uk/government/organisations/ministry-of-justice/about/personal-information-charter\" >personal information charter</a > explains more about how they process personal data.",
       "description3": "When you use this service we (HMCTS) will ask you to provide some personal data."
     },
     "whyWeCollectYourPersonalData": {
@@ -37,7 +37,7 @@
     "typesOfPersonalDataWeCollect": {
       "title": "Types of personal data we collect",
       "description1": "The personal data we collect includes:",
-      "description2": "Some services collect more personal data. Find out more about the <a routerlink=\"/privacy-policy\" fragment=\"otherservices\" href=\"/privacy-policy#otherservices\" >personal data that is collected by the service you are using</a >.",
+      "description2": "Some services collect more personal data. Find out more about the <a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"otherservices\" href=\"/privacy-policy#otherservices\" >personal data that is collected by the service you are using</a >.",
       "list": {
         "item1": "your name, address and contact details",
         "item2": "your email and password (if you create an account)",
@@ -66,14 +66,14 @@
       "title": "Storing your data",
       "description1": "When you make your claim or application we store the data you have provided. The amount of time that your data is kept for depends on the service that you are using.",
       "description2": "When you make your claim or application we store the data you have provided. The amount of time that your data is kept for depends on the service that you are using.",
-      "description3": "Some services collect more personal data. Find out more about the <a routerlink=\"/privacy-policy\" fragment=\"otherservices\" href=\"/privacy-policy#otherservices\" >personal data that is collected by the service you are using</a >."
+      "description3": "Some services collect more personal data. Find out more about the <a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"otherservices\" href=\"/privacy-policy#otherservices\" >personal data that is collected by the service you are using</a >."
     },
     "sharingYourData": {
       "title": "Sharing your data",
       "description1": "While processing your claim or application, another government department, agency or organisation might be involved and we may share your data with them.",
       "description2": "If you contact us and ask for help with the service you are using, your personal data may be shared with the Good Things Foundation. This is a company who we have partnered with to offer face to face support.",
       "description3": "In some circumstances we may share your data for example, to prevent or detect crime, or to produce anonymised statistics.",
-      "description4": "We use Google Analytics to collect data about how a website is used. This anonymous data is shared with Google. Find out about this in our <a routerlink=\"/terms-and-conditions\" href=\"/terms-and-conditions\">terms and conditions</a>."
+      "description4": "We use Google Analytics to collect data about how a website is used. This anonymous data is shared with Google. Find out about this in our <a class=\"govuk-link\" routerlink=\"/terms-and-conditions\" href=\"/terms-and-conditions\">terms and conditions</a>."
     },
     "storingAndSharingYourDataInternationally": {
       "title": "Storing and sharing your data internationally",
@@ -104,26 +104,26 @@
       "description4": "You can contact the MoJ data protection officer, by:",
       "list4": {
         "item1": "how we check that the information we hold is accurate and up-to-date",
-        "item2": "emailing: <a href=\"mailto:DataProtection@justice.gov.uk\">DataProtection@justice.gov.uk</a>"
+        "item2": "emailing: <a class=\"govuk-link\" href=\"mailto:DataProtection@justice.gov.uk\">DataProtection@justice.gov.uk</a>"
       }
     },
     "howToComplain": {
       "title": "How to complain",
-      "description1": "See our <a href=\"https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service/about/complaints-procedure\" >complaints procedure</a > if you want to complain about how we’ve handled your personal data.",
+      "description1": "See our <a class=\"govuk-link\" href=\"https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service/about/complaints-procedure\" >complaints procedure</a > if you want to complain about how we’ve handled your personal data.",
       "description2": "Write to: Data Protection Team, Ministry of Justice, 11th Floor, Post Point 11.52, 102 Petty France, London SW1H 9AJ",
-      "description3": "Email: <a href=\"mailto:DataProtection@justice.gov.uk\">DataProtection@justice.gov.uk</a>",
-      "description4": "You can also complain to the <a href=\"https://ico.org.uk/global/contact-us\">Information Commissioner’s Office</a> if you’re not satisfied with our response or believe we are not processing your personal data lawfully."
+      "description3": "Email: <a class=\"govuk-link\" href=\"mailto:DataProtection@justice.gov.uk\">DataProtection@justice.gov.uk</a>",
+      "description4": "You can also complain to the <a class=\"govuk-link\" href=\"https://ico.org.uk/global/contact-us\">Information Commissioner’s Office</a> if you’re not satisfied with our response or believe we are not processing your personal data lawfully."
     },
     "theServiceYouAreUsing": {
       "title": "The service you are using",
       "description1": "The types of personal data collected, how long it is stored for, and who it is shared with depends on the service you are using. Find out more by following the links below:",
       "list": {
-        "item1": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-4\" href=\"/privacy-policy#tabs-4\" >Using the appeal a benefit decision service</a >",
-        "item2": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-3\" href=\"/privacy-policy#tabs-3\" >Using the apply for a divorce service</a >",
-        "item3": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-5\" href=\"/privacy-policy#tabs-5\" >Using the apply for probate service</a >",
-        "item4": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-2\" href=\"/privacy-policy#tabs-2\" >Using the money claims service</a >",
-        "item5": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-6\" href=\"/privacy-policy#tabs-6\" >Using family public law service</a >",
-        "item6": "<a routerlink=\"/privacy-policy\" fragment=\"tabs-8\" href=\"/privacy-policy#tabs-8\" >Using the possession claims service</a >"
+        "item1": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-4\" href=\"/privacy-policy#tabs-4\" >Using the appeal a benefit decision service</a >",
+        "item2": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-3\" href=\"/privacy-policy#tabs-3\" >Using the apply for a divorce service</a >",
+        "item3": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-5\" href=\"/privacy-policy#tabs-5\" >Using the apply for probate service</a >",
+        "item4": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-2\" href=\"/privacy-policy#tabs-2\" >Using the money claims service</a >",
+        "item5": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-6\" href=\"/privacy-policy#tabs-6\" >Using family public law service</a >",
+        "item6": "<a class=\"govuk-link\" routerlink=\"/privacy-policy\" fragment=\"tabs-8\" href=\"/privacy-policy#tabs-8\" >Using the possession claims service</a >"
       }
     }
   },
@@ -158,7 +158,7 @@
       "title": "Receiving notifications",
       "description1": "As part of your appeal we’ll ask if you want to receive text message and email notifications to keep you updated with your appeal.",
       "description2": "You can cancel text messages by following the steps mentioned in the text message, and you can cancel emails by following the steps mentioned in the emails.",
-      "description3": "If you have asked for your named representative to receive updates on your appeal, then we will share your data with them. If you want your representative to stop receiving notifications then you need to <a href=\"https://hmcts-access.service.gov.uk/contact-us\">Contact us</a>."
+      "description3": "If you have asked for your named representative to receive updates on your appeal, then we will share your data with them. If you want your representative to stop receiving notifications then you need to <a class=\"govuk-link\" href=\"https://hmcts-access.service.gov.uk/contact-us\">Contact us</a>."
     },
     "storingAndSharingYourData": {
       "title": "Storing and sharing your data",
@@ -232,7 +232,7 @@
       "title": "Storing your data",
       "description1": "As part of your application you’ll be asked to use your email address to set up an account. You will be able to use this email address and password to sign into other HMCTS services.",
       "description2": "We may ask for your permission to use your email address to send you emails using GOV.UK Notify. This system processes emails only within the European Economic Area until the point where emails are handed over to the email provider you use.",
-      "description3": "We use <a routerlink=\"/cookies\" href=\"/cookies\">cookies</a> to collect data that tells us about how you’re using this service, including:",
+      "description3": "We use <a class=\"govuk-link\" routerlink=\"/cookies\" href=\"/cookies\">cookies</a> to collect data that tells us about how you’re using this service, including:",
       "list": {
         "item1": "if you open an email from us or click on a link in an email",
         "item2": "your computer, phone or tablet’s IP address",
@@ -255,9 +255,9 @@
     "sharingYourData4": {
       "title": "Sharing your data",
       "description1": "While processing your application, another government department, agency or organisation might be involved and we may share your data with them.",
-      "description2": "If you contact us and ask for help with a service you are using, your personal data may be shared with the <a href=\"https://www.goodthingsfoundation.org/\" target=\"_blank\" rel=\"noopener noreferrer\" >Good Things Foundation (opens in a new window)</a >. This is a company who we have partnered with to offer face to face support.",
+      "description2": "If you contact us and ask for help with a service you are using, your personal data may be shared with the <a class=\"govuk-link\" href=\"https://www.goodthingsfoundation.org/\" target=\"_blank\" rel=\"noopener noreferrer\" >Good Things Foundation (opens in a new window)</a >. This is a company who we have partnered with to offer face to face support.",
       "description3": "In some circumstances we may share your data. For example, to prevent or detect crime, or to produce anonymised statistics.",
-      "description4": "We use Google Analytics to collect data about how a website is used. This anonymous data is shared with Google. Find out about this in our <a href=\"https://www.apply-for-probate.service.gov.uk/terms-conditions\">terms and conditions</a>.",
+      "description4": "We use Google Analytics to collect data about how a website is used. This anonymous data is shared with Google. Find out about this in our <a class=\"govuk-link\" href=\"https://www.apply-for-probate.service.gov.uk/terms-conditions\">terms and conditions</a>.",
       "description5": "Storing and sharing your data internationally",
       "description6": "Sometimes we need to send your personal information outside of the UK. When we do this we comply with data protection law."
     }
@@ -333,7 +333,7 @@
       "description2": "We also collect",
       "list2": {
         "item1": "information that tells us if you open an email from us, or click on a link in an email",
-        "item2": "information about how you use this service, like your IP address and the web browser you use. We do this by <a routerlink=\"/cookies\" href=\"/cookies\">using cookies</a>"
+        "item2": "information about how you use this service, like your IP address and the web browser you use. We do this by <a class=\"govuk-link\" routerlink=\"/cookies\" href=\"/cookies\">using cookies</a>"
       }
     },
     "whatWeDoWithYourData": {
@@ -351,7 +351,7 @@
     "yourRights2": {
       "title": "Your rights",
       "description1": "You can ask:",
-      "description2": "Email <a href=\"mailto:data.access@justice.gov.uk\">data.access@justice.gov.uk</a> if you want to see any of this information.",
+      "description2": "Email <a class=\"govuk-link\" href=\"mailto:data.access@justice.gov.uk\">data.access@justice.gov.uk</a> if you want to see any of this information.",
       "list": {
         "item1": "to see the personal data that we hold on you",
         "item2": "to have the personal data corrected",
@@ -361,17 +361,17 @@
     },
     "sharingYourData5": {
       "title": "Sharing your data",
-      "description1": "We allow Google to use or share our website analytics data, find out about this in our &nbsp;<a routerlink=\"/terms-and-conditions\" href=\"/terms-and-conditions\" >terms and conditions</a >."
+      "description1": "We allow Google to use or share our website analytics data, find out about this in our &nbsp;<a class=\"govuk-link\" routerlink=\"/terms-and-conditions\" href=\"/terms-and-conditions\" >terms and conditions</a >."
     },
     "receivingNotifications3": {
       "title": "Receiving notifications",
       "description1": "As part of your application we will send you notifications to let you know how your application is proceeding.",
-      "description2": "Email <a href=\"mailto:contactfpl@justice.gov.uk\">contactfpl@justice.gov.uk</a> if you want to cancel email updates."
+      "description2": "Email <a class=\"govuk-link\" href=\"mailto:contactfpl@justice.gov.uk\">contactfpl@justice.gov.uk</a> if you want to cancel email updates."
     },
     "howToComplain2": {
       "title": "How to complain",
-      "description1": "If you want to complain about how we have handled your personal data, email <a href=\"mailto:DataProtection@justice.gov.uk\">DataProtection@justice.gov.uk</a>.",
-      "description2": "You can complain to the <a href=\"https://ico.org.uk/global/contact-us\">Information Commissioner’s Office</a> if you are unsatisfied with our response or believe we are not legally processing your personal data."
+      "description1": "If you want to complain about how we have handled your personal data, email <a class=\"govuk-link\" href=\"mailto:DataProtection@justice.gov.uk\">DataProtection@justice.gov.uk</a>.",
+      "description2": "You can complain to the <a class=\"govuk-link\" href=\"https://ico.org.uk/global/contact-us\">Information Commissioner’s Office</a> if you are unsatisfied with our response or believe we are not legally processing your personal data."
     }
   },
   "appealAnImmigrationOrAsylumDecisionService": {
