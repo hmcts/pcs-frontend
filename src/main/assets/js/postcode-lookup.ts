@@ -91,7 +91,10 @@ export function initPostcodeLookup(): void {
 
     field.classList.remove('govuk-input--error');
 
-    const errorId = field.getAttribute('aria-describedby')?.split(/\s+/).find(id => id.endsWith('-error'));
+    const errorId = field
+      .getAttribute('aria-describedby')
+      ?.split(/\s+/)
+      .find(id => id.endsWith('-error'));
     if (errorId) {
       document.getElementById(errorId)?.classList.add('govuk-!-display-none');
     }
