@@ -1,12 +1,10 @@
 import { SpanStatusCode, trace } from '@opentelemetry/api';
 import winston from 'winston';
 
+// Never receives an Error: toException returns those directly, so their stack survives.
 function toLogMessage(value: unknown): string {
   if (typeof value === 'string') {
     return value;
-  }
-  if (value instanceof Error) {
-    return value.message;
   }
   try {
     return JSON.stringify(value);
