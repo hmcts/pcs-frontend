@@ -79,6 +79,64 @@ describe('logger module', () => {
     expect(emit).toHaveBeenCalledWith(expect.objectContaining({ body: 'Retrying', severityText: 'warn' }));
   });
 
+  it('does not export info logs, which bypass trace sampling entirely (HDPI-8953)', () => {
+    const emit = jest.fn();
+    logs.setGlobalLoggerProvider({ getLogger: () => ({ emit, enabled: () => true }) });
+
+    try {
+      Logger.enableTelemetry();
+      const logger = Logger.getLogger(`logger-otel-level-${Date.now()}`);
+      logger.info('Calling submitEvent with URL: http://ccd/cases, eventId: respondPossessionClaim');
+      logger.warn('Retrying');
+    } finally {
+      logs.disable();
+    }
+
+    expect(emit).toHaveBeenCalledTimes(1);
+    expect(emit).toHaveBeenCalledWith(expect.objectContaining({ severityText: 'warn' }));
+  });
+
+  it('strips query values before a record reaches the console or App Insights (HDPI-8953)', () => {
+    const emit = jest.fn();
+    logs.setGlobalLoggerProvider({ getLogger: () => ({ emit, enabled: () => true }) });
+
+    try {
+      Logger.enableTelemetry();
+      const logger = Logger.getLogger(`logger-otel-redact-${Date.now()}`);
+      // The OIDC callback URL: logging it verbatim ships the authorization code to App Insights.
+      logger.error('Authentication error details:', { url: '/oauth2/callback?code=secret-code&state=abc' });
+    } finally {
+      logs.disable();
+    }
+
+    expect(emit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        attributes: expect.objectContaining({ url: '/oauth2/callback?code=***&state=***' }),
+      })
+    );
+    expect(JSON.stringify(emit.mock.calls)).not.toContain('secret-code');
+  });
+
+  it('strips query values passed positionally, as the 404 handler logs them', () => {
+    const logger = Logger.getLogger(`logger-redact-splat-${Date.now()}`);
+
+    logger.error('Page not found', '/oauth2/callback?code=secret-code&state=abc');
+
+    const output = stripAnsiCodes(formattedLines.join('\n'));
+    expect(output).toContain('/oauth2/callback?code=***&state=***');
+    expect(output).not.toContain('secret-code');
+  });
+
+  it('strips query values embedded in the message itself', () => {
+    const logger = Logger.getLogger(`logger-redact-message-${Date.now()}`);
+
+    logger.info('Calling getEventToken with URL: http://ccd/cases/1?ignore-warning=false&key=secret-key');
+
+    const output = stripAnsiCodes(formattedLines.join('\n'));
+    expect(output).toContain('http://ccd/cases/1?ignore-warning=***&key=***');
+    expect(output).not.toContain('secret-key');
+  });
+
   it('reuses the logger for a name so telemetry is never attached twice', () => {
     const name = `logger-reuse-${Date.now()}`;
     const first = Logger.getLogger(name);

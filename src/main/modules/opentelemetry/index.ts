@@ -2,6 +2,10 @@ import { shutdownAzureMonitor, useAzureMonitor } from '@azure/monitor-openteleme
 import config from 'config';
 
 import { Logger } from '@modules/logger';
+import { redactQueryValues } from '@modules/logger/redact-url';
+
+// One pattern for both routes into App Insights: span attributes here, log records in the logger.
+export { redactQueryValues };
 
 let isTelemetryInitialized = false;
 let telemetryShutdownPromise: Promise<void> | null = null;
@@ -19,13 +23,6 @@ function getServiceName(): string {
   } catch {
     return 'pcs-frontend';
   }
-}
-
-// Span URLs reach App Insights, and ours carry the OS Places key, OIDC codes and postcodes.
-const QUERY_VALUE_PATTERN = /([?&])([^=&#?\s]+)=[^&#\s]+/g;
-
-export function redactQueryValues(url: string): string {
-  return url.replace(QUERY_VALUE_PATTERN, '$1$2=***');
 }
 
 const URL_SPAN_ATTRIBUTES = ['http.url', 'url.full', 'http.target', 'url.query'];
@@ -48,9 +45,11 @@ const redactSpanUrlAttributes = (span: EndedSpan): void => {
   }
 };
 
-// onEnd, not the HTTP instrumentation's hook: that one skips timed-out and failed requests.
+// Not the HTTP instrumentation's hook: that one skips timed-out and failed requests.
+// onStart as well as onEnd - the distro's own span processor runs ahead of this one and feeds
+// Live Metrics from onEnd, so the attributes set at span creation have to be clean by then.
 export const secretRedactingSpanProcessor = {
-  onStart: (): void => undefined,
+  onStart: (span: EndedSpan): void => redactSpanUrlAttributes(span),
   onEnd: (span: EndedSpan): void => redactSpanUrlAttributes(span),
   forceFlush: (): Promise<void> => Promise.resolve(),
   shutdown: (): Promise<void> => Promise.resolve(),

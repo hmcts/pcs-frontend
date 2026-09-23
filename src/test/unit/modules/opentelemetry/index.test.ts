@@ -29,7 +29,10 @@ interface TelemetryConfig {
       enabled: boolean;
     };
   };
-  spanProcessors: { onEnd: (span: { attributes: Record<string, unknown> }) => void }[];
+  spanProcessors: {
+    onStart: (span: { attributes: Record<string, unknown> }) => void;
+    onEnd: (span: { attributes: Record<string, unknown> }) => void;
+  }[];
   enableLiveMetrics: boolean;
 }
 
@@ -190,6 +193,26 @@ describe('opentelemetry module', () => {
         'url.query': 'postcode=***&key=***',
         'http.method': 'GET',
         'error.type': 'AbortError',
+      });
+    });
+
+    it('redacts at span start, before the distro feeds Live Metrics from its own onEnd', async () => {
+      const telemetryConfig = await initializeAndGetTelemetryConfig();
+      const [spanProcessor] = telemetryConfig.spanProcessors;
+      // The distro registers its span processor ahead of this one, and its onEnd builds Live
+      // Metrics documents from these attributes. Redacting only in onEnd would be too late.
+      const span = {
+        attributes: {
+          'url.full': 'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123',
+          'http.method': 'GET',
+        },
+      };
+
+      spanProcessor.onStart(span);
+
+      expect(span.attributes).toEqual({
+        'url.full': 'https://api.os.uk/search/places/v1/postcode?postcode=***&key=***',
+        'http.method': 'GET',
       });
     });
 
