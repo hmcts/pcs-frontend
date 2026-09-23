@@ -2,7 +2,7 @@ import { noticeDateWhenNotProvided } from '../../data/page-data/lr-page-data';
 import { performAction, performValidation } from '../../utils/controller';
 
 export async function noticeDateWhenNotProvidedErrorValidation(): Promise<void> {
-  await performAction('enterNoticeDateKnown', {
+  await performAction('enterNoticeDateUnknown', {
     day: '25',
     month: '2',
     year: '2050',

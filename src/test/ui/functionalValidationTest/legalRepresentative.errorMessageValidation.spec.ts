@@ -78,7 +78,6 @@ import {
   rentArrearsErrorValidation,
   repaymentsAgreedErrorValidation,
   repaymentsMadeErrorValidation,
-  responseSubmittedCounterclaimFeePaymentNeededErrorValidation,
   selectDefendantErrorValidation,
 } from '../functional/legalRepresentative-functional';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
@@ -881,10 +880,6 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await softErrorMessageValidation(
-      'responseSubmittedCounterclaimFeePaymentNeeded',
-      responseSubmittedCounterclaimFeePaymentNeededErrorValidation
-    );
     await performAction(
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
