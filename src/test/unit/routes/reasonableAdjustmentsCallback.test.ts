@@ -292,6 +292,33 @@ describe('reasonableAdjustmentsCallback routes', () => {
     });
   });
 
+  it('normalises the draft like every other draft save before writing (stale answers are dropped)', async () => {
+    // contactByText is only reachable when contactByPhone is YES; the shared normaliser removes the
+    // stale answer, and the callback must go through it rather than re-persisting the draft verbatim.
+    mockGetCaseByIdForEvent.mockResolvedValue({
+      id: '123',
+      data: {
+        possessionClaimResponse: {
+          ...existingResponse,
+          defendantResponses: { situation_HasMoved: 'NO', contactByPhone: 'NO', contactByText: 'YES' },
+        },
+      },
+    });
+    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
+    const res = {} as unknown as Response;
+
+    await getHandler()(buildReq(), res);
+
+    const saved = mockUpdateDraft.mock.calls[0][3] as {
+      possessionClaimResponse: { defendantResponses: Record<string, unknown> };
+    };
+    expect(saved.possessionClaimResponse.defendantResponses).toEqual({
+      situation_HasMoved: 'NO',
+      contactByPhone: 'NO',
+      completedSections: ['YOUR_SUPPORT'],
+    });
+  });
+
   it('redirects to the "not changed" page and writes nothing when the action is cancel', async () => {
     mockGetPayload.mockResolvedValue({ action: 'cancel', correlationId: '123' });
     const res = {} as unknown as Response;

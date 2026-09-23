@@ -5,30 +5,35 @@ import { cuiYourSupportFeatureMiddleware } from '../middleware/cuiYourSupportFea
 import { oidcMiddleware } from '../middleware/oidc';
 import { respondToClaimFeatureMiddleware } from '../middleware/respondToClaimFeatureMiddleware';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../steps/respond-to-claim/draftEvent';
+import { normaliseRespondToClaimDraft } from '../steps/respond-to-claim/normalise';
 import { addYourSupportToCompletedSections } from '../steps/respond-to-claim/yourSupportSection';
+import { toDefendantDraftSlice } from '../steps/utils/buildDraftDefendantResponse';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import type { PossessionClaimResponse } from '@services/ccdCase.interface';
 import { isDefendantResponseSubmitted } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
+import type { CcdFlags } from '@services/cuiRa/cuiRa.interface';
 import { cuiRaService } from '@services/cuiRa/cuiRaService';
 import { toCcdFlags } from '@services/cuiRa/flagMapping';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('reasonableAdjustmentsCallback');
 
-// The draft-save fully REPLACES the defendant response, so re-send the existing answers and any flags
-// already captured alongside the completed-section marker.
-function defendantSliceWithNoSupportNeeded(existingResponse: PossessionClaimResponse): PossessionClaimResponse {
-  return {
-    defendantContactDetails: existingResponse.defendantContactDetails,
-    defendantResponses: {
-      ...existingResponse.defendantResponses,
-      completedSections: addYourSupportToCompletedSections(existingResponse.defendantResponses?.completedSections),
-    },
-    ...(existingResponse.defendantFlags ? { defendantFlags: existingResponse.defendantFlags } : {}),
-  };
+// Both callback writes send the same defendant slice every other draft save sends (the draft save
+// REPLACES the stored response), normalised the same way, changing only what this outcome decides:
+// the completed-section marker, or the flags.
+function draftWithNoSupportNeeded(existingResponse: PossessionClaimResponse): PossessionClaimResponse {
+  const draft = toDefendantDraftSlice(existingResponse);
+  draft.defendantResponses.completedSections = addYourSupportToCompletedSections(
+    draft.defendantResponses.completedSections
+  );
+  return normaliseRespondToClaimDraft(draft);
+}
+
+function draftWithFlags(existingResponse: PossessionClaimResponse, defendantFlags: CcdFlags): PossessionClaimResponse {
+  return normaliseRespondToClaimDraft({ ...toDefendantDraftSlice(existingResponse), defendantFlags });
 }
 
 // Return leg from the CUI Your Support (cui-ra) microsite.
@@ -119,7 +124,7 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
               RESPOND_TO_CLAIM_DRAFT_EVENT,
               accessToken,
               caseReference,
-              { possessionClaimResponse: defendantSliceWithNoSupportNeeded(existingResponse) },
+              { possessionClaimResponse: draftWithNoSupportNeeded(existingResponse) },
               req.session?.clientContext
             );
           }
@@ -134,18 +139,11 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
           return safeRedirect303(res, confirmationUrl, fallback, ['/case']);
         }
 
-        // The draft-save fully REPLACES the defendant response, re-send the existing
-        // answers — narrowed to the defendant slice — alongside the flags
-        const possessionClaimResponse: PossessionClaimResponse = {
-          defendantContactDetails: existingResponse.defendantContactDetails,
-          defendantResponses: existingResponse.defendantResponses,
-          defendantFlags,
-        };
         await ccdCaseService.updateDraft(
           RESPOND_TO_CLAIM_DRAFT_EVENT,
           accessToken,
           caseReference,
-          { possessionClaimResponse },
+          { possessionClaimResponse: draftWithFlags(existingResponse, defendantFlags) },
           req.session?.clientContext
         );
         return safeRedirect303(res, confirmationUrl, fallback, ['/case']);
