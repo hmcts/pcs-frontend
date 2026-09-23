@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 
+import { RESPOND_TO_CLAIM_TASK_LIST_ROUTE } from '../../constants/caseRoutes';
+
 import { RESPOND_TO_CLAIM_ROUTE } from './flow.config';
 import type { RespondToClaimSectionEnum } from './sections.config';
 import { sectionIdToBackendEnum } from './sections.config';
@@ -78,7 +80,7 @@ export function getYourSupportReturnUrl(req: Request): string | undefined {
   if (resolveYourSupportOrigin(req, caseReference) === 'dashboard') {
     return getDashboardUrl(caseReference) ?? undefined;
   }
-  return `${RESPOND_TO_CLAIM_ROUTE}/task-list`.replace(':caseReference', caseReference);
+  return RESPOND_TO_CLAIM_TASK_LIST_ROUTE.replace(':caseReference', caseReference);
 }
 
 /**
