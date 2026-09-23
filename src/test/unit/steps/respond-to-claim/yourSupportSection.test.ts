@@ -11,9 +11,33 @@ import {
   YOUR_SUPPORT_SECTION_ENUM,
   addYourSupportToCompletedSections,
   getYourSupportReturnUrl,
+  getYourSupportTriageUrl,
   isYourSupportSectionComplete,
   rememberYourSupportOrigin,
 } from '../../../../main/steps/respond-to-claim/yourSupportSection';
+
+const CASE = '1234123412341234';
+const OTHER_CASE = '9876987698769876';
+const SUBMITTED = { possessionClaimResponse: { defendantResponses: { status: 'SUBMITTED' } } };
+
+// A request with just what the origin functions read: the query, the session, and the validated case.
+const build = (options: {
+  id?: string;
+  query?: Record<string, unknown>;
+  recorded?: Record<string, 'dashboard' | 'task-list'>;
+  session?: false;
+  submitted?: boolean;
+}): Request =>
+  ({
+    query: options.query ?? {},
+    session: options.session === false ? undefined : { yourSupportReturnTo: options.recorded },
+    res: {
+      locals: {
+        validatedCase:
+          options.id === undefined ? undefined : { id: options.id, data: options.submitted ? SUBMITTED : {} },
+      },
+    },
+  }) as unknown as Request;
 
 describe('yourSupportSection', () => {
   it('maps the section id to the enum value pcs-api stores in completedSections', () => {
@@ -58,76 +82,105 @@ describe('yourSupportSection', () => {
 });
 
 describe('rememberYourSupportOrigin', () => {
-  const reqWith = (query: Record<string, unknown>, session: Record<string, unknown> | undefined): Request =>
-    ({ query, session }) as unknown as Request;
-
-  it("records 'dashboard' when the triage was reached with ?from=dashboard", () => {
-    const req = reqWith({ from: 'dashboard' }, {});
+  it("records 'dashboard' against the case when reached with ?from=dashboard", () => {
+    const req = build({ id: CASE, query: { from: 'dashboard' } });
 
     rememberYourSupportOrigin(req);
 
-    expect(req.session.yourSupportReturnTo).toBe('dashboard');
+    expect(req.session.yourSupportReturnTo).toEqual({ [CASE]: 'dashboard' });
   });
 
-  it("records 'task-list' for any other entry, replacing an earlier dashboard origin", () => {
-    const req = reqWith({}, { yourSupportReturnTo: 'dashboard' });
+  it("records 'task-list' against the case when reached with ?from=task-list", () => {
+    const req = build({ id: CASE, query: { from: 'task-list' } });
 
     rememberYourSupportOrigin(req);
 
-    expect(req.session.yourSupportReturnTo).toBe('task-list');
+    expect(req.session.yourSupportReturnTo).toEqual({ [CASE]: 'task-list' });
   });
 
-  it('does not trust arbitrary ?from values', () => {
-    const req = reqWith({ from: 'https://evil.example' }, {});
+  it('leaves the recorded origin alone when from is absent (language toggle, reload, retry)', () => {
+    const req = build({ id: CASE, query: { lang: 'cy' }, recorded: { [CASE]: 'dashboard' } });
 
     rememberYourSupportOrigin(req);
 
-    expect(req.session.yourSupportReturnTo).toBe('task-list');
+    expect(req.session.yourSupportReturnTo).toEqual({ [CASE]: 'dashboard' });
   });
 
-  it('is a no-op without a session', () => {
-    expect(() => rememberYourSupportOrigin(reqWith({ from: 'dashboard' }, undefined))).not.toThrow();
+  it('does not trust arbitrary from values', () => {
+    const req = build({ id: CASE, query: { from: 'https://evil.example' }, recorded: { [CASE]: 'dashboard' } });
+
+    rememberYourSupportOrigin(req);
+
+    expect(req.session.yourSupportReturnTo).toEqual({ [CASE]: 'dashboard' });
+  });
+
+  it('keeps origins for other cases when recording this one', () => {
+    const req = build({ id: CASE, query: { from: 'task-list' }, recorded: { [OTHER_CASE]: 'dashboard' } });
+
+    rememberYourSupportOrigin(req);
+
+    expect(req.session.yourSupportReturnTo).toEqual({ [OTHER_CASE]: 'dashboard', [CASE]: 'task-list' });
+  });
+
+  it('is a no-op without a session or a case reference', () => {
+    expect(() =>
+      rememberYourSupportOrigin(build({ id: CASE, query: { from: 'dashboard' }, session: false }))
+    ).not.toThrow();
+    const noCase = build({ query: { from: 'dashboard' } });
+    rememberYourSupportOrigin(noCase);
+    expect(noCase.session.yourSupportReturnTo).toBeUndefined();
   });
 });
 
 describe('getYourSupportReturnUrl', () => {
-  const build = (options: { id?: string; origin?: 'dashboard' | 'task-list'; submitted?: boolean }): Request =>
-    ({
-      session: options.origin ? { yourSupportReturnTo: options.origin } : {},
-      res: {
-        locals: {
-          validatedCase:
-            options.id === undefined
-              ? undefined
-              : {
-                  id: options.id,
-                  data: options.submitted
-                    ? { possessionClaimResponse: { defendantResponses: { status: 'SUBMITTED' } } }
-                    : {},
-                },
-        },
-      },
-    }) as unknown as Request;
-
-  it('returns the dashboard when the recorded origin is the dashboard', () => {
-    expect(getYourSupportReturnUrl(build({ id: '123', origin: 'dashboard' }))).toBe('/case/123/dashboard');
+  it('returns the dashboard when the recorded origin for this case is the dashboard', () => {
+    expect(getYourSupportReturnUrl(build({ id: CASE, recorded: { [CASE]: 'dashboard' } }))).toBe(
+      `/case/${CASE}/dashboard`
+    );
   });
 
-  it('returns the task list when the recorded origin is the task list', () => {
-    expect(getYourSupportReturnUrl(build({ id: '123', origin: 'task-list' }))).toBe(
-      '/case/123/respond-to-claim/task-list'
+  it('returns the task list when the recorded origin for this case is the task list', () => {
+    expect(getYourSupportReturnUrl(build({ id: CASE, recorded: { [CASE]: 'task-list' } }))).toBe(
+      `/case/${CASE}/respond-to-claim/task-list`
+    );
+  });
+
+  it('ignores an origin recorded for a different case', () => {
+    expect(getYourSupportReturnUrl(build({ id: CASE, recorded: { [OTHER_CASE]: 'dashboard' } }))).toBe(
+      `/case/${CASE}/respond-to-claim/task-list`
     );
   });
 
   it('falls back to the task list before the response is submitted when nothing was recorded', () => {
-    expect(getYourSupportReturnUrl(build({ id: '123' }))).toBe('/case/123/respond-to-claim/task-list');
+    expect(getYourSupportReturnUrl(build({ id: CASE }))).toBe(`/case/${CASE}/respond-to-claim/task-list`);
   });
 
   it('falls back to the dashboard after the response is submitted when nothing was recorded', () => {
-    expect(getYourSupportReturnUrl(build({ id: '123', submitted: true }))).toBe('/case/123/dashboard');
+    expect(getYourSupportReturnUrl(build({ id: CASE, submitted: true }))).toBe(`/case/${CASE}/dashboard`);
   });
 
   it('is undefined when no case reference is available', () => {
-    expect(getYourSupportReturnUrl(build({ origin: 'dashboard' }))).toBeUndefined();
+    expect(getYourSupportReturnUrl(build({ recorded: { [CASE]: 'dashboard' } }))).toBeUndefined();
+  });
+});
+
+describe('getYourSupportTriageUrl', () => {
+  it('carries the recorded origin so a retry re-enters with it', () => {
+    expect(getYourSupportTriageUrl(build({ id: CASE, recorded: { [CASE]: 'dashboard' } }))).toBe(
+      `/case/${CASE}/respond-to-claim/reasonable-adjustments-triage?from=dashboard`
+    );
+  });
+
+  it('uses the same fallback as the return url when nothing was recorded', () => {
+    expect(getYourSupportTriageUrl(build({ id: CASE }))).toBe(
+      `/case/${CASE}/respond-to-claim/reasonable-adjustments-triage?from=task-list`
+    );
+    expect(getYourSupportTriageUrl(build({ id: CASE, submitted: true }))).toBe(
+      `/case/${CASE}/respond-to-claim/reasonable-adjustments-triage?from=dashboard`
+    );
+  });
+
+  it('is undefined when no case reference is available', () => {
+    expect(getYourSupportTriageUrl(build({}))).toBeUndefined();
   });
 });

@@ -127,6 +127,8 @@ const sectionDefs = [
     groupId: 'yourResponse',
     titleKey: 'taskList.yourSupport',
     steps: ['reasonable-adjustments-triage'],
+    // The triage remembers where it was launched from; the dashboard row says ?from=dashboard.
+    entryQuery: 'from=task-list',
     isApplicable: async (req: Request) => isCuiYourSupportEnabled(req),
   },
   {
@@ -171,6 +173,7 @@ const sectionDefs = [
   steps: readonly RespondToClaimStepName[];
   isApplicable?: (req: Request) => Promise<boolean>;
   dependsOn?: readonly string[];
+  entryQuery?: string;
 }[];
 
 export type RespondToClaimSectionId = (typeof sectionDefs)[number]['id'];

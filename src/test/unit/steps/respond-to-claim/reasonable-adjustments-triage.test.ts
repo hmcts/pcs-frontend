@@ -177,20 +177,31 @@ describe('reasonable-adjustments-triage beforeRedirect', () => {
 });
 
 describe('reasonable-adjustments-triage beforeGet (remembers where Your Support was launched from)', () => {
-  it("records 'dashboard' when reached with ?from=dashboard", async () => {
+  it("records 'dashboard' against the case when reached with ?from=dashboard", async () => {
     const { req } = buildReq('questions', '123', undefined, { query: { from: 'dashboard' } });
 
     await beforeGet(req);
 
-    expect(req.session.yourSupportReturnTo).toBe('dashboard');
+    expect(req.session.yourSupportReturnTo).toEqual({ '123': 'dashboard' });
   });
 
-  it("records 'task-list' otherwise", async () => {
-    const { req } = buildReq('questions', '123');
+  it("records 'task-list' against the case when reached with ?from=task-list", async () => {
+    const { req } = buildReq('questions', '123', undefined, { query: { from: 'task-list' } });
 
     await beforeGet(req);
 
-    expect(req.session.yourSupportReturnTo).toBe('task-list');
+    expect(req.session.yourSupportReturnTo).toEqual({ '123': 'task-list' });
+  });
+
+  it('leaves the recorded origin alone when from is absent, e.g. after the language toggle', async () => {
+    const { req } = buildReq('questions', '123', undefined, {
+      query: { lang: 'cy' },
+      session: { yourSupportReturnTo: { '123': 'dashboard' } },
+    });
+
+    await beforeGet(req);
+
+    expect(req.session.yourSupportReturnTo).toEqual({ '123': 'dashboard' });
   });
 });
 
@@ -219,7 +230,9 @@ describe('reasonable-adjustments-triage extendGetContent', () => {
 
   it('points the back link at the dashboard when Your Support was launched from there', async () => {
     mockIsCuiYourSupportEnabled.mockResolvedValue(true);
-    const { req } = buildReq('questions', '123', undefined, { session: { yourSupportReturnTo: 'dashboard' } });
+    const { req } = buildReq('questions', '123', undefined, {
+      session: { yourSupportReturnTo: { '123': 'dashboard' } },
+    });
 
     await expect(extendGetContent(req)).resolves.toEqual({
       cuiYourSupportEnabled: true,
@@ -262,13 +275,13 @@ describe('reasonable-adjustments-triage isAnswered (drives the task-list "Your s
 
 describe('reasonable-adjustments-triage resolveRedirectAfterPost (skip returns to where Your Support was launched from)', () => {
   it('returns the task-list url when Your Support was launched from the task list', async () => {
-    const { req } = buildReq('skip', '123', undefined, { session: { yourSupportReturnTo: 'task-list' } });
+    const { req } = buildReq('skip', '123', undefined, { session: { yourSupportReturnTo: { '123': 'task-list' } } });
 
     await expect(resolveRedirectAfterPost(req)).resolves.toBe('/case/123/respond-to-claim/task-list');
   });
 
   it('returns the dashboard url when Your Support was launched from the dashboard', async () => {
-    const { req } = buildReq('skip', '123', undefined, { session: { yourSupportReturnTo: 'dashboard' } });
+    const { req } = buildReq('skip', '123', undefined, { session: { yourSupportReturnTo: { '123': 'dashboard' } } });
 
     await expect(resolveRedirectAfterPost(req)).resolves.toBe('/case/123/dashboard');
   });

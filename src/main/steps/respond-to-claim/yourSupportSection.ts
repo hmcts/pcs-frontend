@@ -32,19 +32,42 @@ export function isYourSupportSectionComplete(response: PossessionClaimResponse |
 
 export type YourSupportOrigin = 'dashboard' | 'task-list';
 
-/**
- * Remembers where the citizen entered Your Support from.
- */
-export function rememberYourSupportOrigin(req: Request): void {
-  if (!req.session) {
-    return;
-  }
-  req.session.yourSupportReturnTo = req.query?.from === 'dashboard' ? 'dashboard' : 'task-list';
+const YOUR_SUPPORT_ORIGINS: readonly YourSupportOrigin[] = ['dashboard', 'task-list'];
+const TRIAGE_STEP = 'reasonable-adjustments-triage';
+
+function isYourSupportOrigin(value: unknown): value is YourSupportOrigin {
+  return typeof value === 'string' && (YOUR_SUPPORT_ORIGINS as readonly string[]).includes(value);
 }
 
 /**
- * The page Your Support returns to the recorded origin or falls back to
- * task-list / dashboard based on submission status.
+ * Remembers where the citizen entered Your Support from. Both entry links say so explicitly
+ * (`?from=dashboard` on the dashboard row, `?from=task-list` on the task-list row). A triage GET
+ * without `from` — the language toggle, a reload, the error page's retry — leaves the recorded origin
+ * alone. Kept per case reference so tabs on different cases cannot interfere with each other.
+ */
+export function rememberYourSupportOrigin(req: Request): void {
+  const origin = req.query?.from;
+  const caseReference = req.res?.locals.validatedCase?.id;
+  if (!req.session || !caseReference || !isYourSupportOrigin(origin)) {
+    return;
+  }
+
+  req.session.yourSupportReturnTo = { ...req.session.yourSupportReturnTo, [caseReference]: origin };
+}
+
+// The recorded origin for this case, or, when nothing was recorded (a deep link straight to an outcome
+// page), the task list before the response is submitted and the dashboard after.
+function resolveYourSupportOrigin(req: Request, caseReference: string): YourSupportOrigin {
+  return (
+    req.session?.yourSupportReturnTo?.[caseReference] ??
+    (isDefendantResponseSubmitted(req.res?.locals.validatedCase?.data) ? 'dashboard' : 'task-list')
+  );
+}
+
+/**
+ * The page Your Support returns to (back link, "I do not need any support", and the Continue and Save
+ * for later buttons on the confirmation and cancelled pages). Undefined only when no case reference is
+ * available.
  */
 export function getYourSupportReturnUrl(req: Request): string | undefined {
   const caseReference = req.res?.locals.validatedCase?.id;
@@ -52,12 +75,22 @@ export function getYourSupportReturnUrl(req: Request): string | undefined {
     return undefined;
   }
 
-  const origin: YourSupportOrigin =
-    req.session?.yourSupportReturnTo ??
-    (isDefendantResponseSubmitted(req.res?.locals.validatedCase?.data) ? 'dashboard' : 'task-list');
-
-  if (origin === 'dashboard') {
+  if (resolveYourSupportOrigin(req, caseReference) === 'dashboard') {
     return getDashboardUrl(caseReference) ?? undefined;
   }
   return `${RESPOND_TO_CLAIM_ROUTE}/task-list`.replace(':caseReference', caseReference);
+}
+
+/**
+ * The triage URL carrying the current origin, for links that re-enter Your Support mid-journey (the
+ * error page's "Try again"), so the origin survives the detour.
+ */
+export function getYourSupportTriageUrl(req: Request): string | undefined {
+  const caseReference = req.res?.locals.validatedCase?.id;
+  if (!caseReference) {
+    return undefined;
+  }
+
+  const origin = resolveYourSupportOrigin(req, caseReference);
+  return `${RESPOND_TO_CLAIM_ROUTE}/${TRIAGE_STEP}?from=${origin}`.replace(':caseReference', caseReference);
 }

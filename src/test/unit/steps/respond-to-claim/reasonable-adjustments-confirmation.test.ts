@@ -20,7 +20,7 @@ describe('reasonable-adjustments-confirmation step', () => {
   const reqWith = (origin?: 'dashboard' | 'task-list'): Request =>
     ({
       params: {},
-      session: origin ? { yourSupportReturnTo: origin } : {},
+      session: origin ? { yourSupportReturnTo: { '1234123412341234': origin } } : {},
       res: { locals: { validatedCase: { id: '1234123412341234', data: {} } } },
     }) as unknown as Request;
 

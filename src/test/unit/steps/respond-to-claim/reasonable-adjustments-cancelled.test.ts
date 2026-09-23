@@ -16,7 +16,7 @@ describe('reasonable-adjustments-cancelled step', () => {
 
   const reqWith = (origin?: 'dashboard' | 'task-list', submitted = false) => ({
     params: {},
-    session: origin ? { yourSupportReturnTo: origin } : {},
+    session: origin ? { yourSupportReturnTo: { '1234123412341234': origin } } : {},
     res: {
       locals: {
         validatedCase: {

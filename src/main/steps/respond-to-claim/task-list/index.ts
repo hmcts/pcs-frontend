@@ -133,7 +133,8 @@ function buildItem(
 
   // Locked sections render the same tag as the rest, but without a link target.
   const firstStep = status === 'NOT_AVAILABLE_YET' ? undefined : getFirstVisibleStep(section, flowConfig, req);
-  const href = firstStep ? `/case/${caseRef}/respond-to-claim/${firstStep}` : undefined;
+  const entryQuery = section.entryQuery ? `?${section.entryQuery}` : '';
+  const href = firstStep ? `/case/${caseRef}/respond-to-claim/${firstStep}${entryQuery}` : undefined;
 
   return {
     title,
