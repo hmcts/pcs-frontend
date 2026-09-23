@@ -322,8 +322,8 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     option: whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
   });
 
-//three decimal validation
-await performAction('selectWhatRegularIncomeDoYouReceive', {
+  //three decimal validation
+  await performAction('selectWhatRegularIncomeDoYouReceive', {
     regularIncomeOptions: [
       [
         whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
@@ -337,7 +337,6 @@ await performAction('selectWhatRegularIncomeDoYouReceive', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
     message: whatRegularIncomeDoYouReceive.incorrectFormatErrorMessage,
   });
-
 }
 
 export async function whatRegularIncomeDoYouReceiveNavigationTests(): Promise<void> {

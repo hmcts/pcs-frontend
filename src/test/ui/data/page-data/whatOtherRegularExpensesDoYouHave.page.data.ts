@@ -15,7 +15,7 @@ export const whatOtherRegularExpensesDoYouHave = {
   loanPaymentsParagraph: `Loan payments`,
   loanPaymentsAmountPaidHiddenLabel: `Amount paid`,
   loanPaymentsTotalAmountInput: `200.00`,
-    loanPaymentsTotalAmountTextInput: `200`,
+  loanPaymentsTotalAmountTextInput: `200`,
   loanPaymentsPaidEveryHiddenLabel: `Paid every:`,
   loanPaymentsWeekHiddenRadioOption: `Week`,
   loanPaymentsMonthHiddenRadioOption: `Month`,

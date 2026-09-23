@@ -63,7 +63,7 @@ export async function counterClaimSpecificSumErrorValidation(): Promise<void> {
     message: counterClaimSpecificSumOfMoney.negativeMaxValueErrorMessage,
   });
   //validations --incorrect format - 3 decimals
-   await performAction(
+  await performAction(
     'inputText',
     counterClaimSpecificSumOfMoney.maximumValueOfYourClaimHiddenQuestion,
     counterClaimSpecificSumOfMoney.threeDecimalIncorrectFormatTextInput

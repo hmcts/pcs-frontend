@@ -185,7 +185,7 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
     message2: priorityDebtDetails.enterAmountYouPayInTheCorrectFormatErrorMessage,
   });
 
-//Amount you pay 3 decimal format
+  //Amount you pay 3 decimal format
   await performAction(
     'inputText',
     priorityDebtDetails.howMuchDoYouPayQuestion,
@@ -194,12 +194,12 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
   await performAction('clickRadioButton', priorityDebtDetails.weekRadioOption);
   await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
-  header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
-  message: priorityDebtDetails.enterTotalAmountInTheCorrectFormatErrorMessage,
+    header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
+    message: priorityDebtDetails.enterTotalAmountInTheCorrectFormatErrorMessage,
   });
-  
+
   //what is the total amount you owe for all your priority debts? - incorrect format
-await performAction(
+  await performAction(
     'inputText',
     priorityDebtDetails.howMuchDoYouPayQuestion,
     priorityDebtDetails.threeDecimalIncorrectFormatTextInput

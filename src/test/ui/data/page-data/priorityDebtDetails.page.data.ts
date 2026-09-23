@@ -29,5 +29,4 @@ export const priorityDebtDetails = {
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `priority-debt-details`,
   threeDecimalIncorrectFormatTextInput: `20.003`,
-  
 };
