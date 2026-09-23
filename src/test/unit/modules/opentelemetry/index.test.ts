@@ -1,20 +1,19 @@
 const mockUseAzureMonitor = jest.fn();
 const mockShutdownAzureMonitor = jest.fn();
 const mockConfigGet = jest.fn();
+const mockEnableTelemetry = jest.fn();
 
 jest.mock('@azure/monitor-opentelemetry', () => ({
   useAzureMonitor: mockUseAzureMonitor,
   shutdownAzureMonitor: mockShutdownAzureMonitor,
 }));
 
-jest.mock('@opentelemetry/api', () => ({
-  SpanStatusCode: {
-    ERROR: 'ERROR',
-  },
-}));
-
 jest.mock('config', () => ({
   get: mockConfigGet,
+}));
+
+jest.mock('@modules/logger', () => ({
+  Logger: { enableTelemetry: mockEnableTelemetry },
 }));
 
 interface TelemetryConfig {
@@ -27,16 +26,11 @@ interface TelemetryConfig {
       ignoreOutgoingRequestHook: (options: { path?: string }) => boolean;
     };
     winston: {
-      logHook: (span: MockSpan, record: Record<string, unknown>) => void;
+      enabled: boolean;
     };
   };
   spanProcessors: { onEnd: (span: { attributes: Record<string, unknown> }) => void }[];
   enableLiveMetrics: boolean;
-}
-
-interface MockSpan {
-  recordException: jest.Mock;
-  setStatus: jest.Mock;
 }
 
 const getTelemetryModule = async () => {
@@ -107,63 +101,11 @@ describe('opentelemetry module', () => {
     expect(ignoreOutgoingRequestHook({ path: '/healthz' })).toBe(false);
   });
 
-  it('records exception and span status for error-level logs', async () => {
+  it('hands winston to the logger module rather than instrumenting it', async () => {
     const telemetryConfig = await initializeAndGetTelemetryConfig();
-    const span: MockSpan = {
-      recordException: jest.fn(),
-      setStatus: jest.fn(),
-    };
 
-    telemetryConfig.instrumentationOptions.winston.logHook(span, {
-      level: 'error',
-      message: 'Telemetry error',
-    });
-
-    expect(span.recordException).toHaveBeenCalledWith({
-      name: 'Error',
-      message: 'Telemetry error',
-      stack: undefined,
-    });
-    expect(span.setStatus).toHaveBeenCalledWith({
-      code: 'ERROR',
-      message: 'Telemetry error',
-    });
-  });
-
-  it('does not enrich spans for non-error log levels', async () => {
-    const telemetryConfig = await initializeAndGetTelemetryConfig();
-    const span: MockSpan = {
-      recordException: jest.fn(),
-      setStatus: jest.fn(),
-    };
-
-    telemetryConfig.instrumentationOptions.winston.logHook(span, {
-      level: 'info',
-      message: 'Informational log',
-    });
-
-    expect(span.recordException).not.toHaveBeenCalled();
-    expect(span.setStatus).not.toHaveBeenCalled();
-  });
-
-  it('uses existing Error instances when recording exceptions', async () => {
-    const telemetryConfig = await initializeAndGetTelemetryConfig();
-    const span: MockSpan = {
-      recordException: jest.fn(),
-      setStatus: jest.fn(),
-    };
-    const error = new Error('Boom');
-
-    telemetryConfig.instrumentationOptions.winston.logHook(span, {
-      level: 'error',
-      error,
-    });
-
-    expect(span.recordException).toHaveBeenCalledWith(error);
-    expect(span.setStatus).toHaveBeenCalledWith({
-      code: 'ERROR',
-      message: 'Boom',
-    });
+    expect(telemetryConfig.instrumentationOptions.winston).toEqual({ enabled: false });
+    expect(mockEnableTelemetry).toHaveBeenCalledTimes(1);
   });
 
   it('returns early when flushing before initialization', async () => {

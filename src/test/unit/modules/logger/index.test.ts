@@ -1,3 +1,4 @@
+import { logs } from '@opentelemetry/api-logs';
 import winston from 'winston';
 
 import { Logger } from '@modules/logger';
@@ -52,5 +53,29 @@ describe('logger module', () => {
     expect(output).toContain('Connecting to redis');
     expect(output).toContain('"healthy":true');
     expect(output).not.toContain('Connecting to redis redis');
+  });
+
+  it('exports logs from loggers created before and after telemetry starts', () => {
+    const earlyLogger = Logger.getLogger(`logger-otel-early-${Date.now()}`);
+    const emit = jest.fn();
+    logs.setGlobalLoggerProvider({ getLogger: () => ({ emit, enabled: () => true }) });
+
+    try {
+      Logger.enableTelemetry();
+      const lateLogger = Logger.getLogger(`logger-otel-late-${Date.now()}`);
+      earlyLogger.error('Could not reach CCD', { caseReference: '1234' });
+      lateLogger.warn('Retrying');
+    } finally {
+      logs.disable();
+    }
+
+    expect(emit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: 'Could not reach CCD',
+        severityText: 'error',
+        attributes: expect.objectContaining({ caseReference: '1234' }),
+      })
+    );
+    expect(emit).toHaveBeenCalledWith(expect.objectContaining({ body: 'Retrying', severityText: 'warn' }));
   });
 });
