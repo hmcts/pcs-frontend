@@ -33,4 +33,3 @@ export * from './priorityDebts.pft.lr';
 export * from './rentArrears.pft.lr';
 export * from './repaymentsAgreed.pft.lr';
 export * from './repaymentsMade.pft.lr';
-export * from './responseSubmittedCounterclaimFeePaymentNeeded.pft.lr';
