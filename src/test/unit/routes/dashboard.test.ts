@@ -619,6 +619,15 @@ describe('Dashboard Routes', () => {
       expect(tasks.map(task => task.title.html)).toEqual(['View response title']);
     });
 
+    it('should remove the Your Support task when the respond-to-claim flag is off for the user', async () => {
+      mockIsRespondToClaimEnabledForUser.mockResolvedValueOnce(false);
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce(yourSupportDashboardData('AVAILABLE'));
+
+      const tasks = await renderResponseTasks();
+
+      expect(tasks.map(task => task.title.html)).toEqual(['View response title']);
+    });
+
     it('should remove the Your Support task for legal representative users', async () => {
       (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce(yourSupportDashboardData('AVAILABLE'));
 

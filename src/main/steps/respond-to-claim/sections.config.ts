@@ -120,9 +120,10 @@ const sectionDefs = [
     ],
   },
   {
-    // Your Support (Reasonable Adjustments) — last row under "Your response". Reached only from the
-    // task list (the row links to its first step, the triage page); hidden when the feature flag is
-    // off. See reasonable-adjustments-triage for the triage/microsite behaviour.
+    // Your Support (Reasonable Adjustments) — last row under "Your response"; hidden when the feature
+    // flag is off. Also reachable from the dashboard once the response is submitted (dashboardTaskPaths,
+    // ?from=dashboard); this row says ?from=task-list so the triage can return the citizen to wherever
+    // they came from. See reasonable-adjustments-triage for the triage/microsite behaviour.
     id: 'yourSupport',
     groupId: 'yourResponse',
     titleKey: 'taskList.yourSupport',

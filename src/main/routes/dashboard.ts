@@ -176,7 +176,10 @@ export default function dashboardRoutes(app: Application): void {
       const dashboardData = await ccdCaseService.getDashboardView(accessToken, caseReference);
 
       const showRespondToClaimLinks = await isRespondToClaimEnabledForUser(req);
-      const showYourSupportTask = getUserType(req) !== 'legalrep' && (await isCuiYourSupportEnabled(req));
+      // Every Your Support page sits inside the respond-to-claim journey, so it needs that flag as well as
+      // its own; otherwise the row would link to a page that bounces straight back here.
+      const showYourSupportTask =
+        showRespondToClaimLinks && getUserType(req) !== 'legalrep' && (await isCuiYourSupportEnabled(req));
 
       const t = getTranslationFunction(req, ['dashboard', 'common']);
 
