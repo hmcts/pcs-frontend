@@ -24,6 +24,9 @@ function toContextSuffix(record: Record<string, unknown>): string {
   if (typeof record.error === 'string' && record.error.length > 0) {
     contextParts.push(`error=${record.error}`);
   }
+  if (typeof record.cause === 'string' && record.cause.length > 0) {
+    contextParts.push(`cause=${record.cause}`);
+  }
 
   return contextParts.length > 0 ? ` | ${contextParts.join(' ')}` : '';
 }

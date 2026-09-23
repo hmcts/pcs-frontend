@@ -108,6 +108,23 @@ describe('recordErrorsOnActiveSpan', () => {
     );
   });
 
+  it('appends the cause, which is the only part of a "fetch failed" that identifies it', () => {
+    transform({
+      level: 'error',
+      message: 'Authentication error details:',
+      error: 'fetch failed',
+      cause: 'Error: connect ECONNREFUSED 10.0.0.1:443 (ECONNREFUSED)',
+    });
+
+    expect(span.recordException).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message:
+          'Authentication error details: | error=fetch failed ' +
+          'cause=Error: connect ECONNREFUSED 10.0.0.1:443 (ECONNREFUSED)',
+      })
+    );
+  });
+
   it('keeps the record name and stack when they are present', () => {
     transform({ level: 'error', message: 'Timed out', name: 'TimeoutError', stack: 'at somewhere' });
 

@@ -23,8 +23,12 @@ export function describeCause(cause: unknown): string | undefined {
   if (!(cause instanceof Error)) {
     return cause ? String(cause) : undefined;
   }
-  const { code } = cause as NodeJS.ErrnoException;
-  return [cause.name, ': ', cause.message, code ? ` (${code})` : ''].join('');
+  // undici reports a multi-address connect failure as an AggregateError whose own message is
+  // empty and whose detail sits in `errors`. Checked structurally: AggregateError is ES2021.
+  const { errors } = cause as { errors?: unknown[] };
+  const root = Array.isArray(errors) && errors[0] instanceof Error ? errors[0] : cause;
+  const { code } = root as NodeJS.ErrnoException;
+  return `${root.name}: ${root.message}${code ? ` (${code})` : ''}`;
 }
 
 export class OIDCModule {
