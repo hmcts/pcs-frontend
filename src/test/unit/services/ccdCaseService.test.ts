@@ -544,6 +544,30 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.getDefendantSupport(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
     });
 
+    it('throws 403 rather than choosing when more than one party is eligible (guard bypass or bad data)', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          token: 'support-token',
+          case_details: {
+            case_data: {
+              partySupport: [
+                { id: 'party-1', value: { supportFlags } },
+                { id: 'party-2', value: { supportFlags } },
+              ],
+            },
+          },
+        },
+      });
+
+      await expect(ccdCaseService.getDefendantSupport(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
+      await expect(ccdCaseService.submitDefendantSupportFlags(accessToken, caseId, supportFlags)).rejects.toMatchObject(
+        {
+          status: 403,
+        }
+      );
+      expect(mockPost).not.toHaveBeenCalled();
+    });
+
     it('throws 404 for an invalid case reference without calling CCD', async () => {
       await expect(ccdCaseService.getDefendantSupport(accessToken, 'not-a-case')).rejects.toMatchObject({
         status: 404,

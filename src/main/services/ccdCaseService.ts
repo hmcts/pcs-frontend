@@ -274,9 +274,13 @@ async function startDefendantSupport(userToken: string, caseId: string): Promise
     if (!party) {
       throw new HTTPError('No defendant party eligible for support on this case', 403);
     }
+    // Your Support is citizen-only: citizenOnlyStepsAccessMiddleware keeps legal representatives off every
+    // route that reaches here, and a citizen defendant owns exactly one party. More than one entry can
+    // therefore only mean malformed data or a bypassed guard, and choosing one could attach flags to the
+    // wrong defendant, so refuse rather than guess.
     if (partySupport.length > 1) {
-      //TODO confirm whether LR can use this, because if their firm represents multiple, the first is picked.
-      logger.warn(`Case ${caseId}: user owns ${partySupport.length} support parties, using ${party.id}`);
+      logger.error(`Case ${caseId}: user owns ${partySupport.length} support parties; refusing to choose one`);
+      throw new HTTPError('More than one defendant party eligible for support on this case', 403);
     }
 
     return { eventToken: response.data.token, partyId: party.id, supportFlags: party.value?.supportFlags };
