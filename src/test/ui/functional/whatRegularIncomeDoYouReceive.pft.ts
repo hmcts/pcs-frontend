@@ -321,6 +321,23 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     question: whatRegularIncomeDoYouReceive.mainHeader,
     option: whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
   });
+
+//three decimal validation
+await performAction('selectWhatRegularIncomeDoYouReceive', {
+    regularIncomeOptions: [
+      [
+        whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
+        whatRegularIncomeDoYouReceive.threeDecimalIncorrectFormatTextInput,
+        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
+      ],
+    ],
+  });
+
+  await performValidation('errorMessage', {
+    header: whatRegularIncomeDoYouReceive.errorValidationHeader,
+    message: whatRegularIncomeDoYouReceive.incorrectFormatErrorMessage,
+  });
+
 }
 
 export async function whatRegularIncomeDoYouReceiveNavigationTests(): Promise<void> {

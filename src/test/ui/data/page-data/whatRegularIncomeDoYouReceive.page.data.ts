@@ -13,6 +13,7 @@ export const whatRegularIncomeDoYouReceive = {
   pensionTextInput: `250.00`,
   universalCreditParagraph: `Universal Credit`,
   universalCreditTextInput: `380.00`,
+  universalCreditWithoutPenceTextInput: `380`,
   otherBenefitsAndCreditsParagraph: `Other benefits and credits`,
   otherBenefitsTextInput: `330.00`,
   moneyFromSomewhereElseParagraph: `Money from somewhere else (for example, child maintenance payments or someone in your household gives you money) `,
@@ -52,4 +53,5 @@ export const whatRegularIncomeDoYouReceive = {
   backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `what-regular-income-do-you-receive`,
+  threeDecimalIncorrectFormatTextInput: `20.003`,
 };

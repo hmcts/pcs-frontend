@@ -26,7 +26,7 @@ export async function whatOtherRegularExpensesDoYouHaveErrorValidation(): Promis
   });
   console.log(`err msg - mandatory frequency not selected`);
 
-  // 4. Enter incorrect format
+  // 4. Enter incorrect format, modified as per the new requirement, now it is accepting whole number so the incorrect format is changed to 3 decimals
   await performAction(
     'inputText',
     whatOtherRegularExpensesDoYouHave.householdBillsAmountPaidHiddenLabel,
@@ -54,6 +54,22 @@ export async function whatOtherRegularExpensesDoYouHaveErrorValidation(): Promis
   await performValidation('errorMessage', {
     header: whatOtherRegularExpensesDoYouHave.errorValidationHeader,
     message: whatOtherRegularExpensesDoYouHave.householdBillsMinErrorMessage,
+  });
+  console.log(`verified negative value error message for household bills`);
+
+  //three decimal incorrect format validation
+
+  await performAction(
+    'inputText',
+    whatOtherRegularExpensesDoYouHave.householdBillsAmountPaidHiddenLabel,
+    whatOtherRegularExpensesDoYouHave.incorrectFormatTextInput
+  );
+  await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+  console.log(`entered negative value for amount`);
+
+  await performValidation('errorMessage', {
+    header: whatOtherRegularExpensesDoYouHave.errorValidationHeader,
+    message: whatOtherRegularExpensesDoYouHave.invalidFormatErrorMessage,
   });
   console.log(`verified negative value error message for household bills`);
 

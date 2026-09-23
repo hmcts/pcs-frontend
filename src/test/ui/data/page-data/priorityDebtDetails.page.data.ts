@@ -14,6 +14,8 @@ export const priorityDebtDetails = {
   billionTextInput: `1000000001.00`,
   totalAmountTextInput: `1000.00`,
   amountYouPayTextInput: `1000.00`,
+  DebtTotalAmountWithoutPenceTextInput: `1000`,
+  AmountYouPayWithoutPenceTextInput: `1000`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   enterTheTotalAmountErrorMessage: `Enter the total amount you owe for all your priority debts`,
   enterTheAmountYouPayErrorMessage: `Enter the amount you pay towards your priority debts each week or month`,
@@ -26,4 +28,6 @@ export const priorityDebtDetails = {
   amountYouPayNegativeValueErrorMessage: `The amount you pay towards your priority debts each week or month must be £0.00 or above`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `priority-debt-details`,
+  threeDecimalIncorrectFormatTextInput: `20.003`,
+  
 };

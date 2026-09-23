@@ -43,6 +43,18 @@ export async function rentArrearsErrorValidation(): Promise<void> {
     header: rentArrears.thereIsAProblemErrorMessageHeader,
     message: rentArrears.enterAmountInCorrectFormatErrorMessage,
   });
+
+  //validations --incorrect format for 3 decimals
+  await performAction(
+    'inputText',
+    rentArrears.howMuchDoYouBelieveHiddenTextLabel,
+    rentArrears.threeDecimalsIncorrectFormatTextInput
+  );
+  await performAction('clickButton', rentArrears.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: rentArrears.thereIsAProblemErrorMessageHeader,
+    message: rentArrears.threeDecimalsEnterAmountInCorrectFormatErrorMessage,
+  });
 }
 
 // Need to fix this as part of HDPI-5786

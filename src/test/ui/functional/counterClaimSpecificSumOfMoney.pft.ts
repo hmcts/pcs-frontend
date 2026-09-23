@@ -62,6 +62,17 @@ export async function counterClaimSpecificSumErrorValidation(): Promise<void> {
     header: counterClaimSpecificSumOfMoney.thereIsAProblemErrorMessageHeader,
     message: counterClaimSpecificSumOfMoney.negativeMaxValueErrorMessage,
   });
+  //validations --incorrect format - 3 decimals
+   await performAction(
+    'inputText',
+    counterClaimSpecificSumOfMoney.maximumValueOfYourClaimHiddenQuestion,
+    counterClaimSpecificSumOfMoney.threeDecimalIncorrectFormatTextInput
+  );
+  await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
+  await performValidation('errorMessage', {
+    header: counterClaimSpecificSumOfMoney.thereIsAProblemErrorMessageHeader,
+    message: counterClaimSpecificSumOfMoney.threeDecimalErrorMessage,
+  });
 }
 
 export async function counterClaimSpecificSumNavigationTests(): Promise<void> {
