@@ -99,6 +99,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       const phoneNumber = (req.body?.['contactByTelephone.phoneNumber'] as string | undefined)?.trim();
       if (phoneNumber) {
         response.defendantContactDetails.party.phoneNumber = phoneNumber;
+        response.defendantContactDetails.party.phoneNumberProvided = 'YES';
       } else {
         delete response.defendantContactDetails.party.phoneNumber;
       }

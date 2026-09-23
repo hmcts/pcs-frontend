@@ -7,12 +7,8 @@
 {% block mainContent %}
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  {# POSTs rather than linking straight on, so the step can hand the citizen to PCQ first. #}
-  <form method="post" action="{{ url }}">
-    {{ govukButton({
-      text: continueButton,
-      attributes: { name: 'action', value: 'continue' }
-    }) }}
-    {{ csrfProtection(csrfToken) }}
-  </form>
+  {{ govukButton({
+    text: continueButton,
+    href: taskListUrl
+  }) }}
 {% endblock %}

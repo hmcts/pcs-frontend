@@ -1,9 +1,9 @@
 {
   "pageTitle": "Enw eich cleient",
   "nameConfirmationLabel": "Ai enw eich cleient yw {{defendantName}}?",
-  "firstNameLabel": "cyDefendant’s first name",
-  "lastNameLabel": "cyDefendant’s last name",
-  "nameConfirmationHint": "cyThis is the name provided by {{organisationName}}",
+  "firstNameLabel": "Enw cyntaf y diffynnydd",
+  "lastNameLabel": "Cyfenw'r diffynnydd",
+  "nameConfirmationHint": "Dyma'r enw a ddarparwyd gan {{organisationName}}",
   "yesOption": "Ydy",
   "noOption": "Nac ydy",
   "errors": {

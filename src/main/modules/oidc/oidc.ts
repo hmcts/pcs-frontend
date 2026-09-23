@@ -4,6 +4,8 @@ import * as jose from 'jose';
 import type { Configuration, TokenEndpointResponse, UserInfoResponse } from 'openid-client';
 import * as client from 'openid-client';
 
+import { isLegalRepresentativeUser } from '../../steps/utils/userRole';
+
 import type { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
 
@@ -73,6 +75,20 @@ export class OIDCModule {
       return this.clientConfig;
     }
     return this.setupClient();
+  }
+
+  private describeAuthSession(req: Request): Record<string, unknown> {
+    const cookie = req.cookies?.[config.get<string>('session.cookieName')];
+    const presentedSessionId = typeof cookie === 'string' ? cookie.replace(/^s:/, '').split('.')[0] : undefined;
+
+    return {
+      sessionCookiePresented: presentedSessionId !== undefined,
+      sessionMatchesCookie: presentedSessionId === req.sessionID,
+      hasCodeVerifier: Boolean(req.session?.codeVerifier),
+      hasNonce: Boolean(req.session?.nonce),
+      alreadyAuthenticated: Boolean(req.session?.user),
+      sessionKeys: req.session ? Object.keys(req.session) : [],
+    };
   }
 
   public static getCurrentUrl(req: Request): URL {
@@ -168,6 +184,11 @@ export class OIDCModule {
             return next(new OIDCAuthenticationError('Failed to initiate authentication'));
           }
 
+          this.logger.info('Stored PKCE code verifier and redirecting to IDAM', {
+            event: 'authorization_request',
+            ...this.describeAuthSession(req),
+          });
+
           res.redirect(redirectTo.href);
         });
       } catch (error) {
@@ -178,9 +199,17 @@ export class OIDCModule {
 
     // Callback route
     app.get('/oauth2/callback', async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        const { codeVerifier, nonce } = req.session;
+      const { codeVerifier, nonce } = req.session;
 
+      if (!codeVerifier) {
+        this.logger.error('Callback reached with no PKCE code verifier in session', {
+          event: 'pkce_verifier_missing',
+          ...this.describeAuthSession(req),
+        });
+        return res.redirect('/login');
+      }
+
+      try {
         const callbackUrl = OIDCModule.getCurrentUrl(req);
 
         const authorizationChecks: Parameters<typeof client.authorizationCodeGrant>[2] = {
@@ -237,6 +266,7 @@ export class OIDCModule {
           redirectUri: this.oidcConfig.redirectUri,
           issuer: this.oidcConfig.issuer,
           clientId: this.oidcConfig.clientId,
+          ...this.describeAuthSession(req),
         });
         next(new OIDCCallbackError('Failed to complete authentication'));
       }
@@ -246,6 +276,24 @@ export class OIDCModule {
     app.get('/logout', (req: Request, res: Response) => {
       // build the logout url
       const callbackUrl = OIDCModule.getCurrentUrl(req);
+
+      // For Legal Representative users, redirect directly to XUI /auth/logout.
+      // This clears the XUI session and XUI handles the IDAM end session itself.
+      // PCS session is destroyed below, so the user is fully logged out of both.
+      if (isLegalRepresentativeUser(req) && config.has('xui.uri')) {
+        const xuiUri: string = config.get('xui.uri');
+        if (xuiUri) {
+          const xuiLogoutUrl = `${xuiUri.replace(/\/+$/, '')}/auth/logout`;
+          req.session.destroy((err: unknown) => {
+            if (err) {
+              this.logger.error('Session destroyed error:', err);
+            }
+            res.redirect(xuiLogoutUrl);
+          });
+          return;
+        }
+      }
+
       const logoutUrl = client.buildEndSessionUrl(this.clientConfig, {
         post_logout_redirect_uri: callbackUrl.origin,
         id_token_hint: req.session.user?.idToken as string,

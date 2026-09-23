@@ -1,4 +1,4 @@
-import type { BrowserContext, Page } from '@playwright/test';
+import { type BrowserContext, type Page, expect } from '@playwright/test';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
@@ -13,6 +13,7 @@ import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValida
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
+import { resolveIdamPassword } from '../utils/idamPassword';
 
 const home_url = process.env.TEST_URL;
 
@@ -28,21 +29,33 @@ async function clearBrowserSession(page: Page, context: BrowserContext): Promise
   });
 }
 
-async function validateSolicitorCannotAccessCase(
-  page: Page,
-  context: BrowserContext,
-  solicitorEmail: string
-): Promise<void> {
-  await clearBrowserSession(page, context);
-  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('login', solicitorEmail);
-  await performValidation('mainHeader', 'You do not have access to this page');
+async function validateSolicitorCannotAccessCase(page: Page, solicitorEmail: string): Promise<void> {
+  const browser = page.context().browser();
+  if (!browser) {
+    throw new Error('Browser is required to validate access with an isolated session');
+  }
+
+  const isolatedContext = await browser.newContext();
+  const isolatedPage = await isolatedContext.newPage();
+
+  try {
+    await isolatedPage.goto(home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+    await isolatedPage.getByLabel('Email address').fill(solicitorEmail);
+    await isolatedPage.getByLabel('Password').fill(resolveIdamPassword());
+    await isolatedPage.getByRole('button', { name: 'Sign in' }).click();
+    await expect(isolatedPage.getByRole('heading', { name: 'You do not have access to this page' })).toBeVisible();
+  } finally {
+    await isolatedContext.close();
+  }
 }
 
 async function validateCitizenCannotAccessCase(page: Page, context: BrowserContext): Promise<void> {
   await clearBrowserSession(page, context);
-  await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('login');
+  await page.goto(home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+  await page.getByLabel('Email address').fill(process.env.IDAM_PCS_USER_EMAIL as string);
+  await page.getByLabel('Password').fill(resolveIdamPassword());
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.waitForLoadState();
   await performValidation('mainHeader', 'You do not have access to this page');
 }
 
@@ -108,7 +121,7 @@ test.describe('Legal representative organisation access after Notice of Change @
       radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
     });
 
-    await validateSolicitorCannotAccessCase(page, context, user.defendantSolicitor3.email);
+    await validateSolicitorCannotAccessCase(page, user.defendantSolicitor3.email);
   });
 
   test('All representatives in the linked organisation can respond for a single-defendant case @LR @singleDefendant', async ({
@@ -119,7 +132,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
     await performAction('clickButton', startNow.startNowButton);
-    await validateSolicitorCannotAccessCase(page, context, user.defendantSolicitor3.email);
+    await validateSolicitorCannotAccessCase(page, user.defendantSolicitor3.email);
   });
 
   test('Representatives can only respond for defendants linked to their organisation @LR @mixedOrganisation', async ({
@@ -185,7 +198,7 @@ test.describe('Legal representative organisation access after Notice of Change @
       defendantIndex: 0,
     });
 
-    await validateSolicitorCannotAccessCase(page, context, user.defendantSolicitor2.email);
+    await validateSolicitorCannotAccessCase(page, user.defendantSolicitor2.email);
 
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
@@ -197,7 +210,7 @@ test.describe('Legal representative organisation access after Notice of Change @
       option: defendantNameConfirmation.yesRadioOption,
     });
 
-    await validateSolicitorCannotAccessCase(page, context, user.defendantSolicitor2.email);
+    await validateSolicitorCannotAccessCase(page, user.defendantSolicitor2.email);
   });
 
   test('Further Notice of Change removes the previous organisation draft for that defendant @LR @draftRevocation', async ({
@@ -231,7 +244,7 @@ test.describe('Legal representative organisation access after Notice of Change @
       defendantIndex: 0,
     });
 
-    await validateSolicitorCannotAccessCase(page, context, user.defendantSolicitor2.email);
+    await validateSolicitorCannotAccessCase(page, user.defendantSolicitor2.email);
 
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
@@ -241,19 +254,24 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performValidation('radioButtonChecked', defendantNameConfirmation.noRadioOption, false);
   });
 
-  //Skipping this test untill issue mentioned on HDPI-6936 ticket is resolved
-  test.skip('Citizen draft is deleted when Notice of Change gives access to the legal representative organisation @LR @citizenDraftRevocation', async ({
+  test('Citizen draft is deleted when Notice of Change gives access to the legal representative organisation @LR @citizenDraftRevocation', async ({
     page,
     context,
   }) => {
-    await performAction('createUser', 'citizen', ['citizen']);
-    await performAction('validateAccessCodeAPI');
+    const selectedDefendant = submitCaseApiData.submitCasePayload.defendant1;
 
-    await clearBrowserSession(page, context);
+    await performAction('createUser', 'citizen', ['citizen']);
     await performAction('navigateToUrl', home_url);
     await performAction('login');
-    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-    await performAction('clickButton', citizenStartNow.startNowButton);
+    await performAction('navigateToUrl', home_url + `/access-your-case`);
+    await performAction('accessYourCase', {
+      caseNumber: process.env.CASE_NUMBER,
+      defendantFirstName: selectedDefendant.firstName,
+      defendantLastName: selectedDefendant.lastName,
+    });
+    await page.goto(home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
+    await page.getByRole('button', { name: citizenStartNow.startNowButton }).click();
+    await page.waitForLoadState();
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -273,7 +291,10 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
     await performAction('clickButton', startNow.startNowButton);
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader('Test', 'John'));
+    await performValidation(
+      'mainHeader',
+      defendantNameConfirmation.mainHeader(selectedDefendant.firstName, selectedDefendant.lastName)
+    );
     await performValidation('radioButtonChecked', defendantNameConfirmation.noRadioOption, false);
   });
 });
