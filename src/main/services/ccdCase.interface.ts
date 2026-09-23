@@ -169,6 +169,7 @@ export interface CcdDefendantParty {
   addressSameAsProperty?: string;
   phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
+  textMessageNumber?: string;
   pcqId?: string;
 }
 
@@ -270,6 +271,7 @@ export interface PossessionClaimResponse {
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
   responseDocumentId?: string;
+  draftVersion?: number;
   claimIssuedDate?: string;
 
   defendantFlags?: CcdFlags;

@@ -3,6 +3,7 @@
   "nameConfirmationLabel": "Is the defendant’s name {{defendantName}}?",
   "firstNameLabel": "Defendant’s first name",
   "lastNameLabel": "Defendant’s last name",
+  "nameConfirmationHint": "This is the name provided by {{organisationName}}",
   "errors": {
     "nameConfirmation": "You must say if the defendant’s name is {{defendantName}}",
     "firstName": "Enter the defendant’s first name",
