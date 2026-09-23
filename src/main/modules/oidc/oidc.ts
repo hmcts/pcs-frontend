@@ -19,7 +19,7 @@ export interface RefreshTokenResult {
 import { Logger } from '@modules/logger';
 
 // Node's fetch reports every network failure as "fetch failed" and puts the real reason on `cause`.
-function describeCause(cause: unknown): string | undefined {
+export function describeCause(cause: unknown): string | undefined {
   if (!(cause instanceof Error)) {
     return cause ? String(cause) : undefined;
   }

@@ -14,6 +14,7 @@ import {
 } from 'openid-client';
 
 import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '../../../../main/modules/oidc';
+import { describeCause } from '../../../../main/modules/oidc/oidc';
 
 import { Logger } from '@modules/logger';
 
@@ -720,6 +721,26 @@ describe('OIDCModule', () => {
         oidcModule.enableFor(mockApp);
         expect(mockApp.locals.oidc).toBe(oidcModule);
       });
+    });
+  });
+
+  describe('describeCause', () => {
+    it('names the error and its code, which is what "fetch failed" hides', () => {
+      const cause = Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' });
+
+      expect(describeCause(cause)).toBe('Error: connect ECONNREFUSED (ECONNREFUSED)');
+    });
+
+    it('omits the code when the error has none', () => {
+      expect(describeCause(new TypeError('bad url'))).toBe('TypeError: bad url');
+    });
+
+    it('stringifies a cause that is not an Error', () => {
+      expect(describeCause('socket hang up')).toBe('socket hang up');
+    });
+
+    it('returns undefined when there is no cause', () => {
+      expect(describeCause(undefined)).toBeUndefined();
     });
   });
 });

@@ -78,4 +78,31 @@ describe('logger module', () => {
     );
     expect(emit).toHaveBeenCalledWith(expect.objectContaining({ body: 'Retrying', severityText: 'warn' }));
   });
+
+  it('reuses the logger for a name so telemetry is never attached twice', () => {
+    const name = `logger-reuse-${Date.now()}`;
+    const first = Logger.getLogger(name);
+    const transportCount = first.transports.length;
+
+    const second = Logger.getLogger(name);
+
+    expect(second).toBe(first);
+    expect(second.transports).toHaveLength(transportCount);
+  });
+
+  it('only attaches the telemetry transport once however often telemetry starts', () => {
+    const logger = Logger.getLogger(`logger-enable-twice-${Date.now()}`);
+    const emit = jest.fn();
+    logs.setGlobalLoggerProvider({ getLogger: () => ({ emit, enabled: () => true }) });
+
+    try {
+      Logger.enableTelemetry();
+      Logger.enableTelemetry();
+      logger.error('Exported once');
+    } finally {
+      logs.disable();
+    }
+
+    expect(emit).toHaveBeenCalledTimes(1);
+  });
 });
