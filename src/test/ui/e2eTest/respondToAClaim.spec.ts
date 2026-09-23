@@ -408,7 +408,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('enterPriorityDebtDetails', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.monthRadioOption,
     });
     await performAction('selectWhatOtherRegularExpensesDoYouHave', {
@@ -867,7 +866,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('enterPriorityDebtDetails', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.weekRadioOption,
     });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
@@ -1243,7 +1241,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('enterPriorityDebtDetails', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.monthRadioOption,
     });
     await performAction('selectWhatOtherRegularExpensesDoYouHave', {
@@ -1658,7 +1655,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('enterPriorityDebtDetails', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.weekRadioOption,
     });
     await performAction('selectWhatOtherRegularExpensesDoYouHave');

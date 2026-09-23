@@ -749,7 +749,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('enterPriorityDebtDetailsLR', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.weekRadioOption,
     });
     await performAction('selectExpensesLR');
@@ -898,7 +897,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('enterPriorityDebtDetailsLR', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.weekRadioOption,
     });
     await performAction('selectExpensesLR');
