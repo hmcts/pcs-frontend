@@ -101,6 +101,48 @@ const winstonTelemetryConfig: WinstonInstrumentationConfig = {
   },
 };
 
+// Query strings can carry secrets (the OS Places lookup passes its API key as `key=`), and the
+// HTTP instrumentation records the full URL, so redact them before the span is exported (HDPI-8953).
+const SECRET_QUERY_PARAMS = ['key', 'code', 'token', 'client_secret'];
+
+export function redactSecretQueryParams(url: string): string {
+  return SECRET_QUERY_PARAMS.reduce(
+    (redacted, param) => redacted.replace(new RegExp(`(^|[?&])(${param}=)[^&\\s]+`, 'gi'), '$1$2***'),
+    url
+  );
+}
+
+const URL_SPAN_ATTRIBUTES = ['http.url', 'url.full', 'http.target', 'url.query'];
+// `url.query` is recorded without its leading '?', so the first parameter has no separator in front of it.
+const secretQueryParamPattern = new RegExp(`(^|[?&])(${SECRET_QUERY_PARAMS.join('|')})=`, 'i');
+
+// Structural shape of an ended span - avoids importing @opentelemetry/sdk-trace-base, which is
+// only present transitively.
+interface RedactableSpan {
+  attributes: Record<string, unknown>;
+}
+
+const redactSpanUrlAttributes = (span: RedactableSpan): void => {
+  const attributes = span.attributes ?? {};
+  for (const attribute of URL_SPAN_ATTRIBUTES) {
+    const value = attributes[attribute];
+    if (typeof value === 'string' && secretQueryParamPattern.test(value)) {
+      // Rewrite in place: setAttribute() is a no-op once the span has ended.
+      attributes[attribute] = redactSecretQueryParams(value);
+    }
+  }
+};
+
+// A span processor rather than the HTTP instrumentation's applyCustomAttributesOnSpan hook: that
+// hook only runs when a response completes, so a timed-out, aborted or refused request would
+// export its URL - and the key in it - unredacted. onEnd is the one point every path reaches.
+export const secretRedactingSpanProcessor = {
+  onStart: (): void => undefined,
+  onEnd: (span: RedactableSpan): void => redactSpanUrlAttributes(span),
+  forceFlush: (): Promise<void> => Promise.resolve(),
+  shutdown: (): Promise<void> => Promise.resolve(),
+};
+
 const httpTelemetryConfig: HttpTelemetryConfig = {
   enabled: true,
   ignoreIncomingRequestHook: request => {
@@ -134,6 +176,7 @@ export function initializeTelemetry(): void {
       },
       winston: winstonTelemetryConfig as InstrumentationConfig,
     },
+    spanProcessors: [secretRedactingSpanProcessor],
     enableLiveMetrics: true,
   });
 

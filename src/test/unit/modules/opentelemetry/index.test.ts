@@ -30,6 +30,7 @@ interface TelemetryConfig {
       logHook: (span: MockSpan, record: Record<string, unknown>) => void;
     };
   };
+  spanProcessors: { onEnd: (span: { attributes: Record<string, unknown> }) => void }[];
   enableLiveMetrics: boolean;
 }
 
@@ -194,6 +195,64 @@ describe('opentelemetry module', () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to flush telemetry cleanly', shutdownError);
     consoleErrorSpy.mockRestore();
+  });
+
+  describe('secret redaction in span URLs (HDPI-8953)', () => {
+    it('replaces secret query parameter values, leaving the rest of the URL intact', async () => {
+      const { redactSecretQueryParams } = await getTelemetryModule();
+
+      expect(redactSecretQueryParams('https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123')).toBe(
+        'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=***'
+      );
+      expect(redactSecretQueryParams('https://idam/o/token?code=xyz&client_secret=shh&scope=openid')).toBe(
+        'https://idam/o/token?code=***&client_secret=***&scope=openid'
+      );
+      expect(redactSecretQueryParams('https://ccd/cases/123?ignore-warning=false')).toBe(
+        'https://ccd/cases/123?ignore-warning=false'
+      );
+    });
+
+    it('redacts a secret in the first position, which url.query records without a leading ?', async () => {
+      const { redactSecretQueryParams } = await getTelemetryModule();
+
+      expect(redactSecretQueryParams('code=xyz&state=abc')).toBe('code=***&state=abc');
+      expect(redactSecretQueryParams('monkey=1&donkey=2')).toBe('monkey=1&donkey=2');
+    });
+
+    it('rewrites the URL attributes of every span it ends, including failed requests', async () => {
+      const telemetryConfig = await initializeAndGetTelemetryConfig();
+      const [spanProcessor] = telemetryConfig.spanProcessors;
+
+      // A request that never got a response: the instrumentation closes the span without calling
+      // applyCustomAttributesOnSpan, so onEnd is the only chance to redact it.
+      const span = {
+        attributes: {
+          'http.url': 'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123',
+          'url.query': 'postcode=W37RX&key=abc123',
+          'http.method': 'GET',
+          'error.type': 'AbortError',
+        },
+      };
+
+      spanProcessor.onEnd(span);
+
+      expect(span.attributes).toEqual({
+        'http.url': 'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=***',
+        'url.query': 'postcode=W37RX&key=***',
+        'http.method': 'GET',
+        'error.type': 'AbortError',
+      });
+    });
+
+    it('leaves spans alone when nothing carries a secret', async () => {
+      const telemetryConfig = await initializeAndGetTelemetryConfig();
+      const [spanProcessor] = telemetryConfig.spanProcessors;
+      const attributes = { 'http.url': 'http://ccd-data-store/cases/123?ignore-warning=false' };
+
+      spanProcessor.onEnd({ attributes });
+
+      expect(attributes).toEqual({ 'http.url': 'http://ccd-data-store/cases/123?ignore-warning=false' });
+    });
   });
 
   it('times out flush when shutdown does not settle', async () => {

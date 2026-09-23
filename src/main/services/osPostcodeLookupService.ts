@@ -37,11 +37,12 @@ function formatPostcode(value: string): string {
 }
 
 export const getAddressesByPostcode = async (postcode: string): Promise<Address[]> => {
+  // The API key is a query parameter, so the URL is a secret: never log it (HDPI-8953).
   const url = `${getBaseUrl()}/postcode?postcode=${encodeURIComponent(postcode)}&key=${getToken()}`;
-  logger.info(`[osPostcodeLookupService] Calling getAddressesByPostcode with URL: ${url}`);
+  logger.info('[osPostcodeLookupService] Looking up addresses by postcode');
   try {
     const response = await axios.get<OSResponse>(url);
-    logger.info(`[osPostcodeLookupService] Response data: ${JSON.stringify(response.data, null, 2)}`);
+    logger.info(`[osPostcodeLookupService] Postcode lookup returned ${response.data?.results?.length ?? 0} result(s)`);
     if (!response.data?.results) {
       return [];
     }
@@ -100,8 +101,6 @@ export const getAddressesByPostcode = async (postcode: string): Promise<Address[
           postcode: formatPostcode(POSTCODE ?? ''),
           country: countryCodes.get(COUNTRY_CODE),
         };
-
-        logger.info(`[osPostcodeLookupService] Address: ${JSON.stringify(addr, null, 2)}`);
 
         return addr;
       })
