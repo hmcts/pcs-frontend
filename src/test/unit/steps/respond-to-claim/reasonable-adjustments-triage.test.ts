@@ -146,13 +146,14 @@ describe('reasonable-adjustments-triage beforeRedirect', () => {
       expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
     });
 
-    it('does not launch Your Support when the feature flag is off (falls through like skip)', async () => {
+    it('neither launches Your Support nor records an answer when the feature flag is off', async () => {
       mockIsCuiYourSupportEnabled.mockResolvedValue(false);
       const { req, redirect } = buildReq('questions', '123');
 
       await beforeRedirect(req);
 
       expect(mockStartYourSupport).not.toHaveBeenCalled();
+      expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
       expect(redirect).not.toHaveBeenCalled();
     });
 

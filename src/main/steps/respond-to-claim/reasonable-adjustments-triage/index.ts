@@ -59,6 +59,7 @@ export const step: StepDefinition = createFormStep({
     }
 
     if (!(await isCuiYourSupportEnabled(req))) {
+      // Flag off: the button is hidden, so this is a stale tab or a crafted POST
       return;
     }
     const caseReference = req.res?.locals.validatedCase?.id;
@@ -81,7 +82,7 @@ export const step: StepDefinition = createFormStep({
   // the microsite inside beforeRedirect (postHandler short-circuits on headersSent) and never gets here.
   resolveRedirectAfterPost: async (req: Request) => getYourSupportReturnUrl(req),
   // When the Your Support feature flag is off, hide the "Continue to the questions" button so the
-  // page doesn't advertise a microsite that won't launch (beforeRedirect also treats it as skip).
+  // page doesn't advertise a microsite that won't launch (see the flag-off branch in beforeRedirect).
   // backUrl points back to wherever the citizen launched Your Support from.
   extendGetContent: async (req: Request) => ({
     cuiYourSupportEnabled: await isCuiYourSupportEnabled(req),
