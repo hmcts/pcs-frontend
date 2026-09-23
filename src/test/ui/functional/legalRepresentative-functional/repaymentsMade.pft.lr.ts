@@ -1,12 +1,11 @@
 import { repaymentsMade } from '../../data/page-data/lr-page-data';
-import { claimantsName } from '../../utils/actions/custom-actions';
 import { performAction, performValidation } from '../../utils/controller';
 
 export async function repaymentsMadeErrorValidation(): Promise<void> {
   await performAction('clickButton', repaymentsMade.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: repaymentsMade.thereIsAProblemErrorMessageHeader,
-    message: repaymentsMade.getSelectIfYouPaidAnyMoneyErrorMessage(claimantsName),
+    message: repaymentsMade.getSelectIfYouPaidAnyMoneyErrorMessage(process.env.CLAIMANT_NAME as string),
   });
 
   await performAction('clickRadioButton', repaymentsMade.yesRadioOption);

@@ -2,7 +2,7 @@ import { noticeDateWhenProvided } from '../../data/page-data/lr-page-data';
 import { performAction, performValidation } from '../../utils/controller';
 
 export async function noticeDateWhenProvidedErrorValidation(): Promise<void> {
-  await performAction('enterNoticeDateKnown', {
+  await performAction('enterNoticeDateKnownLR', {
     day: '25',
     month: '2',
     year: '2050',
