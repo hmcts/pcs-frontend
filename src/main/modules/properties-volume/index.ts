@@ -4,11 +4,9 @@ import * as propertiesVolume from '@hmcts/properties-volume';
 import config from 'config';
 import { get, set } from 'lodash';
 
-// Lazy: winston must not load before initializeTelemetry() or it is never instrumented (HDPI-8954).
-const warn = async (message: string): Promise<void> => {
-  const { Logger } = await import('@modules/logger');
-  Logger.getLogger('properties-volume').warn(message);
-};
+import { Logger } from '@modules/logger';
+
+const logger = Logger.getLogger('properties-volume');
 
 export class PropertiesVolume {
   constructor(public developmentMode: boolean) {
@@ -27,7 +25,7 @@ export class PropertiesVolume {
           omit: ['redis-connection-string'],
         });
       } catch (err) {
-        await warn(
+        logger.warn(
           `Could not load secrets from Azure Key Vault: ${(err as Error).message}. ` +
             'Falling back to values from .env / process.env. Run `az login` or set USE_VAULT=false to silence.'
         );

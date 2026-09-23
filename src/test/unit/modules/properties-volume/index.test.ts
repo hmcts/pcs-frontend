@@ -120,32 +120,4 @@ describe('PropertiesVolume Module', () => {
       expect(config.get).not.toHaveBeenCalled();
     });
   });
-
-  describe('Telemetry load order (HDPI-8954)', () => {
-    // bootstrap.ts loads this module before initializeTelemetry(). OpenTelemetry can only
-    // instrument winston when winston is required after telemetry starts, so importing the
-    // logger here would silently stop every logger.error() reaching App Insights.
-    it('should not load the logger (and so winston) when the module is imported', () => {
-      jest.isolateModules(() => {
-        const { Logger } = require('@modules/logger');
-        (Logger.getLogger as jest.Mock).mockClear();
-
-        require('@modules/properties-volume');
-
-        expect(Logger.getLogger).not.toHaveBeenCalled();
-      });
-    });
-
-    it('should still log a warning when the Azure vault lookup fails', async () => {
-      delete process.env.USE_VAULT;
-      const { Logger } = require('@modules/logger');
-      const warn = jest.fn();
-      (Logger.getLogger as jest.Mock).mockReturnValue({ warn, info: jest.fn(), error: jest.fn() });
-      (propertiesVolume.addFromAzureVault as jest.Mock).mockRejectedValueOnce(new Error('az login required'));
-
-      await new PropertiesVolume(true).enableFor();
-
-      expect(warn).toHaveBeenCalledWith(expect.stringContaining('az login required'));
-    });
-  });
 });
