@@ -62,7 +62,7 @@ const emptyDraftPayload = (): MakeOrderDraftPayload => ({
 
 async function loadEnvelope(accessToken: string, caseReference: string): Promise<MakeOrderEnvelope> {
   const ccdCase = await ccdCaseService.getCaseByIdForEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID);
-  const payload = ccdCase.data.makeOrderPayload;
+  const payload = ccdCase.data.eventPayload;
   if (!payload) {
     throw new HTTPError('The make order event did not return order data', 500);
   }
@@ -76,7 +76,7 @@ function submitOrderEvent(
   order: { id: string | null; version: number; draftPayload: MakeOrderDraftPayload }
 ): Promise<unknown> {
   return ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, {
-    makeOrderPayload: JSON.stringify({ action, order }),
+    eventPayload: JSON.stringify({ action, order }),
   });
 }
 

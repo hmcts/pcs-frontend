@@ -45,10 +45,10 @@ function ccdStub(): Express {
   const ccd = express();
   ccd.use(express.json());
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
-    res.json({ token: 'event-token', case_details: { case_data: { makeOrderPayload: JSON.stringify(envelope) } } });
+    res.json({ token: 'event-token', case_details: { case_data: { eventPayload: JSON.stringify(envelope) } } });
   });
   ccd.post('/cases/:id/events', (req: Request, res: Response) => {
-    const posted = JSON.parse(req.body.data.makeOrderPayload);
+    const posted = JSON.parse(req.body.data.eventPayload);
     envelope = {
       ...envelope,
       order: {
