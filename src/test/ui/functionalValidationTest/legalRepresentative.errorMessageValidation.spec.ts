@@ -842,7 +842,6 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     await performAction('enterPriorityDebtDetailsLR', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.weekRadioOption,
     });
     await performAction('selectExpensesLR');
@@ -994,7 +993,6 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     await performAction('enterPriorityDebtDetailsLR', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.weekRadioOption,
     });
     await performAction('selectExpensesLR');
