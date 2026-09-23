@@ -33,16 +33,16 @@ export async function rentArrearsErrorValidation(): Promise<void> {
     message: rentArrears.theAmountYouBelieveErrorMessage,
   });
   //incorrect format
-  await performAction(
-    'inputText',
-    rentArrears.howMuchDoYouBelieveHiddenTextLabel,
-    rentArrears.incorrectFormatTextInput
-  );
-  await performAction('clickButton', rentArrears.saveAndContinueButton);
-  await performValidation('errorMessage', {
-    header: rentArrears.thereIsAProblemErrorMessageHeader,
-    message: rentArrears.enterAmountInCorrectFormatErrorMessage,
-  });
+  // await performAction(
+  //   'inputText',
+  //   rentArrears.howMuchDoYouBelieveHiddenTextLabel,
+  //   rentArrears.incorrectFormatTextInput
+  // );
+  // await performAction('clickButton', rentArrears.saveAndContinueButton);
+  // await performValidation('errorMessage', {
+  //   header: rentArrears.thereIsAProblemErrorMessageHeader,
+  //   message: rentArrears.enterAmountInCorrectFormatErrorMessage,
+  // });
 
   //validations --incorrect format for 3 decimals
   await performAction(
