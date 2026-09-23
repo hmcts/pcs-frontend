@@ -197,26 +197,33 @@ describe('opentelemetry module', () => {
     consoleErrorSpy.mockRestore();
   });
 
-  describe('secret redaction in span URLs (HDPI-8953)', () => {
-    it('replaces secret query parameter values, leaving the rest of the URL intact', async () => {
-      const { redactSecretQueryParams } = await getTelemetryModule();
+  describe('query redaction in span URLs (HDPI-8953)', () => {
+    it('drops every query value, whatever it is called, and keeps the rest of the URL', async () => {
+      const { redactQueryValues } = await getTelemetryModule();
 
-      expect(redactSecretQueryParams('https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123')).toBe(
-        'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=***'
+      expect(redactQueryValues('https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123')).toBe(
+        'https://api.os.uk/search/places/v1/postcode?postcode=***&key=***'
       );
-      expect(redactSecretQueryParams('https://idam/o/token?code=xyz&client_secret=shh&scope=openid')).toBe(
-        'https://idam/o/token?code=***&client_secret=***&scope=openid'
-      );
-      expect(redactSecretQueryParams('https://ccd/cases/123?ignore-warning=false')).toBe(
-        'https://ccd/cases/123?ignore-warning=false'
-      );
+      // A parameter nobody thought to name in advance is redacted the same way.
+      expect(redactQueryValues('https://svc/thing?api_signature=deadbeef')).toBe('https://svc/thing?api_signature=***');
+      expect(redactQueryValues('https://ccd/cases/123')).toBe('https://ccd/cases/123');
     });
 
-    it('redacts a secret in the first position, which url.query records without a leading ?', async () => {
-      const { redactSecretQueryParams } = await getTelemetryModule();
+    it('leaves an = in the path or the fragment alone', async () => {
+      const { redactQueryValues } = await getTelemetryModule();
 
-      expect(redactSecretQueryParams('code=xyz&state=abc')).toBe('code=***&state=abc');
-      expect(redactSecretQueryParams('monkey=1&donkey=2')).toBe('monkey=1&donkey=2');
+      expect(redactQueryValues('https://dm-store/documents/a=b/binary')).toBe('https://dm-store/documents/a=b/binary');
+      expect(redactQueryValues('https://svc/thing?a=1#b=2')).toBe('https://svc/thing?a=***#b=2');
+    });
+
+    it('redacts the first value in url.query, which is recorded without a leading ?', async () => {
+      const telemetryConfig = await initializeAndGetTelemetryConfig();
+      const [spanProcessor] = telemetryConfig.spanProcessors;
+      const attributes = { 'url.query': 'code=xyz&state=abc' };
+
+      spanProcessor.onEnd({ attributes });
+
+      expect(attributes).toEqual({ 'url.query': 'code=***&state=***' });
     });
 
     it('rewrites the URL attributes of every span it ends, including failed requests', async () => {
@@ -237,21 +244,21 @@ describe('opentelemetry module', () => {
       spanProcessor.onEnd(span);
 
       expect(span.attributes).toEqual({
-        'http.url': 'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=***',
-        'url.query': 'postcode=W37RX&key=***',
+        'http.url': 'https://api.os.uk/search/places/v1/postcode?postcode=***&key=***',
+        'url.query': 'postcode=***&key=***',
         'http.method': 'GET',
         'error.type': 'AbortError',
       });
     });
 
-    it('leaves spans alone when nothing carries a secret', async () => {
+    it('leaves spans alone when there is no query string', async () => {
       const telemetryConfig = await initializeAndGetTelemetryConfig();
       const [spanProcessor] = telemetryConfig.spanProcessors;
-      const attributes = { 'http.url': 'http://ccd-data-store/cases/123?ignore-warning=false' };
+      const attributes = { 'http.url': 'http://ccd-data-store/cases/123' };
 
       spanProcessor.onEnd({ attributes });
 
-      expect(attributes).toEqual({ 'http.url': 'http://ccd-data-store/cases/123?ignore-warning=false' });
+      expect(attributes).toEqual({ 'http.url': 'http://ccd-data-store/cases/123' });
     });
   });
 

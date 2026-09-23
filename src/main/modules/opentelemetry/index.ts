@@ -101,20 +101,21 @@ const winstonTelemetryConfig: WinstonInstrumentationConfig = {
   },
 };
 
-// Query strings can carry secrets (the OS Places lookup passes its API key as `key=`), and the
-// HTTP instrumentation records the full URL, so redact them before the span is exported (HDPI-8953).
-const SECRET_QUERY_PARAMS = ['key', 'code', 'token', 'client_secret'];
+// The HTTP instrumentation records the full URL on every span, and our query strings carry both
+// secrets (the OS Places lookup passes its API key as `key=`, the login callback returns `code=`)
+// and personal data (postcodes). Keeping a list of parameters to hide would leak anything not on
+// it, so keep only the parameter names - enough to tell the calls apart - and drop every value.
+// Anchored on '?' or '&' so an '=' inside a path is left alone, and stopping at '#' so a
+// fragment is not treated as a query.
+const QUERY_VALUE_PATTERN = /([?&])([^=&#?\s]+)=[^&#\s]+/g;
 
-export function redactSecretQueryParams(url: string): string {
-  return SECRET_QUERY_PARAMS.reduce(
-    (redacted, param) => redacted.replace(new RegExp(`(^|[?&])(${param}=)[^&\\s]+`, 'gi'), '$1$2***'),
-    url
-  );
+export function redactQueryValues(url: string): string {
+  return url.replace(QUERY_VALUE_PATTERN, '$1$2=***');
 }
 
 const URL_SPAN_ATTRIBUTES = ['http.url', 'url.full', 'http.target', 'url.query'];
-// `url.query` is recorded without its leading '?', so the first parameter has no separator in front of it.
-const secretQueryParamPattern = new RegExp(`(^|[?&])(${SECRET_QUERY_PARAMS.join('|')})=`, 'i');
+// `url.query` holds the query string without the leading '?' that the others carry.
+const BARE_QUERY_ATTRIBUTE = 'url.query';
 
 // Structural shape of an ended span - avoids importing @opentelemetry/sdk-trace-base, which is
 // only present transitively.
@@ -126,9 +127,14 @@ const redactSpanUrlAttributes = (span: RedactableSpan): void => {
   const attributes = span.attributes ?? {};
   for (const attribute of URL_SPAN_ATTRIBUTES) {
     const value = attributes[attribute];
-    if (typeof value === 'string' && secretQueryParamPattern.test(value)) {
+    if (typeof value !== 'string') {
+      continue;
+    }
+    const redacted =
+      attribute === BARE_QUERY_ATTRIBUTE ? redactQueryValues(`?${value}`).slice(1) : redactQueryValues(value);
+    if (redacted !== value) {
       // Rewrite in place: setAttribute() is a no-op once the span has ended.
-      attributes[attribute] = redactSecretQueryParams(value);
+      attributes[attribute] = redacted;
     }
   }
 };
