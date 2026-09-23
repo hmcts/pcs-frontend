@@ -87,10 +87,11 @@ describe('reasonableAdjustmentsCallback routes', () => {
     claimantName: 'Acme Landlord',
     claimantEnteredDefendantDetails: { firstName: 'Jo' },
   };
-  // Only the defendant slice should be re-sent (defendantContactDetails + defendantResponses).
+  // Only the defendant slice should be re-sent (defendantContactDetails + defendantResponses), and
+  // every pre-submission write records Your Support as complete.
   const expectedDefendantSlice = {
     defendantContactDetails: { party: { emailAddress: 'defendant@example.com' } },
-    defendantResponses: { situation_HasMoved: 'NO' },
+    defendantResponses: { situation_HasMoved: 'NO', completedSections: ['YOUR_SUPPORT'] },
   };
 
   beforeEach(() => {
@@ -251,7 +252,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
       expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
     });
 
-    it('keeps flags already on the draft and does not duplicate the marker', async () => {
+    it('keeps flags already on the draft when recording "no support needed"', async () => {
       const storedFlags = {
         partyName: 'John Doe',
         roleOnCase: 'Defendant',
@@ -259,13 +260,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
       };
       mockGetCaseByIdForEvent.mockResolvedValue({
         id: '123',
-        data: {
-          possessionClaimResponse: {
-            ...existingResponse,
-            defendantResponses: { situation_HasMoved: 'NO', completedSections: ['YOUR_SUPPORT'] },
-            defendantFlags: storedFlags,
-          },
-        },
+        data: { possessionClaimResponse: { ...existingResponse, defendantFlags: storedFlags } },
       });
       mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
       const res = {} as unknown as Response;
@@ -279,6 +274,25 @@ describe('reasonableAdjustmentsCallback routes', () => {
         { possessionClaimResponse: { ...noSupportNeededSlice, defendantFlags: storedFlags } },
         { context: 'x' }
       );
+    });
+
+    it('writes nothing when Your Support is already recorded as complete (the write would be identical)', async () => {
+      mockGetCaseByIdForEvent.mockResolvedValue({
+        id: '123',
+        data: {
+          possessionClaimResponse: {
+            ...existingResponse,
+            defendantResponses: { situation_HasMoved: 'NO', completedSections: ['YOUR_SUPPORT'] },
+          },
+        },
+      });
+      mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
+      const res = {} as unknown as Response;
+
+      await getHandler()(buildReq(), res);
+
+      expect(mockUpdateDraft).not.toHaveBeenCalled();
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
     });
 
     it('redirects to the error page when recording "no support needed" fails', async () => {

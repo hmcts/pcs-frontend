@@ -6,8 +6,11 @@ import { oidcMiddleware } from '../middleware/oidc';
 import { respondToClaimFeatureMiddleware } from '../middleware/respondToClaimFeatureMiddleware';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../steps/respond-to-claim/draftEvent';
 import { normaliseRespondToClaimDraft } from '../steps/respond-to-claim/normalise';
-import { addYourSupportToCompletedSections } from '../steps/respond-to-claim/yourSupportSection';
-import { toDefendantDraftSlice } from '../steps/utils/buildDraftDefendantResponse';
+import {
+  addYourSupportToCompletedSections,
+  isYourSupportSectionComplete,
+} from '../steps/respond-to-claim/yourSupportSection';
+import { type DraftDefendantResponse, toDefendantDraftSlice } from '../steps/utils/buildDraftDefendantResponse';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
@@ -22,18 +25,24 @@ import { safeRedirect303 } from '@utils/safeRedirect';
 const logger = Logger.getLogger('reasonableAdjustmentsCallback');
 
 // Both callback writes send the same defendant slice every other draft save sends (the draft save
-// REPLACES the stored response), normalised the same way, changing only what this outcome decides:
-// the completed-section marker, or the flags.
-function draftWithNoSupportNeeded(existingResponse: PossessionClaimResponse): PossessionClaimResponse {
+// REPLACES the stored response), normalised the same way, and both record Your Support as complete:
+// a trip through the microsite is an answer whether or not it changed any flags.
+function completedDraft(existingResponse: PossessionClaimResponse): DraftDefendantResponse {
   const draft = toDefendantDraftSlice(existingResponse);
   draft.defendantResponses.completedSections = addYourSupportToCompletedSections(
     draft.defendantResponses.completedSections
   );
-  return normaliseRespondToClaimDraft(draft);
+  return draft;
+}
+
+function draftWithNoSupportNeeded(existingResponse: PossessionClaimResponse): PossessionClaimResponse {
+  return normaliseRespondToClaimDraft(completedDraft(existingResponse));
 }
 
 function draftWithFlags(existingResponse: PossessionClaimResponse, defendantFlags: CcdFlags): PossessionClaimResponse {
-  return normaliseRespondToClaimDraft({ ...toDefendantDraftSlice(existingResponse), defendantFlags });
+  const draft = completedDraft(existingResponse);
+  draft.defendantFlags = defendantFlags;
+  return normaliseRespondToClaimDraft(draft);
 }
 
 // Return leg from the CUI Your Support (cui-ra) microsite.
@@ -119,7 +128,9 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
         if (!flags?.details?.length) {
           // Submitted the microsite without adding or changing anything: an explicit "no support needed".
           // Record it on the draft so the task-list row turns Done
-          if (!responseSubmitted) {
+          // Nothing to write once the response is submitted (no draft) or when Your Support is already
+          // recorded as complete (the write would be byte-identical).
+          if (!responseSubmitted && !isYourSupportSectionComplete(existingResponse)) {
             await ccdCaseService.updateDraft(
               RESPOND_TO_CLAIM_DRAFT_EVENT,
               accessToken,

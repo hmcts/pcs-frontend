@@ -101,19 +101,17 @@ describe('reasonable-adjustments-triage beforeRedirect', () => {
       expect(redirect).not.toHaveBeenCalled();
     });
 
-    it('does not duplicate the marker when Your Support is already complete', async () => {
-      mockBuildDraftDefendantResponse.mockReturnValue({
-        defendantContactDetails: { party: {} },
-        defendantResponses: { completedSections: ['YOUR_SUPPORT'] },
+    it('writes nothing when Your Support is already recorded as complete (the write would be identical)', async () => {
+      const { req, redirect } = buildReq('skip', undefined, {
+        id: '123',
+        possessionClaimResponse: { defendantResponses: { completedSections: ['YOUR_SUPPORT'] } },
       });
-      const { req } = buildReq('skip', '123');
 
       await beforeRedirect(req);
 
-      expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
-        req,
-        expect.objectContaining({ defendantResponses: { completedSections: ['YOUR_SUPPORT'] } })
-      );
+      expect(mockBuildDraftDefendantResponse).not.toHaveBeenCalled();
+      expect(mockSaveDraftDefendantResponse).not.toHaveBeenCalled();
+      expect(redirect).not.toHaveBeenCalled();
     });
 
     it('writes nothing once the response has been submitted (there is no draft any more)', async () => {

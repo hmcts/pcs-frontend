@@ -20,7 +20,12 @@ const logger = Logger.getLogger('reasonableAdjustmentsTriage');
 
 // "I do not need any support at this time" is an explicit answer. Record it on the draft
 async function recordNoSupportNeeded(req: Request): Promise<void> {
-  if (isDefendantResponseSubmitted(req.res?.locals.validatedCase?.data)) {
+  const validatedCase = req.res?.locals.validatedCase;
+  // Nothing to write once the response is submitted (no draft) or when Your Support is already recorded
+  if (
+    isDefendantResponseSubmitted(validatedCase?.data) ||
+    isYourSupportSectionComplete(validatedCase?.possessionClaimResponse)
+  ) {
     return;
   }
 
@@ -48,7 +53,7 @@ export const step: StepDefinition = createFormStep({
   // writes nothing, so it leaves the status as it was.
   isAnswered: (req: Request) => {
     const response = req.res?.locals.validatedCase?.possessionClaimResponse;
-    return Boolean(response?.defendantFlags?.details?.length) || isYourSupportSectionComplete(response);
+    return isYourSupportSectionComplete(response) || Boolean(response?.defendantFlags?.details?.length);
   },
   // "Continue to the questions" (reasonableAdjustmentsChoice=questions) launches the Your Support
   // microsite;
