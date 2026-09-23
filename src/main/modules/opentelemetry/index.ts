@@ -1,5 +1,5 @@
 import { shutdownAzureMonitor, useAzureMonitor } from '@azure/monitor-opentelemetry';
-import { type Span, SpanStatusCode } from '@opentelemetry/api';
+import { SpanStatusCode } from '@opentelemetry/api';
 import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
 import type { WinstonInstrumentationConfig } from '@opentelemetry/instrumentation-winston';
 import config from 'config';
@@ -10,10 +10,6 @@ const ignoredIncomingUrlPattern = /\/assets\/|\.js(?:$|\?)|\.css(?:$|\?)/;
 
 interface HttpTelemetryConfig {
   enabled: boolean;
-  applyCustomAttributesOnSpan: (
-    span: Span,
-    request?: { path?: string; url?: string; host?: string; protocol?: string }
-  ) => void;
   ignoreIncomingRequestHook: (request: { method?: string; url?: string }) => boolean;
   ignoreOutgoingRequestHook: (options: { path?: string }) => boolean;
 }
@@ -111,49 +107,44 @@ const SECRET_QUERY_PARAMS = ['key', 'code', 'token', 'client_secret'];
 
 export function redactSecretQueryParams(url: string): string {
   return SECRET_QUERY_PARAMS.reduce(
-    (redacted, param) => redacted.replace(new RegExp(`([?&]${param}=)[^&\\s]+`, 'gi'), '$1***'),
+    (redacted, param) => redacted.replace(new RegExp(`(^|[?&])(${param}=)[^&\\s]+`, 'gi'), '$1$2***'),
     url
   );
 }
 
 const URL_SPAN_ATTRIBUTES = ['http.url', 'url.full', 'http.target', 'url.query'];
-const secretQueryParamPattern = new RegExp(`[?&](${SECRET_QUERY_PARAMS.join('|')})=`, 'i');
+// `url.query` is recorded without its leading '?', so the first parameter has no separator in front of it.
+const secretQueryParamPattern = new RegExp(`(^|[?&])(${SECRET_QUERY_PARAMS.join('|')})=`, 'i');
 
-// The hook receives the ClientRequest (outgoing) or IncomingMessage (incoming) alongside the span.
-interface HttpRequestLike {
-  path?: string;
-  url?: string;
-  host?: string;
-  protocol?: string;
+// Structural shape of an ended span - avoids importing @opentelemetry/sdk-trace-base, which is
+// only present transitively.
+interface RedactableSpan {
+  attributes: Record<string, unknown>;
 }
 
-const redactSpanUrlAttributes = (span: Span, request?: HttpRequestLike): void => {
-  // Spans created by the SDK expose the attributes recorded so far; rewrite any that hold a secret.
-  const attributes = (span as unknown as { attributes?: Record<string, unknown> }).attributes ?? {};
+const redactSpanUrlAttributes = (span: RedactableSpan): void => {
+  const attributes = span.attributes ?? {};
   for (const attribute of URL_SPAN_ATTRIBUTES) {
     const value = attributes[attribute];
     if (typeof value === 'string' && secretQueryParamPattern.test(value)) {
-      span.setAttribute(attribute, redactSecretQueryParams(value));
+      // Rewrite in place: setAttribute() is a no-op once the span has ended.
+      attributes[attribute] = redactSecretQueryParams(value);
     }
   }
+};
 
-  // Fall back to the request itself, so redaction does not depend on that non-public field.
-  const target = request?.path ?? request?.url;
-  if (typeof target !== 'string' || !secretQueryParamPattern.test(target)) {
-    return;
-  }
-  const redactedTarget = redactSecretQueryParams(target);
-  span.setAttribute('http.target', redactedTarget);
-  if (request?.host) {
-    const fullUrl = `${request.protocol ?? 'https:'}//${request.host}${redactedTarget}`;
-    span.setAttribute('http.url', fullUrl);
-    span.setAttribute('url.full', fullUrl);
-  }
+// A span processor rather than the HTTP instrumentation's applyCustomAttributesOnSpan hook: that
+// hook only runs when a response completes, so a timed-out, aborted or refused request would
+// export its URL - and the key in it - unredacted. onEnd is the one point every path reaches.
+export const secretRedactingSpanProcessor = {
+  onStart: (): void => undefined,
+  onEnd: (span: RedactableSpan): void => redactSpanUrlAttributes(span),
+  forceFlush: (): Promise<void> => Promise.resolve(),
+  shutdown: (): Promise<void> => Promise.resolve(),
 };
 
 const httpTelemetryConfig: HttpTelemetryConfig = {
   enabled: true,
-  applyCustomAttributesOnSpan: redactSpanUrlAttributes,
   ignoreIncomingRequestHook: request => {
     if (request.method === 'OPTIONS') {
       return true;
@@ -185,6 +176,7 @@ export function initializeTelemetry(): void {
       },
       winston: winstonTelemetryConfig as InstrumentationConfig,
     },
+    spanProcessors: [secretRedactingSpanProcessor],
     enableLiveMetrics: true,
   });
 
