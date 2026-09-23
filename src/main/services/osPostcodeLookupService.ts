@@ -37,7 +37,7 @@ function formatPostcode(value: string): string {
 }
 
 export const getAddressesByPostcode = async (postcode: string): Promise<Address[]> => {
-  // The API key is a query parameter, so the URL is a secret: never log it (HDPI-8953).
+  // The URL carries the API key - never log it.
   const url = `${getBaseUrl()}/postcode?postcode=${encodeURIComponent(postcode)}&key=${getToken()}`;
   logger.info('[osPostcodeLookupService] Looking up addresses by postcode');
   try {

@@ -138,7 +138,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   logger.error(`Error in ${context}: ${axiosError.message}`);
   if (responseData) {
-    // CCD error bodies can carry case data, so log only the parts that identify the failure (HDPI-8953).
+    // CCD error bodies can carry case data - log only what identifies the failure.
     logger.error(
       `Error response from CCD in ${context}: status=${status ?? 'unknown'} ` +
         `message=${responseData.message ?? 'none'} exception=${responseData.exception ?? 'none'}`

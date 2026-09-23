@@ -101,12 +101,7 @@ const winstonTelemetryConfig: WinstonInstrumentationConfig = {
   },
 };
 
-// The HTTP instrumentation records the full URL on every span, and our query strings carry both
-// secrets (the OS Places lookup passes its API key as `key=`, the login callback returns `code=`)
-// and personal data (postcodes). Keeping a list of parameters to hide would leak anything not on
-// it, so keep only the parameter names - enough to tell the calls apart - and drop every value.
-// Anchored on '?' or '&' so an '=' inside a path is left alone, and stopping at '#' so a
-// fragment is not treated as a query.
+// Span URLs reach App Insights, and ours carry the OS Places key, OIDC codes and postcodes.
 const QUERY_VALUE_PATTERN = /([?&])([^=&#?\s]+)=[^&#\s]+/g;
 
 export function redactQueryValues(url: string): string {
@@ -114,37 +109,29 @@ export function redactQueryValues(url: string): string {
 }
 
 const URL_SPAN_ATTRIBUTES = ['http.url', 'url.full', 'http.target', 'url.query'];
-// `url.query` holds the query string without the leading '?' that the others carry.
-const BARE_QUERY_ATTRIBUTE = 'url.query';
 
-// Structural shape of an ended span - avoids importing @opentelemetry/sdk-trace-base, which is
-// only present transitively.
-interface RedactableSpan {
+// `url.query` is the query string on its own; the others hold a URL or a path.
+const redactUrlAttribute = (attribute: string, value: string): string =>
+  attribute === 'url.query' ? redactQueryValues(`?${value}`).slice(1) : redactQueryValues(value);
+
+// Structural: @opentelemetry/sdk-trace-base is only a transitive dependency.
+interface EndedSpan {
   attributes: Record<string, unknown>;
 }
 
-const redactSpanUrlAttributes = (span: RedactableSpan): void => {
-  const attributes = span.attributes ?? {};
+const redactSpanUrlAttributes = (span: EndedSpan): void => {
   for (const attribute of URL_SPAN_ATTRIBUTES) {
-    const value = attributes[attribute];
-    if (typeof value !== 'string') {
-      continue;
-    }
-    const redacted =
-      attribute === BARE_QUERY_ATTRIBUTE ? redactQueryValues(`?${value}`).slice(1) : redactQueryValues(value);
-    if (redacted !== value) {
-      // Rewrite in place: setAttribute() is a no-op once the span has ended.
-      attributes[attribute] = redacted;
+    const value = span.attributes?.[attribute];
+    if (typeof value === 'string') {
+      span.attributes[attribute] = redactUrlAttribute(attribute, value);
     }
   }
 };
 
-// A span processor rather than the HTTP instrumentation's applyCustomAttributesOnSpan hook: that
-// hook only runs when a response completes, so a timed-out, aborted or refused request would
-// export its URL - and the key in it - unredacted. onEnd is the one point every path reaches.
+// onEnd, not the HTTP instrumentation's hook: that one skips timed-out and failed requests.
 export const secretRedactingSpanProcessor = {
   onStart: (): void => undefined,
-  onEnd: (span: RedactableSpan): void => redactSpanUrlAttributes(span),
+  onEnd: (span: EndedSpan): void => redactSpanUrlAttributes(span),
   forceFlush: (): Promise<void> => Promise.resolve(),
   shutdown: (): Promise<void> => Promise.resolve(),
 };
