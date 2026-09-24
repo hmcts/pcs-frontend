@@ -627,6 +627,12 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
     doc => doc.categoryId === 'statementsOfCase' && doc.filename?.startsWith('Counterclaim - Defendant')
   );
 
+  if (counterclaimPdf) {
+    logger.info('[viewTheResponse] Fallback match found', { filename: counterclaimPdf.filename });
+  } else {
+    logger.info('[viewTheResponse] No counterclaim PDF found');
+  }
+
   return counterclaimPdf?.id ?? null;
 }
 
