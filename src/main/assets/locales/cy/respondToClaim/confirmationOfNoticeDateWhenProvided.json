@@ -14,7 +14,7 @@
     "EMAIL": "cyflwynwyd yr hysbysiad drwy e-bost i {{emailAddress}}",
     "EMAIL_ALT": "cyflwynwyd yr hysbysiad drwy e-bost",
     "DELIVERED_PERMITTED_PLACE": "cyflwynwyd yr hysbysiad drwy ei ddanfon i neu ei adael mewn man a ganiateir ar {{date}}",
-    "DELIVERED_PERMITTED_PLACE_ALT": "cyflwynwyd yr hysbysiad drwy ei ddanfon i neu ei adael mewn man a ganiateir ar",
+    "DELIVERED_PERMITTED_PLACE_ALT": "cyflwynwyd yr hysbysiad drwy ei ddanfon i neu ei adael mewn man a ganiateir",
     "FIRST_CLASS_POST": "cyflwynwyd yr hysbysiad drwy bost dosbarth cyntaf neu wasanaeth arall sy'n danfon erbyn y diwrnod gwaith nesaf",
     "OTHER_ELECTRONIC": "cyflwynwyd yr hysbysiad drwy ddull electronig arall: {{details}}",
     "OTHER_ELECTRONIC_ALT": "cyflwynwyd yr hysbysiad drwy ddull electronig arall",
