@@ -595,15 +595,7 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
 function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
-  logger.info('[viewTheResponse] findCounterclaimPdfDocument called', {
-    hasResponses: !!responses,
-    hasCounterClaim: !!responses?.counterClaim,
-    makeCounterClaim: responses?.makeCounterClaim,
-    counterClaimStatus: responses?.counterClaim?.status,
-  });
-
   if (!responses?.counterClaim || isNo(responses.makeCounterClaim)) {
-    logger.info('[viewTheResponse] No counterclaim or makeCounterClaim is NO');
     return null;
   }
 
@@ -615,21 +607,13 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
   if (currentDefendantPartyId && allDefendants.length > 0) {
     const defendantIndex = allDefendants.findIndex(defendant => defendant.id === currentDefendantPartyId);
 
-    // Debug logging - TODO: remove after investigating HDPI-7995
-    logger.info('[viewTheResponse] Counterclaim PDF lookup', {
-      currentDefendantPartyId,
-      allDefendantsCount: allDefendants.length,
-      allDefendantIds: allDefendants.map(d => d.id),
-      defendantIndex,
-      foundMatch: defendantIndex >= 0,
-    });
-
     if (defendantIndex >= 0) {
       const defendantNumber = defendantIndex + 1;
       const counterclaimPdf = documents.find(
         doc => doc.categoryId === 'statementsOfCase' && doc.filename === `Counterclaim - Defendant ${defendantNumber}`
       );
       if (counterclaimPdf) {
+        logger.info('[viewTheResponse] Exact match found', { defendantNumber, filename: counterclaimPdf.filename });
         return counterclaimPdf.id;
       }
     }
@@ -706,14 +690,9 @@ export default function viewTheResponseRoutes(app: Application): void {
       };
 
       const counterclaimPdfId = findCounterclaimPdfDocument(caseData);
-      logger.info('[viewTheResponse] Counterclaim PDF result', {
-        counterclaimPdfId,
-        hasCounterclaimPdfId: !!counterclaimPdfId,
-      });
       const counterclaimPdfUrl = counterclaimPdfId
         ? `/case/${caseReference}/view-documents/${counterclaimPdfId}`
         : null;
-      logger.info('[viewTheResponse] Counterclaim PDF URL', { counterclaimPdfUrl });
 
       return res.render('view-the-response', {
         t,
