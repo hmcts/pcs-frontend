@@ -40,10 +40,10 @@
     "statementOfTruth": "Datganiad gwirionedd"
   },
   "labels": {
-    "claimantName": "cyName",
+    "claimantName": "Enw",
     "addressForService": "Cyfeiriad ar gyfer cyflwyno",
     "isExemptLandlord": "A yw'r hawlydd yn landlord wedi'i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
-    "defendantName": "cyName",
+    "defendantName": "Enw",
     "defendantNameKnown": "A yw enw'r diffynnydd ychwanegol yn hysbys?",
     "defendantAddressKnown": "A yw cyfeiriad y diffynnydd ychwanegol ar gyfer cyflwyno yn hysbys?",
     "claimantType": "Math o hawlydd",
@@ -95,7 +95,7 @@
     "defendantCircumstancesQuestion": "A oes yna unrhyw wybodaeth sy'n ofynnol i chi ei darparu, neu yr ydych am ei darparu am amgylchiadau'r diffynnydd?",
     "defendantCircumstancesDetails": "Manylion am amgylchiadau'r diffynnydd",
     "hasUnderlesseeOrMortgagee": "A oes yna is-brydleswr neu godwr morgais sydd â hawl i wneud cais am ryddhad yn erbyn fforffediad?",
-    "underlesseeName": "cyName",
+    "underlesseeName": "Enw",
     "underlesseeAddress": "Cyfeiriad ar gyfer cyflwyno",
     "demotionQuestion": "Fel dewis arall yn lle meddiannu, a yw'r hawlydd yn gofyn i'r llys orchymyn israddio tenantiaeth?",
     "demotionHousingAct": "O dan pa adran o'r Ddeddf Tai a wneir yr hawliad ar gyfer israddio tenantiaeth ei wneud?",

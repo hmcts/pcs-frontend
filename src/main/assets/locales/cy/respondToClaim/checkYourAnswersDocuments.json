@@ -3,7 +3,7 @@
   "cardTitle": "Uwchlwytho ffeiliau",
   "rows": {
     "uploadedDocuments": {
-      "label": "cy Uploaded files",
+      "label": "Ffeiliau wedi’u huwchlwytho",
       "changeHidden": "cy uploaded files",
       "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     }

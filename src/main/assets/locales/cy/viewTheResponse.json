@@ -24,11 +24,11 @@
   },
   "claimantDetails": {
     "organisation": "Sefydliad yr hawlydd",
-    "name": "cyName",
+    "name": "Enw",
     "address": "Cyfeiriad ar gyfer cyflwyno"
   },
   "defendant": {
-    "name": "cyName",
+    "name": "Enw",
     "dateOfBirth": "Dyddiad geni",
     "email": "Cyfeiriad e-bost",
     "phone": "Rhif ffôn",
@@ -60,8 +60,8 @@
     "noticeReceivedDate": "Pryd gawsoch yr hysbysiad gan yr hawlydd?",
     "rentArrearsAmountConfirmation": "A yw'r swm ôl-ddyledion rhent a roddwyd gan yr hawlydd yn gywir?",
     "rentArrearsAmount": "Swm sy'n ddyledus mewn ôl-ddyledion rhent a dderbyniwyd",
-    "writtenTerms": "cyHas your landlord sent you written terms of the occupation contract?",
-    "makeCounterClaim": "cyDo you want to make a counterclaim?"
+    "writtenTerms": "A yw eich landlord wedi anfon telerau ysgrifenedig atoch o'r contract meddiannaeth?",
+    "makeCounterClaim": "Ydych chi eisiau gwneud gwrth-hawliad?"
   },
   "payments": {
     "anyPaymentsMade": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{claimIssueDate}}?",
@@ -135,7 +135,7 @@
     "factsForCourt": "Pa ffeithiau hoffech chi i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
     "needHelpWithFees": "Ydych chi angen help i dalu'r ffi gwrth-hawliad?",
     "appliedForHwf": "A ydych chi eisoes wedi gwneud cais am help gyda'ch ffi gwrth-hawliad?",
-    "hwfReference": "cyHelp with Fees reference number",
+    "hwfReference": "Cyfeirnod Help i Dalu Ffioedd",
     "claimTypeOptions": {
       "PAYMENT_OR_COMPENSATION": "Swm o arian neu iawndal",
       "SOMETHING_ELSE": "Rhywbeth arall",
@@ -147,12 +147,12 @@
     }
   },
   "incomeFrequencies": {
-    "WEEKLY": "cyreceived every week",
-    "MONTHLY": "cyreceived every month"
+    "WEEKLY": "derbynnir bob wythnos",
+    "MONTHLY": "derbynnir bob mis"
   },
   "paymentFrequencies": {
-    "WEEKLY": "cypaid every week",
-    "MONTHLY": "cypaid every month"
+    "WEEKLY": "telir bob wythnos",
+    "MONTHLY": "telir bob mis"
   },
   "frequency": {
     "weekly": "Pob wythnos",

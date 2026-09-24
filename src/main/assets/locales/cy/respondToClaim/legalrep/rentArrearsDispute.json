@@ -9,7 +9,7 @@
     "or": "neu",
     "notSure": "Diffynnydd ddim yn siŵr"
   },
-  "insetIntroText": "cyRent arrears are money you owe in rent payments.",
+  "insetIntroText": "Ôl-ddyledion rhent yw'r arian sy'n ddyledus gennych mewn taliadau rhent.",
   "insetDetailsText": "Wrth wneud eu hawliad, roedd yn rhaid i {{claimantName}} ddarparu copi o'u datganiad rhent ar gyfer eiddo'r diffynnydd, yn dangos y cyfanswm ôl-ddyledion rhent sy'n ddyledus gan y diffynnydd.",
   "rentStatementDocumentLinkText": "Gweld copi o'r datganiad rhent (yn agor mewn tab newydd)",
   "rentArrearsAmountCorrection": {

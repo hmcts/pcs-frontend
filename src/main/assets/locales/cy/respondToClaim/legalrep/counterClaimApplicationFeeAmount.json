@@ -20,7 +20,7 @@
   "notApplicable": "Amherthnasol",
   "counterClaimAmountLabel": "Swm gwrth-hawliad",
   "counterClaimFeeLabel": "Ffi gwrth-hawliad",
-  "counterClaimAmountDisplay": "cy{{counterClaimAmount, currency(currency: GBP)}}",
-  "counterClaimFeeDisplay": "cy{{counterClaimFee, currency(currency: GBP)}}",
+  "counterClaimAmountDisplay": "{{counterClaimAmount, currency(currency: GBP)}}",
+  "counterClaimFeeDisplay": "{{counterClaimFee, currency(currency: GBP)}}",
   "payNowButton": "cyPay your counterclaim fee ({{counterClaimFee, currency(currency: GBP)}})"
 }

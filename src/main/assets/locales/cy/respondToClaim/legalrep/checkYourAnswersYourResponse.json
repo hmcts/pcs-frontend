@@ -4,7 +4,7 @@
   "options": {
     "yes": "Ydy",
     "no": "Nac ydy",
-    "imNotSure": "cy Defendant is not sure"
+    "imNotSure": "Diffynnydd ddim yn siŵr"
   },
   "rows": {
     "exemptLandlord": {
@@ -60,11 +60,11 @@
       "changeHidden": "manylion y gwrthwynebiad"
     },
     "makeCounterClaim": {
-      "label": "cy Is the defendant planning to make a counterclaim against {{claimantName}}?",
+      "label": "A yw'r diffynnydd yn cynllunio i wneud gwrth-hawliad yn erbyn {{claimantName}}?",
       "changeHidden": "gwneud gwrth-hawliad"
     },
     "counterClaimType": {
-      "label": "cy What is the defendant claiming for?",
+      "label": "Am beth mae'r diffynnydd yn ei hawlio?",
       "changeHidden": "math o wrth-hawliad",
       "options": {
         "PAYMENT_OR_COMPENSATION": "Swm o arian neu iawndal",
@@ -73,55 +73,55 @@
       }
     },
     "isClaimAmountKnown": {
-      "label": "cy Is the defendant claiming for a specific sum of money?",
+      "label": "Ydy'r diffynnydd yn hawlio ar gyfer swm penodol o arian?",
       "changeHidden": "swm yr hawliad yn hysbys"
     },
     "claimAmount": {
-      "label": "cy How much is the defendant claiming?",
+      "label": "Faint mae'r diffynnydd yn ei hawlio?",
       "changeHidden": "swm yr hawliad"
     },
     "estimatedMaxClaimAmount": {
-      "label": "cy What’s the maximum value of their claim?",
+      "label": "Beth yw uchafswm gwerth eu hawliad?",
       "changeHidden": "amcangyfrif o uchafswm swm yr hawliad"
     },
     "counterClaimNeedHelpWithFees": {
-      "label": "cy Does the defendant need help paying the counterclaim fee?",
+      "label": "A yw'r diffynnydd angen help i dalu ffi'r gwrth-hawliad?",
       "changeHidden": "help i dalu'r ffi gwrth-hawliad",
       "options": {
-        "YES": "cy The defendant needs help paying the fee",
-        "NO": "cy The defendant does not need help paying the fee"
+        "YES": "Mae'r diffynnydd angen help i dalu'r ffi",
+        "NO": "Nid yw'r diffynnydd angen help i dalu’r ffi"
       }
     },
     "counterClaimAppliedForHwf": {
-      "label": "cy Has the defendant already applied for help with their counterclaim fee?",
+      "label": "A ydy'r diffynnydd eisoes wedi gwneud cais am help i dalu eu ffi gwrth-hawliad?",
       "changeHidden": "wedi gwneud cais am help i dalu ffioedd"
     },
     "counterClaimHwfReference": {
-      "label": "cy Enter the defendant’s Help with Fees reference number",
+      "label": "Nodwch gyfeirnod Help i Dalu Ffioedd y diffynnydd",
       "changeHidden": "Cyfeirnod Help i Dalu Ffioedd"
     },
     "counterClaimFor": {
-      "label": "cy What is the defendant’s counterclaim for?",
+      "label": "Am beth mae gwrth-hawliad y diffynnydd?",
       "changeHidden": "testun y gwrth-hawliad"
     },
     "counterClaimReasons": {
-      "label": "cy What are their reasons for making the counterclaim?",
+      "label": "Beth yw eu rhesymau dros wneud y gwrth-hawliad?",
       "changeHidden": "rhesymau dros y gwrth-hawliad"
     },
     "counterClaimAgainst": {
-      "label": "cy Who is the defendant making a counterclaim against?",
+      "label": "Pwy mae'r diffynnydd yn gwneud gwrth-hawliad yn erbyn? ",
       "changeHidden": "gwrth-hawliad yn erbyn"
     },
     "otherOrderRequestDetails": {
-      "label": "cy What orders are they asking for the court to make?",
+      "label": "Pa orchymyn ydyn nhw'n gofyn i’r llys ei wneud?",
       "changeHidden": "gorchmynion a geisiwyd"
     },
     "otherOrderRequestFacts": {
-      "label": "cy What facts would they like the court to consider when deciding the claim?",
+      "label": "Pa ffeithiau hoffen nhw i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
       "changeHidden": "ffeithiau i'r llys"
     },
     "counterClaimWantToUploadFiles": {
-      "label": "cy Do you want to upload files to support the counterclaim?",
+      "label": "Ydych chi eisiau uwchlwytho ffeiliau i gefnogi'r gwrth-hawliad?",
       "changeHidden": "uwchlwytho ffeiliau ar gyfer gwrth-hawliad"
     },
     "counterClaimDocuments": {

@@ -1,18 +1,18 @@
 {
   "pageTitle": "Gwirio eich atebion",
-  "cardTitle": "cy Personal details",
+  "cardTitle": "Manylion personol",
   "rows": {
     "defendantNameConfirmation": {
       "label": "Ai {{name}} yw eich enw?",
-      "changeHidden": "cy name"
+      "changeHidden": "enw"
     },
     "defendantName": {
-      "label": "cy Name",
-      "changeHidden": "cy corrected name"
+      "label": "Enw",
+      "changeHidden": "enw wedi'i gywiro"
     },
     "defendantNameCapture": {
       "label": "Beth yw eich enw?",
-      "changeHidden": "cy name"
+      "changeHidden": "enw"
     },
     "dateOfBirth": {
       "label": "Beth yw eich dyddiad geni?",
@@ -21,7 +21,7 @@
     "correspondenceAddressConfirmation": {
       "label": "Ai eich cyfeiriad post yw {{address}}?",
       "fallbackLabel": "cy What’s your postal address?",
-      "changeHidden": "cy postal address"
+      "changeHidden": "cyfeiriad post"
     },
     "contactByEmailOrPost": {
       "label": "Sut ydych chi eisiau cael diweddariadau?",

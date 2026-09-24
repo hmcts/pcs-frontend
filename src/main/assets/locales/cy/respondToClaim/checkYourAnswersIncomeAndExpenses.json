@@ -2,21 +2,21 @@
   "pageTitle": "Gwirio eich atebion",
   "cardTitle": "Incwm a chostau",
   "frequencies": {
-    "WEEKLY": "cy every week",
-    "MONTHLY": "cy every month"
+    "WEEKLY": "pob wythnos",
+    "MONTHLY": "pob mis"
   },
   "incomeFrequencies": {
-    "WEEKLY": "cy received every week",
-    "MONTHLY": "cy received every month"
+    "WEEKLY": "derbynnir bob wythnos",
+    "MONTHLY": "derbynnir bob mis"
   },
   "paymentFrequencies": {
-    "WEEKLY": "cy paid every week",
-    "MONTHLY": "cy paid every month"
+    "WEEKLY": "telir bob wythnos",
+    "MONTHLY": "telir bob mis"
   },
   "rows": {
     "shareIncomeExpenseDetails": {
       "label": "A ydych eisiau darparu manylion am eich incwm a chostau?",
-      "changeHidden": "cy share income and expense details"
+      "changeHidden": "rhannu manylion incwm a threuliau"
     },
     "regularIncome": {
       "label": "Pa incwm rheolaidd ydych chi’n ei gael?",
@@ -31,11 +31,11 @@
     },
     "hasAppliedForUniversalCredit": {
       "label": "Ydych chi wedi gwneud cais am Gredyd Cynhwysol?",
-      "changeHidden": "cy applied for Universal Credit"
+      "changeHidden": "wedi gwneud cais am Gredyd Cynhwysol"
     },
     "universalCreditApplicationDate": {
       "label": "Pryd wnaethoch chi wneud cais am Gredyd Cynhwysol?",
-      "changeHidden": "cy Universal Credit application date"
+      "changeHidden": "Dyddiad y cais Credyd Cynhwysol"
     },
     "priorityDebts": {
       "label": "A oes gennych chi unrhyw ddyledion blaenoriaeth?",
@@ -43,11 +43,11 @@
     },
     "priorityDebtTotal": {
       "label": "Beth yw'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
-      "changeHidden": "cy priority debt total"
+      "changeHidden": "cyfanswm dyled flaenoriaeth"
     },
     "priorityDebtContribution": {
       "label": "Faint ydych yn ei dalu tuag at eich dyledion blaenoriaeth bob wythnos neu fis?",
-      "changeHidden": "cy priority debt contribution"
+      "changeHidden": "cyfraniad dyled flaenoriaeth"
     },
     "regularExpenses": {
       "label": "Pa gostau rheolaidd eraill sydd gennych?",
@@ -66,11 +66,11 @@
     },
     "otherConsiderations": {
       "label": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
-      "changeHidden": "cy other considerations"
+      "changeHidden": "ystyriaethau eraill"
     },
     "otherConsiderationsDetails": {
       "label": "Rhowch fanylion beth arall rydych eisiau ei ddweud wrth y llys",
-      "changeHidden": "cy other considerations details"
+      "changeHidden": "manylion ystyriaethau eraill"
     }
   }
 }
