@@ -8,8 +8,8 @@
   },
   "rows": {
     "exemptLandlord": {
-      "label": "A yw eich landlord yn landlord wedi'i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
-      "changeHidden": "landlord wedi'i eithrio"
+      "label": "A yw eich landlord yn landlord wedi’i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
+      "changeHidden": "landlord wedi’i eithrio"
     },
     "writtenTerms": {
       "label": "A yw eich landlord wedi anfon telerau ysgrifenedig atoch o'r contract meddiannaeth?",
@@ -21,16 +21,16 @@
     },
     "tenancyTypeDetails": {
       "label": "Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded",
-      "changeHidden": "math o denantiaeth wedi'i gywiro"
+      "changeHidden": "math o denantiaeth wedi’i gywiro"
     },
     "tenancyStartDate": {
-      "changeHidden": "dyddiad dechrau'r denantiaeth",
+      "changeHidden": "dyddiad dechrau’r denantiaeth",
       "confirm": {
         "label": "A yw dyddiad dechrau'r denantiaeth, drwydded neu gontract meddiannaeth yn gywir?",
-        "changeHidden": "dyddiad dechrau'r denantiaeth"
+        "changeHidden": "dyddiad dechrau’r denantiaeth"
       },
       "correctDate": {
-        "label": "Beth yw'r dyddiad dechrau cywir?",
+        "label": "Beth yw’r dyddiad dechrau cywir?",
         "changeHidden": "dyddiad dechrau tenantiaeth cywir"
       },
       "labelEntered": "Pryd wnaeth eich tenantiaeth, contract meddiannaeth neu drwydded ddechrau?"
@@ -53,7 +53,7 @@
     },
     "disputeClaim": {
       "label": "A ydych eisiau gwrthwynebu unrhyw rannau eraill o'r hawliad?",
-      "changeHidden": "gwrthwynebu rhannau eraill o'r hawliad"
+      "changeHidden": "gwrthwynebu rhannau eraill o’r hawliad"
     },
     "disputeClaimDetails": {
       "label": "Eglurwch pa rannau o'r hawliad nad ydych yn cytuno â nhw",
@@ -86,7 +86,7 @@
     },
     "counterClaimNeedHelpWithFees": {
       "label": "Ydych chi angen help i dalu'r ffi gwrth-hawliad?",
-      "changeHidden": "help i dalu'r ffi gwrth-hawliad",
+      "changeHidden": "help i dalu’r ffi gwrth-hawliad",
       "options": {
         "YES": "Rwyf angen help i dalu’r ffi",
         "NO": "Nid wyf angen help i dalu’r ffi"
@@ -118,7 +118,7 @@
     },
     "otherOrderRequestFacts": {
       "label": "Pa ffeithiau hoffech chi i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
-      "changeHidden": "ffeithiau i'r llys"
+      "changeHidden": "ffeithiau i’r llys"
     },
     "counterClaimWantToUploadFiles": {
       "label": "Ydych chi eisiau uwchlwytho ffeiliau i gefnogi eich gwrth-hawliad?",
@@ -126,7 +126,7 @@
     },
     "counterClaimDocuments": {
       "label": "Ffeiliau wedi’u huwchlwytho",
-      "changeHidden": "ffeiliau wedi'u huwchlwytho ar gyfer gwrth-hawliad",
+      "changeHidden": "ffeiliau wedi’u huwchlwytho ar gyfer gwrth-hawliad",
       "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     }
   }

@@ -44,7 +44,7 @@
     "heading": "Datganiad gwirionedd",
     "hint": "Gwiriwch yr holl fanylion a roddwyd gennych ar gyfer cywirdeb.",
     "contemptFieldLabel": "Datganiad gwirionedd",
-    "contemptOption": "Deallaf y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu'n onest ei fod yn wir.",
+    "contemptOption": "Deallaf y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu’n onest ei fod yn wir.",
     "beliefFieldLabel": "Datganiad gwirionedd",
     "beliefOption": "Credaf fod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir.",
     "legalRepBeliefOption": "Creda'r diffynnydd bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir. Fe’m hawdurdodir gan y diffynnydd i lofnodi’r datganiad hwn.",
@@ -59,9 +59,9 @@
     "legalRepStatementOfTruthBelief": "Dewiswch a yw'r diffynnydd yn credu bod y ffeithiau a nodir yn y ffruflen amddifyniad hwn yn wir ac eich bod wedi'ch awdurdodi gan y diffynnydd i gyflwyno'r datganiad hwn.",
     "fullName": "Nodwch eich enw llawn",
     "fullNameMaxLength": "Rhaid i'ch enw llawn fod yn 100 nod neu lai",
-    "nameOfFirm": "cy Enter the name of firm",
+    "nameOfFirm": "Nodwch enw’r cwmni",
     "nameOfFirmMaxLength": "Rhaid i'ch enw llawn fod yn 100 nod neu lai",
-    "positionHeld": "cy Enter your position or office held",
+    "positionHeld": "Nodwch eich swydd neu safle a ddelir",
     "positionHeldMaxLength": "Rhaid i’ch eglurhad fod yn 100 nod neu lai"
   }
 }

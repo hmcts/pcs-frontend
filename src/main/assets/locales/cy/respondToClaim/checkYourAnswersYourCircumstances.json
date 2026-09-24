@@ -8,7 +8,7 @@
     },
     "dependantChildrenDetails": {
       "label": "Rhowch fanylion eich plant dibynnol",
-      "changeHidden": "manylion plant sy'n ddibynnol"
+      "changeHidden": "manylion plant sy’n ddibynnol"
     },
     "otherDependants": {
       "label": "A oes gennych chi unrhyw un arall sy'n ddibynnol arnoch?",
@@ -16,11 +16,11 @@
     },
     "otherDependantsDetails": {
       "label": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnoch",
-      "changeHidden": "manylion eraill sy'n ddibynnol"
+      "changeHidden": "manylion eraill sy’n ddibynnol"
     },
     "otherTenants": {
       "label": "A oes yna unrhyw oedolion eraill yn byw yn eich cartref?",
-      "changeHidden": "oedolion eraill sy'n byw yn eich cartref"
+      "changeHidden": "oedolion eraill sy’n byw yn eich cartref"
     },
     "otherTenantsDetails": {
       "label": "Rhowch fanylion yr oedolion eraill sy'n byw yn eich cartref",

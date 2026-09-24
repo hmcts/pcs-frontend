@@ -48,19 +48,19 @@
     "post": "Post"
   },
   "responseToClaim": {
-    "disputeClaim": "A ydych yn gwrthwynebu unrhyw rannau eraill o'r hawliad?",
-    "disputeDetails": "Eglurwch pa rannau o'r hawliad nad ydych yn cytuno â nhw",
+    "disputeClaim": "A ydych yn gwrthwynebu unrhyw rannau eraill o’r hawliad?",
+    "disputeDetails": "Eglurwch pa rannau o’r hawliad nad ydych yn cytuno â nhw",
     "claimGrounds": "Sail yr hawliad",
-    "exemptLandlord": "A yw eich landlord yn landlord wedi'i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
-    "tenancyTypeConfirmation": "A yw'r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded a roddwyd gan yr hawlydd yn gywir?",
-    "tenancyType": "Math o denantiaeth wedi'i chywiro, contract meddiannaeth neu gytundeb trwydded",
-    "tenancyStartDateConfirmation": "A yw dyddiad dechrau'r denantiaeth, contract meddiannaeth neu gytundeb trwydded a roddwyd gan yr hawlydd yn gywir?",
-    "tenancyStartDate": "Dyddiad dechrau tenantiaeth, contract meddiannaeth neu gytundeb trwydded wedi'i gywiro",
+    "exemptLandlord": "A yw eich landlord yn landlord wedi’i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
+    "tenancyTypeConfirmation": "A yw’r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded a roddwyd gan yr hawlydd yn gywir?",
+    "tenancyType": "Math o denantiaeth wedi’i chywiro, contract meddiannaeth neu gytundeb trwydded",
+    "tenancyStartDateConfirmation": "A yw dyddiad dechrau’r denantiaeth, contract meddiannaeth neu gytundeb trwydded a roddwyd gan yr hawlydd yn gywir?",
+    "tenancyStartDate": "Dyddiad dechrau tenantiaeth, contract meddiannaeth neu gytundeb trwydded wedi’i gywiro",
     "possessionNoticeReceived": "A wnaeth yr hawlydd eich hysbysu am eu bwriad i ddechrau achos meddiannu?",
     "noticeReceivedDate": "Pryd gawsoch yr hysbysiad gan yr hawlydd?",
-    "rentArrearsAmountConfirmation": "A yw'r swm ôl-ddyledion rhent a roddwyd gan yr hawlydd yn gywir?",
-    "rentArrearsAmount": "Swm sy'n ddyledus mewn ôl-ddyledion rhent a dderbyniwyd",
-    "writtenTerms": "A yw eich landlord wedi anfon telerau ysgrifenedig atoch o'r contract meddiannaeth?",
+    "rentArrearsAmountConfirmation": "A yw’r swm ôl-ddyledion rhent a roddwyd gan yr hawlydd yn gywir?",
+    "rentArrearsAmount": "Swm sy’n ddyledus mewn ôl-ddyledion rhent a dderbyniwyd",
+    "writtenTerms": "A yw eich landlord wedi anfon telerau ysgrifenedig atoch o’r contract meddiannaeth?",
     "makeCounterClaim": "Ydych chi eisiau gwneud gwrth-hawliad?"
   },
   "payments": {
@@ -74,7 +74,7 @@
   },
   "household": {
     "dependantChildren": "A oes gennych chi unrhyw blant sy'n ddibynnol arnoch?",
-    "dependantChildrenDetails": "Manylion plant sy'n ddibynnol",
+    "dependantChildrenDetails": "Manylion plant sy’n ddibynnol",
     "otherDependants": "A oes gennych chi unrhyw un arall sy'n ddibynnol arnoch?",
     "otherDependantDetails": "Manylion dibynyddion eraill",
     "otherTenants": "A oes yna unrhyw oedolion eraill yn byw yn eich cartref?",
@@ -127,7 +127,7 @@
     "amount": "Faint ydych chi'n ei hawlio?",
     "estimatedMaxAmount": "Beth yw uchafswm gwerth eich hawliad?",
     "against": "Yn erbyn pwy ydych chi'n gwneud y gwrth-hawliad?",
-    "againstName": "Beth yw enw'r unigolyn neu'r sefydliad rydych yn gwneud y gwrth-hawliad yn eu herbyn?",
+    "againstName": "Beth yw enw’r unigolyn neu’r sefydliad rydych yn gwneud y gwrth-hawliad yn eu herbyn?",
     "againstAddress": "Beth yw eu cyfeiriad?",
     "for": "Ar gyfer beth mae eich gwrth-hawliad?",
     "reasons": "Beth yw eich rhesymau dros wneud y gwrth-hawliad?",
@@ -165,13 +165,13 @@
     "completedBy": "Cwblhawyd gan"
   },
   "pdf": {
-    "heading": "Lawrlwythwch gopi PDF o'r ymateb",
+    "heading": "Lawrlwythwch gopi PDF o’r ymateb",
     "linkText": "Ymateb (PDF)"
   },
   "closeAndReturn": "Cau a dychwelyd i drosolwg o’r achos",
   "accordion": {
     "summary": "Os na allwch ddod o hyd i ddogfen rydych yn chwilio amdani yn yr adran hon",
-    "body": "Mae'r holl ddogfennau gafodd eu huwchlwytho gennych chi neu'r hawlydd ar y",
+    "body": "Mae’r holl ddogfennau gafodd eu huwchlwytho gennych chi neu’r hawlydd ar y",
     "linkText": "dudalen Dogfennau"
   },
   "personsUnknown": "Unigolion yn anhysbys",

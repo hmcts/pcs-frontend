@@ -8,8 +8,8 @@
   },
   "rows": {
     "exemptLandlord": {
-      "label": "A yw landlord yn landlord wedi'i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
-      "changeHidden": "landlord wedi'i eithrio"
+      "label": "A yw landlord yn landlord wedi’i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
+      "changeHidden": "landlord wedi’i eithrio"
     },
     "writtenTerms": {
       "label": "A yw'r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth?",
@@ -60,11 +60,11 @@
       "changeHidden": "manylion y gwrthwynebiad"
     },
     "makeCounterClaim": {
-      "label": "A yw'r diffynnydd yn cynllunio i wneud gwrth-hawliad yn erbyn {{claimantName}}?",
+      "label": "A yw’r diffynnydd yn cynllunio i wneud gwrth-hawliad yn erbyn {{claimantName}}?",
       "changeHidden": "gwneud gwrth-hawliad"
     },
     "counterClaimType": {
-      "label": "Am beth mae'r diffynnydd yn ei hawlio?",
+      "label": "Am beth mae’r diffynnydd yn ei hawlio?",
       "changeHidden": "math o wrth-hawliad",
       "options": {
         "PAYMENT_OR_COMPENSATION": "Swm o arian neu iawndal",
@@ -73,11 +73,11 @@
       }
     },
     "isClaimAmountKnown": {
-      "label": "Ydy'r diffynnydd yn hawlio ar gyfer swm penodol o arian?",
+      "label": "Ydy’r diffynnydd yn hawlio ar gyfer swm penodol o arian?",
       "changeHidden": "swm yr hawliad yn hysbys"
     },
     "claimAmount": {
-      "label": "Faint mae'r diffynnydd yn ei hawlio?",
+      "label": "Faint mae’r diffynnydd yn ei hawlio?",
       "changeHidden": "swm yr hawliad"
     },
     "estimatedMaxClaimAmount": {
@@ -85,15 +85,15 @@
       "changeHidden": "amcangyfrif o uchafswm swm yr hawliad"
     },
     "counterClaimNeedHelpWithFees": {
-      "label": "A yw'r diffynnydd angen help i dalu ffi'r gwrth-hawliad?",
+      "label": "A yw’r diffynnydd angen help i dalu ffi’r gwrth-hawliad?",
       "changeHidden": "help i dalu'r ffi gwrth-hawliad",
       "options": {
-        "YES": "Mae'r diffynnydd angen help i dalu'r ffi",
-        "NO": "Nid yw'r diffynnydd angen help i dalu’r ffi"
+        "YES": "Mae’r diffynnydd angen help i dalu’r ffi",
+        "NO": "Nid yw’r diffynnydd angen help i dalu’r ffi"
       }
     },
     "counterClaimAppliedForHwf": {
-      "label": "A ydy'r diffynnydd eisoes wedi gwneud cais am help i dalu eu ffi gwrth-hawliad?",
+      "label": "A ydy’r diffynnydd eisoes wedi gwneud cais am help i dalu eu ffi gwrth-hawliad?",
       "changeHidden": "wedi gwneud cais am help i dalu ffioedd"
     },
     "counterClaimHwfReference": {
@@ -109,19 +109,19 @@
       "changeHidden": "rhesymau dros y gwrth-hawliad"
     },
     "counterClaimAgainst": {
-      "label": "Pwy mae'r diffynnydd yn gwneud gwrth-hawliad yn erbyn? ",
+      "label": "Pwy mae’r diffynnydd yn gwneud gwrth-hawliad yn erbyn? ",
       "changeHidden": "gwrth-hawliad yn erbyn"
     },
     "otherOrderRequestDetails": {
-      "label": "Pa orchymyn ydyn nhw'n gofyn i’r llys ei wneud?",
+      "label": "Pa orchymyn ydyn nhw’n gofyn i’r llys ei wneud?",
       "changeHidden": "gorchmynion a geisiwyd"
     },
     "otherOrderRequestFacts": {
-      "label": "Pa ffeithiau hoffen nhw i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
+      "label": "Pa ffeithiau hoffen nhw i’r llys eu hystyried wrth benderfynu ar yr hawliad?",
       "changeHidden": "ffeithiau i'r llys"
     },
     "counterClaimWantToUploadFiles": {
-      "label": "Ydych chi eisiau uwchlwytho ffeiliau i gefnogi'r gwrth-hawliad?",
+      "label": "Ydych chi eisiau uwchlwytho ffeiliau i gefnogi’r gwrth-hawliad?",
       "changeHidden": "uwchlwytho ffeiliau ar gyfer gwrth-hawliad"
     },
     "counterClaimDocuments": {

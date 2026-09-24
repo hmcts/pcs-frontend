@@ -7,7 +7,7 @@
     "no": "Naddo",
     "imNotSure": "Diffynnydd ddim yn siŵr"
   },
-  "insetText": "Pan wnaethon nhw eu hawliad, roedd rhaid i {{claimantName}} ddarparu copi o'r hysbysiad a gyflwynon nhw i'r diffynnydd.",
+  "insetText": "Pan wnaethon nhw eu hawliad, roedd rhaid i {{claimantName}} ddarparu copi o’r hysbysiad a gyflwynon nhw i’r diffynnydd.",
   "noticeDateLabel": "Pryd gafodd y diffynnydd yr hysbysiad gan {{claimantName}}? (Dewisol)",
   "noticeDateHint": "Er enghraifft, 16 4 2021",
   "errors": {

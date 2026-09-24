@@ -4,7 +4,7 @@
   "applicationFee": "Ffi gwneud cais:",
   "formattedFeeAmount": "{{feeAmount, currency(currency: GBP)}}",
   "youWillBeRedirected": "Byddwch yn cael eich ailgyfeirio i GOV.UK Talu i gwblhau eich taliad yn ddiogel.",
-  "govPayIsASecureService": "Mae GOV.UK Talu yn wasanaeth talu diogel a ddefnyddir gan wasanaethau'r llywodraeth.",
+  "govPayIsASecureService": "Mae GOV.UK Talu yn wasanaeth talu diogel a ddefnyddir gan wasanaethau’r llywodraeth.",
   "buttons": {
     "continueToPayment": "Parhau i dalu"
   }

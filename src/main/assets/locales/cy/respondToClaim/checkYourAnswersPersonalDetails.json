@@ -8,7 +8,7 @@
     },
     "defendantName": {
       "label": "Enw",
-      "changeHidden": "enw wedi'i gywiro"
+      "changeHidden": "enw wedi’i gywiro"
     },
     "defendantNameCapture": {
       "label": "Beth yw eich enw?",

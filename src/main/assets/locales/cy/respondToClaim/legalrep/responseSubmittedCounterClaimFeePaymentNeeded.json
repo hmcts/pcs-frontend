@@ -1,10 +1,10 @@
 {
-  "pageTitle": "Ymateb wedi'i gyflwyno <br> Rhaid ichi dalu'r ffi gwrth-hawliad",
+  "pageTitle": "Ymateb wedi’i gyflwyno <br> Rhaid ichi dalu’r ffi gwrth-hawliad",
   "responseSubmittedCounterClaimFeePaymentNeededParagraph1": "Rydym wedi anfon neges gadarnhau atoch drwy e-bost.",
-  "responseSubmittedCounterClaimFeePaymentNeededHeading1": "Beth i'w wneud nesaf",
+  "responseSubmittedCounterClaimFeePaymentNeededHeading1": "Beth i’w wneud nesaf",
   "responseSubmittedCounterClaimFeePaymentNeededListItem1": "cy<a href='{{counterClaimApplicationFeeAmountUrl}}' class=\"govuk-link\" target=\"_blank\" >Pay the counterclaim fee (opens in new tab)</a>. The counterclaim fee must be paid otherwise the counterclaim will not be considered.",
   "responseSubmittedCounterClaimFeePaymentNeededListItem2": "Os ydych yn cynrychioli mwy nag un diffynnydd yn yr achos hwn, rhaid i chi gyflwyno ymateb ar wahân i bob un.",
-  "responseSubmittedCounterClaimFeePaymentNeededListItem3": "Mae angen <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"noreferrer noopener\">cymorth ar rai pobl i ddefnyddio gwasanaethau GLlTEF (yn agor mewn tab newydd)</a>, fel mynediad di-risiau i lys ar gyfer gwrandawiad. Os oes angen cymorth arnoch chi neu'r diffynnydd, dylech ofyn am hyn nawr.",
+  "responseSubmittedCounterClaimFeePaymentNeededListItem3": "Mae angen <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"noreferrer noopener\">cymorth ar rai pobl i ddefnyddio gwasanaethau GLlTEF (yn agor mewn tab newydd)</a>, fel mynediad di-risiau i lys ar gyfer gwrandawiad. Os oes angen cymorth arnoch chi neu’r diffynnydd, dylech ofyn am hyn nawr.",
   "responseSubmittedCounterClaimFeePaymentNeededHeading2": "",
   "responseSubmittedCounterClaimFeePaymentNeededParagraph2": "",
   "closeAndReturnToCaseOverview": "Cau a dychwelyd i drosolwg o’r achos"

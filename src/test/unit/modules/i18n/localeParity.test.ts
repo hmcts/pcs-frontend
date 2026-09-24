@@ -6,34 +6,55 @@ const EN = path.join(LOCALES, 'en');
 const CY = path.join(LOCALES, 'cy');
 
 /**
- * Keys with no Welsh supplied yet (HDPI-9039 "Scope 2").
+ * Keys still rendering English (HDPI-9039 "Scope 2"). Three shapes:
  *
- * Thirteen have no translation anywhere in the service and are waiting on the
- * language team; four have two competing renderings in the repo and need a
- * house-style ruling rather than a guess:
- *   "Check your answers"  -> Gwirio eich atebion / Gwiriwch eich atebion
- *   "Regular expenses"    -> Costau rheolaidd / Treuliau
- *   "What's your postal address?" -> no exact existing match
+ *  - no Welsh supplied anywhere in the service, awaiting the language team;
+ *  - two competing renderings already live, needing a house-style ruling
+ *    ("Check your answers", "Regular expenses");
+ *  - a placeholder whose English has since drifted, so the original
+ *    "cy<English>" no longer matches the current source string - these were
+ *    invisible to the first version of this check.
  *
  * This list must only ever shrink. Adding to it needs a Jira reference.
  */
 const UNTRANSLATED_ALLOWLIST = new Set([
+  'claimList.json::accessYourCase',
   'common.json::taskList.yourSupport',
   'respondToClaim/checkYourAnswersDocuments.json::rows.uploadedDocuments.changeHidden',
   'respondToClaim/checkYourAnswersPersonalDetails.json::rows.correspondenceAddressConfirmation.fallbackLabel',
-  'respondToClaim/endOfJourneyCya.json::pageTitle',
+  'respondToClaim/contactPreferencesEmailOrPost.json::content',
+  'respondToClaim/counterClaimApplicationFeeAmount.json::pageTitle',
+  'respondToClaim/counterClaimApplicationFeeAmount.json::payNowButton',
+  'respondToClaim/counterClaimHaveYouAppliedForHelp.json::revealedHwfQuestionHint',
+  'respondToClaim/counterClaimSpecificSum.json::noSpecificFeeText',
+  'respondToClaim/counterClaimSpecificSum.json::specificFeeText',
   'respondToClaim/endOfJourneyCya.json::heading',
-  'respondToClaim/endOfJourneyCya.json::sections.regularExpenses',
+  'respondToClaim/endOfJourneyCya.json::pageTitle',
   'respondToClaim/endOfJourneyCya.json::rows.uploadedDocuments.changeHidden',
+  'respondToClaim/endOfJourneyCya.json::sections.regularExpenses',
   'respondToClaim/legalrep/checkYourAnswersDocuments.json::rows.uploadedDocuments.changeHidden',
   'respondToClaim/legalrep/checkYourAnswersPersonalDetails.json::rows.emailAddress.changeHidden',
-  'respondToClaim/legalrep/counterClaimApplicationFeeAmount.json::options.pba',
+  'respondToClaim/legalrep/counterClaimApplicationFeeAmount.json::labels.pba',
   'respondToClaim/legalrep/counterClaimApplicationFeeAmount.json::labels.selectPba',
+  'respondToClaim/legalrep/counterClaimApplicationFeeAmount.json::options.pba',
+  'respondToClaim/legalrep/counterClaimApplicationFeeAmount.json::pageTitle',
+  'respondToClaim/legalrep/counterClaimApplicationFeeAmount.json::payNowButton',
+  'respondToClaim/legalrep/counterClaimHaveYouAppliedForHelp.json::revealedHwfQuestionHint',
+  'respondToClaim/legalrep/counterClaimSpecificSum.json::noSpecificFeeText',
+  'respondToClaim/legalrep/counterClaimSpecificSum.json::specificFeeText',
   'respondToClaim/legalrep/endOfJourneyCya.json::rows.uploadedDocuments.changeHidden',
+  'respondToClaim/legalrep/responseSubmittedCounterClaimFeePaymentNeeded.json::responseSubmittedCounterClaimFeePaymentNeededListItem1',
+  'respondToClaim/legalrep/tenancyDateDetails.json::dateLabel',
+  'respondToClaim/legalrep/tenancyDateDetails.json::errors.confirmTenancyDate',
+  'respondToClaim/legalrep/tenancyDateDetails.json::heading',
+  'respondToClaim/legalrep/tenancyDateDetails.json::hintText',
+  'respondToClaim/legalrep/tenancyDateDetails.json::question',
   'respondToClaim/legalrep/tenancyTypeDetails.json::tenancyTypeOther',
-  'viewTheClaim.json::sections.tenancyDetails',
-  'viewTheClaim.json::labels.trespassClaim',
+  'respondToClaim/responseSubmitted.json::responseSubmittedListItem2',
+  'respondToClaim/responseSubmittedCounterClaimFeePaymentNeeded.json::pageTitle',
   'viewTheClaim.json::labels.previousSteps',
+  'viewTheClaim.json::labels.trespassClaim',
+  'viewTheClaim.json::sections.tenancyDetails',
   'viewTheResponse.json::defendant.address',
 ]);
 
@@ -83,6 +104,15 @@ const flatten = (value: Json, prefix = ''): Record<string, Json> => {
 };
 
 const read = (file: string) => flatten(JSON.parse(fs.readFileSync(file, 'utf8')));
+/**
+ * An untranslated marker: the literal "cy" stuck on the front of English text,
+ * either directly before a capital or a tag, or left as a bare word. Matched
+ * anywhere in the value so a marker inside HTML is caught too. No Welsh word is
+ * a bare "cy", and none has "cy" immediately before a capital, so this does not
+ * fire on real translations such as "cyflwynwyd".
+ */
+const PLACEHOLDER = /\bcy(?=[A-Z<])|\bcy\s+(?=[A-Za-z<])/;
+
 const tokens = (s: string) => (s.match(/\{\{.*?\}\}/g) ?? []).map(t => t.replace(/\s+/g, '')).sort();
 
 const files = jsonFiles(EN).map(f => path.relative(EN, f));
@@ -106,13 +136,10 @@ describe('en/cy locale parity', () => {
       expect({ missingFromCy, orphanedInCy }).toEqual({ missingFromCy: [], orphanedInCy: [] });
     });
 
-    it('has no untranslated "cy<English>" placeholders', () => {
+    it('has no untranslated "cy" markers', () => {
       const untranslated = pairs
-        .filter(([key, value]) => {
-          const actual = (cy[key] as string).trim();
-          const expected = value.trim();
-          return actual === `cy${expected}` || actual === `cy ${expected}`;
-        })
+        .filter(([, value]) => value.trim() !== '')
+        .filter(([key]) => PLACEHOLDER.test(cy[key] as string))
         .map(([key]) => `${file}::${key}`)
         .filter(id => !UNTRANSLATED_ALLOWLIST.has(id));
       expect(untranslated).toEqual([]);
