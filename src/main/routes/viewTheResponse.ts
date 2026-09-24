@@ -27,7 +27,7 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
-import { findCaseDocumentById } from '@utils/documentUtils';
+import { extractCaseDocuments, findCaseDocumentById } from '@utils/documentUtils';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 import { RELEASE_1_2_ENABLED } from '@utils/respondToClaimFlags';
@@ -592,6 +592,50 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
   return { rows };
 }
 
+function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
+  logger.info('[viewTheResponse] findCounterclaimPdfDocument START');
+  const responses = caseData.possessionClaimResponse?.defendantResponses;
+
+  if (!responses?.counterClaim || isNo(responses.makeCounterClaim)) {
+    logger.info('[viewTheResponse] Early return - no counterclaim');
+    return null;
+  }
+
+  const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
+  const allDefendants = caseData.allDefendants ?? [];
+  const documents = extractCaseDocuments(caseData as Record<string, unknown>);
+
+  // If we can determine the specific defendant number, use exact matching
+  if (currentDefendantPartyId && allDefendants.length > 0) {
+    const defendantIndex = allDefendants.findIndex(defendant => defendant.id === currentDefendantPartyId);
+
+    if (defendantIndex >= 0) {
+      const defendantNumber = defendantIndex + 1;
+      const counterclaimPdf = documents.find(
+        doc => doc.categoryId === 'statementsOfCase' && doc.filename === `Counterclaim - Defendant ${defendantNumber}`
+      );
+      if (counterclaimPdf) {
+        logger.info('[viewTheResponse] Exact match found', { defendantNumber, filename: counterclaimPdf.filename });
+        return counterclaimPdf.id;
+      }
+    }
+  }
+
+  // Fallback: find any counterclaim PDF for this defendant
+  // This handles single defendant cases or when exact matching fails
+  const counterclaimPdf = documents.find(
+    doc => doc.categoryId === 'statementsOfCase' && doc.filename?.startsWith('Counterclaim - Defendant')
+  );
+
+  if (counterclaimPdf) {
+    logger.info('[viewTheResponse] Fallback match found', { filename: counterclaimPdf.filename });
+  } else {
+    logger.info('[viewTheResponse] No counterclaim PDF found');
+  }
+
+  return counterclaimPdf?.id ?? null;
+}
+
 function resolveResponsePdfUrl(caseData: CcdCaseData, caseReference: string): string | undefined {
   const documentId = caseData.possessionClaimResponse?.responseDocumentId;
   if (!documentId) {
@@ -653,6 +697,11 @@ export default function viewTheResponseRoutes(app: Application): void {
         counterclaim: buildCounterclaim(t, caseData),
       };
 
+      const counterclaimPdfId = findCounterclaimPdfDocument(caseData);
+      const counterclaimPdfUrl = counterclaimPdfId
+        ? `/case/${caseReference}/view-documents/${counterclaimPdfId}`
+        : null;
+
       return res.render('view-the-response', {
         t,
         propertyAddress: formatAddress(caseData.propertyAddress),
@@ -663,6 +712,7 @@ export default function viewTheResponseRoutes(app: Application): void {
         ...sections,
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
+        counterclaimPdfUrl,
         responsePdfUrl: responsePdfEnabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
       });
     } catch (e) {
