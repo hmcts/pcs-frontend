@@ -479,12 +479,20 @@ describe('registerAllJourneys', () => {
     expect(mockUse).toHaveBeenCalled();
   });
 
-  it('routeMiddleware fires AFTER caseReferenceParamMiddleware loads validatedCase, BEFORE per-step middleware', async () => {
+  it('routeMiddleware fires AFTER requireEventAccess loads validatedCase, BEFORE per-step middleware', async () => {
     const callOrder: string[] = [];
 
+    // Mirrors the real middleware: sanitises the param only. It does NOT load the case,
+    // so anything stacked on the param callback would run without validatedCase.
     const caseRefMw = jest.fn((req, res, next, value) => {
-      res.locals.validatedCase = { id: value };
+      req.params.caseReference = value;
       callOrder.push(`caseRef:${!!res.locals.validatedCase}`);
+      next();
+    });
+
+    const requireEventAccessHandler = jest.fn((req, res, next) => {
+      res.locals.validatedCase = { id: req.params.caseReference };
+      callOrder.push(`eventAccess:${!!res.locals.validatedCase}`);
       next();
     });
 
@@ -502,7 +510,7 @@ describe('registerAllJourneys', () => {
     jest.doMock('../../../main/middleware', () => ({
       oidcMiddleware: jest.fn((req, res, next) => next()),
       caseReferenceParamMiddleware: caseRefMw,
-      requireEventAccess: jest.fn(() => jest.fn((req, res, next) => next())),
+      requireEventAccess: jest.fn(() => requireEventAccessHandler),
       legalRepresentativeSpecificStepsAccessMiddleware: jest.fn((req, res, next) => next()),
       legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) => next()),
       respondToClaimFeatureMiddleware: jest.fn((req, res, next) => next()),
@@ -566,6 +574,6 @@ describe('registerAllJourneys', () => {
       setImmediate(() => resolve());
     });
 
-    expect(callOrder).toEqual(['caseRef:true', 'tracer:true', 'handler:true']);
+    expect(callOrder).toEqual(['caseRef:false', 'eventAccess:true', 'tracer:true', 'handler:true']);
   });
 });
