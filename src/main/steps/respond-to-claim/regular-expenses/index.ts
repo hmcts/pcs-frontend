@@ -1,81 +1,12 @@
 import type { Request } from 'express';
 
-import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
+import { validateAmount } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { FrequencyValue, HouseholdCircumstances, IncomeExpenseDetails } from '@services/ccdCase.interface';
-
-const createAmountValidator =
-  (largeAmountErrorKey: string, negativeErrorKey: string) =>
-  (value: unknown): boolean | string => {
-    if (typeof value !== 'string') {
-      return true;
-    }
-
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return true;
-    }
-
-    const normalized = trimmed.replace(/,/g, '');
-    const numericValue = parseFloat(normalized);
-
-    if (!Number.isNaN(numericValue)) {
-      if (numericValue < 0) {
-        return negativeErrorKey;
-      }
-      // AC: £1bn or more should throw error
-      if (numericValue >= MAX_INCOME_AMOUNT) {
-        return largeAmountErrorKey;
-      }
-    }
-
-    if (!AMOUNT_FORMAT_REGEX.test(normalized)) {
-      return 'errors.amount.invalidFormat';
-    }
-
-    return true;
-  };
-
-const validateHouseholdBillsAmount = createAmountValidator(
-  'errors.householdBillsAmount.largeAmount',
-  'errors.householdBillsAmount.negative'
-);
-const validateLoanPaymentsAmount = createAmountValidator(
-  'errors.loanPaymentsAmount.largeAmount',
-  'errors.loanPaymentsAmount.negative'
-);
-const validateChildSpousalMaintenanceAmount = createAmountValidator(
-  'errors.childSpousalMaintenanceAmount.largeAmount',
-  'errors.childSpousalMaintenanceAmount.negative'
-);
-const validateMobilePhoneAmount = createAmountValidator(
-  'errors.mobilePhoneAmount.largeAmount',
-  'errors.mobilePhoneAmount.negative'
-);
-const validateGroceryShoppingAmount = createAmountValidator(
-  'errors.groceryShoppingAmount.largeAmount',
-  'errors.groceryShoppingAmount.negative'
-);
-const validateFuelParkingTransportAmount = createAmountValidator(
-  'errors.fuelParkingTransportAmount.largeAmount',
-  'errors.fuelParkingTransportAmount.negative'
-);
-const validateSchoolCostsAmount = createAmountValidator(
-  'errors.schoolCostsAmount.largeAmount',
-  'errors.schoolCostsAmount.negative'
-);
-const validateClothingAmount = createAmountValidator(
-  'errors.clothingAmount.largeAmount',
-  'errors.clothingAmount.negative'
-);
-const validateOtherExpensesAmount = createAmountValidator(
-  'errors.otherExpensesAmount.largeAmount',
-  'errors.otherExpensesAmount.negative'
-);
 
 const regularExpenseKeys = [
   'householdBills',
@@ -133,7 +64,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateHouseholdBillsAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.householdBillsAmount.negative',
+                  maxAmountError: 'errors.householdBillsAmount.largeAmount',
+                }),
             },
             householdBillsFrequency: {
               name: 'householdBillsFrequency',
@@ -170,7 +106,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateLoanPaymentsAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.loanPaymentsAmount.negative',
+                  maxAmountError: 'errors.loanPaymentsAmount.largeAmount',
+                }),
             },
             loanPaymentsFrequency: {
               name: 'loanPaymentsFrequency',
@@ -207,7 +148,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateChildSpousalMaintenanceAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.childSpousalMaintenanceAmount.negative',
+                  maxAmountError: 'errors.childSpousalMaintenanceAmount.largeAmount',
+                }),
             },
             childSpousalMaintenanceFrequency: {
               name: 'childSpousalMaintenanceFrequency',
@@ -244,7 +190,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateMobilePhoneAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.mobilePhoneAmount.negative',
+                  maxAmountError: 'errors.mobilePhoneAmount.largeAmount',
+                }),
             },
             mobilePhoneFrequency: {
               name: 'mobilePhoneFrequency',
@@ -281,7 +232,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateGroceryShoppingAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.groceryShoppingAmount.negative',
+                  maxAmountError: 'errors.groceryShoppingAmount.largeAmount',
+                }),
             },
             groceryShoppingFrequency: {
               name: 'groceryShoppingFrequency',
@@ -318,7 +274,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateFuelParkingTransportAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.fuelParkingTransportAmount.negative',
+                  maxAmountError: 'errors.fuelParkingTransportAmount.largeAmount',
+                }),
             },
             fuelParkingTransportFrequency: {
               name: 'fuelParkingTransportFrequency',
@@ -355,7 +316,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateSchoolCostsAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.schoolCostsAmount.negative',
+                  maxAmountError: 'errors.schoolCostsAmount.largeAmount',
+                }),
             },
             schoolCostsFrequency: {
               name: 'schoolCostsFrequency',
@@ -392,7 +358,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateClothingAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.clothingAmount.negative',
+                  maxAmountError: 'errors.clothingAmount.largeAmount',
+                }),
             },
             clothingFrequency: {
               name: 'clothingFrequency',
@@ -429,7 +400,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateOtherExpensesAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.otherExpensesAmount.negative',
+                  maxAmountError: 'errors.otherExpensesAmount.largeAmount',
+                }),
             },
             otherExpensesFrequency: {
               name: 'otherExpensesFrequency',

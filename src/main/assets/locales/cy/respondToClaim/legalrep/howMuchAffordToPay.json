@@ -12,7 +12,7 @@
   "amountHint": "",
   "errors": {
     "installmentAmount": "Nodwch faint gall y diffynnydd fforddio’i dalu ar ben eu rhent cyfredol",
-    "installmentAmountFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50",
+    "installmentAmountFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148 neu 148.50",
     "installmentAmountMax": "Rhaid i'r swm y gallai'r diffynnydd fforddio ei dalu ar ben y rhent cyfredol fod yn llai nag £1 biliwn.",
     "installmentAmountMin": "Rhaid i'r swm y gallai'r diffynnydd fforddio ei dalu ar ben y rhent cyfredol fod yn £0.00 neu'n uwch.",
     "installmentFrequency": "Dewiswch pa mor aml y gallai'r diffynnydd fforddio talu'r swm hwn"

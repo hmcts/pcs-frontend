@@ -1,6 +1,6 @@
 export const whatOtherRegularExpensesDoYouHave = {
   mainHeader: `What other regular expenses do you have? (Optional)`,
-  selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.`,
+  selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148 or £148.50. The information you provide must be truthful and accurate.`,
 
   // Household Bills
   householdBillsParagraph: `Household bills (for example, council tax, gas, electricity, water, internet)`,
@@ -98,7 +98,7 @@ export const whatOtherRegularExpensesDoYouHave = {
   clothingFrequencyErrorMessage: `Select how frequently you pay for clothing`,
   otherExpensesFrequencyErrorMessage: `Select how frequently you pay for other expenses`,
 
-  invalidFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
+  invalidFormatErrorMessage: `Enter an amount in the correct format, for example 148 or 148.50`,
 
   // Minimum Limit Errors
   householdBillsMinErrorMessage: `The amount you pay for household bills each week or month must be £0.00 or above`,

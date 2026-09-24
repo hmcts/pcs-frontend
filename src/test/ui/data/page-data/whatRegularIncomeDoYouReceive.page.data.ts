@@ -2,7 +2,7 @@ import { generateRandomString } from '../../utils/common/string.utils';
 
 export const whatRegularIncomeDoYouReceive = {
   mainHeader: `What regular income do you receive? (Optional)`,
-  selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate. `,
+  selectAllThatApplyHintText: `Select all that apply. Enter total amount in pounds and pence, for example £148 or £148.50. The information you provide must be truthful and accurate. `,
   incomeFromAllJobsParagraph: `Income from all jobs you do`,
   totalAmountReceivedHiddenTextLabel: `Total amount received`,
   incomeFromJobsTextInput: `450.00`,
@@ -27,7 +27,7 @@ export const whatRegularIncomeDoYouReceive = {
   universalCreditFrequencyErrorMessage: `Select how frequently you receive Universal Credit`,
   otherBenefitsAndCreditsAmountErrorMessage: `Enter the total amount you receive from other benefits and credits`,
   otherBenefitsAndCreditsFrequencyErrorMessage: `Select how frequently you receive income from other benefits and credits`,
-  incorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
+  incorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148 or 148.50`,
   incorrectFormatTextInput: `1000`,
   negativeTextInput: `-100.00`,
   incomeFromAllJobsNegativeErrorMessage: `The total amount you receive from all jobs you do each week or month must be £0.00 or above`,

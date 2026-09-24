@@ -54,7 +54,7 @@ const t = ((key: string) => {
     'frequencyOptions.every4Weeks': 'Every 4 weeks',
     'frequencyOptions.monthly': 'Monthly',
     'errors.installmentAmount': 'Enter how much you could afford to pay in addition to the current rent',
-    'errors.installmentAmountFormat': 'Enter an amount in the correct format, for example 148.00 or 148.50',
+    'errors.installmentAmountFormat': 'Enter an amount in the correct format, for example 148 or 148.50',
     'errors.installmentAmountMax':
       'The amount you could afford to pay in addition to the current rent must be less than £1 billion',
     'errors.installmentAmountMin':
@@ -134,7 +134,7 @@ describe('respond-to-claim installments step', () => {
 
   it('POST returns validation errors for invalid amount and missing frequency', async () => {
     (validateForm as jest.Mock).mockReturnValue({
-      installmentAmount: 'Enter an amount in the correct format, for example 148.00 or 148.50',
+      installmentAmount: 'Enter an amount in the correct format, for example 148 or 148.50',
       installmentFrequency: 'Select how frequently you could afford to pay this amount',
     });
 
