@@ -108,7 +108,11 @@ describe('en/cy locale parity', () => {
 
     it('has no untranslated "cy<English>" placeholders', () => {
       const untranslated = pairs
-        .filter(([key, value]) => cy[key] === `cy${value}` || cy[key] === `cy ${value}`)
+        .filter(([key, value]) => {
+          const actual = (cy[key] as string).trim();
+          const expected = value.trim();
+          return actual === `cy${expected}` || actual === `cy ${expected}`;
+        })
         .map(([key]) => `${file}::${key}`)
         .filter(id => !UNTRANSLATED_ALLOWLIST.has(id));
       expect(untranslated).toEqual([]);
