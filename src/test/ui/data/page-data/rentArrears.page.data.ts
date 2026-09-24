@@ -28,5 +28,5 @@ export const rentArrears = {
   amountYouOweHeader: `Amount you owe in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
   rentDocumentDynamicLink: 'View a copy of the rent statement (opens in new tab)',
   threeDecimalsEnterAmountInCorrectFormatErrorMessage:
-    'Enter how much you believe you owe in rent arrears, in the correct format (for example, if you owe £148, please write £148.00)',
+    'Enter how much you believe you owe in rent arrears, in the correct format (e.g. if you owe £148, please write 148 or 148.00)',
 };
