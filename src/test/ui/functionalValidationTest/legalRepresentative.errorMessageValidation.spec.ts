@@ -69,6 +69,15 @@ import {
   incomeAndExpensesErrorValidation,
   instalmentPaymentsErrorValidation,
   languageUsedErrorValidation,
+  nonRentArrearsDisputeErrorValidation,
+  noticeDateWhenNotProvidedErrorValidation,
+  noticeDateWhenProvidedErrorValidation,
+  otherConsiderationsErrorValidation,
+  priorityDebtDetailsErrorValidation,
+  priorityDebtsErrorValidation,
+  rentArrearsErrorValidation,
+  repaymentsAgreedErrorValidation,
+  repaymentsMadeErrorValidation,
   selectDefendantErrorValidation,
 } from '../functional/legalRepresentative-functional';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
@@ -231,7 +240,9 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     await performAction('selectNoticeDetailsLR', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
+    await softErrorMessageValidation('noticeDateWhenNotProvided', noticeDateWhenNotProvidedErrorValidation);
     await performAction('enterNoticeDateUnknownLR');
+    await softErrorMessageValidation('nonRentArrearsDispute', nonRentArrearsDisputeErrorValidation);
     await performAction('disputingOtherPartsOfTheClaimLR', {
       disputeOption: nonRentArrearsDispute.noRadioOption,
     });
@@ -528,7 +539,9 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     await performAction('selectNoticeDetailsLR', {
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
+    await softErrorMessageValidation('noticeDateWhenProvided', noticeDateWhenProvidedErrorValidation);
     await performAction('enterNoticeDateKnownLR');
+    await softErrorMessageValidation('rentArrears', rentArrearsErrorValidation);
     await performAction('rentArrearsLR', {
       option: rentArrears.yesRadioOption,
       rentArrearsTotal: submitCaseApiData.submitCasePayload.rentArrears_Total,
@@ -584,6 +597,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       question: repaymentsMade.getMainHeader(),
       repaymentOption: repaymentsMade.noRadioOption,
     });
+    await softErrorMessageValidation('repaymentsAgreed', repaymentsAgreedErrorValidation);
     await performAction('repaymentAgreedLR', {
       question: repaymentsAgreed.giveDetailsHiddenTextLabel,
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
@@ -649,6 +663,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       option: priorityDebts.noRadioOption,
     });
     await performAction('selectExpensesLR');
+    await softErrorMessageValidation('otherConsiderations', otherConsiderationsErrorValidation);
     await performAction('otherConsiderationsLR', {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
@@ -788,6 +803,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     await performAction('doYouWantToUploadFilesLR', {
       option: counterclaimDoYouWantToUploadFiles.noRadioOption,
     });
+    await softErrorMessageValidation('repaymentsMade', repaymentsMadeErrorValidation);
     await performAction('previousPaymentsLR', {
       question: repaymentsMade.getMainHeader(),
       repaymentOption: repaymentsMade.noRadioOption,
@@ -839,6 +855,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.yesRadioOption,
     });
+    await softErrorMessageValidation('priorityDebtDetails', priorityDebtDetailsErrorValidation);
     await performAction('enterPriorityDebtDetailsLR', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
@@ -987,6 +1004,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
       ...getRelativeDate(-3),
     });
+    await softErrorMessageValidation('priorityDebts', priorityDebtsErrorValidation);
     await performAction('selectPriorityDebtsLR', {
       question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.yesRadioOption,
