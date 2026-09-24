@@ -393,6 +393,22 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
   },
 
+  async submitCaseEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string,
+    data: Record<string, unknown>
+  ): Promise<CcdCase> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const eventUrl = `${getBaseUrl()}/cases/${safeCaseId}/event-triggers/${eventId}`;
+    const eventToken = await getEventToken(accessToken, eventUrl);
+    return submitEvent(accessToken, `${getBaseUrl()}/cases/${safeCaseId}/events`, eventId, eventToken, data);
+  },
+
   async getExistingCaseData(
     accessToken: string | undefined,
     ccdCaseId: string,

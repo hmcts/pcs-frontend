@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 
 export const LEGAL_REPRESENTATIVE_USER_ROLES = ['caseworker-pcs-solicitor'] as const;
+export const JUDGE_USER_ROLES = ['caseworker-civil-judge'] as const;
 
 export type UserType = 'citizen' | 'legalrep';
 
@@ -21,6 +22,10 @@ export function isLegalRepresentativeUser(req: Request): boolean {
   return getUserRoles(req).some(role =>
     LEGAL_REPRESENTATIVE_USER_ROLES.includes(role as (typeof LEGAL_REPRESENTATIVE_USER_ROLES)[number])
   );
+}
+
+export function isJudgeUser(req: Request): boolean {
+  return getUserRoles(req).some(role => JUDGE_USER_ROLES.includes(role as (typeof JUDGE_USER_ROLES)[number]));
 }
 
 export function getUserType(req: Request): UserType {
