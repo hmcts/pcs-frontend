@@ -6,8 +6,6 @@ export const counterClaimAgainstWhom = {
   backLink: `Back`,
   feedbackLink: `feedback`,
   pageSlug: `counter-claim-against-whom`,
-  /*
-   selectWhoYouAreMakingErrorMessage: `Select who you are making the counterclaim against`,
+  selectWhoYouAreMakingErrorMessage: `Select who the defendant is making a counterclaim against`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-   */
 };

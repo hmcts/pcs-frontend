@@ -1,39 +1,39 @@
 {
-  "pageTitle": "cy Check your answers",
-  "cardTitle": "cy Payments and agreements",
+  "pageTitle": "Gwiriwch eich atebion",
+  "cardTitle": "Taliadau a chytundebau",
   "rows": {
     "anyPaymentsMade": {
-      "label": "cy Has the defendant paid any money to {{claimantName}} since {{dateIssued, ordinalDate}}?",
-      "changeHidden": "cy payments made"
+      "label": "A yw'r diffynnydd wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
+      "changeHidden": "taliadau wedi'u gwneud"
     },
     "paymentDetails": {
-      "label": "cy Give details about how much the defendant paid and when",
-      "changeHidden": "cy payment details"
+      "label": "Rhowch fanylion faint wnaeth y diffynnydd ei dalu a phryd",
+      "changeHidden": "manylion talu"
     },
     "repaymentPlanAgreed": {
-      "label": "cy Has the defendant come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}?",
-      "changeHidden": "cy repayment agreement"
+      "label": "A yw'r diffynnydd wedi dod i unrhyw gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
+      "changeHidden": "cytundeb ad-dalu"
     },
     "repaymentAgreedDetails": {
-      "label": "cy Give details about how much they’ve agreed to pay and when",
-      "changeHidden": "cy repayment details"
+      "label": "Rhowch fanylion faint maent wedi cytuno i'w dalu a phryd",
+      "changeHidden": "manylion ad-dalu"
     },
     "repayArrearsInstalments": {
-      "label": "cy Would the defendant like to offer to pay off their arrears in instalments?",
-      "changeHidden": "cy offer to pay in instalments"
+      "label": "A hoffai'r diffynnydd gynnig talu ôl-ddyledion mewn rhandaliadau?",
+      "changeHidden": "cynnig talu mewn rhandaliadau"
     },
     "installmentAmount": {
-      "label": "cy How much could the defendant afford to pay in addition to the current rent?",
-      "changeHidden": "cy instalment amount"
+      "label": "Faint allai'r diffynnydd fforddio’i dalu ar ben eu rhent cyfredol?",
+      "changeHidden": "swm y rhandaliadau"
     },
     "installmentFrequency": {
-      "label": "cy How frequently could the defendant afford to pay this amount?",
-      "changeHidden": "cy instalment frequency",
+      "label": "Pa mor aml allai'r diffynnydd fforddio talu'r swm hwn?",
+      "changeHidden": "amlder y rhandaliadau",
       "frequencies": {
-        "weekly": "cy Weekly",
-        "every2Weeks": "cy Every 2 weeks",
-        "every4Weeks": "cy Every 4 weeks",
-        "monthly": "cy Monthly"
+        "weekly": "Pob wythnos",
+        "every2Weeks": "Pob 2 wythnos",
+        "every4Weeks": "Pob 4 wythnos",
+        "monthly": "Pob mis"
       }
     }
   }

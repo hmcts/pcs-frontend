@@ -13,8 +13,6 @@ export const counterClaimFee = {
   saveForLaterButton: `Save for later`,
   feedbackLink: `feedback`,
   pageSlug: `counter-claim-fee`,
-  /*
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  selectIfYouNeedHelpErrorMessage: `Select if you need help paying the counterclaim fee`,
-   */
+  selectIfYouNeedHelpErrorMessage: `Select if the defendant needs help paying the counterclaim fee`,
 };

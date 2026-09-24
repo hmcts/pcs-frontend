@@ -142,7 +142,21 @@ export class CreateCaseAPIAction implements IAction {
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
-            throw error;
+            const status = error.response?.status;
+            const responseBody = error.response?.data;
+
+            console.error('=== SUBMIT CASE ERROR RESPONSE ===');
+            console.error('HTTP Status:', status);
+            console.error('Exception:', responseBody?.exception);
+            console.error('Error:', responseBody?.error);
+            console.error('Message:', responseBody?.message);
+            console.error('Path:', responseBody?.path);
+            console.error('Timestamp:', responseBody?.timestamp);
+            console.error('Full response body:', JSON.stringify(responseBody, null, 2));
+
+            throw new Error(
+              `Submit case API failed with status ${status}: ${JSON.stringify(responseBody ?? error.message)}`
+            );
           }
           throw new Error('Submit case failed unexpectedly.');
         }
