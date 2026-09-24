@@ -1,5 +1,4 @@
-{
-  "serviceName": "Hawliadau Meddiant",
+{  "serviceName": "Hawliadau Meddiant",
   "phase": "ALPHA",
   "feedback": "Mae hwn yn wasanaeth newydd, bydd eich <a href=\"https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl={{pageTrackingUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">adborth (yn agor mewn tab newydd)</a> yn ein helpu i'w wella.",
   "opensInNewTab": "yn agor mewn tab newydd",
@@ -206,7 +205,7 @@
     "situationAndCircumstances": "Rhowch fanylion am eich aelwyd a'ch amgylchiadau",
     "payments": "Datganwch daliadau diweddar neu gytundebau a wnaed",
     "incomeAndExpenditure": "Rhowch fanylion eich incwm a’ch gwariant",
-    "yourSupport": "cyYour support",
+    "yourSupport": "Eich cymorth",
     "uploadFiles": "Uwchlwytho dogfennau",
     "checkYourAnswersAndSubmit": "Gwiriwch eich atebion cyn cyflwyno"
   }
