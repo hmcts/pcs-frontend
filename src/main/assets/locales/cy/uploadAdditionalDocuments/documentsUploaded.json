@@ -1,10 +1,10 @@
 {
-  "pageTitle": "cyDocuments uploaded",
-  "panelTitle": "cyDocuments uploaded",
-  "confirmationBody": "cyWe have received the documents you uploaded",
+  "pageTitle": "Dogfennau wedi’u huwchlwytho",
+  "panelTitle": "Dogfennau wedi’u huwchlwytho",
+  "confirmationBody": "Rydym wedi cael y dogfennau wnaethoch eu huwchlwytho.",
   "whatHappensNext": {
     "heading": "Beth fydd yn digwydd nesaf",
-    "body": "cyYou do not need to do anything else. We will review the documents."
+    "body": "Nid oes angen i chi wneud unrhyw beth arall. Byddwn yn adolygu'r dogfennau."
   },
   "closeLink": "Cau a dychwelyd i drosolwg o’r achos"
 }

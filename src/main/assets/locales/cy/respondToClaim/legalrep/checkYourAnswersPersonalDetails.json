@@ -19,13 +19,13 @@
       "changeHidden": "dyddiad geni"
     },
     "correspondenceAddressConfirmation": {
-      "label": "cy Is the defendant’s postal address {{address}}?",
+      "label": "Ai {{address}} yw cyfeiriad post y diffynnydd?",
       "fallbackLabel": "Beth yw eu cyfeiriad?",
       "changeHidden": "cyfeiriad post"
     },
     "emailConfirmation": {
       "label": "cy Do you know the defendant’s email address?",
-      "changeHidden": "cy whether you know the defendant’s email address"
+      "changeHidden": "p'un a ydych yn gwybod cyfeiriad e-bost y diffynnydd"
     },
     "emailAddress": {
       "label": "cy Defendant’s email address",

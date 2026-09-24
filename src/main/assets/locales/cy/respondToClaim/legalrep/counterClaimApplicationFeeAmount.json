@@ -1,24 +1,24 @@
 {
-  "paymentError": "cyWe could not start your payment. Try again.",
+  "paymentError": "Nid oedd modd inni ddechrau eich taliad. Rhowch gynnig arall arni.",
   "options": {
     "pba": "cyPay fee using Payment by Account (PBA)",
-    "card": "cyPay by credit or debit card"
+    "card": "Talu â cherdyn credyd neu gerdyn debyd"
   },
   "labels": {
     "pba": "cySelect PBA account",
-    "customerReferenceHeading": "cyEnter a reference for your PBA account statements",
-    "customerReferenceHint": "cyThis should be your own unique reference to identify the case. It will appear on your statements.",
+    "customerReferenceHeading": "Rhowch gyfeirnod ar gyfer cyfriflenni eich cyfrif PBA",
+    "customerReferenceHint": "Dylai hwn fod yn gyfeirnod unigryw er mwyn ichi allu cydnabod yr achos. Bydd yn ymddangos ar eich datganiadau.",
     "selectPba": "cySelect option"
   },
   "errors": {
-    "paymentOptions": "cyYou must select a payment option",
-    "pbaAccount": "cyYou must select a PBA account",
-    "customerReference": "cyYou must enter a customer reference"
+    "paymentOptions": "Rhaid i chi ddewis opsiwn talu",
+    "pbaAccount": "Rhaid i chi ddewis cyfrif PBA",
+    "customerReference": "Rhaid i chi nodi cyfeirnod cwsmer"
   },
   "pageTitle": "cyPay your counterclaim fee",
   "caption": "Ymateb i hawliad i feddiannu eiddo",
-  "notApplicable": "cyNot applicable",
-  "counterClaimAmountLabel": "cyCounterclaim amount",
+  "notApplicable": "Amherthnasol",
+  "counterClaimAmountLabel": "Swm gwrth-hawliad",
   "counterClaimFeeLabel": "Ffi gwrth-hawliad",
   "counterClaimAmountDisplay": "cy{{counterClaimAmount, currency(currency: GBP)}}",
   "counterClaimFeeDisplay": "cy{{counterClaimFee, currency(currency: GBP)}}",

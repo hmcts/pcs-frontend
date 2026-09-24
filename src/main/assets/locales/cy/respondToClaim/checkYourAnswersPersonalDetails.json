@@ -3,7 +3,7 @@
   "cardTitle": "cy Personal details",
   "rows": {
     "defendantNameConfirmation": {
-      "label": "cy Is your name {{name}}?",
+      "label": "Ai {{name}} yw eich enw?",
       "changeHidden": "cy name"
     },
     "defendantName": {
@@ -15,7 +15,7 @@
       "changeHidden": "cy name"
     },
     "dateOfBirth": {
-      "label": "cy What’s your date of birth?",
+      "label": "Beth yw eich dyddiad geni?",
       "changeHidden": "dyddiad geni"
     },
     "correspondenceAddressConfirmation": {

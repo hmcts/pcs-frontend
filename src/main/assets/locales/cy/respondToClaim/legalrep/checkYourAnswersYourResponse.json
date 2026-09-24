@@ -8,8 +8,8 @@
   },
   "rows": {
     "exemptLandlord": {
-      "label": "cy Is the landlord an exempt landlord under Part 1 of the Housing (Wales) Act 2014?",
-      "changeHidden": "cy exempt landlord"
+      "label": "A yw landlord yn landlord wedi'i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
+      "changeHidden": "landlord wedi'i eithrio"
     },
     "writtenTerms": {
       "label": "A yw'r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth?",
