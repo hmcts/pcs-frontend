@@ -1,8 +1,11 @@
 import { shutdownAzureMonitor, useAzureMonitor } from '@azure/monitor-opentelemetry';
-import { SpanStatusCode } from '@opentelemetry/api';
-import type { InstrumentationConfig } from '@opentelemetry/instrumentation';
-import type { WinstonInstrumentationConfig } from '@opentelemetry/instrumentation-winston';
 import config from 'config';
+
+import { Logger } from '@modules/logger';
+import { redactQueryValues } from '@modules/logger/redact-url';
+
+// One pattern for both routes into App Insights: span attributes here, log records in the logger.
+export { redactQueryValues };
 
 let isTelemetryInitialized = false;
 let telemetryShutdownPromise: Promise<void> | null = null;
@@ -22,83 +25,34 @@ function getServiceName(): string {
   }
 }
 
-function toLogMessage(value: unknown): string {
-  if (typeof value === 'string') {
-    return value;
-  }
-  if (value instanceof Error) {
-    return value.message;
-  }
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return String(value);
-  }
+const URL_SPAN_ATTRIBUTES = ['http.url', 'url.full', 'http.target', 'url.query'];
+
+// `url.query` is the query string on its own; the others hold a URL or a path.
+const redactUrlAttribute = (attribute: string, value: string): string =>
+  attribute === 'url.query' ? redactQueryValues(`?${value}`).slice(1) : redactQueryValues(value);
+
+// Structural: @opentelemetry/sdk-trace-base is only a transitive dependency.
+interface EndedSpan {
+  attributes: Record<string, unknown>;
 }
 
-function toLogLevel(record: Record<string, unknown>): string {
-  const candidate = record.level ?? record.severityText ?? record.severity;
-  return String(candidate ?? '').toLowerCase();
-}
-
-function toRecordMessage(record: Record<string, unknown>): string {
-  const candidate = record.message ?? record.body;
-  return toLogMessage(candidate);
-}
-
-function toContextSuffix(record: Record<string, unknown>): string {
-  const contextParts: string[] = [];
-  if (typeof record.url === 'string' && record.url.length > 0) {
-    contextParts.push(`url=${record.url}`);
-  }
-  if (typeof record.caseReference === 'string' && record.caseReference.length > 0) {
-    contextParts.push(`caseReference=${record.caseReference}`);
-  }
-  if (typeof record.error === 'string' && record.error.length > 0) {
-    contextParts.push(`error=${record.error}`);
-  }
-
-  return contextParts.length > 0 ? ` | ${contextParts.join(' ')}` : '';
-}
-
-function toException(record: Record<string, unknown>): Error | { name: string; message: string; stack?: string } {
-  if (record.error instanceof Error) {
-    return record.error;
-  }
-  if (record.message instanceof Error) {
-    return record.message;
-  }
-
-  const message = `${toRecordMessage(record)}${toContextSuffix(record)}`;
-  const name = typeof record.name === 'string' ? record.name : 'Error';
-  const stack =
-    typeof record.stack === 'string' && record.stack.length > 0 && record.stack !== 'undefined'
-      ? record.stack
-      : undefined;
-
-  // Avoid creating synthetic Error stacks at this callsite when no original stack exists.
-  return { name, message, stack };
-}
-
-const winstonTelemetryConfig: WinstonInstrumentationConfig = {
-  enabled: true,
-  logHook: (span, record) => {
-    try {
-      const level = toLogLevel(record);
-      if (level !== 'error') {
-        return;
-      }
-
-      const exception = toException(record);
-      span.recordException(exception);
-      span.setStatus({
-        code: SpanStatusCode.ERROR,
-        message: exception.message,
-      });
-    } catch {
-      // Never allow telemetry enrichment to break application logging.
+const redactSpanUrlAttributes = (span: EndedSpan): void => {
+  for (const attribute of URL_SPAN_ATTRIBUTES) {
+    const value = span.attributes?.[attribute];
+    if (typeof value === 'string') {
+      span.attributes[attribute] = redactUrlAttribute(attribute, value);
     }
-  },
+  }
+};
+
+// Not the HTTP instrumentation's hook: that one skips timed-out and failed requests.
+// onStart as well as onEnd - the distro's own span processor runs ahead of this one and feeds
+// Live Metrics from onEnd, so the attributes set at span creation have to be clean by then.
+export const secretRedactingSpanProcessor = {
+  onStart: (span: EndedSpan): void => redactSpanUrlAttributes(span),
+  onEnd: (span: EndedSpan): void => redactSpanUrlAttributes(span),
+  forceFlush: (): Promise<void> => Promise.resolve(),
+  shutdown: (): Promise<void> => Promise.resolve(),
 };
 
 const httpTelemetryConfig: HttpTelemetryConfig = {
@@ -132,10 +86,15 @@ export function initializeTelemetry(): void {
       redis: {
         enabled: false,
       },
-      winston: winstonTelemetryConfig as InstrumentationConfig,
+      // Logger.enableTelemetry() adds the transport instead, which works however early winston loads.
+      winston: {
+        enabled: false,
+      },
     },
+    spanProcessors: [secretRedactingSpanProcessor],
     enableLiveMetrics: true,
   });
+  Logger.enableTelemetry();
 
   isTelemetryInitialized = true;
 }
