@@ -599,15 +599,42 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
     return null;
   }
 
+  if (responses.counterClaim.status !== 'COUNTER_CLAIM_ISSUED') {
+    return null;
+  }
+
   const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
   const allDefendants = caseData.allDefendants ?? [];
-
-  const defendantIndex = allDefendants.findIndex(defendant => defendant.id === currentDefendantPartyId);
-  const defendantNumber = defendantIndex >= 0 ? defendantIndex + 1 : 1;
-
   const documents = extractCaseDocuments(caseData as Record<string, unknown>);
+
+  // If we can determine the specific defendant number, use exact matching
+  if (currentDefendantPartyId && allDefendants.length > 0) {
+    const defendantIndex = allDefendants.findIndex(defendant => defendant.id === currentDefendantPartyId);
+
+    // Debug logging - TODO: remove after investigating HDPI-7995
+    logger.debug('Counterclaim PDF lookup', {
+      currentDefendantPartyId,
+      allDefendantsCount: allDefendants.length,
+      allDefendantIds: allDefendants.map(d => d.id),
+      defendantIndex,
+      foundMatch: defendantIndex >= 0,
+    });
+
+    if (defendantIndex >= 0) {
+      const defendantNumber = defendantIndex + 1;
+      const counterclaimPdf = documents.find(
+        doc => doc.categoryId === 'statementsOfCase' && doc.filename === `Counterclaim - Defendant ${defendantNumber}`
+      );
+      if (counterclaimPdf) {
+        return counterclaimPdf.id;
+      }
+    }
+  }
+
+  // Fallback: find any counterclaim PDF for this defendant
+  // This handles single defendant cases or when exact matching fails
   const counterclaimPdf = documents.find(
-    doc => doc.categoryId === 'statementsOfCase' && doc.filename === `Counterclaim - Defendant ${defendantNumber}`
+    doc => doc.categoryId === 'statementsOfCase' && doc.filename?.startsWith('Counterclaim - Defendant')
   );
 
   return counterclaimPdf?.id ?? null;
