@@ -6,6 +6,8 @@ export const RELEASE_1_2_ENABLED = 'release-1.2-enabled';
 
 export const RELEASE_1_3_ENABLED = 'release-1.3-enabled';
 
+export const RELEASE_1_4_ENABLED = 'release-1.4-enabled';
+
 export const ENABLE_UNCATEGORISED_DOCUMENTS = 'uncategorised-documents-enabled';
 
 export const ENABLE_CUI_PCQ = 'cui-pcq-enabled';
