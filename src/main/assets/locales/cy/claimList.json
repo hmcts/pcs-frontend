@@ -10,5 +10,6 @@
     "actions": "cy Actions",
     "viewClaim": "cy View claim"
   },
-  "noClaimsFound": "cy There are no claims against you."
+  "noClaimsFound": "cy There are no claims against you.",
+  "claimsUnavailable": "cy We could not retrieve your claims just now. Refresh this page or try again in a few minutes."
 }
