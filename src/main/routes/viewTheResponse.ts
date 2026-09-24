@@ -612,7 +612,7 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
     const defendantIndex = allDefendants.findIndex(defendant => defendant.id === currentDefendantPartyId);
 
     // Debug logging - TODO: remove after investigating HDPI-7995
-    logger.debug('Counterclaim PDF lookup', {
+    logger.info('[viewTheResponse] Counterclaim PDF lookup', {
       currentDefendantPartyId,
       allDefendantsCount: allDefendants.length,
       allDefendantIds: allDefendants.map(d => d.id),
