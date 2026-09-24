@@ -3,6 +3,7 @@ import type { RequestHandler } from 'express';
 
 import {
   caseReferenceParamMiddleware,
+  citizenOnlyStepsAccessMiddleware,
   legalRepresentativeHeaderMiddleware,
   legalRepresentativeSpecificStepsAccessMiddleware,
   oidcMiddleware,
@@ -59,6 +60,7 @@ function buildGetMiddleware(
         dependencyCheck,
         ...stepMiddleware,
         legalRepresentativeSpecificStepsAccessMiddleware,
+        citizenOnlyStepsAccessMiddleware,
         legalRepresentativeHeaderMiddleware,
         respondToClaimFeatureMiddleware,
       ]
@@ -67,6 +69,7 @@ function buildGetMiddleware(
         ...authMiddlewares,
         dependencyCheck,
         legalRepresentativeSpecificStepsAccessMiddleware,
+        citizenOnlyStepsAccessMiddleware,
         legalRepresentativeHeaderMiddleware,
         respondToClaimFeatureMiddleware,
       ];
@@ -126,6 +129,7 @@ function registerStepRoutes(
       stepContext,
       ...authMiddlewares,
       legalRepresentativeSpecificStepsAccessMiddleware,
+      citizenOnlyStepsAccessMiddleware,
       legalRepresentativeHeaderMiddleware,
       respondToClaimFeatureMiddleware,
       (req, res, next) => {

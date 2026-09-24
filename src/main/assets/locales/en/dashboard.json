@@ -67,6 +67,7 @@
     "ViewClaim": { "title": "View the claim" },
     "RespondToClaim": { "title": "Respond to the claim" },
     "ViewResponse": { "title": "View the response" },
+    "YourSupport": { "title": "Your support" },
     "ViewDocuments": { "title": "View documents" },
     "ViewHearingDocuments": { "title": "View hearing documents" },
     "ViewOrdersAndNotices": { "title": "View orders and notices" },
