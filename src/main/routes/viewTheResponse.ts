@@ -595,11 +595,22 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
 function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
+  logger.info('[viewTheResponse] findCounterclaimPdfDocument called', {
+    hasResponses: !!responses,
+    hasCounterClaim: !!responses?.counterClaim,
+    makeCounterClaim: responses?.makeCounterClaim,
+    counterClaimStatus: responses?.counterClaim?.status,
+  });
+
   if (!responses?.counterClaim || isNo(responses.makeCounterClaim)) {
+    logger.info('[viewTheResponse] No counterclaim or makeCounterClaim is NO');
     return null;
   }
 
   if (responses.counterClaim.status !== 'COUNTER_CLAIM_ISSUED') {
+    logger.info('[viewTheResponse] Counterclaim status is not COUNTER_CLAIM_ISSUED', {
+      status: responses.counterClaim.status,
+    });
     return null;
   }
 
@@ -702,9 +713,14 @@ export default function viewTheResponseRoutes(app: Application): void {
       };
 
       const counterclaimPdfId = findCounterclaimPdfDocument(caseData);
+      logger.info('[viewTheResponse] Counterclaim PDF result', {
+        counterclaimPdfId,
+        hasCounterclaimPdfId: !!counterclaimPdfId,
+      });
       const counterclaimPdfUrl = counterclaimPdfId
         ? `/case/${caseReference}/view-documents/${counterclaimPdfId}`
         : null;
+      logger.info('[viewTheResponse] Counterclaim PDF URL', { counterclaimPdfUrl });
 
       return res.render('view-the-response', {
         t,
