@@ -327,4 +327,3 @@ function getExistingAddress(req: Request): { formattedAddress: string } {
 
   return { formattedAddress: '?' };
 }
-
