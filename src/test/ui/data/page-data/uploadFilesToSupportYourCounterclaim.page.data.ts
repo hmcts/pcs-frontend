@@ -3,7 +3,7 @@ export const uploadFilesToSupportYourCounterclaim = {
   youShouldOnlyParagraph: `You should only upload files that are relevant to your counterclaim`,
   theClaimantWillBeParagraph: `The claimant will be able to see any files you upload`,
   beforeYouUploadParagraph: `Before you upload the files give it a name that tells the court what it is, for example ‘Job offer letter’`,
-  eachFileMustBeParagraph: `Each file must be less than 100MB. You can upload the following file types: DOC/DOCX (Word), XLS/XLSM (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.`,
+  eachFileMustBeParagraph: `Each file must be less than 100MB. You can upload the following file types: DOC/DOCX (Word), XLS/XLSX (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.`,
   uploadFileParagraph: `Upload a file`,
   chooseFileButton: `Choose files`,
   saveAndContinueButton: `Save and continue`,
