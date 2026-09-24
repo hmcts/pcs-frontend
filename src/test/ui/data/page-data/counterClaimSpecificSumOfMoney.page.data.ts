@@ -29,5 +29,5 @@ export const counterClaimSpecificSumOfMoney = {
   backLink: `Back`,
   feeHiddenAmount: `35.00`,
   threeDecimalIncorrectFormatTextInput: `20.003`,
-  threeDecimalErrorMessage: `Enter the maximum value of your claim in the correct format, for example 148.00 or 148.50.`,
+  threeDecimalErrorMessage: `Enter the maximum value of your claim in the correct format, for example 148.00 or 148.50`,
 };
