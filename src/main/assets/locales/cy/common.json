@@ -1,4 +1,5 @@
-{  "serviceName": "Hawliadau Meddiant",
+{
+  "serviceName": "Hawliadau Meddiant",
   "phase": "ALPHA",
   "feedback": "Mae hwn yn wasanaeth newydd, bydd eich <a href=\"https://www.smartsurvey.co.uk/s/Poss_feedback/?pageurl={{pageTrackingUrl}}\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">adborth (yn agor mewn tab newydd)</a> yn ein helpu i'w wella.",
   "opensInNewTab": "yn agor mewn tab newydd",
