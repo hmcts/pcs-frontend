@@ -593,9 +593,11 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
 }
 
 function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
+  logger.info('[viewTheResponse] findCounterclaimPdfDocument START');
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
   if (!responses?.counterClaim || isNo(responses.makeCounterClaim)) {
+    logger.info('[viewTheResponse] Early return - no counterclaim');
     return null;
   }
 
