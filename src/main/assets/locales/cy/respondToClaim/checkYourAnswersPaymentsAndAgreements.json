@@ -1,6 +1,6 @@
 {
   "pageTitle": "Gwirio eich atebion",
-  "cardTitle": "cy Payments and agreements",
+  "cardTitle": "Taliadau a chytundebau",
   "rows": {
     "anyPaymentsMade": {
       "label": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
@@ -8,27 +8,27 @@
     },
     "paymentDetails": {
       "label": "Rhowch fanylion faint rydych wedi’i dalu a phryd",
-      "changeHidden": "cy payment details"
+      "changeHidden": "manylion talu"
     },
     "repaymentPlanAgreed": {
       "label": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
-      "changeHidden": "cy repayment agreement"
+      "changeHidden": "cytundeb ad-dalu"
     },
     "repaymentAgreedDetails": {
       "label": "Rhowch fanylion faint rydych wedi cytuno i'w dalu, pa mor aml y byddwch yn talu a phryd wnaed y cytundeb",
-      "changeHidden": "cy repayment details"
+      "changeHidden": "manylion ad-dalu"
     },
     "repayArrearsInstalments": {
       "label": "A hoffech chi gynnig talu eich ôl-ddyledion mewn rhandaliadau?",
-      "changeHidden": "cy offer to pay in instalments"
+      "changeHidden": "cynnig talu mewn rhandaliadau"
     },
     "installmentAmount": {
       "label": "Faint allwch chi fforddio’i dalu ar ben eich rhent cyfredol?",
-      "changeHidden": "cy instalment amount"
+      "changeHidden": "swm y rhandaliad"
     },
     "installmentFrequency": {
       "label": "Pa mor aml allech chi fforddio talu'r swm hwn?",
-      "changeHidden": "cy instalment frequency",
+      "changeHidden": "amlder rhandaliad",
       "frequencies": {
         "weekly": "Pob wythnos",
         "every2Weeks": "Pob 2 wythnos",

@@ -1,7 +1,7 @@
 {
   "pageTitle": "Treuliau",
   "heading": "Treuliau",
-  "expenseQuestion": "Pa dreuliau misol rheolaidd sydd gan y diffynnydd?  (Dewisol)",
+  "expenseQuestion": "Pa dreuliau misol rheolaidd sydd gan y diffynnydd? (Dewisol)",
   "hintText": "Dewiswch bopeth sy'n berthnasol. Rhaid i’r wybodaeth a ddarperir gan y diffynnydd fod yn wir ac yn gywir.",
   "options": {
     "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
@@ -41,11 +41,11 @@
     },
     "childSpousalMaintenanceAmount": {
       "required": "Nodwch faint mae'r diffynnydd yn dalu am gynhaliaeth plant neu gynhaliaeth briod",
-      "negative": "Rhaid i'r swm a delir gan y diffynnydd am gynhaliaeth plant neu gynhaliaeth briod bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "negative": "Rhaid i'r swm a delir gan y diffynnydd am gynhaliaeth plant neu gynhaliaeth priod bob wythnos neu bob mis fod yn £0.00 neu uwch",
       "largeAmount": "Rhaid i'r swm a delir gan y diffynnydd am gynhaliaeth plant neu ŵr/gwraig bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "childSpousalMaintenanceFrequency": {
-      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu cynhaliaeth plant neu gynhaliaeth briod"
+      "required": "Dewiswch pa mor aml mae'r diffynnydd yn talu cynhaliaeth plant neu gynhaliaeth priod"
     },
     "mobilePhoneAmount": {
       "required": "Nodwch faint mae'r diffynnydd yn ei dalu am ffôn symudol",

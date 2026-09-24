@@ -75,12 +75,12 @@
     },
     "documentUpload": {
       "wrongFileTypeDocStore": "Rhaid i'r ffeil a ddewiswyd fod yn DOC/DOT/DOCX/DOTX, XLS/XLT/XLA/XLSX/XLTX/XLSB, PPT/POT/PPS/PPA/PPTX/POTX/PPSX, PDF, TXT/RTF/CSV, JPG/JPEG, PNG, BMP, TIF/TIFF",
-      "fileTooLargeDocStore": "cyFile you have uploaded is too big. Document files must be less than {{maxSize}}.",
-      "fileTooLargeMedia": "cyFile you have uploaded is too big. Image files must be smaller than {{maxSize}}.",
-      "fileTotalTooLargeDocStore": "cyThe selected files must be smaller than {{maxSize}}. Delete one or more files or reduce the file sizes.",
-      "filenameTooLong": "cyThe file name must be {{maxLength}} characters or fewer",
+      "fileTooLargeDocStore": "Mae’r ffeil yr ydych wedi ei uwchlwytho yn rhy fawr. Rhaid i ffeiliau dogfen fod yn llai na {{maxSize}}.",
+      "fileTooLargeMedia": "Mae’r ffeil yr ydych wedi ei uwchlwytho yn rhy fawr. Rhaid i ffeiliau delweddfod yn llai na {{maxSize}}.",
+      "fileTotalTooLargeDocStore": "Rhaid i’r ffeil a ddewiswyd fod yn llai na {{maxSize}}. Dileu un neu fwy o ffeiliau neu leihau maint ffeil.",
+      "filenameTooLong": "Rhaid i enw'r ffeil fod yn {{maxLength}} nod neu lai",
       "noFileSelected": "Dewiswch ffeil i’w llwytho",
-      "uploadFailed": "cyThe selected file could not be uploaded – try again",
+      "uploadFailed": "Ni ellid uwchlwytho’r ffeil a ddewiswyd, rhowch gynig arall arni",
       "fileDeleteFailed": "Ni ellid dileu’r ffeil - rhowch gynnig arall arni.",
       "documentUrlRequired": "Dewiswch ffeil i’w dileu",
       "uploadSuccess": "{{filename}} wedi'i uwchlwytho",
@@ -148,7 +148,7 @@
       "heading2": "Rhif ffôn",
       "paragraph6": "0300 303 5174",
       "paragraph7": "Dydd Llun i ddydd Iau 9am - 5pm, dydd Gwener 9am - 4.30pm.",
-      "paragraph8": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
+      "paragraph8": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Gwybodaeth am ffioedd galwad (yn agor mewn tab newydd)</a>."
     },
     "serviceUnavailable": {
       "title": "Yn anffodus, nid yw’r gwasanaeth ar gael",
@@ -162,7 +162,7 @@
       "heading2": "Rhif ffôn",
       "paragraph5": "0300 303 5174",
       "paragraph6": "Dydd Llun i ddydd Iau 9am - 5pm, dydd Gwener 9am - 4.30pm.",
-      "paragraph7": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
+      "paragraph7": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Gwybodaeth am ffioedd galwad (yn agor mewn tab newydd)</a>."
     },
     "technicalError": {
       "title": "Mae’n ddrwg gennym, mae yna broblem gyda'r gwasanaeth",
@@ -175,7 +175,7 @@
       "heading2": "Rhif ffôn",
       "paragraph6": "0300 303 5174",
       "paragraph7": "Dydd Llun i ddydd Iau 9am - 5pm, dydd Gwener 9am - 4.30pm.",
-      "paragraph8": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
+      "paragraph8": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Gwybodaeth am ffioedd galwad (yn agor mewn tab newydd)</a>."
     },
     "accessDenied": {
       "title": "Nid oes gennych fynediad i’r dudalen hon.",
@@ -186,7 +186,7 @@
       "heading2": "Rhif ffôn",
       "paragraph4": "0300 303 5174",
       "paragraph5": "Dydd Llun i ddydd Iau 9am - 5pm, dydd Gwener 9am - 4.30pm.",
-      "paragraph6": "cy<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Find out about call charges (opens in new tab)</a>."
+      "paragraph6": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Gwybodaeth am ffioedd galwad (yn agor mewn tab newydd)</a>."
     }
   },
   "applicationErrors": {

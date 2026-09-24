@@ -2,18 +2,18 @@
   "pageTitle": "cy Check your answers",
   "heading": "cy Check your answers",
   "sections": {
-    "legalAdvice": "cy Legal advice",
-    "personalDetails": "cy Personal details",
+    "legalAdvice": "Cyngor cyfreithiol",
+    "personalDetails": "Manylion personol",
     "claimantsClaim": "cy {{claimantName, pluralPossessive}} claim",
-    "dependantsAndOtherResidents": "cy Dependants and other residents",
+    "dependantsAndOtherResidents": "Dibynyddion a phreswylwyr eraill",
     "yourCircumstances": "Eich amgylchiadau",
     "incomeAndExpenses": "cy Income and expenses",
     "regularIncome": "cy Regular income",
     "universalCredit": "Credyd Cynhwysol",
     "priorityDebts": "Dyledion blaenoriaeth",
     "regularExpenses": "cy Regular expenses",
-    "uploadFiles": "cy Upload files",
-    "otherConsiderations": "cy Other considerations",
+    "uploadFiles": "Uwchlwytho ffeiliau",
+    "otherConsiderations": "Ystyriaethau eraill",
     "languageUsed": "cy Language used"
   },
   "rows": {

@@ -8,7 +8,7 @@
     },
     "dependantChildrenDetails": {
       "label": "Rhowch fanylion eich plant dibynnol",
-      "changeHidden": "cy dependent children details"
+      "changeHidden": "manylion plant sy'n ddibynnol"
     },
     "otherDependants": {
       "label": "A oes gennych chi unrhyw un arall sy'n ddibynnol arnoch?",
@@ -16,31 +16,31 @@
     },
     "otherDependantsDetails": {
       "label": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnoch",
-      "changeHidden": "cy other dependants details"
+      "changeHidden": "manylion eraill sy'n ddibynnol"
     },
     "otherTenants": {
       "label": "A oes yna unrhyw oedolion eraill yn byw yn eich cartref?",
-      "changeHidden": "cy other adults in your home"
+      "changeHidden": "oedolion eraill sy'n byw yn eich cartref"
     },
     "otherTenantsDetails": {
       "label": "Rhowch fanylion yr oedolion eraill sy'n byw yn eich cartref",
-      "changeHidden": "cy other adults details"
+      "changeHidden": "manylion oedolion eraill"
     },
     "alternativeAccommodation": {
       "label": "A fyddai gennych rywle arall i fyw os byddai'n rhaid i chi adael eich cartref?",
-      "changeHidden": "cy alternative accommodation"
+      "changeHidden": "llety amgen"
     },
     "alternativeAccommodationDate": {
-      "label": "cy When would you be able to move in?",
-      "changeHidden": "cy alternative accommodation move-in date"
+      "label": "Pryd fyddech yn gallu symud i mewn?",
+      "changeHidden": "dyddiad symud i mewn i lety amgen"
     },
     "shareAdditionalCircumstances": {
       "label": "Hoffech chi rannu unrhyw beth am eich amgylchiadau?",
-      "changeHidden": "cy additional circumstances"
+      "changeHidden": "amgylchiadau ychwanegol"
     },
     "shareAdditionalCircumstancesDetails": {
       "label": "Rhowch fanylion am eich amgylchiadau",
-      "changeHidden": "cy additional circumstances details"
+      "changeHidden": "manylion amgylchiadau ychwanegol"
     },
     "exceptionalHardship": {
       "label": "A fyddech yn profi caledi eithriadol os gofynnir i chi adael eich cartref?",
@@ -48,7 +48,7 @@
     },
     "exceptionalHardshipDetails": {
       "label": "Rhowch fanylion am y caledi eithriadol y byddech yn ei brofi",
-      "changeHidden": "cy exceptional hardship details"
+      "changeHidden": "manylion caledi eithriadol"
     }
   }
 }
