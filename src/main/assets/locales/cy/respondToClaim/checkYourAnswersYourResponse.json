@@ -94,7 +94,7 @@
     },
     "counterClaimAppliedForHwf": {
       "label": "A ydych chi eisoes wedi gwneud cais am help gyda'ch ffi gwrth-hawliad?",
-      "changeHidden": "cy applied for help with fees"
+      "changeHidden": "cy applied for Help with Fees"
     },
     "counterClaimHwfReference": {
       "label": "Nodwch eich cyfeirnod Help i Dalu Ffioedd",
