@@ -281,6 +281,8 @@ export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
+  /** Group Access role on this case: claimant | claimant-solicitor | defendant-solicitor. */
+  currentUserGroupRole?: string;
   dateIssued?: string;
   claimIssueDate?: string;
   dateSubmitted?: string;

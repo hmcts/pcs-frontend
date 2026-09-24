@@ -33,6 +33,12 @@ export function requireEventAccess(eventId: string): RequestHandler {
         req.session?.clientContext
       );
       res.locals.validatedCase = new CcdCaseModel(validatedCase);
+
+      // Persist group-access journey for caseless gates (access middleware, logout).
+      if (req.session.user) {
+        req.session.user.isDefendantSolicitor = validatedCase.data?.currentUserGroupRole === 'defendant-solicitor';
+      }
+
       return next();
     } catch (error) {
       const httpError = error instanceof HTTPError ? error : new HTTPError('Internal server error', 500);

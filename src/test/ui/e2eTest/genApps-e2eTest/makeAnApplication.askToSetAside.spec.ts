@@ -1,3 +1,5 @@
+import { test } from '@playwright/test';
+
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import { dashboard } from '../../data/page-data';
 import {
@@ -15,7 +17,6 @@ import {
   youNeedToApplyForHelpWithYourApplicationFee,
 } from '../../data/page-data/genApps-page-data';
 import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
-import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = process.env.TEST_URL;

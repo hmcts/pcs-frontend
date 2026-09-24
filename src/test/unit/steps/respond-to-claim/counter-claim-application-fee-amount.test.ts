@@ -64,6 +64,7 @@ type CounterClaimApplicationFeeAmountStep = {
     session?: {
       user?: {
         roles?: string[];
+        isDefendantSolicitor?: boolean;
       };
       payment?: {
         customerReference?: string;
@@ -81,6 +82,7 @@ type CounterClaimApplicationFeeAmountStep = {
     session?: {
       user?: {
         roles?: string[];
+        isDefendantSolicitor?: boolean;
         accessToken?: string;
       };
       payment?: {
@@ -449,7 +451,8 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       },
       session: {
         user: {
-          roles: ['caseworker-pcs-solicitor'],
+          roles: [],
+          isDefendantSolicitor: true,
           accessToken: 'token-1',
         },
         payment: {
@@ -470,7 +473,8 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
         body: { paymentOptions: 'card' },
         session: {
           user: {
-            roles: ['caseworker-pcs-solicitor'],
+            roles: [],
+            isDefendantSolicitor: true,
           },
         },
       })
@@ -487,7 +491,8 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
       },
       session: {
         user: {
-          roles: ['caseworker-pcs-solicitor'],
+          roles: [],
+          isDefendantSolicitor: true,
         },
         payment: {
           serviceRequestReference: 'SR-1',
@@ -514,7 +519,8 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
         body: { paymentOptions: 'unexpected' },
         session: {
           user: {
-            roles: ['caseworker-pcs-solicitor'],
+            roles: [],
+            isDefendantSolicitor: true,
           },
         },
       })
