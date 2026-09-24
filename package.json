@@ -184,6 +184,10 @@
     "glob": "^13.0.1",
     "js-yaml": "^5.0.0",
     "protobufjs": "^8.0.0",
+    "prosemirror-dropcursor": "1.8.4",
+    "prosemirror-model": "1.25.12",
+    "prosemirror-transform": "1.12.1",
+    "prosemirror-view": "1.42.5",
     "semver": "^7.5.2",
     "uuid": "14.0.2"
   },
