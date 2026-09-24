@@ -39,7 +39,8 @@ import { HTTPError } from '../HttpError';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { GenAppType, MakeAnApplicationResponse } from '@services/ccdCase.interface';
-import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
+import type { CcdCase, CcdCaseData, CcdPartySupportEntry, StartCallbackData } from '@services/ccdCase.interface';
+import type { CcdFlags } from '@services/cuiRa/cuiRa.interface';
 import type {
   DashboardNotification,
   DashboardRelatedApplication,
@@ -190,7 +191,9 @@ async function getEventToken(userToken: string, url: string): Promise<string> {
   try {
     logger.info(`Calling getEventToken with URL: ${url}`);
     const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
+    // Never log bodies at any level: event payloads and case data can carry personal and
+    // special-category detail (e.g. reasonable-adjustment comments). Summaries only.
+    logger.debug('Event token received');
     return response.data.token;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'getEventToken');
@@ -235,12 +238,54 @@ async function submitEvent(
 
   try {
     logger.info(`Calling submitEvent with URL: ${url}`);
-    logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
+    logger.debug(`Submitting event ${eventId} with data fields: ${Object.keys(payload.data).join(', ') || '(none)'}`);
     const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
+    logger.debug(`Event ${eventId} submitted for case ${response.data?.id ?? 'unknown'}`);
     return response.data;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'submitEvent');
+  }
+}
+
+export const DEFENDANT_SUPPORT_EVENT_ID = 'requestSupport';
+
+export interface DefendantSupport {
+  partyId: string;
+  supportFlags?: CcdFlags;
+}
+
+interface DefendantSupportStart extends DefendantSupport {
+  eventToken: string;
+}
+
+/**
+ * START the citizen `requestSupport` event. pcs-api's about-to-start narrows `partySupport` to the
+ * defendant parties the logged-in user owns, so for a citizen defendant it holds their own party id
+ * and that party's current external flags
+ */
+async function startDefendantSupport(userToken: string, caseId: string): Promise<DefendantSupportStart> {
+  const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${DEFENDANT_SUPPORT_EVENT_ID}?ignore-warning=false`;
+
+  try {
+    const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(userToken));
+
+    const partySupport = (response.data.case_details?.case_data?.partySupport ?? []).filter(entry => entry?.id);
+    const [party] = partySupport;
+    if (!party) {
+      throw new HTTPError('No defendant party eligible for support on this case', 403);
+    }
+    // Your Support is citizen-only: citizenOnlyStepsAccessMiddleware keeps legal representatives off every
+    // route that reaches here, and a citizen defendant owns exactly one party. More than one entry can
+    // therefore only mean malformed data or a bypassed guard, and choosing one could attach flags to the
+    // wrong defendant, so refuse rather than guess.
+    if (partySupport.length > 1) {
+      logger.error(`Case ${caseId}: user owns ${partySupport.length} support parties; refusing to choose one`);
+      throw new HTTPError('More than one defendant party eligible for support on this case', 403);
+    }
+
+    return { eventToken: response.data.token, partyId: party.id, supportFlags: party.value?.supportFlags };
+  } catch (error) {
+    throw convertReadErrorToHttpError(error, 'startDefendantSupport');
   }
 }
 
@@ -391,6 +436,40 @@ export const ccdCaseService = {
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 
     return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
+  },
+
+  /**
+   * The logged-in defendant's party id and current external ("support") flags, read through the
+   * requestSupport START callback.
+   */
+  async getDefendantSupport(accessToken: string | undefined, caseId: string): Promise<DefendantSupport> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const { partyId, supportFlags } = await startDefendantSupport(accessToken || '', safeCaseId);
+    return { partyId, supportFlags };
+  },
+
+  /**
+   * Write a defendant's support flags straight to their party via the citizen requestSupport event
+   */
+  async submitDefendantSupportFlags(
+    accessToken: string | undefined,
+    caseId: string,
+    supportFlags: CcdFlags
+  ): Promise<CcdCase> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const { eventToken, partyId } = await startDefendantSupport(accessToken || '', safeCaseId);
+    const url = `${getBaseUrl()}/cases/${safeCaseId}/events`;
+    const partySupport: CcdPartySupportEntry[] = [{ id: partyId, value: { supportFlags } }];
+
+    return submitEvent(accessToken || '', url, DEFENDANT_SUPPORT_EVENT_ID, eventToken, { partySupport });
   },
 
   async getExistingCaseData(
