@@ -14,6 +14,12 @@
   "subFields": {
     "moneyFromElsewhereDetailsHint": "Give details about the other sources of income and how much the defendant usually receives a month"
   },
+  "frequencyLegend": {
+    "incomeFromJobs": "How often does the defendant receive income from all jobs they do?",
+    "pension": "How often does the defendant receive income from a state or private pension?",
+    "universalCredit": "How often does the defendant receive Universal Credit?",
+    "otherBenefits": "How often does the defendant receive income from other benefits and credits?"
+  },
   "errors": {
     "incomeFromJobsAmount": {
       "required": "Enter the total amount the defendant receives from all jobs they do",

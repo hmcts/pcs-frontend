@@ -28,6 +28,11 @@ export interface FormFieldOption {
   conditionalText?: string | ((translations: Record<string, string>) => string);
   // SubFields appear conditionally when this option is selected (e.g., text inputs under "No" radio button)
   subFields?: Record<string, FormFieldConfig>;
+  // Translation key for a visually hidden legend naming the revealed group, so screen reader users can tie
+  // the revealed controls back to the option that revealed them. When set, subFields are wrapped in a fieldset.
+  subFieldsLegendKey?: string;
+  // Resolved text for the above, populated during translation.
+  subFieldsLegend?: string;
 }
 
 // Shape of the built `component` config that the radio macro consumes. Steps reach into this

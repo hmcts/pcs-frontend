@@ -729,7 +729,6 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('enterPriorityDebtDetails', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.weekRadioOption,
     });
     await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatOtherRegularExpensesDoYouHaveErrorValidation);

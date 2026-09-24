@@ -15,12 +15,22 @@
     "otherExpenses": "Arall"
   },
   "subFields": {
-    "amount": "Swm a dalwyd",
-    "frequency": "Talu pob:"
+    "amount": "Swm a dalwyd"
+  },
+  "frequencyLegend": {
+    "householdBills": "cyHow often does the defendant pay household bills?",
+    "loanPayments": "cyHow often does the defendant pay loan payments?",
+    "childSpousalMaintenance": "cyHow often does the defendant pay child or spousal maintenance?",
+    "mobilePhone": "cyHow often does the defendant pay for a mobile phone?",
+    "groceryShopping": "cyHow often does the defendant pay for grocery shopping?",
+    "fuelParkingTransport": "cyHow often does the defendant pay for fuel, parking and transport?",
+    "schoolCosts": "cyHow often does the defendant pay school costs?",
+    "clothing": "cyHow often does the defendant pay for clothing?",
+    "otherExpenses": "cyHow often does the defendant pay for other expenses?"
   },
   "frequency": {
-    "week": "Wythnos",
-    "month": "Mis"
+    "week": "cyPaid every week",
+    "month": "cyPaid every month"
   },
   "errors": {
     "householdBillsAmount": {
