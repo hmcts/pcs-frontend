@@ -18,8 +18,8 @@
   },
   "rows": {
     "uploadedDocuments": {
-      "label": "cy Uploaded files",
-      "changeHidden": "cy uploaded files",
+      "label": "Ffeiliau wedi’u huwchlwytho",
+      "changeHidden": "ffeiliau wedi'u huwchlwytho",
       "none": "cy No files uploaded"
     },
     "otherConsiderations": {

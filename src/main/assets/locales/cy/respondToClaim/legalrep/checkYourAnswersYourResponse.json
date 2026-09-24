@@ -4,11 +4,11 @@
   "options": {
     "yes": "Ydy",
     "no": "Nac ydy",
-    "imNotSure": "cy Defendant is not sure"
+    "imNotSure": "Diffynnydd ddim yn siŵr"
   },
   "rows": {
     "exemptLandlord": {
-      "label": "A yw'r hawlydd yn landlord wedi'i eithrio o dan Ran 1 Deddf Tai (Cymru) 2014?",
+      "label": "A yw'r landlord yn landlord wedi'i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
       "changeHidden": "cy exempt landlord"
     },
     "writtenTerms": {
