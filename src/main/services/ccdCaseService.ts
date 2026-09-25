@@ -38,7 +38,7 @@ import { HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
-import { GenAppType, MakeAnApplicationResponse } from '@services/ccdCase.interface';
+import { MakeAnApplicationResponse } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
 import type {
   DashboardNotification,
@@ -57,12 +57,6 @@ const logger = Logger.getLogger('ccdCaseService');
 
 interface EventTokenResponse {
   token: string;
-}
-
-export interface RelatedApplication {
-  id: string;
-  type?: GenAppType;
-  applicationSubmittedDate?: string;
 }
 
 export interface TransformedDashboardData {
@@ -174,7 +168,7 @@ function convertReadErrorToHttpError(error: unknown, context: string): HTTPError
 }
 
 /**
- * START Phase: Get event token from CCD
+ * Get event token from CCD
  *
  * This is the first phase of the CCD event lifecycle.
  * CCD validates permissions and returns a one-time event token.
@@ -183,14 +177,16 @@ function convertReadErrorToHttpError(error: unknown, context: string): HTTPError
  * because the SUBMIT phase returns the authoritative merged data.
  *
  * @param userToken - User's OIDC access token
- * @param url - CCD event trigger URL
+ * @param caseId - CCD case reference
+ * @param eventId - CCD event ID
  * @returns Event token for SUBMIT phase
  */
-async function getEventToken(userToken: string, url: string): Promise<string> {
+async function getEventToken(userToken: string, caseId: string, eventId: string): Promise<string> {
+  const eventTriggerUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}`;
+
   try {
-    logger.info(`Calling getEventToken with URL: ${url}`);
-    const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
+    logger.debug(`Calling getEventToken with URL: ${eventTriggerUrl}`);
+    const response = await http.get<EventTokenResponse>(eventTriggerUrl, getCaseHeaders(userToken));
     return response.data.token;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'getEventToken');
@@ -198,32 +194,39 @@ async function getEventToken(userToken: string, url: string): Promise<string> {
 }
 
 /**
- * SUBMIT Phase: Submit changes to CCD
- *
- * This is the second phase of the CCD event lifecycle.
- * Submits incremental changes (only modified fields) and receives merged result.
- *
- * CCD performs deep merge server-side:
- * - Existing case data + our incremental changes = merged result
- * - Only send changed fields (e.g., just firstName/lastName, not entire case)
- * - Backend preserves all other fields unchanged
+ * Submit an event to CCD
  *
  * @param userToken - User's OIDC access token
- * @param url - CCD events URL
  * @param eventId - CCD event identifier (e.g., 'respondPossessionClaim')
- * @param eventToken - One-time token from START phase
- * @param data - Incremental changes only (not full case data)
+ * @param ccdCase - The event data in the CCD case model
  * @returns Merged case data from CCD (authoritative source of truth)
  */
-async function submitEvent(
-  userToken: string,
-  url: string,
-  eventId: string,
-  eventToken: string,
-  data: CcdCaseData | Record<string, unknown>
-): Promise<CcdCase> {
-  const payload = {
-    data: data as Record<string, unknown>,
+async function submitEvent(userToken: string | undefined, eventId: string, ccdCase: CcdCase): Promise<CcdCase> {
+  if (!userToken) {
+    throw new HTTPError('No user token provided', 401);
+  }
+
+  const caseId = ccdCase.id;
+  if (!caseId) {
+    throw new HTTPError('Case ID not provided', 500);
+  }
+
+  const eventToken = await getEventToken(userToken, caseId, eventId);
+  const payload = buildEventPayload(ccdCase, eventId, eventToken);
+  const eventSubmitUrl = `${getBaseUrl()}/cases/${caseId}/events`;
+
+  try {
+    logger.info(`Submitting event ${eventId} for case ${caseId}`);
+    const response = await http.post<CcdCase>(eventSubmitUrl, payload, getCaseHeaders(userToken));
+    return response.data;
+  } catch (error) {
+    throw convertAxiosErrorToHttpError(error, 'submitEvent');
+  }
+}
+
+function buildEventPayload(ccdCase: CcdCase, eventId: string, eventToken: string) {
+  return {
+    data: ccdCase.data as Record<string, unknown>,
     event: {
       id: eventId,
       summary: `Citizen ${eventId} summary`,
@@ -232,16 +235,6 @@ async function submitEvent(
     event_token: eventToken,
     ignore_warning: false,
   };
-
-  try {
-    logger.info(`Calling submitEvent with URL: ${url}`);
-    logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
-    const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
-    return response.data;
-  } catch (error) {
-    throw convertAxiosErrorToHttpError(error, 'submitEvent');
-  }
 }
 
 export const ccdCaseService = {
@@ -303,74 +296,17 @@ export const ccdCaseService = {
     }
   },
 
-  /**
-   * Create a new case in CCD
-   *
-   * Follows CCD's two-phase START → SUBMIT pattern.
-   *
-   * @param accessToken - User's OIDC access token
-   * @param data - Initial case data
-   * @returns Created case with merged data from CCD
-   */
-  async createCase(accessToken: string | undefined, data: Record<string, unknown>): Promise<CcdCase> {
-    // Phase 1: START - Get event token
-    const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/citizenCreateApplication`;
-    const eventToken = await getEventToken(accessToken || '', eventUrl);
-
-    // Phase 2: SUBMIT - Create case and receive result
-    const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/cases`;
-    return submitEvent(accessToken || '', url, 'citizenCreateApplication', eventToken, data);
-  },
-
-  /**
-   * Submit a case to CCD (finalize draft)
-   *
-   * Follows CCD's two-phase START → SUBMIT pattern.
-   * Transitions case from DRAFT to SUBMITTED state.
-   *
-   * @param accessToken - User's OIDC access token
-   * @param ccdCase - Case to submit
-   * @returns Submitted case data from CCD
-   */
-  async submitCase(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
-    if (!ccdCase.id) {
-      throw new HTTPError('Cannot SUBMIT Case, CCD Case Not found', 500);
-    }
-
-    // Phase 1: START - Get event token
-    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/citizenSubmitApplication`;
-    const eventToken = await getEventToken(accessToken || '', eventUrl);
-
-    // Phase 2: SUBMIT - Finalize case submission
-    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
-    return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
-  },
-
   async submitResponseToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
-    if (!ccdCase.id) {
-      throw new HTTPError('Cannot Submit Response to Case, CCD Case Not found', 500);
-    }
-    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/respondPossessionClaim`;
-    const eventToken = await getEventToken(accessToken || '', eventUrl);
-    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
-
-    return submitEvent(accessToken || '', url, 'respondPossessionClaim', eventToken, ccdCase.data);
+    const eventId = 'respondPossessionClaim';
+    return submitEvent(accessToken, eventId, ccdCase);
   },
 
   async submitGeneralApplication(
     accessToken: string | undefined,
     ccdCase: CcdCase
   ): Promise<MakeAnApplicationResponse> {
-    if (!ccdCase.id) {
-      throw new HTTPError('Cannot submit general application, case ID not specified', 500);
-    }
-
     const eventId = 'makeAnApplication';
-    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/${eventId}`;
-    const eventToken = await getEventToken(accessToken || '', eventUrl);
-    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
-
-    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data).then(responseData => {
+    return submitEvent(accessToken, eventId, ccdCase).then(responseData => {
       const confirmationBodyJson = responseData.after_submit_callback_response?.confirmation_body;
       if (confirmationBodyJson) {
         return JSON.parse(confirmationBodyJson) as MakeAnApplicationResponse;
@@ -381,16 +317,8 @@ export const ccdCaseService = {
   },
 
   async submitUploadDocuments(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
-    if (!ccdCase.id) {
-      throw new HTTPError('Cannot upload documents, case ID not specified', 500);
-    }
-
     const eventId = 'uploadDocuments';
-    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/${eventId}`;
-    const eventToken = await getEventToken(accessToken || '', eventUrl);
-    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
-
-    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
+    return submitEvent(accessToken, eventId, ccdCase);
   },
 
   async getExistingCaseData(
