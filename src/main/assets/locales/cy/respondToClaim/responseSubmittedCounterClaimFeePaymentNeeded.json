@@ -1,5 +1,5 @@
 {
-  "pageTitle": "cyResponse submitted. You must pay your counterclaim fee",
+  "pageTitle": "Ymateb wedi’i gyflwyno. <br> Rhaid ichi dalu eich ffi gwrth-hawliad",
   "responseSubmittedCounterClaimFeePaymentNeededParagraph1": "Rydym wedi anfon neges gadarnhau atoch drwy e-bost.",
   "responseSubmittedCounterClaimFeePaymentNeededHeading1": "Beth i'w wneud nesaf",
   "responseSubmittedCounterClaimFeePaymentNeededListItem1": "<a href='{{counterClaimApplicationFeeAmountUrl}}' class=\"govuk-link\">Talu eich ffi gwrth-hawliad</a>. Os na fyddwch yn talu’r ffi, ni fydd eich gwrth-hawliad yn cael ei ystyried.",

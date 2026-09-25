@@ -1,7 +1,7 @@
 {
   "pageTitle": "Eich cyfrif Hawliadau Meddiannu",
   "heading": "Eich cyfrif Hawliadau Meddiannu",
-  "accessYourCase": "cy If a claim you want to view is not listed below, you must first <a href=\"/access-your-case\" class=\"govuk-link\" target=\"_blank\" rel=\"noreferrer noopener\">cy provide some details to access it (opens in new tab)</a>.",
+  "accessYourCase": "Os nad yw hawliad rydych eisiau ei weld wedi’i restru isod, dylech yn gyntaf <a href=\"/access-your-case\" class=\"govuk-link\" target=\"_blank\" rel=\"noreferrer noopener\">roi manylion i gael mynediad (yn agor mewn tab newydd)</a>.",
   "claimsMadeAgainstYou": "Hawliadau a wnaed yn eich erbyn",
   "table": {
     "claimNumber": "Rhif yr hawliad",

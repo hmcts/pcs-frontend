@@ -4,7 +4,7 @@
   "rows": {
     "uploadedDocuments": {
       "label": "Ffeiliau wedi’u huwchlwytho",
-      "changeHidden": "cy uploaded files",
+      "changeHidden": "ffeiliau wedi’u huwchlwytho",
       "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     }
   }

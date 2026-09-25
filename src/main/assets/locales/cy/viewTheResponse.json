@@ -32,7 +32,7 @@
     "dateOfBirth": "Dyddiad geni",
     "email": "Cyfeiriad e-bost",
     "phone": "Rhif ffôn",
-    "address": "cyPostal address",
+    "address": "Cyfeiriad post",
     "contactPreferences": "Dewisiadau cyswllt",
     "freeLegalAdvice": "A ydych wedi cael unrhyw gyngor cyfreithiol am ddim?",
     "freeLegalAdviceOptions": {

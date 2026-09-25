@@ -18,21 +18,11 @@ const CY = path.join(LOCALES, 'cy');
  * This list must only ever shrink. Adding to it needs a Jira reference.
  */
 const UNTRANSLATED_ALLOWLIST = new Set([
-  'claimList.json::accessYourCase',
   'common.json::taskList.yourSupport',
-  'respondToClaim/checkYourAnswersDocuments.json::rows.uploadedDocuments.changeHidden',
   'respondToClaim/checkYourAnswersPersonalDetails.json::rows.correspondenceAddressConfirmation.fallbackLabel',
-  'respondToClaim/contactPreferencesEmailOrPost.json::content',
-  'respondToClaim/counterClaimApplicationFeeAmount.json::pageTitle',
-  'respondToClaim/counterClaimApplicationFeeAmount.json::payNowButton',
-  'respondToClaim/counterClaimHaveYouAppliedForHelp.json::revealedHwfQuestionHint',
-  'respondToClaim/counterClaimSpecificSum.json::noSpecificFeeText',
-  'respondToClaim/counterClaimSpecificSum.json::specificFeeText',
   'respondToClaim/endOfJourneyCya.json::heading',
   'respondToClaim/endOfJourneyCya.json::pageTitle',
-  'respondToClaim/endOfJourneyCya.json::rows.uploadedDocuments.changeHidden',
   'respondToClaim/endOfJourneyCya.json::sections.regularExpenses',
-  'respondToClaim/legalrep/checkYourAnswersDocuments.json::rows.uploadedDocuments.changeHidden',
   'respondToClaim/legalrep/checkYourAnswersPersonalDetails.json::rows.emailAddress.changeHidden',
   'respondToClaim/legalrep/counterClaimApplicationFeeAmount.json::labels.pba',
   'respondToClaim/legalrep/counterClaimApplicationFeeAmount.json::labels.selectPba',
@@ -42,7 +32,6 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'respondToClaim/legalrep/counterClaimHaveYouAppliedForHelp.json::revealedHwfQuestionHint',
   'respondToClaim/legalrep/counterClaimSpecificSum.json::noSpecificFeeText',
   'respondToClaim/legalrep/counterClaimSpecificSum.json::specificFeeText',
-  'respondToClaim/legalrep/endOfJourneyCya.json::rows.uploadedDocuments.changeHidden',
   'respondToClaim/legalrep/responseSubmittedCounterClaimFeePaymentNeeded.json::responseSubmittedCounterClaimFeePaymentNeededListItem1',
   'respondToClaim/legalrep/tenancyDateDetails.json::dateLabel',
   'respondToClaim/legalrep/tenancyDateDetails.json::errors.confirmTenancyDate',
@@ -50,12 +39,6 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'respondToClaim/legalrep/tenancyDateDetails.json::hintText',
   'respondToClaim/legalrep/tenancyDateDetails.json::question',
   'respondToClaim/legalrep/tenancyTypeDetails.json::tenancyTypeOther',
-  'respondToClaim/responseSubmitted.json::responseSubmittedListItem2',
-  'respondToClaim/responseSubmittedCounterClaimFeePaymentNeeded.json::pageTitle',
-  'viewTheClaim.json::labels.previousSteps',
-  'viewTheClaim.json::labels.trespassClaim',
-  'viewTheClaim.json::sections.tenancyDetails',
-  'viewTheResponse.json::defendant.address',
 ]);
 
 /**

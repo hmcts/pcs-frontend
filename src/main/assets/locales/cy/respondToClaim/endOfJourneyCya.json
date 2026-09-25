@@ -19,7 +19,7 @@
   "rows": {
     "uploadedDocuments": {
       "label": "Uwchlwythwch unrhyw ffeilio rydych yn meddwl sy'n berthnasol i'ch ymateb.",
-      "changeHidden": "cy uploaded files",
+      "changeHidden": "ffeiliau wedi’u huwchlwytho",
       "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     },
     "otherConsiderations": {
