@@ -2,8 +2,6 @@ export const rentArrears = {
   mainHeader: `Rent arrears`,
   saveAndContinueButton: `Save and continue`,
   rentAmountTextInput: `1000.00`,
-  // below variable is updated as per the newr equirement
-  rentArrearsAmountTextInput: `1000`,
   incorrectFormatTextInput: `1000`,
   threeDecimalsIncorrectFormatTextInput: `1000.000`,
   negativeTextInput: `-100.00`,

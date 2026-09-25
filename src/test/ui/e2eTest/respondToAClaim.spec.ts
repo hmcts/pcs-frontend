@@ -1564,7 +1564,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('rentArrears', {
       option: rentArrears.noRadioOption,
-      rentAmount: rentArrears.rentArrearsAmountTextInput,
+      rentAmount: rentArrears.incorrectFormatTextInput,
     });
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
