@@ -11,6 +11,6 @@
   },
   "errorPrefix": "Gwall:",
   "errors": {
-    "respondToClaimUnavailable": "cyThe option to respond to a claim is not available at the moment."
+    "respondToClaimUnavailable": "Nid yw’r dewis i ymateb i hawliad ar gael ar hyn o bryd."
   }
 }

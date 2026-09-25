@@ -1,5 +1,5 @@
 {
-  "pageTitle": "cyDefendant’s postal address",
+  "pageTitle": "Cyfeiriad y diffynnydd ar gyfer anfon drwy’r post",
   "legend": "Ai {{ formattedAddressStr }} yw cyfeiriad post y diffynnydd?",
   "legend.hint": "Dyma’r cyfeiriad a ddarparwyd gan {{claimantName}}",
   "labels": {

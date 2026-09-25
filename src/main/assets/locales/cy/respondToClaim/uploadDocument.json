@@ -1,9 +1,9 @@
 {
   "pageTitle": "Uwchlwytho dogfennau",
-  "heading": "cy Upload files (optional)",
-  "guidanceText": "cy Upload any files that you think are relevant to your response. The claimant will be able to see the files you upload.",
-  "beforeUploadHeading": "cy Before you upload your files",
-  "beforeUploadText": "cy Give your file a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "heading": "Uwchlwytho ffeil (dewisol)",
+  "guidanceText": "Uwchlwythwch unrhyw ffeiliau rydych yn meddwl sy’n berthnasol i’ch ymateb. Bydd yr hawlydd yn gallu gweld y ffeiliau fyddwch yn eu huwchlwytho.",
+  "beforeUploadHeading": "Cyn ichi uwchlwytho eich feiliau",
+  "beforeUploadText": "Rhowch enw i’ch ffeil sy’n egluro beth ydyw. Er enghraifft, 'Derbyn taliad gan Jane Smith'",
   "uploadLabel": "Uwchlwytho ffeil",
   "filesAddedHeading": "Ffeiliau wedi eu hychwanegu",
   "uploadButton": "Uwchlwytho ffeil",

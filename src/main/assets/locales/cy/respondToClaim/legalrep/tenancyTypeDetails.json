@@ -2,5 +2,10 @@
   "pageTitle": "Cytundeb rhentu",
   "insetText": "Pan wnaethant wneud eu hawliad, roedd yn rhaid i {{orgname}} roi manylion am y math o denantiaeth, contract meddiannaeth neu gytundeb trwydded a lofnodwyd gan y diffynnydd i rentu eu heiddo, a'r dyddiad dechrau, os yn hysbys.",
   "notSure": "Diffynnydd ddim yn siŵr",
-  "tenancyTypeOther": "cyThe claimant provided the following information about the defendant’s tenancy, occupation contract or licence agreement type: {{otherTenancyTypeDetails}}"
+  "tenancyTypeOther": "cyThe claimant provided the following information about the defendant’s tenancy, occupation contract or licence agreement type: {{otherTenancyTypeDetails}}",
+  "heading": "Tenantiaeth, contract meddiannaeth neu gytundeb trwydded",
+  "legend": "A yw'r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?",
+  "yes": "Ydy",
+  "no": "Nac ydy",
+  "correctTypeLabel": "Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded"
 }

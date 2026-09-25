@@ -18,9 +18,9 @@
   },
   "rows": {
     "uploadedDocuments": {
-      "label": "cy Uploaded files",
-      "changeHidden": "cy uploaded files",
-      "none": "cy No files uploaded"
+      "label": "Ffeiliau wedi’u huwchlwytho",
+      "changeHidden": "ffeiliau wedi’u huwchlwytho",
+      "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     },
     "otherConsiderations": {
       "label": "Oes yna unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fel rhan o'u hymateb?"

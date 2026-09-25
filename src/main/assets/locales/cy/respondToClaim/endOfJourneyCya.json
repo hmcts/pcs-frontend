@@ -2,25 +2,25 @@
   "pageTitle": "cy Check your answers",
   "heading": "cy Check your answers",
   "sections": {
-    "legalAdvice": "cy Legal advice",
-    "personalDetails": "cy Personal details",
-    "claimantsClaim": "cy {{claimantName, pluralPossessive}} claim",
-    "dependantsAndOtherResidents": "cy Dependants and other residents",
+    "legalAdvice": "Cyngor cyfreithiol",
+    "personalDetails": "Manylion personol",
+    "claimantsClaim": "Hawliad {{claimantName, pluralPossessive}}",
+    "dependantsAndOtherResidents": "Dibynyddion a phreswylwyr eraill",
     "yourCircumstances": "Eich amgylchiadau",
-    "incomeAndExpenses": "cy Income and expenses",
-    "regularIncome": "cy Regular income",
+    "incomeAndExpenses": "Incwm a chostau",
+    "regularIncome": "Incwm rheolaidd",
     "universalCredit": "Credyd Cynhwysol",
     "priorityDebts": "Dyledion blaenoriaeth",
     "regularExpenses": "cy Regular expenses",
-    "uploadFiles": "cy Upload files",
-    "otherConsiderations": "cy Other considerations",
-    "languageUsed": "cy Language used"
+    "uploadFiles": "Uwchlwytho ffeiliau",
+    "otherConsiderations": "Ystyriaethau eraill",
+    "languageUsed": "Iaith a ddefnyddiwyd"
   },
   "rows": {
     "uploadedDocuments": {
       "label": "Uwchlwythwch unrhyw ffeilio rydych yn meddwl sy'n berthnasol i'ch ymateb.",
-      "changeHidden": "cy uploaded files",
-      "none": "cy No files uploaded"
+      "changeHidden": "ffeiliau wedi’u huwchlwytho",
+      "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     },
     "otherConsiderations": {
       "label": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
@@ -44,14 +44,14 @@
     "heading": "Datganiad gwirionedd",
     "hint": "Gwiriwch yr holl fanylion a roddwyd gennych ar gyfer cywirdeb.",
     "contemptFieldLabel": "Datganiad gwirionedd",
-    "contemptOption": "cy I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
+    "contemptOption": "Deallaf y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu’n onest ei fod yn wir.",
     "beliefFieldLabel": "Datganiad gwirionedd",
     "beliefOption": "Credaf fod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir.",
     "legalRepBeliefOption": "Creda'r diffynnydd bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir. Fe’m hawdurdodir gan y diffynnydd i lofnodi’r datganiad hwn.",
     "fullNameLabel": "Eich enw llawn",
     "legalRepFullNameLabel": "Enw llawn",
-    "nameOfFirmLabel": "cy Name of firm",
-    "positionHeldLabel": "cy Position or office held"
+    "nameOfFirmLabel": "Enw’r cwmni",
+    "positionHeldLabel": "Safle neu swydd a ddelir"
   },
   "errors": {
     "statementOfTruthContempt": "Dewiswch os ydych yn deall y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu'n onest ei fod yn wir",
@@ -59,9 +59,9 @@
     "legalRepStatementOfTruthBelief": "Dewiswch a yw'r diffynnydd yn credu bod y ffeithiau a nodir yn y ffruflen amddifyniad hwn yn wir ac eich bod wedi'ch awdurdodi gan y diffynnydd i gyflwyno'r datganiad hwn.",
     "fullName": "Nodwch eich enw llawn",
     "fullNameMaxLength": "Rhaid i'ch enw llawn fod yn 100 nod neu lai",
-    "nameOfFirm": "cy Enter the name of firm",
+    "nameOfFirm": "Nodwch enw’r cwmni",
     "nameOfFirmMaxLength": "Rhaid i'ch enw llawn fod yn 100 nod neu lai",
-    "positionHeld": "cy Enter your position or office held",
+    "positionHeld": "Nodwch eich swydd neu safle a ddelir",
     "positionHeldMaxLength": "Rhaid i’ch eglurhad fod yn 100 nod neu lai"
   }
 }
