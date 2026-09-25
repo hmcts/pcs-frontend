@@ -27,7 +27,7 @@ export const enable_error_message_validation = process.env.ENABLE_ERROR_MESSAGES
 export const enable_navigation_tests = process.env.ENABLE_NAVIGATION_TESTS || 'false';
 export const enable_axe_audit = process.env.ENABLE_AXE_AUDIT || 'false';
 const is_smoke_run = process.env.npm_lifecycle_event === 'test:smoke';
-const is_full_functional_run = process.env.npm_lifecycle_event === 'test:fullfunctional';
+// const is_full_functional_run = process.env.npm_lifecycle_event === 'test:fullfunctional';
 const junit_result_output =
   process.env.PLAYWRIGHT_JUNIT_OUTPUT ||
   (is_smoke_run ? 'smoke-output/junit-result.xml' : 'functional-output/junit-result.xml');
