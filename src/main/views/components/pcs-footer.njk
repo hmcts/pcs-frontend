@@ -1,0 +1,58 @@
+{% from "govuk/components/footer/macro.njk" import govukFooter %}
+{% from "footer/macro.njk" import hmctsUiFooter %}
+
+{% macro pcsFooter(isLegalRepresentative, footerModel, release1dot3Enabled) %}
+  {% if isLegalRepresentative %}
+    {{ hmctsUiFooter(footerModel) }}
+  {% elif release1dot3Enabled %}
+    {{ govukFooter({
+      meta: {
+        visuallyHiddenTitle: "Support links",
+        items: [
+          {
+            text: "Accessibility",
+            href: "/accessibility",
+            attributes: {
+              target: "_blank",
+              rel: "noopener noreferrer"
+            }
+          },
+          {
+            text: "Cookies",
+            href: "/cookies",
+            attributes: {
+              target: "_blank",
+              rel: "noopener noreferrer"
+            }
+          },
+          {
+            text: "Privacy policy",
+            href: "/privacy-policy",
+            attributes: {
+              target: "_blank",
+              rel: "noopener noreferrer"
+            }
+          },
+          {
+            text: "Terms and conditions",
+            href: "/terms-and-conditions",
+            attributes: {
+              target: "_blank",
+              rel: "noopener noreferrer"
+            }
+          },
+          {
+            text: "Get help",
+            href: "/get-help",
+            attributes: {
+              target: "_blank",
+              rel: "noopener noreferrer"
+            }
+          }
+        ]
+      }
+    }) }}
+  {% else %}
+    {{ govukFooter() }}
+  {% endif %}
+{% endmacro %}

@@ -1,0 +1,68 @@
+{% extends "footer/layout.njk" %}
+
+{% block pageTitle %}
+  {{ t('footer/accessibility:pageTitle') }}
+{% endblock %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-xl">{{ t('footer/accessibility:accessibilityStatement.title') }}</h1>
+  <p class="govuk-body">{{ t('footer/accessibility:accessibilityStatement.description1') }}</p>
+  <p class="govuk-body">{{ t('footer/accessibility:accessibilityStatement.description2') }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+      <li>{{ t('footer/accessibility:accessibilityStatement.list.item1') }}</li>
+      <li>{{ t('footer/accessibility:accessibilityStatement.list.item2') }}</li>
+      <li>{{ t('footer/accessibility:accessibilityStatement.list.item3') }}</li>
+      <li>{{ t('footer/accessibility:accessibilityStatement.list.item4') }}</li>
+      <li>{{ t('footer/accessibility:accessibilityStatement.list.item5') }}</li>
+  </ul>
+  <p class="govuk-body">{{ t('footer/accessibility:accessibilityStatement.description3') }}</p>
+  <p class="govuk-body">
+    {{ t('footer/accessibility:accessibilityStatement.description4') | safe }}
+  </p>
+
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:enforcementProcedure.title') }}</h2>
+  <p class="govuk-body">
+    {{ t('footer/accessibility:enforcementProcedure.description1') | safe }}
+  </p>
+
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:feedbackAndContactInformation.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:feedbackAndContactInformation.description1') }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+      <li>{{ t('footer/accessibility:feedbackAndContactInformation.list.item1') | safe }}</li>
+      <li>{{ t('footer/accessibility:feedbackAndContactInformation.list.item2') }}</li>
+  </ul>
+  <p class="govuk-body">{{ t('footer/accessibility:feedbackAndContactInformation.description2') }}</p>
+
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:technicalInformationAboutThisWebsitesAccessibility.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:technicalInformationAboutThisWebsitesAccessibility.description1') }}</p>
+
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:complianceStatus.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:complianceStatus.description1') }}</p>
+
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:non-accessibleContent.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:non-accessibleContent.description1') }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item1') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item2') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item3') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item4') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item5') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item6') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item7') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item8') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item9') | safe }}</li>
+      <li>{{ t('footer/accessibility:non-accessibleContent.list.item10') | safe }}</li>
+  </ul>
+
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:whatWeAreDoingToImproveAccessibility.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:whatWeAreDoingToImproveAccessibility.description1') }}</p>
+   <p class="govuk-body">{{ t('footer/accessibility:whatWeAreDoingToImproveAccessibility.description2') }}</p>
+   <p class="govuk-body">{{ t('footer/accessibility:whatWeAreDoingToImproveAccessibility.description3') }}</p>
+
+  <h2 class="govuk-heading-l">{{ t('footer/accessibility:preparationOfThisAccessibilityStatement.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/accessibility:preparationOfThisAccessibilityStatement.description1') }}</p>
+  <p class="govuk-body">
+   {{ t('footer/accessibility:preparationOfThisAccessibilityStatement.description2') | safe }}
+  </p>
+  
+{% endblock %}
