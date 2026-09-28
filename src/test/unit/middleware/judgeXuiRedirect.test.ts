@@ -61,17 +61,35 @@ describe('judgeXuiRedirectMiddleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it.each(['/case/1234567890123456/make-order', '/cases/1234567890123456/event/ext:makeOrder'])(
-    'allows the %s judicial journey through',
-    path => {
-      mockIsJudgeUser.mockReturnValue(true);
+  it('returns judges to the case when an event they cannot use is handed over from XUI', () => {
+    mockIsJudgeUser.mockReturnValue(true);
 
-      invokeMiddleware(path);
+    invokeMiddleware('/cases/1234567890123456/event/ext%3ArespondPossessionClaim');
 
-      expect(next).toHaveBeenCalled();
-      expect(res.redirect).not.toHaveBeenCalled();
-    }
-  );
+    expect(res.redirect).toHaveBeenCalledWith(303, `${CASE_DETAILS_BASE_URL}/1234567890123456`);
+  });
+
+  it('redirects judges from a path with malformed encoding to XUI', () => {
+    mockIsJudgeUser.mockReturnValue(true);
+
+    invokeMiddleware('/claims%E0%A4%A');
+
+    expect(res.redirect).toHaveBeenCalledWith(303, XUI_URL);
+  });
+
+  it.each([
+    '/case/1234567890123456/make-order',
+    '/cases/1234567890123456/event/ext:makeOrder',
+    // How XUI builds the hand-off: encodeURIComponent(eventId)
+    '/cases/1234567890123456/event/ext%3AmakeOrder',
+  ])('allows the %s judicial journey through', path => {
+    mockIsJudgeUser.mockReturnValue(true);
+
+    invokeMiddleware(path);
+
+    expect(next).toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
 
   it('allows Docweave template requests made by the make-order journey through', () => {
     mockIsJudgeUser.mockReturnValue(true);

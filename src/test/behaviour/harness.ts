@@ -20,16 +20,19 @@ function jwt(claims: Record<string, unknown>): string {
 }
 
 interface Envelope {
-  order: { id?: string; state: string; version: number; draftPayload: Record<string, unknown> };
+  order: {
+    id?: string;
+    state: string;
+    version: number;
+    orderType?: string;
+    formData?: Record<string, unknown>;
+    docweaveSnapshot?: unknown;
+  };
   caseContext: Record<string, unknown>;
 }
 
 const blankCase = (): Envelope => ({
-  order: {
-    state: 'DRAFT',
-    version: 0,
-    draftPayload: { version: 1, orderType: 'OUTRIGHT_POSSESSION', formData: {}, documents: {} },
-  },
+  order: { state: 'DRAFT', version: 0 },
   caseContext: {
     caseReference: Number(CASE_REFERENCE),
     propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
@@ -45,17 +48,19 @@ function ccdStub(): Express {
   const ccd = express();
   ccd.use(express.json());
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
-    res.json({ token: 'event-token', case_details: { case_data: { eventPayload: JSON.stringify(envelope) } } });
+    res.json({ token: 'event-token', case_details: { case_data: { sdkEventPayload: JSON.stringify(envelope) } } });
   });
   ccd.post('/cases/:id/events', (req: Request, res: Response) => {
-    const posted = JSON.parse(req.body.data.eventPayload);
+    const posted = JSON.parse(req.body.data.sdkEventPayload);
     envelope = {
       ...envelope,
       order: {
         id: posted.order.id ?? 'order-id',
         state: posted.action === 'SUBMIT_FOR_REVIEW' ? 'SUBMITTED_FOR_REVIEW' : 'DRAFT',
         version: posted.order.version + 1,
-        draftPayload: posted.order.draftPayload,
+        orderType: posted.order.orderType,
+        formData: posted.order.formData,
+        docweaveSnapshot: posted.order.docweaveSnapshot,
       },
     };
     res.json({ id: req.params.id, data: {} });

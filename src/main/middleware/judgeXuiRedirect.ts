@@ -17,7 +17,16 @@ const NON_PAGE_PATHS = [
   /^\/(?:health|info|ready|readiness|liveness)(?:\/.*)?$/,
 ] as const;
 
-const CASE_PATH = /^\/case\/(\d+)(?:\/|$)/;
+const CASE_PATH = /^\/cases?\/(\d+)(?:\/|$)/;
+
+/** XUI encodes the event id it hands over, so `ext:makeOrder` arrives as `ext%3AmakeOrder`. */
+function decodePath(path: string): string {
+  try {
+    return decodeURIComponent(path);
+  } catch {
+    return path;
+  }
+}
 
 function isAllowedJudgePath(path: string): boolean {
   return [...JUDGE_JOURNEY_PATHS, ...NON_PAGE_PATHS].some(pattern => pattern.test(path));
@@ -44,9 +53,10 @@ function getJudgeRedirectUrl(path: string): string {
  * unless the request is part of a supported judicial journey.
  */
 export const judgeXuiRedirectMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
-  if (!isJudgeUser(req) || isAllowedJudgePath(req.path)) {
+  const path = decodePath(req.path);
+  if (!isJudgeUser(req) || isAllowedJudgePath(path)) {
     return next();
   }
 
-  return res.redirect(303, getJudgeRedirectUrl(req.path));
+  return res.redirect(303, getJudgeRedirectUrl(path));
 };
