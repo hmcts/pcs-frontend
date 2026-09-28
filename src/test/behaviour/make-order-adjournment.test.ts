@@ -59,6 +59,30 @@ describe('make an order: adjournment', () => {
     expect(control('[name="adj-directions"][value="counterclaim"]').checked).toBe(true);
   });
 
+  it('adds current rent to the conditions only when the judge chooses it', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-adjournment');
+    check('adj-type', 'generally');
+    check('adj-gen', 'payments');
+    type('adj-gen-payments-amount', '100');
+    typeDate('adj-gen-payments-date', '1', '10', '2026');
+    expect(page.orderText()).toContain(
+      [
+        'The claim is adjourned generally on condition that the defendant makes the following payments towards any arrears:',
+        'instalment payments to the claimant of £100.00 every month, the first instalment to be paid on or before 1 October 2026;',
+      ].join('\n')
+    );
+
+    uncheck('adj-gen', 'payments');
+    check('adj-gen', 'oneoff');
+    type('adj-gen-oneoff-amount', '500');
+    typeDate('adj-gen-oneoff-date', '1', '10', '2026');
+    expect(page.orderText()).toContain(
+      'The claim is adjourned generally on condition that the defendant makes the following payments towards any arrears:'
+    );
+    expect(page.orderText()).not.toContain('current rent');
+  });
+
   it('adjourns generally on payment conditions with automatic strike out', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-adjournment');

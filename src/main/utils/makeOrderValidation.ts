@@ -62,7 +62,16 @@ function validateCosts(formData: Record<string, unknown>, suspended: boolean): M
   const choice = value(formData, 'costs-choice');
   const amountType = amountTypes[choice];
   const id = `costs-${choice}-amount`;
-  if (!values(formData, 'costs').includes('yes') || !amountType || hasValidMoney(formData, id)) {
+  if (!values(formData, 'costs').includes('yes')) {
+    return [];
+  }
+  if (!choice) {
+    return [{ id: 'costs-choice', message: 'Select a costs order' }];
+  }
+  if (choice === 'other' && !value(formData, 'costs-other-text')) {
+    return [{ id: 'costs-other-text', message: 'Enter the costs order' }];
+  }
+  if (!amountType || hasValidMoney(formData, id)) {
     return [];
   }
   return [{ id, message: suspended ? `Enter a valid ${amountType} costs amount` : 'Enter a valid costs amount' }];
@@ -245,8 +254,10 @@ const validators: Record<MakeOrderType, (formData: Record<string, unknown>) => M
   SUSPENDED_POSSESSION: validateSuspended,
   ADJOURNMENT: validateAdjournment,
   STRIKE_OUT_DISMISSAL: validateStrikeOut,
-  FREE_FORM: formData =>
-    value(formData, 'free-form-text') ? [] : [{ id: 'free-form-text', message: 'Enter the order wording' }],
+  FREE_FORM: formData => [
+    ...(value(formData, 'free-form-text') ? [] : [{ id: 'free-form-text', message: 'Enter the order wording' }]),
+    ...validateCosts(formData, false),
+  ],
 };
 
 export function validateMakeOrder(

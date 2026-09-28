@@ -125,7 +125,10 @@ export function initSuspendedMoneyOptions(form: HTMLFormElement): void {
   sync(judgment, adjourned);
 }
 
-/** Costs payable on the same terms as the suspension only exist for a suspended order. */
+/**
+ * Costs payable on the same terms as the suspension only exist for a suspended order. Other order
+ * types disable them, which leaves them out of the form data but keeps the choice for coming back.
+ */
 export function syncSuspendedOnlyCosts(form: HTMLFormElement, type: OrderType): void {
   const hidden = type !== 'SUSPENDED_POSSESSION';
   const column = form.querySelector<HTMLElement>('[data-suspended-costs-column]');
@@ -135,7 +138,6 @@ export function syncSuspendedOnlyCosts(form: HTMLFormElement, type: OrderType): 
   form.querySelectorAll<HTMLInputElement>('input[name="costs-choice"]').forEach(choice => {
     if (SAME_TERMS_COSTS.has(choice.value)) {
       choice.disabled = hidden;
-      choice.checked = choice.checked && !hidden;
     }
   });
 }

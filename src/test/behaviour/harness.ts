@@ -229,8 +229,37 @@ export interface Page {
   form: HTMLFormElement;
   /** The order document the page builds from the current form state, as plain text. */
   orderText(): string;
+  /** The order document the page will submit (the editor's current snapshot), as plain text. */
+  documentText(): string;
   /** The form as the browser would submit it. */
   body(): URLSearchParams;
+}
+
+interface SnapshotNode {
+  type: string;
+  text?: string;
+  attrs?: { text?: string };
+  content?: SnapshotNode[];
+}
+
+/** A Docweave snapshot's current document as plain text, one line per paragraph. */
+function snapshotText(json: string): string {
+  const inline = (node: SnapshotNode): string =>
+    node.type === 'text'
+      ? (node.text ?? '')
+      : node.type === 'generated_text'
+        ? (node.attrs?.text ?? '')
+        : (node.content ?? []).map(inline).join('');
+  const lines: string[] = [];
+  const walk = (node: SnapshotNode): void => {
+    if (node.type === 'paragraph') {
+      lines.push(inline(node));
+    } else {
+      node.content?.forEach(walk);
+    }
+  };
+  walk(JSON.parse(json).current);
+  return lines.join('\n');
 }
 
 /** Loads served HTML into jsdom and starts the page's JavaScript, as a browser would. */
@@ -252,6 +281,7 @@ export async function openPage(html: string): Promise<Page> {
   return {
     form,
     orderText: () => buildOrderDocument(form).textContent,
+    documentText: () => snapshotText(control<HTMLTextAreaElement>('#order-document').value),
     body: () => {
       const body = new URLSearchParams();
       new FormData(form).forEach((value, name) => body.append(name, String(value)));

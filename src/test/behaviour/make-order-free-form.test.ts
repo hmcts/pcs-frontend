@@ -1,4 +1,4 @@
-import { CASE_REFERENCE, type TestApp, bootApp, check, control, openPage, selectTab, type } from './harness';
+import { CASE_REFERENCE, type TestApp, bootApp, check, openPage, selectTab, type } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
 
@@ -25,6 +25,41 @@ describe('make an order: free form and strike out', () => {
     expect(page.orderText()).toBe(
       ['UPON hearing the parties', 'IT IS ORDERED THAT:', 'The claim is stayed.', 'Liberty to apply.'].join('\n')
     );
+  });
+
+  it('includes the costs order, and needs a complete one before review', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-free-form');
+    type('free-form-text', 'The claim is stayed.');
+    check('costs', 'yes');
+
+    const noChoice = page.body();
+    noChoice.set('action', 'SUBMIT_FOR_REVIEW');
+    const unchosen = await app.post(PAGE, noChoice);
+    expect(unchosen.status).toBe(400);
+    expect(unchosen.text).toContain('Select a costs order');
+
+    check('costs-choice', 'other');
+    const noWording = page.body();
+    noWording.set('action', 'SUBMIT_FOR_REVIEW');
+    const unworded = await app.post(PAGE, noWording);
+    expect(unworded.status).toBe(400);
+    expect(unworded.text).toContain('Enter the costs order');
+
+    check('costs-choice', 'def-pay-cl-fixed');
+    type('costs-def-pay-cl-fixed-amount', '250');
+    expect(page.orderText()).toBe(
+      [
+        'IT IS ORDERED THAT:',
+        'The claim is stayed.',
+        "The defendant shall pay the claimant's costs of the claim in the fixed sum of £250.00.",
+      ].join('\n')
+    );
+    expect(page.documentText()).toBe(page.orderText());
+
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    expect((await app.post(PAGE, body)).status).toBe(302);
   });
 
   it('requires a strike out or dismissal outcome before review', async () => {
@@ -57,9 +92,9 @@ describe('make an order: free form and strike out', () => {
     body.set('action', 'SAVE_DRAFT');
     expect((await app.post(PAGE, body)).status).toBe(302);
     const reopened = await openPage((await app.get(PAGE)).text);
-    const saved = control<HTMLTextAreaElement>('#order-document').value;
-    expect(saved).toContain('The claim is dismissed.');
-    expect(saved).toContain('Costs reserved.');
+    expect(reopened.documentText()).toBe(
+      ['IT IS ORDERED THAT:', 'The claim is dismissed.', 'Costs reserved.'].join('\n')
+    );
 
     const submission = reopened.body();
     submission.set('action', 'SUBMIT_FOR_REVIEW');
