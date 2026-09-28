@@ -69,8 +69,8 @@ export const getAccessToken = async (): Promise<void> => {
     );
   }
   process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({
-    username: process.env.E2E_IDAM_USER_EMAIL || user.claimantSolicitor.email,
-    password: process.env.E2E_IDAM_USER_PASSWORD || user.claimantSolicitor.password,
+    username: user.claimantSolicitor.email,
+    password: user.claimantSolicitor.password,
     grantType: 'password',
     clientId: 'pcs-frontend',
     clientSecret: process.env.PCS_FRONTEND_IDAM_SECRET as string,
