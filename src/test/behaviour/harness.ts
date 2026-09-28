@@ -41,6 +41,7 @@ const blankCase = (): Envelope => ({
     propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
     claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
     defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
+    // Arrears on issue as pcs-api sent it before HDPI-6373 had the judge fill it in; the page ignores it.
     caseFacts: { tenancyStartDate: '2024-01-09', currentRent: 750, arrearsOnIssue: 2400 },
   },
 });

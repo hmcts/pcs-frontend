@@ -81,6 +81,8 @@ describe('make an order: outright possession', () => {
     expect(document.body.textContent).toContain('10 Test Street, Bristol, BS1 1AA');
     expect(document.body.textContent).toContain('Example Housing vs Alex Example');
     expect(control('[name="current-rent"]').value).toBe('750');
+    // The judge works out the arrears on issue for themselves, even if pcs-api sends the claim's.
+    expect(control('[name="arrears-issue"]').value).toBe('');
     expect(control('[name="date-tenancy-day"]').value).toBe('9');
     expect(control('[name="date-tenancy-month"]').value).toBe('1');
     expect(control('[name="date-tenancy-year"]').value).toBe('2024');
