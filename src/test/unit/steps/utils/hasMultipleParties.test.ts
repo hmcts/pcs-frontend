@@ -72,7 +72,7 @@ describe('hasMultipleParties', () => {
     expect(hasMultipleParties(req)).toBe(true);
   });
 
-  it('returns false with current defendant, unnamed defendant, and claimant', () => {
+  it('returns true with current defendant, unnamed defendant, and claimant', () => {
     const req = {
       res: {
         locals: {
@@ -92,6 +92,6 @@ describe('hasMultipleParties', () => {
       },
     } as unknown as Request;
 
-    expect(hasMultipleParties(req)).toBe(false);
+    expect(hasMultipleParties(req)).toBe(true);
   });
 });

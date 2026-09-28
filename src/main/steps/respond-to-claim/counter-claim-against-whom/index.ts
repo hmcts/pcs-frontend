@@ -40,12 +40,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     );
     const orderedParties = [...(data?.allClaimants ?? []), ...defendants].filter(p => p.id);
 
-    const checkboxItems = orderedParties
-      .filter(p => p.value?.orgName || p.value?.firstName || p.value?.lastName)
-      .map(p => {
-        const displayName = [p.value?.orgName, p.value?.firstName, p.value?.lastName].join(' ').trim();
-        return { value: p.id, text: displayName, checked: checkedIds.includes(p.id) };
-      });
+    const checkboxItems = orderedParties.map(p => {
+      const displayName =
+        [p.value?.orgName, p.value?.firstName, p.value?.lastName].filter(Boolean).join(' ').trim() ||
+        'Persons unknown';
+      return { value: p.id, text: displayName, checked: checkedIds.includes(p.id) };
+    });
 
     const [field] = formContent.fields;
     if (!field) {
