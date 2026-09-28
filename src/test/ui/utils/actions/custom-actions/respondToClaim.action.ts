@@ -1875,8 +1875,6 @@ export class RespondToClaimAction implements IAction {
       await expect(adjustment).toHaveCount(1);
       await expect(adjustment.locator('.overview-col1')).toHaveText(expected.type);
       await expect(adjustment.locator('.govuk-tag')).toHaveText(expected.status);
-
-      console.log(`VErified  ${expected.type} ${expected.status}`);
     }
   }
 }
