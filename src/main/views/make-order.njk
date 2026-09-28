@@ -5,6 +5,7 @@
 {% from "xui-header/macro.njk" import hmctsXuiHeader %}
 {% from "footer/macro.njk" import hmctsUiFooter %}
 {% from "macros/csrf.njk" import csrfProtection %}
+{% import "make-order/_compact.njk" as compact with context %}
 
 {% set containerClasses = "pcs-wide" %}
 
@@ -43,10 +44,22 @@
   <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
   {{ csrfProtection(csrfToken) }}
 
-  {% include "make-order/_case-summary.njk" %}
+  <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make an order</h1>
+
+  <p class="govuk-body govuk-!-margin-bottom-1">
+    <span class="govuk-!-font-weight-bold">Case reference:</span> {{ caseReferenceDisplay }}
+  </p>
+  <p class="govuk-body govuk-!-margin-bottom-1">{{ propertyAddressDisplay }}</p>
+  <p class="govuk-body govuk-!-font-weight-bold">
+    {{ claimantNames }} vs {{ defendantNames }}
+  </p>
+
   {% include "make-order/_case-facts.njk" %}
   {% include "make-order/_attendance.njk" %}
-  {% include "make-order/_recitals.njk" %}
+
+  <h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>
+
+  {{ compact.reveal("recitals", "Recitals", compact.textarea("recitals-text", { label: "Recital paragraphs" })) }}
 
   <h2 class="govuk-heading-l govuk-!-margin-top-6">Order type</h2>
 
@@ -80,8 +93,14 @@
   </div>
 
   {% include "make-order/_costs.njk" %}
-  {% include "make-order/_order-preview.njk" %}
-  {% include "make-order/_staff-message.njk" %}
+
+  <section class="govuk-!-margin-top-6" aria-labelledby="order-preview-heading">
+    <h2 class="govuk-heading-l" id="order-preview-heading">Order preview</h2>
+    <div id="order-editor"></div>
+    <textarea hidden id="order-document" name="orderDocument">{{ orderDocumentJson }}</textarea>
+  </section>
+
+  {{ compact.reveal("staff-message", "Staff message", compact.textarea("staff-message-text", { label: "Message for court staff" })) }}
 
   <div class="govuk-button-group govuk-!-margin-top-6">
     {{ govukButton({
