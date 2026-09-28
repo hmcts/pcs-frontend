@@ -22,6 +22,12 @@ describe('make an order: outright possession', () => {
     expect((await app.get('/docweave/templates')).status).toBe(404);
   });
 
+  it('does not exist while its feature flag is off', async () => {
+    app = await bootApp({ makeOrderEnabled: false });
+    expect((await app.get(PAGE)).status).toBe(404);
+    expect((await app.get('/docweave/templates')).status).toBe(404);
+  });
+
   it('is refused to a caseworker, whom CCD does not let make an order', async () => {
     app = await bootApp({ caseworker: true });
     expect((await app.get(PAGE)).status).toBe(404);
