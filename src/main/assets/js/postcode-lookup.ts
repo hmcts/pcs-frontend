@@ -101,9 +101,11 @@ export function initPostcodeLookup(): void {
 
     field.closest('.govuk-form-group')?.classList.remove('govuk-form-group--error');
 
+    const fieldTargets = [field.id, field.name].filter(Boolean).map(value => `#${value}`);
+
     document.querySelectorAll<HTMLUListElement>('.govuk-error-summary__list').forEach(errorList => {
       errorList.querySelectorAll<HTMLAnchorElement>('a').forEach(link => {
-        if (link.getAttribute('href') === `#${field.id}`) {
+        if (fieldTargets.includes(link.getAttribute('href') || '')) {
           link.closest('li')?.remove();
         }
       });
@@ -294,7 +296,7 @@ export function initPostcodeLookup(): void {
     // Add error to error summary
     if (input?.id && errorMessage?.textContent) {
       const errorText = errorMessage.textContent.replace('Error:', '').trim();
-      addErrorToSummary(`${prefix}-postcode-not-found-error`, errorText, `#${prefix}-lookupPostcode`);
+      addErrorToSummary(errorMessage.id, errorText, `#${prefix}-lookupPostcode`);
     }
   };
 
@@ -313,7 +315,9 @@ export function initPostcodeLookup(): void {
     hideError(errorMessage, input);
 
     // Remove any previous "no addresses found" error from summary
-    removeErrorFromSummary(`${prefix}-postcode-not-found-error`);
+    if (errorMessage?.id) {
+      removeErrorFromSummary(errorMessage.id);
+    }
 
     try {
       const resp = await fetch(`/api/postcode-lookup?postcode=${encodeURIComponent(postcode)}`, {
@@ -468,7 +472,10 @@ export function initPostcodeLookup(): void {
 
     // Remove error from error summary when user starts typing
     removeErrorFromSummary(`${prefix}-lookup-postcode-error`);
-    removeErrorFromSummary(`${prefix}-postcode-not-found-error`);
+    const { errorMessage } = getParts(container);
+    if (errorMessage?.id) {
+      removeErrorFromSummary(errorMessage.id);
+    }
   });
 
   document.addEventListener('change', evt => {

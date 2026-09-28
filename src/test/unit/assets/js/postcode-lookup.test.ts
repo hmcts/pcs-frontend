@@ -555,6 +555,53 @@ describe('initPostcodeLookup', () => {
       expect(errorItem?.textContent).toContain('No addresses found');
     });
 
+    it('uses the resolved postcode lookup error id for legacy templates', async () => {
+      document.body.innerHTML =
+        buildErrorSummary() + buildComponent().replace(/address-postcode-not-found-error/g, 'address-postcode-error');
+
+      setFetch(
+        jest.fn().mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ addresses: [] }),
+        })
+      );
+
+      initPostcodeLookup();
+
+      const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
+      const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
+      const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
+
+      input.value = 'SW1A 2AA';
+      button.click();
+      await flushPromises();
+
+      let errorItem = errorList.querySelector('li[data-error-id="address-postcode-error"]');
+      expect(errorItem).toBeTruthy();
+
+      setFetch(
+        jest.fn().mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({
+            addresses: [
+              {
+                fullAddress: '10 Downing Street',
+                addressLine1: '10 Downing Street',
+                town: 'London',
+                postcode: 'SW1A 2AA',
+              },
+            ],
+          }),
+        })
+      );
+
+      button.click();
+      await flushPromises();
+
+      errorItem = errorList.querySelector('li[data-error-id="address-postcode-error"]');
+      expect(errorItem).toBeNull();
+    });
+
     it('removes no addresses found error when performing new lookup', async () => {
       document.body.innerHTML = buildErrorSummary() + buildComponent();
 
@@ -711,22 +758,24 @@ describe('initPostcodeLookup', () => {
     });
 
     it('clears manual address field errors after a valid address selection', () => {
-      document.body.innerHTML = buildErrorSummary() + buildComponent();
+      document.body.innerHTML = buildErrorSummary() + buildComponent('correspondence');
       initPostcodeLookup();
 
-      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-      const postcode = document.getElementById('address-postcode') as HTMLInputElement;
+      const select = document.getElementById('correspondence-selectedAddress') as HTMLSelectElement;
+      const postcode = document.getElementById('correspondence-postcode') as HTMLInputElement;
       const errorSummary = document.querySelector('.govuk-error-summary') as HTMLDivElement;
       const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
       const postcodeError = document.createElement('p');
-      postcodeError.id = 'address-postcode-error';
+      postcode.name = 'correspondenceAddressConfirm.postcode';
+      postcodeError.id = 'correspondence-postcode-error';
       postcodeError.className = 'govuk-error-message';
       postcodeError.textContent = 'Error: Enter a valid UK postcode';
       postcode.insertAdjacentElement('beforebegin', postcodeError);
-      postcode.setAttribute('aria-describedby', 'address-postcode-error');
+      postcode.setAttribute('aria-describedby', 'correspondence-postcode-error');
       postcode.classList.add('govuk-input--error');
       errorSummary.hidden = false;
-      errorList.innerHTML = '<li><a href="#address-postcode">Enter a valid UK postcode</a></li>';
+      errorList.innerHTML =
+        '<li><a href="#correspondenceAddressConfirm.postcode">Enter a valid UK postcode</a></li>';
 
       const opt = document.createElement('option');
       opt.value = '0';
@@ -742,7 +791,7 @@ describe('initPostcodeLookup', () => {
       expect(postcode.value).toBe('AB1 2CD');
       expect(postcode.classList.contains('govuk-input--error')).toBe(false);
       expect(postcodeError.classList.contains('govuk-!-display-none')).toBe(true);
-      expect(errorList.querySelector('a[href="#address-postcode"]')).toBeNull();
+      expect(errorList.querySelector('a[href="#correspondenceAddressConfirm.postcode"]')).toBeNull();
       expect(errorSummary.hidden).toBe(true);
     });
 
