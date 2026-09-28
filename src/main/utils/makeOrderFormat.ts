@@ -1,8 +1,21 @@
 /** Parsing and formatting of the money and date answers on the make order form (server and browser). */
 
-export function parseMoney(raw: string): number | undefined {
+/** The most any amount on an order can be. */
+export const MAX_MONEY = 1_000_000_000;
+
+/** An amount in pounds, with no more than two decimal places, whatever its size. */
+function amountOf(raw: string): number | undefined {
   const amount = raw.trim().replace(/,/g, '');
   return /^\d+(\.\d{1,2})?$/.test(amount) ? Number(amount) : undefined;
+}
+
+export function parseMoney(raw: string): number | undefined {
+  const amount = amountOf(raw);
+  return amount !== undefined && amount <= MAX_MONEY ? amount : undefined;
+}
+
+export function exceedsMaxMoney(raw: string): boolean {
+  return (amountOf(raw) ?? 0) > MAX_MONEY;
 }
 
 export function parseDate(day: string, month: string, year: string): Date | undefined {

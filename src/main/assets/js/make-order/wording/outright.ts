@@ -4,6 +4,7 @@ import { formatMoney, parseMoney } from '../../../../utils/makeOrderFormat';
 import { type OrderData } from '../data';
 
 import {
+  AMOUNT_NOT_PROVIDED,
   type CostsWording,
   addCosts,
   addPaymentTerm,
@@ -76,10 +77,11 @@ export function buildOutrightOrder(data: OrderData): DocWeaveDocument {
           const arrears = parseMoney(value(data, 'outright-mj-arrears'));
           const interestText = value(data, 'outright-mj-interest');
           const interest = parseMoney(interestText);
+          // Interest the judge gave but the order cannot read leaves the total unknown, not the arrears alone.
           const total =
-            arrears !== undefined && interest !== undefined
-              ? formatMoney(arrears + interest)
-              : money(value(data, 'outright-mj-arrears'));
+            arrears !== undefined && (!interestText || interest !== undefined)
+              ? formatMoney(arrears + (interest ?? 0))
+              : AMOUNT_NOT_PROVIDED;
           content
             .text(`Judgment for the claimant(s) in the ${interestText ? 'total ' : ''}sum of £`)
             .fact('amount', total, { sourceId: 'outright-mj-amounts' })

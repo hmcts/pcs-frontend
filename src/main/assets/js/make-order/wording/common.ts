@@ -24,9 +24,11 @@ export function date(data: OrderData, prefix: string): string {
   return parsed ? formatDate(parsed) : '[date not provided]';
 }
 
+export const AMOUNT_NOT_PROVIDED = '[amount not provided]';
+
 export function money(raw: string): string {
   const amount = parseMoney(raw);
-  return amount === undefined ? '[amount not provided]' : formatMoney(amount);
+  return amount === undefined ? AMOUNT_NOT_PROVIDED : formatMoney(amount);
 }
 
 export function frequency(data: OrderData, name: string): string {
