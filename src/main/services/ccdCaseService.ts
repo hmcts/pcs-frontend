@@ -34,7 +34,7 @@ import { AxiosError } from 'axios';
 import config from 'config';
 
 import { ClientContextHeaders } from '../../types/global';
-import { HTTPError } from '../HttpError';
+import { CallbackRejectedError, HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
@@ -151,7 +151,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const callbackMessages = [...(responseData?.callbackErrors ?? []), ...(responseData?.callbackWarnings ?? [])];
   if (callbackMessages.length > 0) {
-    return new HTTPError(`CCD callback rejected request: ${callbackMessages.join('; ')}`, status || 422);
+    return new CallbackRejectedError(callbackMessages, status || 422);
   }
 
   const retryAfterHeader = axiosError.response?.headers?.['retry-after'];
