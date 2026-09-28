@@ -27,15 +27,42 @@ describe('make an order: free form and strike out', () => {
     );
   });
 
-  it('records the strike out or dismissal outcome', async () => {
+  it('requires a strike out or dismissal outcome before review', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-strike-out');
-    check('strike-claim-outcome', 'dismissed');
-    expect(page.orderText()).toBe('');
 
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
+    const rejected = await app.post(PAGE, body);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Select whether the claim is struck out or dismissed');
+  });
+
+  it('orders the claim struck out', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-strike-out');
+    check('strike-claim-outcome', 'struck-out');
+    expect(page.orderText()).toBe(['IT IS ORDERED THAT:', 'The claim is struck out.'].join('\n'));
+  });
+
+  it('dismisses the claim with its costs order, and saves that document', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-strike-out');
+    check('strike-claim-outcome', 'dismissed');
+    check('costs', 'yes');
+    check('costs-choice', 'reserved');
+    expect(page.orderText()).toBe(['IT IS ORDERED THAT:', 'The claim is dismissed.', 'Costs reserved.'].join('\n'));
+
+    const body = page.body();
+    body.set('action', 'SAVE_DRAFT');
     expect((await app.post(PAGE, body)).status).toBe(302);
-    expect(control('[name="strike-claim-outcome"][value="dismissed"]').checked).toBe(true);
+    const reopened = await openPage((await app.get(PAGE)).text);
+    const saved = control<HTMLTextAreaElement>('#order-document').value;
+    expect(saved).toContain('The claim is dismissed.');
+    expect(saved).toContain('Costs reserved.');
+
+    const submission = reopened.body();
+    submission.set('action', 'SUBMIT_FOR_REVIEW');
+    expect((await app.post(PAGE, submission)).status).toBe(302);
   });
 });
