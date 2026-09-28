@@ -59,6 +59,24 @@ describe('make an order: adjournment', () => {
     expect(control('[name="adj-directions"][value="counterclaim"]').checked).toBe(true);
   });
 
+  it('writes the time of hearing the same way however the judge types it', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-adjournment');
+    check('adj-type', 'further-hearing');
+    typeDate('adj-hearing-date-specific', '1', '10', '2026');
+    const heardAt = (time: string): string => {
+      type('adj-specific-time', time);
+      return /on 1 October 2026 at (.+?) with/.exec(page.orderText())![1];
+    };
+    expect(heardAt('14:30')).toBe('2:30pm');
+    expect(heardAt('09.05')).toBe('9:05am');
+    expect(heardAt('10:30 A.M.')).toBe('10:30am');
+    expect(heardAt('2pm')).toBe('2pm');
+    expect(heardAt('12:00')).toBe('midday');
+    expect(heardAt('12am')).toBe('midnight');
+    expect(heardAt('after lunch')).toBe('[hearing time not provided]');
+  });
+
   it('adds current rent to the conditions only when the judge chooses it', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-adjournment');

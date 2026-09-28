@@ -1,5 +1,6 @@
 import { type DocWeaveDocument, buildDoc } from '@hmcts-cft/docweave';
 
+import { formatTime, parseTime } from '../../../../utils/makeOrderFormat';
 import { type OrderData } from '../data';
 
 import {
@@ -63,9 +64,10 @@ export function buildAdjournmentOrder(data: OrderData): DocWeaveDocument {
             sourceId: `adj-hearing-date-${when}`,
           });
           if (when === 'specific') {
+            const time = parseTime(value(data, 'adj-specific-time'));
             content
               .text(' at ')
-              .fact('adjournment-hearing-time', value(data, 'adj-specific-time') || '[hearing time not provided]', {
+              .fact('adjournment-hearing-time', time ? formatTime(time) : '[hearing time not provided]', {
                 sourceId: 'adj-specific-time',
               });
           }

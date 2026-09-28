@@ -1,4 +1,4 @@
-import { MAX_MONEY, exceedsMaxMoney, parseDate, parseMoney } from './makeOrderFormat';
+import { MAX_MONEY, exceedsMaxMoney, parseDate, parseMoney, parseTime } from './makeOrderFormat';
 
 export const MAKE_ORDER_TYPES = [
   'OUTRIGHT_POSSESSION',
@@ -258,7 +258,12 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
       'Select minutes or hours for the time estimate'
     );
     if (when === 'specific') {
-      add(Boolean(value(formData, 'adj-specific-time')), 'adj-specific-time', 'Enter the time of hearing');
+      const time = value(formData, 'adj-specific-time');
+      if (!time) {
+        add(false, 'adj-specific-time', 'Enter the time of hearing');
+      } else {
+        add(Boolean(parseTime(time)), 'adj-specific-time', 'Enter a valid time of hearing, like 10:30am or 14:30');
+      }
     }
     if (directions.includes('defence')) {
       date('adj-defence-date', 'Enter a valid defence date');
