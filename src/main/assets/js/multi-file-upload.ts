@@ -239,7 +239,6 @@ function initContainer(container: HTMLElement): void {
   const errorSummaryTitle = container.dataset.errorSummaryTitle || 'There is a problem';
   const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
 
-
   // Disable Continue while a file is uploading, so the user can't proceed before the document is attached
   let uploadsInProgress = 0;
   const allButtons = Array.from(form.querySelectorAll('button'));
