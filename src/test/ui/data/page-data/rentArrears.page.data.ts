@@ -3,6 +3,7 @@ export const rentArrears = {
   saveAndContinueButton: `Save and continue`,
   rentAmountTextInput: `1000.00`,
   incorrectFormatTextInput: `1000`,
+  threeDecimalsIncorrectFormatTextInput: `1000.000`,
   negativeTextInput: `-100.00`,
   billionTextInput: `1000000001.00`,
   doYouOweThisQuestion: `Do you owe this amount in rent arrears?`,
@@ -24,4 +25,6 @@ export const rentArrears = {
   whenTheyMadeTheirClaimParagraph: `When they made their claim, ${process.env.CLAIMANT_NAME} had to provide a copy of the rent statement for your property, showing the total rent arrears you owe.`,
   amountYouOweHeader: `Amount you owe in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
   rentDocumentDynamicLink: 'View a copy of the rent statement (opens in new tab)',
+  threeDecimalsEnterAmountInCorrectFormatErrorMessage:
+    'Enter how much you believe you owe in rent arrears, in the correct format (e.g. if you owe £148, please write 148 or 148.00)',
 };

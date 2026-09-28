@@ -13,6 +13,7 @@ export const whatRegularIncomeDoYouReceive = {
   pensionTextInput: `250.00`,
   universalCreditParagraph: `Universal Credit`,
   universalCreditTextInput: `380.00`,
+  universalCreditWithoutPenceTextInput: `380`,
   otherBenefitsAndCreditsParagraph: `Other benefits and credits`,
   otherBenefitsTextInput: `330.00`,
   moneyFromSomewhereElseParagraph: `Money from somewhere else (for example, child maintenance payments or someone in your household gives you money) `,
@@ -28,7 +29,6 @@ export const whatRegularIncomeDoYouReceive = {
   otherBenefitsAndCreditsAmountErrorMessage: `Enter the total amount you receive from other benefits and credits`,
   otherBenefitsAndCreditsFrequencyErrorMessage: `Select how frequently you receive income from other benefits and credits`,
   incorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148 or 148.50`,
-  incorrectFormatTextInput: `1000`,
   negativeTextInput: `-100.00`,
   incomeFromAllJobsNegativeErrorMessage: `The total amount you receive from all jobs you do each week or month must be £0.00 or above`,
   pensionStateAndPrivateNegativeErrorMessage: `The total amount you receive from pension (state and private) each week or month must be £0.00 or above`,
@@ -52,4 +52,5 @@ export const whatRegularIncomeDoYouReceive = {
   backLink: `Back`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `what-regular-income-do-you-receive`,
+  threeDecimalIncorrectFormatTextInput: `20.003`,
 };
