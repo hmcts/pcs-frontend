@@ -47,6 +47,8 @@ const NAMED_ATTENDANCE = ['counsel', 'solicitor', 'solicitor-agent', 'housing-of
 
 const MAX_ATTENDANCE_NAME_LENGTH = 120;
 
+const PAYMENT_FREQUENCIES = ['weekly', 'fortnightly', 'monthly'];
+
 const MAX_FREE_TEXT_LENGTH = 30000;
 const MAX_GROUNDS_DETAILS_LENGTH = 100;
 
@@ -107,6 +109,8 @@ function validation(formData: Record<string, unknown>) {
     optionalMoney: (id: string, message: string): void =>
       addMoney(id, value(formData, id) ? moneyError(formData, id, message) : undefined),
     date: (prefix: string, message: string): void => add(hasValidDate(formData, prefix), `${prefix}-day`, message),
+    frequency: (id: string, message: string): void =>
+      add(PAYMENT_FREQUENCIES.includes(value(formData, id)), id, message),
   };
 }
 
@@ -136,7 +140,7 @@ function validateCosts(formData: Record<string, unknown>, suspended: boolean): M
 }
 
 function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const { issues, add, money, date } = validation(formData);
+  const { issues, add, money, date, frequency } = validation(formData);
   const terms = values(formData, 'suspended-payment-terms');
   const options = values(formData, 'suspended-options');
 
@@ -153,6 +157,7 @@ function validateSuspended(formData: Record<string, unknown>): MakeOrderValidati
   }
   if (terms.includes('instalments')) {
     money('suspended-instalment-amount', 'Enter a valid instalment amount');
+    frequency('suspended-instalment-frequency', 'Select weekly, fortnightly or monthly instalments');
     date('suspended-instalment-date', 'Enter a valid first instalment date');
   }
   if (options.includes('use-occupation')) {
@@ -164,7 +169,7 @@ function validateSuspended(formData: Record<string, unknown>): MakeOrderValidati
 }
 
 function validateOutright(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const { issues, add, money, optionalMoney, date, maxLength } = validation(formData);
+  const { issues, add, money, optionalMoney, date, frequency, maxLength } = validation(formData);
   const possession = value(formData, 'outright-possession');
   const options = values(formData, 'outright-options');
 
@@ -214,11 +219,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
       }
       if (plans.includes('instalments')) {
         money('outright-mj-inst-amount', 'Enter a valid instalment amount');
-        add(
-          ['weekly', 'monthly'].includes(value(formData, 'outright-mj-inst-freq')),
-          'outright-mj-inst-freq',
-          'Select weekly or monthly instalments'
-        );
+        frequency('outright-mj-inst-freq', 'Select weekly, fortnightly or monthly instalments');
         date('outright-mj-inst-date', 'Enter a valid first instalment date');
       }
     }
@@ -233,7 +234,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
 }
 
 function validateAdjournment(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const { issues, add, money, date } = validation(formData);
+  const { issues, add, money, date, frequency } = validation(formData);
   const type = value(formData, 'adj-type');
 
   add(
@@ -276,15 +277,18 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
   }
   if (type === 'generally') {
     const conditions = values(formData, 'adj-gen');
-    const validatePayment = (option: string, prefix: string): void => {
+    const validatePayment = (option: string, prefix: string, instalments = true): void => {
       if (conditions.includes(option)) {
         money(`${prefix}-amount`, 'Enter a valid payment amount');
+        if (instalments) {
+          frequency(`${prefix}-frequency`, 'Select weekly, fortnightly or monthly payments');
+        }
         date(`${prefix}-date`, 'Enter a valid payment date');
       }
     };
     validatePayment('current-rent-plus', 'adj-gen-current-rent-plus');
     validatePayment('payments', 'adj-gen-payments');
-    validatePayment('oneoff', 'adj-gen-oneoff');
+    validatePayment('oneoff', 'adj-gen-oneoff', false);
     add(
       !(conditions.includes('current-rent-plus') && conditions.includes('payments')),
       'adj-gen',
