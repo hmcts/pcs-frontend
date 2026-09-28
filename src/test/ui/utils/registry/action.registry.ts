@@ -134,6 +134,8 @@ export class ActionRegistry {
     ['changeAnswerOnFinalCYA', new RespondToClaimAction()],
     ['selectStatementOfTruthRTC', new RespondToClaimAction()],
     ['validateRTCSectionCYA', new RespondToClaimAction()],
+    ['verifyYourSupportLink', new RespondToClaimAction()], 
+    ['verifySupportAdjustments', new RespondToClaimAction()], 
     ['getCaseAPI', new CreateCaseAPIAction()],
     ['linkSolicitorAPI', new LinkSolicitorAPIAction()],
     ['doYouWantToUploadFiles', new RespondToClaimAction()],

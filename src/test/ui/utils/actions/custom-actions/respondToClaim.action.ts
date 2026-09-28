@@ -249,6 +249,8 @@ export class RespondToClaimAction implements IAction {
       ['counterClaimOrderOtherThanSum', () => this.counterClaimOrderOtherThanSum(fieldName as actionRecord)],
       ['selectReasonableAdjustments', () => this.selectReasonableAdjustments(fieldName as actionRecord, page)],
       ['selectEqualityAndDiversity', () => this.selectEqualityAndDiversity(fieldName as actionRecord)],
+      ['verifyYourSupportLink', () => this.verifyYourSupportLink(fieldName as actionRecord, page)], 
+      ['verifySupportAdjustments', () => this.verifySupportAdjustments(fieldName as actionRecord, page)], 
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -1831,5 +1833,50 @@ export class RespondToClaimAction implements IAction {
       option: diversityData.radioOption,
     });
     await performAction('clickButton', diversityData.button);
+  }
+
+  private async verifyYourSupportLink(ysData: actionRecord, page: Page) {
+    const isResponseCompleted = String(ysData.respondTag).toLowerCase() === 'completed';
+    const isResponseInProgress = String(ysData.respondTag).toLowerCase() === 'in progress';
+
+    const yourSupportText = String(ysData.ysSubHeader);
+    const yourSupportTask = page.locator('li.govuk-task-list__item').filter({ hasText: yourSupportText });
+    if (isResponseCompleted || isResponseInProgress) {
+      // Verify Your support is an active link
+      await expect(yourSupportTask.getByRole('link', { name: yourSupportText })).toBeVisible();
+      // Verify status/tag
+      await expect(yourSupportTask.locator('.govuk-task-list__status')).toHaveText(String(ysData.ysTag));
+    } else {
+      // Verify Your support is NOT a link
+      await expect(yourSupportTask.getByRole('link', { name: yourSupportText })).toHaveCount(0);
+      // Verify Your support text is still visible
+      await expect(yourSupportTask.getByText(yourSupportText, { exact: true })).toBeVisible();
+      // Verify status container is empty
+      await expect(yourSupportTask.locator('.govuk-task-list__status')).toBeEmpty();
+    }
+    if (ysData.rtcSubHeader && isResponseCompleted) {
+      const rtcHeader = String(ysData.rtcSubHeader);
+      const rtcTask = page.locator('li.govuk-task-list__item').filter({ hasText: rtcHeader });
+      // RTC text should be visible
+      await expect(rtcTask.getByText(rtcHeader, { exact: true })).toBeVisible();
+      // RTC should NOT be clickable
+      await expect(rtcTask.getByRole('link', { name: rtcHeader })).toHaveCount(0);
+    }
+}
+
+  private async verifySupportAdjustments(expectedData: actionRecord, page: Page): Promise<void> {
+    const expectedAdjustments = expectedData.expectedAdjustments as { type: string; status: string }[] | undefined;
+    if (!expectedAdjustments) throw new Error('expectedAdjustments data is required');
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Support for');
+    const adjustmentItems = page.locator('.govuk-task-list__item');
+    await expect(adjustmentItems).toHaveCount(expectedAdjustments.length);
+    for (const expected of expectedAdjustments) {
+      const adjustment = adjustmentItems.filter({ hasText: expected.type });
+      await expect(adjustment).toHaveCount(1);
+      await expect(adjustment.locator('.overview-col1')).toHaveText(expected.type);
+      await expect(adjustment.locator('.govuk-tag')).toHaveText(expected.status);
+
+      console.log(`VErified  ${expected.type} ${expected.status}`);
+    }
   }
 }
