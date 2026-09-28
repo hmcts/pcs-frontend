@@ -1,7 +1,11 @@
 import type { Request, RequestHandler } from 'express';
 
+import { flowConfig as uploadTranslatedClaimFormFlowConfig } from './upload-translated-claim-form/flow.config';
+import { stepRegistry as uploadTranslatedClaimFormStepRegistry } from './upload-translated-claim-form/stepRegistry';
+
 import { flowConfig as uploadAdditionalDocumentsFlowConfig } from './case-tasks/upload-additional-documents/flow.config';
 import { stepRegistry as uploadAdditionalDocumentsStepRegistry } from './case-tasks/upload-additional-documents/stepRegistry';
+
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
 import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
 import { respondToClaimAccessGuard } from './respond-to-claim/accessGuard';
@@ -75,6 +79,14 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
     default: {
       flowConfig: uploadAdditionalDocumentsFlowConfig,
       stepRegistry: uploadAdditionalDocumentsStepRegistry,
+    },
+  },
+  uploadTranslatedClaimForm: {
+    name: 'uploadTranslatedClaimForm',
+    slug: 'upload-translated-claim-form',
+    default: {
+      flowConfig: uploadTranslatedClaimFormFlowConfig,
+      stepRegistry: uploadTranslatedClaimFormStepRegistry,
     },
   },
 };

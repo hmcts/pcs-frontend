@@ -18,6 +18,11 @@ export interface RefreshTokenResult {
 
 import { Logger } from '@modules/logger';
 
+// const LOGIN_USERNAME = 'pcs-solicitor1@test.com';
+// const LOGIN_USERNAME = 'pcs-hearing-centre-team-leader-01@localhost';
+const LOGIN_USERNAME = 'wlu-team-leader-01@localhost';
+
+
 export class OIDCModule {
   private clientConfig!: Configuration;
   private clientConfigPromise: Promise<Configuration> | null = null;

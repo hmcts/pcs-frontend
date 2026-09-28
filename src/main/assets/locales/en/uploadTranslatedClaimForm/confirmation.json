@@ -1,0 +1,9 @@
+{
+  "pageTitle": "Check your answers",
+  "caption": "Upload translated claim form",
+  "confirmationPanelTitle": "Translation uploaded",
+  "translationUploadedMessage": "The translated claim form has been uploaded.",
+  "whatHappensNext": "What happens next",
+  "claimPackWillBeSent": "The claim pack will be sent out when all of the required documents are available.",
+  "closeAndReturnToCaseSummary": "Close and return to case summary"
+}

@@ -135,7 +135,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
     logger.error(`Error response data: ${JSON.stringify(responseData, null, 2)}`);
   }
 
-  if (status === 403) {
+  if (status === 403 || status == 404) { // TODO: Test
     return new HTTPError('Not authorised to access CCD case service', 403);
   }
 
@@ -201,7 +201,7 @@ async function getEventToken(userToken: string, caseId: string, eventId: string)
  * @param ccdCase - The event data in the CCD case model
  * @returns Merged case data from CCD (authoritative source of truth)
  */
-async function submitEvent(userToken: string | undefined, eventId: string, ccdCase: CcdCase): Promise<CcdCase> {
+export async function submitEvent(userToken: string | undefined, eventId: string, ccdCase: CcdCase): Promise<CcdCase> {
   if (!userToken) {
     throw new HTTPError('No user token provided', 401);
   }
@@ -218,6 +218,7 @@ async function submitEvent(userToken: string | undefined, eventId: string, ccdCa
   try {
     logger.info(`Submitting event ${eventId} for case ${caseId}`);
     const response = await http.post<CcdCase>(eventSubmitUrl, payload, getCaseHeaders(userToken));
+    response.status;
     return response.data;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'submitEvent');
@@ -229,8 +230,8 @@ function buildEventPayload(ccdCase: CcdCase, eventId: string, eventToken: string
     data: ccdCase.data as Record<string, unknown>,
     event: {
       id: eventId,
-      summary: `Citizen ${eventId} summary`,
-      description: `Citizen ${eventId} description`,
+      summary: `Citizen ${eventId} summary`, // TODO: Remove?
+      description: `Citizen ${eventId} description`, // TODO: Remove?
     },
     event_token: eventToken,
     ignore_warning: false,
@@ -296,6 +297,7 @@ export const ccdCaseService = {
     }
   },
 
+  // TODO: Refactor these out
   async submitResponseToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
     const eventId = 'respondPossessionClaim';
     return submitEvent(accessToken, eventId, ccdCase);
