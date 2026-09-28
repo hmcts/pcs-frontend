@@ -117,6 +117,35 @@ describe('logger module', () => {
     expect(JSON.stringify(emit.mock.calls)).not.toContain('secret-code');
   });
 
+  it('keeps query values stripped when the console transport merges object metadata back in', () => {
+    const logger = Logger.getLogger(`logger-redact-console-meta-${Date.now()}`);
+    const metadata = {
+      url: '/oauth2/callback?code=secret-code&state=abc',
+      session: { returnTo: '/postcode?postcode=secret-postcode' },
+    };
+
+    logger.error('Authentication error details:', metadata);
+
+    const output = stripAnsiCodes(formattedLines.join('\n'));
+    expect(output).toContain('/oauth2/callback?code=***&state=***');
+    expect(output).toContain('/postcode?postcode=***');
+    expect(output).not.toContain('secret-code');
+    expect(output).not.toContain('secret-postcode');
+    expect(metadata.url).toBe('/oauth2/callback?code=secret-code&state=abc');
+  });
+
+  it('logs circular metadata without recursing forever', () => {
+    const logger = Logger.getLogger(`logger-redact-circular-${Date.now()}`);
+    const metadata: Record<string, unknown> = { url: '/cb?code=secret-code' };
+    metadata.self = metadata;
+
+    logger.error('Circular', metadata);
+
+    const output = stripAnsiCodes(formattedLines.join('\n'));
+    expect(output).toContain('/cb?code=***');
+    expect(output).not.toContain('secret-code');
+  });
+
   it('strips query values passed positionally, as the 404 handler logs them', () => {
     const logger = Logger.getLogger(`logger-redact-splat-${Date.now()}`);
 
