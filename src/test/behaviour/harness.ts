@@ -47,7 +47,10 @@ const blankCase = (): Envelope => ({
 /** Minimal CCD: hands out the stored envelope and applies posted make-order events to it. */
 let envelope = blankCase();
 
-/** CCD lets only the judge, whom it knows by their role assignments, use the make order event. */
+/**
+ * CCD lets only the judge, whom it knows by their role assignments, use the make order event: anyone
+ * else can start it but is not shown its payload, and cannot submit it.
+ */
 function isJudge(req: Request): boolean {
   const token = (req.headers.authorization ?? '').replace(/^Bearer /, '');
   const claims = JSON.parse(Buffer.from(token.split('.')[1] ?? '', 'base64url').toString() || '{}');
@@ -57,13 +60,14 @@ function isJudge(req: Request): boolean {
 function ccdStub(): Express {
   const ccd = express();
   ccd.use(express.json());
-  ccd.use((req: Request, res: Response, next) =>
-    isJudge(req) ? next() : res.status(403).json({ message: 'Forbidden' })
-  );
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
-    res.json({ token: 'event-token', case_details: { case_data: { sdkEventPayload: JSON.stringify(envelope) } } });
+    const caseData = isJudge(req) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
+    res.json({ token: 'event-token', case_details: { case_data: caseData } });
   });
   ccd.post('/cases/:id/events', (req: Request, res: Response) => {
+    if (!isJudge(req)) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
     const posted = JSON.parse(req.body.data.sdkEventPayload);
     envelope = {
       ...envelope,

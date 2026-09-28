@@ -58,7 +58,9 @@ async function loadEnvelope(accessToken: string, caseReference: string): Promise
   const ccdCase = await ccdCaseService.getCaseByIdForEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID);
   const payload = ccdCase.data.sdkEventPayload;
   if (!payload) {
-    throw new HTTPError('The make order event did not return order data', 500);
+    // CCD starts the event for anyone who can see the case, but only shows the payload to users
+    // it lets use the event.
+    throw new HTTPError('Not permitted to make an order on this case', 403);
   }
   return JSON.parse(payload) as MakeOrderStart;
 }
@@ -225,8 +227,8 @@ function parseDocument(orderDocument: unknown): DocWeaveSnapshot | undefined {
 }
 
 /**
- * Only judges may make an order, which CCD decides from their role assignments: it refuses to
- * start or submit the event for anyone else, and they are shown the page does not exist.
+ * Only judges may make an order, which CCD decides from their role assignments: anyone else is
+ * not given the event's payload or allowed to submit it, and is shown the page does not exist.
  */
 function refusedByCcd(error: unknown): boolean {
   return error instanceof HTTPError && (error.status === 403 || error.status === 404);

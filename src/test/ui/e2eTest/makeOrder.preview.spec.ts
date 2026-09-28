@@ -16,6 +16,16 @@ async function signInIfAsked(page: Page): Promise<void> {
   }
 }
 
+/** A claim issued in the pcs-api preview, ready for a judge to make an order on. */
+async function createIssuedCase(): Promise<void> {
+  process.env.NOTICE_SERVED = 'YES';
+  process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
+  process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
+  await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
+  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
+  await performAction('updatePaymentAPI');
+}
+
 /** The case in the XUI that pcs-frontend hands the judge back to. */
 function xuiCaseUrl(caseNumber: string): string {
   return `${process.env.XUI_BASE_URI}/cases/case-details/PCS/PCS/${caseNumber}`;
@@ -45,14 +55,23 @@ async function openMakeOrder(page: Page, caseNumber: string): Promise<void> {
 test.describe('Make an order in a preview environment', () => {
   test.skip(process.env.E2E_PREVIEW_PCS !== 'true', 'Runs against a pcs-frontend preview wired to a pcs-api preview');
 
+  test('a caseworker, whom CCD does not let make an order, is shown it does not exist', async ({ page }) => {
+    initializeExecutor(page);
+    await createIssuedCase();
+    const caseNumber = process.env.CASE_NUMBER as string;
+
+    await page.goto(`${homeUrl}/case/${caseNumber}/make-order`, { waitUntil: 'networkidle' });
+    const email = page.getByRole('textbox', { name: 'Email address' });
+    await expect(email).toBeVisible({ timeout: 30_000 });
+    await performAction('login', process.env.E2E_CASEWORKER_EMAIL ?? 'pcs-caseworker@test.com');
+
+    await expect(page.getByText('Not Found')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole('heading', { name: 'Make an order' })).toHaveCount(0);
+  });
+
   test('a judge drafts, changes, reopens and submits an order for review', async ({ page }) => {
     initializeExecutor(page);
-    process.env.NOTICE_SERVED = 'YES';
-    process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
-    process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
-    await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-    await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadNoDefendants });
-    await performAction('updatePaymentAPI');
+    await createIssuedCase();
     const caseNumber = process.env.CASE_NUMBER as string;
     expect(caseNumber).toBeTruthy();
     test.info().annotations.push({ type: 'case', description: caseNumber });
