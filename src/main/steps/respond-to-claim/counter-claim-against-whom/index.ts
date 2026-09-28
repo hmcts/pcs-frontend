@@ -42,8 +42,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     const checkboxItems = orderedParties.map(p => {
       const displayName =
-        [p.value?.orgName, p.value?.firstName, p.value?.lastName].filter(Boolean).join(' ').trim() ||
-        'Persons unknown';
+        [p.value?.orgName, p.value?.firstName, p.value?.lastName].filter(Boolean).join(' ').trim() || 'Persons unknown';
       return { value: p.id, text: displayName, checked: checkedIds.includes(p.id) };
     });
 
