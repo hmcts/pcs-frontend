@@ -239,6 +239,18 @@ function initContainer(container: HTMLElement): void {
   const errorSummaryTitle = container.dataset.errorSummaryTitle || 'There is a problem';
   const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
 
+
+  // Disable Continue while a file is uploading, so the user can't proceed before the document is attached
+  let uploadsInProgress = 0;
+  const allButtons = Array.from(form.querySelectorAll('button'));
+  const continueButtons = allButtons.filter(button => button.name === 'action' && button.value === 'continue');
+
+  const setSubmitButtonsDisabled = (disabled: boolean): void => {
+    continueButtons.forEach(button => {
+      button.disabled = disabled;
+    });
+  };
+
   const instance = new MultiFileUpload(container, {
     uploadUrl,
     deleteUrl,
@@ -272,9 +284,15 @@ function initContainer(container: HTMLElement): void {
           showErrorSummary(container, tooLargeMessage, errorSummaryTitle);
           throw new Error('too_large');
         }
+
+        uploadsInProgress += 1;
+        setSubmitButtonsDisabled(true);
       },
 
       exitHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File, xhr: XMLHttpRequest) => {
+        uploadsInProgress = Math.max(0, uploadsInProgress - 1);
+        setSubmitButtonsDisabled(uploadsInProgress > 0);
+
         clearErrorSummary(container);
         try {
           const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
@@ -310,6 +328,9 @@ function initContainer(container: HTMLElement): void {
       },
 
       errorHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File, xhr: XMLHttpRequest) => {
+        uploadsInProgress = Math.max(0, uploadsInProgress - 1);
+        setSubmitButtonsDisabled(uploadsInProgress > 0);
+
         // Per AC04/AC05: show the error-summary banner only for AC-defined messages
         // returned by the server (wrongType / tooLarge as structured JSON).
         // Non-AC failures (abort, network drop, CDAM unreachable, 5xx) leave the MOJ
