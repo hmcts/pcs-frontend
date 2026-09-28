@@ -16,7 +16,6 @@ export function initSessionTimeout(): void {
   const inertContainer = inertSelector ? document.querySelector<HTMLElement>(inertSelector) : null;
 
   let lastActivity = Date.now();
-  let lastRenewal = Date.now();
   let warningShown = false;
   let countdownInterval: number | null = null;
 
@@ -156,19 +155,10 @@ export function initSessionTimeout(): void {
     }
   };
 
-  // Activity only moves this page's clock; the server session lasts sessionTimeoutMinutes from the
-  // last request. Renew it while the user is active, so that working on one page for a long time,
-  // such as drafting an order, does not end the session they are about to save with.
-  const renewEveryMs = ((sessionTimeoutMinutes - sessionWarningMinutes) * 60 * 1000) / 2;
-
   // reset - user must click button
   const resetActivity = () => {
     if (!warningShown) {
       lastActivity = Date.now();
-      if (lastActivity - lastRenewal >= renewEveryMs) {
-        lastRenewal = lastActivity;
-        fetch('/active').catch(() => undefined);
-      }
     }
   };
 
@@ -193,7 +183,6 @@ export function initSessionTimeout(): void {
         .then(response => {
           if (response.ok) {
             lastActivity = Date.now();
-            lastRenewal = lastActivity;
             hideModal();
           }
         })
