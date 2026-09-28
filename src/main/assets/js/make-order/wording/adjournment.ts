@@ -90,9 +90,13 @@ export function buildAdjournmentOrder(data: OrderData): DocWeaveDocument {
         const instalments = ['current-rent-plus', 'payments'].find(option => conditions.includes(option));
         const restore = conditions.includes('restore');
         if (instalments || conditions.includes('oneoff')) {
+          const payments =
+            instalments === 'current-rent-plus'
+              ? 'payment of current rent as it falls due together with the following payments towards any arrears:'
+              : 'the following payments towards any arrears:';
           list.item(
             'adjournment-condition',
-            `The claim is adjourned generally on condition that ${defendant} ${defendantVerb('makes', 'make')} payment of current rent as it falls due together with the following payments towards any arrears:`,
+            `The claim is adjourned generally on condition that ${defendant} ${defendantVerb('makes', 'make')} ${payments}`,
             item => {
               item.orderedList('adjournment-payment-terms', terms => {
                 if (conditions.includes('oneoff')) {

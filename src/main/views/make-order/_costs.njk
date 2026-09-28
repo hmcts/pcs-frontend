@@ -38,7 +38,13 @@
       conditional: { html: fields } if choice.amountLabel or choice.value == "other"
     }]) %}
   {% endfor %}
-  {{ govukRadios({ idPrefix: idPrefix, name: "costs-choice", classes: "govuk-radios--small", items: items }) }}
+  {{ govukRadios({
+    idPrefix: idPrefix,
+    name: "costs-choice",
+    classes: "govuk-radios--small",
+    items: items,
+    errorMessage: validationErrors[idPrefix]
+  }) }}
 {% endmacro %}
 
 {% set costsChoicesHtml %}

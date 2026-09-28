@@ -59,6 +59,15 @@ describe('make an order: suspended possession', () => {
       ].join('\n')
     );
 
+    // Looking at another order type and coming back keeps the costs and their suspension.
+    const suspendedOrder = page.orderText();
+    selectTab('tab-outright');
+    expect(control('[name="costs-choice"][value="fixed-same-terms"]').disabled).toBe(true);
+    selectTab('tab-suspended');
+    expect(control('[name="costs-choice"][value="fixed-same-terms"]').checked).toBe(true);
+    expect(page.orderText()).toBe(suspendedOrder);
+    expect(page.documentText()).toBe(suspendedOrder);
+
     // Adding a one-off payment lists the terms instead.
     check('suspended-payment-terms', 'one-off');
     type('suspended-oneoff-amount', '500');
