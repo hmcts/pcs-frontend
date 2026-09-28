@@ -115,7 +115,6 @@ function caseFactsFormData(caseFacts: Record<string, unknown> = {}): FormData {
     currentRent: 'current-rent',
     rentFrequency: 'rent-frequency',
     groundsPleaded: 'grounds-pleaded',
-    arrearsOnIssue: 'arrears-issue',
   };
   const dates: Record<string, string> = { tenancyStartDate: 'date-tenancy', noticeDate: 'date-notice' };
   for (const [fact, field] of Object.entries(fields)) {
@@ -218,7 +217,7 @@ function stubbedEnvelope(formData: FormData = {}): MakeOrderStart {
       propertyAddress: { addressLine1: '10 Test Street', postTown: 'Bristol', postCode: 'BS1 1AA' },
       claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
       defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
-      caseFacts: { tenancyStartDate: '2024-01-09', noticeDate: '2025-06-12', currentRent: 750, arrearsOnIssue: 2400 },
+      caseFacts: { tenancyStartDate: '2024-01-09', noticeDate: '2025-06-12', currentRent: 750 },
     },
   };
 }
