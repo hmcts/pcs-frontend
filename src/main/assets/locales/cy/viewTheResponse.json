@@ -32,6 +32,7 @@
     "dateOfBirth": "Dyddiad geni",
     "email": "Cyfeiriad e-bost",
     "phone": "cyPhone number",
+    "smsMobileNumber": "cySMS mobile number",
     "address": "cyPostal address",
     "contactPreferences": "cyContact preferences",
     "freeLegalAdvice": "A ydych wedi cael unrhyw gyngor cyfreithiol am ddim?",
