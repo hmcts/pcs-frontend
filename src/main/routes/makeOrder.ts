@@ -269,7 +269,10 @@ export default function makeOrderRoutes(app: Application): void {
       }
       const validationIssues = action === 'SUBMIT_FOR_REVIEW' ? validateMakeOrder(orderType, formData) : [];
       if (validationIssues.length) {
-        const envelope = await loadEnvelope(accessToken, caseReference);
+        const latest = await loadEnvelope(accessToken, caseReference);
+        // Keep the version the judge's answers were made against, so that if the draft was saved
+        // elsewhere meanwhile, pcs-api refuses the retry rather than overwriting that save.
+        const envelope = { ...latest, order: { ...latest.order, id: orderId, version: Number(orderVersion) } };
         const orderDocumentJson = typeof orderDocument === 'string' ? orderDocument : '';
         return res
           .status(400)

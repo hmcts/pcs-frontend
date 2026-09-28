@@ -100,6 +100,33 @@ describe('make an order: drafting', () => {
     expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Carried on after reloading');
   });
 
+  it('does not let a retry after validation errors overwrite a save from another tab', async () => {
+    const firstTab = (await app.get(PAGE)).text;
+
+    const secondTab = await openPage((await app.get(PAGE)).text);
+    type('hearing-notes', 'Saved from the second tab');
+    const second = secondTab.body();
+    second.set('action', 'SAVE_DRAFT');
+    expect((await app.post(PAGE, second)).status).toBe(302);
+
+    const stale = await openPage(firstTab);
+    type('hearing-notes', 'Typed in the first tab');
+    const incomplete = stale.body();
+    incomplete.set('action', 'SUBMIT_FOR_REVIEW');
+    const invalid = await app.post(PAGE, incomplete);
+    expect(invalid.status).toBe(400);
+
+    const retry = (await openPage(invalid.text)).body();
+    expect(retry.get('orderVersion')).toBe(incomplete.get('orderVersion'));
+    retry.set('action', 'SAVE_DRAFT');
+    const refused = await app.post(PAGE, retry);
+    expect(refused.status).toBe(422);
+    expect(refused.text).toContain('The order draft has been updated by another user');
+
+    await openPage((await app.get(PAGE)).text);
+    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Saved from the second tab');
+  });
+
   it('starts a new draft, and says why, when the order was sent for review from another tab', async () => {
     const firstTab = (await app.get(PAGE)).text;
 
