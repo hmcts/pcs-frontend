@@ -31,8 +31,10 @@ export function money(raw: string): string {
   return amount === undefined ? AMOUNT_NOT_PROVIDED : formatMoney(amount);
 }
 
+const PERIODS: Record<string, string> = { weekly: 'week', fortnightly: 'fortnight', monthly: 'month' };
+
 export function frequency(data: OrderData, name: string): string {
-  return value(data, name) === 'weekly' ? 'week' : 'month';
+  return PERIODS[value(data, name)] ?? '[frequency not provided]';
 }
 
 export function sentenceCase(text: string): string {

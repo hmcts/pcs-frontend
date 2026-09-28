@@ -107,4 +107,19 @@ describe('make an order: limits', () => {
       'Costs amount must be £1,000,000,000 or less',
     ]);
   });
+
+  it('takes adjourned payments every week, fortnight or month', async () => {
+    const payments = {
+      'adj-type': 'generally',
+      'adj-gen': 'payments',
+      'adj-gen-payments-amount': '100',
+      'adj-gen-payments-date-day': '1',
+      'adj-gen-payments-date-month': '10',
+      'adj-gen-payments-date-year': '2026',
+    };
+    expect(await errors('tab-adjournment', { ...payments, 'adj-gen-payments-frequency': 'fortnightly' })).toEqual([]);
+    expect(await errors('tab-adjournment', { ...payments, 'adj-gen-payments-frequency': 'yearly' })).toEqual([
+      'Select weekly, fortnightly or monthly payments',
+    ]);
+  });
 });

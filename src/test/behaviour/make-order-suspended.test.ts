@@ -89,6 +89,30 @@ describe('make an order: suspended possession', () => {
     expect(submitted.location).toBe(MANAGE_CASE_URL);
   });
 
+  it('takes instalments every week, fortnight or month', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-suspended');
+    type('suspended-arrears', '1200');
+    check('suspended-payment-terms', 'instalments');
+    type('suspended-instalment-amount', '100');
+    typeDate('suspended-instalment-date', '1', '11', '2026');
+    expect(
+      [...control<HTMLSelectElement>('[name="suspended-instalment-frequency"]').options].map(option => option.text)
+    ).toEqual(['Weekly', 'Fortnightly', 'Monthly']);
+
+    type('suspended-instalment-frequency', 'fortnightly');
+    expect(page.orderText()).toContain('by payments of £100.00 to the claimant every fortnight, the first instalment');
+
+    recordAttendance();
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    expect((await app.post(PAGE, body)).status).toBe(302);
+    body.set('suspended-instalment-frequency', 'yearly');
+    const rejected = await app.post(PAGE, body);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Select weekly, fortnightly or monthly instalments');
+  });
+
   it('treats a money judgment and an adjourned money claim as alternatives', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-suspended');
