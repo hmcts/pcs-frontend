@@ -202,6 +202,7 @@ export function initMakeOrder(): void {
       }
     },
   });
+  const unreadable = document.querySelector<HTMLElement>('[data-order-document-unreadable]');
   const render = (): void => editor.render(buildOrderDocument(form));
   const selectOrderType = (type: OrderType): void => {
     if (orderType === type) {
@@ -210,7 +211,15 @@ export function initMakeOrder(): void {
     orderType = type;
     orderTypeField.value = type;
     syncSuspendedOnlyCosts(form, type);
-    editor.load(documents[type]);
+    try {
+      editor.load(documents[type]);
+    } catch {
+      // A saved document this editor cannot read, such as one from an older Docweave, would otherwise
+      // stop the page working. Rebuild it from the answers; the next save replaces it.
+      delete documents[type];
+      editor.load(undefined);
+      unreadable?.removeAttribute('hidden');
+    }
     render();
   };
 

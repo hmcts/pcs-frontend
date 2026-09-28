@@ -167,6 +167,27 @@ describe('make an order: drafting', () => {
     expect(reopened.documentText()).toContain(wording);
   });
 
+  it('rebuilds a saved document the editor cannot open, and says so', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-free-form');
+    type('free-form-text', 'The claim is stayed.');
+    const body = page.body();
+    body.set('action', 'SAVE_DRAFT');
+    // A document from a Docweave this page does not understand.
+    body.set('orderDocument', JSON.stringify({ ...JSON.parse(body.get('orderDocument')!), version: 99 }));
+    expect((await app.post(PAGE, body)).status).toBe(302);
+
+    const reopened = await openPage((await app.get(PAGE)).text);
+    expect(control('[data-order-document-unreadable]').hidden).toBe(false);
+    expect(reopened.documentText()).toBe(['IT IS ORDERED THAT:', 'The claim is stayed.'].join('\n'));
+
+    const resave = reopened.body();
+    resave.set('action', 'SAVE_DRAFT');
+    expect((await app.post(PAGE, resave)).status).toBe(302);
+    await openPage((await app.get(PAGE)).text);
+    expect(control('[data-order-document-unreadable]').hidden).toBe(true);
+  });
+
   it('offers quick dates and a collapsible case facts panel', async () => {
     await openPage((await app.get(PAGE)).text);
     check('outright-possession', 'by');
