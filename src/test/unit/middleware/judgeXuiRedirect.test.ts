@@ -1,10 +1,10 @@
 import type { NextFunction, Request, Response } from 'express';
 
-const mockIsJudgeUser = jest.fn();
+const mockIsStaffUser = jest.fn();
 const mockConfigGet = jest.fn();
 
 jest.mock('../../../main/steps/utils', () => ({
-  isJudgeUser: (...args: unknown[]) => mockIsJudgeUser(...args),
+  isStaffUser: (...args: unknown[]) => mockIsStaffUser(...args),
 }));
 
 jest.mock('config', () => ({
@@ -40,8 +40,8 @@ describe('judgeXuiRedirectMiddleware', () => {
     next = jest.fn();
   });
 
-  it('allows non-judge users through', () => {
-    mockIsJudgeUser.mockReturnValue(false);
+  it('allows users who are not staff through', () => {
+    mockIsStaffUser.mockReturnValue(false);
 
     invokeMiddleware('/claims');
 
@@ -49,8 +49,8 @@ describe('judgeXuiRedirectMiddleware', () => {
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
-  it.each(['/', '/claims', '/case/1234567890123456/dashboard'])('redirects judges from %s to XUI', path => {
-    mockIsJudgeUser.mockReturnValue(true);
+  it.each(['/', '/claims', '/case/1234567890123456/dashboard'])('redirects staff from %s to XUI', path => {
+    mockIsStaffUser.mockReturnValue(true);
 
     invokeMiddleware(path);
 
@@ -61,16 +61,16 @@ describe('judgeXuiRedirectMiddleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('returns judges to the case when an event they cannot use is handed over from XUI', () => {
-    mockIsJudgeUser.mockReturnValue(true);
+  it('returns staff to the case when an event they cannot use is handed over from XUI', () => {
+    mockIsStaffUser.mockReturnValue(true);
 
     invokeMiddleware('/cases/1234567890123456/event/ext%3ArespondPossessionClaim');
 
     expect(res.redirect).toHaveBeenCalledWith(303, `${CASE_DETAILS_BASE_URL}/1234567890123456`);
   });
 
-  it('redirects judges from a path with malformed encoding to XUI', () => {
-    mockIsJudgeUser.mockReturnValue(true);
+  it('redirects staff from a path with malformed encoding to XUI', () => {
+    mockIsStaffUser.mockReturnValue(true);
 
     invokeMiddleware('/claims%E0%A4%A');
 
@@ -83,7 +83,7 @@ describe('judgeXuiRedirectMiddleware', () => {
     // How XUI builds the hand-off: encodeURIComponent(eventId)
     '/cases/1234567890123456/event/ext%3AmakeOrder',
   ])('allows the %s judicial journey through', path => {
-    mockIsJudgeUser.mockReturnValue(true);
+    mockIsStaffUser.mockReturnValue(true);
 
     invokeMiddleware(path);
 
@@ -92,7 +92,7 @@ describe('judgeXuiRedirectMiddleware', () => {
   });
 
   it('allows Docweave template requests made by the make-order journey through', () => {
-    mockIsJudgeUser.mockReturnValue(true);
+    mockIsStaffUser.mockReturnValue(true);
 
     invokeMiddleware('/docweave/templates/order-template');
 
@@ -101,7 +101,7 @@ describe('judgeXuiRedirectMiddleware', () => {
   });
 
   it('allows the session heartbeat through for an active judicial journey', () => {
-    mockIsJudgeUser.mockReturnValue(true);
+    mockIsStaffUser.mockReturnValue(true);
 
     invokeMiddleware('/active');
 

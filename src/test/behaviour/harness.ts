@@ -11,8 +11,10 @@ import express, { type Express, type Request, type Response } from 'express';
 export const CASE_REFERENCE = '1777027600017760';
 export const MANAGE_CASE_URL = `http://manage-case.test/cases/case-details/PCS/PCS/${CASE_REFERENCE}`;
 
-const JUDGE = { uid: 'judge-uid', sub: 'judge-uid', roles: ['caseworker-civil-judge'] };
+// IDAM gives a judge the same roles as a caseworker; CCD knows them from their role assignments.
+const JUDGE = { uid: 'judge-uid', sub: 'judge-uid', roles: ['caseworker', 'caseworker-pcs'] };
 const CITIZEN = { uid: 'citizen-uid', sub: 'citizen-uid', roles: ['citizen'] };
+const CASEWORKER = { uid: 'caseworker-uid', sub: 'caseworker-uid', roles: ['caseworker', 'caseworker-pcs'] };
 
 function jwt(claims: Record<string, unknown>): string {
   const encode = (value: unknown): string => Buffer.from(JSON.stringify(value)).toString('base64url');
@@ -44,9 +46,20 @@ const blankCase = (): Envelope => ({
 
 /** Minimal CCD: hands out the stored envelope and applies posted make-order events to it. */
 let envelope = blankCase();
+
+/** CCD lets only the judge, whom it knows by their role assignments, use the make order event. */
+function isJudge(req: Request): boolean {
+  const token = (req.headers.authorization ?? '').replace(/^Bearer /, '');
+  const claims = JSON.parse(Buffer.from(token.split('.')[1] ?? '', 'base64url').toString() || '{}');
+  return claims.uid === JUDGE.uid;
+}
+
 function ccdStub(): Express {
   const ccd = express();
   ccd.use(express.json());
+  ccd.use((req: Request, res: Response, next) =>
+    isJudge(req) ? next() : res.status(403).json({ message: 'Forbidden' })
+  );
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
     res.json({ token: 'event-token', case_details: { case_data: { sdkEventPayload: JSON.stringify(envelope) } } });
   });
@@ -90,7 +103,7 @@ export interface TestApp {
 let ccd: http.Server | undefined;
 afterAll(() => ccd?.close());
 
-export async function bootApp(options: { judge?: boolean } = {}): Promise<TestApp> {
+export async function bootApp(options: { judge?: boolean; caseworker?: boolean } = {}): Promise<TestApp> {
   envelope = blankCase();
   ccd ??= await listen(ccdStub());
   process.env.CCD_URL = `http://127.0.0.1:${(ccd.address() as AddressInfo).port}`;
@@ -124,7 +137,7 @@ export async function bootApp(options: { judge?: boolean } = {}): Promise<TestAp
     typeof fallback === 'string' ? fallback : key
   );
   app.use((req: Request, res: Response, next) => {
-    const user = options.judge === false ? CITIZEN : JUDGE;
+    const user = options.caseworker ? CASEWORKER : options.judge === false ? CITIZEN : JUDGE;
     Object.assign(req, {
       session: { user: { ...user, accessToken: jwt({ ...user, exp: Math.floor(Date.now() / 1000) + 3600 }) } },
     });
