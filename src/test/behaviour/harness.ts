@@ -74,7 +74,8 @@ function isJudge(req: Request): boolean {
 
 function ccdStub(): Express {
   const ccd = express();
-  ccd.use(express.json());
+  // CCD takes events far larger than express's 100kb default.
+  ccd.use(express.json({ limit: '10mb' }));
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
     // Once the draft is sent for review, the judge is offered a new one.
     const current = envelope.order.state === 'DRAFT' ? envelope : { ...envelope, order: blankCase().order };
@@ -157,7 +158,7 @@ export async function bootApp(
   httpService.setToken('s2s-token', Date.now() + 60 * 60 * 1000);
 
   const app = express();
-  app.use(express.urlencoded({ extended: false }));
+  app.use(express.urlencoded({ extended: false, limit: '2mb' }));
   new Nunjucks(false).enableFor(app);
   app.locals.nunjucksEnv.addGlobal('sessionTimeout', {});
   // LaunchDarkly, with the make order flag on unless a test turns it off.
