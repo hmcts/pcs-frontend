@@ -230,11 +230,21 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
   return [...issues, ...validateCosts(formData, false)];
 }
 
+function validateStrikeOut(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const { issues, add } = validation(formData);
+  add(
+    ['struck-out', 'dismissed'].includes(value(formData, 'strike-claim-outcome')),
+    'strike-claim-outcome',
+    'Select whether the claim is struck out or dismissed'
+  );
+  return [...issues, ...validateCosts(formData, false)];
+}
+
 const validators: Record<MakeOrderType, (formData: Record<string, unknown>) => MakeOrderValidationIssue[]> = {
   OUTRIGHT_POSSESSION: validateOutright,
   SUSPENDED_POSSESSION: validateSuspended,
   ADJOURNMENT: validateAdjournment,
-  STRIKE_OUT_DISMISSAL: () => [],
+  STRIKE_OUT_DISMISSAL: validateStrikeOut,
   FREE_FORM: formData =>
     value(formData, 'free-form-text') ? [] : [{ id: 'free-form-text', message: 'Enter the order wording' }],
 };
