@@ -66,7 +66,7 @@
 
 {% set useOccupationHtml %}
   {% call compact.row() %}
-    {{ compact.money({ id: "suspended-use-occupation-rate", label: "Daily rate", inputmode: "decimal" }) }}
+    {{ compact.money({ id: "suspended-use-occupation-rate", label: "Daily rate" }) }}
     {{ compact.date({ id: "suspended-use-occupation-from-date", legend: "From" }) }}
   {% endcall %}
 {% endset %}

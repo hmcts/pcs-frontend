@@ -59,6 +59,18 @@ describe('make an order: outright possession', () => {
     expect(control('#outright-mj-amounts').nextElementSibling?.textContent).toBe('Return to document');
   });
 
+  it('leaves the judgment total unknown while the interest is not an amount the order can take', async () => {
+    app = await bootApp();
+    const page = await openPage((await app.get(PAGE)).text);
+    check('outright-options', 'money-judgment');
+    check('outright-mj-sections', 'arrears');
+    type('outright-mj-arrears', '500');
+    type('outright-mj-interest', '2,000,000,000');
+    expect(page.orderText()).toContain('Judgment for the claimant(s) in the total sum of £[amount not provided].');
+    type('outright-mj-interest', '');
+    expect(page.orderText()).toContain('Judgment for the claimant(s) in the sum of £500.00.');
+  });
+
   it('starts a blank draft, builds the order from the form and sends it for review', async () => {
     app = await bootApp();
     const response = await app.get(PAGE);

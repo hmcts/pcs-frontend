@@ -1,4 +1,4 @@
-import { parseDate, parseMoney } from './makeOrderFormat';
+import { MAX_MONEY, exceedsMaxMoney, parseDate, parseMoney } from './makeOrderFormat';
 
 export const MAKE_ORDER_TYPES = [
   'OUTRIGHT_POSSESSION',
@@ -64,8 +64,20 @@ function textLength(formData: Record<string, unknown>, name: string): number {
   return value(formData, name).replace(/\r\n/g, '\n').length;
 }
 
-function hasValidMoney(formData: Record<string, unknown>, name: string): boolean {
-  return parseMoney(value(formData, name)) !== undefined;
+/**
+ * Why an amount is not valid, or nothing if it is. `message` asks for a valid amount, as in "Enter a
+ * valid current rent"; an amount over the limit is named from it: "Current rent must be …".
+ */
+function moneyError(formData: Record<string, unknown>, name: string, message: string): string | undefined {
+  const raw = value(formData, name);
+  if (parseMoney(raw) !== undefined) {
+    return undefined;
+  }
+  if (!exceedsMaxMoney(raw)) {
+    return message;
+  }
+  const amount = message.replace(/^Enter (a )?valid /, '');
+  return `${amount[0].toUpperCase()}${amount.slice(1)} must be £${MAX_MONEY.toLocaleString('en-GB')} or less`;
 }
 
 function hasValidDate(formData: Record<string, unknown>, prefix: string): boolean {
@@ -85,11 +97,15 @@ function validation(formData: Record<string, unknown>) {
       issues.push({ id, message });
     }
   };
+  const addMoney = (id: string, error: string | undefined): void => add(!error, id, error ?? '');
   return {
     issues,
     add,
     maxLength: (id: string, max: number, message: string): void => add(textLength(formData, id) <= max, id, message),
-    money: (id: string, message: string): void => add(hasValidMoney(formData, id), id, message),
+    money: (id: string, message: string): void => addMoney(id, moneyError(formData, id, message)),
+    /** An amount the judge need not give, but which must be valid if they do. */
+    optionalMoney: (id: string, message: string): void =>
+      addMoney(id, value(formData, id) ? moneyError(formData, id, message) : undefined),
     date: (prefix: string, message: string): void => add(hasValidDate(formData, prefix), `${prefix}-day`, message),
   };
 }
@@ -113,10 +129,10 @@ function validateCosts(formData: Record<string, unknown>, suspended: boolean): M
   if (choice === 'other' && !value(formData, 'costs-other-text')) {
     return [{ id: 'costs-other-text', message: 'Enter the costs order' }];
   }
-  if (!amountType || hasValidMoney(formData, id)) {
-    return [];
-  }
-  return [{ id, message: suspended ? `Enter a valid ${amountType} costs amount` : 'Enter a valid costs amount' }];
+  const error =
+    amountType &&
+    moneyError(formData, id, suspended ? `Enter a valid ${amountType} costs amount` : 'Enter a valid costs amount');
+  return error ? [{ id, message: error }] : [];
 }
 
 function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
@@ -148,7 +164,7 @@ function validateSuspended(formData: Record<string, unknown>): MakeOrderValidati
 }
 
 function validateOutright(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const { issues, add, money, date, maxLength } = validation(formData);
+  const { issues, add, money, optionalMoney, date, maxLength } = validation(formData);
   const possession = value(formData, 'outright-possession');
   const options = values(formData, 'outright-options');
 
@@ -180,11 +196,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
     );
     if (sections.includes('arrears')) {
       money('outright-mj-arrears', 'Enter a valid arrears amount');
-      add(
-        !value(formData, 'outright-mj-interest') || hasValidMoney(formData, 'outright-mj-interest'),
-        'outright-mj-interest',
-        'Enter a valid interest amount'
-      );
+      optionalMoney('outright-mj-interest', 'Enter a valid interest amount');
     }
     if (sections.includes('payment-plan')) {
       const plans = values(formData, 'outright-mj-plan');
@@ -316,6 +328,17 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
   return issues;
 }
 
+/** The judge's own figures for the case, which they need not give. */
+function validateCaseFacts(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const { issues, optionalMoney } = validation(formData);
+  optionalMoney('arrears-notice', 'Enter valid arrears at notice');
+  optionalMoney('current-rent', 'Enter a valid current rent');
+  optionalMoney('arrears-issue', 'Enter valid arrears on issue');
+  optionalMoney('last-payment', 'Enter a valid last payment');
+  optionalMoney('arrears-today', 'Enter valid arrears today');
+  return issues;
+}
+
 /** A long text box the page has whatever the order type: hearing notes, recitals or the staff message. */
 function validateText(formData: Record<string, unknown>, id: string, name: string): MakeOrderValidationIssue[] {
   const { issues, maxLength } = validation(formData);
@@ -346,6 +369,7 @@ export function validateMakeOrder(
   const chosen = (name: string): boolean => values(formData, name).includes('yes');
   // In the order the page asks, so the error summary follows the page.
   return [
+    ...validateCaseFacts(formData),
     ...validateText(formData, 'hearing-notes', 'Hearing notes'),
     ...validateAttendance(formData, parties),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),

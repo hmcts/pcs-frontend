@@ -69,4 +69,42 @@ describe('make an order: limits', () => {
       'Details of grounds must be 100 characters or less',
     ]);
   });
+
+  it('takes amounts of up to £1,000,000,000 in pounds and pence', async () => {
+    const judgment = {
+      'outright-possession': 'forthwith',
+      'outright-grounds-type': 'mandatory',
+      'outright-options': 'money-judgment',
+      'outright-mj-sections': 'arrears',
+      costs: 'yes',
+      'costs-choice': 'def-pay-cl-fixed',
+    };
+    expect(
+      await errors('tab-outright', {
+        ...judgment,
+        'current-rent': '1,000,000,000',
+        'outright-mj-arrears': '1000000000.00',
+        'outright-mj-interest': '0.5',
+        'costs-def-pay-cl-fixed-amount': '355',
+      })
+    ).toEqual([]);
+    expect(
+      await errors('tab-outright', {
+        ...judgment,
+        'arrears-notice': '-5',
+        'current-rent': '750.001',
+        'arrears-today': '1000000000.01',
+        'outright-mj-arrears': '2,000,000,000',
+        'outright-mj-interest': 'ten pounds',
+        'costs-def-pay-cl-fixed-amount': '1000000001',
+      })
+    ).toEqual([
+      'Enter valid arrears at notice',
+      'Enter a valid current rent',
+      'Arrears today must be £1,000,000,000 or less',
+      'Arrears amount must be £1,000,000,000 or less',
+      'Enter a valid interest amount',
+      'Costs amount must be £1,000,000,000 or less',
+    ]);
+  });
 });
