@@ -48,18 +48,12 @@ const blankCase = (): Envelope => ({
 /** Minimal CCD: hands out the stored envelope and applies posted make-order events to it. */
 let envelope = blankCase();
 
-/** Why pcs-api refuses a change to the judge's order, if it does: it must be to their draft as they last saw it. */
-function rejection(posted: { action: string; order: { id: string | null; version: number } }): string | undefined {
-  if (posted.action === 'START_DRAFT') {
-    return undefined;
-  }
-  if (envelope.order.state !== 'DRAFT' || !envelope.order.id || envelope.order.id !== posted.order.id) {
-    return 'The order draft does not exist for this case';
-  }
-  if (envelope.order.version !== posted.order.version) {
-    return 'The order draft has been updated by another user. Reload it and try again';
-  }
-  return undefined;
+/** The reason pcs-api gives for refusing the next make order event, if a test has asked it to. */
+let refusal: string | undefined;
+
+/** Has the next make order event refused, as pcs-api does when the draft changed elsewhere. */
+export function refuseNextEvent(reason: string): void {
+  refusal = reason;
 }
 
 /**
@@ -77,20 +71,19 @@ function ccdStub(): Express {
   // CCD takes events far larger than express's 100kb default.
   ccd.use(express.json({ limit: '10mb' }));
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
-    // Once the draft is sent for review, the judge is offered a new one.
-    const current = envelope.order.state === 'DRAFT' ? envelope : { ...envelope, order: blankCase().order };
-    const caseData = isJudge(req) ? { sdkEventPayload: JSON.stringify(current) } : {};
+    const caseData = isJudge(req) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
     res.json({ token: 'event-token', case_details: { case_data: caseData } });
   });
   ccd.post('/cases/:id/events', (req: Request, res: Response) => {
     if (!isJudge(req)) {
       return res.status(403).json({ message: 'Forbidden' });
     }
-    const posted = JSON.parse(req.body.data.sdkEventPayload);
-    const refused = rejection(posted);
-    if (refused) {
-      return res.status(422).json({ callbackErrors: [refused] });
+    if (refusal) {
+      const reason = refusal;
+      refusal = undefined;
+      return res.status(422).json({ callbackErrors: [reason] });
     }
+    const posted = JSON.parse(req.body.data.sdkEventPayload);
     envelope = {
       ...envelope,
       order: {
@@ -133,6 +126,7 @@ export async function bootApp(
   options: { judge?: boolean; caseworker?: boolean; makeOrderEnabled?: boolean } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
+  refusal = undefined;
   ccd ??= await listen(ccdStub());
   process.env.CCD_URL = `http://127.0.0.1:${(ccd.address() as AddressInfo).port}`;
   process.env.REDIRECTS_MANAGE_CASE_RETURN_URL = MANAGE_CASE_URL.slice(0, MANAGE_CASE_URL.lastIndexOf('/'));

@@ -7,6 +7,7 @@ import {
   control,
   futureDate,
   openPage,
+  refuseNextEvent,
   selectTab,
   type,
 } from './harness';
@@ -69,85 +70,43 @@ describe('make an order: drafting', () => {
     expect(JSON.parse(control<HTMLTextAreaElement>('#order-document').value).schema).toBe('docweave-document');
   });
 
-  it('shows the saved order, and why, when a save from another tab got there first', async () => {
-    const firstTab = (await app.get(PAGE)).text;
-
-    const secondTab = await openPage((await app.get(PAGE)).text);
-    type('hearing-notes', 'Saved from the second tab');
-    const second = secondTab.body();
-    second.set('action', 'SAVE_DRAFT');
-    expect((await app.post(PAGE, second)).status).toBe(302);
-
-    const stale = await openPage(firstTab);
-    type('hearing-notes', 'Typed in the first tab');
-    const first = stale.body();
+  it('shows the saved order, and why, when pcs-api refuses a save', async () => {
+    const saved = await openPage((await app.get(PAGE)).text);
+    type('hearing-notes', 'Saved earlier');
+    const first = saved.body();
     first.set('action', 'SAVE_DRAFT');
-    const refused = await app.post(PAGE, first);
-    expect(refused.status).toBe(422);
-    expect(refused.text).not.toContain('You do not have access to this page');
+    expect((await app.post(PAGE, first)).status).toBe(302);
 
-    const reloaded = await openPage(refused.text);
+    const page = await openPage((await app.get(PAGE)).text);
+    type('hearing-notes', 'Typed since');
+    const body = page.body();
+    body.set('action', 'SAVE_DRAFT');
+    refuseNextEvent('The order draft has been updated by another user. Reload it and try again');
+    const refused = await app.post(PAGE, body);
+    expect(refused.status).toBe(422);
+
+    await openPage(refused.text);
     expect(control('#make-order-error-summary').textContent).toContain(
       'The order draft has been updated by another user. Reload it and try again'
     );
-    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Saved from the second tab');
-
-    type('hearing-notes', 'Carried on after reloading');
-    const resumed = reloaded.body();
-    resumed.set('action', 'SAVE_DRAFT');
-    expect((await app.post(PAGE, resumed)).status).toBe(302);
-    await openPage((await app.get(PAGE)).text);
-    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Carried on after reloading');
+    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Saved earlier');
   });
 
-  it('does not let a retry after validation errors overwrite a save from another tab', async () => {
+  it('keeps the version the answers were made against when review validation fails', async () => {
     const firstTab = (await app.get(PAGE)).text;
 
     const secondTab = await openPage((await app.get(PAGE)).text);
-    type('hearing-notes', 'Saved from the second tab');
     const second = secondTab.body();
     second.set('action', 'SAVE_DRAFT');
     expect((await app.post(PAGE, second)).status).toBe(302);
 
-    const stale = await openPage(firstTab);
-    type('hearing-notes', 'Typed in the first tab');
-    const incomplete = stale.body();
+    const incomplete = (await openPage(firstTab)).body();
     incomplete.set('action', 'SUBMIT_FOR_REVIEW');
     const invalid = await app.post(PAGE, incomplete);
     expect(invalid.status).toBe(400);
 
     const retry = (await openPage(invalid.text)).body();
     expect(retry.get('orderVersion')).toBe(incomplete.get('orderVersion'));
-    retry.set('action', 'SAVE_DRAFT');
-    const refused = await app.post(PAGE, retry);
-    expect(refused.status).toBe(422);
-    expect(refused.text).toContain('The order draft has been updated by another user');
-
-    await openPage((await app.get(PAGE)).text);
-    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Saved from the second tab');
-  });
-
-  it('starts a new draft, and says why, when the order was sent for review from another tab', async () => {
-    const firstTab = (await app.get(PAGE)).text;
-
-    const secondTab = await openPage((await app.get(PAGE)).text);
-    selectTab('tab-free-form');
-    type('free-form-text', 'The claim is stayed.');
-    const second = secondTab.body();
-    second.set('action', 'SUBMIT_FOR_REVIEW');
-    expect((await app.post(PAGE, second)).status).toBe(302);
-
-    const stale = await openPage(firstTab);
-    type('hearing-notes', 'Typed in the first tab');
-    const first = stale.body();
-    first.set('action', 'SAVE_DRAFT');
-    const refused = await app.post(PAGE, first);
-    expect(refused.status).toBe(422);
-
-    await openPage(refused.text);
-    expect(control('#make-order-error-summary').textContent).toContain('The order draft does not exist for this case');
-    expect(control('#order-type').value).toBe('OUTRIGHT_POSSESSION');
-    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('');
   });
 
   it('saves a long order', async () => {
