@@ -4,7 +4,7 @@ import config from 'config';
 import { Application, Request, Response } from 'express';
 import { DateTime } from 'luxon';
 
-import { HTTPError } from '../HttpError';
+import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { MAKE_ORDER_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 import { getUserRoles } from '../steps/utils';
@@ -145,10 +145,11 @@ function attendanceParties({ caseContext }: MakeOrderStart): Record<string, stri
   return [...parties('claimant', caseContext.claimants), ...parties('defendant', caseContext.defendants)];
 }
 
+/** What the judge sent, shown back with the issues that stopped it; the saved order fills any gaps. */
 interface Submission {
-  orderType: MakeOrderType;
-  formData: FormData;
-  orderDocumentJson: string;
+  orderType?: MakeOrderType;
+  formData?: FormData;
+  orderDocumentJson?: string;
   validationIssues: MakeOrderValidationIssue[];
 }
 
@@ -275,13 +276,24 @@ export default function makeOrderRoutes(app: Application): void {
           .render('make-order', pageModel(req, envelope, { orderType, formData, orderDocumentJson, validationIssues }));
       }
       const document = parseDocument(orderDocument);
-      await submitOrderEvent(accessToken, caseReference, action, {
-        id: orderId || null,
-        version: Number(orderVersion),
-        orderType,
-        formData,
-        docweaveSnapshot: document ?? null,
-      });
+      try {
+        await submitOrderEvent(accessToken, caseReference, action, {
+          id: orderId || null,
+          version: Number(orderVersion),
+          orderType,
+          formData,
+          docweaveSnapshot: document ?? null,
+        });
+      } catch (error) {
+        if (!(error instanceof CallbackRejectedError)) {
+          throw error;
+        }
+        // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
+        // tab: show the judge the order as it now stands, and why.
+        const envelope = await loadOrStartDraft(accessToken, caseReference);
+        const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
+        return res.status(error.status).render('make-order', pageModel(req, envelope, { validationIssues: reasons }));
+      }
       const manageCaseUrl = buildManageCaseDetailsRedirect(config.get('redirects.manageCaseReturnURL'), caseReference);
       if (!manageCaseUrl) {
         throw new HTTPError('The Manage Case return URL is not configured', 500);
