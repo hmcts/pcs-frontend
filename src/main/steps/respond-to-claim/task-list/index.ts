@@ -9,6 +9,7 @@ import {
   respondToClaimSections,
 } from '../sections.config';
 import { stepRegistry } from '../stepRegistry';
+import { forgetYourSupportOrigin } from '../yourSupportSection';
 
 import { createGetController, createStepNavigation, getTranslationFunction } from '@modules/steps';
 import type { SectionConfig, SectionStatus } from '@modules/steps/stepFlow.interface';
@@ -64,6 +65,9 @@ export const step: StepDefinition = {
     createGetController(VIEW, stepName, stepNavigation, async (req: Request) => {
       const validatedCase = req.res?.locals.validatedCase;
       const t: TFunction = getTranslationFunction(req);
+
+      // Landing here ends any Your Support detour for this case, so drop its remembered origin.
+      forgetYourSupportOrigin(req, validatedCase?.id);
 
       const allStatuses = await getAllSectionStatuses(flowConfig, stepRegistry, req);
       const groups = buildGroups(validatedCase, allStatuses, t, req);

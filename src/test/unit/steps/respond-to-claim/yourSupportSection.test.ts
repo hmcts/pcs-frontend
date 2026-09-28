@@ -10,6 +10,7 @@ import type { Request } from 'express';
 import {
   YOUR_SUPPORT_SECTION_ENUM,
   addYourSupportToCompletedSections,
+  forgetYourSupportOrigin,
   getYourSupportReturnUrl,
   getYourSupportTriageUrl,
   isYourSupportSectionComplete,
@@ -129,6 +130,33 @@ describe('rememberYourSupportOrigin', () => {
     const noCase = build({ query: { from: 'dashboard' } });
     rememberYourSupportOrigin(noCase);
     expect(noCase.session.yourSupportReturnTo).toBeUndefined();
+  });
+});
+
+describe('forgetYourSupportOrigin', () => {
+  it('drops the entry for this case and keeps the others', () => {
+    const req = build({ id: CASE, recorded: { [CASE]: 'dashboard', [OTHER_CASE]: 'task-list' } });
+
+    forgetYourSupportOrigin(req, CASE);
+
+    expect(req.session.yourSupportReturnTo).toEqual({ [OTHER_CASE]: 'task-list' });
+  });
+
+  it('removes the map altogether once the last entry goes', () => {
+    const req = build({ id: CASE, recorded: { [CASE]: 'dashboard' } });
+
+    forgetYourSupportOrigin(req, CASE);
+
+    expect(req.session.yourSupportReturnTo).toBeUndefined();
+  });
+
+  it('is a no-op without a session, a case reference, or a recorded entry for the case', () => {
+    expect(() => forgetYourSupportOrigin(build({ id: CASE, session: false }), CASE)).not.toThrow();
+
+    const untouched = build({ id: CASE, recorded: { [OTHER_CASE]: 'dashboard' } });
+    forgetYourSupportOrigin(untouched, undefined);
+    forgetYourSupportOrigin(untouched, CASE);
+    expect(untouched.session.yourSupportReturnTo).toEqual({ [OTHER_CASE]: 'dashboard' });
   });
 });
 

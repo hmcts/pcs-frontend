@@ -57,6 +57,25 @@ export function rememberYourSupportOrigin(req: Request): void {
   req.session.yourSupportReturnTo = { ...req.session.yourSupportReturnTo, [caseReference]: origin };
 }
 
+/**
+ * Forgets the recorded origin for this case once the citizen is back where they started.
+ */
+export function forgetYourSupportOrigin(req: Request, caseReference: string | undefined): void {
+  const recorded = req.session?.yourSupportReturnTo;
+  if (!caseReference || !recorded || !(caseReference in recorded)) {
+    return;
+  }
+
+  const remaining = { ...recorded };
+  delete remaining[caseReference];
+
+  if (Object.keys(remaining).length > 0) {
+    req.session.yourSupportReturnTo = remaining;
+  } else {
+    delete req.session.yourSupportReturnTo;
+  }
+}
+
 // The recorded origin for this case, or, when nothing was recorded (a deep link straight to an outcome
 // page), the task list before the response is submitted and the dashboard after.
 function resolveYourSupportOrigin(req: Request, caseReference: string): YourSupportOrigin {

@@ -32,11 +32,12 @@ const mockRouter = {
 function dashboardCaseRequest(options: {
   caseReference: string | undefined;
   sessionUser: { accessToken?: string; roles?: string[] } | undefined;
+  yourSupportReturnTo?: Record<string, 'dashboard' | 'task-list'>;
 }): Request {
-  const { caseReference, sessionUser } = options;
+  const { caseReference, sessionUser, yourSupportReturnTo } = options;
   return {
     params: caseReference === undefined ? {} : { caseReference },
-    session: { user: sessionUser },
+    session: { user: sessionUser, yourSupportReturnTo },
   } as unknown as Request;
 }
 
@@ -634,6 +635,20 @@ describe('Dashboard Routes', () => {
       const tasks = await renderResponseTasks(['caseworker-pcs-solicitor']);
 
       expect(tasks.map(task => task.title.html)).toEqual(['View response title']);
+    });
+
+    it('should forget the remembered Your Support origin for this case only', async () => {
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce(yourSupportDashboardData('AVAILABLE'));
+      dashboardRoutes(app);
+      const req = dashboardCaseRequest({
+        caseReference: '1234567890123456',
+        sessionUser: { accessToken: 'access-token-1' },
+        yourSupportReturnTo: { '1234567890123456': 'dashboard', '9999999999999999': 'task-list' },
+      });
+
+      await getDashboardCaseHandler()(req, { render: jest.fn() } as unknown as Response, jest.fn());
+
+      expect(req.session.yourSupportReturnTo).toEqual({ '9999999999999999': 'task-list' });
     });
   });
 

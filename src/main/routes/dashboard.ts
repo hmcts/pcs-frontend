@@ -5,6 +5,7 @@ import type { TFunction } from 'i18next';
 import { HTTPError } from '../HttpError';
 import { MAKE_GENERAL_APPLICATION_ROUTE, UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware/oidc';
+import { forgetYourSupportOrigin } from '../steps/respond-to-claim/yourSupportSection';
 import { getUserType } from '../steps/utils';
 
 import { getTranslationFunction } from '@modules/i18n';
@@ -206,6 +207,9 @@ export default function dashboardRoutes(app: Application): void {
       );
 
       const propertyAddress = dashboardData.propertyAddress ?? null;
+
+      // Landing here ends any Your Support detour for this case, so drop its remembered origin.
+      forgetYourSupportOrigin(req, caseReference);
 
       return res.render('dashboard', {
         notifications,
