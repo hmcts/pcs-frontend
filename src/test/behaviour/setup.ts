@@ -4,6 +4,8 @@ import { TextDecoder, TextEncoder } from 'node:util';
 // jsdom does not provide these. ProseMirror needs the encoders; express and node http need
 // setImmediate because the application runs in the same process as the page.
 Object.assign(globalThis, { TextDecoder, TextEncoder, setImmediate, clearImmediate });
+// Nor this, which Docweave calls to bring a fact's form control into view.
+Element.prototype.scrollIntoView ??= (): void => undefined;
 
 process.env.LOG_LEVEL ??= 'error';
 

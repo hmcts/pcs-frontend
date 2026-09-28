@@ -40,6 +40,25 @@ describe('make an order: outright possession', () => {
     expect(launch.location).toBe(PAGE);
   });
 
+  it('offers a way back to the document from the arrears and interest behind a judgment total', async () => {
+    app = await bootApp();
+    await openPage((await app.get(PAGE)).text);
+    check('outright-options', 'money-judgment');
+    check('outright-mj-sections', 'arrears');
+    type('outright-mj-arrears', '400');
+    type('outright-mj-interest', '45');
+
+    const fact = (): HTMLElement =>
+      [...document.querySelectorAll<HTMLElement>('[data-generated-text]')].find(
+        element => element.textContent === '445.00'
+      )!;
+    expect(fact().getAttribute('aria-description')).toBe('Arrears and interest');
+    fact().dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+    expect(document.activeElement?.id).toBe('outright-mj-arrears');
+    expect(control('#outright-mj-amounts').nextElementSibling?.textContent).toBe('Return to document');
+  });
+
   it('starts a blank draft, builds the order from the form and sends it for review', async () => {
     app = await bootApp();
     const response = await app.get(PAGE);

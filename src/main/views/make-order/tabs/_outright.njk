@@ -30,7 +30,7 @@
 }) }}
 
 {% set arrearsHtml %}
-  {% call compact.row({ id: "outright-mj-amounts" }) %}
+  {% call compact.row({ id: "outright-mj-amounts", groupLabel: "Arrears and interest" }) %}
     {{ compact.copy("Arrears") }}
     {{ compact.money({ id: "outright-mj-arrears", label: "Arrears", labelHidden: true }) }}
     {{ compact.copy("Interest") }}
