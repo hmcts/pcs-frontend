@@ -280,6 +280,28 @@ export const ccdCaseService = {
     }
   },
 
+  /** Starts an event, for a later `submitCaseEvent` with the token it returns. */
+  async startCaseEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string
+  ): Promise<CcdCase & { eventToken: string }> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    try {
+      const response = await http.get<StartCallbackData>(
+        `${getBaseUrl()}/cases/${safeCaseId}/event-triggers/${eventId}?ignore-warning=false`,
+        getCaseHeaders(accessToken)
+      );
+      return { id: safeCaseId, data: response.data.case_details?.case_data ?? {}, eventToken: response.data.token };
+    } catch (error) {
+      throw convertReadErrorToHttpError(error, 'startCaseEvent');
+    }
+  },
+
   async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
     const safeCaseId = sanitiseCaseReference(caseId);
     if (!safeCaseId) {
@@ -393,19 +415,18 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
   },
 
+  /** Submits an event with the token from the `startCaseEvent` the change was based on. */
   async submitCaseEvent(
     accessToken: string,
     caseId: string,
     eventId: string,
+    eventToken: string,
     data: Record<string, unknown>
   ): Promise<CcdCase> {
     const safeCaseId = sanitiseCaseReference(caseId);
     if (!safeCaseId) {
       throw new HTTPError('Invalid case reference format', 404);
     }
-
-    const eventUrl = `${getBaseUrl()}/cases/${safeCaseId}/event-triggers/${eventId}`;
-    const eventToken = await getEventToken(accessToken, eventUrl);
     return submitEvent(accessToken, `${getBaseUrl()}/cases/${safeCaseId}/events`, eventId, eventToken, data);
   },
 

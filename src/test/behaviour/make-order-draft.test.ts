@@ -5,10 +5,13 @@ import {
   bootApp,
   check,
   control,
+  eventStarts,
   futureDate,
   openPage,
+  recordAttendance,
   refuseNextEvent,
   selectTab,
+  submittedEventTokens,
   type,
 } from './harness';
 
@@ -70,6 +73,39 @@ describe('make an order: drafting', () => {
     expect(JSON.parse(control<HTMLTextAreaElement>('#order-document').value).schema).toBe('docweave-document');
   });
 
+  it("starts the event when the page loads, and submits the judge's change with that start", async () => {
+    // A first visit creates the draft with one start, then starts again to show it.
+    const page = await openPage((await app.get(PAGE)).text);
+    expect(eventStarts()).toBe(2);
+    expect(submittedEventTokens()).toEqual(['event-token-1']);
+    const token = control('[name="eventToken"]').value;
+    expect(token).toBe('event-token-2');
+
+    // Neither a rejected nor an accepted submission starts the event again.
+    selectTab('tab-free-form');
+    const incomplete = page.body();
+    incomplete.set('action', 'SUBMIT_FOR_REVIEW');
+    const invalid = await app.post(PAGE, incomplete);
+    expect(invalid.status).toBe(400);
+    const retry = await openPage(invalid.text);
+    expect(control('[name="eventToken"]').value).toBe(token);
+    expect(control('#make-order-error-summary').textContent).toContain(
+      'Select how Claimant 1: Example Housing attended'
+    );
+
+    type('free-form-text', 'The claim is stayed.');
+    recordAttendance();
+    const body = retry.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    expect((await app.post(PAGE, body)).status).toBe(302);
+    expect(eventStarts()).toBe(2);
+    expect(submittedEventTokens()).toEqual(['event-token-1', 'event-token-2']);
+
+    // Returning to a draft needs only the one start.
+    await app.get(PAGE);
+    expect(eventStarts()).toBe(3);
+  });
+
   it('shows the saved order, and why, when pcs-api refuses a save', async () => {
     const saved = await openPage((await app.get(PAGE)).text);
     type('hearing-notes', 'Saved earlier');
@@ -85,7 +121,11 @@ describe('make an order: drafting', () => {
     const refused = await app.post(PAGE, body);
     expect(refused.status).toBe(422);
 
+    // The refused page is based on a new start, which the judge's next change is submitted with.
+    expect(body.get('eventToken')).toBe(submittedEventTokens().at(-1));
     await openPage(refused.text);
+    expect(control('[name="eventToken"]').value).toBe(`event-token-${eventStarts()}`);
+    expect(control('[name="eventToken"]').value).not.toBe(body.get('eventToken'));
     expect(control('#make-order-error-summary').textContent).toContain(
       'The order draft has been updated by another user. Reload it and try again'
     );
