@@ -156,11 +156,15 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
         const navigationBackUrl = await stepNavigation.getBackUrl(req, stepName);
         const resultProps = result as Record<string, unknown>;
         const backUrl = typeof resultProps.backUrl === 'string' ? resultProps.backUrl : navigationBackUrl;
+        const dashboardUrl =
+          typeof resultProps.dashboardUrl === 'string'
+            ? resultProps.dashboardUrl
+            : getDashboardUrl(req.res?.locals.validatedCase?.id);
         return {
           ...result,
           ccdId: req.res?.locals.validatedCase?.id,
           caseReference: req.res?.locals.validatedCase?.id,
-          dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
+          dashboardUrl,
           stepName,
           journeyFolder,
           languageToggle: t('languageToggle'),

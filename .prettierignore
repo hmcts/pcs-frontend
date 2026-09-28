@@ -5,3 +5,6 @@ src/main/public/main*.js
 .pnp.*
 src/main/views/govuk
 .yarn/
+
+# Prettier reflows the `build: >` block scalars into something ACR won't parse
+acb.tpl.yaml

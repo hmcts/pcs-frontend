@@ -6,9 +6,17 @@ import type { DocumentStorage } from '@modules/documents/storage';
 import type { UploadValidationOptions } from '@utils/documentUploadValidation';
 
 export type FormFieldType =
-  'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup' | 'file';
+  'radio' | 'checkbox' | 'text' | 'date' | 'textarea' | 'character-count' | 'postcodeLookup' | 'file' | 'select';
 export type ComponentType =
-  'input' | 'textarea' | 'characterCount' | 'radios' | 'checkboxes' | 'dateInput' | 'postcodeLookup' | 'fileUpload';
+  | 'input'
+  | 'textarea'
+  | 'characterCount'
+  | 'radios'
+  | 'checkboxes'
+  | 'dateInput'
+  | 'postcodeLookup'
+  | 'fileUpload'
+  | 'select';
 
 export interface FormFieldOption {
   value?: string;
@@ -37,7 +45,8 @@ export interface FormFieldConfig {
   name: string;
   type: FormFieldType;
   id?: string;
-  required?: boolean | ((formData: Record<string, unknown>, allData: Record<string, unknown>) => boolean);
+  required?:
+    boolean | ((formData: Record<string, unknown>, allData: Record<string, unknown>, req?: Request) => boolean);
   pattern?: string;
   maxLength?: number;
   errorMessage?: string;

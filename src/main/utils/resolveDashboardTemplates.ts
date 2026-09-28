@@ -24,16 +24,30 @@ export function lookup(t: TFunction, key: string, values: Record<string, unknown
 
 const withCaseRef = (values: Record<string, unknown>, caseReference: string) => ({ caseReference, ...values });
 
+function withFeeAmountAsNumber(values: Record<string, unknown>): Record<string, unknown> {
+  const feeAmount = values.feeAmount;
+  if (feeAmount === undefined || feeAmount === null || feeAmount === '') {
+    return values;
+  }
+
+  const asNumber = typeof feeAmount === 'number' ? feeAmount : Number(feeAmount);
+  if (Number.isNaN(asNumber)) {
+    return values;
+  }
+
+  return { ...values, feeAmount: asNumber };
+}
+
 export function resolveNotification(
   t: TFunction,
   templateId: string,
   values: Record<string, unknown>,
   caseReference: string
 ): ResolvedNotification | null {
-  const merged = {
+  const merged = withFeeAmountAsNumber({
     ...withCaseRef(values, caseReference),
     ...getNotificationUrlPlaceholders(caseReference),
-  };
+  });
   const title = lookup(t, `dashboard:notifications.${templateId}.title`);
   const body = lookup(t, `dashboard:notifications.${templateId}.body`, merged, true);
   if (!title || !body) {

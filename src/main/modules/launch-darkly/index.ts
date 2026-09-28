@@ -12,9 +12,11 @@ export class LaunchDarkly {
       logger: this.logger,
     });
 
+    // Register before waiting: the SDK retries in the background, so a slow init self-heals.
+    app.locals.launchDarklyClient = client;
+
     try {
       await client.waitForInitialization({ timeout: 10 });
-      app.locals.launchDarklyClient = client;
       this.logger.info('LaunchDarkly client initialized successfully');
     } catch (err) {
       this.logger.error('LaunchDarkly client initialization failed', err);

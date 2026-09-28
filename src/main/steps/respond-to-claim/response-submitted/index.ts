@@ -1,6 +1,8 @@
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { clientContextSessionClearer } from '@utils/clientContextSessionClearer';
+import { getCaseManagementUrl } from '@utils/legalRepresentativeRedirectHandler';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'response-submitted',
@@ -17,7 +19,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     closeAndReturnToCaseOverview: 'closeAndReturnToCaseOverview',
   },
   customTemplate: `${__dirname}/responseSubmitted.njk`,
-  extendGetContent: () => ({
-    backUrl: '',
-  }),
+  extendGetContent: req => {
+    clientContextSessionClearer(req);
+    return {
+      backUrl: '',
+      closeUrl: getCaseManagementUrl(req),
+    };
+  },
 });

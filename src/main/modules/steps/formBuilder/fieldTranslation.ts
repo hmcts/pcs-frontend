@@ -106,6 +106,28 @@ function resolveLabel(
 }
 
 /**
+ * Resolves an option's display text with graceful fallback so a missing or bespoke
+ * translation key
+ */
+function resolveOptionText(t: TFunction, option: FormFieldOption, interpolation?: Record<string, unknown>): string {
+  if (option.text) {
+    return option.text;
+  }
+
+  if (option.translationKey) {
+    const genericKey = `options.${option.translationKey.split('.').pop()}`;
+    return (
+      getTranslation(t, option.translationKey, undefined, interpolation) ??
+      getTranslation(t, genericKey, undefined, interpolation) ??
+      option.value ??
+      ''
+    );
+  }
+
+  return option.value ?? '';
+}
+
+/**
  * Processes options with label functions, conditionalText, and subFields
  */
 function processOptions(
@@ -125,16 +147,7 @@ function processOptions(
     }
 
     // Resolve label (function or string)
-    const optionLabel = resolveLabel(
-      option.label,
-      translations,
-      option.text ||
-        (option.translationKey
-          ? interpolation
-            ? t(option.translationKey, interpolation)
-            : t(option.translationKey)
-          : (option.value ?? ''))
-    );
+    const optionLabel = resolveLabel(option.label, translations, resolveOptionText(t, option, interpolation));
 
     // Process conditionalText if provided
     let resolvedConditionalText: string | undefined;
@@ -303,13 +316,16 @@ export function translateFields(
 
     // Build translated options for component builder (backward compatible format)
     const translatedOptions = processedOptionsWithSubFields?.map(option => {
-      const text = option.text || (option.translationKey ? t(option.translationKey) : null) || option.value;
       const hint = option.hint ? getTranslation(t, option.hint, option.hint, interpolation) : undefined;
-      const translatedOption = {
-        ...option,
-        ...(option.divider ? { divider: t(option.divider, option.divider) } : { text, hint }),
-      };
-      return translatedOption;
+      if (option.divider) {
+        // Same graceful fallback as option text: page-specific key -> generic common key -> raw divider string
+        const genericKey = `options.${option.divider.split('.').pop()}`;
+        const divider =
+          getTranslation(t, option.divider, undefined, interpolation) ??
+          getTranslation(t, genericKey, option.divider, interpolation);
+        return { ...option, divider };
+      }
+      return { ...option, text: resolveOptionText(t, option, interpolation), hint };
     });
     // For nested fields (subFields), extract simple name to look up values
     // field.name might be nested (e.g., "parent.subField") but fieldValues is keyed by simple names

@@ -3,7 +3,7 @@ import type { Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
-import { flowConfig } from '../flow.config';
+import { MAIN_CLAIM_OPTION_VALUE, flowConfig } from '../flow.config';
 
 import { date } from '@modules/nunjucks/filters/date';
 import {
@@ -26,7 +26,6 @@ const stepName = 'confirm-if-these-documents-relate-to-an-application';
 const templatePath =
   'case-tasks/upload-additional-documents/confirm-if-these-documents-relate-to-an-application/confirmIfTheseDocumentsRelateToAnApplication.njk';
 const UPLOAD_DOCUMENTS_EVENT_ID = 'uploadDocuments';
-const MAIN_CLAIM_OPTION_VALUE = 'MAIN_CLAIM_OR_COUNTERCLAIM';
 
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
@@ -41,8 +40,8 @@ function labelForOption(t: TFunction, option: RelatedApplicationOption): string 
       return t('applicationOptionSetAside', { date: formattedDate });
     case 'GENERAL_APPLICATION':
       return t('applicationOptionGeneric', { date: formattedDate });
-    case 'MAIN_CLAIM_OR_COUNTERCLAIM':
-      return t('optionClaimOrCounterclaim');
+    case 'COUNTERCLAIM':
+      return t('optionCounterclaim');
   }
 }
 
@@ -117,6 +116,8 @@ export const step: StepDefinition = {
         }
       }
 
+      const counterClaimOption = options.find(item => Boolean(item.value.counterClaimId));
+
       const applications = [
         ...options
           .filter(item => Boolean(item.value.genAppId))
@@ -129,9 +130,18 @@ export const step: StepDefinition = {
               ...(hint ? { hint } : {}),
             };
           }),
+        ...(counterClaimOption
+          ? [
+              {
+                value: counterClaimOption.value.counterClaimId as string,
+                text: labelForOption(t, counterClaimOption.value),
+                checked: selectedApplicationId === counterClaimOption.value.counterClaimId,
+              },
+            ]
+          : []),
         {
           value: MAIN_CLAIM_OPTION_VALUE,
-          text: t('optionClaimOrCounterclaim'),
+          text: t('optionMainClaim'),
           checked: selectedApplicationId === MAIN_CLAIM_OPTION_VALUE,
         },
       ];
@@ -177,10 +187,12 @@ export const step: StepDefinition = {
       let relatedApplicationText = '';
       if (relatedApplicationId === MAIN_CLAIM_OPTION_VALUE) {
         relatedApplicationCategory = MAIN_CLAIM_OPTION_VALUE;
-        relatedApplicationText = t('optionClaimOrCounterclaim');
+        relatedApplicationText = t('optionMainClaim');
       } else if (relatedApplicationId) {
         const options = await loadRelatedApplicationOptions(req);
-        const match = options.find(item => item.value.genAppId === relatedApplicationId);
+        const match = options.find(
+          item => item.value.genAppId === relatedApplicationId || item.value.counterClaimId === relatedApplicationId
+        );
         if (match) {
           relatedApplicationCategory = match.value.category;
           relatedApplicationText = labelForOption(t, match.value);

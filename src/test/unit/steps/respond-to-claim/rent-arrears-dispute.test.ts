@@ -39,6 +39,12 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   saveDraftDefendantResponse: jest.fn(),
 }));
 
+jest.mock('@services/ccdCaseService', () => ({
+  ccdCaseService: {
+    getCaseById: jest.fn(),
+  },
+}));
+
 const t = ((key: string, options?: Record<string, string>) => {
   const translations: Record<string, string> = {
     pageTitle: 'Do you agree with the amount of rent arrears?',
@@ -64,11 +70,17 @@ const t = ((key: string, options?: Record<string, string>) => {
 import type { SupportedLang } from '../../../../main/modules/steps';
 import { GetController } from '../../../../main/modules/steps';
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
-import { step } from '../../../../main/steps/respond-to-claim/rent-arrears-dispute';
+import { getRentStatementDocumentInfo, step } from '../../../../main/steps/respond-to-claim/rent-arrears-dispute';
 import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
+
+import { ccdCaseService } from '@services/ccdCaseService';
 
 describe('respond-to-claim rent-arrears-dispute step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createReq = (overrides: Record<string, unknown> = {}): any => ({
@@ -231,6 +243,25 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
       },
     };
 
+    // getCaseById returns the full case with detailsTab_RentArrearsDetails populated
+    (ccdCaseService.getCaseById as jest.Mock)
+      .mockResolvedValueOnce({
+        id: '1234567890123456',
+        data: {
+          detailsTab_RentArrearsDetails: {
+            rentStatement: [rentStatementDocument, { id: 'ignored' }],
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        id: '1234567890123456',
+        data: {
+          detailsTab_RentArrearsDetails: {
+            rentStatement: [rentStatementDocument, { id: 'ignored' }],
+          },
+        },
+      });
+
     const req = createReq({
       res: {
         locals: {
@@ -238,9 +269,7 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
             id: '1234567890123456',
             data: {
               rentArrears_Total: '12345',
-              detailsTab_RentArrearsDetails: {
-                rentStatement: [rentStatementDocument, { id: 'ignored' }],
-              },
+              detailsTab_RentArrearsDetails: {},
               possessionClaimResponse: {
                 claimantOrganisations: [{ value: 'Treetops Housing' }],
               },
@@ -262,10 +291,28 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1] as Record<string, unknown>;
-    expect(renderData.rentStatementDocument).toEqual(rentStatementDocument);
+    expect(renderData.rentStatementDocument).toEqual({ id: '66666666-6666-4666-8666-666666666666' });
   });
 
   it('returns an empty string when detailsTab_RentArrearsDetails exists but rentStatement is empty', async () => {
+    (ccdCaseService.getCaseById as jest.Mock)
+      .mockResolvedValueOnce({
+        id: '1234567890123456',
+        data: {
+          detailsTab_RentArrearsDetails: {
+            rentStatement: [],
+          },
+        },
+      })
+      .mockResolvedValueOnce({
+        id: '1234567890123456',
+        data: {
+          detailsTab_RentArrearsDetails: {
+            rentStatement: [],
+          },
+        },
+      });
+
     const req = createReq({
       res: {
         locals: {
@@ -298,5 +345,45 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1] as Record<string, unknown>;
     expect(renderData.rentStatementDocument).toEqual('');
+  });
+
+  it('getRentStatementDocumentInfo resolves document from rentArrears_StatementDocuments', () => {
+    const result = getRentStatementDocumentInfo({
+      id: '123',
+      data: {
+        rentArrears_StatementDocuments: [
+          {
+            id: 'stmt-id-123',
+            value: {
+              document_url: 'http://dm-store/documents/stmt-id-123',
+              document_filename: 'statement.pdf',
+            },
+          },
+        ],
+      },
+    });
+    expect(result).toEqual({ isDocumentUploaded: true, documentId: 'stmt-id-123' });
+  });
+
+  it('getRentStatementDocumentInfo extracts document UUID from document_url when item id is missing', () => {
+    const result = getRentStatementDocumentInfo({
+      id: '123',
+      data: {
+        rentArrears_StatementDocuments: [
+          {
+            value: {
+              document_url: 'http://dm-store/documents/url-uuid-999',
+              document_filename: 'statement.pdf',
+            },
+          },
+        ],
+      },
+    });
+    expect(result).toEqual({ isDocumentUploaded: true, documentId: 'url-uuid-999' });
+  });
+
+  it('getRentStatementDocumentInfo returns isDocumentUploaded false when no document exists', () => {
+    const result = getRentStatementDocumentInfo(undefined);
+    expect(result).toEqual({ isDocumentUploaded: false });
   });
 });

@@ -239,11 +239,13 @@ function addDisputeClaimRows({ rows, responses, t, change, yesNoNotSure }: RowCo
   rows.push(detailRow);
 }
 
-function addCounterClaimRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
+function addCounterClaimRow({ rows, responses, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   if (!responses.makeCounterClaim) {
     return;
   }
-  pushYesNoRow(rows, 'rows.makeCounterClaim', responses.makeCounterClaim, 'counter-claim', t, yesNoNotSure, change);
+  pushYesNoRow(rows, 'rows.makeCounterClaim', responses.makeCounterClaim, 'counter-claim', t, yesNoNotSure, change, {
+    claimantName: validatedCase.claimantName,
+  });
 }
 
 function addCounterClaimDetailsRows(ctx: RowContext): void {

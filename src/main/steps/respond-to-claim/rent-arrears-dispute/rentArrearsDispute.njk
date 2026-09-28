@@ -20,9 +20,9 @@
   <div class="govuk-inset-text">
     <p class="govuk-body">{{ insetIntroText }}</p>
     <p class="govuk-body">{{ insetDetailsText }}</p>
-    {% if (rentStatementDocument and isRelease12Enabled) %}
+    {% if isRelease12Enabled %}
     <p class="govuk-body">
-      <a class="govuk-link" href="/case/{{ caseReference }}/view-documents/{{ rentStatementDocument.id }}" target="_blank" rel="noopener noreferrer">{{ rentStatementDocumentLinkText }}</a>
+      <a class="govuk-link" href="{% if rentStatementDocument.id %}/case/{{ caseReference }}/view-documents/{{ rentStatementDocument.id }}{% else %}/case/{{ caseReference }}/view-documents{% endif %}" target="_blank" rel="noopener noreferrer">{{ rentStatementDocumentLinkText }}</a>
     </p>
     {% endif %}
   </div>

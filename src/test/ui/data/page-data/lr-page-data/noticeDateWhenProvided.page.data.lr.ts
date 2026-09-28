@@ -1,7 +1,7 @@
 import { convertDateFormat } from '../../../utils/common/date.utils';
 import { submitCaseApiData } from '../../api-data';
 
-export const noticeDateWhenProvidedLR = {
+export const noticeDateWhenProvided = {
   mainHeader: `Notice date`,
   backLink: `Back`,
   noticeGivenDateLabel: `They served the defendant with a notice seeking possession on ${convertDateFormat(submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.notice_PostedDate)}`,
@@ -19,4 +19,5 @@ export const noticeDateWhenProvidedLR = {
   theDateDefendantReceivedNoticeErrorMessage: `The date the defendant received notice must either be today’s date or in the past`,
   feedbackLink: `feedback`,
   pageSlug: `confirmation-of-notice-date-when-provided`,
+  noticeDocumentDynamicLink: 'View a copy of the notice (opens in new tab)',
 };
