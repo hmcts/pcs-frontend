@@ -122,4 +122,26 @@ describe('make an order: limits', () => {
       'Select weekly, fortnightly or monthly payments',
     ]);
   });
+
+  it('needs a real time for a hearing on a specific date', async () => {
+    const hearing = {
+      'adj-type': 'further-hearing',
+      'adj-when': 'specific',
+      'adj-hearing-date-specific-day': '1',
+      'adj-hearing-date-specific-month': '10',
+      'adj-hearing-date-specific-year': '2026',
+      'adj-time-estimate': '30',
+    };
+    for (const time of ['10:30am', '2 p.m.', '14:30', '09.15', '12am']) {
+      expect(await errors('tab-adjournment', { ...hearing, 'adj-specific-time': time })).toEqual([]);
+    }
+    expect(await errors('tab-adjournment', { ...hearing, 'adj-specific-time': '' })).toEqual([
+      'Enter the time of hearing',
+    ]);
+    for (const time of ['25:00', '13pm', '0:30am', '1030', 'after lunch']) {
+      expect(await errors('tab-adjournment', { ...hearing, 'adj-specific-time': time })).toEqual([
+        'Enter a valid time of hearing, like 10:30am or 14:30',
+      ]);
+    }
+  });
 });
