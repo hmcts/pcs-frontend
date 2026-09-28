@@ -22,6 +22,11 @@ describe('make an order: outright possession', () => {
     expect((await app.get('/docweave/templates')).status).toBe(404);
   });
 
+  it('is refused to a caseworker, whom CCD does not let make an order', async () => {
+    app = await bootApp({ caseworker: true });
+    expect((await app.get(PAGE)).status).toBe(404);
+  });
+
   it('is launched from the Manage Case event link', async () => {
     app = await bootApp();
     const launch = await app.get(`/cases/${CASE_REFERENCE}/event/ext:makeOrder?expected_sub=judge-uid`);

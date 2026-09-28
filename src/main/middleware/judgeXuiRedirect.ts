@@ -1,7 +1,7 @@
 import config from 'config';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
-import { isJudgeUser } from '../steps/utils';
+import { isStaffUser } from '../steps/utils';
 
 import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 
@@ -48,13 +48,13 @@ function getJudgeRedirectUrl(path: string): string {
 }
 
 /**
- * Judges use PCS through an explicit journey launched from XUI. Keep them out
+ * Staff and judges use PCS through an explicit journey launched from XUI. Keep them out
  * of the citizen-facing entry points and return them to the case-management UI
  * unless the request is part of a supported judicial journey.
  */
 export const judgeXuiRedirectMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
   const path = decodePath(req.path);
-  if (!isJudgeUser(req) || isAllowedJudgePath(path)) {
+  if (!isStaffUser(req) || isAllowedJudgePath(path)) {
     return next();
   }
 

@@ -6,7 +6,7 @@ import { DateTime } from 'luxon';
 
 import { HTTPError } from '../HttpError';
 import { MAKE_ORDER_ROUTE } from '../constants/caseRoutes';
-import { judgeAccessMiddleware, oidcMiddleware } from '../middleware';
+import { oidcMiddleware } from '../middleware';
 import { getUserRoles } from '../steps/utils';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 import { buildManageCaseDetailsRedirect } from '../utils/manageCaseRedirect';
@@ -224,6 +224,14 @@ function parseDocument(orderDocument: unknown): DocWeaveSnapshot | undefined {
   }
 }
 
+/**
+ * Only judges may make an order, which CCD decides from their role assignments: it refuses to
+ * start or submit the event for anyone else, and they are shown the page does not exist.
+ */
+function refusedByCcd(error: unknown): boolean {
+  return error instanceof HTTPError && (error.status === 403 || error.status === 404);
+}
+
 export default function makeOrderRoutes(app: Application): void {
   if (process.env.USE_STUBBED_DEPS === 'true') {
     app.get(STUBBED_MAKE_ORDER_ROUTE, (req, res) => res.render('make-order', pageModel(req, stubbedEnvelope())));
@@ -232,16 +240,19 @@ export default function makeOrderRoutes(app: Application): void {
     );
   }
 
-  app.get(MAKE_ORDER_ROUTE, oidcMiddleware, judgeAccessMiddleware, async (req: Request, res: Response, next) => {
+  app.get(MAKE_ORDER_ROUTE, oidcMiddleware, async (req: Request, res: Response, next) => {
     try {
       const envelope = await loadOrStartDraft(req.session.user!.accessToken, req.params.caseReference as string);
       res.render('make-order', pageModel(req, envelope));
     } catch (error) {
+      if (refusedByCcd(error)) {
+        return res.status(404).send('Not Found');
+      }
       next(error);
     }
   });
 
-  app.post(MAKE_ORDER_ROUTE, oidcMiddleware, judgeAccessMiddleware, async (req: Request, res: Response, next) => {
+  app.post(MAKE_ORDER_ROUTE, oidcMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
     const { _csrf, action, orderId, orderVersion, orderType, orderDocument, ...formData } = req.body;
@@ -275,6 +286,9 @@ export default function makeOrderRoutes(app: Application): void {
       }
       return res.redirect(manageCaseUrl);
     } catch (error) {
+      if (refusedByCcd(error)) {
+        return res.status(404).send('Not Found');
+      }
       return next(error);
     }
   });
