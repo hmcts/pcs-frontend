@@ -774,8 +774,7 @@ describe('initPostcodeLookup', () => {
       postcode.setAttribute('aria-describedby', 'correspondence-postcode-error');
       postcode.classList.add('govuk-input--error');
       errorSummary.hidden = false;
-      errorList.innerHTML =
-        '<li><a href="#correspondenceAddressConfirm.postcode">Enter a valid UK postcode</a></li>';
+      errorList.innerHTML = '<li><a href="#correspondenceAddressConfirm.postcode">Enter a valid UK postcode</a></li>';
 
       const opt = document.createElement('option');
       opt.value = '0';
