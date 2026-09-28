@@ -248,6 +248,10 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
   if (!addressUnknown && phoneNumber) {
     pushRow(rows, t('viewTheResponse:defendant.phone'), phoneNumber);
   }
+  const smsMobileNumber = isYes(responses?.contactByText) ? party?.textMessageNumber?.trim() : undefined;
+  if (!addressUnknown && smsMobileNumber && smsMobileNumber !== phoneNumber) {
+    pushRow(rows, t('viewTheResponse:defendant.smsMobileNumber'), smsMobileNumber);
+  }
   const emailAddress = isYes(responses?.contactByEmail) ? party?.emailAddress?.trim() : undefined;
   if (emailAddress) {
     pushRow(rows, t('viewTheResponse:defendant.email'), emailAddress);
