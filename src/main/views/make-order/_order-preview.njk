@@ -1,12 +1,5 @@
 <section class="govuk-!-margin-top-6" aria-labelledby="order-preview-heading">
   <h2 class="govuk-heading-l" id="order-preview-heading">Order preview</h2>
-  <div class="govuk-warning-text" data-order-document-unreadable hidden>
-    <span class="govuk-warning-text__icon" aria-hidden="true">!</span>
-    <strong class="govuk-warning-text__text">
-      <span class="govuk-visually-hidden">Warning</span>
-      The saved order wording could not be opened, so it has been rebuilt from your answers. Check the order, and add again any wording you had written yourself.
-    </strong>
-  </div>
   <div id="order-editor"></div>
   <textarea hidden id="order-document" name="orderDocument">{{ orderDocumentJson }}</textarea>
 </section>
