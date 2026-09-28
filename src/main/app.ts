@@ -29,7 +29,8 @@ setupDev(app, developmentMode);
 app.use(cookieParser());
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+// Make an order posts the whole order document, which outgrows the 100kb default.
+app.use(bodyParser.urlencoded({ extended: false, limit: '2mb' }));
 
 modules.modules.forEach(async moduleName => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

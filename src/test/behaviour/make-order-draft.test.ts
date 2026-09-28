@@ -150,6 +150,23 @@ describe('make an order: drafting', () => {
     expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('');
   });
 
+  it('saves a long order', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-free-form');
+    const wording = 'The parties shall exchange evidence within fourteen days. '.repeat(1000).trim();
+    type('free-form-text', wording);
+
+    const body = page.body();
+    body.set('action', 'SAVE_DRAFT');
+    // Well past the 100kb that the application's other forms are held to.
+    expect(body.toString().length).toBeGreaterThan(100 * 1024);
+    expect((await app.post(PAGE, body)).status).toBe(302);
+
+    const reopened = await openPage((await app.get(PAGE)).text);
+    expect(control<HTMLTextAreaElement>('[name="free-form-text"]').value).toBe(wording);
+    expect(reopened.documentText()).toContain(wording);
+  });
+
   it('offers quick dates and a collapsible case facts panel', async () => {
     await openPage((await app.get(PAGE)).text);
     check('outright-possession', 'by');
