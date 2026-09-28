@@ -385,6 +385,16 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   margin-bottom: 0;
 }
 
+// A name's error message takes its own line above the label and input.
+.pcs-attendance__row .govuk-form-group--error {
+  flex-wrap: wrap;
+
+  .govuk-error-message {
+    flex-basis: 100%;
+    order: -1;
+  }
+}
+
 .pcs-attendance__name-label {
   flex: 0 0 auto;
   margin-bottom: 0;

@@ -1,4 +1,4 @@
-import { CASE_REFERENCE, type TestApp, bootApp, check, openPage, selectTab, type } from './harness';
+import { CASE_REFERENCE, type TestApp, bootApp, check, openPage, recordAttendance, selectTab, type } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
 
@@ -57,6 +57,7 @@ describe('make an order: free form and strike out', () => {
     );
     expect(page.documentText()).toBe(page.orderText());
 
+    recordAttendance();
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     expect((await app.post(PAGE, body)).status).toBe(302);
@@ -96,6 +97,7 @@ describe('make an order: free form and strike out', () => {
       ['IT IS ORDERED THAT:', 'The claim is dismissed.', 'Costs reserved.'].join('\n')
     );
 
+    recordAttendance();
     const submission = reopened.body();
     submission.set('action', 'SUBMIT_FOR_REVIEW');
     expect((await app.post(PAGE, submission)).status).toBe(302);

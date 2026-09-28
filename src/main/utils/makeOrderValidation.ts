@@ -14,6 +14,39 @@ export interface MakeOrderValidationIssue {
   message: string;
 }
 
+/** A party on the attendance register: `id` prefixes its answers, `label` names it, e.g. "Claimant 1: Example Housing". */
+export interface AttendanceParty {
+  id: string;
+  label: string;
+  type: 'claimant' | 'defendant';
+}
+
+const ATTENDANCE_CHOICES: Record<AttendanceParty['type'], readonly string[]> = {
+  claimant: [
+    'counsel',
+    'solicitor',
+    'solicitor-agent',
+    'housing-officer',
+    'litigant-in-person',
+    'letter-only',
+    'not-present',
+  ],
+  defendant: [
+    'counsel',
+    'solicitor',
+    'solicitor-agent',
+    'duty-adviser',
+    'litigant-in-person',
+    'letter-only',
+    'not-present',
+  ],
+};
+
+/** Attendance by someone speaking for the party, whom the order names. */
+const NAMED_ATTENDANCE = ['counsel', 'solicitor', 'solicitor-agent', 'housing-officer', 'duty-adviser'];
+
+const MAX_ATTENDANCE_NAME_LENGTH = 120;
+
 function value(formData: Record<string, unknown>, name: string): string {
   return String(formData[name] ?? '').trim();
 }
@@ -249,6 +282,26 @@ function validateStrikeOut(formData: Record<string, unknown>): MakeOrderValidati
   return [...issues, ...validateCosts(formData, false)];
 }
 
+// The error summary takes the judge to the party's row, which names the party and the error.
+function validateAttendance(formData: Record<string, unknown>, parties: readonly AttendanceParty[]) {
+  const { issues, add } = validation(formData);
+  for (const party of parties) {
+    const choice = value(formData, `${party.id}-attendance`);
+    const name = value(formData, `${party.id}-name`);
+    if (!ATTENDANCE_CHOICES[party.type].includes(choice)) {
+      add(false, `${party.id}-attendance`, `Select how ${party.label} attended`);
+    } else if (NAMED_ATTENDANCE.includes(choice) && !name) {
+      add(false, `${party.id}-name`, `Enter the name of the person who attended for ${party.label}`);
+    }
+    add(
+      name.length <= MAX_ATTENDANCE_NAME_LENGTH,
+      `${party.id}-name`,
+      `Name for ${party.label} must be ${MAX_ATTENDANCE_NAME_LENGTH} characters or less`
+    );
+  }
+  return issues;
+}
+
 const validators: Record<MakeOrderType, (formData: Record<string, unknown>) => MakeOrderValidationIssue[]> = {
   OUTRIGHT_POSSESSION: validateOutright,
   SUSPENDED_POSSESSION: validateSuspended,
@@ -262,7 +315,8 @@ const validators: Record<MakeOrderType, (formData: Record<string, unknown>) => M
 
 export function validateMakeOrder(
   orderType: MakeOrderType,
-  formData: Record<string, unknown>
+  formData: Record<string, unknown>,
+  parties: readonly AttendanceParty[]
 ): MakeOrderValidationIssue[] {
-  return validators[orderType](formData);
+  return [...validateAttendance(formData, parties), ...validators[orderType](formData)];
 }

@@ -7,6 +7,7 @@ import {
   control,
   futureDate,
   openPage,
+  recordAttendance,
   selectTab,
   type,
   typeDate,
@@ -80,6 +81,7 @@ describe('make an order: suspended possession', () => {
       ].join('\n')
     );
 
+    recordAttendance();
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     const submitted = await app.post(PAGE, body);

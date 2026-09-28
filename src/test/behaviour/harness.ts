@@ -317,6 +317,12 @@ export function typeDate(prefix: string, day: string, month: string, year: strin
   type(`${prefix}-year`, year);
 }
 
+/** Records how the case's claimant and defendant attended, which every order needs before review. */
+export function recordAttendance(): void {
+  check('claimant-claimant-id-attendance', 'litigant-in-person');
+  check('defendant-defendant-id-attendance', 'not-present');
+}
+
 /** Switches order type the way GOV.UK tabs do: by changing the fragment. */
 export function selectTab(id: string): void {
   window.location.hash = `#${id}`;
