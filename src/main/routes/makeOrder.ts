@@ -6,7 +6,7 @@ import { DateTime } from 'luxon';
 
 import { HTTPError } from '../HttpError';
 import { MAKE_ORDER_ROUTE } from '../constants/caseRoutes';
-import { oidcMiddleware } from '../middleware';
+import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 import { getUserRoles } from '../steps/utils';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 import { buildManageCaseDetailsRedirect } from '../utils/manageCaseRedirect';
@@ -242,7 +242,7 @@ export default function makeOrderRoutes(app: Application): void {
     );
   }
 
-  app.get(MAKE_ORDER_ROUTE, oidcMiddleware, async (req: Request, res: Response, next) => {
+  app.get(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     try {
       const envelope = await loadOrStartDraft(req.session.user!.accessToken, req.params.caseReference as string);
       res.render('make-order', pageModel(req, envelope));
@@ -254,7 +254,7 @@ export default function makeOrderRoutes(app: Application): void {
     }
   });
 
-  app.post(MAKE_ORDER_ROUTE, oidcMiddleware, async (req: Request, res: Response, next) => {
+  app.post(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
     const { _csrf, action, orderId, orderVersion, orderType, orderDocument, ...formData } = req.body;

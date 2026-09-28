@@ -2,7 +2,7 @@ import { createTemplateProxy } from '@hmcts-cft/docweave/express';
 import config from 'config';
 import type { Application } from 'express';
 
-import { oidcMiddleware, staffAccessMiddleware } from '../middleware';
+import { makeOrderFeatureMiddleware, oidcMiddleware, staffAccessMiddleware } from '../middleware';
 
 import { http } from '@modules/http';
 
@@ -11,6 +11,7 @@ export default function docweaveTemplateRoutes(app: Application): void {
     '/docweave/templates',
     oidcMiddleware,
     staffAccessMiddleware,
+    makeOrderFeatureMiddleware,
     createTemplateProxy({
       upstream: `${config.get<string>('api.url')}/docweave/templates`,
       getUserToken: request => request.session.user?.accessToken,

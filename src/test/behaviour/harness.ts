@@ -107,7 +107,9 @@ export interface TestApp {
 let ccd: http.Server | undefined;
 afterAll(() => ccd?.close());
 
-export async function bootApp(options: { judge?: boolean; caseworker?: boolean } = {}): Promise<TestApp> {
+export async function bootApp(
+  options: { judge?: boolean; caseworker?: boolean; makeOrderEnabled?: boolean } = {}
+): Promise<TestApp> {
   envelope = blankCase();
   ccd ??= await listen(ccdStub());
   process.env.CCD_URL = `http://127.0.0.1:${(ccd.address() as AddressInfo).port}`;
@@ -137,6 +139,11 @@ export async function bootApp(options: { judge?: boolean; caseworker?: boolean }
   app.use(express.urlencoded({ extended: false }));
   new Nunjucks(false).enableFor(app);
   app.locals.nunjucksEnv.addGlobal('sessionTimeout', {});
+  // LaunchDarkly, with the make order flag on unless a test turns it off.
+  app.locals.launchDarklyClient = {
+    variation: async (flag: string, _context: unknown, fallback: unknown) =>
+      flag === 'make-order-enabled' ? options.makeOrderEnabled !== false : fallback,
+  };
   app.locals.nunjucksEnv.addGlobal('t', (key: string, fallback?: unknown) =>
     typeof fallback === 'string' ? fallback : key
   );
