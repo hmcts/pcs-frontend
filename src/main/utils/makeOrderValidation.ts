@@ -47,6 +47,9 @@ const NAMED_ATTENDANCE = ['counsel', 'solicitor', 'solicitor-agent', 'housing-of
 
 const MAX_ATTENDANCE_NAME_LENGTH = 120;
 
+const MAX_FREE_TEXT_LENGTH = 30000;
+const MAX_GROUNDS_DETAILS_LENGTH = 100;
+
 function value(formData: Record<string, unknown>, name: string): string {
   return String(formData[name] ?? '').trim();
 }
@@ -54,6 +57,11 @@ function value(formData: Record<string, unknown>, name: string): string {
 function values(formData: Record<string, unknown>, name: string): string[] {
   const raw = formData[name];
   return (Array.isArray(raw) ? raw : raw === undefined ? [] : [raw]).map(String);
+}
+
+/** Length as the judge typed it: browsers post each new line in a text box as two characters. */
+function textLength(formData: Record<string, unknown>, name: string): number {
+  return value(formData, name).replace(/\r\n/g, '\n').length;
 }
 
 function hasValidMoney(formData: Record<string, unknown>, name: string): boolean {
@@ -80,6 +88,7 @@ function validation(formData: Record<string, unknown>) {
   return {
     issues,
     add,
+    maxLength: (id: string, max: number, message: string): void => add(textLength(formData, id) <= max, id, message),
     money: (id: string, message: string): void => add(hasValidMoney(formData, id), id, message),
     date: (prefix: string, message: string): void => add(hasValidDate(formData, prefix), `${prefix}-day`, message),
   };
@@ -139,7 +148,7 @@ function validateSuspended(formData: Record<string, unknown>): MakeOrderValidati
 }
 
 function validateOutright(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const { issues, add, money, date } = validation(formData);
+  const { issues, add, money, date, maxLength } = validation(formData);
   const possession = value(formData, 'outright-possession');
   const options = values(formData, 'outright-options');
 
@@ -155,6 +164,11 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
     ['mandatory', 'discretionary'].includes(value(formData, 'outright-grounds-type')),
     'outright-grounds-type',
     'Select mandatory or discretionary grounds'
+  );
+  maxLength(
+    'outright-grounds-details',
+    MAX_GROUNDS_DETAILS_LENGTH,
+    `Details of grounds must be ${MAX_GROUNDS_DETAILS_LENGTH} characters or less`
   );
 
   if (options.includes('money-judgment')) {
@@ -302,6 +316,17 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
   return issues;
 }
 
+/** A long text box the page has whatever the order type: hearing notes, recitals or the staff message. */
+function validateText(formData: Record<string, unknown>, id: string, name: string): MakeOrderValidationIssue[] {
+  const { issues, maxLength } = validation(formData);
+  maxLength(
+    id,
+    MAX_FREE_TEXT_LENGTH,
+    `${name} must be ${MAX_FREE_TEXT_LENGTH.toLocaleString('en-GB')} characters or less`
+  );
+  return issues;
+}
+
 const validators: Record<MakeOrderType, (formData: Record<string, unknown>) => MakeOrderValidationIssue[]> = {
   OUTRIGHT_POSSESSION: validateOutright,
   SUSPENDED_POSSESSION: validateSuspended,
@@ -318,5 +343,13 @@ export function validateMakeOrder(
   formData: Record<string, unknown>,
   parties: readonly AttendanceParty[]
 ): MakeOrderValidationIssue[] {
-  return [...validateAttendance(formData, parties), ...validators[orderType](formData)];
+  const chosen = (name: string): boolean => values(formData, name).includes('yes');
+  // In the order the page asks, so the error summary follows the page.
+  return [
+    ...validateText(formData, 'hearing-notes', 'Hearing notes'),
+    ...validateAttendance(formData, parties),
+    ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
+    ...validators[orderType](formData),
+    ...(chosen('staff-message') ? validateText(formData, 'staff-message-text', 'Staff message') : []),
+  ];
 }

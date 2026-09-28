@@ -1,0 +1,72 @@
+import { CASE_REFERENCE, type TestApp, bootApp, openPage, recordAttendance, selectTab } from './harness';
+
+const PAGE = `/case/${CASE_REFERENCE}/make-order`;
+
+describe('make an order: limits', () => {
+  let app: TestApp;
+  beforeEach(async () => {
+    app = await bootApp();
+  });
+  afterEach(() => app.close());
+
+  /** Sends the order for review with the given answers over the page's own, and returns the error summary's messages: none if it was sent. */
+  async function errors(tab: string, answers: Record<string, string>): Promise<string[]> {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab(tab);
+    recordAttendance();
+    const body = page.body();
+    Object.entries(answers).forEach(([name, value]) => body.set(name, value));
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    const response = await app.post(PAGE, body);
+    if (response.status === 302) {
+      return [];
+    }
+    expect(response.status).toBe(400);
+    await openPage(response.text);
+    // Each error shows on the field the summary links to, as well as in the summary.
+    return [...document.querySelectorAll<HTMLAnchorElement>('#make-order-error-summary a')].map(link => {
+      const message = link.textContent!.trim();
+      expect(document.querySelector(`${link.hash}-error`)?.textContent).toContain(message);
+      return message;
+    });
+  }
+
+  it('keeps hearing notes, recitals and the staff message to 30,000 characters, listing errors in page order', async () => {
+    const tooLong = 'a'.repeat(30001);
+    expect(
+      await errors('tab-free-form', {
+        'hearing-notes': tooLong,
+        recitals: 'yes',
+        'recitals-text': tooLong,
+        'staff-message': 'yes',
+        'staff-message-text': tooLong,
+      })
+    ).toEqual([
+      'Hearing notes must be 30,000 characters or less',
+      'Recitals must be 30,000 characters or less',
+      'Enter the order wording',
+      'Staff message must be 30,000 characters or less',
+    ]);
+  });
+
+  it('counts a new line as one character, and ignores text the judge has not asked to include', async () => {
+    // Browsers post a new line as two characters.
+    const atTheLimit = `${'a'.repeat(29998)}\r\na`;
+    expect(
+      await errors('tab-free-form', {
+        'free-form-text': 'The claim is stayed.',
+        'hearing-notes': atTheLimit,
+        'recitals-text': 'a'.repeat(30001),
+        'staff-message-text': 'a'.repeat(30001),
+      })
+    ).toEqual([]);
+  });
+
+  it('keeps the details of grounds to 100 characters', async () => {
+    const outright = { 'outright-possession': 'forthwith', 'outright-grounds-type': 'mandatory' };
+    expect(await errors('tab-outright', { ...outright, 'outright-grounds-details': 'a'.repeat(100) })).toEqual([]);
+    expect(await errors('tab-outright', { ...outright, 'outright-grounds-details': 'a'.repeat(101) })).toEqual([
+      'Details of grounds must be 100 characters or less',
+    ]);
+  });
+});
