@@ -13,6 +13,7 @@ import { buildManageCaseDetailsRedirect } from '../utils/manageCaseRedirect';
 
 import { ccdCaseService } from '@services/ccdCaseService';
 import {
+  type AttendanceParty,
   MAKE_ORDER_TYPES,
   type MakeOrderType,
   type MakeOrderValidationIssue,
@@ -133,8 +134,14 @@ function caseFactsFormData(caseFacts: Record<string, unknown> = {}): FormData {
   return formData;
 }
 
-function attendanceParties({ caseContext }: MakeOrderStart): Record<string, string>[] {
-  const parties = (type: 'claimant' | 'defendant', list: MakeOrderParty[]): Record<string, string>[] =>
+/** A row of the attendance register. */
+interface AttendanceRow extends AttendanceParty {
+  partyId: string;
+  name: string;
+}
+
+function attendanceParties({ caseContext }: MakeOrderStart): AttendanceRow[] {
+  const parties = (type: AttendanceParty['type'], list: MakeOrderParty[]): AttendanceRow[] =>
     list.map((party, index) => ({
       id: `${type}-${party.id}`,
       partyId: party.id,
@@ -267,16 +274,22 @@ export default function makeOrderRoutes(app: Application): void {
       if (!MAKE_ORDER_TYPES.includes(orderType)) {
         throw new HTTPError('The order type is invalid', 400);
       }
-      const validationIssues = action === 'SUBMIT_FOR_REVIEW' ? validateMakeOrder(orderType, formData) : [];
-      if (validationIssues.length) {
+      if (action === 'SUBMIT_FOR_REVIEW') {
+        // Validation needs the case's parties, to check each one's attendance.
         const latest = await loadEnvelope(accessToken, caseReference);
-        // Keep the version the judge's answers were made against, so that if the draft was saved
-        // elsewhere meanwhile, pcs-api refuses the retry rather than overwriting that save.
-        const envelope = { ...latest, order: { ...latest.order, id: orderId, version: Number(orderVersion) } };
-        const orderDocumentJson = typeof orderDocument === 'string' ? orderDocument : '';
-        return res
-          .status(400)
-          .render('make-order', pageModel(req, envelope, { orderType, formData, orderDocumentJson, validationIssues }));
+        const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(latest));
+        if (validationIssues.length) {
+          // Keep the version the judge's answers were made against, so that if the draft was saved
+          // elsewhere meanwhile, pcs-api refuses the retry rather than overwriting that save.
+          const envelope = { ...latest, order: { ...latest.order, id: orderId, version: Number(orderVersion) } };
+          const orderDocumentJson = typeof orderDocument === 'string' ? orderDocument : '';
+          return res
+            .status(400)
+            .render(
+              'make-order',
+              pageModel(req, envelope, { orderType, formData, orderDocumentJson, validationIssues })
+            );
+        }
       }
       const document = parseDocument(orderDocument);
       try {
