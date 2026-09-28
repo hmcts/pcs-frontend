@@ -29,20 +29,19 @@ interface MakeOrderParty {
   name: string;
 }
 
-interface MakeOrderDraftPayload {
-  version: 1;
+/** The judge's order as pcs-api stores it: which order, the form they submitted and the order document. */
+interface MakeOrderContent {
   orderType: MakeOrderType;
   formData: FormData;
-  documents: Partial<Record<MakeOrderType, DocWeaveSnapshot>>;
+  docweaveSnapshot: DocWeaveSnapshot | null;
 }
 
-/** The make order event's case field, as the backend stores and returns it. */
-interface MakeOrderEnvelope {
-  order: {
+/** What the make order event sends when the judge opens it: their working order and the case. */
+interface MakeOrderStart {
+  order: Partial<MakeOrderContent> & {
     id?: string;
-    state: 'DRAFT' | 'SUBMITTED_FOR_REVIEW' | 'ISSUED';
+    state: 'DRAFT' | 'SUBMITTED_FOR_REVIEW';
     version: number;
-    draftPayload: MakeOrderDraftPayload;
   };
   caseContext: {
     caseReference: number;
@@ -53,34 +52,36 @@ interface MakeOrderEnvelope {
   };
 }
 
-const emptyDraftPayload = (): MakeOrderDraftPayload => ({
-  version: 1,
-  orderType: 'OUTRIGHT_POSSESSION',
-  formData: {},
-  documents: {},
-});
+const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 
-async function loadEnvelope(accessToken: string, caseReference: string): Promise<MakeOrderEnvelope> {
+async function loadEnvelope(accessToken: string, caseReference: string): Promise<MakeOrderStart> {
   const ccdCase = await ccdCaseService.getCaseByIdForEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID);
-  const payload = ccdCase.data.eventPayload;
+  const payload = ccdCase.data.sdkEventPayload;
   if (!payload) {
     throw new HTTPError('The make order event did not return order data', 500);
   }
-  return JSON.parse(payload) as MakeOrderEnvelope;
+  return JSON.parse(payload) as MakeOrderStart;
+}
+
+/** What the frontend submits when the judge acts on their order. */
+interface MakeOrderRequest {
+  action: string;
+  order: MakeOrderContent & { id: string | null; version: number };
 }
 
 function submitOrderEvent(
   accessToken: string,
   caseReference: string,
-  action: string,
-  order: { id: string | null; version: number; draftPayload: MakeOrderDraftPayload }
+  action: MakeOrderRequest['action'],
+  order: MakeOrderRequest['order']
 ): Promise<unknown> {
+  const request: MakeOrderRequest = { action, order };
   return ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, {
-    eventPayload: JSON.stringify({ action, order }),
+    sdkEventPayload: JSON.stringify(request),
   });
 }
 
-async function loadOrStartDraft(accessToken: string, caseReference: string): Promise<MakeOrderEnvelope> {
+async function loadOrStartDraft(accessToken: string, caseReference: string): Promise<MakeOrderStart> {
   const envelope = await loadEnvelope(accessToken, caseReference);
   if (envelope.order.id) {
     return envelope;
@@ -88,7 +89,9 @@ async function loadOrStartDraft(accessToken: string, caseReference: string): Pro
   await submitOrderEvent(accessToken, caseReference, 'START_DRAFT', {
     id: null,
     version: 0,
-    draftPayload: emptyDraftPayload(),
+    orderType: DEFAULT_ORDER_TYPE,
+    formData: {},
+    docweaveSnapshot: null,
   });
   return loadEnvelope(accessToken, caseReference);
 }
@@ -128,7 +131,7 @@ function caseFactsFormData(caseFacts: Record<string, unknown> = {}): FormData {
   return formData;
 }
 
-function attendanceParties({ caseContext }: MakeOrderEnvelope): Record<string, string>[] {
+function attendanceParties({ caseContext }: MakeOrderStart): Record<string, string>[] {
   const parties = (type: 'claimant' | 'defendant', list: MakeOrderParty[]): Record<string, string>[] =>
     list.map((party, index) => ({
       id: `${type}-${party.id}`,
@@ -147,25 +150,25 @@ interface Submission {
   validationIssues: MakeOrderValidationIssue[];
 }
 
-function pageModel(req: Request, envelope: MakeOrderEnvelope, submission?: Submission): Record<string, unknown> {
+function pageModel(req: Request, envelope: MakeOrderStart, submission?: Submission): Record<string, unknown> {
   const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles: getUserRoles(req) } });
   headerModel.assetsPath = '/assets/ui-component-lib';
   const { caseContext } = envelope;
-  const draftPayload = envelope.order.draftPayload ?? emptyDraftPayload();
+  const { order } = envelope;
   const draft: FormData = {
     ...caseFactsFormData(caseContext.caseFacts),
-    ...(submission?.formData ?? draftPayload.formData),
+    ...(submission?.formData ?? order.formData),
   };
   const issues = submission?.validationIssues ?? [];
-  const orderType = submission?.orderType ?? draftPayload.orderType;
+  const orderType = submission?.orderType ?? order.orderType ?? DEFAULT_ORDER_TYPE;
 
   return {
     headerModel,
     footerModel: buildFooterModel(),
-    order: envelope.order,
+    order,
     draft,
     draftOrderType: orderType,
-    orderDocumentJson: submission?.orderDocumentJson ?? JSON.stringify(draftPayload.documents?.[orderType] ?? null),
+    orderDocumentJson: submission?.orderDocumentJson ?? JSON.stringify(order.docweaveSnapshot ?? null),
     draftValue: (name: string): unknown => draft[name],
     draftChecked: (name: string, value: string): boolean => {
       const saved = draft[name];
@@ -190,13 +193,15 @@ function pageModel(req: Request, envelope: MakeOrderEnvelope, submission?: Submi
   };
 }
 
-function stubbedEnvelope(formData: FormData = {}): MakeOrderEnvelope {
+function stubbedEnvelope(formData: FormData = {}): MakeOrderStart {
   return {
     order: {
       id: 'local-make-order-draft',
       state: 'DRAFT',
       version: 1,
-      draftPayload: { ...emptyDraftPayload(), formData },
+      orderType: DEFAULT_ORDER_TYPE,
+      formData,
+      docweaveSnapshot: null,
     },
     caseContext: {
       caseReference: 1777027600017760,
@@ -260,7 +265,9 @@ export default function makeOrderRoutes(app: Application): void {
       await submitOrderEvent(accessToken, caseReference, action, {
         id: orderId || null,
         version: Number(orderVersion),
-        draftPayload: { version: 1, orderType, formData, documents: document ? { [orderType]: document } : {} },
+        orderType,
+        formData,
+        docweaveSnapshot: document ?? null,
       });
       const manageCaseUrl = buildManageCaseDetailsRedirect(config.get('redirects.manageCaseReturnURL'), caseReference);
       if (!manageCaseUrl) {
