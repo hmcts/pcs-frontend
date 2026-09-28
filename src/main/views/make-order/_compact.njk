@@ -16,9 +16,13 @@
   { value: "monthly", text: "Monthly" }
 ] %}
 
-{# Row of related controls on one (wrapping) line. Use with {% call %}. #}
+{#
+  Row of related controls on one (wrapping) line. Use with {% call %}. A row that an order fact
+  links to needs a groupLabel: Docweave then treats the row as the fact's control, names the fact
+  after it and puts its "Return to document" button next to it.
+#}
 {% macro row(params={}) %}
-  <div{% if params.id %} id="{{ params.id }}"{% endif %} class="pcs-inline-fields{% if params.classes %} {{ params.classes }}{% endif %}">
+  <div{% if params.id %} id="{{ params.id }}"{% endif %}{% if params.groupLabel %} role="group" aria-label="{{ params.groupLabel }}"{% endif %} class="pcs-inline-fields{% if params.classes %} {{ params.classes }}{% endif %}">
     {{ caller() }}
   </div>
 {% endmacro %}
