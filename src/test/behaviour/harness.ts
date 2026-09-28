@@ -49,6 +49,22 @@ const blankCase = (): Envelope => ({
 /** Minimal CCD: hands out the stored envelope and applies posted make-order events to it. */
 let envelope = blankCase();
 
+/** The tokens CCD has handed out for starting the make order event, in order. */
+let startTokens: string[] = [];
+
+/** The tokens the make order event has been submitted with, in order. */
+let submittedTokens: string[] = [];
+
+/** How many times the make order event has been started. */
+export function eventStarts(): number {
+  return startTokens.length;
+}
+
+/** The start tokens the make order event has been submitted with, in order. */
+export function submittedEventTokens(): string[] {
+  return submittedTokens;
+}
+
 /** The reason pcs-api gives for refusing the next make order event, if a test has asked it to. */
 let refusal: string | undefined;
 
@@ -73,11 +89,18 @@ function ccdStub(): Express {
   ccd.use(express.json({ limit: '10mb' }));
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
     const caseData = isJudge(req) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
-    res.json({ token: 'event-token', case_details: { case_data: caseData } });
+    const token = `event-token-${startTokens.length + 1}`;
+    startTokens.push(token);
+    res.json({ token, case_details: { case_data: caseData } });
   });
   ccd.post('/cases/:id/events', (req: Request, res: Response) => {
     if (!isJudge(req)) {
       return res.status(403).json({ message: 'Forbidden' });
+    }
+    submittedTokens.push(req.body.event_token);
+    // CCD only takes an event it started.
+    if (!startTokens.includes(req.body.event_token)) {
+      return res.status(404).json({ message: 'Cannot find matching start trigger' });
     }
     if (refusal) {
       const reason = refusal;
@@ -127,6 +150,8 @@ export async function bootApp(
   options: { judge?: boolean; caseworker?: boolean; makeOrderEnabled?: boolean } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
+  startTokens = [];
+  submittedTokens = [];
   refusal = undefined;
   ccd ??= await listen(ccdStub());
   process.env.CCD_URL = `http://127.0.0.1:${(ccd.address() as AddressInfo).port}`;

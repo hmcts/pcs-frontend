@@ -55,15 +55,21 @@ interface MakeOrderStart {
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 
-async function loadEnvelope(accessToken: string, caseReference: string): Promise<MakeOrderStart> {
-  const ccdCase = await ccdCaseService.getCaseByIdForEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID);
-  const payload = ccdCase.data.sdkEventPayload;
+/** The make order event as CCD started it: the page's data, and the token to submit a change to it with. */
+interface StartedOrder {
+  envelope: MakeOrderStart;
+  eventToken: string;
+}
+
+async function startOrderEvent(accessToken: string, caseReference: string): Promise<StartedOrder> {
+  const started = await ccdCaseService.startCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID);
+  const payload = started.data.sdkEventPayload;
   if (!payload) {
     // CCD starts the event for anyone who can see the case, but only shows the payload to users
     // it lets use the event.
     throw new HTTPError('Not permitted to make an order on this case', 403);
   }
-  return JSON.parse(payload) as MakeOrderStart;
+  return { envelope: JSON.parse(payload) as MakeOrderStart, eventToken: started.eventToken };
 }
 
 /** What the frontend submits when the judge acts on their order. */
@@ -75,28 +81,31 @@ interface MakeOrderRequest {
 function submitOrderEvent(
   accessToken: string,
   caseReference: string,
+  eventToken: string,
   action: MakeOrderRequest['action'],
   order: MakeOrderRequest['order']
 ): Promise<unknown> {
   const request: MakeOrderRequest = { action, order };
-  return ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, {
+  return ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
     sdkEventPayload: JSON.stringify(request),
   });
 }
 
-async function loadOrStartDraft(accessToken: string, caseReference: string): Promise<MakeOrderStart> {
-  const envelope = await loadEnvelope(accessToken, caseReference);
-  if (envelope.order.id) {
-    return envelope;
+/** Starts the event for the judge's draft, first creating the draft if they have none. */
+async function startWithDraft(accessToken: string, caseReference: string): Promise<StartedOrder> {
+  const started = await startOrderEvent(accessToken, caseReference);
+  if (started.envelope.order.id) {
+    return started;
   }
-  await submitOrderEvent(accessToken, caseReference, 'START_DRAFT', {
+  await submitOrderEvent(accessToken, caseReference, started.eventToken, 'START_DRAFT', {
     id: null,
     version: 0,
     orderType: DEFAULT_ORDER_TYPE,
     formData: {},
     docweaveSnapshot: null,
   });
-  return loadEnvelope(accessToken, caseReference);
+  // The page is built from the new draft, which only a new start returns.
+  return startOrderEvent(accessToken, caseReference);
 }
 
 /** Case context addresses arrive with CCD (PascalCase) or JSON (camelCase) keys. */
@@ -159,7 +168,11 @@ interface Submission {
   validationIssues: MakeOrderValidationIssue[];
 }
 
-function pageModel(req: Request, envelope: MakeOrderStart, submission?: Submission): Record<string, unknown> {
+function pageModel(
+  req: Request,
+  { envelope, eventToken }: StartedOrder,
+  submission?: Submission
+): Record<string, unknown> {
   const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles: getUserRoles(req) } });
   headerModel.assetsPath = '/assets/ui-component-lib';
   const { caseContext } = envelope;
@@ -175,6 +188,9 @@ function pageModel(req: Request, envelope: MakeOrderStart, submission?: Submissi
     headerModel,
     footerModel: buildFooterModel(),
     order,
+    eventToken,
+    // The case as the event started it, which the page's change is based on.
+    caseContextJson: JSON.stringify(caseContext),
     draft,
     draftOrderType: orderType,
     orderDocumentJson: submission?.orderDocumentJson ?? JSON.stringify(order.docweaveSnapshot ?? null),
@@ -202,22 +218,25 @@ function pageModel(req: Request, envelope: MakeOrderStart, submission?: Submissi
   };
 }
 
-function stubbedEnvelope(formData: FormData = {}): MakeOrderStart {
+function stubbedEnvelope(formData: FormData = {}): StartedOrder {
   return {
-    order: {
-      id: 'local-make-order-draft',
-      state: 'DRAFT',
-      version: 1,
-      orderType: DEFAULT_ORDER_TYPE,
-      formData,
-      docweaveSnapshot: null,
-    },
-    caseContext: {
-      caseReference: 1777027600017760,
-      propertyAddress: { addressLine1: '10 Test Street', postTown: 'Bristol', postCode: 'BS1 1AA' },
-      claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
-      defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
-      caseFacts: { tenancyStartDate: '2024-01-09', noticeDate: '2025-06-12', currentRent: 750 },
+    eventToken: 'local-event-token',
+    envelope: {
+      order: {
+        id: 'local-make-order-draft',
+        state: 'DRAFT',
+        version: 1,
+        orderType: DEFAULT_ORDER_TYPE,
+        formData,
+        docweaveSnapshot: null,
+      },
+      caseContext: {
+        caseReference: 1777027600017760,
+        propertyAddress: { addressLine1: '10 Test Street', postTown: 'Bristol', postCode: 'BS1 1AA' },
+        claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
+        defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
+        caseFacts: { tenancyStartDate: '2024-01-09', noticeDate: '2025-06-12', currentRent: 750 },
+      },
     },
   };
 }
@@ -251,8 +270,8 @@ export default function makeOrderRoutes(app: Application): void {
 
   app.get(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     try {
-      const envelope = await loadOrStartDraft(req.session.user!.accessToken, req.params.caseReference as string);
-      res.render('make-order', pageModel(req, envelope));
+      const started = await startWithDraft(req.session.user!.accessToken, req.params.caseReference as string);
+      res.render('make-order', pageModel(req, started));
     } catch (error) {
       if (refusedByCcd(error)) {
         return res.status(404).send('Not Found');
@@ -264,7 +283,8 @@ export default function makeOrderRoutes(app: Application): void {
   app.post(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
-    const { _csrf, action, orderId, orderVersion, orderType, orderDocument, ...formData } = req.body;
+    const { _csrf, action, eventToken, caseContext, orderId, orderVersion, orderType, orderDocument, ...formData } =
+      req.body;
 
     try {
       if (action !== 'SAVE_DRAFT' && action !== 'SUBMIT_FOR_REVIEW') {
@@ -273,26 +293,34 @@ export default function makeOrderRoutes(app: Application): void {
       if (!MAKE_ORDER_TYPES.includes(orderType)) {
         throw new HTTPError('The order type is invalid', 400);
       }
+      if (typeof eventToken !== 'string' || !eventToken) {
+        throw new HTTPError('The event token is missing', 400);
+      }
       if (action === 'SUBMIT_FOR_REVIEW') {
-        // Validation needs the case's parties, to check each one's attendance.
-        const latest = await loadEnvelope(accessToken, caseReference);
-        const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(latest));
+        // The order is checked against the case as the page's start returned it.
+        const started: StartedOrder = {
+          eventToken,
+          envelope: {
+            order: { id: orderId, state: 'DRAFT', version: Number(orderVersion) },
+            caseContext: JSON.parse(caseContext),
+          },
+        };
+        const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(started.envelope));
         if (validationIssues.length) {
-          // Keep the version the judge's answers were made against, so that if the draft was saved
-          // elsewhere meanwhile, pcs-api refuses the retry rather than overwriting that save.
-          const envelope = { ...latest, order: { ...latest.order, id: orderId, version: Number(orderVersion) } };
+          // Nothing was submitted, so the page's start, and the version it gave, still stand: if the
+          // draft was saved elsewhere meanwhile, pcs-api refuses the retry rather than overwriting it.
           const orderDocumentJson = typeof orderDocument === 'string' ? orderDocument : '';
           return res
             .status(400)
             .render(
               'make-order',
-              pageModel(req, envelope, { orderType, formData, orderDocumentJson, validationIssues })
+              pageModel(req, started, { orderType, formData, orderDocumentJson, validationIssues })
             );
         }
       }
       const document = parseDocument(orderDocument);
       try {
-        await submitOrderEvent(accessToken, caseReference, action, {
+        await submitOrderEvent(accessToken, caseReference, eventToken, action, {
           id: orderId || null,
           version: Number(orderVersion),
           orderType,
@@ -305,9 +333,9 @@ export default function makeOrderRoutes(app: Application): void {
         }
         // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
         // tab: show the judge the order as it now stands, and why.
-        const envelope = await loadOrStartDraft(accessToken, caseReference);
+        const current = await startWithDraft(accessToken, caseReference);
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
-        return res.status(error.status).render('make-order', pageModel(req, envelope, { validationIssues: reasons }));
+        return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }
       const manageCaseUrl = buildManageCaseDetailsRedirect(config.get('redirects.manageCaseReturnURL'), caseReference);
       if (!manageCaseUrl) {

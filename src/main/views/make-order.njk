@@ -36,6 +36,8 @@
 
   <form method="post" novalidate id="make-order-form"
         data-property-address="{{ propertyAddressDisplay }}">
+  <input type="hidden" name="eventToken" value="{{ eventToken }}">
+  <input type="hidden" name="caseContext" value="{{ caseContextJson }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
   <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
