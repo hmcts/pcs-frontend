@@ -118,6 +118,11 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
     }
   }
 
+  // Temporary density trade-off: retain accessible names while hiding visual D/M/Y labels.
+  .govuk-date-input__label {
+    @include govuk-visually-hidden;
+  }
+
   .govuk-date-input__item .govuk-form-group {
     margin-bottom: 0;
   }
