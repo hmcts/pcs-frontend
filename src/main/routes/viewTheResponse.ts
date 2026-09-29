@@ -599,10 +599,6 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
     return null;
   }
 
-  if (responses.counterClaim.status !== 'COUNTER_CLAIM_ISSUED') {
-    return null;
-  }
-
   const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
   const allDefendants = caseData.allDefendants ?? [];
   const documents = extractCaseDocuments(caseData as Record<string, unknown>);
