@@ -1313,7 +1313,7 @@ describe('viewTheResponse route', () => {
         {
           id: 'counterclaim-pdf-id-1',
           value: {
-            document_filename: 'Counterclaim - Defendant 1',
+            document_filename: 'Counterclaim - Defendant 1.pdf',
             document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id-1/binary',
             category_id: 'statementsOfCase',
           },
@@ -1321,7 +1321,7 @@ describe('viewTheResponse route', () => {
         {
           id: 'counterclaim-pdf-id-2',
           value: {
-            document_filename: 'Counterclaim - Defendant 2',
+            document_filename: 'Counterclaim - Defendant 2.pdf',
             document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id-2/binary',
             category_id: 'statementsOfCase',
           },
