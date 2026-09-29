@@ -359,6 +359,14 @@ function validateText(formData: Record<string, unknown>, id: string, name: strin
   return issues;
 }
 
+/** A ticked staff message needs a message, as well as fitting the length every long text box has. */
+function validateStaffMessage(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  if (!value(formData, 'staff-message-text')) {
+    return [{ id: 'staff-message-text', message: 'Enter a message for court staff' }];
+  }
+  return validateText(formData, 'staff-message-text', 'Staff message');
+}
+
 /** The checks particular to one kind of order. A switch, so an order type from the request only reaches these. */
 function validateOrderType(orderType: MakeOrderType, formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   switch (orderType) {
@@ -393,6 +401,6 @@ export function validateMakeOrder(
     ...validateAttendance(formData, parties),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
     ...validateOrderType(orderType, formData),
-    ...(chosen('staff-message') ? validateText(formData, 'staff-message-text', 'Staff message') : []),
+    ...(chosen('staff-message') ? validateStaffMessage(formData) : []),
   ];
 }

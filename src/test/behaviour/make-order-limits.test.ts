@@ -49,6 +49,16 @@ describe('make an order: limits', () => {
     ]);
   });
 
+  it('asks for the staff message once the judge has ticked it', async () => {
+    expect(
+      await errors('tab-free-form', {
+        'free-form-text': 'The claim is stayed.',
+        'staff-message': 'yes',
+        'staff-message-text': '  ',
+      })
+    ).toEqual(['Enter a message for court staff']);
+  });
+
   it('counts a new line as one character, and ignores text the judge has not asked to include', async () => {
     // Browsers post a new line as two characters.
     const atTheLimit = `${'a'.repeat(29998)}\r\na`;
