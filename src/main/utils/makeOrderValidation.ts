@@ -359,22 +359,30 @@ function validateText(formData: Record<string, unknown>, id: string, name: strin
   return issues;
 }
 
-const validators: Record<MakeOrderType, (formData: Record<string, unknown>) => MakeOrderValidationIssue[]> = {
-  OUTRIGHT_POSSESSION: validateOutright,
-  SUSPENDED_POSSESSION: validateSuspended,
-  ADJOURNMENT: validateAdjournment,
-  STRIKE_OUT_DISMISSAL: validateStrikeOut,
-  FREE_FORM: formData => [
-    ...(value(formData, 'free-form-text') ? [] : [{ id: 'free-form-text', message: 'Enter the order wording' }]),
-    ...validateCosts(formData, false),
+// A Map, so an order type from the request can only find a validator it names.
+const validators = new Map<MakeOrderType, (formData: Record<string, unknown>) => MakeOrderValidationIssue[]>([
+  ['OUTRIGHT_POSSESSION', validateOutright],
+  ['SUSPENDED_POSSESSION', validateSuspended],
+  ['ADJOURNMENT', validateAdjournment],
+  ['STRIKE_OUT_DISMISSAL', validateStrikeOut],
+  [
+    'FREE_FORM',
+    formData => [
+      ...(value(formData, 'free-form-text') ? [] : [{ id: 'free-form-text', message: 'Enter the order wording' }]),
+      ...validateCosts(formData, false),
+    ],
   ],
-};
+]);
 
 export function validateMakeOrder(
   orderType: MakeOrderType,
   formData: Record<string, unknown>,
   parties: readonly AttendanceParty[]
 ): MakeOrderValidationIssue[] {
+  const validateOrderType = validators.get(orderType);
+  if (!validateOrderType) {
+    throw new Error(`Unknown order type: ${orderType}`);
+  }
   const chosen = (name: string): boolean => values(formData, name).includes('yes');
   // In the order the page asks, so the error summary follows the page.
   return [
@@ -382,7 +390,7 @@ export function validateMakeOrder(
     ...validateText(formData, 'hearing-notes', 'Hearing notes'),
     ...validateAttendance(formData, parties),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
-    ...validators[orderType](formData),
+    ...validateOrderType(formData),
     ...(chosen('staff-message') ? validateText(formData, 'staff-message-text', 'Staff message') : []),
   ];
 }
