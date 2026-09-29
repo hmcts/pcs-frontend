@@ -15,6 +15,8 @@ import {
 
 import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '../../../../main/modules/oidc';
 
+import { Logger } from '@modules/logger';
+
 jest.mock('config');
 jest.mock('jose');
 jest.mock('openid-client', () => ({
@@ -85,6 +87,9 @@ describe('OIDCModule', () => {
       if (key === 'xui.uri') {
         return 'https://manage-case.aat.platform.hmcts.net';
       }
+      if (key === 'session.cookieName') {
+        return 'pcs_session';
+      }
       return undefined;
     });
 
@@ -110,6 +115,8 @@ describe('OIDCModule', () => {
     } as unknown as Express;
     mockRequest = {
       session: createMockSession(),
+      sessionID: 'test-session-id',
+      cookies: { pcs_session: 's:test-session-id.signature' },
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost:3000'),
       originalUrl: '/oauth2/callback?code=test_code',
@@ -458,28 +465,73 @@ describe('OIDCModule', () => {
         expect(mockResponse.redirect).toHaveBeenCalledWith('/claims');
       });
 
-      it('should handle missing session data', async () => {
-        const mockTokens = {
-          access_token: 'test-token',
-          id_token: 'test-id-token',
-          refresh_token: 'test-refresh-token',
-          claims: jest.fn().mockReturnValue({ sub: 'test-sub' }),
-        };
-
-        (authorizationCodeGrant as jest.Mock).mockResolvedValue(mockTokens);
-
+      it('should restart the login instead of exchanging the code without a verifier', async () => {
         mockRequest.session = createMockSession({});
 
         oidcModule.enableFor(mockApp);
         const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
         await callbackHandler(mockRequest, mockResponse, mockNext);
 
-        expect(authorizationCodeGrant).toHaveBeenCalledWith(
-          expect.any(Object),
-          expect.any(URL),
+        expect(authorizationCodeGrant).not.toHaveBeenCalled();
+        expect(mockResponse.redirect).toHaveBeenCalledWith('/login');
+        expect(mockNext).not.toHaveBeenCalled();
+      });
+
+      it('should log the session as intact when only the verifier is missing', async () => {
+        const logger = Logger.getLogger('oidc');
+        mockRequest.session = createMockSession({ user: { email: 'test@example.com' } });
+
+        oidcModule.enableFor(mockApp);
+        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
+        await callbackHandler(mockRequest, mockResponse, mockNext);
+
+        expect(logger.error).toHaveBeenCalledWith(
+          'Callback reached with no PKCE code verifier in session',
           expect.objectContaining({
-            pkceCodeVerifier: undefined,
-            idTokenExpected: true,
+            event: 'pkce_verifier_missing',
+            sessionCookiePresented: true,
+            sessionMatchesCookie: true,
+            hasCodeVerifier: false,
+            alreadyAuthenticated: true,
+          })
+        );
+      });
+
+      it('should log the session as lost when the presented cookie does not match', async () => {
+        const logger = Logger.getLogger('oidc');
+        mockRequest.session = createMockSession({});
+        mockRequest.cookies = { pcs_session: 's:an-evicted-session-id.signature' };
+
+        oidcModule.enableFor(mockApp);
+        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
+        await callbackHandler(mockRequest, mockResponse, mockNext);
+
+        expect(logger.error).toHaveBeenCalledWith(
+          'Callback reached with no PKCE code verifier in session',
+          expect.objectContaining({
+            event: 'pkce_verifier_missing',
+            sessionCookiePresented: true,
+            sessionMatchesCookie: false,
+            alreadyAuthenticated: false,
+          })
+        );
+      });
+
+      it('should log that no cookie was presented when the browser sent none', async () => {
+        const logger = Logger.getLogger('oidc');
+        mockRequest.session = createMockSession({});
+        mockRequest.cookies = {};
+
+        oidcModule.enableFor(mockApp);
+        const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
+        await callbackHandler(mockRequest, mockResponse, mockNext);
+
+        expect(logger.error).toHaveBeenCalledWith(
+          'Callback reached with no PKCE code verifier in session',
+          expect.objectContaining({
+            event: 'pkce_verifier_missing',
+            sessionCookiePresented: false,
+            sessionMatchesCookie: false,
           })
         );
       });
