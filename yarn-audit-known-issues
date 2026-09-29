@@ -1,0 +1,1 @@
+{"value":"multer","children":{"ID":1239935,"Issue":"multer vulnerable to Denial of Service via orphaned disk writes on aborted uploads","URL":"https://github.com/advisories/GHSA-3pph-fpjx-jg34","Severity":"moderate","Vulnerable Versions":">=2.2.0 <2.4.0","Tree Versions":["2.3.0"],"Dependents":["pcs-frontend@workspace:."]}}
