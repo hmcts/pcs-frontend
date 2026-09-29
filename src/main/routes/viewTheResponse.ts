@@ -617,7 +617,7 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
     if (defendantIndex >= 0) {
       const defendantNumber = defendantIndex + 1;
       const counterclaimPdf = documents.find(
-        doc => doc.categoryId === 'statementsOfCase' && doc.filename === `Counterclaim - Defendant ${defendantNumber}`
+        doc => doc.categoryId === 'statementsOfCase' && doc.filename === `Counterclaim - Defendant ${defendantNumber}.pdf`
       );
       if (counterclaimPdf) {
         logger.info('[viewTheResponse] Exact match found', { defendantNumber, filename: counterclaimPdf.filename });
