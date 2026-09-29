@@ -66,6 +66,8 @@ describe('make an order: attendance', () => {
     expect(page.orderText()).toContain(
       'The Court heard from Harriet Officer, the housing officer on behalf of the claimant.'
     );
+    // The order names the party, not the "Defendant 1:" label the screen shows.
+    expect(page.orderText()).toContain('The Court read a letter from Alex Example.');
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     const submitted = await app.post(PAGE, body);

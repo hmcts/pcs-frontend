@@ -89,13 +89,13 @@ export function addPreamble(order: DocBuilder, data: OrderData): void {
       paragraphs.push({
         id: `attendance-letter-${entry.rowIndex}`,
         entry,
-        text: `The Court read a letter from ${entry.representativeName || entry.partyLabel}.`,
+        text: `The Court read a letter from ${entry.representativeName || entry.partyName}.`,
       });
     } else if (entry.choice === 'not-present') {
       paragraphs.push({
         id: `attendance-absent-${entry.rowIndex}`,
         entry,
-        text: `The ${entry.partyLabel} did not attend the hearing, but the Court was satisfied they had received notice of the hearing, and it was reasonable to proceed in their absence.`,
+        text: `${sentenceCase(entry.partyName)} did not attend the hearing, but the Court was satisfied they had received notice of the hearing, and it was reasonable to proceed in their absence.`,
       });
     } else if (role) {
       heard.push(entry.representativeName ? `${entry.representativeName}, ${role(party)}` : role(party));

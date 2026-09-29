@@ -7,7 +7,8 @@ export interface AttendanceEntry {
   sourceId: string;
   rowIndex: number;
   partyKind: 'claimant' | 'defendant';
-  partyLabel: string;
+  /** The party's name as the order gives it, not the "Defendant 1: …" label the screen shows. */
+  partyName: string;
   choice: string;
   representativeName: string;
 }
@@ -55,7 +56,7 @@ export function readOrderData(form: HTMLFormElement): OrderData {
       sourceId: row.id,
       rowIndex,
       partyKind,
-      partyLabel: row.dataset.partyLabel ?? `the ${partyKind}`,
+      partyName: partyName || `the ${partyKind}`,
       choice,
       representativeName: row.querySelector<HTMLInputElement>('input[type="text"]')?.value.trim() ?? '',
     });
