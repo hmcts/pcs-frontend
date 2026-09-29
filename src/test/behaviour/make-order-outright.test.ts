@@ -1,14 +1,4 @@
-import {
-  CASE_REFERENCE,
-  MANAGE_CASE_URL,
-  type TestApp,
-  bootApp,
-  check,
-  control,
-  openPage,
-  type,
-  typeDate,
-} from './harness';
+import { CASE_REFERENCE, type TestApp, bootApp, check, control, openPage, type, typeDate } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
 
@@ -38,6 +28,12 @@ describe('make an order: outright possession', () => {
     const launch = await app.get(`/cases/${CASE_REFERENCE}/event/ext:makeOrder?expected_sub=judge-uid`);
     expect(launch.status).toBe(303);
     expect(launch.location).toBe(PAGE);
+  });
+
+  it("shows a judge XUI's judicial header, which XUI chooses from their role assignments", async () => {
+    app = await bootApp();
+    // The header renders in a shadow root, which jsdom does not attach.
+    expect((await app.get(PAGE)).text).toContain('xui-header--judicial');
   });
 
   it('offers a way back to the document from the arrears and interest behind a judgment total', async () => {
@@ -131,6 +127,6 @@ describe('make an order: outright possession', () => {
     body.set('action', 'SUBMIT_FOR_REVIEW');
     const submitted = await app.post(PAGE, body);
     expect(submitted.status).toBe(302);
-    expect(submitted.location).toBe(MANAGE_CASE_URL);
+    expect(submitted.location).toBe(`${PAGE}/sent-for-review`);
   });
 });

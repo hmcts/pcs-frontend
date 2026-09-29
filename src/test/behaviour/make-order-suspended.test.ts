@@ -1,6 +1,5 @@
 import {
   CASE_REFERENCE,
-  MANAGE_CASE_URL,
   type TestApp,
   bootApp,
   check,
@@ -86,7 +85,7 @@ describe('make an order: suspended possession', () => {
     body.set('action', 'SUBMIT_FOR_REVIEW');
     const submitted = await app.post(PAGE, body);
     expect(submitted.status).toBe(302);
-    expect(submitted.location).toBe(MANAGE_CASE_URL);
+    expect(submitted.location).toBe(`${PAGE}/sent-for-review`);
   });
 
   it('takes instalments every week, fortnight or month', async () => {

@@ -147,9 +147,17 @@ let ccd: http.Server | undefined;
 afterAll(() => ccd?.close());
 
 export async function bootApp(
-  options: { judge?: boolean; caseworker?: boolean; makeOrderEnabled?: boolean } = {}
+  options: {
+    judge?: boolean;
+    caseworker?: boolean;
+    makeOrderEnabled?: boolean;
+    defendants?: { id: string; name: string }[];
+  } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
+  if (options.defendants) {
+    envelope.caseContext.defendants = options.defendants;
+  }
   startTokens = [];
   submittedTokens = [];
   refusal = undefined;
@@ -189,11 +197,11 @@ export async function bootApp(
   app.locals.nunjucksEnv.addGlobal('t', (key: string, fallback?: unknown) =>
     typeof fallback === 'string' ? fallback : key
   );
+  // One signed-in session for the whole test, as the browser's session cookie would keep it.
+  const user = options.caseworker ? CASEWORKER : options.judge === false ? CITIZEN : JUDGE;
+  const session = { user: { ...user, accessToken: jwt({ ...user, exp: Math.floor(Date.now() / 1000) + 3600 }) } };
   app.use((req: Request, res: Response, next) => {
-    const user = options.caseworker ? CASEWORKER : options.judge === false ? CITIZEN : JUDGE;
-    Object.assign(req, {
-      session: { user: { ...user, accessToken: jwt({ ...user, exp: Math.floor(Date.now() / 1000) + 3600 }) } },
-    });
+    Object.assign(req, { session });
     res.locals.csrfToken = 'csrf-test';
     next();
   });

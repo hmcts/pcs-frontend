@@ -5,7 +5,7 @@ import { Application, Request, Response } from 'express';
 import { DateTime } from 'luxon';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
-import { MAKE_ORDER_ROUTE } from '../constants/caseRoutes';
+import { MAKE_ORDER_ROUTE, MAKE_ORDER_SENT_FOR_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 import { getUserRoles } from '../steps/utils';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
@@ -116,6 +116,36 @@ function attendanceParties({ caseContext }: MakeOrderStart): AttendanceRow[] {
   return [...parties('claimant', caseContext.claimants), ...parties('defendant', caseContext.defendants)];
 }
 
+/** The case as the confirmation of an order sent for review shows it. */
+function sentForReviewHeader(caseReference: string, caseContext: MakeOrderStart['caseContext']) {
+  const claimant = caseContext.claimants[0]?.name;
+  const primaryDefendant = caseContext.defendants[0]?.name;
+  return {
+    caseReference: caseNumberFormatter(caseReference),
+    propertyAddress: formatAddress(caseContext.propertyAddress),
+    caseName: [claimant, primaryDefendant].filter(Boolean).join(' vs '),
+  };
+}
+
+/**
+ * XUI's header as it shows it to a judge. XUI adds a user's role assignments, such as judge, to their
+ * IDAM roles to choose the header, and only judges reach these pages: CCD lets only them make an order.
+ */
+function xuiHeaderModel(req: Request): ReturnType<typeof buildHeaderModel> {
+  const roles = [...getUserRoles(req), 'judge'];
+  const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles } });
+  headerModel.assetsPath = '/assets/ui-component-lib';
+  return headerModel;
+}
+
+function manageCaseDetailsUrl(caseReference: string): string {
+  const url = buildManageCaseDetailsRedirect(config.get('redirects.manageCaseReturnURL'), caseReference);
+  if (!url) {
+    throw new HTTPError('The Manage Case return URL is not configured', 500);
+  }
+  return url;
+}
+
 /** What the judge sent, shown back with the issues that stopped it; the saved order fills any gaps. */
 interface Submission {
   orderType?: MakeOrderType;
@@ -129,8 +159,7 @@ function pageModel(
   { envelope, eventToken }: StartedOrder,
   submission?: Submission
 ): Record<string, unknown> {
-  const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles: getUserRoles(req) } });
-  headerModel.assetsPath = '/assets/ui-component-lib';
+  const headerModel = xuiHeaderModel(req);
   const { caseContext, order } = envelope;
   const draft: FormData = {
     ...caseFactsFormData(caseContext.caseFacts),
@@ -185,6 +214,8 @@ function refusedByCcd(error: unknown): boolean {
 export default function makeOrderRoutes(app: Application): void {
   app.get(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     try {
+      // A new order on the case is under way, so there is no longer one to confirm.
+      delete req.session.ordersSentForReview?.[req.params.caseReference as string];
       const started = await startOrderEvent(req.session.user!.accessToken, req.params.caseReference as string);
       res.render('make-order', pageModel(req, started));
     } catch (error) {
@@ -240,11 +271,15 @@ export default function makeOrderRoutes(app: Application): void {
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }
-      const manageCaseUrl = buildManageCaseDetailsRedirect(config.get('redirects.manageCaseReturnURL'), caseReference);
-      if (!manageCaseUrl) {
-        throw new HTTPError('The Manage Case return URL is not configured', 500);
+      if (action === 'SUBMIT_FOR_REVIEW') {
+        // Kept on the session so the confirmation survives a refresh, which cannot resubmit the order.
+        req.session.ordersSentForReview = {
+          ...req.session.ordersSentForReview,
+          [caseReference]: sentForReviewHeader(caseReference, JSON.parse(caseContext)),
+        };
+        return res.redirect(MAKE_ORDER_SENT_FOR_REVIEW_ROUTE.replace(':caseReference', caseReference));
       }
-      return res.redirect(manageCaseUrl);
+      return res.redirect(manageCaseDetailsUrl(caseReference));
     } catch (error) {
       if (refusedByCcd(error)) {
         return res.status(404).send('Not Found');
@@ -252,4 +287,25 @@ export default function makeOrderRoutes(app: Application): void {
       return next(error);
     }
   });
+
+  app.get(
+    MAKE_ORDER_SENT_FOR_REVIEW_ROUTE,
+    oidcMiddleware,
+    makeOrderFeatureMiddleware,
+    (req: Request, res: Response) => {
+      const caseReference = req.params.caseReference as string;
+      const closeUrl = manageCaseDetailsUrl(caseReference);
+      const sent = req.session.ordersSentForReview?.[caseReference];
+      if (!sent) {
+        // As in XUI, a confirmation with nothing to confirm returns the user to the case.
+        return res.redirect(closeUrl);
+      }
+      res.render('make-order-sent-for-review', {
+        headerModel: xuiHeaderModel(req),
+        footerModel: buildFooterModel(),
+        ...sent,
+        closeUrl,
+      });
+    }
+  );
 }
