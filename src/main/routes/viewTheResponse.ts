@@ -604,7 +604,7 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
   const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
   const allDefendants = caseData.allDefendants ?? [];
   const documents = extractCaseDocuments(caseData as Record<string, unknown>);
-  
+
   logger.info('[viewTheResponse] Document search context', {
     totalDocuments: documents.length,
     counterclaimDocs: documents.filter(d => d.categoryId === 'statementsOfCase').map(d => d.filename),
