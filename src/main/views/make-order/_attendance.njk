@@ -38,6 +38,7 @@
                    name="{{ party.id }}-attendance"
                    type="radio"
                    value="{{ option.value }}"
+                   required
                    {%- if draft[party.id + "-attendance"] == option.value %} checked{% endif %}>
             <label class="govuk-label govuk-radios__label" for="{{ party.id }}-{{ option.value }}">
               {%- if option.full -%}

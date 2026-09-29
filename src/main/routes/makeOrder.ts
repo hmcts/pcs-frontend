@@ -141,6 +141,8 @@ function pageModel(
   return {
     headerModel,
     footerModel: buildFooterModel(),
+    // The page's own URL, without the tab fragment the browser would otherwise post back to.
+    formAction: req.originalUrl,
     order,
     eventToken,
     // The case as the event started it, which the page's change is based on.

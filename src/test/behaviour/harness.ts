@@ -290,10 +290,10 @@ export async function openPage(html: string): Promise<Page> {
   document.write(html);
   document.close();
   const { initAll } = await import('govuk-frontend');
-  const { initMakeOrder, buildOrderDocument } = await import('../../main/assets/js/make-order');
+  const { initMakeOrder, buildOrderDocument, startWithSavedOrderTab } = await import('../../main/assets/js/make-order');
   // The template's inline script adds these; jsdom does not run it.
   document.body.classList.add('js-enabled', 'govuk-frontend-supported');
-  initAll();
+  startWithSavedOrderTab(initAll);
   initMakeOrder();
   const form = document.querySelector<HTMLFormElement>('#make-order-form');
   if (!form) {

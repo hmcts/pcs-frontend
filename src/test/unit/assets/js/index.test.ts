@@ -14,6 +14,7 @@ jest.mock('../../../../main/assets/js/multi-file-upload', () => ({
 
 jest.mock('../../../../main/assets/js/make-order', () => ({
   initMakeOrder: jest.fn(),
+  startWithSavedOrderTab: jest.fn((start: () => void) => start()),
 }));
 
 jest.mock('../../../../main/assets/js/postcode-lookup', () => ({

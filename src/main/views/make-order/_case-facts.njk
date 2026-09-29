@@ -24,7 +24,7 @@
 
 <section class="pcs-case-facts" aria-labelledby="case-facts-heading" data-case-facts>
   <div class="pcs-case-facts__header">
-    <h2 class="govuk-heading-s" id="case-facts-heading">Case facts (tenancy/contract)</h2>
+    <h2 class="govuk-heading-s" id="case-facts-heading">Case facts (tenancy/contract) <span class="govuk-!-font-weight-regular">(optional)</span></h2>
     <button
       type="button"
       class="pcs-case-facts__toggle"
@@ -59,12 +59,14 @@
 
       {{ compact.money({
         id: "arrears-notice",
+        optional: true,
         label: "Arrears at notice",
         labelClasses: "govuk-label--s"
       }) }}
 
       {{ compact.money({
         id: "current-rent",
+        optional: true,
         label: "Current rent",
         labelClasses: "govuk-label--s"
       }) }}
@@ -86,6 +88,7 @@
 
       {{ compact.money({
         id: "arrears-issue",
+        optional: true,
         label: "Arrears on issue",
         labelClasses: "govuk-label--s"
       }) }}
@@ -106,12 +109,14 @@
 
       {{ compact.money({
         id: "last-payment",
+        optional: true,
         label: "Last payment",
         labelClasses: "govuk-label--s"
       }) }}
 
       {{ compact.money({
         id: "arrears-today",
+        optional: true,
         label: "Arrears today",
         labelClasses: "govuk-label--s"
       }) }}
@@ -122,7 +127,7 @@
       name: "hearing-notes",
       rows: 8,
       value: draftValue("hearing-notes"),
-      label: { text: "Hearing notes (internal use only)", classes: "govuk-label--s" },
+      label: { text: "Hearing notes (optional, internal use only)", classes: "govuk-label--s" },
       errorMessage: validationErrors["hearing-notes"],
       formGroup: { classes: "govuk-!-margin-bottom-0" }
     }) }}

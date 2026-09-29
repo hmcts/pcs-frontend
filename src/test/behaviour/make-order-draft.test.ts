@@ -34,6 +34,8 @@ describe('make an order: drafting', () => {
     const rejected = await app.post(PAGE, body);
     expect(rejected.status).toBe(400);
     await openPage(rejected.text);
+    // The summary keeps the focus GOV.UK gives it, so the errors are read out.
+    expect(document.activeElement).toBe(control('#make-order-error-summary'));
     const summary = control('#make-order-error-summary').textContent;
     expect(summary).toContain('Select when the defendant must give up possession');
     expect(summary).toContain('Select mandatory or discretionary grounds');
@@ -69,6 +71,8 @@ describe('make an order: drafting', () => {
     await openPage((await app.get(PAGE)).text);
     expect(control('#order-type').value).toBe('SUSPENDED_POSSESSION');
     expect(control('.govuk-tabs__list-item--selected a').textContent).toContain('Suspended possession');
+    // The tab opens without leaving a fragment the browser would scroll to once the page loads.
+    expect(window.location.hash).toBe('');
     expect(control('[name="suspended-arrears"]').value).toBe('900');
     expect(JSON.parse(control<HTMLTextAreaElement>('#order-document').value).schema).toBe('docweave-document');
   });

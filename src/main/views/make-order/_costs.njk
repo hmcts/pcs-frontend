@@ -35,6 +35,7 @@
       text: choice.text,
       checked: draftChecked("costs-choice", choice.value),
       disabled: disabled,
+      attributes: { required: true } if not disabled,
       conditional: { html: fields } if choice.amountLabel or choice.value == "other"
     }]) %}
   {% endfor %}

@@ -6,8 +6,9 @@
   Each listing option carries its own date on the same row as its radio, so a judge
   can fill the date in one movement rather than selecting an option and then moving
   to a shared field. Typing in a row selects that row's radio (initOptionRows in
-  make-order.ts), and only the selected option's date is read into the order.
-  Hidden legends keep every control named for assistive technology.
+  make-order.ts), and only the selected option's date is read into the order, so only
+  its fields are marked required. Hidden legends keep every control named for assistive
+  technology.
 #}
 {% macro whenRow(id, value, text, checked, extraHtml) %}
   <div class="pcs-option-row" data-option-row>
@@ -16,7 +17,7 @@
       <label class="govuk-label govuk-radios__label" for="{{ id }}">{{ text }}</label>
     </div>
     <div class="pcs-option-row__fields">
-      {{ compact.date({ id: "adj-hearing-date-" + value, legend: text, legendHidden: true }) }}
+      {{ compact.date({ id: "adj-hearing-date-" + value, legend: text, legendHidden: true, optional: not checked }) }}
       {{ extraHtml | safe if extraHtml }}
     </div>
   </div>
@@ -29,7 +30,8 @@
     hint: "For example, 10:30am or 14:30",
     classes: "govuk-input--width-5",
     formGroupClasses: "pcs-option-row__time",
-    spellcheck: false
+    spellcheck: false,
+    optional: not draftChecked("adj-when", "specific")
   }) }}
 {% endset %}
 
@@ -71,7 +73,7 @@
 
   <div id="adj-format-group" class="pcs-section-break">
     {{ compact.checkboxes("adj-format", {
-      legend: "Hearing format",
+      legend: "Hearing format (optional)",
       default: "in-person",
       items: [
         { value: "in-person", text: "In person" },
@@ -94,7 +96,7 @@
     }]) %}
   {% endfor %}
   {{ compact.checkboxes("adj-directions", {
-    legend: "Directions",
+    legend: "Directions (optional)",
     classes: "pcs-divided-options",
     formGroup: { classes: "pcs-section-break" },
     items: directionItems
@@ -114,7 +116,7 @@
 
 {% set generallyHtml %}
   {{ compact.checkboxes("adj-gen", {
-    legend: "Conditions",
+    legend: "Conditions (optional)",
     classes: "pcs-divided-options",
     items: [
       {

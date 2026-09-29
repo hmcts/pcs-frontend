@@ -3,6 +3,9 @@
   saved answers (draftChecked, draftValue, draftDate, draftSelect) and validation errors
   themselves, so the tab partials only describe the question. The screen is used by judges
   during a hearing, so related fields sit on one row; matching classes live in make-order.scss.
+
+  Every question the page shows is required unless it says otherwise, so the controls are marked
+  required for assistive technology by default; pass optional: true for the few that are not.
 #}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
@@ -40,7 +43,8 @@
       text: item.text,
       html: item.html,
       conditional: item.conditional,
-      checked: draftChecked(name, item.value) or (item.value == params.default and not draftValue(name))
+      checked: draftChecked(name, item.value) or (item.value == params.default and not draftValue(name)),
+      attributes: { required: true } if not params.optional
     }]) %}
   {% endfor %}
   {{ govukRadios({
@@ -59,6 +63,7 @@
     {% set items = items.concat([{
       value: item.value,
       text: item.text,
+      html: item.html,
       conditional: item.conditional,
       disabled: item.disabled,
       checked: draftChecked(name, item.value) or (item.value == params.default and not draftValue(name))
@@ -68,7 +73,9 @@
     idPrefix: params.idPrefix or name,
     name: name,
     classes: "govuk-checkboxes--small" + (" " + params.classes if params.classes else ""),
-    fieldset: { legend: { text: params.legend, classes: "govuk-fieldset__legend--s" } } if params.legend,
+    fieldset: {
+      legend: { text: params.legend, classes: "govuk-visually-hidden" if params.legendHidden else "govuk-fieldset__legend--s" }
+    } if params.legend,
     formGroup: params.formGroup,
     errorMessage: validationErrors[name],
     items: items
@@ -86,6 +93,7 @@
     name: id,
     label: { text: params.label, classes: "govuk-visually-hidden" if params.labelHidden else params.labelClasses },
     items: draftSelect(params.items, id, params.default),
+    attributes: { required: true } if not params.optional,
     errorMessage: validationErrors[id]
   }) }}
 {% endmacro %}
@@ -101,6 +109,7 @@
     spellcheck: params.spellcheck,
     inputmode: params.inputmode,
     value: draftValue(id),
+    attributes: { required: true } if not params.optional,
     errorMessage: validationErrors[id]
   }) }}
 {% endmacro %}
@@ -113,6 +122,7 @@
     label: { text: params.label, classes: params.labelClasses },
     formGroup: { classes: params.formGroupClasses },
     value: draftValue(id),
+    attributes: { required: true } if not params.optional,
     errorMessage: validationErrors[id]
   }) }}
 {% endmacro %}
@@ -131,6 +141,7 @@
     value: draftValue(params.id),
     inputmode: "decimal",
     prefix: { text: "£" },
+    attributes: { required: true } if not params.optional,
     errorMessage: validationErrors[params.id]
   }) }}
 {% endmacro %}
@@ -138,11 +149,19 @@
 {# Date with quick-fill pills. #}
 {% macro date(params={}) %}
   {# Suffixed: govukDateInput derives its item ids from params.id, so it keeps that id. #}
+  {% set dateItems = [] %}
+  {% for item in draftDate(params.id) %}
+    {% set dateItems = dateItems.concat([{
+      name: item.name,
+      value: item.value,
+      attributes: { required: true } if not params.optional
+    }]) %}
+  {% endfor %}
   <div id="{{ params.id }}-pills" class="pcs-date-with-pills">
     {{ govukDateInput({
       id: params.id,
       namePrefix: params.id,
-      items: draftDate(params.id),
+      items: dateItems,
       fieldset: {
         legend: {
           text: params.legend,

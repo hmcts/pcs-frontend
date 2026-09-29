@@ -26,6 +26,7 @@
 {# This field continues the Grounds question, so it has no divider. #}
 {{ compact.text("outright-grounds-details", {
   label: "Details of grounds (optional)",
+  optional: true,
   formGroupClasses: "pcs-continues-question"
 }) }}
 
@@ -33,8 +34,8 @@
   {% call compact.row({ id: "outright-mj-amounts", groupLabel: "Arrears and interest" }) %}
     {{ compact.copy("Arrears") }}
     {{ compact.money({ id: "outright-mj-arrears", label: "Arrears", labelHidden: true }) }}
-    {{ compact.copy("Interest") }}
-    {{ compact.money({ id: "outright-mj-interest", label: "Interest", labelHidden: true }) }}
+    {{ compact.copy("Interest (optional)") }}
+    {{ compact.money({ id: "outright-mj-interest", label: "Interest (optional)", labelHidden: true, optional: true }) }}
   {% endcall %}
 {% endset %}
 
@@ -43,7 +44,7 @@
 {% endset %}
 
 {% set lumpHtml %}
-  {% call compact.row() %}
+  {% call compact.row({ groupLabel: "Payment to claimant" }) %}
     {{ compact.copy("Payment of") }}
     {{ compact.money({ id: "outright-mj-lump-amount", label: "Payment amount", labelHidden: true }) }}
     {{ compact.copy("by") }}
@@ -53,7 +54,7 @@
 {% endset %}
 
 {% set instalmentsHtml %}
-  {% call compact.row() %}
+  {% call compact.row({ groupLabel: "Instalment payments" }) %}
     {{ compact.copy("Instalment payments of") }}
     {{ compact.money({ id: "outright-mj-inst-amount", label: "Instalment amount", labelHidden: true }) }}
     {{ compact.select("outright-mj-inst-freq", {
@@ -70,6 +71,8 @@
 {# A lump sum and instalments may both apply to the same debt. #}
 {% set paymentPlanHtml %}
   {{ compact.checkboxes("outright-mj-plan", {
+    legend: "How the sums must be paid",
+    legendHidden: true,
     items: [
       { value: "lump", text: "Payment to claimant", conditional: { html: lumpHtml } },
       { value: "instalments", text: "Instalment payments", conditional: { html: instalmentsHtml } }
@@ -79,6 +82,8 @@
 
 {% set moneyJudgmentHtml %}
   {{ compact.checkboxes("outright-mj-sections", {
+    legend: "Money judgment",
+    legendHidden: true,
     items: [
       { value: "arrears", text: "Judgment for arrears", conditional: { html: arrearsHtml } },
       { value: "payment-plan", text: "The above sums must be paid by", conditional: { html: paymentPlanHtml } }
@@ -87,7 +92,7 @@
 {% endset %}
 
 {% set useOccupationHtml %}
-  {% call compact.row() %}
+  {% call compact.row({ groupLabel: "Damages for unlawful occupation" }) %}
     {{ compact.money({ id: "outright-use-occupation-rate", label: "Daily rate" }) }}
     {{ compact.copy("From") }}
     {{ compact.date({ id: "outright-use-occupation-from-date", legend: "Damages start date", legendHidden: true }) }}
@@ -95,6 +100,7 @@
 {% endset %}
 
 {{ compact.checkboxes("outright-options", {
+  legend: "Additional orders (optional)",
   classes: "pcs-divided-options",
   items: [
     { value: "money-judgment", text: "Money judgment", conditional: { html: moneyJudgmentHtml } },

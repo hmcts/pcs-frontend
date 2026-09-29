@@ -35,7 +35,8 @@
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
-  <form method="post" novalidate id="make-order-form"
+  {# The explicit action leaves out the tab fragment, so a refused submission opens at the error summary. #}
+  <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
         data-property-address="{{ propertyAddressDisplay }}">
   <input type="hidden" name="eventToken" value="{{ eventToken }}">
   <input type="hidden" name="caseContext" value="{{ caseContextJson }}">
@@ -54,12 +55,14 @@
     {{ claimantNames }} vs {{ defendantNames }}
   </p>
 
+  <p class="govuk-body">Answer every question unless it says it is optional.</p>
+
   {% include "make-order/_case-facts.njk" %}
   {% include "make-order/_attendance.njk" %}
 
   <h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>
 
-  {{ compact.reveal("recitals", "Recitals", compact.textarea("recitals-text", { label: "Recital paragraphs" })) }}
+  {{ compact.reveal("recitals", "Recitals", compact.textarea("recitals-text", { label: "Recital paragraphs", optional: true })) }}
 
   <h2 class="govuk-heading-l govuk-!-margin-top-6">Order type</h2>
 
@@ -100,7 +103,7 @@
     <textarea hidden id="order-document" name="orderDocument">{{ orderDocumentJson }}</textarea>
   </section>
 
-  {{ compact.reveal("staff-message", "Staff message", compact.textarea("staff-message-text", { label: "Message for court staff" })) }}
+  {{ compact.reveal("staff-message", "Staff message", compact.textarea("staff-message-text", { label: "Message for court staff", optional: true })) }}
 
   <div class="govuk-button-group govuk-!-margin-top-6">
     {{ govukButton({
