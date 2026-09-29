@@ -379,10 +379,7 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
     case 'STRIKE_OUT_DISMISSAL':
       return validateStrikeOut(formData);
     case 'FREE_FORM':
-      return [
-        ...(value(formData, 'free-form-text') ? [] : [{ id: 'free-form-text', message: 'Enter the order wording' }]),
-        ...validateCosts(formData, false),
-      ];
+      return validateCosts(formData, false);
     default:
       throw new Error(`Unknown order type: ${orderType}`);
   }

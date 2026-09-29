@@ -8,7 +8,6 @@ import {
   recordAttendance,
   selectTab,
   submittedEventTokens,
-  type,
 } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
@@ -22,7 +21,6 @@ function parse(html: string): Document {
 async function sendOrderForReview(app: TestApp, recordOtherAttendance = () => {}) {
   const page = await openPage((await app.get(PAGE)).text);
   selectTab('tab-free-form');
-  type('free-form-text', 'The claim is stayed.');
   recordAttendance();
   recordOtherAttendance();
   const body = page.body();
