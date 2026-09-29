@@ -1,14 +1,16 @@
-import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { toCaseReference16 } from '@utils/caseReference';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
-import { createFormStep, getTranslationFunction } from '@modules/steps';
+
 import { getCaseTitleData } from '../../utils/getCaseTitleData';
 import { flowConfig } from '../flow.config';
+
 import { buildSummaryListRows } from './summaryListRowFactory';
-// import VisibleFormDataView from './visibleFormDataView';
-import { submitEvent } from '@services/ccdCaseService';
 import VisibleFormDataView from './visibleFormDataView';
+
+import { createFormStep, getTranslationFunction } from '@modules/steps';
+import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { submitEvent } from '@services/ccdCaseService';
+import { toCaseReference16 } from '@utils/caseReference';
 
 // TODO: Put journeyName into common file?
 const STEP_NAME = 'check-your-answers';
@@ -20,12 +22,11 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/checkYourAnswers.njk`,
-  fields: [
-  ],
+  fields: [],
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
-    heading: 'heading'
+    heading: 'heading',
   },
   extendGetContent: async (req: Request) => {
     const t: TFunction = getTranslationFunction(req);
@@ -34,7 +35,7 @@ export const step: StepDefinition = createFormStep({
       summaryData: {
         rows: await buildSummaryListRows(req, t),
       },
-      ...getCaseTitleData(req)
+      ...getCaseTitleData(req),
     };
   },
   beforeRedirect: async (req: Request) => {
@@ -52,8 +53,7 @@ export const step: StepDefinition = createFormStep({
         translatedDocuments: uploadedDocs,
       },
     };
-    await submitEvent(req.session?.user?.accessToken, "ext:uploadTranslatedClaimForm", eventData)
-
+    await submitEvent(req.session?.user?.accessToken, 'ext:uploadTranslatedClaimForm', eventData);
 
     //
     // clearFormData(req);

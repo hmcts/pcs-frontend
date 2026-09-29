@@ -17,7 +17,8 @@ export function getUserRoles(req: Request): string[] {
     .filter(Boolean);
 }
 
-export function isLegalRepresentativeUser(req: Request): boolean {
+// TODO: Change to support caseworkers as well
+export function isLegalRepresentativeUser(_req: Request): boolean {
   return true;
   // return getUserRoles(req).some(role =>
   //   LEGAL_REPRESENTATIVE_USER_ROLES.includes(role as (typeof LEGAL_REPRESENTATIVE_USER_ROLES)[number])

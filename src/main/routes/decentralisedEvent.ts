@@ -51,8 +51,6 @@ export default function decentralisedEventRoutes(app: Application): void {
         delete req.session[key];
       }
 
-      req.query
-
       return res.redirect('/login');
     }
 

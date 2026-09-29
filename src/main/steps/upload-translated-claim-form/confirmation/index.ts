@@ -1,9 +1,10 @@
-import { createFormStep } from '@modules/steps';
 import type { Request } from 'express';
+
 import { getCaseTitleData } from '../../utils/getCaseTitleData';
 import { buildCaseOverviewUrl } from '../../utils/xuiLinkBuilder';
 import { flowConfig } from '../flow.config';
 
+import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const STEP_NAME = 'confirmation';
@@ -19,7 +20,7 @@ export const step: StepDefinition = createFormStep({
   translationKeys: {
     pageTitle: 'pageTitle',
     confirmationPanelTitle: 'confirmationPanelTitle',
-    confirmationPanelBody: 'confirmationPanelBody'
+    confirmationPanelBody: 'confirmationPanelBody',
   },
   extendGetContent: async (req: Request) => {
     const ccdCase = req.res?.locals.validatedCase;
@@ -31,7 +32,7 @@ export const step: StepDefinition = createFormStep({
 
     return {
       caseOverviewUrl: buildCaseOverviewUrl(ccdCase?.id),
-      ...getCaseTitleData(req)
+      ...getCaseTitleData(req),
     };
   },
 });

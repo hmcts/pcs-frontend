@@ -1,10 +1,12 @@
+import { Request } from 'express';
+
+import { getCaseTitleData } from '../../utils/getCaseTitleData';
+import { flowConfig } from '../flow.config';
+
 import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
-import { Request } from 'express';
-import { getCaseTitleData } from '../../utils/getCaseTitleData';
-import { flowConfig } from '../flow.config';
 
 const STEP_NAME = 'upload-documents';
 const JOURNEY_NAME = 'uploadTranslatedClaimForm';
@@ -47,5 +49,5 @@ export const step: StepDefinition = createFormStep({
   extendGetContent: async (req: Request) => {
     return getCaseTitleData(req);
   },
-  getInitialFormData: async req => ({documents: toDisplayDocuments(await uploadStorage.read(req)) }),
+  getInitialFormData: async req => ({ documents: toDisplayDocuments(await uploadStorage.read(req)) }),
 });

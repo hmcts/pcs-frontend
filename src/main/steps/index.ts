@@ -1,11 +1,7 @@
 import type { Request, RequestHandler } from 'express';
 
-import { flowConfig as uploadTranslatedClaimFormFlowConfig } from './upload-translated-claim-form/flow.config';
-import { stepRegistry as uploadTranslatedClaimFormStepRegistry } from './upload-translated-claim-form/stepRegistry';
-
 import { flowConfig as uploadAdditionalDocumentsFlowConfig } from './case-tasks/upload-additional-documents/flow.config';
 import { stepRegistry as uploadAdditionalDocumentsStepRegistry } from './case-tasks/upload-additional-documents/stepRegistry';
-
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
 import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
 import { respondToClaimAccessGuard } from './respond-to-claim/accessGuard';
@@ -14,6 +10,8 @@ import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.
 import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
 import { legalRepStepRegistry as respondToClaimLegalRepStepRegistry } from './respond-to-claim/legalrep.stepRegistry';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
+import { flowConfig as uploadTranslatedClaimFormFlowConfig } from './upload-translated-claim-form/flow.config';
+import { stepRegistry as uploadTranslatedClaimFormStepRegistry } from './upload-translated-claim-form/stepRegistry';
 import { getUserType } from './utils';
 
 import type { CcdDraftEvent } from '@modules/documents/storage';

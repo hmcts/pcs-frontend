@@ -1,7 +1,8 @@
+import type { Request } from 'express';
+
 import { sessionDocs } from '@modules/documents/storage';
 import { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { toCaseReference16 } from '@utils/caseReference';
-import type { Request } from 'express';
 
 const uploadStorage = sessionDocs({ stepName: 'upload-documents' }); // TODO: Is this OK?
 // export type FieldDetails<T> = {
@@ -21,5 +22,4 @@ export default class VisibleFormDataView {
     // const docs = this.req.session.uploadedDocs?.[caseRef]?.['upload-documents'];
     return Array.isArray(docs) ? (docs as CcdCollectionItem<CcdUploadedDocument>[]) : [];
   }
-
 }
