@@ -103,7 +103,7 @@
     <textarea hidden id="order-document" name="orderDocument">{{ orderDocumentJson }}</textarea>
   </section>
 
-  {{ compact.reveal("staff-message", "Staff message", compact.textarea("staff-message-text", { label: "Message for court staff", optional: true })) }}
+  {{ compact.reveal("staff-message", "Staff message", compact.textarea("staff-message-text", { label: "Message for court staff" })) }}
 
   <div class="govuk-button-group govuk-!-margin-top-6">
     {{ govukButton({
