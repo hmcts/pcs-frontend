@@ -611,6 +611,13 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
   });
 
   // If we can determine the specific defendant number, use exact matching
+  logger.info('[viewTheResponse] Exact match attempt', {
+    hasCurrentDefendantPartyId: !!currentDefendantPartyId,
+    currentDefendantPartyId,
+    allDefendantsCount: allDefendants.length,
+    allDefendantIds: allDefendants.map(d => d.id),
+  });
+
   if (currentDefendantPartyId && allDefendants.length > 0) {
     const defendantIndex = allDefendants.findIndex(defendant => defendant.id === currentDefendantPartyId);
 
