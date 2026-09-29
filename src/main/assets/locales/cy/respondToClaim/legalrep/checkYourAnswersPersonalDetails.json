@@ -29,7 +29,7 @@
     },
     "emailAddress": {
       "label": "Cyfeiriad e-bost y diffynnydd",
-      "changeHidden": "cy defendant’s email address"
+      "changeHidden": "cyfeiriad e-bost y diffynnydd"
     }
   }
 }

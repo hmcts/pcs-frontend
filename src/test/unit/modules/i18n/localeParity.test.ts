@@ -23,7 +23,6 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'respondToClaim/endOfJourneyCya.json::heading',
   'respondToClaim/endOfJourneyCya.json::pageTitle',
   'respondToClaim/endOfJourneyCya.json::sections.regularExpenses',
-  'respondToClaim/legalrep/checkYourAnswersPersonalDetails.json::rows.emailAddress.changeHidden',
   'respondToClaim/legalrep/counterClaimApplicationFeeAmount.json::labels.pba',
   'respondToClaim/legalrep/counterClaimApplicationFeeAmount.json::labels.selectPba',
   'respondToClaim/legalrep/counterClaimApplicationFeeAmount.json::options.pba',
