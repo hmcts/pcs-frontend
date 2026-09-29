@@ -36,8 +36,8 @@
     "contactPreferences": "Dewisiadau cyswllt",
     "freeLegalAdvice": "A ydych wedi cael unrhyw gyngor cyfreithiol am ddim?",
     "freeLegalAdviceOptions": {
-      "YES": "Ydy",
-      "NO": "Nac ydy",
+      "YES": "Do",
+      "NO": "Naddo",
       "PREFER_NOT_TO_SAY": "Mae'n well gen i beidio dweud"
     }
   },
@@ -175,5 +175,71 @@
     "linkText": "dudalen Dogfennau"
   },
   "personsUnknown": "Unigolion yn anhysbys",
-  "addressUnknown": "Cyfeiriad yn anhysbys"
+  "addressUnknown": "Cyfeiriad yn anhysbys",
+  "answers": {
+    "possessionNoticeReceived": {
+      "yes": "Do",
+      "no": "Naddo"
+    },
+    "makeCounterClaim": {
+      "yes": "Oes",
+      "no": "Nac oes"
+    },
+    "anyPaymentsMade": {
+      "yes": "Do",
+      "no": "Naddo"
+    },
+    "repaymentPlanAgreed": {
+      "yes": "Do",
+      "no": "Naddo"
+    },
+    "repayArrearsInstalments": {
+      "yes": "Hoffwn",
+      "no": "Na hoffwn"
+    },
+    "dependantChildren": {
+      "yes": "Oes",
+      "no": "Nac oes"
+    },
+    "otherDependants": {
+      "yes": "Oes",
+      "no": "Nac oes"
+    },
+    "otherTenants": {
+      "yes": "Oes",
+      "no": "Nac oes"
+    },
+    "alternativeAccommodation": {
+      "yes": "Byddai",
+      "no": "Na fyddai"
+    },
+    "shareAdditionalCircumstances": {
+      "yes": "Hoffwn",
+      "no": "Na hoffwn"
+    },
+    "exceptionalHardship": {
+      "yes": "Byddwn",
+      "no": "Na fyddwn"
+    },
+    "universalCreditApplied": {
+      "yes": "Do",
+      "no": "Naddo"
+    },
+    "priorityDebts": {
+      "yes": "Oes",
+      "no": "Nac oes"
+    },
+    "otherConsiderations": {
+      "yes": "Oes",
+      "no": "Nac oes"
+    },
+    "isClaimAmountKnown": {
+      "yes": "Ydw",
+      "no": "Nac ydw"
+    },
+    "appliedForHwf": {
+      "yes": "Do",
+      "no": "Naddo"
+    }
+  }
 }
