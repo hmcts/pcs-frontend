@@ -79,6 +79,7 @@ describe('judgeXuiRedirectMiddleware', () => {
 
   it.each([
     '/case/1234567890123456/make-order',
+    '/case/1234567890123456/make-order/sent-for-review',
     '/cases/1234567890123456/event/ext:makeOrder',
     // How XUI builds the hand-off: encodeURIComponent(eventId)
     '/cases/1234567890123456/event/ext%3AmakeOrder',

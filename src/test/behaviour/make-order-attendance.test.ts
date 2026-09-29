@@ -1,14 +1,4 @@
-import {
-  CASE_REFERENCE,
-  MANAGE_CASE_URL,
-  type TestApp,
-  bootApp,
-  check,
-  control,
-  openPage,
-  selectTab,
-  type,
-} from './harness';
+import { CASE_REFERENCE, type TestApp, bootApp, check, control, openPage, selectTab, type } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
 
@@ -80,7 +70,7 @@ describe('make an order: attendance', () => {
     body.set('action', 'SUBMIT_FOR_REVIEW');
     const submitted = await app.post(PAGE, body);
     expect(submitted.status).toBe(302);
-    expect(submitted.location).toBe(MANAGE_CASE_URL);
+    expect(submitted.location).toBe(`${PAGE}/sent-for-review`);
   });
 
   it('only accepts the attendance a party can have', async () => {
