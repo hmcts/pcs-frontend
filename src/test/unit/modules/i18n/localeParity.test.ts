@@ -32,7 +32,6 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'respondToClaim/legalrep/counterClaimHaveYouAppliedForHelp.json::revealedHwfQuestionHint',
   'respondToClaim/legalrep/counterClaimSpecificSum.json::noSpecificFeeText',
   'respondToClaim/legalrep/counterClaimSpecificSum.json::specificFeeText',
-  'respondToClaim/legalrep/responseSubmittedCounterClaimFeePaymentNeeded.json::responseSubmittedCounterClaimFeePaymentNeededListItem1',
   'respondToClaim/legalrep/tenancyDateDetails.json::dateLabel',
   'respondToClaim/legalrep/tenancyDateDetails.json::errors.confirmTenancyDate',
   'respondToClaim/legalrep/tenancyDateDetails.json::heading',
