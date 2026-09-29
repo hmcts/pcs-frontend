@@ -4,7 +4,7 @@ properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([
     cron('H 07 * * 1-5'),
-    cron('5 15 * * 2')   // TEST: every Tuesday at 15:05
+    cron('15 15 * * 2')   // TEST: every Tuesday at 15:15
   ]),
   parameters([
     text(
@@ -148,7 +148,7 @@ withNightlyPipeline(type, product, component) {
     runE2ETests(yarnBuilder)
   }
 
-  // Weekly @EMV test run — currently TEST schedule: every Tuesday at 15:05
+  // Weekly @EMV test run — currently TEST schedule: every Tuesday at 15:15
   afterAlways('fortify-scan') {
     if (isWeeklyEmvSchedule()) {
       runEmvWeeklyTests(yarnBuilder)
@@ -157,7 +157,7 @@ withNightlyPipeline(type, product, component) {
 }
 
 def isWeeklyEmvSchedule() {
-  // TEST schedule: fires from cron('5 15 * * 2') — Tuesday 15:05.
+  // TEST schedule: fires from cron('15 15 * * 2') — Tuesday 15:15.
   // Guard matches Tuesday (DAY_OF_WEEK = 3) in the 15:00 hour.
   def cal = Calendar.getInstance()
   cal.setTime(new Date())
@@ -254,7 +254,7 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
   }
 }
 
-/** Weekly @EMV run — currently TEST schedule: every Tuesday at 15:05, Chrome only. */
+/** Weekly @EMV run — currently TEST schedule: every Tuesday at 15:15, Chrome only. */
 def runEmvWeeklyTests(yarnBuilder) {
   stage("E2E - Weekly @EMV [${env.ENVIRONMENT}]") {
     node {
