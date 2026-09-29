@@ -4,4 +4,7 @@ export const reviewSupport = {
   submitButton: `Submit`,
   cancelLink: `Cancel`,
   newSupportRequestButton: `Add a new support request`,
+  noLongerNeededLink: `I no longer need this`,
+  stillNeedThisLink: `I still need this`,
+  supportYouNoLongerNeedSubHeader: 'Support you no longer need',
 };

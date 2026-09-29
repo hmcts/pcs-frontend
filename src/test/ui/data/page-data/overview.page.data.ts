@@ -3,9 +3,22 @@ export const overview = {
   backLink: `Back`,
   continueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
-   expectedAdjustments: [
+  changeLink: `Change my support options`,
+  expectedAdjustments: [
     { type: 'Accessible toilet', status: 'Approved' },
     { type: 'Audio translation of documents', status: 'Approved' },
+    { type: 'Braille documents', status: 'Approved' },
+    { type: 'Extra time to think and explain myself', status: 'Requested' },
+    { type: 'Help using a lift', status: 'Approved' },
+    { type: 'Information emailed to me', status: 'Approved' },
+    { type: 'Need to be close to who is speaking', status: 'Requested' },
+    { type: 'Private waiting area', status: 'Requested' },
+    { type: 'Regular breaks', status: 'Requested' },
+    { type: 'Use of venue wheelchair', status: 'Approved' },
+  ],
+  remaningAdjustments: [
+    { type: 'Accessible toilet', status: 'No longer needed' },
+    { type: 'Audio translation of documents', status: 'No longer needed' },
     { type: 'Braille documents', status: 'Approved' },
     { type: 'Extra time to think and explain myself', status: 'Requested' },
     { type: 'Help using a lift', status: 'Approved' },

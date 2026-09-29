@@ -80,6 +80,7 @@ import {
   yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { overview } from '../data/page-data/overview.page.data';
+import { supportNeedsChanged } from '../data/page-data/supportNeedsChanged.page.data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
@@ -452,6 +453,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: taskList.yourSupportLink,
+      respondTag: dashboard.inProgressTag,
+      ysTag: taskList.doneTag,
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
@@ -2244,7 +2250,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       ysSubHeader: dashboard.yourSupportSubHeader,
       respondTag: dashboard.notStartedTag,
       ysTag: dashboard.blankTag,
-    }); 
+    });
     await performAction('clickLink', dashboard.respondToTheClaimSubHeader);
     await performAction('clickLink', taskList.readInformationAboutLink);
     await performAction('clickButton', startNow.startNowButton);
@@ -2392,7 +2398,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       ysSubHeader: taskList.yourSupportLink,
       respondTag: dashboard.inProgressTag,
       ysTag: taskList.availableTag,
-    }); 
+    });
     await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
@@ -2466,7 +2472,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       ysSubHeader: taskList.yourSupportLink,
       respondTag: dashboard.inProgressTag,
       ysTag: taskList.doneTag,
-    }); 
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -2556,11 +2562,33 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       respondTag: dashboard.completedTag,
       ysTag: dashboard.availableTag,
       rtcSubHeader: dashboard.respondToTheClaimSubHeader,
-    }); 
+    });
     await performAction('clickLink', dashboard.yourSupportSubHeader);
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
-    await performAction('verifySupportAdjustments',{expectedAdjustments: overview.expectedAdjustments,} ); 
+    await performAction('verifySupportAdjustments', { expectedAdjustments: overview.expectedAdjustments });
+    await performAction('clickLink', overview.changeLink);
+    await performValidation('mainHeader', supportNeedsChanged.mainHeader);
+    await performAction('clickButton', supportNeedsChanged.startNowButton);
+    await performValidation('mainHeader', reviewSupport.mainHeader);
+    await performAction('changeSupport', {
+      expectedAdjustments: ['Accessible toilet', 'Audio translation of documents'],
+      supportYouNoLongerNeedHeader: reviewSupport.supportYouNoLongerNeedSubHeader,
+      notNeededLink: reviewSupport.noLongerNeededLink,
+      stillNeeded: reviewSupport.stillNeedThisLink,
+    });
+    await performAction('clickButton', reviewSupport.submitButton);
+    await performValidation('mainHeader', supportRequest.mainHeader);
+    await performAction('clickButton', supportRequest.continueButton);
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: dashboard.yourSupportSubHeader,
+      respondTag: dashboard.completedTag,
+      ysTag: dashboard.availableTag,
+    });
+    await performAction('clickLink', dashboard.yourSupportSubHeader);
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
+    await performAction('verifySupportAdjustments', { expectedAdjustments: overview.remaningAdjustments });
   });
 
   test('YourSupport Request NOT Sent To Court NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @regression @assured @nightly', async () => {
