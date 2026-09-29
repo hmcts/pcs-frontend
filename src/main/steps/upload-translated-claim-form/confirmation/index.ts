@@ -21,6 +21,11 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     confirmationPanelTitle: 'confirmationPanelTitle',
     confirmationPanelBody: 'confirmationPanelBody',
+    caption: 'caption',
+    translationUploadedMessage: 'translationUploadedMessage',
+    whatHappensNext: 'whatHappensNext',
+    claimPackWillBeSent: 'claimPackWillBeSent',
+    closeAndReturnToCaseSummary: 'closeAndReturnToCaseSummary',
   },
   extendGetContent: async (req: Request) => {
     const ccdCase = req.res?.locals.validatedCase;
