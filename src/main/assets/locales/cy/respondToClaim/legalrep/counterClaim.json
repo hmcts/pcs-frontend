@@ -6,5 +6,9 @@
   "question": "A yw'r diffynnydd yn cynllunio i wneud gwrth-hawliad yn erbyn {{claimantName}}?",
   "errors": {
     "makeCounterClaim": "Dewiswch a yw'r diffynnydd yn bwriadu gwneud gwrth-hawliad"
+  },
+  "options": {
+    "yes": "Ydy",
+    "no": "Nac ydy"
   }
 }

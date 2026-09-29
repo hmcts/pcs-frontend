@@ -7,5 +7,9 @@
     "otherConsiderationsDetails": "Rhowch fanylion yr hyn yr ydych am ei ddweud wrth y llys",
     "otherConsiderationsInvalid": "Rhowch fanylion beth arall yr ydych am ei ddweud wrth y llys i gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod",
     "otherConsiderationsDetailsMaxLength": "Rhaid i fanylion am beth arall rydych eisiau ei ddweud wrth y llys fod yn 6400 nod neu lai"
+  },
+  "options": {
+    "yes": "Oes",
+    "no": "Nac oes"
   }
 }

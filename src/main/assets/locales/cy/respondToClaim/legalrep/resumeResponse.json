@@ -8,5 +8,9 @@
   "question": "A ydych eisiau parhau â’r ymateb gan ddefnyddio’ch atebion a gadwyd?",
   "errors": {
     "resumeResponse": "Dewiswch a ydych eisiau parhau â’r ymateb gan ddefnyddio’ch atebion a gadwyd?"
+  },
+  "options": {
+    "yes": "Oes",
+    "no": "Nac oes"
   }
 }

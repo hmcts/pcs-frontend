@@ -3,8 +3,8 @@
   "heading": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
   "question": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
+    "yes": "Do",
+    "no": "Naddo",
     "or": "neu",
     "imNotSure": "Nid wyf yn siŵr"
   },

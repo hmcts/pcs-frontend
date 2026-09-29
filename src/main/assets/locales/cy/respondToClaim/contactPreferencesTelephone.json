@@ -5,8 +5,8 @@
   "labels": {
     "question": "Ydych chi'n hapus i ni gysylltu â chi dros y ffôn?",
     "options": {
-      "yes": "Ydy",
-      "no": "Nac ydy"
+      "yes": "Ydw",
+      "no": "Nac ydw"
     },
     "phoneNumberLabel": "Rhif ffôn yn y DU"
   },

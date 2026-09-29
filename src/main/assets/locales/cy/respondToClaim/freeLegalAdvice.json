@@ -5,8 +5,8 @@
   "question": "A ydych wedi cael unrhyw gyngor cyfreithiol am ddim?",
   "hadLegalAdviceHint": "Rydym yn gofyn y cwestiwn hwn fel y gallwn wirio bod pawb yn cael y cymorth am ddim sydd ganddynt hawl iddo. Ni fydd eich ateb yn effeithio ar ganlyniad yr hawliad",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
+    "yes": "Do",
+    "no": "Naddo",
     "or": "neu",
     "preferNotToSay": "Mae'n well gen i beidio dweud"
   },

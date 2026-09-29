@@ -21,5 +21,9 @@
       "negative": "Rhaid i uchafswm gwerth rydych yn ei hawlio fod yn £0.00 neu'n uwch",
       "invalidFormat": "Rhowch uchafswm gwerth eich hawliad yn y fformat cywir, er enghraifft 148.00 neu 148.50"
     }
+  },
+  "options": {
+    "yes": "Ydw",
+    "no": "Nac ydw"
   }
 }

@@ -5,8 +5,8 @@
   "dateLabel": "Pryd wnaethoch chi wneud cais?",
   "dateHint": "Er enghraifft, 27 9 2022",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy"
+    "yes": "Do",
+    "no": "Naddo"
   },
   "errors": {
     "haveAppliedForUniversalCredit": "Dewiswch os ydych chi wedi gwneud cais am Gredyd Cynhwysol",

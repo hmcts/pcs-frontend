@@ -2,8 +2,8 @@
   "pageTitle": "Oedolion eraill",
   "question": "A oes yna unrhyw oedolion eraill yn byw yn eich cartref?",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy"
+    "yes": "Oes",
+    "no": "Nac oes"
   },
   "textAreaLabel": "Rhowch fanylion yr oedolion eraill sy'n byw yn eich cartref",
   "textAreaHintText": "Dylech gynnwys manylion faint o oedolion sy'n byw yn eich cartref, eu perthynas â chi, yn ogystal ag unrhyw beth arall yr ydych yn meddwl y dylai'r llys wybod amdano",

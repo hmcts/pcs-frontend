@@ -7,8 +7,8 @@
   "bullet3": "rydych yn gweithio oriau afreolaidd, sy'n ei gwneud yn anodd dod o hyd i le newydd i fyw",
   "question": "Hoffech chi rannu unrhyw beth am eich amgylchiadau?",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy"
+    "yes": "Hoffwn",
+    "no": "Na hoffwn"
   },
   "textAreaLabel": "Rhowch fanylion am eich amgylchiadau",
   "errors": {

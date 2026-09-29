@@ -6,5 +6,9 @@
   "question": "A ydych eisiau darparu manylion am eich incwm a chostau?",
   "errors": {
     "provideFinanceDetails": "Dewiswch a ydych eisiau rhoi manylion eich incwm a chostau"
+  },
+  "options": {
+    "yes": "Ydw",
+    "no": "Nac ydw"
   }
 }

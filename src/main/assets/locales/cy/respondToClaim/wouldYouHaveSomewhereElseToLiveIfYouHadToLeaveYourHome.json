@@ -3,8 +3,8 @@
   "question": "A fyddai gennych rywle arall i fyw os byddai'n rhaid i chi adael eich cartref?",
   "dateLabel": "Pryd fyddech yn gallu symud i mewn (dewisol)?",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
+    "yes": "Byddai",
+    "no": "Na fyddai",
     "or": "neu",
     "notSure": "Nid wyf yn siŵr"
   },

@@ -6,5 +6,9 @@
   "question": "Ydy'r diffynnydd eisiau rhoi manylion eu hincwm a threuliau?",
   "errors": {
     "provideFinanceDetails": "Dewiswch a yw'r diffynnydd eisiau rhoi manylion eu hincwm a threuliau"
+  },
+  "options": {
+    "yes": "Ydy",
+    "no": "Nac ydy"
   }
 }

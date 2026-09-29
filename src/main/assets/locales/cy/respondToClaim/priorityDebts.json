@@ -16,5 +16,9 @@
   "question": "A oes gennych chi unrhyw ddyledion blaenoriaeth?",
   "errors": {
     "havePriorityDebts": "Nodwch os oes gennych unrhyw ddyledion blaenoriaeth"
+  },
+  "options": {
+    "yes": "Oes",
+    "no": "Nac oes"
   }
 }

@@ -7,8 +7,8 @@
   "paragraph3": "",
   "paragraph4": "",
   "options": {
-    "yes": "Byddai",
-    "no": "Na fyddai"
+    "yes": "Hoffai",
+    "no": "Na hoffai"
   },
   "errors": {
     "confirmInstallmentOffer": "Dewiswch a hoffai'r diffynnydd gynnig talu eu hôl-ddyledion mewn rhandaliadau"

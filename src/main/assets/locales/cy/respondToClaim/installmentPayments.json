@@ -7,8 +7,8 @@
   "paragraph4": "Byddwch yn gallu dweud wrth y barnwr os yw'r swm y gallwch fforddio ei dalu wedi newid.",
   "question": "A hoffech chi gynnig talu eich ôl-ddyledion mewn rhandaliadau?",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy"
+    "yes": "Hoffwn",
+    "no": "Na hoffwn"
   },
   "errors": {
     "confirmInstallmentOffer": "Dewiswch a hoffech chi gynnig talu eich ôl-ddyledion mewn rhandaliadau"

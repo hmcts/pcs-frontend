@@ -3,8 +3,9 @@
   "heading": "Cyfeiriad e-bost y diffynnydd",
   "emailConfirmationLabel": "Ydych chi'n gwybod cyfeiriad e-bost y diffynnydd?",
   "options": {
-    "yes": "Ydy",
-    "noOption": "Nac ydy"
+    "yes": "Ydw",
+    "no": "Nac ydw",
+    "noOption": "Nac ydw"
   },
   "emailLabel": "Rhowch gyfeiriad e-bost y diffynnydd",
   "errors": {

@@ -6,8 +6,8 @@
   "bulletPoint": "Dechreuodd y denantiaeth, contract meddiannaeth neu drwydded ar {{tenancyStartDate}}",
   "dateLabel": "cyWhat is the correct start date (optional)?",
   "options": {
-    "yes": "Do",
-    "no": "Naddo",
+    "yes": "Ydy",
+    "no": "Nac ydy",
     "or": "neu",
     "notSure": "Diffynnydd ddim yn siŵr"
   },

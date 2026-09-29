@@ -6,5 +6,9 @@
   "multipleApplicationsText": "Os ydych wedi dewis sawl cais, dylech uwchlwytho dogfennau sy'n ymwneud â phob un ohonynt.",
   "errors": {
     "uploadDocuments": "Cadarnhewch os ydych chi eisiau uwchlwytho dogfennau i gefnogi eich cais"
+  },
+  "options": {
+    "yes": "Ydw",
+    "no": "Nac ydw"
   }
 }

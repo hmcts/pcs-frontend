@@ -8,5 +8,9 @@
     "dependentChildren": "Dewiswch a oes gennych chi unrhyw blant sy'n ddibynnol arnoch",
     "dependentChildrenDetails": "Rhowch fanylion eich plant dibynnol",
     "dependantChildrenDetailsMaxLength": "Rhaid i fanylion plant dibynnol fod yn 500 o nodau neu lai"
+  },
+  "options": {
+    "yes": "Oes",
+    "no": "Nac oes"
   }
 }

@@ -3,8 +3,8 @@
   "legend": "Ai {{ formattedAddressStr }} yw cyfeiriad post y diffynnydd?",
   "legend.hint": "Dyma’r cyfeiriad a ddarparwyd gan {{claimantName}}",
   "labels": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
+    "yes": "Ie",
+    "no": "Na",
     "enterAddress": "Rhowch gyfeiriad gohebiaeth",
     "enterPostcode": "Nodwch god post yn y DU",
     "enterManually": "Teipiwch gyfeiriad â llaw",

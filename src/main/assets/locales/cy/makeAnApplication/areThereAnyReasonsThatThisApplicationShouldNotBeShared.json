@@ -14,5 +14,9 @@
   "errors": {
     "confirmIfThereIsAReason": "Cadarnhewch p'un a oes yna reswm pam na ddylid rhannu'r cais hwn gyda'r partïon eraill",
     "provideAReason": "Cadarnhewch pam na ddylid hysbysu'r partïon eraill"
+  },
+  "options": {
+    "yes": "Oes",
+    "no": "Nac oes"
   }
 }

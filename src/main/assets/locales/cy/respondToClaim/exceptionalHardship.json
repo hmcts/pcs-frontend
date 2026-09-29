@@ -10,8 +10,8 @@
   "bullet4": "eich datgan yn fethdalwr",
   "question": "A fyddech yn profi caledi eithriadol os gofynnir i chi adael eich cartref?",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy"
+    "yes": "Byddwn",
+    "no": "Na fyddwn"
   },
   "textAreaLabel": "Rhowch fanylion am y caledi eithriadol y byddech yn ei brofi",
   "errors": {
