@@ -357,6 +357,27 @@ export function recordAttendance(): void {
   check('defendant-defendant-id-attendance', 'not-present');
 }
 
+/**
+ * Writes paragraphs into the order preview after "IT IS ORDERED THAT:", as a judge writes a free form order there.
+ * jsdom cannot type into the editor, so this changes the document the page submits, as the editor would. The next
+ * change to the form regenerates that document, so call it after the other answers.
+ */
+export function writeInPreview(...paragraphs: string[]): void {
+  const field = control<HTMLTextAreaElement>('#order-document');
+  const snapshot = JSON.parse(field.value);
+  const content: { attrs?: { id?: string | null } }[] = snapshot.current.content;
+  const orderedThat = content.findIndex(node => node.attrs?.id === 'paragraph:ordered-that');
+  if (orderedThat === -1) {
+    throw new Error('The order preview has no "IT IS ORDERED THAT:"');
+  }
+  content.splice(
+    orderedThat + 1,
+    0,
+    ...paragraphs.map(text => ({ type: 'paragraph', attrs: { id: null }, content: [{ type: 'text', text }] }))
+  );
+  field.value = JSON.stringify(snapshot);
+}
+
 /** Switches order type the way GOV.UK tabs do: by changing the fragment. */
 export function selectTab(id: string): void {
   window.location.hash = `#${id}`;

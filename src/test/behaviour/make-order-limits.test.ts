@@ -44,7 +44,6 @@ describe('make an order: limits', () => {
     ).toEqual([
       'Hearing notes must be 30,000 characters or less',
       'Recitals must be 30,000 characters or less',
-      'Enter the order wording',
       'Staff message must be 30,000 characters or less',
     ]);
   });
@@ -52,7 +51,6 @@ describe('make an order: limits', () => {
   it('asks for the staff message once the judge has ticked it', async () => {
     expect(
       await errors('tab-free-form', {
-        'free-form-text': 'The claim is stayed.',
         'staff-message': 'yes',
         'staff-message-text': '  ',
       })
@@ -64,7 +62,6 @@ describe('make an order: limits', () => {
     const atTheLimit = `${'a'.repeat(29998)}\r\na`;
     expect(
       await errors('tab-free-form', {
-        'free-form-text': 'The claim is stayed.',
         'hearing-notes': atTheLimit,
         'recitals-text': 'a'.repeat(30001),
         'staff-message-text': 'a'.repeat(30001),

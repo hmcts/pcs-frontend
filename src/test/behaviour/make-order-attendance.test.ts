@@ -12,7 +12,6 @@ describe('make an order: attendance', () => {
   it("needs every party's attendance, and the name of whoever attended for them, before review", async () => {
     let page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-free-form');
-    type('free-form-text', 'The claim is stayed.');
     // A rejected order comes back as a new page, with the answers kept.
     const submit = async (): Promise<number> => {
       const body = page.body();
@@ -78,7 +77,6 @@ describe('make an order: attendance', () => {
   it('only accepts the attendance a party can have', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-free-form');
-    type('free-form-text', 'The claim is stayed.');
     const body = page.body();
     // A defendant has no housing officer.
     body.set('claimant-claimant-id-attendance', 'litigant-in-person');

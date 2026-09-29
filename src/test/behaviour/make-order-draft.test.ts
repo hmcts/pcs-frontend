@@ -13,6 +13,7 @@ import {
   selectTab,
   submittedEventTokens,
   type,
+  writeInPreview,
 } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
@@ -95,7 +96,6 @@ describe('make an order: drafting', () => {
       'Select how Claimant 1: Example Housing attended'
     );
 
-    type('free-form-text', 'The claim is stayed.');
     recordAttendance();
     const body = retry.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
@@ -150,8 +150,9 @@ describe('make an order: drafting', () => {
   it('saves a long order', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-free-form');
-    const wording = 'The parties shall exchange evidence within fourteen days. '.repeat(1000).trim();
-    type('free-form-text', wording);
+    // The wording goes once into the document now, rather than also in a text box.
+    const wording = 'The parties shall exchange evidence within fourteen days. '.repeat(2000).trim();
+    writeInPreview(wording);
 
     const body = page.body();
     body.set('action', 'SAVE_DRAFT');
@@ -160,7 +161,6 @@ describe('make an order: drafting', () => {
     expect((await app.post(PAGE, body)).status).toBe(302);
 
     const reopened = await openPage((await app.get(PAGE)).text);
-    expect(control<HTMLTextAreaElement>('[name="free-form-text"]').value).toBe(wording);
     expect(reopened.documentText()).toContain(wording);
   });
 
