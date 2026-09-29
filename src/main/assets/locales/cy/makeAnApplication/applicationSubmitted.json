@@ -3,11 +3,11 @@
   "applicationSubmitted": "Cais wedi'i gyflwyno",
   "paymentBeingProcessed": "Taliad yn cael ei brosesu",
   "adjournRequestReceived": "Rydym wedi derbyn eich cais i ohirio’r gwrandawiad llys.",
-  "setAsideRequestReceived": "Rydym wedi derbyn eich cais i roi’r gorchymyn  o’r neilltu (canslo).",
+  "setAsideRequestReceived": "Rydym wedi derbyn eich cais i roi’r gorchymyn o’r neilltu (canslo).",
   "somethingElseRequestReceived": "Rydym wedi derbyn eich cais i ofyn i’r llys i wneud gorchymyn.",
   "whatHappensNext": "Beth fydd yn digwydd nesaf",
   "youDoNotNeedToDoAnythingElse": "Nid oes angen i chi wneud unrhyw beth arall. Byddwn yn anfon eich cais at y barnwr a byddwn yn cysylltu â chi eto pan fyddant wedi gwneud penderfyniad.",
-  "giveFeedbackAboutThisService": "Rhowch adborth am y gwasanaeth hwn.",
+  "giveFeedbackAboutThisService": "Rhowch adborth am y gwasanaeth hwn",
   "completeThisShortSurvey": "<a href=\"https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Llenwch yr arolwg byr hwn i'n helpu i wella'r gwasanaeth hwn</a> (fel arfer yn cymryd 5 munud).",
   "buttons": {
     "closeAndReturnToCaseOverview": "Cau a dychwelyd i drosolwg o’r achos"
