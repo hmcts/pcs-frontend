@@ -14,7 +14,7 @@
     "additionalDefendantDetails": "Manylion diffynnydd {{number}} ychwanegol",
     "responseToClaim": "Ymateb i hawliad yr hawlydd",
     "paymentsOrAgreements": "Taliadau neu gytundebau ers gwneud yr hawliad",
-    "householdAndCircumstances": "Eich cartref a'ch amgylchiadau",
+    "householdAndCircumstances": "Eich cartref a’ch amgylchiadau",
     "regularIncome": "Incwm rheolaidd",
     "priorityDebts": "Dyledion blaenoriaeth",
     "regularExpenses": "Costau rheolaidd",
@@ -38,7 +38,7 @@
     "freeLegalAdviceOptions": {
       "YES": "Do",
       "NO": "Naddo",
-      "PREFER_NOT_TO_SAY": "Mae'n well gen i beidio dweud"
+      "PREFER_NOT_TO_SAY": "Mae’n well gen i beidio dweud"
     }
   },
   "contactPreference": {
@@ -66,20 +66,20 @@
   "payments": {
     "anyPaymentsMade": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{claimIssueDate}}?",
     "paymentDetails": "Manylion taliadau a wnaed",
-    "repaymentPlanAgreed": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{claimIssueDate}}?",
+    "repaymentPlanAgreed": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu’r ôl-ddyledion ers {{claimIssueDate}}?",
     "repaymentAgreedDetails": "Manylion cytundeb ad-dalu",
     "repayArrearsInstalments": "A hoffech chi gynnig talu eich ôl-ddyledion mewn rhandaliadau?",
     "additionalContribution": "Faint allwch chi fforddio’i dalu ar ben eich rhent cyfredol?",
-    "additionalContributionFrequency": "Pa mor aml allech chi fforddio talu'r swm hwn?"
+    "additionalContributionFrequency": "Pa mor aml allech chi fforddio talu’r swm hwn?"
   },
   "household": {
-    "dependantChildren": "A oes gennych chi unrhyw blant sy'n ddibynnol arnoch?",
+    "dependantChildren": "A oes gennych chi unrhyw blant sy’n ddibynnol arnoch?",
     "dependantChildrenDetails": "Manylion plant sy’n ddibynnol",
-    "otherDependants": "A oes gennych chi unrhyw un arall sy'n ddibynnol arnoch?",
+    "otherDependants": "A oes gennych chi unrhyw un arall sy’n ddibynnol arnoch?",
     "otherDependantDetails": "Manylion dibynyddion eraill",
     "otherTenants": "A oes yna unrhyw oedolion eraill yn byw yn eich cartref?",
     "otherTenantsDetails": "Manylion oedolion eraill yn byw yn eich cartref?",
-    "alternativeAccommodation": "A fyddai gennych rywle arall i fyw os byddai'n rhaid i chi adael eich cartref?",
+    "alternativeAccommodation": "A fyddai gennych rywle arall i fyw os byddai’n rhaid i chi adael eich cartref?",
     "alternativeAccommodationDate": "Pryd fyddech yn gallu symud i mewn?",
     "shareAdditional": "Hoffech chi rannu unrhyw beth am eich amgylchiadau?",
     "additionalDetails": "Manylion am eich amgylchiadau",
@@ -100,12 +100,12 @@
   },
   "debts": {
     "hasPriorityDebts": "A oes gennych chi unrhyw ddyledion blaenoriaeth?",
-    "debtTotal": "Beth yw'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
+    "debtTotal": "Beth yw’r cyfanswm sy’n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
     "debtContribution": "Faint ydych yn ei dalu tuag at eich dyledion blaenoriaeth bob wythnos neu fis?",
     "paidEvery": "Talwyd bob"
   },
   "expenses": {
-    "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
+    "householdBills": "Biliau’r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
     "loanPayments": "Taliadau benthyciadau",
     "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/gwraig",
     "mobilePhone": "Ffôn symudol",
@@ -118,23 +118,23 @@
     "paidEvery": "Talwyd bob"
   },
   "additional": {
-    "otherConsiderations": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
+    "otherConsiderations": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o’ch ymateb?",
     "otherConsiderationsDetails": "Manylion beth arall rydych eisiau ei ddweud wrth y llys"
   },
   "counterclaim": {
     "type": "Beth ydych chi’n ei hawlio?",
-    "amountKnown": "Ydych chi'n hawlio ar gyfer swm penodol o arian?",
-    "amount": "Faint ydych chi'n ei hawlio?",
+    "amountKnown": "Ydych chi’n hawlio ar gyfer swm penodol o arian?",
+    "amount": "Faint ydych chi’n ei hawlio?",
     "estimatedMaxAmount": "Beth yw uchafswm gwerth eich hawliad?",
-    "against": "Yn erbyn pwy ydych chi'n gwneud y gwrth-hawliad?",
+    "against": "Yn erbyn pwy ydych chi’n gwneud y gwrth-hawliad?",
     "againstName": "Beth yw enw’r unigolyn neu’r sefydliad rydych yn gwneud y gwrth-hawliad yn eu herbyn?",
     "againstAddress": "Beth yw eu cyfeiriad?",
     "for": "Ar gyfer beth mae eich gwrth-hawliad?",
     "reasons": "Beth yw eich rhesymau dros wneud y gwrth-hawliad?",
     "ordersRequested": "Pa orchymyn ydych chi’n gofyn i’r tribiwnlys ei wneud?",
-    "factsForCourt": "Pa ffeithiau hoffech chi i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
-    "needHelpWithFees": "Ydych chi angen help i dalu'r ffi gwrth-hawliad?",
-    "appliedForHwf": "A ydych chi eisoes wedi gwneud cais am help gyda'ch ffi gwrth-hawliad?",
+    "factsForCourt": "Pa ffeithiau hoffech chi i’r llys eu hystyried wrth benderfynu ar yr hawliad?",
+    "needHelpWithFees": "Ydych chi angen help i dalu’r ffi gwrth-hawliad?",
+    "appliedForHwf": "A ydych chi eisoes wedi gwneud cais am help gyda’ch ffi gwrth-hawliad?",
     "hwfReference": "Cyfeirnod Help i Dalu Ffioedd",
     "claimTypeOptions": {
       "PAYMENT_OR_COMPENSATION": "Swm o arian neu iawndal",

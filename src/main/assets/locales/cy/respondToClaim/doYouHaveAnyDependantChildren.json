@@ -1,11 +1,11 @@
 {
   "pageTitle": "Plant dibynnol",
-  "heading": "A oes gennych chi unrhyw blant sy'n ddibynnol arnoch?",
-  "dependentChildrenParagraph": "Mae plant sy'n ddibynnol yn blant rydych chi'n gofalu amdanynt yn ariannol.",
+  "heading": "A oes gennych chi unrhyw blant sy’n ddibynnol arnoch?",
+  "dependentChildrenParagraph": "Mae plant sy’n ddibynnol yn blant rydych chi’n gofalu amdanynt yn ariannol.",
   "dependentChildrenDetailsLabel": "Rhowch fanylion eich plant dibynnol",
   "dependentChildrenDetailsHint": "Dylech gynnwys manylion am faint o blant dibynnol sydd gennych a faint yw eu hoed",
   "errors": {
-    "dependentChildren": "Dewiswch a oes gennych chi unrhyw blant sy'n ddibynnol arnoch",
+    "dependentChildren": "Dewiswch a oes gennych chi unrhyw blant sy’n ddibynnol arnoch",
     "dependentChildrenDetails": "Rhowch fanylion eich plant dibynnol",
     "dependantChildrenDetailsMaxLength": "Rhaid i fanylion plant dibynnol fod yn 500 o nodau neu lai"
   },

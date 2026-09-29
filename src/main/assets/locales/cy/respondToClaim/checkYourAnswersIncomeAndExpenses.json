@@ -42,7 +42,7 @@
       "changeHidden": "dyledion blaenoriaeth"
     },
     "priorityDebtTotal": {
-      "label": "Beth yw'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
+      "label": "Beth yw’r cyfanswm sy’n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
       "changeHidden": "cyfanswm dyled flaenoriaeth"
     },
     "priorityDebtContribution": {
@@ -53,7 +53,7 @@
       "label": "Pa gostau rheolaidd eraill sydd gennych?",
       "changeHidden": "costau rheolaidd",
       "options": {
-        "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
+        "householdBills": "Biliau’r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
         "loanPayments": "Taliadau benthyciadau",
         "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/gwraig",
         "mobilePhone": "Ffôn symudol",
@@ -65,7 +65,7 @@
       }
     },
     "otherConsiderations": {
-      "label": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
+      "label": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o’ch ymateb?",
       "changeHidden": "ystyriaethau eraill"
     },
     "otherConsiderationsDetails": {

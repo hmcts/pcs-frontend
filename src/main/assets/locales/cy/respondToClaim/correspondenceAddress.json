@@ -30,7 +30,7 @@
     "postcodeNotFound": "Heb ddod o hyd i god post. Gwiriwch y manylion a rhowch gynnig arall arni.",
     "selectAddress": "Dewiswch gyfeiriad",
     "correspondenceAddressConfirm": "Cadarnhewch eich cyfeiriad drwy ddewis yr opsiynau isod",
-    "correspondenceAddressConfirm.addressLine1": "Rhowch linell cyfeiriad 1, fel arfer yr adeilad a'r stryd",
+    "correspondenceAddressConfirm.addressLine1": "Rhowch linell cyfeiriad 1, fel arfer yr adeilad a’r stryd",
     "correspondenceAddressConfirm.townOrCity": "Nodwch tref neu ddinas",
     "correspondenceAddressConfirm.postcode": "Nodwch god post dilys yn y DU"
   }

@@ -1,6 +1,6 @@
 {
   "pageTitle": "Manylion yr hysbysiad",
-  "question": "A wnaeth {{claimantName}} hysbysu'r diffynnydd am eu bwriad i ddechrau achos meddiannu?",
+  "question": "A wnaeth {{claimantName}} hysbysu’r diffynnydd am eu bwriad i ddechrau achos meddiannu?",
   "hintText": "",
   "options": {
     "yes": "Do",
@@ -11,16 +11,16 @@
   "noticeDateLabel": "Pryd gafodd y diffynnydd yr hysbysiad gan {{claimantName}}? (Dewisol)",
   "noticeDateHint": "Er enghraifft, 16 4 2021",
   "errors": {
-    "possessionNoticeReceived": "Dewiswch a wnaeth {{claimantName}} hysbysu'r diffynnydd am eu bwriad i ddechrau achos meddiannu",
+    "possessionNoticeReceived": "Dewiswch a wnaeth {{claimantName}} hysbysu’r diffynnydd am eu bwriad i ddechrau achos meddiannu",
     "date": {
       "day": "Diwrnod",
       "month": "Mis",
       "year": "Blwyddyn",
       "required": "Rhaid i’r dyddiad gynnwys diwrnod, mis a blwyddyn",
-      "notRealDate": "Rhaid i'r dyddiad fod yn ddyddiad go iawn",
-      "futureDate": "Rhaid i'r dyddiad fod yn y gorffennol",
-      "missingOne": "Rhaid i'r dyddiad gynnwys {{missingField}}",
-      "missingTwo": "Rhaid i'r dyddiad gynnwys {{first}} a {{second}}"
+      "notRealDate": "Rhaid i’r dyddiad fod yn ddyddiad go iawn",
+      "futureDate": "Rhaid i’r dyddiad fod yn y gorffennol",
+      "missingOne": "Rhaid i’r dyddiad gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i’r dyddiad gynnwys {{first}} a {{second}}"
     }
   }
 }

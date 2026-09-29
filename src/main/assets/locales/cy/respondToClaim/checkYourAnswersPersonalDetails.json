@@ -36,11 +36,11 @@
       "label": "E-bost"
     },
     "contactByPhone": {
-      "label": "Ydych chi'n hapus i ni gysylltu â chi dros y ffôn?",
+      "label": "Ydych chi’n hapus i ni gysylltu â chi dros y ffôn?",
       "changeHidden": "cysylltu dros y ffôn"
     },
     "contactByText": {
-      "label": "Ydych chi'n hapus i ni gysylltu â chi drwy neges testun?",
+      "label": "Ydych chi’n hapus i ni gysylltu â chi drwy neges testun?",
       "changeHidden": "cysylltu drwy neges testun"
     },
     "contactDetails": {

@@ -8,21 +8,21 @@
     "yes": "Do",
     "no": "Naddo",
     "or": "neu",
-    "preferNotToSay": "Mae'n well gen i beidio dweud"
+    "preferNotToSay": "Mae’n well gen i beidio dweud"
   },
   "subHeading1": "Cymorth sydd ar gael nawr ar-lein",
-  "paragraph1": "Mae arbenigwyr tai yn barod ac yn aros i'ch helpu chi, a dim ond munudau mae'n gymryd i ddod o hyd i un yn eich ardal chi.",
-  "listItem1": "Ewch i'r gwasanaeth dod o hyd i gynghorydd cyfreithiol <a href=\"https://find-legal-advice.justice.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Dod o hyd i gynghorydd cyfreithiol (yn agor mewn tab newydd)</a>.",
-  "listItem2": "Rhowch eich cod post a dewis yr opsiynau 'Gwasanaeth Cyngor Atal Colli Tŷ' a 'Tai'.",
+  "paragraph1": "Mae arbenigwyr tai yn barod ac yn aros i’ch helpu chi, a dim ond munudau mae’n gymryd i ddod o hyd i un yn eich ardal chi.",
+  "listItem1": "Ewch i’r gwasanaeth dod o hyd i gynghorydd cyfreithiol <a href=\"https://find-legal-advice.justice.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Dod o hyd i gynghorydd cyfreithiol (yn agor mewn tab newydd)</a>.",
+  "listItem2": "Rhowch eich cod post a dewis yr opsiynau ‘Gwasanaeth Cyngor Atal Colli Tŷ’ a ‘Tai’.",
   "listItem3": "Dewiswch arbenigwr lleol.",
   "listItem4": "Ffoniwch nhw i drafod eich opsiynau.",
   "paragraph2": "Gall Cyngor Cyfreithiol Sifil (CLA) hefyd eich rhoi mewn cysylltiad ag arbenigwr lleol. Gallwch naill ai:",
-  "bullet1": "ffonio 0345 345 4345 Mae'r llinellau ar agor o ddydd Llun i ddydd Gwener, rhwng 9am ac 8pm a dydd Sadwrn rhwng 9am a 12.30pm",
-  "bullet2": "Anfonwch neges testun yn cynnwys 'legalaid' a'ch enw i 80010 i ofyn i CLA eich ffonio'n ôl. Mae’r gost yr un peth â neges testun arferol",
+  "bullet1": "ffonio 0345 345 4345 Mae’r llinellau ar agor o ddydd Llun i ddydd Gwener, rhwng 9am ac 8pm a dydd Sadwrn rhwng 9am a 12.30pm",
+  "bullet2": "Anfonwch neges testun yn cynnwys ‘legalaid’ a’ch enw i 80010 i ofyn i CLA eich ffonio’n ôl. Mae’r gost yr un peth â neges testun arferol",
   "subHeading2": "Cymorth a all fod ar gael yn y gwrandawiad",
-  "paragraph3": "Os nad oes gennych eich cynghorydd cyfreithiol eich hun, mae'n bosib y gallwch siarad â chynghorydd ar ddyletswydd (gweithiwr proffesiynol cyfreithiol sy'n helpu pobl yn y llys) ar ddiwrnod eich gwrandawiad. Os ydynt ar gael, gallant roi cyngor i chi a'ch cynrychioli yn y gwrandawiad am ddim.",
-  "paragraph4": "Os ydych eisiau siarad â'r cynghorydd ar ddyletswydd, dylech gyrraedd o leiaf 45 munud cyn amser eich gwrandawiad.",
+  "paragraph3": "Os nad oes gennych eich cynghorydd cyfreithiol eich hun, mae’n bosib y gallwch siarad â chynghorydd ar ddyletswydd (gweithiwr proffesiynol cyfreithiol sy’n helpu pobl yn y llys) ar ddiwrnod eich gwrandawiad. Os ydynt ar gael, gallant roi cyngor i chi a’ch cynrychioli yn y gwrandawiad am ddim.",
+  "paragraph4": "Os ydych eisiau siarad â’r cynghorydd ar ddyletswydd, dylech gyrraedd o leiaf 45 munud cyn amser eich gwrandawiad.",
   "errors": {
-    "hadLegalAdvice": "Mae'n rhaid i chi ddweud os ydych wedi cael unrhyw gyngor cyfreithiol am ddim."
+    "hadLegalAdvice": "Mae’n rhaid i chi ddweud os ydych wedi cael unrhyw gyngor cyfreithiol am ddim."
   }
 }

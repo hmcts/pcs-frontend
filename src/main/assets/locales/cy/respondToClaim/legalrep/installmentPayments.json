@@ -1,7 +1,7 @@
 {
   "pageTitle": "Taliadau mewn rhandaliadau",
   "heading": "Taliadau mewn rhandaliadau",
-  "question": "A hoffai'r diffynnydd gynnig talu ôl-ddyledion mewn rhandaliadau?",
+  "question": "A hoffai’r diffynnydd gynnig talu ôl-ddyledion mewn rhandaliadau?",
   "paragraph1": "",
   "paragraph2": "",
   "paragraph3": "",
@@ -11,6 +11,6 @@
     "no": "Na hoffai"
   },
   "errors": {
-    "confirmInstallmentOffer": "Dewiswch a hoffai'r diffynnydd gynnig talu eu hôl-ddyledion mewn rhandaliadau"
+    "confirmInstallmentOffer": "Dewiswch a hoffai’r diffynnydd gynnig talu eu hôl-ddyledion mewn rhandaliadau"
   }
 }

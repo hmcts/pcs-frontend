@@ -11,11 +11,11 @@
       "changeHidden": "manylion talu"
     },
     "repaymentPlanAgreed": {
-      "label": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
+      "label": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu’r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
       "changeHidden": "cytundeb ad-dalu"
     },
     "repaymentAgreedDetails": {
-      "label": "Rhowch fanylion faint rydych wedi cytuno i'w dalu, pa mor aml y byddwch yn talu a phryd wnaed y cytundeb",
+      "label": "Rhowch fanylion faint rydych wedi cytuno i’w dalu, pa mor aml y byddwch yn talu a phryd wnaed y cytundeb",
       "changeHidden": "manylion ad-dalu"
     },
     "repayArrearsInstalments": {
@@ -27,7 +27,7 @@
       "changeHidden": "swm y rhandaliadau"
     },
     "installmentFrequency": {
-      "label": "Pa mor aml allech chi fforddio talu'r swm hwn?",
+      "label": "Pa mor aml allech chi fforddio talu’r swm hwn?",
       "changeHidden": "amlder y rhandaliadau",
       "frequencies": {
         "weekly": "Pob wythnos",

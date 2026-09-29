@@ -12,31 +12,31 @@
       "changeHidden": "landlord wedi’i eithrio"
     },
     "writtenTerms": {
-      "label": "A yw'r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o'r contract meddiannaeth?",
+      "label": "A yw’r landlord wedi anfon telerau ysgrifenedig at y diffynnydd o’r contract meddiannaeth?",
       "changeHidden": "telerau ysgrifenedig"
     },
     "tenancyTypeCorrect": {
-      "label": "A yw'r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?",
+      "label": "A yw’r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?",
       "changeHidden": "math o denantiaeth"
     },
     "tenancyTypeDetails": {
       "label": "Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded",
-      "changeHidden": "math o denantiaeth wedi'i gywiro"
+      "changeHidden": "math o denantiaeth wedi’i gywiro"
     },
     "tenancyStartDate": {
-      "changeHidden": "dyddiad dechrau'r denantiaeth",
+      "changeHidden": "dyddiad dechrau’r denantiaeth",
       "confirm": {
-        "label": "A yw dyddiad dechrau'r denantiaeth, drwydded neu gontract meddiannaeth yn gywir?",
-        "changeHidden": "dyddiad dechrau'r denantiaeth"
+        "label": "A yw dyddiad dechrau’r denantiaeth, drwydded neu gontract meddiannaeth yn gywir?",
+        "changeHidden": "dyddiad dechrau’r denantiaeth"
       },
       "correctDate": {
-        "label": "Beth yw'r dyddiad dechrau cywir?",
+        "label": "Beth yw’r dyddiad dechrau cywir?",
         "changeHidden": "dyddiad dechrau tenantiaeth cywir"
       },
-      "labelEntered": "Beth yw dyddiad dechrau'r denantiaeth, contract meddiannaeth neu drwydded?"
+      "labelEntered": "Beth yw dyddiad dechrau’r denantiaeth, contract meddiannaeth neu drwydded?"
     },
     "possessionNoticeReceived": {
-      "label": "A wnaeth {{ claimantName }} hysbysu'r diffynnydd am eu bwriad i ddechrau achos meddiannu?",
+      "label": "A wnaeth {{ claimantName }} hysbysu’r diffynnydd am eu bwriad i ddechrau achos meddiannu?",
       "changeHidden": "wedi derbyn hysbysiad"
     },
     "noticeReceivedDate": {
@@ -44,19 +44,19 @@
       "changeHidden": "dyddiad derbyn hysbysiad"
     },
     "rentArrearsAmountConfirmation": {
-      "label": "A yw'r swm hwn yn ddyledus gan y diffynnydd mewn ôl-ddyledion rhent?",
+      "label": "A yw’r swm hwn yn ddyledus gan y diffynnydd mewn ôl-ddyledion rhent?",
       "changeHidden": "swm ôl-ddyledion rhent"
     },
     "rentArrearsAmountDetails": {
-      "label": "Faint mae'r diffynnydd yn credu sy'n ddyledus ganddynt mewn ôl-ddyledion rhent?",
+      "label": "Faint mae’r diffynnydd yn credu sy’n ddyledus ganddynt mewn ôl-ddyledion rhent?",
       "changeHidden": "manylion y swm ôl-ddyledion rhent"
     },
     "disputeClaim": {
-      "label": "A ydy'r diffynnydd yn gwrthwynebu unrhyw rannau eraill o'r hawliad?",
-      "changeHidden": "gwrthwynebu rhannau eraill o'r hawliad"
+      "label": "A ydy’r diffynnydd yn gwrthwynebu unrhyw rannau eraill o’r hawliad?",
+      "changeHidden": "gwrthwynebu rhannau eraill o’r hawliad"
     },
     "disputeClaimDetails": {
-      "label": "Esboniwch y rhannau o'r hawliad mae'r diffynnydd yn eu gwrthwynebu",
+      "label": "Esboniwch y rhannau o’r hawliad mae’r diffynnydd yn eu gwrthwynebu",
       "changeHidden": "manylion y gwrthwynebiad"
     },
     "makeCounterClaim": {
@@ -86,7 +86,7 @@
     },
     "counterClaimNeedHelpWithFees": {
       "label": "A yw’r diffynnydd angen help i dalu ffi’r gwrth-hawliad?",
-      "changeHidden": "help i dalu'r ffi gwrth-hawliad",
+      "changeHidden": "help i dalu’r ffi gwrth-hawliad",
       "options": {
         "YES": "Mae’r diffynnydd angen help i dalu’r ffi",
         "NO": "Nid yw’r diffynnydd angen help i dalu’r ffi"
@@ -118,7 +118,7 @@
     },
     "otherOrderRequestFacts": {
       "label": "Pa ffeithiau hoffen nhw i’r llys eu hystyried wrth benderfynu ar yr hawliad?",
-      "changeHidden": "ffeithiau i'r llys"
+      "changeHidden": "ffeithiau i’r llys"
     },
     "counterClaimWantToUploadFiles": {
       "label": "Ydych chi eisiau uwchlwytho ffeiliau i gefnogi’r gwrth-hawliad?",
@@ -126,7 +126,7 @@
     },
     "counterClaimDocuments": {
       "label": "Ffeiliau wedi’u huwchlwytho",
-      "changeHidden": "ffeiliau wedi'u huwchlwytho ar gyfer gwrth-hawliad",
+      "changeHidden": "ffeiliau wedi’u huwchlwytho ar gyfer gwrth-hawliad",
       "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     }
   }

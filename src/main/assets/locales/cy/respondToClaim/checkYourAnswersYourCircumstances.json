@@ -3,7 +3,7 @@
   "cardTitle": "Eich amgylchiadau",
   "rows": {
     "dependantChildren": {
-      "label": "A oes gennych chi unrhyw blant sy'n ddibynnol arnoch?",
+      "label": "A oes gennych chi unrhyw blant sy’n ddibynnol arnoch?",
       "changeHidden": "plant dibynnol"
     },
     "dependantChildrenDetails": {
@@ -11,11 +11,11 @@
       "changeHidden": "manylion plant sy’n ddibynnol"
     },
     "otherDependants": {
-      "label": "A oes gennych chi unrhyw un arall sy'n ddibynnol arnoch?",
+      "label": "A oes gennych chi unrhyw un arall sy’n ddibynnol arnoch?",
       "changeHidden": "dibynyddion eraill"
     },
     "otherDependantsDetails": {
-      "label": "Rhowch fanylion am bobl eraill sy'n ddibynnol arnoch",
+      "label": "Rhowch fanylion am bobl eraill sy’n ddibynnol arnoch",
       "changeHidden": "manylion eraill sy’n ddibynnol"
     },
     "otherTenants": {
@@ -23,11 +23,11 @@
       "changeHidden": "oedolion eraill sy’n byw yn eich cartref"
     },
     "otherTenantsDetails": {
-      "label": "Rhowch fanylion yr oedolion eraill sy'n byw yn eich cartref",
+      "label": "Rhowch fanylion yr oedolion eraill sy’n byw yn eich cartref",
       "changeHidden": "manylion oedolion eraill"
     },
     "alternativeAccommodation": {
-      "label": "A fyddai gennych rywle arall i fyw os byddai'n rhaid i chi adael eich cartref?",
+      "label": "A fyddai gennych rywle arall i fyw os byddai’n rhaid i chi adael eich cartref?",
       "changeHidden": "llety amgen"
     },
     "alternativeAccommodationDate": {

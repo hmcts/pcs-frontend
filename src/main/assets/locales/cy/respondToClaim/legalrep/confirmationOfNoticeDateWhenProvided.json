@@ -1,11 +1,11 @@
 {
   "pageTitle": "Dyddiad yr hysbysiad",
   "bulletPointLabel": "Manylion yr hysbysiad a roddwyd gan {{claimantName}}:",
-  "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}} roi'r dyddiad pan wnaethant roi'r hysbysiad i'r diffynnydd (y dyddiad cyflwyno).",
-  "listItem1": "Gwnaethant gyflwyno hysbysiad i'r diffynnydd yn ceisio meddiant ar {{noticeDate}}",
+  "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}} roi’r dyddiad pan wnaethant roi’r hysbysiad i’r diffynnydd (y dyddiad cyflwyno).",
+  "listItem1": "Gwnaethant gyflwyno hysbysiad i’r diffynnydd yn ceisio meddiant ar {{noticeDate}}",
   "release12": {
-    "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}} roi'r dyddiad pan wnaethant roi'r hysbysiad i'r diffynnydd (y dyddiad cyflwyno).",
-    "listItem1": "Gwnaethant gyflwyno hysbysiad i'r diffynnydd yn ceisio meddiant ar {{noticeDate}}"
+    "hintText": "Wrth wneud yr hawliad, roedd yn rhaid i {{claimantName}} roi’r dyddiad pan wnaethant roi’r hysbysiad i’r diffynnydd (y dyddiad cyflwyno).",
+    "listItem1": "Gwnaethant gyflwyno hysbysiad i’r diffynnydd yn ceisio meddiant ar {{noticeDate}}"
   },
   "methodOfService": {
     "PERSONALLY_HANDED": "cyflwynwyd yr hysbysiad drwy ei drosglwyddo’n bersonol i neu ei adael gyda {{name}}",
@@ -28,10 +28,10 @@
       "month": "Mis",
       "year": "Blwyddyn",
       "notRealDate": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad fod yn ddyddiad go iawn",
-      "futureDate": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad fod naill ai'n ddyddiad heddiw neu yn y gorffennol",
+      "futureDate": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad fod naill ai’n ddyddiad heddiw neu yn y gorffennol",
       "invalidValue": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad fod yn ddyddiad go iawn",
-      "missingOne": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{missingField}}",
-      "missingTwo": "Rhaid i'r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{first}} a {{second}}"
+      "missingOne": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{missingField}}",
+      "missingTwo": "Rhaid i’r dyddiad pan gafodd y diffynnydd yr hysbysiad gynnwys {{first}} a {{second}}"
     }
   }
 }

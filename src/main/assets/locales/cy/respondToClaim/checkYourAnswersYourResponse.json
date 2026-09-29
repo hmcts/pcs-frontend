@@ -12,11 +12,11 @@
       "changeHidden": "landlord wedi’i eithrio"
     },
     "writtenTerms": {
-      "label": "A yw eich landlord wedi anfon telerau ysgrifenedig atoch o'r contract meddiannaeth?",
+      "label": "A yw eich landlord wedi anfon telerau ysgrifenedig atoch o’r contract meddiannaeth?",
       "changeHidden": "telerau ysgrifenedig"
     },
     "tenancyTypeCorrect": {
-      "label": "A yw'r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?",
+      "label": "A yw’r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?",
       "changeHidden": "math o denantiaeth"
     },
     "tenancyTypeDetails": {
@@ -26,7 +26,7 @@
     "tenancyStartDate": {
       "changeHidden": "dyddiad dechrau’r denantiaeth",
       "confirm": {
-        "label": "A yw dyddiad dechrau'r denantiaeth, drwydded neu gontract meddiannaeth yn gywir?",
+        "label": "A yw dyddiad dechrau’r denantiaeth, drwydded neu gontract meddiannaeth yn gywir?",
         "changeHidden": "dyddiad dechrau’r denantiaeth"
       },
       "correctDate": {
@@ -44,19 +44,19 @@
       "changeHidden": "dyddiad derbyn hysbysiad"
     },
     "rentArrearsAmountConfirmation": {
-      "label": "A yw'r swm hwn yn ddyledus gennych mewn ôl-ddyledion rhent?",
+      "label": "A yw’r swm hwn yn ddyledus gennych mewn ôl-ddyledion rhent?",
       "changeHidden": "swm ôl-ddyledion rhent"
     },
     "rentArrearsAmountDetails": {
-      "label": "Faint ydych chi'n credu sy'n ddyledus gennych mewn ôl-ddyledion rhent?",
+      "label": "Faint ydych chi’n credu sy’n ddyledus gennych mewn ôl-ddyledion rhent?",
       "changeHidden": "manylion y swm ôl-ddyledion rhent"
     },
     "disputeClaim": {
-      "label": "A ydych eisiau gwrthwynebu unrhyw rannau eraill o'r hawliad?",
+      "label": "A ydych eisiau gwrthwynebu unrhyw rannau eraill o’r hawliad?",
       "changeHidden": "gwrthwynebu rhannau eraill o’r hawliad"
     },
     "disputeClaimDetails": {
-      "label": "Eglurwch pa rannau o'r hawliad nad ydych yn cytuno â nhw",
+      "label": "Eglurwch pa rannau o’r hawliad nad ydych yn cytuno â nhw",
       "changeHidden": "manylion y gwrthwynebiad"
     },
     "makeCounterClaim": {
@@ -73,11 +73,11 @@
       }
     },
     "isClaimAmountKnown": {
-      "label": "Ydych chi'n hawlio ar gyfer swm penodol o arian?",
+      "label": "Ydych chi’n hawlio ar gyfer swm penodol o arian?",
       "changeHidden": "swm yr hawliad yn hysbys"
     },
     "claimAmount": {
-      "label": "Faint ydych chi'n ei hawlio?",
+      "label": "Faint ydych chi’n ei hawlio?",
       "changeHidden": "swm yr hawliad"
     },
     "estimatedMaxClaimAmount": {
@@ -85,7 +85,7 @@
       "changeHidden": "amcangyfrif o uchafswm swm yr hawliad"
     },
     "counterClaimNeedHelpWithFees": {
-      "label": "Ydych chi angen help i dalu'r ffi gwrth-hawliad?",
+      "label": "Ydych chi angen help i dalu’r ffi gwrth-hawliad?",
       "changeHidden": "help i dalu’r ffi gwrth-hawliad",
       "options": {
         "YES": "Rwyf angen help i dalu’r ffi",
@@ -93,7 +93,7 @@
       }
     },
     "counterClaimAppliedForHwf": {
-      "label": "A ydych chi eisoes wedi gwneud cais am help gyda'ch ffi gwrth-hawliad?",
+      "label": "A ydych chi eisoes wedi gwneud cais am help gyda’ch ffi gwrth-hawliad?",
       "changeHidden": "wedi gwneud cais am help i dalu ffioedd"
     },
     "counterClaimHwfReference": {
@@ -109,7 +109,7 @@
       "changeHidden": "rhesymau dros y gwrth-hawliad"
     },
     "counterClaimAgainst": {
-      "label": "Yn erbyn pwy ydych chi'n gwneud y gwrth-hawliad?",
+      "label": "Yn erbyn pwy ydych chi’n gwneud y gwrth-hawliad?",
       "changeHidden": "gwrth-hawliad yn erbyn"
     },
     "otherOrderRequestDetails": {
@@ -117,7 +117,7 @@
       "changeHidden": "gorchmynion a geisiwyd"
     },
     "otherOrderRequestFacts": {
-      "label": "Pa ffeithiau hoffech chi i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
+      "label": "Pa ffeithiau hoffech chi i’r llys eu hystyried wrth benderfynu ar yr hawliad?",
       "changeHidden": "ffeithiau i’r llys"
     },
     "counterClaimWantToUploadFiles": {

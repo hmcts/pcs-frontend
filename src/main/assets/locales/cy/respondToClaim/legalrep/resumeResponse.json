@@ -4,7 +4,7 @@
   "resumeResponseParagraph1": "Mae eich atebion blaenorol wedi eu cadw.  Gallwch naill ai:",
   "resumeResponseListItem1": "parhau â’ch ymateb gan ddefnyddio’ch atebion a gadwyd",
   "resumeResponseListItem2": "dechrau eich ymateb eto o’r dechrau",
-  "resumeResponseParagraph2": "Os byddwch yn parhau â’ch ymateb gan ddefnyddio’ch atebion a gadwyd rhaid i chi ddewis 'Parhau' ar waelod pob tudalen nes i chi gyrraedd y cwestiwn yr hoffech barhau â’ch ymateb ohono.",
+  "resumeResponseParagraph2": "Os byddwch yn parhau â’ch ymateb gan ddefnyddio’ch atebion a gadwyd rhaid i chi ddewis ‘Parhau’ ar waelod pob tudalen nes i chi gyrraedd y cwestiwn yr hoffech barhau â’ch ymateb ohono.",
   "question": "A ydych eisiau parhau â’r ymateb gan ddefnyddio’ch atebion a gadwyd?",
   "errors": {
     "resumeResponse": "Dewiswch a ydych eisiau parhau â’r ymateb gan ddefnyddio’ch atebion a gadwyd?"

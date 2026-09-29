@@ -2,7 +2,7 @@
   "serviceName": "Hawliadau Meddiant",
   "caseReferenceLabel": "Rhif yr achos:",
   "iWantToHeading": "Rwyf eisiau ...",
-  "askCourtToMakeOrder": "Gofyn i'r llys wneud gorchymyn (gwneud cais cyffredinol)",
+  "askCourtToMakeOrder": "Gofyn i’r llys wneud gorchymyn (gwneud cais cyffredinol)",
   "uploadAdditionalDocuments": "Uwchlwytho dogfennau ychwanegol",
   "helpAndSupportHeading": "Cymorth a chefnogaeth",
   "helpAndSupportAriaLabel": "Cymorth a chefnogaeth",
@@ -25,8 +25,8 @@
   "notifications": {
     "Defendant": {
       "CaseIssued": {
-        "title": "Achos wedi'i gyflwyno",
-        "body": "Mae eich achos wedi'i gyflwyno <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">Gweld yr hawliad</a>. Ymateb erbyn {{responseEndDate}}."
+        "title": "Achos wedi’i gyflwyno",
+        "body": "Mae eich achos wedi’i gyflwyno <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">Gweld yr hawliad</a>. Ymateb erbyn {{responseEndDate}}."
       },
       "ResponseToClaim": {
         "title": "Ymateb i’r hawliad",
@@ -34,11 +34,11 @@
       },
       "ResponseNotStarted": {
         "title": "Eich ymateb",
-        "body": "Dylech ymateb i'r hawliad cyn y gwrandawiad.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Dechrau eich ymateb </a>"
+        "body": "Dylech ymateb i’r hawliad cyn y gwrandawiad.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Dechrau eich ymateb </a>"
       },
       "ResponseInProgress": {
         "title": "Eich ymateb",
-        "body": "Dylech gwblhau eich ymateb cyn y gwrandawiad.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Parhau gyda'ch ymateb </a>"
+        "body": "Dylech gwblhau eich ymateb cyn y gwrandawiad.<br><br><a class=\"govuk-link\" href=\"/case/{{caseReference}}/respond-to-claim/task-list\">Parhau gyda’ch ymateb </a>"
       },
       "ResponseSubmitted": {
         "title": "Eich ymateb",
@@ -50,7 +50,7 @@
       },
       "NoHearingArranged": {
         "title": "Mae hawliad meddiannu eiddo wedi’i wneud yn eich erbyn",
-        "body": "Bydd y llys yn trefnu'r gwrandawiad ac yn cysylltu gyda chi gyda manylion."
+        "body": "Bydd y llys yn trefnu’r gwrandawiad ac yn cysylltu gyda chi gyda manylion."
       }
     }
   },
@@ -83,13 +83,13 @@
       "title": "Uwchlwytho dogfennau ychwanegol"
     },
     "ReviewResponse": {
-      "title": "Adolygu'r ymateb"
+      "title": "Adolygu’r ymateb"
     },
     "SubmitResponse": {
-      "title": "Cyflwyno'r ymateb"
+      "title": "Cyflwyno’r ymateb"
     },
     "MakeGeneralApplication": {
-      "title": "Gofyn i'r llys wneud gorchymyn (gwneud cais cyffredinol)"
+      "title": "Gofyn i’r llys wneud gorchymyn (gwneud cais cyffredinol)"
     },
     "ViewAllApplications": {
       "title": "Gweld yr holl geisiadau"
@@ -98,7 +98,7 @@
 
   "viewDocuments": {
     "pageTitle": "Gweld y dogfennau",
-    "noDocuments": "Nid oes unrhyw ddogfennau i'w harddangos.",
+    "noDocuments": "Nid oes unrhyw ddogfennau i’w harddangos.",
     "submittedOn": "Cyflwynwyd ar",
     "folders": {
       "statementsOfCase": "Datganiadau am yr achos",

@@ -1,14 +1,14 @@
 {
   "pageTitle": "Eich enw",
   "nameConfirmationLabel": "Ai eich enw yw {{defendantName}}?",
-  "nameConfirmationHint": "Dyma'r enw a ddarparwyd gan {{organisationName}}",
+  "nameConfirmationHint": "Dyma’r enw a ddarparwyd gan {{organisationName}}",
   "yesOption": "Ie",
   "noOption": "Na",
   "firstNameLabel": "Enw cyntaf",
   "lastNameLabel": "Cyfenw",
   "contactUs": "Cysylltu â ni i gael cymorth",
   "errors": {
-    "nameConfirmation": "Mae'n rhaid i chi ddweud os mai eich enw yw {{defendantName}}",
+    "nameConfirmation": "Mae’n rhaid i chi ddweud os mai eich enw yw {{defendantName}}",
     "firstName": "Nodwch eich enw cyntaf",
     "firstNameMaxLength": "Rhaid i’r enw cyntaf fod yn 60 nod neu lai",
     "lastName": "Nodwch eich cyfenw",

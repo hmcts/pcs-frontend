@@ -1,7 +1,7 @@
 {
   "pageTitle": "Swm gwrth-hawliad",
-  "heading": "Ydych chi'n hawlio ar gyfer swm penodol o arian?",
-  "claimAmountLabel": "Faint ydych chi'n ei hawlio?",
+  "heading": "Ydych chi’n hawlio ar gyfer swm penodol o arian?",
+  "claimAmountLabel": "Faint ydych chi’n ei hawlio?",
   "maxClaimAmountLabel": "Beth yw uchafswm gwerth eich hawliad?",
   "specificFeeText": "<p class=\"govuk-body\">Mae eich ffi gwrth-hawliad (y ffi fyddwch yn ei thalu i wneud y gwrth-hawliad hwn) yn dibynnu ar y swm rydych yn ei hawlio.</p><p class=\"govuk-body\">Os ydych eisiau gwirio faint fydd eich ffi, gallwch <a href=\"https://www.gov.uk/government/publications/fees-in-the-civil-and-family-courts-main-fees-ex50/civil-court-fees-ex50\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">amcangyfrif beth fydd y gost i chi i wneud eich gwrth-hawliad (yn agor mewn tab newydd)</a></p>",
   "noSpecificFeeText": "<p class=\"govuk-body\">Os nad ydych yn gwybod y swm penodol rydych yn ei hawlio, mae’r llys angen gwybod faint ydych yn credu yw uchfaswm gwerth eich hawliad.</p><p class=\"govuk-body\">Os nad ydych yn gwybod yr union swm, rhowch amcangyfrif.</p>",
@@ -11,14 +11,14 @@
     },
     "claimAmount": {
       "required": "Nodwch faint ydych chi’n ei hawlio",
-      "largeAmount": "Rhaid i'r swm rydych yn ei hawlio fod yn llai nag £1 biliwn.",
-      "negative": "Rhaid i'r swm rydych yn ei hawlio fod yn £0.00 neu'n uwch.",
+      "largeAmount": "Rhaid i’r swm rydych yn ei hawlio fod yn llai nag £1 biliwn.",
+      "negative": "Rhaid i’r swm rydych yn ei hawlio fod yn £0.00 neu’n uwch.",
       "invalidFormat": "Rhowch faint ydych yn ei hawlio yn y fformat cywir, er enghraifft 148.00 neu 148.50"
     },
     "estimatedMaxClaimAmount": {
       "required": "Rhowch uchafswm gwerth eich hawliad",
       "largeAmount": "Rhaid i uchafswm gwerth rydych yn ei hawlio fod yn llai nag £1 biliwn",
-      "negative": "Rhaid i uchafswm gwerth rydych yn ei hawlio fod yn £0.00 neu'n uwch",
+      "negative": "Rhaid i uchafswm gwerth rydych yn ei hawlio fod yn £0.00 neu’n uwch",
       "invalidFormat": "Rhowch uchafswm gwerth eich hawliad yn y fformat cywir, er enghraifft 148.00 neu 148.50"
     }
   },
