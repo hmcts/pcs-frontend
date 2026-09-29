@@ -135,8 +135,8 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
     logger.error(`Error response data: ${JSON.stringify(responseData, null, 2)}`);
   }
 
-  if (status === 403 || status === 404) {
-    // TODO: Test
+  if (status === 403) {
+    // TODO: Also return this for a 404
     return new HTTPError('Not authorised to access CCD case service', 403);
   }
 
