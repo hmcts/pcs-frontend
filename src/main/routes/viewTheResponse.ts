@@ -593,30 +593,15 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
 }
 
 function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
-  logger.info('[viewTheResponse] findCounterclaimPdfDocument START');
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
   if (!responses?.counterClaim || isNo(responses.makeCounterClaim)) {
-    logger.info('[viewTheResponse] Early return - no counterclaim');
     return null;
   }
 
   const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
   const allDefendants = caseData.allDefendants ?? [];
   const documents = extractCaseDocuments(caseData as Record<string, unknown>);
-
-  logger.info('[viewTheResponse] Document search context', {
-    totalDocuments: documents.length,
-    counterclaimDocs: documents.filter(d => d.categoryId === 'statementsOfCase').map(d => d.filename),
-  });
-
-  // If we can determine the specific defendant number, use exact matching
-  logger.info('[viewTheResponse] Exact match attempt', {
-    hasCurrentDefendantPartyId: !!currentDefendantPartyId,
-    currentDefendantPartyId,
-    allDefendantsCount: allDefendants.length,
-    allDefendantIds: allDefendants.map(d => d.id),
-  });
 
   if (currentDefendantPartyId && allDefendants.length > 0) {
     const defendantIndex = allDefendants.findIndex(defendant => defendant.id === currentDefendantPartyId);
@@ -628,25 +613,12 @@ function findCounterclaimPdfDocument(caseData: CcdCaseData): string | null {
           doc.categoryId === 'statementsOfCase' && doc.filename === `Counterclaim - Defendant ${defendantNumber}.pdf`
       );
       if (counterclaimPdf) {
-        logger.info('[viewTheResponse] Exact match found', { defendantNumber, filename: counterclaimPdf.filename });
         return counterclaimPdf.id;
       }
     }
   }
 
-  // Fallback: find any counterclaim PDF for this defendant
-  // This handles single defendant cases or when exact matching fails
-  const counterclaimPdf = documents.find(
-    doc => doc.categoryId === 'statementsOfCase' && doc.filename?.startsWith('Counterclaim - Defendant')
-  );
-
-  if (counterclaimPdf) {
-    logger.info('[viewTheResponse] Fallback match found', { filename: counterclaimPdf.filename });
-  } else {
-    logger.info('[viewTheResponse] No counterclaim PDF found');
-  }
-
-  return counterclaimPdf?.id ?? null;
+  return null;
 }
 
 function resolveResponsePdfUrl(caseData: CcdCaseData, caseReference: string): string | undefined {
