@@ -2,7 +2,10 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('H 07 * * 1-5')]),
+  pipelineTriggers([
+    cron('H 07 * * 1-5'),
+    cron('5 15 * * 2')   // TEST: every Tuesday at 15:05
+  ]),
   parameters([
     text(
       name: 'MANUAL_BUILD_REASON',
@@ -21,7 +24,7 @@ properties([
     ),
     choice(
       name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
+      choices: ['@nightly', '@smoke', '@e2e', '@regression', '@EMV'],
       description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
     ),
     choice(
@@ -144,6 +147,23 @@ withNightlyPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
     runE2ETests(yarnBuilder)
   }
+
+  // Weekly @EMV test run — currently TEST schedule: every Tuesday at 15:05
+  afterAlways('fortify-scan') {
+    if (isWeeklyEmvSchedule()) {
+      runEmvWeeklyTests(yarnBuilder)
+    }
+  }
+}
+
+def isWeeklyEmvSchedule() {
+  // TEST schedule: fires from cron('5 15 * * 2') — Tuesday 15:05.
+  // Guard matches Tuesday (DAY_OF_WEEK = 3) in the 15:00 hour.
+  def cal = Calendar.getInstance()
+  cal.setTime(new Date())
+  def dayOfWeek = cal.get(Calendar.DAY_OF_WEEK) // TUESDAY = 3
+  def hour = cal.get(Calendar.HOUR_OF_DAY)
+  return dayOfWeek == Calendar.TUESDAY && hour == 15
 }
 
 def selectedSauceSuites() {
@@ -230,6 +250,37 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
         artifacts: 'definitions/test/playwright-report/**'
       )
       sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
+    }
+  }
+}
+
+/** Weekly @EMV run — currently TEST schedule: every Tuesday at 15:05, Chrome only. */
+def runEmvWeeklyTests(yarnBuilder) {
+  stage("E2E - Weekly @EMV [${env.ENVIRONMENT}]") {
+    node {
+      checkout scm
+      sh 'rm -rf allure-results allure-report'
+      withEnv([
+        "E2E_TEST_SCOPE=@EMV",
+        "PLAYWRIGHT_PROJECT=chrome"
+      ]) {
+        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+          yarnBuilder.yarn('test:E2e')
+        }
+      }
+      publishHTML([
+        allowMissing: true,
+        alwaysLinkToLastBuild: true,
+        keepAll: true,
+        reportDir: "allure-report",
+        reportFiles: 'index.html',
+        reportName: "Weekly @EMV E2E Test Report"
+      ])
+      steps.archiveArtifacts(
+        allowEmptyArchive: true,
+        artifacts: 'definitions/test/playwright-report/**'
+      )
+      sendAllureReportToSlack('EMV-Weekly', "Weekly_20EMV_20E2E_20Test_20Report/")
     }
   }
 }
