@@ -113,7 +113,7 @@ describe('make an order: outright possession', () => {
     expect(page.orderText()).toBe(
       [
         'The Court heard from Sam Solicitor, solicitor for the claimant.',
-        'The Defendant 1: Alex Example did not attend the hearing, but the Court was satisfied they had received notice of the hearing, and it was reasonable to proceed in their absence.',
+        'Alex Example did not attend the hearing, but the Court was satisfied they had received notice of the hearing, and it was reasonable to proceed in their absence.',
         'IT IS ORDERED THAT:',
         'The defendant(s) must give up possession of 10 Test Street, Bristol, BS1 1AA to the claimant(s) on or before 1 October 2026.',
         'This order for possession was made on mandatory grounds, namely Ground 8.',
