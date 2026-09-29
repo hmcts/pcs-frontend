@@ -1,4 +1,3 @@
-{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
 {% import "make-order/_compact.njk" as compact with context %}
 
 <h3 class="govuk-heading-m">Suspended possession</h3>
@@ -8,49 +7,52 @@
   {{ compact.date({ id: "suspended-by-date", legend: "Possession by", legendHidden: true }) }}
 </div>
 
-{% call compact.row({ classes: "govuk-form-group" }) %}
-  {{ compact.copy("Suspended on condition of payment of current rent plus arrears of") }}
-  {{ compact.money({
-    id: "suspended-arrears",
-    label: "Arrears",
-    labelHidden: true,
-    formGroupClasses: "govuk-!-margin-bottom-0"
-  }) }}
-  {{ compact.copy("to be paid by") }}
-{% endcall %}
+{# The conditions are one question: the arrears and how they are paid, each payment row named
+   for assistive technology. #}
+{% set oneOffHtml %}
+  {% call compact.row({ groupLabel: "One-off payment" }) %}
+    {{ compact.money({ id: "suspended-oneoff-amount", label: "One-off payment amount", labelHidden: true }) }}
+    {{ compact.date({ id: "suspended-oneoff-date", legend: "On or before" }) }}
+  {% endcall %}
+{% endset %}
 
-{# A single payment and instalments may both apply; CaseMan keeps both rows visible, so this
-   checkbox group is written out rather than using the macro, which would hide the fields. #}
-{% set termsError = validationErrors["suspended-payment-terms"] %}
-<div class="govuk-form-group{% if termsError %} govuk-form-group--error{% endif %}">
-  {% if termsError %}
-    {{ govukErrorMessage({ id: "suspended-payment-terms-error", text: termsError.text }) }}
-  {% endif %}
-  <div class="govuk-checkboxes govuk-checkboxes--small pcs-divided-options" data-module="govuk-checkboxes">
-    <div class="govuk-checkboxes__item">
-      <input class="govuk-checkboxes__input" id="suspended-payment-terms" name="suspended-payment-terms" type="checkbox" value="one-off"{% if termsError %} aria-describedby="suspended-payment-terms-error"{% endif %}{% if draftChecked("suspended-payment-terms", "one-off") %} checked{% endif %}>
-      <label class="govuk-label govuk-checkboxes__label" for="suspended-payment-terms">Payment of<span class="govuk-visually-hidden"> a one-off amount</span></label>
-    </div>
-    {% call compact.row({ classes: "govuk-!-margin-left-7" }) %}
-      {{ compact.money({ id: "suspended-oneoff-amount", label: "One-off payment amount", labelHidden: true }) }}
-      {{ compact.date({ id: "suspended-oneoff-date", legend: "On or before" }) }}
-    {% endcall %}
+{% set instalmentsHtml %}
+  {% call compact.row({ groupLabel: "Instalments" }) %}
+    {{ compact.money({ id: "suspended-instalment-amount", label: "Instalment amount", labelHidden: true }) }}
+    {{ compact.select("suspended-instalment-frequency", {
+      label: "Instalment frequency",
+      labelHidden: true,
+      items: compact.paymentFrequencies,
+      default: "monthly"
+    }) }}
+    {{ compact.date({ id: "suspended-instalment-date", legend: "with the first payment by" }) }}
+  {% endcall %}
+{% endset %}
 
-    <div class="govuk-checkboxes__item">
-      <input class="govuk-checkboxes__input" id="suspended-payment-terms-2" name="suspended-payment-terms" type="checkbox" value="instalments"{% if draftChecked("suspended-payment-terms", "instalments") %} checked{% endif %}>
-      <label class="govuk-label govuk-checkboxes__label" for="suspended-payment-terms-2">Payments of<span class="govuk-visually-hidden"> instalments</span></label>
-    </div>
-    {% call compact.row({ classes: "govuk-!-margin-left-7" }) %}
-      {{ compact.money({ id: "suspended-instalment-amount", label: "Instalment amount", labelHidden: true }) }}
-      {{ compact.select("suspended-instalment-frequency", {
-        label: "Instalment frequency",
+<div class="govuk-form-group">
+  <fieldset class="govuk-fieldset">
+    <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Suspended on condition of</legend>
+    {% call compact.row({ classes: "govuk-!-margin-bottom-4" }) %}
+      {{ compact.copy("Payment of current rent plus arrears of") }}
+      {{ compact.money({
+        id: "suspended-arrears",
+        label: "Arrears",
         labelHidden: true,
-        items: compact.paymentFrequencies,
-        default: "monthly"
+        formGroupClasses: "govuk-!-margin-bottom-0"
       }) }}
-      {{ compact.date({ id: "suspended-instalment-date", legend: "with the first payment by" }) }}
     {% endcall %}
-  </div>
+
+    {# A single payment and instalments may both apply. #}
+    {{ compact.checkboxes("suspended-payment-terms", {
+      legend: "Arrears to be paid by",
+      classes: "pcs-divided-options",
+      formGroup: { classes: "govuk-!-margin-bottom-0" },
+      items: [
+        { value: "one-off", html: 'Payment of<span class="govuk-visually-hidden"> a one-off amount</span>', conditional: { html: oneOffHtml } },
+        { value: "instalments", html: 'Payments of<span class="govuk-visually-hidden"> instalments</span>', conditional: { html: instalmentsHtml } }
+      ]
+    }) }}
+  </fieldset>
 </div>
 
 {# Same terms is only available when the money-judgment option reveals it. #}
@@ -65,13 +67,14 @@
 {% endset %}
 
 {% set useOccupationHtml %}
-  {% call compact.row() %}
+  {% call compact.row({ groupLabel: "Damages for unlawful occupation" }) %}
     {{ compact.money({ id: "suspended-use-occupation-rate", label: "Daily rate" }) }}
     {{ compact.date({ id: "suspended-use-occupation-from-date", legend: "From" }) }}
   {% endcall %}
 {% endset %}
 
 {{ compact.checkboxes("suspended-options", {
+  legend: "Additional orders (optional)",
   classes: "pcs-divided-options",
   items: [
     { value: "money-judgment-arrears", text: "Money judgment for the arrears above", conditional: { html: sameTermsHtml } },

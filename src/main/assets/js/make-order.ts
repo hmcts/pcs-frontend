@@ -85,6 +85,17 @@ export function initOptionRows(form: HTMLFormElement): void {
       radio.dispatchEvent(new Event('change', { bubbles: true }));
     }
   });
+  // Only the chosen option's fields are needed, so only they are marked required. Also run now,
+  // as a browser that restores the form does not say so with a change event.
+  const markChosenRequired = (): void =>
+    form.querySelectorAll<HTMLElement>('[data-option-row]').forEach(row => {
+      const chosen = row.querySelector<HTMLInputElement>('input[type="radio"]')?.checked ?? false;
+      row.querySelectorAll<HTMLInputElement>('.pcs-option-row__fields input.govuk-input').forEach(field => {
+        field.required = chosen;
+      });
+    });
+  form.addEventListener('change', markChosenRequired);
+  markChosenRequired();
 }
 
 export function initCaseFactsToggle(form: HTMLFormElement): void {
@@ -216,6 +227,7 @@ export function initMakeOrder(): void {
 
   // GOV.UK tabs record the open tab in the fragment for clicks, arrow keys and history.
   const tabs = Array.from(form.querySelectorAll<HTMLAnchorElement>('[data-order-type]'));
+  const savedTab = tabs.find(tab => tab.dataset.orderType === orderTypeField.value);
   const tabType = (): OrderType | undefined =>
     tabs.find(tab => tab.hash === window.location.hash)?.dataset.orderType as OrderType | undefined;
   const followTab = (): void => {
@@ -224,16 +236,42 @@ export function initMakeOrder(): void {
       selectOrderType(type);
     }
   };
-  window.addEventListener('hashchange', followTab);
+  window.addEventListener('hashchange', () => {
+    // The page opened without a fragment (see startWithSavedOrderTab), so going back to it reopens the saved tab.
+    if (!window.location.hash && savedTab) {
+      window.history.replaceState(window.history.state, '', savedTab.hash);
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+      return;
+    }
+    followTab();
+  });
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
-  const savedTab = tabs.find(tab => tab.dataset.orderType === orderTypeField.value);
-  if (!window.location.hash && savedTab) {
-    // GOV.UK opens its first tab when there is no fragment; reopen the saved one without a history entry.
-    window.history.replaceState(window.history.state, '', savedTab.hash);
-    window.dispatchEvent(new HashChangeEvent('hashchange'));
+}
+
+/**
+ * Starts GOV.UK's components with the saved order type's tab open. GOV.UK tabs open the tab the
+ * fragment names, or else the first, so the fragment names the saved tab while they start and is
+ * then taken away again: left in place, the browser would scroll to it once the page loads, past
+ * the top of the page or the error summary of a refused submission.
+ */
+export function startWithSavedOrderTab(start: () => void): void {
+  const orderType = document.querySelector<HTMLInputElement>('#make-order-form #order-type')?.value;
+  const savedTab = Array.from(document.querySelectorAll<HTMLAnchorElement>('#make-order-form [data-order-type]')).find(
+    tab => tab.dataset.orderType === orderType
+  );
+  if (window.location.hash || !savedTab) {
+    start();
+    return;
+  }
+  const url = window.location.href;
+  window.history.replaceState(window.history.state, '', savedTab.hash);
+  try {
+    start();
+  } finally {
+    window.history.replaceState(window.history.state, '', url);
   }
 }

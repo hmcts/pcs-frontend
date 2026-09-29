@@ -1,11 +1,20 @@
 @use 'govuk-frontend' as *;
 
 // This cap also reserves space so keyboard focus is not obscured by the sticky panel.
-$pcs-case-facts-max-height: min(60vh, 320px);
+$pcs-case-facts-max-height: 40vh;
 
 // Include content-box padding and borders in the focus reservation.
 $pcs-case-facts-reserve: calc(#{$pcs-case-facts-max-height} + #{govuk-spacing(3) * 2 + 2px});
 $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
+
+// The panel only sticks where it leaves most of the screen to the form: at desktop widths with at
+// least 800px of height, where its cap of 40% of the height fits the case facts. Zooming in, or a
+// short laptop screen, returns it to the page flow (WCAG 1.4.10).
+@mixin pcs-case-facts-sticky {
+  @include govuk-media-query($from: desktop, $and: '(min-height: 800px)') {
+    @content;
+  }
+}
 
 // Use the available width without changing the shared citizen-page container.
 .pcs-wide {
@@ -21,32 +30,29 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
 
 // Match GOV.UK's selector specificity and reserve the sticky panel on the root scrollport.
 .govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)) {
-  scroll-padding-top: $pcs-case-facts-reserve;
-
-  @include govuk-media-query($until: desktop) {
-    scroll-padding-top: 0;
+  @include pcs-case-facts-sticky {
+    scroll-padding-top: $pcs-case-facts-reserve;
   }
 }
 
 .govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)):has(.pcs-case-facts--collapsed) {
-  scroll-padding-top: $pcs-case-facts-collapsed-reserve;
+  @include pcs-case-facts-sticky {
+    scroll-padding-top: $pcs-case-facts-collapsed-reserve;
+  }
 }
 
 .pcs-case-facts {
-  position: sticky;
-  top: 0;
-  z-index: 100;
   padding: govuk-spacing(3) 0;
   border-top: 1px solid $govuk-border-colour;
   border-bottom: 1px solid $govuk-border-colour;
   background-color: govuk-colour('black', $variant: 'tint-95');
 
-  max-height: $pcs-case-facts-max-height;
-  overflow-y: auto;
-
-  @include govuk-media-query($until: desktop) {
-    position: static;
-    max-height: none;
+  @include pcs-case-facts-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    max-height: $pcs-case-facts-max-height;
+    overflow-y: auto;
   }
 }
 
@@ -110,11 +116,6 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
     > .govuk-fieldset > .govuk-fieldset__legend {
       margin-bottom: govuk-spacing(1);
     }
-  }
-
-  // Temporary density trade-off: retain accessible names while hiding visual D/M/Y labels.
-  .govuk-date-input__label {
-    @include govuk-visually-hidden;
   }
 
   .govuk-date-input__item .govuk-form-group {
