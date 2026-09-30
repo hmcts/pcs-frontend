@@ -1,0 +1,24 @@
+{% extends "confirm-order-review/_layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set pageHeading = "Are you sure you want to remove review date " + number + "?" %}
+
+{% block page %}
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+    {{ govukSummaryList({
+      rows: [
+        { key: { text: "Date of review" }, value: { text: reviewDate.date } },
+        { key: { text: "Reason" }, value: { text: reviewDate.reason } },
+        { key: { text: "Description of review" }, value: { text: reviewDate.description } }
+      ]
+    }) }}
+    <div class="govuk-button-group">
+      {{ govukButton({ text: "Yes", classes: "govuk-button--warning", name: "confirm", value: "yes" }) }}
+      <a class="govuk-link" href="{{ reviewDatesUrl }}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}

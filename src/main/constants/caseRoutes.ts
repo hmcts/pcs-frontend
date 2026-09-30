@@ -30,3 +30,5 @@ export const VIEW_RESPONSE_ROUTE = '/case/:caseReference/view-the-response';
 export const MAKE_ORDER_ROUTE = '/case/:caseReference/make-order';
 
 export const MAKE_ORDER_SENT_FOR_REVIEW_ROUTE = `${MAKE_ORDER_ROUTE}/sent-for-review`;
+
+export const CONFIRM_ORDER_REVIEW_ROUTE = '/case/:caseReference/confirm-order-review';

@@ -1,0 +1,59 @@
+@use 'govuk-frontend' as *;
+
+// The judge's order as they left it, read only, set apart from the page like a document.
+.pcs-order-preview {
+  @include govuk-font($size: 19);
+  margin-bottom: govuk-spacing(6);
+  padding: govuk-spacing(4);
+  border: 1px solid $govuk-border-colour;
+
+  ol {
+    padding-left: govuk-spacing(6);
+  }
+
+  ol ol {
+    list-style-type: lower-roman;
+  }
+
+  // The judge's changes to the generated wording, as tracked changes. Screen readers do not announce
+  // insertions and deletions, so each says what it is.
+  ins {
+    background-color: govuk-colour('green', tint-80);
+    text-decoration: underline;
+  }
+
+  del {
+    color: $govuk-error-colour;
+    text-decoration: line-through;
+  }
+
+  ins::before,
+  ins::after,
+  del::before,
+  del::after {
+    @include govuk-visually-hidden;
+  }
+
+  ins::before {
+    content: ' [added by the Judge] ';
+  }
+
+  del::before {
+    content: ' [removed by the Judge] ';
+  }
+
+  ins::after,
+  del::after {
+    content: ' [end] ';
+  }
+}
+
+.pcs-preserve-lines {
+  white-space: pre-wrap;
+}
+
+.pcs-review-date {
+  margin-bottom: govuk-spacing(6);
+  padding-bottom: govuk-spacing(4);
+  border-bottom: 1px solid $govuk-border-colour;
+}

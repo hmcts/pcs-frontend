@@ -1,15 +1,10 @@
-import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
-import type { DocWeaveSnapshot } from '@hmcts-cft/docweave';
-import config from 'config';
+import { buildFooterModel } from '@hmcts-cft/cft-ui-component-lib';
 import { Application, Request, Response } from 'express';
 import { DateTime } from 'luxon';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { MAKE_ORDER_ROUTE, MAKE_ORDER_SENT_FOR_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
-import { getUserRoles } from '../steps/utils';
-import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
-import { buildManageCaseDetailsRedirect } from '../utils/manageCaseRedirect';
 
 import { ccdCaseService } from '@services/ccdCaseService';
 import {
@@ -18,33 +13,18 @@ import {
   type MakeOrderValidationIssue,
   validateMakeOrder,
 } from '@utils/makeOrderValidation';
+import {
+  type FormData,
+  type MakeOrderStart,
+  type OrderParty,
+  caseHeader,
+  confirmationHeader,
+  manageCaseDetailsUrl,
+  refusedByCcd,
+  xuiHeaderModel,
+} from '@utils/orderCase';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
-
-type FormData = Record<string, unknown>;
-
-interface MakeOrderParty {
-  id: string;
-  name: string;
-}
-
-/** What the make order event sends when the judge opens it: their working order, if any, and the case. */
-interface MakeOrderStart {
-  order: {
-    id?: string;
-    version: number;
-    orderType?: MakeOrderType;
-    formData?: FormData;
-    docweaveSnapshot?: DocWeaveSnapshot | null;
-  };
-  caseContext: {
-    caseReference: number;
-    propertyAddress?: Record<string, string | undefined>;
-    claimants: MakeOrderParty[];
-    defendants: MakeOrderParty[];
-    caseFacts?: Record<string, unknown>;
-  };
-}
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 
@@ -63,13 +43,6 @@ async function startOrderEvent(accessToken: string, caseReference: string): Prom
     throw new HTTPError('Not permitted to make an order on this case', 403);
   }
   return { envelope: JSON.parse(payload) as MakeOrderStart, eventToken: started.eventToken };
-}
-
-function formatAddress(address: Record<string, string | undefined> = {}): string {
-  return ['AddressLine1', 'AddressLine2', 'AddressLine3', 'PostTown', 'County', 'PostCode', 'Country']
-    .map(key => address[key])
-    .filter(Boolean)
-    .join(', ');
 }
 
 /** Pre-fills the case facts fields from the claim, in the form's field names. */
@@ -105,7 +78,7 @@ interface AttendanceRow extends AttendanceParty {
 }
 
 function attendanceParties({ caseContext }: MakeOrderStart): AttendanceRow[] {
-  const parties = (type: AttendanceParty['type'], list: MakeOrderParty[]): AttendanceRow[] =>
+  const parties = (type: AttendanceParty['type'], list: OrderParty[]): AttendanceRow[] =>
     list.map((party, index) => ({
       id: `${type}-${party.id}`,
       partyId: party.id,
@@ -114,36 +87,6 @@ function attendanceParties({ caseContext }: MakeOrderStart): AttendanceRow[] {
       type,
     }));
   return [...parties('claimant', caseContext.claimants), ...parties('defendant', caseContext.defendants)];
-}
-
-/** The case as the confirmation of an order sent for review shows it. */
-function sentForReviewHeader(caseReference: string, caseContext: MakeOrderStart['caseContext']) {
-  const claimant = caseContext.claimants[0]?.name;
-  const primaryDefendant = caseContext.defendants[0]?.name;
-  return {
-    caseReference: caseNumberFormatter(caseReference),
-    propertyAddress: formatAddress(caseContext.propertyAddress),
-    caseName: [claimant, primaryDefendant].filter(Boolean).join(' vs '),
-  };
-}
-
-/**
- * XUI's header as it shows it to a judge. XUI adds a user's role assignments, such as judge, to their
- * IDAM roles to choose the header, and only judges reach these pages: CCD lets only them make an order.
- */
-function xuiHeaderModel(req: Request): ReturnType<typeof buildHeaderModel> {
-  const roles = [...getUserRoles(req), 'judge'];
-  const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles } });
-  headerModel.assetsPath = '/assets/ui-component-lib';
-  return headerModel;
-}
-
-function manageCaseDetailsUrl(caseReference: string): string {
-  const url = buildManageCaseDetailsRedirect(config.get('redirects.manageCaseReturnURL'), caseReference);
-  if (!url) {
-    throw new HTTPError('The Manage Case return URL is not configured', 500);
-  }
-  return url;
 }
 
 /** What the judge sent, shown back with the issues that stopped it; the saved order fills any gaps. */
@@ -159,7 +102,7 @@ function pageModel(
   { envelope, eventToken }: StartedOrder,
   submission?: Submission
 ): Record<string, unknown> {
-  const headerModel = xuiHeaderModel(req);
+  const headerModel = xuiHeaderModel(req, ['judge']);
   const { caseContext, order } = envelope;
   const draft: FormData = {
     ...caseFactsFormData(caseContext.caseFacts),
@@ -187,10 +130,7 @@ function pageModel(
     draftDate: (prefix: string) => ['day', 'month', 'year'].map(name => ({ name, value: draft[`${prefix}-${name}`] })),
     draftSelect: (items: Record<string, unknown>[], name: string, defaultValue?: string) =>
       items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) })),
-    caseReferenceDisplay: caseNumberFormatter(caseContext.caseReference),
-    propertyAddressDisplay: formatAddress(caseContext.propertyAddress),
-    claimantNames: caseContext.claimants.map(party => party.name).join(', '),
-    defendantNames: caseContext.defendants.map(party => party.name).join(', '),
+    ...caseHeader(caseContext),
     attendanceParties: attendanceParties(envelope),
     validationErrors: Object.fromEntries(issues.map(issue => [issue.id, { text: issue.message }])),
     errorSummary: issues.length
@@ -201,14 +141,6 @@ function pageModel(
         }
       : undefined,
   };
-}
-
-/**
- * Only judges may make an order, which CCD decides from their role assignments: anyone else is
- * not given the event's payload or allowed to submit it, and is shown the page does not exist.
- */
-function refusedByCcd(error: unknown): boolean {
-  return error instanceof HTTPError && (error.status === 403 || error.status === 404);
 }
 
 export default function makeOrderRoutes(app: Application): void {
@@ -275,7 +207,7 @@ export default function makeOrderRoutes(app: Application): void {
         // Kept on the session so the confirmation survives a refresh, which cannot resubmit the order.
         req.session.ordersSentForReview = {
           ...req.session.ordersSentForReview,
-          [caseReference]: sentForReviewHeader(caseReference, JSON.parse(caseContext)),
+          [caseReference]: confirmationHeader(caseReference, JSON.parse(caseContext)),
         };
         return res.redirect(MAKE_ORDER_SENT_FOR_REVIEW_ROUTE.replace(':caseReference', caseReference));
       }
@@ -301,7 +233,7 @@ export default function makeOrderRoutes(app: Application): void {
         return res.redirect(closeUrl);
       }
       res.render('make-order-sent-for-review', {
-        headerModel: xuiHeaderModel(req),
+        headerModel: xuiHeaderModel(req, ['judge']),
         footerModel: buildFooterModel(),
         ...sent,
         closeUrl,

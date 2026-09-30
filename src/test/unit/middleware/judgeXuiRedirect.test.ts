@@ -83,7 +83,10 @@ describe('judgeXuiRedirectMiddleware', () => {
     '/cases/1234567890123456/event/ext:makeOrder',
     // How XUI builds the hand-off: encodeURIComponent(eventId)
     '/cases/1234567890123456/event/ext%3AmakeOrder',
-  ])('allows the %s judicial journey through', path => {
+    '/case/1234567890123456/confirm-order-review',
+    '/case/1234567890123456/confirm-order-review/check-your-answers',
+    '/cases/1234567890123456/event/ext%3AconfirmOrderReview',
+  ])('allows the %s staff order journey through', path => {
     mockIsStaffUser.mockReturnValue(true);
 
     invokeMiddleware(path);
