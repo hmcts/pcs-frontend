@@ -1,6 +1,6 @@
 {
   "pageTitle": "Enw eich cleient",
-  "nameConfirmationLabel": "Ai enw eich cleient yw {{defendantName}}?",
+  "nameConfirmationLabel": "Ai {{defendantName}} yw enw eich cleient?",
   "firstNameLabel": "Enw cyntaf y diffynnydd",
   "lastNameLabel": "Cyfenw’r diffynnydd",
   "nameConfirmationHint": "Dyma’r enw a ddarparwyd gan {{organisationName}}",

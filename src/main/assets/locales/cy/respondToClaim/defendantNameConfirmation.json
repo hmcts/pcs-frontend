@@ -1,6 +1,6 @@
 {
   "pageTitle": "Eich enw",
-  "nameConfirmationLabel": "Ai eich enw yw {{defendantName}}?",
+  "nameConfirmationLabel": "Ai {{defendantName}} yw eich enw?",
   "nameConfirmationHint": "Dyma’r enw a ddarparwyd gan {{organisationName}}",
   "yesOption": "Ie",
   "noOption": "Na",
