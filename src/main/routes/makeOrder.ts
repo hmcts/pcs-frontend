@@ -232,10 +232,13 @@ export default function makeOrderRoutes(app: Application): void {
         // As in XUI, a confirmation with nothing to confirm returns the user to the case.
         return res.redirect(closeUrl);
       }
-      res.render('make-order-sent-for-review', {
+      res.render('order-confirmation', {
         headerModel: xuiHeaderModel(req, ['judge']),
         footerModel: buildFooterModel(),
+        title: 'Order sent to caseworker for review',
         ...sent,
+        whatHappensNext: 'A caseworker will review the order.',
+        closeText: 'Close and return to case details',
         closeUrl,
       });
     }

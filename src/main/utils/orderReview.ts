@@ -73,22 +73,22 @@ export function blankReviewDate(): ReviewDateAnswer {
   return { day: '', month: '', year: '', reason: '', description: '' };
 }
 
+/** Whether a posted checkbox was ticked. */
+export function ticked(value: unknown): boolean {
+  return ([] as unknown[]).concat(value ?? []).includes('yes');
+}
+
 // The judge's staff message, as the make order form holds it.
 export function staffMessage(formData: FormData = {}): string | undefined {
-  const ticked = ([] as unknown[]).concat(formData['staff-message'] ?? []).includes('yes');
   const text = String(formData['staff-message-text'] ?? '').trim();
-  return ticked && text ? text : undefined;
+  return ticked(formData['staff-message']) && text ? text : undefined;
 }
 
 export function validateQuery(answers: OrderReviewAnswers): ValidationIssue[] {
+  const query = answers.queryToJudge?.trim() ?? '';
   if (!answers.sendQuery) {
     return [{ id: 'send-query', message: "Select 'Send query to Judge' and enter your query to return the order" }];
   }
-  return validateQueryText(answers);
-}
-
-function validateQueryText(answers: OrderReviewAnswers): ValidationIssue[] {
-  const query = answers.queryToJudge?.trim() ?? '';
   if (!query) {
     return [{ id: 'query-to-judge', message: 'Enter your query for the Judge' }];
   }
@@ -119,7 +119,7 @@ export function validateReviewDates(answers: OrderReviewAnswers): ValidationIssu
     const { day, month, year } = reviewDate;
     if (!day && !month && !year) {
       issues.push({ id: `${prefix}-date-day`, message: `Enter the date of review ${n}` });
-    } else if (!parseDate(day, month, year)) {
+    } else if (!/^\d{4}$/.test(year) || !parseDate(day, month, year)) {
       issues.push({ id: `${prefix}-date-day`, message: `Date of review ${n} must be a real date` });
     }
     if (!REVIEW_REASONS.some(reason => reason.value === reviewDate.reason)) {

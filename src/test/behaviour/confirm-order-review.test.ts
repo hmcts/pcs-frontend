@@ -85,8 +85,11 @@ function changeGeneratedWording(): void {
   field.value = JSON.stringify(snapshot);
 }
 
+// Making an order boots the judge's page, so the plain order most tests review is made once.
+let plainOrder: Promise<Order> | undefined;
+
 async function caseworkerReviewing(order?: Order): Promise<TestApp> {
-  return bootApp({ caseworker: true, orderAwaitingReview: order ?? (await judgesOrder()) });
+  return bootApp({ caseworker: true, orderAwaitingReview: order ?? (await (plainOrder ??= judgesOrder())) });
 }
 
 /** Takes the caseworker from the introduction to the given page with every answer before it given. */
@@ -163,7 +166,7 @@ describe('confirm order review', () => {
     });
 
     it('does not exist for someone CCD does not let review orders', async () => {
-      app = await bootApp({ orderAwaitingReview: await judgesOrder() });
+      app = await bootApp({ orderAwaitingReview: await (plainOrder ??= judgesOrder()) });
 
       expect((await app.get(BASE)).status).toBe(404);
     });
@@ -336,6 +339,23 @@ describe('confirm order review', () => {
         'Select the reason for review 1',
         'The description of review 1 must be 500 characters or less',
       ]);
+    });
+
+    it('needs a four-digit year', async () => {
+      const shortYear = await app.post(
+        REVIEW_DATES,
+        new URLSearchParams({
+          'has-review-dates': 'yes',
+          'review-date-1-date-day': '1',
+          'review-date-1-date-month': '2',
+          'review-date-1-date-year': '202',
+          'review-date-1-reason': 'OTHER',
+          'review-date-1-description': 'Check',
+          action: 'continue',
+        })
+      );
+
+      expect(errors(shortYear.text)).toEqual(['Date of review 1 must be a real date']);
     });
 
     it('adds review dates one after another, up to 10', async () => {
@@ -521,6 +541,36 @@ describe('confirm order review', () => {
       expect((await app.get(`${BASE}/order-issued`)).status).toBe(200);
       expect(submittedReviews()).toHaveLength(1);
       expect((await app.get(`${BASE}/referred-to-judge`)).location).toBe(MANAGE_CASE_URL);
+    });
+
+    it('escapes the names of the parties to serve', async () => {
+      await app.close();
+      app = await bootApp({
+        caseworker: true,
+        orderAwaitingReview: await (plainOrder ??= judgesOrder()),
+        defendants: [{ id: 'defendant-id', name: '<img src=x onerror=alert(1)>' }],
+      });
+      await reachProceedToIssue(app);
+      await app.post(
+        PROCEED_TO_ISSUE,
+        proceedToIssueAnswers({ 'serve-all-parties': 'no', 'parties-to-serve': 'defendant-id' })
+      );
+
+      const page = await app.get(CHECK_YOUR_ANSWERS);
+
+      expect(page.text).not.toContain('<img src=x');
+      expect(parse(page.text).body.textContent).toContain('Defendant 1: <img src=x onerror=alert(1)>');
+    });
+
+    it('does not issue an order whose answers were reset since the page showed them', async () => {
+      await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers());
+      // Opening the review again, such as in another tab, starts its answers afresh.
+      await app.get(BASE);
+
+      const submitted = await app.post(CHECK_YOUR_ANSWERS, new URLSearchParams({ action: 'continue' }));
+
+      expect(submitted.location).toBe(REVIEW_DATES);
+      expect(submittedReviews()).toEqual([]);
     });
 
     it('shows why pcs-api refused the review', async () => {

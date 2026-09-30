@@ -1,29 +1,6 @@
-{% extends "template.njk" %}
+{% extends "xui-layout.njk" %}
 
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "xui-header/macro.njk" import hmctsXuiHeader %}
-{% from "footer/macro.njk" import hmctsUiFooter %}
-
-{% set containerClasses = "pcs-wide" %}
-
-{% block pageTitle %}
-  {% if errorSummary %}Error: {% endif %}{{ pageHeading }} - HM Courts &amp; Tribunals Service &ndash; GOV.UK
-{% endblock %}
-
-{% block head %}
-  {{ super() }}
-  <link rel="stylesheet" href="/assets/ui-component-lib/ui-component-lib.css">
-{% endblock %}
-
-{% block header %}
-  {{ hmctsXuiHeader(headerModel) }}
-{% endblock %}
-
-{% block beforeContent %}{% endblock %}
-
-{% block footer %}
-  {{ hmctsUiFooter(footerModel) }}
-{% endblock %}
 
 {% block content %}
   {% if errorSummary %}
