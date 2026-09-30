@@ -11,7 +11,8 @@ const mockFlags = (flags: Record<string, boolean>) =>
   (getLaunchDarklyFlag as jest.Mock).mockImplementation((_req, name: string) => Promise.resolve(flags[name] ?? false));
 
 // `getUserType` reads roles straight off the session, so build the request rather than mocking it.
-const reqWithRoles = (roles: string[]) => ({ session: { user: { roles } } }) as unknown as Request;
+const reqWithRoles = (roles: string[], isDefendantSolicitor = false) =>
+  ({ session: { user: { roles, isDefendantSolicitor } } }) as unknown as Request;
 
 describe('isPcqEnabled', () => {
   const req = reqWithRoles([]);
@@ -54,13 +55,13 @@ describe('isPcqEnabled', () => {
     // sent — their answers would be filed against the defendant's party id.
     mockFlags({ 'release-1.3-enabled': true, 'cui-pcq-enabled': true });
 
-    await expect(isPcqEnabled(reqWithRoles(['caseworker-pcs-solicitor']))).resolves.toBe(false);
+    await expect(isPcqEnabled(reqWithRoles([], true))).resolves.toBe(false);
   });
 
   it('short-circuits for a legal representative without reading the flags', async () => {
     mockFlags({ 'release-1.3-enabled': true, 'cui-pcq-enabled': true });
 
-    await isPcqEnabled(reqWithRoles(['caseworker-pcs-solicitor']));
+    await isPcqEnabled(reqWithRoles([], true));
 
     expect(getLaunchDarklyFlag).not.toHaveBeenCalled();
   });

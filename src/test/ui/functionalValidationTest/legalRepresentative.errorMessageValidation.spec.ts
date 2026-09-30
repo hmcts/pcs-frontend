@@ -1,3 +1,5 @@
+import { test } from '@playwright/test';
+
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { responseAndCounterClaimSubmitted } from '../data/page-data';
 import {
@@ -83,7 +85,6 @@ import {
   RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS,
   logTestEnvAfterBeforeEach,
 } from '../utils/common/log-test-env';
-import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
 

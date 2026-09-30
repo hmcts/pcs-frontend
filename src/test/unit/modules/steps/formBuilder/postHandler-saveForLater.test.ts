@@ -244,7 +244,8 @@ describe('PostHandler - Save for Later Fix', () => {
         ...mockRequest.session,
         user: {
           ...mockRequest.session?.user,
-          roles: ['caseworker-pcs-solicitor'],
+          roles: [],
+          isDefendantSolicitor: true,
         },
       } as unknown as Request['session'];
       mockRequest.body = {
@@ -269,7 +270,8 @@ describe('PostHandler - Save for Later Fix', () => {
         ...mockRequest.session,
         user: {
           ...mockRequest.session?.user,
-          roles: ['caseworker-pcs-solicitor'],
+          roles: [],
+          isDefendantSolicitor: true,
         },
       } as unknown as Request['session'];
       mockRequest.res = {

@@ -14,6 +14,8 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
   idToken: string;
   refreshToken: string;
+  /** True when the last opened case named the caller as defendant-solicitor. */
+  isDefendantSolicitor?: boolean;
 }
 
 export interface ClientContextHeaders {

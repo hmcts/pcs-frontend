@@ -125,7 +125,8 @@ describe('section-CYA row builders — characterisation', () => {
       const req = reqWith(validatedCase);
       req.session = {
         user: {
-          roles: ['caseworker-pcs-solicitor'],
+          roles: [],
+          isDefendantSolicitor: true,
         },
       } as unknown as Request['session'];
 
@@ -802,7 +803,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(citizenRow?.value.text).toBe('options.imNotSure');
 
       const lrReq = reqWith(citizenCase);
-      lrReq.session = { user: { roles: ['caseworker-pcs-solicitor'] } } as unknown as Request['session'];
+      lrReq.session = { user: { roles: [], isDefendantSolicitor: true } } as unknown as Request['session'];
       const lrRows = buildSituationRows(lrReq, t);
       const lrRow = lrRows.find(r => r.key.text === 'rows.alternativeAccommodation.label');
       expect(lrRow?.value.text).toBe('options.notSure');

@@ -1,4 +1,4 @@
-import { type BrowserContext, type Page, expect } from '@playwright/test';
+import { type BrowserContext, type Page, expect, test } from '@playwright/test';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
@@ -11,7 +11,6 @@ import { defendantNameConfirmation, selectDefendant, startNow } from '../data/pa
 import { user } from '../data/user-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
-import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { resolveIdamPassword } from '../utils/idamPassword';
 

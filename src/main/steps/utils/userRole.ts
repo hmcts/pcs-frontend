@@ -1,7 +1,5 @@
 import type { Request } from 'express';
 
-export const LEGAL_REPRESENTATIVE_USER_ROLES = ['caseworker-pcs-solicitor'] as const;
-
 export type UserType = 'citizen' | 'legalrep';
 
 export function getUserRoles(req: Request): string[] {
@@ -17,10 +15,9 @@ export function getUserRoles(req: Request): string[] {
     .filter(Boolean);
 }
 
+/** Defendant solicitor on this case (`session.user.isDefendantSolicitor`), not an IDAM role. */
 export function isLegalRepresentativeUser(req: Request): boolean {
-  return getUserRoles(req).some(role =>
-    LEGAL_REPRESENTATIVE_USER_ROLES.includes(role as (typeof LEGAL_REPRESENTATIVE_USER_ROLES)[number])
-  );
+  return req.session?.user?.isDefendantSolicitor === true;
 }
 
 export function getUserType(req: Request): UserType {
