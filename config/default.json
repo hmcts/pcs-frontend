@@ -146,6 +146,8 @@
   },
   "decentralisedEventRoutes": {
     "ext:respondPossessionClaim": "/case/:caseReference/respond-to-claim/start-now",
-    "ext:resumeResponse": "/case/:caseReference/respond-to-claim/start-now"
+    "ext:resumeResponse": "/case/:caseReference/respond-to-claim/start-now",
+    "ext:uploadTranslatedClaimForm": "/case/:caseReference/upload-translated-claim-form/upload-documents",
+    "ext:uploadTranslatedGenAppForm": "/case/:caseReference/upload-translated-genapp-form/upload-documents"
   }
 }

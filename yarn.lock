@@ -11428,7 +11428,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"multer@npm:^2.3.0":
+"multer@npm:^2.4.0":
   version: 2.4.0
   resolution: "multer@npm:2.4.0"
   dependencies:
@@ -12121,7 +12121,7 @@ __metadata:
     luxon: "npm:3.7.2"
     mini-css-extract-plugin: "npm:2.10.2"
     module-alias: "npm:2.3.4"
-    multer: "npm:^2.3.0"
+    multer: "npm:^2.4.0"
     nodemon: "npm:3.1.14"
     nunjucks: "npm:3.2.4"
     openid-client: "npm:6.8.8"
