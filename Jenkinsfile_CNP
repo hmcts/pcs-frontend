@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.4.9")
+@Library("Infrastructure@2.10.1")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
@@ -44,6 +44,7 @@ withPipeline(type, product, component) {
   env.REDIRECTS_MANAGE_CASE_RETURN_URL = "https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS"
   env.CASE_TYPE_ID = "PCS"
   onPR() {
+    enableFullFunctionalTest(120)
     env.ENABLE_AXE_AUDIT = 'false'
     env.E2E_TEST_SCOPE = '@sanity'
     if (githubApi.getLabelsbyPattern(env.BRANCH_NAME, "enable_critical_test").size() > 0) {
