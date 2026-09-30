@@ -3,6 +3,7 @@ import { type UserInfoResponse } from 'openid-client';
 import { type Redis } from 'ioredis';
 import { type Environment } from 'nunjucks';
 import { type CcdCase } from '@services/ccdCase.interface';
+import { ParsedQs } from 'qs';
 import { S2S } from '../main/modules/s2s';
 import { OIDCModule } from '../main/modules/oidc';
 import { type TFunction } from 'i18next';
@@ -18,6 +19,7 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
 
 export interface ClientContextHeaders {
   selectedPartyId?: string;
+  eventQueryParams?: ParsedQs;
 }
 
 interface CustomSessionData extends SessionData {
@@ -36,7 +38,7 @@ interface CustomSessionData extends SessionData {
   applicationIds?: Record<string, string>;
   payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
-  clientContext?: ClientContextHeaders;
+  clientContext?: ClientContextHeaders; // TODO: Should this be separated by journey name as well?
 }
 
 declare module 'express-session' {
