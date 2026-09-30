@@ -5,7 +5,7 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
 {% from "xui-header/macro.njk" import hmctsXuiHeader %}
-{% from "footer/macro.njk" import hmctsUiFooter %}
+{% from "components/pcs-footer.njk" import pcsFooter %}
 
 {% set bodyAttributes = {
   "data-session-timeout": sessionTimeout.sessionTimeoutMinutes,
@@ -101,11 +101,7 @@
 {% endblock %}
 
 {% block footer %}
-    {% if isLegalRepresentative %}
-      {{ hmctsUiFooter(footerModel) }}
-    {% else %}
-      {{ super() }}
-    {% endif %}
+  {{ pcsFooter(isLegalRepresentative, footerModel, release1dot3Enabled) }}
 {% endblock %}
 
 {% block bodyEnd %}

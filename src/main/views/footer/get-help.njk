@@ -1,0 +1,28 @@
+{% extends "footer/layout.njk" %}
+
+{% block pageTitle %}
+  {{ t('footer/get-help:pageTitle') }}
+{% endblock %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-xl">{{ t('footer/get-help:getHelp.title') }}</h1>
+  <p class="govuk-body">{{ t('footer/get-help:getHelp.description1') }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+      <li>{{ t('footer/get-help:getHelp.list.item1') }}</li>
+      <li>{{ t('footer/get-help:getHelp.list.item2') }}</li>
+      <li>{{ t('footer/get-help:getHelp.list.item3') }}</li>
+      <li>{{ t('footer/get-help:getHelp.list.item4') }}</li>
+      <li>{{ t('footer/get-help:getHelp.list.item5') }}</li>
+  </ul>
+
+  {% if isLegalRepresentative %}
+    <h3 class="govuk-heading-m govuk-!-margin-bottom-2">{{ t('footer/get-help:myHMCTSContactDetails.title') }}</h3>
+    <p class="govuk-body">{{ t('footer/get-help:myHMCTSContactDetails.description1') | safe }}</p>
+  {% endif %}
+
+  <h3 class="govuk-heading-m govuk-!-margin-bottom-2">{{ t('footer/get-help:possessionsClaimContactDetails.title') }}</h3>
+  <p class="govuk-body">{{ t('footer/get-help:possessionsClaimContactDetails.description1') | safe }}</p>
+
+  <h3 class="govuk-heading-m govuk-!-margin-bottom-2">{{ t('footer/get-help:nationalContactCentreForCivilFamilyCourtContactDetails.title') }}</h3>
+  <p class="govuk-body">{{ t('footer/get-help:nationalContactCentreForCivilFamilyCourtContactDetails.description1') | safe }}</p>
+{% endblock %}
