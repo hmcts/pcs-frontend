@@ -2341,15 +2341,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api-logs@npm:^0.222.0":
-  version: 0.222.0
-  resolution: "@opentelemetry/api-logs@npm:0.222.0"
-  dependencies:
-    "@opentelemetry/api": "npm:^1.3.0"
-  checksum: 10/bf6944ab9e3f3e415a81eae8b3d25bca3795a512c41def3db1c159136052f03b98f0b9a267a88215ad65078958d34d435c307087c6908dc5a9ed2cdf91d4cfef
-  languageName: node
-  linkType: hard
-
 "@opentelemetry/api@npm:1.9.1, @opentelemetry/api@npm:^1.3.0, @opentelemetry/api@npm:^1.9.0, @opentelemetry/api@npm:^1.9.1":
   version: 1.9.1
   resolution: "@opentelemetry/api@npm:1.9.1"
@@ -2929,18 +2920,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-winston@npm:0.66.0":
-  version: 0.66.0
-  resolution: "@opentelemetry/instrumentation-winston@npm:0.66.0"
-  dependencies:
-    "@opentelemetry/api-logs": "npm:^0.222.0"
-    "@opentelemetry/instrumentation": "npm:^0.222.0"
-  peerDependencies:
-    "@opentelemetry/api": ^1.3.0
-  checksum: 10/97f9ad5bb9eed7d883bf53eda2aa04a45fa19f782b44c6f27e224034f2e4c1426b29460f91c9252642a0647b93ea07e7d561c1313ef0f8a35b7284b90385f296
-  languageName: node
-  linkType: hard
-
 "@opentelemetry/instrumentation-winston@npm:^0.65.0":
   version: 0.65.0
   resolution: "@opentelemetry/instrumentation-winston@npm:0.65.0"
@@ -3348,7 +3327,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/winston-transport@npm:^0.31.0":
+"@opentelemetry/winston-transport@npm:0.31.0, @opentelemetry/winston-transport@npm:^0.31.0":
   version: 0.31.0
   resolution: "@opentelemetry/winston-transport@npm:0.31.0"
   dependencies:
@@ -10206,13 +10185,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jest-pact@npm:0.13.0":
-  version: 0.13.0
-  resolution: "jest-pact@npm:0.13.0"
+"jest-pact@npm:0.14.0":
+  version: 0.14.0
+  resolution: "jest-pact@npm:0.14.0"
   peerDependencies:
-    "@pact-foundation/pact": ^16.0.0
+    "@pact-foundation/pact": ^16.0.0 || ^17.0.0
     jest: ^24.0.0 || ^25.0.0 || ^26.0.0 || ^27.0.0 || ^28.0.0 || ^29.0.0 || ^30.0.0
-  checksum: 10/aec455f69053384847bcb3e93666ff3281a3edbc7a5ee0c842daaeb23fd7a71d247795b9818e9288753584f7be3b71fd4f0da11295617676b25a2fb5fa4e57fe
+  checksum: 10/61166c37f9cdd7951df85fd2c3c79b8512804db20e3f0a79ea7e1811bf6b38353c1168c6d2d8802f30b759b7fe3649a25da79056f4f133078d1d2c4b5ebb2c3b
   languageName: node
   linkType: hard
 
@@ -12078,7 +12057,7 @@ __metadata:
     "@launchdarkly/node-server-sdk": "npm:9.13.6"
     "@ministryofjustice/frontend": "npm:^11.0.0"
     "@opentelemetry/api": "npm:1.9.1"
-    "@opentelemetry/instrumentation-winston": "npm:0.66.0"
+    "@opentelemetry/winston-transport": "npm:0.31.0"
     "@pact-foundation/pact": "npm:17.1.4"
     "@pact-foundation/pact-cli": "npm:18.1.2"
     "@playwright/test": "npm:1.62.1"
@@ -12136,7 +12115,7 @@ __metadata:
     jest: "npm:30.5.2"
     jest-environment-jsdom: "npm:30.5.2"
     jest-html-reporter: "npm:4.4.2"
-    jest-pact: "npm:0.13.0"
+    jest-pact: "npm:0.14.0"
     jose: "npm:6.2.12"
     lint-staged: "npm:17.5.1"
     lodash: "npm:4.18.1"
@@ -12150,10 +12129,10 @@ __metadata:
     playwright: "npm:1.62.1"
     playwright-core: "npm:1.62.1"
     postcss: "npm:8.5.28"
-    prettier: "npm:3.9.8"
-    sass: "npm:1.103.1"
+    prettier: "npm:3.9.9"
+    sass: "npm:1.105.0"
     sass-loader: "npm:17.0.1"
-    saucectl: "npm:^0.213.0"
+    saucectl: "npm:^0.214.0"
     serve-favicon: "npm:2.5.1"
     style-loader: "npm:4.0.0"
     stylelint: "npm:17.14.1"
@@ -12543,12 +12522,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:3.9.8":
-  version: 3.9.8
-  resolution: "prettier@npm:3.9.8"
+"prettier@npm:3.9.9":
+  version: 3.9.9
+  resolution: "prettier@npm:3.9.9"
   bin:
     prettier: bin/prettier.cjs
-  checksum: 10/4ac262aaf9a5e221b02cc17447ebe7aa9689be59b85ab9de8152cd7422fb363ed3e09da6df585fa19ab1fc6cffebdc3ea34db1a75c978536aeba3f87bfd06ab3
+  checksum: 10/3d11a8095a7db50f0fbc8086ad96be676401154b63a2e9023e1274893457dccab19a9c211f4fb2cae7244e800bea2d5185d9bb6fc510f48a53017815e47d4e6d
   languageName: node
   linkType: hard
 
@@ -13150,9 +13129,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:1.103.1":
-  version: 1.103.1
-  resolution: "sass@npm:1.103.1"
+"sass@npm:1.105.0":
+  version: 1.105.0
+  resolution: "sass@npm:1.105.0"
   dependencies:
     "@parcel/watcher": "npm:^2.4.1"
     chokidar: "npm:^5.0.0"
@@ -13163,18 +13142,18 @@ __metadata:
       optional: true
   bin:
     sass: sass.js
-  checksum: 10/b66acf027bbd0e6bfd9eb2a171779ae7c59115d10b2b55d52f547a7835bf63c108879ba699b47bcf5328042067a9e1b7f38141da3b8cd6af8d6805a9b5666609
+  checksum: 10/3f6cb44c3e4d6f7e360fb2394ebc360fb0a9307a64e377890c8a427525889b4f3c4bdc286eb67bceb686d8a794f0c54b4ec5692990ff4488d5f3592840c30d48
   languageName: node
   linkType: hard
 
-"saucectl@npm:^0.213.0":
-  version: 0.213.0
-  resolution: "saucectl@npm:0.213.0"
+"saucectl@npm:^0.214.0":
+  version: 0.214.0
+  resolution: "saucectl@npm:0.214.0"
   dependencies:
     "@saucelabs/bin-wrapper": "npm:^2.1.0"
   bin:
     saucectl: index.js
-  checksum: 10/0994a37bafd5581ed4f081ead6590586491372a04c8506030f1a4ef7e0008fab452db8f27cb64663af7b16b16fa39153f94f42a9299c161472c9d45efa04f165
+  checksum: 10/1c5fa721458aa0e8a7bed44a5be3d0cdf654878e7798657c8e9a4af07e7bffd7eb6fb2bf6010caaf9b58209edf30d775723f92bcfe3ee2e4ea8db6d358ff83c1
   languageName: node
   linkType: hard
 
