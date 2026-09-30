@@ -129,9 +129,10 @@ describe('OIDCModule', () => {
   });
 
   describe('constructor', () => {
-    it('should create an instance and call setupClient', () => {
+    it('should create an instance without eagerly initialising the client', () => {
       expect(oidcModule).toBeInstanceOf(OIDCModule);
-      expect(discovery).toHaveBeenCalled();
+      // not at construction — lazy on first request
+      expect(discovery).not.toHaveBeenCalled();
     });
   });
 
@@ -235,6 +236,7 @@ describe('OIDCModule', () => {
         });
 
         oidcModule.enableFor(mockApp);
+        await oidcModule['setupClient']();
         const loginHandler = (mockApp.get as jest.Mock).mock.calls[0][1];
         await loginHandler(mockRequest, mockResponse, mockNext);
 
@@ -470,6 +472,7 @@ describe('OIDCModule', () => {
         mockRequest.session = createMockSession({});
 
         oidcModule.enableFor(mockApp);
+        await oidcModule['setupClient']();
         const callbackHandler = (mockApp.get as jest.Mock).mock.calls[1][1];
         await callbackHandler(mockRequest, mockResponse, mockNext);
 
@@ -553,6 +556,7 @@ describe('OIDCModule', () => {
         });
 
         oidcModule.enableFor(mockApp);
+        await oidcModule['setupClient']();
         const logoutHandler = (mockApp.get as jest.Mock).mock.calls[2][1];
         await logoutHandler(mockRequest, mockResponse, mockNext);
 
@@ -598,6 +602,7 @@ describe('OIDCModule', () => {
         });
 
         oidcModule.enableFor(mockApp);
+        await oidcModule['setupClient']();
         const logoutHandler = (mockApp.get as jest.Mock).mock.calls[2][1];
         await logoutHandler(mockRequest, mockResponse, mockNext);
 
