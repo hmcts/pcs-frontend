@@ -1,6 +1,5 @@
 {
   "pageTitle": "Cytundebau a wnaed",
-  "heading": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu’r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
   "question": "A ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu’r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
   "options": {
     "yes": "Do",
