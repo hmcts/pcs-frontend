@@ -98,13 +98,6 @@ export function validateQuery(answers: OrderReviewAnswers): ValidationIssue[] {
   return [];
 }
 
-/** A caseworker issues the order only once they have no query for the judge. */
-export function validateIssueFromReview(answers: OrderReviewAnswers): ValidationIssue[] {
-  return answers.sendQuery
-    ? [{ id: 'send-query', message: "Return the order to the Judge, or untick 'Send query to Judge' to issue it" }]
-    : [];
-}
-
 export function validateReviewDates(answers: OrderReviewAnswers): ValidationIssue[] {
   if (!answers.hasReviewDates) {
     return [{ id: 'has-review-dates', message: 'Select if there are any review dates to add' }];

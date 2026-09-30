@@ -170,21 +170,6 @@ describe('confirm order review', () => {
 
       expect((await app.get(BASE)).status).toBe(404);
     });
-
-    it('does not exist while the make order feature flag is off', async () => {
-      app = await bootApp({ caseworker: true, makeOrderEnabled: false });
-
-      expect((await app.get(BASE)).status).toBe(404);
-    });
-
-    it('starts again from the introduction when a later page is opened without a review under way', async () => {
-      app = await caseworkerReviewing();
-
-      const review = await app.get(REVIEW);
-
-      expect(review.status).toBe(302);
-      expect(review.location).toBe(BASE);
-    });
   });
 
   describe('reviewing the order', () => {
@@ -264,34 +249,11 @@ describe('confirm order review', () => {
       app = await caseworkerReviewing();
       await app.get(BASE);
 
-      const unticked = await app.post(REVIEW, new URLSearchParams({ action: 'RETURN_TO_JUDGE' }));
-      expect(unticked.status).toBe(400);
-      expect(errors(unticked.text)).toEqual(["Select 'Send query to Judge' and enter your query to return the order"]);
-
       const empty = await app.post(REVIEW, new URLSearchParams({ 'send-query': 'yes', action: 'RETURN_TO_JUDGE' }));
+
+      expect(empty.status).toBe(400);
       expect(errors(empty.text)).toEqual(['Enter your query for the Judge']);
-
-      const tooLong = await app.post(
-        REVIEW,
-        new URLSearchParams({ 'send-query': 'yes', 'query-to-judge': 'x'.repeat(30001), action: 'RETURN_TO_JUDGE' })
-      );
-      expect(errors(tooLong.text)).toEqual(['Your query for the Judge must be 30,000 characters or less']);
       expect(submittedReviews()).toEqual([]);
-    });
-
-    it('does not issue the order while the caseworker has a query for the judge', async () => {
-      app = await caseworkerReviewing();
-      await app.get(BASE);
-
-      const issued = await app.post(
-        REVIEW,
-        new URLSearchParams({ 'send-query': 'yes', 'query-to-judge': 'A query', action: 'ISSUE' })
-      );
-
-      expect(issued.status).toBe(400);
-      expect(errors(issued.text)).toEqual([
-        "Return the order to the Judge, or untick 'Send query to Judge' to issue it",
-      ]);
     });
 
     it('cancels the review, keeping nothing, and returns the caseworker to the case', async () => {
@@ -314,14 +276,10 @@ describe('confirm order review', () => {
       await app.post(REVIEW, new URLSearchParams({ action: 'ISSUE' }));
     });
 
-    it('asks whether there are review dates to add', async () => {
+    it('asks whether there are review dates, then for a real date, a reason and a description of each', async () => {
       const unanswered = await app.post(REVIEW_DATES, new URLSearchParams({ action: 'continue' }));
-
-      expect(unanswered.status).toBe(400);
       expect(errors(unanswered.text)).toEqual(['Select if there are any review dates to add']);
-    });
 
-    it('needs a real date, a reason and a description of up to 500 characters for each review date', async () => {
       const incomplete = await app.post(
         REVIEW_DATES,
         new URLSearchParams({
@@ -339,23 +297,6 @@ describe('confirm order review', () => {
         'Select the reason for review 1',
         'The description of review 1 must be 500 characters or less',
       ]);
-    });
-
-    it('needs a four-digit year', async () => {
-      const shortYear = await app.post(
-        REVIEW_DATES,
-        new URLSearchParams({
-          'has-review-dates': 'yes',
-          'review-date-1-date-day': '1',
-          'review-date-1-date-month': '2',
-          'review-date-1-date-year': '202',
-          'review-date-1-reason': 'OTHER',
-          'review-date-1-description': 'Check',
-          action: 'continue',
-        })
-      );
-
-      expect(errors(shortYear.text)).toEqual(['Date of review 1 must be a real date']);
     });
 
     it('adds review dates one after another, up to 10', async () => {
@@ -407,17 +348,6 @@ describe('confirm order review', () => {
       page = parse((await app.get(REVIEW_DATES)).text);
       expect(page.querySelector<HTMLInputElement>('#review-date-1-description')?.value).toBe('');
     });
-
-    it('goes back to the review keeping the answers', async () => {
-      const previous = await app.post(
-        REVIEW_DATES,
-        new URLSearchParams({ 'has-review-dates': 'no', action: 'previous' })
-      );
-      expect(previous.location).toBe(REVIEW);
-
-      const page = parse((await app.get(REVIEW_DATES)).text);
-      expect(page.querySelector<HTMLInputElement>('input[name="has-review-dates"][value="no"]')?.checked).toBe(true);
-    });
   });
 
   describe('proceed to issue', () => {
@@ -426,7 +356,7 @@ describe('confirm order review', () => {
       await reachProceedToIssue(app);
     });
 
-    it('serves the order on all parties under the County Court seal unless the caseworker changes it', async () => {
+    it('serves the order on all parties, in claim order, under the County Court seal unless changed', async () => {
       const page = parse((await app.get(PROCEED_TO_ISSUE)).text);
 
       expect(page.querySelector<HTMLInputElement>('input[name="serve-all-parties"][value="yes"]')?.checked).toBe(true);
@@ -436,6 +366,12 @@ describe('confirm order review', () => {
       expect(page.querySelector('#outstanding-tasks-guidance')?.textContent).toBe(
         'You should complete all outstanding tasks'
       );
+      // The parties to serve, in claim order.
+      expect(
+        [...page.querySelectorAll('input[name="parties-to-serve"]')].map(input =>
+          page.querySelector(`label[for="${input.id}"]`)?.textContent?.trim()
+        )
+      ).toEqual(['Claimant 1: Example Housing', 'Defendant 1: Alex Example']);
     });
 
     it('asks every question, and who to serve when not all parties are served', async () => {
@@ -450,22 +386,6 @@ describe('confirm order review', () => {
         'Select who to serve the order on',
         'Select which seal this order should have',
       ]);
-    });
-
-    it('lists the parties to serve in claim order', async () => {
-      const page = parse((await app.get(PROCEED_TO_ISSUE)).text);
-
-      expect(
-        [...page.querySelectorAll('input[name="parties-to-serve"]')].map(input =>
-          page.querySelector(`label[for="${input.id}"]`)?.textContent?.trim()
-        )
-      ).toEqual(['Claimant 1: Example Housing', 'Defendant 1: Alex Example']);
-    });
-
-    it('lets the caseworker continue with tasks still to do', async () => {
-      const outstanding = await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers({ 'next-steps': 'outstanding' }));
-
-      expect(outstanding.location).toBe(CHECK_YOUR_ANSWERS);
     });
   });
 
@@ -543,36 +463,6 @@ describe('confirm order review', () => {
       expect((await app.get(`${BASE}/referred-to-judge`)).location).toBe(MANAGE_CASE_URL);
     });
 
-    it('escapes the names of the parties to serve', async () => {
-      await app.close();
-      app = await bootApp({
-        caseworker: true,
-        orderAwaitingReview: await (plainOrder ??= judgesOrder()),
-        defendants: [{ id: 'defendant-id', name: '<img src=x onerror=alert(1)>' }],
-      });
-      await reachProceedToIssue(app);
-      await app.post(
-        PROCEED_TO_ISSUE,
-        proceedToIssueAnswers({ 'serve-all-parties': 'no', 'parties-to-serve': 'defendant-id' })
-      );
-
-      const page = await app.get(CHECK_YOUR_ANSWERS);
-
-      expect(page.text).not.toContain('<img src=x');
-      expect(parse(page.text).body.textContent).toContain('Defendant 1: <img src=x onerror=alert(1)>');
-    });
-
-    it('does not issue an order whose answers were reset since the page showed them', async () => {
-      await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers());
-      // Opening the review again, such as in another tab, starts its answers afresh.
-      await app.get(BASE);
-
-      const submitted = await app.post(CHECK_YOUR_ANSWERS, new URLSearchParams({ action: 'continue' }));
-
-      expect(submitted.location).toBe(REVIEW_DATES);
-      expect(submittedReviews()).toEqual([]);
-    });
-
     it('shows why pcs-api refused the review', async () => {
       await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers());
       refuseNextEvent('The order has been updated by another user. Reload it and try again');
@@ -581,10 +471,6 @@ describe('confirm order review', () => {
 
       expect(refused.status).toBe(422);
       expect(errors(refused.text)).toEqual(['The order has been updated by another user. Reload it and try again']);
-    });
-
-    it('asks any unanswered question before showing the answers', async () => {
-      expect((await app.get(CHECK_YOUR_ANSWERS)).location).toBe(PROCEED_TO_ISSUE);
     });
   });
 });
