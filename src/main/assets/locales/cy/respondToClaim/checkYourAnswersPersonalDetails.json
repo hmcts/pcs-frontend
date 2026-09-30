@@ -20,7 +20,7 @@
     },
     "correspondenceAddressConfirmation": {
       "label": "Ai eich cyfeiriad post yw {{address}}?",
-      "fallbackLabel": "cy What’s your postal address?",
+      "fallbackLabel": "Beth yw eich cyfeiriad post?",
       "changeHidden": "cyfeiriad post"
     },
     "contactByEmailOrPost": {
