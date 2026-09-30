@@ -30,6 +30,7 @@ import {
   newAnswers,
   reviewRequest,
   staffMessage,
+  ticked,
   validateIssueFromReview,
   validateProceedToIssue,
   validateQuery,
@@ -140,10 +141,6 @@ function orderModel(review: OrderReviewSession) {
   };
 }
 
-function checked(value: unknown): boolean {
-  return ([] as unknown[]).concat(value ?? []).includes('yes');
-}
-
 function list(value: unknown): string[] {
   return ([] as unknown[]).concat(value ?? []).map(String);
 }
@@ -194,9 +191,9 @@ function partyChoices(review: OrderReviewSession) {
 }
 
 /**
- * Submits the caseworker's review with the token the introduction's start gave, so CCD and pcs-api
- * refuse it if the case or the order changed since. The review then ends, and its confirmation is
- * kept so it survives a refresh, which cannot submit it again.
+ * Submits the caseworker's review with the token the introduction's start gave; pcs-api refuses it if
+ * the order changed since. The review then ends, and its confirmation is kept so it survives a
+ * refresh, which cannot submit it again.
  */
 async function submitReview(req: Request, review: OrderReviewSession, action: 'RETURN_TO_JUDGE' | 'ISSUE') {
   const caseReference = caseReferenceOf(req);
@@ -217,53 +214,12 @@ async function submitReview(req: Request, review: OrderReviewSession, action: 'R
   };
 }
 
-function rejectionIssues(error: CallbackRejectedError): ValidationIssue[] {
-  return error.reasons.map(message => ({ id: 'confirm-order-review-form', message }));
-}
-
-function renderReview(req: Request, res: Response, review: OrderReviewSession, issues: ValidationIssue[] = []) {
-  res.status(issues.length ? 400 : 200).render('confirm-order-review/review', {
-    ...pageModel(req, review, issues),
-    ...orderModel(review),
-    answers: review.answers,
-    maxQueryLength: MAX_QUERY_LENGTH,
-  });
-}
-
-function renderReviewDates(req: Request, res: Response, review: OrderReviewSession, issues: ValidationIssue[] = []) {
-  res.status(issues.length ? 400 : 200).render('confirm-order-review/review-dates', {
-    ...pageModel(req, review, issues),
-    answers: review.answers,
-    reviewDates: shownReviewDates(review.answers),
-    reasons: REVIEW_REASONS,
-    canAddReviewDate: review.answers.reviewDates.length < MAX_REVIEW_DATES,
-    maxDescriptionLength: MAX_REVIEW_DESCRIPTION_LENGTH,
-  });
-}
-
-function renderProceedToIssue(req: Request, res: Response, review: OrderReviewSession, issues: ValidationIssue[] = []) {
-  res.status(issues.length ? 400 : 200).render('confirm-order-review/proceed-to-issue', {
-    ...pageModel(req, review, issues),
-    answers: review.answers,
-    nextSteps: NEXT_STEPS,
-    seals: SEALS,
-    parties: partyChoices(review),
-  });
-}
-
-function renderCheckYourAnswers(
-  req: Request,
-  res: Response,
-  review: OrderReviewSession,
-  issues: ValidationIssue[] = []
-) {
+function checkYourAnswersContent(req: Request, review: OrderReviewSession): Record<string, unknown> {
   const { answers } = review;
-  const caseReference = caseReferenceOf(req);
-  const change = (page: Page) => `${pageUrl(caseReference, page)}?change=cya`;
+  const change = (page: Page) => `${pageUrl(caseReferenceOf(req), page)}?change=cya`;
   const yesNo = (value?: string) => (value === 'yes' ? 'Yes' : 'No');
   const partyNames = new Map(partyChoices(review).map(party => [party.value, party.text]));
-  res.status(issues.length ? 422 : 200).render('confirm-order-review/check-your-answers', {
-    ...pageModel(req, review, issues),
+  return {
     reviewDates:
       answers.hasReviewDates === 'yes'
         ? answers.reviewDates.map(reviewDate => ({
@@ -286,18 +242,67 @@ function renderCheckYourAnswers(
           : undefined,
       seal: { value: SEALS.find(option => option.value === answers.seal)?.text, href: change('proceedToIssue') },
     },
+  };
+}
+
+/** What each question page shows besides the case and any errors. */
+const VIEWS = {
+  review: (_req: Request, review: OrderReviewSession) => ({
+    ...orderModel(review),
+    answers: review.answers,
+    maxQueryLength: MAX_QUERY_LENGTH,
+  }),
+  'review-dates': (_req: Request, review: OrderReviewSession) => ({
+    answers: review.answers,
+    reviewDates: shownReviewDates(review.answers),
+    reasons: REVIEW_REASONS,
+    canAddReviewDate: review.answers.reviewDates.length < MAX_REVIEW_DATES,
+    maxDescriptionLength: MAX_REVIEW_DESCRIPTION_LENGTH,
+  }),
+  'proceed-to-issue': (_req: Request, review: OrderReviewSession) => ({
+    answers: review.answers,
+    nextSteps: NEXT_STEPS,
+    seals: SEALS,
+    parties: partyChoices(review),
+  }),
+  'check-your-answers': checkYourAnswersContent,
+} as const;
+
+type View = keyof typeof VIEWS;
+
+function render(
+  req: Request,
+  res: Response,
+  view: View,
+  issues: ValidationIssue[] = [],
+  status = issues.length ? 400 : 200
+): void {
+  const review = reviewOf(req)!;
+  res.status(status).render(`confirm-order-review/${view}`, {
+    ...pageModel(req, review, issues),
+    ...VIEWS[view](req, review),
   });
 }
 
-/** Where a submission CCD or pcs-api refused goes: back to the page it came from, with why. */
-async function handleSubmitError(error: unknown, rerender: (issues: ValidationIssue[]) => void, res: Response) {
+/** Where a submission pcs-api refused goes: back to the page it came from, with why. */
+function handleSubmitError(req: Request, res: Response, view: View, error: unknown): void {
   if (error instanceof CallbackRejectedError) {
-    return rerender(rejectionIssues(error));
+    const reasons = error.reasons.map(message => ({ id: 'confirm-order-review-form', message }));
+    return render(req, res, view, reasons, error.status);
   }
   if (refusedByCcd(error)) {
-    return res.status(404).send('Not Found');
+    res.status(404).send('Not Found');
+    return;
   }
   throw error;
+}
+
+/** The first page with a question left unanswered, if any: check your answers only shows a complete review. */
+function firstIncompletePage(answers: OrderReviewAnswers): Page | undefined {
+  if (validateReviewDates(answers).length) {
+    return 'reviewDates';
+  }
+  return validateProceedToIssue(answers).length ? 'proceedToIssue' : undefined;
 }
 
 export default function confirmOrderReviewRoutes(app: Application): void {
@@ -345,38 +350,36 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     res.redirect(manageCaseDetailsUrl(caseReferenceOf(req)));
   });
 
-  app.get(route('review'), ...inJourney, (req: Request, res: Response) => renderReview(req, res, reviewOf(req)!));
+  app.get(route('review'), ...inJourney, (req: Request, res: Response) => render(req, res, 'review'));
 
   app.post(route('review'), ...inJourney, async (req: Request, res: Response, next) => {
     const review = reviewOf(req)!;
-    review.answers.sendQuery = checked(req.body['send-query']);
+    review.answers.sendQuery = ticked(req.body['send-query']);
     review.answers.queryToJudge = text(req.body['query-to-judge']);
     try {
       if (req.body.action === 'RETURN_TO_JUDGE') {
         const issues = validateQuery(review.answers);
         if (issues.length) {
-          return renderReview(req, res, review, issues);
+          return render(req, res, 'review', issues);
         }
         await submitReview(req, review, 'RETURN_TO_JUDGE');
         return res.redirect(pageUrl(caseReferenceOf(req), 'referredToJudge'));
       }
       const issues = validateIssueFromReview(review.answers);
       if (issues.length) {
-        return renderReview(req, res, review, issues);
+        return render(req, res, 'review', issues);
       }
       return res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'));
     } catch (error) {
       try {
-        await handleSubmitError(error, issues => renderReview(req, res, review, issues), res);
+        handleSubmitError(req, res, 'review', error);
       } catch (unhandled) {
         next(unhandled);
       }
     }
   });
 
-  app.get(route('reviewDates'), ...inJourney, (req: Request, res: Response) =>
-    renderReviewDates(req, res, reviewOf(req)!)
-  );
+  app.get(route('reviewDates'), ...inJourney, (req: Request, res: Response) => render(req, res, 'review-dates'));
 
   app.post(route('reviewDates'), ...inJourney, (req: Request, res: Response) => {
     const review = reviewOf(req)!;
@@ -403,7 +406,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     }
     const issues = validateReviewDates(answers);
     if (issues.length) {
-      return renderReviewDates(req, res, review, issues);
+      return render(req, res, 'review-dates', issues);
     }
     return res.redirect(nextPage(req, caseReference, 'proceedToIssue'));
   });
@@ -432,9 +435,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     res.redirect(`${pageUrl(caseReferenceOf(req), 'reviewDates')}${changing(req) ? '?change=cya' : ''}`);
   });
 
-  app.get(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) =>
-    renderProceedToIssue(req, res, reviewOf(req)!)
-  );
+  app.get(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => render(req, res, 'proceed-to-issue'));
 
   app.post(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => {
     const review = reviewOf(req)!;
@@ -450,34 +451,36 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     }
     const issues = validateProceedToIssue(answers);
     if (issues.length) {
-      return renderProceedToIssue(req, res, review, issues);
+      return render(req, res, 'proceed-to-issue', issues);
     }
     return res.redirect(pageUrl(caseReferenceOf(req), 'checkYourAnswers'));
   });
 
   app.get(route('checkYourAnswers'), ...inJourney, (req: Request, res: Response) => {
-    const review = reviewOf(req)!;
-    // Check your answers only shows a complete review: anything unanswered is asked first.
-    if (validateReviewDates(review.answers).length) {
-      return res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'));
+    const incomplete = firstIncompletePage(reviewOf(req)!.answers);
+    if (incomplete) {
+      return res.redirect(pageUrl(caseReferenceOf(req), incomplete));
     }
-    if (validateProceedToIssue(review.answers).length) {
-      return res.redirect(pageUrl(caseReferenceOf(req), 'proceedToIssue'));
-    }
-    renderCheckYourAnswers(req, res, review);
+    render(req, res, 'check-your-answers');
   });
 
   app.post(route('checkYourAnswers'), ...inJourney, async (req: Request, res: Response, next) => {
     const review = reviewOf(req)!;
+    const caseReference = caseReferenceOf(req);
     if (req.body.action === 'previous') {
-      return res.redirect(pageUrl(caseReferenceOf(req), 'proceedToIssue'));
+      return res.redirect(pageUrl(caseReference, 'proceedToIssue'));
+    }
+    // The answers may have changed since the page showed them, such as in another tab.
+    const incomplete = firstIncompletePage(review.answers);
+    if (incomplete) {
+      return res.redirect(pageUrl(caseReference, incomplete));
     }
     try {
       await submitReview(req, review, 'ISSUE');
-      return res.redirect(pageUrl(caseReferenceOf(req), 'orderIssued'));
+      return res.redirect(pageUrl(caseReference, 'orderIssued'));
     } catch (error) {
       try {
-        await handleSubmitError(error, issues => renderCheckYourAnswers(req, res, review, issues), res);
+        handleSubmitError(req, res, 'check-your-answers', error);
       } catch (unhandled) {
         next(unhandled);
       }
@@ -492,11 +495,12 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       // As in XUI, a confirmation with nothing to confirm returns the user to the case.
       return res.redirect(closeUrl);
     }
-    res.render('confirm-order-review/confirmation', {
+    res.render('order-confirmation', {
       headerModel: xuiHeaderModel(req),
       footerModel: buildFooterModel(),
       title,
       ...reviewed,
+      closeText: 'Close and return to case summary',
       closeUrl,
     });
   };

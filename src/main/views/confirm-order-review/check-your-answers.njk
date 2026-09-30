@@ -48,9 +48,13 @@
       }
     ] %}
     {% if rows.partiesToServe %}
+      {# Party names come from the claim, so each is escaped. #}
+      {% set partiesHtml %}
+        {% for name in rows.partiesToServe.value %}{{ name }}{% if not loop.last %}<br>{% endif %}{% endfor %}
+      {% endset %}
       {% set issueRows = (issueRows.push({
         key: { text: "Who should the order be served on?" },
-        value: { html: rows.partiesToServe.value | join("<br>") },
+        value: { html: partiesHtml },
         actions: { items: [{ href: rows.partiesToServe.href, text: "Change", visuallyHiddenText: "who to serve" }] }
       }), issueRows) %}
     {% endif %}

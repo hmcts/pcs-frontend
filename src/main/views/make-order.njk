@@ -1,34 +1,13 @@
-{% extends "template.njk" %}
+{% extends "xui-layout.njk" %}
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{% from "xui-header/macro.njk" import hmctsXuiHeader %}
-{% from "footer/macro.njk" import hmctsUiFooter %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% import "make-order/_compact.njk" as compact with context %}
 
-{% set containerClasses = "pcs-wide" %}
-
 {% set htmlClasses = "pcs-make-order" %}
 
-{% block pageTitle %}
-  {% if errorSummary %}Error: {% endif %}Make an order - HM Courts &amp; Tribunals Service &ndash; GOV.UK
-{% endblock %}
-
-{% block head %}
-  {{ super() }}
-  <link rel="stylesheet" href="/assets/ui-component-lib/ui-component-lib.css">
-{% endblock %}
-
-{% block header %}
-  {{ hmctsXuiHeader(headerModel) }}
-{% endblock %}
-
-{% block beforeContent %}{% endblock %}
-
-{% block footer %}
-  {{ hmctsUiFooter(footerModel) }}
-{% endblock %}
+{% set pageHeading = "Make an order" %}
 
 {% block content %}
   {% if errorSummary %}

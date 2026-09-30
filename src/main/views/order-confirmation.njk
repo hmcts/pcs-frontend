@@ -1,0 +1,30 @@
+{# The confirmation of an order event: the outcome and the case in a panel, then back to the case. #}
+{% extends "xui-layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% set pageHeading = title %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {# The case the order is on, as pcs-api's own event confirmations show it in their panel. #}
+      {% set caseDetails %}
+        <span class="govuk-!-font-size-24">
+          Case number {{ caseReference }}<br>
+          {{ propertyAddress }}<br>
+          {{ caseName }}
+        </span>
+      {% endset %}
+      {{ govukPanel({ titleText: title, html: caseDetails }) }}
+
+      {% if whatHappensNext %}
+        <h2 class="govuk-heading-m">What happens next</h2>
+        <p class="govuk-body">{{ whatHappensNext }}</p>
+      {% endif %}
+
+      {{ govukButton({ text: closeText, href: closeUrl }) }}
+    </div>
+  </div>
+{% endblock %}
