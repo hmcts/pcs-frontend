@@ -311,10 +311,13 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       // Opening the review starts it afresh: whatever was answered before, and its confirmation, go.
       endReview(req);
       delete req.session.orderReviewOutcomes?.[caseReference];
+      // The draft orders tab links to the review of one order, which pcs-api starts.
+      const orderId = typeof req.query.orderId === 'string' ? req.query.orderId : undefined;
       const started = await ccdCaseService.startCaseEvent(
         req.session.user!.accessToken,
         caseReference,
-        CONFIRM_ORDER_REVIEW_EVENT_ID
+        CONFIRM_ORDER_REVIEW_EVENT_ID,
+        { orderId }
       );
       const payload = started.data.sdkEventPayload;
       if (!payload) {
@@ -328,7 +331,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       res.render('confirm-order-review/intro', { ...pageModel(req, review), ...orderModel(review) });
     } catch (error) {
       if (error instanceof CallbackRejectedError) {
-        // pcs-api refuses to start the review when there is no order waiting for it.
+        // pcs-api refuses to start the review when the chosen order is not waiting for one.
         return res.render('confirm-order-review/no-order', {
           headerModel: xuiHeaderModel(req),
           footerModel: buildFooterModel(),
