@@ -17,6 +17,10 @@ jest.mock('../../../../main/assets/js/make-order', () => ({
   startWithSavedOrderTab: jest.fn((start: () => void) => start()),
 }));
 
+jest.mock('../../../../main/assets/js/order-preview', () => ({
+  initOrderPreview: jest.fn(),
+}));
+
 jest.mock('../../../../main/assets/js/postcode-lookup', () => ({
   initPostcodeLookup: jest.fn(),
 }));
@@ -36,6 +40,7 @@ describe('index.ts', () => {
     const { initAll } = require('govuk-frontend');
     const { initMakeOrder } = require('../../../../main/assets/js/make-order');
     const { initMultiFileUpload } = require('../../../../main/assets/js/multi-file-upload');
+    const { initOrderPreview } = require('../../../../main/assets/js/order-preview');
     const { initPostcodeLookup } = require('../../../../main/assets/js/postcode-lookup');
     const { initPostcodeSelection } = require('../../../../main/assets/js/postcode-select');
     const { initSessionTimeout } = require('../../../../main/assets/js/session-timeout');
@@ -43,6 +48,7 @@ describe('index.ts', () => {
     expect(initAll).toHaveBeenCalled();
     expect(initMakeOrder).toHaveBeenCalled();
     expect(initMultiFileUpload).toHaveBeenCalled();
+    expect(initOrderPreview).toHaveBeenCalled();
     expect(initPostcodeLookup).toHaveBeenCalled();
     expect(initPostcodeSelection).toHaveBeenCalled();
     expect(initSessionTimeout).toHaveBeenCalled();

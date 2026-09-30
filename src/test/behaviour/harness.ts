@@ -1,5 +1,5 @@
 /**
- * Runs the make-order page as the application does: real route, real middleware, real
+ * Runs the make-order and confirm order review pages as the application does: real route, real middleware, real
  * templates, real client code in jsdom. Only the boundary is faked: CCD is a tiny HTTP server
  * and the signed-in user is placed on the session.
  */
@@ -46,7 +46,7 @@ const blankCase = (): Envelope => ({
   },
 });
 
-/** Minimal CCD: hands out the stored envelope and applies posted make-order events to it. */
+/** Minimal CCD: hands out the stored envelope and applies posted make order and confirm order review events to it. */
 let envelope = blankCase();
 
 /** The tokens CCD has handed out for starting the make order event, in order. */
@@ -65,6 +65,13 @@ export function submittedEventTokens(): string[] {
   return submittedTokens;
 }
 
+/** The confirm order review requests caseworkers have submitted, in order. */
+let reviewRequests: Record<string, unknown>[] = [];
+
+export function submittedReviews(): Record<string, unknown>[] {
+  return reviewRequests;
+}
+
 /** The reason pcs-api gives for refusing the next make order event, if a test has asked it to. */
 let refusal: string | undefined;
 
@@ -77,10 +84,25 @@ export function refuseNextEvent(reason: string): void {
  * CCD lets only the judge, whom it knows by their role assignments, use the make order event: anyone
  * else can start it but is not shown its payload, and cannot submit it.
  */
-function isJudge(req: Request): boolean {
+function uid(req: Request): string | undefined {
   const token = (req.headers.authorization ?? '').replace(/^Bearer /, '');
-  const claims = JSON.parse(Buffer.from(token.split('.')[1] ?? '', 'base64url').toString() || '{}');
-  return claims.uid === JUDGE.uid;
+  return JSON.parse(Buffer.from(token.split('.')[1] ?? '', 'base64url').toString() || '{}').uid;
+}
+
+function isJudge(req: Request): boolean {
+  return uid(req) === JUDGE.uid;
+}
+
+/** Likewise CCD lets only caseworkers, by their role assignments, use the confirm order review event. */
+function isCaseworker(req: Request): boolean {
+  return uid(req) === CASEWORKER.uid;
+}
+
+const CONFIRM_ORDER_REVIEW = 'ext:confirmOrderReview';
+
+/** Whether this user may use the event, as CCD decides from their role assignments. */
+function mayUse(req: Request, event: string): boolean {
+  return event === CONFIRM_ORDER_REVIEW ? isCaseworker(req) : isJudge(req);
 }
 
 function ccdStub(): Express {
@@ -88,13 +110,19 @@ function ccdStub(): Express {
   // CCD takes events far larger than express's 100kb default.
   ccd.use(express.json({ limit: '10mb' }));
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
-    const caseData = isJudge(req) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
+    const event = req.params.event as string;
+    if (event === CONFIRM_ORDER_REVIEW && isCaseworker(req) && envelope.order.state !== 'SUBMITTED_FOR_REVIEW') {
+      // pcs-api refuses to start a review with no order waiting for one.
+      return res.status(422).json({ callbackErrors: ['There is no order waiting for review on this case'] });
+    }
+    const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
     const token = `event-token-${startTokens.length + 1}`;
     startTokens.push(token);
     res.json({ token, case_details: { case_data: caseData } });
   });
   ccd.post('/cases/:id/events', (req: Request, res: Response) => {
-    if (!isJudge(req)) {
+    const event = req.body.event?.id as string;
+    if (!mayUse(req, event)) {
       return res.status(403).json({ message: 'Forbidden' });
     }
     submittedTokens.push(req.body.event_token);
@@ -108,6 +136,11 @@ function ccdStub(): Express {
       return res.status(422).json({ callbackErrors: [reason] });
     }
     const posted = JSON.parse(req.body.data.sdkEventPayload);
+    if (event === CONFIRM_ORDER_REVIEW) {
+      reviewRequests.push(posted);
+      envelope.order.state = posted.action === 'ISSUE' ? 'ISSUED' : 'RETURNED_TO_JUDGE';
+      return res.json({ id: req.params.id, data: {} });
+    }
     envelope = {
       ...envelope,
       order: {
@@ -152,14 +185,27 @@ export async function bootApp(
     caseworker?: boolean;
     makeOrderEnabled?: boolean;
     defendants?: { id: string; name: string }[];
+    /** A judge's order waiting for a caseworker's review. */
+    orderAwaitingReview?: Partial<Envelope['order']>;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
   if (options.defendants) {
     envelope.caseContext.defendants = options.defendants;
   }
+  if (options.orderAwaitingReview) {
+    envelope.order = {
+      id: 'order-awaiting-review',
+      version: 3,
+      orderType: 'OUTRIGHT_POSSESSION',
+      formData: {},
+      ...options.orderAwaitingReview,
+      state: 'SUBMITTED_FOR_REVIEW',
+    };
+  }
   startTokens = [];
   submittedTokens = [];
+  reviewRequests = [];
   refusal = undefined;
   ccd ??= await listen(ccdStub());
   process.env.CCD_URL = `http://127.0.0.1:${(ccd.address() as AddressInfo).port}`;
@@ -170,6 +216,7 @@ export async function bootApp(
     { Nunjucks },
     { http: httpService },
     { default: makeOrderRoutes },
+    { default: confirmOrderReviewRoutes },
     { default: decentralisedEventRoutes },
     { default: docweaveTemplateRoutes },
     { setupErrorHandlers },
@@ -178,6 +225,7 @@ export async function bootApp(
     import('../../main/modules/nunjucks'),
     import('../../main/modules/http'),
     import('../../main/routes/makeOrder'),
+    import('../../main/routes/confirmOrderReview'),
     import('../../main/routes/decentralisedEvent'),
     import('../../main/routes/docweaveTemplates'),
     import('../../main/modules/error-handler'),
@@ -207,6 +255,7 @@ export async function bootApp(
   });
   app.param('caseReference', middleware.caseReferenceParamMiddleware);
   makeOrderRoutes(app);
+  confirmOrderReviewRoutes(app);
   decentralisedEventRoutes(app);
   docweaveTemplateRoutes(app);
   setupErrorHandlers(app, 'test');
@@ -314,6 +363,34 @@ export async function openPage(html: string): Promise<Page> {
     body: () => {
       const body = new URLSearchParams();
       new FormData(form).forEach((value, name) => body.append(name, String(value)));
+      return body;
+    },
+  };
+}
+
+/** Loads a confirm order review page into jsdom and starts its JavaScript, as a browser would. */
+export async function openReviewPage(html: string): Promise<{ body(action?: string): URLSearchParams }> {
+  window.history.replaceState(null, '', '/');
+  document.open();
+  document.write(html);
+  document.close();
+  const { initAll } = await import('govuk-frontend');
+  const { initOrderPreview } = await import('../../main/assets/js/order-preview');
+  document.body.classList.add('js-enabled', 'govuk-frontend-supported');
+  initAll();
+  initOrderPreview();
+  return {
+    // The form as the browser would submit it with the named button.
+    body: action => {
+      const form = document.querySelector<HTMLFormElement>('main form');
+      if (!form) {
+        throw new Error('The page has no form');
+      }
+      const body = new URLSearchParams();
+      new FormData(form).forEach((value, name) => body.append(name, String(value)));
+      if (action) {
+        body.set('action', action);
+      }
       return body;
     },
   };

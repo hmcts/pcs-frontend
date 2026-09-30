@@ -1,0 +1,38 @@
+{% extends "confirm-order-review/_layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% set pageHeading = "Confirm order review" %}
+
+{% block page %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      {% if freeForm %}
+        {{ govukWarningText({
+          text: "The Judge has created a custom order. Review the full order before issuing",
+          attributes: { id: "free-form-warning" }
+        }) }}
+      {% elif edits.added or edits.changed or edits.deleted %}
+        {{ govukWarningText({
+          text: "The system has identified differences between the order preview and the information entered by the Judge in the data fields. You must update the data in the fields to match the preview",
+          attributes: { id: "edited-warning" }
+        }) }}
+      {% endif %}
+
+      <p class="govuk-body">A Judge has made an order on this case. Before it is issued you need to:</p>
+      <ul class="govuk-list govuk-list--bullet">
+        <li>review the order and any message the Judge left for you</li>
+        <li>return the order to the Judge if you have a query about it</li>
+        <li>add any review dates the order needs</li>
+        <li>confirm how the order should be issued, served and sealed</li>
+      </ul>
+
+      <div class="govuk-button-group">
+        {{ govukButton({ text: "Continue", href: urls.review }) }}
+        <a class="govuk-link" href="{{ cancelUrl }}">Cancel</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

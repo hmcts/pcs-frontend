@@ -1,0 +1,66 @@
+{% extends "confirm-order-review/_layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% import "confirm-order-review/_buttons.njk" as buttons with context %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set pageHeading = "Check your answers" %}
+
+{% block page %}
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+
+    <h2 class="govuk-heading-m">Review dates</h2>
+    {% set reviewDateRows = [{
+      key: { text: "Are there any review dates to add?" },
+      value: { text: rows.hasReviewDates.value },
+      actions: { items: [{ href: rows.hasReviewDates.href, text: "Change", visuallyHiddenText: "whether there are review dates" }] }
+    }] %}
+    {% for reviewDate in reviewDates %}
+      {% set reviewDateHtml %}
+        {{ reviewDate.date }}<br>{{ reviewDate.reason }}<br><span class="pcs-preserve-lines">{{ reviewDate.description }}</span>
+      {% endset %}
+      {% set reviewDateRows = (reviewDateRows.push({
+        key: { text: "Review date " + loop.index },
+        value: { html: reviewDateHtml },
+        actions: { items: [{ href: rows.hasReviewDates.href, text: "Change", visuallyHiddenText: "review date " + loop.index }] }
+      }), reviewDateRows) %}
+    {% endfor %}
+    {{ govukSummaryList({ rows: reviewDateRows, attributes: { id: "review-dates-answers" } }) }}
+
+    <h2 class="govuk-heading-m">Proceed to issue</h2>
+    {% set issueRows = [
+      {
+        key: { text: "Have all the next steps for court staff been completed?" },
+        value: { text: rows.nextSteps.value },
+        actions: { items: [{ href: rows.nextSteps.href, text: "Change", visuallyHiddenText: "next steps for court staff" }] }
+      },
+      {
+        key: { text: "Is this a final order?" },
+        value: { text: rows.finalOrder.value },
+        actions: { items: [{ href: rows.finalOrder.href, text: "Change", visuallyHiddenText: "whether this is a final order" }] }
+      },
+      {
+        key: { text: "Should this order be served on all parties?" },
+        value: { text: rows.serveAllParties.value },
+        actions: { items: [{ href: rows.serveAllParties.href, text: "Change", visuallyHiddenText: "whether to serve all parties" }] }
+      }
+    ] %}
+    {% if rows.partiesToServe %}
+      {% set issueRows = (issueRows.push({
+        key: { text: "Who should the order be served on?" },
+        value: { html: rows.partiesToServe.value | join("<br>") },
+        actions: { items: [{ href: rows.partiesToServe.href, text: "Change", visuallyHiddenText: "who to serve" }] }
+      }), issueRows) %}
+    {% endif %}
+    {% set issueRows = (issueRows.push({
+      key: { text: "Which seal should this order have?" },
+      value: { text: rows.seal.value },
+      actions: { items: [{ href: rows.seal.href, text: "Change", visuallyHiddenText: "the seal" }] }
+    }), issueRows) %}
+    {{ govukSummaryList({ rows: issueRows, attributes: { id: "issue-answers" } }) }}
+
+    {{ buttons.eventButtons("Submit") }}
+  </form>
+{% endblock %}

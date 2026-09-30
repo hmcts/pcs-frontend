@@ -1,0 +1,90 @@
+{% extends "confirm-order-review/_layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% set pageHeading = "Review an order" %}
+
+{% block page %}
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+
+    {% if edits.added or edits.changed or edits.deleted %}
+      {% set editsHtml %}
+        <p class="govuk-notification-banner__heading">Order preview edited by the Judge</p>
+        <ul class="govuk-list govuk-list--bullet">
+          {% if edits.added %}
+            <li>The Judge added wording to the order. Check the wording and any follow-up before issue</li>
+          {% endif %}
+          {% if edits.changed %}
+            <li>The Judge changed generated wording. Check the fields below still reflect the order</li>
+          {% endif %}
+          {% if edits.deleted %}
+            <li>The Judge deleted wording to the order. Check the wording and any follow-up before issue</li>
+          {% endif %}
+        </ul>
+      {% endset %}
+      {{ govukNotificationBanner({
+        titleText: "The Judge edited this order",
+        html: editsHtml,
+        attributes: { id: "judge-edits" }
+      }) }}
+    {% endif %}
+
+    {% if staffMessage %}
+      <h2 class="govuk-heading-m">Message from the Judge</h2>
+      {{ govukInsetText({
+        html: '<p class="govuk-body pcs-preserve-lines">' + (staffMessage | escape) + '</p>',
+        attributes: { id: "judge-message" }
+      }) }}
+    {% endif %}
+
+    <h2 class="govuk-heading-m">Order preview</h2>
+    {% if edits.added or edits.changed or edits.deleted %}
+      <p class="govuk-body" id="tracked-changes-key">
+        Wording the Judge added is underlined and highlighted. Wording they removed is struck through.
+      </p>
+    {% endif %}
+    {% include "confirm-order-review/_order-preview.njk" %}
+
+    {% set queryHtml %}
+      {{ govukCharacterCount({
+        name: "query-to-judge",
+        id: "query-to-judge",
+        maxlength: maxQueryLength,
+        label: { text: "Your query for the Judge" },
+        value: answers.queryToJudge,
+        errorMessage: validationErrors["query-to-judge"]
+      }) }}
+    {% endset %}
+    {{ govukCheckboxes({
+      name: "send-query",
+      idPrefix: "send-query",
+      fieldset: { legend: { text: "Do you have a query for the Judge?", classes: "govuk-fieldset__legend--m" } },
+      hint: { text: "The order will be returned to the Judge with your query" },
+      errorMessage: validationErrors["send-query"],
+      items: [{
+        value: "yes",
+        text: "Send query to Judge",
+        checked: answers.sendQuery,
+        conditional: { html: queryHtml }
+      }]
+    }) }}
+
+    <div class="govuk-button-group">
+      {{ govukButton({ text: "Issue order", name: "action", value: "ISSUE" }) }}
+      {{ govukButton({
+        text: "Return to Judge",
+        classes: "govuk-button--secondary",
+        name: "action",
+        value: "RETURN_TO_JUDGE",
+        preventDoubleClick: true
+      }) }}
+      <a class="govuk-link" href="{{ cancelUrl }}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}
