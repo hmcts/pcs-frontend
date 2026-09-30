@@ -1,4 +1,5 @@
-import { counterClaim } from '../../data/page-data/lr-page-data';
+import { feedback } from '../../data/page-data';
+import { counterClaim, nonRentArrearsDispute, rentArrears } from '../../data/page-data/lr-page-data';
 import { performAction, performValidation } from '../../utils/controller';
 
 export async function counterClaimErrorValidation(): Promise<void> {
@@ -7,4 +8,17 @@ export async function counterClaimErrorValidation(): Promise<void> {
     header: counterClaim.thereIsAProblemErrorMessageHeader,
     message: counterClaim.selectIfDefendantPlanningToMakeClaimErrorMessage,
   });
+}
+
+export async function counterClaimNavigationTests(): Promise<void> {
+  await performValidation('pageNavigation', counterClaim.feedbackLink, {
+    element: feedback.tellUsWhatYouThinkParagraph,
+    feedbackPageUrl: `respond-to-claim/${counterClaim.pageSlug}`,
+  });
+
+  if (process.env.RENT_ARREARS === 'YES' && process.env.RENT_NON_RENT === 'NO') {
+    await performValidation('pageNavigation', counterClaim.backLink, rentArrears.mainHeader);
+  } else {
+    await performValidation('pageNavigation', counterClaim.backLink, nonRentArrearsDispute.mainHeader);
+  }
 }
