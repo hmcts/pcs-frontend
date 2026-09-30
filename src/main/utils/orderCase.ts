@@ -31,7 +31,7 @@ export interface OrderCaseContext {
  * sends the judge their working order, if any; the confirm order review event sends the caseworker the
  * order awaiting review.
  */
-export interface MakeOrderStart {
+export interface OrderStart {
   order: {
     id?: string;
     version: number;

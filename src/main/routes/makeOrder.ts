@@ -15,8 +15,8 @@ import {
 } from '@utils/makeOrderValidation';
 import {
   type FormData,
-  type MakeOrderStart,
   type OrderParty,
+  type OrderStart,
   caseHeader,
   confirmationHeader,
   manageCaseDetailsUrl,
@@ -30,7 +30,7 @@ const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 
 /** The make order event as CCD started it: the page's data, and the token to submit a change to it with. */
 interface StartedOrder {
-  envelope: MakeOrderStart;
+  envelope: OrderStart;
   eventToken: string;
 }
 
@@ -42,7 +42,7 @@ async function startOrderEvent(accessToken: string, caseReference: string): Prom
     // it lets use the event.
     throw new HTTPError('Not permitted to make an order on this case', 403);
   }
-  return { envelope: JSON.parse(payload) as MakeOrderStart, eventToken: started.eventToken };
+  return { envelope: JSON.parse(payload) as OrderStart, eventToken: started.eventToken };
 }
 
 /** Pre-fills the case facts fields from the claim, in the form's field names. */
@@ -77,7 +77,7 @@ interface AttendanceRow extends AttendanceParty {
   name: string;
 }
 
-function attendanceParties({ caseContext }: MakeOrderStart): AttendanceRow[] {
+function attendanceParties({ caseContext }: OrderStart): AttendanceRow[] {
   const parties = (type: AttendanceParty['type'], list: OrderParty[]): AttendanceRow[] =>
     list.map((party, index) => ({
       id: `${type}-${party.id}`,
