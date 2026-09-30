@@ -118,7 +118,7 @@
     "@types/git-rev-sync": "2.0.2",
     "@types/jest": "30.0.0",
     "@types/lodash": "4.17.25",
-    "@types/luxon": "3.7.5",
+    "@types/luxon": "3.7.6",
     "@types/multer": "^2.2.0",
     "@types/node": "26.6.2",
     "@types/nunjucks": "3.2.6",
