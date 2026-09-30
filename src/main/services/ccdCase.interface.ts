@@ -272,6 +272,7 @@ export interface PossessionClaimResponse {
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
   responseDocumentId?: string;
+  counterclaimDocumentId?: string;
   draftVersion?: number;
   claimIssuedDate?: string;
 

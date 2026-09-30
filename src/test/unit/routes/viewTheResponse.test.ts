@@ -1190,171 +1190,6 @@ describe('viewTheResponse route', () => {
     expect(next).toHaveBeenCalledWith(serviceError);
   });
 
-  describe('PDF document links', () => {
-    it('should include counterclaim PDF URL when counterclaim exists for first defendant', async () => {
-      const caseData = buildComprehensiveCaseData();
-      caseData.possessionClaimResponse!.currentDefendantPartyId = 'def-1';
-      caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'YES';
-      caseData.possessionClaimResponse!.defendantResponses!.counterClaim = {
-        claimType: 'PAYMENT_OR_COMPENSATION',
-        status: 'COUNTER_CLAIM_ISSUED',
-      };
-      caseData.allDocuments = [
-        {
-          id: 'counterclaim-pdf-id',
-          value: {
-            document_filename: 'Counterclaim - Defendant 1.pdf',
-            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id/binary',
-            category_id: 'statementsOfCase',
-          },
-        },
-      ];
-
-      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
-        id: caseReference,
-        data: caseData,
-      });
-
-      viewTheResponseRoute(app);
-      const handler = getHandler();
-      const res = { render: jest.fn() } as unknown as Response;
-
-      await handler(
-        viewTheResponseRequest({
-          caseReference,
-          sessionUser: { accessToken: 'access-token-1' },
-        }),
-        res,
-        jest.fn()
-      );
-
-      expect(res.render).toHaveBeenCalledWith(
-        'view-the-response',
-        expect.objectContaining({
-          counterclaimPdfUrl: '/case/1234567890123456/view-documents/counterclaim-pdf-id',
-        })
-      );
-    });
-
-    it('should not include counterclaim PDF URL when no counterclaim made', async () => {
-      const caseData = buildComprehensiveCaseData();
-      caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'NO';
-
-      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
-        id: caseReference,
-        data: caseData,
-      });
-
-      viewTheResponseRoute(app);
-      const handler = getHandler();
-      const res = { render: jest.fn() } as unknown as Response;
-
-      await handler(
-        viewTheResponseRequest({
-          caseReference,
-          sessionUser: { accessToken: 'access-token-1' },
-        }),
-        res,
-        jest.fn()
-      );
-
-      expect(res.render).toHaveBeenCalledWith(
-        'view-the-response',
-        expect.objectContaining({
-          counterclaimPdfUrl: null,
-        })
-      );
-    });
-
-    it('should not include counterclaim PDF URL when counterclaim is pending (PENDING_COUNTER_CLAIM_ISSUED)', async () => {
-      const caseData = buildComprehensiveCaseData();
-      caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'YES';
-      caseData.possessionClaimResponse!.defendantResponses!.counterClaim = {
-        claimType: 'PAYMENT_OR_COMPENSATION',
-        status: 'PENDING_COUNTER_CLAIM_ISSUED',
-      };
-      caseData.allDocuments = [];
-
-      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
-        id: caseReference,
-        data: caseData,
-      });
-
-      viewTheResponseRoute(app);
-      const handler = getHandler();
-      const res = { render: jest.fn() } as unknown as Response;
-
-      await handler(
-        viewTheResponseRequest({
-          caseReference,
-          sessionUser: { accessToken: 'access-token-1' },
-        }),
-        res,
-        jest.fn()
-      );
-
-      expect(res.render).toHaveBeenCalledWith(
-        'view-the-response',
-        expect.objectContaining({
-          counterclaimPdfUrl: null,
-        })
-      );
-    });
-
-    it('should include correct counterclaim PDF URL for second defendant when multiple defendants exist', async () => {
-      const caseData = buildComprehensiveCaseData();
-      caseData.possessionClaimResponse!.currentDefendantPartyId = 'def-2';
-      caseData.possessionClaimResponse!.defendantResponses!.makeCounterClaim = 'YES';
-      caseData.possessionClaimResponse!.defendantResponses!.counterClaim = {
-        claimType: 'PAYMENT_OR_COMPENSATION',
-        status: 'COUNTER_CLAIM_ISSUED',
-      };
-      caseData.allDocuments = [
-        {
-          id: 'counterclaim-pdf-id-1',
-          value: {
-            document_filename: 'Counterclaim - Defendant 1.pdf',
-            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id-1/binary',
-            category_id: 'statementsOfCase',
-          },
-        },
-        {
-          id: 'counterclaim-pdf-id-2',
-          value: {
-            document_filename: 'Counterclaim - Defendant 2.pdf',
-            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id-2/binary',
-            category_id: 'statementsOfCase',
-          },
-        },
-      ];
-
-      (ccdCaseService.getCaseById as jest.Mock).mockResolvedValue({
-        id: caseReference,
-        data: caseData,
-      });
-
-      viewTheResponseRoute(app);
-      const handler = getHandler();
-      const res = { render: jest.fn() } as unknown as Response;
-
-      await handler(
-        viewTheResponseRequest({
-          caseReference,
-          sessionUser: { accessToken: 'access-token-1' },
-        }),
-        res,
-        jest.fn()
-      );
-
-      expect(res.render).toHaveBeenCalledWith(
-        'view-the-response',
-        expect.objectContaining({
-          counterclaimPdfUrl: '/case/1234567890123456/view-documents/counterclaim-pdf-id-2',
-        })
-      );
-    });
-  });
-
   async function renderResponse(data: CcdCaseData) {
     mockCaseById(data);
     viewTheResponseRoute(app);
@@ -1442,6 +1277,82 @@ describe('viewTheResponse route', () => {
     } as unknown as CcdCaseData);
 
     expect(renderArgs.responsePdfUrl).toBeUndefined();
+  });
+
+  it('should build counterclaimPdfUrl when counterclaimDocumentId matches a document in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'counterclaim-pdf-id',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'counterclaim-pdf-id',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBe(`/case/${caseReference}/view-documents/counterclaim-pdf-id`);
+  });
+
+  it('should not build counterclaimPdfUrl when counterclaimDocumentId is not present', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      possessionClaimResponse: {
+        defendantResponses: {},
+      },
+    } as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
+  });
+
+  it('should not build counterclaimPdfUrl when counterclaimDocumentId does not match a document in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'some-other-doc',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/some-other-doc/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'not-present',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
+  });
+
+  it('should not build counterclaimPdfUrl when the matching document is missing its binary url', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'counterclaim-pdf-id',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'counterclaim-pdf-id',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
   });
 });
 
