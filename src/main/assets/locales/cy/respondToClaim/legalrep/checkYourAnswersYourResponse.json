@@ -8,7 +8,7 @@
   },
   "rows": {
     "exemptLandlord": {
-      "label": "A yw landlord yn landlord wedi’i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
+      "label": "A yw’r landlord yn landlord wedi’i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
       "changeHidden": "landlord wedi’i eithrio"
     },
     "writtenTerms": {
