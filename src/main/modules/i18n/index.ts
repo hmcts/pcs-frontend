@@ -7,8 +7,6 @@ import i18next, { type InitOptions, type TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
 import { LanguageDetector, handle as i18nextHandle } from 'i18next-http-middleware';
 import type { Environment } from 'nunjucks';
-import { z } from 'zod';
-import { makeZodI18nMap } from 'zod-i18n-map';
 
 import { ordinalDate, pluralPossessive } from './formatters';
 
@@ -240,7 +238,5 @@ export class I18n {
 
       next();
     });
-
-    z.setErrorMap(makeZodI18nMap({ t: i18next.t }));
   }
 }
