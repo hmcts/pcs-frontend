@@ -11,5 +11,5 @@ export const hasMultipleParties = (req: Request): boolean => {
     return party.id && !isCurrentDefendant;
   });
 
-  return otherParties.length >= 2;
+  return otherParties.length >= 1;
 };
