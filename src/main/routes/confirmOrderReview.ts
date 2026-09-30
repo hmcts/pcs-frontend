@@ -31,7 +31,6 @@ import {
   reviewRequest,
   staffMessage,
   ticked,
-  validateIssueFromReview,
   validateProceedToIssue,
   validateQuery,
   validateReviewDates,
@@ -364,10 +363,6 @@ export default function confirmOrderReviewRoutes(app: Application): void {
         }
         await submitReview(req, review, 'RETURN_TO_JUDGE');
         return res.redirect(pageUrl(caseReferenceOf(req), 'referredToJudge'));
-      }
-      const issues = validateIssueFromReview(review.answers);
-      if (issues.length) {
-        return render(req, res, 'review', issues);
       }
       return res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'));
     } catch (error) {
