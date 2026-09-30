@@ -18,6 +18,7 @@ import {
 
 const MAKE_ORDER = `/case/${CASE_REFERENCE}/make-order`;
 const BASE = `/case/${CASE_REFERENCE}/confirm-order-review`;
+const INTRO = `${BASE}?orderId=order-awaiting-review`;
 const REVIEW = `${BASE}/review`;
 const REVIEW_DATES = `${BASE}/review-dates`;
 const PROCEED_TO_ISSUE = `${BASE}/proceed-to-issue`;
@@ -94,7 +95,7 @@ async function caseworkerReviewing(order?: Order): Promise<TestApp> {
 
 /** Takes the caseworker from the introduction to the given page with every answer before it given. */
 async function reachProceedToIssue(app: TestApp): Promise<void> {
-  await app.get(BASE);
+  await app.get(INTRO);
   expect((await app.post(REVIEW, new URLSearchParams({ action: 'ISSUE' }))).location).toBe(REVIEW_DATES);
   const dates = await app.post(REVIEW_DATES, new URLSearchParams({ 'has-review-dates': 'no', action: 'continue' }));
   expect(dates.location).toBe(PROCEED_TO_ISSUE);
@@ -118,7 +119,7 @@ describe('confirm order review', () => {
     it('shows the case and what the caseworker needs to do, starting the review event', async () => {
       app = await caseworkerReviewing();
 
-      const intro = await app.get(BASE);
+      const intro = await app.get(INTRO);
 
       expect(intro.status).toBe(200);
       const page = parse(intro.text);
@@ -137,7 +138,7 @@ describe('confirm order review', () => {
         await judgesOrder({ tab: 'tab-free-form', edit: () => writeInPreview('The claim is adjourned.') })
       );
 
-      const page = parse((await app.get(BASE)).text);
+      const page = parse((await app.get(INTRO)).text);
 
       expect(page.querySelector('#free-form-warning')?.textContent).toContain(
         'The Judge has created a custom order. Review the full order before issuing'
@@ -148,34 +149,34 @@ describe('confirm order review', () => {
     it('warns when the judge edited the generated order', async () => {
       app = await caseworkerReviewing(await judgesOrder({ edit: changeGeneratedWording }));
 
-      const page = parse((await app.get(BASE)).text);
+      const page = parse((await app.get(INTRO)).text);
 
       expect(page.querySelector('#edited-warning')?.textContent).toContain(
         'The system has identified differences between the order preview and the information entered by the Judge in the data fields. You must update the data in the fields to match the preview'
       );
     });
 
-    it('says so when there is no order waiting for review', async () => {
+    it('says so when the chosen order is not waiting for review', async () => {
       app = await bootApp({ caseworker: true });
 
-      const page = parse((await app.get(BASE)).text);
+      const page = parse((await app.get(INTRO)).text);
 
       expect(page.querySelector('h1')?.textContent?.trim()).toBe('No order to review');
-      expect(page.body.textContent).toContain('There is no order waiting for review on this case');
+      expect(page.body.textContent).toContain('The order is no longer waiting for review');
       expect(page.querySelector<HTMLAnchorElement>('a.govuk-button')?.href).toBe(MANAGE_CASE_URL);
     });
 
     it('does not exist for someone CCD does not let review orders', async () => {
       app = await bootApp({ orderAwaitingReview: await (plainOrder ??= judgesOrder()) });
 
-      expect((await app.get(BASE)).status).toBe(404);
+      expect((await app.get(INTRO)).status).toBe(404);
     });
   });
 
   describe('reviewing the order', () => {
     it("shows the judge's message and their order", async () => {
       app = await caseworkerReviewing(await judgesOrder({ staffMessage: 'Please list for a review in 28 days.' }));
-      await app.get(BASE);
+      await app.get(INTRO);
 
       await openReviewPage((await app.get(REVIEW)).text);
 
@@ -194,7 +195,7 @@ describe('confirm order review', () => {
           },
         })
       );
-      await app.get(BASE);
+      await app.get(INTRO);
 
       await openReviewPage((await app.get(REVIEW)).text);
 
@@ -218,7 +219,7 @@ describe('confirm order review', () => {
 
     it('returns the order to the judge with the query, submitting the event the introduction started', async () => {
       app = await caseworkerReviewing();
-      await app.get(BASE);
+      await app.get(INTRO);
       const page = await openReviewPage((await app.get(REVIEW)).text);
       check('send-query', 'yes');
       type('query-to-judge', 'Which defendant does paragraph 2 mean?');
@@ -247,7 +248,7 @@ describe('confirm order review', () => {
 
     it('does not return the order to the judge without a query', async () => {
       app = await caseworkerReviewing();
-      await app.get(BASE);
+      await app.get(INTRO);
 
       const empty = await app.post(REVIEW, new URLSearchParams({ 'send-query': 'yes', action: 'RETURN_TO_JUDGE' }));
 
@@ -258,7 +259,7 @@ describe('confirm order review', () => {
 
     it('cancels the review, keeping nothing, and returns the caseworker to the case', async () => {
       app = await caseworkerReviewing();
-      await app.get(BASE);
+      await app.get(INTRO);
       await app.post(REVIEW, new URLSearchParams({ action: 'ISSUE' }));
 
       const cancelled = await app.get(`${BASE}/cancel`);
@@ -272,7 +273,7 @@ describe('confirm order review', () => {
   describe('review dates', () => {
     beforeEach(async () => {
       app = await caseworkerReviewing();
-      await app.get(BASE);
+      await app.get(INTRO);
       await app.post(REVIEW, new URLSearchParams({ action: 'ISSUE' }));
     });
 

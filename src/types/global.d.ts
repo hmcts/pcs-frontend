@@ -18,6 +18,8 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
 
 export interface ClientContextHeaders {
   selectedPartyId?: string;
+  /** The order a caseworker chose to review, from the case's draft orders tab. */
+  orderId?: string;
 }
 
 interface CustomSessionData extends SessionData {

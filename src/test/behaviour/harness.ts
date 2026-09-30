@@ -111,9 +111,14 @@ function ccdStub(): Express {
   ccd.use(express.json({ limit: '10mb' }));
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
     const event = req.params.event as string;
-    if (event === CONFIRM_ORDER_REVIEW && isCaseworker(req) && envelope.order.state !== 'SUBMITTED_FOR_REVIEW') {
-      // pcs-api refuses to start a review with no order waiting for one.
-      return res.status(422).json({ callbackErrors: ['There is no order waiting for review on this case'] });
+    // pcs-api starts the review of the order the caseworker chose, which CCD passes on in the client context.
+    const chosenOrder = JSON.parse(String(req.headers['client-context'] ?? '{}')).orderId;
+    if (
+      event === CONFIRM_ORDER_REVIEW &&
+      isCaseworker(req) &&
+      (envelope.order.state !== 'SUBMITTED_FOR_REVIEW' || chosenOrder !== envelope.order.id)
+    ) {
+      return res.status(422).json({ callbackErrors: ['The order is no longer waiting for review'] });
     }
     const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
     const token = `event-token-${startTokens.length + 1}`;
