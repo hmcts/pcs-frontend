@@ -60,12 +60,12 @@ export default function decentralisedEventRoutes(app: Application): void {
     });
 
     const queryShallowClone = {
-      ...req.query
+      ...req.query,
     };
     delete queryShallowClone.expected_sub;
 
     req.session.clientContext = {
-      'eventQueryParams' : queryShallowClone
+      eventQueryParams: queryShallowClone,
     };
 
     const redirectRoute = config
