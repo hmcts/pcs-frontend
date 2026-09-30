@@ -8,7 +8,7 @@ import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
 import {
-  type MakeOrderStart,
+  type OrderStart,
   caseHeader,
   confirmationHeader,
   manageCaseDetailsUrl,
@@ -107,7 +107,7 @@ function errorSummary(issues: ValidationIssue[]) {
     : undefined;
 }
 
-function pageModel(req: Request, review: MakeOrderStart, issues: ValidationIssue[] = []): Record<string, unknown> {
+function pageModel(req: Request, review: OrderStart, issues: ValidationIssue[] = []): Record<string, unknown> {
   const caseReference = caseReferenceOf(req);
   return {
     headerModel: xuiHeaderModel(req),
@@ -323,7 +323,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
         // caseworkers it lets use the event.
         throw new HTTPError('Not permitted to review an order on this case', 403);
       }
-      const start = JSON.parse(payload as string) as MakeOrderStart;
+      const start = JSON.parse(payload as string) as OrderStart;
       const review: OrderReviewSession = { ...start, eventToken: started.eventToken, answers: newAnswers() };
       req.session.orderReviews = { ...req.session.orderReviews, [caseReference]: review };
       res.render('confirm-order-review/intro', { ...pageModel(req, review), ...orderModel(review) });

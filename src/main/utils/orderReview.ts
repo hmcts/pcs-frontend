@@ -1,5 +1,5 @@
 import { parseDate } from '@utils/makeOrderFormat';
-import type { FormData, MakeOrderStart, OrderConfirmationHeader } from '@utils/orderCase';
+import type { FormData, OrderConfirmationHeader, OrderStart } from '@utils/orderCase';
 
 export const REVIEW_REASONS = [
   { value: 'UNLESS_ORDER', text: 'Unless order' },
@@ -45,7 +45,7 @@ export interface OrderReviewAnswers {
  * A caseworker's review of an order, from the event's start on the introductory page to its submission:
  * the order and case it started with, the token to submit it with, and the answers given so far.
  */
-export interface OrderReviewSession extends MakeOrderStart {
+export interface OrderReviewSession extends OrderStart {
   eventToken: string;
   answers: OrderReviewAnswers;
 }
