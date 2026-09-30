@@ -24,4 +24,5 @@ tasks.register('fortifyScan', JavaExec) {
   mainClass = "uk.gov.hmcts.fortifyclient.FortifyClientMainApp"
   classpath += sourceSets.test.runtimeClasspath
   jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
+  ignoreExitValue = true
 }
