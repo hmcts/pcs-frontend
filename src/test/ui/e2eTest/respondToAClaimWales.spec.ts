@@ -292,7 +292,6 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('enterPriorityDebtDetails', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.weekRadioOption,
     });
     await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
@@ -952,7 +951,6 @@ test.describe('Common Component YS And PCQ Respond to a claim - e2e Journey @nig
     await performAction('enterPriorityDebtDetails', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.weekRadioOption,
     });
     await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);
@@ -1298,7 +1296,6 @@ test.describe('Common Component YS And PCQ Respond to a claim - e2e Journey @nig
     await performAction('enterPriorityDebtDetails', {
       totalAmount: priorityDebtDetails.totalAmountTextInput,
       payAmount: priorityDebtDetails.amountYouPayTextInput,
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.weekRadioOption,
     });
     await performValidation('mainHeader', whatOtherRegularExpensesDoYouHave.mainHeader);

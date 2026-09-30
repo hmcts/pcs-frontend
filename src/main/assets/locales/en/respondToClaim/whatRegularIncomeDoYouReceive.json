@@ -13,13 +13,25 @@
   },
   "subFields": {
     "amount": "Total amount received",
-    "frequency": "Received every:",
     "moneyFromElsewhereDetailsLabel": "Give details",
     "moneyFromElsewhereDetailsHint": "Give details about the other sources of income and how much you usually receive"
   },
+  "subFieldsLegend": {
+    "incomeFromJobs": "Income from jobs details",
+    "pension": "Pension details",
+    "universalCredit": "Universal Credit details",
+    "otherBenefits": "Other benefits and credits details",
+    "moneyFromElsewhere": "Money from somewhere else details"
+  },
+  "frequencyLegend": {
+    "incomeFromJobs": "How often do you receive income from all jobs you do?",
+    "pension": "How often do you receive income from a state or private pension?",
+    "universalCredit": "How often do you receive Universal Credit?",
+    "otherBenefits": "How often do you receive income from other benefits and credits?"
+  },
   "frequency": {
-    "week": "Week",
-    "month": "Month"
+    "week": "Received every week",
+    "month": "Received every month"
   },
   "errors": {
     "incomeFromJobsAmount": {
