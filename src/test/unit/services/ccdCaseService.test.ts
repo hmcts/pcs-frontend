@@ -9,9 +9,16 @@ import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('config');
 jest.mock('@modules/http');
+jest.mock('@modules/logger', () => {
+  const logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+  return { Logger: { getLogger: () => logger } };
+});
 
 const mockPost = http.post as jest.Mock;
 const mockGet = http.get as jest.Mock;
+const mockLoggerError = (
+  jest.requireMock('@modules/logger') as { Logger: { getLogger: () => { error: jest.Mock } } }
+).Logger.getLogger().error;
 
 const accessToken = 'token';
 const mockUrl = 'http://ccd.example.com';
@@ -122,6 +129,65 @@ describe('ccdCaseService', () => {
         status: 404,
       });
       expect(mockGet).not.toHaveBeenCalled();
+    });
+
+    it('logs what identifies a CCD failure without the response payload (HDPI-8953)', async () => {
+      mockGet.mockRejectedValue({
+        response: {
+          status: 422,
+          data: {
+            message: 'Case data validation failed',
+            exception: 'uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException',
+            details: { applicantForename: 'John', applicantSurname: 'Doe' },
+          },
+        },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      const logged = mockLoggerError.mock.calls.map(([line]) => String(line)).join('\n');
+      expect(logged).toContain(
+        'status=422 message=Case data validation failed ' +
+          'exception=uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException'
+      );
+      expect(logged).not.toContain('John');
+    });
+
+    it('keeps the body of a CCD error that is not JSON, which has no message field', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 502, data: '<html>502 Bad Gateway</html>' },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      const logged = mockLoggerError.mock.calls.map(([line]) => String(line)).join('\n');
+      expect(logged).toContain('status=502 body=<html>502 Bad Gateway</html>');
+    });
+
+    it('reports which case failed, taken from the request URL', async () => {
+      mockGet.mockRejectedValue({
+        config: { url: `${mockUrl}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false` },
+        response: { status: 502, data: { message: 'Callback failed' } },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      expect(mockLoggerError).toHaveBeenCalledWith(expect.any(String), { caseReference: caseId });
+    });
+
+    it('leaves the case reference undefined when the failing request has no case in its URL', async () => {
+      mockGet.mockRejectedValue({
+        config: { url: `${mockUrl}/case-types/PCS` },
+        response: { status: 500, data: { message: 'Boom' } },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      expect(mockLoggerError).toHaveBeenCalledWith(expect.any(String), { caseReference: undefined });
     });
 
     it('should throw HTTPError with 403 status on unauthorized access', async () => {

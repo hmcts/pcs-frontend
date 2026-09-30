@@ -1,20 +1,19 @@
 const mockUseAzureMonitor = jest.fn();
 const mockShutdownAzureMonitor = jest.fn();
 const mockConfigGet = jest.fn();
+const mockEnableTelemetry = jest.fn();
 
 jest.mock('@azure/monitor-opentelemetry', () => ({
   useAzureMonitor: mockUseAzureMonitor,
   shutdownAzureMonitor: mockShutdownAzureMonitor,
 }));
 
-jest.mock('@opentelemetry/api', () => ({
-  SpanStatusCode: {
-    ERROR: 'ERROR',
-  },
-}));
-
 jest.mock('config', () => ({
   get: mockConfigGet,
+}));
+
+jest.mock('@modules/logger', () => ({
+  Logger: { enableTelemetry: mockEnableTelemetry },
 }));
 
 interface TelemetryConfig {
@@ -27,15 +26,14 @@ interface TelemetryConfig {
       ignoreOutgoingRequestHook: (options: { path?: string }) => boolean;
     };
     winston: {
-      logHook: (span: MockSpan, record: Record<string, unknown>) => void;
+      enabled: boolean;
     };
   };
+  spanProcessors: {
+    onStart: (span: { attributes: Record<string, unknown> }) => void;
+    onEnd: (span: { attributes: Record<string, unknown> }) => void;
+  }[];
   enableLiveMetrics: boolean;
-}
-
-interface MockSpan {
-  recordException: jest.Mock;
-  setStatus: jest.Mock;
 }
 
 const getTelemetryModule = async () => {
@@ -106,63 +104,11 @@ describe('opentelemetry module', () => {
     expect(ignoreOutgoingRequestHook({ path: '/healthz' })).toBe(false);
   });
 
-  it('records exception and span status for error-level logs', async () => {
+  it('hands winston to the logger module rather than instrumenting it', async () => {
     const telemetryConfig = await initializeAndGetTelemetryConfig();
-    const span: MockSpan = {
-      recordException: jest.fn(),
-      setStatus: jest.fn(),
-    };
 
-    telemetryConfig.instrumentationOptions.winston.logHook(span, {
-      level: 'error',
-      message: 'Telemetry error',
-    });
-
-    expect(span.recordException).toHaveBeenCalledWith({
-      name: 'Error',
-      message: 'Telemetry error',
-      stack: undefined,
-    });
-    expect(span.setStatus).toHaveBeenCalledWith({
-      code: 'ERROR',
-      message: 'Telemetry error',
-    });
-  });
-
-  it('does not enrich spans for non-error log levels', async () => {
-    const telemetryConfig = await initializeAndGetTelemetryConfig();
-    const span: MockSpan = {
-      recordException: jest.fn(),
-      setStatus: jest.fn(),
-    };
-
-    telemetryConfig.instrumentationOptions.winston.logHook(span, {
-      level: 'info',
-      message: 'Informational log',
-    });
-
-    expect(span.recordException).not.toHaveBeenCalled();
-    expect(span.setStatus).not.toHaveBeenCalled();
-  });
-
-  it('uses existing Error instances when recording exceptions', async () => {
-    const telemetryConfig = await initializeAndGetTelemetryConfig();
-    const span: MockSpan = {
-      recordException: jest.fn(),
-      setStatus: jest.fn(),
-    };
-    const error = new Error('Boom');
-
-    telemetryConfig.instrumentationOptions.winston.logHook(span, {
-      level: 'error',
-      error,
-    });
-
-    expect(span.recordException).toHaveBeenCalledWith(error);
-    expect(span.setStatus).toHaveBeenCalledWith({
-      code: 'ERROR',
-      message: 'Boom',
-    });
+    expect(telemetryConfig.instrumentationOptions.winston).toEqual({ enabled: false });
+    expect(mockEnableTelemetry).toHaveBeenCalledTimes(1);
   });
 
   it('returns early when flushing before initialization', async () => {
@@ -194,6 +140,91 @@ describe('opentelemetry module', () => {
 
     expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to flush telemetry cleanly', shutdownError);
     consoleErrorSpy.mockRestore();
+  });
+
+  describe('query redaction in span URLs (HDPI-8953)', () => {
+    it('drops every query value, whatever it is called, and keeps the rest of the URL', async () => {
+      const { redactQueryValues } = await getTelemetryModule();
+
+      expect(redactQueryValues('https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123')).toBe(
+        'https://api.os.uk/search/places/v1/postcode?postcode=***&key=***'
+      );
+      // A parameter nobody thought to name in advance is redacted the same way.
+      expect(redactQueryValues('https://svc/thing?api_signature=deadbeef')).toBe('https://svc/thing?api_signature=***');
+      expect(redactQueryValues('https://ccd/cases/123')).toBe('https://ccd/cases/123');
+    });
+
+    it('leaves an = in the path or the fragment alone', async () => {
+      const { redactQueryValues } = await getTelemetryModule();
+
+      expect(redactQueryValues('https://dm-store/documents/a=b/binary')).toBe('https://dm-store/documents/a=b/binary');
+      expect(redactQueryValues('https://svc/thing?a=1#b=2')).toBe('https://svc/thing?a=***#b=2');
+    });
+
+    it('redacts the first value in url.query, which is recorded without a leading ?', async () => {
+      const telemetryConfig = await initializeAndGetTelemetryConfig();
+      const [spanProcessor] = telemetryConfig.spanProcessors;
+      const attributes = { 'url.query': 'code=xyz&state=abc' };
+
+      spanProcessor.onEnd({ attributes });
+
+      expect(attributes).toEqual({ 'url.query': 'code=***&state=***' });
+    });
+
+    it('rewrites the URL attributes of every span it ends, including failed requests', async () => {
+      const telemetryConfig = await initializeAndGetTelemetryConfig();
+      const [spanProcessor] = telemetryConfig.spanProcessors;
+
+      // A request that never got a response: the instrumentation closes the span without calling
+      // applyCustomAttributesOnSpan, so onEnd is the only chance to redact it.
+      const span = {
+        attributes: {
+          'http.url': 'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123',
+          'url.query': 'postcode=W37RX&key=abc123',
+          'http.method': 'GET',
+          'error.type': 'AbortError',
+        },
+      };
+
+      spanProcessor.onEnd(span);
+
+      expect(span.attributes).toEqual({
+        'http.url': 'https://api.os.uk/search/places/v1/postcode?postcode=***&key=***',
+        'url.query': 'postcode=***&key=***',
+        'http.method': 'GET',
+        'error.type': 'AbortError',
+      });
+    });
+
+    it('redacts at span start, before the distro feeds Live Metrics from its own onEnd', async () => {
+      const telemetryConfig = await initializeAndGetTelemetryConfig();
+      const [spanProcessor] = telemetryConfig.spanProcessors;
+      // The distro registers its span processor ahead of this one, and its onEnd builds Live
+      // Metrics documents from these attributes. Redacting only in onEnd would be too late.
+      const span = {
+        attributes: {
+          'url.full': 'https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123',
+          'http.method': 'GET',
+        },
+      };
+
+      spanProcessor.onStart(span);
+
+      expect(span.attributes).toEqual({
+        'url.full': 'https://api.os.uk/search/places/v1/postcode?postcode=***&key=***',
+        'http.method': 'GET',
+      });
+    });
+
+    it('leaves spans alone when there is no query string', async () => {
+      const telemetryConfig = await initializeAndGetTelemetryConfig();
+      const [spanProcessor] = telemetryConfig.spanProcessors;
+      const attributes = { 'http.url': 'http://ccd-data-store/cases/123' };
+
+      spanProcessor.onEnd({ attributes });
+
+      expect(attributes).toEqual({ 'http.url': 'http://ccd-data-store/cases/123' });
+    });
   });
 
   it('times out flush when shutdown does not settle', async () => {

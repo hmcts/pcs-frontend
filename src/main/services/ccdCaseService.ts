@@ -128,11 +128,23 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
-  const responseData = axiosError.response?.data as CcdErrorResponseData | undefined;
+  const rawBody: unknown = axiosError.response?.data;
+  const responseData = rawBody as CcdErrorResponseData | undefined;
+  // Every CCD URL carries the case reference, so take it from the request that failed rather
+  // than threading it through each call site. Logged as a field: the span exception picks it up.
+  const caseReference = /\/cases\/(\d{16})/.exec(axiosError.config?.url ?? '')?.[1];
 
-  logger.error(`Error in ${context}: ${axiosError.message}`);
-  if (responseData) {
-    logger.error(`Error response data: ${JSON.stringify(responseData, null, 2)}`);
+  logger.error(`Error in ${context}: ${axiosError.message}`, { caseReference });
+  if (rawBody) {
+    // CCD error bodies can carry case data - log only what identifies the failure. `details` is
+    // left out deliberately: it echoes the submitted field values.
+    const summary =
+      typeof rawBody === 'string'
+        ? `body=${rawBody.slice(0, 200)}`
+        : `message=${responseData?.message ?? 'none'} exception=${responseData?.exception ?? 'none'}`;
+    logger.error(`Error response from CCD in ${context}: status=${status ?? 'unknown'} ${summary}`, {
+      caseReference,
+    });
   }
 
   if (status === 403) {
@@ -285,7 +297,6 @@ export const ccdCaseService = {
     try {
       logger.debug(`Fetching case by id for read view: ${safeCaseId}`);
       const response = await http.get<CcdCase>(caseUrl, getCaseHeaders(accessToken));
-      logger.debug(`Read case response for ${safeCaseId}: ${JSON.stringify(response.data, null, 2)}`);
       const caseData = response.data.data ?? {};
 
       return {
