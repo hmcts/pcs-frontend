@@ -179,7 +179,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('login', user.defendantSolicitor.email);
-  await performAction('clickButton', startNow.startNowButton);
+  await performAction('When the user clicks the button', startNow.startNowButton);
 });
 
 test.afterEach(async () => {
@@ -218,7 +218,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     await performAction('emailConfirmationLR', {
       radioOption: emailConfirmation.noRadioOption,
     });
-    await performAction('tenancyOrContractTypeDetails', {
+    await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
@@ -483,7 +483,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -491,7 +491,10 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
+    await performAction(
+      'When the user clicks the button',
+      responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton
+    );
     assertAllErrorMessageValidations();
   });
 
@@ -713,7 +716,10 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
-    await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
+    await performValidation(
+      'Then the user sees the main header',
+      counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader
+    );
     assertAllErrorMessageValidations();
   });
 
@@ -855,7 +861,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -864,7 +870,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
     await performAction(
-      'clickButton',
+      'When the user clicks the button',
       responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
     );
     assertAllErrorMessageValidations();
@@ -1007,7 +1013,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -1016,7 +1022,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
     await performAction(
-      'clickButton',
+      'When the user clicks the button',
       responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
     );
     assertAllErrorMessageValidations();

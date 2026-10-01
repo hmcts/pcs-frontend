@@ -24,11 +24,11 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url + `/access-your-case`);
   await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
-  await performAction('clickButton', startNow.startNowButton);
+  await performAction('When the user clicks the button', startNow.startNowButton);
 });
 
 test.describe('Respond to a claim - smoke test @sanity', async () => {
   test('Respond to a claim E2E Journey @sanity', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
+    await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
   });
 });

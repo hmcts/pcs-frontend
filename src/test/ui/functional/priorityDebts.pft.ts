@@ -2,7 +2,7 @@ import { priorityDebts } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function priorityDebtsErrorValidation(): Promise<void> {
-  await performAction('clickButton', priorityDebts.saveAndContinueButton);
+  await performAction('When the user clicks the button', priorityDebts.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebts.errorValidationHeader,
     message: priorityDebts.selectIfYouHaveErrorMessage,

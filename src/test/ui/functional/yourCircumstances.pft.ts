@@ -3,7 +3,7 @@ import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function yourCircumstancesErrorValidation(): Promise<void> {
-  await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+  await performAction('When the user clicks the button', yourCircumstances.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: yourCircumstances.thereIsAProblemErrorMessageHeader,
     message: yourCircumstances.selectCircumstancesErrorMessage,
@@ -12,14 +12,14 @@ export async function yourCircumstancesErrorValidation(): Promise<void> {
   await performValidation('elementToBeVisible', yourCircumstances.youCanEnterUpToHiddenHintText);
   await performAction('inputText', yourCircumstances.giveDetailsHiddenTextLabel, generateRandomString(501));
   await performValidation('elementToBeVisible', yourCircumstances.tooManyCharacterHiddenHintText);
-  await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+  await performAction('When the user clicks the button', yourCircumstances.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: yourCircumstances.thereIsAProblemErrorMessageHeader,
     message: yourCircumstances.mustBe500CharactersOrFewerErrorMessage,
   });
   //emoji validation
   await performAction('inputText', yourCircumstances.giveDetailsHiddenTextLabel, yourCircumstances.emojiTextInput);
-  await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+  await performAction('When the user clicks the button', yourCircumstances.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: yourCircumstances.thereIsAProblemErrorMessageHeader,
     message: yourCircumstances.emojiGiveGiveDetailsAboutYourCircumstancesErrorMessage,

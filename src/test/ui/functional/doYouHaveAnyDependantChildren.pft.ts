@@ -4,14 +4,14 @@ import { performAction, performValidation } from '../utils/controller';
 
 const charLimitInputText = generateRandomString(501);
 export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<void> {
-  await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+  await performAction('When the user clicks the button', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
     message: doYouHaveAnyDependantChildren.selectIfYouHaveAnyDependentChildrenErrorMessage,
   });
 
   await performAction('clickRadioButton', doYouHaveAnyDependantChildren.yesRadioOption);
-  await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+  await performAction('When the user clicks the button', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
     message: doYouHaveAnyDependantChildren.giveDetailsAboutYourDependentChildrenErrorMessage,
@@ -19,7 +19,7 @@ export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<vo
 
   await performAction('clickRadioButton', doYouHaveAnyDependantChildren.yesRadioOption);
   await performAction('inputText', doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel, charLimitInputText);
-  await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+  await performAction('When the user clicks the button', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
     message: doYouHaveAnyDependantChildren.mustBeUnderCharacterLimitErrorMessage,
@@ -32,7 +32,7 @@ export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<vo
     doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
     doYouHaveAnyDependantChildren.emojiTextInput
   );
-  await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+  await performAction('When the user clicks the button', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
     message: doYouHaveAnyDependantChildren.emojiErrorMessage,

@@ -35,9 +35,9 @@ test.beforeEach(async ({ page }) => {
     caseNumber: process.env.CASE_NUMBER,
     defendantDetailsKnown: false,
   });
-  await performValidation('mainHeader', dashboard.mainHeader);
+  await performValidation('Then the user sees the main header', dashboard.mainHeader);
   await performAction('clickLink', dashboard.askTheCourtToMakeAnOrderLink);
-  await performValidation('mainHeader', chooseAnApplication.mainHeader);
+  await performValidation('Then the user sees the main header', chooseAnApplication.mainHeader);
 });
 
 test.afterEach(async () => {
@@ -50,13 +50,13 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
     });
-    await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performAction('When the user clicks the button', askTheCourtToSetAsideTheOrder.startNowButton);
+    await performValidation('Then the user sees the main header', doYouNeedHelpPayingTheFee.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
       question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
       option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
     });
-    await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
+    await performValidation('Then the user sees the main header', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
     await performAction('confirmYouHaveAppliedForFeeHelp', {
       question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
       option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
@@ -75,13 +75,13 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: doYouWantToUploadDocumentsToSupportYourApplication.doYouWantToUploadDocumentQuestion,
       option: doYouWantToUploadDocumentsToSupportYourApplication.yesRadioOption,
     });
-    await performValidation('mainHeader', uploadDocumentsToSupportYourApplication.mainHeader);
+    await performValidation('Then the user sees the main header', uploadDocumentsToSupportYourApplication.mainHeader);
     await performAction('uploadFilesGenApps', { files: ['genApps.docx'] });
     await performAction('selectLanguageUsedToComplete', {
       question: whichLanguageDidYouUseToCompleteThisService.whichLanguageDidYouUseQuestion,
       option: whichLanguageDidYouUseToCompleteThisService.englishRadioOption,
     });
-    await performValidation('mainHeader', checkYourAnswersGenApps.mainHeader);
+    await performValidation('Then the user sees the main header', checkYourAnswersGenApps.mainHeader);
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
     await performAction('reviewAndUpdateCYA', {
@@ -97,7 +97,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
     await performAction('payForApplication');
-    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performValidation('Then the user sees the main header', paymentDetails.mainHeader);
     await performAction('inputPaymentDetails', {
       question: paymentDetails.mainHeader,
       cardNumberLabel: paymentDetails.cardNumberTextLabel,
@@ -121,7 +121,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     });
     await performAction('confirmPayment');
     await performAction('verifyApplicationSubmitted');
-    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
 
   test('Select an Application - Ask to Set aside - You need to apply for application fee', async () => {
@@ -129,19 +129,22 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: chooseAnApplication.whatDoYouWantToApplyForQuestion,
       option: chooseAnApplication.setAsideRadioOption,
     });
-    await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performAction('When the user clicks the button', askTheCourtToSetAsideTheOrder.startNowButton);
+    await performValidation('Then the user sees the main header', doYouNeedHelpPayingTheFee.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
       question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
       option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
     });
-    await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
+    await performValidation('Then the user sees the main header', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
     await performAction('confirmYouHaveAppliedForFeeHelp', {
       question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
       option: haveYouAlreadyAppliedForHelpWithFees.noRadioOption,
       label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
-    await performValidation('mainHeader', youNeedToApplyForHelpWithYourApplicationFee.mainHeader);
+    await performValidation(
+      'Then the user sees the main header',
+      youNeedToApplyForHelpWithYourApplicationFee.mainHeader
+    );
   });
 });

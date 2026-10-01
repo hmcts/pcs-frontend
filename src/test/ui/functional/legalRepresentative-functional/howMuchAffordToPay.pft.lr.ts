@@ -2,7 +2,7 @@ import { howMuchAffordToPay } from '../../data/page-data/lr-page-data';
 import { performAction, performValidation } from '../../utils/controller';
 
 export async function howMuchAffordToPayErrorValidation(): Promise<void> {
-  await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
+  await performAction('When the user clicks the button', howMuchAffordToPay.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: howMuchAffordToPay.thereIsAProblemErrorMessageHeader,
     message1: howMuchAffordToPay.selectHowFrequentlyDefendantCouldAffordErrorMessage,
@@ -15,7 +15,7 @@ export async function howMuchAffordToPayErrorValidation(): Promise<void> {
     howMuchAffordToPay.billionTextInput
   );
   await performAction('clickRadioButton', howMuchAffordToPay.weeklyRadioOption);
-  await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
+  await performAction('When the user clicks the button', howMuchAffordToPay.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: howMuchAffordToPay.thereIsAProblemErrorMessageHeader,
     message: howMuchAffordToPay.mustBeLessThanBillionErrorMessage,
@@ -27,7 +27,7 @@ export async function howMuchAffordToPayErrorValidation(): Promise<void> {
     howMuchAffordToPay.negativeTextInput
   );
   await performAction('clickRadioButton', howMuchAffordToPay.every2WeeksRadioOption);
-  await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
+  await performAction('When the user clicks the button', howMuchAffordToPay.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: howMuchAffordToPay.thereIsAProblemErrorMessageHeader,
     message: howMuchAffordToPay.negativeValueErrorMessage,
@@ -39,7 +39,7 @@ export async function howMuchAffordToPayErrorValidation(): Promise<void> {
     howMuchAffordToPay.incorrectFormatTextInput
   );
   await performAction('clickRadioButton', howMuchAffordToPay.every4weeksRadioOption);
-  await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
+  await performAction('When the user clicks the button', howMuchAffordToPay.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: howMuchAffordToPay.thereIsAProblemErrorMessageHeader,
     message: howMuchAffordToPay.enterAmountInTheCorrectFormatErrorMessage,

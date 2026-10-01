@@ -2,7 +2,7 @@ import { feedback, landlordLicensed, landlordRegistered } from '../data/page-dat
 import { performAction, performValidation } from '../utils/controller';
 
 export async function landlordLicensedErrorValidation(): Promise<void> {
-  await performAction('clickButton', landlordLicensed.saveAndContinueButton);
+  await performAction('When the user clicks the button', landlordLicensed.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: landlordLicensed.thereIsAProblemErrorMessageHeader,
     message: landlordLicensed.selectIfYouAgreeWithLandlordsClaimLicensedErrorMessage,

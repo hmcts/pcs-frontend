@@ -13,14 +13,14 @@ import { performAction, performValidation } from '../utils/controller';
 const charLimitInputText = generateRandomString(6501);
 export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
   //mandatory radio button selection
-  await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+  await performAction('When the user clicks the button', nonRentArrearsDispute.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
     message: nonRentArrearsDispute.selectIfYouWantToDisputeErrorMessage,
   });
   //mandatory input field validation for 'Yes' radio button selection
   await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
-  await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+  await performAction('When the user clicks the button', nonRentArrearsDispute.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
     message: nonRentArrearsDispute.partsOfClaimDoNotAgreeErrorMessage,
@@ -43,7 +43,7 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
     nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
     nonRentArrearsDispute.emojiTextInput
   );
-  await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+  await performAction('When the user clicks the button', nonRentArrearsDispute.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
     message: nonRentArrearsDispute.emojiExplainPartsOfClaimErrorMessage,
@@ -52,7 +52,7 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
   // Char limit
   await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
   await performAction('inputText', nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel, charLimitInputText);
-  await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+  await performAction('When the user clicks the button', nonRentArrearsDispute.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
     message: nonRentArrearsDispute.charLimitErrorMessage,

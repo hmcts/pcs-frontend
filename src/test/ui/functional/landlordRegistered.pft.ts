@@ -3,7 +3,7 @@ import { disputeClaimInterstitial, feedback, landlordRegistered } from '../data/
 import { performAction, performValidation } from '../utils/controller';
 
 export async function landlordRegisteredErrorValidation(): Promise<void> {
-  await performAction('clickButton', landlordRegistered.saveAndContinueButton);
+  await performAction('When the user clicks the button', landlordRegistered.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: landlordRegistered.thereIsAProblemErrorMessageHeader,
     message: landlordRegistered.selectIfYouAgreeWithLandlordsClaimRegisteredErrorMessage,

@@ -2,7 +2,7 @@ import { confirmIfTheseDocumentsRelateToAnApplication } from '../../data/page-da
 import { performAction, performValidation } from '../../utils/controller';
 
 export async function confirmDocumentsRelateToApplicationErrorValidation(): Promise<void> {
-  await performAction('clickButton', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
+  await performAction('When the user clicks the button', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
   await performValidation('errorMessage', {
     header: confirmIfTheseDocumentsRelateToAnApplication.thereIsAProblemErrorMessageHeader,
     message: confirmIfTheseDocumentsRelateToAnApplication.confirmIfTheseErrorMessage,

@@ -2,7 +2,7 @@ import { checkYourAnswersRTC } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function checkYourAnswersRTCErrorValidation(): Promise<void> {
-  await performAction('clickButton', checkYourAnswersRTC.submitButton);
+  await performAction('When the user clicks the button', checkYourAnswersRTC.submitButton);
   await performValidation('errorMessage', {
     header: checkYourAnswersRTC.thereIsAProblemErrorMessageHeader,
     message: checkYourAnswersRTC.ifYouUnderstandErrorMessage,

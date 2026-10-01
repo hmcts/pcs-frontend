@@ -3,7 +3,7 @@ import { performAction, performValidation } from '../utils/controller';
 
 export async function accessYourCaseErrorValidation(): Promise<void> {
   // Test 1: Empty validation - both fields empty
-  await performAction('clickButton', accessYourCase.continueButton);
+  await performAction('When the user clicks the button', accessYourCase.continueButton);
   await performValidation('errorMessage', {
     header: accessYourCase.thereIsAProblemErrorMessageHeader,
     message: accessYourCase.enterYourClaimNumberErrorMessage,
@@ -25,7 +25,7 @@ export async function accessYourCaseErrorValidation(): Promise<void> {
     accessYourCase.accessCodeIncorrectFormatInput
   );
 
-  await performAction('clickButton', accessYourCase.continueButton);
+  await performAction('When the user clicks the button', accessYourCase.continueButton);
   await performValidation('errorMessage', {
     header: accessYourCase.thereIsAProblemErrorMessageHeader,
     message: accessYourCase.claimNumberMustOnlyIncludeNumbersErrorMessage,
@@ -37,7 +37,7 @@ export async function accessYourCaseErrorValidation(): Promise<void> {
     accessYourCase.enterYourClaimNumberLabel,
     accessYourCase.incorrectLengthClaimNumberInput
   );
-  await performAction('clickButton', accessYourCase.continueButton);
+  await performAction('When the user clicks the button', accessYourCase.continueButton);
   await performValidation('errorMessage', {
     header: accessYourCase.thereIsAProblemErrorMessageHeader,
     message: accessYourCase.claimNumberMustBeBetween16And20CharactersErrorMessage,
@@ -49,7 +49,7 @@ export async function accessYourCaseErrorValidation(): Promise<void> {
     accessYourCase.enterYourClaimNumberLabel,
     accessYourCase.incorrectLengthTooLongClaimNumberInput
   );
-  await performAction('clickButton', accessYourCase.continueButton);
+  await performAction('When the user clicks the button', accessYourCase.continueButton);
   await performValidation('errorMessage', {
     header: accessYourCase.thereIsAProblemErrorMessageHeader,
     message: accessYourCase.claimNumberMustBeBetween16And20CharactersErrorMessage,
@@ -66,7 +66,7 @@ export async function accessYourCaseErrorValidation(): Promise<void> {
     accessYourCase.enterYourAccessCodeLabel,
     accessYourCase.accessCodeIncorrectFormatSpecialCharInput
   );
-  await performAction('clickButton', accessYourCase.continueButton);
+  await performAction('When the user clicks the button', accessYourCase.continueButton);
   await performValidation('errorMessage', {
     header: accessYourCase.thereIsAProblemErrorMessageHeader,
     message: accessYourCase.accessCodeMustOnlyIncludeLettersAndNumbersErrorMessage,
@@ -78,7 +78,7 @@ export async function accessYourCaseErrorValidation(): Promise<void> {
     accessYourCase.enterYourAccessCodeLabel,
     accessYourCase.incorrectShortAccessCodeInput
   );
-  await performAction('clickButton', accessYourCase.continueButton);
+  await performAction('When the user clicks the button', accessYourCase.continueButton);
   await performValidation('errorMessage', {
     header: accessYourCase.thereIsAProblemErrorMessageHeader,
     message: accessYourCase.accessCodeMustBe12CharactersErrorMessage,
@@ -90,7 +90,7 @@ export async function accessYourCaseErrorValidation(): Promise<void> {
     accessYourCase.enterYourAccessCodeLabel,
     accessYourCase.incorrectLongAccessCodeInput
   );
-  await performAction('clickButton', accessYourCase.continueButton);
+  await performAction('When the user clicks the button', accessYourCase.continueButton);
   await performValidation('errorMessage', {
     header: accessYourCase.thereIsAProblemErrorMessageHeader,
     message: accessYourCase.accessCodeMustBe12CharactersErrorMessage,

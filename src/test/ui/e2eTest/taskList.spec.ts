@@ -82,8 +82,8 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('navigateToUrl', home_url);
   await performAction('login');
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
-  await performAction('clickButton', dashboard.startYourResponseLink);
-  await performValidation('mainHeader', taskList.mainHeader);
+  await performAction('When the user clicks the button', dashboard.startYourResponseLink);
+  await performValidation('Then the user sees the main header', taskList.mainHeader);
 });
 
 test.afterEach(async () => {
@@ -94,9 +94,11 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
   test('Respond to a claim - TaskList @noDefendants @crossbrowser @NonAutomaticEMV', async () => {
     //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
-    await performAction('taskList', { subSection: taskList.readInformationAboutLink });
-    await performAction('clickButton', startNow.startNowButton);
-    await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.readInformationAboutLink,
+    });
+    await performAction('When the user clicks the button', startNow.startNowButton);
+    await performAction('When the user clicks the button', freeLegalAdvice.saveForLaterButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -107,33 +109,45 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       ],
       status: 'Available',
     });
-    await performAction('taskList', { subSection: taskList.readInformationAboutLink });
-    await performAction('clickButton', startNow.startNowButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.readInformationAboutLink,
+    });
+    await performAction('When the user clicks the button', startNow.startNowButton);
     await performAction('clickRadioButton', freeLegalAdvice.yesRadioOption);
-    await performAction('clickButton', freeLegalAdvice.saveForLaterButton);
+    await performAction('When the user clicks the button', freeLegalAdvice.saveForLaterButton);
 
-    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
-    await performAction('inputDefendantDetails', {
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.confirmDetailsLink,
+    });
+    await performAction('When the user enters the defendant details', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
-    await performAction('clickButton', defendantDateOfBirth.saveForLaterButton);
-    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction('When the user clicks the button', defendantDateOfBirth.saveForLaterButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
+    });
     await performAction(
-      'disputeClaimInterstitial',
+      'When the user responds to the dispute claim interstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
     await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
-    await performAction('clickButton', tenancyTypeDetails.saveForLaterButton);
-    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('When the user clicks the button', tenancyTypeDetails.saveForLaterButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.householdAndCircumstancesLink,
+    });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('clickRadioButton', doYouHaveAnyDependantChildren.noRadioOption);
-    await performAction('clickButton', doYouHaveAnyDependantChildren.saveForLaterButton);
-    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performAction('When the user clicks the button', doYouHaveAnyDependantChildren.saveForLaterButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.incomeAndExpensesLink,
+    });
     await performAction('clickRadioButton', incomeAndExpenses.noRadioOption);
-    await performAction('clickButton', incomeAndExpenses.saveForLaterButton);
-    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
-    await performAction('clickButton', uploadFiles.saveForLaterButton);
+    await performAction('When the user clicks the button', incomeAndExpenses.saveForLaterButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.uploadDocumentsLink,
+    });
+    await performAction('When the user clicks the button', uploadFiles.saveForLaterButton);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -145,7 +159,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     });
     await performAction('clickLink', taskList.backLink);
     await performValidation('text', { elementType: 'link', text: dashboard.continueYourResponseLink });
-    await performAction('clickButton', dashboard.continueYourResponseLink);
+    await performAction('When the user clicks the button', dashboard.continueYourResponseLink);
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -155,33 +169,37 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       ],
       status: 'In progress',
     });
-    await performAction('taskList', { subSection: taskList.readInformationAboutLink });
-    await performAction('clickButton', startNow.startNowButton);
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction('clickButton', 'Save and continue');
-    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
-    await performAction('inputDefendantDetails', {
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.readInformationAboutLink,
+    });
+    await performAction('When the user clicks the button', startNow.startNowButton);
+    await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
+    await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('When the user clicks the button', 'Save and continue');
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.confirmDetailsLink,
+    });
+    await performAction('When the user enters the defendant details', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
-    await performAction('enterDateOfBirthDetails', {
+    await performAction('And the user enters the date of birth details', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('selectCorrespondenceAddressKnown', {
+    await performAction('And the user selects whether the correspondence address is known', {
       radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
       postcode: correspondenceAddress.walesPostcodeTextInput,
     });
-    await performAction('selectContactPreferenceEmailOrPost', {
+    await performAction('And the user selects the contact preference (email or post)', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
-    await performAction('selectContactByTelephone', {
+    await performAction('And the user selects contact by telephone', {
       radioOption: contactPreferencesTelephone.yesRadioOption,
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
@@ -189,17 +207,19 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       radioOption: contactPreferencesTextMessage.yesRadioOption,
       mobileNumber: contactPreferencesTextMessage.ukMobileNumberTextInput,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction('When the user clicks the button', 'Save and continue');
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
+    });
     await performAction(
-      'disputeClaimInterstitial',
+      'When the user responds to the dispute claim interstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
-    await performAction('tenancyOrContractTypeDetails', {
+    await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadNoDefendants.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
     });
-    await performAction('enterTenancyStartDetailsUnKnown', {
+    await performAction('And the user enters the tenancy start details when unknown', {
       tsDay: '15',
       tsMonth: '11',
       tsYear: '2024',
@@ -235,8 +255,10 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('When the user clicks the button', 'Save and continue');
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.householdAndCircumstancesLink,
+    });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('doYouHaveAnyDependantChildren', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.yesRadioOption,
@@ -261,8 +283,10 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performAction('When the user clicks the button', 'Save and continue');
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.incomeAndExpensesLink,
+    });
     await performAction('selectIncomeAndExpenses', {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
@@ -304,10 +328,12 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
-    await performAction('clickButton', 'Save and continue');
-    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+    await performAction('When the user clicks the button', 'Save and continue');
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.uploadDocumentsLink,
+    });
     await performAction('uploadFiles');
-    await performAction('clickButton', 'Save and continue');
+    await performAction('When the user clicks the button', 'Save and continue');
     await performAction('taskListStatus', {
       subSecArray: [
         taskList.readInformationAboutLink,
@@ -322,17 +348,21 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       subSecArray: [taskList.checkYourAnswersAndSubmitHiddenLink],
       status: 'Available',
     });
-    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
+    });
     await performAction(
-      'disputeClaimInterstitial',
+      'When the user responds to the dispute claim interstitial',
       submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
     );
     await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
-    await performAction('clickButton', tenancyTypeDetails.saveForLaterButton);
-    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('When the user clicks the button', tenancyTypeDetails.saveForLaterButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.householdAndCircumstancesLink,
+    });
     await performAction('readYourHouseholdAndCircumstances');
     await performAction('clickRadioButton', doYouHaveAnyDependantChildren.noRadioOption);
-    await performAction('clickButton', doYouHaveAnyDependantChildren.saveForLaterButton);
+    await performAction('When the user clicks the button', doYouHaveAnyDependantChildren.saveForLaterButton);
     await performAction('taskListStatus', {
       subSecArray: [taskList.householdAndCircumstancesLink, taskList.respondToSpecificPartsOfClaimantsClaimLink],
       status: 'In progress',

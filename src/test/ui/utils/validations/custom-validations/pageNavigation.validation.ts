@@ -150,7 +150,7 @@ export class PageNavigationValidation implements IValidation {
   }
 
   private async validateButtonNavigation(page: Page, buttonText: string, fieldName: validationRecord): Promise<void> {
-    await performAction('clickButton', buttonText);
+    await performAction('When the user clicks the button', buttonText);
     await this.validatePageNavigation(page, fieldName);
   }
 
@@ -566,9 +566,7 @@ export class PageNavigationValidation implements IValidation {
     console.log(`   Number of pages passed: ${passedPages.size}`);
     console.log(`   Number of pages failed: ${failedPages.size}`);
     console.log(
-      `   Missing navigation methods: ${
-        PageNavigationValidation.missingNavigationMethods.size + PageNavigationValidation.missingNavigationFiles.size
-      }`
+      `   Missing navigation methods: ${PageNavigationValidation.missingNavigationMethods.size + PageNavigationValidation.missingNavigationFiles.size}`
     );
 
     if (passedPages.size > 0) {

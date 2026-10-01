@@ -5,7 +5,7 @@ import { performAction, performValidation } from '../utils/controller';
 
 export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
   //mandatory radio button selection
-  await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyTypeDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
     message: tenancyTypeDetails.selectIfTenancyDetailsErrorMessage,
@@ -15,14 +15,14 @@ export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
     question: tenancyTypeDetails.isTenancyTypeCorrectQuestion,
     option: tenancyTypeDetails.noRadioOption,
   });
-  await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyTypeDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
     message: tenancyTypeDetails.enterCorrectTenancyDetailsErrorMessage,
   });
   //character limit error validation
   await performAction('inputText', tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel, generateRandomString(61));
-  await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyTypeDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
     message: tenancyTypeDetails.characterLimitErrorMessage,
@@ -33,7 +33,7 @@ export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
     tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
     tenancyTypeDetails.emojiTextInput
   );
-  await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyTypeDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
     message: tenancyTypeDetails.emojiGiveTheCorrectTenancyTypeErrorMessage,

@@ -475,9 +475,7 @@ export function validateForm(
               const translatedMsg = translations?.[fieldName];
               if (!translatedMsg) {
                 logger.debug(
-                  `No translation found for validator of field "${fieldName}". Available keys: ${Object.keys(
-                    translations || {}
-                  ).join(', ')}`
+                  `No translation found for validator of field "${fieldName}". Available keys: ${Object.keys(translations || {}).join(', ')}`
                 );
               }
             }

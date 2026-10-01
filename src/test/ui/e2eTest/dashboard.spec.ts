@@ -45,7 +45,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
   test('Validate address, case number and links on the dashboard @smoke @regression @crossbrowser @healthCheck', async () => {
-    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('Then the user sees the main header', dashboard.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
     await performActions(
       'Validate I want to... links',
@@ -186,7 +186,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
   });
 
   test('Validate notification and response status @crossbrowser', async ({ page }) => {
-    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('Then the user sees the main header', dashboard.mainHeader);
     await performValidation('text', { elementType: 'subHeader', text: dashboard.aPropertyPossessionClaimSubHeader });
     await performValidation('text', { elementType: 'paragraph', text: dashboard.courtWillArrangeHearingParagraph });
     await performValidation('text', { elementType: 'subHeader', text: dashboard.yourResponseSubHeader });
@@ -224,13 +224,13 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
     await performAction('reloadPage');
     await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
-    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
-    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('When the user clicks the button', counterClaimApplicationFeeAmount.getPayButton('80.00'));
+    await performValidation('Then the user sees the main header', paymentDetails.mainHeader);
     await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
-    await performAction('clickButton', paymentDetails.confirmPaymentButton);
-    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performAction('When the user clicks the button', paymentDetails.confirmPaymentButton);
+    await performValidation('Then the user sees the main header', counterClaimPaymentSuccessful.mainHeader);
     await performAction(
-      'clickButton',
+      'When the user clicks the button',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
     );
     for (let i = 0; i < 12; i++) {
@@ -257,22 +257,22 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
 
   // This test will be skipped until the bugs HDPI-7401 & HDPI-7360 get fixed
   test.skip('Validate View the response page data @regression @crossbrowser', async () => {
-    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('Then the user sees the main header', dashboard.mainHeader);
     await performAction('reloadPage');
     await performAction('respondPossessionClaimAPI', {
       data: respondPossessionClaimApiData.respondPossessionClaimPayload,
       type: 'both',
     });
     await performAction('reloadPage');
-    await performAction('clickButton', dashboard.viewTheResponseSubHeader);
-    await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
+    await performAction('When the user clicks the button', dashboard.viewTheResponseSubHeader);
+    await performValidation('Then the user sees the main header', dashboard.viewTheResponseSubHeader);
     await performAction('verifyResponseDetailsOnViewTheResponsePage');
   });
 
   test('Validate View the claim page data @regression @crossbrowser', async () => {
     await performAction('clickLink', dashboard.viewTheClaimLink);
-    await performValidation('mainHeader', viewTheClaim.mainHeader);
+    await performValidation('Then the user sees the main header', viewTheClaim.mainHeader);
     await performAction('verifyClaimDetailsOnViewTheClaimPage');
-    await performValidation('mainHeader', dashboard.mainHeader);
+    await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
 });

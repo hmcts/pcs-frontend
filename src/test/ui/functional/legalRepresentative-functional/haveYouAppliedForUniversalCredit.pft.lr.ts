@@ -2,7 +2,7 @@ import { haveYouAppliedForUniversalCredit } from '../../data/page-data/lr-page-d
 import { performAction, performValidation } from '../../utils/controller';
 
 export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise<void> {
-  await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+  await performAction('When the user clicks the button', haveYouAppliedForUniversalCredit.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: haveYouAppliedForUniversalCredit.errorValidationHeader,
     message: haveYouAppliedForUniversalCredit.selectIfDefendantAppliedErrorMessage,
@@ -16,7 +16,7 @@ export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise
   await performAction('inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, ' ');
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, ' ');
   await performAction('inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, ' ');
-  await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+  await performAction('When the user clicks the button', haveYouAppliedForUniversalCredit.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: haveYouAppliedForUniversalCredit.errorValidationHeader,
     message: haveYouAppliedForUniversalCredit.enterTheDateErrorMessage,
@@ -26,7 +26,7 @@ export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise
   await performAction('inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, ' ');
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, '11');
   await performAction('inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, '2022');
-  await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+  await performAction('When the user clicks the button', haveYouAppliedForUniversalCredit.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: haveYouAppliedForUniversalCredit.errorValidationHeader,
     message: haveYouAppliedForUniversalCredit.dayMissingErrorMessage,
@@ -36,7 +36,7 @@ export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise
   await performAction('inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, '12');
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, ' ');
   await performAction('inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, '2022');
-  await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+  await performAction('When the user clicks the button', haveYouAppliedForUniversalCredit.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: haveYouAppliedForUniversalCredit.errorValidationHeader,
     message: haveYouAppliedForUniversalCredit.monthMissingErrorMessage,
@@ -46,7 +46,7 @@ export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, '11');
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, '11');
   await performAction('inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, ' ');
-  await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+  await performAction('When the user clicks the button', haveYouAppliedForUniversalCredit.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: haveYouAppliedForUniversalCredit.errorValidationHeader,
     message: haveYouAppliedForUniversalCredit.yearMissingErrorMessage,
@@ -56,7 +56,7 @@ export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise
   await performAction('inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, '32');
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, '11');
   await performAction('inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, '2025');
-  await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+  await performAction('When the user clicks the button', haveYouAppliedForUniversalCredit.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: haveYouAppliedForUniversalCredit.errorValidationHeader,
     message: haveYouAppliedForUniversalCredit.realDateErrorMessage,
@@ -66,7 +66,7 @@ export async function haveYouAppliedForUniversalCreditErrorValidation(): Promise
   await performAction('inputText', haveYouAppliedForUniversalCredit.dayHiddenTextLabel, '20');
   await performAction('inputText', haveYouAppliedForUniversalCredit.monthHiddenTextLabel, '11');
   await performAction('inputText', haveYouAppliedForUniversalCredit.yearHiddenTextLabel, '2030');
-  await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+  await performAction('When the user clicks the button', haveYouAppliedForUniversalCredit.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: haveYouAppliedForUniversalCredit.errorValidationHeader,
     message: haveYouAppliedForUniversalCredit.futureDateErrorMessage,

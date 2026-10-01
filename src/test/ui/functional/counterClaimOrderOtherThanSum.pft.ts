@@ -2,7 +2,7 @@ import { counterClaimOrderOtherThanSum } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function counterClaimOrderOtherThanSumErrorValidation(): Promise<void> {
-  await performAction('clickButton', counterClaimOrderOtherThanSum.saveAndContinueButton);
+  await performAction('When the user clicks the button', counterClaimOrderOtherThanSum.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: counterClaimOrderOtherThanSum.thereIsAProblemErrorMessageHeader,
     message: counterClaimOrderOtherThanSum.enterWhatOrdersErrorMessage,

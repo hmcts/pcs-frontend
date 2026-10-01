@@ -4,7 +4,7 @@ import { performAction, performValidation } from '../utils/controller';
 
 const overMaxLengthString = 'A'.repeat(501);
 export async function repaymentsAgreedErrorValidation(): Promise<void> {
-  await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  await performAction('When the user clicks the button', repaymentsAgreed.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: repaymentsAgreed.thereIsAProblemErrorMessageHeader,
     message: repaymentsAgreed.getSelectAgreementErrorMessage(claimantsName),
@@ -13,13 +13,13 @@ export async function repaymentsAgreedErrorValidation(): Promise<void> {
   await performValidation('elementToBeVisible', repaymentsAgreed.youCanEnterUpToHiddenHintText);
   await performAction('inputText', repaymentsAgreed.giveDetailsHiddenTextLabel, overMaxLengthString);
   await performValidation('elementToBeVisible', repaymentsAgreed.tooManyCharacterHiddenHintText);
-  await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  await performAction('When the user clicks the button', repaymentsAgreed.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: repaymentsAgreed.thereIsAProblemErrorMessageHeader,
     message: repaymentsAgreed.mustBe500CharactersOrFewerErrorMessage,
   });
   await performAction('inputText', repaymentsAgreed.giveDetailsHiddenTextLabel, repaymentsAgreed.emojiTextInput);
-  await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+  await performAction('When the user clicks the button', repaymentsAgreed.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: repaymentsAgreed.thereIsAProblemErrorMessageHeader,
     message: repaymentsAgreed.emojiErrorMessage,

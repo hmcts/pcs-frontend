@@ -2,7 +2,7 @@ import { contactPreferencesTextMessage } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function contactPreferencesTextMessageErrorValidation(): Promise<void> {
-  await performAction('clickButton', contactPreferencesTextMessage.saveAndContinueButton);
+  await performAction('When the user clicks the button', contactPreferencesTextMessage.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferencesTextMessage.thereIsAProblemErrorMessageHeader,
     message: contactPreferencesTextMessage.selectIfYouWantErrorMessage,

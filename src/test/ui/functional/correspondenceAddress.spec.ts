@@ -45,26 +45,28 @@ test.beforeEach(async ({ page }, testInfo) => {
   });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   console.log('caseId', process.env.CASE_NUMBER);
-  await performAction('clickButton', startNow.startNowButton);
+  await performAction('When the user clicks the button', startNow.startNowButton);
 });
 
 //This test case will be deleted once correspondence address functional tests automatically handle page routing - will be implemented in a new story
 test.describe('Correspondence Address - functional test @nightly', async () => {
   test('Correspondent Address Known - Error messages - save for later Validations', async () => {
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
+    await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.confirmDetailsLink,
+    });
     await performAction('confirmDefendantDetails', {
       question: defendantNameConfirmation.mainHeader,
       option: defendantNameConfirmation.yesRadioOption,
     });
-    await performAction('enterDateOfBirthDetails', {
+    await performAction('And the user enters the date of birth details', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
-    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: correspondenceAddress.errorValidation,
       validationType: correspondenceAddress.errorValidationType.radio,
@@ -73,7 +75,7 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       header: correspondenceAddress.errorValidationHeader,
     });
     await performAction('clickRadioButton', correspondenceAddress.noRadioOption);
-    await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
+    await performAction('When the user clicks the button', correspondenceAddress.findAddressHiddenButton);
     await performAction('inputErrorValidation', {
       validationReq: correspondenceAddress.errorValidation,
       validationType: correspondenceAddress.errorValidationType.input,
@@ -81,7 +83,7 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       header: correspondenceAddress.errorValidationHeader,
     });
     await performAction('inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, '12345');
-    await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
+    await performAction('When the user clicks the button', correspondenceAddress.findAddressHiddenButton);
     await performAction('inputErrorValidation', {
       validationReq: correspondenceAddress.errorValidation,
       validationType: correspondenceAddress.errorValidationType.input,
@@ -97,8 +99,8 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
     await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, '');
     await performAction('inputText', correspondenceAddress.townOrCityHiddenTextLabel, '');
     await performAction('inputText', correspondenceAddress.postcodeHiddenTextLabel, '');
-    await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
-    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    await performAction('When the user clicks the button', correspondenceAddress.findAddressHiddenButton);
+    await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: correspondenceAddress.errorValidation,
       validationType: correspondenceAddress.errorValidationType.input,
@@ -110,12 +112,12 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       correspondenceAddress.enterUKPostcodeHiddenTextLabel,
       correspondenceAddress.englandPostcodeTextInput
     );
-    await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
+    await performAction('When the user clicks the button', correspondenceAddress.findAddressHiddenButton);
     await performAction('select', correspondenceAddress.addressSelectHiddenLabel, correspondenceAddress.addressIndex);
     await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, '');
     await performAction('inputText', correspondenceAddress.townOrCityHiddenTextLabel, '');
     await performAction('inputText', correspondenceAddress.postcodeHiddenTextLabel, '');
-    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: correspondenceAddress.errorValidation,
       validationType: correspondenceAddress.errorValidationType.input,
@@ -133,7 +135,7 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       correspondenceAddress.englandTownOrCityTextInput
     );
     await performAction('inputText', correspondenceAddress.postcodeHiddenTextLabel, 'ABED');
-    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
     await performAction('inputErrorValidation', {
       validationReq: correspondenceAddress.errorValidation,
       validationType: correspondenceAddress.errorValidationType.input,
@@ -141,7 +143,7 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       header: correspondenceAddress.errorValidationHeader,
     });
     await performAction('clickRadioButton', correspondenceAddress.yesRadioOption);
-    await performAction('clickButton', correspondenceAddress.saveForLaterButton);
-    await performValidation('mainHeader', taskList.mainHeader);
+    await performAction('When the user clicks the button', correspondenceAddress.saveForLaterButton);
+    await performValidation('Then the user sees the main header', taskList.mainHeader);
   });
 });

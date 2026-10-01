@@ -48,6 +48,6 @@ export class PaymentAction implements IAction {
       }
     }
 
-    await performAction('clickButton', paymentOptions.button);
+    await performAction('When the user clicks the button', paymentOptions.button);
   }
 }

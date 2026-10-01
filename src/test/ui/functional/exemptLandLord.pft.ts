@@ -2,7 +2,7 @@ import { exemptLandLord, feedback, landlordRegistered } from '../data/page-data'
 import { performAction, performValidation } from '../utils/controller';
 
 export async function exemptLandLordErrorValidation(): Promise<void> {
-  await performAction('clickButton', exemptLandLord.saveAndContinueButton);
+  await performAction('When the user clicks the button', exemptLandLord.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: exemptLandLord.thereIsAProblemErrorMessageHeader,
     message: exemptLandLord.selectIfYouAgreeWithExemptLandLordErrorMessage,

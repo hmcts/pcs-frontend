@@ -26,7 +26,7 @@ test.describe('Error page to indicate Page Not Found error @nightly', () => {
 
   test('Invalid caseId validation', async () => {
     await performAction('navigateToUrl', home_url + '/case/1234567891234567/dashboard');
-    await performValidation('mainHeader', 'You do not have access to this page');
+    await performValidation('Then the user sees the main header', 'You do not have access to this page');
     await performValidation('text', {
       text: 'Contact us if you think you should have access, or if you need help with your case.',
       elementType: 'paragraph',
@@ -37,7 +37,7 @@ test.describe('Error page to indicate Page Not Found error @nightly', () => {
     await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
-    await performValidation('mainHeader', 'You do not have access to this page');
+    await performValidation('Then the user sees the main header', 'You do not have access to this page');
     await performValidation('text', {
       text: 'Contact us if you think you should have access, or if you need help with your case.',
       elementType: 'paragraph',
