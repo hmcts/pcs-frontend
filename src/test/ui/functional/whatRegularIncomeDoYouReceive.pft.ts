@@ -7,7 +7,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     question: whatRegularIncomeDoYouReceive.mainHeader,
     option: whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
   });
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
 
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
@@ -75,7 +75,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     question: whatRegularIncomeDoYouReceive.mainHeader,
     option: whatRegularIncomeDoYouReceive.universalCreditParagraph,
   });
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
 
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
@@ -142,7 +142,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     question: whatRegularIncomeDoYouReceive.mainHeader,
     option: whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
   });
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
 
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
@@ -209,7 +209,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     question: whatRegularIncomeDoYouReceive.mainHeader,
     option: whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
   });
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
 
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
@@ -278,7 +278,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     question: whatRegularIncomeDoYouReceive.mainHeader,
     option: whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
   });
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
 
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
@@ -289,7 +289,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
     whatRegularIncomeDoYouReceive.emojiTextInput
   );
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
     message: whatRegularIncomeDoYouReceive.emojiErrorMessage,
@@ -299,7 +299,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
     whatRegularIncomeDoYouReceive.tooManyCharTextInput
   );
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
     message: whatRegularIncomeDoYouReceive.tooManyCharErrorMessage,

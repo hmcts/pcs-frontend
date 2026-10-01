@@ -8,7 +8,10 @@ import { performAction, performValidation } from '../utils/controller';
 
 export async function wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation(): Promise<void> {
   //mandatory selection
-  await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
+  await performAction(
+    'When the user clicks the button',
+    wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton
+  );
   await performValidation('errorMessage', {
     header: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.thereIsAProblemErrorMessageHeader,
     message: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.selectIfYouHadAlternativeAccommodationErrorMessage,
@@ -21,7 +24,10 @@ export async function wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErro
   });
   await performAction('inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, '11');
   await performAction('inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, '2022');
-  await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
+  await performAction(
+    'When the user clicks the button',
+    wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton
+  );
   await performValidation('errorMessage', {
     header: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.thereIsAProblemErrorMessageHeader,
     message: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayMissingErrorMessage,
@@ -30,7 +36,10 @@ export async function wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErro
   //This error message will trigger if no month value is provided
   await performAction('inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayHiddenTextLabel, '12');
   await performAction('inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, '');
-  await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
+  await performAction(
+    'When the user clicks the button',
+    wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton
+  );
   await performValidation('errorMessage', {
     header: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.thereIsAProblemErrorMessageHeader,
     message: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthMissingErrorMessage,
@@ -39,7 +48,10 @@ export async function wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErro
   //This error message will trigger if no year value is provided
   await performAction('inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.monthHiddenTextLabel, '11');
   await performAction('inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, '');
-  await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
+  await performAction(
+    'When the user clicks the button',
+    wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton
+  );
   await performValidation('errorMessage', {
     header: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.thereIsAProblemErrorMessageHeader,
     message: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearMissingErrorMessage,
@@ -48,7 +60,10 @@ export async function wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErro
   //This error message will trigger if invalid date is provided
   await performAction('inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.dayHiddenTextLabel, '32');
   await performAction('inputText', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yearHiddenTextLabel, '2025');
-  await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
+  await performAction(
+    'When the user clicks the button',
+    wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton
+  );
   await performValidation('errorMessage', {
     header: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.thereIsAProblemErrorMessageHeader,
     message: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.realDateErrorMessage,

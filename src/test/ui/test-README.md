@@ -73,7 +73,7 @@ Playwright 1.30+ | TypeScript 4.9+
 
 ```typescript
 initializeExecutor(page);
-await performAction('clickButton', 'LoginButton');
+await performAction('When the user clicks the button', 'LoginButton');
 await performValidation('text', 'WelcomeMsg', 'Welcome!');
 ```
 
@@ -83,7 +83,7 @@ await performValidation('text', 'WelcomeMsg', 'Welcome!');
 await performActionGroup(
   'Login',
   { action: 'inputText', fieldName: 'Email', value: 'test@example.com' },
-  { action: 'clickButton', fieldName: 'Submit' }
+  { action: 'When the user clicks the button', fieldName: 'Submit' }
 );
 
 await performValidationGroup(

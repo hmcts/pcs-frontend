@@ -29,18 +29,18 @@ export class DocumentsAction implements IAction {
   }
 
   private async startEvidenceUpload(data: actionData): Promise<void> {
-    await performAction('clickButton', data);
+    await performAction('When the user clicks the button', data);
   }
 
   private async uploadDocuments(data: actionRecord): Promise<void> {
     if (data?.files) {
       await performAction('uploadFile', data.files);
     }
-    await performAction('clickButton', uploadYourDocuments.continueButton);
+    await performAction('When the user clicks the button', uploadYourDocuments.continueButton);
   }
 
   private async verifyCheckYourAnswers(data: actionRecord): Promise<void> {
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performValidation('Then the user sees the main header', checkYourAnswers.mainHeader);
 
     if (data.relatedApplication) {
       await performValidation('summaryRow', checkYourAnswers.relatedApplicationKey, {
@@ -133,6 +133,6 @@ Actual: "${actualText}"`
       question: confirmDocumentData.question,
       option: selectOption,
     });
-    await performAction('clickButton', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
+    await performAction('When the user clicks the button', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
   }
 }

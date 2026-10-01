@@ -2,20 +2,20 @@ import { correspondenceAddress, defendantDateOfBirth } from '../data/page-data';
 import { performAction, performValidation, performValidations } from '../utils/controller';
 
 export async function correspondenceAddressErrorValidation(): Promise<void> {
-  await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: correspondenceAddress.thereIsAProblemErrorMessageHeader,
     message: correspondenceAddress.pleaseConfirmYourAddressErrorMessage,
   });
   await performAction('clickRadioButton', correspondenceAddress.noRadioOption);
-  await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
+  await performAction('When the user clicks the button', correspondenceAddress.findAddressHiddenButton);
   await performValidation('errorMessage', {
     header: correspondenceAddress.thereIsAProblemErrorMessageHeader,
     message: correspondenceAddress.enterValidPostcodeErrorMessage,
   });
 
   await performAction('inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, '12345');
-  await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
+  await performAction('When the user clicks the button', correspondenceAddress.findAddressHiddenButton);
   await performValidation('errorMessage', {
     header: correspondenceAddress.thereIsAProblemErrorMessageHeader,
     message: correspondenceAddress.postCodeNotFoundErrorMessage,
@@ -26,8 +26,8 @@ export async function correspondenceAddressErrorValidation(): Promise<void> {
     correspondenceAddress.enterUKPostcodeHiddenTextLabel,
     correspondenceAddress.englandPostcodeTextInput
   );
-  await performAction('clickButton', correspondenceAddress.findAddressHiddenButton);
-  await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  await performAction('When the user clicks the button', correspondenceAddress.findAddressHiddenButton);
+  await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: correspondenceAddress.thereIsAProblemErrorMessageHeader,
     message: correspondenceAddress.pleaseSelectAnAddressErrorMessage,
@@ -37,7 +37,7 @@ export async function correspondenceAddressErrorValidation(): Promise<void> {
   await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, '');
   await performAction('inputText', correspondenceAddress.townOrCityHiddenTextLabel, '');
   await performAction('inputText', correspondenceAddress.postcodeHiddenTextLabel, '');
-  await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
   await performValidations(
     'Address related error messages',
     [
@@ -74,7 +74,7 @@ export async function correspondenceAddressErrorValidation(): Promise<void> {
     correspondenceAddress.englandTownOrCityTextInput
   );
   await performAction('inputText', correspondenceAddress.postcodeHiddenTextLabel, 'ABED');
-  await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+  await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: correspondenceAddress.thereIsAProblemErrorMessageHeader,
     message: correspondenceAddress.enterValidPostcodeErrorMessage,

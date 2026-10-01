@@ -4,7 +4,7 @@ import { performAction, performValidation } from '../utils/controller';
 
 export async function doAnyOtherAdultsLiveInYourHomeErrorValidation(): Promise<void> {
   //mandatory selection
-  await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+  await performAction('When the user clicks the button', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doAnyOtherAdultsLiveInYourHome.thereIsAProblemErrorMessageHeader,
     message: doAnyOtherAdultsLiveInYourHome.selectIfAnyOtherAdultsErrorMessage,
@@ -12,7 +12,7 @@ export async function doAnyOtherAdultsLiveInYourHomeErrorValidation(): Promise<v
 
   //no input text provided for 'Yes' radio option
   await performAction('clickRadioButton', doAnyOtherAdultsLiveInYourHome.yesRadioOption);
-  await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+  await performAction('When the user clicks the button', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doAnyOtherAdultsLiveInYourHome.thereIsAProblemErrorMessageHeader,
     message: doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsErrorMessage,
@@ -23,7 +23,7 @@ export async function doAnyOtherAdultsLiveInYourHomeErrorValidation(): Promise<v
     generateRandomString(501)
   );
 
-  await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+  await performAction('When the user clicks the button', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doAnyOtherAdultsLiveInYourHome.thereIsAProblemErrorMessageHeader,
     message: doAnyOtherAdultsLiveInYourHome.mustBe500ErrorMessage,
@@ -36,7 +36,7 @@ export async function doAnyOtherAdultsLiveInYourHomeErrorValidation(): Promise<v
     doAnyOtherAdultsLiveInYourHome.emojiTextInput
   );
 
-  await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+  await performAction('When the user clicks the button', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doAnyOtherAdultsLiveInYourHome.thereIsAProblemErrorMessageHeader,
     message: doAnyOtherAdultsLiveInYourHome.emojiErrorMessage,

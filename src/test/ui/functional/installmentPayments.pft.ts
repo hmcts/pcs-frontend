@@ -3,7 +3,7 @@ import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function installmentPaymentsErrorValidation(): Promise<void> {
-  await performAction('clickButton', installmentPayments.saveAndContinueButton);
+  await performAction('When the user clicks the button', installmentPayments.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: installmentPayments.thereIsAProblemErrorMessageHeader,
     message: installmentPayments.selectWhetherYouWouldLikeToOfferErrorMessage,

@@ -7,7 +7,7 @@ function getClaimantName(): string {
 }
 
 export async function confirmationOfNoticeGivenErrorValidation(): Promise<void> {
-  await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
+  await performAction('When the user clicks the button', confirmationOfNoticeGiven.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: confirmationOfNoticeGiven.thereIsAProblemErrorMessageHeader,
     message: confirmationOfNoticeGiven.selectIfNoticeOfIntentionGivenErrorMessage(getClaimantName()),

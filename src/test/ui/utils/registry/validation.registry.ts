@@ -30,7 +30,7 @@ export class ValidationRegistry {
     ['formLabelValue', new FormLabelValueValidation()],
     ['summaryListValue', new SummaryListValueValidation()],
     ['optionList', new OptionListValidation()],
-    ['mainHeader', new MainHeaderValidation()],
+    ['Then the user sees the main header', new MainHeaderValidation()],
     ['errorMessage', new ErrorMessageValidation()],
     ['inputError', new InputErrorValidation()],
     ['radioButtonChecked', new RadioButtonValidation()],
@@ -51,9 +51,7 @@ export class ValidationRegistry {
     const validation = this.validations.get(validationType);
     if (!validation) {
       throw new Error(
-        `Validation '${validationType}' is not registered. Available validations: ${Array.from(
-          this.validations.keys()
-        ).join(', ')}`
+        `Validation '${validationType}' is not registered. Available validations: ${Array.from(this.validations.keys()).join(', ')}`
       );
     }
     return validation;

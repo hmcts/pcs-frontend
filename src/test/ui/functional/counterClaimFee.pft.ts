@@ -6,7 +6,7 @@ import {
 } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 export async function counterClaimFeeErrorValidation(): Promise<void> {
-  await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+  await performAction('When the user clicks the button', counterClaimFee.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: counterClaimFee.thereIsAProblemErrorMessageHeader,
     message: counterClaimFee.selectIfYouNeedHelpErrorMessage,

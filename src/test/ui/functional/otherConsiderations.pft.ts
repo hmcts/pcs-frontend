@@ -4,14 +4,14 @@ import { performAction, performValidation } from '../utils/controller';
 
 const charLimitInputText = generateRandomString(6401);
 export async function otherConsiderationsErrorValidation(): Promise<void> {
-  await performAction('clickButton', otherConsiderations.saveAndContinueButton);
+  await performAction('When the user clicks the button', otherConsiderations.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: otherConsiderations.thereIsAProblemErrorMessageHeader,
     message: otherConsiderations.selectIfThereIsAnythingElseYouWantToTellTheCourtErrorMessage,
   });
 
   await performAction('clickRadioButton', otherConsiderations.yesRadioOption);
-  await performAction('clickButton', otherConsiderations.saveAndContinueButton);
+  await performAction('When the user clicks the button', otherConsiderations.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: otherConsiderations.thereIsAProblemErrorMessageHeader,
     message: otherConsiderations.giveDetailsAboutWhatYouWantToTellTheCourtErrorMessage,
@@ -20,7 +20,7 @@ export async function otherConsiderationsErrorValidation(): Promise<void> {
   // Char limit
   await performAction('clickRadioButton', otherConsiderations.yesRadioOption);
   await performAction('inputText', otherConsiderations.giveDetailsHiddenTextLabel, charLimitInputText);
-  await performAction('clickButton', otherConsiderations.saveAndContinueButton);
+  await performAction('When the user clicks the button', otherConsiderations.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: otherConsiderations.thereIsAProblemErrorMessageHeader,
     message: otherConsiderations.mustBeUnderCharacterLimitErrorMessage,
@@ -29,7 +29,7 @@ export async function otherConsiderationsErrorValidation(): Promise<void> {
   // emojis
   await performAction('clickRadioButton', otherConsiderations.yesRadioOption);
   await performAction('inputText', otherConsiderations.giveDetailsHiddenTextLabel, otherConsiderations.emojiTextInput);
-  await performAction('clickButton', otherConsiderations.saveAndContinueButton);
+  await performAction('When the user clicks the button', otherConsiderations.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: otherConsiderations.thereIsAProblemErrorMessageHeader,
     message: otherConsiderations.emojiExplainPartsOfClaimErrorMessage,

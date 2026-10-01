@@ -5,7 +5,7 @@ import {
 } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 export async function uploadFilesToSupportYourCounterclaimErrorValidation(): Promise<void> {
-  await performAction('clickButton', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
+  await performAction('When the user clicks the button', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: uploadFilesToSupportYourCounterclaim.thereIsAProblemErrorMessageHeader,
     message: uploadFilesToSupportYourCounterclaim.selectAFileErrorMessage,

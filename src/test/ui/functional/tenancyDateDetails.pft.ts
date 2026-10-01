@@ -2,7 +2,7 @@ import { feedback, tenancyDateDetails, tenancyTypeDetails } from '../data/page-d
 import { performAction, performActions, performValidation } from '../utils/controller';
 
 export async function tenancyDateDetailsErrorValidation(): Promise<void> {
-  await performAction('clickButton', tenancyDateDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyDateDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyDateDetails.errorValidationHeader,
     message: tenancyDateDetails.selectIfTheseTenancyDetailsAreCorrectErrorMessage,
@@ -22,7 +22,7 @@ export async function tenancyDateDetailsErrorValidation(): Promise<void> {
     ['inputText', tenancyDateDetails.dayHiddenTextLabel, ''],
     ['inputText', tenancyDateDetails.monthHiddenTextLabel, '12']
   );
-  await performAction('clickButton', tenancyDateDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyDateDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyDateDetails.errorValidationHeader,
     message: tenancyDateDetails.dayMissingErrorMessage,
@@ -32,7 +32,7 @@ export async function tenancyDateDetailsErrorValidation(): Promise<void> {
     ['inputText', tenancyDateDetails.dayHiddenTextLabel, '12'],
     ['inputText', tenancyDateDetails.monthHiddenTextLabel, '']
   );
-  await performAction('clickButton', tenancyDateDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyDateDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyDateDetails.errorValidationHeader,
     message: tenancyDateDetails.monthMissingErrorMessage,
@@ -42,7 +42,7 @@ export async function tenancyDateDetailsErrorValidation(): Promise<void> {
     ['inputText', tenancyDateDetails.monthHiddenTextLabel, '12'],
     ['inputText', tenancyDateDetails.yearHiddenTextLabel, '']
   );
-  await performAction('clickButton', tenancyDateDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyDateDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyDateDetails.errorValidationHeader,
     message: tenancyDateDetails.yearMissingErrorMessage,

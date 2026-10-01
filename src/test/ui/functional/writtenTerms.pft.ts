@@ -2,7 +2,7 @@ import { landlordLicensed, writtenTerms } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function writtenTermsErrorValidation(): Promise<void> {
-  await performAction('clickButton', writtenTerms.saveAndContinueButton);
+  await performAction('When the user clicks the button', writtenTerms.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: writtenTerms.thereIsAProblemErrorMessageHeader,
     message: writtenTerms.selectIfTheLandlordHasSentYouWrittenTermsOfTheOccupationContractErrorMessage,

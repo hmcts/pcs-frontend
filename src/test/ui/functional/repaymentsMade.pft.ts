@@ -3,14 +3,14 @@ import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function repaymentsMadeErrorValidation(): Promise<void> {
-  await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  await performAction('When the user clicks the button', repaymentsMade.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: repaymentsMade.thereIsAProblemErrorMessageHeader,
     message: repaymentsMade.getSelectIfYouPaidAnyMoneyErrorMessage(claimantsName),
   });
 
   await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
-  await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  await performAction('When the user clicks the button', repaymentsMade.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: repaymentsMade.thereIsAProblemErrorMessageHeader,
     message: repaymentsMade.giveDetailsAboutHowMuchYouPaidErrorMessage,
@@ -18,14 +18,14 @@ export async function repaymentsMadeErrorValidation(): Promise<void> {
 
   await performAction('clickRadioButton', repaymentsMade.yesRadioOption);
   await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.detailsCharLimitInputText);
-  await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  await performAction('When the user clicks the button', repaymentsMade.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: repaymentsMade.thereIsAProblemErrorMessageHeader,
     message: repaymentsMade.mustBeUnderCharacterLimitErrorMessage,
   });
   // emoji
   await performAction('inputText', repaymentsMade.giveDetailsHiddenTextLabel, repaymentsMade.emojiTextInput);
-  await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+  await performAction('When the user clicks the button', repaymentsMade.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: repaymentsMade.thereIsAProblemErrorMessageHeader,
     message: repaymentsMade.emojiErrorMessage,

@@ -109,26 +109,26 @@ const isNoticeMethodPayload = (value: actionData | undefined): value is NoticeMe
   typeof value === 'object' && !Array.isArray(value) && value !== null && 'notice_ServiceMethod' in value;
 
 const rtcSectionByAction = new Map<string, string>([
-  ['selectLegalAdvice', 'startNowAndDetails'],
-  ['inputDefendantDetails', 'personalDetails'],
-  ['enterDateOfBirthDetails', 'personalDetails'],
+  ['When the user selects the legal advice option', 'startNowAndDetails'],
+  ['When the user enters the defendant details', 'personalDetails'],
+  ['And the user enters the date of birth details', 'personalDetails'],
   ['confirmDefendantDetails', 'personalDetails'],
-  ['selectCorrespondenceAddressKnown', 'personalDetails'],
+  ['And the user selects whether the correspondence address is known', 'personalDetails'],
   ['selectCorrespondenceAddressUnKnown', 'personalDetails'],
-  ['selectContactPreferenceEmailOrPost', 'personalDetails'],
-  ['selectContactByTelephone', 'personalDetails'],
+  ['And the user selects the contact preference (email or post)', 'personalDetails'],
+  ['And the user selects contact by telephone', 'personalDetails'],
   ['selectContactByTextMessage', 'personalDetails'],
-  ['disputeClaimInterstitial', 'disputeAndTenancy'],
+  ['When the user responds to the dispute claim interstitial', 'disputeAndTenancy'],
   ['selectLandlordRegistered', 'disputeAndTenancy'],
   ['exemptLandLord', 'disputeAndTenancy'],
   ['selectLandlordLicensed', 'disputeAndTenancy'],
   ['selectWrittenTerms', 'disputeAndTenancy'],
-  ['enterTenancyStartDetailsUnKnown', 'disputeAndTenancy'],
+  ['And the user enters the tenancy start details when unknown', 'disputeAndTenancy'],
   ['selectTenancyStartDateKnown', 'disputeAndTenancy'],
   ['selectNoticeDetails', 'disputeAndTenancy'],
   ['enterNoticeDateKnown', 'disputeAndTenancy'],
   ['enterNoticeDateUnknown', 'disputeAndTenancy'],
-  ['tenancyOrContractTypeDetails', 'disputeAndTenancy'],
+  ['And the user enters the tenancy or contract type details', 'disputeAndTenancy'],
   ['rentArrears', 'disputeAndTenancy'],
   ['disputingOtherPartsOfTheClaim', 'disputeAndTenancy'],
   ['selectCounterClaim', 'disputeAndTenancy'],
@@ -163,16 +163,22 @@ export let claimantsName: string;
 export class RespondToClaimAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
-      ['selectLegalAdvice', () => this.selectLegalAdvice(fieldName as actionRecord)],
-      ['selectDoYouHaveASolicitor', () => this.selectDoYouHaveASolicitor(fieldName as actionRecord)],
+      ['When the user selects the legal advice option', () => this.selectLegalAdvice(fieldName as actionRecord)],
+      [
+        'And the user selects whether they have a solicitor',
+        () => this.selectDoYouHaveASolicitor(fieldName as actionRecord),
+      ],
       ['askYourSolicitorToRespond', () => this.askYourSolicitorToRespond(fieldName as actionData)],
-      ['inputDefendantDetails', () => this.inputDefendantDetails(fieldName as actionRecord)],
+      ['When the user enters the defendant details', () => this.inputDefendantDetails(fieldName as actionRecord)],
       ['inputErrorValidation', () => this.inputErrorValidation(fieldName as actionRecord)],
-      ['enterDateOfBirthDetails', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
+      ['And the user enters the date of birth details', () => this.enterDateOfBirthDetails(fieldName as actionRecord)],
       ['confirmDefendantDetails', () => this.confirmDefendantDetails(fieldName as actionRecord)],
-      ['selectCorrespondenceAddressKnown', () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord)],
+      [
+        'And the user selects whether the correspondence address is known',
+        () => this.selectCorrespondenceAddressKnown(fieldName as actionRecord),
+      ],
       ['selectCorrespondenceAddressUnKnown', () => this.selectCorrespondenceAddressUnKnown(fieldName as actionRecord)],
-      ['selectContactByTelephone', () => this.selectContactByTelephone(fieldName as actionRecord)],
+      ['And the user selects contact by telephone', () => this.selectContactByTelephone(fieldName as actionRecord)],
       ['selectContactByTextMessage', () => this.selectContactByTextMessage(fieldName as actionRecord)],
       ['selectTenancyStartDateKnown', () => this.selectTenancyStartDateKnown(fieldName as actionRecord)],
       ['selectNoticeDetails', () => this.selectNoticeDetails(fieldName as actionRecord)],
@@ -180,13 +186,22 @@ export class RespondToClaimAction implements IAction {
       ['enterNoticeDateUnknown', () => this.enterNoticeDateUnknown(fieldName as actionRecord)],
       ['readPaymentInterstitial', () => this.readPaymentInterstitial()],
       ['repaymentsMade', () => this.repaymentsMade(fieldName as actionRecord)],
-      ['selectContactPreferenceEmailOrPost', () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord)],
-      ['disputeClaimInterstitial', () => this.disputeClaimInterstitial(fieldName as actionData)],
+      [
+        'And the user selects the contact preference (email or post)',
+        () => this.selectContactPreferenceEmailOrPost(fieldName as actionRecord),
+      ],
+      [
+        'When the user responds to the dispute claim interstitial',
+        () => this.disputeClaimInterstitial(fieldName as actionData),
+      ],
       ['repaymentsAgreed', () => this.repaymentsAgreed(fieldName as actionRecord)],
       ['exemptLandLord', () => this.exemptLandLord(fieldName as actionData)],
       ['selectLandlordRegistered', () => this.selectLandlordRegistered(fieldName as actionData)],
       ['selectWrittenTerms', () => this.selectWrittenTerms(fieldName as actionRecord)],
-      ['enterTenancyStartDetailsUnKnown', () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord)],
+      [
+        'And the user enters the tenancy start details when unknown',
+        () => this.enterTenancyStartDetailsUnKnown(fieldName as actionRecord),
+      ],
       ['disputingOtherPartsOfTheClaim', () => this.disputingOtherPartsOfTheClaim(fieldName as actionRecord)],
       [
         'counterClaimHaveYouAppliedForHelpWithFee',
@@ -194,7 +209,10 @@ export class RespondToClaimAction implements IAction {
       ],
       ['selectCounterClaim', () => this.selectCounterClaim(fieldName as actionRecord)],
       ['rentArrears', () => this.rentArrears(fieldName as actionRecord)],
-      ['tenancyOrContractTypeDetails', () => this.tenancyOrContractTypeDetails(fieldName as actionRecord)],
+      [
+        'And the user enters the tenancy or contract type details',
+        () => this.tenancyOrContractTypeDetails(fieldName as actionRecord),
+      ],
       ['selectLandlordLicensed', () => this.selectLandlordLicensed(fieldName as actionRecord)],
       ['selectIncomeAndExpenses', () => this.selectIncomeAndExpenses(fieldName as actionRecord)],
       [
@@ -214,7 +232,7 @@ export class RespondToClaimAction implements IAction {
       ],
       ['uploadFilesToSupportCounterclaim', () => this.uploadFilesToSupportCounterclaim(fieldName as actionRecord)],
       ['doYouWantToUploadFiles', () => this.doYouWantToUploadFiles(fieldName as actionRecord)],
-      ['taskList', () => this.taskList(fieldName as actionRecord)],
+      ['And the user navigates to the task list subsection', () => this.taskList(fieldName as actionRecord)],
       ['selectAlternativeAccommodation', () => this.selectAlternativeAccommodation(fieldName as actionRecord)],
       ['installmentPayments', () => this.installmentPayments(fieldName as actionRecord)],
       ['selectHowMuchAffordToPay', () => this.selectHowMuchAffordToPay(fieldName as actionRecord)],
@@ -238,11 +256,17 @@ export class RespondToClaimAction implements IAction {
       ['counterClaimSpecificSumOfMoney', () => this.counterClaimSpecificSumOfMoney(fieldName as actionRecord)],
       ['taskListStatus', () => this.taskListStatus(fieldName as actionRecord)],
       ['resetRTCAnswerStore', () => this.resetRTCAnswerStore()],
-      ['retrieveCYATableDataRTC', () => this.retrieveCYATableDataRTC(page, fieldName as actionData)],
+      [
+        'And the user retrieves the check‑your‑answers table data for the RTC section',
+        () => this.retrieveCYATableDataRTC(page, fieldName as actionData),
+      ],
       ['validateCYARTC', () => this.validateCYARTC(fieldName as actionData)],
       ['changeAnswerOnFinalCYA', () => this.changeAnswerOnFinalCYA(page, fieldName as actionData)],
       ['selectStatementOfTruthRTC', () => this.selectStatementOfTruthRTC(fieldName as actionRecord)],
-      ['validateRTCSectionCYA', () => this.validateRTCSectionCYA(fieldName as actionRecord)],
+      [
+        'Then the user validates the RTC section on the check‑your‑answers page',
+        () => this.validateRTCSectionCYA(fieldName as actionRecord),
+      ],
       ['accessYourCase', () => this.accessYourCase(fieldName as actionRecord)],
       ['selectClaimAgainstWhom', () => this.selectClaimAgainstWhom(fieldName as actionRecord)],
       ['counterClaimAbout', () => this.counterClaimAbout(fieldName as actionRecord)],
@@ -414,7 +438,7 @@ export class RespondToClaimAction implements IAction {
       question: freeLegalAdvice.haveYouHadAnyFreeLegalAdviceQuestion,
       option: legalAdviceData,
     });
-    await performAction('clickButton', freeLegalAdvice.saveAndContinueButton);
+    await performAction('When the user clicks the button', freeLegalAdvice.saveAndContinueButton);
   }
 
   private async selectDoYouHaveASolicitor(solicitorData: actionData) {
@@ -423,11 +447,11 @@ export class RespondToClaimAction implements IAction {
       question: doYouHaveASolicitor.mainHeader,
       option: solicitorData,
     });
-    await performAction('clickButton', doYouHaveASolicitor.saveAndContinueButton);
+    await performAction('When the user clicks the button', doYouHaveASolicitor.saveAndContinueButton);
   }
 
   private async askYourSolicitorToRespond(_askYourSolicitorData: actionData) {
-    await performAction('clickButton', {
+    await performAction('When the user clicks the button', {
       question: askYourSolicitorToRespond.mainHeader,
       button: askYourSolicitorToRespond.closeAndReturnToTaskListButton,
     });
@@ -439,10 +463,10 @@ export class RespondToClaimAction implements IAction {
     const lastNameValue = defendantData.lName ?? selectedPinUser?.lastName;
 
     this.recordRtcCyaName(this.getRtcCyaQuestionLabel(defendantNameCapture.mainHeader), firstNameValue, lastNameValue);
-    await performValidation('mainHeader', defendantNameCapture.mainHeader);
+    await performValidation('Then the user sees the main header', defendantNameCapture.mainHeader);
     await performAction('inputText', defendantNameCapture.firstNameTextLabel, firstNameValue);
     await performAction('inputText', defendantNameCapture.lastNameTextLabel, lastNameValue);
-    await performAction('clickButton', defendantNameCapture.saveAndContinueButton);
+    await performAction('When the user clicks the button', defendantNameCapture.saveAndContinueButton);
   }
 
   private async enterDateOfBirthDetails(defendantData: actionRecord) {
@@ -460,11 +484,11 @@ export class RespondToClaimAction implements IAction {
         ['inputText', defendantDateOfBirth.yearTextLabel, defendantData.dobYear]
       );
     }
-    await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
+    await performAction('When the user clicks the button', defendantDateOfBirth.saveAndContinueButton);
   }
 
   private async confirmDefendantDetails(defendantData: actionRecord) {
-    await performValidation('mainHeader', defendantData.question);
+    await performValidation('Then the user sees the main header', defendantData.question);
     await performAction('clickRadioButton', {
       question: defendantData.question,
       option: defendantData.option,
@@ -478,11 +502,14 @@ export class RespondToClaimAction implements IAction {
       await performAction('inputText', defendantNameConfirmation.firstNameHiddenTextLabel, defendantData.fName);
       await performAction('inputText', defendantNameConfirmation.lastNameHiddenTextLabel, defendantData.lName);
     }
-    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+    await performAction('When the user clicks the button', defendantNameConfirmation.saveAndContinueButton);
   }
 
   private async selectCorrespondenceAddressKnown(addressData: actionRecord) {
-    await performValidation('mainHeader', correspondenceAddress.correspondenceAddressPostalMainHeader);
+    await performValidation(
+      'Then the user sees the main header',
+      correspondenceAddress.correspondenceAddressPostalMainHeader
+    );
     await performAction('clickRadioButton', {
       question: correspondenceAddress.correspondenceAddressConfirmHintText(),
       option: addressData.radioOption,
@@ -494,7 +521,7 @@ export class RespondToClaimAction implements IAction {
         await performActions(
           'Find Address based on postcode',
           ['inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, addressData.postcode],
-          ['clickButton', correspondenceAddress.findAddressHiddenButton],
+          ['When the user clicks the button', correspondenceAddress.findAddressHiddenButton],
           ['select', correspondenceAddress.addressSelectHiddenLabel, addressData.addressIndex]
         );
       } else if (addressData.addressLine1) {
@@ -514,7 +541,7 @@ export class RespondToClaimAction implements IAction {
       this.recordAnswer(correspondenceAddress.correspondenceAddressPostalMainHeader, addressData.radioOption);
     }
 
-    await performAction('clickButton', correspondenceAddress.saveAndContinueButton);
+    await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
   }
 
   private async selectCorrespondenceAddressUnKnown(addressData: actionRecord) {
@@ -570,7 +597,7 @@ export class RespondToClaimAction implements IAction {
         ? this.buildRtcCyaAddressValue(contactPreferenceData.emailAddress)
         : '';
     this.updateRtcCyaContactDetails(undefined, emailAddress);
-    await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+    await performAction('When the user clicks the button', contactPreferenceEmailOrPost.saveAndContinueButton);
   }
 
   private async selectContactByTelephone(contactByPhoneData: actionRecord): Promise<void> {
@@ -594,7 +621,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.updateRtcCyaContactDetails();
     }
-    await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
+    await performAction('When the user clicks the button', contactPreferencesTelephone.saveAndContinueButton);
   }
 
   private async selectContactByTextMessage(contactData: actionRecord): Promise<void> {
@@ -611,7 +638,7 @@ export class RespondToClaimAction implements IAction {
         contactData.mobileNumber
       );
     }
-    await performAction('clickButton', contactPreferencesTextMessage.saveAndContinueButton);
+    await performAction('When the user clicks the button', contactPreferencesTextMessage.saveAndContinueButton);
   }
 
   private async disputeClaimInterstitial(isClaimantNameCorrect: actionData) {
@@ -622,7 +649,7 @@ export class RespondToClaimAction implements IAction {
     }
     const mainHeader = disputeClaimInterstitial.getMainHeader(claimantsName);
     await performValidation('text', { elementType: 'heading', text: mainHeader });
-    await performAction('clickButton', disputeClaimInterstitial.continueButton);
+    await performAction('When the user clicks the button', disputeClaimInterstitial.continueButton);
   }
 
   private async exemptLandLord(exemptLandLordAnswer: actionData): Promise<void> {
@@ -631,7 +658,7 @@ export class RespondToClaimAction implements IAction {
       question: exemptLandLord.isYourLandlordAnExemptSubHeader,
       option: exemptLandLordAnswer,
     });
-    await performAction('clickButton', exemptLandLord.saveAndContinueButton);
+    await performAction('When the user clicks the button', exemptLandLord.saveAndContinueButton);
   }
 
   private async selectLandlordRegistered(registeredData: actionData): Promise<void> {
@@ -640,7 +667,7 @@ export class RespondToClaimAction implements IAction {
       question: landlordRegistered.isYourLandlordRegisteredQuestion,
       option: registeredData,
     });
-    await performAction('clickButton', landlordRegistered.saveAndContinueButton);
+    await performAction('When the user clicks the button', landlordRegistered.saveAndContinueButton);
   }
 
   private async selectLandlordLicensed(licensedLandlordData: actionRecord): Promise<void> {
@@ -649,7 +676,7 @@ export class RespondToClaimAction implements IAction {
       question: licensedLandlordData.question,
       option: licensedLandlordData.radioOption,
     });
-    await performAction('clickButton', landlordLicensed.saveAndContinueButton);
+    await performAction('When the user clicks the button', landlordLicensed.saveAndContinueButton);
   }
 
   private async selectWrittenTerms(writtenTermsData: actionRecord): Promise<void> {
@@ -658,11 +685,11 @@ export class RespondToClaimAction implements IAction {
       question: writtenTermsData.question,
       option: writtenTermsData.radioOption,
     });
-    await performAction('clickButton', writtenTerms.saveAndContinueButton);
+    await performAction('When the user clicks the button', writtenTerms.saveAndContinueButton);
   }
 
   private async readPaymentInterstitial(): Promise<void> {
-    await performAction('clickButton', paymentInterstitial.continueButton);
+    await performAction('When the user clicks the button', paymentInterstitial.continueButton);
   }
   private async repaymentsMade(repaymentsData: actionRecord): Promise<void> {
     const repaymentsMadeQuestion = repaymentsMade.getmainHeader(claimantsName);
@@ -677,7 +704,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.deleteAnswer(repaymentsMade.giveDetailsHiddenTextLabel);
     }
-    await performAction('clickButton', repaymentsMade.saveAndContinueButton);
+    await performAction('When the user clicks the button', repaymentsMade.saveAndContinueButton);
   }
 
   private async repaymentsAgreed(repaymentsAgreedData: actionRecord): Promise<void> {
@@ -697,7 +724,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.deleteAnswer(repaymentsAgreed.giveDetailsHiddenTextLabel);
     }
-    await performAction('clickButton', repaymentsAgreed.saveAndContinueButton);
+    await performAction('When the user clicks the button', repaymentsAgreed.saveAndContinueButton);
   }
 
   private async installmentPayments(installmentData: actionRecord): Promise<void> {
@@ -706,7 +733,7 @@ export class RespondToClaimAction implements IAction {
       question: installmentData.question,
       option: installmentData.radioOption,
     });
-    await performAction('clickButton', installmentPayments.saveAndContinueButton);
+    await performAction('When the user clicks the button', installmentPayments.saveAndContinueButton);
   }
 
   private async selectHowMuchAffordToPay(howMuchToPayData: actionRecord): Promise<void> {
@@ -721,7 +748,7 @@ export class RespondToClaimAction implements IAction {
       question: howMuchToPayData.question,
       option: howMuchToPayData.radioOption,
     });
-    await performAction('clickButton', howMuchAffordToPay.saveAndContinueButton);
+    await performAction('When the user clicks the button', howMuchAffordToPay.saveAndContinueButton);
   }
 
   private async selectCounterClaim(counterClaimOption: actionRecord): Promise<void> {
@@ -731,7 +758,7 @@ export class RespondToClaimAction implements IAction {
       option: counterClaimOption.option,
     });
 
-    await performAction('clickButton', counterClaim.saveAndContinueButton);
+    await performAction('When the user clicks the button', counterClaim.saveAndContinueButton);
   }
 
   private async selectIncomeAndExpenses(incomeAndExpenseData: actionRecord): Promise<void> {
@@ -740,14 +767,14 @@ export class RespondToClaimAction implements IAction {
       question: incomeAndExpenses.doYouWantToProvideDetailsHeader,
       option: incomeAndExpenseData.incomeAndExpensesOption,
     });
-    await performAction('clickButton', incomeAndExpenses.saveAndContinueButton);
+    await performAction('When the user clicks the button', incomeAndExpenses.saveAndContinueButton);
   }
 
   private async selectWhatRegularIncomeDoYouReceive(regularIncome?: actionRecord): Promise<void> {
     const regularIncomeQuestionLabel = this.getRtcCyaQuestionLabel(whatRegularIncomeDoYouReceive.mainHeader);
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
       this.recordAnswer(regularIncomeQuestionLabel, rtcNoAnswerProvidedValue);
-      await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+      await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
       return;
     }
 
@@ -786,7 +813,7 @@ export class RespondToClaimAction implements IAction {
 
     this.recordRtcCyaHeadingWithItems(regularIncomeQuestionLabel, selectedRegularIncomeEntries);
 
-    await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+    await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   }
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
@@ -813,7 +840,7 @@ export class RespondToClaimAction implements IAction {
         ['inputText', tenancyDateDetails.yearHiddenTextLabel, tenancyStartDateData.year]
       );
     }
-    await performAction('clickButton', tenancyDateDetails.saveAndContinueButton);
+    await performAction('When the user clicks the button', tenancyDateDetails.saveAndContinueButton);
   }
 
   private async selectNoticeDetails(noticeGivenData: actionRecord): Promise<void> {
@@ -822,7 +849,7 @@ export class RespondToClaimAction implements IAction {
       question: confirmationOfNoticeGiven.getDidClaimantGiveYouQuestion(claimantsName),
       option: noticeGivenData.option,
     });
-    await performAction('clickButton', confirmationOfNoticeGiven.saveAndContinueButton);
+    await performAction('When the user clicks the button', confirmationOfNoticeGiven.saveAndContinueButton);
   }
 
   private async enterNoticeDateKnown(noticeData: actionRecord): Promise<void> {
@@ -856,7 +883,7 @@ export class RespondToClaimAction implements IAction {
         ['inputText', noticeDateWhenProvided.yearTextLabel, noticeData.year]
       );
     }
-    await performAction('clickButton', noticeDateWhenProvided.saveAndContinueButton);
+    await performAction('When the user clicks the button', noticeDateWhenProvided.saveAndContinueButton);
   }
 
   private async enterNoticeDateUnknown(noticeData: actionRecord): Promise<void> {
@@ -874,7 +901,7 @@ export class RespondToClaimAction implements IAction {
         ['inputText', noticeDateWhenNotProvided.yearTextLabel, noticeData.year]
       );
     }
-    await performAction('clickButton', noticeDateWhenNotProvided.saveAndContinueButton);
+    await performAction('When the user clicks the button', noticeDateWhenNotProvided.saveAndContinueButton);
   }
 
   private async enterTenancyStartDetailsUnKnown(tenancyStartData: actionRecord) {
@@ -894,7 +921,7 @@ export class RespondToClaimAction implements IAction {
         ['inputText', tenancyDateUnknown.yearTextLabel, tenancyStartData.tsYear]
       );
     }
-    await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
+    await performAction('When the user clicks the button', tenancyDateUnknown.saveAndContinueButton);
   }
 
   private async selectIfAnyOtherAdultsLiveInYourHouse(adultsInHouseDetails: actionRecord) {
@@ -917,7 +944,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.deleteAnswer(doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel);
     }
-    await performAction('clickButton', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
+    await performAction('When the user clicks the button', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
   }
 
   private async selectAlternativeAccommodation(moveInDetails: actionRecord) {
@@ -944,7 +971,10 @@ export class RespondToClaimAction implements IAction {
     if (moveInDetails.radioOption !== 'Yes') {
       this.deleteRtcCyaDate(moveInDateLabel);
     }
-    await performAction('clickButton', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton);
+    await performAction(
+      'When the user clicks the button',
+      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.saveAndContinueButton
+    );
   }
 
   private async disputingOtherPartsOfTheClaim(doYouWantToDisputeOption: actionRecord): Promise<void> {
@@ -964,7 +994,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.deleteAnswer(nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel);
     }
-    await performAction('clickButton', nonRentArrearsDispute.saveAndContinueButton);
+    await performAction('When the user clicks the button', nonRentArrearsDispute.saveAndContinueButton);
   }
 
   private async counterClaimHaveYouAppliedForHelpWithFee(helpWithFee: actionRecord): Promise<void> {
@@ -987,7 +1017,7 @@ export class RespondToClaimAction implements IAction {
       this.deleteAnswer(rtcCyaLabels.counterClaimHelpWithFeesReference);
       this.deleteAnswer(counterclaimYouNeedToApplyForHelpWithYourFees.helpWithFeesLink);
     }
-    await performAction('clickButton', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
+    await performAction('When the user clicks the button', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
   }
 
   private async rentArrears(rentArrearsInfo: actionRecord): Promise<void> {
@@ -1027,7 +1057,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.deleteAnswer(rentArrears.howMuchDoYouBelieveHiddenTextLabel);
     }
-    await performAction('clickButton', rentArrears.saveAndContinueButton);
+    await performAction('When the user clicks the button', rentArrears.saveAndContinueButton);
   }
 
   private async tenancyOrContractTypeDetails(tenancyTypeDetailsInfo: actionRecord) {
@@ -1096,7 +1126,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.deleteAnswer(tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel);
     }
-    await performAction('clickButton', tenancyTypeDetails.saveAndContinueButton);
+    await performAction('When the user clicks the button', tenancyTypeDetails.saveAndContinueButton);
   }
 
   private async yourCircumstances(yourCircumstancesData: actionRecord): Promise<void> {
@@ -1115,7 +1145,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.deleteAnswer(yourCircumstances.giveDetailsHiddenTextLabel);
     }
-    await performAction('clickButton', yourCircumstances.saveAndContinueButton);
+    await performAction('When the user clicks the button', yourCircumstances.saveAndContinueButton);
   }
 
   private async selectCounterClaimFee(counterClaimFeeOption: actionRecord) {
@@ -1158,7 +1188,7 @@ export class RespondToClaimAction implements IAction {
       question: counterClaimFee.doYouNeedHelpPayingCounterClaimQuestion,
       option: counterClaimFeeOption.radioOption,
     });
-    await performAction('clickButton', counterClaimFee.saveAndContinueButton);
+    await performAction('When the user clicks the button', counterClaimFee.saveAndContinueButton);
   }
 
   private async inputCounterClaimPaymentDetails(paymentData: actionRecord): Promise<void> {
@@ -1174,7 +1204,7 @@ export class RespondToClaimAction implements IAction {
       ['inputText', paymentDetails.postcodeTextLabel, paymentDetails.postcodeTextInput],
       ['inputText', paymentDetails.emailTextLabel, paymentDetails.emailTextInput]
     );
-    await performAction('clickButton', paymentDetails.continueButton);
+    await performAction('When the user clicks the button', paymentDetails.continueButton);
   }
 
   private async validateCounterClaimApplicationFee(feeData: actionRecord): Promise<void> {
@@ -1186,7 +1216,7 @@ export class RespondToClaimAction implements IAction {
       ? counterClaimApplicationFeeAmount.getLrPayButton(String(feeData.fee))
       : counterClaimApplicationFeeAmount.getPayButton(String(feeData.fee));
 
-    await performValidation('mainHeader', mainHeader);
+    await performValidation('Then the user sees the main header', mainHeader);
     await performValidation('summaryListValue', counterClaimApplicationFeeAmount.counterClaimAmountLabel, {
       value: feeData.amount ?? '',
     });
@@ -1218,11 +1248,11 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.deleteAnswer(exceptionalHardship.giveDetailsHiddenTextLabel);
     }
-    await performAction('clickButton', exceptionalHardship.saveAndContinueButton);
+    await performAction('When the user clicks the button', exceptionalHardship.saveAndContinueButton);
   }
 
   private async readYourHouseholdAndCircumstances(): Promise<void> {
-    await performAction('clickButton', yourHouseholdAndCircumstances.continueButton);
+    await performAction('When the user clicks the button', yourHouseholdAndCircumstances.continueButton);
   }
 
   private async doYouHaveAnyOtherDependants(otherDependantsData: actionRecord): Promise<void> {
@@ -1245,7 +1275,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.deleteAnswer(doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel);
     }
-    await performAction('clickButton', doYouHaveAnyOtherDependants.saveAndContinueButton);
+    await performAction('When the user clicks the button', doYouHaveAnyOtherDependants.saveAndContinueButton);
   }
 
   private async doYouHaveAnyDependantChildren(dependantChildrenData: actionRecord): Promise<void> {
@@ -1268,7 +1298,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.deleteAnswer(doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel);
     }
-    await performAction('clickButton', doYouHaveAnyDependantChildren.saveAndContinueButton);
+    await performAction('When the user clicks the button', doYouHaveAnyDependantChildren.saveAndContinueButton);
   }
 
   private async selectUniversalCredit(universalCreditDateData: actionRecord): Promise<void> {
@@ -1299,7 +1329,7 @@ export class RespondToClaimAction implements IAction {
     if (universalCreditDateData.creditRadioOption !== 'Yes') {
       this.deleteRtcCyaDate(rtcCyaLabels.universalCreditApplicationDate);
     }
-    await performAction('clickButton', haveYouAppliedForUniversalCredit.saveAndContinueButton);
+    await performAction('When the user clicks the button', haveYouAppliedForUniversalCredit.saveAndContinueButton);
   }
 
   private async selectPriorityDebts(priorityDebtsData: actionRecord): Promise<void> {
@@ -1308,7 +1338,7 @@ export class RespondToClaimAction implements IAction {
       question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebtsData.option,
     });
-    await performAction('clickButton', priorityDebts.saveAndContinueButton);
+    await performAction('When the user clicks the button', priorityDebts.saveAndContinueButton);
   }
 
   private async selectDoYouWantToUploadDocFoCounterclaim(uploadOption: actionRecord): Promise<void> {
@@ -1316,7 +1346,10 @@ export class RespondToClaimAction implements IAction {
       question: doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader,
       option: uploadOption.option,
     });
-    await performAction('clickButton', doYouWantToUploadFilesToSupportYourCounterclaim.saveAndContinueButton);
+    await performAction(
+      'When the user clicks the button',
+      doYouWantToUploadFilesToSupportYourCounterclaim.saveAndContinueButton
+    );
   }
 
   private async enterPriorityDebtDetails(priorityDebtDetailsData: actionRecord): Promise<void> {
@@ -1343,7 +1376,7 @@ export class RespondToClaimAction implements IAction {
       question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetailsData.option,
     });
-    await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+    await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   }
 
   private async selectWhatOtherRegularExpensesDoYouHave(regularIncome?: actionRecord): Promise<void> {
@@ -1356,7 +1389,7 @@ export class RespondToClaimAction implements IAction {
     if (!Array.isArray(regularIncome?.regularIncomeOptions)) {
       clearRegularExpenseAnswers();
       this.recordRtcCyaSummaryRow(regularExpensesQuestionLabel, []);
-      await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+      await performAction('When the user clicks the button', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
       return;
     }
 
@@ -1387,7 +1420,7 @@ export class RespondToClaimAction implements IAction {
 
     this.recordRtcCyaHeadingWithItems(regularExpensesQuestionLabel, selectedRegularExpenseEntries);
 
-    await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
+    await performAction('When the user clicks the button', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   }
 
   private async taskList(taskListData: actionRecord): Promise<void> {
@@ -1416,7 +1449,7 @@ export class RespondToClaimAction implements IAction {
       question: languageScreenData.question,
       option: languageScreenData.radioOption,
     });
-    await performAction('clickButton', languageUsed.saveAndContinueButton);
+    await performAction('When the user clicks the button', languageUsed.saveAndContinueButton);
   }
   private async selectStatementOfTruthRTC(sot: actionRecord): Promise<void> {
     await performValidation('text', { elementType: 'paragraph', text: checkYourAnswersRTC.statementOfTruthParagraph });
@@ -1428,11 +1461,11 @@ export class RespondToClaimAction implements IAction {
       });
     }
     await performAction('inputText', checkYourAnswersRTC.yourFullNameTextLabel, sot.input);
-    await performAction('clickButton', checkYourAnswersRTC.submitButton);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.submitButton);
   }
 
   private async changeAnswerOnFinalCYA(page: Page, question: actionData): Promise<void> {
-    await performValidation('mainHeader', checkYourAnswersRTC.mainHeader);
+    await performValidation('Then the user sees the main header', checkYourAnswersRTC.mainHeader);
     const questionText = String(question);
     const rows = page.locator('.govuk-summary-list__row');
     const rowCount = await rows.count();
@@ -1476,7 +1509,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.deleteAnswer(otherConsiderations.giveDetailsHiddenTextLabel);
     }
-    await performAction('clickButton', otherConsiderations.saveAndContinueButton);
+    await performAction('When the user clicks the button', otherConsiderations.saveAndContinueButton);
   }
 
   private async uploadFiles(uploadDocs: actionRecord): Promise<void> {
@@ -1487,7 +1520,7 @@ export class RespondToClaimAction implements IAction {
     } else {
       this.recordAnswer(rtcUploadedDocumentsQuestion, rtcNoDocumentsUploadedValue);
     }
-    await performAction('clickButton', uploadFiles.saveAndContinueButton);
+    await performAction('When the user clicks the button', uploadFiles.saveAndContinueButton);
   }
 
   private async doYouWantToUploadFiles(uploadOption: actionRecord): Promise<void> {
@@ -1496,12 +1529,15 @@ export class RespondToClaimAction implements IAction {
       question: doYouWantToUploadFilesToSupportYourCounterclaim.mainHeader,
       option: uploadOption.option,
     });
-    await performAction('clickButton', doYouWantToUploadFilesToSupportYourCounterclaim.saveAndContinueButton);
+    await performAction(
+      'When the user clicks the button',
+      doYouWantToUploadFilesToSupportYourCounterclaim.saveAndContinueButton
+    );
   }
 
   private async uploadFilesToSupportCounterclaim(uploadCounterClaimFiles: actionRecord): Promise<void> {
     await performAction('uploadFile', uploadCounterClaimFiles.files);
-    await performAction('clickButton', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
+    await performAction('When the user clicks the button', uploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   }
 
   private async selectWhatAreYouClaimingFor(claim: actionRecord): Promise<void> {
@@ -1510,7 +1546,7 @@ export class RespondToClaimAction implements IAction {
       question: claim.question,
       option: claim.option,
     });
-    await performAction('clickButton', counterClaimWhatAreYouClaimingFor.saveAndContinueButton);
+    await performAction('When the user clicks the button', counterClaimWhatAreYouClaimingFor.saveAndContinueButton);
   }
 
   private async counterClaimSpecificSumOfMoney(sumOfMoney: actionRecord): Promise<void> {
@@ -1535,7 +1571,7 @@ export class RespondToClaimAction implements IAction {
         sumOfMoney.amount
       );
     }
-    await performAction('clickButton', counterClaimSpecificSumOfMoney.saveAndContinueButton);
+    await performAction('When the user clicks the button', counterClaimSpecificSumOfMoney.saveAndContinueButton);
   }
 
   private async retrieveCYATableDataRTC(page: Page, sectionData?: actionData): Promise<void> {
@@ -1722,12 +1758,12 @@ export class RespondToClaimAction implements IAction {
 
     await performAction('inputText', accessYourCase.enterYourClaimNumberLabel, accessCode.caseNumber);
     await performAction('inputText', accessYourCase.enterYourAccessCodeLabel, pin);
-    await performAction('clickButton', accessYourCase.continueButton);
+    await performAction('When the user clicks the button', accessYourCase.continueButton);
   }
 
   private async readReasonableAdjustmentsTriage(): Promise<void> {
     //this.recordAnswer(reasonableAdjustmentsTriage.mainHeader, reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('When the user clicks the button', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
   }
 
   private async selectClaimAgainstWhom(claimAgainstWhom: actionRecord): Promise<void> {
@@ -1746,7 +1782,7 @@ export class RespondToClaimAction implements IAction {
         option: claimAgainstWhom.radioOption,
       });
     }
-    await performAction('clickButton', counterClaimAgainstWhom.saveAndContinueButton);
+    await performAction('When the user clicks the button', counterClaimAgainstWhom.saveAndContinueButton);
   }
 
   private async counterClaimAbout(claimAbout: actionRecord): Promise<void> {
@@ -1754,7 +1790,7 @@ export class RespondToClaimAction implements IAction {
     this.recordAnswer(counterClaimAbout.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
     await performAction('inputText', counterClaimAbout.whatIsYourCounterClaimLabelText, claimAbout.counterClaimFor);
     await performAction('inputText', counterClaimAbout.whatAreYourReasonsLabelText, claimAbout.reasonsInput);
-    await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+    await performAction('When the user clicks the button', counterClaimAbout.saveAndContinueButton);
   }
 
   private async counterClaimOrderOtherThanSum(cliamOtherThanSum: actionRecord): Promise<void> {
@@ -1770,7 +1806,7 @@ export class RespondToClaimAction implements IAction {
       counterClaimOrderOtherThanSum.whatFactsWouldYouLikeLabelText,
       cliamOtherThanSum.factsInput
     );
-    await performAction('clickButton', counterClaimOrderOtherThanSum.saveAndContinueButton);
+    await performAction('When the user clicks the button', counterClaimOrderOtherThanSum.saveAndContinueButton);
   }
 
   // Below changes are temporary will be changed as part of HDPI-3596
@@ -1798,7 +1834,7 @@ export class RespondToClaimAction implements IAction {
           await performValidation('errorMessage', { header: validationArr.header, message: item.errMessage });
           break;
         case 'checkBox':
-          await performAction('clickButton', validationArr.button);
+          await performAction('When the user clicks the button', validationArr.button);
           await performValidation(
             'inputError',
             !validationArr?.label ? validationArr.question : validationArr.label,
@@ -1821,7 +1857,7 @@ export class RespondToClaimAction implements IAction {
         option,
       });
     }
-    await performAction('clickButton', ra.button);
+    await performAction('When the user clicks the button', ra.button);
   }
 
   private async selectEqualityAndDiversity(diversityData: actionRecord): Promise<void> {
@@ -1830,6 +1866,6 @@ export class RespondToClaimAction implements IAction {
       question: diversityData.question,
       option: diversityData.radioOption,
     });
-    await performAction('clickButton', diversityData.button);
+    await performAction('When the user clicks the button', diversityData.button);
   }
 }

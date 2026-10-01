@@ -16,9 +16,9 @@ export class ClickButtonAction implements IAction {
       )
       .nth(i);
     const actionsMap = new Map<string, () => Promise<void>>([
-      ['clickButton', () => this.clickButton(page, button)],
+      ['When the user clicks the button', () => this.clickButton(page, button)],
       ['clickButtonAndVerifyPageNavigation', () => this.clickButtonAndVerifyPageNavigation(page, button, actionParams)],
-      ['verifyPageAndClickButton', () => this.verifyPageAndClickButton(page, actionParams, button)],
+      ['verifyPageAndWhen the user clicks the button', () => this.verifyPageAndClickButton(page, actionParams, button)],
       ['clickButtonAndWaitForElement', () => this.clickButtonAndWaitForElement(page, button, actionParams)],
     ]);
     const actionToPerform = actionsMap.get(action);

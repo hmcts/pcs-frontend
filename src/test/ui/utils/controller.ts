@@ -170,11 +170,7 @@ export async function performAction(
     displayFieldName = displayValue;
   }
 
-  const stepText = `${action}${
-    displayFieldName !== undefined
-      ? ` - ${typeof displayFieldName === 'object' ? readValuesFromInputObjects(displayFieldName) : displayFieldName}`
-      : ''
-  }${
+  const stepText = `${action}${displayFieldName !== undefined ? ` - ${typeof displayFieldName === 'object' ? readValuesFromInputObjects(displayFieldName) : displayFieldName}` : ''}${
     displayValue !== undefined && value !== undefined
       ? ` with value '${typeof displayValue === 'object' ? readValuesFromInputObjects(displayValue) : displayValue}'`
       : ''
@@ -264,9 +260,7 @@ function readValuesFromInputObjects(obj: object): string {
     const value = (obj as actionRecord)[key];
     let valueString: string;
     if (Array.isArray(value)) {
-      valueString = `[${value
-        .map(item => (typeof item === 'object' ? `{ ${readValuesFromInputObjects(item)} }` : String(item)))
-        .join(', ')}]`;
+      valueString = `[${value.map(item => (typeof item === 'object' ? `{ ${readValuesFromInputObjects(item)} }` : String(item))).join(', ')}]`;
     } else if (typeof value === 'object' && value !== null) {
       valueString = `{ ${readValuesFromInputObjects(value)} }`;
     } else {

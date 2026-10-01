@@ -2,13 +2,13 @@ import { contactPreferencesTelephone } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function contactPreferencesTelephoneErrorValidation(): Promise<void> {
-  await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
+  await performAction('When the user clicks the button', contactPreferencesTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferencesTelephone.thereIsAProblemErrorMessageHeader,
     message: contactPreferencesTelephone.selectWhetherHappyToBeContactedByTelephoneErrorMessage,
   });
   await performAction('clickRadioButton', contactPreferencesTelephone.yesRadioOption);
-  await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
+  await performAction('When the user clicks the button', contactPreferencesTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferencesTelephone.thereIsAProblemErrorMessageHeader,
     message: contactPreferencesTelephone.enterUKPhoneNumberErrorMessage,
@@ -18,7 +18,7 @@ export async function contactPreferencesTelephoneErrorValidation(): Promise<void
     contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel,
     contactPreferencesTelephone.invalidUkPhoneNumberTextInput
   );
-  await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
+  await performAction('When the user clicks the button', contactPreferencesTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferencesTelephone.thereIsAProblemErrorMessageHeader,
     message: contactPreferencesTelephone.enterUKPhoneNumberFormatErrorMessage,
@@ -28,7 +28,7 @@ export async function contactPreferencesTelephoneErrorValidation(): Promise<void
     contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel,
     contactPreferencesTelephone.ukPhoneNumberMoreThan11DigitTextInput
   );
-  await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
+  await performAction('When the user clicks the button', contactPreferencesTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferencesTelephone.thereIsAProblemErrorMessageHeader,
     message: contactPreferencesTelephone.enterUKPhoneNumberFormatErrorMessage,
@@ -38,7 +38,7 @@ export async function contactPreferencesTelephoneErrorValidation(): Promise<void
     contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel,
     contactPreferencesTelephone.ukPhoneNumberWithCountryCodeTextInput
   );
-  await performAction('clickButton', contactPreferencesTelephone.saveAndContinueButton);
+  await performAction('When the user clicks the button', contactPreferencesTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferencesTelephone.thereIsAProblemErrorMessageHeader,
     message: contactPreferencesTelephone.enterUKPhoneNumberFormatErrorMessage,

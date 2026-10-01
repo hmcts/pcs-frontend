@@ -56,7 +56,7 @@ async function validateCitizenCannotAccessCase(page: Page, context: BrowserConte
   await page.getByLabel('Password').fill(resolveIdamPassword());
   await page.getByRole('button', { name: 'Sign in' }).click();
   await page.waitForLoadState();
-  await performValidation('mainHeader', 'You do not have access to this page');
+  await performValidation('Then the user sees the main header', 'You do not have access to this page');
 }
 
 test.beforeEach(async ({ page }, testInfo) => {
@@ -98,7 +98,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   if (!shouldManuallyLinkDefendants) {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor.email);
-    await performAction('clickButton', startNow.startNowButton);
+    await performAction('When the user clicks the button', startNow.startNowButton);
   }
 });
 
@@ -114,7 +114,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
-    await performAction('clickButton', startNow.startNowButton);
+    await performAction('When the user clicks the button', startNow.startNowButton);
     const pinUser = await getPinUserAt(0);
     await performAction('representationLR', {
       question: selectDefendant.whichDefendantQuestion,
@@ -131,7 +131,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
-    await performAction('clickButton', startNow.startNowButton);
+    await performAction('When the user clicks the button', startNow.startNowButton);
     await validateSolicitorCannotAccessCase(page, user.defendantSolicitor3.email);
   });
 
@@ -155,8 +155,8 @@ test.describe('Legal representative organisation access after Notice of Change @
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
-    await performAction('clickButton', startNow.startNowButton);
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader('Test', 'John'));
+    await performAction('When the user clicks the button', startNow.startNowButton);
+    await performValidation('Then the user sees the main header', defendantNameConfirmation.mainHeader('Test', 'John'));
     await performValidation('elementNotToBeVisible', 'Peter Parker');
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader('Test', 'John'),
@@ -166,8 +166,11 @@ test.describe('Legal representative organisation access after Notice of Change @
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor3.email);
-    await performAction('clickButton', startNow.startNowButton);
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader('Peter', 'Parker'));
+    await performAction('When the user clicks the button', startNow.startNowButton);
+    await performValidation(
+      'Then the user sees the main header',
+      defendantNameConfirmation.mainHeader('Peter', 'Parker')
+    );
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader('Peter', 'Parker'),
       option: defendantNameConfirmation.yesRadioOption,
@@ -188,8 +191,8 @@ test.describe('Legal representative organisation access after Notice of Change @
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
-    await performAction('clickButton', startNow.startNowButton);
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader('Test', 'John'));
+    await performAction('When the user clicks the button', startNow.startNowButton);
+    await performValidation('Then the user sees the main header', defendantNameConfirmation.mainHeader('Test', 'John'));
 
     await performAction('linkDefendantToSolicitorForCaseAPI', {
       req: 'Link Solicitor',
@@ -203,8 +206,8 @@ test.describe('Legal representative organisation access after Notice of Change @
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor3.email);
-    await performAction('clickButton', startNow.startNowButton);
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader('Test', 'John'));
+    await performAction('When the user clicks the button', startNow.startNowButton);
+    await performValidation('Then the user sees the main header', defendantNameConfirmation.mainHeader('Test', 'John'));
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader('Test', 'John'),
       option: defendantNameConfirmation.yesRadioOption,
@@ -227,15 +230,15 @@ test.describe('Legal representative organisation access after Notice of Change @
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
-    await performAction('clickButton', startNow.startNowButton);
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader('Test', 'John'));
+    await performAction('When the user clicks the button', startNow.startNowButton);
+    await performValidation('Then the user sees the main header', defendantNameConfirmation.mainHeader('Test', 'John'));
     await performAction('clickRadioButton', {
       question: defendantNameConfirmation.mainHeader('Test', 'John'),
       option: defendantNameConfirmation.noRadioOption,
     });
     await performAction('inputText', defendantNameConfirmation.defendantFirstNameHiddenTextLabel, 'Old');
     await performAction('inputText', defendantNameConfirmation.defendantLastNameHiddenTextLabel, 'Draft');
-    await performAction('clickButton', defendantNameConfirmation.saveForLaterButton);
+    await performAction('When the user clicks the button', defendantNameConfirmation.saveForLaterButton);
 
     await performAction('linkDefendantToSolicitorForCaseAPI', {
       req: 'Link Solicitor',
@@ -249,8 +252,8 @@ test.describe('Legal representative organisation access after Notice of Change @
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor3.email);
-    await performAction('clickButton', startNow.startNowButton);
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader('Test', 'John'));
+    await performAction('When the user clicks the button', startNow.startNowButton);
+    await performValidation('Then the user sees the main header', defendantNameConfirmation.mainHeader('Test', 'John'));
     await performValidation('radioButtonChecked', defendantNameConfirmation.noRadioOption, false);
   });
 
@@ -272,11 +275,14 @@ test.describe('Legal representative organisation access after Notice of Change @
     await page.goto(home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await page.getByRole('button', { name: citizenStartNow.startNowButton }).click();
     await page.waitForLoadState();
-    await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
-    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
-    await performAction('validateRTCSectionCYA', 'startNowAndDetails');
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
+    await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction(
+      'And the user retrieves the check‑your‑answers table data for the RTC section',
+      'startNowAndDetails'
+    );
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
     await performAction('linkDefendantToSolicitorForCaseAPI', {
       req: 'Link Solicitor',
@@ -290,9 +296,9 @@ test.describe('Legal representative organisation access after Notice of Change @
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
-    await performAction('clickButton', startNow.startNowButton);
+    await performAction('When the user clicks the button', startNow.startNowButton);
     await performValidation(
-      'mainHeader',
+      'Then the user sees the main header',
       defendantNameConfirmation.mainHeader(selectedDefendant.firstName, selectedDefendant.lastName)
     );
     await performValidation('radioButtonChecked', defendantNameConfirmation.noRadioOption, false);

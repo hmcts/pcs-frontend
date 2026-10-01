@@ -87,13 +87,13 @@ export class CitizenDashboardAction implements IAction {
     });
     await expect(yourResponseLink).toBeVisible();
     await yourResponseLink.click();
-    await performValidation('mainHeader', notificationData.nextPageHeader);
+    await performValidation('Then the user sees the main header', notificationData.nextPageHeader);
     await page.goBack();
   }
 
   private async validateViewAllApplications(): Promise<void> {
     await performAction('clickLink', dashboard.viewAllApplicationsLink);
-    await performValidation('mainHeader', viewAllApplications.mainHeader);
+    await performValidation('Then the user sees the main header', viewAllApplications.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: viewAllApplications.getCaseNumber() });
     await performValidation('text', { elementType: 'subHeader', text: viewAllApplications.yourApplicationsSubHeader });
     const firstName = pinUsers[0]?.firstName;
@@ -215,6 +215,6 @@ export class CitizenDashboardAction implements IAction {
       text: viewTheClaim.allDocumentsUploadedParagraph,
     });
     await performValidation('text', { elementType: 'link', text: viewTheClaim.documentsPageLink });
-    await performAction('clickButton', viewTheClaim.closeAndReturnButton);
+    await performAction('When the user clicks the button', viewTheClaim.closeAndReturnButton);
   }
 }

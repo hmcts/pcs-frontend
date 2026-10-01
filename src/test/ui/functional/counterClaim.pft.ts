@@ -2,7 +2,7 @@ import { counterClaim, feedback, nonRentArrearsDispute, rentArrears } from '../d
 import { performAction, performValidation } from '../utils/controller';
 
 export async function counterClaimErrorValidation(): Promise<void> {
-  await performAction('clickButton', counterClaim.saveAndContinueButton);
+  await performAction('When the user clicks the button', counterClaim.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: counterClaim.thereIsAProblemErrorMessageHeader,
     message: counterClaim.selectIfYouArePlanningToMakeClaimErrorMessage,

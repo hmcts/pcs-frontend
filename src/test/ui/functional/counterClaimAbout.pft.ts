@@ -2,7 +2,7 @@ import { counterClaimAbout } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function counterClaimAboutErrorValidation(): Promise<void> {
-  await performAction('clickButton', counterClaimAbout.saveAndContinueButton);
+  await performAction('When the user clicks the button', counterClaimAbout.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: counterClaimAbout.thereIsAProblemErrorMessageHeader,
     message: counterClaimAbout.enterWhatYourCounterClaimErrorMessage,
