@@ -326,7 +326,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       // Opening the review starts it afresh: whatever was answered before, and its confirmation, go.
       endReview(req);
       delete req.session.orderReviewOutcomes?.[caseReference];
-      // The draft orders tab links to the review of one order, which pcs-api starts.
+      // The orders tab links to the review of one order, which pcs-api starts.
       const orderId = typeof req.query.orderId === 'string' ? req.query.orderId : undefined;
       const started = await ccdCaseService.startCaseEvent(
         req.session.user!.accessToken,
