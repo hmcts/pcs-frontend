@@ -28,8 +28,8 @@ export interface OrderCaseContext {
 
 /**
  * What an order event sends when it starts: the order, and the case it is made on. The make order event
- * sends the judge their working order, if any; the confirm order review event sends the caseworker the
- * order awaiting review.
+ * sends the judge their working order, if any, or the order a caseworker returned to them with its query; the
+ * confirm order review event sends the caseworker the order awaiting review.
  */
 export interface OrderStart {
   order: {
@@ -38,6 +38,7 @@ export interface OrderStart {
     orderType?: MakeOrderType;
     formData?: FormData;
     docweaveSnapshot?: DocWeaveSnapshot | null;
+    queryFromCaseworker?: string | null;
   };
   caseContext: OrderCaseContext;
 }

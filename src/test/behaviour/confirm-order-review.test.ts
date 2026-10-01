@@ -1,12 +1,13 @@
 import {
   CASE_REFERENCE,
   MANAGE_CASE_URL,
+  type Page,
   type TestApp,
   bootApp,
   check,
+  control,
   eventStarts,
   openPage,
-  openReviewPage,
   recordAttendance,
   refuseNextEvent,
   selectTab,
@@ -35,8 +36,8 @@ function errors(html: string): string[] {
 }
 
 /**
- * The order a judge sends for review from the make order page, with the Docweave document the page
- * built; `edit` changes that document as the judge would in the preview.
+ * The order a judge sends for review from the make order page, an outright order unless a tab is named, with the
+ * Docweave document the page built; `edit` changes that document as the judge would in the preview.
  */
 async function judgesOrder(options: { tab?: string; staffMessage?: string; edit?: () => void } = {}): Promise<Order> {
   const judgeApp = await bootApp();
@@ -44,6 +45,10 @@ async function judgesOrder(options: { tab?: string; staffMessage?: string; edit?
     const page = await openPage((await judgeApp.get(MAKE_ORDER)).text);
     if (options.tab) {
       selectTab(options.tab);
+    } else {
+      // An outright order the make order page would send: possession forthwith, on mandatory grounds.
+      check('outright-possession', 'forthwith');
+      check('outright-grounds-type', 'mandatory');
     }
     recordAttendance();
     if (options.staffMessage) {
@@ -93,10 +98,21 @@ async function caseworkerReviewing(order?: Order): Promise<TestApp> {
   return bootApp({ caseworker: true, orderAwaitingReview: order ?? (await (plainOrder ??= judgesOrder())) });
 }
 
+/** Opens the review of the order, as the caseworker reaches it from the introduction. */
+async function openReview(app: TestApp): Promise<Page> {
+  await app.get(INTRO);
+  return openPage((await app.get(REVIEW)).text);
+}
+
+/** Goes on to issue the order as the review page shows it, which asks for the review dates next. */
+async function issueFromReview(app: TestApp): Promise<void> {
+  const page = await openReview(app);
+  expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(REVIEW_DATES);
+}
+
 /** Takes the caseworker from the introduction to the given page with every answer before it given. */
 async function reachProceedToIssue(app: TestApp): Promise<void> {
-  await app.get(INTRO);
-  expect((await app.post(REVIEW, new URLSearchParams({ action: 'ISSUE' }))).location).toBe(REVIEW_DATES);
+  await issueFromReview(app);
   const dates = await app.post(REVIEW_DATES, new URLSearchParams({ 'has-review-dates': 'no', action: 'continue' }));
   expect(dates.location).toBe(PROCEED_TO_ISSUE);
 }
@@ -176,14 +192,13 @@ describe('confirm order review', () => {
   describe('reviewing the order', () => {
     it("shows the judge's message and their order", async () => {
       app = await caseworkerReviewing(await judgesOrder({ staffMessage: 'Please list for a review in 28 days.' }));
-      await app.get(INTRO);
 
-      await openReviewPage((await app.get(REVIEW)).text);
+      await openReview(app);
 
       expect(document.querySelector('#judge-message')?.textContent).toContain('Please list for a review in 28 days.');
       expect(document.querySelector('[data-order-preview]')?.textContent).toContain('IT IS ORDERED THAT');
       expect(document.querySelector('#judge-edits')).toBeNull();
-      expect(document.querySelector('[data-order-preview] ins, [data-order-preview] del')).toBeNull();
+      expect(document.querySelector('[data-order-preview] .docweave-editor__clause')).toBeNull();
     });
 
     it('tells the caseworker what the judge added and changed in the order', async () => {
@@ -195,32 +210,72 @@ describe('confirm order review', () => {
           },
         })
       );
-      await app.get(INTRO);
 
-      await openReviewPage((await app.get(REVIEW)).text);
+      await openReview(app);
 
       const edits = document.querySelector('#judge-edits')?.textContent;
       expect(edits).toContain('The Judge edited this order');
       expect(edits).toContain('Order preview edited by the Judge');
       expect(edits).toContain('The Judge added wording to the order. Check the wording and any follow-up before issue');
       expect(edits).toContain('The Judge changed generated wording. Check the fields below still reflect the order');
-      // Docweave shows the judge's changes to the generated wording as tracked changes.
+      // Docweave marks the clauses the judge added and changed as its editor showed them.
       const preview = document.querySelector('[data-order-preview]')!;
-      expect([...preview.querySelectorAll('ins')].map(ins => ins.textContent)).toContain(
+      expect(preview.querySelector('.docweave-editor__clause--inserted')?.textContent).toContain(
         'The defendant may apply to vary this order.'
       );
-      const reworded = preview.querySelector('[data-docweave-change="modified"]')!;
-      expect([...reworded.querySelectorAll('ins')].map(ins => ins.textContent).join(' ')).toContain('rewrote');
-      expect(reworded.querySelector('del')).not.toBeNull();
-      expect(document.querySelector('#tracked-changes-key')?.textContent).toContain(
-        'Wording the Judge added is underlined and highlighted. Wording they removed is struck through.'
+      expect(preview.querySelector('.docweave-editor__clause--modified')?.textContent).toContain(
+        'Wording the judge rewrote'
       );
+      expect(document.querySelector('#judge-changes-key')?.textContent).toContain(
+        'Clauses the Judge added are highlighted in green. Generated clauses they changed are highlighted in blue.'
+      );
+    });
+
+    it("shows the judge's answers and wording below their order, for the caseworker to change", async () => {
+      app = await caseworkerReviewing(await judgesOrder({ edit: changeGeneratedWording }));
+
+      const page = await openReview(app);
+
+      expect(control('input[name="claimant-claimant-id-attendance"][value="litigant-in-person"]').checked).toBe(true);
+      expect(control('input[name="defendant-defendant-id-attendance"][value="not-present"]').checked).toBe(true);
+      expect(page.documentText()).toContain('Wording the judge rewrote');
+      expect(document.querySelector('#order-editor')?.textContent).toContain('Wording the judge rewrote');
+    });
+
+    it("keeps the caseworker's changes to the answers and the wording, under the order the judge submitted", async () => {
+      app = await caseworkerReviewing();
+      const page = await openReview(app);
+      check('recitals', 'yes');
+      type('recitals-text', 'Upon hearing the claimant');
+      writeInPreview('The claimant may apply to restore the claim.');
+
+      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(REVIEW_DATES);
+
+      const again = await openPage((await app.get(REVIEW)).text);
+      expect(control<HTMLTextAreaElement>('[name="recitals-text"]').value).toBe('Upon hearing the claimant');
+      expect(again.documentText()).toContain('The claimant may apply to restore the claim.');
+      const judges = document.querySelector('[data-order-preview]')?.textContent;
+      expect(judges).toContain('IT IS ORDERED THAT');
+      expect(judges).not.toContain('Upon hearing the claimant');
+      expect(judges).not.toContain('The claimant may apply to restore the claim.');
+    });
+
+    it('does not go on to issue an order the judge could not have sent', async () => {
+      app = await caseworkerReviewing();
+      const page = await openReview(app);
+      type('current-rent', 'a lot');
+
+      const refused = await app.post(REVIEW, page.body('ISSUE'));
+
+      expect(refused.status).toBe(400);
+      expect(errors(refused.text)).toEqual(['Enter a valid current rent']);
+      await openPage(refused.text);
+      expect(control('[name="current-rent"]').value).toBe('a lot');
     });
 
     it('returns the order to the judge with the query, submitting the event the introduction started', async () => {
       app = await caseworkerReviewing();
-      await app.get(INTRO);
-      const page = await openReviewPage((await app.get(REVIEW)).text);
+      const page = await openReview(app);
       check('send-query', 'yes');
       type('query-to-judge', 'Which defendant does paragraph 2 mean?');
 
@@ -259,8 +314,7 @@ describe('confirm order review', () => {
 
     it('cancels the review, keeping nothing, and returns the caseworker to the case', async () => {
       app = await caseworkerReviewing();
-      await app.get(INTRO);
-      await app.post(REVIEW, new URLSearchParams({ action: 'ISSUE' }));
+      await issueFromReview(app);
 
       const cancelled = await app.get(`${BASE}/cancel`);
 
@@ -273,8 +327,7 @@ describe('confirm order review', () => {
   describe('review dates', () => {
     beforeEach(async () => {
       app = await caseworkerReviewing();
-      await app.get(INTRO);
-      await app.post(REVIEW, new URLSearchParams({ action: 'ISSUE' }));
+      await issueFromReview(app);
     });
 
     it('asks whether there are review dates, then for a real date, a reason and a description of each', async () => {
@@ -422,7 +475,13 @@ describe('confirm order review', () => {
       expect(changed.location).toBe(CHECK_YOUR_ANSWERS);
     });
 
-    it('issues the order with the answers, submitting the event the introduction started', async () => {
+    it("issues the order with the caseworker's changes and answers, submitting the event the introduction started", async () => {
+      const page = await openPage((await app.get(REVIEW)).text);
+      check('recitals', 'yes');
+      type('recitals-text', 'Upon hearing the claimant');
+      writeInPreview('The claimant may apply to restore the claim.');
+      await app.post(REVIEW, page.body('ISSUE'));
+      const { orderType, orderDocument } = Object.fromEntries(page.body());
       await app.post(
         `${REVIEW_DATES}?change=cya`,
         new URLSearchParams({
@@ -446,6 +505,11 @@ describe('confirm order review', () => {
           orderId: 'order-awaiting-review',
           version: 3,
           issue: {
+            order: {
+              orderType,
+              formData: expect.objectContaining({ recitals: 'yes', 'recitals-text': 'Upon hearing the claimant' }),
+              docweaveSnapshot: JSON.parse(orderDocument),
+            },
             reviewDates: [{ date: '2027-03-05', reason: 'UNLESS_ORDER', description: 'Check compliance' }],
             nextStepsComplete: true,
             finalOrder: true,
@@ -455,6 +519,7 @@ describe('confirm order review', () => {
           },
         },
       ]);
+      expect(JSON.stringify(submittedReviews()[0])).toContain('The claimant may apply to restore the claim.');
       expect(submittedEventTokens()).toEqual(['event-token-1']);
 
       const confirmation = parse((await app.get(`${BASE}/order-issued`)).text);

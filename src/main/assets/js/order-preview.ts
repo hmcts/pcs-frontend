@@ -1,8 +1,8 @@
 import { type DocWeaveSnapshot, renderHtml } from '@hmcts-cft/docweave';
 
 /**
- * Shows the judge's order where a page asks for its read-only preview, with the changes they made to the
- * wording Docweave generated shown as tracked changes.
+ * Shows the judge's order where a page asks for its read-only preview, with the clauses they added and
+ * changed marked as Docweave's editor showed them.
  */
 export function initOrderPreview(): void {
   const preview = document.querySelector<HTMLElement>('[data-order-preview]');

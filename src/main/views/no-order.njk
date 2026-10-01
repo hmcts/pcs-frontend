@@ -2,12 +2,13 @@
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
 
-{% set pageHeading = "No order to review" %}
+{# An order event that pcs-api would not start on the chosen order, such as one already reviewed, and why. #}
+{% set pageHeading = heading %}
 
 {% block content %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h1 class="govuk-heading-xl">No order to review</h1>
+      <h1 class="govuk-heading-xl">{{ heading }}</h1>
       {% for reason in reasons %}
         <p class="govuk-body">{{ reason }}</p>
       {% endfor %}

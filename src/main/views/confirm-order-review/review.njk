@@ -7,10 +7,16 @@
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
+{# The make order form's layout, for the Judge's form the caseworker may change. #}
+{% set htmlClasses = "pcs-make-order" %}
+
 {% set pageHeading = "Review an order" %}
+{% set orderPreviewHeading = "Order to issue" %}
 
 {% block page %}
-  <form method="post" action="{{ formAction }}" novalidate>
+  {# The make order page's script runs the Judge's form and its order editor, which it finds by this id. #}
+  <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
+        data-property-address="{{ propertyAddressDisplay }}">
     {{ csrfProtection(csrfToken) }}
 
     {% if edits.added or edits.changed or edits.deleted %}
@@ -43,13 +49,28 @@
       }) }}
     {% endif %}
 
-    <h2 class="govuk-heading-m">Order preview</h2>
-    {% if edits.added or edits.changed or edits.deleted %}
-      <p class="govuk-body" id="tracked-changes-key">
-        Wording the Judge added is underlined and highlighted. Wording they removed is struck through.
-      </p>
-    {% endif %}
-    {% include "confirm-order-review/_order-preview.njk" %}
+    {# What the Judge submitted stays on the page, read only, whatever the caseworker changes below it. #}
+    <details class="govuk-details" open id="judge-order">
+      <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">Order the Judge submitted</span>
+      </summary>
+      <div class="govuk-details__text">
+        {% if edits.added or edits.changed or edits.deleted %}
+          <p class="govuk-body" id="judge-changes-key">
+            Clauses the Judge added are highlighted in green. Generated clauses they changed are highlighted in blue.
+          </p>
+        {% endif %}
+        {% include "confirm-order-review/_order-preview.njk" %}
+      </div>
+    </details>
+
+    <h2 class="govuk-heading-l">Check the order before you issue it</h2>
+    <p class="govuk-body" id="order-changes-guidance">
+      These are the Judge's answers and the order they generate. You can change the answers and the wording
+      of the order. The order the Judge submitted is kept as it is shown above.
+    </p>
+
+    {% include "make-order/_form.njk" %}
 
     {% set queryHtml %}
       {{ govukCharacterCount({

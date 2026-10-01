@@ -2,6 +2,7 @@
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% import "make-order/_compact.njk" as compact with context %}
 
@@ -21,7 +22,6 @@
   <input type="hidden" name="caseContext" value="{{ caseContextJson }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
-  <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
   {{ csrfProtection(csrfToken) }}
 
   <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make an order</h1>
@@ -34,53 +34,22 @@
     {{ claimantNames }} vs {{ defendantNames }}
   </p>
 
+  {% if order.queryFromCaseworker %}
+    {# An order a caseworker returned: their query, which the page keeps if it is shown again with errors. #}
+    <h2 class="govuk-heading-m">Query from the caseworker</h2>
+    <p class="govuk-body">
+      A caseworker returned this order to you with a query. Change the order if you need to, then send it for review again.
+    </p>
+    {{ govukInsetText({
+      html: '<p class="govuk-body pcs-preserve-lines">' + (order.queryFromCaseworker | escape) + '</p>',
+      attributes: { id: "caseworker-query" }
+    }) }}
+    <textarea hidden name="queryFromCaseworker">{{ order.queryFromCaseworker }}</textarea>
+  {% endif %}
+
   <p class="govuk-body">Answer every question unless it says it is optional.</p>
 
-  {% include "make-order/_case-facts.njk" %}
-  {% include "make-order/_attendance.njk" %}
-
-  <h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>
-
-  {{ compact.reveal("recitals", "Recitals", compact.textarea("recitals-text", { label: "Recital paragraphs", optional: true })) }}
-
-  <h2 class="govuk-heading-l govuk-!-margin-top-6">Order type</h2>
-
-  {# One list drives both the tabs and their panels. #}
-  {% set orderTypeTabs = [
-    { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk" },
-    { id: "tab-suspended", type: "SUSPENDED_POSSESSION", label: "Suspended possession", template: "make-order/tabs/_suspended.njk" },
-    { id: "tab-adjournment", type: "ADJOURNMENT", label: "Adjournment", template: "make-order/tabs/_adjournment.njk" },
-    { id: "tab-strike-out", type: "STRIKE_OUT_DISMISSAL", label: "Strike out/dismiss", template: "make-order/tabs/_strike-out.njk" },
-    { id: "tab-free-form", type: "FREE_FORM", label: "Free form", template: "make-order/tabs/_free-form.njk" }
-  ] %}
-
-  {# The macro hardcodes an h2 tab-list heading, so use its markup directly to preserve heading order. #}
-  <div class="govuk-tabs" data-module="govuk-tabs">
-    <h3 class="govuk-tabs__title">Contents</h3>
-
-    <ul class="govuk-tabs__list">
-      {% for tab in orderTypeTabs %}
-        <li class="govuk-tabs__list-item {%- if tab.type == draftOrderType %} govuk-tabs__list-item--selected{% endif %}">
-          <a class="govuk-tabs__tab" href="#{{ tab.id }}" data-order-type="{{ tab.type }}">{{ tab.label }}</a>
-        </li>
-      {% endfor %}
-    </ul>
-
-    {# govuk-frontend expects every panel after the first to start hidden. #}
-    {% for tab in orderTypeTabs %}
-      <div class="govuk-tabs__panel {%- if tab.type != draftOrderType %} govuk-tabs__panel--hidden{% endif %}" id="{{ tab.id }}">
-        {% include tab.template %}
-      </div>
-    {% endfor %}
-  </div>
-
-  {% include "make-order/_costs.njk" %}
-
-  <section class="govuk-!-margin-top-6" aria-labelledby="order-preview-heading">
-    <h2 class="govuk-heading-l" id="order-preview-heading">Order preview</h2>
-    <div id="order-editor" tabindex="-1"></div>
-    <textarea hidden id="order-document" name="orderDocument">{{ orderDocumentJson }}</textarea>
-  </section>
+  {% include "make-order/_form.njk" %}
 
   {{ compact.reveal("staff-message", "Staff message", compact.textarea("staff-message-text", { label: "Message for court staff" })) }}
 
