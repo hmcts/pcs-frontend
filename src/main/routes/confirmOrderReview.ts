@@ -124,8 +124,9 @@ function pageModel(req: Request, review: OrderStart, issues: ValidationIssue[] =
 
 /** How the judge changed the order Docweave generated from their answers, as the review pages tell the caseworker. */
 function judgeEdits(snapshot: DocWeaveSnapshot | null | undefined) {
-  const changes = snapshot ? describeChanges(snapshot) : { inserted: 0, modified: 0, removed: 0 };
-  return { added: changes.inserted > 0, changed: changes.modified > 0, deleted: changes.removed > 0 };
+  const changes = snapshot ? describeChanges(snapshot) : { inserted: 0, modified: 0 };
+  // Docweave does not let the judge remove a generated clause; wording they delete within one is a change.
+  return { added: changes.inserted > 0, changed: changes.modified > 0, deleted: false };
 }
 
 /** The order as the review pages show it: its document for the preview, and how the judge changed it. */
