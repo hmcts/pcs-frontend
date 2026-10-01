@@ -2341,15 +2341,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/api-logs@npm:^0.222.0":
-  version: 0.222.0
-  resolution: "@opentelemetry/api-logs@npm:0.222.0"
-  dependencies:
-    "@opentelemetry/api": "npm:^1.3.0"
-  checksum: 10/bf6944ab9e3f3e415a81eae8b3d25bca3795a512c41def3db1c159136052f03b98f0b9a267a88215ad65078958d34d435c307087c6908dc5a9ed2cdf91d4cfef
-  languageName: node
-  linkType: hard
-
 "@opentelemetry/api@npm:1.9.1, @opentelemetry/api@npm:^1.3.0, @opentelemetry/api@npm:^1.9.0, @opentelemetry/api@npm:^1.9.1":
   version: 1.9.1
   resolution: "@opentelemetry/api@npm:1.9.1"
@@ -2929,18 +2920,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-winston@npm:0.66.0":
-  version: 0.66.0
-  resolution: "@opentelemetry/instrumentation-winston@npm:0.66.0"
-  dependencies:
-    "@opentelemetry/api-logs": "npm:^0.222.0"
-    "@opentelemetry/instrumentation": "npm:^0.222.0"
-  peerDependencies:
-    "@opentelemetry/api": ^1.3.0
-  checksum: 10/97f9ad5bb9eed7d883bf53eda2aa04a45fa19f782b44c6f27e224034f2e4c1426b29460f91c9252642a0647b93ea07e7d561c1313ef0f8a35b7284b90385f296
-  languageName: node
-  linkType: hard
-
 "@opentelemetry/instrumentation-winston@npm:^0.65.0":
   version: 0.65.0
   resolution: "@opentelemetry/instrumentation-winston@npm:0.65.0"
@@ -3348,7 +3327,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/winston-transport@npm:^0.31.0":
+"@opentelemetry/winston-transport@npm:0.31.0, @opentelemetry/winston-transport@npm:^0.31.0":
   version: 0.31.0
   resolution: "@opentelemetry/winston-transport@npm:0.31.0"
   dependencies:
@@ -6723,18 +6702,6 @@ __metadata:
   version: 1.3.1
   resolution: "component-emitter@npm:1.3.1"
   checksum: 10/94550aa462c7bd5a61c1bc480e28554aa306066930152d1b1844a0dd3845d4e5db7e261ddec62ae184913b3e59b55a2ad84093b9d3596a8f17c341514d6c483d
-  languageName: node
-  linkType: hard
-
-"concat-stream@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "concat-stream@npm:2.0.0"
-  dependencies:
-    buffer-from: "npm:^1.0.0"
-    inherits: "npm:^2.0.3"
-    readable-stream: "npm:^3.0.2"
-    typedarray: "npm:^0.0.6"
-  checksum: 10/250e576d0617e7c58e1c4b2dd6fe69560f316d2c962a409f9f3aac794018499ddb31948b1e4296f217008e124cd5d526432097745157fe504b5d9f3dc469eadb
   languageName: node
   linkType: hard
 
@@ -11463,14 +11430,13 @@ __metadata:
   linkType: hard
 
 "multer@npm:^2.3.0":
-  version: 2.3.0
-  resolution: "multer@npm:2.3.0"
+  version: 2.4.0
+  resolution: "multer@npm:2.4.0"
   dependencies:
     append-field: "npm:^1.0.0"
     busboy: "npm:^1.6.0"
-    concat-stream: "npm:^2.0.0"
     type-is: "npm:^1.6.18"
-  checksum: 10/bd939b7d364aea9d859eb7ff7f86811b0ae620e9d4b5684d3ef33e9b336f062b053c06fc2f3d292a5e373835e84828d68ce8bc35aad63df0c5ba5769f146c50e
+  checksum: 10/644efb2eefa60079866c3ed9eb549e76c93bd642af2790c2579b224de9a4a4e0545d8e36aeafca21207445b6d2505e85779dca365351eb6f45fca8ce44a8e605
   languageName: node
   linkType: hard
 
@@ -12091,7 +12057,7 @@ __metadata:
     "@launchdarkly/node-server-sdk": "npm:9.13.6"
     "@ministryofjustice/frontend": "npm:^11.0.0"
     "@opentelemetry/api": "npm:1.9.1"
-    "@opentelemetry/instrumentation-winston": "npm:0.66.0"
+    "@opentelemetry/winston-transport": "npm:0.31.0"
     "@pact-foundation/pact": "npm:17.1.4"
     "@pact-foundation/pact-cli": "npm:18.1.2"
     "@playwright/test": "npm:1.62.1"
@@ -12809,7 +12775,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"readable-stream@npm:^3.0.2, readable-stream@npm:^3.4.0, readable-stream@npm:^3.6.2":
+"readable-stream@npm:^3.4.0, readable-stream@npm:^3.6.2":
   version: 3.6.2
   resolution: "readable-stream@npm:3.6.2"
   dependencies:
@@ -14594,13 +14560,6 @@ __metadata:
   version: 2.12.1
   resolution: "typed-query-selector@npm:2.12.1"
   checksum: 10/d0947b3f6898b7e187c23b284a0b225351530858aaefd3490ff6176df7e5625b0af067281cb980776fa102b313ae7641d2f08774c0a495445676303cfd7dfaf0
-  languageName: node
-  linkType: hard
-
-"typedarray@npm:^0.0.6":
-  version: 0.0.6
-  resolution: "typedarray@npm:0.0.6"
-  checksum: 10/2cc1bcf7d8c1237f6a16c04efc06637b2c5f2d74e58e84665445cf87668b85a21ab18dd751fa49eee6ae024b70326635d7b79ad37b1c370ed2fec6aeeeb52714
   languageName: node
   linkType: hard
 
