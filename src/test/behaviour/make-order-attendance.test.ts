@@ -37,13 +37,8 @@ describe('make an order: attendance', () => {
 
     check('claimant-claimant-id-attendance', 'housing-officer');
     check('defendant-defendant-id-attendance', 'letter-only');
-    expect(await submit()).toBe(400);
-    expect(control('#make-order-error-summary').textContent).toContain(
-      'Enter the name of the person who attended for Claimant 1: Example Housing'
-    );
-    expect(control('#claimant-claimant-id-name-error').textContent).toContain('Enter the name');
-    // A letter needs no name.
-    expect(document.querySelector('#defendant-defendant-id-name-error')).toBeNull();
+    // The name of whoever attended is optional; the order then names their role alone.
+    expect(page.orderText()).toContain('The Court heard from the housing officer on behalf of the claimant.');
 
     type('claimant-claimant-id-name', 'x'.repeat(121));
     expect(await submit()).toBe(400);
@@ -51,16 +46,6 @@ describe('make an order: attendance', () => {
       'Name for Claimant 1: Example Housing must be 120 characters or less'
     );
 
-    // A defendant's duty adviser is named too.
-    check('defendant-defendant-id-attendance', 'duty-adviser');
-    type('claimant-claimant-id-name', 'x'.repeat(120));
-    expect(await submit()).toBe(400);
-    expect(document.querySelector('#claimant-claimant-id-name-error')).toBeNull();
-    expect(control('#defendant-defendant-id-name-error').textContent).toContain(
-      'Enter the name of the person who attended for Defendant 1: Alex Example'
-    );
-
-    check('defendant-defendant-id-attendance', 'letter-only');
     type('claimant-claimant-id-name', 'Harriet Officer');
     expect(page.orderText()).toContain(
       'The Court heard from Harriet Officer, the housing officer on behalf of the claimant.'

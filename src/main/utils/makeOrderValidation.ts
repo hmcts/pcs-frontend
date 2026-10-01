@@ -42,9 +42,6 @@ const ATTENDANCE_CHOICES: Record<AttendanceParty['type'], readonly string[]> = {
   ],
 };
 
-/** Attendance by someone speaking for the party, whom the order names. */
-const NAMED_ATTENDANCE = ['counsel', 'solicitor', 'solicitor-agent', 'housing-officer', 'duty-adviser'];
-
 const MAX_ATTENDANCE_NAME_LENGTH = 120;
 
 const PAYMENT_FREQUENCIES = ['weekly', 'fortnightly', 'monthly'];
@@ -325,8 +322,6 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
     const name = value(formData, `${party.id}-name`);
     if (!ATTENDANCE_CHOICES[party.type].includes(choice)) {
       add(false, `${party.id}-attendance`, `Select how ${party.label} attended`);
-    } else if (NAMED_ATTENDANCE.includes(choice) && !name) {
-      add(false, `${party.id}-name`, `Enter the name of the person who attended for ${party.label}`);
     }
     add(
       name.length <= MAX_ATTENDANCE_NAME_LENGTH,
