@@ -14,6 +14,7 @@ import {
 } from 'openid-client';
 
 import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '../../../../main/modules/oidc';
+import { describeCause } from '../../../../main/modules/oidc/oidc';
 
 import { Logger } from '@modules/logger';
 
@@ -720,6 +721,42 @@ describe('OIDCModule', () => {
         oidcModule.enableFor(mockApp);
         expect(mockApp.locals.oidc).toBe(oidcModule);
       });
+    });
+  });
+
+  describe('describeCause', () => {
+    it('names the error and its code, which is what "fetch failed" hides', () => {
+      const cause = Object.assign(new Error('connect ECONNREFUSED'), { code: 'ECONNREFUSED' });
+
+      expect(describeCause(cause)).toBe('Error: connect ECONNREFUSED (ECONNREFUSED)');
+    });
+
+    it('omits the code when the error has none', () => {
+      expect(describeCause(new TypeError('bad url'))).toBe('TypeError: bad url');
+    });
+
+    it('unwraps the AggregateError undici raises when every address fails', () => {
+      // Its own message is empty, so reporting it directly says no more than "fetch failed".
+      const cause = Object.assign(new Error(''), {
+        name: 'AggregateError',
+        errors: [Object.assign(new Error('connect ETIMEDOUT 10.0.0.1:443'), { code: 'ETIMEDOUT' })],
+      });
+
+      expect(describeCause(cause)).toBe('Error: connect ETIMEDOUT 10.0.0.1:443 (ETIMEDOUT)');
+    });
+
+    it('keeps the outer error when errors is empty or not an Error array', () => {
+      const cause = Object.assign(new Error('nothing nested'), { name: 'AggregateError', errors: [] });
+
+      expect(describeCause(cause)).toBe('AggregateError: nothing nested');
+    });
+
+    it('stringifies a cause that is not an Error', () => {
+      expect(describeCause('socket hang up')).toBe('socket hang up');
+    });
+
+    it('returns undefined when there is no cause', () => {
+      expect(describeCause(undefined)).toBeUndefined();
     });
   });
 });
