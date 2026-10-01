@@ -30,6 +30,7 @@ interface Envelope {
     orderType?: string;
     formData?: Record<string, unknown>;
     docweaveSnapshot?: unknown;
+    queryFromCaseworker?: string;
   };
   caseContext: Record<string, unknown>;
 }
@@ -120,7 +121,19 @@ function ccdStub(): Express {
     ) {
       return res.status(422).json({ callbackErrors: ['The order is no longer waiting for review'] });
     }
-    const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
+    let started = envelope;
+    if (event !== CONFIRM_ORDER_REVIEW && isJudge(req)) {
+      // pcs-api starts the order the judge chose while it is theirs to change, and else their working order:
+      // an order a caseworker returned to them is not that until they choose it.
+      const changeable = ['DRAFT', 'RETURNED_TO_JUDGE'].includes(envelope.order.state);
+      if (chosenOrder && (chosenOrder !== envelope.order.id || !changeable)) {
+        return res.status(422).json({ callbackErrors: ['The order is no longer waiting for you to change it'] });
+      }
+      if (!chosenOrder && envelope.order.state === 'RETURNED_TO_JUDGE') {
+        started = { ...envelope, order: blankCase().order };
+      }
+    }
+    const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(started) } : {};
     const token = `event-token-${startTokens.length + 1}`;
     startTokens.push(token);
     res.json({ token, case_details: { case_data: caseData } });
@@ -192,6 +205,8 @@ export async function bootApp(
     defendants?: { id: string; name: string }[];
     /** A judge's order waiting for a caseworker's review. */
     orderAwaitingReview?: Partial<Envelope['order']>;
+    /** The judge's order as a caseworker returned it to them, with their query. */
+    orderReturnedToJudge?: Partial<Envelope['order']>;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -206,6 +221,16 @@ export async function bootApp(
       formData: {},
       ...options.orderAwaitingReview,
       state: 'SUBMITTED_FOR_REVIEW',
+    };
+  }
+  if (options.orderReturnedToJudge) {
+    envelope.order = {
+      id: 'order-returned',
+      version: 4,
+      orderType: 'FREE_FORM',
+      formData: {},
+      ...options.orderReturnedToJudge,
+      state: 'RETURNED_TO_JUDGE',
     };
   }
   startTokens = [];
@@ -314,8 +339,8 @@ export interface Page {
   orderText(): string;
   /** The order document the page will submit (the editor's current snapshot), as plain text. */
   documentText(): string;
-  /** The form as the browser would submit it. */
-  body(): URLSearchParams;
+  /** The form as the browser would submit it, with the named button if the page has several. */
+  body(action?: string): URLSearchParams;
 }
 
 interface SnapshotNode {
@@ -345,7 +370,10 @@ function snapshotText(json: string): string {
   return lines.join('\n');
 }
 
-/** Loads served HTML into jsdom and starts the page's JavaScript, as a browser would. */
+/**
+ * Loads a served page with the make order form into jsdom and starts its JavaScript, as a browser would: the judge's
+ * make order page, or the caseworker's review of an order, which also shows the judge's order read only.
+ */
 export async function openPage(html: string): Promise<Page> {
   window.history.replaceState(null, '', '/');
   document.open();
@@ -353,10 +381,12 @@ export async function openPage(html: string): Promise<Page> {
   document.close();
   const { initAll } = await import('govuk-frontend');
   const { initMakeOrder, buildOrderDocument, startWithSavedOrderTab } = await import('../../main/assets/js/make-order');
+  const { initOrderPreview } = await import('../../main/assets/js/order-preview');
   // The template's inline script adds these; jsdom does not run it.
   document.body.classList.add('js-enabled', 'govuk-frontend-supported');
   startWithSavedOrderTab(initAll);
   initMakeOrder();
+  initOrderPreview();
   const form = document.querySelector<HTMLFormElement>('#make-order-form');
   if (!form) {
     throw new Error('The make order form is not on the page');
@@ -365,32 +395,7 @@ export async function openPage(html: string): Promise<Page> {
     form,
     orderText: () => buildOrderDocument(form).textContent,
     documentText: () => snapshotText(control<HTMLTextAreaElement>('#order-document').value),
-    body: () => {
-      const body = new URLSearchParams();
-      new FormData(form).forEach((value, name) => body.append(name, String(value)));
-      return body;
-    },
-  };
-}
-
-/** Loads a confirm order review page into jsdom and starts its JavaScript, as a browser would. */
-export async function openReviewPage(html: string): Promise<{ body(action?: string): URLSearchParams }> {
-  window.history.replaceState(null, '', '/');
-  document.open();
-  document.write(html);
-  document.close();
-  const { initAll } = await import('govuk-frontend');
-  const { initOrderPreview } = await import('../../main/assets/js/order-preview');
-  document.body.classList.add('js-enabled', 'govuk-frontend-supported');
-  initAll();
-  initOrderPreview();
-  return {
-    // The form as the browser would submit it with the named button.
     body: action => {
-      const form = document.querySelector<HTMLFormElement>('main form');
-      if (!form) {
-        throw new Error('The page has no form');
-      }
       const body = new URLSearchParams();
       new FormData(form).forEach((value, name) => body.append(name, String(value)));
       if (action) {

@@ -1,3 +1,4 @@
+import type { OrderFormSubmission } from '@utils/makeOrderForm';
 import { parseDate } from '@utils/makeOrderFormat';
 import type { FormData, OrderConfirmationHeader, OrderStart } from '@utils/orderCase';
 
@@ -30,6 +31,8 @@ export interface ReviewDateAnswer {
 
 /** The caseworker's answers so far, as they gave them. */
 export interface OrderReviewAnswers {
+  /** The order to issue, as the review page last sent it: the judge's form and document with the caseworker's changes. */
+  order?: Required<OrderFormSubmission>;
   sendQuery?: boolean;
   queryToJudge?: string;
   hasReviewDates?: 'yes' | 'no';
@@ -43,7 +46,7 @@ export interface OrderReviewAnswers {
 
 /**
  * A caseworker's review of an order, from the event's start on the introductory page to its submission:
- * the order and case it started with, the token to submit it with, and the answers given so far.
+ * the judge's order and the case it started with, the token to submit it with, and the answers given so far.
  */
 export interface OrderReviewSession extends OrderStart {
   eventToken: string;
@@ -150,7 +153,10 @@ export function validateProceedToIssue(answers: OrderReviewAnswers): ValidationI
   return issues;
 }
 
-/** The caseworker's review as pcs-api's confirm order review event takes it. */
+/**
+ * The caseworker's review as pcs-api's confirm order review event takes it. An order returned to the judge
+ * goes back as the judge submitted it, without the caseworker's changes.
+ */
 export function reviewRequest(
   review: OrderReviewSession,
   action: 'RETURN_TO_JUDGE' | 'ISSUE'
@@ -173,6 +179,11 @@ export function reviewRequest(
     orderId: order.id,
     version: order.version,
     issue: {
+      order: answers.order && {
+        orderType: answers.order.orderType,
+        formData: answers.order.formData,
+        docweaveSnapshot: JSON.parse(answers.order.orderDocumentJson || 'null'),
+      },
       reviewDates,
       nextStepsComplete: answers.nextSteps === 'complete',
       finalOrder: answers.finalOrder === 'yes',

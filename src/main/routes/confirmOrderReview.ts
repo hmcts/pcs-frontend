@@ -7,6 +7,8 @@ import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
+import { attendanceParties, orderFormModel } from '@utils/makeOrderForm';
+import { MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   type OrderStart,
   caseHeader,
@@ -129,7 +131,7 @@ function judgeEdits(snapshot: DocWeaveSnapshot | null | undefined) {
   return { added: changes.inserted > 0, changed: changes.modified > 0, deleted: false };
 }
 
-/** The order as the review pages show it: its document for the preview, and how the judge changed it. */
+/** The judge's order as the review pages show it: its document for the preview, and how the judge changed it. */
 function orderModel(review: OrderReviewSession) {
   const snapshot = review.order.docweaveSnapshot;
   return {
@@ -249,6 +251,8 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
 const VIEWS = {
   review: (_req: Request, review: OrderReviewSession) => ({
     ...orderModel(review),
+    // The judge's form, which the caseworker may change: as they last sent it, or else as the judge did.
+    ...orderFormModel(review, review.answers.order),
     answers: review.answers,
     maxQueryLength: MAX_QUERY_LENGTH,
   }),
@@ -297,8 +301,18 @@ function handleSubmitError(req: Request, res: Response, view: View, error: unkno
   throw error;
 }
 
+/** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
+function orderIssues(review: OrderReviewSession): ValidationIssue[] {
+  const { order } = review.answers;
+  return order ? validateMakeOrder(order.orderType, order.formData, attendanceParties(review)) : [];
+}
+
 /** The first page with a question left unanswered, if any: check your answers only shows a complete review. */
-function firstIncompletePage(answers: OrderReviewAnswers): Page | undefined {
+function firstIncompletePage(review: OrderReviewSession): Page | undefined {
+  const { answers } = review;
+  if (!answers.order || orderIssues(review).length) {
+    return 'review';
+  }
   if (validateReviewDates(answers).length) {
     return 'reviewDates';
   }
@@ -333,9 +347,10 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     } catch (error) {
       if (error instanceof CallbackRejectedError) {
         // pcs-api refuses to start the review when the chosen order is not waiting for one.
-        return res.render('confirm-order-review/no-order', {
+        return res.render('no-order', {
           headerModel: xuiHeaderModel(req),
           footerModel: buildFooterModel(),
+          heading: 'No order to review',
           reasons: error.reasons,
           closeUrl: manageCaseDetailsUrl(caseReference),
         });
@@ -357,16 +372,34 @@ export default function confirmOrderReviewRoutes(app: Application): void {
 
   app.post(route('review'), ...inJourney, async (req: Request, res: Response, next) => {
     const review = reviewOf(req)!;
-    review.answers.sendQuery = ticked(req.body['send-query']);
-    review.answers.queryToJudge = text(req.body['query-to-judge']);
+    const {
+      _csrf,
+      action,
+      orderType,
+      orderDocument,
+      'send-query': sendQuery,
+      'query-to-judge': queryToJudge,
+      ...formData
+    } = req.body;
+    review.answers.sendQuery = ticked(sendQuery);
+    review.answers.queryToJudge = text(queryToJudge);
+    const type = choice(orderType, MAKE_ORDER_TYPES);
+    if (type) {
+      // Kept whichever button was pressed, so the page shows the caseworker's changes again.
+      review.answers.order = { orderType: type, formData, orderDocumentJson: text(orderDocument) };
+    }
     try {
-      if (req.body.action === 'RETURN_TO_JUDGE') {
+      if (action === 'RETURN_TO_JUDGE') {
         const issues = validateQuery(review.answers);
         if (issues.length) {
           return render(req, res, 'review', issues);
         }
         await submitReview(req, review, 'RETURN_TO_JUDGE');
         return res.redirect(pageUrl(caseReferenceOf(req), 'referredToJudge'));
+      }
+      const issues = orderIssues(review);
+      if (!review.answers.order || issues.length) {
+        return render(req, res, 'review', issues);
       }
       return res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'));
     } catch (error) {
@@ -456,7 +489,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
   });
 
   app.get(route('checkYourAnswers'), ...inJourney, (req: Request, res: Response) => {
-    const incomplete = firstIncompletePage(reviewOf(req)!.answers);
+    const incomplete = firstIncompletePage(reviewOf(req)!);
     if (incomplete) {
       return res.redirect(pageUrl(caseReferenceOf(req), incomplete));
     }
@@ -470,7 +503,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       return res.redirect(pageUrl(caseReference, 'proceedToIssue'));
     }
     // The answers may have changed since the page showed them, such as in another tab.
-    const incomplete = firstIncompletePage(review.answers);
+    const incomplete = firstIncompletePage(review);
     if (incomplete) {
       return res.redirect(pageUrl(caseReference, incomplete));
     }
