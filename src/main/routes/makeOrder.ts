@@ -26,7 +26,7 @@ interface StartedOrder {
 }
 
 /**
- * Starts the judge's working order, or the order they chose on the case's draft orders tab: one a
+ * Starts the judge's working order, or the order they chose on the case's orders tab: one a
  * caseworker returned to them, which pcs-api starts with the caseworker's query.
  */
 async function startOrderEvent(accessToken: string, caseReference: string, orderId?: string): Promise<StartedOrder> {
@@ -81,7 +81,7 @@ function pageModel(
   };
 }
 
-/** The order the draft orders tab linked to, which the page's URL names for as long as the judge works on it. */
+/** The order the orders tab linked to, which the page's URL names for as long as the judge works on it. */
 function chosenOrderId(req: Request): string | undefined {
   return typeof req.query.orderId === 'string' ? req.query.orderId : undefined;
 }
