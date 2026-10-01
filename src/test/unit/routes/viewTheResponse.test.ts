@@ -705,7 +705,7 @@ describe('viewTheResponse route', () => {
 
   it('does not show the SMS mobile number when it matches the phone number', async () => {
     const data = buildComprehensiveCaseData();
-    data.possessionClaimResponse!.defendantContactDetails!.party!.phoneNumber = '07700900982';
+    data.possessionClaimResponse!.defendantContactDetails!.party!.phoneNumber = '07700 900 982';
     data.possessionClaimResponse!.defendantContactDetails!.party!.textMessageNumber = ' 07700900982 ';
     data.possessionClaimResponse!.defendantResponses!.contactByPhone = 'YES';
     data.possessionClaimResponse!.defendantResponses!.contactByText = 'YES';
