@@ -139,7 +139,6 @@ function validateCosts(formData: Record<string, unknown>, suspended: boolean): M
 function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add, money, date, frequency } = validation(formData);
   const terms = values(formData, 'suspended-payment-terms');
-  const options = values(formData, 'suspended-options');
 
   date('suspended-by-date', 'Enter a valid possession date');
   money('suspended-arrears', 'Enter valid arrears');
@@ -156,10 +155,6 @@ function validateSuspended(formData: Record<string, unknown>): MakeOrderValidati
     money('suspended-instalment-amount', 'Enter a valid instalment amount');
     frequency('suspended-instalment-frequency', 'Select weekly, fortnightly or monthly instalments');
     date('suspended-instalment-date', 'Enter a valid first instalment date');
-  }
-  if (options.includes('use-occupation')) {
-    money('suspended-use-occupation-rate', 'Enter a valid daily rate for use and occupation');
-    date('suspended-use-occupation-from-date', 'Enter a valid start date for use and occupation');
   }
 
   return [...issues, ...validateCosts(formData, true)];
