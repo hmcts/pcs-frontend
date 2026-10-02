@@ -97,6 +97,9 @@ jest.mock('@modules/i18n', () => ({
       'dashboard:notifications.Defendant.CaseIssued.body': 'The claim has been issued to you.',
       'dashboard:notifications.Defendant.ResponseNotStarted.title': 'Your response',
       'dashboard:notifications.Defendant.ResponseNotStarted.body': 'Start your response',
+      'dashboard:notifications.Defendant.CounterClaimFeeUnpaid.title': 'Unpaid counterclaim fee',
+      'dashboard:notifications.Defendant.CounterClaimFeeUnpaid.body':
+        'Pay your counterclaim fee at {{payCounterclaimFeeUrl}}',
     };
     return ((key: string, opts?: { defaultValue?: string }) =>
       strings[key] ?? opts?.defaultValue ?? MISSING) as import('i18next').TFunction;
@@ -503,6 +506,45 @@ describe('Dashboard Routes', () => {
         },
       ]);
       expect(renderArgs.taskGroups[0].tasks[0].href).toBeUndefined();
+    });
+
+    it('should hide unpaid counterclaim fee notification when respond-to-claim is disabled', async () => {
+      mockIsRespondToClaimEnabledForUser.mockResolvedValueOnce(false);
+
+      (ccdCaseService.getDashboardView as jest.Mock).mockResolvedValueOnce({
+        notifications: [
+          { templateId: 'Defendant.CaseIssued', templateValues: {} },
+          { templateId: 'Defendant.CounterClaimFeeUnpaid', templateValues: { feeAmount: '50.00' } },
+        ],
+        taskGroups: [],
+        propertyAddress: null,
+      });
+
+      dashboardRoutes(app);
+      const handler = getDashboardCaseHandler();
+
+      const res = { render: jest.fn() } as unknown as Response;
+      const next: NextFunction = jest.fn();
+
+      await handler(
+        dashboardCaseRequest({
+          caseReference: '1234567890123456',
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        next
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1] as {
+        notifications: unknown[];
+      };
+
+      expect(renderArgs.notifications).toEqual([
+        {
+          title: 'Case issued title',
+          body: 'The claim has been issued to you.',
+        },
+      ]);
     });
   });
 

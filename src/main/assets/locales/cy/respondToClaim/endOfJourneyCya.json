@@ -6,7 +6,7 @@
     "personalDetails": "cy Personal details",
     "claimantsClaim": "cy {{claimantName, pluralPossessive}} claim",
     "dependantsAndOtherResidents": "cy Dependants and other residents",
-    "yourCircumstances": "cy Your circumstances",
+    "yourCircumstances": "Eich amgylchiadau",
     "incomeAndExpenses": "cy Income and expenses",
     "regularIncome": "cy Regular income",
     "universalCredit": "Credyd Cynhwysol",
@@ -18,50 +18,50 @@
   },
   "rows": {
     "uploadedDocuments": {
-      "label": "cy Upload any files that you think are relevant to your response",
+      "label": "Uwchlwythwch unrhyw ffeilio rydych yn meddwl sy'n berthnasol i'ch ymateb.",
       "changeHidden": "cy uploaded files",
       "none": "cy No files uploaded"
     },
     "otherConsiderations": {
       "label": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?",
-      "changeHidden": "cy whether there is anything else you want to tell the court as part of your response"
+      "changeHidden": "Oes yna unrhyw beth arall rydych eisiau ei ddweud wrth y llys fel rhan o'ch ymateb?"
     },
     "otherConsiderationsDetails": {
       "label": "Rhowch fanylion beth arall rydych eisiau ei ddweud wrth y llys",
-      "changeHidden": "cy the details about what else you want to tell the court"
+      "changeHidden": "manylion beth arall rydych eisiau ei ddweud wrth y llys"
     },
     "languageUsed": {
-      "label": "cy Which language did you use to complete your response?",
-      "changeHidden": "cy which language you used to complete your response",
+      "label": "Pa iaith a ddefnyddiwyd gennych i lenwi eich ymateb?",
+      "changeHidden": "pa iaith a ddefnyddiwyd gennych i lenwi eich ymateb",
       "options": {
-        "ENGLISH": "cy English",
-        "WELSH": "cy Welsh",
-        "ENGLISH_AND_WELSH": "cy English and Welsh"
+        "ENGLISH": "Saesneg",
+        "WELSH": "Cymraeg",
+        "ENGLISH_AND_WELSH": "Saesneg a Chymraeg"
       }
     }
   },
   "statementOfTruth": {
     "heading": "Datganiad gwirionedd",
-    "hint": "cy Please check all the details you have entered for accuracy.",
+    "hint": "Gwiriwch yr holl fanylion a roddwyd gennych ar gyfer cywirdeb.",
     "contemptFieldLabel": "Datganiad gwirionedd",
     "contemptOption": "cy I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
     "beliefFieldLabel": "Datganiad gwirionedd",
-    "beliefOption": "cy I believe that the facts stated in this defence form are true.",
-    "legalRepBeliefOption": "cy The defendant believes that the facts stated in this defence form are true. I am authorised by the defendant to submit this statement.",
+    "beliefOption": "Credaf fod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir.",
+    "legalRepBeliefOption": "Creda'r diffynnydd bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir. Fe’m hawdurdodir gan y diffynnydd i lofnodi’r datganiad hwn.",
     "fullNameLabel": "Eich enw llawn",
-    "legalRepFullNameLabel": "cy Full name",
+    "legalRepFullNameLabel": "Enw llawn",
     "nameOfFirmLabel": "cy Name of firm",
     "positionHeldLabel": "cy Position or office held"
   },
   "errors": {
-    "statementOfTruthContempt": "cy Select if you understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth",
-    "statementOfTruthBelief": "cy Select if you believe that the facts stated in this defence form are true",
-    "legalRepStatementOfTruthBelief": "cy Select if the defendant believes that the facts stated in this defence form are true and that you are authorised by the defendant to submit this statement",
-    "fullName": "cy Enter your full name",
+    "statementOfTruthContempt": "Dewiswch os ydych yn deall y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu'n onest ei fod yn wir",
+    "statementOfTruthBelief": "Dewiswch os ydych yn credu bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir",
+    "legalRepStatementOfTruthBelief": "Dewiswch a yw'r diffynnydd yn credu bod y ffeithiau a nodir yn y ffruflen amddifyniad hwn yn wir ac eich bod wedi'ch awdurdodi gan y diffynnydd i gyflwyno'r datganiad hwn.",
+    "fullName": "Nodwch eich enw llawn",
     "fullNameMaxLength": "Rhaid i'ch enw llawn fod yn 100 nod neu lai",
     "nameOfFirm": "cy Enter the name of firm",
-    "nameOfFirmMaxLength": "cy Name of firm must be 100 characters or fewer",
+    "nameOfFirmMaxLength": "Rhaid i'ch enw llawn fod yn 100 nod neu lai",
     "positionHeld": "cy Enter your position or office held",
-    "positionHeldMaxLength": "cy Position or office held must be 100 characters or fewer"
+    "positionHeldMaxLength": "Rhaid i’ch eglurhad fod yn 100 nod neu lai"
   }
 }

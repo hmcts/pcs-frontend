@@ -398,7 +398,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
         formContent
       );
 
-      expect(content.tenancyDocument).toEqual(tenancyLicenceDocument);
+      expect(content.tenancyDocument).toEqual({ id: tenancyLicenceDocument.id });
     });
 
     it('returns the first occupation contract licence document from detailsTab_OccupationContractLicenceDetails.documents', async () => {
@@ -435,7 +435,7 @@ describe('respond-to-claim tenancy-type-details step', () => {
         formContent
       );
 
-      expect(content.tenancyDocument).toEqual(occupationContractDocument);
+      expect(content.tenancyDocument).toEqual({ id: occupationContractDocument.id });
     });
 
     it('returns an empty string when detailsTab_TenancyLicenceDetails exists but tenancyLicenceDocuments is empty', async () => {

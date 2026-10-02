@@ -90,6 +90,9 @@
   "payment": {
     "returnUrl": "PAYMENT_RETURN_URL"
   },
+  "pcq": {
+    "url": "PCQ_URL"
+  },
   "cuiRa": {
     "url": "CUI_RA_URL",
     "hmctsServiceId": "CUI_RA_HMCTS_SERVICE_ID",

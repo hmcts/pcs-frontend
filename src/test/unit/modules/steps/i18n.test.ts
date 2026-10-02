@@ -93,26 +93,35 @@ describe('steps/i18n', () => {
       expect(access).not.toHaveBeenCalled();
     });
 
-    it('should skip loading when a journey-scoped namespace bundle is already cached', async () => {
-      // Namespaces are scoped by journey, so once a (journey, step) bundle
-      // is loaded the next request for the same pair short-circuits — no disk
-      // I/O, no shared mutable state, no race.
+    it('applies the merge even when the raw namespace bundle already exists, then caches it', async () => {
+      // A pre-existing bundle for the namespace (e.g. the fs-backend lazily loaded the raw
+      // userType file) must NOT short-circuit the citizen-base + userType merge — otherwise
+      // any key absent from the userType file silently falls back to English. The skip is
+      // instead driven by whether *this* loader has already applied the merge for the pair.
       (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
+      mockGetUserType.mockReturnValue('citizen');
 
+      const loadNamespaces = jest.fn((_ns: string, cb: (err: unknown) => void) => cb(null));
       const addResourceBundle = jest.fn();
+      // Simulate the fs-backend having already populated the raw namespace bundle.
       const getResourceBundle = jest.fn().mockReturnValue({ already: 'loaded' });
-      const access = jest.spyOn(fs, 'access');
-      const req = buildReq({
-        i18n: { getResourceBundle, addResourceBundle, loadNamespaces: jest.fn() },
-        step: { name: 'test-step', journey: 'folder' },
-      });
+      const access = jest.spyOn(fs, 'access').mockResolvedValue(undefined);
+      jest.spyOn(fs, 'readFile').mockResolvedValue(JSON.stringify({ title: 'Test Title' }));
 
-      await loadStepNamespace(req);
+      const i18n = { getResourceBundle, addResourceBundle, loadNamespaces };
 
-      expect(getResourceBundle).toHaveBeenCalledWith('en', 'folder/testStep');
+      // First request: the pre-existing raw bundle must not prevent the merge from applying.
+      await loadStepNamespace(buildReq({ i18n, step: { name: 'test-step', journey: 'folder' } }));
+      expect(addResourceBundle).toHaveBeenCalledTimes(1);
+      expect(addResourceBundle).toHaveBeenCalledWith('en', 'folder/testStep', { title: 'Test Title' }, true, true);
+
+      access.mockClear();
+
+      // Second request for the same (lang, namespace): now short-circuits, no disk I/O.
+      await loadStepNamespace(buildReq({ i18n, step: { name: 'test-step', journey: 'folder' } }));
+      expect(addResourceBundle).toHaveBeenCalledTimes(1);
       expect(access).not.toHaveBeenCalled();
-      expect(addResourceBundle).not.toHaveBeenCalled();
     });
 
     it('should isolate the same step name across journeys into distinct namespaces', async () => {
@@ -315,8 +324,8 @@ describe('steps/i18n', () => {
 
       await loadStepNamespaces(req, ['stepA', 'stepB'], 'respondToClaim');
 
-      expect(getResourceBundle).toHaveBeenCalledWith('en', 'respondToClaim/stepA');
-      expect(getResourceBundle).toHaveBeenCalledWith('en', 'respondToClaim/stepB');
+      expect(loadNamespaces).toHaveBeenCalledWith('respondToClaim/stepA', expect.any(Function));
+      expect(loadNamespaces).toHaveBeenCalledWith('respondToClaim/stepB', expect.any(Function));
       expect(addResourceBundle).toHaveBeenCalledTimes(2);
       expect(addResourceBundle).toHaveBeenNthCalledWith(
         1,

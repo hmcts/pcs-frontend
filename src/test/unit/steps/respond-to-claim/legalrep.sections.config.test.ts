@@ -1,15 +1,20 @@
 import { legalRepRespondToClaimSections } from '../../../../main/steps/respond-to-claim/legalrep.sections.config';
 
 describe('legal rep respond-to-claim sections config', () => {
-  it('injects selectDefendant section after startNowAndDetails', () => {
+  it('injects selectDefendant section after startNowAndDetails (and inherits every citizen section)', () => {
+    // The legal rep list mirrors the citizen sections (only navigation, via the flat stepOrder,
+    // differentiates the two journeys), so citizen-only sections like yourSupport ride along here.
+    // Legal reps are redirected away from the task list, so the inherited section is never rendered.
     expect(legalRepRespondToClaimSections.map(section => section.id)).toEqual([
       'startNowAndDetails',
       'selectDefendant',
+      'resumeResponse',
       'personalDetails',
       'disputeAndTenancy',
       'payments',
       'situationAndCircumstances',
       'incomeAndExpenditure',
+      'yourSupport',
       'uploadFiles',
       'checkYourAnswersAndSubmit',
     ]);

@@ -4,6 +4,8 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
+// Shown when the citizen cancelled in the microsite (payload action = 'cancel')
+
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'reasonable-adjustments-cancelled',
   stepDir: __dirname,
@@ -14,9 +16,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     heading: 'heading',
     continueButton: 'continueButton',
   },
-  // Shown when the citizen cancelled in the microsite (payload action = 'cancel')
+  // Shown when the citizen cancelled / made no changes in the microsite (payload action = 'cancel').
   extendGetContent: (req: Request) => {
     const caseReference = req.res?.locals.validatedCase?.id;
-    return { languageUsedUrl: `/case/${caseReference}/respond-to-claim/language-used?nav=1` };
+    return { taskListUrl: `/case/${caseReference}/respond-to-claim/task-list` };
   },
 });

@@ -1,4 +1,5 @@
 {
+  "pageTitle": "Agreements made",
   "heading": "Repayment agreement",
   "question": "",
   "repaymentsAgreedQuestion": "Has the defendant come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}?",
@@ -9,6 +10,7 @@
   "textAreaHint": "Enter up to 500 characters",
   "errors": {
     "repaymentsAgreed": "Select if the defendant has come to any agreement with {{claimantName}} to repay the arrears since {{dateIssued, ordinalDate}}",
-    "repaymentsAgreed.repaymentsAgreedDetails": "Give details about how much the defendant has agreed to pay, how often the defendant will pay and when the agreement was made"
+    "repaymentsAgreed.repaymentsAgreedDetails": "Give details about how much the defendant has agreed to pay, how often the defendant will pay and when the agreement was made",
+    "repaymentsAgreedDetailsMaxLength": "Repayment agreement details must be 500 characters or less"
   }
 }

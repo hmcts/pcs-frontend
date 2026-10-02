@@ -17,7 +17,7 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
 }
 
 export interface ClientContextHeaders {
-  selectedPartyId: string;
+  selectedPartyId?: string;
 }
 
 interface CustomSessionData extends SessionData {
@@ -25,15 +25,15 @@ interface CustomSessionData extends SessionData {
   nonce?: string;
   user?: UserInfoResponseWithToken;
   returnTo?: string;
-  formData?: Record<string, any>;
+  // Step form data keyed by journey name, then case reference (or 'default'), then step name.
+  formData?: Record<string, Record<string, Record<string, any>>>;
   uploadedDocs?: Record<string, Record<string, unknown[]>>;
   returnToCya?: string;
   respondToClaimPostSubmitRedirect?: string;
+  respondToClaimSubmitRejection?: string;
   ccdCase?: CcdCase;
-  genApp?: {
-    applicationId?: string;
-    showDuplicateSubmissionPage?: boolean;
-  };
+  // Generated application ID for the make-an-application journey, keyed by case reference.
+  applicationIds?: Record<string, string>;
   payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
   clientContext?: ClientContextHeaders;

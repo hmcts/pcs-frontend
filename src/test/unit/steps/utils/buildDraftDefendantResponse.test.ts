@@ -26,6 +26,33 @@ const makeReq = (): Request =>
     res: { locals: { validatedCase: { id: '123', data: {} } } },
   }) as unknown as Request;
 
+describe('buildDraftDefendantResponse — pcqId carry-forward', () => {
+  const reqWith = (possessionClaimResponse: Record<string, unknown>): Request =>
+    ({
+      path: '/case/123/respond-to-claim/free-legal-advice',
+      body: {},
+      res: { locals: { validatedCase: { id: '123', data: { possessionClaimResponse } } } },
+    }) as unknown as Request;
+
+  it('carries an existing pcqId onto every subsequent save', () => {
+    // The backend REPLACEs the defendant slice on each save, so an id dropped here would be wiped
+    // the next time the citizen moves through the journey — and at final submit, which reads this
+    // same draft. The party object is deep-cloned wholesale, so this comes for free.
+    const result = buildDraftDefendantResponse(
+      reqWith({ defendantContactDetails: { party: { firstName: 'Ada', pcqId: 'pcq-abc-123' } } })
+    );
+
+    expect(result.defendantContactDetails.party.pcqId).toBe('pcq-abc-123');
+    expect(result.defendantContactDetails.party.firstName).toBe('Ada');
+  });
+
+  it('does not invent a pcqId when the draft has none', () => {
+    const result = buildDraftDefendantResponse(reqWith({}));
+
+    expect(result.defendantContactDetails.party.pcqId).toBeUndefined();
+  });
+});
+
 describe('saveDraftDefendantResponse wrapper', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -265,5 +292,68 @@ describe('buildDraftDefendantResponse — carries reasonable-adjustment flags fo
   it('omits defendantFlags entirely when there are none in the existing draft', () => {
     const draft = buildDraftDefendantResponse(reqWithFlags());
     expect('defendantFlags' in draft).toBe(false);
+  });
+});
+
+// HDPI-8866 W05 — the review page posts the draft version it rendered; the save forwards it so pcs-api can check it.
+describe('saveDraftDefendantResponse — reviewed draft version', () => {
+  const reqWithBody = (body: Record<string, unknown>): Request =>
+    ({
+      body,
+      session: { user: { accessToken: 'tok' } },
+      res: { locals: { validatedCase: { id: '123', data: {} } } },
+    }) as unknown as Request;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('forwards the draftVersion posted by the review page as a number', async () => {
+    await saveDraftDefendantResponse(reqWithBody({ draftVersion: '4' }), { defendantResponses: {} });
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      expect.anything(),
+      'tok',
+      '123',
+      { possessionClaimResponse: { defendantResponses: {}, draftVersion: 4 } },
+      undefined
+    );
+  });
+
+  it('omits draftVersion when the form did not post one (ordinary steps)', async () => {
+    await saveDraftDefendantResponse(reqWithBody({}), { defendantResponses: {} });
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      expect.anything(),
+      'tok',
+      '123',
+      { possessionClaimResponse: { defendantResponses: {} } },
+      undefined
+    );
+  });
+
+  it('ignores a draftVersion that is not a whole number', async () => {
+    await saveDraftDefendantResponse(reqWithBody({ draftVersion: 'abc' }), { defendantResponses: {} });
+
+    const [, , , payload] = (ccdCaseService.updateDraft as jest.Mock).mock.calls[0];
+    expect(payload.possessionClaimResponse).not.toHaveProperty('draftVersion');
+  });
+});
+
+describe('saveDraftDefendantResponse — draft version returned by the save', () => {
+  it('carries the version pcs-api echoes into validatedCase so the submit posts it', async () => {
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValueOnce({
+      id: '123',
+      data: { possessionClaimResponse: { defendantResponses: {}, draftVersion: 5 } },
+    });
+    const req = {
+      body: { draftVersion: '4' },
+      session: { user: { accessToken: 'tok' } },
+      res: { locals: { validatedCase: { id: '123', data: { possessionClaimResponse: { draftVersion: 4 } } } } },
+    } as unknown as Request;
+
+    await saveDraftDefendantResponse(req, { defendantResponses: {} });
+
+    expect(req.res?.locals.validatedCase?.data?.possessionClaimResponse?.draftVersion).toBe(5);
   });
 });

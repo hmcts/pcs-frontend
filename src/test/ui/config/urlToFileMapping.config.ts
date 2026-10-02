@@ -88,4 +88,5 @@ export default {
   'counter-claim-order-other-than-sum': 'counterClaimOrderOtherThanSum',
   'email-confirmation': 'emailConfirmation',
   'exempt-landlord': 'exemptLandlord',
+  'resume-response': 'resumeResponse',
 };

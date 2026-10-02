@@ -44,6 +44,10 @@
         "title": "Eich ymateb",
         "body": "Rydych wedi ymateb i’r hawliad."
       },
+      "CounterClaimFeeUnpaid": {
+        "title": "Eich ymateb",
+        "body": "Nid ydych wedi talu ffi’r gwrth-hawliad o {{feeAmount, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}}.<br><br>Ni fydd eich gwrth-hawliad yn mynd rhagddo nes bod y ffi hon wedi’i thalu.<br><br><a class=\"govuk-link\" href=\"{{payCounterclaimFeeUrl}}\">Talu ffi eich gwrth-hawliad</a>"
+      },
       "NoHearingArranged": {
         "title": "Mae hawliad meddiannu eiddo wedi’i wneud yn eich erbyn",
         "body": "Bydd y llys yn trefnu'r gwrandawiad ac yn cysylltu gyda chi gyda manylion."
