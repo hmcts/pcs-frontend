@@ -146,7 +146,7 @@ export function buildAdjournmentOrder(data: OrderData): DocWeaveDocument {
           if (restore) {
             list.item('adjournment-strike-out', content => {
               content
-                .text('If no application to restore the claim is made by ')
+                .text(`If no application to restore ${subject} is made by `)
                 .fact('adjournment-restore-date', date(data, 'adj-gen-restore-date'), {
                   sourceId: 'adj-gen-restore-date',
                 })
