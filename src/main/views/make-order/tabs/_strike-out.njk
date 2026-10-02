@@ -2,11 +2,24 @@
 
 <h3 class="govuk-heading-m">Strike out/dismiss</h3>
 
-{{ compact.radios("strike-claim-outcome", {
+{% macro outcome(subject, legend) %}
+  {{ compact.radios("strike-" + subject + "-outcome", {
+    legend: legend,
+    classes: "govuk-radios--small govuk-radios--inline",
+    optional: true,
+    items: [
+      { value: "struck-out", text: legend + " struck out" },
+      { value: "dismissed", text: legend + " dismissed" }
+    ]
+  }) }}
+{% endmacro %}
+
+{{ compact.checkboxes("strike-subjects", {
   legend: "Outcome",
-  classes: "govuk-radios--small govuk-radios--inline",
+  default: "claim",
   items: [
-    { value: "struck-out", text: "Claim struck out" },
-    { value: "dismissed", text: "Claim dismissed" }
+    { value: "claim", text: "Claim", conditional: { html: outcome("claim", "Claim") } },
+    { value: "counterclaim", text: "Counterclaim", conditional: { html: outcome("counterclaim", "Counterclaim") } },
+    { value: "application", text: "Application dismissed" }
   ]
 }) }}

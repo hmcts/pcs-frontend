@@ -301,11 +301,15 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
 
 function validateStrikeOut(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add } = validation(formData);
-  add(
-    ['struck-out', 'dismissed'].includes(value(formData, 'strike-claim-outcome')),
-    'strike-claim-outcome',
-    'Select whether the claim is struck out or dismissed'
-  );
+  const subjects = values(formData, 'strike-subjects');
+  add(subjects.length > 0, 'strike-subjects', 'Select what is struck out or dismissed');
+  for (const subject of ['claim', 'counterclaim'].filter(chosen => subjects.includes(chosen))) {
+    add(
+      ['struck-out', 'dismissed'].includes(value(formData, `strike-${subject}-outcome`)),
+      `strike-${subject}-outcome`,
+      `Select whether the ${subject} is struck out or dismissed`
+    );
+  }
   return [...issues, ...validateCosts(formData, false)];
 }
 
