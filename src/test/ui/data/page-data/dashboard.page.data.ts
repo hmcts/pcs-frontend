@@ -44,8 +44,11 @@ export const dashboard = {
   respondedToClaimParagraph: `You have responded to the claim`,
   respondToTheClaimSubHeader: `Respond to the claim`,
   viewTheResponseSubHeader: `View the response`,
+  yourSupportSubHeader: `Your support`,
   notStartedTag: `Not started`,
   inProgressTag: `In progress`,
   completedTag: `Completed`,
   availableTag: `Available`,
+  blankTag: ``,
+  backLink: `Back`,
 };
