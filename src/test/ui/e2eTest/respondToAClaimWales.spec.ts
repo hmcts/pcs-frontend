@@ -1167,7 +1167,7 @@ test.describe('Common Component YS And PCQ Respond to a claim - e2e Journey @nig
     });
     await performAction('clickButton', 'Close and return to case overview');
     await performValidation('mainHeader', dashboard.mainHeader);
-        await performAction('verifyYourSupportLink', {
+    await performAction('verifyYourSupportLink', {
       ysSubHeader: dashboard.yourSupportSubHeader,
       respondTag: dashboard.completedTag,
       ysTag: dashboard.availableTag,
