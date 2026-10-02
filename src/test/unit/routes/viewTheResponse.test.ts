@@ -1278,6 +1278,82 @@ describe('viewTheResponse route', () => {
 
     expect(renderArgs.responsePdfUrl).toBeUndefined();
   });
+
+  it('should build counterclaimPdfUrl when counterclaimDocumentId matches a document in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'counterclaim-pdf-id',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'counterclaim-pdf-id',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBe(`/case/${caseReference}/view-documents/counterclaim-pdf-id`);
+  });
+
+  it('should not build counterclaimPdfUrl when counterclaimDocumentId is not present', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      possessionClaimResponse: {
+        defendantResponses: {},
+      },
+    } as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
+  });
+
+  it('should not build counterclaimPdfUrl when counterclaimDocumentId does not match a document in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'some-other-doc',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/some-other-doc/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'not-present',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
+  });
+
+  it('should not build counterclaimPdfUrl when the matching document is missing its binary url', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'counterclaim-pdf-id',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'counterclaim-pdf-id',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
+  });
 });
 
 describe('view-the-response template - response PDF link', () => {
@@ -1287,7 +1363,7 @@ describe('view-the-response template - response PDF link', () => {
   const templatePath = path.resolve(__dirname, '../../../main/views/view-the-response.njk');
   const templateSource = fs.readFileSync(templatePath, 'utf8');
   const pdfBlockMatch = templateSource.match(
-    /\{%\s*if dateSubmitted\s*%\}[\s\S]*?pdf\.linkText[\s\S]*?\{%\s*endif\s*%\}[\s\S]*?\{%\s*endif\s*%\}/
+    /\{%\s*if dateSubmitted\s*%\}\s*<h2 class="govuk-heading-m">[\s\S]*?pdf\.heading[\s\S]*?<\/h2>\s*<p class="govuk-body">\s*\{%\s*if dateSubmitted and responsePdfUrl\s*%\}[\s\S]*?pdf\.linkText[\s\S]*?\{%\s*endif\s*%\}\s*<\/p>\s*<p class="govuk-body">\s*\{%\s*if counterclaimPdfUrl\s*%\}[\s\S]*?\{%\s*endif\s*%\}\s*<\/p>\s*\{%\s*endif\s*%\}/
   );
 
   const t = (key: string) =>
