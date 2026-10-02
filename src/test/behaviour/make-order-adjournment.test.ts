@@ -39,7 +39,7 @@ describe('make an order: adjournment', () => {
       [
         'IT IS ORDERED THAT:',
         'The claim shall be adjourned to be heard on 1 October 2026 at 10:30am with a time estimate of 1 hour.',
-        'The defendant must by 4pm on 15 September 2026 send to the court and all other parties a defence.',
+        'The defendant must by 4pm on 15 September 2026 submit to the court and all other parties a defence.',
       ].join('\n')
     );
 
