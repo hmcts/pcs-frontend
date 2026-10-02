@@ -36,6 +36,14 @@ describe('make an order: outright possession', () => {
     expect((await app.get(PAGE)).text).toContain('xui-header--judicial');
   });
 
+  it("signs out through this service, as XUI's own script is not on the page", async () => {
+    app = await bootApp();
+    await openPage((await app.get(PAGE)).text);
+    const header = document.querySelector<HTMLTemplateElement>('hmcts-xui-header template')!.content;
+    const signOut = [...header.querySelectorAll('a, button')].find(link => link.textContent?.trim() === 'Sign out');
+    expect(signOut?.getAttribute('href')).toBe('/logout');
+  });
+
   it('offers a way back to the document from the arrears and interest behind a judgment total', async () => {
     app = await bootApp();
     await openPage((await app.get(PAGE)).text);

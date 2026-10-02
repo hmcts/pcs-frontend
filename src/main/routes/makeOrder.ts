@@ -6,7 +6,7 @@ import { DateTime } from 'luxon';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { MAKE_ORDER_ROUTE, MAKE_ORDER_SENT_FOR_REVIEW_ROUTE } from '../constants/caseRoutes';
-import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
+import { linkSignOutToLogout, makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 import { getUserRoles } from '../steps/utils';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 import { buildManageCaseDetailsRedirect } from '../utils/manageCaseRedirect';
@@ -135,6 +135,7 @@ function xuiHeaderModel(req: Request): ReturnType<typeof buildHeaderModel> {
   const roles = [...getUserRoles(req), 'judge'];
   const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles } });
   headerModel.assetsPath = '/assets/ui-component-lib';
+  linkSignOutToLogout(headerModel);
   return headerModel;
 }
 
