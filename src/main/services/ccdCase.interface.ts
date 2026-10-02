@@ -277,6 +277,17 @@ export interface PossessionClaimResponse {
   defendantFlags?: CcdFlags;
 }
 
+/** One party's external ("support") flags, as exposed by pcs-api's requestSupport / manageSupport events. */
+export interface CcdPartySupport {
+  supportFlags?: CcdFlags;
+}
+
+/** `partySupport` collection item. `id` is the party id pcs-api binds the flags to. */
+export interface CcdPartySupportEntry {
+  id: string;
+  value: CcdPartySupport;
+}
+
 export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
@@ -319,6 +330,8 @@ export interface CcdCaseData {
   otherLicenceTypeDetails?: string;
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
+  // Narrowed by pcs-api to the defendant parties the logged-in user owns (requestSupport START).
+  partySupport?: CcdPartySupportEntry[];
   submitDraftAnswers?: string;
   genApps?: CcdCollectionItem<GenApp>[];
   allClaimants?: CcdCollectionItem<CcdParty>[];

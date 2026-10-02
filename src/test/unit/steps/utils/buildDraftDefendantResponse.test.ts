@@ -17,6 +17,7 @@ import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import {
   buildDraftDefendantResponse,
   saveDraftDefendantResponse,
+  toDefendantDraftSlice,
 } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 import { ClientContextHeaders } from '../../../../types/global';
 
@@ -355,5 +356,40 @@ describe('saveDraftDefendantResponse — draft version returned by the save', ()
     await saveDraftDefendantResponse(req, { defendantResponses: {} });
 
     expect(req.res?.locals.validatedCase?.data?.possessionClaimResponse?.draftVersion).toBe(5);
+  });
+});
+
+describe('toDefendantDraftSlice — the defendant slice every draft save sends', () => {
+  it('pre-initialises the nested objects when there is no existing response', () => {
+    expect(toDefendantDraftSlice(undefined)).toEqual({
+      defendantResponses: {},
+      defendantContactDetails: { party: {} },
+    });
+  });
+
+  it('narrows to the defendant slice and carries flags forward', () => {
+    const existing = {
+      claimantName: 'Acme Landlord',
+      defendantResponses: { situation_HasMoved: 'NO' },
+      defendantContactDetails: { party: { emailAddress: 'defendant@example.com' } },
+      defendantFlags: { partyName: 'Jo', roleOnCase: 'Defendant', details: [] },
+    } as never;
+
+    expect(toDefendantDraftSlice(existing)).toEqual({
+      defendantResponses: { situation_HasMoved: 'NO' },
+      defendantContactDetails: { party: { emailAddress: 'defendant@example.com' } },
+      defendantFlags: { partyName: 'Jo', roleOnCase: 'Defendant', details: [] },
+    });
+  });
+
+  it('deep-clones so callers can mutate the slice without touching the source', () => {
+    const existing = { defendantResponses: { completedSections: ['PERSONAL_DETAILS'] } } as never;
+
+    const slice = toDefendantDraftSlice(existing);
+    slice.defendantResponses.completedSections?.push('YOUR_SUPPORT' as never);
+
+    expect(
+      (existing as { defendantResponses: { completedSections: string[] } }).defendantResponses.completedSections
+    ).toEqual(['PERSONAL_DETAILS']);
   });
 });

@@ -17,11 +17,10 @@ export interface DraftDefendantResponse extends PossessionClaimResponse {
   };
 }
 
-// Get a deep clone of defendant-only fields from the existing draft/case data.
-// All nested objects are pre-initialised so callers can set/delete fields directly.
-export const buildDraftDefendantResponse = (req: Request): DraftDefendantResponse => {
-  const existing = req.res?.locals.validatedCase?.data?.possessionClaimResponse;
-
+// The defendant-only slice of the response that every draft save sends. The draft save REPLACES the
+// stored response, so a writer that omits a field wipes it: build the slice here and nowhere else.
+// Nested objects are deep-cloned and pre-initialised so callers can set/delete fields directly.
+export const toDefendantDraftSlice = (existing?: PossessionClaimResponse): DraftDefendantResponse => {
   const defendantOnly: PossessionClaimResponse = {
     defendantResponses: existing?.defendantResponses ? cloneDeep(existing.defendantResponses) : {},
     defendantContactDetails: existing?.defendantContactDetails
@@ -35,9 +34,15 @@ export const buildDraftDefendantResponse = (req: Request): DraftDefendantRespons
     defendantOnly.defendantContactDetails = { party: {} };
   }
 
-  clearSectionCompletionOnEdit(req, defendantOnly);
-
   return defendantOnly as DraftDefendantResponse;
+};
+
+// The defendant slice from the existing draft/case data on the request, with the current step's section
+// confirmation cleared (editing a step revokes that section's "done").
+export const buildDraftDefendantResponse = (req: Request): DraftDefendantResponse => {
+  const defendantOnly = toDefendantDraftSlice(req.res?.locals.validatedCase?.data?.possessionClaimResponse);
+  clearSectionCompletionOnEdit(req, defendantOnly);
+  return defendantOnly;
 };
 
 function clearSectionCompletionOnEdit(req: Request, draft: PossessionClaimResponse): void {
