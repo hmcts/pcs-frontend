@@ -3,6 +3,7 @@ import {
   type TestApp,
   bootApp,
   check,
+  control,
   openPage,
   recordAttendance,
   selectTab,
@@ -86,11 +87,26 @@ describe('make an order: free form and strike out', () => {
     expect(page.orderText()).toBe(['IT IS ORDERED THAT:', 'The claim is struck out.'].join('\n'));
   });
 
+  it('keeps nothing ticked when the judge unticks the claim', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-strike-out');
+    uncheck('strike-subjects', 'claim');
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    const rejected = await app.post(PAGE, body);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Select what is struck out or dismissed');
+    await openPage(rejected.text);
+    expect(control('[name="strike-subjects"][value="claim"]').checked).toBe(false);
+  });
+
   it('offers only the claim when the case has no open counterclaim or application', async () => {
     await openPage((await app.get(PAGE)).text);
-    expect([...document.querySelectorAll<HTMLInputElement>('[name="strike-subjects"]')].map(box => box.value)).toEqual([
-      'claim',
-    ]);
+    expect(
+      [...document.querySelectorAll<HTMLInputElement>('[name="strike-subjects"][type="checkbox"]')].map(
+        box => box.value
+      )
+    ).toEqual(['claim']);
   });
 
   it('strikes out or dismisses the claim, counterclaim and application together', async () => {
