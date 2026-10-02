@@ -75,6 +75,19 @@ describe('make an order: outright possession', () => {
     expect(page.orderText()).toContain('Judgment for the claimant(s) in the sum of £500.00.');
   });
 
+  it('takes the arrears from arrears today until the judge enters their own', async () => {
+    app = await bootApp();
+    await openPage((await app.get(PAGE)).text);
+    type('arrears-today', '5000');
+    expect(control('[name="outright-mj-arrears"]').value).toBe('5000');
+    expect(control('[name="suspended-arrears"]').value).toBe('5000');
+
+    type('outright-mj-arrears', '4000');
+    type('arrears-today', '6000');
+    expect(control('[name="outright-mj-arrears"]').value).toBe('4000');
+    expect(control('[name="suspended-arrears"]').value).toBe('6000');
+  });
+
   it('leaves out possession and grounds until the judge chooses them', async () => {
     app = await bootApp();
     const page = await openPage((await app.get(PAGE)).text);
