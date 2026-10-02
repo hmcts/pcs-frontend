@@ -45,7 +45,7 @@
 
 {% set lumpHtml %}
   {% call compact.row({ groupLabel: "Payment to claimant" }) %}
-    {{ compact.copy("Payment of") }}
+    {{ compact.copy("Initial payment of") }}
     {{ compact.money({ id: "outright-mj-lump-amount", label: "Payment amount", labelHidden: true }) }}
     {{ compact.copy("by") }}
     {{ compact.date({ id: "outright-mj-lump-date", legend: "Payment deadline", legendHidden: true }) }}
