@@ -17,9 +17,7 @@ export class ClaimantCreateGenAppAPIAction implements IAction {
 
     const requestData = fieldName as actionData;
     const providedPayload =
-      typeof requestData === 'object' && requestData !== null && 'data' in requestData
-        ? requestData.data
-        : requestData;
+      typeof requestData === 'object' && requestData !== null && 'data' in requestData ? requestData.data : requestData;
     if (typeof providedPayload !== 'object' || providedPayload === null || Array.isArray(providedPayload)) {
       throw new Error('Claimant GenApp payload was not provided.');
     }
