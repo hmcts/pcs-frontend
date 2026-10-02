@@ -28,6 +28,8 @@ describe('make an order: suspended possession', () => {
 
     selectTab('tab-suspended');
     expect(control('#order-type').value).toBe('SUSPENDED_POSSESSION');
+    expect(document.querySelector('[name="suspended-options"][value="use-occupation"]')).toBeNull();
+    expect(document.querySelector('[name="suspended-options"][value="transfer-high-court"]')).toBeNull();
     expect(column.hidden).toBe(false);
     const fortnight = futureDate(14);
     expect(control('[name="suspended-by-date-day"]').value).toBe(fortnight.day);

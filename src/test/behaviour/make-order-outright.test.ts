@@ -77,15 +77,29 @@ describe('make an order: outright possession', () => {
 
   it('takes the arrears from arrears today until the judge enters their own', async () => {
     app = await bootApp();
-    await openPage((await app.get(PAGE)).text);
-    type('arrears-today', '5000');
-    expect(control('[name="outright-mj-arrears"]').value).toBe('5000');
+    const page = await openPage((await app.get(PAGE)).text);
+    check('outright-options', 'money-judgment');
+    check('outright-mj-sections', 'arrears');
+    // A keystroke alone fires input, so the preview must follow without a change event.
+    const arrearsToday = control('[name="arrears-today"]');
+    arrearsToday.value = '5000';
+    arrearsToday.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(page.documentText()).toContain('Judgment for the claimant(s) in the sum of £5,000.00.');
     expect(control('[name="suspended-arrears"]').value).toBe('5000');
 
     type('outright-mj-arrears', '4000');
     type('arrears-today', '6000');
     expect(control('[name="outright-mj-arrears"]').value).toBe('4000');
     expect(control('[name="suspended-arrears"]').value).toBe('6000');
+
+    // A saved draft keeps the judge's own figure.
+    const body = page.body();
+    body.set('action', 'SAVE_DRAFT');
+    expect((await app.post(PAGE, body)).status).toBe(302);
+    await openPage((await app.get(PAGE)).text);
+    type('arrears-today', '7000');
+    expect(control('[name="outright-mj-arrears"]').value).toBe('4000');
+    expect(control('[name="suspended-arrears"]').value).toBe('7000');
   });
 
   it('works out the daily rate for damages from the rent until the judge enters their own', async () => {
