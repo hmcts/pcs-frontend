@@ -79,5 +79,7 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     draftSelect: (items: Record<string, unknown>[], name: string, defaultValue?: string) =>
       items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) })),
     attendanceParties: attendanceParties(start),
+    openCounterclaim: caseContext.openCounterclaim === true,
+    openApplication: caseContext.openApplication === true,
   };
 }

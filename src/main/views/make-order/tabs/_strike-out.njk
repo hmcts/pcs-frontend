@@ -14,12 +14,13 @@
   }) }}
 {% endmacro %}
 
-{{ compact.checkboxes("strike-subjects", {
-  legend: "Outcome",
-  default: "claim",
-  items: [
-    { value: "claim", text: "Claim", conditional: { html: outcome("claim", "Claim") } },
-    { value: "counterclaim", text: "Counterclaim", conditional: { html: outcome("counterclaim", "Counterclaim") } },
-    { value: "application", text: "Application dismissed" }
-  ]
-}) }}
+{% set strikeItems = [{ value: "claim", text: "Claim", conditional: { html: outcome("claim", "Claim") } }] %}
+{% if openCounterclaim %}
+  {% set strikeItems = strikeItems.concat([
+    { value: "counterclaim", text: "Counterclaim", conditional: { html: outcome("counterclaim", "Counterclaim") } }
+  ]) %}
+{% endif %}
+{% if openApplication %}
+  {% set strikeItems = strikeItems.concat([{ value: "application", text: "Application dismissed" }]) %}
+{% endif %}
+{{ compact.checkboxes("strike-subjects", { legend: "Outcome", default: "claim", items: strikeItems }) }}

@@ -20,7 +20,14 @@ describe('make an order: adjournment', () => {
   });
   afterEach(() => app.close());
 
+  it('only asks what is adjourned when the case has an open counterclaim or application', async () => {
+    await openPage((await app.get(PAGE)).text);
+    expect(document.querySelector('[name="adj-subjects"]')).toBeNull();
+  });
+
   it('adjourns whichever of the claim, counterclaim and application is chosen', async () => {
+    await app.close();
+    app = await bootApp({ openCounterclaim: true, openApplication: true });
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-adjournment');
     check('adj-type', 'generally');
