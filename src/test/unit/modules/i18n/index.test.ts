@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import fs, { promises as fsPromises } from 'fs';
 
+import config from 'config';
 import express, { Express } from 'express';
 import type { TFunction } from 'i18next';
 import i18next from 'i18next';
@@ -34,6 +35,10 @@ jest.mock('i18next', () => {
 
 jest.mock('i18next-fs-backend', () => ({}), { virtual: true });
 
+jest.mock('config', () => ({
+  get: jest.fn(),
+}));
+
 jest.mock(
   'i18next-http-middleware',
   () => ({
@@ -63,6 +68,7 @@ describe('i18n module', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (config.get as jest.Mock).mockImplementation((key: string) => (key === 'node-env' ? 'development' : undefined));
     app = express();
     // spy so we can assert .use calls while still letting express accept functions
     jest.spyOn(app, 'use');
@@ -90,14 +96,29 @@ describe('i18n module', () => {
     expect(mockLogger.info).toHaveBeenCalledWith('[i18n] initialised OK');
   });
 
-  it('caches the language in a SameSite=Lax cookie so it survives returns from external sites', () => {
+  it('caches the language in a SameSite=Lax, HttpOnly cookie so it survives returns from external sites', () => {
     mockInit.mockImplementation((_opts: unknown, cb: (err: unknown) => void) => cb(null));
 
     new I18n().enableFor(app);
 
     expect(mockInit.mock.calls[0][0].detection).toEqual(
-      expect.objectContaining({ lookupCookie: 'lang', caches: ['cookie'], cookieSameSite: 'lax' })
+      expect.objectContaining({
+        lookupCookie: 'lang',
+        caches: ['cookie'],
+        cookieSameSite: 'lax',
+        cookieSecure: false,
+        cookieHttpOnly: true,
+      })
     );
+  });
+
+  it('marks the language cookie Secure in production', () => {
+    mockInit.mockImplementation((_opts: unknown, cb: (err: unknown) => void) => cb(null));
+    (config.get as jest.Mock).mockImplementation((key: string) => (key === 'node-env' ? 'production' : undefined));
+
+    new I18n().enableFor(app);
+
+    expect(mockInit.mock.calls[0][0].detection.cookieSecure).toBe(true);
   });
 
   it('logs (but does not throw) on init failure and still registers middlewares', async () => {
