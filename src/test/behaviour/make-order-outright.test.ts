@@ -88,6 +88,20 @@ describe('make an order: outright possession', () => {
     expect(control('[name="suspended-arrears"]').value).toBe('6000');
   });
 
+  it('works out the daily rate for damages from the rent until the judge enters their own', async () => {
+    app = await bootApp();
+    await openPage((await app.get(PAGE)).text);
+    type('rent-frequency', 'WEEKLY');
+    type('current-rent', '102.50');
+    expect(control('[name="outright-use-occupation-rate"]').value).toBe('14.64');
+    type('rent-frequency', 'MONTHLY');
+    expect(control('[name="outright-use-occupation-rate"]').value).toBe('3.37');
+
+    type('outright-use-occupation-rate', '15');
+    type('current-rent', '900');
+    expect(control('[name="outright-use-occupation-rate"]').value).toBe('15');
+  });
+
   it('leaves out possession and grounds until the judge chooses them', async () => {
     app = await bootApp();
     const page = await openPage((await app.get(PAGE)).text);

@@ -1,5 +1,6 @@
 import { type DocWeaveDocument, type DocWeaveSnapshot, createDocEditor } from '@hmcts-cft/docweave';
 
+import { parseMoney } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
 import { type OrderData, readOrderData } from './make-order/data';
@@ -138,12 +139,19 @@ function fillFromCaseFacts(form: HTMLFormElement, sources: string[], targets: st
   fill();
 }
 
+const DAYS_PER_RENT_PERIOD: Record<string, number> = { WEEKLY: 7, FORTNIGHTLY: 14, MONTHLY: 365 / 12 };
+
 export function initCaseFactDefaults(form: HTMLFormElement): void {
   const field = (name: string): string =>
-    form.querySelector<HTMLInputElement>(`input[name="${name}"]`)?.value.trim() ?? '';
+    form.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${name}"]`)?.value.trim() ?? '';
   fillFromCaseFacts(form, ['arrears-today'], ['outright-mj-arrears', 'suspended-arrears'], () =>
     field('arrears-today')
   );
+  fillFromCaseFacts(form, ['current-rent', 'rent-frequency'], ['outright-use-occupation-rate'], () => {
+    const rent = parseMoney(field('current-rent'));
+    const days = DAYS_PER_RENT_PERIOD[field('rent-frequency')];
+    return rent === undefined || !days ? '' : (rent / days).toFixed(2);
+  });
 }
 
 /** A money judgment and an adjourned money claim are alternatives; same terms only applies to a judgment. */
