@@ -33,7 +33,9 @@ export function initPostcodeLookup(): void {
       selectFormGroup: byIdOrName<HTMLDivElement>(`${prefix}-selectedAddress-form-group`),
       selectErrorMessage: byIdOrName<HTMLParagraphElement>(`${prefix}-selectedAddress-error`),
       lookupErrorMessage: byIdOrName<HTMLParagraphElement>(`${prefix}-lookup-postcode-error`),
-      errorMessage: byIdOrName<HTMLParagraphElement>(`${prefix}-postcode-error`),
+      errorMessage:
+        byIdOrName<HTMLParagraphElement>(`${prefix}-postcode-not-found-error`) ||
+        byIdOrName<HTMLParagraphElement>(`${prefix}-postcode-error`),
       postcodeFormGroup: byIdOrName<HTMLDivElement>(`${prefix}-postcode-form-group`),
       addressLine1: byIdOrName<HTMLInputElement>(`${prefix}-addressLine1`),
       addressLine2: byIdOrName<HTMLInputElement>(`${prefix}-addressLine2`),
@@ -82,6 +84,38 @@ export function initPostcodeLookup(): void {
     select.focus();
   };
 
+  const clearFieldError = (field: HTMLInputElement | null) => {
+    if (!field) {
+      return;
+    }
+
+    field.classList.remove('govuk-input--error');
+
+    const errorId = field
+      .getAttribute('aria-describedby')
+      ?.split(/\s+/)
+      .find(id => id.endsWith('-error'));
+    if (errorId) {
+      document.getElementById(errorId)?.classList.add('govuk-!-display-none');
+    }
+
+    field.closest('.govuk-form-group')?.classList.remove('govuk-form-group--error');
+
+    const fieldTargets = [field.id, field.name].filter(Boolean).map(value => `#${value}`);
+
+    document.querySelectorAll<HTMLUListElement>('.govuk-error-summary__list').forEach(errorList => {
+      errorList.querySelectorAll<HTMLAnchorElement>('a').forEach(link => {
+        if (fieldTargets.includes(link.getAttribute('href') || '')) {
+          link.closest('li')?.remove();
+        }
+      });
+
+      if (errorList.querySelectorAll('li').length === 0) {
+        errorList.closest('.govuk-error-summary')?.setAttribute('hidden', '');
+      }
+    });
+  };
+
   const populateAddressFields = (container: HTMLElement, selected: HTMLOptionElement) => {
     const { addressLine1, addressLine2, town, county, postcodeOut, enterManuallyDetails } = getParts(container);
 
@@ -101,6 +135,7 @@ export function initPostcodeLookup(): void {
     fieldMappings.forEach(({ field, value }) => {
       if (field) {
         field.value = value || '';
+        clearFieldError(field);
       }
     });
 
@@ -261,7 +296,7 @@ export function initPostcodeLookup(): void {
     // Add error to error summary
     if (input?.id && errorMessage?.textContent) {
       const errorText = errorMessage.textContent.replace('Error:', '').trim();
-      addErrorToSummary(`${prefix}-postcode-error`, errorText, `#${prefix}-lookupPostcode`);
+      addErrorToSummary(errorMessage.id, errorText, `#${prefix}-lookupPostcode`);
     }
   };
 
@@ -280,7 +315,9 @@ export function initPostcodeLookup(): void {
     hideError(errorMessage, input);
 
     // Remove any previous "no addresses found" error from summary
-    removeErrorFromSummary(`${prefix}-postcode-error`);
+    if (errorMessage?.id) {
+      removeErrorFromSummary(errorMessage.id);
+    }
 
     try {
       const resp = await fetch(`/api/postcode-lookup?postcode=${encodeURIComponent(postcode)}`, {
@@ -435,7 +472,10 @@ export function initPostcodeLookup(): void {
 
     // Remove error from error summary when user starts typing
     removeErrorFromSummary(`${prefix}-lookup-postcode-error`);
-    removeErrorFromSummary(`${prefix}-postcode-error`);
+    const { errorMessage } = getParts(container);
+    if (errorMessage?.id) {
+      removeErrorFromSummary(errorMessage.id);
+    }
   });
 
   document.addEventListener('change', evt => {
