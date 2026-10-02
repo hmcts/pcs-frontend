@@ -70,6 +70,8 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../data/page-data';
+import { overview } from '../data/page-data/overview.page.data';
+import { supportNeedsChanged } from '../data/page-data/supportNeedsChanged.page.data';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -316,6 +318,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: taskList.yourSupportLink,
+      respondTag: dashboard.inProgressTag,
+      ysTag: taskList.doneTag,
+    });
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
     await performAction('retrieveCYATableDataRTC', 'uploadFiles');
@@ -798,6 +805,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
 test.describe('Common Component YS And PCQ Respond to a claim - e2e Journey @nightly ', async () => {
   test('Your Support Request Sent to Court And PCQ Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @regression @nightly', async () => {
     //Single named party - A sum of money or comp - specific sum of money (Yes) - counterclaimFee- I need help
+    await performAction('clickLink', freeLegalAdvice.backLink);
+    await performAction('clickLink', startNow.backLink);
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: dashboard.yourSupportSubHeader,
+      respondTag: dashboard.notStartedTag,
+      ysTag: dashboard.blankTag,
+    });
+    await performAction('clickLink', dashboard.respondToTheClaimSubHeader);
+    await performAction('clickLink', taskList.readInformationAboutLink);
+    await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -988,6 +1005,11 @@ test.describe('Common Component YS And PCQ Respond to a claim - e2e Journey @nig
       ],
       status: 'Done',
     });
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: taskList.yourSupportLink,
+      respondTag: dashboard.inProgressTag,
+      ysTag: taskList.availableTag,
+    });
     await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
@@ -1057,6 +1079,11 @@ test.describe('Common Component YS And PCQ Respond to a claim - e2e Journey @nig
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequest.mainHeader);
     await performAction('clickButton', supportRequest.continueButton);
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: taskList.yourSupportLink,
+      respondTag: dashboard.inProgressTag,
+      ysTag: taskList.doneTag,
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -1140,6 +1167,38 @@ test.describe('Common Component YS And PCQ Respond to a claim - e2e Journey @nig
     });
     await performAction('clickButton', 'Close and return to case overview');
     await performValidation('mainHeader', dashboard.mainHeader);
+        await performAction('verifyYourSupportLink', {
+      ysSubHeader: dashboard.yourSupportSubHeader,
+      respondTag: dashboard.completedTag,
+      ysTag: dashboard.availableTag,
+      rtcSubHeader: dashboard.respondToTheClaimSubHeader,
+    });
+    await performAction('clickLink', dashboard.yourSupportSubHeader);
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
+    await performAction('verifySupportAdjustments', { expectedAdjustments: overview.expectedAdjustments });
+    await performAction('clickLink', overview.changeLink);
+    await performValidation('mainHeader', supportNeedsChanged.mainHeader);
+    await performAction('clickButton', supportNeedsChanged.startNowButton);
+    await performValidation('mainHeader', reviewSupport.mainHeader);
+    await performAction('changeSupport', {
+      expectedAdjustments: ['Accessible toilet', 'Audio translation of documents'],
+      supportYouNoLongerNeedHeader: reviewSupport.supportYouNoLongerNeedSubHeader,
+      notNeededLink: reviewSupport.noLongerNeededLink,
+      stillNeeded: reviewSupport.stillNeedThisLink,
+    });
+    await performAction('clickButton', reviewSupport.submitButton);
+    await performValidation('mainHeader', supportRequest.mainHeader);
+    await performAction('clickButton', supportRequest.continueButton);
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: dashboard.yourSupportSubHeader,
+      respondTag: dashboard.completedTag,
+      ysTag: dashboard.availableTag,
+    });
+    await performAction('clickLink', dashboard.yourSupportSubHeader);
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
+    await performAction('verifySupportAdjustments', { expectedAdjustments: overview.remaningAdjustments });
   });
 
   test('Your Support Request NOT Sent to Court Respond to a claim - Wales - Secure contract - RentArrears and NonRentArrears - SelectCounterClaim - Yes - CounterClaimFee - INeedHelp @regression @nightly', async () => {
