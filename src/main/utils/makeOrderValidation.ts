@@ -301,7 +301,7 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
 
 function validateStrikeOut(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add } = validation(formData);
-  const subjects = values(formData, 'strike-subjects');
+  const subjects = values(formData, 'strike-subjects').filter(subject => subject !== 'none');
   add(subjects.length > 0, 'strike-subjects', 'Select what is struck out or dismissed');
   for (const subject of ['claim', 'counterclaim'].filter(chosen => subjects.includes(chosen))) {
     add(
