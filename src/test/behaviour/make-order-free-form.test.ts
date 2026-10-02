@@ -86,7 +86,16 @@ describe('make an order: free form and strike out', () => {
     expect(page.orderText()).toBe(['IT IS ORDERED THAT:', 'The claim is struck out.'].join('\n'));
   });
 
+  it('offers only the claim when the case has no open counterclaim or application', async () => {
+    await openPage((await app.get(PAGE)).text);
+    expect([...document.querySelectorAll<HTMLInputElement>('[name="strike-subjects"]')].map(box => box.value)).toEqual([
+      'claim',
+    ]);
+  });
+
   it('strikes out or dismisses the claim, counterclaim and application together', async () => {
+    await app.close();
+    app = await bootApp({ openCounterclaim: true, openApplication: true });
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-strike-out');
     check('strike-claim-outcome', 'struck-out');

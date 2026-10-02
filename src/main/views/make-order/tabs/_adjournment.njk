@@ -135,14 +135,17 @@
   }) }}
 {% endset %}
 
-{{ compact.checkboxes("adj-subjects", {
-  legend: "What is adjourned",
-  items: [
-    { value: "claim", text: "Claim" },
-    { value: "counterclaim", text: "Counterclaim" },
-    { value: "application", text: "Application" }
-  ]
-}) }}
+{# Only a case with an open counterclaim or application has more than its claim to adjourn. #}
+{% if openCounterclaim or openApplication %}
+  {% set adjournedItems = [{ value: "claim", text: "Claim" }] %}
+  {% if openCounterclaim %}
+    {% set adjournedItems = adjournedItems.concat([{ value: "counterclaim", text: "Counterclaim" }]) %}
+  {% endif %}
+  {% if openApplication %}
+    {% set adjournedItems = adjournedItems.concat([{ value: "application", text: "Application" }]) %}
+  {% endif %}
+  {{ compact.checkboxes("adj-subjects", { legend: "What is adjourned", items: adjournedItems }) }}
+{% endif %}
 
 {{ compact.radios("adj-type", {
   legend: "Adjournment type",

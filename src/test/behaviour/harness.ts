@@ -203,6 +203,9 @@ export async function bootApp(
     caseworker?: boolean;
     makeOrderEnabled?: boolean;
     defendants?: { id: string; name: string }[];
+    /** Whether the case has an open counterclaim or application. */
+    openCounterclaim?: boolean;
+    openApplication?: boolean;
     /** A judge's order waiting for a caseworker's review. */
     orderAwaitingReview?: Partial<Envelope['order']>;
     /** The judge's order as a caseworker returned it to them, with their query. */
@@ -213,6 +216,8 @@ export async function bootApp(
   if (options.defendants) {
     envelope.caseContext.defendants = options.defendants;
   }
+  envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
+  envelope.caseContext.openApplication = options.openApplication ?? false;
   if (options.orderAwaitingReview) {
     envelope.order = {
       id: 'order-awaiting-review',
