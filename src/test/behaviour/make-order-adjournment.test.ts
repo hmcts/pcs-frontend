@@ -37,6 +37,17 @@ describe('make an order: adjournment', () => {
     expect(page.orderText()).toContain(
       'The counterclaim and the application are adjourned generally with liberty to restore'
     );
+
+    uncheck('adj-subjects', 'application');
+    check('adj-gen', 'oneoff');
+    check('adj-gen', 'restore');
+    typeDate('adj-gen-restore-date', '1', '3', '2027');
+    const order = page.orderText();
+    expect(order).toContain('The counterclaim is adjourned generally on condition that');
+    expect(order).toContain('The claimant may apply to restore the counterclaim if there is a breach');
+    expect(order).toContain(
+      'If no application to restore the counterclaim is made by 1 March 2027 the counterclaim shall stand as struck out'
+    );
   });
 
   it('adjourns to a specific hearing with directions', async () => {
