@@ -75,6 +75,17 @@ describe('make an order: outright possession', () => {
     expect(page.orderText()).toContain('Judgment for the claimant(s) in the sum of £500.00.');
   });
 
+  it('leaves out possession and grounds until the judge chooses them', async () => {
+    app = await bootApp();
+    const page = await openPage((await app.get(PAGE)).text);
+    expect(page.orderText()).toBe('IT IS ORDERED THAT:');
+    check('outright-possession', 'forthwith');
+    expect(page.orderText()).toContain('to the claimant(s) forthwith.');
+    expect(page.orderText()).not.toContain('grounds');
+    check('outright-grounds-type', 'mandatory');
+    expect(page.orderText()).toContain('This order for possession was made on mandatory grounds.');
+  });
+
   it('starts a blank draft, builds the order from the form and sends it for review', async () => {
     app = await bootApp();
     const response = await app.get(PAGE);
