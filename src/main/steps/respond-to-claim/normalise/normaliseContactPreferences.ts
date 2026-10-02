@@ -13,4 +13,9 @@ export function normaliseContactPreferences(response: PossessionClaimResponse): 
   if (normalizeYesNoValue(dr.contactByPhone) !== 'YES') {
     delete dr.contactByText;
   }
+
+  // Note: the stale mobile number (party.textMessageNumber) is cleared by the BE in
+  // ClaimResponseService.saveContactPreferences whenever the defendant is not opted in to
+  // text. Normalisers must not touch party contact-detail fields — the BE rebuilds those from
+  // PartyEntity on every START callback, so clearing them here would be a no-op.
 }

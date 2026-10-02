@@ -12,6 +12,7 @@ import {
   authorisationGate,
   caseReferenceParamMiddleware,
   pageTrackingUrlMiddleware,
+  withAccessControlEnabled,
 } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
@@ -50,7 +51,7 @@ app.use((req, res, next) => {
 app.use(pageTrackingUrlMiddleware);
 
 app.use(authenticationGate);
-app.use(authorisationGate);
+app.use(withAccessControlEnabled(authorisationGate));
 
 // param middleware for caseReference
 app.param('caseReference', caseReferenceParamMiddleware);

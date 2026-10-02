@@ -4,9 +4,13 @@ import { currency } from '../../../modules/nunjucks/filters/currency';
 import { getTranslation, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, penceToPounds, poundsToPence, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
+import { getRentStatementDocumentInfo, resolveStepDocumentId } from '../utils/stepDocumentUtils';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+
+export { getRentStatementDocumentInfo };
 
 // Validation constants
 const MAX_RENT_ARREARS_AMOUNT = 1_000_000_000; // £1 billion maximum
@@ -19,6 +23,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    rentStatementDocumentLinkText: 'rentStatementDocumentLinkText',
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
@@ -63,7 +68,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return formData;
   },
-  extendGetContent: (req: Request) => {
+  extendGetContent: async (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
     const amountInPence = (caseData?.rentArrears_Total as string | number) || 0;
@@ -76,12 +81,20 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const insetDetailsText = getTranslation(t, 'insetDetailsText', '', { claimantName }) ?? '';
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
+
+    const documentId = await resolveStepDocumentId(req, getRentStatementDocumentInfo, 'rentArrearsDispute');
+    const rentStatementDocument = documentId ? { id: documentId } : '';
+
+    const release12Enabled = isRelease12Enabled(req);
+
     return {
       insetIntroText,
       insetDetailsText,
       amountOwedHeading,
       rentArrearsAmount,
       rentArrearsAmountCorrection,
+      rentStatementDocument,
+      isRelease12Enabled: release12Enabled,
     };
   },
   fields: [

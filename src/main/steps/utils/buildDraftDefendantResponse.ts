@@ -27,6 +27,8 @@ export const buildDraftDefendantResponse = (req: Request): DraftDefendantRespons
     defendantContactDetails: existing?.defendantContactDetails
       ? cloneDeep(existing.defendantContactDetails)
       : { party: {} },
+    // Carry forward any reasonable-adjustment flags written by the cui-ra callback.
+    ...(existing?.defendantFlags ? { defendantFlags: cloneDeep(existing.defendantFlags) } : {}),
   };
 
   if (!defendantOnly.defendantContactDetails?.party) {
@@ -53,6 +55,16 @@ function clearSectionCompletionOnEdit(req: Request, draft: PossessionClaimRespon
   );
 }
 
+export function parseDraftVersion(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isInteger(value)) {
+    return value;
+  }
+  if (typeof value === 'string' && /^\d+$/.test(value.trim())) {
+    return Number(value.trim());
+  }
+  return undefined;
+}
+
 // Convenience wrapper: normalises orphaned cross-page fields, saves the draft defendant response,
 // and refreshes validatedCase on the request.
 export const saveDraftDefendantResponse = async (req: Request, response: PossessionClaimResponse): Promise<void> => {
@@ -61,12 +73,17 @@ export const saveDraftDefendantResponse = async (req: Request, response: Possess
   const accessToken = req.session?.user?.accessToken || '';
   const caseId = req.res?.locals.validatedCase?.id || '';
 
+  const reviewedDraftVersion = parseDraftVersion(req.body?.draftVersion);
+
   const updatedCase = await ccdCaseService.updateDraft(
     RESPOND_TO_CLAIM_DRAFT_EVENT,
     accessToken,
     caseId,
     {
-      possessionClaimResponse: normalised,
+      possessionClaimResponse: {
+        ...normalised,
+        ...(reviewedDraftVersion !== undefined && { draftVersion: reviewedDraftVersion }),
+      },
     },
     req.session?.clientContext
   );

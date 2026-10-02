@@ -1,6 +1,11 @@
 import { AMOUNT_FORMAT_REGEX } from '../../../constants/validation';
 import type { FrequencyValue } from '../../../services/ccdCase.interface';
-import { ccdPenceToPoundsString, getValidatedCaseHouseholdCircumstances, poundsStringToPence } from '../../utils';
+import {
+  ccdPenceToPoundsString,
+  getValidatedCaseHouseholdCircumstances,
+  hasMandatoryPriorityDebtDetailFields,
+  poundsToPence,
+} from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -13,13 +18,15 @@ const FREQUENCY_MAP: Record<FrequencyValue, FrequencyFormValue> = {
   MONTHLY: 'monthly',
 };
 
+const normalizeMoneyInput = (value: string): string => value.trim().replace(/,/g, '');
+
 const validateMoney =
   (negativeKey: string, largeKey: string) =>
   (value: unknown): boolean | string => {
     if (typeof value !== 'string' || !value.trim()) {
       return true;
     }
-    const normalized = value.trim().split(',').join('');
+    const normalized = normalizeMoneyInput(value);
     const numericValue = parseFloat(normalized);
 
     if (!Number.isNaN(numericValue)) {
@@ -43,11 +50,7 @@ const validateMoney =
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'priority-debt-details',
-  isAnswered: req =>
-    Boolean(
-      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.debtTotal ||
-      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.debtContribution
-    ),
+  isAnswered: req => hasMandatoryPriorityDebtDetailFields(getValidatedCaseHouseholdCircumstances(req)),
   stepDir: __dirname,
   beforeRedirect: async req => {
     const total = req.body?.priorityDebtTotal as string | undefined;
@@ -59,9 +62,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const hc = response.defendantResponses.householdCircumstances;
 
     if (typeof total === 'string' && total.trim()) {
-      const pence = poundsStringToPence(total);
+      const pence = poundsToPence(total);
       if (pence !== undefined) {
-        hc.debtTotal = String(pence);
+        hc.debtTotal = pence;
       } else {
         delete hc.debtTotal;
       }
@@ -70,9 +73,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     if (typeof contribution === 'string' && contribution.trim()) {
-      const pence = poundsStringToPence(contribution);
+      const pence = poundsToPence(contribution);
       if (pence !== undefined) {
-        hc.debtContribution = String(pence);
+        hc.debtContribution = pence;
       } else {
         delete hc.debtContribution;
       }

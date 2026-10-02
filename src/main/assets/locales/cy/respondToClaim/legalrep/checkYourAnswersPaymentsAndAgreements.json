@@ -1,0 +1,40 @@
+{
+  "pageTitle": "Gwiriwch eich atebion",
+  "cardTitle": "Taliadau a chytundebau",
+  "rows": {
+    "anyPaymentsMade": {
+      "label": "A yw'r diffynnydd wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
+      "changeHidden": "taliadau wedi'u gwneud"
+    },
+    "paymentDetails": {
+      "label": "Rhowch fanylion faint wnaeth y diffynnydd ei dalu a phryd",
+      "changeHidden": "manylion talu"
+    },
+    "repaymentPlanAgreed": {
+      "label": "A yw'r diffynnydd wedi dod i unrhyw gytundeb gyda {{claimantName}} i ad-dalu'r ôl-ddyledion ers {{dateIssued, ordinalDate}}?",
+      "changeHidden": "cytundeb ad-dalu"
+    },
+    "repaymentAgreedDetails": {
+      "label": "Rhowch fanylion faint maent wedi cytuno i'w dalu a phryd",
+      "changeHidden": "manylion ad-dalu"
+    },
+    "repayArrearsInstalments": {
+      "label": "A hoffai'r diffynnydd gynnig talu ôl-ddyledion mewn rhandaliadau?",
+      "changeHidden": "cynnig talu mewn rhandaliadau"
+    },
+    "installmentAmount": {
+      "label": "Faint allai'r diffynnydd fforddio’i dalu ar ben eu rhent cyfredol?",
+      "changeHidden": "swm y rhandaliadau"
+    },
+    "installmentFrequency": {
+      "label": "Pa mor aml allai'r diffynnydd fforddio talu'r swm hwn?",
+      "changeHidden": "amlder y rhandaliadau",
+      "frequencies": {
+        "weekly": "Pob wythnos",
+        "every2Weeks": "Pob 2 wythnos",
+        "every4Weeks": "Pob 4 wythnos",
+        "monthly": "Pob mis"
+      }
+    }
+  }
+}

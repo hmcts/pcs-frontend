@@ -2,6 +2,7 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
+import { isLegalRepresentativeUser } from '../../utils/userRole';
 import type { RespondToClaimSectionId } from '../sections.config';
 
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -44,10 +45,10 @@ export const listHtml = (items: string[]): string =>
 /**
  * Map a CCD yes/no/not-sure value (any casing the backend echoes — 'YES', 'Yes',
  * 'NO_SURE', etc.) to the lowercase translation key in `common.json` (`options.yes`,
- * `options.no`, `options.imNotSure`). Unknown values fall through lowercased so
- * mistakes surface as a missing-key, not as a silent miscast.
+ * `options.no`, `options.imNotSure`, `options.notSure`). Unknown values fall through
+ * lowercased so mistakes surface as a missing-key, not as a silent miscast.
  */
-const toOptionKey = (value: string): string => {
+const toOptionKey = (value: string, isLegalRep = false): string => {
   const upper = value.trim().toUpperCase();
   if (upper === 'YES') {
     return 'yes';
@@ -56,15 +57,15 @@ const toOptionKey = (value: string): string => {
     return 'no';
   }
   if (upper === 'NOT_SURE') {
-    return 'imNotSure';
+    return isLegalRep ? 'notSure' : 'imNotSure';
   }
   return value.trim().toLowerCase();
 };
 
 export const makeYesNoNotSure =
-  (t: TFunction) =>
+  (t: TFunction, isLegalRep = false) =>
   (value: string): string =>
-    t(`options.${toOptionKey(value)}`);
+    t(`options.${toOptionKey(value, isLegalRep)}`);
 
 // Hidden text is a short noun so screen readers announce "Change name", not the full question.
 export const makeChange =
@@ -95,7 +96,14 @@ export function createRowContext(
   if (!validatedCase || !caseRef) {
     return undefined;
   }
-  return { rows: [], validatedCase, t, change: makeChange(caseRef, sectionId, t), yesNoNotSure: makeYesNoNotSure(t) };
+  const isLegalRep = isLegalRepresentativeUser(req);
+  return {
+    rows: [],
+    validatedCase,
+    t,
+    change: makeChange(caseRef, sectionId, t),
+    yesNoNotSure: makeYesNoNotSure(t, isLegalRep),
+  };
 }
 
 /** Push a yes/no/not-sure summary row, deriving `.label` from `labelKey`. */
@@ -106,10 +114,11 @@ export function pushYesNoRow(
   step: string,
   t: TFunction,
   yesNoNotSure: ReturnType<typeof makeYesNoNotSure>,
-  change: ReturnType<typeof makeChange>
+  change: ReturnType<typeof makeChange>,
+  labelOptions?: Record<string, unknown>
 ): SummaryListRow {
   const row: SummaryListRow = {
-    key: { text: t(`${labelKey}.label`) },
+    key: { text: t(`${labelKey}.label`, labelOptions) },
     value: { text: yesNoNotSure(answer) },
     actions: { items: [change(step, `${labelKey}.changeHidden`)] },
   };

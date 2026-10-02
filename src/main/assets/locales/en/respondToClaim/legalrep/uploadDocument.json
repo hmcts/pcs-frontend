@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Upload documents",
+  "heading": "Upload additional documents (Optional)",
+  "guidanceText": "Upload any documents that you think are relevant to the response. The claimant will be able to see any documents you upload.",
+  "beforeUploadHeading": "Before you upload your documents",
+  "beforeUploadText": "Give your document a name that explains what it is.",
+  "uploadLabel": "Upload a document",
+  "filesAddedHeading": "Documents added",
+  "uploadButton": "Upload document",
+  "deleteButton": "Remove",
+  "noFilesUploaded": "No documents uploaded"
+}

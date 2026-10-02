@@ -50,7 +50,7 @@ export function buildClaimPdfSection(
   copy: ViewTheClaimCopy
 ): ViewTheClaimDownloadSection {
   const claimDocument = documents.find(
-    document => document.categoryId === 'statementsOfCase' || document.filename.toLowerCase().includes('claim')
+    document => document.categoryId === 'statementsOfCase' && document.filename.toLowerCase().includes('claim')
   );
 
   return {

@@ -1,0 +1,14 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+  <p class="govuk-body">{{ paragraph }}</p>
+
+  {{ govukButton({
+    text: tryAgainButton,
+    href: triageUrl
+  }) }}
+{% endblock %}

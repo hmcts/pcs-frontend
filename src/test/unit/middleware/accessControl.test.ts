@@ -2,9 +2,14 @@ import type { NextFunction, Request, Response } from 'express';
 
 const mockOidcMiddleware = jest.fn();
 const mockGetUserType = jest.fn();
+const mockIsAccessControlEnabled = jest.fn();
 
 jest.mock('../../../main/middleware/oidc', () => ({
   oidcMiddleware: (...args: unknown[]) => mockOidcMiddleware(...args),
+}));
+
+jest.mock('../../../main/utils/isAccessControlEnabled', () => ({
+  isAccessControlEnabled: (...args: unknown[]) => mockIsAccessControlEnabled(...args),
 }));
 
 jest.mock('../../../main/steps/utils', () => ({
@@ -23,17 +28,19 @@ import {
   authorisationGate,
   isPublicPath,
   isSolicitorAllowedPath,
+  withAccessControlEnabled,
 } from '../../../main/middleware/accessControl';
 
 describe('accessControl', () => {
   let res: Partial<Response>;
   let next: NextFunction;
 
-  const run = (handler: unknown, req: Request): void =>
-    (handler as (request: Request, response: Response, nextFn: NextFunction) => void)(req, res as Response, next);
+  const run = (handler: unknown, req: Request): unknown =>
+    (handler as (request: Request, response: Response, nextFn: NextFunction) => unknown)(req, res as Response, next);
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsAccessControlEnabled.mockResolvedValue(true);
     res = { redirect: jest.fn(), status: jest.fn().mockReturnThis(), send: jest.fn() };
     next = jest.fn();
   });
@@ -133,6 +140,28 @@ describe('accessControl', () => {
 
       expect(res.redirect).toHaveBeenCalledWith('/logout');
       expect(next).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('withAccessControlEnabled', () => {
+    it('runs the wrapped handler when access control is enabled', async () => {
+      const handler = jest.fn();
+      mockIsAccessControlEnabled.mockResolvedValue(true);
+
+      await run(withAccessControlEnabled(handler), { path: '/claims' } as Request);
+
+      expect(handler).toHaveBeenCalledWith(expect.anything(), res, next);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('passes through without running the handler when access control is disabled', async () => {
+      const handler = jest.fn();
+      mockIsAccessControlEnabled.mockResolvedValue(false);
+
+      await run(withAccessControlEnabled(handler), { path: '/claims' } as Request);
+
+      expect(handler).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith();
     });
   });
 });

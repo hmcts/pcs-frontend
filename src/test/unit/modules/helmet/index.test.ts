@@ -45,6 +45,9 @@ describe('Helmet Module', () => {
         if (key === 'redirects.manageCaseReturnURL') {
           return 'https://manage.example.com/return';
         }
+        if (key === 'cuiRa.url') {
+          return 'https://cui-ra.example.com';
+        }
         return undefined;
       });
 
@@ -61,7 +64,13 @@ describe('Helmet Module', () => {
             scriptSrc: ["'self'", '*.google-analytics.com', "'unsafe-eval'", "'unsafe-inline'"],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
-            formAction: ["'self'", 'https://pcq.example.com', 'https://idam.example.com', 'https://manage.example.com'],
+            formAction: [
+              "'self'",
+              'https://pcq.example.com',
+              'https://idam.example.com',
+              'https://manage.example.com',
+              'https://cui-ra.example.com',
+            ],
           },
         },
         referrerPolicy: { policy: 'origin' },
@@ -78,6 +87,9 @@ describe('Helmet Module', () => {
         if (key === 'redirects.manageCaseReturnURL') {
           return 'https://manage.example.com/return';
         }
+        if (key === 'cuiRa.url') {
+          return 'https://cui-ra.example.com';
+        }
         return undefined;
       });
 
@@ -94,7 +106,12 @@ describe('Helmet Module', () => {
             scriptSrc: ["'self'", '*.google-analytics.com', "'unsafe-eval'", "'unsafe-inline'"],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
-            formAction: ["'self'", 'https://idam.example.com', 'https://manage.example.com'],
+            formAction: [
+              "'self'",
+              'https://idam.example.com',
+              'https://manage.example.com',
+              'https://cui-ra.example.com',
+            ],
           },
         },
         referrerPolicy: { policy: 'origin' },
@@ -109,6 +126,9 @@ describe('Helmet Module', () => {
         }
         if (key === 'redirects.manageCaseReturnURL') {
           return 'https://manage.example.com/return';
+        }
+        if (key === 'cuiRa.url') {
+          return 'https://cui-ra.example.com';
         }
         return undefined;
       });
@@ -160,6 +180,9 @@ describe('Helmet Module', () => {
         if (key === 'redirects.manageCaseReturnURL') {
           return 'https://manage.example.com/return';
         }
+        if (key === 'cuiRa.url') {
+          return 'https://cui-ra.example.com';
+        }
         return undefined;
       });
 
@@ -176,7 +199,13 @@ describe('Helmet Module', () => {
             scriptSrc: ["'self'", '*.google-analytics.com', "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
-            formAction: ["'self'", 'https://pcq.example.com', 'https://idam.example.com', 'https://manage.example.com'],
+            formAction: [
+              "'self'",
+              'https://pcq.example.com',
+              'https://idam.example.com',
+              'https://manage.example.com',
+              'https://cui-ra.example.com',
+            ],
           },
         },
         referrerPolicy: { policy: 'origin' },
@@ -193,6 +222,9 @@ describe('Helmet Module', () => {
         if (key === 'redirects.manageCaseReturnURL') {
           return 'https://manage.example.com/return';
         }
+        if (key === 'cuiRa.url') {
+          return 'https://cui-ra.example.com';
+        }
         return undefined;
       });
 
@@ -209,7 +241,12 @@ describe('Helmet Module', () => {
             scriptSrc: ["'self'", '*.google-analytics.com', "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
-            formAction: ["'self'", 'https://idam.example.com', 'https://manage.example.com'],
+            formAction: [
+              "'self'",
+              'https://idam.example.com',
+              'https://manage.example.com',
+              'https://cui-ra.example.com',
+            ],
           },
         },
         referrerPolicy: { policy: 'origin' },
@@ -283,6 +320,9 @@ describe('Helmet Module', () => {
         if (key === 'redirects.manageCaseReturnURL') {
           return 'https://manage.example.com/return';
         }
+        if (key === 'cuiRa.url') {
+          return 'https://cui-ra.example.com';
+        }
         return undefined;
       });
 
@@ -299,7 +339,12 @@ describe('Helmet Module', () => {
             scriptSrc: ["'self'", '*.google-analytics.com', "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
-            formAction: ["'self'", 'https://idam.example.com', 'https://manage.example.com'],
+            formAction: [
+              "'self'",
+              'https://idam.example.com',
+              'https://manage.example.com',
+              'https://cui-ra.example.com',
+            ],
           },
         },
         referrerPolicy: { policy: 'origin' },

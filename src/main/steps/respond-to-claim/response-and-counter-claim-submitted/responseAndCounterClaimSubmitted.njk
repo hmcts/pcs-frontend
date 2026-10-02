@@ -23,7 +23,7 @@
   <p class="govuk-body">{{ responseAndCounterClaimSubmittedParagraph5 | safe }}</p>
   {{ govukButton({
     text: closeAndReturnToCaseOverview,
-    href: dashboardUrl,
+    href: closeUrl or dashboardUrl,
     classes: "govuk-!-margin-top-6"
   }) }}
 {% endblock %}

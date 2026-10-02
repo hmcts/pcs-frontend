@@ -342,6 +342,9 @@ describe('confirmation-of-notice-date-when-provided step', () => {
   describe('legal representative copy', () => {
     type NoticeDateLocale = { release12: Record<string, string> };
 
+    // Legal rep copy names the defendant where the citizen copy says "you".
+    const DEFENDANT_TERM: Record<string, string> = { en: 'the defendant', cy: 'diffynnydd' };
+
     const readLocale = (lang: string, folder: string): NoticeDateLocale =>
       JSON.parse(
         fs.readFileSync(
@@ -363,7 +366,7 @@ describe('confirmation-of-notice-date-when-provided step', () => {
       for (const key of Object.keys(citizen.release12)) {
         expect(legalRep.release12[key]).toBeDefined();
         expect(legalRep.release12[key]).not.toBe(citizen.release12[key]);
-        expect(legalRep.release12[key]).toContain('the defendant');
+        expect(legalRep.release12[key]).toContain(DEFENDANT_TERM[lang]);
       }
     });
   });
