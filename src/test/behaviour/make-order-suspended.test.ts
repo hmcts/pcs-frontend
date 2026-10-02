@@ -21,6 +21,16 @@ describe('make an order: suspended possession', () => {
   });
   afterEach(() => app.close());
 
+  it('links an unchosen payment term to the payment term choices', async () => {
+    await openPage((await app.get(PAGE)).text);
+    selectTab('tab-suspended');
+    const missing = [...document.querySelectorAll<HTMLElement>('[data-generated-text]')].find(
+      fact => fact.textContent === '[select a payment term]'
+    )!;
+    missing.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(control('[name="suspended-payment-terms"][value="one-off"]'));
+  });
+
   it('suspends possession, the money judgment and costs on payment terms', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     const column = control('[data-suspended-costs-column]');

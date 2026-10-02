@@ -111,7 +111,9 @@ export function buildSuspendedOrder(data: OrderData): DocWeaveDocument {
                 });
               }
               if (!paymentTerms.length) {
-                subList.item('suspended-missing-payment-term', '[select a payment term];');
+                subList.item('suspended-missing-payment-term', content => {
+                  content.fact('missing', '[select a payment term]', { sourceId: 'suspended-payment-terms' }).text(';');
+                });
               }
             });
           }
