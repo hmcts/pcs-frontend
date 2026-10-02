@@ -32,14 +32,14 @@ const LISTINGS: Record<string, string> = {
 };
 
 const DIRECTIONS: Record<string, { party: 'claimant' | 'defendant'; text: string }> = {
-  defence: { party: 'defendant', text: ' send to the court and all other parties a defence.' },
+  defence: { party: 'defendant', text: ' submit to the court and all other parties a defence.' },
   counterclaim: {
     party: 'defendant',
-    text: ' send to the court and all other parties a defence and any counterclaim, having paid any court fees which are due.',
+    text: ' submit to the court and all other parties a defence and any counterclaim, having paid any court fees which are due.',
   },
   'claimant-reply': {
     party: 'claimant',
-    text: ' send to the court and all other parties a defence to the counterclaim and any reply.',
+    text: ' submit to the court and all other parties a defence to the counterclaim and any reply.',
   },
 };
 

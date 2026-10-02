@@ -85,9 +85,9 @@
 
   {% set directionItems = [] %}
   {% for direction in [
-    { value: "defence", text: "The defendant must send a defence" },
-    { value: "counterclaim", text: "The defendant must send a defence and any counterclaim" },
-    { value: "claimant-reply", text: "The claimant must send a defence to the counterclaim and any reply" }
+    { value: "defence", text: "The defendant must submit a defence" },
+    { value: "counterclaim", text: "The defendant must submit a defence and any counterclaim" },
+    { value: "claimant-reply", text: "The claimant must submit a defence to the counterclaim and any reply" }
   ] %}
     {% set directionItems = directionItems.concat([{
       value: direction.value,
