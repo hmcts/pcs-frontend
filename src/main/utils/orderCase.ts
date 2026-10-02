@@ -4,6 +4,7 @@ import config from 'config';
 import type { Request } from 'express';
 
 import { HTTPError } from '../HttpError';
+import { linkSignOutToLogout } from '../middleware/legalRepresentativeHeaders';
 import { getUserRoles } from '../steps/utils';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 
@@ -85,6 +86,7 @@ export function xuiHeaderModel(req: Request, roleAssignments: string[] = []): Re
   const roles = [...getUserRoles(req), ...roleAssignments];
   const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles } });
   headerModel.assetsPath = '/assets/ui-component-lib';
+  linkSignOutToLogout(headerModel);
   return headerModel;
 }
 

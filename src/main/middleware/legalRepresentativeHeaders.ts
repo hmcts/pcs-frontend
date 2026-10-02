@@ -4,6 +4,20 @@ import { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { isLegalRepresentativeUser } from '../steps/utils';
 
+/** XUI's own script handles the header's sign out action, so outside XUI it links to this service's logout. */
+export function linkSignOutToLogout(headerModel: ReturnType<typeof buildHeaderModel>): void {
+  if (headerModel?.accountNav?.items) {
+    headerModel.accountNav.items = headerModel.accountNav.items.map(item => {
+      if (item.id === 'sign-out' || item.action === 'sign-out') {
+        const newItem = { ...item, href: '/logout' };
+        delete newItem.action;
+        return newItem;
+      }
+      return item;
+    });
+  }
+}
+
 export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
   req: Request,
   res: Response,
@@ -25,16 +39,7 @@ export const legalRepresentativeHeaderMiddleware: RequestHandler = async (
     // Override default assetsPath
     headerModel.assetsPath = '/assets/ui-component-lib';
 
-    if (headerModel?.accountNav?.items) {
-      headerModel.accountNav.items = headerModel.accountNav.items.map(item => {
-        if (item.id === 'sign-out' || item.action === 'sign-out') {
-          const newItem = { ...item, href: '/logout' };
-          delete newItem.action;
-          return newItem;
-        }
-        return item;
-      });
-    }
+    linkSignOutToLogout(headerModel);
 
     const footerModel = buildFooterModel();
 
