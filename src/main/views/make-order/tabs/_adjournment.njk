@@ -135,6 +135,15 @@
   }) }}
 {% endset %}
 
+{{ compact.checkboxes("adj-subjects", {
+  legend: "What is adjourned",
+  items: [
+    { value: "claim", text: "Claim" },
+    { value: "counterclaim", text: "Counterclaim" },
+    { value: "application", text: "Application" }
+  ]
+}) }}
+
 {{ compact.radios("adj-type", {
   legend: "Adjournment type",
   classes: "govuk-radios--small pcs-inline-radios",

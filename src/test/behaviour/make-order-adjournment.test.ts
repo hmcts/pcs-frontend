@@ -20,6 +20,18 @@ describe('make an order: adjournment', () => {
   });
   afterEach(() => app.close());
 
+  it('adjourns whichever of the claim, counterclaim and application is chosen', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-adjournment');
+    check('adj-type', 'generally');
+    expect(page.orderText()).toContain('The claim is adjourned generally with liberty to restore');
+    check('adj-subjects', 'counterclaim');
+    check('adj-subjects', 'application');
+    expect(page.orderText()).toContain(
+      'The counterclaim and the application are adjourned generally with liberty to restore'
+    );
+  });
+
   it('adjourns to a specific hearing with directions', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-adjournment');
@@ -124,7 +136,7 @@ describe('make an order: adjournment', () => {
     // Without payment conditions the claim is simply adjourned with liberty to restore.
     uncheck('adj-gen', 'current-rent-plus');
     expect(page.orderText()).toContain(
-      'This claim is adjourned generally with liberty to restore by application by any party on notice to all other parties. If no application is made by 4pm on 1 March 2027 the claim shall automatically be struck out without the need for any further application or order.'
+      'The claim is adjourned generally with liberty to restore by application by any party on notice to all other parties. If no application is made by 4pm on 1 March 2027 the claim shall automatically be struck out without the need for any further application or order.'
     );
   });
 });
