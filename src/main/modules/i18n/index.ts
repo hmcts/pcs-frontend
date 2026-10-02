@@ -174,6 +174,9 @@ function createI18nextConfig(localesDir: string, namespaces: string[]): InitOpti
       lookupCookie: 'lang',
       lookupSession: 'lang',
       caches: ['cookie'],
+      // Lax, not the library's Strict default: the cookie must survive top-level returns from
+      // external sites (GOV.UK Pay, IDAM), or the language falls back to English and is re-cached.
+      cookieSameSite: 'lax',
     },
     debug: false,
     saveMissing: false,

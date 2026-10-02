@@ -90,6 +90,16 @@ describe('i18n module', () => {
     expect(mockLogger.info).toHaveBeenCalledWith('[i18n] initialised OK');
   });
 
+  it('caches the language in a SameSite=Lax cookie so it survives returns from external sites', () => {
+    mockInit.mockImplementation((_opts: unknown, cb: (err: unknown) => void) => cb(null));
+
+    new I18n().enableFor(app);
+
+    expect(mockInit.mock.calls[0][0].detection).toEqual(
+      expect.objectContaining({ lookupCookie: 'lang', caches: ['cookie'], cookieSameSite: 'lax' })
+    );
+  });
+
   it('logs (but does not throw) on init failure and still registers middlewares', async () => {
     const err = new Error('Init failed');
     mockInit.mockImplementation((_opts: unknown, cb: (err: unknown) => void) => cb(err));
