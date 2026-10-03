@@ -630,6 +630,25 @@ describe('OIDCModule', () => {
         expect(mockRequest.session.destroy).toHaveBeenCalled();
         expect(mockResponse.redirect).toHaveBeenCalledWith('https://manage-case.aat.platform.hmcts.net/auth/logout');
       });
+
+      it('should redirect directly to XUI logout URL for staff users', async () => {
+        mockRequest.session = createMockSession({
+          user: {
+            idToken: 'test-id-token',
+            roles: ['caseworker', 'caseworker-pcs'],
+          },
+          destroy: jest.fn().mockImplementation(function (callback) {
+            callback(null);
+          }),
+        });
+
+        oidcModule.enableFor(mockApp);
+        const logoutHandler = (mockApp.get as jest.Mock).mock.calls[2][1];
+        await logoutHandler(mockRequest, mockResponse, mockNext);
+
+        expect(buildEndSessionUrl).not.toHaveBeenCalled();
+        expect(mockResponse.redirect).toHaveBeenCalledWith('https://manage-case.aat.platform.hmcts.net/auth/logout');
+      });
     });
 
     describe('refreshUserTokens', () => {
