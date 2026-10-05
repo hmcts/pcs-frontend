@@ -6,7 +6,6 @@ import { createCaseEventTokenApiData } from '../../../data/api-data';
 import { claimantCreateGenAppApiData } from '../../../data/api-data/claimantCreateGenApp.api.data';
 import { getCaseApiData } from '../../../data/api-data/getCase.api.data';
 import { paymentApiData } from '../../../data/api-data/payment.api.data';
-import { user } from '../../../data/user-data';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class ClaimantCreateGenAppAPIAction implements IAction {
@@ -22,6 +21,11 @@ export class ClaimantCreateGenAppAPIAction implements IAction {
       throw new Error('Claimant GenApp payload was not provided.');
     }
 
+    const { email, password } = fieldName as actionRecord;
+    if (typeof email !== 'string' || email.trim() === '' || typeof password !== 'string' || password === '') {
+      throw new Error('email and password are required to create a claimant GenApp');
+    }
+
     const caseResponse = await Axios.create(createCaseEventTokenApiData.createCaseApiInstance()).get(
       getCaseApiData.getCaseApiEndPoint()
     );
@@ -32,8 +36,8 @@ export class ClaimantCreateGenAppAPIAction implements IAction {
 
     const { IdamUtils } = await import('@hmcts/playwright-common');
     const claimantToken = await new IdamUtils().generateIdamToken({
-      username: user.claimantSolicitor.email,
-      password: user.claimantSolicitor.password,
+      username: email,
+      password,
       grantType: 'password',
       clientId: 'pcs-frontend',
       clientSecret: process.env.PCS_FRONTEND_IDAM_SECRET as string,
