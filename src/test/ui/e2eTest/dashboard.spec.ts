@@ -177,7 +177,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
   });
 
-  test('View all applications should be enabled when another defendant has withoutNotice = NO', async () => {
+  test('View all applications should be enabled when another defendant has withoutNotice = NO', async ({ page }) => {
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
     });
@@ -195,6 +195,8 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
     await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
     await performAction('clickLink', dashboard.viewAllApplicationsLink);
+    // Temporary diagnostic: remove once the CI failure is understood.
+    console.log('VIEW ALL APPLICATIONS H2s:', await page.locator('h2').allTextContents());
     await performValidation('text', {
       elementType: 'subHeader',
       text: `Applications made by ${submitCaseApiData.submitCasePayload.claimantName}`,
