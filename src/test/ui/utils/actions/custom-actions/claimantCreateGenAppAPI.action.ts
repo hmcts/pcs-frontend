@@ -62,7 +62,7 @@ export class ClaimantCreateGenAppAPIAction implements IAction {
       // The application stays unissued until its own fee service request is paid; that request is created asynchronously.
       // Submitting the GenApp event creates the application, but it stays unissued until its own fee service request is paid.
       // That fee service request isn't created in the same call. The backend creates it asynchronously after the event is submitted.
-      // If the test moved on right away, the application would still be unissued and later steps would fail.
+      // If the test moved on right away, the application would still be unissued and later steps would fail
 
       const paymentApi = Axios.create(paymentApiData.paymentApiInstance());
       type FeeRequest = { serviceRequestReference: string; paymentStatus: string; paymentCallbackHandlerType: string };
