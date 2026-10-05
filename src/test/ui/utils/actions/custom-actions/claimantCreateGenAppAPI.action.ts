@@ -90,7 +90,7 @@ export class ClaimantCreateGenAppAPIAction implements IAction {
         paymentApiData.updatePaymentApiEndPoint,
         paymentApiData.paymentUpdatePayload(unpaid.serviceRequestReference)
       );
-      console.log(`\n✅ CLAIMANT GENAPP SUBMITTED AND FEE PAID: case ${process.env.CASE_NUMBER}`);
+      console.log(`\n CLAIMANT GENAPP SUBMITTED AND FEE PAID: case ${process.env.CASE_NUMBER}`);
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
         throw new Error(
