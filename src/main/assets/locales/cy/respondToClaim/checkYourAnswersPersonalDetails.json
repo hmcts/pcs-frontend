@@ -39,9 +39,15 @@
       "label": "Ydych chi'n hapus i ni gysylltu â chi dros y ffôn?",
       "changeHidden": "cysylltu dros y ffôn"
     },
+    "phoneNumber": {
+      "label": "cysylltu dros y ffôn"
+    },
     "contactByText": {
       "label": "Ydych chi'n hapus i ni gysylltu â chi drwy neges testun?",
       "changeHidden": "cysylltu drwy neges testun"
+    },
+    "textMessageNumber": {
+      "label": "cysylltu dros y ffôn"
     },
     "contactDetails": {
       "label": "Manylion cyswllt",
