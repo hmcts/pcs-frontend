@@ -21,35 +21,15 @@ export class ClaimantCreateGenAppAPIAction implements IAction {
       throw new Error('Claimant GenApp payload was not provided.');
     }
 
-    const { email, password } = fieldName as actionRecord;
-    if (typeof email !== 'string' || email.trim() === '' || typeof password !== 'string' || password === '') {
-      throw new Error('email and password are required to create a claimant GenApp');
-    }
-
-    const caseResponse = await Axios.create(createCaseEventTokenApiData.createCaseApiInstance()).get(
-      getCaseApiData.getCaseApiEndPoint()
-    );
+    const caseApi = Axios.create(createCaseEventTokenApiData.createCaseApiInstance());
+    const caseResponse = await caseApi.get(getCaseApiData.getCaseApiEndPoint());
     const applicantPartyId = caseResponse.data?.data?.allClaimants?.[0]?.id;
     if (!applicantPartyId) {
       throw new Error(`No claimant party ID found for case ${process.env.CASE_NUMBER}`);
     }
 
-    const { IdamUtils } = await import('@hmcts/playwright-common');
-    const claimantToken = await new IdamUtils().generateIdamToken({
-      username: email,
-      password,
-      grantType: 'password',
-      clientId: 'pcs-frontend',
-      clientSecret: process.env.PCS_FRONTEND_IDAM_SECRET as string,
-      scope: 'profile openid roles',
-    });
-
     const config = claimantCreateGenAppApiData();
-    const baseConfig = createCaseEventTokenApiData.createCaseApiInstance();
-    const claimantApi = Axios.create({
-      ...baseConfig,
-      headers: { ...baseConfig.headers, Authorization: `Bearer ${claimantToken}` },
-    });
+    const claimantApi = caseApi;
 
     const eventToken = (await claimantApi.get(config.claimantCreateGenAppEventTokenApiEndPoint())).data?.token;
     if (!eventToken) {

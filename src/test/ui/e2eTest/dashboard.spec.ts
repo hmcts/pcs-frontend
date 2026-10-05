@@ -183,8 +183,6 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
     await performAction('claimantCreateGenAppApi', {
       data: claimantCreateGenAppApiData().claimantCreateGenAppPayload,
-      email: user.claimantSolicitor.email,
-      password: user.claimantSolicitor.password,
     });
     await performAction('reloadPage');
     await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
