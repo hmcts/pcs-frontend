@@ -195,8 +195,6 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
     await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
     await performAction('clickLink', dashboard.viewAllApplicationsLink);
-    // Temporary diagnostic: remove once the CI failure is understood.
-    console.log('VIEW ALL APPLICATIONS H2s:', await page.locator('h2').allTextContents());
     await performValidation('text', {
       elementType: 'subHeader',
       text: `Applications made by ${submitCaseApiData.submitCasePayload.claimantName}`,
