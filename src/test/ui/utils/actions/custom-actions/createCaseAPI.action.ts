@@ -200,7 +200,7 @@ export class CreateCaseAPIAction implements IAction {
   }
 
   private async deleteCaseRole(roleData: actionData): Promise<void> {
-    const userId = user.claimantSolicitor.uid;
+    const userId = user.localAuthority.uid;
     const caseId = (process.env.CASE_NUMBER ?? '').replace(/-/g, '');
     const caseRole = typeof roleData === 'string' ? roleData : String(roleData);
     if (!caseId) {

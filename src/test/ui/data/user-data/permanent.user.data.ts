@@ -1,12 +1,19 @@
 import { resolveIdamPassword } from '../../utils/idamPassword';
 
 export const user = {
-  claimantSolicitor: {
-    email: 'pcs-solicitor-automation@test.com',
+  // claimantSolicitor: {
+  //   email: 'pcs-solicitor-automation@test.com',
+  //   get password() {
+  //     return resolveIdamPassword();
+  //   },
+  //   uid: process.env.PCS_SOLICITOR_AUTOMATION_UID,
+  // },
+  localAuthority: {
+    email: 'pcs.local.auth1user1@test.com',
     get password() {
       return resolveIdamPassword();
     },
-    uid: process.env.PCS_SOLICITOR_AUTOMATION_UID,
+    uid: process.env.PCS_LOCAL_AUTH_AUTOMATION_UID,
   },
   caseworker: {
     email: 'pcs-caseworker@test.com',
