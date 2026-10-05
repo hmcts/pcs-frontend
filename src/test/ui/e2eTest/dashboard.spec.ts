@@ -177,7 +177,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
   });
 
-  test('View all applications should be enabled when another defendant has withoutNotice = NO', async ({ page }) => {
+  test('View all applications should be enabled when another defendant has withoutNotice = NO', async () => {
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
     });
