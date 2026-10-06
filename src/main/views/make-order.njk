@@ -8,7 +8,7 @@
 
 {% set htmlClasses = "pcs-make-order" %}
 
-{% set pageHeading = "Make an order" %}
+{% set pageHeading = ("Decide application " + application.reference) if application else "Make an order" %}
 
 {% block content %}
   {% if errorSummary %}
@@ -22,9 +22,10 @@
   <input type="hidden" name="caseContext" value="{{ caseContextJson }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
+  <input type="hidden" name="genAppId" value="{{ order.genAppId or '' }}">
   {{ csrfProtection(csrfToken) }}
 
-  <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make an order</h1>
+  <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ pageHeading }}</h1>
 
   <p class="govuk-body govuk-!-margin-bottom-1">
     <span class="govuk-!-font-weight-bold">Case reference:</span> {{ caseReferenceDisplay }}

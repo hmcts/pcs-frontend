@@ -1,9 +1,33 @@
 import { DateTime } from 'luxon';
 
 import type { AttendanceParty, MakeOrderType } from '@utils/makeOrderValidation';
-import type { FormData, OrderParty, OrderStart } from '@utils/orderCase';
+import type { FormData, OrderApplication, OrderParty, OrderStart } from '@utils/orderCase';
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
+const APPLICATION_ORDER_TYPE: MakeOrderType = 'APPLICATION_DECISION';
+
+const YES_NO: Record<string, string> = { YES: 'Yes', NO: 'No' };
+
+function displayDate(iso?: string | null): string | undefined {
+  const date = DateTime.fromISO(String(iso ?? ''));
+  return date.isValid ? date.setLocale('en-GB').toFormat('d MMMM yyyy') : undefined;
+}
+
+/** The application as its panel shows it: its answers in words, and its dates as the court writes them. */
+function applicationModel(application: OrderApplication, caseReference: number) {
+  return {
+    ...application,
+    documents: application.documents.map(document => ({
+      ...document,
+      href: `/case/${caseReference}/view-documents/${encodeURIComponent(document.id)}`,
+    })),
+    submittedOnDisplay: displayDate(application.submittedOn),
+    referredOnDisplay: displayDate(application.referredOn),
+    within14DaysDisplay: YES_NO[application.within14Days ?? ''],
+    otherPartiesAgreedDisplay: YES_NO[application.otherPartiesAgreed ?? ''],
+    withoutNoticeDisplay: YES_NO[application.withoutNotice ?? ''],
+  };
+}
 
 /** Pre-fills the case facts fields from the claim, in the form's field names. */
 function caseFactsFormData(caseFacts: Record<string, unknown> = {}): FormData {
@@ -68,7 +92,10 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
   };
   return {
     draft,
-    draftOrderType: submission?.orderType ?? order.orderType ?? DEFAULT_ORDER_TYPE,
+    draftOrderType:
+      submission?.orderType ??
+      order.orderType ??
+      (caseContext.application ? APPLICATION_ORDER_TYPE : DEFAULT_ORDER_TYPE),
     orderDocumentJson: submission?.orderDocumentJson ?? JSON.stringify(order.docweaveSnapshot ?? null),
     draftValue: (name: string): unknown => draft[name],
     draftChecked: (name: string, value: string): boolean => {
@@ -81,5 +108,8 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     attendanceParties: attendanceParties(start),
     openCounterclaim: caseContext.openCounterclaim === true,
     openApplication: caseContext.openApplication === true,
+    application: caseContext.application
+      ? applicationModel(caseContext.application, caseContext.caseReference)
+      : undefined,
   };
 }

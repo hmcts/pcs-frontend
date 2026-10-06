@@ -1,0 +1,30 @@
+{#
+  What the judge decides about the application, which starts the order's wording. Listing it for a
+  hearing leaves the application open.
+#}
+{% import "make-order/_compact.njk" as compact with context %}
+
+{% set listHtml %}
+  {{ compact.radios("application-list-notice", {
+    legend: "Hearing",
+    classes: "govuk-radios--small",
+    default: "on-notice",
+    items: [
+      { value: "on-notice", text: "On notice to the other parties" },
+      { value: "without-notice", text: "Without notice" }
+    ]
+  }) }}
+{% endset %}
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Decision</h2>
+
+{{ compact.radios("application-decision", {
+  legend: "What do you decide?",
+  items: [
+    { value: "grant", text: "Grant the application" },
+    { value: "refuse", text: "Refuse the application" },
+    { value: "strike-out", text: "Strike out the application" },
+    { value: "list", text: "List the application for a hearing", conditional: { html: listHtml } },
+    { value: "other", text: "Something else", hint: { text: "Write the order in the order preview" } }
+  ]
+}) }}

@@ -5,6 +5,7 @@ import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation
 
 import { type OrderData, readOrderData } from './make-order/data';
 import { buildAdjournmentOrder } from './make-order/wording/adjournment';
+import { buildApplicationOrder, requestedParagraphs } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildFreeFormOrder } from './make-order/wording/free-form';
 import { buildOutrightOrder } from './make-order/wording/outright';
@@ -199,12 +200,63 @@ const builders: Record<OrderType, (data: OrderData) => DocWeaveDocument> = {
   ADJOURNMENT: buildAdjournmentOrder,
   STRIKE_OUT_DISMISSAL: buildStrikeOutDismissalOrder,
   FREE_FORM: buildFreeFormOrder,
+  APPLICATION_DECISION: buildApplicationOrder,
 };
 
 /** The generated order for the form's current answers and selected order type. */
 export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
   const type = form.querySelector<HTMLInputElement>('#order-type')?.value as OrderType;
   return builders[type](readOrderData(form));
+}
+
+function escapeHtml(text: string): string {
+  const element = document.createElement('span');
+  element.textContent = text;
+  return element.innerHTML;
+}
+
+/** Lets the editor take up what was just done to it, which it does on the browser's next turn. */
+const nextTurn = (): Promise<void> => new Promise(resolve => window.setTimeout(resolve));
+
+/**
+ * The applicant's wording, added to the end of the order as the judge's own clauses, so they can change
+ * or delete any of it as they would anything they typed. It goes in as the judge would put it there: a
+ * new clause after the last one, then a paste, which is how the editor takes in wording the judge writes.
+ * Once added, the form says so and the button is spent.
+ */
+export function initRequestedWording(form: HTMLFormElement, mount: HTMLElement): void {
+  const button = form.querySelector<HTMLButtonElement>('[data-use-requested-wording]');
+  const added = form.querySelector<HTMLInputElement>('input[name="application-wording-added"]');
+  const wording = form.querySelector<HTMLElement>('[data-application]')?.dataset.applicationWording ?? '';
+  if (!button || !added) {
+    return;
+  }
+  button.addEventListener('click', async () => {
+    const editable = mount.querySelector<HTMLElement>('[contenteditable="true"]');
+    const paragraphs = requestedParagraphs(wording);
+    if (!editable || !paragraphs.length) {
+      return;
+    }
+    editable.focus();
+    const end = document.createRange();
+    end.selectNodeContents(editable);
+    end.collapse(false);
+    window.getSelection()?.removeAllRanges();
+    window.getSelection()?.addRange(end);
+    await nextTurn();
+    editable.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true, cancelable: true })
+    );
+    await nextTurn();
+    const clipboard = new DataTransfer();
+    clipboard.setData('text/html', `<ol>${paragraphs.map(p => `<li><p>${escapeHtml(p)}</p></li>`).join('')}</ol>`);
+    clipboard.setData('text/plain', paragraphs.join('\n'));
+    editable.dispatchEvent(new ClipboardEvent('paste', { clipboardData: clipboard, bubbles: true, cancelable: true }));
+    added.value = 'yes';
+    button.disabled = true;
+    button.textContent = 'Added to the order preview';
+    mount.scrollIntoView({ block: 'center' });
+  });
 }
 
 export function initMakeOrder(): void {
@@ -291,6 +343,7 @@ export function initMakeOrder(): void {
   form.addEventListener('submit', followTab);
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
+  initRequestedWording(form, mount);
 }
 
 /**

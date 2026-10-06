@@ -25,16 +25,27 @@ interface StartedOrder {
   eventToken: string;
 }
 
+/** What the page's URL names: an order from the orders tab, or the application a task asks the judge to decide. */
+interface Chosen {
+  orderId?: string;
+  genAppId?: string;
+}
+
 /**
  * Starts the judge's working order, or the order they chose on the case's orders tab: one a
- * caseworker returned to them, which pcs-api starts with the caseworker's query.
+ * caseworker returned to them, which pcs-api starts with the caseworker's query. A task to decide an
+ * application starts the judge's order on that application.
  */
-async function startOrderEvent(accessToken: string, caseReference: string, orderId?: string): Promise<StartedOrder> {
+async function startOrderEvent(
+  accessToken: string,
+  caseReference: string,
+  { orderId, genAppId }: Chosen = {}
+): Promise<StartedOrder> {
   const started = await ccdCaseService.startCaseEvent(
     accessToken,
     caseReference,
     MAKE_ORDER_EVENT_ID,
-    orderId ? { orderId } : undefined
+    orderId || genAppId ? { orderId, genAppId } : undefined
   );
   const payload = started.data.sdkEventPayload;
   if (!payload) {
@@ -81,9 +92,13 @@ function pageModel(
   };
 }
 
-/** The order the orders tab linked to, which the page's URL names for as long as the judge works on it. */
-function chosenOrderId(req: Request): string | undefined {
-  return typeof req.query.orderId === 'string' ? req.query.orderId : undefined;
+/**
+ * The order the orders tab linked to, or the application a task linked to, which the page's URL names
+ * for as long as the judge works on it.
+ */
+function chosenFromUrl(req: Request): Chosen {
+  const id = (name: string): string | undefined => (typeof req.query[name] === 'string' ? req.query[name] : undefined);
+  return { orderId: id('orderId'), genAppId: id('genAppId') };
 }
 
 /** pcs-api would not start the chosen order, such as one already sent for review again: say why. */
@@ -105,7 +120,7 @@ export default function makeOrderRoutes(app: Application): void {
       const started = await startOrderEvent(
         req.session.user!.accessToken,
         req.params.caseReference as string,
-        chosenOrderId(req)
+        chosenFromUrl(req)
       );
       res.render('make-order', pageModel(req, started));
     } catch (error) {
@@ -129,6 +144,7 @@ export default function makeOrderRoutes(app: Application): void {
       caseContext,
       orderId,
       orderVersion,
+      genAppId,
       queryFromCaseworker,
       orderType,
       orderDocument,
@@ -141,7 +157,7 @@ export default function makeOrderRoutes(app: Application): void {
         const started: StartedOrder = {
           eventToken,
           envelope: {
-            order: { id: orderId, version: Number(orderVersion), queryFromCaseworker },
+            order: { id: orderId, version: Number(orderVersion), queryFromCaseworker, genAppId },
             caseContext: JSON.parse(caseContext),
           },
         };
@@ -161,6 +177,7 @@ export default function makeOrderRoutes(app: Application): void {
           orderType,
           formData,
           docweaveSnapshot: JSON.parse(orderDocument || 'null'),
+          genAppId: genAppId || null,
         },
       };
       try {
@@ -173,7 +190,7 @@ export default function makeOrderRoutes(app: Application): void {
         }
         // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
         // tab: show the judge the order as it now stands, and why.
-        const current = await startOrderEvent(accessToken, caseReference, chosenOrderId(req));
+        const current = await startOrderEvent(accessToken, caseReference, chosenFromUrl(req));
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }

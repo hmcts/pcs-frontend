@@ -31,8 +31,16 @@ interface Envelope {
     formData?: Record<string, unknown>;
     docweaveSnapshot?: unknown;
     queryFromCaseworker?: string;
+    genAppId?: string;
   };
   caseContext: Record<string, unknown>;
+}
+
+/** The orders the judge submitted, as pcs-api received them. */
+let orderRequests: Record<string, unknown>[] = [];
+
+export function submittedOrders(): Record<string, unknown>[] {
+  return orderRequests;
 }
 
 const blankCase = (): Envelope => ({
@@ -168,8 +176,10 @@ function ccdStub(): Express {
         orderType: posted.order.orderType,
         formData: posted.order.formData,
         docweaveSnapshot: posted.order.docweaveSnapshot,
+        genAppId: posted.order.genAppId ?? envelope.order.genAppId,
       },
     };
+    orderRequests.push(posted);
     res.json({ id: req.params.id, data: {} });
   });
   return ccd;
@@ -210,6 +220,8 @@ export async function bootApp(
     orderAwaitingReview?: Partial<Envelope['order']>;
     /** The judge's order as a caseworker returned it to them, with their query. */
     orderReturnedToJudge?: Partial<Envelope['order']>;
+    /** The general application court staff referred to the judge, which the judge's order decides. */
+    application?: Record<string, unknown> & { id: string };
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -238,8 +250,13 @@ export async function bootApp(
       state: 'RETURNED_TO_JUDGE',
     };
   }
+  if (options.application) {
+    envelope.caseContext.application = options.application;
+    envelope.order.genAppId = options.application.id;
+  }
   startTokens = [];
   submittedTokens = [];
+  orderRequests = [];
   reviewRequests = [];
   refusal = undefined;
   ccd ??= await listen(ccdStub());
