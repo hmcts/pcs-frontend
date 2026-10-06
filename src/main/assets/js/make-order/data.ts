@@ -13,7 +13,16 @@ export interface AttendanceEntry {
   representativeName: string;
 }
 
+/** The general application an order decides, as its panel on the page gives it. */
+export interface OrderApplication {
+  reference: string;
+  type: string;
+  applicant: string;
+  submittedOn: string;
+}
+
 export interface OrderData {
+  application?: OrderApplication;
   answers: Readonly<Record<string, readonly string[]>>;
   selectedControlIds: Readonly<Record<string, string>>;
   propertyAddress: string;
@@ -62,7 +71,18 @@ export function readOrderData(form: HTMLFormElement): OrderData {
     });
   });
 
+  const panel = form.querySelector<HTMLElement>('[data-application]');
+  const application = panel
+    ? {
+        reference: panel.dataset.applicationReference ?? '',
+        type: panel.dataset.applicationType ?? '',
+        applicant: panel.dataset.applicationApplicant ?? 'the applicant',
+        submittedOn: panel.dataset.applicationSubmitted ?? '',
+      }
+    : undefined;
+
   return {
+    application,
     answers,
     selectedControlIds,
     propertyAddress: form.dataset.propertyAddress ?? '',

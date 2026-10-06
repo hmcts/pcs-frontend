@@ -6,6 +6,11 @@
 
 <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
 
+{% if application %}
+{# An order deciding an application is made on paper: the application, then the decision, without the hearing. #}
+{% include "make-order/_application.njk" %}
+{% include "make-order/_application-decision.njk" %}
+{% else %}
 {% include "make-order/_case-facts.njk" %}
 {% include "make-order/_attendance.njk" %}
 
@@ -43,6 +48,7 @@
     </div>
   {% endfor %}
 </div>
+{% endif %}
 
 {% include "make-order/_costs.njk" %}
 

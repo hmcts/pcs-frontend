@@ -42,6 +42,7 @@
       value: item.value,
       text: item.text,
       html: item.html,
+      hint: item.hint,
       conditional: item.conditional,
       checked: draftChecked(name, item.value) or (item.value == params.default and not draftValue(name)),
       attributes: { required: true } if not params.optional
@@ -64,6 +65,7 @@
       value: item.value,
       text: item.text,
       html: item.html,
+      hint: item.hint,
       conditional: item.conditional,
       disabled: item.disabled,
       checked: draftChecked(name, item.value) or (item.value == params.default and not draftValue(name))

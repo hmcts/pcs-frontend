@@ -6,6 +6,7 @@ export const MAKE_ORDER_TYPES = [
   'ADJOURNMENT',
   'STRIKE_OUT_DISMISSAL',
   'FREE_FORM',
+  'APPLICATION_DECISION',
 ] as const;
 export type MakeOrderType = (typeof MAKE_ORDER_TYPES)[number];
 
@@ -331,6 +332,27 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
   return issues;
 }
 
+export const APPLICATION_DECISIONS = ['grant', 'refuse', 'strike-out', 'list', 'other'] as const;
+
+/** What the judge decides about the application, and whether a hearing they list it for is on notice. */
+function validateApplicationDecision(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const { issues, add } = validation(formData);
+  const decision = value(formData, 'application-decision');
+  add(
+    (APPLICATION_DECISIONS as readonly string[]).includes(decision),
+    'application-decision',
+    'Select what you decide about the application'
+  );
+  if (decision === 'list') {
+    add(
+      ['on-notice', 'without-notice'].includes(value(formData, 'application-list-notice')),
+      'application-list-notice',
+      'Select whether the hearing is on notice'
+    );
+  }
+  return [...issues, ...validateCosts(formData, false)];
+}
+
 /** The judge's own figures for the case, which they need not give. */
 function validateCaseFacts(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, optionalMoney } = validation(formData);
@@ -374,6 +396,8 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
       return validateStrikeOut(formData);
     case 'FREE_FORM':
       return validateCosts(formData, false);
+    case 'APPLICATION_DECISION':
+      return validateApplicationDecision(formData);
     default:
       throw new Error(`Unknown order type: ${orderType}`);
   }
@@ -389,7 +413,8 @@ export function validateMakeOrder(
   return [
     ...validateCaseFacts(formData),
     ...validateText(formData, 'hearing-notes', 'Hearing notes'),
-    ...validateAttendance(formData, parties),
+    // An order deciding an application is made without a hearing, so no one attended.
+    ...(orderType === 'APPLICATION_DECISION' ? [] : validateAttendance(formData, parties)),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
     ...validateOrderType(orderType, formData),
     ...(chosen('staff-message') ? validateStaffMessage(formData) : []),

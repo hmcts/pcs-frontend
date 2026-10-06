@@ -31,6 +31,7 @@ interface Envelope {
     formData?: Record<string, unknown>;
     docweaveSnapshot?: unknown;
     queryFromCaseworker?: string;
+    genAppId?: string;
   };
   caseContext: Record<string, unknown>;
 }
@@ -163,6 +164,7 @@ function ccdStub(): Express {
         orderType: posted.order.orderType,
         formData: posted.order.formData,
         docweaveSnapshot: posted.order.docweaveSnapshot,
+        genAppId: posted.order.genAppId ?? envelope.order.genAppId,
       },
     };
     res.json({ id: req.params.id, data: {} });
@@ -207,6 +209,8 @@ export async function bootApp(
     openApplication?: boolean;
     /** The order pcs-api starts the event with, over a blank one. */
     order?: Partial<Envelope['order']>;
+    /** The general application court staff referred to the judge, which the judge's order decides. */
+    application?: Record<string, unknown> & { id: string };
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -216,6 +220,10 @@ export async function bootApp(
   envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
   envelope.caseContext.openApplication = options.openApplication ?? false;
   envelope.order = { ...envelope.order, ...options.order };
+  if (options.application) {
+    envelope.caseContext.application = options.application;
+    envelope.order.genAppId = options.application.id;
+  }
   startTokens = [];
   submittedTokens = [];
   reviewRequests = [];
