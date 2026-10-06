@@ -12,12 +12,18 @@ export function buildLanguageUsedRows(req: Request, t: TFunction): SummaryListRo
 
   const change = makeChange(caseRef, 'checkYourAnswersAndSubmit', t);
   const languageUsed = validatedCase.defendantResponses?.languageUsed;
+  const canChange = req.res?.locals.welshLanguageUsedEnabled === true;
+
+  // With the question switched off there is nothing to change; show an earlier answer if there is one.
+  if (!canChange && !languageUsed) {
+    return [];
+  }
 
   return [
     {
       key: { text: t('rows.languageUsed.label') },
       value: { text: languageUsed ? t(`rows.languageUsed.options.${languageUsed}`) : t('noAnswerProvided') },
-      actions: { items: [change('language-used', 'rows.languageUsed.changeHidden')] },
+      ...(canChange ? { actions: { items: [change('language-used', 'rows.languageUsed.changeHidden')] } } : {}),
     },
   ];
 }

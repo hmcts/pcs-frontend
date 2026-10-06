@@ -3,7 +3,7 @@ import type { Request } from 'express';
 import { legalrepFlowConfig } from '../../../../main/steps/respond-to-claim/legalrep.flow.config';
 import { legalRepStepRegistry } from '../../../../main/steps/respond-to-claim/legalrep.stepRegistry';
 
-import { getNextStep } from '@modules/steps/flow';
+import { getNextStep, getPreviousStep } from '@modules/steps/flow';
 
 const CITIZEN_ONLY_STEPS = [
   'free-legal-advice',
@@ -43,5 +43,27 @@ describe('respond-to-claim legalrep flow config', () => {
     const next = await getNextStep(req, 'start-now', legalrepFlowConfig, {});
     expect(next).not.toBe('free-legal-advice');
     expect(['select-defendant']).toContain(next);
+  });
+});
+
+describe('respond-to-claim legalrep language-used step', () => {
+  const buildReq = (welshLanguageUsedEnabled: boolean) =>
+    ({ res: { locals: { welshLanguageUsedEnabled, validatedCase: { data: {} } } } }) as unknown as Request;
+
+  it('inherits the citizen show condition', () => {
+    const showCondition = legalrepFlowConfig.steps['language-used'].showCondition!;
+
+    expect(showCondition(buildReq(true))).toBe(true);
+    expect(showCondition(buildReq(false))).toBe(false);
+  });
+
+  it('goes from upload-document straight to the end-of-journey CYA and back when the flag is off', async () => {
+    await expect(getNextStep(buildReq(true), 'upload-document', legalrepFlowConfig, {})).resolves.toBe('language-used');
+    await expect(getNextStep(buildReq(false), 'upload-document', legalrepFlowConfig, {})).resolves.toBe(
+      'end-of-journey-cya'
+    );
+    await expect(getPreviousStep(buildReq(false), 'end-of-journey-cya', legalrepFlowConfig)).resolves.toBe(
+      'upload-document'
+    );
   });
 });

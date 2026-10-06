@@ -28,6 +28,7 @@ import { buildErrorSummary } from '@modules/steps/formBuilder/errorUtils';
 import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
+import { LanguageUsed } from '@services/ccdCase.interface';
 
 const STEP_NAME = 'end-of-journey-cya';
 
@@ -196,6 +197,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
 
     draft.defendantResponses.statementOfTruth = buildStatementOfTruthPayload(req.body, isLegalRepresentative);
+
+    // The language step is hidden when welsh-language-used-enabled is off. Record English then,
+    // but keep an answer given before the flag was turned off.
+    if (req.res?.locals.welshLanguageUsedEnabled !== true && !draft.defendantResponses.languageUsed) {
+      draft.defendantResponses.languageUsed = LanguageUsed.ENGLISH;
+    }
 
     const enumValue = sectionIdToBackendEnum('checkYourAnswersAndSubmit');
     const current = draft.defendantResponses.completedSections ?? [];

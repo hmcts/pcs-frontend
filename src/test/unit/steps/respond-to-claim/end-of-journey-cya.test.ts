@@ -87,6 +87,7 @@ import {
   getStatementOfTruthInitialFormData,
   step,
 } from '../../../../main/steps/respond-to-claim/end-of-journey-cya';
+import { buildDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 import { RespondToClaimSubmitRejectedError } from '../../../../main/steps/utils/respondToClaimFinalSubmit';
 
 const CASE_REF = '1234567890123456';
@@ -321,5 +322,47 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
 
     expect(initial.statementOfTruthBelief).toEqual(['yes']);
     expect(initial.statementOfTruthContempt).toEqual(['yes']);
+  });
+});
+
+describe('respond-to-claim end-of-journey-cya step — language used', () => {
+  const completeBody = {
+    statementOfTruthContempt: ['yes'],
+    statementOfTruthBelief: ['yes'],
+    fullName: 'Jane Defendant',
+    draftVersion: '4',
+  };
+
+  const postWith = async (welshLanguageUsedEnabled: boolean, languageUsed?: string) => {
+    (buildDraftDefendantResponse as jest.Mock).mockReturnValueOnce({
+      defendantResponses: { completedSections: [], ...(languageUsed ? { languageUsed } : {}) },
+      defendantContactDetails: { party: {} },
+    });
+    const req = createReq({
+      body: completeBody,
+      res: { locals: { welshLanguageUsedEnabled, validatedCase: { id: CASE_REF, data: {} } } },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await step.postController!.post(req, { redirect: jest.fn() } as any, jest.fn());
+    return mockSaveDraftDefendantResponse.mock.calls[0][1].defendantResponses.languageUsed;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mockSubmitRespondToClaimResponse.mockResolvedValue({
+      confirmationPath: `/case/${CASE_REF}/respond-to-claim/response-submitted`,
+    });
+  });
+
+  it('records English when the question is switched off and was never answered', async () => {
+    await expect(postWith(false)).resolves.toBe('ENGLISH');
+  });
+
+  it('keeps an answer given before the question was switched off', async () => {
+    await expect(postWith(false, 'WELSH')).resolves.toBe('WELSH');
+  });
+
+  it('leaves the language alone when the question is switched on', async () => {
+    await expect(postWith(true)).resolves.toBeUndefined();
   });
 });
