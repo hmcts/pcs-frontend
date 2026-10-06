@@ -1,3 +1,10 @@
+const getCurrentResponseDate = (): string =>
+  new Date().toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
 export const viewTheResponse = {
   mainHeader: `View the response`,
   theResponseCaption: `The response`,
@@ -23,21 +30,6 @@ export const viewTheResponse = {
     Name: 'Possession Claims Solicitor Org',
     'Address for service': 'Ministry Of Justice, Seventh Floor 102 Petty France, London, SW1H 9AJ',
   },
-  defendant1Details: {
-    Name: 'Test John',
-    'Postal address': '10 Second Avenue, London, W3 7RX',
-    'Date of birth': '20 May 1990',
-  },
-  additionalDefendant1Details: {
-    // The lines below will be commented until the bugs HDPI-7401 & HDPI-7360 get fixed
-    // Name: 'Peter Parker',
-    // 'Postal address': '2 Second Avenue, London, W3 7RX',
-  },
-  additionalDefendant2Details: {
-    Name: 'Jen Parker',
-    // The line below will be commented until the bug HDPI-7401 gets fixed
-    // 'Postal address': '2 Second Avenue, London, W3 7RX',
-  },
   responseToClaimDetails: {
     'Is the tenancy, occupation contract or licence agreement type given by the claimant correct?': 'Yes',
     'Is the tenancy, occupation contract or licence agreement start date given by the claimant correct?': 'Yes',
@@ -48,9 +40,10 @@ export const viewTheResponse = {
     'Do you dispute any other parts of the claim?': 'No',
   },
   paymentsOrAgreementsDetails: {
-    'Have you paid any money to Possession Claims Solicitor Org since ?': 'Yes',
+    [`Have you paid any money to Possession Claims Solicitor Org since ${getCurrentResponseDate()}?`]: 'Yes',
     'Details of payments made': 'Paid £200 on 1 March 2026 by bank transfer.',
-    'Have you come to any agreement with Possession Claims Solicitor Org to repay the arrears since ?': 'Yes',
+    [`Have you come to any agreement with Possession Claims Solicitor Org to repay the arrears since ${getCurrentResponseDate()}?`]:
+      'Yes',
     'Details of repayment agreement': 'Agreed to pay £50 per week until arrears cleared.',
     'Would you like to offer to pay your arrears in instalments?': 'Yes',
     'How much could you afford to pay in addition to the current rent?': '£50.00',
@@ -100,4 +93,18 @@ export const viewTheResponse = {
     'What are your reasons for making the counterclaim?': 'Landlord withheld deposit without valid reason',
     'Do you need help paying the counterclaim fee?': 'I do not need help paying the fee',
   },
+  statementOfTruthDetails: {
+    'Completed by': 'Test John',
+  },
 };
+
+export const getDefendantDetails = (firstName: string, lastName: string, address: string) => ({
+  Name: `${firstName} ${lastName}`,
+  'Phone number': '07700900000',
+  'Postal address': address,
+  'Date of birth': '20 May 1990',
+});
+
+export const getStatementOfTruthDetails = (defendantName: string) => ({
+  'Completed by': defendantName,
+});
