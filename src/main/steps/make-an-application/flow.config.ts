@@ -60,7 +60,7 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => documentUploadWanted(req),
     },
     'which-language-did-you-use-to-complete-this-service': {
-      showCondition: (req: Request) => req.res?.locals.welshLanguageUsedEnabled === true,
+      showCondition: (req: Request) => req.res?.locals.welshEnabled === true,
     },
     'pay-for-your-application': {
       preventBack: true,

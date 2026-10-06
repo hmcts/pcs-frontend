@@ -14,12 +14,12 @@ import { isPcqEnabled } from '@utils/isPcqEnabled';
 const logger = Logger.getLogger('startPcq');
 
 // PCQ returns the citizen once they finish the questionnaire. It is offered on entry to the
-// language-used step, or to the end-of-journey CYA when welsh-language-used-enabled hides that step,
+// language-used step, or to the end-of-journey CYA when cui-welsh-enabled hides that step,
 // so we resume on the same step — on return the reserved PcqId makes the middleware a no-op and the
 // page renders. `nav=1` marks the arrival as internal navigation — without it the access guard
 // bounces a direct GET of a mid-section step back to the start of the section.
 const getReturnStep = (req: Request): string =>
-  req.res?.locals.welshLanguageUsedEnabled === true ? 'language-used?nav=1' : 'end-of-journey-cya?nav=1';
+  req.res?.locals.welshEnabled === true ? 'language-used?nav=1' : 'end-of-journey-cya?nav=1';
 
 /**
  * Builds the PCQ invocation URL for the current request and reserves a PcqId against the case.

@@ -1,4 +1,4 @@
-// LaunchDarkly flag keys for switching Welsh off without a deploy.
-// Both default to off, so they must be on in every environment before release.
-export const CUI_WELSH_TOGGLE_ENABLED = 'cui-welsh-toggle-enabled';
-export const WELSH_LANGUAGE_USED_ENABLED = 'welsh-language-used-enabled';
+// LaunchDarkly flag key for switching Welsh off in CUI without a deploy. It covers the English /
+// Cymraeg toggle, the "available in Welsh" start-page sentence and the CUI language questions.
+// Defaults to off, so it must be on in every environment before release.
+export const CUI_WELSH_ENABLED = 'cui-welsh-enabled';

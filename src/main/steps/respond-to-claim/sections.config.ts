@@ -153,7 +153,7 @@ const sectionDefs = [
     // Their step folders, registry entries and locale files are retained so re-
     // enablement is a one-line restore here. The PCQ hand-off itself is gated by the
     // `release-1.3-enabled` and `cui-pcq-enabled` LaunchDarkly flags, and fires on entry to
-    // language-used (or end-of-journey-cya when welsh-language-used-enabled hides it), not from these pages.
+    // language-used (or end-of-journey-cya when cui-welsh-enabled hides it), not from these pages.
     steps: [
       'language-used',
       'end-of-journey-cya',

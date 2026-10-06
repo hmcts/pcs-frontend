@@ -52,7 +52,7 @@ describe('startPcq', () => {
 
     mockRes = {
       locals: {
-        welshLanguageUsedEnabled: true,
+        welshEnabled: true,
         validatedCase: new CcdCaseModel({
           id: '123456789',
           data: {},
@@ -159,8 +159,8 @@ describe('startPcq', () => {
     );
   });
 
-  it('returns the citizen to the end-of-journey CYA when welsh-language-used-enabled hides language-used', async () => {
-    mockRes.locals!.welshLanguageUsedEnabled = false;
+  it('returns the citizen to the end-of-journey CYA when cui-welsh-enabled hides language-used', async () => {
+    mockRes.locals!.welshEnabled = false;
 
     await startPcq(mockReq as Request);
 

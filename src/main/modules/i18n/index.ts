@@ -14,8 +14,7 @@ import { makeZodI18nMap } from 'zod-i18n-map';
 import { ordinalDate, pluralPossessive } from './formatters';
 
 import { Logger } from '@modules/logger';
-import { isWelshLanguageUsedEnabled } from '@utils/isWelshLanguageUsedEnabled';
-import { isWelshToggleEnabled } from '@utils/isWelshToggleEnabled';
+import { isCuiWelshEnabled } from '@utils/isCuiWelshEnabled';
 
 function firstExistingPath(paths: string[]): string | null {
   for (const p of paths) {
@@ -247,12 +246,8 @@ export class I18n {
     app.use(i18nextHandle(i18next));
 
     app.use(async (req: I18nRequest & { session?: SessionWithUser }, res: Response, next: NextFunction) => {
-      const [welshEnabled, welshLanguageUsedEnabled] = await Promise.all([
-        isWelshToggleEnabled(req),
-        isWelshLanguageUsedEnabled(req),
-      ]);
+      const welshEnabled = await isCuiWelshEnabled(req);
       res.locals.welshEnabled = welshEnabled;
-      res.locals.welshLanguageUsedEnabled = welshLanguageUsedEnabled;
 
       if (!welshEnabled) {
         await forceEnglish(req, res);

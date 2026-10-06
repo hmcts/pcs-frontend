@@ -199,9 +199,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     draft.defendantResponses.statementOfTruth = buildStatementOfTruthPayload(req.body, isLegalRepresentative);
 
-    // The language step is hidden when welsh-language-used-enabled is off. Record English then,
+    // The language step is hidden when cui-welsh-enabled is off. Record English then,
     // but keep an answer given before the flag was turned off.
-    if (req.res?.locals.welshLanguageUsedEnabled !== true && !draft.defendantResponses.languageUsed) {
+    if (req.res?.locals.welshEnabled !== true && !draft.defendantResponses.languageUsed) {
       draft.defendantResponses.languageUsed = LanguageUsed.ENGLISH;
     }
 
@@ -253,10 +253,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
 });
 
-// PCQ is normally offered on entry to language-used. When welsh-language-used-enabled hides that step
+// PCQ is normally offered on entry to language-used. When cui-welsh-enabled hides that step
 // it is offered here instead, so the citizen still sees it once before submitting.
 export const pcqWhenLanguageUsedHidden: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
-  if (req.res?.locals.welshLanguageUsedEnabled === true) {
+  if (req.res?.locals.welshEnabled === true) {
     return next();
   }
   return pcqEntryMiddleware(req, res, next);

@@ -12,7 +12,7 @@ export function buildLanguageUsedRows(req: Request, t: TFunction): SummaryListRo
 
   const change = makeChange(caseRef, 'checkYourAnswersAndSubmit', t);
   const languageUsed = validatedCase.defendantResponses?.languageUsed;
-  const canChange = req.res?.locals.welshLanguageUsedEnabled === true;
+  const canChange = req.res?.locals.welshEnabled === true;
 
   // With the question switched off there is nothing to change; show an earlier answer if there is one.
   if (!canChange && !languageUsed) {

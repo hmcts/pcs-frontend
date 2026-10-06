@@ -47,8 +47,8 @@ describe('respond-to-claim legalrep flow config', () => {
 });
 
 describe('respond-to-claim legalrep language-used step', () => {
-  const buildReq = (welshLanguageUsedEnabled: boolean) =>
-    ({ res: { locals: { welshLanguageUsedEnabled, validatedCase: { data: {} } } } }) as unknown as Request;
+  const buildReq = (welshEnabled: boolean) =>
+    ({ res: { locals: { welshEnabled, validatedCase: { data: {} } } } }) as unknown as Request;
 
   it('inherits the citizen show condition', () => {
     const showCondition = legalrepFlowConfig.steps['language-used'].showCondition!;

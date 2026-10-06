@@ -157,7 +157,7 @@ export const flowConfig: JourneyFlowConfig = {
     },
     // Inherited by the legal-rep flow, which spreads these steps.
     'language-used': {
-      showCondition: (req: Request) => req.res?.locals.welshLanguageUsedEnabled === true,
+      showCondition: (req: Request) => req.res?.locals.welshEnabled === true,
     },
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),

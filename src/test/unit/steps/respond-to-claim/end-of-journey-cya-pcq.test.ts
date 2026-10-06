@@ -8,8 +8,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { pcqWhenLanguageUsedHidden, step } from '../../../../main/steps/respond-to-claim/end-of-journey-cya';
 
 describe('end-of-journey CYA PCQ entry', () => {
-  const buildReq = (welshLanguageUsedEnabled: boolean) =>
-    ({ res: { locals: { welshLanguageUsedEnabled } } }) as unknown as Request;
+  const buildReq = (welshEnabled: boolean) => ({ res: { locals: { welshEnabled } } }) as unknown as Request;
   const res = {} as Response;
 
   beforeEach(() => jest.clearAllMocks());
@@ -27,7 +26,7 @@ describe('end-of-journey CYA PCQ entry', () => {
     expect(next).toHaveBeenCalledTimes(1);
   });
 
-  it('offers PCQ here when welsh-language-used-enabled hides the language step', () => {
+  it('offers PCQ here when cui-welsh-enabled hides the language step', () => {
     const req = buildReq(false);
     const next = jest.fn();
 

@@ -1,27 +1,19 @@
 import type { Request } from 'express';
 
 import { getLaunchDarklyFlag } from '../../../main/utils/getLaunchDarklyFlag';
-import { isWelshLanguageUsedEnabled } from '../../../main/utils/isWelshLanguageUsedEnabled';
-import { isWelshToggleEnabled } from '../../../main/utils/isWelshToggleEnabled';
+import { isCuiWelshEnabled } from '../../../main/utils/isCuiWelshEnabled';
 
 jest.mock('../../../main/utils/getLaunchDarklyFlag', () => ({
   getLaunchDarklyFlag: jest.fn(),
 }));
 
-describe('Welsh flags', () => {
+describe('isCuiWelshEnabled', () => {
   const req = {} as Request;
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  it.each([
-    ['isWelshToggleEnabled', isWelshToggleEnabled, 'cui-welsh-toggle-enabled'],
-    ['isWelshLanguageUsedEnabled', isWelshLanguageUsedEnabled, 'welsh-language-used-enabled'],
-  ])('%s reads %s, defaulting to off', async (_name, check, flagKey) => {
+  it('reads cui-welsh-enabled, defaulting to off', async () => {
     (getLaunchDarklyFlag as jest.Mock).mockResolvedValue(true);
 
-    await expect(check(req)).resolves.toBe(true);
-    expect(getLaunchDarklyFlag).toHaveBeenCalledWith(req, flagKey, false);
+    await expect(isCuiWelshEnabled(req)).resolves.toBe(true);
+    expect(getLaunchDarklyFlag).toHaveBeenCalledWith(req, 'cui-welsh-enabled', false);
   });
 });

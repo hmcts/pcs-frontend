@@ -106,10 +106,10 @@ describe('respond-to-claim sections config', () => {
   describe('HDPI-6929 — navigation contract from upload-document', () => {
     const PARKED_STEPS = ['equality-and-diversity-start', 'equality-and-diversity-end'];
 
-    // With welsh-language-used-enabled on, as in production today; language-used is skipped when off.
+    // With cui-welsh-enabled on, as in production today; language-used is skipped when off.
     const makeReq = (): Request =>
       ({
-        res: { locals: { welshLanguageUsedEnabled: true, validatedCase: { data: {} } } },
+        res: { locals: { welshEnabled: true, validatedCase: { data: {} } } },
       }) as unknown as Request;
 
     const walkFrom = async (startStep: string): Promise<string[]> => {

@@ -27,10 +27,10 @@ describe('respond-to-claim citizen flow config', () => {
 });
 
 describe('respond-to-claim language-used step', () => {
-  const buildReq = (welshLanguageUsedEnabled: boolean) =>
-    ({ res: { locals: { welshLanguageUsedEnabled, validatedCase: { data: {} } } } }) as unknown as Request;
+  const buildReq = (welshEnabled: boolean) =>
+    ({ res: { locals: { welshEnabled, validatedCase: { data: {} } } } }) as unknown as Request;
 
-  it('is shown only when welsh-language-used-enabled is on', () => {
+  it('is shown only when cui-welsh-enabled is on', () => {
     const showCondition = flowConfig.steps['language-used'].showCondition!;
 
     expect(showCondition(buildReq(true))).toBe(true);

@@ -63,11 +63,11 @@ describe('language-used pcqEntryMiddleware (PCQ fires before the language screen
 // createFormStep is mocked to return its config, so the step carries beforeRedirect.
 const beforeRedirect = (step as unknown as { beforeRedirect: (req: Request) => Promise<void> }).beforeRedirect;
 
-describe('language-used when welsh-language-used-enabled is switched', () => {
-  const buildReq = (welshLanguageUsedEnabled: boolean, body: Record<string, unknown> = {}): Request =>
+describe('language-used when cui-welsh-enabled is switched', () => {
+  const buildReq = (welshEnabled: boolean, body: Record<string, unknown> = {}): Request =>
     ({
       body,
-      res: { locals: { welshLanguageUsedEnabled, validatedCase: { id: '1234567812345678' } } },
+      res: { locals: { welshEnabled, validatedCase: { id: '1234567812345678' } } },
     }) as unknown as Request;
 
   beforeEach(() => {

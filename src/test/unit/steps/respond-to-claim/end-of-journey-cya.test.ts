@@ -333,14 +333,14 @@ describe('respond-to-claim end-of-journey-cya step — language used', () => {
     draftVersion: '4',
   };
 
-  const postWith = async (welshLanguageUsedEnabled: boolean, languageUsed?: string) => {
+  const postWith = async (welshEnabled: boolean, languageUsed?: string) => {
     (buildDraftDefendantResponse as jest.Mock).mockReturnValueOnce({
       defendantResponses: { completedSections: [], ...(languageUsed ? { languageUsed } : {}) },
       defendantContactDetails: { party: {} },
     });
     const req = createReq({
       body: completeBody,
-      res: { locals: { welshLanguageUsedEnabled, validatedCase: { id: CASE_REF, data: {} } } },
+      res: { locals: { welshEnabled, validatedCase: { id: CASE_REF, data: {} } } },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await step.postController!.post(req, { redirect: jest.fn() } as any, jest.fn());

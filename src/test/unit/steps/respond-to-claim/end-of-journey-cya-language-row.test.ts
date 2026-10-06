@@ -5,11 +5,11 @@ import { buildLanguageUsedRows } from '../../../../main/steps/respond-to-claim/e
 
 const t = ((key: string) => key) as TFunction;
 
-const buildReq = (welshLanguageUsedEnabled: boolean, languageUsed?: string) =>
+const buildReq = (welshEnabled: boolean, languageUsed?: string) =>
   ({
     res: {
       locals: {
-        welshLanguageUsedEnabled,
+        welshEnabled,
         validatedCase: { id: '1234567812345678', defendantResponses: languageUsed ? { languageUsed } : {} },
       },
     },

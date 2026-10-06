@@ -4,7 +4,7 @@ import VisibleFormDataView from '../../../../../main/steps/make-an-application/c
 
 const LANGUAGE_STEP = 'which-language-did-you-use-to-complete-this-service';
 
-const buildReq = (welshLanguageUsedEnabled: boolean, whichLanguage?: string) =>
+const buildReq = (welshEnabled: boolean, whichLanguage?: string) =>
   ({
     params: { caseReference: '1234567812345678' },
     session: {
@@ -16,7 +16,7 @@ const buildReq = (welshLanguageUsedEnabled: boolean, whichLanguage?: string) =>
     },
     res: {
       locals: {
-        welshLanguageUsedEnabled,
+        welshEnabled,
         step: { journey: 'makeAnApplication' },
         validatedCase: { id: '1234567812345678' },
       },
@@ -25,7 +25,7 @@ const buildReq = (welshLanguageUsedEnabled: boolean, whichLanguage?: string) =>
 
 describe('VisibleFormDataView language used', () => {
   it.each(['ENGLISH', 'WELSH', 'ENGLISH_AND_WELSH'])(
-    'uses the answer %s when welsh-language-used-enabled is on',
+    'uses the answer %s when cui-welsh-enabled is on',
     whichLanguage => {
       const view = new VisibleFormDataView(buildReq(true, whichLanguage));
 
@@ -34,7 +34,7 @@ describe('VisibleFormDataView language used', () => {
     }
   );
 
-  it('hides the language answer and records English when welsh-language-used-enabled is off', () => {
+  it('hides the language answer and records English when cui-welsh-enabled is off', () => {
     const view = new VisibleFormDataView(buildReq(false, 'WELSH'));
 
     expect(view.getWhichLanguageField()).toBeUndefined();

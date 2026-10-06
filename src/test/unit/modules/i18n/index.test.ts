@@ -16,8 +16,7 @@ import {
   setupNunjucksGlobals,
 } from '@modules/i18n';
 import { Logger } from '@modules/logger';
-import { isWelshLanguageUsedEnabled } from '@utils/isWelshLanguageUsedEnabled';
-import { isWelshToggleEnabled } from '@utils/isWelshToggleEnabled';
+import { isCuiWelshEnabled } from '@utils/isCuiWelshEnabled';
 
 // ---- Mocks (must be declared before importing the SUT) ----
 // Mock factories run when jest.mock is hoisted; create mocks inside factories so they exist.
@@ -51,8 +50,7 @@ jest.mock(
   { virtual: true }
 );
 
-jest.mock('@utils/isWelshToggleEnabled', () => ({ isWelshToggleEnabled: jest.fn() }));
-jest.mock('@utils/isWelshLanguageUsedEnabled', () => ({ isWelshLanguageUsedEnabled: jest.fn() }));
+jest.mock('@utils/isCuiWelshEnabled', () => ({ isCuiWelshEnabled: jest.fn() }));
 
 jest.mock('@modules/logger', () => {
   const mockLogger = { info: jest.fn(), error: jest.fn() };
@@ -74,8 +72,7 @@ describe('i18n module', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (config.get as jest.Mock).mockImplementation((key: string) => (key === 'node-env' ? 'development' : undefined));
-    (isWelshToggleEnabled as jest.Mock).mockResolvedValue(true);
-    (isWelshLanguageUsedEnabled as jest.Mock).mockResolvedValue(true);
+    (isCuiWelshEnabled as jest.Mock).mockResolvedValue(true);
     app = express();
     // spy so we can assert .use calls while still letting express accept functions
     jest.spyOn(app, 'use');
@@ -265,17 +262,14 @@ describe('i18n module', () => {
       return { req, res, next, changeLanguage };
     };
 
-    it('exposes both flags to templates and show conditions', async () => {
-      (isWelshLanguageUsedEnabled as jest.Mock).mockResolvedValue(false);
-
+    it('exposes the flag to templates and show conditions', async () => {
       const { res, next } = await runMiddleware('en');
 
       expect(res.locals.welshEnabled).toBe(true);
-      expect(res.locals.welshLanguageUsedEnabled).toBe(false);
       expect(next).toHaveBeenCalled();
     });
 
-    it('keeps Welsh when the toggle flag is on', async () => {
+    it('keeps Welsh when cui-welsh-enabled is on', async () => {
       const { req, res, changeLanguage } = await runMiddleware('cy');
 
       expect(req.language).toBe('cy');
@@ -284,8 +278,8 @@ describe('i18n module', () => {
       expect(cacheUserLanguage).not.toHaveBeenCalled();
     });
 
-    it('pins a Welsh request to English and rewrites the cookie when the toggle flag is off', async () => {
-      (isWelshToggleEnabled as jest.Mock).mockResolvedValue(false);
+    it('pins a Welsh request to English and rewrites the cookie when cui-welsh-enabled is off', async () => {
+      (isCuiWelshEnabled as jest.Mock).mockResolvedValue(false);
 
       const { req, res, next, changeLanguage } = await runMiddleware('cy');
 

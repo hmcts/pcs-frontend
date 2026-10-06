@@ -7,9 +7,9 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, LanguageUsed } from '@services/ccdCase.interface';
 import { redirectToPcq } from '@services/pcq/redirectToPcq';
 
-const isLanguageUsedEnabled = (req: Request): boolean => req.res?.locals.welshLanguageUsedEnabled === true;
+const isLanguageUsedEnabled = (req: Request): boolean => req.res?.locals.welshEnabled === true;
 
-// The step is hidden by its show condition when welsh-language-used-enabled is off. Legal reps skip
+// The step is hidden by its show condition when cui-welsh-enabled is off. Legal reps skip
 // the access guard that enforces that, so a direct visit is sent on to the end-of-journey CYA.
 export const languageUsedEnabledMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
   const caseId = req.res?.locals.validatedCase?.id;
