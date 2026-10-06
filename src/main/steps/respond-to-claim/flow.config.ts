@@ -155,6 +155,10 @@ export const flowConfig: JourneyFlowConfig = {
     'what-other-regular-expenses-do-you-have': {
       showCondition: (req: Request) => hasProvidedFinanceDetails(req),
     },
+    // Inherited by the legal-rep flow, which spreads these steps.
+    'language-used': {
+      showCondition: (req: Request) => req.res?.locals.welshEnabled === true,
+    },
     'equality-and-diversity-end': {
       showCondition: (req: Request) => !hasSkippedEqualityAndDiversityQuestions(req),
     },

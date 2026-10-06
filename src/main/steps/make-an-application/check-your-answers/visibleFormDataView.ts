@@ -82,6 +82,11 @@ export default class VisibleFormDataView {
     return this.getField<LanguageUsed>('which-language-did-you-use-to-complete-this-service', 'whichLanguage');
   }
 
+  // The language step is hidden when cui-welsh-enabled is off; English is recorded then.
+  getLanguageUsed(): LanguageUsed {
+    return this.getWhichLanguageField()?.fieldValue ?? LanguageUsed.ENGLISH;
+  }
+
   getUploadedDocuments(): CcdCollectionItem<CcdUploadedDocument>[] {
     const caseRef = toCaseReference16(this.req.params?.caseReference);
     if (!caseRef) {

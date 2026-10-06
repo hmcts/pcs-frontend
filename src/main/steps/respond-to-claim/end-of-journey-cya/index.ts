@@ -1,5 +1,5 @@
 import config from 'config';
-import type { Request } from 'express';
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import {
@@ -19,6 +19,7 @@ import {
   submitRespondToClaimResponse,
 } from '../../utils/respondToClaimFinalSubmit';
 import { createRespondToClaimFormStep } from '../formStep';
+import { pcqEntryMiddleware } from '../language-used';
 import { sectionIdToBackendEnum } from '../sections.config';
 
 import { buildEndOfJourneyCyaSections } from './buildEndOfJourneyCyaRows';
@@ -28,6 +29,7 @@ import { buildErrorSummary } from '@modules/steps/formBuilder/errorUtils';
 import { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
+import { LanguageUsed } from '@services/ccdCase.interface';
 
 const STEP_NAME = 'end-of-journey-cya';
 
@@ -197,6 +199,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     draft.defendantResponses.statementOfTruth = buildStatementOfTruthPayload(req.body, isLegalRepresentative);
 
+    // The language step is hidden when cui-welsh-enabled is off. Record English then,
+    // but keep an answer given before the flag was turned off.
+    if (req.res?.locals.welshEnabled !== true && !draft.defendantResponses.languageUsed) {
+      draft.defendantResponses.languageUsed = LanguageUsed.ENGLISH;
+    }
+
     const enumValue = sectionIdToBackendEnum('checkYourAnswersAndSubmit');
     const current = draft.defendantResponses.completedSections ?? [];
     if (!current.includes(enumValue)) {
@@ -244,3 +252,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     return redirectPath;
   },
 });
+
+// PCQ is normally offered on entry to language-used. When cui-welsh-enabled hides that step
+// it is offered here instead, so the citizen still sees it once before submitting.
+export const pcqWhenLanguageUsedHidden: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+  if (req.res?.locals.welshEnabled === true) {
+    return next();
+  }
+  return pcqEntryMiddleware(req, res, next);
+};
+
+// createRespondToClaimFormStep does not carry a middleware field through; registerSteps applies
+// step.middleware to the GET route after the case loads.
+step.middleware = [pcqWhenLanguageUsedHidden];

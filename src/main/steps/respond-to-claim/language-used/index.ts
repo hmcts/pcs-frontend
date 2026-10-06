@@ -7,6 +7,18 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, LanguageUsed } from '@services/ccdCase.interface';
 import { redirectToPcq } from '@services/pcq/redirectToPcq';
 
+const isLanguageUsedEnabled = (req: Request): boolean => req.res?.locals.welshEnabled === true;
+
+// The step is hidden by its show condition when cui-welsh-enabled is off. Legal reps skip
+// the access guard that enforces that, so a direct visit is sent on to the end-of-journey CYA.
+export const languageUsedEnabledMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+  const caseId = req.res?.locals.validatedCase?.id;
+  if (isLanguageUsedEnabled(req) || !caseId) {
+    return next();
+  }
+  res.redirect(303, `/case/${caseId}/respond-to-claim/end-of-journey-cya?nav=1`);
+};
+
 // Offer PCQ (the equality questionnaire) before the language screen renders.
 // redirectToPcq 303s to PCQ (which returns the citizen to language-used?nav=1);
 // on the return leg the reserved PcqId makes it a no-op.
@@ -57,7 +69,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const languageUsed: LanguageUsed | undefined = req.body?.languageUsed;
     const response = buildDraftDefendantResponse(req);
 
-    if (languageUsed) {
+    if (languageUsed && isLanguageUsedEnabled(req)) {
       response.defendantResponses = { ...response.defendantResponses, languageUsed };
     }
 
@@ -68,4 +80,4 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 // createRespondToClaimFormStep does not carry a middleware field through, so attach the PCQ entry
 // hook to the built step. registerSteps applies step.middleware to the GET route (after the case
 // loads), so it runs before the language screen is rendered.
-step.middleware = [pcqEntryMiddleware];
+step.middleware = [languageUsedEnabledMiddleware, pcqEntryMiddleware];

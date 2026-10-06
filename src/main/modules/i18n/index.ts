@@ -14,6 +14,7 @@ import { makeZodI18nMap } from 'zod-i18n-map';
 import { ordinalDate, pluralPossessive } from './formatters';
 
 import { Logger } from '@modules/logger';
+import { isCuiWelshEnabled } from '@utils/isCuiWelshEnabled';
 
 function firstExistingPath(paths: string[]): string | null {
   for (const p of paths) {
@@ -160,6 +161,19 @@ export function setupNunjucksGlobals(env: Environment | undefined, globals: Reco
   }
 }
 
+/**
+ * Pins the request to English when Welsh is switched off. A `lang=cy` cookie or `?lang=cy` would
+ * otherwise still be detected, and payment, PCQ and Your Support all read `req.language` first.
+ * The cookie is rewritten through the detector so it keeps the configured SameSite/Secure/HttpOnly.
+ */
+async function forceEnglish(req: I18nRequest, res: Response): Promise<void> {
+  req.language = 'en';
+  if (typeof req.i18n?.changeLanguage === 'function') {
+    await req.i18n.changeLanguage('en');
+  }
+  i18next.services?.languageDetector?.cacheUserLanguage?.(req, res, 'en');
+}
+
 /** Creates i18next configuration. */
 function createI18nextConfig(localesDir: string, namespaces: string[]): InitOptions {
   return {
@@ -231,7 +245,14 @@ export class I18n {
 
     app.use(i18nextHandle(i18next));
 
-    app.use((req: I18nRequest & { session?: SessionWithUser }, res: Response, next: NextFunction) => {
+    app.use(async (req: I18nRequest & { session?: SessionWithUser }, res: Response, next: NextFunction) => {
+      const welshEnabled = await isCuiWelshEnabled(req);
+      res.locals.welshEnabled = welshEnabled;
+
+      if (!welshEnabled) {
+        await forceEnglish(req, res);
+      }
+
       const lang = getRequestLanguage(req);
 
       if (typeof req.i18n?.changeLanguage === 'function') {

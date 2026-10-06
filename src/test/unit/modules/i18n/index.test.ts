@@ -16,6 +16,7 @@ import {
   setupNunjucksGlobals,
 } from '@modules/i18n';
 import { Logger } from '@modules/logger';
+import { isCuiWelshEnabled } from '@utils/isCuiWelshEnabled';
 
 // ---- Mocks (must be declared before importing the SUT) ----
 // Mock factories run when jest.mock is hoisted; create mocks inside factories so they exist.
@@ -49,6 +50,8 @@ jest.mock(
   { virtual: true }
 );
 
+jest.mock('@utils/isCuiWelshEnabled', () => ({ isCuiWelshEnabled: jest.fn() }));
+
 jest.mock('@modules/logger', () => {
   const mockLogger = { info: jest.fn(), error: jest.fn() };
   return {
@@ -69,6 +72,7 @@ describe('i18n module', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (config.get as jest.Mock).mockImplementation((key: string) => (key === 'node-env' ? 'development' : undefined));
+    (isCuiWelshEnabled as jest.Mock).mockResolvedValue(true);
     app = express();
     // spy so we can assert .use calls while still letting express accept functions
     jest.spyOn(app, 'use');
@@ -146,7 +150,7 @@ describe('i18n module', () => {
 
     await new Promise(r => setImmediate(r));
 
-    const langMw = (app.use as jest.Mock).mock.calls[1][0] as (req: any, res: any, next: any) => void;
+    const langMw = (app.use as jest.Mock).mock.calls[1][0] as (req: any, res: any, next: any) => Promise<void>;
 
     const changeLanguage = jest.fn();
     const addGlobal = jest.fn();
@@ -162,7 +166,7 @@ describe('i18n module', () => {
     const res = { locals: {} } as any;
     const next = jest.fn();
 
-    langMw(req, res, next);
+    await langMw(req, res, next);
 
     // changeLanguage called with clamped 'cy'
     expect(changeLanguage).toHaveBeenCalledWith('cy');
@@ -189,7 +193,7 @@ describe('i18n module', () => {
 
     await new Promise(r => setImmediate(r));
 
-    const langMw = (app.use as jest.Mock).mock.calls[1][0] as (req: any, res: any, next: any) => void;
+    const langMw = (app.use as jest.Mock).mock.calls[1][0] as (req: any, res: any, next: any) => Promise<void>;
 
     const changeLanguage = jest.fn();
     const addGlobal = jest.fn();
@@ -205,7 +209,7 @@ describe('i18n module', () => {
     const res = { locals: {} } as { locals: Record<string, unknown> };
     const next = jest.fn();
 
-    langMw(req, res, next);
+    await langMw(req, res, next);
 
     // Language clamped to 'en'
     expect(changeLanguage).toHaveBeenCalledWith('en');
@@ -225,6 +229,67 @@ describe('i18n module', () => {
     expect(addGlobal).not.toHaveBeenCalledWith('user', expect.anything());
 
     expect(next).toHaveBeenCalled();
+  });
+
+  describe('Welsh feature flags', () => {
+    const cacheUserLanguage = jest.fn();
+
+    beforeEach(() => {
+      mockInit.mockImplementation((_opts: unknown, cb: (err: unknown) => void) => cb(null));
+      (i18next as any).services = { languageDetector: { cacheUserLanguage } };
+    });
+
+    afterEach(() => {
+      delete (i18next as any).services;
+    });
+
+    const runMiddleware = async (language: string) => {
+      new I18n().enableFor(app);
+      const langMw = (app.use as jest.Mock).mock.calls[1][0] as (req: any, res: any, next: any) => Promise<void>;
+      const changeLanguage = jest.fn().mockResolvedValue(undefined);
+      const req = {
+        language,
+        i18n: { changeLanguage },
+        t: (key: string) => key,
+        app: { locals: { nunjucksEnv: { addGlobal: jest.fn() } } },
+        session: {},
+      } as any;
+      const res = { locals: {} } as any;
+      const next = jest.fn();
+
+      await langMw(req, res, next);
+
+      return { req, res, next, changeLanguage };
+    };
+
+    it('exposes the flag to templates and show conditions', async () => {
+      const { res, next } = await runMiddleware('en');
+
+      expect(res.locals.welshEnabled).toBe(true);
+      expect(next).toHaveBeenCalled();
+    });
+
+    it('keeps Welsh when cui-welsh-enabled is on', async () => {
+      const { req, res, changeLanguage } = await runMiddleware('cy');
+
+      expect(req.language).toBe('cy');
+      expect(res.locals.lang).toBe('cy');
+      expect(changeLanguage).not.toHaveBeenCalledWith('en');
+      expect(cacheUserLanguage).not.toHaveBeenCalled();
+    });
+
+    it('pins a Welsh request to English and rewrites the cookie when cui-welsh-enabled is off', async () => {
+      (isCuiWelshEnabled as jest.Mock).mockResolvedValue(false);
+
+      const { req, res, next, changeLanguage } = await runMiddleware('cy');
+
+      expect(req.language).toBe('en');
+      expect(changeLanguage).toHaveBeenCalledWith('en');
+      expect(cacheUserLanguage).toHaveBeenCalledWith(req, res, 'en');
+      expect(res.locals.welshEnabled).toBe(false);
+      expect(res.locals.lang).toBe('en');
+      expect(next).toHaveBeenCalled();
+    });
   });
 
   describe('findLocalesDir', () => {
