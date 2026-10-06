@@ -1,5 +1,5 @@
 import config from 'config';
-import type { Request } from 'express';
+import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import {
@@ -19,6 +19,7 @@ import {
   submitRespondToClaimResponse,
 } from '../../utils/respondToClaimFinalSubmit';
 import { createRespondToClaimFormStep } from '../formStep';
+import { pcqEntryMiddleware } from '../language-used';
 import { sectionIdToBackendEnum } from '../sections.config';
 
 import { buildEndOfJourneyCyaSections } from './buildEndOfJourneyCyaRows';
@@ -251,3 +252,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     return redirectPath;
   },
 });
+
+// PCQ is normally offered on entry to language-used. When welsh-language-used-enabled hides that step
+// it is offered here instead, so the citizen still sees it once before submitting.
+export const pcqWhenLanguageUsedHidden: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+  if (req.res?.locals.welshLanguageUsedEnabled === true) {
+    return next();
+  }
+  return pcqEntryMiddleware(req, res, next);
+};
+
+// createRespondToClaimFormStep does not carry a middleware field through; registerSteps applies
+// step.middleware to the GET route after the case loads.
+step.middleware = [pcqWhenLanguageUsedHidden];

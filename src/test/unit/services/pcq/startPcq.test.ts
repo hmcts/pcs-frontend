@@ -52,6 +52,7 @@ describe('startPcq', () => {
 
     mockRes = {
       locals: {
+        welshLanguageUsedEnabled: true,
         validatedCase: new CcdCaseModel({
           id: '123456789',
           data: {},
@@ -153,6 +154,19 @@ describe('startPcq', () => {
     expect(createSecureTokenModule.createSecureToken).toHaveBeenCalledWith(
       expect.objectContaining({
         returnUrl: 'localhost:3000/case/123456789/respond-to-claim/language-used?nav=1',
+      }),
+      'dummy-token-key'
+    );
+  });
+
+  it('returns the citizen to the end-of-journey CYA when welsh-language-used-enabled hides language-used', async () => {
+    mockRes.locals!.welshLanguageUsedEnabled = false;
+
+    await startPcq(mockReq as Request);
+
+    expect(createSecureTokenModule.createSecureToken).toHaveBeenCalledWith(
+      expect.objectContaining({
+        returnUrl: 'localhost:3000/case/123456789/respond-to-claim/end-of-journey-cya?nav=1',
       }),
       'dummy-token-key'
     );
