@@ -116,7 +116,7 @@ export const step: StepDefinition = createFormStep({
       otherPartiesAgreed: toYesNoEnum(visibleFormData.getOtherPartiesAgreedField()?.fieldValue),
       withoutNotice: toYesNoEnum(visibleFormData.getAnyReasonsNotToShareField()?.fieldValue),
       withoutNoticeReason: visibleFormData.getReasonForNotSharingField()?.fieldValue,
-      languageUsed: visibleFormData.getWhichLanguageField()?.fieldValue,
+      languageUsed: visibleFormData.getLanguageUsed(),
       whatOrderWanted: visibleFormData.getWhatOrderWantedField()?.fieldValue,
       hasSupportingDocuments: toYesNoEnum(visibleFormData.getHasSupportingDocuments()?.fieldValue),
       uploadedDocuments: uploadedDocs.length > 0 ? uploadedDocs : undefined,

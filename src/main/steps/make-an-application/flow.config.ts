@@ -59,6 +59,9 @@ export const flowConfig: JourneyFlowConfig = {
     'upload-documents-to-support-your-application': {
       showCondition: (req: Request) => documentUploadWanted(req),
     },
+    'which-language-did-you-use-to-complete-this-service': {
+      showCondition: (req: Request) => req.res?.locals.welshLanguageUsedEnabled === true,
+    },
     'pay-for-your-application': {
       preventBack: true,
       showCondition: (req: Request) => paymentRequired(req),
