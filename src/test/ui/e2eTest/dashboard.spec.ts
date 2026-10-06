@@ -269,6 +269,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
   });
 
   test('Validate View the claim page data @regression @crossbrowser', async () => {
+    await performAction('skipTestIfLdFlagDisabled', 'release-1.2-enabled');
     await performAction('clickLink', dashboard.viewTheClaimLink);
     await performValidation('mainHeader', viewTheClaim.mainHeader);
     await performAction('verifyClaimDetailsOnViewTheClaimPage');

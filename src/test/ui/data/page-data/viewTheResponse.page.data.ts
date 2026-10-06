@@ -10,8 +10,6 @@ export const viewTheResponse = {
   theResponseCaption: `The response`,
   claimantDetailsSubHeader: `Claimant details`,
   defendant1SubHeader: `Defendant 1 details`,
-  additionalDefendant1DynamicSubHeader: `Additional defendant 1 details`,
-  additionalDefendant2DynamicSubHeader: `Additional defendant 2 details`,
   responseToClaimSubHeader: `Response to the claimant’s claim`,
   paymentsOrAgreementsSubHeader: `Payments or agreements since the claim was made`,
   yourHouseholdSubHeader: `Your household and circumstances`,
