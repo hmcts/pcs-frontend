@@ -1,0 +1,79 @@
+{#
+  The general application the judge is deciding: what was applied for and by whom, the applicant's
+  answers and documents, and the order they asked for, which the judge can add to the order to change.
+#}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+<section class="pcs-application" aria-labelledby="application-heading"
+         data-application
+         data-application-reference="{{ application.reference }}"
+         data-application-type="{{ application.type }}"
+         data-application-applicant="{{ application.applicant or 'the applicant' }}"
+         data-application-submitted="{{ application.submittedOnDisplay or '' }}"
+         data-application-wording="{{ application.whatOrderWanted or '' }}">
+  <h2 class="govuk-heading-l govuk-!-margin-top-6" id="application-heading">
+    Application {{ application.reference }}: {{ application.type }}
+  </h2>
+
+  {% if application.withoutNotice == "YES" %}
+    {{ govukWarningText({ text: "The applicant asked for this application to be made without notice. Only the applicant will be told of it." }) }}
+  {% endif %}
+
+  {% if application.referralNote %}
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Note from court staff{% if application.referredOnDisplay %}, {{ application.referredOnDisplay }}{% endif %}</h3>
+    {{ govukInsetText({
+      html: '<p class="govuk-body">' + (application.referralNote | escape | nl2br) + '</p>',
+      classes: "govuk-!-margin-top-1",
+      attributes: { id: "referral-note" }
+    }) }}
+  {% endif %}
+
+  {% set documentLinks %}
+    {% if application.documents | length %}
+      <ul class="govuk-list">
+        {% for document in application.documents %}
+          <li><a class="govuk-link" href="{{ document.href }}" target="_blank" rel="noopener">{{ document.fileName }} (opens in new tab)</a></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      None
+    {% endif %}
+  {% endset %}
+
+  {% set rows = [
+    { key: { text: "Submitted by" }, value: { text: application.applicant or "Not known" } },
+    { key: { text: "Submitted on" }, value: { text: application.submittedOnDisplay or "Not known" } }
+  ] %}
+  {% if application.somethingElseDetails %}
+    {% set rows = rows.concat([{ key: { text: "What the application is for" }, value: { text: application.somethingElseDetails } }]) %}
+  {% endif %}
+  {% if application.within14DaysDisplay %}
+    {% set rows = rows.concat([{ key: { text: "Hearing in the next 14 days" }, value: { text: application.within14DaysDisplay } }]) %}
+  {% endif %}
+  {% set rows = rows.concat([
+    { key: { text: "Other parties agree" }, value: { text: application.otherPartiesAgreedDisplay or "Not answered" } },
+    { key: { text: "Without notice" }, value: { text: (application.withoutNoticeDisplay or "No") + ((": " + application.withoutNoticeReason) if application.withoutNoticeReason else "") } },
+    { key: { text: "Application documents" }, value: { html: documentLinks } }
+  ]) %}
+  {{ govukSummaryList({ rows: rows, classes: "govuk-!-margin-bottom-4", attributes: { id: "application-details" } }) }}
+
+  <h3 class="govuk-heading-m">The order the applicant asked for</h3>
+  {% if application.whatOrderWanted %}
+    {{ govukInsetText({
+      html: '<p class="govuk-body">' + (application.whatOrderWanted | escape | nl2br) + '</p>',
+      attributes: { id: "application-requested" }
+    }) }}
+    {# One click puts the wording in the order preview as the judge's own clauses, for them to change or delete. #}
+    {% set wordingAdded = draftValue("application-wording-added") == "yes" %}
+    <input type="hidden" name="application-wording-added" value="{{ 'yes' if wordingAdded else '' }}">
+    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2" data-use-requested-wording
+            {%- if wordingAdded %} disabled{% endif %}>
+      {{ "Added to the order preview" if wordingAdded else "Use the applicant's wording" }}
+    </button>
+    <p class="govuk-hint">This adds it to the order preview, where you can change it or delete what you do not need.</p>
+  {% else %}
+    <p class="govuk-body">The applicant did not say what order they want. Read the application documents.</p>
+  {% endif %}
+</section>
