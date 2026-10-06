@@ -1,7 +1,10 @@
 import { DateTime } from 'luxon';
 
 import { getTranslationFunction } from '../../../modules/steps';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -77,10 +80,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     );
   },
   extendGetContent: async req => {
-    const claimantNameFromValidatedCase = req.res?.locals.validatedCase?.data?.possessionClaimResponse
-      ?.claimantOrganisations?.[0]?.value as string | undefined;
+    const claimantNameFromValidatedCase = req.res?.locals.validatedCase?.data
+      ?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
     const claimantNameFromSession = req.session?.ccdCase?.data?.claimantName as string | undefined;
-    const claimantName = claimantNameFromValidatedCase || claimantNameFromSession || 'Treetops Housing';
+    const claimantName =
+      claimantNameFromValidatedCase || claimantNameFromSession || 'Treetops Housing';
 
     const t = getTranslationFunction(req);
     const paragraph = t('paragraph', { claimantName });

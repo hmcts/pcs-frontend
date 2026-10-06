@@ -54,7 +54,10 @@ describe('getEventIdFromPath', () => {
 
   describe('missing or invalid params', () => {
     it('should return undefined when caseReference param is missing', () => {
-      const req = { path: `/case/${CASE_REF}/make-an-application`, params: {} } as unknown as Request;
+      const req = {
+        path: `/case/${CASE_REF}/make-an-application`,
+        params: {},
+      } as unknown as Request;
       expect(getEventIdFromPath(req)).toBeUndefined();
     });
 

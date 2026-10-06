@@ -1,12 +1,4 @@
-import {
-  confirmationOfNoticeGiven,
-  nonRentArrearsDispute,
-  noticeDateWhenNotProvided,
-  noticeDateWhenProvided,
-  rentArrears,
-  tenancyDateDetails,
-  tenancyDateUnknown,
-} from '../data/page-data';
+import { confirmationOfNoticeGiven, nonRentArrearsDispute, noticeDateWhenNotProvided, noticeDateWhenProvided, rentArrears, tenancyDateDetails, tenancyDateUnknown } from '../data/page-data';
 import { generateRandomString } from '../utils/common/string.utils';
 import { performAction, performValidation } from '../utils/controller';
 
@@ -31,18 +23,10 @@ export async function nonRentArrearsDisputeErrorValidation(): Promise<void> {
   //   nonRentArrearsDispute.viewTheClaimLink,
   //   nonRentArrearsDispute.titleGovServiceHiddenNewTab
   // );
-  await performAction(
-    'inputText',
-    nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
-    nonRentArrearsDispute.explainClaimTextInput
-  );
+  await performAction('inputText', nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel, nonRentArrearsDispute.explainClaimTextInput);
   // emoji
   await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
-  await performAction(
-    'inputText',
-    nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
-    nonRentArrearsDispute.emojiTextInput
-  );
+  await performAction('inputText', nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel, nonRentArrearsDispute.emojiTextInput);
   await performAction('When the user clicks the button', nonRentArrearsDispute.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: nonRentArrearsDispute.thereIsAProblemErrorMessageHeader,
@@ -75,23 +59,11 @@ export async function noRentArrearsNavigationTests(): Promise<void> {
     }
   }
 
-  if (
-    process.env.NOTICE_SERVED === 'NO' &&
-    process.env.TENANCY_START_DATE_KNOWN === 'NO' &&
-    process.env.RENT_NON_RENT === 'NO'
-  ) {
+  if (process.env.NOTICE_SERVED === 'NO' && process.env.TENANCY_START_DATE_KNOWN === 'NO' && process.env.RENT_NON_RENT === 'NO') {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateUnknown.mainHeader);
-  } else if (
-    process.env.NOTICE_SERVED === 'NO' &&
-    process.env.TENANCY_START_DATE_KNOWN === 'YES' &&
-    process.env.RENT_NON_RENT === 'NO'
-  ) {
+  } else if (process.env.NOTICE_SERVED === 'NO' && process.env.TENANCY_START_DATE_KNOWN === 'YES' && process.env.RENT_NON_RENT === 'NO') {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, tenancyDateDetails.mainHeader);
-  } else if (
-    process.env.NOTICE_SERVED === 'NO' &&
-    process.env.TENANCY_START_DATE_KNOWN === 'YES' &&
-    process.env.RENT_NON_RENT === 'YES'
-  ) {
+  } else if (process.env.NOTICE_SERVED === 'NO' && process.env.TENANCY_START_DATE_KNOWN === 'YES' && process.env.RENT_NON_RENT === 'YES') {
     await performValidation('pageNavigation', nonRentArrearsDispute.backLink, rentArrears.mainHeader);
   }
   await performAction('clickRadioButton', nonRentArrearsDispute.yesRadioOption);
@@ -100,10 +72,6 @@ export async function noRentArrearsNavigationTests(): Promise<void> {
 export async function nonRentArrearsDisputeVisibilityValidationTests(): Promise<void> {
   await performAction('inputText', nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel, '');
   await performValidation('elementToBeVisible', nonRentArrearsDispute.youHave6500CharactersHiddenHintText);
-  await performAction(
-    'inputText',
-    nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel,
-    nonRentArrearsDispute.detailsCharLimitInputText
-  );
+  await performAction('inputText', nonRentArrearsDispute.explainPartOfClaimHiddenTextLabel, nonRentArrearsDispute.detailsCharLimitInputText);
   await performValidation('elementToBeVisible', nonRentArrearsDispute.tooManyCharacterHiddenHintText);
 }

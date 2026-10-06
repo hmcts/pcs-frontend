@@ -20,7 +20,8 @@ export default function decentralisedEventRoutes(app: Application): void {
     const rawExpectedSub = req.query.expected_sub;
     const expectedSub = typeof rawExpectedSub === 'string' ? rawExpectedSub : undefined;
 
-    const caseReference = typeof rawCaseReference === 'string' ? sanitiseCaseReference(rawCaseReference) : null;
+    const caseReference =
+      typeof rawCaseReference === 'string' ? sanitiseCaseReference(rawCaseReference) : null;
     if (!caseReference) {
       logger.error('Invalid case reference format', { caseReference: rawCaseReference });
       return res.status(404).send('Not Found');
@@ -32,7 +33,10 @@ export default function decentralisedEventRoutes(app: Application): void {
     }
 
     if (!expectedSub) {
-      logger.warn('Missing expected_sub in decentralised event request', { caseReference, eventId });
+      logger.warn('Missing expected_sub in decentralised event request', {
+        caseReference,
+        eventId,
+      });
       return res.status(404).send('Not found');
     }
 

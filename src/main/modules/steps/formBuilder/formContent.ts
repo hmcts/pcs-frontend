@@ -26,7 +26,8 @@ export function buildFormContent(
 ): BuiltFormContent {
   const fieldValues = buildFieldValues(fields, bodyData);
   const pageTitle =
-    getTranslation(t, 'title', undefined, interpolation) || getTranslation(t, 'question', undefined, interpolation);
+    getTranslation(t, 'title', undefined, interpolation) ||
+    getTranslation(t, 'question', undefined, interpolation);
   // Pass bodyData as originalData so translateFields can extract nested field values
   const fieldsWithLabels = translateFields(
     fields,
@@ -67,7 +68,8 @@ export function buildFormContent(
     }
   }
 
-  const allFieldsHaveOwnFieldset = fields.length > 0 && fields.every(f => f.type === 'radio' || f.type === 'checkbox');
+  const allFieldsHaveOwnFieldset =
+    fields.length > 0 && fields.every(f => f.type === 'radio' || f.type === 'checkbox');
 
   return {
     ...bodyData,

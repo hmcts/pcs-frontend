@@ -2,7 +2,10 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 import { DateTime } from 'luxon';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
@@ -45,15 +48,22 @@ const getNoticeDocumentId = (validatedCase?: CcdCaseModel): string | undefined =
   return noticeDoc?.id;
 };
 
-const getNoticeMethodText = (validatedCase: CcdCaseModel | undefined, t: TFunction): string | undefined => {
+const getNoticeMethodText = (
+  validatedCase: CcdCaseModel | undefined,
+  t: TFunction
+): string | undefined => {
   switch (validatedCase?.notice_ServiceMethod) {
     case 'PERSONALLY_HANDED': {
       const name = textOrUndefined(validatedCase.notice_PersonName);
-      return name ? t('methodOfService.PERSONALLY_HANDED', { name }) : t('methodOfService.PERSONALLY_HANDED_ALT');
+      return name
+        ? t('methodOfService.PERSONALLY_HANDED', { name })
+        : t('methodOfService.PERSONALLY_HANDED_ALT');
     }
     case 'EMAIL': {
       const emailAddress = textOrUndefined(validatedCase.notice_EmailAddress);
-      return emailAddress ? t('methodOfService.EMAIL', { emailAddress }) : t('methodOfService.EMAIL_ALT');
+      return emailAddress
+        ? t('methodOfService.EMAIL', { emailAddress })
+        : t('methodOfService.EMAIL_ALT');
     }
     case 'DELIVERED_PERMITTED_PLACE': {
       const date = formatDateOrdinal(validatedCase.notice_DeliveredDate);
@@ -65,7 +75,9 @@ const getNoticeMethodText = (validatedCase: CcdCaseModel | undefined, t: TFuncti
       return t('methodOfService.FIRST_CLASS_POST');
     case 'OTHER_ELECTRONIC': {
       const details = textOrUndefined(validatedCase.notice_OtherElectronicExplanation);
-      return details ? t('methodOfService.OTHER_ELECTRONIC', { details }) : t('methodOfService.OTHER_ELECTRONIC_ALT');
+      return details
+        ? t('methodOfService.OTHER_ELECTRONIC', { details })
+        : t('methodOfService.OTHER_ELECTRONIC_ALT');
     }
     case 'OTHER': {
       const details = textOrUndefined(validatedCase.notice_OtherExplanation);
@@ -107,7 +119,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: req => {
     const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
-    const noticeReceivedDateRaw: unknown = caseData?.possessionClaimResponse?.defendantResponses?.noticeReceivedDate;
+    const noticeReceivedDateRaw: unknown =
+      caseData?.possessionClaimResponse?.defendantResponses?.noticeReceivedDate;
 
     if (!noticeReceivedDateRaw) {
       return {};
@@ -141,7 +154,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
   beforeRedirect: async (req: Request) => {
     const response = buildDraftDefendantResponse(req);
-    const dateObject: { day?: string; month?: string; year?: string } | undefined = req.body?.noticeReceivedDate;
+    const dateObject: { day?: string; month?: string; year?: string } | undefined =
+      req.body?.noticeReceivedDate;
     const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';
     const month = dateObject?.month !== undefined ? String(dateObject.month).trim() : '';
     const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';

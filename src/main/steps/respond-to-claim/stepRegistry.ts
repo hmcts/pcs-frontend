@@ -118,7 +118,8 @@ export const stepRegistry = {
   'counter-claim-fee': counterClaimFee,
   'counter-claim-payment-successful': counterClaimPaymentSuccessful,
   'counter-claim-have-you-applied-for-help': counterClaimHaveYouAppliedForHelp,
-  'counter-claim-you-need-to-apply-for-help-with-your-fees': counterClaimYouNeedToApplyForHelpWithYourFees,
+  'counter-claim-you-need-to-apply-for-help-with-your-fees':
+    counterClaimYouNeedToApplyForHelpWithYourFees,
   'counter-claim-against-whom': counterClaimAgainstWhom,
   'counter-claim-about': counterClaimAbout,
   'counter-claim-order-other-than-sum': counterClaimOrderOtherThanSum,
@@ -153,7 +154,8 @@ export const stepRegistry = {
   'language-used': languageUsed,
   'end-of-journey-cya': endOfJourneyCya,
   'response-submitted': responseSubmitted,
-  'response-submitted-counter-claim-fee-payment-needed': responseSubmittedCounterClaimFeePaymentNeeded,
+  'response-submitted-counter-claim-fee-payment-needed':
+    responseSubmittedCounterClaimFeePaymentNeeded,
   'response-and-counter-claim-submitted': responseAndCounterClaimSubmitted,
 } satisfies Record<string, StepDefinition>;
 

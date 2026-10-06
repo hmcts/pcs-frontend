@@ -70,8 +70,12 @@ describe('sections utils', () => {
         res: { locals: {} },
       } as unknown as Request;
 
-      await expect(isSectionApplicable('sectionB', testSections, applicableReq)).resolves.toBe(true);
-      await expect(isSectionApplicable('sectionB', testSections, nonApplicableReq)).resolves.toBe(false);
+      await expect(isSectionApplicable('sectionB', testSections, applicableReq)).resolves.toBe(
+        true
+      );
+      await expect(isSectionApplicable('sectionB', testSections, nonApplicableReq)).resolves.toBe(
+        false
+      );
     });
 
     it('returns false for unknown section', async () => {
@@ -120,7 +124,9 @@ describe('sections utils', () => {
         },
       ];
 
-      expect(getSectionCoverage(['step-a1', 'step-a2', 'step-b1', 'step-z1'], overlappingSections)).toEqual({
+      expect(
+        getSectionCoverage(['step-a1', 'step-a2', 'step-b1', 'step-z1'], overlappingSections)
+      ).toEqual({
         unmappedSteps: ['step-z1'],
         duplicateAssignments: ['step-a2'],
       });

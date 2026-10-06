@@ -3,7 +3,10 @@ import { flowConfig } from '../flow.config';
 import { sessionDocs, toDisplayDocuments } from '@modules/documents/storage';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
+import {
+  ACCEPT_ATTRIBUTE_EXTENSIONS,
+  UPLOAD_MAX_FILE_SIZE_MB,
+} from '@utils/documentUploadValidation';
 
 const STEP_NAME = 'upload-documents-to-support-your-application';
 const storage = sessionDocs({ stepName: STEP_NAME });

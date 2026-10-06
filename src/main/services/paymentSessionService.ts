@@ -20,7 +20,10 @@ function saveSession(req: Request): Promise<void> {
   });
 }
 
-export function setPaymentSessionState(req: Request, paymentSessionState: PaymentSessionState): void {
+export function setPaymentSessionState(
+  req: Request,
+  paymentSessionState: PaymentSessionState
+): void {
   req.session.payment = {
     ...paymentSessionState,
   };

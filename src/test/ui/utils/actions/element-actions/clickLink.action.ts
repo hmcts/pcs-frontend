@@ -12,19 +12,11 @@ type ClickLinkParams =
     };
 
 export class ClickLinkAction implements IAction {
-  async execute(
-    page: Page,
-    action: string,
-    fieldName: string | actionRecord | ClickLinkParams,
-    header?: string
-  ): Promise<void | Page> {
+  async execute(page: Page, action: string, fieldName: string | actionRecord | ClickLinkParams, header?: string): Promise<void | Page> {
     const actionsMap = new Map<string, () => Promise<void | Page>>([
       ['clickLink', () => this.clickLink(page, fieldName as string)],
       ['clickLinkAndSwitchToNewTab', () => this.clickLinkAndSwitchToNewTab(page, fieldName as string)],
-      [
-        'clickLinkAndVerifySameTabTitle',
-        () => this.clickLinkAndVerifySameTabTitle(page, fieldName as string | ClickLinkParams, header!),
-      ],
+      ['clickLinkAndVerifySameTabTitle', () => this.clickLinkAndVerifySameTabTitle(page, fieldName as string | ClickLinkParams, header!)],
       ['clickLinkAndVerifyNewTabTitle', () => this.clickLinkAndVerifyNewTabTitle(page, fieldName as string, header!)],
     ]);
 
@@ -37,9 +29,7 @@ export class ClickLinkAction implements IAction {
 
   private async clickLink(page: Page, fieldName: string): Promise<void> {
     const linkText = await this.getVisibleLinkText(page, fieldName);
-    const locator = page
-      .locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`)
-      .first();
+    const locator = page.locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`).first();
     await locator.click();
   }
 
@@ -47,9 +37,7 @@ export class ClickLinkAction implements IAction {
     const linkTextOptions = Array.from(new Set([fieldName, fieldName.replace(/[.?!]+$/, '')]));
 
     for (const linkText of linkTextOptions) {
-      const link = page
-        .locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`)
-        .first();
+      const link = page.locator(`a:text-is("${linkText}"), .govuk-details__summary-text:text-is("${linkText}")`).first();
       if (await link.isVisible({ timeout: SHORT_TIMEOUT }).catch(() => false)) {
         return linkText;
       }
@@ -58,11 +46,7 @@ export class ClickLinkAction implements IAction {
     return fieldName;
   }
 
-  private async clickLinkAndVerifySameTabTitle(
-    page: Page,
-    fieldName: string | ClickLinkParams,
-    fallbackHeader?: string
-  ): Promise<void> {
+  private async clickLinkAndVerifySameTabTitle(page: Page, fieldName: string | ClickLinkParams, fallbackHeader?: string): Promise<void> {
     let name: string;
     let expectedHeader: string;
     let sectionHeader: string | undefined;
@@ -76,9 +60,7 @@ export class ClickLinkAction implements IAction {
     }
     let link: Locator;
     if (sectionHeader) {
-      const section = page
-        .locator(`h2:text-is("${sectionHeader}")`)
-        .locator('xpath=following-sibling::ul | following-sibling::nav//ul');
+      const section = page.locator(`h2:text-is("${sectionHeader}")`).locator('xpath=following-sibling::ul | following-sibling::nav//ul');
       link = section.locator(`a:text-is("${name}")`);
     } else {
       link = page.locator(`a:text-is("${name}")`).first();
@@ -88,9 +70,7 @@ export class ClickLinkAction implements IAction {
     await page.waitForFunction(() => document.title && document.title.length > 0);
     const pageTitle = await page.title();
     if (!pageTitle.includes(expectedHeader)) {
-      throw new Error(
-        `Navigation failed. Expected title to contain: "${expectedHeader}", Actual title: "${pageTitle}"`
-      );
+      throw new Error(`Navigation failed. Expected title to contain: "${expectedHeader}", Actual title: "${pageTitle}"`);
     }
     await page.goBack();
     await page.waitForLoadState('domcontentloaded');

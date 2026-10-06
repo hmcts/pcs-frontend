@@ -13,31 +13,19 @@ export async function contactPreferencesTelephoneErrorValidation(): Promise<void
     header: contactPreferencesTelephone.thereIsAProblemErrorMessageHeader,
     message: contactPreferencesTelephone.enterUKPhoneNumberErrorMessage,
   });
-  await performAction(
-    'inputText',
-    contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel,
-    contactPreferencesTelephone.invalidUkPhoneNumberTextInput
-  );
+  await performAction('inputText', contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel, contactPreferencesTelephone.invalidUkPhoneNumberTextInput);
   await performAction('When the user clicks the button', contactPreferencesTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferencesTelephone.thereIsAProblemErrorMessageHeader,
     message: contactPreferencesTelephone.enterUKPhoneNumberFormatErrorMessage,
   });
-  await performAction(
-    'inputText',
-    contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel,
-    contactPreferencesTelephone.ukPhoneNumberMoreThan11DigitTextInput
-  );
+  await performAction('inputText', contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel, contactPreferencesTelephone.ukPhoneNumberMoreThan11DigitTextInput);
   await performAction('When the user clicks the button', contactPreferencesTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferencesTelephone.thereIsAProblemErrorMessageHeader,
     message: contactPreferencesTelephone.enterUKPhoneNumberFormatErrorMessage,
   });
-  await performAction(
-    'inputText',
-    contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel,
-    contactPreferencesTelephone.ukPhoneNumberWithCountryCodeTextInput
-  );
+  await performAction('inputText', contactPreferencesTelephone.ukPhoneNumberHiddenTextLabel, contactPreferencesTelephone.ukPhoneNumberWithCountryCodeTextInput);
   await performAction('When the user clicks the button', contactPreferencesTelephone.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferencesTelephone.thereIsAProblemErrorMessageHeader,

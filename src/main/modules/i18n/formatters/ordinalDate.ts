@@ -26,7 +26,10 @@ function toValidDate(value: unknown): Date | undefined {
   return undefined;
 }
 
-function resolveOptions(lng?: string, options?: OrdinalDateOptions): Intl.DateTimeFormatOptions & { locale: string } {
+function resolveOptions(
+  lng?: string,
+  options?: OrdinalDateOptions
+): Intl.DateTimeFormatOptions & { locale: string } {
   const nestedOptions =
     options?.interpolationkey && options.formatParams?.[options.interpolationkey]
       ? options.formatParams[options.interpolationkey]
@@ -40,7 +43,11 @@ function resolveOptions(lng?: string, options?: OrdinalDateOptions): Intl.DateTi
   };
 }
 
-export function formatOrdinalDate(value: unknown, lng?: string, options?: OrdinalDateOptions): string {
+export function formatOrdinalDate(
+  value: unknown,
+  lng?: string,
+  options?: OrdinalDateOptions
+): string {
   const date = toValidDate(value);
   if (!date) {
     return typeof value === 'string' ? value : '';

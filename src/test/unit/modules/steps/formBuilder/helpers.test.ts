@@ -41,12 +41,17 @@ describe('formBuilder helpers', () => {
     });
 
     it('should preserve an explicit empty translation', () => {
-      const mockT = jest.fn((key: string) => (key === 'empty.key' ? '' : key)) as unknown as TFunction;
+      const mockT = jest.fn((key: string) =>
+        key === 'empty.key' ? '' : key
+      ) as unknown as TFunction;
 
       const result = getTranslation(mockT, 'empty.key', 'Fallback Text');
 
       expect(result).toBe('');
-      expect(mockT).toHaveBeenCalledWith('empty.key', { returnObjects: true, returnEmptyString: true });
+      expect(mockT).toHaveBeenCalledWith('empty.key', {
+        returnObjects: true,
+        returnEmptyString: true,
+      });
     });
   });
 
@@ -579,7 +584,10 @@ describe('formBuilder helpers', () => {
   });
 
   describe('validateForm', () => {
-    const createMockRequest = (body: Record<string, unknown> = {}, sessionFormData: Record<string, unknown> = {}) => {
+    const createMockRequest = (
+      body: Record<string, unknown> = {},
+      sessionFormData: Record<string, unknown> = {}
+    ) => {
       return {
         body,
         session: {
@@ -1212,7 +1220,9 @@ describe('formBuilder helpers', () => {
         };
 
         const errors = validateForm(req, fields, translations);
-        expect(errors['contactMethod.emailAddress']).toBe('Email address must be 5 characters or less');
+        expect(errors['contactMethod.emailAddress']).toBe(
+          'Email address must be 5 characters or less'
+        );
       });
     });
 
@@ -1288,7 +1298,8 @@ describe('formBuilder helpers', () => {
           age: 'Age validation failed',
         };
 
-        const mockT = ((key: string) => translations[key.replace('errors.', '')] || key) as unknown as TFunction;
+        const mockT = ((key: string) =>
+          translations[key.replace('errors.', '')] || key) as unknown as TFunction;
 
         const errors = validateForm(req, fields, translations, undefined, mockT);
 

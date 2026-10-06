@@ -1,18 +1,7 @@
-import {
-  citizenCreateGenAppApiData,
-  createCaseApiData,
-  respondPossessionClaimApiData,
-  submitCaseApiData,
-} from '../data/api-data';
+import { citizenCreateGenAppApiData, createCaseApiData, respondPossessionClaimApiData, submitCaseApiData } from '../data/api-data';
 import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
 import { dashboard } from '../data/index.selector';
-import {
-  counterClaimApplicationFeeAmount,
-  counterClaimPaymentSuccessful,
-  paymentDetails,
-  responseSubmittedCounterclaimFeePaymentNeeded,
-  taskList,
-} from '../data/page-data';
+import { counterClaimApplicationFeeAmount, counterClaimPaymentSuccessful, paymentDetails, responseSubmittedCounterclaimFeePaymentNeeded, taskList } from '../data/page-data';
 import { viewHearingDocuments } from '../data/page-data/courtHearings-page-data';
 import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-page-data';
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
@@ -229,10 +218,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
     await performAction('When the user clicks the button', paymentDetails.confirmPaymentButton);
     await performValidation('Then the user sees the main header', counterClaimPaymentSuccessful.mainHeader);
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
     for (let i = 0; i < 12; i++) {
       await performAction('reloadPage');
       const respondedNotification = page.locator('p.govuk-body', {

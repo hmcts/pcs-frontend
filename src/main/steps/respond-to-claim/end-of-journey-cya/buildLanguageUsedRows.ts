@@ -16,7 +16,9 @@ export function buildLanguageUsedRows(req: Request, t: TFunction): SummaryListRo
   return [
     {
       key: { text: t('rows.languageUsed.label') },
-      value: { text: languageUsed ? t(`rows.languageUsed.options.${languageUsed}`) : t('noAnswerProvided') },
+      value: {
+        text: languageUsed ? t(`rows.languageUsed.options.${languageUsed}`) : t('noAnswerProvided'),
+      },
       actions: { items: [change('language-used', 'rows.languageUsed.changeHidden')] },
     },
   ];

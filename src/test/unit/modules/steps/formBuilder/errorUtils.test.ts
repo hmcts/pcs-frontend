@@ -42,7 +42,9 @@ describe('errorUtils', () => {
       expect(fieldTypeForErrorKey(fields, 'parent.nestedDate')).toBe('date');
       expect(fieldTypeForErrorKey(fields, 'a.b.c')).toBeUndefined();
       expect(fieldTypeForErrorKey(fields, 'parent.unknown')).toBeUndefined();
-      expect(fieldTypeForErrorKey([{ name: 'parent', type: 'radio' }], 'parent.nestedDate')).toBeUndefined();
+      expect(
+        fieldTypeForErrorKey([{ name: 'parent', type: 'radio' }], 'parent.nestedDate')
+      ).toBeUndefined();
     });
   });
 
@@ -318,7 +320,8 @@ describe('errorUtils', () => {
           fields: [],
           errors: {
             correspondenceAddressConfirm: 'i18n title key',
-            'correspondenceAddressConfirm.addressLine1': 'i18n duplicate key shape — must not drive field Errors',
+            'correspondenceAddressConfirm.addressLine1':
+              'i18n duplicate key shape — must not drive field Errors',
           } as Record<string, unknown>,
         },
         'correspondence-address',
@@ -330,7 +333,9 @@ describe('errorUtils', () => {
       const viewLocals = mockRender.mock.calls[0][1];
       expect(viewLocals.validationErrors).toEqual(fieldValidation);
       expect(viewLocals.errors).toEqual(fieldValidation);
-      expect(viewLocals.validationErrors['correspondenceAddressConfirm.addressLine1']).toBe('Enter address line 1');
+      expect(viewLocals.validationErrors['correspondenceAddressConfirm.addressLine1']).toBe(
+        'Enter address line 1'
+      );
     });
   });
 });

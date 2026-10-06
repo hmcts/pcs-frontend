@@ -13,7 +13,11 @@ import {
   refreshTokenGrant,
 } from 'openid-client';
 
-import { OIDCAuthenticationError, OIDCCallbackError, OIDCModule } from '../../../../main/modules/oidc';
+import {
+  OIDCAuthenticationError,
+  OIDCCallbackError,
+  OIDCModule,
+} from '../../../../main/modules/oidc';
 import { describeCause } from '../../../../main/modules/oidc/oidc';
 
 import { Logger } from '@modules/logger';
@@ -166,11 +170,19 @@ describe('OIDCModule', () => {
     it('should successfully setup the OIDC client', async () => {
       await oidcModule['setupClient']();
 
-      expect(discovery).toHaveBeenCalledWith(expect.any(URL), 'test-client-id', 'test-secret', undefined, undefined);
+      expect(discovery).toHaveBeenCalledWith(
+        expect.any(URL),
+        'test-client-id',
+        'test-secret',
+        undefined,
+        undefined
+      );
     });
 
     it('should not allow insecure discovery for non-http issuers', () => {
-      expect(oidcModule['shouldAllowInsecureDiscovery'](new URL('https://test-issuer'))).toBe(false);
+      expect(oidcModule['shouldAllowInsecureDiscovery'](new URL('https://test-issuer'))).toBe(
+        false
+      );
     });
 
     it('should throw OIDCAuthenticationError when setup fails', async () => {
@@ -256,7 +268,9 @@ describe('OIDCModule', () => {
 
       it('should handle calculatePKCECodeChallenge errors', async () => {
         (randomPKCECodeVerifier as jest.Mock).mockReturnValue('test-verifier');
-        (calculatePKCECodeChallenge as jest.Mock).mockRejectedValue(new Error('Challenge calculation failed'));
+        (calculatePKCECodeChallenge as jest.Mock).mockRejectedValue(
+          new Error('Challenge calculation failed')
+        );
 
         oidcModule.enableFor(mockApp);
         const loginHandler = (mockApp.get as jest.Mock).mock.calls[0][1];
@@ -628,7 +642,9 @@ describe('OIDCModule', () => {
 
         expect(buildEndSessionUrl).not.toHaveBeenCalled();
         expect(mockRequest.session.destroy).toHaveBeenCalled();
-        expect(mockResponse.redirect).toHaveBeenCalledWith('https://manage-case.aat.platform.hmcts.net/auth/logout');
+        expect(mockResponse.redirect).toHaveBeenCalledWith(
+          'https://manage-case.aat.platform.hmcts.net/auth/logout'
+        );
       });
     });
 
@@ -695,7 +711,9 @@ describe('OIDCModule', () => {
       it('should throw OIDCAuthenticationError when refresh fails', async () => {
         (refreshTokenGrant as jest.Mock).mockRejectedValue(new Error('Refresh failed'));
 
-        await expect(oidcModule.refreshUserTokens('invalid-refresh-token')).rejects.toThrow(OIDCAuthenticationError);
+        await expect(oidcModule.refreshUserTokens('invalid-refresh-token')).rejects.toThrow(
+          OIDCAuthenticationError
+        );
       });
 
       it('should handle token without exp claim', async () => {
@@ -746,7 +764,10 @@ describe('OIDCModule', () => {
     });
 
     it('keeps the outer error when errors is empty or not an Error array', () => {
-      const cause = Object.assign(new Error('nothing nested'), { name: 'AggregateError', errors: [] });
+      const cause = Object.assign(new Error('nothing nested'), {
+        name: 'AggregateError',
+        errors: [],
+      });
 
       expect(describeCause(cause)).toBe('AggregateError: nothing nested');
     });

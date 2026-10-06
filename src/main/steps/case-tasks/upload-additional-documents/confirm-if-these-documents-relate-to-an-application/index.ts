@@ -17,7 +17,11 @@ import {
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '@routes/cancelUploadAdditionalDocuments';
 import { getDashboardUrl } from '@routes/dashboard';
-import type { CcdCollectionItem, GenApp, RelatedApplicationOption } from '@services/ccdCase.interface';
+import type {
+  CcdCollectionItem,
+  GenApp,
+  RelatedApplicationOption,
+} from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getFlowConfigForJourney } from '@steps';
 
@@ -27,7 +31,9 @@ const templatePath =
   'case-tasks/upload-additional-documents/confirm-if-these-documents-relate-to-an-application/confirmIfTheseDocumentsRelateToAnApplication.njk';
 const UPLOAD_DOCUMENTS_EVENT_ID = 'uploadDocuments';
 
-const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
+const stepNavigation = createStepNavigation(
+  req => getFlowConfigForJourney(journeyName, req) || flowConfig
+);
 
 function labelForOption(t: TFunction, option: RelatedApplicationOption): string {
   const formattedDate = option.submittedDate ? date(option.submittedDate, 'cccc d MMMM yyyy') : '';
@@ -45,13 +51,19 @@ function labelForOption(t: TFunction, option: RelatedApplicationOption): string 
   }
 }
 
-async function loadRelatedApplicationOptions(req: Request): Promise<CcdCollectionItem<RelatedApplicationOption>[]> {
+async function loadRelatedApplicationOptions(
+  req: Request
+): Promise<CcdCollectionItem<RelatedApplicationOption>[]> {
   const caseId = req.res?.locals.validatedCase?.id;
   const accessToken = req.session?.user?.accessToken;
   if (!caseId || !accessToken) {
     return [];
   }
-  const startResponse = await ccdCaseService.getCaseByIdForEvent(accessToken, caseId, UPLOAD_DOCUMENTS_EVENT_ID);
+  const startResponse = await ccdCaseService.getCaseByIdForEvent(
+    accessToken,
+    caseId,
+    UPLOAD_DOCUMENTS_EVENT_ID
+  );
   return startResponse.data?.relatedApplicationOptions ?? [];
 }
 
@@ -108,7 +120,8 @@ export const step: StepDefinition = {
       const openInNewTabText = t('opensInNewTab');
 
       const options = await loadRelatedApplicationOptions(req);
-      const ccdCase = caseId && accessToken ? await ccdCaseService.getCaseById(accessToken, caseId) : undefined;
+      const ccdCase =
+        caseId && accessToken ? await ccdCaseService.getCaseById(accessToken, caseId) : undefined;
       const genAppsById = new Map<string, GenApp>();
       for (const genApp of ccdCase?.data.genApps ?? []) {
         if (genApp.id) {
@@ -122,7 +135,12 @@ export const step: StepDefinition = {
         ...options
           .filter(item => Boolean(item.value.genAppId))
           .map(item => {
-            const hint = buildApplicationHint(caseId, genAppsById, item.value.genAppId, openInNewTabText);
+            const hint = buildApplicationHint(
+              caseId,
+              genAppsById,
+              item.value.genAppId,
+              openInNewTabText
+            );
             return {
               value: item.value.genAppId as string,
               text: labelForOption(t, item.value),
@@ -148,7 +166,9 @@ export const step: StepDefinition = {
 
       return {
         dashboardUrl: getDashboardUrl(caseId),
-        cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
+        cancelUrl: caseId
+          ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId))
+          : '',
         url: req.originalUrl || '',
         applications,
       };
@@ -159,7 +179,8 @@ export const step: StepDefinition = {
 
       if (!relatedApplicationId) {
         await loadStepNamespace(req);
-        const getController = typeof step.getController === 'function' ? step.getController() : step.getController;
+        const getController =
+          typeof step.getController === 'function' ? step.getController() : step.getController;
         let pageContent: Record<string, unknown> = {};
         const captureRes = {
           render: (_view: string, content: Record<string, unknown>) => {
@@ -191,7 +212,9 @@ export const step: StepDefinition = {
       } else if (relatedApplicationId) {
         const options = await loadRelatedApplicationOptions(req);
         const match = options.find(
-          item => item.value.genAppId === relatedApplicationId || item.value.counterClaimId === relatedApplicationId
+          item =>
+            item.value.genAppId === relatedApplicationId ||
+            item.value.counterClaimId === relatedApplicationId
         );
         if (match) {
           relatedApplicationCategory = match.value.category;

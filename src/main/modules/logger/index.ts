@@ -61,7 +61,9 @@ const myFormat = printf((info: Record<string, unknown> & { [key: symbol]: unknow
   const metadata = { ...rawMetadata };
   const additionalValues = Array.isArray(info[splatSymbol]) ? (info[splatSymbol] as unknown[]) : [];
   const mergedStringValue = extractMergedStringMetadata(metadata);
-  const allAdditionalValues = mergedStringValue ? [mergedStringValue, ...additionalValues] : additionalValues;
+  const allAdditionalValues = mergedStringValue
+    ? [mergedStringValue, ...additionalValues]
+    : additionalValues;
   const jsonMetadata = stringifyLogValue(metadata);
   const deduplicatedExtraValues = allAdditionalValues.filter(value => {
     const stringifiedValue = stringifyLogValue(value);
@@ -77,7 +79,9 @@ const myFormat = printf((info: Record<string, unknown> & { [key: symbol]: unknow
     return true;
   });
   const extraValues =
-    deduplicatedExtraValues.length > 0 ? ` ${deduplicatedExtraValues.map(stringifyLogValue).join(' ')}` : '';
+    deduplicatedExtraValues.length > 0
+      ? ` ${deduplicatedExtraValues.map(stringifyLogValue).join(' ')}`
+      : '';
   const extraMetadata = jsonMetadata !== '{}' ? ` ${jsonMetadata}` : '';
   return `${logTimestamp} ${level}: ${message}${extraValues}${extraMetadata}`;
 });

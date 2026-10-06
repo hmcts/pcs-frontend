@@ -15,10 +15,6 @@ export async function installmentPaymentsNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: installmentPayments.pageSlug,
   });
-  await performValidation(
-    'pageNavigation',
-    installmentPayments.backLink,
-    repaymentsAgreed.getMainHeader(claimantsName)
-  );
+  await performValidation('pageNavigation', installmentPayments.backLink, repaymentsAgreed.getMainHeader(claimantsName));
   await performAction('clickRadioButton', installmentPayments.yesRadioOption);
 }

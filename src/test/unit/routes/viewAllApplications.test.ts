@@ -42,7 +42,9 @@ describe('View All Application Route', () => {
   it('should register handler with path and OIDC middleware', () => {
     viewAllApplicationsRoutes(app);
 
-    expect((app.get as jest.Mock).mock.calls[0][0]).toBe('/case/:caseReference/view-all-applications');
+    expect((app.get as jest.Mock).mock.calls[0][0]).toBe(
+      '/case/:caseReference/view-all-applications'
+    );
     expect((app.get as jest.Mock).mock.calls[0][1]).toBe(oidcMiddleware);
   });
 
@@ -98,7 +100,11 @@ describe('View All Application Route', () => {
       },
     });
 
-    expect(app.get).toHaveBeenCalledWith(VIEW_ALL_APPLICATIONS_ROUTE, expect.any(Function), expect.any(Function));
+    expect(app.get).toHaveBeenCalledWith(
+      VIEW_ALL_APPLICATIONS_ROUTE,
+      expect.any(Function),
+      expect.any(Function)
+    );
     expect(res.render).toHaveBeenCalledWith(
       'view-all-applications',
       expect.objectContaining({
@@ -317,7 +323,8 @@ function getTestGenApps() {
           document: {
             document_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a7ef',
             document_filename: 'General Application GA1 - Defendant 3.pdf',
-            document_binary_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a7ef/binary',
+            document_binary_url:
+              'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a7ef/binary',
           },
         },
         supportingDocuments: [
@@ -326,7 +333,8 @@ function getTestGenApps() {
             value: {
               document_url: 'http://localhost:4506/documents/88a3402a-035b-4dcf-95c2-011e5f2099d9',
               document_filename: 'rent_statement2 GA3 - Defendant 2.txt',
-              document_binary_url: 'http://localhost:4506/documents/88a3402a-035b-4dcf-95c2-011e5f2099d9/binary',
+              document_binary_url:
+                'http://localhost:4506/documents/88a3402a-035b-4dcf-95c2-011e5f2099d9/binary',
             },
           },
         ],
@@ -348,7 +356,8 @@ function getTestGenApps() {
           document: {
             document_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a200',
             document_filename: 'General Application GA2 - Defendant 3.pdf',
-            document_binary_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a200/binary',
+            document_binary_url:
+              'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a200/binary',
           },
         },
       },
@@ -369,7 +378,8 @@ function getTestGenApps() {
           document: {
             document_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a300',
             document_filename: 'General Application GA1 - Defendant 1.pdf',
-            document_binary_url: 'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a300/binary',
+            document_binary_url:
+              'http://localhost:4506/documents/bf112cdf-76d7-4d15-bb92-cd7c3483a300/binary',
           },
         },
       },

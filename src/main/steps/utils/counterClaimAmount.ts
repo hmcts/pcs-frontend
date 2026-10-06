@@ -4,7 +4,9 @@ export interface CounterClaimAmountSource {
   estimatedMaxClaimAmount?: string;
 }
 
-export function getCounterClaimAmountInPence(counterClaim?: CounterClaimAmountSource): string | undefined {
+export function getCounterClaimAmountInPence(
+  counterClaim?: CounterClaimAmountSource
+): string | undefined {
   if (!counterClaim) {
     return undefined;
   }

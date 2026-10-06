@@ -31,10 +31,6 @@ export async function yourCircumstancesNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: yourCircumstances.pageSlug,
   });
-  await performValidation(
-    'pageNavigation',
-    yourCircumstances.backLink,
-    wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader
-  );
+  await performValidation('pageNavigation', yourCircumstances.backLink, wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.mainHeader);
   await performAction('clickRadioButton', yourCircumstances.noRadioOption);
 }

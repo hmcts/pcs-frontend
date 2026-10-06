@@ -30,13 +30,23 @@ describe('respond-to-claim what-other-regular-expenses-do-you-have back navigati
 
   it('returns priority-debt-details when user has priority debts', async () => {
     await expect(
-      getPreviousStep(reqWithPriorityDebts('YES'), 'what-other-regular-expenses-do-you-have', flowConfig, {})
+      getPreviousStep(
+        reqWithPriorityDebts('YES'),
+        'what-other-regular-expenses-do-you-have',
+        flowConfig,
+        {}
+      )
     ).resolves.toBe('priority-debt-details');
   });
 
   it('returns priority-debts when user has no priority debts', async () => {
     await expect(
-      getPreviousStep(reqWithPriorityDebts('NO'), 'what-other-regular-expenses-do-you-have', flowConfig, {})
+      getPreviousStep(
+        reqWithPriorityDebts('NO'),
+        'what-other-regular-expenses-do-you-have',
+        flowConfig,
+        {}
+      )
     ).resolves.toBe('priority-debts');
   });
 });

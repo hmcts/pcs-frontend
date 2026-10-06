@@ -83,14 +83,7 @@ import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValida
 import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
-import {
-  finaliseAllValidations,
-  initializeExecutor,
-  performAction,
-  performActions,
-  performValidation,
-  performValidations,
-} from '../utils/controller';
+import { finaliseAllValidations, initializeExecutor, performAction, performActions, performValidation, performValidations } from '../utils/controller';
 const home_url = process.env.TEST_URL;
 let claimantName: string;
 
@@ -113,10 +106,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.RENT_NON_RENT = 'NO';
   }
 
-  const isRentArrearsOnly =
-    testInfo.title.includes('RentArrears') &&
-    !testInfo.title.includes('NonRentArrears') &&
-    !testInfo.title.includes('Respond to a claim');
+  const isRentArrearsOnly = testInfo.title.includes('RentArrears') && !testInfo.title.includes('NonRentArrears') && !testInfo.title.includes('Respond to a claim');
 
   process.env.RENT_ARREARS = isRentArrearsOnly ? 'YES' : 'NO';
 
@@ -128,9 +118,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   // Assign the tenancy type & grounds in the payload
-  const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type =>
-    testInfo.title.includes(type)
-  );
+  const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type => testInfo.title.includes(type));
 
   switch (tenancyKey) {
     case 'Introductory':
@@ -292,10 +280,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performValidation('Then the user sees the main header', defendantNameCapture.mainHeader);
     await performActions(
       'Respond to a claim - step group 2',
-      [
-        'When the user enters the defendant details',
-        { fName: defendantNameCapture.firstNameTextInput, lName: defendantNameCapture.lastNameTextInput },
-      ],
+      ['When the user enters the defendant details', { fName: defendantNameCapture.firstNameTextInput, lName: defendantNameCapture.lastNameTextInput }],
       [
         'And the user enters the date of birth details',
         {
@@ -304,10 +289,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
           dobYear: defendantDateOfBirth.yearInputText,
         },
       ],
-      [
-        'And the user selects whether the correspondence address is known',
-        { radioOption: correspondenceAddress.yesRadioOption },
-      ],
+      ['And the user selects whether the correspondence address is known', { radioOption: correspondenceAddress.yesRadioOption }],
       [
         'And the user selects the contact preference (email or post)',
         {
@@ -333,14 +315,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ['And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails'],
       ['Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails'],
       ['When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton],
-      [
-        'And the user navigates to the task list subsection',
-        { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink },
-      ],
-      [
-        'When the user responds to the dispute claim interstitial',
-        submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect,
-      ],
+      ['And the user navigates to the task list subsection', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink }],
+      ['When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect],
       [
         'And the user enters the tenancy or contract type details',
         {
@@ -371,10 +347,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
           details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
         },
       ],
-      [
-        'selectAlternativeAccommodation',
-        { radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption, ...getRelativeDate(5) },
-      ],
+      ['selectAlternativeAccommodation', { radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption, ...getRelativeDate(5) }],
       [
         'yourCircumstances',
         {
@@ -382,10 +355,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
           yourCircumstancesOption: yourCircumstances.yesRadioOption,
         },
       ],
-      [
-        'exceptionalHardship',
-        { question: exceptionalHardship.mainHeader, exceptionalHardshipOption: exceptionalHardship.yesRadioOption },
-      ],
+      ['exceptionalHardship', { question: exceptionalHardship.mainHeader, exceptionalHardshipOption: exceptionalHardship.yesRadioOption }],
       ['And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances'],
       ['Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances'],
       ['When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton],
@@ -401,18 +371,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
         'selectWhatRegularIncomeDoYouReceive',
         {
           regularIncomeOptions: [
-            [
-              whatRegularIncomeDoYouReceive.universalCreditParagraph,
-              whatRegularIncomeDoYouReceive.universalCreditTextInput,
-              whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-            ],
+            [whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
           ],
         },
       ],
-      [
-        'selectPriorityDebts',
-        { question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion, option: priorityDebts.yesRadioOption },
-      ],
+      ['selectPriorityDebts', { question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion, option: priorityDebts.yesRadioOption }],
       [
         'enterPriorityDebtDetails',
         {
@@ -476,10 +439,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performActions(
       'Respond to a claim - step group 5',
       ['When the user clicks the button', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton],
-      [
-        'And the user navigates to the task list subsection',
-        { subSection: taskList.checkYourAnswersAndSubmitHiddenLink },
-      ]
+      ['And the user navigates to the task list subsection', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink }]
     );
 
     await performValidation('Then the user sees the main header', equalityAndDiversityStart.mainHeader);
@@ -520,10 +480,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       ['text', { elementType: 'paragraph', text: counterClaimPaymentSuccessful.paymentConfirmationParagraph }]
     );
 
-    await performActions('Respond to a claim - step group 8', [
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton,
-    ]);
+    await performActions('Respond to a claim - step group 8', ['When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton]);
 
     await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
@@ -540,10 +497,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -577,19 +531,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTextMessage', {
       radioOption: contactPreferencesTextMessage.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadAssuredTenancy.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadAssuredTenancy.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
@@ -631,10 +579,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'disputeAndTenancy'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'disputeAndTenancy');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'disputeAndTenancy');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -664,14 +609,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'situationAndCircumstances'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'situationAndCircumstances'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.incomeAndExpensesLink,
@@ -683,14 +622,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'incomeAndExpenditure'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'incomeAndExpenditure'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'incomeAndExpenditure');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'incomeAndExpenditure');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.uploadDocumentsLink,
@@ -700,13 +633,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'uploadFiles');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
@@ -727,10 +654,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
     await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
 
@@ -738,10 +662,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // > 3 named parties - CounterClaimAppliedForHelp - No - You need to apply for help with your fees
     await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -774,19 +695,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTextMessage', {
       radioOption: contactPreferencesTextMessage.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadAssuredTenancy.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadAssuredTenancy.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
@@ -820,20 +735,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
-    await performValidation(
-      'Then the user sees the main header',
-      counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader
-    );
+    await performValidation('Then the user sees the main header', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
   });
 
   test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - SomethingElse - SelectCounterClaim - Yes @secureFlexible', async () => {
     //Income and expenses - yes - no option On regular Income - universal credit, no defendants - Counterclaim - yes - SomethingElse -  I need help
     await performAction('When the user selects the legal advice option', freeLegalAdvice.noRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -862,19 +771,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectContactByTextMessage', {
       radioOption: contactPreferencesTextMessage.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
@@ -922,10 +825,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'disputeAndTenancy'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'disputeAndTenancy');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'disputeAndTenancy');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -954,14 +854,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'situationAndCircumstances'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'situationAndCircumstances'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.incomeAndExpensesLink,
@@ -989,14 +883,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'incomeAndExpenditure'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'incomeAndExpenditure'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'incomeAndExpenditure');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'incomeAndExpenditure');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.uploadDocumentsLink,
@@ -1006,13 +894,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'uploadFiles');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
@@ -1033,10 +915,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
     await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
 
@@ -1044,10 +923,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //Income and expenses - yes - all options except Universal Credit - universal credit - What are you claiming for - sum of money - I need help
     await performAction('When the user selects the legal advice option', freeLegalAdvice.preferNotToSayRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -1075,19 +951,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('And the user selects contact by telephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
@@ -1130,10 +1000,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'disputeAndTenancy'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'disputeAndTenancy');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'disputeAndTenancy');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -1164,14 +1031,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'situationAndCircumstances'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'situationAndCircumstances'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.incomeAndExpensesLink,
@@ -1181,25 +1042,10 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatRegularIncomeDoYouReceive', {
       regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-          whatRegularIncomeDoYouReceive.pensionTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
-          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
-        ],
+        [whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph, whatRegularIncomeDoYouReceive.otherBenefitsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph, whatRegularIncomeDoYouReceive.pensionTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph, whatRegularIncomeDoYouReceive.incomeFromJobsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph, whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput],
       ],
     });
     await performAction('selectUniversalCredit', {
@@ -1224,14 +1070,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'incomeAndExpenditure'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'incomeAndExpenditure'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'incomeAndExpenditure');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'incomeAndExpenditure');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.uploadDocumentsLink,
@@ -1241,13 +1081,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'uploadFiles');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
@@ -1268,10 +1102,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
     await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
 
@@ -1279,10 +1110,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //Counterclaim - both - I need help
     await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -1310,10 +1138,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('And the user selects contact by telephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -1362,10 +1187,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'disputeAndTenancy'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'disputeAndTenancy');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'disputeAndTenancy');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -1396,14 +1218,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'situationAndCircumstances'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'situationAndCircumstances'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.incomeAndExpensesLink,
@@ -1433,25 +1249,15 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
           whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
           whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
         ],
-        [
-          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
-        ],
+        [whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph, whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput, whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption],
       ],
     });
     await performAction('otherConsiderations', {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'incomeAndExpenditure'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'incomeAndExpenditure'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'incomeAndExpenditure');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'incomeAndExpenditure');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.uploadDocumentsLink,
@@ -1461,13 +1267,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'uploadFiles');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
@@ -1488,10 +1288,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
     await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
 
@@ -1499,10 +1296,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //universal credit with all other options - priority debts - No - Multiple namedParties - sumOfMoney - iNeedHelp
     await performAction('When the user selects the legal advice option', freeLegalAdvice.noRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -1529,19 +1323,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('And the user selects contact by telephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayload.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
@@ -1591,10 +1379,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'disputeAndTenancy'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'disputeAndTenancy');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'disputeAndTenancy');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -1639,14 +1424,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'situationAndCircumstances'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'situationAndCircumstances'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.incomeAndExpensesLink,
@@ -1656,30 +1435,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatRegularIncomeDoYouReceive', {
       regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-          whatRegularIncomeDoYouReceive.pensionTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
-          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
-        ],
+        [whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph, whatRegularIncomeDoYouReceive.otherBenefitsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph, whatRegularIncomeDoYouReceive.pensionTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph, whatRegularIncomeDoYouReceive.incomeFromJobsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph, whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput],
       ],
     });
     await performAction('selectPriorityDebts', {
@@ -1691,14 +1451,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'incomeAndExpenditure'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'incomeAndExpenditure'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'incomeAndExpenditure');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'incomeAndExpenditure');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.uploadDocumentsLink,
@@ -1708,13 +1462,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'uploadFiles');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
@@ -1735,20 +1483,14 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
     await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
 
   test('RentArrears - Demoted - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known - InstallmentPayment - No - PriorityDebts - Yes - SelectCounterClaim - Yes @smoke @PR @healthCheck', async () => {
     await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -1773,19 +1515,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('And the user selects contact by telephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayload.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
@@ -1836,10 +1572,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'disputeAndTenancy'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'disputeAndTenancy');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'disputeAndTenancy');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -1886,14 +1619,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.yesRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'situationAndCircumstances'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'situationAndCircumstances'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.incomeAndExpensesLink,
@@ -1922,14 +1649,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'incomeAndExpenditure'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'incomeAndExpenditure'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'incomeAndExpenditure');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'incomeAndExpenditure');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.uploadDocumentsLink,
@@ -1939,13 +1660,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'uploadFiles');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
@@ -1966,10 +1681,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
     await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
 
@@ -1977,10 +1689,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //somethingElse - multiple named parties - iDoNotNeedHelp
     await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -2005,19 +1714,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('And the user selects contact by telephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayload.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
@@ -2060,10 +1763,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'disputeAndTenancy'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'disputeAndTenancy');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'disputeAndTenancy');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -2117,14 +1817,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'situationAndCircumstances'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'situationAndCircumstances'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.incomeAndExpensesLink,
@@ -2146,14 +1840,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'incomeAndExpenditure'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'incomeAndExpenditure'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'incomeAndExpenditure');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'incomeAndExpenditure');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.uploadDocumentsLink,
@@ -2163,13 +1851,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'uploadFiles');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
@@ -2190,10 +1872,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
     await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
 
@@ -2201,10 +1880,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     //> 3 named parties - CounterClaimAppliedForHelp - Yes - Who are you claiming against
     await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -2229,19 +1905,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('And the user selects contact by telephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadRentNonRent.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadRentNonRent.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadRentNonRent.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
@@ -2261,10 +1931,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('selectCounterClaim', {
       option: counterClaim.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'disputeAndTenancy'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'disputeAndTenancy');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'disputeAndTenancy');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -2308,14 +1975,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'situationAndCircumstances'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'situationAndCircumstances'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.incomeAndExpensesLink,
@@ -2337,14 +1998,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'incomeAndExpenditure'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'incomeAndExpenditure'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'incomeAndExpenditure');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'incomeAndExpenditure');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.uploadDocumentsLink,
@@ -2354,13 +2009,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'uploadFiles');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
@@ -2389,10 +2038,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     // Multiparty - Unknown defendant details - somethingElse - iDoNotNeedHelp
     await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -2420,19 +2066,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('And the user selects contact by telephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadDefault.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadDefault.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadDefault.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.imNotSureRadioOption,
@@ -2481,10 +2121,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'disputeAndTenancy'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'disputeAndTenancy');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'disputeAndTenancy');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -2529,14 +2166,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'situationAndCircumstances'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'situationAndCircumstances'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.incomeAndExpensesLink,
@@ -2548,14 +2179,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'incomeAndExpenditure'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'incomeAndExpenditure'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'incomeAndExpenditure');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'incomeAndExpenditure');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.uploadDocumentsLink,
@@ -2565,13 +2190,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'uploadFiles');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
@@ -2597,10 +2216,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       amount: counterClaimApplicationFeeAmount.counterClaimAmountNotApplicable,
       fee: counterClaimApplicationFeeAmount.somethingElseCounterClaimFee,
     });
-    await performAction(
-      'When the user clicks the button',
-      counterClaimApplicationFeeAmount.getPayButton(counterClaimApplicationFeeAmount.somethingElseCounterClaimFee)
-    );
+    await performAction('When the user clicks the button', counterClaimApplicationFeeAmount.getPayButton(counterClaimApplicationFeeAmount.somethingElseCounterClaimFee));
     await performValidation('Then the user sees the main header', paymentDetails.mainHeader);
     await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.declinedCardNumber });
     await performValidation('Then the user sees the main header', 'Your payment has been declined');
@@ -2616,10 +2232,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -2653,19 +2266,13 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performAction('selectContactByTextMessage', {
       radioOption: contactPreferencesTextMessage.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadAssuredTenancy.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadAssuredTenancy.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
@@ -2707,10 +2314,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'disputeAndTenancy'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'disputeAndTenancy');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'disputeAndTenancy');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -2740,14 +2344,8 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'situationAndCircumstances'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'situationAndCircumstances'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.incomeAndExpensesLink,
@@ -2759,14 +2357,8 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'incomeAndExpenditure'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'incomeAndExpenditure'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'incomeAndExpenditure');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'incomeAndExpenditure');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.uploadDocumentsLink,
@@ -2776,13 +2368,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'uploadFiles');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
@@ -2803,28 +2389,17 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     });
     await performAction('selectReasonableAdjustments', {
       header: adjustmentToGetIntoBuilding.mainHeader,
-      options: [
-        adjustmentToGetIntoBuilding.accessibleToiletCheckbox,
-        adjustmentToGetIntoBuilding.helpUsingALiftCheckbox,
-        adjustmentToGetIntoBuilding.useOfVenueWheelchairCheckbox,
-      ],
+      options: [adjustmentToGetIntoBuilding.accessibleToiletCheckbox, adjustmentToGetIntoBuilding.helpUsingALiftCheckbox, adjustmentToGetIntoBuilding.useOfVenueWheelchairCheckbox],
       button: adjustmentToGetIntoBuilding.continueButton,
     });
     await performAction('selectReasonableAdjustments', {
       header: documentInAlternativeFormat.mainHeader,
-      options: [
-        documentInAlternativeFormat.audioTranslationOfDocumentsCheckbox,
-        documentInAlternativeFormat.brailleDocumentsCheckbox,
-        documentInAlternativeFormat.informationEmailedToMeCheckbox,
-      ],
+      options: [documentInAlternativeFormat.audioTranslationOfDocumentsCheckbox, documentInAlternativeFormat.brailleDocumentsCheckbox, documentInAlternativeFormat.informationEmailedToMeCheckbox],
       button: documentInAlternativeFormat.continueButton,
     });
     await performAction('selectReasonableAdjustments', {
       header: helpcommunicatingAndUnderstanding.mainHeader,
-      options: [
-        helpcommunicatingAndUnderstanding.extraTimeToThinkAndExplainMyselfCheckbox,
-        helpcommunicatingAndUnderstanding.needToBeCloseToWhoIsSpeakingCheckbox,
-      ],
+      options: [helpcommunicatingAndUnderstanding.extraTimeToThinkAndExplainMyselfCheckbox, helpcommunicatingAndUnderstanding.needToBeCloseToWhoIsSpeakingCheckbox],
       button: helpcommunicatingAndUnderstanding.continueButton,
     });
     await performAction('selectReasonableAdjustments', {
@@ -2834,10 +2409,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     });
     await performAction('selectReasonableAdjustments', {
       header: feelComfortableDuringHearing.mainHeader,
-      options: [
-        feelComfortableDuringHearing.privateWaitingAreaCheckbox,
-        feelComfortableDuringHearing.regularBreaksCheckbox,
-      ],
+      options: [feelComfortableDuringHearing.privateWaitingAreaCheckbox, feelComfortableDuringHearing.regularBreaksCheckbox],
       button: feelComfortableDuringHearing.continueButton,
     });
     await performAction('selectReasonableAdjustments', {
@@ -2889,10 +2461,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       radioOption: equalityAndDiversityHowYouThink.hetroRadioOption,
       button: equalityAndDiversityHowYouThink.ContinueButton,
     });
-    await performValidation(
-      'Then the user sees the main header',
-      equalityAndDiversityMarriedOrCivilPartnership.mainHeader
-    );
+    await performValidation('Then the user sees the main header', equalityAndDiversityMarriedOrCivilPartnership.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityMarriedOrCivilPartnership.mainHeader,
       radioOption: equalityAndDiversityMarriedOrCivilPartnership.preferNotToSayRadioOption,
@@ -2916,10 +2485,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       radioOption: equalityAndDiversityHealthCondiotion.yesRadioOption,
       button: equalityAndDiversityHealthCondiotion.ContinueButton,
     });
-    await performValidation(
-      'Then the user sees the main header',
-      equalityAndDiversityAbilityToCarryOutActivity.mainHeader
-    );
+    await performValidation('Then the user sees the main header', equalityAndDiversityAbilityToCarryOutActivity.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityAbilityToCarryOutActivity.mainHeader,
       radioOption: equalityAndDiversityAbilityToCarryOutActivity.notAtAllRadioOption,
@@ -2941,10 +2507,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
     await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
 
@@ -2952,10 +2515,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
     await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -2989,19 +2549,13 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performAction('selectContactByTextMessage', {
       radioOption: contactPreferencesTextMessage.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'personalDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'personalDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'personalDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadAssuredTenancy.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadAssuredTenancy.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadAssuredTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
@@ -3043,10 +2597,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'disputeAndTenancy'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'disputeAndTenancy');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'disputeAndTenancy');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -3076,14 +2627,8 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'situationAndCircumstances'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'situationAndCircumstances'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'situationAndCircumstances');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'situationAndCircumstances');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.incomeAndExpensesLink,
@@ -3095,14 +2640,8 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       question: otherConsiderations.mainHeader,
       option: otherConsiderations.noRadioOption,
     });
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'incomeAndExpenditure'
-    );
-    await performAction(
-      'Then the user validates the RTC section on the check‑your‑answers page',
-      'incomeAndExpenditure'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'incomeAndExpenditure');
+    await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'incomeAndExpenditure');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.uploadDocumentsLink,
@@ -3112,13 +2651,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'uploadFiles');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     //
@@ -3127,10 +2660,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performAction('When the user clicks the button', reasonableAdjustmentsTriage.continueToQuestionsButton);
     await performAction('selectReasonableAdjustments', {
       header: physicalMentalOrLearningDisability.mainHeader,
-      options: [
-        physicalMentalOrLearningDisability.bringSupportCheckbox,
-        physicalMentalOrLearningDisability.askCertainTypeOfHearingCheckbox,
-      ],
+      options: [physicalMentalOrLearningDisability.bringSupportCheckbox, physicalMentalOrLearningDisability.askCertainTypeOfHearingCheckbox],
       button: physicalMentalOrLearningDisability.continueButton,
     });
     await performAction('selectReasonableAdjustments', {
@@ -3182,10 +2712,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       radioOption: equalityAndDiversityHowYouThink.preferNotToSayRadioOption,
       button: equalityAndDiversityHowYouThink.ContinueButton,
     });
-    await performValidation(
-      'Then the user sees the main header',
-      equalityAndDiversityMarriedOrCivilPartnership.mainHeader
-    );
+    await performValidation('Then the user sees the main header', equalityAndDiversityMarriedOrCivilPartnership.mainHeader);
     await performAction('selectEqualityAndDiversity', {
       question: equalityAndDiversityMarriedOrCivilPartnership.mainHeader,
       radioOption: equalityAndDiversityMarriedOrCivilPartnership.preferNotToSayRadioOption,
@@ -3225,10 +2752,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       options: [checkYourAnswersRTC.contemptOfCourtCheckboxLabel, checkYourAnswersRTC.factsTrueCheckboxLabel],
       input: checkYourAnswersRTC.yourFullNameTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton);
     await performValidation('Then the user sees the main header', dashboard.mainHeader);
   });
 });

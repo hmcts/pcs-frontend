@@ -1,10 +1,5 @@
 import { IValidation } from '../interfaces';
-import {
-  ErrorMessageValidation,
-  PageContentValidation,
-  PageNavigationValidation,
-  VisibilityValidation,
-} from '../validations/custom-validations';
+import { ErrorMessageValidation, PageContentValidation, PageNavigationValidation, VisibilityValidation } from '../validations/custom-validations';
 import {
   BannerAlertValidation,
   CheckYourAnswersSummaryRowValidation,
@@ -50,9 +45,7 @@ export class ValidationRegistry {
   static getValidation(validationType: string): IValidation {
     const validation = this.validations.get(validationType);
     if (!validation) {
-      throw new Error(
-        `Validation '${validationType}' is not registered. Available validations: ${Array.from(this.validations.keys()).join(', ')}`
-      );
+      throw new Error(`Validation '${validationType}' is not registered. Available validations: ${Array.from(this.validations.keys()).join(', ')}`);
     }
     return validation;
   }

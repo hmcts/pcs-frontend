@@ -10,11 +10,9 @@ export const accessYourCase = {
   thereIsAProblemErrorMessageHeader: 'There is a problem',
   enterYourClaimNumberErrorMessage: 'Enter your claim number',
   enterYourAccessCodeErrorMessage: 'Enter your access code',
-  claimNumberMustOnlyIncludeNumbersErrorMessage:
-    'Claim number must only include numbers 0 to 9 and special characters such as hyphens',
+  claimNumberMustOnlyIncludeNumbersErrorMessage: 'Claim number must only include numbers 0 to 9 and special characters such as hyphens',
   claimNumberMustBeBetween16And20CharactersErrorMessage: 'Claim number must be between 16 and 20 characters',
-  accessCodeMustOnlyIncludeLettersAndNumbersErrorMessage:
-    'Access code must only include letters a to z, and numbers 0 to 9',
+  accessCodeMustOnlyIncludeLettersAndNumbersErrorMessage: 'Access code must only include letters a to z, and numbers 0 to 9',
   accessCodeMustBe12CharactersErrorMessage: 'Access code must be 12 characters',
   caseNumberIncorrectFormatInput: '1234-5678-ABCD-1234',
   accessCodeIncorrectFormatInput: 'validcode123',

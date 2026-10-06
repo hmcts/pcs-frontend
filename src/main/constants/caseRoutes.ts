@@ -7,7 +7,8 @@ export { RESPOND_TO_CLAIM_ROUTE };
 
 export const VIEW_THE_CLAIM_ROUTE = '/case/:caseReference/view-the-claim';
 
-export const UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE = '/case/:caseReference/upload-additional-documents';
+export const UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE =
+  '/case/:caseReference/upload-additional-documents';
 
 export const UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE = `${UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE}/start-evidence-upload`;
 
@@ -19,7 +20,8 @@ export const VIEW_ORDERS_AND_NOTICES_ROUTE = '/case/:caseReference/view-orders-a
 
 export const VIEW_ALL_APPLICATIONS_ROUTE = '/case/:caseReference/view-all-applications';
 
-export const MAKE_GENERAL_APPLICATION_ROUTE = '/case/:caseReference/make-an-application/choose-an-application';
+export const MAKE_GENERAL_APPLICATION_ROUTE =
+  '/case/:caseReference/make-an-application/choose-an-application';
 
 export const RESPOND_TO_CLAIM_START_ROUTE = `${RESPOND_TO_CLAIM_ROUTE}/start-now`;
 

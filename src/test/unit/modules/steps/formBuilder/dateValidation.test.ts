@@ -1,6 +1,9 @@
 import type { TFunction } from 'i18next';
 
-import { getDateTranslationKey, validateDateField } from '@modules/steps/formBuilder/dateValidation';
+import {
+  getDateTranslationKey,
+  validateDateField,
+} from '@modules/steps/formBuilder/dateValidation';
 
 describe('dateValidation', () => {
   const createMockT = (translations: Record<string, string> = {}): TFunction => {
@@ -176,7 +179,8 @@ describe('dateValidation', () => {
 
       it('should use translation for year less than 1900 when provided', () => {
         const t = createMockT({
-          'errors.date.yearMustBeSameOrAfter': 'cyThe year must be the same as or after {{minYear}}',
+          'errors.date.yearMustBeSameOrAfter':
+            'cyThe year must be the same as or after {{minYear}}',
         });
         const result = validateDateField('15', '06', '1899', true, t);
         expect(result?.message).toBe('cyThe year must be the same as or after 1900');
@@ -185,7 +189,17 @@ describe('dateValidation', () => {
 
       it('should use translations object for year less than 1900 when provided', () => {
         const translations = { yearMustBeSameOrAfter: 'Custom year {{minYear}} message' };
-        const result = validateDateField('15', '06', '1899', true, undefined, false, true, false, translations);
+        const result = validateDateField(
+          '15',
+          '06',
+          '1899',
+          true,
+          undefined,
+          false,
+          true,
+          false,
+          translations
+        );
         expect(result?.message).toBe('Custom year 1900 message');
         expect(result?.erroneousParts).toEqual(['year']);
       });

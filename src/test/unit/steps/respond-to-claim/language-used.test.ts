@@ -21,7 +21,8 @@ const runMiddleware = pcqEntryMiddleware as unknown as (
 ) => Promise<void>;
 
 describe('language-used pcqEntryMiddleware (PCQ fires before the language screen)', () => {
-  const buildReq = (): Request => ({ res: { locals: { validatedCase: { id: '123' } } } }) as unknown as Request;
+  const buildReq = (): Request =>
+    ({ res: { locals: { validatedCase: { id: '123' } } } }) as unknown as Request;
   const res = {} as Response;
 
   beforeEach(() => jest.clearAllMocks());

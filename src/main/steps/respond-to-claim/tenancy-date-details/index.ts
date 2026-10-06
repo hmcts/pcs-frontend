@@ -3,7 +3,10 @@ import type { Request } from 'express';
 
 import { getTranslationFunction } from '../../../modules/steps';
 import { formatDatePartsToISODate, fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -15,7 +18,8 @@ function getTenancyStartDate(caseData: CcdCaseData | undefined): string | undefi
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'tenancy-date-details',
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.tenancyStartDateConfirmation),
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.tenancyStartDateConfirmation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/tenancyDateDetails.njk`,
   translationKeys: {
@@ -59,8 +63,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
-    const existingDateIsCorrect = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDateConfirmation;
-    const existingTenancyStartDate = caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDate;
+    const existingDateIsCorrect =
+      caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDateConfirmation;
+    const existingTenancyStartDate =
+      caseData?.possessionClaimResponse?.defendantResponses?.tenancyStartDate;
 
     const formValue = fromYesNoNotSureEnum(existingDateIsCorrect);
     if (!formValue) {
@@ -93,9 +99,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       response.defendantResponses.tenancyStartDateConfirmation = enumValue;
 
       if (confirmValue === 'no') {
-        const day = (req.body?.['confirmTenancyDate.tenancyStartDate-day'] as string | undefined) ?? '';
-        const month = (req.body?.['confirmTenancyDate.tenancyStartDate-month'] as string | undefined) ?? '';
-        const year = (req.body?.['confirmTenancyDate.tenancyStartDate-year'] as string | undefined) ?? '';
+        const day =
+          (req.body?.['confirmTenancyDate.tenancyStartDate-day'] as string | undefined) ?? '';
+        const month =
+          (req.body?.['confirmTenancyDate.tenancyStartDate-month'] as string | undefined) ?? '';
+        const year =
+          (req.body?.['confirmTenancyDate.tenancyStartDate-year'] as string | undefined) ?? '';
         const correctedDate = formatDatePartsToISODate(day, month, year);
         if (correctedDate) {
           response.defendantResponses.tenancyStartDate = correctedDate;
@@ -114,13 +123,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   extendGetContent: req => {
     const caseData = req.res?.locals.validatedCase?.data;
-    const claimantNameFromValidatedCase = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
+    const claimantNameFromValidatedCase =
+      caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
     const claimantNameFromSession = caseData?.claimantName;
     const claimantName = claimantNameFromValidatedCase || claimantNameFromSession;
     const existingStartDate = getTenancyStartDate(caseData);
 
     // Format tenancy date with ordinal
-    const tenancyStartDate = existingStartDate ? format(parseISO(existingStartDate), 'do LLLL yyyy') : undefined;
+    const tenancyStartDate = existingStartDate
+      ? format(parseISO(existingStartDate), 'do LLLL yyyy')
+      : undefined;
 
     const t = getTranslationFunction(req);
     const bulletPoint = t('bulletPoint', { returnObjects: true, tenancyStartDate });

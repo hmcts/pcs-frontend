@@ -2,8 +2,16 @@ import type { Request } from 'express';
 
 import { currency } from '../../../modules/nunjucks/filters/currency';
 import { getTranslation, getTranslationFunction } from '../../../modules/steps';
-import { fromYesNoNotSureEnum, penceToPounds, poundsToPence, toYesNoNotSureEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  fromYesNoNotSureEnum,
+  penceToPounds,
+  poundsToPence,
+  toYesNoNotSureEnum,
+} from '../../utils';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
 import { getRentStatementDocumentInfo, resolveStepDocumentId } from '../utils/stepDocumentUtils';
@@ -18,7 +26,8 @@ const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/; // Up to 10 digits, exactly 2 d
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'rent-arrears-dispute',
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.rentArrearsAmountConfirmation),
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.rentArrearsAmountConfirmation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/rentArrearsDispute.njk`,
   translationKeys: {
@@ -63,7 +72,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     if (formValue === 'no' && response?.rentArrearsAmount) {
       // dotted notation matches subField rendering pattern
-      formData['rentArrears.rentArrearsAmountCorrection'] = penceToPounds(response.rentArrearsAmount as string);
+      formData['rentArrears.rentArrearsAmountCorrection'] = penceToPounds(
+        response.rentArrearsAmount as string
+      );
     }
 
     return formData;
@@ -72,7 +83,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseData = req.res?.locals.validatedCase?.data;
     const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value;
     const amountInPence = (caseData?.rentArrears_Total as string | number) || 0;
-    const amountInPounds = typeof amountInPence === 'string' ? parseFloat(amountInPence) / 100 : amountInPence / 100;
+    const amountInPounds =
+      typeof amountInPence === 'string' ? parseFloat(amountInPence) / 100 : amountInPence / 100;
     const rentArrearsAmount = currency(amountInPounds);
 
     const t = getTranslationFunction(req);
@@ -82,7 +94,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const amountOwedHeading = t('amountOwedHeading', { claimantName });
     const rentArrearsAmountCorrection = t('rentArrearsAmountCorrection');
 
-    const documentId = await resolveStepDocumentId(req, getRentStatementDocumentInfo, 'rentArrearsDispute');
+    const documentId = await resolveStepDocumentId(
+      req,
+      getRentStatementDocumentInfo,
+      'rentArrearsDispute'
+    );
     const rentStatementDocument = documentId ? { id: documentId } : '';
 
     const release12Enabled = isRelease12Enabled(req);

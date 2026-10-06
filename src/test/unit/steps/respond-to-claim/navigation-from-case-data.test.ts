@@ -13,14 +13,19 @@ import {
 import { getNextStep, getPreviousStep } from '@modules/steps/flow';
 
 describe('respond-to-claim navigation from CCD case data', () => {
-  const createReq = (validatedCase: Record<string, unknown>, options: { release12Enabled?: boolean } = {}): Request => {
+  const createReq = (
+    validatedCase: Record<string, unknown>,
+    options: { release12Enabled?: boolean } = {}
+  ): Request => {
     const includesNestedData =
       'data' in validatedCase &&
       typeof validatedCase['data'] === 'object' &&
       validatedCase['data'] !== null &&
       !Array.isArray(validatedCase['data']);
 
-    const normalizedValidatedCase = includesNestedData ? validatedCase : { ...validatedCase, data: validatedCase };
+    const normalizedValidatedCase = includesNestedData
+      ? validatedCase
+      : { ...validatedCase, data: validatedCase };
 
     return {
       res: {
@@ -36,12 +41,12 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const optedInReq = createReq({ isDefendantContactByPhone: true });
     const optedOutReq = createReq({ isDefendantContactByPhone: false });
 
-    await expect(getNextStep(optedInReq, 'contact-preferences-telephone', flowConfig, {})).resolves.toBe(
-      'contact-preferences-text-message'
-    );
-    await expect(getNextStep(optedOutReq, 'contact-preferences-telephone', flowConfig, {})).resolves.toBe(
-      'check-your-answers-personal-details'
-    );
+    await expect(
+      getNextStep(optedInReq, 'contact-preferences-telephone', flowConfig, {})
+    ).resolves.toBe('contact-preferences-text-message');
+    await expect(
+      getNextStep(optedOutReq, 'contact-preferences-telephone', flowConfig, {})
+    ).resolves.toBe('check-your-answers-personal-details');
   });
 
   it('routes confirmation of notice step from validated case data', async () => {
@@ -58,12 +63,12 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(noticeDateProvidedReq, 'confirmation-of-notice-given', flowConfig, {})).resolves.toBe(
-      'confirmation-of-notice-date-when-provided'
-    );
-    await expect(getNextStep(rentArrearsReq, 'confirmation-of-notice-given', flowConfig, {})).resolves.toBe(
-      'rent-arrears-dispute'
-    );
+    await expect(
+      getNextStep(noticeDateProvidedReq, 'confirmation-of-notice-given', flowConfig, {})
+    ).resolves.toBe('confirmation-of-notice-date-when-provided');
+    await expect(
+      getNextStep(rentArrearsReq, 'confirmation-of-notice-given', flowConfig, {})
+    ).resolves.toBe('rent-arrears-dispute');
   });
 
   it('routes unexpected possessionNoticeReceived values to arrears branches (not notice-date pages)', async () => {
@@ -76,16 +81,18 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(unexpectedValueReq, 'confirmation-of-notice-given', flowConfig, {})).resolves.toBe(
-      'non-rent-arrears-dispute'
-    );
+    await expect(
+      getNextStep(unexpectedValueReq, 'confirmation-of-notice-given', flowConfig, {})
+    ).resolves.toBe('non-rent-arrears-dispute');
   });
 
   it('derives tenancy type back navigation from validated case data only', async () => {
     const welshReq = createReq({ legislativeCountry: 'Wales' }, { release12Enabled: true });
     const englishReq = createReq({ legislativeCountry: 'England' });
 
-    await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
+    await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
+      'written-terms'
+    );
     // dispute-claim-interstitial is now the first step of disputeAndTenancy; the
     // non-Wales back-walk lands on it after the hidden exempt-landlord step is skipped.
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
@@ -96,15 +103,23 @@ describe('respond-to-claim navigation from CCD case data', () => {
   it('routes Wales dispute interstitial forward to exempt landlord and then written terms when release 1.2 is enabled', async () => {
     const welshReq = createReq({ legislativeCountry: 'Wales' }, { release12Enabled: true });
 
-    await expect(getNextStep(welshReq, 'dispute-claim-interstitial', flowConfig, {})).resolves.toBe('exempt-landlord');
-    await expect(getNextStep(welshReq, 'exempt-landlord', flowConfig, {})).resolves.toBe('written-terms');
-    await expect(getPreviousStep(welshReq, 'written-terms', flowConfig, {})).resolves.toBe('exempt-landlord');
+    await expect(getNextStep(welshReq, 'dispute-claim-interstitial', flowConfig, {})).resolves.toBe(
+      'exempt-landlord'
+    );
+    await expect(getNextStep(welshReq, 'exempt-landlord', flowConfig, {})).resolves.toBe(
+      'written-terms'
+    );
+    await expect(getPreviousStep(welshReq, 'written-terms', flowConfig, {})).resolves.toBe(
+      'exempt-landlord'
+    );
   });
 
   it('skips exempt landlord for Wales when release 1.2 is disabled', async () => {
     const welshReq = createReq({ legislativeCountry: 'Wales' }, { release12Enabled: false });
 
-    await expect(getNextStep(welshReq, 'dispute-claim-interstitial', flowConfig, {})).resolves.toBe('written-terms');
+    await expect(getNextStep(welshReq, 'dispute-claim-interstitial', flowConfig, {})).resolves.toBe(
+      'written-terms'
+    );
     await expect(getPreviousStep(welshReq, 'written-terms', flowConfig, {})).resolves.toBe(
       'dispute-claim-interstitial'
     );
@@ -114,12 +129,12 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const nameKnownReq = createReq({ claimantEnteredDefendantDetailsNameKnown: 'YES' });
     const nameUnknownReq = createReq({ claimantEnteredDefendantDetailsNameKnown: 'NO' });
 
-    await expect(getPreviousStep(nameKnownReq, 'defendant-date-of-birth', flowConfig, {})).resolves.toBe(
-      'defendant-name-confirmation'
-    );
-    await expect(getPreviousStep(nameUnknownReq, 'defendant-date-of-birth', flowConfig, {})).resolves.toBe(
-      'defendant-name-capture'
-    );
+    await expect(
+      getPreviousStep(nameKnownReq, 'defendant-date-of-birth', flowConfig, {})
+    ).resolves.toBe('defendant-name-confirmation');
+    await expect(
+      getPreviousStep(nameUnknownReq, 'defendant-date-of-birth', flowConfig, {})
+    ).resolves.toBe('defendant-name-capture');
   });
 
   const rentArrearsData = {
@@ -128,7 +143,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
 
   it('routes back from the first step of situationAndCircumstances to the task-list hub', async () => {
     const req = createReq({ data: rentArrearsData });
-    await expect(getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})).resolves.toBe('task-list');
+    await expect(
+      getPreviousStep(req, 'your-household-and-circumstances', flowConfig, {})
+    ).resolves.toBe('task-list');
   });
 
   it('routes counter-claim NO to section CYA for non-rent-arrears-only claims', async () => {
@@ -143,15 +160,18 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'check-your-answers-your-response'
-    );
+    await expect(
+      getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })
+    ).resolves.toBe('check-your-answers-your-response');
   });
 
   it('routes counter-claim NO to section CYA for rent-arrears claims', async () => {
     const req = createReq({
       data: {
-        claimGroundSummaries: [{ value: { isRentArrears: 'YES' } }, { value: { isRentArrears: 'NO' } }],
+        claimGroundSummaries: [
+          { value: { isRentArrears: 'YES' } },
+          { value: { isRentArrears: 'NO' } },
+        ],
         possessionClaimResponse: {
           defendantResponses: {
             makeCounterClaim: 'NO',
@@ -160,9 +180,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })).resolves.toBe(
-      'check-your-answers-your-response'
-    );
+    await expect(
+      getNextStep(req, 'counter-claim', flowConfig, {}, { makeCounterClaim: 'NO' })
+    ).resolves.toBe('check-your-answers-your-response');
   });
 
   it('routes counter-claim YES to what-are-you-claiming-for', async () => {
@@ -229,7 +249,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
+    await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe(
+      'how-much-afford-to-pay'
+    );
 
     await expect(getNextStep(createReq({}), 'installment-payments', flowConfig, {})).resolves.toBe(
       'your-household-and-circumstances'
@@ -246,7 +268,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
+    await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe(
+      'how-much-afford-to-pay'
+    );
   });
 
   it('routes installment-payments forward from the submitted answer before CCD state is refreshed', async () => {
@@ -367,7 +391,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
     const req = createReq({});
     req.body = { provideFinanceDetails: 'no' };
 
-    await expect(getNextStep(req, 'income-and-expenses', flowConfig, {})).resolves.toBe('other-considerations');
+    await expect(getNextStep(req, 'income-and-expenses', flowConfig, {})).resolves.toBe(
+      'other-considerations'
+    );
   });
 
   it('routes income-and-expenses yes answer into finance journey', async () => {
@@ -395,9 +421,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'what-regular-income-do-you-receive', flowConfig, {})).resolves.toBe(
-      'priority-debts'
-    );
+    await expect(
+      getNextStep(req, 'what-regular-income-do-you-receive', flowConfig, {})
+    ).resolves.toBe('priority-debts');
   });
 
   it('routes regular-income to universal-credit when universalCredit is NO in case data', async () => {
@@ -414,9 +440,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'what-regular-income-do-you-receive', flowConfig, {})).resolves.toBe(
-      'have-you-applied-for-universal-credit'
-    );
+    await expect(
+      getNextStep(req, 'what-regular-income-do-you-receive', flowConfig, {})
+    ).resolves.toBe('have-you-applied-for-universal-credit');
   });
 
   it('routes counter-claim HWF step to counter-claim-about when user applied for HWF (YES)', async () => {
@@ -430,9 +456,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})).resolves.toBe(
-      'counter-claim-about'
-    );
+    await expect(
+      getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})
+    ).resolves.toBe('counter-claim-about');
   });
 
   it('routes counter-claim-have-you-applied-for-help to counter-claim-against-whom when HWF YES, applied YES, and multiple parties', async () => {
@@ -452,9 +478,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})).resolves.toBe(
-      'counter-claim-against-whom'
-    );
+    await expect(
+      getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})
+    ).resolves.toBe('counter-claim-against-whom');
   });
 
   it('routes counter-claim-fee forward to counter-claim-about when needHelpWithFees is NO and not multiple parties', async () => {
@@ -471,7 +497,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim-fee', flowConfig, {})).resolves.toBe('counter-claim-about');
+    await expect(getNextStep(req, 'counter-claim-fee', flowConfig, {})).resolves.toBe(
+      'counter-claim-about'
+    );
   });
 
   it('routes counter-claim HWF step to you-need-to-apply when user has not applied for HWF (NO)', async () => {
@@ -485,9 +513,9 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})).resolves.toBe(
-      'counter-claim-you-need-to-apply-for-help-with-your-fees'
-    );
+    await expect(
+      getNextStep(req, 'counter-claim-have-you-applied-for-help', flowConfig, {})
+    ).resolves.toBe('counter-claim-you-need-to-apply-for-help-with-your-fees');
   });
 
   it('HWF show condition helpers are derived from CCD counterClaim data', () => {

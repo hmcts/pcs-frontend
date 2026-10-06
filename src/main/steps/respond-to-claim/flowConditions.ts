@@ -31,8 +31,8 @@ export function isNoticeDateConfirmedAndNotProvided(req: Request): boolean {
 
 export function hasRejectedRepaymentAgreement(req: Request): boolean {
   const ccdAnswer =
-    req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
-      ?.repaymentPlanAgreed;
+    req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+      ?.paymentAgreement?.repaymentPlanAgreed;
   return normalizeYesNoValue(ccdAnswer) === 'NO';
 }
 
@@ -90,8 +90,8 @@ export function shouldShowPriorityDebtDetailsStep(req: Request): boolean {
 }
 
 function getCounterClaimNeedHelpWithFees(req: Request) {
-  return req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim
-    ?.needHelpWithFees;
+  return req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+    ?.counterClaim?.needHelpWithFees;
 }
 
 export function shouldShowCounterClaimHelpWithFeesStep(req: Request): boolean {
@@ -104,7 +104,8 @@ export function shouldShowCounterClaimNeedToApplyStep(req: Request): boolean {
 
 export function shouldShowCounterClaimAgainstWhoStep(req: Request): boolean {
   return (
-    hasMultipleParties(req) && (getCounterClaimNeedHelpWithFees(req) === 'NO' || hasAppliedForCounterClaimHwf(req))
+    hasMultipleParties(req) &&
+    (getCounterClaimNeedHelpWithFees(req) === 'NO' || hasAppliedForCounterClaimHwf(req))
   );
 }
 

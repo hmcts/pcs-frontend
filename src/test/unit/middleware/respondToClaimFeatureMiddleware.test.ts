@@ -14,7 +14,10 @@ jest.mock('../../../main/middleware/handleRespondToClaimDisabled', () => ({
   handleRespondToClaimDisabled: jest.fn(),
 }));
 
-import { handleRespondToClaimDisabled, respondToClaimFeatureMiddleware } from '../../../main/middleware';
+import {
+  handleRespondToClaimDisabled,
+  respondToClaimFeatureMiddleware,
+} from '../../../main/middleware';
 import { isLegalRepresentativeUser } from '../../../main/steps/utils';
 
 import {
@@ -25,9 +28,10 @@ import {
 const mockIsRespondToClaimEnabledForUser = isRespondToClaimEnabledForUser as jest.MockedFunction<
   typeof isRespondToClaimEnabledForUser
 >;
-const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
-  typeof isRespondToClaimEnabledForRelease
->;
+const mockIsRespondToClaimEnabledForRelease =
+  isRespondToClaimEnabledForRelease as jest.MockedFunction<
+    typeof isRespondToClaimEnabledForRelease
+  >;
 
 const mockHandleRespondToClaimDisabled = handleRespondToClaimDisabled as jest.MockedFunction<
   typeof handleRespondToClaimDisabled
@@ -42,10 +46,16 @@ interface MakeReqArgs {
   validatedCaseId?: string;
 }
 
-const makeReq = ({ caseReference = '1234567890123456', validatedCaseId }: MakeReqArgs = {}): Request =>
+const makeReq = ({
+  caseReference = '1234567890123456',
+  validatedCaseId,
+}: MakeReqArgs = {}): Request =>
   ({
     params: { caseReference },
-    res: validatedCaseId === undefined ? { locals: {} } : { locals: { validatedCase: { id: validatedCaseId } } },
+    res:
+      validatedCaseId === undefined
+        ? { locals: {} }
+        : { locals: { validatedCase: { id: validatedCaseId } } },
   }) as unknown as Request;
 
 describe('respondToClaimFeatureMiddleware', () => {

@@ -318,8 +318,11 @@ describe('GetController', () => {
     const mockGenerateContent = jest.fn(() => ({ title: 'Test' }));
     const controller = new GetController('test.njk', mockGenerateContent);
     const req = {} as Request;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const res = { render: jest.fn(), locals: { isLegalRepresentative: true, headerModel: { name: 'xui' } } } as any;
+
+    const res = {
+      render: jest.fn(),
+      locals: { isLegalRepresentative: true, headerModel: { name: 'xui' } },
+    } as any;
 
     await controller.get(req, res);
 
@@ -410,7 +413,13 @@ describe('createPostController', () => {
   it('should execute beforeRedirect callback when provided', async () => {
     const mockT = jest.fn((key: string) => key);
     const beforeRedirect = jest.fn();
-    const controller = createPostController(stepName, stepNavigation, mockGetFields, view, beforeRedirect);
+    const controller = createPostController(
+      stepName,
+      stepNavigation,
+      mockGetFields,
+      view,
+      beforeRedirect
+    );
     const req = {
       body: { field1: 'value1' },
       language: 'en',
@@ -430,7 +439,13 @@ describe('createPostController', () => {
   it('should not redirect if beforeRedirect sends response', async () => {
     const mockT = jest.fn((key: string) => key);
     const beforeRedirect = jest.fn();
-    const controller = createPostController(stepName, stepNavigation, mockGetFields, view, beforeRedirect);
+    const controller = createPostController(
+      stepName,
+      stepNavigation,
+      mockGetFields,
+      view,
+      beforeRedirect
+    );
     const req = {
       body: { field1: 'value1' },
       language: 'en',

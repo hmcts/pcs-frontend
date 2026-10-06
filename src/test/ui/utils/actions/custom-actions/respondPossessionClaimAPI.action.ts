@@ -9,9 +9,7 @@ import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class respondPossessionClaimAPIAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
-    const actionsMap = new Map<string, () => Promise<void>>([
-      ['respondPossessionClaimAPI', () => this.respondPossessionClaimAPI(fieldName)],
-    ]);
+    const actionsMap = new Map<string, () => Promise<void>>([['respondPossessionClaimAPI', () => this.respondPossessionClaimAPI(fieldName)]]);
 
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -21,9 +19,7 @@ export class respondPossessionClaimAPIAction implements IAction {
   }
 
   private async respondPossessionClaimAPI(caseData: actionData): Promise<void> {
-    const respondPossessionClaimApi = Axios.create(
-      respondPossessionClaimEventTokenApiData.respondPossessionClaimApiInstance()
-    );
+    const respondPossessionClaimApi = Axios.create(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiInstance());
 
     // Starting the event creates the draft that the mid-event save writes to.
     await respondPossessionClaimApi.get(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiEndPoint());
@@ -47,9 +43,7 @@ export class respondPossessionClaimAPIAction implements IAction {
     }
   }
 
-  private async respondPossessionClaimMidEvent(
-    respondPossessionClaimMidEventApi: ReturnType<typeof Axios.create>
-  ): Promise<void> {
+  private async respondPossessionClaimMidEvent(respondPossessionClaimMidEventApi: ReturnType<typeof Axios.create>): Promise<void> {
     const midEventRequest = {
       event: {
         id: 'respondPossessionClaim',
@@ -58,8 +52,7 @@ export class respondPossessionClaimAPIAction implements IAction {
       },
       case_reference: process.env.CASE_NUMBER,
       event_data: {
-        possessionClaimResponse:
-          respondPossessionClaimMidEventApiData.respondPossessionClaimPayload.event_data.possessionClaimResponse,
+        possessionClaimResponse: respondPossessionClaimMidEventApiData.respondPossessionClaimPayload.event_data.possessionClaimResponse,
       },
       ignore_warning: false,
     };
@@ -68,10 +61,7 @@ export class respondPossessionClaimAPIAction implements IAction {
       console.log('MID EVENT ENDPOINT:', respondPossessionClaimMidEventApiData.respondPossessionClaimApiEndPoint());
       console.log(respondPossessionClaimMidEventApi.defaults.headers);
 
-      const midEventResponse = await respondPossessionClaimMidEventApi.post(
-        respondPossessionClaimMidEventApiData.respondPossessionClaimApiEndPoint(),
-        midEventRequest
-      );
+      const midEventResponse = await respondPossessionClaimMidEventApi.post(respondPossessionClaimMidEventApiData.respondPossessionClaimApiEndPoint(), midEventRequest);
 
       console.log('MID EVENT RESPONSE:\n', JSON.stringify(midEventResponse.data, null, 2));
     } catch (error: unknown) {
@@ -83,13 +73,9 @@ export class respondPossessionClaimAPIAction implements IAction {
     }
   }
 
-  private async submitRespondPossessionClaim(
-    respondPossessionClaimApi: ReturnType<typeof Axios.create>
-  ): Promise<void> {
+  private async submitRespondPossessionClaim(respondPossessionClaimApi: ReturnType<typeof Axios.create>): Promise<void> {
     // Start the event after any draft save: pcs-api rejects a submit whose draftVersion isn't the stored one.
-    const startEvent = (
-      await respondPossessionClaimApi.get(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiEndPoint())
-    ).data;
+    const startEvent = (await respondPossessionClaimApi.get(respondPossessionClaimEventTokenApiData.respondPossessionClaimApiEndPoint())).data;
     const eventToken = startEvent.token;
     const draftVersion = startEvent.case_details?.case_data?.possessionClaimResponse?.draftVersion;
 
@@ -115,10 +101,7 @@ export class respondPossessionClaimAPIAction implements IAction {
     try {
       console.log('RESPONDTOCLAIM SUBMIT REQUEST:\n', JSON.stringify(submitRequest, null, 2));
 
-      await respondPossessionClaimApi.post(
-        respondPossessionClaimApiData.respondPossessionClaimApiEndPoint(),
-        submitRequest
-      );
+      await respondPossessionClaimApi.post(respondPossessionClaimApiData.respondPossessionClaimApiEndPoint(), submitRequest);
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
         throw error;

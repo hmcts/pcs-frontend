@@ -142,9 +142,6 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
       input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
     });
-    await performValidation(
-      'Then the user sees the main header',
-      youNeedToApplyForHelpWithYourApplicationFee.mainHeader
-    );
+    await performValidation('Then the user sees the main header', youNeedToApplyForHelpWithYourApplicationFee.mainHeader);
   });
 });

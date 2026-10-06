@@ -17,31 +17,19 @@ export async function tenancyDateDetailsErrorValidation(): Promise<void> {
     header: tenancyDateDetails.errorValidationHeader,
     message: tenancyDateDetails.realDateErrorMessage,
   });
-  await performActions(
-    'Enter Date',
-    ['inputText', tenancyDateDetails.dayHiddenTextLabel, ''],
-    ['inputText', tenancyDateDetails.monthHiddenTextLabel, '12']
-  );
+  await performActions('Enter Date', ['inputText', tenancyDateDetails.dayHiddenTextLabel, ''], ['inputText', tenancyDateDetails.monthHiddenTextLabel, '12']);
   await performAction('When the user clicks the button', tenancyDateDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyDateDetails.errorValidationHeader,
     message: tenancyDateDetails.dayMissingErrorMessage,
   });
-  await performActions(
-    'Enter Date',
-    ['inputText', tenancyDateDetails.dayHiddenTextLabel, '12'],
-    ['inputText', tenancyDateDetails.monthHiddenTextLabel, '']
-  );
+  await performActions('Enter Date', ['inputText', tenancyDateDetails.dayHiddenTextLabel, '12'], ['inputText', tenancyDateDetails.monthHiddenTextLabel, '']);
   await performAction('When the user clicks the button', tenancyDateDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyDateDetails.errorValidationHeader,
     message: tenancyDateDetails.monthMissingErrorMessage,
   });
-  await performActions(
-    'Enter Date',
-    ['inputText', tenancyDateDetails.monthHiddenTextLabel, '12'],
-    ['inputText', tenancyDateDetails.yearHiddenTextLabel, '']
-  );
+  await performActions('Enter Date', ['inputText', tenancyDateDetails.monthHiddenTextLabel, '12'], ['inputText', tenancyDateDetails.yearHiddenTextLabel, '']);
   await performAction('When the user clicks the button', tenancyDateDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyDateDetails.errorValidationHeader,

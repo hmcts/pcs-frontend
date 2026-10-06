@@ -317,7 +317,9 @@ describe('CcdCaseModel', () => {
       expect(model.legislativeCountry).toBe('England');
       expect(model.tenancy_TypeOfTenancyLicence).toBe('ASSURED_TENANCY');
       expect(model.occupationLicenceTypeWales).toBe('OTHER');
-      expect(model.possessionClaimResponse).toEqual({ defendantResponses: { freeLegalAdvice: 'yes' } });
+      expect(model.possessionClaimResponse).toEqual({
+        defendantResponses: { freeLegalAdvice: 'yes' },
+      });
       expect(model.submitDraftAnswers).toBe('YES');
       expect(model.introGroundsIntroductoryDemotedOrOtherGrounds).toEqual(['G1', 'G2']);
       expect(model.secureGroundsWalesDiscretionaryGrounds).toEqual(['W1']);

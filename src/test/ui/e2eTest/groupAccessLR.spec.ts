@@ -1,12 +1,7 @@
 import { type BrowserContext, type Page, expect } from '@playwright/test';
 
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import {
-  checkYourAnswersRTC,
-  startNow as citizenStartNow,
-  doYouHaveASolicitor,
-  freeLegalAdvice,
-} from '../data/page-data';
+import { checkYourAnswersRTC, startNow as citizenStartNow, doYouHaveASolicitor, freeLegalAdvice } from '../data/page-data';
 import { defendantNameConfirmation, selectDefendant, startNow } from '../data/page-data/lr-page-data';
 import { user } from '../data/user-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
@@ -68,17 +63,12 @@ test.beforeEach(async ({ page }, testInfo) => {
   const isNocRevocationTest = testInfo.title.includes('@nocRevocation');
   const isDraftRevocationTest = testInfo.title.includes('@draftRevocation');
   const isCitizenDraftRevocationTest = testInfo.title.includes('@citizenDraftRevocation');
-  const shouldManuallyLinkDefendants =
-    isMixedOrganisationTest || isNocRevocationTest || isDraftRevocationTest || isCitizenDraftRevocationTest;
+  const shouldManuallyLinkDefendants = isMixedOrganisationTest || isNocRevocationTest || isDraftRevocationTest || isCitizenDraftRevocationTest;
   process.env.NOTICE_SERVED = isSingleDefendantTest ? 'NO' : 'YES';
-  process.env.TENANCY_TYPE = isSingleDefendantTest
-    ? submitCaseApiData.submitCaseDefendantAddressKnown.tenancy_TypeOfTenancyLicence
-    : 'INTRODUCTORY_TENANCY';
+  process.env.TENANCY_TYPE = isSingleDefendantTest ? submitCaseApiData.submitCaseDefendantAddressKnown.tenancy_TypeOfTenancyLicence : 'INTRODUCTORY_TENANCY';
   process.env.CORRESPONDENCE_ADDRESS = 'KNOWN';
 
-  const submitCasePayload = isSingleDefendantTest
-    ? submitCaseApiData.submitCaseDefendantAddressKnown
-    : submitCaseApiData.submitCasePayload;
+  const submitCasePayload = isSingleDefendantTest ? submitCaseApiData.submitCaseDefendantAddressKnown : submitCaseApiData.submitCasePayload;
 
   process.env.CLAIMANT_NAME = submitCasePayload.claimantName;
 
@@ -107,10 +97,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Legal representative organisation access after Notice of Change @nightly', async () => {
-  test('All representatives in the linked organisation can respond for a multi-defendant case @LR', async ({
-    page,
-    context,
-  }) => {
+  test('All representatives in the linked organisation can respond for a multi-defendant case @LR', async ({ page, context }) => {
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
@@ -124,10 +111,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await validateSolicitorCannotAccessCase(page, user.defendantSolicitor3.email);
   });
 
-  test('All representatives in the linked organisation can respond for a single-defendant case @LR @singleDefendant', async ({
-    page,
-    context,
-  }) => {
+  test('All representatives in the linked organisation can respond for a single-defendant case @LR @singleDefendant', async ({ page, context }) => {
     await clearBrowserSession(page, context);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
@@ -135,10 +119,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await validateSolicitorCannotAccessCase(page, user.defendantSolicitor3.email);
   });
 
-  test('Representatives can only respond for defendants linked to their organisation @LR @mixedOrganisation', async ({
-    page,
-    context,
-  }) => {
+  test('Representatives can only respond for defendants linked to their organisation @LR @mixedOrganisation', async ({ page, context }) => {
     await performAction('linkDefendantToSolicitorForCaseAPI', {
       req: 'Link Solicitor',
       email: user.defendantSolicitor.email,
@@ -167,20 +148,14 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor3.email);
     await performAction('When the user clicks the button', startNow.startNowButton);
-    await performValidation(
-      'Then the user sees the main header',
-      defendantNameConfirmation.mainHeader('Peter', 'Parker')
-    );
+    await performValidation('Then the user sees the main header', defendantNameConfirmation.mainHeader('Peter', 'Parker'));
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader('Peter', 'Parker'),
       option: defendantNameConfirmation.yesRadioOption,
     });
   });
 
-  test('Further Notice of Change gives the new organisation access and revokes the previous organisation @LR @nocRevocation', async ({
-    page,
-    context,
-  }) => {
+  test('Further Notice of Change gives the new organisation access and revokes the previous organisation @LR @nocRevocation', async ({ page, context }) => {
     await performAction('linkDefendantToSolicitorForCaseAPI', {
       req: 'Link Solicitor',
       email: user.defendantSolicitor.email,
@@ -216,10 +191,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await validateSolicitorCannotAccessCase(page, user.defendantSolicitor2.email);
   });
 
-  test('Further Notice of Change removes the previous organisation draft for that defendant @LR @draftRevocation', async ({
-    page,
-    context,
-  }) => {
+  test('Further Notice of Change removes the previous organisation draft for that defendant @LR @draftRevocation', async ({ page, context }) => {
     await performAction('linkDefendantToSolicitorForCaseAPI', {
       req: 'Link Solicitor',
       email: user.defendantSolicitor.email,
@@ -257,10 +229,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performValidation('radioButtonChecked', defendantNameConfirmation.noRadioOption, false);
   });
 
-  test('Citizen draft is deleted when Notice of Change gives access to the legal representative organisation @LR @citizenDraftRevocation', async ({
-    page,
-    context,
-  }) => {
+  test('Citizen draft is deleted when Notice of Change gives access to the legal representative organisation @LR @citizenDraftRevocation', async ({ page, context }) => {
     const selectedDefendant = submitCaseApiData.submitCasePayload.defendant1;
 
     await performAction('createUser', 'citizen', ['citizen']);
@@ -277,10 +246,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await page.waitForLoadState();
     await performAction('When the user selects the legal advice option', freeLegalAdvice.yesRadioOption);
     await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction(
-      'And the user retrieves the check‑your‑answers table data for the RTC section',
-      'startNowAndDetails'
-    );
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', 'startNowAndDetails');
     await performAction('Then the user validates the RTC section on the check‑your‑answers page', 'startNowAndDetails');
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
@@ -297,10 +263,7 @@ test.describe('Legal representative organisation access after Notice of Change @
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
     await performAction('login', user.defendantSolicitor2.email);
     await performAction('When the user clicks the button', startNow.startNowButton);
-    await performValidation(
-      'Then the user sees the main header',
-      defendantNameConfirmation.mainHeader(selectedDefendant.firstName, selectedDefendant.lastName)
-    );
+    await performValidation('Then the user sees the main header', defendantNameConfirmation.mainHeader(selectedDefendant.firstName, selectedDefendant.lastName));
     await performValidation('radioButtonChecked', defendantNameConfirmation.noRadioOption, false);
   });
 });

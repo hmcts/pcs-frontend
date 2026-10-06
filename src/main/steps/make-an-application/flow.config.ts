@@ -51,7 +51,8 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => doesFeeApply(req) && needHelpPayingTheFee(req),
     },
     'you-need-to-apply-for-help-with-your-application-fee': {
-      showCondition: (req: Request) => doesFeeApply(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHwf(req),
+      showCondition: (req: Request) =>
+        doesFeeApply(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHwf(req),
     },
     'are-there-any-reasons-that-this-application-should-not-be-shared': {
       showCondition: (req: Request) => !otherPartiesAgreed(req),
@@ -86,7 +87,9 @@ function needHelpPayingTheFee(req: Request): boolean {
 }
 
 function alreadyAppliedForHwf(req: Request): boolean {
-  return getFormData(req, 'have-you-already-applied-for-help-with-fees').alreadyAppliedForHwf === 'yes';
+  return (
+    getFormData(req, 'have-you-already-applied-for-help-with-fees').alreadyAppliedForHwf === 'yes'
+  );
 }
 
 function doesFeeApply(req: Request): boolean {
@@ -94,11 +97,17 @@ function doesFeeApply(req: Request): boolean {
 }
 
 function otherPartiesAgreed(req: Request): boolean {
-  return getFormData(req, 'have-the-other-parties-agreed-to-this-application').otherPartiesAgreed === 'yes';
+  return (
+    getFormData(req, 'have-the-other-parties-agreed-to-this-application').otherPartiesAgreed ===
+    'yes'
+  );
 }
 
 function documentUploadWanted(req: Request): boolean {
-  return getFormData(req, 'do-you-want-to-upload-documents-to-support-your-application').uploadDocuments === 'yes';
+  return (
+    getFormData(req, 'do-you-want-to-upload-documents-to-support-your-application')
+      .uploadDocuments === 'yes'
+  );
 }
 
 function paymentRequired(req: Request): boolean {

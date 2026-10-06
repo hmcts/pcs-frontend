@@ -1,7 +1,10 @@
 import type { Request } from 'express';
 
 import { HTTPError } from '../../../HttpError';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { getUserToken } from '../../utils/userRole';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../draftEvent';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -11,14 +14,18 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { toCaseReference16 } from '@utils/caseReference';
-import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
+import {
+  ACCEPT_ATTRIBUTE_EXTENSIONS,
+  UPLOAD_MAX_FILE_SIZE_MB,
+} from '@utils/documentUploadValidation';
 
 // Holistic save: each upload/delete sends the full defendant slice so CCD does not
 // replace defendantResponses with only counterClaimDocuments (wiping siblings).
 const storage: DocumentStorage = {
   async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
     const docs =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaimDocuments;
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+        ?.counterClaimDocuments;
     return Array.isArray(docs) ? docs : [];
   },
 
@@ -62,7 +69,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       validate: (_value, formData) => {
         const uploaded = formData['uploadedDocuments[]'];
         const hasFiles =
-          uploaded !== undefined && uploaded !== null && !(Array.isArray(uploaded) && uploaded.length === 0);
+          uploaded !== undefined &&
+          uploaded !== null &&
+          !(Array.isArray(uploaded) && uploaded.length === 0);
         return hasFiles ? undefined : 'errors.documents';
       },
     },
@@ -83,7 +92,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   getInitialFormData: async req => ({ documents: toDisplayDocuments(await storage.read(req)) }),
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.counterClaimDocuments = response.defendantResponses.counterClaimDocuments ?? [];
+    response.defendantResponses.counterClaimDocuments =
+      response.defendantResponses.counterClaimDocuments ?? [];
     await saveDraftDefendantResponse(req, response);
   },
 });

@@ -30,7 +30,12 @@
     "typeRoots": ["./node_modules/@types", "./src/types"],
     "types": ["jest", "node", "express", "express-session"]
   },
-  "include": ["src/main/**/*", "src/types/**/*", "src/main/assets/locales/**/*", "src/test/unit/**/*"],
+  "include": [
+    "src/main/**/*",
+    "src/types/**/*",
+    "src/main/assets/locales/**/*",
+    "src/test/unit/**/*"
+  ],
   "exclude": [
     "**/codecept.conf.ts",
     "**/__mocks__/*",

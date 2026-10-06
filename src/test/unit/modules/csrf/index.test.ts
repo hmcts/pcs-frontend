@@ -62,7 +62,9 @@ describe('Csrf', () => {
 
       const headerTokenReq = {
         body: {},
-        get: jest.fn((headerName: string) => (headerName === 'x-csrf-token' ? 'token-from-header' : undefined)),
+        get: jest.fn((headerName: string) =>
+          headerName === 'x-csrf-token' ? 'token-from-header' : undefined
+        ),
       } as unknown as Request;
       expect(options.getTokenFromRequest(headerTokenReq)).toBe('token-from-header');
 
@@ -76,7 +78,8 @@ describe('Csrf', () => {
     it('should register csrfSynchronisedProtection middleware via app.use', () => {
       csrf.enableFor(mockApp);
 
-      const protectionMiddleware = (csrfSync as jest.Mock).mock.results[0].value.csrfSynchronisedProtection;
+      const protectionMiddleware = (csrfSync as jest.Mock).mock.results[0].value
+        .csrfSynchronisedProtection;
       expect(mockUse).toHaveBeenCalledWith(protectionMiddleware);
     });
 
@@ -92,7 +95,11 @@ describe('Csrf', () => {
   describe('locals middleware (csrf token in views)', () => {
     it('should set res.locals.csrfToken when req.csrfToken is a function', () => {
       csrf.enableFor(mockApp);
-      const localsMiddleware = mockUse.mock.calls[1][0] as (req: Request, res: Response, next: NextFunction) => void;
+      const localsMiddleware = mockUse.mock.calls[1][0] as (
+        req: Request,
+        res: Response,
+        next: NextFunction
+      ) => void;
 
       const mockCsrfToken = jest.fn().mockReturnValue('generated-token');
       const req = { csrfToken: mockCsrfToken } as unknown as Request;
@@ -108,7 +115,11 @@ describe('Csrf', () => {
 
     it('should call next without setting csrfToken when req.csrfToken is not a function', () => {
       csrf.enableFor(mockApp);
-      const localsMiddleware = mockUse.mock.calls[1][0] as (req: Request, res: Response, next: NextFunction) => void;
+      const localsMiddleware = mockUse.mock.calls[1][0] as (
+        req: Request,
+        res: Response,
+        next: NextFunction
+      ) => void;
 
       const req = { csrfToken: undefined } as unknown as Request;
       const res = { locals: {} } as unknown as Response;
@@ -122,7 +133,11 @@ describe('Csrf', () => {
 
     it('should log and call next with the error when req.csrfToken throws', () => {
       csrf.enableFor(mockApp);
-      const localsMiddleware = mockUse.mock.calls[1][0] as (req: Request, res: Response, next: NextFunction) => void;
+      const localsMiddleware = mockUse.mock.calls[1][0] as (
+        req: Request,
+        res: Response,
+        next: NextFunction
+      ) => void;
 
       const error = new Error('csrf token failure');
       const req = {
@@ -143,7 +158,11 @@ describe('Csrf', () => {
 
     it('should call next when req has no csrfToken property', () => {
       csrf.enableFor(mockApp);
-      const localsMiddleware = mockUse.mock.calls[1][0] as (req: Request, res: Response, next: NextFunction) => void;
+      const localsMiddleware = mockUse.mock.calls[1][0] as (
+        req: Request,
+        res: Response,
+        next: NextFunction
+      ) => void;
 
       const req = {} as Request;
       const res = { locals: {} } as unknown as Response;

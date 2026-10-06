@@ -15,7 +15,11 @@ import type { SectionConfig, SectionStatus } from '@modules/steps/stepFlow.inter
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
-import { getAllSectionStatuses, getFirstVisibleStep, getStatusTagClasses } from '@services/sectionStatus';
+import {
+  getAllSectionStatuses,
+  getFirstVisibleStep,
+  getStatusTagClasses,
+} from '@services/sectionStatus';
 import { getUserVariant } from '@steps';
 
 const stepName = 'task-list';
@@ -23,7 +27,11 @@ const VIEW = 'respond-to-claim/task-list/taskList.njk';
 
 const stepNavigation = createStepNavigation(() => flowConfig);
 
-const redirectLegalrepToDashboard: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+const redirectLegalrepToDashboard: RequestHandler = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (getUserVariant(req) === 'legalrep') {
     return res.redirect(303, getDashboardUrl(req.res?.locals.validatedCase?.id) ?? '/');
   }
@@ -87,12 +95,18 @@ export const step: StepDefinition = {
         ],
         helpSupportLinks: [
           { key: 'helpSupport.fees', href: 'https://www.gov.uk/get-help-with-court-fees' },
-          { key: 'helpSupport.mediation', href: 'https://www.gov.uk/guidance/a-guide-to-civil-mediation' },
+          {
+            key: 'helpSupport.mediation',
+            href: 'https://www.gov.uk/guidance/a-guide-to-civil-mediation',
+          },
           {
             key: 'helpSupport.hearing',
             href: 'https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal',
           },
-          { key: 'helpSupport.representYourself', href: 'https://www.gov.uk/represent-yourself-in-court' },
+          {
+            key: 'helpSupport.representYourself',
+            href: 'https://www.gov.uk/represent-yourself-in-court',
+          },
           { key: 'helpSupport.findLegalAdvice', href: 'https://www.gov.uk/find-legal-advice' },
           { key: 'helpSupport.findCourt', href: 'https://www.gov.uk/find-court-tribunal' },
         ],
@@ -111,7 +125,9 @@ function buildGroups(
     const sectionsInGroup = respondToClaimSections.filter(s => s.groupId === group.id);
     const items = sectionsInGroup
       .filter(section => allStatuses.get(section.id) !== 'NOT_APPLICABLE')
-      .map(section => buildItem(section, allStatuses.get(section.id) ?? 'AVAILABLE', caseRef, t, req));
+      .map(section =>
+        buildItem(section, allStatuses.get(section.id) ?? 'AVAILABLE', caseRef, t, req)
+      );
     return {
       id: group.id,
       number: index + 1,
@@ -132,7 +148,8 @@ function buildItem(
   const statusText = t(`taskList.status.${status}`);
 
   // Locked sections render the same tag as the rest, but without a link target.
-  const firstStep = status === 'NOT_AVAILABLE_YET' ? undefined : getFirstVisibleStep(section, flowConfig, req);
+  const firstStep =
+    status === 'NOT_AVAILABLE_YET' ? undefined : getFirstVisibleStep(section, flowConfig, req);
   const href = firstStep ? `/case/${caseRef}/respond-to-claim/${firstStep}` : undefined;
 
   return {

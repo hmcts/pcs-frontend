@@ -54,10 +54,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     process.env.NOTICE_SERVED = 'YES';
   }
 
-  const isRentArrearsOnly =
-    testInfo.title.includes('RentArrears') &&
-    !testInfo.title.includes('NonRentArrears') &&
-    !testInfo.title.includes('Respond to a claim');
+  const isRentArrearsOnly = testInfo.title.includes('RentArrears') && !testInfo.title.includes('NonRentArrears') && !testInfo.title.includes('Respond to a claim');
 
   process.env.RENT_ARREARS = isRentArrearsOnly ? 'YES' : 'NO';
 
@@ -100,13 +97,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('When the user clicks the button', startNow.startNowButton);
     await performAction('When the user clicks the button', freeLegalAdvice.saveForLaterButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Available',
     });
     await performAction('And the user navigates to the task list subsection', {
@@ -127,10 +118,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect);
     await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
     await performAction('When the user clicks the button', tenancyTypeDetails.saveForLaterButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -149,24 +137,14 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     });
     await performAction('When the user clicks the button', uploadFiles.saveForLaterButton);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.confirmDetailsLink],
       status: 'In progress',
     });
     await performAction('clickLink', taskList.backLink);
     await performValidation('text', { elementType: 'link', text: dashboard.continueYourResponseLink });
     await performAction('When the user clicks the button', dashboard.continueYourResponseLink);
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.confirmDetailsLink],
       status: 'In progress',
     });
     await performAction('And the user navigates to the task list subsection', {
@@ -211,10 +189,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect);
     await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadNoDefendants.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.yesRadioOption,
@@ -291,13 +266,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoYouReceive', {
-      regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-      ],
+      regularIncomeOptions: [[whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption]],
     });
     await performAction('selectPriorityDebts', {
       question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
@@ -316,11 +285,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
           whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
           whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
         ],
-        [
-          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
-        ],
+        [whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph, whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput, whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption],
       ],
     });
     await performAction('otherConsiderations', {
@@ -335,13 +300,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('uploadFiles');
     await performAction('When the user clicks the button', 'Save and continue');
     await performAction('taskListStatus', {
-      subSecArray: [
-        taskList.readInformationAboutLink,
-        taskList.respondToSpecificPartsOfClaimantsClaimLink,
-        taskList.incomeAndExpensesLink,
-        taskList.uploadDocumentsLink,
-        taskList.confirmDetailsLink,
-      ],
+      subSecArray: [taskList.readInformationAboutLink, taskList.respondToSpecificPartsOfClaimantsClaimLink, taskList.incomeAndExpensesLink, taskList.uploadDocumentsLink, taskList.confirmDetailsLink],
       status: 'Done',
     });
     await performAction('taskListStatus', {
@@ -351,10 +310,7 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
     await performAction('And the user navigates to the task list subsection', {
       subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
     });
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadNoDefendants.isClaimantNameCorrect);
     await performAction('clickRadioButton', tenancyTypeDetails.yesRadioOption);
     await performAction('When the user clicks the button', tenancyTypeDetails.saveForLaterButton);
     await performAction('And the user navigates to the task list subsection', {

@@ -8,13 +8,9 @@ export class ViewClaimHeaderDetailsValidation implements IValidation {
       let actual = '';
 
       if (key === 'Date issued' || key === 'Date submitted') {
-        actual =
-          (
-            await page.locator(`dt:text-is("${key}")`).locator('xpath=following-sibling::dd[1]').textContent()
-          )?.trim() ?? '';
+        actual = (await page.locator(`dt:text-is("${key}")`).locator('xpath=following-sibling::dd[1]').textContent())?.trim() ?? '';
       } else {
-        actual =
-          (await page.locator(`p:has(span:text-is("${key}:"))`).textContent())?.replace(`${key}:`, '').trim() ?? '';
+        actual = (await page.locator(`p:has(span:text-is("${key}:"))`).textContent())?.replace(`${key}:`, '').trim() ?? '';
       }
 
       expect(actual.replace(/\s+/g, ' ')).toBe(String(value).replace(/\s+/g, ' '));

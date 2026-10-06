@@ -109,7 +109,13 @@ function addRepaymentPlanAgreedRows({
   rows.push(detailRow);
 }
 
-function addRepayArrearsInstalmentsRow({ rows, paymentAgreement, t, change, yesNoNotSure }: RowContext): void {
+function addRepayArrearsInstalmentsRow({
+  rows,
+  paymentAgreement,
+  t,
+  change,
+  yesNoNotSure,
+}: RowContext): void {
   if (!paymentAgreement.repayArrearsInstalments) {
     return;
   }
@@ -128,7 +134,10 @@ function addRepayArrearsInstalmentsRow({ rows, paymentAgreement, t, change, yesN
 // CYA row with its own Change link — both link back to the same step page, where the
 // citizen can edit either field. Mirrors the counter-claim-about pattern.
 function addInstallmentRows({ rows, paymentAgreement, t, change }: RowContext): void {
-  if (!isYes(paymentAgreement.repayArrearsInstalments) || paymentAgreement.additionalRentContribution === undefined) {
+  if (
+    !isYes(paymentAgreement.repayArrearsInstalments) ||
+    paymentAgreement.additionalRentContribution === undefined
+  ) {
     return;
   }
   const pounds = penceToPounds(paymentAgreement.additionalRentContribution);
@@ -144,7 +153,9 @@ function addInstallmentRows({ rows, paymentAgreement, t, change }: RowContext): 
     rows.push({
       key: { text: t('rows.installmentFrequency.label') },
       value: { text: t(`rows.installmentFrequency.frequencies.${frequency}`) },
-      actions: { items: [change('how-much-afford-to-pay', 'rows.installmentFrequency.changeHidden')] },
+      actions: {
+        items: [change('how-much-afford-to-pay', 'rows.installmentFrequency.changeHidden')],
+      },
     });
   }
 }

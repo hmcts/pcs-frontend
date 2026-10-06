@@ -101,7 +101,10 @@ describe('respond-to-claim counter-claim-fee', () => {
       await testedStep.beforeRedirect(req);
 
       const saved = mockSaveDraftDefendantResponse.mock.calls[0][1];
-      expect(saved.defendantResponses.counterClaim).toEqual({ claimType: 'OTHER', needHelpWithFees: 'NO' });
+      expect(saved.defendantResponses.counterClaim).toEqual({
+        claimType: 'OTHER',
+        needHelpWithFees: 'NO',
+      });
     });
   });
 

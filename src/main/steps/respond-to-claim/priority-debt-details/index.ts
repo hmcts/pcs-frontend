@@ -6,7 +6,10 @@ import {
   hasMandatoryPriorityDebtDetailFields,
   poundsToPence,
 } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -50,7 +53,8 @@ const validateMoney =
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'priority-debt-details',
-  isAnswered: req => hasMandatoryPriorityDebtDetailFields(getValidatedCaseHouseholdCircumstances(req)),
+  isAnswered: req =>
+    hasMandatoryPriorityDebtDetailFields(getValidatedCaseHouseholdCircumstances(req)),
   stepDir: __dirname,
   beforeRedirect: async req => {
     const total = req.body?.priorityDebtTotal as string | undefined;
@@ -58,7 +62,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const frequency = req.body?.priorityDebtContributionFrequency as FrequencyFormValue | undefined;
 
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    response.defendantResponses.householdCircumstances =
+      response.defendantResponses.householdCircumstances ?? {};
     const hc = response.defendantResponses.householdCircumstances;
 
     if (typeof total === 'string' && total.trim()) {
@@ -101,7 +106,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       | undefined;
 
     const priorityDebtTotal = ccdPenceToPoundsString(householdCircumstances?.debtTotal);
-    const priorityDebtContribution = ccdPenceToPoundsString(householdCircumstances?.debtContribution);
+    const priorityDebtContribution = ccdPenceToPoundsString(
+      householdCircumstances?.debtContribution
+    );
     const priorityDebtContributionFrequencyRaw = householdCircumstances?.debtContributionFrequency;
     const normalizedFrequency = priorityDebtContributionFrequencyRaw?.toUpperCase();
     const priorityDebtContributionFrequency =
@@ -151,7 +158,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       prefix: { text: '£' },
       classes: 'govuk-input--width-10',
       attributes: { inputmode: 'decimal' },
-      validator: validateMoney('errors.priorityDebtContributionMin', 'errors.priorityDebtContributionMax'),
+      validator: validateMoney(
+        'errors.priorityDebtContributionMin',
+        'errors.priorityDebtContributionMax'
+      ),
     },
     {
       name: 'priorityDebtContributionFrequency',

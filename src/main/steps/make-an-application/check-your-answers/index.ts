@@ -19,7 +19,11 @@ import VisibleFormDataView from './visibleFormDataView';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CitizenGenAppRequest, GenAppState, GenAppType } from '@services/ccdCase.interface';
-import { PaymentSessionState, clearPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
+import {
+  PaymentSessionState,
+  clearPaymentSessionState,
+  setPaymentSessionState,
+} from '@services/paymentSessionService';
 import { toCaseReference16 } from '@utils/caseReference';
 
 const STEP_NAME = 'check-your-answers';
@@ -98,11 +102,15 @@ export const step: StepDefinition = createFormStep({
 
     const applicationId = getApplicationId(req);
     if (!applicationId) {
-      throw new ApplicationError('No application ID in session', ApplicationErrorCode.noApplicationIdInSession);
+      throw new ApplicationError(
+        'No application ID in session',
+        ApplicationErrorCode.noApplicationIdInSession
+      );
     }
 
     const cyaFormData = getFormData(req, STEP_NAME);
-    const statementOfTruthAccepted = (cyaFormData.statementOfTruthAccepted as string[])[0] as 'yes' | 'no';
+    const statementOfTruthAccepted = (cyaFormData.statementOfTruthAccepted as string[])[0] as
+      'yes' | 'no';
 
     const visibleFormData = new VisibleFormDataView(req);
     const uploadedDocs = visibleFormData.getUploadedDocuments();
@@ -125,12 +133,15 @@ export const step: StepDefinition = createFormStep({
       clientReference: applicationId,
     };
 
-    const makeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
-      id: ccdCase.id,
-      data: {
-        citizenGenAppRequest,
-      },
-    });
+    const makeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(
+      req.session?.user?.accessToken,
+      {
+        id: ccdCase.id,
+        data: {
+          citizenGenAppRequest,
+        },
+      }
+    );
 
     clearFormData(req);
     const caseRef = toCaseReference16(req.params?.caseReference);

@@ -37,7 +37,8 @@ function buildReq(overrides: Record<string, unknown> = {}): { req: Request } {
     body: { reasonableAdjustmentsChoice: 'questions' },
     // callback/logout URLs are derived from the request host, so the req must expose protocol + host.
     protocol: 'https',
-    get: (name: string) => (name.toLowerCase() === 'host' ? 'pcs.aat.platform.hmcts.net' : undefined),
+    get: (name: string) =>
+      name.toLowerCase() === 'host' ? 'pcs.aat.platform.hmcts.net' : undefined,
     session: { user: { accessToken: 'idam-access-token' } },
     res: {
       locals: {

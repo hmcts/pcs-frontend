@@ -175,7 +175,9 @@ const sectionDefs = [
 
 export type RespondToClaimSectionId = (typeof sectionDefs)[number]['id'];
 
-export const RESPOND_TO_CLAIM_SECTION_IDS: readonly RespondToClaimSectionId[] = sectionDefs.map(s => s.id);
+export const RESPOND_TO_CLAIM_SECTION_IDS: readonly RespondToClaimSectionId[] = sectionDefs.map(
+  s => s.id
+);
 
 export const respondToClaimSections: readonly SectionConfig[] = sectionDefs;
 
@@ -200,7 +202,9 @@ export function sectionIdToBackendEnum(id: RespondToClaimSectionId): RespondToCl
 }
 
 export function sectionHasCya(section: SectionConfig): boolean {
-  return section.steps.some(stepName => stepName === 'end-of-journey-cya' || stepName.startsWith(CYA_STEP_PREFIX));
+  return section.steps.some(
+    stepName => stepName === 'end-of-journey-cya' || stepName.startsWith(CYA_STEP_PREFIX)
+  );
 }
 
 const stepToSectionId = buildStepToSectionIdMap();

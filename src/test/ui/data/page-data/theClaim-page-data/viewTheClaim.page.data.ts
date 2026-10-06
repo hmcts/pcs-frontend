@@ -94,8 +94,7 @@ export const viewTheClaim = {
   },
 
   defendantCircumstancesDetails: {
-    'Is there any information the claimant is required to provide, or wants to provide about the defendants’ circumstances?':
-      'No',
+    'Is there any information the claimant is required to provide, or wants to provide about the defendants’ circumstances?': 'No',
   },
 
   underlesseeDetails: {

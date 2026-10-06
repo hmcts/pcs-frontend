@@ -2,7 +2,10 @@ import type { Request } from 'express';
 
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { noEmojiValidator } from '../../utils/fieldValidators';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -39,7 +42,9 @@ const createAmountValidator =
     return true;
   };
 
-const validateMoneyFromElsewhereDetails = noEmojiValidator('errors.moneyFromElsewhereDetails.invalidCharacters');
+const validateMoneyFromElsewhereDetails = noEmojiValidator(
+  'errors.moneyFromElsewhereDetails.invalidCharacters'
+);
 
 const validateIncomeFromJobsAmount = createAmountValidator(
   'errors.incomeFromJobsAmount.negative',
@@ -79,7 +84,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     if (fromYesNoEnum(hc.incomeFromJobs) === 'yes') {
       selectedIncome.push('incomeFromJobs');
       if (hc.incomeFromJobsAmount) {
-        formData['regularIncome.incomeFromJobsAmount'] = penceToPounds(hc.incomeFromJobsAmount as string);
+        formData['regularIncome.incomeFromJobsAmount'] = penceToPounds(
+          hc.incomeFromJobsAmount as string
+        );
       }
       if (hc.incomeFromJobsFrequency) {
         formData['regularIncome.incomeFromJobsFrequency'] = hc.incomeFromJobsFrequency;
@@ -99,10 +106,15 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     // Universal Credit
     const appliedForUniversalCredit = fromYesNoEnum(hc.universalCredit);
-    if ((hc.universalCreditAmount || hc.universalCreditFrequency) && appliedForUniversalCredit !== 'no') {
+    if (
+      (hc.universalCreditAmount || hc.universalCreditFrequency) &&
+      appliedForUniversalCredit !== 'no'
+    ) {
       selectedIncome.push('universalCredit');
       if (hc.universalCreditAmount) {
-        formData['regularIncome.universalCreditAmount'] = penceToPounds(hc.universalCreditAmount as string);
+        formData['regularIncome.universalCreditAmount'] = penceToPounds(
+          hc.universalCreditAmount as string
+        );
       }
       if (hc.universalCreditFrequency) {
         formData['regularIncome.universalCreditFrequency'] = hc.universalCreditFrequency;
@@ -113,7 +125,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     if (fromYesNoEnum(hc.otherBenefits) === 'yes') {
       selectedIncome.push('otherBenefits');
       if (hc.otherBenefitsAmount) {
-        formData['regularIncome.otherBenefitsAmount'] = penceToPounds(hc.otherBenefitsAmount as string);
+        formData['regularIncome.otherBenefitsAmount'] = penceToPounds(
+          hc.otherBenefitsAmount as string
+        );
       }
       if (hc.otherBenefitsFrequency) {
         formData['regularIncome.otherBenefitsFrequency'] = hc.otherBenefitsFrequency;
@@ -137,18 +151,27 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
   beforeRedirect: async (req: Request) => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    response.defendantResponses.householdCircumstances =
+      response.defendantResponses.householdCircumstances ?? {};
     const hc = response.defendantResponses.householdCircumstances;
 
     const selectedIncome = req.body?.regularIncome as string | string[] | undefined;
-    const incomeArray = Array.isArray(selectedIncome) ? selectedIncome : selectedIncome ? [selectedIncome] : [];
+    const incomeArray = Array.isArray(selectedIncome)
+      ? selectedIncome
+      : selectedIncome
+        ? [selectedIncome]
+        : [];
 
     const applyAmountFrequency = (
       checked: boolean,
       flagKey: 'incomeFromJobs' | 'pension' | 'universalCredit' | 'otherBenefits',
-      amountKey: 'incomeFromJobsAmount' | 'pensionAmount' | 'universalCreditAmount' | 'otherBenefitsAmount',
+      amountKey:
+        'incomeFromJobsAmount' | 'pensionAmount' | 'universalCreditAmount' | 'otherBenefitsAmount',
       frequencyKey:
-        'incomeFromJobsFrequency' | 'pensionFrequency' | 'universalCreditFrequency' | 'otherBenefitsFrequency',
+        | 'incomeFromJobsFrequency'
+        | 'pensionFrequency'
+        | 'universalCreditFrequency'
+        | 'otherBenefitsFrequency',
       amountBodyKey: string,
       frequencyBodyKey: string
     ) => {
@@ -208,7 +231,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     if (incomeArray.includes('moneyFromElsewhere')) {
       hc.moneyFromElsewhere = toYesNoEnum('yes');
-      const details = (req.body?.['regularIncome.moneyFromElsewhereDetails'] as string | undefined)?.trim();
+      const details = (
+        req.body?.['regularIncome.moneyFromElsewhereDetails'] as string | undefined
+      )?.trim();
       if (details) {
         hc.moneyFromElsewhereDetails = details;
       } else {

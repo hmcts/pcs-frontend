@@ -29,12 +29,15 @@ const ConditionalTextFunctionSchema = z
 
 // Function type for validator
 const ValidatorFunctionSchema = z
-  .custom<(value: unknown, formData?: Record<string, unknown>, allData?: Record<string, unknown>) => boolean | string>(
-    val => typeof val === 'function',
-    {
-      message: 'validator must be a function',
-    }
-  )
+  .custom<
+    (
+      value: unknown,
+      formData?: Record<string, unknown>,
+      allData?: Record<string, unknown>
+    ) => boolean | string
+  >(val => typeof val === 'function', {
+    message: 'validator must be a function',
+  })
   .optional();
 
 // Function type for required validation
@@ -46,7 +49,11 @@ const RequiredFunctionSchema = z.custom<
 
 // Function type for validate validation
 const ValidateFunctionSchema = z.custom<
-  (value: unknown, formData: Record<string, unknown>, allData: Record<string, unknown>) => string | undefined
+  (
+    value: unknown,
+    formData: Record<string, unknown>,
+    allData: Record<string, unknown>
+  ) => string | undefined
 >(val => typeof val === 'function', {
   message: 'validate must be a function',
 });
@@ -56,7 +63,16 @@ const ValidateFunctionSchema = z.custom<
 export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
   z.object({
     name: z.string(),
-    type: z.enum(['radio', 'checkbox', 'text', 'date', 'textarea', 'character-count', 'file', 'select']),
+    type: z.enum([
+      'radio',
+      'checkbox',
+      'text',
+      'date',
+      'textarea',
+      'character-count',
+      'file',
+      'select',
+    ]),
     required: z.union([z.boolean(), RequiredFunctionSchema]).optional(),
     pattern: z.string().optional(),
     maxLength: z.number().optional(),
@@ -79,7 +95,16 @@ export const FormFieldConfigSchema: z.ZodType<FormFieldConfig> = z.lazy(() =>
     // Pre-processed component configuration for template rendering
     component: z.record(z.string(), z.unknown()).optional(),
     componentType: z
-      .enum(['input', 'textarea', 'characterCount', 'radios', 'checkboxes', 'dateInput', 'fileUpload', 'select'])
+      .enum([
+        'input',
+        'textarea',
+        'characterCount',
+        'radios',
+        'checkboxes',
+        'dateInput',
+        'fileUpload',
+        'select',
+      ])
       .optional(),
     // Cross-field validation function
     validate: ValidateFunctionSchema.optional(),
@@ -128,9 +153,12 @@ const BeforeRedirectFunctionSchema = z
 
 // Function type for extendGetContent
 const ExtendGetContentFunctionSchema = z
-  .custom<(req: unknown, content: unknown) => Record<string, unknown>>(val => typeof val === 'function', {
-    message: 'extendGetContent must be a function',
-  })
+  .custom<(req: unknown, content: unknown) => Record<string, unknown>>(
+    val => typeof val === 'function',
+    {
+      message: 'extendGetContent must be a function',
+    }
+  )
   .optional();
 
 // Function type for getInitialFormData

@@ -31,7 +31,11 @@ export const step: StepDefinition = createFormStep({
           translationKey: 'options.setAside.label',
           hint: 'options.setAside.hint',
         },
-        { value: 'SOMETHING_ELSE', translationKey: 'options.somethingElse.label', hint: 'options.somethingElse.hint' },
+        {
+          value: 'SOMETHING_ELSE',
+          translationKey: 'options.somethingElse.label',
+          hint: 'options.somethingElse.hint',
+        },
       ],
     },
   ],

@@ -1,6 +1,9 @@
 import type { Request } from 'express';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -36,7 +39,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: async req => {
     const caseData = req.res?.locals.validatedCase?.data;
-    const writtenTerms = caseData?.possessionClaimResponse?.defendantResponses?.writtenTerms as string | undefined;
+    const writtenTerms = caseData?.possessionClaimResponse?.defendantResponses?.writtenTerms as
+      string | undefined;
     return { writtenTerms };
   },
   beforeRedirect: async (req: Request) => {

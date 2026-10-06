@@ -18,7 +18,12 @@ describe('validateForm', () => {
 
   it('should return error for empty checkbox', () => {
     const fields: FormFieldConfig[] = [
-      { name: 'choices', type: 'checkbox', required: true, errorMessage: 'Please select at least one' },
+      {
+        name: 'choices',
+        type: 'checkbox',
+        required: true,
+        errorMessage: 'Please select at least one',
+      },
     ];
 
     const req = { body: { choices: [] }, session: {} } as Partial<Request>;
@@ -82,7 +87,10 @@ describe('validateForm', () => {
     });
 
     it('should not set special character error for valid text', () => {
-      const req = { body: { testField: "valid text with hyphens and apostrophe's" }, session: {} } as Partial<Request>;
+      const req = {
+        body: { testField: "valid text with hyphens and apostrophe's" },
+        session: {},
+      } as Partial<Request>;
 
       const errors = validateForm(req as Request, emojiFields, {});
 
@@ -106,7 +114,10 @@ describe('validateForm', () => {
     });
 
     it('should strip HTML tags silently and write back to req.body without validation error', () => {
-      const req = { body: { testField: '<script>alert(1)</script>hello' }, session: {} } as Partial<Request>;
+      const req = {
+        body: { testField: '<script>alert(1)</script>hello' },
+        session: {},
+      } as Partial<Request>;
 
       const errors = validateForm(req as Request, emojiFields, {});
 

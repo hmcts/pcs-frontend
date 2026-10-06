@@ -40,6 +40,5 @@ export const midEventLRRespondPossessionClaimApiData = {
 
     ignore_warning: false,
   }),
-  midEventLRRespondPossessionClaimApiEndPoint: (): string =>
-    '/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage',
+  midEventLRRespondPossessionClaimApiEndPoint: (): string => '/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage',
 };

@@ -51,7 +51,9 @@ export async function startYourSupport(req: Request): Promise<string> {
   const caseReference = validatedCase.id;
   const partyName = resolveDefendantPartyName(validatedCase);
   if (!partyName) {
-    logger.warn(`Starting Your Support for case ${caseReference} with an empty defendant party name`);
+    logger.warn(
+      `Starting Your Support for case ${caseReference} with an empty defendant party name`
+    );
   }
 
   // Pre-populate the microsite with any adjustments already captured for this defendant

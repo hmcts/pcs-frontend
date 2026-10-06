@@ -62,7 +62,13 @@ export class OIDCModule {
         const clientSecret = config.get<string>('secrets.pcs.pcs-frontend-idam-secret');
 
         // Create the client configuration with the server discovery
-        this.clientConfig = await client.discovery(issuer, clientId, clientSecret, undefined, discoveryOptions);
+        this.clientConfig = await client.discovery(
+          issuer,
+          clientId,
+          clientSecret,
+          undefined,
+          discoveryOptions
+        );
         return this.clientConfig;
       } catch (error) {
         this.logger.error('Failed to setup OIDC client:', error);
@@ -92,7 +98,8 @@ export class OIDCModule {
 
   private describeAuthSession(req: Request): Record<string, unknown> {
     const cookie = req.cookies?.[config.get<string>('session.cookieName')];
-    const presentedSessionId = typeof cookie === 'string' ? cookie.replace(/^s:/, '').split('.')[0] : undefined;
+    const presentedSessionId =
+      typeof cookie === 'string' ? cookie.replace(/^s:/, '').split('.')[0] : undefined;
 
     return {
       sessionCookiePresented: presentedSessionId !== undefined,
@@ -115,7 +122,10 @@ export class OIDCModule {
   public async refreshUserTokens(refreshToken: string): Promise<RefreshTokenResult> {
     try {
       const clientConfig = await this.ensureClientConfig();
-      const tokens: TokenEndpointResponse = await client.refreshTokenGrant(clientConfig, refreshToken);
+      const tokens: TokenEndpointResponse = await client.refreshTokenGrant(
+        clientConfig,
+        refreshToken
+      );
 
       const { access_token, id_token, refresh_token } = tokens;
 
@@ -246,7 +256,11 @@ export class OIDCModule {
         const claims = tokens.claims();
 
         const { sub } = claims;
-        const user: UserInfoResponse = await client.fetchUserInfo(this.clientConfig, access_token, sub);
+        const user: UserInfoResponse = await client.fetchUserInfo(
+          this.clientConfig,
+          access_token,
+          sub
+        );
 
         req.session.user = {
           accessToken: access_token,

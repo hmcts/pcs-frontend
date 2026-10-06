@@ -99,7 +99,11 @@ describe('viewTheClaim route', () => {
     const next = jest.fn();
     const res = { render: jest.fn() } as unknown as Response;
 
-    await handler({ params: { caseReference: '1234567890123456' } } as unknown as Request, res, next);
+    await handler(
+      { params: { caseReference: '1234567890123456' } } as unknown as Request,
+      res,
+      next
+    );
 
     expect(res.render).not.toHaveBeenCalled();
     expect(next).toHaveBeenCalledWith(expect.objectContaining({ status: 401 }));

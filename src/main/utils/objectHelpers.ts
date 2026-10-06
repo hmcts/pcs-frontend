@@ -13,5 +13,7 @@ export function isNonEmpty(value: unknown): boolean {
  * Filters an object to only include entries with non-empty values
  */
 export function filterNonEmptyValues<T extends Record<string, unknown>>(obj: T): Partial<T> {
-  return Object.fromEntries(Object.entries(obj).filter(([, value]) => isNonEmpty(value))) as Partial<T>;
+  return Object.fromEntries(
+    Object.entries(obj).filter(([, value]) => isNonEmpty(value))
+  ) as Partial<T>;
 }

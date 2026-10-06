@@ -13,7 +13,8 @@ export function initPostcodeSelection(): void {
   };
 
   const addressSelect =
-    byIdOrName<HTMLSelectElement>(`${prefix}-selectedAddress`) ?? byIdOrName<HTMLSelectElement>('selectedAddress');
+    byIdOrName<HTMLSelectElement>(`${prefix}-selectedAddress`) ??
+    byIdOrName<HTMLSelectElement>('selectedAddress');
 
   // Focus the dropdown if we just came from a postcode lookup
   const getHref = (): string => {
@@ -92,7 +93,9 @@ export function initPostcodeSelection(): void {
       postcode.value = selected.dataset.postcode || '';
     }
 
-    const details = (component ?? document).querySelector<HTMLDetailsElement | Element>('.govuk-details');
+    const details = (component ?? document).querySelector<HTMLDetailsElement | Element>(
+      '.govuk-details'
+    );
     if (details) {
       if ('open' in details) {
         (details as HTMLDetailsElement).open = true;

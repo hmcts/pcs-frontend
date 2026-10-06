@@ -111,12 +111,16 @@ describe('PostHandler - documentStorage', () => {
       documentStorage
     );
 
-    await expect(post(req, mockResponse as Response, mockNext)).rejects.toThrow('Nunjucks environment not initialized');
+    await expect(post(req, mockResponse as Response, mockNext)).rejects.toThrow(
+      'Nunjucks environment not initialized'
+    );
   });
 
   it('hydrates req.body from documentStorage — empty storage clears file field value', async () => {
     mockRead.mockResolvedValue([]);
-    const validateSpy = jest.spyOn(helpers, 'validateForm').mockReturnValue({ documents: 'Upload a file' });
+    const validateSpy = jest
+      .spyOn(helpers, 'validateForm')
+      .mockReturnValue({ documents: 'Upload a file' });
 
     const req = buildRequest();
     const { post } = createPostHandler(

@@ -50,15 +50,23 @@ import {
 
 describe('correspondence-address isAnswered', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const reqWith = (validatedCase: Record<string, unknown>): any => ({ res: { locals: { validatedCase } } });
+  const reqWith = (validatedCase: Record<string, unknown>): any => ({
+    res: { locals: { validatedCase } },
+  });
 
   it('is answered once the citizen confirms (correspondenceAddressConfirmation set)', () => {
-    expect(step.isAnswered?.(reqWith({ defendantResponses: { correspondenceAddressConfirmation: 'YES' } }))).toBe(true);
+    expect(
+      step.isAnswered?.(
+        reqWith({ defendantResponses: { correspondenceAddressConfirmation: 'YES' } })
+      )
+    ).toBe(true);
   });
 
   it('is NOT answered when only the claim-prefilled party address is present (no confirmation)', () => {
     expect(
-      step.isAnswered?.(reqWith({ defendantContactDetailsPartyAddress: { AddressLine1: '2 Second Avenue' } }))
+      step.isAnswered?.(
+        reqWith({ defendantContactDetailsPartyAddress: { AddressLine1: '2 Second Avenue' } })
+      )
     ).toBe(false);
   });
 
@@ -99,7 +107,10 @@ describe('correspondence-address beforeRedirect', () => {
     const response = {
       defendantResponses: {} as Record<string, unknown>,
       defendantContactDetails: {
-        party: { address: { AddressLine1: 'Stale Road', PostCode: 'SW1A 1AA' } } as Record<string, unknown>,
+        party: { address: { AddressLine1: 'Stale Road', PostCode: 'SW1A 1AA' } } as Record<
+          string,
+          unknown
+        >,
       },
     };
     mockBuildDraftDefendantResponse.mockReturnValue(response);
@@ -211,9 +222,12 @@ describe('correspondence-address buildAddressFieldValues', () => {
 });
 
 describe('correspondence-address isFullUkPostcode', () => {
-  it.each(['W3 7RX', 'w3 7rx', 'SW1A 1AA', 'EC1A1BB', 'M1 1AE'])('accepts full postcode %s', postcode => {
-    expect(isFullUkPostcode(postcode)).toBe(true);
-  });
+  it.each(['W3 7RX', 'w3 7rx', 'SW1A 1AA', 'EC1A1BB', 'M1 1AE'])(
+    'accepts full postcode %s',
+    postcode => {
+      expect(isFullUkPostcode(postcode)).toBe(true);
+    }
+  );
 
   it.each(['W5', 'INVALID', 'W3', '12345', 'W3 7R'])('rejects %s', postcode => {
     expect(isFullUkPostcode(postcode)).toBe(false);

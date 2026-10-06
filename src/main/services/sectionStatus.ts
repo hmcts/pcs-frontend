@@ -1,6 +1,10 @@
 import type { Request } from 'express';
 
-import type { JourneyFlowConfig, SectionConfig, SectionStatus } from '../modules/steps/stepFlow.interface';
+import type {
+  JourneyFlowConfig,
+  SectionConfig,
+  SectionStatus,
+} from '../modules/steps/stepFlow.interface';
 import type { StepDefinition } from '../modules/steps/stepFormData.interface';
 import {
   type RespondToClaimSectionId,
@@ -8,7 +12,11 @@ import {
   sectionIdToBackendEnum,
 } from '../steps/respond-to-claim/sections.config';
 
-export type { SectionStatus, SectionConfig, JourneyFlowConfig } from '../modules/steps/stepFlow.interface';
+export type {
+  SectionStatus,
+  SectionConfig,
+  JourneyFlowConfig,
+} from '../modules/steps/stepFlow.interface';
 export type { StepDefinition } from '../modules/steps/stepFormData.interface';
 
 const STATUS_TAG_CLASSES: Partial<Record<SectionStatus, string>> = {
@@ -18,7 +26,8 @@ const STATUS_TAG_CLASSES: Partial<Record<SectionStatus, string>> = {
   NOT_AVAILABLE_YET: 'govuk-tag govuk-tag--grey',
 };
 
-export const getStatusTagClasses = (status: SectionStatus): string | undefined => STATUS_TAG_CLASSES[status];
+export const getStatusTagClasses = (status: SectionStatus): string | undefined =>
+  STATUS_TAG_CLASSES[status];
 
 export function getFirstVisibleStep(
   section: SectionConfig,
@@ -92,7 +101,9 @@ export async function getSectionStatus(
 }
 
 function userHasCompletedSectionViaCya(section: SectionConfig, req: Request): boolean {
-  const completed = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.completedSections ?? [];
+  const completed =
+    req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.completedSections ??
+    [];
   return completed.includes(sectionIdToBackendEnum(section.id as RespondToClaimSectionId));
 }
 
@@ -117,7 +128,10 @@ export function validateSectionConfig(flowConfig: JourneyFlowConfig): void {
 }
 
 // Catches cycles too — any cycle has at least one back-reference.
-function assertDeclarationOrderIsTopological(sections: readonly SectionConfig[], journeyLabel: string): void {
+function assertDeclarationOrderIsTopological(
+  sections: readonly SectionConfig[],
+  journeyLabel: string
+): void {
   const seen = new Set<string>();
   for (const section of sections) {
     for (const depId of section.dependsOn ?? []) {
@@ -145,7 +159,10 @@ async function isSectionNotApplicable(section: SectionConfig, req: Request): Pro
   return Boolean(section.isApplicable && !(await section.isApplicable(req)));
 }
 
-function hasUnsatisfiedDependencies(section: SectionConfig, allStatuses: ReadonlyMap<string, SectionStatus>): boolean {
+function hasUnsatisfiedDependencies(
+  section: SectionConfig,
+  allStatuses: ReadonlyMap<string, SectionStatus>
+): boolean {
   if (!section.dependsOn?.length) {
     return false;
   }
@@ -208,7 +225,9 @@ function assertUniqueIds(sections: readonly SectionConfig[], journeyLabel: strin
   const seen = new Set<string>();
   for (const section of sections) {
     if (seen.has(section.id)) {
-      throw new SectionConfigError(`Journey '${journeyLabel}' has duplicate section id '${section.id}'.`);
+      throw new SectionConfigError(
+        `Journey '${journeyLabel}' has duplicate section id '${section.id}'.`
+      );
     }
     seen.add(section.id);
   }
@@ -219,7 +238,9 @@ function assertReferencesResolve(sections: readonly SectionConfig[], journeyLabe
   for (const section of sections) {
     for (const depId of section.dependsOn ?? []) {
       if (depId === section.id) {
-        throw new SectionConfigError(`Journey '${journeyLabel}': section '${section.id}' depends on itself.`);
+        throw new SectionConfigError(
+          `Journey '${journeyLabel}': section '${section.id}' depends on itself.`
+        );
       }
       if (!ids.has(depId)) {
         throw new SectionConfigError(

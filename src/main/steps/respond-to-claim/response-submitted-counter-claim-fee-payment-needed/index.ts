@@ -10,13 +10,20 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   fields: [],
   translationKeys: {
     pageTitle: 'pageTitle',
-    responseSubmittedCounterClaimFeePaymentNeededParagraph1: 'responseSubmittedCounterClaimFeePaymentNeededParagraph1',
-    responseSubmittedCounterClaimFeePaymentNeededHeading1: 'responseSubmittedCounterClaimFeePaymentNeededHeading1',
-    responseSubmittedCounterClaimFeePaymentNeededListItem1: 'responseSubmittedCounterClaimFeePaymentNeededListItem1',
-    responseSubmittedCounterClaimFeePaymentNeededListItem2: 'responseSubmittedCounterClaimFeePaymentNeededListItem2',
-    responseSubmittedCounterClaimFeePaymentNeededListItem3: 'responseSubmittedCounterClaimFeePaymentNeededListItem3',
-    responseSubmittedCounterClaimFeePaymentNeededHeading2: 'responseSubmittedCounterClaimFeePaymentNeededHeading2',
-    responseSubmittedCounterClaimFeePaymentNeededParagraph2: 'responseSubmittedCounterClaimFeePaymentNeededParagraph2',
+    responseSubmittedCounterClaimFeePaymentNeededParagraph1:
+      'responseSubmittedCounterClaimFeePaymentNeededParagraph1',
+    responseSubmittedCounterClaimFeePaymentNeededHeading1:
+      'responseSubmittedCounterClaimFeePaymentNeededHeading1',
+    responseSubmittedCounterClaimFeePaymentNeededListItem1:
+      'responseSubmittedCounterClaimFeePaymentNeededListItem1',
+    responseSubmittedCounterClaimFeePaymentNeededListItem2:
+      'responseSubmittedCounterClaimFeePaymentNeededListItem2',
+    responseSubmittedCounterClaimFeePaymentNeededListItem3:
+      'responseSubmittedCounterClaimFeePaymentNeededListItem3',
+    responseSubmittedCounterClaimFeePaymentNeededHeading2:
+      'responseSubmittedCounterClaimFeePaymentNeededHeading2',
+    responseSubmittedCounterClaimFeePaymentNeededParagraph2:
+      'responseSubmittedCounterClaimFeePaymentNeededParagraph2',
     closeAndReturnToCaseOverview: 'closeAndReturnToCaseOverview',
   },
   customTemplate: `${__dirname}/responseSubmittedCounterClaimFeePaymentNeeded.njk`,

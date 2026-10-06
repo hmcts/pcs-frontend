@@ -52,7 +52,8 @@ import { ccdCaseService } from '@services/ccdCaseService';
 
 const mockSubmit = ccdCaseService.submitUploadDocuments as jest.Mock;
 const mockGetFormData = getFormData as jest.Mock;
-const storage = (sessionDocs as jest.Mock).mock.results[0]?.value as { read: jest.Mock; save: jest.Mock } | undefined;
+const storage = (sessionDocs as jest.Mock).mock.results[0]?.value as
+  { read: jest.Mock; save: jest.Mock } | undefined;
 
 const CASE_REF = '1234567890123456';
 
@@ -76,7 +77,9 @@ const buildRes = (): Response => {
 beforeEach(() => {
   jest.clearAllMocks();
   if (storage) {
-    storage.read.mockResolvedValue([{ id: 'doc-1', value: { document: { document_filename: 'f.pdf' } } }]);
+    storage.read.mockResolvedValue([
+      { id: 'doc-1', value: { document: { document_filename: 'f.pdf' } } },
+    ]);
   }
 });
 
@@ -89,7 +92,10 @@ describe('upload-additional-documents check-your-answers GET viewmodel', () => {
   };
 
   it('sets hasRelatedApplication=true when the confirm step has form data', async () => {
-    mockGetFormData.mockReturnValue({ relatedApplicationId: 'app-1', relatedApplicationText: 'App one' });
+    mockGetFormData.mockReturnValue({
+      relatedApplicationId: 'app-1',
+      relatedApplicationText: 'App one',
+    });
 
     const vm = await buildViewmodel(buildReq());
 

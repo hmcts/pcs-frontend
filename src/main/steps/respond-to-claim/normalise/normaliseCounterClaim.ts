@@ -64,7 +64,10 @@ export function normaliseCounterClaim(response: PossessionClaimResponse): void {
 }
 
 function dropAgainstAndAboutWhenAwaitingHwfApplication(cc: CcdCounterClaim): void {
-  if (normalizeYesNoValue(cc.needHelpWithFees) !== 'YES' || normalizeYesNoValue(cc.appliedForHwf) === 'YES') {
+  if (
+    normalizeYesNoValue(cc.needHelpWithFees) !== 'YES' ||
+    normalizeYesNoValue(cc.appliedForHwf) === 'YES'
+  ) {
     return;
   }
   delete cc.counterClaimAgainst;

@@ -1,4 +1,7 @@
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 import { purgeUploadedDocumentsFromCdam } from '../utils';
 import { DocumentType } from '../utils/purgeUploadedDocuments';
@@ -34,7 +37,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   beforeRedirect: async req => {
-    const counterClaimWantToUploadFiles = req.body?.counterClaimWantToUploadFiles as YesNoValue | undefined;
+    const counterClaimWantToUploadFiles = req.body?.counterClaimWantToUploadFiles as
+      YesNoValue | undefined;
     const response = buildDraftDefendantResponse(req);
 
     if (counterClaimWantToUploadFiles) {

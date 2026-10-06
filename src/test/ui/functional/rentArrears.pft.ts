@@ -33,11 +33,7 @@ export async function rentArrearsErrorValidation(): Promise<void> {
     message: rentArrears.theAmountYouBelieveErrorMessage,
   });
   //incorrect format
-  await performAction(
-    'inputText',
-    rentArrears.howMuchDoYouBelieveHiddenTextLabel,
-    rentArrears.incorrectFormatTextInput
-  );
+  await performAction('inputText', rentArrears.howMuchDoYouBelieveHiddenTextLabel, rentArrears.incorrectFormatTextInput);
   await performAction('When the user clicks the button', rentArrears.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: rentArrears.thereIsAProblemErrorMessageHeader,

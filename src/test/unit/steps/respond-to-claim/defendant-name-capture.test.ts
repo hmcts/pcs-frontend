@@ -92,7 +92,8 @@ describe('respond-to-claim defendant-name-capture step', () => {
   });
 
   it('GET renders translated content and input attributes', async () => {
-    const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
+    const controller =
+      typeof step.getController === 'function' ? step.getController() : step.getController;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { render: jest.fn() } as any;
 
@@ -112,9 +113,11 @@ describe('respond-to-claim defendant-name-capture step', () => {
 
     const viewModel = res.render.mock.calls[0][1] as { fields: Record<string, unknown>[] };
     const firstNameField = viewModel.fields.find(f => f.name === 'firstName') as
-      { component?: { label?: { classes?: string }; attributes?: Record<string, unknown> } } | undefined;
+      | { component?: { label?: { classes?: string }; attributes?: Record<string, unknown> } }
+      | undefined;
     const lastNameField = viewModel.fields.find(f => f.name === 'lastName') as
-      { component?: { label?: { classes?: string }; attributes?: Record<string, unknown> } } | undefined;
+      | { component?: { label?: { classes?: string }; attributes?: Record<string, unknown> } }
+      | undefined;
 
     expect(firstNameField?.component?.label?.classes).toBe('govuk-label--s');
     expect(firstNameField?.component?.attributes).toEqual(
@@ -145,7 +148,10 @@ describe('respond-to-claim defendant-name-capture step', () => {
     );
 
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.render).toHaveBeenCalledWith(step.view, expect.objectContaining({ errorSummary: expect.anything() }));
+    expect(res.render).toHaveBeenCalledWith(
+      step.view,
+      expect.objectContaining({ errorSummary: expect.anything() })
+    );
   });
 
   it('POST saves data and redirects when validation passes', async () => {

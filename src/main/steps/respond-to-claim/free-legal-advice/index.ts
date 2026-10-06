@@ -1,4 +1,7 @@
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -11,7 +14,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
     const hadLegalAdvice = req.body?.hadLegalAdvice as string | undefined;
-    const enumMapping: Record<string, string> = { yes: 'YES', no: 'NO', preferNotToSay: 'PREFER_NOT_TO_SAY' };
+    const enumMapping: Record<string, string> = {
+      yes: 'YES',
+      no: 'NO',
+      preferNotToSay: 'PREFER_NOT_TO_SAY',
+    };
 
     if (hadLegalAdvice && enumMapping[hadLegalAdvice]) {
       response.defendantResponses.freeLegalAdvice = enumMapping[hadLegalAdvice];
@@ -42,7 +49,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     paragraph4: 'paragraph4',
   },
   getInitialFormData: req => {
-    const existingAnswer = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.freeLegalAdvice;
+    const existingAnswer =
+      req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.freeLegalAdvice;
 
     // Map CCD enum to frontend value
     const formValue =

@@ -1,4 +1,7 @@
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 import { purgeUploadedDocumentsFromCdam } from '../utils';
 import { DocumentType } from '../utils/purgeUploadedDocuments';

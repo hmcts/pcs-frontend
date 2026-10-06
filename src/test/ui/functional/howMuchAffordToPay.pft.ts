@@ -9,11 +9,7 @@ export async function howMuchAffordToPayErrorValidation(): Promise<void> {
     message2: howMuchAffordToPay.enterHowMuchYouCouldAffordErrorMessage,
   });
   //amount exceeding max allowed value
-  await performAction(
-    'inputText',
-    howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel,
-    howMuchAffordToPay.billionTextInput
-  );
+  await performAction('inputText', howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel, howMuchAffordToPay.billionTextInput);
   await performAction('clickRadioButton', howMuchAffordToPay.weeklyRadioOption);
   await performAction('When the user clicks the button', howMuchAffordToPay.saveAndContinueButton);
   await performValidation('errorMessage', {
@@ -21,11 +17,7 @@ export async function howMuchAffordToPayErrorValidation(): Promise<void> {
     message: howMuchAffordToPay.mustBeLessThanBillionErrorMessage,
   });
   //negative value entered
-  await performAction(
-    'inputText',
-    howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel,
-    howMuchAffordToPay.negativeTextInput
-  );
+  await performAction('inputText', howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel, howMuchAffordToPay.negativeTextInput);
   await performAction('clickRadioButton', howMuchAffordToPay.every2WeeksRadioOption);
   await performAction('When the user clicks the button', howMuchAffordToPay.saveAndContinueButton);
   await performValidation('errorMessage', {
@@ -33,11 +25,7 @@ export async function howMuchAffordToPayErrorValidation(): Promise<void> {
     message: howMuchAffordToPay.negativeValueErrorMessage,
   });
   //incorrect format
-  await performAction(
-    'inputText',
-    howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel,
-    howMuchAffordToPay.incorrectFormatTextInput
-  );
+  await performAction('inputText', howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel, howMuchAffordToPay.incorrectFormatTextInput);
   await performAction('clickRadioButton', howMuchAffordToPay.every4weeksRadioOption);
   await performAction('When the user clicks the button', howMuchAffordToPay.saveAndContinueButton);
   await performValidation('errorMessage', {
@@ -52,10 +40,6 @@ export async function howMuchAffordToPayNavigationTests(): Promise<void> {
     pageSlug: howMuchAffordToPay.pageSlug,
   });
   await performValidation('pageNavigation', howMuchAffordToPay.backLink, installmentPayments.mainHeader);
-  await performAction(
-    'inputText',
-    howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel,
-    howMuchAffordToPay.affordToPayTextInput
-  );
+  await performAction('inputText', howMuchAffordToPay.howMuchCouldYouAffordToPayTextLabel, howMuchAffordToPay.affordToPayTextInput);
   await performAction('clickRadioButton', howMuchAffordToPay.monthlyRadioOption);
 }

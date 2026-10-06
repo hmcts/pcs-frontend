@@ -27,14 +27,16 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'is-the-court-hearing-in-the-next-14-days': isTheCourtHearingInTheNext14Days,
   'do-you-need-help-paying-the-fee': doYouNeedHelpPayingTheFee,
   'have-you-already-applied-for-help-with-fees': haveYouAlreadyAppliedForHelpWithFees,
-  'you-need-to-apply-for-help-with-your-application-fee': youNeedToApplyForHelpWithYourApplicationFee,
+  'you-need-to-apply-for-help-with-your-application-fee':
+    youNeedToApplyForHelpWithYourApplicationFee,
   'have-the-other-parties-agreed-to-this-application': haveTheOtherPartiesAgreedToThisApplication,
   'are-there-any-reasons-that-this-application-should-not-be-shared':
     areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   'what-order-do-you-want-the-court-to-make-and-why': whatOrderDoYouWantTheCourtToMakeAndWhy,
   'do-you-want-to-upload-documents-to-support-your-application': doYouWanToUploadDocuments,
   'upload-documents-to-support-your-application': uploadDocumentsToSupportYourApplication,
-  'which-language-did-you-use-to-complete-this-service': whichLanguageDidYouUseToCompleteThisService,
+  'which-language-did-you-use-to-complete-this-service':
+    whichLanguageDidYouUseToCompleteThisService,
   'check-your-answers': checkYourAnswers,
   'pay-for-your-application': payForYourApplication,
   'payment-unsuccessful': paymentUnsuccessful,

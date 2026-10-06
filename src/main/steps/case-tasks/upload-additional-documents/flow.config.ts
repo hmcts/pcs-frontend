@@ -9,7 +9,8 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 // Frontend-only radio value: never sent to the backend, unlike the gen app and counterclaim ids
 export const MAIN_CLAIM_OPTION_VALUE = 'MAIN_CLAIM';
 
-export const confirmIfTheseDocumentsRelateToAnApplicationStep = 'confirm-if-these-documents-relate-to-an-application';
+export const confirmIfTheseDocumentsRelateToAnApplicationStep =
+  'confirm-if-these-documents-relate-to-an-application';
 export const uploadYourDocumentsStep = 'upload-your-documents';
 export const checkYourAnswersStep = 'check-your-answers';
 export const documentsUploadedStep = 'documents-uploaded';
@@ -36,7 +37,9 @@ export const flowConfig: JourneyFlowConfig = {
         { nextStep: uploadYourDocumentsStep },
       ],
     },
-    [confirmIfTheseDocumentsRelateToAnApplicationStep]: { routes: [{ nextStep: uploadYourDocumentsStep }] },
+    [confirmIfTheseDocumentsRelateToAnApplicationStep]: {
+      routes: [{ nextStep: uploadYourDocumentsStep }],
+    },
     [uploadYourDocumentsStep]: {
       routes: [{ nextStep: checkYourAnswersStep }],
       previousStep: async (req: Request) => {

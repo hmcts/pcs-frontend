@@ -24,7 +24,11 @@ const SECTION_ID: RespondToClaimSectionId = 'incomeAndExpenditure';
 const INCOME_SOURCES = [
   { key: 'incomeFromJobs', amount: 'incomeFromJobsAmount', frequency: 'incomeFromJobsFrequency' },
   { key: 'pension', amount: 'pensionAmount', frequency: 'pensionFrequency' },
-  { key: 'universalCredit', amount: 'universalCreditAmount', frequency: 'universalCreditFrequency' },
+  {
+    key: 'universalCredit',
+    amount: 'universalCreditAmount',
+    frequency: 'universalCreditFrequency',
+  },
   { key: 'otherBenefits', amount: 'otherBenefitsAmount', frequency: 'otherBenefitsFrequency' },
 ] as const;
 
@@ -79,7 +83,9 @@ function amountWithFrequency(
 ): string {
   const pounds = penceToPounds(amount ?? undefined);
   const money = pounds ? `£${pounds}` : '';
-  const freq = frequency ? t(`${frequencyNamespace}.${String(frequency).trim().toUpperCase()}`) : '';
+  const freq = frequency
+    ? t(`${frequencyNamespace}.${String(frequency).trim().toUpperCase()}`)
+    : '';
   return [money, freq].filter(Boolean).join(' ');
 }
 
@@ -143,7 +149,12 @@ function addRegularIncomeRows({ rows, hc, t, change }: RowContext): void {
       continue;
     }
     const optionKey = `rows.regularIncome.options.${source.key}`;
-    const detail = amountWithFrequency(hc[source.amount], hc[source.frequency], t, 'incomeFrequencies');
+    const detail = amountWithFrequency(
+      hc[source.amount],
+      hc[source.frequency],
+      t,
+      'incomeFrequencies'
+    );
     itemRows.push({
       key: { text: t(optionKey), classes: 'govuk-!-font-weight-regular' },
       value: { text: detail },
@@ -187,7 +198,12 @@ function addAppliedForUcRow({ rows, hc, t, change, yesNoNotSure }: RowContext): 
     key: { text: t('rows.universalCreditApplicationDate.label') },
     value: { text: formatIsoDate(hc.ucApplicationDate) },
     actions: {
-      items: [change('have-you-applied-for-universal-credit', 'rows.universalCreditApplicationDate.changeHidden')],
+      items: [
+        change(
+          'have-you-applied-for-universal-credit',
+          'rows.universalCreditApplicationDate.changeHidden'
+        ),
+      ],
     },
   };
   groupQuestionAndDetail(questionRow, detailRow);
@@ -198,7 +214,15 @@ function addPriorityDebtsRow({ rows, hc, t, change, yesNoNotSure }: RowContext):
   if (!hc.priorityDebts) {
     return;
   }
-  pushYesNoRow(rows, 'rows.priorityDebts', hc.priorityDebts, 'priority-debts', t, yesNoNotSure, change);
+  pushYesNoRow(
+    rows,
+    'rows.priorityDebts',
+    hc.priorityDebts,
+    'priority-debts',
+    t,
+    yesNoNotSure,
+    change
+  );
 }
 
 function addPriorityDebtDetailsRow({ rows, hc, t, change }: RowContext): void {
@@ -213,12 +237,19 @@ function addPriorityDebtDetailsRow({ rows, hc, t, change }: RowContext): void {
       actions: { items: [change('priority-debt-details', 'rows.priorityDebtTotal.changeHidden')] },
     });
   }
-  const contribution = amountWithFrequency(hc.debtContribution, hc.debtContributionFrequency, t, 'paymentFrequencies');
+  const contribution = amountWithFrequency(
+    hc.debtContribution,
+    hc.debtContributionFrequency,
+    t,
+    'paymentFrequencies'
+  );
   if (contribution) {
     rows.push({
       key: { text: t('rows.priorityDebtContribution.label') },
       value: { text: contribution },
-      actions: { items: [change('priority-debt-details', 'rows.priorityDebtContribution.changeHidden')] },
+      actions: {
+        items: [change('priority-debt-details', 'rows.priorityDebtContribution.changeHidden')],
+      },
     });
   }
 }
@@ -265,7 +296,15 @@ function addOtherConsiderationsRow({ rows, responses, t, change, yesNoNotSure }:
   if (!isYes(responses.otherConsiderations) || !detail) {
     return;
   }
-  pushDetailRow(rows, questionRow, 'rows.otherConsiderationsDetails', detail, 'other-considerations', t, change);
+  pushDetailRow(
+    rows,
+    questionRow,
+    'rows.otherConsiderationsDetails',
+    detail,
+    'other-considerations',
+    t,
+    change
+  );
 }
 
 function pushExpandedRows(
@@ -301,7 +340,14 @@ function addEOJRegularIncomeRows(ctx: RowContext): void {
     if (isYes(hc[source.key])) {
       items.push({
         label: t(`rows.regularIncome.options.${source.key}`),
-        value: { text: amountWithFrequency(hc[source.amount], hc[source.frequency], t, 'incomeFrequencies') },
+        value: {
+          text: amountWithFrequency(
+            hc[source.amount],
+            hc[source.frequency],
+            t,
+            'incomeFrequencies'
+          ),
+        },
       });
     }
   }

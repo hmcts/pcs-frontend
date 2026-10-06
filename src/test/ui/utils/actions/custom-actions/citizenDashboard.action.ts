@@ -12,14 +12,8 @@ import { pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
 export class CitizenDashboardAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
-      [
-        'verifyRespondToClaimNotificationAndTag',
-        () => this.verifyRespondToClaimNotificationAndTag(page, fieldName as actionRecord),
-      ],
-      [
-        'verifyNavigationFromNotificationLink',
-        () => this.verifyNavigationFromNotificationLink(page, fieldName as actionRecord),
-      ],
+      ['verifyRespondToClaimNotificationAndTag', () => this.verifyRespondToClaimNotificationAndTag(page, fieldName as actionRecord)],
+      ['verifyNavigationFromNotificationLink', () => this.verifyNavigationFromNotificationLink(page, fieldName as actionRecord)],
       ['validateViewAllApplications', () => this.validateViewAllApplications()],
       ['verifyResponseDetailsOnViewTheResponsePage', () => this.verifyResponseDetailsOnViewTheResponsePage()],
       ['verifyClaimDetailsOnViewTheClaimPage', () => this.verifyClaimDetailsOnViewTheClaimPage()],
@@ -65,9 +59,7 @@ export class CitizenDashboardAction implements IAction {
       const vireResponseTask = page.locator('li.govuk-task-list__item').filter({
         hasText: String(notificationData.viewResponseHeader),
       });
-      await expect(vireResponseTask.locator('.govuk-task-list__status')).toHaveText(
-        String(notificationData.viewResponseTag)
-      );
+      await expect(vireResponseTask.locator('.govuk-task-list__status')).toHaveText(String(notificationData.viewResponseTag));
     } else {
       // Verify link is deactivated (not rendered as a link)
       await expect(viewResponseLink).toHaveCount(0);
@@ -127,31 +119,15 @@ export class CitizenDashboardAction implements IAction {
       ['viewClaimOrResponseTable', viewTheResponse.claimantDetailsSubHeader, viewTheResponse.claimantDetails],
       // The line below will be commented until the bug HDPI-7360 gets fixed
       //['viewClaimOrResponseTable', viewTheResponse.defendant1SubHeader, viewTheResponse.defendant1Details],
-      [
-        'viewClaimOrResponseTable',
-        viewTheResponse.additionalDefendant1DynamicSubHeader,
-        viewTheResponse.additionalDefendant1Details,
-      ],
-      [
-        'viewClaimOrResponseTable',
-        viewTheResponse.additionalDefendant2DynamicSubHeader,
-        viewTheResponse.additionalDefendant2Details,
-      ],
+      ['viewClaimOrResponseTable', viewTheResponse.additionalDefendant1DynamicSubHeader, viewTheResponse.additionalDefendant1Details],
+      ['viewClaimOrResponseTable', viewTheResponse.additionalDefendant2DynamicSubHeader, viewTheResponse.additionalDefendant2Details],
       ['viewClaimOrResponseTable', viewTheResponse.responseToClaimSubHeader, viewTheResponse.responseToClaimDetails],
-      [
-        'viewClaimOrResponseTable',
-        viewTheResponse.paymentsOrAgreementsSubHeader,
-        viewTheResponse.paymentsOrAgreementsDetails,
-      ],
+      ['viewClaimOrResponseTable', viewTheResponse.paymentsOrAgreementsSubHeader, viewTheResponse.paymentsOrAgreementsDetails],
       ['viewClaimOrResponseTable', viewTheResponse.yourHouseholdSubHeader, viewTheResponse.yourHouseholdDetails],
       ['viewClaimOrResponseTable', viewTheResponse.regularIncomeSubHeader, viewTheResponse.regularIncomeDetails],
       ['viewClaimOrResponseTable', viewTheResponse.priorityDebtsSubHeader, viewTheResponse.priorityDebtsDetails],
       ['viewClaimOrResponseTable', viewTheResponse.regularExpensesSubHeader, viewTheResponse.regularExpensesDetails],
-      [
-        'viewClaimOrResponseTable',
-        viewTheResponse.additionalInformationSubHeader,
-        viewTheResponse.additionalInformationDetails,
-      ],
+      ['viewClaimOrResponseTable', viewTheResponse.additionalInformationSubHeader, viewTheResponse.additionalInformationDetails],
       ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
     );
     await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
@@ -168,31 +144,15 @@ export class CitizenDashboardAction implements IAction {
       'View the claim page validation',
       ['viewClaimOrResponseTable', viewTheClaim.claimantDetailsSubHeader, viewTheClaim.claimantDetails],
       ['viewClaimOrResponseTable', viewTheClaim.defendant1SubHeader, viewTheClaim.defendant1Details],
-      [
-        'viewClaimOrResponseTable',
-        viewTheClaim.additionalDefendant1SubHeader,
-        viewTheClaim.additionalDefendant1Details,
-      ],
-      [
-        'viewClaimOrResponseTable',
-        viewTheClaim.additionalDefendant2SubHeader,
-        viewTheClaim.additionalDefendant2Details,
-      ],
+      ['viewClaimOrResponseTable', viewTheClaim.additionalDefendant1SubHeader, viewTheClaim.additionalDefendant1Details],
+      ['viewClaimOrResponseTable', viewTheClaim.additionalDefendant2SubHeader, viewTheClaim.additionalDefendant2Details],
       ['viewClaimOrResponseTable', viewTheClaim.claimDetailsSubHeader, viewTheClaim.claimDetails],
       ['viewClaimOrResponseTable', viewTheClaim.rentArrearsSubHeader, viewTheClaim.rentArrearsDetails],
       ['viewClaimOrResponseTable', viewTheClaim.actionTakenSubHeader, viewTheClaim.actionTakenDetails],
       ['viewClaimOrResponseTable', viewTheClaim.noticeDetailsSubHeader, viewTheClaim.noticeDetails],
       ['viewClaimOrResponseTable', viewTheClaim.tenancyDetailsSubHeader, viewTheClaim.tenancyDetails],
-      [
-        'viewClaimOrResponseTable',
-        viewTheClaim.claimantCircumstancesSubHeader,
-        viewTheClaim.claimantCircumstancesDetails,
-      ],
-      [
-        'viewClaimOrResponseTable',
-        viewTheClaim.defendantCircumstancesSubHeader,
-        viewTheClaim.defendantCircumstancesDetails,
-      ],
+      ['viewClaimOrResponseTable', viewTheClaim.claimantCircumstancesSubHeader, viewTheClaim.claimantCircumstancesDetails],
+      ['viewClaimOrResponseTable', viewTheClaim.defendantCircumstancesSubHeader, viewTheClaim.defendantCircumstancesDetails],
       ['viewClaimOrResponseTable', viewTheClaim.underlesseeSubHeader, viewTheClaim.underlesseeDetails],
       ['viewClaimOrResponseTable', viewTheClaim.statementOfTruthSubHeader, viewTheClaim.statementOfTruthDetails]
     );

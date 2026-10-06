@@ -1,6 +1,9 @@
 import type { Request } from 'express';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -13,7 +16,8 @@ export { getNoticeDocumentInfo };
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'confirmation-of-notice-given',
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.possessionNoticeReceived),
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.possessionNoticeReceived),
   stepDir: __dirname,
   customTemplate: `${__dirname}/confirmationOfNoticeGiven.njk`,
   translationKeys: {
@@ -48,7 +52,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   beforeRedirect: async (req: Request) => {
     const response = buildDraftDefendantResponse(req);
-    const possessionNoticeReceived: YesNoNotSureValue | undefined = req.body?.possessionNoticeReceived;
+    const possessionNoticeReceived: YesNoNotSureValue | undefined =
+      req.body?.possessionNoticeReceived;
 
     if (possessionNoticeReceived) {
       response.defendantResponses.possessionNoticeReceived = possessionNoticeReceived;
@@ -60,7 +65,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   extendGetContent: async (req: Request) => {
     const claimantName = getClaimantName(req);
-    const documentId = await resolveStepDocumentId(req, getNoticeDocumentInfo, 'confirmationOfNoticeGiven');
+    const documentId = await resolveStepDocumentId(
+      req,
+      getNoticeDocumentInfo,
+      'confirmationOfNoticeGiven'
+    );
     const noticeDocument = documentId ? { id: documentId } : '';
     const release12Enabled = isRelease12Enabled(req);
 

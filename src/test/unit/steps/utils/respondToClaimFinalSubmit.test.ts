@@ -103,7 +103,9 @@ describe('respondToClaimFinalSubmit', () => {
 
     it('throws when access token is missing', async () => {
       const req = createReq({ session: {} });
-      await expect(submitRespondToClaimResponse(req)).rejects.toThrow('No user access token in session');
+      await expect(submitRespondToClaimResponse(req)).rejects.toThrow(
+        'No user access token in session'
+      );
     });
 
     it('submits to CCD and returns confirmation path', async () => {
@@ -112,7 +114,9 @@ describe('respondToClaimFinalSubmit', () => {
 
       const result = await submitRespondToClaimResponse(createReq());
 
-      expect(result.confirmationPath).toBe('/case/1234567890123456/respond-to-claim/response-submitted');
+      expect(result.confirmationPath).toBe(
+        '/case/1234567890123456/respond-to-claim/response-submitted'
+      );
       expect(mockHttpPost).toHaveBeenCalled();
       expect(mockClientContextClearer).not.toHaveBeenCalled();
     });
@@ -122,7 +126,10 @@ describe('respondToClaimFinalSubmit', () => {
       mockHttpPost.mockResolvedValue({ data: {} });
 
       const req = {
-        session: { user: { accessToken: 'mock-token' }, clientContext: { selectedPartyId: 'partyId' } },
+        session: {
+          user: { accessToken: 'mock-token' },
+          clientContext: { selectedPartyId: 'partyId' },
+        },
         res: {
           locals: {
             validatedCase: {
@@ -139,7 +146,9 @@ describe('respondToClaimFinalSubmit', () => {
 
       const result = await submitRespondToClaimResponse(req);
 
-      expect(result.confirmationPath).toBe('/case/1234567890123456/respond-to-claim/response-submitted');
+      expect(result.confirmationPath).toBe(
+        '/case/1234567890123456/respond-to-claim/response-submitted'
+      );
       expect(mockHttpPost).toHaveBeenCalled();
     });
 
@@ -248,7 +257,9 @@ describe('submitRespondToClaimResponse — reviewed draft version', () => {
     };
     mockHttpPost.mockRejectedValue(refusal);
 
-    const rejection = await submitRespondToClaimResponse(reqWithDraftVersion(5)).catch(error => error);
+    const rejection = await submitRespondToClaimResponse(reqWithDraftVersion(5)).catch(
+      error => error
+    );
 
     expect(rejection).toBe(refusal);
     expect(isDraftChangedError(rejection)).toBe(true);
@@ -256,10 +267,15 @@ describe('submitRespondToClaimResponse — reviewed draft version', () => {
 
   it('maps a validation refusal from pcs-api to RespondToClaimSubmitRejectedError carrying the messages', async () => {
     mockHttpPost.mockRejectedValue({
-      response: { status: 422, data: { callbackErrors: ['Enter a valid postcode for correspondence address'] } },
+      response: {
+        status: 422,
+        data: { callbackErrors: ['Enter a valid postcode for correspondence address'] },
+      },
     });
 
-    const rejection = await submitRespondToClaimResponse(reqWithDraftVersion(5)).catch(error => error);
+    const rejection = await submitRespondToClaimResponse(reqWithDraftVersion(5)).catch(
+      error => error
+    );
 
     expect(rejection).toBeInstanceOf(RespondToClaimSubmitRejectedError);
     expect(rejection.messages).toEqual(['Enter a valid postcode for correspondence address']);
@@ -275,15 +291,24 @@ describe('submitRespondToClaimResponse — reviewed draft version', () => {
 
 describe('isDraftChangedError', () => {
   it.each([
-    ['an HTTPError built from mid-event callback errors', new Error('CCD callback rejected request: DRAFT_CHANGED')],
-    ['an axios error carrying callbackErrors', { response: { data: { callbackErrors: ['DRAFT_CHANGED'] } } }],
+    [
+      'an HTTPError built from mid-event callback errors',
+      new Error('CCD callback rejected request: DRAFT_CHANGED'),
+    ],
+    [
+      'an axios error carrying callbackErrors',
+      { response: { data: { callbackErrors: ['DRAFT_CHANGED'] } } },
+    ],
   ])('recognises %s', (_label, error) => {
     expect(isDraftChangedError(error)).toBe(true);
   });
 
   it.each([
     ['a plain error', new Error('boom')],
-    ['an axios error with unrelated callback errors', { response: { data: { callbackErrors: ['Other'] } } }],
+    [
+      'an axios error with unrelated callback errors',
+      { response: { data: { callbackErrors: ['Other'] } } },
+    ],
     ['undefined', undefined],
   ])('rejects %s', (_label, error) => {
     expect(isDraftChangedError(error)).toBe(false);
@@ -300,7 +325,9 @@ describe('getEndOfJourneyCyaDraftChangedPath', () => {
 
 describe('submitRejectionReason', () => {
   it('maps a correspondence-address refusal to the address reason', () => {
-    expect(submitRejectionReason(['Enter a valid postcode for correspondence address'])).toBe('correspondenceAddress');
+    expect(submitRejectionReason(['Enter a valid postcode for correspondence address'])).toBe(
+      'correspondenceAddress'
+    );
   });
 
   it('maps anything else to other', () => {

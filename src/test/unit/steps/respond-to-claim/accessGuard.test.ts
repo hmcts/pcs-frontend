@@ -21,13 +21,21 @@ import { respondToClaimAccessGuard } from '../../../../main/steps/respond-to-cla
 import { flowConfig } from '../../../../main/steps/respond-to-claim/flow.config';
 import { getUserType } from '../../../../main/steps/utils';
 
-import { getAllSectionStatuses, getFirstVisibleStep, safeIsAnswered } from '@services/sectionStatus';
+import {
+  getAllSectionStatuses,
+  getFirstVisibleStep,
+  safeIsAnswered,
+} from '@services/sectionStatus';
 import { shouldShowStep } from '@steps';
 
 const mockGetUserType = getUserType as jest.MockedFunction<typeof getUserType>;
 const mockShouldShowStep = shouldShowStep as jest.MockedFunction<typeof shouldShowStep>;
-const mockGetAllSectionStatuses = getAllSectionStatuses as jest.MockedFunction<typeof getAllSectionStatuses>;
-const mockGetFirstVisibleStep = getFirstVisibleStep as jest.MockedFunction<typeof getFirstVisibleStep>;
+const mockGetAllSectionStatuses = getAllSectionStatuses as jest.MockedFunction<
+  typeof getAllSectionStatuses
+>;
+const mockGetFirstVisibleStep = getFirstVisibleStep as jest.MockedFunction<
+  typeof getFirstVisibleStep
+>;
 const mockSafeIsAnswered = safeIsAnswered as jest.MockedFunction<typeof safeIsAnswered>;
 
 interface MakeReqArgs {
@@ -119,7 +127,9 @@ describe('respondToClaimAccessGuard', () => {
   });
 
   it('redirects to hub when the section is NOT_AVAILABLE_YET', async () => {
-    mockGetAllSectionStatuses.mockResolvedValue(new Map([['disputeAndTenancy', 'NOT_AVAILABLE_YET']]));
+    mockGetAllSectionStatuses.mockResolvedValue(
+      new Map([['disputeAndTenancy', 'NOT_AVAILABLE_YET']])
+    );
     const req = makeReq();
     const res = makeRes();
     await respondToClaimAccessGuard()(req, res, next);
@@ -186,7 +196,10 @@ describe('respondToClaimAccessGuard', () => {
     const req = makeReq({ path: '/case/123/respond-to-claim/exempt-landlord' });
     const res = makeRes();
     await respondToClaimAccessGuard()(req, res, next);
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/dispute-claim-interstitial');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/123/respond-to-claim/dispute-claim-interstitial'
+    );
     expect(next).not.toHaveBeenCalled();
   });
 
@@ -201,7 +214,10 @@ describe('respondToClaimAccessGuard', () => {
 
   it('passes through a mid-section step reached via internal navigation (?nav=1)', async () => {
     mockGetFirstVisibleStep.mockReturnValue('dispute-claim-interstitial');
-    const req = makeReq({ path: '/case/123/respond-to-claim/exempt-landlord', query: { nav: '1' } });
+    const req = makeReq({
+      path: '/case/123/respond-to-claim/exempt-landlord',
+      query: { nav: '1' },
+    });
     const res = makeRes();
     await respondToClaimAccessGuard()(req, res, next);
     expect(next).toHaveBeenCalledTimes(1);
@@ -256,11 +272,16 @@ describe('respondToClaimAccessGuard', () => {
   });
 
   it('builds the hub URL from flowConfig.hubStepName, not a string literal', async () => {
-    mockGetAllSectionStatuses.mockResolvedValue(new Map([['disputeAndTenancy', 'NOT_AVAILABLE_YET']]));
+    mockGetAllSectionStatuses.mockResolvedValue(
+      new Map([['disputeAndTenancy', 'NOT_AVAILABLE_YET']])
+    );
     const req = makeReq();
     const res = makeRes();
     await respondToClaimAccessGuard()(req, res, next);
-    expect(res.redirect).toHaveBeenCalledWith(303, expect.stringContaining(`/${flowConfig.hubStepName}`));
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      expect.stringContaining(`/${flowConfig.hubStepName}`)
+    );
   });
 
   describe('solicitor screens (startNowAndDetails)', () => {
@@ -275,7 +296,9 @@ describe('respondToClaimAccessGuard', () => {
 
     it('redirects ask-your-solicitor to hub when its showCondition is false (no solicitor)', async () => {
       mockShouldShowStep.mockReturnValue(false);
-      const req = makeReq({ path: '/case/123/respond-to-claim/ask-your-solicitor-to-respond-to-the-claim' });
+      const req = makeReq({
+        path: '/case/123/respond-to-claim/ask-your-solicitor-to-respond-to-the-claim',
+      });
       const res = makeRes();
       await respondToClaimAccessGuard()(req, res, next);
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/task-list');

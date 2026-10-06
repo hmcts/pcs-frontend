@@ -45,7 +45,9 @@ describe('cancelUploadJourney', () => {
         formData: {
           uploadAdditionalDocuments: {
             '1234567890123456': {
-              'confirm-if-these-documents-relate-to-an-application': { relatedApplicationId: 'abc' },
+              'confirm-if-these-documents-relate-to-an-application': {
+                relatedApplicationId: 'abc',
+              },
               'upload-your-documents': { documents: ['a.pdf'] },
               'check-your-answers': { something: true },
             },

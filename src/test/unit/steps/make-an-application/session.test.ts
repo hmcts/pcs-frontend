@@ -58,7 +58,11 @@ describe('make-an-application session data', () => {
 
   it('does not see answers stored under another journey for the same case', () => {
     const session = {
-      formData: { uploadAdditionalDocuments: { '1111222233334444': { 'check-your-answers': { something: true } } } },
+      formData: {
+        uploadAdditionalDocuments: {
+          '1111222233334444': { 'check-your-answers': { something: true } },
+        },
+      },
     } as unknown as Request['session'];
     const caseA = createRequest(session, '1111222233334444');
 

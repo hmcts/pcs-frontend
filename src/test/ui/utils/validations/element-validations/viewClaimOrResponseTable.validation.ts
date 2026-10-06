@@ -13,25 +13,20 @@ export class ViewClaimOrResponseTableValidation implements IValidation {
         throw new Error(`Subheader "${subHeaderName}" not found on the page`);
       }
 
-      const keyLocator = page.locator(
-        `xpath=//h2[normalize-space()="${subHeaderName}"]/following-sibling::dl[1]//dt[normalize-space()="${key}"]`
-      );
+      const keyLocator = page.locator(`xpath=//h2[normalize-space()="${subHeaderName}"]/following-sibling::dl[1]//dt[normalize-space()="${key}"]`);
       const keyCount = await keyLocator.count();
 
       if (keyCount === 0) {
         throw new Error(`Key "${key}" not found under subheader "${subHeaderName}"`);
       }
 
-      const valueLocator = page.locator(
-        `xpath=//h2[normalize-space()="${subHeaderName}"]/following-sibling::dl[1]//dt[normalize-space()="${key}"]/following-sibling::dd[1]`
-      );
+      const valueLocator = page.locator(`xpath=//h2[normalize-space()="${subHeaderName}"]/following-sibling::dl[1]//dt[normalize-space()="${key}"]/following-sibling::dd[1]`);
 
       const actualText = await valueLocator.first().textContent();
 
-      expect(
-        actualText?.trim().replace(/\s+/g, ' '),
-        `"${key}" under "${subHeaderName}"\nExpected: "${value}"\nActual:   "${actualText?.trim().replace(/\s+/g, ' ')}"`
-      ).toBe((value as string).trim().replace(/\s+/g, ' '));
+      expect(actualText?.trim().replace(/\s+/g, ' '), `"${key}" under "${subHeaderName}"\nExpected: "${value}"\nActual:   "${actualText?.trim().replace(/\s+/g, ' ')}"`).toBe(
+        (value as string).trim().replace(/\s+/g, ' ')
+      );
     }
   }
 }

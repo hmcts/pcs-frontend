@@ -66,7 +66,9 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'value1' });
 
-      const session = req.session as { formData?: Record<string, Record<string, Record<string, unknown>>> };
+      const session = req.session as {
+        formData?: Record<string, Record<string, Record<string, unknown>>>;
+      };
       expect(session.formData?.default?.default).toEqual({
         'test-step': {
           field1: 'value1',
@@ -91,7 +93,9 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'new-value', field2: 'value2' });
 
-      const session = req.session as { formData?: Record<string, Record<string, Record<string, unknown>>> };
+      const session = req.session as {
+        formData?: Record<string, Record<string, Record<string, unknown>>>;
+      };
       expect(session.formData?.default?.default).toEqual({
         'test-step': {
           field1: 'new-value',
@@ -107,7 +111,9 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'value1' });
 
-      const session = req.session as { formData?: Record<string, Record<string, Record<string, unknown>>> };
+      const session = req.session as {
+        formData?: Record<string, Record<string, Record<string, unknown>>>;
+      };
       expect(session.formData).toBeDefined();
       expect(session.formData?.default?.default?.['test-step']).toEqual({ field1: 'value1' });
     });
@@ -811,9 +817,11 @@ describe('formHelpers', () => {
           },
         } as unknown as Request;
 
-        const requiredFn = jest.fn((formData: Record<string, unknown>, allData: Record<string, unknown>) => {
-          return allData.previousField === 'previousValue';
-        });
+        const requiredFn = jest.fn(
+          (formData: Record<string, unknown>, allData: Record<string, unknown>) => {
+            return allData.previousField === 'previousValue';
+          }
+        );
 
         const fields = [
           {
@@ -826,7 +834,11 @@ describe('formHelpers', () => {
         validateForm(req, fields);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1' }),
-          expect.objectContaining({ previousField: 'previousValue', anotherField: 'anotherValue', field1: 'value1' }),
+          expect.objectContaining({
+            previousField: 'previousValue',
+            anotherField: 'anotherValue',
+            field1: 'value1',
+          }),
           req
         );
       });
@@ -864,9 +876,11 @@ describe('formHelpers', () => {
 
         const allFormData = { customData: 'customValue' };
 
-        const requiredFn = jest.fn((formData: Record<string, unknown>, allData: Record<string, unknown>) => {
-          return allData.customData === 'customValue';
-        });
+        const requiredFn = jest.fn(
+          (formData: Record<string, unknown>, allData: Record<string, unknown>) => {
+            return allData.customData === 'customValue';
+          }
+        );
 
         const fields = [
           {
@@ -958,7 +972,9 @@ describe('formHelpers', () => {
 
         const validateFn = jest.fn(
           (value: unknown, formData: Record<string, unknown>, allData: Record<string, unknown>) => {
-            return formData.field2 === 'value2' && allData.previousField === 'previousValue' ? undefined : 'Error';
+            return formData.field2 === 'value2' && allData.previousField === 'previousValue'
+              ? undefined
+              : 'Error';
           }
         );
 
@@ -975,7 +991,11 @@ describe('formHelpers', () => {
         expect(validateFn).toHaveBeenCalledWith(
           'value1',
           expect.objectContaining({ field1: 'value1', field2: 'value2' }),
-          expect.objectContaining({ previousField: 'previousValue', field1: 'value1', field2: 'value2' })
+          expect.objectContaining({
+            previousField: 'previousValue',
+            field1: 'value1',
+            field2: 'value2',
+          })
         );
       });
 
@@ -2379,9 +2399,11 @@ describe('formHelpers', () => {
           },
         } as unknown as Request;
 
-        const requiredFn = jest.fn((formData: Record<string, unknown>, allData: Record<string, unknown>) => {
-          return allData.previousField === 'previousValue';
-        });
+        const requiredFn = jest.fn(
+          (formData: Record<string, unknown>, allData: Record<string, unknown>) => {
+            return allData.previousField === 'previousValue';
+          }
+        );
 
         const fields = [
           {
@@ -2394,7 +2416,11 @@ describe('formHelpers', () => {
         validateForm(req, fields);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1' }),
-          expect.objectContaining({ previousField: 'previousValue', anotherField: 'anotherValue', field1: 'value1' }),
+          expect.objectContaining({
+            previousField: 'previousValue',
+            anotherField: 'anotherValue',
+            field1: 'value1',
+          }),
           req
         );
       });
@@ -2432,9 +2458,11 @@ describe('formHelpers', () => {
 
         const allFormData = { customData: 'customValue' };
 
-        const requiredFn = jest.fn((formData: Record<string, unknown>, allData: Record<string, unknown>) => {
-          return allData.customData === 'customValue';
-        });
+        const requiredFn = jest.fn(
+          (formData: Record<string, unknown>, allData: Record<string, unknown>) => {
+            return allData.customData === 'customValue';
+          }
+        );
 
         const fields = [
           {
@@ -2526,7 +2554,9 @@ describe('formHelpers', () => {
 
         const validateFn = jest.fn(
           (value: unknown, formData: Record<string, unknown>, allData: Record<string, unknown>) => {
-            return formData.field2 === 'value2' && allData.previousField === 'previousValue' ? undefined : 'Error';
+            return formData.field2 === 'value2' && allData.previousField === 'previousValue'
+              ? undefined
+              : 'Error';
           }
         );
 
@@ -2543,7 +2573,11 @@ describe('formHelpers', () => {
         expect(validateFn).toHaveBeenCalledWith(
           'value1',
           expect.objectContaining({ field1: 'value1', field2: 'value2' }),
-          expect.objectContaining({ previousField: 'previousValue', field1: 'value1', field2: 'value2' })
+          expect.objectContaining({
+            previousField: 'previousValue',
+            field1: 'value1',
+            field2: 'value2',
+          })
         );
       });
 

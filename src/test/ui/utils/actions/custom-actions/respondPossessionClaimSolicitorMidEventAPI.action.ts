@@ -8,9 +8,7 @@ import { IAction } from '../../interfaces';
 
 export class RespondPossessionClaimLRMidEventAPIAction implements IAction {
   async execute(page: Page, action: string): Promise<void> {
-    const actionsMap = new Map<string, () => Promise<void>>([
-      ['midEventRespondPossessionClaimLRAPI', () => this.midEventRespondPossessionClaimLRAPI()],
-    ]);
+    const actionsMap = new Map<string, () => Promise<void>>([['midEventRespondPossessionClaimLRAPI', () => this.midEventRespondPossessionClaimLRAPI()]]);
 
     const actionToPerform = actionsMap.get(action);
 
@@ -34,10 +32,7 @@ export class RespondPossessionClaimLRMidEventAPIAction implements IAction {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       const midEventPayload = midEventLRRespondPossessionClaimApiData.midEventLRRespondPossessionClaimPayload();
       try {
-        const response = await validateApi.post(
-          midEventLRRespondPossessionClaimApiData.midEventLRRespondPossessionClaimApiEndPoint(),
-          midEventPayload
-        );
+        const response = await validateApi.post(midEventLRRespondPossessionClaimApiData.midEventLRRespondPossessionClaimApiEndPoint(), midEventPayload);
 
         console.log(`\n✅ MID EVENT LEGAL REPRESENTATIVE RESPONSE SUCCESSFUL:`);
         console.log(`Status Code: ${response.status}`);

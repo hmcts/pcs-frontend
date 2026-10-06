@@ -28,11 +28,7 @@ export async function tenancyTypeDetailsErrorValidation(): Promise<void> {
     message: tenancyTypeDetails.characterLimitErrorMessage,
   });
   //emoji error validation
-  await performAction(
-    'inputText',
-    tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel,
-    tenancyTypeDetails.emojiTextInput
-  );
+  await performAction('inputText', tenancyTypeDetails.giveCorrectTenancyTypeHiddenTextLabel, tenancyTypeDetails.emojiTextInput);
   await performAction('When the user clicks the button', tenancyTypeDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyTypeDetails.thereIsAProblemErrorMessageHeader,
@@ -47,11 +43,7 @@ export async function tenancyTypeDetailsNavigationTests(): Promise<void> {
     }
   } else {
     if (claimantsName) {
-      await performValidation(
-        'pageNavigation',
-        tenancyTypeDetails.backLink,
-        disputeClaimInterstitial.getMainHeader(claimantsName)
-      );
+      await performValidation('pageNavigation', tenancyTypeDetails.backLink, disputeClaimInterstitial.getMainHeader(claimantsName));
     }
   }
   await performAction('clickRadioButton', {

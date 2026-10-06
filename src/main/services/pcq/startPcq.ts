@@ -3,7 +3,10 @@ import config from 'config';
 import type { Request } from 'express';
 import { v4 as uuid } from 'uuid';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../steps/utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../steps/utils/buildDraftDefendantResponse';
 
 import { createSecureToken } from './createSecureToken';
 
@@ -59,7 +62,9 @@ export async function startPcq(req: Request): Promise<string | null> {
 
   try {
     logger.info(`Checking Pcq health url: ${healthUrl}`);
-    const health = await axios.get(healthUrl, { timeout: config.get<number>('pcq.healthTimeoutMs') });
+    const health = await axios.get(healthUrl, {
+      timeout: config.get<number>('pcq.healthTimeoutMs'),
+    });
     if (health.data.status !== 'UP') {
       logger.warn('PCQ service is not available, skipping');
       return null;

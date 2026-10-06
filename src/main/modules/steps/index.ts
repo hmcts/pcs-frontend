@@ -7,7 +7,12 @@
  */
 
 // Export controller factory API
-export { GetController, createGetController, createPostController, createPostRedirectController } from './controller';
+export {
+  GetController,
+  createGetController,
+  createPostController,
+  createPostRedirectController,
+} from './controller';
 
 // Export form builder API
 export { createFormStep } from './formBuilder';

@@ -42,7 +42,9 @@ export const getAddressesByPostcode = async (postcode: string): Promise<Address[
   logger.info('[osPostcodeLookupService] Looking up addresses by postcode');
   try {
     const response = await axios.get<OSResponse>(url);
-    logger.info(`[osPostcodeLookupService] Postcode lookup returned ${response.data?.results?.length ?? 0} result(s)`);
+    logger.info(
+      `[osPostcodeLookupService] Postcode lookup returned ${response.data?.results?.length ?? 0} result(s)`
+    );
     if (!response.data?.results) {
       return [];
     }

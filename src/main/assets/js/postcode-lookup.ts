@@ -83,7 +83,8 @@ export function initPostcodeLookup(): void {
   };
 
   const populateAddressFields = (container: HTMLElement, selected: HTMLOptionElement) => {
-    const { addressLine1, addressLine2, town, county, postcodeOut, enterManuallyDetails } = getParts(container);
+    const { addressLine1, addressLine2, town, county, postcodeOut, enterManuallyDetails } =
+      getParts(container);
 
     // Ensure the Details component is open so address fields are visible
     if (enterManuallyDetails) {
@@ -315,7 +316,15 @@ export function initPostcodeLookup(): void {
         }
       }
     } catch {
-      handleNoAddresses(errorMessage, input, select, selectContainer, enterManuallyDetails, addressesFoundFlag, prefix);
+      handleNoAddresses(
+        errorMessage,
+        input,
+        select,
+        selectContainer,
+        enterManuallyDetails,
+        addressesFoundFlag,
+        prefix
+      );
     } finally {
       button.disabled = false;
     }
@@ -379,7 +388,11 @@ export function initPostcodeLookup(): void {
       // Add error to error summary
       if (lookupErrorMessage?.textContent) {
         const errorText = lookupErrorMessage.textContent.replace('Error:', '').trim();
-        addErrorToSummary(`${prefix}-lookup-postcode-error`, errorText, `#${prefix}-lookupPostcode`);
+        addErrorToSummary(
+          `${prefix}-lookup-postcode-error`,
+          errorText,
+          `#${prefix}-lookupPostcode`
+        );
       }
 
       const errorSummary = getErrorSummary();
@@ -462,14 +475,27 @@ export function initPostcodeLookup(): void {
     }
 
     // Find all address components within this form
-    const addressComponents = Array.from(form.querySelectorAll<HTMLElement>('[data-address-component]'));
+    const addressComponents = Array.from(
+      form.querySelectorAll<HTMLElement>('[data-address-component]')
+    );
 
     for (const container of addressComponents) {
-      const { prefix, addressesFoundFlag, select, selectContainer, selectErrorMessage, selectFormGroup } =
-        getParts(container);
+      const {
+        prefix,
+        addressesFoundFlag,
+        select,
+        selectContainer,
+        selectErrorMessage,
+        selectFormGroup,
+      } = getParts(container);
 
       // Check if addresses were found and dropdown is visible
-      if (addressesFoundFlag?.value === 'true' && select && !selectContainer?.hidden && !select.hidden) {
+      if (
+        addressesFoundFlag?.value === 'true' &&
+        select &&
+        !selectContainer?.hidden &&
+        !select.hidden
+      ) {
         // Check if no address is selected
         const selectedValue = select.value;
         if (!selectedValue) {
@@ -485,7 +511,11 @@ export function initPostcodeLookup(): void {
           // Add error to error summary
           if (selectErrorMessage?.textContent) {
             const errorText = selectErrorMessage.textContent.replace('Error:', '').trim();
-            addErrorToSummary(`${prefix}-selectedAddress-error`, errorText, `#${prefix}-selectedAddress`);
+            addErrorToSummary(
+              `${prefix}-selectedAddress-error`,
+              errorText,
+              `#${prefix}-selectedAddress`
+            );
           }
 
           // Focus on the error summary (GOV.UK pattern)

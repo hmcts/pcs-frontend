@@ -17,11 +17,7 @@ export async function doAnyOtherAdultsLiveInYourHomeErrorValidation(): Promise<v
     header: doAnyOtherAdultsLiveInYourHome.thereIsAProblemErrorMessageHeader,
     message: doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsErrorMessage,
   });
-  await performAction(
-    'inputText',
-    doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
-    generateRandomString(501)
-  );
+  await performAction('inputText', doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel, generateRandomString(501));
 
   await performAction('When the user clicks the button', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
   await performValidation('errorMessage', {
@@ -30,11 +26,7 @@ export async function doAnyOtherAdultsLiveInYourHomeErrorValidation(): Promise<v
   });
 
   //enter emoji
-  await performAction(
-    'inputText',
-    doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel,
-    doAnyOtherAdultsLiveInYourHome.emojiTextInput
-  );
+  await performAction('inputText', doAnyOtherAdultsLiveInYourHome.giveDetailsAboutOtherAdultsHiddenTextLabel, doAnyOtherAdultsLiveInYourHome.emojiTextInput);
 
   await performAction('When the user clicks the button', doAnyOtherAdultsLiveInYourHome.saveAndContinueButton);
   await performValidation('errorMessage', {

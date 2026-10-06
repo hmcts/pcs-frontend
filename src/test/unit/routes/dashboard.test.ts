@@ -115,7 +115,8 @@ jest.mock('@services/ccdCaseService', () => ({
 const mockIsRespondToClaimEnabledForUser = jest.fn().mockResolvedValue(true);
 
 jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
-  isRespondToClaimEnabledForUser: (...args: unknown[]) => mockIsRespondToClaimEnabledForUser(...args),
+  isRespondToClaimEnabledForUser: (...args: unknown[]) =>
+    mockIsRespondToClaimEnabledForUser(...args),
 }));
 
 describe('Dashboard Routes', () => {
@@ -194,7 +195,10 @@ describe('Dashboard Routes', () => {
         next
       );
 
-      expect(ccdCaseService.getDashboardView).toHaveBeenCalledWith('access-token-1', '1234567890123456');
+      expect(ccdCaseService.getDashboardView).toHaveBeenCalledWith(
+        'access-token-1',
+        '1234567890123456'
+      );
       expect(next).not.toHaveBeenCalled();
 
       expect(res.render).toHaveBeenCalledWith(
@@ -275,7 +279,9 @@ describe('Dashboard Routes', () => {
       };
       const [configuredTask] = renderArgs.taskGroups[0].tasks;
 
-      expect(configuredTask.href).toBe('/case/1234567890123456/upload-additional-documents/start-evidence-upload');
+      expect(configuredTask.href).toBe(
+        '/case/1234567890123456/upload-additional-documents/start-evidence-upload'
+      );
     });
 
     it('should disable href for COMPLETED tasks and use configured href for AVAILABLE view-response', async () => {
@@ -440,7 +446,9 @@ describe('Dashboard Routes', () => {
         next
       );
 
-      expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Invalid case reference format' }));
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Invalid case reference format' })
+      );
       expect(ccdCaseService.getDashboardView).not.toHaveBeenCalled();
     });
 
@@ -458,7 +466,9 @@ describe('Dashboard Routes', () => {
         next
       );
 
-      expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Authentication required' }));
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Authentication required' })
+      );
       expect(ccdCaseService.getDashboardView).not.toHaveBeenCalled();
     });
 

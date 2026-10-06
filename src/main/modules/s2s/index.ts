@@ -85,7 +85,12 @@ export class S2S {
         serviceToken = await response.text();
 
         // Store token in Redis with expiry
-        await serviceConfig.redisClient.set(serviceConfig.key, serviceToken, 'EX', serviceConfig.ttl);
+        await serviceConfig.redisClient.set(
+          serviceConfig.key,
+          serviceToken,
+          'EX',
+          serviceConfig.ttl
+        );
         // Publish token update to all instances
         await this.publishTokenUpdate(serviceConfig.redisClient, serviceToken);
       }

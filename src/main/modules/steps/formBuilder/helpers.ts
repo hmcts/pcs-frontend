@@ -22,7 +22,11 @@ export function getTranslation(
 ): string | undefined {
   const options = { returnObjects: true, returnEmptyString: true, ...interpolation };
   const result = t(key, options) as unknown;
-  if (typeof result === 'string' && result !== key && !result.includes('returned an object instead of string')) {
+  if (
+    typeof result === 'string' &&
+    result !== key &&
+    !result.includes('returned an object instead of string')
+  ) {
     return result;
   }
   return fallback;
@@ -43,7 +47,12 @@ export function normalizeCheckboxValue(value: unknown): string[] {
   if (Array.isArray(value)) {
     // Handle edge case: array containing object(s) with numeric keys
     // e.g., [{ '0': 'value1', '1': 'value2' }] or [{ '0': 'value1' }, { '0': 'value2' }]
-    if (value.length > 0 && typeof value[0] === 'object' && value[0] !== null && !Array.isArray(value[0])) {
+    if (
+      value.length > 0 &&
+      typeof value[0] === 'object' &&
+      value[0] !== null &&
+      !Array.isArray(value[0])
+    ) {
       const extractedValues: string[] = [];
       for (const item of value) {
         if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
@@ -118,7 +127,9 @@ export function getTranslationErrors(
 
   for (const field of fields) {
     // Get the nested field name if this is a subField
-    const fieldName = parentFieldName ? getNestedFieldName(parentFieldName, field.name) : field.name;
+    const fieldName = parentFieldName
+      ? getNestedFieldName(parentFieldName, field.name)
+      : field.name;
 
     // For subFields, prioritize field.errorMessage (which is usually 'errors.subFieldName')
     // For top-level fields, check both the nested name and errorMessage property
@@ -147,8 +158,14 @@ export function getTranslationErrors(
       }
 
       // Also check the errorMessage property if set
-      if (field.errorMessage && typeof field.errorMessage === 'string' && field.errorMessage.startsWith('errors.')) {
-        const errorMsgFromProperty = interpolation ? t(field.errorMessage, interpolation) : t(field.errorMessage);
+      if (
+        field.errorMessage &&
+        typeof field.errorMessage === 'string' &&
+        field.errorMessage.startsWith('errors.')
+      ) {
+        const errorMsgFromProperty = interpolation
+          ? t(field.errorMessage, interpolation)
+          : t(field.errorMessage);
         if (errorMsgFromProperty && errorMsgFromProperty !== field.errorMessage) {
           translationErrors[field.name] = errorMsgFromProperty;
         }
@@ -162,7 +179,12 @@ export function getTranslationErrors(
           // Recursively collect error translations from subFields
           // Pass the current fieldName (which may already be nested) as the parent
           // But we need to use the simple field.name for the parent, not fieldName
-          const subFieldErrors = getTranslationErrors(t, Object.values(option.subFields), field.name, interpolation);
+          const subFieldErrors = getTranslationErrors(
+            t,
+            Object.values(option.subFields),
+            field.name,
+            interpolation
+          );
           Object.assign(translationErrors, subFieldErrors);
         }
       }
@@ -172,11 +194,19 @@ export function getTranslationErrors(
   return translationErrors;
 }
 
-export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig[]): Record<string, string> {
+export function getCustomErrorTranslations(
+  t: TFunction,
+  fields: FormFieldConfig[]
+): Record<string, string> {
   const stepSpecificErrors: Record<string, string> = {};
 
   const nestedKeys = ['required', 'custom', 'missingOne', 'missingTwo', 'futureDate'];
-  const commonErrorKeys = ['defaultRequired', 'defaultInvalid', 'defaultMaxLength', 'defaultSpecialCharacter'];
+  const commonErrorKeys = [
+    'defaultRequired',
+    'defaultInvalid',
+    'defaultMaxLength',
+    'defaultSpecialCharacter',
+  ];
 
   for (const key of commonErrorKeys) {
     const errorKey = `errors.${key}`;
@@ -237,7 +267,9 @@ export function getCustomErrorTranslations(t: TFunction, fields: FormFieldConfig
         }
 
         for (const subField of Object.values(option.subFields)) {
-          const nestedName = subField.name.includes('.') ? subField.name : `${field.name}.${subField.name}`;
+          const nestedName = subField.name.includes('.')
+            ? subField.name
+            : `${field.name}.${subField.name}`;
           visitField({ ...subField, name: nestedName });
         }
       }
@@ -277,7 +309,10 @@ export function getFormDataScope(req: Request): FormDataScope {
   };
 }
 
-export const getAllFormData = (req: Request, scope = getFormDataScope(req)): Record<string, StepFormData> => {
+export const getAllFormData = (
+  req: Request,
+  scope = getFormDataScope(req)
+): Record<string, StepFormData> => {
   return req.session?.formData?.[scope.journey]?.[scope.caseReference] ?? {};
 };
 
@@ -308,13 +343,18 @@ export function validateForm(
 
   // Merge allFormData if provided, otherwise get from session
   const mergedAllData: Record<string, unknown> =
-    allFormData || Object.values(getAllFormData(req)).reduce((acc, stepData) => ({ ...acc, ...stepData }), {});
+    allFormData ||
+    Object.values(getAllFormData(req)).reduce((acc, stepData) => ({ ...acc, ...stepData }), {});
 
   // Merge current form data into all data for validation context
   const validationAllData = { ...mergedAllData, ...formData };
 
   // Helper function to validate a single field (including nested subFields)
-  const validateField = (field: FormFieldConfig, parentFieldName?: string, parentOptionValue?: string): void => {
+  const validateField = (
+    field: FormFieldConfig,
+    parentFieldName?: string,
+    parentOptionValue?: string
+  ): void => {
     // Check if field should be validated (is visible)
     // For nested fields, check if parent option is selected
     if (parentFieldName && parentOptionValue) {
@@ -344,7 +384,9 @@ export function validateForm(
     }
 
     // Get field value - handle nested field names
-    const fieldName = parentFieldName ? getNestedFieldName(parentFieldName, field.name) : field.name;
+    const fieldName = parentFieldName
+      ? getNestedFieldName(parentFieldName, field.name)
+      : field.name;
     let value: unknown;
 
     if (parentFieldName) {
@@ -438,8 +480,13 @@ export function validateForm(
 
       const isMissing =
         field.type === 'checkbox'
-          ? !value || (Array.isArray(value) && value.length === 0) || (typeof value === 'string' && !value.trim())
-          : value === undefined || value === null || value === '' || (typeof value === 'string' && !value.trim());
+          ? !value ||
+            (Array.isArray(value) && value.length === 0) ||
+            (typeof value === 'string' && !value.trim())
+          : value === undefined ||
+            value === null ||
+            value === '' ||
+            (typeof value === 'string' && !value.trim());
 
       if (isRequired && isMissing) {
         // Check translations first (which contains translated errorMessage), then field.errorMessage, then defaults
@@ -462,7 +509,9 @@ export function validateForm(
 
             // Use translation function if available, else translations map, else fallback
             if (typeof validatorResult === 'string') {
-              errorMsg = t ? t(validatorResult) : translations?.[validatorResult] || validatorResult;
+              errorMsg = t
+                ? t(validatorResult)
+                : translations?.[validatorResult] || validatorResult;
             } else {
               errorMsg = 'Invalid value';
             }
@@ -494,7 +543,10 @@ export function validateForm(
             if (!errors[fieldName]) {
               // Use translated error message if available, then field.errorMessage, then default
               errors[fieldName] =
-                translations?.[fieldName] || field.errorMessage || translations?.defaultInvalid || 'Invalid format';
+                translations?.[fieldName] ||
+                field.errorMessage ||
+                translations?.defaultInvalid ||
+                'Invalid format';
             }
           }
         }
@@ -503,9 +555,14 @@ export function validateForm(
         if (field.maxLength && typeof value === 'string' && value.length > field.maxLength) {
           if (!errors[fieldName]) {
             const fieldSpecificMaxLengthMsg = translations?.[`${fieldName}.maxLength`];
-            const defaultMaxLengthMsg = translations?.defaultMaxLength?.replace('{max}', field.maxLength.toString());
+            const defaultMaxLengthMsg = translations?.defaultMaxLength?.replace(
+              '{max}',
+              field.maxLength.toString()
+            );
             errors[fieldName] =
-              fieldSpecificMaxLengthMsg || defaultMaxLengthMsg || `Must be ${field.maxLength} characters or less`;
+              fieldSpecificMaxLengthMsg ||
+              defaultMaxLengthMsg ||
+              `Must be ${field.maxLength} characters or less`;
           }
         }
 
@@ -515,15 +572,22 @@ export function validateForm(
         };
 
         //emoji validation
-        if (field.type === 'character-count' || field.type === 'text' || (field.type === 'textarea' && value)) {
+        if (
+          field.type === 'character-count' ||
+          field.type === 'text' ||
+          (field.type === 'textarea' && value)
+        ) {
           const text = (value as string)?.trim();
           const allowedCharsRegex = /^[^\p{Emoji_Presentation}\p{Extended_Pictographic}]+$/u;
 
           if (!allowedCharsRegex.test(text)) {
             if (!errors[fieldName]) {
               const translationLabelKey =
-                typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
-              const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
+                typeof field.translationKey === 'object'
+                  ? field.translationKey.label
+                  : field.translationKey;
+              const resolvedLabel =
+                translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
               const displayName = resolvedLabel ?? toSentenceCase(fieldName);
               const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace(
                 '{fieldName}',
@@ -584,7 +648,11 @@ export function validateForm(
       }
 
       for (const option of field.options) {
-        if (option.subFields && option.value && isOptionSelected(fieldValue, option.value, field.type)) {
+        if (
+          option.subFields &&
+          option.value &&
+          isOptionSelected(fieldValue, option.value, field.type)
+        ) {
           // Validate each subField recursively
           for (const [subFieldName, subField] of Object.entries(option.subFields)) {
             // Set the name on the subField if not already set

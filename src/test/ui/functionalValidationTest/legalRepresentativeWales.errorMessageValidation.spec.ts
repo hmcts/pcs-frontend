@@ -42,11 +42,7 @@ import {
 import { user } from '../data/user-data';
 import { exemptLandLordErrorValidation } from '../functional/legalRepresentative-functional';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
-import {
-  assertAllErrorMessageValidations,
-  clearErrorMessageValidationFailures,
-  softErrorMessageValidation,
-} from '../utils/common/error-message-validation-helper';
+import { assertAllErrorMessageValidations, clearErrorMessageValidationFailures, softErrorMessageValidation } from '../utils/common/error-message-validation-helper';
 import { RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction } from '../utils/controller';

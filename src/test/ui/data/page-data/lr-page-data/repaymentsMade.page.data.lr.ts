@@ -13,8 +13,7 @@ export const repaymentsMade = {
   tooManyCharacterHiddenHintText: `You have 1 character too many`,
   youHave500CharactersHiddenHintText: `You have 500 characters remaining`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  getSelectIfYouPaidAnyMoneyErrorMessage: (claimantName: string): string =>
-    `Select if the defendant paid any money to ${claimantName} since 20th May 2025?`,
+  getSelectIfYouPaidAnyMoneyErrorMessage: (claimantName: string): string => `Select if the defendant paid any money to ${claimantName} since 20th May 2025?`,
   giveDetailsAboutHowMuchYouPaidErrorMessage: `Give details about how much the defendant paid and when`,
   mustBeUnderCharacterLimitErrorMessage: `Payment details must be 500 characters or less`,
   emojiTextInput: `👉 😄`,

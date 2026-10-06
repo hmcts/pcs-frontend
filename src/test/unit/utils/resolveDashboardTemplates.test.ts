@@ -4,7 +4,9 @@ import { lookup, resolveNotification, resolveTask } from '@utils/resolveDashboar
 
 const MISSING = '__MISSING_TRANSLATION__';
 
-function createT(map: Record<string, string | ((opts: Record<string, unknown>) => string)>): TFunction {
+function createT(
+  map: Record<string, string | ((opts: Record<string, unknown>) => string)>
+): TFunction {
   return ((key: string, opts?: Record<string, unknown> & { defaultValue?: string }) => {
     const entry = map[key];
     if (typeof entry === 'function') {
@@ -59,7 +61,8 @@ describe('resolveDashboardTemplates', () => {
     it('merges caseReference into values passed to body lookup', () => {
       const t = createT({
         'dashboard:notifications.Defendant.Foo.title': 'Title',
-        'dashboard:notifications.Defendant.Foo.body': opts => `Case ref in body: ${String(opts.caseReference)}`,
+        'dashboard:notifications.Defendant.Foo.body': opts =>
+          `Case ref in body: ${String(opts.caseReference)}`,
       });
 
       expect(resolveNotification(t, 'Defendant.Foo', { extra: 'x' }, '999')).toEqual({
@@ -79,7 +82,9 @@ describe('resolveDashboardTemplates', () => {
         return MISSING;
       }) as unknown as TFunction;
 
-      expect(resolveNotification(t, 'Defendant.CounterClaimFeeUnpaid', { feeAmount: '404.00' }, '1234')).toEqual({
+      expect(
+        resolveNotification(t, 'Defendant.CounterClaimFeeUnpaid', { feeAmount: '404.00' }, '1234')
+      ).toEqual({
         title: 'Your response',
         body: 'Fee 404 link /case/1234/respond-to-claim/counter-claim-application-fee-amount?from=dashboard',
       });
@@ -87,7 +92,8 @@ describe('resolveDashboardTemplates', () => {
         'dashboard:notifications.Defendant.CounterClaimFeeUnpaid.body',
         expect.objectContaining({
           feeAmount: 404,
-          payCounterclaimFeeUrl: '/case/1234/respond-to-claim/counter-claim-application-fee-amount?from=dashboard',
+          payCounterclaimFeeUrl:
+            '/case/1234/respond-to-claim/counter-claim-application-fee-amount?from=dashboard',
         })
       );
     });

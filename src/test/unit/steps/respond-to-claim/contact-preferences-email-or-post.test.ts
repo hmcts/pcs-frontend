@@ -50,7 +50,11 @@ describe('contact-preferences-email-or-post', () => {
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const createRes = (): any => ({ redirect: jest.fn(), status: jest.fn().mockReturnThis(), send: jest.fn() });
+  const createRes = (): any => ({
+    redirect: jest.fn(),
+    status: jest.fn().mockReturnThis(),
+    send: jest.fn(),
+  });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -62,7 +66,10 @@ describe('contact-preferences-email-or-post', () => {
     mockBuildDraftDefendantResponse.mockReturnValue(response);
 
     await step.postController!.post(
-      createReq({ contactByEmailOrPost: ['email'], 'contactByEmailOrPost.email': 'new@example.com' }) as Request,
+      createReq({
+        contactByEmailOrPost: ['email'],
+        'contactByEmailOrPost.email': 'new@example.com',
+      }) as Request,
       createRes() as Response,
       jest.fn()
     );
@@ -113,7 +120,10 @@ describe('contact-preferences-email-or-post', () => {
     expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
-        defendantResponses: expect.objectContaining({ contactByEmail: 'YES', contactByPost: 'YES' }),
+        defendantResponses: expect.objectContaining({
+          contactByEmail: 'YES',
+          contactByPost: 'YES',
+        }),
         defendantContactDetails: expect.objectContaining({
           party: expect.objectContaining({ emailAddress: 'both@example.com' }),
         }),

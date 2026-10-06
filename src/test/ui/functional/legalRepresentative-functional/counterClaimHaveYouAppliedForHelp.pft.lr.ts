@@ -10,11 +10,7 @@ export async function counterClaimHaveYouAppliedForHelpErrorValidation(): Promis
 
   await performAction('clickRadioButton', counterClaimHaveYouAppliedForHelp.yesRadioOption);
 
-  await performAction(
-    'inputText',
-    counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel,
-    counterClaimHaveYouAppliedForHelp.emojiTextInput
-  );
+  await performAction('inputText', counterClaimHaveYouAppliedForHelp.enterHelpWithFeeReferenceHiddenTextLabel, counterClaimHaveYouAppliedForHelp.emojiTextInput);
   await performAction('When the user clicks the button', counterClaimHaveYouAppliedForHelp.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: counterClaimHaveYouAppliedForHelp.thereIsAProblemErrorMessageHeader,

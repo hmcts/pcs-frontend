@@ -7,7 +7,9 @@ import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/counter-claim-payment-successful';
 
 type CounterClaimPaymentSuccessfulStep = {
-  extendGetContent: (req: { session?: { payment?: { paymentReference?: string } } }) => Record<string, unknown>;
+  extendGetContent: (req: {
+    session?: { payment?: { paymentReference?: string } };
+  }) => Record<string, unknown>;
 };
 
 describe('counter-claim-payment-successful step', () => {

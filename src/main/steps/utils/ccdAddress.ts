@@ -13,7 +13,8 @@ export interface AddressFormParts {
 export function buildCcdAddressFromFormParts(parts: AddressFormParts): CcdCaseAddress {
   return {
     AddressLine1: parts.addressLine1,
-    ...(parts.addressLine2 !== undefined && parts.addressLine2 !== '' && { AddressLine2: parts.addressLine2 }),
+    ...(parts.addressLine2 !== undefined &&
+      parts.addressLine2 !== '' && { AddressLine2: parts.addressLine2 }),
     PostTown: parts.townOrCity,
     ...(parts.county !== undefined && parts.county !== '' && { County: parts.county }),
     PostCode: parts.postcode,

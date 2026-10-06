@@ -36,7 +36,9 @@ describe('moneyAmountTransforms', () => {
 
     it('returns undefined for non-pence string shapes and logs a warning', () => {
       expect(ccdPenceToPoundsString('148.50')).toBeUndefined();
-      expect(mockWarn).toHaveBeenCalledWith('Unexpected money value [ccdPenceToPoundsString:string]: "148.50"');
+      expect(mockWarn).toHaveBeenCalledWith(
+        'Unexpected money value [ccdPenceToPoundsString:string]: "148.50"'
+      );
       mockWarn.mockClear();
       expect(ccdPenceToPoundsString('')).toBeUndefined();
       expect(mockWarn).not.toHaveBeenCalled();

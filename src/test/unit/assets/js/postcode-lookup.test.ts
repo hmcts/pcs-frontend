@@ -80,8 +80,12 @@ describe('initPostcodeLookup', () => {
 
     it('hides error messages on initialization', () => {
       document.body.innerHTML = buildComponent();
-      const lookupError = document.getElementById('address-lookup-postcode-error') as HTMLParagraphElement;
-      const postcodeError = document.getElementById('address-postcode-error') as HTMLParagraphElement;
+      const lookupError = document.getElementById(
+        'address-lookup-postcode-error'
+      ) as HTMLParagraphElement;
+      const postcodeError = document.getElementById(
+        'address-postcode-error'
+      ) as HTMLParagraphElement;
 
       // Make errors visible before init
       lookupError.classList.remove('govuk-!-display-none');
@@ -143,8 +147,12 @@ describe('initPostcodeLookup', () => {
       const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
       const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
       const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
-      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+      const selectContainer = document.getElementById(
+        'address-addressSelectContainer'
+      ) as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById(
+        'address-addressesFoundFlag'
+      ) as HTMLInputElement;
 
       const focusSpy = jest.spyOn(select, 'focus');
 
@@ -154,7 +162,9 @@ describe('initPostcodeLookup', () => {
       await flushPromises();
 
       expect(global.fetch).toHaveBeenCalledTimes(1);
-      expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe('/api/postcode-lookup?postcode=SW1A%202AA');
+      expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe(
+        '/api/postcode-lookup?postcode=SW1A%202AA'
+      );
       expect((global.fetch as jest.Mock).mock.calls[0][1]).toMatchObject({
         headers: { Accept: 'application/json' },
         credentials: 'same-origin',
@@ -198,7 +208,9 @@ describe('initPostcodeLookup', () => {
       const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
       const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
       const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+      const addressesFoundFlag = document.getElementById(
+        'address-addressesFoundFlag'
+      ) as HTMLInputElement;
 
       input.value = 'SW1A 2AA';
       button.click();
@@ -233,7 +245,9 @@ describe('initPostcodeLookup', () => {
 
       const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
       const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
-      const enterManuallyDetails = document.getElementById('address-enterManuallyDetails') as HTMLDetailsElement;
+      const enterManuallyDetails = document.getElementById(
+        'address-enterManuallyDetails'
+      ) as HTMLDetailsElement;
 
       // Hide details initially
       enterManuallyDetails.style.display = 'none';
@@ -260,13 +274,18 @@ describe('initPostcodeLookup', () => {
       const input = document.getElementById('homeAddress-lookupPostcode') as HTMLInputElement;
       const button = document.getElementById('homeAddress-findAddressBtn') as HTMLButtonElement;
       const select = document.getElementById('homeAddress-selectedAddress') as HTMLSelectElement;
-      const selectContainer = document.getElementById('homeAddress-addressSelectContainer') as HTMLDivElement;
+      const selectContainer = document.getElementById(
+        'homeAddress-addressSelectContainer'
+      ) as HTMLDivElement;
 
       input.value = 'AB1 2CD';
       button.click();
       await flushPromises();
 
-      expect(global.fetch).toHaveBeenCalledWith('/api/postcode-lookup?postcode=AB1%202CD', expect.any(Object));
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/postcode-lookup?postcode=AB1%202CD',
+        expect.any(Object)
+      );
       expect(select.hidden).toBe(false);
       expect(selectContainer.hidden).toBe(false);
     });
@@ -281,8 +300,12 @@ describe('initPostcodeLookup', () => {
 
       const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
       const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
-      const lookupError = document.getElementById('address-lookup-postcode-error') as HTMLParagraphElement;
-      const postcodeFormGroup = document.getElementById('address-postcode-form-group') as HTMLDivElement;
+      const lookupError = document.getElementById(
+        'address-lookup-postcode-error'
+      ) as HTMLParagraphElement;
+      const postcodeFormGroup = document.getElementById(
+        'address-postcode-form-group'
+      ) as HTMLDivElement;
 
       input.value = '';
       button.click();
@@ -304,7 +327,9 @@ describe('initPostcodeLookup', () => {
 
       const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
       const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
-      const lookupError = document.getElementById('address-lookup-postcode-error') as HTMLParagraphElement;
+      const lookupError = document.getElementById(
+        'address-lookup-postcode-error'
+      ) as HTMLParagraphElement;
 
       input.value = '   ';
       button.click();
@@ -323,7 +348,9 @@ describe('initPostcodeLookup', () => {
 
       const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
       const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
-      const lookupError = document.getElementById('address-lookup-postcode-error') as HTMLParagraphElement;
+      const lookupError = document.getElementById(
+        'address-lookup-postcode-error'
+      ) as HTMLParagraphElement;
 
       // Trigger blank field error first
       input.value = '';
@@ -365,8 +392,12 @@ describe('initPostcodeLookup', () => {
 
       const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
       const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
-      const lookupError = document.getElementById('address-lookup-postcode-error') as HTMLParagraphElement;
-      const postcodeFormGroup = document.getElementById('address-postcode-form-group') as HTMLDivElement;
+      const lookupError = document.getElementById(
+        'address-lookup-postcode-error'
+      ) as HTMLParagraphElement;
+      const postcodeFormGroup = document.getElementById(
+        'address-postcode-form-group'
+      ) as HTMLDivElement;
 
       // Trigger blank field error first
       input.value = '';
@@ -403,10 +434,18 @@ describe('initPostcodeLookup', () => {
       const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
       const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
       const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
-      const postcodeError = document.getElementById('address-postcode-error') as HTMLParagraphElement;
-      const enterManuallyDetails = document.getElementById('address-enterManuallyDetails') as HTMLDetailsElement;
-      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+      const selectContainer = document.getElementById(
+        'address-addressSelectContainer'
+      ) as HTMLDivElement;
+      const postcodeError = document.getElementById(
+        'address-postcode-error'
+      ) as HTMLParagraphElement;
+      const enterManuallyDetails = document.getElementById(
+        'address-enterManuallyDetails'
+      ) as HTMLDetailsElement;
+      const addressesFoundFlag = document.getElementById(
+        'address-addressesFoundFlag'
+      ) as HTMLInputElement;
 
       input.value = 'SW1A 1AA';
       button.click();
@@ -441,8 +480,12 @@ describe('initPostcodeLookup', () => {
       const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
       const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
       const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
-      const postcodeError = document.getElementById('address-postcode-error') as HTMLParagraphElement;
+      const selectContainer = document.getElementById(
+        'address-addressSelectContainer'
+      ) as HTMLDivElement;
+      const postcodeError = document.getElementById(
+        'address-postcode-error'
+      ) as HTMLParagraphElement;
 
       input.value = 'SW1A 1AA';
       button.click();
@@ -466,7 +509,9 @@ describe('initPostcodeLookup', () => {
 
       const input = document.getElementById('address-lookupPostcode') as HTMLInputElement;
       const button = document.getElementById('address-findAddressBtn') as HTMLButtonElement;
-      const postcodeError = document.getElementById('address-postcode-error') as HTMLParagraphElement;
+      const postcodeError = document.getElementById(
+        'address-postcode-error'
+      ) as HTMLParagraphElement;
 
       input.value = 'SW1A 1AA';
       button.click();
@@ -496,7 +541,9 @@ describe('initPostcodeLookup', () => {
       await flushPromises();
 
       expect(errorSummary.hidden).toBe(false);
-      const errorItem = errorList.querySelector('li[data-error-id="address-lookup-postcode-error"]');
+      const errorItem = errorList.querySelector(
+        'li[data-error-id="address-lookup-postcode-error"]'
+      );
       expect(errorItem).toBeTruthy();
       expect(errorItem?.textContent).toContain('Enter a postcode');
       const link = errorItem?.querySelector('a');
@@ -649,7 +696,9 @@ describe('initPostcodeLookup', () => {
       button.click();
       await flushPromises();
 
-      const errorItems = errorList.querySelectorAll('li[data-error-id="address-lookup-postcode-error"]');
+      const errorItems = errorList.querySelectorAll(
+        'li[data-error-id="address-lookup-postcode-error"]'
+      );
       expect(errorItems).toHaveLength(1);
     });
 
@@ -679,7 +728,9 @@ describe('initPostcodeLookup', () => {
       initPostcodeLookup();
 
       const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-      const enterManuallyDetails = document.getElementById('address-enterManuallyDetails') as HTMLDetailsElement;
+      const enterManuallyDetails = document.getElementById(
+        'address-enterManuallyDetails'
+      ) as HTMLDetailsElement;
       const line1 = document.getElementById('address-addressLine1') as HTMLInputElement;
       const line1FocusSpy = jest.spyOn(line1, 'focus');
 
@@ -702,10 +753,18 @@ describe('initPostcodeLookup', () => {
       select.dispatchEvent(new Event('change', { bubbles: true }));
 
       expect(line1.value).toBe('1 Main St');
-      expect((document.getElementById('address-addressLine2') as HTMLInputElement).value).toBe('Area');
-      expect((document.getElementById('address-town') as HTMLInputElement).value).toBe('Townsville');
-      expect((document.getElementById('address-county') as HTMLInputElement).value).toBe('Countyshire');
-      expect((document.getElementById('address-postcode') as HTMLInputElement).value).toBe('AB1 2CD');
+      expect((document.getElementById('address-addressLine2') as HTMLInputElement).value).toBe(
+        'Area'
+      );
+      expect((document.getElementById('address-town') as HTMLInputElement).value).toBe(
+        'Townsville'
+      );
+      expect((document.getElementById('address-county') as HTMLInputElement).value).toBe(
+        'Countyshire'
+      );
+      expect((document.getElementById('address-postcode') as HTMLInputElement).value).toBe(
+        'AB1 2CD'
+      );
       expect(enterManuallyDetails.open).toBe(true);
       expect(line1FocusSpy).toHaveBeenCalled();
     });
@@ -753,8 +812,12 @@ describe('initPostcodeLookup', () => {
       initPostcodeLookup();
 
       const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-      const selectError = document.getElementById('address-selectedAddress-error') as HTMLParagraphElement;
-      const selectFormGroup = document.getElementById('address-selectedAddress-form-group') as HTMLDivElement;
+      const selectError = document.getElementById(
+        'address-selectedAddress-error'
+      ) as HTMLParagraphElement;
+      const selectFormGroup = document.getElementById(
+        'address-selectedAddress-form-group'
+      ) as HTMLDivElement;
 
       // Manually add error state
       selectError.classList.remove('govuk-!-display-none');
@@ -808,7 +871,9 @@ describe('initPostcodeLookup', () => {
       select.selectedIndex = 0;
       select.dispatchEvent(new Event('change', { bubbles: true }));
 
-      const errorItem = errorList.querySelector('li[data-error-id="address-selectedAddress-error"]');
+      const errorItem = errorList.querySelector(
+        'li[data-error-id="address-selectedAddress-error"]'
+      );
       expect(errorItem).toBeNull();
     });
   });
@@ -828,17 +893,26 @@ describe('initPostcodeLookup', () => {
 
       const form = document.getElementById('testForm') as HTMLFormElement;
       const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
-      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
-      const selectError = document.getElementById('address-selectedAddress-error') as HTMLParagraphElement;
-      const selectFormGroup = document.getElementById('address-selectedAddress-form-group') as HTMLDivElement;
+      const selectContainer = document.getElementById(
+        'address-addressSelectContainer'
+      ) as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById(
+        'address-addressesFoundFlag'
+      ) as HTMLInputElement;
+      const selectError = document.getElementById(
+        'address-selectedAddress-error'
+      ) as HTMLParagraphElement;
+      const selectFormGroup = document.getElementById(
+        'address-selectedAddress-form-group'
+      ) as HTMLDivElement;
       const errorSummary = document.querySelector('.govuk-error-summary') as HTMLDivElement;
 
       // Simulate addresses found scenario
       addressesFoundFlag.value = 'true';
       selectContainer.hidden = false;
       select.hidden = false;
-      select.innerHTML = '<option value="">2 addresses found</option><option value="0">Address 1</option>';
+      select.innerHTML =
+        '<option value="">2 addresses found</option><option value="0">Address 1</option>';
 
       const preventDefaultSpy = jest.fn();
       const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
@@ -853,7 +927,9 @@ describe('initPostcodeLookup', () => {
       expect(errorSummary.hidden).toBe(false);
 
       const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
-      const errorItem = errorList.querySelector('li[data-error-id="address-selectedAddress-error"]');
+      const errorItem = errorList.querySelector(
+        'li[data-error-id="address-selectedAddress-error"]'
+      );
       expect(errorItem).toBeTruthy();
     });
 
@@ -870,14 +946,19 @@ describe('initPostcodeLookup', () => {
 
       const form = document.getElementById('testForm') as HTMLFormElement;
       const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
-      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+      const selectContainer = document.getElementById(
+        'address-addressSelectContainer'
+      ) as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById(
+        'address-addressesFoundFlag'
+      ) as HTMLInputElement;
 
       // Simulate addresses found and one selected
       addressesFoundFlag.value = 'true';
       selectContainer.hidden = false;
       select.hidden = false;
-      select.innerHTML = '<option value="">2 addresses found</option><option value="0">Address 1</option>';
+      select.innerHTML =
+        '<option value="">2 addresses found</option><option value="0">Address 1</option>';
       select.selectedIndex = 1;
 
       const preventDefaultSpy = jest.fn();
@@ -902,8 +983,12 @@ describe('initPostcodeLookup', () => {
 
       const form = document.getElementById('testForm') as HTMLFormElement;
       const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
-      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+      const selectContainer = document.getElementById(
+        'address-addressSelectContainer'
+      ) as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById(
+        'address-addressesFoundFlag'
+      ) as HTMLInputElement;
 
       // Simulate no addresses found scenario
       addressesFoundFlag.value = 'false';
@@ -932,8 +1017,12 @@ describe('initPostcodeLookup', () => {
       initPostcodeLookup();
 
       const form = document.getElementById('testForm') as HTMLFormElement;
-      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
-      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+      const selectContainer = document.getElementById(
+        'address-addressSelectContainer'
+      ) as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById(
+        'address-addressesFoundFlag'
+      ) as HTMLInputElement;
 
       // Dropdown hidden (no lookup performed yet)
       addressesFoundFlag.value = '';
@@ -965,21 +1054,27 @@ describe('initPostcodeLookup', () => {
 
       // Set up home address (found, not selected)
       const homeSelect = document.getElementById('home-selectedAddress') as HTMLSelectElement;
-      const homeSelectContainer = document.getElementById('home-addressSelectContainer') as HTMLDivElement;
+      const homeSelectContainer = document.getElementById(
+        'home-addressSelectContainer'
+      ) as HTMLDivElement;
       const homeFlag = document.getElementById('home-addressesFoundFlag') as HTMLInputElement;
       homeFlag.value = 'true';
       homeSelectContainer.hidden = false;
       homeSelect.hidden = false;
-      homeSelect.innerHTML = '<option value="">2 addresses found</option><option value="0">Address 1</option>';
+      homeSelect.innerHTML =
+        '<option value="">2 addresses found</option><option value="0">Address 1</option>';
 
       // Set up work address (found, not selected)
       const workSelect = document.getElementById('work-selectedAddress') as HTMLSelectElement;
-      const workSelectContainer = document.getElementById('work-addressSelectContainer') as HTMLDivElement;
+      const workSelectContainer = document.getElementById(
+        'work-addressSelectContainer'
+      ) as HTMLDivElement;
       const workFlag = document.getElementById('work-addressesFoundFlag') as HTMLInputElement;
       workFlag.value = 'true';
       workSelectContainer.hidden = false;
       workSelect.hidden = false;
-      workSelect.innerHTML = '<option value="">1 address found</option><option value="0">Work Address</option>';
+      workSelect.innerHTML =
+        '<option value="">1 address found</option><option value="0">Work Address</option>';
 
       const preventDefaultSpy = jest.fn();
       const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
@@ -992,7 +1087,9 @@ describe('initPostcodeLookup', () => {
       // Note: The implementation returns after the first validation error,
       // so only the first error is added to the summary
       const errorList = document.querySelector('.govuk-error-summary__list') as HTMLUListElement;
-      expect(errorList.querySelector('li[data-error-id="home-selectedAddress-error"]')).toBeTruthy();
+      expect(
+        errorList.querySelector('li[data-error-id="home-selectedAddress-error"]')
+      ).toBeTruthy();
     });
 
     it('focuses and scrolls to error summary on validation failure', () => {
@@ -1009,14 +1106,19 @@ describe('initPostcodeLookup', () => {
 
       const form = document.getElementById('testForm') as HTMLFormElement;
       const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
-      const selectContainer = document.getElementById('address-addressSelectContainer') as HTMLDivElement;
-      const addressesFoundFlag = document.getElementById('address-addressesFoundFlag') as HTMLInputElement;
+      const selectContainer = document.getElementById(
+        'address-addressSelectContainer'
+      ) as HTMLDivElement;
+      const addressesFoundFlag = document.getElementById(
+        'address-addressesFoundFlag'
+      ) as HTMLInputElement;
       const errorSummary = document.querySelector('.govuk-error-summary') as HTMLDivElement;
 
       addressesFoundFlag.value = 'true';
       selectContainer.hidden = false;
       select.hidden = false;
-      select.innerHTML = '<option value="">2 addresses found</option><option value="0">Address 1</option>';
+      select.innerHTML =
+        '<option value="">2 addresses found</option><option value="0">Address 1</option>';
 
       const focusSpy = jest.spyOn(errorSummary, 'focus');
       const scrollSpy = jest.spyOn(errorSummary, 'scrollIntoView');
@@ -1050,7 +1152,10 @@ describe('initPostcodeLookup', () => {
       homeButton.click();
       await flushPromises();
 
-      expect(global.fetch).toHaveBeenCalledWith('/api/postcode-lookup?postcode=SW1A%202AA', expect.any(Object));
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/postcode-lookup?postcode=SW1A%202AA',
+        expect.any(Object)
+      );
       expect(homeSelect.hidden).toBe(false);
 
       const workInput = document.getElementById('work-lookupPostcode') as HTMLInputElement;
@@ -1061,12 +1166,16 @@ describe('initPostcodeLookup', () => {
       workButton.click();
       await flushPromises();
 
-      expect(global.fetch).toHaveBeenCalledWith('/api/postcode-lookup?postcode=AB1%202CD', expect.any(Object));
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/postcode-lookup?postcode=AB1%202CD',
+        expect.any(Object)
+      );
       expect(workSelect.hidden).toBe(false);
     });
 
     it('handles click events on non-matching elements', () => {
-      document.body.innerHTML = buildComponent('home') + '<button id="other-button">Other Button</button>';
+      document.body.innerHTML =
+        buildComponent('home') + '<button id="other-button">Other Button</button>';
 
       setFetch(jest.fn());
       initPostcodeLookup();
@@ -1108,7 +1217,9 @@ describe('initPostcodeLookup', () => {
       initPostcodeLookup();
 
       const homeInput = document.getElementById('home-lookupPostcode') as HTMLInputElement;
-      const homeError = document.getElementById('home-lookup-postcode-error') as HTMLParagraphElement;
+      const homeError = document.getElementById(
+        'home-lookup-postcode-error'
+      ) as HTMLParagraphElement;
 
       // Show error first
       homeError.classList.remove('govuk-!-display-none');
@@ -1164,7 +1275,8 @@ describe('initPostcodeLookup', () => {
     });
 
     it('handles change events on non-matching elements', () => {
-      document.body.innerHTML = buildComponent('home') + '<select id="other-select"><option>Other</option></select>';
+      document.body.innerHTML =
+        buildComponent('home') + '<select id="other-select"><option>Other</option></select>';
 
       initPostcodeLookup();
 
@@ -1176,7 +1288,8 @@ describe('initPostcodeLookup', () => {
 
     it('handles change event with missing container', () => {
       document.body.innerHTML =
-        buildComponent('home') + '<select id="orphan-selectedAddress"><option>Orphan</option></select>';
+        buildComponent('home') +
+        '<select id="orphan-selectedAddress"><option>Orphan</option></select>';
 
       initPostcodeLookup();
 

@@ -1,4 +1,7 @@
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -6,7 +9,8 @@ import type { CaseData, YesNoValue } from '@services/ccdCase.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'other-considerations',
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.otherConsiderations),
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.otherConsiderations),
   stepDir: __dirname,
   customTemplate: `${__dirname}/otherConsiderations.njk`,
   translationKeys: {
@@ -20,7 +24,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     if (otherConsiderations === 'YES') {
       response.defendantResponses.otherConsiderations = 'YES';
-      const details = req.body?.['otherConsiderations.otherConsiderationsDetails'] as string | undefined;
+      const details = req.body?.['otherConsiderations.otherConsiderationsDetails'] as
+        string | undefined;
       if (details) {
         response.defendantResponses.otherConsiderationsDetails = details;
       } else {

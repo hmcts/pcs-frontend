@@ -1,7 +1,10 @@
 import config from 'config';
 import type { Request, Response } from 'express';
 
-import { getCaseManagementUrl, redirectToCaseManagement } from '@utils/legalRepresentativeRedirectHandler';
+import {
+  getCaseManagementUrl,
+  redirectToCaseManagement,
+} from '@utils/legalRepresentativeRedirectHandler';
 
 jest.mock('config');
 

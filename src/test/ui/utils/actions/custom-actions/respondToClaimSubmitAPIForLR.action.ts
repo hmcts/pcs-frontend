@@ -9,9 +9,7 @@ import { IAction } from '../../interfaces';
 
 export class SubmitPossessionClaimResponseAPIAction implements IAction {
   async execute(page: Page, action: string): Promise<void> {
-    const actionsMap = new Map<string, () => Promise<void>>([
-      ['submitPossessionClaimResponseLRAPI', () => this.submitPossessionClaimResponseLRAPI()],
-    ]);
+    const actionsMap = new Map<string, () => Promise<void>>([['submitPossessionClaimResponseLRAPI', () => this.submitPossessionClaimResponseLRAPI()]]);
 
     const actionToPerform = actionsMap.get(action);
 
@@ -23,15 +21,9 @@ export class SubmitPossessionClaimResponseAPIAction implements IAction {
   }
 
   private async submitPossessionClaimResponseLRAPI(): Promise<void> {
-    const submitPossessionClaimResponseApi = Axios.create(
-      submitPossessionClaimResponseApiDataForLR.submitPossessionClaimResponseApiInstance()
-    );
+    const submitPossessionClaimResponseApi = Axios.create(submitPossessionClaimResponseApiDataForLR.submitPossessionClaimResponseApiInstance());
 
-    const startEvent = (
-      await submitPossessionClaimResponseApi.get(
-        respondPossessionClaimSolicitorEventTokenApiData.respondPossessionClaimSolicitorApiEndPoint()
-      )
-    ).data;
+    const startEvent = (await submitPossessionClaimResponseApi.get(respondPossessionClaimSolicitorEventTokenApiData.respondPossessionClaimSolicitorApiEndPoint())).data;
     const RESPONDCLAIM_EVENT_TOKEN = startEvent.token;
     // pcs-api rejects a submit whose draftVersion isn't the stored one.
     const draftVersion = startEvent.case_details?.case_data?.possessionClaimResponse?.draftVersion;
@@ -42,10 +34,7 @@ export class SubmitPossessionClaimResponseAPIAction implements IAction {
       try {
         const submitResponseLR = await submitPossessionClaimResponseApi.post(
           submitPossessionClaimResponseApiDataForLR.submitPossessionClaimResponseApiEndPoint(),
-          submitPossessionClaimResponseApiDataForLR.submitPossessionClaimResponsePayload(
-            RESPONDCLAIM_EVENT_TOKEN,
-            draftVersion
-          )
+          submitPossessionClaimResponseApiDataForLR.submitPossessionClaimResponsePayload(RESPONDCLAIM_EVENT_TOKEN, draftVersion)
         );
 
         console.log('\n✅ SUBMIT LEGAL REPRESENTATIVE RESPONSE SUCCESSFUL:');

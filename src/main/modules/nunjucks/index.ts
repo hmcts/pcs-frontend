@@ -17,7 +17,9 @@ export class Nunjucks {
     );
     const cftNunjucksRoot = path.resolve(cftNunjucksPath, '..');
 
-    const mojFrontendPath = path.dirname(require.resolve('@ministryofjustice/frontend/moj/template.njk'));
+    const mojFrontendPath = path.dirname(
+      require.resolve('@ministryofjustice/frontend/moj/template.njk')
+    );
     const mojFrontendRoot = path.resolve(mojFrontendPath, '..');
 
     app.locals.nunjucksEnv = nunjucks.configure(
@@ -46,11 +48,13 @@ export class Nunjucks {
   }
 
   private addCustomFilters(nunjucksEnv: Environment) {
-    glob.sync(path.join(path.resolve(__dirname, 'filters'), '**/*.{ts,js}')).forEach(async (filename: string) => {
-      const filter = await import(filename);
-      Object.entries(filter).forEach(([key, value]) => {
-        nunjucksEnv.addFilter(key, value as (...args: unknown[]) => unknown);
+    glob
+      .sync(path.join(path.resolve(__dirname, 'filters'), '**/*.{ts,js}'))
+      .forEach(async (filename: string) => {
+        const filter = await import(filename);
+        Object.entries(filter).forEach(([key, value]) => {
+          nunjucksEnv.addFilter(key, value as (...args: unknown[]) => unknown);
+        });
       });
-    });
   }
 }

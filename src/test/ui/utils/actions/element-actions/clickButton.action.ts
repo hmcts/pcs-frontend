@@ -33,11 +33,7 @@ export class ClickButtonAction implements IAction {
     await page.waitForLoadState();
   }
 
-  private async clickButtonAndVerifyPageNavigation(
-    page: Page,
-    button: Locator,
-    nextPageElement: string
-  ): Promise<void> {
+  private async clickButtonAndVerifyPageNavigation(page: Page, button: Locator, nextPageElement: string): Promise<void> {
     const pageElement = page.locator(`h1:has-text("${nextPageElement}")`);
     let attempt = 0;
     let nextPageElementIsVisible: boolean;

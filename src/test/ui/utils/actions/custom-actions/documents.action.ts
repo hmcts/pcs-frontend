@@ -1,10 +1,6 @@
 import { Page } from '@playwright/test';
 
-import {
-  checkYourAnswers,
-  confirmIfTheseDocumentsRelateToAnApplication,
-  uploadYourDocuments,
-} from '../../../data/page-data/documents-page-data';
+import { checkYourAnswers, confirmIfTheseDocumentsRelateToAnApplication, uploadYourDocuments } from '../../../data/page-data/documents-page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -15,10 +11,7 @@ export class DocumentsAction implements IAction {
       ['uploadDocuments', () => this.uploadDocuments(fieldName)],
       ['verifyCheckYourAnswers', () => this.verifyCheckYourAnswers(fieldName)],
       ['validateViewDocuments', () => this.validateViewDocuments(fieldName)],
-      [
-        'verifyDocumentRelatesToApplication',
-        () => this.verifyDocumentRelatesToApplication(page, fieldName as actionRecord),
-      ],
+      ['verifyDocumentRelatesToApplication', () => this.verifyDocumentRelatesToApplication(page, fieldName as actionRecord)],
     ]);
 
     const actionToPerform = actionsMap.get(action);
@@ -123,9 +116,7 @@ Actual: "${actualText}"`
     }
 
     const selectOption =
-      confirmDocumentData.option === confirmIfTheseDocumentsRelateToAnApplication.noMainClaimRadioOption
-        ? confirmDocumentData.option
-        : `${confirmDocumentData.option} ${formattedDate}`;
+      confirmDocumentData.option === confirmIfTheseDocumentsRelateToAnApplication.noMainClaimRadioOption ? confirmDocumentData.option : `${confirmDocumentData.option} ${formattedDate}`;
 
     // VERIFY option is visible on UI BEFORE clicking
     await performValidation('elementToBeVisible', { elementType: 'radio', text: selectOption });

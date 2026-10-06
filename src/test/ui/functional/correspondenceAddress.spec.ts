@@ -1,14 +1,5 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import {
-  checkYourAnswersRTC,
-  correspondenceAddress,
-  defendantDateOfBirth,
-  defendantNameConfirmation,
-  doYouHaveASolicitor,
-  freeLegalAdvice,
-  startNow,
-  taskList,
-} from '../data/page-data';
+import { checkYourAnswersRTC, correspondenceAddress, defendantDateOfBirth, defendantNameConfirmation, doYouHaveASolicitor, freeLegalAdvice, startNow, taskList } from '../data/page-data';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -90,11 +81,7 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       inputArray: correspondenceAddress.errorValidationField.errorTextField2,
       header: correspondenceAddress.errorValidationHeader,
     });
-    await performAction(
-      'inputText',
-      correspondenceAddress.enterUKPostcodeHiddenTextLabel,
-      correspondenceAddress.englandPostcodeTextInput
-    );
+    await performAction('inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, correspondenceAddress.englandPostcodeTextInput);
     // Below lines are added to by pass the bug HDPI-8779, once the bug is fixed, these lines can be removed till 99line code
     await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, '');
     await performAction('inputText', correspondenceAddress.townOrCityHiddenTextLabel, '');
@@ -107,11 +94,7 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       inputArray: correspondenceAddress.errorValidationField.errorTextField3,
       header: correspondenceAddress.errorValidationHeader,
     });
-    await performAction(
-      'inputText',
-      correspondenceAddress.enterUKPostcodeHiddenTextLabel,
-      correspondenceAddress.englandPostcodeTextInput
-    );
+    await performAction('inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, correspondenceAddress.englandPostcodeTextInput);
     await performAction('When the user clicks the button', correspondenceAddress.findAddressHiddenButton);
     await performAction('select', correspondenceAddress.addressSelectHiddenLabel, correspondenceAddress.addressIndex);
     await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, '');
@@ -124,16 +107,8 @@ test.describe('Correspondence Address - functional test @nightly', async () => {
       inputArray: correspondenceAddress.errorValidationField.errorTextField4,
       header: correspondenceAddress.errorValidationHeader,
     });
-    await performAction(
-      'inputText',
-      correspondenceAddress.addressLine1HiddenTextLabel,
-      correspondenceAddress.englandAddressLine1TextInput
-    );
-    await performAction(
-      'inputText',
-      correspondenceAddress.townOrCityHiddenTextLabel,
-      correspondenceAddress.englandTownOrCityTextInput
-    );
+    await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, correspondenceAddress.englandAddressLine1TextInput);
+    await performAction('inputText', correspondenceAddress.townOrCityHiddenTextLabel, correspondenceAddress.englandTownOrCityTextInput);
     await performAction('inputText', correspondenceAddress.postcodeHiddenTextLabel, 'ABED');
     await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
     await performAction('inputErrorValidation', {

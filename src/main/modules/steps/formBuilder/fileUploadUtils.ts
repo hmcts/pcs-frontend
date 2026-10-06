@@ -15,7 +15,9 @@ const logger = Logger.getLogger('form-builder-fileUploadUtils');
  * MOJ script. On "Save and continue" those arrive as ordinary form fields — not as `req.files`.
  * This helper decodes them so validation-error re-renders can restore the file list.
  */
-export function parseUploadedDocumentsFromBody(body: Record<string, unknown>): Record<string, unknown>[] {
+export function parseUploadedDocumentsFromBody(
+  body: Record<string, unknown>
+): Record<string, unknown>[] {
   const raw = body['uploadedDocuments[]'];
   if (raw === undefined || raw === null) {
     return [];
@@ -100,5 +102,6 @@ export async function wireFileUploadOnPostError(
   }
   const body = req.body as Record<string, unknown>;
   const parsed = parseUploadedDocumentsFromBody(body);
-  fileField.component.value = parsed.length > 0 ? parsed : toDisplayDocuments(await documentStorage.read(req));
+  fileField.component.value =
+    parsed.length > 0 ? parsed : toDisplayDocuments(await documentStorage.read(req));
 }

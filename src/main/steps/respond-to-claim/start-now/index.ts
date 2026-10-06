@@ -12,7 +12,9 @@ import { clientContextSessionClearer } from '@utils/clientContextSessionClearer'
 
 const journeyName = 'respondToClaim';
 const stepName = 'start-now';
-const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
+const stepNavigation = createStepNavigation(
+  req => getFlowConfigForJourney(journeyName, req) || flowConfig
+);
 
 export const step: StepDefinition = {
   url: `${RESPOND_TO_CLAIM_ROUTE}/start-now`,
@@ -20,18 +22,27 @@ export const step: StepDefinition = {
   view: 'respond-to-claim/start-now/startNow.njk',
   stepDir: __dirname,
   getController: () => {
-    return createGetController('respond-to-claim/start-now/startNow.njk', stepName, stepNavigation, (req: Request) => {
-      const caseId = req.res?.locals.validatedCase?.id;
-      const dashboardUrl = getDashboardUrl(caseId);
-      let backUrl = dashboardUrl;
-      if (isLegalRepresentativeUser(req) && caseId && config.has('redirects.manageCaseReturnURL')) {
-        backUrl = `${config.get<string>('redirects.manageCaseReturnURL')}/${caseId}`;
+    return createGetController(
+      'respond-to-claim/start-now/startNow.njk',
+      stepName,
+      stepNavigation,
+      (req: Request) => {
+        const caseId = req.res?.locals.validatedCase?.id;
+        const dashboardUrl = getDashboardUrl(caseId);
+        let backUrl = dashboardUrl;
+        if (
+          isLegalRepresentativeUser(req) &&
+          caseId &&
+          config.has('redirects.manageCaseReturnURL')
+        ) {
+          backUrl = `${config.get<string>('redirects.manageCaseReturnURL')}/${caseId}`;
+        }
+        return {
+          backUrl,
+          dashboardUrl,
+        };
       }
-      return {
-        backUrl,
-        dashboardUrl,
-      };
-    });
+    );
   },
   postController: {
     post: async (req: Request, res: Response) => {

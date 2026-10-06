@@ -1,8 +1,4 @@
-import {
-  checkYourAnswersGenApps,
-  haveYouAlreadyAppliedForHelpWithFees,
-  isTheCourtHearingInTheNext14Days,
-} from '../../data/page-data/genApps-page-data';
+import { checkYourAnswersGenApps, haveYouAlreadyAppliedForHelpWithFees, isTheCourtHearingInTheNext14Days } from '../../data/page-data/genApps-page-data';
 import { FieldsStore } from '../../utils/actions/custom-actions';
 import { performAction } from '../../utils/controller';
 
@@ -15,9 +11,7 @@ export async function checkYourAnswersGenAppsErrorValidation(): Promise<void> {
 
   const payOrSubmit = value === 'Yes' || value1 === 'No';
 
-  const dynamicButton = payOrSubmit
-    ? checkYourAnswersGenApps.submitHiddenButton
-    : checkYourAnswersGenApps.continueToPaymentHiddenButton;
+  const dynamicButton = payOrSubmit ? checkYourAnswersGenApps.submitHiddenButton : checkYourAnswersGenApps.continueToPaymentHiddenButton;
 
   await performAction('inputErrorValidationGenApp', {
     validationType: checkYourAnswersGenApps.errorValidationType.three,

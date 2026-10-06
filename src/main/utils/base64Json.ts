@@ -5,7 +5,9 @@ export function encodeBase64UrlJson(value: unknown): string {
 
 // Accepts base64url or legacy raw JSON.
 export function decodeBase64UrlJson(entry: string): Record<string, unknown> | null {
-  const json = /^[A-Za-z0-9_-]+$/.test(entry) ? Buffer.from(entry, 'base64url').toString('utf8') : entry;
+  const json = /^[A-Za-z0-9_-]+$/.test(entry)
+    ? Buffer.from(entry, 'base64url').toString('utf8')
+    : entry;
   try {
     const doc = JSON.parse(json);
     if (doc !== null && typeof doc === 'object' && !Array.isArray(doc)) {

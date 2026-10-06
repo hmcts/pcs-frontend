@@ -92,11 +92,7 @@ import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation }
 import { writtenTermsErrorValidation } from '../functional/writtenTerms.pft';
 import { yourCircumstancesErrorValidation } from '../functional/yourCircumstances.pft';
 import { getRelativeDate } from '../utils/common/date.utils';
-import {
-  assertAllErrorMessageValidations,
-  clearErrorMessageValidationFailures,
-  softErrorMessageValidation,
-} from '../utils/common/error-message-validation-helper';
+import { assertAllErrorMessageValidations, clearErrorMessageValidationFailures, softErrorMessageValidation } from '../utils/common/error-message-validation-helper';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -134,9 +130,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   // Assign the tenancy type & grounds in the payload
-  const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type =>
-    testInfo.title.includes(type)
-  );
+  const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type => testInfo.title.includes(type));
 
   switch (tenancyKey) {
     case 'Introductory':
@@ -309,10 +303,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
 
     await softErrorMessageValidation('When the user responds to the dispute claim interstitial', NO_EMV_READ_ONLY);
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayload.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
 
     await softErrorMessageValidation('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
     await performAction('And the user enters the tenancy or contract type details', {
@@ -329,10 +320,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
 
-    await softErrorMessageValidation(
-      'confirmation-of-notice-date-when-provided',
-      noticeDateWhenProvidedErrorValidation
-    );
+    await softErrorMessageValidation('confirmation-of-notice-date-when-provided', noticeDateWhenProvidedErrorValidation);
     await performAction('enterNoticeDateUnknown');
 
     await softErrorMessageValidation('rentArrears', rentArrearsErrorValidation);
@@ -374,18 +362,12 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
 
-    await softErrorMessageValidation(
-      'doYouWantToUploadFilesToSupportYourCounterclaim',
-      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
-    );
+    await softErrorMessageValidation('doYouWantToUploadFilesToSupportYourCounterclaim', doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation);
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
     });
 
-    await softErrorMessageValidation(
-      'uploadFilesToSupportYourCounterclaim',
-      uploadFilesToSupportYourCounterclaimErrorValidation
-    );
+    await softErrorMessageValidation('uploadFilesToSupportYourCounterclaim', uploadFilesToSupportYourCounterclaimErrorValidation);
     await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
     await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
     await performAction('And the user navigates to the task list subsection', {
@@ -433,10 +415,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
     });
 
-    await softErrorMessageValidation(
-      'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
-      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation
-    );
+    await softErrorMessageValidation('wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation);
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
     });
@@ -466,30 +445,11 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatRegularIncomeDoYouReceiveErrorValidation);
     await performAction('selectWhatRegularIncomeDoYouReceive', {
       regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-          whatRegularIncomeDoYouReceive.pensionTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
-          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
-        ],
+        [whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph, whatRegularIncomeDoYouReceive.otherBenefitsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph, whatRegularIncomeDoYouReceive.pensionTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph, whatRegularIncomeDoYouReceive.incomeFromJobsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph, whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput],
       ],
     });
     await softErrorMessageValidation('priorityDebts', priorityDebtsErrorValidation);
@@ -497,10 +457,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.noRadioOption,
     });
-    await softErrorMessageValidation(
-      'what-other-regular-expenses-do-you-have',
-      whatOtherRegularExpensesDoYouHaveErrorValidation
-    );
+    await softErrorMessageValidation('what-other-regular-expenses-do-you-have', whatOtherRegularExpensesDoYouHaveErrorValidation);
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
 
     await softErrorMessageValidation('otherConsiderations', otherConsiderationsErrorValidation);
@@ -598,10 +555,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
 
     await softErrorMessageValidation('When the user responds to the dispute claim interstitial', NO_EMV_READ_ONLY);
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect);
 
     await softErrorMessageValidation('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
     await performAction('And the user enters the tenancy or contract type details', {
@@ -622,10 +576,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
 
-    await softErrorMessageValidation(
-      'confirmation-of-notice-date-when-not-provided',
-      noticeDateWhenNotProvidedErrorValidation
-    );
+    await softErrorMessageValidation('confirmation-of-notice-date-when-not-provided', noticeDateWhenNotProvidedErrorValidation);
     await performAction('enterNoticeDateKnown');
 
     await softErrorMessageValidation('nonRentArrearsDispute', nonRentArrearsDisputeErrorValidation);
@@ -658,10 +609,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
 
-    await softErrorMessageValidation(
-      'counterClaimHaveYouAppliedForHelp',
-      counterClaimHaveYouAppliedForHelpErrorValidation
-    );
+    await softErrorMessageValidation('counterClaimHaveYouAppliedForHelp', counterClaimHaveYouAppliedForHelpErrorValidation);
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
       feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
@@ -672,10 +620,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
 
-    await softErrorMessageValidation(
-      'doYouWantToUploadFilesToSupportYourCounterclaim',
-      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
-    );
+    await softErrorMessageValidation('doYouWantToUploadFilesToSupportYourCounterclaim', doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation);
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
@@ -704,10 +649,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
     });
 
-    await softErrorMessageValidation(
-      'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
-      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation
-    );
+    await softErrorMessageValidation('wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation);
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
       ...getRelativeDate(1),
@@ -737,10 +679,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatRegularIncomeDoYouReceiveErrorValidation);
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await softErrorMessageValidation(
-      'haveYouAppliedForUniversalCredit',
-      haveYouAppliedForUniversalCreditErrorValidation
-    );
+    await softErrorMessageValidation('haveYouAppliedForUniversalCredit', haveYouAppliedForUniversalCreditErrorValidation);
     await performAction('selectUniversalCredit', {
       question: haveYouAppliedForUniversalCredit.mainHeader,
       creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
@@ -847,10 +786,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
 
     await softErrorMessageValidation('When the user responds to the dispute claim interstitial', NO_EMV_READ_ONLY);
-    await performAction(
-      'When the user responds to the dispute claim interstitial',
-      submitCaseApiData.submitCasePayload.isClaimantNameCorrect
-    );
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await softErrorMessageValidation('exemptLandLord', exemptLandLordErrorValidation);
     await performAction('exemptLandLord', exemptLandLord.yesRadioOption);
     await softErrorMessageValidation('writtenTerms', writtenTermsErrorValidation);

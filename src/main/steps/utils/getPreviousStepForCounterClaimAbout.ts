@@ -5,8 +5,8 @@ import { hasMultipleParties } from './hasMultipleParties';
 import type { YesNoValue } from '@services/ccdCase.interface';
 
 function getNeedHelpWithFees(req: Request): YesNoValue | undefined {
-  return req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim
-    ?.needHelpWithFees;
+  return req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+    ?.counterClaim?.needHelpWithFees;
 }
 
 export async function getPreviousStepForCounterClaimAbout(req: Request): Promise<string> {

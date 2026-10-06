@@ -32,7 +32,10 @@ describe('notices route', () => {
   it('should render the view-orders-and-notices template', () => {
     noticesRoute(app);
 
-    const handler = (app.get as jest.Mock).mock.calls[0][2] as (req: Request, res: Response) => void;
+    const handler = (app.get as jest.Mock).mock.calls[0][2] as (
+      req: Request,
+      res: Response
+    ) => void;
     const res = { render: jest.fn() } as unknown as Response;
 
     handler({} as Request, res);

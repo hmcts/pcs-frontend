@@ -10,8 +10,7 @@ export const respondPossessionClaimEventTokenApiData = {
     },
   }),
 
-  respondPossessionClaimApiEndPoint: (): string =>
-    `/cases/${process.env.CASE_NUMBER}/event-triggers/respondPossessionClaim?ignore-warning=false`,
+  respondPossessionClaimApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/event-triggers/respondPossessionClaim?ignore-warning=false`,
 };
 
 export const respondPossessionClaimSolicitorEventTokenApiData = {
@@ -25,6 +24,5 @@ export const respondPossessionClaimSolicitorEventTokenApiData = {
       Accept: '*/*',
     },
   }),
-  respondPossessionClaimSolicitorApiEndPoint: (): string =>
-    `/cases/${process.env.CASE_NUMBER}/event-triggers/respondPossessionClaim`,
+  respondPossessionClaimSolicitorApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/event-triggers/respondPossessionClaim`,
 };

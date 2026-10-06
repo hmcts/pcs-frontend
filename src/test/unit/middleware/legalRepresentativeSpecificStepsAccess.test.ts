@@ -60,7 +60,9 @@ describe('legalRepresentativeSpecificStepsAccessMiddleware', () => {
 
   it('blocks non legalrep users from select-defendant path', () => {
     mockIsLegalRepresentativeUser.mockReturnValue(false);
-    const req = { path: '/case/1234567890123456/respond-to-claim/select-defendant' } as unknown as Request;
+    const req = {
+      path: '/case/1234567890123456/respond-to-claim/select-defendant',
+    } as unknown as Request;
 
     invokeMiddleware(req);
 

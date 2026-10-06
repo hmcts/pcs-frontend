@@ -27,7 +27,9 @@ async function isUniversalCreditSelectedForRegularIncomeRouting(
   return hasSelectedUniversalCredit(req);
 }
 
-function priorityDebtsAnswerFromForm(currentStepData: Record<string, unknown>): 'yes' | 'no' | undefined {
+function priorityDebtsAnswerFromForm(
+  currentStepData: Record<string, unknown>
+): 'yes' | 'no' | undefined {
   const v = currentStepData.havePriorityDebts;
   if (v === 'yes' || v === 'no') {
     return v;

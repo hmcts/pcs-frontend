@@ -32,12 +32,18 @@ describe('createSectionCyaStep postController — hub-and-spoke redirect', () =>
   it('redirects continue submissions to the task-list hub for citizen RTC', async () => {
     const res = mkRes();
     await step.postController!.post(reqWith({ action: 'continue' }), res, jest.fn());
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234123412341234/respond-to-claim/task-list');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/1234123412341234/respond-to-claim/task-list'
+    );
   });
 
   it('redirects saveForLater submissions to the task-list hub for citizen RTC', async () => {
     const res = mkRes();
     await step.postController!.post(reqWith({ action: 'saveForLater' }), res, jest.fn());
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234123412341234/respond-to-claim/task-list');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/1234123412341234/respond-to-claim/task-list'
+    );
   });
 });

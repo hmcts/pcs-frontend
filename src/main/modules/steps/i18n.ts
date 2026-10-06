@@ -110,7 +110,11 @@ function markStepBundleMerged(i18n: object, key: string): void {
   applied.add(key);
 }
 
-export async function loadStepNamespace(req: Request, stepName?: string, journeyFolder?: string): Promise<void> {
+export async function loadStepNamespace(
+  req: Request,
+  stepName?: string,
+  journeyFolder?: string
+): Promise<void> {
   if (!req.i18n) {
     return;
   }
@@ -131,7 +135,9 @@ export async function loadStepNamespace(req: Request, stepName?: string, journey
   const localesDir = await findLocalesDir();
   if (!localesDir) {
     if (isDevelopment) {
-      logger.warn(`Locales directory not found. Translation file for ${context.stepName} will not be loaded.`);
+      logger.warn(
+        `Locales directory not found. Translation file for ${context.stepName} will not be loaded.`
+      );
     }
     return;
   }
@@ -139,7 +145,11 @@ export async function loadStepNamespace(req: Request, stepName?: string, journey
   try {
     let translations: Record<string, unknown> = {};
 
-    for (const translationPath of getStepTranslationPaths(context.stepName, context.journeyFolder, userType)) {
+    for (const translationPath of getStepTranslationPaths(
+      context.stepName,
+      context.journeyFolder,
+      userType
+    )) {
       const filePath = path.join(localesDir, lang, `${translationPath}.json`);
       const resolvedPath = path.resolve(filePath);
       const resolvedLocalesDir = path.resolve(localesDir);
@@ -154,7 +164,10 @@ export async function loadStepNamespace(req: Request, stepName?: string, journey
       try {
         await fs.access(resolvedPath);
         const fileContent = await fs.readFile(resolvedPath, 'utf8');
-        translations = mergeTranslations(translations, JSON.parse(fileContent) as Record<string, unknown>);
+        translations = mergeTranslations(
+          translations,
+          JSON.parse(fileContent) as Record<string, unknown>
+        );
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         if (!errorMessage.includes('ENOENT')) {
@@ -186,11 +199,19 @@ export async function loadStepNamespace(req: Request, stepName?: string, journey
   }
 }
 
-export async function loadStepNamespaces(req: Request, stepNames: string[], journeyFolder?: string): Promise<void> {
+export async function loadStepNamespaces(
+  req: Request,
+  stepNames: string[],
+  journeyFolder?: string
+): Promise<void> {
   await Promise.all(stepNames.map(stepName => loadStepNamespace(req, stepName, journeyFolder)));
 }
 
-export function getStepTranslations(req: Request, stepName?: string, folder?: string): TranslationContent {
+export function getStepTranslations(
+  req: Request,
+  stepName?: string,
+  folder?: string
+): TranslationContent {
   if (!req.i18n) {
     return {};
   }

@@ -27,7 +27,11 @@ describe('paymentService', () => {
   });
 
   it('creates a card payment request with encoded service request reference', async () => {
-    const responsePayload = { paymentReference: 'RC-123', status: 'Created', nextUrl: 'https://next.url' };
+    const responsePayload = {
+      paymentReference: 'RC-123',
+      status: 'Created',
+      nextUrl: 'https://next.url',
+    };
     mockHttp.post.mockResolvedValue({ data: responsePayload });
 
     const response = await paymentService.createCardPaymentRequest('token-123', 'SR 123', {
@@ -60,12 +64,15 @@ describe('paymentService', () => {
     const response = await paymentService.getCardPaymentStatus('token-123', 'RC 123');
 
     expect(response).toEqual(responsePayload);
-    expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/payment/card-payment/RC%20123/status`, {
-      headers: {
-        Authorization: 'Bearer token-123',
-        'Content-Type': 'application/json',
-      },
-    });
+    expect(mockHttp.get).toHaveBeenCalledWith(
+      `${testApiBase}/payment/card-payment/RC%20123/status`,
+      {
+        headers: {
+          Authorization: 'Bearer token-123',
+          'Content-Type': 'application/json',
+        },
+      }
+    );
   });
 
   it('starts card payment request using existing service request reference', async () => {
@@ -103,7 +110,10 @@ describe('paymentService', () => {
     const responsePayload = { serviceRequestReference: 'SR-999', feeAmount: 404 };
     mockHttp.get.mockResolvedValue({ data: responsePayload });
 
-    const response = await paymentService.getOutstandingCounterClaimPayment('token-123', '1234567890123456');
+    const response = await paymentService.getOutstandingCounterClaimPayment(
+      'token-123',
+      '1234567890123456'
+    );
 
     expect(response).toEqual(responsePayload);
     expect(mockHttp.get).toHaveBeenCalledWith(
@@ -118,7 +128,11 @@ describe('paymentService', () => {
   });
 
   it('creates a pba payment request with encoded service request reference', async () => {
-    const responsePayload = { paymentReference: 'RC-123', status: 'Created', dateCreated: '11-11-2025' };
+    const responsePayload = {
+      paymentReference: 'RC-123',
+      status: 'Created',
+      dateCreated: '11-11-2025',
+    };
     mockHttp.post.mockResolvedValue({ data: responsePayload });
 
     const response = await paymentService.createPbaPaymentRequest('token-123', 'SR 123', {

@@ -32,12 +32,7 @@ export class ErrorMessageValidation implements IValidation {
   private static emvFailed = false;
   private static readonly MAPPING_PATH = path.join(__dirname, '../../../config/urlToFileMapping.config.ts');
 
-  async validate(
-    page: Page,
-    validation: string,
-    fieldName: string,
-    error?: validationData | validationRecord
-  ): Promise<void> {
+  async validate(page: Page, validation: string, fieldName: string, error?: validationData | validationRecord): Promise<void> {
     if (validation !== 'errorMessage' || !error) {
       return;
     }
@@ -331,8 +326,7 @@ export class ErrorMessageValidation implements IValidation {
       errors.push(`${pageName}: ${errorMessage}`);
     }
 
-    const shouldThrow =
-      (failedPages.size > 0 || ErrorMessageValidation.emvFailed) && ErrorMessageValidation.shouldThrowError;
+    const shouldThrow = (failedPages.size > 0 || ErrorMessageValidation.emvFailed) && ErrorMessageValidation.shouldThrowError;
 
     ErrorMessageValidation.clearResults();
 

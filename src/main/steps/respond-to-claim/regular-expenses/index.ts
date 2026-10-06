@@ -2,11 +2,18 @@ import type { Request } from 'express';
 
 import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import type { FrequencyValue, HouseholdCircumstances, IncomeExpenseDetails } from '@services/ccdCase.interface';
+import type {
+  FrequencyValue,
+  HouseholdCircumstances,
+  IncomeExpenseDetails,
+} from '@services/ccdCase.interface';
 
 const createAmountValidator =
   (largeAmountErrorKey: string, negativeErrorKey: string) =>
@@ -451,8 +458,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
-    const draftHc = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances as
-      HouseholdCircumstances | undefined;
+    const draftHc = caseData?.possessionClaimResponse?.defendantResponses
+      ?.householdCircumstances as HouseholdCircumstances | undefined;
 
     if (!draftHc) {
       return {};
@@ -487,7 +494,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const body = req.body as Record<string, unknown> | undefined;
 
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    response.defendantResponses.householdCircumstances =
+      response.defendantResponses.householdCircumstances ?? {};
     const hc = response.defendantResponses.householdCircumstances;
 
     for (const key of regularExpenseKeys) {

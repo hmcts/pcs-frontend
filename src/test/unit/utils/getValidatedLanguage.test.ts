@@ -119,7 +119,9 @@ describe('getValidatedLanguage', () => {
     });
 
     it('should handle array with mixed valid and invalid values', () => {
-      expect(getValidatedLanguage(createMockRequest(['en', 'invalid', 'cy']) as Request)).toBe('en');
+      expect(getValidatedLanguage(createMockRequest(['en', 'invalid', 'cy']) as Request)).toBe(
+        'en'
+      );
       expect(getValidatedLanguage(createMockRequest(['invalid', 'cy']) as Request)).toBe('en');
     });
   });

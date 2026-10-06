@@ -9,6 +9,5 @@ export const linkSolicitorTokenApiData = {
       Accept: '*/*',
     },
   }),
-  linkSolicitorApiEndPoint: (): string =>
-    `/testing-support/link-defendant-solicitor-to-party/${process.env.CASE_NUMBER}/${process.env.Defendant_ID}`,
+  linkSolicitorApiEndPoint: (): string => `/testing-support/link-defendant-solicitor-to-party/${process.env.CASE_NUMBER}/${process.env.Defendant_ID}`,
 };

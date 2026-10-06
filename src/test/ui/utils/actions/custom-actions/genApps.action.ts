@@ -38,10 +38,7 @@ export class GenAppsAction implements IAction {
       ['confirmYouHaveAppliedForFeeHelp', () => this.confirmYouHaveAppliedForFeeHelp(fieldName as actionRecord)],
       ['confirmOtherPartiesAgreed', () => this.confirmOtherPartiesAgreed(fieldName as actionRecord)],
       ['confirmOrderDoYouWant', () => this.confirmOrderDoYouWant(fieldName as actionRecord)],
-      [
-        'reasonsApplicationShouldNotBeShared',
-        () => this.reasonsApplicationShouldNotBeShared(fieldName as actionRecord),
-      ],
+      ['reasonsApplicationShouldNotBeShared', () => this.reasonsApplicationShouldNotBeShared(fieldName as actionRecord)],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
       ['confirmDocumentToUpload', () => this.confirmDocumentToUpload(fieldName as actionRecord)],
       ['uploadFilesGenApps', () => this.uploadFilesGenApps(page, fieldName as actionRecord)],
@@ -98,10 +95,7 @@ export class GenAppsAction implements IAction {
       option: confirmFeeHelp.option,
     });
     if (confirmFeeHelp.option === 'Yes') {
-      const userInput =
-        typeof confirmFeeHelp.input === 'number'
-          ? generateRandomString(confirmFeeHelp.input)
-          : (confirmFeeHelp.input as string);
+      const userInput = typeof confirmFeeHelp.input === 'number' ? generateRandomString(confirmFeeHelp.input) : (confirmFeeHelp.input as string);
       await performAction('inputText', confirmFeeHelp.label, userInput);
       FieldsStore.update(confirmFeeHelp.label as string, userInput);
       FieldsStore.rename(confirmFeeHelp.label as string, 'What is your Help with Fees reference number?');
@@ -127,25 +121,18 @@ export class GenAppsAction implements IAction {
       option: reason.option,
     });
     if (reason.option === 'Yes') {
-      const userInput =
-        typeof reason.input === 'number' ? generateRandomString(reason.input) : (reason.input as string);
+      const userInput = typeof reason.input === 'number' ? generateRandomString(reason.input) : (reason.input as string);
       await performAction('inputText', reason.label, userInput);
       FieldsStore.update(reason.label as string, userInput);
     } else {
       FieldsStore.delete(reason.label as string);
     }
-    await performAction(
-      'When the user clicks the button',
-      areThereAnyReasonsThatThisApplicationShouldNotBeShared.continueButton
-    );
+    await performAction('When the user clicks the button', areThereAnyReasonsThatThisApplicationShouldNotBeShared.continueButton);
   }
 
   private async confirmOrderDoYouWant(confirmOrder: actionRecord) {
     await performAction('recordUserEntry', confirmOrder);
-    const userInput =
-      typeof confirmOrder.input === 'number'
-        ? generateRandomString(confirmOrder.input)
-        : (confirmOrder.input as string);
+    const userInput = typeof confirmOrder.input === 'number' ? generateRandomString(confirmOrder.input) : (confirmOrder.input as string);
     await performAction('inputText', confirmOrder.label, userInput);
     FieldsStore.rename(confirmOrder.label as string, 'What order do you want the court to make and why?');
     FieldsStore.update('What order do you want the court to make and why?', userInput);
@@ -158,10 +145,7 @@ export class GenAppsAction implements IAction {
       question: confirmUpload.question,
       option: confirmUpload.option,
     });
-    await performAction(
-      'When the user clicks the button',
-      doYouWantToUploadDocumentsToSupportYourApplication.continueButton
-    );
+    await performAction('When the user clicks the button', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
   }
 
   private async uploadFilesGenApps(page: Page, uploadDocs: actionRecord): Promise<void> {
@@ -202,9 +186,7 @@ export class GenAppsAction implements IAction {
 
     const payOrSubmit = value === 'Yes' || value1 === 'No';
 
-    const button = payOrSubmit
-      ? checkYourAnswersGenApps.submitHiddenButton
-      : checkYourAnswersGenApps.continueToPaymentHiddenButton;
+    const button = payOrSubmit ? checkYourAnswersGenApps.submitHiddenButton : checkYourAnswersGenApps.continueToPaymentHiddenButton;
 
     await performAction('When the user clicks the button', button);
   }
@@ -246,11 +228,7 @@ export class GenAppsAction implements IAction {
       switch (validationArr.validationType) {
         case 'radioOptions':
           await performAction('When the user clicks the button', validationArr.button);
-          await performValidation(
-            'errorMessage',
-            !validationArr?.header ? (validationArr.header = 'There is a problem') : validationArr.header,
-            item.errMessage
-          );
+          await performValidation('errorMessage', !validationArr?.header ? (validationArr.header = 'There is a problem') : validationArr.header, item.errMessage);
           await performAction('clickRadioButton', { question: validationArr.question, option: validationArr.option });
           break;
 
@@ -262,11 +240,7 @@ export class GenAppsAction implements IAction {
 
         case 'checkBox':
           await performAction('When the user clicks the button', validationArr.button);
-          await performValidation(
-            'errorMessage',
-            !validationArr?.header ? (validationArr.header = 'There is a problem') : validationArr.header,
-            item.errMessage
-          );
+          await performValidation('errorMessage', !validationArr?.header ? (validationArr.header = 'There is a problem') : validationArr.header, item.errMessage);
           await performAction('check', { question: validationArr.question, option: validationArr.option });
           break;
       }
@@ -392,12 +366,7 @@ export class GenAppsAction implements IAction {
 
   private async updatePreviouslyAnsweredPage(page: Page) {
     const currentPage = stringToCamelCase(
-      await page
-        .locator(
-          'legend h1.govuk-fieldset__heading, h1.govuk-heading-xl, h1.govuk-heading-l, h1.govuk-heading-m, legend.govuk-fieldset__legend--l'
-        )
-        .first()
-        .innerText()
+      await page.locator('legend h1.govuk-fieldset__heading, h1.govuk-heading-xl, h1.govuk-heading-l, h1.govuk-heading-m, legend.govuk-fieldset__legend--l').first().innerText()
     );
 
     switch (currentPage) {
@@ -417,10 +386,7 @@ export class GenAppsAction implements IAction {
             option: doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption,
           });
         } else {
-          await performValidation(
-            'Then the user sees the main header',
-            haveTheOtherPartiesAgreedToThisApplication.mainHeader
-          );
+          await performValidation('Then the user sees the main header', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
           FieldsStore.deleteKeys([
             doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
             haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
@@ -432,8 +398,7 @@ export class GenAppsAction implements IAction {
       }
       case 'doYouNeedHelpPayingTheFeeForThisApplication': {
         const feeOption1 =
-          FieldsStore.get(doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion as string) ===
-          'I need help paying the fee'
+          FieldsStore.get(doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion as string) === 'I need help paying the fee'
             ? doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption
             : doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption;
         await performAction('doYouNeedHelpPayingFee', {
@@ -441,15 +406,9 @@ export class GenAppsAction implements IAction {
           option: feeOption1,
         });
         if (feeOption1 !== 'I need help paying the fee') {
-          FieldsStore.deleteKeys([
-            haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
-            'What is your Help with Fees reference number?',
-          ]);
+          FieldsStore.deleteKeys([haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion, 'What is your Help with Fees reference number?']);
         } else {
-          await performValidation(
-            'Then the user sees the main header',
-            haveYouAlreadyAppliedForHelpWithFees.mainHeader
-          );
+          await performValidation('Then the user sees the main header', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
           await performAction('confirmYouHaveAppliedForFeeHelp', {
             question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
             option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
@@ -457,10 +416,7 @@ export class GenAppsAction implements IAction {
             input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
           });
         }
-        await performValidation(
-          'Then the user sees the main header',
-          haveTheOtherPartiesAgreedToThisApplication.mainHeader
-        );
+        await performValidation('Then the user sees the main header', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
         break;
       }
       case 'whatOrderDoYouWantTheCourtToMakeAndWhy': {
@@ -469,10 +425,7 @@ export class GenAppsAction implements IAction {
           label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
           input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
         });
-        await performValidation(
-          'Then the user sees the main header',
-          doYouWantToUploadDocumentsToSupportYourApplication.mainHeader
-        );
+        await performValidation('Then the user sees the main header', doYouWantToUploadDocumentsToSupportYourApplication.mainHeader);
         break;
       }
       case 'haveYouAlreadyAppliedForHelpWithYourApplicationFee': {
@@ -483,10 +436,7 @@ export class GenAppsAction implements IAction {
           label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
           input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
         });
-        await performValidation(
-          'Then the user sees the main header',
-          haveTheOtherPartiesAgreedToThisApplication.mainHeader
-        );
+        await performValidation('Then the user sees the main header', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
         break;
       }
 

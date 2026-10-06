@@ -19,7 +19,9 @@ const normalisers: readonly Normaliser[] = [
 
 // Returns a new object — the input is never modified.
 // Inside, each normaliser mutates a private working copy.
-export function normaliseRespondToClaimDraft(response: PossessionClaimResponse): PossessionClaimResponse {
+export function normaliseRespondToClaimDraft(
+  response: PossessionClaimResponse
+): PossessionClaimResponse {
   const workingCopy = cloneDeep(response);
   for (const normalise of normalisers) {
     normalise(workingCopy);

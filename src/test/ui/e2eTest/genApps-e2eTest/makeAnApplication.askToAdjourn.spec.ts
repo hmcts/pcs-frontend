@@ -125,10 +125,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
       option: haveTheOtherPartiesAgreedToThisApplication.noRadioOption,
     });
-    await performValidation(
-      'Then the user sees the main header',
-      areThereAnyReasonsThatThisApplicationShouldNotBeShared.mainHeader
-    );
+    await performValidation('Then the user sees the main header', areThereAnyReasonsThatThisApplicationShouldNotBeShared.mainHeader);
     await performAction('reasonsApplicationShouldNotBeShared', {
       question: areThereAnyReasonsThatThisApplicationShouldNotBeShared.areThereAnyReasonQuestion,
       option: areThereAnyReasonsThatThisApplicationShouldNotBeShared.yesRadioOption,

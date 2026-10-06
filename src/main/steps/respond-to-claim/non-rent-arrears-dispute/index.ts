@@ -2,7 +2,10 @@ import type { Request } from 'express';
 
 import { getTranslation, getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoEnum, toYesNoEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -24,7 +27,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       response.defendantResponses.disputeClaim = toYesNoEnum(disputeOtherParts);
 
       if (disputeOtherParts === 'yes') {
-        const disputeDetailsRaw = req.body?.['disputeOtherParts.disputeDetails'] as string | undefined;
+        const disputeDetailsRaw = req.body?.['disputeOtherParts.disputeDetails'] as
+          string | undefined;
         const trimmed = disputeDetailsRaw?.trim();
         if (trimmed) {
           response.defendantResponses.disputeClaimDetails = trimmed;
@@ -76,7 +80,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const caseReference = req.params.caseReference;
-    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string | undefined;
+    const claimantName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as
+      string | undefined;
 
     const t = getTranslationFunction(req);
 

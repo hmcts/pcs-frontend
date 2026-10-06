@@ -771,8 +771,7 @@ export const submitCaseApiDataWales = {
     mediationAttempted: 'YES',
     settlementAttempted: 'YES',
     walesNoticeServed: 'No',
-    walesNoticeStatement:
-      'I am a landlord under a tenancy or license which is not an occupation\ncontract because: test',
+    walesNoticeStatement: 'I am a landlord under a tenancy or license which is not an occupation\ncontract because: test',
     rentDetails_CurrentRent: '85000',
     rentDetails_Frequency: 'MONTHLY',
     rentDetails_CalculatedDailyCharge: '2792',
@@ -888,8 +887,7 @@ export const submitCaseApiDataWales = {
     mediationAttempted: 'YES',
     settlementAttempted: 'YES',
     walesNoticeServed: 'No',
-    walesNoticeStatement:
-      'I am a landlord under a tenancy or license which is not an occupation\ncontract because:Test',
+    walesNoticeStatement: 'I am a landlord under a tenancy or license which is not an occupation\ncontract because:Test',
     claimantNamePossessiveForm: 'Possession Claims Solicitor Org’s',
     claimantCircumstancesSelect: 'NO',
     hasDefendantCircumstancesInfo: 'NO',
@@ -1190,12 +1188,7 @@ export const submitCaseApiDataWales = {
       walesMakeAClaimEnabled: 'YES',
     },
     applicationWithClaim: 'YES',
-    documentsYouveUploaded: [
-      'WRITTEN_TERMS_OF_OCCUPATION_CONTRACT',
-      'CURRENT_GAS_SAFETY_REPORT',
-      'ENERGY_PERFORMANCE_CERTIFICATE',
-      'NOTICE_SERVED',
-    ],
+    documentsYouveUploaded: ['WRITTEN_TERMS_OF_OCCUPATION_CONTRACT', 'CURRENT_GAS_SAFETY_REPORT', 'ENERGY_PERFORMANCE_CERTIFICATE', 'NOTICE_SERVED'],
     languageUsed: 'WELSH',
     completionNextStep: 'SUBMIT_AND_PAY_NOW',
     endButtonLabel: null,

@@ -98,14 +98,20 @@ function isForApplicant(genApp: GenApp, currentUserIdamId: string) {
   return genApp.party.idamId && genApp.party.idamId === currentUserIdamId;
 }
 
-function buildUserGenAppSummaries(allGenApps: CcdCollectionItem<GenApp>[], currentUserIdamId: string) {
+function buildUserGenAppSummaries(
+  allGenApps: CcdCollectionItem<GenApp>[],
+  currentUserIdamId: string
+) {
   return allGenApps
     .map(genAppListValue => genAppListValue.value)
     .filter(genApp => isForApplicant(genApp, currentUserIdamId))
     .map(toGenAppSummary);
 }
 
-function buildOtherPartyGenAppsMap(allGenApps: CcdCollectionItem<GenApp>[], currentUserIdamId: string) {
+function buildOtherPartyGenAppsMap(
+  allGenApps: CcdCollectionItem<GenApp>[],
+  currentUserIdamId: string
+) {
   // The Map type maintains the insertion order of keys when iterating
   const initialMap = new Map<string, PartyGenApps>();
 

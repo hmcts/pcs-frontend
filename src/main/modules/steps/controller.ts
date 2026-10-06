@@ -4,7 +4,12 @@ import type { TFunction } from 'i18next';
 import { getCommonTranslations, getRequestLanguage } from '../i18n';
 
 import { getFormData, setFormData, validateForm } from './formBuilder/helpers';
-import { type TranslationContent, getStepTranslations, getTranslationFunction, loadStepNamespace } from './i18n';
+import {
+  type TranslationContent,
+  getStepTranslations,
+  getTranslationFunction,
+  loadStepNamespace,
+} from './i18n';
 
 import { Logger } from '@modules/logger';
 import { StepNavigation } from '@modules/steps/flow';
@@ -104,7 +109,9 @@ export const createGetController = (
   });
 };
 
-export const createPostRedirectController = (nextUrl: string): { post: (req: Request, res: Response) => void } => {
+export const createPostRedirectController = (
+  nextUrl: string
+): { post: (req: Request, res: Response) => void } => {
   return {
     post: (_req: Request, res: Response) => {
       res.redirect(nextUrl);
@@ -137,7 +144,8 @@ export const createPostController = (
 
       if (Object.keys(errors).length > 0) {
         const firstField = Object.keys(errors)[0];
-        const errorMessage = typeof errors[firstField] === 'string' ? errors[firstField] : errors[firstField].message;
+        const errorMessage =
+          typeof errors[firstField] === 'string' ? errors[firstField] : errors[firstField].message;
         return res.status(400).render(view, {
           ...req.body,
           error: { field: firstField, text: errorMessage },

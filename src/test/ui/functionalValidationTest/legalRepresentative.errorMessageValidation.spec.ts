@@ -73,16 +73,8 @@ import {
 } from '../functional/legalRepresentative-functional';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
-import {
-  assertAllErrorMessageValidations,
-  clearErrorMessageValidationFailures,
-  softErrorMessageValidation,
-} from '../utils/common/error-message-validation-helper';
-import {
-  RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS,
-  RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS,
-  logTestEnvAfterBeforeEach,
-} from '../utils/common/log-test-env';
+import { assertAllErrorMessageValidations, clearErrorMessageValidationFailures, softErrorMessageValidation } from '../utils/common/error-message-validation-helper';
+import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
 import { ErrorMessageValidation } from '../utils/validations/custom-validations';
@@ -148,10 +140,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown });
   }
 
-  if (
-    testInfo.title.includes('Something else') ||
-    testInfo.title.includes('CounterClaim - Something else - Defendant need help')
-  ) {
+  if (testInfo.title.includes('Something else') || testInfo.title.includes('CounterClaim - Something else - Defendant need help')) {
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadAssuredTenancy.claimantName;
     claimantName = process.env.CLAIMANT_NAME;
     process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
@@ -161,10 +150,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   }
 
-  if (
-    testInfo.title.includes('CounterClaim - Defendant need help') ||
-    testInfo.title.includes('CounterClaim - Defendant need help - Has the defendant already applied - No')
-  ) {
+  if (testInfo.title.includes('CounterClaim - Defendant need help') || testInfo.title.includes('CounterClaim - Defendant need help - Has the defendant already applied - No')) {
     claimantName = submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.claimantName;
     process.env.CLAIMANT_NAME = claimantName;
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
@@ -265,10 +251,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await softErrorMessageValidation(
-      'counterclaimDoYouWantToUploadFiles',
-      counterclaimDoYouWantToUploadFilesErrorValidation
-    );
+    await softErrorMessageValidation('counterclaimDoYouWantToUploadFiles', counterclaimDoYouWantToUploadFilesErrorValidation);
     await performAction('doYouWantToUploadFilesLR', {
       option: counterclaimDoYouWantToUploadFiles.yesRadioOption,
     });
@@ -301,13 +284,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
-      regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-      ],
+      regularIncomeOptions: [[whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption]],
     });
     await performAction('selectPriorityDebtsLR', {
       question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
@@ -320,11 +297,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
           whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
           whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
         ],
-        [
-          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
-        ],
+        [whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph, whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput, whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption],
       ],
     });
     await performAction('otherConsiderationsLR', {
@@ -447,13 +420,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
-      regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-      ],
+      regularIncomeOptions: [[whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption]],
     });
     await performAction('selectPriorityDebtsLR', {
       question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
@@ -466,11 +433,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
           whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
           whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
         ],
-        [
-          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
-        ],
+        [whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph, whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput, whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption],
       ],
     });
     await performAction('otherConsiderationsLR', {
@@ -491,10 +454,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
     assertAllErrorMessageValidations();
   });
 
@@ -550,19 +510,13 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       option: counterClaimSpecificSumOfMoney.noRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueFEE0508Input,
     });
-    await softErrorMessageValidation(
-      'counterClaimWhatAreYouClaimingFor',
-      counterClaimWhatAreYouClaimingForErrorValidation
-    );
+    await softErrorMessageValidation('counterClaimWhatAreYouClaimingFor', counterClaimWhatAreYouClaimingForErrorValidation);
     await performAction('selectCounterClaimFeeLR', {
       radioOption: counterClaimFee.defendantNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueFEE0508Input,
     });
-    await softErrorMessageValidation(
-      'counterClaimHaveYouAppliedForHelp',
-      counterClaimHaveYouAppliedForHelpErrorValidation
-    );
+    await softErrorMessageValidation('counterClaimHaveYouAppliedForHelp', counterClaimHaveYouAppliedForHelpErrorValidation);
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
       feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
@@ -576,10 +530,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       counterClaimFor: counterClaimAbout.counterClaimForInput,
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
-    await softErrorMessageValidation(
-      'doYouWantToUploadFilesToSupportYourCounterclaim',
-      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
-    );
+    await softErrorMessageValidation('doYouWantToUploadFilesToSupportYourCounterclaim', doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation);
     await performAction('doYouWantToUploadFilesLR', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
@@ -621,30 +572,11 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
       regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-          whatRegularIncomeDoYouReceive.pensionTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
-          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
-        ],
+        [whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph, whatRegularIncomeDoYouReceive.otherBenefitsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph, whatRegularIncomeDoYouReceive.pensionTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph, whatRegularIncomeDoYouReceive.incomeFromJobsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph, whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput],
       ],
     });
     await performAction('selectPriorityDebtsLR', {
@@ -716,10 +648,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
-    await performValidation(
-      'Then the user sees the main header',
-      counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader
-    );
+    await performValidation('Then the user sees the main header', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
     assertAllErrorMessageValidations();
   });
 
@@ -832,10 +761,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR');
-    await softErrorMessageValidation(
-      'haveYouAppliedForUniversalCredit',
-      haveYouAppliedForUniversalCreditErrorValidation
-    );
+    await softErrorMessageValidation('haveYouAppliedForUniversalCredit', haveYouAppliedForUniversalCreditErrorValidation);
     await performAction('selectUniversalCreditLR', {
       question: haveYouAppliedForUniversalCredit.mainHeader,
       creditRadioOption: haveYouAppliedForUniversalCredit.yesRadioOption,
@@ -869,10 +795,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton);
     assertAllErrorMessageValidations();
   });
 
@@ -1021,10 +944,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nigh
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction(
-      'When the user clicks the button',
-      responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton);
     assertAllErrorMessageValidations();
   });
 });

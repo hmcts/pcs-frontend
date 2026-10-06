@@ -7,6 +7,8 @@ const TAG_CLASSES: Partial<Record<TaskStatus, string>> = {
   NOT_STARTED: 'govuk-tag--red',
 };
 
-export const isLinkableStatus = (status: string): boolean => status !== 'NOT_AVAILABLE' && status !== 'COMPLETED';
+export const isLinkableStatus = (status: string): boolean =>
+  status !== 'NOT_AVAILABLE' && status !== 'COMPLETED';
 
-export const getTagClasses = (status: string): string | undefined => TAG_CLASSES[status as TaskStatus];
+export const getTagClasses = (status: string): string | undefined =>
+  TAG_CLASSES[status as TaskStatus];

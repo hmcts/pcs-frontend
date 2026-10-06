@@ -6,9 +6,7 @@ import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class PaymentAction implements IAction {
   async execute(page: Page, action: string, fieldName?: actionData | actionRecord): Promise<void> {
-    const actionsMap = new Map<string, () => Promise<void>>([
-      ['selectPaymentOptions', () => this.selectPaymentOptions(fieldName as actionRecord, page)],
-    ]);
+    const actionsMap = new Map<string, () => Promise<void>>([['selectPaymentOptions', () => this.selectPaymentOptions(fieldName as actionRecord, page)]]);
 
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {

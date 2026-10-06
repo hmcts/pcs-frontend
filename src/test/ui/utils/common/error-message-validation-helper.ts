@@ -37,18 +37,13 @@ function asText(err: unknown): string {
 }
 
 /** Soft ErrorMessageValidation(EMV) (`errorMessage` PFT) or Allure-only skip note; end the test with `assertAllErrorMessageValidations`. */
-export async function softErrorMessageValidation(
-  pageKey: string,
-  pftFun: (() => Promise<void>) | string
-): Promise<void> {
+export async function softErrorMessageValidation(pageKey: string, pftFun: (() => Promise<void>) | string): Promise<void> {
   const stepRunner = getStepRunner();
   if (typeof pftFun === 'string') {
     // Do not use StepContext.parameter() here: with allure-playwright it can race step teardown
     // and log "could not update test step: no step with uuid ... is found". Keep the reason in the title.
     const note = pftFun.trim().slice(0, 400);
-    const title = note
-      ? `No ErrorMessageValidation(EMV): ${pageKey} — ${note}`
-      : `No ErrorMessageValidation(EMV): ${pageKey}`;
+    const title = note ? `No ErrorMessageValidation(EMV): ${pageKey} — ${note}` : `No ErrorMessageValidation(EMV): ${pageKey}`;
     await stepRunner(title, async () => {
       /* note is in step title */
     });
@@ -70,9 +65,7 @@ export async function softErrorMessageValidation(
         return;
       }
 
-      const detail = pftCrashed
-        ? asText(pftError)
-        : failedMessageChecks.map(r => `${r.pageName || pageKey}: ${r.expected}`).join('\n');
+      const detail = pftCrashed ? asText(pftError) : failedMessageChecks.map(r => `${r.pageName || pageKey}: ${r.expected}`).join('\n');
       failures.push({ pageKey, error: detail });
       throw new SoftEmvStepFailed(detail);
     });

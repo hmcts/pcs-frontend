@@ -63,7 +63,12 @@ export function ccdPenceToPoundsString(value: unknown): string | undefined {
 function penceToPoundsString(value: unknown): string | undefined {
   const getPenceAmount = (amountValue: unknown): number | undefined => {
     const parsed = parseOptionalFiniteNumber(amountValue);
-    if (parsed === undefined && amountValue !== undefined && amountValue !== null && amountValue !== '') {
+    if (
+      parsed === undefined &&
+      amountValue !== undefined &&
+      amountValue !== null &&
+      amountValue !== ''
+    ) {
       warnUnexpectedMoney('penceToPoundsString:object.amount', amountValue);
     }
     return parsed;

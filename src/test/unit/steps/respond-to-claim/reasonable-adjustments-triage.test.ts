@@ -21,9 +21,12 @@ import type { Request } from 'express';
 
 import { step } from '../../../../main/steps/respond-to-claim/reasonable-adjustments-triage';
 
-const beforeRedirect = (step as unknown as { beforeRedirect: (req: Request) => Promise<void> }).beforeRedirect;
+const beforeRedirect = (step as unknown as { beforeRedirect: (req: Request) => Promise<void> })
+  .beforeRedirect;
 const extendGetContent = (
-  step as unknown as { extendGetContent: (req: Request) => Promise<{ cuiYourSupportEnabled: boolean }> }
+  step as unknown as {
+    extendGetContent: (req: Request) => Promise<{ cuiYourSupportEnabled: boolean }>;
+  }
 ).extendGetContent;
 const isAnswered = (step as unknown as { isAnswered: (req: Request) => unknown }).isAnswered;
 const resolveRedirectAfterPost = (
@@ -89,7 +92,10 @@ describe('reasonable-adjustments-triage beforeRedirect', () => {
 
       await beforeRedirect(req);
 
-      expect(redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/reasonable-adjustments-error');
+      expect(redirect).toHaveBeenCalledWith(
+        303,
+        '/case/123/respond-to-claim/reasonable-adjustments-error'
+      );
     });
 
     it('rethrows (never silently continues) when there is no case reference to build the error page', async () => {
@@ -123,10 +129,14 @@ describe('reasonable-adjustments-triage extendGetContent', () => {
 
 describe('reasonable-adjustments-triage isAnswered (drives the task-list "Your support" row status)', () => {
   const reqWith = (possessionClaimResponse?: unknown): Request =>
-    ({ res: { locals: { validatedCase: { id: '123', possessionClaimResponse } } } }) as unknown as Request;
+    ({
+      res: { locals: { validatedCase: { id: '123', possessionClaimResponse } } },
+    }) as unknown as Request;
 
   it('is truthy once the defendant has captured adjustments (defendantFlags.details present)', () => {
-    const req = reqWith({ defendantFlags: { details: [{ id: 'f1', value: { name: 'Language interpreter' } }] } });
+    const req = reqWith({
+      defendantFlags: { details: [{ id: 'f1', value: { name: 'Language interpreter' } }] },
+    });
 
     expect(Boolean(isAnswered(req))).toBe(true);
   });
@@ -145,7 +155,9 @@ describe('reasonable-adjustments-triage resolveRedirectAfterPost (skip returns t
   it('returns the task-list url when a case reference is present', async () => {
     const req = { res: { locals: { validatedCase: { id: '123' } } } } as unknown as Request;
 
-    await expect(resolveRedirectAfterPost(req)).resolves.toBe('/case/123/respond-to-claim/task-list');
+    await expect(resolveRedirectAfterPost(req)).resolves.toBe(
+      '/case/123/respond-to-claim/task-list'
+    );
   });
 
   it('returns undefined when there is no case reference (postHandler then falls back to flow nav)', async () => {

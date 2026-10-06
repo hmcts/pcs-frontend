@@ -1,4 +1,7 @@
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { noEmojiValidator } from '../../utils/fieldValidators';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -6,7 +9,8 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-name-capture',
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantContactDetailsParty?.firstName),
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantContactDetailsParty?.firstName),
   stepDir: __dirname,
   showCancelButton: false,
   beforeRedirect: async req => {
@@ -40,7 +44,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
 
     const firstName =
-      (typeof party?.firstName === 'string' && party.firstName.trim() ? party.firstName : undefined) ||
+      (typeof party?.firstName === 'string' && party.firstName.trim()
+        ? party.firstName
+        : undefined) ||
       (typeof claimantEntry?.firstName === 'string' && claimantEntry.firstName.trim()
         ? claimantEntry.firstName
         : undefined);

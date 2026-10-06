@@ -19,11 +19,15 @@ export {
 
 export const UPLOAD_MAX_FILE_SIZE_MB: number = config.get('documentUpload.maxFileSizePerFileMB');
 export const UPLOAD_MAX_FILE_SIZE_BYTES = UPLOAD_MAX_FILE_SIZE_MB * 1024 * 1024;
-export const UPLOAD_MAX_MEDIA_FILE_SIZE_MB: number = config.get('documentUpload.maxMediaFileSizeMB');
+export const UPLOAD_MAX_MEDIA_FILE_SIZE_MB: number = config.get(
+  'documentUpload.maxMediaFileSizeMB'
+);
 export const UPLOAD_MAX_MEDIA_FILE_SIZE_BYTES = UPLOAD_MAX_MEDIA_FILE_SIZE_MB * 1024 * 1024;
 export const UPLOAD_MAX_TOTAL_SIZE_MB: number = config.get('documentUpload.maxTotalFileSizeMB');
 export const UPLOAD_MAX_TOTAL_SIZE_BYTES = UPLOAD_MAX_TOTAL_SIZE_MB * 1024 * 1024;
-export const UPLOAD_MAX_DOCUMENT_FILE_SIZE_MB: number = config.get('documentUpload.maxDocumentFileSizeMB');
+export const UPLOAD_MAX_DOCUMENT_FILE_SIZE_MB: number = config.get(
+  'documentUpload.maxDocumentFileSizeMB'
+);
 export const UPLOAD_MAX_DOCUMENT_FILE_SIZE_BYTES = UPLOAD_MAX_DOCUMENT_FILE_SIZE_MB * 1024 * 1024;
 export const UPLOAD_MAX_FILENAME_LENGTH: number = config.get('documentUpload.maxFilenameLength');
 
@@ -183,10 +187,19 @@ export function getUploadErrorKey(error: UploadValidationError): UploadErrorTran
     case 'filename_too_long':
       return { key: `${LOCALE_PREFIX}.filenameTooLong`, params: { maxLength: error.maxLength } };
     case 'document_too_large':
-      return { key: `${LOCALE_PREFIX}.fileTooLargeDocument`, params: { maxSize: bytesToMb(error.maxBytes) } };
+      return {
+        key: `${LOCALE_PREFIX}.fileTooLargeDocument`,
+        params: { maxSize: bytesToMb(error.maxBytes) },
+      };
     case 'media_too_large':
-      return { key: `${LOCALE_PREFIX}.fileTooLargeMedia`, params: { maxSize: bytesToMb(error.maxBytes) } };
+      return {
+        key: `${LOCALE_PREFIX}.fileTooLargeMedia`,
+        params: { maxSize: bytesToMb(error.maxBytes) },
+      };
     case 'file_too_large':
-      return { key: `${LOCALE_PREFIX}.fileTooLargeDocStore`, params: { maxSize: bytesToMb(error.maxBytes) } };
+      return {
+        key: `${LOCALE_PREFIX}.fileTooLargeDocStore`,
+        params: { maxSize: bytesToMb(error.maxBytes) },
+      };
   }
 }

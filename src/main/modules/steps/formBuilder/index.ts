@@ -8,13 +8,20 @@ import { createStepNavigation } from '../flow';
 import { getTranslationFunction, loadStepNamespace } from '../i18n';
 
 import { wireFileUploadUrls } from './fileUploadUtils';
-import { getStaticBasePath, getStaticEntryStepId, resolveFormBuilderFlowConfig } from './flowConfig';
+import {
+  getStaticBasePath,
+  getStaticEntryStepId,
+  resolveFormBuilderFlowConfig,
+} from './flowConfig';
 import { buildFormContent } from './formContent';
 import { getFormData } from './helpers';
 import { createPostHandler } from './postHandler';
 import { validateConfigInDevelopment } from './schema';
 
-import type { BuiltFormContent, FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type {
+  BuiltFormContent,
+  FormBuilderConfig,
+} from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
@@ -103,7 +110,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
   const viewPath = customTemplate || 'formBuilder.njk';
   const basePath = getStaticBasePath(flowConfig, configuredBasePath || `/steps/${journeyPath}`);
   const stepNavigation = createStepNavigation(flowConfig);
-  const stepUrl = getStaticEntryStepId(flowConfig) === stepName ? basePath : path.join(basePath, stepName);
+  const stepUrl =
+    getStaticEntryStepId(flowConfig) === stepName ? basePath : path.join(basePath, stepName);
 
   return {
     url: stepUrl,
@@ -130,13 +138,16 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
 
         // Get interpolation values from extendGetContent if available (for dynamic translation values)
         const emptyFormContent = { fields: [] } as BuiltFormContent;
-        const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
+        const interpolationValues = extendGetContent
+          ? await extendGetContent(req, emptyFormContent)
+          : {};
         const initialFormData = getInitialFormData ? await getInitialFormData(req) : undefined;
         const resolvedFlowConfig = await resolveFormBuilderFlowConfig(req, flowConfig);
         const formContent = buildFormContent(
           fields,
           t,
-          initialFormData ?? getPersistedFormDataFromResolvedConfig(req, stepName, resolvedFlowConfig),
+          initialFormData ??
+            getPersistedFormDataFromResolvedConfig(req, stepName, resolvedFlowConfig),
           {},
           translationKeys,
           nunjucksEnv,
@@ -151,11 +162,14 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           }
         }
 
-        const extraContent = extendGetContent ? await extendGetContent(req, formContent) : undefined;
+        const extraContent = extendGetContent
+          ? await extendGetContent(req, formContent)
+          : undefined;
         const result = extraContent ? { ...formContent, ...extraContent } : formContent;
         const navigationBackUrl = await stepNavigation.getBackUrl(req, stepName);
         const resultProps = result as Record<string, unknown>;
-        const backUrl = typeof resultProps.backUrl === 'string' ? resultProps.backUrl : navigationBackUrl;
+        const backUrl =
+          typeof resultProps.backUrl === 'string' ? resultProps.backUrl : navigationBackUrl;
         const dashboardUrl =
           typeof resultProps.dashboardUrl === 'string'
             ? resultProps.dashboardUrl

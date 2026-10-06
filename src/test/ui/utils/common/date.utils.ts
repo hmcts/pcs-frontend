@@ -1,17 +1,4 @@
-const monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-] as const;
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'] as const;
 
 // Returns a date relative to today as zero-padded day, month, and year parts.
 export function getRelativeDate(daysOffset: number = 0): {
@@ -44,11 +31,7 @@ export function formatDateFromParts(day?: unknown, month?: unknown, year?: unkno
   }
 
   const date = new Date(Date.UTC(yearNumber, monthNumber - 1, dayNumber));
-  if (
-    date.getUTCFullYear() !== yearNumber ||
-    date.getUTCMonth() !== monthNumber - 1 ||
-    date.getUTCDate() !== dayNumber
-  ) {
+  if (date.getUTCFullYear() !== yearNumber || date.getUTCMonth() !== monthNumber - 1 || date.getUTCDate() !== dayNumber) {
     return undefined;
   }
 

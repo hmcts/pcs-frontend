@@ -23,7 +23,10 @@ export type ChangeAction = {
 };
 
 /** Group a question row with its revealed detail: no divider, regular-weight detail key. */
-export function groupQuestionAndDetail(questionRow: SummaryListRow, detailRow: SummaryListRow): void {
+export function groupQuestionAndDetail(
+  questionRow: SummaryListRow,
+  detailRow: SummaryListRow
+): void {
   questionRow.classes = 'govuk-summary-list__row--no-border';
   detailRow.key.classes = 'govuk-!-font-weight-regular';
 }
@@ -33,10 +36,12 @@ export const getValidatedCase = (req: Request): CcdCaseModel | undefined =>
   req.res?.locals.validatedCase as CcdCaseModel | undefined;
 
 /** Escape user-entered free text and preserve newlines as <br> (GDS pattern). */
-export const escapeWithLineBreaks = (value: string): string => escapeHtml(value).replace(/\n/g, '<br>');
+export const escapeWithLineBreaks = (value: string): string =>
+  escapeHtml(value).replace(/\n/g, '<br>');
 
 /** Case-insensitive yes check — the backend can echo 'Yes'/'YES'. */
-export const isYes = (value?: string | null): boolean => (value ?? '').trim().toUpperCase() === 'YES';
+export const isYes = (value?: string | null): boolean =>
+  (value ?? '').trim().toUpperCase() === 'YES';
 
 /** Render a list of (already HTML-safe) items as a govuk-list. */
 export const listHtml = (items: string[]): string =>
@@ -148,7 +153,10 @@ export function pushDetailRow(
 // GDS multi-select pattern: a single value renders as text; many values render as a
 // govuk-list. Items in `userSuppliedItems` are HTML-escaped (the rest are translation
 // strings that are safe to render verbatim).
-export function multiSelectValue(items: string[], userSuppliedItems: Set<string> = new Set()): SummaryListRow['value'] {
+export function multiSelectValue(
+  items: string[],
+  userSuppliedItems: Set<string> = new Set()
+): SummaryListRow['value'] {
   if (items.length === 0) {
     return { text: '' };
   }
@@ -156,6 +164,8 @@ export function multiSelectValue(items: string[], userSuppliedItems: Set<string>
     const item = items[0];
     return userSuppliedItems.has(item) ? { html: escapeHtml(item) } : { text: item };
   }
-  const lis = items.map(item => `<li>${userSuppliedItems.has(item) ? escapeHtml(item) : item}</li>`).join('\n');
+  const lis = items
+    .map(item => `<li>${userSuppliedItems.has(item) ? escapeHtml(item) : item}</li>`)
+    .join('\n');
   return { html: `<ul class="govuk-list">\n${lis}\n</ul>` };
 }

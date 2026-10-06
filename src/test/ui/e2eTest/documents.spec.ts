@@ -1,17 +1,7 @@
 import { citizenCreateGenAppApiData, createCaseApiData, submitCaseApiData } from '../data/api-data';
 import { dashboard } from '../data/page-data';
-import {
-  checkYourAnswers,
-  confirmIfTheseDocumentsRelateToAnApplication,
-  documentsUploaded,
-  startEvidenceUpload,
-  uploadYourDocuments,
-  viewDocuments,
-} from '../data/page-data/documents-page-data';
-import {
-  confirmDocumentsRelateToApplicationErrorValidation,
-  uploadYourDocumentsErrorValidation,
-} from '../functional/documents-functional';
+import { checkYourAnswers, confirmIfTheseDocumentsRelateToAnApplication, documentsUploaded, startEvidenceUpload, uploadYourDocuments, viewDocuments } from '../data/page-data/documents-page-data';
+import { confirmDocumentsRelateToApplicationErrorValidation, uploadYourDocumentsErrorValidation } from '../functional/documents-functional';
 import { getSelectedDefendantNumber } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { softErrorMessageValidation } from '../utils/common/error-message-validation-helper';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
@@ -45,10 +35,7 @@ test.afterEach(async () => {
 test.describe('Documents - e2e Journey @nightly', async () => {
   test('Upload documents when GenApps submitted @smoke @regression @crossbrowser @healthCheck', async () => {
     await performAction('citizenCreateGenAppAPI', { data: citizenCreateGenAppApiData().citizenCreateGenAppPayload });
-    await performAction(
-      'navigateToUrl',
-      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
-    );
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`);
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
@@ -76,10 +63,7 @@ test.describe('Documents - e2e Journey @nightly', async () => {
   });
 
   test('Upload documents when GenApps not submitted @regression', async () => {
-    await performAction(
-      'navigateToUrl',
-      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
-    );
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`);
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await softErrorMessageValidation('uploadYourDocuments', uploadYourDocumentsErrorValidation);
     await performAction('uploadDocuments', { files: ['uploadYourDocuments.ppt'] });
@@ -156,35 +140,23 @@ test.describe('Documents - e2e Journey @nightly', async () => {
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SET_ASIDE').citizenCreateGenAppPayload,
     });
-    await performAction(
-      'navigateToUrl',
-      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
-    );
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`);
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
-    await softErrorMessageValidation(
-      'confirmIfTheseDocumentsRelateToAnApplication',
-      confirmDocumentsRelateToApplicationErrorValidation
-    );
+    await softErrorMessageValidation('confirmIfTheseDocumentsRelateToAnApplication', confirmDocumentsRelateToApplicationErrorValidation);
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,
       option: confirmIfTheseDocumentsRelateToAnApplication.relatedToSetAsideRadioOptionHidden,
     });
     await performValidation('Then the user sees the main header', uploadYourDocuments.mainHeader);
     await performAction('clickLink', 'Back');
-    await performValidation(
-      'Then the user sees the main header',
-      confirmIfTheseDocumentsRelateToAnApplication.mainHeader
-    );
+    await performValidation('Then the user sees the main header', confirmIfTheseDocumentsRelateToAnApplication.mainHeader);
     await performAction('clickLink', 'Back');
     await performValidation('Then the user sees the main header', startEvidenceUpload.mainHeader);
     // SOMETHING_ELSE + default YES
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
     });
-    await performAction(
-      'navigateToUrl',
-      home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`
-    );
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/upload-additional-documents/start-evidence-upload`);
     await performAction('startEvidenceUpload', startEvidenceUpload.startNowButton);
     await performAction('verifyDocumentRelatesToApplication', {
       question: confirmIfTheseDocumentsRelateToAnApplication.doTheseDocumentsQuestion,

@@ -3,10 +3,7 @@ import { counterClaimHaveYouAppliedForHelp } from '../data/page-data/counterClai
 import { performAction, performValidation } from '../utils/controller';
 
 export async function doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation(): Promise<void> {
-  await performAction(
-    'When the user clicks the button',
-    doYouWantToUploadFilesToSupportYourCounterclaim.saveAndContinueButton
-  );
+  await performAction('When the user clicks the button', doYouWantToUploadFilesToSupportYourCounterclaim.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouWantToUploadFilesToSupportYourCounterclaim.thereIsAProblemErrorMessageHeader,
     message: doYouWantToUploadFilesToSupportYourCounterclaim.selectIfYouWantToUploadErrorMessage,
@@ -20,17 +17,9 @@ export async function doYouWantToUploadFilesToSupportYourCounterclaimNavigationT
   });
 
   if (process.env.I_NEED_HELP === 'NO') {
-    await performValidation(
-      'pageNavigation',
-      doYouWantToUploadFilesToSupportYourCounterclaim.backLink,
-      counterClaimAbout.mainHeader
-    );
+    await performValidation('pageNavigation', doYouWantToUploadFilesToSupportYourCounterclaim.backLink, counterClaimAbout.mainHeader);
   } else if (process.env.I_NEED_HELP === 'YES') {
-    await performValidation(
-      'pageNavigation',
-      doYouWantToUploadFilesToSupportYourCounterclaim.backLink,
-      counterClaimHaveYouAppliedForHelp.mainHeader
-    );
+    await performValidation('pageNavigation', doYouWantToUploadFilesToSupportYourCounterclaim.backLink, counterClaimHaveYouAppliedForHelp.mainHeader);
   }
   await performAction('clickRadioButton', doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption);
 }

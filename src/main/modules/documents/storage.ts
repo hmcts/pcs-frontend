@@ -3,7 +3,11 @@ import type { Request } from 'express';
 import { HTTPError } from '../../HttpError';
 import { getUserToken } from '../../steps/utils';
 
-import type { CcdCaseData, CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
+import type {
+  CcdCaseData,
+  CcdCollectionItem,
+  CcdUploadedDocument,
+} from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { toCaseReference16 } from '@utils/caseReference';
 
@@ -26,7 +30,9 @@ export interface DocumentStorage {
   save(req: Request, docs: CcdCollectionItem<CcdUploadedDocument>[]): Promise<void>;
 }
 
-export function toDisplayDocuments(docs: CcdCollectionItem<CcdUploadedDocument>[]): DisplayDocument[] {
+export function toDisplayDocuments(
+  docs: CcdCollectionItem<CcdUploadedDocument>[]
+): DisplayDocument[] {
   if (!Array.isArray(docs)) {
     return [];
   }
@@ -57,7 +63,12 @@ export function createCcdDraftStorage(opts: {
       if (!caseId) {
         throw new HTTPError('Invalid case reference format', 404);
       }
-      const fresh = await ccdCaseService.getCaseByIdForEvent(token, caseId, opts.event.id, req.session?.clientContext);
+      const fresh = await ccdCaseService.getCaseByIdForEvent(
+        token,
+        caseId,
+        opts.event.id,
+        req.session?.clientContext
+      );
       return opts.getDocs((fresh.data ?? {}) as CcdCaseData) ?? [];
     },
 
@@ -67,7 +78,13 @@ export function createCcdDraftStorage(opts: {
       if (!caseId) {
         throw new HTTPError('Invalid case reference format', 404);
       }
-      await ccdCaseService.updateDraft(opts.event, token, caseId, opts.setDocs(docs), req.session?.clientContext);
+      await ccdCaseService.updateDraft(
+        opts.event,
+        token,
+        caseId,
+        opts.setDocs(docs),
+        req.session?.clientContext
+      );
     },
   };
 }
@@ -93,7 +110,9 @@ export function sessionDocs(opts: { stepName: string }): DocumentStorage {
     },
 
     async readFresh(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-      await new Promise<void>((resolve, reject) => req.session.reload(err => (err ? reject(err) : resolve())));
+      await new Promise<void>((resolve, reject) =>
+        req.session.reload(err => (err ? reject(err) : resolve()))
+      );
       return readFromSession(req);
     },
 
@@ -109,7 +128,9 @@ export function sessionDocs(opts: { stepName: string }): DocumentStorage {
         req.session.uploadedDocs[caseRef] = {} as Record<string, unknown[]>;
       }
       (req.session.uploadedDocs[caseRef] as Record<string, unknown[]>)[opts.stepName] = docs;
-      await new Promise<void>((resolve, reject) => req.session.save(err => (err ? reject(err) : resolve())));
+      await new Promise<void>((resolve, reject) =>
+        req.session.save(err => (err ? reject(err) : resolve()))
+      );
     },
   };
 }

@@ -1,6 +1,9 @@
 import type { Request } from 'express';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -28,7 +31,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   extendGetContent: (req: Request, formContent) => {
     const data = req.res?.locals?.validatedCase?.data;
-    const alreadySaved = data?.possessionClaimResponse?.defendantResponses?.counterClaim?.counterClaimAgainst ?? [];
+    const alreadySaved =
+      data?.possessionClaimResponse?.defendantResponses?.counterClaim?.counterClaimAgainst ?? [];
     const submitted = req.body?.counterClaimAgainst;
     const checkedIds: (string | undefined)[] = submitted
       ? Array.isArray(submitted)
@@ -43,7 +47,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const checkboxItems = orderedParties
       .filter(p => p.value?.orgName || p.value?.firstName || p.value?.lastName)
       .map(p => {
-        const displayName = [p.value?.orgName, p.value?.firstName, p.value?.lastName].join(' ').trim();
+        const displayName = [p.value?.orgName, p.value?.firstName, p.value?.lastName]
+          .join(' ')
+          .trim();
         return { value: p.id, text: displayName, checked: checkedIds.includes(p.id) };
       });
 

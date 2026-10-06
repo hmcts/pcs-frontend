@@ -3,7 +3,11 @@ import { cloneDeep } from 'lodash';
 
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../respond-to-claim/draftEvent';
 import { normaliseRespondToClaimDraft } from '../respond-to-claim/normalise';
-import { CYA_STEP_PREFIX, findSectionIdForStep, sectionIdToBackendEnum } from '../respond-to-claim/sections.config';
+import {
+  CYA_STEP_PREFIX,
+  findSectionIdForStep,
+  sectionIdToBackendEnum,
+} from '../respond-to-claim/sections.config';
 
 import { PossessionClaimResponse } from '@services/ccdCase.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
@@ -50,9 +54,9 @@ function clearSectionCompletionOnEdit(req: Request, draft: PossessionClaimRespon
     return;
   }
   const enumValue = sectionIdToBackendEnum(sectionId);
-  draft.defendantResponses.completedSections = (draft.defendantResponses.completedSections ?? []).filter(
-    s => s !== enumValue
-  );
+  draft.defendantResponses.completedSections = (
+    draft.defendantResponses.completedSections ?? []
+  ).filter(s => s !== enumValue);
 }
 
 export function parseDraftVersion(value: unknown): number | undefined {
@@ -67,7 +71,10 @@ export function parseDraftVersion(value: unknown): number | undefined {
 
 // Convenience wrapper: normalises orphaned cross-page fields, saves the draft defendant response,
 // and refreshes validatedCase on the request.
-export const saveDraftDefendantResponse = async (req: Request, response: PossessionClaimResponse): Promise<void> => {
+export const saveDraftDefendantResponse = async (
+  req: Request,
+  response: PossessionClaimResponse
+): Promise<void> => {
   const normalised = normaliseRespondToClaimDraft(response);
 
   const accessToken = req.session?.user?.accessToken || '';

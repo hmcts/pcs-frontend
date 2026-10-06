@@ -33,8 +33,7 @@ export default {
   'your-circumstances': 'yourCircumstances',
   'exceptional-hardship': 'exceptionalHardship',
   'do-any-other-adults-live-in-your-home': 'doAnyOtherAdultsLiveInYourHome',
-  'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home':
-    'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
+  'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home': 'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
   'installment-payments': 'installmentPayments',
   'how-much-afford-to-pay': 'howMuchAffordToPay',
   'your-household-and-circumstances': 'yourHouseholdAndCircumstances',
@@ -56,8 +55,7 @@ export default {
   'have-the-other-parties-agreed-to-this-application': 'haveTheOtherPartiesAgreedToThisApplication',
   'you-need-to-apply-for-help-with-your-application-fee': 'youNeedToApplyForHelpWithYourApplicationFee',
   'what-order-do-you-want-the-court-to-make-and-why': 'whatOrderDoYouWantTheCourtToMakeAndWhy',
-  'are-there-any-reasons-that-this-application-should-not-be-shared':
-    'areThereAnyReasonsThatThisApplicationShouldNotBeShared',
+  'are-there-any-reasons-that-this-application-should-not-be-shared': 'areThereAnyReasonsThatThisApplicationShouldNotBeShared',
   'do-you-want-to-upload-documents-to-support-your-application': 'doYouWantToUploadDocumentsToSupportYourApplication',
   'upload-documents-to-support-your-application': 'uploadDocumentsToSupportYourApplication',
   'which-language-did-you-use-to-complete-this-service': 'whichLanguageDidYouUseToCompleteThisService',

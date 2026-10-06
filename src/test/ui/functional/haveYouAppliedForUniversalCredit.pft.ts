@@ -78,10 +78,6 @@ export async function haveYouAppliedForUniversalCreditNavigationTests(): Promise
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: haveYouAppliedForUniversalCredit.pageSlug,
   });
-  await performValidation(
-    'pageNavigation',
-    haveYouAppliedForUniversalCredit.backLink,
-    whatRegularIncomeDoYouReceive.mainHeader
-  );
+  await performValidation('pageNavigation', haveYouAppliedForUniversalCredit.backLink, whatRegularIncomeDoYouReceive.mainHeader);
   await performAction('clickRadioButton', haveYouAppliedForUniversalCredit.noRadioOption);
 }

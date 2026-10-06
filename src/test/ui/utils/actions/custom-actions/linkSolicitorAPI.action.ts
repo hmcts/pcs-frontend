@@ -47,9 +47,7 @@ export class LinkSolicitorAPIAction implements IAction {
 
     for (const defendant of defendantsToLink) {
       process.env.Defendant_ID = defendant.id;
-      console.log(
-        `Linking solicitor ${email} to defendant ${this.getDefendantName(defendant)} with id ${defendant.id}`
-      );
+      console.log(`Linking solicitor ${email} to defendant ${this.getDefendantName(defendant)} with id ${defendant.id}`);
 
       await this.linkSolicitorAPI(email);
     }
@@ -77,20 +75,14 @@ export class LinkSolicitorAPIAction implements IAction {
         if (!status) {
           throw new Error('Defendant id not retrieved: no response from server.');
         }
-        throw new Error(
-          `Retrieving defendant id failed with status ${status}. Response received is ${responseBody?.message}`
-        );
+        throw new Error(`Retrieving defendant id failed with status ${status}. Response received is ${responseBody?.message}`);
       }
 
       throw new Error('Defendant id not retrieved due to an unexpected error.');
     }
   }
 
-  private getDefendantsToLink(
-    allDefendants: DefendantCollectionItem[],
-    defendantIndexValue: actionData | undefined,
-    responseStatus: number
-  ): (DefendantCollectionItem & { id: string })[] {
+  private getDefendantsToLink(allDefendants: DefendantCollectionItem[], defendantIndexValue: actionData | undefined, responseStatus: number): (DefendantCollectionItem & { id: string })[] {
     if (!Array.isArray(allDefendants) || allDefendants.length === 0) {
       throw new Error(`No Defendants ID retrieved and the status is ${responseStatus}`);
     }
@@ -204,9 +196,7 @@ export class LinkSolicitorAPIAction implements IAction {
     return `${defendant.value?.firstName ?? ''} ${defendant.value?.lastName ?? ''}`.trim();
   }
 
-  private hasDefendantId(
-    defendant: DefendantCollectionItem | undefined
-  ): defendant is DefendantCollectionItem & { id: string } {
+  private hasDefendantId(defendant: DefendantCollectionItem | undefined): defendant is DefendantCollectionItem & { id: string } {
     return typeof defendant?.id === 'string' && defendant.id.trim() !== '';
   }
 }

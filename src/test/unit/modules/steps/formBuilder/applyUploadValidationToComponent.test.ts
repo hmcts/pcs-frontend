@@ -25,21 +25,27 @@ describe('applyUploadValidationToComponent', () => {
     const component: Record<string, unknown> = {};
     applyUploadValidationToComponent(component, { maxFilenameLength: 255 }, t);
     expect(component.maxFilenameLength).toBe(255);
-    expect(component.errorFilenameTooLong).toBe('common:errors.documentUpload.filenameTooLong(maxLength=255)');
+    expect(component.errorFilenameTooLong).toBe(
+      'common:errors.documentUpload.filenameTooLong(maxLength=255)'
+    );
   });
 
   it('wires document cap (MB) + translated error when maxDocumentBytes is set', () => {
     const component: Record<string, unknown> = {};
     applyUploadValidationToComponent(component, { maxDocumentBytes: 1024 * MB }, t);
     expect(component.maxDocumentMB).toBe(1024);
-    expect(component.errorFileTooLargeDocument).toBe('common:errors.documentUpload.fileTooLargeDocument(maxSize=1024)');
+    expect(component.errorFileTooLargeDocument).toBe(
+      'common:errors.documentUpload.fileTooLargeDocument(maxSize=1024)'
+    );
   });
 
   it('wires media cap (MB) + translated error when maxMediaBytes is set', () => {
     const component: Record<string, unknown> = {};
     applyUploadValidationToComponent(component, { maxMediaBytes: 500 * MB }, t);
     expect(component.maxMediaMB).toBe(500);
-    expect(component.errorFileTooLargeMedia).toBe('common:errors.documentUpload.fileTooLargeMedia(maxSize=500)');
+    expect(component.errorFileTooLargeMedia).toBe(
+      'common:errors.documentUpload.fileTooLargeMedia(maxSize=500)'
+    );
   });
 
   it('skips each branch independently when its option is omitted', () => {

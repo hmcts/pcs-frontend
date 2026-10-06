@@ -2,7 +2,10 @@ import type { Request } from 'express';
 
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
 import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -70,7 +73,8 @@ const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.tenancyTypeConfirmation),
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.tenancyTypeConfirmation),
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -89,7 +93,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseData = req.res?.locals.validatedCase?.data;
     const existingTenancyTypeConfirmation =
       caseData?.possessionClaimResponse?.defendantResponses?.tenancyTypeConfirmation;
-    const existingCorrectedTenancyType = caseData?.possessionClaimResponse?.defendantResponses?.tenancyType;
+    const existingCorrectedTenancyType =
+      caseData?.possessionClaimResponse?.defendantResponses?.tenancyType;
 
     const formValue = fromYesNoNotSureEnum(existingTenancyTypeConfirmation);
     if (!formValue) {
@@ -132,11 +137,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   extendGetContent: async (req, formContent) => {
     const existingTenancyTypeConfirmation =
-      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.tenancyTypeConfirmation;
-    const existingCorrectedTenancyType = req.res?.locals.validatedCase?.data?.possessionClaimResponse
-      ?.defendantResponses?.tenancyType as string;
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+        ?.tenancyTypeConfirmation;
+    const existingCorrectedTenancyType = req.res?.locals.validatedCase?.data
+      ?.possessionClaimResponse?.defendantResponses?.tenancyType as string;
     const tenancyTypeConfirm =
-      (req.body?.tenancyTypeConfirm as string) || fromYesNoNotSureEnum(existingTenancyTypeConfirmation) || '';
+      (req.body?.tenancyTypeConfirm as string) ||
+      fromYesNoNotSureEnum(existingTenancyTypeConfirmation) ||
+      '';
     const correctType =
       (req.body?.['tenancyTypeConfirm.correctType'] as string) ||
       (req.body?.correctType as string) ||
@@ -170,10 +178,17 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         tenancyType = formContent.tenancyType;
       }
     } else {
-      tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
+      tenancyType =
+        tenancyTypeOfTenancyLicence === 'OTHER'
+          ? formContent.tenancyTypeOther
+          : formContent.tenancyType;
     }
 
-    const documentId = await resolveStepDocumentId(req, getTenancyDocumentInfo, 'tenancyTypeDetails');
+    const documentId = await resolveStepDocumentId(
+      req,
+      getTenancyDocumentInfo,
+      'tenancyTypeDetails'
+    );
     const tenancyDocument = documentId ? { id: documentId } : '';
 
     return {

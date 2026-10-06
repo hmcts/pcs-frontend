@@ -23,7 +23,9 @@ describe('upload-additional-documents flow.config', () => {
 
       expect(conditionalRoute?.condition).toBe(isViewAllApplicationsAvailable);
       expect(conditionalRoute?.nextStep).toBe(confirmIfTheseDocumentsRelateToAnApplicationStep);
-      expect(conditionalRoute?.nextStep).toBe('confirm-if-these-documents-relate-to-an-application');
+      expect(conditionalRoute?.nextStep).toBe(
+        'confirm-if-these-documents-relate-to-an-application'
+      );
     });
 
     it('falls through to upload-your-documents as the default branch', () => {

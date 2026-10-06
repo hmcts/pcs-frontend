@@ -21,11 +21,7 @@ export async function correspondenceAddressErrorValidation(): Promise<void> {
     message: correspondenceAddress.postCodeNotFoundErrorMessage,
   });
 
-  await performAction(
-    'inputText',
-    correspondenceAddress.enterUKPostcodeHiddenTextLabel,
-    correspondenceAddress.englandPostcodeTextInput
-  );
+  await performAction('inputText', correspondenceAddress.enterUKPostcodeHiddenTextLabel, correspondenceAddress.englandPostcodeTextInput);
   await performAction('When the user clicks the button', correspondenceAddress.findAddressHiddenButton);
   await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
   await performValidation('errorMessage', {
@@ -63,16 +59,8 @@ export async function correspondenceAddressErrorValidation(): Promise<void> {
     ]
   );
 
-  await performAction(
-    'inputText',
-    correspondenceAddress.addressLine1HiddenTextLabel,
-    correspondenceAddress.englandAddressLine1TextInput
-  );
-  await performAction(
-    'inputText',
-    correspondenceAddress.townOrCityHiddenTextLabel,
-    correspondenceAddress.englandTownOrCityTextInput
-  );
+  await performAction('inputText', correspondenceAddress.addressLine1HiddenTextLabel, correspondenceAddress.englandAddressLine1TextInput);
+  await performAction('inputText', correspondenceAddress.townOrCityHiddenTextLabel, correspondenceAddress.englandTownOrCityTextInput);
   await performAction('inputText', correspondenceAddress.postcodeHiddenTextLabel, 'ABED');
   await performAction('When the user clicks the button', correspondenceAddress.saveAndContinueButton);
   await performValidation('errorMessage', {

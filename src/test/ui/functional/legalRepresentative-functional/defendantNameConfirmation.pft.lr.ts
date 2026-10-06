@@ -21,21 +21,13 @@ export async function defendantNameConfirmationErrorValidation(): Promise<void> 
     message: defendantNameConfirmation.enterDefendantLastNameErrorMessage,
   });
   //Test: Both first name and last name for emoji
-  await performAction(
-    'inputText',
-    defendantNameConfirmation.defendantFirstNameHiddenTextLabel,
-    defendantNameConfirmation.emojiTextInput
-  );
+  await performAction('inputText', defendantNameConfirmation.defendantFirstNameHiddenTextLabel, defendantNameConfirmation.emojiTextInput);
   await performAction('When the user clicks the button', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,
     message: defendantNameConfirmation.emojiFirstNameErrorMessage,
   });
-  await performAction(
-    'inputText',
-    defendantNameConfirmation.defendantLastNameHiddenTextLabel,
-    defendantNameConfirmation.emojiTextInput
-  );
+  await performAction('inputText', defendantNameConfirmation.defendantLastNameHiddenTextLabel, defendantNameConfirmation.emojiTextInput);
   await performAction('When the user clicks the button', defendantNameConfirmation.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: defendantNameConfirmation.thereIsAProblemErrorMessageHeader,

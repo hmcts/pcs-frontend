@@ -7,6 +7,9 @@ import type { PossessionClaimResponse } from '@services/ccdCase.interface';
  */
 export const hasSkippedEqualityAndDiversityQuestions = (req: Request): boolean => {
   const caseData = req.res?.locals.validatedCase?.data;
-  const possessionClaimResponse: PossessionClaimResponse | undefined = caseData?.possessionClaimResponse;
-  return possessionClaimResponse?.defendantResponses?.equalityAndDiversityQuestionsChoice === 'SKIP';
+  const possessionClaimResponse: PossessionClaimResponse | undefined =
+    caseData?.possessionClaimResponse;
+  return (
+    possessionClaimResponse?.defendantResponses?.equalityAndDiversityQuestionsChoice === 'SKIP'
+  );
 };

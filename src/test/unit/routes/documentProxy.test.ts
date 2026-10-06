@@ -10,9 +10,11 @@ jest.mock('multer', () => {
     }
   }
 
-  const mockSingle = jest.fn((_field: string) => (req: unknown, _res: unknown, cb: (err: unknown) => void) => {
-    cb((req as { __mockMulterErr?: unknown }).__mockMulterErr);
-  });
+  const mockSingle = jest.fn(
+    (_field: string) => (req: unknown, _res: unknown, cb: (err: unknown) => void) => {
+      cb((req as { __mockMulterErr?: unknown }).__mockMulterErr);
+    }
+  );
 
   const multerFactory = jest.fn(() => ({ single: mockSingle })) as unknown as {
     (opts?: unknown): { single: jest.Mock };
@@ -149,13 +151,20 @@ describe('documentProxyRoutes', () => {
 
     beforeEach(() => {
       const getCalls = (mockApp.get as jest.Mock).mock.calls;
-      const downloadCall = getCalls.find((c: unknown[]) => (c[0] as string).includes('/document/:index'));
+      const downloadCall = getCalls.find((c: unknown[]) =>
+        (c[0] as string).includes('/document/:index')
+      );
       handler = downloadCall[downloadCall.length - 1];
     });
 
     it('returns 404 for invalid index', async () => {
       const req = makeReqWithDocs({
-        params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: 'abc' },
+        params: {
+          caseReference: '123456',
+          journey: 'respond-to-claim',
+          step: 'upload-document',
+          index: 'abc',
+        },
       });
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
@@ -166,7 +175,14 @@ describe('documentProxyRoutes', () => {
 
     it('returns 404 when index out of range', async () => {
       const req = makeReqWithDocs(
-        { params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: '5' } },
+        {
+          params: {
+            caseReference: '123456',
+            journey: 'respond-to-claim',
+            step: 'upload-document',
+            index: '5',
+          },
+        },
         [existingDoc]
       );
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
@@ -179,10 +195,20 @@ describe('documentProxyRoutes', () => {
     it('streams document with security headers using server-side CDAM URL', async () => {
       const { getDocumentBinary } = require('@services/cdamService');
       const mockStream = { pipe: jest.fn(), on: jest.fn() };
-      (getDocumentBinary as jest.Mock).mockResolvedValue({ stream: mockStream, contentType: 'application/pdf' });
+      (getDocumentBinary as jest.Mock).mockResolvedValue({
+        stream: mockStream,
+        contentType: 'application/pdf',
+      });
 
       const req = makeReqWithDocs(
-        { params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: '0' } },
+        {
+          params: {
+            caseReference: '123456',
+            journey: 'respond-to-claim',
+            step: 'upload-document',
+            index: '0',
+          },
+        },
         [existingDoc]
       );
       const res = {
@@ -194,7 +220,10 @@ describe('documentProxyRoutes', () => {
 
       expect(getDocumentBinary).toHaveBeenCalledWith('http://dm/doc/existing-uuid/binary', 'token');
       expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf');
-      expect(res.setHeader).toHaveBeenCalledWith('Content-Disposition', 'attachment; filename="existing.pdf"');
+      expect(res.setHeader).toHaveBeenCalledWith(
+        'Content-Disposition',
+        'attachment; filename="existing.pdf"'
+      );
       expect(res.setHeader).toHaveBeenCalledWith('Content-Security-Policy', 'sandbox');
       expect(res.setHeader).toHaveBeenCalledWith('X-Content-Type-Options', 'nosniff');
       expect(mockStream.on).toHaveBeenCalledWith('error', expect.any(Function));
@@ -206,7 +235,14 @@ describe('documentProxyRoutes', () => {
       (getDocumentBinary as jest.Mock).mockRejectedValue(new Error('CDAM down'));
 
       const req = makeReqWithDocs(
-        { params: { caseReference: '123456', journey: 'respond-to-claim', step: 'upload-document', index: '0' } },
+        {
+          params: {
+            caseReference: '123456',
+            journey: 'respond-to-claim',
+            step: 'upload-document',
+            index: '0',
+          },
+        },
         [existingDoc]
       );
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
@@ -236,7 +272,10 @@ describe('documentProxyRoutes', () => {
 
     it('rejects invalid file types with UploadValidationFailure(invalid_type)', () => {
       const cb = jest.fn();
-      const file = { mimetype: 'application/x-executable', originalname: 'malware.exe' } as Express.Multer.File;
+      const file = {
+        mimetype: 'application/x-executable',
+        originalname: 'malware.exe',
+      } as Express.Multer.File;
       fileFilter({} as Request, file, cb);
       const arg = (cb as jest.Mock).mock.calls[0][0];
       expect(arg).toBeInstanceOf(UploadValidationFailure);
@@ -504,7 +543,12 @@ describe('documentProxyRoutes', () => {
       mockUploadDocument.mockResolvedValue(mockDoc);
 
       const req = makeReqWithDocs({
-        file: { originalname: 'test.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 1024 },
+        file: {
+          originalname: 'test.pdf',
+          mimetype: 'application/pdf',
+          buffer: Buffer.from(''),
+          size: 1024,
+        },
       });
       const res = { json: jest.fn() } as unknown as Response;
 
@@ -534,13 +578,24 @@ describe('documentProxyRoutes', () => {
       mockReadFresh.mockResolvedValue([existingDoc]);
 
       const req = makeReqWithDocs(
-        { file: { originalname: 'new.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 2048 } },
+        {
+          file: {
+            originalname: 'new.pdf',
+            mimetype: 'application/pdf',
+            buffer: Buffer.from(''),
+            size: 2048,
+          },
+        },
         [existingDoc]
       );
       // Rewire so the dynamic mock is in effect
       const { findStep } = require('../../../main/steps/index');
       (findStep as jest.Mock).mockReturnValue({
-        documentStorage: { read: jest.fn().mockResolvedValue([existingDoc]), readFresh: mockReadFresh, save: mockSave },
+        documentStorage: {
+          read: jest.fn().mockResolvedValue([existingDoc]),
+          readFresh: mockReadFresh,
+          save: mockSave,
+        },
       });
 
       const res = { json: jest.fn() } as unknown as Response;
@@ -549,7 +604,10 @@ describe('documentProxyRoutes', () => {
 
       expect(mockSave).toHaveBeenCalledWith(
         req,
-        expect.arrayContaining([existingDoc, expect.objectContaining({ value: expect.any(Object) })])
+        expect.arrayContaining([
+          existingDoc,
+          expect.objectContaining({ value: expect.any(Object) }),
+        ])
       );
 
       const body = (res.json as jest.Mock).mock.calls[0][0];
@@ -566,7 +624,12 @@ describe('documentProxyRoutes', () => {
       });
 
       const req = makeReqWithDocs({
-        file: { originalname: 'new.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 2048 },
+        file: {
+          originalname: 'new.pdf',
+          mimetype: 'application/pdf',
+          buffer: Buffer.from(''),
+          size: 2048,
+        },
       });
 
       // Override AFTER makeReqWithDocs so this mock wins
@@ -586,14 +649,21 @@ describe('documentProxyRoutes', () => {
 
       const savedDocs = (mockSave as jest.Mock).mock.calls[0][1];
       expect(savedDocs).toHaveLength(1);
-      expect(savedDocs[0].id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i);
+      expect(savedDocs[0].id).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      );
     });
 
     it('returns 502 when cdamService throws', async () => {
       mockUploadDocument.mockRejectedValue(new Error('CDAM down'));
 
       const req = makeReqWithDocs({
-        file: { originalname: 'test.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 1024 },
+        file: {
+          originalname: 'test.pdf',
+          mimetype: 'application/pdf',
+          buffer: Buffer.from(''),
+          size: 1024,
+        },
       });
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
@@ -630,7 +700,14 @@ describe('documentProxyRoutes', () => {
       const mockSave = jest.fn().mockResolvedValue(undefined);
 
       const req = makeReqWithDocs(
-        { file: { originalname: 'small.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 10 } },
+        {
+          file: {
+            originalname: 'small.pdf',
+            mimetype: 'application/pdf',
+            buffer: Buffer.from(''),
+            size: 10,
+          },
+        },
         [hugeExistingDoc]
       );
       const { findStep } = require('../../../main/steps/index');
@@ -858,7 +935,12 @@ describe('documentProxyRoutes', () => {
       });
 
       const req = makeReqWithDocs({
-        file: { originalname: 'a&b<c>d"e.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 10 },
+        file: {
+          originalname: 'a&b<c>d"e.pdf',
+          mimetype: 'application/pdf',
+          buffer: Buffer.from(''),
+          size: 10,
+        },
       });
       const res = { json: jest.fn() } as unknown as Response;
 
@@ -872,7 +954,12 @@ describe('documentProxyRoutes', () => {
     it('upload: returns 502 when user not authenticated', async () => {
       const req = makeReqWithDocs({
         session: undefined,
-        file: { originalname: 'test.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 10 },
+        file: {
+          originalname: 'test.pdf',
+          mimetype: 'application/pdf',
+          buffer: Buffer.from(''),
+          size: 10,
+        },
       });
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
@@ -891,7 +978,12 @@ describe('documentProxyRoutes', () => {
         params: { caseReference: '123', journey: 'respond-to-claim', step: 'upload-document' },
         t: mockT,
         res: { locals: {} },
-        file: { originalname: 'test.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 10 },
+        file: {
+          originalname: 'test.pdf',
+          mimetype: 'application/pdf',
+          buffer: Buffer.from(''),
+          size: 10,
+        },
       } as unknown as Request;
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
@@ -904,7 +996,12 @@ describe('documentProxyRoutes', () => {
       mockUploadDocument.mockRejectedValue('non-error-reject');
 
       const req = makeReqWithDocs({
-        file: { originalname: 'test.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 1024 },
+        file: {
+          originalname: 'test.pdf',
+          mimetype: 'application/pdf',
+          buffer: Buffer.from(''),
+          size: 1024,
+        },
       });
       const res = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
@@ -993,7 +1090,11 @@ describe('documentProxyRoutes', () => {
 
       expect(persisted).toHaveLength(3);
       const filenames = persisted
-        .map(d => (d as { value: { document: { document_filename: string } } }).value.document.document_filename)
+        .map(
+          d =>
+            (d as { value: { document: { document_filename: string } } }).value.document
+              .document_filename
+        )
         .sort();
       expect(filenames).toEqual(['a.pdf', 'b.pdf', 'c.pdf']);
     });
@@ -1026,8 +1127,14 @@ describe('documentProxyRoutes', () => {
       const deleteRes = { json: jest.fn() } as unknown as Response;
 
       await Promise.all([
-        uploadHandler({ ...baseReq, file: makeFile('new.pdf', 99) } as unknown as Request, uploadRes),
-        deleteHandler({ ...baseReq, body: { delete: 'existing-doc-id' } } as unknown as Request, deleteRes),
+        uploadHandler(
+          { ...baseReq, file: makeFile('new.pdf', 99) } as unknown as Request,
+          uploadRes
+        ),
+        deleteHandler(
+          { ...baseReq, body: { delete: 'existing-doc-id' } } as unknown as Request,
+          deleteRes
+        ),
       ]);
 
       expect(persisted).toHaveLength(1);
@@ -1067,12 +1174,20 @@ describe('documentProxyRoutes', () => {
       const resB = { status: jest.fn().mockReturnThis(), json: jest.fn() } as unknown as Response;
 
       await Promise.all([
-        uploadHandler({ ...baseReq, file: makeFile('first.pdf', overHalfCapBytes) } as unknown as Request, resA),
-        uploadHandler({ ...baseReq, file: makeFile('second.pdf', overHalfCapBytes) } as unknown as Request, resB),
+        uploadHandler(
+          { ...baseReq, file: makeFile('first.pdf', overHalfCapBytes) } as unknown as Request,
+          resA
+        ),
+        uploadHandler(
+          { ...baseReq, file: makeFile('second.pdf', overHalfCapBytes) } as unknown as Request,
+          resB
+        ),
       ]);
 
       expect(persisted).toHaveLength(1);
-      expect((persisted[0] as { value: { sizeInBytes?: number } }).value.sizeInBytes).toBe(overHalfCapBytes);
+      expect((persisted[0] as { value: { sizeInBytes?: number } }).value.sizeInBytes).toBe(
+        overHalfCapBytes
+      );
       expect(mockDeleteDocument).toHaveBeenCalledTimes(1);
       const rejected = [resA, resB].filter(r =>
         (r.status as jest.Mock).mock.calls.some(([code]: [number]) => code === 400)
@@ -1084,7 +1199,13 @@ describe('documentProxyRoutes', () => {
       const { findStep } = require('../../../main/steps/index');
       const staleDoc = {
         id: 'stale',
-        value: { document: { document_url: 'x', document_binary_url: 'x/b', document_filename: 'stale.pdf' } },
+        value: {
+          document: {
+            document_url: 'x',
+            document_binary_url: 'x/b',
+            document_filename: 'stale.pdf',
+          },
+        },
       };
       const freshDoc = existingDoc;
 

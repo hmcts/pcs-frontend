@@ -17,7 +17,14 @@ export function formatAddress(addr: CcdCaseAddress | undefined): string | undefi
   if (!addr) {
     return undefined;
   }
-  return [addr.AddressLine1, addr.AddressLine2, addr.AddressLine3, addr.PostTown, addr.County, addr.PostCode]
+  return [
+    addr.AddressLine1,
+    addr.AddressLine2,
+    addr.AddressLine3,
+    addr.PostTown,
+    addr.County,
+    addr.PostCode,
+  ]
     .filter(Boolean)
     .join(', ');
 }
@@ -26,7 +33,9 @@ function unwrapCollection<T>(items: CcdCollectionItem<T>[] | undefined): T[] {
   return (items ?? []).map(item => item.value);
 }
 
-function flattenTemplateValues(items: CcdCollectionItem<CcdTemplateKeyValue>[]): Record<string, unknown> {
+function flattenTemplateValues(
+  items: CcdCollectionItem<CcdTemplateKeyValue>[]
+): Record<string, unknown> {
   const result: Record<string, unknown> = {};
   for (const item of items) {
     result[item.value.key] = item.value.value;
@@ -45,7 +54,9 @@ export function unwrapNotifications(
 }
 
 /** Unwraps CCD-wrapped task groups into the flat shape */
-export function unwrapTaskGroups(raw: CcdCollectionItem<CcdDashboardTaskGroup>[] | undefined): DashboardTaskGroup[] {
+export function unwrapTaskGroups(
+  raw: CcdCollectionItem<CcdDashboardTaskGroup>[] | undefined
+): DashboardTaskGroup[] {
   return unwrapCollection(raw).map(g => ({
     groupId: g.groupId as DashboardTaskGroup['groupId'],
     tasks: unwrapCollection(g.tasks).map((t): DashboardTask => ({
@@ -60,7 +71,9 @@ export function unwrapRelatedApplications(
 ): DashboardRelatedApplication[] {
   return unwrapCollection(raw)
     .filter(
-      (app): app is CcdRelatedApplication & { id: string; type: DashboardRelatedApplication['type'] } =>
+      (
+        app
+      ): app is CcdRelatedApplication & { id: string; type: DashboardRelatedApplication['type'] } =>
         !!app.id && !!app.type
     )
     .map(app => ({

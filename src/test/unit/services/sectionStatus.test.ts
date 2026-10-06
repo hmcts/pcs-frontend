@@ -18,7 +18,9 @@ import { getFirstVisibleStep, getSectionStatus } from '@services/sectionStatus';
 const yourSupport = respondToClaimSections.find(section => section.id === 'yourSupport')!;
 
 const makeReq = (possessionClaimResponse?: unknown): Request =>
-  ({ res: { locals: { validatedCase: { id: '123', data: {}, possessionClaimResponse } } } }) as unknown as Request;
+  ({
+    res: { locals: { validatedCase: { id: '123', data: {}, possessionClaimResponse } } },
+  }) as unknown as Request;
 
 describe('yourSupport section status (task-list "Your support" row)', () => {
   beforeEach(() => jest.clearAllMocks());
@@ -26,7 +28,13 @@ describe('yourSupport section status (task-list "Your support" row)', () => {
   it('is NOT_APPLICABLE (row filtered out of the task list) when the feature flag is off', async () => {
     mockIsCuiYourSupportEnabled.mockResolvedValue(false);
 
-    const status = await getSectionStatus(yourSupport, flowConfig, stepRegistry, makeReq(), new Map());
+    const status = await getSectionStatus(
+      yourSupport,
+      flowConfig,
+      stepRegistry,
+      makeReq(),
+      new Map()
+    );
 
     expect(status).toBe('NOT_APPLICABLE');
   });
@@ -34,14 +42,22 @@ describe('yourSupport section status (task-list "Your support" row)', () => {
   it('is AVAILABLE when the flag is on and no adjustments have been captured yet', async () => {
     mockIsCuiYourSupportEnabled.mockResolvedValue(true);
 
-    const status = await getSectionStatus(yourSupport, flowConfig, stepRegistry, makeReq(), new Map());
+    const status = await getSectionStatus(
+      yourSupport,
+      flowConfig,
+      stepRegistry,
+      makeReq(),
+      new Map()
+    );
 
     expect(status).toBe('AVAILABLE');
   });
 
   it('is DONE when the flag is on and the defendant has captured adjustments (defendantFlags present)', async () => {
     mockIsCuiYourSupportEnabled.mockResolvedValue(true);
-    const req = makeReq({ defendantFlags: { details: [{ id: 'f1', value: { name: 'Language interpreter' } }] } });
+    const req = makeReq({
+      defendantFlags: { details: [{ id: 'f1', value: { name: 'Language interpreter' } }] },
+    });
 
     const status = await getSectionStatus(yourSupport, flowConfig, stepRegistry, req, new Map());
 
@@ -49,6 +65,8 @@ describe('yourSupport section status (task-list "Your support" row)', () => {
   });
 
   it('links the row to the triage page (its only, always-visible step)', () => {
-    expect(getFirstVisibleStep(yourSupport, flowConfig, makeReq())).toBe('reasonable-adjustments-triage');
+    expect(getFirstVisibleStep(yourSupport, flowConfig, makeReq())).toBe(
+      'reasonable-adjustments-triage'
+    );
   });
 });

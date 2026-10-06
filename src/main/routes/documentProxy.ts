@@ -45,7 +45,11 @@ export class UploadValidationFailure extends Error {
   }
 }
 
-export function fileFilter(req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback): void {
+export function fileFilter(
+  req: Request,
+  file: Express.Multer.File,
+  cb: multer.FileFilterCallback
+): void {
   const opts = (req as RequestWithUploadValidation).uploadValidation ?? {};
   // Size is unknown at fileFilter time; multer.limits.fileSize enforces the per-file byte cap during streaming.
   const error = validateUploadedFile(
@@ -103,7 +107,9 @@ function getErrorTranslations(req: Request) {
     tooLargeMedia: t('errors.documentUpload.fileTooLargeMedia', {
       maxSize: formatSizeForDisplay(UPLOAD_MAX_MEDIA_FILE_SIZE_MB),
     }),
-    filenameTooLong: t('errors.documentUpload.filenameTooLong', { maxLength: String(UPLOAD_MAX_FILENAME_LENGTH) }),
+    filenameTooLong: t('errors.documentUpload.filenameTooLong', {
+      maxLength: String(UPLOAD_MAX_FILENAME_LENGTH),
+    }),
     totalTooLarge: t('errors.documentUpload.fileTotalTooLargeDocStore', {
       maxSize: formatSizeForDisplay(UPLOAD_MAX_TOTAL_SIZE_MB),
     }),
@@ -141,7 +147,9 @@ export function handleMulterError(
     return;
   }
   if (err instanceof UploadValidationFailure) {
-    res.status(400).json({ error: { message: translateValidationError(req, err.validationError) } });
+    res
+      .status(400)
+      .json({ error: { message: translateValidationError(req, err.validationError) } });
     return;
   }
   if (err.message === 'FILENAME_TOO_LONG') {
@@ -151,7 +159,10 @@ export function handleMulterError(
   next(err);
 }
 
-function uploadCtx(req: Request): { storage: DocumentStorage; uploadValidation?: UploadValidationOptions } {
+function uploadCtx(req: Request): {
+  storage: DocumentStorage;
+  uploadValidation?: UploadValidationOptions;
+} {
   const slug = req.params.journey as string | undefined;
   const stepName = req.params.step as string | undefined;
   const variant = getUserVariant(req);
@@ -185,7 +196,10 @@ async function withCaseLock<T>(caseId: string, fn: () => Promise<T>): Promise<T>
   }
 }
 
-async function saveDraftWithNewDocument(req: Request, entry: CcdCollectionItem<CcdUploadedDocument>): Promise<number> {
+async function saveDraftWithNewDocument(
+  req: Request,
+  entry: CcdCollectionItem<CcdUploadedDocument>
+): Promise<number> {
   const caseId = req.params.caseReference as string;
   const { storage } = uploadCtx(req);
   const token = getUserToken(req);
@@ -284,9 +298,17 @@ function sanitiseFilename(filename: string): string {
   return filename.replace(/["\\\n\r]/g, '_');
 }
 
-function validateDocumentIndex(indexParam: string, docs: CcdCollectionItem<CcdUploadedDocument>[]): number | null {
+function validateDocumentIndex(
+  indexParam: string,
+  docs: CcdCollectionItem<CcdUploadedDocument>[]
+): number | null {
   const docIndex = Number(indexParam);
-  if (Number.isNaN(docIndex) || !Number.isInteger(docIndex) || docIndex < 0 || docIndex >= docs.length) {
+  if (
+    Number.isNaN(docIndex) ||
+    !Number.isInteger(docIndex) ||
+    docIndex < 0 ||
+    docIndex >= docs.length
+  ) {
     return null;
   }
   return docIndex;
@@ -365,7 +387,10 @@ export default function documentProxyRoutes(app: Application): void {
 
         // Image files have a tighter cap than documents. multer.limits.fileSize enforces the larger
         // (document) cap during streaming; this re-check rejects oversize images before CDAM upload.
-        if (isMediaExtension(req.file.originalname) && req.file.size > UPLOAD_MAX_MEDIA_FILE_SIZE_BYTES) {
+        if (
+          isMediaExtension(req.file.originalname) &&
+          req.file.size > UPLOAD_MAX_MEDIA_FILE_SIZE_BYTES
+        ) {
           return res.status(400).json({ error: { message: errors.tooLargeMedia } });
         }
 
@@ -377,11 +402,17 @@ export default function documentProxyRoutes(app: Application): void {
         const opts = (req as RequestWithUploadValidation).uploadValidation;
         if (opts) {
           const postUploadError = validateUploadedFile(
-            { originalname: req.file.originalname, mimetype: req.file.mimetype, size: req.file.size },
+            {
+              originalname: req.file.originalname,
+              mimetype: req.file.mimetype,
+              size: req.file.size,
+            },
             opts
           );
           if (postUploadError) {
-            return res.status(400).json({ error: { message: translateValidationError(req, postUploadError) } });
+            return res
+              .status(400)
+              .json({ error: { message: translateValidationError(req, postUploadError) } });
           }
         }
 
@@ -393,7 +424,11 @@ export default function documentProxyRoutes(app: Application): void {
         if (error instanceof HTTPError && error.status === 404) {
           return res.status(404).json({ error: { message: errors.documentNotFound } });
         }
-        if (error instanceof HTTPError && error.status === 400 && error.message === DOCUMENT_TOTAL_SIZE_EXCEEDED) {
+        if (
+          error instanceof HTTPError &&
+          error.status === 400 &&
+          error.message === DOCUMENT_TOTAL_SIZE_EXCEEDED
+        ) {
           return res.status(400).json({ error: { message: errors.totalTooLarge } });
         }
         logger.error('Failed to upload document to CDAM', {
@@ -404,26 +439,30 @@ export default function documentProxyRoutes(app: Application): void {
     }
   );
 
-  app.post('/case/:caseReference/:journey/:step/delete', oidcMiddleware, async (req: Request, res: Response) => {
-    const errors = getErrorTranslations(req);
-    try {
-      const docId = (req.body as Record<string, string>).delete;
-      if (typeof docId !== 'string' || docId.length === 0) {
-        return res.status(404).json({ error: { message: errors.documentNotFound } });
-      }
+  app.post(
+    '/case/:caseReference/:journey/:step/delete',
+    oidcMiddleware,
+    async (req: Request, res: Response) => {
+      const errors = getErrorTranslations(req);
+      try {
+        const docId = (req.body as Record<string, string>).delete;
+        if (typeof docId !== 'string' || docId.length === 0) {
+          return res.status(404).json({ error: { message: errors.documentNotFound } });
+        }
 
-      // Delete is idempotent: a missing doc means it's already gone (concurrent
-      // delete from another tab/click). Treat as success so the client converges.
-      await removeDraftDocument(req, docId);
-      return res.json({ success: true });
-    } catch (error) {
-      if (error instanceof HTTPError && error.status === 404) {
-        return res.status(404).json({ error: { message: errors.documentNotFound } });
+        // Delete is idempotent: a missing doc means it's already gone (concurrent
+        // delete from another tab/click). Treat as success so the client converges.
+        await removeDraftDocument(req, docId);
+        return res.json({ success: true });
+      } catch (error) {
+        if (error instanceof HTTPError && error.status === 404) {
+          return res.status(404).json({ error: { message: errors.documentNotFound } });
+        }
+        logger.error('Failed to delete document from CDAM', {
+          error: error instanceof Error ? error.message : String(error),
+        });
+        return res.status(502).json({ error: { message: errors.deleteFailed } });
       }
-      logger.error('Failed to delete document from CDAM', {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      return res.status(502).json({ error: { message: errors.deleteFailed } });
     }
-  });
+  );
 }

@@ -27,11 +27,7 @@ export async function whatOtherRegularExpensesDoYouHaveErrorValidation(): Promis
   console.log(`err msg - mandatory frequency not selected`);
 
   // 4. Enter incorrect format
-  await performAction(
-    'inputText',
-    whatOtherRegularExpensesDoYouHave.householdBillsAmountPaidHiddenLabel,
-    whatOtherRegularExpensesDoYouHave.incorrectFormatTextInput
-  );
+  await performAction('inputText', whatOtherRegularExpensesDoYouHave.householdBillsAmountPaidHiddenLabel, whatOtherRegularExpensesDoYouHave.incorrectFormatTextInput);
   await performAction('clickRadioButton', whatOtherRegularExpensesDoYouHave.householdBillsWeekHiddenRadioOption);
   await performAction('When the user clicks the button', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   console.log(`entered incorrect format for amount`);
@@ -43,11 +39,7 @@ export async function whatOtherRegularExpensesDoYouHaveErrorValidation(): Promis
   console.log(`verified incorrect format error message`);
 
   // 5. Enter negative value
-  await performAction(
-    'inputText',
-    whatOtherRegularExpensesDoYouHave.householdBillsAmountPaidHiddenLabel,
-    whatOtherRegularExpensesDoYouHave.negativeTextInput
-  );
+  await performAction('inputText', whatOtherRegularExpensesDoYouHave.householdBillsAmountPaidHiddenLabel, whatOtherRegularExpensesDoYouHave.negativeTextInput);
   await performAction('When the user clicks the button', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   console.log(`entered negative value for amount`);
 
@@ -58,11 +50,7 @@ export async function whatOtherRegularExpensesDoYouHaveErrorValidation(): Promis
   console.log(`verified negative value error message for household bills`);
 
   // 6. Enter > £1 billion
-  await performAction(
-    'inputText',
-    whatOtherRegularExpensesDoYouHave.householdBillsAmountPaidHiddenLabel,
-    whatOtherRegularExpensesDoYouHave.billionTextInput
-  );
+  await performAction('inputText', whatOtherRegularExpensesDoYouHave.householdBillsAmountPaidHiddenLabel, whatOtherRegularExpensesDoYouHave.billionTextInput);
   await performAction('When the user clicks the button', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   console.log(`entered > £1 billion for amount`);
 
@@ -102,11 +90,7 @@ export async function whatOtherRegularExpensesDoYouHaveErrorValidation(): Promis
   });
   console.log(`err msg - mandatory frequency not selected`);
 
-  await performAction(
-    'inputText',
-    whatOtherRegularExpensesDoYouHave.loanPaymentsAmountPaidHiddenLabel,
-    whatOtherRegularExpensesDoYouHave.incorrectFormatTextInput
-  );
+  await performAction('inputText', whatOtherRegularExpensesDoYouHave.loanPaymentsAmountPaidHiddenLabel, whatOtherRegularExpensesDoYouHave.incorrectFormatTextInput);
   await performAction('clickRadioButton', whatOtherRegularExpensesDoYouHave.loanPaymentsWeekHiddenRadioOption);
   await performAction('When the user clicks the button', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   console.log(`entered incorrect format for amount`);
@@ -117,11 +101,7 @@ export async function whatOtherRegularExpensesDoYouHaveErrorValidation(): Promis
   });
   console.log(`verified incorrect format error message`);
 
-  await performAction(
-    'inputText',
-    whatOtherRegularExpensesDoYouHave.loanPaymentsAmountPaidHiddenLabel,
-    whatOtherRegularExpensesDoYouHave.negativeTextInput
-  );
+  await performAction('inputText', whatOtherRegularExpensesDoYouHave.loanPaymentsAmountPaidHiddenLabel, whatOtherRegularExpensesDoYouHave.negativeTextInput);
   await performAction('When the user clicks the button', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   console.log(`entered negative value for amount`);
 
@@ -131,11 +111,7 @@ export async function whatOtherRegularExpensesDoYouHaveErrorValidation(): Promis
   });
   console.log(`verified negative value error message for loan payments`);
 
-  await performAction(
-    'inputText',
-    whatOtherRegularExpensesDoYouHave.loanPaymentsAmountPaidHiddenLabel,
-    whatOtherRegularExpensesDoYouHave.billionTextInput
-  );
+  await performAction('inputText', whatOtherRegularExpensesDoYouHave.loanPaymentsAmountPaidHiddenLabel, whatOtherRegularExpensesDoYouHave.billionTextInput);
   await performAction('When the user clicks the button', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
   console.log(`entered > £1 billion for amount`);
 

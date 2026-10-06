@@ -6,7 +6,11 @@ import { CASE_TYPE, CLASSIFICATION, JURISDICTION } from '../constants';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
-import type { CdamDocument, CdamRawDocument, CdamUploadResponse } from '@services/documentUpload.interface';
+import type {
+  CdamDocument,
+  CdamRawDocument,
+  CdamUploadResponse,
+} from '@services/documentUpload.interface';
 
 const logger = Logger.getLogger('cdamService');
 
@@ -14,7 +18,10 @@ function getCdamUrl(): string {
   return config.get<string>('cdam.url');
 }
 
-export async function uploadDocument(file: Express.Multer.File, userToken: string): Promise<CdamDocument> {
+export async function uploadDocument(
+  file: Express.Multer.File,
+  userToken: string
+): Promise<CdamDocument> {
   const cdamUrl = getCdamUrl();
 
   const formData = new FormData();
@@ -96,10 +103,13 @@ export async function getDocumentBinary(
   } catch (error) {
     const axiosError = error as AxiosError;
     if (axiosError.response?.status === 403) {
-      logger.warn('CDAM returned 403 Forbidden, attempting fallback to direct DM-Store binaryUrl with user token', {
-        requestUrl,
-        binaryUrl,
-      });
+      logger.warn(
+        'CDAM returned 403 Forbidden, attempting fallback to direct DM-Store binaryUrl with user token',
+        {
+          requestUrl,
+          binaryUrl,
+        }
+      );
       try {
         response = await http.get(binaryUrl, {
           headers: {
@@ -123,13 +133,16 @@ export async function getDocumentBinary(
           });
           logger.info('S2S service fallback fetch from DM-Store succeeded');
         } catch (s2sFallbackError) {
-          logger.error('All document binary fetch attempts failed (CDAM, DM-Store user token, DM-Store S2S service)', {
-            requestUrl,
-            binaryUrl,
-            cdamError: axiosError.message,
-            userFallbackError: (userFallbackError as AxiosError).message,
-            s2sFallbackError: (s2sFallbackError as AxiosError).message,
-          });
+          logger.error(
+            'All document binary fetch attempts failed (CDAM, DM-Store user token, DM-Store S2S service)',
+            {
+              requestUrl,
+              binaryUrl,
+              cdamError: axiosError.message,
+              userFallbackError: (userFallbackError as AxiosError).message,
+              s2sFallbackError: (s2sFallbackError as AxiosError).message,
+            }
+          );
           throw error;
         }
       }

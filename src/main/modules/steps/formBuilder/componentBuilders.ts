@@ -33,7 +33,10 @@ function createFieldsetLegend(
   };
 }
 
-export function buildConditionalItemContent(option: FormFieldOption, nunjucksEnv: Environment): string | undefined {
+export function buildConditionalItemContent(
+  option: FormFieldOption,
+  nunjucksEnv: Environment
+): string | undefined {
   const conditionalParts: string[] = [];
 
   if (option.conditionalText && typeof option.conditionalText === 'string') {
@@ -52,7 +55,8 @@ export function buildConditionalItemContent(option: FormFieldOption, nunjucksEnv
 
 export function buildSelectionItems(
   options: FormFieldOption[] | undefined,
-  translatedOptions: { value?: string; text?: string; hint?: string; divider?: string }[] | undefined,
+  translatedOptions:
+    { value?: string; text?: string; hint?: string; divider?: string }[] | undefined,
   isChecked: (option: FormFieldOption) => boolean,
   nunjucksEnv: Environment
 ): Record<string, unknown>[] {
@@ -94,7 +98,8 @@ export function buildComponentConfig({
   label: string;
   hint: string | undefined;
   fieldValue: unknown;
-  translatedOptions: { value?: string; text?: string; hint?: string; divider?: string }[] | undefined;
+  translatedOptions:
+    { value?: string; text?: string; hint?: string; divider?: string }[] | undefined;
   hasError: boolean;
   errorText: string | undefined;
   erroneousParts?: ('day' | 'month' | 'year')[];
@@ -183,7 +188,10 @@ export function buildComponentConfig({
       ] as const;
 
       for (const key of charCountKeys) {
-        const translation = t(`characterCount.${key}`, { returnObjects: true, defaultValue: '' }) as unknown;
+        const translation = t(`characterCount.${key}`, {
+          returnObjects: true,
+          defaultValue: '',
+        }) as unknown;
         if (translation && translation !== '') {
           component[key] = translation;
         }
@@ -194,7 +202,12 @@ export function buildComponentConfig({
     }
     case 'radio': {
       const radioValue = (fieldValue as string) || '';
-      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses, field.isPageHeading);
+      component.fieldset = createFieldsetLegend(
+        label,
+        isFirstField,
+        field.legendClasses,
+        field.isPageHeading
+      );
       component.items = buildSelectionItems(
         field.options,
         translatedOptions,
@@ -255,7 +268,12 @@ export function buildComponentConfig({
       };
       component.namePrefix = field.name;
       component.idPrefix = field.name;
-      component.fieldset = createFieldsetLegend(label, isFirstField, field.legendClasses, field.isPageHeading);
+      component.fieldset = createFieldsetLegend(
+        label,
+        isFirstField,
+        field.legendClasses,
+        field.isPageHeading
+      );
       const isPartErroneous = (part: 'day' | 'month' | 'year') =>
         hasError && (erroneousParts === undefined || erroneousParts.includes(part));
       component.items = [

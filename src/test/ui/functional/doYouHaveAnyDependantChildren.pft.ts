@@ -27,11 +27,7 @@ export async function doYouHaveAnyDependantChildrenErrorValidation(): Promise<vo
 
   //Test: emoji
   await performAction('clickRadioButton', doYouHaveAnyDependantChildren.yesRadioOption);
-  await performAction(
-    'inputText',
-    doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel,
-    doYouHaveAnyDependantChildren.emojiTextInput
-  );
+  await performAction('inputText', doYouHaveAnyDependantChildren.giveDetailsHiddenTextLabel, doYouHaveAnyDependantChildren.emojiTextInput);
   await performAction('When the user clicks the button', doYouHaveAnyDependantChildren.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyDependantChildren.thereIsAProblemErrorMessageHeader,
@@ -44,9 +40,5 @@ export async function doYouHaveAnyDependantChildrenNavigationTests(): Promise<vo
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: doYouHaveAnyDependantChildren.pageSlug,
   });
-  await performValidation(
-    'pageNavigation',
-    doYouHaveAnyDependantChildren.backLink,
-    yourHouseholdAndCircumstances.mainHeader
-  );
+  await performValidation('pageNavigation', doYouHaveAnyDependantChildren.backLink, yourHouseholdAndCircumstances.mainHeader);
 }

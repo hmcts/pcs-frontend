@@ -77,7 +77,11 @@ describe('claimList route', () => {
   it('renders claimList with mapped table rows on successful fetch', async () => {
     (getCitizenClaims as jest.Mock).mockResolvedValue([
       { caseReference: '1234567890123456', claimantName: 'John Doe', propertyPostcode: 'SW1A 1AA' },
-      { caseReference: '9876543210987654', claimantName: 'Jane Smith', propertyPostcode: 'EC1A 1BB' },
+      {
+        caseReference: '9876543210987654',
+        claimantName: 'Jane Smith',
+        propertyPostcode: 'EC1A 1BB',
+      },
     ]);
 
     const app = buildApp();
@@ -97,13 +101,17 @@ describe('claimList route', () => {
             { text: '1234567890123456' },
             { text: 'John Doe' },
             { text: 'SW1A 1AA' },
-            { html: '<a href="/case/1234567890123456/dashboard" class="govuk-link">claimList:table.viewClaim</a>' },
+            {
+              html: '<a href="/case/1234567890123456/dashboard" class="govuk-link">claimList:table.viewClaim</a>',
+            },
           ],
           [
             { text: '9876543210987654' },
             { text: 'Jane Smith' },
             { text: 'EC1A 1BB' },
-            { html: '<a href="/case/9876543210987654/dashboard" class="govuk-link">claimList:table.viewClaim</a>' },
+            {
+              html: '<a href="/case/9876543210987654/dashboard" class="govuk-link">claimList:table.viewClaim</a>',
+            },
           ],
         ],
       })
@@ -122,7 +130,10 @@ describe('claimList route', () => {
 
     await getHandler(app)(req, res, next);
 
-    expect(res.render).toHaveBeenCalledWith('claimList', expect.objectContaining({ tableRows: [] }));
+    expect(res.render).toHaveBeenCalledWith(
+      'claimList',
+      expect.objectContaining({ tableRows: [] })
+    );
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
@@ -169,7 +180,9 @@ describe('claimList route', () => {
             { text: '1234567890123456' },
             { text: undefined },
             { text: undefined },
-            { html: '<a href="/case/1234567890123456/dashboard" class="govuk-link">claimList:table.viewClaim</a>' },
+            {
+              html: '<a href="/case/1234567890123456/dashboard" class="govuk-link">claimList:table.viewClaim</a>',
+            },
           ],
         ],
       })

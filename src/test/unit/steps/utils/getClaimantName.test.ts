@@ -15,7 +15,9 @@ const mockReq = (claimantName?: unknown): Request =>
 
 describe('getClaimantName', () => {
   it('returns claimantName when present and non-empty', () => {
-    expect(getClaimantName(mockReq('Possession Claims Solicitor Org'))).toBe('Possession Claims Solicitor Org');
+    expect(getClaimantName(mockReq('Possession Claims Solicitor Org'))).toBe(
+      'Possession Claims Solicitor Org'
+    );
   });
 
   it('falls back to Treetops Housing when claimantName is blank', () => {

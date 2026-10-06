@@ -45,6 +45,8 @@ describe('getFirstVisibleStep', () => {
 
   it('treats absent step config as visible (no showCondition = always visible)', () => {
     const flow: JourneyFlowConfig = { steps: {} };
-    expect(getFirstVisibleStep(section(['unregistered-step']), flow, reqStub)).toBe('unregistered-step');
+    expect(getFirstVisibleStep(section(['unregistered-step']), flow, reqStub)).toBe(
+      'unregistered-step'
+    );
   });
 });

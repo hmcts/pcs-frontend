@@ -148,9 +148,12 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
       typeof rawBody === 'string'
         ? `body=${rawBody.slice(0, 200)}`
         : `message=${responseData?.message ?? 'none'} exception=${responseData?.exception ?? 'none'}`;
-    logger.error(`Error response from CCD in ${context}: status=${status ?? 'unknown'} ${summary}`, {
-      caseReference,
-    });
+    logger.error(
+      `Error response from CCD in ${context}: status=${status ?? 'unknown'} ${summary}`,
+      {
+        caseReference,
+      }
+    );
   }
 
   if (status === 403) {
@@ -161,9 +164,15 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
     return new HTTPError('Access denied', 403);
   }
 
-  const callbackMessages = [...(responseData?.callbackErrors ?? []), ...(responseData?.callbackWarnings ?? [])];
+  const callbackMessages = [
+    ...(responseData?.callbackErrors ?? []),
+    ...(responseData?.callbackWarnings ?? []),
+  ];
   if (callbackMessages.length > 0) {
-    return new HTTPError(`CCD callback rejected request: ${callbackMessages.join('; ')}`, status || 422);
+    return new HTTPError(
+      `CCD callback rejected request: ${callbackMessages.join('; ')}`,
+      status || 422
+    );
   }
 
   const retryAfterHeader = axiosError.response?.headers?.['retry-after'];
@@ -172,7 +181,11 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
       ? retryAfterHeader
       : undefined;
 
-  return new HTTPError(`CCD case service error: ${axiosError.message || 'Unknown error'}`, status || 500, retryAfter);
+  return new HTTPError(
+    `CCD case service error: ${axiosError.message || 'Unknown error'}`,
+    status || 500,
+    retryAfter
+  );
 }
 
 // Read endpoints coerce 400/404 to a 403 so the client sees an access-denied page
@@ -320,7 +333,10 @@ export const ccdCaseService = {
    * @param data - Initial case data
    * @returns Created case with merged data from CCD
    */
-  async createCase(accessToken: string | undefined, data: Record<string, unknown>): Promise<CcdCase> {
+  async createCase(
+    accessToken: string | undefined,
+    data: Record<string, unknown>
+  ): Promise<CcdCase> {
     // Phase 1: START - Get event token
     const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/citizenCreateApplication`;
     const eventToken = await getEventToken(accessToken || '', eventUrl);
@@ -351,7 +367,13 @@ export const ccdCaseService = {
 
     // Phase 2: SUBMIT - Finalize case submission
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
-    return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
+    return submitEvent(
+      accessToken || '',
+      url,
+      'citizenSubmitApplication',
+      eventToken,
+      ccdCase.data
+    );
   },
 
   async submitResponseToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
@@ -378,14 +400,16 @@ export const ccdCaseService = {
     const eventToken = await getEventToken(accessToken || '', eventUrl);
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 
-    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data).then(responseData => {
-      const confirmationBodyJson = responseData.after_submit_callback_response?.confirmation_body;
-      if (confirmationBodyJson) {
-        return JSON.parse(confirmationBodyJson) as MakeAnApplicationResponse;
-      } else {
-        throw new HTTPError('No confirmation body found in response data', 500);
+    return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data).then(
+      responseData => {
+        const confirmationBodyJson = responseData.after_submit_callback_response?.confirmation_body;
+        if (confirmationBodyJson) {
+          return JSON.parse(confirmationBodyJson) as MakeAnApplicationResponse;
+        } else {
+          throw new HTTPError('No confirmation body found in response data', 500);
+        }
       }
-    });
+    );
   },
 
   async submitUploadDocuments(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
@@ -474,7 +498,12 @@ export const ccdCaseService = {
       const taskGroups = unwrapTaskGroups(raw.taskGroups);
       const relatedApplications = unwrapRelatedApplications(raw.relatedApplications);
 
-      return { notifications, taskGroups, propertyAddress: formatAddress(raw.propertyAddress), relatedApplications };
+      return {
+        notifications,
+        taskGroups,
+        propertyAddress: formatAddress(raw.propertyAddress),
+        relatedApplications,
+      };
     } catch (error) {
       throw convertReadErrorToHttpError(error, 'getDashboardView');
     }

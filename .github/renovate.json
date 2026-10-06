@@ -1,6 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>hmcts/.github//renovate/automerge-all", "local>hmcts/.github:renovate-config"],
+  "extends": [
+    "github>hmcts/.github//renovate/automerge-all",
+    "local>hmcts/.github:renovate-config"
+  ],
   "packageRules": [
     {
       "matchPackageNames": ["typescript"],
@@ -9,5 +12,8 @@
     }
   ],
   "platformAutomerge": false,
-  "automergeSchedule": ["after 7am and before 9am every weekday", "after 5pm and before 7pm every weekday"]
+  "automergeSchedule": [
+    "after 7am and before 9am every weekday",
+    "after 5pm and before 7pm every weekday"
+  ]
 }

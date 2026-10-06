@@ -4,7 +4,12 @@ import { shouldShowStep } from '../../';
 import { flowConfig } from '../flow.config';
 
 import { getFormData } from '@modules/steps';
-import { CcdCollectionItem, CcdUploadedDocument, GenAppType, LanguageUsed } from '@services/ccdCase.interface';
+import {
+  CcdCollectionItem,
+  CcdUploadedDocument,
+  GenAppType,
+  LanguageUsed,
+} from '@services/ccdCase.interface';
 import { toCaseReference16 } from '@utils/caseReference';
 
 const UPLOAD_STEP_NAME = 'upload-documents-to-support-your-application';
@@ -30,21 +35,30 @@ export default class VisibleFormDataView {
   }
 
   getAlreadyAppliedForHwfField(): FieldDetails<'yes' | 'no'> | undefined {
-    return this.getField<'yes' | 'no'>('have-you-already-applied-for-help-with-fees', 'alreadyAppliedForHwf');
+    return this.getField<'yes' | 'no'>(
+      'have-you-already-applied-for-help-with-fees',
+      'alreadyAppliedForHwf'
+    );
   }
 
   getHwfReferenceField(): FieldDetails<string> | undefined {
     const alreadyAppliedForHwfField = this.getAlreadyAppliedForHwfField();
 
     if (alreadyAppliedForHwfField?.fieldValue === 'yes') {
-      return this.getField<string>('have-you-already-applied-for-help-with-fees', 'alreadyAppliedForHwf.hwfReference');
+      return this.getField<string>(
+        'have-you-already-applied-for-help-with-fees',
+        'alreadyAppliedForHwf.hwfReference'
+      );
     } else {
       return undefined;
     }
   }
 
   getOtherPartiesAgreedField(): FieldDetails<'yes' | 'no'> | undefined {
-    return this.getField<'yes' | 'no'>('have-the-other-parties-agreed-to-this-application', 'otherPartiesAgreed');
+    return this.getField<'yes' | 'no'>(
+      'have-the-other-parties-agreed-to-this-application',
+      'otherPartiesAgreed'
+    );
   }
 
   getAnyReasonsNotToShareField(): FieldDetails<'yes' | 'no'> | undefined {
@@ -68,7 +82,10 @@ export default class VisibleFormDataView {
   }
 
   getWhatOrderWantedField(): FieldDetails<string> | undefined {
-    return this.getField<string>('what-order-do-you-want-the-court-to-make-and-why', 'whatOrderWanted');
+    return this.getField<string>(
+      'what-order-do-you-want-the-court-to-make-and-why',
+      'whatOrderWanted'
+    );
   }
 
   getHasSupportingDocuments(): FieldDetails<'yes' | 'no'> | undefined {
@@ -79,7 +96,10 @@ export default class VisibleFormDataView {
   }
 
   getWhichLanguageField(): FieldDetails<LanguageUsed> | undefined {
-    return this.getField<LanguageUsed>('which-language-did-you-use-to-complete-this-service', 'whichLanguage');
+    return this.getField<LanguageUsed>(
+      'which-language-did-you-use-to-complete-this-service',
+      'whichLanguage'
+    );
   }
 
   getUploadedDocuments(): CcdCollectionItem<CcdUploadedDocument>[] {

@@ -35,7 +35,9 @@ describe('hasMultipleParties', () => {
               possessionClaimResponse: {
                 currentDefendantPartyId: 'def-1',
               },
-              allDefendants: [{ id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant' } }],
+              allDefendants: [
+                { id: 'def-1', value: { firstName: 'Current', lastName: 'Defendant' } },
+              ],
               allClaimants: [{ id: 'claim-1', value: { orgName: 'Landlord Org' } }],
             },
           },

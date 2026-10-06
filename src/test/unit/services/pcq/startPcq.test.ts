@@ -102,7 +102,9 @@ describe('startPcq', () => {
 
     (ccdCaseService.updateDraft as jest.Mock).mockResolvedValue({
       id: '123456789',
-      data: { possessionClaimResponse: { defendantContactDetails: { party: { pcqId: 'mock-pcq-id' } } } },
+      data: {
+        possessionClaimResponse: { defendantContactDetails: { party: { pcqId: 'mock-pcq-id' } } },
+      },
     });
 
     (createSecureTokenModule.createSecureToken as jest.Mock).mockReturnValue({
@@ -199,7 +201,9 @@ describe('startPcq', () => {
 
     // On the party, not the slice root — that is what maps onto PartyEntity at final submission.
     const [, , , data] = (ccdCaseService.updateDraft as jest.Mock).mock.calls[0];
-    expect(data.possessionClaimResponse.defendantContactDetails.party.pcqId).toEqual(expect.any(String));
+    expect(data.possessionClaimResponse.defendantContactDetails.party.pcqId).toEqual(
+      expect.any(String)
+    );
   });
 
   it('re-sends the answers already given so the backend REPLACE cannot wipe them', async () => {
@@ -220,7 +224,9 @@ describe('startPcq', () => {
     const [, , , data] = (ccdCaseService.updateDraft as jest.Mock).mock.calls[0];
     expect(data.possessionClaimResponse.defendantResponses.freeLegalAdvice).toBe('YES');
     expect(data.possessionClaimResponse.defendantContactDetails.party.firstName).toBe('Ada');
-    expect(data.possessionClaimResponse.defendantContactDetails.party.pcqId).toEqual(expect.any(String));
+    expect(data.possessionClaimResponse.defendantContactDetails.party.pcqId).toEqual(
+      expect.any(String)
+    );
   });
 
   it('returns null when the LaunchDarkly flag is off', async () => {
@@ -258,7 +264,9 @@ describe('startPcq', () => {
   });
 
   it('returns null when the PCQ health check times out', async () => {
-    const timeout = Object.assign(new Error('timeout of 3000ms exceeded'), { code: 'ECONNABORTED' });
+    const timeout = Object.assign(new Error('timeout of 3000ms exceeded'), {
+      code: 'ECONNABORTED',
+    });
     (axios.get as jest.Mock).mockRejectedValue(timeout);
 
     // The citizen carries on to language-used rather than waiting on an unresponsive PCQ.
@@ -283,7 +291,9 @@ describe('startPcq', () => {
     mockRes.locals!.validatedCase = new CcdCaseModel({
       id: '123456789',
       data: {
-        possessionClaimResponse: { defendantContactDetails: { party: { pcqId: 'existing-pcq-id' } } },
+        possessionClaimResponse: {
+          defendantContactDetails: { party: { pcqId: 'existing-pcq-id' } },
+        },
       },
     });
 

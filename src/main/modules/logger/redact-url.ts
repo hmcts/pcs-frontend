@@ -34,7 +34,9 @@ function redactValue(value: unknown, ancestors: Set<object> = new Set()): unknow
   ancestors.add(value);
   const redacted = Array.isArray(value)
     ? value.map(item => redactValue(item, ancestors))
-    : Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redactValue(item, ancestors)]));
+    : Object.fromEntries(
+        Object.entries(value).map(([key, item]) => [key, redactValue(item, ancestors)])
+      );
   ancestors.delete(value);
   return redacted;
 }

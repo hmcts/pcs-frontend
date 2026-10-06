@@ -3,7 +3,10 @@ import type { Application, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
 import { HTTPError } from '../HttpError';
-import { MAKE_GENERAL_APPLICATION_ROUTE, UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
+import {
+  MAKE_GENERAL_APPLICATION_ROUTE,
+  UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE,
+} from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { getTranslationFunction } from '@modules/i18n';
@@ -43,7 +46,10 @@ const HELP_SUPPORT_LINKS: { key: string; href: string }[] = [
   },
   { key: 'representMyselfAtTheHearing', href: 'https://www.gov.uk/represent-yourself-in-court' },
   { key: 'findLegalAdvice', href: 'https://www.gov.uk/find-legal-advice' },
-  { key: 'getDebtRespite', href: 'https://www.gov.uk/options-for-dealing-with-your-debts/breathing-space' },
+  {
+    key: 'getDebtRespite',
+    href: 'https://www.gov.uk/options-for-dealing-with-your-debts/breathing-space',
+  },
   { key: 'findInformation', href: 'https://www.gov.uk/find-court-tribunal' },
 ];
 
@@ -124,7 +130,13 @@ export default function dashboardRoutes(app: Application): void {
           return {
             title: { html: resolved.title },
             href: linkable
-              ? getTaskUrl(task.templateId, task.status, caseReference, groupIdLower, showRespondToClaimLinks)
+              ? getTaskUrl(
+                  task.templateId,
+                  task.status,
+                  caseReference,
+                  groupIdLower,
+                  showRespondToClaimLinks
+                )
               : undefined,
             status: tagText && classes ? { tag: { text: tagText, classes } } : {},
           };
@@ -174,7 +186,9 @@ export default function dashboardRoutes(app: Application): void {
 
       const notifications = dashboardData.notifications
         .filter(
-          notification => showRespondToClaimLinks || !isRespondToClaimDashboardNotification(notification.templateId)
+          notification =>
+            showRespondToClaimLinks ||
+            !isRespondToClaimDashboardNotification(notification.templateId)
         )
         .map(n => {
           const resolved = resolveNotification(
@@ -206,7 +220,9 @@ export default function dashboardRoutes(app: Application): void {
         helpSupportLinks: HELP_SUPPORT_LINKS,
       });
     } catch (e) {
-      logger.error(`Failed to fetch dashboard data for case ${caseReference}. Error was: ${String(e)}`);
+      logger.error(
+        `Failed to fetch dashboard data for case ${caseReference}. Error was: ${String(e)}`
+      );
       return next(e);
     }
   });

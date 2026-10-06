@@ -13,7 +13,9 @@ import { cuiYourSupportFeatureMiddleware } from '../../../main/middleware';
 
 import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
 
-const mockIsCuiYourSupportEnabled = isCuiYourSupportEnabled as jest.MockedFunction<typeof isCuiYourSupportEnabled>;
+const mockIsCuiYourSupportEnabled = isCuiYourSupportEnabled as jest.MockedFunction<
+  typeof isCuiYourSupportEnabled
+>;
 
 describe('cuiYourSupportFeatureMiddleware', () => {
   let req: Request;

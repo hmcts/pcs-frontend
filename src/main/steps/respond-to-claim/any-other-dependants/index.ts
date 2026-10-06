@@ -1,5 +1,8 @@
 import { fromYesNoEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -8,7 +11,9 @@ import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccd
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-you-have-any-other-dependants',
   isAnswered: req =>
-    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.otherDependants),
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.otherDependants
+    ),
   stepDir: __dirname,
   customTemplate: `${__dirname}/anyOtherDependants.njk`,
   translationKeys: {
@@ -19,7 +24,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    response.defendantResponses.householdCircumstances =
+      response.defendantResponses.householdCircumstances ?? {};
     const otherDependants: string = req.body?.otherDependants;
     const enumMapping: Record<string, YesNoValue> = { yes: 'YES', no: 'NO' };
     const otherDependantsCcd = enumMapping[otherDependants];
@@ -59,7 +65,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     if (otherDependantsForm === 'yes') {
-      const otherDependantDetails: string | undefined = householdCircumstances?.otherDependantDetails;
+      const otherDependantDetails: string | undefined =
+        householdCircumstances?.otherDependantDetails;
       return {
         otherDependants: 'yes',
         'otherDependants.otherDependantDetails': otherDependantDetails ?? '',

@@ -1,4 +1,7 @@
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -29,7 +32,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: req => {
     const hasSolicitor =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor;
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+        ?.hasSolicitor;
     return { hasSolicitor };
   },
   beforeRedirect: async req => {
@@ -47,7 +51,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     // Ensure the local validatedCase reflects the saved value so the showCondition
     // on ask-your-solicitor-to-respond-to-the-claim resolves correctly during
     // this request's flow navigation, regardless of what CCD echoes back.
-    const defendantResponses = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses;
+    const defendantResponses =
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses;
     if (defendantResponses !== undefined) {
       if (hasSolicitor) {
         defendantResponses.hasSolicitor = hasSolicitor;

@@ -3,20 +3,10 @@ import * as path from 'path';
 
 import { Page, test } from '@playwright/test';
 
-import {
-  enable_content_validation,
-  enable_error_message_validation,
-  enable_navigation_tests,
-  enable_visibility_validation,
-} from '../../../../../../playwright.config';
+import { enable_content_validation, enable_error_message_validation, enable_navigation_tests, enable_visibility_validation } from '../../../../../../playwright.config';
 import { shortUrl, truncateForLog } from '../../common/string.utils';
 import { IAction } from '../../interfaces';
-import {
-  ErrorMessageValidation,
-  PageContentValidation,
-  PageNavigationValidation,
-  VisibilityValidation,
-} from '../../validations/custom-validations';
+import { ErrorMessageValidation, PageContentValidation, PageNavigationValidation, VisibilityValidation } from '../../validations/custom-validations';
 
 export class TriggerPageFunctionalTestsAction implements IAction {
   private static readonly LOCK_DIR = path.join(process.cwd(), 'test-results', 'pft-locks');
@@ -45,16 +35,12 @@ export class TriggerPageFunctionalTestsAction implements IAction {
         return;
       }
       const urlSegment = this.getUrlSegment(page.url());
-      console.warn(
-        `[PFT] WARNING mapping missing in urlToFileMapping.config.ts | test="${truncateForLog(test.info().title, 160)}" | url=${shortUrl(page.url())} | key: ${urlSegment}`
-      );
+      console.warn(`[PFT] WARNING mapping missing in urlToFileMapping.config.ts | test="${truncateForLog(test.info().title, 160)}" | url=${shortUrl(page.url())} | key: ${urlSegment}`);
       return;
     }
 
     const isLR = test.info().title.includes('@LR') || false;
-    const baseDir = isLR
-      ? TriggerPageFunctionalTestsAction.PAGE_DATA_LR_DIR
-      : TriggerPageFunctionalTestsAction.PAGE_DATA_DIR;
+    const baseDir = isLR ? TriggerPageFunctionalTestsAction.PAGE_DATA_LR_DIR : TriggerPageFunctionalTestsAction.PAGE_DATA_DIR;
     const pageDataFilePath = this.resolveFilePath(baseDir, `${pageName}${isLR ? '.page.data.lr.ts' : '.page.data.ts'}`);
 
     if (TriggerPageFunctionalTestsAction.pagesTestedInCurrentRun.has(pageName)) {
@@ -73,9 +59,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
 
     const isLRForPFT = test.info().title.includes('@LR') || false;
-    const pftBaseDir = isLRForPFT
-      ? TriggerPageFunctionalTestsAction.LR_PFT_DIR
-      : TriggerPageFunctionalTestsAction.PFT_DIR;
+    const pftBaseDir = isLRForPFT ? TriggerPageFunctionalTestsAction.LR_PFT_DIR : TriggerPageFunctionalTestsAction.PFT_DIR;
     const pftFilePath = this.resolveFilePath(pftBaseDir, `${pageName}.pft.ts`);
 
     if (!pftFilePath || !fs.existsSync(pftFilePath)) {

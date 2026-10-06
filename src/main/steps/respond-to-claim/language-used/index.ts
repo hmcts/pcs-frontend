@@ -1,6 +1,9 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -10,7 +13,11 @@ import { redirectToPcq } from '@services/pcq/redirectToPcq';
 // Offer PCQ (the equality questionnaire) before the language screen renders.
 // redirectToPcq 303s to PCQ (which returns the citizen to language-used?nav=1);
 // on the return leg the reserved PcqId makes it a no-op.
-export const pcqEntryMiddleware: RequestHandler = async (req: Request, _res: Response, next: NextFunction) => {
+export const pcqEntryMiddleware: RequestHandler = async (
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
   const redirected = await redirectToPcq(req);
   if (!redirected) {
     next();

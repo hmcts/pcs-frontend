@@ -1,23 +1,13 @@
 import { Page, test } from '@playwright/test';
 
-import {
-  enable_axe_audit,
-  enable_content_validation,
-  enable_error_message_validation,
-  enable_navigation_tests,
-} from '../../../../playwright.config';
+import { enable_axe_audit, enable_content_validation, enable_error_message_validation, enable_navigation_tests } from '../../../../playwright.config';
 import { axe_exclusions } from '../config/axe-exclusions.config';
 import { loadPlaywrightSetupEnvIntoProcess } from '../config/load-playwright-setup-env';
 
 import { TriggerPageFunctionalTestsAction } from './actions/custom-actions';
 import { actionData, actionRecord, actionTuple, validationData, validationRecord, validationTuple } from './interfaces';
 import { ActionRegistry, ValidationRegistry } from './registry';
-import {
-  ErrorMessageValidation,
-  PageContentValidation,
-  PageNavigationValidation,
-  VisibilityValidation,
-} from './validations/custom-validations';
+import { ErrorMessageValidation, PageContentValidation, PageNavigationValidation, VisibilityValidation } from './validations/custom-validations';
 
 loadPlaywrightSetupEnvIntoProcess();
 
@@ -104,13 +94,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
     const pageNavigated = await detectPageNavigation();
     const executor = getExecutor();
     if (pageNavigated) {
-      if (
-        startFunctionalTests &&
-        !isFunctionalValidationTestFile() &&
-        (enable_content_validation === 'true' ||
-          enable_error_message_validation === 'true' ||
-          enable_navigation_tests === 'true')
-      ) {
+      if (startFunctionalTests && !isFunctionalValidationTestFile() && (enable_content_validation === 'true' || enable_error_message_validation === 'true' || enable_navigation_tests === 'true')) {
         await performAction('triggerFunctionalTests');
       }
       if (startAxeAudit && enable_axe_audit === 'true') {
@@ -123,11 +107,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
           });
         } catch (error) {
           const errorMessage = String((error as Error).message || error).toLowerCase();
-          if (
-            errorMessage.includes('execution context was destroyed') ||
-            errorMessage.includes('navigation') ||
-            errorMessage.includes('documentelement')
-          ) {
+          if (errorMessage.includes('execution context was destroyed') || errorMessage.includes('navigation') || errorMessage.includes('documentelement')) {
             console.warn(`Accessibility audit skipped due to navigation: ${errorMessage}`);
           } else {
             throw error;
@@ -139,16 +119,10 @@ async function validatePageIfNavigated(action: string): Promise<void> {
 }
 
 function isPage(actionResult: unknown): actionResult is Page {
-  return (
-    typeof actionResult === 'object' && actionResult !== null && 'locator' in actionResult && 'url' in actionResult
-  );
+  return typeof actionResult === 'object' && actionResult !== null && 'locator' in actionResult && 'url' in actionResult;
 }
 
-export async function performAction(
-  action: string,
-  fieldName?: actionData | actionRecord,
-  value?: actionData | actionRecord
-): Promise<void> {
+export async function performAction(action: string, fieldName?: actionData | actionRecord, value?: actionData | actionRecord): Promise<void> {
   const executor = getExecutor();
   if (action === 'reloadPage') {
     await test.step('reloadPage', async () => {
@@ -171,9 +145,7 @@ export async function performAction(
   }
 
   const stepText = `${action}${displayFieldName !== undefined ? ` - ${typeof displayFieldName === 'object' ? readValuesFromInputObjects(displayFieldName) : displayFieldName}` : ''}${
-    displayValue !== undefined && value !== undefined
-      ? ` with value '${typeof displayValue === 'object' ? readValuesFromInputObjects(displayValue) : displayValue}'`
-      : ''
+    displayValue !== undefined && value !== undefined ? ` with value '${typeof displayValue === 'object' ? readValuesFromInputObjects(displayValue) : displayValue}'` : ''
   }`;
 
   await test.step(stepText, async () => {
@@ -186,19 +158,10 @@ export async function performAction(
   await attachSauceJourneyStepScreenshot(getExecutor().page);
 }
 
-export async function performValidation(
-  validation: string,
-  inputFieldName?: validationData | validationRecord,
-  inputData?: validationData | validationRecord
-): Promise<void> {
+export async function performValidation(validation: string, inputFieldName?: validationData | validationRecord, inputData?: validationData | validationRecord): Promise<void> {
   const executor = getExecutor();
 
-  const [fieldName, data] =
-    inputFieldName === undefined
-      ? ['', undefined]
-      : typeof inputFieldName === 'string'
-        ? [inputFieldName, inputData]
-        : ['', inputFieldName];
+  const [fieldName, data] = inputFieldName === undefined ? ['', undefined] : typeof inputFieldName === 'string' ? [inputFieldName, inputData] : ['', inputFieldName];
 
   const validationInstance = ValidationRegistry.getValidation(validation);
   const validationStepText = `Validated ${validation}${
@@ -221,9 +184,7 @@ export async function performValidation(
         return;
       }
 
-      const failureDetail = failedChecks
-        .map(result => `${result.pageName || fieldName || 'errorMessage'}: ${result.expected}`)
-        .join('\n');
+      const failureDetail = failedChecks.map(result => `${result.pageName || fieldName || 'errorMessage'}: ${result.expected}`).join('\n');
       throw new SoftErrorMessageStepFailed(failureDetail);
     });
   } catch (error) {

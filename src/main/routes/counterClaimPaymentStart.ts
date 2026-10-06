@@ -56,7 +56,10 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
 
         return res.redirect(303, paymentResponse.nextUrl);
       } catch (error) {
-        logger.error(`Failed to create counterclaim card payment request for case ${caseReference}`, error);
+        logger.error(
+          `Failed to create counterclaim card payment request for case ${caseReference}`,
+          error
+        );
         return safeRedirect303(
           res,
           `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount?payment=failed`,
@@ -73,7 +76,8 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
     async (req: Request, res: Response, next: NextFunction) => {
       const caseReference = String(req.params.caseReference || '');
       const accessToken = req.session.user?.accessToken;
-      const { serviceRequestReference, feeAmount, customerReference, pbaAccount } = req.session.payment ?? {};
+      const { serviceRequestReference, feeAmount, customerReference, pbaAccount } =
+        req.session.payment ?? {};
 
       if (!accessToken) {
         return redirectOnMissingAccessToken(caseReference, next);
@@ -123,7 +127,10 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
           ['/case']
         );
       } catch (error) {
-        logger.error(`Failed to create counterclaim PBA payment request for case ${caseReference}`, error);
+        logger.error(
+          `Failed to create counterclaim PBA payment request for case ${caseReference}`,
+          error
+        );
         return safeRedirect303(
           res,
           `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount?payment=failed`,
@@ -161,7 +168,9 @@ function redirectOnMissingPbaPaymentDetails(res: Response, caseReference: string
 }
 
 function redirectOnMissingPaymentReturnUrl(res: Response, caseReference: string) {
-  logger.error(`No payment return URL configured when starting counterclaim payment for case ${caseReference}`);
+  logger.error(
+    `No payment return URL configured when starting counterclaim payment for case ${caseReference}`
+  );
   return safeRedirect303(
     res,
     `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount?payment=failed`,

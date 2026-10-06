@@ -1,4 +1,7 @@
-import { buildCcdAddressFromFormParts, formatCcdAddress } from '../../../../main/steps/utils/ccdAddress';
+import {
+  buildCcdAddressFromFormParts,
+  formatCcdAddress,
+} from '../../../../main/steps/utils/ccdAddress';
 
 describe('ccdAddress utilities', () => {
   describe('buildCcdAddressFromFormParts', () => {

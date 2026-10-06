@@ -13,8 +13,10 @@ export const getRootGreeting = async (): Promise<string> => {
   return response.data;
 };
 
-export type AccessCodeValidationError = 'not_found' | 'expired' | 'already_used' | 'mismatch' | 'unknown';
-export type AccessCodeValidationResult = { valid: true } | { valid: false; error: AccessCodeValidationError };
+export type AccessCodeValidationError =
+  'not_found' | 'expired' | 'already_used' | 'mismatch' | 'unknown';
+export type AccessCodeValidationResult =
+  { valid: true } | { valid: false; error: AccessCodeValidationError };
 
 export const validateAccessCode = async (
   accessToken: string,

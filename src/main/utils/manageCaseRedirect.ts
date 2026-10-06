@@ -10,14 +10,19 @@ function trimTrailingSlashes(pathname: string): string {
   return pathname.slice(0, end);
 }
 
-export function buildManageCaseDetailsRedirect(caseDetailsBaseUrl: string | null, caseId: unknown): string | undefined {
+export function buildManageCaseDetailsRedirect(
+  caseDetailsBaseUrl: string | null,
+  caseId: unknown
+): string | undefined {
   if (!caseDetailsBaseUrl) {
     logger.warn('Unable to build Manage Case redirect: missing case details base URL');
     return undefined;
   }
 
   if (typeof caseId !== 'string' || !/^\d+$/.test(caseId)) {
-    logger.warn('Unable to build Manage Case redirect: invalid case ID', { caseIdType: typeof caseId });
+    logger.warn('Unable to build Manage Case redirect: invalid case ID', {
+      caseIdType: typeof caseId,
+    });
     return undefined;
   }
 
@@ -25,12 +30,16 @@ export function buildManageCaseDetailsRedirect(caseDetailsBaseUrl: string | null
     const url = new URL(caseDetailsBaseUrl);
     const isAllowedProtocol = url.protocol === 'https:' || url.protocol === 'http:';
     if (!isAllowedProtocol) {
-      logger.warn('Unable to build Manage Case redirect: invalid URL protocol', { protocol: url.protocol });
+      logger.warn('Unable to build Manage Case redirect: invalid URL protocol', {
+        protocol: url.protocol,
+      });
       return undefined;
     }
 
     if (!url.pathname.startsWith('/cases/case-details/')) {
-      logger.warn('Unable to build Manage Case redirect: invalid URL path', { pathname: url.pathname });
+      logger.warn('Unable to build Manage Case redirect: invalid URL path', {
+        pathname: url.pathname,
+      });
       return undefined;
     }
 

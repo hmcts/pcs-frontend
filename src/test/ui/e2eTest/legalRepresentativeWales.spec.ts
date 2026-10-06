@@ -729,30 +729,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
       regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-          whatRegularIncomeDoYouReceive.pensionTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
-          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
-        ],
+        [whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph, whatRegularIncomeDoYouReceive.otherBenefitsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph, whatRegularIncomeDoYouReceive.pensionTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph, whatRegularIncomeDoYouReceive.incomeFromJobsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph, whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput],
       ],
     });
     await performAction('selectPriorityDebtsLR', {
@@ -890,30 +871,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
       regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-          whatRegularIncomeDoYouReceive.pensionTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
-          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
-        ],
+        [whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph, whatRegularIncomeDoYouReceive.otherBenefitsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph, whatRegularIncomeDoYouReceive.pensionTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph, whatRegularIncomeDoYouReceive.incomeFromJobsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph, whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput],
       ],
     });
     await performAction('selectPriorityDebtsLR', {

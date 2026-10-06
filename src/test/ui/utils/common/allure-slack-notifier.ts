@@ -37,9 +37,7 @@ function findSummaryJson(baseDir: string): string {
       return fullPath;
     }
   }
-  throw new Error(
-    `Allure summary.json not found. Checked: ${SUMMARY_CANDIDATES.map(c => path.join(baseDir, c)).join(', ')}`
-  );
+  throw new Error(`Allure summary.json not found. Checked: ${SUMMARY_CANDIDATES.map(c => path.join(baseDir, c)).join(', ')}`);
 }
 
 function parseSummary(summaryPath: string): AllureSummary {
@@ -168,15 +166,8 @@ function ragStatus(summary: AllureSummary): string {
 }
 
 function inferEnvironment(): string {
-  const explicitEnv =
-    process.env.E2E_TARGET_ENV?.trim() || process.env.ENVIRONMENT?.trim() || process.env.E2E_ENV?.trim();
-  return (
-    explicitEnv ||
-    process.env.TEST_URL?.match(
-      /https?:\/\/(?:[^./]+\.)?pcs(?:-[^./]+)?[.-]([a-z0-9-]+)\.platform\.hmcts\.net/i
-    )?.[1]?.toLowerCase() ||
-    'unknown'
-  );
+  const explicitEnv = process.env.E2E_TARGET_ENV?.trim() || process.env.ENVIRONMENT?.trim() || process.env.E2E_ENV?.trim();
+  return explicitEnv || process.env.TEST_URL?.match(/https?:\/\/(?:[^./]+\.)?pcs(?:-[^./]+)?[.-]([a-z0-9-]+)\.platform\.hmcts\.net/i)?.[1]?.toLowerCase() || 'unknown';
 }
 
 function latestResultSummary(tests: AllureTestRecord[]): { failed: number; broken: number; pass_rate: number } {
@@ -191,15 +182,7 @@ function latestResultSummary(tests: AllureTestRecord[]): { failed: number; broke
   return { failed, broken, pass_rate };
 }
 
-function buildMessage(
-  summary: AllureSummary,
-  buildNumber: string,
-  buildUrl: string,
-  reportSuffix: string,
-  tests: AllureTestRecord[] | null,
-  serviceName: string,
-  pipelineType: string
-): string {
+function buildMessage(summary: AllureSummary, buildNumber: string, buildUrl: string, reportSuffix: string, tests: AllureTestRecord[] | null, serviceName: string, pipelineType: string): string {
   const summaryForRag = tests && tests.length > 0 ? { ...summary, ...latestResultSummary(tests) } : summary;
   const rag = ragStatus(summaryForRag);
   const reportUrl = buildUrl ? `${buildUrl}${reportSuffix}` : '';
@@ -273,13 +256,7 @@ function parsePipelineTypeFromArgv(): string | null {
   return null;
 }
 
-function getFallbackMessage(
-  buildNumber: string,
-  buildUrl: string,
-  reportSuffix: string,
-  serviceName: string,
-  pipelineType: string
-): string {
+function getFallbackMessage(buildNumber: string, buildUrl: string, reportSuffix: string, serviceName: string, pipelineType: string): string {
   const platform = (process.env.E2E_PLATFORM ?? 'Linux').trim();
   const browser = (process.env.E2E_BROWSER ?? 'Chrome').trim();
   const testEnv = inferEnvironment();
@@ -306,10 +283,7 @@ function getSlackMessage(): string {
   const reportSuffix = (process.env.ALLURE_REPORT_PATH_SUFFIX ?? DEFAULT_REPORT_PATH).trim() || DEFAULT_REPORT_PATH;
   const serviceName = (process.env.E2E_SERVICE_NAME ?? DEFAULT_SERVICE_NAME).trim() || DEFAULT_SERVICE_NAME;
   const pipelineTypeArg = parsePipelineTypeFromArgv();
-  const pipelineType =
-    pipelineTypeArg ??
-    ((process.env.E2E_PIPELINE_TYPE ?? (jobName.toLowerCase().includes('nightly') ? 'nightly' : 'master')).trim() ||
-      'master');
+  const pipelineType = pipelineTypeArg ?? ((process.env.E2E_PIPELINE_TYPE ?? (jobName.toLowerCase().includes('nightly') ? 'nightly' : 'master')).trim() || 'master');
 
   try {
     const summary = parseSummary(findSummaryJson(baseDir));
@@ -344,9 +318,7 @@ if (require.main === module || process.argv[1]?.includes('allure-slack-notifier'
       const reportSuffix = (process.env.ALLURE_REPORT_PATH_SUFFIX ?? DEFAULT_REPORT_PATH).trim() || DEFAULT_REPORT_PATH;
       const serviceName = (process.env.E2E_SERVICE_NAME ?? DEFAULT_SERVICE_NAME).trim() || DEFAULT_SERVICE_NAME;
       const pipelineType = parsePipelineTypeFromArgv() ?? process.env.E2E_PIPELINE_TYPE ?? 'master';
-      process.stdout.write(
-        getFallbackMessage(buildNumber, buildUrl, reportSuffix, serviceName, String(pipelineType).trim())
-      );
+      process.stdout.write(getFallbackMessage(buildNumber, buildUrl, reportSuffix, serviceName, String(pipelineType).trim()));
     } else {
       console.error(err);
       process.exit(1);

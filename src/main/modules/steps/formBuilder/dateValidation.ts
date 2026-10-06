@@ -56,7 +56,11 @@ function getDateErrorMessage(
   return translated !== key ? translated : DEFAULT_DATE_ERROR_MESSAGE;
 }
 
-function getYearMinimumMessage(minYear: number, t?: TFunction, translations?: Record<string, string>): string {
+function getYearMinimumMessage(
+  minYear: number,
+  t?: TFunction,
+  translations?: Record<string, string>
+): string {
   if (translations?.yearMustBeSameOrAfter) {
     return translations.yearMustBeSameOrAfter.replace('{{minYear}}', minYear.toString());
   }
@@ -118,7 +122,8 @@ function validateDatePart(
     return null;
   }
 
-  const isInvalidFormat = !isNumeric(value) || value.length > maxLength || (noLeadingZero && value.startsWith('0'));
+  const isInvalidFormat =
+    !isNumeric(value) || value.length > maxLength || (noLeadingZero && value.startsWith('0'));
 
   if (isInvalidFormat) {
     return getDateErrorMessage(t, undefined, translations);

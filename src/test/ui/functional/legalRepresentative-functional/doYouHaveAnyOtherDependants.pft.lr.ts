@@ -27,11 +27,7 @@ export async function doYouHaveAnyOtherDependantsErrorValidation(): Promise<void
 
   //Test: emoji
   await performAction('clickRadioButton', doYouHaveAnyOtherDependants.yesRadioOption);
-  await performAction(
-    'inputText',
-    doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel,
-    doYouHaveAnyOtherDependants.emojiTextInput
-  );
+  await performAction('inputText', doYouHaveAnyOtherDependants.giveDetailsHiddenTextLabel, doYouHaveAnyOtherDependants.emojiTextInput);
   await performAction('When the user clicks the button', doYouHaveAnyOtherDependants.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: doYouHaveAnyOtherDependants.thereIsAProblemErrorMessageHeader,

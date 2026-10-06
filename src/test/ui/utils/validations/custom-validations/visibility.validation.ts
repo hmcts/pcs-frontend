@@ -41,9 +41,7 @@ export class VisibilityValidation implements IValidation {
     if (pattern) {
       locator = pattern(page, elementKey);
     } else {
-      locator = page.locator(
-        `label:text-is("${elementKey}"), span:text-is("${elementKey}"), div:text-is("${elementKey}")`
-      );
+      locator = page.locator(`label:text-is("${elementKey}"), span:text-is("${elementKey}"), div:text-is("${elementKey}")`);
     }
 
     const validationsMap = new Map<string, () => Promise<void>>([
@@ -60,12 +58,7 @@ export class VisibilityValidation implements IValidation {
     await validationToPerform();
   }
 
-  private async elementToBeVisible(
-    locator: any,
-    pageName: string,
-    elementKey: string,
-    validationType: string
-  ): Promise<void> {
+  private async elementToBeVisible(locator: any, pageName: string, elementKey: string, validationType: string): Promise<void> {
     let visibilityIsPassed: boolean;
     let errorMsg = '';
 
@@ -91,12 +84,7 @@ export class VisibilityValidation implements IValidation {
     }
   }
 
-  private async elementNotToBeVisible(
-    locator: any,
-    pageName: string,
-    elementKey: string,
-    validationType: string
-  ): Promise<void> {
+  private async elementNotToBeVisible(locator: any, pageName: string, elementKey: string, validationType: string): Promise<void> {
     let isPassed = true;
     let errorMsg = '';
 
@@ -121,12 +109,7 @@ export class VisibilityValidation implements IValidation {
     }
   }
 
-  private async waitUntilElementDisappears(
-    locator: any,
-    pageName: string,
-    elementKey: string,
-    validationType: string
-  ): Promise<void> {
+  private async waitUntilElementDisappears(locator: any, pageName: string, elementKey: string, validationType: string): Promise<void> {
     let isPassed: boolean;
     let errorMsg = '';
 
@@ -239,8 +222,7 @@ export class VisibilityValidation implements IValidation {
   static finaliseTest(): void {
     VisibilityValidation.testCounter++;
 
-    const totalPages =
-      VisibilityValidation.pagesWithVisibilityTests.size + VisibilityValidation.missingVisibilityMethods.size;
+    const totalPages = VisibilityValidation.pagesWithVisibilityTests.size + VisibilityValidation.missingVisibilityMethods.size;
 
     if (totalPages === 0 && VisibilityValidation.results.length === 0) {
       console.log(`\n📊 VISIBILITY VALIDATION (Test #${VisibilityValidation.testCounter}):`);
@@ -286,9 +268,7 @@ export class VisibilityValidation implements IValidation {
     }
 
     if (VisibilityValidation.missingVisibilityMethods.size > 0) {
-      console.log(
-        `   Visibility methods not found: ${Array.from(VisibilityValidation.missingVisibilityMethods).join(', ')}`
-      );
+      console.log(`   Visibility methods not found: ${Array.from(VisibilityValidation.missingVisibilityMethods).join(', ')}`);
     }
 
     if (failedPages.size > 0) {

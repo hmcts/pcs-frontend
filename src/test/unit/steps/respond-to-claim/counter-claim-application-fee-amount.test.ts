@@ -33,7 +33,9 @@ jest.mock('@services/pcsApi/paymentService', () => ({
 }));
 
 jest.mock('@routes/dashboard', () => ({
-  getDashboardUrl: jest.fn((caseReference?: string) => (caseReference ? `/case/${caseReference}/dashboard` : null)),
+  getDashboardUrl: jest.fn((caseReference?: string) =>
+    caseReference ? `/case/${caseReference}/dashboard` : null
+  ),
 }));
 
 import { getTranslationFunction } from '../../../../main/modules/steps';
@@ -44,7 +46,10 @@ import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { getCounterClaimFeeType, getFee } from '@services/feeLookupService';
 import { paymentService } from '@services/pcsApi/paymentService';
 
-const makeValidatedCase = (counterClaim?: CcdCounterClaim, defendantResponses: Record<string, unknown> = {}) =>
+const makeValidatedCase = (
+  counterClaim?: CcdCounterClaim,
+  defendantResponses: Record<string, unknown> = {}
+) =>
   new CcdCaseModel({
     id: '',
     data: {
@@ -304,7 +309,9 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
   });
 
   it('keeps pay disabled when outstanding payment lookup fails', async () => {
-    (paymentService.getOutstandingCounterClaimPayment as jest.Mock).mockRejectedValue(new Error('not found'));
+    (paymentService.getOutstandingCounterClaimPayment as jest.Mock).mockRejectedValue(
+      new Error('not found')
+    );
 
     const content = await testedStep.extendGetContent({
       params: { caseReference: '123' },
@@ -460,7 +467,10 @@ describe('respond-to-claim counter-claim-application-fee-amount step', () => {
     });
 
     expect(content.pbaAccountItems).toEqual([{ value: '', text: 'labels.selectPba' }]);
-    expect(mockLogger.error).toHaveBeenCalledWith('Unable to get PBA accounts for user', expect.any(Error));
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      'Unable to get PBA accounts for user',
+      expect.any(Error)
+    );
   });
 
   it('redirects card payment POSTs to the card payment start route for the no-JS flow', async () => {

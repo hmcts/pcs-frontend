@@ -127,7 +127,10 @@ export const paymentService = {
     return response.data;
   },
 
-  async getCardPaymentStatus(accessToken: string, paymentReference: string): Promise<CardPaymentStatusResponse> {
+  async getCardPaymentStatus(
+    accessToken: string,
+    paymentReference: string
+  ): Promise<CardPaymentStatusResponse> {
     const pcsApiURL = getBaseUrl();
     const response = await http.get<CardPaymentStatusResponse>(
       `${pcsApiURL}/payment/card-payment/${encodeURIComponent(paymentReference)}/status`,
@@ -136,12 +139,18 @@ export const paymentService = {
     return response.data;
   },
 
-  async startCardPaymentRequest(input: StartCardPaymentRequestInput): Promise<StartCardPaymentRequestResult> {
-    const paymentResponse = await this.createCardPaymentRequest(input.accessToken, input.serviceRequestReference, {
-      amount: input.amount,
-      language: mapRequestLanguageToPaymentLanguage(input.requestLanguage),
-      returnUrl: input.returnUrl,
-    });
+  async startCardPaymentRequest(
+    input: StartCardPaymentRequestInput
+  ): Promise<StartCardPaymentRequestResult> {
+    const paymentResponse = await this.createCardPaymentRequest(
+      input.accessToken,
+      input.serviceRequestReference,
+      {
+        amount: input.amount,
+        language: mapRequestLanguageToPaymentLanguage(input.requestLanguage),
+        returnUrl: input.returnUrl,
+      }
+    );
 
     return {
       paymentReference: paymentResponse.paymentReference,
@@ -172,11 +181,15 @@ export const paymentService = {
   },
 
   async startPbaPaymentRequest(input: StartPbaPaymentRequestInput): Promise<PbaPaymentResponse> {
-    const paymentResponse = await this.createPbaPaymentRequest(input.accessToken, input.serviceRequestReference, {
-      amount: input.amount,
-      pbaAccount: input.pbaAccount,
-      customerReference: input.customerReference,
-    });
+    const paymentResponse = await this.createPbaPaymentRequest(
+      input.accessToken,
+      input.serviceRequestReference,
+      {
+        amount: input.amount,
+        pbaAccount: input.pbaAccount,
+        customerReference: input.customerReference,
+      }
+    );
 
     return {
       status: paymentResponse.status,

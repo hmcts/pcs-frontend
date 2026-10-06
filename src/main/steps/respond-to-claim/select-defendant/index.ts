@@ -35,9 +35,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const allLinkedDefendants: CcdCollectionItem<CcdDefendantParty>[] | undefined =
       req.res?.locals?.validatedCase?.allLinkedDefendants;
 
-    const radio = formContent.fields.find(f => f.name === 'selectDefendant') as RadioItems | undefined;
+    const radio = formContent.fields.find(f => f.name === 'selectDefendant') as
+      RadioItems | undefined;
 
-    addRadioButtonForAllLinkedDefendants(allLinkedDefendants, radio, req.session.clientContext?.selectedPartyId);
+    addRadioButtonForAllLinkedDefendants(
+      allLinkedDefendants,
+      radio,
+      req.session.clientContext?.selectedPartyId
+    );
 
     return formContent;
   },
@@ -59,7 +64,11 @@ async function getExistingDraftData(req: Request): Promise<void> {
   const accessToken = req.session?.user?.accessToken || '';
   const caseId = req.res?.locals.validatedCase?.id || '';
 
-  const data = await ccdCaseService.getExistingCaseData(accessToken, caseId, req.session?.clientContext);
+  const data = await ccdCaseService.getExistingCaseData(
+    accessToken,
+    caseId,
+    req.session?.clientContext
+  );
   if (req.res?.locals) {
     req.res.locals.selectedDefendantResponses =
       data.case_details?.case_data?.possessionClaimResponse?.defendantResponses || {};

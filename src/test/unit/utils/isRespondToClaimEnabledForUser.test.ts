@@ -21,7 +21,9 @@ import {
   RELEASE_1_2_ENABLED,
 } from '@utils/respondToClaimFlags';
 
-const mockGetLaunchDarklyFlag = getLaunchDarklyFlag as jest.MockedFunction<typeof getLaunchDarklyFlag>;
+const mockGetLaunchDarklyFlag = getLaunchDarklyFlag as jest.MockedFunction<
+  typeof getLaunchDarklyFlag
+>;
 const mockGetUserType = getUserType as jest.MockedFunction<typeof getUserType>;
 
 const makeReq = (): Request => ({ session: { user: { uid: 'user-1' } } }) as unknown as Request;
@@ -50,7 +52,11 @@ describe('isRespondToClaimEnabledForUser', () => {
     const result = await isRespondToClaimEnabledForUser(req);
 
     expect(result).toBe(false);
-    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, ENABLE_CUI_RESPOND_TO_CLAIM_LR, false);
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(
+      req,
+      ENABLE_CUI_RESPOND_TO_CLAIM_LR,
+      false
+    );
   });
 
   it('defaults to false when LaunchDarkly returns false', async () => {

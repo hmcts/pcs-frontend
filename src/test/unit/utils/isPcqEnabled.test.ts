@@ -8,7 +8,9 @@ jest.mock('../../../main/utils/getLaunchDarklyFlag', () => ({
 }));
 
 const mockFlags = (flags: Record<string, boolean>) =>
-  (getLaunchDarklyFlag as jest.Mock).mockImplementation((_req, name: string) => Promise.resolve(flags[name] ?? false));
+  (getLaunchDarklyFlag as jest.Mock).mockImplementation((_req, name: string) =>
+    Promise.resolve(flags[name] ?? false)
+  );
 
 // `getUserType` reads roles straight off the session, so build the request rather than mocking it.
 const reqWithRoles = (roles: string[]) => ({ session: { user: { roles } } }) as unknown as Request;

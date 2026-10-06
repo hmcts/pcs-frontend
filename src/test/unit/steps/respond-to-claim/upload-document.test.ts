@@ -145,8 +145,24 @@ describe('upload-document step', () => {
 
     it('assigns sequential indexes to multiple documents', async () => {
       const docs = [
-        { value: { document: { document_url: 'x', document_binary_url: 'x/b', document_filename: 'first.pdf' } } },
-        { value: { document: { document_url: 'y', document_binary_url: 'y/b', document_filename: 'second.pdf' } } },
+        {
+          value: {
+            document: {
+              document_url: 'x',
+              document_binary_url: 'x/b',
+              document_filename: 'first.pdf',
+            },
+          },
+        },
+        {
+          value: {
+            document: {
+              document_url: 'y',
+              document_binary_url: 'y/b',
+              document_filename: 'second.pdf',
+            },
+          },
+        },
       ];
 
       const result = await testedStep.getInitialFormData(makeReq(docs));
@@ -157,7 +173,11 @@ describe('upload-document step', () => {
     });
 
     it('handles missing validatedCase gracefully', async () => {
-      const result = await testedStep.getInitialFormData({ res: { locals: {} }, session: {}, params: {} });
+      const result = await testedStep.getInitialFormData({
+        res: { locals: {} },
+        session: {},
+        params: {},
+      });
       expect(result).toEqual({ documents: [] });
     });
   });

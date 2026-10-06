@@ -23,7 +23,9 @@ function getPaymentAgreementFromCase(req: Request): PaymentAgreementShape | unde
   return pcr?.defendantResponses?.paymentAgreement ?? pcr?.paymentAgreement;
 }
 
-function hasInstalmentAmountOrFrequency(paymentAgreement: PaymentAgreementShape | undefined): boolean {
+function hasInstalmentAmountOrFrequency(
+  paymentAgreement: PaymentAgreementShape | undefined
+): boolean {
   if (!paymentAgreement) {
     return false;
   }
@@ -54,7 +56,9 @@ function hasInstalmentAmountOrFrequency(paymentAgreement: PaymentAgreementShape 
   return false;
 }
 
-export async function getPreviousStepForYourHouseholdAndCircumstances(req: Request): Promise<string> {
+export async function getPreviousStepForYourHouseholdAndCircumstances(
+  req: Request
+): Promise<string> {
   const rentArrearsClaim = await isRentArrearsClaim(req);
   if (!rentArrearsClaim) {
     return 'counter-claim';

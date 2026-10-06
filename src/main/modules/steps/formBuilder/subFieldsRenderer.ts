@@ -8,14 +8,19 @@ const logger = Logger.getLogger('form-builder-subFieldsRenderer');
  * Builds HTML string for subFields to be included in GOV.UK conditional reveals
  * Uses nunjucks templates to render the HTML, letting nunjucks handle escaping and formatting
  */
-export function buildSubFieldsHTML(subFields: Record<string, FormFieldConfig>, nunjucksEnv: Environment): string {
+export function buildSubFieldsHTML(
+  subFields: Record<string, FormFieldConfig>,
+  nunjucksEnv: Environment
+): string {
   if (!subFields || Object.keys(subFields).length === 0) {
     return '';
   }
 
   // Convert Record to array format expected by the template
   // Filter out fields without component/componentType
-  const subFieldsArray = Object.values(subFields).filter(subField => subField.component && subField.componentType);
+  const subFieldsArray = Object.values(subFields).filter(
+    subField => subField.component && subField.componentType
+  );
 
   if (subFieldsArray.length === 0) {
     return '';

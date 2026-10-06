@@ -1,5 +1,13 @@
-import { formatDatePartsToISODate, fromYesNoNotSureEnum, parseISOToDateParts, toYesNoNotSureEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  formatDatePartsToISODate,
+  fromYesNoNotSureEnum,
+  parseISOToDateParts,
+  toYesNoNotSureEnum,
+} from '../../utils';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -7,7 +15,10 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
   isAnswered: req =>
-    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.alternativeAccommodation),
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances
+        ?.alternativeAccommodation
+    ),
   stepDir: __dirname,
   customTemplate: `${__dirname}/alternativeAccommodation.njk`,
   translationKeys: {
@@ -50,7 +61,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: req => {
     const caseData =
-      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+        ?.householdCircumstances;
     const existing = caseData?.alternativeAccommodation;
     const existingDate = caseData?.alternativeAccommodationTransferDate;
 
@@ -61,14 +73,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     if (existingDate) {
       // Dotted key so the form-builder matches this against the subField inputs
       // (named confirmAlternativeAccommodation.alternativeAccommodationDate-{day,month,year}).
-      result['confirmAlternativeAccommodation.alternativeAccommodationDate'] = parseISOToDateParts(existingDate);
+      result['confirmAlternativeAccommodation.alternativeAccommodationDate'] =
+        parseISOToDateParts(existingDate);
     }
 
     return result;
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    response.defendantResponses.householdCircumstances =
+      response.defendantResponses.householdCircumstances ?? {};
     const confirmValue = req.body?.confirmAlternativeAccommodation as string | undefined;
     const enumValue = toYesNoNotSureEnum(confirmValue);
 
@@ -77,25 +91,31 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
       if (confirmValue === 'yes') {
         const day =
-          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-day'] as string | undefined) ?? '';
+          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-day'] as
+            string | undefined) ?? '';
         const month =
-          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-month'] as string | undefined) ??
-          '';
+          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-month'] as
+            string | undefined) ?? '';
         const year =
-          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-year'] as string | undefined) ?? '';
+          (req.body?.['confirmAlternativeAccommodation.alternativeAccommodationDate-year'] as
+            string | undefined) ?? '';
         const isoDate = formatDatePartsToISODate(day, month, year);
         if (isoDate) {
-          response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate = isoDate;
+          response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate =
+            isoDate;
         } else {
           // Optional date cleared on edit - drop it from the cloned draft so it isn't re-sent.
-          delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
+          delete response.defendantResponses.householdCircumstances
+            .alternativeAccommodationTransferDate;
         }
       } else {
-        delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
+        delete response.defendantResponses.householdCircumstances
+          .alternativeAccommodationTransferDate;
       }
     } else {
       delete response.defendantResponses.householdCircumstances.alternativeAccommodation;
-      delete response.defendantResponses.householdCircumstances.alternativeAccommodationTransferDate;
+      delete response.defendantResponses.householdCircumstances
+        .alternativeAccommodationTransferDate;
     }
 
     await saveDraftDefendantResponse(

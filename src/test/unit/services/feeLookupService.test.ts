@@ -1,7 +1,12 @@
 import axios from 'axios';
 import config from 'config';
 
-import { FeeLookupParams, FeeType, getCounterClaimFeeType, getFee } from '@services/feeLookupService';
+import {
+  FeeLookupParams,
+  FeeType,
+  getCounterClaimFeeType,
+  getFee,
+} from '@services/feeLookupService';
 
 jest.mock('axios');
 jest.mock('config');
@@ -72,7 +77,9 @@ describe('feeLookupService', () => {
     });
 
     it('should throw error when no params for for fee type', () => {
-      expect(getFee(FeeType.genAppMaxFee)).rejects.toThrow('No config found for fee type genAppMaxFee');
+      expect(getFee(FeeType.genAppMaxFee)).rejects.toThrow(
+        'No config found for fee type genAppMaxFee'
+      );
     });
 
     it('should throw error when call to Fee Service fails', () => {
@@ -109,17 +116,23 @@ describe('feeLookupService', () => {
     });
 
     it('returns ranged fee type for amount up to 5,000', () => {
-      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION', '30000')).toEqual(FeeType.counterClaimRanged);
+      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION', '30000')).toEqual(
+        FeeType.counterClaimRanged
+      );
       expect(getCounterClaimFeeType('BOTH', '500000')).toEqual(FeeType.counterClaimRanged);
     });
 
     it('returns counter-claim fee type for amount over 5,000', () => {
       expect(getCounterClaimFeeType('BOTH', '1000001')).toEqual(FeeType.counterClaim);
-      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION', '20000001')).toEqual(FeeType.counterClaim);
+      expect(getCounterClaimFeeType('PAYMENT_OR_COMPENSATION', '20000001')).toEqual(
+        FeeType.counterClaim
+      );
     });
 
     it('throws when claim type is unsupported', () => {
-      expect(() => getCounterClaimFeeType('UNKNOWN')).toThrow('Unsupported counterclaim claim type: UNKNOWN');
+      expect(() => getCounterClaimFeeType('UNKNOWN')).toThrow(
+        'Unsupported counterclaim claim type: UNKNOWN'
+      );
     });
 
     it('falls back to counter-claim fee type when amount is missing for money claim types', () => {

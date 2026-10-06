@@ -34,7 +34,16 @@ describe('translateFields', () => {
   ];
 
   function runTranslate(dataSource: Record<string, unknown>) {
-    return translateFields(fields, mockT as unknown as TFunction, {}, {}, false, '', dataSource, mockNunjucksEnv);
+    return translateFields(
+      fields,
+      mockT as unknown as TFunction,
+      {},
+      {},
+      false,
+      '',
+      dataSource,
+      mockNunjucksEnv
+    );
   }
 
   function getDateInputItems(result: FormFieldConfig[]) {
@@ -79,7 +88,13 @@ describe('translateFields', () => {
     mockT = jest.fn((key: string) => (key === 'feeText' ? '<p>Fee info</p>' : key));
 
     const result = translateFields(
-      [{ name: 'isClaimAmountKnown', type: 'radio', options: [{ value: 'yes', conditionalText: 'feeText' }] }],
+      [
+        {
+          name: 'isClaimAmountKnown',
+          type: 'radio',
+          options: [{ value: 'yes', conditionalText: 'feeText' }],
+        },
+      ],
       mockT as unknown as TFunction,
       {},
       {},
@@ -116,7 +131,8 @@ describe('translateFields', () => {
     );
 
     const field = result[0] as FormFieldConfig;
-    const component = field.component as { prefix?: { text: string }; suffix?: { text: string } } | undefined;
+    const component = field.component as
+      { prefix?: { text: string }; suffix?: { text: string } } | undefined;
 
     expect(component?.prefix).toEqual({ text: '£' });
     expect(component?.suffix).toEqual({ text: 'per month' });

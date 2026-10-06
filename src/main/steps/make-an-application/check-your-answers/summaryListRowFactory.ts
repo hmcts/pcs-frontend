@@ -224,7 +224,9 @@ export function buildSummaryListRows(req: Request, t: TFunction): SummaryListRow
         text: t('answers.uploadedDocuments.label'),
       },
       value: {
-        html: uploadedDocuments.map(document => document.value.document.document_filename).join('<br>'),
+        html: uploadedDocuments
+          .map(document => document.value.document.document_filename)
+          .join('<br>'),
       },
       actions: {
         items: [

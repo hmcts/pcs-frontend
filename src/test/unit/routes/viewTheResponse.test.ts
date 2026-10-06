@@ -13,9 +13,10 @@ import { ccdCaseService } from '@services/ccdCaseService';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 
-const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
-  typeof isRespondToClaimEnabledForRelease
->;
+const mockIsRespondToClaimEnabledForRelease =
+  isRespondToClaimEnabledForRelease as jest.MockedFunction<
+    typeof isRespondToClaimEnabledForRelease
+  >;
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
@@ -38,7 +39,8 @@ const translationStrings: Record<string, string> = {
   'viewTheResponse:defendant.freeLegalAdviceOptions.YES': 'Yes',
   'viewTheResponse:defendant.freeLegalAdviceOptions.NO': 'No',
   'viewTheResponse:defendant.freeLegalAdviceOptions.PREFER_NOT_TO_SAY': 'Prefer not to say',
-  'viewTheResponse:counterclaim.claimTypeOptions.PAYMENT_OR_COMPENSATION': 'A sum of money or compensation',
+  'viewTheResponse:counterclaim.claimTypeOptions.PAYMENT_OR_COMPENSATION':
+    'A sum of money or compensation',
   'viewTheResponse:counterclaim.claimTypeOptions.SOMETHING_ELSE': 'Something else',
   'viewTheResponse:counterclaim.claimTypeOptions.BOTH': 'Both',
   'viewTheResponse:counterclaim.needHelpWithFeesOptions.NO': 'I do not need help paying the fee',
@@ -377,7 +379,9 @@ describe('viewTheResponse route', () => {
       ])
     );
     expect(renderArgs.defendant1Details.rows.length).toBeGreaterThan(0);
-    expect(renderArgs.defendant1Details.rows.map((row: { key: { text: string } }) => row.key.text)).toEqual([
+    expect(
+      renderArgs.defendant1Details.rows.map((row: { key: { text: string } }) => row.key.text)
+    ).toEqual([
       'viewTheResponse:defendant.name',
       'viewTheResponse:defendant.phone',
       'viewTheResponse:defendant.email',
@@ -1129,7 +1133,9 @@ describe('viewTheResponse route', () => {
       next
     );
 
-    expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Defendant response not found' }));
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Defendant response not found' })
+    );
   });
 
   it('should return 404 when case reference is invalid', async () => {
@@ -1147,7 +1153,9 @@ describe('viewTheResponse route', () => {
       next
     );
 
-    expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Invalid case reference format' }));
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Invalid case reference format' })
+    );
     expect(ccdCaseService.getCaseById).not.toHaveBeenCalled();
   });
 
@@ -1166,7 +1174,9 @@ describe('viewTheResponse route', () => {
       next
     );
 
-    expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Authentication required' }));
+    expect(next).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Authentication required' })
+    );
     expect(ccdCaseService.getCaseById).not.toHaveBeenCalled();
   });
 
@@ -1302,7 +1312,10 @@ describe('view-the-response template - response PDF link', () => {
     if (!pdfBlockMatch) {
       throw new Error('Could not locate the response PDF block in view-the-response.njk');
     }
-    return new Environment(null, { autoescape: true }).renderString(pdfBlockMatch[0], { t, ...context });
+    return new Environment(null, { autoescape: true }).renderString(pdfBlockMatch[0], {
+      t,
+      ...context,
+    });
   }
 
   it('locates the response PDF block in the template', () => {
@@ -1330,7 +1343,9 @@ describe('view-the-response template - response PDF link', () => {
   });
 
   it('renders nothing when the response has not been submitted', () => {
-    const html = renderPdfBlock({ responsePdfUrl: '/case/1234567890123456/view-documents/doc-response-1' });
+    const html = renderPdfBlock({
+      responsePdfUrl: '/case/1234567890123456/view-documents/doc-response-1',
+    });
 
     expect(html.trim()).toBe('');
   });

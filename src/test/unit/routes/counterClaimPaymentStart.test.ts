@@ -79,7 +79,11 @@ describe('counterClaimPaymentStart routes', () => {
   });
 
   it('returns 401 via error middleware when access token is missing', async () => {
-    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const handler = mockGet.mock.calls[0][2] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
     const req = {
       params: { caseReference: '123' },
       session: {
@@ -99,7 +103,11 @@ describe('counterClaimPaymentStart routes', () => {
   });
 
   it('redirects to fee page when service request reference is missing', async () => {
-    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const handler = mockGet.mock.calls[0][2] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
     const req = {
       params: { caseReference: '123' },
       session: {
@@ -112,11 +120,18 @@ describe('counterClaimPaymentStart routes', () => {
 
     await handler(req, res, next);
 
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/123/respond-to-claim/counter-claim-application-fee-amount'
+    );
   });
 
   it('creates card payment and redirects to gov pay nextUrl', async () => {
-    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const handler = mockGet.mock.calls[0][2] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
     mockStartCardPaymentRequest.mockResolvedValue({
       paymentReference: 'RC-1',
       paymentStatus: 'Created',
@@ -159,7 +174,11 @@ describe('counterClaimPaymentStart routes', () => {
   });
 
   it('preserves submit-time counterclaim snapshot when starting gov pay', async () => {
-    const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const handler = mockGet.mock.calls[0][2] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
     mockStartCardPaymentRequest.mockResolvedValue({
       paymentReference: 'RC-1',
       paymentStatus: 'Created',
@@ -188,7 +207,8 @@ describe('counterClaimPaymentStart routes', () => {
         paymentReference: 'RC-1',
         counterClaimType: 'PAYMENT_OR_COMPENSATION',
         counterClaimAmountInPence: '64900',
-        failureRedirectUrl: '/case/123/respond-to-claim/counter-claim-application-fee-amount?payment=failed',
+        failureRedirectUrl:
+          '/case/123/respond-to-claim/counter-claim-application-fee-amount?payment=failed',
       })
     );
   });
@@ -231,7 +251,11 @@ describe('counter-claim-pba-payment/start route', () => {
   });
 
   it('returns 401 via error middleware when access token is missing', async () => {
-    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const handler = mockGet.mock.calls[1][2] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
     const req = {
       params: { caseReference: '123' },
       session: {
@@ -251,7 +275,11 @@ describe('counter-claim-pba-payment/start route', () => {
   });
 
   it('redirects to fee page when service request reference is missing', async () => {
-    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const handler = mockGet.mock.calls[1][2] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
     const req = {
       params: { caseReference: '123' },
       session: {
@@ -264,11 +292,18 @@ describe('counter-claim-pba-payment/start route', () => {
 
     await handler(req, res, next);
 
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/123/respond-to-claim/counter-claim-application-fee-amount'
+    );
   });
 
   it('redirects to fee page when PBA account details are missing', async () => {
-    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const handler = mockGet.mock.calls[1][2] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
     const req = {
       params: { caseReference: '123' },
       session: createSession({
@@ -284,12 +319,21 @@ describe('counter-claim-pba-payment/start route', () => {
     await handler(req, res, next);
 
     expect(mockStartPbaPaymentRequest).not.toHaveBeenCalled();
-    expect(mockLogger.warn).toHaveBeenCalledWith('Missing PBA payment details for counterclaim payment start case 123');
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-application-fee-amount');
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      'Missing PBA payment details for counterclaim payment start case 123'
+    );
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/123/respond-to-claim/counter-claim-application-fee-amount'
+    );
   });
 
   it('creates PBA payment request and redirects to successful page', async () => {
-    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const handler = mockGet.mock.calls[1][2] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
     mockStartPbaPaymentRequest.mockResolvedValue({
       paymentReference: 'RC-PBA-123',
       status: 'Success',
@@ -326,11 +370,18 @@ describe('counter-claim-pba-payment/start route', () => {
         paymentReference: 'RC-PBA-123',
       })
     );
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/counter-claim-payment-successful');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/123/respond-to-claim/counter-claim-payment-successful'
+    );
   });
 
   it('rejects a path-manipulated case reference through safeRedirect303 instead of redirecting to it', async () => {
-    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const handler = mockGet.mock.calls[1][2] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
     mockStartPbaPaymentRequest.mockResolvedValue({
       paymentReference: 'RC-PBA-123',
       status: 'Success',
@@ -352,12 +403,22 @@ describe('counter-claim-pba-payment/start route', () => {
 
     await handler(req, res, next);
 
-    expect(mockLogger.warn).toHaveBeenCalledWith('safeRedirect303: Prefix not allowed', expect.anything());
-    expect(res.redirect).not.toHaveBeenCalledWith(303, '/case/../../respond-to-claim/counter-claim-payment-successful');
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      'safeRedirect303: Prefix not allowed',
+      expect.anything()
+    );
+    expect(res.redirect).not.toHaveBeenCalledWith(
+      303,
+      '/case/../../respond-to-claim/counter-claim-payment-successful'
+    );
   });
 
   it('redirects to payment failed page when PBA payment status is unsuccessful', async () => {
-    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const handler = mockGet.mock.calls[1][2] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
     mockGetPaymentOutcome.mockReturnValue('failure');
     mockStartPbaPaymentRequest.mockResolvedValue({
       paymentReference: 'RC-PBA-123',
@@ -395,7 +456,11 @@ describe('counter-claim-pba-payment/start route', () => {
   });
 
   it('redirects to payment failed page when PBA service call fails', async () => {
-    const handler = mockGet.mock.calls[1][2] as (req: Request, res: Response, next: NextFunction) => Promise<void>;
+    const handler = mockGet.mock.calls[1][2] as (
+      req: Request,
+      res: Response,
+      next: NextFunction
+    ) => Promise<void>;
     mockStartPbaPaymentRequest.mockRejectedValue(new Error('PBA Account Error'));
 
     const req = {

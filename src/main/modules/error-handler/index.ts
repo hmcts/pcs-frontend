@@ -28,7 +28,9 @@ export function createNotFoundHandler(): (req: Request, res: Response, next: Nex
   };
 }
 
-export function createErrorHandler(env: string): (err: Error, req: Request, res: Response, next: NextFunction) => void {
+export function createErrorHandler(
+  env: string
+): (err: Error, req: Request, res: Response, next: NextFunction) => void {
   return (err: Error, req: Request, res: Response, next: NextFunction) => {
     // If response already sent, don't try to handle the error
     if (res.headersSent || (res as { writableEnded?: boolean }).writableEnded || res.finished) {
@@ -43,7 +45,8 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
 
     // Skip logging for common browser/dev tools requests that generate harmless 404s
     const url = req.originalUrl || 'Unknown URL';
-    const shouldSkipLogging = status === 404 && (url.startsWith('/.well-known/') || url.startsWith('/favicon.ico'));
+    const shouldSkipLogging =
+      status === 404 && (url.startsWith('/.well-known/') || url.startsWith('/favicon.ico'));
 
     if (!shouldSkipLogging) {
       logger.error('Request failed', {
@@ -73,9 +76,12 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
         const seconds = Number(retryAfter);
 
         if (!Number.isNaN(seconds)) {
-          res.locals.serviceUnavailableParagraph = t('errorPages.serviceUnavailable.paragraphMinutes', {
-            minutes: Math.ceil(seconds / 60),
-          });
+          res.locals.serviceUnavailableParagraph = t(
+            'errorPages.serviceUnavailable.paragraphMinutes',
+            {
+              minutes: Math.ceil(seconds / 60),
+            }
+          );
         } else {
           const retryAfterDate = new Date(retryAfter);
           const time = retryAfterDate.toLocaleTimeString('en-GB', {
@@ -88,10 +94,13 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
             month: 'short',
             day: 'numeric',
           });
-          res.locals.serviceUnavailableParagraph = t('errorPages.serviceUnavailable.paragraphDateAndTime', {
-            date,
-            time,
-          });
+          res.locals.serviceUnavailableParagraph = t(
+            'errorPages.serviceUnavailable.paragraphDateAndTime',
+            {
+              date,
+              time,
+            }
+          );
         }
       }
     }

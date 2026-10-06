@@ -24,7 +24,9 @@ import { step } from '../../../../main/steps/respond-to-claim/solicitor';
 
 describe('solicitor isAnswered', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const reqWith = (validatedCase: Record<string, unknown>): any => ({ res: { locals: { validatedCase } } });
+  const reqWith = (validatedCase: Record<string, unknown>): any => ({
+    res: { locals: { validatedCase } },
+  });
 
   it('is answered when hasSolicitor is set to YES', () => {
     expect(step.isAnswered?.(reqWith({ defendantResponses: { hasSolicitor: 'YES' } }))).toBe(true);
