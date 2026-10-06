@@ -1,6 +1,7 @@
 import type { OrderFormSubmission } from '@utils/makeOrderForm';
 import { parseDate } from '@utils/makeOrderFormat';
 import type { FormData, OrderConfirmationHeader, OrderStart } from '@utils/orderCase';
+import { orderHtml } from '@utils/orderHtml';
 
 export const REVIEW_REASONS = [
   { value: 'UNLESS_ORDER', text: 'Unless order' },
@@ -155,7 +156,8 @@ export function validateProceedToIssue(answers: OrderReviewAnswers): ValidationI
 
 /**
  * The caseworker's review as pcs-api's confirm order review event takes it. An order returned to the judge
- * goes back as the judge submitted it, without the caseworker's changes.
+ * goes back as the judge submitted it, without the caseworker's changes. An order issued goes with its
+ * wording exported to HTML, which becomes its document.
  */
 export function reviewRequest(
   review: OrderReviewSession,
@@ -179,11 +181,7 @@ export function reviewRequest(
     orderId: order.id,
     version: order.version,
     issue: {
-      order: answers.order && {
-        orderType: answers.order.orderType,
-        formData: answers.order.formData,
-        docweaveSnapshot: JSON.parse(answers.order.orderDocumentJson || 'null'),
-      },
+      order: answers.order && issuedOrder(answers.order),
       reviewDates,
       nextStepsComplete: answers.nextSteps === 'complete',
       finalOrder: answers.finalOrder === 'yes',
@@ -191,5 +189,15 @@ export function reviewRequest(
       partiesToServe: serveAllParties ? [] : answers.partiesToServe,
       seal: answers.seal,
     },
+  };
+}
+
+function issuedOrder(order: Required<OrderFormSubmission>): Record<string, unknown> {
+  const docweaveSnapshot = JSON.parse(order.orderDocumentJson || 'null');
+  return {
+    orderType: order.orderType,
+    formData: order.formData,
+    docweaveSnapshot,
+    html: orderHtml(docweaveSnapshot),
   };
 }

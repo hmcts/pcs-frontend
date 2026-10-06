@@ -509,6 +509,7 @@ describe('confirm order review', () => {
               orderType,
               formData: expect.objectContaining({ recitals: 'yes', 'recitals-text': 'Upon hearing the claimant' }),
               docweaveSnapshot: JSON.parse(orderDocument),
+              html: expect.stringContaining('<p>Upon hearing the claimant</p>'),
             },
             reviewDates: [{ date: '2027-03-05', reason: 'UNLESS_ORDER', description: 'Check compliance' }],
             nextStepsComplete: true,
@@ -520,6 +521,10 @@ describe('confirm order review', () => {
         },
       ]);
       expect(JSON.stringify(submittedReviews()[0])).toContain('The claimant may apply to restore the claim.');
+      const { html } = (submittedReviews()[0] as { issue: { order: { html: string } } }).issue.order;
+      expect(html).toContain('The claimant may apply to restore the claim.');
+      expect(html).toMatch(/<ol>.*<li>/);
+      expect(html).not.toMatch(/data-|class=/);
       expect(submittedEventTokens()).toEqual(['event-token-1']);
 
       const confirmation = parse((await app.get(`${BASE}/order-issued`)).text);
