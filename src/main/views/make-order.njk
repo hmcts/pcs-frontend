@@ -48,7 +48,9 @@
     <textarea hidden name="queryFromCaseworker">{{ order.queryFromCaseworker }}</textarea>
   {% endif %}
 
-  <p class="govuk-body">Answer every question unless it says it is optional.</p>
+  {% if not application %}
+    <p class="govuk-body">Answer every question unless it says it is optional.</p>
+  {% endif %}
 
   {% include "make-order/_form.njk" %}
 

@@ -41,6 +41,7 @@ describe('make an order: deciding an application', () => {
     expect(document.querySelector('#referral-note')?.textContent).toContain('The hearing is next week');
     expect(document.querySelector('[data-attendance-row]')).toBeNull();
     expect(document.querySelector('[data-order-type]')).toBeNull();
+    expect(document.body.textContent).not.toContain('Answer every question');
   });
 
   it("orders the application granted, leaving the applicant's wording for the judge to add", async () => {
