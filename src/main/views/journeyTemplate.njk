@@ -47,9 +47,11 @@
   {% endif %}
 
   <div class="govuk-width-container">
-    <div class="govuk-language-toggle">
-      {{ (languageToggle or t('languageToggle') or '') | safe }}
-    </div>
+    {% if welshEnabled %}
+      <div class="govuk-language-toggle">
+        {{ (languageToggle or t('languageToggle') or '') | safe }}
+      </div>
+    {% endif %}
   </div>
 {% endblock %}
 
