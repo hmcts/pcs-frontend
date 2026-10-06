@@ -27,7 +27,7 @@ export const getLaunchDarklyFlag = async <T>(req: Request, flagName: string, def
     };
 
     result = (await ldClient?.variation(flagName, context, defaultValue)) ?? defaultValue;
-    logger.info('-------Flag from LaunchDarkly----------', { result, flagName });
+    logger.debug('-------Flag from LaunchDarkly----------', { result, flagName });
   } catch (err: unknown) {
     logger.error('LaunchDarkly evaluation failed', err);
   }
