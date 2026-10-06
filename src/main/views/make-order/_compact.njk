@@ -53,6 +53,7 @@
     name: name,
     classes: params.classes,
     fieldset: { legend: { text: params.legend, classes: "govuk-fieldset__legend--s" } } if params.legend,
+    hint: { text: params.hint } if params.hint,
     errorMessage: validationErrors[name],
     items: items
   }) }}
