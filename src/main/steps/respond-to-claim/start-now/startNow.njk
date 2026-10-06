@@ -34,6 +34,10 @@
     <p class="govuk-body">{{ description | safe }}</p>
   {% endif %}
 
+  {% if welshAvailableInfo and not isLegalRepresentative %}
+    <p class="govuk-body">{{ welshAvailableInfo | safe }}</p>
+  {% endif %}
+
   {% if completingYourResponse %}
     <h2 class="govuk-heading-s">{{completingYourResponse}}</h2>
   {% endif %}
@@ -56,9 +60,15 @@
     <h2 class="govuk-heading-s">{{whatYouWillNeed}}</h2>
   {% endif %}
 
+  {% if provideDetailsInfo %}
     <p class="govuk-body">
     {{provideDetailsInfo | safe}}
     </p>
+  {% endif %}
+
+  {% if welshAvailableInfo and isLegalRepresentative %}
+    <p class="govuk-body">{{ welshAvailableInfo | safe }}</p>
+  {% endif %}
 
   {% if not isLegalRepresentative %}
     <ul class="govuk-list govuk-list--bullet">
