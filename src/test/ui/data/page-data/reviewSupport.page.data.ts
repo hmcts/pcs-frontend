@@ -1,5 +1,5 @@
 export const reviewSupport = {
-  mainHeader: `Review the support you've requested`,
+  mainHeader: `Review the support you've asked for`,
   backLink: `Back`,
   submitButton: `Submit`,
   cancelLink: `Cancel`,
