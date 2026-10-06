@@ -1,4 +1,3 @@
-import { format, isValid, parseISO } from 'date-fns';
 import escapeHTML from 'escape-html';
 import type { TFunction } from 'i18next';
 import { DateTime } from 'luxon';
@@ -30,6 +29,7 @@ import {
 import type { CcdCaseAddress, CcdCaseData } from '@services/ccdCase.interface';
 import { extractCaseDocuments } from '@utils/documentUtils';
 import type { CaseDocumentLookupItem } from '@utils/documentUtils';
+import { formatLocalisedDate, toDateLocale } from '@utils/formatLocalisedDate';
 
 export interface ViewTheClaimSummaryRow {
   key: {
@@ -154,10 +154,7 @@ function createViewTheClaimCopy(t: TFunction, locale: string): ViewTheClaimCopy 
   };
 }
 
-/** Maps an application language code to the Luxon locale used for date formatting. */
-export function toDateLocale(language?: string): string {
-  return language?.toLowerCase() === 'cy' ? 'cy' : 'en-gb';
-}
+export { toDateLocale };
 
 export function section(title: string, rows: (ViewTheClaimSummaryRow | undefined)[]): ViewTheClaimSection | undefined {
   const visibleRows = sectionRows(rows);
@@ -598,18 +595,16 @@ export function formatDate(value: unknown, locale = 'en-gb'): string | undefined
     return undefined;
   }
 
-  const date = DateTime.fromISO(text, { zone: 'utc' });
-  return date.isValid ? date.setZone('Europe/London').setLocale(locale).toFormat('d LLLL y') : text;
+  return formatLocalisedDate(text, locale) ?? text;
 }
 
-export function formatDateOrdinal(value: unknown): string | undefined {
+export function formatDateOrdinal(value: unknown, lang?: string): string | undefined {
   const text = getStringFromValue(value);
   if (!text) {
     return undefined;
   }
 
-  const date = parseISO(text);
-  return isValid(date) ? format(date, 'do LLLL yyyy') : text;
+  return formatLocalisedDate(text, lang, 'ordinal') ?? text;
 }
 
 export function formatTime(value: unknown, locale = 'en-gb'): string | undefined {

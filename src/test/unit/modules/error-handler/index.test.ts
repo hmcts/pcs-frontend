@@ -310,6 +310,29 @@ describe('error-handler', () => {
       expect(res.locals.serviceUnavailableParagraph).toBe('You will be able to use the service from [dateAndTime].');
     });
 
+    it.each([
+      ['en', '21 Apr 2026', '08:28 am'],
+      ['cy', '21 Ebr 2026', '08:28 yb'],
+    ])('should show the retry-after date and UK time in the request language (%s)', (language, date, time) => {
+      const errorHandler = createErrorHandler('test');
+      const err = new HTTPError('Service unavailable', 503, 'Tue, 21 Apr 2026 07:28:00 GMT');
+      const t = jest.fn((key: string, options?: Record<string, unknown>) =>
+        options && 'date' in options ? `${options.time}|${options.date}` : key
+      );
+      const req = { i18n: { getFixedT: () => t }, language } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: { t },
+        headersSent: false,
+      } as any;
+
+      errorHandler(err, req, res, jest.fn() as NextFunction);
+
+      // ICU versions differ on whether the space before am/pm is a normal or narrow no-break space.
+      expect(res.locals.serviceUnavailableParagraph.replace(/\s/g, ' ')).toBe(`${time}|${date}`);
+    });
+
     it('should convert non-HTTPError to HTTPError with status 500', () => {
       const errorHandler = createErrorHandler('test');
       const err = new Error('Generic error');

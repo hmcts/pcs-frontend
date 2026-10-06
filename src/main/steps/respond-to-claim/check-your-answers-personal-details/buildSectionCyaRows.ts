@@ -92,12 +92,12 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
   });
 }
 
-function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void {
+function addDateOfBirthRow({ rows, validatedCase, t, lang, change }: RowContext): void {
   // DOB page has no showCondition and the field is optional, so always render the row.
   const dateOfBirth = validatedCase.defendantResponsesDateOfBirth;
   rows.push({
     key: { text: t('rows.dateOfBirth.label') },
-    value: { text: dateOfBirth ? formatIsoDate(dateOfBirth) : t('noAnswerProvided') },
+    value: { text: dateOfBirth ? formatIsoDate(dateOfBirth, lang) : t('noAnswerProvided') },
     actions: { items: [change('defendant-date-of-birth', 'rows.dateOfBirth.changeHidden')] },
   });
 }

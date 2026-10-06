@@ -18,8 +18,12 @@ import { buildSectionCyaRows as buildDisputeRows } from '../../../../main/steps/
 // before the P1/P2 refactor. Identity `t` so assertions can match translation keys.
 const t = ((key: string) => key) as unknown as TFunction;
 
-const reqWith = (validatedCase: CcdCaseModel | undefined, options: { release12Enabled?: boolean } = {}): Request =>
+const reqWith = (
+  validatedCase: CcdCaseModel | undefined,
+  options: { release12Enabled?: boolean; language?: string } = {}
+): Request =>
   ({
+    language: options.language,
     res: {
       locals: {
         validatedCase,
@@ -391,6 +395,21 @@ describe('section-CYA row builders — characterisation', () => {
       expect(confirmRow?.classes).toContain('govuk-summary-list__row--no-border');
       expect(dateRow?.value).toEqual({ text: '1 January 2023' });
       expect(dateRow?.actions?.items[0].href).toContain('/tenancy-date-details?edit=disputeAndTenancy');
+    });
+
+    it('tenancy-date row: shows the corrected date in Welsh when the request language is cy', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model(
+            { tenancyStartDateConfirmation: 'NO', tenancyStartDate: '2023-01-01' },
+            { tenancy_TenancyLicenceDate: '2023-01-01' }
+          ),
+          { language: 'cy' }
+        ),
+        t
+      );
+      const dateRow = rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label');
+      expect(dateRow?.value).toEqual({ text: '1 Ionawr 2023' });
     });
 
     it('tenancy-date row: "unknown" branch links to tenancy-date-unknown and uses the entered label', () => {

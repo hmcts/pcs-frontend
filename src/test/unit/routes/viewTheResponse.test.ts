@@ -7,6 +7,7 @@ import { Environment } from 'nunjucks';
 import { VIEW_RESPONSE_ROUTE } from '../../../main/constants/caseRoutes';
 import { oidcMiddleware } from '../../../main/middleware';
 
+import { getRequestLanguage } from '@modules/i18n';
 import viewTheResponseRoute from '@routes/viewTheResponse';
 import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -79,6 +80,7 @@ const translationStrings: Record<string, string> = {
 };
 
 jest.mock('@modules/i18n', () => ({
+  getRequestLanguage: jest.fn(() => 'en'),
   getTranslationFunction: jest.fn(
     () => ((key: string) => translationStrings[key] ?? key) as import('i18next').TFunction
   ),
@@ -1309,6 +1311,43 @@ describe('viewTheResponse route', () => {
     } as unknown as CcdCaseData);
 
     expect(renderArgs.responsePdfUrl).toBeUndefined();
+  });
+  it('should format every date in Welsh when the request language is cy', async () => {
+    (getRequestLanguage as jest.Mock).mockReturnValueOnce('cy');
+    mockCaseById(buildComprehensiveCaseData());
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+    const next: NextFunction = jest.fn();
+
+    await handler(viewTheResponseRequest({ caseReference, sessionUser: { accessToken: 'access-token-1' } }), res, next);
+
+    expect(next).not.toHaveBeenCalled();
+    const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderArgs.caseDates.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: { text: '5 Chwefror 2026' } }),
+        expect.objectContaining({ value: { text: '1 Chwefror 2026' } }),
+      ])
+    );
+    expect(renderArgs.defendant1Details.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.dateOfBirth' },
+          value: { text: '15 Mai 1990' },
+        }),
+      ])
+    );
+    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
+      expect.arrayContaining([expect.objectContaining({ value: { text: '20 Gorffennaf 1985' } })])
+    );
+    expect(renderArgs.responseToClaim.rows).toEqual(
+      expect.arrayContaining([expect.objectContaining({ value: { text: '1 Rhagfyr 2025' } })])
+    );
+    expect(renderArgs.householdAndCircumstances.rows).toEqual(
+      expect.arrayContaining([expect.objectContaining({ value: { text: '1 Mehefin 2026' } })])
+    );
   });
 });
 
