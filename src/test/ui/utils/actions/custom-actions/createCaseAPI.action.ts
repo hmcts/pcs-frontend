@@ -189,9 +189,15 @@ export class CreateCaseAPIAction implements IAction {
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
-            throw new Error(`Payment API failed after retries: ${error.response?.status}`);
+            const responseDetails = error.response?.data ?? error.message;
+            const status = error.response?.status ? ` (HTTP ${error.response.status})` : '';
+            throw new Error(
+              `Payment API failed after ${attempt} attempts${status}: ${JSON.stringify(responseDetails)}`,
+              { cause: error }
+            );
           }
-          throw new Error('Payment API failed unexpectedly after retries.');
+          const details = error instanceof Error ? error.message : String(error);
+          throw new Error(`Payment API failed after ${attempt} attempts: ${details}`, { cause: error });
         }
         await new Promise(res => setTimeout(res, delayMs));
       }
