@@ -4305,7 +4305,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsdom@npm:^21.1.7":
+"@types/jsdom@npm:21.1.7, @types/jsdom@npm:^21.1.7":
   version: 21.1.7
   resolution: "@types/jsdom@npm:21.1.7"
   dependencies:
@@ -10538,7 +10538,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsdom@npm:^26.1.0":
+"jsdom@npm:26.1.0, jsdom@npm:^26.1.0":
   version: 26.1.0
   resolution: "jsdom@npm:26.1.0"
   dependencies:
@@ -12100,6 +12100,7 @@ __metadata:
     "@types/express-session": "npm:1.19.0"
     "@types/git-rev-sync": "npm:2.0.2"
     "@types/jest": "npm:30.0.0"
+    "@types/jsdom": "npm:21.1.7"
     "@types/lodash": "npm:4.17.25"
     "@types/luxon": "npm:3.7.5"
     "@types/multer": "npm:^2.2.0"
@@ -12149,6 +12150,7 @@ __metadata:
     jest-html-reporter: "npm:4.4.2"
     jest-pact: "npm:0.14.0"
     jose: "npm:6.2.12"
+    jsdom: "npm:26.1.0"
     lint-staged: "npm:17.5.1"
     lodash: "npm:4.18.1"
     luxon: "npm:3.7.2"
