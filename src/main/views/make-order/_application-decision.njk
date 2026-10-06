@@ -1,30 +1,34 @@
 {#
-  What the judge decides about the application, which starts the order's wording. Listing it for a
-  hearing leaves the application open.
+  What the judge decides about the application, which starts the order's wording, on one row as the rest of
+  the make order page asks its questions. Listing it for a hearing leaves the application open. Inline radios
+  can't reveal a question, so whether the hearing is on notice follows on its own row, shown while the
+  judge is listing it (initApplicationListing in make-order.ts).
 #}
 {% import "make-order/_compact.njk" as compact with context %}
 
-{% set listHtml %}
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Decision</h2>
+
+{{ compact.radios("application-decision", {
+  legend: "What do you decide?",
+  hint: "For something else, write the order in the order preview",
+  classes: "govuk-radios--small govuk-radios--inline",
+  items: [
+    { value: "grant", text: "Grant" },
+    { value: "refuse", text: "Refuse" },
+    { value: "strike-out", text: "Strike out" },
+    { value: "list", text: "List for a hearing" },
+    { value: "other", text: "Something else" }
+  ]
+}) }}
+
+<div data-application-listing {%- if not draftChecked("application-decision", "list") %} hidden{% endif %}>
   {{ compact.radios("application-list-notice", {
-    legend: "Hearing",
-    classes: "govuk-radios--small",
+    legend: "Is the hearing on notice?",
+    classes: "govuk-radios--small govuk-radios--inline",
     default: "on-notice",
     items: [
       { value: "on-notice", text: "On notice to the other parties" },
       { value: "without-notice", text: "Without notice" }
     ]
   }) }}
-{% endset %}
-
-<h2 class="govuk-heading-l govuk-!-margin-top-6">Decision</h2>
-
-{{ compact.radios("application-decision", {
-  legend: "What do you decide?",
-  items: [
-    { value: "grant", text: "Grant the application" },
-    { value: "refuse", text: "Refuse the application" },
-    { value: "strike-out", text: "Strike out the application" },
-    { value: "list", text: "List the application for a hearing", conditional: { html: listHtml } },
-    { value: "other", text: "Something else", hint: { text: "Write the order in the order preview" } }
-  ]
-}) }}
+</div>

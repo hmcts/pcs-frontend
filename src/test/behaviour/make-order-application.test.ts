@@ -88,7 +88,10 @@ describe('make an order: deciding an application', () => {
 
   it('lists the application for a hearing, on notice unless the judge says otherwise', async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    const listing = document.querySelector<HTMLElement>('[data-application-listing]');
+    expect(listing?.hidden).toBe(true);
     check('application-decision', 'list');
+    expect(listing?.hidden).toBe(false);
     expect(page.orderText()).toContain('The application is listed for a hearing on notice to the other parties.');
     check('application-list-notice', 'without-notice');
     expect(page.orderText()).toContain('The application is listed for a hearing without notice.');

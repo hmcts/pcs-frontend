@@ -215,6 +215,20 @@ function escapeHtml(text: string): string {
   return element.innerHTML;
 }
 
+/** Whether a hearing the judge lists the application for is on notice, asked only while they are listing it. */
+export function initApplicationListing(form: HTMLFormElement): void {
+  const listing = form.querySelector<HTMLElement>('[data-application-listing]');
+  if (!listing) {
+    return;
+  }
+  form.addEventListener('change', event => {
+    const decision = event.target as HTMLInputElement;
+    if (decision.name === 'application-decision') {
+      listing.hidden = decision.value !== 'list';
+    }
+  });
+}
+
 /** Lets the editor take up what was just done to it, which it does on the browser's next turn. */
 const nextTurn = (): Promise<void> => new Promise(resolve => window.setTimeout(resolve));
 
@@ -344,6 +358,7 @@ export function initMakeOrder(): void {
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
   initRequestedWording(form, mount);
+  initApplicationListing(form);
 }
 
 /**
