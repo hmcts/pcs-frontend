@@ -34,7 +34,7 @@
     <p class="govuk-body">{{ description | safe }}</p>
   {% endif %}
 
-  {% if welshAvailableInfo and not isLegalRepresentative %}
+  {% if welshEnabled and welshAvailableInfo and not isLegalRepresentative %}
     <p class="govuk-body">{{ welshAvailableInfo | safe }}</p>
   {% endif %}
 
@@ -66,7 +66,7 @@
     </p>
   {% endif %}
 
-  {% if welshAvailableInfo and isLegalRepresentative %}
+  {% if welshEnabled and welshAvailableInfo and isLegalRepresentative %}
     <p class="govuk-body">{{ welshAvailableInfo | safe }}</p>
   {% endif %}
 

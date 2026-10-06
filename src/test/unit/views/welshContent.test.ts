@@ -86,6 +86,16 @@ describe('respond-to-claim start page', () => {
     expect(html).not.toContain('provide or confirm details');
   });
 
+  it.each([
+    ['a citizen', false],
+    ['a legal representative', true],
+  ])('does not tell %s the service is available in Welsh when Welsh is switched off', (_who, isLegalRepresentative) => {
+    const html = render(isLegalRepresentative, false);
+
+    expect(html).not.toContain('Welsh (Cymraeg)');
+    expect(html).not.toContain('?lang=cy');
+  });
+
   it.each(['en', 'cy'])('keeps the citizen and legal-rep %s files in step', lang => {
     expect(readLocale(lang, 'respondToClaim/legalrep/startNow.json').provideDetailsInfo).toBe('');
     expect(readLocale(lang, 'respondToClaim/startNow.json').description).not.toContain('<p');
