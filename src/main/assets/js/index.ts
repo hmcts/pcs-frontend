@@ -19,7 +19,9 @@ if (document.querySelector('#make-order-form')) {
 }
 // So is the read-only order preview, which renders with Docweave.
 if (document.querySelector('[data-order-preview]')) {
-  void import(/* webpackChunkName: "order-preview" */ './order-preview').then(({ initOrderPreview }) => initOrderPreview());
+  void import(/* webpackChunkName: "order-preview" */ './order-preview').then(({ initOrderPreview }) =>
+    initOrderPreview()
+  );
 }
 initPostcodeSelection();
 initPostcodeLookup();
