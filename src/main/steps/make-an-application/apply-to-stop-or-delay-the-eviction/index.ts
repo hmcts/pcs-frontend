@@ -2,9 +2,9 @@ import type { Request } from 'express';
 
 import { createFormStep, getStepUrl } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+import { getSuspendApplicationFee } from '../suspendFee';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { FeeType, getFee } from '@services/feeLookupService';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { RELEASE_1B_ENABLED } from '@utils/respondToClaimFlags';
 
@@ -54,7 +54,7 @@ export const step: StepDefinition = createFormStep({
     }
   },
   extendGetContent: async (_req: Request) => {
-    const suspendFee = await getFee(FeeType.genAppSuspendFeeFEE0458);
+    const suspendFee = await getSuspendApplicationFee();
     return {
       suspendFee,
     };

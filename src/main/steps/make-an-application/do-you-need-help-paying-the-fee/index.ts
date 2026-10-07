@@ -2,6 +2,7 @@ import { Request } from 'express';
 
 import { createFormStep, getFormData } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+import { getSuspendApplicationFee } from '../suspendFee';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { FeeType, getFee } from '@services/feeLookupService';
@@ -49,7 +50,7 @@ export const step: StepDefinition = createFormStep({
   extendGetContent: async (_req: Request) => {
     const isSuspend = getFormData(_req, 'choose-an-application').typeOfApplication === 'SUSPEND';
     if (isSuspend) {
-      const suspendFee = await getFee(FeeType.genAppSuspendFeeFEE0458);
+      const suspendFee = await getSuspendApplicationFee();
       return {
         isSuspend,
         suspendFee,
