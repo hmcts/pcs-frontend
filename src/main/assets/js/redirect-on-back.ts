@@ -5,11 +5,6 @@ import { redirectTo } from './navigate';
  * history entry. The first Back press pops that entry and fires `popstate`
  * while the confirmation page is still open, and we then send the user to
  * the URL on the marker (the Manage Case case summary).
- *
- * A confirmation page is usually reached by a redirect. The browser can still
- * be settling history when the script first runs, so a `pushState` made too
- * soon may not create an entry Back can pop. Re-push across a short window
- * on each `pageshow` to cover that.
  */
 export function initRedirectOnBack(): void {
   const marker = document.getElementById('redirect-on-back');
