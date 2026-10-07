@@ -1,3 +1,5 @@
+import { test } from '@playwright/test';
+
 import {
   citizenCreateGenAppApiData,
   createCaseApiData,
@@ -19,7 +21,6 @@ import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
-import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;

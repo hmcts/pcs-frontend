@@ -1,3 +1,5 @@
+import { test } from '@playwright/test';
+
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
 import {
   confirmationOfNoticeGiven,
@@ -36,7 +38,6 @@ import {
 } from '../data/page-data';
 import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
-import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
 const home_url = process.env.TEST_URL;

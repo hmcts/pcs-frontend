@@ -1,3 +1,5 @@
+import { test } from '@playwright/test';
+
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import { dashboard } from '../../data/page-data';
 import {
@@ -12,7 +14,6 @@ import {
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../data/page-data/genApps-page-data';
-import { test } from '../../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../../utils/controller';
 
 const home_url = process.env.TEST_URL;
