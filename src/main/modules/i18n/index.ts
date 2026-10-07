@@ -242,8 +242,9 @@ export class I18n {
 
       res.locals.lang = lang;
       res.locals.t = t;
+      res.locals.htmlLang = lang;
 
-      setupNunjucksGlobals(req.app.locals?.nunjucksEnv, { lang, t });
+      setupNunjucksGlobals(req.app.locals?.nunjucksEnv, { lang, t, htmlLang: lang });
 
       next();
     });
