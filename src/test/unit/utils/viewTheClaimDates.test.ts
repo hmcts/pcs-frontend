@@ -9,6 +9,7 @@ const copyFor = (language: string): ViewTheClaimCopy => ({
   section: key => key,
   label: key => key,
   text: key => key,
+  value: (_key, english) => english,
   personsUnknown: '',
   addressUnknown: '',
   locale: toDateLocale(language),

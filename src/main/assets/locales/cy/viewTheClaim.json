@@ -162,5 +162,102 @@
     "walesSecureLandlordNoticeSection186Reason": "Hysbysiad landlord mewn cysylltiad â diwedd tymor penodol wedi’i roi (adran 186)",
     "walesSecureLandlordNoticeSection199Reason": "Hysbysiad wedi’i roi o dan gymal terfynu landlord (adran 199)",
     "walesSecureOtherBreachOfContractReason": "Tor-contract arall (adran 157)"
+  },
+  "values": {
+    "answers": {
+      "isAre": {
+        "yes": "Ydy",
+        "no": "Nac ydy"
+      },
+      "isThere": {
+        "yes": "Oes",
+        "no": "Nac oes"
+      },
+      "past": {
+        "yes": "Do",
+        "no": "Naddo"
+      },
+      "notSure": "Ddim yn siŵr"
+    },
+    "groundNames": {
+      "ABSOLUTE_GROUNDS": "Seiliau absoliwt",
+      "ALTERNATIVE_ACCOMMODATION_GROUND9": "Llety amgen addas (sail 9)",
+      "ANTISOCIAL_BEHAVIOUR_GROUND7A": "Ymddygiad gwrthgymdeithasol (sail 7A)",
+      "ANTISOCIAL_BEHAVIOUR_S157": "Ymddygiad gwrthgymdeithasol (tor-contract) (adran 157)",
+      "ANTI_SOCIAL": "Ymddygiad gwrthgymdeithasol",
+      "BREACH_OF_THE_TENANCY": "Torri’r denantiaeth",
+      "BREACH_TENANCY_GROUND12": "Torri amodau tenantiaeth (sail 12)",
+      "DEATH_OF_TENANT_GROUND7": "Marwolaeth y tenant (sail 7)",
+      "DETERIORATION_FURNITURE_GROUND15": "Dirywiad dodrefn (sail 15)",
+      "DETERIORATION_PROPERTY_GROUND13": "Dirywiad yng nghyflwr yr eiddo (sail 13)",
+      "DOMESTIC_VIOLENCE": "Trais domestig (sail 2A)",
+      "DOMESTIC_VIOLENCE_GROUND14A": "Trais domestig (sail 14A)",
+      "EMPLOYEE_LANDLORD_GROUND16": "Cyflogai y landlord (sail 16)",
+      "FAILURE_TO_GIVE_UP_POSSESSION_S170": "Methu ildio meddiant ar ddyddiad a nodwyd yn hysbysiad y deilydd contract (adran 170)",
+      "FAILURE_TO_GIVE_UP_POSSESSION_S191": "Methu rhoi’r gorau i feddiannu ar y dyddiad a nodwyd yn hysbysiad cymal terfynu deilydd y contract (adran 191)",
+      "FAIL_TO_GIVE_UP_BREAK_NOTICE_S191": "Methu rhoi’r gorau i feddiannu ar y dyddiad a nodwyd yn hysbysiad cymal terfynu deilydd y contract (adran 191)",
+      "FALSE_STATEMENT_GROUND17": "Tenantiaeth drwy ddatganiad anwir (sail 17)",
+      "FURNITURE_DETERIORATION": "Dirywiad dodrefn (sail 4)",
+      "HOLIDAY_LET_GROUND3": "Llety gwyliau (sail 3)",
+      "LANDLORD_BREAK_CLAUSE_S199": "Hysbysiad wedi’i roi o dan gymal terfynu landlord (adran 199)",
+      "LANDLORD_NOTICE_FT_END_S186": "Hysbysiad landlord mewn cysylltiad â diwedd tymor penodol wedi’i roi (adran 186)",
+      "LANDLORD_NOTICE_S186": "Hysbysiad landlord mewn cysylltiad â diwedd tymor penodol wedi’i roi (adran 186)",
+      "LANDLORD_NOTICE_S199": "Hysbysiad wedi’i roi o dan gymal terfynu landlord (adran 199)",
+      "MINISTER_RELIGION_GROUND5": "Angen yr eiddo ar gyfer gweinidog crefydd (sail 5)",
+      "NO_RIGHT_TO_RENT_GROUND7B": "Nid oes gan y tenant hawl i rentu (sail 7B)",
+      "NUISANCE_ANNOYANCE_GROUND14": "Niwsans, dicter, defnydd anghyfreithlon neu anfoesol o’r eiddo (sail 14)",
+      "NUISANCE_OR_IMMORAL_USE": "Niwsans, dicter, defnydd anghyfreithlon neu anfoesol o’r eiddo (sail 2)",
+      "OFFENCE_RIOT_GROUND14ZA": "Trosedd yn ystod terfysg (sail 14ZA)",
+      "OTHER": "Arall",
+      "OTHER_BREACH_OF_CONTRACT_S157": "Tor-contract arall (adran 157)",
+      "OWNER_OCCUPIER_GROUND1": "Perchen-feddiannydd (sail 1)",
+      "PROPERTY_DETERIORATION": "Dirywiad yng nghyflwr yr eiddo (sail 3)",
+      "REDEVELOPMENT_GROUND6": "Angen yr eiddo ar gyfer ailddatblygu (sail 6)",
+      "RENT_ARREARS": "Ôl-ddyledion rhent",
+      "RENT_ARREARS_GROUND10": "Ôl-ddyledion rhent (sail 10)",
+      "RENT_ARREARS_S157": "Ôl-ddyledion rhent (tor-contract) (adran 157)",
+      "REPOSSESSION_GROUND2": "Ailfeddiannu gan fenthyciwr morgais y landlord (sail 2)",
+      "RIOT_OFFENCE": "Trosedd yn ystod terfysg (sail 2ZA)",
+      "S84A_CONDITION_1": "Amod 1 o Adran 84A Deddf Tai 1985",
+      "S84A_CONDITION_2": "Amod 2 o Adran 84A Deddf Tai 1985",
+      "S84A_CONDITION_3": "Amod 3 o Adran 84A Deddf Tai 1985",
+      "S84A_CONDITION_4": "Amod 4 o Adran 84A Deddf Tai 1985",
+      "S84A_CONDITION_5": "Amod 5 o Adran 84A Deddf Tai 1985",
+      "STUDENT_LET_GROUND4": "Llety myfyrwyr (sail 4)",
+      "TENANCY_OBTAINED_BY_FALSE_STATEMENT": "Tenantiaeth drwy ddatganiad anwir (sail 5)"
+    },
+    "noticeMethods": {
+      "FIRST_CLASS_POST": "Drwy bost dosbarth cyntaf neu wasanaeth arall sy’n danfon erbyn y diwrnod gwaith nesaf",
+      "DELIVERED_PERMITTED_PLACE": "Drwy ei ddanfon i neu ei adael mewn man a ganiateir",
+      "PERSONALLY_HANDED": "Drwy ei drosglwyddo’n bersonol i neu ei adael gyda rhywun",
+      "EMAIL": "Drwy e-bost",
+      "OTHER_ELECTRONIC": "Drwy ddull electronig arall",
+      "OTHER": "Arall"
+    },
+    "tenancyTypes": {
+      "STANDARD_CONTRACT": "Contract safonol",
+      "SECURE_CONTRACT": "Contract diogel",
+      "OTHER": "Arall"
+    },
+    "rentFrequencies": {
+      "WEEKLY": "Pob wythnos",
+      "FORTNIGHTLY": "Pob pythefnos",
+      "MONTHLY": "Pob mis",
+      "OTHER": "Arall"
+    },
+    "housingActSections": {
+      "SECTION_82A_2": "Adran 82A(2) Deddf Tai 1985",
+      "SECTION_6A_2": "Adran 6A(2) Deddf Tai 1988",
+      "SECTION_121A": "Adran 121A Deddf Tai 1985"
+    },
+    "claimantTypes": {
+      "PRIVATE_LANDLORD": "Landlord preifat",
+      "PROVIDER_OF_SOCIAL_HOUSING": "Darparwr cofrestredig tai cymdeithasol neu awdurdod lleol",
+      "MORTGAGE_LENDER": "Benthycwr morgeisi",
+      "OTHER": "Arall"
+    },
+    "statementOfTruthCompletedBy": {
+      "CLAIMANT": "Hawlydd"
+    }
   }
 }

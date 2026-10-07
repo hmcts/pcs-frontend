@@ -6,6 +6,8 @@ export const YES_NO_LABELS: Record<string, string> = {
   IMNOTSURE: 'Not sure',
 };
 
+// English labels as pcs-api sends them (enum getLabel()). Used to recognise a pcs-api display value so it can be
+// shown in Welsh; a value that no longer matches simply stays in English.
 export const TENANCY_TYPE_LABELS: Record<string, string> = {
   ASSURED_TENANCY: 'Assured tenancy',
   SECURE_TENANCY: 'Secure tenancy',
@@ -26,12 +28,25 @@ export const NOTICE_SERVICE_METHOD_LABELS: Record<string, string> = {
   PERSONALLY_HANDED: 'By personally handing it to or leaving it with someone',
 };
 
-export const FREQUENCY_LABELS: Record<string, string> = {
+export const RENT_FREQUENCY_LABELS: Record<string, string> = {
   WEEKLY: 'Weekly',
   FORTNIGHTLY: 'Fortnightly',
   MONTHLY: 'Monthly',
-  QUARTERLY: 'Quarterly',
-  YEARLY: 'Yearly',
+  OTHER: 'Other',
+};
+
+export const HOUSING_ACT_LABELS: Record<string, string> = {
+  SECTION_82A_2: 'Section 82A(2) of the Housing Act 1985',
+  SECTION_6A_2: 'Section 6A(2) of the Housing Act 1988',
+  SECTION_121A: 'Section 121A of the Housing Act 1985',
+};
+
+export const CLAIMANT_TYPE_LABELS: Record<string, string> = {
+  PRIVATE_LANDLORD: 'Private landlord',
+  PROVIDER_OF_SOCIAL_HOUSING: 'Registered provider of social housing or local authority',
+  COMMUNITY_LANDLORD: 'Community landlord',
+  MORTGAGE_LENDER: 'Mortgage lender',
+  OTHER: 'Other',
 };
 
 export const STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS: Record<string, string> = {

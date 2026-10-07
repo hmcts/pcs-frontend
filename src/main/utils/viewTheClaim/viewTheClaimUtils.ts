@@ -2,7 +2,13 @@ import escapeHTML from 'escape-html';
 import type { TFunction } from 'i18next';
 import { DateTime } from 'luxon';
 
-import { GROUND_COLLECTION_PATHS, GROUND_LABELS, REASON_FIELDS, YES_NO_LABELS } from './viewTheClaimLabels';
+import {
+  CLAIMANT_TYPE_LABELS,
+  GROUND_COLLECTION_PATHS,
+  GROUND_LABELS,
+  REASON_FIELDS,
+  YES_NO_LABELS,
+} from './viewTheClaimLabels';
 import {
   buildActionTakenSection,
   buildAdditionalDefendantSections,
@@ -76,10 +82,18 @@ export interface ViewTheClaimCopy {
   section: (key: string, options?: Record<string, unknown>) => string;
   label: (key: string, options?: Record<string, unknown>) => string;
   text: (key: string, options?: Record<string, unknown>) => string;
+  /** A data value in the page language: `english` as-is, or `viewTheClaim:values.<key>` in Welsh when one exists. */
+  value: (key: string, english: string) => string;
   personsUnknown: string;
   addressUnknown: string;
   locale: string;
 }
+
+/**
+ * Welsh answers echo the verb of the question, so each yes/no row names the form its question takes:
+ * `isAre` (A yw…? → Ydy / Nac ydy), `isThere` (A oes…? → Oes / Nac oes), `past` (A gyflwynwyd…? → Do / Naddo).
+ */
+export type AnswerForm = 'isAre' | 'isThere' | 'past';
 
 export function buildViewTheClaimPageData(
   caseReference: string,
@@ -148,6 +162,8 @@ function createViewTheClaimCopy(t: TFunction, locale: string): ViewTheClaimCopy 
     section: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:sections.${key}`, options),
     label: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:labels.${key}`, options),
     text: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:${key}`, options),
+    value: (key: string, english: string) =>
+      locale === 'en-gb' ? english : t(`viewTheClaim:values.${key}`, { defaultValue: english }),
     personsUnknown: t('viewTheClaim:personsUnknown'),
     addressUnknown: t('viewTheClaim:addressUnknown'),
     locale,
@@ -193,7 +209,7 @@ export function claimantName(data: UnknownRecord, copy: ViewTheClaimCopy): strin
       'fallbackClaimantName',
       'possessionClaimResponse.claimantOrganisations.0.value',
     ]) ??
-    dynamicListLabel(getValue(data, 'claimantType'))
+    localisedLabel(copy, 'claimantTypes', CLAIMANT_TYPE_LABELS, dynamicListLabel(getValue(data, 'claimantType')))
   );
 }
 
@@ -425,6 +441,31 @@ export function groundLabels(data: UnknownRecord): string[] {
   return unique(labels);
 }
 
+/** Ground names in the page language, keyed by the ground code pcs-api sends alongside its English label. */
+export function groundNames(data: UnknownRecord, copy: ViewTheClaimCopy): string[] {
+  const summaryNames = getArray(getValue(data, 'claimGroundSummaries'))
+    .map(item => asRecord(asRecord(item)?.value))
+    .map(value =>
+      groundName(value?.code, getStringFromValue(value?.label) ?? enumText(value?.code, GROUND_LABELS), copy)
+    )
+    .filter((value): value is string => !!value);
+
+  if (summaryNames.length > 0) {
+    return unique(summaryNames);
+  }
+
+  const names = GROUND_COLLECTION_PATHS.flatMap(path =>
+    getArray(getValue(data, path)).map(value => groundName(value, enumText(value, GROUND_LABELS), copy))
+  ).filter((value): value is string => !!value);
+
+  return unique(names);
+}
+
+function groundName(code: unknown, english: string | undefined, copy: ViewTheClaimCopy): string | undefined {
+  const groundCode = getStringFromValue(code)?.toUpperCase();
+  return english && groundCode ? copy.value(`groundNames.${groundCode}`, english) : english;
+}
+
 export function groundReasonRows(data: UnknownRecord, copy: ViewTheClaimCopy): (ViewTheClaimSummaryRow | undefined)[] {
   const summaryRows = getArray(getValue(data, 'claimGroundSummaries'))
     .map(item => asRecord(item))
@@ -440,7 +481,7 @@ export function groundReasonRows(data: UnknownRecord, copy: ViewTheClaimCopy): (
           : sectionNumber
             ? getString(data, `detailsTab_ReasonsForPossessionDetails.section${sectionNumber}`)
             : undefined);
-      return textRow(copy.label('reasonForGround', { ground: label }), reason);
+      return textRow(copy.label('reasonForGround', { ground: groundName(value.code, label, copy) }), reason);
     })
     .filter((row): row is ViewTheClaimSummaryRow => !!row);
 
@@ -632,9 +673,42 @@ export function formatMoney(value: unknown): string | undefined {
   return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(pounds);
 }
 
-export function yesNoText(value: unknown): string | undefined {
+export function yesNoText(value: unknown, copy?: ViewTheClaimCopy, form: AnswerForm = 'isAre'): string | undefined {
   const normalised = normaliseYesNo(value);
-  return normalised ? (YES_NO_LABELS[normalised] ?? enumToSentence(normalised)) : undefined;
+  if (!normalised) {
+    return undefined;
+  }
+
+  const english = YES_NO_LABELS[normalised];
+  if (!english) {
+    return enumToSentence(normalised);
+  }
+  if (!copy) {
+    return english;
+  }
+
+  const key = normalised === 'YES' ? `${form}.yes` : normalised === 'NO' ? `${form}.no` : 'notSure';
+  return copy.value(`answers.${key}`, english);
+}
+
+/** Shows a pcs-api display label in the page language by recognising which code it was made from. */
+export function localisedLabel(
+  copy: ViewTheClaimCopy,
+  group: string,
+  labels: Record<string, string>,
+  english: string | undefined
+): string | undefined {
+  if (!english) {
+    return undefined;
+  }
+
+  const code = Object.keys(labels).find(key => sameLabel(labels[key], english));
+  return code ? copy.value(`${group}.${code}`, english) : english;
+}
+
+function sameLabel(a: string, b: string): boolean {
+  const normalise = (text: string) => text.replace(/[’‘]/g, "'").replace(/\s+/g, ' ').trim().toLowerCase();
+  return normalise(a) === normalise(b);
 }
 
 export function normaliseYesNo(value: unknown): string | undefined {
