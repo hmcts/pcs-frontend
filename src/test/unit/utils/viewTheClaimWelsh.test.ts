@@ -106,6 +106,31 @@ describe('View the claim values in Welsh', () => {
     );
   });
 
+  it('shows the Wales grounds in their Renting Homes (Wales) Act 2016 Welsh', async () => {
+    const { page, t } = await pageFor('cy', {
+      claimGroundSummaries: [
+        {
+          value: {
+            code: 'HOUSING_ASSOCIATIONS_AND_TRUSTS',
+            label: 'Housing associations and housing trusts: people difficult to house (ground E)',
+          },
+        },
+        {
+          value: {
+            code: 'SERIOUS_ARREARS_PERIODIC_S181',
+            label: 'Contract-holder under a periodic standard contract seriously in arrears with rent (section 181)',
+          },
+        },
+      ],
+    });
+    const grounds = valueFor(page, t('viewTheClaim:labels.groundsForPossession'));
+
+    expect(grounds).toContain('Cymdeithasau tai ac ymddiriedolaethau tai: pobl y mae’n anodd eu cartrefu (sail E)');
+    expect(grounds).toContain(
+      'Deiliad contract o dan gontract safonol cyfnodol ag ôl-ddyledion rhent difrifol (adran 181)'
+    );
+  });
+
   it('keeps a value with no Welsh translation yet in English', async () => {
     const { page } = await pageFor('cy', {
       claimantType: { value: { code: 'COMMUNITY_LANDLORD', label: 'Community landlord' } },
@@ -128,6 +153,92 @@ describe('View the claim values in Welsh', () => {
     expect(value('tenancyStartDate')).toBe('1 January 2020');
     expect(value('demotionHousingAct')).toBe('Section 82A(2) of the Housing Act 1985');
     expect(value('statementOfTruthCompletedBy')).toBe('Claimant');
+  });
+});
+
+// Every ground code pcs-api can send (PossessionGroundEnum implementations, pcs-api master 7 Oct 2026).
+const PCS_API_GROUND_CODES = [
+  'ABSOLUTE_GROUNDS',
+  'ADAPTED_ACCOMMODATION',
+  'ALTERNATIVE_ACCOMMODATION_GROUND9',
+  'ANTISOCIAL_BEHAVIOUR_GROUND7A',
+  'ANTISOCIAL_BEHAVIOUR_S157',
+  'ANTI_SOCIAL',
+  'BREACH_OF_THE_TENANCY',
+  'BREACH_TENANCY_GROUND12',
+  'BUILDING_WORKS',
+  'CHARITABLE_LANDLORD',
+  'CHARITIES',
+  'CONVERTED_FIXED_TERM_SCH12_25B2',
+  'DEATH_OF_TENANT_GROUND7',
+  'DETERIORATION_FURNITURE_GROUND15',
+  'DETERIORATION_PROPERTY_GROUND13',
+  'DISABLED_SUITABLE_DWELLING',
+  'DOMESTIC_VIOLENCE',
+  'DOMESTIC_VIOLENCE_GROUND14A',
+  'EMPLOYEE_LANDLORD_GROUND16',
+  'ESTATE_MANAGEMENT_GROUNDS_S160',
+  'FAILURE_TO_GIVE_UP_POSSESSION_S170',
+  'FAILURE_TO_GIVE_UP_POSSESSION_S191',
+  'FAIL_TO_GIVE_UP_BREAK_NOTICE_S191',
+  'FALSE_STATEMENT_GROUND17',
+  'FURNITURE_DETERIORATION',
+  'HOLIDAY_LET_GROUND3',
+  'HOUSING_ASSOCIATIONS_AND_TRUSTS',
+  'HOUSING_ASSOCIATION_SPECIAL_CIRCUMSTANCES',
+  'JOINT_CONTRACT_HOLDERS',
+  'LANDLORD_BREAK_CLAUSE_S199',
+  'LANDLORD_NOTICE_FT_END_S186',
+  'LANDLORD_NOTICE_PERIODIC_S178',
+  'LANDLORD_NOTICE_S186',
+  'LANDLORD_NOTICE_S199',
+  'LANDLORD_WORKS',
+  'MINISTER_RELIGION_GROUND5',
+  'NO_GROUNDS',
+  'NO_RIGHT_TO_RENT_GROUND7B',
+  'NUISANCE_ANNOYANCE_GROUND14',
+  'NUISANCE_OR_IMMORAL_USE',
+  'OFFENCE_RIOT_GROUND14ZA',
+  'OTHER',
+  'OTHER_BREACH_OF_CONTRACT_S157',
+  'OTHER_ESTATE_MANAGEMENT_REASONS',
+  'OVERCROWDING',
+  'OWNER_OCCUPIER_GROUND1',
+  'PERSISTENT_DELAY_GROUND11',
+  'PREMIUM_PAID_MUTUAL_EXCHANGE',
+  'PROPERTY_DETERIORATION',
+  'PROPERTY_SOLD',
+  'REDEVELOPMENT_GROUND6',
+  'REDEVELOPMENT_SCHEMES',
+  'REFUSAL_TO_MOVE_BACK',
+  'RENT_ARREARS',
+  'RENT_ARREARS_GROUND10',
+  'RENT_ARREARS_OR_BREACH_OF_TENANCY',
+  'RENT_ARREARS_S157',
+  'REPOSSESSION_GROUND2',
+  'RESERVE_SUCCESSORS',
+  'RIOT_OFFENCE',
+  'S84A_CONDITION_1',
+  'S84A_CONDITION_2',
+  'S84A_CONDITION_3',
+  'S84A_CONDITION_4',
+  'S84A_CONDITION_5',
+  'SERIOUS_ARREARS_FIXED_TERM_S187',
+  'SERIOUS_ARREARS_PERIODIC_S181',
+  'SERIOUS_RENT_ARREARS_GROUND8',
+  'SPECIAL_NEEDS_ACCOMMODATION',
+  'SPECIAL_NEEDS_DWELLINGS',
+  'STUDENT_LET_GROUND4',
+  'TENANCY_OBTAINED_BY_FALSE_STATEMENT',
+  'TIED_ACCOMMODATION_NEEDED_FOR_EMPLOYEE',
+  'UNDER_OCCUPYING_AFTER_SUCCESSION',
+  'UNREASONABLE_CONDUCT_TIED_ACCOMMODATION',
+];
+
+describe('Welsh ground names', () => {
+  it('has a Welsh name for every ground code pcs-api sends', () => {
+    const welsh = (cyViewTheClaim.values as Record<string, Record<string, unknown>>).groundNames;
+    expect(PCS_API_GROUND_CODES.filter(code => !welsh[code])).toEqual([]);
   });
 });
 

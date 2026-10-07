@@ -249,7 +249,12 @@
       "SPECIAL_NEEDS_DWELLINGS": "Grwpiau o eiddo i bobl ag anghenion arbennig (sail F)",
       "RESERVE_SUCCESSORS": "Olynwyr wrth gefn (sail G)",
       "JOINT_CONTRACT_HOLDERS": "Deiliaid contract ar y cyd (sail H)",
-      "OTHER_ESTATE_MANAGEMENT_REASONS": "Rhesymau rheoli ystad eraill (sail I)"
+      "OTHER_ESTATE_MANAGEMENT_REASONS": "Rhesymau rheoli ystad eraill (sail I)",
+      "HOUSING_ASSOCIATIONS_AND_TRUSTS": "Cymdeithasau tai ac ymddiriedolaethau tai: pobl y mae’n anodd eu cartrefu (sail E)",
+      "LANDLORD_NOTICE_PERIODIC_S178": "Hysbysiad landlord wedi’i roi mewn cysylltiad â chontract safonol cyfnodol (adran 178)",
+      "SERIOUS_ARREARS_PERIODIC_S181": "Deiliad contract o dan gontract safonol cyfnodol ag ôl-ddyledion rhent difrifol (adran 181)",
+      "SERIOUS_ARREARS_FIXED_TERM_S187": "Deiliad contract o dan gontract safonol cyfnod penodol ag ôl-ddyledion rhent difrifol (adran 187)",
+      "CONVERTED_FIXED_TERM_SCH12_25B2": "Hysbysiad wedi’i roi mewn cysylltiad â diwedd contract safonol cyfnod penodol wedi’i drosi (paragraff 25B(2) o Atodlen 12)"
     },
     "noticeMethods": {
       "FIRST_CLASS_POST": "Drwy bost dosbarth cyntaf neu wasanaeth arall sy’n danfon erbyn y diwrnod gwaith nesaf",
