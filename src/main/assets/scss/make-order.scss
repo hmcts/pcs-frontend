@@ -155,6 +155,7 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   border-top: 1px solid $govuk-border-colour;
 }
 
+// The claimant's costs beside the defendant's rather than in one long list.
 .pcs-costs-columns {
   display: grid;
   gap: govuk-spacing(6);
@@ -163,7 +164,16 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  > .govuk-form-group {
+  // The claimant bank stacks its groups, and the suspended ones while they show, an even gap apart.
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: govuk-spacing(4);
+  }
+
+  > .govuk-form-group,
+  > div > .govuk-form-group,
+  > div > div > .govuk-form-group {
     margin-bottom: 0;
   }
 }
