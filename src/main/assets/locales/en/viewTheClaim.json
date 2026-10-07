@@ -224,7 +224,32 @@
       "S84A_CONDITION_4": "Condition 4 of Section 84A of the Housing Act 1985",
       "S84A_CONDITION_5": "Condition 5 of Section 84A of the Housing Act 1985",
       "STUDENT_LET_GROUND4": "Student let (ground 4)",
-      "TENANCY_OBTAINED_BY_FALSE_STATEMENT": "Tenancy obtained by false statement (ground 5)"
+      "TENANCY_OBTAINED_BY_FALSE_STATEMENT": "Tenancy obtained by false statement (ground 5)",
+      "PERSISTENT_DELAY_GROUND11": "Persistent delay in paying rent (ground 11)",
+      "SERIOUS_RENT_ARREARS_GROUND8": "Serious rent arrears (ground 8)",
+      "NO_GROUNDS": "No grounds",
+      "RENT_ARREARS_OR_BREACH_OF_TENANCY": "Rent arrears or breach of the tenancy (ground 1)",
+      "PREMIUM_PAID_MUTUAL_EXCHANGE": "Premium paid in connection with mutual exchange (ground 6)",
+      "UNREASONABLE_CONDUCT_TIED_ACCOMMODATION": "Unreasonable conduct in tied accommodation (ground 7)",
+      "REFUSAL_TO_MOVE_BACK": "Refusal to move back to main home after works completed (ground 8)",
+      "TIED_ACCOMMODATION_NEEDED_FOR_EMPLOYEE": "Tied accommodation needed for another employee (ground 12)",
+      "ADAPTED_ACCOMMODATION": "Adapted accommodation (ground 13)",
+      "HOUSING_ASSOCIATION_SPECIAL_CIRCUMSTANCES": "Housing association special circumstances accommodation (ground 14)",
+      "SPECIAL_NEEDS_ACCOMMODATION": "Special needs accommodation (ground 15)",
+      "UNDER_OCCUPYING_AFTER_SUCCESSION": "Under occupying after succession (ground 15A)",
+      "OVERCROWDING": "Overcrowding (ground 9)",
+      "LANDLORD_WORKS": "Landlord’s works (ground 10)",
+      "PROPERTY_SOLD": "Property sold for redevelopment (ground 10A)",
+      "CHARITABLE_LANDLORD": "Charitable landlords (ground 11)",
+      "ESTATE_MANAGEMENT_GROUNDS_S160": "Estate management grounds (section 160)",
+      "BUILDING_WORKS": "Building works (ground A)",
+      "REDEVELOPMENT_SCHEMES": "Redevelopment schemes (ground B)",
+      "CHARITIES": "Charities (ground C)",
+      "DISABLED_SUITABLE_DWELLING": "Dwelling suitable for disabled people (ground D)",
+      "SPECIAL_NEEDS_DWELLINGS": "Groups of dwellings for people with special needs (ground F)",
+      "RESERVE_SUCCESSORS": "Reserve successors (ground G)",
+      "JOINT_CONTRACT_HOLDERS": "Joint contract-holders (ground H)",
+      "OTHER_ESTATE_MANAGEMENT_REASONS": "Other estate management reasons (ground I)"
     },
     "noticeMethods": {
       "FIRST_CLASS_POST": "By first class post or other service which provides for delivery on the next business day",
@@ -237,7 +262,12 @@
     "tenancyTypes": {
       "STANDARD_CONTRACT": "Standard contract",
       "SECURE_CONTRACT": "Secure contract",
-      "OTHER": "Other"
+      "OTHER": "Other",
+      "ASSURED_TENANCY": "Assured tenancy",
+      "SECURE_TENANCY": "Secure tenancy",
+      "INTRODUCTORY_TENANCY": "Introductory tenancy",
+      "FLEXIBLE_TENANCY": "Flexible tenancy",
+      "DEMOTED_TENANCY": "Demoted tenancy"
     },
     "rentFrequencies": {
       "WEEKLY": "Weekly",
@@ -257,7 +287,8 @@
       "OTHER": "Other"
     },
     "statementOfTruthCompletedBy": {
-      "CLAIMANT": "Claimant"
+      "CLAIMANT": "Claimant",
+      "LEGAL_REPRESENTATIVE": "Claimant's legal representative (as defined by CPR 2.3 (1))"
     }
   }
 }

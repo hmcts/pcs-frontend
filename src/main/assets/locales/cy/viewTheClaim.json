@@ -224,7 +224,32 @@
       "S84A_CONDITION_4": "Amod 4 o Adran 84A Deddf Tai 1985",
       "S84A_CONDITION_5": "Amod 5 o Adran 84A Deddf Tai 1985",
       "STUDENT_LET_GROUND4": "Llety myfyrwyr (sail 4)",
-      "TENANCY_OBTAINED_BY_FALSE_STATEMENT": "Tenantiaeth drwy ddatganiad anwir (sail 5)"
+      "TENANCY_OBTAINED_BY_FALSE_STATEMENT": "Tenantiaeth drwy ddatganiad anwir (sail 5)",
+      "PERSISTENT_DELAY_GROUND11": "Oedi cyson wrth dalu rhent (sail 11)",
+      "SERIOUS_RENT_ARREARS_GROUND8": "Ôl-ddyledion rhent difrifol (sail 8)",
+      "NO_GROUNDS": "Dim seiliau",
+      "RENT_ARREARS_OR_BREACH_OF_TENANCY": "Ôl-ddyledion rhent neu dorri’r denantiaeth (sail 1)",
+      "PREMIUM_PAID_MUTUAL_EXCHANGE": "Premiwm a dalwyd mewn cysylltiad â chyfnewid cydfuddiannol (sail 6)",
+      "UNREASONABLE_CONDUCT_TIED_ACCOMMODATION": "Ymddygiad afresymol mewn llety clwm (sail 7)",
+      "REFUSAL_TO_MOVE_BACK": "Gwrthod symud yn ôl i’r prif gartref ar ôl i’r gwaith gael ei gwblhau (sail 8)",
+      "TIED_ACCOMMODATION_NEEDED_FOR_EMPLOYEE": "Angen llety clwm ar gyfer gweithiwr arall (sail 12)",
+      "ADAPTED_ACCOMMODATION": "Llety wedi’i addasu (sail 13)",
+      "HOUSING_ASSOCIATION_SPECIAL_CIRCUMSTANCES": "Llety amgylchiadau arbennig cymdeithas dai (sail 14)",
+      "SPECIAL_NEEDS_ACCOMMODATION": "Llety ar gyfer unigolion ag anghenion arbennig (sail 15)",
+      "UNDER_OCCUPYING_AFTER_SUCCESSION": "Tan feddiannu yn dilyn olyniaeth (sail 15A)",
+      "OVERCROWDING": "Eiddo gorlawn (sail 9)",
+      "LANDLORD_WORKS": "Gwaith y landlord (sail 10)",
+      "PROPERTY_SOLD": "Eiddo wedi’i werthu ar gyfer ailddatblygu (sail 10A)",
+      "CHARITABLE_LANDLORD": "Landlordiaid elusennol (sail 11)",
+      "ESTATE_MANAGEMENT_GROUNDS_S160": "Seiliau rheoli ystad (adran 160)",
+      "BUILDING_WORKS": "Gwaith adeiladu (sail A)",
+      "REDEVELOPMENT_SCHEMES": "Cynlluniau ail-ddatblygu (sail B)",
+      "CHARITIES": "Elusennau (sail C)",
+      "DISABLED_SUITABLE_DWELLING": "Eiddo addas ar gyfer pobl anabl (sail D)",
+      "SPECIAL_NEEDS_DWELLINGS": "Grwpiau o eiddo i bobl ag anghenion arbennig (sail F)",
+      "RESERVE_SUCCESSORS": "Olynwyr wrth gefn (sail G)",
+      "JOINT_CONTRACT_HOLDERS": "Deiliaid contract ar y cyd (sail H)",
+      "OTHER_ESTATE_MANAGEMENT_REASONS": "Rhesymau rheoli ystad eraill (sail I)"
     },
     "noticeMethods": {
       "FIRST_CLASS_POST": "Drwy bost dosbarth cyntaf neu wasanaeth arall sy’n danfon erbyn y diwrnod gwaith nesaf",
@@ -237,7 +262,12 @@
     "tenancyTypes": {
       "STANDARD_CONTRACT": "Contract safonol",
       "SECURE_CONTRACT": "Contract diogel",
-      "OTHER": "Arall"
+      "OTHER": "Arall",
+      "ASSURED_TENANCY": "Tenantiaeth sicr",
+      "SECURE_TENANCY": "Tenantiaeth ddiogel",
+      "INTRODUCTORY_TENANCY": "Tenantiaeth ragarweiniol",
+      "FLEXIBLE_TENANCY": "Tenantiaeth hyblyg",
+      "DEMOTED_TENANCY": "Tenantiaeth isradd"
     },
     "rentFrequencies": {
       "WEEKLY": "Pob wythnos",
@@ -257,7 +287,8 @@
       "OTHER": "Arall"
     },
     "statementOfTruthCompletedBy": {
-      "CLAIMANT": "Hawlydd"
+      "CLAIMANT": "Hawlydd",
+      "LEGAL_REPRESENTATIVE": "Cynrychiolydd cyfreithiol yr hawlydd (fel y’i diffinnir gan CPR 2.3(1))"
     }
   }
 }

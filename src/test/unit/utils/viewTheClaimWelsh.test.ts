@@ -37,7 +37,10 @@ const caseData = {
   statementOfTruth: { completedBy: 'CLAIMANT' },
 };
 
-async function pageFor(language: 'en' | 'cy'): Promise<{ page: ViewTheClaimPageData; t: TFunction }> {
+async function pageFor(
+  language: 'en' | 'cy',
+  overrides: Record<string, unknown> = {}
+): Promise<{ page: ViewTheClaimPageData; t: TFunction }> {
   const i18n = i18next.createInstance();
   await i18n.init({
     lng: language,
@@ -45,7 +48,8 @@ async function pageFor(language: 'en' | 'cy'): Promise<{ page: ViewTheClaimPageD
     resources: { en: { viewTheClaim: enViewTheClaim }, cy: { viewTheClaim: cyViewTheClaim } },
   });
   const t = i18n.getFixedT(language);
-  return { page: buildViewTheClaimPageData('1234567890123456', caseData as never, t, language), t };
+  const data = { ...caseData, ...overrides };
+  return { page: buildViewTheClaimPageData('1234567890123456', data as never, t, language), t };
 }
 
 function valueFor(page: ViewTheClaimPageData, label: string): string | undefined {
@@ -80,10 +84,34 @@ describe('View the claim values in Welsh', () => {
     expect(value('statementOfTruthCompletedBy')).toBe('Hawlydd');
   });
 
-  it('keeps a ground with no Welsh translation in English', async () => {
-    const { page, t } = await pageFor('cy');
+  it('shows the grounds, England tenancy types and legal representative added from the ExUI Welsh', async () => {
+    const { page, t } = await pageFor('cy', {
+      claimGroundSummaries: [
+        { value: { code: 'BUILDING_WORKS', label: 'Building works (ground A)' } },
+        { value: { code: 'SERIOUS_RENT_ARREARS_GROUND8', label: 'Serious rent arrears (ground 8)' } },
+        { value: { code: 'NO_GROUNDS', label: 'No grounds' } },
+      ],
+      detailsTab_TenancyLicenceDetails: { typeOfTenancyLicence: 'Assured tenancy' },
+      detailsTab_OccupationContractLicenceDetails: undefined,
+      statementOfTruth: { completedBy: 'LEGAL_REPRESENTATIVE' },
+    });
+    const value = (key: string) => valueFor(page, t(`viewTheClaim:labels.${key}`));
 
-    expect(valueFor(page, t('viewTheClaim:labels.groundsForPossession'))).toContain('Building works (ground A)');
+    expect(value('groundsForPossession')).toContain('Gwaith adeiladu (sail A)');
+    expect(value('groundsForPossession')).toContain('Ôl-ddyledion rhent difrifol (sail 8)');
+    expect(value('groundsForPossession')).toContain('Dim seiliau');
+    expect(value('tenancyType')).toBe('Tenantiaeth sicr');
+    expect(value('statementOfTruthCompletedBy')).toBe(
+      'Cynrychiolydd cyfreithiol yr hawlydd (fel y’i diffinnir gan CPR 2.3(1))'
+    );
+  });
+
+  it('keeps a value with no Welsh translation yet in English', async () => {
+    const { page } = await pageFor('cy', {
+      claimantType: { value: { code: 'COMMUNITY_LANDLORD', label: 'Community landlord' } },
+    });
+
+    expect(page.introText).toContain('Community landlord');
   });
 
   it('leaves every English value exactly as pcs-api sent it', async () => {
