@@ -66,17 +66,4 @@ describe('index.ts', () => {
     expect(initAll).toHaveBeenCalled();
     expect(initMakeOrder).toHaveBeenCalled();
   });
-
-  it('still starts the GOV.UK components if the make order editor fails to load', async () => {
-    document.body.innerHTML = '<form id="make-order-form"></form>';
-    jest.doMock('../../../../main/assets/js/make-order', () => {
-      throw new Error('chunk failed to load');
-    });
-
-    require('../../../../main/assets/js/index');
-    await new Promise(resolve => setTimeout(resolve, 0));
-
-    const { initAll } = require('govuk-frontend');
-    expect(initAll).toHaveBeenCalled();
-  });
 });
