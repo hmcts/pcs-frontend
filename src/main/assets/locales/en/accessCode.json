@@ -11,6 +11,16 @@
   },
   "errorPrefix": "Error:",
   "errors": {
-    "respondToClaimUnavailable": "The option to respond to a claim is not available at the moment."
+    "respondToClaimUnavailable": "The option to respond to a claim is not available at the moment.",
+    "claimNumberRequired": "Enter your claim number",
+    "claimNumberInvalidCharacters": "Claim number must only include numbers 0 to 9 and special characters such as hyphens",
+    "claimNumberLength": "Claim number must be between 16 and 20 characters",
+    "accessCodeRequired": "Enter your access code",
+    "accessCodeInvalidCharacters": "Access code must only include letters a to z, and numbers 0 to 9",
+    "accessCodeLength": "Access code must be 12 characters",
+    "claimNotFound": "We cannot find that claim number. Enter the claim number that you received from the court",
+    "accessCodeExpired": "The access code you entered has expired. Contact the court to get a new code",
+    "accessCodeAlreadyUsed": "The access code you entered has already been used, you should contact the court",
+    "accessCodeMismatch": "Access code does not match claim number"
   }
 }

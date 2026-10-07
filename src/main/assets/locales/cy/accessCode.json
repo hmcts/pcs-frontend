@@ -11,6 +11,16 @@
   },
   "errorPrefix": "Gwall:",
   "errors": {
-    "respondToClaimUnavailable": "Nid yw’r dewis i ymateb i hawliad ar gael ar hyn o bryd."
+    "respondToClaimUnavailable": "Nid yw’r dewis i ymateb i hawliad ar gael ar hyn o bryd.",
+    "claimNumberRequired": "Nodwch rif eich hawliad",
+    "claimNumberInvalidCharacters": "Rhaid i’r rhif hawliad gynnwys rhifau 0 i 9 a nodau arbennig fel cysylltnodau yn unig",
+    "claimNumberLength": "Rhaid i’r rhif hawliad fod rhwng 16 ac 20 nod",
+    "accessCodeRequired": "Nodwch eich cod mynediad",
+    "accessCodeInvalidCharacters": "Rhaid i’r cod mynediad gynnwys llythrennau a i z, a rhifau 0 i 9 yn unig",
+    "accessCodeLength": "Rhaid i’r cod mynediad fod yn 12 nod",
+    "claimNotFound": "Ni allwn ddod o hyd i’r rhif hawliad hwnnw. Nodwch y rhif hawliad a gawsoch gan y llys",
+    "accessCodeExpired": "Mae’r cod mynediad a nodwyd gennych wedi dod i ben. Cysylltwch â’r llys i gael cod newydd",
+    "accessCodeAlreadyUsed": "Mae’r cod mynediad a nodwyd gennych eisoes wedi cael ei ddefnyddio, dylech gysylltu â’r llys",
+    "accessCodeMismatch": "Nid yw’r cod mynediad yn cyfateb i’r rhif hawliad"
   }
 }
