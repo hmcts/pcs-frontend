@@ -214,5 +214,16 @@
   "footer": {
     "contentLicence": "Mae’r holl gynnwys ar gael o dan y <a class=\"govuk-footer__link\" href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence-cymraeg/version/3/\" rel=\"license\">Drwydded Llywodraeth Agored v3.0</a>, oni nodir yn wahanol",
     "copyright": "© Hawlfraint y Goron"
+  },
+  "errorPrefix": "Gwall",
+  "fileUpload": {
+    "dropzoneHint": "Llusgwch a gollyngwch ffeiliau yma neu",
+    "dropzoneButton": "Dewis ffeiliau",
+    "uploadStatus": "Wrthi’n uwchlwytho ffeiliau, arhoswch"
+  },
+  "addressLookup": {
+    "oneFound": "Daethpwyd o hyd i 1 cyfeiriad",
+    "manyFound": "Daethpwyd o hyd i {count} cyfeiriad",
+    "noneFound": "Heb ganfod cyfeiriad"
   }
 }
