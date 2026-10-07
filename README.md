@@ -280,7 +280,6 @@ in [info.ts](src/main/routes/info.ts) file and currently displays info from:
 
 ## License
 
-
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
 
 ### The following environment variables are needed to run the tests:
