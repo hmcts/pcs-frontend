@@ -131,12 +131,14 @@ describe('View the claim values in Welsh', () => {
     );
   });
 
-  it('keeps a value with no Welsh translation yet in English', async () => {
+  it('shows a Welsh community landlord as Landlord cymunedol', async () => {
+    // Term from the Welsh text of the Renting Homes (Wales) Act 2016, section 9.
     const { page } = await pageFor('cy', {
       claimantType: { value: { code: 'COMMUNITY_LANDLORD', label: 'Community landlord' } },
     });
 
-    expect(page.introText).toContain('Community landlord');
+    expect(page.introText).toContain('Landlord cymunedol');
+    expect(page.introText).not.toContain('Community landlord');
   });
 
   it('leaves every English value exactly as pcs-api sent it', async () => {

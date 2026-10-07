@@ -289,7 +289,8 @@
       "PRIVATE_LANDLORD": "Landlord preifat",
       "PROVIDER_OF_SOCIAL_HOUSING": "Darparwr cofrestredig tai cymdeithasol neu awdurdod lleol",
       "MORTGAGE_LENDER": "Benthycwr morgeisi",
-      "OTHER": "Arall"
+      "OTHER": "Arall",
+      "COMMUNITY_LANDLORD": "Landlord cymunedol"
     },
     "statementOfTruthCompletedBy": {
       "CLAIMANT": "Hawlydd",

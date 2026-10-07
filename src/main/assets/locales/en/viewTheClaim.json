@@ -289,7 +289,8 @@
       "PRIVATE_LANDLORD": "Private landlord",
       "PROVIDER_OF_SOCIAL_HOUSING": "Registered provider of social housing or local authority",
       "MORTGAGE_LENDER": "Mortgage lender",
-      "OTHER": "Other"
+      "OTHER": "Other",
+      "COMMUNITY_LANDLORD": "Community landlord"
     },
     "statementOfTruthCompletedBy": {
       "CLAIMANT": "Claimant",
