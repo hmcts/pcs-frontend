@@ -6,5 +6,9 @@
   "question": "Is the defendant planning to make a counterclaim against {{claimantName}}?",
   "errors": {
     "makeCounterClaim": "Select if the defendant is planning to make a counterclaim"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }
