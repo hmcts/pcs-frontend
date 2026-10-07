@@ -636,7 +636,13 @@ export function formatDate(value: unknown, locale = 'en-gb'): string | undefined
     return undefined;
   }
 
-  return formatLocalisedDate(text, locale) ?? text;
+  return formatLocalisedDate(text, locale) ?? formatDetailsTabDate(text, locale) ?? text;
+}
+
+/** pcs-api's details tab writes dates as English text (`1 January 2020`); show them in the page language. */
+function formatDetailsTabDate(text: string, locale: string): string | undefined {
+  const date = DateTime.fromFormat(text, 'd MMMM yyyy', { locale: 'en-gb' });
+  return date.isValid ? date.setLocale(locale).toFormat('d MMMM yyyy') : undefined;
 }
 
 export function formatDateOrdinal(value: unknown, lang?: string): string | undefined {

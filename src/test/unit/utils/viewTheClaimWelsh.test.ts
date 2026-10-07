@@ -131,6 +131,12 @@ describe('View the claim values in Welsh', () => {
     );
   });
 
+  it('shows the tenancy start date in Welsh when only the details-tab date is available', async () => {
+    const { page, t } = await pageFor('cy', { licenceStartDate: undefined });
+
+    expect(valueFor(page, t('viewTheClaim:labels.tenancyStartDate'))).toBe('1 Ionawr 2020');
+  });
+
   it('shows a Welsh community landlord as Landlord cymunedol', async () => {
     // Term from the Welsh text of the Renting Homes (Wales) Act 2016, section 9.
     const { page } = await pageFor('cy', {

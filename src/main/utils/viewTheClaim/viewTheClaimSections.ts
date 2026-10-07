@@ -323,8 +323,11 @@ export function buildTenancySection(
     ),
     textRow(
       copy.label('tenancyStartDate'),
-      formatDate(getFirstValue(data, ['tenancy_TenancyLicenceDate', 'licenceStartDate']), copy.locale) ??
-        getFirstString(data, [`${tenancy}.tenancyLicenceDate`, `${occupation}.agreementStartDate`])
+      formatDate(
+        getFirstValue(data, ['tenancy_TenancyLicenceDate', 'licenceStartDate']) ??
+          getFirstString(data, [`${tenancy}.tenancyLicenceDate`, `${occupation}.agreementStartDate`]),
+        copy.locale
+      )
     ),
     textRow(
       copy.label('tenancyCopy'),
