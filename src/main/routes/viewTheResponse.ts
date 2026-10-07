@@ -592,8 +592,11 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
   return { rows };
 }
 
-function resolveResponsePdfUrl(caseData: CcdCaseData, caseReference: string): string | undefined {
-  const documentId = caseData.possessionClaimResponse?.responseDocumentId;
+function resolveDocumentUrl(
+  documentId: string | undefined,
+  caseData: CcdCaseData,
+  caseReference: string
+): string | undefined {
   if (!documentId) {
     return undefined;
   }
@@ -663,7 +666,14 @@ export default function viewTheResponseRoutes(app: Application): void {
         ...sections,
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
-        responsePdfUrl: responsePdfEnabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
+        counterclaimPdfUrl: resolveDocumentUrl(
+          caseData.possessionClaimResponse?.counterclaimDocumentId,
+          caseData,
+          caseReference
+        ),
+        responsePdfUrl: responsePdfEnabled
+          ? resolveDocumentUrl(caseData.possessionClaimResponse?.responseDocumentId, caseData, caseReference)
+          : undefined,
       });
     } catch (e) {
       logger.error(`Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`);
