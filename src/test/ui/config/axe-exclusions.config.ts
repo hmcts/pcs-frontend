@@ -33,4 +33,7 @@ export const axe_exclusions = [
   '#sexuality-4', // page: sexuality, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#religion-8', // page: religion, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#ethnicity-4', // page: ethnicity, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is not allowed for this radio button
+  // govuk-frontend adds aria-expanded to conditional-reveal radios, which axe rejects for role=radio.
+  // Scope the exclusion to affected radios on this page; checkbox reveals remain in the audit.
+  '.pcs-make-order .govuk-radios__input[aria-expanded]',
 ];

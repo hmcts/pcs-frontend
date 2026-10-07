@@ -1,0 +1,12 @@
+{% import "make-order/_compact.njk" as compact with context %}
+
+<h3 class="govuk-heading-m">Strike out/dismiss</h3>
+
+{{ compact.radios("strike-claim-outcome", {
+  legend: "Outcome",
+  classes: "govuk-radios--small govuk-radios--inline",
+  items: [
+    { value: "struck-out", text: "Claim struck out" },
+    { value: "dismissed", text: "Claim dismissed" }
+  ]
+}) }}

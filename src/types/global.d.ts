@@ -34,6 +34,8 @@ interface CustomSessionData extends SessionData {
   ccdCase?: CcdCase;
   // Generated application ID for the make-an-application journey, keyed by case reference.
   applicationIds?: Record<string, string>;
+  // The case an order was last sent for review on, keyed by case reference, for its confirmation page.
+  ordersSentForReview?: Record<string, { caseReference: string; propertyAddress: string; caseName: string }>;
   payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
   clientContext?: ClientContextHeaders;

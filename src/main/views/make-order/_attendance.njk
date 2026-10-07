@@ -1,0 +1,69 @@
+{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Attendance</h2>
+
+{% for party in attendanceParties %}
+  {# Full terms remain accessible while the register displays compact abbreviations. #}
+  {% set attendanceOptions = [
+    { value: "counsel", short: "Csl", full: "Counsel" },
+    { value: "solicitor", short: "Sol", full: "Solicitor" },
+    { value: "solicitor-agent", short: "S/A", full: "Solicitor agent" },
+    { value: "housing-officer", short: "H/O", full: "Housing officer" } if party.type == "claimant" else { value: "duty-adviser", short: "Duty", full: "Duty adviser" },
+    { value: "litigant-in-person", short: "LiP", full: "Litigant in person" },
+    { value: "letter-only", short: "Ltr", full: "Letter only" },
+    { value: "not-present", short: "Not present", full: "" }
+  ] %}
+  {# A labelled ARIA group allows the party name to occupy the first grid column. It takes focus
+     from the error summary, which then announces the party and the error. #}
+  {% set attendanceError = validationErrors[party.id + "-attendance"] %}
+  <div id="{{ party.id }}-attendance" class="pcs-attendance__row{% if attendanceError %} govuk-form-group--error{% endif %}"
+       role="group" aria-labelledby="{{ party.id }}-label" tabindex="-1"
+       {%- if attendanceError %} aria-describedby="{{ party.id }}-attendance-error"{% endif %}
+       data-attendance-row data-party-kind="{{ party.type }}" data-party-id="{{ party.partyId }}"
+       data-party-name="{{ party.name }}">
+    <span class="govuk-label govuk-label--s pcs-attendance__label" id="{{ party.id }}-label">
+      {{ party.label }}
+    </span>
+
+    <div>
+      {% if attendanceError %}
+        {{ govukErrorMessage({ id: party.id + "-attendance-error", text: attendanceError.text }) }}
+      {% endif %}
+      <div class="govuk-radios govuk-radios--small govuk-radios--inline" data-module="govuk-radios">
+        {% for option in attendanceOptions %}
+          <div class="govuk-radios__item">
+            <input class="govuk-radios__input"
+                   id="{{ party.id }}-{{ option.value }}"
+                   name="{{ party.id }}-attendance"
+                   type="radio"
+                   value="{{ option.value }}"
+                   required
+                   {%- if draft[party.id + "-attendance"] == option.value %} checked{% endif %}>
+            <label class="govuk-label govuk-radios__label" for="{{ party.id }}-{{ option.value }}">
+              {%- if option.full -%}
+                <span aria-hidden="true">{{ option.short }}</span>
+                <span class="govuk-visually-hidden">{{ option.full }}</span>
+              {%- else -%}
+                {{ option.short }}
+              {%- endif -%}
+            </label>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {# Keep each repeated name field unambiguous to assistive technology. #}
+    {{ govukInput({
+      id: party.id + "-name",
+      name: party.id + "-name",
+      label: {
+        html: 'Name<span aria-hidden="true">:</span><span class="govuk-visually-hidden"> of representative for ' + (party.label | escape) + '</span>',
+        classes: "pcs-attendance__name-label"
+      },
+      classes: "govuk-input--width-20",
+      value: draft[party.id + "-name"],
+      errorMessage: validationErrors[party.id + "-name"]
+    }) }}
+  </div>
+{% endfor %}
