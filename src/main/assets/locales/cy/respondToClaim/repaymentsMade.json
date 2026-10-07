@@ -2,8 +2,8 @@
   "pageTitle": "Taliadau a wnaed",
   "question": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy"
+    "yes": "Do",
+    "no": "Naddo"
   },
   "textAreaLabel": "Rhowch fanylion faint rydych wedi’i dalu a phryd",
   "textAreaHint": "Gallwch nodi hyd at 500 o nodau.",
