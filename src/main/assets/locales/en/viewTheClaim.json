@@ -254,7 +254,8 @@
       "LANDLORD_NOTICE_PERIODIC_S178": "Landlord’s notice given in relation to periodic standard contract (section 178)",
       "SERIOUS_ARREARS_PERIODIC_S181": "Contract-holder under a periodic standard contract seriously in arrears with rent (section 181)",
       "SERIOUS_ARREARS_FIXED_TERM_S187": "Contract-holder under a fixed term standard contract seriously in arrears with rent (section 187)",
-      "CONVERTED_FIXED_TERM_SCH12_25B2": "Notice given in relation to end of converted fixed term standard contract (paragraph 25B(2) of Schedule 12)"
+      "CONVERTED_FIXED_TERM_SCH12_25B2": "Notice given in relation to end of converted fixed term standard contract (paragraph 25B(2) of Schedule 12)",
+      "BREACH_OF_TENANCY": "Breach of the tenancy"
     },
     "noticeMethods": {
       "FIRST_CLASS_POST": "By first class post or other service which provides for delivery on the next business day",

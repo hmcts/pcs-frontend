@@ -209,7 +209,7 @@ export function claimantName(data: UnknownRecord, copy: ViewTheClaimCopy): strin
       'fallbackClaimantName',
       'possessionClaimResponse.claimantOrganisations.0.value',
     ]) ??
-    localisedLabel(copy, 'claimantTypes', CLAIMANT_TYPE_LABELS, dynamicListLabel(getValue(data, 'claimantType')))
+    localisedValue(copy, 'claimantTypes', CLAIMANT_TYPE_LABELS, getValue(data, 'claimantType'))
   );
 }
 
@@ -335,11 +335,19 @@ export function partyName(party: UnknownRecord | undefined, copy: ViewTheClaimCo
   const firstName = getStringFromValue(party.firstName);
   const lastName = getStringFromValue(party.lastName);
 
-  if (firstName === 'Person unknown' && lastName === 'Person unknown') {
+  if (isPersonUnknown(firstName, lastName)) {
     return copy.personsUnknown;
   }
 
   return [firstName, lastName].filter(Boolean).join(' ') || getStringFromValue(party.orgName);
+}
+
+const PERSON_UNKNOWN_NAMES = new Set(['person unknown', 'persons unknown']);
+
+/** pcs-api records an unnamed party as "Person unknown" in the name fields. */
+function isPersonUnknown(firstName: string | undefined, lastName: string | undefined): boolean {
+  const unknown = (name: string | undefined) => !!name && PERSON_UNKNOWN_NAMES.has(name.trim().toLowerCase());
+  return (unknown(firstName) && (unknown(lastName) || !lastName)) || (!firstName && unknown(lastName));
 }
 
 export function underlesseeName(party: UnknownRecord | undefined, copy: ViewTheClaimCopy): string | undefined {
@@ -462,7 +470,8 @@ export function groundNames(data: UnknownRecord, copy: ViewTheClaimCopy): string
 }
 
 function groundName(code: unknown, english: string | undefined, copy: ViewTheClaimCopy): string | undefined {
-  const groundCode = getStringFromValue(code)?.toUpperCase();
+  const groundCode =
+    getStringFromValue(code)?.toUpperCase() ?? (english ? codeFor(GROUND_LABELS, [english]) : undefined);
   return english && groundCode ? copy.value(`groundNames.${groundCode}`, english) : english;
 }
 
@@ -640,9 +649,17 @@ export function formatDate(value: unknown, locale = 'en-gb'): string | undefined
 }
 
 /** pcs-api's details tab writes dates as English text (`1 January 2020`); show them in the page language. */
+const DETAILS_TAB_DATE_FORMATS = ['d MMMM yyyy', 'd MMM yyyy', 'dd/MM/yyyy', 'd/M/yyyy'];
+
 function formatDetailsTabDate(text: string, locale: string): string | undefined {
-  const date = DateTime.fromFormat(text, 'd MMMM yyyy', { locale: 'en-gb' });
-  return date.isValid ? date.setLocale(locale).toFormat('d MMMM yyyy') : undefined;
+  const withoutOrdinal = text.trim().replace(/^(\d{1,2})(st|nd|rd|th)\b/i, '$1');
+  for (const format of DETAILS_TAB_DATE_FORMATS) {
+    const date = DateTime.fromFormat(withoutOrdinal, format, { locale: 'en-gb' });
+    if (date.isValid) {
+      return date.setLocale(locale).toFormat('d MMMM yyyy');
+    }
+  }
+  return undefined;
 }
 
 export function formatDateOrdinal(value: unknown, lang?: string): string | undefined {
@@ -680,14 +697,14 @@ export function formatMoney(value: unknown): string | undefined {
 }
 
 export function yesNoText(value: unknown, copy?: ViewTheClaimCopy, form: AnswerForm = 'isAre'): string | undefined {
-  const normalised = normaliseYesNo(value);
+  const normalised = normaliseYesNo(value)?.replace(/[’‘']/g, '').replace(/\s+/g, '_');
   if (!normalised) {
     return undefined;
   }
 
   const english = YES_NO_LABELS[normalised];
   if (!english) {
-    return enumToSentence(normalised);
+    return undefined;
   }
   if (!copy) {
     return english;
@@ -697,19 +714,50 @@ export function yesNoText(value: unknown, copy?: ViewTheClaimCopy, form: AnswerF
   return copy.value(`answers.${key}`, english);
 }
 
-/** Shows a pcs-api display label in the page language by recognising which code it was made from. */
-export function localisedLabel(
+/**
+ * Shows a pcs-api value in the page language, whether it arrives as a code (`ASSURED_TENANCY`), as the
+ * English label made from that code (`Assured tenancy`) or as a dynamic list. Anything unrecognised is
+ * shown as received.
+ */
+export function localisedValue(
   copy: ViewTheClaimCopy,
   group: string,
   labels: Record<string, string>,
-  english: string | undefined
+  value: unknown
 ): string | undefined {
-  if (!english) {
+  const candidates = valueCandidates(value);
+  if (candidates.length === 0) {
     return undefined;
   }
 
-  const code = Object.keys(labels).find(key => sameLabel(labels[key], english));
-  return code ? copy.value(`${group}.${code}`, english) : english;
+  const code = codeFor(labels, candidates);
+  return code ? copy.value(`${group}.${code}`, labels[code]) : candidates[candidates.length - 1];
+}
+
+export function codeFor(labels: Record<string, string>, candidates: string[]): string | undefined {
+  for (const candidate of candidates) {
+    const upper = candidate.toUpperCase();
+    if (labels[upper]) {
+      return upper;
+    }
+  }
+  for (const candidate of candidates) {
+    const code = Object.keys(labels).find(key => sameLabel(labels[key], candidate));
+    if (code) {
+      return code;
+    }
+  }
+  return undefined;
+}
+
+/** Codes first, then labels, from a plain value or a CCD dynamic list. */
+function valueCandidates(value: unknown): string[] {
+  const record = asRecord(value);
+  const nested = asRecord(record?.value);
+  const values = record
+    ? [nested?.code, record.valueCode, record.code, nested?.label, record.valueLabel, record.label]
+    : [value];
+  return values.map(item => getStringFromValue(item)).filter((item): item is string => !!item);
 }
 
 function sameLabel(a: string, b: string): boolean {

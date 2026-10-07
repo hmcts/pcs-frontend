@@ -14,7 +14,6 @@ import {
   claimantAddressHtml,
   claimantName,
   documentLinksHtml,
-  enumText,
   firstDefendantParty,
   firstUnderlesseeParty,
   formatDate,
@@ -31,7 +30,7 @@ import {
   htmlRow,
   linkHtml,
   listHtml,
-  localisedLabel,
+  localisedValue,
   noticeDateTimeValue,
   noticeDateValue,
   otherGroundDescriptions,
@@ -193,7 +192,7 @@ export function buildRentArrearsSection(
     textRow(copy.label('rentAmount'), getString(data, 'detailsTab_RentArrearsDetails.rentAmount')),
     textRow(
       copy.label('howIsRentCalculated'),
-      localisedLabel(
+      localisedValue(
         copy,
         'rentFrequencies',
         RENT_FREQUENCY_LABELS,
@@ -280,7 +279,7 @@ export function buildNoticeDetailsSection(
     textRow(copy.label('noticeType'), getString(data, `${notice}.typeOfNoticeServed`)),
     textRow(
       copy.label('noticeServiceMethod'),
-      localisedLabel(copy, 'noticeMethods', NOTICE_SERVICE_METHOD_LABELS, getString(data, `${notice}.noticeMethod`))
+      localisedValue(copy, 'noticeMethods', NOTICE_SERVICE_METHOD_LABELS, getString(data, `${notice}.noticeMethod`))
     ),
     textRow(copy.label('noticeDate'), formatDate(noticeDateValue(data), copy.locale)),
     textRow(copy.label('noticeTime'), formatTime(noticeDateTimeValue(data), copy.locale)),
@@ -314,7 +313,7 @@ export function buildTenancySection(
   const rows = [
     textRow(
       copy.label('tenancyType'),
-      localisedLabel(
+      localisedValue(
         copy,
         'tenancyTypes',
         TENANCY_TYPE_LABELS,
@@ -461,7 +460,7 @@ export function buildDemotionSection(data: UnknownRecord, copy: ViewTheClaimCopy
     ),
     textRow(
       copy.label('demotionHousingAct'),
-      localisedLabel(
+      localisedValue(
         copy,
         'housingActSections',
         HOUSING_ACT_LABELS,
@@ -487,7 +486,7 @@ export function buildSuspensionSection(data: UnknownRecord, copy: ViewTheClaimCo
     ),
     textRow(
       copy.label('suspensionHousingAct'),
-      localisedLabel(
+      localisedValue(
         copy,
         'housingActSections',
         HOUSING_ACT_LABELS,
@@ -605,11 +604,11 @@ export function buildStatementOfTruthSection(
 
   const completedBy =
     getFirstString(statementOfTruth, ['fullNameLegalRep', 'fullNameParty', 'fullNameClaimant']) ??
-    localisedLabel(
+    localisedValue(
       copy,
       'statementOfTruthCompletedBy',
       STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS,
-      enumText(statementOfTruth.completedBy, STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS)
+      statementOfTruth.completedBy
     );
   const firmName = getFirstString(statementOfTruth, ['firmNameLegalRep']);
   const position = getFirstString(statementOfTruth, ['positionLegalRep', 'positionParty', 'positionClaimant']);

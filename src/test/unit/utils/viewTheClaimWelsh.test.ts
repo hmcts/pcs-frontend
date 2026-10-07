@@ -5,6 +5,7 @@ import enViewTheClaim from '../../../main/assets/locales/en/viewTheClaim.json';
 
 import {
   CLAIMANT_TYPE_LABELS,
+  GROUND_LABELS,
   HOUSING_ACT_LABELS,
   NOTICE_SERVICE_METHOD_LABELS,
   RENT_FREQUENCY_LABELS,
@@ -265,5 +266,130 @@ describe('Welsh value keys match the English labels pcs-api sends', () => {
     for (const code of Object.keys(values[group])) {
       expect(englishValues[group][code]).toBe(labels[code]);
     }
+  });
+});
+
+describe('View the claim values that arrive as codes or without a code', () => {
+  const welshValue = async (overrides: Record<string, unknown>, label: string) => {
+    const { page, t } = await pageFor('cy', overrides);
+    return valueFor(page, t(`viewTheClaim:labels.${label}`));
+  };
+
+  it('shows a tenancy type code in Welsh', async () => {
+    expect(
+      await welshValue(
+        { detailsTab_OccupationContractLicenceDetails: { agreementType: 'STANDARD_CONTRACT' } },
+        'tenancyType'
+      )
+    ).toBe('Contract safonol');
+  });
+
+  it('shows a notice method code in Welsh', async () => {
+    expect(
+      await welshValue(
+        { detailsTab_NoticeDetails: { noticeServed: 'Yes', noticeMethod: 'EMAIL' } },
+        'noticeServiceMethod'
+      )
+    ).toBe('Drwy e-bost');
+  });
+
+  it('shows a rent frequency code in Welsh', async () => {
+    expect(
+      await welshValue({ detailsTab_RentArrearsDetails: { calculationFrequency: 'MONTHLY' } }, 'howIsRentCalculated')
+    ).toBe('Pob mis');
+  });
+
+  it('shows a Housing Act section code in Welsh', async () => {
+    expect(
+      await welshValue({ detailsTab_DemotionOfTenancyDetails: { housingAct: 'SECTION_82A_2' } }, 'demotionHousingAct')
+    ).toBe('Adran 82A(2) Deddf Tai 1985');
+  });
+
+  it('shows a claimant type sent only as a code in Welsh', async () => {
+    const { page } = await pageFor('cy', { claimantType: { valueCode: 'PRIVATE_LANDLORD' } });
+
+    expect(page.introText).toContain('Landlord preifat');
+    expect(page.introText).not.toContain('PRIVATE_LANDLORD');
+  });
+
+  it('keeps English for code-only values on the English page', async () => {
+    const { page, t } = await pageFor('en', {
+      detailsTab_OccupationContractLicenceDetails: { agreementType: 'STANDARD_CONTRACT' },
+      claimantType: { valueCode: 'PRIVATE_LANDLORD' },
+    });
+
+    expect(valueFor(page, t('viewTheClaim:labels.tenancyType'))).toBe('Standard contract');
+    expect(page.introText).toContain('Private landlord');
+  });
+
+  it('shows a ground that has a label but no code in Welsh', async () => {
+    expect(
+      await welshValue({ claimGroundSummaries: [{ value: { label: 'Antisocial behaviour' } }] }, 'groundsForPossession')
+    ).toContain('Ymddygiad gwrthgymdeithasol');
+  });
+
+  it('shows the breach of tenancy code in Welsh', async () => {
+    expect(
+      await welshValue({ claimGroundSummaries: [{ value: { code: 'BREACH_OF_TENANCY' } }] }, 'groundsForPossession')
+    ).toContain('Torri’r denantiaeth');
+  });
+
+  it('shows a not sure answer in Welsh whatever its spelling', async () => {
+    expect(
+      await welshValue(
+        { detailsTab_ClaimantRegistrationAndLicensingDetails: { isExemptLandlord: 'I’m not sure' } },
+        'isExemptLandlord'
+      )
+    ).toBe('Ddim yn siŵr');
+  });
+
+  it('never turns an unexpected answer code into English', async () => {
+    expect(
+      await welshValue(
+        { detailsTab_ClaimantRegistrationAndLicensingDetails: { isExemptLandlord: 'MAYBE_LATER' } },
+        'isExemptLandlord'
+      )
+    ).toBeUndefined();
+  });
+
+  it('shows persons unknown in Welsh whatever the casing', async () => {
+    const { page, t } = await pageFor('cy', {
+      allDefendants: [{ value: { firstName: 'person unknown', lastName: 'PERSON UNKNOWN' } }],
+    });
+    const defendant = page.sections.find(section => section.title === t('viewTheClaim:sections.defendantDetails'));
+
+    expect(defendant?.rows[0].value.text).toBe('Unigolion yn anhysbys');
+  });
+
+  it.each(['1 Jan 2020', '1st January 2020', '01/01/2020'])(
+    'shows the details-tab date %s in Welsh',
+    async agreementStartDate => {
+      expect(
+        await welshValue(
+          {
+            licenceStartDate: undefined,
+            detailsTab_OccupationContractLicenceDetails: { agreementType: 'Standard contract', agreementStartDate },
+          },
+          'tenancyStartDate'
+        )
+      ).toBe('1 Ionawr 2020');
+    }
+  );
+
+  it('shows the type of notice served exactly as the claimant typed it', async () => {
+    expect(
+      await welshValue(
+        { detailsTab_NoticeDetails: { noticeServed: 'Yes', typeOfNoticeServed: 'Section 173 notice' } },
+        'noticeType'
+      )
+    ).toBe('Section 173 notice');
+  });
+});
+
+describe('Ground labels used to recognise pcs-api grounds', () => {
+  it('has an English label for every ground with Welsh, matching the English page text', () => {
+    const englishNames = enViewTheClaim.values.groundNames as Record<string, string>;
+    const mismatched = Object.keys(englishNames).filter(code => GROUND_LABELS[code] !== englishNames[code]);
+    expect(mismatched).toEqual([]);
   });
 });
