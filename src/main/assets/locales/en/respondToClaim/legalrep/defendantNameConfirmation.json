@@ -8,5 +8,7 @@
     "nameConfirmation": "You must say if the defendant’s name is {{defendantName}}",
     "firstName": "Enter the defendant’s first name",
     "lastName": "Enter the defendant’s last name"
-  }
+  },
+  "yesOption": "Yes",
+  "noOption": "No"
 }

@@ -3,7 +3,7 @@
   "heading": "What regular income do you receive? (Optional)",
   "incomeQuestion": "",
   "groupName": "Regular income options",
-  "hintText": "Select all that apply. Enter total amount in pounds and pence, for example £148.00 or £148.50. The information you provide must be truthful and accurate.",
+  "hintText": "Select all that apply. Enter total amount in pounds and pence, for example £148 or £148.50. The information you provide must be truthful and accurate.",
   "options": {
     "incomeFromJobs": "Income from all jobs you do",
     "pension": "Pension – state and private",
@@ -60,7 +60,7 @@
       "invalidCharacters": "Give details about the other sources of income and how much you usually receive must only include letters a to z, and special characters such as hyphens, spaces and apostrophes"
     },
     "amount": {
-      "invalidFormat": "Enter an amount in the correct format, for example 148.00 or 148.50"
+      "invalidFormat": "Enter an amount in the correct format, for example 148 or 148.50"
     }
   }
 }
