@@ -7,7 +7,7 @@ import { Environment } from 'nunjucks';
 import { VIEW_RESPONSE_ROUTE } from '../../../main/constants/caseRoutes';
 import { oidcMiddleware } from '../../../main/middleware';
 
-import { getRequestLanguage } from '@modules/i18n';
+import { getRequestLanguage, getTranslationFunction } from '@modules/i18n';
 import viewTheResponseRoute from '@routes/viewTheResponse';
 import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -1348,6 +1348,85 @@ describe('viewTheResponse route', () => {
     expect(renderArgs.householdAndCircumstances.rows).toEqual(
       expect.arrayContaining([expect.objectContaining({ value: { text: '1 Mehefin 2026' } })])
     );
+  });
+
+  describe('Welsh dates not covered above', () => {
+    const renderInWelsh = async (data: CcdCaseData) => {
+      (getRequestLanguage as jest.Mock).mockReturnValueOnce('cy');
+      mockCaseById(data);
+      viewTheResponseRoute(app);
+      const res = { render: jest.fn() } as unknown as Response;
+      await getHandler()(
+        viewTheResponseRequest({ caseReference, sessionUser: { accessToken: 'access-token-1' } }),
+        res,
+        jest.fn()
+      );
+      return (res.render as jest.Mock).mock.calls[0][1];
+    };
+
+    it('shows the corrected tenancy start date in Welsh', async () => {
+      const data = buildComprehensiveCaseData();
+      Object.assign(data.possessionClaimResponse!.defendantResponses!, {
+        tenancyStartDateConfirmation: 'NO',
+        tenancyStartDate: '2018-03-01',
+      });
+
+      const renderArgs = await renderInWelsh(data);
+
+      expect(renderArgs.responseToClaim.rows).toEqual(
+        expect.arrayContaining([
+          { key: { text: 'viewTheResponse:responseToClaim.tenancyStartDate' }, value: { text: '1 Mawrth 2018' } },
+        ])
+      );
+    });
+
+    it('shows the Universal Credit application date in Welsh', async () => {
+      const data = buildComprehensiveCaseData();
+      Object.assign(data.possessionClaimResponse!.defendantResponses!.householdCircumstances!, {
+        universalCredit: 'NO',
+        hasAppliedForUniversalCredit: 'YES',
+        ucApplicationDate: '2026-04-10',
+      });
+
+      const renderArgs = await renderInWelsh(data);
+
+      expect(renderArgs.regularIncome.rows).toEqual(
+        expect.arrayContaining([
+          {
+            key: { text: 'viewTheResponse:income.universalCreditApplicationDate' },
+            value: { text: '10 Ebrill 2026' },
+          },
+        ])
+      );
+    });
+
+    it('puts the Welsh claim issue date into the payment question', async () => {
+      const t = jest.fn((key: string, options?: Record<string, unknown>) =>
+        key === 'viewTheResponse:payments.anyPaymentsMade' ? `payments since ${options?.claimIssueDate}` : key
+      );
+      (getTranslationFunction as jest.Mock).mockReturnValueOnce(t);
+
+      const renderArgs = await renderInWelsh(buildComprehensiveCaseData());
+
+      expect(renderArgs.paymentsOrAgreements.rows[0].key.text).toBe('payments since 5 Chwefror 2026');
+    });
+  });
+
+  it('leaves out a counterclaim type that has no translation rather than showing its code', async () => {
+    const data = buildComprehensiveCaseData();
+    data.possessionClaimResponse!.defendantResponses!.counterClaim!.claimType = 'NEW_TYPE_FROM_PCS_API' as never;
+    mockCaseById(data);
+    viewTheResponseRoute(app);
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await getHandler()(
+      viewTheResponseRequest({ caseReference, sessionUser: { accessToken: 'access-token-1' } }),
+      res,
+      jest.fn()
+    );
+
+    const rows = (res.render as jest.Mock).mock.calls[0][1].counterclaim.rows as { value: { text: string } }[];
+    expect(rows.map(row => row.value.text)).not.toContain('NEW_TYPE_FROM_PCS_API');
   });
 });
 

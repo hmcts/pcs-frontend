@@ -575,6 +575,8 @@ function buildAdditionalInformation(t: TFunction, caseData: CcdCaseData): Summar
   return { rows };
 }
 
+const COUNTERCLAIM_TYPES = ['PAYMENT_OR_COMPENSATION', 'SOMETHING_ELSE', 'BOTH'];
+
 function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
@@ -584,9 +586,13 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
 
   const cc: CcdCounterClaim = responses.counterClaim;
 
-  if (cc.claimType) {
-    const typeLabel = t(`viewTheResponse:counterclaim.claimTypeOptions.${cc.claimType}`, cc.claimType);
-    pushRow(rows, t('viewTheResponse:counterclaim.type'), typeLabel);
+  // Only types with a translation are shown, so a new pcs-api type never appears as its raw code.
+  if (cc.claimType && COUNTERCLAIM_TYPES.includes(cc.claimType)) {
+    pushRow(
+      rows,
+      t('viewTheResponse:counterclaim.type'),
+      t(`viewTheResponse:counterclaim.claimTypeOptions.${cc.claimType}`)
+    );
   }
 
   const claimsMoney = cc.claimType === 'PAYMENT_OR_COMPENSATION' || cc.claimType === 'BOTH';
