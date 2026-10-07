@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { Page } from '@playwright/test';
 // eslint-disable-next-line import/no-named-as-default
 import Axios from 'axios';
@@ -49,7 +50,12 @@ export class ClaimantCreateGenAppAPIAction implements IAction {
       // If the test moved on right away, the application would still be unissued and later steps would fail.
 
       const paymentApi = Axios.create(paymentApiData.paymentApiInstance());
-      type FeeRequest = { serviceRequestReference: string; paymentStatus: string; paymentCallbackHandlerType: string };
+      type FeeRequest = {
+        serviceRequestReference: string;
+        amount?: number;
+        paymentStatus: string;
+        paymentCallbackHandlerType: string;
+      };
       let unpaid: FeeRequest | undefined;
       let feeRequests: FeeRequest[] = [];
       for (let attempt = 1; attempt <= 10 && !unpaid; attempt++) {
@@ -72,7 +78,7 @@ export class ClaimantCreateGenAppAPIAction implements IAction {
       }
       await paymentApi.put(
         paymentApiData.updatePaymentApiEndPoint,
-        paymentApiData.paymentUpdatePayload(unpaid.serviceRequestReference)
+        paymentApiData.paymentUpdatePayload(unpaid.serviceRequestReference, Number(unpaid.amount))
       );
       console.log(`\n CLAIMANT GENAPP SUBMITTED AND FEE PAID: case ${process.env.CASE_NUMBER}`);
     } catch (error: unknown) {
