@@ -2,7 +2,7 @@
   "expenseQuestion": "",
   "pageTitle": "Costau rheolaidd",
   "heading": "Pa gostau rheolaidd eraill sydd gennych? (Dewisol)",
-  "hintText": "Dewiswch bopeth sy'n berthnasol. Rhowch y cyfanswm mewn punnoedd a cheiniogau, er enghraifft £148.00 neu £148.50. Rhaid i’r wybodaeth a ddarperir gennych fod yn wir ac yn gywir.",
+  "hintText": "Dewiswch bopeth sy'n berthnasol. Rhowch y cyfanswm mewn punnoedd a cheiniogau, er enghraifft £148 neu £148.50. Rhaid i’r wybodaeth a ddarperir gennych fod yn wir ac yn gywir.",
   "options": {
     "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
     "loanPayments": "Taliadau benthyciadau",
@@ -96,7 +96,7 @@
       "required": "Dewiswch pa mor aml ydych chi’n talu am unrhyw gostau eraill"
     },
     "amount": {
-      "invalidFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"
+      "invalidFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148 neu 148.50"
     }
   }
 }

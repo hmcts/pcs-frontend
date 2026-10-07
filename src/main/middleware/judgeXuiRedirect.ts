@@ -2,6 +2,7 @@ import config from 'config';
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { isStaffUser } from '../steps/utils';
+import { getLaunchDarklyFlag } from '../utils/getLaunchDarklyFlag';
 
 import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 
@@ -52,11 +53,19 @@ function getJudgeRedirectUrl(path: string): string {
 /**
  * Staff and judges use PCS through an explicit journey launched from XUI. Keep them out
  * of the citizen-facing entry points and return them to the case-management UI
- * unless the request is part of a supported judicial or caseworker order journey.
+ * unless the request is part of a supported judicial or caseworker order journey. Only while make order is
+ * enabled.
  */
-export const judgeXuiRedirectMiddleware: RequestHandler = (req: Request, res: Response, next: NextFunction): void => {
+export const judgeXuiRedirectMiddleware: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   const path = decodePath(req.path);
   if (!isStaffUser(req) || isAllowedJudgePath(path)) {
+    return next();
+  }
+  if (!(await getLaunchDarklyFlag(req, 'make-order-enabled', false))) {
     return next();
   }
 

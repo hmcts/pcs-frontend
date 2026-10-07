@@ -8,5 +8,9 @@
     "dependentChildren": "Select if you have any dependent children",
     "dependentChildrenDetails": "Give details about your dependent children",
     "dependantChildrenDetailsMaxLength": "Dependent children details must be 500 characters or less"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

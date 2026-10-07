@@ -2,15 +2,15 @@
   "pageTitle": "Oedolion eraill",
   "question": "A oes yna unrhyw oedolion eraill yn byw yn eich cartref?",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy"
+    "yes": "Oes",
+    "no": "Nac oes"
   },
-  "textAreaLabel": "Rhowch fanylion yr oedolion eraill sy'n byw yn eich cartref",
-  "textAreaHintText": "Dylech gynnwys manylion faint o oedolion sy'n byw yn eich cartref, eu perthynas â chi, yn ogystal ag unrhyw beth arall yr ydych yn meddwl y dylai'r llys wybod amdano",
+  "textAreaLabel": "Rhowch fanylion yr oedolion eraill sy’n byw yn eich cartref",
+  "textAreaHintText": "Dylech gynnwys manylion faint o oedolion sy’n byw yn eich cartref, eu perthynas â chi, yn ogystal ag unrhyw beth arall yr ydych yn meddwl y dylai’r llys wybod amdano",
   "errors": {
     "confirmOtherAdults": "Dewiswch a oes yna unrhyw oedolion eraill yn byw yn eich cartref",
-    "confirmOtherAdults.otherAdultsDetails": "Rhowch fanylion yr oedolion eraill sy'n byw yn eich cartref",
+    "confirmOtherAdults.otherAdultsDetails": "Rhowch fanylion yr oedolion eraill sy’n byw yn eich cartref",
     "otherAdultsDetailsMaxLength": "Rhaid i fanylion am oedolion eraill fod yn 500 o nodau neu lai",
-    "otherAdultsDetailsInvalidCharacters": "Rhowch fanylion am yr oedolion eraill sy'n byw yn eich cartref i gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
+    "otherAdultsDetailsInvalidCharacters": "Rhowch fanylion am yr oedolion eraill sy’n byw yn eich cartref i gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"
   }
 }

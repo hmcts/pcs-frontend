@@ -2,9 +2,14 @@ import type { NextFunction, Request, Response } from 'express';
 
 const mockIsStaffUser = jest.fn();
 const mockConfigGet = jest.fn();
+const mockGetLaunchDarklyFlag = jest.fn();
 
 jest.mock('../../../main/steps/utils', () => ({
   isStaffUser: (...args: unknown[]) => mockIsStaffUser(...args),
+}));
+
+jest.mock('../../../main/utils/getLaunchDarklyFlag', () => ({
+  getLaunchDarklyFlag: (...args: unknown[]) => mockGetLaunchDarklyFlag(...args),
 }));
 
 jest.mock('config', () => ({
@@ -20,13 +25,14 @@ describe('judgeXuiRedirectMiddleware', () => {
   let res: Partial<Response>;
   let next: NextFunction;
 
-  const invokeMiddleware = (path: string): void => {
+  const invokeMiddleware = async (path: string): Promise<void> => {
     const req = { path } as unknown as Request;
-    judgeXuiRedirectMiddleware(req, res as Response, next);
+    await judgeXuiRedirectMiddleware(req, res as Response, next);
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetLaunchDarklyFlag.mockResolvedValue(true);
     mockConfigGet.mockImplementation((key: string) => {
       if (key === 'xui.uri') {
         return XUI_URL;
@@ -40,19 +46,19 @@ describe('judgeXuiRedirectMiddleware', () => {
     next = jest.fn();
   });
 
-  it('allows users who are not staff through', () => {
+  it('allows users who are not staff through', async () => {
     mockIsStaffUser.mockReturnValue(false);
 
-    invokeMiddleware('/claims');
+    await invokeMiddleware('/claims');
 
     expect(next).toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
-  it.each(['/', '/claims', '/case/1234567890123456/dashboard'])('redirects staff from %s to XUI', path => {
+  it.each(['/', '/claims', '/case/1234567890123456/dashboard'])('redirects staff from %s to XUI', async path => {
     mockIsStaffUser.mockReturnValue(true);
 
-    invokeMiddleware(path);
+    await invokeMiddleware(path);
 
     expect(res.redirect).toHaveBeenCalledWith(
       303,
@@ -61,18 +67,29 @@ describe('judgeXuiRedirectMiddleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('returns staff to the case when an event they cannot use is handed over from XUI', () => {
+  it('leaves staff where they are while make order is disabled', async () => {
+    mockIsStaffUser.mockReturnValue(true);
+    mockGetLaunchDarklyFlag.mockResolvedValue(false);
+
+    await invokeMiddleware('/claims');
+
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(expect.anything(), 'make-order-enabled', false);
+    expect(next).toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
+  it('returns staff to the case when an event they cannot use is handed over from XUI', async () => {
     mockIsStaffUser.mockReturnValue(true);
 
-    invokeMiddleware('/cases/1234567890123456/event/ext%3ArespondPossessionClaim');
+    await invokeMiddleware('/cases/1234567890123456/event/ext%3ArespondPossessionClaim');
 
     expect(res.redirect).toHaveBeenCalledWith(303, `${CASE_DETAILS_BASE_URL}/1234567890123456`);
   });
 
-  it('redirects staff from a path with malformed encoding to XUI', () => {
+  it('redirects staff from a path with malformed encoding to XUI', async () => {
     mockIsStaffUser.mockReturnValue(true);
 
-    invokeMiddleware('/claims%E0%A4%A');
+    await invokeMiddleware('/claims%E0%A4%A');
 
     expect(res.redirect).toHaveBeenCalledWith(303, XUI_URL);
   });
@@ -86,28 +103,28 @@ describe('judgeXuiRedirectMiddleware', () => {
     '/case/1234567890123456/confirm-order-review',
     '/case/1234567890123456/confirm-order-review/check-your-answers',
     '/cases/1234567890123456/event/ext%3AconfirmOrderReview',
-  ])('allows the %s staff order journey through', path => {
+  ])('allows the %s staff order journey through', async path => {
     mockIsStaffUser.mockReturnValue(true);
 
-    invokeMiddleware(path);
+    await invokeMiddleware(path);
 
     expect(next).toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
-  it('allows Docweave template requests made by the make-order journey through', () => {
+  it('allows Docweave template requests made by the make-order journey through', async () => {
     mockIsStaffUser.mockReturnValue(true);
 
-    invokeMiddleware('/docweave/templates/order-template');
+    await invokeMiddleware('/docweave/templates/order-template');
 
     expect(next).toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
   });
 
-  it('allows the session heartbeat through for an active judicial journey', () => {
+  it('allows the session heartbeat through for an active judicial journey', async () => {
     mockIsStaffUser.mockReturnValue(true);
 
-    invokeMiddleware('/active');
+    await invokeMiddleware('/active');
 
     expect(next).toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();

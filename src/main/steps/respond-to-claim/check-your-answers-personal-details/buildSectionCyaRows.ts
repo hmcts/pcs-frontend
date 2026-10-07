@@ -56,7 +56,7 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
           defendantName: claimDefendantName,
         }),
       },
-      value: { text: yesNoNotSure(nameConfirmation) },
+      value: { text: yesNoNotSure(nameConfirmation, 'defendant-name-confirmation') },
       actions: { items: [change('defendant-name-confirmation', 'rows.defendantNameConfirmation.changeHidden')] },
     };
     rows.push(questionRow);
@@ -138,7 +138,7 @@ function addCorrespondenceAddressRow({ rows, validatedCase, t, change, yesNoNotS
     // YES: question carries the address, value is just "Yes" (same shape as the name row).
     rows.push({
       key: { text: t('rows.correspondenceAddressConfirmation.label', { address: lines.join(', ') }) },
-      value: { text: yesNoNotSure(activeConfirmation) },
+      value: { text: yesNoNotSure(activeConfirmation, 'correspondence-address') },
       actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
     });
     return;
@@ -231,7 +231,7 @@ function addEmailConfirmationRow({ rows, validatedCase, t, change, yesNoNotSure 
 
   const questionRow: SummaryListRow = {
     key: { text: t('rows.emailConfirmation.label') },
-    value: { text: yesNoNotSure(contactByEmail) },
+    value: { text: yesNoNotSure(contactByEmail, 'email-confirmation') },
     actions: { items: [change('email-confirmation', 'rows.emailConfirmation.changeHidden')] },
   };
   rows.push(questionRow);

@@ -19,6 +19,7 @@ import {
   submitRespondToClaimResponse,
 } from '../../utils/respondToClaimFinalSubmit';
 import { createRespondToClaimFormStep } from '../formStep';
+import { loadYesNoQuestionNamespaces } from '../section-cya/cyaRow';
 import { sectionIdToBackendEnum } from '../sections.config';
 
 import { buildEndOfJourneyCyaSections } from './buildEndOfJourneyCyaRows';
@@ -76,6 +77,7 @@ export async function getEndOfJourneyCyaContent(req: Request, _formContent: unkn
     ],
     'respondToClaim'
   );
+  await loadYesNoQuestionNamespaces(req);
   const t: TFunction = getTranslationFunction(req, ['common']);
   const sections = buildEndOfJourneyCyaSections(req, t);
   const status = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.status;
