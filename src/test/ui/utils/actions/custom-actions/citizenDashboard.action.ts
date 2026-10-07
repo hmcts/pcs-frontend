@@ -1,13 +1,13 @@
 import { Page, expect } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
-import { dashboard, viewTheResponse } from '../../../data/page-data';
+import { dashboard, getDefendantDetails, getStatementOfTruthDetails, viewTheResponse } from '../../../data/page-data';
 import { viewAllApplications } from '../../../data/page-data/genApps-page-data';
 import { viewTheClaim } from '../../../data/page-data/theClaim-page-data';
 import { performAction, performValidation, performValidations } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
-import { pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
+import { getSelectedDefendantNumber, getSelectedPinUser, pinUsers } from './fetchPINsAndValidateAccessCodeAPI.action';
 
 export class CitizenDashboardAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
@@ -21,7 +21,7 @@ export class CitizenDashboardAction implements IAction {
         () => this.verifyNavigationFromNotificationLink(page, fieldName as actionRecord),
       ],
       ['validateViewAllApplications', () => this.validateViewAllApplications()],
-      ['verifyResponseDetailsOnViewTheResponsePage', () => this.verifyResponseDetailsOnViewTheResponsePage()],
+      ['verifyResponseDetailsOnViewTheResponsePage', () => this.verifyResponseDetailsOnViewTheResponsePage(page)],
       ['verifyClaimDetailsOnViewTheClaimPage', () => this.verifyClaimDetailsOnViewTheClaimPage()],
     ]);
 
@@ -121,12 +121,41 @@ export class CitizenDashboardAction implements IAction {
     });
   }
 
-  private async verifyResponseDetailsOnViewTheResponsePage() {
+  private async verifyResponseDetailsOnViewTheResponsePage(page: Page) {
+    const selectedDefendant = getSelectedPinUser();
+    if (!selectedDefendant) {
+      throw new Error('No authenticated defendant PIN user is available for response validation');
+    }
+    const defendantName = `${selectedDefendant.firstName} ${selectedDefendant.lastName}`;
+    const defendantNumber = getSelectedDefendantNumber();
+    const defendantDetailsSubHeader = `Defendant ${defendantNumber} details`;
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: `Property address: ${viewTheClaim.dateAndCaseDetails['Property address']}`,
+    });
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: `Case number: ${process.env.CASE_FID}`,
+    });
+    await performValidation('viewClaimHeaderDetails', '', {
+      'Date issued': viewTheClaim.dateAndCaseDetails['Date issued'],
+      'Date submitted': viewTheClaim.dateAndCaseDetails['Date submitted'],
+    });
+    await expect(page.getByRole('heading', { name: defendantDetailsSubHeader, exact: true })).toBeVisible();
+    await performValidation(
+      'viewClaimOrResponseTable',
+      defendantDetailsSubHeader,
+      getDefendantDetails(selectedDefendant.firstName, selectedDefendant.lastName, selectedDefendant.address)
+    );
+    for (const defendant of pinUsers) {
+      const otherDefendantName = `${defendant.firstName} ${defendant.lastName}`;
+      if (otherDefendantName !== defendantName) {
+        await expect(page.getByText(otherDefendantName, { exact: true })).toHaveCount(0);
+      }
+    }
     await performValidations(
       'View the response page validation',
       ['viewClaimOrResponseTable', viewTheResponse.claimantDetailsSubHeader, viewTheResponse.claimantDetails],
-      // The line below will be commented until the bug HDPI-7360 gets fixed
-      //['viewClaimOrResponseTable', viewTheResponse.defendant1SubHeader, viewTheResponse.defendant1Details],
       ['viewClaimOrResponseTable', viewTheResponse.responseToClaimSubHeader, viewTheResponse.responseToClaimDetails],
       [
         'viewClaimOrResponseTable',
@@ -142,8 +171,12 @@ export class CitizenDashboardAction implements IAction {
         viewTheResponse.additionalInformationSubHeader,
         viewTheResponse.additionalInformationDetails,
       ],
-      ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
+      ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails],
+      ['viewClaimOrResponseTable', viewTheResponse.statementOfTruthSubHeader, getStatementOfTruthDetails(defendantName)]
     );
+    await performValidation('text', { elementType: 'paragraph', text: viewTheResponse.iBelieveTheFactsParagraph });
+    await performAction('reloadPage');
+    await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
     await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
   }
 
