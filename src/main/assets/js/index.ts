@@ -10,10 +10,14 @@ import { initSessionTimeout } from './session-timeout';
 
 // The order editor is large, so only the make order page loads it.
 if (document.querySelector('#make-order-form')) {
-  void import(/* webpackChunkName: "make-order" */ './make-order').then(({ initMakeOrder, startWithSavedOrderTab }) => {
-    startWithSavedOrderTab(initAll);
-    initMakeOrder();
-  });
+  // If the editor fails to load, still start the GOV.UK components.
+  void import(/* webpackChunkName: "make-order" */ './make-order').then(
+    ({ initMakeOrder, startWithSavedOrderTab }) => {
+      startWithSavedOrderTab(initAll);
+      initMakeOrder();
+    },
+    () => initAll()
+  );
 } else {
   initAll();
 }

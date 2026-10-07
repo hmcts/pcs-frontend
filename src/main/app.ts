@@ -6,7 +6,6 @@ import express from 'express';
 import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
-import { MAKE_ORDER_ROUTE } from './constants/caseRoutes';
 import { setupDev } from './development';
 import {
   caseReferenceParamMiddleware,
@@ -30,8 +29,9 @@ setupDev(app, developmentMode);
 app.use(cookieParser());
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
-// Make an order posts the whole order document, which outgrows the 100kb default.
-app.use(MAKE_ORDER_ROUTE, bodyParser.urlencoded({ extended: false, limit: '2mb' }));
+// Make an order posts the whole order document, which outgrows the 100kb default. A regex rather than
+// MAKE_ORDER_ROUTE so the caseReference param middleware does not run before the modules are set up.
+app.use(/^\/case\/\d{16}\/make-order\/?$/i, bodyParser.urlencoded({ extended: false, limit: '2mb' }));
 app.use(bodyParser.urlencoded({ extended: false }));
 
 modules.modules.forEach(async moduleName => {
