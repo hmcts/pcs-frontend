@@ -18,6 +18,8 @@ const CY = path.join(LOCALES, 'cy');
  * This list must only ever shrink. Adding to it needs a Jira reference.
  */
 const UNTRANSLATED_ALLOWLIST = new Set([
+  // HDPI-7548 (#1965) added the dashboard page title in English only; awaiting the translation team.
+  'dashboard.json::pageTitle',
   'respondToClaim/checkYourAnswersPersonalDetails.json::rows.correspondenceAddressConfirmation.fallbackLabel',
   'respondToClaim/endOfJourneyCya.json::heading',
   'respondToClaim/endOfJourneyCya.json::pageTitle',
