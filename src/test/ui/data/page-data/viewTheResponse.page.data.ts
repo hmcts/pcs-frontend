@@ -61,7 +61,7 @@ export const viewTheResponse = {
     'Details of dependent children': 'Children aged 4 and 7.',
     'Do you have any other dependants?': 'No',
     'Do any other adults live in your home?': 'Yes',
-    'Details of other adults living in your home?': 'Partner is also named on the tenancy agreement.',
+    'Details of other adults living in your home': 'Partner is also named on the tenancy agreement.',
     'Would you have somewhere else to live if you had to leave your home?': 'I’m not sure',
     'Would you like to share anything about your circumstances?': 'Yes',
     'Details about your circumstances': 'Recent job loss affecting ability to pay rent.',
