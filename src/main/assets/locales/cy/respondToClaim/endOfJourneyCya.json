@@ -18,7 +18,7 @@
   },
   "rows": {
     "uploadedDocuments": {
-      "label": "Uwchlwythwch unrhyw ffeilio rydych yn meddwl sy’n berthnasol i’ch ymateb.",
+      "label": "Uwchlwythwch unrhyw ffeiliau rydych yn meddwl sy’n berthnasol i’ch ymateb.",
       "changeHidden": "ffeiliau wedi’u huwchlwytho",
       "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     },
@@ -56,12 +56,12 @@
   "errors": {
     "statementOfTruthContempt": "Dewiswch os ydych yn deall y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu’n onest ei fod yn wir",
     "statementOfTruthBelief": "Dewiswch os ydych yn credu bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir",
-    "legalRepStatementOfTruthBelief": "Dewiswch a yw’r diffynnydd yn credu bod y ffeithiau a nodir yn y ffruflen amddifyniad hwn yn wir ac eich bod wedi’ch awdurdodi gan y diffynnydd i gyflwyno’r datganiad hwn.",
+    "legalRepStatementOfTruthBelief": "Dewiswch a yw’r diffynnydd yn credu bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir a’ch bod wedi’ch awdurdodi gan y diffynnydd i gyflwyno’r datganiad hwn.",
     "fullName": "Nodwch eich enw llawn",
     "fullNameMaxLength": "Rhaid i’ch enw llawn fod yn 100 nod neu lai",
     "nameOfFirm": "Nodwch enw’r cwmni",
-    "nameOfFirmMaxLength": "Rhaid i’ch enw llawn fod yn 100 nod neu lai",
+    "nameOfFirmMaxLength": "Rhaid i enw’r cwmni fod yn 100 nod neu lai",
     "positionHeld": "Nodwch eich swydd neu safle a ddelir",
-    "positionHeldMaxLength": "Rhaid i’ch eglurhad fod yn 100 nod neu lai"
+    "positionHeldMaxLength": "Rhaid i’r swydd a ddelir fod yn 100 nod neu lai"
   }
 }

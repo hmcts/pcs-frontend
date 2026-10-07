@@ -24,32 +24,32 @@
   "errors": {
     "incomeFromJobsAmount": {
       "required": "Nodwch y cyfanswm rydych yn ei gael o'r holl swyddi a wneir gennych",
-      "negative": "Rhaid i'r cyfanswm rydych yn ei gael o'r holl swyddi a wneir gennych bob wythnos neu bob mis fod yn -£0.00 neu uwch",
-      "largeAmount": "Rhaid i'r cyfanswm rydych yn ei gael o'r holl swyddi a wneir gennych bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
+      "negative": "Rhaid i'r cyfanswm rydych yn ei gael o'r holl swyddi a wneir gennych bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r cyfanswm rydych yn ei gael o'r holl swyddi a wneir gennych bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "incomeFromJobsFrequency": {
       "required": "Dewiswch pa mor aml ydych chi’n cael incwm o’r holl swyddi a wneir gennych"
     },
     "pensionAmount": {
       "required": "Nodwch faint rydych yn ei gael o bensiwn gwladol neu breifat",
-      "negative": "Rhaid i'r cyfanswm rydych yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn -£0.00 neu uwch",
-      "largeAmount": "Rhaid i'r cyfanswm rydych yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
+      "negative": "Rhaid i'r cyfanswm rydych yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i'r cyfanswm rydych yn ei gael o bensiwn (gwladol a phreifat) bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "pensionFrequency": {
       "required": "Dewiswch pa mor aml rydych yn cael incwm o bensiwn gwladol neu breifat"
     },
     "universalCreditAmount": {
-      "required": "Nodwch faint o Gredyd Cymhwysol rydych yn ei gael",
-      "negative": "Rhaid i faint o Gredyd Cymhwysol rydych yn ei gael bob wythnos neu bob mis fod yn -£0.00 neu uwch",
-      "largeAmount": "Rhaid i faint o Gredyd Cymhwysol rydych yn ei gael bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
+      "required": "Nodwch faint o Gredyd Cynhwysol rydych yn ei gael",
+      "negative": "Rhaid i faint o Gredyd Cynhwysol rydych yn ei gael bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i faint o Gredyd Cynhwysol rydych yn ei gael bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "universalCreditFrequency": {
       "required": "Dewiswch pa mor aml rydych yn cael Credyd Cynhwysol"
     },
     "otherBenefitsAmount": {
       "required": "Nodwch faint o fudd-daliadau a chredydau eraill rydych yn ei gael",
-      "negative": "Rhaid i faint o fudd-daliadau a chredydau eraill rydych yn ei gael bob wythnos neu bob mis fod yn -£0.00 neu uwch",
-      "largeAmount": "Rhaid i faint o fudd-daliadau a chredydau eraill rydych yn ei gael bob wythnos neu bob mis fod yn llai nag -£1 biliwn"
+      "negative": "Rhaid i faint o fudd-daliadau a chredydau eraill rydych yn ei gael bob wythnos neu bob mis fod yn £0.00 neu uwch",
+      "largeAmount": "Rhaid i faint o fudd-daliadau a chredydau eraill rydych yn ei gael bob wythnos neu bob mis fod yn llai nag £1 biliwn"
     },
     "otherBenefitsFrequency": {
       "required": "Dewiswch pa mor aml rydych yn cael incwm o fudd-daliadau a chredydau eraill"
