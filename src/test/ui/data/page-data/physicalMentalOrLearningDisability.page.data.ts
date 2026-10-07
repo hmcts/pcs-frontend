@@ -10,5 +10,5 @@ export const physicalMentalOrLearningDisability = {
   hearingCheckbox: `I need something to feel comfortable during my hearing`,
   bringSupportCheckbox: `I need to bring support with me to a hearing`,
   askCertainTypeOfHearingCheckbox: `I need to request a certain type of hearing`,
-  noAdjustmentCheckbox: `I do not need any support at this time`,
+  noAdjustmentCheckbox: `I do not need any any reasonable adjustments at this time`,
 };
