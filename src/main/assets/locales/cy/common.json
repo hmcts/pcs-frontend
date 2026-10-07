@@ -225,5 +225,6 @@
     "oneFound": "Daethpwyd o hyd i 1 cyfeiriad",
     "manyFound": "Daethpwyd o hyd i {count} cyfeiriad",
     "noneFound": "Heb ganfod cyfeiriad"
-  }
+  },
+  "pageTitleSuffix": "Gwasanaeth Llysoedd a Thribiwnlysoedd EF – GOV.UK"
 }

@@ -225,5 +225,6 @@
     "oneFound": "1 address found",
     "manyFound": "{count} addresses found",
     "noneFound": "No addresses found"
-  }
+  },
+  "pageTitleSuffix": "HM Courts & Tribunals Service – GOV.UK"
 }
