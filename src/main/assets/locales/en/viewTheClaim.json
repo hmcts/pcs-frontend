@@ -22,6 +22,7 @@
     "claimantDetails": "Claimant details",
     "defendantDetails": "Defendant 1 details",
     "additionalDefendantDetails": "Additional defendant {{number}} details",
+    "rankedDefendantDetails": "Defendant {{number}} details",
     "claimDetails": "Claim details",
     "asb": "Alleged antisocial behaviour and illegal or prohibited conduct",
     "rentArrears": "Details of rent arrears",
