@@ -39,7 +39,7 @@ describe('index.ts', () => {
     document.body.innerHTML = '';
   });
 
-  it('initialises all modules without loading the make order editor', () => {
+  it('initialises all modules without loading the make order editor or order preview', () => {
     require('../../../../main/assets/js/index');
 
     const { initAll } = require('govuk-frontend');
@@ -53,7 +53,7 @@ describe('index.ts', () => {
     expect(initAll).toHaveBeenCalled();
     expect(initMakeOrder).not.toHaveBeenCalled();
     expect(initMultiFileUpload).toHaveBeenCalled();
-    expect(initOrderPreview).toHaveBeenCalled();
+    expect(initOrderPreview).not.toHaveBeenCalled();
     expect(initPostcodeLookup).toHaveBeenCalled();
     expect(initPostcodeSelection).toHaveBeenCalled();
     expect(initSessionTimeout).toHaveBeenCalled();
@@ -71,5 +71,16 @@ describe('index.ts', () => {
     expect(startWithSavedOrderTab).toHaveBeenCalledWith(initAll);
     expect(initAll).toHaveBeenCalled();
     expect(initMakeOrder).toHaveBeenCalled();
+  });
+
+  it('loads the order preview on a page that shows one', async () => {
+    document.body.innerHTML = '<div data-order-preview></div>';
+
+    require('../../../../main/assets/js/index');
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    const { initOrderPreview } = require('../../../../main/assets/js/order-preview');
+
+    expect(initOrderPreview).toHaveBeenCalled();
   });
 });
