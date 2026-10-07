@@ -542,6 +542,44 @@ describe('error-handler', () => {
       expect(res.locals.errorPageKey).toBe('technicalError');
     });
 
+    it('should populate res.locals.t and lang so error.njk renders when i18n middleware never ran', () => {
+      const errorHandler = createErrorHandler('test');
+      const err = new HTTPError('Test error', 500);
+      const req = {} as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: {},
+        headersSent: false,
+      } as any;
+
+      errorHandler(err, req, res, jest.fn() as NextFunction);
+
+      expect(typeof res.locals.t).toBe('function');
+      expect(res.locals.lang).toBe('en');
+    });
+
+    it('should not overwrite a res.locals.t already set by the i18n middleware', () => {
+      const errorHandler = createErrorHandler('test');
+      const err = new HTTPError('Test error', 500);
+      const existingT = createMockTranslation();
+      const req = {
+        i18n: { getFixedT: () => createMockTranslation() },
+        language: 'cy',
+      } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: { t: existingT, lang: 'cy' },
+        headersSent: false,
+      } as any;
+
+      errorHandler(err, req, res, jest.fn() as NextFunction);
+
+      expect(res.locals.t).toBe(existingT);
+      expect(res.locals.lang).toBe('cy');
+    });
+
     it('should handle application error with custom error codes', () => {
       const errorHandler = createErrorHandler('test');
       const err = new ApplicationError('Bad request', ApplicationErrorCode.noApplicationIdInSession);

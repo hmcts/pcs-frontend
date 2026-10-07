@@ -2,7 +2,7 @@ import type { Express, NextFunction, Request, Response } from 'express';
 
 import { ApplicationError } from '../../ApplicationError';
 import { HTTPError } from '../../HttpError';
-import { getTranslationFunction, populateCommonTranslations } from '../i18n';
+import { getRequestLanguage, getTranslationFunction, populateCommonTranslations } from '../i18n';
 
 import { authFailure } from './authFailure';
 import { getErrorPageKey } from './errorPageKeys';
@@ -56,6 +56,11 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
     }
 
     const t = getTranslationFunction(req, ['common']);
+
+    // Errors raised before the i18n middleware runs (e.g. a body-parser failure)
+    // reach here with no res.locals.t, and error.njk calls t() throughout.
+    res.locals.t ??= t;
+    res.locals.lang ??= getRequestLanguage(req);
 
     res.locals.message = httpError.message;
     res.locals.error = env === 'development' ? httpError : {};
