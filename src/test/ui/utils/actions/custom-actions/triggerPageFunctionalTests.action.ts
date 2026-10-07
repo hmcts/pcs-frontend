@@ -79,7 +79,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     const pftBaseDir = isLRForPFT
       ? TriggerPageFunctionalTestsAction.LR_PFT_DIR
       : TriggerPageFunctionalTestsAction.PFT_DIR;
-    const pftFilePath = this.resolveFilePath(pftBaseDir, `${pageName}.pft.ts`);
+    const pftFilePath = this.resolvePftFilePath(pftBaseDir, pageName, isLRForPFT);
 
     if (!pftFilePath || !fs.existsSync(pftFilePath)) {
       if (enable_error_message_validation === 'true') {
@@ -114,7 +114,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       if (enable_navigation_tests === 'true' && !skipNavigationForTaskListSpec) {
         await test.step(`Navigation tests triggered for page - ${pageName}`, async () => {
           try {
-            await this.runNavigationTests(page, pageName, pftFilePath);
+            await this.runNavigationTests(page, pageName, pftFilePath, isLRForPFT);
           } catch (error) {
             PageNavigationValidation.trackNavigationFailure(pageName, error);
             navigationTestsFailed = true;
@@ -163,6 +163,19 @@ export class TriggerPageFunctionalTestsAction implements IAction {
       const subDirPath = path.join(baseDir, dir.name, pageName);
       if (fs.existsSync(subDirPath)) {
         return subDirPath;
+      }
+    }
+
+    return null;
+  }
+
+  private resolvePftFilePath(baseDir: string, pageName: string, isLR: boolean): string | null {
+    const candidates = isLR ? [`${pageName}.pft.lr.ts`, `${pageName}.pft.ts`] : [`${pageName}.pft.ts`];
+
+    for (const candidate of candidates) {
+      const resolved = this.resolveFilePath(baseDir, candidate);
+      if (resolved) {
+        return resolved;
       }
     }
 
@@ -219,7 +232,7 @@ export class TriggerPageFunctionalTestsAction implements IAction {
     }
   }
 
-  private async runNavigationTests(page: Page, pageName: string, pftFilePath: string): Promise<void> {
+  private async runNavigationTests(page: Page, pageName: string, pftFilePath: string, isLR: boolean): Promise<void> {
     delete require.cache[require.resolve(pftFilePath)];
     const pftModule = require(pftFilePath);
 
@@ -228,9 +241,12 @@ export class TriggerPageFunctionalTestsAction implements IAction {
 
     if (typeof navigationFunction === 'function') {
       PageNavigationValidation.trackPageWithNavigation(pageName);
-      PageNavigationValidation.setSourcePage(pageName);
-      await navigationFunction(page);
-      PageNavigationValidation.clearSourcePage();
+      PageNavigationValidation.setSourcePage(pageName, isLR);
+      try {
+        await navigationFunction(page);
+      } finally {
+        PageNavigationValidation.clearSourcePage();
+      }
       PageNavigationValidation.trackPagePassed(pageName);
     } else {
       PageNavigationValidation.trackMissingNavigationMethod(pageName);

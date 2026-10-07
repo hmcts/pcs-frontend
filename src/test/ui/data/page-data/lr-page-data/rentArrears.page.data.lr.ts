@@ -22,6 +22,7 @@ export const rentArrears = {
   theAmountDefendantBelieveErrorMessage: `The amount the defendant believes they owe in rent arrears must be £0.00 or above`,
   lessThanBillionErrorMessage: `The amount the defendant believes they owe in rent arrears must be less than £1 billion`,
   enterAmountInCorrectFormatErrorMessage: `Enter how much the defendant believes they owe in rent arrears, in the correct format (e.g. if the defendant owes £148, please write £148.00)`,
+  feedbackLink: `feedback`,
   pageSlug: `rent-arrears-dispute`,
   rentDocumentDynamicLink: 'View a copy of the rent statement (opens in new tab)',
 };

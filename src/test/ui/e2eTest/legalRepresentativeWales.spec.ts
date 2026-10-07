@@ -54,6 +54,10 @@ const isLR = true;
 let claimantName: string;
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  delete process.env.NOTICE_DATE_PROVIDED;
+  delete process.env.RENT_ARREARS;
+  delete process.env.RENT_NON_RENT;
+  delete process.env.SOMETHING_ELSE;
   await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-enabled');
   await performAction('resetRTCAnswerStore');
   process.env.WALES_POSTCODE = 'YES';

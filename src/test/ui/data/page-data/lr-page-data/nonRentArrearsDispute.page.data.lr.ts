@@ -19,5 +19,6 @@ export const nonRentArrearsDispute = {
   selectIfYouWantToDisputeErrorMessage: `Select if the defendant wants to dispute any other parts of the claim`,
   partsOfClaimDoNotAgreeErrorMessage: `Enter the parts of the claim the defendant does not agree with`,
   charLimitErrorMessage: `Explanation must be 6500 characters or less`,
+  feedbackLink: `feedback`,
   pageSlug: `non-rent-arrears-dispute`,
 };

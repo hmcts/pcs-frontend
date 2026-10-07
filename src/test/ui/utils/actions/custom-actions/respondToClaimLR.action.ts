@@ -300,6 +300,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async enterNoticeDateKnownLR(noticeData: actionRecord): Promise<void> {
+    process.env.NOTICE_DATE_PROVIDED = 'YES';
     await performValidation('text', { elementType: 'listItem', text: noticeDateWhenProvided.noticeGivenDateLabel });
     await performValidation('text', {
       elementType: 'listItem',
@@ -353,6 +354,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async disputingOtherPartsOfTheClaimLR(doYouWantToDisputeOption: actionRecord): Promise<void> {
+    process.env.RENT_NON_RENT = process.env.RENT_ARREARS === 'YES' ? 'YES' : 'NO';
     this.recordAnswer(nonRentArrearsDispute.doYouWantToDisputeQuestion, doYouWantToDisputeOption.disputeOption);
     await performAction('clickRadioButton', {
       question: nonRentArrearsDispute.doYouWantToDisputeQuestion,
@@ -371,6 +373,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async enterNoticeDateUnknownLR(noticeData: actionRecord): Promise<void> {
+    process.env.NOTICE_DATE_PROVIDED = 'NO';
     const noticeDateNotProvidedQuestion = `When did the defendant receive notice from ${process.env.CLAIMANT_NAME} (optional)?`;
     await performValidation('text', { elementType: 'legend', text: noticeDateNotProvidedQuestion });
     await performValidation('text', {
@@ -798,6 +801,8 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async rentArrearsLR(rentArrearsInfo: actionRecord): Promise<void> {
+    process.env.RENT_ARREARS = 'YES';
+    process.env.RENT_NON_RENT = 'NO';
     await performValidation('text', {
       elementType: 'subHeader',
       text: `Amount the defendant owes in rent arrears given by ${process.env.CLAIMANT_NAME}:`,
@@ -879,6 +884,8 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
   }
 
   private async selectWhatAreYouClaimingForLR(counterClaimingOption: actionRecord): Promise<void> {
+    process.env.SOMETHING_ELSE =
+      counterClaimingOption.option === counterClaimWhatAreYouClaimingFor.somethingElseRadioOption ? 'YES' : 'NO';
     this.recordAnswer(String(counterClaimingOption.question), counterClaimingOption.option);
     await performAction('clickRadioButton', {
       question: counterClaimWhatAreYouClaimingFor.mainHeader,
