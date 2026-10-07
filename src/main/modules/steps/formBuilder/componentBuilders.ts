@@ -41,7 +41,7 @@ export function buildConditionalItemContent(option: FormFieldOption, nunjucksEnv
   }
 
   if (option.subFields) {
-    const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv);
+    const subFieldsHTML = buildSubFieldsHTML(option.subFields, nunjucksEnv, option.subFieldsLegend);
     if (subFieldsHTML) {
       conditionalParts.push(subFieldsHTML);
     }

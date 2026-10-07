@@ -97,3 +97,9 @@ export function stringToCamelCase(input: string): string {
     .map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
     .join('');
 }
+
+export function extractFrequencyUnit(frequencyLabel: string): string {
+  // Strips a leading "Paid every " or "Received every " (case-insensitive) from a radio label,
+  // leaving just the unit, e.g. "month" or "week".
+  return frequencyLabel.replace(/^(paid|received)\s+every\s+/i, '').trim();
+}
