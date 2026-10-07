@@ -1,25 +1,29 @@
 {
   "pageTitle": "Swm y gwrth-hawliad",
-  "heading": "Ydy'r diffynnydd yn hawlio ar gyfer swm penodol o arian?",
-  "claimAmountLabel": "Faint mae'r diffynnydd yn ei hawlio?",
+  "heading": "Ydy’r diffynnydd yn hawlio ar gyfer swm penodol o arian?",
+  "claimAmountLabel": "Faint mae’r diffynnydd yn ei hawlio?",
   "maxClaimAmountLabel": "Beth yw uchafswm gwerth eu hawliad?",
-  "specificFeeText": "<p class=\"govuk-body\">cyThe defendant’s counterclaim fee (the fee the defendant will pay to make the counterclaim) depends on the amount they're claiming for.</p><p class=\"govuk-body\">cyIf you want to check how much the defendant’s fee will be, you can <a href=\"https://www.gov.uk/government/publications/fees-in-the-civil-and-family-courts-main-fees-ex50/civil-court-fees-ex50\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">estimate how much it will cost the defendant to make their counterclaim (opens in new tab)</a></p>",
-  "noSpecificFeeText": "<p class=\"govuk-body\">cyIf you do not know the specific sum the defendant is claiming for, the court needs to know what they believe the maximum value of the claim will be.</p><p class=\"govuk-body\">cyIf you do not know the exact amount, give an estimate.</p>",
+  "specificFeeText": "<p class=\"govuk-body\">Mae ffi gwrth-hawliad y diffynnydd (y ffi fydd y diffynnydd yn ei thalu i wneud y gwrth-hawliad) yn dibynnu ar y swm maen nhw’n ei hawlio.</p><p class=\"govuk-body\">Os ydych eisiau gwirio faint fydd ffi’r diffynnydd, gallwch <a href=\"https://www.gov.uk/government/publications/fees-in-the-civil-and-family-courts-main-fees-ex50/civil-court-fees-ex50\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">amcangyfrif beth fydd y gost i’r diffynnydd i wneud eu gwrth-hawliad (yn agor mewn tab newydd)</a></p>",
+  "noSpecificFeeText": "<p class=\"govuk-body\">Os nad ydych yn gwybod y swm penodol mae’r diffynnydd yn ei hawlio, mae’r llys angen gwybod faint maen nhw’n credu yw uchafswm gwerth yr hawliad.</p><p class=\"govuk-body\">Os nad ydych yn gwybod yr union swm, rhowch amcangyfrif.</p>",
   "errors": {
     "isClaimAmountKnown": {
-      "required": "Dewiswch os ydy'r diffynnydd yn hawlio am swm penodol o arian"
+      "required": "Dewiswch os ydy’r diffynnydd yn hawlio am swm penodol o arian"
     },
     "claimAmount": {
-      "required": "Nodwch faint mae'r diffynnydd yn hawlio amdano",
-      "largeAmount": "Rhaid i'r swm mae'r diffynnydd yn ei hawlio fod yn llai nag £1 biliwn.",
-      "negative": "Rhaid i'r swm mae'r diffynnydd yn ei hawlio fod yn £0.00 neu'n uwch.",
-      "invalidFormat": "Rhowch faint mae'r diffynnydd yn ei hawlio yn y fformat cywir, er enghraifft 148.00 neu 148.50"
+      "required": "Nodwch faint mae’r diffynnydd yn hawlio amdano",
+      "largeAmount": "Rhaid i’r swm mae’r diffynnydd yn ei hawlio fod yn llai nag £1 biliwn.",
+      "negative": "Rhaid i’r swm mae’r diffynnydd yn ei hawlio fod yn £0.00 neu’n uwch.",
+      "invalidFormat": "Rhowch faint mae’r diffynnydd yn ei hawlio yn y fformat cywir, er enghraifft 148.00 neu 148.50"
     },
     "estimatedMaxClaimAmount": {
       "required": "Rhowch uchafswm gwerth hawliad y diffynnydd",
-      "largeAmount": "Rhaid i uchafswm y gwerth mae'r diffynnydd yn ei hawlio fod yn llai nag £1 biliwn",
-      "negative": "Rhaid i uchafswm y gwerth mae'r diffynnydd yn ei hawlio fod yn £0.00 neu'n uwch",
+      "largeAmount": "Rhaid i uchafswm y gwerth mae’r diffynnydd yn ei hawlio fod yn llai nag £1 biliwn",
+      "negative": "Rhaid i uchafswm y gwerth mae’r diffynnydd yn ei hawlio fod yn £0.00 neu’n uwch",
       "invalidFormat": "Rhowch uchafswm gwerth eich hawliad yn y fformat cywir, er enghraifft 148.00 neu 148.50"
     }
+  },
+  "options": {
+    "yes": "Ydy",
+    "no": "Nac ydy"
   }
 }
