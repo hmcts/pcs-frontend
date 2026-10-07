@@ -1,12 +1,12 @@
 {
   "pageTitle": "Eich cyfeiriad post",
-  "legend": "Ai dyma yw eich cyfeiriad ar gyfer anfon gohebiaeth {{ formattedAddressStr }}",
+  "legend": "Ai dyma yw eich cyfeiriad ar gyfer anfon gohebiaeth {{ formattedAddressStr }}?",
   "legendNa": "Beth yw eich cyfeiriad ar gyfer gohebiaeth?",
   "legend.hint": "Dyma’r cyfeiriad a ddarparwyd gan {{claimantName}}",
   "legend.hintNa": "Eich cyfeiriad gohebiaeth yw eich cyfeiriad post.",
   "labels": {
-    "yes": "Ydy",
-    "no": "Nac ydy",
+    "yes": "Ie",
+    "no": "Na",
     "enterAddress": "Rhowch gyfeiriad gohebiaeth",
     "enterPostcode": "Nodwch god post yn y DU",
     "enterManually": "Teipiwch gyfeiriad â llaw",
@@ -30,7 +30,7 @@
     "postcodeNotFound": "Heb ddod o hyd i god post. Gwiriwch y manylion a rhowch gynnig arall arni.",
     "selectAddress": "Dewiswch gyfeiriad",
     "correspondenceAddressConfirm": "Cadarnhewch eich cyfeiriad drwy ddewis yr opsiynau isod",
-    "correspondenceAddressConfirm.addressLine1": "Rhowch linell cyfeiriad 1, fel arfer yr adeilad a'r stryd",
+    "correspondenceAddressConfirm.addressLine1": "Rhowch linell cyfeiriad 1, fel arfer yr adeilad a’r stryd",
     "correspondenceAddressConfirm.townOrCity": "Nodwch tref neu ddinas",
     "correspondenceAddressConfirm.postcode": "Nodwch god post dilys yn y DU"
   }

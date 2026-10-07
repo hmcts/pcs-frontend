@@ -5,7 +5,7 @@ import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../u
 import { RESPOND_TO_CLAIM_ROUTE, flowConfig } from '../flow.config';
 import { findSectionIdForStep, sectionIdToBackendEnum } from '../sections.config';
 
-import type { SummaryListRow } from './cyaRow';
+import { type SummaryListRow, loadYesNoQuestionNamespaces } from './cyaRow';
 
 import { createGetController, createStepNavigation, getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
@@ -56,6 +56,7 @@ export function createSectionCyaStep({
         const caseRef = req.res?.locals.validatedCase?.id;
         const t: TFunction = getTranslationFunction(req);
         const cardTitle = t(cardTitleKey);
+        await loadYesNoQuestionNamespaces(req);
         const rows = buildRows(req, t);
 
         return {
