@@ -180,7 +180,7 @@ export class CreateCaseAPIAction implements IAction {
         const requestReference = paymentInfo[0].serviceRequestReference;
         const updateResponse = await paymentApi.put(
           paymentApiData.updatePaymentApiEndPoint,
-          paymentApiData.paymentUpdatePayload(requestReference)
+          paymentApiData.paymentUpdatePayload(requestReference, Number(paymentInfo[0].amount))
         );
         if (updateResponse.status === 200 || updateResponse.status === 204) {
           return;
