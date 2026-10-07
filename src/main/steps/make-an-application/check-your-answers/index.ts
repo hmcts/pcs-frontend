@@ -2,10 +2,17 @@ import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { ApplicationError, ApplicationErrorCode } from '../../../ApplicationError';
-import { createFormStep, getFormData, getTranslationFunction } from '../../../modules/steps';
+import {
+  clearFormData,
+  createFormStep,
+  getAllFormData,
+  getFormData,
+  getTranslationFunction,
+} from '../../../modules/steps';
 import { ccdCaseService } from '../../../services/ccdCaseService';
 import { toYesNoEnum } from '../../utils';
 import { flowConfig } from '../flow.config';
+import { clearApplicationId, getApplicationId } from '../session';
 
 import { buildSummaryListRows } from './summaryListRowFactory';
 import VisibleFormDataView from './visibleFormDataView';
@@ -84,12 +91,13 @@ export const step: StepDefinition = createFormStep({
       throw Error('No existing case details in session');
     }
 
-    const formData = req.session.formData;
-    if (!formData) {
+    const formData = getAllFormData(req);
+    if (Object.keys(formData).length === 0) {
       throw Error('No existing formData in session');
     }
 
-    if (!req.session.genApp?.applicationId) {
+    const applicationId = getApplicationId(req);
+    if (!applicationId) {
       throw new ApplicationError('No application ID in session', ApplicationErrorCode.noApplicationIdInSession);
     }
 
@@ -114,7 +122,7 @@ export const step: StepDefinition = createFormStep({
       uploadedDocuments: uploadedDocs.length > 0 ? uploadedDocs : undefined,
       sotAccepted: toYesNoEnum(statementOfTruthAccepted),
       sotFullName: cyaFormData.fullName as string,
-      clientReference: req.session.genApp.applicationId,
+      clientReference: applicationId,
     };
 
     const makeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(req.session?.user?.accessToken, {
@@ -124,12 +132,12 @@ export const step: StepDefinition = createFormStep({
       },
     });
 
-    delete req.session.formData;
+    clearFormData(req);
     const caseRef = toCaseReference16(req.params?.caseReference);
     if (caseRef && req.session.uploadedDocs?.[caseRef]) {
       delete req.session.uploadedDocs[caseRef];
     }
-    delete req.session.genApp;
+    clearApplicationId(req);
 
     if (makeAnApplicationResponse?.state === GenAppState.PENDING_GEN_APP_ISSUED) {
       const paymentSessionState: PaymentSessionState = {

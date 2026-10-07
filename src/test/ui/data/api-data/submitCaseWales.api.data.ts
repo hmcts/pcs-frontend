@@ -88,11 +88,10 @@ export const submitCaseApiDataWales = {
     rentArrears_StatementDocuments: [
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/69a31b98-9de1-49ae-a79c-97d8c521d0f5`,
-          document_filename: 'rentArrears.png',
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/69a31b98-9de1-49ae-a79c-97d8c521d0f5/binary`,
+          document_url: `${process.env.DM_STORE_URL}/documents/98864bc5-edd5-4773-ac98-284ad0a74392`,
+          document_binary_url: `${process.env.DM_STORE_URL}/documents/98864bc5-edd5-4773-ac98-284ad0a74392/binary`,
+          document_filename: 'RentArrearsStatement.pdf',
         },
-        id: 'be255526-1c87-46be-8107-7643ec2a9112',
       },
     ],
 
