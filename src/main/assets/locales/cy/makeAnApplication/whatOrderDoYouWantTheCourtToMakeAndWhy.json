@@ -6,6 +6,10 @@
   "whatOrderDoYouWantLabel": "Eglurwch beth ydych eisiau i’r llys ei wneud, a pham",
   "list": {
     "heading": "Er enghraifft, dywedwch wrth y llys:",
+    "SUSPEND": [
+      "cypam rydych yn gofyn i’r llys atal y warant dros dro",
+      "cypa daliadau y gallwch eu gwneud tuag at y rhent neu’r taliadau morgais sy’n ddyledus gennych"
+    ],
     "SOMETHING_ELSE": [
       "cywhy you want to add someone to your claim",
       "cywhy you should not be sanctioned (punished)",

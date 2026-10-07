@@ -1,4 +1,5 @@
 import { step as applicationSubmitted } from './application-submitted';
+import { step as applyToStopOrDelayTheEviction } from './apply-to-stop-or-delay-the-eviction';
 import { step as areThereAnyReasonsThatThisApplicationShouldNotBeShared } from './are-there-any-reasons-that-this-application-should-not-be-shared';
 import { step as askToMakeAnOrder } from './ask-the-court-to-make-an-order';
 import { step as askToSetAside } from './ask-the-court-to-set-aside-the-order';
@@ -21,6 +22,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'choose-an-application': chooseAnApplication,
+  'apply-to-stop-or-delay-the-eviction': applyToStopOrDelayTheEviction,
   'ask-to-adjourn-the-court-hearing': askToAdjourn,
   'ask-the-court-to-set-aside-the-order': askToSetAside,
   'ask-the-court-to-make-an-order': askToMakeAnOrder,

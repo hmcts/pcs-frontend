@@ -11,6 +11,7 @@
       "label": "Beth ydych chi eisiau gwneud cais amdano?",
       "changeHint": "Newid beth rydych eisiau gwneud cais amdano",
       "options": {
+        "SUSPEND": "Gofyn i'r llys atal (stopio neu ohirio) y troi allan",
         "ADJOURN": "Gofyn i ohirio'r gwrandawiad (ei symud i amser neu ddyddiad diweddarach)",
         "SET_ASIDE": "Gofyn i'r llys roi penderfyniad a wnaed gan y llys o'r neilltu (canslo)",
         "SOMETHING_ELSE": "Rhywbeth arall"

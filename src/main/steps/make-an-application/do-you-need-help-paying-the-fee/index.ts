@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-import { createFormStep } from '../../../modules/steps';
+import { createFormStep, getFormData } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -44,12 +44,23 @@ export const step: StepDefinition = createFormStep({
     areOnCertainBenefits: 'areOnCertainBenefits',
     haveLittleOrNoSavings: 'haveLittleOrNoSavings',
     haveLowIncome: 'haveLowIncome',
+    itCostsToApplyToSuspend: 'itCostsToApplyToSuspend',
   },
   extendGetContent: async (_req: Request) => {
+    const isSuspend = getFormData(_req, 'choose-an-application').typeOfApplication === 'SUSPEND';
+    if (isSuspend) {
+      const suspendFee = await getFee(FeeType.genAppSuspendFeeFEE0458);
+      return {
+        isSuspend,
+        suspendFee,
+      };
+    }
+
     const standardFeePromise = getFee(FeeType.genAppStandardFee);
     const maxFeePromise = getFee(FeeType.genAppMaxFee);
     const [standardFee, maxFee] = await Promise.all([standardFeePromise, maxFeePromise]);
     return {
+      isSuspend,
       standardFee,
       maxFee,
     };

@@ -26,6 +26,15 @@ const COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS: FeeLookupParams = {
   keyword: 'AnyOtherRemedy',
 };
 
+const SUSPEND_FEE_FEE0458_LOOKUP_PARAMS: FeeLookupParams = {
+  channel: 'default',
+  event: 'general application',
+  jurisdiction1: 'civil',
+  jurisdiction2: 'civil',
+  service: 'general',
+  keyword: 'ApplicationToVaryJudgmentOrSuspendEnforcement',
+};
+
 (config.get as jest.Mock).mockImplementation(key => {
   if (key === 'feeService.url') {
     return FEE_SERVICE_URL;
@@ -36,6 +45,9 @@ const COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS: FeeLookupParams = {
   if (key === 'feeService.lookup.counterClaimFlatFeeFEE0450') {
     return COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS;
   }
+  if (key === 'feeService.lookup.genAppSuspendFeeFEE0458') {
+    return SUSPEND_FEE_FEE0458_LOOKUP_PARAMS;
+  }
 });
 
 (config.has as jest.Mock).mockImplementation(key => {
@@ -43,6 +55,9 @@ const COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS: FeeLookupParams = {
     return true;
   }
   if (key === 'feeService.lookup.counterClaimFlatFeeFEE0450') {
+    return true;
+  }
+  if (key === 'feeService.lookup.genAppSuspendFeeFEE0458') {
     return true;
   }
 });
@@ -98,6 +113,23 @@ describe('feeLookupService', () => {
         `${FEE_SERVICE_URL}/fees-register/fees/lookup`,
         expect.objectContaining({
           params: COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS,
+        })
+      );
+    });
+
+    it('should include lookup params for FEE0458 suspend application fee', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          fee_amount: 16,
+        },
+      });
+
+      await getFee(FeeType.genAppSuspendFeeFEE0458);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${FEE_SERVICE_URL}/fees-register/fees/lookup`,
+        expect.objectContaining({
+          params: SUSPEND_FEE_FEE0458_LOOKUP_PARAMS,
         })
       );
     });

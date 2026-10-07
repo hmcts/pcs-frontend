@@ -2,6 +2,7 @@
   "pageTitle": "Cais wedi'i gyflwyno",
   "applicationSubmitted": "Cais wedi'i gyflwyno",
   "paymentBeingProcessed": "cyPayment being processed",
+  "suspendRequestReceived": "cyWe have received your request to suspend the eviction.",
   "adjournRequestReceived": "cyWe have received your request to adjourn (delay) the court hearing.",
   "setAsideRequestReceived": "cyWe have received your request to set aside (cancel) the order.",
   "somethingElseRequestReceived": "cyWe have received your request to ask the court to make an order.",

@@ -14,16 +14,22 @@
   <span class="govuk-caption-xl">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  <p class="govuk-body">
-  {{ itUsuallyCostsToApply }}
-  </p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>{{ youHaveAlreadyToldTheOtherParty }}</li>
-    <li>{{ theyDidNotAgreeToIt }}</li>
-  </ul>
-  <p class="govuk-body">
-    {{ youWillSeeTheFinalApplicationFee }}
-  </p>
+  {% if isSuspend %}
+    <p class="govuk-body">
+    {{ itCostsToApplyToSuspend }}
+    </p>
+  {% else %}
+    <p class="govuk-body">
+    {{ itUsuallyCostsToApply }}
+    </p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>{{ youHaveAlreadyToldTheOtherParty }}</li>
+      <li>{{ theyDidNotAgreeToIt }}</li>
+    </ul>
+    <p class="govuk-body">
+      {{ youWillSeeTheFinalApplicationFee }}
+    </p>
+  {% endif %}
 
   <p class="govuk-body">
   {{ youMayBeAbleToGetHelp }}

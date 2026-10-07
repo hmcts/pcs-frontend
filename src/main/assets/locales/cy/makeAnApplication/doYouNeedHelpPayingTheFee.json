@@ -11,6 +11,7 @@
     "no": "Nid wyf angen help i dalu’r ffi"
   },
   "itUsuallyCostsToApply": "Fel arfer, mae'n costio {{standardFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} i wneud cais. Bydd y ffi yn cynyddu i {{maxFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} os:",
+  "itCostsToApplyToSuspend": "Mae’n costio {{suspendFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} i wneud cais i atal y troi allan dros dro.",
   "youHaveAlreadyToldTheOtherParty": "ydych eisoes wedi dweud wrth y parti arall eich bod yn gwneud y cais hwn, ac",
   "theyDidNotAgreeToIt": "ni wnaethant gytuno iddo (mae hyn yn golygu eu bod wedi ei wrthwynebu)",
   "youWillSeeTheFinalApplicationFee": "Byddwch yn gweld y ffi gwneud cais terfynol cyn i chi dalu.",
