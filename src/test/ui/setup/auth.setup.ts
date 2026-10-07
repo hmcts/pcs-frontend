@@ -7,13 +7,7 @@ import { clearEmvLocksIfLocal, getAccessToken, getS2SToken } from '../config/glo
 
 const SETUP_ENV_PATH = path.join(__dirname, '../.auth/setup-env.json');
 
-const KEYS_TO_SNAPSHOT = [
-  'S2S_URL',
-  'SERVICE_AUTH_TOKEN',
-  'IDAM_WEB_URL',
-  'IDAM_TESTING_SUPPORT_URL',
-  'BEARER_TOKEN',
-] as const;
+const KEYS_TO_SNAPSHOT = ['S2S_URL', 'SERVICE_AUTH_TOKEN', 'IDAM_WEB_URL', 'IDAM_TESTING_SUPPORT_URL', 'BEARER_TOKEN'] as const;
 
 setup.describe.configure({ mode: 'serial' });
 

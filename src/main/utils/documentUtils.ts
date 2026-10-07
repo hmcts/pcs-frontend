@@ -80,7 +80,9 @@ export function extractViewDocumentFolders(
     });
   }
 
-  return Object.values(folders).filter((folder): folder is ViewDocumentFolder => (folder?.documents.length ?? 0) > 0);
+  return Object.values(folders).filter(
+    (folder): folder is ViewDocumentFolder => (folder?.documents.length ?? 0) > 0
+  );
 }
 
 const CASE_DETAILS_DOCUMENT_PATHS = [
@@ -93,12 +95,17 @@ const CASE_DETAILS_DOCUMENT_PATHS = [
   'detailsTab_RequiredDocumentsDetails.electricalInstallationReports',
 ] as const;
 
-export function findCaseDocumentById(caseData: CaseDataRecord, documentId: string): CaseDocumentLookupItem | undefined {
+export function findCaseDocumentById(
+  caseData: CaseDataRecord,
+  documentId: string
+): CaseDocumentLookupItem | undefined {
   return extractCaseDocuments(caseData).find(document => {
     if (document.id === documentId) {
       return true;
     }
-    const urlUuid = document.binaryUrl ? document.binaryUrl.split('/documents/')[1]?.split('/')[0] : undefined;
+    const urlUuid = document.binaryUrl
+      ? document.binaryUrl.split('/documents/')[1]?.split('/')[0]
+      : undefined;
     return urlUuid === documentId;
   });
 }
@@ -125,7 +132,11 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   return documents;
 }
 
-function addDocumentsFromGenApps(documents: CaseDocumentLookupItem[], seen: Set<string>, genApps: unknown): void {
+function addDocumentsFromGenApps(
+  documents: CaseDocumentLookupItem[],
+  seen: Set<string>,
+  genApps: unknown
+): void {
   for (const item of asCollection(genApps)) {
     if (!item || typeof item !== 'object') {
       continue;
@@ -134,8 +145,18 @@ function addDocumentsFromGenApps(documents: CaseDocumentLookupItem[], seen: Set<
     const genApp = ((item as Record<string, unknown>).value as Record<string, unknown>) ?? item;
     const sourceField = 'genApps';
 
-    addDocumentsFromCollection(documents, seen, genApp.submissionDocument, `${sourceField}.submissionDocument`);
-    addDocumentsFromCollection(documents, seen, genApp.supportingDocuments, `${sourceField}.supportingDocuments`);
+    addDocumentsFromCollection(
+      documents,
+      seen,
+      genApp.submissionDocument,
+      `${sourceField}.submissionDocument`
+    );
+    addDocumentsFromCollection(
+      documents,
+      seen,
+      genApp.supportingDocuments,
+      `${sourceField}.supportingDocuments`
+    );
   }
 }
 
@@ -199,7 +220,8 @@ function addDocumentsFromCollection(
       'document') as string;
 
     const urlId = url ? url.split('/documents/')[1]?.split('/')[0] : undefined;
-    const id = (stringValue(rec.id) || stringValue(val.id) || stringValue(docObj.id) || urlId) as string | undefined;
+    const id = (stringValue(rec.id) || stringValue(val.id) || stringValue(docObj.id) || urlId) as
+      string | undefined;
 
     if (!id || !binaryUrl || seen.has(id)) {
       continue;

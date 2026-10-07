@@ -21,7 +21,11 @@ export const step: StepDefinition = createFormStep({
   },
   extendGetContent: async (req: Request) => {
     const caseReference = req.res?.locals.validatedCase?.id;
-    const payForYourApplicationUrl = getStepUrl('pay-for-your-application', flowConfig, caseReference);
+    const payForYourApplicationUrl = getStepUrl(
+      'pay-for-your-application',
+      flowConfig,
+      caseReference
+    );
 
     return {
       payForYourApplicationUrl,

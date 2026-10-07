@@ -2,7 +2,11 @@ import type { Request } from 'express';
 
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../respond-to-claim/draftEvent';
 
-import { type CcdCase, CcdCaseModel, type PossessionClaimResponse } from '@services/ccdCaseData.model';
+import {
+  type CcdCase,
+  CcdCaseModel,
+  type PossessionClaimResponse,
+} from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 type PlainRecord = Record<string, unknown>;

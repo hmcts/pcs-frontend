@@ -35,7 +35,8 @@ export function requireEventAccess(eventId: string): RequestHandler {
       res.locals.validatedCase = new CcdCaseModel(validatedCase);
       return next();
     } catch (error) {
-      const httpError = error instanceof HTTPError ? error : new HTTPError('Internal server error', 500);
+      const httpError =
+        error instanceof HTTPError ? error : new HTTPError('Internal server error', 500);
 
       logger.error('Case access validation failed', {
         caseReference,

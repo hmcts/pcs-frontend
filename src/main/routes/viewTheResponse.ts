@@ -109,20 +109,32 @@ function formatMoneyAmount(pence: string | number | undefined): string {
   return pounds ? `£${pounds}` : '';
 }
 
-function formatIncomeValue(t: TFunction, amount: string | undefined, frequency: string | undefined | null): string {
+function formatIncomeValue(
+  t: TFunction,
+  amount: string | undefined,
+  frequency: string | undefined | null
+): string {
   const money = formatMoneyAmount(amount);
   const freq =
-    frequency === 'WEEKLY' || frequency === 'MONTHLY' ? t(`viewTheResponse:incomeFrequencies.${frequency}`) : '';
+    frequency === 'WEEKLY' || frequency === 'MONTHLY'
+      ? t(`viewTheResponse:incomeFrequencies.${frequency}`)
+      : '';
   if (money && freq) {
     return `${money} ${freq}`;
   }
   return money || freq;
 }
 
-function formatPaymentValue(t: TFunction, amount: string | undefined, frequency: string | undefined | null): string {
+function formatPaymentValue(
+  t: TFunction,
+  amount: string | undefined,
+  frequency: string | undefined | null
+): string {
   const money = formatMoneyAmount(amount);
   const freq =
-    frequency === 'WEEKLY' || frequency === 'MONTHLY' ? t(`viewTheResponse:paymentFrequencies.${frequency}`) : '';
+    frequency === 'WEEKLY' || frequency === 'MONTHLY'
+      ? t(`viewTheResponse:paymentFrequencies.${frequency}`)
+      : '';
   if (money && freq) {
     return `${money} ${freq}`;
   }
@@ -190,16 +202,29 @@ function pushRow(rows: SummaryRow[], label: string, value: string | null | undef
   }
 }
 
-function buildCaseDatesSummary(t: TFunction, dateSubmitted: string | null, dateIssued: string | null): SummarySection {
+function buildCaseDatesSummary(
+  t: TFunction,
+  dateSubmitted: string | null,
+  dateIssued: string | null
+): SummarySection {
   return {
     rows: [
-      { key: summaryKey(t('viewTheResponse:summary.dateIssued')), value: { text: dateIssued ?? '' } },
-      { key: summaryKey(t('viewTheResponse:summary.dateSubmitted')), value: { text: dateSubmitted ?? '' } },
+      {
+        key: summaryKey(t('viewTheResponse:summary.dateIssued')),
+        value: { text: dateIssued ?? '' },
+      },
+      {
+        key: summaryKey(t('viewTheResponse:summary.dateSubmitted')),
+        value: { text: dateSubmitted ?? '' },
+      },
     ],
   };
 }
 
-function buildStatementOfTruthSummary(t: TFunction, completedByName: string | undefined): SummarySection {
+function buildStatementOfTruthSummary(
+  t: TFunction,
+  completedByName: string | undefined
+): SummarySection {
   return {
     rows: [
       {
@@ -239,7 +264,8 @@ function resolveClaimantName(caseData: CcdCaseData): string {
 
 function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
-  const party: CcdDefendantParty | undefined = caseData.possessionClaimResponse?.defendantContactDetails?.party;
+  const party: CcdDefendantParty | undefined =
+    caseData.possessionClaimResponse?.defendantContactDetails?.party;
   const responses = caseData.possessionClaimResponse?.defendantResponses;
   const addressUnknown = isNo(party?.addressKnown);
 
@@ -258,12 +284,19 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
     resolveDefendantPostalAddress(t, party, caseData.propertyAddress)
   );
   if (!addressUnknown) {
-    pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
+    pushRow(
+      rows,
+      t('viewTheResponse:defendant.dateOfBirth'),
+      formatGdsDate(responses?.dateOfBirth) ?? ''
+    );
   }
   return { rows };
 }
 
-function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): TitledSummarySection[] {
+function buildAdditionalDefendantDetails(
+  t: TFunction,
+  caseData: CcdCaseData
+): TitledSummarySection[] {
   const defendants = caseData.allDefendants ?? [];
   if (defendants.length < 2) {
     return [];
@@ -285,22 +318,36 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
         resolveDefendantPostalAddress(t, party, caseData.propertyAddress)
       );
       if (!addressUnknown) {
-        pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(party.dateOfBirth) ?? '');
+        pushRow(
+          rows,
+          t('viewTheResponse:defendant.dateOfBirth'),
+          formatGdsDate(party.dateOfBirth) ?? ''
+        );
       }
 
       return {
-        sectionTitle: t('viewTheResponse:sections.additionalDefendantDetails', { number: index + 1 }),
+        sectionTitle: t('viewTheResponse:sections.additionalDefendantDetails', {
+          number: index + 1,
+        }),
         rows,
       };
     });
 }
 
-function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLandlord: boolean): SummarySection {
+function buildResponseToClaim(
+  t: TFunction,
+  caseData: CcdCaseData,
+  showExemptLandlord: boolean
+): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
   if (showExemptLandlord) {
-    pushRow(rows, t('viewTheResponse:responseToClaim.exemptLandlord'), yesNoNotSure(t, responses?.exemptLandlord));
+    pushRow(
+      rows,
+      t('viewTheResponse:responseToClaim.exemptLandlord'),
+      yesNoNotSure(t, responses?.exemptLandlord)
+    );
   }
   pushRow(
     rows,
@@ -322,7 +369,11 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLan
       formatGdsDate(responses?.tenancyStartDate) ?? ''
     );
   }
-  pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
+  pushRow(
+    rows,
+    t('viewTheResponse:responseToClaim.writtenTerms'),
+    yesNoNotSure(t, responses?.writtenTerms)
+  );
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
@@ -345,11 +396,23 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLan
       formatMoneyAmount(responses?.rentArrearsAmount)
     );
   }
-  pushRow(rows, t('viewTheResponse:responseToClaim.disputeClaim'), yesNo(t, responses?.disputeClaim));
+  pushRow(
+    rows,
+    t('viewTheResponse:responseToClaim.disputeClaim'),
+    yesNo(t, responses?.disputeClaim)
+  );
   if (isYes(responses?.disputeClaim)) {
-    pushRow(rows, t('viewTheResponse:responseToClaim.disputeDetails'), responses?.disputeClaimDetails);
+    pushRow(
+      rows,
+      t('viewTheResponse:responseToClaim.disputeDetails'),
+      responses?.disputeClaimDetails
+    );
   }
-  pushRow(rows, t('viewTheResponse:responseToClaim.makeCounterClaim'), yesNo(t, responses?.makeCounterClaim));
+  pushRow(
+    rows,
+    t('viewTheResponse:responseToClaim.makeCounterClaim'),
+    yesNo(t, responses?.makeCounterClaim)
+  );
   return { rows };
 }
 
@@ -362,9 +425,14 @@ function resolveClaimIssueDate(caseData: CcdCaseData, dateIssued: string | null)
   );
 }
 
-function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssued: string | null): SummarySection {
+function buildPaymentsOrAgreements(
+  t: TFunction,
+  caseData: CcdCaseData,
+  dateIssued: string | null
+): SummarySection {
   const rows: SummaryRow[] = [];
-  const payment: PaymentAgreement | undefined = caseData.possessionClaimResponse?.defendantResponses?.paymentAgreement;
+  const payment: PaymentAgreement | undefined =
+    caseData.possessionClaimResponse?.defendantResponses?.paymentAgreement;
   if (!payment) {
     return { rows };
   }
@@ -372,15 +440,27 @@ function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssu
     claimantName: resolveClaimantName(caseData),
     claimIssueDate: resolveClaimIssueDate(caseData, dateIssued),
   };
-  pushRow(rows, t('viewTheResponse:payments.anyPaymentsMade', paymentLabelContext), yesNo(t, payment.anyPaymentsMade));
+  pushRow(
+    rows,
+    t('viewTheResponse:payments.anyPaymentsMade', paymentLabelContext),
+    yesNo(t, payment.anyPaymentsMade)
+  );
   pushRow(rows, t('viewTheResponse:payments.paymentDetails'), payment.paymentDetails);
   pushRow(
     rows,
     t('viewTheResponse:payments.repaymentPlanAgreed', paymentLabelContext),
     yesNoNotSure(t, payment.repaymentPlanAgreed)
   );
-  pushRow(rows, t('viewTheResponse:payments.repaymentAgreedDetails'), payment.repaymentAgreedDetails);
-  pushRow(rows, t('viewTheResponse:payments.repayArrearsInstalments'), yesNo(t, payment.repayArrearsInstalments));
+  pushRow(
+    rows,
+    t('viewTheResponse:payments.repaymentAgreedDetails'),
+    payment.repaymentAgreedDetails
+  );
+  pushRow(
+    rows,
+    t('viewTheResponse:payments.repayArrearsInstalments'),
+    yesNo(t, payment.repayArrearsInstalments)
+  );
   if (payment.additionalRentContribution || payment.additionalContributionFrequency) {
     pushRow(
       rows,
@@ -404,21 +484,45 @@ function buildHouseholdAndCircumstances(t: TFunction, caseData: CcdCaseData): Su
     return { rows };
   }
   pushRow(rows, t('viewTheResponse:household.dependantChildren'), yesNo(t, hc.dependantChildren));
-  pushRow(rows, t('viewTheResponse:household.dependantChildrenDetails'), hc.dependantChildrenDetails);
+  pushRow(
+    rows,
+    t('viewTheResponse:household.dependantChildrenDetails'),
+    hc.dependantChildrenDetails
+  );
   pushRow(rows, t('viewTheResponse:household.otherDependants'), yesNo(t, hc.otherDependants));
   pushRow(rows, t('viewTheResponse:household.otherDependantDetails'), hc.otherDependantDetails);
   pushRow(rows, t('viewTheResponse:household.otherTenants'), yesNo(t, hc.otherTenants));
   pushRow(rows, t('viewTheResponse:household.otherTenantsDetails'), hc.otherTenantsDetails);
-  pushRow(rows, t('viewTheResponse:household.alternativeAccommodation'), yesNoNotSure(t, hc.alternativeAccommodation));
+  pushRow(
+    rows,
+    t('viewTheResponse:household.alternativeAccommodation'),
+    yesNoNotSure(t, hc.alternativeAccommodation)
+  );
   pushRow(
     rows,
     t('viewTheResponse:household.alternativeAccommodationDate'),
     formatGdsDate(hc.alternativeAccommodationTransferDate) ?? ''
   );
-  pushRow(rows, t('viewTheResponse:household.shareAdditional'), yesNo(t, hc.shareAdditionalCircumstances));
-  pushRow(rows, t('viewTheResponse:household.additionalDetails'), hc.additionalCircumstancesDetails);
-  pushRow(rows, t('viewTheResponse:household.exceptionalHardship'), yesNo(t, hc.exceptionalHardship));
-  pushRow(rows, t('viewTheResponse:household.exceptionalHardshipDetails'), hc.exceptionalHardshipDetails);
+  pushRow(
+    rows,
+    t('viewTheResponse:household.shareAdditional'),
+    yesNo(t, hc.shareAdditionalCircumstances)
+  );
+  pushRow(
+    rows,
+    t('viewTheResponse:household.additionalDetails'),
+    hc.additionalCircumstancesDetails
+  );
+  pushRow(
+    rows,
+    t('viewTheResponse:household.exceptionalHardship'),
+    yesNo(t, hc.exceptionalHardship)
+  );
+  pushRow(
+    rows,
+    t('viewTheResponse:household.exceptionalHardshipDetails'),
+    hc.exceptionalHardshipDetails
+  );
   return { rows };
 }
 
@@ -451,12 +555,23 @@ function buildRegularIncome(t: TFunction, caseData: CcdCaseData): SummarySection
     hc.incomeFromJobsFrequency,
     'viewTheResponse:income.fromJobs'
   );
-  buildIncomeRow(t, rows, hc.pension, hc.pensionAmount, hc.pensionFrequency, 'viewTheResponse:income.pension');
+  buildIncomeRow(
+    t,
+    rows,
+    hc.pension,
+    hc.pensionAmount,
+    hc.pensionFrequency,
+    'viewTheResponse:income.pension'
+  );
   if (isYes(hc.universalCredit)) {
     pushRow(
       rows,
       t('viewTheResponse:income.universalCredit'),
-      formatIncomeValue(t, hc.universalCreditAmount ?? undefined, hc.universalCreditFrequency ?? undefined)
+      formatIncomeValue(
+        t,
+        hc.universalCreditAmount ?? undefined,
+        hc.universalCreditFrequency ?? undefined
+      )
     );
   } else if (isYes(hc.hasAppliedForUniversalCredit)) {
     pushRow(rows, t('viewTheResponse:income.universalCreditApplied'), t('common:options.yes'));
@@ -477,7 +592,11 @@ function buildRegularIncome(t: TFunction, caseData: CcdCaseData): SummarySection
     'viewTheResponse:income.otherBenefits'
   );
   pushRow(rows, t('viewTheResponse:income.moneyFromElsewhere'), yesNo(t, hc.moneyFromElsewhere));
-  pushRow(rows, t('viewTheResponse:income.moneyFromElsewhereDetails'), hc.moneyFromElsewhereDetails);
+  pushRow(
+    rows,
+    t('viewTheResponse:income.moneyFromElsewhereDetails'),
+    hc.moneyFromElsewhereDetails
+  );
   return { rows };
 }
 
@@ -523,10 +642,20 @@ function buildRegularExpenses(t: TFunction, caseData: CcdCaseData): SummarySecti
   }
   buildExpenseRow(t, rows, hc.householdBills, 'viewTheResponse:expenses.householdBills');
   buildExpenseRow(t, rows, hc.loanPayments, 'viewTheResponse:expenses.loanPayments');
-  buildExpenseRow(t, rows, hc.childSpousalMaintenance, 'viewTheResponse:expenses.childSpousalMaintenance');
+  buildExpenseRow(
+    t,
+    rows,
+    hc.childSpousalMaintenance,
+    'viewTheResponse:expenses.childSpousalMaintenance'
+  );
   buildExpenseRow(t, rows, hc.mobilePhone, 'viewTheResponse:expenses.mobilePhone');
   buildExpenseRow(t, rows, hc.groceryShopping, 'viewTheResponse:expenses.groceryShopping');
-  buildExpenseRow(t, rows, hc.fuelParkingTransport, 'viewTheResponse:expenses.fuelParkingTransport');
+  buildExpenseRow(
+    t,
+    rows,
+    hc.fuelParkingTransport,
+    'viewTheResponse:expenses.fuelParkingTransport'
+  );
   buildExpenseRow(t, rows, hc.schoolCosts, 'viewTheResponse:expenses.schoolCosts');
   buildExpenseRow(t, rows, hc.clothing, 'viewTheResponse:expenses.clothing');
   buildExpenseRow(t, rows, hc.otherExpenses, 'viewTheResponse:expenses.other');
@@ -536,8 +665,16 @@ function buildRegularExpenses(t: TFunction, caseData: CcdCaseData): SummarySecti
 function buildAdditionalInformation(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
-  pushRow(rows, t('viewTheResponse:additional.otherConsiderations'), yesNo(t, responses?.otherConsiderations));
-  pushRow(rows, t('viewTheResponse:additional.otherConsiderationsDetails'), responses?.otherConsiderationsDetails);
+  pushRow(
+    rows,
+    t('viewTheResponse:additional.otherConsiderations'),
+    yesNo(t, responses?.otherConsiderations)
+  );
+  pushRow(
+    rows,
+    t('viewTheResponse:additional.otherConsiderationsDetails'),
+    responses?.otherConsiderationsDetails
+  );
   return { rows };
 }
 
@@ -551,7 +688,10 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
   const cc: CcdCounterClaim = responses.counterClaim;
 
   if (cc.claimType) {
-    const typeLabel = t(`viewTheResponse:counterclaim.claimTypeOptions.${cc.claimType}`, cc.claimType);
+    const typeLabel = t(
+      `viewTheResponse:counterclaim.claimTypeOptions.${cc.claimType}`,
+      cc.claimType
+    );
     pushRow(rows, t('viewTheResponse:counterclaim.type'), typeLabel);
   }
 
@@ -569,7 +709,11 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
     }
   }
 
-  pushRow(rows, t('viewTheResponse:counterclaim.against'), formatCounterClaimParties(cc.counterClaimAgainst));
+  pushRow(
+    rows,
+    t('viewTheResponse:counterclaim.against'),
+    formatCounterClaimParties(cc.counterClaimAgainst)
+  );
   pushRow(rows, t('viewTheResponse:counterclaim.for'), cc.counterClaimFor);
   pushRow(rows, t('viewTheResponse:counterclaim.reasons'), cc.counterClaimReasons);
   pushRow(rows, t('viewTheResponse:counterclaim.ordersRequested'), cc.otherOrderRequestDetails);
@@ -605,69 +749,79 @@ function resolveResponsePdfUrl(caseData: CcdCaseData, caseReference: string): st
 }
 
 export default function viewTheResponseRoutes(app: Application): void {
-  app.get(VIEW_RESPONSE_ROUTE, oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
-    const rawRef = req.params?.caseReference;
-    const caseReference =
-      typeof rawRef === 'string' || typeof rawRef === 'number' ? sanitiseCaseReference(rawRef) : null;
+  app.get(
+    VIEW_RESPONSE_ROUTE,
+    oidcMiddleware,
+    async (req: Request, res: Response, next: NextFunction) => {
+      const rawRef = req.params?.caseReference;
+      const caseReference =
+        typeof rawRef === 'string' || typeof rawRef === 'number'
+          ? sanitiseCaseReference(rawRef)
+          : null;
 
-    if (!caseReference) {
-      logger.error('Invalid case reference format', { caseReference: rawRef });
-      return next(new HTTPError('Invalid case reference format', 404));
-    }
-
-    const accessToken = req.session.user?.accessToken;
-    if (!accessToken) {
-      logger.error('viewTheResponse: user not authenticated - no access token');
-      return next(new HTTPError('Authentication required', 401));
-    }
-
-    try {
-      const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
-      const caseData = ccdCase.data;
-      const responses = caseData.possessionClaimResponse?.defendantResponses;
-
-      if (!responses) {
-        return next(new HTTPError('Defendant response not found', 404));
+      if (!caseReference) {
+        logger.error('Invalid case reference format', { caseReference: rawRef });
+        return next(new HTTPError('Invalid case reference format', 404));
       }
 
-      const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
-      const release12Enabled = await isRespondToClaimEnabledForRelease(req);
-      const showExemptLandlord = release12Enabled && isWalesProperty(caseData);
+      const accessToken = req.session.user?.accessToken;
+      if (!accessToken) {
+        logger.error('viewTheResponse: user not authenticated - no access token');
+        return next(new HTTPError('Authentication required', 401));
+      }
 
-      const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
-      const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
-      const completedBy = responses?.statementOfTruthCompletedBy;
-      const responsePdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_2_ENABLED, false);
+      try {
+        const ccdCase = await ccdCaseService.getCaseById(accessToken, caseReference);
+        const caseData = ccdCase.data;
+        const responses = caseData.possessionClaimResponse?.defendantResponses;
 
-      const sections = {
-        claimantDetails: buildClaimantDetails(t, caseData),
-        defendant1Details: buildDefendant1Details(t, caseData),
-        additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData),
-        responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord),
-        paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
-        householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
-        regularIncome: buildRegularIncome(t, caseData),
-        priorityDebts: buildPriorityDebts(t, caseData),
-        regularExpenses: buildRegularExpenses(t, caseData),
-        additionalInformation: buildAdditionalInformation(t, caseData),
-        counterclaim: buildCounterclaim(t, caseData),
-      };
+        if (!responses) {
+          return next(new HTTPError('Defendant response not found', 404));
+        }
 
-      return res.render('view-the-response', {
-        t,
-        propertyAddress: formatAddress(caseData.propertyAddress),
-        caseReferenceDisplay: caseReference.replace(/(\d{4})(?=\d)/g, '$1 '),
-        caseDates: buildCaseDatesSummary(t, dateSubmitted, dateIssued),
-        statementOfTruth: buildStatementOfTruthSummary(t, completedBy),
-        dateSubmitted,
-        ...sections,
-        dashboardUrl: getDashboardUrl(caseReference),
-        viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
-        responsePdfUrl: responsePdfEnabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
-      });
-    } catch (e) {
-      logger.error(`Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`);
-      return next(e);
+        const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
+        const release12Enabled = await isRespondToClaimEnabledForRelease(req);
+        const showExemptLandlord = release12Enabled && isWalesProperty(caseData);
+
+        const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
+        const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
+        const completedBy = responses?.statementOfTruthCompletedBy;
+        const responsePdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_2_ENABLED, false);
+
+        const sections = {
+          claimantDetails: buildClaimantDetails(t, caseData),
+          defendant1Details: buildDefendant1Details(t, caseData),
+          additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData),
+          responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord),
+          paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
+          householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
+          regularIncome: buildRegularIncome(t, caseData),
+          priorityDebts: buildPriorityDebts(t, caseData),
+          regularExpenses: buildRegularExpenses(t, caseData),
+          additionalInformation: buildAdditionalInformation(t, caseData),
+          counterclaim: buildCounterclaim(t, caseData),
+        };
+
+        return res.render('view-the-response', {
+          t,
+          propertyAddress: formatAddress(caseData.propertyAddress),
+          caseReferenceDisplay: caseReference.replace(/(\d{4})(?=\d)/g, '$1 '),
+          caseDates: buildCaseDatesSummary(t, dateSubmitted, dateIssued),
+          statementOfTruth: buildStatementOfTruthSummary(t, completedBy),
+          dateSubmitted,
+          ...sections,
+          dashboardUrl: getDashboardUrl(caseReference),
+          viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
+          responsePdfUrl: responsePdfEnabled
+            ? resolveResponsePdfUrl(caseData, caseReference)
+            : undefined,
+        });
+      } catch (e) {
+        logger.error(
+          `Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`
+        );
+        return next(e);
+      }
     }
-  });
+  );
 }

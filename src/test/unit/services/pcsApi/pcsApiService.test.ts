@@ -1,6 +1,10 @@
 import config from 'config';
 
-import { getCitizenClaims, getRootGreeting, validateAccessCode } from '@services/pcsApi/pcsApiService';
+import {
+  getCitizenClaims,
+  getRootGreeting,
+  validateAccessCode,
+} from '@services/pcsApi/pcsApiService';
 
 jest.mock('config', () => ({
   get: jest.fn(),
@@ -103,7 +107,13 @@ describe('pcsApiService', () => {
     const accessToken = 'test-access-token';
 
     test('returns array of claims on success', async () => {
-      const claims = [{ caseReference: '1234567890123456', claimantName: 'John Doe', propertyPostcode: 'SW1A 1AA' }];
+      const claims = [
+        {
+          caseReference: '1234567890123456',
+          claimantName: 'John Doe',
+          propertyPostcode: 'SW1A 1AA',
+        },
+      ];
       mockHttp.get.mockResolvedValue({ data: claims });
 
       const result = await getCitizenClaims(accessToken);
@@ -116,7 +126,9 @@ describe('pcsApiService', () => {
 
     test('throws when response data is not an array', async () => {
       mockHttp.get.mockResolvedValue({ data: null });
-      await expect(getCitizenClaims(accessToken)).rejects.toThrow('Unexpected response from citizen-claims endpoint');
+      await expect(getCitizenClaims(accessToken)).rejects.toThrow(
+        'Unexpected response from citizen-claims endpoint'
+      );
     });
   });
 });

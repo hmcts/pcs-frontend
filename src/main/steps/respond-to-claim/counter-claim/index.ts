@@ -1,6 +1,9 @@
 import type { Request } from 'express';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 import { purgeUploadedDocumentsFromCdam } from '../utils';
 import { DocumentType } from '../utils/purgeUploadedDocuments';
@@ -87,7 +90,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   extendGetContent: async (req: Request) => {
     const counterClaimFlatFeeFEE0450 = await getFee(FeeType.counterClaimFlatFeeFEE0450);
     const caseData = req.res?.locals.validatedCase?.data;
-    const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
+    const claimantName =
+      (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
     return { counterClaimFlatFeeFEE0450, claimantName };
   },
 });

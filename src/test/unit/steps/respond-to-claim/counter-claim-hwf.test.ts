@@ -135,7 +135,10 @@ describe('respond-to-claim counter-claim-have-you-applied-for-help', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const fields = (step as any).fields as {
         name: string;
-        options?: { value: string; subFields?: Record<string, { maxLength?: number; errorMessage?: string }> }[];
+        options?: {
+          value: string;
+          subFields?: Record<string, { maxLength?: number; errorMessage?: string }>;
+        }[];
       }[];
       const alreadyAppliedField = fields.find(f => f.name === 'alreadyAppliedForHelp');
       const yesOption = alreadyAppliedField?.options?.find(o => o.value === 'yes');
@@ -267,7 +270,8 @@ describe('respond-to-claim counter-claim HWF show conditions', () => {
   });
 
   describe('counter-claim-you-need-to-apply showCondition', () => {
-    const showCondition = flowConfig.steps['counter-claim-you-need-to-apply-for-help-with-your-fees']?.showCondition;
+    const showCondition =
+      flowConfig.steps['counter-claim-you-need-to-apply-for-help-with-your-fees']?.showCondition;
 
     const makeNeedToApplyReq = (
       counterClaim: { needHelpWithFees?: string; appliedForHwf?: string } | undefined
@@ -289,11 +293,15 @@ describe('respond-to-claim counter-claim HWF show conditions', () => {
     });
 
     it('is visible when needHelpWithFees is YES and appliedForHwf is NO', () => {
-      expect(showCondition?.(makeNeedToApplyReq({ needHelpWithFees: 'YES', appliedForHwf: 'NO' }))).toBe(true);
+      expect(
+        showCondition?.(makeNeedToApplyReq({ needHelpWithFees: 'YES', appliedForHwf: 'NO' }))
+      ).toBe(true);
     });
 
     it('is not visible when appliedForHwf is YES', () => {
-      expect(showCondition?.(makeNeedToApplyReq({ needHelpWithFees: 'YES', appliedForHwf: 'YES' }))).toBe(false);
+      expect(
+        showCondition?.(makeNeedToApplyReq({ needHelpWithFees: 'YES', appliedForHwf: 'YES' }))
+      ).toBe(false);
     });
 
     it('is not visible when needHelpWithFees is not YES', () => {
@@ -306,7 +314,8 @@ describe('respond-to-claim counter-claim HWF show conditions', () => {
   });
 
   describe('counter-claim-have-you-applied-for-help showCondition', () => {
-    const showCondition = flowConfig.steps['counter-claim-have-you-applied-for-help']?.showCondition;
+    const showCondition =
+      flowConfig.steps['counter-claim-have-you-applied-for-help']?.showCondition;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const makeNeedHelpReq = (needHelpWithFees: string | undefined): any => ({

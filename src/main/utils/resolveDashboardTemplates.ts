@@ -13,7 +13,12 @@ export interface ResolvedTask {
 
 const MISSING_TRANSLATION_KEY_VALUE = '__MISSING_TRANSLATION__';
 
-export function lookup(t: TFunction, key: string, values: Record<string, unknown> = {}, escape = false): string | null {
+export function lookup(
+  t: TFunction,
+  key: string,
+  values: Record<string, unknown> = {},
+  escape = false
+): string | null {
   const translated = t(key, {
     defaultValue: MISSING_TRANSLATION_KEY_VALUE,
     interpolation: { escapeValue: escape },
@@ -22,7 +27,10 @@ export function lookup(t: TFunction, key: string, values: Record<string, unknown
   return translated === MISSING_TRANSLATION_KEY_VALUE ? null : translated;
 }
 
-const withCaseRef = (values: Record<string, unknown>, caseReference: string) => ({ caseReference, ...values });
+const withCaseRef = (values: Record<string, unknown>, caseReference: string) => ({
+  caseReference,
+  ...values,
+});
 
 function withFeeAmountAsNumber(values: Record<string, unknown>): Record<string, unknown> {
   const feeAmount = values.feeAmount;

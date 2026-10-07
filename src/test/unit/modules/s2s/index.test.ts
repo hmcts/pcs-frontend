@@ -117,7 +117,10 @@ describe('S2S', () => {
       await s2s.enableFor(mockApp);
 
       expect(mockRedisClient.duplicate).toHaveBeenCalled();
-      expect(mockSubscriber.subscribe).toHaveBeenCalledWith('s2s-token-update', expect.any(Function));
+      expect(mockSubscriber.subscribe).toHaveBeenCalledWith(
+        's2s-token-update',
+        expect.any(Function)
+      );
       expect(mockSubscriber.on).toHaveBeenCalledWith('message', expect.any(Function));
     }, 5000);
 
@@ -204,7 +207,10 @@ describe('S2S', () => {
       mockSubscriber.unsubscribe.mockRejectedValue(new Error('Cleanup error'));
       await s2s.cleanup();
 
-      expect(mockLogger.error).toHaveBeenCalledWith('Error cleaning up S2S Redis subscriber:', expect.any(Error));
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        'Error cleaning up S2S Redis subscriber:',
+        expect.any(Error)
+      );
     }, 5000);
   });
 

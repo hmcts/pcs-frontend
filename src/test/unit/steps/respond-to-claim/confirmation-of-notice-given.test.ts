@@ -101,7 +101,10 @@ describe('confirmation-of-notice-given step', () => {
                 noticeDocuments: [
                   {
                     id: 'notice-doc-123',
-                    value: { document_filename: 'notice.pdf', document_binary_url: 'http://dm-store/binary' },
+                    value: {
+                      document_filename: 'notice.pdf',
+                      document_binary_url: 'http://dm-store/binary',
+                    },
                   },
                 ],
               },

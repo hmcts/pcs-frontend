@@ -38,10 +38,7 @@ export class GenAppsAction implements IAction {
       ['confirmYouHaveAppliedForFeeHelp', () => this.confirmYouHaveAppliedForFeeHelp(fieldName as actionRecord)],
       ['confirmOtherPartiesAgreed', () => this.confirmOtherPartiesAgreed(fieldName as actionRecord)],
       ['confirmOrderDoYouWant', () => this.confirmOrderDoYouWant(fieldName as actionRecord)],
-      [
-        'reasonsApplicationShouldNotBeShared',
-        () => this.reasonsApplicationShouldNotBeShared(fieldName as actionRecord),
-      ],
+      ['reasonsApplicationShouldNotBeShared', () => this.reasonsApplicationShouldNotBeShared(fieldName as actionRecord)],
       ['selectLanguageUsedToComplete', () => this.selectLanguageUsedToComplete(fieldName as actionRecord)],
       ['confirmDocumentToUpload', () => this.confirmDocumentToUpload(fieldName as actionRecord)],
       ['uploadFilesGenApps', () => this.uploadFilesGenApps(page, fieldName as actionRecord)],
@@ -70,7 +67,7 @@ export class GenAppsAction implements IAction {
       option: chooseApp.option,
     });
     //FieldsStore.rename(chooseApp.question as string, 'Type of application');
-    await performAction('clickButton', chooseAnApplication.continueButton);
+    await performAction('When the user clicks the button', chooseAnApplication.continueButton);
   }
 
   private async confirmIfCourtHearingInNext14Days(courtHearing: actionRecord) {
@@ -79,7 +76,7 @@ export class GenAppsAction implements IAction {
       question: courtHearing.question,
       option: courtHearing.option,
     });
-    await performAction('clickButton', isTheCourtHearingInTheNext14Days.continueButton);
+    await performAction('When the user clicks the button', isTheCourtHearingInTheNext14Days.continueButton);
   }
 
   private async doYouNeedHelpPayingFee(feeHelp: actionRecord) {
@@ -88,7 +85,7 @@ export class GenAppsAction implements IAction {
       question: feeHelp.question,
       option: feeHelp.option,
     });
-    await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
+    await performAction('When the user clicks the button', doYouNeedHelpPayingTheFee.continueButton);
   }
 
   private async confirmYouHaveAppliedForFeeHelp(confirmFeeHelp: actionRecord) {
@@ -98,17 +95,14 @@ export class GenAppsAction implements IAction {
       option: confirmFeeHelp.option,
     });
     if (confirmFeeHelp.option === 'Yes') {
-      const userInput =
-        typeof confirmFeeHelp.input === 'number'
-          ? generateRandomString(confirmFeeHelp.input)
-          : (confirmFeeHelp.input as string);
+      const userInput = typeof confirmFeeHelp.input === 'number' ? generateRandomString(confirmFeeHelp.input) : (confirmFeeHelp.input as string);
       await performAction('inputText', confirmFeeHelp.label, userInput);
       FieldsStore.update(confirmFeeHelp.label as string, userInput);
       FieldsStore.rename(confirmFeeHelp.label as string, 'What is your Help with Fees reference number?');
     } else {
       FieldsStore.delete('What is your Help with Fees reference number?');
     }
-    await performAction('clickButton', haveYouAlreadyAppliedForHelpWithFees.continueButton);
+    await performAction('When the user clicks the button', haveYouAlreadyAppliedForHelpWithFees.continueButton);
   }
 
   private async confirmOtherPartiesAgreed(confirmOtherParty: actionRecord) {
@@ -117,7 +111,7 @@ export class GenAppsAction implements IAction {
       question: confirmOtherParty.question,
       option: confirmOtherParty.option,
     });
-    await performAction('clickButton', haveTheOtherPartiesAgreedToThisApplication.continueButton);
+    await performAction('When the user clicks the button', haveTheOtherPartiesAgreedToThisApplication.continueButton);
   }
 
   private async reasonsApplicationShouldNotBeShared(reason: actionRecord) {
@@ -127,26 +121,22 @@ export class GenAppsAction implements IAction {
       option: reason.option,
     });
     if (reason.option === 'Yes') {
-      const userInput =
-        typeof reason.input === 'number' ? generateRandomString(reason.input) : (reason.input as string);
+      const userInput = typeof reason.input === 'number' ? generateRandomString(reason.input) : (reason.input as string);
       await performAction('inputText', reason.label, userInput);
       FieldsStore.update(reason.label as string, userInput);
     } else {
       FieldsStore.delete(reason.label as string);
     }
-    await performAction('clickButton', areThereAnyReasonsThatThisApplicationShouldNotBeShared.continueButton);
+    await performAction('When the user clicks the button', areThereAnyReasonsThatThisApplicationShouldNotBeShared.continueButton);
   }
 
   private async confirmOrderDoYouWant(confirmOrder: actionRecord) {
     await performAction('recordUserEntry', confirmOrder);
-    const userInput =
-      typeof confirmOrder.input === 'number'
-        ? generateRandomString(confirmOrder.input)
-        : (confirmOrder.input as string);
+    const userInput = typeof confirmOrder.input === 'number' ? generateRandomString(confirmOrder.input) : (confirmOrder.input as string);
     await performAction('inputText', confirmOrder.label, userInput);
     FieldsStore.rename(confirmOrder.label as string, 'What order do you want the court to make and why?');
     FieldsStore.update('What order do you want the court to make and why?', userInput);
-    await performAction('clickButton', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
+    await performAction('When the user clicks the button', whatOrderDoYouWantTheCourtToMakeAndWhy.continueButton);
   }
 
   private async confirmDocumentToUpload(confirmUpload: actionRecord) {
@@ -155,7 +145,7 @@ export class GenAppsAction implements IAction {
       question: confirmUpload.question,
       option: confirmUpload.option,
     });
-    await performAction('clickButton', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
+    await performAction('When the user clicks the button', doYouWantToUploadDocumentsToSupportYourApplication.continueButton);
   }
 
   private async uploadFilesGenApps(page: Page, uploadDocs: actionRecord): Promise<void> {
@@ -169,7 +159,7 @@ export class GenAppsAction implements IAction {
       await expect(fileUploadSuccessMessage).toHaveText(`${fileName} has been uploaded`);
       FieldsStore.set('Upload documents', fileName);
     }
-    await performAction('clickButton', uploadDocumentsToSupportYourApplication.continueButton);
+    await performAction('When the user clicks the button', uploadDocumentsToSupportYourApplication.continueButton);
   }
 
   private async selectLanguageUsedToComplete(selectLanguageData: actionRecord) {
@@ -178,7 +168,7 @@ export class GenAppsAction implements IAction {
       question: selectLanguageData.question,
       option: selectLanguageData.option,
     });
-    await performAction('clickButton', whichLanguageDidYouUseToCompleteThisService.continueButton);
+    await performAction('When the user clicks the button', whichLanguageDidYouUseToCompleteThisService.continueButton);
   }
 
   private async selectStatementOfTruth(sot: actionRecord) {
@@ -196,15 +186,13 @@ export class GenAppsAction implements IAction {
 
     const payOrSubmit = value === 'Yes' || value1 === 'No';
 
-    const button = payOrSubmit
-      ? checkYourAnswersGenApps.submitHiddenButton
-      : checkYourAnswersGenApps.continueToPaymentHiddenButton;
+    const button = payOrSubmit ? checkYourAnswersGenApps.submitHiddenButton : checkYourAnswersGenApps.continueToPaymentHiddenButton;
 
-    await performAction('clickButton', button);
+    await performAction('When the user clicks the button', button);
   }
 
   private async payForApplication() {
-    await performAction('clickButton', payForYourApplication.continueToPaymentButton);
+    await performAction('When the user clicks the button', payForYourApplication.continueToPaymentButton);
   }
 
   private async inputPaymentDetails(inputDetails: actionRecord) {
@@ -220,17 +208,17 @@ export class GenAppsAction implements IAction {
       ['inputText', inputDetails.postcodeLabel, inputDetails.postcode],
       ['inputText', inputDetails.emailLabel, inputDetails.email]
     );
-    await performAction('clickButton', paymentDetails.continueButton);
+    await performAction('When the user clicks the button', paymentDetails.continueButton);
   }
 
   private async confirmPayment() {
-    await performValidation('mainHeader', confirmYourPayment.mainHeader);
-    await performAction('clickButton', confirmYourPayment.confirmPaymentButton);
+    await performValidation('Then the user sees the main header', confirmYourPayment.mainHeader);
+    await performAction('When the user clicks the button', confirmYourPayment.confirmPaymentButton);
   }
 
   private async verifyApplicationSubmitted(): Promise<void> {
-    await performValidation('mainHeader', applicationSubmitted.mainHeader);
-    await performAction('clickButton', applicationSubmitted.closeAndReturnToCaseOverviewButton);
+    await performValidation('Then the user sees the main header', applicationSubmitted.mainHeader);
+    await performAction('When the user clicks the button', applicationSubmitted.closeAndReturnToCaseOverviewButton);
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
@@ -239,28 +227,20 @@ export class GenAppsAction implements IAction {
     for (const item of inputs) {
       switch (validationArr.validationType) {
         case 'radioOptions':
-          await performAction('clickButton', validationArr.button);
-          await performValidation(
-            'errorMessage',
-            !validationArr?.header ? (validationArr.header = 'There is a problem') : validationArr.header,
-            item.errMessage
-          );
+          await performAction('When the user clicks the button', validationArr.button);
+          await performValidation('errorMessage', !validationArr?.header ? (validationArr.header = 'There is a problem') : validationArr.header, item.errMessage);
           await performAction('clickRadioButton', { question: validationArr.question, option: validationArr.option });
           break;
 
         case 'textField':
           await performAction('inputText', validationArr.label, generateRandomString(item.input));
-          await performAction('clickButton', validationArr.button);
+          await performAction('When the user clicks the button', validationArr.button);
           await performValidation('errorMessage', validationArr.label, item.errMessage);
           break;
 
         case 'checkBox':
-          await performAction('clickButton', validationArr.button);
-          await performValidation(
-            'errorMessage',
-            !validationArr?.header ? (validationArr.header = 'There is a problem') : validationArr.header,
-            item.errMessage
-          );
+          await performAction('When the user clicks the button', validationArr.button);
+          await performValidation('errorMessage', !validationArr?.header ? (validationArr.header = 'There is a problem') : validationArr.header, item.errMessage);
           await performAction('check', { question: validationArr.question, option: validationArr.option });
           break;
       }
@@ -386,12 +366,7 @@ export class GenAppsAction implements IAction {
 
   private async updatePreviouslyAnsweredPage(page: Page) {
     const currentPage = stringToCamelCase(
-      await page
-        .locator(
-          'legend h1.govuk-fieldset__heading, h1.govuk-heading-xl, h1.govuk-heading-l, h1.govuk-heading-m, legend.govuk-fieldset__legend--l'
-        )
-        .first()
-        .innerText()
+      await page.locator('legend h1.govuk-fieldset__heading, h1.govuk-heading-xl, h1.govuk-heading-l, h1.govuk-heading-m, legend.govuk-fieldset__legend--l').first().innerText()
     );
 
     switch (currentPage) {
@@ -405,13 +380,13 @@ export class GenAppsAction implements IAction {
           option: option1,
         });
         if (option1 === 'Yes') {
-          await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+          await performValidation('Then the user sees the main header', doYouNeedHelpPayingTheFee.mainHeader);
           await performAction('doYouNeedHelpPayingFee', {
             question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
             option: doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption,
           });
         } else {
-          await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+          await performValidation('Then the user sees the main header', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
           FieldsStore.deleteKeys([
             doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
             haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
@@ -423,8 +398,7 @@ export class GenAppsAction implements IAction {
       }
       case 'doYouNeedHelpPayingTheFeeForThisApplication': {
         const feeOption1 =
-          FieldsStore.get(doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion as string) ===
-          'I need help paying the fee'
+          FieldsStore.get(doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion as string) === 'I need help paying the fee'
             ? doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption
             : doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption;
         await performAction('doYouNeedHelpPayingFee', {
@@ -432,12 +406,9 @@ export class GenAppsAction implements IAction {
           option: feeOption1,
         });
         if (feeOption1 !== 'I need help paying the fee') {
-          FieldsStore.deleteKeys([
-            haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
-            'What is your Help with Fees reference number?',
-          ]);
+          FieldsStore.deleteKeys([haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion, 'What is your Help with Fees reference number?']);
         } else {
-          await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
+          await performValidation('Then the user sees the main header', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
           await performAction('confirmYouHaveAppliedForFeeHelp', {
             question: haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
             option: haveYouAlreadyAppliedForHelpWithFees.yesRadioOption,
@@ -445,7 +416,7 @@ export class GenAppsAction implements IAction {
             input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
           });
         }
-        await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+        await performValidation('Then the user sees the main header', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
         break;
       }
       case 'whatOrderDoYouWantTheCourtToMakeAndWhy': {
@@ -454,7 +425,7 @@ export class GenAppsAction implements IAction {
           label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
           input: whatOrderDoYouWantTheCourtToMakeAndWhy.whatYouWantTheCourtToDoTextInput,
         });
-        await performValidation('mainHeader', doYouWantToUploadDocumentsToSupportYourApplication.mainHeader);
+        await performValidation('Then the user sees the main header', doYouWantToUploadDocumentsToSupportYourApplication.mainHeader);
         break;
       }
       case 'haveYouAlreadyAppliedForHelpWithYourApplicationFee': {
@@ -465,7 +436,7 @@ export class GenAppsAction implements IAction {
           label: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceHiddenTextLabel,
           input: haveYouAlreadyAppliedForHelpWithFees.hwfReferenceTextInput,
         });
-        await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
+        await performValidation('Then the user sees the main header', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
         break;
       }
 
@@ -489,7 +460,7 @@ export class GenAppsAction implements IAction {
       expect(onAllowedPage, `Expected: ${expectedPage}, Actual: ${currentUrl}`).toBeTruthy();
 
       const navButton = !currentUrl.includes('ask') ? 'Continue' : 'Start now';
-      await performAction('clickButton', navButton);
+      await performAction('When the user clicks the button', navButton);
     }
 
     throw new Error('Exceeded maximum steps before reaching CYA');

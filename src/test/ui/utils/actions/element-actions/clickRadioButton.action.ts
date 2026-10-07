@@ -30,19 +30,10 @@ export class ClickRadioButtonAction implements IAction {
   }
 
   private radioInFieldset(page: Page, question: string, option: string, idx: number): Locator {
-    return page
-      .locator('fieldset')
-      .filter({ hasText: question })
-      .nth(idx)
-      .getByRole('radio', { name: option, exact: true });
+    return page.locator('fieldset').filter({ hasText: question }).nth(idx).getByRole('radio', { name: option, exact: true });
   }
 
   private radioNearQuestionLabel(page: Page, question: string, option: string, idx: number): Locator {
-    return page
-      .locator(QUESTION_LABEL_SELECTOR)
-      .filter({ hasText: question })
-      .nth(idx)
-      .locator('..')
-      .getByRole('radio', { name: option, exact: true });
+    return page.locator(QUESTION_LABEL_SELECTOR).filter({ hasText: question }).nth(idx).locator('..').getByRole('radio', { name: option, exact: true });
   }
 }

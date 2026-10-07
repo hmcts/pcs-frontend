@@ -78,7 +78,9 @@ describe('recordErrorsOnActiveSpan', () => {
   it('serialises a non-string message', () => {
     transform({ level: 'error', message: { status: 502 } });
 
-    expect(span.recordException).toHaveBeenCalledWith(expect.objectContaining({ message: '{"status":502}' }));
+    expect(span.recordException).toHaveBeenCalledWith(
+      expect.objectContaining({ message: '{"status":502}' })
+    );
   });
 
   it('falls back to String() when the message cannot be serialised', () => {
@@ -87,7 +89,9 @@ describe('recordErrorsOnActiveSpan', () => {
 
     transform({ level: 'error', message: circular });
 
-    expect(span.recordException).toHaveBeenCalledWith(expect.objectContaining({ message: '[object Object]' }));
+    expect(span.recordException).toHaveBeenCalledWith(
+      expect.objectContaining({ message: '[object Object]' })
+    );
   });
 
   it('appends url, case reference and error context to the message', () => {
@@ -126,7 +130,12 @@ describe('recordErrorsOnActiveSpan', () => {
   });
 
   it('keeps the record name and stack when they are present', () => {
-    transform({ level: 'error', message: 'Timed out', name: 'TimeoutError', stack: 'at somewhere' });
+    transform({
+      level: 'error',
+      message: 'Timed out',
+      name: 'TimeoutError',
+      stack: 'at somewhere',
+    });
 
     expect(span.recordException).toHaveBeenCalledWith({
       name: 'TimeoutError',
@@ -138,7 +147,9 @@ describe('recordErrorsOnActiveSpan', () => {
   it('treats a stringified undefined stack as no stack', () => {
     transform({ level: 'error', message: 'No stack', stack: 'undefined' });
 
-    expect(span.recordException).toHaveBeenCalledWith(expect.objectContaining({ stack: undefined }));
+    expect(span.recordException).toHaveBeenCalledWith(
+      expect.objectContaining({ stack: undefined })
+    );
   });
 
   it('never lets a failing span break logging', () => {

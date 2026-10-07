@@ -15,7 +15,10 @@ type PartyFixture = {
   allDefendants?: { id: string; value: Record<string, unknown> }[];
 };
 
-const makeReq = (counterClaim: Record<string, unknown> | undefined, parties?: PartyFixture): FakeReq => {
+const makeReq = (
+  counterClaim: Record<string, unknown> | undefined,
+  parties?: PartyFixture
+): FakeReq => {
   const possessionClaimResponse: Record<string, unknown> = {
     defendantResponses: {
       counterClaim,

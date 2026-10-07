@@ -1,4 +1,7 @@
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -54,7 +57,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
                 const businessRegex = /^0[389]\d{9}$/;
 
-                if (mobileRegex.test(normalized) || landlineRegex.test(normalized) || businessRegex.test(normalized)) {
+                if (
+                  mobileRegex.test(normalized) ||
+                  landlineRegex.test(normalized) ||
+                  businessRegex.test(normalized)
+                ) {
                   return true;
                 }
 
@@ -96,7 +103,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     if (contactByTelephone === 'yes') {
       response.defendantResponses.contactByPhone = 'YES';
-      const phoneNumber = (req.body?.['contactByTelephone.phoneNumber'] as string | undefined)?.trim();
+      const phoneNumber = (
+        req.body?.['contactByTelephone.phoneNumber'] as string | undefined
+      )?.trim();
       if (phoneNumber) {
         response.defendantContactDetails.party.phoneNumber = phoneNumber;
         response.defendantContactDetails.party.phoneNumberProvided = 'YES';

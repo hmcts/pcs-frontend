@@ -11,7 +11,9 @@ const journeyBase = `/case/${caseId}/respond-to-claim`;
 describe('postSubmissionRouting', () => {
   describe('getRespondToClaimConfirmationPath', () => {
     it('returns response-submitted when there is no counterclaim', () => {
-      expect(getRespondToClaimConfirmationPath(caseId, undefined)).toBe(`${journeyBase}/response-submitted`);
+      expect(getRespondToClaimConfirmationPath(caseId, undefined)).toBe(
+        `${journeyBase}/response-submitted`
+      );
       expect(
         getRespondToClaimConfirmationPath(caseId, {
           possessionClaimResponse: { defendantResponses: { makeCounterClaim: 'NO' } },
@@ -70,7 +72,9 @@ describe('postSubmissionRouting', () => {
       } as CcdCaseData);
 
       expect(navigation.counterClaimFeePaymentRequired).toBe(false);
-      expect(navigation.confirmationPath).toBe(`${journeyBase}/response-submitted-counter-claim-fee-payment-needed`);
+      expect(navigation.confirmationPath).toBe(
+        `${journeyBase}/response-submitted-counter-claim-fee-payment-needed`
+      );
     });
   });
 });

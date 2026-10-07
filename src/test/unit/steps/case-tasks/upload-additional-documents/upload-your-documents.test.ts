@@ -5,7 +5,10 @@ jest.mock('../../../../../main/modules/steps', () => ({
 
 import type { Request } from 'express';
 
-import type { DisplayDocument, DocumentStorage } from '../../../../../main/modules/documents/storage';
+import type {
+  DisplayDocument,
+  DocumentStorage,
+} from '../../../../../main/modules/documents/storage';
 import { step } from '../../../../../main/steps/case-tasks/upload-additional-documents/upload-your-documents';
 
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';

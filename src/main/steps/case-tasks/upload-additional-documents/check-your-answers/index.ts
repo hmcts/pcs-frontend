@@ -23,8 +23,11 @@ const logger = Logger.getLogger('uploadAdditionalDocumentsCheckYourAnswers');
 
 const journeyName = 'uploadAdditionalDocuments';
 const stepName = 'check-your-answers';
-const templatePath = 'case-tasks/upload-additional-documents/check-your-answers/checkYourAnswers.njk';
-const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
+const templatePath =
+  'case-tasks/upload-additional-documents/check-your-answers/checkYourAnswers.njk';
+const stepNavigation = createStepNavigation(
+  req => getFlowConfigForJourney(journeyName, req) || flowConfig
+);
 const uploadStorage = sessionDocs({ stepName: uploadYourDocumentsStep });
 
 async function getCheckYourAnswersContent(req: Request) {
@@ -36,7 +39,9 @@ async function getCheckYourAnswersContent(req: Request) {
 
   return {
     dashboardUrl: getDashboardUrl(caseId),
-    cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
+    cancelUrl: caseId
+      ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId))
+      : '',
     url: req.originalUrl || '',
     documents,
     hasRelatedApplication,
@@ -59,7 +64,9 @@ export const step: StepDefinition = {
 
       return {
         dashboardUrl: getDashboardUrl(caseId),
-        cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
+        cancelUrl: caseId
+          ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId))
+          : '',
         url: req.originalUrl || '',
         documents,
         hasRelatedApplication,
@@ -82,7 +89,9 @@ export const step: StepDefinition = {
       const confirmData = getFormData(req, 'confirm-if-these-documents-relate-to-an-application');
       const relatedApplicationId = confirmData?.relatedApplicationId as string | undefined;
       const selectedRelatedApplicationId =
-        relatedApplicationId && relatedApplicationId !== MAIN_CLAIM_OPTION_VALUE ? relatedApplicationId : undefined;
+        relatedApplicationId && relatedApplicationId !== MAIN_CLAIM_OPTION_VALUE
+          ? relatedApplicationId
+          : undefined;
 
       try {
         await ccdCaseService.submitUploadDocuments(req.session?.user?.accessToken, {

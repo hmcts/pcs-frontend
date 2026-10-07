@@ -1,5 +1,8 @@
 import { normalizeYesNoValue } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -7,7 +10,9 @@ import { getTranslation, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { YesNoValue } from '@services/ccdCase.interface';
 
-function repayArrearsInstalmentsFromConfirmOffer(value: string | undefined): YesNoValue | undefined {
+function repayArrearsInstalmentsFromConfirmOffer(
+  value: string | undefined
+): YesNoValue | undefined {
   if (value === 'yes') {
     return 'YES';
   }
@@ -20,18 +25,22 @@ function repayArrearsInstalmentsFromConfirmOffer(value: string | undefined): Yes
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'installment-payments',
   isAnswered: req =>
-    Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.repayArrearsInstalments),
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.repayArrearsInstalments
+    ),
   stepDir: __dirname,
   customTemplate: `${__dirname}/instalmentOffer.njk`,
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
+    response.defendantResponses.paymentAgreement =
+      response.defendantResponses.paymentAgreement ?? {};
     const repayArrearsInstalments = repayArrearsInstalmentsFromConfirmOffer(
       req.body?.confirmInstallmentOffer as string | undefined
     );
 
     if (repayArrearsInstalments) {
-      response.defendantResponses.paymentAgreement.repayArrearsInstalments = repayArrearsInstalments;
+      response.defendantResponses.paymentAgreement.repayArrearsInstalments =
+        repayArrearsInstalments;
     } else {
       delete response.defendantResponses.paymentAgreement.repayArrearsInstalments;
     }
@@ -40,8 +49,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   getInitialFormData: req => {
     const stored =
-      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement
-        ?.repayArrearsInstalments;
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+        ?.paymentAgreement?.repayArrearsInstalments;
     const normalizedStored = normalizeYesNoValue(stored);
 
     if (normalizedStored === 'YES') {

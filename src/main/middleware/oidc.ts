@@ -59,7 +59,9 @@ export const oidcMiddleware: RequestHandler = async (
       tokenExp = decoded.exp;
 
       if (tokenExp) {
-        const accessTokenEarlyRefreshSeconds = config.get<number>('oidc.accessTokenEarlyRefreshSeconds');
+        const accessTokenEarlyRefreshSeconds = config.get<number>(
+          'oidc.accessTokenEarlyRefreshSeconds'
+        );
         const nowSeconds = Math.floor(Date.now() / 1000);
         const expiryThreshold = tokenExp - accessTokenEarlyRefreshSeconds;
         shouldRefresh = nowSeconds >= expiryThreshold;

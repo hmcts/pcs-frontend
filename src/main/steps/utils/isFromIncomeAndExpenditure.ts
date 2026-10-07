@@ -13,7 +13,8 @@ import type { Request } from 'express';
 export const isFromIncomeAndExpenditure = async (req: Request): Promise<boolean> => {
   const caseData = req.res?.locals?.validatedCase?.data;
   const shareIncomeExpenseDetails =
-    caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances?.shareIncomeExpenseDetails;
+    caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances
+      ?.shareIncomeExpenseDetails;
 
   return shareIncomeExpenseDetails === 'NO';
 };

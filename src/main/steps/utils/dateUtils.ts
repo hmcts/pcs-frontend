@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon';
 
-export function parseISOToDateParts(isoDate: string): { day: string; month: string; year: string } | undefined {
+export function parseISOToDateParts(
+  isoDate: string
+): { day: string; month: string; year: string } | undefined {
   const dt = DateTime.fromISO(isoDate);
   if (!dt.isValid) {
     return undefined;
@@ -20,7 +22,11 @@ export function formatIsoDate(iso?: string): string {
   return dt.isValid ? dt.toFormat('d LLLL yyyy') : iso;
 }
 
-export function formatDatePartsToISODate(day: string, month: string, year: string): string | undefined {
+export function formatDatePartsToISODate(
+  day: string,
+  month: string,
+  year: string
+): string | undefined {
   const d = day?.trim();
   const m = month?.trim();
   const y = year?.trim();

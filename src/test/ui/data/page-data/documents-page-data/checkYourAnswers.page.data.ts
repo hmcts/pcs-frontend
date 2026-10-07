@@ -14,8 +14,7 @@ export const checkYourAnswers = {
   uploadedDocumentsKey: 'Uploaded documents',
   relatedApplicationKey: 'Related application',
 
-  getRelatedApplicationAdjournValue: () =>
-    `Yes, the documents I’m uploading relate to the application to adjourn the hearing - submitted on ${getFormattedDate()}`,
+  getRelatedApplicationAdjournValue: () => `Yes, the documents I’m uploading relate to the application to adjourn the hearing - submitted on ${getFormattedDate()}`,
   relatedApplicationNoValue: 'No, the documents I’m uploading relate to the main claim',
 
   changeLink: 'Change',

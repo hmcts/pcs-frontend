@@ -56,7 +56,9 @@ export const step: StepDefinition = createFormStep({
   extendGetContent: async req => {
     const caseId = req.res?.locals.validatedCase?.id;
     return {
-      cancelUrl: caseId ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId)) : '',
+      cancelUrl: caseId
+        ? CANCEL_UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE.replace(':caseReference', String(caseId))
+        : '',
     };
   },
 });

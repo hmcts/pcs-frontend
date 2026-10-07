@@ -70,7 +70,9 @@ describe('toCcdFlags', () => {
   });
 
   it('tolerates missing details / path collections', () => {
-    expect(toCcdFlags({ partyName: 'A', roleOnCase: 'Defendant' } as unknown as CuiRaFlags)).toEqual({
+    expect(
+      toCcdFlags({ partyName: 'A', roleOnCase: 'Defendant' } as unknown as CuiRaFlags)
+    ).toEqual({
       partyName: 'A',
       roleOnCase: 'Defendant',
       details: [],
@@ -89,7 +91,10 @@ describe('toCuiRaFlags', () => {
           value: {
             name: 'Language interpreter',
             flagCode: 'RA0042',
-            path: [{ id: 'p1', value: 'Reasonable adjustment' }, { value: 'Support with the case' }],
+            path: [
+              { id: 'p1', value: 'Reasonable adjustment' },
+              { value: 'Support with the case' },
+            ],
           },
         },
       ],
@@ -118,14 +123,21 @@ describe('toCuiRaFlags', () => {
     const original = {
       partyName: 'Jane',
       roleOnCase: 'Defendant',
-      details: [{ id: 'x', value: { name: 'Step free', flagCode: 'RA0001', path: [{ id: 'p', name: 'Access' }] } }],
+      details: [
+        {
+          id: 'x',
+          value: { name: 'Step free', flagCode: 'RA0001', path: [{ id: 'p', name: 'Access' }] },
+        },
+      ],
     } as unknown as CuiRaFlags;
 
     expect(toCuiRaFlags(toCcdFlags(original))).toEqual(original);
   });
 
   it('tolerates missing details / path collections', () => {
-    expect(toCuiRaFlags({ partyName: 'A', roleOnCase: 'Defendant' } as unknown as CcdFlags)).toEqual({
+    expect(
+      toCuiRaFlags({ partyName: 'A', roleOnCase: 'Defendant' } as unknown as CcdFlags)
+    ).toEqual({
       partyName: 'A',
       roleOnCase: 'Defendant',
       details: [],

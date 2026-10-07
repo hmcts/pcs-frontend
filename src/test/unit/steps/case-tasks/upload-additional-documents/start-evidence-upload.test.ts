@@ -14,7 +14,9 @@ type NavMocks = { getBackUrl: jest.Mock; getNextStepUrl: jest.Mock };
 jest.mock('../../../../../main/modules/steps/flow', () => {
   const navigation: NavMocks = {
     getBackUrl: jest.fn(async () => '/back-from-flow'),
-    getNextStepUrl: jest.fn(async () => '/case/123/upload-additional-documents/upload-your-documents'),
+    getNextStepUrl: jest.fn(
+      async () => '/case/123/upload-additional-documents/upload-your-documents'
+    ),
   };
 
   const globalCtx = globalThis as typeof globalThis & { __startEvidenceUploadNavMocks?: NavMocks };
@@ -95,7 +97,9 @@ describe('start-evidence-upload step', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     const nav = navigationMocks();
-    nav.getNextStepUrl.mockResolvedValue('/case/123/upload-additional-documents/upload-your-documents');
+    nav.getNextStepUrl.mockResolvedValue(
+      '/case/123/upload-additional-documents/upload-your-documents'
+    );
     nav.getBackUrl.mockResolvedValue('/back-from-flow');
   });
 
@@ -106,7 +110,8 @@ describe('start-evidence-upload step', () => {
   });
 
   it('GET renders with dashboard links and route url when case id is present', async () => {
-    const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
+    const controller =
+      typeof step.getController === 'function' ? step.getController() : step.getController;
 
     const req = createReq({
       res: {
@@ -132,7 +137,8 @@ describe('start-evidence-upload step', () => {
   });
 
   it('GET uses /dashboard fallback for backUrl when case id is missing', async () => {
-    const controller = typeof step.getController === 'function' ? step.getController() : step.getController;
+    const controller =
+      typeof step.getController === 'function' ? step.getController() : step.getController;
 
     const req = createReq({
       res: {
@@ -164,7 +170,10 @@ describe('start-evidence-upload step', () => {
     await step.postController.post(req, res, next);
 
     expect(navigationMocks().getNextStepUrl).toHaveBeenCalledWith(req, 'start-evidence-upload');
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/upload-additional-documents/upload-your-documents');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/123/upload-additional-documents/upload-your-documents'
+    );
   });
 
   it('POST renders not-found when navigation returns no url', async () => {

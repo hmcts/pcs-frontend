@@ -12,7 +12,11 @@ import {
   YesNoEnum,
 } from '@services/ccdCase.interface';
 
-export type { CcdCase, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
+export type {
+  CcdCase,
+  PossessionClaimResponse,
+  YesNoNotSureValue,
+} from '@services/ccdCase.interface';
 
 export class CcdCaseModel {
   protected readonly validatedCase: CcdCase;
@@ -157,7 +161,10 @@ export class CcdCaseModel {
   }
 
   get claimantName(): string {
-    if (this.data.isClaimantNameCorrect === YesNoEnum.NO && this.data.overriddenClaimantName?.trim()) {
+    if (
+      this.data.isClaimantNameCorrect === YesNoEnum.NO &&
+      this.data.overriddenClaimantName?.trim()
+    ) {
       return this.data.overriddenClaimantName.trim();
     }
 
@@ -174,7 +181,8 @@ export class CcdCaseModel {
 
   get claimantEnteredDefendantDetails(): CcdClaimantEnteredDefendantDetails {
     return (
-      this.data.possessionClaimResponse?.claimantEnteredDefendantDetails ?? ({} as CcdClaimantEnteredDefendantDetails)
+      this.data.possessionClaimResponse?.claimantEnteredDefendantDetails ??
+      ({} as CcdClaimantEnteredDefendantDetails)
     );
   }
 
@@ -200,7 +208,9 @@ export class CcdCaseModel {
   }
 
   get defendantContactDetailsParty(): CcdDefendantParty {
-    return this.data.possessionClaimResponse?.defendantContactDetails?.party ?? ({} as CcdDefendantParty);
+    return (
+      this.data.possessionClaimResponse?.defendantContactDetails?.party ?? ({} as CcdDefendantParty)
+    );
   }
 
   get defendantContactDetailsPartyEmailAddress(): string | undefined {

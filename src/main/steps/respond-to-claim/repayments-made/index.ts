@@ -1,4 +1,7 @@
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -7,7 +10,8 @@ import type { CaseData, PaymentAgreement, YesNoValue } from '@services/ccdCase.i
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-made',
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.anyPaymentsMade),
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.anyPaymentsMade),
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -48,7 +52,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
+    response.defendantResponses.paymentAgreement =
+      response.defendantResponses.paymentAgreement ?? {};
     const confirmRepaymentsMade: YesNoValue | undefined = req.body?.confirmRepaymentsMade;
 
     if (confirmRepaymentsMade) {

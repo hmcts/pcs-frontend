@@ -1,6 +1,9 @@
 import type { TFunction } from 'i18next';
 
-import { ViewTheClaimSection, buildViewTheClaimPageData } from '@utils/viewTheClaim/viewTheClaimUtils';
+import {
+  ViewTheClaimSection,
+  buildViewTheClaimPageData,
+} from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const translations: Record<string, string> = {
   'viewTheClaim:claimPdfLabel': 'Claim (PDF)',
@@ -9,9 +12,11 @@ const translations: Record<string, string> = {
   'viewTheClaim:sections.additionalDefendantDetails': 'Additional defendant 1 details',
   'viewTheClaim:sections.claimDetails': 'Claim details',
   'viewTheClaim:sections.rentArrears': 'Details of rent arrears - RENT ARREARS CLAIMS ONLY',
-  'viewTheClaim:sections.underlesseeTriage': 'Underlessees or mortgagees entitled to claim relief against forfeiture',
+  'viewTheClaim:sections.underlesseeTriage':
+    'Underlessees or mortgagees entitled to claim relief against forfeiture',
   'viewTheClaim:sections.underlesseeDetails': 'Underlessee or mortgagee 1 details',
-  'viewTheClaim:sections.additionalUnderlesseeDetails': 'Additional underlessee or mortgagee 1 details',
+  'viewTheClaim:sections.additionalUnderlesseeDetails':
+    'Additional underlessee or mortgagee 1 details',
   'viewTheClaim:labels.claimantName': 'Name',
   'viewTheClaim:labels.addressForService': 'Address for service',
   'viewTheClaim:labels.defendantName': 'Name',
@@ -19,7 +24,8 @@ const translations: Record<string, string> = {
   'viewTheClaim:dateSubmitted': 'Date submitted',
   'viewTheClaim:labels.claimantType': 'Claimant type',
   'viewTheClaim:labels.trespassClaim': 'Is your claim a trespass claim?',
-  'viewTheClaim:labels.propertyAddress': 'Address of the property the claimant is seeking possession of',
+  'viewTheClaim:labels.propertyAddress':
+    'Address of the property the claimant is seeking possession of',
   'viewTheClaim:labels.hasGrounds': 'Does the claimant have grounds for possession?',
   'viewTheClaim:labels.groundsForPossession': 'Grounds for possession',
   'viewTheClaim:labels.descriptionOfGrounds': 'Description of grounds',
@@ -48,7 +54,8 @@ const translations: Record<string, string> = {
   'viewTheClaim:labels.tenancyDocument': 'Tenancy, occupation contract or licence agreement',
   'viewTheClaim:sections.actionTaken': 'Action already taken by the claimant',
   'viewTheClaim:labels.preActionProtocol': 'Has the pre-action protocol been followed?',
-  'viewTheClaim:labels.preActionProtocolReason': 'Why has the pre-action protocol not been followed?',
+  'viewTheClaim:labels.preActionProtocolReason':
+    'Why has the pre-action protocol not been followed?',
   'viewTheClaim:labels.mediationAttempted': 'Has mediation been attempted?',
   'viewTheClaim:labels.settlementAttempted': 'Has a settlement tried to be reached?',
 };
@@ -69,7 +76,10 @@ const t = ((key: string, options?: Record<string, unknown>) => {
   return options?.defaultValue ?? translations[key] ?? key;
 }) as TFunction;
 
-function sectionByTitle(page: ReturnType<typeof buildViewTheClaimPageData>, title: string): ViewTheClaimSection {
+function sectionByTitle(
+  page: ReturnType<typeof buildViewTheClaimPageData>,
+  title: string
+): ViewTheClaimSection {
   const section = page.sections.find(item => item.title === title);
   if (!section) {
     throw new Error(`Missing section ${title}`);
@@ -195,14 +205,21 @@ describe('viewTheClaimUtils', () => {
     expect(rowHtml(sectionByTitle(page, 'Defendant 1 details'), 'Address for service')).toBe(
       '10 Second Avenue<br>London<br>W3 7RX'
     );
-    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
-    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
-      'Address unknown'
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe(
+      'Persons unknown'
     );
-    expect(rowText(sectionByTitle(page, 'Claim details'), 'Does the claimant have grounds for possession?')).toBe(
-      'Yes'
+    expect(
+      rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')
+    ).toBe('Address unknown');
+    expect(
+      rowText(
+        sectionByTitle(page, 'Claim details'),
+        'Does the claimant have grounds for possession?'
+      )
+    ).toBe('Yes');
+    expect(rowHtml(sectionByTitle(page, 'Claim details'), 'Grounds for possession')).toBe(
+      'Rent arrears'
     );
-    expect(rowHtml(sectionByTitle(page, 'Claim details'), 'Grounds for possession')).toBe('Rent arrears');
 
     const rentSection = sectionByTitle(page, 'Details of rent arrears - RENT ARREARS CLAIMS ONLY');
     expect(rowText(rentSection, 'Rent amount')).toBe('£1,000.00');
@@ -229,7 +246,9 @@ describe('viewTheClaimUtils', () => {
       t
     );
 
-    expect(page.sections.some(section => section.title.startsWith('Additional defendant'))).toBe(false);
+    expect(page.sections.some(section => section.title.startsWith('Additional defendant'))).toBe(
+      false
+    );
   });
 
   it('uses pcs-api returned party collections for claimant and defendant details', () => {
@@ -285,10 +304,12 @@ describe('viewTheClaimUtils', () => {
     expect(rowHtml(sectionByTitle(page, 'Defendant 1 details'), 'Address for service')).toBe(
       '2 Second Avenue<br>London<br>W3 7RX'
     );
-    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
-    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
-      'Address unknown'
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe(
+      'Persons unknown'
     );
+    expect(
+      rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')
+    ).toBe('Address unknown');
   });
 
   it('uses casePartiesTab_ClaimantDetails.serviceAddress when detailsTab_ClaimantAddress is empty', () => {
@@ -388,7 +409,9 @@ describe('viewTheClaimUtils', () => {
       t
     );
 
-    expect(rowText(sectionByTitle(page, 'Claimant details'), 'Name')).toBe('Possession Claims Solicitor Org');
+    expect(rowText(sectionByTitle(page, 'Claimant details'), 'Name')).toBe(
+      'Possession Claims Solicitor Org'
+    );
     expect(rowHtml(sectionByTitle(page, 'Claimant details'), 'Address for service')).toBe(
       '102 Petty France<br>London<br>SW1H 9AJ<br>United Kingdom'
     );
@@ -442,7 +465,9 @@ describe('viewTheClaimUtils', () => {
       t
     );
 
-    expect(rowText(sectionByTitle(page, 'Claimant details'), 'Name')).toBe('Possession Claims Solicitor Org');
+    expect(rowText(sectionByTitle(page, 'Claimant details'), 'Name')).toBe(
+      'Possession Claims Solicitor Org'
+    );
     expect(rowHtml(sectionByTitle(page, 'Claimant details'), 'Address for service')).toBe(
       '102 Petty France<br>London<br>SW1H 9AJ<br>United Kingdom'
     );
@@ -514,12 +539,16 @@ describe('viewTheClaimUtils', () => {
     expect(rowHtml(sectionByTitle(page, 'Defendant 1 details'), 'Address for service')).toBe(
       '2 Pentre Street<br>Caerdydd<br>CF11 6QX'
     );
-    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
-    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBeUndefined();
-    expect(rowText(sectionByTitle(page, 'Additional defendant 2 details'), 'Name')).toBe('y test');
-    expect(rowHtml(sectionByTitle(page, 'Additional defendant 2 details'), 'Address for service')).toBe(
-      '2 Pentre Street<br>Caerdydd<br>CF11 6QX'
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe(
+      'Persons unknown'
     );
+    expect(
+      rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')
+    ).toBeUndefined();
+    expect(rowText(sectionByTitle(page, 'Additional defendant 2 details'), 'Name')).toBe('y test');
+    expect(
+      rowHtml(sectionByTitle(page, 'Additional defendant 2 details'), 'Address for service')
+    ).toBe('2 Pentre Street<br>Caerdydd<br>CF11 6QX');
   });
 
   it('uses detailsTab_RentArrearsDetails.rentFrequency for Wales rent calculation', () => {
@@ -565,13 +594,19 @@ describe('viewTheClaimUtils', () => {
 
     const tenancySection = sectionByTitle(page, 'Tenancy, occupation contract or licence details');
     expect(
-      rowText(tenancySection, 'What type of tenancy, occupation contract or licence is in place, or was in place?')
+      rowText(
+        tenancySection,
+        'What type of tenancy, occupation contract or licence is in place, or was in place?'
+      )
     ).toBe('Secure contract');
-    expect(rowText(tenancySection, 'Tenancy, occupation contract or licence start date')).toBe('1 January 2020');
+    expect(rowText(tenancySection, 'Tenancy, occupation contract or licence start date')).toBe(
+      '1 January 2020'
+    );
     expect(
       tenancySection.rows.some(
         row =>
-          row.key.text === 'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?'
+          row.key.text ===
+          'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?'
       )
     ).toBe(false);
   });
@@ -605,11 +640,19 @@ describe('viewTheClaimUtils', () => {
 
     const tenancySection = sectionByTitle(page, 'Tenancy, occupation contract or licence details');
     expect(
-      rowText(tenancySection, 'What type of tenancy, occupation contract or licence is in place, or was in place?')
+      rowText(
+        tenancySection,
+        'What type of tenancy, occupation contract or licence is in place, or was in place?'
+      )
     ).toBe('Assured tenancy');
-    expect(rowText(tenancySection, 'Tenancy, occupation contract or licence start date')).toBe('1 January 2020');
+    expect(rowText(tenancySection, 'Tenancy, occupation contract or licence start date')).toBe(
+      '1 January 2020'
+    );
     expect(
-      rowText(tenancySection, 'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?')
+      rowText(
+        tenancySection,
+        'Does the claimant have a copy of the tenancy, occupation contract or licence agreement?'
+      )
     ).toBe('No');
     expect(
       rowText(
@@ -660,10 +703,12 @@ describe('viewTheClaimUtils', () => {
       'Underlessee or mortgagee 1 details',
       'Additional underlessee or mortgagee 1 details',
     ]);
-    expect(rowText(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Name')).toBe('underlessee 1');
-    expect(rowText(sectionByTitle(page, 'Additional underlessee or mortgagee 1 details'), 'Name')).toBe(
-      'Acme Mortgagee'
+    expect(rowText(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Name')).toBe(
+      'underlessee 1'
     );
+    expect(
+      rowText(sectionByTitle(page, 'Additional underlessee or mortgagee 1 details'), 'Name')
+    ).toBe('Acme Mortgagee');
   });
 
   it('builds underlessee and additional underlessee sections in numerical order', () => {
@@ -705,10 +750,12 @@ describe('viewTheClaimUtils', () => {
       'Underlessee or mortgagee 1 details',
       'Additional underlessee or mortgagee 1 details',
     ]);
-    expect(rowText(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Name')).toBe('Persons unknown');
-    expect(rowText(sectionByTitle(page, 'Additional underlessee or mortgagee 1 details'), 'Name')).toBe(
-      'Acme Mortgagee'
+    expect(rowText(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Name')).toBe(
+      'Persons unknown'
     );
+    expect(
+      rowText(sectionByTitle(page, 'Additional underlessee or mortgagee 1 details'), 'Name')
+    ).toBe('Acme Mortgagee');
   });
 
   it('shows Persons unknown when underlessee name is missing and nameKnown is not set', () => {
@@ -733,10 +780,12 @@ describe('viewTheClaimUtils', () => {
       t
     );
 
-    expect(rowText(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Name')).toBe('Persons unknown');
-    expect(rowHtml(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Address for service')).toBe(
-      '1 Mortgage Lane<br>Cardiff<br>CF10 1AA'
+    expect(rowText(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Name')).toBe(
+      'Persons unknown'
     );
+    expect(
+      rowHtml(sectionByTitle(page, 'Underlessee or mortgagee 1 details'), 'Address for service')
+    ).toBe('1 Mortgage Lane<br>Cardiff<br>CF10 1AA');
   });
 
   it('shows pre-action protocol reason from detailsTab_ActionsTakenDetails', () => {

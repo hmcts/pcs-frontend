@@ -31,7 +31,9 @@ describe('respond-to-claim priority-debts flow routing (showCondition paradigm)'
   describe('forward navigation from priority-debts', () => {
     it('goes to priority-debt-details when priorityDebts is YES', async () => {
       const req = createReq({ priorityDebts: 'YES', debtTotal: '50000' });
-      await expect(getNextStep(req, 'priority-debts', flowConfig, {})).resolves.toBe('priority-debt-details');
+      await expect(getNextStep(req, 'priority-debts', flowConfig, {})).resolves.toBe(
+        'priority-debt-details'
+      );
     });
 
     it('skips priority-debt-details and goes to regular-expenses when priorityDebts is NO', async () => {

@@ -5,7 +5,7 @@ export async function tenancyDateUnknownErrorValidation(): Promise<void> {
   //This error message will trigger if no day is provided
   await performAction('inputText', tenancyDateUnknown.monthTextLabel, '11');
   await performAction('inputText', tenancyDateUnknown.yearTextLabel, '2022');
-  await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyDateUnknown.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyDateUnknown.thereIsAProblemErrorMessageHeader,
     message: tenancyDateUnknown.dayMissingErrorMessage,
@@ -14,7 +14,7 @@ export async function tenancyDateUnknownErrorValidation(): Promise<void> {
   //This error message will trigger if no month value is provided
   await performAction('inputText', tenancyDateUnknown.dayTextLabel, '12');
   await performAction('inputText', tenancyDateUnknown.monthTextLabel, '');
-  await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyDateUnknown.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyDateUnknown.thereIsAProblemErrorMessageHeader,
     message: tenancyDateUnknown.monthMissingErrorMessage,
@@ -23,7 +23,7 @@ export async function tenancyDateUnknownErrorValidation(): Promise<void> {
   //This error message will trigger if no year value is provided
   await performAction('inputText', tenancyDateUnknown.monthTextLabel, '11');
   await performAction('inputText', tenancyDateUnknown.yearTextLabel, '');
-  await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyDateUnknown.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyDateUnknown.thereIsAProblemErrorMessageHeader,
     message: tenancyDateUnknown.yearMissingErrorMessage,
@@ -32,7 +32,7 @@ export async function tenancyDateUnknownErrorValidation(): Promise<void> {
   //This error message will trigger if invalid date is provided
   await performAction('inputText', tenancyDateUnknown.dayTextLabel, '32');
   await performAction('inputText', tenancyDateUnknown.yearTextLabel, '2025');
-  await performAction('clickButton', tenancyDateUnknown.saveAndContinueButton);
+  await performAction('When the user clicks the button', tenancyDateUnknown.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: tenancyDateUnknown.thereIsAProblemErrorMessageHeader,
     message: tenancyDateUnknown.realDateErrorMessage,

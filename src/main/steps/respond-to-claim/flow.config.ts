@@ -57,7 +57,8 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'ask-your-solicitor-to-respond-to-the-claim': {
       showCondition: (req: Request) =>
-        req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.hasSolicitor === 'YES',
+        req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+          ?.hasSolicitor === 'YES',
     },
     'defendant-name-confirmation': {
       showCondition: (req: Request) => isDefendantNameKnown(req),
@@ -66,7 +67,8 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => !isDefendantNameKnown(req),
     },
     'contact-preferences-text-message': {
-      showCondition: (req: Request) => req.res?.locals.validatedCase?.isDefendantContactByPhone === true,
+      showCondition: (req: Request) =>
+        req.res?.locals.validatedCase?.isDefendantContactByPhone === true,
     },
     'exempt-landlord': {
       showCondition: (req: Request) => shouldShowExemptLandlordStep(req),
@@ -164,19 +166,27 @@ export const flowConfig: JourneyFlowConfig = {
     },
     'response-submitted-counter-claim-fee-payment-needed': {
       showCondition: (req: Request) =>
-        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(
+          req.res?.locals?.validatedCase?.data
+        ),
     },
     'counter-claim-application-fee-amount': {
       showCondition: (req: Request) =>
-        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(
+          req.res?.locals?.validatedCase?.data
+        ),
     },
     'counter-claim-payment-successful': {
       showCondition: (req: Request) =>
-        shouldShowCounterClaimFeePaymentNeededConfirmationStep(req.res?.locals?.validatedCase?.data),
+        shouldShowCounterClaimFeePaymentNeededConfirmationStep(
+          req.res?.locals?.validatedCase?.data
+        ),
     },
     'response-and-counter-claim-submitted': {
       showCondition: (req: Request) =>
-        shouldShowResponseAndCounterClaimSubmittedConfirmationStep(req.res?.locals?.validatedCase?.data),
+        shouldShowResponseAndCounterClaimSubmittedConfirmationStep(
+          req.res?.locals?.validatedCase?.data
+        ),
     },
   } satisfies Partial<Record<RespondToClaimStepName, StepConfig>>,
 };

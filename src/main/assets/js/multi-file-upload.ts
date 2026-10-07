@@ -1,6 +1,10 @@
 import { MultiFileUpload } from '@ministryofjustice/frontend';
 
-import { isAllowedExtension, isBlockedExtension, isMediaExtension } from '@utils/fileExtensionValidation';
+import {
+  isAllowedExtension,
+  isBlockedExtension,
+  isMediaExtension,
+} from '@utils/fileExtensionValidation';
 
 const uploadInstances = new WeakMap<HTMLElement, MultiFileUpload>();
 
@@ -99,7 +103,8 @@ function setInlineFieldError(container: HTMLElement, message: string): void {
     // put the error inside the dropzone box — wrong place visually. Insert
     // before the dropzone wrapper instead so the error sits between label and
     // dashed box, matching the MOJ design pattern.
-    const anchor = formGroup.querySelector<HTMLElement>('.moj-multi-file-upload__dropzone') ?? fileInput;
+    const anchor =
+      formGroup.querySelector<HTMLElement>('.moj-multi-file-upload__dropzone') ?? fileInput;
     anchor.parentNode?.insertBefore(errorEl, anchor);
   }
   errorEl.innerHTML = '<span class="govuk-visually-hidden">Error:</span> ';
@@ -126,7 +131,9 @@ function clearInlineFieldError(container: HTMLElement): void {
   const errorId = `${fileInput.id}-error`;
   formGroup.querySelector(`#${CSS.escape(errorId)}`)?.remove();
 
-  const ids = (fileInput.getAttribute('aria-describedby') || '').split(/\s+/).filter(id => id && id !== errorId);
+  const ids = (fileInput.getAttribute('aria-describedby') || '')
+    .split(/\s+/)
+    .filter(id => id && id !== errorId);
   if (ids.length === 0) {
     fileInput.removeAttribute('aria-describedby');
   } else {
@@ -134,7 +141,11 @@ function clearInlineFieldError(container: HTMLElement): void {
   }
 }
 
-function showErrorSummary(container: HTMLElement, message: string, title = 'There is a problem'): void {
+function showErrorSummary(
+  container: HTMLElement,
+  message: string,
+  title = 'There is a problem'
+): void {
   const summary = getOrCreateErrorSummary(title);
   const list = summary.querySelector<HTMLUListElement>('.govuk-error-summary__list');
   if (list) {
@@ -165,10 +176,12 @@ function clearErrorSummary(container: HTMLElement): void {
 }
 
 function removeFailedRows(container: HTMLElement): void {
-  container.querySelectorAll('.moj-multi-file-upload__row--error, .moj-multi-file-upload__error').forEach(el => {
-    const row = el.closest('.moj-multi-file-upload__row');
-    (row ?? el).remove();
-  });
+  container
+    .querySelectorAll('.moj-multi-file-upload__row--error, .moj-multi-file-upload__error')
+    .forEach(el => {
+      const row = el.closest('.moj-multi-file-upload__row');
+      (row ?? el).remove();
+    });
 }
 
 function hasVisibleError(container: HTMLElement): boolean {
@@ -184,7 +197,11 @@ function hasVisibleError(container: HTMLElement): boolean {
 function installCsrfInterceptor(): void {
   const needsCsrf = new WeakSet<XMLHttpRequest>();
 
-  const originalOpen = XMLHttpRequest.prototype.open as (method: string, url: string | URL, ...rest: unknown[]) => void;
+  const originalOpen = XMLHttpRequest.prototype.open as (
+    method: string,
+    url: string | URL,
+    ...rest: unknown[]
+  ) => void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (XMLHttpRequest.prototype as any).open = function (
     this: XMLHttpRequest,
@@ -200,7 +217,10 @@ function installCsrfInterceptor(): void {
   };
 
   const originalSend = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.send = function (this: XMLHttpRequest, body?: Document | XMLHttpRequestBodyInit | null) {
+  XMLHttpRequest.prototype.send = function (
+    this: XMLHttpRequest,
+    body?: Document | XMLHttpRequestBodyInit | null
+  ) {
     if (needsCsrf.has(this)) {
       this.setRequestHeader('x-csrf-token', getCsrfToken());
       needsCsrf.delete(this);
@@ -274,10 +294,15 @@ function initContainer(container: HTMLElement): void {
         }
       },
 
-      exitHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File, xhr: XMLHttpRequest) => {
+      exitHook: (
+        _upload: InstanceType<typeof MultiFileUpload>,
+        _file: File,
+        xhr: XMLHttpRequest
+      ) => {
         clearErrorSummary(container);
         try {
-          const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
+          const response =
+            typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
           const doc: DisplayDocument | undefined = response?.document;
           if (doc && typeof doc.index === 'number') {
             const input = document.createElement('input');
@@ -295,27 +320,34 @@ function initContainer(container: HTMLElement): void {
         removeFailedRows(container);
 
         // MOJ component creates delete buttons with "Delete" text -- patch to match translation
-        container.querySelectorAll<HTMLButtonElement>('.moj-multi-file-upload__delete').forEach(btn => {
-          const hiddenSpan = btn.querySelector('.govuk-visually-hidden');
-          const filename = hiddenSpan?.textContent || '';
-          btn.textContent = '';
-          btn.appendChild(document.createTextNode(deleteButtonText + ' '));
-          if (filename) {
-            const span = document.createElement('span');
-            span.className = 'govuk-visually-hidden';
-            span.textContent = filename;
-            btn.appendChild(span);
-          }
-        });
+        container
+          .querySelectorAll<HTMLButtonElement>('.moj-multi-file-upload__delete')
+          .forEach(btn => {
+            const hiddenSpan = btn.querySelector('.govuk-visually-hidden');
+            const filename = hiddenSpan?.textContent || '';
+            btn.textContent = '';
+            btn.appendChild(document.createTextNode(deleteButtonText + ' '));
+            if (filename) {
+              const span = document.createElement('span');
+              span.className = 'govuk-visually-hidden';
+              span.textContent = filename;
+              btn.appendChild(span);
+            }
+          });
       },
 
-      errorHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File, xhr: XMLHttpRequest) => {
+      errorHook: (
+        _upload: InstanceType<typeof MultiFileUpload>,
+        _file: File,
+        xhr: XMLHttpRequest
+      ) => {
         // Per AC04/AC05: show the error-summary banner only for AC-defined messages
         // returned by the server (wrongType / tooLarge as structured JSON).
         // Non-AC failures (abort, network drop, CDAM unreachable, 5xx) leave the MOJ
         // row-level "Upload failed" indicator as the sole signal — no misleading banner.
         try {
-          const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
+          const response =
+            typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
           if (response?.error?.message) {
             showErrorSummary(container, response.error.message, errorSummaryTitle);
             removeFailedRows(container);
@@ -325,7 +357,11 @@ function initContainer(container: HTMLElement): void {
         }
       },
 
-      deleteHook: (_upload: InstanceType<typeof MultiFileUpload>, _file: File | undefined, xhr: XMLHttpRequest) => {
+      deleteHook: (
+        _upload: InstanceType<typeof MultiFileUpload>,
+        _file: File | undefined,
+        xhr: XMLHttpRequest
+      ) => {
         if (xhr.status === 409) {
           // Stale index — another delete already shifted the list. Reload so
           // the page rebuilds from the current draft state and the user can retry.
@@ -335,7 +371,8 @@ function initContainer(container: HTMLElement): void {
         if (xhr.status >= 200 && xhr.status < 300) {
           clearErrorSummary(container);
           try {
-            const response = typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
+            const response =
+              typeof xhr.response === 'object' ? xhr.response : JSON.parse(xhr.responseText);
             if (response?.success) {
               rebuildHiddenInputs(hiddenContainer, container);
             }
@@ -411,7 +448,9 @@ function getRowDocumentFilename(row: Element, deleteButton: HTMLButtonElement | 
     return fromFilenameEl;
   }
 
-  const fromVisuallyHidden = deleteButton?.querySelector('.govuk-visually-hidden')?.textContent?.trim();
+  const fromVisuallyHidden = deleteButton
+    ?.querySelector('.govuk-visually-hidden')
+    ?.textContent?.trim();
   if (fromVisuallyHidden) {
     return fromVisuallyHidden;
   }
@@ -421,12 +460,16 @@ function getRowDocumentFilename(row: Element, deleteButton: HTMLButtonElement | 
 
 function rebuildHiddenInputs(hiddenContainer: HTMLElement, uploadContainer: HTMLElement): void {
   // Remove all existing hidden inputs
-  hiddenContainer.querySelectorAll<HTMLInputElement>('input[name="uploadedDocuments[]"]').forEach(input => {
-    input.remove();
-  });
+  hiddenContainer
+    .querySelectorAll<HTMLInputElement>('input[name="uploadedDocuments[]"]')
+    .forEach(input => {
+      input.remove();
+    });
 
   // Rebuild from remaining file rows in the MOJ component
-  const rows = uploadContainer.querySelectorAll('.moj-multi-file-upload__row:not(.moj-multi-file-upload__row--error)');
+  const rows = uploadContainer.querySelectorAll(
+    '.moj-multi-file-upload__row:not(.moj-multi-file-upload__row--error)'
+  );
   rows.forEach((row, index) => {
     const deleteButton = row.querySelector<HTMLButtonElement>('.moj-multi-file-upload__delete');
     const documentId = deleteButton?.value?.trim();
@@ -449,7 +492,9 @@ function rebuildHiddenInputs(hiddenContainer: HTMLElement, uploadContainer: HTML
 }
 
 export function initMultiFileUpload(): void {
-  const containers = document.querySelectorAll<HTMLElement>('[data-module="moj-multi-file-upload"]');
+  const containers = document.querySelectorAll<HTMLElement>(
+    '[data-module="moj-multi-file-upload"]'
+  );
   if (containers.length === 0) {
     return;
   }

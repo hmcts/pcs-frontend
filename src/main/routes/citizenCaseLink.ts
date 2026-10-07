@@ -35,7 +35,10 @@ interface RenderFormOptions {
   blockedMessage?: string;
 }
 
-const API_ERROR_MESSAGES: Record<AccessCodeValidationError, { field: 'claimNumber' | 'accessCode'; text: string }> = {
+const API_ERROR_MESSAGES: Record<
+  AccessCodeValidationError,
+  { field: 'claimNumber' | 'accessCode'; text: string }
+> = {
   not_found: {
     field: 'claimNumber',
     text: 'We cannot find that claim number. Enter the claim number that you received from the court',
@@ -75,7 +78,13 @@ function buildErrorList(errors: FormErrors, blockedMessage?: string): ErrorListI
 }
 
 function renderForm(res: Response, options: RenderFormOptions = {}): void {
-  const { errors = {}, claimNumber = '', accessCode = '', respondToClaimBlocked = false, blockedMessage } = options;
+  const {
+    errors = {},
+    claimNumber = '',
+    accessCode = '',
+    respondToClaimBlocked = false,
+    blockedMessage,
+  } = options;
 
   res.render('accessCode', {
     errors,
@@ -149,7 +158,9 @@ export default function citizenCaseLinkRoutes(app: Application): void {
     if (!accessCode) {
       errors.accessCode = { text: 'Enter your access code' };
     } else if (!ACCESS_CODE_REGEX.test(accessCode)) {
-      errors.accessCode = { text: 'Access code must only include letters a to z, and numbers 0 to 9' };
+      errors.accessCode = {
+        text: 'Access code must only include letters a to z, and numbers 0 to 9',
+      };
     } else if (accessCode.length !== 12) {
       errors.accessCode = { text: 'Access code must be 12 characters' };
     }

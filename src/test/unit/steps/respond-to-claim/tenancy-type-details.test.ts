@@ -46,7 +46,10 @@ type TenancyTypeDetailsStep = {
           orgName?: string;
           data?: {
             possessionClaimResponse?: {
-              defendantResponses?: { tenancyTypeConfirmation?: YesNoNotSureValue; tenancyType?: string };
+              defendantResponses?: {
+                tenancyTypeConfirmation?: YesNoNotSureValue;
+                tenancyType?: string;
+              };
             };
           };
         };
@@ -66,7 +69,10 @@ type TenancyTypeDetailsStep = {
             data?: {
               possessionClaimResponse?: {
                 claimantOrganisations?: { value?: string }[];
-                defendantResponses?: { tenancyTypeConfirmation?: YesNoNotSureValue; tenancyType?: string };
+                defendantResponses?: {
+                  tenancyTypeConfirmation?: YesNoNotSureValue;
+                  tenancyType?: string;
+                };
               };
               legislativeCountry?: string;
               tenancy_TypeOfTenancyLicence?: string;
@@ -501,27 +507,32 @@ describe('respond-to-claim tenancy-type-details step', () => {
         ['FLEXIBLE_TENANCY', 'a flexible'],
         ['DEMOTED_TENANCY', 'a demoted'],
         ['OTHER', 'other'],
-      ])('maps tenancy_TypeOfTenancyLicence=%s to tenancyTypeAgreementType=%s', async (licenceType, expectedText) => {
-        const content = await testedStep.extendGetContent(
-          {
-            body: {},
-            res: {
-              locals: {
-                validatedCase: {
-                  id: '12345',
-                  data: {
-                    possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
-                    tenancy_TypeOfTenancyLicence: licenceType,
+      ])(
+        'maps tenancy_TypeOfTenancyLicence=%s to tenancyTypeAgreementType=%s',
+        async (licenceType, expectedText) => {
+          const content = await testedStep.extendGetContent(
+            {
+              body: {},
+              res: {
+                locals: {
+                  validatedCase: {
+                    id: '12345',
+                    data: {
+                      possessionClaimResponse: {
+                        claimantOrganisations: [{ value: 'Acme Housing' }],
+                      },
+                      tenancy_TypeOfTenancyLicence: licenceType,
+                    },
                   },
                 },
               },
             },
-          },
-          { detailsHeading: 'Details given by ', tenancyType: 'standard tenancy text' }
-        );
+            { detailsHeading: 'Details given by ', tenancyType: 'standard tenancy text' }
+          );
 
-        expect(content.tenancyTypeAgreementType).toBe(expectedText);
-      });
+          expect(content.tenancyTypeAgreementType).toBe(expectedText);
+        }
+      );
     });
 
     describe('tenancyType content for OTHER type', () => {

@@ -19,7 +19,10 @@ jest.mock('../../../../main/modules/i18n', () => ({
   getStepTranslations: jest.fn(() => ({})),
 }));
 
-const createReqRes = (validatedCase: CcdCaseModel, sessionFormData: Record<string, unknown> = {}) => {
+const createReqRes = (
+  validatedCase: CcdCaseModel,
+  sessionFormData: Record<string, unknown> = {}
+) => {
   const res = {
     render: jest.fn(),
     locals: {
@@ -103,7 +106,9 @@ describe('respond-to-claim getInitialFormData uses CCD', () => {
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1];
-    expect(renderData.fieldValues).toEqual(expect.objectContaining({ contactByEmailOrPost: ['email'] }));
+    expect(renderData.fieldValues).toEqual(
+      expect.objectContaining({ contactByEmailOrPost: ['email'] })
+    );
     expect(renderData['contactByEmailOrPost.email']).toBe('tenant@example.com');
   });
 

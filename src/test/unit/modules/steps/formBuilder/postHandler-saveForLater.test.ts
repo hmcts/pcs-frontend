@@ -89,7 +89,9 @@ describe('PostHandler - Save for Later Fix', () => {
       getBackUrl: jest.fn().mockResolvedValue('/previous-step'),
       getNextStepUrl: jest.fn().mockResolvedValue('/next-step'),
     });
-    (flowModule.getStepUrl as jest.Mock).mockReturnValue('/case/1771325608502536/respond-to-claim/task-list');
+    (flowModule.getStepUrl as jest.Mock).mockReturnValue(
+      '/case/1771325608502536/respond-to-claim/task-list'
+    );
   });
 
   afterEach(() => {
@@ -98,7 +100,9 @@ describe('PostHandler - Save for Later Fix', () => {
 
   describe('Fix #3: Save for Later Functionality', () => {
     it('passes current step post payload to navigation for forward routing', async () => {
-      const getNextStepUrl = jest.fn().mockResolvedValue('/case/1771325608502536/respond-to-claim/contact-preferences');
+      const getNextStepUrl = jest
+        .fn()
+        .mockResolvedValue('/case/1771325608502536/respond-to-claim/contact-preferences');
       (flowModule.createStepNavigation as jest.Mock).mockReturnValue({
         getBackUrl: jest.fn().mockResolvedValue('/previous-step'),
         getNextStepUrl,
@@ -115,7 +119,13 @@ describe('PostHandler - Save for Later Fix', () => {
         },
       };
 
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', testFlowConfig);
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        testFlowConfig
+      );
 
       mockRequest.body = {
         hadLegalAdvice: 'yes',
@@ -143,21 +153,33 @@ describe('PostHandler - Save for Later Fix', () => {
         },
       };
 
-      createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', () => resolvedFlowConfig);
+      createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        () => resolvedFlowConfig
+      );
 
       const createStepNavigationCalls = (flowModule.createStepNavigation as jest.Mock).mock.calls;
-      const flowConfigResolver = createStepNavigationCalls[createStepNavigationCalls.length - 1][0] as (
-        req: Request
-      ) => Promise<JourneyFlowConfig>;
+      const flowConfigResolver = createStepNavigationCalls[
+        createStepNavigationCalls.length - 1
+      ][0] as (req: Request) => Promise<JourneyFlowConfig>;
 
       await expect(flowConfigResolver(mockRequest as Request)).resolves.toBe(resolvedFlowConfig);
     });
 
     it('uses request-resolved flow config for session form data persistence', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', () => ({
-        ...flowConfig,
-        useSessionFormData: false,
-      }));
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        () => ({
+          ...flowConfig,
+          useSessionFormData: false,
+        })
+      );
 
       mockRequest.body = {
         hadLegalAdvice: 'yes',
@@ -171,15 +193,21 @@ describe('PostHandler - Save for Later Fix', () => {
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
       expect(
-        (mockRequest.session as Request['session'] | undefined)?.formData?.default?.['1771325608502536']?.[
-          'free-legal-advice'
-        ]
+        (mockRequest.session as Request['session'] | undefined)?.formData?.default?.[
+          '1771325608502536'
+        ]?.['free-legal-advice']
       ).toBeUndefined();
       expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/next-step');
     });
 
     it('bypasses validation on saveForLater and redirects', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        flowConfig
+      );
       mockRequest.body = { action: 'saveForLater' };
 
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
@@ -193,13 +221,26 @@ describe('PostHandler - Save for Later Fix', () => {
         ...flowConfig,
         hubStepName: 'task-list',
       };
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', hubFlowConfig);
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        hubFlowConfig
+      );
       mockRequest.body = { action: 'saveForLater' };
 
       await post(mockRequest as unknown as Request, mockResponse as Response, mockNext);
 
-      expect(flowModule.getStepUrl).toHaveBeenCalledWith('task-list', hubFlowConfig, '1771325608502536');
-      expect(mockResponse.redirect).toHaveBeenCalledWith(303, '/case/1771325608502536/respond-to-claim/task-list');
+      expect(flowModule.getStepUrl).toHaveBeenCalledWith(
+        'task-list',
+        hubFlowConfig,
+        '1771325608502536'
+      );
+      expect(mockResponse.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1771325608502536/respond-to-claim/task-list'
+      );
     });
 
     it('should save valid data and redirect to dashboard', async () => {
@@ -223,9 +264,9 @@ describe('PostHandler - Save for Later Fix', () => {
 
       // Should save to session
       expect(
-        (mockRequest.session as Request['session'] | undefined)?.formData?.default?.['1771325608502536']?.[
-          'free-legal-advice'
-        ]
+        (mockRequest.session as Request['session'] | undefined)?.formData?.default?.[
+          '1771325608502536'
+        ]?.['free-legal-advice']
       ).toEqual({
         hadLegalAdvice: 'yes',
       });
@@ -238,7 +279,13 @@ describe('PostHandler - Save for Later Fix', () => {
     });
 
     it('redirects legal representative users to a validated Manage Case URL on save for later', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        flowConfig
+      );
 
       mockRequest.session = {
         ...mockRequest.session,
@@ -263,7 +310,13 @@ describe('PostHandler - Save for Later Fix', () => {
     });
 
     it('does not use an invalid case ID in the legal representative Manage Case redirect', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        flowConfig
+      );
 
       mockRequest.session = {
         ...mockRequest.session,
@@ -289,7 +342,13 @@ describe('PostHandler - Save for Later Fix', () => {
     });
 
     it('should use case ID from res.locals.validatedCase', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        flowConfig
+      );
 
       mockRequest.body = {
         hadLegalAdvice: 'yes',
@@ -309,7 +368,13 @@ describe('PostHandler - Save for Later Fix', () => {
     });
 
     it('should handle missing case ID gracefully', async () => {
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        flowConfig
+      );
 
       mockRequest.body = {
         hadLegalAdvice: 'yes',
@@ -399,7 +464,9 @@ describe('PostHandler - Save for Later Fix', () => {
     });
 
     it('uses a custom redirect path after post when provided', async () => {
-      const resolveRedirectAfterPost = jest.fn().mockResolvedValue('/case/1771325608502536/custom-next');
+      const resolveRedirectAfterPost = jest
+        .fn()
+        .mockResolvedValue('/case/1771325608502536/custom-next');
       const { post } = createPostHandler(
         fields,
         'free-legal-advice',
@@ -455,7 +522,13 @@ describe('PostHandler - Save for Later Fix', () => {
         getBackUrl: jest.fn().mockResolvedValue('/previous-step'),
         getNextStepUrl: jest.fn().mockResolvedValue(undefined),
       });
-      const { post } = createPostHandler(fields, 'free-legal-advice', 'test.njk', 'respondToClaim', flowConfig);
+      const { post } = createPostHandler(
+        fields,
+        'free-legal-advice',
+        'test.njk',
+        'respondToClaim',
+        flowConfig
+      );
 
       mockRequest.body = {
         hadLegalAdvice: 'yes',

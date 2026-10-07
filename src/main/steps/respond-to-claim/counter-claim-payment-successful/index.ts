@@ -31,7 +31,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseId = req.res?.locals.validatedCase?.id;
 
     return {
-      paymentReferenceLine: paymentReference ? t('paymentReference', { paymentReference }) : undefined,
+      paymentReferenceLine: paymentReference
+        ? t('paymentReference', { paymentReference })
+        : undefined,
       closeUrl: getCaseManagementUrl(req),
       dashboardUrl: getDashboardUrl(caseId),
     };

@@ -2,7 +2,11 @@ import type { Request } from 'express';
 
 import { getSectionStatus } from '../../../../main/services/sectionStatus';
 
-import type { JourneyFlowConfig, SectionConfig, SectionStatus } from '@modules/steps/stepFlow.interface';
+import type {
+  JourneyFlowConfig,
+  SectionConfig,
+  SectionStatus,
+} from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const reqStub = {} as Request;
@@ -18,7 +22,9 @@ const stub = (overrides: Partial<StepDefinition> = {}): StepDefinition =>
     ...overrides,
   }) as StepDefinition;
 
-const flow = (steps: Record<string, { showCondition?: (req: Request) => boolean }> = {}): JourneyFlowConfig => ({
+const flow = (
+  steps: Record<string, { showCondition?: (req: Request) => boolean }> = {}
+): JourneyFlowConfig => ({
   sections: [],
   steps,
 });
@@ -120,7 +126,9 @@ describe('getSectionStatus', () => {
       hidden1: { showCondition: () => false },
       hidden2: { showCondition: () => false },
     });
-    expect(await getSectionStatus(sec, flowConfig, registry, reqStub, new Map())).toBe('NOT_APPLICABLE');
+    expect(await getSectionStatus(sec, flowConfig, registry, reqStub, new Map())).toBe(
+      'NOT_APPLICABLE'
+    );
   });
 
   it('falls through to "not answered" when isAnswered throws (defensive)', async () => {
@@ -140,7 +148,9 @@ describe('getSectionStatus', () => {
   it('treats a section with no question steps (no isAnswered predicates) as NOT_APPLICABLE', async () => {
     const sec = section({ steps: ['stepA'] });
     const registry = { stepA: { ...stub(), isAnswered: undefined } };
-    expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe('NOT_APPLICABLE');
+    expect(await getSectionStatus(sec, flow(), registry, reqStub, new Map())).toBe(
+      'NOT_APPLICABLE'
+    );
   });
 
   it('skips steps not present in the registry (graceful)', async () => {
@@ -159,7 +169,9 @@ describe('getSectionStatus', () => {
       ({
         res: {
           locals: {
-            validatedCase: { possessionClaimResponse: { defendantResponses: { completedSections: ids } } },
+            validatedCase: {
+              possessionClaimResponse: { defendantResponses: { completedSections: ids } },
+            },
           },
         },
       }) as unknown as Request;
@@ -186,7 +198,13 @@ describe('getSectionStatus', () => {
         stepA: stub({ isAnswered: () => true }),
         'check-your-answers-personal-details': { ...stub(), isAnswered: undefined },
       };
-      const status = await getSectionStatus(sec, flow(), registry, reqWithCompleted(['PERSONAL_DETAILS']), new Map());
+      const status = await getSectionStatus(
+        sec,
+        flow(),
+        registry,
+        reqWithCompleted(['PERSONAL_DETAILS']),
+        new Map()
+      );
       expect(status).toBe('DONE');
     });
 
@@ -203,7 +221,13 @@ describe('getSectionStatus', () => {
       // CYA confirmation is the citizen's explicit "I'm done" — it overrides per-step scoring
       // so that skipping an optional step doesn't trap the section at IN_PROGRESS.
       // Edits revoke the flag via clearSectionCompletionOnEdit, so this can't go stale in practice.
-      const status = await getSectionStatus(sec, flow(), registry, reqWithCompleted(['PERSONAL_DETAILS']), new Map());
+      const status = await getSectionStatus(
+        sec,
+        flow(),
+        registry,
+        reqWithCompleted(['PERSONAL_DETAILS']),
+        new Map()
+      );
       expect(status).toBe('DONE');
     });
 

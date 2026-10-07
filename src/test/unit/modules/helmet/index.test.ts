@@ -196,7 +196,11 @@ describe('Helmet Module', () => {
             fontSrc: ["'self'", 'data:'],
             imgSrc: ["'self'", '*.google-analytics.com'],
             objectSrc: ["'self'"],
-            scriptSrc: ["'self'", '*.google-analytics.com', "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"],
+            scriptSrc: [
+              "'self'",
+              '*.google-analytics.com',
+              "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='",
+            ],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
             formAction: [
@@ -238,7 +242,11 @@ describe('Helmet Module', () => {
             fontSrc: ["'self'", 'data:'],
             imgSrc: ["'self'", '*.google-analytics.com'],
             objectSrc: ["'self'"],
-            scriptSrc: ["'self'", '*.google-analytics.com', "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"],
+            scriptSrc: [
+              "'self'",
+              '*.google-analytics.com',
+              "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='",
+            ],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
             formAction: [
@@ -336,7 +344,11 @@ describe('Helmet Module', () => {
             fontSrc: ["'self'", 'data:'],
             imgSrc: ["'self'", '*.google-analytics.com'],
             objectSrc: ["'self'"],
-            scriptSrc: ["'self'", '*.google-analytics.com', "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='"],
+            scriptSrc: [
+              "'self'",
+              '*.google-analytics.com',
+              "'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='",
+            ],
             styleSrc: ["'self'"],
             manifestSrc: ["'self'"],
             formAction: [

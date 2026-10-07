@@ -9,22 +9,7 @@ import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../comm
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
 
-const ELEMENT_TYPES = [
-  'Button',
-  'Link',
-  'Header',
-  'Caption',
-  'Checkbox',
-  'Question',
-  'RadioOption',
-  'SelectLabel',
-  'SelectOption',
-  'HintText',
-  'TextLabel',
-  'Paragraph',
-  'List',
-  'Summary',
-] as const;
+const ELEMENT_TYPES = ['Button', 'Link', 'Header', 'Caption', 'Checkbox', 'Question', 'RadioOption', 'SelectLabel', 'SelectOption', 'HintText', 'TextLabel', 'Paragraph', 'List', 'Summary'] as const;
 
 type ValidationResult = { element: string; expected: string; status: 'pass' | 'fail' };
 
@@ -294,11 +279,7 @@ export class PageContentValidation implements IValidation {
   static finaliseTest(): void {
     PageContentValidation.testCounter++;
 
-    if (
-      PageContentValidation.validationExecuted &&
-      PageContentValidation.validationResults.size === 0 &&
-      PageContentValidation.missingDataFiles.size === 0
-    ) {
+    if (PageContentValidation.validationExecuted && PageContentValidation.validationResults.size === 0 && PageContentValidation.missingDataFiles.size === 0) {
       return;
     }
 

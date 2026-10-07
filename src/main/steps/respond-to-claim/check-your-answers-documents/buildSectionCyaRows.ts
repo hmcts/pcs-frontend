@@ -2,7 +2,12 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { type BaseRowContext, type SummaryListRow, createRowContext, listHtml } from '../section-cya/cyaRow';
+import {
+  type BaseRowContext,
+  type SummaryListRow,
+  createRowContext,
+  listHtml,
+} from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
 import type { CcdDefendantResponses } from '@services/ccdCase.interface';

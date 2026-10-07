@@ -37,7 +37,9 @@ describe('stepDocumentUtils', () => {
         },
       };
 
-      const result = extractDocumentIdFromCollections(caseData, [caseData.detailsTab_NoticeDetails.noticeDocuments]);
+      const result = extractDocumentIdFromCollections(caseData, [
+        caseData.detailsTab_NoticeDetails.noticeDocuments,
+      ]);
       expect(result).toEqual({ isDocumentUploaded: true, documentId: 'doc-123' });
     });
 
@@ -48,7 +50,9 @@ describe('stepDocumentUtils', () => {
         },
       };
 
-      const result = extractDocumentIdFromCollections(caseData, [caseData.detailsTab_NoticeDetails.noticeDocuments]);
+      const result = extractDocumentIdFromCollections(caseData, [
+        caseData.detailsTab_NoticeDetails.noticeDocuments,
+      ]);
       expect(result).toEqual({ isDocumentUploaded: false });
     });
   });
@@ -118,7 +122,9 @@ describe('stepDocumentUtils', () => {
                   noticeDocuments: [
                     {
                       id: 'doc-local-123',
-                      value: { document_binary_url: 'http://dm-store/documents/doc-local-123/binary' },
+                      value: {
+                        document_binary_url: 'http://dm-store/documents/doc-local-123/binary',
+                      },
                     },
                   ],
                 },

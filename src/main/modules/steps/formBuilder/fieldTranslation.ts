@@ -6,7 +6,10 @@ import { buildConditionalContent, getNestedFieldName } from './conditionalFields
 import { type FormError, getErrorMessage } from './errorUtils';
 import { getTranslation, normalizeCheckboxValue } from './helpers';
 
-import type { FormFieldConfig, FormFieldOption } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type {
+  FormFieldConfig,
+  FormFieldOption,
+} from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 export function buildFieldValues(
   fields: FormFieldConfig[],
@@ -25,7 +28,11 @@ export function buildFieldValues(
       fieldValues[field.name] = normalizeCheckboxValue(value);
     } else if (field.type === 'date') {
       if (savedData?.[fullFieldName] && typeof savedData[fullFieldName] === 'object') {
-        const dateValue = savedData[fullFieldName] as { day?: string; month?: string; year?: string };
+        const dateValue = savedData[fullFieldName] as {
+          day?: string;
+          month?: string;
+          year?: string;
+        };
         fieldValues[field.name] = {
           day: dateValue.day || '',
           month: dateValue.month || '',
@@ -67,7 +74,9 @@ function buildTranslationsObject(t: TFunction): Record<string, string> {
 
   // Extract all translations from i18next store
   // Note: TFunction type doesn't include store, but it exists at runtime
-  const tWithStore = t as TFunction & { store?: { data?: Record<string, Record<string, Record<string, unknown>>> } };
+  const tWithStore = t as TFunction & {
+    store?: { data?: Record<string, Record<string, Record<string, unknown>>> };
+  };
   if (tWithStore.store?.data) {
     for (const lang of Object.keys(tWithStore.store.data)) {
       for (const ns of Object.keys(tWithStore.store.data[lang] || {})) {
@@ -109,7 +118,11 @@ function resolveLabel(
  * Resolves an option's display text with graceful fallback so a missing or bespoke
  * translation key
  */
-function resolveOptionText(t: TFunction, option: FormFieldOption, interpolation?: Record<string, unknown>): string {
+function resolveOptionText(
+  t: TFunction,
+  option: FormFieldOption,
+  interpolation?: Record<string, unknown>
+): string {
   if (option.text) {
     return option.text;
   }
@@ -147,7 +160,11 @@ function processOptions(
     }
 
     // Resolve label (function or string)
-    const optionLabel = resolveLabel(option.label, translations, resolveOptionText(t, option, interpolation));
+    const optionLabel = resolveLabel(
+      option.label,
+      translations,
+      resolveOptionText(t, option, interpolation)
+    );
 
     // Process conditionalText if provided
     let resolvedConditionalText: string | undefined;
@@ -223,7 +240,13 @@ function processField(
 
   // Process options with label functions and conditionalText
   // Pass parentFieldName so subFields can be properly prefixed
-  const processedOptions = processOptions(field.options, t, translations, parentFieldName || fieldName, interpolation);
+  const processedOptions = processOptions(
+    field.options,
+    t,
+    translations,
+    parentFieldName || fieldName,
+    interpolation
+  );
 
   return {
     ...field,
@@ -251,7 +274,14 @@ export function translateFields(
 
   return fields.map((field, index) => {
     // Process field (handles label functions)
-    const processedField = processField(field, t, translations, undefined, fieldPrefix || undefined, interpolation);
+    const processedField = processField(
+      field,
+      t,
+      translations,
+      undefined,
+      fieldPrefix || undefined,
+      interpolation
+    );
 
     // Process subFields recursively if they exist in options
     let processedOptionsWithSubFields = processedField.options;
@@ -316,7 +346,9 @@ export function translateFields(
 
     // Build translated options for component builder (backward compatible format)
     const translatedOptions = processedOptionsWithSubFields?.map(option => {
-      const hint = option.hint ? getTranslation(t, option.hint, option.hint, interpolation) : undefined;
+      const hint = option.hint
+        ? getTranslation(t, option.hint, option.hint, interpolation)
+        : undefined;
       if (option.divider) {
         // Same graceful fallback as option text: page-specific key -> generic common key -> raw divider string
         const genericKey = `options.${option.divider.split('.').pop()}`;
@@ -330,15 +362,20 @@ export function translateFields(
     // For nested fields (subFields), extract simple name to look up values
     // field.name might be nested (e.g., "parent.subField") but fieldValues is keyed by simple names
     const fieldNameForValueLookup =
-      fieldPrefix && field.name.includes('.') ? field.name.split('.').pop() || field.name : field.name;
+      fieldPrefix && field.name.includes('.')
+        ? field.name.split('.').pop() || field.name
+        : field.name;
 
     const fieldError = errors[processedField.name];
     const hasError = fieldError !== undefined;
     const errorText = fieldError !== undefined ? getErrorMessage(fieldError) : undefined;
     const erroneousParts =
-      fieldError !== undefined && typeof fieldError !== 'string' ? fieldError.erroneousParts : undefined;
+      fieldError !== undefined && typeof fieldError !== 'string'
+        ? fieldError.erroneousParts
+        : undefined;
     // processedField.label is already resolved to a string by processField
-    const resolvedLabel = typeof processedField.label === 'string' ? processedField.label : processedField.name;
+    const resolvedLabel =
+      typeof processedField.label === 'string' ? processedField.label : processedField.name;
     if (!nunjucksEnv) {
       throw new Error('Nunjucks environment is required for building component config');
     }

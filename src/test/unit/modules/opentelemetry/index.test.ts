@@ -138,7 +138,10 @@ describe('opentelemetry module', () => {
     telemetryModule.initializeTelemetry();
     await expect(telemetryModule.flushTelemetry()).resolves.toBeUndefined();
 
-    expect(consoleErrorSpy).toHaveBeenCalledWith('Failed to flush telemetry cleanly', shutdownError);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'Failed to flush telemetry cleanly',
+      shutdownError
+    );
     consoleErrorSpy.mockRestore();
   });
 
@@ -146,18 +149,22 @@ describe('opentelemetry module', () => {
     it('drops every query value, whatever it is called, and keeps the rest of the URL', async () => {
       const { redactQueryValues } = await getTelemetryModule();
 
-      expect(redactQueryValues('https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123')).toBe(
-        'https://api.os.uk/search/places/v1/postcode?postcode=***&key=***'
-      );
+      expect(
+        redactQueryValues('https://api.os.uk/search/places/v1/postcode?postcode=W37RX&key=abc123')
+      ).toBe('https://api.os.uk/search/places/v1/postcode?postcode=***&key=***');
       // A parameter nobody thought to name in advance is redacted the same way.
-      expect(redactQueryValues('https://svc/thing?api_signature=deadbeef')).toBe('https://svc/thing?api_signature=***');
+      expect(redactQueryValues('https://svc/thing?api_signature=deadbeef')).toBe(
+        'https://svc/thing?api_signature=***'
+      );
       expect(redactQueryValues('https://ccd/cases/123')).toBe('https://ccd/cases/123');
     });
 
     it('leaves an = in the path or the fragment alone', async () => {
       const { redactQueryValues } = await getTelemetryModule();
 
-      expect(redactQueryValues('https://dm-store/documents/a=b/binary')).toBe('https://dm-store/documents/a=b/binary');
+      expect(redactQueryValues('https://dm-store/documents/a=b/binary')).toBe(
+        'https://dm-store/documents/a=b/binary'
+      );
       expect(redactQueryValues('https://svc/thing?a=1#b=2')).toBe('https://svc/thing?a=***#b=2');
     });
 

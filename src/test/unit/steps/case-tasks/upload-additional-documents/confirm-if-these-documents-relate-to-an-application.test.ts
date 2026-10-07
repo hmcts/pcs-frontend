@@ -49,7 +49,11 @@ import {
   loadStepNamespace,
   setFormData,
 } from '@modules/steps';
-import type { CcdCase, CcdCollectionItem, RelatedApplicationOption } from '@services/ccdCase.interface';
+import type {
+  CcdCase,
+  CcdCollectionItem,
+  RelatedApplicationOption,
+} from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 const mockGetCaseByIdForEvent = ccdCaseService.getCaseByIdForEvent as jest.Mock;
@@ -107,12 +111,16 @@ const item = (
   value: { genAppId, category, submittedDate },
 });
 
-const counterClaimItem = (counterClaimId = COUNTER_CLAIM_ID): CcdCollectionItem<RelatedApplicationOption> => ({
+const counterClaimItem = (
+  counterClaimId = COUNTER_CLAIM_ID
+): CcdCollectionItem<RelatedApplicationOption> => ({
   id: counterClaimId,
   value: { counterClaimId, category: 'COUNTERCLAIM', submittedDate: '2026-06-01' },
 });
 
-const startResponseWithOptions = (options: CcdCollectionItem<RelatedApplicationOption>[]): CcdCase => ({
+const startResponseWithOptions = (
+  options: CcdCollectionItem<RelatedApplicationOption>[]
+): CcdCase => ({
   id: CASE_REF,
   data: { relatedApplicationOptions: options },
 });
@@ -255,7 +263,10 @@ describe('confirm-if-these-documents-relate-to-an-application GET', () => {
 
   it('renders the counterclaim option keyed by counterClaimId, between the gen-apps and main claim', async () => {
     mockGetCaseByIdForEvent.mockResolvedValue(
-      startResponseWithOptions([item(GEN_APP_1, 'ADJOURN_HEARING_APPLICATION', '2026-05-01'), counterClaimItem()])
+      startResponseWithOptions([
+        item(GEN_APP_1, 'ADJOURN_HEARING_APPLICATION', '2026-05-01'),
+        counterClaimItem(),
+      ])
     );
 
     const result = await invokeGet();

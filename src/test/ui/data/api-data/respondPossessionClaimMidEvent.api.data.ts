@@ -111,6 +111,5 @@ export const respondPossessionClaimMidEventApiData = {
     },
   },
 
-  respondPossessionClaimApiEndPoint: (): string =>
-    `/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage`,
+  respondPossessionClaimApiEndPoint: (): string => `/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage`,
 };

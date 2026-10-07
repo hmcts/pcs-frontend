@@ -133,8 +133,14 @@ export function initSessionTimeout(): void {
       updateVisualCountdown(secondsRemaining);
 
       if (secondsRemaining === warningTimeSeconds) {
-        updateScreenReaderAnnouncement(`${timeoutSubtitle} ${warningTimeSeconds / 60} ${timeMinutes}.`);
-      } else if (secondsRemaining > 0 && secondsRemaining < warningTimeSeconds && secondsRemaining % 60 === 0) {
+        updateScreenReaderAnnouncement(
+          `${timeoutSubtitle} ${warningTimeSeconds / 60} ${timeMinutes}.`
+        );
+      } else if (
+        secondsRemaining > 0 &&
+        secondsRemaining < warningTimeSeconds &&
+        secondsRemaining % 60 === 0
+      ) {
         const minutes = secondsRemaining / 60;
         updateScreenReaderAnnouncement(`${formatTime(minutes, 0)} ${timeRemaining}`);
       }

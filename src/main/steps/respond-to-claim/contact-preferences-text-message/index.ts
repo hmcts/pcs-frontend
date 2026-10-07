@@ -1,4 +1,7 @@
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -25,7 +28,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       return true;
     }
     // "Yes" is only complete once a textable mobile number has actually been captured.
-    const mobileNumber = validatedCase?.possessionClaimResponse?.defendantContactDetails?.party?.textMessageNumber;
+    const mobileNumber =
+      validatedCase?.possessionClaimResponse?.defendantContactDetails?.party?.textMessageNumber;
     return contactByText === 'YES' && Boolean(mobileNumber);
   },
   showCancelButton: false,
@@ -80,7 +84,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   getInitialFormData: req => {
     const caseData = req.res?.locals.validatedCase?.possessionClaimResponse;
     const contactByText = caseData?.defendantResponses?.contactByText as string | undefined;
-    const mobileNumber = caseData?.defendantContactDetails?.party?.textMessageNumber as string | undefined;
+    const mobileNumber = caseData?.defendantContactDetails?.party?.textMessageNumber as
+      string | undefined;
 
     const result: Record<string, unknown> = {};
 

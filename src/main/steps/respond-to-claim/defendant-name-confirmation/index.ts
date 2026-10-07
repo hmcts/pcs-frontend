@@ -1,13 +1,17 @@
 import type { Request } from 'express';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'defendant-name-confirmation',
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.defendantNameConfirmation),
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.defendantNameConfirmation),
   stepDir: __dirname,
   customTemplate: `${__dirname}/defendantNameConfirmation.njk`,
   beforeRedirect: async req => {
@@ -15,7 +19,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const nameConfirmation = req.body?.nameConfirmation as string | undefined;
 
     if (nameConfirmation === 'yes' || nameConfirmation === 'no') {
-      response.defendantResponses.defendantNameConfirmation = nameConfirmation === 'yes' ? 'YES' : 'NO';
+      response.defendantResponses.defendantNameConfirmation =
+        nameConfirmation === 'yes' ? 'YES' : 'NO';
 
       if (nameConfirmation === 'no') {
         const firstName = req.body?.['nameConfirmation.firstName'] as string | undefined;
@@ -74,9 +79,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseData = req.res?.locals.validatedCase?.data;
     const claimantEntry = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails;
     const defendantName =
-      claimantEntry?.firstName && claimantEntry?.lastName ? `${claimantEntry.firstName} ${claimantEntry.lastName}` : '';
+      claimantEntry?.firstName && claimantEntry?.lastName
+        ? `${claimantEntry.firstName} ${claimantEntry.lastName}`
+        : '';
 
-    const organisationName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
+    const organisationName =
+      (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
 
     return {
       defendantName,

@@ -1,11 +1,5 @@
 import { createCaseApiData, submitCaseApiData } from '../data/api-data';
-import {
-  counterClaimApplicationFeeAmount,
-  counterClaimPaymentSuccessful,
-  responseAndCounterClaimSubmitted,
-  responseSubmitted,
-  serviceRequestPayment,
-} from '../data/page-data';
+import { counterClaimApplicationFeeAmount, counterClaimPaymentSuccessful, responseAndCounterClaimSubmitted, responseSubmitted, serviceRequestPayment } from '../data/page-data';
 import {
   confirmationOfNoticeGiven,
   correspondenceAddress,
@@ -54,11 +48,7 @@ import {
 import { user } from '../data/user-data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
-import {
-  RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS,
-  RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS,
-  logTestEnvAfterBeforeEach,
-} from '../utils/common/log-test-env';
+import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, RESPOND_TO_CLAIM_WALES_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { finaliseAllValidations, initializeExecutor, performAction, performValidation } from '../utils/controller';
 
@@ -114,10 +104,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown });
   }
 
-  if (
-    testInfo.title.includes('Something else') ||
-    testInfo.title.includes('CounterClaim - Something else - Defendant need help')
-  ) {
+  if (testInfo.title.includes('Something else') || testInfo.title.includes('CounterClaim - Something else - Defendant need help')) {
     process.env.CLAIMANT_NAME = submitCaseApiData.submitCasePayloadAssuredTenancy.claimantName;
     claimantName = process.env.CLAIMANT_NAME;
     process.env.CLAIMANT_NAME_OVERRIDDEN = 'YES';
@@ -127,10 +114,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayloadAssuredTenancy });
   }
 
-  if (
-    testInfo.title.includes('CounterClaim - Defendant need help') ||
-    testInfo.title.includes('CounterClaim - Defendant need help - Has the defendant already applied - No')
-  ) {
+  if (testInfo.title.includes('CounterClaim - Defendant need help') || testInfo.title.includes('CounterClaim - Defendant need help - Has the defendant already applied - No')) {
     claimantName = submitCaseApiData.submitCaseRentDemotedCorrespondenceAddressUnknown.claimantName;
     process.env.CLAIMANT_NAME = claimantName;
     process.env.CORRESPONDENCE_ADDRESS = 'UNKNOWN';
@@ -145,7 +129,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   logTestEnvAfterBeforeEach(testInfo.title, RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS);
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await performAction('login', user.defendantSolicitor.email);
-  await performAction('clickButton', startNow.startNowButton);
+  await performAction('When the user clicks the button', startNow.startNowButton);
 });
 
 test.afterEach(async () => {
@@ -250,13 +234,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
-      regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-      ],
+      regularIncomeOptions: [[whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption]],
     });
     await performAction('selectPriorityDebtsLR', {
       question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
@@ -269,11 +247,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
           whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
           whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
         ],
-        [
-          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
-        ],
+        [whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph, whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput, whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption],
       ],
     });
     await performAction('otherConsiderationsLR', {
@@ -286,7 +260,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -294,11 +268,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeededLR.mainHeader);
-    await performAction(
-      'clickLinkAndSwitchToNewTab',
-      responseSubmittedCounterclaimFeePaymentNeededLR.payTheCounterclaimFeeOpensInNewTabLink
-    );
+    await performValidation('Then the user sees the main header', responseSubmittedCounterclaimFeePaymentNeededLR.mainHeader);
+    await performAction('clickLinkAndSwitchToNewTab', responseSubmittedCounterclaimFeePaymentNeededLR.payTheCounterclaimFeeOpensInNewTabLink);
     await performAction('validateCounterClaimApplicationFee', {
       amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
       fee: counterClaimSpecificSumOfMoney.feeHiddenAmount,
@@ -314,7 +285,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       referenceText: serviceRequestPayment.pbaReferenceInputText,
       button: counterClaimApplicationFeeAmount.getLrPayButton('35.00'),
     });
-    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('Then the user sees the main header', counterClaimPaymentSuccessful.mainHeader);
     await performValidation('text', {
       elementType: 'paragraph',
       text: counterClaimPaymentSuccessful.lrPaymentConfirmationParagraph,
@@ -413,13 +384,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
-      regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-      ],
+      regularIncomeOptions: [[whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption]],
     });
     await performAction('selectPriorityDebtsLR', {
       question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
@@ -432,11 +397,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
           whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
           whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
         ],
-        [
-          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
-        ],
+        [whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph, whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput, whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption],
       ],
     });
     await performAction('otherConsiderationsLR', {
@@ -449,7 +410,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -457,11 +418,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeededLR.mainHeader);
-    await performAction(
-      'clickLinkAndSwitchToNewTab',
-      responseSubmittedCounterclaimFeePaymentNeededLR.payTheCounterclaimFeeOpensInNewTabLink
-    );
+    await performValidation('Then the user sees the main header', responseSubmittedCounterclaimFeePaymentNeededLR.mainHeader);
+    await performAction('clickLinkAndSwitchToNewTab', responseSubmittedCounterclaimFeePaymentNeededLR.payTheCounterclaimFeeOpensInNewTabLink);
     await performAction('validateCounterClaimApplicationFee', {
       amount: counterClaimApplicationFeeAmount.counterClaimAmountNotApplicable,
       fee: counterClaimApplicationFeeAmount.somethingElseCounterClaimFee,
@@ -475,11 +433,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       pbaValue: serviceRequestPayment.pbaIndex1,
       referenceLabel: serviceRequestPayment.pbaReferenceLabel,
       referenceText: serviceRequestPayment.pbaReferenceInputText,
-      button: counterClaimApplicationFeeAmount.getLrPayButton(
-        counterClaimApplicationFeeAmount.somethingElseCounterClaimFee
-      ),
+      button: counterClaimApplicationFeeAmount.getLrPayButton(counterClaimApplicationFeeAmount.somethingElseCounterClaimFee),
     });
-    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('Then the user sees the main header', counterClaimPaymentSuccessful.mainHeader);
     await performValidation('text', {
       elementType: 'paragraph',
       text: counterClaimPaymentSuccessful.lrPaymentConfirmationParagraph,
@@ -582,13 +538,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       incomeAndExpensesOption: incomeAndExpenses.yesRadioOption,
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
-      regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-      ],
+      regularIncomeOptions: [[whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption]],
     });
     await performAction('selectPriorityDebtsLR', {
       question: priorityDebts.doesDefendantHaveAnyPriorityDebtsQuestion,
@@ -601,11 +551,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
           whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
           whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
         ],
-        [
-          whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
-        ],
+        [whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph, whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput, whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption],
       ],
     });
     await performAction('otherConsiderationsLR', {
@@ -618,7 +564,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -626,7 +572,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
+    await performAction('When the user clicks the button', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - NonRentArrears - AssuredTenancy - LR @PR @rentNonRent @LR', async () => {
@@ -762,7 +708,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -770,10 +716,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction(
-      'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @PR @rentNonRent @LR @regression @healthCheck', async () => {
@@ -911,7 +854,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -919,10 +862,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction(
-      'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('When the user clicks the button', responseSubmittedCounterclaimFeePaymentNeededLR.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - DemotedTenancy - LR @rent @LR', async () => {
@@ -1003,7 +943,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -1011,7 +951,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction('clickButton', responseSubmitted.closeAndReturnToCaseOverviewButton);
+    await performAction('When the user clicks the button', responseSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('RentArrears - DemotedTenancy - CounterClaim - Defendant need help - LR @rent @LR @crossbrowser', async () => {
@@ -1117,7 +1057,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -1125,7 +1065,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performValidation('mainHeader', responseAndCounterClaimSubmitted.mainHeader);
+    await performValidation('Then the user sees the main header', responseAndCounterClaimSubmitted.mainHeader);
     await performValidation('text', {
       elementType: 'paragraph',
       text: responseAndCounterClaimSubmitted.reviewHwfApplicationParagraph,
@@ -1184,7 +1124,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
-    await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
+    await performValidation('Then the user sees the main header', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
     await performAction('clickLink', counterclaimYouNeedToApplyForHelpWithYourFees.signOutLink);
   });
 
@@ -1252,7 +1192,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('counterClaimHaveYouAppliedForHelpWithFeeLR', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.noRadioOption,
     });
-    await performValidation('mainHeader', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
+    await performValidation('Then the user sees the main header', counterclaimYouNeedToApplyForHelpWithYourFees.mainHeader);
   });
 
   test('RentArrears - Verify dynamic link @LR', async () => {
@@ -1363,30 +1303,11 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     });
     await performAction('selectWhatRegularIncomeDoTheyReceiveLR', {
       regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-          whatRegularIncomeDoYouReceive.pensionTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
-          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
-        ],
+        [whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph, whatRegularIncomeDoYouReceive.otherBenefitsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph, whatRegularIncomeDoYouReceive.pensionTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph, whatRegularIncomeDoYouReceive.incomeFromJobsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph, whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput],
       ],
     });
     await performAction('selectPriorityDebtsLR', {
@@ -1403,7 +1324,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: languageUsed.whichLanguageParagraph,
       radioOption: languageUsed.englishRadioOption,
     });
-    await performAction('retrieveCYATableDataRTC', isLR);
+    await performAction('And the user retrieves the check‑your‑answers table data for the RTC section', isLR);
     await performAction('validateCYARTC', isLR);
     await performAction('selectStatementOfTruthRTCLR', {
       checkBox: endOfJourneyCYA.factsTrueCheckboxLabel,
@@ -1411,7 +1332,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       firmName: endOfJourneyCYA.nameOfFirmTextInput,
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
-    await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
+    await performAction('When the user clicks the button', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
   test('Existing draft response resumes to the saved journey @nonRent @LR', async () => {
@@ -1423,29 +1344,21 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
     });
-    await performValidation('mainHeader', resumeResponse.mainHeader);
+    await performValidation('Then the user sees the main header', resumeResponse.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: resumeResponse.resumeResponseParagraph1 });
     await performValidation('text', { elementType: 'listItem', text: resumeResponse.resumeResponseListItem1 });
     await performValidation('text', { elementType: 'listItem', text: resumeResponse.resumeResponseListItem2 });
     await performValidation('text', { elementType: 'paragraph', text: resumeResponse.resumeResponseParagraph2 });
     await performAction('selectResumeResponseLR', { option: resumeResponse.yesRadioOption });
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
+    await performValidation('Then the user sees the main header', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
     await performValidation('radioButtonChecked', defendantNameConfirmation.yesRadioOption, true);
-    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
-    await performValidation('mainHeader', defendantDateOfBirth.mainHeader);
-    await performValidation(
-      'inputTextValue',
-      defendantDateOfBirth.dayTextLabel,
-      defendantDateOfBirth.savedDayInputText
-    );
-    await performValidation(
-      'inputTextValue',
-      defendantDateOfBirth.monthTextLabel,
-      defendantDateOfBirth.savedMonthInputText
-    );
+    await performAction('When the user clicks the button', defendantNameConfirmation.saveAndContinueButton);
+    await performValidation('Then the user sees the main header', defendantDateOfBirth.mainHeader);
+    await performValidation('inputTextValue', defendantDateOfBirth.dayTextLabel, defendantDateOfBirth.savedDayInputText);
+    await performValidation('inputTextValue', defendantDateOfBirth.monthTextLabel, defendantDateOfBirth.savedMonthInputText);
     await performValidation('inputTextValue', defendantDateOfBirth.yearTextLabel, defendantDateOfBirth.yearInputText);
     await performAction('inputText', defendantDateOfBirth.yearTextLabel, '2001');
-    await performAction('clickButton', defendantDateOfBirth.saveAndContinueButton);
+    await performAction('When the user clicks the button', defendantDateOfBirth.saveAndContinueButton);
 
     await performAction('reopenStartNowLR');
     await performAction('representationLR', {
@@ -1453,7 +1366,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
     });
     await performAction('selectResumeResponseLR', { option: resumeResponse.yesRadioOption });
-    await performAction('clickButton', defendantNameConfirmation.saveAndContinueButton);
+    await performAction('When the user clicks the button', defendantNameConfirmation.saveAndContinueButton);
     await performValidation('inputTextValue', defendantDateOfBirth.yearTextLabel, '2001');
   });
 
@@ -1466,9 +1379,9 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
     });
-    await performValidation('mainHeader', resumeResponse.mainHeader);
+    await performValidation('Then the user sees the main header', resumeResponse.mainHeader);
     await performAction('selectResumeResponseLR', { option: resumeResponse.noRadioOption });
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
+    await performValidation('Then the user sees the main header', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
     await performValidation('radioButtonChecked', defendantNameConfirmation.yesRadioOption, false);
 
     await performAction('reopenStartNowLR');
@@ -1476,7 +1389,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       question: selectDefendant.whichDefendantQuestion,
       radioOption: `${pinUser.firstName} ${pinUser.lastName}`,
     });
-    await performValidation('mainHeader', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
+    await performValidation('Then the user sees the main header', defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName));
   });
 
   test('Only one defendant with a draft goes to resume response @rentNonRent @singleDefendant @LR @regression', async () => {
@@ -1484,6 +1397,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('createDraftResponseLR', pinUser);
 
     await performAction('reopenStartNowLR');
-    await performValidation('mainHeader', resumeResponse.mainHeader);
+    await performValidation('Then the user sees the main header', resumeResponse.mainHeader);
   });
 });

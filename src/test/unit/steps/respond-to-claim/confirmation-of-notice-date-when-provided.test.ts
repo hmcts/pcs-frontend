@@ -263,7 +263,12 @@ describe('confirmation-of-notice-date-when-provided step', () => {
         ['methodOfService.EMAIL', { emailAddress: 'jane@example.com' }],
         'EMAIL[emailAddress=jane@example.com]',
       ],
-      ['EMAIL without address', { notice_ServiceMethod: 'EMAIL' }, ['methodOfService.EMAIL_ALT'], 'EMAIL_ALT'],
+      [
+        'EMAIL without address',
+        { notice_ServiceMethod: 'EMAIL' },
+        ['methodOfService.EMAIL_ALT'],
+        'EMAIL_ALT',
+      ],
       [
         'DELIVERED_PERMITTED_PLACE',
         { notice_ServiceMethod: 'DELIVERED_PERMITTED_PLACE', notice_DeliveredDate: '2024-01-15' },
@@ -303,19 +308,27 @@ describe('confirmation-of-notice-date-when-provided step', () => {
         ['methodOfService.OTHER', { details: 'handed to neighbour' }],
         'OTHER[details=handed to neighbour]',
       ],
-      ['OTHER without details', { notice_ServiceMethod: 'OTHER' }, ['methodOfService.OTHER_ALT'], 'OTHER_ALT'],
-    ] as const)('returns noticeMethodText for %s', (_label, caseData, expectedTranslationCall, expectedText) => {
-      const content = testedStep.extendGetContent({
-        res: {
-          locals: {
-            validatedCase: makeValidatedCase(caseData),
+      [
+        'OTHER without details',
+        { notice_ServiceMethod: 'OTHER' },
+        ['methodOfService.OTHER_ALT'],
+        'OTHER_ALT',
+      ],
+    ] as const)(
+      'returns noticeMethodText for %s',
+      (_label, caseData, expectedTranslationCall, expectedText) => {
+        const content = testedStep.extendGetContent({
+          res: {
+            locals: {
+              validatedCase: makeValidatedCase(caseData),
+            },
           },
-        },
-      });
+        });
 
-      expect(tMock).toHaveBeenCalledWith(...expectedTranslationCall);
-      expect(content.noticeMethodText).toBe(expectedText);
-    });
+        expect(tMock).toHaveBeenCalledWith(...expectedTranslationCall);
+        expect(content.noticeMethodText).toBe(expectedText);
+      }
+    );
 
     it('omits noticeMethodText when service method is missing or unknown', () => {
       const missingMethodContent = testedStep.extendGetContent({
@@ -359,15 +372,18 @@ describe('confirmation-of-notice-date-when-provided step', () => {
         )
       );
 
-    it.each(['en', 'cy'])('overrides every release 1.2 key in %s so citizen wording cannot leak through', lang => {
-      const citizen = readLocale(lang, 'respondToClaim');
-      const legalRep = readLocale(lang, 'respondToClaim/legalrep');
+    it.each(['en', 'cy'])(
+      'overrides every release 1.2 key in %s so citizen wording cannot leak through',
+      lang => {
+        const citizen = readLocale(lang, 'respondToClaim');
+        const legalRep = readLocale(lang, 'respondToClaim/legalrep');
 
-      for (const key of Object.keys(citizen.release12)) {
-        expect(legalRep.release12[key]).toBeDefined();
-        expect(legalRep.release12[key]).not.toBe(citizen.release12[key]);
-        expect(legalRep.release12[key]).toContain(DEFENDANT_TERM[lang]);
+        for (const key of Object.keys(citizen.release12)) {
+          expect(legalRep.release12[key]).toBeDefined();
+          expect(legalRep.release12[key]).not.toBe(citizen.release12[key]);
+          expect(legalRep.release12[key]).toContain(DEFENDANT_TERM[lang]);
+        }
       }
-    });
+    );
   });
 });

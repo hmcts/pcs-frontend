@@ -41,12 +41,14 @@ export class RespondToClaimSubmitRejectedError extends Error {
 export const RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY = 'respondToClaimSubmitRejection';
 
 export function submitRejectionReason(messages: string[]): 'correspondenceAddress' | 'other' {
-  return messages.some(message => /correspondence address/i.test(message)) ? 'correspondenceAddress' : 'other';
+  return messages.some(message => /correspondence address/i.test(message))
+    ? 'correspondenceAddress'
+    : 'other';
 }
 
 export function callbackErrorMessages(error: unknown): string[] {
-  const callbackErrors = (error as { response?: { data?: { callbackErrors?: unknown } } })?.response?.data
-    ?.callbackErrors;
+  const callbackErrors = (error as { response?: { data?: { callbackErrors?: unknown } } })?.response
+    ?.data?.callbackErrors;
   return Array.isArray(callbackErrors)
     ? callbackErrors.filter((value): value is string => typeof value === 'string')
     : [];
@@ -69,7 +71,9 @@ interface ParsedSubmitPaymentPayload {
   counterClaimType?: string;
 }
 
-export function parseSubmitPaymentPayload(confirmationBody?: string | null): ParsedSubmitPaymentPayload | undefined {
+export function parseSubmitPaymentPayload(
+  confirmationBody?: string | null
+): ParsedSubmitPaymentPayload | undefined {
   if (!confirmationBody) {
     return undefined;
   }
@@ -100,7 +104,8 @@ export function parseSubmitPaymentPayload(confirmationBody?: string | null): Par
 
     return {
       serviceRequestReference: paymentDetails.serviceRequestReference,
-      feeAmount: typeof paymentDetails.feeAmount === 'number' ? paymentDetails.feeAmount : undefined,
+      feeAmount:
+        typeof paymentDetails.feeAmount === 'number' ? paymentDetails.feeAmount : undefined,
       counterClaimType: claimType,
     };
   } catch (error) {
@@ -124,7 +129,9 @@ function getCaseHeaders(token: string) {
   };
 }
 
-export async function submitRespondToClaimResponse(req: Request): Promise<{ confirmationPath: string }> {
+export async function submitRespondToClaimResponse(
+  req: Request
+): Promise<{ confirmationPath: string }> {
   const validatedCase = req.res?.locals.validatedCase;
 
   if (!validatedCase) {
@@ -146,7 +153,10 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
   logger.info(`Submitting response to claim for case ${caseId}`);
 
   const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/respondPossessionClaim`;
-  const startResponse = await http.get<{ token: string }>(eventUrl, getCaseHeaders(userAccessToken));
+  const startResponse = await http.get<{ token: string }>(
+    eventUrl,
+    getCaseHeaders(userAccessToken)
+  );
   const eventToken = startResponse.data.token;
 
   const submitUrl = `${getBaseUrl()}/cases/${caseId}/events`;
@@ -169,7 +179,11 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
 
   let submittedCase: CcdCase;
   try {
-    const submitResponse = await http.post<CcdCase>(submitUrl, payload, getCaseHeaders(userAccessToken));
+    const submitResponse = await http.post<CcdCase>(
+      submitUrl,
+      payload,
+      getCaseHeaders(userAccessToken)
+    );
     submittedCase = submitResponse.data;
   } catch (error) {
     if (isDraftChangedError(error)) {
@@ -186,7 +200,9 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
 
   logger.info(`Response submitted successfully for case ${caseId}`);
 
-  const paymentPayload = parseSubmitPaymentPayload(submittedCase.after_submit_callback_response?.confirmation_body);
+  const paymentPayload = parseSubmitPaymentPayload(
+    submittedCase.after_submit_callback_response?.confirmation_body
+  );
   const { confirmationPath, counterClaimFeePaymentRequired } = getRespondToClaimSubmitNavigation(
     caseId,
     validatedCase.data,
@@ -194,7 +210,8 @@ export async function submitRespondToClaimResponse(req: Request): Promise<{ conf
   );
 
   if (counterClaimFeePaymentRequired) {
-    const counterClaim = validatedCase.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
+    const counterClaim =
+      validatedCase.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
     await persistPaymentSessionState(req, {
       caseReference: caseId,
       serviceRequestReference: paymentPayload!.serviceRequestReference,

@@ -7,9 +7,7 @@ import { IAction, actionData, actionRecord } from '../../interfaces';
 
 export class CitizenCreateGenAppAPIAction implements IAction {
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
-    const actionsMap = new Map<string, () => Promise<void>>([
-      ['citizenCreateGenAppAPI', () => this.citizenCreateGenAppAPI(fieldName)],
-    ]);
+    const actionsMap = new Map<string, () => Promise<void>>([['citizenCreateGenAppAPI', () => this.citizenCreateGenAppAPI(fieldName)]]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
       throw new Error(`No action found for '${action}'`);
@@ -19,11 +17,8 @@ export class CitizenCreateGenAppAPIAction implements IAction {
 
   private async citizenCreateGenAppAPI(caseData: actionData): Promise<void> {
     const citizenCreateGenAppApi = Axios.create(citizenCreateGenAppEventTokenApiData.citizenCreateGenAppApiInstance());
-    const GENAPP_EVENT_TOKEN = (
-      await citizenCreateGenAppApi.get(citizenCreateGenAppEventTokenApiData.citizenCreateGenAppApiEndPoint())
-    ).data.token;
-    const citizenCreateGenAppPayloadData =
-      typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
+    const GENAPP_EVENT_TOKEN = (await citizenCreateGenAppApi.get(citizenCreateGenAppEventTokenApiData.citizenCreateGenAppApiEndPoint())).data.token;
+    const citizenCreateGenAppPayloadData = typeof caseData === 'object' && 'data' in caseData ? caseData.data : caseData;
     // create config instance (defaults to ADJOURN if nothing passed)
 
     const genAppApiConfig = citizenCreateGenAppApiData();

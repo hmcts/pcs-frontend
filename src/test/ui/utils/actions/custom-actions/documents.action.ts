@@ -1,10 +1,6 @@
 import { Page } from '@playwright/test';
 
-import {
-  checkYourAnswers,
-  confirmIfTheseDocumentsRelateToAnApplication,
-  uploadYourDocuments,
-} from '../../../data/page-data/documents-page-data';
+import { checkYourAnswers, confirmIfTheseDocumentsRelateToAnApplication, uploadYourDocuments } from '../../../data/page-data/documents-page-data';
 import { performAction, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -15,10 +11,7 @@ export class DocumentsAction implements IAction {
       ['uploadDocuments', () => this.uploadDocuments(fieldName)],
       ['verifyCheckYourAnswers', () => this.verifyCheckYourAnswers(fieldName)],
       ['validateViewDocuments', () => this.validateViewDocuments(fieldName)],
-      [
-        'verifyDocumentRelatesToApplication',
-        () => this.verifyDocumentRelatesToApplication(page, fieldName as actionRecord),
-      ],
+      ['verifyDocumentRelatesToApplication', () => this.verifyDocumentRelatesToApplication(page, fieldName as actionRecord)],
     ]);
 
     const actionToPerform = actionsMap.get(action);
@@ -29,18 +22,18 @@ export class DocumentsAction implements IAction {
   }
 
   private async startEvidenceUpload(data: actionData): Promise<void> {
-    await performAction('clickButton', data);
+    await performAction('When the user clicks the button', data);
   }
 
   private async uploadDocuments(data: actionRecord): Promise<void> {
     if (data?.files) {
       await performAction('uploadFile', data.files);
     }
-    await performAction('clickButton', uploadYourDocuments.continueButton);
+    await performAction('When the user clicks the button', uploadYourDocuments.continueButton);
   }
 
   private async verifyCheckYourAnswers(data: actionRecord): Promise<void> {
-    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+    await performValidation('Then the user sees the main header', checkYourAnswers.mainHeader);
 
     if (data.relatedApplication) {
       await performValidation('summaryRow', checkYourAnswers.relatedApplicationKey, {
@@ -123,9 +116,7 @@ Actual: "${actualText}"`
     }
 
     const selectOption =
-      confirmDocumentData.option === confirmIfTheseDocumentsRelateToAnApplication.noMainClaimRadioOption
-        ? confirmDocumentData.option
-        : `${confirmDocumentData.option} ${formattedDate}`;
+      confirmDocumentData.option === confirmIfTheseDocumentsRelateToAnApplication.noMainClaimRadioOption ? confirmDocumentData.option : `${confirmDocumentData.option} ${formattedDate}`;
 
     // VERIFY option is visible on UI BEFORE clicking
     await performValidation('elementToBeVisible', { elementType: 'radio', text: selectOption });
@@ -133,6 +124,6 @@ Actual: "${actualText}"`
       question: confirmDocumentData.question,
       option: selectOption,
     });
-    await performAction('clickButton', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
+    await performAction('When the user clicks the button', confirmIfTheseDocumentsRelateToAnApplication.continueButton);
   }
 }

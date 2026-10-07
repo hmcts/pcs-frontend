@@ -1,7 +1,10 @@
 import type { Request } from 'express';
 import { DateTime } from 'luxon';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { formatDatePartsToISODate } from '../../utils/dateUtils';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -40,7 +43,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: req => {
     const caseData: CaseData | undefined = req.res?.locals.validatedCase?.data;
-    const noticeReceivedDateRaw: unknown = caseData?.possessionClaimResponse?.defendantResponses?.noticeReceivedDate;
+    const noticeReceivedDateRaw: unknown =
+      caseData?.possessionClaimResponse?.defendantResponses?.noticeReceivedDate;
 
     if (!noticeReceivedDateRaw) {
       return {};
@@ -74,7 +78,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
   beforeRedirect: async (req: Request) => {
     const response = buildDraftDefendantResponse(req);
-    const dateObject: { day?: string; month?: string; year?: string } | undefined = req.body?.noticeReceivedDate;
+    const dateObject: { day?: string; month?: string; year?: string } | undefined =
+      req.body?.noticeReceivedDate;
     const day = dateObject?.day !== undefined ? String(dateObject.day).trim() : '';
     const month = dateObject?.month !== undefined ? String(dateObject.month).trim() : '';
     const year = dateObject?.year !== undefined ? String(dateObject.year).trim() : '';

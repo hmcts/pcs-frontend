@@ -7,7 +7,10 @@ import {
   buildSelectionItems,
 } from '../../../../../main/modules/steps/formBuilder/componentBuilders';
 
-import type { FormFieldConfig, FormFieldOption } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type {
+  FormFieldConfig,
+  FormFieldOption,
+} from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 describe('componentBuilders', () => {
   const mockT = ((key: string, defaultValue?: string | Record<string, unknown>) => {
@@ -27,7 +30,10 @@ describe('componentBuilders', () => {
     renderString: mockRenderString,
   } as unknown as Environment;
 
-  const buildArgs = (field: FormFieldConfig, overrides: Partial<Parameters<typeof buildComponentConfig>[0]> = {}) => ({
+  const buildArgs = (
+    field: FormFieldConfig,
+    overrides: Partial<Parameters<typeof buildComponentConfig>[0]> = {}
+  ) => ({
     field,
     label: 'Test label',
     hint: undefined,
@@ -49,7 +55,9 @@ describe('componentBuilders', () => {
 
   describe('buildConditionalItemContent', () => {
     it('should return undefined when there is no conditional content', () => {
-      expect(buildConditionalItemContent({ value: 'yes', text: 'Yes' }, mockNunjucksEnv)).toBeUndefined();
+      expect(
+        buildConditionalItemContent({ value: 'yes', text: 'Yes' }, mockNunjucksEnv)
+      ).toBeUndefined();
     });
 
     it('should combine conditional text and rendered subfields', () => {
@@ -103,7 +111,9 @@ describe('componentBuilders', () => {
         mockNunjucksEnv
       );
 
-      expect(result).toEqual([{ value: 'maybe', text: 'maybe', hint: { text: 'Fallback hint' }, checked: false }]);
+      expect(result).toEqual([
+        { value: 'maybe', text: 'maybe', hint: { text: 'Fallback hint' }, checked: false },
+      ]);
     });
   });
 
@@ -304,7 +314,9 @@ describe('componentBuilders', () => {
         translationKey: { label: 'legacy' },
       } as unknown as FormFieldConfig;
 
-      const result = buildComponentConfig(buildArgs(field, { label: 'Legacy input', fieldValue: 'AB1 2CD' }));
+      const result = buildComponentConfig(
+        buildArgs(field, { label: 'Legacy input', fieldValue: 'AB1 2CD' })
+      );
 
       expect(result.componentType).toBe('input');
       expect(result.component.value).toBeUndefined();
@@ -410,7 +422,11 @@ describe('componentBuilders', () => {
           buildArgs(field, {
             label: 'Answer',
             fieldValue: '',
-            translatedOptions: [{ value: 'yes', text: 'Yes' }, { divider: 'or' }, { value: 'no', text: 'No' }],
+            translatedOptions: [
+              { value: 'yes', text: 'Yes' },
+              { divider: 'or' },
+              { value: 'no', text: 'No' },
+            ],
           })
         );
 
@@ -466,7 +482,12 @@ describe('componentBuilders', () => {
         );
 
         expect(result.component.items).toEqual([
-          { value: 'yes', text: 'Yes', hint: { text: 'This includes advice from a solicitor.' }, checked: true },
+          {
+            value: 'yes',
+            text: 'Yes',
+            hint: { text: 'This includes advice from a solicitor.' },
+            checked: true,
+          },
           { value: 'no', text: 'No', checked: false },
         ]);
       });
@@ -534,7 +555,11 @@ describe('componentBuilders', () => {
         const field: FormFieldConfig = {
           name: 'options',
           type: 'checkbox',
-          options: [{ value: 'option1', text: 'Option 1' }, { divider: 'or' }, { value: 'option2', text: 'Option 2' }],
+          options: [
+            { value: 'option1', text: 'Option 1' },
+            { divider: 'or' },
+            { value: 'option2', text: 'Option 2' },
+          ],
         };
 
         const result = buildComponentConfig(
@@ -556,7 +581,13 @@ describe('componentBuilders', () => {
         const field: FormFieldConfig = {
           name: 'agreement',
           type: 'checkbox',
-          options: [{ value: 'agree', text: 'I agree', conditionalText: '<p>You have agreed to the terms</p>' }],
+          options: [
+            {
+              value: 'agree',
+              text: 'I agree',
+              conditionalText: '<p>You have agreed to the terms</p>',
+            },
+          ],
         };
 
         const result = buildComponentConfig(
@@ -595,7 +626,12 @@ describe('componentBuilders', () => {
         );
 
         expect(result.component.items).toEqual([
-          { value: 'agree', text: 'I agree', hint: { text: 'This means you accept the terms.' }, checked: true },
+          {
+            value: 'agree',
+            text: 'I agree',
+            hint: { text: 'This means you accept the terms.' },
+            checked: true,
+          },
           { value: 'updates', text: 'Send me updates', checked: false },
         ]);
       });
@@ -730,7 +766,9 @@ describe('componentBuilders', () => {
           type: 'postcodeLookup' as 'text',
         };
 
-        const result = buildComponentConfig(buildArgs(field, { label: 'Unknown field', fieldValue: '' }));
+        const result = buildComponentConfig(
+          buildArgs(field, { label: 'Unknown field', fieldValue: '' })
+        );
 
         expect(result.componentType).toBe('input');
       });
@@ -880,7 +918,9 @@ describe('componentBuilders', () => {
 
       const result = buildComponentConfig(buildArgs(field));
 
-      expect(result.component.errorWrongType).toBe('common:errors.documentUpload.wrongFileTypeDocStore');
+      expect(result.component.errorWrongType).toBe(
+        'common:errors.documentUpload.wrongFileTypeDocStore'
+      );
       expect(result.component.errorFileTooLarge).toBeTruthy();
       expect(result.component.errorDelete).toBe('common:errors.documentUpload.fileDeleteFailed');
       expect(result.component.uploadButtonText).toBe('uploadButton');
@@ -903,7 +943,11 @@ describe('componentBuilders', () => {
 
     it('preserves existing documents as field value', () => {
       const existingDocs = [
-        { document_url: 'http://dm/doc/1', document_binary_url: 'http://dm/doc/1/binary', document_filename: 'a.pdf' },
+        {
+          document_url: 'http://dm/doc/1',
+          document_binary_url: 'http://dm/doc/1/binary',
+          document_filename: 'a.pdf',
+        },
       ];
       const field: FormFieldConfig = {
         name: 'documents',

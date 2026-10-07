@@ -12,7 +12,9 @@ function hasRentArrearsInIntroOrWales(caseData: CcdCaseData | undefined): boolea
     return true;
   }
 
-  const welsh = (caseData?.secureGroundsWales_DiscretionaryGrounds ?? []).map(ground => String(ground).toUpperCase());
+  const welsh = (caseData?.secureGroundsWales_DiscretionaryGrounds ?? []).map(ground =>
+    String(ground).toUpperCase()
+  );
   return welsh.some(code => code.includes('RENT_ARREARS'));
 }
 
@@ -33,7 +35,8 @@ function onlyRentArrearsFromIntroOrWales(caseData: CcdCaseData | undefined): boo
     intro.length > 0 && intro.every(ground => String(ground).toUpperCase() === 'RENT_ARREARS');
 
   const walesOnlyRentArrears =
-    welsh.length > 0 && welsh.every(ground => String(ground).toUpperCase().includes('RENT_ARREARS'));
+    welsh.length > 0 &&
+    welsh.every(ground => String(ground).toUpperCase().includes('RENT_ARREARS'));
 
   if (intro.length > 0 && welsh.length > 0) {
     return introOnlyRentArrears && walesOnlyRentArrears;

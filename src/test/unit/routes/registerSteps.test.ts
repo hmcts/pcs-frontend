@@ -33,7 +33,9 @@ jest.mock('../../../main/middleware', () => ({
   legalRepresentativeHeaderMiddleware: jest.fn((req, res, next) =>
     mockLegalRepresentativeHeaderMiddleware(req, res, next)
   ),
-  respondToClaimFeatureMiddleware: jest.fn((req, res, next) => mockRespondToClaimFeatureMiddleware(req, res, next)),
+  respondToClaimFeatureMiddleware: jest.fn((req, res, next) =>
+    mockRespondToClaimFeatureMiddleware(req, res, next)
+  ),
   legalRepresentativeSpecificStepsAccessMiddleware: jest.fn((req, res, next) =>
     mockLegalRepresentativeSpecificStepsAccessMiddleware(req, res, next)
   ),
@@ -96,7 +98,12 @@ jest.mock('@steps', () => ({
         flowConfig: {
           basePath: '/respond-to-claim',
           eventId: 'respondPossessionClaim',
-          stepOrder: ['protected-step', 'unprotected-step', 'function-controller-step', 'middleware-step'],
+          stepOrder: [
+            'protected-step',
+            'unprotected-step',
+            'function-controller-step',
+            'middleware-step',
+          ],
           steps: {
             'protected-step': { requiresAuth: true },
             'unprotected-step': { requiresAuth: false },
@@ -277,7 +284,9 @@ describe('registerSteps', () => {
   it('includes custom step middleware along with protection middlewares', () => {
     registerSteps(app);
 
-    const stepWithMiddlewareCall = mockGet.mock.calls.find(call => call[0] === '/steps/with-middleware');
+    const stepWithMiddlewareCall = mockGet.mock.calls.find(
+      call => call[0] === '/steps/with-middleware'
+    );
 
     expect(stepWithMiddlewareCall).toBeDefined();
     // [url, stepContext, oidc, dependencyCheck, customMiddleware, legalRepHeaders, handler]
@@ -465,7 +474,9 @@ describe('registerAllJourneys', () => {
 
     expect(mockUse).toHaveBeenCalledWith(expect.any(Function));
     expect(mockLogger.info).toHaveBeenCalledWith('Auto-registering all journeys from registry');
-    expect(mockLogger.info).toHaveBeenCalledWith("Journey 'respondToClaim' auto-registered and mounted");
+    expect(mockLogger.info).toHaveBeenCalledWith(
+      "Journey 'respondToClaim' auto-registered and mounted"
+    );
     expect(mockLogger.info).toHaveBeenCalledWith('All journeys registered successfully');
   });
 

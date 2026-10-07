@@ -5,18 +5,9 @@ import { createCaseApiWalesData } from '../api-data/createCaseWales.api.data';
 function getDefaultPostalAddress(): string {
   const isWalesJourney = process.env.WALES_POSTCODE && process.env.WALES_POSTCODE.toUpperCase() === 'YES';
 
-  const propertyAddress = isWalesJourney
-    ? createCaseApiWalesData.createCasePayload.propertyAddress
-    : createCaseApiData.createCasePayload.propertyAddress;
+  const propertyAddress = isWalesJourney ? createCaseApiWalesData.createCasePayload.propertyAddress : createCaseApiData.createCasePayload.propertyAddress;
 
-  return [
-    propertyAddress.AddressLine1,
-    propertyAddress.AddressLine2,
-    propertyAddress.AddressLine3,
-    propertyAddress.PostTown,
-    propertyAddress.County,
-    propertyAddress.PostCode,
-  ]
+  return [propertyAddress.AddressLine1, propertyAddress.AddressLine2, propertyAddress.AddressLine3, propertyAddress.PostTown, propertyAddress.County, propertyAddress.PostCode]
     .filter(Boolean)
     .join(', ');
 }
@@ -73,9 +64,7 @@ export const correspondenceAddress = {
   errorValidationField: {
     errorRadioMsg: [{ errMessage: `Please confirm your address by selecting the options below` }],
     errorTextField1: [{ type: `empty`, label: `Enter a UK postcode`, errMessage: `Enter a valid UK postcode` }],
-    errorTextField2: [
-      { type: `empty`, label: `Enter a UK postcode`, errMessage: `Postcode not found. Please check and try again.` },
-    ],
+    errorTextField2: [{ type: `empty`, label: `Enter a UK postcode`, errMessage: `Postcode not found. Please check and try again.` }],
     errorTextField3: [{ type: `empty`, label: `Select an address`, errMessage: `Please select an address` }],
     errorTextField4: [
       { type: `empty`, label: `Address line 1`, errMessage: `Enter address line 1, typically the building and street` },

@@ -4,14 +4,18 @@ function getDefendantResponses(caseData: CcdCaseData | undefined) {
   return caseData?.possessionClaimResponse?.defendantResponses;
 }
 //  Response submitted (no counterclaim).
-export function shouldShowResponseSubmittedConfirmationStep(caseData: CcdCaseData | undefined): boolean {
+export function shouldShowResponseSubmittedConfirmationStep(
+  caseData: CcdCaseData | undefined
+): boolean {
   const makeCounterClaim = getDefendantResponses(caseData)?.makeCounterClaim;
 
   return makeCounterClaim === 'NO' || makeCounterClaim === undefined;
 }
 
 //  Response and counterclaim submitted (with Help With Fees reference).
-export function shouldShowResponseAndCounterClaimSubmittedConfirmationStep(caseData: CcdCaseData | undefined): boolean {
+export function shouldShowResponseAndCounterClaimSubmittedConfirmationStep(
+  caseData: CcdCaseData | undefined
+): boolean {
   const defendantResponses = getDefendantResponses(caseData);
   if (defendantResponses?.makeCounterClaim !== 'YES') {
     return false;
@@ -20,7 +24,9 @@ export function shouldShowResponseAndCounterClaimSubmittedConfirmationStep(caseD
 }
 
 //  Response submitted with counterclaim, but fee payment needed (no Help With Fees reference).
-export function shouldShowCounterClaimFeePaymentNeededConfirmationStep(caseData: CcdCaseData | undefined): boolean {
+export function shouldShowCounterClaimFeePaymentNeededConfirmationStep(
+  caseData: CcdCaseData | undefined
+): boolean {
   const defendantResponses = getDefendantResponses(caseData);
   if (defendantResponses?.makeCounterClaim !== 'YES') {
     return false;
@@ -39,7 +45,10 @@ export interface RespondToClaimSubmitNavigation {
 }
 
 // Final submit route handler function used to determine which confirmation page to show after response submission
-export function getRespondToClaimConfirmationPath(caseId: string, caseData: CcdCaseData | undefined): string {
+export function getRespondToClaimConfirmationPath(
+  caseId: string,
+  caseData: CcdCaseData | undefined
+): string {
   return getRespondToClaimSubmitNavigation(caseId, caseData).confirmationPath;
 }
 

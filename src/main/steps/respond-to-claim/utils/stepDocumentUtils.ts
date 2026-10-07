@@ -17,7 +17,9 @@ export function extractDocumentIdFromCollections(
   candidateCollections: (unknown[] | undefined | null)[]
 ): DocumentInfoResult {
   const caseData =
-    (validatedCase as { data?: Record<string, unknown> })?.data ?? (validatedCase as Record<string, unknown>) ?? {};
+    (validatedCase as { data?: Record<string, unknown> })?.data ??
+    (validatedCase as Record<string, unknown>) ??
+    {};
 
   for (const collection of candidateCollections) {
     for (const item of collection ?? []) {
@@ -52,17 +54,22 @@ export function extractDocumentIdFromCollections(
 
 export function getNoticeDocumentInfo(validatedCase?: unknown): DocumentInfoResult {
   const caseData =
-    (validatedCase as { data?: Record<string, unknown> })?.data ?? (validatedCase as Record<string, unknown>) ?? {};
+    (validatedCase as { data?: Record<string, unknown> })?.data ??
+    (validatedCase as Record<string, unknown>) ??
+    {};
 
   return extractDocumentIdFromCollections(validatedCase, [
-    (caseData.detailsTab_NoticeDetails as Record<string, unknown> | undefined)?.noticeDocuments as unknown[],
+    (caseData.detailsTab_NoticeDetails as Record<string, unknown> | undefined)
+      ?.noticeDocuments as unknown[],
     caseData.notice_Documents as unknown[],
   ]);
 }
 
 export function getTenancyDocumentInfo(validatedCase?: unknown): DocumentInfoResult {
   const caseData =
-    (validatedCase as { data?: Record<string, unknown> })?.data ?? (validatedCase as Record<string, unknown>) ?? {};
+    (validatedCase as { data?: Record<string, unknown> })?.data ??
+    (validatedCase as Record<string, unknown>) ??
+    {};
 
   return extractDocumentIdFromCollections(validatedCase, [
     (caseData.detailsTab_TenancyLicenceDetails as Record<string, unknown> | undefined)
@@ -74,10 +81,13 @@ export function getTenancyDocumentInfo(validatedCase?: unknown): DocumentInfoRes
 
 export function getRentStatementDocumentInfo(validatedCase?: unknown): DocumentInfoResult {
   const caseData =
-    (validatedCase as { data?: Record<string, unknown> })?.data ?? (validatedCase as Record<string, unknown>) ?? {};
+    (validatedCase as { data?: Record<string, unknown> })?.data ??
+    (validatedCase as Record<string, unknown>) ??
+    {};
 
   return extractDocumentIdFromCollections(validatedCase, [
-    (caseData.detailsTab_RentArrearsDetails as Record<string, unknown> | undefined)?.rentStatement as unknown[],
+    (caseData.detailsTab_RentArrearsDetails as Record<string, unknown> | undefined)
+      ?.rentStatement as unknown[],
     caseData.rentArrears_StatementDocuments as unknown[],
     caseData.rentStatement as unknown[],
   ]);
@@ -94,7 +104,9 @@ export async function resolveStepDocumentId(
     try {
       const accessToken = req.session?.user?.accessToken;
       const rawCaseReference = req.params?.caseReference;
-      const caseReference = Array.isArray(rawCaseReference) ? rawCaseReference[0] : rawCaseReference;
+      const caseReference = Array.isArray(rawCaseReference)
+        ? rawCaseReference[0]
+        : rawCaseReference;
       if (accessToken && caseReference) {
         const fullCase = await ccdCaseService.getCaseById(accessToken, caseReference);
         const fullCaseDocInfo = getDocInfoFn(fullCase);
@@ -104,7 +116,9 @@ export async function resolveStepDocumentId(
         }
       }
     } catch (err) {
-      logger.warn(`[${stepLoggerName}] Failed to fetch full case for document lookup`, { error: err });
+      logger.warn(`[${stepLoggerName}] Failed to fetch full case for document lookup`, {
+        error: err,
+      });
     }
   }
 

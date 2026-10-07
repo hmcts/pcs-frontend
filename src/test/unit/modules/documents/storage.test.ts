@@ -7,7 +7,11 @@ jest.mock('../../../../main/services/ccdCaseService', () => ({
 
 import type { Request } from 'express';
 
-import { createCcdDraftStorage, sessionDocs, toDisplayDocuments } from '../../../../main/modules/documents/storage';
+import {
+  createCcdDraftStorage,
+  sessionDocs,
+  toDisplayDocuments,
+} from '../../../../main/modules/documents/storage';
 
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -58,7 +62,9 @@ describe('createCcdDraftStorage', () => {
   const storage = createCcdDraftStorage({
     event: EVENT,
     getDocs: data => data.possessionClaimResponse?.defendantResponses?.defendantDocuments ?? [],
-    setDocs: docs => ({ possessionClaimResponse: { defendantResponses: { defendantDocuments: docs } } }),
+    setDocs: docs => ({
+      possessionClaimResponse: { defendantResponses: { defendantDocuments: docs } },
+    }),
   });
 
   beforeEach(() => {
@@ -119,7 +125,12 @@ describe('createCcdDraftStorage', () => {
       const req = makeReq();
       const result = await storage.readFresh(req);
 
-      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith('test-token', VALID_CASE_REF, EVENT.id, undefined);
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(
+        'test-token',
+        VALID_CASE_REF,
+        EVENT.id,
+        undefined
+      );
       expect(result).toEqual([doc1, doc2]);
     });
 
@@ -133,7 +144,12 @@ describe('createCcdDraftStorage', () => {
       const req = makeReq({ session: { user: { accessToken: 'test-token' }, clientContext } });
       await storage.readFresh(req);
 
-      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith('test-token', VALID_CASE_REF, EVENT.id, clientContext);
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(
+        'test-token',
+        VALID_CASE_REF,
+        EVENT.id,
+        clientContext
+      );
     });
 
     it('returns empty array when path not present in fresh response', async () => {
@@ -214,7 +230,10 @@ describe('sessionDocs', () => {
   const OTHER_CASE_REF = '9999999999999999';
   const storage = sessionDocs({ stepName: STEP_NAME });
 
-  function makeSessionReq(docs?: CcdCollectionItem<CcdUploadedDocument>[], caseRef: string = VALID_CASE_REF): Request {
+  function makeSessionReq(
+    docs?: CcdCollectionItem<CcdUploadedDocument>[],
+    caseRef: string = VALID_CASE_REF
+  ): Request {
     return {
       params: { caseReference: caseRef },
       session: {
@@ -246,7 +265,9 @@ describe('sessionDocs', () => {
         params: { caseReference: VALID_CASE_REF },
         session: {
           uploadedDocs: {
-            [VALID_CASE_REF]: { [STEP_NAME]: '' as unknown as CcdCollectionItem<CcdUploadedDocument>[] },
+            [VALID_CASE_REF]: {
+              [STEP_NAME]: '' as unknown as CcdCollectionItem<CcdUploadedDocument>[],
+            },
           },
           reload: jest.fn(),
           save: jest.fn(),
@@ -360,8 +381,20 @@ describe('toDisplayDocuments', () => {
     const result = toDisplayDocuments([doc1, doc2]);
 
     expect(result).toEqual([
-      { index: 0, id: 'id-1', document_filename: 'file1.pdf', content_type: 'application/pdf', sizeInBytes: 1024 },
-      { index: 1, id: 'id-2', document_filename: 'file2.pdf', content_type: 'application/pdf', sizeInBytes: 2048 },
+      {
+        index: 0,
+        id: 'id-1',
+        document_filename: 'file1.pdf',
+        content_type: 'application/pdf',
+        sizeInBytes: 1024,
+      },
+      {
+        index: 1,
+        id: 'id-2',
+        document_filename: 'file2.pdf',
+        content_type: 'application/pdf',
+        sizeInBytes: 2048,
+      },
     ]);
   });
 
@@ -370,8 +403,12 @@ describe('toDisplayDocuments', () => {
   });
 
   it('returns empty array when input is not an array (defensive)', () => {
-    expect(toDisplayDocuments(undefined as unknown as CcdCollectionItem<CcdUploadedDocument>[])).toEqual([]);
-    expect(toDisplayDocuments('' as unknown as CcdCollectionItem<CcdUploadedDocument>[])).toEqual([]);
+    expect(
+      toDisplayDocuments(undefined as unknown as CcdCollectionItem<CcdUploadedDocument>[])
+    ).toEqual([]);
+    expect(toDisplayDocuments('' as unknown as CcdCollectionItem<CcdUploadedDocument>[])).toEqual(
+      []
+    );
   });
 
   it('handles missing optional fields (contentType, sizeInBytes)', () => {

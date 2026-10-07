@@ -18,8 +18,7 @@ export function applyPlaywrightServiceUrls(): void {
   } else {
     process.env.IDAM_WEB_URL ||= 'https://idam-api.aat.platform.hmcts.net';
     process.env.IDAM_TESTING_SUPPORT_URL ||= 'https://idam-testing-support-api.aat.platform.hmcts.net';
-    process.env.S2S_URL ||=
-      'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease';
+    process.env.S2S_URL ||= 'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease';
     process.env.DM_STORE_URL ||= 'http://dm-store-aat.service.core-compute-aat.internal';
   }
 }
@@ -37,9 +36,7 @@ export const getS2SToken = async (): Promise<void> => {
   const { ServiceAuthUtils } = await import('@hmcts/playwright-common');
   applyPlaywrightServiceUrls();
   if (!process.env.S2S_URL) {
-    throw new Error(
-      'S2S_URL is not set (set ENVIRONMENT to aat|demo|perftest|ithc, or export S2S_URL; otherwise AAT defaults apply via applyPlaywrightServiceUrls)'
-    );
+    throw new Error('S2S_URL is not set (set ENVIRONMENT to aat|demo|perftest|ithc, or export S2S_URL; otherwise AAT defaults apply via applyPlaywrightServiceUrls)');
   }
 
   let lastError: unknown;
@@ -64,9 +61,7 @@ export const getAccessToken = async (): Promise<void> => {
   const { IdamUtils } = await import('@hmcts/playwright-common');
   applyPlaywrightServiceUrls();
   if (!process.env.IDAM_WEB_URL || !process.env.IDAM_TESTING_SUPPORT_URL) {
-    throw new Error(
-      'IDAM_WEB_URL and IDAM_TESTING_SUPPORT_URL are not set (set ENVIRONMENT to aat|demo|perftest|ithc, or export both URLs)'
-    );
+    throw new Error('IDAM_WEB_URL and IDAM_TESTING_SUPPORT_URL are not set (set ENVIRONMENT to aat|demo|perftest|ithc, or export both URLs)');
   }
   process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({
     username: user.claimantSolicitor.email,

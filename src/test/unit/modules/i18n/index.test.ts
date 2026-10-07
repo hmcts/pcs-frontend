@@ -115,7 +115,11 @@ describe('i18n module', () => {
 
     await new Promise(r => setImmediate(r));
 
-    const langMw = (app.use as jest.Mock).mock.calls[1][0] as (req: any, res: any, next: any) => void;
+    const langMw = (app.use as jest.Mock).mock.calls[1][0] as (
+      req: any,
+      res: any,
+      next: any
+    ) => void;
 
     const changeLanguage = jest.fn();
     const addGlobal = jest.fn();
@@ -123,7 +127,8 @@ describe('i18n module', () => {
     const req = {
       language: 'cy',
       i18n: { changeLanguage },
-      t: (key: string | string[], def?: string) => (Array.isArray(key) ? (def ?? key[0]) : (def ?? key)),
+      t: (key: string | string[], def?: string) =>
+        Array.isArray(key) ? (def ?? key[0]) : (def ?? key),
       app: { locals: { nunjucksEnv: { addGlobal } } },
       session: { user: { name: 'Alice' } },
     } as unknown as Parameters<typeof langMw>[0];
@@ -158,7 +163,11 @@ describe('i18n module', () => {
 
     await new Promise(r => setImmediate(r));
 
-    const langMw = (app.use as jest.Mock).mock.calls[1][0] as (req: any, res: any, next: any) => void;
+    const langMw = (app.use as jest.Mock).mock.calls[1][0] as (
+      req: any,
+      res: any,
+      next: any
+    ) => void;
 
     const changeLanguage = jest.fn();
     const addGlobal = jest.fn();

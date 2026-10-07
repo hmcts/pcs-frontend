@@ -3,12 +3,7 @@ import { Page } from '@playwright/test';
 import Axios from 'axios';
 
 import { SHORT_TIMEOUT, VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
-import {
-  createCaseEventTokenApiData,
-  fetchPINsApiData,
-  submitCaseApiData,
-  validateAccessCodeApiData,
-} from '../../../data/api-data';
+import { createCaseEventTokenApiData, fetchPINsApiData, submitCaseApiData, validateAccessCodeApiData } from '../../../data/api-data';
 import { getCaseApiData } from '../../../data/api-data/getCase.api.data';
 import { IAction } from '../../interfaces';
 
@@ -51,13 +46,9 @@ export const getSelectedDefendantNumber = (): number => {
   }
   const payload = submitCaseApiData.submitCasePayload;
   const defendants = [payload.defendant1, ...(payload.additionalDefendants ?? []).map(defendant => defendant.value)];
-  const defendantIndex = defendants.findIndex(
-    defendant => defendant.firstName === selectedUser.firstName && defendant.lastName === selectedUser.lastName
-  );
+  const defendantIndex = defendants.findIndex(defendant => defendant.firstName === selectedUser.firstName && defendant.lastName === selectedUser.lastName);
   if (defendantIndex === -1) {
-    throw new Error(
-      `Could not find selected defendant ${selectedUser.firstName} ${selectedUser.lastName} in submitCasePayload`
-    );
+    throw new Error(`Could not find selected defendant ${selectedUser.firstName} ${selectedUser.lastName} in submitCasePayload`);
   }
   return defendantIndex + 1;
 };
@@ -73,9 +64,7 @@ export function selectPinUserByIndex(index: number): PinUser | undefined {
 
 export function selectPinUserByName(firstNameValue: string, lastNameValue: string): PinUser | undefined {
   const matchingPinUser = pinUsers.find(
-    pinUser =>
-      pinUser.firstName?.trim().toLowerCase() === firstNameValue.trim().toLowerCase() &&
-      pinUser.lastName?.trim().toLowerCase() === lastNameValue.trim().toLowerCase()
+    pinUser => pinUser.firstName?.trim().toLowerCase() === firstNameValue.trim().toLowerCase() && pinUser.lastName?.trim().toLowerCase() === lastNameValue.trim().toLowerCase()
   );
   return setSelectedPinUser(matchingPinUser);
 }
@@ -93,16 +82,11 @@ function updatePinUsers(responseData: Record<string, any>): void {
     let formattedAddress = '';
     if (addressObj) {
       const { AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode } = addressObj;
-      formattedAddress = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode]
-        .filter(value => value && typeof value === 'string' && value.trim() !== '')
-        .join(', ');
+      formattedAddress = [AddressLine1, AddressLine2, AddressLine3, PostTown, County, PostCode].filter(value => value && typeof value === 'string' && value.trim() !== '').join(', ');
     }
     return {
       pin,
-      nameKnown:
-        typeof pinData.nameKnown === 'string'
-          ? pinData.nameKnown === 'YES'
-          : Boolean(pinData.firstName || pinData.lastName),
+      nameKnown: typeof pinData.nameKnown === 'string' ? pinData.nameKnown === 'YES' : Boolean(pinData.firstName || pinData.lastName),
       firstName: pinData.firstName,
       lastName: pinData.lastName,
       address: formattedAddress,
@@ -194,10 +178,7 @@ export class FetchPINsAndValidateAccessCodeAPIAction implements IAction {
       console.info(`Using unknown defendant PIN: ${unknownPinUser.pin}`);
     }
 
-    const accessCode =
-      process.env.VALIDATE_ACCESS_CODE && process.env.VALIDATE_ACCESS_CODE !== ''
-        ? process.env.VALIDATE_ACCESS_CODE
-        : pins?.[0];
+    const accessCode = process.env.VALIDATE_ACCESS_CODE && process.env.VALIDATE_ACCESS_CODE !== '' ? process.env.VALIDATE_ACCESS_CODE : pins?.[0];
 
     if (!accessCode) {
       throw new Error('No access code available for validation');

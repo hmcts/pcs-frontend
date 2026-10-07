@@ -167,7 +167,9 @@ describe('initSessionTimeout', () => {
     document.body.dataset.sessionWarning = '5';
 
     const modalContainer = document.getElementById('timeout-modal-container') as HTMLDivElement;
-    const continueButton = document.getElementById('timeout-modal-close-button') as HTMLButtonElement;
+    const continueButton = document.getElementById(
+      'timeout-modal-close-button'
+    ) as HTMLButtonElement;
 
     initSessionTimeout();
 
@@ -196,7 +198,9 @@ describe('initSessionTimeout', () => {
     mockFetch.mockRejectedValue(new Error('Network error'));
 
     const modalContainer = document.getElementById('timeout-modal-container') as HTMLDivElement;
-    const continueButton = document.getElementById('timeout-modal-close-button') as HTMLButtonElement;
+    const continueButton = document.getElementById(
+      'timeout-modal-close-button'
+    ) as HTMLButtonElement;
 
     initSessionTimeout();
 

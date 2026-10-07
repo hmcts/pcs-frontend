@@ -45,12 +45,20 @@ describe('shouldShowPriorityDebtDetailsStep', () => {
   });
 
   it('returns true when validatedCase has debt amounts persisted', () => {
-    const req = makeReq({ shareIncomeExpenseDetails: 'YES', priorityDebts: 'YES', debtTotal: '50000' });
+    const req = makeReq({
+      shareIncomeExpenseDetails: 'YES',
+      priorityDebts: 'YES',
+      debtTotal: '50000',
+    });
     expect(shouldShowPriorityDebtDetailsStep(req)).toBe(true);
   });
 
   it('returns true when validatedCase has only debtContribution', () => {
-    const req = makeReq({ shareIncomeExpenseDetails: 'YES', priorityDebts: 'YES', debtContribution: '5000' });
+    const req = makeReq({
+      shareIncomeExpenseDetails: 'YES',
+      priorityDebts: 'YES',
+      debtContribution: '5000',
+    });
     expect(shouldShowPriorityDebtDetailsStep(req)).toBe(true);
   });
 

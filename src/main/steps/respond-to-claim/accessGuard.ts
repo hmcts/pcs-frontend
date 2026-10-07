@@ -3,13 +3,22 @@ import type { Request, RequestHandler } from 'express';
 import { getUserType } from '../utils';
 
 import { flowConfig } from './flow.config';
-import { CYA_STEP_PREFIX, type RespondToClaimSectionId, findSectionIdForStep, sectionById } from './sections.config';
+import {
+  CYA_STEP_PREFIX,
+  type RespondToClaimSectionId,
+  findSectionIdForStep,
+  sectionById,
+} from './sections.config';
 import { stepRegistry } from './stepRegistry';
 
 import { Logger } from '@modules/logger';
 import { getStepUrl } from '@modules/steps/flow';
 import type { SectionConfig } from '@modules/steps/stepFlow.interface';
-import { getAllSectionStatuses, getFirstVisibleStep, safeIsAnswered } from '@services/sectionStatus';
+import {
+  getAllSectionStatuses,
+  getFirstVisibleStep,
+  safeIsAnswered,
+} from '@services/sectionStatus';
 import { shouldShowStep } from '@steps';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -64,7 +73,9 @@ export function respondToClaimAccessGuard(): RequestHandler {
         const section = sectionById.get(sectionId);
         const firstVisibleStep = section && getFirstVisibleStep(section, flowConfig, req);
         if (firstVisibleStep) {
-          return safeRedirect303(res, getStepUrl(firstVisibleStep, flowConfig, caseId), hubUrl, ['/case/']);
+          return safeRedirect303(res, getStepUrl(firstVisibleStep, flowConfig, caseId), hubUrl, [
+            '/case/',
+          ]);
         }
       }
 
@@ -88,7 +99,11 @@ function isCyaStep(stepName: string): boolean {
 // step requires an internal-navigation marker: ?nav=1 (Back / Save and
 // continue), ?edit= (CYA "Change" links), or ?lang= (the in-page Cymraeg /
 // English toggle, which reloads the current page in the other language).
-function shouldRedirectToFirstVisibleStep(sectionId: RespondToClaimSectionId, stepName: string, req: Request): boolean {
+function shouldRedirectToFirstVisibleStep(
+  sectionId: RespondToClaimSectionId,
+  stepName: string,
+  req: Request
+): boolean {
   if (req.query.edit !== undefined || req.query.nav !== undefined || req.query.lang !== undefined) {
     return false;
   }
@@ -100,7 +115,10 @@ function shouldRedirectToFirstVisibleStep(sectionId: RespondToClaimSectionId, st
   return firstVisibleStep !== undefined && stepName !== firstVisibleStep;
 }
 
-async function isSectionUnavailable(sectionId: RespondToClaimSectionId, req: Request): Promise<boolean> {
+async function isSectionUnavailable(
+  sectionId: RespondToClaimSectionId,
+  req: Request
+): Promise<boolean> {
   const statuses = await getAllSectionStatuses(flowConfig, stepRegistry, req);
   const status = statuses.get(sectionId);
   return status === 'NOT_AVAILABLE_YET' || status === 'NOT_APPLICABLE';

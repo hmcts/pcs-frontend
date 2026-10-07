@@ -4,7 +4,12 @@ import { HTTPError } from '../../../main/HttpError';
 import { ClientContextHeaders } from '../../../types/global';
 
 import { http } from '@modules/http';
-import { CcdCase, CitizenGenAppRequest, GenAppState, GenAppType } from '@services/ccdCase.interface';
+import {
+  CcdCase,
+  CitizenGenAppRequest,
+  GenAppState,
+  GenAppType,
+} from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('config');
@@ -124,7 +129,9 @@ describe('ccdCaseService', () => {
     });
 
     it('should throw HTTPError with 404 status for an invalid case id before calling CCD', async () => {
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, '../evil', eventId)).rejects.toMatchObject({
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, '../evil', eventId)
+      ).rejects.toMatchObject({
         message: 'Invalid case reference format',
         status: 404,
       });
@@ -144,7 +151,9 @@ describe('ccdCaseService', () => {
         message: 'Request failed',
       });
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow(HTTPError);
 
       const logged = mockLoggerError.mock.calls.map(([line]) => String(line)).join('\n');
       expect(logged).toContain(
@@ -160,7 +169,9 @@ describe('ccdCaseService', () => {
         message: 'Request failed',
       });
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow(HTTPError);
 
       const logged = mockLoggerError.mock.calls.map(([line]) => String(line)).join('\n');
       expect(logged).toContain('status=502 body=<html>502 Bad Gateway</html>');
@@ -168,12 +179,16 @@ describe('ccdCaseService', () => {
 
     it('reports which case failed, taken from the request URL', async () => {
       mockGet.mockRejectedValue({
-        config: { url: `${mockUrl}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false` },
+        config: {
+          url: `${mockUrl}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`,
+        },
         response: { status: 502, data: { message: 'Callback failed' } },
         message: 'Request failed',
       });
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow(HTTPError);
 
       expect(mockLoggerError).toHaveBeenCalledWith(expect.any(String), { caseReference: caseId });
     });
@@ -185,9 +200,13 @@ describe('ccdCaseService', () => {
         message: 'Request failed',
       });
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow(HTTPError);
 
-      expect(mockLoggerError).toHaveBeenCalledWith(expect.any(String), { caseReference: undefined });
+      expect(mockLoggerError).toHaveBeenCalledWith(expect.any(String), {
+        caseReference: undefined,
+      });
     });
 
     it('should throw HTTPError with 403 status on unauthorized access', async () => {
@@ -196,8 +215,12 @@ describe('ccdCaseService', () => {
         message: 'Request failed',
       });
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Not authorised');
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow('Not authorised');
     });
 
     it('should throw HTTPError with 403 status on case not found (404)', async () => {
@@ -206,9 +229,15 @@ describe('ccdCaseService', () => {
         message: 'Case not found',
       });
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Access denied');
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toMatchObject({
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow('Access denied');
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toMatchObject({
         status: 403,
       });
     });
@@ -219,9 +248,15 @@ describe('ccdCaseService', () => {
         message: 'Bad request',
       });
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Access denied');
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toMatchObject({
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow('Access denied');
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toMatchObject({
         status: 403,
       });
     });
@@ -229,10 +264,12 @@ describe('ccdCaseService', () => {
     it('should throw HTTPError on unexpected error', async () => {
       mockGet.mockRejectedValue(new Error('Network error'));
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(
-        'CCD case service error'
-      );
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow('CCD case service error');
     });
   });
 
@@ -293,8 +330,12 @@ describe('ccdCaseService', () => {
       });
 
       await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Access denied');
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(
+        'Access denied'
+      );
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toMatchObject({
+        status: 403,
+      });
     });
 
     it('should throw HTTPError with 403 status on invalid case (400)', async () => {
@@ -304,8 +345,12 @@ describe('ccdCaseService', () => {
       });
 
       await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow('Access denied');
-      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toThrow(
+        'Access denied'
+      );
+      await expect(ccdCaseService.getCaseById(accessToken, caseId)).rejects.toMatchObject({
+        status: 403,
+      });
     });
 
     it('maps 502 CallbackException from about-to-start callback to Access denied HTTPError', async () => {
@@ -322,8 +367,12 @@ describe('ccdCaseService', () => {
         message: 'Bad Gateway',
       });
 
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow('Access denied');
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)
+      ).rejects.toThrow('Access denied');
     });
   });
 
@@ -362,9 +411,15 @@ describe('ccdCaseService', () => {
         message: 'Case not found',
       });
 
-      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow('Access denied');
-      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(
+        HTTPError
+      );
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(
+        'Access denied'
+      );
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toMatchObject({
+        status: 403,
+      });
     });
 
     it('should throw HTTPError with 403 status on invalid case (400)', async () => {
@@ -373,9 +428,15 @@ describe('ccdCaseService', () => {
         message: 'Bad request',
       });
 
-      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow('Access denied');
-      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(
+        HTTPError
+      );
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(
+        'Access denied'
+      );
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toMatchObject({
+        status: 403,
+      });
     });
 
     it('should preserve direct 403 from CCD', async () => {
@@ -384,8 +445,12 @@ describe('ccdCaseService', () => {
         message: 'Request failed',
       });
 
-      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow('Not authorised');
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(
+        HTTPError
+      );
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(
+        'Not authorised'
+      );
     });
 
     it('maps 502 CallbackException from about-to-start callback to Access denied HTTPError', async () => {
@@ -402,8 +467,12 @@ describe('ccdCaseService', () => {
         message: 'Bad Gateway',
       });
 
-      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow('Access denied');
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(
+        HTTPError
+      );
+      await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(
+        'Access denied'
+      );
     });
 
     it('should retrieve case by ID with client context headers', async () => {
@@ -459,17 +528,21 @@ describe('ccdCaseService', () => {
     const draftEvent = { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' };
 
     it('throws HTTPError if case id is missing', async () => {
-      await expect(ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })
+      ).rejects.toThrow(HTTPError);
 
-      await expect(ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })).rejects.toThrow(
-        'Cannot UPDATE draft, Case Id not specified'
-      );
+      await expect(
+        ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })
+      ).rejects.toThrow('Cannot UPDATE draft, Case Id not specified');
     });
   });
 
   describe('submitCase', () => {
     it('throws HTTPError if case id is missing', async () => {
-      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(
+        HTTPError
+      );
       await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(
         'Cannot SUBMIT Case, CCD Case Not found'
       );
@@ -478,21 +551,23 @@ describe('ccdCaseService', () => {
 
   describe('submitResponseToClaim', () => {
     it('throws HTTPError if case id is missing', async () => {
-      await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(
-        'Cannot Submit Response to Case, CCD Case Not found'
-      );
+      await expect(
+        ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })
+      ).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })
+      ).rejects.toThrow('Cannot Submit Response to Case, CCD Case Not found');
     });
   });
 
   describe('submitGeneralApplication', () => {
     it('throws HTTPError if case id is missing', async () => {
-      await expect(ccdCaseService.submitGeneralApplication(accessToken, { id: '', data: {} })).rejects.toThrow(
-        HTTPError
-      );
-      await expect(ccdCaseService.submitGeneralApplication(accessToken, { id: '', data: {} })).rejects.toThrow(
-        'Cannot submit general application, case ID not specified'
-      );
+      await expect(
+        ccdCaseService.submitGeneralApplication(accessToken, { id: '', data: {} })
+      ).rejects.toThrow(HTTPError);
+      await expect(
+        ccdCaseService.submitGeneralApplication(accessToken, { id: '', data: {} })
+      ).rejects.toThrow('Cannot submit general application, case ID not specified');
     });
 
     it('submits via a CCD event', async () => {
@@ -520,7 +595,10 @@ describe('ccdCaseService', () => {
         },
       });
 
-      const actualMakeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(accessToken, ccdData);
+      const actualMakeAnApplicationResponse = await ccdCaseService.submitGeneralApplication(
+        accessToken,
+        ccdData
+      );
 
       expect(mockGet).toHaveBeenCalledWith(
         `${mockUrl}/cases/${caseId}/event-triggers/makeAnApplication`,
@@ -574,7 +652,9 @@ describe('ccdCaseService', () => {
         },
       });
 
-      await expect(ccdCaseService.submitGeneralApplication(accessToken, ccdData)).rejects.toThrow(HTTPError);
+      await expect(ccdCaseService.submitGeneralApplication(accessToken, ccdData)).rejects.toThrow(
+        HTTPError
+      );
       await expect(ccdCaseService.submitGeneralApplication(accessToken, ccdData)).rejects.toThrow(
         'No confirmation body found in response data'
       );
@@ -672,8 +752,12 @@ describe('ccdCaseService', () => {
       });
 
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Access denied');
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(
+        'Access denied'
+      );
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toMatchObject({
+        status: 403,
+      });
     });
 
     it('maps 400 from CCD to Access denied HTTPError', async () => {
@@ -683,8 +767,12 @@ describe('ccdCaseService', () => {
       });
 
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Access denied');
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(
+        'Access denied'
+      );
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toMatchObject({
+        status: 403,
+      });
     });
 
     it('maps 502 CallbackException from about-to-start callback to Access denied HTTPError', async () => {
@@ -702,7 +790,9 @@ describe('ccdCaseService', () => {
       });
 
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('Access denied');
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(
+        'Access denied'
+      );
     });
 
     it('preserves 502 CallbackException without about-to-start as CCD case service error', async () => {
@@ -712,14 +802,19 @@ describe('ccdCaseService', () => {
           data: {
             exception: 'uk.gov.hmcts.ccd.endpoint.exceptions.CallbackException',
             status: 502,
-            message: 'Callback to service has been unsuccessful for event ... callbackType AboutToSubmit',
+            message:
+              'Callback to service has been unsuccessful for event ... callbackType AboutToSubmit',
           },
         },
         message: 'Bad Gateway',
       });
 
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('CCD case service error');
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toMatchObject({ status: 502 });
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(
+        'CCD case service error'
+      );
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toMatchObject({
+        status: 502,
+      });
     });
 
     it('preserves generic 502 as CCD case service HTTPError', async () => {
@@ -729,7 +824,9 @@ describe('ccdCaseService', () => {
       });
 
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('CCD case service error');
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(
+        'CCD case service error'
+      );
     });
 
     it('preserves 503 as CCD case service HTTPError', async () => {
@@ -739,7 +836,9 @@ describe('ccdCaseService', () => {
       });
 
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('CCD case service error');
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(
+        'CCD case service error'
+      );
     });
 
     it('maps other HTTP errors to CCD case service HTTPError', async () => {
@@ -749,7 +848,9 @@ describe('ccdCaseService', () => {
       });
 
       await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow('CCD case service error');
+      await expect(ccdCaseService.getDashboardView(accessToken, caseId)).rejects.toThrow(
+        'CCD case service error'
+      );
     });
   });
 });
@@ -762,10 +863,12 @@ describe('updateCase', () => {
   });
 
   it('should throw HTTPError if case id is missing', async () => {
-    await expect(ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })).rejects.toThrow(HTTPError);
-    await expect(ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })).rejects.toThrow(
-      'Cannot UPDATE draft, Case Id not specified'
-    );
+    await expect(
+      ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })
+    ).rejects.toThrow(HTTPError);
+    await expect(
+      ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })
+    ).rejects.toThrow('Cannot UPDATE draft, Case Id not specified');
   });
 
   it('should call CCD validate endpoint and return merged data with caller-supplied id', async () => {
@@ -806,13 +909,13 @@ describe('updateCase', () => {
       message: 'Server exploded',
     });
 
-    await expect(ccdCaseService.updateDraft(draftEvent, accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
-      HTTPError
-    );
+    await expect(
+      ccdCaseService.updateDraft(draftEvent, accessToken, caseId, { foo: 'bar' })
+    ).rejects.toThrow(HTTPError);
 
-    await expect(ccdCaseService.updateDraft(draftEvent, accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
-      'CCD case service error'
-    );
+    await expect(
+      ccdCaseService.updateDraft(draftEvent, accessToken, caseId, { foo: 'bar' })
+    ).rejects.toThrow('CCD case service error');
   });
 
   it('should surface CCD callback errors when the validate endpoint returns 422', async () => {
@@ -824,7 +927,9 @@ describe('updateCase', () => {
       message: 'Unprocessable Entity',
     });
 
-    await expect(ccdCaseService.updateDraft(draftEvent, accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
+    await expect(
+      ccdCaseService.updateDraft(draftEvent, accessToken, caseId, { foo: 'bar' })
+    ).rejects.toThrow(
       'CCD callback rejected request: Invalid submission: immutable field nameKnown'
     );
   });
@@ -840,7 +945,13 @@ describe('updateCase', () => {
       selectedPartyId: 'abc',
     };
 
-    const result = await ccdCaseService.updateDraft(draftEvent, accessToken, caseId, mockData, clientContextHeaders);
+    const result = await ccdCaseService.updateDraft(
+      draftEvent,
+      accessToken,
+      caseId,
+      mockData,
+      clientContextHeaders
+    );
 
     expect(mockPost).toHaveBeenCalledWith(
       `${mockUrl}/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage`,

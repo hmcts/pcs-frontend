@@ -241,16 +241,19 @@ describe('buildDraftDefendantResponse — any mid-section submission auto-clears
   });
 
   it('is a no-op when the step is not part of any section', () => {
-    const req = reqFor('/case/123/respond-to-claim/task-list', 'saveForLater', ['PERSONAL_DETAILS']);
+    const req = reqFor('/case/123/respond-to-claim/task-list', 'saveForLater', [
+      'PERSONAL_DETAILS',
+    ]);
     const draft = buildDraftDefendantResponse(req);
     expect(draft.defendantResponses.completedSections).toEqual(['PERSONAL_DETAILS']);
   });
 
   it('is a no-op when the step is a section CYA — the CYA postController owns the flag', () => {
-    const req = reqFor('/case/123/respond-to-claim/check-your-answers-personal-details', 'saveForLater', [
-      'PERSONAL_DETAILS',
-      'PAYMENTS',
-    ]);
+    const req = reqFor(
+      '/case/123/respond-to-claim/check-your-answers-personal-details',
+      'saveForLater',
+      ['PERSONAL_DETAILS', 'PAYMENTS']
+    );
     const draft = buildDraftDefendantResponse(req);
     expect(draft.defendantResponses.completedSections).toEqual(['PERSONAL_DETAILS', 'PAYMENTS']);
   });
@@ -279,7 +282,12 @@ describe('buildDraftDefendantResponse — carries reasonable-adjustment flags fo
     const defendantFlags = {
       partyName: 'John Doe',
       roleOnCase: 'Defendant',
-      details: [{ id: 'd1', value: { flagCode: 'RA0042', path: [{ id: 'p1', value: 'Reasonable adjustment' }] } }],
+      details: [
+        {
+          id: 'd1',
+          value: { flagCode: 'RA0042', path: [{ id: 'p1', value: 'Reasonable adjustment' }] },
+        },
+      ],
     };
 
     const draft = buildDraftDefendantResponse(reqWithFlags(defendantFlags));
@@ -309,7 +317,9 @@ describe('saveDraftDefendantResponse — reviewed draft version', () => {
   });
 
   it('forwards the draftVersion posted by the review page as a number', async () => {
-    await saveDraftDefendantResponse(reqWithBody({ draftVersion: '4' }), { defendantResponses: {} });
+    await saveDraftDefendantResponse(reqWithBody({ draftVersion: '4' }), {
+      defendantResponses: {},
+    });
 
     expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
       expect.anything(),
@@ -333,7 +343,9 @@ describe('saveDraftDefendantResponse — reviewed draft version', () => {
   });
 
   it('ignores a draftVersion that is not a whole number', async () => {
-    await saveDraftDefendantResponse(reqWithBody({ draftVersion: 'abc' }), { defendantResponses: {} });
+    await saveDraftDefendantResponse(reqWithBody({ draftVersion: 'abc' }), {
+      defendantResponses: {},
+    });
 
     const [, , , payload] = (ccdCaseService.updateDraft as jest.Mock).mock.calls[0];
     expect(payload.possessionClaimResponse).not.toHaveProperty('draftVersion');
@@ -349,7 +361,11 @@ describe('saveDraftDefendantResponse — draft version returned by the save', ()
     const req = {
       body: { draftVersion: '4' },
       session: { user: { accessToken: 'tok' } },
-      res: { locals: { validatedCase: { id: '123', data: { possessionClaimResponse: { draftVersion: 4 } } } } },
+      res: {
+        locals: {
+          validatedCase: { id: '123', data: { possessionClaimResponse: { draftVersion: 4 } } },
+        },
+      },
     } as unknown as Request;
 
     await saveDraftDefendantResponse(req, { defendantResponses: {} });

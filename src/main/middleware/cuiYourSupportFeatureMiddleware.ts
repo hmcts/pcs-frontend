@@ -13,7 +13,10 @@ export const cuiYourSupportFeatureMiddleware: RequestHandler = async (
     return next();
   }
   const caseReference = String(req.params.caseReference || '');
-  return safeRedirect303(res, `/case/${caseReference}/respond-to-claim/language-used?nav=1`, `/case/${caseReference}`, [
-    '/case',
-  ]);
+  return safeRedirect303(
+    res,
+    `/case/${caseReference}/respond-to-claim/language-used?nav=1`,
+    `/case/${caseReference}`,
+    ['/case']
+  );
 };

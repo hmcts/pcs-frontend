@@ -110,7 +110,11 @@ export function journeyForSlug(slug: string): JourneyConfig | undefined {
 
 // Variant-scoped step lookup. Resolves the step definition for the specified variant,
 // falling back to journey.default if a variant-specific stepRegistry is not defined for the journey.
-export function findStep(slug: string, stepName: string, variant: JourneyVariant): StepDefinition | undefined {
+export function findStep(
+  slug: string,
+  stepName: string,
+  variant: JourneyVariant
+): StepDefinition | undefined {
   const journey = journeyForSlug(slug);
   if (!journey) {
     return undefined;
@@ -119,7 +123,10 @@ export function findStep(slug: string, stepName: string, variant: JourneyVariant
   return resolved?.stepRegistry[stepName];
 }
 
-function getJourneyConfigForRequest(journeyName: string, req?: Request): ResolvedJourneyConfig | undefined {
+function getJourneyConfigForRequest(
+  journeyName: string,
+  req?: Request
+): ResolvedJourneyConfig | undefined {
   const journey = journeyRegistry[journeyName];
   if (!journey) {
     logger.warn(`Failed to load JourneyConfig for journey name [${journeyName}]`);
@@ -141,11 +148,18 @@ function getRegistrationStepNames(journey: JourneyConfig): string[] {
   return Array.from(stepNames);
 }
 
-export function getFlowConfigForJourney(journeyName: string, req?: Request): JourneyFlowConfig | undefined {
+export function getFlowConfigForJourney(
+  journeyName: string,
+  req?: Request
+): JourneyFlowConfig | undefined {
   return getJourneyConfigForRequest(journeyName, req)?.flowConfig;
 }
 
-export function getStepForJourney(journeyName: string, stepName: string, req?: Request): StepDefinition | undefined {
+export function getStepForJourney(
+  journeyName: string,
+  stepName: string,
+  req?: Request
+): StepDefinition | undefined {
   return getJourneyConfigForRequest(journeyName, req)?.stepRegistry[stepName];
 }
 
@@ -157,7 +171,10 @@ export function getStepsForJourney(journeyName: string, req?: Request): StepDefi
   }
 
   const activeJourney = getJourneyConfigForRequest(journeyName, req);
-  const stepNames = req && activeJourney ? getStepOrder(activeJourney.flowConfig) : getRegistrationStepNames(journey);
+  const stepNames =
+    req && activeJourney
+      ? getStepOrder(activeJourney.flowConfig)
+      : getRegistrationStepNames(journey);
 
   return stepNames
     .map(stepName => {
@@ -170,7 +187,11 @@ export function getStepsForJourney(journeyName: string, req?: Request): StepDefi
     .filter((step: StepDefinition | undefined): step is StepDefinition => step !== undefined);
 }
 
-export function shouldShowStep(req: Request, stepName: string, flowConfig: JourneyFlowConfig): boolean {
+export function shouldShowStep(
+  req: Request,
+  stepName: string,
+  flowConfig: JourneyFlowConfig
+): boolean {
   const stepConfig = flowConfig.steps[stepName];
   if (!stepConfig || !stepConfig.showCondition) {
     return true;

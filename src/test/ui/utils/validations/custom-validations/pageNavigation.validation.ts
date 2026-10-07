@@ -57,8 +57,7 @@ export class PageNavigationValidation implements IValidation {
     const isBackLink = typeof navigateButton === 'string' && navigateButton.includes('Back');
     const isFeedbackLink = typeof navigateButton === 'string' && navigateButton.includes('feedback');
     const isButtonNavigation = typeof navigateButton === 'string' && !isBackLink && !isFeedbackLink;
-    const shouldUseClickNavigation =
-      isBackLink && enable_navigation_tests === 'true' && PageNavigationValidation.isCriticalPage();
+    const shouldUseClickNavigation = isBackLink && enable_navigation_tests === 'true' && PageNavigationValidation.isCriticalPage();
 
     try {
       if (isFeedbackLink) {
@@ -127,12 +126,7 @@ export class PageNavigationValidation implements IValidation {
     }
   }
 
-  private async validateLinkDestination(
-    page: Page,
-    linkText: string,
-    linkType: 'Back link' | 'Feedback link',
-    predicate: (href: string) => boolean
-  ): Promise<void> {
+  private async validateLinkDestination(page: Page, linkText: string, linkType: 'Back link' | 'Feedback link', predicate: (href: string) => boolean): Promise<void> {
     const locator = page.getByRole('link', { name: linkText, exact: true });
     const href = await locator.getAttribute('href');
 
@@ -150,15 +144,11 @@ export class PageNavigationValidation implements IValidation {
   }
 
   private async validateButtonNavigation(page: Page, buttonText: string, fieldName: validationRecord): Promise<void> {
-    await performAction('clickButton', buttonText);
+    await performAction('When the user clicks the button', buttonText);
     await this.validatePageNavigation(page, fieldName);
   }
 
-  private async validateClickedNavigation(
-    page: Page,
-    navigateButton: string,
-    fieldName: validationRecord
-  ): Promise<void> {
+  private async validateClickedNavigation(page: Page, navigateButton: string, fieldName: validationRecord): Promise<void> {
     let newPage: Page | null = null;
     let isNewWindow = false;
     const popupPromise = page
@@ -225,17 +215,14 @@ export class PageNavigationValidation implements IValidation {
         try {
           const { hostname } = new URL(actualUrl);
           const normalizedHostname = hostname.toLowerCase();
-          isSmartSurveyPage =
-            normalizedHostname === 'smartsurvey.co.uk' || normalizedHostname.endsWith('.smartsurvey.co.uk');
+          isSmartSurveyPage = normalizedHostname === 'smartsurvey.co.uk' || normalizedHostname.endsWith('.smartsurvey.co.uk');
         } catch {
           isSmartSurveyPage = false;
         }
 
         if (validationData.element && !isSmartSurveyPage) {
           expectedElementText = validationData.element;
-          const locator = page.locator(
-            `h1, h1.govuk-heading-xl, h1.govuk-heading-l, span:text-is("${expectedElementText}")`
-          );
+          const locator = page.locator(`h1, h1.govuk-heading-xl, h1.govuk-heading-l, span:text-is("${expectedElementText}")`);
           try {
             await expect(locator).toHaveText(expectedElementText, { timeout: 5000 });
             actualElementText = expectedElementText;
@@ -544,12 +531,7 @@ export class PageNavigationValidation implements IValidation {
     }
 
     for (const result of PageNavigationValidation.navigationResults) {
-      if (
-        result.passed &&
-        result.hasPFTFile &&
-        !failedPages.has(result.pageName) &&
-        !failedPages.has(result.sourcePage || '')
-      ) {
+      if (result.passed && result.hasPFTFile && !failedPages.has(result.pageName) && !failedPages.has(result.sourcePage || '')) {
         actuallyPassedPages.add(result.pageName);
       }
     }
@@ -565,11 +547,7 @@ export class PageNavigationValidation implements IValidation {
     console.log(`   Total pages with navigation tests: ${totalPages}`);
     console.log(`   Number of pages passed: ${passedPages.size}`);
     console.log(`   Number of pages failed: ${failedPages.size}`);
-    console.log(
-      `   Missing navigation methods: ${
-        PageNavigationValidation.missingNavigationMethods.size + PageNavigationValidation.missingNavigationFiles.size
-      }`
-    );
+    console.log(`   Missing navigation methods: ${PageNavigationValidation.missingNavigationMethods.size + PageNavigationValidation.missingNavigationFiles.size}`);
 
     if (passedPages.size > 0) {
       console.log(`   Passed pages: ${Array.from(passedPages).join(', ')}`);
@@ -580,15 +558,11 @@ export class PageNavigationValidation implements IValidation {
     }
 
     if (PageNavigationValidation.missingNavigationMethods.size > 0) {
-      console.log(
-        `   Navigation methods not found: ${Array.from(PageNavigationValidation.missingNavigationMethods).join(', ')}`
-      );
+      console.log(`   Navigation methods not found: ${Array.from(PageNavigationValidation.missingNavigationMethods).join(', ')}`);
     }
 
     if (PageNavigationValidation.missingNavigationFiles.size > 0) {
-      console.log(
-        `   Navigation files not found: ${Array.from(PageNavigationValidation.missingNavigationFiles).join(', ')}`
-      );
+      console.log(`   Navigation files not found: ${Array.from(PageNavigationValidation.missingNavigationFiles).join(', ')}`);
     }
 
     if (failedPages.size > 0) {

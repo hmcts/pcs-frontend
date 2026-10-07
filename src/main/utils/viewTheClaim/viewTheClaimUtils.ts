@@ -3,7 +3,12 @@ import escapeHTML from 'escape-html';
 import type { TFunction } from 'i18next';
 import { DateTime } from 'luxon';
 
-import { GROUND_COLLECTION_PATHS, GROUND_LABELS, REASON_FIELDS, YES_NO_LABELS } from './viewTheClaimLabels';
+import {
+  GROUND_COLLECTION_PATHS,
+  GROUND_LABELS,
+  REASON_FIELDS,
+  YES_NO_LABELS,
+} from './viewTheClaimLabels';
 import {
   buildActionTakenSection,
   buildAdditionalDefendantSections,
@@ -101,8 +106,12 @@ export function buildViewTheClaimPageData(
   );
   const claimSubmittedDateText = formatDate(getValue(data, 'dateSubmitted'), locale);
   const pageMetadataRows = sectionRows([
-    claimIssueDateText ? summaryRow(t('viewTheClaim:dateIssued'), { text: claimIssueDateText }) : undefined,
-    claimSubmittedDateText ? summaryRow(t('viewTheClaim:dateSubmitted'), { text: claimSubmittedDateText }) : undefined,
+    claimIssueDateText
+      ? summaryRow(t('viewTheClaim:dateIssued'), { text: claimIssueDateText })
+      : undefined,
+    claimSubmittedDateText
+      ? summaryRow(t('viewTheClaim:dateSubmitted'), { text: claimSubmittedDateText })
+      : undefined,
   ]);
 
   const sections = [
@@ -145,8 +154,10 @@ export function buildViewTheClaimPageData(
 
 function createViewTheClaimCopy(t: TFunction, locale: string): ViewTheClaimCopy {
   return {
-    section: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:sections.${key}`, options),
-    label: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:labels.${key}`, options),
+    section: (key: string, options?: Record<string, unknown>) =>
+      t(`viewTheClaim:sections.${key}`, options),
+    label: (key: string, options?: Record<string, unknown>) =>
+      t(`viewTheClaim:labels.${key}`, options),
     text: (key: string, options?: Record<string, unknown>) => t(`viewTheClaim:${key}`, options),
     personsUnknown: t('viewTheClaim:personsUnknown'),
     addressUnknown: t('viewTheClaim:addressUnknown'),
@@ -159,16 +170,24 @@ export function toDateLocale(language?: string): string {
   return language?.toLowerCase() === 'cy' ? 'cy' : 'en-gb';
 }
 
-export function section(title: string, rows: (ViewTheClaimSummaryRow | undefined)[]): ViewTheClaimSection | undefined {
+export function section(
+  title: string,
+  rows: (ViewTheClaimSummaryRow | undefined)[]
+): ViewTheClaimSection | undefined {
   const visibleRows = sectionRows(rows);
   return visibleRows.length > 0 ? { title, rows: visibleRows } : undefined;
 }
 
-export function sectionRows(rows: (ViewTheClaimSummaryRow | undefined)[]): ViewTheClaimSummaryRow[] {
+export function sectionRows(
+  rows: (ViewTheClaimSummaryRow | undefined)[]
+): ViewTheClaimSummaryRow[] {
   return rows.filter((row): row is ViewTheClaimSummaryRow => !!row);
 }
 
-export function summaryRow(label: string, value: { text: string } | { html: string }): ViewTheClaimSummaryRow {
+export function summaryRow(
+  label: string,
+  value: { text: string } | { html: string }
+): ViewTheClaimSummaryRow {
   return {
     key: { text: label },
     value,
@@ -176,11 +195,17 @@ export function summaryRow(label: string, value: { text: string } | { html: stri
   };
 }
 
-export function textRow(label: string, value: string | undefined): ViewTheClaimSummaryRow | undefined {
+export function textRow(
+  label: string,
+  value: string | undefined
+): ViewTheClaimSummaryRow | undefined {
   return value ? summaryRow(label, { text: value }) : undefined;
 }
 
-export function htmlRow(label: string, value: string | undefined): ViewTheClaimSummaryRow | undefined {
+export function htmlRow(
+  label: string,
+  value: string | undefined
+): ViewTheClaimSummaryRow | undefined {
   return value ? summaryRow(label, { html: value }) : undefined;
 }
 
@@ -220,7 +245,8 @@ export function claimantAddressHtml(data: UnknownRecord): string | undefined {
   const addressOptions = { includeCountry: true };
   const useOverriddenOnly =
     normaliseYesNo(getValue(data, 'isCorrectClaimantContactAddress')) === 'NO' ||
-    normaliseYesNo(getValue(data, 'claimantContactPreferences.isCorrectClaimantContactAddress')) === 'NO';
+    normaliseYesNo(getValue(data, 'claimantContactPreferences.isCorrectClaimantContactAddress')) ===
+      'NO';
 
   return (
     getFirstAddressHtml(
@@ -246,8 +272,12 @@ export function additionalDefendantParties(data: UnknownRecord): UnknownRecord[]
   const defendantItems = collectionItems(getValue(data, 'allDefendants'));
   if (defendantItems.length > 0) {
     const currentDefendantId = getString(data, 'possessionClaimResponse.currentDefendantPartyId');
-    const currentDefendant = asRecord(getValue(data, 'possessionClaimResponse.claimantEnteredDefendantDetails'));
-    return defendantItems.slice(1).map(item => mergeCurrentParty(item, currentDefendantId, currentDefendant));
+    const currentDefendant = asRecord(
+      getValue(data, 'possessionClaimResponse.claimantEnteredDefendantDetails')
+    );
+    return defendantItems
+      .slice(1)
+      .map(item => mergeCurrentParty(item, currentDefendantId, currentDefendant));
   }
 
   return collectionRecords(getValue(data, 'additionalDefendants'));
@@ -257,8 +287,12 @@ function defendantParties(data: UnknownRecord): UnknownRecord[] {
   const defendantItems = collectionItems(getValue(data, 'allDefendants'));
   if (defendantItems.length > 0) {
     const currentDefendantId = getString(data, 'possessionClaimResponse.currentDefendantPartyId');
-    const currentDefendant = asRecord(getValue(data, 'possessionClaimResponse.claimantEnteredDefendantDetails'));
-    return defendantItems.map(item => mergeCurrentParty(item, currentDefendantId, currentDefendant));
+    const currentDefendant = asRecord(
+      getValue(data, 'possessionClaimResponse.claimantEnteredDefendantDetails')
+    );
+    return defendantItems.map(item =>
+      mergeCurrentParty(item, currentDefendantId, currentDefendant)
+    );
   }
 
   return [
@@ -307,10 +341,15 @@ export function underlesseeParties(data: UnknownRecord): UnknownRecord[] {
     return parties;
   }
 
-  return [asRecord(getValue(data, 'underlesseeOrMortgagee1'))].filter((party): party is UnknownRecord => !!party);
+  return [asRecord(getValue(data, 'underlesseeOrMortgagee1'))].filter(
+    (party): party is UnknownRecord => !!party
+  );
 }
 
-export function partyName(party: UnknownRecord | undefined, copy: ViewTheClaimCopy): string | undefined {
+export function partyName(
+  party: UnknownRecord | undefined,
+  copy: ViewTheClaimCopy
+): string | undefined {
   if (!party) {
     return undefined;
   }
@@ -329,7 +368,10 @@ export function partyName(party: UnknownRecord | undefined, copy: ViewTheClaimCo
   return [firstName, lastName].filter(Boolean).join(' ') || getStringFromValue(party.orgName);
 }
 
-export function underlesseeName(party: UnknownRecord | undefined, copy: ViewTheClaimCopy): string | undefined {
+export function underlesseeName(
+  party: UnknownRecord | undefined,
+  copy: ViewTheClaimCopy
+): string | undefined {
   if (!party) {
     return undefined;
   }
@@ -341,7 +383,10 @@ export function underlesseeName(party: UnknownRecord | undefined, copy: ViewTheC
   return getStringFromValue(party.name) ?? partyName(party, copy) ?? copy.personsUnknown;
 }
 
-export function partyAddressHtml(party: UnknownRecord | undefined, propertyAddress: unknown): string | undefined {
+export function partyAddressHtml(
+  party: UnknownRecord | undefined,
+  propertyAddress: unknown
+): string | undefined {
   if (!party) {
     return undefined;
   }
@@ -428,7 +473,10 @@ export function groundLabels(data: UnknownRecord): string[] {
   return unique(labels);
 }
 
-export function groundReasonRows(data: UnknownRecord, copy: ViewTheClaimCopy): (ViewTheClaimSummaryRow | undefined)[] {
+export function groundReasonRows(
+  data: UnknownRecord,
+  copy: ViewTheClaimCopy
+): (ViewTheClaimSummaryRow | undefined)[] {
   const summaryRows = getArray(getValue(data, 'claimGroundSummaries'))
     .map(item => asRecord(item))
     .map(item => asRecord(item?.value))
@@ -496,7 +544,9 @@ export function documentLinksHtml(
   const links = documents.filter(document => {
     const filename = document.filename.toLowerCase();
     return (
-      (documentTypes.size > 0 && !!document.documentType && documentTypes.has(document.documentType)) ||
+      (documentTypes.size > 0 &&
+        !!document.documentType &&
+        documentTypes.has(document.documentType)) ||
       (categoryIds.size > 0 && !!document.categoryId && categoryIds.has(document.categoryId)) ||
       (filenameIncludes.length > 0 && filenameIncludes.some(part => filename.includes(part)))
     );
@@ -504,7 +554,9 @@ export function documentLinksHtml(
 
   return links.length > 0
     ? links
-        .map(document => linkHtml(document.filename, `/case/${caseReference}/view-documents/${document.id}`))
+        .map(document =>
+          linkHtml(document.filename, `/case/${caseReference}/view-documents/${document.id}`)
+        )
         .join('<br>')
     : undefined;
 }
@@ -517,17 +569,26 @@ export function listHtml(values: string[]): string | undefined {
   return values.length > 0 ? values.map(value => escapeHTML(value)).join('<br>') : undefined;
 }
 
-export function addressHtml(value: unknown, options: { includeCountry?: boolean } = {}): string | undefined {
+export function addressHtml(
+  value: unknown,
+  options: { includeCountry?: boolean } = {}
+): string | undefined {
   const lines = addressLines(value, options);
   return lines.length > 0 ? lines.map(line => escapeHTML(line)).join('<br>') : undefined;
 }
 
-export function addressText(value: unknown, options: { includeCountry?: boolean } = {}): string | undefined {
+export function addressText(
+  value: unknown,
+  options: { includeCountry?: boolean } = {}
+): string | undefined {
   const lines = addressLines(value, options);
   return lines.length > 0 ? lines.join(', ') : undefined;
 }
 
-export function addressLines(value: unknown, { includeCountry = false }: { includeCountry?: boolean } = {}): string[] {
+export function addressLines(
+  value: unknown,
+  { includeCountry = false }: { includeCountry?: boolean } = {}
+): string[] {
   const address = asRecord(value);
   if (!address) {
     return [];
@@ -562,7 +623,9 @@ export function formattedAddressHtml(value: string | undefined): string | undefi
 }
 
 export function collectionAddressesHtml(parties: UnknownRecord[]): string | undefined {
-  const addresses = parties.map(party => addressHtml(party.address)).filter((value): value is string => !!value);
+  const addresses = parties
+    .map(party => addressHtml(party.address))
+    .filter((value): value is string => !!value);
 
   return addresses.length > 0 ? addresses.join('<br><br>') : undefined;
 }
@@ -619,7 +682,9 @@ export function formatTime(value: unknown, locale = 'en-gb'): string | undefined
   }
 
   const date = DateTime.fromISO(text, { zone: 'utc' });
-  return date.isValid ? date.setZone('Europe/London').setLocale(locale).toFormat('HH:mm') : undefined;
+  return date.isValid
+    ? date.setZone('Europe/London').setLocale(locale).toFormat('HH:mm')
+    : undefined;
 }
 
 export function formatMoney(value: unknown): string | undefined {
@@ -670,7 +735,9 @@ export function dynamicListLabel(value: unknown): string | undefined {
   const record = asRecord(value);
   const nestedValue = asRecord(record?.value);
   return (
-    getStringFromValue(nestedValue?.label) ?? getStringFromValue(record?.label) ?? getStringFromValue(record?.valueCode)
+    getStringFromValue(nestedValue?.label) ??
+    getStringFromValue(record?.label) ??
+    getStringFromValue(record?.valueCode)
   );
 }
 
@@ -689,7 +756,11 @@ export function getFirstAddressHtml(
   return paths.map(path => addressHtml(getValue(data, path), options)).find(Boolean);
 }
 
-export function getFirstPartyName(data: UnknownRecord, paths: string[], copy: ViewTheClaimCopy): string | undefined {
+export function getFirstPartyName(
+  data: UnknownRecord,
+  paths: string[],
+  copy: ViewTheClaimCopy
+): string | undefined {
   return paths.map(path => partyName(asRecord(getValue(data, path)), copy)).find(Boolean);
 }
 
@@ -739,7 +810,9 @@ export function getStringFromValue(value: unknown): string | undefined {
 }
 
 export function asRecord(value: unknown): UnknownRecord | undefined {
-  return value && typeof value === 'object' && !Array.isArray(value) ? (value as UnknownRecord) : undefined;
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as UnknownRecord)
+    : undefined;
 }
 
 export function getArray(value: unknown): unknown[] {

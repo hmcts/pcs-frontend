@@ -114,7 +114,13 @@ describe('steps/i18n', () => {
       // First request: the pre-existing raw bundle must not prevent the merge from applying.
       await loadStepNamespace(buildReq({ i18n, step: { name: 'test-step', journey: 'folder' } }));
       expect(addResourceBundle).toHaveBeenCalledTimes(1);
-      expect(addResourceBundle).toHaveBeenCalledWith('en', 'folder/testStep', { title: 'Test Title' }, true, true);
+      expect(addResourceBundle).toHaveBeenCalledWith(
+        'en',
+        'folder/testStep',
+        { title: 'Test Title' },
+        true,
+        true
+      );
 
       access.mockClear();
 
@@ -167,7 +173,10 @@ describe('steps/i18n', () => {
       (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue(null);
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
-      const req = buildReq({ i18n: { getResourceBundle: jest.fn().mockReturnValue(null) }, step: stepContext });
+      const req = buildReq({
+        i18n: { getResourceBundle: jest.fn().mockReturnValue(null) },
+        step: stepContext,
+      });
 
       await loadStepNamespace(req);
 
@@ -185,7 +194,11 @@ describe('steps/i18n', () => {
 
       const addResourceBundle = jest.fn();
       const req = buildReq({
-        i18n: { getResourceBundle: jest.fn().mockReturnValue(null), addResourceBundle, loadNamespaces },
+        i18n: {
+          getResourceBundle: jest.fn().mockReturnValue(null),
+          addResourceBundle,
+          loadNamespaces,
+        },
         step: stepContext,
       });
 
@@ -194,7 +207,13 @@ describe('steps/i18n', () => {
 
       await loadStepNamespace(req);
 
-      expect(addResourceBundle).toHaveBeenCalledWith('en', 'testFolder/testStep', mockTranslations, true, true);
+      expect(addResourceBundle).toHaveBeenCalledWith(
+        'en',
+        'testFolder/testStep',
+        mockTranslations,
+        true,
+        true
+      );
       expect(loadNamespaces).toHaveBeenCalledWith('testFolder/testStep', expect.any(Function));
     });
 
@@ -207,15 +226,23 @@ describe('steps/i18n', () => {
 
       const addResourceBundle = jest.fn();
       const req = buildReq({
-        i18n: { getResourceBundle: jest.fn().mockReturnValue(null), addResourceBundle, loadNamespaces },
+        i18n: {
+          getResourceBundle: jest.fn().mockReturnValue(null),
+          addResourceBundle,
+          loadNamespaces,
+        },
         step: stepContext,
       });
 
       jest.spyOn(fs, 'access').mockResolvedValue(undefined);
       jest
         .spyOn(fs, 'readFile')
-        .mockResolvedValueOnce(JSON.stringify({ title: 'Citizen title', nested: { keep: 'citizen', swap: 'base' } }))
-        .mockResolvedValueOnce(JSON.stringify({ title: 'Professional title', nested: { swap: 'professional' } }));
+        .mockResolvedValueOnce(
+          JSON.stringify({ title: 'Citizen title', nested: { keep: 'citizen', swap: 'base' } })
+        )
+        .mockResolvedValueOnce(
+          JSON.stringify({ title: 'Professional title', nested: { swap: 'professional' } })
+        );
 
       await loadStepNamespace(req);
 
@@ -255,7 +282,9 @@ describe('steps/i18n', () => {
 
       await loadStepNamespace(req);
 
-      expect(mockLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Invalid translation path detected'));
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Invalid translation path detected')
+      );
 
       jest.restoreAllMocks();
     });
@@ -265,7 +294,10 @@ describe('steps/i18n', () => {
       (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
-      const req = buildReq({ i18n: { getResourceBundle: jest.fn().mockReturnValue(null) }, step: stepContext });
+      const req = buildReq({
+        i18n: { getResourceBundle: jest.fn().mockReturnValue(null) },
+        step: stepContext,
+      });
 
       jest.spyOn(fs, 'access').mockRejectedValue(new Error('ENOENT: no such file'));
 
@@ -281,7 +313,10 @@ describe('steps/i18n', () => {
       (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
-      const req = buildReq({ i18n: { getResourceBundle: jest.fn().mockReturnValue(null) }, step: stepContext });
+      const req = buildReq({
+        i18n: { getResourceBundle: jest.fn().mockReturnValue(null) },
+        step: stepContext,
+      });
 
       const error = new Error('Parse error');
       jest.spyOn(fs, 'access').mockResolvedValue(undefined);
@@ -289,14 +324,20 @@ describe('steps/i18n', () => {
 
       await loadStepNamespace(req);
 
-      expect(mockLogger.error).toHaveBeenCalledWith('Failed to load translation file for test-step:', error);
+      expect(mockLogger.error).toHaveBeenCalledWith(
+        'Failed to load translation file for test-step:',
+        error
+      );
     });
 
     it('should handle errors silently when not in development', async () => {
       (mainI18n.findLocalesDir as jest.Mock).mockResolvedValue('/test/locales');
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
-      const req = buildReq({ i18n: { getResourceBundle: jest.fn().mockReturnValue(null) }, step: stepContext });
+      const req = buildReq({
+        i18n: { getResourceBundle: jest.fn().mockReturnValue(null) },
+        step: stepContext,
+      });
 
       jest.spyOn(fs, 'access').mockRejectedValue(new Error('ENOENT: no such file'));
 
@@ -375,7 +416,10 @@ describe('steps/i18n', () => {
     it('should return empty object if resource bundle is missing', () => {
       (mainI18n.getRequestLanguage as jest.Mock).mockReturnValue('en');
 
-      const req = buildReq({ i18n: { getResourceBundle: jest.fn().mockReturnValue(null) }, step: stepContext });
+      const req = buildReq({
+        i18n: { getResourceBundle: jest.fn().mockReturnValue(null) },
+        step: stepContext,
+      });
 
       expect(getStepTranslations(req)).toEqual({});
     });
@@ -492,7 +536,9 @@ describe('steps/i18n', () => {
 
       validateTranslationKey(mockT, 'missing.key', 'test context');
 
-      expect(mockLogger.warn).toHaveBeenCalledWith('Missing translation key: "missing.key" in test context');
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        'Missing translation key: "missing.key" in test context'
+      );
     });
 
     it('should not warn if translation exists', () => {

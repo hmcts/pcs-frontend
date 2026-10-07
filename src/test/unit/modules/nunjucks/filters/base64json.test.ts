@@ -16,7 +16,9 @@ function extractValues(html: string): string[] {
 
 describe('base64json filter (server render -> parse round-trip)', () => {
   it('renders a WAF-safe value with no SQLi punctuation', () => {
-    const [value] = extractValues(renderHiddenInput({ index: 0, id: 'id-1', document_filename: 'rentArrears.pdf' }));
+    const [value] = extractValues(
+      renderHiddenInput({ index: 0, id: 'id-1', document_filename: 'rentArrears.pdf' })
+    );
     // base64url alphabet only — none of the { } " : , chars CRS flags as SQLi
     expect(value).toMatch(/^[A-Za-z0-9_-]+$/);
   });

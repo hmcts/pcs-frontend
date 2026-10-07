@@ -10,6 +10,5 @@ export const submitCaseEventTokenApiData = {
     },
   }),
 
-  submitCaseEventTokenApiEndPoint: (): string =>
-    `/cases/${process.env.CASE_NUMBER}/event-triggers/resumePossessionClaim`,
+  submitCaseEventTokenApiEndPoint: (): string => `/cases/${process.env.CASE_NUMBER}/event-triggers/resumePossessionClaim`,
 };

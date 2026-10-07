@@ -48,7 +48,8 @@ function takeSubmitRejection(req: Request): string | undefined {
 }
 
 export function getStatementOfTruthInitialFormData(req: Request): Record<string, unknown> {
-  const sot = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.statementOfTruth;
+  const sot =
+    req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.statementOfTruth;
   const accepted = sot?.accepted === 'YES' && req.query?.draftChanged !== '1';
   const fullName = sot?.fullName;
   const nameOfFirm = sot?.nameOfFirm;
@@ -61,7 +62,10 @@ export function getStatementOfTruthInitialFormData(req: Request): Record<string,
   };
 }
 
-export async function getEndOfJourneyCyaContent(req: Request, _formContent: unknown): Promise<Record<string, unknown>> {
+export async function getEndOfJourneyCyaContent(
+  req: Request,
+  _formContent: unknown
+): Promise<Record<string, unknown>> {
   await loadStepNamespaces(
     req,
     [
@@ -78,7 +82,8 @@ export async function getEndOfJourneyCyaContent(req: Request, _formContent: unkn
   );
   const t: TFunction = getTranslationFunction(req, ['common']);
   const sections = buildEndOfJourneyCyaSections(req, t);
-  const status = req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.status;
+  const status =
+    req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.status;
   const submitDisabled = status === 'SUBMITTED';
   const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
 
@@ -94,7 +99,8 @@ export async function getEndOfJourneyCyaContent(req: Request, _formContent: unkn
     }
   }
 
-  const draftVersion = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.draftVersion ?? '';
+  const draftVersion =
+    req.res?.locals.validatedCase?.data?.possessionClaimResponse?.draftVersion ?? '';
   const base = { sections, submitDisabled, isLegalRepresentative, dashboardUrl, draftVersion };
 
   const draftChanged = req.query.draftChanged === '1';
@@ -130,7 +136,11 @@ export async function getEndOfJourneyCyaContent(req: Request, _formContent: unkn
   const translated = tError(errorKey);
   const message = translated && translated !== errorKey ? translated : fallback;
 
-  const errorSummary = buildErrorSummary({ submitResponse: message }, submitResponseErrorFields, tError);
+  const errorSummary = buildErrorSummary(
+    { submitResponse: message },
+    submitResponseErrorFields,
+    tError
+  );
 
   return { ...base, ...(errorSummary ? { errorSummary } : {}) };
 }
@@ -195,7 +205,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const draft = buildDraftDefendantResponse(req);
     const isLegalRepresentative = req.res?.locals.isLegalRepresentative === true;
 
-    draft.defendantResponses.statementOfTruth = buildStatementOfTruthPayload(req.body, isLegalRepresentative);
+    draft.defendantResponses.statementOfTruth = buildStatementOfTruthPayload(
+      req.body,
+      isLegalRepresentative
+    );
 
     const enumValue = sectionIdToBackendEnum('checkYourAnswersAndSubmit');
     const current = draft.defendantResponses.completedSections ?? [];
@@ -205,7 +218,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const caseId = req.res?.locals.validatedCase?.id;
 
     if (caseId && parseDraftVersion(req.body?.draftVersion) === undefined) {
-      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaDraftChangedPath(caseId);
+      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] =
+        getEndOfJourneyCyaDraftChangedPath(caseId);
       return;
     }
 
@@ -213,16 +227,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       await saveDraftDefendantResponse(req, draft);
     } catch (error) {
       if (caseId && isDraftChangedError(error)) {
-        req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaDraftChangedPath(caseId);
+        req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] =
+          getEndOfJourneyCyaDraftChangedPath(caseId);
         return;
       }
       throw error;
     }
 
     if (!caseId) {
-      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = getEndOfJourneyCyaSubmitErrorPath(
-        String(req.params?.caseReference ?? '')
-      );
+      req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] =
+        getEndOfJourneyCyaSubmitErrorPath(String(req.params?.caseReference ?? ''));
       return;
     }
 
@@ -231,7 +245,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = confirmationPath;
     } catch (error) {
       if (error instanceof RespondToClaimSubmitRejectedError) {
-        req.session[RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY] = submitRejectionReason(error.messages);
+        req.session[RESPOND_TO_CLAIM_SUBMIT_REJECTION_SESSION_KEY] = submitRejectionReason(
+          error.messages
+        );
       }
       req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] = isDraftChangedError(error)
         ? getEndOfJourneyCyaDraftChangedPath(caseId)
@@ -239,7 +255,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
   },
   resolveRedirectAfterPost: async (req: Request) => {
-    const redirectPath = req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] as string | undefined;
+    const redirectPath = req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY] as
+      string | undefined;
     delete req.session[RESPOND_TO_CLAIM_POST_SUBMIT_REDIRECT_SESSION_KEY];
     return redirectPath;
   },

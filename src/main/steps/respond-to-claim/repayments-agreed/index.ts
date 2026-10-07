@@ -1,20 +1,27 @@
 import type { Request } from 'express';
 
 import { fromYesNoNotSureEnum, toYesNoNotSureEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'repayments-agreed',
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.repaymentPlanAgreed),
+  isAnswered: req =>
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.repaymentPlanAgreed
+    ),
   showCancelButton: false,
   stepDir: __dirname,
   customTemplate: `${__dirname}/repaymentsAgreed.njk`,
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
+    response.defendantResponses.paymentAgreement =
+      response.defendantResponses.paymentAgreement ?? {};
     const repaymentsAgreed = req.body?.repaymentsAgreed as string | undefined;
     const enumValue = toYesNoNotSureEnum(repaymentsAgreed);
 
@@ -83,7 +90,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   extendGetContent: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
-    const claimantName = (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
+    const claimantName =
+      (caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string) ?? '';
     const dateIssued = caseData?.dateIssued;
 
     return {

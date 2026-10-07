@@ -1,5 +1,8 @@
 import { fromYesNoEnum, getValidatedCaseHouseholdCircumstances, toYesNoEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -8,7 +11,10 @@ const STEP_NAME = 'priority-debts';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.priorityDebts),
+  isAnswered: req =>
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.priorityDebts
+    ),
   stepDir: __dirname,
   beforeRedirect: async req => {
     const selection = req.body?.havePriorityDebts as string | undefined;
@@ -17,7 +23,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    response.defendantResponses.householdCircumstances =
+      response.defendantResponses.householdCircumstances ?? {};
     response.defendantResponses.householdCircumstances.priorityDebts = toYesNoEnum(selection);
 
     await saveDraftDefendantResponse(req, response);

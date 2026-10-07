@@ -33,7 +33,9 @@ describe('legal rep respond-to-claim sections config', () => {
   it('preserves all original sections', () => {
     expect(legalRepRespondToClaimSections.map(section => section.id)).toContain('personalDetails');
     expect(legalRepRespondToClaimSections.map(section => section.id)).toContain('uploadFiles');
-    expect(legalRepRespondToClaimSections.map(section => section.id)).toContain('checkYourAnswersAndSubmit');
+    expect(legalRepRespondToClaimSections.map(section => section.id)).toContain(
+      'checkYourAnswersAndSubmit'
+    );
   });
 
   it('has no duplicate section ids', () => {

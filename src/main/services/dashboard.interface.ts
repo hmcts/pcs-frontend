@@ -23,4 +23,5 @@ export interface DashboardRelatedApplication {
   applicationSubmittedDate?: string;
 }
 
-export type TaskStatus = 'AVAILABLE' | 'IN_PROGRESS' | 'COMPLETED' | 'NOT_STARTED' | 'NOT_AVAILABLE';
+export type TaskStatus =
+  'AVAILABLE' | 'IN_PROGRESS' | 'COMPLETED' | 'NOT_STARTED' | 'NOT_AVAILABLE';

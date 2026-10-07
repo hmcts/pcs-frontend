@@ -6,8 +6,13 @@ import { Logger } from '@modules/logger';
 
 const logger = Logger.getLogger('getLaunchDarklyFlag');
 
-export const getLaunchDarklyFlag = async <T>(req: Request, flagName: string, defaultValue: T): Promise<T> => {
-  const ldClient = (req.app?.locals?.launchDarklyClient as LDClient.LDClient | undefined) ?? undefined;
+export const getLaunchDarklyFlag = async <T>(
+  req: Request,
+  flagName: string,
+  defaultValue: T
+): Promise<T> => {
+  const ldClient =
+    (req.app?.locals?.launchDarklyClient as LDClient.LDClient | undefined) ?? undefined;
 
   let result: T = defaultValue;
   const environment = config.get<string>('launchdarkly.env');

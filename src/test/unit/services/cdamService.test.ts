@@ -103,7 +103,10 @@ describe('cdamService', () => {
       };
       mockPost.mockResolvedValue(response);
 
-      const result = await uploadDocument(createMockFile({ originalname: 'fallback.pdf' }), userToken);
+      const result = await uploadDocument(
+        createMockFile({ originalname: 'fallback.pdf' }),
+        userToken
+      );
 
       expect(result.document_filename).toBe('fallback.pdf');
     });
@@ -163,7 +166,10 @@ describe('cdamService', () => {
       };
       mockPost.mockResolvedValue(response);
 
-      const result = await uploadDocument(createMockFile({ mimetype: 'application/pdf' }), userToken);
+      const result = await uploadDocument(
+        createMockFile({ mimetype: 'application/pdf' }),
+        userToken
+      );
 
       expect(result.content_type).toBe('application/pdf');
     });
@@ -190,7 +196,10 @@ describe('cdamService', () => {
       mockDelete.mockResolvedValue({});
       const uuid = 'abc12345-1234-1234-1234-123456789abc';
 
-      await deleteDocument(`http://dm-store-aat.service.core-compute-aat.internal/documents/${uuid}`, userToken);
+      await deleteDocument(
+        `http://dm-store-aat.service.core-compute-aat.internal/documents/${uuid}`,
+        userToken
+      );
 
       expect(mockDelete).toHaveBeenCalledWith(
         `${mockCdamUrl}/cases/documents/${uuid}`,
@@ -337,7 +346,9 @@ describe('cdamService', () => {
       const error = new Error('boom');
       mockGet.mockRejectedValue(error);
 
-      await expect(getDocumentBinary('http://dm-store/documents/test/binary', userToken)).rejects.toThrow('boom');
+      await expect(
+        getDocumentBinary('http://dm-store/documents/test/binary', userToken)
+      ).rejects.toThrow('boom');
     });
   });
 });

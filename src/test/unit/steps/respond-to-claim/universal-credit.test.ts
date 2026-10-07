@@ -186,7 +186,10 @@ describe('respond-to-claim universal-credit step', () => {
     };
 
     it('pre-populates yes + date when saved with a date (came from this screen)', async () => {
-      const data = await render({ hasAppliedForUniversalCredit: 'YES', ucApplicationDate: '2024-02-10' });
+      const data = await render({
+        hasAppliedForUniversalCredit: 'YES',
+        ucApplicationDate: '2024-02-10',
+      });
       expect(data.fieldValues.haveAppliedForUniversalCredit).toBe('yes');
       expect(data['haveAppliedForUniversalCredit.ucApplicationDate']).toEqual({
         day: '10',

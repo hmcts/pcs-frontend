@@ -1,6 +1,9 @@
 import type { Request } from 'express';
 
-import type { JourneyFlowConfig, JourneyFlowConfigResolver } from '@modules/steps/stepFlow.interface';
+import type {
+  JourneyFlowConfig,
+  JourneyFlowConfigResolver,
+} from '@modules/steps/stepFlow.interface';
 
 export type FormBuilderFlowConfig = JourneyFlowConfig | JourneyFlowConfigResolver;
 
@@ -15,7 +18,10 @@ export async function resolveFormBuilderFlowConfig(
   return flowConfigOrResolver;
 }
 
-export function getStaticBasePath(flowConfigOrResolver: FormBuilderFlowConfig, fallbackBasePath: string): string {
+export function getStaticBasePath(
+  flowConfigOrResolver: FormBuilderFlowConfig,
+  fallbackBasePath: string
+): string {
   if (typeof flowConfigOrResolver === 'function') {
     return fallbackBasePath;
   }
@@ -23,7 +29,9 @@ export function getStaticBasePath(flowConfigOrResolver: FormBuilderFlowConfig, f
   return flowConfigOrResolver.basePath || fallbackBasePath;
 }
 
-export function getStaticEntryStepId(flowConfigOrResolver: FormBuilderFlowConfig): string | undefined {
+export function getStaticEntryStepId(
+  flowConfigOrResolver: FormBuilderFlowConfig
+): string | undefined {
   if (typeof flowConfigOrResolver === 'function') {
     return undefined;
   }

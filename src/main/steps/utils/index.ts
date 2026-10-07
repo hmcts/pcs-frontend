@@ -34,7 +34,10 @@ export {
   shouldRouteToPriorityDebtDetails,
   shouldRouteToOtherRegularExpenses,
 } from './respondToClaimRouteConditions';
-export { ccdPenceToPoundsString, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
+export {
+  ccdPenceToPoundsString,
+  additionalRentContributionToPoundsString,
+} from './moneyAmountTransforms';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export {
   LEGAL_REPRESENTATIVE_USER_ROLES,

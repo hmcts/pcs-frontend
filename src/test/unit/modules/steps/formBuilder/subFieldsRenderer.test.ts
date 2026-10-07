@@ -26,13 +26,19 @@ describe('subFieldsRenderer', () => {
     });
 
     it('should return empty string when subFields is null', () => {
-      const result = buildSubFieldsHTML(null as unknown as Record<string, FormFieldConfig>, mockNunjucksEnv);
+      const result = buildSubFieldsHTML(
+        null as unknown as Record<string, FormFieldConfig>,
+        mockNunjucksEnv
+      );
       expect(result).toBe('');
       expect(renderSpy).not.toHaveBeenCalled();
     });
 
     it('should return empty string when subFields is undefined', () => {
-      const result = buildSubFieldsHTML(undefined as unknown as Record<string, FormFieldConfig>, mockNunjucksEnv);
+      const result = buildSubFieldsHTML(
+        undefined as unknown as Record<string, FormFieldConfig>,
+        mockNunjucksEnv
+      );
       expect(result).toBe('');
       expect(renderSpy).not.toHaveBeenCalled();
     });

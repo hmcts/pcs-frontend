@@ -64,9 +64,7 @@ export const FieldsStore = {
 
 export class RecordAnswers implements IAction {
   async execute(page: Page, action: string, fieldName?: actionRecord): Promise<void> {
-    const actionsMap = new Map<string, () => Promise<void>>([
-      ['recordUserEntry', () => this.recordUserEntry(fieldName as actionRecord)],
-    ]);
+    const actionsMap = new Map<string, () => Promise<void>>([['recordUserEntry', () => this.recordUserEntry(fieldName as actionRecord)]]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
       throw new Error(`No action found for '${action}'`);

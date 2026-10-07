@@ -18,7 +18,9 @@ export const step: StepDefinition = createFormStep({
   // Drives the task-list "Your support" row status: DONE once the defendant has captured
   // adjustments (defendantFlags persisted in draft), AVAILABLE otherwise.
   isAnswered: (req: Request) =>
-    Boolean(req.res?.locals.validatedCase?.possessionClaimResponse?.defendantFlags?.details?.length),
+    Boolean(
+      req.res?.locals.validatedCase?.possessionClaimResponse?.defendantFlags?.details?.length
+    ),
   // "Continue to the questions" (reasonableAdjustmentsChoice=questions) launches the Your Support
   // microsite;
   beforeRedirect: async (req: Request) => {
@@ -42,7 +44,10 @@ export const step: StepDefinition = createFormStep({
       if (!caseReference) {
         throw error;
       }
-      req.res?.redirect(303, `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`);
+      req.res?.redirect(
+        303,
+        `/case/${caseReference}/respond-to-claim/reasonable-adjustments-error`
+      );
     }
   },
   // The "I do not need any support at this time" button (and the flag-off fall-through) lands here.

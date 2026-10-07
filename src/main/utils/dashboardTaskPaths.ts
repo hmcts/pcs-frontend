@@ -33,14 +33,20 @@ export const RESPOND_TO_CLAIM_DASHBOARD_NOTIFICATION_TEMPLATE_IDS = [
 ] as const;
 
 export function isRespondToClaimDashboardNotification(templateId: string): boolean {
-  return (RESPOND_TO_CLAIM_DASHBOARD_NOTIFICATION_TEMPLATE_IDS as readonly string[]).includes(templateId);
+  return (RESPOND_TO_CLAIM_DASHBOARD_NOTIFICATION_TEMPLATE_IDS as readonly string[]).includes(
+    templateId
+  );
 }
 
 /**
  * Resolves the same href the dashboard task list uses for a linkable task (canonical `/case/...`
  * when mapped; otherwise legacy `/dashboard/:caseRef/:group/:templateId`).
  */
-export function getDashboardTaskPath(templateId: string, caseReference: string, fallbackTaskGroupId: string): string {
+export function getDashboardTaskPath(
+  templateId: string,
+  caseReference: string,
+  fallbackTaskGroupId: string
+): string {
   const pattern = DASHBOARD_TASK_PATH_PATTERNS[templateId];
   if (pattern) {
     return pattern.replace(/:caseReference/g, caseReference);

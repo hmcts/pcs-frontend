@@ -2,7 +2,7 @@ import { counterClaim, counterClaimWhatAreYouClaimingFor, feedback } from '../da
 import { performAction, performValidation } from '../utils/controller';
 
 export async function counterClaimWhatAreYouClaimingForErrorValidation(): Promise<void> {
-  await performAction('clickButton', counterClaimWhatAreYouClaimingFor.saveAndContinueButton);
+  await performAction('When the user clicks the button', counterClaimWhatAreYouClaimingFor.saveAndContinueButton);
   console.log(`clicked save and continue without selecting any option`);
 
   await performValidation('errorMessage', {

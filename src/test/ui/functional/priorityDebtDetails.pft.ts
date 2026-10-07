@@ -3,7 +3,7 @@ import { performAction, performValidation } from '../utils/controller';
 
 export async function priorityDebtDetailsErrorValidation(): Promise<void> {
   // All mandatory fields
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message1: priorityDebtDetails.enterTheTotalAmountErrorMessage,
@@ -12,17 +12,9 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
   });
 
   // Radio option not selected
-  await performAction(
-    'inputText',
-    priorityDebtDetails.whatIsTheTotalAmountQuestion,
-    priorityDebtDetails.totalAmountTextInput
-  );
-  await performAction(
-    'inputText',
-    priorityDebtDetails.howMuchDoYouPayQuestion,
-    priorityDebtDetails.amountYouPayTextInput
-  );
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, priorityDebtDetails.totalAmountTextInput);
+  await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetails.amountYouPayTextInput);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message: priorityDebtDetails.selectHowFrequentlyErrorMessage,
@@ -30,127 +22,79 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
 
   //Total Amount missing
   await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, ' ');
-  await performAction(
-    'inputText',
-    priorityDebtDetails.howMuchDoYouPayQuestion,
-    priorityDebtDetails.amountYouPayTextInput
-  );
+  await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetails.amountYouPayTextInput);
   await performAction('clickRadioButton', priorityDebtDetails.weekRadioOption);
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message: priorityDebtDetails.enterTheTotalAmountErrorMessage,
   });
 
   // Amount you pay missing
-  await performAction(
-    'inputText',
-    priorityDebtDetails.whatIsTheTotalAmountQuestion,
-    priorityDebtDetails.totalAmountTextInput
-  );
+  await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, priorityDebtDetails.totalAmountTextInput);
   await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, ' ');
   await performAction('clickRadioButton', priorityDebtDetails.weekRadioOption);
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message: priorityDebtDetails.enterTheAmountYouPayErrorMessage,
   });
 
   //Total amount exceeding max allowed value
-  await performAction(
-    'inputText',
-    priorityDebtDetails.whatIsTheTotalAmountQuestion,
-    priorityDebtDetails.billionTextInput
-  );
-  await performAction(
-    'inputText',
-    priorityDebtDetails.howMuchDoYouPayQuestion,
-    priorityDebtDetails.amountYouPayTextInput
-  );
+  await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, priorityDebtDetails.billionTextInput);
+  await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetails.amountYouPayTextInput);
   await performAction('clickRadioButton', priorityDebtDetails.weekRadioOption);
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message: priorityDebtDetails.totalAmountYouOweMustBeLessThanBillionErrorMessage,
   });
 
   //Total amount negative value entered
-  await performAction(
-    'inputText',
-    priorityDebtDetails.whatIsTheTotalAmountQuestion,
-    priorityDebtDetails.negativeTextInput
-  );
-  await performAction(
-    'inputText',
-    priorityDebtDetails.howMuchDoYouPayQuestion,
-    priorityDebtDetails.amountYouPayTextInput
-  );
+  await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, priorityDebtDetails.negativeTextInput);
+  await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetails.amountYouPayTextInput);
   await performAction('clickRadioButton', priorityDebtDetails.weekRadioOption);
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message: priorityDebtDetails.totalAmountNegativeValueErrorMessage,
   });
 
   //Total Amount incorrect format
-  await performAction(
-    'inputText',
-    priorityDebtDetails.whatIsTheTotalAmountQuestion,
-    priorityDebtDetails.incorrectFormatTextInput
-  );
-  await performAction(
-    'inputText',
-    priorityDebtDetails.howMuchDoYouPayQuestion,
-    priorityDebtDetails.amountYouPayTextInput
-  );
+  await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, priorityDebtDetails.incorrectFormatTextInput);
+  await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetails.amountYouPayTextInput);
   await performAction('clickRadioButton', priorityDebtDetails.weekRadioOption);
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message: priorityDebtDetails.enterTotalAmountInTheCorrectFormatErrorMessage,
   });
 
   //Amount you pay exceeding max allowed value
-  await performAction(
-    'inputText',
-    priorityDebtDetails.whatIsTheTotalAmountQuestion,
-    priorityDebtDetails.totalAmountTextInput
-  );
+  await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, priorityDebtDetails.totalAmountTextInput);
   await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetails.billionTextInput);
   await performAction('clickRadioButton', priorityDebtDetails.weekRadioOption);
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message: priorityDebtDetails.amountYouPayMustBeLessThanBillionErrorMessage,
   });
 
   //Amount you pay negative value entered
-  await performAction(
-    'inputText',
-    priorityDebtDetails.whatIsTheTotalAmountQuestion,
-    priorityDebtDetails.totalAmountTextInput
-  );
+  await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, priorityDebtDetails.totalAmountTextInput);
   await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetails.negativeTextInput);
   await performAction('clickRadioButton', priorityDebtDetails.weekRadioOption);
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message: priorityDebtDetails.amountYouPayNegativeValueErrorMessage,
   });
 
   //Amount you pay incorrect format
-  await performAction(
-    'inputText',
-    priorityDebtDetails.whatIsTheTotalAmountQuestion,
-    priorityDebtDetails.totalAmountTextInput
-  );
-  await performAction(
-    'inputText',
-    priorityDebtDetails.howMuchDoYouPayQuestion,
-    priorityDebtDetails.incorrectFormatTextInput
-  );
+  await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, priorityDebtDetails.totalAmountTextInput);
+  await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetails.incorrectFormatTextInput);
   await performAction('clickRadioButton', priorityDebtDetails.weekRadioOption);
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message: priorityDebtDetails.enterAmountYouPayInTheCorrectFormatErrorMessage,
@@ -158,12 +102,8 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
 
   //Total Amount and Radio option both missing
   await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, ' ');
-  await performAction(
-    'inputText',
-    priorityDebtDetails.howMuchDoYouPayQuestion,
-    priorityDebtDetails.amountYouPayTextInput
-  );
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetails.amountYouPayTextInput);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message1: priorityDebtDetails.enterTheTotalAmountErrorMessage,
@@ -172,13 +112,9 @@ export async function priorityDebtDetailsErrorValidation(): Promise<void> {
 
   //Total Amount missing and Amount you pay incorrect format
   await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, ' ');
-  await performAction(
-    'inputText',
-    priorityDebtDetails.howMuchDoYouPayQuestion,
-    priorityDebtDetails.incorrectFormatTextInput
-  );
+  await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetails.incorrectFormatTextInput);
   await performAction('clickRadioButton', priorityDebtDetails.weekRadioOption);
-  await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
+  await performAction('When the user clicks the button', priorityDebtDetails.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: priorityDebtDetails.thereIsAProblemErrorMessageHeader,
     message1: priorityDebtDetails.enterTheTotalAmountErrorMessage,
@@ -194,15 +130,7 @@ export async function priorityDebtDetailsNavigationTests(): Promise<void> {
   if (process.env.PRIORITY_DEBTS === 'YES') {
     await performValidation('pageNavigation', priorityDebtDetails.backLink, priorityDebts.mainHeader);
   }
-  await performAction(
-    'inputText',
-    priorityDebtDetails.whatIsTheTotalAmountQuestion,
-    priorityDebtDetails.totalAmountTextInput
-  );
-  await performAction(
-    'inputText',
-    priorityDebtDetails.howMuchDoYouPayQuestion,
-    priorityDebtDetails.amountYouPayTextInput
-  );
+  await performAction('inputText', priorityDebtDetails.whatIsTheTotalAmountQuestion, priorityDebtDetails.totalAmountTextInput);
+  await performAction('inputText', priorityDebtDetails.howMuchDoYouPayQuestion, priorityDebtDetails.amountYouPayTextInput);
   await performAction('clickRadioButton', priorityDebtDetails.monthRadioOption);
 }

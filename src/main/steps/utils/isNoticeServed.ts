@@ -13,7 +13,9 @@ import { normalizeYesNoValue } from './normalizeYesNoValue';
  */
 export const isNoticeServed = (req: Request): boolean => {
   const validatedCase = req.res?.locals.validatedCase;
-  const value = isWalesProperty(req) ? validatedCase?.walesNoticeServed : validatedCase?.noticeServed;
+  const value = isWalesProperty(req)
+    ? validatedCase?.walesNoticeServed
+    : validatedCase?.noticeServed;
 
   return normalizeYesNoValue(value) === 'YES';
 };

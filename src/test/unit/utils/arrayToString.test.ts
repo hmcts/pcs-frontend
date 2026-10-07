@@ -2,7 +2,15 @@ import { arrayToString } from '../../../main/utils/arrayToString';
 
 describe('arrayToString', () => {
   it('should join non-empty trimmed parts with default separator', () => {
-    const result = arrayToString([' 10 Second Avenue ', '', '  ', 'London', null, undefined, ' W3 7RX ']);
+    const result = arrayToString([
+      ' 10 Second Avenue ',
+      '',
+      '  ',
+      'London',
+      null,
+      undefined,
+      ' W3 7RX ',
+    ]);
 
     expect(result).toBe('10 Second Avenue, London, W3 7RX');
   });

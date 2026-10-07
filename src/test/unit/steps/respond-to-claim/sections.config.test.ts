@@ -30,7 +30,9 @@ describe('respond-to-claim sections config', () => {
       'equality-and-diversity-start',
       'equality-and-diversity-end',
     ]);
-    const flowStepSlugs = Object.keys(stepRegistry).filter(stepSlug => !nonSectionStepSlugs.has(stepSlug));
+    const flowStepSlugs = Object.keys(stepRegistry).filter(
+      stepSlug => !nonSectionStepSlugs.has(stepSlug)
+    );
     const coverage = getSectionCoverage(flowStepSlugs, respondToClaimSections);
 
     expect(coverage.unmappedSteps).toEqual([]);
@@ -53,7 +55,9 @@ describe('respond-to-claim sections config', () => {
   });
 
   it('section ids match the canonical id list (no missing or extra sections)', () => {
-    expect(respondToClaimSections.map(section => section.id)).toEqual([...RESPOND_TO_CLAIM_SECTION_IDS]);
+    expect(respondToClaimSections.map(section => section.id)).toEqual([
+      ...RESPOND_TO_CLAIM_SECTION_IDS,
+    ]);
   });
 
   it('has no duplicate section ids', () => {
@@ -62,7 +66,10 @@ describe('respond-to-claim sections config', () => {
   });
 
   it('maps upload section steps', () => {
-    expect(findSection('uploadFiles')?.steps).toEqual(['upload-document', 'check-your-answers-documents']);
+    expect(findSection('uploadFiles')?.steps).toEqual([
+      'upload-document',
+      'check-your-answers-documents',
+    ]);
   });
 
   it('maps end-of-journey steps into final section (triage moved out to yourSupport)', () => {
@@ -259,7 +266,9 @@ describe('respond-to-claim sections config', () => {
         const fromSection = sectionFor(slug);
         const toSection = sectionFor(step.previousStep);
         if (toSection !== null && fromSection !== null && fromSection !== toSection) {
-          violations.push(`${slug} (${fromSection}) -> previousStep ${step.previousStep} (${toSection})`);
+          violations.push(
+            `${slug} (${fromSection}) -> previousStep ${step.previousStep} (${toSection})`
+          );
         }
       }
 

@@ -20,8 +20,16 @@ describe('safeRedirect303', () => {
     });
 
     it('should redirect to valid case URL', () => {
-      safeRedirect303(mockRes as Response, '/case/1234567890123456/respond-to-claim/start-now', '/', ['/case/']);
-      expect(redirectSpy).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/start-now');
+      safeRedirect303(
+        mockRes as Response,
+        '/case/1234567890123456/respond-to-claim/start-now',
+        '/',
+        ['/case/']
+      );
+      expect(redirectSpy).toHaveBeenCalledWith(
+        303,
+        '/case/1234567890123456/respond-to-claim/start-now'
+      );
     });
 
     it('should redirect to root path', () => {
@@ -30,18 +38,24 @@ describe('safeRedirect303', () => {
     });
 
     it('should allow multiple prefixes and match the correct one', () => {
-      safeRedirect303(mockRes as Response, '/case/123/step', '/', ['/dashboard', '/case/', '/login']);
+      safeRedirect303(mockRes as Response, '/case/123/step', '/', [
+        '/dashboard',
+        '/case/',
+        '/login',
+      ]);
       expect(redirectSpy).toHaveBeenCalledWith(303, '/case/123/step');
     });
   });
 
   describe('Security: Blocks absolute URLs', () => {
-    ['http://evil.com', 'https://evil.com', 'ftp://evil.com', 'javascript:alert(1)'].forEach(url => {
-      it(`should block ${url} URLs and redirect to fallback`, () => {
-        safeRedirect303(mockRes as Response, url, '/', ['/']);
-        expect(redirectSpy).toHaveBeenCalledWith(303, '/');
-      });
-    });
+    ['http://evil.com', 'https://evil.com', 'ftp://evil.com', 'javascript:alert(1)'].forEach(
+      url => {
+        it(`should block ${url} URLs and redirect to fallback`, () => {
+          safeRedirect303(mockRes as Response, url, '/', ['/']);
+          expect(redirectSpy).toHaveBeenCalledWith(303, '/');
+        });
+      }
+    );
   });
 
   describe('Security: Blocks protocol-relative URLs', () => {
@@ -67,7 +81,9 @@ describe('safeRedirect303', () => {
 
   describe('Security: URL encoding attacks', () => {
     it('should block CRLF injection attempts with encoded newlines', () => {
-      safeRedirect303(mockRes as Response, '/dashboard%0D%0ALocation:http://script.com', '/', ['/dashboard']);
+      safeRedirect303(mockRes as Response, '/dashboard%0D%0ALocation:http://script.com', '/', [
+        '/dashboard',
+      ]);
       expect(redirectSpy).toHaveBeenCalledWith(303, '/');
     });
 

@@ -91,7 +91,10 @@ async function rehydratePaymentSessionIfNeeded(
   }
 
   try {
-    const outstanding = await paymentService.getOutstandingCounterClaimPayment(accessToken, caseReference);
+    const outstanding = await paymentService.getOutstandingCounterClaimPayment(
+      accessToken,
+      caseReference
+    );
     const feeAmount = toFeeAmountNumber(outstanding.feeAmount);
     if (!outstanding.serviceRequestReference || feeAmount === undefined) {
       return paymentSession;
@@ -103,13 +106,18 @@ async function rehydratePaymentSessionIfNeeded(
       serviceRequestReference: outstanding.serviceRequestReference,
       feeAmount,
       counterClaimAmountInPence:
-        outstanding.counterClaimAmountInPence ?? claimAmountInPence ?? paymentSession?.counterClaimAmountInPence,
-      counterClaimType: outstanding.counterClaimType ?? claimType ?? paymentSession?.counterClaimType,
+        outstanding.counterClaimAmountInPence ??
+        claimAmountInPence ??
+        paymentSession?.counterClaimAmountInPence,
+      counterClaimType:
+        outstanding.counterClaimType ?? claimType ?? paymentSession?.counterClaimType,
     };
     await persistPaymentSessionState(req, rehydratedSession);
     return rehydratedSession;
   } catch (error) {
-    logger.warn(`Unable to rehydrate outstanding counterclaim payment for case ${caseReference}: ${String(error)}`);
+    logger.warn(
+      `Unable to rehydrate outstanding counterclaim payment for case ${caseReference}: ${String(error)}`
+    );
     return paymentSession;
   }
 }
@@ -128,7 +136,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const paymentOption = req.body?.paymentOptions as string | undefined;
 
     if (paymentOption === 'card') {
-      return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start` : '#';
+      return caseReference
+        ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start`
+        : '#';
     } else if (paymentOption === 'pba') {
       const paymentSession = getPaymentSessionState(req);
       if (paymentSession) {
@@ -138,23 +148,36 @@ export const step: StepDefinition = createRespondToClaimFormStep({
           pbaAccount: req.body?.['paymentOptions.pbaAccount'],
         });
       }
-      return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-pba-payment/start` : '#';
+      return caseReference
+        ? `/case/${caseReference}/respond-to-claim/counter-claim-pba-payment/start`
+        : '#';
     } else {
-      return caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount` : '#';
+      return caseReference
+        ? `/case/${caseReference}/respond-to-claim/counter-claim-application-fee-amount`
+        : '#';
     }
   },
   extendGetContent: async (req, formContent) => {
     const caseModel = req.res?.locals?.validatedCase;
-    const counterClaim = caseModel instanceof CcdCaseModel ? caseModel.defendantResponsesCounterClaim : undefined;
+    const counterClaim =
+      caseModel instanceof CcdCaseModel ? caseModel.defendantResponsesCounterClaim : undefined;
     const caseReferenceParam = req.params?.caseReference;
-    const caseReference = Array.isArray(caseReferenceParam) ? caseReferenceParam[0] : caseReferenceParam;
+    const caseReference = Array.isArray(caseReferenceParam)
+      ? caseReferenceParam[0]
+      : caseReferenceParam;
     const fromDashboard = req.query?.from === 'dashboard';
 
     let paymentSession = getPaymentSessionState(req);
     let claimType = paymentSession?.counterClaimType ?? counterClaim?.claimType;
-    let claimAmountInPence = paymentSession?.counterClaimAmountInPence ?? getCounterClaimAmountInPence(counterClaim);
+    let claimAmountInPence =
+      paymentSession?.counterClaimAmountInPence ?? getCounterClaimAmountInPence(counterClaim);
 
-    paymentSession = await rehydratePaymentSessionIfNeeded(req, caseReference, claimType, claimAmountInPence);
+    paymentSession = await rehydratePaymentSessionIfNeeded(
+      req,
+      caseReference,
+      claimType,
+      claimAmountInPence
+    );
 
     claimType = paymentSession?.counterClaimType ?? claimType;
     claimAmountInPence = paymentSession?.counterClaimAmountInPence ?? claimAmountInPence;
@@ -179,10 +202,15 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     const t = getTranslationFunction(req);
-    const counterClaimAmountPounds = claimAmountInPence ? penceToPounds(claimAmountInPence) : undefined;
-    const counterClaimAmount = counterClaimAmountPounds === undefined ? undefined : Number(counterClaimAmountPounds);
+    const counterClaimAmountPounds = claimAmountInPence
+      ? penceToPounds(claimAmountInPence)
+      : undefined;
+    const counterClaimAmount =
+      counterClaimAmountPounds === undefined ? undefined : Number(counterClaimAmountPounds);
     const serviceRequestReference = paymentSession?.serviceRequestReference;
-    const payNowUrl = caseReference ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start` : '#';
+    const payNowUrl = caseReference
+      ? `/case/${caseReference}/respond-to-claim/counter-claim-payment/start`
+      : '#';
     const payNowDisabled = !serviceRequestReference;
     const paymentQuery = req.query?.payment;
     const showPaymentError = paymentQuery === 'failed' || paymentQuery === 'pending';
@@ -190,7 +218,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const confirmationBackUrl = caseReference
       ? `/case/${caseReference}/respond-to-claim/response-submitted-counter-claim-fee-payment-needed`
       : '';
-    const backUrl = fromDashboard ? (getDashboardUrl(caseReference) ?? confirmationBackUrl) : confirmationBackUrl;
+    const backUrl = fromDashboard
+      ? (getDashboardUrl(caseReference) ?? confirmationBackUrl)
+      : confirmationBackUrl;
 
     const isLegalRepresentative = isLegalRepresentativeUser(req);
     let pbaAccountItems: { value: string; text: string }[] = [];
@@ -204,7 +234,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       isLegalRepresentative,
       pbaAccountItems,
       formattedCounterClaimAmount:
-        counterClaimAmount === undefined ? undefined : t('counterClaimAmountDisplay', { counterClaimAmount }),
+        counterClaimAmount === undefined
+          ? undefined
+          : t('counterClaimAmountDisplay', { counterClaimAmount }),
       formattedCounterClaimFee: t('counterClaimFeeDisplay', { counterClaimFee: feeAmount }),
       payNowButton: t('payNowButton', { counterClaimFee: feeAmount }),
       payNowUrl,

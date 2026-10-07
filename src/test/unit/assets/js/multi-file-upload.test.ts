@@ -15,14 +15,18 @@ if (typeof globalThis.TextDecoder === 'undefined') {
 let capturedHooks: Record<string, (...args: unknown[]) => void> = {};
 
 jest.mock('@ministryofjustice/frontend', () => ({
-  MultiFileUpload: jest.fn().mockImplementation((_el: unknown, config: { hooks?: Record<string, unknown> }) => {
-    capturedHooks = (config?.hooks || {}) as Record<string, (...args: unknown[]) => void>;
-    return {};
-  }),
+  MultiFileUpload: jest
+    .fn()
+    .mockImplementation((_el: unknown, config: { hooks?: Record<string, unknown> }) => {
+      capturedHooks = (config?.hooks || {}) as Record<string, (...args: unknown[]) => void>;
+      return {};
+    }),
 }));
 
 jest.mock('@utils/fileExtensionValidation', () => ({
-  isBlockedExtension: jest.fn((filename: string) => filename.endsWith('.mp4') || filename.endsWith('.mp3')),
+  isBlockedExtension: jest.fn(
+    (filename: string) => filename.endsWith('.mp4') || filename.endsWith('.mp3')
+  ),
   isAllowedExtension: jest.fn(
     (filename: string) =>
       filename.endsWith('.pdf') ||
@@ -45,7 +49,10 @@ jest.mock('@utils/fileExtensionValidation', () => ({
   ),
 }));
 
-import { encodeUploadedDocument, initMultiFileUpload } from '../../../../main/assets/js/multi-file-upload';
+import {
+  encodeUploadedDocument,
+  initMultiFileUpload,
+} from '../../../../main/assets/js/multi-file-upload';
 
 import { decodeBase64UrlJson } from '@utils/base64Json';
 
@@ -176,7 +183,9 @@ describe('multi-file-upload', () => {
     });
 
     it('throws for blocked extensions', () => {
-      expect(() => capturedHooks.entryHook(null, { name: 'video.mp4', size: 100 })).toThrow('blocked');
+      expect(() => capturedHooks.entryHook(null, { name: 'video.mp4', size: 100 })).toThrow(
+        'blocked'
+      );
       const summary = document.querySelector('.govuk-error-summary');
       expect(summary).not.toBeNull();
       expect(summary!.textContent).toContain('Wrong file type');
@@ -184,7 +193,9 @@ describe('multi-file-upload', () => {
 
     it('throws for files exceeding max size', () => {
       const maxBytes = 1024 * 1024 * 1024;
-      expect(() => capturedHooks.entryHook(null, { name: 'big.pdf', size: maxBytes + 1 })).toThrow('too_large');
+      expect(() => capturedHooks.entryHook(null, { name: 'big.pdf', size: maxBytes + 1 })).toThrow(
+        'too_large'
+      );
       const summary = document.querySelector('.govuk-error-summary');
       expect(summary!.textContent).toContain('File too large');
     });
@@ -215,33 +226,45 @@ describe('multi-file-upload', () => {
 
     it('throws filename_too_long for an over-length name', () => {
       const longName = 'a'.repeat(256) + '.pdf';
-      expect(() => capturedHooks.entryHook(null, { name: longName, size: 100 })).toThrow('filename_too_long');
-      expect(document.querySelector('.govuk-error-summary')!.textContent).toContain('Filename too long');
+      expect(() => capturedHooks.entryHook(null, { name: longName, size: 100 })).toThrow(
+        'filename_too_long'
+      );
+      expect(document.querySelector('.govuk-error-summary')!.textContent).toContain(
+        'Filename too long'
+      );
     });
 
     it('throws media_too_large for an oversize image', () => {
       const fiveHundredMbPlusOneByte = 500 * 1024 * 1024 + 1;
-      expect(() => capturedHooks.entryHook(null, { name: 'big-photo.jpg', size: fiveHundredMbPlusOneByte })).toThrow(
-        'media_too_large'
+      expect(() =>
+        capturedHooks.entryHook(null, { name: 'big-photo.jpg', size: fiveHundredMbPlusOneByte })
+      ).toThrow('media_too_large');
+      expect(document.querySelector('.govuk-error-summary')!.textContent).toContain(
+        'Image too large'
       );
-      expect(document.querySelector('.govuk-error-summary')!.textContent).toContain('Image too large');
     });
 
     it('allows an image just under the media cap', () => {
       const justUnder = 500 * 1024 * 1024 - 1;
-      expect(() => capturedHooks.entryHook(null, { name: 'photo.jpg', size: justUnder })).not.toThrow();
+      expect(() =>
+        capturedHooks.entryHook(null, { name: 'photo.jpg', size: justUnder })
+      ).not.toThrow();
     });
 
     it('uses the document cap for non-image files even when the media cap is configured', () => {
       // 600MB pdf — over the 500MB media cap, under the 1024MB document cap. Should pass.
       const sixHundredMb = 600 * 1024 * 1024;
-      expect(() => capturedHooks.entryHook(null, { name: 'big.pdf', size: sixHundredMb })).not.toThrow();
+      expect(() =>
+        capturedHooks.entryHook(null, { name: 'big.pdf', size: sixHundredMb })
+      ).not.toThrow();
     });
 
     it('checks filename length before extension allowlist', () => {
       // Overlong .xyz name: precedence puts filename_too_long before invalid_type.
       const longName = 'a'.repeat(256) + '.xyz';
-      expect(() => capturedHooks.entryHook(null, { name: longName, size: 100 })).toThrow('filename_too_long');
+      expect(() => capturedHooks.entryHook(null, { name: longName, size: 100 })).toThrow(
+        'filename_too_long'
+      );
     });
   });
 
@@ -272,7 +295,11 @@ describe('multi-file-upload', () => {
     });
 
     it('handles malformed response gracefully', () => {
-      const xhr = { status: 200, response: null, responseText: 'not json' } as unknown as XMLHttpRequest;
+      const xhr = {
+        status: 200,
+        response: null,
+        responseText: 'not json',
+      } as unknown as XMLHttpRequest;
       expect(() => capturedHooks.exitHook(null, {}, xhr)).not.toThrow();
     });
 
@@ -327,7 +354,11 @@ describe('multi-file-upload', () => {
     it('does not show a banner when server response has no structured error message', () => {
       // Per AC: non-AC failures (abort, network, CDAM, 5xx) get the row-level
       // "Upload failed" indicator only — no misleading wrong-type banner.
-      const xhr = { status: 500, response: null, responseText: 'not json' } as unknown as XMLHttpRequest;
+      const xhr = {
+        status: 500,
+        response: null,
+        responseText: 'not json',
+      } as unknown as XMLHttpRequest;
       capturedHooks.errorHook(null, {}, xhr);
 
       const summary = document.querySelector('.govuk-error-summary');
@@ -397,7 +428,8 @@ describe('multi-file-upload', () => {
       row.className = 'moj-multi-file-upload__row';
       const message = document.createElement('div');
       message.className = 'moj-multi-file-upload__message';
-      message.innerHTML = '<span class="moj-multi-file-upload__success"><svg></svg>uploaded.pdf</span>';
+      message.innerHTML =
+        '<span class="moj-multi-file-upload__success"><svg></svg>uploaded.pdf</span>';
       row.appendChild(message);
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'moj-multi-file-upload__delete';
@@ -429,7 +461,11 @@ describe('multi-file-upload', () => {
     });
 
     it('handles malformed success response gracefully', () => {
-      const xhr = { status: 200, response: null, responseText: 'not json' } as unknown as XMLHttpRequest;
+      const xhr = {
+        status: 200,
+        response: null,
+        responseText: 'not json',
+      } as unknown as XMLHttpRequest;
       expect(() => capturedHooks.deleteHook(null, undefined, xhr)).not.toThrow();
     });
   });
@@ -505,7 +541,9 @@ describe('multi-file-upload', () => {
       initMultiFileUpload();
 
       // Original <label> is gone; a real <button> takes its place
-      expect(document.querySelector('.moj-multi-file-upload__dropzone label.govuk-button--secondary')).toBeNull();
+      expect(
+        document.querySelector('.moj-multi-file-upload__dropzone label.govuk-button--secondary')
+      ).toBeNull();
 
       const button = getChooseFilesButton();
       expect(button).toBeInstanceOf(HTMLButtonElement);
@@ -574,11 +612,17 @@ describe('multi-file-upload', () => {
       initMultiFileUpload();
 
       const dropzone = getDropzone();
-      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(false);
+      expect(
+        dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')
+      ).toBe(false);
 
-      document.querySelector<HTMLAnchorElement>('.govuk-error-summary a[href="#documents"]')!.click();
+      document
+        .querySelector<HTMLAnchorElement>('.govuk-error-summary a[href="#documents"]')!
+        .click();
 
-      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(true);
+      expect(
+        dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')
+      ).toBe(true);
     });
 
     it('highlights dropzone on file input focus when form group is in error', () => {
@@ -590,7 +634,9 @@ describe('multi-file-upload', () => {
 
       fileInput.focus();
 
-      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(true);
+      expect(
+        dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')
+      ).toBe(true);
     });
 
     it('clears dropzone highlight on file input blur', () => {
@@ -603,7 +649,9 @@ describe('multi-file-upload', () => {
       fileInput.focus();
       fileInput.blur();
 
-      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(false);
+      expect(
+        dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')
+      ).toBe(false);
     });
 
     it('clears dropzone highlight when inline field error is cleared', () => {
@@ -611,8 +659,12 @@ describe('multi-file-upload', () => {
       initMultiFileUpload();
 
       const dropzone = getDropzone();
-      document.querySelector<HTMLAnchorElement>('.govuk-error-summary a[href="#documents"]')!.click();
-      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(true);
+      document
+        .querySelector<HTMLAnchorElement>('.govuk-error-summary a[href="#documents"]')!
+        .click();
+      expect(
+        dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')
+      ).toBe(true);
 
       try {
         capturedHooks.entryHook(null, { name: 'doc.pdf', size: 1024 });
@@ -620,7 +672,9 @@ describe('multi-file-upload', () => {
         /* not expected */
       }
 
-      expect(dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')).toBe(false);
+      expect(
+        dropzone.classList.contains('moj-multi-file-upload__dropzone--error-summary-target')
+      ).toBe(false);
     });
   });
 });

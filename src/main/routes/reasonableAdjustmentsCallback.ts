@@ -41,7 +41,10 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
       try {
         serviceToken = await http.getValidS2SToken();
       } catch (error) {
-        logger.error(`No S2S service token available to fetch Your Support payload for id ${payloadId}`, error);
+        logger.error(
+          `No S2S service token available to fetch Your Support payload for id ${payloadId}`,
+          error
+        );
         return safeRedirect303(res, errorUrl, fallback, ['/case']);
       }
 
@@ -84,7 +87,9 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
         // Pick whichever collection actually has flags, preferring `replacementFlags`.
         // "No request was sent" only when microsite was abandoned (action !== 'submit')
         // or neither collection has any flags.
-        const flags = payload.replacementFlags?.details?.length ? payload.replacementFlags : payload.flagsAsSupplied;
+        const flags = payload.replacementFlags?.details?.length
+          ? payload.replacementFlags
+          : payload.flagsAsSupplied;
         if (payload.action !== 'submit' || !flags?.details?.length) {
           return safeRedirect303(res, cancelledUrl, fallback, ['/case']);
         }

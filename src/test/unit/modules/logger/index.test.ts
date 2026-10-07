@@ -21,7 +21,8 @@ describe('logger module', () => {
       .mockImplementation((...args: unknown[]) => {
         const info = (args[0] ?? {}) as Record<PropertyKey, unknown>;
         const next = args[1] as (() => void) | undefined;
-        const message = typeof info[messageSymbol] === 'string' ? info[messageSymbol] : info.message;
+        const message =
+          typeof info[messageSymbol] === 'string' ? info[messageSymbol] : info.message;
         formattedLines.push(String(message ?? ''));
         next?.();
       });
@@ -76,7 +77,9 @@ describe('logger module', () => {
         attributes: expect.objectContaining({ caseReference: '1234' }),
       })
     );
-    expect(emit).toHaveBeenCalledWith(expect.objectContaining({ body: 'Retrying', severityText: 'warn' }));
+    expect(emit).toHaveBeenCalledWith(
+      expect.objectContaining({ body: 'Retrying', severityText: 'warn' })
+    );
   });
 
   it('does not export info logs, which bypass trace sampling entirely (HDPI-8953)', () => {
@@ -86,7 +89,9 @@ describe('logger module', () => {
     try {
       Logger.enableTelemetry();
       const logger = Logger.getLogger(`logger-otel-level-${Date.now()}`);
-      logger.info('Calling submitEvent with URL: http://ccd/cases, eventId: respondPossessionClaim');
+      logger.info(
+        'Calling submitEvent with URL: http://ccd/cases, eventId: respondPossessionClaim'
+      );
       logger.warn('Retrying');
     } finally {
       logs.disable();
@@ -104,7 +109,9 @@ describe('logger module', () => {
       Logger.enableTelemetry();
       const logger = Logger.getLogger(`logger-otel-redact-${Date.now()}`);
       // The OIDC callback URL: logging it verbatim ships the authorization code to App Insights.
-      logger.error('Authentication error details:', { url: '/oauth2/callback?code=secret-code&state=abc' });
+      logger.error('Authentication error details:', {
+        url: '/oauth2/callback?code=secret-code&state=abc',
+      });
     } finally {
       logs.disable();
     }
@@ -159,7 +166,9 @@ describe('logger module', () => {
   it('strips query values embedded in the message itself', () => {
     const logger = Logger.getLogger(`logger-redact-message-${Date.now()}`);
 
-    logger.info('Calling getEventToken with URL: http://ccd/cases/1?ignore-warning=false&key=secret-key');
+    logger.info(
+      'Calling getEventToken with URL: http://ccd/cases/1?ignore-warning=false&key=secret-key'
+    );
 
     const output = stripAnsiCodes(formattedLines.join('\n'));
     expect(output).toContain('http://ccd/cases/1?ignore-warning=***&key=***');

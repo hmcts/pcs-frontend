@@ -21,7 +21,11 @@ export function getFirstStepInSection(sectionId: string, sections: Sections): st
   return sections.find(section => section.id === sectionId)?.steps[0] ?? null;
 }
 
-export async function isSectionApplicable(sectionId: string, sections: Sections, req: Request): Promise<boolean> {
+export async function isSectionApplicable(
+  sectionId: string,
+  sections: Sections,
+  req: Request
+): Promise<boolean> {
   const section = sections.find(s => s.id === sectionId);
   if (!section) {
     return false;
@@ -39,7 +43,11 @@ export async function isSectionApplicable(sectionId: string, sections: Sections,
  *   section-mapped (e.g. terminal routes like `end-now` that are omitted from section metadata).
  * - If the current step is not in any section, returns false (no section boundary to detect).
  */
-export function isLastStepInSection(currentStepSlug: string, nextStepSlug: string | null, sections: Sections): boolean {
+export function isLastStepInSection(
+  currentStepSlug: string,
+  nextStepSlug: string | null,
+  sections: Sections
+): boolean {
   if (!nextStepSlug) {
     return true;
   }
@@ -69,7 +77,9 @@ export function getSectionCoverage(
   }
 
   const unmappedSteps = stepSlugs.filter(step => !stepToSectionCount.has(step));
-  const duplicateAssignments = [...stepToSectionCount.entries()].filter(([, count]) => count > 1).map(([step]) => step);
+  const duplicateAssignments = [...stepToSectionCount.entries()]
+    .filter(([, count]) => count > 1)
+    .map(([step]) => step);
 
   return { unmappedSteps, duplicateAssignments };
 }

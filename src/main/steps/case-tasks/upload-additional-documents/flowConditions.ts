@@ -27,7 +27,9 @@ export const isViewAllApplicationsAvailable: StepCondition = async (req: Request
     );
     return startResponse.data?.showRelatedApplicationsPage?.toUpperCase() === 'YES';
   } catch (error) {
-    logger.warn(`Failed to resolve uploadDocuments START for case ${caseReference}: ${String(error)}`);
+    logger.warn(
+      `Failed to resolve uploadDocuments START for case ${caseReference}: ${String(error)}`
+    );
     return false;
   }
 };

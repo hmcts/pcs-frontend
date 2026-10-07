@@ -41,7 +41,8 @@ export class Helmet {
       formAction.push(idamDomain);
     }
 
-    const manageCaseReturnURL: string = new URL(config.get<string>('redirects.manageCaseReturnURL')).origin;
+    const manageCaseReturnURL: string = new URL(config.get<string>('redirects.manageCaseReturnURL'))
+      .origin;
     if (manageCaseReturnURL) {
       formAction.push(manageCaseReturnURL);
     }

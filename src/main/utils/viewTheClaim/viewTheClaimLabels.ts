@@ -20,7 +20,8 @@ export const TENANCY_TYPE_LABELS: Record<string, string> = {
 export const NOTICE_SERVICE_METHOD_LABELS: Record<string, string> = {
   DELIVERED_PERMITTED_PLACE: 'By delivering it to or leaving it at a permitted place',
   EMAIL: 'By email',
-  FIRST_CLASS_POST: 'By first class post or other service which provides for delivery on the next business day',
+  FIRST_CLASS_POST:
+    'By first class post or other service which provides for delivery on the next business day',
   OTHER: 'Other',
   OTHER_ELECTRONIC: 'By other electronic method',
   PERSONALLY_HANDED: 'By personally handing it to or leaving it with someone',
@@ -64,13 +65,17 @@ export const GROUND_LABELS: Record<string, string> = {
     "Failure to give up possession on date specified in contract-holder's break clause notice (section 191)",
   FALSE_STATEMENT_GROUND17: 'Tenancy obtained by false statement (ground 17)',
   FURNITURE_DETERIORATION: 'Deterioration of furniture (ground 4)',
-  HOUSING_ASSOCIATION_SPECIAL_CIRCUMSTANCES: 'Housing association special circumstances accommodation (ground 14)',
-  HOUSING_ASSOCIATIONS_AND_TRUSTS: 'Housing associations and housing trusts: people difficult to house (ground E)',
+  HOUSING_ASSOCIATION_SPECIAL_CIRCUMSTANCES:
+    'Housing association special circumstances accommodation (ground 14)',
+  HOUSING_ASSOCIATIONS_AND_TRUSTS:
+    'Housing associations and housing trusts: people difficult to house (ground E)',
   JOINT_CONTRACT_HOLDERS: 'Joint contract-holders (ground H)',
-  LANDLORD_NOTICE_S186: "Landlord's notice in connection with end of fixed term given (section 186)",
+  LANDLORD_NOTICE_S186:
+    "Landlord's notice in connection with end of fixed term given (section 186)",
   LANDLORD_NOTICE_S199: "Notice given under a landlord's break clause (section 199)",
   LANDLORD_WORKS: "Landlord's works (ground 10)",
-  NUISANCE_ANNOYANCE_GROUND14: 'Nuisance, annoyance, illegal or immoral use of the property (ground 14)',
+  NUISANCE_ANNOYANCE_GROUND14:
+    'Nuisance, annoyance, illegal or immoral use of the property (ground 14)',
   NUISANCE_OR_IMMORAL_USE: 'Nuisance, annoyance, illegal or immoral use of the property (ground 2)',
   OFFENCE_RIOT_GROUND14ZA: 'Offence during a riot (ground 14ZA)',
   OTHER: 'Other',
@@ -93,7 +98,8 @@ export const GROUND_LABELS: Record<string, string> = {
   SPECIAL_NEEDS_ACCOMMODATION: 'Special needs accommodation (ground 15)',
   SPECIAL_NEEDS_DWELLINGS: 'Groups of dwellings for people with special needs (ground F)',
   TENANCY_OBTAINED_BY_FALSE_STATEMENT: 'Tenancy obtained by false statement (ground 5)',
-  TIED_ACCOMMODATION_NEEDED_FOR_EMPLOYEE: 'Tied accommodation needed for another employee (ground 12)',
+  TIED_ACCOMMODATION_NEEDED_FOR_EMPLOYEE:
+    'Tied accommodation needed for another employee (ground 12)',
   UNDER_OCCUPYING_AFTER_SUCCESSION: 'Under occupying after succession (ground 15A)',
   UNREASONABLE_CONDUCT_TIED_ACCOMMODATION: 'Unreasonable conduct in tied accommodation (ground 7)',
 };
@@ -128,17 +134,32 @@ export const REASON_FIELDS = [
   { path: 'ownerOccupierReason', label: 'ownerOccupierReason' },
   { path: 'studentLetReason', label: 'studentLetReason' },
   { path: 'suitableAltAccommodationReason', label: 'suitableAltAccommodationReason' },
-  { path: 'assuredNoArrearsReasons_AntisocialBehaviour', label: 'assuredNoArrearsReasonsAntisocialBehaviour' },
+  {
+    path: 'assuredNoArrearsReasons_AntisocialBehaviour',
+    label: 'assuredNoArrearsReasonsAntisocialBehaviour',
+  },
   {
     path: 'assuredNoArrearsReasons_BreachOfTenancyConditions',
     label: 'assuredNoArrearsReasonsBreachOfTenancyConditions',
   },
   { path: 'assuredNoArrearsReasons_DeathOfTenant', label: 'assuredNoArrearsReasonsDeathOfTenant' },
-  { path: 'assuredNoArrearsReasons_DomesticViolence', label: 'assuredNoArrearsReasonsDomesticViolence' },
-  { path: 'assuredNoArrearsReasons_FalseStatement', label: 'assuredNoArrearsReasonsFalseStatement' },
-  { path: 'assuredNoArrearsReasons_FurnitureDeterioration', label: 'assuredNoArrearsReasonsFurnitureDeterioration' },
+  {
+    path: 'assuredNoArrearsReasons_DomesticViolence',
+    label: 'assuredNoArrearsReasonsDomesticViolence',
+  },
+  {
+    path: 'assuredNoArrearsReasons_FalseStatement',
+    label: 'assuredNoArrearsReasonsFalseStatement',
+  },
+  {
+    path: 'assuredNoArrearsReasons_FurnitureDeterioration',
+    label: 'assuredNoArrearsReasonsFurnitureDeterioration',
+  },
   { path: 'assuredNoArrearsReasons_HolidayLet', label: 'assuredNoArrearsReasonsHolidayLet' },
-  { path: 'assuredNoArrearsReasons_LandlordEmployee', label: 'assuredNoArrearsReasonsLandlordEmployee' },
+  {
+    path: 'assuredNoArrearsReasons_LandlordEmployee',
+    label: 'assuredNoArrearsReasonsLandlordEmployee',
+  },
   {
     path: 'assuredNoArrearsReasons_MinisterOfReligion',
     label: 'assuredNoArrearsReasonsMinisterOfReligion',
@@ -148,7 +169,10 @@ export const REASON_FIELDS = [
     path: 'assuredNoArrearsReasons_NuisanceOrIllegalUse',
     label: 'assuredNoArrearsReasonsNuisanceOrIllegalUse',
   },
-  { path: 'assuredNoArrearsReasons_OffenceDuringRiot', label: 'assuredNoArrearsReasonsOffenceDuringRiot' },
+  {
+    path: 'assuredNoArrearsReasons_OffenceDuringRiot',
+    label: 'assuredNoArrearsReasonsOffenceDuringRiot',
+  },
   { path: 'assuredNoArrearsReasons_OwnerOccupier', label: 'assuredNoArrearsReasonsOwnerOccupier' },
   {
     path: 'assuredNoArrearsReasons_PropertyDeterioration',
@@ -194,5 +218,8 @@ export const REASON_FIELDS = [
     path: 'walesSecureLandlordNoticeSection199Reason',
     label: 'walesSecureLandlordNoticeSection199Reason',
   },
-  { path: 'walesSecureOtherBreachOfContractReason', label: 'walesSecureOtherBreachOfContractReason' },
+  {
+    path: 'walesSecureOtherBreachOfContractReason',
+    label: 'walesSecureOtherBreachOfContractReason',
+  },
 ];

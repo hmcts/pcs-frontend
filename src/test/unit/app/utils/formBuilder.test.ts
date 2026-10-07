@@ -982,7 +982,10 @@ describe('formBuilder', () => {
         );
 
         // Hub-first: a citizen with a task-list hub lands on the hub, never the dashboard (AC10).
-        expect(res.redirect).toHaveBeenCalledWith(303, '/case/1765881343803991/respond-to-claim/task-list');
+        expect(res.redirect).toHaveBeenCalledWith(
+          303,
+          '/case/1765881343803991/respond-to-claim/task-list'
+        );
       });
 
       it('should redirect to home when ccdId not available for saveForLater', async () => {
@@ -1079,7 +1082,9 @@ describe('formBuilder', () => {
           jest.fn()
         );
 
-        expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { checkboxField: ['option1'] });
+        expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', {
+          checkboxField: ['option1'],
+        });
       });
 
       it('should normalize date field for saveForLater', async () => {
@@ -1201,7 +1206,9 @@ describe('formBuilder', () => {
           jest.fn()
         );
 
-        expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', { checkboxField: ['option1'] });
+        expect(mockSetFormData).toHaveBeenCalledWith(req, 'test-step', {
+          checkboxField: ['option1'],
+        });
       });
 
       it('should normalize date field for continue action', async () => {

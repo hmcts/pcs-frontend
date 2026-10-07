@@ -4,11 +4,14 @@ import { TFunction } from 'i18next';
 import { buildSummaryListRows } from '../../../../../main/steps/make-an-application/check-your-answers/summaryListRowFactory';
 
 const mockVisibleFormDataView = createMockVisibleFormDataView();
-jest.mock('../../../../../main/steps/make-an-application/check-your-answers/visibleFormDataView', () => {
-  return jest.fn().mockImplementation(() => {
-    return mockVisibleFormDataView;
-  });
-});
+jest.mock(
+  '../../../../../main/steps/make-an-application/check-your-answers/visibleFormDataView',
+  () => {
+    return jest.fn().mockImplementation(() => {
+      return mockVisibleFormDataView;
+    });
+  }
+);
 
 const t = ((key: string) => {
   return `translation for: ${key}`;

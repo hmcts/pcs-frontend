@@ -73,24 +73,16 @@ Playwright 1.30+ | TypeScript 4.9+
 
 ```typescript
 initializeExecutor(page);
-await performAction('clickButton', 'LoginButton');
+await performAction('When the user clicks the button', 'LoginButton');
 await performValidation('text', 'WelcomeMsg', 'Welcome!');
 ```
 
 ### Test Groups
 
 ```typescript
-await performActionGroup(
-  'Login',
-  { action: 'inputText', fieldName: 'Email', value: 'test@example.com' },
-  { action: 'clickButton', fieldName: 'Submit' }
-);
+await performActionGroup('Login', { action: 'inputText', fieldName: 'Email', value: 'test@example.com' }, { action: 'When the user clicks the button', fieldName: 'Submit' });
 
-await performValidationGroup(
-  'Post-Login',
-  { validationType: 'url', data: { expected: '/dashboard' } },
-  { validationType: 'visible', fieldName: 'UserMenu' }
-);
+await performValidationGroup('Post-Login', { validationType: 'url', data: { expected: '/dashboard' } }, { validationType: 'visible', fieldName: 'UserMenu' });
 ```
 
 ## 6. Extending the Framework

@@ -1,7 +1,10 @@
 import type { Request } from 'express';
 
 import { HTTPError } from '../../../HttpError';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { getUserToken } from '../../utils/userRole';
 import { RESPOND_TO_CLAIM_DRAFT_EVENT } from '../draftEvent';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -11,7 +14,10 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCollectionItem, CcdUploadedDocument } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { toCaseReference16 } from '@utils/caseReference';
-import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/documentUploadValidation';
+import {
+  ACCEPT_ATTRIBUTE_EXTENSIONS,
+  UPLOAD_MAX_FILE_SIZE_MB,
+} from '@utils/documentUploadValidation';
 
 // Respond-to-claim-specific document storage. Uses the holistic-save contract:
 // every save sends the WHOLE defendant slice (via buildDraftDefendantResponse +
@@ -21,7 +27,9 @@ import { ACCEPT_ATTRIBUTE_EXTENSIONS, UPLOAD_MAX_FILE_SIZE_MB } from '@utils/doc
 // must remain journey-agnostic for genapps and other journeys (see PR #1259).
 const storage: DocumentStorage = {
   async read(req: Request): Promise<CcdCollectionItem<CcdUploadedDocument>[]> {
-    const docs = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.defendantDocuments;
+    const docs =
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+        ?.defendantDocuments;
     return Array.isArray(docs) ? docs : [];
   },
 
@@ -95,7 +103,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   // isAnswered above knows the citizen has been to this page (even without uploading).
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.defendantDocuments = response.defendantResponses.defendantDocuments ?? [];
+    response.defendantResponses.defendantDocuments =
+      response.defendantResponses.defendantDocuments ?? [];
     await saveDraftDefendantResponse(req, response);
   },
 });

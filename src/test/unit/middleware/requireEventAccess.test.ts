@@ -64,7 +64,12 @@ describe('requireEventAccess', () => {
       const middleware = requireEventAccess(eventId);
       await middleware(mockReq as Request, mockRes as Response, next);
 
-      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(mockAccessToken, validCaseRef, eventId, undefined);
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(
+        mockAccessToken,
+        validCaseRef,
+        eventId,
+        undefined
+      );
       expect(mockRes.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
       expect((mockRes.locals?.validatedCase as CcdCaseModel).id).toBe(validCaseRef);
       expect(next).toHaveBeenCalledTimes(1);
@@ -85,7 +90,12 @@ describe('requireEventAccess', () => {
       const middleware = requireEventAccess(eventId);
       await middleware(mockReq as Request, mockRes as Response, next);
 
-      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(mockAccessToken, validCaseRef, eventId, clientContext);
+      expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(
+        mockAccessToken,
+        validCaseRef,
+        eventId,
+        clientContext
+      );
       expect(mockRes.locals?.validatedCase).toBeInstanceOf(CcdCaseModel);
       expect((mockRes.locals?.validatedCase as CcdCaseModel).id).toBe(validCaseRef);
       expect(next).toHaveBeenCalledTimes(1);

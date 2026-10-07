@@ -40,7 +40,9 @@ const existingCounterClaimAgainst = [
 ];
 jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   buildDraftDefendantResponse: jest.fn(() => ({
-    defendantResponses: { counterClaim: { claimType: 'OTHER', counterClaimAgainst: existingCounterClaimAgainst } },
+    defendantResponses: {
+      counterClaim: { claimType: 'OTHER', counterClaimAgainst: existingCounterClaimAgainst },
+    },
     defendantContactDetails: { party: {} },
   })),
   saveDraftDefendantResponse: mockSaveDraftDefendantResponse,

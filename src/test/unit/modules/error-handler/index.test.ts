@@ -18,7 +18,11 @@ jest.mock('@modules/logger', () => ({
   },
 }));
 
-import { createErrorHandler, createNotFoundHandler, setupErrorHandlers } from '@modules/error-handler';
+import {
+  createErrorHandler,
+  createNotFoundHandler,
+  setupErrorHandlers,
+} from '@modules/error-handler';
 import { authFailure } from '@modules/error-handler/authFailure';
 
 describe('error-handler', () => {
@@ -29,15 +33,19 @@ describe('error-handler', () => {
       'errorPages.pageNotFound.title': 'Page not found',
       'errorPages.pageNotFound.paragraph': 'If you typed the web address, check it is correct.',
       'errorPages.serviceUnavailable.title': 'Sorry, the service is unavailable',
-      'errorPages.serviceUnavailable.paragraphMinutes': 'You will be able to use the service in [minutes] minutes.',
-      'errorPages.serviceUnavailable.paragraphDateAndTime': 'You will be able to use the service from [dateAndTime].',
+      'errorPages.serviceUnavailable.paragraphMinutes':
+        'You will be able to use the service in [minutes] minutes.',
+      'errorPages.serviceUnavailable.paragraphDateAndTime':
+        'You will be able to use the service from [dateAndTime].',
       'errorPages.technicalError.title': 'Sorry, there is a problem with the service',
       'errorPages.technicalError.paragraph': 'Try again later.',
       'errorPages.accessDenied.title': 'You do not have access to this page',
       'errorPages.accessDenied.paragraph':
         'Contact us if you think you should have access, or if you need help with your case.',
-      'applicationErrors.noApplicationIdInSession.title': 'translated noApplicationIdInSession title',
-      'applicationErrors.noApplicationIdInSession.paragraph': 'translated noApplicationIdInSession paragraph',
+      'applicationErrors.noApplicationIdInSession.title':
+        'translated noApplicationIdInSession title',
+      'applicationErrors.noApplicationIdInSession.paragraph':
+        'translated noApplicationIdInSession paragraph',
       serviceName: 'Possession claims',
       phase: 'ALPHA',
       languageToggle: 'Language toggle',
@@ -212,7 +220,9 @@ describe('error-handler', () => {
       expect(res.status).toHaveBeenCalledWith(403);
       expect(res.render).toHaveBeenCalledWith('error');
       expect(res.locals.errorPageKey).toBe('accessDenied');
-      expect(res.locals.t('errorPages.accessDenied.title')).toBe('You do not have access to this page');
+      expect(res.locals.t('errorPages.accessDenied.title')).toBe(
+        'You do not have access to this page'
+      );
       expect(res.locals.t('errorPages.accessDenied.paragraph')).toBe(
         'Contact us if you think you should have access, or if you need help with your case.'
       );
@@ -264,7 +274,9 @@ describe('error-handler', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.render).toHaveBeenCalledWith('error');
       expect(res.locals.errorPageKey).toBe('technicalError');
-      expect(res.locals.t('errorPages.technicalError.title')).toBe('Sorry, there is a problem with the service');
+      expect(res.locals.t('errorPages.technicalError.title')).toBe(
+        'Sorry, there is a problem with the service'
+      );
       expect(res.locals.t('errorPages.technicalError.paragraph')).toBe('Try again later.');
     });
 
@@ -286,7 +298,9 @@ describe('error-handler', () => {
       errorHandler(err, req, res, next);
 
       expect(res.locals.errorPageKey).toBe('serviceUnavailable');
-      expect(res.locals.serviceUnavailableParagraph).toBe('You will be able to use the service in [minutes] minutes.');
+      expect(res.locals.serviceUnavailableParagraph).toBe(
+        'You will be able to use the service in [minutes] minutes.'
+      );
     });
 
     it('should handle service unavailable with retry after date and time', () => {
@@ -307,7 +321,9 @@ describe('error-handler', () => {
       errorHandler(err, req, res, next);
 
       expect(res.locals.errorPageKey).toBe('serviceUnavailable');
-      expect(res.locals.serviceUnavailableParagraph).toBe('You will be able to use the service from [dateAndTime].');
+      expect(res.locals.serviceUnavailableParagraph).toBe(
+        'You will be able to use the service from [dateAndTime].'
+      );
     });
 
     it('should convert non-HTTPError to HTTPError with status 500', () => {
@@ -330,7 +346,9 @@ describe('error-handler', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.render).toHaveBeenCalledWith('error');
       expect(res.locals.errorPageKey).toBe('technicalError');
-      expect(res.locals.t('errorPages.technicalError.title')).toBe('Sorry, there is a problem with the service');
+      expect(res.locals.t('errorPages.technicalError.title')).toBe(
+        'Sorry, there is a problem with the service'
+      );
       expect(res.locals.t('errorPages.technicalError.paragraph')).toBe('Try again later.');
     });
 
@@ -521,7 +539,9 @@ describe('error-handler', () => {
 
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.locals.errorPageKey).toBe('accessDenied');
-      expect(res.locals.t('errorPages.accessDenied.title')).toBe('You do not have access to this page');
+      expect(res.locals.t('errorPages.accessDenied.title')).toBe(
+        'You do not have access to this page'
+      );
     });
 
     it('should use fallback translation function if i18n is not available', () => {
@@ -544,7 +564,10 @@ describe('error-handler', () => {
 
     it('should handle application error with custom error codes', () => {
       const errorHandler = createErrorHandler('test');
-      const err = new ApplicationError('Bad request', ApplicationErrorCode.noApplicationIdInSession);
+      const err = new ApplicationError(
+        'Bad request',
+        ApplicationErrorCode.noApplicationIdInSession
+      );
       const req = {
         i18n: { getFixedT: () => createMockTranslation() },
         language: 'en',

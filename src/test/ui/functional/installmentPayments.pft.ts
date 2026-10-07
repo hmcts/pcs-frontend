@@ -3,7 +3,7 @@ import { claimantsName } from '../utils/actions/custom-actions';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function installmentPaymentsErrorValidation(): Promise<void> {
-  await performAction('clickButton', installmentPayments.saveAndContinueButton);
+  await performAction('When the user clicks the button', installmentPayments.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: installmentPayments.thereIsAProblemErrorMessageHeader,
     message: installmentPayments.selectWhetherYouWouldLikeToOfferErrorMessage,
@@ -15,10 +15,6 @@ export async function installmentPaymentsNavigationTests(): Promise<void> {
     element: feedback.tellUsWhatYouThinkParagraph,
     pageSlug: installmentPayments.pageSlug,
   });
-  await performValidation(
-    'pageNavigation',
-    installmentPayments.backLink,
-    repaymentsAgreed.getMainHeader(claimantsName)
-  );
+  await performValidation('pageNavigation', installmentPayments.backLink, repaymentsAgreed.getMainHeader(claimantsName));
   await performAction('clickRadioButton', installmentPayments.yesRadioOption);
 }

@@ -16,7 +16,8 @@ const translations: Record<string, string> = {
   'statementOfTruth.fullNameLabel': 'Your full name',
   'errors.statementOfTruthContempt':
     'Select if you understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth',
-  'errors.statementOfTruthBelief': 'Select if you believe that the facts stated in this defence form are true',
+  'errors.statementOfTruthBelief':
+    'Select if you believe that the facts stated in this defence form are true',
   'errors.fullName': 'Enter your full name',
   'buttons.continue': 'Continue',
   'buttons.saveForLater': 'Save for later',
@@ -55,9 +56,12 @@ jest.mock('../../../../main/modules/steps/flow', () => ({
   })),
 }));
 
-jest.mock('../../../../main/steps/respond-to-claim/end-of-journey-cya/buildEndOfJourneyCyaRows', () => ({
-  buildEndOfJourneyCyaSections: jest.fn(() => []),
-}));
+jest.mock(
+  '../../../../main/steps/respond-to-claim/end-of-journey-cya/buildEndOfJourneyCyaRows',
+  () => ({
+    buildEndOfJourneyCyaSections: jest.fn(() => []),
+  })
+);
 
 const mockSubmitRespondToClaimResponse = jest.fn();
 jest.mock('../../../../main/steps/utils/respondToClaimFinalSubmit', () => {
@@ -165,7 +169,10 @@ describe('respond-to-claim end-of-journey-cya step', () => {
 
     expect(mockSaveDraftDefendantResponse).toHaveBeenCalled();
     expect(mockSubmitRespondToClaimResponse).toHaveBeenCalledWith(req);
-    expect(res.redirect).toHaveBeenCalledWith(303, `/case/${CASE_REF}/respond-to-claim/response-submitted`);
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      `/case/${CASE_REF}/respond-to-claim/response-submitted`
+    );
   });
 });
 
@@ -184,7 +191,9 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
   });
 
   it('does not submit and returns to the review page when the statement-of-truth save is refused', async () => {
-    mockSaveDraftDefendantResponse.mockRejectedValueOnce(new Error('CCD callback rejected request: DRAFT_CHANGED'));
+    mockSaveDraftDefendantResponse.mockRejectedValueOnce(
+      new Error('CCD callback rejected request: DRAFT_CHANGED')
+    );
     const req = createReq({ body: completeStatementOfTruth });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const res = { redirect: jest.fn() } as any;
@@ -227,7 +236,9 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const content = (await getEndOfJourneyCyaContent(req, {} as never)) as any;
 
-    expect(content.errorSummary.errorList[0].href).toBe(`/case/${CASE_REF}/respond-to-claim/correspondence-address`);
+    expect(content.errorSummary.errorList[0].href).toBe(
+      `/case/${CASE_REF}/respond-to-claim/correspondence-address`
+    );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((req as any).session.respondToClaimSubmitRejection).toBeUndefined();
   });
@@ -288,7 +299,9 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
             id: CASE_REF,
             data: {},
             possessionClaimResponse: {
-              defendantResponses: { statementOfTruth: { accepted: 'YES', fullName: 'Jane Defendant' } },
+              defendantResponses: {
+                statementOfTruth: { accepted: 'YES', fullName: 'Jane Defendant' },
+              },
             },
           },
         },
@@ -310,7 +323,9 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
             id: CASE_REF,
             data: {},
             possessionClaimResponse: {
-              defendantResponses: { statementOfTruth: { accepted: 'YES', fullName: 'Jane Defendant' } },
+              defendantResponses: {
+                statementOfTruth: { accepted: 'YES', fullName: 'Jane Defendant' },
+              },
             },
           },
         },

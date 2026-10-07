@@ -59,9 +59,10 @@ export class HttpService {
         return response;
       },
       async error => {
-        const originalRequest = error.config as TracedRequestConfig as InternalAxiosRequestConfig & {
-          __isRetryRequest?: boolean;
-        };
+        const originalRequest =
+          error.config as TracedRequestConfig as InternalAxiosRequestConfig & {
+            __isRetryRequest?: boolean;
+          };
         if (error.response?.status !== 401 || !originalRequest) {
           this.endSpanWithStatus(originalRequest, 401);
           return Promise.reject(error);
@@ -73,7 +74,9 @@ export class HttpService {
           (originalRequest.headers['Authorization'] ?? originalRequest.headers['authorization']);
         if (hasUserToken) {
           this.logger.warn('Received 401 on user-token request, redirecting to login');
-          return Promise.reject(new HTTPError('Unauthenticated - access token invalid or expired', 401));
+          return Promise.reject(
+            new HTTPError('Unauthenticated - access token invalid or expired', 401)
+          );
         }
 
         // S2S-only requests - try regenerating service token and retry
@@ -166,11 +169,16 @@ export class HttpService {
     return this.instance.getUri(config);
   }
 
-  public request<T = unknown, R = AxiosResponse<T>, D = unknown>(config: AxiosRequestConfig<D>): Promise<R> {
+  public request<T = unknown, R = AxiosResponse<T>, D = unknown>(
+    config: AxiosRequestConfig<D>
+  ): Promise<R> {
     return this.instance.request<T, R, D>(config) as Promise<R>;
   }
 
-  public get<T = unknown, R = AxiosResponse<T>, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R> {
+  public get<T = unknown, R = AxiosResponse<T>, D = unknown>(
+    url: string,
+    config?: AxiosRequestConfig<D>
+  ): Promise<R> {
     return this.instance.get<T, R, D>(url, config) as Promise<R>;
   }
 
@@ -181,7 +189,10 @@ export class HttpService {
     return this.instance.delete<T, R, D>(url, config) as Promise<R>;
   }
 
-  public head<T = unknown, R = AxiosResponse<T>, D = unknown>(url: string, config?: AxiosRequestConfig<D>): Promise<R> {
+  public head<T = unknown, R = AxiosResponse<T>, D = unknown>(
+    url: string,
+    config?: AxiosRequestConfig<D>
+  ): Promise<R> {
     return this.instance.head<T, R, D>(url, config) as Promise<R>;
   }
 
@@ -262,7 +273,10 @@ export class HttpService {
     config.__otelSpan = span;
   }
 
-  private getRequestContext(config: TracedRequestConfig | undefined): { method: string; url: string } {
+  private getRequestContext(config: TracedRequestConfig | undefined): {
+    method: string;
+    url: string;
+  } {
     if (!config) {
       return { method: 'UNKNOWN', url: 'UNKNOWN_URL' };
     }

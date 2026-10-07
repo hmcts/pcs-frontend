@@ -60,7 +60,9 @@ describe('HttpService', () => {
   let testHttp: HttpService;
 
   // Helper to get request interceptor for testing
-  const getRequestInterceptor = (): ((config: Record<string, unknown>) => Promise<InterceptedConfig>) => {
+  const getRequestInterceptor = (): ((
+    config: Record<string, unknown>
+  ) => Promise<InterceptedConfig>) => {
     return mockAxiosInstance.interceptors.request.use.mock.calls[0][0] as unknown as (
       config: Record<string, unknown>
     ) => Promise<InterceptedConfig>;
@@ -500,7 +502,11 @@ describe('HttpService', () => {
 
       const result = await testHttp.patch('/test/1', { name: 'patched' });
 
-      expect(mockAxiosInstance.patch).toHaveBeenCalledWith('/test/1', { name: 'patched' }, undefined);
+      expect(mockAxiosInstance.patch).toHaveBeenCalledWith(
+        '/test/1',
+        { name: 'patched' },
+        undefined
+      );
       expect(result).toEqual(expectedResponse);
     });
 

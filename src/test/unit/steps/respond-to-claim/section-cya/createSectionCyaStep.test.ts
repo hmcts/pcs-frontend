@@ -80,13 +80,19 @@ describe('createSectionCyaStep postController — completedSections producer', (
   it('redirects to the task-list hub on Save and continue (citizen)', async () => {
     const draft = { defendantResponses: { completedSections: [] } };
     const { res } = await callPost(undefined, draft);
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/1777294706554860/respond-to-claim/task-list');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/1777294706554860/respond-to-claim/task-list'
+    );
   });
 
   it('redirects to the task-list hub on Save for later (citizen) — not the dashboard', async () => {
     const draft = { defendantResponses: { completedSections: ['PERSONAL_DETAILS'] } };
     const { res } = await callPost('saveForLater', draft);
-    expect(res.redirect).toHaveBeenCalledWith(303, '/case/1777294706554860/respond-to-claim/task-list');
+    expect(res.redirect).toHaveBeenCalledWith(
+      303,
+      '/case/1777294706554860/respond-to-claim/task-list'
+    );
   });
 
   it('routes errors via next() when the draft save fails', async () => {

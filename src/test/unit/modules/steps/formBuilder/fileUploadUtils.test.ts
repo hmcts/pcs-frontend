@@ -16,7 +16,9 @@ const stubStorage: DocumentStorage = {
   save: jest.fn(async () => {}),
 };
 
-function makeFileUploadForm(overrides: { uploadUrl?: string; deleteUrl?: string; value?: unknown } = {}) {
+function makeFileUploadForm(
+  overrides: { uploadUrl?: string; deleteUrl?: string; value?: unknown } = {}
+) {
   return {
     fields: [
       {
@@ -55,7 +57,9 @@ describe('fileUploadUtils', () => {
 
     it('parses a single JSON object string', () => {
       const doc = { index: 0, document_filename: 'x.pdf', id: 'id-1' };
-      expect(parseUploadedDocumentsFromBody({ 'uploadedDocuments[]': JSON.stringify(doc) })).toEqual([doc]);
+      expect(
+        parseUploadedDocumentsFromBody({ 'uploadedDocuments[]': JSON.stringify(doc) })
+      ).toEqual([doc]);
     });
 
     it('parses base64url-encoded JSON (WAF-safe wire format)', () => {
@@ -121,7 +125,9 @@ describe('fileUploadUtils', () => {
     });
 
     it('no-op when there is no fileUpload field', () => {
-      const form = { fields: [{ name: 'x', type: 'text', componentType: 'input', component: {} }] } as BuiltFormContent;
+      const form = {
+        fields: [{ name: 'x', type: 'text', componentType: 'input', component: {} }],
+      } as BuiltFormContent;
       wireFileUploadUrls(form, makeRequest({}), stubStorage);
       expect(form.fields[0].component?.uploadUrl).toBeUndefined();
     });
@@ -136,7 +142,9 @@ describe('fileUploadUtils', () => {
       });
       await hydrateUploadedDocumentsFromBody(req, stubStorage);
       expect(stubStorage.read).not.toHaveBeenCalled();
-      expect(req.body['uploadedDocuments[]']).toBe(JSON.stringify({ index: 0, document_filename: 'from-body.pdf' }));
+      expect(req.body['uploadedDocuments[]']).toBe(
+        JSON.stringify({ index: 0, document_filename: 'from-body.pdf' })
+      );
     });
 
     it('injects JSON hidden values from CCD when body is empty', async () => {

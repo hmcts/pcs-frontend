@@ -86,7 +86,9 @@ describe('PropertiesVolume Module', () => {
 
     it('should swallow Azure failures so the app can fall back to .env', async () => {
       delete process.env.USE_VAULT;
-      (propertiesVolume.addFromAzureVault as jest.Mock).mockRejectedValueOnce(new Error('az login required'));
+      (propertiesVolume.addFromAzureVault as jest.Mock).mockRejectedValueOnce(
+        new Error('az login required')
+      );
       const propsVolume = new PropertiesVolume(true);
 
       await expect(propsVolume.enableFor()).resolves.toBeUndefined();
@@ -96,7 +98,8 @@ describe('PropertiesVolume Module', () => {
   describe('App Insights mapping', () => {
     it('should copy the app-insights connection string into appInsights.connectionString when present', async () => {
       (config.has as jest.Mock).mockImplementation(
-        (key: string) => key === 'secrets.pcs' || key === 'secrets.pcs.app-insights-connection-string'
+        (key: string) =>
+          key === 'secrets.pcs' || key === 'secrets.pcs.app-insights-connection-string'
       );
       // lodash.get/set walk the actual object — populate the path the module reads from.
       (config as unknown as Record<string, unknown>).secrets = {
@@ -106,9 +109,10 @@ describe('PropertiesVolume Module', () => {
 
       await propsVolume.enableFor();
 
-      expect((config as unknown as { appInsights: { connectionString: string } }).appInsights.connectionString).toBe(
-        'InstrumentationKey=abc'
-      );
+      expect(
+        (config as unknown as { appInsights: { connectionString: string } }).appInsights
+          .connectionString
+      ).toBe('InstrumentationKey=abc');
     });
 
     it('should leave config alone when secrets.pcs is absent', async () => {

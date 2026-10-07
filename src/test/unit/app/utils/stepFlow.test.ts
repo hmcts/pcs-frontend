@@ -138,7 +138,12 @@ describe('stepFlow', () => {
         useShowConditions: true,
         sections: [
           { id: 'a', titleKey: 'a', steps: ['step-a1'] },
-          { id: 'b', titleKey: 'b', steps: ['step-b1', 'step-b2'], isApplicable: async () => false },
+          {
+            id: 'b',
+            titleKey: 'b',
+            steps: ['step-b1', 'step-b2'],
+            isApplicable: async () => false,
+          },
           { id: 'c', titleKey: 'c', steps: ['step-c1'] },
         ],
         steps: {},
@@ -905,7 +910,9 @@ describe('stepFlow', () => {
         },
       } as unknown as Request;
 
-      await expect(navigation.getNextStepUrl(req, 'step1')).resolves.toBe('/steps/test-journey/step2');
+      await expect(navigation.getNextStepUrl(req, 'step1')).resolves.toBe(
+        '/steps/test-journey/step2'
+      );
       await expect(navigation.getBackUrl(req, 'step2')).resolves.toBe('/steps/test-journey/step1');
     });
   });

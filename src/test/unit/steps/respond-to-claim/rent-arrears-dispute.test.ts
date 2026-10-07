@@ -70,7 +70,10 @@ const t = ((key: string, options?: Record<string, string>) => {
 import type { SupportedLang } from '../../../../main/modules/steps';
 import { GetController } from '../../../../main/modules/steps';
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
-import { getRentStatementDocumentInfo, step } from '../../../../main/steps/respond-to-claim/rent-arrears-dispute';
+import {
+  getRentStatementDocumentInfo,
+  step,
+} from '../../../../main/steps/respond-to-claim/rent-arrears-dispute';
 import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -287,11 +290,14 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
     req.res = res;
 
     const gc = step.getController;
-    const controller: GetController = typeof gc === 'function' ? (gc as (lang?: SupportedLang) => GetController)() : gc;
+    const controller: GetController =
+      typeof gc === 'function' ? (gc as (lang?: SupportedLang) => GetController)() : gc;
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1] as Record<string, unknown>;
-    expect(renderData.rentStatementDocument).toEqual({ id: '66666666-6666-4666-8666-666666666666' });
+    expect(renderData.rentStatementDocument).toEqual({
+      id: '66666666-6666-4666-8666-666666666666',
+    });
   });
 
   it('returns an empty string when detailsTab_RentArrearsDetails exists but rentStatement is empty', async () => {
@@ -340,7 +346,8 @@ describe('respond-to-claim rent-arrears-dispute step', () => {
     req.res = res;
 
     const gc = step.getController;
-    const controller: GetController = typeof gc === 'function' ? (gc as (lang?: SupportedLang) => GetController)() : gc;
+    const controller: GetController =
+      typeof gc === 'function' ? (gc as (lang?: SupportedLang) => GetController)() : gc;
     await controller.get(req, res);
 
     const renderData = (res.render as jest.Mock).mock.calls[0][1] as Record<string, unknown>;

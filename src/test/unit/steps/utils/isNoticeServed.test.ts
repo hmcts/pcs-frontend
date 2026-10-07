@@ -98,7 +98,10 @@ describe('isNoticeServed', () => {
       const mockReq = {
         res: {
           locals: {
-            validatedCase: new CcdCaseModel({ id: '', data: { legislativeCountry: 'Wales', walesNoticeServed: 'No' } }),
+            validatedCase: new CcdCaseModel({
+              id: '',
+              data: { legislativeCountry: 'Wales', walesNoticeServed: 'No' },
+            }),
           },
         },
       } as unknown as Request;

@@ -19,17 +19,25 @@ jest.mock('@utils/legalRepresentativeRedirectHandler', () => ({
 
 const mockGetUserType = getUserType as jest.MockedFunction<typeof getUserType>;
 
-const mockRedirectToCaseManagement = redirectToCaseManagement as jest.MockedFunction<typeof redirectToCaseManagement>;
+const mockRedirectToCaseManagement = redirectToCaseManagement as jest.MockedFunction<
+  typeof redirectToCaseManagement
+>;
 
 interface MakeReqArgs {
   caseReference?: string;
   validatedCaseId?: string;
 }
 
-const makeReq = ({ caseReference = '1234567890123456', validatedCaseId }: MakeReqArgs = {}): Request =>
+const makeReq = ({
+  caseReference = '1234567890123456',
+  validatedCaseId,
+}: MakeReqArgs = {}): Request =>
   ({
     params: { caseReference },
-    res: validatedCaseId === undefined ? { locals: {} } : { locals: { validatedCase: { id: validatedCaseId } } },
+    res:
+      validatedCaseId === undefined
+        ? { locals: {} }
+        : { locals: { validatedCase: { id: validatedCaseId } } },
   }) as unknown as Request;
 
 const makeRes = (): Response =>

@@ -130,7 +130,11 @@ describe('contact preferences submit-time CCD payloads', () => {
         'contactByTextMessage.mobileNumber': '07700 900 982',
       };
 
-      await textStep.postController!.post(req as unknown as Request, res as unknown as Response, next);
+      await textStep.postController!.post(
+        req as unknown as Request,
+        res as unknown as Response,
+        next
+      );
 
       expect(saveDraftDefendantResponse).toHaveBeenCalledWith(
         req,
@@ -157,7 +161,11 @@ describe('contact preferences submit-time CCD payloads', () => {
         contactByTextMessage: 'no',
       };
 
-      await textStep.postController!.post(req as unknown as Request, res as unknown as Response, next);
+      await textStep.postController!.post(
+        req as unknown as Request,
+        res as unknown as Response,
+        next
+      );
 
       const savedResponse = (saveDraftDefendantResponse as jest.Mock).mock.calls[0][1];
       expect(savedResponse.defendantResponses.contactByText).toBe('NO');
@@ -175,11 +183,15 @@ describe('contact preferences submit-time CCD payloads', () => {
     });
 
     it('rejects a landline number', () => {
-      expect(validateMobileNumber('01632960001')).toBe('errors.contactByTextMessage.mobileNumber.invalid');
+      expect(validateMobileNumber('01632960001')).toBe(
+        'errors.contactByTextMessage.mobileNumber.invalid'
+      );
     });
 
     it('rejects a spaced value that is not a valid mobile', () => {
-      expect(validateMobileNumber('012 3456')).toBe('errors.contactByTextMessage.mobileNumber.invalid');
+      expect(validateMobileNumber('012 3456')).toBe(
+        'errors.contactByTextMessage.mobileNumber.invalid'
+      );
     });
   });
 });

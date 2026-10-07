@@ -1,5 +1,8 @@
 import { fromYesNoEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
@@ -9,7 +12,10 @@ import type { YesNoValue } from '@services/ccdCase.interface';
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'your-circumstances',
   isAnswered: req =>
-    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.shareAdditionalCircumstances),
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances
+        ?.shareAdditionalCircumstances
+    ),
   stepDir: __dirname,
   translationKeys: {
     pageTitle: 'pageTitle',
@@ -63,17 +69,18 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    response.defendantResponses.householdCircumstances =
+      response.defendantResponses.householdCircumstances ?? {};
     const shareCircumstances = req.body?.shareCircumstances as string | undefined;
     const ccdMapping: Record<string, YesNoValue> = { yes: 'YES', no: 'NO' };
 
     if (shareCircumstances && ccdMapping[shareCircumstances]) {
-      response.defendantResponses.householdCircumstances.shareAdditionalCircumstances = ccdMapping[shareCircumstances];
+      response.defendantResponses.householdCircumstances.shareAdditionalCircumstances =
+        ccdMapping[shareCircumstances];
 
       if (shareCircumstances === 'yes') {
-        response.defendantResponses.householdCircumstances.additionalCircumstancesDetails = req.body?.[
-          'shareCircumstances.circumstancesDetails'
-        ] as string | undefined;
+        response.defendantResponses.householdCircumstances.additionalCircumstancesDetails = req
+          .body?.['shareCircumstances.circumstancesDetails'] as string | undefined;
       } else {
         delete response.defendantResponses.householdCircumstances.additionalCircumstancesDetails;
       }
@@ -90,7 +97,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   getInitialFormData: req => {
     const caseData = req.res?.locals.validatedCase?.data;
-    const circumstances = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const circumstances =
+      caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
     // CCD echoes YesOrNo PascalCase since pcs-api PR #1678 — fromYesNoEnum handles either casing.
     const shareCircumstances = fromYesNoEnum(circumstances?.shareAdditionalCircumstances);
 
@@ -101,7 +109,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     return {
       shareCircumstances,
       ...(shareCircumstances === 'yes' && circumstances?.additionalCircumstancesDetails
-        ? { 'shareCircumstances.circumstancesDetails': circumstances.additionalCircumstancesDetails }
+        ? {
+            'shareCircumstances.circumstancesDetails': circumstances.additionalCircumstancesDetails,
+          }
         : {}),
     };
   },

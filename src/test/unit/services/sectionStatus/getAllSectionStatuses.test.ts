@@ -50,7 +50,10 @@ describe('getAllSectionStatuses', () => {
   it('marks dependent NOT_AVAILABLE_YET when a dependency is still IN_PROGRESS', async () => {
     const flow: JourneyFlowConfig = {
       steps: {},
-      sections: [section({ id: 'a', steps: ['x', 'y'] }), section({ id: 'final', dependsOn: ['a'], steps: ['x'] })],
+      sections: [
+        section({ id: 'a', steps: ['x', 'y'] }),
+        section({ id: 'final', dependsOn: ['a'], steps: ['x'] }),
+      ],
     };
     const registry = {
       x: stub({ isAnswered: () => true }),

@@ -6,7 +6,10 @@ import {
   getValidatedCaseHouseholdCircumstances,
   toYesNoEnum,
 } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -16,12 +19,16 @@ const STEP_NAME = 'have-you-applied-for-universal-credit';
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: STEP_NAME,
   isAnswered: req =>
-    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.hasAppliedForUniversalCredit),
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances
+        ?.hasAppliedForUniversalCredit
+    ),
   stepDir: __dirname,
   beforeRedirect: async req => {
     const selection = req.body?.haveAppliedForUniversalCredit as string | undefined;
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    response.defendantResponses.householdCircumstances =
+      response.defendantResponses.householdCircumstances ?? {};
     const hc = response.defendantResponses.householdCircumstances;
 
     if (selection === 'no') {
@@ -29,13 +36,16 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       delete hc.ucApplicationDate;
     } else if (selection === 'yes') {
       const day = (
-        (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-day'] as string | undefined) ?? ''
+        (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-day'] as string | undefined) ??
+        ''
       ).trim();
       const month = (
-        (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-month'] as string | undefined) ?? ''
+        (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-month'] as
+          string | undefined) ?? ''
       ).trim();
       const year = (
-        (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-year'] as string | undefined) ?? ''
+        (req.body?.['haveAppliedForUniversalCredit.ucApplicationDate-year'] as
+          string | undefined) ?? ''
       ).trim();
       if (!day || !month || !year) {
         return;

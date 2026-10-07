@@ -1,12 +1,18 @@
 import { fromYesNoEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-any-other-adults-live-in-your-home',
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.otherTenants),
+  isAnswered: req =>
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.otherTenants
+    ),
   stepDir: __dirname,
   customTemplate: `${__dirname}/otherAdults.njk`,
   translationKeys: {
@@ -49,7 +55,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: req => {
-    const hc = req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses?.householdCircumstances;
+    const hc =
+      req.res?.locals.validatedCase?.possessionClaimResponse?.defendantResponses
+        ?.householdCircumstances;
     // CCD round-trips YesOrNo PascalCase ("Yes"/"No") since pcs-api PR #1678, so a strict
     // `=== 'YES'` compare here would mis-prefill the form as "no" on revisit and the
     // otherTenantsDetails textarea pre-fill below would never run.
@@ -72,10 +80,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const confirmValue = req.body?.confirmOtherAdults as string | undefined;
 
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    response.defendantResponses.householdCircumstances =
+      response.defendantResponses.householdCircumstances ?? {};
 
     if (confirmValue === 'yes' || confirmValue === 'no') {
-      response.defendantResponses.householdCircumstances.otherTenants = confirmValue === 'yes' ? 'YES' : 'NO';
+      response.defendantResponses.householdCircumstances.otherTenants =
+        confirmValue === 'yes' ? 'YES' : 'NO';
 
       if (confirmValue === 'yes') {
         response.defendantResponses.householdCircumstances.otherTenantsDetails = req.body?.[

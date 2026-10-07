@@ -1,7 +1,15 @@
 {
   "semi": true,
-  "printWidth": 120,
+  "printWidth": 100,
   "singleQuote": true,
   "trailingComma": "es5",
-  "arrowParens": "avoid"
+  "arrowParens": "avoid",
+  "overrides": [
+    {
+      "files": "src/test/ui/**/*",
+      "options": {
+        "printWidth": 200
+      }
+    }
+  ]
 }

@@ -38,7 +38,10 @@ function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
   return flowConfig?.useSessionFormData !== false;
 }
 
-function resolveSaveForLaterRedirect(req: Request, flowConfig: JourneyFlowConfig | undefined): string {
+function resolveSaveForLaterRedirect(
+  req: Request,
+  flowConfig: JourneyFlowConfig | undefined
+): string {
   const caseId = req.res?.locals.validatedCase?.id;
   if (flowConfig?.hubStepName && caseId) {
     return getStepUrl(flowConfig.hubStepName, flowConfig, caseId);
@@ -87,7 +90,10 @@ export function createPostHandler(
       const resolvedFlowConfig = await resolveFormBuilderFlowConfig(req, flowConfig);
 
       const allFormData = shouldUseSessionFormData(resolvedFlowConfig)
-        ? Object.values(getAllFormData(req)).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
+        ? Object.values(getAllFormData(req)).reduce(
+            (acc, stepData) => ({ ...acc, ...stepData }),
+            {}
+          )
         : {};
 
       // Normalize checkbox fields BEFORE validation to ensure checkbox values are arrays
@@ -112,7 +118,9 @@ export function createPostHandler(
 
       // Get interpolation values from extendGetContent if available (for dynamic translation values)
       const emptyFormContent = { fields: [] } as BuiltFormContent;
-      const interpolationValues = extendGetContent ? await extendGetContent(req, emptyFormContent) : {};
+      const interpolationValues = extendGetContent
+        ? await extendGetContent(req, emptyFormContent)
+        : {};
 
       const fieldsWithLabels = translateFields(
         fields,
@@ -129,7 +137,13 @@ export function createPostHandler(
       const isSaveForLater = action === 'saveForLater';
 
       const fieldErrors = getTranslationErrors(t, fields, undefined, interpolationValues);
-      const errors = validateForm(req, fieldsWithLabels, { ...fieldErrors, ...stepSpecificErrors }, allFormData, t);
+      const errors = validateForm(
+        req,
+        fieldsWithLabels,
+        { ...fieldErrors, ...stepSpecificErrors },
+        allFormData,
+        t
+      );
 
       if (!isSaveForLater && Object.keys(errors).length > 0) {
         const formContent = buildFormContent(
@@ -198,7 +212,9 @@ export function createPostHandler(
             return res.redirect(303, caseDetailsUrl);
           }
         }
-        return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
+        return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', [
+          '/',
+        ]);
       }
 
       if (resolveRedirectAfterPost) {

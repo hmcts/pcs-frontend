@@ -20,7 +20,8 @@ jest.mock('../../../main/services/pcsApi/paymentService', () => ({
   paymentService: {
     getCardPaymentStatus: mockGetCardPaymentStatus,
   },
-  getPaymentOutcome: jest.requireActual('../../../main/services/pcsApi/paymentService').getPaymentOutcome,
+  getPaymentOutcome: jest.requireActual('../../../main/services/pcsApi/paymentService')
+    .getPaymentOutcome,
 }));
 
 import type { Application, Request, Response } from 'express';
@@ -62,7 +63,10 @@ describe('paymentReturn routes', () => {
     });
 
     it('redirects home when payment reference is missing', async () => {
-      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockRouterGet.mock.calls[0][2] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       const req = {
         session: {
@@ -80,7 +84,10 @@ describe('paymentReturn routes', () => {
     });
 
     it('returns 401 when access token is missing', async () => {
-      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockRouterGet.mock.calls[0][2] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       const req = {
         session: {
@@ -106,7 +113,10 @@ describe('paymentReturn routes', () => {
     });
 
     it('redirects to success URL and retains payment reference on successful status', async () => {
-      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockRouterGet.mock.calls[0][2] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       mockGetCardPaymentStatus.mockResolvedValue({ status: 'Success' });
 
@@ -135,15 +145,24 @@ describe('paymentReturn routes', () => {
 
       await handler(req, res);
 
-      expect(mockGetCardPaymentStatus).toHaveBeenCalledWith('token-123', 'e44c5090-e207-48ac-b8dd-344a63829deb');
-      expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/payment-successful');
+      expect(mockGetCardPaymentStatus).toHaveBeenCalledWith(
+        'token-123',
+        'e44c5090-e207-48ac-b8dd-344a63829deb'
+      );
+      expect(res.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1234567890123456/respond-to-claim/payment-successful'
+      );
       expect(req.session.payment).toEqual({
         paymentReference: 'RC-123',
       });
     });
 
     it('redirects to success URL when Demo-style confirmation token is present in path', async () => {
-      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockRouterGet.mock.calls[0][2] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       mockGetCardPaymentStatus.mockResolvedValue({ status: 'Success' });
 
@@ -153,7 +172,8 @@ describe('paymentReturn routes', () => {
           payment: {
             paymentReference: 'RC-123',
             caseReference: '1234567890123456',
-            successRedirectUrl: '/case/1234567890123456/respond-to-claim/counter-claim-payment-successful',
+            successRedirectUrl:
+              '/case/1234567890123456/respond-to-claim/counter-claim-payment-successful',
             failureRedirectUrl:
               '/case/1234567890123456/respond-to-claim/counter-claim-application-fee-amount?payment=failed',
           },
@@ -174,7 +194,10 @@ describe('paymentReturn routes', () => {
 
       await handler(req, res);
 
-      expect(mockGetCardPaymentStatus).toHaveBeenCalledWith('token-123', '1f905214-3af0-4f11-a9e7-8b37133bb645');
+      expect(mockGetCardPaymentStatus).toHaveBeenCalledWith(
+        'token-123',
+        '1f905214-3af0-4f11-a9e7-8b37133bb645'
+      );
       expect(res.redirect).toHaveBeenCalledWith(
         303,
         '/case/1234567890123456/respond-to-claim/counter-claim-payment-successful'
@@ -182,7 +205,10 @@ describe('paymentReturn routes', () => {
     });
 
     it('redirects to failure URL and clears payment reference on failed status', async () => {
-      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockRouterGet.mock.calls[0][2] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       mockGetCardPaymentStatus.mockResolvedValue({ status: 'Failed' });
 
@@ -210,7 +236,10 @@ describe('paymentReturn routes', () => {
 
       await handler(req, res);
 
-      expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/payment-failed');
+      expect(res.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1234567890123456/respond-to-claim/payment-failed'
+      );
       expect(req.session.payment).toEqual({
         caseReference: '1234567890123456',
         failureRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-failed',
@@ -218,7 +247,10 @@ describe('paymentReturn routes', () => {
     });
 
     it('redirects to pending URL and keeps session state on pending status', async () => {
-      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockRouterGet.mock.calls[0][2] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       mockGetCardPaymentStatus.mockResolvedValue({ status: 'Created' });
 
@@ -252,7 +284,10 @@ describe('paymentReturn routes', () => {
     });
 
     it('falls back to default case path when status check fails', async () => {
-      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const handler = mockRouterGet.mock.calls[0][2] as (
+        req: Request,
+        res: Response
+      ) => Promise<void>;
 
       mockGetCardPaymentStatus.mockRejectedValue(new Error('status lookup failed'));
 

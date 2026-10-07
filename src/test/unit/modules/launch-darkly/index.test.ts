@@ -35,7 +35,10 @@ describe('LaunchDarkly', () => {
     await launchDarkly.enableFor(mockApp);
 
     expect(config.get).toHaveBeenCalledWith('secrets.pcs.launchdarkly-sdk-key');
-    expect(ld.init).toHaveBeenCalledWith('sdk-key', expect.objectContaining({ logger: expect.anything() }));
+    expect(ld.init).toHaveBeenCalledWith(
+      'sdk-key',
+      expect.objectContaining({ logger: expect.anything() })
+    );
   });
 
   it('registers the client on the app when initialisation succeeds', async () => {
@@ -46,7 +49,9 @@ describe('LaunchDarkly', () => {
   });
 
   it('still registers the client when initialisation times out, so flags recover once the SDK reconnects', async () => {
-    mockClient.waitForInitialization.mockRejectedValue(new Error('waitForInitialization timed out after 10 seconds.'));
+    mockClient.waitForInitialization.mockRejectedValue(
+      new Error('waitForInitialization timed out after 10 seconds.')
+    );
 
     await expect(launchDarkly.enableFor(mockApp)).resolves.toBeUndefined();
 

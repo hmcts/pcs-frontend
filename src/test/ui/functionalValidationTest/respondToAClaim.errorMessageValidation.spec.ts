@@ -92,11 +92,7 @@ import { wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation }
 import { writtenTermsErrorValidation } from '../functional/writtenTerms.pft';
 import { yourCircumstancesErrorValidation } from '../functional/yourCircumstances.pft';
 import { getRelativeDate } from '../utils/common/date.utils';
-import {
-  assertAllErrorMessageValidations,
-  clearErrorMessageValidationFailures,
-  softErrorMessageValidation,
-} from '../utils/common/error-message-validation-helper';
+import { assertAllErrorMessageValidations, clearErrorMessageValidationFailures, softErrorMessageValidation } from '../utils/common/error-message-validation-helper';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performValidation } from '../utils/controller';
@@ -134,9 +130,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   }
 
   // Assign the tenancy type & grounds in the payload
-  const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type =>
-    testInfo.title.includes(type)
-  );
+  const tenancyKey = ['Introductory', 'Demoted', 'Assured', 'Secure', 'Flexible'].find(type => testInfo.title.includes(type));
 
   switch (tenancyKey) {
     case 'Introductory':
@@ -253,7 +247,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
   await softErrorMessageValidation('startNow', NO_EMV_READ_ONLY);
-  await performAction('clickButton', startNow.startNowButton);
+  await performAction('When the user clicks the button', startNow.startNowButton);
 });
 
 test.afterEach(() => {
@@ -264,11 +258,13 @@ test.afterEach(() => {
 test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly @EMV', () => {
   test('RentArrears - Introductory - NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
-    await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
-    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('When the user selects the legal advice option', freeLegalAdvice.noRadioOption);
+    await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.confirmDetailsLink,
+    });
 
     await softErrorMessageValidation('defendantNameConfirmation', defendantNameConfirmationErrorValidation);
     await performAction('confirmDefendantDetails', {
@@ -279,36 +275,38 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
 
     await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_MISSING_DESIGN);
-    await performAction('enterDateOfBirthDetails', {
+    await performAction('And the user enters the date of birth details', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
 
     await softErrorMessageValidation('correspondenceAddress', NO_EMV_MISSING_DESIGN);
-    await performAction('selectCorrespondenceAddressKnown', {
+    await performAction('And the user selects whether the correspondence address is known', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
 
     await softErrorMessageValidation('contactPreferenceEmailOrPost', contactPreferenceEmailOrPostErrorValidation);
-    await performAction('selectContactPreferenceEmailOrPost', {
+    await performAction('And the user selects the contact preference (email or post)', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
 
     await softErrorMessageValidation('contactPreferencesTelephone', contactPreferencesTelephoneErrorValidation);
-    await performAction('selectContactByTelephone', {
+    await performAction('And the user selects contact by telephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
+    });
 
-    await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
-    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await softErrorMessageValidation('When the user responds to the dispute claim interstitial', NO_EMV_READ_ONLY);
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
 
     await softErrorMessageValidation('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
-    await performAction('tenancyOrContractTypeDetails', {
+    await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayload.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
@@ -322,10 +320,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
 
-    await softErrorMessageValidation(
-      'confirmation-of-notice-date-when-provided',
-      noticeDateWhenProvidedErrorValidation
-    );
+    await softErrorMessageValidation('confirmation-of-notice-date-when-provided', noticeDateWhenProvidedErrorValidation);
     await performAction('enterNoticeDateUnknown');
 
     await softErrorMessageValidation('rentArrears', rentArrearsErrorValidation);
@@ -367,21 +362,17 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
 
-    await softErrorMessageValidation(
-      'doYouWantToUploadFilesToSupportYourCounterclaim',
-      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
-    );
+    await softErrorMessageValidation('doYouWantToUploadFilesToSupportYourCounterclaim', doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation);
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.yesRadioOption,
     });
 
-    await softErrorMessageValidation(
-      'uploadFilesToSupportYourCounterclaim',
-      uploadFilesToSupportYourCounterclaimErrorValidation
-    );
+    await softErrorMessageValidation('uploadFilesToSupportYourCounterclaim', uploadFilesToSupportYourCounterclaimErrorValidation);
     await performAction('uploadFilesToSupportCounterclaim', { files: ['rentArrears.pdf'] });
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performAction('taskList', { subSection: taskList.declareRecentPaymentsHiddenLink });
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.declareRecentPaymentsHiddenLink,
+    });
 
     await softErrorMessageValidation('PaymentInterstitial', NO_EMV_READ_ONLY);
     await performAction('readPaymentInterstitial');
@@ -398,9 +389,11 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       repaymentAgreedOption: repaymentsAgreed.yesRadioOption,
       repaymentAgreedInfo: repaymentsAgreed.detailsTextInput,
     });
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.householdAndCircumstancesLink,
+    });
 
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
@@ -422,10 +415,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       radioOption: doAnyOtherAdultsLiveInYourHome.noRadioOption,
     });
 
-    await softErrorMessageValidation(
-      'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
-      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation
-    );
+    await softErrorMessageValidation('wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation);
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.noRadioOption,
     });
@@ -441,9 +431,11 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.incomeAndExpensesLink,
+    });
 
     await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
     await performAction('selectIncomeAndExpenses', {
@@ -453,30 +445,11 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatRegularIncomeDoYouReceiveErrorValidation);
     await performAction('selectWhatRegularIncomeDoYouReceive', {
       regularIncomeOptions: [
-        [
-          whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-          whatRegularIncomeDoYouReceive.otherBenefitsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-          whatRegularIncomeDoYouReceive.pensionTextInput,
-          whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-          whatRegularIncomeDoYouReceive.incomeFromJobsTextInput,
-          whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-        ],
-        [
-          whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
-          whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput,
-        ],
+        [whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph, whatRegularIncomeDoYouReceive.otherBenefitsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.universalCreditTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph, whatRegularIncomeDoYouReceive.pensionTextInput, whatRegularIncomeDoYouReceive.monthHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph, whatRegularIncomeDoYouReceive.incomeFromJobsTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
+        [whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph, whatRegularIncomeDoYouReceive.detailsAboutOtherSourcesOfIncomeTextInput],
       ],
     });
     await softErrorMessageValidation('priorityDebts', priorityDebtsErrorValidation);
@@ -484,10 +457,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: priorityDebts.doYouHaveAnyPriorityDebtsQuestion,
       option: priorityDebts.noRadioOption,
     });
-    await softErrorMessageValidation(
-      'what-other-regular-expenses-do-you-have',
-      whatOtherRegularExpensesDoYouHaveErrorValidation
-    );
+    await softErrorMessageValidation('what-other-regular-expenses-do-you-have', whatOtherRegularExpensesDoYouHaveErrorValidation);
     await performAction('selectWhatOtherRegularExpensesDoYouHave');
 
     await softErrorMessageValidation('otherConsiderations', otherConsiderationsErrorValidation);
@@ -496,22 +466,26 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('taskList', { subSection: taskList.yourSupportLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
+    await performValidation('Then the user sees the main header', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('When the user clicks the button', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
 
-    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.uploadDocumentsLink,
+    });
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
 
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.checkYourAnswersAndSubmitHiddenLink,
+    });
 
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
+    await performValidation('Then the user sees the main header', equalityAndDiversityStart.mainHeader);
+    await performAction('When the user clicks the button', equalityAndDiversityStart.idontWantToAnswerQuestions);
 
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
@@ -531,24 +505,26 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
   test('NonRentArrears - Secure - NoticeServed - Yes and NoticeDateProvided - Yes - NoticeDetails- Yes - Notice date known @secureFlexible', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
-    await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
+    await performAction('When the user selects the legal advice option', freeLegalAdvice.noRadioOption);
     await softErrorMessageValidation('doYouHaveASolicitor', doYouHaveASolicitorErrorValidation);
-    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.confirmDetailsLink,
+    });
 
     await softErrorMessageValidation('defendantNameCapture', defendantNameCaptureErrorValidation);
-    await performAction('inputDefendantDetails', {
+    await performAction('When the user enters the defendant details', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
 
     await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_MISSING_DESIGN);
-    await performAction('enterDateOfBirthDetails');
+    await performAction('And the user enters the date of birth details');
 
     await softErrorMessageValidation('correspondenceAddress', NO_EMV_MISSING_DESIGN);
-    await performAction('selectCorrespondenceAddressKnown', {
+    await performAction('And the user selects whether the correspondence address is known', {
       radioOption: correspondenceAddress.noRadioOption,
       addressLine1: correspondenceAddress.walesAddressLine1TextInput,
       townOrCity: correspondenceAddress.walesTownOrCityTextInput,
@@ -556,14 +532,14 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     });
 
     await softErrorMessageValidation('contactPreferenceEmailOrPost', contactPreferenceEmailOrPostErrorValidation);
-    await performAction('selectContactPreferenceEmailOrPost', {
+    await performAction('And the user selects the contact preference (email or post)', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byEmailCheckbox,
       emailAddress: contactPreferenceEmailOrPost.emailAddressTextInput,
     });
 
     await softErrorMessageValidation('contactPreferencesTelephone', contactPreferencesTelephoneErrorValidation);
-    await performAction('selectContactByTelephone', {
+    await performAction('And the user selects contact by telephone', {
       radioOption: contactPreferencesTelephone.yesRadioOption,
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
@@ -572,25 +548,24 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
     await performAction('selectContactByTextMessage', {
       radioOption: contactPreferencesTextMessage.noRadioOption,
     });
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
+    });
 
-    await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
-    await performAction(
-      'disputeClaimInterstitial',
-      submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect
-    );
+    await softErrorMessageValidation('When the user responds to the dispute claim interstitial', NO_EMV_READ_ONLY);
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.isClaimantNameCorrect);
 
     await softErrorMessageValidation('tenancyTypeDetails', tenancyTypeDetailsErrorValidation);
-    await performAction('tenancyOrContractTypeDetails', {
+    await performAction('And the user enters the tenancy or contract type details', {
       tenancyType: submitCaseApiData.submitCasePayloadSecureFlexibleTenancy.tenancy_TypeOfTenancyLicence,
       tenancyOption: tenancyTypeDetails.noRadioOption,
       tenancyTypeInfo: tenancyTypeDetails.giveCorrectTenancyTypeTextInput,
     });
 
     await softErrorMessageValidation('tenancyDateUnknown', tenancyDateUnknownErrorValidation);
-    await performAction('enterTenancyStartDetailsUnKnown', {
+    await performAction('And the user enters the tenancy start details when unknown', {
       tsDay: '15',
       tsMonth: '11',
       tsYear: '2024',
@@ -601,10 +576,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       option: confirmationOfNoticeGiven.yesRadioOption,
     });
 
-    await softErrorMessageValidation(
-      'confirmation-of-notice-date-when-not-provided',
-      noticeDateWhenNotProvidedErrorValidation
-    );
+    await softErrorMessageValidation('confirmation-of-notice-date-when-not-provided', noticeDateWhenNotProvidedErrorValidation);
     await performAction('enterNoticeDateKnown');
 
     await softErrorMessageValidation('nonRentArrearsDispute', nonRentArrearsDisputeErrorValidation);
@@ -637,10 +609,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       amount: counterClaimSpecificSumOfMoney.enterMaximumValueOfYourClaimInput,
     });
 
-    await softErrorMessageValidation(
-      'counterClaimHaveYouAppliedForHelp',
-      counterClaimHaveYouAppliedForHelpErrorValidation
-    );
+    await softErrorMessageValidation('counterClaimHaveYouAppliedForHelp', counterClaimHaveYouAppliedForHelpErrorValidation);
     await performAction('counterClaimHaveYouAppliedForHelpWithFee', {
       helpWithFeeOption: counterClaimHaveYouAppliedForHelp.yesRadioOption,
       feeReference: counterClaimHaveYouAppliedForHelp.helpWithFeeReferenceTextInput,
@@ -651,16 +620,15 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       reasonsInput: counterClaimAbout.reasonsForCounterClaimInput,
     });
 
-    await softErrorMessageValidation(
-      'doYouWantToUploadFilesToSupportYourCounterclaim',
-      doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation
-    );
+    await softErrorMessageValidation('doYouWantToUploadFilesToSupportYourCounterclaim', doYouWantToUploadFilesToSupportYourCounterclaimErrorValidation);
     await performAction('doYouWantToUploadFiles', {
       option: doYouWantToUploadFilesToSupportYourCounterclaim.noRadioOption,
     });
 
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performAction('taskList', { subSection: taskList.householdAndCircumstancesLink });
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.householdAndCircumstancesLink,
+    });
 
     await softErrorMessageValidation('YourHouseholdAndCircumstances', NO_EMV_READ_ONLY);
     await performAction('readYourHouseholdAndCircumstances');
@@ -681,10 +649,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       details: doAnyOtherAdultsLiveInYourHome.detailsAboutAdultsTextInput,
     });
 
-    await softErrorMessageValidation(
-      'wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome',
-      wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation
-    );
+    await softErrorMessageValidation('wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome', wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHomeErrorValidation);
     await performAction('selectAlternativeAccommodation', {
       radioOption: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome.yesRadioOption,
       ...getRelativeDate(1),
@@ -701,9 +666,11 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       question: exceptionalHardship.mainHeader,
       exceptionalHardshipOption: exceptionalHardship.noRadioOption,
     });
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('taskList', { subSection: taskList.incomeAndExpensesLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.incomeAndExpensesLink,
+    });
 
     await softErrorMessageValidation('incomeAndExpenses', incomeAndExpensesErrorValidation);
     await performAction('selectIncomeAndExpenses', {
@@ -712,10 +679,7 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
     await softErrorMessageValidation('whatRegularIncomeDoYouReceive', whatRegularIncomeDoYouReceiveErrorValidation);
     await performAction('selectWhatRegularIncomeDoYouReceive');
-    await softErrorMessageValidation(
-      'haveYouAppliedForUniversalCredit',
-      haveYouAppliedForUniversalCreditErrorValidation
-    );
+    await softErrorMessageValidation('haveYouAppliedForUniversalCredit', haveYouAppliedForUniversalCreditErrorValidation);
     await performAction('selectUniversalCredit', {
       question: haveYouAppliedForUniversalCredit.mainHeader,
       creditRadioOption: haveYouAppliedForUniversalCredit.noRadioOption,
@@ -741,22 +705,26 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
       option: otherConsiderations.yesRadioOption,
       courtInfo: otherConsiderations.detailsTextInput,
     });
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('taskList', { subSection: taskList.yourSupportLink });
-    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
-    await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('And the user navigates to the task list subsection', { subSection: taskList.yourSupportLink });
+    await performValidation('Then the user sees the main header', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('When the user clicks the button', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
 
-    await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.uploadDocumentsLink,
+    });
 
     await softErrorMessageValidation('uploadFiles', NO_EMV_READ_ONLY);
     await performAction('uploadFiles');
 
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
-    await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.checkYourAnswersAndSubmitHiddenLink,
+    });
 
-    await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
-    await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
+    await performValidation('Then the user sees the main header', equalityAndDiversityStart.mainHeader);
+    await performAction('When the user clicks the button', equalityAndDiversityStart.idontWantToAnswerQuestions);
 
     await softErrorMessageValidation('languageUsed', languageUsedErrorValidation);
     await performAction('languageUsed', {
@@ -775,50 +743,54 @@ test.describe('Respond to claim — ErrorMessageValidation(EMV) journey @nightly
 
   test('Wales-specific page error validation for exempt landlord and written terms @PR', async () => {
     await softErrorMessageValidation('freeLegalAdvice', freeLegalAdviceErrorValidation);
-    await performAction('selectLegalAdvice', freeLegalAdvice.noRadioOption);
-    await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('When the user selects the legal advice option', freeLegalAdvice.noRadioOption);
+    await performAction('And the user selects whether they have a solicitor', doYouHaveASolicitor.noRadioOption);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('taskList', { subSection: taskList.confirmDetailsLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.confirmDetailsLink,
+    });
 
     await softErrorMessageValidation('defendantNameCapture', defendantNameCaptureErrorValidation);
-    await performAction('inputDefendantDetails', {
+    await performAction('When the user enters the defendant details', {
       fName: defendantNameCapture.firstNameTextInput,
       lName: defendantNameCapture.lastNameTextInput,
     });
 
     await softErrorMessageValidation('defendantDateOfBirth', NO_EMV_MISSING_DESIGN);
-    await performAction('enterDateOfBirthDetails', {
+    await performAction('And the user enters the date of birth details', {
       dobDay: defendantDateOfBirth.dayInputText,
       dobMonth: defendantDateOfBirth.monthInputText,
       dobYear: defendantDateOfBirth.yearInputText,
     });
 
     await softErrorMessageValidation('correspondenceAddress', NO_EMV_MISSING_DESIGN);
-    await performAction('selectCorrespondenceAddressKnown', {
+    await performAction('And the user selects whether the correspondence address is known', {
       radioOption: correspondenceAddress.yesRadioOption,
     });
 
     await softErrorMessageValidation('contactPreferenceEmailOrPost', contactPreferenceEmailOrPostErrorValidation);
-    await performAction('selectContactPreferenceEmailOrPost', {
+    await performAction('And the user selects the contact preference (email or post)', {
       question: contactPreferenceEmailOrPost.howDoYouWantTOReceiveUpdatesQuestion,
       radioOption: contactPreferenceEmailOrPost.byPostCheckbox,
     });
 
     await softErrorMessageValidation('contactPreferencesTelephone', contactPreferencesTelephoneErrorValidation);
-    await performAction('selectContactByTelephone', {
+    await performAction('And the user selects contact by telephone', {
       radioOption: contactPreferencesTelephone.noRadioOption,
     });
-    await performAction('clickButton', checkYourAnswersRTC.saveAndContinueButton);
+    await performAction('When the user clicks the button', checkYourAnswersRTC.saveAndContinueButton);
 
-    await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
+    await performAction('And the user navigates to the task list subsection', {
+      subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink,
+    });
 
-    await softErrorMessageValidation('disputeClaimInterstitial', NO_EMV_READ_ONLY);
-    await performAction('disputeClaimInterstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
+    await softErrorMessageValidation('When the user responds to the dispute claim interstitial', NO_EMV_READ_ONLY);
+    await performAction('When the user responds to the dispute claim interstitial', submitCaseApiData.submitCasePayload.isClaimantNameCorrect);
     await softErrorMessageValidation('exemptLandLord', exemptLandLordErrorValidation);
     await performAction('exemptLandLord', exemptLandLord.yesRadioOption);
     await softErrorMessageValidation('writtenTerms', writtenTermsErrorValidation);
-    await performValidation('mainHeader', writtenTerms.mainHeader);
+    await performValidation('Then the user sees the main header', writtenTerms.mainHeader);
     await performAction('selectWrittenTerms', {
       question: writtenTerms.hasYourLandlordSentYouWrittenTermsQuestion,
       radioOption: writtenTerms.noRadioOption,

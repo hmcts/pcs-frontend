@@ -1,6 +1,9 @@
 import type { Request } from 'express';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -42,7 +45,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   getInitialFormData: (req: Request) => {
     const counterClaim =
-      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
+      req.res?.locals?.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+        ?.counterClaim;
     if (!counterClaim) {
       return {};
     }
@@ -50,11 +54,15 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ...(counterClaim.otherOrderRequestDetails
         ? { otherOrderRequestDetails: counterClaim.otherOrderRequestDetails }
         : {}),
-      ...(counterClaim.otherOrderRequestFacts ? { otherOrderRequestFacts: counterClaim.otherOrderRequestFacts } : {}),
+      ...(counterClaim.otherOrderRequestFacts
+        ? { otherOrderRequestFacts: counterClaim.otherOrderRequestFacts }
+        : {}),
     };
   },
   beforeRedirect: async (req: Request) => {
-    const otherOrderRequestDetails = (req.body?.otherOrderRequestDetails as string | undefined)?.trim();
+    const otherOrderRequestDetails = (
+      req.body?.otherOrderRequestDetails as string | undefined
+    )?.trim();
     const otherOrderRequestFacts = (req.body?.otherOrderRequestFacts as string | undefined)?.trim();
 
     const response = buildDraftDefendantResponse(req);

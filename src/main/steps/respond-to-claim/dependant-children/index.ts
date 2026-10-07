@@ -1,5 +1,8 @@
 import { fromYesNoEnum } from '../../utils';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -8,7 +11,9 @@ import type { CaseData, HouseholdCircumstances, YesNoValue } from '@services/ccd
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'do-you-have-any-dependant-children',
   isAnswered: req =>
-    Boolean(req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.dependantChildren),
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.householdCircumstances?.dependantChildren
+    ),
   stepDir: __dirname,
   customTemplate: `${__dirname}/dependantChildren.njk`,
   translationKeys: {
@@ -19,7 +24,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.householdCircumstances = response.defendantResponses.householdCircumstances ?? {};
+    response.defendantResponses.householdCircumstances =
+      response.defendantResponses.householdCircumstances ?? {};
     const dependantChildren: string = req.body?.dependantChildren;
     const enumMapping: Record<string, YesNoValue> = { yes: 'YES', no: 'NO' };
     const dependantChildrenCcd = enumMapping[dependantChildren];
@@ -59,7 +65,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     if (dependantChildrenForm === 'yes') {
-      const dependantChildrenDetails: string | undefined = householdCircumstances?.dependantChildrenDetails;
+      const dependantChildrenDetails: string | undefined =
+        householdCircumstances?.dependantChildrenDetails;
       return {
         dependantChildren: 'yes',
         'dependantChildren.dependantChildrenDetails': dependantChildrenDetails ?? '',

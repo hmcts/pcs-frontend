@@ -5,18 +5,9 @@ import { createCaseApiWalesData } from '../../api-data/createCaseWales.api.data'
 function getDefaultPostalAddressLR(): string {
   const isWalesJourney = process.env.WALES_POSTCODE && process.env.WALES_POSTCODE.toUpperCase() === 'YES';
 
-  const propertyAddress = isWalesJourney
-    ? createCaseApiWalesData.createCasePayload.propertyAddress
-    : createCaseApiData.createCasePayload.propertyAddress;
+  const propertyAddress = isWalesJourney ? createCaseApiWalesData.createCasePayload.propertyAddress : createCaseApiData.createCasePayload.propertyAddress;
 
-  return [
-    propertyAddress.AddressLine1,
-    propertyAddress.AddressLine2,
-    propertyAddress.AddressLine3,
-    propertyAddress.PostTown,
-    propertyAddress.County,
-    propertyAddress.PostCode,
-  ]
+  return [propertyAddress.AddressLine1, propertyAddress.AddressLine2, propertyAddress.AddressLine3, propertyAddress.PostTown, propertyAddress.County, propertyAddress.PostCode]
     .filter(Boolean)
     .join(', ');
 }

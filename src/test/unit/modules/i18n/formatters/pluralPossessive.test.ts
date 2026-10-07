@@ -26,7 +26,11 @@ describe('pluralPossessive formatter', () => {
   });
 
   describe('English language (en)', () => {
-    let formatterFn: (value: string, lng: string | undefined, options: { format?: string }) => string;
+    let formatterFn: (
+      value: string,
+      lng: string | undefined,
+      options: { format?: string }
+    ) => string;
 
     beforeEach(() => {
       pluralPossessive(mockI18n);
@@ -79,7 +83,11 @@ describe('pluralPossessive formatter', () => {
   });
 
   describe('non-English languages', () => {
-    let formatterFn: (value: string, lng: string | undefined, options: { format?: string }) => string;
+    let formatterFn: (
+      value: string,
+      lng: string | undefined,
+      options: { format?: string }
+    ) => string;
 
     beforeEach(() => {
       pluralPossessive(mockI18n);
@@ -103,7 +111,11 @@ describe('pluralPossessive formatter', () => {
   });
 
   describe('edge cases', () => {
-    let formatterFn: (value: string, lng: string | undefined, options: { format?: string }) => string;
+    let formatterFn: (
+      value: string,
+      lng: string | undefined,
+      options: { format?: string }
+    ) => string;
 
     beforeEach(() => {
       pluralPossessive(mockI18n);

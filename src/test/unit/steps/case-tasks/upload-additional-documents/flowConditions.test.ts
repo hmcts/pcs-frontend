@@ -65,7 +65,11 @@ describe('isViewAllApplicationsAvailable', () => {
     const result = await isViewAllApplicationsAvailable(buildRequest(), formData, currentStepData);
 
     expect(result).toBe(true);
-    expect(mockGetCaseById).toHaveBeenCalledWith('access-token-1', '1234567890123456', 'uploadDocuments');
+    expect(mockGetCaseById).toHaveBeenCalledWith(
+      'access-token-1',
+      '1234567890123456',
+      'uploadDocuments'
+    );
   });
 
   it('returns true regardless of casing on the Yes value', async () => {

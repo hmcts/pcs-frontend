@@ -16,9 +16,9 @@ export class ClickButtonAction implements IAction {
       )
       .nth(i);
     const actionsMap = new Map<string, () => Promise<void>>([
-      ['clickButton', () => this.clickButton(page, button)],
+      ['When the user clicks the button', () => this.clickButton(page, button)],
       ['clickButtonAndVerifyPageNavigation', () => this.clickButtonAndVerifyPageNavigation(page, button, actionParams)],
-      ['verifyPageAndClickButton', () => this.verifyPageAndClickButton(page, actionParams, button)],
+      ['verifyPageAndWhen the user clicks the button', () => this.verifyPageAndClickButton(page, actionParams, button)],
       ['clickButtonAndWaitForElement', () => this.clickButtonAndWaitForElement(page, button, actionParams)],
     ]);
     const actionToPerform = actionsMap.get(action);
@@ -33,11 +33,7 @@ export class ClickButtonAction implements IAction {
     await page.waitForLoadState();
   }
 
-  private async clickButtonAndVerifyPageNavigation(
-    page: Page,
-    button: Locator,
-    nextPageElement: string
-  ): Promise<void> {
+  private async clickButtonAndVerifyPageNavigation(page: Page, button: Locator, nextPageElement: string): Promise<void> {
     const pageElement = page.locator(`h1:has-text("${nextPageElement}")`);
     let attempt = 0;
     let nextPageElementIsVisible: boolean;

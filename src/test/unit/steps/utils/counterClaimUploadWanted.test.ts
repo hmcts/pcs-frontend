@@ -14,7 +14,9 @@ const makeReq = (counterClaimWantToUploadFiles?: YesNoValue): Request =>
           data: {
             possessionClaimResponse: {
               defendantResponses: {
-                ...(counterClaimWantToUploadFiles !== undefined && { counterClaimWantToUploadFiles }),
+                ...(counterClaimWantToUploadFiles !== undefined && {
+                  counterClaimWantToUploadFiles,
+                }),
               },
             },
           },

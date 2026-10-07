@@ -218,7 +218,9 @@ describe('oidcMiddleware', () => {
       sub: 'test-user',
     });
 
-    (mockOidcModule.refreshUserTokens as jest.Mock).mockRejectedValue(new Error('Refresh token invalid'));
+    (mockOidcModule.refreshUserTokens as jest.Mock).mockRejectedValue(
+      new Error('Refresh token invalid')
+    );
 
     await oidcMiddleware(
       mockRequest as Request & { i18n: import('i18next').i18n; t: import('i18next').TFunction },

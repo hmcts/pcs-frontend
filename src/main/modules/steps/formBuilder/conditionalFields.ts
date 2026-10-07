@@ -9,7 +9,11 @@ import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig
  * @param fieldType - The type of field ('radio' or 'checkbox')
  * @returns True if the option is selected, false otherwise
  */
-export function isOptionSelected(fieldValue: unknown, optionValue: string, fieldType: 'radio' | 'checkbox'): boolean {
+export function isOptionSelected(
+  fieldValue: unknown,
+  optionValue: string,
+  fieldType: 'radio' | 'checkbox'
+): boolean {
   if (fieldType === 'radio') {
     return fieldValue === optionValue;
   }
@@ -62,7 +66,10 @@ export function getSubFieldsForOption(
  * @param fieldValue - The current value of the field
  * @returns Record of all visible subFields keyed by their names
  */
-export function getVisibleSubFields(field: FormFieldConfig, fieldValue: unknown): Record<string, FormFieldConfig> {
+export function getVisibleSubFields(
+  field: FormFieldConfig,
+  fieldValue: unknown
+): Record<string, FormFieldConfig> {
   const visibleSubFields: Record<string, FormFieldConfig> = {};
 
   if (field.type !== 'radio' && field.type !== 'checkbox') {
@@ -74,7 +81,11 @@ export function getVisibleSubFields(field: FormFieldConfig, fieldValue: unknown)
   }
 
   for (const option of field.options) {
-    if (option.subFields && option.value && isOptionSelected(fieldValue, option.value, field.type)) {
+    if (
+      option.subFields &&
+      option.value &&
+      isOptionSelected(fieldValue, option.value, field.type)
+    ) {
       // Merge subFields into visibleSubFields
       // Note: If multiple options have subFields with same names, later ones will overwrite
       // This is expected behavior - only one option can be selected for radio

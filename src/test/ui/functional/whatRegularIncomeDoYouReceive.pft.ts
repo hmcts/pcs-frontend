@@ -7,7 +7,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     question: whatRegularIncomeDoYouReceive.mainHeader,
     option: whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
   });
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
 
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
@@ -21,11 +21,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
     regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-        whatRegularIncomeDoYouReceive.incorrectFormatTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
+      [whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph, whatRegularIncomeDoYouReceive.incorrectFormatTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
     ],
   });
 
@@ -35,13 +31,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-        whatRegularIncomeDoYouReceive.negativeTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+    regularIncomeOptions: [[whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph, whatRegularIncomeDoYouReceive.negativeTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption]],
   });
 
   await performValidation('errorMessage', {
@@ -50,13 +40,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph,
-        whatRegularIncomeDoYouReceive.billionTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+    regularIncomeOptions: [[whatRegularIncomeDoYouReceive.otherBenefitsAndCreditsParagraph, whatRegularIncomeDoYouReceive.billionTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption]],
   });
 
   await performValidation('errorMessage', {
@@ -75,7 +59,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     question: whatRegularIncomeDoYouReceive.mainHeader,
     option: whatRegularIncomeDoYouReceive.universalCreditParagraph,
   });
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
 
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
@@ -88,13 +72,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.universalCreditParagraph,
-        whatRegularIncomeDoYouReceive.incorrectFormatTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+    regularIncomeOptions: [[whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.incorrectFormatTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption]],
   });
 
   await performValidation('errorMessage', {
@@ -103,13 +81,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.universalCreditParagraph,
-        whatRegularIncomeDoYouReceive.negativeTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+    regularIncomeOptions: [[whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.negativeTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption]],
   });
 
   await performValidation('errorMessage', {
@@ -118,13 +90,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.universalCreditParagraph,
-        whatRegularIncomeDoYouReceive.billionTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+    regularIncomeOptions: [[whatRegularIncomeDoYouReceive.universalCreditParagraph, whatRegularIncomeDoYouReceive.billionTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption]],
   });
 
   await performValidation('errorMessage', {
@@ -142,7 +108,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     question: whatRegularIncomeDoYouReceive.mainHeader,
     option: whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
   });
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
 
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
@@ -156,11 +122,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
     regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-        whatRegularIncomeDoYouReceive.incorrectFormatTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
+      [whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph, whatRegularIncomeDoYouReceive.incorrectFormatTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption],
     ],
   });
 
@@ -170,13 +132,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-        whatRegularIncomeDoYouReceive.negativeTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+    regularIncomeOptions: [[whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph, whatRegularIncomeDoYouReceive.negativeTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption]],
   });
 
   await performValidation('errorMessage', {
@@ -185,13 +141,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph,
-        whatRegularIncomeDoYouReceive.billionTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+    regularIncomeOptions: [[whatRegularIncomeDoYouReceive.pensionStateAndPrivateParagraph, whatRegularIncomeDoYouReceive.billionTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption]],
   });
 
   await performValidation('errorMessage', {
@@ -209,7 +159,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     question: whatRegularIncomeDoYouReceive.mainHeader,
     option: whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
   });
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
 
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
@@ -222,13 +172,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-        whatRegularIncomeDoYouReceive.incorrectFormatTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+    regularIncomeOptions: [[whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph, whatRegularIncomeDoYouReceive.incorrectFormatTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption]],
   });
 
   await performValidation('errorMessage', {
@@ -237,13 +181,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-        whatRegularIncomeDoYouReceive.negativeTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+    regularIncomeOptions: [[whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph, whatRegularIncomeDoYouReceive.negativeTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption]],
   });
 
   await performValidation('errorMessage', {
@@ -252,13 +190,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
   });
 
   await performAction('selectWhatRegularIncomeDoYouReceive', {
-    regularIncomeOptions: [
-      [
-        whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph,
-        whatRegularIncomeDoYouReceive.billionTextInput,
-        whatRegularIncomeDoYouReceive.weekHiddenRadioOption,
-      ],
-    ],
+    regularIncomeOptions: [[whatRegularIncomeDoYouReceive.incomeFromAllJobsParagraph, whatRegularIncomeDoYouReceive.billionTextInput, whatRegularIncomeDoYouReceive.weekHiddenRadioOption]],
   });
 
   await performValidation('errorMessage', {
@@ -278,28 +210,20 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     question: whatRegularIncomeDoYouReceive.mainHeader,
     option: whatRegularIncomeDoYouReceive.moneyFromSomewhereElseParagraph,
   });
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
 
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
     message: whatRegularIncomeDoYouReceive.enterDetailsAboutMoneyFromSomewhereElseErrorMessage,
   });
-  await performAction(
-    'inputText',
-    whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
-    whatRegularIncomeDoYouReceive.emojiTextInput
-  );
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('inputText', whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel, whatRegularIncomeDoYouReceive.emojiTextInput);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
     message: whatRegularIncomeDoYouReceive.emojiErrorMessage,
   });
-  await performAction(
-    'inputText',
-    whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
-    whatRegularIncomeDoYouReceive.tooManyCharTextInput
-  );
-  await performAction('clickButton', whatRegularIncomeDoYouReceive.saveAndContinueButton);
+  await performAction('inputText', whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel, whatRegularIncomeDoYouReceive.tooManyCharTextInput);
+  await performAction('When the user clicks the button', whatRegularIncomeDoYouReceive.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: whatRegularIncomeDoYouReceive.errorValidationHeader,
     message: whatRegularIncomeDoYouReceive.tooManyCharErrorMessage,
@@ -309,11 +233,7 @@ export async function whatRegularIncomeDoYouReceiveErrorValidation(): Promise<vo
     text: whatRegularIncomeDoYouReceive.oneCharTooManyHiddenHintText,
   });
 
-  await performAction(
-    'inputText',
-    whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel,
-    generateRandomString(500)
-  );
+  await performAction('inputText', whatRegularIncomeDoYouReceive.giveDetailsAboutOtherSourcesOfIncomeHiddenTextLabel, generateRandomString(500));
   await performValidation('text', { elementType: 'hintText', text: whatRegularIncomeDoYouReceive.limitHiddenHintText });
 
   //uncheck

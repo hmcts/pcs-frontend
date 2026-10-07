@@ -157,7 +157,13 @@ function addAlternativeAccommodationRow({ rows, hc, t, change, yesNoNotSure }: R
   }
 }
 
-function addShareAdditionalCircumstancesRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
+function addShareAdditionalCircumstancesRow({
+  rows,
+  hc,
+  t,
+  change,
+  yesNoNotSure,
+}: RowContext): void {
   if (!hc.shareAdditionalCircumstances) {
     return;
   }
@@ -199,7 +205,15 @@ function addExceptionalHardshipRow({ rows, hc, t, change, yesNoNotSure }: RowCon
   );
   const detail = hc.exceptionalHardshipDetails?.trim();
   if (isYes(hc.exceptionalHardship) && detail) {
-    pushDetailRow(rows, questionRow, 'rows.exceptionalHardshipDetails', detail, 'exceptional-hardship', t, change);
+    pushDetailRow(
+      rows,
+      questionRow,
+      'rows.exceptionalHardshipDetails',
+      detail,
+      'exceptional-hardship',
+      t,
+      change
+    );
   }
 }
 
@@ -208,7 +222,10 @@ export function buildEOJDependantsRows(req: Request, t: TFunction): SummaryListR
   if (!base) {
     return [];
   }
-  const ctx: RowContext = { ...base, hc: base.validatedCase.defendantResponses?.householdCircumstances ?? {} };
+  const ctx: RowContext = {
+    ...base,
+    hc: base.validatedCase.defendantResponses?.householdCircumstances ?? {},
+  };
   addDependantChildrenRow(ctx);
   addOtherDependantsRow(ctx);
   addOtherTenantsRow(ctx);
@@ -220,7 +237,10 @@ export function buildEOJCircumstancesRows(req: Request, t: TFunction): SummaryLi
   if (!base) {
     return [];
   }
-  const ctx: RowContext = { ...base, hc: base.validatedCase.defendantResponses?.householdCircumstances ?? {} };
+  const ctx: RowContext = {
+    ...base,
+    hc: base.validatedCase.defendantResponses?.householdCircumstances ?? {},
+  };
   addAlternativeAccommodationRow(ctx);
   addShareAdditionalCircumstancesRow(ctx);
   addExceptionalHardshipRow(ctx);

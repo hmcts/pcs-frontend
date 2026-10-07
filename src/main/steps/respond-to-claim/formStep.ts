@@ -8,7 +8,10 @@ import { legalrepFlowConfig } from './legalrep.flow.config';
 import { createFormStep } from '@modules/steps';
 import type { FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-type RespondToClaimFormStepConfig = Omit<FormBuilderConfig, 'journeyFolder' | 'flowConfig' | 'basePath'>;
+type RespondToClaimFormStepConfig = Omit<
+  FormBuilderConfig,
+  'journeyFolder' | 'flowConfig' | 'basePath'
+>;
 
 function resolveRespondToClaimFlowConfig(req: Request) {
   return getUserType(req) === 'legalrep' ? legalrepFlowConfig : flowConfig;

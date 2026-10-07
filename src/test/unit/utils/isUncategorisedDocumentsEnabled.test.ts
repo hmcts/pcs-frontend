@@ -8,7 +8,9 @@ import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isUncategorisedDocumentsEnabled } from '@utils/isUncategorisedDocumentsEnabled';
 import { ENABLE_UNCATEGORISED_DOCUMENTS, RELEASE_1_2_ENABLED } from '@utils/respondToClaimFlags';
 
-const mockGetLaunchDarklyFlag = getLaunchDarklyFlag as jest.MockedFunction<typeof getLaunchDarklyFlag>;
+const mockGetLaunchDarklyFlag = getLaunchDarklyFlag as jest.MockedFunction<
+  typeof getLaunchDarklyFlag
+>;
 
 const makeReq = (): Request => ({ session: { user: { uid: 'user-1' } } }) as unknown as Request;
 
@@ -25,11 +27,17 @@ describe('isUncategorisedDocumentsEnabled', () => {
 
     expect(result).toBe(true);
     expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, RELEASE_1_2_ENABLED, false);
-    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, ENABLE_UNCATEGORISED_DOCUMENTS, false);
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(
+      req,
+      ENABLE_UNCATEGORISED_DOCUMENTS,
+      false
+    );
   });
 
   it('is disabled when the release flag is off', async () => {
-    mockGetLaunchDarklyFlag.mockImplementation(async (_req, flagName) => flagName === ENABLE_UNCATEGORISED_DOCUMENTS);
+    mockGetLaunchDarklyFlag.mockImplementation(
+      async (_req, flagName) => flagName === ENABLE_UNCATEGORISED_DOCUMENTS
+    );
 
     const result = await isUncategorisedDocumentsEnabled(makeReq());
 
@@ -37,7 +45,9 @@ describe('isUncategorisedDocumentsEnabled', () => {
   });
 
   it('is disabled when the journey flag is off', async () => {
-    mockGetLaunchDarklyFlag.mockImplementation(async (_req, flagName) => flagName === RELEASE_1_2_ENABLED);
+    mockGetLaunchDarklyFlag.mockImplementation(
+      async (_req, flagName) => flagName === RELEASE_1_2_ENABLED
+    );
 
     const result = await isUncategorisedDocumentsEnabled(makeReq());
 

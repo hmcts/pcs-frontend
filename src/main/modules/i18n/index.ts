@@ -100,7 +100,9 @@ export function getValidatedLanguage(req: Request): AllowedLang {
 
   const raw =
     (typeof req.query?.lang === 'string' && req.query.lang) ||
-    (Array.isArray(req.query?.lang) && typeof req.query.lang[0] === 'string' && req.query.lang[0]) ||
+    (Array.isArray(req.query?.lang) &&
+      typeof req.query.lang[0] === 'string' &&
+      req.query.lang[0]) ||
     (typeof req.body?.lang === 'string' && req.body.lang) ||
     '';
   const normalized = raw.toLowerCase().trim();
@@ -150,7 +152,10 @@ export function populateCommonTranslations(req: Request, res: Response, t: TFunc
 }
 
 /** Sets up Nunjucks globals for i18n. */
-export function setupNunjucksGlobals(env: Environment | undefined, globals: Record<string, unknown>): void {
+export function setupNunjucksGlobals(
+  env: Environment | undefined,
+  globals: Record<string, unknown>
+): void {
   if (!env) {
     return;
   }
@@ -202,7 +207,9 @@ export class I18n {
     this.logger.info(`[i18n] candidate locale roots:\n${candidateRoots}`);
 
     if (!localesDir) {
-      this.logger.error('[i18n] No locales directory found. Set LOCALES_DIR or create src/main/public/locales.');
+      this.logger.error(
+        '[i18n] No locales directory found. Set LOCALES_DIR or create src/main/public/locales.'
+      );
     }
 
     const ns = localesDir ? discoverNamespaces(localesDir, 'en') : ['common'];
@@ -224,22 +231,24 @@ export class I18n {
 
     app.use(i18nextHandle(i18next));
 
-    app.use((req: I18nRequest & { session?: SessionWithUser }, res: Response, next: NextFunction) => {
-      const lang = getRequestLanguage(req);
+    app.use(
+      (req: I18nRequest & { session?: SessionWithUser }, res: Response, next: NextFunction) => {
+        const lang = getRequestLanguage(req);
 
-      if (typeof req.i18n?.changeLanguage === 'function') {
-        req.i18n.changeLanguage(lang);
+        if (typeof req.i18n?.changeLanguage === 'function') {
+          req.i18n.changeLanguage(lang);
+        }
+
+        const t: TFunction = typeof req.t === 'function' ? req.t : createFallbackTFunction();
+
+        res.locals.lang = lang;
+        res.locals.t = t;
+
+        setupNunjucksGlobals(req.app.locals?.nunjucksEnv, { lang, t });
+
+        next();
       }
-
-      const t: TFunction = typeof req.t === 'function' ? req.t : createFallbackTFunction();
-
-      res.locals.lang = lang;
-      res.locals.t = t;
-
-      setupNunjucksGlobals(req.app.locals?.nunjucksEnv, { lang, t });
-
-      next();
-    });
+    );
 
     z.setErrorMap(makeZodI18nMap({ t: i18next.t }));
   }

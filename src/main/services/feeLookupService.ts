@@ -23,7 +23,10 @@ export enum FeeType {
   counterClaim,
 }
 
-export const getCounterClaimFeeType = (claimType?: string, claimAmountInPence?: string): FeeType => {
+export const getCounterClaimFeeType = (
+  claimType?: string,
+  claimAmountInPence?: string
+): FeeType => {
   if (claimType === 'SOMETHING_ELSE') {
     return FeeType.counterClaimFlatFeeFEE0450;
   }

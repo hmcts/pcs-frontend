@@ -30,13 +30,19 @@ function buildReqWithData(data: Record<string, unknown>): Request {
 describe('rent arrears ground helpers', () => {
   describe('hasAnyRentArrearsGround', () => {
     it('returns true when at least one ground is rent arrears', () => {
-      const req = buildReq([{ value: { isRentArrears: 'No' } }, { value: { isRentArrears: 'Yes' } }]);
+      const req = buildReq([
+        { value: { isRentArrears: 'No' } },
+        { value: { isRentArrears: 'Yes' } },
+      ]);
 
       expect(hasAnyRentArrearsGround(req)).toBe(true);
     });
 
     it('returns false when no grounds are rent arrears', () => {
-      const req = buildReq([{ value: { isRentArrears: 'No' } }, { value: { isRentArrears: 'NO' } }]);
+      const req = buildReq([
+        { value: { isRentArrears: 'No' } },
+        { value: { isRentArrears: 'NO' } },
+      ]);
 
       expect(hasAnyRentArrearsGround(req)).toBe(false);
     });
@@ -61,13 +67,19 @@ describe('rent arrears ground helpers', () => {
 
   describe('hasOnlyRentArrearsGrounds', () => {
     it('returns true when all grounds are rent arrears', () => {
-      const req = buildReq([{ value: { isRentArrears: 'Yes' } }, { value: { isRentArrears: 'YES' } }]);
+      const req = buildReq([
+        { value: { isRentArrears: 'Yes' } },
+        { value: { isRentArrears: 'YES' } },
+      ]);
 
       expect(hasOnlyRentArrearsGrounds(req)).toBe(true);
     });
 
     it('returns false when there is a mix of rent and non-rent arrears grounds', () => {
-      const req = buildReq([{ value: { isRentArrears: 'Yes' } }, { value: { isRentArrears: 'No' } }]);
+      const req = buildReq([
+        { value: { isRentArrears: 'Yes' } },
+        { value: { isRentArrears: 'No' } },
+      ]);
 
       expect(hasOnlyRentArrearsGrounds(req)).toBe(false);
     });

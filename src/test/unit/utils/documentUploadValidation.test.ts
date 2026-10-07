@@ -249,13 +249,19 @@ describe('documentUploadValidation', () => {
     });
 
     it('returns blocked_media for audio/video', () => {
-      expect(validateUploadedFile(file({ originalname: 'song.mp3', mimetype: 'audio/mpeg' }))).toEqual({
+      expect(
+        validateUploadedFile(file({ originalname: 'song.mp3', mimetype: 'audio/mpeg' }))
+      ).toEqual({
         kind: 'blocked_media',
       });
     });
 
     it('returns invalid_type for unsupported types', () => {
-      expect(validateUploadedFile(file({ originalname: 'app.exe', mimetype: 'application/x-executable' }))).toEqual({
+      expect(
+        validateUploadedFile(
+          file({ originalname: 'app.exe', mimetype: 'application/x-executable' })
+        )
+      ).toEqual({
         kind: 'invalid_type',
       });
     });
@@ -263,7 +269,9 @@ describe('documentUploadValidation', () => {
     describe('filename length', () => {
       it('returns filename_too_long when over the limit', () => {
         const longName = 'a'.repeat(260) + '.pdf';
-        expect(validateUploadedFile(file({ originalname: longName }), { maxFilenameLength: 255 })).toEqual({
+        expect(
+          validateUploadedFile(file({ originalname: longName }), { maxFilenameLength: 255 })
+        ).toEqual({
           kind: 'filename_too_long',
           maxLength: 255,
         });
@@ -271,7 +279,9 @@ describe('documentUploadValidation', () => {
 
       it('passes at exactly the limit', () => {
         const name = 'a'.repeat(251) + '.pdf'; // 255 chars total
-        expect(validateUploadedFile(file({ originalname: name }), { maxFilenameLength: 255 })).toBeNull();
+        expect(
+          validateUploadedFile(file({ originalname: name }), { maxFilenameLength: 255 })
+        ).toBeNull();
       });
 
       it('skips the check when maxFilenameLength is omitted', () => {
@@ -292,7 +302,10 @@ describe('documentUploadValidation', () => {
 
       it('returns media_too_large for an oversized image', () => {
         expect(
-          validateUploadedFile(file({ originalname: 'photo.jpg', mimetype: 'image/jpeg', size: 501 * MB }), opts)
+          validateUploadedFile(
+            file({ originalname: 'photo.jpg', mimetype: 'image/jpeg', size: 501 * MB }),
+            opts
+          )
         ).toEqual({
           kind: 'media_too_large',
           maxBytes: 500 * MB,
@@ -305,21 +318,30 @@ describe('documentUploadValidation', () => {
 
       it('allows a 400MB image (under media cap)', () => {
         expect(
-          validateUploadedFile(file({ originalname: 'photo.jpg', mimetype: 'image/jpeg', size: 400 * MB }), opts)
+          validateUploadedFile(
+            file({ originalname: 'photo.jpg', mimetype: 'image/jpeg', size: 400 * MB }),
+            opts
+          )
         ).toBeNull();
       });
     });
 
     describe('size — generic per-file fallback', () => {
       it('returns file_too_large when over maxPerFileBytes', () => {
-        expect(validateUploadedFile(file({ size: 101 * MB }), { maxPerFileBytes: 100 * MB })).toEqual({
+        expect(
+          validateUploadedFile(file({ size: 101 * MB }), { maxPerFileBytes: 100 * MB })
+        ).toEqual({
           kind: 'file_too_large',
           maxBytes: 100 * MB,
         });
       });
 
       it('does not apply the generic fallback when doc/media caps are set', () => {
-        const opts = { maxDocumentBytes: 1024 * MB, maxMediaBytes: 500 * MB, maxPerFileBytes: 10 * MB };
+        const opts = {
+          maxDocumentBytes: 1024 * MB,
+          maxMediaBytes: 500 * MB,
+          maxPerFileBytes: 10 * MB,
+        };
         expect(validateUploadedFile(file({ size: 50 * MB }), opts)).toBeNull();
       });
 
@@ -339,7 +361,11 @@ describe('documentUploadValidation', () => {
       it('blocked_media beats filename and size', () => {
         expect(
           validateUploadedFile(
-            file({ originalname: 'this_filename_is_too_long.mp3', mimetype: 'audio/mpeg', size: 1024 * MB }),
+            file({
+              originalname: 'this_filename_is_too_long.mp3',
+              mimetype: 'audio/mpeg',
+              size: 1024 * MB,
+            }),
             opts
           )
         ).toEqual({ kind: 'blocked_media' });
@@ -359,9 +385,12 @@ describe('documentUploadValidation', () => {
       });
 
       it('filename_too_long beats size', () => {
-        expect(validateUploadedFile(file({ originalname: 'a_very_long_filename.pdf', size: 1024 * MB }), opts)).toEqual(
-          { kind: 'filename_too_long', maxLength: 10 }
-        );
+        expect(
+          validateUploadedFile(
+            file({ originalname: 'a_very_long_filename.pdf', size: 1024 * MB }),
+            opts
+          )
+        ).toEqual({ kind: 'filename_too_long', maxLength: 10 });
       });
     });
   });

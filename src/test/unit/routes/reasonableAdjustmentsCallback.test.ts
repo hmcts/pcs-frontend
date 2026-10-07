@@ -66,7 +66,8 @@ describe('reasonableAdjustmentsCallback routes', () => {
     }) as unknown as Request;
 
   // The route handler is the last argument registered (after oidc + feature-flag middleware).
-  const getHandler = () => mockAppGet.mock.calls[0].at(-1) as (req: Request, res: Response) => Promise<void>;
+  const getHandler = () =>
+    mockAppGet.mock.calls[0].at(-1) as (req: Request, res: Response) => Promise<void>;
 
   // The existing in-progress response the callback loads before writing flags. Includes
   // claimant-side fields to prove the callback narrows to the defendant slice and does not
@@ -86,7 +87,10 @@ describe('reasonableAdjustmentsCallback routes', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockGetValidS2SToken.mockResolvedValue('s2s-tok');
-    mockGetCaseByIdForEvent.mockResolvedValue({ id: '123', data: { possessionClaimResponse: existingResponse } });
+    mockGetCaseByIdForEvent.mockResolvedValue({
+      id: '123',
+      data: { possessionClaimResponse: existingResponse },
+    });
     mockAppGet = jest.fn();
     reasonableAdjustmentsCallbackRoutes({ get: mockAppGet } as unknown as Application);
   });
@@ -127,16 +131,25 @@ describe('reasonableAdjustmentsCallback routes', () => {
         },
       ],
     };
-    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', replacementFlags: flags });
+    mockGetPayload.mockResolvedValue({
+      action: 'submit',
+      correlationId: '123',
+      replacementFlags: flags,
+    });
     const res = {} as unknown as Response;
 
     await getHandler()(buildReq(), res);
 
     expect(mockGetPayload).toHaveBeenCalledWith('abc-1', 's2s-tok');
     // Loads the in-progress defendant response so the REPLACE-style draft-save doesn't wipe answers.
-    expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith('user-tok', '123', 'respondPossessionClaim', {
-      context: 'x',
-    });
+    expect(mockGetCaseByIdForEvent).toHaveBeenCalledWith(
+      'user-tok',
+      '123',
+      'respondPossessionClaim',
+      {
+        context: 'x',
+      }
+    );
     expect(mockUpdateDraft).toHaveBeenCalledWith(
       RESPOND_TO_CLAIM_DRAFT_EVENT,
       'user-tok',
@@ -240,7 +253,11 @@ describe('reasonableAdjustmentsCallback routes', () => {
   it('refuses to persist and redirects to the error page when the payload correlationId does not match the case', async () => {
     const flags = { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] };
     // correlationId belongs to a different case than the one in the callback URL (123).
-    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '999', replacementFlags: flags });
+    mockGetPayload.mockResolvedValue({
+      action: 'submit',
+      correlationId: '999',
+      replacementFlags: flags,
+    });
     const res = {} as unknown as Response;
 
     await getHandler()(buildReq(), res);
@@ -253,7 +270,11 @@ describe('reasonableAdjustmentsCallback routes', () => {
 
   it('redirects to the error page when loading the current response fails', async () => {
     const flags = { partyName: 'x', roleOnCase: 'y', details: [] };
-    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', replacementFlags: flags });
+    mockGetPayload.mockResolvedValue({
+      action: 'submit',
+      correlationId: '123',
+      replacementFlags: flags,
+    });
     mockGetCaseByIdForEvent.mockRejectedValue(new Error('case load down'));
     const res = {} as unknown as Response;
 
@@ -264,8 +285,16 @@ describe('reasonableAdjustmentsCallback routes', () => {
   });
 
   it('redirects to the error page when persisting the flags fails', async () => {
-    const flags = { partyName: 'x', roleOnCase: 'y', details: [{ id: 'd1', value: { flagCode: 'RA0001' } }] };
-    mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', replacementFlags: flags });
+    const flags = {
+      partyName: 'x',
+      roleOnCase: 'y',
+      details: [{ id: 'd1', value: { flagCode: 'RA0001' } }],
+    };
+    mockGetPayload.mockResolvedValue({
+      action: 'submit',
+      correlationId: '123',
+      replacementFlags: flags,
+    });
     mockUpdateDraft.mockRejectedValue(new Error('ccd down'));
     const res = {} as unknown as Response;
 

@@ -5,7 +5,10 @@ jest.mock('../../../../main/modules/steps/i18n', () => ({
 }));
 
 jest.mock('../../../../main/modules/steps/flow', () => ({
-  stepNavigation: { getBackUrl: jest.fn(async () => null), getNextStepUrl: jest.fn(async () => '/next') },
+  stepNavigation: {
+    getBackUrl: jest.fn(async () => null),
+    getNextStepUrl: jest.fn(async () => '/next'),
+  },
   createStepNavigation: jest.fn(() => ({
     getBackUrl: jest.fn(async () => null),
     getNextStepUrl: jest.fn(async () => '/next'),
@@ -47,12 +50,16 @@ const reqWith = (defendantResponses: Record<string, unknown>): Request =>
   ({
     res: {
       locals: {
-        validatedCase: new CcdCaseModel({ id: '1', data: { possessionClaimResponse: { defendantResponses } } }),
+        validatedCase: new CcdCaseModel({
+          id: '1',
+          data: { possessionClaimResponse: { defendantResponses } },
+        }),
       },
     },
   }) as unknown as Request;
 
-const statusFor = (dr: Record<string, unknown>) => getSectionStatus(section, flow, registry, reqWith(dr), new Map());
+const statusFor = (dr: Record<string, unknown>) =>
+  getSectionStatus(section, flow, registry, reqWith(dr), new Map());
 
 describe('startNowAndDetails status reacts to the solicitor answer', () => {
   it('is AVAILABLE when nothing is answered', async () => {
@@ -70,8 +77,12 @@ describe('startNowAndDetails status reacts to the solicitor answer', () => {
 
   it('is DONE once the section CYA is confirmed (completedSections)', async () => {
     const enumValue = sectionIdToBackendEnum('startNowAndDetails');
-    expect(await statusFor({ freeLegalAdvice: 'YES', hasSolicitor: 'YES', completedSections: [enumValue] })).toBe(
-      'DONE'
-    );
+    expect(
+      await statusFor({
+        freeLegalAdvice: 'YES',
+        hasSolicitor: 'YES',
+        completedSections: [enumValue],
+      })
+    ).toBe('DONE');
   });
 });

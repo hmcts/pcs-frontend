@@ -27,13 +27,15 @@ jest.mock('@utils/safeRedirect', () => ({
 
 const mockIsRespondToClaimEnabledForUser = jest.fn().mockResolvedValue(true);
 jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
-  isRespondToClaimEnabledForUser: (...args: unknown[]) => mockIsRespondToClaimEnabledForUser(...args),
+  isRespondToClaimEnabledForUser: (...args: unknown[]) =>
+    mockIsRespondToClaimEnabledForUser(...args),
 }));
 
 jest.mock('@modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => {
     const strings: Record<string, string> = {
-      'accessCode:errors.respondToClaimUnavailable': 'The option to respond to a claim is not available at the moment.',
+      'accessCode:errors.respondToClaimUnavailable':
+        'The option to respond to a claim is not available at the moment.',
     };
     return ((key: string) => strings[key] ?? key) as import('i18next').TFunction;
   }),
@@ -67,7 +69,9 @@ describe('citizenCaseLink routes', () => {
     it('should render the form', async () => {
       const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
-      const req = { i18n: { loadNamespaces: jest.fn().mockResolvedValue(undefined) } } as unknown as Request;
+      const req = {
+        i18n: { loadNamespaces: jest.fn().mockResolvedValue(undefined) },
+      } as unknown as Request;
       const res = { render: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -87,7 +91,9 @@ describe('citizenCaseLink routes', () => {
 
       const handler = mockGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
 
-      const req = { i18n: { loadNamespaces: jest.fn().mockResolvedValue(undefined) } } as unknown as Request;
+      const req = {
+        i18n: { loadNamespaces: jest.fn().mockResolvedValue(undefined) },
+      } as unknown as Request;
       const res = { render: jest.fn() } as unknown as Response;
 
       await handler(req, res);
@@ -161,7 +167,9 @@ describe('citizenCaseLink routes', () => {
 
       expect(res.render).toHaveBeenCalledWith(
         'accessCode',
-        expect.objectContaining({ errors: expect.objectContaining({ claimNumber: expect.any(Object) }) })
+        expect.objectContaining({
+          errors: expect.objectContaining({ claimNumber: expect.any(Object) }),
+        })
       );
     });
 
@@ -178,7 +186,9 @@ describe('citizenCaseLink routes', () => {
 
       expect(res.render).toHaveBeenCalledWith(
         'accessCode',
-        expect.objectContaining({ errors: expect.objectContaining({ accessCode: expect.any(Object) }) })
+        expect.objectContaining({
+          errors: expect.objectContaining({ accessCode: expect.any(Object) }),
+        })
       );
     });
 
@@ -196,7 +206,9 @@ describe('citizenCaseLink routes', () => {
       expect(res.render).toHaveBeenCalledWith(
         'accessCode',
         expect.objectContaining({
-          errors: expect.objectContaining({ accessCode: { text: 'Access code must be 12 characters' } }),
+          errors: expect.objectContaining({
+            accessCode: { text: 'Access code must be 12 characters' },
+          }),
         })
       );
     });
@@ -214,7 +226,12 @@ describe('citizenCaseLink routes', () => {
 
       await handler(req, res);
 
-      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, '/case/1234567890123456/dashboard', '/', ['/case']);
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(
+        res,
+        '/case/1234567890123456/dashboard',
+        '/',
+        ['/case']
+      );
     });
 
     it('should strip hyphens from claim number before validating', async () => {
@@ -230,7 +247,11 @@ describe('citizenCaseLink routes', () => {
 
       await handler(req, res);
 
-      expect(mockValidateAccessCode).toHaveBeenCalledWith('mock-token', '1234567890123456', 'ABCD12345678');
+      expect(mockValidateAccessCode).toHaveBeenCalledWith(
+        'mock-token',
+        '1234567890123456',
+        'ABCD12345678'
+      );
     });
 
     it('should show field error on validation failure', async () => {
@@ -248,7 +269,9 @@ describe('citizenCaseLink routes', () => {
 
       expect(res.render).toHaveBeenCalledWith(
         'accessCode',
-        expect.objectContaining({ errors: expect.objectContaining({ accessCode: expect.any(Object) }) })
+        expect.objectContaining({
+          errors: expect.objectContaining({ accessCode: expect.any(Object) }),
+        })
       );
     });
 
@@ -267,7 +290,9 @@ describe('citizenCaseLink routes', () => {
 
       expect(res.render).toHaveBeenCalledWith(
         'accessCode',
-        expect.objectContaining({ errors: expect.objectContaining({ claimNumber: expect.any(Object) }) })
+        expect.objectContaining({
+          errors: expect.objectContaining({ claimNumber: expect.any(Object) }),
+        })
       );
     });
   });

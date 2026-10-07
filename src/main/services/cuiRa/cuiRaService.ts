@@ -3,7 +3,11 @@ import config from 'config';
 
 import { HTTPError } from '../../HttpError';
 
-import type { CuiRaGetPayloadResponse, CuiRaInvocationRequest, CuiRaInvocationResponse } from './cuiRa.interface';
+import type {
+  CuiRaGetPayloadResponse,
+  CuiRaInvocationRequest,
+  CuiRaInvocationResponse,
+} from './cuiRa.interface';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
@@ -31,7 +35,10 @@ function toHttpError(error: unknown): HTTPError {
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
   logger.error(`cui-ra request failed: ${axiosError.message}`);
-  return new HTTPError(`cui-ra service error: ${axiosError.message || 'Unknown error'}`, status || 500);
+  return new HTTPError(
+    `cui-ra service error: ${axiosError.message || 'Unknown error'}`,
+    status || 500
+  );
 }
 
 export interface InvokePayloadInput {

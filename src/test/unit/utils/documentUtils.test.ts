@@ -1,5 +1,9 @@
 import { formatCaseReferenceForDisplay } from '@utils/caseReference';
-import { extractCaseDocuments, extractViewDocumentFolders, findCaseDocumentById } from '@utils/documentUtils';
+import {
+  extractCaseDocuments,
+  extractViewDocumentFolders,
+  findCaseDocumentById,
+} from '@utils/documentUtils';
 
 describe('documentUtils', () => {
   it('extracts documents only from supported categories', () => {
@@ -691,7 +695,9 @@ describe('documentUtils', () => {
 
     expect(
       extractViewDocumentFolders({
-        allDocuments: [{ id: '1', value: { category_id: 'statementsOfCase', document_filename: '' } }],
+        allDocuments: [
+          { id: '1', value: { category_id: 'statementsOfCase', document_filename: '' } },
+        ],
       })
     ).toEqual([]);
     expect(documents.find(d => d.id === 'single-id')).toBeDefined();

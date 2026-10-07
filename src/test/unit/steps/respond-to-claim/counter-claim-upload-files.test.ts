@@ -58,7 +58,11 @@ describe('counter-claim-upload-files', () => {
     it('returns no error when saveForLater has uploadedDocuments[]', () => {
       const error = documentsField?.validate?.(undefined, {
         action: 'saveForLater',
-        'uploadedDocuments[]': JSON.stringify({ index: 0, id: 'doc-1', document_filename: 'evidence.pdf' }),
+        'uploadedDocuments[]': JSON.stringify({
+          index: 0,
+          id: 'doc-1',
+          document_filename: 'evidence.pdf',
+        }),
       });
 
       expect(error).toBeUndefined();

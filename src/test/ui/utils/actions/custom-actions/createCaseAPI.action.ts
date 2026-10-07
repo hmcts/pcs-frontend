@@ -3,13 +3,7 @@ import { Page } from '@playwright/test';
 import Axios from 'axios';
 
 import { VERY_SHORT_TIMEOUT, actionRetries } from '../../../../../../playwright.config';
-import {
-  caseUserRoleDeletionApiData,
-  createCaseApiData,
-  createCaseEventTokenApiData,
-  submitCaseApiData,
-  submitCaseEventTokenApiData,
-} from '../../../data/api-data';
+import { caseUserRoleDeletionApiData, createCaseApiData, createCaseEventTokenApiData, submitCaseApiData, submitCaseEventTokenApiData } from '../../../data/api-data';
 import { getCaseApiData } from '../../../data/api-data/getCase.api.data';
 import { paymentApiData } from '../../../data/api-data/payment.api.data';
 import { user } from '../../../data/user-data';
@@ -154,9 +148,7 @@ export class CreateCaseAPIAction implements IAction {
             console.error('Timestamp:', responseBody?.timestamp);
             console.error('Full response body:', JSON.stringify(responseBody, null, 2));
 
-            throw new Error(
-              `Submit case API failed with status ${status}: ${JSON.stringify(responseBody ?? error.message)}`
-            );
+            throw new Error(`Submit case API failed with status ${status}: ${JSON.stringify(responseBody ?? error.message)}`);
           }
           throw new Error('Submit case failed unexpectedly.');
         }
@@ -178,10 +170,7 @@ export class CreateCaseAPIAction implements IAction {
           throw new Error('No payment information found.');
         }
         const requestReference = paymentInfo[0].serviceRequestReference;
-        const updateResponse = await paymentApi.put(
-          paymentApiData.updatePaymentApiEndPoint,
-          paymentApiData.paymentUpdatePayload(requestReference)
-        );
+        const updateResponse = await paymentApi.put(paymentApiData.updatePaymentApiEndPoint, paymentApiData.paymentUpdatePayload(requestReference));
         if (updateResponse.status === 200 || updateResponse.status === 204) {
           return;
         }

@@ -32,7 +32,9 @@ describe('getStepBeforeDisputePages', () => {
     it('returns confirmation-of-notice-given when user said imNotSure and notice served', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
-      mockReq.res.locals.validatedCase = { defendantResponsesPossessionNoticeReceived: 'imNotSure' };
+      mockReq.res.locals.validatedCase = {
+        defendantResponsesPossessionNoticeReceived: 'imNotSure',
+      };
 
       expect(await getStepBeforeDisputePages(mockReq)).toBe('confirmation-of-notice-given');
     });
@@ -51,7 +53,9 @@ describe('getStepBeforeDisputePages', () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
 
-      expect(await getStepBeforeDisputePages(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+      expect(await getStepBeforeDisputePages(mockReq)).toBe(
+        'confirmation-of-notice-date-when-provided'
+      );
     });
   });
 
@@ -60,7 +64,9 @@ describe('getStepBeforeDisputePages', () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
 
-      expect(await getStepBeforeDisputePages(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
+      expect(await getStepBeforeDisputePages(mockReq)).toBe(
+        'confirmation-of-notice-date-when-not-provided'
+      );
     });
   });
 
@@ -114,7 +120,9 @@ describe('getStepBeforeDisputePages', () => {
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
       mockReq.res.locals = {};
 
-      expect(await getStepBeforeDisputePages(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+      expect(await getStepBeforeDisputePages(mockReq)).toBe(
+        'confirmation-of-notice-date-when-provided'
+      );
     });
 
     it('returns correct page when res is undefined', async () => {
@@ -123,7 +131,9 @@ describe('getStepBeforeDisputePages', () => {
       mockReq = {};
       (isTenancyStartDateKnown as jest.Mock).mockResolvedValue(true);
 
-      expect(await getStepBeforeDisputePages(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+      expect(await getStepBeforeDisputePages(mockReq)).toBe(
+        'confirmation-of-notice-date-when-provided'
+      );
     });
 
     it('returns tenancy-date-unknown when session is undefined and notice not served and start date unknown', async () => {
@@ -141,14 +151,18 @@ describe('getStepBeforeDisputePages', () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(true);
 
-      expect(await getStepBeforeDisputePages(mockReq)).toBe('confirmation-of-notice-date-when-provided');
+      expect(await getStepBeforeDisputePages(mockReq)).toBe(
+        'confirmation-of-notice-date-when-provided'
+      );
     });
 
     it('handles non-rent arrears scenario without notice date', async () => {
       (isNoticeServed as jest.Mock).mockResolvedValue(true);
       (isNoticeDateProvided as jest.Mock).mockResolvedValue(false);
 
-      expect(await getStepBeforeDisputePages(mockReq)).toBe('confirmation-of-notice-date-when-not-provided');
+      expect(await getStepBeforeDisputePages(mockReq)).toBe(
+        'confirmation-of-notice-date-when-not-provided'
+      );
     });
 
     it('handles user rejection scenario (CCD-backed)', async () => {

@@ -1,4 +1,5 @@
-export type ErrorPageKey = 'pageNotFound' | 'serviceUnavailable' | 'technicalError' | 'accessDenied';
+export type ErrorPageKey =
+  'pageNotFound' | 'serviceUnavailable' | 'technicalError' | 'accessDenied';
 
 const PAGE_NOT_FOUND_STATUSES = [404, 410];
 const SERVICE_UNAVAILABLE_STATUSES = [502, 503, 504, 429];

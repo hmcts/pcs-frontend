@@ -24,7 +24,11 @@ const verifyAsPcqWould = (
   key: string
 ): Record<string, string> => {
   const derivedKey = crypto.scryptSync(key, Buffer.from(received.salt, 'base64'), 32);
-  const decipher = crypto.createDecipheriv('aes-256-gcm', derivedKey, Buffer.from(received.iv, 'base64'));
+  const decipher = crypto.createDecipheriv(
+    'aes-256-gcm',
+    derivedKey,
+    Buffer.from(received.iv, 'base64')
+  );
   decipher.setAuthTag(Buffer.from(received.authTag, 'base64'));
 
   let decrypted = decipher.update(received.token, 'base64', 'utf8');
@@ -88,6 +92,8 @@ describe('createSecureToken', () => {
     const raw = Buffer.from(secureToken.token, 'base64');
     raw[0] ^= 0xff;
 
-    expect(() => verifyAsPcqWould({ ...secureToken, token: raw.toString('base64') }, tokenKey)).toThrow();
+    expect(() =>
+      verifyAsPcqWould({ ...secureToken, token: raw.toString('base64') }, tokenKey)
+    ).toThrow();
   });
 });

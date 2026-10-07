@@ -7,7 +7,11 @@ import { Logger } from '../modules/logger';
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getDocumentBinary } from '@services/cdamService';
-import { extractCaseDocuments, extractViewDocumentFolders, findCaseDocumentById } from '@utils/documentUtils';
+import {
+  extractCaseDocuments,
+  extractViewDocumentFolders,
+  findCaseDocumentById,
+} from '@utils/documentUtils';
 import { asHeaderString } from '@utils/httpHeaders';
 import { isUncategorisedDocumentsEnabled } from '@utils/isUncategorisedDocumentsEnabled';
 import { sanitiseUUID } from '@utils/uuid';
@@ -20,7 +24,10 @@ function toFilename(value: string): string {
 }
 
 function encodeRFC5987ValueChars(value: string): string {
-  return encodeURIComponent(value).replace(/['()*]/g, ch => `%${ch.charCodeAt(0).toString(16).toUpperCase()}`);
+  return encodeURIComponent(value).replace(
+    /['()*]/g,
+    ch => `%${ch.charCodeAt(0).toString(16).toUpperCase()}`
+  );
 }
 
 function buildInlineContentDisposition(filename: string): string {
@@ -51,18 +58,23 @@ export default function viewDocumentsRoutes(app: Application): void {
           dashboardUrl: getDashboardUrl(caseReference),
           backUrl: getDashboardUrl(caseReference),
           caseReference,
-          documentFolders: extractViewDocumentFolders((ccdCase.data ?? {}) as Record<string, unknown>, {
-            includeUncategorised: uncategorisedEnabled,
-            folderTitles: {
-              statementsOfCase: req.t('dashboard:viewDocuments.folders.statementsOfCase'),
-              propertyDocuments: req.t('dashboard:viewDocuments.folders.propertyDocuments'),
-              evidence: req.t('dashboard:viewDocuments.folders.evidence'),
-              correspondence: req.t('dashboard:viewDocuments.folders.correspondence'),
-              ...(uncategorisedEnabled && {
-                uncategorisedDocuments: req.t('dashboard:viewDocuments.folders.uncategorisedDocuments'),
-              }),
-            },
-          }),
+          documentFolders: extractViewDocumentFolders(
+            (ccdCase.data ?? {}) as Record<string, unknown>,
+            {
+              includeUncategorised: uncategorisedEnabled,
+              folderTitles: {
+                statementsOfCase: req.t('dashboard:viewDocuments.folders.statementsOfCase'),
+                propertyDocuments: req.t('dashboard:viewDocuments.folders.propertyDocuments'),
+                evidence: req.t('dashboard:viewDocuments.folders.evidence'),
+                correspondence: req.t('dashboard:viewDocuments.folders.correspondence'),
+                ...(uncategorisedEnabled && {
+                  uncategorisedDocuments: req.t(
+                    'dashboard:viewDocuments.folders.uncategorisedDocuments'
+                  ),
+                }),
+              },
+            }
+          ),
         });
       } catch (error) {
         next(error);
@@ -83,7 +95,9 @@ export default function viewDocumentsRoutes(app: Application): void {
         return next(new HTTPError('Authentication required', 401));
       }
       if (!documentId) {
-        logger.warn('[viewDocuments] Invalid document ID param', { rawDocumentId: req.params.documentId });
+        logger.warn('[viewDocuments] Invalid document ID param', {
+          rawDocumentId: req.params.documentId,
+        });
         return next(new HTTPError('Document not found', 404));
       }
 
@@ -102,7 +116,10 @@ export default function viewDocumentsRoutes(app: Application): void {
           extractedSourceFields: extractedDocs.map(doc => doc.sourceField),
         });
 
-        const document = findCaseDocumentById((ccdCase.data ?? {}) as Record<string, unknown>, documentId);
+        const document = findCaseDocumentById(
+          (ccdCase.data ?? {}) as Record<string, unknown>,
+          documentId
+        );
         const filename = document?.filename || 'document';
         const binaryUrl = document?.binaryUrl?.trim();
 
@@ -113,7 +130,10 @@ export default function viewDocumentsRoutes(app: Application): void {
         });
 
         if (!binaryUrl) {
-          logger.warn('[viewDocuments] Document not found or missing binaryUrl', { caseReference, documentId });
+          logger.warn('[viewDocuments] Document not found or missing binaryUrl', {
+            caseReference,
+            documentId,
+          });
           return next(new HTTPError('Document not found', 404));
         }
 
@@ -127,7 +147,10 @@ export default function viewDocumentsRoutes(app: Application): void {
         if (contentLength) {
           res.setHeader('Content-Length', contentLength);
         }
-        res.setHeader('Content-Disposition', contentDisposition || buildInlineContentDisposition(filename));
+        res.setHeader(
+          'Content-Disposition',
+          contentDisposition || buildInlineContentDisposition(filename)
+        );
 
         stream.on('error', () => {
           if (!res.headersSent) {

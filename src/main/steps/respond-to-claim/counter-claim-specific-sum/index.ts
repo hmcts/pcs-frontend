@@ -1,6 +1,9 @@
 import type { Request } from 'express';
 
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -52,7 +55,8 @@ const validateEstimatedMaxClaimAmount = createAmountValidator(
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-specific-sum',
-  isAnswered: req => Boolean(req.res?.locals.validatedCase?.defendantResponses?.counterClaim?.isClaimAmountKnown),
+  isAnswered: req =>
+    Boolean(req.res?.locals.validatedCase?.defendantResponses?.counterClaim?.isClaimAmountKnown),
   stepDir: __dirname,
   customTemplate: `${__dirname}/counterClaimSpecificSum.njk`,
   translationKeys: {
@@ -114,7 +118,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     },
   ],
   getInitialFormData: (req: Request) => {
-    const counterClaim = req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.counterClaim;
+    const counterClaim =
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+        ?.counterClaim;
 
     if (!counterClaim?.isClaimAmountKnown) {
       return {};
@@ -130,7 +136,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     } else if (counterClaim.isClaimAmountKnown === 'NO') {
       formData.isClaimAmountKnown = 'no';
       if (counterClaim.estimatedMaxClaimAmount) {
-        formData['isClaimAmountKnown.estimatedMaxClaimAmount'] = penceToPounds(counterClaim.estimatedMaxClaimAmount);
+        formData['isClaimAmountKnown.estimatedMaxClaimAmount'] = penceToPounds(
+          counterClaim.estimatedMaxClaimAmount
+        );
       }
     }
 
@@ -153,7 +161,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       delete response.defendantResponses.counterClaim.estimatedMaxClaimAmount;
     } else if (isClaimAmountKnown === 'no') {
       response.defendantResponses.counterClaim.isClaimAmountKnown = 'NO';
-      const amountRaw = req.body?.['isClaimAmountKnown.estimatedMaxClaimAmount'] as string | undefined;
+      const amountRaw = req.body?.['isClaimAmountKnown.estimatedMaxClaimAmount'] as
+        string | undefined;
       const amountInPence = amountRaw ? poundsToPence(amountRaw) : undefined;
       if (amountInPence !== undefined) {
         response.defendantResponses.counterClaim.estimatedMaxClaimAmount = amountInPence;

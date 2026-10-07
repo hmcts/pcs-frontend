@@ -5,8 +5,7 @@ export const noticeDateWhenProvided = {
   mainHeader: `Notice date`,
   backLink: `Back`,
   noticeGivenDateLabel: `They served the defendant with a notice seeking possession on ${convertDateFormat(submitCaseApiData.submitCaseRentNonRentCorrespondenceAddressUnknown.notice_PostedDate)}`,
-  whenMakingClaimHintText: () =>
-    `When making the claim, ${process.env.CLAIMANT_NAME} had to say the date they gave the defendant notice (the date of service).`,
+  whenMakingClaimHintText: () => `When making the claim, ${process.env.CLAIMANT_NAME} had to say the date they gave the defendant notice (the date of service).`,
   noticeDetailsGivenLabel: () => `Notice details given by ${process.env.CLAIMANT_NAME}:`,
   getWhenDidYouReceiveNoticeQuestion: `When did the defendant receive notice from ${process.env.CLAIMANT_NAME} (optional)?`,
   exampleHintText: `For example, 27 9 2022`,

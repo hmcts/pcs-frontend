@@ -22,7 +22,10 @@ export interface ErrorSummaryData {
 export type FormError = string | DateFieldError;
 
 /** Config type for an error key: top-level name or parent.child under a radio/checkbox option */
-export function fieldTypeForErrorKey(fields: FormFieldConfig[], key: string): FormFieldType | undefined {
+export function fieldTypeForErrorKey(
+  fields: FormFieldConfig[],
+  key: string
+): FormFieldType | undefined {
   const topLevel = fields.find(f => f.name === key);
   if (topLevel) {
     return topLevel.type;
@@ -107,7 +110,10 @@ export function buildErrorSummary(
 
   const titleTranslation = t('errors.title');
   // Check if translation exists (not just the key itself)
-  const titleText = titleTranslation && titleTranslation !== 'errors.title' ? titleTranslation : 'There is a problem';
+  const titleText =
+    titleTranslation && titleTranslation !== 'errors.title'
+      ? titleTranslation
+      : 'There is a problem';
 
   return {
     titleText,

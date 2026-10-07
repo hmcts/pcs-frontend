@@ -36,7 +36,10 @@ describe('decentralisedEvent route', () => {
     decentralisedEventRoutes(app);
 
     expect(app.use).toHaveBeenCalledWith('/cases', expect.anything());
-    expect(mockRouterGet).toHaveBeenCalledWith('/:caseReference/event/:eventId', expect.any(Function));
+    expect(mockRouterGet).toHaveBeenCalledWith(
+      '/:caseReference/event/:eventId',
+      expect.any(Function)
+    );
   });
 
   it('should apply oidcMiddleware to the router', () => {
@@ -67,7 +70,10 @@ describe('decentralisedEvent route', () => {
 
       handler(req, res);
 
-      expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/start-now');
+      expect(res.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1234567890123456/respond-to-claim/start-now'
+      );
     });
 
     it('forces re-authentication (redirects to /login) on expected_sub mismatch', () => {
@@ -78,7 +84,8 @@ describe('decentralisedEvent route', () => {
         params: { caseReference: '1234567890123456', eventId: 'ext:respondPossessionClaim' },
         query: { expected_sub: 'expected-user-sub' },
         session: { user: { sub: 'different-user-sub' } },
-        originalUrl: '/cases/1234567890123456/event/ext:respondPossessionClaim?expected_sub=expected-user-sub',
+        originalUrl:
+          '/cases/1234567890123456/event/ext:respondPossessionClaim?expected_sub=expected-user-sub',
       } as unknown as Request;
 
       const res = {
@@ -107,7 +114,8 @@ describe('decentralisedEvent route', () => {
         params: { caseReference: '1234567890123456', eventId: 'ext:respondPossessionClaim' },
         query: { expected_sub: 'expected-user-sub' },
         session,
-        originalUrl: '/cases/1234567890123456/event/ext:respondPossessionClaim?expected_sub=expected-user-sub',
+        originalUrl:
+          '/cases/1234567890123456/event/ext:respondPossessionClaim?expected_sub=expected-user-sub',
       } as unknown as Request;
 
       const res = {

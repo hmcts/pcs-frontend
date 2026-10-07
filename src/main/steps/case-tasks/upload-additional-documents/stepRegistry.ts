@@ -8,7 +8,8 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const stepRegistry: Record<string, StepDefinition> = {
   'start-evidence-upload': startEvidenceUpload,
-  'confirm-if-these-documents-relate-to-an-application': confirmIfTheseDocumentsRelateToAnApplication,
+  'confirm-if-these-documents-relate-to-an-application':
+    confirmIfTheseDocumentsRelateToAnApplication,
   'upload-your-documents': uploadYourDocuments,
   'check-your-answers': checkYourAnswers,
   'documents-uploaded': documentsUploaded,

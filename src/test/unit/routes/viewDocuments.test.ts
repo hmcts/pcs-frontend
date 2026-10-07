@@ -228,7 +228,10 @@ describe('viewDocuments route', () => {
         jest.fn()
       );
 
-      expect(res.render).toHaveBeenCalledWith('view-documents', expect.objectContaining({ documentFolders: [] }));
+      expect(res.render).toHaveBeenCalledWith(
+        'view-documents',
+        expect.objectContaining({ documentFolders: [] })
+      );
     });
 
     it('returns 401 when access token is missing', async () => {
@@ -245,7 +248,9 @@ describe('viewDocuments route', () => {
       );
 
       expect(mockGetCaseById).not.toHaveBeenCalled();
-      expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Authentication required', status: 401 }));
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Authentication required', status: 401 })
+      );
     });
 
     it('forwards errors from getCaseById to the next middleware (e.g. 404)', async () => {
@@ -314,7 +319,10 @@ describe('viewDocuments route', () => {
       );
 
       expect(mockGetCaseById).toHaveBeenCalledWith('token', '1777570813792018');
-      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/abc-123/binary', 'token');
+      expect(getDocumentBinary).toHaveBeenCalledWith(
+        'http://dm-store/documents/abc-123/binary',
+        'token'
+      );
       expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf');
       expect(res.setHeader).toHaveBeenCalledWith('Content-Length', '1234');
       expect(res.setHeader).toHaveBeenCalledWith(
@@ -367,7 +375,10 @@ describe('viewDocuments route', () => {
         next
       );
 
-      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/tenancy-1/binary', 'token');
+      expect(getDocumentBinary).toHaveBeenCalledWith(
+        'http://dm-store/documents/tenancy-1/binary',
+        'token'
+      );
       expect(pipeSpy).toHaveBeenCalledWith(res);
       expect(next).not.toHaveBeenCalled();
     });
@@ -390,7 +401,9 @@ describe('viewDocuments route', () => {
 
       expect(mockGetCaseById).not.toHaveBeenCalled();
       expect(getDocumentBinary).not.toHaveBeenCalled();
-      expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Authentication required', status: 401 }));
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Authentication required', status: 401 })
+      );
     });
 
     it('returns 404 when documentId is not a valid UUID', async () => {
@@ -411,7 +424,9 @@ describe('viewDocuments route', () => {
 
       expect(mockGetCaseById).not.toHaveBeenCalled();
       expect(getDocumentBinary).not.toHaveBeenCalled();
-      expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Document not found', status: 404 }));
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Document not found', status: 404 })
+      );
     });
 
     it('returns 404 when document binary URL is missing', async () => {
@@ -443,7 +458,9 @@ describe('viewDocuments route', () => {
       );
 
       expect(getDocumentBinary).not.toHaveBeenCalled();
-      expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Document not found', status: 404 }));
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Document not found', status: 404 })
+      );
     });
 
     it('forwards errors from getCaseById to next', async () => {
@@ -496,7 +513,9 @@ describe('viewDocuments route', () => {
       );
 
       stream.emit('error', new Error('stream failed'));
-      expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Failed to stream document', status: 502 }));
+      expect(next).toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Failed to stream document', status: 502 })
+      );
     });
 
     it('streams document binary from detailsTab_NoticeDetails.noticeDocuments when not in allDocuments', async () => {
@@ -543,7 +562,10 @@ describe('viewDocuments route', () => {
         next
       );
 
-      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/notice-52/binary', 'token');
+      expect(getDocumentBinary).toHaveBeenCalledWith(
+        'http://dm-store/documents/notice-52/binary',
+        'token'
+      );
       expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/rtf');
       expect(pipeSpy).toHaveBeenCalledWith(res);
       expect(next).not.toHaveBeenCalled();
@@ -591,7 +613,10 @@ describe('viewDocuments route', () => {
         next
       );
 
-      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/notice-ccd/binary', 'token');
+      expect(getDocumentBinary).toHaveBeenCalledWith(
+        'http://dm-store/documents/notice-ccd/binary',
+        'token'
+      );
       expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf');
       expect(pipeSpy).toHaveBeenCalledWith(res);
       expect(next).not.toHaveBeenCalled();

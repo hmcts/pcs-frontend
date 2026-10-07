@@ -28,7 +28,9 @@ export function toYesNoEnum(value: 'yes' | 'no' | undefined): YesNoValue | undef
  * @param value - CCD enum value
  * @returns Frontend radio button value ('yes' or 'no'), or undefined if value is null/invalid
  */
-export function fromYesNoEnum(value: YesNoValue | string | null | undefined): 'yes' | 'no' | undefined {
+export function fromYesNoEnum(
+  value: YesNoValue | string | null | undefined
+): 'yes' | 'no' | undefined {
   if (!value) {
     return undefined;
   }

@@ -3,7 +3,10 @@ import type { Application, Request, Response } from 'express';
 import { oidcMiddleware } from '../middleware/oidc';
 
 import { Logger } from '@modules/logger';
-import { clearPaymentReferenceOnly, retainPaymentReferenceOnly } from '@services/paymentSessionService';
+import {
+  clearPaymentReferenceOnly,
+  retainPaymentReferenceOnly,
+} from '@services/paymentSessionService';
 import { getPaymentOutcome, paymentService } from '@services/pcsApi/paymentService';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -13,7 +16,10 @@ function getDefaultReturnPath(caseReference?: string): string {
   return caseReference ? `/case/${caseReference}` : '/';
 }
 
-async function handlePaymentReturnConfirmation(req: Request, res: Response): Promise<void | Response> {
+async function handlePaymentReturnConfirmation(
+  req: Request,
+  res: Response
+): Promise<void | Response> {
   const paymentSession = req.session.payment;
   const accessToken = req.session.user?.accessToken;
 
@@ -32,7 +38,10 @@ async function handlePaymentReturnConfirmation(req: Request, res: Response): Pro
   const defaultReturnPath = getDefaultReturnPath(paymentSession.caseReference);
 
   try {
-    const statusResponse = await paymentService.getCardPaymentStatus(accessToken, internalPaymentReference);
+    const statusResponse = await paymentService.getCardPaymentStatus(
+      accessToken,
+      internalPaymentReference
+    );
     const outcome = getPaymentOutcome(statusResponse.status);
 
     const successRedirectUrl = paymentSession.successRedirectUrl || defaultReturnPath;
@@ -51,7 +60,11 @@ async function handlePaymentReturnConfirmation(req: Request, res: Response): Pro
       await retainPaymentReferenceOnly(req);
     }
 
-    return safeRedirect303(res, redirectTarget, defaultReturnPath, ['/case', '/dashboard', '/payment']);
+    return safeRedirect303(res, redirectTarget, defaultReturnPath, [
+      '/case',
+      '/dashboard',
+      '/payment',
+    ]);
   } catch (error) {
     logger.error('Failed to retrieve card payment status on return callback', error);
     return safeRedirect303(res, paymentSession.failureRedirectUrl, defaultReturnPath, [

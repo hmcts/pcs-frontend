@@ -1,7 +1,10 @@
 import type { Request } from 'express';
 
 import { getTranslationFunction } from '../../../modules/steps';
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { buildCcdAddressFromFormParts, formatCcdAddress } from '../../utils/ccdAddress';
 import { getClaimantName } from '../../utils/getClaimantName';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -33,7 +36,14 @@ export function buildAddressFieldValues(
   req: Pick<Request, 'method'>,
   formContent: Record<string, unknown>,
   savedAddress:
-    { AddressLine1?: string; AddressLine2?: string; PostTown?: string; County?: string; PostCode?: string } | undefined
+    | {
+        AddressLine1?: string;
+        AddressLine2?: string;
+        PostTown?: string;
+        County?: string;
+        PostCode?: string;
+      }
+    | undefined
 ): {
   correspondenceAddressLine1: string;
   correspondenceAddressLine2: string;
@@ -206,7 +216,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     if (wasPropertyFallback) {
       const draftAnswer = possessionClaimResponse?.defendantResponses?.propertyAddressConfirmation;
-      const radioValueToSelect = draftAnswer === 'YES' ? 'yes' : draftAnswer === 'NO' ? 'no' : undefined;
+      const radioValueToSelect =
+        draftAnswer === 'YES' ? 'yes' : draftAnswer === 'NO' ? 'no' : undefined;
       if (radioValueToSelect) {
         result['correspondenceAddressConfirm'] = radioValueToSelect;
         if (radioValueToSelect === 'no') {
@@ -218,8 +229,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         }
       }
     } else {
-      const draftAnswer = possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
-      const radioValueToSelect = draftAnswer === 'YES' ? 'yes' : draftAnswer === 'NO' ? 'no' : undefined;
+      const draftAnswer =
+        possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
+      const radioValueToSelect =
+        draftAnswer === 'YES' ? 'yes' : draftAnswer === 'NO' ? 'no' : undefined;
       if (radioValueToSelect) {
         result['correspondenceAddressConfirm'] = radioValueToSelect;
         if (radioValueToSelect === 'no') {
@@ -245,7 +258,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const addressKnown = req.res?.locals.validatedCase?.claimantEnteredDefendantDetailsAddressKnown;
     const wasPropertyFallback = addressKnown !== 'YES';
 
-    const radio = formContent.fields.find(f => f.componentType === 'radios') as RadioFormField | undefined;
+    const radio = formContent.fields.find(f => f.componentType === 'radios') as
+      RadioFormField | undefined;
     if (!radio || !radio.component) {
       return {};
     }
@@ -313,7 +327,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
 function getExistingAddress(req: Request): { formattedAddress: string } {
   const caseData = req.res?.locals.validatedCase?.data;
-  const originalAddress = caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails?.address;
+  const originalAddress =
+    caseData?.possessionClaimResponse?.claimantEnteredDefendantDetails?.address;
 
   if (originalAddress && 'AddressLine1' in originalAddress && originalAddress.AddressLine1) {
     // Drop Country for this caller — the legend is a UK-only correspondence address.

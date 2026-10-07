@@ -2,84 +2,56 @@ import { contactPreferenceEmailOrPost, feedback } from '../data/page-data';
 import { performAction, performValidation } from '../utils/controller';
 
 export async function contactPreferenceEmailOrPostErrorValidation(): Promise<void> {
-  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performAction('When the user clicks the button', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
     message: contactPreferenceEmailOrPost.selectHowYouWantToReceiveUpdatesErrorMessage,
   });
 
   await performAction('check', contactPreferenceEmailOrPost.byEmailCheckbox);
-  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performAction('When the user clicks the button', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
     message: contactPreferenceEmailOrPost.enterEmailAddressErrorMessage,
   });
-  await performAction(
-    'inputText',
-    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-    contactPreferenceEmailOrPost.emailAddressWithMoreThan254CharTextInput
-  );
-  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performAction('inputText', contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel, contactPreferenceEmailOrPost.emailAddressWithMoreThan254CharTextInput);
+  await performAction('When the user clicks the button', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
     message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
   });
-  await performAction(
-    'inputText',
-    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-    contactPreferenceEmailOrPost.emailAddressWithMultipleSpecialCharTextInput
-  );
-  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performAction('inputText', contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel, contactPreferenceEmailOrPost.emailAddressWithMultipleSpecialCharTextInput);
+  await performAction('When the user clicks the button', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
     message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
   });
-  await performAction(
-    'inputText',
-    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-    contactPreferenceEmailOrPost.emailAddressWithSpaceTextInput
-  );
-  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performAction('inputText', contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel, contactPreferenceEmailOrPost.emailAddressWithSpaceTextInput);
+  await performAction('When the user clicks the button', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
     message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
   });
-  await performAction(
-    'inputText',
-    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-    contactPreferenceEmailOrPost.emailAddressWithSpecialCharInDomainTextInput
-  );
-  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performAction('inputText', contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel, contactPreferenceEmailOrPost.emailAddressWithSpecialCharInDomainTextInput);
+  await performAction('When the user clicks the button', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
     message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
   });
-  await performAction(
-    'inputText',
-    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-    contactPreferenceEmailOrPost.emailAddressWithSpecialCharInDomainTextInput
-  );
-  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performAction('inputText', contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel, contactPreferenceEmailOrPost.emailAddressWithSpecialCharInDomainTextInput);
+  await performAction('When the user clicks the button', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
     message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
   });
-  await performAction(
-    'inputText',
-    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-    contactPreferenceEmailOrPost.plainAddressTextInput
-  );
-  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performAction('inputText', contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel, contactPreferenceEmailOrPost.plainAddressTextInput);
+  await performAction('When the user clicks the button', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
     message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,
   });
-  await performAction(
-    'inputText',
-    contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel,
-    contactPreferenceEmailOrPost.missingDomainExtensionTextInput
-  );
-  await performAction('clickButton', contactPreferenceEmailOrPost.saveAndContinueButton);
+  await performAction('inputText', contactPreferenceEmailOrPost.enterEmailAddressHiddenTextLabel, contactPreferenceEmailOrPost.missingDomainExtensionTextInput);
+  await performAction('When the user clicks the button', contactPreferenceEmailOrPost.saveAndContinueButton);
   await performValidation('errorMessage', {
     header: contactPreferenceEmailOrPost.thereIsAProblemErrorMessageHeader,
     message: contactPreferenceEmailOrPost.invalidEmailAddressErrorMessage,

@@ -58,14 +58,22 @@ describe('cuiRaService.invokePayload', () => {
     mockHttp.post.mockRejectedValue({ message: 'boom', response: { status: 502 } });
 
     await expect(
-      cuiRaService.invokePayload({ accessToken: 'idam-tok', serviceToken: 's2s-tok', body: sampleBody })
+      cuiRaService.invokePayload({
+        accessToken: 'idam-tok',
+        serviceToken: 's2s-tok',
+        body: sampleBody,
+      })
     ).rejects.toMatchObject({ status: 502 });
   });
 
   it('defaults to a 500 HTTPError when there is no upstream status', async () => {
     mockHttp.post.mockRejectedValue({ message: 'network down' });
 
-    const promise = cuiRaService.invokePayload({ accessToken: 'x', serviceToken: 'y', body: sampleBody });
+    const promise = cuiRaService.invokePayload({
+      accessToken: 'x',
+      serviceToken: 'y',
+      body: sampleBody,
+    });
 
     await expect(promise).rejects.toBeInstanceOf(HTTPError);
     await expect(promise).rejects.toMatchObject({ status: 500 });
@@ -99,12 +107,17 @@ describe('cuiRaService.getPayload', () => {
 
     await cuiRaService.getPayload('a/b c', 's2s-tok');
 
-    expect(mockHttp.get).toHaveBeenCalledWith(`${cuiRaBase}/api/payload/a%2Fb%20c`, expect.anything());
+    expect(mockHttp.get).toHaveBeenCalledWith(
+      `${cuiRaBase}/api/payload/a%2Fb%20c`,
+      expect.anything()
+    );
   });
 
   it('wraps a failure as an HTTPError', async () => {
     mockHttp.get.mockRejectedValue({ message: 'boom', response: { status: 404 } });
 
-    await expect(cuiRaService.getPayload('missing', 's2s-tok')).rejects.toMatchObject({ status: 404 });
+    await expect(cuiRaService.getPayload('missing', 's2s-tok')).rejects.toMatchObject({
+      status: 404,
+    });
   });
 });

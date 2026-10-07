@@ -11,10 +11,19 @@ import {
 } from '../middleware';
 
 import { Logger } from '@modules/logger';
-import { getValidatedLanguage, stepDependencyCheckMiddleware, withStepContext } from '@modules/steps';
+import {
+  getValidatedLanguage,
+  stepDependencyCheckMiddleware,
+  withStepContext,
+} from '@modules/steps';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { getFlowConfigForJourney, getStepForJourney, getStepsForJourney, journeyRegistry } from '@steps';
+import {
+  getFlowConfigForJourney,
+  getStepForJourney,
+  getStepsForJourney,
+  journeyRegistry,
+} from '@steps';
 
 const logger = Logger.getLogger('registerSteps');
 
@@ -27,14 +36,18 @@ interface StepRegistrationStats {
 /**
  * Get journeys to register based on specific journey filter
  */
-function getJourneysToRegister(specificJourney?: string): [string, (typeof journeyRegistry)[string]][] {
+function getJourneysToRegister(
+  specificJourney?: string
+): [string, (typeof journeyRegistry)[string]][] {
   const journeysToRegister = specificJourney
     ? Object.entries(journeyRegistry).filter(([name]) => name === specificJourney)
     : Object.entries(journeyRegistry);
 
   if (specificJourney && journeysToRegister.length === 0) {
     const availableJourneys = Object.keys(journeyRegistry).join(', ');
-    throw new Error(`Journey '${specificJourney}' not found in registry. Available journeys: ${availableJourneys}`);
+    throw new Error(
+      `Journey '${specificJourney}' not found in registry. Available journeys: ${availableJourneys}`
+    );
   }
 
   return journeysToRegister;
@@ -94,7 +107,9 @@ function createGetHandler(step: StepDefinition, journeyName: string): RequestHan
 
     const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
     const controller =
-      typeof resolvedStep.getController === 'function' ? resolvedStep.getController() : resolvedStep.getController;
+      typeof resolvedStep.getController === 'function'
+        ? resolvedStep.getController()
+        : resolvedStep.getController;
     return controller.get(req, res);
   };
 }
@@ -109,14 +124,20 @@ function registerStepRoutes(
   journeyName: string,
   stats: StepRegistrationStats
 ): void {
-  const flowConfigResolver = (req: Request) => getFlowConfigForJourney(journeyName, req) || flowConfig;
+  const flowConfigResolver = (req: Request) =>
+    getFlowConfigForJourney(journeyName, req) || flowConfig;
   const stepConfig = flowConfig.steps[step.name];
   const requiresAuth = stepConfig?.requiresAuth !== false;
   const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
   const stepContext = withStepContext({ name: step.name, journey: journeyName });
 
   if (step.getController) {
-    const allGetMiddleware = buildGetMiddleware(requiresAuth, flowConfigResolver, stepContext, step.middleware);
+    const allGetMiddleware = buildGetMiddleware(
+      requiresAuth,
+      flowConfigResolver,
+      stepContext,
+      step.middleware
+    );
     router.get(step.url, ...allGetMiddleware, createGetHandler(step, journeyName));
   }
 
@@ -130,7 +151,9 @@ function registerStepRoutes(
       respondToClaimFeatureMiddleware,
       (req, res, next) => {
         const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
-        return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();
+        return resolvedStep.postController?.post
+          ? resolvedStep.postController.post(req, res, next)
+          : next();
       }
     );
   }

@@ -1,4 +1,7 @@
-import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import {
+  buildDraftDefendantResponse,
+  saveDraftDefendantResponse,
+} from '../../utils/buildDraftDefendantResponse';
 import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -7,11 +10,15 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'how-much-afford-to-pay',
   isAnswered: req =>
-    Boolean(req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement?.additionalRentContribution),
+    Boolean(
+      req.res?.locals.validatedCase?.defendantResponses?.paymentAgreement
+        ?.additionalRentContribution
+    ),
   stepDir: __dirname,
   beforeRedirect: async req => {
     const response = buildDraftDefendantResponse(req);
-    response.defendantResponses.paymentAgreement = response.defendantResponses.paymentAgreement ?? {};
+    response.defendantResponses.paymentAgreement =
+      response.defendantResponses.paymentAgreement ?? {};
     const installmentAmount = req.body?.installmentAmount as string | undefined;
     const installmentFrequency = req.body?.installmentFrequency as string | undefined;
 
@@ -26,7 +33,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     }
 
     if (typeof installmentFrequency === 'string' && installmentFrequency.trim()) {
-      response.defendantResponses.paymentAgreement.additionalContributionFrequency = installmentFrequency.trim();
+      response.defendantResponses.paymentAgreement.additionalContributionFrequency =
+        installmentFrequency.trim();
     } else {
       delete response.defendantResponses.paymentAgreement.additionalContributionFrequency;
     }
@@ -39,8 +47,11 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   },
   getInitialFormData: req => {
     const paymentAgreement =
-      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses?.paymentAgreement;
-    const amountInPounds = penceToPounds(paymentAgreement?.additionalRentContribution as string | number | undefined);
+      req.res?.locals.validatedCase?.data?.possessionClaimResponse?.defendantResponses
+        ?.paymentAgreement;
+    const amountInPounds = penceToPounds(
+      paymentAgreement?.additionalRentContribution as string | number | undefined
+    );
     const installmentFrequency = paymentAgreement?.additionalContributionFrequency;
 
     if (amountInPounds || installmentFrequency) {
@@ -102,12 +113,15 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   ],
   extendGetContent: (_req, formContent) => {
     const amountField = formContent.fields.find(
-      field => field.componentType === 'input' && (field.component as { name?: string })?.name === 'installmentAmount'
+      field =>
+        field.componentType === 'input' &&
+        (field.component as { name?: string })?.name === 'installmentAmount'
     );
 
     if (amountField?.component) {
       const component = amountField.component;
-      const existingAttributes = (component.attributes as Record<string, unknown> | undefined) || {};
+      const existingAttributes =
+        (component.attributes as Record<string, unknown> | undefined) || {};
 
       component.prefix = { text: '£' };
       component.classes = 'govuk-input--width-10';
