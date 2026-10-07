@@ -18,7 +18,6 @@ const CY = path.join(LOCALES, 'cy');
  * This list must only ever shrink. Adding to it needs a Jira reference.
  */
 const UNTRANSLATED_ALLOWLIST = new Set([
-  'common.json::taskList.yourSupport',
   'respondToClaim/checkYourAnswersPersonalDetails.json::rows.correspondenceAddressConfirmation.fallbackLabel',
   'respondToClaim/endOfJourneyCya.json::heading',
   'respondToClaim/endOfJourneyCya.json::pageTitle',
