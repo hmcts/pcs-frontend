@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-export const LEGAL_REPRESENTATIVE_USER_ROLES = ['caseworker-pcs-solicitor'] as const;
+export const LEGAL_REPRESENTATIVE_USER_ROLES = ['caseworker-pcs-solicitor', 'caseworker-pcs'] as const;
 
 export type UserType = 'citizen' | 'legalrep';
 
@@ -17,7 +17,9 @@ export function getUserRoles(req: Request): string[] {
     .filter(Boolean);
 }
 
+// TODO: Change to support caseworkers as well
 export function isLegalRepresentativeUser(req: Request): boolean {
+  // return true;
   return getUserRoles(req).some(role =>
     LEGAL_REPRESENTATIVE_USER_ROLES.includes(role as (typeof LEGAL_REPRESENTATIVE_USER_ROLES)[number])
   );

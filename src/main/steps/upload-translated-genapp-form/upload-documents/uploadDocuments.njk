@@ -1,0 +1,52 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% from "macros/fileUploadMoj.njk" import fileUploadMoj %}
+{% from "macros/caseTitle.njk" import caseTitle %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{# GOV.UK pattern: [Browser title] &ndash; HM Courts & Tribunals Service &ndash; GOV.UK #}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <span class="govuk-caption-xl">{{ caption }}</span>
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+
+  {{ caseTitle(caseReference, propertyAddress) }}
+
+  <p class="govuk-body">{{ uploadTranslatedDocsIntro }}</p>
+
+  <p class="govuk-body">{{ doNotUploadOtherTypes }}</p>
+
+  <form method="post" action="{{ url }}" novalidate>
+    {% for field in fields %}
+      {% if field.componentType == 'fileUpload' %}
+        {{ fileUploadMoj(
+          field.component,
+          field.component.uploadButtonText,
+          field.component.filesAddedHeading,
+          field.component.value
+        ) }}
+      {% endif %}
+    {% endfor %}
+
+    <div class="govuk-button-group">
+      {{ govukButton({
+          text: t('buttons.continue', { ns: 'common' }),
+          attributes: { type: 'submit', name: 'action', value: 'continue' }
+      }) }}
+      <p class="govuk-body">
+        <a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a>
+      </p>
+    </div>
+
+    {{ csrfProtection(csrfToken) }}
+  </form>
+{% endblock %}

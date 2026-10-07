@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Check your answers",
+  "caption": "Upload translated claim form",
+  "heading": "Check your answers",
+  "answers": {
+    "uploadedDocuments": {
+      "label": "Uploaded documents",
+      "changeHint": "Change uploaded documents"
+    }
+  }
+}

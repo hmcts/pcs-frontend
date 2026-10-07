@@ -59,9 +59,19 @@ export default function decentralisedEventRoutes(app: Application): void {
       eventId,
     });
 
+    const queryShallowClone = {
+      ...req.query,
+    };
+    delete queryShallowClone.expected_sub;
+
+    req.session.clientContext = {
+      eventQueryParams: queryShallowClone,
+    };
+
     const redirectRoute = config
       .get<string>('decentralisedEventRoutes.' + eventId)
       .replace(':caseReference', caseReference);
+
     return safeRedirect303(res, redirectRoute);
   });
 

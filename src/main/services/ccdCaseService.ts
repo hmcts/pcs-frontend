@@ -148,6 +148,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
   }
 
   if (status === 403) {
+    // TODO: Also return this for a 404
     return new HTTPError('Not authorised to access CCD case service', 403);
   }
 
@@ -213,7 +214,7 @@ async function getEventToken(userToken: string, caseId: string, eventId: string)
  * @param ccdCase - The event data in the CCD case model
  * @returns Merged case data from CCD (authoritative source of truth)
  */
-async function submitEvent(userToken: string | undefined, eventId: string, ccdCase: CcdCase): Promise<CcdCase> {
+export async function submitEvent(userToken: string | undefined, eventId: string, ccdCase: CcdCase): Promise<CcdCase> {
   if (!userToken) {
     throw new HTTPError('No user token provided', 401);
   }
@@ -241,8 +242,8 @@ function buildEventPayload(ccdCase: CcdCase, eventId: string, eventToken: string
     data: ccdCase.data as Record<string, unknown>,
     event: {
       id: eventId,
-      summary: `Citizen ${eventId} summary`,
-      description: `Citizen ${eventId} description`,
+      summary: `Citizen ${eventId} summary`, // TODO: Remove?
+      description: `Citizen ${eventId} description`, // TODO: Remove?
     },
     event_token: eventToken,
     ignore_warning: false,
@@ -307,6 +308,7 @@ export const ccdCaseService = {
     }
   },
 
+  // TODO: Refactor these out
   async submitResponseToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
     const eventId = 'respondPossessionClaim';
     return submitEvent(accessToken, eventId, ccdCase);
