@@ -26,8 +26,8 @@
   "notifications": {
     "Defendant": {
       "CaseIssued": {
-        "title": "Achos wedi’i gyflwyno",
-        "body": "Mae eich achos wedi’i gyflwyno <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">Gweld yr hawliad</a>. Ymateb erbyn {{responseEndDate}}."
+        "title": "Achos wedi’i gyhoeddi",
+        "body": "Mae eich achos wedi’i gyhoeddi. <a class=\"govuk-link\" href=\"{{viewClaimUrl}}\">Gweld yr hawliad</a>. Ymateb erbyn {{responseEndDate}}."
       },
       "ResponseToClaim": {
         "title": "Ymateb i’r hawliad",
