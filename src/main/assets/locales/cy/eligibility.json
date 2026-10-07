@@ -7,7 +7,7 @@
     "whatYouNeedText": "I wneud eich hawliad, byddwch angen yr wybodaeth ganlynol wrth law:",
     "needNoticeInfo": "Gwybodaeth am y math o hysbysiad a roddwyd a phryd y rhoddwyd (os yn berthnasol)",
     "needPropertyInfo": "Manylion am yr eiddo yr hoffech hawlio meddiant ohono",
-    "needDefendantInfo": "Manylion y diffynnydd (os yn hysbys)",
+    "needDefendantInfo": "Manylion y diffynyddion (os yn hysbys)",
     "needGroundsInfo": "Eich seiliau dros feddiannu a manylion eich rhesymau dros wneud hawliad meddiant",
     "needDocuments": "Copïau o ddogfennau perthnasol"
   },
@@ -15,8 +15,8 @@
     "ageLabel": "Ydych chi'n 18 oed neu'n hŷn?",
     "ageDescription": "Dewiswch opsiwn i barhau.",
     "ageOptions": {
-      "yes": "Ydy",
-      "no": "Nac ydy"
+      "yes": "Ydw",
+      "no": "Nac ydw"
     }
   },
   "page3": {
@@ -129,8 +129,8 @@
   },
   "errors": {
     "address": {
-      "addressLine1": "Nodwch llinell 1 y cyfeiriad",
-      "town": "Nodwch tref neu ddinas",
+      "addressLine1": "Nodwch linell 1 y cyfeiriad",
+      "town": "Nodwch dref neu ddinas",
       "postcode": "Nodwch god post dilys"
     }
   }

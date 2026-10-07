@@ -19,8 +19,8 @@
   "counterClaimFeesCourtFeesLinkText": "<a href=\"https://www.gov.uk/government/publications/fees-in-the-civil-and-family-courts-main-fees-ex50/civil-court-fees-ex50\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Gwybodaeth am ffioedd llys (yn agor mewn tab newydd)</a>.",
   "question": "Ydych chi eisiau gwneud gwrth-hawliad?",
   "options": {
-    "yes": "Oes",
-    "no": "Nac oes"
+    "yes": "Ydw",
+    "no": "Nac ydw"
   },
   "errors": {
     "makeCounterClaim": "Dewiswch os ydych yn bwriadu gwneud gwrth-hawliad"

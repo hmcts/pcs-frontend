@@ -6,7 +6,7 @@
   "hintText": "Dewiswch bopeth sy'n berthnasol. Rhowch y cyfanswm mewn punnoedd a cheiniogau, er enghraifft £148 neu £148.50. Rhaid i’r wybodaeth a ddarperir gennych fod yn wir ac yn gywir.",
   "options": {
     "incomeFromJobs": "Incwm o bob swydd a wneir gennych",
-    "pension": "Pensiwn, y wladwriaeth a phreifat",
+    "pension": "Pensiwn – gwladol a phreifat",
     "universalCredit": "Credyd Cynhwysol",
     "otherBenefits": "Budd-daliadau a chredydau eraill",
     "moneyFromElsewhere": "Arian o rywle arall (er enghraifft, taliadau cynhaliaeth plant neu rywun yn eich cartref yn rhoi arian i chi)"
@@ -18,7 +18,7 @@
     "moneyFromElsewhereDetailsHint": "Rhowch fanylion y ffynonellau eraill o incwm a faint rydych fel arfer yn ei gael"
   },
   "frequency": {
-    "week": "Pob wythnos",
+    "week": "Wythnos",
     "month": "Mis"
   },
   "errors": {
@@ -54,7 +54,7 @@
     "otherBenefitsFrequency": {
       "required": "Dewiswch pa mor aml rydych yn cael incwm o fudd-daliadau a chredydau eraill"
     },
-    "moneyFromElsewhereDetailsMaxLength": "Rhaid i fanylion arian o rhywle arall fod yn 500 o nodau neu lai",
+    "moneyFromElsewhereDetailsMaxLength": "Rhaid i fanylion arian o rywle arall fod yn 500 o nodau neu lai",
     "moneyFromElsewhereDetails": {
       "required": "Rhowch fanylion yr arian rydych yn ei gael o rywle arall a faint rydych fel arfer yn ei gael",
       "invalidCharacters": "Rhowch fanylion am y ffynonellau eraill o incwm a faint rydych fel arfer yn ei gael - dylai gynnwys y llythrennau a i z yn unig, a nodau arbennig fel cysylltnod, gofod a chollnod"

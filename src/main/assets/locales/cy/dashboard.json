@@ -96,13 +96,12 @@
       "title": "Gweld yr holl geisiadau"
     }
   },
-
   "viewDocuments": {
     "pageTitle": "Gweld y dogfennau",
     "noDocuments": "Nid oes unrhyw ddogfennau i’w harddangos.",
     "submittedOn": "Cyflwynwyd ar",
     "folders": {
-      "statementsOfCase": "Datganiadau am yr achos",
+      "statementsOfCase": "Datganiadau achos",
       "propertyDocuments": "Dogfennau eiddo",
       "evidence": "Tystiolaeth",
       "correspondence": "Gohebiaeth",

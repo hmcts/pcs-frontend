@@ -10,6 +10,6 @@
     "otherOrderRequestDetailsRequired": "Nodwch pa orchmynion yr ydych yn gofyn i’r llys eu gwneud",
     "otherOrderRequestDetailsMaxLength": "Rhaid i unrhyw orchmynion y gofynnwch i'r llys eu gwneud fod yn 6800 nod neu lai",
     "otherOrderRequestFactsRequired": "Nodwch pa ffeithiau yr hoffech i'r llys eu hystyried wrth benderfynu ar yr hawliad",
-    "otherOrderRequestFactsMaxLength": "Rhaid i pa ffeithiau y dymunwch i'r llys eu hystyried fod yn 6800 nod neu lai"
+    "otherOrderRequestFactsMaxLength": "Rhaid i’r ffeithiau yr hoffech i’r llys eu hystyried fod yn 6800 nod neu lai"
   }
 }
