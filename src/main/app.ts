@@ -8,9 +8,11 @@ import favicon from 'serve-favicon';
 
 import { setupDev } from './development';
 import {
+  authenticationGate,
+  authorisationGate,
   caseReferenceParamMiddleware,
-  legalRepresentativeAccessMiddleware,
   pageTrackingUrlMiddleware,
+  withAccessControlEnabled,
 } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
@@ -47,7 +49,9 @@ app.use((req, res, next) => {
 });
 
 app.use(pageTrackingUrlMiddleware);
-app.use(legalRepresentativeAccessMiddleware);
+
+app.use(authenticationGate);
+app.use(withAccessControlEnabled(authorisationGate));
 
 // param middleware for caseReference
 app.param('caseReference', caseReferenceParamMiddleware);
