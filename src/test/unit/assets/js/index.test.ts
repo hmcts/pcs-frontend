@@ -30,7 +30,12 @@ jest.mock('../../../../main/assets/js/session-timeout', () => ({
 }));
 
 describe('index.ts', () => {
-  it('initialises all modules', () => {
+  beforeEach(() => {
+    jest.resetModules();
+    document.body.innerHTML = '';
+  });
+
+  it('initialises all modules without loading the make order editor', () => {
     require('../../../../main/assets/js/index');
 
     const { initAll } = require('govuk-frontend');
@@ -41,10 +46,24 @@ describe('index.ts', () => {
     const { initSessionTimeout } = require('../../../../main/assets/js/session-timeout');
 
     expect(initAll).toHaveBeenCalled();
-    expect(initMakeOrder).toHaveBeenCalled();
+    expect(initMakeOrder).not.toHaveBeenCalled();
     expect(initMultiFileUpload).toHaveBeenCalled();
     expect(initPostcodeLookup).toHaveBeenCalled();
     expect(initPostcodeSelection).toHaveBeenCalled();
     expect(initSessionTimeout).toHaveBeenCalled();
+  });
+
+  it('loads the make order editor on the make order page', async () => {
+    document.body.innerHTML = '<form id="make-order-form"></form>';
+
+    require('../../../../main/assets/js/index');
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    const { initAll } = require('govuk-frontend');
+    const { initMakeOrder, startWithSavedOrderTab } = require('../../../../main/assets/js/make-order');
+
+    expect(startWithSavedOrderTab).toHaveBeenCalledWith(initAll);
+    expect(initAll).toHaveBeenCalled();
+    expect(initMakeOrder).toHaveBeenCalled();
   });
 });

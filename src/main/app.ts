@@ -6,6 +6,7 @@ import express from 'express';
 import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
+import { MAKE_ORDER_ROUTE } from './constants/caseRoutes';
 import { setupDev } from './development';
 import {
   caseReferenceParamMiddleware,
@@ -30,7 +31,8 @@ app.use(cookieParser());
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
 // Make an order posts the whole order document, which outgrows the 100kb default.
-app.use(bodyParser.urlencoded({ extended: false, limit: '2mb' }));
+app.use(MAKE_ORDER_ROUTE, bodyParser.urlencoded({ extended: false, limit: '2mb' }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 modules.modules.forEach(async moduleName => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
