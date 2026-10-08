@@ -6,5 +6,9 @@
   "question": "Do you want to provide details of your income and expenses?",
   "errors": {
     "provideFinanceDetails": "Select if you want to provide details of your income and expenses"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

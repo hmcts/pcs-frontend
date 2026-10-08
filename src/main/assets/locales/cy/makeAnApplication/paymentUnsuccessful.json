@@ -1,8 +1,8 @@
 {
-  "pageTitle": "cyPayment unsuccessful",
-  "yourPaymentWasUnsuccessful": "cyYour payment was unsuccessful",
+  "pageTitle": "Taliad yn aflwyddiannus",
+  "yourPaymentWasUnsuccessful": "Roedd eich taliad yn aflwyddiannus",
   "whatHappensNext": "Beth fydd yn digwydd nesaf",
-  "youCanTryToMakeACardPayment": "cyYou can try to <a href=\"{{ payForYourApplicationUrl }}\" class=\"govuk-link\">make a card payment</a> again.",
+  "youCanTryToMakeACardPayment": "Gallwch geisio <a href=\"{{ payForYourApplicationUrl }}\" class=\"govuk-link\">gwneud taliad gyda cherdyn </a> eto.",
   "buttons": {
     "closeAndReturnToCaseOverview": "Cau a dychwelyd i drosolwg o’r achos"
   }
