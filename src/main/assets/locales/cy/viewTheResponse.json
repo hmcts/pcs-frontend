@@ -51,7 +51,7 @@
     "disputeClaim": "A ydych yn gwrthwynebu unrhyw rannau eraill o’r hawliad?",
     "disputeDetails": "Eglurwch pa rannau o’r hawliad nad ydych yn cytuno â nhw",
     "claimGrounds": "Sail yr hawliad",
-    "exemptLandlord": "A yw eich landlord yn landlord wedi’i eithrio o dan Ran 1 o Ddeddf Tai (Cymru) 2014?",
+    "exemptLandlord": "A yw eich landlord yn landlord wedi’i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
     "tenancyTypeConfirmation": "A yw’r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded a roddwyd gan yr hawlydd yn gywir?",
     "tenancyType": "Math o denantiaeth wedi’i chywiro, contract meddiannaeth neu gytundeb trwydded",
     "tenancyStartDateConfirmation": "A yw dyddiad dechrau’r denantiaeth, contract meddiannaeth neu gytundeb trwydded a roddwyd gan yr hawlydd yn gywir?",
@@ -88,7 +88,7 @@
   },
   "income": {
     "fromJobs": "Incwm o bob swydd a wneir gennych",
-    "pension": "Pensiwn – gwladol a phreifat",
+    "pension": "Pensiwn, y wladwriaeth a phreifat",
     "universalCredit": "Credyd Cynhwysol",
     "universalCreditApplied": "Ydych chi wedi gwneud cais am Gredyd Cynhwysol?",
     "universalCreditApplicationDate": "Pryd wnaethoch chi wneud cais?",
