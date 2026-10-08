@@ -7,7 +7,6 @@ import { createGetController, createStepNavigation } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { getFlowConfigForJourney } from '@steps';
-import { getCaseManagementUrl } from '@utils/legalRepresentativeRedirectHandler';
 
 const journeyName = 'uploadAdditionalDocuments';
 const stepName = 'documents-uploaded';
@@ -24,6 +23,5 @@ export const step: StepDefinition = {
       dashboardUrl: getDashboardUrl(req.res?.locals.validatedCase?.id),
       backUrl: null,
       redirectOnBack: true,
-      closeUrl: getCaseManagementUrl(req),
     })),
 };
