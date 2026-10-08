@@ -1,6 +1,7 @@
 import type { TFunction } from 'i18next';
 
 import { getNotificationUrlPlaceholders } from './dashboardTaskPaths';
+import { formatLocalisedDate } from './formatLocalisedDate';
 
 export interface ResolvedNotification {
   title: string;
@@ -38,14 +39,31 @@ function withFeeAmountAsNumber(values: Record<string, unknown>): Record<string, 
   return { ...values, feeAmount: asNumber };
 }
 
+// Only plain ISO dates (2026-11-12) or date-times; anything else is left exactly as sent.
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
+
+/** Shows ISO date template values in the page language, e.g. 12 Tachwedd 2026. */
+function withLocalisedDates(values: Record<string, unknown>, lang?: string): Record<string, unknown> {
+  if (!lang) {
+    return values;
+  }
+  return Object.fromEntries(
+    Object.entries(values).map(([key, value]) => [
+      key,
+      typeof value === 'string' && ISO_DATE.test(value.trim()) ? (formatLocalisedDate(value, lang) ?? value) : value,
+    ])
+  );
+}
+
 export function resolveNotification(
   t: TFunction,
   templateId: string,
   values: Record<string, unknown>,
-  caseReference: string
+  caseReference: string,
+  lang?: string
 ): ResolvedNotification | null {
   const merged = withFeeAmountAsNumber({
-    ...withCaseRef(values, caseReference),
+    ...withCaseRef(withLocalisedDates(values, lang), caseReference),
     ...getNotificationUrlPlaceholders(caseReference),
   });
   const title = lookup(t, `dashboard:notifications.${templateId}.title`);

@@ -42,6 +42,45 @@ describe('resolveDashboardTemplates', () => {
   });
 
   describe('resolveNotification', () => {
+    describe('date values', () => {
+      const t = createT({
+        'dashboard:notifications.Defendant.CaseIssued.title': 'Case issued',
+        'dashboard:notifications.Defendant.CaseIssued.body': opts => `Respond by ${opts.responseEndDate as string}.`,
+      });
+
+      it('shows an ISO date in Welsh on a Welsh page', () => {
+        expect(
+          resolveNotification(t, 'Defendant.CaseIssued', { responseEndDate: '2026-11-12' }, '1234567890123456', 'cy')
+            ?.body
+        ).toBe('Respond by 12 Tachwedd 2026.');
+      });
+
+      it('shows an ISO date in English on an English page', () => {
+        expect(
+          resolveNotification(t, 'Defendant.CaseIssued', { responseEndDate: '2026-11-12' }, '1234567890123456', 'en')
+            ?.body
+        ).toBe('Respond by 12 November 2026.');
+      });
+
+      it('leaves values that are not ISO dates exactly as sent', () => {
+        expect(
+          resolveNotification(
+            t,
+            'Defendant.CaseIssued',
+            { responseEndDate: '12 November 2026' },
+            '1234567890123456',
+            'cy'
+          )?.body
+        ).toBe('Respond by 12 November 2026.');
+      });
+
+      it('changes nothing when no page language is given', () => {
+        expect(
+          resolveNotification(t, 'Defendant.CaseIssued', { responseEndDate: '2026-11-12' }, '1234567890123456')?.body
+        ).toBe('Respond by 2026-11-12.');
+      });
+    });
+
     it('returns null when title is missing', () => {
       const t = createT({
         'dashboard:notifications.Defendant.Foo.body': 'Body only',
