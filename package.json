@@ -56,13 +56,13 @@
     "@router": "dist/main/router"
   },
   "dependencies": {
-    "@azure/monitor-opentelemetry": "1.20.0",
+    "@azure/monitor-opentelemetry": "1.20.1",
     "@hmcts-cft/cft-ui-component-lib": "0.1.0-alpha.4",
     "@hmcts-cft/docweave": "0.3.0",
     "@hmcts/info-provider": "1.4.0",
     "@hmcts/nodejs-healthcheck": "1.8.6",
     "@hmcts/properties-volume": "1.4.1",
-    "@launchdarkly/node-server-sdk": "9.13.6",
+    "@launchdarkly/node-server-sdk": "9.14.4",
     "@ministryofjustice/frontend": "^11.0.0",
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/winston-transport": "0.31.0",
@@ -155,7 +155,7 @@
     "nodemon": "3.1.14",
     "playwright": "1.62.1",
     "playwright-core": "1.62.1",
-    "postcss": "8.5.28",
+    "postcss": "8.5.29",
     "prettier": "3.9.9",
     "sass": "1.105.1",
     "sass-loader": "17.0.1",
@@ -164,7 +164,7 @@
     "stylelint": "17.14.1",
     "stylelint-config-standard": "40.0.0",
     "stylelint-config-standard-scss": "17.0.0",
-    "ts-jest": "29.4.12",
+    "ts-jest": "29.4.14",
     "ts-loader": "9.6.2",
     "ts-node": "10.9.2",
     "typescript": "6.0.3",
@@ -198,5 +198,5 @@
     "*.{js,ts}": "eslint --cache --fix",
     "*.{js,ts,css,md,html,json}": "prettier --write"
   },
-  "packageManager": "yarn@4.18.0"
+  "packageManager": "yarn@4.18.1"
 }
