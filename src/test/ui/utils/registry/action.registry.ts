@@ -55,6 +55,7 @@ export class ActionRegistry {
     ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()],
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['updatePaymentAPI', new CreateCaseAPIAction()],
+    ['pollRespondEventTriggerAPI', new CreateCaseAPIAction()],
     ['linkDefendantToSolicitorForCaseAPI', new LinkSolicitorAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
