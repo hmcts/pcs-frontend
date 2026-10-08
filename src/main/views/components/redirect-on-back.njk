@@ -1,10 +1,14 @@
 {#
   Marker consumed by assets/js/redirect-on-back.ts.
 
-  Legal representatives on a confirmation page (`redirectOnBack`) are sent to
-  the Manage Case case summary (`closeUrl`) when they use the browser Back
-  button. Gated by `release-1.4-enabled` (`release14Enabled`).
+  Citizens are sent to the case dashboard when `release-1.2-enabled` is on.
+  Legal representatives are sent to the Manage Case case summary (`closeUrl`)
+  when `release-1.4-enabled` is on.
 #}
-{% if release14Enabled and isLegalRepresentative and redirectOnBack and closeUrl %}
-  <span id="redirect-on-back" data-redirect-url="{{ closeUrl }}" hidden></span>
+{% if isLegalRepresentative %}
+  {% if release14Enabled and redirectOnBack and closeUrl %}
+    <span id="redirect-on-back" data-redirect-url="{{ closeUrl }}" hidden></span>
+  {% endif %}
+{% elif release12Enabled and redirectOnBack and dashboardUrl %}
+  <span id="redirect-on-back" data-dashboard-url="{{ dashboardUrl }}" hidden></span>
 {% endif %}

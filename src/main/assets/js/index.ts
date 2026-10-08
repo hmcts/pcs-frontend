@@ -24,7 +24,6 @@ initSessionTimeout();
 initMultiFileUpload();
 initRedirectOnBack();
 initCounterClaimPaymentChoice();
-initRedirectOnBack();
 
 if (module.hot) {
   module.hot.accept();

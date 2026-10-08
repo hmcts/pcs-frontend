@@ -8,7 +8,7 @@ import { redirectTo } from './navigate';
  */
 export function initRedirectOnBack(): void {
   const marker = document.getElementById('redirect-on-back');
-  const redirectUrl = marker?.dataset.redirectUrl;
+  const redirectUrl = marker?.dataset.redirectUrl || marker?.dataset.dashboardUrl;
 
   if (!marker || !redirectUrl) {
     return;
