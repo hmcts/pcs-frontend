@@ -6,7 +6,7 @@ import { HTTPError } from '../HttpError';
 import { MAKE_GENERAL_APPLICATION_ROUTE, UPLOAD_ADDITIONAL_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware/oidc';
 
-import { getTranslationFunction } from '@modules/i18n';
+import { getRequestLanguage, getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
 import type { DashboardTaskGroup } from '@services/dashboard.interface';
@@ -181,7 +181,8 @@ export default function dashboardRoutes(app: Application): void {
             t,
             n.templateId,
             n.templateValues as Record<string, unknown>,
-            caseReference
+            caseReference,
+            getRequestLanguage(req)
           );
           if (!resolved) {
             logger.warn(`No dashboard translation for notification templateId=${n.templateId}`);
