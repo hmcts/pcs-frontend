@@ -2,6 +2,7 @@ import fs, { promises as fsPromises } from 'fs';
 import path from 'path';
 
 type ExpressRequest = Request;
+import config from 'config';
 import type { Express, NextFunction, Request, Response } from 'express';
 import i18next, { type InitOptions, type TFunction } from 'i18next';
 import Backend from 'i18next-fs-backend';
@@ -174,6 +175,12 @@ function createI18nextConfig(localesDir: string, namespaces: string[]): InitOpti
       lookupCookie: 'lang',
       lookupSession: 'lang',
       caches: ['cookie'],
+      // Lax, not the library's Strict default: the cookie must survive top-level returns from
+      // external sites (GOV.UK Pay, IDAM), or the language falls back to English and is re-cached.
+      cookieSameSite: 'lax',
+      // Same Secure rule as the session cookie; nothing client-side reads it, so HttpOnly too.
+      cookieSecure: config.get<string>('node-env').toLowerCase() === 'production',
+      cookieHttpOnly: true,
     },
     debug: false,
     saveMissing: false,
@@ -206,12 +213,12 @@ export class I18n {
     }
 
     const ns = localesDir ? discoverNamespaces(localesDir, 'en') : ['common'];
-    const config = createI18nextConfig(localesDir || '', ns);
+    const i18nextConfig = createI18nextConfig(localesDir || '', ns);
 
     i18next
       .use(Backend)
       .use(LanguageDetector)
-      .init(config, err => {
+      .init(i18nextConfig, err => {
         if (err) {
           this.logger.error('[i18n] init error', err);
         } else {
