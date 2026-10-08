@@ -48,6 +48,7 @@ export const step: StepDefinition = createFormStep({
     return {
       confirmationPanelTitle,
       receivedYourApplicationMessage,
+      redirectOnBack: true,
     };
   },
 });

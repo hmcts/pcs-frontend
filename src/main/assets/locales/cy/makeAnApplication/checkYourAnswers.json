@@ -18,8 +18,8 @@
       }
     },
     "hearingInNext14Days": {
-      "label": "A yw'r gwrandawiad llys yn ystod yr 14 diwrnod nesaf?",
-      "changeHint": "Newid a yw'r gwrandawiad llys yn ystod yr 14 diwrnod nesaf"
+      "label": "A yw’r gwrandawiad llys yn ystod y 14 diwrnod nesaf?",
+      "changeHint": "Newid a yw’r gwrandawiad llys yn ystod y 14 diwrnod nesaf"
     },
     "helpWithFeesNeeded": {
       "label": "A ydych angen help i dalu’r ffi am wneud y cais hwn?",
