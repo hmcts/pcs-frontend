@@ -13,6 +13,6 @@
     "repaymentsAgreed": "Dewiswch a ydych wedi dod i gytundeb gyda {{claimantName}} i ad-dalu’r ôl-ddyledion ers {{dateIssued, ordinalDate}}",
     "repaymentsAgreed.repaymentsAgreedDetails": "Rhowch fanylion faint rydych wedi cytuno i’w dalu, pa mor aml y byddwch yn talu a phryd wnaed y cytundeb",
     "repaymentsAgreedDetailsMaxLength": "Rhaid i fanylion y cytundeb ad-dalu fod yn 500 o nodau neu lai",
-    "repaymentsAgreed.repaymentsAgreedDetails.invalid": "Dylai manylion y cytunwyd arnynt ar gyfer ad-dalu gynnwys llythrennau a i z yn unig, a nodweddion arbennig fel cysylltnod, bylchau a chollnod."
+    "repaymentsAgreed.repaymentsAgreedDetails.invalid": "Dylai manylion y cytunwyd arnynt ar gyfer ad-dalu gynnwys llythrennau a i z yn unig, a nodau arbennig fel cysylltnodau, bylchau a chollnodau."
   }
 }

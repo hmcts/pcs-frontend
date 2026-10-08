@@ -30,12 +30,15 @@ jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
   isRespondToClaimEnabledForUser: (...args: unknown[]) => mockIsRespondToClaimEnabledForUser(...args),
 }));
 
+// Translate from the real accessCode locale files, in the language set by mockLanguage.
+let mockLanguage: 'en' | 'cy' = 'en';
 jest.mock('@modules/i18n', () => ({
   getTranslationFunction: jest.fn(() => {
-    const strings: Record<string, string> = {
-      'accessCode:errors.respondToClaimUnavailable': 'The option to respond to a claim is not available at the moment.',
-    };
-    return ((key: string) => strings[key] ?? key) as import('i18next').TFunction;
+    const errors = require(`../../../main/assets/locales/${mockLanguage}/accessCode.json`).errors as Record<
+      string,
+      string
+    >;
+    return ((key: string) => errors[key.replace('accessCode:errors.', '')] ?? key) as import('i18next').TFunction;
   }),
 }));
 
@@ -50,6 +53,7 @@ describe('citizenCaseLink routes', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockLanguage = 'en';
     mockIsRespondToClaimEnabledForUser.mockResolvedValue(true);
 
     mockGet = jest.fn();
@@ -270,5 +274,55 @@ describe('citizenCaseLink routes', () => {
         expect.objectContaining({ errors: expect.objectContaining({ claimNumber: expect.any(Object) }) })
       );
     });
+  });
+
+  describe('POST /access-your-case in Welsh', () => {
+    const post = async (body: Record<string, string>) => {
+      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      const req = { body, session: { user: { accessToken: 'mock-token' } } } as unknown as Request;
+      const res = { render: jest.fn() } as unknown as Response;
+      await handler(req, res);
+      return (res.render as jest.Mock).mock.calls[0][1];
+    };
+
+    beforeEach(() => {
+      mockLanguage = 'cy';
+    });
+
+    it('shows field validation errors in Welsh', async () => {
+      const view = await post({ claimNumber: '', accessCode: 'ABCD' });
+
+      expect(view.errors).toEqual({
+        claimNumber: { text: 'Nodwch rif eich hawliad' },
+        accessCode: { text: 'Rhaid i’r cod mynediad fod yn 12 nod' },
+      });
+      expect(view.errorList.map((e: { text: string }) => e.text)).toEqual([
+        'Nodwch rif eich hawliad',
+        'Rhaid i’r cod mynediad fod yn 12 nod',
+      ]);
+    });
+
+    it('shows access code check failures in Welsh', async () => {
+      mockValidateAccessCode.mockResolvedValueOnce({ valid: false, error: 'expired' });
+
+      const view = await post({ claimNumber: '1234567890123456', accessCode: 'ABCD12345678' });
+
+      expect(view.errors.accessCode.text).toBe(
+        'Mae’r cod mynediad a nodwyd gennych wedi dod i ben. Cysylltwch â’r llys i gael cod newydd'
+      );
+    });
+
+    it.each(['not_found', 'expired', 'already_used', 'mismatch', 'unknown'])(
+      'has Welsh for the %s result',
+      async error => {
+        mockValidateAccessCode.mockResolvedValueOnce({ valid: false, error });
+
+        const view = await post({ claimNumber: '1234567890123456', accessCode: 'ABCD12345678' });
+        const text = (view.errors.claimNumber ?? view.errors.accessCode).text as string;
+
+        expect(text).not.toMatch(/^accessCode:|^[a-z]+[A-Z]/);
+        expect(text).not.toMatch(/claim number|access code/i);
+      }
+    );
   });
 });

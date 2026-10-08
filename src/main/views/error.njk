@@ -2,15 +2,15 @@
 
 {% block pageTitle %}
   {% if errorPageKey == 'pageNotFound' %}
-    {{ t('errorPages.pageNotFound.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+    {{ t('errorPages.pageNotFound.title') }} &ndash; {{ t('common:pageTitleSuffix') }}
   {% elif errorPageKey == 'serviceUnavailable' %}
-    {{ t('errorPages.serviceUnavailable.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+    {{ t('errorPages.serviceUnavailable.title') }} &ndash; {{ t('common:pageTitleSuffix') }}
   {% elif errorPageKey == 'technicalError' %}
-    {{ t('errorPages.technicalError.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+    {{ t('errorPages.technicalError.title') }} &ndash; {{ t('common:pageTitleSuffix') }}
   {% elif errorPageKey == 'accessDenied' %}
-    {{ t('errorPages.accessDenied.title') }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+    {{ t('errorPages.accessDenied.title') }} &ndash; {{ t('common:pageTitleSuffix') }}
   {% else %}
-    {{ errorTitle or t('errorPages.technicalError.title') or "Something went wrong" }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+    {{ errorTitle or t('errorPages.technicalError.title') or "Something went wrong" }} &ndash; {{ t('common:pageTitleSuffix') }}
   {% endif %}
 {% endblock %}
 

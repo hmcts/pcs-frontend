@@ -3,13 +3,13 @@
   "heading": "Cadarnhewch os yw’r dogfennau hyn yn ymwneud â chais presennol",
   "paragraph1": "Rydym fel arfer yn rhannu unrhyw beth rydych yn ei uwchlwytho gyda’r parti arall, er enghraifft eich landlord, cymdeithas dai neu ddarparwyr morgais",
   "paragraph2": "Os yw eich cais yn un ‘heb rybudd’ (ble rydych wedi gofyn i ni ystyried eich cais heb ddweud wrth y parti arall) ni fyddwn yn rhannu unrhyw beth gyda nhw.",
-  "question": "A yw’r ceisiadau hyn yn ymwneud â chais presennol?",
+  "question": "A yw’r dogfennau hyn yn ymwneud â chais presennol?",
   "applicationOptionAdjourn": "Ydyn, mae’r dogfennau rwy’n eu huwchlwytho yn ymwneud â’r cais i ohirio’r gwrandawiad - cyflwynwyd ar  {{date}}",
-  "applicationOptionSuspend": "Ydyn, mae’r dogfennau rwy’n eu huwchlwytho yn ymwneud â’r cais i ohirio’r troi allan - cyflwynwyd ar {{date}}",
+  "applicationOptionSuspend": "Ydyn, mae’r dogfennau rwy’n eu huwchlwytho yn ymwneud â’r cais i atal y troi allan - cyflwynwyd ar {{date}}",
   "applicationOptionSetAside": "Ydyn, mae’r dogfennau rwy’n eu huwchlwytho yn ymwneud â’r cais i roi’r gorchymyn o’r neilltu - cyflwynwyd ar {{date}}",
   "applicationOptionGeneric": "Ydyn, mae’r dogfennau rwy’n eu huwchlwytho yn ymwneud â’r cais a gyflwynwyd ar  {{date}}",
   "optionCounterclaim": "Na, mae’r dogfennau rwy’n uwchlwytho yn ymwneud â’r gwrth-hawliad",
-  "optionMainClaim": "Na, mae’r dogfennau rwy’n uwchlwytho yn ymwneud â’r prif gais",
+  "optionMainClaim": "Na, mae’r dogfennau rwy’n uwchlwytho yn ymwneud â’r prif hawliad",
   "errors": {
     "title": "Mae yna broblem",
     "relatedApplicationId": {

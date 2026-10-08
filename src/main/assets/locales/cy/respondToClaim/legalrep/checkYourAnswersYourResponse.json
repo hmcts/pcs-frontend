@@ -8,7 +8,7 @@
   },
   "rows": {
     "exemptLandlord": {
-      "label": "A yw’r landlord yn landlord wedi’i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
+      "label": "A yw’r landlord yn landlord wedi’i eithrio o dan Ran 1 o Ddeddf Tai (Cymru) 2014?",
       "changeHidden": "landlord wedi’i eithrio"
     },
     "writtenTerms": {
@@ -118,7 +118,7 @@
       "changeHidden": "gwrth-hawliad yn erbyn"
     },
     "otherOrderRequestDetails": {
-      "label": "Pa orchymyn ydyn nhw’n gofyn i’r llys ei wneud?",
+      "label": "Pa orchmynion ydyn nhw’n gofyn i’r llys eu gwneud?",
       "changeHidden": "gorchmynion a geisiwyd"
     },
     "otherOrderRequestFacts": {

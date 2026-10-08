@@ -11,6 +11,16 @@ let postcodeLookupDelegatedBound = false;
 export function initPostcodeLookup(): void {
   const containers = Array.from(document.querySelectorAll<HTMLElement>('[data-address-component]'));
 
+  // Page-language text the server renders onto the address component
+  const componentText = (el: HTMLElement, key: string, fallback: string): string =>
+    el.closest<HTMLElement>('[data-address-component]')?.dataset[key] || fallback;
+
+  const visibleErrorText = (el: HTMLElement): string => {
+    const copy = el.cloneNode(true) as HTMLElement;
+    copy.querySelectorAll('.govuk-visually-hidden').forEach(hidden => hidden.remove());
+    return (copy.textContent || '').trim();
+  };
+
   // Helper utilities that work per-container
   const getParts = (container: HTMLElement) => {
     const prefix = container.dataset.namePrefix || 'address';
@@ -60,7 +70,13 @@ export function initPostcodeLookup(): void {
     clearOptions(select);
     const defaultOpt = document.createElement('option');
     defaultOpt.value = '';
-    defaultOpt.textContent = `${addresses.length} address${addresses.length === 1 ? '' : 'es'} found`;
+    defaultOpt.textContent =
+      addresses.length === 1
+        ? componentText(select, 'oneAddressFound', '1 address found')
+        : componentText(select, 'manyAddressesFound', '{count} addresses found').replace(
+            '{count}',
+            String(addresses.length)
+          );
     select.appendChild(defaultOpt);
 
     for (let i = 0; i < addresses.length; i++) {
@@ -225,7 +241,7 @@ export function initPostcodeLookup(): void {
   const showEmptyDropdown = (
     select: HTMLSelectElement,
     selectContainer: HTMLDivElement | null,
-    message: string = 'No addresses found'
+    message: string = componentText(select, 'noAddressesFound', 'No addresses found')
   ) => {
     clearOptions(select);
     const opt = document.createElement('option');
@@ -260,7 +276,7 @@ export function initPostcodeLookup(): void {
 
     // Add error to error summary
     if (input?.id && errorMessage?.textContent) {
-      const errorText = errorMessage.textContent.replace('Error:', '').trim();
+      const errorText = visibleErrorText(errorMessage);
       addErrorToSummary(`${prefix}-postcode-error`, errorText, `#${prefix}-lookupPostcode`);
     }
   };
@@ -378,7 +394,7 @@ export function initPostcodeLookup(): void {
 
       // Add error to error summary
       if (lookupErrorMessage?.textContent) {
-        const errorText = lookupErrorMessage.textContent.replace('Error:', '').trim();
+        const errorText = visibleErrorText(lookupErrorMessage);
         addErrorToSummary(`${prefix}-lookup-postcode-error`, errorText, `#${prefix}-lookupPostcode`);
       }
 
@@ -484,7 +500,7 @@ export function initPostcodeLookup(): void {
 
           // Add error to error summary
           if (selectErrorMessage?.textContent) {
-            const errorText = selectErrorMessage.textContent.replace('Error:', '').trim();
+            const errorText = visibleErrorText(selectErrorMessage);
             addErrorToSummary(`${prefix}-selectedAddress-error`, errorText, `#${prefix}-selectedAddress`);
           }
 

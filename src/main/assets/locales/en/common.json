@@ -209,5 +209,22 @@
     "yourSupport": "Your support",
     "uploadFiles": "Upload documents",
     "checkYourAnswersAndSubmit": "Check your answers and submit"
-  }
+  },
+  "skipLink": "Skip to main content",
+  "footer": {
+    "contentLicence": "All content is available under the <a class=\"govuk-footer__link\" href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\" rel=\"license\">Open Government Licence v3.0</a>, except where otherwise stated",
+    "copyright": "© Crown copyright"
+  },
+  "errorPrefix": "Error",
+  "fileUpload": {
+    "dropzoneHint": "Drag and drop files here or",
+    "dropzoneButton": "Choose files",
+    "uploadStatus": "Uploading files, please wait"
+  },
+  "addressLookup": {
+    "oneFound": "1 address found",
+    "manyFound": "{count} addresses found",
+    "noneFound": "No addresses found"
+  },
+  "pageTitleSuffix": "HM Courts & Tribunals Service – GOV.UK"
 }

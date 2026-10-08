@@ -5,7 +5,7 @@
   "infoParagraph2": "Bydd yr hawlydd yn gallu gweld eich atebion.",
   "characterCountHint": "Er enghraifft, 'i'r landlord wneud gwaith adfer'",
   "otherOrderRequestFactsLabel": "Pa ffeithiau hoffen nhw i'r llys eu hystyried wrth benderfynu ar yr hawliad?",
-  "otherOrderRequestDetailsLabel": "Pa orchymyn ydyn nhw'n gofyn i’r llys ei wneud?",
+  "otherOrderRequestDetailsLabel": "Pa orchmynion ydyn nhw’n gofyn i’r llys eu gwneud?",
   "errors": {
     "otherOrderRequestDetailsRequired": "Nodwch pa orchmynion maent yn gofyn i’r llys eu gwneud",
     "otherOrderRequestDetailsMaxLength": "Rhaid i unrhyw orchmynion maen nhw'n gofyn i'r llys eu gwneud fod yn 6800 nod neu lai",

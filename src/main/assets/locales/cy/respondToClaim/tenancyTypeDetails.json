@@ -19,5 +19,13 @@
     "tenancyDetails.correctType": "Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded",
     "requiredText": "Rhowch y manylion cywir ar gyfer y denantiaeth, drwydded neu gontract meddiannaeth",
     "defaultMaxLength": "Rhaid i’r math cywir o denantiaeth, contract meddiannaeth neu drwydded fod yn 60 nod neu lai"
+  },
+  "tenancyTypeAgreementTypes": {
+    "ASSURED_TENANCY": "sicr",
+    "SECURE_TENANCY": "ddiogel",
+    "INTRODUCTORY_TENANCY": "ragarweiniol",
+    "FLEXIBLE_TENANCY": "hyblyg",
+    "DEMOTED_TENANCY": "isradd",
+    "OTHER": "arall"
   }
 }
