@@ -2,7 +2,14 @@ import { DateTime } from 'luxon';
 
 import { parseDate, parseMoney } from '@utils/makeOrderFormat';
 import type { AttendanceParty, MakeOrderType } from '@utils/makeOrderValidation';
-import type { FormData, OrderApplication, OrderHearing, OrderParty, OrderStart } from '@utils/orderCase';
+import type {
+  FormData,
+  OrderApplication,
+  OrderCaseBundle,
+  OrderHearing,
+  OrderParty,
+  OrderStart,
+} from '@utils/orderCase';
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 const APPLICATION_ORDER_TYPE: MakeOrderType = 'APPLICATION_DECISION';
@@ -27,6 +34,22 @@ function applicationModel(application: OrderApplication, caseReference: number) 
     within14DaysDisplay: YES_NO[application.within14Days ?? ''],
     otherPartiesAgreedDisplay: YES_NO[application.otherPartiesAgreed ?? ''],
     withoutNoticeDisplay: YES_NO[application.withoutNotice ?? ''],
+  };
+}
+
+/** The case bundle as the application panel links it, with when it was last brought up to date. */
+function caseBundleModel(bundle: OrderCaseBundle, caseReference: number) {
+  const updated = DateTime.fromISO(String(bundle.updatedAt ?? ''));
+  return {
+    ...bundle,
+    href: `/case/${caseReference}/view-documents/${encodeURIComponent(bundle.id)}`,
+    updatedDisplay: updated.isValid
+      ? updated
+          .setZone('Europe/London')
+          .setLocale('en-GB')
+          .toFormat("d MMMM yyyy 'at' h:mma")
+          .replace(/AM|PM/, m => m.toLowerCase())
+      : undefined,
   };
 }
 
@@ -177,5 +200,6 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
       ? applicationModel(caseContext.application, caseContext.caseReference)
       : undefined,
     ...hearingModel(hearing),
+    caseBundle: caseContext.caseBundle ? caseBundleModel(caseContext.caseBundle, caseContext.caseReference) : undefined,
   };
 }

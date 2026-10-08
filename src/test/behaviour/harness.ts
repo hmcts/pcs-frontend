@@ -240,6 +240,8 @@ export async function bootApp(
     application?: Record<string, unknown> & { id: string };
     /** The hearing pcs-api starts the event for, over the default one, or null for an order made without one. */
     hearing?: Record<string, unknown> | null;
+    /** The case bundle, once the case has one. */
+    caseBundle?: Record<string, unknown>;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -249,6 +251,9 @@ export async function bootApp(
   envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
   envelope.caseContext.openApplication = options.openApplication ?? false;
   envelope.order = { ...envelope.order, ...options.order };
+  if (options.caseBundle) {
+    envelope.caseContext.caseBundle = options.caseBundle;
+  }
   if (options.application) {
     envelope.caseContext.application = options.application;
     envelope.order.genAppId = options.application.id;

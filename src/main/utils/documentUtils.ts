@@ -108,6 +108,8 @@ export function extractCaseDocuments(caseData: CaseDataRecord): CaseDocumentLook
   const seen = new Set<string>();
 
   addDocumentsFromCollection(documents, seen, caseData.allDocuments, 'allDocuments');
+  // The case bundle, which CCD shows only to court staff and judges.
+  addDocumentsFromCollection(documents, seen, caseData.caseBundle, 'caseBundle');
   addDocumentsFromGenApps(documents, seen, caseData.genApps);
   addDocumentsFromCollection(documents, seen, caseData.notice_Documents, 'notice_Documents');
   addDocumentsFromCollection(

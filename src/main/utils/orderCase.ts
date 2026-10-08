@@ -28,6 +28,14 @@ export interface OrderCaseContext {
   openApplication?: boolean;
   /** The general application an order on one decides. */
   application?: OrderApplication | null;
+  /** The case bundle, once one has been generated: every document on the case in one PDF. */
+  caseBundle?: OrderCaseBundle | null;
+}
+
+export interface OrderCaseBundle {
+  id: string;
+  fileName: string;
+  updatedAt?: string | null;
 }
 
 /** A general application as the judge deciding it reads it, with what court staff said when they referred it. */

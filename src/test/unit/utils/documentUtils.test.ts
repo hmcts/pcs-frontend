@@ -615,6 +615,26 @@ describe('documentUtils', () => {
     );
   });
 
+  it('finds the case bundle by its document store id', () => {
+    const document = findCaseDocumentById(
+      {
+        caseBundle: {
+          document_url: 'http://doc-store/documents/b0b0b0b0-0000-4000-8000-000000000002',
+          document_binary_url: 'http://doc-store/documents/b0b0b0b0-0000-4000-8000-000000000002/binary',
+          document_filename: '1234-case-bundle.pdf',
+        },
+      },
+      'b0b0b0b0-0000-4000-8000-000000000002'
+    );
+
+    expect(document).toEqual(
+      expect.objectContaining({
+        filename: '1234-case-bundle.pdf',
+        binaryUrl: 'http://doc-store/documents/b0b0b0b0-0000-4000-8000-000000000002/binary',
+      })
+    );
+  });
+
   it('finds a general application supporting document by its collection id', () => {
     const document = findCaseDocumentById(
       {
