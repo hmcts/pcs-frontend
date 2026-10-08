@@ -179,7 +179,7 @@ export const step: StepDefinition = {
             titleText: t('errors.title'),
             errorList: [{ text: errorMessage, href: '#relatedApplicationId' }],
           },
-          radioErrorMessage: { text: errorMessage },
+          radioErrorMessage: { text: errorMessage, visuallyHiddenText: t('common:errorPrefix') },
         });
       }
 

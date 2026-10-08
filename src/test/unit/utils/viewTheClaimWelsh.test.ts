@@ -357,6 +357,27 @@ describe('View the claim values that arrive as codes or without a code', () => {
     ).toBe('Maybe later');
   });
 
+  it('shows a short September date in Welsh', async () => {
+    expect(
+      await welshValue(
+        {
+          licenceStartDate: undefined,
+          detailsTab_OccupationContractLicenceDetails: {
+            agreementType: 'Standard contract',
+            agreementStartDate: '5 Sep 2024',
+          },
+        },
+        'tenancyStartDate'
+      )
+    ).toBe('5 Medi 2024');
+  });
+
+  it('keeps free text that happens to be in capitals exactly as typed', () => {
+    const copy = { value: (_key: string, english: string) => english } as unknown as ViewTheClaimCopy;
+    expect(localisedValue(copy, 'rentFrequencies', {}, 'QUARTERLY')).toBe('QUARTERLY');
+    expect(localisedValue(copy, 'rentFrequencies', {}, 'EVERY 4 WEEKS')).toBe('EVERY 4 WEEKS');
+  });
+
   it('shows an unknown code as a sentence, not the raw code', () => {
     const copy = { value: (_key: string, english: string) => english } as unknown as ViewTheClaimCopy;
     expect(localisedValue(copy, 'statementOfTruthCompletedBy', {}, 'CLAIMANT_LITIGATION_FRIEND')).toBe(
@@ -374,7 +395,7 @@ describe('View the claim values that arrive as codes or without a code', () => {
     expect(defendant?.rows[0].value.text).toBe('Unigolion yn anhysbys');
   });
 
-  it.each(['1 Jan 2020', '1st January 2020', '01/01/2020'])(
+  it.each(['1 Jan 2020', '1st January 2020', '01/01/2020', '1 January 2020, 3:30:00PM'])(
     'shows the details-tab date %s in Welsh',
     async agreementStartDate => {
       expect(

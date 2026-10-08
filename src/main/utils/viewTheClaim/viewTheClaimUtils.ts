@@ -170,8 +170,6 @@ function createViewTheClaimCopy(t: TFunction, locale: string): ViewTheClaimCopy 
   };
 }
 
-export { toDateLocale };
-
 export function section(title: string, rows: (ViewTheClaimSummaryRow | undefined)[]): ViewTheClaimSection | undefined {
   const visibleRows = sectionRows(rows);
   return visibleRows.length > 0 ? { title, rows: visibleRows } : undefined;
@@ -431,42 +429,41 @@ export function additionalDefendantName(
   );
 }
 
-export function groundLabels(data: UnknownRecord): string[] {
-  const summaryLabels = getArray(getValue(data, 'claimGroundSummaries'))
-    .map(item => asRecord(item))
-    .map(item => asRecord(item?.value))
-    .map(value => getStringFromValue(value?.label) ?? enumText(value?.code, GROUND_LABELS))
-    .filter((value): value is string => !!value);
+interface GroundEntry {
+  code: unknown;
+  english: string;
+}
 
-  if (summaryLabels.length > 0) {
-    return unique(summaryLabels);
+/** The claim's grounds, from the ground summaries when pcs-api sends them, otherwise from the ground collections. */
+function groundEntries(data: UnknownRecord): GroundEntry[] {
+  const fromSummaries = getArray(getValue(data, 'claimGroundSummaries'))
+    .map(item => asRecord(asRecord(item)?.value))
+    .map(value => ({
+      code: value?.code,
+      english: getStringFromValue(value?.label) ?? enumText(value?.code, GROUND_LABELS),
+    }))
+    .filter((entry): entry is GroundEntry => !!entry.english);
+
+  if (fromSummaries.length > 0) {
+    return fromSummaries;
   }
 
-  const labels = GROUND_COLLECTION_PATHS.flatMap(path =>
-    getArray(getValue(data, path)).map(value => enumText(value, GROUND_LABELS))
-  ).filter((value): value is string => !!value);
+  return GROUND_COLLECTION_PATHS.flatMap(path =>
+    getArray(getValue(data, path)).map(value => ({ code: value, english: enumText(value, GROUND_LABELS) }))
+  ).filter((entry): entry is GroundEntry => !!entry.english);
+}
 
-  return unique(labels);
+export function groundLabels(data: UnknownRecord): string[] {
+  return unique(groundEntries(data).map(entry => entry.english));
 }
 
 /** Ground names in the page language, keyed by the ground code pcs-api sends alongside its English label. */
 export function groundNames(data: UnknownRecord, copy: ViewTheClaimCopy): string[] {
-  const summaryNames = getArray(getValue(data, 'claimGroundSummaries'))
-    .map(item => asRecord(asRecord(item)?.value))
-    .map(value =>
-      groundName(value?.code, getStringFromValue(value?.label) ?? enumText(value?.code, GROUND_LABELS), copy)
-    )
-    .filter((value): value is string => !!value);
-
-  if (summaryNames.length > 0) {
-    return unique(summaryNames);
-  }
-
-  const names = GROUND_COLLECTION_PATHS.flatMap(path =>
-    getArray(getValue(data, path)).map(value => groundName(value, enumText(value, GROUND_LABELS), copy))
-  ).filter((value): value is string => !!value);
-
-  return unique(names);
+  return unique(
+    groundEntries(data)
+      .map(entry => groundName(entry.code, entry.english, copy))
+      .filter((value): value is string => !!value)
+  );
 }
 
 function groundName(code: unknown, english: string | undefined, copy: ViewTheClaimCopy): string | undefined {
@@ -649,14 +646,19 @@ export function formatDate(value: unknown, locale = 'en-gb'): string | undefined
 }
 
 /** pcs-api's details tab writes dates as English text (`1 January 2020`); show them in the page language. */
-const DETAILS_TAB_DATE_FORMATS = ['d MMMM yyyy', 'd MMM yyyy', 'dd/MM/yyyy', 'd/M/yyyy'];
+// pcs-api writes 'd MMMM yyyy' (dates) and 'd MMMM yyyy, h:mm:ssa' (date-times); the rest are tolerated variants.
+const DETAILS_TAB_DATE_FORMATS = ['d MMMM yyyy', 'd MMMM yyyy, h:mm:ssa', 'd MMM yyyy', 'dd/MM/yyyy', 'd/M/yyyy'];
+// en-gb only reads "Sept" as the short month; en also reads "Sep".
+const DETAILS_TAB_DATE_LOCALES = ['en-gb', 'en'];
 
 function formatDetailsTabDate(text: string, locale: string): string | undefined {
   const withoutOrdinal = text.trim().replace(/^(\d{1,2})(st|nd|rd|th)\b/i, '$1');
   for (const format of DETAILS_TAB_DATE_FORMATS) {
-    const date = DateTime.fromFormat(withoutOrdinal, format, { locale: 'en-gb' });
-    if (date.isValid) {
-      return date.setLocale(locale).toFormat('d MMMM yyyy');
+    for (const parseLocale of DETAILS_TAB_DATE_LOCALES) {
+      const date = DateTime.fromFormat(withoutOrdinal, format, { locale: parseLocale });
+      if (date.isValid) {
+        return date.setLocale(locale).toFormat('d MMMM yyyy');
+      }
     }
   }
   return undefined;
@@ -716,8 +718,9 @@ export function yesNoText(value: unknown, copy?: ViewTheClaimCopy, form: AnswerF
 
 /**
  * Shows a pcs-api value in the page language, whether it arrives as a code (`ASSURED_TENANCY`), as the
- * English label made from that code (`Assured tenancy`) or as a dynamic list. An unrecognised code is shown
- * as a sentence (`Claimant litigation friend`); any other unrecognised text is shown as received.
+ * English label made from that code (`Assured tenancy`) or as a dynamic list. An unrecognised code
+ * (`CLAIMANT_LITIGATION_FRIEND`) is shown as a sentence; anything else, such as free text the claimant typed,
+ * is shown exactly as received.
  */
 export function localisedValue(
   copy: ViewTheClaimCopy,
@@ -735,7 +738,7 @@ export function localisedValue(
     return copy.value(`${group}.${code}`, labels[code]);
   }
   const received = candidates[candidates.length - 1];
-  return /^[A-Z0-9_]+$/.test(received) ? enumToSentence(received) : received;
+  return /^[A-Z0-9]+(_[A-Z0-9]+)+$/.test(received) ? enumToSentence(received) : received;
 }
 
 export function codeFor(labels: Record<string, string>, candidates: string[]): string | undefined {

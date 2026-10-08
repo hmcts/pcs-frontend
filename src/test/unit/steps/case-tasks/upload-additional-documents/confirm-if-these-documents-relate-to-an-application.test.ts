@@ -377,7 +377,7 @@ describe('confirm-if-these-documents-relate-to-an-application POST', () => {
         errorSummary: expect.objectContaining({
           titleText: 'errors.title',
         }),
-        radioErrorMessage: { text: 'errors.relatedApplicationId.required' },
+        radioErrorMessage: { text: 'errors.relatedApplicationId.required', visuallyHiddenText: 'common:errorPrefix' },
       })
     );
   });

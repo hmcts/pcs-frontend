@@ -1,7 +1,8 @@
 import type { TFunction } from 'i18next';
 
+import { toDateLocale } from '@utils/formatLocalisedDate';
 import { buildNoticeDetailsSection } from '@utils/viewTheClaim/viewTheClaimSections';
-import { type ViewTheClaimCopy, buildViewTheClaimPageData, toDateLocale } from '@utils/viewTheClaim/viewTheClaimUtils';
+import { type ViewTheClaimCopy, buildViewTheClaimPageData } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const t = ((key: string) => key) as unknown as TFunction;
 

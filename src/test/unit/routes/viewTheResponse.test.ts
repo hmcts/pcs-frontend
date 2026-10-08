@@ -1412,7 +1412,7 @@ describe('viewTheResponse route', () => {
     });
   });
 
-  it('leaves out a counterclaim type that has no translation rather than showing its code', async () => {
+  it('shows a counterclaim type that has no translation as words rather than its code', async () => {
     const data = buildComprehensiveCaseData();
     data.possessionClaimResponse!.defendantResponses!.counterClaim!.claimType = 'NEW_TYPE_FROM_PCS_API' as never;
     mockCaseById(data);
@@ -1426,7 +1426,9 @@ describe('viewTheResponse route', () => {
     );
 
     const rows = (res.render as jest.Mock).mock.calls[0][1].counterclaim.rows as { value: { text: string } }[];
-    expect(rows.map(row => row.value.text)).not.toContain('NEW_TYPE_FROM_PCS_API');
+    const values = rows.map(row => row.value.text);
+    expect(values).not.toContain('NEW_TYPE_FROM_PCS_API');
+    expect(values).toContain('New type from pcs api');
   });
 });
 

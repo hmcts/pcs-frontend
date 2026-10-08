@@ -9,7 +9,6 @@
     "label": "Nodwch eich cod mynediad",
     "hint": "Mae hwn yn cynnwys 12 nod"
   },
-  "errorPrefix": "Gwall:",
   "errors": {
     "respondToClaimUnavailable": "Nid yw’r dewis i ymateb i hawliad ar gael ar hyn o bryd.",
     "claimNumberRequired": "Nodwch rif eich hawliad",

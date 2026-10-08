@@ -31,6 +31,7 @@ import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 import { RELEASE_1_2_ENABLED } from '@utils/respondToClaimFlags';
+import { enumToSentence } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const logger = Logger.getLogger('viewTheResponse');
 
@@ -586,12 +587,14 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
 
   const cc: CcdCounterClaim = responses.counterClaim;
 
-  // Only types with a translation are shown, so a new pcs-api type never appears as its raw code.
-  if (cc.claimType && COUNTERCLAIM_TYPES.includes(cc.claimType)) {
+  // A type without a translation (e.g. a new pcs-api type) is shown as words rather than hidden or shown as its code.
+  if (cc.claimType) {
     pushRow(
       rows,
       t('viewTheResponse:counterclaim.type'),
-      t(`viewTheResponse:counterclaim.claimTypeOptions.${cc.claimType}`)
+      COUNTERCLAIM_TYPES.includes(cc.claimType)
+        ? t(`viewTheResponse:counterclaim.claimTypeOptions.${cc.claimType}`)
+        : enumToSentence(cc.claimType)
     );
   }
 
