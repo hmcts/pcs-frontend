@@ -4,6 +4,8 @@
 @use 'service-navigation';
 @use 'timeout-modal';
 @use 'multi-file-upload';
+@use 'make-order';
+@use '@hmcts-cft/docweave/styles/editor';
 
 .section-border {
   border: 1px solid govuk-colour('blue');
