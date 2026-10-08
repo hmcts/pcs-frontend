@@ -29,6 +29,10 @@ jest.mock('../../../../main/assets/js/session-timeout', () => ({
   initSessionTimeout: jest.fn(),
 }));
 
+jest.mock('../../../../main/assets/js/redirect-on-back', () => ({
+  initRedirectOnBack: jest.fn(),
+}));
+
 describe('index.ts', () => {
   beforeEach(() => {
     jest.resetModules();
@@ -44,6 +48,7 @@ describe('index.ts', () => {
     const { initPostcodeLookup } = require('../../../../main/assets/js/postcode-lookup');
     const { initPostcodeSelection } = require('../../../../main/assets/js/postcode-select');
     const { initSessionTimeout } = require('../../../../main/assets/js/session-timeout');
+    const { initRedirectOnBack } = require('../../../../main/assets/js/redirect-on-back');
 
     expect(initAll).toHaveBeenCalled();
     expect(initMakeOrder).not.toHaveBeenCalled();
@@ -51,6 +56,7 @@ describe('index.ts', () => {
     expect(initPostcodeLookup).toHaveBeenCalled();
     expect(initPostcodeSelection).toHaveBeenCalled();
     expect(initSessionTimeout).toHaveBeenCalled();
+    expect(initRedirectOnBack).toHaveBeenCalled();
   });
 
   it('loads the make order editor on the make order page', async () => {
