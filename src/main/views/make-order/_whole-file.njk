@@ -1,0 +1,6 @@
+{% if caseBundle %}
+  <p class="govuk-body govuk-!-margin-bottom-1">
+    <a class="govuk-link" id="case-bundle-link" href="{{ caseBundle.href }}" target="_blank" rel="noopener noreferrer">Whole file download (opens in new tab)</a>
+  </p>
+  <p class="govuk-hint govuk-!-margin-bottom-4">Every document on the case.{% if caseBundle.updatedDisplay %} Last updated {{ caseBundle.updatedDisplay }}.{% endif %}</p>
+{% endif %}

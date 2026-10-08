@@ -37,7 +37,7 @@ function applicationModel(application: OrderApplication, caseReference: number) 
   };
 }
 
-/** The case bundle as the application panel links it, with when it was last brought up to date. */
+/** The whole file download linked from the order page, with when it was last brought up to date. */
 function caseBundleModel(bundle: OrderCaseBundle, caseReference: number) {
   const updated = DateTime.fromISO(String(bundle.updatedAt ?? ''));
   return {
