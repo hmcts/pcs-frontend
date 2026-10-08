@@ -178,11 +178,11 @@ describe('logger module', () => {
   });
 
   it('only attaches the telemetry transport once however often telemetry starts', () => {
-    const logger = Logger.getLogger(`logger-enable-twice-${Date.now()}`);
     const emit = jest.fn();
     logs.setGlobalLoggerProvider({ getLogger: () => ({ emit, enabled: () => true }) });
 
     try {
+      const logger = Logger.getLogger(`logger-enable-twice-${Date.now()}`);
       Logger.enableTelemetry();
       Logger.enableTelemetry();
       logger.error('Exported once');
