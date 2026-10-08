@@ -15,8 +15,8 @@
     "ageLabel": "Ydych chi'n 18 oed neu'n hŷn?",
     "ageDescription": "Dewiswch opsiwn i barhau.",
     "ageOptions": {
-      "yes": "Ydw",
-      "no": "Nac ydw"
+      "yes": "Ydy",
+      "no": "Nac ydy"
     }
   },
   "page3": {

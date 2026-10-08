@@ -8,8 +8,8 @@
   "includesBullet3": "unrhyw wybodaeth arall a roddwyd ganddynt fel rhan o'u hawliad",
   "disputeOtherPartsQuestion": "A ydych eisiau gwrthwynebu unrhyw rannau eraill o'r hawliad?",
   "disputeOtherPartsOptions": {
-    "yes": "Ydw",
-    "no": "Nac ydw"
+    "yes": "Ydy",
+    "no": "Nac ydy"
   },
   "disputeDetails": {
     "label": "Eglurwch pa rannau o'r hawliad nad ydych yn cytuno â nhw"
