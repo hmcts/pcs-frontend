@@ -19,7 +19,7 @@
     },
     "setAside": {
       "label": "Gofyn i'r llys roi penderfyniad a wnaed gan y llys o'r neilltu (canslo)",
-      "hint": "Gallwch ofyn i'r llys roi ei orchymyn o'r neilltu os oes gennych reswm da. Er enghraifft, os nad oeddech yn gallu mynychu'r gwrandawiad llys oherwydd eich bod yn sâl."
+      "hint": "Gallwch ofyn i'r llys roi ei orchymyn o'r neilltu os oes gennych reswm da. Er enghraifft, os nad oeddech yn gallu mynychu'r gwrandawiad llys oherwydd eich bod yn sâl"
     },
     "somethingElse": {
       "label": "Rhywbeth arall",

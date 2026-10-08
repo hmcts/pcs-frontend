@@ -7,9 +7,9 @@
   "errors": {
     "firstName": "Nodwch eich enw cyntaf",
     "firstNameMaxLength": "Rhaid i’r enw cyntaf fod yn 60 nod neu lai",
-    "firstNameInvalidCharacters": "Dylai enw cyntaf ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnodau, bylchau a chollnodau.",
+    "firstNameInvalidCharacters": "Dylai enw cyntaf ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnodau, bylchau a chollnodau",
     "lastName": "Nodwch eich cyfenw",
     "lastNameMaxLength": "Rhaid i’r cyfenw fod yn 60 nod neu lai",
-    "lastNameInvalidCharacters": "Dylai cyfenw ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnodau, bylchau a chollnodau."
+    "lastNameInvalidCharacters": "Dylai cyfenw ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnodau, bylchau a chollnodau"
   }
 }

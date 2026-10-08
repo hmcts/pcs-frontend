@@ -6,7 +6,7 @@
     "no": "Naddo"
   },
   "textAreaLabel": "Rhowch fanylion faint rydych wedi’i dalu a phryd",
-  "textAreaHint": "Gallwch nodi hyd at 500 o nodau.",
+  "textAreaHint": "Gallwch nodi hyd at 500 o nodau",
   "errors": {
     "repaymentsInfo": "Rhowch fanylion faint rydych wedi’i dalu a phryd",
     "repaymentsInfoMaxLength": "Rhaid i’r manylion talu fod yn 500 nod neu lai",

@@ -11,8 +11,8 @@
     },
     "claimAmount": {
       "required": "Nodwch faint mae'r diffynnydd yn hawlio amdano",
-      "largeAmount": "Rhaid i'r swm mae'r diffynnydd yn ei hawlio fod yn llai nag £1 biliwn.",
-      "negative": "Rhaid i'r swm mae'r diffynnydd yn ei hawlio fod yn £0.00 neu'n uwch.",
+      "largeAmount": "Rhaid i'r swm mae'r diffynnydd yn ei hawlio fod yn llai nag £1 biliwn",
+      "negative": "Rhaid i'r swm mae'r diffynnydd yn ei hawlio fod yn £0.00 neu'n uwch",
       "invalidFormat": "Rhowch faint mae'r diffynnydd yn ei hawlio yn y fformat cywir, er enghraifft 148 neu 148.50"
     },
     "estimatedMaxClaimAmount": {

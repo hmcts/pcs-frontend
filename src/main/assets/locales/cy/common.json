@@ -51,7 +51,7 @@
     "defaultRequired": "Rhaid llenwi’r blwch hwn",
     "defaultInvalid": "Fformat annilys",
     "defaultMaxLength": "Rhaid iddo fod yn {max} nod neu lai",
-    "defaultSpecialCharacter": "Dylai {fieldName} ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnodau, bylchau a chollnodau.",
+    "defaultSpecialCharacter": "Dylai {fieldName} ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnodau, bylchau a chollnodau",
     "chooseOption": "Dewis opsiwn",
     "email": {
       "required": "Rhowch gyfeiriad e-bost",
@@ -81,7 +81,7 @@
       "filenameTooLong": "Rhaid i enw’r ffeil fod yn {{maxLength}} nod neu lai",
       "noFileSelected": "Dewiswch ffeil i’w llwytho",
       "uploadFailed": "Ni ellid llwytho’r ffeil a ddewiswyd - rhowch gynnig arall arni",
-      "fileDeleteFailed": "Ni ellid dileu’r ffeil - rhowch gynnig arall arni.",
+      "fileDeleteFailed": "Ni ellid dileu’r ffeil - rhowch gynnig arall arni",
       "documentUrlRequired": "Dewiswch ffeil i’w dileu",
       "uploadSuccess": "{{filename}} wedi’i uwchlwytho",
       "errorSummaryTitle": "Mae yna broblem"
@@ -134,7 +134,7 @@
       "one": "Mae gennych %{count} gair yn ormod",
       "other": "Mae gennych %{count} gair yn ormod"
     },
-    "textareaDescriptionText": "Gallwch nodi hyd at %{count} o nodau."
+    "textareaDescriptionText": "Gallwch nodi hyd at %{count} o nodau"
   },
   "errorPages": {
     "pageNotFound": {
@@ -178,7 +178,7 @@
       "paragraph8": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Gwybodaeth am ffioedd galwad (yn agor mewn tab newydd)</a>."
     },
     "accessDenied": {
-      "title": "Nid oes gennych fynediad i’r dudalen hon.",
+      "title": "Nid oes gennych fynediad i’r dudalen hon",
       "paragraph": "Cysylltwch â ni os ydych yn meddwl y dylech gael mynediad, neu os ydych angen help gyda’ch achos.",
       "heading": "E-bost",
       "paragraph2": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">gwasanaeth dod o hyd i lys neu dribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
