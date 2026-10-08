@@ -52,6 +52,29 @@ describe('make an order: deciding an application', () => {
     expect(document.body.textContent).not.toContain('Answer every question');
   });
 
+  it('links the case bundle beside the application documents, once the case has one', async () => {
+    await openPage((await app.get(PAGE)).text);
+    expect(document.querySelector('#case-bundle-link')).toBeNull();
+    await app.close();
+
+    app = await bootApp({
+      application: APPLICATION,
+      caseBundle: {
+        id: 'b0b0b0b0-0000-4000-8000-000000000002',
+        fileName: '1234-case-bundle.pdf',
+        updatedAt: '2026-10-07T22:24:17Z',
+      },
+    });
+    await openPage((await app.get(PAGE)).text);
+
+    const link = document.querySelector<HTMLAnchorElement>('#case-bundle-link');
+    expect(link?.href).toContain(`/case/${CASE_REFERENCE}/view-documents/b0b0b0b0-0000-4000-8000-000000000002`);
+    expect(link?.textContent).toContain('1234-case-bundle.pdf');
+    expect(document.querySelector('#application-details')?.textContent).toContain(
+      'Last updated 7 October 2026 at 11:24pm'
+    );
+  });
+
   it("uses the applicant's wording as the order's numbered clauses, with no decision clause of its own", async () => {
     const page = await openPage((await app.get(PAGE)).text);
     expect(control<HTMLButtonElement>('[data-restore-requested-wording]').hidden).toBe(true);
