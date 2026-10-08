@@ -37,7 +37,12 @@
     },
     "possessionNoticeReceived": {
       "label": "A wnaeth {{ claimantName }} hysbysu’r diffynnydd am eu bwriad i ddechrau achos meddiannu?",
-      "changeHidden": "wedi derbyn hysbysiad"
+      "changeHidden": "wedi derbyn hysbysiad",
+      "options": {
+        "yes": "Do",
+        "no": "Naddo",
+        "imNotSure": "Diffynnydd ddim yn siŵr"
+      }
     },
     "noticeReceivedDate": {
       "label": "Pryd gafodd y diffynnydd yr hysbysiad gan {{claimantName}}?",

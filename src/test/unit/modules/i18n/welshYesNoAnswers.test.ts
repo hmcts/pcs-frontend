@@ -42,6 +42,9 @@ const WLU_YES_NO: [file: string, yesKey: string, yes: string, no: string][] = [
   ['makeAnApplication/doYouWantToUploadDocumentsToSupportYourApplication.json', 'options', 'Ydw', 'Nac ydw'],
   // View the response repeats the answer the defendant chose on the counterclaim screen
   ['viewTheResponse.json', 'answers.makeCounterClaim', 'Oes', 'Nac oes'],
+  // Check your answers repeats the answer the defendant chose on the notice screen
+  ['respondToClaim/checkYourAnswersYourResponse.json', 'rows.possessionNoticeReceived.options', 'Do', 'Naddo'],
+  ['respondToClaim/legalrep/checkYourAnswersYourResponse.json', 'rows.possessionNoticeReceived.options', 'Do', 'Naddo'],
 ];
 
 const localesDir = path.join(__dirname, '..', '..', '..', '..', 'main', 'assets', 'locales', 'cy');

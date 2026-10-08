@@ -153,7 +153,7 @@ function addPossessionNoticeReceivedRow({ rows, validatedCase, t, change }: RowC
   }
   rows.push({
     key: { text: t('rows.possessionNoticeReceived.label', { claimantName: validatedCase.claimantName }) },
-    value: { text: t(`options.${value}`) },
+    value: { text: t(`rows.possessionNoticeReceived.options.${value}`) },
     actions: { items: [change('confirmation-of-notice-given', 'rows.possessionNoticeReceived.changeHidden')] },
   });
 }
