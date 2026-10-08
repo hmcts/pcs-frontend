@@ -18,7 +18,7 @@
   },
   "rows": {
     "uploadedDocuments": {
-      "label": "Uwchlwythwch unrhyw ffeilio rydych yn meddwl sy’n berthnasol i’ch ymateb.",
+      "label": "Uwchlwythwch unrhyw ffeiliau rydych yn meddwl sy’n berthnasol i’ch ymateb.",
       "changeHidden": "ffeiliau wedi’u huwchlwytho",
       "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     },

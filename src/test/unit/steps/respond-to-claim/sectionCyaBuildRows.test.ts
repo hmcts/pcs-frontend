@@ -481,6 +481,12 @@ describe('section-CYA row builders — characterisation', () => {
       expect(row?.actions?.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
     });
 
+    it('notice-received row uses its own question’s answer wording', () => {
+      const rows = buildDisputeRows(reqWith(model({ possessionNoticeReceived: 'YES' })), t);
+      const row = rows.find(r => r.key.text === 'rows.possessionNoticeReceived.label');
+      expect(row?.value).toEqual({ text: 'rows.possessionNoticeReceived.options.yes' });
+    });
+
     it('notice-date row: "not-provided" branch shows "No answer provided" when the optional date is blank', () => {
       const rows = buildDisputeRows(reqWith(model({ possessionNoticeReceived: 'YES' })), t);
       const row = rows.find(r => r.key.text === 'rows.noticeReceivedDate.label');
