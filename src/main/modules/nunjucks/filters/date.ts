@@ -6,5 +6,5 @@ type FilterContext = { ctx?: { lang?: string } } | void;
 // The shared env globals are rewritten on every request, so they are not safe to read here.
 export function date(this: FilterContext, isoDateUtc: string, format: string = 'd LLLL y', lang?: string): string {
   const dateTime = toUkDateTime(isoDateUtc);
-  return dateTime ? dateTime.setLocale(toDateLocale(lang ?? (this ? this.ctx?.lang : undefined))).toFormat(format) : '';
+  return dateTime ? dateTime.setLocale(toDateLocale(lang ?? this?.ctx?.lang)).toFormat(format) : '';
 }
