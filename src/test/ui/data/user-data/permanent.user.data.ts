@@ -1,7 +1,6 @@
 import { resolveIdamPassword } from '../../utils/idamPassword';
 
 export const user = {
-  
   localAuthority: {
     email: 'pcs.local.auth1user1@test.com',
     get password() {
