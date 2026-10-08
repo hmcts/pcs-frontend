@@ -28,11 +28,13 @@ const COUNTERCLAIM_FLAT_FEE_FEE0450_LOOKUP_PARAMS: FeeLookupParams = {
 
 const SUSPEND_FEE_FEE0458_LOOKUP_PARAMS: FeeLookupParams = {
   channel: 'default',
-  event: 'general application',
+  event: 'miscellaneous',
   jurisdiction1: 'civil',
   jurisdiction2: 'civil',
-  service: 'general',
-  keyword: 'ApplicationToVaryJudgmentOrSuspendEnforcement',
+  service: 'other',
+  applicant_type: 'all',
+  amount_or_volume: 1,
+  keyword: 'AppnToVaryOrSuspend',
 };
 
 (config.get as jest.Mock).mockImplementation(key => {
