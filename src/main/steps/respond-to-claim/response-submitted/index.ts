@@ -21,6 +21,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/responseSubmitted.njk`,
   extendGetContent: req => {
     clientContextSessionClearer(req);
+
     return {
       backUrl: '',
       redirectOnBack: true,
