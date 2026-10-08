@@ -55,11 +55,23 @@ describe('resolveDashboardTemplates', () => {
         ).toBe('Respond by 12 Tachwedd 2026.');
       });
 
-      it('shows an ISO date in English on an English page', () => {
+      it('leaves dates exactly as sent on an English page', () => {
         expect(
           resolveNotification(t, 'Defendant.CaseIssued', { responseEndDate: '2026-11-12' }, '1234567890123456', 'en')
             ?.body
-        ).toBe('Respond by 12 November 2026.');
+        ).toBe('Respond by 2026-11-12.');
+      });
+
+      it('leaves date-times exactly as sent so the time is not lost', () => {
+        expect(
+          resolveNotification(
+            t,
+            'Defendant.CaseIssued',
+            { responseEndDate: '2026-11-12T14:30:00Z' },
+            '1234567890123456',
+            'cy'
+          )?.body
+        ).toBe('Respond by 2026-11-12T14:30:00Z.');
       });
 
       it('leaves values that are not ISO dates exactly as sent', () => {

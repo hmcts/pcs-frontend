@@ -39,12 +39,12 @@ function withFeeAmountAsNumber(values: Record<string, unknown>): Record<string, 
   return { ...values, feeAmount: asNumber };
 }
 
-// Only plain ISO dates (2026-11-12) or date-times; anything else is left exactly as sent.
-const ISO_DATE = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
+// Only plain ISO dates (2026-11-12); date-times and anything else are left exactly as sent.
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-/** Shows ISO date template values in the page language, e.g. 12 Tachwedd 2026. */
+/** Shows ISO date template values in Welsh on a Welsh page, e.g. 12 Tachwedd 2026. English is left as sent. */
 function withLocalisedDates(values: Record<string, unknown>, lang?: string): Record<string, unknown> {
-  if (!lang) {
+  if (lang !== 'cy') {
     return values;
   }
   return Object.fromEntries(

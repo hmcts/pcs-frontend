@@ -57,6 +57,11 @@ describe('formatLocalisedDate', () => {
     );
   });
 
+  it('accepts a timestamp with a space instead of a T', () => {
+    expect(formatLocalisedDate('2024-03-20 10:00:00', 'en')).toBe('20 March 2024');
+    expect(formatLocalisedDate('2024-03-20 10:00:00', 'cy')).toBe('20 Mawrth 2024');
+  });
+
   it('keeps the calendar date of a date-only value', () => {
     expect(formatLocalisedDate('2024-06-30', 'en')).toBe('30 June 2024');
   });
