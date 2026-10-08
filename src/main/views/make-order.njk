@@ -39,6 +39,8 @@
     {{ claimantNames }} vs {{ defendantNames }}
   </p>
 
+  {% include "make-order/_whole-file.njk" %}
+
   {% if order.queryFromCaseworker %}
     {# An order a caseworker returned: their query, which the page keeps if it is shown again with errors. #}
     <h2 class="govuk-heading-m">Query from the caseworker</h2>

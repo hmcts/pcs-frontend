@@ -19,6 +19,8 @@
         data-property-address="{{ propertyAddressDisplay }}">
     {{ csrfProtection(csrfToken) }}
 
+    {% include "make-order/_whole-file.njk" %}
+
     {% if edits.added or edits.changed %}
       {% set editsHtml %}
         <p class="govuk-notification-banner__heading">Order preview edited by the Judge</p>

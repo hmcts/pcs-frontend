@@ -57,13 +57,6 @@
     { key: { text: "Without notice" }, value: { text: (application.withoutNoticeDisplay or "No") + ((": " + application.withoutNoticeReason) if application.withoutNoticeReason else "") } },
     { key: { text: "Application documents" }, value: { html: documentLinks } }
   ]) %}
-  {% if caseBundle %}
-    {% set bundleLink %}
-      <a class="govuk-link" id="case-bundle-link" href="{{ caseBundle.href }}" target="_blank" rel="noopener">{{ caseBundle.fileName }} (opens in new tab)</a>
-      {% if caseBundle.updatedDisplay %}<p class="govuk-hint govuk-!-margin-top-1 govuk-!-margin-bottom-0">Every document on the case. Last updated {{ caseBundle.updatedDisplay }}.</p>{% endif %}
-    {% endset %}
-    {% set rows = rows.concat([{ key: { text: "Case bundle" }, value: { html: bundleLink } }]) %}
-  {% endif %}
   {{ govukSummaryList({ rows: rows, classes: "govuk-!-margin-bottom-4", attributes: { id: "application-details" } }) }}
 
   <h3 class="govuk-heading-m">The order the applicant asked for</h3>
