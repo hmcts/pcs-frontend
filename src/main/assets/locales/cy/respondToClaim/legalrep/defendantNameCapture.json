@@ -6,7 +6,7 @@
     "firstNameMaxLength": "Rhaid i enw cyntaf y cleient fod yn 60 nod neu lai",
     "firstNameInvalidCharacters": "Dylai enw cyntaf y cleient ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnodau, bylchau a chollnodau",
     "lastName": "Nodwch gyfenw eich cleient",
-    "lastNameMaxLength": "Rhaid i gyfenw'r cleient fod yn 60 nod neu lai",
-    "lastNameInvalidCharacters": "Rhaid i gyfenw'r cleient ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnodau, bylchau a chollnodau"
+    "lastNameMaxLength": "Rhaid i gyfenw’r cleient fod yn 60 nod neu lai",
+    "lastNameInvalidCharacters": "Rhaid i gyfenw’r cleient ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnodau, bylchau a chollnodau"
   }
 }

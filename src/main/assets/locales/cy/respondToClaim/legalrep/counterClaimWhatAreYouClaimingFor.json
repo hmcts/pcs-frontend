@@ -1,6 +1,6 @@
 {
-  "pageTitle": "Am beth mae'r diffynnydd yn ei hawlio?",
-  "heading": "Am beth mae'r diffynnydd yn ei hawlio?",
+  "pageTitle": "Am beth mae’r diffynnydd yn ei hawlio?",
+  "heading": "Am beth mae’r diffynnydd yn ei hawlio?",
   "options": {
     "paymentOrCompensation": "Swm o arian neu iawndal",
     "somethingElse": "Rhywbeth arall",
@@ -8,7 +8,7 @@
   },
   "errors": {
     "claimType": {
-      "required": "Dewiswch os yw'r diffynnydd yn hawlio am swm o arian neu iawndal, y ddau neu rywbeth arall"
+      "required": "Dewiswch os yw’r diffynnydd yn hawlio am swm o arian neu iawndal, y ddau neu rywbeth arall"
     }
   }
 }
