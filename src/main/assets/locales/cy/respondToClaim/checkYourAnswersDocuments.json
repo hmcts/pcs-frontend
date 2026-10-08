@@ -1,10 +1,10 @@
 {
   "pageTitle": "Gwirio eich atebion",
-  "cardTitle": "cy Upload files",
+  "cardTitle": "Uwchlwytho ffeiliau",
   "rows": {
     "uploadedDocuments": {
-      "label": "cy Uploaded files",
-      "changeHidden": "cy uploaded files",
+      "label": "Ffeiliau wedi’u huwchlwytho",
+      "changeHidden": "ffeiliau wedi’u huwchlwytho",
       "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
     }
   }

@@ -36,7 +36,8 @@ module.exports = {
       ...scss.rules,
       {
         test: /\.ts$/,
-        use: 'ts-loader',
+        // ES modules let webpack split the make order editor into its own chunk.
+        use: { loader: 'ts-loader', options: { compilerOptions: { module: 'es2020' } } },
         exclude: /node_modules/,
       },
     ],
@@ -51,5 +52,6 @@ module.exports = {
     path: path.resolve(__dirname, 'src/main/public/'),
     publicPath: '/',
     filename,
+    chunkFilename: filename,
   },
 };
