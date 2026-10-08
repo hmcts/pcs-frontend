@@ -32,6 +32,9 @@ export function toUkDateTime(value: unknown): DateTime | undefined {
     dateTime = DATE_ONLY.test(text)
       ? DateTime.fromISO(text, { zone: UK_ZONE })
       : DateTime.fromISO(text, { zone: 'utc' });
+    if (!dateTime.isValid) {
+      dateTime = DateTime.fromSQL(text, { zone: 'utc' });
+    }
   }
   return dateTime?.isValid ? dateTime.setZone(UK_ZONE) : undefined;
 }

@@ -704,7 +704,7 @@ export function yesNoText(value: unknown, copy?: ViewTheClaimCopy, form: AnswerF
 
   const english = YES_NO_LABELS[normalised];
   if (!english) {
-    return undefined;
+    return enumToSentence(normalised);
   }
   if (!copy) {
     return english;
@@ -716,8 +716,8 @@ export function yesNoText(value: unknown, copy?: ViewTheClaimCopy, form: AnswerF
 
 /**
  * Shows a pcs-api value in the page language, whether it arrives as a code (`ASSURED_TENANCY`), as the
- * English label made from that code (`Assured tenancy`) or as a dynamic list. Anything unrecognised is
- * shown as received.
+ * English label made from that code (`Assured tenancy`) or as a dynamic list. An unrecognised code is shown
+ * as a sentence (`Claimant litigation friend`); any other unrecognised text is shown as received.
  */
 export function localisedValue(
   copy: ViewTheClaimCopy,
@@ -731,7 +731,11 @@ export function localisedValue(
   }
 
   const code = codeFor(labels, candidates);
-  return code ? copy.value(`${group}.${code}`, labels[code]) : candidates[candidates.length - 1];
+  if (code) {
+    return copy.value(`${group}.${code}`, labels[code]);
+  }
+  const received = candidates[candidates.length - 1];
+  return /^[A-Z0-9_]+$/.test(received) ? enumToSentence(received) : received;
 }
 
 export function codeFor(labels: Record<string, string>, candidates: string[]): string | undefined {

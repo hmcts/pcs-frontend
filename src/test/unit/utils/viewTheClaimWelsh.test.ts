@@ -12,7 +12,12 @@ import {
   STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS,
   TENANCY_TYPE_LABELS,
 } from '@utils/viewTheClaim/viewTheClaimLabels';
-import { type ViewTheClaimPageData, buildViewTheClaimPageData } from '@utils/viewTheClaim/viewTheClaimUtils';
+import {
+  type ViewTheClaimCopy,
+  type ViewTheClaimPageData,
+  buildViewTheClaimPageData,
+  localisedValue,
+} from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const caseData = {
   claimGroundSummaries: [
@@ -343,13 +348,21 @@ describe('View the claim values that arrive as codes or without a code', () => {
     ).toBe('Ddim yn siŵr');
   });
 
-  it('never turns an unexpected answer code into English', async () => {
+  it('still shows an unexpected answer rather than hiding the row', async () => {
     expect(
       await welshValue(
         { detailsTab_ClaimantRegistrationAndLicensingDetails: { isExemptLandlord: 'MAYBE_LATER' } },
         'isExemptLandlord'
       )
-    ).toBeUndefined();
+    ).toBe('Maybe later');
+  });
+
+  it('shows an unknown code as a sentence, not the raw code', () => {
+    const copy = { value: (_key: string, english: string) => english } as unknown as ViewTheClaimCopy;
+    expect(localisedValue(copy, 'statementOfTruthCompletedBy', {}, 'CLAIMANT_LITIGATION_FRIEND')).toBe(
+      'Claimant litigation friend'
+    );
+    expect(localisedValue(copy, 'statementOfTruthCompletedBy', {}, 'Jane Smith')).toBe('Jane Smith');
   });
 
   it('shows persons unknown in Welsh whatever the casing', async () => {
