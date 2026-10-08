@@ -124,7 +124,7 @@ function addOtherTenantsRow({ rows, hc, t, change, yesNoNotSure }: RowContext): 
   }
 }
 
-function addAlternativeAccommodationRow({ rows, hc, t, change, yesNoNotSure }: RowContext): void {
+function addAlternativeAccommodationRow({ rows, hc, t, lang, change, yesNoNotSure }: RowContext): void {
   if (!hc.alternativeAccommodation) {
     return;
   }
@@ -142,7 +142,7 @@ function addAlternativeAccommodationRow({ rows, hc, t, change, yesNoNotSure }: R
   if (isYes(hc.alternativeAccommodation)) {
     const detailRow: SummaryListRow = {
       key: { text: t('rows.alternativeAccommodationDate.label') },
-      value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
+      value: { text: date ? formatIsoDate(date, lang) : t('noAnswerProvided') },
       actions: {
         items: [
           change(
