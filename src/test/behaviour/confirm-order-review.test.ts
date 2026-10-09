@@ -19,7 +19,7 @@ import {
 
 const MAKE_ORDER = `/case/${CASE_REFERENCE}/make-order`;
 const BASE = `/case/${CASE_REFERENCE}/confirm-order-review`;
-const INTRO = `${BASE}?orderId=order-awaiting-review`;
+const INTRO = `${BASE}?orderId=order-awaiting-review&taskId=task-1`;
 const REVIEW = `${BASE}/review`;
 const REVIEW_DATES = `${BASE}/review-dates`;
 const PROCEED_TO_ISSUE = `${BASE}/proceed-to-issue`;
@@ -287,6 +287,7 @@ describe('confirm order review', () => {
           action: 'RETURN_TO_JUDGE',
           orderId: 'order-awaiting-review',
           version: 3,
+          taskId: 'task-1',
           queryToJudge: 'Which defendant does paragraph 2 mean?',
         },
       ]);
@@ -504,6 +505,7 @@ describe('confirm order review', () => {
           action: 'ISSUE',
           orderId: 'order-awaiting-review',
           version: 3,
+          taskId: 'task-1',
           issue: {
             order: {
               orderType,

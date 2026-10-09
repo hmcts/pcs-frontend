@@ -326,8 +326,9 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       // Opening the review starts it afresh: whatever was answered before, and its confirmation, go.
       endReview(req);
       delete req.session.orderReviewOutcomes?.[caseReference];
-      // The orders tab links to the review of one order, which pcs-api starts.
+      // The caseworker's task links to the review of one order, which pcs-api starts, and names the task.
       const orderId = typeof req.query.orderId === 'string' ? req.query.orderId : undefined;
+      const taskId = typeof req.query.taskId === 'string' ? req.query.taskId : undefined;
       const started = await ccdCaseService.startCaseEvent(
         req.session.user!.accessToken,
         caseReference,
@@ -341,7 +342,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
         throw new HTTPError('Not permitted to review an order on this case', 403);
       }
       const start = JSON.parse(payload as string) as OrderStart;
-      const review: OrderReviewSession = { ...start, eventToken: started.eventToken, answers: newAnswers() };
+      const review: OrderReviewSession = { ...start, eventToken: started.eventToken, answers: newAnswers(), taskId };
       req.session.orderReviews = { ...req.session.orderReviews, [caseReference]: review };
       res.render('confirm-order-review/intro', { ...pageModel(req, review), ...orderModel(review) });
     } catch (error) {
