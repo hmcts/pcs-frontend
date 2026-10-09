@@ -1,5 +1,5 @@
 import { buildFooterModel } from '@hmcts-cft/cft-ui-component-lib';
-import { type DocWeaveSnapshot, describeChanges } from '@hmcts-cft/docweave';
+import { type DocWeaveSnapshot, describeChanges, renderHtml } from '@hmcts-cft/docweave';
 import { Application, NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
@@ -131,15 +131,17 @@ function judgeEdits(snapshot: DocWeaveSnapshot | null | undefined) {
   return { added: changes.inserted > 0, changed: changes.modified > 0, deleted: false };
 }
 
-/** The judge's order as the review pages show it: its document for the preview, and how the judge changed it. */
+/**
+ * The judge's order as the review pages show it: its preview, with the clauses they added and changed marked
+ * as Docweave's editor showed them, and how the judge changed it.
+ */
 function orderModel(review: OrderReviewSession) {
   const snapshot = review.order.docweaveSnapshot;
   return {
     freeForm: review.order.orderType === 'FREE_FORM',
     edits: judgeEdits(snapshot),
     staffMessage: staffMessage(review.order.formData),
-    // Rendered into a script element, so nothing in the order can close it.
-    orderSnapshotJson: JSON.stringify(snapshot ?? null).replace(/</g, '\\u003c'),
+    orderPreviewHtml: snapshot ? renderHtml(snapshot, { changes: true }) : undefined,
   };
 }
 

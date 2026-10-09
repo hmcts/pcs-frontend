@@ -17,10 +17,6 @@ jest.mock('../../../../main/assets/js/make-order', () => ({
   startWithSavedOrderTab: jest.fn((start: () => void) => start()),
 }));
 
-jest.mock('../../../../main/assets/js/order-preview', () => ({
-  initOrderPreview: jest.fn(),
-}));
-
 jest.mock('../../../../main/assets/js/postcode-lookup', () => ({
   initPostcodeLookup: jest.fn(),
 }));
@@ -43,13 +39,12 @@ describe('index.ts', () => {
     document.body.innerHTML = '';
   });
 
-  it('initialises all modules without loading the make order editor or order preview', () => {
+  it('initialises all modules without loading the make order editor', () => {
     require('../../../../main/assets/js/index');
 
     const { initAll } = require('govuk-frontend');
     const { initMakeOrder } = require('../../../../main/assets/js/make-order');
     const { initMultiFileUpload } = require('../../../../main/assets/js/multi-file-upload');
-    const { initOrderPreview } = require('../../../../main/assets/js/order-preview');
     const { initPostcodeLookup } = require('../../../../main/assets/js/postcode-lookup');
     const { initPostcodeSelection } = require('../../../../main/assets/js/postcode-select');
     const { initSessionTimeout } = require('../../../../main/assets/js/session-timeout');
@@ -58,7 +53,6 @@ describe('index.ts', () => {
     expect(initAll).toHaveBeenCalled();
     expect(initMakeOrder).not.toHaveBeenCalled();
     expect(initMultiFileUpload).toHaveBeenCalled();
-    expect(initOrderPreview).not.toHaveBeenCalled();
     expect(initPostcodeLookup).toHaveBeenCalled();
     expect(initPostcodeSelection).toHaveBeenCalled();
     expect(initSessionTimeout).toHaveBeenCalled();
@@ -77,16 +71,5 @@ describe('index.ts', () => {
     expect(startWithSavedOrderTab).toHaveBeenCalledWith(initAll);
     expect(initAll).toHaveBeenCalled();
     expect(initMakeOrder).toHaveBeenCalled();
-  });
-
-  it('loads the order preview on a page that shows one', async () => {
-    document.body.innerHTML = '<div data-order-preview></div>';
-
-    require('../../../../main/assets/js/index');
-    await new Promise(resolve => setTimeout(resolve, 0));
-
-    const { initOrderPreview } = require('../../../../main/assets/js/order-preview');
-
-    expect(initOrderPreview).toHaveBeenCalled();
   });
 });

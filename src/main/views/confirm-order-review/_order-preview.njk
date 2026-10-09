@@ -1,5 +1,8 @@
-{# The judge's order as they submitted it, read only, which the page's script renders from its Docweave document. #}
-<script type="application/json" id="order-preview-document">{{ orderSnapshotJson | safe }}</script>
+{# The judge's order as they submitted it, read only, as Docweave renders its document. #}
 <div class="pcs-order-preview" data-order-preview aria-label="Order the Judge submitted" role="region">
-  <p class="govuk-body">The order preview needs JavaScript to show.</p>
+  {% if orderPreviewHtml %}
+    {{ orderPreviewHtml | safe }}
+  {% else %}
+    <p class="govuk-body">The Judge did not write in the order preview.</p>
+  {% endif %}
 </div>
