@@ -7,7 +7,7 @@ const mockProvider = new PactV4({
   dir: './pact/pacts',
 });
 
-  describe('Service Authorisation Consumer Pact Test', () => {
+describe('Service Authorisation Consumer Pact Test', () => {
   const MICRO_SERVICE_NAME = 'someMicroServiceName';
   const MICRO_SERVICE_TOKEN = 'someMicroServiceToken';
 
