@@ -2,7 +2,7 @@ export const priorityDebtDetails = {
   mainHeader: `Priority debt details`,
   whatIsTheTotalAmountQuestion: `What is the total amount the defendant owes for all their priority debts?`,
   howMuchDoesDefendantPayQuestion: `How much does the defendant pay towards their priority debts each week or month?`,
-  enterTotalAmountHintText: `Enter total amount in pounds and pence, for example £148 or £148.50`,
+  enterTotalAmountHintText: `Enter total amount in pounds and pence, for example £148.00 or £148.50`,
   paidEveryParagraph: `Paid every:`,
   weekRadioOption: `Week`,
   monthRadioOption: `Month`,
