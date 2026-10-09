@@ -5,6 +5,7 @@ import type { TFunction } from 'i18next';
 import { isLegalRepresentativeUser } from '../../utils/userRole';
 import type { RespondToClaimSectionId } from '../sections.config';
 
+import { getStepTranslations, loadStepNamespaces } from '@modules/steps';
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
 
 // Shared helpers for the respond-to-claim section-CYA row builders.
@@ -62,10 +63,69 @@ const toOptionKey = (value: string, isLegalRep = false): string => {
   return value.trim().toLowerCase();
 };
 
+/**
+ * Question pages whose Welsh yes/no is not the generic Ydy / Nac ydy (Oes, Do, Ie, Ydw, Hoffwn…).
+ * Their CYA rows read the answer from the question page's own translations so the two always
+ * match; every other row keeps the section's `options.*` wording.
+ */
+export const YES_NO_QUESTION_STEPS = [
+  'contact-preferences-telephone',
+  'correspondence-address',
+  'counter-claim',
+  'counter-claim-do-you-want-to-upload-files',
+  'counter-claim-have-you-applied-for-help',
+  'counter-claim-specific-sum',
+  'defendant-name-confirmation',
+  'do-any-other-adults-live-in-your-home',
+  'do-you-have-any-dependant-children',
+  'do-you-have-any-other-dependants',
+  'email-confirmation',
+  'exceptional-hardship',
+  'have-you-applied-for-universal-credit',
+  'income-and-expenses',
+  'instalment-payments',
+  'other-considerations',
+  'priority-debts',
+  'repayments-agreed',
+  'repayments-made',
+  'tenancy-date-details',
+  'would-you-have-somewhere-else-to-live-if-you-had-to-leave-your-home',
+  'your-circumstances',
+];
+
+// Where each question page keeps its yes/no labels.
+const STEP_ANSWER_KEYS: Record<'yes' | 'no', string[]> = {
+  yes: ['options.yes', 'yesOption', 'labels.yes', 'labels.options.yes'],
+  no: ['options.no', 'noOption', 'labels.no', 'labels.options.no'],
+};
+
+const lookup = (bundle: unknown, path: string): unknown =>
+  path
+    .split('.')
+    .reduce<unknown>(
+      (node, key) => (node && typeof node === 'object' ? (node as Record<string, unknown>)[key] : undefined),
+      bundle
+    );
+
+/** Load the question-page bundles `makeYesNoNotSure` reads from. Call before building rows. */
+export const loadYesNoQuestionNamespaces = (req: Request): Promise<void> =>
+  loadStepNamespaces(req, YES_NO_QUESTION_STEPS, 'respondToClaim');
+
 export const makeYesNoNotSure =
-  (t: TFunction, isLegalRep = false) =>
-  (value: string): string =>
-    t(`options.${toOptionKey(value, isLegalRep)}`);
+  (t: TFunction, isLegalRep = false, req?: Request) =>
+  (value: string, step?: string): string => {
+    const key = toOptionKey(value, isLegalRep);
+    if (req && step && (key === 'yes' || key === 'no') && YES_NO_QUESTION_STEPS.includes(step)) {
+      const bundle = getStepTranslations(req, step, 'respondToClaim');
+      for (const path of STEP_ANSWER_KEYS[key]) {
+        const label = lookup(bundle, path);
+        if (typeof label === 'string' && label) {
+          return label;
+        }
+      }
+    }
+    return t(`options.${key}`);
+  };
 
 // Hidden text is a short noun so screen readers announce "Change name", not the full question.
 export const makeChange =
@@ -102,7 +162,7 @@ export function createRowContext(
     validatedCase,
     t,
     change: makeChange(caseRef, sectionId, t),
-    yesNoNotSure: makeYesNoNotSure(t, isLegalRep),
+    yesNoNotSure: makeYesNoNotSure(t, isLegalRep, req),
   };
 }
 
@@ -119,7 +179,7 @@ export function pushYesNoRow(
 ): SummaryListRow {
   const row: SummaryListRow = {
     key: { text: t(`${labelKey}.label`, labelOptions) },
-    value: { text: yesNoNotSure(answer) },
+    value: { text: yesNoNotSure(answer, step) },
     actions: { items: [change(step, `${labelKey}.changeHidden`)] },
   };
   rows.push(row);

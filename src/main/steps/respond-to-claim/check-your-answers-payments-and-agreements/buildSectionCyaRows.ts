@@ -59,7 +59,7 @@ function addAnyPaymentsMadeRows({
   }
   const questionRow: SummaryListRow = {
     key: { text: t('rows.anyPaymentsMade.label', { claimantName, dateIssued }) },
-    value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade) },
+    value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade, 'repayments-made') },
     actions: { items: [change('repayments-made', 'rows.anyPaymentsMade.changeHidden')] },
   };
   rows.push(questionRow);
@@ -91,7 +91,7 @@ function addRepaymentPlanAgreedRows({
   }
   const questionRow: SummaryListRow = {
     key: { text: t('rows.repaymentPlanAgreed.label', { claimantName, dateIssued }) },
-    value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed) },
+    value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed, 'repayments-agreed') },
     actions: { items: [change('repayments-agreed', 'rows.repaymentPlanAgreed.changeHidden')] },
   };
   rows.push(questionRow);
@@ -117,7 +117,7 @@ function addRepayArrearsInstalmentsRow({ rows, paymentAgreement, t, change, yesN
     rows,
     'rows.repayArrearsInstalments',
     paymentAgreement.repayArrearsInstalments,
-    'installment-payments',
+    'instalment-payments',
     t,
     yesNoNotSure,
     change
