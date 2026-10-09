@@ -4,7 +4,7 @@ properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([
     cron('H 07 * * 1-5'),
-    cron('15 15 * * 2')   // TEST: every Tuesday at 15:15
+    cron('14 40 * * 5')   // TEST: every Tuesday at 15:15
   ]),
   parameters([
     text(
