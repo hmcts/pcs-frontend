@@ -41,13 +41,19 @@ import {
   validateReviewDates,
 } from '@utils/orderReview';
 
+/*
+ * A caseworker's review of a judge's order, reached from their Work Allocation task through XUI. Like the
+ * make order page, it is plain Express rather than a citizen steps journey: its pages are a CCD event
+ * started on the introduction and submitted with that start's token, its first page embeds the make
+ * order form and its editor, and its forms post several buttons.
+ */
+
 const CONFIRM_ORDER_REVIEW_EVENT_ID = 'ext:confirmOrderReview';
 
 const PAGES = {
   intro: '',
   review: '/review',
   reviewDates: '/review-dates',
-  removeReviewDate: '/review-dates/remove/:index',
   proceedToIssue: '/proceed-to-issue',
   checkYourAnswers: '/check-your-answers',
   cancel: '/cancel',
@@ -61,27 +67,19 @@ function route(page: Page): string {
   return `${CONFIRM_ORDER_REVIEW_ROUTE}${PAGES[page]}`;
 }
 
-function pageUrl(caseReference: string, page: Page, index?: number): string {
-  return route(page)
-    .replace(':caseReference', caseReference)
-    .replace(':index', String(index ?? ''));
+/** A page's URL on the case. A page reached from check your answers, to change an answer, returns there. */
+function pageUrl(caseReference: string, page: Page, options: { change?: boolean } = {}): string {
+  const url = route(page).replace(':caseReference', caseReference);
+  return options.change ? `${url}?change=cya` : url;
 }
 
-/** A page reached from check your answers returns there once the caseworker continues. */
+/** Whether the page was reached from check your answers, to change an answer. */
 function changing(req: Request): boolean {
   return req.query.change === 'cya';
 }
 
-function nextPage(req: Request, caseReference: string, page: Page): string {
-  return pageUrl(caseReference, changing(req) ? 'checkYourAnswers' : page);
-}
-
 function caseReferenceOf(req: Request): string {
   return req.params.caseReference as string;
-}
-
-function reviewOf(req: Request): OrderReviewSession | undefined {
-  return req.session.orderReviews?.[caseReferenceOf(req)];
 }
 
 function endReview(req: Request): void {
@@ -89,15 +87,23 @@ function endReview(req: Request): void {
 }
 
 /**
- * The pages after the introduction continue the review the introduction started; without one, such
- * as after a cancel or in a new session, the caseworker starts again from the introduction.
+ * The pages after the introduction continue the review the introduction started, which they find on the
+ * response; without one, such as after a cancel or in a new session, the caseworker starts again from
+ * the introduction.
  */
 const reviewInProgress: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
-  if (!reviewOf(req)) {
+  const review = req.session.orderReviews?.[caseReferenceOf(req)];
+  if (!review) {
     return res.redirect(pageUrl(caseReferenceOf(req), 'intro'));
   }
+  res.locals.review = review;
   next();
 };
+
+/** The review in progress, which `reviewInProgress` found. */
+function reviewOf(res: Response): OrderReviewSession {
+  return res.locals.review as OrderReviewSession;
+}
 
 const journey = [oidcMiddleware, makeOrderFeatureMiddleware];
 const inJourney = [...journey, reviewInProgress];
@@ -121,9 +127,6 @@ function pageModel(req: Request, review: OrderStart, issues: ValidationIssue[] =
     errorSummary: errorSummary(issues),
     validationErrors: Object.fromEntries(issues.map(issue => [issue.id, { text: issue.message }])),
     cancelUrl: pageUrl(caseReference, 'cancel'),
-    urls: Object.fromEntries(
-      (Object.keys(PAGES) as Page[]).map(page => [page, pageUrl(caseReference, page)])
-    ) as Record<Page, string>,
   };
 }
 
@@ -211,7 +214,7 @@ async function submitReview(req: Request, review: OrderReviewSession, action: 'R
 
 function checkYourAnswersContent(req: Request, review: OrderReviewSession): Record<string, unknown> {
   const { answers } = review;
-  const change = (page: Page) => `${pageUrl(caseReferenceOf(req), page)}?change=cya`;
+  const change = (page: Page) => pageUrl(caseReferenceOf(req), page, { change: true });
   const yesNo = (value?: string) => (value === 'yes' ? 'Yes' : 'No');
   const partyNames = new Map(partyChoices(review).map(party => [party.value, party.text]));
   return {
@@ -274,24 +277,25 @@ function render(
   issues: ValidationIssue[] = [],
   status = issues.length ? 400 : 200
 ): void {
-  const review = reviewOf(req)!;
+  const review = reviewOf(res);
   res.status(status).render(`confirm-order-review/${view}`, {
     ...pageModel(req, review, issues),
     ...VIEWS[view](req, review),
   });
 }
 
-/** Where a submission pcs-api refused goes: back to the page it came from, with why. */
-function handleSubmitError(req: Request, res: Response, view: View, error: unknown): void {
+/** Answers a submission pcs-api or CCD refused: back to the page it came from with why, or not found. */
+function handleSubmitError(req: Request, res: Response, view: View, error: unknown): boolean {
   if (error instanceof CallbackRejectedError) {
     const reasons = error.reasons.map(message => ({ id: 'confirm-order-review-form', message }));
-    return render(req, res, view, reasons, error.status);
+    render(req, res, view, reasons, error.status);
+    return true;
   }
   if (refusedByCcd(error)) {
     res.status(404).send('Not Found');
-    return;
+    return true;
   }
-  throw error;
+  return false;
 }
 
 /** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
@@ -340,7 +344,11 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       const start = JSON.parse(payload as string) as OrderStart;
       const review: OrderReviewSession = { ...start, eventToken: started.eventToken, answers: newAnswers(), taskId };
       req.session.orderReviews = { ...req.session.orderReviews, [caseReference]: review };
-      res.render('confirm-order-review/intro', { ...pageModel(req, review), ...orderModel(review) });
+      res.render('confirm-order-review/intro', {
+        ...pageModel(req, review),
+        ...orderModel(review),
+        continueUrl: pageUrl(caseReference, 'review'),
+      });
     } catch (error) {
       if (error instanceof CallbackRejectedError) {
         // pcs-api refuses to start the review when the chosen order is not waiting for one.
@@ -368,7 +376,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
   app.get(route('review'), ...inJourney, (req: Request, res: Response) => render(req, res, 'review'));
 
   app.post(route('review'), ...inJourney, async (req: Request, res: Response, next) => {
-    const review = reviewOf(req)!;
+    const review = reviewOf(res);
     const {
       _csrf,
       action,
@@ -400,10 +408,8 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       }
       return res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'));
     } catch (error) {
-      try {
-        handleSubmitError(req, res, 'review', error);
-      } catch (unhandled) {
-        next(unhandled);
+      if (!handleSubmitError(req, res, 'review', error)) {
+        next(error);
       }
     }
   });
@@ -411,7 +417,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
   app.get(route('reviewDates'), ...inJourney, (req: Request, res: Response) => render(req, res, 'review-dates'));
 
   app.post(route('reviewDates'), ...inJourney, (req: Request, res: Response) => {
-    const review = reviewOf(req)!;
+    const review = reviewOf(res);
     const { answers } = review;
     const caseReference = caseReferenceOf(req);
     answers.hasReviewDates = choice(req.body['has-review-dates'], ['yes', 'no'] as const);
@@ -430,44 +436,20 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     }
     const removing = /^remove-(\d+)$/.exec(action);
     if (removing) {
-      const removeUrl = pageUrl(caseReference, 'removeReviewDate', Number(removing[1]));
-      return res.redirect(changing(req) ? `${removeUrl}?change=cya` : removeUrl);
+      answers.reviewDates.splice(Number(removing[1]) - 1, 1);
+      return res.redirect(pageUrl(caseReference, 'reviewDates', { change: changing(req) }));
     }
     const issues = validateReviewDates(answers);
     if (issues.length) {
       return render(req, res, 'review-dates', issues);
     }
-    return res.redirect(nextPage(req, caseReference, 'proceedToIssue'));
-  });
-
-  app.get(route('removeReviewDate'), ...inJourney, (req: Request, res: Response) => {
-    const review = reviewOf(req)!;
-    const index = Number(req.params.index);
-    const reviewDate = review.answers.reviewDates[index - 1];
-    const reviewDatesUrl = `${pageUrl(caseReferenceOf(req), 'reviewDates')}${changing(req) ? '?change=cya' : ''}`;
-    if (!reviewDate) {
-      return res.redirect(reviewDatesUrl);
-    }
-    res.render('confirm-order-review/remove-review-date', {
-      ...pageModel(req, review),
-      number: index,
-      reviewDate: { ...reviewDate, reason: reasonLabel(reviewDate.reason), date: reviewDateLabel(reviewDate) },
-      reviewDatesUrl,
-    });
-  });
-
-  app.post(route('removeReviewDate'), ...inJourney, (req: Request, res: Response) => {
-    const review = reviewOf(req)!;
-    if (req.body.confirm === 'yes') {
-      review.answers.reviewDates.splice(Number(req.params.index) - 1, 1);
-    }
-    res.redirect(`${pageUrl(caseReferenceOf(req), 'reviewDates')}${changing(req) ? '?change=cya' : ''}`);
+    return res.redirect(pageUrl(caseReference, changing(req) ? 'checkYourAnswers' : 'proceedToIssue'));
   });
 
   app.get(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => render(req, res, 'proceed-to-issue'));
 
   app.post(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => {
-    const review = reviewOf(req)!;
+    const review = reviewOf(res);
     const { answers } = review;
     answers.nextSteps = text(req.body['next-steps']) || undefined;
     answers.finalOrder = choice(req.body['final-order'], ['yes', 'no'] as const);
@@ -486,7 +468,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
   });
 
   app.get(route('checkYourAnswers'), ...inJourney, (req: Request, res: Response) => {
-    const incomplete = firstIncompletePage(reviewOf(req)!);
+    const incomplete = firstIncompletePage(reviewOf(res));
     if (incomplete) {
       return res.redirect(pageUrl(caseReferenceOf(req), incomplete));
     }
@@ -494,7 +476,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
   });
 
   app.post(route('checkYourAnswers'), ...inJourney, async (req: Request, res: Response, next) => {
-    const review = reviewOf(req)!;
+    const review = reviewOf(res);
     const caseReference = caseReferenceOf(req);
     if (req.body.action === 'previous') {
       return res.redirect(pageUrl(caseReference, 'proceedToIssue'));
@@ -508,10 +490,8 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       await submitReview(req, review, 'ISSUE');
       return res.redirect(pageUrl(caseReference, 'orderIssued'));
     } catch (error) {
-      try {
-        handleSubmitError(req, res, 'check-your-answers', error);
-      } catch (unhandled) {
-        next(unhandled);
+      if (!handleSubmitError(req, res, 'check-your-answers', error)) {
+        next(error);
       }
     }
   });

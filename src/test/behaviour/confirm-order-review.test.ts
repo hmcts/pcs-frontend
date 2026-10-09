@@ -10,6 +10,7 @@ import {
   openPage,
   recordAttendance,
   refuseNextEvent,
+  refuseNextStart,
   selectTab,
   submittedEventTokens,
   submittedReviews,
@@ -94,8 +95,13 @@ function changeGeneratedWording(): void {
 // Making an order boots the judge's page, so the plain order most tests review is made once.
 let plainOrder: Promise<Order> | undefined;
 
+/** The order as pcs-api starts its review, the given one or else the plain one. */
+async function awaitingReview(order?: Order) {
+  return { id: 'order-awaiting-review', version: 3, ...(order ?? (await (plainOrder ??= judgesOrder()))) };
+}
+
 async function caseworkerReviewing(order?: Order): Promise<TestApp> {
-  return bootApp({ caseworker: true, orderAwaitingReview: order ?? (await (plainOrder ??= judgesOrder())) });
+  return bootApp({ caseworker: true, order: await awaitingReview(order) });
 }
 
 /** Opens the review of the order, as the caseworker reaches it from the introduction. */
@@ -161,8 +167,9 @@ describe('confirm order review', () => {
       expect(page.querySelector('#edited-warning')).toBeNull();
     });
 
-    it('says so when the chosen order is not waiting for review', async () => {
-      app = await bootApp({ caseworker: true });
+    it('says so when pcs-api will not start the review', async () => {
+      app = await caseworkerReviewing();
+      refuseNextStart('The order is no longer waiting for review');
 
       const page = parse((await app.get(INTRO)).text);
 
@@ -172,7 +179,7 @@ describe('confirm order review', () => {
     });
 
     it('does not exist for someone CCD does not let review orders', async () => {
-      app = await bootApp({ orderAwaitingReview: await (plainOrder ??= judgesOrder()) });
+      app = await bootApp({ order: await awaitingReview() });
 
       expect((await app.get(INTRO)).status).toBe(404);
     });
@@ -358,32 +365,20 @@ describe('confirm order review', () => {
       expect(page.body.textContent).toContain('You can add up to 10 review dates.');
     });
 
-    it('asks the caseworker to confirm removing a review date, and keeps it if they cancel', async () => {
+    it('removes a review date, keeping the others as they were last typed', async () => {
       const answers = {
         'has-review-dates': 'yes',
-        'review-date-1-date-day': '15',
-        'review-date-1-date-month': '1',
-        'review-date-1-date-year': '2027',
-        'review-date-1-reason': 'STAY_CASE',
         'review-date-1-description': 'Check the stay',
+        'review-date-2-description': 'Check compliance',
       };
+      await app.post(REVIEW_DATES, new URLSearchParams({ 'has-review-dates': 'yes', action: 'add' }));
+
       const removing = await app.post(REVIEW_DATES, new URLSearchParams({ ...answers, action: 'remove-1' }));
-      expect(removing.location).toBe(`${REVIEW_DATES}/remove/1`);
 
-      const confirm = parse((await app.get(`${REVIEW_DATES}/remove/1`)).text);
-      expect(confirm.querySelector('h1')?.textContent).toContain('Are you sure you want to remove review date 1?');
-      expect(confirm.body.textContent).toContain('15/01/2027');
-      expect(confirm.body.textContent).toContain('Stay a case');
-      expect(confirm.querySelector<HTMLAnchorElement>('.govuk-button-group a')?.getAttribute('href')).toBe(
-        REVIEW_DATES
-      );
-      let page = parse((await app.get(REVIEW_DATES)).text);
-      expect(page.querySelector<HTMLInputElement>('#review-date-1-description')?.value).toBe('Check the stay');
-
-      await app.post(`${REVIEW_DATES}/remove/1`, new URLSearchParams({ confirm: 'yes' }));
-
-      page = parse((await app.get(REVIEW_DATES)).text);
-      expect(page.querySelector<HTMLInputElement>('#review-date-1-description')?.value).toBe('');
+      expect(removing.location).toBe(REVIEW_DATES);
+      const page = parse((await app.get(REVIEW_DATES)).text);
+      expect(page.querySelectorAll('fieldset.pcs-review-date')).toHaveLength(1);
+      expect(page.querySelector<HTMLInputElement>('#review-date-1-description')?.value).toBe('Check compliance');
     });
   });
 
