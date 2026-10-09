@@ -76,25 +76,27 @@ function isNo(value: string | null | undefined): boolean {
   return normalizeYesNoValue(value) === 'NO';
 }
 
-function yesNo(t: TFunction, value: YesNoValue | string | undefined): string {
+// `answerKey` picks the question's own Welsh yes/no (Oes, Do, Hoffwn…) from `answers.*`, so the
+// summary matches what the defendant chose; without it the generic Ydy / Nac ydy is used.
+function yesNo(t: TFunction, value: YesNoValue | string | undefined, answerKey?: string): string {
   if (!value) {
     return '';
   }
   const normalized = normalizeYesNoValue(value);
   if (normalized === 'YES') {
-    return t('common:options.yes');
+    return answerKey ? t(`viewTheResponse:answers.${answerKey}.yes`) : t('common:options.yes');
   }
   if (normalized === 'NO') {
-    return t('common:options.no');
+    return answerKey ? t(`viewTheResponse:answers.${answerKey}.no`) : t('common:options.no');
   }
   return '';
 }
 
-function yesNoNotSure(t: TFunction, value: YesNoNotSureValue | string | undefined): string {
+function yesNoNotSure(t: TFunction, value: YesNoNotSureValue | string | undefined, answerKey?: string): string {
   if (!value) {
     return '';
   }
-  const yesNoLabel = yesNo(t, value);
+  const yesNoLabel = yesNo(t, value, answerKey);
   if (yesNoLabel) {
     return yesNoLabel;
   }
@@ -333,7 +335,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLan
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
-    yesNoNotSure(t, responses?.possessionNoticeReceived)
+    yesNoNotSure(t, responses?.possessionNoticeReceived, 'possessionNoticeReceived')
   );
   pushRow(
     rows,
@@ -356,7 +358,11 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLan
   if (isYes(responses?.disputeClaim)) {
     pushRow(rows, t('viewTheResponse:responseToClaim.disputeDetails'), responses?.disputeClaimDetails);
   }
-  pushRow(rows, t('viewTheResponse:responseToClaim.makeCounterClaim'), yesNo(t, responses?.makeCounterClaim));
+  pushRow(
+    rows,
+    t('viewTheResponse:responseToClaim.makeCounterClaim'),
+    yesNo(t, responses?.makeCounterClaim, 'makeCounterClaim')
+  );
   return { rows };
 }
 
@@ -379,15 +385,23 @@ function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssu
     claimantName: resolveClaimantName(caseData),
     claimIssueDate: resolveClaimIssueDate(caseData, dateIssued),
   };
-  pushRow(rows, t('viewTheResponse:payments.anyPaymentsMade', paymentLabelContext), yesNo(t, payment.anyPaymentsMade));
+  pushRow(
+    rows,
+    t('viewTheResponse:payments.anyPaymentsMade', paymentLabelContext),
+    yesNo(t, payment.anyPaymentsMade, 'anyPaymentsMade')
+  );
   pushRow(rows, t('viewTheResponse:payments.paymentDetails'), payment.paymentDetails);
   pushRow(
     rows,
     t('viewTheResponse:payments.repaymentPlanAgreed', paymentLabelContext),
-    yesNoNotSure(t, payment.repaymentPlanAgreed)
+    yesNoNotSure(t, payment.repaymentPlanAgreed, 'repaymentPlanAgreed')
   );
   pushRow(rows, t('viewTheResponse:payments.repaymentAgreedDetails'), payment.repaymentAgreedDetails);
-  pushRow(rows, t('viewTheResponse:payments.repayArrearsInstalments'), yesNo(t, payment.repayArrearsInstalments));
+  pushRow(
+    rows,
+    t('viewTheResponse:payments.repayArrearsInstalments'),
+    yesNo(t, payment.repayArrearsInstalments, 'repayArrearsInstalments')
+  );
   if (payment.additionalRentContribution || payment.additionalContributionFrequency) {
     pushRow(
       rows,
@@ -410,21 +424,33 @@ function buildHouseholdAndCircumstances(t: TFunction, caseData: CcdCaseData): Su
   if (!hc) {
     return { rows };
   }
-  pushRow(rows, t('viewTheResponse:household.dependantChildren'), yesNo(t, hc.dependantChildren));
+  pushRow(rows, t('viewTheResponse:household.dependantChildren'), yesNo(t, hc.dependantChildren, 'dependantChildren'));
   pushRow(rows, t('viewTheResponse:household.dependantChildrenDetails'), hc.dependantChildrenDetails);
-  pushRow(rows, t('viewTheResponse:household.otherDependants'), yesNo(t, hc.otherDependants));
+  pushRow(rows, t('viewTheResponse:household.otherDependants'), yesNo(t, hc.otherDependants, 'otherDependants'));
   pushRow(rows, t('viewTheResponse:household.otherDependantDetails'), hc.otherDependantDetails);
-  pushRow(rows, t('viewTheResponse:household.otherTenants'), yesNo(t, hc.otherTenants));
+  pushRow(rows, t('viewTheResponse:household.otherTenants'), yesNo(t, hc.otherTenants, 'otherTenants'));
   pushRow(rows, t('viewTheResponse:household.otherTenantsDetails'), hc.otherTenantsDetails);
-  pushRow(rows, t('viewTheResponse:household.alternativeAccommodation'), yesNoNotSure(t, hc.alternativeAccommodation));
+  pushRow(
+    rows,
+    t('viewTheResponse:household.alternativeAccommodation'),
+    yesNoNotSure(t, hc.alternativeAccommodation, 'alternativeAccommodation')
+  );
   pushRow(
     rows,
     t('viewTheResponse:household.alternativeAccommodationDate'),
     formatGdsDate(hc.alternativeAccommodationTransferDate) ?? ''
   );
-  pushRow(rows, t('viewTheResponse:household.shareAdditional'), yesNo(t, hc.shareAdditionalCircumstances));
+  pushRow(
+    rows,
+    t('viewTheResponse:household.shareAdditional'),
+    yesNo(t, hc.shareAdditionalCircumstances, 'shareAdditionalCircumstances')
+  );
   pushRow(rows, t('viewTheResponse:household.additionalDetails'), hc.additionalCircumstancesDetails);
-  pushRow(rows, t('viewTheResponse:household.exceptionalHardship'), yesNo(t, hc.exceptionalHardship));
+  pushRow(
+    rows,
+    t('viewTheResponse:household.exceptionalHardship'),
+    yesNo(t, hc.exceptionalHardship, 'exceptionalHardship')
+  );
   pushRow(rows, t('viewTheResponse:household.exceptionalHardshipDetails'), hc.exceptionalHardshipDetails);
   return { rows };
 }
@@ -466,7 +492,11 @@ function buildRegularIncome(t: TFunction, caseData: CcdCaseData): SummarySection
       formatIncomeValue(t, hc.universalCreditAmount ?? undefined, hc.universalCreditFrequency ?? undefined)
     );
   } else if (isYes(hc.hasAppliedForUniversalCredit)) {
-    pushRow(rows, t('viewTheResponse:income.universalCreditApplied'), t('common:options.yes'));
+    pushRow(
+      rows,
+      t('viewTheResponse:income.universalCreditApplied'),
+      t('viewTheResponse:answers.universalCreditApplied.yes')
+    );
     pushRow(
       rows,
       t('viewTheResponse:income.universalCreditApplicationDate'),
@@ -494,7 +524,7 @@ function buildPriorityDebts(t: TFunction, caseData: CcdCaseData): SummarySection
   if (!hc) {
     return { rows };
   }
-  pushRow(rows, t('viewTheResponse:debts.hasPriorityDebts'), yesNo(t, hc.priorityDebts));
+  pushRow(rows, t('viewTheResponse:debts.hasPriorityDebts'), yesNo(t, hc.priorityDebts, 'priorityDebts'));
   pushRow(rows, t('viewTheResponse:debts.debtTotal'), formatMoneyAmount(hc.debtTotal));
   if (hc.debtContribution || hc.debtContributionFrequency) {
     pushRow(
@@ -543,7 +573,11 @@ function buildRegularExpenses(t: TFunction, caseData: CcdCaseData): SummarySecti
 function buildAdditionalInformation(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
-  pushRow(rows, t('viewTheResponse:additional.otherConsiderations'), yesNo(t, responses?.otherConsiderations));
+  pushRow(
+    rows,
+    t('viewTheResponse:additional.otherConsiderations'),
+    yesNo(t, responses?.otherConsiderations, 'otherConsiderations')
+  );
   pushRow(rows, t('viewTheResponse:additional.otherConsiderationsDetails'), responses?.otherConsiderationsDetails);
   return { rows };
 }
@@ -564,7 +598,7 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
 
   const claimsMoney = cc.claimType === 'PAYMENT_OR_COMPENSATION' || cc.claimType === 'BOTH';
   if (claimsMoney && cc.isClaimAmountKnown) {
-    pushRow(rows, t('viewTheResponse:counterclaim.amountKnown'), yesNo(t, cc.isClaimAmountKnown));
+    pushRow(rows, t('viewTheResponse:counterclaim.amountKnown'), yesNo(t, cc.isClaimAmountKnown, 'isClaimAmountKnown'));
     if (isYes(cc.isClaimAmountKnown)) {
       pushRow(rows, t('viewTheResponse:counterclaim.amount'), formatMoneyAmount(cc.claimAmount));
     } else if (isNo(cc.isClaimAmountKnown)) {
@@ -590,7 +624,7 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
     pushRow(rows, t('viewTheResponse:counterclaim.needHelpWithFees'), feesLabel);
   }
   if (cc.appliedForHwf) {
-    pushRow(rows, t('viewTheResponse:counterclaim.appliedForHwf'), yesNo(t, cc.appliedForHwf));
+    pushRow(rows, t('viewTheResponse:counterclaim.appliedForHwf'), yesNo(t, cc.appliedForHwf, 'appliedForHwf'));
     if (isYes(cc.appliedForHwf)) {
       pushRow(rows, t('viewTheResponse:counterclaim.hwfReference'), cc.hwfReferenceNumber);
     }

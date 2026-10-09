@@ -2,7 +2,7 @@ import config from 'config';
 
 import { http } from '@modules/http';
 
-export type PaymentLanguage = 'English' | 'Welsh';
+export type PaymentLanguage = 'en' | 'cy';
 export type PaymentOutcome = 'success' | 'failure' | 'pending';
 
 export interface CreateCardPaymentRequest {
@@ -80,7 +80,7 @@ function getUserAuthHeaders(accessToken: string) {
 }
 
 export function mapRequestLanguageToPaymentLanguage(requestLanguage?: string): PaymentLanguage {
-  return requestLanguage?.toLowerCase() === 'cy' ? 'Welsh' : 'English';
+  return requestLanguage?.toLowerCase() === 'cy' ? 'cy' : 'en';
 }
 
 const PAYMENT_OUTCOME_BY_STATUS: Record<string, PaymentOutcome> = {

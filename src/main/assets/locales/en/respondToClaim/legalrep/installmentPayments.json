@@ -8,5 +8,9 @@
   "paragraph4": "",
   "errors": {
     "confirmInstallmentOffer": "Select whether the defendant would like to offer to pay off their arrears in instalments"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }
