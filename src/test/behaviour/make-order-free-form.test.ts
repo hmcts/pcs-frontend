@@ -100,16 +100,15 @@ describe('make an order: free form and strike out', () => {
     expect(control('[name="strike-subjects"][value="claim"]').checked).toBe(false);
   });
 
-  it('offers only the claim when the case has no open counterclaim or application', async () => {
+  it('strikes out or dismisses whichever of the claim, counterclaim and application the case has open', async () => {
+    // Only the claim is offered until the case has an open counterclaim or application.
     await openPage((await app.get(PAGE)).text);
-    expect(
+    const subjects = () =>
       [...document.querySelectorAll<HTMLInputElement>('[name="strike-subjects"][type="checkbox"]')].map(
         box => box.value
-      )
-    ).toEqual(['claim']);
-  });
+      );
+    expect(subjects()).toEqual(['claim']);
 
-  it('strikes out or dismisses the claim, counterclaim and application together', async () => {
     await app.close();
     app = await bootApp({ openCounterclaim: true, openApplication: true });
     const page = await openPage((await app.get(PAGE)).text);
