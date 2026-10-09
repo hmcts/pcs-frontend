@@ -2367,6 +2367,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opentelemetry/api-logs@npm:^0.223.0":
+  version: 0.223.0
+  resolution: "@opentelemetry/api-logs@npm:0.223.0"
+  dependencies:
+    "@opentelemetry/api": "npm:^1.3.0"
+  checksum: 10/2647721d0bc04fc6ec8fc70622ef764276fc2ed4163e9570308cde18d077d6a5ed81f7771d30b3846f236e7f6c9b56610df3c4423a3315051081823026b0e6c7
+  languageName: node
+  linkType: hard
+
 "@opentelemetry/api@npm:1.9.1, @opentelemetry/api@npm:^1.3.0, @opentelemetry/api@npm:^1.9.0, @opentelemetry/api@npm:^1.9.1":
   version: 1.9.1
   resolution: "@opentelemetry/api@npm:1.9.1"
@@ -2895,16 +2904,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.70.0":
-  version: 0.70.0
-  resolution: "@opentelemetry/instrumentation-redis@npm:0.70.0"
+"@opentelemetry/instrumentation-redis-4@npm:@opentelemetry/instrumentation-redis@^0.71.0":
+  version: 0.71.0
+  resolution: "@opentelemetry/instrumentation-redis@npm:0.71.0"
   dependencies:
-    "@opentelemetry/instrumentation": "npm:^0.222.0"
+    "@opentelemetry/instrumentation": "npm:^0.223.0"
     "@opentelemetry/redis-common": "npm:^0.38.3"
     "@opentelemetry/semantic-conventions": "npm:^1.27.0"
   peerDependencies:
     "@opentelemetry/api": ^1.3.0
-  checksum: 10/f19b2e6453b9a5eab346a68236bf5b5d465c1dd08ddbbae2b5fc2e276eea58993ff440aa61156ceb2c199450ada12d03576cd8ee00f8c7985c0fc5944027f4a2
+  checksum: 10/b122e896c03400daa2f9bb6124e36090abb85d6e9709bae3a6bf629783ad60d8e83c6d7a33c496da3e95981f64fd8420304b22afa41cf68b1fa90aadd30f24ad
   languageName: node
   linkType: hard
 
@@ -3353,7 +3362,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opentelemetry/winston-transport@npm:0.31.0, @opentelemetry/winston-transport@npm:^0.31.0":
+"@opentelemetry/winston-transport@npm:0.33.0":
+  version: 0.33.0
+  resolution: "@opentelemetry/winston-transport@npm:0.33.0"
+  dependencies:
+    "@opentelemetry/api-logs": "npm:^0.223.0"
+    "@opentelemetry/semantic-conventions": "npm:^1.41.1"
+    winston-transport: "npm:4.*"
+  checksum: 10/bb9e90167915f8c7c5a0254108b18b6e2ec917233acb075c076f65c5b7a99f06ad17d7080991805833894b6fa5bd88d6859d0ab11f3f6c4fa955a4e241252485
+  languageName: node
+  linkType: hard
+
+"@opentelemetry/winston-transport@npm:^0.31.0":
   version: 0.31.0
   resolution: "@opentelemetry/winston-transport@npm:0.31.0"
   dependencies:
@@ -12103,7 +12123,7 @@ __metadata:
     "@launchdarkly/node-server-sdk": "npm:9.14.4"
     "@ministryofjustice/frontend": "npm:^11.0.0"
     "@opentelemetry/api": "npm:1.9.1"
-    "@opentelemetry/winston-transport": "npm:0.31.0"
+    "@opentelemetry/winston-transport": "npm:0.33.0"
     "@pact-foundation/pact": "npm:17.1.4"
     "@pact-foundation/pact-cli": "npm:18.1.2"
     "@playwright/test": "npm:1.62.1"
