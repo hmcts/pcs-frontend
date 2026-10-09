@@ -127,19 +127,14 @@ function ccdStub(): Express {
     ) {
       return res.status(422).json({ callbackErrors: ['The order is no longer waiting for review'] });
     }
-    let started = envelope;
     if (event !== CONFIRM_ORDER_REVIEW && isJudge(req)) {
-      // pcs-api starts the order the judge chose while it is theirs to change, and else their working order:
-      // an order a caseworker returned to them is not that until they choose it.
+      // pcs-api starts the order the judge chose only while it is theirs to change.
       const changeable = ['DRAFT', 'RETURNED_TO_JUDGE'].includes(envelope.order.state);
       if (chosenOrder && (chosenOrder !== envelope.order.id || !changeable)) {
         return res.status(422).json({ callbackErrors: ['The order is no longer waiting for you to change it'] });
       }
-      if (!chosenOrder && envelope.order.state === 'RETURNED_TO_JUDGE') {
-        started = { ...envelope, order: blankCase().order };
-      }
     }
-    const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(started) } : {};
+    const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
     const token = `event-token-${startTokens.length + 1}`;
     startTokens.push(token);
     res.json({ token, case_details: { case_data: caseData } });

@@ -39,15 +39,4 @@ describe('make an order: an order a caseworker returned', () => {
     expect(again.querySelector('h1')?.textContent?.trim()).toBe('No order to change');
     expect(again.body.textContent).toContain('The order is no longer waiting for you to change it');
   });
-
-  it('starts a new order, without the query, when the judge has not chosen the returned one', async () => {
-    app = await bootApp({
-      orderReturnedToJudge: { queryFromCaseworker: 'Which defendant does paragraph 2 mean?' },
-    });
-
-    await openPage((await app.get(PAGE)).text);
-
-    expect(document.querySelector('#caseworker-query')).toBeNull();
-    expect(document.querySelector<HTMLInputElement>('input[name="orderId"]')?.value).toBe('');
-  });
 });

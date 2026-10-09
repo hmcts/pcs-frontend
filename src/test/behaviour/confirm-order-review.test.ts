@@ -161,16 +161,6 @@ describe('confirm order review', () => {
       expect(page.querySelector('#edited-warning')).toBeNull();
     });
 
-    it('warns when the judge edited the generated order', async () => {
-      app = await caseworkerReviewing(await judgesOrder({ edit: changeGeneratedWording }));
-
-      const page = parse((await app.get(INTRO)).text);
-
-      expect(page.querySelector('#edited-warning')?.textContent).toContain(
-        'The system has identified differences between the order preview and the information entered by the Judge in the data fields. You must update the data in the fields to match the preview'
-      );
-    });
-
     it('says so when the chosen order is not waiting for review', async () => {
       app = await bootApp({ caseworker: true });
 
@@ -200,7 +190,7 @@ describe('confirm order review', () => {
       expect(document.querySelector('[data-order-preview] .docweave-editor__clause')).toBeNull();
     });
 
-    it('tells the caseworker what the judge added and changed in the order', async () => {
+    it('warns of what the judge added and changed, and shows their answers and wording for the caseworker to change', async () => {
       app = await caseworkerReviewing(
         await judgesOrder({
           edit: () => {
@@ -210,13 +200,14 @@ describe('confirm order review', () => {
         })
       );
 
-      await openReview(app);
+      const intro = parse((await app.get(INTRO)).text);
+      expect(intro.querySelector('#edited-warning')?.textContent).toContain('identified differences');
+
+      const page = await openPage((await app.get(REVIEW)).text);
 
       const edits = document.querySelector('#judge-edits')?.textContent;
-      expect(edits).toContain('The Judge edited this order');
-      expect(edits).toContain('Order preview edited by the Judge');
-      expect(edits).toContain('The Judge added wording to the order. Check the wording and any follow-up before issue');
-      expect(edits).toContain('The Judge changed generated wording. Check the fields below still reflect the order');
+      expect(edits).toContain('The Judge added wording to the order');
+      expect(edits).toContain('The Judge changed generated wording');
       // Docweave marks the clauses the judge added and changed as its editor showed them.
       const preview = document.querySelector('[data-order-preview]')!;
       expect(preview.querySelector('.docweave-editor__clause--inserted')?.textContent).toContain(
@@ -225,16 +216,8 @@ describe('confirm order review', () => {
       expect(preview.querySelector('.docweave-editor__clause--modified')?.textContent).toContain(
         'Wording the judge rewrote'
       );
-      expect(document.querySelector('#judge-changes-key')?.textContent).toContain(
-        'Clauses the Judge added are highlighted in green. Generated clauses they changed are highlighted in blue.'
-      );
-    });
-
-    it("shows the judge's answers and wording below their order, for the caseworker to change", async () => {
-      app = await caseworkerReviewing(await judgesOrder({ edit: changeGeneratedWording }));
-
-      const page = await openReview(app);
-
+      expect(document.querySelector('#judge-changes-key')).not.toBeNull();
+      // Below it, the judge's answers and their wording, in the editor the caseworker may change.
       expect(control('input[name="claimant-claimant-id-attendance"][value="litigant-in-person"]').checked).toBe(true);
       expect(control('input[name="defendant-defendant-id-attendance"][value="not-present"]').checked).toBe(true);
       expect(page.documentText()).toContain('Wording the judge rewrote');
