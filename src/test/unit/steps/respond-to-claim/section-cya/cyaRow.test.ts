@@ -54,7 +54,7 @@ describe('makeYesNoNotSure', () => {
     ['defendant-name-confirmation', 'Ie', 'Na'],
     ['correspondence-address', 'Ie', 'Na'],
     ['contact-preferences-telephone', 'Ydw', 'Nac ydw'],
-    ['installment-payments', 'Hoffwn', 'Na hoffwn'],
+    ['instalment-payments', 'Hoffwn', 'Na hoffwn'],
     ['exceptional-hardship', 'Byddwn', 'Na fyddwn'],
   ])('shows the question page’s Welsh answer for %s', (step, yes, no) => {
     const answer = makeYesNoNotSure(sectionT, false, req);
@@ -63,7 +63,7 @@ describe('makeYesNoNotSure', () => {
   });
 
   it.each([
-    ['installment-payments', 'Hoffai', 'Na hoffai'],
+    ['instalment-payments', 'Hoffai', 'Na hoffai'],
     ['tenancy-date-details', 'Ydy', 'Nac ydy'],
     ['counter-claim', 'Ydy', 'Nac ydy'],
     ['email-confirmation', 'Ydw', 'Nac ydw'],

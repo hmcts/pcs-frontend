@@ -10,5 +10,5 @@ export const instalmentPayments = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectWhetherDefendantWouldLikeToOfferErrorMessage: `Select whether the defendant would like to offer to pay off their arrears in instalments`,
   feedbackLink: `feedback`,
-  pageSlug: `installment-payments`,
+  pageSlug: `instalment-payments`,
 };
