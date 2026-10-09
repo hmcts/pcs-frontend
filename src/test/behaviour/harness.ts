@@ -68,6 +68,12 @@ export function submittedEventTokens(): string[] {
 
 /** The confirm order review requests caseworkers have submitted, in order. */
 let reviewRequests: Record<string, unknown>[] = [];
+/** The make order requests judges have submitted, in order. */
+let orderRequests: Record<string, unknown>[] = [];
+
+export function submittedOrders(): Record<string, unknown>[] {
+  return orderRequests;
+}
 
 export function submittedReviews(): Record<string, unknown>[] {
   return reviewRequests;
@@ -159,6 +165,7 @@ function ccdStub(): Express {
       envelope.order.state = posted.action === 'ISSUE' ? 'ISSUED' : 'RETURNED_TO_JUDGE';
       return res.json({ id: req.params.id, data: {} });
     }
+    orderRequests.push(posted);
     envelope = {
       ...envelope,
       order: {
@@ -241,6 +248,7 @@ export async function bootApp(
   startTokens = [];
   submittedTokens = [];
   reviewRequests = [];
+  orderRequests = [];
   refusal = undefined;
   ccd ??= await listen(ccdStub());
   process.env.CCD_URL = `http://127.0.0.1:${(ccd.address() as AddressInfo).port}`;

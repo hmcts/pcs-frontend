@@ -52,6 +52,8 @@ export interface OrderReviewAnswers {
 export interface OrderReviewSession extends OrderStart {
   eventToken: string;
   answers: OrderReviewAnswers;
+  /** The Work Allocation task the caseworker came from, which pcs-api closes as the review ends. */
+  taskId?: string;
 }
 
 /** How the caseworker's review ended, for its confirmation: the case, and whether they issued or returned the order. */
@@ -163,9 +165,9 @@ export function reviewRequest(
   review: OrderReviewSession,
   action: 'RETURN_TO_JUDGE' | 'ISSUE'
 ): Record<string, unknown> {
-  const { order, answers } = review;
+  const { order, answers, taskId } = review;
   if (action === 'RETURN_TO_JUDGE') {
-    return { action, orderId: order.id, version: order.version, queryToJudge: answers.queryToJudge?.trim() };
+    return { action, orderId: order.id, version: order.version, taskId, queryToJudge: answers.queryToJudge?.trim() };
   }
   const reviewDates =
     answers.hasReviewDates === 'yes'
@@ -180,6 +182,7 @@ export function reviewRequest(
     action,
     orderId: order.id,
     version: order.version,
+    taskId,
     issue: {
       order: answers.order && issuedOrder(answers.order),
       reviewDates,

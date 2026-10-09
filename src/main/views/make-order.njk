@@ -21,6 +21,7 @@
   <input type="hidden" name="eventToken" value="{{ eventToken }}">
   <input type="hidden" name="caseContext" value="{{ caseContextJson }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
+  <input type="hidden" name="taskId" value="{{ taskId }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
   {{ csrfProtection(csrfToken) }}
 

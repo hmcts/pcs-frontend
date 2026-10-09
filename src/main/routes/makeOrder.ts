@@ -66,6 +66,8 @@ function pageModel(
     formAction: req.originalUrl,
     order,
     eventToken,
+    // The task the judge came from, if a caseworker's query brought them here, which pcs-api closes on resubmission.
+    taskId: typeof req.query.taskId === 'string' ? req.query.taskId : '',
     // The case as the event started it, which the page's change is based on.
     caseContextJson: JSON.stringify(caseContext),
     ...orderFormModel(envelope, submission),
@@ -128,6 +130,7 @@ export default function makeOrderRoutes(app: Application): void {
       eventToken,
       caseContext,
       orderId,
+      taskId,
       orderVersion,
       queryFromCaseworker,
       orderType,
@@ -162,6 +165,7 @@ export default function makeOrderRoutes(app: Application): void {
           formData,
           docweaveSnapshot: JSON.parse(orderDocument || 'null'),
         },
+        taskId: taskId || null,
       };
       try {
         await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
