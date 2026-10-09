@@ -140,6 +140,71 @@ describe('View the claim values in Welsh', () => {
   // Wording supplied by the Welsh Language Unit (PCS ExUI Welsh upload) – keep it as supplied.
   it.each([
     [
+      'labels.assuredNoArrearsReasonsNuisanceOrIllegalUse',
+      'Niwsans, dicter, defnydd anghyfreithlon neu anfoesol o’r eiddo (sail 14)',
+    ],
+    [
+      'labels.walesFailToGiveUpS170Reason',
+      'Methu ildio meddiant ar ddyddiad a nodwyd yn hysbysiad y deilydd contract (adran 170)',
+    ],
+    [
+      'labels.walesFailToGiveUpBreakNoticeS191Reason',
+      'Methu rhoi’r gorau i feddiannu ar y dyddiad a nodwyd yn hysbysiad cymal terfynu deilydd y contract (adran 191)',
+    ],
+    [
+      'labels.walesLandlordNoticeFtEndS186Reason',
+      'Hysbysiad landlord mewn cysylltiad â diwedd tymor penodol wedi’i roi (adran 186)',
+    ],
+    [
+      'labels.walesSecureFailureToGiveUpPossessionSection170Reason',
+      'Methu ildio meddiant ar ddyddiad a nodwyd yn hysbysiad y deilydd contract (adran 170)',
+    ],
+    [
+      'labels.walesSecureFailureToGiveUpPossessionSection191Reason',
+      'Methu rhoi’r gorau i feddiannu ar y dyddiad a nodwyd yn hysbysiad cymal terfynu deilydd y contract (adran 191)',
+    ],
+    [
+      'labels.walesSecureLandlordNoticeSection186Reason',
+      'Hysbysiad landlord mewn cysylltiad â diwedd tymor penodol wedi’i roi (adran 186)',
+    ],
+    [
+      'values.groundNames.FAILURE_TO_GIVE_UP_POSSESSION_S170',
+      'Methu ildio meddiant ar ddyddiad a nodwyd yn hysbysiad y deilydd contract (adran 170)',
+    ],
+    [
+      'values.groundNames.FAILURE_TO_GIVE_UP_POSSESSION_S191',
+      'Methu rhoi’r gorau i feddiannu ar y dyddiad a nodwyd yn hysbysiad cymal terfynu deilydd y contract (adran 191)',
+    ],
+    [
+      'values.groundNames.FAIL_TO_GIVE_UP_BREAK_NOTICE_S191',
+      'Methu rhoi’r gorau i feddiannu ar y dyddiad a nodwyd yn hysbysiad cymal terfynu deilydd y contract (adran 191)',
+    ],
+    [
+      'values.groundNames.LANDLORD_NOTICE_FT_END_S186',
+      'Hysbysiad landlord mewn cysylltiad â diwedd tymor penodol wedi’i roi (adran 186)',
+    ],
+    [
+      'values.groundNames.LANDLORD_NOTICE_S186',
+      'Hysbysiad landlord mewn cysylltiad â diwedd tymor penodol wedi’i roi (adran 186)',
+    ],
+    [
+      'values.groundNames.NUISANCE_ANNOYANCE_GROUND14',
+      'Niwsans, dicter, defnydd anghyfreithlon neu anfoesol o’r eiddo (sail 14)',
+    ],
+    [
+      'values.groundNames.NUISANCE_OR_IMMORAL_USE',
+      'Niwsans, dicter, defnydd anghyfreithlon neu anfoesol o’r eiddo (sail 2)',
+    ],
+    ['values.groundNames.TENANCY_OBTAINED_BY_FALSE_STATEMENT', 'Tenantiaeth drwy ddatganiad anwir (sail 5)'],
+  ])('keeps the Welsh Language Unit wording for %s', (key, welsh) => {
+    const value = key
+      .split('.')
+      .reduce<unknown>((node, part) => (node as Record<string, unknown>)[part], cyViewTheClaim as unknown);
+    expect(value).toBe(welsh);
+  });
+
+  it.each([
+    [
       'LANDLORD_NOTICE_PERIODIC_S178',
       'Hysbysiad landlord a roddwyd mewn perthynas â chontract cyfnodol safonol (adran 178)',
     ],
