@@ -1259,9 +1259,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts-cft/docweave@npm:0.4.0":
-  version: 0.4.0
-  resolution: "@hmcts-cft/docweave@npm:0.4.0"
+"@hmcts-cft/docweave@npm:0.5.0":
+  version: 0.5.0
+  resolution: "@hmcts-cft/docweave@npm:0.5.0"
   dependencies:
     prosemirror-commands: "npm:1.7.2"
     prosemirror-dropcursor: "npm:1.8.4"
@@ -1280,7 +1280,7 @@ __metadata:
   peerDependenciesMeta:
     express:
       optional: true
-  checksum: 10/ef0c27c1d8405a9f2320f6e2ff1f3bb774e518cb91db8e1bf7b68c48e44d9bc82283bcfb1676eefcfcda0065d2b40b11f9959e739f419b1b7ce9ccdbcf828bae
+  checksum: 10/7f3d360b77352e188f7f2eeaf725842defd03c0f1ad634f59a2d0b68d55e8170db525f10099e3ee5dd8d7f44ac0cbb084ba43a375f9645e05c3426e0c6902dbe
   languageName: node
   linkType: hard
 
@@ -4305,7 +4305,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsdom@npm:21.1.7, @types/jsdom@npm:^21.1.7":
+"@types/jsdom@npm:^21.1.7":
   version: 21.1.7
   resolution: "@types/jsdom@npm:21.1.7"
   dependencies:
@@ -10538,7 +10538,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsdom@npm:26.1.0, jsdom@npm:^26.1.0":
+"jsdom@npm:^26.1.0":
   version: 26.1.0
   resolution: "jsdom@npm:26.1.0"
   dependencies:
@@ -12081,7 +12081,7 @@ __metadata:
     "@eslint/js": "npm:10.0.1"
     "@eslint/plugin-kit": "npm:0.7.3"
     "@hmcts-cft/cft-ui-component-lib": "npm:0.1.0-alpha.4"
-    "@hmcts-cft/docweave": "npm:0.4.0"
+    "@hmcts-cft/docweave": "npm:0.5.0"
     "@hmcts/info-provider": "npm:1.4.0"
     "@hmcts/nodejs-healthcheck": "npm:1.8.6"
     "@hmcts/playwright-common": "npm:1.1.5"
@@ -12100,7 +12100,6 @@ __metadata:
     "@types/express-session": "npm:1.19.0"
     "@types/git-rev-sync": "npm:2.0.2"
     "@types/jest": "npm:30.0.0"
-    "@types/jsdom": "npm:21.1.7"
     "@types/lodash": "npm:4.17.25"
     "@types/luxon": "npm:3.7.6"
     "@types/multer": "npm:^2.2.0"
@@ -12150,7 +12149,6 @@ __metadata:
     jest-html-reporter: "npm:4.4.2"
     jest-pact: "npm:0.14.0"
     jose: "npm:6.2.12"
-    jsdom: "npm:26.1.0"
     lint-staged: "npm:17.5.1"
     lodash: "npm:4.18.1"
     luxon: "npm:3.7.2"
