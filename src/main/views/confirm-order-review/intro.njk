@@ -14,7 +14,7 @@
           text: "The Judge has created a custom order. Review the full order before issuing",
           attributes: { id: "free-form-warning" }
         }) }}
-      {% elif edits.added or edits.changed or edits.deleted %}
+      {% elif edits.added or edits.changed %}
         {{ govukWarningText({
           text: "The system has identified differences between the order preview and the information entered by the Judge in the data fields. You must update the data in the fields to match the preview",
           attributes: { id: "edited-warning" }

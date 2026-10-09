@@ -128,7 +128,7 @@ function pageModel(req: Request, review: OrderStart, issues: ValidationIssue[] =
 function judgeEdits(snapshot: DocWeaveSnapshot | null | undefined) {
   const changes = snapshot ? describeChanges(snapshot) : { inserted: 0, modified: 0 };
   // Docweave does not let the judge remove a generated clause; wording they delete within one is a change.
-  return { added: changes.inserted > 0, changed: changes.modified > 0, deleted: false };
+  return { added: changes.inserted > 0, changed: changes.modified > 0 };
 }
 
 /**
