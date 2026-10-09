@@ -1,6 +1,6 @@
 {
   "pageTitle": "Cael mynediad i’ch achos",
-  "description": "Cael mynediad a rheoli eich achos yn defnyddio rhif eich hawliad a'ch cod mynediad. Bydd y rhain yn y llythyr, yr e-bost neu’r pecyn a anfonwyd gan y llys.",
+  "description": "Cael mynediad a rheoli eich achos yn defnyddio rhif eich hawliad a’ch cod mynediad. Bydd y rhain yn y llythyr, yr e-bost neu’r pecyn a anfonwyd gan y llys.",
   "claimNumber": {
     "label": "Nodwch rif eich hawliad",
     "hint": "Mae’r rhif hwn yn cynnwys 16 digid"
@@ -11,6 +11,6 @@
   },
   "errorPrefix": "Gwall:",
   "errors": {
-    "respondToClaimUnavailable": "cyThe option to respond to a claim is not available at the moment."
+    "respondToClaimUnavailable": "Nid yw’r dewis i ymateb i hawliad ar gael ar hyn o bryd."
   }
 }

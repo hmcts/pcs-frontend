@@ -26,3 +26,7 @@ export const RESPOND_TO_CLAIM_START_ROUTE = `${RESPOND_TO_CLAIM_ROUTE}/start-now
 export const RESPOND_TO_CLAIM_TASK_LIST_ROUTE = `${RESPOND_TO_CLAIM_ROUTE}/task-list`;
 
 export const VIEW_RESPONSE_ROUTE = '/case/:caseReference/view-the-response';
+
+export const MAKE_ORDER_ROUTE = '/case/:caseReference/make-order';
+
+export const MAKE_ORDER_SENT_FOR_REVIEW_ROUTE = `${MAKE_ORDER_ROUTE}/sent-for-review`;
