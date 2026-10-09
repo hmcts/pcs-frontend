@@ -251,10 +251,10 @@
       "JOINT_CONTRACT_HOLDERS": "Deiliaid contract ar y cyd (sail H)",
       "OTHER_ESTATE_MANAGEMENT_REASONS": "Rhesymau rheoli ystad eraill (sail I)",
       "HOUSING_ASSOCIATIONS_AND_TRUSTS": "Cymdeithasau tai ac ymddiriedolaethau tai: pobl y mae’n anodd eu cartrefu (sail E)",
-      "LANDLORD_NOTICE_PERIODIC_S178": "Hysbysiad landlord wedi’i roi mewn cysylltiad â chontract safonol cyfnodol (adran 178)",
-      "SERIOUS_ARREARS_PERIODIC_S181": "Deiliad contract o dan gontract safonol cyfnodol ag ôl-ddyledion rhent difrifol (adran 181)",
-      "SERIOUS_ARREARS_FIXED_TERM_S187": "Deiliad contract o dan gontract safonol cyfnod penodol ag ôl-ddyledion rhent difrifol (adran 187)",
-      "CONVERTED_FIXED_TERM_SCH12_25B2": "Hysbysiad wedi’i roi mewn cysylltiad â diwedd contract safonol cyfnod penodol wedi’i drosi (paragraff 25B(2) o Atodlen 12)",
+      "LANDLORD_NOTICE_PERIODIC_S178": "Hysbysiad landlord a roddwyd mewn perthynas â chontract cyfnodol safonol (adran 178)",
+      "SERIOUS_ARREARS_PERIODIC_S181": "Deilydd contract o dan gontract cyfnodol safonol gydag ôl-ddyledion rhent difrifol (adran 181)",
+      "SERIOUS_ARREARS_FIXED_TERM_S187": "Deilydd contract o dan gontract safonol cyfnod penodol gydag ôl-ddyledion rhent difrifol (adran 187)",
+      "CONVERTED_FIXED_TERM_SCH12_25B2": "Rhoddwyd hysbysiad mewn perthynas â diwedd contract safonol cyfnod penodol wedi’i addasu (paragraff 25B(2) o Atodlen 12)",
       "BREACH_OF_TENANCY": "Torri’r denantiaeth"
     },
     "noticeMethods": {

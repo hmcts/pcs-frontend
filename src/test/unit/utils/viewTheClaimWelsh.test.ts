@@ -133,8 +133,30 @@ describe('View the claim values in Welsh', () => {
 
     expect(grounds).toContain('Cymdeithasau tai ac ymddiriedolaethau tai: pobl y mae’n anodd eu cartrefu (sail E)');
     expect(grounds).toContain(
-      'Deiliad contract o dan gontract safonol cyfnodol ag ôl-ddyledion rhent difrifol (adran 181)'
+      'Deilydd contract o dan gontract cyfnodol safonol gydag ôl-ddyledion rhent difrifol (adran 181)'
     );
+  });
+
+  // Wording supplied by the Welsh Language Unit (PCS ExUI Welsh upload) – keep it as supplied.
+  it.each([
+    [
+      'LANDLORD_NOTICE_PERIODIC_S178',
+      'Hysbysiad landlord a roddwyd mewn perthynas â chontract cyfnodol safonol (adran 178)',
+    ],
+    [
+      'SERIOUS_ARREARS_PERIODIC_S181',
+      'Deilydd contract o dan gontract cyfnodol safonol gydag ôl-ddyledion rhent difrifol (adran 181)',
+    ],
+    [
+      'SERIOUS_ARREARS_FIXED_TERM_S187',
+      'Deilydd contract o dan gontract safonol cyfnod penodol gydag ôl-ddyledion rhent difrifol (adran 187)',
+    ],
+    [
+      'CONVERTED_FIXED_TERM_SCH12_25B2',
+      'Rhoddwyd hysbysiad mewn perthynas â diwedd contract safonol cyfnod penodol wedi’i addasu (paragraff 25B(2) o Atodlen 12)',
+    ],
+  ])('uses the Welsh Language Unit wording for ground %s', (code, welsh) => {
+    expect((cyViewTheClaim.values.groundNames as Record<string, string>)[code]).toBe(welsh);
   });
 
   it('shows the tenancy start date in Welsh when only the details-tab date is available', async () => {
