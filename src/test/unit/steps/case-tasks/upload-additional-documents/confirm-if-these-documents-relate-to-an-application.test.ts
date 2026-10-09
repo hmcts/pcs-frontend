@@ -28,8 +28,8 @@ jest.mock('@steps', () => ({
   getFlowConfigForJourney: jest.fn(),
 }));
 
-jest.mock('@modules/nunjucks/filters/date', () => ({
-  date: jest.fn((input: string) => `formatted(${input})`),
+jest.mock('@utils/formatLocalisedDate', () => ({
+  formatLocalisedDate: jest.fn((input: string) => `formatted(${input})`),
 }));
 
 jest.mock('@routes/dashboard', () => ({
@@ -41,7 +41,6 @@ import type { Request, Response } from 'express';
 import { step } from '../../../../../main/steps/case-tasks/upload-additional-documents/confirm-if-these-documents-relate-to-an-application';
 import { MAIN_CLAIM_OPTION_VALUE } from '../../../../../main/steps/case-tasks/upload-additional-documents/flow.config';
 
-import { date } from '@modules/nunjucks/filters/date';
 import {
   createGetController,
   getFormData,
@@ -51,6 +50,7 @@ import {
 } from '@modules/steps';
 import type { CcdCase, CcdCollectionItem, RelatedApplicationOption } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 
 const mockGetCaseByIdForEvent = ccdCaseService.getCaseByIdForEvent as jest.Mock;
 const mockGetCaseById = ccdCaseService.getCaseById as jest.Mock;
@@ -159,7 +159,7 @@ beforeEach(() => {
       return content;
     },
   }));
-  (date as jest.Mock).mockImplementation((input: string) => `formatted(${input})`);
+  (formatLocalisedDate as jest.Mock).mockImplementation((input: string) => `formatted(${input})`);
 });
 
 describe('confirm-if-these-documents-relate-to-an-application GET', () => {
@@ -182,6 +182,7 @@ describe('confirm-if-these-documents-relate-to-an-application GET', () => {
 
     const result = await invokeGet();
 
+    expect(formatLocalisedDate).toHaveBeenCalledWith('2026-05-01', 'en', 'weekday');
     expect(result.applications).toEqual([
       {
         value: GEN_APP_1,

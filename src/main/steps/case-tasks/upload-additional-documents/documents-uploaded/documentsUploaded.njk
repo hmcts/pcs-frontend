@@ -2,7 +2,7 @@
 {% from "govuk/components/panel/macro.njk" import govukPanel %}
 
 
-{% block pageTitle %}{{ t('pageTitle') }} - HM Courts & Tribunals Service – GOV.UK{% endblock %}
+{% block pageTitle %}{{ t('pageTitle') }} - {{ t('common:pageTitleSuffix') }}{% endblock %}
 
 {% block mainContent %}
   {{ govukPanel({

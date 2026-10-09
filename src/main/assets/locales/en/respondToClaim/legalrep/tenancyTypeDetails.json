@@ -7,5 +7,13 @@
   "yes": "Yes",
   "no": "No",
   "correctTypeLabel": "Give the correct tenancy, occupation contract or licence type",
-  "notSure": "Defendant is not sure"
+  "notSure": "Defendant is not sure",
+  "tenancyTypeAgreementTypes": {
+    "ASSURED_TENANCY": "an assured",
+    "SECURE_TENANCY": "a secure",
+    "INTRODUCTORY_TENANCY": "an introductory",
+    "FLEXIBLE_TENANCY": "a flexible",
+    "DEMOTED_TENANCY": "a demoted",
+    "OTHER": "other"
+  }
 }

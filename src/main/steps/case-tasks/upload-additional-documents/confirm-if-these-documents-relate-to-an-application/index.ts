@@ -5,7 +5,7 @@ import type { TFunction } from 'i18next';
 import { UPLOAD_ADDITIONAL_DOCUMENTS_JOURNEY_BASE } from '../../../../constants/caseRoutes';
 import { MAIN_CLAIM_OPTION_VALUE, flowConfig } from '../flow.config';
 
-import { date } from '@modules/nunjucks/filters/date';
+import { getRequestLanguage } from '@modules/i18n';
 import {
   createGetController,
   createStepNavigation,
@@ -20,6 +20,7 @@ import { getDashboardUrl } from '@routes/dashboard';
 import type { CcdCollectionItem, GenApp, RelatedApplicationOption } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getFlowConfigForJourney } from '@steps';
+import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 
 const journeyName = 'uploadAdditionalDocuments';
 const stepName = 'confirm-if-these-documents-relate-to-an-application';
@@ -29,8 +30,8 @@ const UPLOAD_DOCUMENTS_EVENT_ID = 'uploadDocuments';
 
 const stepNavigation = createStepNavigation(req => getFlowConfigForJourney(journeyName, req) || flowConfig);
 
-function labelForOption(t: TFunction, option: RelatedApplicationOption): string {
-  const formattedDate = option.submittedDate ? date(option.submittedDate, 'cccc d MMMM yyyy') : '';
+function labelForOption(t: TFunction, option: RelatedApplicationOption, lang: string): string {
+  const formattedDate = formatLocalisedDate(option.submittedDate, lang, 'weekday') ?? '';
   switch (option.category) {
     case 'ADJOURN_HEARING_APPLICATION':
       return t('applicationOptionAdjourn', { date: formattedDate });
@@ -106,6 +107,7 @@ export const step: StepDefinition = {
       const savedFormData = getFormData(req, stepName);
       const selectedApplicationId = savedFormData?.relatedApplicationId as string | undefined;
       const openInNewTabText = t('opensInNewTab');
+      const lang = getRequestLanguage(req);
 
       const options = await loadRelatedApplicationOptions(req);
       const ccdCase = caseId && accessToken ? await ccdCaseService.getCaseById(accessToken, caseId) : undefined;
@@ -125,7 +127,7 @@ export const step: StepDefinition = {
             const hint = buildApplicationHint(caseId, genAppsById, item.value.genAppId, openInNewTabText);
             return {
               value: item.value.genAppId as string,
-              text: labelForOption(t, item.value),
+              text: labelForOption(t, item.value, lang),
               checked: selectedApplicationId === item.value.genAppId,
               ...(hint ? { hint } : {}),
             };
@@ -134,7 +136,7 @@ export const step: StepDefinition = {
           ? [
               {
                 value: counterClaimOption.value.counterClaimId as string,
-                text: labelForOption(t, counterClaimOption.value),
+                text: labelForOption(t, counterClaimOption.value, lang),
                 checked: selectedApplicationId === counterClaimOption.value.counterClaimId,
               },
             ]
@@ -183,6 +185,7 @@ export const step: StepDefinition = {
 
       await loadStepNamespace(req);
       const t = getTranslationFunction(req);
+      const lang = getRequestLanguage(req);
       let relatedApplicationCategory: string | undefined;
       let relatedApplicationText = '';
       if (relatedApplicationId === MAIN_CLAIM_OPTION_VALUE) {
@@ -195,7 +198,7 @@ export const step: StepDefinition = {
         );
         if (match) {
           relatedApplicationCategory = match.value.category;
-          relatedApplicationText = labelForOption(t, match.value);
+          relatedApplicationText = labelForOption(t, match.value, lang);
         }
       }
 

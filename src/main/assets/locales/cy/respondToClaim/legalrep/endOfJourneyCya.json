@@ -42,7 +42,7 @@
     "positionHeldLabel": "Safle neu swydd a ddelir"
   },
   "errors": {
-    "statementOfTruthBelief": "Dewiswch os ydych yn credu bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir",
+    "statementOfTruthBelief": "Dewiswch a yw’r diffynnydd yn credu bod y ffeithiau a nodir yn y ffurflen amddiffyniad hon yn wir",
     "nameOfFirm": "Nodwch enw’r cwmni",
     "positionHeld": "Nodwch eich swydd neu safle a ddelir"
   }

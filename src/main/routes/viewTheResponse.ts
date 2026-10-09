@@ -1,4 +1,3 @@
-import { format, parseISO } from 'date-fns';
 import { Application, NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -7,7 +6,7 @@ import { VIEW_DOCUMENTS_ROUTE, VIEW_RESPONSE_ROUTE } from '../constants/caseRout
 import { oidcMiddleware } from '../middleware';
 import { isWalesProperty, normalizeYesNoValue, penceToPounds } from '../steps/utils';
 
-import { getTranslationFunction } from '@modules/i18n';
+import { getRequestLanguage, getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { getDashboardUrl } from '@routes/dashboard';
 import type {
@@ -28,13 +27,12 @@ import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
 import { findCaseDocumentById } from '@utils/documentUtils';
+import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 import { RELEASE_1_2_ENABLED } from '@utils/respondToClaimFlags';
 
 const logger = Logger.getLogger('viewTheResponse');
-
-const GDS_DATE_FORMAT = 'd MMMM yyyy';
 
 interface SummaryRow {
   key: { text: string };
@@ -53,19 +51,11 @@ interface TitledSummarySection extends SummarySection {
   sectionTitle: string;
 }
 
-function formatGdsDate(value: string | undefined | null): string | null {
+function formatGdsDate(value: string | undefined | null, lang: string): string | null {
   if (!value) {
     return null;
   }
-  const candidates = [value, value.substring(0, 10)];
-  for (const candidate of candidates) {
-    try {
-      return format(parseISO(candidate), GDS_DATE_FORMAT);
-    } catch {
-      continue;
-    }
-  }
-  return null;
+  return formatLocalisedDate(value, lang) ?? formatLocalisedDate(value.substring(0, 10), lang) ?? null;
 }
 
 function isYes(value: string | null | undefined): boolean {
@@ -239,7 +229,7 @@ function resolveClaimantName(caseData: CcdCaseData): string {
   return new CcdCaseModel({ id: '', data: caseData }).claimantName;
 }
 
-function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildDefendant1Details(t: TFunction, caseData: CcdCaseData, lang: string): SummarySection {
   const rows: SummaryRow[] = [];
   const party: CcdDefendantParty | undefined = caseData.possessionClaimResponse?.defendantContactDetails?.party;
   const responses = caseData.possessionClaimResponse?.defendantResponses;
@@ -260,12 +250,12 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
     resolveDefendantPostalAddress(t, party, caseData.propertyAddress)
   );
   if (!addressUnknown) {
-    pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
+    pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(responses?.dateOfBirth, lang) ?? '');
   }
   return { rows };
 }
 
-function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): TitledSummarySection[] {
+function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData, lang: string): TitledSummarySection[] {
   const defendants = caseData.allDefendants ?? [];
   if (defendants.length < 2) {
     return [];
@@ -287,7 +277,7 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
         resolveDefendantPostalAddress(t, party, caseData.propertyAddress)
       );
       if (!addressUnknown) {
-        pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(party.dateOfBirth) ?? '');
+        pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(party.dateOfBirth, lang) ?? '');
       }
 
       return {
@@ -297,7 +287,12 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
     });
 }
 
-function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLandlord: boolean): SummarySection {
+function buildResponseToClaim(
+  t: TFunction,
+  caseData: CcdCaseData,
+  showExemptLandlord: boolean,
+  lang: string
+): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
@@ -321,7 +316,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLan
     pushRow(
       rows,
       t('viewTheResponse:responseToClaim.tenancyStartDate'),
-      formatGdsDate(responses?.tenancyStartDate) ?? ''
+      formatGdsDate(responses?.tenancyStartDate, lang) ?? ''
     );
   }
   pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
@@ -333,7 +328,7 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLan
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.noticeReceivedDate'),
-    formatGdsDate(responses?.noticeReceivedDate) ?? ''
+    formatGdsDate(responses?.noticeReceivedDate, lang) ?? ''
   );
   pushRow(
     rows,
@@ -359,16 +354,21 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLan
   return { rows };
 }
 
-function resolveClaimIssueDate(caseData: CcdCaseData, dateIssued: string | null): string {
+function resolveClaimIssueDate(caseData: CcdCaseData, dateIssued: string | null, lang: string): string {
   return (
-    formatGdsDate(caseData.claimIssueDate) ??
-    formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate) ??
+    formatGdsDate(caseData.claimIssueDate, lang) ??
+    formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate, lang) ??
     dateIssued ??
     ''
   );
 }
 
-function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssued: string | null): SummarySection {
+function buildPaymentsOrAgreements(
+  t: TFunction,
+  caseData: CcdCaseData,
+  dateIssued: string | null,
+  lang: string
+): SummarySection {
   const rows: SummaryRow[] = [];
   const payment: PaymentAgreement | undefined = caseData.possessionClaimResponse?.defendantResponses?.paymentAgreement;
   if (!payment) {
@@ -376,7 +376,7 @@ function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssu
   }
   const paymentLabelContext = {
     claimantName: resolveClaimantName(caseData),
-    claimIssueDate: resolveClaimIssueDate(caseData, dateIssued),
+    claimIssueDate: resolveClaimIssueDate(caseData, dateIssued, lang),
   };
   pushRow(
     rows,
@@ -410,7 +410,7 @@ function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssu
   return { rows };
 }
 
-function buildHouseholdAndCircumstances(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildHouseholdAndCircumstances(t: TFunction, caseData: CcdCaseData, lang: string): SummarySection {
   const rows: SummaryRow[] = [];
   const hc: HouseholdCircumstances | undefined =
     caseData.possessionClaimResponse?.defendantResponses?.householdCircumstances;
@@ -431,7 +431,7 @@ function buildHouseholdAndCircumstances(t: TFunction, caseData: CcdCaseData): Su
   pushRow(
     rows,
     t('viewTheResponse:household.alternativeAccommodationDate'),
-    formatGdsDate(hc.alternativeAccommodationTransferDate) ?? ''
+    formatGdsDate(hc.alternativeAccommodationTransferDate, lang) ?? ''
   );
   pushRow(
     rows,
@@ -463,7 +463,7 @@ function buildIncomeRow(
   pushRow(rows, t(labelKey), formatIncomeValue(t, amount, frequency));
 }
 
-function buildRegularIncome(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildRegularIncome(t: TFunction, caseData: CcdCaseData, lang: string): SummarySection {
   const rows: SummaryRow[] = [];
   const hc = caseData.possessionClaimResponse?.defendantResponses?.householdCircumstances;
   if (!hc) {
@@ -493,7 +493,7 @@ function buildRegularIncome(t: TFunction, caseData: CcdCaseData): SummarySection
     pushRow(
       rows,
       t('viewTheResponse:income.universalCreditApplicationDate'),
-      formatGdsDate(hc.ucApplicationDate) ?? ''
+      formatGdsDate(hc.ucApplicationDate, lang) ?? ''
     );
   } else {
     pushRow(rows, t('viewTheResponse:income.universalCredit'), yesNo(t, hc.universalCredit));
@@ -575,6 +575,8 @@ function buildAdditionalInformation(t: TFunction, caseData: CcdCaseData): Summar
   return { rows };
 }
 
+const COUNTERCLAIM_TYPES = ['PAYMENT_OR_COMPENSATION', 'SOMETHING_ELSE', 'BOTH'];
+
 function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
@@ -584,9 +586,13 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
 
   const cc: CcdCounterClaim = responses.counterClaim;
 
-  if (cc.claimType) {
-    const typeLabel = t(`viewTheResponse:counterclaim.claimTypeOptions.${cc.claimType}`, cc.claimType);
-    pushRow(rows, t('viewTheResponse:counterclaim.type'), typeLabel);
+  // Only types with a translation are shown, so a new pcs-api type never appears as its raw code.
+  if (cc.claimType && COUNTERCLAIM_TYPES.includes(cc.claimType)) {
+    pushRow(
+      rows,
+      t('viewTheResponse:counterclaim.type'),
+      t(`viewTheResponse:counterclaim.claimTypeOptions.${cc.claimType}`)
+    );
   }
 
   const claimsMoney = cc.claimType === 'PAYMENT_OR_COMPENSATION' || cc.claimType === 'BOTH';
@@ -665,22 +671,23 @@ export default function viewTheResponseRoutes(app: Application): void {
       }
 
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
+      const lang = getRequestLanguage(req);
       const release12Enabled = await isRespondToClaimEnabledForRelease(req);
       const showExemptLandlord = release12Enabled && isWalesProperty(caseData);
 
-      const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
-      const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
+      const dateSubmitted = formatGdsDate(caseData.dateSubmitted, lang);
+      const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate, lang);
       const completedBy = responses?.statementOfTruthCompletedBy;
       const responsePdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_2_ENABLED, false);
 
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
-        defendant1Details: buildDefendant1Details(t, caseData),
-        additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData),
-        responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord),
-        paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
-        householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
-        regularIncome: buildRegularIncome(t, caseData),
+        defendant1Details: buildDefendant1Details(t, caseData, lang),
+        additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData, lang),
+        responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord, lang),
+        paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued, lang),
+        householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData, lang),
+        regularIncome: buildRegularIncome(t, caseData, lang),
         priorityDebts: buildPriorityDebts(t, caseData),
         regularExpenses: buildRegularExpenses(t, caseData),
         additionalInformation: buildAdditionalInformation(t, caseData),

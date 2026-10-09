@@ -18,7 +18,7 @@
   "assessedOnUrgencyBasis": "Caiff eich cais ei asesu ar sail brys a chaiff ei ystyried gan farnwr cyn dyddiad y gwrandawiad.",
   "howMuchItWillCost": "Beth fydd y gost",
   "freeIfAtLeast14DaysAway": "Gellir gwneud cais am ddim os yw eich gwrandawiad llys o leiaf 14 diwrnod i ffwrdd.",
-  "ifHearingSoonerNeedToPay": "Os bydd eich gwrandawiad llys yn gynt, byddwch angen talu{{standardFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}}.",
+  "ifHearingSoonerNeedToPay": "Os bydd eich gwrandawiad llys yn gynt, byddwch angen talu {{standardFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}}.",
   "feeIncreasesIf": "Bydd y ffi yn cynyddu i {{maxFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} os:",
   "youHaveAlreadyToldTheOtherParty": "ydych eisoes wedi dweud wrth y parti arall eich bod yn gwneud y cais hwn, ac",
   "theyDidNotAgreeToIt": "ni wnaethant gytuno iddo (mae hyn yn golygu eu bod wedi ei wrthwynebu)",
