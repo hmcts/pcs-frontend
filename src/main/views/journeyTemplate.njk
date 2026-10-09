@@ -3,10 +3,23 @@
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% from "govuk/components/skip-link/macro.njk" import govukSkipLink %}
+{% from "govuk/components/footer/macro.njk" import govukFooter %}
 
 {% block head %}
   {{super()}}
   {% include "webpack/css.njk" %}
+{% endblock %}
+
+{% block skipLink %}
+  {{ govukSkipLink({ href: "#main-content", text: t('skipLink', 'Skip to main content') }) }}
+{% endblock %}
+
+{% block govukFooter %}
+  {{ govukFooter({
+    contentLicence: { html: t('footer.contentLicence') },
+    copyright: { text: t('footer.copyright', '© Crown copyright') }
+  }) }}
 {% endblock %}
 
 {% block header %}

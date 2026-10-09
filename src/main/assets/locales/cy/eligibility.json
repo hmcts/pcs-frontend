@@ -1,18 +1,18 @@
 {
   "startPage": {
     "title": "Cyn ichi ddechrau",
-    "description": "Rydym yn creu gwasanaeth newydd. Mae dyluniadau gwahanol yn cael eu profi a'u newid yn seiliedig ar adborth gan ddefnyddwyr.",
-    "eligibilityText": "Gofynnir rhai cwestiynau i chi i wirio eich bod yn gymwys i ddefnyddio'r gwasanaeth hwn.",
+    "description": "Rydym yn creu gwasanaeth newydd. Mae dyluniadau gwahanol yn cael eu profi a’u newid yn seiliedig ar adborth gan ddefnyddwyr.",
+    "eligibilityText": "Gofynnir rhai cwestiynau i chi i wirio eich bod yn gymwys i ddefnyddio’r gwasanaeth hwn.",
     "whatYouNeedTitle": "Beth fydd ei angen arnoch",
     "whatYouNeedText": "I wneud eich hawliad, byddwch angen yr wybodaeth ganlynol wrth law:",
     "needNoticeInfo": "Gwybodaeth am y math o hysbysiad a roddwyd a phryd y rhoddwyd (os yn berthnasol)",
     "needPropertyInfo": "Manylion am yr eiddo yr hoffech hawlio meddiant ohono",
-    "needDefendantInfo": "Manylion y diffynnydd (os yn hysbys)",
+    "needDefendantInfo": "Manylion y diffynyddion (os yn hysbys)",
     "needGroundsInfo": "Eich seiliau dros feddiannu a manylion eich rhesymau dros wneud hawliad meddiant",
     "needDocuments": "Copïau o ddogfennau perthnasol"
   },
   "page2": {
-    "ageLabel": "Ydych chi'n 18 oed neu'n hŷn?",
+    "ageLabel": "Ydych chi’n 18 oed neu’n hŷn?",
     "ageDescription": "Dewiswch opsiwn i barhau.",
     "ageOptions": {
       "yes": "Ydy",
@@ -21,8 +21,8 @@
   },
   "page3": {
     "title": "Beth yw eich seiliau dros feddiannu?",
-    "description": "Dewiswch bob un sy'n berthnasol i'ch achos chi",
-    "groundsLabel": "Dewiswch bob un sy'n berthnasol",
+    "description": "Dewiswch bob un sy’n berthnasol i’ch achos chi",
+    "groundsLabel": "Dewiswch bob un sy’n berthnasol",
     "options": {
       "rentArrears8": {
         "text": "Ôl-ddyledion rhent (sail 8)",
@@ -30,7 +30,7 @@
       },
       "breachContract9": {
         "text": "Tor contract (sail 9)",
-        "hint": "Mae'r tenant wedi torri telerau'r cytundeb tenantiaeth"
+        "hint": "Mae’r tenant wedi torri telerau’r cytundeb tenantiaeth"
       },
       "other10": {
         "text": "Arall (sail 10)",
@@ -103,7 +103,7 @@
   "summary": {
     "title": "Gwirio eich atebion",
     "description": "Gwiriwch eich atebion cyn cyflwyno eich hawliad",
-    "empty": "Dim gwybodaeth i'w harddangos eto.",
+    "empty": "Dim gwybodaeth i’w harddangos eto.",
     "submit": "Cyflwyno"
   },
   "confirmation": {
@@ -124,13 +124,13 @@
   "ineligible": {
     "title": "Nid ydych yn gymwys i wneud hawliad",
     "reason": "Mae angen i chi fod yn 18 oed neu drosodd i wneud hawliad meddiannu.",
-    "changeAnswer": "Os ydych chi'n meddwl bod hyn yn anghywir, gallwch fynd yn ôl a newid eich ateb.",
+    "changeAnswer": "Os ydych chi’n meddwl bod hyn yn anghywir, gallwch fynd yn ôl a newid eich ateb.",
     "exit": "Gadael y cais"
   },
   "errors": {
     "address": {
-      "addressLine1": "Nodwch llinell 1 y cyfeiriad",
-      "town": "Nodwch tref neu ddinas",
+      "addressLine1": "Nodwch linell 1 y cyfeiriad",
+      "town": "Nodwch dref neu ddinas",
       "postcode": "Nodwch god post dilys"
     }
   }

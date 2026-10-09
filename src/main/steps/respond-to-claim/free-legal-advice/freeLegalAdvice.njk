@@ -5,7 +5,7 @@
 {% from "macros/csrf.njk" import csrfProtection %}
 
 {% block pageTitle %}
-  {{ pageTitle }} - HM Courts & Tribunals Service – GOV.UK
+  {{ pageTitle }} - {{ t('common:pageTitleSuffix') }}
 {% endblock %}
 {% block mainContent %}
   {% if errorSummary %}

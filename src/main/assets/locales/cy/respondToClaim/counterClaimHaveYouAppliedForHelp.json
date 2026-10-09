@@ -7,7 +7,7 @@
   "errors": {
     "alreadyAppliedForHelp": "Dewiswch os ydych chi eisoes wedi gwneud cais am help gyda’ch ffi gwrth-hawliad?",
     "hwfReference": "Nodwch eich cyfeirnod Help i Dalu Ffioedd",
-    "hwfReferenceMaxLength": "Rhaid i’ch cyfeirnod Help gyda Ffioedd fod yn 60 nod neu lai"
+    "hwfReferenceMaxLength": "Rhaid i’ch cyfeirnod Help i Dalu Ffioedd fod yn 60 nod neu lai"
   },
   "options": {
     "yes": "Do",

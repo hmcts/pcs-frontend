@@ -11,8 +11,8 @@
       "label": "Beth ydych chi eisiau gwneud cais amdano?",
       "changeHint": "Newid beth rydych eisiau gwneud cais amdano",
       "options": {
-        "ADJOURN": "Gofyn i ohirio'r gwrandawiad (ei symud i amser neu ddyddiad diweddarach)",
-        "SET_ASIDE": "Gofyn i'r llys roi penderfyniad a wnaed gan y llys o'r neilltu (canslo)",
+        "ADJOURN": "Gofyn i ohirio’r gwrandawiad (ei symud i amser neu ddyddiad diweddarach)",
+        "SET_ASIDE": "Gofyn i’r llys roi penderfyniad a wnaed gan y llys o’r neilltu (canslo)",
         "SOMETHING_ELSE": "Rhywbeth arall"
       }
     },
@@ -41,16 +41,16 @@
       "changeHint": "Newid dogfennau wedi eu huwchlwytho"
     },
     "otherPartiesAgreed": {
-      "label": "A yw'r partïon eraill wedi cydsynio i'r cais hwn?",
-      "changeHint": "Newid a yw'r partïon eraill wedi cydsynio i'r cais hwn"
+      "label": "A yw’r partïon eraill wedi cydsynio i’r cais hwn?",
+      "changeHint": "Newid a yw’r partïon eraill wedi cydsynio i’r cais hwn"
     },
     "anyReasonNotToShare": {
-      "label": "A oes yna unrhyw resymau pam na ddylid rhannu'r cais hwn gyda'r partïon eraill?",
-      "changeHint": "Newid a oes yna unrhyw resymau pam na ddylid rhannu'r cais hwn gyda'r partïon eraill"
+      "label": "A oes yna unrhyw resymau pam na ddylid rhannu’r cais hwn gyda’r partïon eraill?",
+      "changeHint": "Newid a oes yna unrhyw resymau pam na ddylid rhannu’r cais hwn gyda’r partïon eraill"
     },
     "reasonForNotSharing": {
-      "label": "Rhowch reswm pam na ddylid rhannu'r cais hwn gyda'r parti arall",
-      "changeHint": "Newid y rheswm pam na ddylid rhannu'r cais hwn gyda'r parti arall"
+      "label": "Rhowch reswm pam na ddylid rhannu’r cais hwn gyda’r parti arall",
+      "changeHint": "Newid y rheswm pam na ddylid rhannu’r cais hwn gyda’r parti arall"
     },
     "whatOrderWanted": {
       "label": "Pa orchymyn ydych chi eisiau i’r llys ei wneud, a pham?",
@@ -61,29 +61,29 @@
       "changeHint": "Newid pa un a ydych eisiau uwchlwytho dogfennau i gefnogi eich cais"
     },
     "whichLanguage": {
-      "label": "Pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn?",
-      "changeHint": "Newid pa iaith wnaethoch ei defnyddio i gwblhau'r gwasanaeth hwn",
+      "label": "Pa iaith wnaethoch ei defnyddio i gwblhau’r gwasanaeth hwn?",
+      "changeHint": "Newid pa iaith wnaethoch ei defnyddio i gwblhau’r gwasanaeth hwn",
       "options": {
         "ENGLISH": "Saesneg",
         "WELSH": "Cymraeg",
-        "ENGLISH_AND_WELSH": "Saesneg a Cymraeg"
+        "ENGLISH_AND_WELSH": "Saesneg a Chymraeg"
       }
     }
   },
   "statementOfTruth": {
     "subheading": "Datganiad gwirionedd",
     "theInformationFormsYourApplication": "Mae’r wybodaeth ar y dudalen hon yn ffurfio eich cais.",
-    "whenYouAreSatisfied": "Pan fyddwch yn fodlon bod eich atebion yn gywir, dylech roi tic yn y blwch isod ac ysgrifennu eich enw i \"lofnodi'r\" datganiad gwirionedd hwn.",
+    "whenYouAreSatisfied": "Pan fyddwch yn fodlon bod eich atebion yn gywir, dylech roi tic yn y blwch isod ac ysgrifennu eich enw i \"lofnodi’r\" datganiad gwirionedd hwn.",
     "checkbox": {
       "fieldLabel": "Datganiad gwirionedd",
       "value": "Credaf fod y ffeithiau a nodir yn y ffurflen hon yn wir."
     },
-    "understandProceedings": "Deallaf y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu'n onest ei fod yn wir.",
+    "understandProceedings": "Deallaf y gellir dwyn achos dirmyg llys yn erbyn unrhyw un sy’n gwneud datganiad anwir, neu sy’n achosi i ddatganiad anwir gael ei wneud mewn dogfen a ddilysir gan ddatganiad gwirionedd heb gredu’n onest ei fod yn wir.",
     "yourFullName": "Eich enw llawn"
   },
   "errors": {
-    "agreeToTheStatementOfTruth": "Cytuno i'r datganiad gwirionedd",
+    "agreeToTheStatementOfTruth": "Cytuno i’r datganiad gwirionedd",
     "youMustSignYourName": "Mae’n rhaid ichi lofnodi eich enw",
-    "fullNameMaxLength": "Rhaid i'ch enw llawn fod yn 100 nod neu lai"
+    "fullNameMaxLength": "Rhaid i’ch enw llawn fod yn 100 nod neu lai"
   }
 }

@@ -1,12 +1,12 @@
 {
   "pageTitle": "Plant dibynnol",
-  "heading": "Plant sy'n ddibynnol",
+  "heading": "Plant sy’n ddibynnol",
   "dependentChildrenParagraph": "",
-  "dependantQuestion": "A oes gan y diffynnydd unrhyw blant sy'n ddibynnol arnynt?",
+  "dependantQuestion": "A oes gan y diffynnydd unrhyw blant sy’n ddibynnol arnynt?",
   "dependentChildrenDetailsLabel": "Rhowch fanylion am eu plant dibynnol",
   "dependentChildrenDetailsHint": "",
   "errors": {
-    "dependentChildren": "Dewiswch a oes ganddynt unrhyw blant sy'n ddibynnol arnynt",
+    "dependentChildren": "Dewiswch a oes ganddynt unrhyw blant sy’n ddibynnol arnynt",
     "dependentChildrenDetails": "Rhowch fanylion eu plant dibynnol",
     "dependantChildrenDetailsMaxLength": "Rhaid i fanylion plant dibynnol fod yn 500 o nodau neu lai"
   }

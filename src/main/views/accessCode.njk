@@ -47,7 +47,7 @@
           </div>
           {% if errors.claimNumber %}
             <p id="claimNumber-error" class="govuk-error-message">
-              <span class="govuk-visually-hidden">{{ t('accessCode:errorPrefix') }}</span> {{ errors.claimNumber.text }}
+              <span class="govuk-visually-hidden">{{ t('common:errorPrefix') }}:</span> {{ errors.claimNumber.text }}
             </p>
           {% endif %}
           <input
@@ -70,7 +70,7 @@
           </div>
           {% if errors.accessCode %}
             <p id="accessCode-error" class="govuk-error-message">
-              <span class="govuk-visually-hidden">{{ t('accessCode:errorPrefix') }}</span> {{ errors.accessCode.text }}
+              <span class="govuk-visually-hidden">{{ t('common:errorPrefix') }}:</span> {{ errors.accessCode.text }}
             </p>
           {% endif %}
           <input

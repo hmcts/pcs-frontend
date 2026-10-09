@@ -1,10 +1,10 @@
 {
   "pageTitle": "Dechrau cytundeb rhent",
   "heading": "Dyddiad dechrau tenantiaeth, contract meddiannaeth neu drwydded",
-  "question": "A yw dyddiad dechrau'r denantiaeth, drwydded neu gontract meddiannaeth yn gywir?",
+  "question": "A yw dyddiad dechrau’r denantiaeth, drwydded neu gontract meddiannaeth yn gywir?",
   "subHeading": "Manylion a roddwyd gan {{claimantName}}:",
   "bulletPoint": "Dechreuodd eich tenantiaeth, contract meddiannaeth neu drwydded ar {{tenancyStartDate}}",
-  "dateLabel": "Beth yw'r dyddiad dechrau cywir (dewisol)?",
+  "dateLabel": "Beth yw’r dyddiad dechrau cywir (dewisol)?",
   "options": {
     "yes": "Ydy",
     "no": "Nac ydy",
@@ -17,10 +17,10 @@
       "month": "Mis",
       "year": "Blwyddyn",
       "notRealDate": "Rhaid i ddyddiad dechrau’r denantiaeth fod yn ddyddiad go iawn",
-      "futureDate": "Rhaid i ddyddiad dechrau'r denantiaeth fod yn y gorffennol",
+      "futureDate": "Rhaid i ddyddiad dechrau’r denantiaeth fod yn y gorffennol",
       "invalidValue": "Rhaid i ddyddiad dechrau’r denantiaeth fod yn ddyddiad go iawn",
       "missingOne": "Rhaid i ddyddiad dechrau eich tenantiaeth gynnwys {{missingField}}",
-      "missingTwo": "Rhaid i ddyddiad dechrau'r denantiaeth gynnwys {{first}} a {{second}}"
+      "missingTwo": "Rhaid i ddyddiad dechrau’r denantiaeth gynnwys {{first}} a {{second}}"
     },
     "confirmTenancyDate": "Dewiswch a yw manylion y denantiaeth, drwydded neu gontract meddiannaeth yn gywir"
   }

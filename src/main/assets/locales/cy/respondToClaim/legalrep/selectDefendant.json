@@ -2,8 +2,8 @@
   "pageTitle": "Cynrychiolaeth",
   "heading": "Cynrychiolaeth",
   "detailsHeading": "Os ydych yn cynrychioli mwy nag un diffynnydd yn yr achos hwn, rhaid i chi gyflwyno ymateb ar wahân i bob un.",
-  "selectDefendantLabel": "Ar ran pa ddiffynnydd ydych yn llenwi'r ymateb hwn?",
+  "selectDefendantLabel": "Ar ran pa ddiffynnydd ydych yn llenwi’r ymateb hwn?",
   "errors": {
-    "selectDefendant": "Rhaid i chi ddewis diffynnydd i'w gynrychioli"
+    "selectDefendant": "Rhaid i chi ddewis diffynnydd i’w gynrychioli"
   }
 }

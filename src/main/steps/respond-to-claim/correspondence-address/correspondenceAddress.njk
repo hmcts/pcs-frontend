@@ -8,7 +8,7 @@
 
 {# GOV.UK pattern: [Browser title] - HM Courts & Tribunals Service – GOV.UK #}
 {% block pageTitle %}
-  {{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK
+  {{ pageTitle }} &ndash; {{ t('common:pageTitleSuffix') }}
 {% endblock %}
 
 {% block mainContent %}
@@ -42,7 +42,8 @@
     {% set hasAddressErrors = fieldErrors['correspondenceAddressConfirm.addressLine1'] or fieldErrors['correspondenceAddressConfirm.townOrCity'] or fieldErrors['correspondenceAddressConfirm.postcode'] %}
 
     {% set postcodeFinderHtml %}
-    <div class="postcode-container govuk-!-margin-top-4" data-address-component data-name-prefix="correspondence">
+    <div class="postcode-container govuk-!-margin-top-4" data-address-component data-name-prefix="correspondence"
+      data-one-address-found="{{ labels.oneAddressFound }}" data-many-addresses-found="{{ labels.manyAddressesFound }}" data-no-addresses-found="{{ labels.noAddressesFound }}">
       <h2 class="govuk-heading-s">{{ labels.enterAddress }}</h2>
 
       <div class="govuk-form-group" id="correspondence-postcode-form-group">
@@ -50,11 +51,11 @@
           {{ labels.enterPostcode }}
         </label>
         <p class="govuk-error-message govuk-!-display-none" id="correspondence-lookup-postcode-error">
-          <span class="govuk-visually-hidden">Error:</span>
+          <span class="govuk-visually-hidden">{{ labels.errorPrefix }}:</span>
           {{ clientErrors.lookupPostcode }}
         </p>
         <p class="govuk-error-message govuk-!-display-none" id="correspondence-postcode-error">
-          <span class="govuk-visually-hidden">Error:</span>
+          <span class="govuk-visually-hidden">{{ labels.errorPrefix }}:</span>
           {{ clientErrors.postcodeNotFound }}
         </p>
 
@@ -84,7 +85,7 @@
             {{ labels.selectAddress }}
           </label>
           <p class="govuk-error-message govuk-!-display-none" id="correspondence-selectedAddress-error">
-            <span class="govuk-visually-hidden">Error:</span>
+            <span class="govuk-visually-hidden">{{ labels.errorPrefix }}:</span>
             {{ clientErrors.selectAddress }}
           </p>
           <select class="govuk-select govuk-!-width-full" id="correspondence-selectedAddress" name="addressList">
@@ -111,7 +112,8 @@
               autocomplete: 'address-line1',
               value: correspondenceAddressLine1 if correspondenceAddressLine1 else '',
               errorMessage: {
-                text: fieldErrors['correspondenceAddressConfirm.addressLine1']
+                text: fieldErrors['correspondenceAddressConfirm.addressLine1'],
+                visuallyHiddenText: labels.errorPrefix
               } if fieldErrors['correspondenceAddressConfirm.addressLine1']
             }) }}
 
@@ -125,7 +127,8 @@
               autocomplete: 'address-line2',
               value: correspondenceAddressLine2 if correspondenceAddressLine2 else '',
               errorMessage: {
-                text: fieldErrors['correspondenceAddressConfirm.addressLine2']
+                text: fieldErrors['correspondenceAddressConfirm.addressLine2'],
+                visuallyHiddenText: labels.errorPrefix
               } if fieldErrors['correspondenceAddressConfirm.addressLine2']
             }) }}
 
@@ -139,7 +142,8 @@
               autocomplete: 'address-level2',
               value: correspondenceTownOrCity if correspondenceTownOrCity else '',
               errorMessage: {
-                text: fieldErrors['correspondenceAddressConfirm.townOrCity']
+                text: fieldErrors['correspondenceAddressConfirm.townOrCity'],
+                visuallyHiddenText: labels.errorPrefix
               } if fieldErrors['correspondenceAddressConfirm.townOrCity']
             }) }}
 
@@ -152,7 +156,8 @@
               classes: 'govuk-!-width-two-thirds',
               value: correspondenceCounty if correspondenceCounty else '',
               errorMessage: {
-                text: fieldErrors['correspondenceAddressConfirm.county']
+                text: fieldErrors['correspondenceAddressConfirm.county'],
+                visuallyHiddenText: labels.errorPrefix
               } if fieldErrors['correspondenceAddressConfirm.county']
             }) }}
 
@@ -166,7 +171,8 @@
               autocomplete: 'postal-code',
               value: correspondencePostcode if correspondencePostcode else '',
               errorMessage: {
-                text: fieldErrors['correspondenceAddressConfirm.postcode']
+                text: fieldErrors['correspondenceAddressConfirm.postcode'],
+                visuallyHiddenText: labels.errorPrefix
               } if fieldErrors['correspondenceAddressConfirm.postcode']
             }) }}
       </div>

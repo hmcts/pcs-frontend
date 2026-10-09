@@ -51,7 +51,7 @@
     "defaultRequired": "Rhaid llenwi’r blwch hwn",
     "defaultInvalid": "Fformat annilys",
     "defaultMaxLength": "Rhaid iddo fod yn {max} nod neu lai",
-    "defaultSpecialCharacter": "Dylai {fieldName} ond cynnwys llythrennau a i z, a nodweddion arbennig fel cysylltnod, bylchau a chollnod.",
+    "defaultSpecialCharacter": "Dylai {fieldName} ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnodau, bylchau a chollnodau",
     "chooseOption": "Dewis opsiwn",
     "email": {
       "required": "Rhowch gyfeiriad e-bost",
@@ -81,7 +81,7 @@
       "filenameTooLong": "Rhaid i enw’r ffeil fod yn {{maxLength}} nod neu lai",
       "noFileSelected": "Dewiswch ffeil i’w llwytho",
       "uploadFailed": "Ni ellid llwytho’r ffeil a ddewiswyd - rhowch gynnig arall arni",
-      "fileDeleteFailed": "Ni ellid dileu’r ffeil - rhowch gynnig arall arni.",
+      "fileDeleteFailed": "Ni ellid dileu’r ffeil - rhowch gynnig arall arni",
       "documentUrlRequired": "Dewiswch ffeil i’w dileu",
       "uploadSuccess": "{{filename}} wedi’i uwchlwytho",
       "errorSummaryTitle": "Mae yna broblem"
@@ -134,7 +134,7 @@
       "one": "Mae gennych %{count} gair yn ormod",
       "other": "Mae gennych %{count} gair yn ormod"
     },
-    "textareaDescriptionText": "Gallwch nodi hyd at %{count} o nodau."
+    "textareaDescriptionText": "Gallwch nodi hyd at %{count} o nodau"
   },
   "errorPages": {
     "pageNotFound": {
@@ -143,7 +143,7 @@
       "paragraph2": "Os bu ichi ludo cyfeiriad y wefan, gwiriwch eich bod wedi copïo’r cyfeiriad cyfan.",
       "paragraph3": "Os yw cyfeiriad y wefan yn gywir, neu os gwnaethoch glicio ar ddolen neu fotwm, cysylltwch â ni drwy e-bost neu dros y ffôn.",
       "heading": "E-bost",
-      "paragraph4": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">dod o hyd i lys neu wasanaeth tribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
+      "paragraph4": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">gwasanaeth dod o hyd i lys neu dribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
       "paragraph5": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna’r categori Tai i ddod o hyd iddo.",
       "heading2": "Rhif ffôn",
       "paragraph6": "0300 303 5174",
@@ -157,7 +157,7 @@
       "paragraphFallback": "Rhowch gynnig arall arni’n hwyrach ymlaen.",
       "paragraph2": "Am gymorth gyda’ch achos, cysylltwch â ni drwy e-bost neu dros y ffôn.",
       "heading": "E-bost",
-      "paragraph3": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">dod o hyd i lys neu wasanaeth tribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
+      "paragraph3": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">gwasanaeth dod o hyd i lys neu dribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
       "paragraph4": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna’r categori Tai i ddod o hyd iddo.",
       "heading2": "Rhif ffôn",
       "paragraph5": "0300 303 5174",
@@ -170,7 +170,7 @@
       "paragraph2": "Rydym wedi cadw eich atebion. Byddant ar gael am 30 diwrnod.",
       "paragraph3": "Am gymorth gyda’ch achos, cysylltwch â ni drwy e-bost neu dros y ffôn.",
       "heading": "E-bost",
-      "paragraph4": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">dod o hyd i lys neu wasanaeth tribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
+      "paragraph4": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">gwasanaeth dod o hyd i lys neu dribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
       "paragraph5": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna’r categori Tai i ddod o hyd iddo.",
       "heading2": "Rhif ffôn",
       "paragraph6": "0300 303 5174",
@@ -178,10 +178,10 @@
       "paragraph8": "<a class=\"govuk-link\" href=\"https://www.gov.uk/call-charges\" target=\"_blank\" rel=\"noopener noreferrer\">Gwybodaeth am ffioedd galwad (yn agor mewn tab newydd)</a>."
     },
     "accessDenied": {
-      "title": "Nid oes gennych fynediad i’r dudalen hon.",
+      "title": "Nid oes gennych fynediad i’r dudalen hon",
       "paragraph": "Cysylltwch â ni os ydych yn meddwl y dylech gael mynediad, neu os ydych angen help gyda’ch achos.",
       "heading": "E-bost",
-      "paragraph2": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">dod o hyd i lys neu wasanaeth tribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
+      "paragraph2": "Defnyddiwch y <a class=\"govuk-link\" href=\"https://www.find-court-tribunal.service.gov.uk/\" target=\"_blank\" rel=\"noopener noreferrer\">gwasanaeth dod o hyd i lys neu dribiwnlys (yn agor mewn tab newydd)</a> i gael cyfeiriad e-bost eich llys lleol.",
       "paragraph3": "Os nad ydych yn gwybod enw eich llys lleol, dewiswch y categori Arian ac yna’r categori Tai i ddod o hyd iddo.",
       "heading2": "Rhif ffôn",
       "paragraph4": "0300 303 5174",
@@ -209,5 +209,22 @@
     "yourSupport": "Eich cymorth",
     "uploadFiles": "Uwchlwytho dogfennau",
     "checkYourAnswersAndSubmit": "Gwiriwch eich atebion cyn cyflwyno"
-  }
+  },
+  "skipLink": "Neidio i’r prif gynnwys",
+  "footer": {
+    "contentLicence": "Mae’r holl gynnwys ar gael o dan y <a class=\"govuk-footer__link\" href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence-cymraeg/version/3/\" rel=\"license\">Drwydded Llywodraeth Agored v3.0</a>, oni nodir yn wahanol",
+    "copyright": "© Hawlfraint y Goron"
+  },
+  "errorPrefix": "Gwall",
+  "fileUpload": {
+    "dropzoneHint": "Llusgwch a gollyngwch ffeiliau yma neu",
+    "dropzoneButton": "Dewis ffeiliau",
+    "uploadStatus": "Wrthi’n uwchlwytho ffeiliau, arhoswch"
+  },
+  "addressLookup": {
+    "oneFound": "Daethpwyd o hyd i 1 cyfeiriad",
+    "manyFound": "Daethpwyd o hyd i {count} cyfeiriad",
+    "noneFound": "Heb ganfod cyfeiriad"
+  },
+  "pageTitleSuffix": "Gwasanaeth Llysoedd a Thribiwnlysoedd EF – GOV.UK"
 }
