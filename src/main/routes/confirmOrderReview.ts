@@ -29,9 +29,12 @@ import {
   SEALS,
   type ValidationIssue,
   blankReviewDate,
+  choice,
+  list,
   newAnswers,
   reviewRequest,
   staffMessage,
+  text,
   ticked,
   validateProceedToIssue,
   validateQuery,
@@ -143,18 +146,6 @@ function orderModel(review: OrderReviewSession) {
     staffMessage: staffMessage(review.order.formData),
     orderPreviewHtml: snapshot ? renderHtml(snapshot, { changes: true }) : undefined,
   };
-}
-
-function list(value: unknown): string[] {
-  return ([] as unknown[]).concat(value ?? []).map(String);
-}
-
-function text(value: unknown): string {
-  return typeof value === 'string' ? value : '';
-}
-
-function choice<T extends string>(value: unknown, choices: readonly T[]): T | undefined {
-  return choices.find(option => option === value);
 }
 
 /** The review dates on the page, as many as it showed. */
@@ -306,13 +297,16 @@ function handleSubmitError(req: Request, res: Response, view: View, error: unkno
 /** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
 function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   const { order } = review.answers;
-  return order ? validateMakeOrder(order.orderType, order.formData, attendanceParties(review)) : [];
+  if (!order) {
+    return [{ id: 'order-type', message: 'Select the type of order' }];
+  }
+  return validateMakeOrder(order.orderType, order.formData, attendanceParties(review));
 }
 
 /** The first page with a question left unanswered, if any: check your answers only shows a complete review. */
 function firstIncompletePage(review: OrderReviewSession): Page | undefined {
   const { answers } = review;
-  if (!answers.order || orderIssues(review).length) {
+  if (orderIssues(review).length) {
     return 'review';
   }
   if (validateReviewDates(answers).length) {
@@ -401,7 +395,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
         return res.redirect(pageUrl(caseReferenceOf(req), 'referredToJudge'));
       }
       const issues = orderIssues(review);
-      if (!review.answers.order || issues.length) {
+      if (issues.length) {
         return render(req, res, 'review', issues);
       }
       return res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'));
@@ -432,7 +426,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       if (answers.reviewDates.length < MAX_REVIEW_DATES) {
         answers.reviewDates.push(blankReviewDate());
       }
-      return res.redirect(`${req.originalUrl.split('#')[0]}#review-date-${answers.reviewDates.length}`);
+      return res.redirect(`${req.originalUrl}#review-date-${answers.reviewDates.length}`);
     }
     const removing = /^remove-(\d+)$/.exec(action);
     if (removing) {

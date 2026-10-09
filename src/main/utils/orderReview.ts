@@ -1,7 +1,8 @@
+import { renderHtml } from '@hmcts-cft/docweave';
+
 import type { OrderFormSubmission } from '@utils/makeOrderForm';
 import { parseDate } from '@utils/makeOrderFormat';
 import type { FormData, OrderConfirmationHeader, OrderStart } from '@utils/orderCase';
-import { orderHtml } from '@utils/orderHtml';
 
 export const REVIEW_REASONS = [
   { value: 'UNLESS_ORDER', text: 'Unless order' },
@@ -79,15 +80,29 @@ export function blankReviewDate(): ReviewDateAnswer {
   return { day: '', month: '', year: '', reason: '', description: '' };
 }
 
+// Posted form values, which a browser sends as a string, several strings, or nothing.
+
+export function list(value: unknown): string[] {
+  return ([] as unknown[]).concat(value ?? []).map(String);
+}
+
+export function text(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
+export function choice<T extends string>(value: unknown, choices: readonly T[]): T | undefined {
+  return choices.find(option => option === value);
+}
+
 /** Whether a posted checkbox was ticked. */
 export function ticked(value: unknown): boolean {
-  return ([] as unknown[]).concat(value ?? []).includes('yes');
+  return list(value).includes('yes');
 }
 
 // The judge's staff message, as the make order form holds it.
 export function staffMessage(formData: FormData = {}): string | undefined {
-  const text = String(formData['staff-message-text'] ?? '').trim();
-  return ticked(formData['staff-message']) && text ? text : undefined;
+  const message = String(formData['staff-message-text'] ?? '').trim();
+  return ticked(formData['staff-message']) && message ? message : undefined;
 }
 
 export function validateQuery(answers: OrderReviewAnswers): ValidationIssue[] {
@@ -139,7 +154,7 @@ export function validateReviewDates(answers: OrderReviewAnswers): ValidationIssu
 
 export function validateProceedToIssue(answers: OrderReviewAnswers): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
-  if (!NEXT_STEPS.some(choice => choice.value === answers.nextSteps)) {
+  if (!NEXT_STEPS.some(step => step.value === answers.nextSteps)) {
     issues.push({ id: 'next-steps', message: 'Select if all the next steps for court staff have been completed' });
   }
   if (!answers.finalOrder) {
@@ -201,6 +216,7 @@ function issuedOrder(order: Required<OrderFormSubmission>): Record<string, unkno
     orderType: order.orderType,
     formData: order.formData,
     docweaveSnapshot,
-    html: orderHtml(docweaveSnapshot),
+    // Its wording exported to HTML, which pcs-api issues as the order's document.
+    html: docweaveSnapshot ? renderHtml(docweaveSnapshot) : undefined,
   };
 }

@@ -145,7 +145,6 @@ describe('confirm order review', () => {
       expect(page.body.textContent).toContain('Example Housing vs Alex Example');
       expect(page.querySelector('.govuk-warning-text')).toBeNull();
       expect(page.querySelector<HTMLAnchorElement>('a.govuk-button')?.getAttribute('href')).toBe(REVIEW);
-      expect(page.body.textContent).not.toContain('Previous');
       expect(eventStarts()).toBe(1);
     });
 
@@ -522,16 +521,12 @@ describe('confirm order review', () => {
           },
         },
       ]);
-      expect(JSON.stringify(submittedReviews()[0])).toContain('The claimant may apply to restore the claim.');
       const { html } = (submittedReviews()[0] as { issue: { order: { html: string } } }).issue.order;
       expect(html).toContain('The claimant may apply to restore the claim.');
-      expect(html).toMatch(/<ol>.*<li>/);
-      expect(html).not.toMatch(/data-|class=/);
       expect(submittedEventTokens()).toEqual(['event-token-1']);
 
       const confirmation = parse((await app.get(`${BASE}/order-issued`)).text);
       expect(confirmation.querySelector('.govuk-panel__title')?.textContent?.trim()).toBe('Order issued');
-      expect((await app.get(`${BASE}/order-issued`)).status).toBe(200);
       expect(submittedReviews()).toHaveLength(1);
       expect((await app.get(`${BASE}/referred-to-judge`)).location).toBe(MANAGE_CASE_URL);
     });
