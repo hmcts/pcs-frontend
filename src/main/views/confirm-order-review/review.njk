@@ -19,7 +19,7 @@
         data-property-address="{{ propertyAddressDisplay }}">
     {{ csrfProtection(csrfToken) }}
 
-    {% if edits.added or edits.changed or edits.deleted %}
+    {% if edits.added or edits.changed %}
       {% set editsHtml %}
         <p class="govuk-notification-banner__heading">Order preview edited by the Judge</p>
         <ul class="govuk-list govuk-list--bullet">
@@ -28,9 +28,6 @@
           {% endif %}
           {% if edits.changed %}
             <li>The Judge changed generated wording. Check the fields below still reflect the order</li>
-          {% endif %}
-          {% if edits.deleted %}
-            <li>The Judge deleted wording to the order. Check the wording and any follow-up before issue</li>
           {% endif %}
         </ul>
       {% endset %}
@@ -55,7 +52,7 @@
         <span class="govuk-details__summary-text">Order the Judge submitted</span>
       </summary>
       <div class="govuk-details__text">
-        {% if edits.added or edits.changed or edits.deleted %}
+        {% if edits.added or edits.changed %}
           <p class="govuk-body" id="judge-changes-key">
             Clauses the Judge added are highlighted in green. Generated clauses they changed are highlighted in blue.
           </p>
