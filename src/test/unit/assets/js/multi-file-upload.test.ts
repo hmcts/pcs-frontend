@@ -72,8 +72,18 @@ function setupDOM() {
            data-error-summary-title="There is a problem"
            data-delete-button-text="Remove">
       </div>
+      <button name="action" value="continue">Continue</button>
+      <button name="action" value="saveForLater">Save for later</button>
     </form>
   `;
+}
+
+function getContinueButton(): HTMLButtonElement {
+  return document.querySelector('button[name="action"][value="continue"]')!;
+}
+
+function getSaveForLaterButton(): HTMLButtonElement {
+  return document.querySelector('button[name="action"][value="saveForLater"]')!;
 }
 
 function setupDOMWithMediaAndFilenameCaps() {
@@ -332,6 +342,40 @@ describe('multi-file-upload', () => {
 
       const summary = document.querySelector('.govuk-error-summary');
       expect(summary).toBeNull();
+    });
+  });
+
+  describe('Continue button disabled while uploading', () => {
+    beforeEach(() => {
+      setupDOM();
+      initMultiFileUpload();
+    });
+
+    it('disables Continue while uploading, then re-enables it', () => {
+      capturedHooks.entryHook(null, { name: 'test.pdf', size: 100 });
+      expect(getContinueButton().disabled).toBe(true);
+      expect(getSaveForLaterButton().disabled).toBe(false);
+
+      capturedHooks.exitHook(null, {}, makeXhr(200, {}));
+      expect(getContinueButton().disabled).toBe(false);
+    });
+
+    it('re-enables Continue when an upload fails', () => {
+      capturedHooks.entryHook(null, { name: 'test.pdf', size: 100 });
+
+      capturedHooks.errorHook(null, {}, makeXhr(500, {}));
+      expect(getContinueButton().disabled).toBe(false);
+    });
+
+    it('keeps Continue disabled until every upload has finished', () => {
+      capturedHooks.entryHook(null, { name: 'first.pdf', size: 100 });
+      capturedHooks.entryHook(null, { name: 'second.pdf', size: 100 });
+
+      capturedHooks.exitHook(null, {}, makeXhr(200, {}));
+      expect(getContinueButton().disabled).toBe(true);
+
+      capturedHooks.exitHook(null, {}, makeXhr(200, {}));
+      expect(getContinueButton().disabled).toBe(false);
     });
   });
 
