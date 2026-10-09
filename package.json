@@ -68,7 +68,7 @@
     "@opentelemetry/winston-transport": "0.31.0",
     "axios": "1.20.0",
     "body-parser": "2.3.0",
-    "config": "4.4.2",
+    "config": "5.0.1",
     "connect-redis": "8.1.0",
     "cookie-parser": "1.4.7",
     "csrf-sync": "4.2.1",
