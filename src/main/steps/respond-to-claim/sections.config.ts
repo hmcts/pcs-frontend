@@ -83,7 +83,7 @@ const sectionDefs = [
       'payment-interstitial',
       'repayments-made',
       'repayments-agreed',
-      'installment-payments',
+      'instalment-payments',
       'how-much-afford-to-pay',
       'check-your-answers-payments-and-agreements',
     ],
