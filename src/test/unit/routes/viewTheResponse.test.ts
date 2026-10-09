@@ -12,6 +12,7 @@ import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.inter
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
+import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
   typeof isRespondToClaimEnabledForRelease
@@ -1331,6 +1332,32 @@ describe('viewTheResponse route', () => {
     } as unknown as CcdCaseData);
 
     expect(renderArgs.counterclaimPdfUrl).toBe(`/case/${caseReference}/view-documents/counterclaim-pdf-id`);
+  });
+
+  it('should not build counterclaimPdfUrl when release 1.4 is off', async () => {
+    (getLaunchDarklyFlag as jest.Mock).mockImplementation((_req, flagName) =>
+      Promise.resolve(flagName !== RELEASE_1_4_ENABLED)
+    );
+
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'counterclaim-pdf-id',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'counterclaim-pdf-id',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
   });
 
   it('should not build counterclaimPdfUrl when counterclaimDocumentId is not present', async () => {
