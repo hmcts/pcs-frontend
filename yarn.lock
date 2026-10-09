@@ -12749,12 +12749,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prosemirror-transform@npm:1.12.1":
-  version: 1.12.1
-  resolution: "prosemirror-transform@npm:1.12.1"
+"prosemirror-transform@npm:1.12.2":
+  version: 1.12.2
+  resolution: "prosemirror-transform@npm:1.12.2"
   dependencies:
     prosemirror-model: "npm:^1.21.0"
-  checksum: 10/d98d989ae381eca043fca40afb7ca5932494a900e91dd5e4e93b1a7e42ad7108e2cfcce5bc6d661cb64f08b42353c02047cd8b6648dc91d5648d9504dd5b1a46
+  checksum: 10/9e859789c11509e7dc46402b12edfb98bc11f8144a833dab0b4a6f83a84cae7df4066e3f03e6074f2a0e8d0ae870651d11ad5aa36609dd34543f439b91d68dd3
   languageName: node
   linkType: hard
 
