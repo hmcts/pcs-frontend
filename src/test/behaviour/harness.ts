@@ -385,7 +385,7 @@ function snapshotText(json: string): string {
 
 /**
  * Loads a served page with the make order form into jsdom and starts its JavaScript, as a browser would: the judge's
- * make order page, or the caseworker's review of an order, which also shows the judge's order read only.
+ * make order page, or the caseworker's review of an order.
  */
 export async function openPage(html: string): Promise<Page> {
   window.history.replaceState(null, '', '/');
@@ -394,12 +394,10 @@ export async function openPage(html: string): Promise<Page> {
   document.close();
   const { initAll } = await import('govuk-frontend');
   const { initMakeOrder, buildOrderDocument, startWithSavedOrderTab } = await import('../../main/assets/js/make-order');
-  const { initOrderPreview } = await import('../../main/assets/js/order-preview');
   // The template's inline script adds these; jsdom does not run it.
   document.body.classList.add('js-enabled', 'govuk-frontend-supported');
   startWithSavedOrderTab(initAll);
   initMakeOrder();
-  initOrderPreview();
   const form = document.querySelector<HTMLFormElement>('#make-order-form');
   if (!form) {
     throw new Error('The make order form is not on the page');
