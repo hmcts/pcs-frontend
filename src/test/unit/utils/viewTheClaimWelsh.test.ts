@@ -131,7 +131,7 @@ describe('View the claim values in Welsh', () => {
     });
     const grounds = valueFor(page, t('viewTheClaim:labels.groundsForPossession'));
 
-    expect(grounds).toContain('Cymdeithasau tai ac ymddiriedolaethau tai: pobl y mae’n anodd eu cartrefu (sail E)');
+    expect(grounds).toContain('Cymdeithasau tai ac ymddiriedolaethau tai: pobl anodd i’w cartrefu (sail E)');
     expect(grounds).toContain(
       'Deilydd contract o dan gontract cyfnodol safonol gydag ôl-ddyledion rhent difrifol (adran 181)'
     );
@@ -196,6 +196,20 @@ describe('View the claim values in Welsh', () => {
       'Niwsans, dicter, defnydd anghyfreithlon neu anfoesol o’r eiddo (sail 2)',
     ],
     ['values.groundNames.TENANCY_OBTAINED_BY_FALSE_STATEMENT', 'Tenantiaeth drwy ddatganiad anwir (sail 5)'],
+    ['values.groundNames.ANTISOCIAL_BEHAVIOUR_S157', 'Ymddygiad gwrthgymdeithasol (torri contract) (adran 157)'],
+    [
+      'values.groundNames.HOUSING_ASSOCIATIONS_AND_TRUSTS',
+      'Cymdeithasau tai ac ymddiriedolaethau tai: pobl anodd i’w cartrefu (sail E)',
+    ],
+    ['values.groundNames.RIOT_OFFENCE', 'Trosedd yn ystod cythrwfl (sail 2ZA)'],
+    ['values.groundNames.OFFENCE_RIOT_GROUND14ZA', 'Trosedd yn ystod cythrwfl (sail 14ZA)'],
+    ['labels.assuredNoArrearsReasonsOffenceDuringRiot', 'Trosedd yn ystod cythrwfl (sail 14ZA)'],
+    [
+      'values.noticeMethods.FIRST_CLASS_POST',
+      'Drwy bost dosbarth cyntaf neu wasanaeth arall sy’n danfon erbyn y diwrnod busnes nesaf',
+    ],
+    ['values.noticeMethods.PERSONALLY_HANDED', 'Drwy ei danfon yn bersonol neu ei gadael gyda rhywun'],
+    ['dateIssued', 'Dyddiad cychwyn'],
   ])('keeps the Welsh Language Unit wording for %s', (key, welsh) => {
     const value = key
       .split('.')
