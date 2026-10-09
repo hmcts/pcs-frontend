@@ -83,7 +83,7 @@ export const YES_NO_QUESTION_STEPS = [
   'exceptional-hardship',
   'have-you-applied-for-universal-credit',
   'income-and-expenses',
-  'installment-payments',
+  'instalment-payments',
   'other-considerations',
   'priority-debts',
   'repayments-agreed',
