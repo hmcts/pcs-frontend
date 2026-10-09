@@ -45,33 +45,37 @@ export function buildOutrightOrder(data: OrderData): DocWeaveDocument {
   return buildDoc(order => {
     addPreamble(order, data);
     order.orderedList('outright-clauses', list => {
-      list.item('possession', content => {
-        content
-          .text('The defendant(s) must give up possession of ')
-          .fact('address', address)
-          .text(' to the claimant(s) ');
-        if (value(data, 'outright-possession') === 'forthwith') {
-          content.fact('deadline', 'forthwith', { sourceId: 'outright-possession' });
-        } else {
+      const possession = value(data, 'outright-possession');
+      if (possession) {
+        list.item('possession', content => {
           content
-            .text('on or before ')
-            .fact('deadline', date(data, 'outright-by-date'), { sourceId: 'outright-by-date' });
-        }
-        content.text('.');
-      });
-      list.item('grounds', content => {
-        const details = value(data, 'outright-grounds-details');
-        content
-          .text('This order for possession was made on ')
-          .fact('type', value(data, 'outright-grounds-type') || '[grounds type not provided]', {
-            sourceId: 'outright-grounds-type',
-          })
-          .text(' grounds');
-        if (details) {
-          content.text(', namely ').fact('details', details, { sourceId: 'outright-grounds-details' });
-        }
-        content.text('.');
-      });
+            .text('The defendant(s) must give up possession of ')
+            .fact('address', address)
+            .text(' to the claimant(s) ');
+          if (possession === 'forthwith') {
+            content.fact('deadline', 'forthwith', { sourceId: 'outright-possession' });
+          } else {
+            content
+              .text('on or before ')
+              .fact('deadline', date(data, 'outright-by-date'), { sourceId: 'outright-by-date' });
+          }
+          content.text('.');
+        });
+      }
+      const groundsType = value(data, 'outright-grounds-type');
+      if (groundsType) {
+        list.item('grounds', content => {
+          const details = value(data, 'outright-grounds-details');
+          content
+            .text('This order for possession was made on ')
+            .fact('type', groundsType, { sourceId: 'outright-grounds-type' })
+            .text(' grounds');
+          if (details) {
+            content.text(', namely ').fact('details', details, { sourceId: 'outright-grounds-details' });
+          }
+          content.text('.');
+        });
+      }
       if (sections.includes('arrears')) {
         list.item('money-judgment', content => {
           const arrears = parseMoney(value(data, 'outright-mj-arrears'));

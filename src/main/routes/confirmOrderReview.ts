@@ -1,0 +1,519 @@
+import { buildFooterModel } from '@hmcts-cft/cft-ui-component-lib';
+import { type DocWeaveSnapshot, describeChanges, renderHtml } from '@hmcts-cft/docweave';
+import { Application, NextFunction, Request, RequestHandler, Response } from 'express';
+
+import { CallbackRejectedError, HTTPError } from '../HttpError';
+import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
+import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
+
+import { ccdCaseService } from '@services/ccdCaseService';
+import { attendanceParties, orderFormModel } from '@utils/makeOrderForm';
+import { MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
+import {
+  type OrderStart,
+  caseHeader,
+  confirmationHeader,
+  manageCaseDetailsUrl,
+  refusedByCcd,
+  xuiHeaderModel,
+} from '@utils/orderCase';
+import {
+  MAX_QUERY_LENGTH,
+  MAX_REVIEW_DATES,
+  MAX_REVIEW_DESCRIPTION_LENGTH,
+  NEXT_STEPS,
+  type OrderReviewAnswers,
+  type OrderReviewSession,
+  REVIEW_REASONS,
+  type ReviewDateAnswer,
+  SEALS,
+  type ValidationIssue,
+  blankReviewDate,
+  choice,
+  list,
+  newAnswers,
+  reviewRequest,
+  staffMessage,
+  text,
+  ticked,
+  validateProceedToIssue,
+  validateQuery,
+  validateReviewDates,
+} from '@utils/orderReview';
+
+/*
+ * A caseworker's review of a judge's order, reached from their Work Allocation task through XUI. Like the
+ * make order page, it is plain Express rather than a citizen steps journey: its pages are a CCD event
+ * started on the introduction and submitted with that start's token, its first page embeds the make
+ * order form and its editor, and its forms post several buttons.
+ */
+
+const CONFIRM_ORDER_REVIEW_EVENT_ID = 'ext:confirmOrderReview';
+
+const PAGES = {
+  intro: '',
+  review: '/review',
+  reviewDates: '/review-dates',
+  proceedToIssue: '/proceed-to-issue',
+  checkYourAnswers: '/check-your-answers',
+  cancel: '/cancel',
+  orderIssued: '/order-issued',
+  referredToJudge: '/referred-to-judge',
+} as const;
+
+type Page = keyof typeof PAGES;
+
+function route(page: Page): string {
+  return `${CONFIRM_ORDER_REVIEW_ROUTE}${PAGES[page]}`;
+}
+
+/** A page's URL on the case. A page reached from check your answers, to change an answer, returns there. */
+function pageUrl(caseReference: string, page: Page, options: { change?: boolean } = {}): string {
+  const url = route(page).replace(':caseReference', caseReference);
+  return options.change ? `${url}?change=cya` : url;
+}
+
+/** Whether the page was reached from check your answers, to change an answer. */
+function changing(req: Request): boolean {
+  return req.query.change === 'cya';
+}
+
+function caseReferenceOf(req: Request): string {
+  return req.params.caseReference as string;
+}
+
+function endReview(req: Request): void {
+  delete req.session.orderReviews?.[caseReferenceOf(req)];
+}
+
+/**
+ * The pages after the introduction continue the review the introduction started, which they find on the
+ * response; without one, such as after a cancel or in a new session, the caseworker starts again from
+ * the introduction.
+ */
+const reviewInProgress: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+  const review = req.session.orderReviews?.[caseReferenceOf(req)];
+  if (!review) {
+    return res.redirect(pageUrl(caseReferenceOf(req), 'intro'));
+  }
+  res.locals.review = review;
+  next();
+};
+
+/** The review in progress, which `reviewInProgress` found. */
+function reviewOf(res: Response): OrderReviewSession {
+  return res.locals.review as OrderReviewSession;
+}
+
+const journey = [oidcMiddleware, makeOrderFeatureMiddleware];
+const inJourney = [...journey, reviewInProgress];
+
+function errorSummary(issues: ValidationIssue[]) {
+  return issues.length
+    ? {
+        titleText: 'There is a problem',
+        errorList: issues.map(issue => ({ text: issue.message, href: `#${issue.id}` })),
+      }
+    : undefined;
+}
+
+function pageModel(req: Request, review: OrderStart, issues: ValidationIssue[] = []): Record<string, unknown> {
+  const caseReference = caseReferenceOf(req);
+  return {
+    headerModel: xuiHeaderModel(req),
+    footerModel: buildFooterModel(),
+    formAction: req.originalUrl,
+    ...caseHeader(review.caseContext),
+    errorSummary: errorSummary(issues),
+    validationErrors: Object.fromEntries(issues.map(issue => [issue.id, { text: issue.message }])),
+    cancelUrl: pageUrl(caseReference, 'cancel'),
+  };
+}
+
+/** How the judge changed the order Docweave generated from their answers, as the review pages tell the caseworker. */
+function judgeEdits(snapshot: DocWeaveSnapshot | null | undefined) {
+  const changes = snapshot ? describeChanges(snapshot) : { inserted: 0, modified: 0 };
+  // Docweave does not let the judge remove a generated clause; wording they delete within one is a change.
+  return { added: changes.inserted > 0, changed: changes.modified > 0 };
+}
+
+/**
+ * The judge's order as the review pages show it: its preview, with the clauses they added and changed marked
+ * as Docweave's editor showed them, and how the judge changed it.
+ */
+function orderModel(review: OrderReviewSession) {
+  const snapshot = review.order.docweaveSnapshot;
+  return {
+    freeForm: review.order.orderType === 'FREE_FORM',
+    edits: judgeEdits(snapshot),
+    staffMessage: staffMessage(review.order.formData),
+    orderPreviewHtml: snapshot ? renderHtml(snapshot, { changes: true }) : undefined,
+  };
+}
+
+/** The review dates on the page, as many as it showed. */
+function postedReviewDates(body: Record<string, unknown>, shown: number): ReviewDateAnswer[] {
+  return Array.from({ length: shown }, (_, index) => {
+    const prefix = `review-date-${index + 1}`;
+    return {
+      day: text(body[`${prefix}-date-day`]).trim(),
+      month: text(body[`${prefix}-date-month`]).trim(),
+      year: text(body[`${prefix}-date-year`]).trim(),
+      reason: text(body[`${prefix}-reason`]),
+      description: text(body[`${prefix}-description`]),
+    };
+  });
+}
+
+/** The review dates the page shows: at least one to fill in once the caseworker says there are some. */
+function shownReviewDates(answers: OrderReviewAnswers): ReviewDateAnswer[] {
+  return answers.reviewDates.length ? answers.reviewDates : [blankReviewDate()];
+}
+
+function reviewDateLabel(reviewDate: ReviewDateAnswer): string {
+  const { day, month, year } = reviewDate;
+  return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+}
+
+function reasonLabel(reason: string): string {
+  return REVIEW_REASONS.find(option => option.value === reason)?.text ?? reason;
+}
+
+function partyChoices(review: OrderReviewSession) {
+  const { claimants, defendants } = review.caseContext;
+  // In claim order: the claimants, then the defendants in the order they were added to the claim.
+  return [
+    ...claimants.map((party, index) => ({ value: party.id, text: `Claimant ${index + 1}: ${party.name}` })),
+    ...defendants.map((party, index) => ({ value: party.id, text: `Defendant ${index + 1}: ${party.name}` })),
+  ];
+}
+
+/**
+ * Submits the caseworker's review with the token the introduction's start gave; pcs-api refuses it if
+ * the order changed since. The review then ends, and its confirmation is kept so it survives a
+ * refresh, which cannot submit it again.
+ */
+async function submitReview(req: Request, review: OrderReviewSession, action: 'RETURN_TO_JUDGE' | 'ISSUE') {
+  const caseReference = caseReferenceOf(req);
+  await ccdCaseService.submitCaseEvent(
+    req.session.user!.accessToken,
+    caseReference,
+    CONFIRM_ORDER_REVIEW_EVENT_ID,
+    review.eventToken,
+    { sdkEventPayload: JSON.stringify(reviewRequest(review, action)) }
+  );
+  endReview(req);
+  req.session.orderReviewOutcomes = {
+    ...req.session.orderReviewOutcomes,
+    [caseReference]: {
+      outcome: action === 'ISSUE' ? 'ISSUED' : 'RETURNED_TO_JUDGE',
+      ...confirmationHeader(caseReference, review.caseContext),
+    },
+  };
+}
+
+function checkYourAnswersContent(req: Request, review: OrderReviewSession): Record<string, unknown> {
+  const { answers } = review;
+  const change = (page: Page) => pageUrl(caseReferenceOf(req), page, { change: true });
+  const yesNo = (value?: string) => (value === 'yes' ? 'Yes' : 'No');
+  const partyNames = new Map(partyChoices(review).map(party => [party.value, party.text]));
+  return {
+    reviewDates:
+      answers.hasReviewDates === 'yes'
+        ? answers.reviewDates.map(reviewDate => ({
+            date: reviewDateLabel(reviewDate),
+            reason: reasonLabel(reviewDate.reason),
+            description: reviewDate.description.trim(),
+          }))
+        : [],
+    rows: {
+      hasReviewDates: { value: yesNo(answers.hasReviewDates), href: change('reviewDates') },
+      nextSteps: {
+        value: NEXT_STEPS.find(option => option.value === answers.nextSteps)?.text,
+        href: change('proceedToIssue'),
+      },
+      finalOrder: { value: yesNo(answers.finalOrder), href: change('proceedToIssue') },
+      serveAllParties: { value: yesNo(answers.serveAllParties), href: change('proceedToIssue') },
+      partiesToServe:
+        answers.serveAllParties === 'no'
+          ? { value: answers.partiesToServe.map(id => partyNames.get(id) ?? id), href: change('proceedToIssue') }
+          : undefined,
+      seal: { value: SEALS.find(option => option.value === answers.seal)?.text, href: change('proceedToIssue') },
+    },
+  };
+}
+
+/** What each question page shows besides the case and any errors. */
+const VIEWS = {
+  review: (_req: Request, review: OrderReviewSession) => ({
+    ...orderModel(review),
+    // The judge's form, which the caseworker may change: as they last sent it, or else as the judge did.
+    ...orderFormModel(review, review.answers.order),
+    answers: review.answers,
+    maxQueryLength: MAX_QUERY_LENGTH,
+  }),
+  'review-dates': (_req: Request, review: OrderReviewSession) => ({
+    answers: review.answers,
+    reviewDates: shownReviewDates(review.answers),
+    reasons: REVIEW_REASONS,
+    canAddReviewDate: review.answers.reviewDates.length < MAX_REVIEW_DATES,
+    maxDescriptionLength: MAX_REVIEW_DESCRIPTION_LENGTH,
+  }),
+  'proceed-to-issue': (_req: Request, review: OrderReviewSession) => ({
+    answers: review.answers,
+    nextSteps: NEXT_STEPS,
+    seals: SEALS,
+    parties: partyChoices(review),
+  }),
+  'check-your-answers': checkYourAnswersContent,
+} as const;
+
+type View = keyof typeof VIEWS;
+
+function render(
+  req: Request,
+  res: Response,
+  view: View,
+  issues: ValidationIssue[] = [],
+  status = issues.length ? 400 : 200
+): void {
+  const review = reviewOf(res);
+  res.status(status).render(`confirm-order-review/${view}`, {
+    ...pageModel(req, review, issues),
+    ...VIEWS[view](req, review),
+  });
+}
+
+/** Answers a submission pcs-api or CCD refused: back to the page it came from with why, or not found. */
+function handleSubmitError(req: Request, res: Response, view: View, error: unknown): boolean {
+  if (error instanceof CallbackRejectedError) {
+    const reasons = error.reasons.map(message => ({ id: 'confirm-order-review-form', message }));
+    render(req, res, view, reasons, error.status);
+    return true;
+  }
+  if (refusedByCcd(error)) {
+    res.status(404).send('Not Found');
+    return true;
+  }
+  return false;
+}
+
+/** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
+function orderIssues(review: OrderReviewSession): ValidationIssue[] {
+  const { order } = review.answers;
+  if (!order) {
+    return [{ id: 'order-type', message: 'Select the type of order' }];
+  }
+  return validateMakeOrder(order.orderType, order.formData, attendanceParties(review));
+}
+
+/** The first page with a question left unanswered, if any: check your answers only shows a complete review. */
+function firstIncompletePage(review: OrderReviewSession): Page | undefined {
+  const { answers } = review;
+  if (orderIssues(review).length) {
+    return 'review';
+  }
+  if (validateReviewDates(answers).length) {
+    return 'reviewDates';
+  }
+  return validateProceedToIssue(answers).length ? 'proceedToIssue' : undefined;
+}
+
+export default function confirmOrderReviewRoutes(app: Application): void {
+  app.get(route('intro'), ...journey, async (req: Request, res: Response, next) => {
+    const caseReference = caseReferenceOf(req);
+    try {
+      // Opening the review starts it afresh: whatever was answered before, and its confirmation, go.
+      endReview(req);
+      delete req.session.orderReviewOutcomes?.[caseReference];
+      // The caseworker's task links to the review of one order, which pcs-api starts, and names the task.
+      const orderId = typeof req.query.orderId === 'string' ? req.query.orderId : undefined;
+      const taskId = typeof req.query.taskId === 'string' ? req.query.taskId : undefined;
+      const started = await ccdCaseService.startCaseEvent(
+        req.session.user!.accessToken,
+        caseReference,
+        CONFIRM_ORDER_REVIEW_EVENT_ID,
+        { orderId }
+      );
+      const payload = started.data.sdkEventPayload;
+      if (!payload) {
+        // CCD starts the event for anyone who can see the case, but only shows the payload to the
+        // caseworkers it lets use the event.
+        throw new HTTPError('Not permitted to review an order on this case', 403);
+      }
+      const start = JSON.parse(payload as string) as OrderStart;
+      const review: OrderReviewSession = { ...start, eventToken: started.eventToken, answers: newAnswers(), taskId };
+      req.session.orderReviews = { ...req.session.orderReviews, [caseReference]: review };
+      res.render('confirm-order-review/intro', {
+        ...pageModel(req, review),
+        ...orderModel(review),
+        continueUrl: pageUrl(caseReference, 'review'),
+      });
+    } catch (error) {
+      if (error instanceof CallbackRejectedError) {
+        // pcs-api refuses to start the review when the chosen order is not waiting for one.
+        return res.render('no-order', {
+          headerModel: xuiHeaderModel(req),
+          footerModel: buildFooterModel(),
+          heading: 'No order to review',
+          reasons: error.reasons,
+          closeUrl: manageCaseDetailsUrl(caseReference),
+        });
+      }
+      if (refusedByCcd(error)) {
+        return res.status(404).send('Not Found');
+      }
+      next(error);
+    }
+  });
+
+  app.get(route('cancel'), ...journey, (req: Request, res: Response) => {
+    // As in XUI, cancelling keeps nothing the caseworker answered.
+    endReview(req);
+    res.redirect(manageCaseDetailsUrl(caseReferenceOf(req)));
+  });
+
+  app.get(route('review'), ...inJourney, (req: Request, res: Response) => render(req, res, 'review'));
+
+  app.post(route('review'), ...inJourney, async (req: Request, res: Response, next) => {
+    const review = reviewOf(res);
+    const {
+      _csrf,
+      action,
+      orderType,
+      orderDocument,
+      'send-query': sendQuery,
+      'query-to-judge': queryToJudge,
+      ...formData
+    } = req.body;
+    review.answers.sendQuery = ticked(sendQuery);
+    review.answers.queryToJudge = text(queryToJudge);
+    const type = choice(orderType, MAKE_ORDER_TYPES);
+    if (type) {
+      // Kept whichever button was pressed, so the page shows the caseworker's changes again.
+      review.answers.order = { orderType: type, formData, orderDocumentJson: text(orderDocument) };
+    }
+    try {
+      if (action === 'RETURN_TO_JUDGE') {
+        const issues = validateQuery(review.answers);
+        if (issues.length) {
+          return render(req, res, 'review', issues);
+        }
+        await submitReview(req, review, 'RETURN_TO_JUDGE');
+        return res.redirect(pageUrl(caseReferenceOf(req), 'referredToJudge'));
+      }
+      const issues = orderIssues(review);
+      if (issues.length) {
+        return render(req, res, 'review', issues);
+      }
+      return res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'));
+    } catch (error) {
+      if (!handleSubmitError(req, res, 'review', error)) {
+        next(error);
+      }
+    }
+  });
+
+  app.get(route('reviewDates'), ...inJourney, (req: Request, res: Response) => render(req, res, 'review-dates'));
+
+  app.post(route('reviewDates'), ...inJourney, (req: Request, res: Response) => {
+    const review = reviewOf(res);
+    const { answers } = review;
+    const caseReference = caseReferenceOf(req);
+    answers.hasReviewDates = choice(req.body['has-review-dates'], ['yes', 'no'] as const);
+    if (answers.hasReviewDates === 'yes') {
+      answers.reviewDates = postedReviewDates(req.body, shownReviewDates(answers).length);
+    }
+    const action = text(req.body.action);
+    if (action === 'previous') {
+      return res.redirect(pageUrl(caseReference, 'review'));
+    }
+    if (action === 'add') {
+      if (answers.reviewDates.length < MAX_REVIEW_DATES) {
+        answers.reviewDates.push(blankReviewDate());
+      }
+      return res.redirect(`${req.originalUrl}#review-date-${answers.reviewDates.length}`);
+    }
+    const removing = /^remove-(\d+)$/.exec(action);
+    if (removing) {
+      answers.reviewDates.splice(Number(removing[1]) - 1, 1);
+      return res.redirect(pageUrl(caseReference, 'reviewDates', { change: changing(req) }));
+    }
+    const issues = validateReviewDates(answers);
+    if (issues.length) {
+      return render(req, res, 'review-dates', issues);
+    }
+    return res.redirect(pageUrl(caseReference, changing(req) ? 'checkYourAnswers' : 'proceedToIssue'));
+  });
+
+  app.get(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => render(req, res, 'proceed-to-issue'));
+
+  app.post(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => {
+    const review = reviewOf(res);
+    const { answers } = review;
+    answers.nextSteps = text(req.body['next-steps']) || undefined;
+    answers.finalOrder = choice(req.body['final-order'], ['yes', 'no'] as const);
+    answers.serveAllParties = choice(req.body['serve-all-parties'], ['yes', 'no'] as const);
+    const parties = new Set(partyChoices(review).map(party => party.value));
+    answers.partiesToServe = list(req.body['parties-to-serve']).filter(id => parties.has(id));
+    answers.seal = text(req.body.seal) || undefined;
+    if (req.body.action === 'previous') {
+      return res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'));
+    }
+    const issues = validateProceedToIssue(answers);
+    if (issues.length) {
+      return render(req, res, 'proceed-to-issue', issues);
+    }
+    return res.redirect(pageUrl(caseReferenceOf(req), 'checkYourAnswers'));
+  });
+
+  app.get(route('checkYourAnswers'), ...inJourney, (req: Request, res: Response) => {
+    const incomplete = firstIncompletePage(reviewOf(res));
+    if (incomplete) {
+      return res.redirect(pageUrl(caseReferenceOf(req), incomplete));
+    }
+    render(req, res, 'check-your-answers');
+  });
+
+  app.post(route('checkYourAnswers'), ...inJourney, async (req: Request, res: Response, next) => {
+    const review = reviewOf(res);
+    const caseReference = caseReferenceOf(req);
+    if (req.body.action === 'previous') {
+      return res.redirect(pageUrl(caseReference, 'proceedToIssue'));
+    }
+    // The answers may have changed since the page showed them, such as in another tab.
+    const incomplete = firstIncompletePage(review);
+    if (incomplete) {
+      return res.redirect(pageUrl(caseReference, incomplete));
+    }
+    try {
+      await submitReview(req, review, 'ISSUE');
+      return res.redirect(pageUrl(caseReference, 'orderIssued'));
+    } catch (error) {
+      if (!handleSubmitError(req, res, 'check-your-answers', error)) {
+        next(error);
+      }
+    }
+  });
+
+  const confirmation = (outcome: 'ISSUED' | 'RETURNED_TO_JUDGE', title: string) => (req: Request, res: Response) => {
+    const caseReference = caseReferenceOf(req);
+    const closeUrl = manageCaseDetailsUrl(caseReference);
+    const reviewed = req.session.orderReviewOutcomes?.[caseReference];
+    if (reviewed?.outcome !== outcome) {
+      // As in XUI, a confirmation with nothing to confirm returns the user to the case.
+      return res.redirect(closeUrl);
+    }
+    res.render('order-confirmation', {
+      headerModel: xuiHeaderModel(req),
+      footerModel: buildFooterModel(),
+      title,
+      ...reviewed,
+      closeText: 'Close and return to case summary',
+      closeUrl,
+    });
+  };
+
+  app.get(route('orderIssued'), ...journey, confirmation('ISSUED', 'Order issued'));
+  app.get(route('referredToJudge'), ...journey, confirmation('RETURNED_TO_JUDGE', 'Referred to Judge'));
+}

@@ -1,0 +1,18 @@
+{% extends "xui-layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{# An order event that pcs-api would not start on the chosen order, such as one already reviewed, and why. #}
+{% set pageHeading = heading %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">{{ heading }}</h1>
+      {% for reason in reasons %}
+        <p class="govuk-body">{{ reason }}</p>
+      {% endfor %}
+      {{ govukButton({ text: "Return to case details", href: closeUrl }) }}
+    </div>
+  </div>
+{% endblock %}

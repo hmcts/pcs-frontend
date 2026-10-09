@@ -18,6 +18,8 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
 
 export interface ClientContextHeaders {
   selectedPartyId?: string;
+  /** The order a caseworker chose to review, from the case's draft orders tab. */
+  orderId?: string;
 }
 
 interface CustomSessionData extends SessionData {
@@ -36,6 +38,8 @@ interface CustomSessionData extends SessionData {
   applicationIds?: Record<string, string>;
   // The case an order was last sent for review on, keyed by case reference, for its confirmation page.
   ordersSentForReview?: Record<string, { caseReference: string; propertyAddress: string; caseName: string }>;
+  orderReviews?: Record<string, import('../main/utils/orderReview').OrderReviewSession>;
+  orderReviewOutcomes?: Record<string, import('../main/utils/orderReview').OrderReviewOutcome>;
   payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
   clientContext?: ClientContextHeaders;

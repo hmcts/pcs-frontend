@@ -70,6 +70,24 @@ describe('decentralisedEvent route', () => {
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/start-now');
     });
 
+    it('hands the page the query XUI was given, without expected_sub', () => {
+      decentralisedEventRoutes(app);
+      const handler = mockRouterGet.mock.calls[0][1] as (req: Request, res: Response) => void;
+      const req = {
+        params: { caseReference: '1234567890123456', eventId: 'ext:respondPossessionClaim' },
+        query: { expected_sub: 'user-sub', orderId: 'order-1' },
+        session: { user: { sub: 'user-sub' } },
+      } as unknown as Request;
+      const res = { redirect: jest.fn() } as unknown as Response;
+
+      handler(req, res);
+
+      expect(res.redirect).toHaveBeenCalledWith(
+        303,
+        '/case/1234567890123456/respond-to-claim/start-now?orderId=order-1'
+      );
+    });
+
     it('forces re-authentication (redirects to /login) on expected_sub mismatch', () => {
       decentralisedEventRoutes(app);
       const handler = mockRouterGet.mock.calls[0][1] as (req: Request, res: Response) => void;

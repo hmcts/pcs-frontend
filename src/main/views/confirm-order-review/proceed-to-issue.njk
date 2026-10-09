@@ -1,0 +1,83 @@
+{% extends "confirm-order-review/_layout.njk" %}
+
+{% from "macros/csrf.njk" import csrfProtection %}
+{% import "confirm-order-review/_buttons.njk" as buttons with context %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% set pageHeading = "Proceed to issue" %}
+
+{% block page %}
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+
+    {{ govukRadios({
+      name: "next-steps",
+      idPrefix: "next-steps",
+      fieldset: {
+        legend: { text: "Have all the next steps for court staff been completed?", classes: "govuk-fieldset__legend--m" }
+      },
+      errorMessage: validationErrors["next-steps"],
+      items: [
+        { value: nextSteps[0].value, text: nextSteps[0].text, checked: answers.nextSteps == nextSteps[0].value },
+        {
+          value: nextSteps[1].value,
+          text: nextSteps[1].text,
+          checked: answers.nextSteps == nextSteps[1].value,
+          conditional: { html: '<p class="govuk-body" id="outstanding-tasks-guidance">You should complete all outstanding tasks</p>' }
+        }
+      ]
+    }) }}
+
+    {{ govukRadios({
+      name: "final-order",
+      idPrefix: "final-order",
+      classes: "govuk-radios--inline",
+      fieldset: { legend: { text: "Is this a final order?", classes: "govuk-fieldset__legend--m" } },
+      errorMessage: validationErrors["final-order"],
+      items: [
+        { value: "yes", text: "Yes", checked: answers.finalOrder == "yes" },
+        { value: "no", text: "No", checked: answers.finalOrder == "no" }
+      ]
+    }) }}
+
+    {% set partyItems = [] %}
+    {% for party in parties %}
+      {% set partyItems = (partyItems.push({ value: party.value, text: party.text, checked: party.value in answers.partiesToServe }), partyItems) %}
+    {% endfor %}
+    {% set partiesHtml %}
+      {{ govukCheckboxes({
+        name: "parties-to-serve",
+        idPrefix: "parties-to-serve",
+        fieldset: { legend: { text: "Who should the order be served on?", classes: "govuk-fieldset__legend--s" } },
+        hint: { text: "Select all that apply" },
+        errorMessage: validationErrors["parties-to-serve"],
+        items: partyItems
+      }) }}
+    {% endset %}
+    {{ govukRadios({
+      name: "serve-all-parties",
+      idPrefix: "serve-all-parties",
+      fieldset: { legend: { text: "Should this order be served on all parties?", classes: "govuk-fieldset__legend--m" } },
+      errorMessage: validationErrors["serve-all-parties"],
+      items: [
+        { value: "yes", text: "Yes", checked: answers.serveAllParties == "yes" },
+        { value: "no", text: "No", checked: answers.serveAllParties == "no", conditional: { html: partiesHtml } }
+      ]
+    }) }}
+
+    {% set sealItems = [] %}
+    {% for seal in seals %}
+      {% set sealItems = (sealItems.push({ value: seal.value, text: seal.text, checked: answers.seal == seal.value }), sealItems) %}
+    {% endfor %}
+    {{ govukRadios({
+      name: "seal",
+      idPrefix: "seal",
+      fieldset: { legend: { text: "Which seal should this order have?", classes: "govuk-fieldset__legend--m" } },
+      errorMessage: validationErrors["seal"],
+      items: sealItems
+    }) }}
+
+    {{ buttons.eventButtons() }}
+  </form>
+{% endblock %}

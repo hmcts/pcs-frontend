@@ -1,0 +1,28 @@
+@use 'govuk-frontend' as *;
+
+// The judge's order as they left it, read only, set apart from the page like a document. Docweave marks the
+// clauses they added and changed as its editor showed them, which its stylesheet colours.
+.pcs-order-preview {
+  @include govuk-font($size: 19);
+  margin-bottom: govuk-spacing(6);
+  padding: govuk-spacing(4);
+  border: 1px solid $govuk-border-colour;
+
+  ol {
+    padding-left: govuk-spacing(6);
+  }
+
+  ol ol {
+    list-style-type: lower-roman;
+  }
+}
+
+.pcs-preserve-lines {
+  white-space: pre-wrap;
+}
+
+.pcs-review-date {
+  margin-bottom: govuk-spacing(6);
+  padding-bottom: govuk-spacing(4);
+  border-bottom: 1px solid $govuk-border-colour;
+}
