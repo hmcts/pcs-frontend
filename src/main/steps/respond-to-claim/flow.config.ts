@@ -134,7 +134,7 @@ export const flowConfig: JourneyFlowConfig = {
     'repayments-agreed': {
       showCondition: (req: Request) => hasAnyRentArrearsGround(req),
     },
-    'installment-payments': {
+    'instalment-payments': {
       showCondition: (req: Request) => shouldShowInstallmentPaymentsStep(req),
     },
     'how-much-afford-to-pay': {
