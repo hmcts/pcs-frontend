@@ -25,7 +25,6 @@ function jwt(claims: Record<string, unknown>): string {
 interface Envelope {
   order: {
     id?: string;
-    state: string;
     version: number;
     orderType?: string;
     formData?: Record<string, unknown>;
@@ -36,7 +35,7 @@ interface Envelope {
 }
 
 const blankCase = (): Envelope => ({
-  order: { state: 'DRAFT', version: 0 },
+  order: { version: 0 },
   caseContext: {
     caseReference: Number(CASE_REFERENCE),
     propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
@@ -47,7 +46,7 @@ const blankCase = (): Envelope => ({
   },
 });
 
-/** Minimal CCD: hands out the stored envelope and applies posted make order and confirm order review events to it. */
+/** Minimal CCD: hands out the stored envelope and applies posted make order events to it. */
 let envelope = blankCase();
 
 /** The tokens CCD has handed out for starting the make order event, in order. */
@@ -79,10 +78,16 @@ export function submittedReviews(): Record<string, unknown>[] {
   return reviewRequests;
 }
 
-/** The reason pcs-api gives for refusing the next make order event, if a test has asked it to. */
+/** The reasons pcs-api gives for refusing the next event start and submission, if a test has asked it to. */
+let startRefusal: string | undefined;
 let refusal: string | undefined;
 
-/** Has the next make order event refused, as pcs-api does when the draft changed elsewhere. */
+/** Has the next order event's start refused, as pcs-api does when the chosen order is not waiting for the user. */
+export function refuseNextStart(reason: string): void {
+  startRefusal = reason;
+}
+
+/** Has the next order event refused, as pcs-api does when the order changed elsewhere. */
 export function refuseNextEvent(reason: string): void {
   refusal = reason;
 }
@@ -118,21 +123,10 @@ function ccdStub(): Express {
   ccd.use(express.json({ limit: '10mb' }));
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
     const event = req.params.event as string;
-    // pcs-api starts the review of the order the caseworker chose, which CCD passes on in the client context.
-    const chosenOrder = JSON.parse(String(req.headers['client-context'] ?? '{}')).orderId;
-    if (
-      event === CONFIRM_ORDER_REVIEW &&
-      isCaseworker(req) &&
-      (envelope.order.state !== 'SUBMITTED_FOR_REVIEW' || chosenOrder !== envelope.order.id)
-    ) {
-      return res.status(422).json({ callbackErrors: ['The order is no longer waiting for review'] });
-    }
-    if (event !== CONFIRM_ORDER_REVIEW && isJudge(req)) {
-      // pcs-api starts the order the judge chose only while it is theirs to change.
-      const changeable = ['DRAFT', 'RETURNED_TO_JUDGE'].includes(envelope.order.state);
-      if (chosenOrder && (chosenOrder !== envelope.order.id || !changeable)) {
-        return res.status(422).json({ callbackErrors: ['The order is no longer waiting for you to change it'] });
-      }
+    if (startRefusal && mayUse(req, event)) {
+      const reason = startRefusal;
+      startRefusal = undefined;
+      return res.status(422).json({ callbackErrors: [reason] });
     }
     const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
     const token = `event-token-${startTokens.length + 1}`;
@@ -157,7 +151,6 @@ function ccdStub(): Express {
     const posted = JSON.parse(req.body.data.sdkEventPayload);
     if (event === CONFIRM_ORDER_REVIEW) {
       reviewRequests.push(posted);
-      envelope.order.state = posted.action === 'ISSUE' ? 'ISSUED' : 'RETURNED_TO_JUDGE';
       return res.json({ id: req.params.id, data: {} });
     }
     orderRequests.push(posted);
@@ -165,7 +158,6 @@ function ccdStub(): Express {
       ...envelope,
       order: {
         id: posted.order.id ?? `order-${randomUUID()}`,
-        state: posted.action === 'SUBMIT_FOR_REVIEW' ? 'SUBMITTED_FOR_REVIEW' : 'DRAFT',
         version: posted.order.version + 1,
         orderType: posted.order.orderType,
         formData: posted.order.formData,
@@ -208,10 +200,8 @@ export async function bootApp(
     /** Whether the case has an open counterclaim or application. */
     openCounterclaim?: boolean;
     openApplication?: boolean;
-    /** A judge's order waiting for a caseworker's review. */
-    orderAwaitingReview?: Partial<Envelope['order']>;
-    /** The judge's order as a caseworker returned it to them, with their query. */
-    orderReturnedToJudge?: Partial<Envelope['order']>;
+    /** The order pcs-api starts the event with, over a blank one. */
+    order?: Partial<Envelope['order']>;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -220,30 +210,12 @@ export async function bootApp(
   }
   envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
   envelope.caseContext.openApplication = options.openApplication ?? false;
-  if (options.orderAwaitingReview) {
-    envelope.order = {
-      id: 'order-awaiting-review',
-      version: 3,
-      orderType: 'OUTRIGHT_POSSESSION',
-      formData: {},
-      ...options.orderAwaitingReview,
-      state: 'SUBMITTED_FOR_REVIEW',
-    };
-  }
-  if (options.orderReturnedToJudge) {
-    envelope.order = {
-      id: 'order-returned',
-      version: 4,
-      orderType: 'FREE_FORM',
-      formData: {},
-      ...options.orderReturnedToJudge,
-      state: 'RETURNED_TO_JUDGE',
-    };
-  }
+  envelope.order = { ...envelope.order, ...options.order };
   startTokens = [];
   submittedTokens = [];
   reviewRequests = [];
   orderRequests = [];
+  startRefusal = undefined;
   refusal = undefined;
   ccd ??= await listen(ccdStub());
   process.env.CCD_URL = `http://127.0.0.1:${(ccd.address() as AddressInfo).port}`;

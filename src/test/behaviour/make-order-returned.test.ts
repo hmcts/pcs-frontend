@@ -1,4 +1,12 @@
-import { CASE_REFERENCE, type TestApp, bootApp, openPage, recordAttendance, submittedOrders } from './harness';
+import {
+  CASE_REFERENCE,
+  type TestApp,
+  bootApp,
+  openPage,
+  recordAttendance,
+  refuseNextStart,
+  submittedOrders,
+} from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
 const RETURNED = `${PAGE}?orderId=order-returned&taskId=task-2`;
@@ -13,7 +21,12 @@ describe('make an order: an order a caseworker returned', () => {
 
   it("shows the judge the caseworker's query on the order they chose, and sends it for review again", async () => {
     app = await bootApp({
-      orderReturnedToJudge: { queryFromCaseworker: 'Which defendant does paragraph 2 mean?' },
+      order: {
+        id: 'order-returned',
+        version: 4,
+        orderType: 'FREE_FORM',
+        queryFromCaseworker: 'Which defendant does paragraph 2 mean?',
+      },
     });
 
     const page = await openPage((await app.get(RETURNED)).text);
@@ -34,7 +47,8 @@ describe('make an order: an order a caseworker returned', () => {
     // The judge's task, which the link named, goes back with the order so pcs-api can close it.
     expect(submittedOrders().at(-1)).toMatchObject({ taskId: 'task-2' });
 
-    // The same order is with the caseworker again, so it is no longer the judge's to change.
+    // pcs-api will not start the order again while it is with the caseworker.
+    refuseNextStart('The order is no longer waiting for you to change it');
     const again = parse((await app.get(RETURNED)).text);
     expect(again.querySelector('h1')?.textContent?.trim()).toBe('No order to change');
     expect(again.body.textContent).toContain('The order is no longer waiting for you to change it');
