@@ -10,12 +10,15 @@ import { redirectTo } from './navigate';
  * the browser is still settling session history, so a `pushState` made too soon
  * may not create a catchable entry. We re-push across a short window on each
  * `pageshow` to cover that.
+ *
+ * Solicitors carry the destination in `data-redirect-url` (the Manage Case
+ * case summary). Citizens still use `data-dashboard-url`.
  */
 export function initRedirectOnBack(): void {
   const marker = document.getElementById('redirect-on-back');
-  const dashboardUrl = marker?.dataset.dashboardUrl;
+  const redirectUrl = marker?.dataset.redirectUrl || marker?.dataset.dashboardUrl;
 
-  if (!marker || !dashboardUrl) {
+  if (!marker || !redirectUrl) {
     return;
   }
 
@@ -25,7 +28,7 @@ export function initRedirectOnBack(): void {
 
   window.addEventListener('popstate', () => {
     pushGuard();
-    redirectTo(dashboardUrl);
+    redirectTo(redirectUrl);
   });
 
   const arm = (): void => {
