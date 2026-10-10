@@ -12,7 +12,7 @@ export const dashboard = {
   askTheCourtToMakeAnOrderLink: 'Ask the court to make an order (make a general application)',
   uploadAdditionalDocumentsLink: 'Upload additional documents',
   helpAndSupportHeader: `Help and support`,
-  helpWithFeesLink: `Help with fees`,
+  helpWithFeesLink: `Help with Fees`,
   getHelpPayingCourtFeesHeader: `Get help paying court and tribunal fees`,
   whatToExpectAtHearingLink: `What to expect at a hearing`,
   whatToExpectComingCourtHeader: `What to expect coming to a court or tribunal`,
