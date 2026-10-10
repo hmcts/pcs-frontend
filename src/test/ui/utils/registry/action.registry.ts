@@ -1,6 +1,7 @@
 import {
   CitizenCreateGenAppAPIAction,
   CreateCaseAPIAction,
+  DefendantNameDivergenceAPIAction,
   DocumentsAction,
   FetchPINsAndValidateAccessCodeAPIAction,
   GenAppsAction,
@@ -58,6 +59,9 @@ export class ActionRegistry {
     ['linkDefendantToSolicitorForCaseAPI', new LinkSolicitorAPIAction()],
     ['fetchPINsAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
     ['validateAccessCodeAPI', new FetchPINsAndValidateAccessCodeAPIAction()],
+    ['createTestCaseAPI', new DefendantNameDivergenceAPIAction()],
+    ['payClaimFeeAPI', new DefendantNameDivergenceAPIAction()],
+    ['fetchDefendantNameReportAPI', new DefendantNameDivergenceAPIAction()],
     ['skipTestIfLdFlagDisabled', new LaunchDarklyAction()],
     ['selectPaymentOptions', new PaymentAction()],
 
