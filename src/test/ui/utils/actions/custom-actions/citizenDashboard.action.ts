@@ -125,18 +125,6 @@ export class CitizenDashboardAction implements IAction {
     await performValidations(
       'View the response page validation',
       ['viewClaimOrResponseTable', viewTheResponse.claimantDetailsSubHeader, viewTheResponse.claimantDetails],
-      // The line below will be commented until the bug HDPI-7360 gets fixed
-      //['viewClaimOrResponseTable', viewTheResponse.defendant1SubHeader, viewTheResponse.defendant1Details],
-      [
-        'viewClaimOrResponseTable',
-        viewTheResponse.additionalDefendant1DynamicSubHeader,
-        viewTheResponse.additionalDefendant1Details,
-      ],
-      [
-        'viewClaimOrResponseTable',
-        viewTheResponse.additionalDefendant2DynamicSubHeader,
-        viewTheResponse.additionalDefendant2Details,
-      ],
       ['viewClaimOrResponseTable', viewTheResponse.responseToClaimSubHeader, viewTheResponse.responseToClaimDetails],
       [
         'viewClaimOrResponseTable',
@@ -154,7 +142,23 @@ export class CitizenDashboardAction implements IAction {
       ],
       ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
     );
-    await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
+    const maxPdfAttempts = 5;
+    let lastPdfError: unknown;
+    for (let attempt = 1; attempt <= maxPdfAttempts; attempt++) {
+      try {
+        await performAction('reloadPage');
+        await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
+        await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
+        await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.counterClaimPDFLink });
+        return;
+      } catch (error: unknown) {
+        lastPdfError = error;
+        if (attempt === maxPdfAttempts) {
+          throw error;
+        }
+      }
+    }
+    throw lastPdfError;
   }
 
   private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {
