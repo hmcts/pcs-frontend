@@ -69,6 +69,19 @@ describe('legalRepresentativeAccessMiddleware', () => {
     expect(next).toHaveBeenCalled();
   });
 
+  it.each(['/accessibility', '/privacy-policy', '/cookies', '/terms-and-conditions', '/get-help'])(
+    'allows legalrep users to access the footer page at %s',
+    path => {
+      mockIsLegalRepresentativeUser.mockReturnValue(true);
+      const req = { path } as unknown as Request;
+
+      invokeMiddleware(req);
+
+      expect(next).toHaveBeenCalled();
+      expect(res.status).not.toHaveBeenCalled();
+    }
+  );
+
   it('blocks legalrep users from non-allowed paths', () => {
     mockIsLegalRepresentativeUser.mockReturnValue(true);
     const req = { path: '/dashboard' } as unknown as Request;
