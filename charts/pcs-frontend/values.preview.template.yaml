@@ -14,7 +14,7 @@ nodejs:
   environment:
     REDIS_CONNECTION_STRING: redis://${SERVICE_NAME}-redis-master:6379
     OIDC_REDIRECT_URI: 'https://${SERVICE_FQDN}/oauth2/callback'
-    PCS_API_URL: '${PCS_API_URL}'
+    PCS_API_URL: 'https://xui-pcs-api-pr-2423.preview.platform.hmcts.net'
     CDAM_URL: '${CDAM_URL}'
     CCD_URL: '${DATA_STORE_URL_BASE}'
     CASE_TYPE_ID: '${CASE_TYPE_ID}'
