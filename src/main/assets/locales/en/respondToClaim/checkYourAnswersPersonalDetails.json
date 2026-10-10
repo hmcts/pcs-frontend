@@ -39,9 +39,15 @@
       "label": "Are you happy to be contacted by telephone?",
       "changeHidden": "contact by phone"
     },
+    "phoneNumber": {
+      "label": "UK phone number"
+    },
     "contactByText": {
       "label": "Are you happy to be contacted by text message?",
       "changeHidden": "contact by text message"
+    },
+    "textMessageNumber": {
+      "label": "UK phone number"
     },
     "contactDetails": {
       "label": "Contact details",
