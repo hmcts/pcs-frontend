@@ -26,7 +26,7 @@ describe('hasMultipleParties', () => {
     expect(hasMultipleParties(req)).toBe(true);
   });
 
-  it('returns false when fewer than two named parties remain after excluding current defendant', () => {
+  it('returns true when one named party remains after excluding current defendant', () => {
     const req = {
       res: {
         locals: {
@@ -43,7 +43,7 @@ describe('hasMultipleParties', () => {
       },
     } as unknown as Request;
 
-    expect(hasMultipleParties(req)).toBe(false);
+    expect(hasMultipleParties(req)).toBe(true);
   });
 
   it('ignores unnamed parties while counting', () => {
@@ -72,7 +72,7 @@ describe('hasMultipleParties', () => {
     expect(hasMultipleParties(req)).toBe(true);
   });
 
-  it('returns false with current defendant, unnamed defendant, and claimant', () => {
+  it('returns true with current defendant, unnamed defendant, and claimant', () => {
     const req = {
       res: {
         locals: {
@@ -92,6 +92,6 @@ describe('hasMultipleParties', () => {
       },
     } as unknown as Request;
 
-    expect(hasMultipleParties(req)).toBe(false);
+    expect(hasMultipleParties(req)).toBe(true);
   });
 });

@@ -107,9 +107,9 @@ describe('shouldShowCounterClaimAgainstWhoStep', () => {
     expect(shouldShowCounterClaimAgainstWhoStep(req)).toBe(false);
   });
 
-  it('returns false when only single other named party counts (not multiple)', () => {
+  it('returns true when single other named party exists', () => {
     const req = makeReq({ needHelpWithFees: 'NO' }, singleOtherPartyFixture);
-    expect(shouldShowCounterClaimAgainstWhoStep(req)).toBe(false);
+    expect(shouldShowCounterClaimAgainstWhoStep(req)).toBe(true);
   });
 
   it('returns false when counterClaim data is absent even with multiple parties', () => {

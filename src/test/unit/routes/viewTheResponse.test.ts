@@ -965,6 +965,79 @@ describe('viewTheResponse route', () => {
     );
   });
 
+  it('should show persons unknown when a counterclaim against party has an empty value object', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'SOMETHING_ELSE',
+            counterClaimAgainst: [
+              { id: 'c1', value: { orgName: 'Named Org' } },
+              { id: 'd2', value: {} },
+            ],
+            counterClaimFor: 'Something',
+          },
+        },
+      },
+    });
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      viewTheResponseRequest({ caseReference, sessionUser: { accessToken: 'access-token-1' } }),
+      res,
+      jest.fn()
+    );
+
+    const { counterclaim } = (res.render as jest.Mock).mock.calls[0][1];
+    expect(counterclaim.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.against' },
+          value: { text: 'Named Org, Persons unknown' },
+        }),
+      ])
+    );
+  });
+
+  it('should show persons unknown when a counterclaim against party has literal Person unknown names', async () => {
+    mockCaseById({
+      possessionClaimResponse: {
+        defendantResponses: {
+          makeCounterClaim: 'YES',
+          counterClaim: {
+            claimType: 'SOMETHING_ELSE',
+            counterClaimAgainst: [{ id: 'd1', value: { firstName: 'Person unknown', lastName: 'Person unknown' } }],
+            counterClaimFor: 'Something',
+          },
+        },
+      },
+    });
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await handler(
+      viewTheResponseRequest({ caseReference, sessionUser: { accessToken: 'access-token-1' } }),
+      res,
+      jest.fn()
+    );
+
+    const { counterclaim } = (res.render as jest.Mock).mock.calls[0][1];
+    expect(counterclaim.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:counterclaim.against' },
+          value: { text: 'Persons unknown' },
+        }),
+      ])
+    );
+  });
+
   it('should format yes/no values regardless of API casing', async () => {
     mockCaseById({
       possessionClaimResponse: {

@@ -122,4 +122,21 @@ describe('respond-to-claim counter-claim-against-whom — holistic draft save', 
 
     expect(savedCounterClaim()).not.toHaveProperty('counterClaimAgainst');
   });
+
+  it('renders Persons unknown as option text when defendant name is missing', async () => {
+    const req = createReq({});
+    req.res.locals.validatedCase.data.allDefendants = [
+      { id: 'd-self', value: { firstName: 'Me', lastName: 'Defendant' } },
+      { id: 'd2', value: {} },
+    ];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const controller = (step as any).getController();
+    const result = await controller.generateContent(req);
+    const items = result.fields[0].component.items;
+    expect(items).toEqual([
+      { value: 'c1', text: 'Landlord Ltd', checked: false },
+      { value: 'd2', text: 'Persons unknown', checked: false },
+    ]);
+  });
 });
