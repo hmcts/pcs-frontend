@@ -38,7 +38,7 @@ export const step: StepDefinition = createFormStep({
     let contentList: string[] = [];
     const t = getTranslationFunction(req);
 
-    if (typeOfApplication === 'ADJOURN' || typeOfApplication === 'SOMETHING_ELSE') {
+    if (typeOfApplication === 'SUSPEND' || typeOfApplication === 'ADJOURN' || typeOfApplication === 'SOMETHING_ELSE') {
       contentList = t(`list.${typeOfApplication}`, { returnObjects: true }) as unknown as string[];
     }
 

@@ -13,6 +13,10 @@
   "question": "Beth ydych chi eisiau gwneud cais amdano?",
   "hintText": "Rhywfaint o destun awgrymog dewisol yma (deiliad lle)",
   "options": {
+    "suspend": {
+      "label": "Gofyn i'r llys atal (stopio neu ohirio) y troi allan",
+      "hint": "Gallwch ofyn i'r llys ‘atal y troi allan’. Mae hyn yn golygu stopio neu ohirio’r troi allan."
+    },
     "adjourn": {
       "label": "Gofyn i ohirio'r gwrandawiad (ei symud i amser neu ddyddiad diweddarach)",
       "hint": "Gallwch wneud cais i newid y gwrandawiad llys i amser neu ddyddiad diweddarach"
@@ -27,6 +31,6 @@
     }
   },
   "errors": {
-    "typeOfApplication": "Dewiswch beth rydych eisiau gwneud cais amdano"
+    "typeOfApplication": "Dewiswch opsiwn"
   }
 }

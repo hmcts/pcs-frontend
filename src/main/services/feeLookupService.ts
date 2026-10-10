@@ -12,12 +12,14 @@ export interface FeeLookupParams {
   channel: string;
   event: string;
   keyword: string;
+  applicant_type?: string;
   amount_or_volume?: number;
 }
 
 export enum FeeType {
   genAppStandardFee,
   genAppMaxFee,
+  genAppSuspendFeeFEE0458,
   counterClaimFlatFeeFEE0450,
   counterClaimRanged,
   counterClaim,

@@ -13,6 +13,10 @@
   "question": "What do you want to apply for?",
   "hintText": "Some optional hint text here (placeholder)",
   "options": {
+    "suspend": {
+      "label": "Ask the court to suspend (stop or delay) the eviction",
+      "hint": "You can ask the court to ‘suspend the eviction’. This means stopping or delaying the eviction."
+    },
     "adjourn": {
       "label": "Ask to adjourn the hearing (move it to a later time or date)",
       "hint": "You can apply to change the court hearing until a later time or date"
@@ -27,6 +31,6 @@
     }
   },
   "errors": {
-    "typeOfApplication": "Choose what you want to apply for"
+    "typeOfApplication": "Please select an option"
   }
 }
