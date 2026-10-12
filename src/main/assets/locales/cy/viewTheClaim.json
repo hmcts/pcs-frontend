@@ -22,7 +22,7 @@
     "claimantDetails": "Manylion yr hawlydd",
     "defendantDetails": "Manylion y diffynnydd 1af",
     "additionalDefendantDetails": "Manylion diffynnydd {{number}} ychwanegol",
-    "rankedDefendantDetails": "cyDefendant {{number}} details",
+    "rankedDefendantDetails": "Manylion diffynnydd {{number}}",
     "claimDetails": "Manylion yr hawliad",
     "asb": "Ymddygiad gwrthgymdeithasol ac anghyfreithlon neu ymddygiad gwaharddedig",
     "rentArrears": "Manylion ôl-ddyledion rhent",

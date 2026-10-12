@@ -12,7 +12,7 @@
     "claimantDetails": "Manylion yr hawlydd",
     "defendant1Details": "Manylion y diffynnydd 1af",
     "additionalDefendantDetails": "Manylion diffynnydd {{number}} ychwanegol",
-    "rankedDefendantDetails": "cyDefendant {{number}} details",
+    "rankedDefendantDetails": "Manylion diffynnydd {{number}}",
     "responseToClaim": "Ymateb i hawliad yr hawlydd",
     "paymentsOrAgreements": "Taliadau neu gytundebau ers gwneud yr hawliad",
     "householdAndCircumstances": "Eich cartref a’ch amgylchiadau",

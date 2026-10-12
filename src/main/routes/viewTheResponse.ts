@@ -28,7 +28,9 @@ import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
 import { findCaseDocumentById } from '@utils/documentUtils';
+import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
+import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 const logger = Logger.getLogger('viewTheResponse');
 
@@ -682,6 +684,8 @@ export default function viewTheResponseRoutes(app: Application): void {
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
       const release12Enabled = await isRespondToClaimEnabledForRelease(req);
       const showExemptLandlord = release12Enabled && isWalesProperty(caseData);
+      const rankedDefendantNumbering =
+        release12Enabled && (await getLaunchDarklyFlag(req, RELEASE_1_4_ENABLED, false));
 
       const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
@@ -689,8 +693,8 @@ export default function viewTheResponseRoutes(app: Application): void {
 
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
-        defendant1Details: buildDefendant1Details(t, caseData, release12Enabled),
-        additionalDefendantDetails: release12Enabled ? [] : buildAdditionalDefendantDetails(t, caseData),
+        defendant1Details: buildDefendant1Details(t, caseData, rankedDefendantNumbering),
+        additionalDefendantDetails: rankedDefendantNumbering ? [] : buildAdditionalDefendantDetails(t, caseData),
         responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord),
         paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
