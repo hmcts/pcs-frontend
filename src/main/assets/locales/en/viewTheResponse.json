@@ -86,7 +86,7 @@
     "otherDependants": "Do you have any other dependants?",
     "otherDependantDetails": "Details of other dependants",
     "otherTenants": "Do any other adults live in your home?",
-    "otherTenantsDetails": "Details of other adults living in your home?",
+    "otherTenantsDetails": "Details of other adults living in your home",
     "alternativeAccommodation": "Would you have somewhere else to live if you had to leave your home?",
     "alternativeAccommodationDate": "When would you be able to move in?",
     "shareAdditional": "Would you like to share anything about your circumstances?",
@@ -196,5 +196,71 @@
   },
 
   "personsUnknown": "Persons unknown",
-  "addressUnknown": "Address unknown"
+  "addressUnknown": "Address unknown",
+  "answers": {
+    "possessionNoticeReceived": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "makeCounterClaim": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "anyPaymentsMade": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "repaymentPlanAgreed": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "repayArrearsInstalments": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "dependantChildren": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "otherDependants": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "otherTenants": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "alternativeAccommodation": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "shareAdditionalCircumstances": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "exceptionalHardship": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "universalCreditApplied": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "priorityDebts": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "otherConsiderations": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "isClaimAmountKnown": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "appliedForHwf": {
+      "yes": "Yes",
+      "no": "No"
+    }
+  }
 }
