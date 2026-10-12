@@ -1,5 +1,5 @@
 import { buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
-import type { DocWeaveSnapshot } from '@hmcts-cft/docweave';
+import { type DocWeaveSnapshot, InvalidSnapshotError, parseSnapshot } from '@hmcts-cft/docweave';
 import config from 'config';
 import type { NextFunction, Request, Response } from 'express';
 
@@ -119,4 +119,13 @@ export function refusedOrderEvent(
     return void res.status(404).send('Not Found');
   }
   next(error);
+}
+
+/** The order's document as a page posted it: none, or a snapshot Docweave accepts. Anything else is a bad request. */
+export function postedSnapshot(json: string | undefined): DocWeaveSnapshot | null {
+  try {
+    return json ? parseSnapshot(json) : null;
+  } catch (error) {
+    throw error instanceof InvalidSnapshotError ? new HTTPError(error.message, 400) : error;
+  }
 }

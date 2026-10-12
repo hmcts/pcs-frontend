@@ -69,7 +69,8 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
   return {
     draft,
     draftOrderType: submission?.orderType ?? order.orderType ?? DEFAULT_ORDER_TYPE,
-    orderDocumentJson: submission?.orderDocumentJson ?? JSON.stringify(order.docweaveSnapshot ?? null),
+    orderDocumentJson:
+      submission?.orderDocumentJson ?? (order.docweaveSnapshot ? JSON.stringify(order.docweaveSnapshot) : ''),
     draftValue: (name: string): unknown => draft[name],
     draftChecked: (name: string, value: string): boolean => {
       const saved = draft[name];
