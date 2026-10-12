@@ -335,6 +335,7 @@ export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
+  sdkEventPayload?: string;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
   detailsTab_TenancyLicenceDetails?: DetailsTab_TenancyLicenceDetails;
   detailsTab_RentArrearsDetails?: DetailsTab_RentArrearsDetails;

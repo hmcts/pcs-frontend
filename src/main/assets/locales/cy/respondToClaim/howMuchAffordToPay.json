@@ -2,7 +2,7 @@
   "pageTitle": "Rhandaliadau",
   "heading": "Rhandaliadau",
   "amountQuestion": "Faint allwch chi fforddio’i dalu ar ben eich rhent cyfredol?",
-  "amountHint": "Er enghraifft, £148.00 neu £148.50",
+  "amountHint": "Er enghraifft, £148 neu £148.50",
   "frequencyQuestion": "Pa mor aml allech chi fforddio talu'r swm hwn?",
   "frequencyHint": "Ei dalu:",
   "frequencyOptions": {
@@ -13,7 +13,7 @@
   },
   "errors": {
     "installmentAmount": "Nodwch faint allwch chi fforddio’i dalu ar ben eich rhent cyfredol",
-    "installmentAmountFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50",
+    "installmentAmountFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148 neu 148.50",
     "installmentAmountMax": "Rhaid i'r swm y gallech fforddio ei dalu ar ben y rhent cyfredol fod yn llai nag - £1 biliwn.",
     "installmentAmountMin": "Rhaid i'r swm y gallech fforddio ei dalu ar ben y rhent cyfredol fod yn - £0.00 neu uwch.",
     "installmentFrequency": "Dewiswch pa mor aml allech chi fforddio talu'r swm hwn"
