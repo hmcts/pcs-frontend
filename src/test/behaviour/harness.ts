@@ -7,6 +7,7 @@ import { randomUUID } from 'node:crypto';
 import * as http from 'node:http';
 import { type AddressInfo } from 'node:net';
 
+import { renderText } from '@hmcts-cft/docweave';
 import express, { type Express, type Request, type Response } from 'express';
 
 export const CASE_REFERENCE = '1777027600017760';
@@ -323,33 +324,6 @@ export interface Page {
   body(action?: string): URLSearchParams;
 }
 
-interface SnapshotNode {
-  type: string;
-  text?: string;
-  attrs?: { text?: string };
-  content?: SnapshotNode[];
-}
-
-/** A Docweave snapshot's current document as plain text, one line per paragraph. */
-function snapshotText(json: string): string {
-  const inline = (node: SnapshotNode): string =>
-    node.type === 'text'
-      ? (node.text ?? '')
-      : node.type === 'generated_text'
-        ? (node.attrs?.text ?? '')
-        : (node.content ?? []).map(inline).join('');
-  const lines: string[] = [];
-  const walk = (node: SnapshotNode): void => {
-    if (node.type === 'paragraph') {
-      lines.push(inline(node));
-    } else {
-      node.content?.forEach(walk);
-    }
-  };
-  walk(JSON.parse(json).current);
-  return lines.join('\n');
-}
-
 /**
  * Loads a served page with the make order form into jsdom and starts its JavaScript, as a browser would: the judge's
  * make order page, or the caseworker's review of an order.
@@ -372,7 +346,7 @@ export async function openPage(html: string): Promise<Page> {
   return {
     form,
     orderText: () => buildOrderDocument(form).textContent,
-    documentText: () => snapshotText(control<HTMLTextAreaElement>('#order-document').value),
+    documentText: () => renderText(JSON.parse(control<HTMLTextAreaElement>('#order-document').value)),
     body: action => {
       const body = new URLSearchParams();
       new FormData(form).forEach((value, name) => body.append(name, String(value)));

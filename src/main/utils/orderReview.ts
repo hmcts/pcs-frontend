@@ -1,4 +1,4 @@
-import { renderHtml } from '@hmcts-cft/docweave';
+import { parseSnapshot, renderHtml } from '@hmcts-cft/docweave';
 
 import type { OrderFormSubmission } from '@utils/makeOrderForm';
 import { parseDate } from '@utils/makeOrderFormat';
@@ -208,7 +208,7 @@ export function reviewRequest(
 }
 
 function issuedOrder(order: Required<OrderFormSubmission>): Record<string, unknown> {
-  const docweaveSnapshot = JSON.parse(order.orderDocumentJson || 'null');
+  const docweaveSnapshot = order.orderDocumentJson ? parseSnapshot(order.orderDocumentJson) : null;
   return {
     orderType: order.orderType,
     formData: order.formData,

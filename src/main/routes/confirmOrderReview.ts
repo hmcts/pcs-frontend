@@ -14,6 +14,7 @@ import {
   caseHeader,
   confirmationHeader,
   manageCaseDetailsUrl,
+  postedSnapshot,
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
@@ -370,6 +371,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     const type = choice(orderType, MAKE_ORDER_TYPES);
     if (type) {
       // Kept whichever button was pressed, so the page shows the caseworker's changes again.
+      postedSnapshot(text(orderDocument));
       review.answers.order = { orderType: type, formData, orderDocumentJson: text(orderDocument) };
     }
     try {

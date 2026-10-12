@@ -190,7 +190,7 @@ describe('confirm order review', () => {
       expect(document.querySelector('#judge-message')?.textContent).toContain('Please list for a review in 28 days.');
       expect(document.querySelector('[data-order-preview]')?.textContent).toContain('IT IS ORDERED THAT');
       expect(document.querySelector('#judge-edits')).toBeNull();
-      expect(document.querySelector('[data-order-preview] .docweave-editor__clause')).toBeNull();
+      expect(document.querySelector('[data-order-preview] .docweave-clause')).toBeNull();
     });
 
     it('warns of what the judge added and changed, and shows their answers and wording for the caseworker to change', async () => {
@@ -213,12 +213,10 @@ describe('confirm order review', () => {
       expect(edits).toContain('The Judge changed generated wording');
       // Docweave marks the clauses the judge added and changed as its editor showed them.
       const preview = document.querySelector('[data-order-preview]')!;
-      expect(preview.querySelector('.docweave-editor__clause--inserted')?.textContent).toContain(
+      expect(preview.querySelector('.docweave-clause--inserted')?.textContent).toContain(
         'The defendant may apply to vary this order.'
       );
-      expect(preview.querySelector('.docweave-editor__clause--modified')?.textContent).toContain(
-        'Wording the judge rewrote'
-      );
+      expect(preview.querySelector('.docweave-clause--modified')?.textContent).toContain('Wording the judge rewrote');
       expect(document.querySelector('#judge-changes-key')).not.toBeNull();
       // Below it, the judge's answers and their wording, in the editor the caseworker may change.
       expect(control('input[name="claimant-claimant-id-attendance"][value="litigant-in-person"]').checked).toBe(true);

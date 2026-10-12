@@ -13,6 +13,7 @@ import {
   caseHeader,
   confirmationHeader,
   manageCaseDetailsUrl,
+  postedSnapshot,
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
@@ -146,7 +147,7 @@ export default function makeOrderRoutes(app: Application): void {
           version: Number(orderVersion),
           orderType,
           formData,
-          docweaveSnapshot: JSON.parse(orderDocument || 'null'),
+          docweaveSnapshot: postedSnapshot(orderDocument),
         },
         taskId: taskId || null,
       };
