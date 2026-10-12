@@ -78,7 +78,12 @@ describe('make an order: deciding an application', () => {
     await app.close();
     app = await bootApp({
       application: APPLICATION,
-      orderReturnedToJudge: { orderType: 'APPLICATION_DECISION', formData: { 'application-wording-added': 'yes' } },
+      order: {
+        id: 'order-returned',
+        version: 4,
+        orderType: 'APPLICATION_DECISION',
+        formData: { 'application-wording-added': 'yes' },
+      },
     });
     await openPage((await app.get(`${PAGE}&orderId=order-returned`)).text);
     const button = control<HTMLButtonElement>('[data-use-requested-wording]');
