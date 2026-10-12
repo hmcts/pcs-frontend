@@ -14,7 +14,7 @@ const WLU_YES_NO: [file: string, yesKey: string, yes: string, no: string][] = [
   ['respondToClaim/confirmationOfNoticeGiven.json', 'options', 'Do', 'Naddo'],
   ['respondToClaim/repaymentsMade.json', 'options', 'Do', 'Naddo'],
   ['respondToClaim/repaymentsAgreed.json', 'options', 'Do', 'Naddo'],
-  ['respondToClaim/installmentPayments.json', 'options', 'Hoffwn', 'Na hoffwn'],
+  ['respondToClaim/instalmentPayments.json', 'options', 'Hoffwn', 'Na hoffwn'],
   ['respondToClaim/counterClaim.json', 'options', 'Oes', 'Nac oes'],
   ['respondToClaim/counterClaimSpecificSum.json', 'options', 'Ydw', 'Nac ydw'],
   ['respondToClaim/counterClaimHaveYouAppliedForHelp.json', 'options', 'Do', 'Naddo'],
@@ -35,7 +35,7 @@ const WLU_YES_NO: [file: string, yesKey: string, yes: string, no: string][] = [
   ['respondToClaim/legalrep/correspondenceAddress.json', 'labels', 'Ie', 'Na'],
   ['respondToClaim/legalrep/emailConfirmation.json', 'options', 'Ydw', 'Nac ydw'],
   ['respondToClaim/legalrep/tenancyDateDetails.json', 'options', 'Ydy', 'Nac ydy'],
-  ['respondToClaim/legalrep/installmentPayments.json', 'options', 'Hoffai', 'Na hoffai'],
+  ['respondToClaim/legalrep/instalmentPayments.json', 'options', 'Hoffai', 'Na hoffai'],
   // Make an application
   ['makeAnApplication/haveYouAlreadyAppliedForHelpWithFees.json', 'options', 'Do', 'Naddo'],
   ['makeAnApplication/areThereAnyReasonsThatThisApplicationShouldNotBeShared.json', 'options', 'Oes', 'Nac oes'],
