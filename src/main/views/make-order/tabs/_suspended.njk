@@ -66,21 +66,12 @@
   }) }}
 {% endset %}
 
-{% set useOccupationHtml %}
-  {% call compact.row({ groupLabel: "Damages for unlawful occupation" }) %}
-    {{ compact.money({ id: "suspended-use-occupation-rate", label: "Daily rate" }) }}
-    {{ compact.date({ id: "suspended-use-occupation-from-date", legend: "From" }) }}
-  {% endcall %}
-{% endset %}
-
 {{ compact.checkboxes("suspended-options", {
   legend: "Additional orders (optional)",
   classes: "pcs-divided-options",
   items: [
     { value: "money-judgment-arrears", text: "Money judgment for the arrears above", conditional: { html: sameTermsHtml } },
     { value: "money-claim-adjourned", text: "Money claim adjourned generally with liberty to restore" },
-    { value: "use-occupation", text: "Damages for unlawful occupation", conditional: { html: useOccupationHtml } },
-    { value: "warrant-on-notice", text: "Any application for a warrant of eviction must be made and heard on notice to all parties unless the court orders otherwise" },
-    { value: "transfer-high-court", text: "Transfer to High Court" }
+    { value: "warrant-on-notice", text: "Any application for a warrant of eviction must be made and heard on notice to all parties unless the court orders otherwise" }
   ]
 }) }}

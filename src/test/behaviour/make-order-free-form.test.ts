@@ -1,4 +1,15 @@
-import { CASE_REFERENCE, type TestApp, bootApp, check, openPage, recordAttendance, selectTab, type } from './harness';
+import {
+  CASE_REFERENCE,
+  type TestApp,
+  bootApp,
+  check,
+  control,
+  openPage,
+  recordAttendance,
+  selectTab,
+  type,
+  uncheck,
+} from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
 
@@ -74,6 +85,55 @@ describe('make an order: free form and strike out', () => {
     selectTab('tab-strike-out');
     check('strike-claim-outcome', 'struck-out');
     expect(page.orderText()).toBe(['IT IS ORDERED THAT:', 'The claim is struck out.'].join('\n'));
+  });
+
+  it('keeps nothing ticked when the judge unticks the claim', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-strike-out');
+    uncheck('strike-subjects', 'claim');
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    const rejected = await app.post(PAGE, body);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Select what is struck out or dismissed');
+    await openPage(rejected.text);
+    expect(control('[name="strike-subjects"][value="claim"]').checked).toBe(false);
+  });
+
+  it('strikes out or dismisses whichever of the claim, counterclaim and application the case has open', async () => {
+    // Only the claim is offered until the case has an open counterclaim or application.
+    await openPage((await app.get(PAGE)).text);
+    const subjects = () =>
+      [...document.querySelectorAll<HTMLInputElement>('[name="strike-subjects"][type="checkbox"]')].map(
+        box => box.value
+      );
+    expect(subjects()).toEqual(['claim']);
+
+    await app.close();
+    app = await bootApp({ openCounterclaim: true, openApplication: true });
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-strike-out');
+    check('strike-claim-outcome', 'struck-out');
+    check('strike-subjects', 'counterclaim');
+    check('strike-counterclaim-outcome', 'dismissed');
+    check('strike-subjects', 'application');
+    expect(page.orderText()).toBe(
+      [
+        'IT IS ORDERED THAT:',
+        'The claim is struck out.',
+        'The counterclaim is dismissed.',
+        'The application is dismissed.',
+      ].join('\n')
+    );
+
+    uncheck('strike-subjects', 'claim');
+    uncheck('strike-subjects', 'application');
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    body.delete('strike-counterclaim-outcome');
+    const rejected = await app.post(PAGE, body);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Select whether the counterclaim is struck out or dismissed');
   });
 
   it('dismisses the claim with its costs order, and saves that document', async () => {

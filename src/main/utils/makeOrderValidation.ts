@@ -139,7 +139,6 @@ function validateCosts(formData: Record<string, unknown>, suspended: boolean): M
 function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add, money, date, frequency } = validation(formData);
   const terms = values(formData, 'suspended-payment-terms');
-  const options = values(formData, 'suspended-options');
 
   date('suspended-by-date', 'Enter a valid possession date');
   money('suspended-arrears', 'Enter valid arrears');
@@ -156,10 +155,6 @@ function validateSuspended(formData: Record<string, unknown>): MakeOrderValidati
     money('suspended-instalment-amount', 'Enter a valid instalment amount');
     frequency('suspended-instalment-frequency', 'Select weekly, fortnightly or monthly instalments');
     date('suspended-instalment-date', 'Enter a valid first instalment date');
-  }
-  if (options.includes('use-occupation')) {
-    money('suspended-use-occupation-rate', 'Enter a valid daily rate for use and occupation');
-    date('suspended-use-occupation-from-date', 'Enter a valid start date for use and occupation');
   }
 
   return [...issues, ...validateCosts(formData, true)];
@@ -306,11 +301,15 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
 
 function validateStrikeOut(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add } = validation(formData);
-  add(
-    ['struck-out', 'dismissed'].includes(value(formData, 'strike-claim-outcome')),
-    'strike-claim-outcome',
-    'Select whether the claim is struck out or dismissed'
-  );
+  const subjects = values(formData, 'strike-subjects').filter(subject => subject !== 'none');
+  add(subjects.length > 0, 'strike-subjects', 'Select what is struck out or dismissed');
+  for (const subject of ['claim', 'counterclaim'].filter(chosen => subjects.includes(chosen))) {
+    add(
+      ['struck-out', 'dismissed'].includes(value(formData, `strike-${subject}-outcome`)),
+      `strike-${subject}-outcome`,
+      `Select whether the ${subject} is struck out or dismissed`
+    );
+  }
   return [...issues, ...validateCosts(formData, false)];
 }
 
