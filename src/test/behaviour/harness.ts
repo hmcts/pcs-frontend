@@ -152,12 +152,17 @@ export async function bootApp(
     caseworker?: boolean;
     makeOrderEnabled?: boolean;
     defendants?: { id: string; name: string }[];
+    /** Whether the case has an open counterclaim or application. */
+    openCounterclaim?: boolean;
+    openApplication?: boolean;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
   if (options.defendants) {
     envelope.caseContext.defendants = options.defendants;
   }
+  envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
+  envelope.caseContext.openApplication = options.openApplication ?? false;
   startTokens = [];
   submittedTokens = [];
   refusal = undefined;
