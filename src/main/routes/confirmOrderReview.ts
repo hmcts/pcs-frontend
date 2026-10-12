@@ -57,8 +57,7 @@ const PAGES = {
   proceedToIssue: '/proceed-to-issue',
   checkYourAnswers: '/check-your-answers',
   cancel: '/cancel',
-  orderIssued: '/order-issued',
-  referredToJudge: '/referred-to-judge',
+  confirmed: '/confirmed',
 } as const;
 
 type Page = keyof typeof PAGES;
@@ -88,12 +87,12 @@ function endReview(req: Request): void {
 
 /**
  * The pages after the introduction continue the review the introduction started, which they find on the
- * response; without one, such as after a cancel or in a new session, the caseworker starts again from
- * the introduction.
+ * response; without one, such as after a cancel, a submission or in a new session, the caseworker starts
+ * again from the introduction.
  */
 const reviewInProgress: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
   const review = req.session.orderReviews?.[caseReferenceOf(req)];
-  if (!review) {
+  if (!review || review.outcome) {
     return res.redirect(pageUrl(caseReferenceOf(req), 'intro'));
   }
   res.locals.review = review;
@@ -190,26 +189,18 @@ function partyChoices(review: OrderReviewSession) {
 
 /**
  * Submits the caseworker's review with the token the introduction's start gave; pcs-api refuses it if
- * the order changed since. The review then ends, and its confirmation is kept so it survives a
- * refresh, which cannot submit it again.
+ * the order changed since. The review then ends with its outcome, which its confirmation shows and which
+ * survives a refresh, which cannot submit it again.
  */
 async function submitReview(req: Request, review: OrderReviewSession, action: 'RETURN_TO_JUDGE' | 'ISSUE') {
-  const caseReference = caseReferenceOf(req);
   await ccdCaseService.submitCaseEvent(
     req.session.user!.accessToken,
-    caseReference,
+    caseReferenceOf(req),
     CONFIRM_ORDER_REVIEW_EVENT_ID,
     review.eventToken,
     { sdkEventPayload: JSON.stringify(reviewRequest(review, action)) }
   );
-  endReview(req);
-  req.session.orderReviewOutcomes = {
-    ...req.session.orderReviewOutcomes,
-    [caseReference]: {
-      outcome: action === 'ISSUE' ? 'ISSUED' : 'RETURNED_TO_JUDGE',
-      ...confirmationHeader(caseReference, review.caseContext),
-    },
-  };
+  review.outcome = action === 'ISSUE' ? 'ISSUED' : 'RETURNED_TO_JUDGE';
 }
 
 function checkYourAnswersContent(req: Request, review: OrderReviewSession): Record<string, unknown> {
@@ -325,7 +316,6 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     try {
       // Opening the review starts it afresh: whatever was answered before, and its confirmation, go.
       endReview(req);
-      delete req.session.orderReviewOutcomes?.[caseReference];
       // The caseworker's task links to the review of one order, which pcs-api starts, and names the task.
       const orderId = typeof req.query.orderId === 'string' ? req.query.orderId : undefined;
       const taskId = typeof req.query.taskId === 'string' ? req.query.taskId : undefined;
@@ -400,7 +390,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
           return render(req, res, 'review', issues);
         }
         await submitReview(req, review, 'RETURN_TO_JUDGE');
-        return res.redirect(pageUrl(caseReferenceOf(req), 'referredToJudge'));
+        return res.redirect(pageUrl(caseReferenceOf(req), 'confirmed'));
       }
       const issues = orderIssues(review);
       if (issues.length) {
@@ -488,7 +478,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     }
     try {
       await submitReview(req, review, 'ISSUE');
-      return res.redirect(pageUrl(caseReference, 'orderIssued'));
+      return res.redirect(pageUrl(caseReference, 'confirmed'));
     } catch (error) {
       if (!handleSubmitError(req, res, 'check-your-answers', error)) {
         next(error);
@@ -496,24 +486,21 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     }
   });
 
-  const confirmation = (outcome: 'ISSUED' | 'RETURNED_TO_JUDGE', title: string) => (req: Request, res: Response) => {
+  app.get(route('confirmed'), ...journey, (req: Request, res: Response) => {
     const caseReference = caseReferenceOf(req);
     const closeUrl = manageCaseDetailsUrl(caseReference);
-    const reviewed = req.session.orderReviewOutcomes?.[caseReference];
-    if (reviewed?.outcome !== outcome) {
+    const review = req.session.orderReviews?.[caseReference];
+    if (!review?.outcome) {
       // As in XUI, a confirmation with nothing to confirm returns the user to the case.
       return res.redirect(closeUrl);
     }
     res.render('order-confirmation', {
       headerModel: xuiHeaderModel(req),
       footerModel: buildFooterModel(),
-      title,
-      ...reviewed,
+      title: review.outcome === 'ISSUED' ? 'Order issued' : 'Referred to Judge',
+      ...confirmationHeader(caseReference, review.caseContext),
       closeText: 'Close and return to case summary',
       closeUrl,
     });
-  };
-
-  app.get(route('orderIssued'), ...journey, confirmation('ISSUED', 'Order issued'));
-  app.get(route('referredToJudge'), ...journey, confirmation('RETURNED_TO_JUDGE', 'Referred to Judge'));
+  });
 }

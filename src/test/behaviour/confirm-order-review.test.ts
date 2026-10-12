@@ -270,7 +270,7 @@ describe('confirm order review', () => {
 
       const returned = await app.post(REVIEW, page.body('RETURN_TO_JUDGE'));
 
-      expect(returned.location).toBe(`${BASE}/referred-to-judge`);
+      expect(returned.location).toBe(`${BASE}/confirmed`);
       expect(submittedReviews()).toEqual([
         {
           action: 'RETURN_TO_JUDGE',
@@ -281,7 +281,7 @@ describe('confirm order review', () => {
         },
       ]);
       expect(submittedEventTokens()).toEqual(['event-token-1']);
-      const confirmation = parse((await app.get(`${BASE}/referred-to-judge`)).text);
+      const confirmation = parse((await app.get(`${BASE}/confirmed`)).text);
       expect(confirmation.querySelector('.govuk-panel__title')?.textContent?.trim()).toBe('Referred to Judge');
       expect(confirmation.querySelector('.govuk-panel__body')?.textContent).toContain(
         'Example Housing vs Alex Example'
@@ -490,7 +490,7 @@ describe('confirm order review', () => {
 
       const submitted = await app.post(CHECK_YOUR_ANSWERS, new URLSearchParams({ action: 'continue' }));
 
-      expect(submitted.location).toBe(`${BASE}/order-issued`);
+      expect(submitted.location).toBe(`${BASE}/confirmed`);
       expect(submittedReviews()).toEqual([
         {
           action: 'ISSUE',
@@ -517,10 +517,11 @@ describe('confirm order review', () => {
       expect(html).toContain('The claimant may apply to restore the claim.');
       expect(submittedEventTokens()).toEqual(['event-token-1']);
 
-      const confirmation = parse((await app.get(`${BASE}/order-issued`)).text);
+      const confirmation = parse((await app.get(`${BASE}/confirmed`)).text);
       expect(confirmation.querySelector('.govuk-panel__title')?.textContent?.trim()).toBe('Order issued');
       expect(submittedReviews()).toHaveLength(1);
-      expect((await app.get(`${BASE}/referred-to-judge`)).location).toBe(MANAGE_CASE_URL);
+      // The review is over: its pages start again from the introduction.
+      expect((await app.get(REVIEW)).location).toBe(BASE);
     });
 
     it('shows why pcs-api refused the review', async () => {

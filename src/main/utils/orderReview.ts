@@ -2,7 +2,7 @@ import { renderHtml } from '@hmcts-cft/docweave';
 
 import type { OrderFormSubmission } from '@utils/makeOrderForm';
 import { parseDate } from '@utils/makeOrderFormat';
-import type { FormData, OrderConfirmationHeader, OrderStart } from '@utils/orderCase';
+import type { FormData, OrderStart } from '@utils/orderCase';
 
 export const REVIEW_REASONS = [
   { value: 'UNLESS_ORDER', text: 'Unless order' },
@@ -55,11 +55,8 @@ export interface OrderReviewSession extends OrderStart {
   answers: OrderReviewAnswers;
   /** The Work Allocation task the caseworker came from, which pcs-api closes as the review ends. */
   taskId?: string;
-}
-
-/** How the caseworker's review ended, for its confirmation: the case, and whether they issued or returned the order. */
-export interface OrderReviewOutcome extends OrderConfirmationHeader {
-  outcome: 'ISSUED' | 'RETURNED_TO_JUDGE';
+  /** How the review ended, once submitted: the order issued, or returned to the judge. */
+  outcome?: 'ISSUED' | 'RETURNED_TO_JUDGE';
 }
 
 export interface ValidationIssue {
