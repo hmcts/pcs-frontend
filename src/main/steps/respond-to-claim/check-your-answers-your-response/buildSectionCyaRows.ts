@@ -307,7 +307,11 @@ function addCounterClaimAgainstRow({ rows, t, change }: RowContext, cc: CcdCount
     return;
   }
   const names = parties
-    .map(p => [p.value?.orgName, p.value?.firstName, p.value?.lastName].filter(Boolean).join(' ').trim())
+    .map(
+      p =>
+        [p.value?.orgName, p.value?.firstName, p.value?.lastName].filter(Boolean).join(' ').trim() ||
+        t('rows.counterClaimAgainst.personsUnknown', { defaultValue: 'Persons unknown' })
+    )
     .filter(Boolean);
   if (names.length === 0) {
     return;

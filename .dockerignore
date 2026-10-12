@@ -1,26 +1,25 @@
-# exclude all by default
-
-*
-
-# exceptions from `exclude all` rule
-
-!package.json
-!yarn.lock
-!version
-!.yarn/**
-!.yarnrc.yml
-!.pnp.cjs
-
-!tsconfig.json
-!webpack/**
-!src/main/**
-!config/**
+node_modules
+**/node_modules
+.yarn/cache
+.yarn/cache/
+.yarn/unplugged
+.yarn/unplugged/
+.yarn/install-state.gz
+.yarn/build-state.yml
+.git
+.github
+.vscode
+.idea
+.DS_Store
+coverage
+**/coverage
+dist
+**/dist
+functional-output
+smoke-output
+test-results
+playwright-report
+allure-report
+allure-results
+blob-report
 config/fortify-client.properties
-!webpack.config.js
-!src/types/**
-!bin/**
-
-# ACR reads both of these from inside the uploaded context tarball, so the `*`
-# rule above must not exclude them or the remote build cannot start.
-!acb.yaml
-!Dockerfile

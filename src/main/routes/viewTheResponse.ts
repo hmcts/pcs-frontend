@@ -212,13 +212,20 @@ function buildStatementOfTruthSummary(t: TFunction, completedByName: string | un
   };
 }
 
-function partyDisplayName(party: CcdParty | undefined): string {
-  return [party?.orgName, party?.firstName, party?.lastName].filter(Boolean).join(' ').trim();
+function partyDisplayName(t: TFunction, party: CcdParty | undefined): string {
+  if (!party || Object.keys(party).length === 0 || isNo(party.nameKnown)) {
+    return t('viewTheResponse:personsUnknown');
+  }
+  if (party.firstName === 'Person unknown' && party.lastName === 'Person unknown') {
+    return t('viewTheResponse:personsUnknown');
+  }
+  const name = [party.orgName, party.firstName, party.lastName].filter(Boolean).join(' ').trim();
+  return name || t('viewTheResponse:personsUnknown');
 }
 
-function formatCounterClaimParties(parties: CcdCollectionItem<CcdParty>[] | undefined): string {
+function formatCounterClaimParties(t: TFunction, parties: CcdCollectionItem<CcdParty>[] | undefined): string {
   return (parties ?? [])
-    .map(p => partyDisplayName(p.value))
+    .map(p => partyDisplayName(t, p.value))
     .filter(Boolean)
     .join(', ');
 }
@@ -603,7 +610,7 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
     }
   }
 
-  pushRow(rows, t('viewTheResponse:counterclaim.against'), formatCounterClaimParties(cc.counterClaimAgainst));
+  pushRow(rows, t('viewTheResponse:counterclaim.against'), formatCounterClaimParties(t, cc.counterClaimAgainst));
   pushRow(rows, t('viewTheResponse:counterclaim.for'), cc.counterClaimFor);
   pushRow(rows, t('viewTheResponse:counterclaim.reasons'), cc.counterClaimReasons);
   pushRow(rows, t('viewTheResponse:counterclaim.ordersRequested'), cc.otherOrderRequestDetails);

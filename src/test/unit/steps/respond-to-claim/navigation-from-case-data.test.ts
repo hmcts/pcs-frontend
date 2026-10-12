@@ -455,7 +455,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
     );
   });
 
-  it('routes counter-claim-fee forward to counter-claim-about when needHelpWithFees is NO and not multiple parties', async () => {
+  it('routes counter-claim-fee forward to counter-claim-against-whom when needHelpWithFees is NO and single party', async () => {
     const req = createReq({
       data: {
         possessionClaimResponse: {
@@ -469,7 +469,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'counter-claim-fee', flowConfig, {})).resolves.toBe('counter-claim-about');
+    await expect(getNextStep(req, 'counter-claim-fee', flowConfig, {})).resolves.toBe('counter-claim-against-whom');
   });
 
   it('routes counter-claim HWF step to you-need-to-apply when user has not applied for HWF (NO)', async () => {
