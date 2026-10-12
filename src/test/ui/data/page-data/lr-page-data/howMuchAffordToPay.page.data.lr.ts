@@ -9,7 +9,6 @@ export const howMuchAffordToPay = {
   saveAndContinueButton: `Save and continue`,
   saveForLaterButton: `Save for later`,
   backLink: `Back`,
-  cancelLink: `Cancel`,
   incorrectFormatTextInput: `10*9a484.00`,
   negativeTextInput: `-100.00`,
   billionTextInput: `1000000001.00`,
