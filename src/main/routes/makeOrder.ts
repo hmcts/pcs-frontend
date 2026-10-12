@@ -13,7 +13,8 @@ import {
   caseHeader,
   confirmationHeader,
   manageCaseDetailsUrl,
-  refusedByCcd,
+  refusedOrderEvent,
+  renderNoOrder,
   xuiHeaderModel,
 } from '@utils/orderCase';
 
@@ -88,17 +89,6 @@ function chosenOrderId(req: Request): string | undefined {
   return typeof req.query.orderId === 'string' ? req.query.orderId : undefined;
 }
 
-/** pcs-api would not start the chosen order, such as one already sent for review again: say why. */
-function renderNoOrder(req: Request, res: Response, error: CallbackRejectedError): void {
-  res.render('no-order', {
-    headerModel: xuiHeaderModel(req, ['judge']),
-    footerModel: buildFooterModel(),
-    heading: 'No order to change',
-    reasons: error.reasons,
-    closeUrl: manageCaseDetailsUrl(req.params.caseReference as string),
-  });
-}
-
 export default function makeOrderRoutes(app: Application): void {
   app.get(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     try {
@@ -111,13 +101,9 @@ export default function makeOrderRoutes(app: Application): void {
       );
       res.render('make-order', pageModel(req, started));
     } catch (error) {
-      if (error instanceof CallbackRejectedError) {
-        return renderNoOrder(req, res, error);
-      }
-      if (refusedByCcd(error)) {
-        return res.status(404).send('Not Found');
-      }
-      next(error);
+      refusedOrderEvent(res, next, error, rejected =>
+        renderNoOrder(req, res, 'No order to change', rejected, ['judge'])
+      );
     }
   });
 
@@ -191,14 +177,10 @@ export default function makeOrderRoutes(app: Application): void {
       }
       return res.redirect(manageCaseDetailsUrl(caseReference));
     } catch (error) {
-      if (error instanceof CallbackRejectedError) {
-        // The order pcs-api refused the change to is no longer the judge's to change either.
-        return renderNoOrder(req, res, error);
-      }
-      if (refusedByCcd(error)) {
-        return res.status(404).send('Not Found');
-      }
-      return next(error);
+      // The order pcs-api refused the change to is no longer the judge's to change either.
+      refusedOrderEvent(res, next, error, rejected =>
+        renderNoOrder(req, res, 'No order to change', rejected, ['judge'])
+      );
     }
   });
 

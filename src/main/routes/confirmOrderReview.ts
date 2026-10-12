@@ -14,7 +14,8 @@ import {
   caseHeader,
   confirmationHeader,
   manageCaseDetailsUrl,
-  refusedByCcd,
+  refusedOrderEvent,
+  renderNoOrder,
   xuiHeaderModel,
 } from '@utils/orderCase';
 import {
@@ -277,19 +278,15 @@ function render(
   });
 }
 
-/** Answers a submission pcs-api or CCD refused: back to the page it came from with why, or not found. */
-function handleSubmitError(req: Request, res: Response, view: View, error: unknown): boolean {
-  if (error instanceof CallbackRejectedError) {
-    const reasons = error.reasons.map(message => ({ id: 'confirm-order-review-form', message }));
-    render(req, res, view, reasons, error.status);
-    return true;
-  }
-  if (refusedByCcd(error)) {
-    res.status(404).send('Not Found');
-    return true;
-  }
-  return false;
-}
+/** Shows the page a submission came from again, with why pcs-api refused it. */
+const showRefusal = (req: Request, res: Response, view: View) => (error: CallbackRejectedError) =>
+  render(
+    req,
+    res,
+    view,
+    error.reasons.map(message => ({ id: 'confirm-order-review-form', message })),
+    error.status
+  );
 
 /** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
 function orderIssues(review: OrderReviewSession): ValidationIssue[] {
@@ -346,20 +343,8 @@ export default function confirmOrderReviewRoutes(app: Application): void {
         continueUrl: pageUrl(caseReference, 'review'),
       });
     } catch (error) {
-      if (error instanceof CallbackRejectedError) {
-        // pcs-api refuses to start the review when the chosen order is not waiting for one.
-        return res.render('no-order', {
-          headerModel: xuiHeaderModel(req),
-          footerModel: buildFooterModel(),
-          heading: 'No order to review',
-          reasons: error.reasons,
-          closeUrl: manageCaseDetailsUrl(caseReference),
-        });
-      }
-      if (refusedByCcd(error)) {
-        return res.status(404).send('Not Found');
-      }
-      next(error);
+      // pcs-api refuses to start the review when the chosen order is not waiting for one.
+      refusedOrderEvent(res, next, error, rejected => renderNoOrder(req, res, 'No order to review', rejected));
     }
   });
 
@@ -404,9 +389,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       }
       return res.redirect(pageUrl(caseReferenceOf(req), firstIncompletePage(review, 'review') ?? 'checkYourAnswers'));
     } catch (error) {
-      if (!handleSubmitError(req, res, 'review', error)) {
-        next(error);
-      }
+      refusedOrderEvent(res, next, error, showRefusal(req, res, 'review'));
     }
   });
 
@@ -486,9 +469,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       await submitReview(req, review, 'ISSUE');
       return res.redirect(pageUrl(caseReference, 'confirmed'));
     } catch (error) {
-      if (!handleSubmitError(req, res, 'check-your-answers', error)) {
-        next(error);
-      }
+      refusedOrderEvent(res, next, error, showRefusal(req, res, 'check-your-answers'));
     }
   });
 
