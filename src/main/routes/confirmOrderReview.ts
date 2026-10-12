@@ -66,15 +66,8 @@ function route(page: Page): string {
   return `${CONFIRM_ORDER_REVIEW_ROUTE}${PAGES[page]}`;
 }
 
-/** A page's URL on the case. A page reached from check your answers, to change an answer, returns there. */
-function pageUrl(caseReference: string, page: Page, options: { change?: boolean } = {}): string {
-  const url = route(page).replace(':caseReference', caseReference);
-  return options.change ? `${url}?change=cya` : url;
-}
-
-/** Whether the page was reached from check your answers, to change an answer. */
-function changing(req: Request): boolean {
-  return req.query.change === 'cya';
+function pageUrl(caseReference: string, page: Page): string {
+  return route(page).replace(':caseReference', caseReference);
 }
 
 function caseReferenceOf(req: Request): string {
@@ -205,7 +198,7 @@ async function submitReview(req: Request, review: OrderReviewSession, action: 'R
 
 function checkYourAnswersContent(req: Request, review: OrderReviewSession): Record<string, unknown> {
   const { answers } = review;
-  const change = (page: Page) => pageUrl(caseReferenceOf(req), page, { change: true });
+  const change = (page: Page) => pageUrl(caseReferenceOf(req), page);
   const yesNo = (value?: string) => (value === 'yes' ? 'Yes' : 'No');
   const partyNames = new Map(partyChoices(review).map(party => [party.value, party.text]));
   return {
@@ -298,16 +291,20 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   return validateMakeOrder(order.orderType, order.formData, attendanceParties(review));
 }
 
-/** The first page with a question left unanswered, if any: check your answers only shows a complete review. */
-function firstIncompletePage(review: OrderReviewSession): Page | undefined {
+/**
+ * The first page after the given one with a question left unanswered, if any. Continuing from a page goes
+ * there, or else to check your answers, which only shows a complete review: so a page reached from check
+ * your answers, to change an answer, returns there.
+ */
+function firstIncompletePage(review: OrderReviewSession, after?: Page): Page | undefined {
   const { answers } = review;
-  if (orderIssues(review).length) {
-    return 'review';
-  }
-  if (validateReviewDates(answers).length) {
-    return 'reviewDates';
-  }
-  return validateProceedToIssue(answers).length ? 'proceedToIssue' : undefined;
+  const pages: [Page, ValidationIssue[]][] = [
+    ['review', orderIssues(review)],
+    ['reviewDates', validateReviewDates(answers)],
+    ['proceedToIssue', validateProceedToIssue(answers)],
+  ];
+  const remaining = pages.slice(pages.findIndex(([page]) => page === after) + 1);
+  return remaining.find(([, issues]) => issues.length)?.[0];
 }
 
 export default function confirmOrderReviewRoutes(app: Application): void {
@@ -396,7 +393,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       if (issues.length) {
         return render(req, res, 'review', issues);
       }
-      return res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'));
+      return res.redirect(pageUrl(caseReferenceOf(req), firstIncompletePage(review, 'review') ?? 'checkYourAnswers'));
     } catch (error) {
       if (!handleSubmitError(req, res, 'review', error)) {
         next(error);
@@ -427,13 +424,13 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     const removing = /^remove-(\d+)$/.exec(action);
     if (removing) {
       answers.reviewDates.splice(Number(removing[1]) - 1, 1);
-      return res.redirect(pageUrl(caseReference, 'reviewDates', { change: changing(req) }));
+      return res.redirect(pageUrl(caseReference, 'reviewDates'));
     }
     const issues = validateReviewDates(answers);
     if (issues.length) {
       return render(req, res, 'review-dates', issues);
     }
-    return res.redirect(pageUrl(caseReference, changing(req) ? 'checkYourAnswers' : 'proceedToIssue'));
+    return res.redirect(pageUrl(caseReference, firstIncompletePage(review, 'reviewDates') ?? 'checkYourAnswers'));
   });
 
   app.get(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => render(req, res, 'proceed-to-issue'));

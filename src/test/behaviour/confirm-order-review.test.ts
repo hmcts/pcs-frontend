@@ -462,8 +462,8 @@ describe('confirm order review', () => {
       ]);
 
       const changeSeal = [...page.querySelectorAll<HTMLAnchorElement>('.govuk-summary-list__actions a')].at(-1)!;
-      expect(changeSeal.getAttribute('href')).toBe(`${PROCEED_TO_ISSUE}?change=cya`);
-      const changed = await app.post(`${PROCEED_TO_ISSUE}?change=cya`, proceedToIssueAnswers({ seal: 'COUNTY_COURT' }));
+      expect(changeSeal.getAttribute('href')).toBe(PROCEED_TO_ISSUE);
+      const changed = await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers({ seal: 'COUNTY_COURT' }));
       expect(changed.location).toBe(CHECK_YOUR_ANSWERS);
     });
 
@@ -475,7 +475,7 @@ describe('confirm order review', () => {
       await app.post(REVIEW, page.body('ISSUE'));
       const { orderType, orderDocument } = Object.fromEntries(page.body());
       await app.post(
-        `${REVIEW_DATES}?change=cya`,
+        REVIEW_DATES,
         new URLSearchParams({
           'has-review-dates': 'yes',
           'review-date-1-date-day': '5',
