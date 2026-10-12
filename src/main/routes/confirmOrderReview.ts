@@ -1,6 +1,6 @@
 import { buildFooterModel } from '@hmcts-cft/cft-ui-component-lib';
 import { type DocWeaveSnapshot, describeChanges, renderHtml } from '@hmcts-cft/docweave';
-import { Application, NextFunction, Request, RequestHandler, Response } from 'express';
+import { Application, Request, RequestHandler, Response } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
@@ -78,24 +78,18 @@ function endReview(req: Request): void {
   delete req.session.orderReviews?.[caseReferenceOf(req)];
 }
 
-/**
- * The pages after the introduction continue the review the introduction started, which they find on the
- * response; without one, such as after a cancel, a submission or in a new session, the caseworker starts
- * again from the introduction.
- */
-const reviewInProgress: RequestHandler = (req: Request, res: Response, next: NextFunction) => {
+/** The review in progress on the case, if the introduction started one that has not ended. */
+function reviewOf(req: Request): OrderReviewSession | undefined {
   const review = req.session.orderReviews?.[caseReferenceOf(req)];
-  if (!review || review.outcome) {
-    return res.redirect(pageUrl(caseReferenceOf(req), 'intro'));
-  }
-  res.locals.review = review;
-  next();
-};
-
-/** The review in progress, which `reviewInProgress` found. */
-function reviewOf(res: Response): OrderReviewSession {
-  return res.locals.review as OrderReviewSession;
+  return review && !review.outcome ? review : undefined;
 }
+
+/**
+ * The pages after the introduction continue the review the introduction started; without one, such as
+ * after a cancel, a submission or in a new session, the caseworker starts again from the introduction.
+ */
+const reviewInProgress: RequestHandler = (req, res, next) =>
+  reviewOf(req) ? next() : res.redirect(pageUrl(caseReferenceOf(req), 'intro'));
 
 const journey = [oidcMiddleware, makeOrderFeatureMiddleware];
 const inJourney = [...journey, reviewInProgress];
@@ -276,7 +270,7 @@ function render(
   issues: ValidationIssue[] = [],
   status = issues.length ? 400 : 200
 ): void {
-  const review = reviewOf(res);
+  const review = reviewOf(req)!;
   res.status(status).render(`confirm-order-review/${view}`, {
     ...pageModel(req, review, issues),
     ...VIEWS[view](req, review),
@@ -378,7 +372,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
   app.get(route('review'), ...inJourney, (req: Request, res: Response) => render(req, res, 'review'));
 
   app.post(route('review'), ...inJourney, async (req: Request, res: Response, next) => {
-    const review = reviewOf(res);
+    const review = reviewOf(req)!;
     const {
       _csrf,
       action,
@@ -419,7 +413,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
   app.get(route('reviewDates'), ...inJourney, (req: Request, res: Response) => render(req, res, 'review-dates'));
 
   app.post(route('reviewDates'), ...inJourney, (req: Request, res: Response) => {
-    const review = reviewOf(res);
+    const review = reviewOf(req)!;
     const { answers } = review;
     const caseReference = caseReferenceOf(req);
     answers.hasReviewDates = choice(req.body['has-review-dates'], ['yes', 'no'] as const);
@@ -451,7 +445,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
   app.get(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => render(req, res, 'proceed-to-issue'));
 
   app.post(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => {
-    const review = reviewOf(res);
+    const review = reviewOf(req)!;
     const { answers } = review;
     answers.nextSteps = text(req.body['next-steps']) || undefined;
     answers.finalOrder = choice(req.body['final-order'], ['yes', 'no'] as const);
@@ -470,7 +464,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
   });
 
   app.get(route('checkYourAnswers'), ...inJourney, (req: Request, res: Response) => {
-    const incomplete = firstIncompletePage(reviewOf(res));
+    const incomplete = firstIncompletePage(reviewOf(req)!);
     if (incomplete) {
       return res.redirect(pageUrl(caseReferenceOf(req), incomplete));
     }
@@ -478,7 +472,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
   });
 
   app.post(route('checkYourAnswers'), ...inJourney, async (req: Request, res: Response, next) => {
-    const review = reviewOf(res);
+    const review = reviewOf(req)!;
     const caseReference = caseReferenceOf(req);
     if (req.body.action === 'previous') {
       return res.redirect(pageUrl(caseReference, 'proceedToIssue'));
