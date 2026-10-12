@@ -217,13 +217,13 @@
   },
   "errorPrefix": "Gwall",
   "fileUpload": {
-    "dropzoneHint": "Llusgwch a gollyngwch ffeiliau yma neu",
-    "dropzoneButton": "Dewis ffeiliau",
-    "uploadStatus": "Wrthi’n uwchlwytho ffeiliau, arhoswch"
+    "dropzoneHint": "Drag and drop files here or",
+    "dropzoneButton": "Choose files",
+    "uploadStatus": "Uploading files, please wait"
   },
   "addressLookup": {
-    "oneFound": "Daethpwyd o hyd i 1 cyfeiriad",
-    "manyFound": "Daethpwyd o hyd i {count} cyfeiriad",
+    "oneFound": "1 address found",
+    "manyFound": "{count} addresses found",
     "noneFound": "Heb ganfod cyfeiriad"
   },
   "pageTitleSuffix": "Gwasanaeth Llysoedd a Thribiwnlysoedd EF – GOV.UK"

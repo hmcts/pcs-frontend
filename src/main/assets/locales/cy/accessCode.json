@@ -12,14 +12,14 @@
   "errors": {
     "respondToClaimUnavailable": "Nid yw’r dewis i ymateb i hawliad ar gael ar hyn o bryd.",
     "claimNumberRequired": "Nodwch rif eich hawliad",
-    "claimNumberInvalidCharacters": "Rhaid i’r rhif hawliad gynnwys rhifau 0 i 9 a nodau arbennig fel cysylltnodau yn unig",
-    "claimNumberLength": "Rhaid i’r rhif hawliad fod rhwng 16 ac 20 nod",
+    "claimNumberInvalidCharacters": "Claim number must only include numbers 0 to 9 and special characters such as hyphens",
+    "claimNumberLength": "Claim number must be between 16 and 20 characters",
     "accessCodeRequired": "Nodwch eich cod mynediad",
-    "accessCodeInvalidCharacters": "Rhaid i’r cod mynediad gynnwys llythrennau a i z, a rhifau 0 i 9 yn unig",
-    "accessCodeLength": "Rhaid i’r cod mynediad fod yn 12 nod",
-    "claimNotFound": "Ni allwn ddod o hyd i’r rhif hawliad hwnnw. Nodwch y rhif hawliad a gawsoch gan y llys",
-    "accessCodeExpired": "Mae’r cod mynediad a nodwyd gennych wedi dod i ben. Cysylltwch â’r llys i gael cod newydd",
-    "accessCodeAlreadyUsed": "Mae’r cod mynediad a nodwyd gennych eisoes wedi cael ei ddefnyddio, dylech gysylltu â’r llys",
-    "accessCodeMismatch": "Nid yw’r cod mynediad yn cyfateb i’r rhif hawliad"
+    "accessCodeInvalidCharacters": "Access code must only include letters a to z, and numbers 0 to 9",
+    "accessCodeLength": "Access code must be 12 characters",
+    "claimNotFound": "We cannot find that claim number. Enter the claim number that you received from the court",
+    "accessCodeExpired": "The access code you entered has expired. Contact the court to get a new code",
+    "accessCodeAlreadyUsed": "The access code you entered has already been used, you should contact the court",
+    "accessCodeMismatch": "Access code does not match claim number"
   }
 }

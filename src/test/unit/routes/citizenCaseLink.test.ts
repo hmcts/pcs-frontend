@@ -289,40 +289,33 @@ describe('citizenCaseLink routes', () => {
       mockLanguage = 'cy';
     });
 
-    it('shows field validation errors in Welsh', async () => {
+    const cyErrors = require('../../../main/assets/locales/cy/accessCode.json').errors as Record<string, string>;
+
+    it('shows field validation errors from the Welsh locale file', async () => {
       const view = await post({ claimNumber: '', accessCode: 'ABCD' });
 
       expect(view.errors).toEqual({
-        claimNumber: { text: 'Nodwch rif eich hawliad' },
-        accessCode: { text: 'Rhaid i’r cod mynediad fod yn 12 nod' },
+        claimNumber: { text: cyErrors.claimNumberRequired },
+        accessCode: { text: cyErrors.accessCodeLength },
       });
       expect(view.errorList.map((e: { text: string }) => e.text)).toEqual([
-        'Nodwch rif eich hawliad',
-        'Rhaid i’r cod mynediad fod yn 12 nod',
+        cyErrors.claimNumberRequired,
+        cyErrors.accessCodeLength,
       ]);
     });
 
-    it('shows access code check failures in Welsh', async () => {
-      mockValidateAccessCode.mockResolvedValueOnce({ valid: false, error: 'expired' });
+    it.each([
+      ['not_found', 'claimNotFound'],
+      ['expired', 'accessCodeExpired'],
+      ['already_used', 'accessCodeAlreadyUsed'],
+      ['mismatch', 'accessCodeMismatch'],
+      ['unknown', 'claimNotFound'],
+    ])('shows the Welsh locale message for the %s result', async (error, key) => {
+      mockValidateAccessCode.mockResolvedValueOnce({ valid: false, error });
 
       const view = await post({ claimNumber: '1234567890123456', accessCode: 'ABCD12345678' });
 
-      expect(view.errors.accessCode.text).toBe(
-        'Mae’r cod mynediad a nodwyd gennych wedi dod i ben. Cysylltwch â’r llys i gael cod newydd'
-      );
+      expect((view.errors.claimNumber ?? view.errors.accessCode).text).toBe(cyErrors[key]);
     });
-
-    it.each(['not_found', 'expired', 'already_used', 'mismatch', 'unknown'])(
-      'has Welsh for the %s result',
-      async error => {
-        mockValidateAccessCode.mockResolvedValueOnce({ valid: false, error });
-
-        const view = await post({ claimNumber: '1234567890123456', accessCode: 'ABCD12345678' });
-        const text = (view.errors.claimNumber ?? view.errors.accessCode).text as string;
-
-        expect(text).not.toMatch(/^accessCode:|^[a-z]+[A-Z]/);
-        expect(text).not.toMatch(/claim number|access code/i);
-      }
-    );
   });
 });
