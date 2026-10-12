@@ -142,23 +142,15 @@ export class CitizenDashboardAction implements IAction {
       ],
       ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
     );
-    const maxPdfAttempts = 5;
-    let lastPdfError: unknown;
-    for (let attempt = 1; attempt <= maxPdfAttempts; attempt++) {
-      try {
-        await performAction('reloadPage');
-        await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
-        await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
-        await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.counterClaimPDFLink });
-        return;
-      } catch (error: unknown) {
-        lastPdfError = error;
-        if (attempt === maxPdfAttempts) {
-          throw error;
-        }
-      }
-    }
-    throw lastPdfError;
+    await expect(async () => {
+      await performAction('reloadPage');
+      await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
+      await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
+      await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.counterClaimPDFLink });
+    }).toPass({
+      timeout: 30_000,
+      intervals: [1_000, 2_000, 3_000],
+    });
   }
 
   private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {
