@@ -49,8 +49,6 @@ describe('make an order: an order a caseworker returned', () => {
 
     // pcs-api will not start the order again while it is with the caseworker.
     refuseNextStart('The order is no longer waiting for you to change it');
-    const again = parse((await app.get(RETURNED)).text);
-    expect(again.querySelector('h1')?.textContent?.trim()).toBe('No order to change');
-    expect(again.body.textContent).toContain('The order is no longer waiting for you to change it');
+    expect((await app.get(RETURNED)).status).toBe(422);
   });
 });

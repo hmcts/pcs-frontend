@@ -14,7 +14,6 @@ import {
   confirmationHeader,
   manageCaseDetailsUrl,
   refusedOrderEvent,
-  renderNoOrder,
   xuiHeaderModel,
 } from '@utils/orderCase';
 
@@ -101,9 +100,7 @@ export default function makeOrderRoutes(app: Application): void {
       );
       res.render('make-order', pageModel(req, started));
     } catch (error) {
-      refusedOrderEvent(res, next, error, rejected =>
-        renderNoOrder(req, res, 'No order to change', rejected, ['judge'])
-      );
+      refusedOrderEvent(res, next, error);
     }
   });
 
@@ -177,10 +174,7 @@ export default function makeOrderRoutes(app: Application): void {
       }
       return res.redirect(manageCaseDetailsUrl(caseReference));
     } catch (error) {
-      // The order pcs-api refused the change to is no longer the judge's to change either.
-      refusedOrderEvent(res, next, error, rejected =>
-        renderNoOrder(req, res, 'No order to change', rejected, ['judge'])
-      );
+      refusedOrderEvent(res, next, error);
     }
   });
 

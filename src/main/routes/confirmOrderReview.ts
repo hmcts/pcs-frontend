@@ -15,7 +15,6 @@ import {
   confirmationHeader,
   manageCaseDetailsUrl,
   refusedOrderEvent,
-  renderNoOrder,
   xuiHeaderModel,
 } from '@utils/orderCase';
 import {
@@ -343,8 +342,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
         continueUrl: pageUrl(caseReference, 'review'),
       });
     } catch (error) {
-      // pcs-api refuses to start the review when the chosen order is not waiting for one.
-      refusedOrderEvent(res, next, error, rejected => renderNoOrder(req, res, 'No order to review', rejected));
+      refusedOrderEvent(res, next, error);
     }
   });
 
