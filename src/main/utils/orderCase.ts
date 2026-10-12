@@ -1,4 +1,4 @@
-import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
+import { buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import type { DocWeaveSnapshot } from '@hmcts-cft/docweave';
 import config from 'config';
 import type { NextFunction, Request, Response } from 'express';
@@ -101,16 +101,16 @@ export function manageCaseDetailsUrl(caseReference: string): string {
 }
 
 /**
- * Answers an order event that was refused. pcs-api refuses one with its reasons, which the page answers.
- * CCD decides who may use an order event from their role assignments: anyone else is not given the
- * event's payload or allowed to submit it, and is shown the page does not exist. Any other error goes
- * on to the error handler.
+ * Answers an order event that was refused. pcs-api refuses one with its reasons, which the page answers
+ * if it can; otherwise the error handler logs them and shows a generic error. CCD decides who may use
+ * an order event from their role assignments: anyone else is not given the event's payload or allowed
+ * to submit it, and is shown the page does not exist.
  */
 export function refusedOrderEvent(
   res: Response,
   next: NextFunction,
   error: unknown,
-  rejected: (error: CallbackRejectedError) => void
+  rejected: (error: CallbackRejectedError) => void = next
 ): void {
   if (error instanceof CallbackRejectedError) {
     return rejected(error);
@@ -119,24 +119,4 @@ export function refusedOrderEvent(
     return void res.status(404).send('Not Found');
   }
   next(error);
-}
-
-/**
- * pcs-api would not start the event on the chosen order, such as one already reviewed: say why, under the
- * header XUI shows the user by the role assignment the event is limited to.
- */
-export function renderNoOrder(
-  req: Request,
-  res: Response,
-  heading: string,
-  error: CallbackRejectedError,
-  roleAssignments: string[] = []
-): void {
-  res.render('no-order', {
-    headerModel: xuiHeaderModel(req, roleAssignments),
-    footerModel: buildFooterModel(),
-    heading,
-    reasons: error.reasons,
-    closeUrl: manageCaseDetailsUrl(req.params.caseReference as string),
-  });
 }
