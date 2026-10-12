@@ -68,15 +68,15 @@ const t = ((key: string) => {
 }) as unknown as (key: string, options?: unknown) => string;
 
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
-import { step } from '../../../../main/steps/respond-to-claim/installment-payments';
+import { step } from '../../../../main/steps/respond-to-claim/instalment-payments';
 
-describe('respond-to-claim installment-payments step', () => {
+describe('respond-to-claim instalment-payments step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createReq = (overrides: Record<string, unknown> = {}): any => ({
     body: {},
-    originalUrl: '/case/1234567890123456/respond-to-claim/installment-payments',
+    originalUrl: '/case/1234567890123456/respond-to-claim/instalment-payments',
     query: { lang: 'en' },
     params: { caseReference: '1234567890123456' },
     session: {
@@ -96,8 +96,8 @@ describe('respond-to-claim installment-payments step', () => {
   });
 
   it('exposes correct step url and view', () => {
-    expect(step.name).toBe('installment-payments');
-    expect(step.url).toBe('/case/:caseReference/respond-to-claim/installment-payments');
+    expect(step.name).toBe('instalment-payments');
+    expect(step.url).toBe('/case/:caseReference/respond-to-claim/instalment-payments');
     expect(step.view).toContain('instalmentOffer.njk');
   });
 

@@ -46,7 +46,7 @@ const KEY_DRIFT_ALLOWLIST = new Set([
   'respondToClaim/legalrep/endOfJourneyCya.json',
   'respondToClaim/legalrep/exceptionalHardship.json',
   'respondToClaim/legalrep/haveYouAppliedForUniversalCredit.json',
-  'respondToClaim/legalrep/installmentPayments.json',
+  'respondToClaim/legalrep/instalmentPayments.json',
   'respondToClaim/legalrep/nonRentArrearsDispute.json',
   'respondToClaim/legalrep/priorityDebts.json',
   'respondToClaim/legalrep/repaymentsAgreed.json',

@@ -11,7 +11,7 @@ const QUESTION_PAGE: Record<string, string> = {
   makeCounterClaim: 'counterClaim',
   anyPaymentsMade: 'repaymentsMade',
   repaymentPlanAgreed: 'repaymentsAgreed',
-  repayArrearsInstalments: 'installmentPayments',
+  repayArrearsInstalments: 'instalmentPayments',
   dependantChildren: 'doYouHaveAnyDependantChildren',
   otherDependants: 'doYouHaveAnyOtherDependants',
   otherTenants: 'doAnyOtherAdultsLiveInYourHome',
