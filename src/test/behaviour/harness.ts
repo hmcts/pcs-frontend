@@ -170,9 +170,13 @@ function ccdStub(): Express {
   return ccd;
 }
 
+/**
+ * Listens on loopback by address, not the wildcard: the kernel can hand a server bound to the wildcard's
+ * port to another process binding 127.0.0.1 at the same moment, which then answers this process's requests.
+ */
 function listen(app: Express): Promise<http.Server> {
   return new Promise(resolve => {
-    const server = app.listen(0, () => resolve(server));
+    const server = app.listen(0, '127.0.0.1', () => resolve(server));
   });
 }
 
@@ -273,11 +277,11 @@ export async function bootApp(
   const server = await listen(app);
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 
-  const requestOnce = (method: string, path: string, body?: string): Promise<HttpResponse> =>
+  const request = (method: string, path: string, body?: string): Promise<HttpResponse> =>
     new Promise((resolve, reject) => {
       const req = http.request(
         `${baseUrl}${path}`,
-        { method, headers: body ? { 'content-type': 'application/x-www-form-urlencoded' } : {} },
+        { method, agent: false, headers: body ? { 'content-type': 'application/x-www-form-urlencoded' } : {} },
         res => {
           let text = '';
           res.setEncoding('utf8');
@@ -288,21 +292,6 @@ export async function bootApp(
       req.on('error', reject);
       req.end(body);
     });
-
-  // On a busy CI host the loopback connection to this test's own server can be
-  // reset before it completes (ECONNRESET), independent of the application's
-  // behaviour; a single retry absorbs that without masking a real failure,
-  // which would still surface as a wrong status, body or a repeat of the reset.
-  const request = async (method: string, path: string, body?: string): Promise<HttpResponse> => {
-    try {
-      return await requestOnce(method, path, body);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException)?.code !== 'ECONNRESET') {
-        throw error;
-      }
-      return requestOnce(method, path, body);
-    }
-  };
 
   return {
     get: path => request('GET', path),
@@ -341,7 +330,7 @@ export async function openPage(html: string): Promise<Page> {
   initMakeOrder();
   const form = document.querySelector<HTMLFormElement>('#make-order-form');
   if (!form) {
-    throw new Error('The make order form is not on the page');
+    throw new Error(`The make order form is not on the page: ${document.body?.textContent?.trim().slice(0, 200)}`);
   }
   return {
     form,
