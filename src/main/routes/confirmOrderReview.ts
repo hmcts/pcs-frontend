@@ -162,15 +162,6 @@ function shownReviewDates(answers: OrderReviewAnswers): ReviewDateAnswer[] {
   return answers.reviewDates.length ? answers.reviewDates : [blankReviewDate()];
 }
 
-function reviewDateLabel(reviewDate: ReviewDateAnswer): string {
-  const { day, month, year } = reviewDate;
-  return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
-}
-
-function reasonLabel(reason: string): string {
-  return REVIEW_REASONS.find(option => option.value === reason)?.text ?? reason;
-}
-
 function partyChoices(review: OrderReviewSession) {
   const { claimants, defendants } = review.caseContext;
   // In claim order: the claimants, then the defendants in the order they were added to the claim.
@@ -196,34 +187,58 @@ async function submitReview(req: Request, review: OrderReviewSession, action: 'R
   review.outcome = action === 'ISSUE' ? 'ISSUED' : 'RETURNED_TO_JUDGE';
 }
 
+/** The caseworker's answers in the order asked, in a section per page, which each is changed on. */
 function checkYourAnswersContent(req: Request, review: OrderReviewSession): Record<string, unknown> {
   const { answers } = review;
-  const change = (page: Page) => pageUrl(caseReferenceOf(req), page);
+  const label = (options: readonly { value: string; text: string }[], value?: string) =>
+    options.find(option => option.value === value)?.text ?? value ?? '';
   const yesNo = (value?: string) => (value === 'yes' ? 'Yes' : 'No');
+  const row = (key: string, hiddenText: string, ...lines: string[]) => ({ key, hiddenText, lines });
+  const reviewDates = answers.hasReviewDates === 'yes' ? answers.reviewDates : [];
   const partyNames = new Map(partyChoices(review).map(party => [party.value, party.text]));
+  const partiesToServe = answers.partiesToServe.map(id => partyNames.get(id) ?? id);
   return {
-    reviewDates:
-      answers.hasReviewDates === 'yes'
-        ? answers.reviewDates.map(reviewDate => ({
-            date: reviewDateLabel(reviewDate),
-            reason: reasonLabel(reviewDate.reason),
-            description: reviewDate.description.trim(),
-          }))
-        : [],
-    rows: {
-      hasReviewDates: { value: yesNo(answers.hasReviewDates), href: change('reviewDates') },
-      nextSteps: {
-        value: NEXT_STEPS.find(option => option.value === answers.nextSteps)?.text,
-        href: change('proceedToIssue'),
+    sections: [
+      {
+        heading: 'Review dates',
+        id: 'review-dates-answers',
+        href: pageUrl(caseReferenceOf(req), 'reviewDates'),
+        rows: [
+          row('Are there any review dates to add?', 'whether there are review dates', yesNo(answers.hasReviewDates)),
+          ...reviewDates.map(({ day, month, year, reason, description }, index) =>
+            row(
+              `Review date ${index + 1}`,
+              `review date ${index + 1}`,
+              `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`,
+              label(REVIEW_REASONS, reason),
+              description.trim()
+            )
+          ),
+        ],
       },
-      finalOrder: { value: yesNo(answers.finalOrder), href: change('proceedToIssue') },
-      serveAllParties: { value: yesNo(answers.serveAllParties), href: change('proceedToIssue') },
-      partiesToServe:
-        answers.serveAllParties === 'no'
-          ? { value: answers.partiesToServe.map(id => partyNames.get(id) ?? id), href: change('proceedToIssue') }
-          : undefined,
-      seal: { value: SEALS.find(option => option.value === answers.seal)?.text, href: change('proceedToIssue') },
-    },
+      {
+        heading: 'Proceed to issue',
+        id: 'issue-answers',
+        href: pageUrl(caseReferenceOf(req), 'proceedToIssue'),
+        rows: [
+          row(
+            'Have all the next steps for court staff been completed?',
+            'next steps',
+            label(NEXT_STEPS, answers.nextSteps)
+          ),
+          row('Is this a final order?', 'whether this is a final order', yesNo(answers.finalOrder)),
+          row(
+            'Should this order be served on all parties?',
+            'whether to serve all parties',
+            yesNo(answers.serveAllParties)
+          ),
+          ...(answers.serveAllParties === 'no'
+            ? [row('Who should the order be served on?', 'who to serve', ...partiesToServe)]
+            : []),
+          row('Which seal should this order have?', 'the seal', label(SEALS, answers.seal)),
+        ],
+      },
+    ],
   };
 }
 
