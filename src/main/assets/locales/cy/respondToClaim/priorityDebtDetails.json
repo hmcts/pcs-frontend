@@ -4,7 +4,7 @@
   "totalQuestion": "Beth yw'r cyfanswm sy'n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth?",
   "contributionQuestion": "Faint ydych yn ei dalu tuag at eich dyledion blaenoriaeth bob wythnos neu fis?",
   "frequencyQuestion": "Talu pob:",
-  "amountHint": "Rhowch y cyfanswm mewn punnoedd a cheiniogau, er enghraifft £148.00 neu £148.50",
+  "amountHint": "Rhowch y cyfanswm mewn punnoedd a cheiniogau, er enghraifft £148 neu £148.50",
   "frequency": {
     "week": "Wythnos",
     "month": "Mis"
@@ -18,7 +18,7 @@
     "priorityDebtContributionMax": "Rhaid i'r swm a delir gennych tuag at eich dyledion blaenoriaeth bob wythnos neu bob mis fod yn llai nag £1 biliwn",
     "priorityDebtContributionFrequency": "Dewiswch pa mor aml rydych yn talu'r swm a nodwyd gennych uchod",
     "amount": {
-      "invalidFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148.00 neu 148.50"
+      "invalidFormat": "Rhowch swm yn y fformat cywir, er enghraifft 148 neu 148.50"
     }
   }
 }

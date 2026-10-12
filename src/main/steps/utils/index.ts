@@ -37,10 +37,12 @@ export {
 export { ccdPenceToPoundsString, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export {
+  STAFF_USER_ROLES,
   LEGAL_REPRESENTATIVE_USER_ROLES,
   getUserRoles,
   getUserToken,
   getUserType,
+  isStaffUser,
   isLegalRepresentativeUser,
 } from './userRole';
 export { getPreviousStepForCounterClaimAbout } from './getPreviousStepForCounterClaimAbout';

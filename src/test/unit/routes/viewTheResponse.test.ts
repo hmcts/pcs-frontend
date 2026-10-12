@@ -12,6 +12,7 @@ import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.inter
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
+import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
   typeof isRespondToClaimEnabledForRelease
@@ -44,6 +45,38 @@ const translationStrings: Record<string, string> = {
   'viewTheResponse:counterclaim.needHelpWithFeesOptions.NO': 'I do not need help paying the fee',
   'viewTheResponse:personsUnknown': 'Persons unknown',
   'viewTheResponse:addressUnknown': 'Address unknown',
+  'viewTheResponse:answers.possessionNoticeReceived.yes': 'Yes',
+  'viewTheResponse:answers.possessionNoticeReceived.no': 'No',
+  'viewTheResponse:answers.makeCounterClaim.yes': 'Yes',
+  'viewTheResponse:answers.makeCounterClaim.no': 'No',
+  'viewTheResponse:answers.anyPaymentsMade.yes': 'Yes',
+  'viewTheResponse:answers.anyPaymentsMade.no': 'No',
+  'viewTheResponse:answers.repaymentPlanAgreed.yes': 'Yes',
+  'viewTheResponse:answers.repaymentPlanAgreed.no': 'No',
+  'viewTheResponse:answers.repayArrearsInstalments.yes': 'Yes',
+  'viewTheResponse:answers.repayArrearsInstalments.no': 'No',
+  'viewTheResponse:answers.dependantChildren.yes': 'Yes',
+  'viewTheResponse:answers.dependantChildren.no': 'No',
+  'viewTheResponse:answers.otherDependants.yes': 'Yes',
+  'viewTheResponse:answers.otherDependants.no': 'No',
+  'viewTheResponse:answers.otherTenants.yes': 'Yes',
+  'viewTheResponse:answers.otherTenants.no': 'No',
+  'viewTheResponse:answers.alternativeAccommodation.yes': 'Yes',
+  'viewTheResponse:answers.alternativeAccommodation.no': 'No',
+  'viewTheResponse:answers.shareAdditionalCircumstances.yes': 'Yes',
+  'viewTheResponse:answers.shareAdditionalCircumstances.no': 'No',
+  'viewTheResponse:answers.exceptionalHardship.yes': 'Yes',
+  'viewTheResponse:answers.exceptionalHardship.no': 'No',
+  'viewTheResponse:answers.universalCreditApplied.yes': 'Yes',
+  'viewTheResponse:answers.universalCreditApplied.no': 'No',
+  'viewTheResponse:answers.priorityDebts.yes': 'Yes',
+  'viewTheResponse:answers.priorityDebts.no': 'No',
+  'viewTheResponse:answers.otherConsiderations.yes': 'Yes',
+  'viewTheResponse:answers.otherConsiderations.no': 'No',
+  'viewTheResponse:answers.isClaimAmountKnown.yes': 'Yes',
+  'viewTheResponse:answers.isClaimAmountKnown.no': 'No',
+  'viewTheResponse:answers.appliedForHwf.yes': 'Yes',
+  'viewTheResponse:answers.appliedForHwf.no': 'No',
 };
 
 jest.mock('@modules/i18n', () => ({
@@ -1299,6 +1332,32 @@ describe('viewTheResponse route', () => {
     } as unknown as CcdCaseData);
 
     expect(renderArgs.counterclaimPdfUrl).toBe(`/case/${caseReference}/view-documents/counterclaim-pdf-id`);
+  });
+
+  it('should not build counterclaimPdfUrl when release 1.4 is off', async () => {
+    (getLaunchDarklyFlag as jest.Mock).mockImplementation((_req, flagName) =>
+      Promise.resolve(flagName !== RELEASE_1_4_ENABLED)
+    );
+
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'counterclaim-pdf-id',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'counterclaim-pdf-id',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
   });
 
   it('should not build counterclaimPdfUrl when counterclaimDocumentId is not present', async () => {
