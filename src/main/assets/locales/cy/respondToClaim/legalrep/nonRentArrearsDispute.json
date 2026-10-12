@@ -1,6 +1,6 @@
 {
   "pageTitle": "Gwrthwynebu’r hawliad",
-  "heading": "hawliad {{claimantName}}",
+  "heading": "Hawliad {{claimantName}}",
   "disputeOtherPartsQuestion": "A ydy'r diffynnydd yn gwrthwynebu unrhyw rannau eraill o'r hawliad?",
   "disputeDetails": {
     "label": "Eglurwch pa rannau o'r hawliad nad yw'r diffynnydd yn cytuno â nhw"

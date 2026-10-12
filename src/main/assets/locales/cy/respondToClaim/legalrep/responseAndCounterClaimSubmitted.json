@@ -1,13 +1,13 @@
 {
-  "pageTitle": "cyResponse and counterclaim submitted",
-  "responseAndCounterClaimSubmittedParagraph1": "cyWe’ve sent you a confirmation email.",
-  "responseAndCounterClaimSubmittedParagraph2": "cyBefore the court can send the counterclaim to the other parties or a judge can consider it, the court must review the Help With Fees application linked to the counterclaim.",
-  "responseAndCounterClaimSubmittedParagraph3": "cyIf the court does not approve the defendant’s Help With Fees application, they might need to pay all or part of the counterclaim fee.",
-  "responseAndCounterClaimSubmittedParagraph4": "cyWe’ll notify you of the outcome of your Help With Fees application.",
-  "responseAndCounterClaimSubmittedHeading1": "cyWhat to do next",
-  "responseAndCounterClaimSubmittedListItem1": "cyIf you’re representing more than one defendant in this case, you must submit a separate response for each one.",
-  "responseAndCounterClaimSubmittedListItem2": "cySome people need <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"noreferrer noopener\">support to use HMCTS services (opens in new tab)</a>, like step-free access to a court for a hearing. If you or the defendant need support, you should request this now.",
+  "pageTitle": "Ymateb a gwrth-hawliad wedi’i gyflwyno",
+  "responseAndCounterClaimSubmittedParagraph1": "Rydym wedi anfon neges gadarnhau atoch drwy e-bost.",
+  "responseAndCounterClaimSubmittedParagraph2": "Cyn y gall y llys anfon y gwrth-hawliad at y partion eraill neu y gall barnwr ei ystyried, rhaid i’r llys adolygu’r cais Help Gyda Ffioedd sy’n gysylltiedig â’r gwrth-hawliad.",
+  "responseAndCounterClaimSubmittedParagraph3": "Os nad yw’r llys yn cymeradwyo cais y diffynnydd am Help i Dalu Ffioedd, efallai y byddant angen talu’r cyfan neu ran o’r ffi gwrth-hawliad.",
+  "responseAndCounterClaimSubmittedParagraph4": "Byddwn yn eich hysbysu am ganlyniad eich cais Help Gyda Ffioedd.",
+  "responseAndCounterClaimSubmittedHeading1": "Beth i’w wneud nesaf",
+  "responseAndCounterClaimSubmittedListItem1": "Os ydych yn cynrychioli mwy nag un diffynnydd yn yr achos hwn, rhaid i chi gyflwyno ymateb ar wahân i bob un.",
+  "responseAndCounterClaimSubmittedListItem2": "Mae angen <a href=\"\" class=\"govuk-link\" target=\"_blank\" rel=\"noreferrer noopener\">cymorth ar rai pobl i ddefnyddio gwasanaethau GLlTEF (yn agor mewn tab newydd)</a>, fel mynediad di-risiau i lys ar gyfer gwrandawiad. Os oes angen cymorth arnoch chi neu’r diffynnydd, dylech ofyn am hyn nawr.",
   "responseAndCounterClaimSubmittedHeading2": "",
   "responseAndCounterClaimSubmittedParagraph5": "",
-  "closeAndReturnToCaseOverview": "cyClose and return to case overview"
+  "closeAndReturnToCaseOverview": "Cau a dychwelyd i drosolwg o’r achos"
 }
