@@ -302,6 +302,20 @@ describe('confirm order review', () => {
       expect(submittedReviews()).toEqual([]);
     });
 
+    it('does not return the order to the judge with a query longer than a case note can hold', async () => {
+      app = await caseworkerReviewing();
+      await app.get(INTRO);
+
+      const tooLong = await app.post(
+        REVIEW,
+        new URLSearchParams({ 'send-query': 'yes', 'query-to-judge': 'a'.repeat(501), action: 'RETURN_TO_JUDGE' })
+      );
+
+      expect(tooLong.status).toBe(400);
+      expect(errors(tooLong.text)).toEqual(['Your query for the Judge must be 500 characters or less']);
+      expect(submittedReviews()).toEqual([]);
+    });
+
     it('cancels the review, keeping nothing, and returns the caseworker to the case', async () => {
       app = await caseworkerReviewing();
       await issueFromReview(app);
