@@ -684,8 +684,7 @@ export default function viewTheResponseRoutes(app: Application): void {
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
       const release12Enabled = await isRespondToClaimEnabledForRelease(req);
       const showExemptLandlord = release12Enabled && isWalesProperty(caseData);
-      const rankedDefendantNumbering =
-        release12Enabled && (await getLaunchDarklyFlag(req, RELEASE_1_4_ENABLED, false));
+      const rankedDefendantNumbering = release12Enabled && (await getLaunchDarklyFlag(req, RELEASE_1_4_ENABLED, false));
 
       const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
