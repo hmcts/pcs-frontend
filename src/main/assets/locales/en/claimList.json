@@ -6,7 +6,7 @@
   "table": {
     "claimNumber": "Claim number",
     "claimantsName": "Claimant’s name",
-    "propertyPostcode": "Property postcode",
+    "propertyPostcode": "Property postcodes ",
     "actions": "Actions",
     "viewClaim": "View claim"
   },
