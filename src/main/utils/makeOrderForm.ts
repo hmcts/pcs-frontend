@@ -24,6 +24,14 @@ const DATE_FACTS: Record<string, string> = {
   lastPaymentDate: 'date-last-payment',
 };
 
+/** Every case facts field empty, so recorded facts leave none of a saved order's behind. */
+const BLANK_FACTS: FormData = Object.fromEntries(
+  [
+    ...Object.values(FACT_FIELDS),
+    ...Object.values(DATE_FACTS).flatMap(field => ['day', 'month', 'year'].map(part => `${field}-${part}`)),
+  ].map(field => [field, ''])
+);
+
 /** Pre-fills the case facts fields, in the form's field names. */
 function caseFactsFormData(caseFacts: Record<string, unknown> = {}): FormData {
   const formData: FormData = {};
@@ -127,14 +135,16 @@ export interface OrderFormSubmission {
  */
 export function orderFormModel(start: OrderStart, submission?: OrderFormSubmission): Record<string, unknown> {
   const { caseContext, order, hearing } = start;
-  // A hearing's order starts from the facts last recorded for the case, and its own note.
+  // A hearing's facts and note are pcs-api's record of the hearing, which replaces any copy the saved order holds.
+  const recorded: FormData = hearing
+    ? { ...BLANK_FACTS, ...caseFactsFormData(hearing.caseFacts), 'hearing-notes': hearing.note ?? '' }
+    : {};
   const draft: FormData = {
-    ...caseFactsFormData(hearing?.caseFacts ?? caseContext.caseFacts),
+    ...caseFactsFormData(caseContext.caseFacts),
     ...(hearing?.recorded && hearing.recorded.hearingDate !== hearing.date
       ? dateFields('date-last-hearing', hearing.recorded.hearingDate)
       : {}),
-    ...(hearing?.note ? { 'hearing-notes': hearing.note } : {}),
-    ...(submission?.formData ?? order.formData),
+    ...(submission?.formData ?? { ...order.formData, ...recorded }),
   };
   return {
     draft,
