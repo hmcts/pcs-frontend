@@ -132,11 +132,30 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   }
 }
 
-// Match the notes field to the facts grid on desktop.
+// The hearing the facts are for, and whose facts they started from.
+.pcs-case-facts__source {
+  margin: govuk-spacing(1) 0 0;
+  color: $govuk-secondary-text-colour;
+}
+
+// Match the notes column to the facts grid on desktop: this hearing's note above, and the earlier
+// notes filling the rest of the column, scrolling within it.
+.pcs-hearing-notes {
+  display: flex;
+  flex-direction: column;
+  gap: govuk-spacing(2);
+  min-height: 0;
+}
+
 @include govuk-media-query($from: desktop) {
-  .pcs-case-facts__layout > .govuk-form-group {
+  .pcs-hearing-notes > .govuk-form-group {
     display: flex;
+    flex: 1 1 auto;
     flex-direction: column;
+  }
+
+  .pcs-hearing-notes:has(.pcs-earlier-notes) > .govuk-form-group {
+    flex: 0 0 auto;
   }
 
   .pcs-case-facts__layout textarea {
@@ -147,6 +166,45 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
     // Resizing remains available below desktop where the field no longer tracks the grid.
     resize: none;
   }
+}
+
+// Earlier notes are read only, so they are greyed out and scroll back within the column.
+.pcs-earlier-notes {
+  flex: 1 1 0;
+  min-height: govuk-spacing(9);
+  max-height: 20rem;
+  overflow-y: auto;
+  border: 1px solid $govuk-border-colour;
+  background-color: govuk-colour('black', $variant: 'tint-80');
+  color: $govuk-secondary-text-colour;
+
+  &:focus {
+    outline: $govuk-focus-width solid $govuk-focus-colour;
+  }
+}
+
+.pcs-earlier-notes__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pcs-earlier-notes__note {
+  padding: govuk-spacing(2);
+
+  & + & {
+    border-top: 1px solid $govuk-border-colour;
+  }
+}
+
+.pcs-earlier-notes__meta {
+  margin-bottom: govuk-spacing(1);
+  font-weight: $govuk-font-weight-bold;
+}
+
+.pcs-earlier-notes__text {
+  margin-bottom: 0;
+  white-space: pre-wrap;
 }
 
 // Divide distinct tab questions, excluding fields that continue the previous question.

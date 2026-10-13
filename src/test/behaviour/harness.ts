@@ -33,6 +33,7 @@ interface Envelope {
     queryFromCaseworker?: string;
   };
   caseContext: Record<string, unknown>;
+  hearing?: Record<string, unknown> | null;
 }
 
 const blankCase = (): Envelope => ({
@@ -55,6 +56,13 @@ let startTokens: string[] = [];
 
 /** The tokens the make order event has been submitted with, in order. */
 let submittedTokens: string[] = [];
+
+/** The client context each event start was given, in order: what the user's link chose. */
+let startContexts: (Record<string, unknown> | undefined)[] = [];
+
+export function startClientContexts(): (Record<string, unknown> | undefined)[] {
+  return startContexts;
+}
 
 /** How many times the make order event has been started. */
 export function eventStarts(): number {
@@ -124,6 +132,8 @@ function ccdStub(): Express {
   ccd.use(express.json({ limit: '10mb' }));
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
     const event = req.params.event as string;
+    const clientContext = req.headers['client-context'];
+    startContexts.push(typeof clientContext === 'string' ? JSON.parse(clientContext) : undefined);
     if (startRefusal && mayUse(req, event)) {
       const reason = startRefusal;
       startRefusal = undefined;
@@ -207,6 +217,8 @@ export async function bootApp(
     openApplication?: boolean;
     /** The order pcs-api starts the event with, over a blank one. */
     order?: Partial<Envelope['order']>;
+    /** The hearing pcs-api starts the event for, if any. */
+    hearing?: Record<string, unknown>;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -216,7 +228,9 @@ export async function bootApp(
   envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
   envelope.caseContext.openApplication = options.openApplication ?? false;
   envelope.order = { ...envelope.order, ...options.order };
+  envelope.hearing = options.hearing ?? null;
   startTokens = [];
+  startContexts = [];
   submittedTokens = [];
   reviewRequests = [];
   orderRequests = [];
