@@ -228,25 +228,40 @@ export function initApplicationListing(form: HTMLFormElement): void {
   });
 }
 
+/** The decision chosen on an application, which has its own document as each order type does. */
+function applicationDecision(form: HTMLFormElement): string {
+  return form.querySelector<HTMLInputElement>('input[name="application-decision"]:checked')?.value ?? '';
+}
+
+interface SnapshotNode {
+  type: string;
+  attrs?: { id?: string | null };
+  content?: SnapshotNode[];
+  text?: string;
+}
+
 /**
- * The applicant's wording, added to the end of the order as the judge's own clauses, so they can change
- * or delete any of it as they would anything they typed. Once added, the form says so and the button is spent.
+ * Adds the applicant's wording to the order as the judge's own numbered clauses, straight after "IT IS
+ * ORDERED THAT", to change or delete as they would their own. Docweave's insert can only add wording at the
+ * end, and not as numbered clauses after an unnumbered line, so the wording goes into the snapshot instead.
  */
-export function initRequestedWording(form: HTMLFormElement, editor: Pick<DocEditorController, 'insert'>): void {
-  const button = form.querySelector<HTMLButtonElement>('[data-use-requested-wording]');
-  const added = form.querySelector<HTMLInputElement>('input[name="application-wording-added"]');
+function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController): void {
   const wording = form.querySelector<HTMLElement>('[data-application]')?.dataset.applicationWording ?? '';
-  if (!button || !added) {
+  const paragraphs = requestedParagraphs(wording);
+  const snapshot = editor.getSnapshot();
+  const content = (snapshot.current as unknown as SnapshotNode).content;
+  const orderedThat = content?.findIndex(node => node.attrs?.id === 'paragraph:ordered-that') ?? -1;
+  if (!paragraphs.length || !content || orderedThat < 0) {
     return;
   }
-  button.addEventListener('click', () => {
-    if (!editor.insert(requestedParagraphs(wording), { at: 'end' })) {
-      return;
-    }
-    added.value = 'yes';
-    button.disabled = true;
-    button.textContent = 'Added to the order preview';
+  const clause = (text: string): SnapshotNode => ({
+    type: 'list_item',
+    attrs: { id: null },
+    content: [{ type: 'paragraph', attrs: { id: null }, content: [{ type: 'text', text }] }],
   });
+  content.splice(orderedThat + 1, 0, { type: 'ordered_list', attrs: { id: null }, content: paragraphs.map(clause) });
+  editor.load(snapshot);
+  editor.render(buildOrderDocument(form));
 }
 
 export function initMakeOrder(): void {
@@ -272,8 +287,11 @@ export function initMakeOrder(): void {
   }
 
   let orderType: OrderType | undefined;
-  // One document per order type, so switching tabs and back keeps any edits.
-  const documents: Partial<Record<OrderType, DocWeaveSnapshot>> = {};
+  let key: string | undefined;
+  // One document per order type, and per decision on an application, so switching and back keeps any edits.
+  const documents: Record<string, DocWeaveSnapshot> = {};
+  const documentKey = (type: OrderType): string =>
+    type === 'APPLICATION_DECISION' ? `${type}:${applicationDecision(form)}` : type;
   const editor = createDocEditor({
     mount,
     label: 'Order',
@@ -285,15 +303,36 @@ export function initMakeOrder(): void {
     // A document the field cannot hold is regenerated from the form.
     onError: () => (documentField.value = ''),
     onChange: snapshot => {
-      if (orderType) {
-        documents[orderType] = snapshot;
+      if (key) {
+        documents[key] = snapshot;
       }
     },
   });
   if (documentField.value) {
-    documents[orderTypeField.value as OrderType] = editor.getSnapshot();
+    documents[documentKey(orderTypeField.value as OrderType)] = editor.getSnapshot();
   }
   const render = (): void => editor.render(buildOrderDocument(form));
+  // Using the applicant's wording starts its document with their wording, which a reset puts back.
+  const startDocument = (): void => {
+    editor.load();
+    render();
+    if (key === 'APPLICATION_DECISION:grant') {
+      insertRequestedWording(form, editor);
+    }
+  };
+  const selectDocument = (): void => {
+    const next = documentKey(orderType!);
+    if (key === next) {
+      return;
+    }
+    key = next;
+    if (documents[next]) {
+      editor.load(documents[next]);
+      render();
+    } else {
+      startDocument();
+    }
+  };
   const selectOrderType = (type: OrderType): void => {
     if (orderType === type) {
       return;
@@ -301,8 +340,7 @@ export function initMakeOrder(): void {
     orderType = type;
     orderTypeField.value = type;
     syncSuspendedOnlyCosts(form, type);
-    editor.load(documents[type]);
-    render();
+    selectDocument();
   };
 
   // GOV.UK tabs record the open tab in the fragment for clicks, arrow keys and history.
@@ -325,12 +363,21 @@ export function initMakeOrder(): void {
     }
     followTab();
   });
+  const reset = form.querySelector<HTMLButtonElement>('[data-restore-requested-wording]');
+  reset?.addEventListener('click', startDocument);
+  form.addEventListener('change', event => {
+    if ((event.target as HTMLInputElement).name === 'application-decision') {
+      selectDocument();
+      if (reset) {
+        reset.hidden = applicationDecision(form) !== 'grant';
+      }
+    }
+  });
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
-  initRequestedWording(form, editor);
   initApplicationListing(form);
 }
 
