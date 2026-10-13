@@ -332,7 +332,7 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
   return issues;
 }
 
-export const APPLICATION_DECISIONS = ['grant', 'refuse', 'strike-out', 'list', 'other'] as const;
+export const APPLICATION_DECISIONS = ['grant', 'dismiss', 'strike-out', 'list', 'other'] as const;
 
 /** What the judge decides about the application, and whether a hearing they list it for is on notice. */
 function validateApplicationDecision(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
