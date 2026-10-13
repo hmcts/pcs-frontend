@@ -56,14 +56,31 @@ describe('make an order: deciding an application', () => {
         'The application is granted.',
       ].join('\n')
     );
-    expect(control<HTMLButtonElement>('[data-use-requested-wording]').disabled).toBe(false);
+    expect(page.documentText()).not.toContain('The hearing on 14 October is adjourned.');
+
+    const button = control<HTMLButtonElement>('[data-use-requested-wording]');
+    button.click();
+
+    expect(page.documentText()).toBe(
+      [
+        'UPON the application of Jane Doe (Defendant) dated 1 October 2026 (GA2) to adjourn the hearing',
+        'AND UPON the Court considering the application without a hearing',
+        'IT IS ORDERED THAT:',
+        'The application is granted.',
+        'The hearing on 14 October is adjourned.',
+        'Costs in the case.',
+      ].join('\n')
+    );
+    expect(button.disabled).toBe(true);
+    expect(button.textContent?.trim()).toBe('Added to the order preview');
 
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     expect((await app.post(PAGE, body)).status).toBe(302);
-    const [submitted] = submittedOrders() as { order: Record<string, unknown> }[];
+    const [submitted] = submittedOrders() as { order: Record<string, unknown>; formData?: unknown }[];
     expect(submitted.order.genAppId).toBe('gen-app-1');
     expect(submitted.order.orderType).toBe('APPLICATION_DECISION');
+    expect((submitted.order.formData as Record<string, unknown>)['application-wording-added']).toBe('yes');
   });
 
   it("splits the applicant's wording into paragraphs, keeping lines they wrapped by hand together", () => {
