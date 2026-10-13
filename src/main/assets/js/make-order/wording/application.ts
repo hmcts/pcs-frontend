@@ -32,7 +32,7 @@ export function requestedParagraphs(wording: string): string[] {
 
 const DECISIONS: Record<string, string> = {
   grant: 'The application is granted.',
-  refuse: 'The application is refused.',
+  dismiss: 'The application is dismissed.',
   'strike-out': 'The application is struck out.',
 };
 

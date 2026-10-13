@@ -108,6 +108,12 @@ describe('make an order: deciding an application', () => {
     expect(button.textContent?.trim()).toBe('Added to the order preview');
   });
 
+  it('orders the application dismissed', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    check('application-decision', 'dismiss');
+    expect(page.orderText()).toContain('The application is dismissed.');
+  });
+
   it('lists the application for a hearing, on notice unless the judge says otherwise', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     const listing = document.querySelector<HTMLElement>('[data-application-listing]');
