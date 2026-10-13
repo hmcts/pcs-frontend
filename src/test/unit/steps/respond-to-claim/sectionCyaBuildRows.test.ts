@@ -90,7 +90,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(keys).toContain('rows.contactByPhone.label');
     });
 
-    it('contact-by-phone: preference row stands alone; phone number lives in the Contact details row', () => {
+    it('contact-by-phone: displays the phone number under the Yes value', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -101,14 +101,44 @@ describe('section-CYA row builders — characterisation', () => {
         },
       });
       const rows = buildPersonalRows(reqWith(validatedCase), t);
-      const questionRow = rows.find(r => r.key.text === 'rows.contactByPhone.label');
-      const contactDetailsRow = rows.find(r => r.key.text === 'rows.contactDetails.label');
-      // Preference row no longer groups a detail row underneath it.
-      expect(questionRow?.classes).toBeUndefined();
-      expect(contactDetailsRow?.value.html).toContain('<p class="govuk-body">07123456789</p>');
-      // Phone-only: Change link targets the telephone step.
-      expect(contactDetailsRow?.actions?.items[0].href).toContain(
-        '/contact-preferences-telephone?edit=personalDetails'
+      const questionRowIndex = rows.findIndex(r => r.key.text === 'rows.contactByPhone.label');
+      const questionRow = rows[questionRowIndex];
+      const phoneNumberRow = rows[questionRowIndex + 1];
+
+      expect(questionRow.value.text).toBe('options.yes');
+      expect(questionRow.classes).toBe('govuk-summary-list__row--no-border');
+      expect(phoneNumberRow.key).toEqual({
+        text: 'rows.phoneNumber.label',
+        classes: 'govuk-!-font-weight-regular',
+      });
+      expect(phoneNumberRow.value.html).toBe('07123456789');
+      expect(phoneNumberRow.actions?.items[0].href).toContain('/contact-preferences-telephone?edit=personalDetails');
+    });
+
+    it('contact-by-text: displays the text message number under the Yes value', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { contactByPhone: 'YES', contactByText: 'YES' },
+            defendantContactDetails: { party: { textMessageNumber: '07700900982' } },
+          },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const questionRowIndex = rows.findIndex(r => r.key.text === 'rows.contactByText.label');
+      const questionRow = rows[questionRowIndex];
+      const textMessageNumberRow = rows[questionRowIndex + 1];
+
+      expect(questionRow.value.text).toBe('options.yes');
+      expect(questionRow.classes).toBe('govuk-summary-list__row--no-border');
+      expect(textMessageNumberRow.key).toEqual({
+        text: 'rows.textMessageNumber.label',
+        classes: 'govuk-!-font-weight-regular',
+      });
+      expect(textMessageNumberRow.value.html).toBe('07700900982');
+      expect(textMessageNumberRow.actions?.items[0].href).toContain(
+        '/contact-preferences-text-message?edit=personalDetails'
       );
     });
 
