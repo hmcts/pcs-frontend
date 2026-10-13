@@ -74,21 +74,14 @@ describe('make an order: for a hearing', () => {
     expect(document.querySelector('.pcs-hearing-notes__list')?.querySelector('input, textarea')).toBeNull();
   });
 
-  it("shows the hearing's recorded facts and note over those the judge's saved draft holds", async () => {
-    app = await bootApp({
-      hearing: { ...HEARING, note: 'Recorded note' },
-      order: {
-        id: 'draft',
-        version: 2,
-        formData: { 'current-rent': '700', 'arrears-today': '5', 'hearing-notes': 'Old' },
-      },
-    });
+  it('makes an order without a hearing with no case facts or notes, here or in what it sends', async () => {
+    app = await bootApp({ hearing: null });
+    const page = await openPage((await app.get(PAGE)).text);
 
-    await openPage((await app.get(FOR_HEARING)).text);
-
-    expect(control('[name="current-rent"]').value).toBe('900');
-    expect(control('[name="arrears-today"]').value).toBe('1200');
-    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('Recorded note');
+    expect(document.querySelector('[data-case-facts]')).toBeNull();
+    expect(document.querySelector('#hearing-notes')).toBeNull();
+    await app.post(PAGE, page.body('SAVE_DRAFT'));
+    expect(submittedOrders().at(-1)?.hearing).toBeNull();
   });
 
   it("sends the hearing's facts and its recorded note, as changed, with the order for review", async () => {
@@ -105,6 +98,9 @@ describe('make an order: for a hearing', () => {
     const sent = await app.post(FOR_HEARING, page.body('SUBMIT_FOR_REVIEW'));
 
     expect(sent.location).toBe(`${PAGE}/sent-for-review`);
+    // The facts and note go with the hearing, never in the order's own answers.
+    expect(submittedOrders().at(-1)?.order).not.toHaveProperty(['formData', 'current-rent']);
+    expect(submittedOrders().at(-1)?.order).not.toHaveProperty(['formData', 'hearing-notes']);
     expect(submittedOrders().at(-1)?.hearing).toEqual({
       id: 7,
       version: 3,

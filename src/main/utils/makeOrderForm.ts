@@ -24,13 +24,19 @@ const DATE_FACTS: Record<string, string> = {
   lastPaymentDate: 'date-last-payment',
 };
 
-/** Every case facts field empty, so recorded facts leave none of a saved order's behind. */
-const BLANK_FACTS: FormData = Object.fromEntries(
-  [
-    ...Object.values(FACT_FIELDS),
-    ...Object.values(DATE_FACTS).flatMap(field => ['day', 'month', 'year'].map(part => `${field}-${part}`)),
-  ].map(field => [field, ''])
-);
+/** The case facts panel's fields: the hearing's record, which is never part of the order. */
+const HEARING_RECORD_FIELDS = new Set([
+  ...Object.values(FACT_FIELDS),
+  ...[...Object.values(DATE_FACTS), 'date-last-hearing'].flatMap(field =>
+    ['day', 'month', 'year'].map(part => `${field}-${part}`)
+  ),
+  'hearing-notes',
+]);
+
+/** The order's answers, without the hearing's facts and note. */
+export function withoutHearingRecord(formData: FormData): FormData {
+  return Object.fromEntries(Object.entries(formData).filter(([field]) => !HEARING_RECORD_FIELDS.has(field)));
+}
 
 /** Pre-fills the case facts fields, in the form's field names. */
 function caseFactsFormData(caseFacts: Record<string, unknown> = {}): FormData {
@@ -135,17 +141,17 @@ export interface OrderFormSubmission {
  */
 export function orderFormModel(start: OrderStart, submission?: OrderFormSubmission): Record<string, unknown> {
   const { caseContext, order, hearing } = start;
-  // A hearing's facts and note are pcs-api's record of the hearing, which replaces any copy the saved order holds.
+  // A hearing's facts and note are pcs-api's record of the hearing, kept apart from the order.
   const recorded: FormData = hearing
-    ? { ...BLANK_FACTS, ...caseFactsFormData(hearing.caseFacts), 'hearing-notes': hearing.note ?? '' }
+    ? {
+        ...caseFactsFormData(hearing.caseFacts),
+        ...(hearing.recorded && hearing.recorded.hearingDate !== hearing.date
+          ? dateFields('date-last-hearing', hearing.recorded.hearingDate)
+          : {}),
+        'hearing-notes': hearing.note ?? '',
+      }
     : {};
-  const draft: FormData = {
-    ...caseFactsFormData(caseContext.caseFacts),
-    ...(hearing?.recorded && hearing.recorded.hearingDate !== hearing.date
-      ? dateFields('date-last-hearing', hearing.recorded.hearingDate)
-      : {}),
-    ...(submission?.formData ?? { ...order.formData, ...recorded }),
-  };
+  const draft: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
   return {
     draft,
     draftOrderType: submission?.orderType ?? order.orderType ?? DEFAULT_ORDER_TYPE,

@@ -43,8 +43,16 @@ const blankCase = (): Envelope => ({
     propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
     claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
     defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
-    // Arrears on issue as pcs-api sent it before HDPI-6373 had the judge fill it in; the page ignores it.
-    caseFacts: { tenancyStartDate: '2024-01-09', currentRent: 750, arrearsOnIssue: 2400 },
+  },
+  // The hearing the order is made for, starting from the claim's facts.
+  hearing: {
+    id: 1,
+    date: '2026-10-13T10:00:00',
+    version: null,
+    caseFacts: { tenancyStartDate: '2024-01-09', currentRent: 750 },
+    recorded: null,
+    note: null,
+    earlierNotes: [],
   },
 });
 
@@ -165,6 +173,15 @@ function ccdStub(): Express {
       return res.json({ id: req.params.id, data: {} });
     }
     orderRequests.push(posted);
+    // pcs-api records the hearing's facts and note on every save, apart from the order.
+    if (posted.hearing && envelope.hearing) {
+      envelope.hearing = {
+        ...envelope.hearing,
+        version: Number(envelope.hearing.version ?? -1) + 1,
+        caseFacts: posted.hearing.caseFacts,
+        note: posted.hearing.note,
+      };
+    }
     envelope = {
       ...envelope,
       order: {
@@ -217,8 +234,8 @@ export async function bootApp(
     openApplication?: boolean;
     /** The order pcs-api starts the event with, over a blank one. */
     order?: Partial<Envelope['order']>;
-    /** The hearing pcs-api starts the event for, if any. */
-    hearing?: Record<string, unknown>;
+    /** The hearing pcs-api starts the event for, over the default one, or null for an order made without one. */
+    hearing?: Record<string, unknown> | null;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -228,7 +245,9 @@ export async function bootApp(
   envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
   envelope.caseContext.openApplication = options.openApplication ?? false;
   envelope.order = { ...envelope.order, ...options.order };
-  envelope.hearing = options.hearing ?? null;
+  if (options.hearing !== undefined) {
+    envelope.hearing = options.hearing && { ...envelope.hearing, ...options.hearing };
+  }
   startTokens = [];
   startContexts = [];
   submittedTokens = [];

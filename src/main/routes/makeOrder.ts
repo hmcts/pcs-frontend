@@ -6,7 +6,13 @@ import { MAKE_ORDER_ROUTE, MAKE_ORDER_SENT_FOR_REVIEW_ROUTE } from '../constants
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { type OrderFormSubmission, attendanceParties, caseFactsFromForm, orderFormModel } from '@utils/makeOrderForm';
+import {
+  type OrderFormSubmission,
+  attendanceParties,
+  caseFactsFromForm,
+  orderFormModel,
+  withoutHearingRecord,
+} from '@utils/makeOrderForm';
 import { type MakeOrderValidationIssue, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   type OrderHearing,
@@ -161,7 +167,7 @@ export default function makeOrderRoutes(app: Application): void {
           id: orderId || null,
           version: Number(orderVersion),
           orderType,
-          formData,
+          formData: withoutHearingRecord(formData),
           docweaveSnapshot: postedSnapshot(orderDocument),
         },
         taskId: taskId || null,
