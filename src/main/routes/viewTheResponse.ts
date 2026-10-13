@@ -643,8 +643,11 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
   return { rows };
 }
 
-function resolveResponsePdfUrl(caseData: CcdCaseData, caseReference: string): string | undefined {
-  const documentId = caseData.possessionClaimResponse?.responseDocumentId;
+function resolveDocumentUrl(
+  documentId: string | undefined,
+  caseData: CcdCaseData,
+  caseReference: string
+): string | undefined {
   if (!documentId) {
     return undefined;
   }
@@ -683,8 +686,9 @@ export default function viewTheResponseRoutes(app: Application): void {
 
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
       const release12Enabled = await isRespondToClaimEnabledForRelease(req);
+      const release14Enabled = await getLaunchDarklyFlag(req, RELEASE_1_4_ENABLED, false);
       const showExemptLandlord = release12Enabled && isWalesProperty(caseData);
-      const rankedDefendantNumbering = release12Enabled && (await getLaunchDarklyFlag(req, RELEASE_1_4_ENABLED, false));
+      const rankedDefendantNumbering = release12Enabled && release14Enabled;
 
       const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
@@ -714,7 +718,12 @@ export default function viewTheResponseRoutes(app: Application): void {
         ...sections,
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
-        responsePdfUrl: release12Enabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
+        counterclaimPdfUrl: release14Enabled
+          ? resolveDocumentUrl(caseData.possessionClaimResponse?.counterclaimDocumentId, caseData, caseReference)
+          : undefined,
+        responsePdfUrl: release12Enabled
+          ? resolveDocumentUrl(caseData.possessionClaimResponse?.responseDocumentId, caseData, caseReference)
+          : undefined,
       });
     } catch (e) {
       logger.error(`Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`);
