@@ -106,6 +106,13 @@ function validation(formData: Record<string, unknown>) {
     optionalMoney: (id: string, message: string): void =>
       addMoney(id, value(formData, id) ? moneyError(formData, id, message) : undefined),
     date: (prefix: string, message: string): void => add(hasValidDate(formData, prefix), `${prefix}-day`, message),
+    /** A date the judge need not give, but which must be valid if they start one. */
+    optionalDate: (prefix: string, message: string): void =>
+      add(
+        !['day', 'month', 'year'].some(part => value(formData, `${prefix}-${part}`)) || hasValidDate(formData, prefix),
+        `${prefix}-day`,
+        message
+      ),
     frequency: (id: string, message: string): void =>
       add(PAYMENT_FREQUENCIES.includes(value(formData, id)), id, message),
   };
@@ -331,15 +338,21 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
   return issues;
 }
 
-/** The judge's own figures for the case, which they need not give. */
-function validateCaseFacts(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const { issues, optionalMoney } = validation(formData);
+/**
+ * The hearing's record: the judge's own figures for the case and their note, which they need not give, but
+ * which pcs-api records whenever they save, so are checked on every save.
+ */
+export function validateHearingRecord(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const { issues, optionalMoney, optionalDate } = validation(formData);
+  optionalDate('date-tenancy', 'Enter a valid date of tenancy or contract');
+  optionalDate('date-notice', 'Enter a valid date of service of notice');
   optionalMoney('arrears-notice', 'Enter valid arrears at notice');
   optionalMoney('current-rent', 'Enter a valid current rent');
   optionalMoney('arrears-issue', 'Enter valid arrears on issue');
+  optionalDate('date-last-payment', 'Enter a valid date of last payment');
   optionalMoney('last-payment', 'Enter a valid last payment');
   optionalMoney('arrears-today', 'Enter valid arrears today');
-  return issues;
+  return [...issues, ...validateText(formData, 'hearing-notes', 'Hearing notes')];
 }
 
 /** A long text box the page has whatever the order type: hearing notes, recitals or the staff message. */
@@ -387,8 +400,7 @@ export function validateMakeOrder(
   const chosen = (name: string): boolean => values(formData, name).includes('yes');
   // In the order the page asks, so the error summary follows the page.
   return [
-    ...validateCaseFacts(formData),
-    ...validateText(formData, 'hearing-notes', 'Hearing notes'),
+    ...validateHearingRecord(formData),
     ...validateAttendance(formData, parties),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
     ...validateOrderType(orderType, formData),

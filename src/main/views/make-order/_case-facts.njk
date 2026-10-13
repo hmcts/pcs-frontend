@@ -4,7 +4,9 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% import "make-order/_compact.njk" as compact with context %}
 
+{# A blank first option, so a fact the judge has not chosen is not recorded as the first one. #}
 {% set tenancyTypes = [
+  { value: "", text: "" },
   { value: "ASSURED_TENANCY", text: "Assured tenancy" },
   { value: "SECURE_TENANCY", text: "Secure tenancy" },
   { value: "INTRODUCTORY_TENANCY", text: "Introductory tenancy" },
@@ -16,6 +18,7 @@
 ] %}
 
 {% set rentFrequencies = [
+  { value: "", text: "" },
   { value: "WEEKLY", text: "Weekly" },
   { value: "FORTNIGHTLY", text: "Fortnightly" },
   { value: "MONTHLY", text: "Monthly" },
@@ -94,13 +97,6 @@
         optional: true,
         label: "Arrears on issue",
         labelClasses: "govuk-label--s"
-      }) }}
-
-      {{ govukDateInput({
-        id: "date-last-hearing",
-        namePrefix: "date-last-hearing",
-        items: draftDate("date-last-hearing"),
-        fieldset: { legend: { text: "Date of last hearing", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
       {{ govukDateInput({
