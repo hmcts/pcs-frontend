@@ -6,9 +6,10 @@ import { MAKE_ORDER_ROUTE, MAKE_ORDER_SENT_FOR_REVIEW_ROUTE } from '../constants
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { type OrderFormSubmission, attendanceParties, orderFormModel } from '@utils/makeOrderForm';
+import { type OrderFormSubmission, attendanceParties, caseFactsFromForm, orderFormModel } from '@utils/makeOrderForm';
 import { type MakeOrderValidationIssue, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
+  type OrderHearing,
   type OrderStart,
   caseHeader,
   confirmationHeader,
@@ -28,14 +29,19 @@ interface StartedOrder {
 
 /**
  * Starts the judge's working order, or the order they chose on the case's orders tab: one a
- * caseworker returned to them, which pcs-api starts with the caseworker's query.
+ * caseworker returned to them, which pcs-api starts with the caseworker's query. A new order is
+ * made for the hearing the judge's link named, if it named one.
  */
-async function startOrderEvent(accessToken: string, caseReference: string, orderId?: string): Promise<StartedOrder> {
+async function startOrderEvent(
+  accessToken: string,
+  caseReference: string,
+  { orderId, hearingId }: { orderId?: string; hearingId?: string } = {}
+): Promise<StartedOrder> {
   const started = await ccdCaseService.startCaseEvent(
     accessToken,
     caseReference,
     MAKE_ORDER_EVENT_ID,
-    orderId ? { orderId } : undefined
+    orderId || hearingId ? { ...(orderId && { orderId }), ...(hearingId && { hearingId }) } : undefined
   );
   const payload = started.data.sdkEventPayload;
   if (!payload) {
@@ -84,9 +90,14 @@ function pageModel(
   };
 }
 
-/** The order the orders tab linked to, which the page's URL names for as long as the judge works on it. */
-function chosenOrderId(req: Request): string | undefined {
-  return typeof req.query.orderId === 'string' ? req.query.orderId : undefined;
+/**
+ * The order the orders tab linked to, or the hearing the judge's link named, which the page's URL keeps for as long
+ * as the judge works on the order.
+ */
+function chosen(req: Request): { orderId?: string; hearingId?: string } {
+  const named = (name: string): string | undefined =>
+    typeof req.query[name] === 'string' ? (req.query[name] as string) : undefined;
+  return { orderId: named('orderId'), hearingId: named('hearingId') };
 }
 
 export default function makeOrderRoutes(app: Application): void {
@@ -97,7 +108,7 @@ export default function makeOrderRoutes(app: Application): void {
       const started = await startOrderEvent(
         req.session.user!.accessToken,
         req.params.caseReference as string,
-        chosenOrderId(req)
+        chosen(req)
       );
       res.render('make-order', pageModel(req, started));
     } catch (error) {
@@ -117,12 +128,15 @@ export default function makeOrderRoutes(app: Application): void {
       taskId,
       orderVersion,
       queryFromCaseworker,
+      hearing,
       orderType,
       orderDocument,
       ...formData
     } = req.body;
 
     try {
+      // The hearing as the page's start returned it, with the facts the judge started from.
+      const startedHearing: OrderHearing | null = JSON.parse(hearing || 'null');
       if (action === 'SUBMIT_FOR_REVIEW') {
         // The order is checked against the case as the page's start returned it.
         const started: StartedOrder = {
@@ -130,6 +144,7 @@ export default function makeOrderRoutes(app: Application): void {
           envelope: {
             order: { id: orderId, version: Number(orderVersion), queryFromCaseworker },
             caseContext: JSON.parse(caseContext),
+            hearing: startedHearing,
           },
         };
         const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(started.envelope));
@@ -150,6 +165,15 @@ export default function makeOrderRoutes(app: Application): void {
           docweaveSnapshot: postedSnapshot(orderDocument),
         },
         taskId: taskId || null,
+        // pcs-api records the hearing's facts and note when the order is sent for review.
+        hearing: startedHearing
+          ? {
+              id: startedHearing.id,
+              version: startedHearing.version ?? null,
+              caseFacts: caseFactsFromForm(formData),
+              note: formData['hearing-notes'] || null,
+            }
+          : null,
       };
       try {
         await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
@@ -161,7 +185,7 @@ export default function makeOrderRoutes(app: Application): void {
         }
         // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
         // tab: show the judge the order as it now stands, and why.
-        const current = await startOrderEvent(accessToken, caseReference, chosenOrderId(req));
+        const current = await startOrderEvent(accessToken, caseReference, chosen(req));
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }

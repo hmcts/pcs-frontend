@@ -24,7 +24,12 @@
 
 <section class="pcs-case-facts" aria-labelledby="case-facts-heading" data-case-facts>
   <div class="pcs-case-facts__header">
-    <h2 class="govuk-heading-s" id="case-facts-heading">Case facts (tenancy/contract) <span class="govuk-!-font-weight-regular">(optional)</span></h2>
+    <div>
+      <h2 class="govuk-heading-s" id="case-facts-heading">Case facts (tenancy/contract) <span class="govuk-!-font-weight-regular">(optional)</span></h2>
+      {% if hearing %}
+        <p class="govuk-body-s pcs-case-facts__source" id="case-facts-source">Hearing on {{ hearingDateDisplay }}. {{ factsRecordedDisplay }}.</p>
+      {% endif %}
+    </div>
     <button
       type="button"
       class="pcs-case-facts__toggle"
@@ -122,14 +127,34 @@
       }) }}
     </div>
 
-    {{ govukTextarea({
-      id: "hearing-notes",
-      name: "hearing-notes",
-      rows: 8,
-      value: draftValue("hearing-notes"),
-      label: { text: "Hearing notes (optional, internal use only)", classes: "govuk-label--s" },
-      errorMessage: validationErrors["hearing-notes"],
-      formGroup: { classes: "govuk-!-margin-bottom-0" }
-    }) }}
+    {# This hearing's note, then the case's earlier notes beneath it, newest first, to scroll back through. #}
+    <div class="pcs-hearing-notes">
+      {{ govukTextarea({
+        id: "hearing-notes",
+        name: "hearing-notes",
+        rows: 4 if hearing else 8,
+        value: draftValue("hearing-notes"),
+        label: {
+          text: ("Notes for this hearing" if hearing else "Hearing notes") + " (optional, internal use only)",
+          classes: "govuk-label--s"
+        },
+        errorMessage: validationErrors["hearing-notes"],
+        formGroup: { classes: "govuk-!-margin-bottom-0" }
+      }) }}
+
+      {% if hearing and earlierNotes | length %}
+        <section class="pcs-earlier-notes" aria-labelledby="earlier-notes-heading" tabindex="0">
+          <h3 class="govuk-visually-hidden" id="earlier-notes-heading">Earlier judicial notes</h3>
+          <ol class="pcs-earlier-notes__list">
+            {% for note in earlierNotes %}
+              <li class="pcs-earlier-notes__note">
+                <p class="govuk-body-s pcs-earlier-notes__meta">{{ note.when }} &ndash; {{ note.by }}</p>
+                <p class="govuk-body-s pcs-earlier-notes__text">{{ note.note }}</p>
+              </li>
+            {% endfor %}
+          </ol>
+        </section>
+      {% endif %}
+    </div>
   </div>
 </section>
