@@ -46,7 +46,7 @@ export interface OrderHearing {
   date: string;
   version?: number | null;
   caseFacts?: Record<string, unknown>;
-  recorded?: { by?: string | null; hearingDate: string; on: string } | null;
+  recorded?: { by?: string | null; hearingDate: string } | null;
   note?: string | null;
   earlierNotes: JudicialNote[];
 }

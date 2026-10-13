@@ -27,9 +27,7 @@ const DATE_FACTS: Record<string, string> = {
 /** The case facts panel's fields: the hearing's record, which is never part of the order. */
 const HEARING_RECORD_FIELDS = new Set([
   ...Object.values(FACT_FIELDS),
-  ...[...Object.values(DATE_FACTS), 'date-last-hearing'].flatMap(field =>
-    ['day', 'month', 'year'].map(part => `${field}-${part}`)
-  ),
+  ...Object.values(DATE_FACTS).flatMap(field => ['day', 'month', 'year'].map(part => `${field}-${part}`)),
   'hearing-notes',
 ]);
 
@@ -47,20 +45,16 @@ function caseFactsFormData(caseFacts: Record<string, unknown> = {}): FormData {
     }
   }
   for (const [fact, field] of Object.entries(DATE_FACTS)) {
-    Object.assign(formData, dateFields(field, caseFacts[fact]));
-  }
-  return formData;
-}
-
-function dateFields(field: string, value: unknown): FormData {
-  const date = DateTime.fromISO(String(value ?? ''));
-  return date.isValid
-    ? {
+    const date = DateTime.fromISO(String(caseFacts[fact] ?? ''));
+    if (date.isValid) {
+      Object.assign(formData, {
         [`${field}-day`]: String(date.day),
         [`${field}-month`]: String(date.month),
         [`${field}-year`]: String(date.year),
-      }
-    : {};
+      });
+    }
+  }
+  return formData;
 }
 
 /** The case facts as the judge left them in the form, as pcs-api records them for the hearing. */
@@ -68,12 +62,7 @@ export function caseFactsFromForm(formData: FormData): Record<string, unknown> {
   const text = (field: string): string => String(formData[field] ?? '').trim();
   const facts: Record<string, unknown> = {};
   for (const [fact, field] of Object.entries(FACT_FIELDS)) {
-    const value = text(field);
-    if (!MONEY_FACTS.has(fact)) {
-      facts[fact] = value || null;
-      continue;
-    }
-    facts[fact] = parseMoney(value) ?? null;
+    facts[fact] = MONEY_FACTS.has(fact) ? (parseMoney(text(field)) ?? null) : text(field) || null;
   }
   for (const [fact, field] of Object.entries(DATE_FACTS)) {
     const date = parseDate(text(`${field}-day`), text(`${field}-month`), text(`${field}-year`));
@@ -143,13 +132,7 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
   const { caseContext, order, hearing } = start;
   // A hearing's facts and note are pcs-api's record of the hearing, kept apart from the order.
   const recorded: FormData = hearing
-    ? {
-        ...caseFactsFormData(hearing.caseFacts),
-        ...(hearing.recorded && hearing.recorded.hearingDate !== hearing.date
-          ? dateFields('date-last-hearing', hearing.recorded.hearingDate)
-          : {}),
-        'hearing-notes': hearing.note ?? '',
-      }
+    ? { ...caseFactsFormData(hearing.caseFacts), 'hearing-notes': hearing.note ?? '' }
     : {};
   const draft: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
   return {

@@ -13,7 +13,7 @@ import {
   orderFormModel,
   withoutHearingRecord,
 } from '@utils/makeOrderForm';
-import { type MakeOrderValidationIssue, validateMakeOrder } from '@utils/makeOrderValidation';
+import { type MakeOrderValidationIssue, validateHearingRecord, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   type OrderHearing,
   type OrderStart,
@@ -143,23 +143,27 @@ export default function makeOrderRoutes(app: Application): void {
     try {
       // The hearing as the page's start returned it, with the facts the judge started from.
       const startedHearing: OrderHearing | null = JSON.parse(hearing || 'null');
-      if (action === 'SUBMIT_FOR_REVIEW') {
-        // The order is checked against the case as the page's start returned it.
-        const started: StartedOrder = {
-          eventToken,
-          envelope: {
-            order: { id: orderId, version: Number(orderVersion), queryFromCaseworker },
-            caseContext: JSON.parse(caseContext),
-            hearing: startedHearing,
-          },
-        };
-        const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(started.envelope));
-        if (validationIssues.length) {
-          // Nothing was submitted, so the page's start, and the version it gave, still stand: if the
-          // draft was saved elsewhere meanwhile, pcs-api refuses the retry rather than overwriting it.
-          const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues };
-          return res.status(400).render('make-order', pageModel(req, started, submission));
-        }
+      // The order is checked against the case as the page's start returned it.
+      const started: StartedOrder = {
+        eventToken,
+        envelope: {
+          order: { id: orderId, version: Number(orderVersion), queryFromCaseworker },
+          caseContext: JSON.parse(caseContext),
+          hearing: startedHearing,
+        },
+      };
+      // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
+      const validationIssues =
+        action === 'SUBMIT_FOR_REVIEW'
+          ? validateMakeOrder(orderType, formData, attendanceParties(started.envelope))
+          : startedHearing
+            ? validateHearingRecord(formData)
+            : [];
+      if (validationIssues.length) {
+        // Nothing was submitted, so the page's start, and the version it gave, still stand: if the
+        // draft was saved elsewhere meanwhile, pcs-api refuses the retry rather than overwriting it.
+        const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues };
+        return res.status(400).render('make-order', pageModel(req, started, submission));
       }
       const request = {
         action,
@@ -171,7 +175,7 @@ export default function makeOrderRoutes(app: Application): void {
           docweaveSnapshot: postedSnapshot(orderDocument),
         },
         taskId: taskId || null,
-        // pcs-api records the hearing's facts and note when the order is sent for review.
+        // pcs-api records the hearing's facts and note whenever the judge saves.
         hearing: startedHearing
           ? {
               id: startedHearing.id,
