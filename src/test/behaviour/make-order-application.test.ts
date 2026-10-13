@@ -1,6 +1,6 @@
 import { requestedParagraphs } from '../../main/assets/js/make-order/wording/application';
 
-import { CASE_REFERENCE, type TestApp, bootApp, check, control, openPage, submittedOrders } from './harness';
+import { CASE_REFERENCE, type TestApp, bootApp, check, control, openPage, submittedOrders, type } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order?genAppId=gen-app-1`;
 
@@ -75,6 +75,21 @@ describe('make an order: deciding an application', () => {
     const [submitted] = submittedOrders() as { order: Record<string, unknown> }[];
     expect(submitted.order.genAppId).toBe('gen-app-1');
     expect(submitted.order.orderType).toBe('APPLICATION_DECISION');
+  });
+
+  it("puts a costs order after the applicant's wording", async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    check('application-decision', 'grant');
+    check('costs', 'yes');
+    check('costs-choice', 'other');
+    type('costs-other-text', 'No order as to costs.');
+
+    expect(page.documentText().split('\n').slice(2)).toEqual([
+      'IT IS ORDERED THAT:',
+      'The hearing on 14 October is adjourned.',
+      'Costs in the case.',
+      'No order as to costs.',
+    ]);
   });
 
   it("splits the applicant's wording into paragraphs, keeping lines they wrapped by hand together", () => {

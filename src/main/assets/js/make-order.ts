@@ -233,35 +233,13 @@ function applicationDecision(form: HTMLFormElement): string {
   return form.querySelector<HTMLInputElement>('input[name="application-decision"]:checked')?.value ?? '';
 }
 
-interface SnapshotNode {
-  type: string;
-  attrs?: { id?: string | null };
-  content?: SnapshotNode[];
-  text?: string;
-}
-
 /**
  * Adds the applicant's wording to the order as the judge's own numbered clauses, straight after "IT IS
- * ORDERED THAT", to change or delete as they would their own. Docweave's insert can only add wording at the
- * end, and not as numbered clauses after an unnumbered line, so the wording goes into the snapshot instead.
+ * ORDERED THAT", to change or delete as they would their own.
  */
 function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController): void {
   const wording = form.querySelector<HTMLElement>('[data-application]')?.dataset.applicationWording ?? '';
-  const paragraphs = requestedParagraphs(wording);
-  const snapshot = editor.getSnapshot();
-  const content = (snapshot.current as unknown as SnapshotNode).content;
-  const orderedThat = content?.findIndex(node => node.attrs?.id === 'paragraph:ordered-that') ?? -1;
-  if (!paragraphs.length || !content || orderedThat < 0) {
-    return;
-  }
-  const clause = (text: string): SnapshotNode => ({
-    type: 'list_item',
-    attrs: { id: null },
-    content: [{ type: 'paragraph', attrs: { id: null }, content: [{ type: 'text', text }] }],
-  });
-  content.splice(orderedThat + 1, 0, { type: 'ordered_list', attrs: { id: null }, content: paragraphs.map(clause) });
-  editor.load(snapshot);
-  editor.render(buildOrderDocument(form));
+  editor.insert(requestedParagraphs(wording), { at: { after: 'paragraph:ordered-that' }, numbered: true });
 }
 
 export function initMakeOrder(): void {
