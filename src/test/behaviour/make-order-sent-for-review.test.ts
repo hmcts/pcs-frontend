@@ -8,6 +8,7 @@ import {
   recordAttendance,
   selectTab,
   submittedEventTokens,
+  submittedOrders,
 } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
@@ -37,6 +38,8 @@ describe('make an order: sent for review', () => {
     const submitted = await sendOrderForReview(app);
     expect(submitted.status).toBe(302);
     expect(submitted.location).toBe(SENT_FOR_REVIEW);
+    // An order made without a hearing records nothing against one.
+    expect(submittedOrders().at(-1)?.hearing).toBeNull();
 
     const confirmation = await app.get(SENT_FOR_REVIEW);
     expect(confirmation.status).toBe(200);

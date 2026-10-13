@@ -24,7 +24,7 @@
   <input type="hidden" name="taskId" value="{{ taskId }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
   {% if hearing %}
-    <input type="hidden" name="hearing" value="{{ hearingJson }}">
+    <input type="hidden" name="hearing" value="{{ hearing | dump }}">
   {% endif %}
   {{ csrfProtection(csrfToken) }}
 

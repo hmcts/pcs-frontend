@@ -82,7 +82,6 @@ function hearingModel(hearing: OrderHearing | null | undefined): Record<string, 
   const recorded = hearing.recorded;
   return {
     hearing,
-    hearingJson: JSON.stringify(hearing),
     hearingDateDisplay: displayDate(hearing.date),
     factsRecordedDisplay: recorded
       ? `As at the hearing on ${displayDate(recorded.hearingDate)}, recorded by ${recorded.by ?? 'a judge'}`
