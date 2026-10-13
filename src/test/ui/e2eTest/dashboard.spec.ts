@@ -266,7 +266,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('reloadPage');
     await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
     await performAction('validateCounterClaimApplicationFee', {
-      amount: `£${dashboard.counterClaimAmount}`,
+      amount: dashboard.counterClaimAmount,
       fee: dashboard.counterClaimFee,
     });
     await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
@@ -283,7 +283,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
     );
-    
+
     await performAction('clickButton', dashboard.viewTheResponseSubHeader);
     await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
     await performAction('verifyResponseDetailsOnViewTheResponsePage');
