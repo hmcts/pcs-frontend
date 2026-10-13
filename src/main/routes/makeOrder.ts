@@ -41,7 +41,7 @@ async function startOrderEvent(
     accessToken,
     caseReference,
     MAKE_ORDER_EVENT_ID,
-    orderId || hearingId ? { ...(orderId && { orderId }), ...(hearingId && { hearingId }) } : undefined
+    orderId || hearingId ? { orderId, hearingId } : undefined
   );
   const payload = started.data.sdkEventPayload;
   if (!payload) {

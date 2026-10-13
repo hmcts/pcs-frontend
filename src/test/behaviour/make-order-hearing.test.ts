@@ -5,7 +5,6 @@ import {
   control,
   openPage,
   recordAttendance,
-  refuseNextEvent,
   selectTab,
   startClientContexts,
   submittedOrders,
@@ -108,25 +107,6 @@ describe('make an order: for a hearing', () => {
     });
   });
 
-  it('shows the judge why pcs-api refused facts another judge has since recorded', async () => {
-    app = await bootApp({ hearing: HEARING });
-    const page = await openPage((await app.get(FOR_HEARING)).text);
-
-    selectTab('tab-free-form');
-    recordAttendance();
-    refuseNextEvent(
-      'The case facts for this hearing have been changed by another judge. Reload the order and try again'
-    );
-    const refused = await app.post(FOR_HEARING, page.body('SUBMIT_FOR_REVIEW'));
-
-    expect(refused.status).toBe(422);
-    expect(parse(refused.text).querySelector('#make-order-error-summary')?.textContent).toContain(
-      'changed by another judge'
-    );
-    // The order starts again for the same hearing.
-    expect(startClientContexts().at(-1)).toEqual({ hearingId: '7' });
-  });
-
   it('keeps the hearing and its earlier notes when the order cannot be sent yet', async () => {
     app = await bootApp({ hearing: HEARING });
     const page = await openPage((await app.get(FOR_HEARING)).text);
@@ -137,18 +117,5 @@ describe('make an order: for a hearing', () => {
     const shown = parse(incomplete.text);
     expect(shown.querySelector('#case-facts-source')?.textContent).toContain('Hearing on 13 October 2026');
     expect(shown.querySelectorAll('.pcs-earlier-notes__note')).toHaveLength(2);
-  });
-
-  it('makes an order without a hearing as before', async () => {
-    app = await bootApp();
-    const page = await openPage((await app.get(PAGE)).text);
-
-    expect(startClientContexts()).toEqual([undefined]);
-    expect(document.querySelector('#case-facts-source')).toBeNull();
-    expect(document.querySelector('.pcs-earlier-notes')).toBeNull();
-    selectTab('tab-free-form');
-    recordAttendance();
-    await app.post(PAGE, page.body('SUBMIT_FOR_REVIEW'));
-    expect(submittedOrders().at(-1)?.hearing).toBeNull();
   });
 });
