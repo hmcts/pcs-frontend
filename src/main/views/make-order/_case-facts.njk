@@ -1,7 +1,6 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
-{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% import "make-order/_compact.njk" as compact with context %}
 
 {% set tenancyTypes = [
@@ -127,34 +126,42 @@
       }) }}
     </div>
 
-    {# This hearing's note, then the case's earlier notes beneath it, newest first, to scroll back through. #}
-    <div class="pcs-hearing-notes">
-      {{ govukTextarea({
-        id: "hearing-notes",
-        name: "hearing-notes",
-        rows: 4 if hearing else 8,
-        value: draftValue("hearing-notes"),
-        label: {
-          text: ("Notes for this hearing" if hearing else "Hearing notes") + " (optional, internal use only)",
-          classes: "govuk-label--s"
-        },
-        errorMessage: validationErrors["hearing-notes"],
-        formGroup: { classes: "govuk-!-margin-bottom-0" }
-      }) }}
-
+    {#
+      One box for the notes: this hearing's note to type at the top, then the case's earlier notes beneath it,
+      newest first and read only, to scroll down through. The box fills the column and scrolls as a whole.
+    #}
+    {% set notesError = validationErrors["hearing-notes"] %}
+    <div class="govuk-form-group govuk-!-margin-bottom-0 pcs-hearing-notes {%- if notesError %} govuk-form-group--error{% endif %}">
+      <label class="govuk-label govuk-label--s" for="hearing-notes">
+        {{ "Notes for this hearing" if hearing else "Hearing notes" }} (optional, internal use only)
+      </label>
       {% if hearing and earlierNotes | length %}
-        <section class="pcs-earlier-notes" aria-labelledby="earlier-notes-heading" tabindex="0">
-          <h3 class="govuk-visually-hidden" id="earlier-notes-heading">Earlier judicial notes</h3>
-          <ol class="pcs-earlier-notes__list">
-            {% for note in earlierNotes %}
-              <li class="pcs-earlier-notes__note">
-                <p class="govuk-body-s pcs-earlier-notes__meta">{{ note.when }} &ndash; {{ note.by }}</p>
-                <p class="govuk-body-s pcs-earlier-notes__text">{{ note.note }}</p>
-              </li>
-            {% endfor %}
-          </ol>
-        </section>
+        <div class="govuk-hint govuk-!-font-size-16" id="hearing-notes-hint">Earlier notes are below it, newest first.</div>
       {% endif %}
+      {% if notesError %}
+        <p id="hearing-notes-error" class="govuk-error-message">
+          <span class="govuk-visually-hidden">Error:</span> {{ notesError.text }}
+        </p>
+      {% endif %}
+      <div class="pcs-notes-box {%- if notesError %} pcs-notes-box--error{% endif %}">
+        {% set describedBy = (("hearing-notes-hint " if hearing and earlierNotes | length else "") + ("hearing-notes-error" if notesError else "")) | trim %}
+        <textarea class="govuk-textarea pcs-notes-box__current" id="hearing-notes" name="hearing-notes" rows="{{ 3 if hearing and earlierNotes | length else 8 }}"
+          {%- if describedBy %} aria-describedby="{{ describedBy }}"{% endif %}>{{ draftValue("hearing-notes") }}</textarea>
+
+        {% if hearing and earlierNotes | length %}
+          <section class="pcs-earlier-notes" aria-labelledby="earlier-notes-heading" tabindex="0">
+            <h3 class="pcs-earlier-notes__heading" id="earlier-notes-heading">Earlier notes</h3>
+            <ol class="pcs-earlier-notes__list">
+              {% for note in earlierNotes %}
+                <li class="pcs-earlier-notes__note">
+                  <p class="govuk-body-s pcs-earlier-notes__meta">{{ note.when }} &ndash; {{ note.by }}</p>
+                  <p class="govuk-body-s pcs-earlier-notes__text">{{ note.note }}</p>
+                </li>
+              {% endfor %}
+            </ol>
+          </section>
+        {% endif %}
+      </div>
     </div>
   </div>
 </section>
