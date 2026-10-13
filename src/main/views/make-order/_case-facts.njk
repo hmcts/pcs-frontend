@@ -1,6 +1,7 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% import "make-order/_compact.njk" as compact with context %}
 
 {% set tenancyTypes = [
@@ -130,25 +131,22 @@
       The case's judicial notes as a stack, newest first, under the note for this hearing; an order made
       without a hearing keeps a single notes field.
     #}
-    {% set notesError = validationErrors["hearing-notes"] %}
-    {% set currentNote = draftValue("hearing-notes") %}
     <div class="pcs-hearing-notes">
       <h3 class="govuk-heading-s govuk-!-margin-bottom-0">{{ "Judicial notes" if hearing else "Hearing notes" }}</h3>
 
       <div class="pcs-hearing-notes__stack">
-        <div class="govuk-form-group govuk-!-margin-bottom-0 {%- if notesError %} govuk-form-group--error{% endif %}">
-          <label class="govuk-label govuk-!-font-weight-bold govuk-!-font-size-16" for="hearing-notes">
-            {% if hearing %}Note for this hearing &ndash; {{ hearingDateDisplay }}{% else %}Hearing notes{% endif %} (optional, internal use only)
-          </label>
-          {% if notesError %}
-            <p id="hearing-notes-error" class="govuk-error-message">
-              <span class="govuk-visually-hidden">Error:</span> {{ notesError.text }}
-            </p>
-          {% endif %}
-          <textarea class="govuk-textarea govuk-!-margin-bottom-0 {%- if notesError %} govuk-textarea--error{% endif %}"
-            id="hearing-notes" name="hearing-notes" rows="{{ 3 if hearing else 8 }}"
-            {%- if notesError %} aria-describedby="hearing-notes-error"{% endif %}>{{ currentNote }}</textarea>
-        </div>
+        {{ govukTextarea({
+          id: "hearing-notes",
+          name: "hearing-notes",
+          rows: 3 if hearing else 8,
+          value: draftValue("hearing-notes"),
+          label: {
+            text: ("Note for this hearing – " + hearingDateDisplay if hearing else "Hearing notes") + " (optional, internal use only)",
+            classes: "govuk-!-font-weight-bold govuk-!-font-size-16"
+          },
+          errorMessage: validationErrors["hearing-notes"],
+          formGroup: { classes: "govuk-!-margin-bottom-0" }
+        }) }}
 
         {% if hearing %}
           {% if earlierNotes | length %}

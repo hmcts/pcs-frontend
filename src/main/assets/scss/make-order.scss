@@ -144,7 +144,11 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   flex-direction: column;
   gap: govuk-spacing(2);
   min-height: 0;
-  contain: size;
+
+  // Beside the facts, the facts set the row's height; on its own row the stack takes its full height.
+  @include govuk-media-query($from: desktop) {
+    contain: size;
+  }
 }
 
 .pcs-hearing-notes__stack {

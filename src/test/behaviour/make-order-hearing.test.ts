@@ -74,17 +74,10 @@ describe('make an order: for a hearing', () => {
     expect(document.querySelector('.pcs-hearing-notes__list')?.querySelector('input, textarea')).toBeNull();
   });
 
-  it("shows this hearing's recorded note, ready to change", async () => {
+  it("sends the hearing's facts and its recorded note, as changed, with the order for review", async () => {
     app = await bootApp({ hearing: { ...HEARING, version: 3, note: 'Adjourned for a rent statement.' } });
-
-    await openPage((await app.get(FOR_HEARING)).text);
-
-    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('Adjourned for a rent statement.');
-  });
-
-  it("sends the hearing's facts and note with the order for review", async () => {
-    app = await bootApp({ hearing: HEARING });
     const page = await openPage((await app.get(FOR_HEARING)).text);
+    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('Adjourned for a rent statement.');
 
     type('current-rent', '950.50');
     type('arrears-today', '1,300');
@@ -97,7 +90,7 @@ describe('make an order: for a hearing', () => {
     expect(sent.location).toBe(`${PAGE}/sent-for-review`);
     expect(submittedOrders().at(-1)?.hearing).toEqual({
       id: 7,
-      version: null,
+      version: 3,
       note: 'Paid £200 on the day.',
       caseFacts: {
         tenancyStartDate: '2020-02-03',
