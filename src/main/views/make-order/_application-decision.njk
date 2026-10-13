@@ -1,0 +1,43 @@
+{#
+  What the judge decides about the application, which starts the order's wording, on one row as the rest of
+  the make order page asks its questions. Using the applicant's wording puts it in the order preview as the
+  judge's own clauses, which the reset button restores. Listing it for a hearing leaves the application open.
+  Inline radios can't reveal a question, so whether the hearing is on notice follows on its own row, shown
+  while the judge is listing it (initApplicationListing in make-order.ts).
+#}
+{% import "make-order/_compact.njk" as compact with context %}
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Decision</h2>
+
+{{ compact.radios("application-decision", {
+  legend: "What do you decide?",
+  legendHidden: true,
+  hint: "For something else, write the order in the order preview. In any case, you may amend the wording in the order preview.",
+  classes: "govuk-radios--small govuk-radios--inline",
+  items: [
+    { value: "grant", text: "Use the applicant’s wording" },
+    { value: "dismiss", text: "Dismiss" },
+    { value: "strike-out", text: "Strike out" },
+    { value: "list", text: "List for a hearing" },
+    { value: "other", text: "Something else" }
+  ]
+}) }}
+
+{% if application.whatOrderWanted %}
+  <button type="button" class="govuk-button govuk-button--secondary" data-restore-requested-wording
+          {%- if not draftChecked("application-decision", "grant") %} hidden{% endif %}>
+    Reset to applicant’s wording
+  </button>
+{% endif %}
+
+<div data-application-listing {%- if not draftChecked("application-decision", "list") %} hidden{% endif %}>
+  {{ compact.radios("application-list-notice", {
+    legend: "Is the hearing on notice?",
+    classes: "govuk-radios--small govuk-radios--inline",
+    default: "on-notice",
+    items: [
+      { value: "on-notice", text: "On notice to the other parties" },
+      { value: "without-notice", text: "Without notice" }
+    ]
+  }) }}
+</div>

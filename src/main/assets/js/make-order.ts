@@ -1,10 +1,16 @@
-import { type DocWeaveDocument, type DocWeaveSnapshot, createDocEditor } from '@hmcts-cft/docweave';
+import {
+  type DocEditorController,
+  type DocWeaveDocument,
+  type DocWeaveSnapshot,
+  createDocEditor,
+} from '@hmcts-cft/docweave';
 
 import { parseMoney } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
 import { type OrderData, readOrderData } from './make-order/data';
 import { buildAdjournmentOrder } from './make-order/wording/adjournment';
+import { buildApplicationOrder, requestedParagraphs } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildFreeFormOrder } from './make-order/wording/free-form';
 import { buildOutrightOrder } from './make-order/wording/outright';
@@ -199,12 +205,41 @@ const builders: Record<OrderType, (data: OrderData) => DocWeaveDocument> = {
   ADJOURNMENT: buildAdjournmentOrder,
   STRIKE_OUT_DISMISSAL: buildStrikeOutDismissalOrder,
   FREE_FORM: buildFreeFormOrder,
+  APPLICATION_DECISION: buildApplicationOrder,
 };
 
 /** The generated order for the form's current answers and selected order type. */
 export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
   const type = form.querySelector<HTMLInputElement>('#order-type')?.value as OrderType;
   return builders[type](readOrderData(form));
+}
+
+/** Whether a hearing the judge lists the application for is on notice, asked only while they are listing it. */
+export function initApplicationListing(form: HTMLFormElement): void {
+  const listing = form.querySelector<HTMLElement>('[data-application-listing]');
+  if (!listing) {
+    return;
+  }
+  form.addEventListener('change', event => {
+    const decision = event.target as HTMLInputElement;
+    if (decision.name === 'application-decision') {
+      listing.hidden = decision.value !== 'list';
+    }
+  });
+}
+
+/** The decision chosen on an application, which has its own document as each order type does. */
+function applicationDecision(form: HTMLFormElement): string {
+  return form.querySelector<HTMLInputElement>('input[name="application-decision"]:checked')?.value ?? '';
+}
+
+/**
+ * Adds the applicant's wording to the order as the judge's own numbered clauses, straight after "IT IS
+ * ORDERED THAT", to change or delete as they would their own.
+ */
+function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController): void {
+  const wording = form.querySelector<HTMLElement>('[data-application]')?.dataset.applicationWording ?? '';
+  editor.insert(requestedParagraphs(wording), { at: { after: 'paragraph:ordered-that' }, numbered: true });
 }
 
 export function initMakeOrder(): void {
@@ -230,8 +265,11 @@ export function initMakeOrder(): void {
   }
 
   let orderType: OrderType | undefined;
-  // One document per order type, so switching tabs and back keeps any edits.
-  const documents: Partial<Record<OrderType, DocWeaveSnapshot>> = {};
+  let key: string | undefined;
+  // One document per order type, and per decision on an application, so switching and back keeps any edits.
+  const documents: Record<string, DocWeaveSnapshot> = {};
+  const documentKey = (type: OrderType): string =>
+    type === 'APPLICATION_DECISION' ? `${type}:${applicationDecision(form)}` : type;
   const editor = createDocEditor({
     mount,
     label: 'Order',
@@ -243,15 +281,36 @@ export function initMakeOrder(): void {
     // A document the field cannot hold is regenerated from the form.
     onError: () => (documentField.value = ''),
     onChange: snapshot => {
-      if (orderType) {
-        documents[orderType] = snapshot;
+      if (key) {
+        documents[key] = snapshot;
       }
     },
   });
   if (documentField.value) {
-    documents[orderTypeField.value as OrderType] = editor.getSnapshot();
+    documents[documentKey(orderTypeField.value as OrderType)] = editor.getSnapshot();
   }
   const render = (): void => editor.render(buildOrderDocument(form));
+  // Using the applicant's wording starts its document with their wording, which a reset puts back.
+  const startDocument = (): void => {
+    editor.load();
+    render();
+    if (key === 'APPLICATION_DECISION:grant') {
+      insertRequestedWording(form, editor);
+    }
+  };
+  const selectDocument = (): void => {
+    const next = documentKey(orderType!);
+    if (key === next) {
+      return;
+    }
+    key = next;
+    if (documents[next]) {
+      editor.load(documents[next]);
+      render();
+    } else {
+      startDocument();
+    }
+  };
   const selectOrderType = (type: OrderType): void => {
     if (orderType === type) {
       return;
@@ -259,8 +318,7 @@ export function initMakeOrder(): void {
     orderType = type;
     orderTypeField.value = type;
     syncSuspendedOnlyCosts(form, type);
-    editor.load(documents[type]);
-    render();
+    selectDocument();
   };
 
   // GOV.UK tabs record the open tab in the fragment for clicks, arrow keys and history.
@@ -283,11 +341,22 @@ export function initMakeOrder(): void {
     }
     followTab();
   });
+  const reset = form.querySelector<HTMLButtonElement>('[data-restore-requested-wording]');
+  reset?.addEventListener('click', startDocument);
+  form.addEventListener('change', event => {
+    if ((event.target as HTMLInputElement).name === 'application-decision') {
+      selectDocument();
+      if (reset) {
+        reset.hidden = applicationDecision(form) !== 'grant';
+      }
+    }
+  });
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
+  initApplicationListing(form);
 }
 
 /**
