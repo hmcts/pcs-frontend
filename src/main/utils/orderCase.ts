@@ -24,7 +24,6 @@ export interface OrderCaseContext {
   propertyAddress?: Record<string, string | undefined>;
   claimants: OrderParty[];
   defendants: OrderParty[];
-  caseFacts?: Record<string, unknown>;
   openCounterclaim?: boolean;
   openApplication?: boolean;
 }
