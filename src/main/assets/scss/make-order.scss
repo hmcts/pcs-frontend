@@ -138,104 +138,42 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   color: $govuk-secondary-text-colour;
 }
 
-// The notes column fills the facts grid's height on desktop, and the notes box fills the column.
+// The notes column takes the facts grid's height, and its stack of notes scrolls within it.
 .pcs-hearing-notes {
   display: flex;
   flex-direction: column;
+  gap: govuk-spacing(2);
   min-height: 0;
-
-  // The facts set the row's height: however many notes there are, the box scrolls within it.
-  @include govuk-media-query($from: desktop) {
-    contain: size;
-  }
-
-  > .govuk-label,
-  > .govuk-hint {
-    margin-bottom: govuk-spacing(1);
-  }
+  contain: size;
 }
 
-// One box: this hearing's note to type at the top, then the earlier notes beneath it, read only, all
-// scrolling together. It looks and takes focus like a GOV.UK textarea.
-.pcs-notes-box {
+.pcs-hearing-notes__stack {
+  display: flex;
   flex: 1 1 auto;
-  min-height: 12rem;
-  max-height: 24rem;
+  flex-direction: column;
+  gap: govuk-spacing(2);
+  min-height: 0;
   overflow-y: auto;
-  border: $govuk-border-width-form-element solid $govuk-input-border-colour;
-  background-color: govuk-colour('white');
-
-  @include govuk-media-query($from: desktop) {
-    min-height: 0;
-    max-height: none;
-  }
-
-  &:focus,
-  &:has(.pcs-notes-box__current:focus) {
-    outline: $govuk-focus-width solid $govuk-focus-colour;
-    outline-offset: 0;
-    box-shadow: inset 0 0 0 $govuk-border-width-form-element;
-  }
 }
 
-.pcs-notes-box--error {
-  border-color: $govuk-error-colour;
-}
-
-.pcs-notes-box__current {
-  display: block;
-  margin: 0;
-  border: 0;
-  border-bottom: 1px solid $govuk-border-colour;
-  resize: vertical;
-
-  &:focus {
-    outline: none;
-    box-shadow: none;
-  }
-}
-
-// Earlier notes are read only, so they are greyed out.
-.pcs-earlier-notes {
-  background-color: govuk-colour('black', $variant: 'tint-95');
-  color: $govuk-secondary-text-colour;
-
-  // Focusing the notes lets a keyboard user scroll the box with the arrow keys.
-  &:focus {
-    outline: $govuk-focus-width solid $govuk-focus-colour;
-    outline-offset: -$govuk-focus-width;
-  }
-}
-
-.pcs-earlier-notes__heading {
-  @include govuk-font($size: 16, $weight: bold);
-
-  margin: 0;
-  padding: govuk-spacing(2) govuk-spacing(2) 0;
-}
-
-.pcs-earlier-notes__list {
+.pcs-hearing-notes__list {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.pcs-earlier-notes__note {
-  padding: govuk-spacing(2);
-
-  & + & {
-    border-top: 1px solid $govuk-border-colour;
-  }
+.pcs-hearing-notes__note {
+  padding: govuk-spacing(2) 0;
+  border-top: 1px solid $govuk-border-colour;
 }
 
-.pcs-earlier-notes__meta {
-  margin-bottom: govuk-spacing(1);
-  font-weight: $govuk-font-weight-bold;
-}
-
-.pcs-earlier-notes__text {
-  margin-bottom: 0;
+.pcs-hearing-notes__text {
   white-space: pre-wrap;
+}
+
+.pcs-hearing-notes__empty {
+  margin: 0;
+  color: $govuk-secondary-text-colour;
 }
 
 // Divide distinct tab questions, excluding fields that continue the previous question.

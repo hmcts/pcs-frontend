@@ -63,15 +63,23 @@ describe('make an order: for a hearing', () => {
     expect(control('[name="arrears-today"]').value).toBe('1200');
     expect(control('[name="date-last-payment-month"]').value).toBe('8');
     expect(control('[name="date-last-hearing-day"]').value).toBe('1');
-    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('');
+    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('');
 
     // The earlier notes, newest first, are for reading only.
-    const earlier = [...document.querySelectorAll('.pcs-earlier-notes__note')].map(note => note.textContent);
+    const earlier = [...document.querySelectorAll('.pcs-hearing-notes__note')].map(note => note.textContent);
     expect(earlier).toHaveLength(2);
     expect(earlier[0]).toContain('Hearing on 1 September 2026 – DJ Howard Daley');
     expect(earlier[0]).toContain('Made clear needs to do x and y.');
     expect(earlier[1]).toContain('Note made on 20 July 2026 – HHJ Anesh Pema');
-    expect(document.querySelector('.pcs-earlier-notes')?.querySelector('input, textarea')).toBeNull();
+    expect(document.querySelector('.pcs-hearing-notes__list')?.querySelector('input, textarea')).toBeNull();
+  });
+
+  it("shows this hearing's recorded note, ready to change", async () => {
+    app = await bootApp({ hearing: { ...HEARING, version: 3, note: 'Adjourned for a rent statement.' } });
+
+    await openPage((await app.get(FOR_HEARING)).text);
+
+    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('Adjourned for a rent statement.');
   });
 
   it("sends the hearing's facts and note with the order for review", async () => {
@@ -116,6 +124,6 @@ describe('make an order: for a hearing', () => {
     expect(incomplete.status).toBe(400);
     const shown = parse(incomplete.text);
     expect(shown.querySelector('#case-facts-source')?.textContent).toContain('Hearing on 13 October 2026');
-    expect(shown.querySelectorAll('.pcs-earlier-notes__note')).toHaveLength(2);
+    expect(shown.querySelectorAll('.pcs-hearing-notes__note')).toHaveLength(2);
   });
 });
