@@ -74,6 +74,23 @@ describe('make an order: for a hearing', () => {
     expect(document.querySelector('.pcs-hearing-notes__list')?.querySelector('input, textarea')).toBeNull();
   });
 
+  it("shows the hearing's recorded facts and note over those the judge's saved draft holds", async () => {
+    app = await bootApp({
+      hearing: { ...HEARING, note: 'Recorded note' },
+      order: {
+        id: 'draft',
+        version: 2,
+        formData: { 'current-rent': '700', 'arrears-today': '5', 'hearing-notes': 'Old' },
+      },
+    });
+
+    await openPage((await app.get(FOR_HEARING)).text);
+
+    expect(control('[name="current-rent"]').value).toBe('900');
+    expect(control('[name="arrears-today"]').value).toBe('1200');
+    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('Recorded note');
+  });
+
   it("sends the hearing's facts and its recorded note, as changed, with the order for review", async () => {
     app = await bootApp({ hearing: { ...HEARING, version: 3, note: 'Adjourned for a rent statement.' } });
     const page = await openPage((await app.get(FOR_HEARING)).text);
