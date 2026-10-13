@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@2.4.9")
+@Library("Infrastructure@2.10.1")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
@@ -24,7 +24,7 @@ def secrets = [
   'pcs-${env}': [
     secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
     secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
-    secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID'),
+    secret('pcs-local-auth-automation-uid', 'PCS_LOCAL_AUTH_AUTOMATION_UID'),
     secret('pcs-api-idam-secret', 'PCS_API_IDAM_SECRET'),
     secret('launchdarkly-sdk-key', 'LAUNCHDARKLY_SDK_KEY'),
   ]

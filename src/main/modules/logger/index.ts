@@ -1,4 +1,8 @@
+import { OpenTelemetryTransportV3 } from '@opentelemetry/winston-transport';
 import winston from 'winston';
+
+import { recordErrorsOnActiveSpan } from './active-span-errors';
+import { redactUrlsInLogRecord } from './redact-url';
 
 const { combine, label, timestamp, colorize, json, printf, splat } = winston.format;
 const splatSymbol = Symbol.for('splat');
@@ -94,8 +98,35 @@ function transport(name: string) {
   });
 }
 
+let isTelemetryEnabled = false;
+
+// Log records bypass trace sampling - the distro sets enableTraceBasedSamplingForLogs to false -
+// so exporting at the logger's own level would ship every per-request info line, unsampled.
+const telemetryTransport = () => new OpenTelemetryTransportV3({ level: 'warn' });
+
 export class Logger {
   public static getLogger(name: string): ReturnType<typeof container.add> {
-    return container.add(name, { transports: [transport(name)] });
+    if (container.has(name)) {
+      return container.get(name);
+    }
+    // Redaction first, so the URLs the next format copies into a span exception are already clean.
+    const logger = container.add(name, {
+      format: combine(redactUrlsInLogRecord(), recordErrorsOnActiveSpan()),
+      transports: [transport(name)],
+    });
+    if (isTelemetryEnabled) {
+      logger.add(telemetryTransport());
+    }
+    return logger;
+  }
+
+  // Called once telemetry has started. The transport binds to the logger provider registered at the
+  // time it is created, so loggers made earlier are given theirs here rather than at creation.
+  public static enableTelemetry(): void {
+    if (isTelemetryEnabled) {
+      return;
+    }
+    isTelemetryEnabled = true;
+    container.loggers.forEach(logger => logger.add(telemetryTransport()));
   }
 }

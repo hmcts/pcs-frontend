@@ -10,5 +10,9 @@
   "errors": {
     "haveYouAlreadyApplied": "Confirm whether you have already applied for help with your application fee",
     "hwfReference": "You must enter a reference number for Help with Fees"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

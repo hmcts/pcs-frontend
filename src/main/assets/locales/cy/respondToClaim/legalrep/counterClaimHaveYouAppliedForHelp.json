@@ -3,7 +3,7 @@
   "heading": "A ydy'r diffynnydd eisoes wedi gwneud cais am help i dalu eu ffi gwrth-hawliad?",
   "question": "A ydy'r diffynnydd eisoes wedi gwneud cais am help i dalu eu ffi gwrth-hawliad?",
   "revealedHwfQuestionLabel": "Nodwch gyfeirnod Help i Dalu Ffioedd y diffynnydd",
-  "revealedHwfQuestionHint": "<span class=\"govuk-body govuk-!-display-block govuk-!-margin-bottom-1\">cyYou (or they) will have received this number when you (or they) applied for Help with Fees. This reference must not have been used for a previous application.</span>cyFor example, HWF-A1B-23C",
+  "revealedHwfQuestionHint": "<span class=\"govuk-body govuk-!-display-block govuk-!-margin-bottom-1\">Byddwch chi (neu nhw) wedi derbyn y rhif hwn pan wnaethoch chi (neu nhw) wneud cais am Help i Dalu Ffioedd. Ni ddylai’r cyfeirnod hwn fod wedi’i ddefnyddio ar gyfer cais blaenorol.</span>Er enghraifft, HWF-A1B-23C",
   "errors": {
     "alreadyAppliedForHelp": "Dewiswch os ydy'r diffynnydd eisoes wedi gwneud cais am help gyda'ch ffi gwrth-hawliad?",
     "hwfReference": "Nodwch gyfeirnod Help i Dalu Ffioedd y diffynnydd",
