@@ -31,7 +31,6 @@ export function requestedParagraphs(wording: string): string[] {
 }
 
 const DECISIONS: Record<string, string> = {
-  grant: 'The application is granted.',
   dismiss: 'The application is dismissed.',
   'strike-out': 'The application is struck out.',
 };
@@ -51,7 +50,7 @@ function decisionClause(data: OrderData): string | undefined {
 
 /**
  * An order deciding a general application without a hearing: the application, the decision, then costs.
- * The applicant's wording is not generated: the judge adds it to the order as their own, to change freely.
+ * Using the applicant's wording generates no decision clause: their wording goes in as the judge's own clauses.
  */
 export function buildApplicationOrder(data: OrderData): DocWeaveDocument {
   const application = data.application;

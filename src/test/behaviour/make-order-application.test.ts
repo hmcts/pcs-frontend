@@ -20,6 +20,14 @@ const APPLICATION = {
   referralNote: 'The hearing is next week',
 };
 
+/** The number of clauses in each numbered list of the order the page will submit. */
+function clauseLists(): number[] {
+  const snapshot = JSON.parse(control<HTMLTextAreaElement>('#order-document').value);
+  return snapshot.current.content
+    .filter((node: { type: string }) => node.type === 'ordered_list')
+    .map((node: { content: unknown[] }) => node.content.length);
+}
+
 describe('make an order: deciding an application', () => {
   let app: TestApp;
   beforeEach(async () => {
@@ -44,43 +52,29 @@ describe('make an order: deciding an application', () => {
     expect(document.body.textContent).not.toContain('Answer every question');
   });
 
-  it("orders the application granted, leaving the applicant's wording for the judge to add", async () => {
+  it("uses the applicant's wording as the order's numbered clauses, with no decision clause of its own", async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    expect(control<HTMLButtonElement>('[data-restore-requested-wording]').hidden).toBe(true);
     check('application-decision', 'grant');
-
-    expect(page.orderText()).toBe(
-      [
-        'UPON the application of Jane Doe (Defendant) dated 1 October 2026 (GA2) to adjourn the hearing',
-        'AND UPON the Court considering the application without a hearing',
-        'IT IS ORDERED THAT:',
-        'The application is granted.',
-      ].join('\n')
-    );
-    expect(page.documentText()).not.toContain('The hearing on 14 October is adjourned.');
-
-    const button = control<HTMLButtonElement>('[data-use-requested-wording]');
-    button.click();
 
     expect(page.documentText()).toBe(
       [
         'UPON the application of Jane Doe (Defendant) dated 1 October 2026 (GA2) to adjourn the hearing',
         'AND UPON the Court considering the application without a hearing',
         'IT IS ORDERED THAT:',
-        'The application is granted.',
         'The hearing on 14 October is adjourned.',
         'Costs in the case.',
       ].join('\n')
     );
-    expect(button.disabled).toBe(true);
-    expect(button.textContent?.trim()).toBe('Added to the order preview');
+    expect(clauseLists()).toEqual([2]);
+    expect(control<HTMLButtonElement>('[data-restore-requested-wording]').hidden).toBe(false);
 
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     expect((await app.post(PAGE, body)).status).toBe(302);
-    const [submitted] = submittedOrders() as { order: Record<string, unknown>; formData?: unknown }[];
+    const [submitted] = submittedOrders() as { order: Record<string, unknown> }[];
     expect(submitted.order.genAppId).toBe('gen-app-1');
     expect(submitted.order.orderType).toBe('APPLICATION_DECISION');
-    expect((submitted.order.formData as Record<string, unknown>)['application-wording-added']).toBe('yes');
   });
 
   it("splits the applicant's wording into paragraphs, keeping lines they wrapped by hand together", () => {
@@ -91,21 +85,45 @@ describe('make an order: deciding an application', () => {
     ).toEqual(['The hearing be adjourned so the defendant can get legal advice.', 'Costs reserved.', 'Why.']);
   });
 
-  it("does not offer the applicant's wording again once the judge has added it", async () => {
+  it('keeps a separate order preview for each decision', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    check('application-decision', 'grant');
+    check('application-decision', 'dismiss');
+    expect(page.documentText()).toContain('The application is dismissed.');
+    expect(page.documentText()).not.toContain('The hearing on 14 October is adjourned.');
+    expect(control<HTMLButtonElement>('[data-restore-requested-wording]').hidden).toBe(true);
+
+    check('application-decision', 'grant');
+    expect(page.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
+    expect(page.documentText()).not.toContain('The application is dismissed.');
+  });
+
+  it("keeps the judge's deletions when they reopen the order, until they reset to the applicant's wording", async () => {
+    await openPage((await app.get(PAGE)).text);
+    check('application-decision', 'grant');
+    // The judge deletes the applicant's clause about costs.
+    const snapshot = JSON.parse(control<HTMLTextAreaElement>('#order-document').value);
+    const wording = snapshot.current.content.find((node: { attrs?: { id?: string | null } }) => !node.attrs?.id);
+    wording.content.pop();
     await app.close();
     app = await bootApp({
       application: APPLICATION,
       order: {
-        id: 'order-returned',
+        id: 'order-saved',
         version: 4,
         orderType: 'APPLICATION_DECISION',
-        formData: { 'application-wording-added': 'yes' },
+        formData: { 'application-decision': 'grant' },
+        docweaveSnapshot: snapshot,
       },
     });
-    await openPage((await app.get(`${PAGE}&orderId=order-returned`)).text);
-    const button = control<HTMLButtonElement>('[data-use-requested-wording]');
-    expect(button.disabled).toBe(true);
-    expect(button.textContent?.trim()).toBe('Added to the order preview');
+
+    const reopened = await openPage((await app.get(`${PAGE}&orderId=order-saved`)).text);
+    expect(reopened.documentText()).toContain('The hearing on 14 October is adjourned.');
+    expect(reopened.documentText()).not.toContain('Costs in the case.');
+
+    control<HTMLButtonElement>('[data-restore-requested-wording]').click();
+    expect(reopened.documentText()).toContain('Costs in the case.');
+    expect(reopened.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
   });
 
   it('orders the application dismissed', async () => {

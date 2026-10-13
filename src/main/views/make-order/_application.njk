@@ -1,6 +1,6 @@
 {#
   The general application the judge is deciding: what was applied for and by whom, the applicant's
-  answers and documents, and the order they asked for, which the judge can add to the order to change.
+  answers and documents, and the order they asked for, which the judge can use as the order's wording.
 #}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
@@ -65,14 +65,6 @@
       html: '<p class="govuk-body">' + (application.whatOrderWanted | escape | nl2br) + '</p>',
       attributes: { id: "application-requested" }
     }) }}
-    {# One click puts the wording in the order preview as the judge's own clauses, for them to change or delete. #}
-    {% set wordingAdded = draftValue("application-wording-added") == "yes" %}
-    <input type="hidden" name="application-wording-added" value="{{ 'yes' if wordingAdded else '' }}">
-    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-2" data-use-requested-wording
-            {%- if wordingAdded %} disabled{% endif %}>
-      {{ "Added to the order preview" if wordingAdded else "Use the applicant's wording" }}
-    </button>
-    <p class="govuk-hint">This adds it to the order preview, where you can change it or delete what you do not need.</p>
   {% else %}
     <p class="govuk-body">The applicant did not say what order they want. Read the application documents.</p>
   {% endif %}
