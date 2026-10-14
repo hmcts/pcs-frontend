@@ -153,7 +153,7 @@
     "nodemon": "3.1.14",
     "playwright": "1.62.1",
     "playwright-core": "1.62.1",
-    "postcss": "8.5.29",
+    "postcss": "8.5.30",
     "prettier": "3.9.10",
     "sass": "1.105.1",
     "sass-loader": "17.0.1",
