@@ -1,5 +1,5 @@
 /**
- * Runs the make-order page as the application does: real route, real middleware, real
+ * Runs the make-order and confirm order review pages as the application does: real route, real middleware, real
  * templates, real client code in jsdom. Only the boundary is faked: CCD is a tiny HTTP server
  * and the signed-in user is placed on the session.
  */
@@ -7,6 +7,7 @@ import { randomUUID } from 'node:crypto';
 import * as http from 'node:http';
 import { type AddressInfo } from 'node:net';
 
+import { renderText } from '@hmcts-cft/docweave';
 import express, { type Express, type Request, type Response } from 'express';
 
 export const CASE_REFERENCE = '1777027600017760';
@@ -25,17 +26,17 @@ function jwt(claims: Record<string, unknown>): string {
 interface Envelope {
   order: {
     id?: string;
-    state: string;
     version: number;
     orderType?: string;
     formData?: Record<string, unknown>;
     docweaveSnapshot?: unknown;
+    queryFromCaseworker?: string;
   };
   caseContext: Record<string, unknown>;
 }
 
 const blankCase = (): Envelope => ({
-  order: { state: 'DRAFT', version: 0 },
+  order: { version: 0 },
   caseContext: {
     caseReference: Number(CASE_REFERENCE),
     propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
@@ -46,7 +47,7 @@ const blankCase = (): Envelope => ({
   },
 });
 
-/** Minimal CCD: hands out the stored envelope and applies posted make-order events to it. */
+/** Minimal CCD: hands out the stored envelope and applies posted make order events to it. */
 let envelope = blankCase();
 
 /** The tokens CCD has handed out for starting the make order event, in order. */
@@ -65,10 +66,29 @@ export function submittedEventTokens(): string[] {
   return submittedTokens;
 }
 
-/** The reason pcs-api gives for refusing the next make order event, if a test has asked it to. */
+/** The confirm order review requests caseworkers have submitted, in order. */
+let reviewRequests: Record<string, unknown>[] = [];
+/** The make order requests judges have submitted, in order. */
+let orderRequests: Record<string, unknown>[] = [];
+
+export function submittedOrders(): Record<string, unknown>[] {
+  return orderRequests;
+}
+
+export function submittedReviews(): Record<string, unknown>[] {
+  return reviewRequests;
+}
+
+/** The reasons pcs-api gives for refusing the next event start and submission, if a test has asked it to. */
+let startRefusal: string | undefined;
 let refusal: string | undefined;
 
-/** Has the next make order event refused, as pcs-api does when the draft changed elsewhere. */
+/** Has the next order event's start refused, as pcs-api does when the chosen order is not waiting for the user. */
+export function refuseNextStart(reason: string): void {
+  startRefusal = reason;
+}
+
+/** Has the next order event refused, as pcs-api does when the order changed elsewhere. */
 export function refuseNextEvent(reason: string): void {
   refusal = reason;
 }
@@ -77,10 +97,25 @@ export function refuseNextEvent(reason: string): void {
  * CCD lets only the judge, whom it knows by their role assignments, use the make order event: anyone
  * else can start it but is not shown its payload, and cannot submit it.
  */
-function isJudge(req: Request): boolean {
+function uid(req: Request): string | undefined {
   const token = (req.headers.authorization ?? '').replace(/^Bearer /, '');
-  const claims = JSON.parse(Buffer.from(token.split('.')[1] ?? '', 'base64url').toString() || '{}');
-  return claims.uid === JUDGE.uid;
+  return JSON.parse(Buffer.from(token.split('.')[1] ?? '', 'base64url').toString() || '{}').uid;
+}
+
+function isJudge(req: Request): boolean {
+  return uid(req) === JUDGE.uid;
+}
+
+/** Likewise CCD lets only caseworkers, by their role assignments, use the confirm order review event. */
+function isCaseworker(req: Request): boolean {
+  return uid(req) === CASEWORKER.uid;
+}
+
+const CONFIRM_ORDER_REVIEW = 'ext:confirmOrderReview';
+
+/** Whether this user may use the event, as CCD decides from their role assignments. */
+function mayUse(req: Request, event: string): boolean {
+  return event === CONFIRM_ORDER_REVIEW ? isCaseworker(req) : isJudge(req);
 }
 
 function ccdStub(): Express {
@@ -88,13 +123,20 @@ function ccdStub(): Express {
   // CCD takes events far larger than express's 100kb default.
   ccd.use(express.json({ limit: '10mb' }));
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
-    const caseData = isJudge(req) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
+    const event = req.params.event as string;
+    if (startRefusal && mayUse(req, event)) {
+      const reason = startRefusal;
+      startRefusal = undefined;
+      return res.status(422).json({ callbackErrors: [reason] });
+    }
+    const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
     const token = `event-token-${startTokens.length + 1}`;
     startTokens.push(token);
     res.json({ token, case_details: { case_data: caseData } });
   });
   ccd.post('/cases/:id/events', (req: Request, res: Response) => {
-    if (!isJudge(req)) {
+    const event = req.body.event?.id as string;
+    if (!mayUse(req, event)) {
       return res.status(403).json({ message: 'Forbidden' });
     }
     submittedTokens.push(req.body.event_token);
@@ -108,11 +150,15 @@ function ccdStub(): Express {
       return res.status(422).json({ callbackErrors: [reason] });
     }
     const posted = JSON.parse(req.body.data.sdkEventPayload);
+    if (event === CONFIRM_ORDER_REVIEW) {
+      reviewRequests.push(posted);
+      return res.json({ id: req.params.id, data: {} });
+    }
+    orderRequests.push(posted);
     envelope = {
       ...envelope,
       order: {
         id: posted.order.id ?? `order-${randomUUID()}`,
-        state: posted.action === 'SUBMIT_FOR_REVIEW' ? 'SUBMITTED_FOR_REVIEW' : 'DRAFT',
         version: posted.order.version + 1,
         orderType: posted.order.orderType,
         formData: posted.order.formData,
@@ -124,9 +170,13 @@ function ccdStub(): Express {
   return ccd;
 }
 
+/**
+ * Listens on loopback by address, not the wildcard: the kernel can hand a server bound to the wildcard's
+ * port to another process binding 127.0.0.1 at the same moment, which then answers this process's requests.
+ */
 function listen(app: Express): Promise<http.Server> {
   return new Promise(resolve => {
-    const server = app.listen(0, () => resolve(server));
+    const server = app.listen(0, '127.0.0.1', () => resolve(server));
   });
 }
 
@@ -155,6 +205,8 @@ export async function bootApp(
     /** Whether the case has an open counterclaim or application. */
     openCounterclaim?: boolean;
     openApplication?: boolean;
+    /** The order pcs-api starts the event with, over a blank one. */
+    order?: Partial<Envelope['order']>;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -163,8 +215,12 @@ export async function bootApp(
   }
   envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
   envelope.caseContext.openApplication = options.openApplication ?? false;
+  envelope.order = { ...envelope.order, ...options.order };
   startTokens = [];
   submittedTokens = [];
+  reviewRequests = [];
+  orderRequests = [];
+  startRefusal = undefined;
   refusal = undefined;
   ccd ??= await listen(ccdStub());
   process.env.CCD_URL = `http://127.0.0.1:${(ccd.address() as AddressInfo).port}`;
@@ -175,6 +231,7 @@ export async function bootApp(
     { Nunjucks },
     { http: httpService },
     { default: makeOrderRoutes },
+    { default: confirmOrderReviewRoutes },
     { default: decentralisedEventRoutes },
     { default: docweaveTemplateRoutes },
     { setupErrorHandlers },
@@ -183,6 +240,7 @@ export async function bootApp(
     import('../../main/modules/nunjucks'),
     import('../../main/modules/http'),
     import('../../main/routes/makeOrder'),
+    import('../../main/routes/confirmOrderReview'),
     import('../../main/routes/decentralisedEvent'),
     import('../../main/routes/docweaveTemplates'),
     import('../../main/modules/error-handler'),
@@ -212,17 +270,18 @@ export async function bootApp(
   });
   app.param('caseReference', middleware.caseReferenceParamMiddleware);
   makeOrderRoutes(app);
+  confirmOrderReviewRoutes(app);
   decentralisedEventRoutes(app);
   docweaveTemplateRoutes(app);
   setupErrorHandlers(app, 'test');
   const server = await listen(app);
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 
-  const requestOnce = (method: string, path: string, body?: string): Promise<HttpResponse> =>
+  const request = (method: string, path: string, body?: string): Promise<HttpResponse> =>
     new Promise((resolve, reject) => {
       const req = http.request(
         `${baseUrl}${path}`,
-        { method, headers: body ? { 'content-type': 'application/x-www-form-urlencoded' } : {} },
+        { method, agent: false, headers: body ? { 'content-type': 'application/x-www-form-urlencoded' } : {} },
         res => {
           let text = '';
           res.setEncoding('utf8');
@@ -233,21 +292,6 @@ export async function bootApp(
       req.on('error', reject);
       req.end(body);
     });
-
-  // On a busy CI host the loopback connection to this test's own server can be
-  // reset before it completes (ECONNRESET), independent of the application's
-  // behaviour; a single retry absorbs that without masking a real failure,
-  // which would still surface as a wrong status, body or a repeat of the reset.
-  const request = async (method: string, path: string, body?: string): Promise<HttpResponse> => {
-    try {
-      return await requestOnce(method, path, body);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException)?.code !== 'ECONNRESET') {
-        throw error;
-      }
-      return requestOnce(method, path, body);
-    }
-  };
 
   return {
     get: path => request('GET', path),
@@ -265,38 +309,14 @@ export interface Page {
   orderText(): string;
   /** The order document the page will submit (the editor's current snapshot), as plain text. */
   documentText(): string;
-  /** The form as the browser would submit it. */
-  body(): URLSearchParams;
+  /** The form as the browser would submit it, with the named button if the page has several. */
+  body(action?: string): URLSearchParams;
 }
 
-interface SnapshotNode {
-  type: string;
-  text?: string;
-  attrs?: { text?: string };
-  content?: SnapshotNode[];
-}
-
-/** A Docweave snapshot's current document as plain text, one line per paragraph. */
-function snapshotText(json: string): string {
-  const inline = (node: SnapshotNode): string =>
-    node.type === 'text'
-      ? (node.text ?? '')
-      : node.type === 'generated_text'
-        ? (node.attrs?.text ?? '')
-        : (node.content ?? []).map(inline).join('');
-  const lines: string[] = [];
-  const walk = (node: SnapshotNode): void => {
-    if (node.type === 'paragraph') {
-      lines.push(inline(node));
-    } else {
-      node.content?.forEach(walk);
-    }
-  };
-  walk(JSON.parse(json).current);
-  return lines.join('\n');
-}
-
-/** Loads served HTML into jsdom and starts the page's JavaScript, as a browser would. */
+/**
+ * Loads a served page with the make order form into jsdom and starts its JavaScript, as a browser would: the judge's
+ * make order page, or the caseworker's review of an order.
+ */
 export async function openPage(html: string): Promise<Page> {
   window.history.replaceState(null, '', '/');
   document.open();
@@ -310,15 +330,18 @@ export async function openPage(html: string): Promise<Page> {
   initMakeOrder();
   const form = document.querySelector<HTMLFormElement>('#make-order-form');
   if (!form) {
-    throw new Error('The make order form is not on the page');
+    throw new Error(`The make order form is not on the page: ${document.body?.textContent?.trim().slice(0, 200)}`);
   }
   return {
     form,
     orderText: () => buildOrderDocument(form).textContent,
-    documentText: () => snapshotText(control<HTMLTextAreaElement>('#order-document').value),
-    body: () => {
+    documentText: () => renderText(JSON.parse(control<HTMLTextAreaElement>('#order-document').value)),
+    body: action => {
       const body = new URLSearchParams();
       new FormData(form).forEach((value, name) => body.append(name, String(value)));
+      if (action) {
+        body.set('action', action);
+      }
       return body;
     },
   };

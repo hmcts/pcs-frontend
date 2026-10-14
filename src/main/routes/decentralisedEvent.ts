@@ -62,7 +62,15 @@ export default function decentralisedEventRoutes(app: Application): void {
     const redirectRoute = config
       .get<string>('decentralisedEventRoutes.' + eventId)
       .replace(':caseReference', caseReference);
-    return safeRedirect303(res, redirectRoute);
+    // XUI hands over the query it was given, which the page may need; expected_sub is only for this check.
+    const handedOver = new URLSearchParams();
+    for (const [name, value] of Object.entries(req.query)) {
+      if (name !== 'expected_sub' && typeof value === 'string') {
+        handedOver.append(name, value);
+      }
+    }
+    const query = handedOver.toString();
+    return safeRedirect303(res, query ? `${redirectRoute}?${query}` : redirectRoute);
   });
 
   // Mount at /cases
