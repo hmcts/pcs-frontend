@@ -29,7 +29,7 @@
   <div class="pcs-case-facts__header">
     <div>
       <h2 class="govuk-heading-s" id="case-facts-heading">Case facts (tenancy/contract) <span class="govuk-!-font-weight-regular">(optional)</span></h2>
-      <p class="govuk-body-s pcs-case-facts__source" id="case-facts-source">Hearing on {{ hearingDateDisplay }}. {{ factsRecordedDisplay }}.</p>
+      <p class="govuk-body-s pcs-case-facts__source" id="case-facts-source">{{ factsRecordedDisplay }}.</p>
     </div>
     <button
       type="button"
@@ -128,11 +128,11 @@
       {{ govukTextarea({
         id: "hearing-notes",
         name: "hearing-notes",
-        rows: 3,
+        rows: 4,
         value: draftValue("hearing-notes"),
         label: {
           text: "Note for this hearing – " + hearingDateDisplay + " (optional, internal use only)",
-          classes: "govuk-!-font-weight-bold govuk-!-font-size-16"
+          classes: "govuk-visually-hidden"
         },
         errorMessage: validationErrors["hearing-notes"],
         formGroup: { classes: "govuk-!-margin-bottom-0" },
