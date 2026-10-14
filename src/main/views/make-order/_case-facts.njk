@@ -4,18 +4,26 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% import "make-order/_compact.njk" as compact with context %}
 
-{# A blank first option, so a fact the judge has not chosen is not recorded as the first one. #}
-{% set tenancyTypes = [
-  { value: "", text: "" },
-  { value: "ASSURED_TENANCY", text: "Assured tenancy" },
-  { value: "SECURE_TENANCY", text: "Secure tenancy" },
-  { value: "INTRODUCTORY_TENANCY", text: "Introductory tenancy" },
-  { value: "FLEXIBLE_TENANCY", text: "Flexible tenancy" },
-  { value: "DEMOTED_TENANCY", text: "Demoted tenancy" },
-  { value: "SECURE_CONTRACT", text: "Secure contract" },
-  { value: "STANDARD_CONTRACT", text: "Standard contract" },
-  { value: "OTHER", text: "Other" }
-] %}
+{# A blank first option, so a fact the judge has not chosen is not recorded as the first one. A case in Wales has
+   the claim's contracts, and one in England its tenancies. #}
+{% if hearing.inWales %}
+  {% set tenancyTypes = [
+    { value: "", text: "" },
+    { value: "SECURE_CONTRACT", text: "Secure contract" },
+    { value: "STANDARD_CONTRACT", text: "Standard contract" },
+    { value: "OTHER", text: "Other" }
+  ] %}
+{% else %}
+  {% set tenancyTypes = [
+    { value: "", text: "" },
+    { value: "ASSURED_TENANCY", text: "Assured tenancy" },
+    { value: "SECURE_TENANCY", text: "Secure tenancy" },
+    { value: "INTRODUCTORY_TENANCY", text: "Introductory tenancy" },
+    { value: "FLEXIBLE_TENANCY", text: "Flexible tenancy" },
+    { value: "DEMOTED_TENANCY", text: "Demoted tenancy" },
+    { value: "OTHER", text: "Other" }
+  ] %}
+{% endif %}
 
 {% set rentFrequencies = [
   { value: "", text: "" },
@@ -46,6 +54,7 @@
         id: "date-tenancy",
         namePrefix: "date-tenancy",
         items: draftDate("date-tenancy"),
+        errorMessage: validationErrors["date-tenancy-day"],
         fieldset: { legend: { text: "Date of tenancy/contract", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
@@ -60,6 +69,7 @@
         id: "date-notice",
         namePrefix: "date-notice",
         items: draftDate("date-notice"),
+        errorMessage: validationErrors["date-notice-day"],
         fieldset: { legend: { text: "Date of service of notice", classes: "govuk-fieldset__legend--s" } }
       }) }}
 
@@ -103,6 +113,7 @@
         id: "date-last-payment",
         namePrefix: "date-last-payment",
         items: draftDate("date-last-payment"),
+        errorMessage: validationErrors["date-last-payment-day"],
         fieldset: { legend: { text: "Date last payment made", classes: "govuk-fieldset__legend--s" } }
       }) }}
 

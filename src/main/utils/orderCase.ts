@@ -44,6 +44,7 @@ export interface JudicialNote {
 export interface OrderHearing {
   id: number;
   date: string;
+  inWales?: boolean;
   version?: number | null;
   caseFacts?: Record<string, unknown>;
   recorded?: { by?: string | null; on: string } | null;

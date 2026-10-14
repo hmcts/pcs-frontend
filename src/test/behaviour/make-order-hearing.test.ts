@@ -1,3 +1,5 @@
+import { DateTime } from 'luxon';
+
 import {
   CASE_REFERENCE,
   type TestApp,
@@ -41,6 +43,11 @@ const HEARING = {
   ],
 };
 
+/** The tenancy types the judge can choose from, after the blank first option. */
+function tenancyTypes(): string[] {
+  return [...document.querySelectorAll('#tenancy-type option')].slice(1).map(option => option.textContent!.trim());
+}
+
 function parse(html: string): Document {
   return new DOMParser().parseFromString(html, 'text/html');
 }
@@ -69,6 +76,21 @@ describe('make an order: for a hearing', () => {
     expect(earlier[0]).toContain('Made clear needs to do x and y.');
     expect(earlier[1]).toContain('20 July 2026 – HHJ Anesh Pema');
     expect(document.querySelector('.pcs-hearing-notes__list')?.querySelector('input, textarea')).toBeNull();
+    expect(tenancyTypes()).toEqual([
+      'Assured tenancy',
+      'Secure tenancy',
+      'Introductory tenancy',
+      'Flexible tenancy',
+      'Demoted tenancy',
+      'Other',
+    ]);
+  });
+
+  it("offers a Welsh case's contracts as its tenancy types", async () => {
+    app = await bootApp({ hearing: { ...HEARING, inWales: true } });
+    await openPage((await app.get(FOR_HEARING)).text);
+
+    expect(tenancyTypes()).toEqual(['Secure contract', 'Standard contract', 'Other']);
   });
 
   it('makes an order without a hearing with no case facts or notes, here or in what it sends', async () => {
@@ -88,22 +110,34 @@ describe('make an order: for a hearing', () => {
 
     // A fact that is not valid stops even a draft, since saving records it, and keeps the hearing on the page.
     type('current-rent', '950.505');
+    const today = DateTime.now().setZone('Europe/London');
+    typeDate('date-notice', String(today.day), String(today.month), String(today.year));
+    const tomorrow = today.plus({ days: 1 });
+    typeDate('date-last-payment', String(tomorrow.day), String(tomorrow.month), String(tomorrow.year));
     const refused = await app.post(FOR_HEARING, page.body('SAVE_DRAFT'));
     expect(refused.status).toBe(400);
     expect(submittedOrders()).toHaveLength(0);
     const shown = parse(refused.text);
-    expect(shown.querySelector('#make-order-error-summary')?.textContent).toContain('Enter a valid current rent');
+    expect([...shown.querySelectorAll('#make-order-error-summary a')].map(link => link.textContent)).toEqual([
+      'Date of service of notice must be in the past',
+      'Enter a valid current rent',
+      'Date of last payment must be today or in the past',
+    ]);
+    expect(shown.querySelector('#date-notice-error')?.textContent).toContain('must be in the past');
     expect(shown.querySelector('label[for="hearing-notes"]')?.textContent).toContain('13 October 2026');
     expect(shown.querySelectorAll('.pcs-hearing-notes__note')).toHaveLength(2);
 
     // Facts and a note left as they started are not sent, so another judge's changes to them are not refused.
     type('current-rent', '900.00');
+    typeDate('date-notice', '', '', '');
+    typeDate('date-last-payment', '1', '8', '2026');
     expect((await app.post(FOR_HEARING, page.body('SAVE_DRAFT'))).status).toBe(302);
     expect(submittedOrders().at(-1)?.hearing).toEqual({ id: 7, version: 3 });
 
     type('current-rent', '950.50');
     type('arrears-today', '1,300');
     typeDate('date-notice', '10', '8', '2026');
+    typeDate('date-last-payment', String(today.day), String(today.month), String(today.year));
     type('hearing-notes', 'Paid £200 on the day.');
     selectTab('tab-free-form');
     recordAttendance();
@@ -126,7 +160,7 @@ describe('make an order: for a hearing', () => {
         groundsPleaded: null,
         arrearsAtNotice: null,
         arrearsAtIssue: null,
-        lastPaymentDate: '2026-08-01',
+        lastPaymentDate: today.toISODate(),
         lastPayment: null,
         arrearsToday: 1300,
       },
