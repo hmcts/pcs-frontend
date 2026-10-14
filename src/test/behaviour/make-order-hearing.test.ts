@@ -28,7 +28,7 @@ const HEARING = {
     arrearsToday: 1200,
     lastPaymentDate: '2026-08-01',
   },
-  recorded: { by: 'DJ Howard Daley', hearingDate: '2026-09-01T10:00:00' },
+  recorded: { by: 'DJ Howard Daley', on: '2026-09-01T15:30:00Z' },
   note: null,
   earlierNotes: [
     {
@@ -56,9 +56,7 @@ describe('make an order: for a hearing', () => {
 
     // The link's hearing goes to pcs-api, which starts the order for it.
     expect(startClientContexts()).toEqual([{ hearingId: '7' }]);
-    expect(control('#case-facts-source').textContent).toBe(
-      'Hearing on 13 October 2026. As at the hearing on 1 September 2026, recorded by DJ Howard Daley.'
-    );
+    expect(control('#case-facts-source').textContent).toBe('Last updated by DJ Howard Daley on 1 September 2026.');
     expect(control('[name="current-rent"]').value).toBe('900');
     expect(control('[name="arrears-today"]').value).toBe('1200');
     expect(control('[name="date-last-payment-month"]').value).toBe('8');
@@ -67,9 +65,9 @@ describe('make an order: for a hearing', () => {
     // The earlier notes, newest first, are for reading only.
     const earlier = [...document.querySelectorAll('.pcs-hearing-notes__note')].map(note => note.textContent);
     expect(earlier).toHaveLength(2);
-    expect(earlier[0]).toContain('Hearing on 1 September 2026 – DJ Howard Daley');
+    expect(earlier[0]).toContain('1 September 2026 – DJ Howard Daley');
     expect(earlier[0]).toContain('Made clear needs to do x and y.');
-    expect(earlier[1]).toContain('Note made on 20 July 2026 – HHJ Anesh Pema');
+    expect(earlier[1]).toContain('20 July 2026 – HHJ Anesh Pema');
     expect(document.querySelector('.pcs-hearing-notes__list')?.querySelector('input, textarea')).toBeNull();
   });
 
@@ -95,7 +93,7 @@ describe('make an order: for a hearing', () => {
     expect(submittedOrders()).toHaveLength(0);
     const shown = parse(refused.text);
     expect(shown.querySelector('#make-order-error-summary')?.textContent).toContain('Enter a valid current rent');
-    expect(shown.querySelector('#case-facts-source')?.textContent).toContain('Hearing on 13 October 2026');
+    expect(shown.querySelector('label[for="hearing-notes"]')?.textContent).toContain('13 October 2026');
     expect(shown.querySelectorAll('.pcs-hearing-notes__note')).toHaveLength(2);
 
     type('current-rent', '950.50');
