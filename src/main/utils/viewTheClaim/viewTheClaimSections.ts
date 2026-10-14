@@ -103,7 +103,17 @@ export function buildDefendantSection(
     partyAddressRow(defendant, propertyAddress, copy.label('addressForService'), copy),
   ];
 
-  return section(copy.section('defendantDetails'), rows);
+  return section(defendantSectionTitle(defendant, copy), rows);
+}
+
+function defendantSectionTitle(defendant: UnknownRecord | undefined, copy: ViewTheClaimCopy): string {
+  if (!copy.rankedDefendantNumbering) {
+    return copy.section('defendantDetails');
+  }
+
+  const rank = typeof defendant?.rank === 'number' ? defendant.rank : undefined;
+
+  return copy.section('rankedDefendantDetails', { number: rank });
 }
 
 export function buildAdditionalDefendantSections(
@@ -115,12 +125,22 @@ export function buildAdditionalDefendantSections(
 
   return defendants
     .map((defendant, index) =>
-      section(copy.section('additionalDefendantDetails', { number: index + 1 }), [
+      section(additionalDefendantSectionTitle(defendant, index, copy), [
         textRow(copy.label('defendantName'), additionalDefendantName(defendant, data, index, copy)),
         partyAddressRow(defendant, propertyAddress, copy.label('addressForService'), copy),
       ])
     )
     .filter((sectionItem): sectionItem is ViewTheClaimSection => !!sectionItem);
+}
+
+function additionalDefendantSectionTitle(defendant: UnknownRecord, index: number, copy: ViewTheClaimCopy): string {
+  if (!copy.rankedDefendantNumbering) {
+    return copy.section('additionalDefendantDetails', { number: index + 1 });
+  }
+
+  const rank = typeof defendant.rank === 'number' ? defendant.rank : undefined;
+
+  return copy.section('rankedDefendantDetails', { number: rank });
 }
 
 export function buildClaimDetailsSection(
