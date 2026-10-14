@@ -22,6 +22,8 @@ export interface ClientContextHeaders {
   orderId?: string;
   /** The general application a judge's task asks them to decide. */
   genAppId?: string;
+  /** The hearing a judge is making an order for, from the link they followed. */
+  hearingId?: string;
 }
 
 interface CustomSessionData extends SessionData {

@@ -4,7 +4,9 @@
 {% from "govuk/components/textarea/macro.njk" import govukTextarea %}
 {% import "make-order/_compact.njk" as compact with context %}
 
+{# A blank first option, so a fact the judge has not chosen is not recorded as the first one. #}
 {% set tenancyTypes = [
+  { value: "", text: "" },
   { value: "ASSURED_TENANCY", text: "Assured tenancy" },
   { value: "SECURE_TENANCY", text: "Secure tenancy" },
   { value: "INTRODUCTORY_TENANCY", text: "Introductory tenancy" },
@@ -16,6 +18,7 @@
 ] %}
 
 {% set rentFrequencies = [
+  { value: "", text: "" },
   { value: "WEEKLY", text: "Weekly" },
   { value: "FORTNIGHTLY", text: "Fortnightly" },
   { value: "MONTHLY", text: "Monthly" },
@@ -24,7 +27,10 @@
 
 <section class="pcs-case-facts" aria-labelledby="case-facts-heading" data-case-facts>
   <div class="pcs-case-facts__header">
-    <h2 class="govuk-heading-s" id="case-facts-heading">Case facts (tenancy/contract) <span class="govuk-!-font-weight-regular">(optional)</span></h2>
+    <div>
+      <h2 class="govuk-heading-s" id="case-facts-heading">Case facts (tenancy/contract) <span class="govuk-!-font-weight-regular">(optional)</span></h2>
+      <p class="govuk-body-s pcs-case-facts__source" id="case-facts-source">{{ factsRecordedDisplay }}.</p>
+    </div>
     <button
       type="button"
       class="pcs-case-facts__toggle"
@@ -94,13 +100,6 @@
       }) }}
 
       {{ govukDateInput({
-        id: "date-last-hearing",
-        namePrefix: "date-last-hearing",
-        items: draftDate("date-last-hearing"),
-        fieldset: { legend: { text: "Date of last hearing", classes: "govuk-fieldset__legend--s" } }
-      }) }}
-
-      {{ govukDateInput({
         id: "date-last-payment",
         namePrefix: "date-last-payment",
         items: draftDate("date-last-payment"),
@@ -122,14 +121,38 @@
       }) }}
     </div>
 
-    {{ govukTextarea({
-      id: "hearing-notes",
-      name: "hearing-notes",
-      rows: 8,
-      value: draftValue("hearing-notes"),
-      label: { text: "Hearing notes (optional, internal use only)", classes: "govuk-label--s" },
-      errorMessage: validationErrors["hearing-notes"],
-      formGroup: { classes: "govuk-!-margin-bottom-0" }
-    }) }}
+    {# The case's judicial notes as a stack, newest first, under the note for this hearing. #}
+    <div class="pcs-hearing-notes">
+      <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Judicial notes</h3>
+
+      {{ govukTextarea({
+        id: "hearing-notes",
+        name: "hearing-notes",
+        rows: 4,
+        value: draftValue("hearing-notes"),
+        label: {
+          text: "Note for this hearing – " + hearingDateDisplay + " (optional, internal use only)",
+          classes: "govuk-visually-hidden"
+        },
+        errorMessage: validationErrors["hearing-notes"],
+        formGroup: { classes: "govuk-!-margin-bottom-0" },
+        classes: "govuk-!-margin-bottom-0"
+      }) }}
+
+      <div class="pcs-hearing-notes__stack">
+        {% if earlierNotes | length %}
+          <ol class="pcs-hearing-notes__list" aria-label="Earlier judicial notes, newest first">
+            {% for note in earlierNotes %}
+              <li class="pcs-hearing-notes__note">
+                <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ note.when }} &ndash; {{ note.by }}</p>
+                <p class="govuk-body-s govuk-!-margin-bottom-0 pcs-hearing-notes__text">{{ note.note }}</p>
+              </li>
+            {% endfor %}
+          </ol>
+        {% else %}
+          <p class="govuk-body-s pcs-hearing-notes__empty">No earlier notes.</p>
+        {% endif %}
+      </div>
+    </div>
   </div>
 </section>

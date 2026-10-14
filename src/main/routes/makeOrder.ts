@@ -6,9 +6,16 @@ import { MAKE_ORDER_ROUTE, MAKE_ORDER_SENT_FOR_REVIEW_ROUTE } from '../constants
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { type OrderFormSubmission, attendanceParties, orderFormModel } from '@utils/makeOrderForm';
-import { type MakeOrderValidationIssue, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
+  type OrderFormSubmission,
+  attendanceParties,
+  caseFactsFromForm,
+  orderFormModel,
+  withoutHearingRecord,
+} from '@utils/makeOrderForm';
+import { type MakeOrderValidationIssue, validateHearingRecord, validateMakeOrder } from '@utils/makeOrderValidation';
+import {
+  type OrderHearing,
   type OrderStart,
   caseHeader,
   confirmationHeader,
@@ -26,27 +33,32 @@ interface StartedOrder {
   eventToken: string;
 }
 
-/** What the page's URL names: an order from the orders tab, or the application a task asks the judge to decide. */
+/**
+ * What the page's URL names: an order from the orders tab, the application a task asks the judge to decide, or the
+ * hearing the judge's link names.
+ */
 interface Chosen {
   orderId?: string;
   genAppId?: string;
+  hearingId?: string;
 }
 
 /**
  * Starts the judge's working order, or the order they chose on the case's orders tab: one a
  * caseworker returned to them, which pcs-api starts with the caseworker's query. A task to decide an
- * application starts the judge's order on that application.
+ * application starts the judge's order on that application. A new order is made for the hearing the
+ * judge's link named, if it named one.
  */
 async function startOrderEvent(
   accessToken: string,
   caseReference: string,
-  { orderId, genAppId }: Chosen = {}
+  { orderId, genAppId, hearingId }: Chosen = {}
 ): Promise<StartedOrder> {
   const started = await ccdCaseService.startCaseEvent(
     accessToken,
     caseReference,
     MAKE_ORDER_EVENT_ID,
-    orderId || genAppId ? { orderId, genAppId } : undefined
+    orderId || genAppId || hearingId ? { orderId, genAppId, hearingId } : undefined
   );
   const payload = started.data.sdkEventPayload;
   if (!payload) {
@@ -96,12 +108,12 @@ function pageModel(
 }
 
 /**
- * The order the orders tab linked to, or the application a task linked to, which the page's URL names
- * for as long as the judge works on it.
+ * The order the orders tab linked to, the application a task linked to, or the hearing the judge's link
+ * named, which the page's URL keeps for as long as the judge works on the order.
  */
 function chosenFromUrl(req: Request): Chosen {
   const id = (name: string): string | undefined => (typeof req.query[name] === 'string' ? req.query[name] : undefined);
-  return { orderId: id('orderId'), genAppId: id('genAppId') };
+  return { orderId: id('orderId'), genAppId: id('genAppId'), hearingId: id('hearingId') };
 }
 
 export default function makeOrderRoutes(app: Application): void {
@@ -133,28 +145,36 @@ export default function makeOrderRoutes(app: Application): void {
       orderVersion,
       genAppId,
       queryFromCaseworker,
+      hearing,
       orderType,
       orderDocument,
       ...formData
     } = req.body;
 
     try {
-      if (action === 'SUBMIT_FOR_REVIEW') {
-        // The order is checked against the case as the page's start returned it.
-        const started: StartedOrder = {
-          eventToken,
-          envelope: {
-            order: { id: orderId, version: Number(orderVersion), queryFromCaseworker, genAppId },
-            caseContext: JSON.parse(caseContext),
-          },
-        };
-        const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(started.envelope));
-        if (validationIssues.length) {
-          // Nothing was submitted, so the page's start, and the version it gave, still stand: if the
-          // draft was saved elsewhere meanwhile, pcs-api refuses the retry rather than overwriting it.
-          const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues };
-          return res.status(400).render('make-order', pageModel(req, started, submission));
-        }
+      // The hearing as the page's start returned it, with the facts the judge started from.
+      const startedHearing: OrderHearing | null = JSON.parse(hearing || 'null');
+      // The order is checked against the case as the page's start returned it.
+      const started: StartedOrder = {
+        eventToken,
+        envelope: {
+          order: { id: orderId, version: Number(orderVersion), queryFromCaseworker, genAppId },
+          caseContext: JSON.parse(caseContext),
+          hearing: startedHearing,
+        },
+      };
+      // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
+      const validationIssues =
+        action === 'SUBMIT_FOR_REVIEW'
+          ? validateMakeOrder(orderType, formData, attendanceParties(started.envelope))
+          : startedHearing
+            ? validateHearingRecord(formData)
+            : [];
+      if (validationIssues.length) {
+        // Nothing was submitted, so the page's start, and the version it gave, still stand: if the
+        // draft was saved elsewhere meanwhile, pcs-api refuses the retry rather than overwriting it.
+        const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues };
+        return res.status(400).render('make-order', pageModel(req, started, submission));
       }
       const request = {
         action,
@@ -162,11 +182,20 @@ export default function makeOrderRoutes(app: Application): void {
           id: orderId || null,
           version: Number(orderVersion),
           orderType,
-          formData,
+          formData: withoutHearingRecord(formData),
           docweaveSnapshot: postedSnapshot(orderDocument),
           genAppId: genAppId || null,
         },
         taskId: taskId || null,
+        // pcs-api records the hearing's facts and note whenever the judge saves.
+        hearing: startedHearing
+          ? {
+              id: startedHearing.id,
+              version: startedHearing.version ?? null,
+              caseFacts: caseFactsFromForm(formData),
+              note: formData['hearing-notes'] || null,
+            }
+          : null,
       };
       try {
         await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
