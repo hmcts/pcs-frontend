@@ -3,7 +3,7 @@ import type { Environment } from 'nunjucks';
 jest.mock('../../../../main/modules/steps/i18n', () => ({
   loadStepNamespace: jest.fn(),
   getStepTranslations: jest.fn(() => ({})),
-  getTranslationFunction: jest.fn(() => t),
+  getTranslationFunction: jest.fn(() => (key: string) => key),
 }));
 
 jest.mock('../../../../main/modules/i18n', () => ({
@@ -31,52 +31,24 @@ jest.mock('../../../../main/modules/steps/formBuilder/helpers', () => {
 });
 
 const mockSaveDraftDefendantResponse = jest.fn();
-const mockBuildDraftDefendantResponse = jest.fn(() => ({
-  defendantResponses: {},
-  defendantContactDetails: { party: {} },
-}));
 jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
-  buildDraftDefendantResponse: mockBuildDraftDefendantResponse,
+  buildDraftDefendantResponse: jest.fn(() => ({
+    defendantResponses: {},
+    defendantContactDetails: { party: {} },
+  })),
   saveDraftDefendantResponse: mockSaveDraftDefendantResponse,
 }));
 
-const t = ((key: string) => {
-  const translations: Record<string, string> = {
-    pageTitle: 'Instalment payments',
-    heading: 'Instalment offer',
-    paragraph1: 'Paragraph one',
-    paragraph2: 'Paragraph two',
-    paragraph3: 'Paragraph three',
-    paragraph4: 'Paragraph four',
-    question: 'Do you want to pay in instalments?',
-    'options.yes': 'Yes',
-    'options.no': 'No',
-    'buttons.saveAndContinue': 'Save and continue',
-    'buttons.continue': 'Continue',
-    'buttons.saveForLater': 'Save for later',
-    'buttons.cancel': 'Cancel',
-    'errors.title': 'There is a problem',
-    serviceName: 'Test service',
-    phase: 'ALPHA',
-    feedback: 'Feedback',
-    back: 'Back',
-    languageToggle: 'Language toggle',
-    contactUsForHelp: 'Contact us for help',
-    contactUsForHelpText: 'You can contact us for help.',
-  };
-  return key in translations ? translations[key] : key;
-}) as unknown as (key: string, options?: unknown) => string;
-
 import { validateForm } from '../../../../main/modules/steps/formBuilder/helpers';
-import { step } from '../../../../main/steps/respond-to-claim/installment-payments';
+import { step } from '../../../../main/steps/respond-to-claim/contact-preferences-telephone';
 
-describe('respond-to-claim installment-payments step', () => {
+describe('respond-to-claim contact-preferences-telephone step', () => {
   const nunjucksEnv = { render: jest.fn() } as unknown as Environment;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const createReq = (overrides: Record<string, unknown> = {}): any => ({
     body: {},
-    originalUrl: '/case/1234567890123456/respond-to-claim/installment-payments',
+    originalUrl: '/case/1234567890123456/respond-to-claim/contact-preferences-telephone',
     query: { lang: 'en' },
     params: { caseReference: '1234567890123456' },
     session: {
@@ -85,8 +57,7 @@ describe('respond-to-claim installment-payments step', () => {
     },
     app: { locals: { nunjucksEnv } },
     i18n: { getResourceBundle: jest.fn(() => ({})) },
-    res: { locals: { validatedCase: { id: '1234567890123456' } } },
-
+    res: { locals: { validatedCase: { id: '1234567890123456', data: {} } } },
     ...overrides,
   });
 
@@ -95,19 +66,13 @@ describe('respond-to-claim installment-payments step', () => {
     mockSaveDraftDefendantResponse.mockResolvedValue(undefined);
   });
 
-  it('exposes correct step url and view', () => {
-    expect(step.name).toBe('installment-payments');
-    expect(step.url).toBe('/case/:caseReference/respond-to-claim/installment-payments');
-    expect(step.view).toContain('instalmentOffer.njk');
-  });
-
-  it('POST saves Yes to defendantResponses.paymentAgreement', async () => {
+  it('sets phoneNumberProvided Yes when the citizen supplies a phone number', async () => {
     (validateForm as jest.Mock).mockReturnValue({});
-
     const req = createReq({
       body: {
         action: 'continue',
-        confirmInstallmentOffer: 'yes',
+        contactByTelephone: 'yes',
+        'contactByTelephone.phoneNumber': '07700900444',
       },
     });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -117,16 +82,22 @@ describe('respond-to-claim installment-payments step', () => {
     if (!step.postController) {
       throw new Error('expected postController');
     }
+
     await step.postController.post(req, res, next);
 
     expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
         defendantResponses: expect.objectContaining({
-          paymentAgreement: expect.objectContaining({ repayArrearsInstalments: 'YES' }),
+          contactByPhone: 'YES',
+        }),
+        defendantContactDetails: expect.objectContaining({
+          party: expect.objectContaining({
+            phoneNumber: '07700900444',
+            phoneNumberProvided: 'YES',
+          }),
         }),
       })
     );
-    expect(res.redirect).toHaveBeenCalledWith(303, '/next-step');
   });
 });

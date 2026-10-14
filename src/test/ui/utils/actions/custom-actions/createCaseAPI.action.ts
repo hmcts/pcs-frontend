@@ -142,7 +142,21 @@ export class CreateCaseAPIAction implements IAction {
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
-            throw error;
+            const status = error.response?.status;
+            const responseBody = error.response?.data;
+
+            console.error('=== SUBMIT CASE ERROR RESPONSE ===');
+            console.error('HTTP Status:', status);
+            console.error('Exception:', responseBody?.exception);
+            console.error('Error:', responseBody?.error);
+            console.error('Message:', responseBody?.message);
+            console.error('Path:', responseBody?.path);
+            console.error('Timestamp:', responseBody?.timestamp);
+            console.error('Full response body:', JSON.stringify(responseBody, null, 2));
+
+            throw new Error(
+              `Submit case API failed with status ${status}: ${JSON.stringify(responseBody ?? error.message)}`
+            );
           }
           throw new Error('Submit case failed unexpectedly.');
         }
@@ -175,9 +189,15 @@ export class CreateCaseAPIAction implements IAction {
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
-            throw new Error(`Payment API failed after retries: ${error.response?.status}`);
+            const responseDetails = error.response?.data ?? error.message;
+            const status = error.response?.status ? ` (HTTP ${error.response.status})` : '';
+            throw new Error(
+              `Payment API failed after ${attempt} attempts${status}: ${JSON.stringify(responseDetails)}`,
+              { cause: error }
+            );
           }
-          throw new Error('Payment API failed unexpectedly after retries.');
+          const details = error instanceof Error ? error.message : String(error);
+          throw new Error(`Payment API failed after ${attempt} attempts: ${details}`, { cause: error });
         }
         await new Promise(res => setTimeout(res, delayMs));
       }
@@ -186,7 +206,7 @@ export class CreateCaseAPIAction implements IAction {
   }
 
   private async deleteCaseRole(roleData: actionData): Promise<void> {
-    const userId = user.claimantSolicitor.uid;
+    const userId = user.localAuthority.uid;
     const caseId = (process.env.CASE_NUMBER ?? '').replace(/-/g, '');
     const caseRole = typeof roleData === 'string' ? roleData : String(roleData);
     if (!caseId) {
