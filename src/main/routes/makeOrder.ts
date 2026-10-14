@@ -10,6 +10,7 @@ import {
   type OrderFormSubmission,
   attendanceParties,
   caseFactsFromForm,
+  hearingRecordChanged,
   orderFormModel,
   withoutHearingRecord,
 } from '@utils/makeOrderForm';
@@ -175,13 +176,16 @@ export default function makeOrderRoutes(app: Application): void {
           docweaveSnapshot: postedSnapshot(orderDocument),
         },
         taskId: taskId || null,
-        // pcs-api records the hearing's facts and note whenever the judge saves.
+        // pcs-api records the hearing's facts and note only if the judge changed them, so a save that left
+        // them alone is not refused because another judge has since changed them.
         hearing: startedHearing
           ? {
               id: startedHearing.id,
               version: startedHearing.version ?? null,
-              caseFacts: caseFactsFromForm(formData),
-              note: formData['hearing-notes'] || null,
+              ...(hearingRecordChanged(startedHearing, formData) && {
+                caseFacts: caseFactsFromForm(formData),
+                note: formData['hearing-notes'] || null,
+              }),
             }
           : null,
       };

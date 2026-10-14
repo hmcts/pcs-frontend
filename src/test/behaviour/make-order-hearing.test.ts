@@ -96,6 +96,11 @@ describe('make an order: for a hearing', () => {
     expect(shown.querySelector('label[for="hearing-notes"]')?.textContent).toContain('13 October 2026');
     expect(shown.querySelectorAll('.pcs-hearing-notes__note')).toHaveLength(2);
 
+    // Facts and a note left as they started are not sent, so another judge's changes to them are not refused.
+    type('current-rent', '900.00');
+    expect((await app.post(FOR_HEARING, page.body('SAVE_DRAFT'))).status).toBe(302);
+    expect(submittedOrders().at(-1)?.hearing).toEqual({ id: 7, version: 3 });
+
     type('current-rent', '950.50');
     type('arrears-today', '1,300');
     typeDate('date-notice', '10', '8', '2026');

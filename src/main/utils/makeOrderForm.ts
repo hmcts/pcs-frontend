@@ -71,6 +71,17 @@ export function caseFactsFromForm(formData: FormData): Record<string, unknown> {
   return facts;
 }
 
+const noteText = (note: unknown): string => String(note ?? '').replace(/\r\n/g, '\n').trim();
+
+/** Whether the judge changed the hearing's facts or note from those the page started with. */
+export function hearingRecordChanged(started: OrderHearing, formData: FormData): boolean {
+  const startedFacts = caseFactsFromForm(caseFactsFormData(started.caseFacts));
+  return (
+    JSON.stringify(caseFactsFromForm(formData)) !== JSON.stringify(startedFacts) ||
+    noteText(formData['hearing-notes']) !== noteText(started.note)
+  );
+}
+
 const displayDate = (iso?: string | null): string =>
   iso ? DateTime.fromISO(iso, { zone: 'Europe/London' }).toFormat('d MMMM yyyy') : '';
 
