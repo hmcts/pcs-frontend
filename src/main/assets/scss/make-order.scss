@@ -151,13 +151,18 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   }
 }
 
+// The earlier notes scroll in their own box, under this hearing's note. A shadow at the bottom shows there are more,
+// until the white cover that scrolls with the notes reaches it.
 .pcs-hearing-notes__stack {
-  display: flex;
   flex: 1 1 auto;
-  flex-direction: column;
-  gap: govuk-spacing(2);
   min-height: 0;
+  padding: 0 govuk-spacing(2);
   overflow-y: auto;
+  border: 1px solid $govuk-border-colour;
+  background:
+    linear-gradient(rgb(govuk-colour("white"), 0), govuk-colour("white") 70%) bottom / 100% govuk-spacing(4) no-repeat local,
+    radial-gradient(farthest-side at 50% 100%, rgb(govuk-colour("black"), .2), transparent) bottom / 100% govuk-spacing(2) no-repeat scroll,
+    govuk-colour("white");
 }
 
 .pcs-hearing-notes__list {
@@ -168,7 +173,10 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
 
 .pcs-hearing-notes__note {
   padding: govuk-spacing(2) 0;
-  border-top: 1px solid $govuk-border-colour;
+
+  & + & {
+    border-top: 1px solid $govuk-border-colour;
+  }
 }
 
 .pcs-hearing-notes__text {
@@ -177,6 +185,7 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
 
 .pcs-hearing-notes__empty {
   margin: 0;
+  padding: govuk-spacing(2) 0;
   color: $govuk-secondary-text-colour;
 }
 

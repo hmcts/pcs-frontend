@@ -125,20 +125,21 @@
     <div class="pcs-hearing-notes">
       <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Judicial notes</h3>
 
-      <div class="pcs-hearing-notes__stack">
-        {{ govukTextarea({
-          id: "hearing-notes",
-          name: "hearing-notes",
-          rows: 3,
-          value: draftValue("hearing-notes"),
-          label: {
-            text: "Note for this hearing – " + hearingDateDisplay + " (optional, internal use only)",
-            classes: "govuk-!-font-weight-bold govuk-!-font-size-16"
-          },
-          errorMessage: validationErrors["hearing-notes"],
-          formGroup: { classes: "govuk-!-margin-bottom-0" }
-        }) }}
+      {{ govukTextarea({
+        id: "hearing-notes",
+        name: "hearing-notes",
+        rows: 3,
+        value: draftValue("hearing-notes"),
+        label: {
+          text: "Note for this hearing – " + hearingDateDisplay + " (optional, internal use only)",
+          classes: "govuk-!-font-weight-bold govuk-!-font-size-16"
+        },
+        errorMessage: validationErrors["hearing-notes"],
+        formGroup: { classes: "govuk-!-margin-bottom-0" },
+        classes: "govuk-!-margin-bottom-0"
+      }) }}
 
+      <div class="pcs-hearing-notes__stack">
         {% if earlierNotes | length %}
           <ol class="pcs-hearing-notes__list" aria-label="Earlier judicial notes, newest first">
             {% for note in earlierNotes %}
