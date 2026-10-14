@@ -22,6 +22,9 @@
       {% endif %}
     {% endfor %}
 
+    <p class="govuk-body">{{ otherParties }}</p>
+    <p class="govuk-body">{{ everyOtherPartyWillNeedToAgree }}</p>
+
     <div class="govuk-button-group">
       {{ govukButton({
           text: t('buttons.continue', { ns: 'common' }),

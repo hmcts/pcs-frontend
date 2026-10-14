@@ -33,5 +33,7 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    otherParties: 'otherParties',
+    everyOtherPartyWillNeedToAgree: 'everyOtherPartyWillNeedToAgree',
   },
 });

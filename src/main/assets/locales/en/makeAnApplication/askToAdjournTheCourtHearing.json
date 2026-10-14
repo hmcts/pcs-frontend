@@ -17,7 +17,7 @@
   "howLongItTakes": "How long it takes",
   "assessedOnUrgencyBasis": "Your application will be assessed on an urgency basis and will be considered by a judge before the hearing date.",
   "howMuchItWillCost": "How much it will cost",
-  "freeIfAtLeast14DaysAway": "It’s free to apply if your court hearing is at least 14 days away.",
+  "freeIfAtLeast14DaysAway": "It’s free to apply if your court hearing is at least 14 days away and the other parties have already agreed to it.",
   "ifHearingSoonerNeedToPay": "If your court hearing is sooner, you will need to pay {{standardFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}}.",
   "feeIncreasesIf": "The fee will increase to {{maxFee, currency(currency: GBP; trailingZeroDisplay: stripIfInteger)}} if:",
   "youHaveAlreadyToldTheOtherParty": "you have already told the other party that you are making this application, and",
