@@ -12,7 +12,6 @@ import {
   groupQuestionAndDetail,
   isYes,
   multiSelectValue,
-  pushYesNoRow,
 } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
@@ -178,7 +177,30 @@ function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: 
   if (!contactByPhone) {
     return;
   }
-  pushYesNoRow(rows, 'rows.contactByPhone', contactByPhone, 'contact-preferences-telephone', t, yesNoNotSure, change);
+
+  const questionRow: SummaryListRow = {
+    key: { text: t('rows.contactByPhone.label') },
+    value: { text: yesNoNotSure(contactByPhone) },
+    actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhone.changeHidden')] },
+  };
+  rows.push(questionRow);
+
+  if (normalizeYesNoValue(contactByPhone) !== 'YES') {
+    return;
+  }
+
+  const phoneNumber = validatedCase.defendantContactDetailsPartyPhoneNumber?.replace(/\s+/g, '');
+  if (!phoneNumber) {
+    return;
+  }
+
+  const detailRow: SummaryListRow = {
+    key: { text: t('rows.phoneNumber.label') },
+    value: { html: escapeHtml(phoneNumber) },
+    actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhone.changeHidden')] },
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addContactByTextRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
@@ -191,7 +213,30 @@ function addContactByTextRow({ rows, validatedCase, t, change, yesNoNotSure }: R
   if (!contactByText) {
     return;
   }
-  pushYesNoRow(rows, 'rows.contactByText', contactByText, 'contact-preferences-text-message', t, yesNoNotSure, change);
+
+  const questionRow: SummaryListRow = {
+    key: { text: t('rows.contactByText.label') },
+    value: { text: yesNoNotSure(contactByText) },
+    actions: { items: [change('contact-preferences-text-message', 'rows.contactByText.changeHidden')] },
+  };
+  rows.push(questionRow);
+
+  if (normalizeYesNoValue(contactByText) !== 'YES') {
+    return;
+  }
+
+  const textMessageNumber = validatedCase.defendantContactDetailsPartyTextMessageNumber?.replace(/\s+/g, '');
+  if (!textMessageNumber) {
+    return;
+  }
+
+  const detailRow: SummaryListRow = {
+    key: { text: t('rows.textMessageNumber.label') },
+    value: { html: escapeHtml(textMessageNumber) },
+    actions: { items: [change('contact-preferences-text-message', 'rows.contactByText.changeHidden')] },
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 // Per the GOV.UK check-answers contact-details example: a single row that stacks

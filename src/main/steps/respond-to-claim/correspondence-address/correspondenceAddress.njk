@@ -54,7 +54,7 @@
           <span class="govuk-visually-hidden">{{ labels.errorPrefix }}:</span>
           {{ clientErrors.lookupPostcode }}
         </p>
-        <p class="govuk-error-message govuk-!-display-none" id="correspondence-postcode-error">
+        <p class="govuk-error-message govuk-!-display-none" id="correspondence-postcode-not-found-error">
           <span class="govuk-visually-hidden">{{ labels.errorPrefix }}:</span>
           {{ clientErrors.postcodeNotFound }}
         </p>
@@ -66,7 +66,7 @@
               name="lookupPostcode"
               type="text"
               autocomplete="postal-code"
-              aria-describedby="correspondence-lookup-postcode-error correspondence-postcode-error"
+              aria-describedby="correspondence-lookup-postcode-error correspondence-postcode-not-found-error"
 />
           <button
               class="govuk-button govuk-!-margin-left-2 govuk-!-margin-bottom-0"

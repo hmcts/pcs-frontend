@@ -30,7 +30,7 @@ import { findCaseDocumentById } from '@utils/documentUtils';
 import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
-import { RELEASE_1_2_ENABLED } from '@utils/respondToClaimFlags';
+import { RELEASE_1_2_ENABLED, RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 import { enumToSentence } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const logger = Logger.getLogger('viewTheResponse');
@@ -635,8 +635,11 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
   return { rows };
 }
 
-function resolveResponsePdfUrl(caseData: CcdCaseData, caseReference: string): string | undefined {
-  const documentId = caseData.possessionClaimResponse?.responseDocumentId;
+function resolveDocumentUrl(
+  documentId: string | undefined,
+  caseData: CcdCaseData,
+  caseReference: string
+): string | undefined {
   if (!documentId) {
     return undefined;
   }
@@ -682,6 +685,7 @@ export default function viewTheResponseRoutes(app: Application): void {
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate, lang);
       const completedBy = responses?.statementOfTruthCompletedBy;
       const responsePdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_2_ENABLED, false);
+      const counterclaimPdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_4_ENABLED, false);
 
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
@@ -707,7 +711,12 @@ export default function viewTheResponseRoutes(app: Application): void {
         ...sections,
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
-        responsePdfUrl: responsePdfEnabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
+        counterclaimPdfUrl: counterclaimPdfEnabled
+          ? resolveDocumentUrl(caseData.possessionClaimResponse?.counterclaimDocumentId, caseData, caseReference)
+          : undefined,
+        responsePdfUrl: responsePdfEnabled
+          ? resolveDocumentUrl(caseData.possessionClaimResponse?.responseDocumentId, caseData, caseReference)
+          : undefined,
       });
     } catch (e) {
       logger.error(`Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`);
