@@ -255,8 +255,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
   });
 
-  // This test will be skipped until the bugs HDPI-7401 & HDPI-7360 get fixed
-  test.skip('Validate View the response page data @regression @crossbrowser', async () => {
+  test('Validate View the response page data @regression @crossbrowser', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performAction('reloadPage');
     await performAction('respondPossessionClaimAPI', {
@@ -264,6 +263,24 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       type: 'both',
     });
     await performAction('reloadPage');
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: `£${dashboard.counterClaimAmount}`,
+      fee: dashboard.counterClaimFee,
+    });
+    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
+    await performAction('clickButton', paymentDetails.confirmPaymentButton);
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: counterClaimPaymentSuccessful.paymentConfirmationParagraph,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
     await performAction('clickButton', dashboard.viewTheResponseSubHeader);
     await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
     await performAction('verifyResponseDetailsOnViewTheResponsePage');
