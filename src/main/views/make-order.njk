@@ -51,8 +51,6 @@
     <textarea hidden name="queryFromCaseworker">{{ order.queryFromCaseworker }}</textarea>
   {% endif %}
 
-  <p class="govuk-body">Answer every question unless it says it is optional.</p>
-
   {% include "make-order/_form.njk" %}
 
   {{ compact.reveal("staff-message", "Staff message", compact.textarea("staff-message-text", { label: "Message for court staff" })) }}
