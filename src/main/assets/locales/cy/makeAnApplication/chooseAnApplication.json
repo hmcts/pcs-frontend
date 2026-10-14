@@ -13,6 +13,10 @@
   "question": "Beth ydych chi eisiau gwneud cais amdano?",
   "hintText": "Rhywfaint o destun awgrymog dewisol yma (deiliad lle)",
   "options": {
+    "suspend": {
+      "label": "Ask the court to suspend (stop or delay) the eviction",
+      "hint": "You can ask the court to ‘suspend the eviction’. This means stopping or delaying the eviction."
+    },
     "adjourn": {
       "label": "Gofyn i ohirio'r gwrandawiad (ei symud i amser neu ddyddiad diweddarach)",
       "hint": "Gallwch wneud cais i newid y gwrandawiad llys i amser neu ddyddiad diweddarach"
@@ -27,6 +31,6 @@
     }
   },
   "errors": {
-    "typeOfApplication": "Dewiswch beth rydych eisiau gwneud cais amdano"
+    "typeOfApplication": "Please select an application"
   }
 }
