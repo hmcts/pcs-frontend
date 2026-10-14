@@ -166,7 +166,8 @@
   },
   "pdf": {
     "heading": "Lawrlwythwch gopi PDF o’r ymateb",
-    "linkText": "Ymateb (PDF)"
+    "linkText": "Ymateb (PDF)",
+    "counterclaimLinkText": "Gwrth-hawliad (PDF)"
   },
   "closeAndReturn": "Cau a dychwelyd i drosolwg o’r achos",
   "accordion": {

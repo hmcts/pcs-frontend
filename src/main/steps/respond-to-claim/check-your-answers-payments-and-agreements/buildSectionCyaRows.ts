@@ -117,7 +117,7 @@ function addRepayArrearsInstalmentsRow({ rows, paymentAgreement, t, change, yesN
     rows,
     'rows.repayArrearsInstalments',
     paymentAgreement.repayArrearsInstalments,
-    'installment-payments',
+    'instalment-payments',
     t,
     yesNoNotSure,
     change
