@@ -102,7 +102,10 @@ function setInlineFieldError(container: HTMLElement, message: string): void {
     const anchor = formGroup.querySelector<HTMLElement>('.moj-multi-file-upload__dropzone') ?? fileInput;
     anchor.parentNode?.insertBefore(errorEl, anchor);
   }
-  errorEl.innerHTML = '<span class="govuk-visually-hidden">Error:</span> ';
+  const errorPrefix = document.createElement('span');
+  errorPrefix.className = 'govuk-visually-hidden';
+  errorPrefix.textContent = `${container.dataset.errorPrefix || 'Error'}:`;
+  errorEl.replaceChildren(errorPrefix, ' ');
   errorEl.appendChild(document.createTextNode(message));
 
   const ids = (fileInput.getAttribute('aria-describedby') || '').split(/\s+/).filter(Boolean);

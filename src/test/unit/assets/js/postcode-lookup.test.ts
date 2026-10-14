@@ -479,6 +479,55 @@ describe('initPostcodeLookup', () => {
     });
   });
 
+  describe('Welsh page', () => {
+    const buildWelshComponent = () =>
+      buildComponent()
+        .replace(
+          '<div data-address-component data-name-prefix="address">',
+          '<div data-address-component data-name-prefix="address" data-one-address-found="Daethpwyd o hyd i 1 cyfeiriad" data-many-addresses-found="Daethpwyd o hyd i {count} cyfeiriad" data-no-addresses-found="Heb ganfod cyfeiriad">'
+        )
+        .replace(/Error:/g, 'Gwall:');
+
+    const lookUp = async (addresses: Record<string, string>[]) => {
+      setFetch(jest.fn().mockResolvedValue({ ok: true, json: async () => ({ addresses }) }));
+      initPostcodeLookup();
+      (document.getElementById('address-lookupPostcode') as HTMLInputElement).value = 'CF10 1AA';
+      (document.getElementById('address-findAddressBtn') as HTMLButtonElement).click();
+      await flushPromises();
+      return document.getElementById('address-selectedAddress') as HTMLSelectElement;
+    };
+
+    it('shows the number of addresses found in Welsh', async () => {
+      document.body.innerHTML = buildWelshComponent();
+
+      const select = await lookUp([
+        { fullAddress: '1 Heol y Frenhines, Caerdydd' },
+        { fullAddress: '2 Heol y Frenhines, Caerdydd' },
+      ]);
+
+      expect(select.options[0].textContent).toBe('Daethpwyd o hyd i 2 cyfeiriad');
+    });
+
+    it('shows a single address found in Welsh', async () => {
+      document.body.innerHTML = buildWelshComponent();
+
+      const select = await lookUp([{ fullAddress: '1 Heol y Frenhines, Caerdydd' }]);
+
+      expect(select.options[0].textContent).toBe('Daethpwyd o hyd i 1 cyfeiriad');
+    });
+
+    it('shows no addresses found in Welsh and keeps the hidden prefix out of the error summary', async () => {
+      document.body.innerHTML = buildErrorSummary() + buildWelshComponent();
+
+      const select = await lookUp([]);
+
+      expect(select.options[0].textContent).toBe('Heb ganfod cyfeiriad');
+      const summaryText = document.querySelector('.govuk-error-summary__list')?.textContent ?? '';
+      expect(summaryText).toContain('No addresses found');
+      expect(summaryText).not.toContain('Gwall');
+    });
+  });
+
   describe('Error summary integration', () => {
     it('adds blank field error to error summary', async () => {
       document.body.innerHTML = buildErrorSummary() + buildComponent();

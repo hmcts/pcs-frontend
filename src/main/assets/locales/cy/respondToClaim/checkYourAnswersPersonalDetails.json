@@ -25,7 +25,7 @@
     },
     "contactByEmailOrPost": {
       "label": "Sut ydych chi eisiau cael diweddariadau?",
-      "changeHidden": "sut byddwn yn derbyn diweddariadau",
+      "changeHidden": "sut rydych yn cael diweddariadau",
       "options": {
         "email": "Trwy e-bost",
         "post": "Trwy’r post",

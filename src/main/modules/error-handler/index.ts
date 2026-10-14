@@ -2,7 +2,7 @@ import type { Express, NextFunction, Request, Response } from 'express';
 
 import { ApplicationError } from '../../ApplicationError';
 import { HTTPError } from '../../HttpError';
-import { getTranslationFunction, populateCommonTranslations } from '../i18n';
+import { getRequestLanguage, getTranslationFunction, populateCommonTranslations } from '../i18n';
 
 import { authFailure } from './authFailure';
 import { getErrorPageKey } from './errorPageKeys';
@@ -78,15 +78,18 @@ export function createErrorHandler(env: string): (err: Error, req: Request, res:
           });
         } else {
           const retryAfterDate = new Date(retryAfter);
-          const time = retryAfterDate.toLocaleTimeString('en-GB', {
+          const locale = getRequestLanguage(req) === 'cy' ? 'cy-GB' : 'en-GB';
+          const time = retryAfterDate.toLocaleTimeString(locale, {
             hour12: true,
             hour: '2-digit',
             minute: '2-digit',
+            timeZone: 'Europe/London',
           });
-          const date = retryAfterDate.toLocaleDateString('en-GB', {
+          const date = retryAfterDate.toLocaleDateString(locale, {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
+            timeZone: 'Europe/London',
           });
           res.locals.serviceUnavailableParagraph = t('errorPages.serviceUnavailable.paragraphDateAndTime', {
             date,

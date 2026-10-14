@@ -14,6 +14,9 @@ jest.mock('../../../../main/modules/steps', () => ({
       if (key === 'tenancyTypeOther') {
         return `The claimant provided the following information about your tenancy, occupation contract or licence agreement type: ${options?.otherTenancyTypeDetails}`;
       }
+      if (key.startsWith('tenancyTypeAgreementTypes.')) {
+        return options?.defaultValue;
+      }
       return key;
     })
   ),
@@ -31,6 +34,7 @@ jest.mock('../../../../main/steps/utils/buildDraftDefendantResponse', () => ({
   saveDraftDefendantResponse: jest.fn(),
 }));
 
+import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/tenancy-type-details';
 import { saveDraftDefendantResponse } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 import { isWalesProperty } from '../../../../main/steps/utils/isWalesProperty';
@@ -522,6 +526,33 @@ describe('respond-to-claim tenancy-type-details step', () => {
 
         expect(content.tenancyTypeAgreementType).toBe(expectedText);
       });
+    });
+
+    it('takes tenancyTypeAgreementType from the page language', async () => {
+      const welsh: Record<string, string> = { 'tenancyTypeAgreementTypes.ASSURED_TENANCY': 'sicr' };
+      (getTranslationFunction as jest.Mock).mockReturnValueOnce(
+        jest.fn((key: string, options?: Record<string, unknown>) => welsh[key] ?? options?.defaultValue ?? key)
+      );
+
+      const content = await testedStep.extendGetContent(
+        {
+          body: {},
+          res: {
+            locals: {
+              validatedCase: {
+                id: '12345',
+                data: {
+                  possessionClaimResponse: { claimantOrganisations: [{ value: 'Acme Housing' }] },
+                  tenancy_TypeOfTenancyLicence: 'ASSURED_TENANCY',
+                },
+              },
+            },
+          },
+        },
+        { detailsHeading: 'Details given by ', tenancyType: 'standard tenancy text' }
+      );
+
+      expect(content.tenancyTypeAgreementType).toBe('sicr');
     });
 
     describe('tenancyType content for OTHER type', () => {

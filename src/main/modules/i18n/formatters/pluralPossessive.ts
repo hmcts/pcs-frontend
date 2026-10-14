@@ -10,7 +10,8 @@ export const pluralPossessive = (i18n: typeof i18next): void => {
 
       const trimmedValue = value.trim();
 
-      if (lng === 'en' || lng === 'cy') {
+      // Welsh shows possession by word order ("Hawliad {{name}}"), not an apostrophe.
+      if (lng === 'en') {
         return trimmedValue.toLowerCase().endsWith('s')
           ? `${trimmedValue}${options.format}`
           : `${trimmedValue}${options.format}s`;
