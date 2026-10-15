@@ -207,6 +207,26 @@ describe('multi-file-upload', () => {
     });
   });
 
+  describe('inline field error', () => {
+    it('uses the page-language hidden error prefix', () => {
+      // jsdom has no CSS.escape
+      Object.defineProperty(globalThis, 'CSS', { value: { escape: (value: string) => value }, configurable: true });
+      setupDOM();
+      const container = getContainer();
+      container.dataset.errorPrefix = 'Gwall';
+      container.innerHTML =
+        '<div class="govuk-form-group"><input id="documents" class="moj-multi-file-upload__input" type="file" /></div>';
+      initMultiFileUpload();
+
+      expect(() => capturedHooks.entryHook(null, { name: 'video.mp4', size: 100 })).toThrow('blocked');
+
+      const inlineError = document.getElementById('documents-error')!;
+      expect(inlineError.querySelector('.govuk-visually-hidden')!.textContent).toBe('Gwall:');
+      expect(inlineError.textContent).toContain('Wrong file type');
+      expect(inlineError.textContent).not.toContain('Error:');
+    });
+  });
+
   describe('entryHook with media + filename caps', () => {
     beforeEach(() => {
       setupDOMWithMediaAndFilenameCaps();

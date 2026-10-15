@@ -7,11 +7,13 @@ import { Environment } from 'nunjucks';
 import { VIEW_RESPONSE_ROUTE } from '../../../main/constants/caseRoutes';
 import { oidcMiddleware } from '../../../main/middleware';
 
+import { getRequestLanguage, getTranslationFunction } from '@modules/i18n';
 import viewTheResponseRoute from '@routes/viewTheResponse';
 import type { CcdCaseData, CcdDefendantResponses } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
+import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
   typeof isRespondToClaimEnabledForRelease
@@ -44,9 +46,42 @@ const translationStrings: Record<string, string> = {
   'viewTheResponse:counterclaim.needHelpWithFeesOptions.NO': 'I do not need help paying the fee',
   'viewTheResponse:personsUnknown': 'Persons unknown',
   'viewTheResponse:addressUnknown': 'Address unknown',
+  'viewTheResponse:answers.possessionNoticeReceived.yes': 'Yes',
+  'viewTheResponse:answers.possessionNoticeReceived.no': 'No',
+  'viewTheResponse:answers.makeCounterClaim.yes': 'Yes',
+  'viewTheResponse:answers.makeCounterClaim.no': 'No',
+  'viewTheResponse:answers.anyPaymentsMade.yes': 'Yes',
+  'viewTheResponse:answers.anyPaymentsMade.no': 'No',
+  'viewTheResponse:answers.repaymentPlanAgreed.yes': 'Yes',
+  'viewTheResponse:answers.repaymentPlanAgreed.no': 'No',
+  'viewTheResponse:answers.repayArrearsInstalments.yes': 'Yes',
+  'viewTheResponse:answers.repayArrearsInstalments.no': 'No',
+  'viewTheResponse:answers.dependantChildren.yes': 'Yes',
+  'viewTheResponse:answers.dependantChildren.no': 'No',
+  'viewTheResponse:answers.otherDependants.yes': 'Yes',
+  'viewTheResponse:answers.otherDependants.no': 'No',
+  'viewTheResponse:answers.otherTenants.yes': 'Yes',
+  'viewTheResponse:answers.otherTenants.no': 'No',
+  'viewTheResponse:answers.alternativeAccommodation.yes': 'Yes',
+  'viewTheResponse:answers.alternativeAccommodation.no': 'No',
+  'viewTheResponse:answers.shareAdditionalCircumstances.yes': 'Yes',
+  'viewTheResponse:answers.shareAdditionalCircumstances.no': 'No',
+  'viewTheResponse:answers.exceptionalHardship.yes': 'Yes',
+  'viewTheResponse:answers.exceptionalHardship.no': 'No',
+  'viewTheResponse:answers.universalCreditApplied.yes': 'Yes',
+  'viewTheResponse:answers.universalCreditApplied.no': 'No',
+  'viewTheResponse:answers.priorityDebts.yes': 'Yes',
+  'viewTheResponse:answers.priorityDebts.no': 'No',
+  'viewTheResponse:answers.otherConsiderations.yes': 'Yes',
+  'viewTheResponse:answers.otherConsiderations.no': 'No',
+  'viewTheResponse:answers.isClaimAmountKnown.yes': 'Yes',
+  'viewTheResponse:answers.isClaimAmountKnown.no': 'No',
+  'viewTheResponse:answers.appliedForHwf.yes': 'Yes',
+  'viewTheResponse:answers.appliedForHwf.no': 'No',
 };
 
 jest.mock('@modules/i18n', () => ({
+  getRequestLanguage: jest.fn(() => 'en'),
   getTranslationFunction: jest.fn(
     () => ((key: string) => translationStrings[key] ?? key) as import('i18next').TFunction
   ),
@@ -1278,6 +1313,226 @@ describe('viewTheResponse route', () => {
 
     expect(renderArgs.responsePdfUrl).toBeUndefined();
   });
+  it('should format every date in Welsh when the request language is cy', async () => {
+    (getRequestLanguage as jest.Mock).mockReturnValueOnce('cy');
+    mockCaseById(buildComprehensiveCaseData());
+
+    viewTheResponseRoute(app);
+    const handler = getHandler();
+    const res = { render: jest.fn() } as unknown as Response;
+    const next: NextFunction = jest.fn();
+
+    await handler(viewTheResponseRequest({ caseReference, sessionUser: { accessToken: 'access-token-1' } }), res, next);
+
+    expect(next).not.toHaveBeenCalled();
+    const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+    expect(renderArgs.caseDates.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ value: { text: '5 Chwefror 2026' } }),
+        expect.objectContaining({ value: { text: '1 Chwefror 2026' } }),
+      ])
+    );
+    expect(renderArgs.defendant1Details.rows).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          key: { text: 'viewTheResponse:defendant.dateOfBirth' },
+          value: { text: '15 Mai 1990' },
+        }),
+      ])
+    );
+    expect(renderArgs.additionalDefendantDetails[0].rows).toEqual(
+      expect.arrayContaining([expect.objectContaining({ value: { text: '20 Gorffennaf 1985' } })])
+    );
+    expect(renderArgs.responseToClaim.rows).toEqual(
+      expect.arrayContaining([expect.objectContaining({ value: { text: '1 Rhagfyr 2025' } })])
+    );
+    expect(renderArgs.householdAndCircumstances.rows).toEqual(
+      expect.arrayContaining([expect.objectContaining({ value: { text: '1 Mehefin 2026' } })])
+    );
+  });
+
+  describe('Welsh dates not covered above', () => {
+    const renderInWelsh = async (data: CcdCaseData) => {
+      (getRequestLanguage as jest.Mock).mockReturnValueOnce('cy');
+      mockCaseById(data);
+      viewTheResponseRoute(app);
+      const res = { render: jest.fn() } as unknown as Response;
+      await getHandler()(
+        viewTheResponseRequest({ caseReference, sessionUser: { accessToken: 'access-token-1' } }),
+        res,
+        jest.fn()
+      );
+      return (res.render as jest.Mock).mock.calls[0][1];
+    };
+
+    it('shows the corrected tenancy start date in Welsh', async () => {
+      const data = buildComprehensiveCaseData();
+      Object.assign(data.possessionClaimResponse!.defendantResponses!, {
+        tenancyStartDateConfirmation: 'NO',
+        tenancyStartDate: '2018-03-01',
+      });
+
+      const renderArgs = await renderInWelsh(data);
+
+      expect(renderArgs.responseToClaim.rows).toEqual(
+        expect.arrayContaining([
+          { key: { text: 'viewTheResponse:responseToClaim.tenancyStartDate' }, value: { text: '1 Mawrth 2018' } },
+        ])
+      );
+    });
+
+    it('shows the Universal Credit application date in Welsh', async () => {
+      const data = buildComprehensiveCaseData();
+      Object.assign(data.possessionClaimResponse!.defendantResponses!.householdCircumstances!, {
+        universalCredit: 'NO',
+        hasAppliedForUniversalCredit: 'YES',
+        ucApplicationDate: '2026-04-10',
+      });
+
+      const renderArgs = await renderInWelsh(data);
+
+      expect(renderArgs.regularIncome.rows).toEqual(
+        expect.arrayContaining([
+          {
+            key: { text: 'viewTheResponse:income.universalCreditApplicationDate' },
+            value: { text: '10 Ebrill 2026' },
+          },
+        ])
+      );
+    });
+
+    it('puts the Welsh claim issue date into the payment question', async () => {
+      const t = jest.fn((key: string, options?: Record<string, unknown>) =>
+        key === 'viewTheResponse:payments.anyPaymentsMade' ? `payments since ${options?.claimIssueDate}` : key
+      );
+      (getTranslationFunction as jest.Mock).mockReturnValueOnce(t);
+
+      const renderArgs = await renderInWelsh(buildComprehensiveCaseData());
+
+      expect(renderArgs.paymentsOrAgreements.rows[0].key.text).toBe('payments since 5 Chwefror 2026');
+    });
+  });
+
+  it('shows a counterclaim type that has no translation as words rather than its code', async () => {
+    const data = buildComprehensiveCaseData();
+    data.possessionClaimResponse!.defendantResponses!.counterClaim!.claimType = 'NEW_TYPE_FROM_PCS_API' as never;
+    mockCaseById(data);
+    viewTheResponseRoute(app);
+    const res = { render: jest.fn() } as unknown as Response;
+
+    await getHandler()(
+      viewTheResponseRequest({ caseReference, sessionUser: { accessToken: 'access-token-1' } }),
+      res,
+      jest.fn()
+    );
+
+    const rows = (res.render as jest.Mock).mock.calls[0][1].counterclaim.rows as { value: { text: string } }[];
+    const values = rows.map(row => row.value.text);
+    expect(values).not.toContain('NEW_TYPE_FROM_PCS_API');
+    expect(values).toContain('New type from pcs api');
+  });
+
+  it('should build counterclaimPdfUrl when counterclaimDocumentId matches a document in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'counterclaim-pdf-id',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'counterclaim-pdf-id',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBe(`/case/${caseReference}/view-documents/counterclaim-pdf-id`);
+  });
+
+  it('should not build counterclaimPdfUrl when release 1.4 is off', async () => {
+    (getLaunchDarklyFlag as jest.Mock).mockImplementation((_req, flagName) =>
+      Promise.resolve(flagName !== RELEASE_1_4_ENABLED)
+    );
+
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'counterclaim-pdf-id',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/documents/counterclaim-pdf-id/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'counterclaim-pdf-id',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
+  });
+
+  it('should not build counterclaimPdfUrl when counterclaimDocumentId is not present', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      possessionClaimResponse: {
+        defendantResponses: {},
+      },
+    } as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
+  });
+
+  it('should not build counterclaimPdfUrl when counterclaimDocumentId does not match a document in allDocuments', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'some-other-doc',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            document_binary_url: 'http://dm-store/some-other-doc/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'not-present',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
+  });
+
+  it('should not build counterclaimPdfUrl when the matching document is missing its binary url', async () => {
+    const renderArgs = await renderResponse({
+      dateSubmitted: '2026-02-01',
+      allDocuments: [
+        {
+          id: 'counterclaim-pdf-id',
+          value: {
+            document_filename: 'Counterclaim - Defendant 1.pdf',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+      possessionClaimResponse: {
+        counterclaimDocumentId: 'counterclaim-pdf-id',
+        defendantResponses: {},
+      },
+    } as unknown as CcdCaseData);
+
+    expect(renderArgs.counterclaimPdfUrl).toBeUndefined();
+  });
 });
 
 describe('view-the-response template - response PDF link', () => {
@@ -1287,7 +1542,7 @@ describe('view-the-response template - response PDF link', () => {
   const templatePath = path.resolve(__dirname, '../../../main/views/view-the-response.njk');
   const templateSource = fs.readFileSync(templatePath, 'utf8');
   const pdfBlockMatch = templateSource.match(
-    /\{%\s*if dateSubmitted\s*%\}[\s\S]*?pdf\.linkText[\s\S]*?\{%\s*endif\s*%\}[\s\S]*?\{%\s*endif\s*%\}/
+    /\{%\s*if dateSubmitted\s*%\}\s*<h2 class="govuk-heading-m">[\s\S]*?pdf\.heading[\s\S]*?<\/h2>\s*<p class="govuk-body">\s*\{%\s*if dateSubmitted and responsePdfUrl\s*%\}[\s\S]*?pdf\.linkText[\s\S]*?\{%\s*endif\s*%\}\s*<\/p>\s*<p class="govuk-body">\s*\{%\s*if counterclaimPdfUrl\s*%\}[\s\S]*?\{%\s*endif\s*%\}\s*<\/p>\s*\{%\s*endif\s*%\}/
   );
 
   const t = (key: string) =>

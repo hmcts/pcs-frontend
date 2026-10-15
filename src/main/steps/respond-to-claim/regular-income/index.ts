@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { AMOUNT_FORMAT_REGEX, MAX_INCOME_AMOUNT } from '../../../constants/validation';
+import { validateAmount } from '../../../constants/validation';
 import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { noEmojiValidator } from '../../utils/fieldValidators';
@@ -8,55 +8,7 @@ import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
-const createAmountValidator =
-  (negativeErrorKey: string, largeAmountErrorKey: string) =>
-  (value: unknown): boolean | string => {
-    if (typeof value !== 'string') {
-      return true;
-    }
-
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return true;
-    } // Let required validation handle empty values
-
-    const normalized = trimmed.replace(/,/g, '');
-    const numericValue = parseFloat(normalized);
-
-    if (!Number.isNaN(numericValue)) {
-      if (numericValue < 0) {
-        return negativeErrorKey;
-      }
-      if (numericValue >= MAX_INCOME_AMOUNT) {
-        return largeAmountErrorKey;
-      }
-    }
-
-    if (!AMOUNT_FORMAT_REGEX.test(normalized)) {
-      return 'errors.amount.invalidFormat';
-    }
-
-    return true;
-  };
-
 const validateMoneyFromElsewhereDetails = noEmojiValidator('errors.moneyFromElsewhereDetails.invalidCharacters');
-
-const validateIncomeFromJobsAmount = createAmountValidator(
-  'errors.incomeFromJobsAmount.negative',
-  'errors.incomeFromJobsAmount.largeAmount'
-);
-const validatePensionAmount = createAmountValidator(
-  'errors.pensionAmount.negative',
-  'errors.pensionAmount.largeAmount'
-);
-const validateUniversalCreditAmount = createAmountValidator(
-  'errors.universalCreditAmount.negative',
-  'errors.universalCreditAmount.largeAmount'
-);
-const validateOtherBenefitsAmount = createAmountValidator(
-  'errors.otherBenefitsAmount.negative',
-  'errors.otherBenefitsAmount.largeAmount'
-);
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'what-regular-income-do-you-receive',
@@ -265,7 +217,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateIncomeFromJobsAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.incomeFromJobsAmount.negative',
+                  maxAmountError: 'errors.incomeFromJobsAmount.largeAmount',
+                }),
             },
             incomeFromJobsFrequency: {
               name: 'incomeFromJobsFrequency',
@@ -303,7 +260,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validatePensionAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.pensionAmount.negative',
+                  maxAmountError: 'errors.pensionAmount.largeAmount',
+                }),
             },
             pensionFrequency: {
               name: 'pensionFrequency',
@@ -341,7 +303,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateUniversalCreditAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.universalCreditAmount.negative',
+                  maxAmountError: 'errors.universalCreditAmount.largeAmount',
+                }),
             },
             universalCreditFrequency: {
               name: 'universalCreditFrequency',
@@ -379,7 +346,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
                 inputmode: 'decimal',
                 spellcheck: false,
               },
-              validator: validateOtherBenefitsAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.amount.invalidFormat',
+                  minAmountError: 'errors.otherBenefitsAmount.negative',
+                  maxAmountError: 'errors.otherBenefitsAmount.largeAmount',
+                }),
             },
             otherBenefitsFrequency: {
               name: 'otherBenefitsFrequency',
