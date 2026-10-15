@@ -24,6 +24,19 @@ import { toCaseReference16 } from '@utils/caseReference';
 
 const STEP_NAME = 'check-your-answers';
 
+type FeeApplicationFormData = Pick<
+  VisibleFormDataView,
+  'getApplicationTypeField' | 'getHearingInNext14DaysField' | 'getOtherPartiesAgreedField'
+>;
+
+export function doesApplicationFeeApply(visibleFormData: FeeApplicationFormData): boolean {
+  return (
+    visibleFormData.getApplicationTypeField()?.fieldValue !== GenAppType.ADJOURN ||
+    visibleFormData.getHearingInNext14DaysField()?.fieldValue === 'yes' ||
+    visibleFormData.getOtherPartiesAgreedField()?.fieldValue === 'no'
+  );
+}
+
 export const step: StepDefinition = createFormStep({
   stepName: STEP_NAME,
   journeyFolder: 'makeAnApplication',
@@ -71,9 +84,7 @@ export const step: StepDefinition = createFormStep({
 
     const visibleFormData = new VisibleFormDataView(req);
 
-    const feeApplies =
-      visibleFormData.getApplicationTypeField()?.fieldValue !== GenAppType.ADJOURN ||
-      visibleFormData.getHearingInNext14DaysField()?.fieldValue === 'yes';
+    const feeApplies = doesApplicationFeeApply(visibleFormData);
 
     const hwfApplies = visibleFormData.getHwfReferenceField()?.fieldValue;
     const paymentNeeded = feeApplies && !hwfApplies;
