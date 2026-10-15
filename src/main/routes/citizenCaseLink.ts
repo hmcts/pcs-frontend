@@ -35,27 +35,13 @@ interface RenderFormOptions {
   blockedMessage?: string;
 }
 
-const API_ERROR_MESSAGES: Record<AccessCodeValidationError, { field: 'claimNumber' | 'accessCode'; text: string }> = {
-  not_found: {
-    field: 'claimNumber',
-    text: 'We cannot find that claim number. Enter the claim number that you received from the court',
-  },
-  expired: {
-    field: 'accessCode',
-    text: 'The access code you entered has expired. Contact the court to get a new code',
-  },
-  already_used: {
-    field: 'accessCode',
-    text: 'The access code you entered has already been used, you should contact the court',
-  },
-  mismatch: {
-    field: 'accessCode',
-    text: 'Access code does not match claim number',
-  },
-  unknown: {
-    field: 'claimNumber',
-    text: 'We cannot find that claim number. Enter the claim number that you received from the court',
-  },
+// Keys under accessCode:errors.* in the en and cy locale files.
+const API_ERROR_MESSAGES: Record<AccessCodeValidationError, { field: 'claimNumber' | 'accessCode'; key: string }> = {
+  not_found: { field: 'claimNumber', key: 'claimNotFound' },
+  expired: { field: 'accessCode', key: 'accessCodeExpired' },
+  already_used: { field: 'accessCode', key: 'accessCodeAlreadyUsed' },
+  mismatch: { field: 'accessCode', key: 'accessCodeMismatch' },
+  unknown: { field: 'claimNumber', key: 'claimNotFound' },
 };
 
 function buildErrorList(errors: FormErrors, blockedMessage?: string): ErrorListItem[] {
@@ -87,10 +73,14 @@ function renderForm(res: Response, options: RenderFormOptions = {}): void {
   });
 }
 
-async function getRespondToClaimBlockedMessage(req: Request): Promise<string> {
+async function getErrorTranslator(req: Request): Promise<(key: string) => string> {
   await req.i18n?.loadNamespaces(['accessCode']);
   const t = getTranslationFunction(req, ['accessCode']);
-  return t('accessCode:errors.respondToClaimUnavailable');
+  return (key: string) => t(`accessCode:errors.${key}`);
+}
+
+async function getRespondToClaimBlockedMessage(req: Request): Promise<string> {
+  return (await getErrorTranslator(req))('respondToClaimUnavailable');
 }
 
 async function renderRespondToClaimBlockedForm(
@@ -133,25 +123,24 @@ export default function citizenCaseLinkRoutes(app: Application): void {
     }
 
     const errors: FormErrors = {};
+    const errorText = await getErrorTranslator(req);
 
     // Claim number validation
     if (!claimNumber) {
-      errors.claimNumber = { text: 'Enter your claim number' };
+      errors.claimNumber = { text: errorText('claimNumberRequired') };
     } else if (!CLAIM_NUMBER_REGEX.test(claimNumber)) {
-      errors.claimNumber = {
-        text: 'Claim number must only include numbers 0 to 9 and special characters such as hyphens',
-      };
+      errors.claimNumber = { text: errorText('claimNumberInvalidCharacters') };
     } else if (claimNumber.length < 16 || claimNumber.length > 20) {
-      errors.claimNumber = { text: 'Claim number must be between 16 and 20 characters' };
+      errors.claimNumber = { text: errorText('claimNumberLength') };
     }
 
     // Access code validation
     if (!accessCode) {
-      errors.accessCode = { text: 'Enter your access code' };
+      errors.accessCode = { text: errorText('accessCodeRequired') };
     } else if (!ACCESS_CODE_REGEX.test(accessCode)) {
-      errors.accessCode = { text: 'Access code must only include letters a to z, and numbers 0 to 9' };
+      errors.accessCode = { text: errorText('accessCodeInvalidCharacters') };
     } else if (accessCode.length !== 12) {
-      errors.accessCode = { text: 'Access code must be 12 characters' };
+      errors.accessCode = { text: errorText('accessCodeLength') };
     }
 
     if (errors.claimNumber || errors.accessCode) {
@@ -169,15 +158,13 @@ export default function citizenCaseLinkRoutes(app: Application): void {
         return safeRedirect303(res, `/case/${caseId}/dashboard`, '/', ['/case']);
       }
 
-      const { field, text } = API_ERROR_MESSAGES[result.error];
-      errors[field] = { text };
+      const { field, key } = API_ERROR_MESSAGES[result.error];
+      errors[field] = { text: errorText(key) };
       logger.warn(`Access code validation failed for case ${caseId}: ${result.error}`);
       return renderForm(res, { errors, claimNumber, accessCode });
     } catch (err) {
       logger.error(`Failed to validate access code for case ${caseId}:`, err);
-      errors.claimNumber = {
-        text: 'We cannot find that claim number. Enter the claim number that you received from the court',
-      };
+      errors.claimNumber = { text: errorText('claimNotFound') };
       return renderForm(res, { errors, claimNumber, accessCode });
     }
   });
