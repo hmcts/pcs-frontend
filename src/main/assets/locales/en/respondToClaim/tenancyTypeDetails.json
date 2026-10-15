@@ -19,5 +19,13 @@
     "tenancyDetails.correctType": "Enter the correct tenancy, occupation contract or licence type",
     "requiredText": "Enter the correct tenancy, licence or occupation contract details",
     "defaultMaxLength": "Tenancy, occupation contract or licence type must be 60 characters or less"
+  },
+  "tenancyTypeAgreementTypes": {
+    "ASSURED_TENANCY": "an assured",
+    "SECURE_TENANCY": "a secure",
+    "INTRODUCTORY_TENANCY": "an introductory",
+    "FLEXIBLE_TENANCY": "a flexible",
+    "DEMOTED_TENANCY": "a demoted",
+    "OTHER": "other"
   }
 }
