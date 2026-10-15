@@ -209,5 +209,16 @@
     "yourSupport": "Your support",
     "uploadFiles": "Upload documents",
     "checkYourAnswersAndSubmit": "Check your answers and submit"
+  },
+  "errorPrefix": "Error",
+  "fileUpload": {
+    "dropzoneHint": "Drag and drop files here or",
+    "dropzoneButton": "Choose files",
+    "uploadStatus": "Uploading files, please wait"
+  },
+  "addressLookup": {
+    "oneFound": "1 address found",
+    "manyFound": "{count} addresses found",
+    "noneFound": "No addresses found"
   }
 }
