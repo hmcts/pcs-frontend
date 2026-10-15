@@ -9,7 +9,7 @@ export const counterClaimHaveYouAppliedForHelp = {
   saveAndContinueButton: `Save and continue`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   selectIfYouHaveAlreadyAppliedForHelpAdultsErrorMessage: `Select if you have already applied for help with your counterclaim fee?`,
-  enterHelpWithFeeReferenceHiddenTextLabel: 'Enter your help with fees reference number',
+  enterHelpWithFeeReferenceHiddenTextLabel: 'Enter your Help with Fees reference number',
   helpWithFeeReferenceTextInput: `HWF-A1B-23C`,
   youWillHaveReceivedThisNumberHiddenParagraph: `You will have received this number when you applied for Help with Fees. This reference must not have been used for a previous application.`,
   exampleHiddenHintText: `For example, HWF-A1B-23C`,
