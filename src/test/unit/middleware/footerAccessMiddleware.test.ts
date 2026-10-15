@@ -3,7 +3,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { footerAccessMiddleware } from '../../../main/middleware/footerAccessMiddleware';
 
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
-import { RELEASE_1_3_ENABLED } from '@utils/respondToClaimFlags';
+import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 jest.mock('@utils/getLaunchDarklyFlag', () => ({
   getLaunchDarklyFlag: jest.fn(),
@@ -28,8 +28,8 @@ describe('footerAccessMiddleware', () => {
 
     await footerAccessMiddleware(req, res, next);
 
-    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, RELEASE_1_3_ENABLED, false);
-    expect(res.locals.release1dot3Enabled).toBe(enabled);
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, RELEASE_1_4_ENABLED, false);
+    expect(res.locals.release1dot4Enabled).toBe(enabled);
     expect(next).toHaveBeenCalledTimes(1);
   });
 });

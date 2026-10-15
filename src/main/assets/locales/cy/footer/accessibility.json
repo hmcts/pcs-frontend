@@ -1,65 +1,65 @@
 {
-  "pageTitle": "cyAccessibility Statement - HM Courts & Tribunals Service - GOV.UK",
+  "pageTitle": "Datganiad Hygyrchedd - Gwasanaeth Llysoedd a Thribiwnlysoedd EF - GOV.UK",
   "accessibilityStatement": {
-    "title": "cyAccessibility Statement",
-    "description1": "cyThis accessibility statement applies to Possession Claim Service (Frontend).",
-    "description2": "cyThis website is run by HM Courts & Tribunals Service. We want as many people as possible to be able to use this website. For example, that means you should be able to:",
-    "description3": "cyWe’ve also made the website text as simple as possible to understand.",
-    "description4": "cy<a class=\"govuk-link\" href=\"https://mcmw.abilitynet.org.uk/\" target=\"_blank\">AbilityNet (opens in a new tab)</a> has advice on making your device easier to use if you have a disability.",
+    "title": "Datganiad Hygyrchedd",
+    "description1": "Mae’r datganiad hygyrchedd hwn yn berthnasol i’r Gwasanaeth Hawliadau Meddiant (Rhyngwyneb Defnyddiwr).",
+    "description2": "Gwasanaeth Llysoedd a Thribiwnlysoedd EF sy’n gyfrifol am y wefan hon. Rydym eisiau i gymaint o bobl â phosibl allu defnyddio’r wefan hon. Er enghraifft, mae hynny’n golygu y dylech allu",
+    "description3": "Rydym hefyd wedi gwneud testun y wefan mor hawdd â phosibl i’w ddeall.",
+    "description4": "Mae gan <a class=\"govuk-link\" href=\"https://mcmw.abilitynet.org.uk/\" target=\"_blank\">AbilityNet (yn agor mewn tab newydd)</a> gyngor ar sut i wneud eich dyfais yn haws i'w defnyddio os oes gennych anabledd.",
     "list": {
-      "item1": "cychange colours, contrast levels and fonts",
-      "item2": "cyzoom in up to 400% without the text spilling off the screen",
-      "item3": "cynavigate most of the website using just a keyboard",
-      "item4": "cynavigate most of the website using speech recognition software",
-      "item5": "cylisten to most of the website using a screen reader (including the most recent versions of JAWS, NVDA and VoiceOver)"
+      "item1": "newid y lliwiau, y lefelau cyferbyniad a’r ffontiau",
+      "item2": "gwneud y testun hyd at 400% yn fwy heb iddo ddiflannu oddi ar y sgrin",
+      "item3": "llywio drwy'r rhan fwyaf o'r wefan gan ddefnyddio bysellfwrdd yn unig",
+      "item4": "llywio drwy'r rhan fwyaf o'r wefan gan ddefnyddio meddalwedd adnabod llais",
+      "item5": "gwrando ar y rhan fwyaf o'r wefan gan ddefnyddio darllenydd sgrin (gan gynnwys fersiynau diweddaraf JAWS, NVDA a VoiceOver)"
     }
   },
   "enforcementProcedure": {
-    "title": "cyEnforcement procedure",
-    "description1": "cyThe Equality and Human Rights Commission (EHRC) is responsible for enforcing the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018 (the ’accessibility regulations’). If you’re not happy with how we respond to your complaint, <a class=\"govuk-link\" href=\"https://www.equalityadvisoryservice.com/\" target=\"_blank\">contact the Equality Advisory and Support Service (opens in a new tab)</a>."
+    "title": "Y Weithdrefn Orfodi",
+    "description1": "Y Comisiwn Cydraddoldeb a Hawliau Dynol (EHRC) sy’n gyfrifol am orfodi Rheoliadau Hygyrchedd Cyrff y Sector Cyhoeddus (Gwefannau a Chymwysiadau Symudol) (Rhif 2) 2018 (y ‘rheoliadau hygyrchedd’). Os nad ydych chi’n fodlon â’r ffordd rydym yn ymateb i’ch cwyn, <a class=\"govuk-link\" href=\"https://www.equalityadvisoryservice.com/\" target=\"_blank\">cysylltwch â’r Gwasanaeth Cynghori a Chymorth Cydraddoldeb (EASS) (yn agor mewn tab newydd)</a>."
   },
   "feedbackAndContactInformation": {
-    "title": "cyFeedback and contact information",
-    "description1": "cyIf you find any problems not listed on this page or think we’re not meeting accessibility requirements or, you need information on this website in a different format like accessible PDF, large print, easy read, audio recording or braille, contact:",
-    "description2": "cyWe’ll consider your request and get back to you in 5 days.",
+    "title": "Adborth a gwybodaeth gyswllt",
+    "description1": "Os cewch unrhyw broblem sydd heb ei rhestru ar y dudalen hon, os ydych chi'n meddwl nad ydym yn bodloni'r gofynion hygyrchedd, neu os ydych angen gwybodaeth sydd ar y wefan hon mewn fformat arall megis ar ffurf PDF hygyrch, print bras, fformat hawdd ei ddeall, recordiad sain neu braille, cysylltwch â ni:",
+    "description2": "Byddwn yn ystyried eich cais ac yn ymateb o fewn 5 diwrnod.",
     "list": {
-      "item1": "cyemail: <a class=\"govuk-link\" href=\"mailto:possession-no-reply@justice.gov.uk\">possession-no-reply@justice.gov.uk</a>",
-      "item2": "cycall: 0300 123 5577"
+      "item1": "e-bost: <a class=\"govuk-link\" href=\"mailto:possession-no-reply@justice.gov.uk\">possession-no-reply@justice.gov.uk</a>",
+      "item2": "ffôn: 0300 123 5577"
     }
   },
   "technicalInformationAboutThisWebsitesAccessibility": {
-    "title": "cyTechnical information about this website’s accessibility",
-    "description1": "cyHM Courts and Tribunals Service is committed to making its web applications accessible, in accordance with the Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018."
+    "title": "Gwybodaeth dechnegol am hygyrchedd y wefan hon",
+    "description1": "Mae Gwasanaeth Llysoedd a Thribiwnlysoedd EF wedi ymrwymo i sicrhau bod ei wasanaethau ar-lein yn hygyrch, yn unol â Rheoliadau Hygyrchedd Cyrff y Sector Cyhoeddus (Gwefannau a Chymwysiadau Symudol) (Rhif 2) 2018."
   },
   "complianceStatus": {
-    "title": "cyCompliance status",
-    "description1": "cyThis online service is partially compliant with the Web Content Accessibility Guidelines version 2.2 AA standard, due to the non-compliances listed below."
+    "title": "Statws cydymffurfiaeth",
+    "description1": "Mae’r gwasanaeth ar-lein hwn yn cydymffurfio’n rhannol â safon AA Canllawiau Hygyrchedd Cynnwys Gwe fersiwn 2.2, a hynny oherwydd yr enghreifftiau o beidio â chydymffurfio a restrir isod."
   },
   "non-accessibleContent": {
-    "title": "cyNon-accessible content",
-    "description1": "cyThe content listed below is non-accessible for the following reasons:",
+    "title": "Cynnwys nad yw'n hygyrch",
+    "description1": "Nid yw'r cynnwys a restrir isod yn hygyrch am y rhesymau canlynol:",
     "list": {
-      "item1": "cy<span class=\"govuk-!-font-weight-bold\">Hidden formatting rules:</span> Input formatting requirements (like forcing decimals for whole numbers 000.00) are not stated upfront, causing validation failures. This fails WCAG success criterion 3.3.2 Labels or Instructions (Level A).",
-      "item2": "cy<span class=\"govuk-!-font-weight-bold\">Generic page title and links not explaining when opening new tab:</span> Give no clear explanation of a page’s purpose or the behaviour on page load. This fails WCAG success criterion 2.4.2 Page Titled (Level A).",
-      "item3": "cy<span class=\"govuk-!-font-weight-bold\">Missing back-navigation:</span> No clear navigation exists to return to the ’respond to claim’ task list without re-running the entire process. This fails WCAG success criterion 2.4.5 Multiple Ways (Level AA).",
-      "item4": "cy<span class=\"govuk-!-font-weight-bold\">Erratic focus order:</span> After the ’Remove’ button, focus drops off-page to an unselected file upload input before returning to the ’Choose files’ button. This fails WCAG success criteria 2.4.3: Focus Order (Level A) and 2.4.7 Focus Visible (Level AA).",
-      "item5": "cy<span class=\"govuk-!-font-weight-bold\">Redundant links:</span> The ’Check answers’ section contains adjacent ’change’ links with identical hidden names that target the same destination. This fails WCAG success criteria 2.4.4 Link Purpose (In Context) (Level A).",
-      "item6": "cy<span class=\"govuk-!-font-weight-bold\">Generic form groupings:</span> Form groups apply a generic &lt;legend&gt; markup instead of associating radio options to monetary inputs, relying instead on generic, repeated legends. This fails WCAG success criteria 1.3.1 Info and Relationships (Level A) and 3.3.2 Labels or Instructions (Level A).",
-      "item7": "cy<span class=\"govuk-!-font-weight-bold\">Inconsistent heading implementation:</span> Identical ’Details given by...’ sections are inconsistently marked up across pages (some as h2, some as h3, and some not as headings at all). This fails WCAG success criteria 1.3.1 Info and Relationships (Level A).",
-      "item8": "cy<span class=\"govuk-!-font-weight-bold\">Duplicate regions:</span> The page contains duplicate ’Case issued’ regions, with the second region failing to match the purpose of its underlying notification. This fails WCAG success criteria 1.3.1 Info and Relationships (Level A) and 4.1.2 Name, Role, Value (Level A).",
-      "item9": "cy<span class=\"govuk-!-font-weight-bold\">Accessible name for task list items includes the status tag:</span> Voice control users may be impacted attempting to click on task list items as they are required to announce the status as it is added as hidden text. This fails WCAG success criteria 2.5.3 Label in Name (Level A).",
-      "item10": "cy<span class=\"govuk-!-font-weight-bold\">Translation failure:</span> The Welsh version of the page fails to translate the text content, and the language attribute (lang) remains incorrectly set to English. This fails WCAG success criteria 3.1.1 Language of Page (Level A)."
+      "item1": "<span class=\"govuk-!-font-weight-bold\">Rheolau fformatio cudd:</span> Nid yw’r gofynion ar gyfer fformatio’r wybodaeth a roddir (megis ei gwneud yn ofynnol defnyddio lleoedd degol ar gyfer rhifau cyfan, e.e. 000.00) yn cael eu nodi ar y dechrau, sy'n achosi methiannau dilysu. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 3.3.2 Labeli neu Gyfarwyddiadau (Lefel A).",
+      "item2": "<span class=\"govuk-!-font-weight-bold\">Teitl tudalen cyffredinol a dolenni nad ydynt yn egluro pryd y bydd tab newydd yn agor:</span> Ni roddir esboniad clir o bwrpas tudalen na’r hyn sy’n digwydd pan fydd y dudalen yn llwytho. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 2.4.2 Teitl Tudalen (Lefel A).",
+      "item3": "<span class=\"govuk-!-font-weight-bold\">Dim ffordd o lywio’n ôl:</span> Nid oes ffordd glir o lywio’n ôl i rhestr tasgau ‘ymateb i hawliad’ heb orfod mynd drwy’r broses gyfan eto. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 2.4.5 Dulliau Lluosog (Lefel AA).",
+      "item4": "<span class=\"govuk-!-font-weight-bold\">Trefn ffocws afreolaidd:</span> Ar ôl y botwm ‘Dileu’, mae’r ffocws yn disgyn oddi ar y dudalen i faes mewnbynnu ar gyfer uwchlwytho ffeil na ddewiswyd, cyn dychwelyd ir botwm ‘Dewis ffeil’. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 2.4.3: Trefn Ffocws (Lefel A) a 2.4.7 Ffocws Gweladwy (Lefel AA).",
+      "item5": "<span class=\"govuk-!-font-weight-bold\">Dolenni diangen:</span> Mae’r adran ‘Gwirio eich atebion’ yn cynnwys dolenni ‘newid’ ar ochr arall y dudalen sydd ag enwau cudd union yr un fath sy’n llywio i'r un dudalen. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 2.4.4 Pwrpas Dolen (Mewn Cyd-destun) (Lefel A).",
+      "item6": "<span class=\"govuk-!-font-weight-bold\">Grwpiau ffurflenni cyffredinol:</span> Mae grwpiau ffurflenni yn defnyddio’r label cyffredinol &lt;legend&gt; yn hytrach na chysylltu opsiynau botymau radio â meysydd mewnbynnu symiau ariannol, gan ddibynnu yn lle hynny ar allweddi cyffredinol sy’n cael eu hailadrodd. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 1.3.1 Gwybodaeth a Pherthasoedd (Lefel A) a 3.3.2 Labeli neu Gyfarwyddiadau (Lefel A).",
+      "item7": "<span class=\"govuk-!-font-weight-bold\">Defnydd anghyson o benawdau:</span> Mae adrannau sydd â’r un teitl, ‘Manylion a roddwyd gan...’, yn cael eu marcio’n anghyson ar draws tudalennau (rhai fel h2, rhai fel h3, ac eraill heb eu marcio fel penawdau o gwbl). Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 1.3.1 Gwybodaeth a Pherthnasoedd (Lefel A).",
+      "item8": "<span class=\"govuk-!-font-weight-bold\">Rhanbarthau dyblyg:</span> Mae’r dudalen yn cynnwys dau ranbarth ‘Hawliad wedi’i gyflwyno’, ac nid yw’r ail ranbarth yn cyfateb i ddiben yr hysbysiad perthnasol. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 1.3.1 Gwybodaeth a Pherthasoedd (Lefel A) a 4.1.2 Enw, Rôl, Gwerth (Lefel A).",
+      "item9": "<span class=\"govuk-!-font-weight-bold\">Enw hygyrch eitemau’r rhestr tasgau yn cynnwys y label statws:</span>Gall hyn effeithio ar ddefnyddwyr sy’n defnyddio rheolaeth llais wrth geisio clicio ar eitemau’r rhestr tasgau, gan fod yn rhaid iddynt ddweud y statws oherwydd ei fod wedi’i ychwanegu fel testun cudd. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 2.5.3 Label Enw (Lefel A).",
+      "item10": "<span class=\"govuk-!-font-weight-bold\">Methiannau cyfieithu:</span> Nid yw fersiwn Gymraeg y dudalen yn cyfieithu cynnwys y testun, ac mae’r briodoledd iaith (lang) yn parhau i fod wedi’i gosod yn anghywir i’r Saesneg. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 3.1.1: Iaith Tudalen (Lefel A)."
     }
   },
   "whatWeAreDoingToImproveAccessibility": {
-    "title": "cyWhat we are doing to improve accessibility",
-    "description1": "cyWe are actively working to review and improve accessibility on our service.",
-    "description2": "cyWe continually run automated tests using aXe core as part of development practices and frequently complete easy checks using assistive technology.",
-    "description3": "cyWe frequently engage with the accessibility team to ensure yearly accessibility audits are conducted."
+    "title": "Beth rydym yn ei wneud i wella hygyrchedd",
+    "description1": "Rydym wrthi’n adolygu ac yn gwella hygyrchedd ein gwasanaeth.",
+    "description2": "Rydym yn cynnal profion awtomataidd yn barhaus gan ddefnyddio aXe core fel rhan o’n harferion datblygu, ac yn cynnal gwiriadau syml yn aml gan ddefnyddio technoleg gynorthwyol.",
+    "description3": "Rydym yn cydweithio’n rheolaidd â’r tîm hygyrchedd i sicrhau bod archwiliadau hygyrchedd yn cael eu cynnal bob blwyddyn."
   },
   "preparationOfThisAccessibilityStatement": {
-    "title": "cyPreparation of this accessibility statement",
-    "description1": "cyThis statement was prepared on 8th Sept 2026 following an evaluation of the web application to which it applies. The assessment was conducted by internal teams within the HM Courts & Tribunals Service organisation and associated IT suppliers.",
-    "description2": "cyThe statement was last reviewed on 16<sup>th</sup> Sept 2026."
+    "title": "Paratoi’r datganiad hygyrchedd hwn",
+    "description1": "Paratowyd y datganiad hwn ar 8 Medi 2026 yn dilyn gwerthusiad o’r gwasanaeth ar-lein y mae’n berthnasol iddo. Cynhaliwyd yr asesiad gan dimau mewnol o fewn Gwasanaeth Llysoedd a Thribiwnlysoedd EF a chyflenwyr TG cysylltiedig.",
+    "description2": "Adolygwyd y datganiad ddiwethaf ar 16 Medi 2026."
   }
 }

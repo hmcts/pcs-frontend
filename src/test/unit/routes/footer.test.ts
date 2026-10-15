@@ -63,7 +63,7 @@ describe('footer page routes', () => {
   it('renders the citizen footer when the user is not a legal representative', async () => {
     const app = buildApp();
     const req = {} as Request;
-    const res = { locals: { release1dot3Enabled: true }, render: jest.fn() } as unknown as Response;
+    const res = { locals: { release1dot4Enabled: true }, render: jest.fn() } as unknown as Response;
     const next = jest.fn();
 
     (legalRepresentativeHeaderMiddleware as jest.Mock).mockImplementationOnce((_req, response, nextHandler) => {
@@ -92,7 +92,7 @@ describe('footer page routes', () => {
     const render = jest.fn();
     const status = jest.fn().mockReturnValue({ render });
     const res = {
-      locals: { isLegalRepresentative: false, release1dot3Enabled: false },
+      locals: { isLegalRepresentative: false, release1dot4Enabled: false },
       status,
     } as unknown as Response;
 

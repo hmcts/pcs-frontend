@@ -15,7 +15,7 @@ const environment = new nunjucks.Environment(
 
 const footerTemplate = `
   {% from "components/pcs-footer.njk" import pcsFooter %}
-  {{ pcsFooter(isLegalRepresentative, footerModel, release1dot3Enabled) }}
+  {{ pcsFooter(isLegalRepresentative, footerModel, release1dot4Enabled) }}
 `;
 
 const legalRepresentativeFooterModel = {
@@ -31,10 +31,10 @@ const legalRepresentativeFooterModel = {
 
 const citizenFooterLinks = ['/accessibility', '/cookies', '/privacy-policy', '/terms-and-conditions', '/get-help'];
 
-function renderFooter(isLegalRepresentative: boolean, release1dot3Enabled: boolean): string {
+function renderFooter(isLegalRepresentative: boolean, release1dot4Enabled: boolean): string {
   return environment.renderString(footerTemplate, {
     isLegalRepresentative,
-    release1dot3Enabled,
+    release1dot4Enabled,
     footerModel: legalRepresentativeFooterModel,
   });
 }
