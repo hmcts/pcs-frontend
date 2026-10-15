@@ -32,7 +32,7 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'respondToClaim/legalrep/tenancyDateDetails.json::question',
   'respondToClaim/legalrep/tenancyTypeDetails.json::tenancyTypeOther',
 
-   // HDPI-8858 - waiting on translations for these pages
+  // HDPI-8858 - waiting on translations for these pages
   'footer/cookies.json::pageTitle',
   'footer/cookies.json::cookies.title',
   'footer/cookies.json::cookies.description1',
@@ -267,7 +267,7 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'footer/terms-and-conditions.json::howToUseThisServiceResponsibly.description13',
   'footer/terms-and-conditions.json::howToUseThisServiceResponsibly.description14',
   'footer/terms-and-conditions.json::howToUseThisServiceResponsibly.description15',
-  'footer/terms-and-conditions.json::howToUseThisServiceResponsibly.description16'
+  'footer/terms-and-conditions.json::howToUseThisServiceResponsibly.description16',
 ]);
 
 /**
