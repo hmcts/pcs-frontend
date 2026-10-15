@@ -4,7 +4,7 @@ properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
   pipelineTriggers([
     cron('H 07 * * 1-5'),
-    cron('10 50 * * 4')   // TEST: every Tuesday at 15:15
+    cron('30 11 * * 4')   // TEST: every Tuesday at 15:15
   ]),
   parameters([
     text(
@@ -157,13 +157,15 @@ withNightlyPipeline(type, product, component) {
 }
 
 def isWeeklyEmvSchedule() {
-  // TEST schedule: fires from cron('15 15 * * 2') — Tuesday 15:15.
-  // Guard matches Tuesday (DAY_OF_WEEK = 3) in the 15:00 hour.
   def cal = Calendar.getInstance()
   cal.setTime(new Date())
-  def dayOfWeek = cal.get(Calendar.DAY_OF_WEEK) // TUESDAY = 3
+  def dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
   def hour = cal.get(Calendar.HOUR_OF_DAY)
-  return dayOfWeek == Calendar.TUESDAY && hour == 15
+  def minute = cal.get(Calendar.MINUTE)
+
+  return dayOfWeek == Calendar.THURSDAY &&
+         hour == 11 &&
+         minute < 35
 }
 
 def selectedSauceSuites() {
