@@ -11,9 +11,21 @@ import { getStepUrl } from '@modules/steps/flow';
 import type { SectionConfig } from '@modules/steps/stepFlow.interface';
 import { getAllSectionStatuses, getFirstVisibleStep, safeIsAnswered } from '@services/sectionStatus';
 import { shouldShowStep } from '@steps';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('respondToClaimAccessGuard');
+
+// Reached by redirect after final submit or back from GOV.UK Pay. Submitting clears the draft, so the
+// section no longer reads as available, showConditions that read the response (e.g. makeCounterClaim)
+// are false and the URL carries no navigation marker — these pages bypass the guard.
+const POST_SUBMISSION_STEPS: ReadonlySet<string> = new Set([
+  'response-submitted',
+  'response-and-counter-claim-submitted',
+  'response-submitted-counter-claim-fee-payment-needed',
+  'counter-claim-application-fee-amount',
+  'counter-claim-payment-successful',
+]);
 
 export function respondToClaimAccessGuard(): RequestHandler {
   return async (req: Request, res, next) => {
@@ -26,7 +38,8 @@ export function respondToClaimAccessGuard(): RequestHandler {
       return next();
     }
 
-    const stepName = req.path.split('/').pop();
+    // Express routes match case-insensitively and with a trailing slash, so normalise before lookup.
+    const stepName = req.path.replace(/\/+$/, '').split('/').pop()?.toLowerCase();
     if (!stepName || stepName === hubStepName) {
       return next();
     }
@@ -44,6 +57,17 @@ export function respondToClaimAccessGuard(): RequestHandler {
     const sectionId = findSectionIdForStep(stepName);
 
     try {
+      if (POST_SUBMISSION_STEPS.has(stepName)) {
+        return next();
+      }
+
+      // The guard runs before the per-step respondToClaimFeatureMiddleware, which is what normally sets
+      // this flag; showConditions such as exempt-landlord read it.
+      const locals = req.res?.locals;
+      if (locals && locals.release12Enabled === undefined) {
+        locals.release12Enabled = await isRespondToClaimEnabledForRelease(req);
+      }
+
       if (sectionId && (await isSectionUnavailable(sectionId, req))) {
         return safeRedirect303(res, hubUrl, '/', ['/case/']);
       }
@@ -86,10 +110,13 @@ function isCyaStep(stepName: string): boolean {
 
 // A citizen may directly open only a section's first visible step. Any other
 // step requires an internal-navigation marker: ?nav=1 (Back / Save and
-// continue), ?edit= (CYA "Change" links), or ?lang= (the in-page Cymraeg /
-// English toggle, which reloads the current page in the other language).
+// continue), ?edit= (CYA "Change" links), ?lang= (the in-page Cymraeg /
+// English toggle, which reloads the current page in the other language), or
+// ?submitError= / ?draftChanged= (final submit returning to end-of-journey-cya).
+const INTERNAL_NAVIGATION_PARAMS = ['edit', 'nav', 'lang', 'submitError', 'draftChanged'] as const;
+
 function shouldRedirectToFirstVisibleStep(sectionId: RespondToClaimSectionId, stepName: string, req: Request): boolean {
-  if (req.query.edit !== undefined || req.query.nav !== undefined || req.query.lang !== undefined) {
+  if (INTERNAL_NAVIGATION_PARAMS.some(param => req.query[param] !== undefined)) {
     return false;
   }
   const section = sectionById.get(sectionId);
@@ -133,9 +160,11 @@ function sectionHasCountableSteps(section: SectionConfig): boolean {
   });
 }
 
+// Only visible steps count, matching the task-list status: some hidden steps report isAnswered
+// as always true (e.g. regular income/expenses before finance details are given).
 function sectionHasAnyAnswer(section: SectionConfig, req: Request): boolean {
   return section.steps.some(stepName => {
     const def = stepRegistry[stepName as keyof typeof stepRegistry];
-    return def ? safeIsAnswered(def, req) : false;
+    return def && shouldShowStep(req, stepName, flowConfig) ? safeIsAnswered(def, req) : false;
   });
 }
