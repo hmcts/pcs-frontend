@@ -12,6 +12,11 @@ jest.mock('@steps', () => ({
   shouldShowStep: jest.fn(),
 }));
 
+jest.mock('@utils/isRespondToClaimEnabledForUser', () => ({
+  ...jest.requireActual('@utils/isRespondToClaimEnabledForUser'),
+  isRespondToClaimEnabledForRelease: jest.fn(),
+}));
+
 jest.mock('../../../../main/steps/utils', () => ({
   ...jest.requireActual('../../../../main/steps/utils'),
   getUserType: jest.fn(),
@@ -24,12 +29,16 @@ import { getUserType } from '../../../../main/steps/utils';
 
 import { getAllSectionStatuses, getFirstVisibleStep, safeIsAnswered } from '@services/sectionStatus';
 import { shouldShowStep } from '@steps';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 
 const mockGetUserType = getUserType as jest.MockedFunction<typeof getUserType>;
 const mockShouldShowStep = shouldShowStep as jest.MockedFunction<typeof shouldShowStep>;
 const mockGetAllSectionStatuses = getAllSectionStatuses as jest.MockedFunction<typeof getAllSectionStatuses>;
 const mockGetFirstVisibleStep = getFirstVisibleStep as jest.MockedFunction<typeof getFirstVisibleStep>;
 const mockSafeIsAnswered = safeIsAnswered as jest.MockedFunction<typeof safeIsAnswered>;
+const mockIsRespondToClaimEnabledForRelease = isRespondToClaimEnabledForRelease as jest.MockedFunction<
+  typeof isRespondToClaimEnabledForRelease
+>;
 
 interface MakeReqArgs {
   path?: string;
@@ -310,13 +319,13 @@ describe('respondToClaimAccessGuard', () => {
       expect(res.redirect).not.toHaveBeenCalled();
     });
 
-    it('still redirects a post-submission page to hub when its showCondition is false', async () => {
+    it('passes through a post-submission page even when its showCondition is false (draft cleared on submit)', async () => {
       mockShouldShowStep.mockReturnValue(false);
-      const req = makeReq({ path: '/case/123/respond-to-claim/response-submitted' });
+      const req = makeReq({ path: '/case/123/respond-to-claim/response-submitted-counter-claim-fee-payment-needed' });
       const res = makeRes();
       await respondToClaimAccessGuard()(req, res, next);
-      expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/task-list');
-      expect(next).not.toHaveBeenCalled();
+      expect(next).toHaveBeenCalledTimes(1);
+      expect(res.redirect).not.toHaveBeenCalled();
     });
   });
 
@@ -352,6 +361,31 @@ describe('respondToClaimAccessGuard', () => {
       await respondToClaimAccessGuard()(req, res, next);
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/123/respond-to-claim/income-and-expenses');
       expect(next).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('release 1.2 flag', () => {
+    it('sets res.locals.release12Enabled before evaluating showConditions', async () => {
+      mockIsRespondToClaimEnabledForRelease.mockResolvedValue(true);
+      let flagSeenByShowCondition: unknown;
+      mockShouldShowStep.mockImplementation(req => {
+        flagSeenByShowCondition = req.res?.locals.release12Enabled;
+        return true;
+      });
+      const req = makeReq({ path: '/case/123/respond-to-claim/exempt-landlord', query: { nav: '1' } });
+      const res = makeRes();
+      await respondToClaimAccessGuard()(req, res, next);
+      expect(flagSeenByShowCondition).toBe(true);
+      expect(next).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps an already-resolved release12Enabled value', async () => {
+      const req = makeReq({ path: '/case/123/respond-to-claim/exempt-landlord', query: { nav: '1' } });
+      (req.res as Response).locals.release12Enabled = false;
+      const res = makeRes();
+      await respondToClaimAccessGuard()(req, res, next);
+      expect(mockIsRespondToClaimEnabledForRelease).not.toHaveBeenCalled();
+      expect(req.res?.locals.release12Enabled).toBe(false);
     });
   });
 

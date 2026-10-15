@@ -11,12 +11,14 @@ import { getStepUrl } from '@modules/steps/flow';
 import type { SectionConfig } from '@modules/steps/stepFlow.interface';
 import { getAllSectionStatuses, getFirstVisibleStep, safeIsAnswered } from '@services/sectionStatus';
 import { shouldShowStep } from '@steps';
+import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('respondToClaimAccessGuard');
 
 // Reached by redirect after final submit or back from GOV.UK Pay. Submitting clears the draft, so the
-// section no longer reads as available and the URL carries no navigation marker — only showCondition applies.
+// section no longer reads as available, showConditions that read the response (e.g. makeCounterClaim)
+// are false and the URL carries no navigation marker — these pages bypass the guard.
 const POST_SUBMISSION_STEPS: ReadonlySet<string> = new Set([
   'response-submitted',
   'response-and-counter-claim-submitted',
@@ -56,7 +58,14 @@ export function respondToClaimAccessGuard(): RequestHandler {
 
     try {
       if (POST_SUBMISSION_STEPS.has(stepName)) {
-        return shouldShowStep(req, stepName, flowConfig) ? next() : safeRedirect303(res, hubUrl, '/', ['/case/']);
+        return next();
+      }
+
+      // The guard runs before the per-step respondToClaimFeatureMiddleware, which is what normally sets
+      // this flag; showConditions such as exempt-landlord read it.
+      const locals = req.res?.locals;
+      if (locals && locals.release12Enabled === undefined) {
+        locals.release12Enabled = await isRespondToClaimEnabledForRelease(req);
       }
 
       if (sectionId && (await isSectionUnavailable(sectionId, req))) {
