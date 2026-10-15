@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { Page } from '@playwright/test';
 // eslint-disable-next-line import/no-named-as-default
 import Axios from 'axios';
