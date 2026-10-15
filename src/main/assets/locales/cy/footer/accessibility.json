@@ -5,13 +5,13 @@
     "description1": "Mae’r datganiad hygyrchedd hwn yn berthnasol i’r Gwasanaeth Hawliadau Meddiant (Rhyngwyneb Defnyddiwr).",
     "description2": "Gwasanaeth Llysoedd a Thribiwnlysoedd EF sy’n gyfrifol am y wefan hon. Rydym eisiau i gymaint o bobl â phosibl allu defnyddio’r wefan hon. Er enghraifft, mae hynny’n golygu y dylech allu",
     "description3": "Rydym hefyd wedi gwneud testun y wefan mor hawdd â phosibl i’w ddeall.",
-    "description4": "Mae gan <a class=\"govuk-link\" href=\"https://mcmw.abilitynet.org.uk/\" target=\"_blank\">AbilityNet (yn agor mewn tab newydd)</a> gyngor ar sut i wneud eich dyfais yn haws i'w defnyddio os oes gennych anabledd.",
+    "description4": "Mae gan <a class=\"govuk-link\" href=\"https://mcmw.abilitynet.org.uk/\" target=\"_blank\">AbilityNet (yn agor mewn tab newydd)</a> gyngor ar sut i wneud eich dyfais yn haws i’w defnyddio os oes gennych anabledd.",
     "list": {
       "item1": "newid y lliwiau, y lefelau cyferbyniad a’r ffontiau",
       "item2": "gwneud y testun hyd at 400% yn fwy heb iddo ddiflannu oddi ar y sgrin",
-      "item3": "llywio drwy'r rhan fwyaf o'r wefan gan ddefnyddio bysellfwrdd yn unig",
-      "item4": "llywio drwy'r rhan fwyaf o'r wefan gan ddefnyddio meddalwedd adnabod llais",
-      "item5": "gwrando ar y rhan fwyaf o'r wefan gan ddefnyddio darllenydd sgrin (gan gynnwys fersiynau diweddaraf JAWS, NVDA a VoiceOver)"
+      "item3": "llywio drwy’r rhan fwyaf o’r wefan gan ddefnyddio bysellfwrdd yn unig",
+      "item4": "llywio drwy’r rhan fwyaf o’r wefan gan ddefnyddio meddalwedd adnabod llais",
+      "item5": "gwrando ar y rhan fwyaf o’r wefan gan ddefnyddio darllenydd sgrin (gan gynnwys fersiynau diweddaraf JAWS, NVDA a VoiceOver)"
     }
   },
   "enforcementProcedure": {
@@ -20,7 +20,7 @@
   },
   "feedbackAndContactInformation": {
     "title": "Adborth a gwybodaeth gyswllt",
-    "description1": "Os cewch unrhyw broblem sydd heb ei rhestru ar y dudalen hon, os ydych chi'n meddwl nad ydym yn bodloni'r gofynion hygyrchedd, neu os ydych angen gwybodaeth sydd ar y wefan hon mewn fformat arall megis ar ffurf PDF hygyrch, print bras, fformat hawdd ei ddeall, recordiad sain neu braille, cysylltwch â ni:",
+    "description1": "Os cewch unrhyw broblem sydd heb ei rhestru ar y dudalen hon, os ydych chi’n meddwl nad ydym yn bodloni’r gofynion hygyrchedd, neu os ydych angen gwybodaeth sydd ar y wefan hon mewn fformat arall megis ar ffurf PDF hygyrch, print bras, fformat hawdd ei ddeall, recordiad sain neu braille, cysylltwch â ni:",
     "description2": "Byddwn yn ystyried eich cais ac yn ymateb o fewn 5 diwrnod.",
     "list": {
       "item1": "e-bost: <a class=\"govuk-link\" href=\"mailto:possession-no-reply@justice.gov.uk\">possession-no-reply@justice.gov.uk</a>",
@@ -36,14 +36,14 @@
     "description1": "Mae’r gwasanaeth ar-lein hwn yn cydymffurfio’n rhannol â safon AA Canllawiau Hygyrchedd Cynnwys Gwe fersiwn 2.2, a hynny oherwydd yr enghreifftiau o beidio â chydymffurfio a restrir isod."
   },
   "non-accessibleContent": {
-    "title": "Cynnwys nad yw'n hygyrch",
-    "description1": "Nid yw'r cynnwys a restrir isod yn hygyrch am y rhesymau canlynol:",
+    "title": "Cynnwys nad yw’n hygyrch",
+    "description1": "Nid yw’r cynnwys a restrir isod yn hygyrch am y rhesymau canlynol:",
     "list": {
-      "item1": "<span class=\"govuk-!-font-weight-bold\">Rheolau fformatio cudd:</span> Nid yw’r gofynion ar gyfer fformatio’r wybodaeth a roddir (megis ei gwneud yn ofynnol defnyddio lleoedd degol ar gyfer rhifau cyfan, e.e. 000.00) yn cael eu nodi ar y dechrau, sy'n achosi methiannau dilysu. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 3.3.2 Labeli neu Gyfarwyddiadau (Lefel A).",
+      "item1": "<span class=\"govuk-!-font-weight-bold\">Rheolau fformatio cudd:</span> Nid yw’r gofynion ar gyfer fformatio’r wybodaeth a roddir (megis ei gwneud yn ofynnol defnyddio lleoedd degol ar gyfer rhifau cyfan, e.e. 000.00) yn cael eu nodi ar y dechrau, sy’n achosi methiannau dilysu. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 3.3.2 Labeli neu Gyfarwyddiadau (Lefel A).",
       "item2": "<span class=\"govuk-!-font-weight-bold\">Teitl tudalen cyffredinol a dolenni nad ydynt yn egluro pryd y bydd tab newydd yn agor:</span> Ni roddir esboniad clir o bwrpas tudalen na’r hyn sy’n digwydd pan fydd y dudalen yn llwytho. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 2.4.2 Teitl Tudalen (Lefel A).",
       "item3": "<span class=\"govuk-!-font-weight-bold\">Dim ffordd o lywio’n ôl:</span> Nid oes ffordd glir o lywio’n ôl i rhestr tasgau ‘ymateb i hawliad’ heb orfod mynd drwy’r broses gyfan eto. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 2.4.5 Dulliau Lluosog (Lefel AA).",
       "item4": "<span class=\"govuk-!-font-weight-bold\">Trefn ffocws afreolaidd:</span> Ar ôl y botwm ‘Dileu’, mae’r ffocws yn disgyn oddi ar y dudalen i faes mewnbynnu ar gyfer uwchlwytho ffeil na ddewiswyd, cyn dychwelyd ir botwm ‘Dewis ffeil’. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 2.4.3: Trefn Ffocws (Lefel A) a 2.4.7 Ffocws Gweladwy (Lefel AA).",
-      "item5": "<span class=\"govuk-!-font-weight-bold\">Dolenni diangen:</span> Mae’r adran ‘Gwirio eich atebion’ yn cynnwys dolenni ‘newid’ ar ochr arall y dudalen sydd ag enwau cudd union yr un fath sy’n llywio i'r un dudalen. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 2.4.4 Pwrpas Dolen (Mewn Cyd-destun) (Lefel A).",
+      "item5": "<span class=\"govuk-!-font-weight-bold\">Dolenni diangen:</span> Mae’r adran ‘Gwirio eich atebion’ yn cynnwys dolenni ‘newid’ ar ochr arall y dudalen sydd ag enwau cudd union yr un fath sy’n llywio i’r un dudalen. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 2.4.4 Pwrpas Dolen (Mewn Cyd-destun) (Lefel A).",
       "item6": "<span class=\"govuk-!-font-weight-bold\">Grwpiau ffurflenni cyffredinol:</span> Mae grwpiau ffurflenni yn defnyddio’r label cyffredinol &lt;legend&gt; yn hytrach na chysylltu opsiynau botymau radio â meysydd mewnbynnu symiau ariannol, gan ddibynnu yn lle hynny ar allweddi cyffredinol sy’n cael eu hailadrodd. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 1.3.1 Gwybodaeth a Pherthasoedd (Lefel A) a 3.3.2 Labeli neu Gyfarwyddiadau (Lefel A).",
       "item7": "<span class=\"govuk-!-font-weight-bold\">Defnydd anghyson o benawdau:</span> Mae adrannau sydd â’r un teitl, ‘Manylion a roddwyd gan...’, yn cael eu marcio’n anghyson ar draws tudalennau (rhai fel h2, rhai fel h3, ac eraill heb eu marcio fel penawdau o gwbl). Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 1.3.1 Gwybodaeth a Pherthnasoedd (Lefel A).",
       "item8": "<span class=\"govuk-!-font-weight-bold\">Rhanbarthau dyblyg:</span> Mae’r dudalen yn cynnwys dau ranbarth ‘Hawliad wedi’i gyflwyno’, ac nid yw’r ail ranbarth yn cyfateb i ddiben yr hysbysiad perthnasol. Nid yw hyn yn bodloni WCAG maen prawf llwyddiant 1.3.1 Gwybodaeth a Pherthasoedd (Lefel A) a 4.1.2 Enw, Rôl, Gwerth (Lefel A).",
