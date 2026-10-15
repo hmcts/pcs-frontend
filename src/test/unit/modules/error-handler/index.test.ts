@@ -310,6 +310,32 @@ describe('error-handler', () => {
       expect(res.locals.serviceUnavailableParagraph).toBe('You will be able to use the service from [dateAndTime].');
     });
 
+    it.each([
+      ['en', '21 Apr 2026'],
+      ['cy', '21 Ebr 2026'],
+    ])('should show the retry-after date and UK time in the request language (%s)', (language, date) => {
+      const errorHandler = createErrorHandler('test');
+      const err = new HTTPError('Service unavailable', 503, 'Tue, 21 Apr 2026 07:28:00 GMT');
+      const t = jest.fn((key: string, options?: Record<string, unknown>) =>
+        options && 'date' in options ? `${options.time}|${options.date}` : key
+      );
+      const req = { i18n: { getFixedT: () => t }, language } as any;
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        render: jest.fn().mockReturnThis(),
+        locals: { t },
+        headersSent: false,
+      } as any;
+
+      errorHandler(err, req, res, jest.fn() as NextFunction);
+
+      // 07:28 GMT is 08:28 in UK summer time. The am/pm marker and the space before it vary with the
+      // ICU data Node is built with (e.g. "yb" or "AM" for Welsh), so only the time digits are pinned.
+      const [time, shownDate] = res.locals.serviceUnavailableParagraph.split('|');
+      expect(time).toMatch(/^08:28\s/);
+      expect(shownDate).toBe(date);
+    });
+
     it('should convert non-HTTPError to HTTPError with status 500', () => {
       const errorHandler = createErrorHandler('test');
       const err = new Error('Generic error');
