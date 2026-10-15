@@ -118,7 +118,7 @@ export async function getEndOfJourneyCyaContent(req: Request, _formContent: unkn
             text && text !== 'errors.correspondenceAddressRejected'
               ? text
               : 'Check the correspondence address you entered and try again.',
-          href: `/case/${caseId}/respond-to-claim/correspondence-address`,
+          href: `/case/${caseId}/respond-to-claim/correspondence-address?nav=1`,
         },
       ],
     };
