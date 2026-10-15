@@ -1,177 +1,103 @@
-{
-  "actions": [],
-  "advisories": {
-    "1240099": {
-      "access": "public",
-      "created": "2026-09-29T23:46:02Z",
-      "cves": [
-        "CVE-2026-17495"
-      ],
-      "cvss": {
-        "vector_string": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:H/A:N",
-        "score": 5.9
-      },
-      "cwe": [
-        "CWE-27"
-      ],
-      "deleted": null,
-      "findings": [
-        {
-          "paths": [
-            "@hmcts/nodejs-logging@npm:4.0.4"
-          ],
-          "version": "2.30.1"
-        }
-      ],
-      "found_by": null,
-      "github_advisory_id": "GHSA-4p3w-j4w9-5jqw",
-      "id": 1240099,
-      "metadata": null,
-      "module_name": "moment",
-      "npm_advisory_id": null,
-      "overview": "### Impact\n\nmoment before 2.31.0 is vulnerable to path traversal in `moment.locale()`. When an application passes a non-string, attacker-influenced value to `moment.locale()`, a specially crafted object can bypass the locale name validation and cause moment to load a file from an attacker-controlled path. This is a further bypass of the validation added in 2.29.2 for [CVE-2022-24785](https://github.com/moment/moment/security/advisories/GHSA-8hfj-j24r-96c4).\n\nThis affects server-side (npm) users only. Plain string input is not affected: the existing validation correctly rejects strings that contain path separators.\n\n### Patches\n\nThis issue is patched in moment 2.31.0.\n\n### Workarounds\n\nValidate that any user-supplied input is a string before passing it to `moment.locale()`.",
-      "patched_versions": "2.31.0",
-      "recommendation": "Upgrade to 2.31.0",
-      "references": "",
-      "reported_by": null,
-      "severity": "moderate",
-      "title": "moment vulnerable to Path Traversal via crafted non-string locale name",
-      "updated": "2026-09-29T23:46:04Z",
-      "url": "https://github.com/advisories/GHSA-4p3w-j4w9-5jqw",
-      "vulnerable_versions": ">= 2.29.2, < 2.31.0"
-    },
-    "1240622": {
-      "access": "public",
-      "created": "2026-09-30T15:35:53Z",
-      "cves": [
-        "CVE-2026-101916"
-      ],
-      "cvss": {
-        "vector_string": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:H/A:N",
-        "score": 7.4
-      },
-      "cwe": [
-        "CWE-295"
-      ],
-      "deleted": null,
-      "findings": [
-        {
-          "paths": [
-            "@opentelemetry/otlp-grpc-exporter-base@virtual:1453e3432af084d00df8c115240cee74de35f74040b062add7dd90156870da42c30d49386467b7b26a84dc4bff081993f745daff1abd8859c5b8290d526eeb95#npm:0.221.0"
-          ],
-          "version": "1.14.4"
-        }
-      ],
-      "found_by": null,
-      "github_advisory_id": "GHSA-m9gg-hp2v-232j",
-      "id": 1240622,
-      "metadata": null,
-      "module_name": "@grpc/grpc-js",
-      "npm_advisory_id": null,
-      "overview": "### Impact\nWhen server credentials are created with the `requireClientCertificate` option set to `false`, `getAuthContext` does not distinguish between authorized and unauthorized certificates in its return value. This can create improper authentication vulnerabilities for `@grpc/grpc-js` users who use the result of `getAuthContext` for authentication.\n\nIn particular, `@grpc/grpc-js-xds` can both set the `requireClientCertificate` option to `false` and use the return value of `getAuthContext` for RBAC authentication in some configurations.\n\n### Patches\n\nThis vulenrability is fixed in 1.13.6 and 1.14.5.\n\n### Workarounds\n`@grpc/grpc-js` users using `getAuthContext` this way can avoid this problem by setting `requireClientCertificate` to `true`. `@grpc/grpc-js-xds` users using RBAC can avoid this by setting the `require_client_certificate` field to `true` in the DownstreamTlsContext in the xDS configuration.",
-      "patched_versions": "1.13.6",
-      "recommendation": "Upgrade to 1.13.6",
-      "references": "",
-      "reported_by": null,
-      "severity": "high",
-      "title": "@grpc/grpc-js: In certain configurations, getAuthContext can return unauthorized certificates as though they were authorized",
-      "updated": "2026-09-30T15:35:57Z",
-      "url": "https://github.com/advisories/GHSA-m9gg-hp2v-232j",
-      "vulnerable_versions": "< 1.13.6"
-    },
-    "1240624": {
-      "access": "public",
-      "created": "2026-09-30T15:35:41Z",
-      "cves": [
-        "CVE-2026-101915"
-      ],
-      "cvss": {
-        "vector_string": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
-        "score": 3.7
-      },
-      "cwe": [
-        "CWE-550"
-      ],
-      "deleted": null,
-      "findings": [
-        {
-          "paths": [
-            "@opentelemetry/otlp-grpc-exporter-base@virtual:1453e3432af084d00df8c115240cee74de35f74040b062add7dd90156870da42c30d49386467b7b26a84dc4bff081993f745daff1abd8859c5b8290d526eeb95#npm:0.221.0"
-          ],
-          "version": "1.14.4"
-        }
-      ],
-      "found_by": null,
-      "github_advisory_id": "GHSA-f596-whhp-79r4",
-      "id": 1240624,
-      "metadata": null,
-      "module_name": "@grpc/grpc-js",
-      "npm_advisory_id": null,
-      "overview": "### Impact\nIf an application method handler crashes, the error message is included in the status message sent to the client. This can leak to the client any sensitive data that may be included in the error message. This impacts anyone using `@grpc/grpc-js` to run servers.\n\n### Patches\nThis vulnerability is fixed in 1.13.6 and 1.14.5.\n\n### Workarounds\nThis can be avoided by using a top-level error handler in method handlers to strip out sensitive error information.",
-      "patched_versions": "1.13.6",
-      "recommendation": "Upgrade to 1.13.6",
-      "references": "",
-      "reported_by": null,
-      "severity": "low",
-      "title": "@grpc/grpc-js: The server transmits some error messages thrown by method handlers to the client in status messages",
-      "updated": "2026-09-30T15:35:42Z",
-      "url": "https://github.com/advisories/GHSA-f596-whhp-79r4",
-      "vulnerable_versions": "< 1.13.6"
-    },
-    "1241210": {
-      "access": "public",
-      "created": "2026-10-05T23:30:26Z",
-      "cves": [
-        "CVE-2026-90711"
-      ],
-      "cvss": {
-        "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:N",
-        "score": 9.1
-      },
-      "cwe": [
-        "CWE-290",
-        "CWE-348",
-        "CWE-697"
-      ],
-      "deleted": null,
-      "findings": [
-        {
-          "paths": [
-            "express@npm:5.2.1"
-          ],
-          "version": "2.0.7"
-        }
-      ],
-      "found_by": null,
-      "github_advisory_id": "GHSA-jqcg-44mw-7w3h",
-      "id": 1241210,
-      "metadata": null,
-      "module_name": "proxy-addr",
-      "npm_advisory_id": null,
-      "overview": "### Impact\n\n`proxy-addr` determines which network hops are trusted proxies so that `X-Forwarded-For` can be believed. When an application configures a trust subnet as an IPv4-mapped IPv6 address with a short prefix, such as `::ffff:10.0.0.0/8` (the correct spelling is `::ffff:10.0.0.0/104`), the subnet compiles with all-zero leading bits and matches every IPv4 address instead of the block it names. The same happens for any IPv6 trust subnet with zero leading bits, such as `::/1`.\n\nEvery unauthenticated client is then trusted as a proxy at hop 0, so `proxyaddr(req, trust)`, and therefore `req.ip` and `req.ips` in Express, returns whatever the client sends in `X-Forwarded-For`. This defeats IP-based access control, rate limiting, geolocation, and audit logging. The misconfiguration compiles without any error, and the same block written correctly behaves correctly, so the difference is not visible from the configuration.\n\n### Patches\n\nUpgrade to `proxy-addr` 2.0.8. An IPv4 address now matches an IPv6 trust subnet only when that subnet is a genuine IPv4-mapped subnet whose prefix covers the mapped marker.\n\n### Workarounds\n\nWrite IPv4 trust subnets in plain IPv4 notation (for example `10.0.0.0/8`). If IPv4-mapped IPv6 notation is required, use the full form so the prefix covers the mapped marker (for example `::ffff:10.0.0.0/104` for the `10.0.0.0/8` block).",
-      "patched_versions": "2.0.8",
-      "recommendation": "Upgrade to 2.0.8",
-      "references": "",
-      "reported_by": null,
-      "severity": "critical",
-      "title": "proxy-addr vulnerable to IP spoofing via IPv4-mapped IPv6 trust subnet",
-      "updated": "2026-10-05T23:30:27Z",
-      "url": "https://github.com/advisories/GHSA-jqcg-44mw-7w3h",
-      "vulnerable_versions": ">= 1.1.0, < 2.0.8"
-    }
-  },
-  "metadata": {
-    "dependencies": 1489,
-    "devDependencies": 0,
-    "optionalDependencies": 0,
-    "totalDependencies": 1489,
-    "vulnerabilities": {
-      "critical": 1,
-      "high": 1,
-      "info": 0,
-      "low": 1,
-      "moderate": 1
-    }
-  },
-  "muted": []
-}
+{"value":"@babel/core","children":{"ID":1123528,"Issue":"@babel/core: Arbitrary File Read via sourceMappingURL Comment","URL":"https://github.com/advisories/GHSA-4x5r-pxfx-6jf8","Severity":"low","Vulnerable Versions":"<=7.29.0","Tree Versions":["7.29.0"],"Dependents":["@jest/transform@npm:30.2.0"]}}
+{"value":"@grpc/grpc-js","children":{"ID":1240622,"Issue":"@grpc/grpc-js: In certain configurations, getAuthContext can return unauthorized certificates as though they were authorized","URL":"https://github.com/advisories/GHSA-m9gg-hp2v-232j","Severity":"high","Vulnerable Versions":">=1.14.0 <1.14.5","Tree Versions":["1.14.4"],"Dependents":["@opentelemetry/otlp-grpc-exporter-base@virtual:1453e3432af084d00df8c115240cee74de35f74040b062add7dd90156870da42c30d49386467b7b26a84dc4bff081993f745daff1abd8859c5b8290d526eeb95#npm:0.221.0"]}}
+{"value":"@grpc/grpc-js","children":{"ID":1240624,"Issue":"@grpc/grpc-js: The server transmits some error messages thrown by method handlers to the client in status messages","URL":"https://github.com/advisories/GHSA-f596-whhp-79r4","Severity":"low","Vulnerable Versions":">=1.14.0 <1.14.5","Tree Versions":["1.14.4"],"Dependents":["@opentelemetry/otlp-grpc-exporter-base@virtual:1453e3432af084d00df8c115240cee74de35f74040b062add7dd90156870da42c30d49386467b7b26a84dc4bff081993f745daff1abd8859c5b8290d526eeb95#npm:0.221.0"]}}
+{"value":"@humanfs/node","children":{"ID":1158499,"Issue":"humanfs: Recursive copy follows symlinked files and copies data from outside the source tree","URL":"https://github.com/advisories/GHSA-p498-v437-472g","Severity":"moderate","Vulnerable Versions":"<0.16.8","Tree Versions":["0.16.7"],"Dependents":["eslint@virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:10.11.0"]}}
+{"value":"@opentelemetry/instrumentation-knex","children":{"ID":1241249,"Issue":"Multiple @opentelemetry/instrumentation-* packages expose database username via unconditional db.user span attribute","URL":"https://github.com/advisories/GHSA-qqmp-wf37-98f9","Severity":"moderate","Vulnerable Versions":"<0.65.0","Tree Versions":["0.44.1"],"Dependents":["@sentry/node@npm:9.47.1"]}}
+{"value":"@opentelemetry/instrumentation-mongoose","children":{"ID":1241251,"Issue":"Multiple @opentelemetry/instrumentation-* packages expose database username via unconditional db.user span attribute","URL":"https://github.com/advisories/GHSA-qqmp-wf37-98f9","Severity":"moderate","Vulnerable Versions":"<0.67.0","Tree Versions":["0.46.1"],"Dependents":["@sentry/node@npm:9.47.1"]}}
+{"value":"@opentelemetry/instrumentation-mysql","children":{"ID":1241250,"Issue":"Multiple @opentelemetry/instrumentation-* packages expose database username via unconditional db.user span attribute","URL":"https://github.com/advisories/GHSA-qqmp-wf37-98f9","Severity":"moderate","Vulnerable Versions":"<0.67.0","Tree Versions":["0.45.1"],"Dependents":["@sentry/node@npm:9.47.1"]}}
+{"value":"@opentelemetry/instrumentation-mysql2","children":{"ID":1241248,"Issue":"Multiple @opentelemetry/instrumentation-* packages expose database username via unconditional db.user span attribute","URL":"https://github.com/advisories/GHSA-qqmp-wf37-98f9","Severity":"moderate","Vulnerable Versions":"<0.67.0","Tree Versions":["0.45.2"],"Dependents":["@sentry/node@npm:9.47.1"]}}
+{"value":"@opentelemetry/instrumentation-pg","children":{"ID":1241247,"Issue":"Multiple @opentelemetry/instrumentation-* packages expose database username via unconditional db.user span attribute","URL":"https://github.com/advisories/GHSA-qqmp-wf37-98f9","Severity":"moderate","Vulnerable Versions":"<0.73.0","Tree Versions":["0.51.1"],"Dependents":["@sentry/node@npm:9.47.1"]}}
+{"value":"@opentelemetry/instrumentation-tedious","children":{"ID":1241253,"Issue":"Multiple @opentelemetry/instrumentation-* packages expose database username via unconditional db.user span attribute","URL":"https://github.com/advisories/GHSA-qqmp-wf37-98f9","Severity":"moderate","Vulnerable Versions":"<0.40.0","Tree Versions":["0.18.1"],"Dependents":["@sentry/node@npm:9.47.1"]}}
+{"value":"@ungap/structured-clone","children":{"ID":"@ungap/structured-clone (deprecation)","Issue":"Potential CWE-502 - Update to 1.3.1 or higher","Severity":"moderate","Vulnerable Versions":"1.3.0","Tree Versions":["1.3.0"],"Dependents":["jest-worker@npm:30.2.0"]}}
+{"value":"adm-zip","children":{"ID":1123686,"Issue":"adm-zip: Crafted ZIP file triggers 4GB memory allocation","URL":"https://github.com/advisories/GHSA-xcpc-8h2w-3j85","Severity":"high","Vulnerable Versions":"<0.6.0","Tree Versions":["0.5.17"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"adm-zip","children":{"ID":1193734,"Issue":"adm-zip extraction follows destination symlinks, allowing arbitrary file overwrite","URL":"https://github.com/advisories/GHSA-vwc7-r8mq-g2x9","Severity":"moderate","Vulnerable Versions":">=0.5.9 <=0.6.0","Tree Versions":["0.5.17"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"adm-zip","children":{"ID":1239030,"Issue":"adm-zip: Uncontrolled memory allocation via the declared uncompressed size (DoS)","URL":"https://github.com/advisories/GHSA-7q85-xj36-vmfc","Severity":"high","Vulnerable Versions":"<0.6.1","Tree Versions":["0.5.17"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"adm-zip","children":{"ID":1240032,"Issue":"adm-zip: Decompression-bomb protection (fix for CVE-2026-39244) can be bypassed by declaring uncompressed size as 0","URL":"https://github.com/advisories/GHSA-rcw4-f5rp-g42v","Severity":"high","Vulnerable Versions":"<=0.6.0","Tree Versions":["0.5.17"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"adm-zip","children":{"ID":1240034,"Issue":"adm-zip extraction preserves SUID/SGID bits from untrusted ZIPs -> local privilege escalation","URL":"https://github.com/advisories/GHSA-j5f4-cc29-5x44","Severity":"high","Vulnerable Versions":"<=0.6.0","Tree Versions":["0.5.17"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"adm-zip","children":{"ID":1240064,"Issue":"adm-zip: Duplicate ZIP entry names: getEntry() and extractAllTo() resolve to different content","URL":"https://github.com/advisories/GHSA-p634-w6r4-rjp2","Severity":"moderate","Vulnerable Versions":"<=0.6.0","Tree Versions":["0.5.17"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"adm-zip","children":{"ID":1240065,"Issue":"adm-zip: getDataAsync() bypasses the maxOutputLength size guard enforced by the synchronous getData() path","URL":"https://github.com/advisories/GHSA-c6fg-446q-cg94","Severity":"moderate","Vulnerable Versions":"<=0.6.0","Tree Versions":["0.5.17"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"adm-zip","children":{"ID":1240066,"Issue":"adm-zip: Unhandled error event in async DEFLATE decompression crashes Node.js process (DoS)","URL":"https://github.com/advisories/GHSA-8238-w5pm-2374","Severity":"high","Vulnerable Versions":"<=0.6.0","Tree Versions":["0.5.17"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1120547,"Issue":"Axios: Regular Expression Denial of Service (ReDoS) via Cookie Name Injection","URL":"https://github.com/advisories/GHSA-hfxv-24rg-xrqf","Severity":"high","Vulnerable Versions":">=1.0.0 <1.16.0","Tree Versions":["1.15.2"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1120643,"Issue":"Allocation of Resources Without Limits or Throttling in Axios","URL":"https://github.com/advisories/GHSA-777c-7fjr-54vf","Severity":"high","Vulnerable Versions":">=1.7.0 <1.16.0","Tree Versions":["1.15.2"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1120645,"Issue":"Axios: Proxy-Authorization Credential Leak to Origin Server Across HTTP-to-HTTPS Redirect in Axios Node.js HTTP Adapter","URL":"https://github.com/advisories/GHSA-p92q-9vqr-4j8v","Severity":"high","Vulnerable Versions":">=1.0.0 <1.16.0","Tree Versions":["1.15.2"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1120647,"Issue":"Axios: Proxy-Authorization header leaks to redirect target when proxy is re-evaluated to direct connection","URL":"https://github.com/advisories/GHSA-j5f8-grm9-p9fc","Severity":"high","Vulnerable Versions":">=1.0.0 <1.16.0","Tree Versions":["1.15.2"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1120650,"Issue":"axios Vulnerable to Full Man-in-the-Middle via Prototype Pollution Gadget in `config.proxy`","URL":"https://github.com/advisories/GHSA-35jp-ww65-95wh","Severity":"high","Vulnerable Versions":">=1.0.0 <1.16.0","Tree Versions":["1.15.2"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1120652,"Issue":"axios has DoS & Header Injection via Prototype Pollution Read-Side Gadgets in axios merge functions","URL":"https://github.com/advisories/GHSA-898c-q2cr-xwhg","Severity":"moderate","Vulnerable Versions":">=1.0.0 <1.16.0","Tree Versions":["1.15.2"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1120653,"Issue":"Axios has a Patch Bypass: Proxy-Authorization Header Injection via Prototype Pollution — Incomplete Null-Prototype Fix","URL":"https://github.com/advisories/GHSA-654m-c8p4-x5fp","Severity":"low","Vulnerable Versions":"=1.15.2","Tree Versions":["1.15.2"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1123824,"Issue":"axios's shouldBypassProxy does not recognize IPv4-mapped IPv6 addresses, allowing NO_PROXY bypass (incomplete fix for CVE-2025-62718)","URL":"https://github.com/advisories/GHSA-pjwm-pj3p-43mv","Severity":"high","Vulnerable Versions":">=1.15.0 <1.16.0","Tree Versions":["1.15.2"],"Dependents":["@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1138749,"Issue":"Axios: Prototype pollution auth subfields can inject Basic auth","URL":"https://github.com/advisories/GHSA-xj6q-8x83-jv6g","Severity":"moderate","Vulnerable Versions":">=1.15.2 <1.18.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1147949,"Issue":"Axios: Prototype pollution gadgets can alter axios request construction","URL":"https://github.com/advisories/GHSA-mmx7-hfxf-jppx","Severity":"moderate","Vulnerable Versions":">=1.0.0 <1.18.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1147950,"Issue":"Axios: Deep formToJSON Key Recursion Can Cause Denial of Service","URL":"https://github.com/advisories/GHSA-pmv8-rq9r-6j72","Severity":"moderate","Vulnerable Versions":">=1.0.0 <1.18.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1153175,"Issue":"Axios: HTTP/2 streamed uploads bypass `maxBodyLength`","URL":"https://github.com/advisories/GHSA-mwf2-3pr3-8698","Severity":"moderate","Vulnerable Versions":">=1.13.0 <1.18.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1153178,"Issue":"Axios Node HTTP adapter can use an inherited proxy after interceptor config cloning","URL":"https://github.com/advisories/GHSA-gcfj-64vw-6mp9","Severity":"high","Vulnerable Versions":">=1.15.2 <1.18.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1153180,"Issue":"Axios: Nested axios option objects can consume polluted prototype values","URL":"https://github.com/advisories/GHSA-7q8q-rj6j-mhjq","Severity":"moderate","Vulnerable Versions":">=1.0.0 <1.18.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1153182,"Issue":"Axios: Fetch adapter `ReadableStream` uploads bypass `maxBodyLength`","URL":"https://github.com/advisories/GHSA-jqh4-m9w3-8hp9","Severity":"moderate","Vulnerable Versions":">=1.7.0 <1.18.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1153184,"Issue":"Axios: NO_PROXY bypass for 0.0.0.0 local addresses in axios","URL":"https://github.com/advisories/GHSA-f4gw-2p7v-4548","Severity":"moderate","Vulnerable Versions":">=1.15.0 <1.18.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1153185,"Issue":"Axios: Excessive recursion in formDataToJSON can cause denial of service","URL":"https://github.com/advisories/GHSA-42h9-826w-cgv3","Severity":"moderate","Vulnerable Versions":">=1.0.0 <1.18.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1193664,"Issue":"Axios form serializer maxDepth bypass via {} metatoken","URL":"https://github.com/advisories/GHSA-hcpx-6fm6-wx23","Severity":"moderate","Vulnerable Versions":">=1.15.1 <1.18.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1240600,"Issue":"Axios: Prototype pollution gadget in fetch adapter can alter outbound requests","URL":"https://github.com/advisories/GHSA-vh66-26gq-q6x8","Severity":"moderate","Vulnerable Versions":">=1.7.0 <1.20.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1240601,"Issue":"Axios: Prototype-Pollution Gadget in the Default Instance Allows Inherited Object.prototype.method to Override HTTP Method","URL":"https://github.com/advisories/GHSA-9fr6-4gfg-395g","Severity":"moderate","Vulnerable Versions":">=1.0.0 <1.20.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1240603,"Issue":"Axios: ReDoS in fromDataURI data: URL parser freezes the Node event loop (DoS)","URL":"https://github.com/advisories/GHSA-c29m-xwm3-cm6r","Severity":"high","Vulnerable Versions":">=1.16.1 <1.20.0","Tree Versions":["1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4"]}}
+{"value":"axios","children":{"ID":1240604,"Issue":"Axios: ReDoS (O(N²)) in shouldBypassProxy host normalization, reachable via untrusted redirect Location","URL":"https://github.com/advisories/GHSA-mghh-pgcx-3jjj","Severity":"high","Vulnerable Versions":">=1.15.0 <1.20.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1240605,"Issue":"Axios: Prototype Pollution Gadget in axios toFormData Options","URL":"https://github.com/advisories/GHSA-x97p-jq2g-jp4f","Severity":"high","Vulnerable Versions":">=1.15.1 <1.20.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1240607,"Issue":"Axios: HTTP/2 adapter bypasses configured DNS lookup and proxy controls","URL":"https://github.com/advisories/GHSA-3pq3-5fj3-cg6v","Severity":"high","Vulnerable Versions":">=1.13.0 <1.20.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1240608,"Issue":"Axios: Denial of Service via Unhandled 'error' Event in HTTP/2 ClientHttp2Session Initialization","URL":"https://github.com/advisories/GHSA-542g-h47m-68v8","Severity":"high","Vulnerable Versions":">=1.13.0 <1.20.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1240626,"Issue":"Axios: Header Injection via Inherited headers After Minimal Interceptor","URL":"https://github.com/advisories/GHSA-j8rh-479h-cp32","Severity":"moderate","Vulnerable Versions":">=1.0.0 <1.20.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1240627,"Issue":"Axios: Fetch Adapter Header Injection via Inherited FormData getHeaders","URL":"https://github.com/advisories/GHSA-4hqw-qxg8-jxx2","Severity":"moderate","Vulnerable Versions":">=1.12.0 <1.20.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1240628,"Issue":"Axios: Node HTTP adapter prototype-pollution gadget allows request socket hijack via inherited createConnection","URL":"https://github.com/advisories/GHSA-m8m8-qj5v-23w3","Severity":"high","Vulnerable Versions":">=1.15.2 <1.20.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1240629,"Issue":"Axios: CIDR-form NO_PROXY entries are ignored, causing proxy exclusion bypass for internal IP ranges","URL":"https://github.com/advisories/GHSA-44g4-m2mj-wpvx","Severity":"moderate","Vulnerable Versions":">=1.15.0 <1.20.0","Tree Versions":["1.15.2","1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4","@saucelabs/bin-wrapper@npm:2.1.1"]}}
+{"value":"axios","children":{"ID":1240634,"Issue":"Axios: maxRedirects: 0 is not enforced by the fetch adapter, allowing redirect-based SSRF","URL":"https://github.com/advisories/GHSA-r4gj-5m52-g5wh","Severity":"high","Vulnerable Versions":">=1.17.0 <1.20.0","Tree Versions":["1.17.0"],"Dependents":["@pact-foundation/pact@npm:17.1.4"]}}
+{"value":"baseline-browser-mapping","children":{"ID":1193686,"Issue":"baseline-browser-mapping process termination on invalid input causes denial of service","URL":"https://github.com/advisories/GHSA-w5vr-8v7q-w6rv","Severity":"moderate","Vulnerable Versions":">=2.0.0 <2.11.0","Tree Versions":["2.10.0"],"Dependents":["browserslist@npm:4.28.1"]}}
+{"value":"basic-ftp","children":{"ID":1117083,"Issue":"basic-ftp vulnerable to denial of service via unbounded memory consumption in Client.list()","URL":"https://github.com/advisories/GHSA-rp42-5vxx-qpwr","Severity":"high","Vulnerable Versions":"<=5.2.2","Tree Versions":["5.2.2"],"Dependents":["get-uri@npm:6.0.5"]}}
+{"value":"basic-ftp","children":{"ID":1118825,"Issue":"basic-ftp allows a malicious FTP server to cause client-side denial of service via unbounded multiline control response buffering","URL":"https://github.com/advisories/GHSA-rpmf-866q-6p89","Severity":"high","Vulnerable Versions":"<=5.3.0","Tree Versions":["5.2.2"],"Dependents":["get-uri@npm:6.0.5"]}}
+{"value":"basic-ftp","children":{"ID":1240853,"Issue":"basic-ftp: Quadratic-time CPU denial of service in Client.list() Unix directory-listing parser (RE_LINE backtracking)","URL":"https://github.com/advisories/GHSA-c475-qrg2-pj4r","Severity":"high","Vulnerable Versions":"<=6.2.0","Tree Versions":["5.2.2"],"Dependents":["get-uri@npm:6.0.5"]}}
+{"value":"braces","children":{"ID":1240992,"Issue":"braces vulnerable to stack-exhaustion denial of service through deeply nested patterns","URL":"https://github.com/advisories/GHSA-vfj7-8cjw-p6xm","Severity":"high","Vulnerable Versions":"<=3.0.3","Tree Versions":["3.0.3"],"Dependents":["chokidar@npm:3.6.0"]}}
+{"value":"browserslist","children":{"ID":1153171,"Issue":"Browserslist: Unbounded memory growth (no cache eviction) via distinct query results, leading to eventual OOM","URL":"https://github.com/advisories/GHSA-c83g-rgw3-j3cx","Severity":"high","Vulnerable Versions":"<=4.28.6","Tree Versions":["4.28.1"],"Dependents":["webpack@virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.110.3"]}}
+{"value":"browserslist","children":{"ID":1153172,"Issue":"Browserslist: Uncaught crash / prototype write via untrusted browserslist-stats.json custom stats (normalizeStats)","URL":"https://github.com/advisories/GHSA-73wf-gq98-2v4g","Severity":"high","Vulnerable Versions":"<=4.28.6","Tree Versions":["4.28.1"],"Dependents":["webpack@virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:5.110.3"]}}
+{"value":"colord","children":{"ID":1193675,"Issue":"Colord: Slow rejection of oversized malformed color strings","URL":"https://github.com/advisories/GHSA-2wm5-q62r-hmrv","Severity":"moderate","Vulnerable Versions":"<2.9.4","Tree Versions":["2.9.3"],"Dependents":["stylelint@npm:17.14.1"]}}
+{"value":"eslint","children":{"ID":"eslint (deprecation)","Issue":"This version is no longer supported. Please see https://eslint.org/version-support for other options.","Severity":"moderate","Vulnerable Versions":"9.39.3","Tree Versions":["9.39.3"],"Dependents":["@hmcts/playwright-common@virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:1.1.5"]}}
+{"value":"extract-zip","children":{"ID":1139346,"Issue":"extract-zip unvalidated symlink path traversal","URL":"https://github.com/advisories/GHSA-jmr9-qjv8-65gv","Severity":"high","Vulnerable Versions":"<=2.0.1","Tree Versions":["2.0.1"],"Dependents":["@puppeteer/browsers@npm:2.13.0"]}}
+{"value":"extract-zip","children":{"ID":1193685,"Issue":"extract-zip allows arbitrary file writes through symlink archive entries","URL":"https://github.com/advisories/GHSA-7pqw-9j4j-h8q3","Severity":"high","Vulnerable Versions":"<=2.0.1","Tree Versions":["2.0.1"],"Dependents":["@puppeteer/browsers@npm:2.13.0"]}}
+{"value":"fast-copy","children":{"ID":1241257,"Issue":"fast-copy: Stack exhaustion in fast-copy when copying deeply-nested values","URL":"https://github.com/advisories/GHSA-jggr-w7fw-pc2j","Severity":"moderate","Vulnerable Versions":">=4.0.0 <4.1.0","Tree Versions":["4.0.3"],"Dependents":["pino-pretty@npm:13.1.3"]}}
+{"value":"fast-uri","children":{"ID":1124064,"Issue":"fast-uri vulnerable to host confusion via literal backslash authority delimiter","URL":"https://github.com/advisories/GHSA-v2hh-gcrm-f6hx","Severity":"high","Vulnerable Versions":">=3.0.0 <=3.1.3","Tree Versions":["3.1.0"],"Dependents":["ajv@npm:8.18.0"]}}
+{"value":"fast-uri","children":{"ID":1130720,"Issue":"fast-uri vulnerable to host confusion via backslash authority introducer","URL":"https://github.com/advisories/GHSA-7p8r-x3mc-p8w7","Severity":"high","Vulnerable Versions":">=3.0.0 <3.1.5","Tree Versions":["3.1.0"],"Dependents":["ajv@npm:8.18.0"]}}
+{"value":"fast-uri","children":{"ID":1145559,"Issue":"fast-uri vulnerable to path traversal via percent-encoded dot segments","URL":"https://github.com/advisories/GHSA-q3j6-qgpj-74h6","Severity":"high","Vulnerable Versions":">=3.0.0 <=3.1.0","Tree Versions":["3.1.0"],"Dependents":["ajv@npm:8.18.0"]}}
+{"value":"fast-uri","children":{"ID":1153168,"Issue":"fast-uri vulnerable to host confusion via percent-encoded authority delimiters","URL":"https://github.com/advisories/GHSA-v39h-62p7-jpjc","Severity":"high","Vulnerable Versions":">=3.0.0 <=3.1.1","Tree Versions":["3.1.0"],"Dependents":["ajv@npm:8.18.0"]}}
+{"value":"fast-uri","children":{"ID":1158524,"Issue":"fast-uri vulnerable to server-side request forgery via malformed IPv6 normalization","URL":"https://github.com/advisories/GHSA-f65p-4m7j-42xc","Severity":"high","Vulnerable Versions":">=3.0.0 <3.1.6","Tree Versions":["3.1.0"],"Dependents":["ajv@npm:8.18.0"]}}
+{"value":"fast-uri","children":{"ID":1158530,"Issue":"fast-uri vulnerable to host confusion via percent-encoded scheme normalization","URL":"https://github.com/advisories/GHSA-jqff-g426-hqxp","Severity":"high","Vulnerable Versions":">=3.0.0 <3.1.6","Tree Versions":["3.1.0"],"Dependents":["ajv@npm:8.18.0"]}}
+{"value":"fast-uri","children":{"ID":1204921,"Issue":"fast-uri vulnerable to host confusion via failed IDN canonicalization","URL":"https://github.com/advisories/GHSA-4c8g-83qw-93j6","Severity":"high","Vulnerable Versions":">=3.0.0 <3.1.3","Tree Versions":["3.1.0"],"Dependents":["ajv@npm:8.18.0"]}}
+{"value":"fast-uri","children":{"ID":1239943,"Issue":"fast-uri vulnerable to authority injection via an unvalidated port in serialize","URL":"https://github.com/advisories/GHSA-qw65-cvwx-89v3","Severity":"high","Vulnerable Versions":">=3.0.0 <3.1.7","Tree Versions":["3.1.0"],"Dependents":["ajv@npm:8.18.0"]}}
+{"value":"fast-uri","children":{"ID":1240091,"Issue":"fast-uri vulnerable to inconsistent host case normalization via percent-encoded octets","URL":"https://github.com/advisories/GHSA-hrr3-gc8f-f4qj","Severity":"moderate","Vulnerable Versions":">=3.0.0 <3.1.8","Tree Versions":["3.1.0"],"Dependents":["ajv@npm:8.18.0"]}}
+{"value":"handlebars","children":{"ID":1241676,"Issue":"Handlebars: JavaScript Injection via Unsafe Inline Embedding of Precompiled Templates","URL":"https://github.com/advisories/GHSA-xw65-4hp5-5hc7","Severity":"moderate","Vulnerable Versions":">=4.0.0 <=4.7.9","Tree Versions":["4.7.9"],"Dependents":["ts-jest@virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:29.4.12"]}}
+{"value":"handlebars","children":{"ID":1241677,"Issue":"Handlebars: JavaScript Injection via AST Type Confusion in compile (bypass of CVE-2026-33937)","URL":"https://github.com/advisories/GHSA-8r5x-fm3f-whwj","Severity":"critical","Vulnerable Versions":">=4.0.0 <=4.7.9","Tree Versions":["4.7.9"],"Dependents":["ts-jest@virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:29.4.12"]}}
+{"value":"handlebars","children":{"ID":1242173,"Issue":"Handlebars: JavaScript Injection via Own Property Check Bypass","URL":"https://github.com/advisories/GHSA-p8wg-vrv2-v86f","Severity":"critical","Vulnerable Versions":">=3.0.0 <=4.7.9","Tree Versions":["4.7.9"],"Dependents":["ts-jest@virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:29.4.12"]}}
+{"value":"http-cache-semantics","children":{"ID":1240991,"Issue":"http-cache-semantics max-stale handling can disclose cross-user cached responses","URL":"https://github.com/advisories/GHSA-ch52-4w7c-c8xp","Severity":"high","Vulnerable Versions":"<=4.2.0","Tree Versions":["4.2.0"],"Dependents":["make-fetch-happen@npm:15.0.4"]}}
+{"value":"immutable","children":{"ID":1164790,"Issue":"Immutable: Hash-collision algorithmic complexity denial of service in Immutable.Map/Set","URL":"https://github.com/advisories/GHSA-xvcm-6775-5m9r","Severity":"high","Vulnerable Versions":">=5.0.0-beta.1 <5.1.8","Tree Versions":["5.1.5"],"Dependents":["sass@npm:1.105.0"]}}
+{"value":"immutable","children":{"ID":1224659,"Issue":"Immutable.js `List` 32-bit trie overflow → unrecoverable DoS","URL":"https://github.com/advisories/GHSA-v56q-mh7h-f735","Severity":"high","Vulnerable Versions":">=5.0.0-beta.1 <5.1.8","Tree Versions":["5.1.5"],"Dependents":["sass@npm:1.105.0"]}}
+{"value":"ip-address","children":{"ID":1118827,"Issue":"ip-address has XSS in Address6 HTML-emitting methods","URL":"https://github.com/advisories/GHSA-v2v4-37r5-5v8g","Severity":"moderate","Vulnerable Versions":"<=10.1.0","Tree Versions":["10.1.0"],"Dependents":["socks@npm:2.8.7"]}}
+{"value":"ip-address","children":{"ID":1130722,"Issue":"ip-address: Address4 decodes leading-zero octets as decimal while resolvers decode them as octal, allowing SSRF and trust-boundary bypass","URL":"https://github.com/advisories/GHSA-mwp4-54f8-5fhr","Severity":"high","Vulnerable Versions":"<=10.3.0","Tree Versions":["10.1.0"],"Dependents":["socks@npm:2.8.7"]}}
+{"value":"ip-address","children":{"ID":1239948,"Issue":"ip-address: Address6.isLinkLocal() recognizes fe80::/64 rather than fe80::/10, allowing SSRF and trust-boundary bypass to on-link hosts","URL":"https://github.com/advisories/GHSA-rpw4-54j3-4h4q","Severity":"moderate","Vulnerable Versions":"<=10.5.0","Tree Versions":["10.1.0"],"Dependents":["socks@npm:2.8.7"]}}
+{"value":"ip-address","children":{"ID":1240097,"Issue":"ip-address: isInSubnet() and isHostInSubnet() compare addresses of different families as if they shared an address space, allowing an allowlist check to admit an address outside its range","URL":"https://github.com/advisories/GHSA-j6r3-76f7-8jcv","Severity":"moderate","Vulnerable Versions":"<=10.7.0","Tree Versions":["10.1.0"],"Dependents":["socks@npm:2.8.7"]}}
+{"value":"ip-address","children":{"ID":1240098,"Issue":"ip-address: Address6 builds a parse diagnostic proportional to the input with no length bound, allowing a single long string to stall or crash the process","URL":"https://github.com/advisories/GHSA-h3mg-xc3c-68pw","Severity":"moderate","Vulnerable Versions":"<=10.7.0","Tree Versions":["10.1.0"],"Dependents":["socks@npm:2.8.7"]}}
+{"value":"moment","children":{"ID":1240099,"Issue":"moment vulnerable to Path Traversal via crafted non-string locale name","URL":"https://github.com/advisories/GHSA-4p3w-j4w9-5jqw","Severity":"moderate","Vulnerable Versions":">=2.29.2 <2.31.0","Tree Versions":["2.30.1"],"Dependents":["@hmcts/nodejs-logging@npm:4.0.4"]}}
+{"value":"nanoid","children":{"ID":1138811,"Issue":"nanoid: non-secure generators can loop indefinitely with negative size","URL":"https://github.com/advisories/GHSA-28wg-ghj8-5hjv","Severity":"high","Vulnerable Versions":"<3.3.16","Tree Versions":["3.3.11"],"Dependents":["postcss@npm:8.5.10"]}}
+{"value":"nanoid","children":{"ID":1139427,"Issue":"nanoid: custom generators can loop indefinitely when size is zero","URL":"https://github.com/advisories/GHSA-2v37-7h3g-55p8","Severity":"high","Vulnerable Versions":"<3.3.18","Tree Versions":["3.3.11","3.3.16"],"Dependents":["postcss@npm:8.5.10","postcss@npm:8.5.22"]}}
+{"value":"nanoid","children":{"ID":1153189,"Issue":"nanoid: Integer Overflow or Wraparound","URL":"https://github.com/advisories/GHSA-xwg4-73v4-xw9w","Severity":"high","Vulnerable Versions":"<3.3.12","Tree Versions":["3.3.11"],"Dependents":["postcss@npm:8.5.10"]}}
+{"value":"postcss","children":{"ID":1124252,"Issue":"PostCSS: Arbitrary file read and information disclosure via attacker-controlled sourceMappingURL in CSS comments","URL":"https://github.com/advisories/GHSA-6g55-p6wh-862q","Severity":"high","Vulnerable Versions":"<=8.5.11","Tree Versions":["8.5.10"],"Dependents":["css-loader@virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:7.1.5"]}}
+{"value":"postcss","children":{"ID":1130709,"Issue":"PostCSS: incomplete fix of GHSA-6g55-p6wh-862q — attacker-controlled sourceMappingURL reads arbitrary .map files when `from` is unset","URL":"https://github.com/advisories/GHSA-fxqj-rqcc-2cmp","Severity":"moderate","Vulnerable Versions":"<=8.5.22","Tree Versions":["8.5.10","8.5.22"],"Dependents":["css-loader@virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:7.1.5","stylelint@npm:17.14.1"]}}
+{"value":"postcss","children":{"ID":1139510,"Issue":"PostCSS: Path Traversal in Previous Source Map Auto-Loading (sourceMappingURL) leads to Arbitrary .map File Disclosure","URL":"https://github.com/advisories/GHSA-r28c-9q8g-f849","Severity":"high","Vulnerable Versions":"<=8.5.17","Tree Versions":["8.5.10"],"Dependents":["css-loader@virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:7.1.5"]}}
+{"value":"postcss-selector-parser","children":{"ID":1153169,"Issue":"postcss-selector-parser allows denial of service through uncontrolled AST recursion","URL":"https://github.com/advisories/GHSA-w9m9-85wc-3x92","Severity":"low","Vulnerable Versions":">=7.1.0 <7.1.3","Tree Versions":["7.1.1"],"Dependents":["postcss-modules-local-by-default@virtual:ff74d562da3b8f6449e719095a31cd56040b77a1653ac24e2dd1af43272c78e7219cf67394c440f35e1e35c7cee7d70d37e017b39503e70ff49285d725261548#npm:4.2.0"]}}
+{"value":"postcss-selector-parser","children":{"ID":1241232,"Issue":"PostCSS: Quadratic complexity in flat selector parsing allows CPU exhaustion","URL":"https://github.com/advisories/GHSA-rj75-hqrm-r3gf","Severity":"moderate","Vulnerable Versions":"<7.1.6","Tree Versions":["7.1.1","7.1.4"],"Dependents":["postcss-modules-local-by-default@virtual:ff74d562da3b8f6449e719095a31cd56040b77a1653ac24e2dd1af43272c78e7219cf67394c440f35e1e35c7cee7d70d37e017b39503e70ff49285d725261548#npm:4.2.0","stylelint@npm:17.14.1"]}}
+{"value":"proxy-addr","children":{"ID":1241210,"Issue":"proxy-addr vulnerable to IP spoofing via IPv4-mapped IPv6 trust subnet","URL":"https://github.com/advisories/GHSA-jqcg-44mw-7w3h","Severity":"critical","Vulnerable Versions":">=1.1.0 <2.0.8","Tree Versions":["2.0.7"],"Dependents":["express@npm:5.2.1"]}}
+{"value":"serialize-javascript","children":{"ID":1240620,"Issue":"Serialize JavaScript: Cross-site scripting (XSS) via unescaped </script> in serialized function bodies","URL":"https://github.com/advisories/GHSA-gfhx-hw2g-v5hg","Severity":"low","Vulnerable Versions":">=7.1.1 <7.1.2","Tree Versions":["7.1.1"],"Dependents":["copy-webpack-plugin@virtual:5578f0b4f0946e03056c35ce2c97c3b2453d39e80c228ac05efcf6a35db69023d504a3bfa190f8432c9978e2c40409e85ef9d9426658e6ed4acc25fc3cf04cfb#npm:14.0.0"]}}
+{"value":"source-map-js","children":{"ID":1241209,"Issue":"source-map-js allows event-loop denial of service through indexed source-map section offsets","URL":"https://github.com/advisories/GHSA-68fv-2mgg-jv7q","Severity":"high","Vulnerable Versions":">=1.0.0 <1.2.2","Tree Versions":["1.2.1"],"Dependents":["postcss@npm:8.5.28"]}}
+{"value":"tar","children":{"ID":1120782,"Issue":"node-tar applies PAX size override to intermediary GNU long-name/long-link headers, causing tar parser interpretation differential (file smuggling)","URL":"https://github.com/advisories/GHSA-vmf3-w455-68vh","Severity":"moderate","Vulnerable Versions":"<=7.5.15","Tree Versions":["7.5.13"],"Dependents":["node-gyp@npm:12.2.0"]}}
+{"value":"tar","children":{"ID":1123939,"Issue":"node-tar: Process crash via PAX numeric path type confusion","URL":"https://github.com/advisories/GHSA-w8wr-v893-vjvp","Severity":"moderate","Vulnerable Versions":"<=7.5.17","Tree Versions":["7.5.13"],"Dependents":["node-gyp@npm:12.2.0"]}}
+{"value":"tar","children":{"ID":1123940,"Issue":"node-tar: Decompression/parse DoS via unlimited input","URL":"https://github.com/advisories/GHSA-23hp-3jrh-7fpw","Severity":"critical","Vulnerable Versions":"<=7.5.18","Tree Versions":["7.5.13"],"Dependents":["node-gyp@npm:12.2.0"]}}
+{"value":"tar","children":{"ID":1123941,"Issue":"node-tar: Negative tar entry size causes infinite loop in archive replace","URL":"https://github.com/advisories/GHSA-8x88-c5mf-7j5w","Severity":"high","Vulnerable Versions":"<=7.5.17","Tree Versions":["7.5.13"],"Dependents":["node-gyp@npm:12.2.0"]}}
+{"value":"tar","children":{"ID":1123942,"Issue":"node-tar: Uncaught Exception DoS via NUL byte in PAX path/linkpath records","URL":"https://github.com/advisories/GHSA-gvwx-54wh-qm9j","Severity":"moderate","Vulnerable Versions":"<=7.5.16","Tree Versions":["7.5.13"],"Dependents":["node-gyp@npm:12.2.0"]}}
+{"value":"tar","children":{"ID":1145647,"Issue":"node-tar: Uncontrolled recursion in mapHas/filesFilter allows uncatchable stack-overflow DoS via crafted long-path tar with member selection","URL":"https://github.com/advisories/GHSA-r292-9mhp-454m","Severity":"high","Vulnerable Versions":"<=7.5.20","Tree Versions":["7.5.13"],"Dependents":["node-gyp@npm:12.2.0"]}}
+{"value":"whatwg-encoding","children":{"ID":"whatwg-encoding (deprecation)","Issue":"Use @exodus/bytes instead for a more spec-conformant and faster implementation","Severity":"moderate","Vulnerable Versions":"3.1.1","Tree Versions":["3.1.1"],"Dependents":["jsdom@virtual:5a9981e55980ebf3fbcb32c43e2e9acf75baa373f01c4dee22b81d9739d2f73c8cd767f291d084a96f745bcf2b26dc3f7fae3d526309ac30c0e9470a1130720a#npm:26.1.0"]}}
+{"value":"ws","children":{"ID":1119108,"Issue":"ws: Uninitialized memory disclosure","URL":"https://github.com/advisories/GHSA-58qx-3vcg-4xpx","Severity":"moderate","Vulnerable Versions":">=8.0.0 <8.20.1","Tree Versions":["8.19.0"],"Dependents":["jsdom@virtual:5a9981e55980ebf3fbcb32c43e2e9acf75baa373f01c4dee22b81d9739d2f73c8cd767f291d084a96f745bcf2b26dc3f7fae3d526309ac30c0e9470a1130720a#npm:26.1.0"]}}
+{"value":"ws","children":{"ID":1123259,"Issue":"ws: Memory exhaustion DoS from tiny fragments and data chunks","URL":"https://github.com/advisories/GHSA-96hv-2xvq-fx4p","Severity":"high","Vulnerable Versions":">=8.0.0 <8.21.0","Tree Versions":["8.19.0"],"Dependents":["jsdom@virtual:5a9981e55980ebf3fbcb32c43e2e9acf75baa373f01c4dee22b81d9739d2f73c8cd767f291d084a96f745bcf2b26dc3f7fae3d526309ac30c0e9470a1130720a#npm:26.1.0"]}}
+{"value":"ws","children":{"ID":1123260,"Issue":"ws: Memory exhaustion DoS from tiny fragments and data chunks","URL":"https://github.com/advisories/GHSA-96hv-2xvq-fx4p","Severity":"high","Vulnerable Versions":">=7.0.0 <7.5.11","Tree Versions":["7.5.10"],"Dependents":["lighthouse@npm:13.1.0"]}}
