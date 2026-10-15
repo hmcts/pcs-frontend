@@ -5,6 +5,7 @@ import type { TFunction } from 'i18next';
 import { isLegalRepresentativeUser } from '../../utils/userRole';
 import type { RespondToClaimSectionId } from '../sections.config';
 
+import { getRequestLanguage } from '@modules/i18n';
 import { getStepTranslations, loadStepNamespaces } from '@modules/steps';
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
 
@@ -83,7 +84,7 @@ export const YES_NO_QUESTION_STEPS = [
   'exceptional-hardship',
   'have-you-applied-for-universal-credit',
   'income-and-expenses',
-  'installment-payments',
+  'instalment-payments',
   'other-considerations',
   'priority-debts',
   'repayments-agreed',
@@ -140,6 +141,7 @@ export interface BaseRowContext {
   rows: SummaryListRow[];
   validatedCase: CcdCaseModel;
   t: TFunction;
+  lang: string;
   change: ReturnType<typeof makeChange>;
   yesNoNotSure: ReturnType<typeof makeYesNoNotSure>;
 }
@@ -161,6 +163,7 @@ export function createRowContext(
     rows: [],
     validatedCase,
     t,
+    lang: getRequestLanguage(req),
     change: makeChange(caseRef, sectionId, t),
     yesNoNotSure: makeYesNoNotSure(t, isLegalRep, req),
   };
