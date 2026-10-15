@@ -76,21 +76,6 @@ export function buildSuspendedOrder(data: OrderData): DocWeaveDocument {
         list.item('suspended-costs', content => addCosts(content, data, costs));
       }
 
-      if (options.includes('use-occupation')) {
-        list.item('suspended-use-occupation', content => {
-          content
-            .text(`${sentenceCase(defendant)} must pay to ${claimant} £`)
-            .fact('suspended-use-occupation-rate', money(value(data, 'suspended-use-occupation-rate')), {
-              sourceId: 'suspended-use-occupation-rate',
-            })
-            .text(' per day for damages for unlawful occupation from ')
-            .fact('suspended-use-occupation-date', date(data, 'suspended-use-occupation-from-date'), {
-              sourceId: 'suspended-use-occupation-from-date',
-            })
-            .text(` until possession of the property is given to ${claimant}.`);
-        });
-      }
-
       const suspended = ['Execution of the order for possession'];
       if (options.includes('money-judgment-arrears') && selected(data, 'suspended-mj-same-terms', 'yes')) {
         suspended.push('enforcement of the money judgment');
@@ -126,7 +111,9 @@ export function buildSuspendedOrder(data: OrderData): DocWeaveDocument {
                 });
               }
               if (!paymentTerms.length) {
-                subList.item('suspended-missing-payment-term', '[select a payment term];');
+                subList.item('suspended-missing-payment-term', content => {
+                  content.fact('missing', '[select a payment term]', { sourceId: 'suspended-payment-terms' }).text(';');
+                });
               }
             });
           }
@@ -145,12 +132,6 @@ export function buildSuspendedOrder(data: OrderData): DocWeaveDocument {
         list.item(
           'suspended-warrant-on-notice',
           'Any application for a warrant of possession must be heard on notice to all parties unless the court orders otherwise.'
-        );
-      }
-      if (options.includes('transfer-high-court')) {
-        list.item(
-          'suspended-high-court-transfer',
-          'The order for possession is transferred to the High Court solely for the purpose of enforcement.'
         );
       }
     });
