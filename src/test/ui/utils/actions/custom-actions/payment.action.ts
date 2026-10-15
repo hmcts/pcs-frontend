@@ -31,7 +31,12 @@ export class PaymentAction implements IAction {
     await performAction('clickRadioButton', String(paymentOptions.payByOption));
 
     if (paymentOptions.payByOption === serviceRequestPayment.payByAccountRadioOption) {
+      if (typeof paymentOptions.pbaValue !== 'string' || paymentOptions.pbaValue === '') {
+        throw new Error('paymentOptions.pbaValue is missing, so the PBA account number cannot be stored.');
+      }
+
       await performAction('select', paymentOptions.pbaLabel, paymentOptions.pbaValue);
+      process.env.PBA_ACCOUNT_NUMBER = paymentOptions.pbaValue;
 
       const buttonText = String(paymentOptions.button);
       const button = page.locator('button', { hasText: buttonText });
