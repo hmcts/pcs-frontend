@@ -233,7 +233,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
   return [...issues, ...validateCosts(formData, false)];
 }
 
-/** The listing questions the form asks with the prefix: the adjournment's, or a hearing listed on paper. */
+/** The listing questions the form asks with the prefix: the adjournment's, or a hearing listed without one. */
 function validateListing(
   formData: Record<string, unknown>,
   prefix: string,
@@ -417,7 +417,7 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
     case 'FREE_FORM':
       return [
         // Made without a hearing, a free form order can list one.
-        ...(values(formData, 'paper-list').includes('yes')
+        ...(values(formData, 'list-on-notice').includes('yes')
           ? validateListing(formData, 'list', 'Enter a valid hearing date')
           : []),
         ...validateCosts(formData, false),

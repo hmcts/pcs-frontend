@@ -9,7 +9,7 @@ export function buildFreeFormOrder(data: OrderData): DocWeaveDocument {
   const { claimant, defendant } = partyLabels(data);
   const costs = caseManCosts(claimant, defendant);
   // Only an order made without a hearing asks whether to list one.
-  const listed = data.withoutHearing && values(data, 'paper-list').includes('yes');
+  const listed = data.withoutHearing && values(data, 'list-on-notice').includes('yes');
 
   return buildDoc(order => {
     // The judge writes the order itself in the preview, after "IT IS ORDERED THAT:".
