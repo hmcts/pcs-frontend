@@ -1190,8 +1190,9 @@ export class RespondToClaimAction implements IAction {
     await performValidation('summaryListValue', counterClaimApplicationFeeAmount.counterClaimAmountLabel, {
       value: feeData.amount ?? '',
     });
+    const feeValue = String(feeData.fee).replace(/^\s*£/, '');
     await performValidation('summaryListValue', counterClaimApplicationFeeAmount.counterClaimFeeLabel, {
-      value: `£${String(feeData.fee)}`,
+      value: formatPoundsValue(feeValue),
     });
     await performValidation('text', {
       elementType: 'linkOrButton',
