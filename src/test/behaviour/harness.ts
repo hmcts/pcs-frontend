@@ -257,7 +257,7 @@ export async function bootApp(
   if (options.application) {
     envelope.caseContext.application = options.application;
     envelope.order.genAppId = options.application.id;
-    // An order deciding an application is made on paper, not for a hearing.
+    // An order deciding an application is made without a hearing.
     envelope.hearing = null;
   }
   if (options.hearing !== undefined) {

@@ -12,7 +12,7 @@ import {
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
 
-describe('make an order: on the papers, for no hearing or application', () => {
+describe('make an order: without a hearing or an application', () => {
   let app: TestApp;
   beforeEach(async () => {
     app = await bootApp({ hearing: null });
@@ -45,7 +45,7 @@ describe('make an order: on the papers, for no hearing or application', () => {
     expect(submitted.order.genAppId).toBeNull();
   });
 
-  it('makes a possession order on the papers, saying so in place of who attended', async () => {
+  it('makes a possession order without a hearing, saying so in place of who attended', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-outright');
     check('outright-options', 'money-judgment');
@@ -61,7 +61,7 @@ describe('make an order: on the papers, for no hearing or application', () => {
 
   it('lists a hearing on notice from a free form order, asking when as an adjournment does', async () => {
     const page = await openPage((await app.get(PAGE)).text);
-    check('paper-list', 'yes');
+    check('list-on-notice', 'yes');
 
     const incomplete = page.body();
     incomplete.set('action', 'SUBMIT_FOR_REVIEW');
@@ -87,7 +87,7 @@ describe('make an order: on the papers, for no hearing or application', () => {
     const page = await openPage((await app.get(PAGE)).text);
 
     expect(document.querySelector('[data-attendance-row]')).not.toBeNull();
-    expect(document.querySelector('input[name="paper-list"]')).toBeNull();
+    expect(document.querySelector('input[name="list-on-notice"]')).toBeNull();
     expect(page.orderText()).not.toContain('considering the papers');
   });
 });

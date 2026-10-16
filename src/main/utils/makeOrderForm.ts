@@ -192,7 +192,7 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
       order.orderType ??
       (caseContext.application ? APPLICATION_ORDER_TYPE : atHearing ? DEFAULT_ORDER_TYPE : WITHOUT_HEARING_ORDER_TYPE),
     // The screen follows what the order is for: an application's decision, a hearing's record and every order type,
-    // or every order type made on the papers, with no one's attendance.
+    // or every order type made without a hearing, with no one's attendance.
     withoutHearing: !atHearing,
     orderDocumentJson:
       submission?.orderDocumentJson ?? (order.docweaveSnapshot ? JSON.stringify(order.docweaveSnapshot) : ''),
