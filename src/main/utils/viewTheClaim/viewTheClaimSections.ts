@@ -1,4 +1,10 @@
-import { STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS } from './viewTheClaimLabels';
+import {
+  HOUSING_ACT_LABELS,
+  NOTICE_SERVICE_METHOD_LABELS,
+  RENT_FREQUENCY_LABELS,
+  STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS,
+  TENANCY_TYPE_LABELS,
+} from './viewTheClaimLabels';
 import {
   additionalDefendantName,
   additionalDefendantParties,
@@ -8,7 +14,6 @@ import {
   claimantAddressHtml,
   claimantName,
   documentLinksHtml,
-  enumText,
   firstDefendantParty,
   firstUnderlesseeParty,
   formatDate,
@@ -20,10 +25,12 @@ import {
   getString,
   getValue,
   groundLabels,
+  groundNames,
   groundReasonRows,
   htmlRow,
   linkHtml,
   listHtml,
+  localisedValue,
   noticeDateTimeValue,
   noticeDateValue,
   otherGroundDescriptions,
@@ -72,7 +79,7 @@ export function buildClaimantSection(data: UnknownRecord, copy: ViewTheClaimCopy
     htmlRow(copy.label('addressForService'), claimantAddressHtml(data)),
     textRow(
       copy.label('isExemptLandlord'),
-      yesNoText(getValue(data, 'detailsTab_ClaimantRegistrationAndLicensingDetails.isExemptLandlord'))
+      yesNoText(getValue(data, 'detailsTab_ClaimantRegistrationAndLicensingDetails.isExemptLandlord'), copy, 'isAre')
     ),
   ];
 
@@ -130,15 +137,21 @@ export function buildClaimDetailsSection(
 ): ViewTheClaimSection | undefined {
   const rows = [
     htmlRow(copy.label('propertyAddress'), addressHtml(propertyAddress)),
-    textRow(copy.label('hasGrounds'), groundLabels(data).length > 0 ? 'Yes' : undefined),
-    htmlRow(copy.label('groundsForPossession'), listHtml(groundLabels(data))),
+    textRow(copy.label('hasGrounds'), groundLabels(data).length > 0 ? yesNoText('YES', copy, 'isThere') : undefined),
+    htmlRow(copy.label('groundsForPossession'), listHtml(groundNames(data, copy))),
     htmlRow(copy.label('descriptionOfGrounds'), listHtml(otherGroundDescriptions(data))),
     ...groundReasonRows(data, copy),
     textRow(copy.label('whyClaimingPossession'), getFirstString(data, ['noGrounds', 'absoluteGrounds'])),
     textRow(
       copy.label('otherInfoAboutReasons'),
-      yesNoText(getFirstValue(data, ['detailsTab_ReasonsForPossessionDetails.hasAdditionalReasons'])) ??
-        (getFirstString(data, ['detailsTab_ReasonsForPossessionDetails.otherGrounds']) ? 'Yes' : undefined)
+      yesNoText(
+        getFirstValue(data, ['detailsTab_ReasonsForPossessionDetails.hasAdditionalReasons']),
+        copy,
+        'isThere'
+      ) ??
+        (getFirstString(data, ['detailsTab_ReasonsForPossessionDetails.otherGrounds'])
+          ? yesNoText('YES', copy, 'isThere')
+          : undefined)
     ),
     textRow(
       copy.label('additionalReasons'),
@@ -155,11 +168,14 @@ export function buildClaimDetailsSection(
 export function buildWelshAsbSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const asb = 'detailsTab_AntisocialAndConductDetails';
   const rows = [
-    textRow(copy.label('isASB'), yesNoText(getValue(data, `${asb}.antiSocialBehaviour`))),
+    textRow(copy.label('isASB'), yesNoText(getValue(data, `${asb}.antiSocialBehaviour`), copy, 'isAre')),
     textRow(copy.label('asbDetails'), getString(data, `${asb}.antiSocialBehaviourDetails`)),
-    textRow(copy.label('isIllegalPurposes'), yesNoText(getValue(data, `${asb}.propertyUsedIllegally`))),
+    textRow(copy.label('isIllegalPurposes'), yesNoText(getValue(data, `${asb}.propertyUsedIllegally`), copy, 'isAre')),
     textRow(copy.label('illegalPurposesDetails'), getString(data, `${asb}.propertyUsedIllegallyDetails`)),
-    textRow(copy.label('isOtherProhibitedConduct'), yesNoText(getValue(data, `${asb}.otherProhibitedConduct`))),
+    textRow(
+      copy.label('isOtherProhibitedConduct'),
+      yesNoText(getValue(data, `${asb}.otherProhibitedConduct`), copy, 'isAre')
+    ),
     textRow(copy.label('otherProhibitedConductDetails'), getString(data, `${asb}.otherProhibitedConductDetails`)),
   ];
 
@@ -176,16 +192,21 @@ export function buildRentArrearsSection(
     textRow(copy.label('rentAmount'), getString(data, 'detailsTab_RentArrearsDetails.rentAmount')),
     textRow(
       copy.label('howIsRentCalculated'),
-      getFirstString(data, [
-        'detailsTab_RentArrearsDetails.calculationFrequency',
-        'detailsTab_RentArrearsDetails.rentFrequency',
-        'summaryTab_RentArrearsDetails.calculationFrequency',
-      ])
+      localisedValue(
+        copy,
+        'rentFrequencies',
+        RENT_FREQUENCY_LABELS,
+        getFirstString(data, [
+          'detailsTab_RentArrearsDetails.calculationFrequency',
+          'detailsTab_RentArrearsDetails.rentFrequency',
+          'summaryTab_RentArrearsDetails.calculationFrequency',
+        ])
+      )
     ),
     textRow(copy.label('totalRentArrears'), getString(data, 'detailsTab_RentArrearsDetails.arrearsTotal')),
     textRow(
       copy.label('previousSteps'),
-      yesNoText(getValue(data, 'detailsTab_RentArrearsDetails.stepsToRecoverArrears'))
+      yesNoText(getValue(data, 'detailsTab_RentArrearsDetails.stepsToRecoverArrears'), copy, 'past')
     ),
     textRow(
       copy.label('previousStepsDetails'),
@@ -193,7 +214,7 @@ export function buildRentArrearsSection(
     ),
     textRow(
       copy.label('judgmentRequested'),
-      yesNoText(getValue(data, 'detailsTab_RentArrearsDetails.judgmentRequested'))
+      yesNoText(getValue(data, 'detailsTab_RentArrearsDetails.judgmentRequested'), copy, 'isAre')
     ),
     htmlRow(
       copy.label('rentStatement'),
@@ -212,7 +233,9 @@ export function buildActionTakenSection(data: UnknownRecord, copy: ViewTheClaimC
     textRow(
       copy.label('preActionProtocol'),
       yesNoText(
-        getFirstValue(data, ['preActionProtocolCompleted', 'detailsTab_ActionsTakenDetails.preactionProtocolFollowed'])
+        getFirstValue(data, ['preActionProtocolCompleted', 'detailsTab_ActionsTakenDetails.preactionProtocolFollowed']),
+        copy,
+        'past'
       )
     ),
     textRow(
@@ -224,11 +247,19 @@ export function buildActionTakenSection(data: UnknownRecord, copy: ViewTheClaimC
     ),
     textRow(
       copy.label('mediationAttempted'),
-      yesNoText(getFirstValue(data, ['mediationAttempted', 'detailsTab_ActionsTakenDetails.mediationAttempted']))
+      yesNoText(
+        getFirstValue(data, ['mediationAttempted', 'detailsTab_ActionsTakenDetails.mediationAttempted']),
+        copy,
+        'past'
+      )
     ),
     textRow(
       copy.label('settlementAttempted'),
-      yesNoText(getFirstValue(data, ['settlementAttempted', 'detailsTab_ActionsTakenDetails.settlementAttempted']))
+      yesNoText(
+        getFirstValue(data, ['settlementAttempted', 'detailsTab_ActionsTakenDetails.settlementAttempted']),
+        copy,
+        'past'
+      )
     ),
   ];
 
@@ -243,17 +274,20 @@ export function buildNoticeDetailsSection(
 ): ViewTheClaimSection | undefined {
   const notice = 'detailsTab_NoticeDetails';
   const rows = [
-    textRow(copy.label('noticeServed'), yesNoText(getValue(data, `${notice}.noticeServed`))),
+    textRow(copy.label('noticeServed'), yesNoText(getValue(data, `${notice}.noticeServed`), copy, 'past')),
     textRow(copy.label('noticeNotServedReason'), getString(data, `${notice}.statement`)),
     textRow(copy.label('noticeType'), getString(data, `${notice}.typeOfNoticeServed`)),
-    textRow(copy.label('noticeServiceMethod'), getString(data, `${notice}.noticeMethod`)),
-    textRow(copy.label('noticeDate'), formatDate(noticeDateValue(data))),
-    textRow(copy.label('noticeTime'), formatTime(noticeDateTimeValue(data))),
+    textRow(
+      copy.label('noticeServiceMethod'),
+      localisedValue(copy, 'noticeMethods', NOTICE_SERVICE_METHOD_LABELS, getString(data, `${notice}.noticeMethod`))
+    ),
+    textRow(copy.label('noticeDate'), formatDate(noticeDateValue(data), copy.locale)),
+    textRow(copy.label('noticeTime'), formatTime(noticeDateTimeValue(data), copy.locale)),
     textRow(copy.label('noticePersonName'), getString(data, `${notice}.noticePersonName`)),
     textRow(copy.label('noticeEmailAddress'), getString(data, `${notice}.noticeEmailAddress`)),
     textRow(copy.label('noticeOtherElectronic'), getString(data, `${notice}.noticeOtherElectronicDetails`)),
     textRow(copy.label('noticeOtherMeans'), getString(data, `${notice}.noticeOtherExplanation`)),
-    textRow(copy.label('canUploadNotice'), yesNoText(getValue(data, `${notice}.noticeUploaded`))),
+    textRow(copy.label('canUploadNotice'), yesNoText(getValue(data, `${notice}.noticeUploaded`), copy, 'isAre')),
     textRow(copy.label('cannotUploadNoticeReason'), getString(data, `${notice}.reasonsForNoNoticeDocument`)),
     htmlRow(
       copy.label('noticeDocument'),
@@ -279,13 +313,25 @@ export function buildTenancySection(
   const rows = [
     textRow(
       copy.label('tenancyType'),
-      getFirstString(data, [`${tenancy}.typeOfTenancyLicence`, `${occupation}.agreementType`])
+      localisedValue(
+        copy,
+        'tenancyTypes',
+        TENANCY_TYPE_LABELS,
+        getFirstString(data, [`${tenancy}.typeOfTenancyLicence`, `${occupation}.agreementType`])
+      )
     ),
     textRow(
       copy.label('tenancyStartDate'),
-      getFirstString(data, [`${tenancy}.tenancyLicenceDate`, `${occupation}.agreementStartDate`])
+      formatDate(
+        getFirstValue(data, ['tenancy_TenancyLicenceDate', 'licenceStartDate']) ??
+          getFirstString(data, [`${tenancy}.tenancyLicenceDate`, `${occupation}.agreementStartDate`]),
+        copy.locale
+      )
     ),
-    textRow(copy.label('tenancyCopy'), yesNoText(getValue(data, `${tenancy}.hasCopyOfTenancyLicence`))),
+    textRow(
+      copy.label('tenancyCopy'),
+      yesNoText(getValue(data, `${tenancy}.hasCopyOfTenancyLicence`), copy, 'isThere')
+    ),
     textRow(copy.label('tenancyNoCopyReason'), getString(data, `${tenancy}.reasonsForNoTenancyLicenceDocuments`)),
     htmlRow(
       copy.label('tenancyDocument'),
@@ -326,7 +372,7 @@ export function buildClaimantCircumstancesSection(
   const rows = [
     textRow(
       copy.label('claimantCircumstancesQuestion'),
-      yesNoText(getValue(data, 'detailsTab_ClaimantCircumstances.claimantCircumstancesGiven'))
+      yesNoText(getValue(data, 'detailsTab_ClaimantCircumstances.claimantCircumstancesGiven'), copy, 'isThere')
     ),
     textRow(
       copy.label('claimantCircumstancesDetails'),
@@ -344,7 +390,7 @@ export function buildDefendantCircumstancesSection(
   const rows = [
     textRow(
       copy.label('defendantCircumstancesQuestion'),
-      yesNoText(getValue(data, 'detailsTab_DefendantCircumstanceDetails.defendantCircumstancesGiven'))
+      yesNoText(getValue(data, 'detailsTab_DefendantCircumstanceDetails.defendantCircumstancesGiven'), copy, 'isThere')
     ),
     textRow(
       copy.label('defendantCircumstancesDetails'),
@@ -362,13 +408,13 @@ export function buildUnderlesseeTriageSection(
   return section(copy.section('underlesseeTriage'), [
     textRow(
       copy.label('hasUnderlesseeOrMortgagee'),
-      yesNoText(getFirstValue(data, ['hasUnderlesseeOrMortgagee'])) ??
-        yesNoText(getValue(data, 'detailsTab_MortgageOneDetails.nameKnown')) ??
+      yesNoText(getFirstValue(data, ['hasUnderlesseeOrMortgagee']), copy, 'isThere') ??
+        yesNoText(getValue(data, 'detailsTab_MortgageOneDetails.nameKnown'), copy, 'isThere') ??
         ([firstUnderlesseeParty(data), ...additionalUnderlesseeParties(data)].some(
           party => party && (getString(party, 'orgName') || getString(party, 'name'))
         )
-          ? 'Yes'
-          : 'No')
+          ? yesNoText('YES', copy, 'isThere')
+          : yesNoText('NO', copy, 'isThere'))
     ),
   ]);
 }
@@ -408,11 +454,22 @@ export function buildAdditionalUnderlesseeSections(
 
 export function buildDemotionSection(data: UnknownRecord, copy: ViewTheClaimCopy): ViewTheClaimSection | undefined {
   const rows = [
-    textRow(copy.label('demotionQuestion'), getValue(data, 'detailsTab_DemotionOfTenancyDetails') ? 'Yes' : undefined),
-    textRow(copy.label('demotionHousingAct'), getString(data, 'detailsTab_DemotionOfTenancyDetails.housingAct')),
+    textRow(
+      copy.label('demotionQuestion'),
+      getValue(data, 'detailsTab_DemotionOfTenancyDetails') ? yesNoText('YES', copy, 'isAre') : undefined
+    ),
+    textRow(
+      copy.label('demotionHousingAct'),
+      localisedValue(
+        copy,
+        'housingActSections',
+        HOUSING_ACT_LABELS,
+        getString(data, 'detailsTab_DemotionOfTenancyDetails.housingAct')
+      )
+    ),
     textRow(
       copy.label('demotionStatement'),
-      yesNoText(getValue(data, 'detailsTab_DemotionOfTenancyDetails.statementOfExpressTermsServed'))
+      yesNoText(getValue(data, 'detailsTab_DemotionOfTenancyDetails.statementOfExpressTermsServed'), copy, 'isAre')
     ),
     textRow(copy.label('demotionDetails'), getString(data, 'detailsTab_DemotionOfTenancyDetails.terms')),
     textRow(copy.label('demotionReason'), getString(data, 'detailsTab_DemotionOfTenancyDetails.reasons')),
@@ -425,9 +482,17 @@ export function buildSuspensionSection(data: UnknownRecord, copy: ViewTheClaimCo
   const rows = [
     textRow(
       copy.label('suspensionQuestion'),
-      getValue(data, 'detailsTab_SuspensionOfRightToBuyDetails') ? 'Yes' : undefined
+      getValue(data, 'detailsTab_SuspensionOfRightToBuyDetails') ? yesNoText('YES', copy, 'isAre') : undefined
     ),
-    textRow(copy.label('suspensionHousingAct'), getString(data, 'detailsTab_SuspensionOfRightToBuyDetails.housingAct')),
+    textRow(
+      copy.label('suspensionHousingAct'),
+      localisedValue(
+        copy,
+        'housingActSections',
+        HOUSING_ACT_LABELS,
+        getString(data, 'detailsTab_SuspensionOfRightToBuyDetails.housingAct')
+      )
+    ),
     textRow(copy.label('suspensionReason'), getString(data, 'detailsTab_SuspensionOfRightToBuyDetails.reasons')),
   ];
 
@@ -441,11 +506,15 @@ export function buildProhibitedConductSection(
   const rows = [
     textRow(
       copy.label('prohibitedConductQuestion'),
-      getString(data, 'detailsTab_ProhibitedConductStandardContractDetails.seekingProhibitedConductStandardContract')
+      yesNoText(
+        getValue(data, 'detailsTab_ProhibitedConductStandardContractDetails.seekingProhibitedConductStandardContract'),
+        copy,
+        'isAre'
+      )
     ),
     textRow(
       copy.label('prohibitedConductAgreement'),
-      getString(data, 'detailsTab_ProhibitedConductStandardContractDetails.agreedTerms')
+      yesNoText(getValue(data, 'detailsTab_ProhibitedConductStandardContractDetails.agreedTerms'), copy, 'isAre')
     ),
     textRow(
       copy.label('prohibitedConductDetails'),
@@ -469,7 +538,7 @@ export function buildRequiredDocumentsSection(
   const rows = [
     textRow(
       copy.label('epcQuestion'),
-      getString(data, 'detailsTab_RequiredDocumentsDetails.hasEnergyPerformanceCertificate')
+      yesNoText(getValue(data, 'detailsTab_RequiredDocumentsDetails.hasEnergyPerformanceCertificate'), copy, 'isAre')
     ),
     textRow(
       copy.label('epcReason'),
@@ -486,7 +555,10 @@ export function buildRequiredDocumentsSection(
           documentTypes: ['ENERGY_PERFORMANCE_CERTIFICATE'],
         })
     ),
-    textRow(copy.label('gasQuestion'), getString(data, 'detailsTab_RequiredDocumentsDetails.hasGasSafetyReport')),
+    textRow(
+      copy.label('gasQuestion'),
+      yesNoText(getValue(data, 'detailsTab_RequiredDocumentsDetails.hasGasSafetyReport'), copy, 'isAre')
+    ),
     textRow(copy.label('gasReason'), getString(data, 'detailsTab_RequiredDocumentsDetails.noGasSafetyReportReason')),
     htmlRow(
       copy.label('gasDocument'),
@@ -495,7 +567,11 @@ export function buildRequiredDocumentsSection(
     ),
     textRow(
       copy.label('eicrQuestion'),
-      getString(data, 'detailsTab_RequiredDocumentsDetails.hasElectricalInstallationConditionReport')
+      yesNoText(
+        getValue(data, 'detailsTab_RequiredDocumentsDetails.hasElectricalInstallationConditionReport'),
+        copy,
+        'isAre'
+      )
     ),
     textRow(
       copy.label('eicrReason'),
@@ -528,7 +604,12 @@ export function buildStatementOfTruthSection(
 
   const completedBy =
     getFirstString(statementOfTruth, ['fullNameLegalRep', 'fullNameParty', 'fullNameClaimant']) ??
-    enumText(statementOfTruth.completedBy, STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS);
+    localisedValue(
+      copy,
+      'statementOfTruthCompletedBy',
+      STATEMENT_OF_TRUTH_COMPLETED_BY_LABELS,
+      statementOfTruth.completedBy
+    );
   const firmName = getFirstString(statementOfTruth, ['firmNameLegalRep']);
   const position = getFirstString(statementOfTruth, ['positionLegalRep', 'positionParty', 'positionClaimant']);
   const rows = [

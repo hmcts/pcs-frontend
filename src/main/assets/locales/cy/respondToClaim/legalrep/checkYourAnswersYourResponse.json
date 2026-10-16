@@ -8,7 +8,7 @@
   },
   "rows": {
     "exemptLandlord": {
-      "label": "A yw’r landlord yn landlord wedi’i eithrio o dan Rhan 1 Deddf Tai (Cymru) 2014?",
+      "label": "A yw’r landlord yn landlord wedi’i eithrio o dan Ran 1 o Ddeddf Tai (Cymru) 2014?",
       "changeHidden": "landlord wedi’i eithrio"
     },
     "writtenTerms": {
@@ -37,7 +37,12 @@
     },
     "possessionNoticeReceived": {
       "label": "A wnaeth {{ claimantName }} hysbysu’r diffynnydd am eu bwriad i ddechrau achos meddiannu?",
-      "changeHidden": "wedi derbyn hysbysiad"
+      "changeHidden": "wedi derbyn hysbysiad",
+      "options": {
+        "yes": "Do",
+        "no": "Naddo",
+        "imNotSure": "Diffynnydd ddim yn siŵr"
+      }
     },
     "noticeReceivedDate": {
       "label": "Pryd gafodd y diffynnydd yr hysbysiad gan {{claimantName}}?",
@@ -113,7 +118,7 @@
       "changeHidden": "gwrth-hawliad yn erbyn"
     },
     "otherOrderRequestDetails": {
-      "label": "Pa orchymyn ydyn nhw’n gofyn i’r llys ei wneud?",
+      "label": "Pa orchmynion ydyn nhw’n gofyn i’r llys eu gwneud?",
       "changeHidden": "gorchmynion a geisiwyd"
     },
     "otherOrderRequestFacts": {

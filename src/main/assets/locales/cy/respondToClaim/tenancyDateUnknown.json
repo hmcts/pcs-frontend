@@ -11,7 +11,7 @@
       "year": "Blwyddyn",
       "required": "Rhaid i ddyddiad dechrau eich tenantiaeth gynnwys diwrnod, mis a blwyddyn",
       "notRealDate": "Rhaid i ddyddiad dechrau’r denantiaeth fod yn ddyddiad go iawn",
-      "futureDate": "Rhaid i ddyddiad dechrau'r denantiaeth fod yn y gorffennol",
+      "futureDate": "Rhaid i ddyddiad dechrau’r denantiaeth fod yn y gorffennol",
       "missingOne": "Rhaid i ddyddiad dechrau eich tenantiaeth gynnwys {{missingField}}",
       "missingTwo": "Rhaid i ddyddiad dechrau eich tenantiaeth gynnwys {{first}} a {{second}}"
     }
