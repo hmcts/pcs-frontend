@@ -7,6 +7,7 @@ export const MAKE_ORDER_TYPES = [
   'STRIKE_OUT_DISMISSAL',
   'FREE_FORM',
   'APPLICATION_DECISION',
+  'ON_PAPER',
 ] as const;
 export type MakeOrderType = (typeof MAKE_ORDER_TYPES)[number];
 
@@ -233,6 +234,52 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
   return [...issues, ...validateCosts(formData, false)];
 }
 
+/** The listing questions the form asks with the prefix: the adjournment's, or a hearing listed on paper. */
+function validateListing(
+  formData: Record<string, unknown>,
+  prefix: string,
+  dateMessage: string
+): MakeOrderValidationIssue[] {
+  const { issues, add, date } = validation(formData);
+  const when = value(formData, `${prefix}-when`) || 'next-list';
+  const hearingDate = `${prefix}-hearing-date-${when}`;
+  const directions = values(formData, `${prefix}-directions`);
+  date(hearingDate, dateMessage);
+  add(
+    /^\d+$/.test(value(formData, `${prefix}-time-estimate`)) && Number(value(formData, `${prefix}-time-estimate`)) > 0,
+    `${prefix}-time-estimate`,
+    'Enter the time estimate as a whole number'
+  );
+  add(
+    ['minutes', 'hours'].includes(value(formData, `${prefix}-time-estimate-unit`)),
+    `${prefix}-time-estimate-unit`,
+    'Select minutes or hours for the time estimate'
+  );
+  if (when === 'specific') {
+    const time = value(formData, `${prefix}-specific-time`);
+    if (!time) {
+      add(false, `${prefix}-specific-time`, 'Enter the time of hearing');
+    } else {
+      add(Boolean(parseTime(time)), `${prefix}-specific-time`, 'Enter a valid time of hearing, like 10:30am or 14:30');
+    }
+  }
+  if (directions.includes('defence')) {
+    date(`${prefix}-defence-date`, 'Enter a valid defence date');
+  }
+  if (directions.includes('counterclaim')) {
+    date(`${prefix}-counterclaim-date`, 'Enter a valid counterclaim date');
+  }
+  if (directions.includes('claimant-reply')) {
+    date(`${prefix}-claimant-reply-date`, 'Enter a valid counterclaim reply date');
+  }
+  add(
+    !(directions.includes('defence') && directions.includes('counterclaim')),
+    `${prefix}-directions`,
+    'Select either defence or defence and any counterclaim, not both'
+  );
+  return issues;
+}
+
 function validateAdjournment(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add, money, date, frequency } = validation(formData);
   const type = value(formData, 'adj-type');
@@ -243,42 +290,7 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
     'Select adjourned for further hearing or adjourned generally'
   );
   if (type === 'further-hearing') {
-    const when = value(formData, 'adj-when') || 'next-list';
-    const hearingDate = `adj-hearing-date-${when}`;
-    const directions = values(formData, 'adj-directions');
-    date(hearingDate, 'Enter a valid adjournment date');
-    add(
-      /^\d+$/.test(value(formData, 'adj-time-estimate')) && Number(value(formData, 'adj-time-estimate')) > 0,
-      'adj-time-estimate',
-      'Enter the time estimate as a whole number'
-    );
-    add(
-      ['minutes', 'hours'].includes(value(formData, 'adj-time-estimate-unit')),
-      'adj-time-estimate-unit',
-      'Select minutes or hours for the time estimate'
-    );
-    if (when === 'specific') {
-      const time = value(formData, 'adj-specific-time');
-      if (!time) {
-        add(false, 'adj-specific-time', 'Enter the time of hearing');
-      } else {
-        add(Boolean(parseTime(time)), 'adj-specific-time', 'Enter a valid time of hearing, like 10:30am or 14:30');
-      }
-    }
-    if (directions.includes('defence')) {
-      date('adj-defence-date', 'Enter a valid defence date');
-    }
-    if (directions.includes('counterclaim')) {
-      date('adj-counterclaim-date', 'Enter a valid counterclaim date');
-    }
-    if (directions.includes('claimant-reply')) {
-      date('adj-claimant-reply-date', 'Enter a valid counterclaim reply date');
-    }
-    add(
-      !(directions.includes('defence') && directions.includes('counterclaim')),
-      'adj-directions',
-      'Select either defence or defence and any counterclaim, not both'
-    );
+    issues.push(...validateListing(formData, 'adj', 'Enter a valid adjournment date'));
   }
   if (type === 'generally') {
     const conditions = values(formData, 'adj-gen');
@@ -341,7 +353,7 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
 
 export const APPLICATION_DECISIONS = ['grant', 'dismiss', 'strike-out', 'list', 'other'] as const;
 
-/** What the judge decides about the application, and whether a hearing they list it for is on notice. */
+/** What the judge decides about the application, and when the hearing is if they list it for one. */
 function validateApplicationDecision(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add } = validation(formData);
   const decision = value(formData, 'application-decision');
@@ -351,13 +363,19 @@ function validateApplicationDecision(formData: Record<string, unknown>): MakeOrd
     'Select what you decide about the application'
   );
   if (decision === 'list') {
-    add(
-      ['on-notice', 'without-notice'].includes(value(formData, 'application-list-notice')),
-      'application-list-notice',
-      'Select whether the hearing is on notice'
-    );
+    issues.push(...validateListing(formData, 'list', 'Enter a valid hearing date'));
   }
   return [...issues, ...validateCosts(formData, false)];
+}
+
+/** An order made on paper without an application, which lists a hearing if the judge ticks it. */
+function validateOnPaper(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  return [
+    ...(values(formData, 'paper-list').includes('yes')
+      ? validateListing(formData, 'list', 'Enter a valid hearing date')
+      : []),
+    ...validateCosts(formData, false),
+  ];
 }
 
 /**
@@ -411,6 +429,8 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
       return validateCosts(formData, false);
     case 'APPLICATION_DECISION':
       return validateApplicationDecision(formData);
+    case 'ON_PAPER':
+      return validateOnPaper(formData);
     default:
       throw new Error(`Unknown order type: ${orderType}`);
   }
@@ -425,8 +445,8 @@ export function validateMakeOrder(
   // In the order the page asks, so the error summary follows the page.
   return [
     ...validateHearingRecord(formData),
-    // An order deciding an application is made without a hearing, so no one attended.
-    ...(orderType === 'APPLICATION_DECISION' ? [] : validateAttendance(formData, parties)),
+    // An order made on paper, as one deciding an application is, has no hearing, so no one attended.
+    ...(orderType === 'APPLICATION_DECISION' || orderType === 'ON_PAPER' ? [] : validateAttendance(formData, parties)),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
     ...validateOrderType(orderType, formData),
     ...(chosen('staff-message') ? validateStaffMessage(formData) : []),

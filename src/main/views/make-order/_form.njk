@@ -6,10 +6,17 @@
 
 <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
 
+{% if onPaper %}
+{#
+  An order made on paper is one screen, whether or not it decides an application: the application and the
+  decision on it if it does, then the listing, without the hearing's attendance and possession order types.
+#}
 {% if application %}
-{# An order deciding an application is made on paper: the application, then the decision, without the hearing. #}
 {% include "make-order/_application.njk" %}
 {% include "make-order/_application-decision.njk" %}
+{% else %}
+{% include "make-order/_paper.njk" %}
+{% endif %}
 {% else %}
 {# Only an order made for a hearing has the case's facts and the hearing's note. #}
 {% if hearing %}

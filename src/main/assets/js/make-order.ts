@@ -13,6 +13,7 @@ import { buildAdjournmentOrder } from './make-order/wording/adjournment';
 import { buildApplicationOrder, requestedParagraphs } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildFreeFormOrder } from './make-order/wording/free-form';
+import { buildOnPaperOrder } from './make-order/wording/on-paper';
 import { buildOutrightOrder } from './make-order/wording/outright';
 import { buildStrikeOutDismissalOrder } from './make-order/wording/strike-out';
 import { buildSuspendedOrder } from './make-order/wording/suspended';
@@ -206,6 +207,7 @@ const builders: Record<OrderType, (data: OrderData) => DocWeaveDocument> = {
   STRIKE_OUT_DISMISSAL: buildStrikeOutDismissalOrder,
   FREE_FORM: buildFreeFormOrder,
   APPLICATION_DECISION: buildApplicationOrder,
+  ON_PAPER: buildOnPaperOrder,
 };
 
 /** The generated order for the form's current answers and selected order type. */
@@ -214,16 +216,14 @@ export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
   return builders[type](readOrderData(form));
 }
 
-/** Whether a hearing the judge lists the application for is on notice, asked only while they are listing it. */
-export function initApplicationListing(form: HTMLFormElement): void {
-  const listing = form.querySelector<HTMLElement>('[data-application-listing]');
-  if (!listing) {
-    return;
-  }
+/** What follows a decision on an application, shown while that decision is chosen. */
+export function initApplicationDecision(form: HTMLFormElement): void {
   form.addEventListener('change', event => {
     const decision = event.target as HTMLInputElement;
     if (decision.name === 'application-decision') {
-      listing.hidden = decision.value !== 'list';
+      form.querySelectorAll<HTMLElement>('[data-decision-shows]').forEach(follows => {
+        follows.hidden = follows.dataset.decisionShows !== decision.value;
+      });
     }
   });
 }
@@ -234,11 +234,27 @@ function applicationDecision(form: HTMLFormElement): string {
 }
 
 /**
+ * The applicant's wording the judge chose to use: in the application, or in a draft order they filed. With only
+ * one, there is no choice to make.
+ */
+function wordingSource(form: HTMLFormElement): string {
+  return (
+    form.querySelector<HTMLInputElement>('input[name="application-wording"]:checked')?.value ??
+    form.querySelector<HTMLElement>('[data-wording-source]')?.dataset.wordingSource ??
+    ''
+  );
+}
+
+/**
  * Adds the applicant's wording to the order as the judge's own numbered clauses, straight after "IT IS
  * ORDERED THAT", to change or delete as they would their own.
  */
 function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController): void {
-  const wording = form.querySelector<HTMLElement>('[data-application]')?.dataset.applicationWording ?? '';
+  const source = wordingSource(form);
+  const wording =
+    Array.from(form.querySelectorAll<HTMLElement>('[data-wording-source]')).find(
+      element => element.dataset.wordingSource === source
+    )?.dataset.wording ?? '';
   editor.insert(requestedParagraphs(wording), { at: { after: 'paragraph:ordered-that' }, numbered: true });
 }
 
@@ -266,10 +282,16 @@ export function initMakeOrder(): void {
 
   let orderType: OrderType | undefined;
   let key: string | undefined;
-  // One document per order type, and per decision on an application, so switching and back keeps any edits.
+  // One document per order type, per decision on an application, and per wording of the applicant's the judge
+  // uses, so switching and back keeps any edits.
   const documents: Record<string, DocWeaveSnapshot> = {};
-  const documentKey = (type: OrderType): string =>
-    type === 'APPLICATION_DECISION' ? `${type}:${applicationDecision(form)}` : type;
+  const documentKey = (type: OrderType): string => {
+    if (type !== 'APPLICATION_DECISION') {
+      return type;
+    }
+    const decision = applicationDecision(form);
+    return decision === 'grant' ? `${type}:grant:${wordingSource(form)}` : `${type}:${decision}`;
+  };
   const editor = createDocEditor({
     mount,
     label: 'Order',
@@ -294,7 +316,7 @@ export function initMakeOrder(): void {
   const startDocument = (): void => {
     editor.load();
     render();
-    if (key === 'APPLICATION_DECISION:grant') {
+    if (key?.startsWith('APPLICATION_DECISION:grant:')) {
       insertRequestedWording(form, editor);
     }
   };
@@ -344,11 +366,8 @@ export function initMakeOrder(): void {
   const reset = form.querySelector<HTMLButtonElement>('[data-restore-requested-wording]');
   reset?.addEventListener('click', startDocument);
   form.addEventListener('change', event => {
-    if ((event.target as HTMLInputElement).name === 'application-decision') {
+    if (['application-decision', 'application-wording'].includes((event.target as HTMLInputElement).name)) {
       selectDocument();
-      if (reset) {
-        reset.hidden = applicationDecision(form) !== 'grant';
-      }
     }
   });
   form.addEventListener('input', render);
@@ -356,7 +375,7 @@ export function initMakeOrder(): void {
   form.addEventListener('submit', followTab);
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
-  initApplicationListing(form);
+  initApplicationDecision(form);
 }
 
 /**

@@ -1,11 +1,13 @@
 {#
   What the judge decides about the application, which starts the order's wording, on one row as the rest of
   the make order page asks its questions. Using the applicant's wording puts it in the order preview as the
-  judge's own clauses, which the reset button restores. Listing it for a hearing leaves the application open.
-  Inline radios can't reveal a question, so whether the hearing is on notice follows on its own row, shown
-  while the judge is listing it (initApplicationListing in make-order.ts).
+  judge's own clauses, which the reset button restores; where the applicant gave it more than once, in the
+  application and in a draft order, the judge chooses which. Listing it for a hearing on notice asks when, as
+  the adjournment tab does, and leaves the application open. Inline radios can't reveal a question, so what
+  follows a decision is on its own rows, shown while it is chosen (initApplicationDecision in make-order.ts).
 #}
 {% import "make-order/_compact.njk" as compact with context %}
+{% import "make-order/_listing.njk" as listing with context %}
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Decision</h2>
 
@@ -18,26 +20,39 @@
     { value: "grant", text: "Use the applicant’s wording" },
     { value: "dismiss", text: "Dismiss" },
     { value: "strike-out", text: "Strike out" },
-    { value: "list", text: "List for a hearing" },
+    { value: "list", text: "List for a hearing on notice" },
     { value: "other", text: "Something else" }
   ]
 }) }}
 
-{% if application.whatOrderWanted %}
-  <button type="button" class="govuk-button govuk-button--secondary" data-restore-requested-wording
-          {%- if not draftChecked("application-decision", "grant") %} hidden{% endif %}>
-    Reset to applicant’s wording
-  </button>
-{% endif %}
+{% for source in application.wordingSources %}
+  <div hidden data-wording-source="{{ source.id }}" data-wording="{{ source.wording }}"></div>
+{% endfor %}
 
-<div data-application-listing {%- if not draftChecked("application-decision", "list") %} hidden{% endif %}>
-  {{ compact.radios("application-list-notice", {
-    legend: "Is the hearing on notice?",
-    classes: "govuk-radios--small govuk-radios--inline",
-    default: "on-notice",
-    items: [
-      { value: "on-notice", text: "On notice to the other parties" },
-      { value: "without-notice", text: "Without notice" }
-    ]
-  }) }}
+<div data-decision-shows="grant" {%- if not draftChecked("application-decision", "grant") %} hidden{% endif %}>
+  {% if application.wordingSources | length > 1 %}
+    {% set sourceItems = [] %}
+    {% for source in application.wordingSources %}
+      {% set sourceItems = sourceItems.concat([{ value: source.id, text: source.label }]) %}
+    {% endfor %}
+    {{ compact.radios("application-wording", {
+      legend: "Which wording?",
+      classes: "govuk-radios--small govuk-radios--inline",
+      default: application.wordingSources[0].id,
+      items: sourceItems
+    }) }}
+  {% endif %}
+  {% if application.wordingSources | length %}
+    <button type="button" class="govuk-button govuk-button--secondary" data-restore-requested-wording>
+      Reset to applicant’s wording
+    </button>
+  {% endif %}
+</div>
+
+<div data-decision-shows="list" data-application-listing {%- if not draftChecked("application-decision", "list") %} hidden{% endif %}>
+  {{ listing.listing("list", "When the hearing is", [
+    "Next available possession list after",
+    "Next available date (non-possession list) after",
+    "Specific date"
+  ]) }}
 </div>
