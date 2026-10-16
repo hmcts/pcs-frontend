@@ -53,8 +53,6 @@ export interface OrderApplication {
   fee?: string | null;
   whatOrderWanted?: string | null;
   documents: { id: string; fileName: string }[];
-  /** Draft orders the applicant filed as documents, with their wording if pcs-api could read it. */
-  draftOrders?: { id: string; fileName: string; wording?: string | null }[];
   referredOn?: string | null;
   referralNote?: string | null;
 }

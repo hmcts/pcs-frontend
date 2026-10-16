@@ -22,29 +22,12 @@ function displayDate(iso?: string | null): string | undefined {
   return date.isValid ? date.setLocale('en-GB').toFormat('d MMMM yyyy') : undefined;
 }
 
-/**
- * The wording the applicant asked for, which the judge can choose to use: what they wrote in the application,
- * then each draft order they filed whose wording pcs-api could read.
- */
-function wordingSources(application: OrderApplication) {
-  return [
-    ...(application.whatOrderWanted
-      ? [{ id: 'requested', label: 'Wording in the application', wording: application.whatOrderWanted }]
-      : []),
-    ...(application.draftOrders ?? [])
-      .filter(draft => draft.wording)
-      .map(draft => ({ id: draft.id, label: `Draft order: ${draft.fileName}`, wording: draft.wording! })),
-  ];
-}
-
 /** The application as its panel shows it: its answers in words, and its dates as the court writes them. */
 function applicationModel(application: OrderApplication, caseReference: number) {
   const href = (id: string): string => `/case/${caseReference}/view-documents/${encodeURIComponent(id)}`;
   return {
     ...application,
     documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
-    draftOrders: (application.draftOrders ?? []).map(draft => ({ ...draft, href: href(draft.id) })),
-    wordingSources: wordingSources(application),
     submittedOnDisplay: displayDate(application.submittedOn),
     referredOnDisplay: displayDate(application.referredOn),
     within14DaysDisplay: YES_NO[application.within14Days ?? ''],
