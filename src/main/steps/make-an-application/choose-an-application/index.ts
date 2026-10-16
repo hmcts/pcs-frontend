@@ -57,12 +57,6 @@ export const step: StepDefinition = createFormStep({
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
-    noticeText: 'noticeText',
-    noticeTextByPost: 'noticeTextByPost',
-    readTheGuidance: 'noticeTextList.readTheGuidance',
-    fillInTheForm: 'noticeTextList.fillInTheForm',
-    findYourLocalCourt: 'noticeTextList.findYourLocalCourt',
-    sendTheFormToTheCourt: 'noticeTextList.sendTheFormToTheCourt',
   },
   beforeGet: async (req: Request) => {
     if (!getApplicationId(req)) {
