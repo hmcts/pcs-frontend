@@ -20,10 +20,15 @@ export class Nunjucks {
     const mojFrontendPath = path.dirname(require.resolve('@ministryofjustice/frontend/moj/template.njk'));
     const mojFrontendRoot = path.resolve(mojFrontendPath, '..');
 
+    // webpack copies the GOV.UK templates into views/govuk for a build; fall back to the
+    // package itself so templates render without a build (development, tests).
+    const govukFrontendRoot = path.resolve(path.dirname(require.resolve('govuk-frontend')), '..');
+
     app.locals.nunjucksEnv = nunjucks.configure(
       [
         path.join(__dirname, '..', '..', 'views'),
         path.join(__dirname, '..', '..', 'steps'),
+        govukFrontendRoot,
         cftNunjucksRoot,
         mojFrontendRoot,
       ],
