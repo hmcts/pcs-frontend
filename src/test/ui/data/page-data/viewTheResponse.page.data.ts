@@ -33,6 +33,8 @@ export const viewTheResponse = {
   },
   defendant1Details: {
     Name: 'Test John',
+    'Phone number': '07700900000',
+    'SMS mobile number': '07700900980',
     'Postal address': '10 Second Avenue, London, W3 7RX',
     'Date of birth': '20 May 1990',
   },
