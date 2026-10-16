@@ -1,0 +1,109 @@
+{#
+  Listing a hearing: when, how long, in what format, and directions before it. The adjournment tab
+  asks it with the prefix "adj", and an order made on paper with "list", so each keeps its answers.
+
+  Each listing option carries its own date on the same row as its radio, so a judge
+  can fill the date in one movement rather than selecting an option and then moving
+  to a shared field. Typing in a row selects that row's radio (initOptionRows in
+  make-order.ts), and only the selected option's date is read into the order, so only
+  its fields are marked required. Hidden legends keep every control named for assistive
+  technology.
+#}
+{% import "make-order/_compact.njk" as compact with context %}
+
+{% macro whenRow(prefix, id, value, text, checked, extraHtml) %}
+  <div class="pcs-option-row" data-option-row>
+    <div class="govuk-radios__item pcs-option-row__choice">
+      <input class="govuk-radios__input" id="{{ id }}" name="{{ prefix }}-when" type="radio" value="{{ value }}"{% if checked %} checked{% endif %}>
+      <label class="govuk-label govuk-radios__label" for="{{ id }}">{{ text }}</label>
+    </div>
+    <div class="pcs-option-row__fields">
+      {{ compact.date({ id: prefix + "-hearing-date-" + value, legend: text, legendHidden: true, optional: not checked }) }}
+      {{ extraHtml | safe if extraHtml }}
+    </div>
+  </div>
+{% endmacro %}
+
+{#
+  The legend over the listing options and their three labels, as the order phrases them: when an adjourned
+  hearing comes back, or when a hearing the judge lists is.
+#}
+{% macro listing(prefix, legend, labels) %}
+  {# Only a specific date has a time; the other options are listed by the court. #}
+  {% set specificTimeHtml %}
+    {{ compact.text(prefix + "-specific-time", {
+      label: "Time of hearing",
+      hint: "For example, 10:30am or 14:30",
+      classes: "govuk-input--width-5",
+      formGroupClasses: "pcs-option-row__time",
+      spellcheck: false,
+      optional: not draftChecked(prefix + "-when", "specific")
+    }) }}
+  {% endset %}
+
+  <div class="govuk-form-group">
+    <fieldset class="govuk-fieldset" role="group">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">{{ legend }}</legend>
+      <div class="govuk-radios govuk-radios--small pcs-option-rows">
+        {{ whenRow(prefix, prefix + "-when", "next-list", labels[0],
+          draftChecked(prefix + "-when", "next-list") or not draftValue(prefix + "-when")) }}
+        {{ whenRow(prefix, prefix + "-when-2", "next-date", labels[1],
+          draftChecked(prefix + "-when", "next-date")) }}
+        {{ whenRow(prefix, prefix + "-when-3", "specific", labels[2],
+          draftChecked(prefix + "-when", "specific"), specificTimeHtml) }}
+      </div>
+    </fieldset>
+  </div>
+
+  <div id="{{ prefix }}-time-estimate-group" class="govuk-form-group pcs-section-break">
+    <fieldset class="govuk-fieldset" role="group">
+      <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Time estimate</legend>
+      {% call compact.row() %}
+        {{ compact.text(prefix + "-time-estimate", {
+          label: "Length",
+          labelHidden: true,
+          classes: "govuk-input--width-3",
+          spellcheck: false,
+          inputmode: "numeric"
+        }) }}
+        {{ compact.select(prefix + "-time-estimate-unit", {
+          label: "Unit",
+          labelHidden: true,
+          items: [{ value: "minutes", text: "Minutes" }, { value: "hours", text: "Hours" }],
+          default: "minutes"
+        }) }}
+      {% endcall %}
+    </fieldset>
+  </div>
+
+  <div id="{{ prefix }}-format-group" class="pcs-section-break">
+    {{ compact.checkboxes(prefix + "-format", {
+      legend: "Hearing format (optional)",
+      default: "in-person",
+      items: [
+        { value: "in-person", text: "In person" },
+        { value: "video", text: "Video hearing" },
+        { value: "telephone", text: "Telephone" }
+      ]
+    }) }}
+  </div>
+
+  {% set directionItems = [] %}
+  {% for direction in [
+    { value: "defence", text: "The defendant must submit a defence" },
+    { value: "counterclaim", text: "The defendant must submit a defence and any counterclaim" },
+    { value: "claimant-reply", text: "The claimant must submit a defence to the counterclaim and any reply" }
+  ] %}
+    {% set directionItems = directionItems.concat([{
+      value: direction.value,
+      text: direction.text,
+      conditional: { html: compact.date({ id: prefix + "-" + direction.value + "-date", legend: "By 4pm on" }) }
+    }]) %}
+  {% endfor %}
+  {{ compact.checkboxes(prefix + "-directions", {
+    legend: "Directions (optional)",
+    classes: "pcs-divided-options",
+    formGroup: { classes: "pcs-section-break" },
+    items: directionItems
+  }) }}
+{% endmacro %}

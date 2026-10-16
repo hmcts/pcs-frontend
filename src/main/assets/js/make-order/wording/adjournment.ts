@@ -1,6 +1,5 @@
 import { type DocWeaveDocument, buildDoc } from '@hmcts-cft/docweave';
 
-import { formatTime, parseTime } from '../../../../utils/makeOrderFormat';
 import { type OrderData } from '../data';
 
 import {
@@ -16,21 +15,7 @@ import {
   value,
   values,
 } from './common';
-
-function timeEstimate(data: OrderData): string {
-  const amount = value(data, 'adj-time-estimate');
-  const unit = value(data, 'adj-time-estimate-unit');
-  if (!amount || (unit !== 'minutes' && unit !== 'hours')) {
-    return '[time not provided]';
-  }
-  return amount === '1' ? `1 ${unit.slice(0, -1)}` : `${amount} ${unit}`;
-}
-
-const LISTINGS: Record<string, string> = {
-  'next-list': ' shall be adjourned to be heard on the next available possession list after ',
-  'next-date': ' shall be adjourned to be heard on the next available date (non-possession list) after ',
-  specific: ' shall be adjourned to be heard on ',
-};
+import { addListing } from './listing';
 
 const SUBJECTS: Record<string, string> = {
   claim: 'the claim',
@@ -38,23 +23,9 @@ const SUBJECTS: Record<string, string> = {
   application: 'the application',
 };
 
-const DIRECTIONS: Record<string, { party: 'claimant' | 'defendant'; text: string }> = {
-  defence: { party: 'defendant', text: ' submit to the court and all other parties a defence.' },
-  counterclaim: {
-    party: 'defendant',
-    text: ' submit to the court and all other parties a defence and any counterclaim, having paid any court fees which are due.',
-  },
-  'claimant-reply': {
-    party: 'claimant',
-    text: ' submit to the court and all other parties a defence to the counterclaim and any reply.',
-  },
-};
-
 export function buildAdjournmentOrder(data: OrderData): DocWeaveDocument {
   const type = value(data, 'adj-type');
-  const labels = partyLabels(data);
-  const { claimant, defendant, defendantVerb } = labels;
-  const directions = values(data, 'adj-directions');
+  const { claimant, defendant, defendantVerb } = partyLabels(data);
   const conditions = values(data, 'adj-gen');
   const costs = caseManCosts(claimant, defendant);
   const chosen = values(data, 'adj-subjects').filter(subject => SUBJECTS[subject]);
@@ -68,38 +39,7 @@ export function buildAdjournmentOrder(data: OrderData): DocWeaveDocument {
     }
     order.orderedList('adjournment-clauses', list => {
       if (type === 'further-hearing') {
-        const when = value(data, 'adj-when') || 'next-list';
-        list.item('adjournment-listing', content => {
-          content
-            .text(`${sentenceCase(subject)}${LISTINGS[when]}`)
-            .fact('adjournment-hearing-date', date(data, `adj-hearing-date-${when}`), {
-              sourceId: `adj-hearing-date-${when}`,
-            });
-          if (when === 'specific') {
-            const time = parseTime(value(data, 'adj-specific-time'));
-            content
-              .text(' at ')
-              .fact('adjournment-hearing-time', time ? formatTime(time) : '[hearing time not provided]', {
-                sourceId: 'adj-specific-time',
-              });
-          }
-          content
-            .text(' with a time estimate of ')
-            .fact('adjournment-time-estimate', timeEstimate(data), { sourceId: 'adj-time-estimate-group' })
-            .text(when === 'specific' ? '.' : '. Further details of the hearing will be provided by the court.');
-        });
-        for (const [direction, { party, text }] of Object.entries(DIRECTIONS)) {
-          if (directions.includes(direction)) {
-            list.item(`adjournment-${direction}`, content => {
-              content
-                .text(`${sentenceCase(labels[party])} must by 4pm on `)
-                .fact(`adjournment-${direction}-date`, date(data, `adj-${direction}-date`), {
-                  sourceId: `adj-${direction}-date`,
-                })
-                .text(text);
-            });
-          }
-        }
+        addListing(list, data, 'adj', 'adjournment', `${sentenceCase(subject)} shall be adjourned to be heard`);
       } else {
         const instalments = ['current-rent-plus', 'payments'].find(option => conditions.includes(option));
         const restore = conditions.includes('restore');

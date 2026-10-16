@@ -1,6 +1,7 @@
 {#
   The general application the judge is deciding: what was applied for and by whom, the applicant's
-  answers and documents, and the order they asked for, which the judge can use as the order's wording.
+  answers and documents, and the order they asked for, in the application and in any draft order they filed,
+  which the judge can use as the order's wording.
 #}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
@@ -11,8 +12,7 @@
          data-application-reference="{{ application.reference }}"
          data-application-type="{{ application.type }}"
          data-application-applicant="{{ application.applicant or 'the applicant' }}"
-         data-application-submitted="{{ application.submittedOnDisplay or '' }}"
-         data-application-wording="{{ application.whatOrderWanted or '' }}">
+         data-application-submitted="{{ application.submittedOnDisplay or '' }}">
   <h2 class="govuk-heading-l govuk-!-margin-top-6" id="application-heading">
     Application {{ application.reference }}: {{ application.type }}
   </h2>
@@ -65,7 +65,24 @@
       html: '<p class="govuk-body">' + (application.whatOrderWanted | escape | nl2br) + '</p>',
       attributes: { id: "application-requested" }
     }) }}
-  {% else %}
+  {% elif not application.draftOrders | length %}
     <p class="govuk-body">The applicant did not say what order they want. Read the application documents.</p>
   {% endif %}
+
+  {# A draft order the applicant filed, as a document whose name says so, with its wording if it could be read. #}
+  {% for draftOrder in application.draftOrders %}
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">
+      Draft order filed:
+      <a class="govuk-link" href="{{ draftOrder.href }}" target="_blank" rel="noopener">{{ draftOrder.fileName }} (opens in new tab)</a>
+    </h3>
+    {% if draftOrder.wording %}
+      {{ govukInsetText({
+        html: '<p class="govuk-body">' + (draftOrder.wording | escape | nl2br) + '</p>',
+        classes: "govuk-!-margin-top-1",
+        attributes: { "data-draft-order": draftOrder.id }
+      }) }}
+    {% else %}
+      <p class="govuk-body">The draft order’s wording could not be read. Open the document to copy it.</p>
+    {% endif %}
+  {% endfor %}
 </section>

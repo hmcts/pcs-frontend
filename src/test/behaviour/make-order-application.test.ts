@@ -1,6 +1,16 @@
 import { requestedParagraphs } from '../../main/assets/js/make-order/wording/application';
 
-import { CASE_REFERENCE, type TestApp, bootApp, check, control, openPage, submittedOrders, type } from './harness';
+import {
+  CASE_REFERENCE,
+  type TestApp,
+  bootApp,
+  check,
+  control,
+  openPage,
+  submittedOrders,
+  type,
+  typeDate,
+} from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order?genAppId=gen-app-1`;
 
@@ -19,6 +29,11 @@ const APPLICATION = {
   referredOn: '2026-10-05',
   referralNote: 'The hearing is next week',
 };
+
+/** Whether the button putting the applicant's wording back is showing. */
+function resetShowing(): boolean {
+  return !control<HTMLButtonElement>('[data-restore-requested-wording]').closest<HTMLElement>('[hidden]');
+}
 
 /** The number of clauses in each numbered list of the order the page will submit. */
 function clauseLists(): number[] {
@@ -85,7 +100,7 @@ describe('make an order: deciding an application', () => {
 
   it("uses the applicant's wording as the order's numbered clauses, with no decision clause of its own", async () => {
     const page = await openPage((await app.get(PAGE)).text);
-    expect(control<HTMLButtonElement>('[data-restore-requested-wording]').hidden).toBe(true);
+    expect(resetShowing()).toBe(false);
     check('application-decision', 'grant');
 
     expect(page.documentText()).toBe(
@@ -98,7 +113,7 @@ describe('make an order: deciding an application', () => {
       ].join('\n')
     );
     expect(clauseLists()).toEqual([2]);
-    expect(control<HTMLButtonElement>('[data-restore-requested-wording]').hidden).toBe(false);
+    expect(resetShowing()).toBe(true);
 
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
@@ -137,7 +152,7 @@ describe('make an order: deciding an application', () => {
     check('application-decision', 'dismiss');
     expect(page.documentText()).toContain('The application is dismissed.');
     expect(page.documentText()).not.toContain('The hearing on 14 October is adjourned.');
-    expect(control<HTMLButtonElement>('[data-restore-requested-wording]').hidden).toBe(true);
+    expect(resetShowing()).toBe(false);
 
     check('application-decision', 'grant');
     expect(page.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
@@ -178,15 +193,35 @@ describe('make an order: deciding an application', () => {
     expect(page.orderText()).toContain('The application is dismissed.');
   });
 
-  it('lists the application for a hearing, on notice unless the judge says otherwise', async () => {
+  it('lists the application for a hearing on notice, asking when as an adjournment does', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     const listing = document.querySelector<HTMLElement>('[data-application-listing]');
     expect(listing?.hidden).toBe(true);
     check('application-decision', 'list');
     expect(listing?.hidden).toBe(false);
-    expect(page.orderText()).toContain('The application is listed for a hearing on notice to the other parties.');
-    check('application-list-notice', 'without-notice');
-    expect(page.orderText()).toContain('The application is listed for a hearing without notice.');
+
+    check('list-when', 'specific');
+    typeDate('list-hearing-date-specific', '2', '11', '2026');
+    type('list-specific-time', '10:30');
+    type('list-time-estimate', '30');
+    check('list-directions', 'defence');
+    typeDate('list-defence-date', '20', '10', '2026');
+
+    expect(page.orderText().split('\n').slice(3)).toEqual([
+      'The application shall be listed for a hearing on notice to all parties on 2 November 2026 at 10:30am with a time estimate of 30 minutes.',
+      'The defendant must by 4pm on 20 October 2026 submit to the court and all other parties a defence.',
+    ]);
+  });
+
+  it('needs the hearing date and time estimate to list the application', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    check('application-decision', 'list');
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    const rejected = await app.post(PAGE, body);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Enter a valid hearing date');
+    expect(rejected.text).toContain('Enter the time estimate as a whole number');
   });
 
   it('needs a decision before review', async () => {
@@ -196,5 +231,55 @@ describe('make an order: deciding an application', () => {
     const rejected = await app.post(PAGE, body);
     expect(rejected.status).toBe(400);
     expect(rejected.text).toContain('Select what you decide about the application');
+  });
+});
+
+describe('make an order: deciding an application with a draft order filed', () => {
+  const DRAFT_ORDER = {
+    id: '3f2a6c1e-0000-4000-8000-000000000009',
+    fileName: 'Draft order.docx',
+    wording: '1. The hearing on 14 October is vacated.\n\n2. The application is to be relisted.',
+  };
+  let app: TestApp;
+  afterEach(() => app.close());
+
+  it("shows the draft order's wording beside the application's, and uses whichever the judge chooses", async () => {
+    app = await bootApp({ application: { ...APPLICATION, draftOrders: [DRAFT_ORDER] } });
+    const page = await openPage((await app.get(PAGE)).text);
+
+    expect(document.querySelector(`[data-draft-order="${DRAFT_ORDER.id}"]`)?.textContent).toContain(
+      'The hearing on 14 October is vacated.'
+    );
+    check('application-decision', 'grant');
+    expect(page.documentText()).toContain('The hearing on 14 October is adjourned.');
+
+    check('application-wording', DRAFT_ORDER.id);
+    expect(page.documentText().split('\n').slice(2)).toEqual([
+      'IT IS ORDERED THAT:',
+      'The hearing on 14 October is vacated.',
+      'The application is to be relisted.',
+    ]);
+    expect(clauseLists()).toEqual([2]);
+
+    check('application-wording', 'requested');
+    expect(page.documentText()).toContain('The hearing on 14 October is adjourned.');
+    expect(page.documentText()).not.toContain('vacated');
+  });
+
+  it("uses a draft order's wording when the applicant wrote none in the application", async () => {
+    app = await bootApp({ application: { ...APPLICATION, whatOrderWanted: null, draftOrders: [DRAFT_ORDER] } });
+    const page = await openPage((await app.get(PAGE)).text);
+
+    expect(document.querySelector('input[name="application-wording"]')).toBeNull();
+    check('application-decision', 'grant');
+    expect(page.documentText()).toContain('The hearing on 14 October is vacated.');
+  });
+
+  it('links a draft order whose wording could not be read, for the judge to copy', async () => {
+    app = await bootApp({ application: { ...APPLICATION, draftOrders: [{ ...DRAFT_ORDER, wording: null }] } });
+    await openPage((await app.get(PAGE)).text);
+
+    expect(document.body.textContent).toContain('The draft order’s wording could not be read.');
+    expect(document.querySelector('input[name="application-wording"]')).toBeNull();
   });
 });

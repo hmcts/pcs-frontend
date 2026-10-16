@@ -13,6 +13,7 @@ import type {
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 const APPLICATION_ORDER_TYPE: MakeOrderType = 'APPLICATION_DECISION';
+const ON_PAPER_ORDER_TYPE: MakeOrderType = 'ON_PAPER';
 
 const YES_NO: Record<string, string> = { YES: 'Yes', NO: 'No' };
 
@@ -21,14 +22,29 @@ function displayDate(iso?: string | null): string | undefined {
   return date.isValid ? date.setLocale('en-GB').toFormat('d MMMM yyyy') : undefined;
 }
 
+/**
+ * The wording the applicant asked for, which the judge can choose to use: what they wrote in the application,
+ * then each draft order they filed whose wording pcs-api could read.
+ */
+function wordingSources(application: OrderApplication) {
+  return [
+    ...(application.whatOrderWanted
+      ? [{ id: 'requested', label: 'Wording in the application', wording: application.whatOrderWanted }]
+      : []),
+    ...(application.draftOrders ?? [])
+      .filter(draft => draft.wording)
+      .map(draft => ({ id: draft.id, label: `Draft order: ${draft.fileName}`, wording: draft.wording! })),
+  ];
+}
+
 /** The application as its panel shows it: its answers in words, and its dates as the court writes them. */
 function applicationModel(application: OrderApplication, caseReference: number) {
+  const href = (id: string): string => `/case/${caseReference}/view-documents/${encodeURIComponent(id)}`;
   return {
     ...application,
-    documents: application.documents.map(document => ({
-      ...document,
-      href: `/case/${caseReference}/view-documents/${encodeURIComponent(document.id)}`,
-    })),
+    documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
+    draftOrders: (application.draftOrders ?? []).map(draft => ({ ...draft, href: href(draft.id) })),
+    wordingSources: wordingSources(application),
     submittedOnDisplay: displayDate(application.submittedOn),
     referredOnDisplay: displayDate(application.referredOn),
     within14DaysDisplay: YES_NO[application.within14Days ?? ''],
@@ -177,12 +193,16 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     ? { ...caseFactsFormData(hearing.caseFacts), 'hearing-notes': hearing.note ?? '' }
     : {};
   const draft: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
+  const draftOrderType =
+    submission?.orderType ??
+    order.orderType ??
+    (caseContext.application ? APPLICATION_ORDER_TYPE : hearing ? DEFAULT_ORDER_TYPE : ON_PAPER_ORDER_TYPE);
   return {
     draft,
-    draftOrderType:
-      submission?.orderType ??
-      order.orderType ??
-      (caseContext.application ? APPLICATION_ORDER_TYPE : DEFAULT_ORDER_TYPE),
+    draftOrderType,
+    // An order deciding an application, or made without a hearing, is made on paper: one screen, without the
+    // hearing's attendance and possession order types. An earlier draft of a possession order keeps its tabs.
+    onPaper: draftOrderType === APPLICATION_ORDER_TYPE || draftOrderType === ON_PAPER_ORDER_TYPE,
     orderDocumentJson:
       submission?.orderDocumentJson ?? (order.docweaveSnapshot ? JSON.stringify(order.docweaveSnapshot) : ''),
     draftValue: (name: string): unknown => draft[name],

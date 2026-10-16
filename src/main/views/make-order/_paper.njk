@@ -1,0 +1,16 @@
+{#
+  An order made on paper with no application to decide: the judge writes it in the order preview, and can
+  list a hearing on notice, asked as the adjournment tab asks it.
+#}
+{% import "make-order/_compact.njk" as compact with context %}
+{% import "make-order/_listing.njk" as listing with context %}
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Order</h2>
+
+<p class="govuk-body">Write the order in the <a class="govuk-link" href="#order-editor">order preview</a>, after "IT IS ORDERED THAT:".</p>
+
+{{ compact.reveal("paper-list", "List for a hearing on notice", listing.listing("list", "When the hearing is", [
+  "Next available possession list after",
+  "Next available date (non-possession list) after",
+  "Specific date"
+])) }}

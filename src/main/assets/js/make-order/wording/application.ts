@@ -3,6 +3,7 @@ import { type DocWeaveDocument, buildDoc } from '@hmcts-cft/docweave';
 import { type OrderData } from '../data';
 
 import { addCosts, caseManCosts, hasCosts, partyLabels, value } from './common';
+import { addListing } from './listing';
 
 const PARAGRAPH_MARKER = /^(?:\(?\d+[.)]|\(?[a-z][.)]|[-•*])\s+/i;
 
@@ -30,33 +31,25 @@ export function requestedParagraphs(wording: string): string[] {
   return paragraphs;
 }
 
+const LISTED = 'The application shall be listed for a hearing on notice to all parties';
+
 const DECISIONS: Record<string, string> = {
   dismiss: 'The application is dismissed.',
   'strike-out': 'The application is struck out.',
 };
 
-const LISTINGS: Record<string, string> = {
-  'on-notice': 'on notice to the other parties',
-  'without-notice': 'without notice',
-};
-
-function decisionClause(data: OrderData): string | undefined {
-  if (value(data, 'application-decision') === 'list') {
-    const notice = LISTINGS[value(data, 'application-list-notice')] ?? LISTINGS['on-notice'];
-    return `The application is listed for a hearing ${notice}.`;
-  }
-  return DECISIONS[value(data, 'application-decision')];
-}
-
 /**
  * An order deciding a general application without a hearing: the application, the decision, then costs.
  * Using the applicant's wording generates no decision clause: their wording goes in as the judge's own clauses.
+ * Listing the application for a hearing says when, as an adjournment does.
  */
 export function buildApplicationOrder(data: OrderData): DocWeaveDocument {
   const application = data.application;
   const { claimant, defendant } = partyLabels(data);
   const costs = caseManCosts(claimant, defendant);
-  const clause = decisionClause(data);
+  const decision = value(data, 'application-decision');
+  const clause = DECISIONS[decision];
+  const listed = decision === 'list';
 
   return buildDoc(order => {
     if (application) {
@@ -68,12 +61,15 @@ export function buildApplicationOrder(data: OrderData): DocWeaveDocument {
       order.paragraph('application-considered', 'AND UPON the Court considering the application without a hearing');
     }
     order.paragraph('ordered-that', 'IT IS ORDERED THAT:');
-    if (!clause && !hasCosts(data, costs)) {
+    if (!clause && !listed && !hasCosts(data, costs)) {
       return;
     }
     order.orderedList('application-clauses', list => {
       if (clause) {
         list.item('application-decision', clause);
+      }
+      if (listed) {
+        addListing(list, data, 'list', 'application', LISTED);
       }
       if (hasCosts(data, costs)) {
         list.item('application-costs', content => addCosts(content, data, costs));
