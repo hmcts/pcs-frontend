@@ -31,6 +31,8 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'respondToClaim/legalrep/tenancyDateDetails.json::hintText',
   'respondToClaim/legalrep/tenancyDateDetails.json::question',
   'respondToClaim/legalrep/tenancyTypeDetails.json::tenancyTypeOther',
+  // HDPI-1234: Awaiting approved Welsh translation.
+  'viewTheResponse.json::defendant.smsMobileNumber',
 ]);
 
 /**
