@@ -80,6 +80,9 @@ const ATTENDANCE_ROLES: Record<string, (party: string) => string> = {
 };
 
 export function addPreamble(order: DocBuilder, data: OrderData): void {
+  if (data.withoutHearing) {
+    order.paragraph('papers-considered', 'UPON the Court considering the papers without a hearing');
+  }
   const heard: string[] = [];
   const paragraphs: { id: string; entry: AttendanceEntry; text: string }[] = [];
   for (const entry of data.attendance) {

@@ -7,7 +7,6 @@ export const MAKE_ORDER_TYPES = [
   'STRIKE_OUT_DISMISSAL',
   'FREE_FORM',
   'APPLICATION_DECISION',
-  'ON_PAPER',
 ] as const;
 export type MakeOrderType = (typeof MAKE_ORDER_TYPES)[number];
 
@@ -368,16 +367,6 @@ function validateApplicationDecision(formData: Record<string, unknown>): MakeOrd
   return [...issues, ...validateCosts(formData, false)];
 }
 
-/** An order made on paper without an application, which lists a hearing if the judge ticks it. */
-function validateOnPaper(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  return [
-    ...(values(formData, 'paper-list').includes('yes')
-      ? validateListing(formData, 'list', 'Enter a valid hearing date')
-      : []),
-    ...validateCosts(formData, false),
-  ];
-}
-
 /**
  * The hearing's record: the judge's own figures for the case and their note, which they need not give, but
  * which pcs-api records whenever they save, so are checked on every save.
@@ -426,11 +415,15 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
     case 'STRIKE_OUT_DISMISSAL':
       return validateStrikeOut(formData);
     case 'FREE_FORM':
-      return validateCosts(formData, false);
+      return [
+        // Made without a hearing, a free form order can list one.
+        ...(values(formData, 'paper-list').includes('yes')
+          ? validateListing(formData, 'list', 'Enter a valid hearing date')
+          : []),
+        ...validateCosts(formData, false),
+      ];
     case 'APPLICATION_DECISION':
       return validateApplicationDecision(formData);
-    case 'ON_PAPER':
-      return validateOnPaper(formData);
     default:
       throw new Error(`Unknown order type: ${orderType}`);
   }
@@ -445,8 +438,9 @@ export function validateMakeOrder(
   // In the order the page asks, so the error summary follows the page.
   return [
     ...validateHearingRecord(formData),
-    // An order made on paper, as one deciding an application is, has no hearing, so no one attended.
-    ...(orderType === 'APPLICATION_DECISION' || orderType === 'ON_PAPER' ? [] : validateAttendance(formData, parties)),
+    // An order deciding an application has no hearing, so no one attended; nor does one made without a hearing,
+    // whose parties the caller leaves out.
+    ...(orderType === 'APPLICATION_DECISION' ? [] : validateAttendance(formData, parties)),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
     ...validateOrderType(orderType, formData),
     ...(chosen('staff-message') ? validateStaffMessage(formData) : []),

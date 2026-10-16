@@ -13,7 +13,6 @@ import { buildAdjournmentOrder } from './make-order/wording/adjournment';
 import { buildApplicationOrder, requestedParagraphs } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildFreeFormOrder } from './make-order/wording/free-form';
-import { buildOnPaperOrder } from './make-order/wording/on-paper';
 import { buildOutrightOrder } from './make-order/wording/outright';
 import { buildStrikeOutDismissalOrder } from './make-order/wording/strike-out';
 import { buildSuspendedOrder } from './make-order/wording/suspended';
@@ -207,7 +206,6 @@ const builders: Record<OrderType, (data: OrderData) => DocWeaveDocument> = {
   STRIKE_OUT_DISMISSAL: buildStrikeOutDismissalOrder,
   FREE_FORM: buildFreeFormOrder,
   APPLICATION_DECISION: buildApplicationOrder,
-  ON_PAPER: buildOnPaperOrder,
 };
 
 /** The generated order for the form's current answers and selected order type. */

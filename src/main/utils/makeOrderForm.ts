@@ -13,7 +13,7 @@ import type {
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 const APPLICATION_ORDER_TYPE: MakeOrderType = 'APPLICATION_DECISION';
-const ON_PAPER_ORDER_TYPE: MakeOrderType = 'ON_PAPER';
+const WITHOUT_HEARING_ORDER_TYPE: MakeOrderType = 'FREE_FORM';
 
 const YES_NO: Record<string, string> = { YES: 'Yes', NO: 'No' };
 
@@ -146,6 +146,14 @@ interface AttendanceRow extends AttendanceParty {
   name: string;
 }
 
+/**
+ * Whether the order records who attended a hearing: one made for a hearing, or one that already says who attended,
+ * as an order a caseworker reviews does. Any other order is made without a hearing, so asks no one's attendance.
+ */
+export function recordsAttendance(hearing: OrderHearing | null | undefined, formData: FormData = {}): boolean {
+  return Boolean(hearing) || Object.keys(formData).some(field => field.endsWith('-attendance'));
+}
+
 export function attendanceParties({ caseContext }: OrderStart): AttendanceRow[] {
   const parties = (type: AttendanceParty['type'], list: OrderParty[]): AttendanceRow[] =>
     list.map((party, index) => ({
@@ -176,16 +184,16 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     ? { ...caseFactsFormData(hearing.caseFacts), 'hearing-notes': hearing.note ?? '' }
     : {};
   const draft: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
-  const draftOrderType =
-    submission?.orderType ??
-    order.orderType ??
-    (caseContext.application ? APPLICATION_ORDER_TYPE : hearing ? DEFAULT_ORDER_TYPE : ON_PAPER_ORDER_TYPE);
+  const atHearing = recordsAttendance(hearing, draft);
   return {
     draft,
-    draftOrderType,
-    // An order deciding an application, or made without a hearing, is made on paper: one screen, without the
-    // hearing's attendance and possession order types. An earlier draft of a possession order keeps its tabs.
-    onPaper: draftOrderType === APPLICATION_ORDER_TYPE || draftOrderType === ON_PAPER_ORDER_TYPE,
+    draftOrderType:
+      submission?.orderType ??
+      order.orderType ??
+      (caseContext.application ? APPLICATION_ORDER_TYPE : atHearing ? DEFAULT_ORDER_TYPE : WITHOUT_HEARING_ORDER_TYPE),
+    // The screen follows what the order is for: an application's decision, a hearing's record and every order type,
+    // or every order type made on the papers, with no one's attendance.
+    withoutHearing: !atHearing,
     orderDocumentJson:
       submission?.orderDocumentJson ?? (order.docweaveSnapshot ? JSON.stringify(order.docweaveSnapshot) : ''),
     draftValue: (name: string): unknown => draft[name],

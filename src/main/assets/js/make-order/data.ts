@@ -26,6 +26,8 @@ export interface OrderData {
   answers: Readonly<Record<string, readonly string[]>>;
   selectedControlIds: Readonly<Record<string, string>>;
   propertyAddress: string;
+  /** An order made on the papers, without a hearing, which says so instead of who attended. */
+  withoutHearing: boolean;
   claimants: readonly OrderParty[];
   defendants: readonly OrderParty[];
   attendance: readonly AttendanceEntry[];
@@ -86,6 +88,7 @@ export function readOrderData(form: HTMLFormElement): OrderData {
     answers,
     selectedControlIds,
     propertyAddress: form.dataset.propertyAddress ?? '',
+    withoutHearing: form.dataset.withoutHearing !== undefined,
     claimants: [...claimants.values()],
     defendants: [...defendants.values()],
     attendance,
