@@ -234,27 +234,11 @@ function applicationDecision(form: HTMLFormElement): string {
 }
 
 /**
- * The applicant's wording the judge chose to use: in the application, or in a draft order they filed. With only
- * one, there is no choice to make.
- */
-function wordingSource(form: HTMLFormElement): string {
-  return (
-    form.querySelector<HTMLInputElement>('input[name="application-wording"]:checked')?.value ??
-    form.querySelector<HTMLElement>('[data-wording-source]')?.dataset.wordingSource ??
-    ''
-  );
-}
-
-/**
  * Adds the applicant's wording to the order as the judge's own numbered clauses, straight after "IT IS
  * ORDERED THAT", to change or delete as they would their own.
  */
 function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController): void {
-  const source = wordingSource(form);
-  const wording =
-    Array.from(form.querySelectorAll<HTMLElement>('[data-wording-source]')).find(
-      element => element.dataset.wordingSource === source
-    )?.dataset.wording ?? '';
+  const wording = form.querySelector<HTMLElement>('[data-application]')?.dataset.applicationWording ?? '';
   editor.insert(requestedParagraphs(wording), { at: { after: 'paragraph:ordered-that' }, numbered: true });
 }
 
@@ -282,16 +266,10 @@ export function initMakeOrder(): void {
 
   let orderType: OrderType | undefined;
   let key: string | undefined;
-  // One document per order type, per decision on an application, and per wording of the applicant's the judge
-  // uses, so switching and back keeps any edits.
+  // One document per order type, and per decision on an application, so switching and back keeps any edits.
   const documents: Record<string, DocWeaveSnapshot> = {};
-  const documentKey = (type: OrderType): string => {
-    if (type !== 'APPLICATION_DECISION') {
-      return type;
-    }
-    const decision = applicationDecision(form);
-    return decision === 'grant' ? `${type}:grant:${wordingSource(form)}` : `${type}:${decision}`;
-  };
+  const documentKey = (type: OrderType): string =>
+    type === 'APPLICATION_DECISION' ? `${type}:${applicationDecision(form)}` : type;
   const editor = createDocEditor({
     mount,
     label: 'Order',
@@ -316,7 +294,7 @@ export function initMakeOrder(): void {
   const startDocument = (): void => {
     editor.load();
     render();
-    if (key?.startsWith('APPLICATION_DECISION:grant:')) {
+    if (key === 'APPLICATION_DECISION:grant') {
       insertRequestedWording(form, editor);
     }
   };
@@ -366,7 +344,7 @@ export function initMakeOrder(): void {
   const reset = form.querySelector<HTMLButtonElement>('[data-restore-requested-wording]');
   reset?.addEventListener('click', startDocument);
   form.addEventListener('change', event => {
-    if (['application-decision', 'application-wording'].includes((event.target as HTMLInputElement).name)) {
+    if ((event.target as HTMLInputElement).name === 'application-decision') {
       selectDocument();
     }
   });
