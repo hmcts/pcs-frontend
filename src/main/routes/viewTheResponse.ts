@@ -313,7 +313,10 @@ function buildResponseToClaim(
     t('viewTheResponse:responseToClaim.tenancyStartDateConfirmation'),
     yesNoNotSure(t, responses?.tenancyStartDateConfirmation)
   );
-  if (isNo(responses?.tenancyStartDateConfirmation)) {
+  if (
+    isNo(responses?.tenancyStartDateConfirmation) ||
+    (!responses?.tenancyStartDateConfirmation && responses?.tenancyStartDate)
+  ) {
     pushRow(
       rows,
       t('viewTheResponse:responseToClaim.tenancyStartDate'),
