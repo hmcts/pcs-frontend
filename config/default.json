@@ -94,7 +94,7 @@
   "secrets": {
     "pcs": {
       "pcs-frontend-s2s-secret": "AAAAAAAAAAAAAAAA",
-      "pcs-session-secret": "pcs-supersecret",
+      "pcs-session-secret": "AAAAAAAAAAAAAAAA",
       "redis-connection-string": "redis://localhost:6379",
       "app-insights-connection-string": "AAAAAAAAAAAAAAAA",
       "pcs-frontend-idam-secret": "AAAAAAAAAAAAAAAA",
