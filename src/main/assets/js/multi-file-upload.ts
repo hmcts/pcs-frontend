@@ -241,6 +241,7 @@ function initContainer(container: HTMLElement): void {
   const deleteFailedMessage = container.dataset.errorDelete || '';
   const errorSummaryTitle = container.dataset.errorSummaryTitle || 'There is a problem';
   const deleteButtonText = container.dataset.deleteButtonText || 'Remove';
+  const disableContinueWhileUploading = container.dataset.disableContinueWhileUploading === 'true';
 
   // Disable Continue while a file is uploading, so the user can't proceed before the document is attached
   let uploadsInProgress = 0;
@@ -248,6 +249,9 @@ function initContainer(container: HTMLElement): void {
   const continueButtons = allButtons.filter(button => button.name === 'action' && button.value === 'continue');
 
   const setSubmitButtonsDisabled = (disabled: boolean): void => {
+    if (!disableContinueWhileUploading) {
+      return;
+    }
     continueButtons.forEach(button => {
       button.disabled = disabled;
     });

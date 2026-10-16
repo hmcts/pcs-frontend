@@ -368,6 +368,7 @@ describe('multi-file-upload', () => {
   describe('Continue button disabled while uploading', () => {
     beforeEach(() => {
       setupDOM();
+      document.getElementById('upload-container')!.setAttribute('data-disable-continue-while-uploading', 'true');
       initMultiFileUpload();
     });
 
@@ -397,6 +398,19 @@ describe('multi-file-upload', () => {
       capturedHooks.exitHook(null, {}, makeXhr(200, {}));
       expect(getContinueButton().disabled).toBe(false);
     });
+
+    it('never disables Continue when the browser rejects a file', () => {
+      expect(() => capturedHooks.entryHook(null, { name: 'video.mp4', size: 100 })).toThrow('blocked');
+      expect(getContinueButton().disabled).toBe(false);
+    });
+  });
+
+  it('leaves Continue enabled while uploading when release 1.4 is disabled', () => {
+    setupDOM();
+    initMultiFileUpload();
+
+    capturedHooks.entryHook(null, { name: 'test.pdf', size: 100 });
+    expect(getContinueButton().disabled).toBe(false);
   });
 
   describe('deleteHook', () => {
