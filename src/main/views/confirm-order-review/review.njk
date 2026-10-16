@@ -16,7 +16,8 @@
 {% block page %}
   {# The make order page's script runs the Judge's form and its order editor, which it finds by this id. #}
   <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
-        data-property-address="{{ propertyAddressDisplay }}">
+        data-property-address="{{ propertyAddressDisplay }}"
+        {%- if withoutHearing and not application %} data-without-hearing{% endif %}>
     {{ csrfProtection(csrfToken) }}
 
     {% include "make-order/_whole-file.njk" %}

@@ -11,6 +11,7 @@ import {
   attendanceParties,
   caseFactsFromForm,
   orderFormModel,
+  recordsAttendance,
   withoutHearingRecord,
 } from '@utils/makeOrderForm';
 import { type MakeOrderValidationIssue, validateHearingRecord, validateMakeOrder } from '@utils/makeOrderValidation';
@@ -166,7 +167,11 @@ export default function makeOrderRoutes(app: Application): void {
       // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
       const validationIssues =
         action === 'SUBMIT_FOR_REVIEW'
-          ? validateMakeOrder(orderType, formData, attendanceParties(started.envelope))
+          ? validateMakeOrder(
+              orderType,
+              formData,
+              recordsAttendance(startedHearing, formData) ? attendanceParties(started.envelope) : []
+            )
           : startedHearing
             ? validateHearingRecord(formData)
             : [];

@@ -7,7 +7,7 @@ import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { attendanceParties, orderFormModel } from '@utils/makeOrderForm';
+import { attendanceParties, orderFormModel, recordsAttendance } from '@utils/makeOrderForm';
 import { MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   type OrderStart,
@@ -294,7 +294,8 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   if (!order) {
     return [{ id: 'order-type', message: 'Select the type of order' }];
   }
-  return validateMakeOrder(order.orderType, order.formData, attendanceParties(review));
+  const parties = recordsAttendance(null, order.formData) ? attendanceParties(review) : [];
+  return validateMakeOrder(order.orderType, order.formData, parties);
 }
 
 /**
