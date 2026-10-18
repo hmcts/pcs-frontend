@@ -418,7 +418,8 @@ function validateEnforcementTransfer(formData: Record<string, unknown>): MakeOrd
     "Select King's Bench Division or a District Registry"
   );
   if (court === 'district-registry') {
-    if (!value(formData, 'transfer-enforcement-registry')) {
+    // The order adds "District Registry" after the name, so that alone names no registry.
+    if (!value(formData, 'transfer-enforcement-registry').replace(/\s*district registry$/i, '')) {
       add(false, 'transfer-enforcement-registry', 'Enter the District Registry');
     } else {
       maxLength(

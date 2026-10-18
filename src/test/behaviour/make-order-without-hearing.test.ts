@@ -74,6 +74,11 @@ describe('make an order: without a hearing or an application', () => {
     expect(noRegistry.status).toBe(400);
     expect(noRegistry.text).toContain('Enter the District Registry');
 
+    type('transfer-enforcement-registry', 'District Registry');
+    const suffixOnly = page.body();
+    suffixOnly.set('action', 'SUBMIT_FOR_REVIEW');
+    expect((await app.post(PAGE, suffixOnly)).text).toContain('Enter the District Registry');
+
     type('transfer-enforcement-registry', 'Bristol District Registry');
     expect(page.orderText().split('\n').slice(2)).toEqual([
       'Enforcement of the Order of Possession is transferred to the High Court, Bristol District Registry, pursuant to section 42 of the County Courts Act 1984.',
