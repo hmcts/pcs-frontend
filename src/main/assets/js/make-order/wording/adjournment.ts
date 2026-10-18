@@ -15,6 +15,7 @@ import {
   value,
   values,
 } from './common';
+import { addEnforcementTransfer, transfersEnforcement } from './enforcement-transfer';
 import { addListing } from './listing';
 
 const SUBJECTS: Record<string, string> = {
@@ -31,16 +32,17 @@ export function buildAdjournmentOrder(data: OrderData): DocWeaveDocument {
   const chosen = values(data, 'adj-subjects').filter(subject => SUBJECTS[subject]);
   const subject = joinList(chosen.map(key => SUBJECTS[key])) || SUBJECTS.claim;
   const is = chosen.length > 1 ? 'are' : 'is';
+  const transferred = transfersEnforcement(data);
 
   return buildDoc(order => {
     addPreamble(order, data);
-    if (!type) {
+    if (!type && !transferred) {
       return;
     }
     order.orderedList('adjournment-clauses', list => {
       if (type === 'further-hearing') {
         addListing(list, data, 'adj', 'adjournment', `${sentenceCase(subject)} shall be adjourned to be heard`);
-      } else {
+      } else if (type) {
         const instalments = ['current-rent-plus', 'payments'].find(option => conditions.includes(option));
         const restore = conditions.includes('restore');
         if (instalments || conditions.includes('oneoff')) {
@@ -110,6 +112,9 @@ export function buildAdjournmentOrder(data: OrderData): DocWeaveDocument {
             }
           });
         }
+      }
+      if (transferred) {
+        addEnforcementTransfer(list, data);
       }
       if (hasCosts(data, costs)) {
         list.item('adjournment-costs', content => addCosts(content, data, costs));

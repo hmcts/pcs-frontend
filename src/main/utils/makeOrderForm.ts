@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 
 import { parseDate, parseMoney } from '@utils/makeOrderFormat';
-import type { AttendanceParty, MakeOrderType } from '@utils/makeOrderValidation';
+import { AT_HEARING_ORDER_TYPES, type AttendanceParty, type MakeOrderType } from '@utils/makeOrderValidation';
 import type {
   FormData,
   OrderApplication,
@@ -185,12 +185,14 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     : {};
   const draft: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
   const atHearing = recordsAttendance(hearing, draft);
+  const orderType =
+    submission?.orderType ??
+    order.orderType ??
+    (caseContext.application ? APPLICATION_ORDER_TYPE : atHearing ? DEFAULT_ORDER_TYPE : WITHOUT_HEARING_ORDER_TYPE);
   return {
     draft,
-    draftOrderType:
-      submission?.orderType ??
-      order.orderType ??
-      (caseContext.application ? APPLICATION_ORDER_TYPE : atHearing ? DEFAULT_ORDER_TYPE : WITHOUT_HEARING_ORDER_TYPE),
+    // A possession order saved without a hearing, from before the screen stopped offering one, opens on free form.
+    draftOrderType: !atHearing && AT_HEARING_ORDER_TYPES.includes(orderType) ? WITHOUT_HEARING_ORDER_TYPE : orderType,
     // The screen follows what the order is for: an application's decision, a hearing's record and every order type,
     // or every order type made without a hearing, with no one's attendance.
     withoutHearing: !atHearing,

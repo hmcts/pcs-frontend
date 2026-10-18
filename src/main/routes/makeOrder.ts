@@ -165,13 +165,10 @@ export default function makeOrderRoutes(app: Application): void {
         },
       };
       // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
+      const atHearing = recordsAttendance(startedHearing, formData);
       const validationIssues =
         action === 'SUBMIT_FOR_REVIEW'
-          ? validateMakeOrder(
-              orderType,
-              formData,
-              recordsAttendance(startedHearing, formData) ? attendanceParties(started.envelope) : []
-            )
+          ? validateMakeOrder(orderType, formData, atHearing ? attendanceParties(started.envelope) : [], !atHearing)
           : startedHearing
             ? validateHearingRecord(formData)
             : [];

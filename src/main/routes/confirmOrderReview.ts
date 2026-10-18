@@ -294,8 +294,8 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   if (!order) {
     return [{ id: 'order-type', message: 'Select the type of order' }];
   }
-  const parties = recordsAttendance(null, order.formData) ? attendanceParties(review) : [];
-  return validateMakeOrder(order.orderType, order.formData, parties);
+  const atHearing = recordsAttendance(null, order.formData);
+  return validateMakeOrder(order.orderType, order.formData, atHearing ? attendanceParties(review) : [], !atHearing);
 }
 
 /**

@@ -27,16 +27,42 @@
 
 {{ compact.reveal("recitals", "Recitals", compact.textarea("recitals-text", { label: "Recital paragraphs", optional: true })) }}
 
+{#
+  Made without a hearing, the order is not offered the possession tabs, but can transfer enforcement of the case's
+  possession order to the High Court, whatever else it orders. An order made at a hearing transfers it with outright possession.
+#}
+{% if withoutHearing %}
+  {% set registryHtml %}
+    {{ compact.text("transfer-enforcement-registry", {
+      label: "District Registry",
+      hint: "For example, Bristol",
+      classes: "govuk-input--width-20"
+    }) }}
+  {% endset %}
+  <h2 class="govuk-heading-l govuk-!-margin-top-6">Enforcement</h2>
+
+  {{ compact.reveal("transfer-enforcement", "Transfer to High Court for enforcement", compact.radios("transfer-enforcement-court", {
+    legend: "Transfer enforcement to",
+    items: [
+      { value: "kings-bench", text: "King's Bench Division" },
+      { value: "district-registry", text: "A District Registry", conditional: { html: registryHtml } }
+    ]
+  })) }}
+{% endif %}
+
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Order type</h2>
 
-{# One list drives both the tabs and their panels. #}
+{# One list drives both the tabs and their panels. The judges asked for no possession tabs without a hearing. #}
 {% set orderTypeTabs = [
-  { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk" },
-  { id: "tab-suspended", type: "SUSPENDED_POSSESSION", label: "Suspended possession", template: "make-order/tabs/_suspended.njk" },
+  { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk", atHearingOnly: true },
+  { id: "tab-suspended", type: "SUSPENDED_POSSESSION", label: "Suspended possession", template: "make-order/tabs/_suspended.njk", atHearingOnly: true },
   { id: "tab-adjournment", type: "ADJOURNMENT", label: "Adjournment", template: "make-order/tabs/_adjournment.njk" },
   { id: "tab-strike-out", type: "STRIKE_OUT_DISMISSAL", label: "Strike out/dismiss", template: "make-order/tabs/_strike-out.njk" },
   { id: "tab-free-form", type: "FREE_FORM", label: "Free form", template: "make-order/tabs/_free-form.njk" }
 ] %}
+{% if withoutHearing %}
+  {% set orderTypeTabs = orderTypeTabs | rejectattr("atHearingOnly") %}
+{% endif %}
 
 {# The macro hardcodes an h2 tab-list heading, so use its markup directly to preserve heading order. #}
 <div class="govuk-tabs" data-module="govuk-tabs">

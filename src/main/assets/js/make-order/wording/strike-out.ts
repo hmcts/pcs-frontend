@@ -3,6 +3,7 @@ import { type DocWeaveDocument, buildDoc } from '@hmcts-cft/docweave';
 import { type OrderData } from '../data';
 
 import { addCosts, addPreamble, caseManCosts, hasCosts, partyLabels, selectedControlId, value, values } from './common';
+import { addEnforcementTransfer, transfersEnforcement } from './enforcement-transfer';
 
 const OUTCOMES: Record<string, string> = {
   'struck-out': 'struck out',
@@ -17,10 +18,11 @@ export function buildStrikeOutDismissalOrder(data: OrderData): DocWeaveDocument 
   const applicationDismissed = subjects.includes('application');
   const { claimant, defendant } = partyLabels(data);
   const costs = caseManCosts(claimant, defendant);
+  const transferred = transfersEnforcement(data);
 
   return buildDoc(order => {
     addPreamble(order, data);
-    if (!outcomes.length && !applicationDismissed) {
+    if (!outcomes.length && !applicationDismissed && !transferred) {
       return;
     }
     order.orderedList('strike-out-clauses', list => {
@@ -34,6 +36,9 @@ export function buildStrikeOutDismissalOrder(data: OrderData): DocWeaveDocument 
       }
       if (applicationDismissed) {
         list.item('application-outcome', 'The application is dismissed.');
+      }
+      if (transferred) {
+        addEnforcementTransfer(list, data);
       }
       if (hasCosts(data, costs)) {
         list.item('strike-out-costs', content => addCosts(content, data, costs));
