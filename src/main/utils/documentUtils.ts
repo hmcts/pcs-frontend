@@ -7,10 +7,25 @@ const DOCUMENT_FOLDER_TITLES = {
   propertyDocuments: 'Property documents',
   evidence: 'Evidence',
   correspondence: 'Correspondence',
+  enforcement: 'Enforcement',
   uncategorisedDocuments: 'Uncategorised',
 } as const;
 
 type DocumentFolderKey = keyof typeof DOCUMENT_FOLDER_TITLES;
+
+/** The `allDocuments` categories the View documents page lists, in the order the folders render. */
+export const VIEW_DOCUMENTS_FOLDER_KEYS: readonly DocumentFolderKey[] = [
+  'statementsOfCase',
+  'propertyDocuments',
+  'evidence',
+  'correspondence',
+];
+
+/**
+ * The `allDocuments` categories the View orders and notices page lists. Enforcement holds the defendant's
+ * served notice of eviction; pcs-api removes every other enforcement document before a defendant sees the case.
+ */
+export const ORDERS_AND_NOTICES_FOLDER_KEYS: readonly DocumentFolderKey[] = ['enforcement'];
 
 type CaseData = {
   allDocuments?: {
@@ -44,15 +59,20 @@ export interface CaseDocumentLookupItem {
 }
 
 interface ExtractViewDocumentOptions {
+  folderKeys?: readonly DocumentFolderKey[];
   folderTitles?: Partial<Record<DocumentFolderKey, string>>;
   includeUncategorised?: boolean;
 }
 
 export function extractViewDocumentFolders(
   caseData: CaseData,
-  { folderTitles, includeUncategorised = false }: ExtractViewDocumentOptions = {}
+  {
+    folderKeys = VIEW_DOCUMENTS_FOLDER_KEYS,
+    folderTitles,
+    includeUncategorised = false,
+  }: ExtractViewDocumentOptions = {}
 ): ViewDocumentFolder[] {
-  const folders = createFolders(folderTitles, includeUncategorised);
+  const folders = createFolders(folderKeys, folderTitles, includeUncategorised);
 
   for (const { id, value } of caseData.allDocuments ?? []) {
     const documentId = id?.trim();
@@ -61,7 +81,8 @@ export function extractViewDocumentFolders(
       continue;
     }
 
-    // The folder may be absent when its category is feature-flagged off (e.g. Uncategorised).
+    // The folder may be absent when this page does not list its category, or when the category is
+    // feature-flagged off (e.g. Uncategorised).
     const folder = folders[value.category_id];
     if (!folder) {
       continue;
@@ -140,6 +161,7 @@ function addDocumentsFromGenApps(documents: CaseDocumentLookupItem[], seen: Set<
 }
 
 function createFolders(
+  folderKeys: readonly DocumentFolderKey[],
   folderTitles?: Partial<Record<DocumentFolderKey, string>>,
   includeUncategorised = false
 ): Partial<Record<DocumentFolderKey, ViewDocumentFolder>> {
@@ -148,12 +170,11 @@ function createFolders(
     ...folderTitles,
   };
 
-  const folders: Partial<Record<DocumentFolderKey, ViewDocumentFolder>> = {
-    statementsOfCase: { title: titles.statementsOfCase, documents: [] },
-    propertyDocuments: { title: titles.propertyDocuments, documents: [] },
-    evidence: { title: titles.evidence, documents: [] },
-    correspondence: { title: titles.correspondence, documents: [] },
-  };
+  const folders: Partial<Record<DocumentFolderKey, ViewDocumentFolder>> = {};
+
+  for (const key of folderKeys) {
+    folders[key] = { title: titles[key], documents: [] };
+  }
 
   // Added last so the Uncategorised folder renders after the known categories.
   if (includeUncategorised) {
