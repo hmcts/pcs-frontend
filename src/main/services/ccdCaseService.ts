@@ -38,7 +38,7 @@ import { CallbackRejectedError, HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
-import { GenAppType, MakeAnApplicationResponse } from '@services/ccdCase.interface';
+import { MakeAnApplicationResponse } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
 import type {
   DashboardNotification,
@@ -57,12 +57,6 @@ const logger = Logger.getLogger('ccdCaseService');
 
 interface EventTokenResponse {
   token: string;
-}
-
-export interface RelatedApplication {
-  id: string;
-  type?: GenAppType;
-  applicationSubmittedDate?: string;
 }
 
 export interface TransformedDashboardData {
@@ -237,8 +231,8 @@ async function submitEvent(
     data: data as Record<string, unknown>,
     event: {
       id: eventId,
-      summary: `Citizen ${eventId} summary`,
-      description: `Citizen ${eventId} description`,
+      summary: '',
+      description: '',
     },
     event_token: eventToken,
     ignore_warning: false,
@@ -333,49 +327,6 @@ export const ccdCaseService = {
     }
   },
 
-  /**
-   * Create a new case in CCD
-   *
-   * Follows CCD's two-phase START → SUBMIT pattern.
-   *
-   * @param accessToken - User's OIDC access token
-   * @param data - Initial case data
-   * @returns Created case with merged data from CCD
-   */
-  async createCase(accessToken: string | undefined, data: Record<string, unknown>): Promise<CcdCase> {
-    // Phase 1: START - Get event token
-    const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/citizenCreateApplication`;
-    const eventToken = await getEventToken(accessToken || '', eventUrl);
-
-    // Phase 2: SUBMIT - Create case and receive result
-    const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/cases`;
-    return submitEvent(accessToken || '', url, 'citizenCreateApplication', eventToken, data);
-  },
-
-  /**
-   * Submit a case to CCD (finalize draft)
-   *
-   * Follows CCD's two-phase START → SUBMIT pattern.
-   * Transitions case from DRAFT to SUBMITTED state.
-   *
-   * @param accessToken - User's OIDC access token
-   * @param ccdCase - Case to submit
-   * @returns Submitted case data from CCD
-   */
-  async submitCase(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
-    if (!ccdCase.id) {
-      throw new HTTPError('Cannot SUBMIT Case, CCD Case Not found', 500);
-    }
-
-    // Phase 1: START - Get event token
-    const eventUrl = `${getBaseUrl()}/cases/${ccdCase.id}/event-triggers/citizenSubmitApplication`;
-    const eventToken = await getEventToken(accessToken || '', eventUrl);
-
-    // Phase 2: SUBMIT - Finalize case submission
-    const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
-    return submitEvent(accessToken || '', url, 'citizenSubmitApplication', eventToken, ccdCase.data);
-  },
-
   async submitResponseToClaim(accessToken: string | undefined, ccdCase: CcdCase): Promise<CcdCase> {
     if (!ccdCase.id) {
       throw new HTTPError('Cannot Submit Response to Case, CCD Case Not found', 500);
@@ -424,18 +375,12 @@ export const ccdCaseService = {
   },
 
   /** Submits an event with the token from the `startCaseEvent` the change was based on. */
-  async submitCaseEvent(
-    accessToken: string,
-    caseId: string,
-    eventId: string,
-    eventToken: string,
-    data: Record<string, unknown>
-  ): Promise<CcdCase> {
-    const safeCaseId = sanitiseCaseReference(caseId);
+  async submitCaseEvent(accessToken: string, eventId: string, eventToken: string, ccdCase: CcdCase): Promise<CcdCase> {
+    const safeCaseId = sanitiseCaseReference(ccdCase.id);
     if (!safeCaseId) {
       throw new HTTPError('Invalid case reference format', 404);
     }
-    return submitEvent(accessToken, `${getBaseUrl()}/cases/${safeCaseId}/events`, eventId, eventToken, data);
+    return submitEvent(accessToken, `${getBaseUrl()}/cases/${safeCaseId}/events`, eventId, eventToken, ccdCase.data);
   },
 
   async getExistingCaseData(
@@ -476,8 +421,8 @@ export const ccdCaseService = {
     const payload = {
       event: {
         id: draftEvent.id,
-        summary: `Citizen ${draftEvent.id} draft save summary`,
-        description: `Citizen ${draftEvent.id} draft save description`,
+        summary: '',
+        description: '',
       },
       case_reference: caseId,
       event_data: data,

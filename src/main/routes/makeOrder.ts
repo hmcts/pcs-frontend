@@ -119,8 +119,9 @@ export default function makeOrderRoutes(app: Application): void {
         },
       };
       try {
-        await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
-          sdkEventPayload: JSON.stringify(request),
+        await ccdCaseService.submitCaseEvent(accessToken, MAKE_ORDER_EVENT_ID, eventToken, {
+          id: caseReference,
+          data: { sdkEventPayload: JSON.stringify(request) },
         });
       } catch (error) {
         if (!(error instanceof CallbackRejectedError)) {

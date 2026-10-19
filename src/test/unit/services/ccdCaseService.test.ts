@@ -155,15 +155,16 @@ describe('ccdCaseService', () => {
     });
 
     it('keeps the body of a CCD error that is not JSON, which has no message field', async () => {
+      const expectedError = '<html lang="en">502 Bad Gateway</html>';
       mockGet.mockRejectedValue({
-        response: { status: 502, data: '<html>502 Bad Gateway</html>' },
+        response: { status: 502, data: expectedError },
         message: 'Request failed',
       });
 
       await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
 
       const logged = mockLoggerError.mock.calls.map(([line]) => String(line)).join('\n');
-      expect(logged).toContain('status=502 body=<html>502 Bad Gateway</html>');
+      expect(logged).toContain(`status=502 body=${expectedError}`);
     });
 
     it('reports which case failed, taken from the request URL', async () => {
@@ -444,17 +445,6 @@ describe('ccdCaseService', () => {
     });
   });
 
-  describe('createCase', () => {
-    it('calls submitEvent with correct args', async () => {
-      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
-      mockPost.mockResolvedValue({ data: { id: '999', data: { applicantForename: 'bar' } } });
-
-      const result = await ccdCaseService.createCase(accessToken, { applicantForename: 'bar' });
-
-      expect(result).toEqual({ id: '999', data: { applicantForename: 'bar' } });
-    });
-  });
-
   describe('updateCase', () => {
     const draftEvent = { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' };
 
@@ -463,15 +453,6 @@ describe('ccdCaseService', () => {
 
       await expect(ccdCaseService.updateDraft(draftEvent, accessToken, '', { data: {} })).rejects.toThrow(
         'Cannot UPDATE draft, Case Id not specified'
-      );
-    });
-  });
-
-  describe('submitCase', () => {
-    it('throws HTTPError if case id is missing', async () => {
-      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(
-        'Cannot SUBMIT Case, CCD Case Not found'
       );
     });
   });
@@ -539,8 +520,8 @@ describe('ccdCaseService', () => {
           },
           event: {
             id: 'makeAnApplication',
-            summary: 'Citizen makeAnApplication summary',
-            description: 'Citizen makeAnApplication description',
+            summary: '',
+            description: '',
           },
           event_token: eventToken,
           ignore_warning: false,
@@ -578,6 +559,55 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.submitGeneralApplication(accessToken, ccdData)).rejects.toThrow(
         'No confirmation body found in response data'
       );
+    });
+  });
+
+  describe('submitCaseEvent', () => {
+    it('throws HTTPError if case id is not valid', async () => {
+      const ccdCase: CcdCase = { id: '../evil', data: { claimantName: 'charlie claimant' } };
+      await expect(ccdCaseService.submitCaseEvent(accessToken, 'some-event', 'some-token', ccdCase)).rejects.toThrow(
+        HTTPError
+      );
+      await expect(ccdCaseService.submitCaseEvent(accessToken, 'some-event', 'some-token', ccdCase)).rejects.toThrow(
+        'Invalid case reference format'
+      );
+    });
+
+    it('submits via a CCD event', async () => {
+      const ccdData = { claimantName: 'charlie claimant' };
+      const ccdCase: CcdCase = { id: caseId, data: ccdData };
+      const eventToken = 'some-token';
+
+      const expectedResponse = {
+        foo: 'bar',
+      };
+
+      mockPost.mockResolvedValue({
+        data: expectedResponse,
+      });
+
+      const response = await ccdCaseService.submitCaseEvent(accessToken, eventId, eventToken, ccdCase);
+
+      expect(mockPost).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/events`,
+        {
+          data: ccdData,
+          event: {
+            id: eventId,
+            summary: '',
+            description: '',
+          },
+          event_token: eventToken,
+          ignore_warning: false,
+        },
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+          }),
+        })
+      );
+
+      expect(response).toEqual(expectedResponse);
     });
   });
 
@@ -782,8 +812,8 @@ describe('updateCase', () => {
       {
         event: {
           id: 'respondPossessionClaim',
-          summary: 'Citizen respondPossessionClaim draft save summary',
-          description: 'Citizen respondPossessionClaim draft save description',
+          summary: '',
+          description: '',
         },
         case_reference: caseId,
         event_data: mockData,
@@ -847,8 +877,8 @@ describe('updateCase', () => {
       {
         event: {
           id: 'respondPossessionClaim',
-          summary: 'Citizen respondPossessionClaim draft save summary',
-          description: 'Citizen respondPossessionClaim draft save description',
+          summary: '',
+          description: '',
         },
         case_reference: caseId,
         event_data: mockData,
