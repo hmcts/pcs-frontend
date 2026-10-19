@@ -2,10 +2,7 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([
-    cron('H 07 * * 1-5'),
-    cron('H 12 * * 1-5'),
-  ]),
+  pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
     text(
       name: 'MANUAL_BUILD_REASON',
@@ -24,7 +21,7 @@ properties([
     ),
     choice(
       name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '@smoke', '@e2e', '@regression', '@EMV'],
+      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
       description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
     ),
     choice(
@@ -125,7 +122,7 @@ def pcsE2eVaultSecrets = [
   secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
   secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
   secret('idam-pcs-user-password-b64', 'IDAM_PCS_USER_PASSWORD_B64'),
-  secret('pcs-local-auth-automation-uid', 'PCS_LOCAL_AUTH_AUTOMATION_UID'),
+  secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID'),
   secret('pcs-api-idam-secret', 'PCS_API_IDAM_SECRET'),
   secret('launchdarkly-sdk-key', 'LAUNCHDARKLY_SDK_KEY'),
 ]
@@ -145,7 +142,7 @@ withNightlyPipeline(type, product, component) {
 
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    runEmvWeeklyTests(yarnBuilder)
+    runE2ETests(yarnBuilder)
   }
 }
 
@@ -233,37 +230,6 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
         artifacts: 'definitions/test/playwright-report/**'
       )
       sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
-    }
-  }
-}
-
-/** Weekly @EMV run — currently TEST schedule: every Tuesday at 15:15, Chrome only. */
-def runEmvWeeklyTests(yarnBuilder) {
-  stage("E2E - Weekly @EMV [${env.ENVIRONMENT}]") {
-    node {
-      checkout scm
-      sh 'rm -rf allure-results allure-report'
-      withEnv([
-        "E2E_TEST_SCOPE=@EMV",
-        "PLAYWRIGHT_PROJECT=chrome"
-      ]) {
-        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-          yarnBuilder.yarn('test:E2e')
-        }
-      }
-      publishHTML([
-        allowMissing: true,
-        alwaysLinkToLastBuild: true,
-        keepAll: true,
-        reportDir: "allure-report",
-        reportFiles: 'index.html',
-        reportName: "Weekly @EMV E2E Test Report"
-      ])
-      steps.archiveArtifacts(
-        allowEmptyArchive: true,
-        artifacts: 'definitions/test/playwright-report/**'
-      )
-      sendAllureReportToSlack('EMV-Weekly', "Weekly_20EMV_20E2E_20Test_20Report/")
     }
   }
 }
