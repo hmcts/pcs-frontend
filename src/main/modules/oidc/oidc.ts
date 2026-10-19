@@ -4,7 +4,8 @@ import * as jose from 'jose';
 import type { Configuration, TokenEndpointResponse, UserInfoResponse } from 'openid-client';
 import * as client from 'openid-client';
 
-import { isLegalRepresentativeUser } from '../../steps/utils/userRole';
+import { isLegalRepresentativeUser, isStaffUser } from '../../steps/utils/userRole';
+import { getLaunchDarklyFlag } from '../../utils/getLaunchDarklyFlag';
 
 import type { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
@@ -287,14 +288,18 @@ export class OIDCModule {
     });
 
     // Logout route
-    app.get('/logout', (req: Request, res: Response) => {
+    app.get('/logout', async (req: Request, res: Response) => {
       // build the logout url
       const callbackUrl = OIDCModule.getCurrentUrl(req);
 
-      // For Legal Representative users, redirect directly to XUI /auth/logout.
+      // For Legal Representative and staff users, redirect directly to XUI /auth/logout.
       // This clears the XUI session and XUI handles the IDAM end session itself.
       // PCS session is destroyed below, so the user is fully logged out of both.
-      if (isLegalRepresentativeUser(req) && config.has('xui.uri')) {
+      // Staff only come from XUI once make order is enabled.
+      const usesXui =
+        isLegalRepresentativeUser(req) ||
+        (isStaffUser(req) && (await getLaunchDarklyFlag(req, 'make-order-enabled', false)));
+      if (usesXui && config.has('xui.uri')) {
         const xuiUri: string = config.get('xui.uri');
         if (xuiUri) {
           const xuiLogoutUrl = `${xuiUri.replace(/\/+$/, '')}/auth/logout`;

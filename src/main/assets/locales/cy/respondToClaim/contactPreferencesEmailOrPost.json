@@ -1,7 +1,7 @@
 {
   "pageTitle": "Dewisiadau cyswllt",
   "title": "Dewisiadau cyswllt",
-  "content": "<p class=\"govuk-body\">cyImportant documents like orders will always be sent by post.</p><p class=\"govuk-body\"> cyYou can choose to receive updates about your case by post or email. For example, when a hearing has been scheduled or a document is ready to view online.</p>",
+  "content": "<p class=\"govuk-body\">Bydd dogfennau pwysig fel gorchmynion bob amser yn cael eu hanfon drwy’r post.</p><p class=\"govuk-body\"> Gallwch ddewis derbyn diweddariadau am eich achos drwy’r post neu e-bost. Er enghraifft, pan fydd gwrandawiad wedi’i drefnu neu pan fydd dogfen yn barod i’w gweld ar-lein.</p>",
   "labels": {
     "question": "Sut ydych chi eisiau cael diweddariadau?",
     "options": {

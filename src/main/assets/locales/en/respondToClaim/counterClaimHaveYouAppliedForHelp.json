@@ -8,5 +8,9 @@
     "alreadyAppliedForHelp": "Select if you have already applied for help with your counterclaim fee?",
     "hwfReference": "Enter your Help with Fees reference number",
     "hwfReferenceMaxLength": "Your Help with Fees reference number must be 60 characters or fewer"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }
