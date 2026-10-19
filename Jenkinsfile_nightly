@@ -2,7 +2,7 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('H 13 * * 1-5')]),
+  pipelineTriggers([cron('H 13 * * 1-5 45 15 * * 1 % PLAYWRIGHT_GREP_TAG=@EMV''')]),
   parameters([
     text(
       name: 'MANUAL_BUILD_REASON',
@@ -21,7 +21,7 @@ properties([
     ),
     choice(
       name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
+      choices: ['@nightly', '@smoke', '@e2e', '@regression', '@EMV'],
       description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
     ),
     choice(
