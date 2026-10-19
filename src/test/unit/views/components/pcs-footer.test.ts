@@ -48,7 +48,7 @@ describe('pcs footer', () => {
     expect(html).toContain('href="/legal-representative-footer-link"');
   });
 
-  it('displays footer links for a citizen when release 1.3 is enabled', () => {
+  it('displays footer links for a citizen when release 1.4 is enabled', () => {
     const html = renderFooter(false, true);
 
     citizenFooterLinks.forEach(link => {
@@ -57,7 +57,7 @@ describe('pcs footer', () => {
     expect(html).not.toContain('ui-component-lib-footer');
   });
 
-  it('does not display footer links for a citizen when release 1.3 is disabled', () => {
+  it('does not display footer links for a citizen when release 1.4 is disabled', () => {
     const html = renderFooter(false, false);
 
     citizenFooterLinks.forEach(link => {
