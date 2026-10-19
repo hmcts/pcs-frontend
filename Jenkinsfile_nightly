@@ -2,7 +2,7 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('''H 07 * * 1-5 00 15 * * 1-5 15 15 * * 1''')]),
+  pipelineTriggers([cron('''H 07 * * 1-5 15 15 * * 1''')]),
   parameters([
     text(
       name: 'MANUAL_BUILD_REASON',
