@@ -1,0 +1,28 @@
+{% extends "stepsTemplate.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+{% from "macros/caseTitle.njk" import caseTitle %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block mainContent %}
+
+  {{ caseTitle(caseReference, propertyAddress) }}
+
+  {{ govukPanel({
+    titleText: confirmationPanelTitle
+  }) }}
+
+  <p class="govuk-body">
+   {{ translationUploadedMessage }}
+  </p>
+
+  <h2 class="govuk-heading-m">{{ whatHappensNext }}</h2>
+  <p class="govuk-body">
+   {{ claimPackWillBeSent }}
+  </p>
+
+  <a href="{{ caseOverviewUrl }}" role="button" draggable="false" class="govuk-button" data-module="govuk-button">
+      {{ closeAndReturnToCaseSummary }}
+  </a>
+
+{% endblock %}

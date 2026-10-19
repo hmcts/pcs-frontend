@@ -344,6 +344,7 @@ export interface CcdCaseData {
   detailsTab_NoticeDetails?: {
     noticeDocuments?: CcdCollectionItem<Document>[];
   };
+  translatedDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
 }
 
 export interface CcdCaseDocument {

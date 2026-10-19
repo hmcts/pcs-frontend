@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Upload translated claim form",
+  "heading": "Upload documents",
+  "caption": "Upload translated claim form",
+  "uploadTranslatedDocsIntro": "Upload the translated copies of the claim form, which will be included in the claim pack.",
+  "beforeUploadHeading": "Before you upload your files",
+  "beforeUploadText": "Give your file a name that... etc",
+  "uploadSubheading": "Upload translated copies of the original claim form",
+  "doNotUploadOtherTypes": "Do not upload any other types of document here.",
+  "uploadLabel": "Upload a file for the claim pack",
+  "filesAddedHeading": "Files added",
+  "uploadButton": "Upload file",
+  "deleteButton": "Remove"
+}

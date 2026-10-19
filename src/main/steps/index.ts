@@ -10,6 +10,10 @@ import { flowConfig as respondToClaimFlowConfig } from './respond-to-claim/flow.
 import { legalrepFlowConfig as respondToClaimLegalrepFlowConfig } from './respond-to-claim/legalrep.flow.config';
 import { legalRepStepRegistry as respondToClaimLegalRepStepRegistry } from './respond-to-claim/legalrep.stepRegistry';
 import { stepRegistry as respondToClaimStepRegistry } from './respond-to-claim/stepRegistry';
+import { flowConfig as uploadTranslatedClaimFormFlowConfig } from './upload-translated-claim-form/flow.config';
+import { stepRegistry as uploadTranslatedClaimFormStepRegistry } from './upload-translated-claim-form/stepRegistry';
+import { flowConfig as uploadTranslatedGenAppFormFlowConfig } from './upload-translated-genapp-form/flow.config';
+import { stepRegistry as uploadTranslatedGenAppFormStepRegistry } from './upload-translated-genapp-form/stepRegistry';
 import { getUserType } from './utils';
 
 import type { CcdDraftEvent } from '@modules/documents/storage';
@@ -75,6 +79,22 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
     default: {
       flowConfig: uploadAdditionalDocumentsFlowConfig,
       stepRegistry: uploadAdditionalDocumentsStepRegistry,
+    },
+  },
+  uploadTranslatedClaimForm: {
+    name: 'uploadTranslatedClaimForm',
+    slug: 'upload-translated-claim-form',
+    default: {
+      flowConfig: uploadTranslatedClaimFormFlowConfig,
+      stepRegistry: uploadTranslatedClaimFormStepRegistry,
+    },
+  },
+  uploadTranslatedGenAppForm: {
+    name: 'uploadTranslatedGenAppForm',
+    slug: 'upload-translated-genapp-form',
+    default: {
+      flowConfig: uploadTranslatedGenAppFormFlowConfig,
+      stepRegistry: uploadTranslatedGenAppFormStepRegistry,
     },
   },
 };

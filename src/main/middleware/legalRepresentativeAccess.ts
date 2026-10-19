@@ -3,6 +3,8 @@ import type { NextFunction, Request, RequestHandler, Response } from 'express';
 import { isLegalRepresentativeUser } from '../steps/utils';
 
 const LEGAL_REPRESENTATIVE_ALLOWED_PATHS = [
+  /^\/case\/[^/]+\/upload-translated-claim-form(?:\/.*)?$/,
+  /^\/case\/[^/]+\/upload-translated-genapp-form(?:\/.*)?$/,
   /^\/case\/[^/]+\/respond-to-claim(?:\/.*)?$/,
   /^\/case\/[^/]+\/view-documents(?:\/.*)?$/,
   /^\/cases\/[^/]+\/event\/[^/]+(?:\/.*)?$/,
