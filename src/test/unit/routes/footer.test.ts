@@ -86,7 +86,7 @@ describe('footer page routes', () => {
     });
   });
 
-  it('returns not found for citizens when release 1.3 is disabled', async () => {
+  it('returns not found for citizens when release 1.4 is disabled', async () => {
     const app = buildApp();
     const req = {} as Request;
     const render = jest.fn();
