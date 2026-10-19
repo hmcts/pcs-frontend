@@ -2,7 +2,7 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('''H 07 * * 1-5 00 15 * * 1 % PLAYWRIGHT_GREP_TAG=@EMV''')]),
+  pipelineTriggers([cron('''H 07 * * 1-5 00 15 * * 1-5 15 15 * * 1''')]),
   parameters([
     text(
       name: 'MANUAL_BUILD_REASON',
@@ -256,5 +256,5 @@ def isWeeklyEmvSchedule() {
   def byTimer = !currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause').isEmpty()
   def cal = Calendar.getInstance()
   cal.setTime(new Date(currentBuild.startTimeInMillis))
-  return byTimer && cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY && cal.get(Calendar.HOUR_OF_DAY) == 14
+  return byTimer && cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY && cal.get(Calendar.HOUR_OF_DAY) == 15
 }
