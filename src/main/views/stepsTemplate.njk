@@ -110,6 +110,9 @@
 
 {% block bodyEnd %}
 
+  {# Form submission confirmation pages opt in via `redirectOnBack` #}
+  {% include "components/redirect-on-back.njk" %}
+
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}
 {% endblock %}

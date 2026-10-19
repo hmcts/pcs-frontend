@@ -1,54 +1,11 @@
 import type { Request } from 'express';
 
+import { validateAmount } from '../../../constants/validation';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-
-const AMOUNT_FORMAT_REGEX = /^\d{1,10}\.\d{2}$/;
-const MAX_AMOUNT = 1_000_000_000;
-
-const createAmountValidator =
-  (largeAmountKey: string, negativeKey: string, invalidFormatKey: string) =>
-  (value: unknown): boolean | string => {
-    if (typeof value !== 'string') {
-      return true;
-    }
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return true;
-    }
-
-    const normalized = trimmed.replace(/,/g, '');
-    const numericValue = parseFloat(normalized);
-
-    if (!Number.isNaN(numericValue)) {
-      if (numericValue < 0) {
-        return negativeKey;
-      }
-      if (numericValue >= MAX_AMOUNT) {
-        return largeAmountKey;
-      }
-    }
-
-    if (!AMOUNT_FORMAT_REGEX.test(normalized)) {
-      return invalidFormatKey;
-    }
-
-    return true;
-  };
-
-const validateClaimAmount = createAmountValidator(
-  'errors.claimAmount.largeAmount',
-  'errors.claimAmount.negative',
-  'errors.claimAmount.invalidFormat'
-);
-const validateEstimatedMaxClaimAmount = createAmountValidator(
-  'errors.estimatedMaxClaimAmount.largeAmount',
-  'errors.estimatedMaxClaimAmount.negative',
-  'errors.estimatedMaxClaimAmount.invalidFormat'
-);
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'counter-claim-specific-sum',
@@ -86,7 +43,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               prefix: { text: '£' },
               classes: 'govuk-input--width-10',
               attributes: { inputmode: 'decimal', spellcheck: false },
-              validator: validateClaimAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.claimAmount.invalidFormat',
+                  minAmountError: 'errors.claimAmount.negative',
+                  maxAmountError: 'errors.claimAmount.largeAmount',
+                }),
             },
           },
         },
@@ -106,7 +68,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               prefix: { text: '£' },
               classes: 'govuk-input--width-10',
               attributes: { inputmode: 'decimal', spellcheck: false },
-              validator: validateEstimatedMaxClaimAmount,
+              validator: (value: unknown): boolean | string =>
+                validateAmount(value, {
+                  invalidAmountFormatError: 'errors.estimatedMaxClaimAmount.invalidFormat',
+                  minAmountError: 'errors.estimatedMaxClaimAmount.negative',
+                  maxAmountError: 'errors.estimatedMaxClaimAmount.largeAmount',
+                }),
             },
           },
         },
