@@ -116,11 +116,14 @@ async function validatePageIfNavigated(action: string): Promise<void> {
       if (startAxeAudit && enable_axe_audit === 'true') {
         try {
           const { AxeUtils } = await import('@hmcts/playwright-common');
-          await test.step('Running Accessibility Scan', async () => {
-            await new AxeUtils(executor.page).audit({
-              exclude: axe_exclusions,
-              disableRules: ['aria-allowed-attr'],
-            });
+          await axeBuilder.audit({
+            exclude: axe_exclusions,
+            rules: {
+              'aria-allowed-attr': {
+                selector: 'input[type="radio"]',
+                enabled: false
+              }
+            }
           });
         } catch (error) {
           const errorMessage = String((error as Error).message || error).toLowerCase();
