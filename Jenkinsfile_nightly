@@ -2,8 +2,7 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('''H 07 * * 1-5 
-15 15 * * 1''')]),
+  pipelineTriggers([cron('H 07 * * 1-5')]),
   parameters([
     text(
       name: 'MANUAL_BUILD_REASON',
@@ -22,7 +21,7 @@ properties([
     ),
     choice(
       name: 'PLAYWRIGHT_GREP_TAG',
-      choices: ['@nightly', '@smoke', '@e2e', '@regression', '@EMV'],
+      choices: ['@nightly', '@smoke', '@e2e', '@regression'],
       description: 'Playwright title grep (E2E_TEST_SCOPE). First option is the default for scheduled runs.'
     ),
     choice(
@@ -123,7 +122,7 @@ def pcsE2eVaultSecrets = [
   secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
   secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
   secret('idam-pcs-user-password-b64', 'IDAM_PCS_USER_PASSWORD_B64'),
-  secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID'),
+  secret('pcs-local-auth-automation-uid', 'PCS_LOCAL_AUTH_AUTOMATION_UID'),
   secret('pcs-api-idam-secret', 'PCS_API_IDAM_SECRET'),
   secret('launchdarkly-sdk-key', 'LAUNCHDARKLY_SDK_KEY'),
 ]
@@ -142,14 +141,12 @@ withNightlyPipeline(type, product, component) {
     enableCrossBrowserTest()
   }
 
+  afterAlways('E2eTest') {
+    runE2ETests(yarnBuilder)
+  }
+
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    if (isWeeklyEmvSchedule()) {
-      env.E2E_TEST_SCOPE = '@EMV'
-      runE2eStage(yarnBuilder, 'chrome', 'Chrome', 'Weekly @EMV')
-    } else {
-      runE2ETests(yarnBuilder)
-    }
   }
 }
 
@@ -251,12 +248,4 @@ def sendAllureReportToSlack(String browser, String reportSuffix) {
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }
-}
-
-
-def isWeeklyEmvSchedule() {
-  def byTimer = !currentBuild.getBuildCauses('hudson.triggers.TimerTrigger$TimerTriggerCause').isEmpty()
-  def cal = Calendar.getInstance()
-  cal.setTime(new Date(currentBuild.startTimeInMillis))
-  return byTimer && cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY && cal.get(Calendar.HOUR_OF_DAY) == 15
 }
