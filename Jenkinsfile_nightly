@@ -134,13 +134,14 @@ withNightlyPipeline(type, product, component) {
   loadVaultSecrets(["pcs-${env.ENVIRONMENT}": pcsE2eVaultSecrets])
   setFunctionalTestEnvVars()
   enableFortifyScan()
+  enableE2eTests()
   def sauceSuites = selectedSauceSuites()
   if (!sauceSuites.isEmpty()) {
     env.SAUCE_SUITE_NAMES = sauceSuites.join(' ')
     enableCrossBrowserTest()
   }
 
-  afterSuccess('build') {
+  afterAlways('E2eTest') {
     runE2ETests(yarnBuilder)
   }
 
