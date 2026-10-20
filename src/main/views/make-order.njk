@@ -2,6 +2,7 @@
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% import "make-order/_compact.njk" as compact with context %}
 
@@ -20,6 +21,7 @@
   <input type="hidden" name="eventToken" value="{{ eventToken }}">
   <input type="hidden" name="caseContext" value="{{ caseContextJson }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
+  <input type="hidden" name="taskId" value="{{ taskId }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
   {{ csrfProtection(csrfToken) }}
 
@@ -32,6 +34,19 @@
   <p class="govuk-body govuk-!-font-weight-bold">
     {{ claimantNames }} vs {{ defendantNames }}
   </p>
+
+  {% if order.queryFromCaseworker %}
+    {# An order a caseworker returned: their query, which the page keeps if it is shown again with errors. #}
+    <h2 class="govuk-heading-m">Query from the caseworker</h2>
+    <p class="govuk-body">
+      A caseworker returned this order to you with a query. Change the order if you need to, then send it for review again.
+    </p>
+    {{ govukInsetText({
+      html: '<p class="govuk-body pcs-preserve-lines">' + (order.queryFromCaseworker | escape) + '</p>',
+      attributes: { id: "caseworker-query" }
+    }) }}
+    <textarea hidden name="queryFromCaseworker">{{ order.queryFromCaseworker }}</textarea>
+  {% endif %}
 
   <p class="govuk-body">Answer every question unless it says it is optional.</p>
 

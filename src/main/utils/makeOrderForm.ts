@@ -57,8 +57,8 @@ export interface OrderFormSubmission {
 }
 
 /**
- * What the make order form shows: the order's answers and document, or those last sent, over the facts
- * of the case.
+ * What the make order form shows, for the judge making an order and the caseworker reviewing it: the
+ * order's answers and document, or those last sent, over the facts of the case.
  */
 export function orderFormModel(start: OrderStart, submission?: OrderFormSubmission): Record<string, unknown> {
   const { caseContext, order } = start;
@@ -69,7 +69,8 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
   return {
     draft,
     draftOrderType: submission?.orderType ?? order.orderType ?? DEFAULT_ORDER_TYPE,
-    orderDocumentJson: submission?.orderDocumentJson ?? JSON.stringify(order.docweaveSnapshot ?? null),
+    orderDocumentJson:
+      submission?.orderDocumentJson ?? (order.docweaveSnapshot ? JSON.stringify(order.docweaveSnapshot) : ''),
     draftValue: (name: string): unknown => draft[name],
     draftChecked: (name: string, value: string): boolean => {
       const saved = draft[name];
