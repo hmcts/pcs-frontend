@@ -70,22 +70,48 @@ describe('decentralisedEvent route', () => {
       expect(res.redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/start-now');
     });
 
-    it('hands the page the query XUI was given, without expected_sub', () => {
+    function launch(eventId: string, query: Record<string, unknown>) {
       decentralisedEventRoutes(app);
       const handler = mockRouterGet.mock.calls[0][1] as (req: Request, res: Response) => void;
       const req = {
-        params: { caseReference: '1234567890123456', eventId: 'ext:respondPossessionClaim' },
-        query: { expected_sub: 'user-sub', orderId: 'order-1' },
+        params: { caseReference: '1234567890123456', eventId },
+        query: { expected_sub: 'user-sub', ...query },
         session: { user: { sub: 'user-sub' } },
       } as unknown as Request;
       const res = { redirect: jest.fn() } as unknown as Response;
-
       handler(req, res);
+      return res.redirect;
+    }
 
-      expect(res.redirect).toHaveBeenCalledWith(
+    it.each([
+      ['ext:makeOrder', '/case/1234567890123456/make-order'],
+      ['ext:confirmOrderReview', '/case/1234567890123456/confirm-order-review'],
+    ])('hands an order page the order and task XUI gave %s, and nothing else', (eventId, route) => {
+      const redirect = launch(eventId, {
+        orderId: 'order-1',
+        taskId: 'a1b2c3d4-0000-4000-8000-000000000000',
+        lang: 'cy',
+      });
+
+      expect(redirect).toHaveBeenCalledWith(
         303,
-        '/case/1234567890123456/respond-to-claim/start-now?orderId=order-1'
+        `${route}?orderId=order-1&taskId=a1b2c3d4-0000-4000-8000-000000000000`
       );
+    });
+
+    it.each(['a%26lang%3Dcy', 'a#tail', 'a\nb', 'a&lang=cy', ''])(
+      'does not hand an order page an id that is not one (%j)',
+      orderId => {
+        const redirect = launch('ext:confirmOrderReview', { orderId });
+
+        expect(redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/confirm-order-review');
+      }
+    );
+
+    it('hands other pages no query', () => {
+      const redirect = launch('ext:respondPossessionClaim', { orderId: 'order-1', lang: 'cy', cyaReturn: 'true' });
+
+      expect(redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/respond-to-claim/start-now');
     });
 
     it('forces re-authentication (redirects to /login) on expected_sub mismatch', () => {
