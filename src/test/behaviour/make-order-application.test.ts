@@ -278,7 +278,8 @@ describe('make an order: deciding an application', () => {
           ...RICH,
           whatOrderWanted:
             '<ol><li><p>Adjourn the hearing.</p></li><li><p>Costs reserved.</p></li></ol>' +
-            '<ul><li><p>The defendant is in hospital.</p></li><li>Counsel is unavailable.</li></ul>' +
+            '<ul><li><p>The defendant is in hospital.</p><ol><li><p>since Monday;</p></li></ol></li>' +
+            '<li>Counsel is unavailable.</li></ul>' +
             '<ol start="3"><li><p>Liberty to apply.</p></li></ol>',
         },
       });
@@ -288,6 +289,7 @@ describe('make an order: deciding an application', () => {
         'Adjourn the hearing.',
         'Costs reserved.',
         '\u2022 The defendant is in hospital.',
+        '1. since Monday;',
         '\u2022 Counsel is unavailable.',
         'Liberty to apply.',
       ]);
