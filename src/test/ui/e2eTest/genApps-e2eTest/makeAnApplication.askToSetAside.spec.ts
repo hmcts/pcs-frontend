@@ -20,6 +20,8 @@ import { finaliseAllValidations, initializeExecutor, performAction, performValid
 
 const home_url = process.env.TEST_URL;
 
+let doYouNeedHelpPayingTheFeeSuspend: ReturnType<typeof doYouNeedHelpPayingTheFee>;
+
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
   FieldsStore.clear();
@@ -38,6 +40,8 @@ test.beforeEach(async ({ page }) => {
   await performValidation('mainHeader', dashboard.mainHeader);
   await performAction('clickLink', dashboard.askTheCourtToMakeAnOrderLink);
   await performValidation('mainHeader', chooseAnApplication.mainHeader);
+
+  doYouNeedHelpPayingTheFeeSuspend = doYouNeedHelpPayingTheFee(test.info().title);
 });
 
 test.afterEach(async () => {
@@ -51,10 +55,11 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: chooseAnApplication.setAsideRadioOption,
     });
     await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFeeSuspend.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
-      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-      option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
+      question: doYouNeedHelpPayingTheFeeSuspend.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFeeSuspend.iNeedHelpPayingTheFeeRadioOption,
+      continueButton: doYouNeedHelpPayingTheFeeSuspend.continueButton
     });
     await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
     await performAction('confirmYouHaveAppliedForFeeHelp', {
@@ -85,8 +90,9 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
     await performAction('reviewAndUpdateCYA', {
-      changeOption: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+      changeOption: doYouNeedHelpPayingTheFeeSuspend.doYouNeedHelpPayingTheFeeQuestion,
       journey: 'journey2',
+      feeData: doYouNeedHelpPayingTheFeeSuspend,
     });
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
@@ -130,10 +136,11 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       option: chooseAnApplication.setAsideRadioOption,
     });
     await performAction('clickButton', askTheCourtToSetAsideTheOrder.startNowButton);
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFeeSuspend.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
-      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-      option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
+      question: doYouNeedHelpPayingTheFeeSuspend.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFeeSuspend.iNeedHelpPayingTheFeeRadioOption,
+      continueButton: doYouNeedHelpPayingTheFeeSuspend.continueButton
     });
     await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
     await performAction('confirmYouHaveAppliedForFeeHelp', {

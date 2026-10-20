@@ -176,6 +176,7 @@ export class ActionRegistry {
     ['inputPaymentDetails', new GenAppsAction()],
     ['confirmPayment', new GenAppsAction()],
     ['verifyApplicationSubmitted', new GenAppsAction()],
+    ['validateCompletedApplication', new GenAppsAction()],
 
     //LR details below
     ['selectNoticeDetailsLR', new RespondToClaimLRAction()],
