@@ -249,7 +249,7 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
         artifacts: 'definitions/test/playwright-report/**'
       )
       sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
-    }
+    
   
 
 def sendAllureReportToSlack(String browser, String reportSuffix) {
