@@ -20,15 +20,20 @@ function visibleFormData(
 }
 
 describe('make-an-application check your answers fee logic', () => {
-  it('does not require a fee for adjourn when hearing is not in the next 14 days and parties agreed', () => {
-    expect(doesApplicationFeeApply(visibleFormData(GenAppType.ADJOURN, 'no', 'yes'))).toBe(false);
-  });
+  describe.each([false, true])('release 1B = %s', enabled => {
+    it.each([
+      ['yes', 'yes', true],
+      ['yes', 'no', true],
+      ['no', 'yes', false],
+      ['no', 'no', enabled],
+    ] as const)('adjourn: within 14 days = %s, consent = %s, fee = %s', (within14Days, consent, expected) => {
+      expect(doesApplicationFeeApply(visibleFormData(GenAppType.ADJOURN, within14Days, consent), enabled)).toBe(
+        expected
+      );
+    });
 
-  it('requires a fee for adjourn when hearing is not in the next 14 days and parties did not agree', () => {
-    expect(doesApplicationFeeApply(visibleFormData(GenAppType.ADJOURN, 'no', 'no'))).toBe(true);
-  });
-
-  it('requires a fee for adjourn when hearing is in the next 14 days', () => {
-    expect(doesApplicationFeeApply(visibleFormData(GenAppType.ADJOURN, 'yes', 'yes'))).toBe(true);
+    it.each([GenAppType.SET_ASIDE, GenAppType.SOMETHING_ELSE])('keeps the fee for %s', applicationType => {
+      expect(doesApplicationFeeApply(visibleFormData(applicationType), enabled)).toBe(true);
+    });
   });
 });

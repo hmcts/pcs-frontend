@@ -8,5 +8,8 @@
   "everyOtherPartyWillNeedToAgree": "Every other party will need to agree to let you make this application, if they don’t agree, you may need to pay a higher fee.",
   "errors": {
     "inNext14Days": "Cadarnhewch a yw’r gwrandawiad llys yn ystod y 14 diwrnod nesaf"
+  },
+  "release1b": {
+    "hintText": "This will affect the fee you will pay. You do not need to pay a fee if your court hearing is (at least) 14 days away and all the other parties have agreed to it."
   }
 }

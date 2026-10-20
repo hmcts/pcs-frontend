@@ -22,8 +22,10 @@
       {% endif %}
     {% endfor %}
 
-    <p class="govuk-body">{{ otherParties }}</p>
-    <p class="govuk-body">{{ everyOtherPartyWillNeedToAgree }}</p>
+    {% if release1bEnabled %}
+      <p class="govuk-body">{{ otherParties }}</p>
+      <p class="govuk-body">{{ everyOtherPartyWillNeedToAgree }}</p>
+    {% endif %}
 
     <div class="govuk-button-group">
       {{ govukButton({

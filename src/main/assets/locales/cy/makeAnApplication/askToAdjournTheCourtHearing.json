@@ -29,5 +29,8 @@
   "ifPreferToRespondByPost": "Os byddai'n well gennych ymateb drwy'r post:",
   "fillInFormForPost": "llenwch <a href=\"https://www.gov.uk/government/publications/form-n244-application-notice\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">ffurflen N244</a>",
   "findYourLocalCourt": "chwiliwch am fanylion eich llys lleol",
-  "sendTheCompletedFormToTheCourt": "anfonwch y ffurflen wedi’i llenwi i’r llys"
+  "sendTheCompletedFormToTheCourt": "anfonwch y ffurflen wedi’i llenwi i’r llys",
+  "release1b": {
+    "freeIfAtLeast14DaysAway": "It’s free to apply if your court hearing is at least 14 days away and the other parties have already agreed to it."
+  }
 }
