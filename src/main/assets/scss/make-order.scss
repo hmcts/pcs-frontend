@@ -279,6 +279,7 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
 
 // Align sentence fragments with their adjacent form controls in the compact order wording rows.
 .pcs-inline-copy {
+  @include govuk-font($size: 19);
   margin-bottom: govuk-spacing(2);
 }
 
