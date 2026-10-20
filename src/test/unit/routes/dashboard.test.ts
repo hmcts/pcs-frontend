@@ -78,6 +78,7 @@ jest.mock('../../../main/middleware/oidc', () => ({
 const MISSING = '__MISSING_TRANSLATION__';
 
 jest.mock('@modules/i18n', () => ({
+  getRequestLanguage: jest.fn(() => 'en'),
   getTranslationFunction: jest.fn(() => {
     const strings: Record<string, string> = {
       'dashboard:taskGroups.CLAIM': 'Claim section',
