@@ -292,6 +292,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         townOrCity: t('labels.townOrCity'),
         county: t('labels.county'),
         postcode: t('labels.postcode'),
+        errorPrefix: t('common:errorPrefix'),
+        oneAddressFound: t('common:addressLookup.oneFound'),
+        manyAddressesFound: t('common:addressLookup.manyFound'),
+        noAddressesFound: t('common:addressLookup.noneFound'),
       },
       buttons: {
         findAddress: t('buttons.findAddress'),

@@ -1,3 +1,6 @@
+// Below exclusions will be addressed as part of below bugs
+// https://hmcts.atlassian.net/browse/HDPI-6146
+// https://hmcts.atlassian.net/browse/HDPI-9505
 export const axe_exclusions = [
   '#correspondenceAddressConfirm-2', //page: correspondenceAddress, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#confirmRepaymentsMade', //page: repaymentsMade, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button

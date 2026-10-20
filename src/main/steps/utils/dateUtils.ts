@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon';
 
+import { formatLocalisedDate } from '@utils/formatLocalisedDate';
+
 export function parseISOToDateParts(isoDate: string): { day: string; month: string; year: string } | undefined {
   const dt = DateTime.fromISO(isoDate);
   if (!dt.isValid) {
@@ -12,12 +14,11 @@ export function parseISOToDateParts(isoDate: string): { day: string; month: stri
   };
 }
 
-export function formatIsoDate(iso?: string): string {
+export function formatIsoDate(iso?: string, lang?: string): string {
   if (!iso) {
     return '';
   }
-  const dt = DateTime.fromISO(iso).setLocale('en-gb');
-  return dt.isValid ? dt.toFormat('d LLLL yyyy') : iso;
+  return formatLocalisedDate(iso, lang) ?? iso;
 }
 
 export function formatDatePartsToISODate(day: string, month: string, year: string): string | undefined {

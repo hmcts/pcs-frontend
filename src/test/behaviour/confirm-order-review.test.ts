@@ -243,6 +243,14 @@ describe('confirm order review', () => {
       expect(judges).not.toContain('The claimant may apply to restore the claim.');
     });
 
+    it('takes an order whose wording outgrows an ordinary form', async () => {
+      app = await caseworkerReviewing();
+      const page = await openReview(app);
+      writeInPreview('The claimant may apply to restore the claim. '.repeat(3000));
+
+      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(REVIEW_DATES);
+    });
+
     it('does not go on to issue an order the judge could not have sent', async () => {
       app = await caseworkerReviewing();
       const page = await openReview(app);
