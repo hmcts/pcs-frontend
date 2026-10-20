@@ -191,12 +191,21 @@ def runE2ETests(yarnBuilder) {
     [flag: 'MOBILE_IOS_TESTS', project: 'mobile-ios', browser: 'MobileIos', label: 'Mobile iOS (WebKit)'],
     [flag: 'MOBILE_IPAD_TESTS', project: 'mobile-ipad', browser: 'MobileIpad', label: 'Mobile iPad (WebKit)'],
   ]
+  
+  def anyFailed = false
+
   e2eMatrix.each { row ->
     if (params[row.flag]) {
-      runE2eStage(yarnBuilder, row.project, row.browser, row.label)
+      if (!runE2eStage(yarnBuilder, row.project, row.browser, row.label)) {
+        anyFailed = true
+      }
     }
   }
-}
+  if (anyFailed) {
+    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+      error('E2E failed for one or more browsers')
+    }
+  }
 
 /** Names of boolean pipeline params that select browser/device E2E stages (must stay in sync with `runE2ETests`). */
 def browserToggleParamNames() {
@@ -212,15 +221,21 @@ def browserToggleParamNames() {
 }
 
 def runE2eStage(yarnBuilder, String playwrightProject, String browser, String stageLabel) {
+  def passed = true
+  stage("E2E - ${stageLabel} [${env.ENVIRONMENT}]") {
     node {
-      echo "Running E2E - ${stageLabel} [${env.ENVIRONMENT}]"
-      checkout scm
-      sh 'rm -rf allure-results allure-report'
-      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-        withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
-          yarnBuilder.yarn('test:E2e')
-        }
-      }
+      ...
+          try {
+            yarnBuilder.yarn('test:E2e')
+          } catch (e) {
+            passed = false
+            throw e
+          }
+      ...
+    }
+  }
+  return passed
+}
       publishHTML([
         allowMissing: true,
         alwaysLinkToLastBuild: true,
@@ -236,7 +251,7 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
       sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
     }
   }
-
+}
 
 def sendAllureReportToSlack(String browser, String reportSuffix) {
   env.E2E_BROWSER = browser
