@@ -12,7 +12,8 @@
          data-application-type="{{ application.type }}"
          data-application-applicant="{{ application.applicant or 'the applicant' }}"
          data-application-submitted="{{ application.submittedOnDisplay or '' }}"
-         data-application-wording="{{ application.whatOrderWanted or '' }}">
+         data-application-wording="{{ application.whatOrderWanted or '' }}"
+         {%- if application.whatOrderWantedRich %} data-application-wording-html="{{ application.whatOrderWantedHtml }}"{% endif %}>
   <h2 class="govuk-heading-l govuk-!-margin-top-6" id="application-heading">
     Application {{ application.reference }}: {{ application.type }}
   </h2>
@@ -61,10 +62,16 @@
 
   <h3 class="govuk-heading-m">The order the applicant asked for</h3>
   {% if application.whatOrderWanted %}
+    {# As the applicant formatted it, so their numbering is the numbering they refer to. #}
     {{ govukInsetText({
-      html: '<p class="govuk-body">' + (application.whatOrderWanted | escape | nl2br) + '</p>',
+      html: '<div class="pcs-rich-text">' + application.whatOrderWantedHtml + '</div>',
       attributes: { id: "application-requested" }
     }) }}
+    {% if application.whatOrderWantedNotKept | length %}
+      <p class="govuk-hint" id="application-requested-not-kept">
+        If you use the applicant’s wording in the order, {{ application.whatOrderWantedNotKept | join("; ") }}.
+      </p>
+    {% endif %}
   {% else %}
     <p class="govuk-body">The applicant did not say what order they want. Read the application documents.</p>
   {% endif %}

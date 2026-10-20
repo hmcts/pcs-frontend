@@ -10,6 +10,7 @@ import type {
   OrderParty,
   OrderStart,
 } from '@utils/orderCase';
+import { isRichText, richTextHtml, richTextNotKept } from '@utils/richText';
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 const APPLICATION_ORDER_TYPE: MakeOrderType = 'APPLICATION_DECISION';
@@ -22,11 +23,17 @@ function displayDate(iso?: string | null): string | undefined {
   return date.isValid ? date.setLocale('en-GB').toFormat('d MMMM yyyy') : undefined;
 }
 
-/** The application as its panel shows it: its answers in words, and its dates as the court writes them. */
+/**
+ * The application as its panel shows it: its answers in words, and its dates as the court writes them. The order
+ * it asks for is shown as the applicant formatted it, and is HTML to use only when they wrote rich text.
+ */
 function applicationModel(application: OrderApplication, caseReference: number) {
   const href = (id: string): string => `/case/${caseReference}/view-documents/${encodeURIComponent(id)}`;
   return {
     ...application,
+    whatOrderWantedHtml: richTextHtml(application.whatOrderWanted),
+    whatOrderWantedRich: isRichText(application.whatOrderWanted),
+    whatOrderWantedNotKept: richTextNotKept(application.whatOrderWanted),
     documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
     submittedOnDisplay: displayDate(application.submittedOn),
     referredOnDisplay: displayDate(application.referredOn),
