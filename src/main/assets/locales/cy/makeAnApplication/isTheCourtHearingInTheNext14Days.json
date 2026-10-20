@@ -3,7 +3,7 @@
   "caption": "Gwneud cais",
   "heading": "A yw’r gwrandawiad llys yn ystod y 14 diwrnod nesaf?",
   "question": "A yw’r gwrandawiad llys yn ystod y 14 diwrnod nesaf?",
-  "hintText": "This will affect the fee you will pay. You do not need to pay a fee if your court hearing is (at least) 14 days away and all the other parties have agreed to it.",
+  "hintText": "Bydd hyn yn effeithio ar y ffi y byddwch yn ei thalu. Nid ydych angen talu ffi os yw eich gwrandawiad llys (o leiaf) 14 diwrnod i ffwrdd.",
   "otherParties": "The ‘other parties’ are the other people or organisations named on the claim form. For example a tenant, landlord, housing association, or mortgage lender.",
   "everyOtherPartyWillNeedToAgree": "Every other party will need to agree to let you make this application, if they don’t agree, you may need to pay a higher fee.",
   "errors": {
