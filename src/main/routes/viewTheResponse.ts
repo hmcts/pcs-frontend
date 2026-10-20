@@ -308,15 +308,9 @@ function buildResponseToClaim(
   if (isNo(responses?.tenancyTypeConfirmation)) {
     pushRow(rows, t('viewTheResponse:responseToClaim.tenancyType'), responses?.tenancyType);
   }
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.tenancyStartDateConfirmation'),
-    yesNoNotSure(t, responses?.tenancyStartDateConfirmation)
-  );
-  if (
-    isNo(responses?.tenancyStartDateConfirmation) ||
-    (!responses?.tenancyStartDateConfirmation && responses?.tenancyStartDate)
-  ) {
+  const confirmation = responses?.tenancyStartDateConfirmation;
+  pushRow(rows, t('viewTheResponse:responseToClaim.tenancyStartDateConfirmation'), yesNoNotSure(t, confirmation));
+  if (isNo(confirmation) || (!confirmation && responses?.tenancyStartDate)) {
     pushRow(
       rows,
       t('viewTheResponse:responseToClaim.tenancyStartDate'),
