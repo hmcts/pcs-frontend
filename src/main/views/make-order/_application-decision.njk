@@ -4,9 +4,15 @@
   judge's own clauses, which the reset button restores. Listing it for a hearing on notice asks when, as
   the adjournment tab does, and leaves the application open. Inline radios can't reveal a question, so what
   follows a decision is on its own rows, shown while it is chosen (initApplicationDecision in make-order.ts).
+
+  The decisions on an application to suspend the warrant of possession are a second row of the same choice, there
+  for every application, since an applicant asking to stop an eviction may not have chosen that kind of
+  application. Granting it suspends the warrant on the conditions a suspended possession order has; dismissing it
+  says when the eviction may go ahead. Whether to block enforcement stays with court staff reviewing the order.
 #}
 {% import "make-order/_compact.njk" as compact with context %}
 {% import "make-order/_listing.njk" as listing with context %}
+{% import "make-order/_payment-conditions.njk" as conditions with context %}
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Decision</h2>
 
@@ -24,6 +30,17 @@
   ]
 }) }}
 
+{{ compact.radios("application-decision", {
+  idPrefix: "application-decision-warrant",
+  legend: "Application to suspend the warrant of possession",
+  classes: "govuk-radios--small govuk-radios--inline",
+  items: [
+    { value: "suspend-warrant", text: "Granted" },
+    { value: "refuse-warrant-suspension", text: "Dismissed" }
+  ],
+  errorShownElsewhere: true
+}) }}
+
 {% if application.whatOrderWanted %}
   <div data-decision-shows="grant" {%- if not draftChecked("application-decision", "grant") %} hidden{% endif %}>
     <button type="button" class="govuk-button govuk-button--secondary" data-restore-requested-wording>
@@ -38,4 +55,14 @@
     "Next available date (non-possession list) after",
     "Specific date"
   ]) }}
+</div>
+
+<div data-decision-shows="suspend-warrant" {%- if not draftChecked("application-decision", "suspend-warrant") %} hidden{% endif %}>
+  {{ conditions.paymentConditions("warrant", "Warrant suspended on condition of") }}
+</div>
+
+<div data-decision-shows="refuse-warrant-suspension" class="pcs-inline-date"
+     {%- if not draftChecked("application-decision", "refuse-warrant-suspension") %} hidden{% endif %}>
+  <span class="govuk-label govuk-label--s pcs-inline-date__label" aria-hidden="true">Eviction may take place on</span>
+  {{ compact.date({ id: "warrant-eviction-date", legend: "Eviction may take place on", legendHidden: true }) }}
 </div>
