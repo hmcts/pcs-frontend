@@ -708,9 +708,7 @@ export default function viewTheResponseRoutes(app: Application): void {
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
         defendant1Details: buildDefendant1Details(t, caseData, rankedDefendantNumbering, lang),
-        additionalDefendantDetails: rankedDefendantNumbering
-          ? []
-          : buildAdditionalDefendantDetails(t, caseData, lang),
+        additionalDefendantDetails: rankedDefendantNumbering ? [] : buildAdditionalDefendantDetails(t, caseData, lang),
         responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord, lang),
         paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued, lang),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData, lang),

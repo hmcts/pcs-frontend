@@ -1154,6 +1154,7 @@ describe('viewTheResponse route', () => {
     expect(renderArgs.responsePdfUrl).toBeUndefined();
   });
   it('should format every date in Welsh when the request language is cy', async () => {
+    mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
     (getRequestLanguage as jest.Mock).mockReturnValueOnce('cy');
     mockCaseById(buildComprehensiveCaseData());
 
