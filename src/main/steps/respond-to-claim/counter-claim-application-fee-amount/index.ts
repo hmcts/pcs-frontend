@@ -206,6 +206,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       formattedCounterClaimAmount:
         counterClaimAmount === undefined ? undefined : t('counterClaimAmountDisplay', { counterClaimAmount }),
       formattedCounterClaimFee: t('counterClaimFeeDisplay', { counterClaimFee: feeAmount }),
+      counterClaimAmountLabel: t('counterClaimAmountLabel'),
+      counterClaimFeeLabel: t('counterClaimFeeLabel'),
       payNowButton: t('payNowButton', { counterClaimFee: feeAmount }),
       payNowUrl,
       payNowDisabled,
