@@ -34,7 +34,7 @@ import { AxiosError } from 'axios';
 import config from 'config';
 
 import { ClientContextHeaders } from '../../types/global';
-import { HTTPError } from '../HttpError';
+import { CallbackRejectedError, HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
@@ -134,11 +134,23 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
-  const responseData = axiosError.response?.data as CcdErrorResponseData | undefined;
+  const rawBody: unknown = axiosError.response?.data;
+  const responseData = rawBody as CcdErrorResponseData | undefined;
+  // Every CCD URL carries the case reference, so take it from the request that failed rather
+  // than threading it through each call site. Logged as a field: the span exception picks it up.
+  const caseReference = /\/cases\/(\d{16})/.exec(axiosError.config?.url ?? '')?.[1];
 
-  logger.error(`Error in ${context}: ${axiosError.message}`);
-  if (responseData) {
-    logger.error(`Error response data: ${JSON.stringify(responseData, null, 2)}`);
+  logger.error(`Error in ${context}: ${axiosError.message}`, { caseReference });
+  if (rawBody) {
+    // CCD error bodies can carry case data - log only what identifies the failure. `details` is
+    // left out deliberately: it echoes the submitted field values.
+    const summary =
+      typeof rawBody === 'string'
+        ? `body=${rawBody.slice(0, 200)}`
+        : `message=${responseData?.message ?? 'none'} exception=${responseData?.exception ?? 'none'}`;
+    logger.error(`Error response from CCD in ${context}: status=${status ?? 'unknown'} ${summary}`, {
+      caseReference,
+    });
   }
 
   if (status === 403) {
@@ -151,7 +163,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const callbackMessages = [...(responseData?.callbackErrors ?? []), ...(responseData?.callbackWarnings ?? [])];
   if (callbackMessages.length > 0) {
-    return new HTTPError(`CCD callback rejected request: ${callbackMessages.join('; ')}`, status || 422);
+    return new CallbackRejectedError(callbackMessages, status || 422);
   }
 
   const retryAfterHeader = axiosError.response?.headers?.['retry-after'];
@@ -190,7 +202,6 @@ async function getEventToken(userToken: string, url: string): Promise<string> {
   try {
     logger.info(`Calling getEventToken with URL: ${url}`);
     const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data.token;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'getEventToken');
@@ -234,10 +245,8 @@ async function submitEvent(
   };
 
   try {
-    logger.info(`Calling submitEvent with URL: ${url}`);
-    logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
+    logger.info(`Calling submitEvent with URL: ${url}, eventId: ${eventId}`);
     const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'submitEvent');
@@ -280,6 +289,28 @@ export const ccdCaseService = {
     }
   },
 
+  /** Starts an event, for a later `submitCaseEvent` with the token it returns. */
+  async startCaseEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string
+  ): Promise<CcdCase & { eventToken: string }> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    try {
+      const response = await http.get<StartCallbackData>(
+        `${getBaseUrl()}/cases/${safeCaseId}/event-triggers/${eventId}?ignore-warning=false`,
+        getCaseHeaders(accessToken)
+      );
+      return { id: safeCaseId, data: response.data.case_details?.case_data ?? {}, eventToken: response.data.token };
+    } catch (error) {
+      throw convertReadErrorToHttpError(error, 'startCaseEvent');
+    }
+  },
+
   async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
     const safeCaseId = sanitiseCaseReference(caseId);
     if (!safeCaseId) {
@@ -291,7 +322,6 @@ export const ccdCaseService = {
     try {
       logger.debug(`Fetching case by id for read view: ${safeCaseId}`);
       const response = await http.get<CcdCase>(caseUrl, getCaseHeaders(accessToken));
-      logger.debug(`Read case response for ${safeCaseId}: ${JSON.stringify(response.data, null, 2)}`);
       const caseData = response.data.data ?? {};
 
       return {
@@ -391,6 +421,21 @@ export const ccdCaseService = {
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 
     return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
+  },
+
+  /** Submits an event with the token from the `startCaseEvent` the change was based on. */
+  async submitCaseEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string,
+    eventToken: string,
+    data: Record<string, unknown>
+  ): Promise<CcdCase> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+    return submitEvent(accessToken, `${getBaseUrl()}/cases/${safeCaseId}/events`, eventId, eventToken, data);
   },
 
   async getExistingCaseData(

@@ -23,7 +23,7 @@ import {
   exemptLandlord,
   haveYouAppliedForUniversalCredit,
   incomeAndExpenses,
-  installmentPayments,
+  instalmentPayments,
   languageUsed,
   nonRentArrearsDispute,
   otherConsiderations,
@@ -189,8 +189,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performAction('installmentPaymentsLR', {
-      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
-      radioOption: installmentPayments.noRadioOption,
+      question: instalmentPayments.wouldDefendantLikeToOfferToPayQuestion,
+      radioOption: instalmentPayments.noRadioOption,
     });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
@@ -318,8 +318,8 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       repaymentAgreedOption: repaymentsAgreed.noRadioOption,
     });
     await performAction('installmentPaymentsLR', {
-      question: installmentPayments.wouldYouLikeToOfferToPayQuestion,
-      radioOption: installmentPayments.noRadioOption,
+      question: instalmentPayments.wouldDefendantLikeToOfferToPayQuestion,
+      radioOption: instalmentPayments.noRadioOption,
     });
     await performAction('doesTheDependantHaveChildrenLR', {
       dependantChildrenOption: doYouHaveAnyDependantChildren.noRadioOption,
