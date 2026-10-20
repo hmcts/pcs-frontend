@@ -963,6 +963,160 @@ describe('viewTheResponse route', () => {
     );
   });
 
+  describe('tenancy start date handling', () => {
+    it('should display tenancy start date when provided via the unknown start date page (no confirmation)', async () => {
+      mockCaseById({
+        possessionClaimResponse: {
+          defendantResponses: {
+            tenancyStartDate: '2021-06-15',
+          },
+        },
+      });
+
+      viewTheResponseRoute(app);
+      const handler = getHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        viewTheResponseRequest({
+          caseReference,
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        jest.fn()
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+      expect(renderArgs.responseToClaim.rows).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            key: { text: 'viewTheResponse:responseToClaim.tenancyStartDate' },
+            value: { text: '15 June 2021' },
+          }),
+        ])
+      );
+      expect(renderArgs.responseToClaim.rows).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            key: { text: 'viewTheResponse:responseToClaim.tenancyStartDateConfirmation' },
+          }),
+        ])
+      );
+    });
+
+    it('should display both confirmation and corrected date when defendant answered NO', async () => {
+      mockCaseById({
+        possessionClaimResponse: {
+          defendantResponses: {
+            tenancyStartDateConfirmation: 'NO',
+            tenancyStartDate: '2021-06-15',
+          },
+        },
+      });
+
+      viewTheResponseRoute(app);
+      const handler = getHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        viewTheResponseRequest({
+          caseReference,
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        jest.fn()
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+      expect(renderArgs.responseToClaim.rows).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            key: { text: 'viewTheResponse:responseToClaim.tenancyStartDateConfirmation' },
+            value: { text: 'No' },
+          }),
+          expect.objectContaining({
+            key: { text: 'viewTheResponse:responseToClaim.tenancyStartDate' },
+            value: { text: '15 June 2021' },
+          }),
+        ])
+      );
+    });
+
+    it('should not display tenancy start date when defendant confirmed YES', async () => {
+      mockCaseById({
+        possessionClaimResponse: {
+          defendantResponses: {
+            tenancyStartDateConfirmation: 'YES',
+            tenancyStartDate: '2021-06-15',
+          },
+        },
+      });
+
+      viewTheResponseRoute(app);
+      const handler = getHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        viewTheResponseRequest({
+          caseReference,
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        jest.fn()
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+      expect(renderArgs.responseToClaim.rows).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            key: { text: 'viewTheResponse:responseToClaim.tenancyStartDateConfirmation' },
+            value: { text: 'Yes' },
+          }),
+        ])
+      );
+      expect(renderArgs.responseToClaim.rows).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            key: { text: 'viewTheResponse:responseToClaim.tenancyStartDate' },
+          }),
+        ])
+      );
+    });
+
+    it('should not display tenancy start date row when unknown start date was skipped', async () => {
+      mockCaseById({
+        possessionClaimResponse: {
+          defendantResponses: {},
+        },
+      });
+
+      viewTheResponseRoute(app);
+      const handler = getHandler();
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        viewTheResponseRequest({
+          caseReference,
+          sessionUser: { accessToken: 'access-token-1' },
+        }),
+        res,
+        jest.fn()
+      );
+
+      const renderArgs = (res.render as jest.Mock).mock.calls[0][1];
+      expect(renderArgs.responseToClaim.rows).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            key: { text: 'viewTheResponse:responseToClaim.tenancyStartDate' },
+          }),
+          expect.objectContaining({
+            key: { text: 'viewTheResponse:responseToClaim.tenancyStartDateConfirmation' },
+          }),
+        ])
+      );
+    });
+  });
+
   it('should accept numeric case reference params', async () => {
     mockCaseById({
       dateSubmitted: '2026-02-01',
