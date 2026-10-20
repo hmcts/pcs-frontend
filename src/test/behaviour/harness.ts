@@ -282,7 +282,7 @@ export async function bootApp(
   httpService.setToken('s2s-token', Date.now() + 60 * 60 * 1000);
 
   const app = express();
-  app.use(express.urlencoded({ extended: false, limit: '2mb' }));
+  app.use(middleware.formBodyMiddleware);
   new Nunjucks(false).enableFor(app);
   app.locals.nunjucksEnv.addGlobal('sessionTimeout', {});
   // LaunchDarkly, with the make order flag on unless a test turns it off.
