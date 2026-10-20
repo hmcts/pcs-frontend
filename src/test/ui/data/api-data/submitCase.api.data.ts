@@ -143,10 +143,10 @@ export const submitCaseApiData = {
       languageUsed: 'ENGLISH',
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       wantToUploadDocuments: 'YES',
-      additionalDocumentsEngland: [
+      allDocuments: [
         {
           value: {
-            AdditionalDocumentTypeEngland: {
+            documentType: {
               value: {
                 code: '8bc45a2f-f2e7-40dd-9857-20582cc1c4dd',
                 label: 'Witness statement',
@@ -163,7 +163,7 @@ export const submitCaseApiData = {
         },
         {
           value: {
-            AdditionalDocumentTypeEngland: {
+            documentType: {
               value: {
                 code: 'fdc09fcb-45ce-461b-9819-63186c34755a',
                 label: 'Rent statement',
@@ -180,7 +180,7 @@ export const submitCaseApiData = {
         },
         {
           value: {
-            AdditionalDocumentTypeEngland: {
+            documentType: {
               value: {
                 code: 'c0dab8bc-9264-4814-af67-b363af60c646',
                 label: 'Notice for service out of the jurisdiction',
@@ -197,7 +197,7 @@ export const submitCaseApiData = {
         },
         {
           value: {
-            AdditionalDocumentTypeEngland: {
+            documentType: {
               value: {
                 code: 'e4983a7d-1430-4c6b-ac50-94669e757248',
                 label: 'Certificate of suitability as litigation friend',
@@ -214,7 +214,7 @@ export const submitCaseApiData = {
         },
         {
           value: {
-            AdditionalDocumentTypeEngland: {
+            documentType: {
               value: {
                 code: 'a6c5dea7-9420-446d-b973-d75d95790b7b',
                 label: 'Other document',
