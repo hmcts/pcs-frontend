@@ -206,6 +206,7 @@ def runE2ETests(yarnBuilder) {
       error('E2E failed for one or more browsers')
     }
   }
+}
 
 /** Names of boolean pipeline params that select browser/device E2E stages (must stay in sync with `runE2ETests`). */
 def browserToggleParamNames() {
