@@ -140,9 +140,12 @@ withNightlyPipeline(type, product, component) {
     enableCrossBrowserTest()
   }
 
+  afterSuccess('build') {
+    runE2ETests(yarnBuilder)
+  }
+
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    runE2ETests(yarnBuilder)
   }
 }
 
