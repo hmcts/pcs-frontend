@@ -1,5 +1,9 @@
 import type { Request } from 'express';
 
+jest.mock('@utils/getLaunchDarklyFlag', () => ({
+  getLaunchDarklyFlag: jest.fn(),
+}));
+
 import {
   hydrateUploadedDocumentsFromBody,
   parseUploadedDocumentsFromBody,
@@ -9,6 +13,10 @@ import {
 
 import type { DocumentStorage } from '@modules/documents/storage';
 import type { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
+import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
+
+const mockGetLaunchDarklyFlag = getLaunchDarklyFlag as jest.MockedFunction<typeof getLaunchDarklyFlag>;
 
 const stubStorage: DocumentStorage = {
   read: jest.fn(async () => []),
@@ -44,6 +52,7 @@ function makeRequest(partial: Partial<Request>): Request {
 describe('fileUploadUtils', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetLaunchDarklyFlag.mockResolvedValue(false);
     (stubStorage.read as jest.Mock).mockResolvedValue([]);
   });
 
@@ -223,6 +232,27 @@ describe('fileUploadUtils', () => {
       await wireFileUploadOnPostError(form, req, undefined);
       expect(form.fields[0].component?.uploadUrl).toBe('');
       expect(form.fields[0].component?.value).toEqual([]);
+    });
+
+    describe('disableContinueWhileUploading (release 1.4)', () => {
+      it('sets disableContinueWhileUploading to true when release 1.4 is enabled', async () => {
+        mockGetLaunchDarklyFlag.mockResolvedValue(true);
+        const form = makeFileUploadForm();
+        const req = makeRequest({});
+
+        await wireFileUploadOnPostError(form, req, stubStorage);
+
+        expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(req, RELEASE_1_4_ENABLED, false);
+        expect(form.fields[0].component?.disableContinueWhileUploading).toBe(true);
+      });
+
+      it('sets disableContinueWhileUploading to false when release 1.4 is disabled', async () => {
+        const form = makeFileUploadForm();
+
+        await wireFileUploadOnPostError(form, makeRequest({}), stubStorage);
+
+        expect(form.fields[0].component?.disableContinueWhileUploading).toBe(false);
+      });
     });
   });
 });
