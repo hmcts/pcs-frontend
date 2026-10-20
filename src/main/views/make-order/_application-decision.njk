@@ -61,8 +61,10 @@
   {{ conditions.paymentConditions("warrant", "Warrant suspended on condition of") }}
 </div>
 
-<div data-decision-shows="refuse-warrant-suspension" class="pcs-inline-date"
+<div data-decision-shows="refuse-warrant-suspension"
      {%- if not draftChecked("application-decision", "refuse-warrant-suspension") %} hidden{% endif %}>
-  <span class="govuk-label govuk-label--s pcs-inline-date__label" aria-hidden="true">Eviction may take place on</span>
-  {{ compact.date({ id: "warrant-eviction-date", legend: "Eviction may take place on", legendHidden: true }) }}
+  <div class="pcs-inline-date">
+    <span class="govuk-label govuk-label--s pcs-inline-date__label" aria-hidden="true">Eviction may take place on</span>
+    {{ compact.date({ id: "warrant-eviction-date", legend: "Eviction may take place on", legendHidden: true }) }}
+  </div>
 </div>
