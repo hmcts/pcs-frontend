@@ -212,8 +212,8 @@ def browserToggleParamNames() {
 }
 
 def runE2eStage(yarnBuilder, String playwrightProject, String browser, String stageLabel) {
-  stage("E2E - ${stageLabel} [${env.ENVIRONMENT}]") {
     node {
+      echo "Running E2E - ${stageLabel} [${env.ENVIRONMENT}]"
       checkout scm
       sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
@@ -236,7 +236,7 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
       sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
     }
   }
-}
+
 
 def sendAllureReportToSlack(String browser, String reportSuffix) {
   env.E2E_BROWSER = browser
