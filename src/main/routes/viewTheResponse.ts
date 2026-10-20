@@ -30,7 +30,7 @@ import { findCaseDocumentById } from '@utils/documentUtils';
 import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
-import { RELEASE_1_2_ENABLED, RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
+import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 import { enumToSentence } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const logger = Logger.getLogger('viewTheResponse');
@@ -708,9 +708,7 @@ export default function viewTheResponseRoutes(app: Application): void {
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
         defendant1Details: buildDefendant1Details(t, caseData, lang),
-        additionalDefendantDetails: rankedDefendantNumbering
-          ? []
-          : buildAdditionalDefendantDetails(t, caseData, lang),
+        additionalDefendantDetails: rankedDefendantNumbering ? [] : buildAdditionalDefendantDetails(t, caseData, lang),
         responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord, lang),
         paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued, lang),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData, lang),
