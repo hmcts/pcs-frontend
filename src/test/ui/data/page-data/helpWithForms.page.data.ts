@@ -6,5 +6,5 @@ export const helpWithForms = {
   guidanceOnHowToCompleteFormsCheckbox: `Guidance on how to complete forms`,
   supportFillingInFormsCheckbox: `Support filling in forms`,
   otherCheckbox: `Other`,
-  noHelpWithFormsCheckbox: `I do not need any support at this time`,
+  noHelpWithFormsCheckbox: `I do not need any help with forms at this time`,
 };

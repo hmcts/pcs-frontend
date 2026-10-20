@@ -175,6 +175,7 @@ export interface CcdDefendantParty {
 
 /** Counter-claim data captured across the counterclaim journey screens. */
 export interface CcdCounterClaim {
+  status?: string;
   needHelpWithFees?: YesNoValue;
   appliedForHwf?: YesNoValue;
   hwfReferenceNumber?: string;
@@ -271,6 +272,8 @@ export interface PossessionClaimResponse {
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
   responseDocumentId?: string;
+  counterclaimDocumentId?: string;
+  draftVersion?: number;
   claimIssuedDate?: string;
 
   defendantFlags?: CcdFlags;
@@ -333,6 +336,7 @@ export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
+  sdkEventPayload?: string;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
   detailsTab_TenancyLicenceDetails?: DetailsTab_TenancyLicenceDetails;
   detailsTab_RentArrearsDetails?: DetailsTab_RentArrearsDetails;
