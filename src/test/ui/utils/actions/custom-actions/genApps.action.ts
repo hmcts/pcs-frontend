@@ -28,7 +28,6 @@ import { defaultJourney, journeys } from '../../journeyMappingGenApps';
 
 import { FieldsStore } from './recordAnsweredFields.action';
 
-
 const cyaMap = new Map<string, string>();
 
 export class GenAppsAction implements IAction {
@@ -236,33 +235,33 @@ export class GenAppsAction implements IAction {
     await performAction('clickButton', applicationSubmitted.closeAndReturnToCaseOverviewButton);
   }
 
-  private async validateCompletedApplication(page: Page, apps: actionRecord) : Promise<void> {
+  private async validateCompletedApplication(page: Page, apps: actionRecord): Promise<void> {
     await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
     await performAction('clickLink', dashboard.viewAllApplicationsLink);
-    await performValidation('mainHeader', dashboard.viewAllApplicationsLink);    
+    await performValidation('mainHeader', dashboard.viewAllApplicationsLink);
     await this.verifyDocumentLink(page, apps.app as string, apps.subDate as string);
     if (apps.doc) {
       await this.verifyDocumentLink(page, apps.doc as string, apps.subDate as string, true);
     }
-
   }
 
-  public async verifyDocumentLink(page: Page, documentName: string, expectedDate: string, docInclude?: boolean): Promise<void> {
-
+  public async verifyDocumentLink(
+    page: Page,
+    documentName: string,
+    expectedDate: string,
+    docInclude?: boolean
+  ): Promise<void> {
     const applicationsCard = page.locator('.govuk-summary-card');
     await expect(applicationsCard.getByText(`Submitted on ${expectedDate}`)).toBeVisible();
 
     if (docInclude) {
       const baseName = documentName.replace(/\.[^.]+$/, '');
-      await expect(page.getByText(dashboard.docsAddedHiddenText)
-        .locator('..')
-        .getByRole('link')
-        .filter({ hasText: baseName }),
+      await expect(
+        page.getByText(dashboard.docsAddedHiddenText).locator('..').getByRole('link').filter({ hasText: baseName })
       ).toBeVisible();
     } else {
       await expect(applicationsCard.getByRole('link', { name: new RegExp(documentName, 'i') })).toBeVisible();
     }
-
   }
 
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
@@ -442,7 +441,7 @@ export class GenAppsAction implements IAction {
           await performAction('doYouNeedHelpPayingFee', {
             question: testPage.doYouNeedHelpPayingTheFeeQuestion,
             option: testPage.iDoNotNeedHelpPayingTheFeeRadioOption,
-            continueButton: testPage.continueButton
+            continueButton: testPage.continueButton,
           });
         } else {
           await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
@@ -457,14 +456,13 @@ export class GenAppsAction implements IAction {
       }
       case 'doYouNeedHelpPayingTheFeeForThisApplication': {
         const feeOption1 =
-          FieldsStore.get(testPage.doYouNeedHelpPayingTheFeeQuestion as string) ===
-          'I need help paying the fee'
+          FieldsStore.get(testPage.doYouNeedHelpPayingTheFeeQuestion as string) === 'I need help paying the fee'
             ? testPage.iDoNotNeedHelpPayingTheFeeRadioOption
             : testPage.iNeedHelpPayingTheFeeRadioOption;
         await performAction('doYouNeedHelpPayingFee', {
           question: testPage.doYouNeedHelpPayingTheFeeQuestion,
           option: feeOption1,
-          continueButton: testPage.continueButton
+          continueButton: testPage.continueButton,
         });
         if (feeOption1 !== 'I need help paying the fee') {
           FieldsStore.deleteKeys([

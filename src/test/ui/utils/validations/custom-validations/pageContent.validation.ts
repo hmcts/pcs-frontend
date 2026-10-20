@@ -215,9 +215,7 @@ export class PageContentValidation implements IValidation {
       delete require.cache[require.resolve(filePath)];
       const module = require(filePath);
       const data = module.default || module[fileName] || module[Object.keys(module)[0]];
-      return typeof data === 'function'
-        ? data(test.info().title)
-        : data;
+      return typeof data === 'function' ? data(test.info().title) : data;
     } catch {
       PageContentValidation.missingDataFiles.add(fileName);
       return null;

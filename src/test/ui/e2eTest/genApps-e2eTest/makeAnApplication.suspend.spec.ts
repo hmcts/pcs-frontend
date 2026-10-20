@@ -1,6 +1,16 @@
 import { createCaseApiData, submitCaseApiData } from '../../data/api-data';
 import { dashboard } from '../../data/page-data';
-import { checkYourAnswersGenApps, chooseAnApplication, doYouNeedHelpPayingTheFee, doYouWantToUploadDocumentsToSupportYourApplication, haveYouAlreadyAppliedForHelpWithFees, paymentDetails, uploadDocumentsToSupportYourApplication, whatOrderDoYouWantTheCourtToMakeAndWhy, whichLanguageDidYouUseToCompleteThisService } from '../../data/page-data/genApps-page-data';
+import {
+  checkYourAnswersGenApps,
+  chooseAnApplication,
+  doYouNeedHelpPayingTheFee,
+  doYouWantToUploadDocumentsToSupportYourApplication,
+  haveYouAlreadyAppliedForHelpWithFees,
+  paymentDetails,
+  uploadDocumentsToSupportYourApplication,
+  whatOrderDoYouWantTheCourtToMakeAndWhy,
+  whichLanguageDidYouUseToCompleteThisService,
+} from '../../data/page-data/genApps-page-data';
 import { applyToStopOrDelayEviction } from '../../data/page-data/genApps-page-data/applyToStopOrDelayEviction.page.data';
 import { FieldsStore } from '../../utils/actions/custom-actions/recordAnsweredFields.action';
 import { getFormattedDate } from '../../utils/common/date.utils';
@@ -44,14 +54,16 @@ test.afterEach(async () => {
 });
 
 test.describe('Make an Application - e2e Journey @nightly', async () => {
-  test('As a Defendant, I successfully apply to Suspend eviction and request help with fees',
+  test(
+    'As a Defendant, I successfully apply to Suspend eviction and request help with fees',
     {
       tag: ['@regression'],
       annotation: [
         { type: 'jira', description: `The corresponding jira ticket : https://hmcts.atlassian.net/browse/HDPI-4622` },
         { type: 'ac', description: 'AC1 to AC7' },
       ],
-    }, async () => {
+    },
+    async () => {
       const upLoadFile = uploadDocumentsToSupportYourApplication.uploadFileHiddenOption[1];
 
       await test.step(`Given the user selects Suspend the eviction`, async () => {
@@ -69,7 +81,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
         await performAction('doYouNeedHelpPayingFee', {
           question: doYouNeedHelpPayingTheFeeSuspend.doYouNeedHelpPayingTheFeeQuestion,
           option: doYouNeedHelpPayingTheFeeSuspend.iNeedHelpPayingTheFeeRadioOption,
-          continueButton: doYouNeedHelpPayingTheFeeSuspend.continueButton
+          continueButton: doYouNeedHelpPayingTheFeeSuspend.continueButton,
         });
       });
 
@@ -84,7 +96,6 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       });
 
       await test.step(`And the user explains what they want the court to do and why `, async () => {
-
         await performValidation('mainHeader', whatOrderDoYouWantTheCourtToMakeAndWhy.mainHeader);
         await performAction('confirmOrderDoYouWant', {
           label: whatOrderDoYouWantTheCourtToMakeAndWhy.explainWhatYouWantTextLabel,
@@ -129,15 +140,18 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
           subDate: getFormattedDate(),
         });
       });
-    });
+    }
+  );
 
-  test('As a Defendant, I successfully apply to Suspend eviction without a request for help with fees',
+  test(
+    'As a Defendant, I successfully apply to Suspend eviction without a request for help with fees',
     {
       tag: ['@CM'],
       annotation: [
         { type: 'jira', description: `The corresponding jira ticket : https://hmcts.atlassian.net/browse/HDPI-4622` },
       ],
-    }, async () => {
+    },
+    async () => {
       const upLoadFile = uploadDocumentsToSupportYourApplication.uploadFileHiddenOption[1];
 
       await test.step('Given the user selects Suspend the eviction', async () => {
@@ -154,7 +168,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
         await performAction('doYouNeedHelpPayingFee', {
           question: doYouNeedHelpPayingTheFeeSuspend.doYouNeedHelpPayingTheFeeQuestion,
           option: doYouNeedHelpPayingTheFeeSuspend.iDoNotNeedHelpPayingTheFeeRadioOption,
-          continueButton: doYouNeedHelpPayingTheFeeSuspend.continueButton
+          continueButton: doYouNeedHelpPayingTheFeeSuspend.continueButton,
         });
       });
 
@@ -225,6 +239,6 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
         await performAction('verifyApplicationSubmitted');
         await performValidation('mainHeader', dashboard.mainHeader);
       });
-    });
-
+    }
+  );
 });

@@ -66,7 +66,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('doYouNeedHelpPayingFee', {
       question: doYouNeedHelpPayingTheFeeSuspend.doYouNeedHelpPayingTheFeeQuestion,
       option: doYouNeedHelpPayingTheFeeSuspend.iNeedHelpPayingTheFeeRadioOption,
-      continueButton: doYouNeedHelpPayingTheFeeSuspend.continueButton
+      continueButton: doYouNeedHelpPayingTheFeeSuspend.continueButton,
     });
     await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
     await performAction('confirmYouHaveAppliedForFeeHelp', {

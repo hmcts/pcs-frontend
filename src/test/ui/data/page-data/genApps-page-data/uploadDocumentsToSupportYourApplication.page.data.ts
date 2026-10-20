@@ -4,7 +4,7 @@ export const uploadDocumentsToSupportYourApplication = {
   beforeYouUploadTheDocumentParagraph: `Before you upload the document, give it a name that tells the court what it is, for example ‘Job offer letter’.`,
   eachDocumentParagraph: `Each document must be less than 100MB. You can upload the following file types: DOC/DOCX (Word), XLS/XLSX (Excel), PPT/PPTX (PowerPoint), PDF, RTF, TXT, CSV, JPG/JPEG, PNG, BMP, TIF/TIFF.`,
   UploadAFileHeader: `Upload a file`,
-  uploadFileHiddenOption: [`General Application GA1`,`rentArrears.pdf`],
+  uploadFileHiddenOption: [`General Application GA1`, `rentArrears.pdf`],
   continueButton: `Continue`,
   cancelLink: `Cancel`,
   backLink: `Back`,
