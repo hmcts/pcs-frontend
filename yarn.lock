@@ -1259,9 +1259,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts-cft/docweave@npm:0.8.0":
-  version: 0.8.0
-  resolution: "@hmcts-cft/docweave@npm:0.8.0"
+"@hmcts-cft/docweave@npm:0.9.0":
+  version: 0.9.0
+  resolution: "@hmcts-cft/docweave@npm:0.9.0"
   dependencies:
     prosemirror-commands: "npm:1.7.2"
     prosemirror-dropcursor: "npm:1.8.4"
@@ -1280,7 +1280,7 @@ __metadata:
   peerDependenciesMeta:
     express:
       optional: true
-  checksum: 10/a024a2356bcc13deb55013113607d2b86e8a67a39444967edb8a4831d4142c9235cfe1bef2f4ca31ec4074f109e9b4e97cc2690fe8e128fb7e0b38da39f43d71
+  checksum: 10/b914c16e38b9ab6e55191acad0870c98d0b1beddb0938b7c2dc68479c089be5a0ad50be39890ea21ff4613a44c29837c02d30e666c4f17373238cfcfe1476b88
   languageName: node
   linkType: hard
 
@@ -12124,7 +12124,7 @@ __metadata:
     "@eslint/js": "npm:10.0.1"
     "@eslint/plugin-kit": "npm:0.7.3"
     "@hmcts-cft/cft-ui-component-lib": "npm:0.1.0-alpha.4"
-    "@hmcts-cft/docweave": "npm:0.8.0"
+    "@hmcts-cft/docweave": "npm:0.9.0"
     "@hmcts/info-provider": "npm:1.4.0"
     "@hmcts/nodejs-healthcheck": "npm:1.8.6"
     "@hmcts/playwright-common": "npm:1.1.5"
