@@ -233,15 +233,17 @@ describe('make an order: deciding an application', () => {
         'Adjourn the hearing.',
         'Costs reserved.',
         '\u2022 The defendant is in hospital.',
-        '1. since Monday;',
+        'since Monday;',
         '\u2022 Counsel is unavailable.',
         'Liberty to apply.',
       ]);
-      // Clauses 1 and 2, the bullets, then clause 3: the order numbers its lists on from one another.
+      // Clauses 1 and 2, the bullets (their numbered list kept), then clause 3: the order numbers its lists on.
       expect(clauseLists()).toEqual([2, 1]);
+      const snapshot = JSON.stringify(JSON.parse(control<HTMLTextAreaElement>('#order-document').value).current);
+      expect(snapshot).toMatch(/"type":"bullet_list".*"type":"ordered_list".*since Monday;/);
     });
 
-    it('keeps what follows a subclause in that subclause, rather than starting another clause', async () => {
+    it('starts another clause with what follows a subclause, as a clause can only end with its subclauses', async () => {
       await app.close();
       app = await bootApp({
         application: {
@@ -259,7 +261,7 @@ describe('make an order: deciding an application', () => {
         'by 4pm.',
         'Costs reserved.',
       ]);
-      expect(clauseLists()).toEqual([2]);
+      expect(clauseLists()).toEqual([3]);
     });
   });
 
