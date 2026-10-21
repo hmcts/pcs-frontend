@@ -4,6 +4,7 @@ import {
   respondPossessionClaimApiData,
   submitCaseApiData,
 } from '../data/api-data';
+import { claimantCreateGenAppApiData } from '../data/api-data/claimantCreateGenApp.api.data';
 import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondPossessionClaimMidEvent.api.data';
 import { dashboard } from '../data/index.selector';
 import {
@@ -18,11 +19,15 @@ import { startEvidenceUpload, viewDocuments } from '../data/page-data/documents-
 import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
+import { user } from '../data/user-data';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
 
-const home_url = process.env.TEST_URL;
+const home_url = process.env.TEST_URL ? new URL(process.env.TEST_URL).origin : undefined;
+if (!home_url) {
+  throw new Error('TEST_URL must be set to run dashboard E2E tests.');
+}
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
@@ -31,7 +36,10 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.TENANCY_TYPE = 'INTRODUCTORY_TENANCY';
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
-  await performAction('submitCaseAPI', { data: submitCaseApiData.submitCasePayload });
+  const submitPayload = testInfo.title.includes('withoutNotice = NO')
+    ? { ...submitCaseApiData.submitCasePayload, claimantContactEmail: user.claimantSolicitor.email }
+    : submitCaseApiData.submitCasePayload;
+  await performAction('submitCaseAPI', { data: submitPayload });
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
   await performAction('updatePaymentAPI');
   await performAction('fetchPINsAPI');
@@ -173,6 +181,9 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('citizenCreateGenAppAPI', {
       data: citizenCreateGenAppApiData('SOMETHING_ELSE').citizenCreateGenAppPayload,
     });
+    await performAction('claimantCreateGenAppApi', {
+      data: claimantCreateGenAppApiData().claimantCreateGenAppPayload,
+    });
     await performAction('reloadPage');
     await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
     await performAction('clickLink', 'Sign out');
@@ -183,6 +194,11 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER, pinIndex: 1 });
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
     await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
+    await performAction('clickLink', dashboard.viewAllApplicationsLink);
+    await performValidation('text', {
+      elementType: 'subHeader',
+      text: `Applications made by ${submitCaseApiData.submitCasePayload.claimantName}`,
+    });
   });
 
   test('Validate notification and response status @crossbrowser', async ({ page }) => {
