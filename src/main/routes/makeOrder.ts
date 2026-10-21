@@ -6,8 +6,15 @@ import { MAKE_ORDER_ROUTE, MAKE_ORDER_SENT_FOR_REVIEW_ROUTE } from '../constants
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { type OrderFormSubmission, attendanceParties, orderFormModel } from '@utils/makeOrderForm';
-import { type MakeOrderValidationIssue, validateMakeOrder } from '@utils/makeOrderValidation';
+import {
+  type OrderFormSubmission,
+  attendanceParties,
+  caseFactsFromForm,
+  hearingRecordChanged,
+  orderFormModel,
+  withoutHearingRecord,
+} from '@utils/makeOrderForm';
+import { type MakeOrderValidationIssue, validateHearingRecord, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   type OrderStart,
   caseHeader,
@@ -28,14 +35,19 @@ interface StartedOrder {
 
 /**
  * Starts the judge's working order, or the order they chose on the case's orders tab: one a
- * caseworker returned to them, which pcs-api starts with the caseworker's query.
+ * caseworker returned to them, which pcs-api starts with the caseworker's query. A new order is
+ * made for the hearing the judge's link named, if it named one.
  */
-async function startOrderEvent(accessToken: string, caseReference: string, orderId?: string): Promise<StartedOrder> {
+async function startOrderEvent(
+  accessToken: string,
+  caseReference: string,
+  { orderId, hearingId }: { orderId?: string; hearingId?: string } = {}
+): Promise<StartedOrder> {
   const started = await ccdCaseService.startCaseEvent(
     accessToken,
     caseReference,
     MAKE_ORDER_EVENT_ID,
-    orderId ? { orderId } : undefined
+    orderId || hearingId ? { orderId, hearingId } : undefined
   );
   const payload = started.data.sdkEventPayload;
   if (!payload) {
@@ -49,6 +61,7 @@ async function startOrderEvent(accessToken: string, caseReference: string, order
 /** What the judge sent, shown back with the issues that stopped it; the saved order fills any gaps. */
 interface Submission extends OrderFormSubmission {
   validationIssues: MakeOrderValidationIssue[];
+  hearingVersion?: string;
 }
 
 function pageModel(
@@ -68,6 +81,7 @@ function pageModel(
     order,
     // The page's start, which its submissions reuse so CCD takes a repeated one, e.g. a double click, as the same.
     eventToken,
+    hearingVersion: submission?.hearingVersion ?? String(envelope.hearing?.version ?? ''),
     // The task the judge came from, if a caseworker's query brought them here, which pcs-api closes on resubmission.
     taskId: typeof req.query.taskId === 'string' ? req.query.taskId : '',
     ...orderFormModel(envelope, submission),
@@ -83,9 +97,14 @@ function pageModel(
   };
 }
 
-/** The order the orders tab linked to, which the page's URL names for as long as the judge works on it. */
-function chosenOrderId(req: Request): string | undefined {
-  return typeof req.query.orderId === 'string' ? req.query.orderId : undefined;
+/**
+ * The order the orders tab linked to, or the hearing the judge's link named, which the page's URL keeps for as long
+ * as the judge works on the order.
+ */
+function chosen(req: Request): { orderId?: string; hearingId?: string } {
+  const named = (name: string): string | undefined =>
+    typeof req.query[name] === 'string' ? (req.query[name] as string) : undefined;
+  return { orderId: named('orderId'), hearingId: named('hearingId') };
 }
 
 export default function makeOrderRoutes(app: Application): void {
@@ -96,7 +115,7 @@ export default function makeOrderRoutes(app: Application): void {
       const started = await startOrderEvent(
         req.session.user!.accessToken,
         req.params.caseReference as string,
-        chosenOrderId(req)
+        chosen(req)
       );
       res.render('make-order', pageModel(req, started));
     } catch (error) {
@@ -107,25 +126,55 @@ export default function makeOrderRoutes(app: Application): void {
   app.post(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
-    const { _csrf, action, eventToken, orderId, taskId, orderVersion, orderType, orderDocument, ...formData } =
-      req.body;
+    const {
+      _csrf,
+      action,
+      eventToken,
+      orderId,
+      taskId,
+      orderVersion,
+      hearing: _hearing,
+      hearingVersion = '',
+      orderType,
+      orderDocument,
+      ...formData
+    } = req.body;
 
     try {
       // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
       // blocks, and could change it. The event token, order id and version stay the page's: CCD takes a
       // repeated submission as the one already made, and pcs-api refuses the change if the order has moved on.
-      const started = await startOrderEvent(accessToken, caseReference, chosenOrderId(req));
-      if (action === 'SUBMIT_FOR_REVIEW') {
-        const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(started.envelope));
-        if (validationIssues.length) {
-          // Nothing was submitted, so the page keeps its token and the version its answers were made against:
-          // if the draft was saved elsewhere meanwhile, pcs-api refuses the retry rather than overwriting it.
-          const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
-          const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues };
-          return res
-            .status(400)
-            .render('make-order', pageModel(req, { eventToken, envelope: { ...started.envelope, order } }, submission));
-        }
+      const started = await startOrderEvent(accessToken, caseReference, chosen(req));
+      const currentHearing = started.envelope.hearing;
+      const hearingChanged = !!currentHearing && hearingRecordChanged(currentHearing, formData);
+      if (hearingChanged && hearingVersion !== String(currentHearing.version ?? '')) {
+        // Reload stale facts rather than silently applying the judge's edits to a newer version.
+        return res.status(409).render(
+          'make-order',
+          pageModel(req, started, {
+            validationIssues: [
+              {
+                id: 'make-order-form',
+                message: 'The hearing facts or notes have changed. Check the reloaded details before saving again.',
+              },
+            ],
+          })
+        );
+      }
+      // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
+      const validationIssues =
+        action === 'SUBMIT_FOR_REVIEW'
+          ? validateMakeOrder(orderType, formData, attendanceParties(started.envelope))
+          : currentHearing
+            ? validateHearingRecord(formData)
+            : [];
+      if (validationIssues.length) {
+        // Nothing was submitted, so keep the token and versions the answers were made against.
+        const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
+        const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues, hearingVersion };
+        return res
+          .status(400)
+          .render('make-order', pageModel(req, { eventToken, envelope: { ...started.envelope, order } }, submission));
       }
       const request = {
         action,
@@ -133,10 +182,21 @@ export default function makeOrderRoutes(app: Application): void {
           id: orderId || null,
           version: Number(orderVersion),
           orderType,
-          formData,
+          formData: withoutHearingRecord(formData),
           docweaveSnapshot: postedSnapshot(orderDocument),
         },
         taskId: taskId || null,
+        // Only send facts and a note when they differ; pcs-api checks the version again when saving.
+        hearing: currentHearing
+          ? {
+              id: currentHearing.id,
+              version: currentHearing.version ?? null,
+              ...(hearingChanged && {
+                caseFacts: caseFactsFromForm(formData),
+                note: formData['hearing-notes'] || null,
+              }),
+            }
+          : null,
       };
       try {
         await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
@@ -148,7 +208,7 @@ export default function makeOrderRoutes(app: Application): void {
         }
         // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
         // tab: show the judge the order as it now stands, and why.
-        const current = await startOrderEvent(accessToken, caseReference, chosenOrderId(req));
+        const current = await startOrderEvent(accessToken, caseReference, chosen(req));
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }

@@ -22,6 +22,7 @@
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="taskId" value="{{ taskId }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
+  <input type="hidden" name="hearingVersion" value="{{ hearingVersion }}">
   {{ csrfProtection(csrfToken) }}
 
   <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make an order</h1>
@@ -45,8 +46,6 @@
       attributes: { id: "caseworker-query" }
     }) }}
   {% endif %}
-
-  <p class="govuk-body">Answer every question unless it says it is optional.</p>
 
   {% include "make-order/_form.njk" %}
 
