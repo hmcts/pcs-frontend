@@ -7,6 +7,7 @@ import {
   control,
   openPage,
   recordAttendance,
+  refuseNextEvent,
   selectTab,
   startClientContexts,
   submittedOrders,
@@ -84,6 +85,111 @@ describe('make an order: for a hearing', () => {
       'Demoted tenancy',
       'Other',
     ]);
+  });
+
+  it('posts edits without the hearing snapshot or historical notes, and ignores a forged snapshot', async () => {
+    app = await bootApp({ hearing: { ...HEARING, version: 3 } });
+    const page = await openPage((await app.get(FOR_HEARING)).text);
+    const body = page.body('SAVE_DRAFT');
+
+    expect(body.has('hearing')).toBe(false);
+    expect(body.has('caseContext')).toBe(false);
+    expect([...body.values()].join(' ')).not.toContain('Read the papers.');
+    body.set('hearing', 'not even JSON');
+    body.set('hearing-notes', 'The judge changed this note.');
+    expect((await app.post(FOR_HEARING, body)).status).toBe(302);
+    expect(submittedOrders().at(-1)?.hearing).toMatchObject({
+      id: 7,
+      version: 3,
+      note: 'The judge changed this note.',
+    });
+    expect(submittedOrders().at(-1)?.order).not.toHaveProperty(['formData', 'hearing']);
+  });
+
+  it('reloads stale hearing edits and lets the judge save against the new version', async () => {
+    app = await bootApp({ hearing: { ...HEARING, version: 3 } });
+    const firstTab = (await app.get(FOR_HEARING)).text;
+    const second = await openPage((await app.get(FOR_HEARING)).text);
+    type('hearing-notes', 'Changed in the other tab.');
+    await app.post(FOR_HEARING, second.body('SAVE_DRAFT'));
+
+    const first = await openPage(firstTab);
+    type('current-rent', '950.50');
+    const stale = await app.post(FOR_HEARING, first.body('SAVE_DRAFT'));
+    expect(stale.status).toBe(409);
+    expect(submittedOrders()).toHaveLength(1);
+    const retry = await openPage(stale.text);
+    expect(control('#make-order-error-summary').textContent).toContain('hearing facts or notes have changed');
+    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('Changed in the other tab.');
+    expect(retry.body().get('hearingVersion')).toBe('4');
+    type('current-rent', '950.50');
+    expect((await app.post(FOR_HEARING, retry.body('SAVE_DRAFT'))).status).toBe(302);
+    expect(submittedOrders().at(-1)?.hearing).toMatchObject({
+      id: 7,
+      version: 4,
+      caseFacts: { currentRent: 950.5 },
+      note: 'Changed in the other tab.',
+    });
+  });
+
+  it('does not update hearing values that already match, even from an older version', async () => {
+    app = await bootApp({ hearing: { ...HEARING, version: 3 } });
+    const firstTab = (await app.get(FOR_HEARING)).text;
+    const second = await openPage((await app.get(FOR_HEARING)).text);
+    type('hearing-notes', 'The same note.');
+    await app.post(FOR_HEARING, second.body('SAVE_DRAFT'));
+
+    const first = await openPage(firstTab);
+    type('hearing-notes', 'The same note.');
+    expect((await app.post(FOR_HEARING, first.body('SAVE_DRAFT'))).status).toBe(302);
+    expect(submittedOrders().at(-1)?.hearing).toEqual({ id: 7, version: 4 });
+  });
+
+  it('keeps the hearing version through validation errors and rejects a retry if it has since changed', async () => {
+    app = await bootApp({ hearing: { ...HEARING, version: 3 } });
+    const page = await openPage((await app.get(FOR_HEARING)).text);
+    type('current-rent', '950.505');
+    const invalid = await app.post(FOR_HEARING, page.body('SAVE_DRAFT'));
+    expect(invalid.status).toBe(400);
+    const retryBody = (await openPage(invalid.text)).body('SAVE_DRAFT');
+    expect(retryBody.get('hearingVersion')).toBe('3');
+    retryBody.set('current-rent', '950.50');
+
+    const other = await openPage((await app.get(FOR_HEARING)).text);
+    type('hearing-notes', 'Changed elsewhere.');
+    await app.post(FOR_HEARING, other.body('SAVE_DRAFT'));
+    expect((await app.post(FOR_HEARING, retryBody)).status).toBe(409);
+    expect(submittedOrders()).toHaveLength(1);
+  });
+
+  it('treats an unrecorded hearing as a version that can become stale', async () => {
+    app = await bootApp({ hearing: HEARING });
+    const firstTab = (await app.get(FOR_HEARING)).text;
+    const second = await openPage((await app.get(FOR_HEARING)).text);
+    expect(second.body().get('hearingVersion')).toBe('');
+    type('hearing-notes', 'First recorded note.');
+    await app.post(FOR_HEARING, second.body('SAVE_DRAFT'));
+
+    const first = await openPage(firstTab);
+    type('hearing-notes', 'A competing first note.');
+    expect((await app.post(FOR_HEARING, first.body('SAVE_DRAFT'))).status).toBe(409);
+    expect(submittedOrders()).toHaveLength(1);
+  });
+
+  it('reloads the hearing and version when the API refuses a save', async () => {
+    app = await bootApp({ hearing: { ...HEARING, version: 3 } });
+    const page = await openPage((await app.get(FOR_HEARING)).text);
+    type('hearing-notes', 'Attempted change.');
+    const body = page.body('SAVE_DRAFT');
+    refuseNextEvent('The hearing record has changed.');
+    const refused = await app.post(FOR_HEARING, body);
+    expect(refused.status).toBe(422);
+    const retry = await openPage(refused.text);
+    expect(retry.body().get('eventToken')).not.toBe(body.get('eventToken'));
+    expect(retry.body().get('hearingVersion')).toBe('3');
+    type('hearing-notes', 'Checked the latest note.');
+    expect((await app.post(FOR_HEARING, retry.body('SAVE_DRAFT'))).status).toBe(302);
+    expect(submittedOrders().at(-1)?.hearing).toMatchObject({ id: 7, version: 3, note: 'Checked the latest note.' });
   });
 
   it("offers a Welsh case's contracts as its tenancy types", async () => {

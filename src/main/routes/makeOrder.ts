@@ -16,7 +16,6 @@ import {
 } from '@utils/makeOrderForm';
 import { type MakeOrderValidationIssue, validateHearingRecord, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
-  type OrderHearing,
   type OrderStart,
   caseHeader,
   confirmationHeader,
@@ -62,6 +61,7 @@ async function startOrderEvent(
 /** What the judge sent, shown back with the issues that stopped it; the saved order fills any gaps. */
 interface Submission extends OrderFormSubmission {
   validationIssues: MakeOrderValidationIssue[];
+  hearingVersion?: string;
 }
 
 function pageModel(
@@ -81,6 +81,7 @@ function pageModel(
     order,
     // The page's start, which its submissions reuse so CCD takes a repeated one, e.g. a double click, as the same.
     eventToken,
+    hearingVersion: submission?.hearingVersion ?? String(envelope.hearing?.version ?? ''),
     // The task the judge came from, if a caseworker's query brought them here, which pcs-api closes on resubmission.
     taskId: typeof req.query.taskId === 'string' ? req.query.taskId : '',
     ...orderFormModel(envelope, submission),
@@ -125,37 +126,55 @@ export default function makeOrderRoutes(app: Application): void {
   app.post(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
-    const { _csrf, action, eventToken, orderId, taskId, orderVersion, hearing, orderType, orderDocument, ...formData } =
-      req.body;
+    const {
+      _csrf,
+      action,
+      eventToken,
+      orderId,
+      taskId,
+      orderVersion,
+      hearing: _hearing,
+      hearingVersion = '',
+      orderType,
+      orderDocument,
+      ...formData
+    } = req.body;
 
     try {
       // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
       // blocks, and could change it. The event token, order id and version stay the page's: CCD takes a
       // repeated submission as the one already made, and pcs-api refuses the change if the order has moved on.
       const started = await startOrderEvent(accessToken, caseReference, chosen(req));
-      // Keep the hearing's original facts and version so changes are checked against what the judge saw.
-      const startedHearing: OrderHearing | null = JSON.parse(hearing || 'null');
+      const currentHearing = started.envelope.hearing;
+      const hearingChanged = !!currentHearing && hearingRecordChanged(currentHearing, formData);
+      if (hearingChanged && hearingVersion !== String(currentHearing.version ?? '')) {
+        // Reload stale facts rather than silently applying the judge's edits to a newer version.
+        return res.status(409).render(
+          'make-order',
+          pageModel(req, started, {
+            validationIssues: [
+              {
+                id: 'make-order-form',
+                message: 'The hearing facts or notes have changed. Check the reloaded details before saving again.',
+              },
+            ],
+          })
+        );
+      }
       // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
       const validationIssues =
         action === 'SUBMIT_FOR_REVIEW'
           ? validateMakeOrder(orderType, formData, attendanceParties(started.envelope))
-          : startedHearing
+          : currentHearing
             ? validateHearingRecord(formData)
             : [];
       if (validationIssues.length) {
         // Nothing was submitted, so keep the token and versions the answers were made against.
         const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
-        const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues };
+        const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues, hearingVersion };
         return res
           .status(400)
-          .render(
-            'make-order',
-            pageModel(
-              req,
-              { eventToken, envelope: { ...started.envelope, order, hearing: startedHearing } },
-              submission
-            )
-          );
+          .render('make-order', pageModel(req, { eventToken, envelope: { ...started.envelope, order } }, submission));
       }
       const request = {
         action,
@@ -167,13 +186,12 @@ export default function makeOrderRoutes(app: Application): void {
           docweaveSnapshot: postedSnapshot(orderDocument),
         },
         taskId: taskId || null,
-        // pcs-api records the hearing's facts and note only if the judge changed them, so a save that left
-        // them alone is not refused because another judge has since changed them.
-        hearing: startedHearing
+        // Only send facts and a note when they differ; pcs-api checks the version again when saving.
+        hearing: currentHearing
           ? {
-              id: startedHearing.id,
-              version: startedHearing.version ?? null,
-              ...(hearingRecordChanged(startedHearing, formData) && {
+              id: currentHearing.id,
+              version: currentHearing.version ?? null,
+              ...(hearingChanged && {
                 caseFacts: caseFactsFromForm(formData),
                 note: formData['hearing-notes'] || null,
               }),

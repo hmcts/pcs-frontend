@@ -22,9 +22,7 @@
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="taskId" value="{{ taskId }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
-  {% if hearing %}
-    <input type="hidden" name="hearing" value="{{ hearing | dump }}">
-  {% endif %}
+  <input type="hidden" name="hearingVersion" value="{{ hearingVersion }}">
   {{ csrfProtection(csrfToken) }}
 
   <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make an order</h1>
