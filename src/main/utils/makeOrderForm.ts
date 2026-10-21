@@ -71,7 +71,10 @@ export function caseFactsFromForm(formData: FormData): Record<string, unknown> {
   return facts;
 }
 
-const noteText = (note: unknown): string => String(note ?? '').replace(/\r\n/g, '\n').trim();
+const noteText = (note: unknown): string =>
+  String(note ?? '')
+    .replace(/\r\n/g, '\n')
+    .trim();
 
 /** Whether the judge changed the hearing's facts or note from those the page started with. */
 export function hearingRecordChanged(started: OrderHearing, formData: FormData): boolean {

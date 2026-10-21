@@ -166,9 +166,11 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   overflow-y: auto;
   border: 1px solid $govuk-border-colour;
   background:
-    linear-gradient(rgb(govuk-colour("white"), 0), govuk-colour("white") 70%) bottom / 100% govuk-spacing(4) no-repeat local,
-    radial-gradient(farthest-side at 50% 100%, rgb(govuk-colour("black"), .2), transparent) bottom / 100% govuk-spacing(2) no-repeat scroll,
-    govuk-colour("white");
+    linear-gradient(rgb(govuk-colour('white'), 0), govuk-colour('white') 70%) bottom / 100% govuk-spacing(4) no-repeat
+      local,
+    radial-gradient(farthest-side at 50% 100%, rgb(govuk-colour('black'), 0.2), transparent) bottom / 100%
+      govuk-spacing(2) no-repeat scroll,
+    govuk-colour('white');
 }
 
 .pcs-hearing-notes__list {
