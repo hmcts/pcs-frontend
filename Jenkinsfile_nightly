@@ -2,7 +2,7 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('H 07 * * 1-5\n0 10 * * 3')]),
+  pipelineTriggers([cron('H 07 * * 1-5\n0 12 * * 3')]),
   parameters([
     text(
       name: 'MANUAL_BUILD_REASON',
@@ -201,6 +201,7 @@ def runE2ETests(yarnBuilder) {
       runE2eStage(yarnBuilder, row.project, row.browser, row.label)
     }
   }
+}
 }
 
 
