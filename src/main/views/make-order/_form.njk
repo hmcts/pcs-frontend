@@ -11,7 +11,10 @@
 {% include "make-order/_application.njk" %}
 {% include "make-order/_application-decision.njk" %}
 {% else %}
-{% include "make-order/_case-facts.njk" %}
+{# Only an order made for a hearing has the case's facts and the hearing's note. #}
+{% if hearing %}
+  {% include "make-order/_case-facts.njk" %}
+{% endif %}
 {% include "make-order/_attendance.njk" %}
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>

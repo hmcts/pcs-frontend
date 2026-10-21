@@ -5,6 +5,7 @@ import {
   check,
   control,
   openPage,
+  startClientContexts,
   submittedOrders,
   type,
   typeDate,
@@ -82,6 +83,8 @@ describe('make an order: deciding an application', () => {
     expect((await app.post(PAGE, body)).status).toBe(302);
     const [submitted] = submittedOrders() as { order: Record<string, unknown> }[];
     expect(submitted.order.genAppId).toBe('gen-app-1');
+    expect((submitted as { hearing?: unknown }).hearing).toBeNull();
+    expect(startClientContexts()).toEqual([{ genAppId: 'gen-app-1' }, { genAppId: 'gen-app-1' }]);
     expect(submitted.order.orderType).toBe('APPLICATION_DECISION');
   });
 

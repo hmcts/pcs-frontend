@@ -34,6 +34,7 @@ interface Envelope {
     genAppId?: string;
   };
   caseContext: Record<string, unknown>;
+  hearing?: Record<string, unknown> | null;
 }
 
 const blankCase = (): Envelope => ({
@@ -43,8 +44,16 @@ const blankCase = (): Envelope => ({
     propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
     claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
     defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
-    // Arrears on issue as pcs-api sent it before HDPI-6373 had the judge fill it in; the page ignores it.
-    caseFacts: { tenancyStartDate: '2024-01-09', currentRent: 750, arrearsOnIssue: 2400 },
+  },
+  // The hearing the order is made for, starting from the claim's facts.
+  hearing: {
+    id: 1,
+    date: '2026-10-13T10:00:00',
+    version: null,
+    caseFacts: { tenancyStartDate: '2024-01-09', currentRent: 750 },
+    recorded: null,
+    note: null,
+    earlierNotes: [],
   },
 });
 
@@ -56,6 +65,16 @@ let startTokens: string[] = [];
 
 /** The tokens the make order event has been submitted with, in order. */
 let submittedTokens: string[] = [];
+
+/** The client context each event start was given, in order: what the user's link chose. */
+let startContexts: (Record<string, unknown> | undefined)[] = [];
+
+export function startClientContexts(): (Record<string, unknown> | undefined)[] {
+  return startContexts;
+}
+
+/** What CCD answered each event token it has taken, so it can answer a repeat without applying it again. */
+let answers = new Map<string, Record<string, unknown>>();
 
 /** How many times the make order event has been started. */
 export function eventStarts(): number {
@@ -125,6 +144,8 @@ function ccdStub(): Express {
   ccd.use(express.json({ limit: '10mb' }));
   ccd.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
     const event = req.params.event as string;
+    const clientContext = req.headers['client-context'];
+    startContexts.push(typeof clientContext === 'string' ? JSON.parse(clientContext) : undefined);
     if (startRefusal && mayUse(req, event)) {
       const reason = startRefusal;
       startRefusal = undefined;
@@ -145,6 +166,11 @@ function ccdStub(): Express {
     if (!startTokens.includes(req.body.event_token)) {
       return res.status(404).json({ message: 'Cannot find matching start trigger' });
     }
+    // CCD keys a submission by its token: a repeat gets the first one's answer and changes nothing.
+    const answered = answers.get(req.body.event_token);
+    if (answered) {
+      return res.json(answered);
+    }
     if (refusal) {
       const reason = refusal;
       refusal = undefined;
@@ -153,9 +179,19 @@ function ccdStub(): Express {
     const posted = JSON.parse(req.body.data.sdkEventPayload);
     if (event === CONFIRM_ORDER_REVIEW) {
       reviewRequests.push(posted);
-      return res.json({ id: req.params.id, data: {} });
+      answers.set(req.body.event_token, { id: req.params.id, data: {} });
+      return res.json(answers.get(req.body.event_token));
     }
     orderRequests.push(posted);
+    // pcs-api records the hearing's facts and note only when changed, apart from the order.
+    if (posted.hearing?.caseFacts && envelope.hearing) {
+      envelope.hearing = {
+        ...envelope.hearing,
+        version: Number(envelope.hearing.version ?? -1) + 1,
+        caseFacts: posted.hearing.caseFacts,
+        note: posted.hearing.note,
+      };
+    }
     envelope = {
       ...envelope,
       order: {
@@ -167,7 +203,8 @@ function ccdStub(): Express {
         genAppId: posted.order.genAppId ?? envelope.order.genAppId,
       },
     };
-    res.json({ id: req.params.id, data: {} });
+    answers.set(req.body.event_token, { id: req.params.id, data: {} });
+    res.json(answers.get(req.body.event_token));
   });
   return ccd;
 }
@@ -211,6 +248,8 @@ export async function bootApp(
     order?: Partial<Envelope['order']>;
     /** The general application court staff referred to the judge, which the judge's order decides. */
     application?: Record<string, unknown> & { id: string };
+    /** The hearing pcs-api starts the event for, over the default one, or null for an order made without one. */
+    hearing?: Record<string, unknown> | null;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -223,9 +262,15 @@ export async function bootApp(
   if (options.application) {
     envelope.caseContext.application = options.application;
     envelope.order.genAppId = options.application.id;
+    envelope.hearing = null;
+  }
+  if (options.hearing !== undefined) {
+    envelope.hearing = options.hearing && { ...envelope.hearing, ...options.hearing };
   }
   startTokens = [];
+  startContexts = [];
   submittedTokens = [];
+  answers = new Map();
   reviewRequests = [];
   orderRequests = [];
   startRefusal = undefined;
