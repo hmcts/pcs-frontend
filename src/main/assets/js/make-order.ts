@@ -150,7 +150,7 @@ const DAYS_PER_RENT_PERIOD: Record<string, number> = { WEEKLY: 7, FORTNIGHTLY: 1
 export function initCaseFactDefaults(form: HTMLFormElement): void {
   const field = (name: string): string =>
     form.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${name}"]`)?.value.trim() ?? '';
-  fillFromCaseFacts(form, ['arrears-today'], ['outright-mj-arrears', 'suspended-arrears'], () =>
+  fillFromCaseFacts(form, ['arrears-today'], ['outright-mj-arrears', 'suspended-arrears', 'warrant-arrears'], () =>
     field('arrears-today')
   );
   fillFromCaseFacts(form, ['current-rent', 'rent-frequency'], ['outright-use-occupation-rate'], () => {
@@ -214,16 +214,14 @@ export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
   return builders[type](readOrderData(form));
 }
 
-/** Whether a hearing the judge lists the application for is on notice, asked only while they are listing it. */
-export function initApplicationListing(form: HTMLFormElement): void {
-  const listing = form.querySelector<HTMLElement>('[data-application-listing]');
-  if (!listing) {
-    return;
-  }
+/** What follows a decision on an application, such as whether a hearing is on notice, asked only while it is chosen. */
+export function initApplicationDecision(form: HTMLFormElement): void {
   form.addEventListener('change', event => {
     const decision = event.target as HTMLInputElement;
     if (decision.name === 'application-decision') {
-      listing.hidden = decision.value !== 'list';
+      form.querySelectorAll<HTMLElement>('[data-decision-shows]').forEach(follows => {
+        follows.hidden = follows.dataset.decisionShows !== decision.value;
+      });
     }
   });
 }
@@ -234,12 +232,18 @@ function applicationDecision(form: HTMLFormElement): string {
 }
 
 /**
- * Adds the applicant's wording to the order as the judge's own numbered clauses, straight after "IT IS
- * ORDERED THAT", to change or delete as they would their own.
+ * Adds the applicant's wording to the order as the judge's own clauses, straight after "IT IS ORDERED THAT", to
+ * change or delete as they would their own. Rich text goes in as the applicant formatted it, so the clauses keep
+ * the numbers the applicant's cross-references use; plain text is numbered a paragraph to a clause.
  */
 function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController): void {
-  const wording = form.querySelector<HTMLElement>('[data-application]')?.dataset.applicationWording ?? '';
-  editor.insert(requestedParagraphs(wording), { at: { after: 'paragraph:ordered-that' }, numbered: true });
+  const panel = form.querySelector<HTMLElement>('[data-application]');
+  const at = { after: 'paragraph:ordered-that' };
+  if (panel?.dataset.applicationWordingHtml) {
+    editor.insertHtml(panel.dataset.applicationWordingHtml, { at });
+    return;
+  }
+  editor.insert(requestedParagraphs(panel?.dataset.applicationWording ?? ''), { at, numbered: true });
 }
 
 export function initMakeOrder(): void {
@@ -356,7 +360,7 @@ export function initMakeOrder(): void {
   form.addEventListener('submit', followTab);
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
-  initApplicationListing(form);
+  initApplicationDecision(form);
 }
 
 /**

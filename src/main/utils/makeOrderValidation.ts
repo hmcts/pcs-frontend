@@ -137,28 +137,33 @@ function validateCosts(formData: Record<string, unknown>, suspended: boolean): M
   return error ? [{ id, message: error }] : [];
 }
 
-function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+/** The arrears a suspension is conditional on and how they are paid, asked with ids that start with the prefix. */
+function validatePaymentConditions(formData: Record<string, unknown>, prefix: string): MakeOrderValidationIssue[] {
   const { issues, add, money, date, frequency } = validation(formData);
-  const terms = values(formData, 'suspended-payment-terms');
+  const terms = values(formData, `${prefix}-payment-terms`);
 
-  date('suspended-by-date', 'Enter a valid possession date');
-  money('suspended-arrears', 'Enter valid arrears');
+  money(`${prefix}-arrears`, 'Enter valid arrears');
   add(
     terms.includes('one-off') || terms.includes('instalments'),
-    'suspended-payment-terms',
+    `${prefix}-payment-terms`,
     'Select a one-off payment or instalments'
   );
   if (terms.includes('one-off')) {
-    money('suspended-oneoff-amount', 'Enter a valid one-off payment amount');
-    date('suspended-oneoff-date', 'Enter a valid one-off payment date');
+    money(`${prefix}-oneoff-amount`, 'Enter a valid one-off payment amount');
+    date(`${prefix}-oneoff-date`, 'Enter a valid one-off payment date');
   }
   if (terms.includes('instalments')) {
-    money('suspended-instalment-amount', 'Enter a valid instalment amount');
-    frequency('suspended-instalment-frequency', 'Select weekly, fortnightly or monthly instalments');
-    date('suspended-instalment-date', 'Enter a valid first instalment date');
+    money(`${prefix}-instalment-amount`, 'Enter a valid instalment amount');
+    frequency(`${prefix}-instalment-frequency`, 'Select weekly, fortnightly or monthly instalments');
+    date(`${prefix}-instalment-date`, 'Enter a valid first instalment date');
   }
+  return issues;
+}
 
-  return [...issues, ...validateCosts(formData, true)];
+function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const { issues, date } = validation(formData);
+  date('suspended-by-date', 'Enter a valid possession date');
+  return [...issues, ...validatePaymentConditions(formData, 'suspended'), ...validateCosts(formData, true)];
 }
 
 function validateOutright(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
@@ -332,11 +337,22 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
   return issues;
 }
 
-export const APPLICATION_DECISIONS = ['grant', 'dismiss', 'strike-out', 'list', 'other'] as const;
+export const APPLICATION_DECISIONS = [
+  'grant',
+  'dismiss',
+  'strike-out',
+  'list',
+  'other',
+  'suspend-warrant',
+  'refuse-warrant-suspension',
+] as const;
 
-/** What the judge decides about the application, and whether a hearing they list it for is on notice. */
+/**
+ * What the judge decides about the application, whether a hearing they list it for is on notice, the conditions
+ * if they suspend the warrant of possession, or when the eviction may go ahead if they refuse to.
+ */
 function validateApplicationDecision(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const { issues, add } = validation(formData);
+  const { issues, add, date } = validation(formData);
   const decision = value(formData, 'application-decision');
   add(
     (APPLICATION_DECISIONS as readonly string[]).includes(decision),
@@ -349,6 +365,12 @@ function validateApplicationDecision(formData: Record<string, unknown>): MakeOrd
       'application-list-notice',
       'Select whether the hearing is on notice'
     );
+  }
+  if (decision === 'suspend-warrant') {
+    issues.push(...validatePaymentConditions(formData, 'warrant'));
+  }
+  if (decision === 'refuse-warrant-suspension') {
+    date('warrant-eviction-date', 'Enter a valid date the eviction may take place');
   }
   return [...issues, ...validateCosts(formData, false)];
 }

@@ -1,6 +1,16 @@
 import { requestedParagraphs } from '../../main/assets/js/make-order/wording/application';
 
-import { CASE_REFERENCE, type TestApp, bootApp, check, control, openPage, submittedOrders, type } from './harness';
+import {
+  CASE_REFERENCE,
+  type TestApp,
+  bootApp,
+  check,
+  control,
+  openPage,
+  submittedOrders,
+  type,
+  typeDate,
+} from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order?genAppId=gen-app-1`;
 
@@ -149,13 +159,187 @@ describe('make an order: deciding an application', () => {
 
   it('lists the application for a hearing, on notice unless the judge says otherwise', async () => {
     const page = await openPage((await app.get(PAGE)).text);
-    const listing = document.querySelector<HTMLElement>('[data-application-listing]');
+    const listing = document.querySelector<HTMLElement>('[data-decision-shows="list"]');
     expect(listing?.hidden).toBe(true);
     check('application-decision', 'list');
     expect(listing?.hidden).toBe(false);
     expect(page.orderText()).toContain('The application is listed for a hearing on notice to the other parties.');
     check('application-list-notice', 'without-notice');
     expect(page.orderText()).toContain('The application is listed for a hearing without notice.');
+  });
+
+  describe('when the applicant wrote rich text in XUI', () => {
+    const RICH = {
+      ...APPLICATION,
+      whatOrderWanted:
+        '<p>The defendant asks that:</p><ol><li><p>The hearing on 14 October is <strong>adjourned</strong>.</p>' +
+        '<ol><li><p>to a date after 28 days;</p></li></ol></li>' +
+        '<li><p>Unless the defendant complies with paragraph 1 above, costs are reserved.</p></li></ol>' +
+        '<script>alert(1)</script><p onclick="steal()">Why: <img src="x" onerror="steal()">counsel is unwell.</p>',
+    };
+
+    beforeEach(async () => {
+      await app.close();
+      app = await bootApp({ application: RICH });
+    });
+
+    it('shows the order asked for as the applicant formatted it, without anything unsafe', async () => {
+      await openPage((await app.get(PAGE)).text);
+      const requested = control<HTMLElement>('#application-requested');
+      expect([...requested.querySelectorAll(':scope ol > li')].map(item => item.textContent)).toEqual([
+        'The hearing on 14 October is adjourned.to a date after 28 days;',
+        'to a date after 28 days;',
+        'Unless the defendant complies with paragraph 1 above, costs are reserved.',
+      ]);
+      expect(requested.querySelector('strong')?.textContent).toBe('adjourned');
+      expect(requested.querySelector('script, img, [onclick]')).toBeNull();
+      expect(requested.textContent).toContain('Why: counsel is unwell.');
+    });
+
+    it("keeps the applicant's paragraphs, numbering and bold text in the order, so paragraph 1 is still clause 1", async () => {
+      const page = await openPage((await app.get(PAGE)).text);
+      check('application-decision', 'grant');
+
+      expect(page.documentText().split('\n').slice(2)).toEqual([
+        'IT IS ORDERED THAT:',
+        'The defendant asks that:',
+        'The hearing on 14 October is adjourned.',
+        'to a date after 28 days;',
+        'Unless the defendant complies with paragraph 1 above, costs are reserved.',
+        'Why: counsel is unwell.',
+      ]);
+      // One numbered list of two clauses, the first with its own subclause, and the first of the order's lists.
+      expect(clauseLists()).toEqual([2]);
+      const snapshot = JSON.stringify(JSON.parse(control<HTMLTextAreaElement>('#order-document').value).current);
+      expect(snapshot).toContain('"marks":[{"type":"strong"}],"text":"adjourned"');
+      expect(snapshot).toMatch(/"type":"list_item".*"type":"ordered_list".*to a date after 28 days/);
+    });
+
+    it("keeps bullets out of the clause numbers, so the applicant's next numbered clause keeps its number", async () => {
+      await app.close();
+      app = await bootApp({
+        application: {
+          ...RICH,
+          whatOrderWanted:
+            '<ol><li><p>Adjourn the hearing.</p></li><li><p>Costs reserved.</p></li></ol>' +
+            '<ul><li><p>The defendant is in hospital.</p><ol><li><p>since Monday;</p></li></ol></li>' +
+            '<li>Counsel is unavailable.</li></ul>' +
+            '<ol start="3"><li><p>Liberty to apply.</p></li></ol>',
+        },
+      });
+      const page = await openPage((await app.get(PAGE)).text);
+      check('application-decision', 'grant');
+      expect(page.documentText().split('\n').slice(3)).toEqual([
+        'Adjourn the hearing.',
+        'Costs reserved.',
+        '\u2022 The defendant is in hospital.',
+        '1. since Monday;',
+        '\u2022 Counsel is unavailable.',
+        'Liberty to apply.',
+      ]);
+      // Clauses 1 and 2, the bullets, then clause 3: the order numbers its lists on from one another.
+      expect(clauseLists()).toEqual([2, 1]);
+    });
+
+    it('keeps what follows a subclause in that subclause, rather than starting another clause', async () => {
+      await app.close();
+      app = await bootApp({
+        application: {
+          ...RICH,
+          whatOrderWanted:
+            '<ol><li><p>The defendant must:</p><ol><li><p>pay the rent;</p></li></ol><p>by 4pm.</p></li>' +
+            '<li><p>Costs reserved.</p></li></ol>',
+        },
+      });
+      const page = await openPage((await app.get(PAGE)).text);
+      check('application-decision', 'grant');
+      expect(page.documentText().split('\n').slice(3)).toEqual([
+        'The defendant must:',
+        'pay the rent;',
+        'by 4pm.',
+        'Costs reserved.',
+      ]);
+      expect(clauseLists()).toEqual([2]);
+    });
+
+    it('tells the judge what of the formatting the order cannot keep', async () => {
+      await openPage((await app.get(PAGE)).text);
+      expect(control<HTMLElement>('#application-requested-not-kept').textContent?.trim()).toBe(
+        'If you use the applicant’s wording in the order, subclauses are numbered (i), (ii) and so on.'
+      );
+      await app.close();
+      app = await bootApp({ application: APPLICATION });
+      await openPage((await app.get(PAGE)).text);
+      expect(document.querySelector('#application-requested-not-kept')).toBeNull();
+    });
+  });
+
+  it('offers the decisions on an application to suspend the warrant on every application', async () => {
+    await openPage((await app.get(PAGE)).text);
+    const warrant = control<HTMLElement>('#application-decision-warrant').closest('fieldset');
+    expect(warrant?.querySelector('legend')?.textContent?.trim()).toBe(
+      'Application to suspend the warrant of possession'
+    );
+    expect([...(warrant?.querySelectorAll('label') ?? [])].map(label => label.textContent?.trim())).toEqual([
+      'Granted',
+      'Dismissed',
+    ]);
+  });
+
+  it('suspends the warrant of possession on the conditions a suspended possession order has', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    const conditions = control<HTMLElement>('[data-decision-shows="suspend-warrant"]');
+    expect(conditions.hidden).toBe(true);
+    check('application-decision', 'suspend-warrant');
+    expect(conditions.hidden).toBe(false);
+
+    type('warrant-arrears', '850');
+    check('warrant-payment-terms', 'instalments');
+    type('warrant-instalment-amount', '25');
+    type('warrant-instalment-frequency', 'weekly');
+    typeDate('warrant-instalment-date', '6', '11', '2026');
+
+    expect(page.orderText().split('\n').slice(2)).toEqual([
+      'IT IS ORDERED THAT:',
+      'The warrant of possession is suspended on condition that the defendant pays (i) the rent as it falls due plus (ii) the arrears of £850.00 by payments of £25.00 to the claimant every week, the first instalment to be paid on or before 6 November 2026.',
+      'Payment of the above instalments made to the claimant shall be applied first to any arrears prior to any order for costs.',
+    ]);
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    expect((await app.post(PAGE, body)).status).toBe(302);
+  });
+
+  it('needs the conditions to suspend the warrant', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    check('application-decision', 'suspend-warrant');
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    const rejected = await app.post(PAGE, body);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Enter valid arrears');
+    expect(rejected.text).toContain('Select a one-off payment or instalments');
+  });
+
+  it('dismisses an application to suspend the warrant, saying when the eviction may go ahead', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    check('application-decision', 'refuse-warrant-suspension');
+    expect(control<HTMLElement>('[data-decision-shows="refuse-warrant-suspension"]').hidden).toBe(false);
+    typeDate('warrant-eviction-date', '23', '10', '2026');
+
+    expect(page.orderText().split('\n').slice(3)).toEqual([
+      'The application to suspend the execution of the warrant of possession is dismissed.',
+      'For the avoidance of doubt subject to any further order of the court, the execution of the warrant of possession on 23 October 2026 may take place.',
+    ]);
+  });
+
+  it('needs the date the eviction may go ahead to dismiss an application to suspend the warrant', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    check('application-decision', 'refuse-warrant-suspension');
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    const rejected = await app.post(PAGE, body);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Enter a valid date the eviction may take place');
   });
 
   it('needs a decision before review', async () => {
@@ -165,5 +349,10 @@ describe('make an order: deciding an application', () => {
     const rejected = await app.post(PAGE, body);
     expect(rejected.status).toBe(400);
     expect(rejected.text).toContain('Select what you decide about the application');
+    await openPage(rejected.text);
+    // The decision is asked over two rows, and its error is shown once, on the first.
+    expect([...document.querySelectorAll('.govuk-error-message')].map(error => error.textContent?.trim())).toEqual([
+      'Error: Select what you decide about the application',
+    ]);
   });
 });

@@ -1,12 +1,10 @@
-import { type DocWeaveDocument, type InlineBuilder, buildDoc } from '@hmcts-cft/docweave';
+import { type DocWeaveDocument, buildDoc } from '@hmcts-cft/docweave';
 
 import { type OrderData } from '../data';
 
 import {
-  type PaymentTerm,
   SAME_TERMS_COSTS,
   addCosts,
-  addPaymentTerm,
   addPreamble,
   caseManCosts,
   date,
@@ -19,33 +17,13 @@ import {
   value,
   values,
 } from './common';
+import { addPaymentConditions } from './payment-conditions';
 
 export function buildSuspendedOrder(data: OrderData): DocWeaveDocument {
   const address = data.propertyAddress || '[property address not provided]';
-  const { claimant, defendant, defendantVerb } = partyLabels(data);
+  const { claimant, defendant } = partyLabels(data);
   const options = values(data, 'suspended-options');
-  const paymentTerms = values(data, 'suspended-payment-terms');
   const costs = caseManCosts(claimant, defendant);
-  const terms: Record<string, PaymentTerm> = {
-    'one-off': {
-      kind: 'one-off',
-      lead: 'payment of £',
-      afterAmount: ` to ${claimant}`,
-      fields: { amount: 'suspended-oneoff-amount', date: 'suspended-oneoff-date' },
-      facts: 'suspended-one-off',
-    },
-    instalments: {
-      kind: 'instalments',
-      lead: 'payments of £',
-      afterAmount: ` to ${claimant}`,
-      fields: {
-        amount: 'suspended-instalment-amount',
-        frequency: 'suspended-instalment-frequency',
-        date: 'suspended-instalment-date',
-      },
-      facts: 'suspended-instalment',
-    },
-  };
 
   return buildDoc(order => {
     addPreamble(order, data);
@@ -83,46 +61,11 @@ export function buildSuspendedOrder(data: OrderData): DocWeaveDocument {
       if (selected(data, 'costs', 'yes') && SAME_TERMS_COSTS.has(value(data, 'costs-choice'))) {
         suspended.push('enforcement of any order for costs');
       }
-      const condition = (content: InlineBuilder, ending: string): void => {
-        content
-          .text(
-            `${joinList(suspended)} ${suspended.length === 1 ? 'is' : 'are'} suspended as long as ${defendant} ${defendantVerb('pays', 'pay')} (i) the rent as it falls due plus (ii) the arrears of £`
-          )
-          .fact('suspended-arrears', money(value(data, 'suspended-arrears')), { sourceId: 'suspended-arrears' })
-          .text(ending);
-      };
-
-      if (paymentTerms.length === 1) {
-        list.item('suspended-condition', content => {
-          condition(content, ' by ');
-          addPaymentTerm(content, data, terms[paymentTerms[0]]);
-          content.text('.');
-        });
-      } else {
-        list.item(
-          'suspended-condition',
-          content => condition(content, ' by:'),
-          item => {
-            item.orderedList('suspended-payment-terms', subList => {
-              for (const key of ['one-off', 'instalments'].filter(term => paymentTerms.includes(term))) {
-                subList.item(`suspended-${key}`, content => {
-                  addPaymentTerm(content, data, terms[key]);
-                  content.text(';');
-                });
-              }
-              if (!paymentTerms.length) {
-                subList.item('suspended-missing-payment-term', content => {
-                  content.fact('missing', '[select a payment term]', { sourceId: 'suspended-payment-terms' }).text(';');
-                });
-              }
-            });
-          }
-        );
-      }
-
-      list.item(
-        'suspended-payment-priority',
-        `Payment of the above instalments made to ${claimant} shall be applied first to any arrears prior to any order for costs.`
+      addPaymentConditions(
+        list,
+        data,
+        'suspended',
+        `${joinList(suspended)} ${suspended.length === 1 ? 'is' : 'are'} suspended as long as`
       );
       list.item(
         'suspended-paid-in-full',
