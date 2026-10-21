@@ -246,3 +246,4 @@ def sendAllureReportToSlack(String browser, String reportSuffix) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }
 }
+}
