@@ -350,7 +350,12 @@ export function initMakeOrder(): void {
       }
     }
   });
-  form.addEventListener('input', render);
+  form.addEventListener('input', event => {
+    // A new decision is rendered once its own document is selected, on change, so it cannot overwrite the last one's.
+    if ((event.target as HTMLInputElement).name !== 'application-decision') {
+      render();
+    }
+  });
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
 
