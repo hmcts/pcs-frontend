@@ -4,6 +4,8 @@ import { type DocumentStorage, toDisplayDocuments } from '@modules/documents/sto
 import { Logger } from '@modules/logger';
 import type { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import { decodeBase64UrlJson } from '@utils/base64Json';
+import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
+import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 const logger = Logger.getLogger('form-builder-fileUploadUtils');
 
@@ -98,6 +100,7 @@ export async function wireFileUploadOnPostError(
   if (!fileField?.component) {
     return;
   }
+  fileField.component.disableContinueWhileUploading = await getLaunchDarklyFlag(req, RELEASE_1_4_ENABLED, false);
   const body = req.body as Record<string, unknown>;
   const parsed = parseUploadedDocumentsFromBody(body);
   fileField.component.value = parsed.length > 0 ? parsed : toDisplayDocuments(await documentStorage.read(req));

@@ -13,7 +13,8 @@ import {
   caseHeader,
   confirmationHeader,
   manageCaseDetailsUrl,
-  refusedByCcd,
+  postedSnapshot,
+  refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
 
@@ -25,8 +26,17 @@ interface StartedOrder {
   eventToken: string;
 }
 
-async function startOrderEvent(accessToken: string, caseReference: string): Promise<StartedOrder> {
-  const started = await ccdCaseService.startCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID);
+/**
+ * Starts the judge's working order, or the order they chose on the case's orders tab: one a
+ * caseworker returned to them, which pcs-api starts with the caseworker's query.
+ */
+async function startOrderEvent(accessToken: string, caseReference: string, orderId?: string): Promise<StartedOrder> {
+  const started = await ccdCaseService.startCaseEvent(
+    accessToken,
+    caseReference,
+    MAKE_ORDER_EVENT_ID,
+    orderId ? { orderId } : undefined
+  );
   const payload = started.data.sdkEventPayload;
   if (!payload) {
     // CCD starts the event for anyone who can see the case, but only shows the payload to users
@@ -57,6 +67,8 @@ function pageModel(
     formAction: req.originalUrl,
     order,
     eventToken,
+    // The task the judge came from, if a caseworker's query brought them here, which pcs-api closes on resubmission.
+    taskId: typeof req.query.taskId === 'string' ? req.query.taskId : '',
     // The case as the event started it, which the page's change is based on.
     caseContextJson: JSON.stringify(caseContext),
     ...orderFormModel(envelope, submission),
@@ -72,33 +84,53 @@ function pageModel(
   };
 }
 
+/** The order the orders tab linked to, which the page's URL names for as long as the judge works on it. */
+function chosenOrderId(req: Request): string | undefined {
+  return typeof req.query.orderId === 'string' ? req.query.orderId : undefined;
+}
+
 export default function makeOrderRoutes(app: Application): void {
   app.get(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     try {
       // A new order on the case is under way, so there is no longer one to confirm.
       delete req.session.ordersSentForReview?.[req.params.caseReference as string];
-      const started = await startOrderEvent(req.session.user!.accessToken, req.params.caseReference as string);
+      const started = await startOrderEvent(
+        req.session.user!.accessToken,
+        req.params.caseReference as string,
+        chosenOrderId(req)
+      );
       res.render('make-order', pageModel(req, started));
     } catch (error) {
-      if (refusedByCcd(error)) {
-        return res.status(404).send('Not Found');
-      }
-      next(error);
+      refusedOrderEvent(res, next, error);
     }
   });
 
   app.post(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
-    const { _csrf, action, eventToken, caseContext, orderId, orderVersion, orderType, orderDocument, ...formData } =
-      req.body;
+    const {
+      _csrf,
+      action,
+      eventToken,
+      caseContext,
+      orderId,
+      taskId,
+      orderVersion,
+      queryFromCaseworker,
+      orderType,
+      orderDocument,
+      ...formData
+    } = req.body;
 
     try {
       if (action === 'SUBMIT_FOR_REVIEW') {
         // The order is checked against the case as the page's start returned it.
         const started: StartedOrder = {
           eventToken,
-          envelope: { order: { id: orderId, version: Number(orderVersion) }, caseContext: JSON.parse(caseContext) },
+          envelope: {
+            order: { id: orderId, version: Number(orderVersion), queryFromCaseworker },
+            caseContext: JSON.parse(caseContext),
+          },
         };
         const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(started.envelope));
         if (validationIssues.length) {
@@ -115,8 +147,9 @@ export default function makeOrderRoutes(app: Application): void {
           version: Number(orderVersion),
           orderType,
           formData,
-          docweaveSnapshot: JSON.parse(orderDocument || 'null'),
+          docweaveSnapshot: postedSnapshot(orderDocument),
         },
+        taskId: taskId || null,
       };
       try {
         await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
@@ -128,7 +161,7 @@ export default function makeOrderRoutes(app: Application): void {
         }
         // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
         // tab: show the judge the order as it now stands, and why.
-        const current = await startOrderEvent(accessToken, caseReference);
+        const current = await startOrderEvent(accessToken, caseReference, chosenOrderId(req));
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }
@@ -142,10 +175,7 @@ export default function makeOrderRoutes(app: Application): void {
       }
       return res.redirect(manageCaseDetailsUrl(caseReference));
     } catch (error) {
-      if (refusedByCcd(error)) {
-        return res.status(404).send('Not Found');
-      }
-      return next(error);
+      refusedOrderEvent(res, next, error);
     }
   });
 
