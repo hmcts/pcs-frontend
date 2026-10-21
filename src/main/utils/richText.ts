@@ -33,7 +33,7 @@ const richTextFilter = new FilterXSS({
   stripIgnoreTagBody: ['script', 'style'],
 });
 
-export function isRichText(text: string | null | undefined): text is string {
+function isRichText(text: string | null | undefined): text is string {
   return RICH_TEXT.test(text ?? '');
 }
 

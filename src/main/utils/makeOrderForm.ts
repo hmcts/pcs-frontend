@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 
 import type { AttendanceParty, MakeOrderType } from '@utils/makeOrderValidation';
 import type { FormData, OrderApplication, OrderParty, OrderStart } from '@utils/orderCase';
-import { isRichText, richTextHtml } from '@utils/richText';
+import { richTextHtml } from '@utils/richText';
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 const APPLICATION_ORDER_TYPE: MakeOrderType = 'APPLICATION_DECISION';
@@ -22,7 +22,6 @@ function applicationModel(application: OrderApplication, caseReference: number) 
   return {
     ...application,
     whatOrderWantedHtml: richTextHtml(application.whatOrderWanted),
-    whatOrderWantedRich: isRichText(application.whatOrderWanted),
     documents: application.documents.map(document => ({
       ...document,
       href: `/case/${caseReference}/view-documents/${encodeURIComponent(document.id)}`,

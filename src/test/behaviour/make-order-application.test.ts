@@ -1,5 +1,3 @@
-import { requestedParagraphs } from '../../main/assets/js/make-order/wording/application';
-
 import {
   CASE_REFERENCE,
   type TestApp,
@@ -24,7 +22,7 @@ const APPLICATION = {
   otherPartiesAgreed: 'NO',
   withoutNotice: 'NO',
   fee: 'Paid, or no fee due',
-  whatOrderWanted: '1. The hearing on 14 October is adjourned.\n2. Costs in the case.',
+  whatOrderWanted: '<ol><li><p>The hearing on 14 October is adjourned.</p></li><li><p>Costs in the case.</p></li></ol>',
   documents: [{ id: '3f2a6c1e-0000-4000-8000-000000000001', fileName: 'witness-statement.pdf' }],
   referredOn: '2026-10-05',
   referralNote: 'The hearing is next week',
@@ -102,12 +100,16 @@ describe('make an order: deciding an application', () => {
     ]);
   });
 
-  it("splits the applicant's wording into paragraphs, keeping lines they wrapped by hand together", () => {
-    expect(
-      requestedParagraphs(
-        '1. The hearing be adjourned so the defendant can get\nlegal advice.\n2) Costs reserved.\n\nWhy.'
-      )
-    ).toEqual(['The hearing be adjourned so the defendant can get legal advice.', 'Costs reserved.', 'Why.']);
+  it("puts plain text wording into the order as the applicant's lines, without making them clauses", async () => {
+    await app.close();
+    app = await bootApp({
+      application: { ...APPLICATION, whatOrderWanted: '1. The hearing is adjourned.\n2. Costs reserved.\n\nWhy.' },
+    });
+    const page = await openPage((await app.get(PAGE)).text);
+    check('application-decision', 'grant');
+
+    expect(page.documentText()).toContain('1. The hearing is adjourned.\n2. Costs reserved.\n\nWhy.');
+    expect(clauseLists()).toEqual([]);
   });
 
   it('keeps a separate order preview for each decision', async () => {
