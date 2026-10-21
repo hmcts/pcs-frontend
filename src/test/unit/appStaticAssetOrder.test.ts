@@ -31,11 +31,13 @@ jest.mock('../../main/modules', () => {
 
 jest.mock('../../main/modules/error-handler', () => ({ setupErrorHandlers: jest.fn() }));
 jest.mock('../../main/routes/registerSteps', () => ({ registerAllJourneys: jest.fn() }));
-jest.mock('../../main/middleware', () => ({
-  caseReferenceParamMiddleware: jest.fn(),
-  legalRepresentativeAccessMiddleware: jest.fn(),
-  pageTrackingUrlMiddleware: jest.fn(),
-}));
+// Every export is a no-op handler, so adding a middleware to app.ts doesn't break this suite.
+jest.mock('../../main/middleware', () => {
+  const noop: RequestHandler = (_req, _res, next) => next();
+  return new Proxy({ __esModule: true } as Record<string, unknown>, {
+    get: (target, name) => (name in target ? target[name as string] : noop),
+  });
+});
 
 describe('app static asset ordering', () => {
   it('mounts helmet before the static assets, and both before session and csrf', async () => {
