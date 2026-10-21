@@ -15,6 +15,7 @@ import {
   confirmationHeader,
   manageCaseDetailsUrl,
   postedSnapshot,
+  refusalPage,
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
@@ -345,7 +346,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
         continueUrl: pageUrl(caseReference, 'review'),
       });
     } catch (error) {
-      refusedOrderEvent(res, next, error);
+      refusedOrderEvent(res, next, error, refusalPage(req, res));
     }
   });
 

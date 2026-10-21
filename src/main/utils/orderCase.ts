@@ -1,4 +1,4 @@
-import { buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
+import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import { type DocWeaveSnapshot, InvalidSnapshotError, parseSnapshot } from '@hmcts-cft/docweave';
 import config from 'config';
 import type { NextFunction, Request, Response } from 'express';
@@ -167,6 +167,17 @@ export function refusedOrderEvent(
     return void res.status(404).send('Not Found');
   }
   next(error);
+}
+
+/** Shows the user why pcs-api would not start an order event, in XUI's page, with the way back to the case. */
+export function refusalPage(req: Request, res: Response, roleAssignments: string[] = []) {
+  return (error: CallbackRejectedError): void =>
+    res.status(error.status).render('order-refused', {
+      headerModel: xuiHeaderModel(req, roleAssignments),
+      footerModel: buildFooterModel(),
+      reasons: error.reasons,
+      closeUrl: manageCaseDetailsUrl(req.params.caseReference as string),
+    });
 }
 
 /** The order's document as a page posted it: none, or a snapshot Docweave accepts. Anything else is a bad request. */
