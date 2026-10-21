@@ -319,12 +319,16 @@ describe('make an order: deciding an application', () => {
     });
 
     it('tells the judge what of the formatting the order cannot keep', async () => {
+      await app.close();
+      app = await bootApp({
+        application: { ...RICH, whatOrderWanted: '<p>The defendant asks:</p><ul><li><p>more time</p></li></ul>' },
+      });
       await openPage((await app.get(PAGE)).text);
       expect(control<HTMLElement>('#application-requested-not-kept').textContent?.trim()).toBe(
-        'If you use the applicant’s wording in the order, subclauses are numbered (i), (ii) and so on.'
+        'If you use the applicant’s wording in the order, bullets become lines starting “•”.'
       );
       await app.close();
-      app = await bootApp({ application: APPLICATION });
+      app = await bootApp({ application: RICH });
       await openPage((await app.get(PAGE)).text);
       expect(document.querySelector('#application-requested-not-kept')).toBeNull();
     });
