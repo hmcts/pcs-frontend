@@ -132,6 +132,8 @@ function orderModel(review: OrderReviewSession) {
   const snapshot = review.order.docweaveSnapshot;
   return {
     freeForm: review.order.orderType === 'FREE_FORM',
+    // A decision on an application is worded in the preview, not in fields staff could bring into line with it.
+    applicationDecision: review.order.orderType === 'APPLICATION_DECISION',
     edits: judgeEdits(snapshot),
     staffMessage: staffMessage(review.order.formData),
     orderPreviewHtml: snapshot ? renderHtml(snapshot, { changes: true }) : undefined,

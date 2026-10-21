@@ -158,6 +158,15 @@ describe('confirm order review', () => {
       expect(page.querySelector('#edited-warning')).toBeNull();
     });
 
+    it('does not ask staff to match fields to the preview of an order deciding an application', async () => {
+      const order = await judgesOrder({ edit: () => writeInPreview('Adjourn the hearing for 28 days.') });
+      app = await caseworkerReviewing({ ...order, orderType: 'APPLICATION_DECISION' });
+
+      const page = parse((await app.get(INTRO)).text);
+
+      expect(page.querySelector('#edited-warning')).toBeNull();
+    });
+
     it('fails when pcs-api will not start the review', async () => {
       app = await caseworkerReviewing();
       refuseNextStart('The order is no longer waiting for review');
