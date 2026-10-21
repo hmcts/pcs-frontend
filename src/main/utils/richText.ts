@@ -47,20 +47,3 @@ export function richTextHtml(text: string | null | undefined): string {
   }
   return `<p>${escapeHtml(text).replace(/\r?\n/g, '<br>')}</p>`;
 }
-
-/**
- * What of the applicant's formatting the order changes, for telling the judge before they use their wording:
- * it has bullets as lines starting "•", headings as bold text, and no underlining or rules.
- */
-export function richTextNotKept(text: string | null | undefined): string[] {
-  if (!isRichText(text)) {
-    return [];
-  }
-  const html = richTextHtml(text);
-  return [
-    /<ul\b/i.test(html) ? 'bullets become lines starting “•”' : '',
-    /<h[1-6]\b/i.test(html) ? 'headings become bold text' : '',
-    /<u\b/i.test(html) ? 'underlining is not kept' : '',
-    /<hr\b/i.test(html) ? 'horizontal lines are not kept' : '',
-  ].filter(Boolean);
-}
