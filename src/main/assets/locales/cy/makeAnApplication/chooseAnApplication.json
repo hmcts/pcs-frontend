@@ -1,6 +1,6 @@
 {
   "pageTitle": "Dewis cais",
-  "caption": "Gwneud cais",
+  "caption": "cyStop or delay an eviction",
   "heading": "Dewis cais",
   "noticeText": "Ni allwch wneud cais i atal (stopio neu ohirio) y troi allan ar-lein.",
   "noticeTextByPost": "Rhaid i chi wneud cais drwy’r post:",
@@ -13,6 +13,10 @@
   "question": "Beth ydych chi eisiau gwneud cais amdano?",
   "hintText": "Rhywfaint o destun awgrymog dewisol yma (deiliad lle)",
   "options": {
+    "suspend": {
+    "label": "cyAsk the court to suspend (stop or delay) the eviction",
+    "hint": "cyYou can ask the court to ‘suspend the eviction’. This means stopping or delaying the eviction"
+    },
     "adjourn": {
       "label": "Gofyn i ohirio’r gwrandawiad (ei symud i amser neu ddyddiad diweddarach)",
       "hint": "Gallwch wneud cais i newid y gwrandawiad llys i amser neu ddyddiad diweddarach"

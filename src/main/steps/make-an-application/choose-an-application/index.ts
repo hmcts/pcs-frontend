@@ -22,6 +22,11 @@ export const step: StepDefinition = createFormStep({
       legendClasses: 'govuk-fieldset__legend--m',
       options: [
         {
+          value: 'SUSPEND',
+          translationKey: 'options.suspend.label',
+          hint: 'options.suspend.hint',
+        },
+        {
           value: 'ADJOURN',
           translationKey: 'options.adjourn.label',
           hint: 'options.adjourn.hint',
