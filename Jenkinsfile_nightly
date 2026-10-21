@@ -192,27 +192,7 @@ def runE2ETests(yarnBuilder) {
     [flag: 'MOBILE_IPAD_TESTS', project: 'mobile-ipad', browser: 'MobileIpad', label: 'Mobile iPad (WebKit)'],
   ]
   
-  
 
-def selected = e2eMatrix.findAll { params[it.flag] }
-  def failedLabels = []
-  selected.each { row ->
-    if (!runE2eStage(yarnBuilder, row.project, row.browser, row.label)) {
-      failedLabels << row.label
-    }
-  }
-  selected.each { row ->
-    stage("E2E - ${row.label} [${env.ENVIRONMENT}]") {
-      if (failedLabels.contains(row.label)) {
-        catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-          error("${row.label} E2E tests failed on ${env.ENVIRONMENT} - see Full ${row.browser} E2E Test Report")
-        }
-      } else {
-        echo "${row.label} E2E tests passed on ${env.ENVIRONMENT}"
-      }
-    }
-  }
-}
 
 /** Names of boolean pipeline params that select browser/device E2E stages (must stay in sync with `runE2ETests`). */
 def browserToggleParamNames() {
@@ -228,37 +208,32 @@ def browserToggleParamNames() {
 }
 
 def runE2eStage(yarnBuilder, String playwrightProject, String browser, String stageLabel) {
-  def passed = true
-  node {
-    echo "Running E2E - ${stageLabel} [${env.ENVIRONMENT}]"
-    checkout scm
-    sh 'rm -rf allure-results allure-report'
-    catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
-      withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
-        try {
+  stage("E2E - ${stageLabel} [${env.ENVIRONMENT}]") {
+    node {
+      checkout scm
+      sh 'rm -rf allure-results allure-report'
+      catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
+        withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
           yarnBuilder.yarn('test:E2e')
-        } catch (e) {
-          passed = false
-          throw e
         }
       }
+      publishHTML([
+        allowMissing: true,
+        alwaysLinkToLastBuild: true,
+        keepAll: true,
+        reportDir: "allure-report",
+        reportFiles: 'index.html',
+        reportName: "Full ${browser} E2E Test Report"
+      ])
+      steps.archiveArtifacts(
+        allowEmptyArchive: true,
+        artifacts: 'definitions/test/playwright-report/**'
+      )
+      sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
     }
-    publishHTML([
-      allowMissing: true,
-      alwaysLinkToLastBuild: true,
-      keepAll: true,
-      reportDir: "allure-report",
-      reportFiles: 'index.html',
-      reportName: "Full ${browser} E2E Test Report"
-    ])
-    steps.archiveArtifacts(
-      allowEmptyArchive: true,
-      artifacts: 'definitions/test/playwright-report/**'
-    )
-    sendAllureReportToSlack(stageLabel, "Full_20${browser}_20E2E_20Test_20Report/")
   }
-  return passed
 }
+
 
 def sendAllureReportToSlack(String browser, String reportSuffix) {
   env.E2E_BROWSER = browser
