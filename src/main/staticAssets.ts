@@ -4,7 +4,6 @@ import express, { type Express, type RequestHandler } from 'express';
 import expressStaticGzip from 'express-static-gzip';
 
 const ONE_YEAR = '1y';
-const ONE_WEEK = '7d';
 
 // express-static-gzip sets Content-Encoding before it knows whether it will answer, and never
 // unsets it, so requests it cannot serve must not reach it.
@@ -28,10 +27,19 @@ export const setupStaticAssets = (app: Express, publicDir = path.join(__dirname,
 
   app.use('/bundles', onlyPlainBundleReads(bundles));
 
+  // govuk-frontend fingerprints its fonts. Nothing else under assets/ is, so those revalidate --
+  // ui-component-lib.css in particular is a fixed URL that changes when the package is bumped.
   app.use(
-    '/assets',
-    express.static(path.join(publicDir, 'assets'), { maxAge: ONE_WEEK, index: false, redirect: false })
+    '/assets/fonts',
+    express.static(path.join(publicDir, 'assets/fonts'), {
+      immutable: true,
+      maxAge: ONE_YEAR,
+      index: false,
+      redirect: false,
+    })
   );
+
+  app.use('/assets', express.static(path.join(publicDir, 'assets'), { index: false, redirect: false }));
 
   app.use('/locales', express.static(path.join(publicDir, 'locales'), { index: false, redirect: false }));
 };

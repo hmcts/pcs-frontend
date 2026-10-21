@@ -46,11 +46,13 @@ describe('setupStaticAssets', () => {
     root = fs.mkdtempSync(path.join(os.tmpdir(), 'pcs-static-'));
     fs.mkdirSync(path.join(root, 'bundles'), { recursive: true });
     fs.mkdirSync(path.join(root, 'assets/ui-component-lib'), { recursive: true });
+    fs.mkdirSync(path.join(root, 'assets/fonts'), { recursive: true });
     fs.mkdirSync(path.join(root, 'locales'), { recursive: true });
     fs.writeFileSync(path.join(root, 'bundles/main.d3bd85ff37217eccffa7.js'), bundleBody);
     fs.writeFileSync(path.join(root, 'bundles/main.d3bd85ff37217eccffa7.js.gz'), gzipSync(Buffer.from(bundleBody)));
     fs.writeFileSync(path.join(root, 'assets/manifest.json'), '{"icons":[]}');
     fs.writeFileSync(path.join(root, 'assets/ui-component-lib/ui-component-lib.css'), 'body{color:red}');
+    fs.writeFileSync(path.join(root, 'assets/fonts/bold-affa96571d-v2.woff2'), 'woff2');
     fs.writeFileSync(path.join(root, 'locales/en.json'), '{"hello":"world"}');
 
     downstreamCalls = [];
@@ -141,15 +143,33 @@ describe('setupStaticAssets', () => {
     expect(res.headers['location']).toBeUndefined();
   });
 
-  it('caches build-time assets for a week rather than immutably', async () => {
+  it('caches the fingerprinted fonts immutably', async () => {
+    const res = await request(port, '/assets/fonts/bold-affa96571d-v2.woff2');
+
+    expect(res.status).toBe(200);
+    expect(res.headers['cache-control']).toBe(IMMUTABLE);
+  });
+
+  it('makes the unfingerprinted assets revalidate', async () => {
     const manifest = await request(port, '/assets/manifest.json');
     const componentLib = await request(port, '/assets/ui-component-lib/ui-component-lib.css');
 
     expect(manifest.status).toBe(200);
-    expect(manifest.headers['cache-control']).toBe('public, max-age=604800');
+    expect(manifest.headers['cache-control']).toBe('public, max-age=0');
     expect(componentLib.status).toBe(200);
     expect(componentLib.headers['content-type']).toContain('text/css');
-    expect(componentLib.headers['cache-control']).toBe('public, max-age=604800');
+    expect(componentLib.headers['cache-control']).toBe('public, max-age=0');
+    expect(componentLib.headers['etag']).toBeDefined();
+  });
+
+  it('answers a revalidation of an unchanged asset with a 304', async () => {
+    const first = await request(port, '/assets/ui-component-lib/ui-component-lib.css');
+    const second = await request(port, '/assets/ui-component-lib/ui-component-lib.css', {
+      'If-None-Match': first.headers['etag'] as string,
+    });
+
+    expect(second.status).toBe(304);
+    expect(second.body).toHaveLength(0);
   });
 
   it('serves locale files', async () => {

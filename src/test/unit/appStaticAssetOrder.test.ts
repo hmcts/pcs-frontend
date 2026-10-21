@@ -45,4 +45,10 @@ describe('app static asset ordering', () => {
 
     expect(mountedBy).toStrictEqual(['helmet', 'staticAssets', 'session', 'csrf']);
   });
+
+  it('leaves helmet out of the module registry, so app.ts is its only mount', async () => {
+    const { modules } = jest.requireActual<typeof import('../../main/modules')>('../../main/modules');
+
+    expect(modules).not.toContain('Helmet');
+  });
 });
