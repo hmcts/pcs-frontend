@@ -14,8 +14,8 @@
   "hintText": "Rhywfaint o destun awgrymog dewisol yma (deiliad lle)",
   "options": {
     "suspend": {
-    "label": "cyAsk the court to suspend (stop or delay) the eviction",
-    "hint": "cyYou can ask the court to ‘suspend the eviction’. This means stopping or delaying the eviction"
+      "label": "cyAsk the court to suspend (stop or delay) the eviction",
+      "hint": "cyYou can ask the court to ‘suspend the eviction’. This means stopping or delaying the eviction"
     },
     "adjourn": {
       "label": "Gofyn i ohirio’r gwrandawiad (ei symud i amser neu ddyddiad diweddarach)",
