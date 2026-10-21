@@ -51,7 +51,11 @@ interface Submission extends OrderFormSubmission {
   validationIssues: MakeOrderValidationIssue[];
 }
 
-function pageModel(req: Request, { envelope }: StartedOrder, submission?: Submission): Record<string, unknown> {
+function pageModel(
+  req: Request,
+  { envelope, eventToken }: StartedOrder,
+  submission?: Submission
+): Record<string, unknown> {
   const headerModel = xuiHeaderModel(req, ['judge']);
   const { caseContext, order } = envelope;
   const issues = submission?.validationIssues ?? [];
@@ -62,6 +66,8 @@ function pageModel(req: Request, { envelope }: StartedOrder, submission?: Submis
     // The page's own URL, without the tab fragment the browser would otherwise post back to.
     formAction: req.originalUrl,
     order,
+    // The page's start, which its submissions reuse so CCD takes a repeated one, e.g. a double click, as the same.
+    eventToken,
     // The task the judge came from, if a caseworker's query brought them here, which pcs-api closes on resubmission.
     taskId: typeof req.query.taskId === 'string' ? req.query.taskId : '',
     ...orderFormModel(envelope, submission),
@@ -101,23 +107,24 @@ export default function makeOrderRoutes(app: Application): void {
   app.post(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
-    const { _csrf, action, orderId, taskId, orderVersion, orderType, orderDocument, ...formData } = req.body;
+    const { _csrf, action, eventToken, orderId, taskId, orderVersion, orderType, orderDocument, ...formData } =
+      req.body;
 
     try {
       // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
-      // blocks, and could change it. The order's id and version stay the page's: pcs-api refuses the change
-      // if the order has moved on since.
+      // blocks, and could change it. The event token, order id and version stay the page's: CCD takes a
+      // repeated submission as the one already made, and pcs-api refuses the change if the order has moved on.
       const started = await startOrderEvent(accessToken, caseReference, chosenOrderId(req));
       if (action === 'SUBMIT_FOR_REVIEW') {
         const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(started.envelope));
         if (validationIssues.length) {
-          // Nothing was submitted, so the page keeps the version its answers were made against: if the
-          // draft was saved elsewhere meanwhile, pcs-api refuses the retry rather than overwriting it.
+          // Nothing was submitted, so the page keeps its token and the version its answers were made against:
+          // if the draft was saved elsewhere meanwhile, pcs-api refuses the retry rather than overwriting it.
           const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
           const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues };
           return res
             .status(400)
-            .render('make-order', pageModel(req, { ...started, envelope: { ...started.envelope, order } }, submission));
+            .render('make-order', pageModel(req, { eventToken, envelope: { ...started.envelope, order } }, submission));
         }
       }
       const request = {
@@ -132,7 +139,7 @@ export default function makeOrderRoutes(app: Application): void {
         taskId: taskId || null,
       };
       try {
-        await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, started.eventToken, {
+        await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
           sdkEventPayload: JSON.stringify(request),
         });
       } catch (error) {

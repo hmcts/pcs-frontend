@@ -60,14 +60,7 @@ async function judgesOrder(options: { tab?: string; staffMessage?: string; edit?
     const body = page.body();
     const { orderType, orderDocument } = Object.fromEntries(body);
     const formData: Record<string, unknown> = {};
-    const hidden = [
-      '_csrf',
-      'action',
-      'orderId',
-      'orderVersion',
-      'orderType',
-      'orderDocument',
-    ];
+    const hidden = ['_csrf', 'action', 'eventToken', 'orderId', 'orderVersion', 'orderType', 'orderDocument'];
     body.forEach((value, name) => {
       if (!hidden.includes(name)) {
         formData[name] = value;

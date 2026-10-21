@@ -18,6 +18,7 @@
   {# The explicit action leaves out the tab fragment, so a refused submission opens at the error summary. #}
   <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
         data-property-address="{{ propertyAddressDisplay }}">
+  <input type="hidden" name="eventToken" value="{{ eventToken }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="taskId" value="{{ taskId }}">
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
@@ -56,9 +57,16 @@
       text: "Send order to caseworker for review",
       name: "action",
       value: "SUBMIT_FOR_REVIEW",
+      preventDoubleClick: true,
       attributes: { id: "submit-order-for-review" }
     }) }}
-    {{ govukButton({ text: "Save as draft", name: "action", value: "SAVE_DRAFT", classes: "govuk-button--secondary" }) }}
+    {{ govukButton({
+      text: "Save as draft",
+      name: "action",
+      value: "SAVE_DRAFT",
+      preventDoubleClick: true,
+      classes: "govuk-button--secondary"
+    }) }}
   </div>
   </form>
 {% endblock %}
