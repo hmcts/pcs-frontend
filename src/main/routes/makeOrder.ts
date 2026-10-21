@@ -46,17 +46,9 @@ async function startOrderEvent(req: Request): Promise<StartedOrder> {
     throw new HTTPError('Not permitted to make an order on this case', 403);
   }
   const envelope = JSON.parse(payload) as OrderStart;
-  const { caseContext, order } = envelope;
-  // Only one order journey is active in the session. Keep its original context and version
-  // server-side; posting the context JSON triggers WAF rules and allows browser tampering.
-  req.session.makeOrderStart = {
-    caseReference,
-    eventToken: started.eventToken,
-    envelope: {
-      caseContext,
-      order: { id: order.id, version: order.version, queryFromCaseworker: order.queryFromCaseworker },
-    },
-  };
+  // Only one order journey is active in the session. Its context and version stay server-side:
+  // posting the context JSON trips WAF rules and lets the browser tamper with it.
+  req.session.makeOrderStart = { caseReference, eventToken: started.eventToken, envelope };
   return { envelope, eventToken: started.eventToken };
 }
 
@@ -116,19 +108,7 @@ export default function makeOrderRoutes(app: Application): void {
   app.post(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
-    const {
-      _csrf,
-      action,
-      eventToken,
-      caseContext: _caseContext,
-      orderId: _orderId,
-      taskId,
-      orderVersion: _orderVersion,
-      queryFromCaseworker: _queryFromCaseworker,
-      orderType,
-      orderDocument,
-      ...formData
-    } = req.body;
+    const { _csrf, action, eventToken, taskId, orderType, orderDocument, ...formData } = req.body;
 
     try {
       const started = req.session.makeOrderStart;
@@ -167,7 +147,7 @@ export default function makeOrderRoutes(app: Application): void {
         taskId: taskId || null,
       };
       try {
-        await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
+        await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, started.eventToken, {
           sdkEventPayload: JSON.stringify(request),
         });
       } catch (error) {
