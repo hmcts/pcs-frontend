@@ -110,6 +110,7 @@ export interface Party {
   idamId: string;
   firstName: string;
   lastName: string;
+  orgName?: string;
 }
 
 export interface Document {
