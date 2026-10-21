@@ -19,6 +19,8 @@ import {
 } from '@utils/orderCase';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
+/** How many order pages a judge may have open at once before the oldest one expires. */
+const MAX_OPEN_ORDER_STARTS = 5;
 
 /** The make order event as CCD started it: the page's data, and the token to submit a change to it with. */
 interface StartedOrder {
@@ -46,9 +48,10 @@ async function startOrderEvent(req: Request): Promise<StartedOrder> {
     throw new HTTPError('Not permitted to make an order on this case', 403);
   }
   const envelope = JSON.parse(payload) as OrderStart;
-  // Only one order journey is active in the session. Its context and version stay server-side:
-  // posting the context JSON trips WAF rules and lets the browser tamper with it.
-  req.session.makeOrderStart = { caseReference, eventToken: started.eventToken, envelope };
+  // Each open page's context and version stay server-side, keyed by its event token: posting the
+  // context JSON trips WAF rules and lets the browser tamper with it.
+  const open = Object.entries(req.session.makeOrderStarts ?? {}).slice(1 - MAX_OPEN_ORDER_STARTS);
+  req.session.makeOrderStarts = Object.fromEntries([...open, [started.eventToken, { caseReference, envelope }]]);
   return { envelope, eventToken: started.eventToken };
 }
 
@@ -111,8 +114,8 @@ export default function makeOrderRoutes(app: Application): void {
     const { _csrf, action, eventToken, taskId, orderType, orderDocument, ...formData } = req.body;
 
     try {
-      const started = req.session.makeOrderStart;
-      if (!started || started.caseReference !== caseReference || started.eventToken !== eventToken) {
+      const open = req.session.makeOrderStarts?.[eventToken];
+      if (!open || open.caseReference !== caseReference) {
         const current = await startOrderEvent(req);
         return res.status(409).render(
           'make-order',
@@ -126,6 +129,7 @@ export default function makeOrderRoutes(app: Application): void {
           })
         );
       }
+      const started: StartedOrder = { envelope: open.envelope, eventToken };
       if (action === 'SUBMIT_FOR_REVIEW') {
         const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(started.envelope));
         if (validationIssues.length) {
@@ -160,7 +164,7 @@ export default function makeOrderRoutes(app: Application): void {
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }
-      delete req.session.makeOrderStart;
+      delete req.session.makeOrderStarts?.[eventToken];
       if (action === 'SUBMIT_FOR_REVIEW') {
         // Kept on the session so the confirmation survives a refresh, which cannot resubmit the order.
         req.session.ordersSentForReview = {

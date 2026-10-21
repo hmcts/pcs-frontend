@@ -38,12 +38,8 @@ interface CustomSessionData extends SessionData {
   applicationIds?: Record<string, string>;
   // The case an order was last sent for review on, keyed by case reference, for its confirmation page.
   ordersSentForReview?: Record<string, { caseReference: string; propertyAddress: string; caseName: string }>;
-  // The single active make-order journey, bound to its case and CCD event token.
-  makeOrderStart?: {
-    caseReference: string;
-    eventToken: string;
-    envelope: import('../main/utils/orderCase').OrderStart;
-  };
+  // The open make-order pages, keyed by CCD event token, each bound to its case.
+  makeOrderStarts?: Record<string, { caseReference: string; envelope: import('../main/utils/orderCase').OrderStart }>;
   orderReviews?: Record<string, import('../main/utils/orderReview').OrderReviewSession>;
   payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;

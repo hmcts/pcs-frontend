@@ -84,14 +84,27 @@ describe('make an order: drafting', () => {
     expect(submittedOrders().at(-1)).toMatchObject({ order: { id: null, version: 0 } });
   });
 
-  it('preserves edits and asks for confirmation when the active journey has changed', async () => {
+  it('saves from each open tab against the start that tab was given', async () => {
+    const first = await openPage((await app.get(PAGE)).text);
+    const firstBody = first.body('SAVE_DRAFT');
+    const second = await openPage((await app.get(PAGE)).text);
+    const secondBody = second.body('SAVE_DRAFT');
+    expect(secondBody.get('eventToken')).not.toBe(firstBody.get('eventToken'));
+    expect((await app.post(PAGE, firstBody)).status).toBe(302);
+    expect((await app.post(PAGE, secondBody)).status).toBe(302);
+    expect(submittedEventTokens()).toEqual([firstBody.get('eventToken'), secondBody.get('eventToken')]);
+  });
+
+  it('preserves edits and asks for confirmation when the page has expired', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-free-form');
     type('hearing-notes', 'Keep these notes');
     writeInPreview('The parties shall exchange evidence within fourteen days.');
     const body = page.body('SAVE_DRAFT');
-    // Starting another order replaces the single active journey.
-    await app.get(PAGE);
+    // Opening more pages than the session keeps expires the oldest.
+    for (let i = 0; i < 5; i++) {
+      await app.get(PAGE);
+    }
     const expired = await app.post(PAGE, body);
     expect(expired.status).toBe(409);
     expect(submittedEventTokens()).toEqual([]);
