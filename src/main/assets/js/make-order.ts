@@ -10,7 +10,7 @@ import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation
 
 import { type OrderData, readOrderData } from './make-order/data';
 import { buildAdjournmentOrder } from './make-order/wording/adjournment';
-import { buildApplicationOrder, requestedParagraphs } from './make-order/wording/application';
+import { buildApplicationOrder } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildFreeFormOrder } from './make-order/wording/free-form';
 import { buildOutrightOrder } from './make-order/wording/outright';
@@ -232,18 +232,13 @@ function applicationDecision(form: HTMLFormElement): string {
 }
 
 /**
- * Adds the applicant's wording to the order as the judge's own clauses, straight after "IT IS ORDERED THAT", to
- * change or delete as they would their own. Rich text goes in as the applicant formatted it, so the clauses keep
- * the numbers the applicant's cross-references use; plain text is numbered a paragraph to a clause.
+ * Adds the applicant's wording to the order as the judge's own, straight after "IT IS ORDERED THAT", to
+ * change or delete as they would their own. It goes in as the application panel shows it: rich text as the applicant
+ * formatted it, so the clauses keep the numbers the applicant's cross-references use, and plain text as its lines.
  */
 function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController): void {
   const panel = form.querySelector<HTMLElement>('[data-application]');
-  const at = { after: 'paragraph:ordered-that' };
-  if (panel?.dataset.applicationWordingHtml) {
-    editor.insertHtml(panel.dataset.applicationWordingHtml, { at });
-    return;
-  }
-  editor.insert(requestedParagraphs(panel?.dataset.applicationWording ?? ''), { at, numbered: true });
+  editor.insertHtml(panel?.dataset.applicationWordingHtml ?? '', { at: { after: 'paragraph:ordered-that' } });
 }
 
 export function initMakeOrder(): void {

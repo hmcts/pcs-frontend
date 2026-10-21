@@ -12,8 +12,7 @@
          data-application-type="{{ application.type }}"
          data-application-applicant="{{ application.applicant or 'the applicant' }}"
          data-application-submitted="{{ application.submittedOnDisplay or '' }}"
-         data-application-wording="{{ application.whatOrderWanted or '' }}"
-         {%- if application.whatOrderWantedRich %} data-application-wording-html="{{ application.whatOrderWantedHtml }}"{% endif %}>
+         data-application-wording-html="{{ application.whatOrderWantedHtml }}">
   <h2 class="govuk-heading-l govuk-!-margin-top-6" id="application-heading">
     Application {{ application.reference }}: {{ application.type }}
   </h2>
