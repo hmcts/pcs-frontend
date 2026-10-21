@@ -56,6 +56,9 @@ let startTokens: string[] = [];
 /** The tokens the make order event has been submitted with, in order. */
 let submittedTokens: string[] = [];
 
+/** What CCD answered each event token it has taken, so it can answer a repeat without applying it again. */
+let answers = new Map<string, Record<string, unknown>>();
+
 /** How many times the make order event has been started. */
 export function eventStarts(): number {
   return startTokens.length;
@@ -144,6 +147,11 @@ function ccdStub(): Express {
     if (!startTokens.includes(req.body.event_token)) {
       return res.status(404).json({ message: 'Cannot find matching start trigger' });
     }
+    // CCD keys a submission by its token: a repeat gets the first one's answer and changes nothing.
+    const answered = answers.get(req.body.event_token);
+    if (answered) {
+      return res.json(answered);
+    }
     if (refusal) {
       const reason = refusal;
       refusal = undefined;
@@ -152,7 +160,8 @@ function ccdStub(): Express {
     const posted = JSON.parse(req.body.data.sdkEventPayload);
     if (event === CONFIRM_ORDER_REVIEW) {
       reviewRequests.push(posted);
-      return res.json({ id: req.params.id, data: {} });
+      answers.set(req.body.event_token, { id: req.params.id, data: {} });
+      return res.json(answers.get(req.body.event_token));
     }
     orderRequests.push(posted);
     envelope = {
@@ -165,7 +174,8 @@ function ccdStub(): Express {
         docweaveSnapshot: posted.order.docweaveSnapshot,
       },
     };
-    res.json({ id: req.params.id, data: {} });
+    answers.set(req.body.event_token, { id: req.params.id, data: {} });
+    res.json(answers.get(req.body.event_token));
   });
   return ccd;
 }
@@ -218,6 +228,7 @@ export async function bootApp(
   envelope.order = { ...envelope.order, ...options.order };
   startTokens = [];
   submittedTokens = [];
+  answers = new Map();
   reviewRequests = [];
   orderRequests = [];
   startRefusal = undefined;
