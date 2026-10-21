@@ -48,25 +48,9 @@ export function richTextHtml(text: string | null | undefined): string {
   return `<p>${escapeHtml(text).replace(/\r?\n/g, '<br>')}</p>`;
 }
 
-/** Whether a numbered list is inside another, which the order numbers (i), (ii) whatever the applicant lettered it. */
-function hasSubclauses(html: string): boolean {
-  const lists: string[] = [];
-  for (const [tag, name] of html.matchAll(/<\/?(ol|ul)\b/gi)) {
-    if (tag.startsWith('</')) {
-      lists.pop();
-    } else if (name.toLowerCase() === 'ol' && lists[lists.length - 1] === 'ol') {
-      return true;
-    } else {
-      lists.push(name.toLowerCase());
-    }
-  }
-  return false;
-}
-
 /**
  * What of the applicant's formatting the order changes, for telling the judge before they use their wording:
- * it numbers subclauses (i), (ii), has bullets as lines starting "•", headings as bold text, and no underlining
- * or rules.
+ * it has bullets as lines starting "•", headings as bold text, and no underlining or rules.
  */
 export function richTextNotKept(text: string | null | undefined): string[] {
   if (!isRichText(text)) {
@@ -74,7 +58,6 @@ export function richTextNotKept(text: string | null | undefined): string[] {
   }
   const html = richTextHtml(text);
   return [
-    hasSubclauses(html) ? 'subclauses are numbered (i), (ii) and so on' : '',
     /<ul\b/i.test(html) ? 'bullets become lines starting “•”' : '',
     /<h[1-6]\b/i.test(html) ? 'headings become bold text' : '',
     /<u\b/i.test(html) ? 'underlining is not kept' : '',
