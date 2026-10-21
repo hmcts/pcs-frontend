@@ -30,17 +30,6 @@
   ]
 }) }}
 
-{{ compact.radios("application-decision", {
-  idPrefix: "application-decision-warrant",
-  legend: "Application to suspend the warrant of possession",
-  classes: "govuk-radios--small govuk-radios--inline",
-  items: [
-    { value: "suspend-warrant", text: "Granted" },
-    { value: "refuse-warrant-suspension", text: "Dismissed" }
-  ],
-  errorShownElsewhere: true
-}) }}
-
 {% if application.whatOrderWanted %}
   <div data-decision-shows="grant" {%- if not draftChecked("application-decision", "grant") %} hidden{% endif %}>
     <button type="button" class="govuk-button govuk-button--secondary" data-restore-requested-wording>
@@ -56,6 +45,17 @@
     "Specific date"
   ]) }}
 </div>
+
+{{ compact.radios("application-decision", {
+  idPrefix: "application-decision-warrant",
+  legend: "Application to suspend the warrant of possession",
+  classes: "govuk-radios--small govuk-radios--inline",
+  items: [
+    { value: "suspend-warrant", text: "Granted" },
+    { value: "refuse-warrant-suspension", text: "Dismissed" }
+  ],
+  errorShownElsewhere: true
+}) }}
 
 <div data-decision-shows="suspend-warrant" {%- if not draftChecked("application-decision", "suspend-warrant") %} hidden{% endif %}>
   {{ conditions.paymentConditions("warrant", "Warrant suspended on condition of") }}
