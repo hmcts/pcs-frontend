@@ -12,6 +12,7 @@ import {
   refuseNextEvent,
   selectTab,
   submittedEventTokens,
+  submittedOrders,
   type,
   writeInPreview,
 } from './harness';
@@ -76,6 +77,16 @@ describe('make an order: drafting', () => {
     expect(window.location.hash).toBe('');
     expect(control('[name="suspended-arrears"]').value).toBe('900');
     expect(JSON.parse(control<HTMLTextAreaElement>('#order-document').value).schema).toBe('docweave-document');
+  });
+
+  it('refuses an order document that Docweave could not have produced', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    const body = page.body();
+    body.set('action', 'SAVE_DRAFT');
+    body.set('orderDocument', '{"schema":"docweave-document","version":1}');
+
+    expect((await app.post(PAGE, body)).status).toBe(400);
+    expect(submittedOrders()).toHaveLength(0);
   });
 
   it("starts the event when the page loads, and submits the judge's change with that start", async () => {
