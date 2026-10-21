@@ -95,19 +95,17 @@ describe('make an order: drafting', () => {
     expect(submittedEventTokens()).toEqual([firstBody.get('eventToken'), secondBody.get('eventToken')]);
   });
 
-  it('preserves edits and asks for confirmation when the page has expired', async () => {
+  it("preserves edits and asks for confirmation when the page's start was already used", async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-free-form');
     type('hearing-notes', 'Keep these notes');
     writeInPreview('The parties shall exchange evidence within fourteen days.');
     const body = page.body('SAVE_DRAFT');
-    // Opening more pages than the session keeps expires the oldest.
-    for (let i = 0; i < 5; i++) {
-      await app.get(PAGE);
-    }
+    // A start is cleared once it is submitted, so submitting it again from a stale page is refused.
+    expect((await app.post(PAGE, body)).status).toBe(302);
     const expired = await app.post(PAGE, body);
     expect(expired.status).toBe(409);
-    expect(submittedEventTokens()).toEqual([]);
+    expect(submittedEventTokens()).toHaveLength(1);
     const retry = await openPage(expired.text);
     expect(control('#make-order-error-summary').textContent).toContain('Check your order and try again');
     expect(control('[name="hearing-notes"]').value).toBe('Keep these notes');
