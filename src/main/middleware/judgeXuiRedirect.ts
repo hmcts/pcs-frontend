@@ -9,6 +9,8 @@ import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 const JUDGE_JOURNEY_PATHS = [
   /^\/cases\/\d+\/event\/ext:makeOrder$/,
   /^\/case\/\d+\/make-order(?:\/.*)?$/,
+  /^\/cases\/\d+\/event\/ext:confirmOrderReview$/,
+  /^\/case\/\d+\/confirm-order-review(?:\/.*)?$/,
   /^\/docweave\/templates(?:\/.*)?$/,
 ] as const;
 
@@ -51,7 +53,8 @@ function getJudgeRedirectUrl(path: string): string {
 /**
  * Staff and judges use PCS through an explicit journey launched from XUI. Keep them out
  * of the citizen-facing entry points and return them to the case-management UI
- * unless the request is part of a supported judicial journey. Only while make order is enabled.
+ * unless the request is part of a supported judicial or caseworker order journey. Only while make order is
+ * enabled.
  */
 export const judgeXuiRedirectMiddleware: RequestHandler = async (
   req: Request,
