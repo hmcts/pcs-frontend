@@ -10,7 +10,7 @@ import type {
   OrderParty,
   OrderStart,
 } from '@utils/orderCase';
-import { isRichText, richTextHtml, richTextNotKept } from '@utils/richText';
+import { isRichText, richTextHtml } from '@utils/richText';
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 const APPLICATION_ORDER_TYPE: MakeOrderType = 'APPLICATION_DECISION';
@@ -33,7 +33,6 @@ function applicationModel(application: OrderApplication, caseReference: number) 
     ...application,
     whatOrderWantedHtml: richTextHtml(application.whatOrderWanted),
     whatOrderWantedRich: isRichText(application.whatOrderWanted),
-    whatOrderWantedNotKept: richTextNotKept(application.whatOrderWanted),
     documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
     submittedOnDisplay: displayDate(application.submittedOn),
     referredOnDisplay: displayDate(application.referredOn),

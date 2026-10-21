@@ -67,11 +67,6 @@
       html: '<div class="pcs-rich-text">' + application.whatOrderWantedHtml + '</div>',
       attributes: { id: "application-requested" }
     }) }}
-    {% if application.whatOrderWantedNotKept | length %}
-      <p class="govuk-hint" id="application-requested-not-kept">
-        If you use the applicant’s wording in the order, {{ application.whatOrderWantedNotKept | join("; ") }}.
-      </p>
-    {% endif %}
   {% else %}
     <p class="govuk-body">The applicant did not say what order they want. Read the application documents.</p>
   {% endif %}
