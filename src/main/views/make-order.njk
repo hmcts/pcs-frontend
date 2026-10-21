@@ -1,0 +1,67 @@
+{% extends "xui-layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% import "make-order/_compact.njk" as compact with context %}
+
+{% set htmlClasses = "pcs-make-order" %}
+
+{% set pageHeading = "Make an order" %}
+
+{% block content %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {# The explicit action leaves out the tab fragment, so a refused submission opens at the error summary. #}
+  <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
+        data-property-address="{{ propertyAddressDisplay }}">
+  <input type="hidden" name="eventToken" value="{{ eventToken }}">
+  <input type="hidden" name="caseContext" value="{{ caseContextJson }}">
+  <input type="hidden" name="orderId" value="{{ order.id }}">
+  <input type="hidden" name="taskId" value="{{ taskId }}">
+  <input type="hidden" name="orderVersion" value="{{ order.version }}">
+  {{ csrfProtection(csrfToken) }}
+
+  <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make an order</h1>
+
+  <p class="govuk-body govuk-!-margin-bottom-1">
+    <span class="govuk-!-font-weight-bold">Case reference:</span> {{ caseReferenceDisplay }}
+  </p>
+  <p class="govuk-body govuk-!-margin-bottom-1">{{ propertyAddressDisplay }}</p>
+  <p class="govuk-body govuk-!-font-weight-bold">
+    {{ claimantNames }} vs {{ defendantNames }}
+  </p>
+
+  {% if order.queryFromCaseworker %}
+    {# An order a caseworker returned: their query, which the page keeps if it is shown again with errors. #}
+    <h2 class="govuk-heading-m">Query from the caseworker</h2>
+    <p class="govuk-body">
+      A caseworker returned this order to you with a query. Change the order if you need to, then send it for review again.
+    </p>
+    {{ govukInsetText({
+      html: '<p class="govuk-body pcs-preserve-lines">' + (order.queryFromCaseworker | escape) + '</p>',
+      attributes: { id: "caseworker-query" }
+    }) }}
+    <textarea hidden name="queryFromCaseworker">{{ order.queryFromCaseworker }}</textarea>
+  {% endif %}
+
+  <p class="govuk-body">Answer every question unless it says it is optional.</p>
+
+  {% include "make-order/_form.njk" %}
+
+  {{ compact.reveal("staff-message", "Staff message", compact.textarea("staff-message-text", { label: "Message for court staff" })) }}
+
+  <div class="govuk-button-group govuk-!-margin-top-6">
+    {{ govukButton({
+      text: "Send order to caseworker for review",
+      name: "action",
+      value: "SUBMIT_FOR_REVIEW",
+      attributes: { id: "submit-order-for-review" }
+    }) }}
+    {{ govukButton({ text: "Save as draft", name: "action", value: "SAVE_DRAFT", classes: "govuk-button--secondary" }) }}
+  </div>
+  </form>
+{% endblock %}

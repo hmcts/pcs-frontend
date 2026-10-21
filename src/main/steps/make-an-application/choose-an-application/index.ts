@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { createFormStep } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
+import { getApplicationId, setApplicationId } from '../session';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
@@ -46,10 +47,8 @@ export const step: StepDefinition = createFormStep({
     sendTheFormToTheCourt: 'noticeTextList.sendTheFormToTheCourt',
   },
   beforeGet: async (req: Request) => {
-    if (!req.session.genApp?.applicationId) {
-      req.session.genApp = {
-        applicationId: uuidv4(),
-      };
+    if (!getApplicationId(req)) {
+      setApplicationId(req, uuidv4());
     }
   },
 });

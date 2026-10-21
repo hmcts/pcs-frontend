@@ -1,0 +1,53 @@
+{#
+  The make order form and the order it generates, which a judge fills in to make an order and a
+  caseworker may change before issuing it. The page's form wraps it, as #make-order-form.
+#}
+{% import "make-order/_compact.njk" as compact with context %}
+
+<input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
+
+{% include "make-order/_case-facts.njk" %}
+{% include "make-order/_attendance.njk" %}
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>
+
+{{ compact.reveal("recitals", "Recitals", compact.textarea("recitals-text", { label: "Recital paragraphs", optional: true })) }}
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Order type</h2>
+
+{# One list drives both the tabs and their panels. #}
+{% set orderTypeTabs = [
+  { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk" },
+  { id: "tab-suspended", type: "SUSPENDED_POSSESSION", label: "Suspended possession", template: "make-order/tabs/_suspended.njk" },
+  { id: "tab-adjournment", type: "ADJOURNMENT", label: "Adjournment", template: "make-order/tabs/_adjournment.njk" },
+  { id: "tab-strike-out", type: "STRIKE_OUT_DISMISSAL", label: "Strike out/dismiss", template: "make-order/tabs/_strike-out.njk" },
+  { id: "tab-free-form", type: "FREE_FORM", label: "Free form", template: "make-order/tabs/_free-form.njk" }
+] %}
+
+{# The macro hardcodes an h2 tab-list heading, so use its markup directly to preserve heading order. #}
+<div class="govuk-tabs" data-module="govuk-tabs">
+  <h3 class="govuk-tabs__title">Contents</h3>
+
+  <ul class="govuk-tabs__list">
+    {% for tab in orderTypeTabs %}
+      <li class="govuk-tabs__list-item {%- if tab.type == draftOrderType %} govuk-tabs__list-item--selected{% endif %}">
+        <a class="govuk-tabs__tab" href="#{{ tab.id }}" data-order-type="{{ tab.type }}">{{ tab.label }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+
+  {# govuk-frontend expects every panel after the first to start hidden. #}
+  {% for tab in orderTypeTabs %}
+    <div class="govuk-tabs__panel {%- if tab.type != draftOrderType %} govuk-tabs__panel--hidden{% endif %}" id="{{ tab.id }}">
+      {% include tab.template %}
+    </div>
+  {% endfor %}
+</div>
+
+{% include "make-order/_costs.njk" %}
+
+<section class="govuk-!-margin-top-6" aria-labelledby="order-preview-heading">
+  <h2 class="govuk-heading-l" id="order-preview-heading">{{ orderPreviewHeading | default("Order preview") }}</h2>
+  <div id="order-editor" tabindex="-1"></div>
+  <textarea hidden id="order-document" name="orderDocument">{{ orderDocumentJson }}</textarea>
+</section>

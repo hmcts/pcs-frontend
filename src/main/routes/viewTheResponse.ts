@@ -1,4 +1,3 @@
-import { format, parseISO } from 'date-fns';
 import { Application, NextFunction, Request, Response } from 'express';
 import type { TFunction } from 'i18next';
 
@@ -7,7 +6,7 @@ import { VIEW_DOCUMENTS_ROUTE, VIEW_RESPONSE_ROUTE } from '../constants/caseRout
 import { oidcMiddleware } from '../middleware';
 import { isWalesProperty, normalizeYesNoValue, penceToPounds } from '../steps/utils';
 
-import { getTranslationFunction } from '@modules/i18n';
+import { getRequestLanguage, getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { getDashboardUrl } from '@routes/dashboard';
 import type {
@@ -28,13 +27,13 @@ import { ccdCaseService } from '@services/ccdCaseService';
 import { sanitiseCaseReference } from '@utils/caseReference';
 import { formatAddress } from '@utils/ccdDashboardUtils';
 import { findCaseDocumentById } from '@utils/documentUtils';
+import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
-import { RELEASE_1_2_ENABLED } from '@utils/respondToClaimFlags';
+import { RELEASE_1_2_ENABLED, RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
+import { enumToSentence } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const logger = Logger.getLogger('viewTheResponse');
-
-const GDS_DATE_FORMAT = 'd MMMM yyyy';
 
 interface SummaryRow {
   key: { text: string };
@@ -53,19 +52,11 @@ interface TitledSummarySection extends SummarySection {
   sectionTitle: string;
 }
 
-function formatGdsDate(value: string | undefined | null): string | null {
+function formatGdsDate(value: string | undefined | null, lang: string): string | null {
   if (!value) {
     return null;
   }
-  const candidates = [value, value.substring(0, 10)];
-  for (const candidate of candidates) {
-    try {
-      return format(parseISO(candidate), GDS_DATE_FORMAT);
-    } catch {
-      continue;
-    }
-  }
-  return null;
+  return formatLocalisedDate(value, lang) ?? formatLocalisedDate(value.substring(0, 10), lang) ?? null;
 }
 
 function isYes(value: string | null | undefined): boolean {
@@ -76,25 +67,27 @@ function isNo(value: string | null | undefined): boolean {
   return normalizeYesNoValue(value) === 'NO';
 }
 
-function yesNo(t: TFunction, value: YesNoValue | string | undefined): string {
+// `answerKey` picks the question's own Welsh yes/no (Oes, Do, Hoffwn…) from `answers.*`, so the
+// summary matches what the defendant chose; without it the generic Ydy / Nac ydy is used.
+function yesNo(t: TFunction, value: YesNoValue | string | undefined, answerKey?: string): string {
   if (!value) {
     return '';
   }
   const normalized = normalizeYesNoValue(value);
   if (normalized === 'YES') {
-    return t('common:options.yes');
+    return answerKey ? t(`viewTheResponse:answers.${answerKey}.yes`) : t('common:options.yes');
   }
   if (normalized === 'NO') {
-    return t('common:options.no');
+    return answerKey ? t(`viewTheResponse:answers.${answerKey}.no`) : t('common:options.no');
   }
   return '';
 }
 
-function yesNoNotSure(t: TFunction, value: YesNoNotSureValue | string | undefined): string {
+function yesNoNotSure(t: TFunction, value: YesNoNotSureValue | string | undefined, answerKey?: string): string {
   if (!value) {
     return '';
   }
-  const yesNoLabel = yesNo(t, value);
+  const yesNoLabel = yesNo(t, value, answerKey);
   if (yesNoLabel) {
     return yesNoLabel;
   }
@@ -237,7 +230,7 @@ function resolveClaimantName(caseData: CcdCaseData): string {
   return new CcdCaseModel({ id: '', data: caseData }).claimantName;
 }
 
-function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildDefendant1Details(t: TFunction, caseData: CcdCaseData, lang: string): SummarySection {
   const rows: SummaryRow[] = [];
   const party: CcdDefendantParty | undefined = caseData.possessionClaimResponse?.defendantContactDetails?.party;
   const responses = caseData.possessionClaimResponse?.defendantResponses;
@@ -258,12 +251,12 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData): SummarySec
     resolveDefendantPostalAddress(t, party, caseData.propertyAddress)
   );
   if (!addressUnknown) {
-    pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(responses?.dateOfBirth) ?? '');
+    pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(responses?.dateOfBirth, lang) ?? '');
   }
   return { rows };
 }
 
-function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): TitledSummarySection[] {
+function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData, lang: string): TitledSummarySection[] {
   const defendants = caseData.allDefendants ?? [];
   if (defendants.length < 2) {
     return [];
@@ -285,7 +278,7 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
         resolveDefendantPostalAddress(t, party, caseData.propertyAddress)
       );
       if (!addressUnknown) {
-        pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(party.dateOfBirth) ?? '');
+        pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(party.dateOfBirth, lang) ?? '');
       }
 
       return {
@@ -295,7 +288,12 @@ function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData): T
     });
 }
 
-function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLandlord: boolean): SummarySection {
+function buildResponseToClaim(
+  t: TFunction,
+  caseData: CcdCaseData,
+  showExemptLandlord: boolean,
+  lang: string
+): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
 
@@ -310,28 +308,25 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLan
   if (isNo(responses?.tenancyTypeConfirmation)) {
     pushRow(rows, t('viewTheResponse:responseToClaim.tenancyType'), responses?.tenancyType);
   }
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.tenancyStartDateConfirmation'),
-    yesNoNotSure(t, responses?.tenancyStartDateConfirmation)
-  );
-  if (isNo(responses?.tenancyStartDateConfirmation)) {
+  const confirmation = responses?.tenancyStartDateConfirmation;
+  pushRow(rows, t('viewTheResponse:responseToClaim.tenancyStartDateConfirmation'), yesNoNotSure(t, confirmation));
+  if (isNo(confirmation) || (!confirmation && responses?.tenancyStartDate)) {
     pushRow(
       rows,
       t('viewTheResponse:responseToClaim.tenancyStartDate'),
-      formatGdsDate(responses?.tenancyStartDate) ?? ''
+      formatGdsDate(responses?.tenancyStartDate, lang) ?? ''
     );
   }
   pushRow(rows, t('viewTheResponse:responseToClaim.writtenTerms'), yesNoNotSure(t, responses?.writtenTerms));
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.possessionNoticeReceived'),
-    yesNoNotSure(t, responses?.possessionNoticeReceived)
+    yesNoNotSure(t, responses?.possessionNoticeReceived, 'possessionNoticeReceived')
   );
   pushRow(
     rows,
     t('viewTheResponse:responseToClaim.noticeReceivedDate'),
-    formatGdsDate(responses?.noticeReceivedDate) ?? ''
+    formatGdsDate(responses?.noticeReceivedDate, lang) ?? ''
   );
   pushRow(
     rows,
@@ -349,20 +344,29 @@ function buildResponseToClaim(t: TFunction, caseData: CcdCaseData, showExemptLan
   if (isYes(responses?.disputeClaim)) {
     pushRow(rows, t('viewTheResponse:responseToClaim.disputeDetails'), responses?.disputeClaimDetails);
   }
-  pushRow(rows, t('viewTheResponse:responseToClaim.makeCounterClaim'), yesNo(t, responses?.makeCounterClaim));
+  pushRow(
+    rows,
+    t('viewTheResponse:responseToClaim.makeCounterClaim'),
+    yesNo(t, responses?.makeCounterClaim, 'makeCounterClaim')
+  );
   return { rows };
 }
 
-function resolveClaimIssueDate(caseData: CcdCaseData, dateIssued: string | null): string {
+function resolveClaimIssueDate(caseData: CcdCaseData, dateIssued: string | null, lang: string): string {
   return (
-    formatGdsDate(caseData.claimIssueDate) ??
-    formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate) ??
+    formatGdsDate(caseData.claimIssueDate, lang) ??
+    formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate, lang) ??
     dateIssued ??
     ''
   );
 }
 
-function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssued: string | null): SummarySection {
+function buildPaymentsOrAgreements(
+  t: TFunction,
+  caseData: CcdCaseData,
+  dateIssued: string | null,
+  lang: string
+): SummarySection {
   const rows: SummaryRow[] = [];
   const payment: PaymentAgreement | undefined = caseData.possessionClaimResponse?.defendantResponses?.paymentAgreement;
   if (!payment) {
@@ -370,17 +374,25 @@ function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssu
   }
   const paymentLabelContext = {
     claimantName: resolveClaimantName(caseData),
-    claimIssueDate: resolveClaimIssueDate(caseData, dateIssued),
+    claimIssueDate: resolveClaimIssueDate(caseData, dateIssued, lang),
   };
-  pushRow(rows, t('viewTheResponse:payments.anyPaymentsMade', paymentLabelContext), yesNo(t, payment.anyPaymentsMade));
+  pushRow(
+    rows,
+    t('viewTheResponse:payments.anyPaymentsMade', paymentLabelContext),
+    yesNo(t, payment.anyPaymentsMade, 'anyPaymentsMade')
+  );
   pushRow(rows, t('viewTheResponse:payments.paymentDetails'), payment.paymentDetails);
   pushRow(
     rows,
     t('viewTheResponse:payments.repaymentPlanAgreed', paymentLabelContext),
-    yesNoNotSure(t, payment.repaymentPlanAgreed)
+    yesNoNotSure(t, payment.repaymentPlanAgreed, 'repaymentPlanAgreed')
   );
   pushRow(rows, t('viewTheResponse:payments.repaymentAgreedDetails'), payment.repaymentAgreedDetails);
-  pushRow(rows, t('viewTheResponse:payments.repayArrearsInstalments'), yesNo(t, payment.repayArrearsInstalments));
+  pushRow(
+    rows,
+    t('viewTheResponse:payments.repayArrearsInstalments'),
+    yesNo(t, payment.repayArrearsInstalments, 'repayArrearsInstalments')
+  );
   if (payment.additionalRentContribution || payment.additionalContributionFrequency) {
     pushRow(
       rows,
@@ -396,28 +408,40 @@ function buildPaymentsOrAgreements(t: TFunction, caseData: CcdCaseData, dateIssu
   return { rows };
 }
 
-function buildHouseholdAndCircumstances(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildHouseholdAndCircumstances(t: TFunction, caseData: CcdCaseData, lang: string): SummarySection {
   const rows: SummaryRow[] = [];
   const hc: HouseholdCircumstances | undefined =
     caseData.possessionClaimResponse?.defendantResponses?.householdCircumstances;
   if (!hc) {
     return { rows };
   }
-  pushRow(rows, t('viewTheResponse:household.dependantChildren'), yesNo(t, hc.dependantChildren));
+  pushRow(rows, t('viewTheResponse:household.dependantChildren'), yesNo(t, hc.dependantChildren, 'dependantChildren'));
   pushRow(rows, t('viewTheResponse:household.dependantChildrenDetails'), hc.dependantChildrenDetails);
-  pushRow(rows, t('viewTheResponse:household.otherDependants'), yesNo(t, hc.otherDependants));
+  pushRow(rows, t('viewTheResponse:household.otherDependants'), yesNo(t, hc.otherDependants, 'otherDependants'));
   pushRow(rows, t('viewTheResponse:household.otherDependantDetails'), hc.otherDependantDetails);
-  pushRow(rows, t('viewTheResponse:household.otherTenants'), yesNo(t, hc.otherTenants));
+  pushRow(rows, t('viewTheResponse:household.otherTenants'), yesNo(t, hc.otherTenants, 'otherTenants'));
   pushRow(rows, t('viewTheResponse:household.otherTenantsDetails'), hc.otherTenantsDetails);
-  pushRow(rows, t('viewTheResponse:household.alternativeAccommodation'), yesNoNotSure(t, hc.alternativeAccommodation));
+  pushRow(
+    rows,
+    t('viewTheResponse:household.alternativeAccommodation'),
+    yesNoNotSure(t, hc.alternativeAccommodation, 'alternativeAccommodation')
+  );
   pushRow(
     rows,
     t('viewTheResponse:household.alternativeAccommodationDate'),
-    formatGdsDate(hc.alternativeAccommodationTransferDate) ?? ''
+    formatGdsDate(hc.alternativeAccommodationTransferDate, lang) ?? ''
   );
-  pushRow(rows, t('viewTheResponse:household.shareAdditional'), yesNo(t, hc.shareAdditionalCircumstances));
+  pushRow(
+    rows,
+    t('viewTheResponse:household.shareAdditional'),
+    yesNo(t, hc.shareAdditionalCircumstances, 'shareAdditionalCircumstances')
+  );
   pushRow(rows, t('viewTheResponse:household.additionalDetails'), hc.additionalCircumstancesDetails);
-  pushRow(rows, t('viewTheResponse:household.exceptionalHardship'), yesNo(t, hc.exceptionalHardship));
+  pushRow(
+    rows,
+    t('viewTheResponse:household.exceptionalHardship'),
+    yesNo(t, hc.exceptionalHardship, 'exceptionalHardship')
+  );
   pushRow(rows, t('viewTheResponse:household.exceptionalHardshipDetails'), hc.exceptionalHardshipDetails);
   return { rows };
 }
@@ -437,7 +461,7 @@ function buildIncomeRow(
   pushRow(rows, t(labelKey), formatIncomeValue(t, amount, frequency));
 }
 
-function buildRegularIncome(t: TFunction, caseData: CcdCaseData): SummarySection {
+function buildRegularIncome(t: TFunction, caseData: CcdCaseData, lang: string): SummarySection {
   const rows: SummaryRow[] = [];
   const hc = caseData.possessionClaimResponse?.defendantResponses?.householdCircumstances;
   if (!hc) {
@@ -459,11 +483,15 @@ function buildRegularIncome(t: TFunction, caseData: CcdCaseData): SummarySection
       formatIncomeValue(t, hc.universalCreditAmount ?? undefined, hc.universalCreditFrequency ?? undefined)
     );
   } else if (isYes(hc.hasAppliedForUniversalCredit)) {
-    pushRow(rows, t('viewTheResponse:income.universalCreditApplied'), t('common:options.yes'));
+    pushRow(
+      rows,
+      t('viewTheResponse:income.universalCreditApplied'),
+      t('viewTheResponse:answers.universalCreditApplied.yes')
+    );
     pushRow(
       rows,
       t('viewTheResponse:income.universalCreditApplicationDate'),
-      formatGdsDate(hc.ucApplicationDate) ?? ''
+      formatGdsDate(hc.ucApplicationDate, lang) ?? ''
     );
   } else {
     pushRow(rows, t('viewTheResponse:income.universalCredit'), yesNo(t, hc.universalCredit));
@@ -487,7 +515,7 @@ function buildPriorityDebts(t: TFunction, caseData: CcdCaseData): SummarySection
   if (!hc) {
     return { rows };
   }
-  pushRow(rows, t('viewTheResponse:debts.hasPriorityDebts'), yesNo(t, hc.priorityDebts));
+  pushRow(rows, t('viewTheResponse:debts.hasPriorityDebts'), yesNo(t, hc.priorityDebts, 'priorityDebts'));
   pushRow(rows, t('viewTheResponse:debts.debtTotal'), formatMoneyAmount(hc.debtTotal));
   if (hc.debtContribution || hc.debtContributionFrequency) {
     pushRow(
@@ -536,10 +564,16 @@ function buildRegularExpenses(t: TFunction, caseData: CcdCaseData): SummarySecti
 function buildAdditionalInformation(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
   const responses = caseData.possessionClaimResponse?.defendantResponses;
-  pushRow(rows, t('viewTheResponse:additional.otherConsiderations'), yesNo(t, responses?.otherConsiderations));
+  pushRow(
+    rows,
+    t('viewTheResponse:additional.otherConsiderations'),
+    yesNo(t, responses?.otherConsiderations, 'otherConsiderations')
+  );
   pushRow(rows, t('viewTheResponse:additional.otherConsiderationsDetails'), responses?.otherConsiderationsDetails);
   return { rows };
 }
+
+const COUNTERCLAIM_TYPES = ['PAYMENT_OR_COMPENSATION', 'SOMETHING_ELSE', 'BOTH'];
 
 function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection {
   const rows: SummaryRow[] = [];
@@ -550,14 +584,20 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
 
   const cc: CcdCounterClaim = responses.counterClaim;
 
+  // A type without a translation (e.g. a new pcs-api type) is shown as words rather than hidden or shown as its code.
   if (cc.claimType) {
-    const typeLabel = t(`viewTheResponse:counterclaim.claimTypeOptions.${cc.claimType}`, cc.claimType);
-    pushRow(rows, t('viewTheResponse:counterclaim.type'), typeLabel);
+    pushRow(
+      rows,
+      t('viewTheResponse:counterclaim.type'),
+      COUNTERCLAIM_TYPES.includes(cc.claimType)
+        ? t(`viewTheResponse:counterclaim.claimTypeOptions.${cc.claimType}`)
+        : enumToSentence(cc.claimType)
+    );
   }
 
   const claimsMoney = cc.claimType === 'PAYMENT_OR_COMPENSATION' || cc.claimType === 'BOTH';
   if (claimsMoney && cc.isClaimAmountKnown) {
-    pushRow(rows, t('viewTheResponse:counterclaim.amountKnown'), yesNo(t, cc.isClaimAmountKnown));
+    pushRow(rows, t('viewTheResponse:counterclaim.amountKnown'), yesNo(t, cc.isClaimAmountKnown, 'isClaimAmountKnown'));
     if (isYes(cc.isClaimAmountKnown)) {
       pushRow(rows, t('viewTheResponse:counterclaim.amount'), formatMoneyAmount(cc.claimAmount));
     } else if (isNo(cc.isClaimAmountKnown)) {
@@ -583,7 +623,7 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
     pushRow(rows, t('viewTheResponse:counterclaim.needHelpWithFees'), feesLabel);
   }
   if (cc.appliedForHwf) {
-    pushRow(rows, t('viewTheResponse:counterclaim.appliedForHwf'), yesNo(t, cc.appliedForHwf));
+    pushRow(rows, t('viewTheResponse:counterclaim.appliedForHwf'), yesNo(t, cc.appliedForHwf, 'appliedForHwf'));
     if (isYes(cc.appliedForHwf)) {
       pushRow(rows, t('viewTheResponse:counterclaim.hwfReference'), cc.hwfReferenceNumber);
     }
@@ -592,8 +632,11 @@ function buildCounterclaim(t: TFunction, caseData: CcdCaseData): SummarySection 
   return { rows };
 }
 
-function resolveResponsePdfUrl(caseData: CcdCaseData, caseReference: string): string | undefined {
-  const documentId = caseData.possessionClaimResponse?.responseDocumentId;
+function resolveDocumentUrl(
+  documentId: string | undefined,
+  caseData: CcdCaseData,
+  caseReference: string
+): string | undefined {
   if (!documentId) {
     return undefined;
   }
@@ -631,22 +674,24 @@ export default function viewTheResponseRoutes(app: Application): void {
       }
 
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
+      const lang = getRequestLanguage(req);
       const release12Enabled = await isRespondToClaimEnabledForRelease(req);
       const showExemptLandlord = release12Enabled && isWalesProperty(caseData);
 
-      const dateSubmitted = formatGdsDate(caseData.dateSubmitted);
-      const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate);
+      const dateSubmitted = formatGdsDate(caseData.dateSubmitted, lang);
+      const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate, lang);
       const completedBy = responses?.statementOfTruthCompletedBy;
       const responsePdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_2_ENABLED, false);
+      const counterclaimPdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_4_ENABLED, false);
 
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
-        defendant1Details: buildDefendant1Details(t, caseData),
-        additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData),
-        responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord),
-        paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued),
-        householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData),
-        regularIncome: buildRegularIncome(t, caseData),
+        defendant1Details: buildDefendant1Details(t, caseData, lang),
+        additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData, lang),
+        responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord, lang),
+        paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued, lang),
+        householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData, lang),
+        regularIncome: buildRegularIncome(t, caseData, lang),
         priorityDebts: buildPriorityDebts(t, caseData),
         regularExpenses: buildRegularExpenses(t, caseData),
         additionalInformation: buildAdditionalInformation(t, caseData),
@@ -663,7 +708,12 @@ export default function viewTheResponseRoutes(app: Application): void {
         ...sections,
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
-        responsePdfUrl: responsePdfEnabled ? resolveResponsePdfUrl(caseData, caseReference) : undefined,
+        counterclaimPdfUrl: counterclaimPdfEnabled
+          ? resolveDocumentUrl(caseData.possessionClaimResponse?.counterclaimDocumentId, caseData, caseReference)
+          : undefined,
+        responsePdfUrl: responsePdfEnabled
+          ? resolveDocumentUrl(caseData.possessionClaimResponse?.responseDocumentId, caseData, caseReference)
+          : undefined,
       });
     } catch (e) {
       logger.error(`Failed to fetch case data for case ${caseReference}. Error was: ${String(e)}`);
