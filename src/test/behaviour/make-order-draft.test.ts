@@ -57,76 +57,6 @@ describe('make an order: drafting', () => {
     );
   });
 
-  it('saves without posting the case context JSON that the WAF blocks', async () => {
-    const page = await openPage((await app.get(PAGE)).text);
-    const body = page.body('SAVE_DRAFT');
-    expect(body.has('caseContext')).toBe(false);
-    expect((await app.post(PAGE, body)).location).toBe(MANAGE_CASE_URL);
-  });
-
-  it('uses the original case to validate attendance even if the browser posts different parties', async () => {
-    const page = await openPage((await app.get(PAGE)).text);
-    selectTab('tab-free-form');
-    const body = page.body('SUBMIT_FOR_REVIEW');
-    body.set('caseContext', JSON.stringify({ claimants: [], defendants: [] }));
-    const rejected = await app.post(PAGE, body);
-    expect(rejected.status).toBe(400);
-    expect(rejected.text).toContain('Select how Claimant 1: Example Housing attended');
-    expect(submittedEventTokens()).toEqual([]);
-  });
-
-  it('uses the original order identity and version rather than hidden browser values', async () => {
-    const page = await openPage((await app.get(PAGE)).text);
-    const body = page.body('SAVE_DRAFT');
-    body.set('orderVersion', '999');
-    body.set('orderId', 'another-order');
-    expect((await app.post(PAGE, body)).status).toBe(302);
-    expect(submittedOrders().at(-1)).toMatchObject({ order: { id: null, version: 0 } });
-  });
-
-  it('saves from each open tab against the start that tab was given', async () => {
-    const first = await openPage((await app.get(PAGE)).text);
-    const firstBody = first.body('SAVE_DRAFT');
-    const second = await openPage((await app.get(PAGE)).text);
-    const secondBody = second.body('SAVE_DRAFT');
-    expect(secondBody.get('eventToken')).not.toBe(firstBody.get('eventToken'));
-    expect((await app.post(PAGE, firstBody)).status).toBe(302);
-    expect((await app.post(PAGE, secondBody)).status).toBe(302);
-    expect(submittedEventTokens()).toEqual([firstBody.get('eventToken'), secondBody.get('eventToken')]);
-  });
-
-  it("preserves edits and asks for confirmation when the page's start was already used", async () => {
-    const page = await openPage((await app.get(PAGE)).text);
-    selectTab('tab-free-form');
-    type('hearing-notes', 'Keep these notes');
-    writeInPreview('The parties shall exchange evidence within fourteen days.');
-    const body = page.body('SAVE_DRAFT');
-    // A start is cleared once it is submitted, so submitting it again from a stale page is refused.
-    expect((await app.post(PAGE, body)).status).toBe(302);
-    const expired = await app.post(PAGE, body);
-    expect(expired.status).toBe(409);
-    expect(submittedEventTokens()).toHaveLength(1);
-    const retry = await openPage(expired.text);
-    expect(control('#make-order-error-summary').textContent).toContain('Check your order and try again');
-    expect(control('[name="hearing-notes"]').value).toBe('Keep these notes');
-    expect(retry.documentText()).toContain('The parties shall exchange evidence within fourteen days.');
-    expect(retry.body().get('eventToken')).not.toBe(body.get('eventToken'));
-    expect((await app.post(PAGE, retry.body('SAVE_DRAFT'))).status).toBe(302);
-  });
-
-  it('does not submit an unknown or previously completed start', async () => {
-    const page = await openPage((await app.get(PAGE)).text);
-    const unknown = page.body('SAVE_DRAFT');
-    unknown.set('eventToken', 'unknown-start');
-    const recovered = await app.post(PAGE, unknown);
-    expect(recovered.status).toBe(409);
-    expect(submittedEventTokens()).toEqual([]);
-    const retry = (await openPage(recovered.text)).body('SAVE_DRAFT');
-    expect((await app.post(PAGE, retry)).status).toBe(302);
-    expect((await app.post(PAGE, retry)).status).toBe(409);
-    expect(submittedEventTokens()).toHaveLength(1);
-  });
-
   it('remembers the selected order type and its document', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-suspended');
@@ -159,20 +89,16 @@ describe('make an order: drafting', () => {
     expect(submittedOrders()).toHaveLength(0);
   });
 
-  it("starts the event when the page loads, and submits the judge's change with that start", async () => {
+  it("submits the judge's change with a new start, so the page posts no case or event token", async () => {
     const page = await openPage((await app.get(PAGE)).text);
-    expect(eventStarts()).toBe(1);
-    const token = control('[name="eventToken"]').value;
-    expect(token).toBe('event-token-1');
-
-    // Neither a rejected nor an accepted submission starts the event again.
     selectTab('tab-free-form');
     const incomplete = page.body();
+    expect(incomplete.has('caseContext')).toBe(false);
+    expect(incomplete.has('eventToken')).toBe(false);
     incomplete.set('action', 'SUBMIT_FOR_REVIEW');
     const invalid = await app.post(PAGE, incomplete);
     expect(invalid.status).toBe(400);
     const retry = await openPage(invalid.text);
-    expect(control('[name="eventToken"]').value).toBe(token);
     expect(control('#make-order-error-summary').textContent).toContain(
       'Select how Claimant 1: Example Housing attended'
     );
@@ -181,8 +107,20 @@ describe('make an order: drafting', () => {
     const body = retry.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     expect((await app.post(PAGE, body)).status).toBe(302);
-    expect(eventStarts()).toBe(1);
-    expect(submittedEventTokens()).toEqual(['event-token-1']);
+    expect(eventStarts()).toBe(3);
+    expect(submittedEventTokens()).toEqual(['event-token-3']);
+  });
+
+  it('checks attendance against the case, not one the browser posts', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-free-form');
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    body.set('caseContext', JSON.stringify({ claimants: [], defendants: [] }));
+    const rejected = await app.post(PAGE, body);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Select how Claimant 1: Example Housing attended');
+    expect(submittedOrders()).toHaveLength(0);
   });
 
   it('shows the saved order, and why, when pcs-api refuses a save', async () => {
@@ -200,26 +138,28 @@ describe('make an order: drafting', () => {
     const refused = await app.post(PAGE, body);
     expect(refused.status).toBe(422);
 
-    // The refused page is based on a new start, which the judge's next change is submitted with.
-    expect(body.get('eventToken')).toBe(submittedEventTokens().at(-1));
     await openPage(refused.text);
-    expect(control('[name="eventToken"]').value).toBe(`event-token-${eventStarts()}`);
-    expect(control('[name="eventToken"]').value).not.toBe(body.get('eventToken'));
     expect(control('#make-order-error-summary').textContent).toContain(
       'The order draft has been updated by another user. Reload it and try again'
     );
     expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Saved earlier');
   });
 
-  it('keeps the original start when review validation fails', async () => {
-    const page = await openPage((await app.get(PAGE)).text);
-    const incomplete = page.body('SUBMIT_FOR_REVIEW');
+  it('keeps the version the answers were made against when review validation fails', async () => {
+    const firstTab = (await app.get(PAGE)).text;
+
+    const secondTab = await openPage((await app.get(PAGE)).text);
+    const second = secondTab.body();
+    second.set('action', 'SAVE_DRAFT');
+    expect((await app.post(PAGE, second)).status).toBe(302);
+
+    const incomplete = (await openPage(firstTab)).body();
+    incomplete.set('action', 'SUBMIT_FOR_REVIEW');
     const invalid = await app.post(PAGE, incomplete);
     expect(invalid.status).toBe(400);
-    const retry = (await openPage(invalid.text)).body('SAVE_DRAFT');
-    expect(retry.get('eventToken')).toBe(incomplete.get('eventToken'));
-    expect((await app.post(PAGE, retry)).status).toBe(302);
-    expect(submittedOrders().at(-1)).toMatchObject({ order: { version: 0 } });
+
+    const retry = (await openPage(invalid.text)).body();
+    expect(retry.get('orderVersion')).toBe(incomplete.get('orderVersion'));
   });
 
   it('saves a long order', async () => {

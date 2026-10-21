@@ -30,11 +30,9 @@ interface StartedOrder {
  * Starts the judge's working order, or the order they chose on the case's orders tab: one a
  * caseworker returned to them, which pcs-api starts with the caseworker's query.
  */
-async function startOrderEvent(req: Request): Promise<StartedOrder> {
-  const caseReference = req.params.caseReference as string;
-  const orderId = chosenOrderId(req);
+async function startOrderEvent(accessToken: string, caseReference: string, orderId?: string): Promise<StartedOrder> {
   const started = await ccdCaseService.startCaseEvent(
-    req.session.user!.accessToken,
+    accessToken,
     caseReference,
     MAKE_ORDER_EVENT_ID,
     orderId ? { orderId } : undefined
@@ -45,20 +43,7 @@ async function startOrderEvent(req: Request): Promise<StartedOrder> {
     // it lets use the event.
     throw new HTTPError('Not permitted to make an order on this case', 403);
   }
-  const envelope = JSON.parse(payload) as OrderStart;
-  // The case and order the page was started on stay server-side, keyed by its event token: posting the
-  // context JSON trips WAF rules and lets the browser tamper with it. The saved answers and document are
-  // left out, as the page posts its own. Entries are cleared on submit and otherwise die with the session.
-  const { id, version, queryFromCaseworker } = envelope.order;
-  req.session.makeOrderStarts = {
-    ...req.session.makeOrderStarts,
-    [started.eventToken]: {
-      caseReference,
-      caseContext: envelope.caseContext,
-      order: { id, version, queryFromCaseworker },
-    },
-  };
-  return { envelope, eventToken: started.eventToken };
+  return { envelope: JSON.parse(payload) as OrderStart, eventToken: started.eventToken };
 }
 
 /** What the judge sent, shown back with the issues that stopped it; the saved order fills any gaps. */
@@ -66,11 +51,7 @@ interface Submission extends OrderFormSubmission {
   validationIssues: MakeOrderValidationIssue[];
 }
 
-function pageModel(
-  req: Request,
-  { envelope, eventToken }: StartedOrder,
-  submission?: Submission
-): Record<string, unknown> {
+function pageModel(req: Request, { envelope }: StartedOrder, submission?: Submission): Record<string, unknown> {
   const headerModel = xuiHeaderModel(req, ['judge']);
   const { caseContext, order } = envelope;
   const issues = submission?.validationIssues ?? [];
@@ -81,7 +62,6 @@ function pageModel(
     // The page's own URL, without the tab fragment the browser would otherwise post back to.
     formAction: req.originalUrl,
     order,
-    eventToken,
     // The task the judge came from, if a caseworker's query brought them here, which pcs-api closes on resubmission.
     taskId: typeof req.query.taskId === 'string' ? req.query.taskId : '',
     ...orderFormModel(envelope, submission),
@@ -107,7 +87,11 @@ export default function makeOrderRoutes(app: Application): void {
     try {
       // A new order on the case is under way, so there is no longer one to confirm.
       delete req.session.ordersSentForReview?.[req.params.caseReference as string];
-      const started = await startOrderEvent(req);
+      const started = await startOrderEvent(
+        req.session.user!.accessToken,
+        req.params.caseReference as string,
+        chosenOrderId(req)
+      );
       res.render('make-order', pageModel(req, started));
     } catch (error) {
       refusedOrderEvent(res, next, error);
@@ -117,39 +101,30 @@ export default function makeOrderRoutes(app: Application): void {
   app.post(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
-    const { _csrf, action, eventToken, taskId, orderType, orderDocument, ...formData } = req.body;
+    const { _csrf, action, orderId, taskId, orderVersion, orderType, orderDocument, ...formData } = req.body;
 
     try {
-      const open = req.session.makeOrderStarts?.[eventToken];
-      if (!open || open.caseReference !== caseReference) {
-        const current = await startOrderEvent(req);
-        return res.status(409).render(
-          'make-order',
-          pageModel(req, current, {
-            orderType,
-            formData,
-            orderDocumentJson: orderDocument,
-            validationIssues: [
-              { id: 'make-order-form', message: 'This order page has expired. Check your order and try again.' },
-            ],
-          })
-        );
-      }
-      const started: StartedOrder = { envelope: { caseContext: open.caseContext, order: open.order }, eventToken };
+      // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
+      // blocks, and could change it. The order's id and version stay the page's: pcs-api refuses the change
+      // if the order has moved on since.
+      const started = await startOrderEvent(accessToken, caseReference, chosenOrderId(req));
       if (action === 'SUBMIT_FOR_REVIEW') {
         const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(started.envelope));
         if (validationIssues.length) {
-          // Nothing was submitted, so the page's start, and the version it gave, still stand: if the
+          // Nothing was submitted, so the page keeps the version its answers were made against: if the
           // draft was saved elsewhere meanwhile, pcs-api refuses the retry rather than overwriting it.
+          const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
           const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues };
-          return res.status(400).render('make-order', pageModel(req, started, submission));
+          return res
+            .status(400)
+            .render('make-order', pageModel(req, { ...started, envelope: { ...started.envelope, order } }, submission));
         }
       }
       const request = {
         action,
         order: {
-          id: started.envelope.order.id || null,
-          version: started.envelope.order.version,
+          id: orderId || null,
+          version: Number(orderVersion),
           orderType,
           formData,
           docweaveSnapshot: postedSnapshot(orderDocument),
@@ -166,11 +141,10 @@ export default function makeOrderRoutes(app: Application): void {
         }
         // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
         // tab: show the judge the order as it now stands, and why.
-        const current = await startOrderEvent(req);
+        const current = await startOrderEvent(accessToken, caseReference, chosenOrderId(req));
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }
-      delete req.session.makeOrderStarts?.[eventToken];
       if (action === 'SUBMIT_FOR_REVIEW') {
         // Kept on the session so the confirmation survives a refresh, which cannot resubmit the order.
         req.session.ordersSentForReview = {

@@ -18,8 +18,9 @@
   {# The explicit action leaves out the tab fragment, so a refused submission opens at the error summary. #}
   <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
         data-property-address="{{ propertyAddressDisplay }}">
-  <input type="hidden" name="eventToken" value="{{ eventToken }}">
+  <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="taskId" value="{{ taskId }}">
+  <input type="hidden" name="orderVersion" value="{{ order.version }}">
   {{ csrfProtection(csrfToken) }}
 
   <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make an order</h1>
@@ -33,7 +34,7 @@
   </p>
 
   {% if order.queryFromCaseworker %}
-    {# An order a caseworker returned: their query, which the page keeps if it is shown again with errors. #}
+    {# An order a caseworker returned: their query. #}
     <h2 class="govuk-heading-m">Query from the caseworker</h2>
     <p class="govuk-body">
       A caseworker returned this order to you with a query. Change the order if you need to, then send it for review again.

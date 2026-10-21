@@ -63,8 +63,6 @@ async function judgesOrder(options: { tab?: string; staffMessage?: string; edit?
     const hidden = [
       '_csrf',
       'action',
-      'eventToken',
-      'caseContext',
       'orderId',
       'orderVersion',
       'orderType',

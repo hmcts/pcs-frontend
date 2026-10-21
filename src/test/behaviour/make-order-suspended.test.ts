@@ -117,12 +117,11 @@ describe('make an order: suspended possession', () => {
     recordAttendance();
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
+    expect((await app.post(PAGE, body)).status).toBe(302);
     body.set('suspended-instalment-frequency', 'yearly');
     const rejected = await app.post(PAGE, body);
     expect(rejected.status).toBe(400);
     expect(rejected.text).toContain('Select weekly, fortnightly or monthly instalments');
-    body.set('suspended-instalment-frequency', 'fortnightly');
-    expect((await app.post(PAGE, body)).status).toBe(302);
   });
 
   it('treats a money judgment and an adjourned money claim as alternatives', async () => {
