@@ -30,9 +30,11 @@ interface StartedOrder {
  * Starts the judge's working order, or the order they chose on the case's orders tab: one a
  * caseworker returned to them, which pcs-api starts with the caseworker's query.
  */
-async function startOrderEvent(accessToken: string, caseReference: string, orderId?: string): Promise<StartedOrder> {
+async function startOrderEvent(req: Request): Promise<StartedOrder> {
+  const caseReference = req.params.caseReference as string;
+  const orderId = chosenOrderId(req);
   const started = await ccdCaseService.startCaseEvent(
-    accessToken,
+    req.session.user!.accessToken,
     caseReference,
     MAKE_ORDER_EVENT_ID,
     orderId ? { orderId } : undefined
@@ -43,7 +45,19 @@ async function startOrderEvent(accessToken: string, caseReference: string, order
     // it lets use the event.
     throw new HTTPError('Not permitted to make an order on this case', 403);
   }
-  return { envelope: JSON.parse(payload) as OrderStart, eventToken: started.eventToken };
+  const envelope = JSON.parse(payload) as OrderStart;
+  const { caseContext, order } = envelope;
+  // Only one order journey is active in the session. Keep its original context and version
+  // server-side; posting the context JSON triggers WAF rules and allows browser tampering.
+  req.session.makeOrderStart = {
+    caseReference,
+    eventToken: started.eventToken,
+    envelope: {
+      caseContext,
+      order: { id: order.id, version: order.version, queryFromCaseworker: order.queryFromCaseworker },
+    },
+  };
+  return { envelope, eventToken: started.eventToken };
 }
 
 /** What the judge sent, shown back with the issues that stopped it; the saved order fills any gaps. */
@@ -69,8 +83,6 @@ function pageModel(
     eventToken,
     // The task the judge came from, if a caseworker's query brought them here, which pcs-api closes on resubmission.
     taskId: typeof req.query.taskId === 'string' ? req.query.taskId : '',
-    // The case as the event started it, which the page's change is based on.
-    caseContextJson: JSON.stringify(caseContext),
     ...orderFormModel(envelope, submission),
     ...caseHeader(caseContext),
     validationErrors: Object.fromEntries(issues.map(issue => [issue.id, { text: issue.message }])),
@@ -94,11 +106,7 @@ export default function makeOrderRoutes(app: Application): void {
     try {
       // A new order on the case is under way, so there is no longer one to confirm.
       delete req.session.ordersSentForReview?.[req.params.caseReference as string];
-      const started = await startOrderEvent(
-        req.session.user!.accessToken,
-        req.params.caseReference as string,
-        chosenOrderId(req)
-      );
+      const started = await startOrderEvent(req);
       res.render('make-order', pageModel(req, started));
     } catch (error) {
       refusedOrderEvent(res, next, error);
@@ -112,26 +120,33 @@ export default function makeOrderRoutes(app: Application): void {
       _csrf,
       action,
       eventToken,
-      caseContext,
-      orderId,
+      caseContext: _caseContext,
+      orderId: _orderId,
       taskId,
-      orderVersion,
-      queryFromCaseworker,
+      orderVersion: _orderVersion,
+      queryFromCaseworker: _queryFromCaseworker,
       orderType,
       orderDocument,
       ...formData
     } = req.body;
 
     try {
+      const started = req.session.makeOrderStart;
+      if (!started || started.caseReference !== caseReference || started.eventToken !== eventToken) {
+        const current = await startOrderEvent(req);
+        return res.status(409).render(
+          'make-order',
+          pageModel(req, current, {
+            orderType,
+            formData,
+            orderDocumentJson: orderDocument,
+            validationIssues: [
+              { id: 'make-order-form', message: 'This order page has expired. Check your order and try again.' },
+            ],
+          })
+        );
+      }
       if (action === 'SUBMIT_FOR_REVIEW') {
-        // The order is checked against the case as the page's start returned it.
-        const started: StartedOrder = {
-          eventToken,
-          envelope: {
-            order: { id: orderId, version: Number(orderVersion), queryFromCaseworker },
-            caseContext: JSON.parse(caseContext),
-          },
-        };
         const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(started.envelope));
         if (validationIssues.length) {
           // Nothing was submitted, so the page's start, and the version it gave, still stand: if the
@@ -143,8 +158,8 @@ export default function makeOrderRoutes(app: Application): void {
       const request = {
         action,
         order: {
-          id: orderId || null,
-          version: Number(orderVersion),
+          id: started.envelope.order.id || null,
+          version: started.envelope.order.version,
           orderType,
           formData,
           docweaveSnapshot: postedSnapshot(orderDocument),
@@ -161,15 +176,16 @@ export default function makeOrderRoutes(app: Application): void {
         }
         // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
         // tab: show the judge the order as it now stands, and why.
-        const current = await startOrderEvent(accessToken, caseReference, chosenOrderId(req));
+        const current = await startOrderEvent(req);
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }
+      delete req.session.makeOrderStart;
       if (action === 'SUBMIT_FOR_REVIEW') {
         // Kept on the session so the confirmation survives a refresh, which cannot resubmit the order.
         req.session.ordersSentForReview = {
           ...req.session.ordersSentForReview,
-          [caseReference]: confirmationHeader(caseReference, JSON.parse(caseContext)),
+          [caseReference]: confirmationHeader(caseReference, started.envelope.caseContext),
         };
         return res.redirect(MAKE_ORDER_SENT_FOR_REVIEW_ROUTE.replace(':caseReference', caseReference));
       }

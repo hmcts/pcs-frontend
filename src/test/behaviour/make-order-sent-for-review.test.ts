@@ -25,6 +25,7 @@ async function sendOrderForReview(app: TestApp, recordOtherAttendance = () => {}
   recordOtherAttendance();
   const body = page.body();
   body.set('action', 'SUBMIT_FOR_REVIEW');
+  expect(body.has('caseContext')).toBe(false);
   return app.post(PAGE, body);
 }
 

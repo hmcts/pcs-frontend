@@ -19,10 +19,7 @@
   <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
         data-property-address="{{ propertyAddressDisplay }}">
   <input type="hidden" name="eventToken" value="{{ eventToken }}">
-  <input type="hidden" name="caseContext" value="{{ caseContextJson }}">
-  <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="taskId" value="{{ taskId }}">
-  <input type="hidden" name="orderVersion" value="{{ order.version }}">
   {{ csrfProtection(csrfToken) }}
 
   <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make an order</h1>
@@ -45,7 +42,6 @@
       html: '<p class="govuk-body pcs-preserve-lines">' + (order.queryFromCaseworker | escape) + '</p>',
       attributes: { id: "caseworker-query" }
     }) }}
-    <textarea hidden name="queryFromCaseworker">{{ order.queryFromCaseworker }}</textarea>
   {% endif %}
 
   <p class="govuk-body">Answer every question unless it says it is optional.</p>
