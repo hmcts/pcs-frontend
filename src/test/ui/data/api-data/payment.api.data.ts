@@ -22,7 +22,7 @@ export const paymentApiData = {
       typeof feeAmountInPounds === 'number' && !Number.isNaN(feeAmountInPounds)
         ? Math.round(feeAmountInPounds * 100)
         : 40400;
-    const accountNumber = process.env.PBA_ACCOUNT_NUMBER ?? 'PBA0084541';
+    const accountNumber = process.env.PBA_ACCOUNT_NUMBER || 'PBA0084541';
 
     console.log('[PAYMENT API] fee (pounds) =', feeAmountInPounds, '-> pence =', serviceRequestAmount);
     console.log('[PAYMENT API] account_number =', accountNumber);
