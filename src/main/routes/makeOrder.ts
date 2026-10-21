@@ -21,6 +21,7 @@ import {
   confirmationHeader,
   manageCaseDetailsUrl,
   postedSnapshot,
+  refusalPage,
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
@@ -127,7 +128,7 @@ export default function makeOrderRoutes(app: Application): void {
       );
       res.render('make-order', pageModel(req, started));
     } catch (error) {
-      refusedOrderEvent(res, next, error);
+      refusedOrderEvent(res, next, error, refusalPage(req, res, ['judge']));
     }
   });
 

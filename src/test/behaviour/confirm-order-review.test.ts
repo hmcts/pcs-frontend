@@ -167,11 +167,16 @@ describe('confirm order review', () => {
       expect(page.querySelector('#edited-warning')).toBeNull();
     });
 
-    it('fails when pcs-api will not start the review', async () => {
+    it('tells the caseworker why pcs-api will not start the review, and the way back to the case', async () => {
       app = await caseworkerReviewing();
-      refuseNextStart('The order is no longer waiting for review');
+      refuseNextStart('Open the order to review from its task');
 
-      expect((await app.get(INTRO)).status).toBe(422);
+      const refused = await app.get(INTRO);
+
+      expect(refused.status).toBe(422);
+      const page = parse(refused.text);
+      expect(page.querySelector('[data-refusal]')?.textContent).toBe('Open the order to review from its task');
+      expect(page.querySelector('a.govuk-button')?.textContent?.trim()).toBe('Return to case details');
     });
 
     it('does not exist for someone CCD does not let review orders', async () => {
