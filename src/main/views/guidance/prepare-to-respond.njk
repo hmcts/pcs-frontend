@@ -1,0 +1,66 @@
+{% extends "public-template.njk" %}
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+
+{% set serviceName = t('serviceName') %}
+{% set phaseBannerText = t('pilotBanner') %}
+
+{% block pageTitle %}{{ t('pageTitle') }} - GOV.UK{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-xl">
+        <span class="govuk-caption-xl">{{ t('caption') }}</span>
+        {{ t('heading') }}
+      </h1>
+
+      <h2 class="govuk-heading-m">{{ t('beforeYouStart') }}</h2>
+      <p class="govuk-body">{{ t('intro') }}</p>
+      <p class="govuk-body">{{ sectionCount }}</p>
+      <p class="govuk-body">{{ t('pilotScope') }}</p>
+
+      {% set readyHtml %}
+        <h2 class="govuk-heading-m">{{ t('readyHeading') }}</h2>
+        <p class="govuk-body">
+          {{ t('readyText') }} <a class="govuk-link" href="{{ respondOnlineUrl }}">{{ t('readyLink') }}</a>.
+        </p>
+      {% endset %}
+      {{ govukInsetText({ html: readyHtml }) }}
+
+      {{ govukWarningText({
+        text: t('claimantCanSeeAnswers'),
+        iconFallbackText: t('warningHiddenText')
+      }) }}
+
+      {% set items = [] %}
+      {% for section in sections %}
+        {% set sectionHtml %}
+          {% for block in section.content %}
+            {% if block.items %}
+              <ul class="govuk-list govuk-list--bullet">
+                {% for item in block.items %}<li>{{ item }}</li>{% endfor %}
+              </ul>
+            {% else %}
+              <p class="govuk-body">{{ block.text }}</p>
+            {% endif %}
+          {% endfor %}
+        {% endset %}
+        {% set added = items.push({ heading: { text: section.heading }, content: { html: sectionHtml } }) %}
+      {% endfor %}
+
+      {{ govukAccordion({
+        id: "prepare-to-respond",
+        headingLevel: 2,
+        items: items,
+        showAllSectionsText: t('accordion.showAllSections'),
+        hideAllSectionsText: t('accordion.hideAllSections'),
+        showSectionText: t('accordion.showSection'),
+        hideSectionText: t('accordion.hideSection'),
+        showSectionAriaLabelText: t('accordion.showSectionAriaLabel'),
+        hideSectionAriaLabelText: t('accordion.hideSectionAriaLabel')
+      }) }}
+    </div>
+  </div>
+{% endblock %}

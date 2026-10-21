@@ -7,6 +7,7 @@ import { glob } from 'glob';
 import favicon from 'serve-favicon';
 
 import { setupDev } from './development';
+import { publicRouter } from './guidance';
 import {
   caseReferenceParamMiddleware,
   formBodyMiddleware,
@@ -32,13 +33,14 @@ app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
 app.use(formBodyMiddleware);
 
+// Public guidance and the static assets, ahead of the session, IDAM, CSRF and role middleware the modules add.
+app.use(publicRouter(developmentMode, path.join(__dirname, 'public')));
+
 modules.modules.forEach(async moduleName => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const moduleInstance = new (modules as any)[moduleName](developmentMode);
   await moduleInstance.enableFor(app);
 });
-
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve CFT UI component lib assets directly from node_modules
 const cftStylesPath = path.dirname(require.resolve('@hmcts-cft/cft-ui-component-lib/styles/ui-component-lib.css'));

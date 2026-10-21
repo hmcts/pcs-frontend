@@ -1,0 +1,151 @@
+{
+  "pageTitle": "Prepare to respond to a claim for possession of a rented property",
+  "serviceName": "Respond to a claim for possession of a rented property",
+  "caption": "Prepare to:",
+  "heading": "Respond to a claim for possession of a rented property",
+  "pilotBanner": "This guide is for the online possession service, which is only available in some courts.",
+  "beforeYouStart": "Before you start",
+  "intro": "This step-by-step guide can help you prepare to respond to a claim for possession of a rented property.",
+  "sectionCount_one": "Each section explains what you will be asked and any documents you may need. There is {{count}} section. Some are optional and may not apply to you.",
+  "sectionCount_other": "Each section explains what you will be asked and any documents you may need. There are {{count}} sections. Some are optional and may not apply to you.",
+  "pilotScope": "You can only respond online if the letter about your claim tells you to. If it does not, follow the instructions in the letter.",
+  "readyHeading": "When you are ready to complete the form",
+  "readyText": "Once you are ready to complete the form, you can",
+  "readyLink": "respond to a property possession claim online",
+  "claimantCanSeeAnswers": "The claimant will be able to see your answers.",
+  "stepHeading": "Step {{number}}: {{title}}",
+  "accordion": {
+    "showAllSections": "Show all sections",
+    "hideAllSections": "Hide all sections",
+    "showSection": "Show",
+    "hideSection": "Hide",
+    "showSectionAriaLabel": "Show this section",
+    "hideSectionAriaLabel": "Hide this section"
+  },
+  "sections": {
+    "yourDetails": {
+      "title": "Your details",
+      "content": [
+        { "text": "We will ask you to confirm your:" },
+        { "items": ["name", "address", "date of birth", "contact preferences"] }
+      ]
+    },
+    "tenancy": {
+      "title": "Tenancy, occupation contract or licence agreement",
+      "content": [
+        {
+          "text": "When your landlord (the claimant) made their claim, they provided information about your agreement."
+        },
+        { "text": "We will ask you to confirm:" },
+        {
+          "items": [
+            "your tenancy, occupation contract, or licence agreement and when it started",
+            "whether your landlord gave you notice before starting possession proceedings, and when they gave it"
+          ]
+        }
+      ]
+    },
+    "payments": {
+      "title": "Payments or agreements since the claim was made",
+      "content": [
+        { "text": "If the claim against you is based on rent arrears, we will ask you to confirm:" },
+        {
+          "items": [
+            "how much money you owe",
+            "whether you have paid any money since the claim was made – if you have, you will be asked how much you paid and when",
+            "whether you have made an agreement with your landlord to repay what you owe – if you have, you will be asked how much you agreed to pay, how often you will pay and when you made this agreement"
+          ]
+        },
+        {
+          "text": "If you have not made an agreement with your landlord, you can offer to pay what you owe in instalments. We will ask:"
+        },
+        {
+          "items": [
+            "how much you could afford to pay in addition to your current rent",
+            "how often you can make this payment"
+          ]
+        }
+      ]
+    },
+    "household": {
+      "title": "Your household and circumstances",
+      "content": [
+        { "text": "We will ask you about:" },
+        {
+          "items": [
+            "any dependants you have (people you look after financially)",
+            "other adults that live in your home",
+            "whether you would have anywhere else to live if you were asked to leave your home",
+            "any personal circumstances that have led to your case that you think a judge should know about",
+            "any exceptional hardship you would experience if you were asked to leave your home"
+          ]
+        }
+      ]
+    },
+    "incomeAndExpenses": {
+      "title": "Your income and expenses",
+      "content": [
+        {
+          "text": "A judge can use details about your income and expenses to reach a decision on your case, and to decide how much you could afford to repay if you owe any money in rent payments."
+        },
+        { "text": "If you choose to give any details, we will ask you about:" },
+        {
+          "items": [
+            "your regular income",
+            "any benefits you receive",
+            "if you have applied for Universal Credit",
+            "any priority debts",
+            "other regular expenses"
+          ]
+        },
+        { "text": "We may also ask you to upload financial documents or other supporting evidence." }
+      ]
+    },
+    "disputing": {
+      "title": "Disputing other parts of the claim",
+      "content": [
+        { "text": "If any part of the claim against you is not about rent arrears, we will ask you to:" },
+        { "items": ["review the claim", "tell us if you disagree with any part of it"] },
+        {
+          "text": "You can dispute part of the claim if you think the claimant has provided incorrect information or you disagree with what they have said. For example, you may think they did not follow the correct legal procedure, or a document they uploaded is not valid."
+        }
+      ]
+    },
+    "counterclaim": {
+      "title": "Making a counterclaim",
+      "content": [
+        {
+          "text": "A counterclaim is a separate claim that you can make alongside your response to the claim against you. In a counterclaim, you say that the claimant owes you something. This can be money or something else."
+        },
+        { "text": "We will ask you:" },
+        {
+          "items": [
+            "if you want to make a counterclaim",
+            "to pay a fee to make a counterclaim, unless you are eligible for help with fees"
+          ]
+        }
+      ]
+    },
+    "support": {
+      "title": "Tell us if you need support",
+      "content": [
+        { "text": "Some people need support to use HMCTS services." },
+        { "text": "You can ask for support such as:" },
+        {
+          "items": [
+            "a language interpreter",
+            "reasonable adjustments if you have a health condition or disability",
+            "special measures to help you feel safe at court (make sure you ask the court dealing with the case as to the special measures offered)"
+          ]
+        },
+        { "text": "You may also be able to choose to answer equality and diversity questions." }
+      ]
+    },
+    "checkYourAnswers": {
+      "title": "Check your answers",
+      "content": [
+        { "text": "You will be able to review all your answers and make any changes before you submit your response." }
+      ]
+    }
+  }
+}
