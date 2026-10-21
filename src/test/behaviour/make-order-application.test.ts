@@ -44,6 +44,27 @@ describe('make an order: deciding an application', () => {
   });
   afterEach(() => app.close());
 
+  it('keeps the application and task when launched from the XUI task link', async () => {
+    const launch = await app.get(
+      `/cases/${CASE_REFERENCE}/event/ext:makeOrder?expected_sub=judge-uid&genAppId=gen-app-1&taskId=task-1`
+    );
+    expect(launch.status).toBe(303);
+    expect(launch.location).toBe(`/case/${CASE_REFERENCE}/make-order?taskId=task-1&genAppId=gen-app-1`);
+
+    const page = await openPage((await app.get(launch.location!)).text);
+    expect(document.querySelector('h1')?.textContent).toBe('Decide application GA2');
+    expect(startClientContexts()).toEqual([{ genAppId: 'gen-app-1' }]);
+
+    check('application-decision', 'dismiss');
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    expect((await app.post(launch.location!, body)).status).toBe(302);
+    const [submitted] = submittedOrders() as { order: { genAppId: string; orderType: string }; taskId: string }[];
+    expect(submitted.order.genAppId).toBe('gen-app-1');
+    expect(submitted.order.orderType).toBe('APPLICATION_DECISION');
+    expect(submitted.taskId).toBe('task-1');
+  });
+
   it('shows the application, its documents and the note from court staff, without the hearing', async () => {
     const response = await app.get(PAGE);
     await openPage(response.text);
