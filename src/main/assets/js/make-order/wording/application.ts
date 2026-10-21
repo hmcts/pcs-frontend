@@ -6,32 +6,6 @@ import { addCosts, caseManCosts, date, hasCosts, partyLabels, value } from './co
 import { addListing } from './listing';
 import { addPaymentConditions } from './payment-conditions';
 
-const PARAGRAPH_MARKER = /^(?:\(?\d+[.)]|\(?[a-z][.)]|[-•*])\s+/i;
-
-/**
- * The applicant's wording as separate paragraphs, without the numbers they gave them, since the order
- * numbers its own paragraphs. A paragraph starts at a numbered or bulleted line or after a blank one;
- * any other line carries on the paragraph before it, as text wrapped by hand or pasted from a document.
- */
-export function requestedParagraphs(wording: string): string[] {
-  const paragraphs: string[] = [];
-  let carryOn = false;
-  for (const raw of wording.split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line) {
-      carryOn = false;
-      continue;
-    }
-    if (carryOn && !PARAGRAPH_MARKER.test(line)) {
-      paragraphs[paragraphs.length - 1] += ` ${line}`;
-    } else {
-      paragraphs.push(line.replace(PARAGRAPH_MARKER, ''));
-    }
-    carryOn = true;
-  }
-  return paragraphs;
-}
-
 const LISTED = 'The application shall be listed for a hearing on notice to all parties';
 
 const DECISIONS: Record<string, string> = {
