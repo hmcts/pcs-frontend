@@ -72,6 +72,9 @@ export function startClientContexts(): (Record<string, unknown> | undefined)[] {
   return startContexts;
 }
 
+/** What CCD answered each event token it has taken, so it can answer a repeat without applying it again. */
+let answers = new Map<string, Record<string, unknown>>();
+
 /** How many times the make order event has been started. */
 export function eventStarts(): number {
   return startTokens.length;
@@ -162,6 +165,11 @@ function ccdStub(): Express {
     if (!startTokens.includes(req.body.event_token)) {
       return res.status(404).json({ message: 'Cannot find matching start trigger' });
     }
+    // CCD keys a submission by its token: a repeat gets the first one's answer and changes nothing.
+    const answered = answers.get(req.body.event_token);
+    if (answered) {
+      return res.json(answered);
+    }
     if (refusal) {
       const reason = refusal;
       refusal = undefined;
@@ -170,11 +178,12 @@ function ccdStub(): Express {
     const posted = JSON.parse(req.body.data.sdkEventPayload);
     if (event === CONFIRM_ORDER_REVIEW) {
       reviewRequests.push(posted);
-      return res.json({ id: req.params.id, data: {} });
+      answers.set(req.body.event_token, { id: req.params.id, data: {} });
+      return res.json(answers.get(req.body.event_token));
     }
     orderRequests.push(posted);
-    // pcs-api records the hearing's facts and note on every save, apart from the order.
-    if (posted.hearing && envelope.hearing) {
+    // pcs-api records the hearing's facts and note only when changed, apart from the order.
+    if (posted.hearing?.caseFacts && envelope.hearing) {
       envelope.hearing = {
         ...envelope.hearing,
         version: Number(envelope.hearing.version ?? -1) + 1,
@@ -192,7 +201,8 @@ function ccdStub(): Express {
         docweaveSnapshot: posted.order.docweaveSnapshot,
       },
     };
-    res.json({ id: req.params.id, data: {} });
+    answers.set(req.body.event_token, { id: req.params.id, data: {} });
+    res.json(answers.get(req.body.event_token));
   });
   return ccd;
 }
@@ -251,6 +261,7 @@ export async function bootApp(
   startTokens = [];
   startContexts = [];
   submittedTokens = [];
+  answers = new Map();
   reviewRequests = [];
   orderRequests = [];
   startRefusal = undefined;

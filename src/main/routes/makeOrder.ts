@@ -79,11 +79,10 @@ function pageModel(
     // The page's own URL, without the tab fragment the browser would otherwise post back to.
     formAction: req.originalUrl,
     order,
+    // The page's start, which its submissions reuse so CCD takes a repeated one, e.g. a double click, as the same.
     eventToken,
     // The task the judge came from, if a caseworker's query brought them here, which pcs-api closes on resubmission.
     taskId: typeof req.query.taskId === 'string' ? req.query.taskId : '',
-    // The case as the event started it, which the page's change is based on.
-    caseContextJson: JSON.stringify(caseContext),
     ...orderFormModel(envelope, submission),
     ...caseHeader(caseContext),
     validationErrors: Object.fromEntries(issues.map(issue => [issue.id, { text: issue.message }])),
@@ -126,33 +125,16 @@ export default function makeOrderRoutes(app: Application): void {
   app.post(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
-    const {
-      _csrf,
-      action,
-      eventToken,
-      caseContext,
-      orderId,
-      taskId,
-      orderVersion,
-      queryFromCaseworker,
-      hearing,
-      orderType,
-      orderDocument,
-      ...formData
-    } = req.body;
+    const { _csrf, action, eventToken, orderId, taskId, orderVersion, hearing, orderType, orderDocument, ...formData } =
+      req.body;
 
     try {
-      // The hearing as the page's start returned it, with the facts the judge started from.
+      // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
+      // blocks, and could change it. The event token, order id and version stay the page's: CCD takes a
+      // repeated submission as the one already made, and pcs-api refuses the change if the order has moved on.
+      const started = await startOrderEvent(accessToken, caseReference, chosen(req));
+      // Keep the hearing's original facts and version so changes are checked against what the judge saw.
       const startedHearing: OrderHearing | null = JSON.parse(hearing || 'null');
-      // The order is checked against the case as the page's start returned it.
-      const started: StartedOrder = {
-        eventToken,
-        envelope: {
-          order: { id: orderId, version: Number(orderVersion), queryFromCaseworker },
-          caseContext: JSON.parse(caseContext),
-          hearing: startedHearing,
-        },
-      };
       // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
       const validationIssues =
         action === 'SUBMIT_FOR_REVIEW'
@@ -161,10 +143,19 @@ export default function makeOrderRoutes(app: Application): void {
             ? validateHearingRecord(formData)
             : [];
       if (validationIssues.length) {
-        // Nothing was submitted, so the page's start, and the version it gave, still stand: if the
-        // draft was saved elsewhere meanwhile, pcs-api refuses the retry rather than overwriting it.
+        // Nothing was submitted, so keep the token and versions the answers were made against.
+        const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
         const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues };
-        return res.status(400).render('make-order', pageModel(req, started, submission));
+        return res
+          .status(400)
+          .render(
+            'make-order',
+            pageModel(
+              req,
+              { eventToken, envelope: { ...started.envelope, order, hearing: startedHearing } },
+              submission
+            )
+          );
       }
       const request = {
         action,
@@ -207,7 +198,7 @@ export default function makeOrderRoutes(app: Application): void {
         // Kept on the session so the confirmation survives a refresh, which cannot resubmit the order.
         req.session.ordersSentForReview = {
           ...req.session.ordersSentForReview,
-          [caseReference]: confirmationHeader(caseReference, JSON.parse(caseContext)),
+          [caseReference]: confirmationHeader(caseReference, started.envelope.caseContext),
         };
         return res.redirect(MAKE_ORDER_SENT_FOR_REVIEW_ROUTE.replace(':caseReference', caseReference));
       }

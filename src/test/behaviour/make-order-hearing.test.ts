@@ -105,7 +105,7 @@ describe('make an order: for a hearing', () => {
 
   it("checks the hearing's facts on every save, then sends them and its recorded note, as changed", async () => {
     app = await bootApp({ hearing: { ...HEARING, version: 3, note: 'Adjourned for a rent statement.' } });
-    const page = await openPage((await app.get(FOR_HEARING)).text);
+    let page = await openPage((await app.get(FOR_HEARING)).text);
     expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('Adjourned for a rent statement.');
 
     // A fact that is not valid stops even a draft, since saving records it, and keeps the hearing on the page.
@@ -134,6 +134,7 @@ describe('make an order: for a hearing', () => {
     expect((await app.post(FOR_HEARING, page.body('SAVE_DRAFT'))).status).toBe(302);
     expect(submittedOrders().at(-1)?.hearing).toEqual({ id: 7, version: 3 });
 
+    page = await openPage((await app.get(FOR_HEARING)).text);
     type('current-rent', '950.50');
     type('arrears-today', '1,300');
     typeDate('date-notice', '10', '8', '2026');
