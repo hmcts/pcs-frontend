@@ -277,7 +277,6 @@ describe('Helmet Module', () => {
     });
   });
 
-
   describe('Edge Cases', () => {
     it('should handle empty PCQ URL', () => {
       mockConfigGet.mockImplementation((key: string) => {
