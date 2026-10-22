@@ -26,15 +26,6 @@
     {{ govukWarningText({ text: "The applicant asked for this application to be made without notice. Only the applicant will be told of it." }) }}
   {% endif %}
 
-  {% if application.referralNote %}
-    <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Note from court staff{% if application.referredOnDisplay %}, {{ application.referredOnDisplay }}{% endif %}</h4>
-    {{ govukInsetText({
-      html: '<p class="govuk-body">' + (application.referralNote | escape | nl2br) + '</p>',
-      classes: "govuk-!-margin-top-1",
-      attributes: { id: application.prefix + "-referral-note" }
-    }) }}
-  {% endif %}
-
   {% set documentLinks %}
     {% if application.documents | length %}
       <ul class="govuk-list">
@@ -159,7 +150,6 @@
       <p class="govuk-body-s govuk-!-margin-bottom-2">
         {{ application.applicant or "Applicant not known" }}{% if application.submittedOnDisplay %}, {{ application.submittedOnDisplay }}{% endif %}
         {%- if application.withoutNotice == "YES" %}, without notice{% endif %}
-        {%- if application.referralNote %}, referred by court staff{% endif %}
       </p>
       {{ govukDetails({
         summaryText: "Application details and the order asked for",

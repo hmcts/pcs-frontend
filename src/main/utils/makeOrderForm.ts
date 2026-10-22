@@ -38,7 +38,6 @@ function applicationModel(application: OrderApplication, caseReference: number) 
     whatOrderWantedHtml: richTextHtml(application.whatOrderWanted),
     documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
     submittedOnDisplay: displayDate(application.submittedOn),
-    referredOnDisplay: displayDate(application.referredOn),
     within14DaysDisplay: YES_NO[application.within14Days ?? ''],
     otherPartiesAgreedDisplay: YES_NO[application.otherPartiesAgreed ?? ''],
     withoutNoticeDisplay: YES_NO[application.withoutNotice ?? ''],

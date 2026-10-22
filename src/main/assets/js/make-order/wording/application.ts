@@ -2,7 +2,7 @@ import { type DocBuilder, type DocWeaveDocument, type OrderedListBuilder, buildD
 
 import { type OrderApplication, type OrderData } from '../data';
 
-import { addCosts, caseManCosts, date, hasCosts, partyLabels } from './common';
+import { addCosts, caseManCosts, date, hasCosts, partyLabels, sentenceCase } from './common';
 import { addListing } from './listing';
 import { addPaymentConditions } from './payment-conditions';
 
@@ -28,10 +28,6 @@ export function describeApplication(data: OrderData, application: OrderApplicati
   const several = (kind === 'claimant' ? data.claimants : data.defendants).length > 1;
   const ordinal = several ? `${ORDINALS[rank - 1] ?? `${rank}th`} ` : '';
   return `the ${ordinal}${kind}'s application${dated}`;
-}
-
-function sentence(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 /**
@@ -78,7 +74,7 @@ export function addApplicationClauses(
   ids: string
 ): void {
   const { decision, prefix } = application;
-  const described = sentence(describeApplication(data, application));
+  const described = sentenceCase(describeApplication(data, application));
   if (decision === 'grant' && application.warrantSuspension) {
     addPaymentConditions(list, data, `${prefix}-warrant`, 'The warrant of possession is suspended on condition that');
   } else if (decision === 'grant') {

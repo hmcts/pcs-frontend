@@ -35,7 +35,6 @@
 {% macro copy(text) %}<span class="pcs-inline-copy">{{ text }}</span>{% endmacro %}
 
 
-{# errorShownElsewhere: a choice asked over two rows shows its error on the first only. #}
 {% macro radios(name, params) %}
   {% set items = [] %}
   {% for item in params.items %}
@@ -57,7 +56,7 @@
       legend: { text: params.legend, classes: "govuk-visually-hidden" if params.legendHidden else "govuk-fieldset__legend--s" }
     } if params.legend,
     hint: { text: params.hint } if params.hint,
-    errorMessage: validationErrors[name] if not params.errorShownElsewhere,
+    errorMessage: validationErrors[name],
     items: items
   }) }}
 {% endmacro %}

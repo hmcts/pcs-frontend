@@ -23,7 +23,6 @@ const ADJOURN = {
   submittedOn: '2026-10-01',
   whatOrderWanted: '<ol><li><p>The hearing on 14 October is adjourned.</p></li><li><p>Costs in the case.</p></li></ol>',
   documents: [{ id: '3f2a6c1e-0000-4000-8000-000000000001', fileName: 'hospital-letter.pdf' }],
-  referralNote: 'The hearing is next week',
 };
 
 const WARRANT = {
@@ -65,7 +64,6 @@ describe('make an order at a hearing: deciding the applications', () => {
     );
     // The details are in an expander the judge, who has the file, need not open.
     expect(document.querySelector('#app-gen-app-1-more details, details#app-gen-app-1-more')).not.toBeNull();
-    expect(document.querySelector('#app-gen-app-1-referral-note')?.textContent).toContain('The hearing is next week');
     expect(control('[name="app-gen-app-1-decision"][value="none"]').checked).toBe(true);
     expect(control('[name="app-gen-app-2-decision"][value="none"]').checked).toBe(true);
     // The claim's tabs no longer offer the application as a subject.
