@@ -9,6 +9,7 @@ import favicon from 'serve-favicon';
 import { setupDev } from './development';
 import {
   caseReferenceParamMiddleware,
+  formBodyMiddleware,
   judgeXuiRedirectMiddleware,
   legalRepresentativeAccessMiddleware,
   pageTrackingUrlMiddleware,
@@ -31,10 +32,7 @@ setupDev(app, developmentMode);
 app.use(cookieParser());
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
-// Make an order posts the whole order document, which outgrows the 100kb default. A regex rather than
-// MAKE_ORDER_ROUTE so the caseReference param middleware does not run before the modules are set up.
-app.use(/^\/case\/\d{16}\/make-order\/?$/i, bodyParser.urlencoded({ extended: false, limit: '2mb' }));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(formBodyMiddleware);
 
 modules.modules.forEach(async moduleName => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
