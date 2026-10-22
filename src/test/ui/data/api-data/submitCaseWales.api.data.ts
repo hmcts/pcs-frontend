@@ -1071,7 +1071,7 @@ export const submitCaseApiDataWales = {
       },
     ],
     wantToUploadDocuments: 'YES',
-    allDocuments: [
+    additionalDocuments: [
       {
         value: {
           documentType: {

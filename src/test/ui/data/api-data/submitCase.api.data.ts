@@ -143,7 +143,7 @@ export const submitCaseApiData = {
       languageUsed: 'ENGLISH',
       completionNextStep: 'SUBMIT_AND_PAY_NOW',
       wantToUploadDocuments: 'YES',
-      allDocuments: [
+      additionalDocuments: [
         {
           value: {
             documentType: {

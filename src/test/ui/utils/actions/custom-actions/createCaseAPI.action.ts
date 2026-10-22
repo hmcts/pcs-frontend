@@ -144,10 +144,8 @@ export class CreateCaseAPIAction implements IAction {
           if (Axios.isAxiosError(error)) {
             const status = error.response?.status;
             const responseBody = error.response?.data;
-            const requestUrl = submitCaseApi.getUri(error.config);
 
             console.error('=== SUBMIT CASE ERROR RESPONSE ===');
-            console.error('URL:', requestUrl);
             console.error('HTTP Status:', status);
             console.error('Exception:', responseBody?.exception);
             console.error('Error:', responseBody?.error);
@@ -157,7 +155,7 @@ export class CreateCaseAPIAction implements IAction {
             console.error('Full response body:', JSON.stringify(responseBody, null, 2));
 
             throw new Error(
-              `Submit case API request to ${requestUrl} failed with status ${status}: ${JSON.stringify(responseBody ?? error.message)}`
+              `Submit case API failed with status ${status}: ${JSON.stringify(responseBody ?? error.message)}`
             );
           }
           throw new Error('Submit case failed unexpectedly.');
