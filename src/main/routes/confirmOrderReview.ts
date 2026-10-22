@@ -416,7 +416,11 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       if (answers.reviewDates.length < MAX_REVIEW_DATES) {
         answers.reviewDates.push(blankReviewDate());
       }
-      return orderRedirect(req, res, `${req.originalUrl}#review-date-${answers.reviewDates.length}`);
+      return orderRedirect(
+        req,
+        res,
+        `${pageUrl(caseReference, 'reviewDates')}#review-date-${answers.reviewDates.length}`
+      );
     }
     const removing = /^remove-(\d+)$/.exec(action);
     if (removing) {
