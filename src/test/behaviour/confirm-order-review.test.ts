@@ -12,6 +12,7 @@ import {
   refuseNextEvent,
   refuseNextStart,
   selectTab,
+  startWithOrder,
   submittedEventTokens,
   submittedReviews,
   type,
@@ -83,6 +84,10 @@ function changeGeneratedWording(): void {
   field.value = JSON.stringify(snapshot);
 }
 
+/** A review page's answers as the page posts them, with the order it is the review of. */
+const form = (answers: Record<string, string>) =>
+  new URLSearchParams({ reviewOrderId: 'order-awaiting-review', ...answers });
+
 // Making an order boots the judge's page, so the plain order most tests review is made once.
 let plainOrder: Promise<Order> | undefined;
 
@@ -110,12 +115,12 @@ async function issueFromReview(app: TestApp): Promise<void> {
 /** Takes the caseworker from the introduction to the given page with every answer before it given. */
 async function reachProceedToIssue(app: TestApp): Promise<void> {
   await issueFromReview(app);
-  const dates = await app.post(REVIEW_DATES, new URLSearchParams({ 'has-review-dates': 'no', action: 'continue' }));
+  const dates = await app.post(REVIEW_DATES, form({ 'has-review-dates': 'no', action: 'continue' }));
   expect(dates.location).toBe(PROCEED_TO_ISSUE);
 }
 
 const proceedToIssueAnswers = (answers: Record<string, string> = {}) =>
-  new URLSearchParams({
+  form({
     'next-steps': 'complete',
     'final-order': 'no',
     'serve-all-parties': 'yes',
@@ -248,6 +253,27 @@ describe('confirm order review', () => {
       expect(judges).not.toContain('The claimant may apply to restore the claim.');
     });
 
+    it("refuses a page left open for one order once another order's review is opened, keeping that review", async () => {
+      app = await caseworkerReviewing();
+      const first = await openReview(app);
+      writeInPreview('Wording meant for the first order.');
+      const firstBody = first.body('ISSUE');
+      // In another tab the caseworker opens the review of a second order on the case.
+      startWithOrder({ id: 'second-order', version: 1 });
+      await app.get(`${BASE}?orderId=second-order&taskId=task-2`);
+
+      const refused = await app.post(REVIEW, firstBody);
+
+      expect(refused.status).toBe(409);
+      expect(parse(refused.text).querySelector('[data-refusal]')?.textContent).toContain(
+        'You opened the review of another order on this case after this page'
+      );
+      const second = await openPage((await app.get(REVIEW)).text);
+      expect(second.documentText()).not.toContain('Wording meant for the first order.');
+      expect(Object.fromEntries(second.body()).reviewOrderId).toBe('second-order');
+      expect(submittedReviews()).toEqual([]);
+    });
+
     it('takes an order whose wording outgrows an ordinary form', async () => {
       app = await caseworkerReviewing();
       const page = await openReview(app);
@@ -302,7 +328,7 @@ describe('confirm order review', () => {
       app = await caseworkerReviewing();
       await app.get(INTRO);
 
-      const empty = await app.post(REVIEW, new URLSearchParams({ 'send-query': 'yes', action: 'RETURN_TO_JUDGE' }));
+      const empty = await app.post(REVIEW, form({ 'send-query': 'yes', action: 'RETURN_TO_JUDGE' }));
 
       expect(empty.status).toBe(400);
       expect(errors(empty.text)).toEqual(['Enter your query for the Judge']);
@@ -315,7 +341,7 @@ describe('confirm order review', () => {
 
       const tooLong = await app.post(
         REVIEW,
-        new URLSearchParams({ 'send-query': 'yes', 'query-to-judge': 'a'.repeat(501), action: 'RETURN_TO_JUDGE' })
+        form({ 'send-query': 'yes', 'query-to-judge': 'a'.repeat(501), action: 'RETURN_TO_JUDGE' })
       );
 
       expect(tooLong.status).toBe(400);
@@ -342,12 +368,12 @@ describe('confirm order review', () => {
     });
 
     it('asks whether there are review dates, then for a real date, a reason and a description of each', async () => {
-      const unanswered = await app.post(REVIEW_DATES, new URLSearchParams({ action: 'continue' }));
+      const unanswered = await app.post(REVIEW_DATES, form({ action: 'continue' }));
       expect(errors(unanswered.text)).toEqual(['Select if there are any review dates to add']);
 
       const incomplete = await app.post(
         REVIEW_DATES,
-        new URLSearchParams({
+        form({
           'has-review-dates': 'yes',
           'review-date-1-date-day': '31',
           'review-date-1-date-month': '2',
@@ -375,7 +401,7 @@ describe('confirm order review', () => {
       let answers: Record<string, string> = { 'has-review-dates': 'yes' };
       for (let n = 1; n <= 10; n++) {
         answers = { ...answers, ...reviewDate(n) };
-        await app.post(REVIEW_DATES, new URLSearchParams({ ...answers, action: 'add' }));
+        await app.post(REVIEW_DATES, form({ ...answers, action: 'add' }));
       }
 
       const page = parse((await app.get(REVIEW_DATES)).text);
@@ -392,9 +418,9 @@ describe('confirm order review', () => {
         'review-date-1-description': 'Check the stay',
         'review-date-2-description': 'Check compliance',
       };
-      await app.post(REVIEW_DATES, new URLSearchParams({ 'has-review-dates': 'yes', action: 'add' }));
+      await app.post(REVIEW_DATES, form({ 'has-review-dates': 'yes', action: 'add' }));
 
-      const removing = await app.post(REVIEW_DATES, new URLSearchParams({ ...answers, action: 'remove-1' }));
+      const removing = await app.post(REVIEW_DATES, form({ ...answers, action: 'remove-1' }));
 
       expect(removing.location).toBe(REVIEW_DATES);
       const page = parse((await app.get(REVIEW_DATES)).text);
@@ -428,10 +454,7 @@ describe('confirm order review', () => {
     });
 
     it('asks every question, and who to serve when not all parties are served', async () => {
-      const unanswered = await app.post(
-        PROCEED_TO_ISSUE,
-        new URLSearchParams({ 'serve-all-parties': 'no', action: 'continue' })
-      );
+      const unanswered = await app.post(PROCEED_TO_ISSUE, form({ 'serve-all-parties': 'no', action: 'continue' }));
 
       expect(errors(unanswered.text)).toEqual([
         'Select if all the next steps for court staff have been completed',
@@ -483,7 +506,7 @@ describe('confirm order review', () => {
       const { orderType, orderDocument } = Object.fromEntries(page.body());
       await app.post(
         REVIEW_DATES,
-        new URLSearchParams({
+        form({
           'has-review-dates': 'yes',
           'review-date-1-date-day': '5',
           'review-date-1-date-month': '3',
@@ -495,7 +518,7 @@ describe('confirm order review', () => {
       );
       await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers({ 'final-order': 'yes' }));
 
-      const submitted = await app.post(CHECK_YOUR_ANSWERS, new URLSearchParams({ action: 'continue' }));
+      const submitted = await app.post(CHECK_YOUR_ANSWERS, form({ action: 'continue' }));
 
       expect(submitted.location).toBe(`${BASE}/confirmed`);
       expect(submittedReviews()).toEqual([
@@ -535,7 +558,7 @@ describe('confirm order review', () => {
       await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers());
       refuseNextEvent('The order has been updated by another user. Reload it and try again');
 
-      const refused = await app.post(CHECK_YOUR_ANSWERS, new URLSearchParams({ action: 'continue' }));
+      const refused = await app.post(CHECK_YOUR_ANSWERS, form({ action: 'continue' }));
 
       expect(refused.status).toBe(422);
       expect(errors(refused.text)).toEqual(['The order has been updated by another user. Reload it and try again']);

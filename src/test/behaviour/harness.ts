@@ -108,6 +108,11 @@ export function refuseNextStart(reason: string): void {
   startRefusal = reason;
 }
 
+/** Has pcs-api start events with another order from now on, as it does when the user opens another order's task. */
+export function startWithOrder(order: Partial<Envelope['order']>): void {
+  envelope.order = { ...envelope.order, ...order };
+}
+
 /** Has the next order event refused, as pcs-api does when the order changed elsewhere. */
 export function refuseNextEvent(reason: string): void {
   refusal = reason;
