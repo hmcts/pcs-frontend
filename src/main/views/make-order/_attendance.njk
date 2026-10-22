@@ -26,7 +26,7 @@
       {{ party.label }}
     </span>
 
-    <div data-attendance-controls>
+    <div>
       {% if attendanceError %}
         {{ govukErrorMessage({ id: party.id + "-attendance-error", text: attendanceError.text }) }}
       {% endif %}

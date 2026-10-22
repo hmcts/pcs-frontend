@@ -19,12 +19,12 @@ import {
   type OrderStart,
   caseHeader,
   confirmationHeader,
+  decodeOrderDocument,
   manageCaseDetailsUrl,
   postedSnapshot,
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
-import { orderErrors, orderRedirect } from '@utils/orderResponses';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
 
@@ -137,9 +137,10 @@ export default function makeOrderRoutes(app: Application): void {
       hearing: _hearing,
       hearingVersion = '',
       orderType,
-      orderDocument,
+      orderDocument: encodedDocument,
       ...formData
     } = req.body;
+    const orderDocument = decodeOrderDocument(encodedDocument);
 
     try {
       // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
@@ -149,16 +150,18 @@ export default function makeOrderRoutes(app: Application): void {
       const currentHearing = started.envelope.hearing;
       const hearingChanged = !!currentHearing && hearingRecordChanged(currentHearing, formData);
       if (hearingChanged && hearingVersion !== String(currentHearing.version ?? '')) {
-        const validationIssues = [
-          {
-            id: 'make-order-form',
-            message: 'The hearing facts or notes have changed. Check the latest details before saving again.',
-          },
-        ];
-        if (orderErrors(req, res, validationIssues, 409, req.originalUrl)) {
-          return;
-        }
-        return res.status(409).render('make-order', pageModel(req, started, { validationIssues }));
+        // Reload stale facts rather than silently applying the judge's edits to a newer version.
+        return res.status(409).render(
+          'make-order',
+          pageModel(req, started, {
+            validationIssues: [
+              {
+                id: 'make-order-form',
+                message: 'The hearing facts or notes have changed. Check the reloaded details before saving again.',
+              },
+            ],
+          })
+        );
       }
       // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
       const validationIssues =
@@ -168,9 +171,6 @@ export default function makeOrderRoutes(app: Application): void {
             ? validateHearingRecord(formData)
             : [];
       if (validationIssues.length) {
-        if (orderErrors(req, res, validationIssues)) {
-          return;
-        }
         // Nothing was submitted, so keep the token and versions the answers were made against.
         const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
         const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues, hearingVersion };
@@ -210,11 +210,8 @@ export default function makeOrderRoutes(app: Application): void {
         }
         // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
         // tab: show the judge the order as it now stands, and why.
-        const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
-        if (orderErrors(req, res, reasons, error.status, req.originalUrl)) {
-          return;
-        }
         const current = await startOrderEvent(accessToken, caseReference, chosen(req));
+        const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }
       if (action === 'SUBMIT_FOR_REVIEW') {
@@ -223,9 +220,9 @@ export default function makeOrderRoutes(app: Application): void {
           ...req.session.ordersSentForReview,
           [caseReference]: confirmationHeader(caseReference, started.envelope.caseContext),
         };
-        return orderRedirect(req, res, MAKE_ORDER_SENT_FOR_REVIEW_ROUTE.replace(':caseReference', caseReference));
+        return res.redirect(MAKE_ORDER_SENT_FOR_REVIEW_ROUTE.replace(':caseReference', caseReference));
       }
-      return orderRedirect(req, res, manageCaseDetailsUrl(caseReference));
+      return res.redirect(manageCaseDetailsUrl(caseReference));
     } catch (error) {
       refusedOrderEvent(res, next, error);
     }

@@ -286,6 +286,20 @@ export function initMakeOrder(): void {
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
+  // Encode only the outgoing submission; the editor and validation pages keep normal JSON.
+  form.addEventListener('submit', () => {
+    form.addEventListener(
+      'formdata',
+      event => {
+        let binary = '';
+        for (const byte of new TextEncoder().encode(documentField.value)) {
+          binary += String.fromCharCode(byte);
+        }
+        event.formData.set('orderDocument', btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''));
+      },
+      { once: true }
+    );
+  });
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
 }

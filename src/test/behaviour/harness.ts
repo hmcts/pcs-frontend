@@ -224,10 +224,8 @@ export interface HttpResponse {
 }
 
 export interface TestApp {
-  url: string;
   get(path: string): Promise<HttpResponse>;
   post(path: string, body: URLSearchParams): Promise<HttpResponse>;
-  postJson(path: string, body: Record<string, unknown>): Promise<HttpResponse>;
   close(): Promise<void>;
 }
 
@@ -323,16 +321,11 @@ export async function bootApp(
   const server = await listen(app);
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 
-  const request = (
-    method: string,
-    path: string,
-    body?: string,
-    contentType = 'application/x-www-form-urlencoded'
-  ): Promise<HttpResponse> =>
+  const request = (method: string, path: string, body?: string): Promise<HttpResponse> =>
     new Promise((resolve, reject) => {
       const req = http.request(
         `${baseUrl}${path}`,
-        { method, agent: false, headers: body ? { 'content-type': contentType } : {} },
+        { method, agent: false, headers: body ? { 'content-type': 'application/x-www-form-urlencoded' } : {} },
         res => {
           let text = '';
           res.setEncoding('utf8');
@@ -345,10 +338,8 @@ export async function bootApp(
     });
 
   return {
-    url: baseUrl,
     get: path => request('GET', path),
     post: (path, body) => request('POST', path, body.toString()),
-    postJson: (path, body) => request('POST', path, JSON.stringify(body), 'application/json'),
     close: () => {
       server.closeAllConnections();
       return new Promise<void>(resolve => server.close(() => resolve()));
@@ -391,7 +382,11 @@ export async function openPage(html: string): Promise<Page> {
     documentText: () => renderText(JSON.parse(control<HTMLTextAreaElement>('#order-document').value)),
     body: action => {
       const body = new URLSearchParams();
-      new FormData(form).forEach((value, name) => body.append(name, String(value)));
+      form.dispatchEvent(new Event('submit', { cancelable: true }));
+      const data = new FormData(form);
+      // jsdom does not emit the native formdata event.
+      form.dispatchEvent(Object.assign(new Event('formdata'), { formData: data }));
+      data.forEach((value, name) => body.append(name, String(value)));
       if (action) {
         body.set('action', action);
       }

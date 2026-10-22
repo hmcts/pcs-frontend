@@ -8,7 +8,7 @@
 {% set pageHeading = "Proceed to issue" %}
 
 {% block page %}
-  <form data-order-json method="post" action="{{ formAction }}" novalidate>
+  <form method="post" action="{{ formAction }}" novalidate>
     {{ csrfProtection(csrfToken) }}
 
     {{ govukRadios({
