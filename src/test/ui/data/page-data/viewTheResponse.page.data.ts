@@ -10,8 +10,6 @@ export const viewTheResponse = {
   theResponseCaption: `The response`,
   claimantDetailsSubHeader: `Claimant details`,
   defendant1SubHeader: `Defendant 1 details`,
-  additionalDefendant1DynamicSubHeader: `Additional defendant 1 details`,
-  additionalDefendant2DynamicSubHeader: `Additional defendant 2 details`,
   responseToClaimSubHeader: `Response to the claimant’s claim`,
   paymentsOrAgreementsSubHeader: `Payments or agreements since the claim was made`,
   yourHouseholdSubHeader: `Your household and circumstances`,
@@ -37,16 +35,6 @@ export const viewTheResponse = {
     'SMS mobile number': '07700900980',
     'Postal address': '10 Second Avenue, London, W3 7RX',
     'Date of birth': '20 May 1990',
-  },
-  additionalDefendant1Details: {
-    // The lines below will be commented until the bugs HDPI-7401 & HDPI-7360 get fixed
-    // Name: 'Peter Parker',
-    // 'Postal address': '2 Second Avenue, London, W3 7RX',
-  },
-  additionalDefendant2Details: {
-    Name: 'Jen Parker',
-    // The line below will be commented until the bug HDPI-7401 gets fixed
-    // 'Postal address': '2 Second Avenue, London, W3 7RX',
   },
   responseToClaimDetails: {
     'Is the tenancy, occupation contract or licence agreement type given by the claimant correct?': 'Yes',

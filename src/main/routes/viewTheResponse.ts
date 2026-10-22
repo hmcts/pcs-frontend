@@ -30,7 +30,7 @@ import { findCaseDocumentById } from '@utils/documentUtils';
 import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
 import { isRespondToClaimEnabledForRelease } from '@utils/isRespondToClaimEnabledForUser';
-import { RELEASE_1_2_ENABLED, RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
+import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 import { enumToSentence } from '@utils/viewTheClaim/viewTheClaimUtils';
 
 const logger = Logger.getLogger('viewTheResponse');
@@ -230,7 +230,12 @@ function resolveClaimantName(caseData: CcdCaseData): string {
   return new CcdCaseModel({ id: '', data: caseData }).claimantName;
 }
 
-function buildDefendant1Details(t: TFunction, caseData: CcdCaseData, lang: string): SummarySection {
+function buildDefendant1Details(
+  t: TFunction,
+  caseData: CcdCaseData,
+  rankedDefendantNumbering: boolean,
+  lang: string
+): TitledSummarySection {
   const rows: SummaryRow[] = [];
   const party: CcdDefendantParty | undefined = caseData.possessionClaimResponse?.defendantContactDetails?.party;
   const responses = caseData.possessionClaimResponse?.defendantResponses;
@@ -260,7 +265,20 @@ function buildDefendant1Details(t: TFunction, caseData: CcdCaseData, lang: strin
   if (!addressUnknown) {
     pushRow(rows, t('viewTheResponse:defendant.dateOfBirth'), formatGdsDate(responses?.dateOfBirth, lang) ?? '');
   }
-  return { rows };
+
+  return { rows, sectionTitle: defendantSectionTitle(t, caseData, rankedDefendantNumbering) };
+}
+
+function defendantSectionTitle(t: TFunction, caseData: CcdCaseData, rankedDefendantNumbering: boolean): string {
+  if (!rankedDefendantNumbering) {
+    return t('viewTheResponse:sections.defendant1Details');
+  }
+
+  const currentDefendantPartyId = caseData.possessionClaimResponse?.currentDefendantPartyId;
+  const currentDefendant = (caseData.allDefendants ?? []).find(defendant => defendant.id === currentDefendantPartyId);
+  const rank = typeof currentDefendant?.value.rank === 'number' ? currentDefendant.value.rank : undefined;
+
+  return t('viewTheResponse:sections.rankedDefendantDetails', { number: rank });
 }
 
 function buildAdditionalDefendantDetails(t: TFunction, caseData: CcdCaseData, lang: string): TitledSummarySection[] {
@@ -315,12 +333,9 @@ function buildResponseToClaim(
   if (isNo(responses?.tenancyTypeConfirmation)) {
     pushRow(rows, t('viewTheResponse:responseToClaim.tenancyType'), responses?.tenancyType);
   }
-  pushRow(
-    rows,
-    t('viewTheResponse:responseToClaim.tenancyStartDateConfirmation'),
-    yesNoNotSure(t, responses?.tenancyStartDateConfirmation)
-  );
-  if (isNo(responses?.tenancyStartDateConfirmation)) {
+  const confirmation = responses?.tenancyStartDateConfirmation;
+  pushRow(rows, t('viewTheResponse:responseToClaim.tenancyStartDateConfirmation'), yesNoNotSure(t, confirmation));
+  if (isNo(confirmation) || (!confirmation && responses?.tenancyStartDate)) {
     pushRow(
       rows,
       t('viewTheResponse:responseToClaim.tenancyStartDate'),
@@ -686,18 +701,18 @@ export default function viewTheResponseRoutes(app: Application): void {
       const t = getTranslationFunction(req, ['viewTheResponse', 'common']);
       const lang = getRequestLanguage(req);
       const release12Enabled = await isRespondToClaimEnabledForRelease(req);
+      const release14Enabled = await getLaunchDarklyFlag(req, RELEASE_1_4_ENABLED, false);
       const showExemptLandlord = release12Enabled && isWalesProperty(caseData);
+      const rankedDefendantNumbering = release12Enabled && release14Enabled;
 
       const dateSubmitted = formatGdsDate(caseData.dateSubmitted, lang);
       const dateIssued = formatGdsDate(caseData.possessionClaimResponse?.claimIssuedDate, lang);
       const completedBy = responses?.statementOfTruthCompletedBy;
-      const responsePdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_2_ENABLED, false);
-      const counterclaimPdfEnabled = await getLaunchDarklyFlag(req, RELEASE_1_4_ENABLED, false);
 
       const sections = {
         claimantDetails: buildClaimantDetails(t, caseData),
-        defendant1Details: buildDefendant1Details(t, caseData, lang),
-        additionalDefendantDetails: buildAdditionalDefendantDetails(t, caseData, lang),
+        defendant1Details: buildDefendant1Details(t, caseData, rankedDefendantNumbering, lang),
+        additionalDefendantDetails: rankedDefendantNumbering ? [] : buildAdditionalDefendantDetails(t, caseData, lang),
         responseToClaim: buildResponseToClaim(t, caseData, showExemptLandlord, lang),
         paymentsOrAgreements: buildPaymentsOrAgreements(t, caseData, dateIssued, lang),
         householdAndCircumstances: buildHouseholdAndCircumstances(t, caseData, lang),
@@ -718,10 +733,10 @@ export default function viewTheResponseRoutes(app: Application): void {
         ...sections,
         dashboardUrl: getDashboardUrl(caseReference),
         viewDocumentsUrl: VIEW_DOCUMENTS_ROUTE.replace(':caseReference', caseReference),
-        counterclaimPdfUrl: counterclaimPdfEnabled
+        counterclaimPdfUrl: release14Enabled
           ? resolveDocumentUrl(caseData.possessionClaimResponse?.counterclaimDocumentId, caseData, caseReference)
           : undefined,
-        responsePdfUrl: responsePdfEnabled
+        responsePdfUrl: release12Enabled
           ? resolveDocumentUrl(caseData.possessionClaimResponse?.responseDocumentId, caseData, caseReference)
           : undefined,
       });

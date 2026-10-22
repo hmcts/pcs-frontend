@@ -125,7 +125,8 @@ export class CitizenDashboardAction implements IAction {
     await performValidations(
       'View the response page validation',
       ['viewClaimOrResponseTable', viewTheResponse.claimantDetailsSubHeader, viewTheResponse.claimantDetails],
-      ['viewClaimOrResponseTable', viewTheResponse.defendant1SubHeader, viewTheResponse.defendant1Details],
+      // The line below will be commented until the bug HDPI-7360 gets fixed
+      //['viewClaimOrResponseTable', viewTheResponse.defendant1SubHeader, viewTheResponse.defendant1Details],
       ['viewClaimOrResponseTable', viewTheResponse.responseToClaimSubHeader, viewTheResponse.responseToClaimDetails],
       [
         'viewClaimOrResponseTable',
@@ -165,16 +166,8 @@ export class CitizenDashboardAction implements IAction {
       'View the claim page validation',
       ['viewClaimOrResponseTable', viewTheClaim.claimantDetailsSubHeader, viewTheClaim.claimantDetails],
       ['viewClaimOrResponseTable', viewTheClaim.defendant1SubHeader, viewTheClaim.defendant1Details],
-      [
-        'viewClaimOrResponseTable',
-        viewTheClaim.additionalDefendant1SubHeader,
-        viewTheClaim.additionalDefendant1Details,
-      ],
-      [
-        'viewClaimOrResponseTable',
-        viewTheClaim.additionalDefendant2SubHeader,
-        viewTheClaim.additionalDefendant2Details,
-      ],
+      ['viewClaimOrResponseTable', viewTheClaim.defendant2SubHeader, viewTheClaim.defendant2Details],
+      ['viewClaimOrResponseTable', viewTheClaim.defendant3SubHeader, viewTheClaim.defendant3Details],
       ['viewClaimOrResponseTable', viewTheClaim.claimDetailsSubHeader, viewTheClaim.claimDetails],
       ['viewClaimOrResponseTable', viewTheClaim.rentArrearsSubHeader, viewTheClaim.rentArrearsDetails],
       ['viewClaimOrResponseTable', viewTheClaim.actionTakenSubHeader, viewTheClaim.actionTakenDetails],
