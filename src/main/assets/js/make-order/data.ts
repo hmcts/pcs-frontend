@@ -62,6 +62,8 @@ export function readOrderData(form: HTMLFormElement): OrderData {
 
   const claimants = new Map<string, OrderParty>();
   const defendants = new Map<string, OrderParty>();
+  const parties: { id: string; name: string; type: string }[] = JSON.parse(form.dataset.parties || '[]');
+  parties.forEach(({ id, name, type }) => (type === 'claimant' ? claimants : defendants).set(id, { id, name }));
   const attendance: AttendanceEntry[] = [];
   form.querySelectorAll<HTMLElement>('[data-attendance-row]').forEach((row, rowIndex) => {
     const partyKind = row.dataset.partyKind === 'claimant' ? 'claimant' : 'defendant';

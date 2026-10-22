@@ -365,9 +365,15 @@ describe('make an order: deciding an application', () => {
   describe('on an application to suspend the warrant of possession', () => {
     beforeEach(async () => {
       await app.close();
+      // The second of two defendants applies, so the order says which, and that both defendants pay.
       app = await bootApp({
+        defendants: [
+          { id: 'defendant-1', name: 'Alex Example' },
+          { id: 'defendant-2', name: 'Sam Example' },
+        ],
         application: {
           ...APPLICATION,
+          applicant: 'Sam Example (Defendant 2)',
           type: 'Something else',
           somethingElseDetails: 'Suspend the warrant of possession',
           warrantSuspension: true,
@@ -389,9 +395,11 @@ describe('make an order: deciding an application', () => {
       type('app-gen-app-1-warrant-instalment-frequency', 'weekly');
       typeDate('app-gen-app-1-warrant-instalment-date', '6', '11', '2026');
 
-      expect(page.orderText().split('\n').slice(2)).toEqual([
+      expect(page.orderText().split('\n')).toEqual([
+        "UPON the second defendant's application dated 1 October 2026 to suspend the warrant of possession",
+        'AND UPON the Court considering the application without a hearing',
         'IT IS ORDERED THAT:',
-        'The warrant of possession is suspended on condition that the defendant pays (i) the rent as it falls due plus (ii) the arrears of £850.00 by payments of £25.00 to the claimant every week, the first instalment to be paid on or before 6 November 2026.',
+        'The warrant of possession is suspended on condition that the defendants pay (i) the rent as it falls due plus (ii) the arrears of £850.00 by payments of £25.00 to the claimant every week, the first instalment to be paid on or before 6 November 2026.',
         'Payment of the above instalments made to the claimant shall be applied first to any arrears prior to any order for costs.',
       ]);
       const body = page.body();
