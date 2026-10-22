@@ -305,10 +305,16 @@ const showRefusal = (req: Request, res: Response, view: View) => (error: Callbac
   );
 
 /** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
+export const NO_WORDING = "The order's wording did not load. Reload the page and review the order again";
+
 function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   const { order } = review.answers;
   if (!order) {
     return [{ id: 'order-type', message: 'Select the type of order' }];
+  }
+  // The page's script builds the wording to issue; without it, as when the script did not load, there is none.
+  if (!order.orderDocumentJson) {
+    return [{ id: 'make-order-form', message: NO_WORDING }];
   }
   return validateMakeOrder(order.orderType, order.formData, attendanceParties(review));
 }
