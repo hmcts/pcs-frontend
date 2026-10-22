@@ -1,158 +1,67 @@
-import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
-import type { DocWeaveSnapshot } from '@hmcts-cft/docweave';
-import config from 'config';
+import { buildFooterModel } from '@hmcts-cft/cft-ui-component-lib';
 import { Application, Request, Response } from 'express';
-import { DateTime } from 'luxon';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { MAKE_ORDER_ROUTE, MAKE_ORDER_SENT_FOR_REVIEW_ROUTE } from '../constants/caseRoutes';
-import { linkSignOutToLogout, makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
-import { getUserRoles } from '../steps/utils';
-import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
-import { buildManageCaseDetailsRedirect } from '../utils/manageCaseRedirect';
+import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
 import {
-  type AttendanceParty,
-  type MakeOrderType,
-  type MakeOrderValidationIssue,
-  validateMakeOrder,
-} from '@utils/makeOrderValidation';
+  type OrderFormSubmission,
+  attendanceParties,
+  caseFactsFromForm,
+  hearingRecordChanged,
+  orderFormModel,
+  withoutHearingRecord,
+} from '@utils/makeOrderForm';
+import { type MakeOrderValidationIssue, validateHearingRecord, validateMakeOrder } from '@utils/makeOrderValidation';
+import {
+  type OrderStart,
+  caseHeader,
+  confirmationHeader,
+  manageCaseDetailsUrl,
+  postedSnapshot,
+  refusedOrderEvent,
+  xuiHeaderModel,
+} from '@utils/orderCase';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
 
-type FormData = Record<string, unknown>;
-
-interface MakeOrderParty {
-  id: string;
-  name: string;
-}
-
-/** What the make order event sends when the judge opens it: their working order, if any, and the case. */
-interface MakeOrderStart {
-  order: {
-    id?: string;
-    version: number;
-    orderType?: MakeOrderType;
-    formData?: FormData;
-    docweaveSnapshot?: DocWeaveSnapshot | null;
-  };
-  caseContext: {
-    caseReference: number;
-    propertyAddress?: Record<string, string | undefined>;
-    claimants: MakeOrderParty[];
-    defendants: MakeOrderParty[];
-    caseFacts?: Record<string, unknown>;
-  };
-}
-
-const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
-
 /** The make order event as CCD started it: the page's data, and the token to submit a change to it with. */
 interface StartedOrder {
-  envelope: MakeOrderStart;
+  envelope: OrderStart;
   eventToken: string;
 }
 
-async function startOrderEvent(accessToken: string, caseReference: string): Promise<StartedOrder> {
-  const started = await ccdCaseService.startCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID);
+/**
+ * Starts the judge's working order, or the order they chose on the case's orders tab: one a
+ * caseworker returned to them, which pcs-api starts with the caseworker's query. A new order is
+ * made for the hearing the judge's link named, if it named one.
+ */
+async function startOrderEvent(
+  accessToken: string,
+  caseReference: string,
+  { orderId, hearingId }: { orderId?: string; hearingId?: string } = {}
+): Promise<StartedOrder> {
+  const started = await ccdCaseService.startCaseEvent(
+    accessToken,
+    caseReference,
+    MAKE_ORDER_EVENT_ID,
+    orderId || hearingId ? { orderId, hearingId } : undefined
+  );
   const payload = started.data.sdkEventPayload;
   if (!payload) {
     // CCD starts the event for anyone who can see the case, but only shows the payload to users
     // it lets use the event.
     throw new HTTPError('Not permitted to make an order on this case', 403);
   }
-  return { envelope: JSON.parse(payload) as MakeOrderStart, eventToken: started.eventToken };
-}
-
-function formatAddress(address: Record<string, string | undefined> = {}): string {
-  return ['AddressLine1', 'AddressLine2', 'AddressLine3', 'PostTown', 'County', 'PostCode', 'Country']
-    .map(key => address[key])
-    .filter(Boolean)
-    .join(', ');
-}
-
-/** Pre-fills the case facts fields from the claim, in the form's field names. */
-function caseFactsFormData(caseFacts: Record<string, unknown> = {}): FormData {
-  const formData: FormData = {};
-  const fields: Record<string, string> = {
-    tenancyType: 'tenancy-type',
-    currentRent: 'current-rent',
-    rentFrequency: 'rent-frequency',
-    groundsPleaded: 'grounds-pleaded',
-  };
-  const dates: Record<string, string> = { tenancyStartDate: 'date-tenancy', noticeDate: 'date-notice' };
-  for (const [fact, field] of Object.entries(fields)) {
-    if (caseFacts[fact] !== undefined && caseFacts[fact] !== null) {
-      formData[field] = String(caseFacts[fact]);
-    }
-  }
-  for (const [fact, field] of Object.entries(dates)) {
-    const date = DateTime.fromISO(String(caseFacts[fact] ?? ''));
-    if (date.isValid) {
-      formData[`${field}-day`] = String(date.day);
-      formData[`${field}-month`] = String(date.month);
-      formData[`${field}-year`] = String(date.year);
-    }
-  }
-  return formData;
-}
-
-/** A row of the attendance register. */
-interface AttendanceRow extends AttendanceParty {
-  partyId: string;
-  name: string;
-}
-
-function attendanceParties({ caseContext }: MakeOrderStart): AttendanceRow[] {
-  const parties = (type: AttendanceParty['type'], list: MakeOrderParty[]): AttendanceRow[] =>
-    list.map((party, index) => ({
-      id: `${type}-${party.id}`,
-      partyId: party.id,
-      name: party.name,
-      label: `${type[0].toUpperCase()}${type.slice(1)} ${index + 1}: ${party.name}`,
-      type,
-    }));
-  return [...parties('claimant', caseContext.claimants), ...parties('defendant', caseContext.defendants)];
-}
-
-/** The case as the confirmation of an order sent for review shows it. */
-function sentForReviewHeader(caseReference: string, caseContext: MakeOrderStart['caseContext']) {
-  const claimant = caseContext.claimants[0]?.name;
-  const primaryDefendant = caseContext.defendants[0]?.name;
-  return {
-    caseReference: caseNumberFormatter(caseReference),
-    propertyAddress: formatAddress(caseContext.propertyAddress),
-    caseName: [claimant, primaryDefendant].filter(Boolean).join(' vs '),
-  };
-}
-
-/**
- * XUI's header as it shows it to a judge. XUI adds a user's role assignments, such as judge, to their
- * IDAM roles to choose the header, and only judges reach these pages: CCD lets only them make an order.
- */
-function xuiHeaderModel(req: Request): ReturnType<typeof buildHeaderModel> {
-  const roles = [...getUserRoles(req), 'judge'];
-  const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles } });
-  headerModel.assetsPath = '/assets/ui-component-lib';
-  linkSignOutToLogout(headerModel);
-  return headerModel;
-}
-
-function manageCaseDetailsUrl(caseReference: string): string {
-  const url = buildManageCaseDetailsRedirect(config.get('redirects.manageCaseReturnURL'), caseReference);
-  if (!url) {
-    throw new HTTPError('The Manage Case return URL is not configured', 500);
-  }
-  return url;
+  return { envelope: JSON.parse(payload) as OrderStart, eventToken: started.eventToken };
 }
 
 /** What the judge sent, shown back with the issues that stopped it; the saved order fills any gaps. */
-interface Submission {
-  orderType?: MakeOrderType;
-  formData?: FormData;
-  orderDocumentJson?: string;
+interface Submission extends OrderFormSubmission {
   validationIssues: MakeOrderValidationIssue[];
+  hearingVersion?: string;
 }
 
 function pageModel(
@@ -160,12 +69,8 @@ function pageModel(
   { envelope, eventToken }: StartedOrder,
   submission?: Submission
 ): Record<string, unknown> {
-  const headerModel = xuiHeaderModel(req);
+  const headerModel = xuiHeaderModel(req, ['judge']);
   const { caseContext, order } = envelope;
-  const draft: FormData = {
-    ...caseFactsFormData(caseContext.caseFacts),
-    ...(submission?.formData ?? order.formData),
-  };
   const issues = submission?.validationIssues ?? [];
 
   return {
@@ -174,25 +79,13 @@ function pageModel(
     // The page's own URL, without the tab fragment the browser would otherwise post back to.
     formAction: req.originalUrl,
     order,
+    // The page's start, which its submissions reuse so CCD takes a repeated one, e.g. a double click, as the same.
     eventToken,
-    // The case as the event started it, which the page's change is based on.
-    caseContextJson: JSON.stringify(caseContext),
-    draft,
-    draftOrderType: submission?.orderType ?? order.orderType ?? DEFAULT_ORDER_TYPE,
-    orderDocumentJson: submission?.orderDocumentJson ?? JSON.stringify(order.docweaveSnapshot ?? null),
-    draftValue: (name: string): unknown => draft[name],
-    draftChecked: (name: string, value: string): boolean => {
-      const saved = draft[name];
-      return Array.isArray(saved) ? saved.includes(value) : saved === value;
-    },
-    draftDate: (prefix: string) => ['day', 'month', 'year'].map(name => ({ name, value: draft[`${prefix}-${name}`] })),
-    draftSelect: (items: Record<string, unknown>[], name: string, defaultValue?: string) =>
-      items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) })),
-    caseReferenceDisplay: caseNumberFormatter(caseContext.caseReference),
-    propertyAddressDisplay: formatAddress(caseContext.propertyAddress),
-    claimantNames: caseContext.claimants.map(party => party.name).join(', '),
-    defendantNames: caseContext.defendants.map(party => party.name).join(', '),
-    attendanceParties: attendanceParties(envelope),
+    hearingVersion: submission?.hearingVersion ?? String(envelope.hearing?.version ?? ''),
+    // The task the judge came from, if a caseworker's query brought them here, which pcs-api closes on resubmission.
+    taskId: typeof req.query.taskId === 'string' ? req.query.taskId : '',
+    ...orderFormModel(envelope, submission),
+    ...caseHeader(caseContext),
     validationErrors: Object.fromEntries(issues.map(issue => [issue.id, { text: issue.message }])),
     errorSummary: issues.length
       ? {
@@ -205,11 +98,13 @@ function pageModel(
 }
 
 /**
- * Only judges may make an order, which CCD decides from their role assignments: anyone else is
- * not given the event's payload or allowed to submit it, and is shown the page does not exist.
+ * The order the orders tab linked to, or the hearing the judge's link named, which the page's URL keeps for as long
+ * as the judge works on the order.
  */
-function refusedByCcd(error: unknown): boolean {
-  return error instanceof HTTPError && (error.status === 403 || error.status === 404);
+function chosen(req: Request): { orderId?: string; hearingId?: string } {
+  const named = (name: string): string | undefined =>
+    typeof req.query[name] === 'string' ? (req.query[name] as string) : undefined;
+  return { orderId: named('orderId'), hearingId: named('hearingId') };
 }
 
 export default function makeOrderRoutes(app: Application): void {
@@ -217,36 +112,69 @@ export default function makeOrderRoutes(app: Application): void {
     try {
       // A new order on the case is under way, so there is no longer one to confirm.
       delete req.session.ordersSentForReview?.[req.params.caseReference as string];
-      const started = await startOrderEvent(req.session.user!.accessToken, req.params.caseReference as string);
+      const started = await startOrderEvent(
+        req.session.user!.accessToken,
+        req.params.caseReference as string,
+        chosen(req)
+      );
       res.render('make-order', pageModel(req, started));
     } catch (error) {
-      if (refusedByCcd(error)) {
-        return res.status(404).send('Not Found');
-      }
-      next(error);
+      refusedOrderEvent(res, next, error);
     }
   });
 
   app.post(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     const accessToken = req.session.user!.accessToken;
     const caseReference = req.params.caseReference as string;
-    const { _csrf, action, eventToken, caseContext, orderId, orderVersion, orderType, orderDocument, ...formData } =
-      req.body;
+    const {
+      _csrf,
+      action,
+      eventToken,
+      orderId,
+      taskId,
+      orderVersion,
+      hearing: _hearing,
+      hearingVersion = '',
+      orderType,
+      orderDocument,
+      ...formData
+    } = req.body;
 
     try {
-      if (action === 'SUBMIT_FOR_REVIEW') {
-        // The order is checked against the case as the page's start returned it.
-        const started: StartedOrder = {
-          eventToken,
-          envelope: { order: { id: orderId, version: Number(orderVersion) }, caseContext: JSON.parse(caseContext) },
-        };
-        const validationIssues = validateMakeOrder(orderType, formData, attendanceParties(started.envelope));
-        if (validationIssues.length) {
-          // Nothing was submitted, so the page's start, and the version it gave, still stand: if the
-          // draft was saved elsewhere meanwhile, pcs-api refuses the retry rather than overwriting it.
-          const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues };
-          return res.status(400).render('make-order', pageModel(req, started, submission));
-        }
+      // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
+      // blocks, and could change it. The event token, order id and version stay the page's: CCD takes a
+      // repeated submission as the one already made, and pcs-api refuses the change if the order has moved on.
+      const started = await startOrderEvent(accessToken, caseReference, chosen(req));
+      const currentHearing = started.envelope.hearing;
+      const hearingChanged = !!currentHearing && hearingRecordChanged(currentHearing, formData);
+      if (hearingChanged && hearingVersion !== String(currentHearing.version ?? '')) {
+        // Reload stale facts rather than silently applying the judge's edits to a newer version.
+        return res.status(409).render(
+          'make-order',
+          pageModel(req, started, {
+            validationIssues: [
+              {
+                id: 'make-order-form',
+                message: 'The hearing facts or notes have changed. Check the reloaded details before saving again.',
+              },
+            ],
+          })
+        );
+      }
+      // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
+      const validationIssues =
+        action === 'SUBMIT_FOR_REVIEW'
+          ? validateMakeOrder(orderType, formData, attendanceParties(started.envelope))
+          : currentHearing
+            ? validateHearingRecord(formData)
+            : [];
+      if (validationIssues.length) {
+        // Nothing was submitted, so keep the token and versions the answers were made against.
+        const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
+        const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues, hearingVersion };
+        return res
+          .status(400)
+          .render('make-order', pageModel(req, { eventToken, envelope: { ...started.envelope, order } }, submission));
       }
       const request = {
         action,
@@ -254,9 +182,21 @@ export default function makeOrderRoutes(app: Application): void {
           id: orderId || null,
           version: Number(orderVersion),
           orderType,
-          formData,
-          docweaveSnapshot: JSON.parse(orderDocument || 'null'),
+          formData: withoutHearingRecord(formData),
+          docweaveSnapshot: postedSnapshot(orderDocument),
         },
+        taskId: taskId || null,
+        // Only send facts and a note when they differ; pcs-api checks the version again when saving.
+        hearing: currentHearing
+          ? {
+              id: currentHearing.id,
+              version: currentHearing.version ?? null,
+              ...(hearingChanged && {
+                caseFacts: caseFactsFromForm(formData),
+                note: formData['hearing-notes'] || null,
+              }),
+            }
+          : null,
       };
       try {
         await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
@@ -268,7 +208,7 @@ export default function makeOrderRoutes(app: Application): void {
         }
         // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
         // tab: show the judge the order as it now stands, and why.
-        const current = await startOrderEvent(accessToken, caseReference);
+        const current = await startOrderEvent(accessToken, caseReference, chosen(req));
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }
@@ -276,16 +216,13 @@ export default function makeOrderRoutes(app: Application): void {
         // Kept on the session so the confirmation survives a refresh, which cannot resubmit the order.
         req.session.ordersSentForReview = {
           ...req.session.ordersSentForReview,
-          [caseReference]: sentForReviewHeader(caseReference, JSON.parse(caseContext)),
+          [caseReference]: confirmationHeader(caseReference, started.envelope.caseContext),
         };
         return res.redirect(MAKE_ORDER_SENT_FOR_REVIEW_ROUTE.replace(':caseReference', caseReference));
       }
       return res.redirect(manageCaseDetailsUrl(caseReference));
     } catch (error) {
-      if (refusedByCcd(error)) {
-        return res.status(404).send('Not Found');
-      }
-      return next(error);
+      refusedOrderEvent(res, next, error);
     }
   });
 
@@ -301,10 +238,13 @@ export default function makeOrderRoutes(app: Application): void {
         // As in XUI, a confirmation with nothing to confirm returns the user to the case.
         return res.redirect(closeUrl);
       }
-      res.render('make-order-sent-for-review', {
-        headerModel: xuiHeaderModel(req),
+      res.render('order-confirmation', {
+        headerModel: xuiHeaderModel(req, ['judge']),
         footerModel: buildFooterModel(),
+        title: 'Order sent to caseworker for review',
         ...sent,
+        whatHappensNext: 'A caseworker will review the order.',
+        closeText: 'Close and return to case details',
         closeUrl,
       });
     }
