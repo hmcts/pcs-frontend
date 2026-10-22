@@ -10,7 +10,6 @@
   "youDoNotNeedToDoAnythingElse": "Nid oes angen i chi wneud unrhyw beth arall. Byddwn yn anfon eich cais at y barnwr a byddwn yn cysylltu â chi eto pan fyddant wedi gwneud penderfyniad.",
   "giveFeedbackAboutThisService": "Rhowch adborth am y gwasanaeth hwn",
   "completeThisShortSurvey": "<a href=\"https://www.smartsurvey.co.uk/s/SurveyExit/?service=possession\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">Llenwch yr arolwg byr hwn i’n helpu i wella’r gwasanaeth hwn</a> (fel arfer yn cymryd 5 munud).",
-  "previewBuildTrigger": "Temporary key to trigger a preview build - remove before merge",
   "buttons": {
     "closeAndReturnToCaseOverview": "Cau a dychwelyd i drosolwg o’r achos"
   }
