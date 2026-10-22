@@ -12,6 +12,7 @@ import {
   refuseNextEvent,
   selectTab,
   submittedEventTokens,
+  submittedOrders,
   type,
   writeInPreview,
 } from './harness';
@@ -78,15 +79,23 @@ describe('make an order: drafting', () => {
     expect(JSON.parse(control<HTMLTextAreaElement>('#order-document').value).schema).toBe('docweave-document');
   });
 
-  it("starts the event when the page loads, and submits the judge's change with that start", async () => {
+  it('refuses an order document that Docweave could not have produced', async () => {
     const page = await openPage((await app.get(PAGE)).text);
-    expect(eventStarts()).toBe(1);
+    const body = page.body();
+    body.set('action', 'SAVE_DRAFT');
+    body.set('orderDocument', '{"schema":"docweave-document","version":1}');
+
+    expect((await app.post(PAGE, body)).status).toBe(400);
+    expect(submittedOrders()).toHaveLength(0);
+  });
+
+  it("submits the judge's change with the page's event token, and posts no case", async () => {
+    const page = await openPage((await app.get(PAGE)).text);
     const token = control('[name="eventToken"]').value;
     expect(token).toBe('event-token-1');
-
-    // Neither a rejected nor an accepted submission starts the event again.
     selectTab('tab-free-form');
     const incomplete = page.body();
+    expect(incomplete.has('caseContext')).toBe(false);
     incomplete.set('action', 'SUBMIT_FOR_REVIEW');
     const invalid = await app.post(PAGE, incomplete);
     expect(invalid.status).toBe(400);
@@ -100,8 +109,31 @@ describe('make an order: drafting', () => {
     const body = retry.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     expect((await app.post(PAGE, body)).status).toBe(302);
-    expect(eventStarts()).toBe(1);
-    expect(submittedEventTokens()).toEqual(['event-token-1']);
+    expect(eventStarts()).toBe(3);
+    expect(submittedEventTokens()).toEqual([token]);
+  });
+
+  it('sends a new order for review once when the judge submits it twice', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-free-form');
+    recordAttendance();
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    expect((await app.post(PAGE, body)).status).toBe(302);
+    expect((await app.post(PAGE, body)).status).toBe(302);
+    expect(submittedOrders()).toHaveLength(1);
+  });
+
+  it('checks attendance against the case, not one the browser posts', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-free-form');
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    body.set('caseContext', JSON.stringify({ claimants: [], defendants: [] }));
+    const rejected = await app.post(PAGE, body);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Select how Claimant 1: Example Housing attended');
+    expect(submittedOrders()).toHaveLength(0);
   });
 
   it('shows the saved order, and why, when pcs-api refuses a save', async () => {
@@ -120,7 +152,6 @@ describe('make an order: drafting', () => {
     expect(refused.status).toBe(422);
 
     // The refused page is based on a new start, which the judge's next change is submitted with.
-    expect(body.get('eventToken')).toBe(submittedEventTokens().at(-1));
     await openPage(refused.text);
     expect(control('[name="eventToken"]').value).toBe(`event-token-${eventStarts()}`);
     expect(control('[name="eventToken"]').value).not.toBe(body.get('eventToken'));
