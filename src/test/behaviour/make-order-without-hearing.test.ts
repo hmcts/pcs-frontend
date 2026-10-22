@@ -12,6 +12,16 @@ import {
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
 
+const APPLICATION = {
+  id: 'gen-app-1',
+  reference: 'GA1',
+  type: 'Adjourn the hearing',
+  applicant: 'Alex Example (Defendant 1)',
+  submittedOn: '2026-10-01',
+  whatOrderWanted: null,
+  documents: [],
+};
+
 describe('make an order: without a hearing or an application', () => {
   let app: TestApp;
   beforeEach(async () => {
@@ -98,6 +108,17 @@ describe('make an order: without a hearing or an application', () => {
       'The claim is dismissed.',
       "Enforcement of the Order of Possession is transferred to the High Court, King's Bench Division, pursuant to section 42 of the County Courts Act 1984.",
     ]);
+  });
+
+  it('transfers enforcement from an order that decides only applications', async () => {
+    await app.close();
+    app = await bootApp({ hearing: null, applications: [APPLICATION] });
+    const page = await openPage((await app.get(PAGE)).text);
+    check('transfer-enforcement', 'yes');
+    check('transfer-enforcement-court', 'kings-bench');
+    expect(page.orderText()).toContain(
+      "Enforcement of the Order of Possession is transferred to the High Court, King's Bench Division, pursuant to section 42 of the County Courts Act 1984."
+    );
   });
 
   it('lists a hearing on notice from a free form order, asking when as an adjournment does', async () => {
