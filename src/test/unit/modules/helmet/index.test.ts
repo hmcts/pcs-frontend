@@ -11,7 +11,7 @@ jest.mock('config', () => ({
 // Mock helmet
 jest.mock('helmet', () => jest.fn());
 
-describe('Helmet Module', () => {
+describe('securityHeaders', () => {
   let mockConfigGet: jest.Mock;
 
   beforeEach(() => {

@@ -32,29 +32,14 @@ export const GUIDE_SECTIONS = [
 ] as const satisfies readonly { key: string; describes: readonly RespondToClaimSectionId[] }[];
 
 /**
- * Welsh is offered once the Welsh Language Unit's translation has replaced every "cy" placeholder in the cy locale
- * (see localeParity.test.ts); until then the guide is English only, rather than a mix of the two.
+ * Off until the Welsh Language Unit's translation replaces the "cy" placeholders in the cy locale (HDPI-9653), so the
+ * guide is English only rather than a mix of the two. Turn on with the translation, and take the file off
+ * AWAITING_TRANSLATION in localeParity.test.ts.
  */
-export function welshAvailable(): boolean {
-  const welsh = i18next.getResourceBundle('cy', NAMESPACE);
-  return Boolean(welsh) && !hasPlaceholder(i18next.getResourceBundle('en', NAMESPACE), welsh);
-}
-
-function hasPlaceholder(english: unknown, welsh: unknown): boolean {
-  if (typeof english === 'string') {
-    return welsh === `cy${english}`;
-  }
-  return Object.entries(english as object).some(([key, value]) =>
-    hasPlaceholder(value, (welsh as Record<string, unknown> | undefined)?.[key])
-  );
-}
-
-function language(requested: unknown): AllowedLang {
-  return requested === 'cy' && welshAvailable() ? 'cy' : 'en';
-}
+const WELSH_AVAILABLE = false;
 
 export function prepareToRespondPage(requestedLang: unknown): Record<string, unknown> {
-  const lang = language(requestedLang);
+  const lang: AllowedLang = requestedLang === 'cy' && WELSH_AVAILABLE ? 'cy' : 'en';
   const t: TFunction = i18next.getFixedT(lang, [NAMESPACE, 'common']);
 
   const sections = GUIDE_SECTIONS.map(({ key }, index) => ({
@@ -66,9 +51,9 @@ export function prepareToRespondPage(requestedLang: unknown): Record<string, unk
     t,
     lang,
     htmlLang: lang,
-    showLanguageToggle: welshAvailable(),
+    showLanguageToggle: WELSH_AVAILABLE,
     respondOnlineUrl: RESPOND_ONLINE_PATH,
-    sectionCount: t('sectionCount', { count: sections.length }),
+    sectionCount: t('sectionCount', { number: sections.length }),
     sections,
   };
 }

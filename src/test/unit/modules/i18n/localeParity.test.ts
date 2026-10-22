@@ -58,8 +58,8 @@ const KEY_DRIFT_ALLOWLIST = new Set([
 ]);
 
 /**
- * Files written ahead of their Welsh, holding a "cy" marker on every value. Their pages check for the markers and
- * stay in English until the translation replaces them all. Must only ever shrink.
+ * Files written ahead of their Welsh, holding a "cy" marker on every value. Their pages stay in English until the
+ * translation replaces them all. Must only ever shrink.
  */
 const AWAITING_TRANSLATION = new Set([
   'prepareToRespond.json', // HDPI-9653

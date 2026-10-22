@@ -6,8 +6,7 @@
   "pilotBanner": "cyThis guide is for the online possession service, which is only available in some courts.",
   "beforeYouStart": "cyBefore you start",
   "intro": "cyThis step-by-step guide can help you prepare to respond to a claim for possession of a rented property.",
-  "sectionCount_one": "cyEach section explains what you will be asked and any documents you may need. There is {{count}} section. Some are optional and may not apply to you.",
-  "sectionCount_other": "cyEach section explains what you will be asked and any documents you may need. There are {{count}} sections. Some are optional and may not apply to you.",
+  "sectionCount": "cyEach section explains what you will be asked and any documents you may need. There are {{number}} sections. Some are optional and may not apply to you.",
   "pilotScope": "cyYou can only respond online if the letter about your claim tells you to. If it does not, follow the instructions in the letter.",
   "readyHeading": "cyWhen you are ready to complete the form",
   "readyText": "cyOnce you are ready to complete the form, you can",
@@ -46,7 +45,7 @@
         {
           "items": [
             "cyyour tenancy, occupation contract, or licence agreement and when it started",
-            "cywhether your landlord gave you notice before starting possession proceedings, and when they gave it"
+            "cywhether your landlord gave you notice before starting possession proceedings, and when you received it"
           ]
         }
       ]
@@ -159,9 +158,10 @@
           "items": [
             "cya language interpreter",
             "cyreasonable adjustments if you have a health condition or disability",
-            "cyspecial measures to help you feel safe at court (make sure you ask the court dealing with the case as to the special measures offered)"
+            "cyspecial measures to help you feel safe at court"
           ]
         },
+        { "text": "cyTo ask for an interpreter or special measures, contact the court dealing with your case." },
         {
           "text": "cyYou may also be able to choose to answer equality and diversity questions."
         }
