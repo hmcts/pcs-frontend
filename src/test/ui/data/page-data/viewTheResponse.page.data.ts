@@ -60,7 +60,8 @@ export const viewTheResponse = {
   paymentsOrAgreementsDetails: {
     [`Have you paid any money to Possession Claims Solicitor Org since ${getCurrentResponseDate()}?`]: 'Yes',
     'Details of payments made': 'Paid £200 on 1 March 2026 by bank transfer.',
-    [`Have you come to any agreement with Possession Claims Solicitor Org to repay the arrears since ${getCurrentResponseDate()}?`]: 'Yes',
+    [`Have you come to any agreement with Possession Claims Solicitor Org to repay the arrears since ${getCurrentResponseDate()}?`]:
+      'Yes',
     'Details of repayment agreement': 'Agreed to pay £50 per week until arrears cleared.',
     'Would you like to offer to pay your arrears in instalments?': 'Yes',
     'How much could you afford to pay in addition to the current rent?': '£50.00',
