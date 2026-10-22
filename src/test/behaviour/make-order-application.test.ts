@@ -166,13 +166,14 @@ describe('make an order: deciding an application', () => {
     expect(clauseLists()).toEqual([1]);
   });
 
-  it('keeps a separate order preview for each decision', async () => {
+  it('keeps the wording the judge inserted when the decision changes', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     check('app-gen-app-1-decision', 'grant');
     insertWording();
     check('app-gen-app-1-decision', 'dismiss');
     expect(page.documentText()).toContain("The defendant's application dated 1 October 2026 is dismissed.");
-    expect(page.documentText()).not.toContain('The hearing on 14 October is adjourned.');
+    expect(page.documentText()).not.toContain('is granted.');
+    expect(page.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
 
     check('app-gen-app-1-decision', 'grant');
     expect(page.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
