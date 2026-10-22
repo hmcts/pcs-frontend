@@ -1,5 +1,6 @@
 import { type OrderedListBuilder } from '@hmcts-cft/docweave';
 
+import { registryName } from '../../../../utils/makeOrderFormat';
 import { type OrderData } from '../data';
 
 import { selected, selectedControlId, value } from './common';
@@ -18,7 +19,7 @@ function destination(data: OrderData): string {
     return "King's Bench Division";
   }
   if (value(data, 'transfer-enforcement-court') === 'district-registry') {
-    const registry = value(data, 'transfer-enforcement-registry').replace(/\s*district registry$/i, '');
+    const registry = registryName(value(data, 'transfer-enforcement-registry'));
     return registry ? `${registry} District Registry` : '[District Registry not provided]';
   }
   return "[King's Bench Division or District Registry not provided]";
