@@ -157,15 +157,18 @@ export interface CostsWording {
   missing?: string;
 }
 
-/** The CaseMan-style costs wording used by suspended possession and adjournment orders. */
-export function caseManCosts(claimant: string, defendant: string): CostsWording {
+/**
+ * The CaseMan-style costs wording used by suspended possession and adjournment orders. Fixed costs are of the claim,
+ * or of the application an order decides.
+ */
+export function caseManCosts(claimant: string, defendant: string, of: 'claim' | 'application' = 'claim'): CostsWording {
   const defendantPays = `${sentenceCase(defendant)} shall pay ${possessive(claimant)} costs`;
   return {
     amounts: {
-      'def-pay-cl-fixed': `${defendantPays} of the claim in the fixed sum of £`,
+      'def-pay-cl-fixed': `${defendantPays} of the ${of} in the fixed sum of £`,
       'def-pay-cl-summary': `${defendantPays} in the summarily assessed sum of £`,
       'cl-pay-def-summary': `${sentenceCase(claimant)} shall pay ${possessive(defendant)} costs in the summarily assessed sum of £`,
-      'fixed-same-terms': `${defendantPays} of the claim in the fixed sum of £`,
+      'fixed-same-terms': `${defendantPays} of the ${of} in the fixed sum of £`,
       'summary-same-terms': `${defendantPays} in the summarily assessed sum of £`,
     },
     fixed: {
