@@ -169,6 +169,23 @@ describe('make an order at a hearing: deciding the applications', () => {
     ]);
   });
 
+  it("keeps the applicant's wording inserted while ordering on the claim when the judge stops ordering on it", async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    recordAttendance();
+    check('claim-order', 'yes');
+    selectTab('tab-adjournment');
+    check('adj-type', 'generally');
+    check('app-gen-app-1-decision', 'grant');
+    control<HTMLButtonElement>('[data-application-reference="GA1"] [data-insert-requested-wording]').click();
+
+    uncheck('claim-order', 'yes');
+    expect(page.documentText()).not.toContain('The claim is adjourned generally');
+    expect(page.documentText()).toContain('The hearing on 14 October is adjourned.');
+    check('claim-order', 'yes');
+    expect(page.documentText()).toContain('The claim is adjourned generally');
+    expect(page.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
+  });
+
   it('needs what follows a decision, naming the application', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     recordAttendance();
