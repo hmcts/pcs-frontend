@@ -92,6 +92,11 @@ describe.each([false, true])('adjourn content with release 1B = %s', enabled => 
     const html = req.app.locals.nunjucksEnv.render(step.view, content) as string;
     expect(html.includes('The ‘other parties’ are the other people or organisations')).toBe(enabled);
     expect(html.includes('Every other party will need to agree')).toBe(enabled);
+    const questionIndex = html.indexOf('<fieldset');
+    expect(questionIndex).toBeGreaterThan(-1);
+    const beforeQuestion = html.slice(0, questionIndex);
+    expect(beforeQuestion.includes('The ‘other parties’ are the other people or organisations')).toBe(enabled);
+    expect(beforeQuestion.includes('Every other party will need to agree')).toBe(enabled);
   });
 });
 
@@ -104,6 +109,16 @@ it('keeps the existing Welsh hearing hint when release 1B is disabled', async ()
 });
 
 describe.each([false, true])('adjourn payment with release 1B = %s', enabled => {
+  it('shows Submit when the hearing is not in the next 14 days and the other parties agreed', async () => {
+    const { req, getContent } = await createRequest('check-your-answers', enabled);
+    setFormData(req, 'have-the-other-parties-agreed-to-this-application', { otherPartiesAgreed: 'yes' });
+    setFormData(req, 'do-you-need-help-paying-the-fee', { helpWithFeesNeeded: 'no' });
+
+    const content = await getContent();
+
+    expect(content.buttonLabel).toBe('Submit');
+  });
+
   it.each([
     ['no help', 'no', 'no', true],
     ['not yet applied', 'yes', 'no', true],
