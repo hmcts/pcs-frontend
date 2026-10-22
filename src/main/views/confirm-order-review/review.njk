@@ -16,9 +16,12 @@
 {% block page %}
   {# The make order page's script runs the Judge's form and its order editor, which it finds by this id. #}
   <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
-        data-property-address="{{ propertyAddressDisplay }}">
+        data-property-address="{{ propertyAddressDisplay }}"
+        {%- if withoutHearing and not application %} data-without-hearing{% endif %}
+        {%- if application %} data-box-work{% endif %}>
     {{ csrfProtection(csrfToken) }}
     <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
+
 
     {% if edits.added or edits.changed %}
       {% set editsHtml %}

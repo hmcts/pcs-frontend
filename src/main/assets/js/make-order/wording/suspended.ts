@@ -2,6 +2,7 @@ import { type DocWeaveDocument, buildDoc } from '@hmcts-cft/docweave';
 
 import { type OrderData } from '../data';
 
+import { addApplicationDecisions } from './application';
 import {
   SAME_TERMS_COSTS,
   addCosts,
@@ -78,5 +79,6 @@ export function buildSuspendedOrder(data: OrderData): DocWeaveDocument {
         );
       }
     });
+    addApplicationDecisions(order, data);
   });
 }

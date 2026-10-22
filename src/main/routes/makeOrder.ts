@@ -8,10 +8,12 @@ import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 import { ccdCaseService } from '@services/ccdCaseService';
 import {
   type OrderFormSubmission,
+  applicationsToDecide,
   attendanceParties,
   caseFactsFromForm,
   hearingRecordChanged,
   orderFormModel,
+  recordsAttendance,
   withoutHearingRecord,
 } from '@utils/makeOrderForm';
 import { type MakeOrderValidationIssue, validateHearingRecord, validateMakeOrder } from '@utils/makeOrderValidation';
@@ -34,7 +36,10 @@ interface StartedOrder {
   eventToken: string;
 }
 
-/** What the page's URL names: an order from the orders tab, or the application a task asks the judge to decide. */
+/**
+ * What the page's URL names: an order from the orders tab, the application a task asks the judge to decide, or the
+ * hearing the judge's link names.
+ */
 interface Chosen {
   orderId?: string;
   genAppId?: string;
@@ -172,9 +177,16 @@ export default function makeOrderRoutes(app: Application): void {
         );
       }
       // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
+      const atHearing = recordsAttendance(currentHearing, formData);
       const validationIssues =
         action === 'SUBMIT_FOR_REVIEW'
-          ? validateMakeOrder(orderType, formData, attendanceParties(started.envelope))
+          ? validateMakeOrder(
+              orderType,
+              formData,
+              atHearing ? attendanceParties(started.envelope) : [],
+              !atHearing,
+              applicationsToDecide(started.envelope)
+            )
           : currentHearing
             ? validateHearingRecord(formData)
             : [];

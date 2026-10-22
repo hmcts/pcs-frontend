@@ -253,6 +253,8 @@ export async function bootApp(
     order?: Partial<Envelope['order']>;
     /** The general application court staff referred to the judge, which the judge's order decides. */
     application?: Record<string, unknown> & { id: string };
+    /** The case's open applications, any of which an order made at a hearing can decide. */
+    applications?: (Record<string, unknown> & { id: string })[];
     /** The hearing pcs-api starts the event for, over the default one, or null for an order made without one. */
     hearing?: Record<string, unknown> | null;
   } = {}
@@ -264,9 +266,13 @@ export async function bootApp(
   envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
   envelope.caseContext.openApplication = options.openApplication ?? false;
   envelope.order = { ...envelope.order, ...options.order };
+  if (options.applications) {
+    envelope.caseContext.applications = options.applications;
+  }
   if (options.application) {
     envelope.caseContext.application = options.application;
     envelope.order.genAppId = options.application.id;
+    // An order deciding an application is made without a hearing.
     envelope.hearing = null;
   }
   if (options.hearing !== undefined) {
