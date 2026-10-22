@@ -2,7 +2,7 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('H 07 * * 1-5')]),
+  pipelineTriggers([cron('H 07 * * 1-5\n45 10 * * 4')]),
   parameters([
     text(
       name: 'MANUAL_BUILD_REASON',
@@ -142,7 +142,12 @@ withNightlyPipeline(type, product, component) {
 
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    runE2ETests(yarnBuilder)
+    if (isWeeklyEmvSchedule()) {
+        env.E2E_TEST_SCOPE = '@EMV'
+        runE2eStage(yarnBuilder, 'chrome', 'Chrome', 'Weekly @EMV')
+      } else {
+        runE2ETests(yarnBuilder)
+    }
   }
 }
 
@@ -244,4 +249,19 @@ def sendAllureReportToSlack(String browser, String reportSuffix) {
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }
+}
+
+def isWeeklyEmvSchedule() {
+  def byTimer = !currentBuild.getBuildCauses(
+    'hudson.triggers.TimerTrigger$TimerTriggerCause'
+  ).isEmpty()
+
+  def cal = Calendar.getInstance()
+  cal.setTime(new Date(currentBuild.startTimeInMillis))
+
+  return byTimer &&
+    cal.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY &&
+    cal.get(Calendar.HOUR_OF_DAY) == 10 &&
+    cal.get(Calendar.MINUTE) >= 45 &&
+    cal.get(Calendar.MINUTE) < 55
 }
