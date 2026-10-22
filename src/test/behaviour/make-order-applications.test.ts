@@ -38,11 +38,6 @@ const WARRANT = {
   documents: [],
 };
 
-/** Whether the reminder about applications left open is showing. */
-function warningShowing(): boolean {
-  return !control<HTMLElement>('[data-undecided-warning]').hidden;
-}
-
 describe('make an order at a hearing: deciding the applications', () => {
   let app: TestApp;
   beforeEach(async () => {
@@ -154,27 +149,6 @@ describe('make an order at a hearing: deciding the applications', () => {
       lines.filter(line => line.startsWith('AND UPON considering')).length +
         lines.filter(line => line.startsWith('UPON considering')).length
     ).toBe(2);
-  });
-
-  it('reminds the judge when a final order on the claim leaves an application not dealt with', async () => {
-    await openPage((await app.get(PAGE)).text);
-    // The page opens on the applications alone, so nothing ends the claim.
-    expect(warningShowing()).toBe(false);
-    check('claim-order', 'yes');
-    // Ordering on the claim opens on outright possession, which ends it.
-    expect(warningShowing()).toBe(true);
-    selectTab('tab-adjournment');
-    expect(warningShowing()).toBe(false);
-    selectTab('tab-strike-out');
-    expect(warningShowing()).toBe(true);
-    check('app-gen-app-1-decision', 'dismiss');
-    expect(warningShowing()).toBe(true);
-    check('app-gen-app-2-decision', 'list');
-    expect(warningShowing()).toBe(false);
-    check('app-gen-app-2-decision', 'none');
-    expect(warningShowing()).toBe(true);
-    uncheck('claim-order', 'yes');
-    expect(warningShowing()).toBe(false);
   });
 
   it('needs what follows a decision, naming the application', async () => {

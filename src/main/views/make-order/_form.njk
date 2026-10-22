@@ -2,7 +2,6 @@
   The make order form and the order it generates, which a judge fills in to make an order and a
   caseworker may change before issuing it. The page's form wraps it, as #make-order-form.
 #}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% import "make-order/_compact.njk" as compact with context %}
 
@@ -121,15 +120,6 @@
     </div>
   {% endfor %}
 </div>
-{# A final order on the claim with an application left open: a reminder, as the judges asked, not a bar. #}
-{% if applications | length %}
-  <div data-undecided-warning hidden>
-    {{ govukWarningText({
-      text: "This order ends the claim but does not deal with every application. Decide them, or list them for a hearing, unless you mean to leave them open.",
-      iconFallbackText: "Warning"
-    }) }}
-  </div>
-{% endif %}
 </div>
 {% endif %}
 

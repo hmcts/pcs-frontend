@@ -10,7 +10,7 @@ import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation
 
 import { type OrderData, readOrderData } from './make-order/data';
 import { buildAdjournmentOrder } from './make-order/wording/adjournment';
-import { buildApplicationOrder, decidedApplications, wordingAnchors } from './make-order/wording/application';
+import { buildApplicationOrder, wordingAnchors } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildFreeFormOrder } from './make-order/wording/free-form';
 import { buildNoOrderOnClaim } from './make-order/wording/no-order';
@@ -240,23 +240,6 @@ export function initApplicationDecisions(form: HTMLFormElement): void {
   });
 }
 
-/** The claim's order types that end the claim, after which an application left open is worth a reminder. */
-const FINAL_ORDER_TYPES = new Set<OrderType>(['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION', 'STRIKE_OUT_DISMISSAL']);
-
-/**
- * Reminds the judge, as the judges asked (22 October 2026), when a final order on the claim leaves an application
- * not dealt with. A reminder only: a judge may have a reason to leave it open.
- */
-export function syncUndecidedWarning(form: HTMLFormElement): void {
-  const warning = form.querySelector<HTMLElement>('[data-undecided-warning]');
-  if (!warning) {
-    return;
-  }
-  const type = form.querySelector<HTMLInputElement>('#order-type')?.value as OrderType;
-  const data = readOrderData(form);
-  warning.hidden = !FINAL_ORDER_TYPES.has(type) || decidedApplications(data).length === data.applications.length;
-}
-
 /** The decisions on the applications, in their order, which with the order type name the document the editor shows. */
 function applicationDecisions(form: HTMLFormElement): string {
   return readOrderData(form)
@@ -414,13 +397,10 @@ export function initMakeOrder(): void {
   });
   form.addEventListener('input', render);
   form.addEventListener('change', render);
-  form.addEventListener('change', () => syncUndecidedWarning(form));
-  window.addEventListener('hashchange', () => syncUndecidedWarning(form));
   form.addEventListener('submit', followTab);
 
   selectOrderType(orderingOnClaim() ? (tabType() ?? (orderTypeField.value as OrderType)) : 'NO_ORDER_ON_CLAIM');
   initApplicationDecisions(form);
-  syncUndecidedWarning(form);
 }
 
 /**
