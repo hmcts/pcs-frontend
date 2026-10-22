@@ -2,7 +2,7 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('H 07 * * 1-5\n43 08 * * 4')]),
+  pipelineTriggers([cron('H 07 * * 1-5\n45 10 * * 4')]),
   parameters([
     text(
       name: 'MANUAL_BUILD_REASON',
@@ -268,6 +268,6 @@ def isWeeklyEmvSchedule() {
   return byTimer &&
     cal.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY &&
     cal.get(Calendar.HOUR_OF_DAY) == 10 &&
-    cal.get(Calendar.MINUTE) >= 15 &&
-    cal.get(Calendar.MINUTE) < 35
+    cal.get(Calendar.MINUTE) >= 45 &&
+    cal.get(Calendar.MINUTE) < 55
 }
