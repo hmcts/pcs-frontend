@@ -286,11 +286,9 @@ export function initMakeOrder(): void {
   }
 
   let orderType: OrderType | undefined;
-  let key: string | undefined;
   // One document per order type, so switching and back keeps any edits. A decision on an application changes the
   // generated clauses in place, so wording the judge inserted after them stays.
-  const documents: Record<string, DocWeaveSnapshot> = {};
-  const documentKey = (type: OrderType): string => type;
+  const documents: Partial<Record<OrderType, DocWeaveSnapshot>> = {};
   const editor = createDocEditor({
     mount,
     label: 'Order',
@@ -302,40 +300,30 @@ export function initMakeOrder(): void {
     // A document the field cannot hold is regenerated from the form.
     onError: () => (documentField.value = ''),
     onChange: snapshot => {
-      if (key) {
-        documents[key] = snapshot;
+      if (orderType) {
+        documents[orderType] = snapshot;
       }
     },
   });
   if (documentField.value) {
-    documents[documentKey(orderTypeField.value as OrderType)] = editor.getSnapshot();
+    documents[orderTypeField.value as OrderType] = editor.getSnapshot();
   }
   const render = (): void => editor.render(buildOrderDocument(form));
-  const startDocument = (): void => {
-    editor.load();
-    render();
-  };
-  const selectDocument = (): void => {
-    const next = documentKey(orderType!);
-    if (key === next) {
-      return;
-    }
-    key = next;
-    if (documents[next]) {
-      editor.load(documents[next]);
-      render();
-    } else {
-      startDocument();
-    }
-  };
   const selectOrderType = (type: OrderType): void => {
     if (orderType === type) {
       return;
     }
+    if (orderType) {
+      documents[orderType] = editor.getSnapshot();
+    }
+    // A type not opened yet starts from the order as it stands when applications are being decided, so the
+    // applicant's wording the judge inserted comes with it; its own clauses replace the last type's.
+    const carried = orderType && readOrderData(form).applications.length ? documents[orderType] : undefined;
     orderType = type;
     orderTypeField.value = type;
     syncSuspendedOnlyCosts(form, type);
-    selectDocument();
+    editor.load(documents[type] ?? carried);
+    render();
   };
 
   // GOV.UK tabs record the open tab in the fragment for clicks, arrow keys and history.

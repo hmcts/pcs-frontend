@@ -151,6 +151,26 @@ describe('make an order at a hearing: deciding the applications', () => {
     ).toBe(2);
   });
 
+  it("keeps the applicant's wording the judge inserted when they go on to order on the claim", async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    recordAttendance();
+    check('app-gen-app-1-decision', 'grant');
+    control<HTMLButtonElement>('[data-application-reference="GA1"] [data-insert-requested-wording]').click();
+    check('claim-order', 'yes');
+    expect(page.documentText()).toContain('The hearing on 14 October is adjourned.');
+    selectTab('tab-adjournment');
+    check('adj-type', 'generally');
+
+    const lines = page.documentText().split('\n');
+    expect(lines.slice(lines.indexOf('IT IS ORDERED THAT:'))).toEqual([
+      'IT IS ORDERED THAT:',
+      'The claim is adjourned generally with liberty to restore by application by any party on notice to all other parties.',
+      "The defendant's application dated 1 October 2026 is granted.",
+      'The hearing on 14 October is adjourned.',
+      'Costs in the case.',
+    ]);
+  });
+
   it('needs what follows a decision, naming the application', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     recordAttendance();
