@@ -462,10 +462,11 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   min-width: 0;
 }
 
-// An application the order can decide, one row of the applications section at a hearing.
+// An application the order can decide, one outlined row of the applications section at a hearing.
 .pcs-application--row {
-  padding-top: govuk-spacing(3);
-  border-top: 1px solid $govuk-border-colour;
+  padding: govuk-spacing(3) govuk-spacing(3) 0;
+  margin-bottom: govuk-spacing(4);
+  border: 1px solid $govuk-border-colour;
 }
 
 .pcs-application--row .govuk-details__text .govuk-summary-list {
