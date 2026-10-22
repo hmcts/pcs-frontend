@@ -98,9 +98,6 @@
 {% if applications | length %}
   <section class="pcs-applications" aria-labelledby="applications-heading" data-applications>
     <h2 class="govuk-heading-l govuk-!-margin-top-6" id="applications-heading">Applications</h2>
-    <p class="govuk-body">
-      Each application you decide goes into this order. An application you do not deal with stays open.
-    </p>
     {% for item in applications %}
       {{ applicationRow.row(item, false) }}
     {% endfor %}
