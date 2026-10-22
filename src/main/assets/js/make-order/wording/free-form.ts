@@ -2,6 +2,7 @@ import { type DocWeaveDocument, buildDoc } from '@hmcts-cft/docweave';
 
 import { type OrderData } from '../data';
 
+import { addApplicationDecisions } from './application';
 import { addCosts, addPreamble, caseManCosts, hasCosts, partyLabels, values } from './common';
 import { addEnforcementTransfer, transfersEnforcement } from './enforcement-transfer';
 import { addListing } from './listing';
@@ -19,13 +20,20 @@ export function buildFreeFormOrder(data: OrderData): DocWeaveDocument {
     if (listed || transferred) {
       order.orderedList('free-form-clauses', list => {
         if (listed) {
-          addListing(list, data, 'list', 'free-form', 'The claim shall be listed for a hearing on notice to all parties');
+          addListing(
+            list,
+            data,
+            'list',
+            'free-form',
+            'The claim shall be listed for a hearing on notice to all parties'
+          );
         }
         if (transferred) {
           addEnforcementTransfer(list, data);
         }
       });
     }
+    addApplicationDecisions(order, data);
     if (hasCosts(data, costs)) {
       order.paragraph('free-form-costs', content => addCosts(content, data, costs));
     }

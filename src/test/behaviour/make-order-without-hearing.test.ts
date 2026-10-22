@@ -29,6 +29,7 @@ describe('make an order: without a hearing or an application', () => {
       'ADJOURNMENT',
       'STRIKE_OUT_DISMISSAL',
       'FREE_FORM',
+      'NO_ORDER_ON_CLAIM',
     ]);
     expect(page.orderText()).toBe(
       ['UPON the Court considering the papers without a hearing', 'IT IS ORDERED THAT:'].join('\n')

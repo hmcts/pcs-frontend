@@ -238,6 +238,8 @@ export async function bootApp(
     order?: Partial<Envelope['order']>;
     /** The general application court staff referred to the judge, which the judge's order decides. */
     application?: Record<string, unknown> & { id: string };
+    /** The case's open applications, any of which an order made at a hearing can decide. */
+    applications?: (Record<string, unknown> & { id: string })[];
     /** The hearing pcs-api starts the event for, over the default one, or null for an order made without one. */
     hearing?: Record<string, unknown> | null;
     /** The case bundle, once the case has one. */
@@ -253,6 +255,9 @@ export async function bootApp(
   envelope.order = { ...envelope.order, ...options.order };
   if (options.caseBundle) {
     envelope.caseContext.caseBundle = options.caseBundle;
+  }
+  if (options.applications) {
+    envelope.caseContext.applications = options.applications;
   }
   if (options.application) {
     envelope.caseContext.application = options.application;

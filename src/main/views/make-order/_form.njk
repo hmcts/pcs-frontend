@@ -2,18 +2,21 @@
   The make order form and the order it generates, which a judge fills in to make an order and a
   caseworker may change before issuing it. The page's form wraps it, as #make-order-form.
 #}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% import "make-order/_compact.njk" as compact with context %}
 
 <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
 
+{% import "make-order/_application.njk" as applicationRow with context %}
+
 {#
-  The screen follows what the order is for. Deciding an application: the application and the decision on it,
-  without the possession order types. Otherwise every order type, with the hearing's facts and who attended for an
-  order made at a hearing, and neither for one made without a hearing.
+  The screen follows what the order is for. Made on one application, as box work: that application and the decision
+  on it, without the possession order types. Otherwise every order type for the claim, with the hearing's facts and
+  who attended for an order made at a hearing, and neither for one made without a hearing, then each open application
+  the order may decide.
 #}
 {% if application %}
-{% include "make-order/_application.njk" %}
-{% include "make-order/_application-decision.njk" %}
+  {{ applicationRow.row(application, true) }}
 {% else %}
 {# Only an order made for a hearing has the case's facts and the hearing's note. #}
 {% if hearing %}
@@ -50,15 +53,19 @@
   })) }}
 {% endif %}
 
-<h2 class="govuk-heading-l govuk-!-margin-top-6">Order type</h2>
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Claim</h2>
 
-{# One list drives both the tabs and their panels. The judges asked for no possession tabs without a hearing. #}
+{#
+  One list drives both the tabs and their panels: what the order does about the claim, which the order types
+  exclude one another over. The judges asked for no possession tabs without a hearing.
+#}
 {% set orderTypeTabs = [
   { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk", atHearingOnly: true },
   { id: "tab-suspended", type: "SUSPENDED_POSSESSION", label: "Suspended possession", template: "make-order/tabs/_suspended.njk", atHearingOnly: true },
   { id: "tab-adjournment", type: "ADJOURNMENT", label: "Adjournment", template: "make-order/tabs/_adjournment.njk" },
   { id: "tab-strike-out", type: "STRIKE_OUT_DISMISSAL", label: "Strike out/dismiss", template: "make-order/tabs/_strike-out.njk" },
-  { id: "tab-free-form", type: "FREE_FORM", label: "Free form", template: "make-order/tabs/_free-form.njk" }
+  { id: "tab-free-form", type: "FREE_FORM", label: "Free form", template: "make-order/tabs/_free-form.njk" },
+  { id: "tab-no-order", type: "NO_ORDER_ON_CLAIM", label: "No order on the claim", template: "make-order/tabs/_no-order.njk" }
 ] %}
 {% if withoutHearing %}
   {% set orderTypeTabs = orderTypeTabs | rejectattr("atHearingOnly") %}
@@ -83,6 +90,29 @@
     </div>
   {% endfor %}
 </div>
+
+{#
+  Every open application, each decided on its own, so one order can decide the claim and any of them. Shown only
+  while the case has one: the judges asked for nothing about applications otherwise.
+#}
+{% if applications | length %}
+  <section class="pcs-applications" aria-labelledby="applications-heading" data-applications>
+    <h2 class="govuk-heading-l govuk-!-margin-top-6" id="applications-heading">Applications</h2>
+    <p class="govuk-body">
+      Each application you decide goes into this order. An application you do not deal with stays open.
+    </p>
+    {% for item in applications %}
+      {{ applicationRow.row(item, false) }}
+    {% endfor %}
+    {# A final order on the claim with an application left open: a reminder, as DJ Daley asked, not a bar. #}
+    <div data-undecided-warning hidden>
+      {{ govukWarningText({
+        text: "This order ends the claim but does not deal with every application. Decide them, or list them for a hearing, unless you mean to leave them open.",
+        iconFallbackText: "Warning"
+      }) }}
+    </div>
+  </section>
+{% endif %}
 {% endif %}
 
 {% include "make-order/_costs.njk" %}

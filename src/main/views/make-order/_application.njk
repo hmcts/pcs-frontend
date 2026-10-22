@@ -1,32 +1,37 @@
 {#
-  The general application the judge is deciding: what was applied for and by whom, the applicant's
-  answers and documents, and the order they asked for, which the judge can use as the order's wording.
+  An open application the order can decide, as a row of the applications section: what was applied for and by
+  whom, the applicant's answers, documents and the order they asked for, then what the judge decides about it.
+  Each application's answers start with its prefix (app-<id>), so an order made at a hearing keeps each one's.
+
+  Made on one application, as box work, the order shows that application in full and must decide it. Made at a
+  hearing, the judge has the file, so the details are folded away and an application may be left as it is.
+
+  Granting an application that asked for an order puts the applicant's wording in the order preview as the judge's
+  own clauses, which the reset button restores. Listing it for a hearing on notice asks when, as the adjournment tab
+  does, and leaves the application open. For an application to suspend the warrant of possession, granting it
+  suspends the warrant on the conditions a suspended possession order has, and dismissing it says when the eviction
+  may go ahead (HHJ Pema's wording, 20 October 2026). Inline radios can't reveal a question, so what follows a
+  decision is on its own rows, shown while it is chosen (initApplicationDecisions in make-order.ts).
 #}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% import "make-order/_compact.njk" as compact with context %}
+{% import "make-order/_listing.njk" as listing with context %}
+{% import "make-order/_payment-conditions.njk" as conditions with context %}
 
-<section class="pcs-application" aria-labelledby="application-heading"
-         data-application
-         data-application-reference="{{ application.reference }}"
-         data-application-type="{{ application.type }}"
-         data-application-applicant="{{ application.applicant or 'the applicant' }}"
-         data-application-submitted="{{ application.submittedOnDisplay or '' }}"
-         data-application-wording-html="{{ application.whatOrderWantedHtml }}">
-  <h2 class="govuk-heading-l govuk-!-margin-top-6" id="application-heading">
-    Application {{ application.reference }}: {{ application.type }}
-  </h2>
-
+{% macro details(application) %}
   {% if application.withoutNotice == "YES" %}
     {{ govukWarningText({ text: "The applicant asked for this application to be made without notice. Only the applicant will be told of it." }) }}
   {% endif %}
 
   {% if application.referralNote %}
-    <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Note from court staff{% if application.referredOnDisplay %}, {{ application.referredOnDisplay }}{% endif %}</h3>
+    <h4 class="govuk-heading-s govuk-!-margin-bottom-1">Note from court staff{% if application.referredOnDisplay %}, {{ application.referredOnDisplay }}{% endif %}</h4>
     {{ govukInsetText({
       html: '<p class="govuk-body">' + (application.referralNote | escape | nl2br) + '</p>',
       classes: "govuk-!-margin-top-1",
-      attributes: { id: "referral-note" }
+      attributes: { id: application.prefix + "-referral-note" }
     }) }}
   {% endif %}
 
@@ -57,16 +62,112 @@
     { key: { text: "Without notice" }, value: { text: (application.withoutNoticeDisplay or "No") + ((": " + application.withoutNoticeReason) if application.withoutNoticeReason else "") } },
     { key: { text: "Application documents" }, value: { html: documentLinks } }
   ]) %}
-  {{ govukSummaryList({ rows: rows, classes: "govuk-!-margin-bottom-4", attributes: { id: "application-details" } }) }}
+  {{ govukSummaryList({ rows: rows, classes: "govuk-!-margin-bottom-4", attributes: { id: application.prefix + "-details" } }) }}
 
-  <h3 class="govuk-heading-m">The order the applicant asked for</h3>
+  <h4 class="govuk-heading-s">The order the applicant asked for</h4>
   {% if application.whatOrderWanted %}
     {# As the applicant formatted it, so their numbering is the numbering they refer to. #}
     {{ govukInsetText({
       html: '<div class="pcs-rich-text">' + application.whatOrderWantedHtml + '</div>',
-      attributes: { id: "application-requested" }
+      attributes: { id: application.prefix + "-requested" }
     }) }}
   {% else %}
     <p class="govuk-body">The applicant did not say what order they want. Read the application documents.</p>
   {% endif %}
-</section>
+{% endmacro %}
+
+{#
+  The decision on the application. Made at a hearing, the judge may leave it as it is, which is the answer until
+  they choose another.
+#}
+{% macro decision(application, boxWork) %}
+  {% set prefix = application.prefix %}
+  {% set name = prefix + "-decision" %}
+  {% set shows = ' hidden' %}
+  {% set items = [] %}
+  {% if not boxWork %}
+    {% set items = items.concat([{ value: "none", text: "Not dealt with" }]) %}
+  {% endif %}
+  {% set items = items.concat([
+    { value: "grant", text: "Granted" },
+    { value: "dismiss", text: "Dismissed" },
+    { value: "strike-out", text: "Struck out" },
+    { value: "list", text: "Listed for a hearing on notice" },
+    { value: "other", text: "Something else" }
+  ]) %}
+  {{ compact.radios(name, {
+    legend: "What do you decide about application " + application.reference + "?",
+    legendHidden: boxWork,
+    hint: ("For something else, write the order in the order preview. In any case, you may amend the wording in the order preview.") if boxWork else none,
+    classes: "govuk-radios--small govuk-radios--inline",
+    default: none if boxWork else "none",
+    items: items
+  }) }}
+
+  {% if application.whatOrderWanted %}
+    <div data-decision-shows="grant" {%- if not draftChecked(name, "grant") %} hidden{% endif %}>
+      <p class="govuk-body-s govuk-!-margin-bottom-1">The applicant’s wording is in the order preview as your clauses, to amend or delete.</p>
+      <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3" data-restore-requested-wording>
+        Reset to applicant’s wording
+      </button>
+    </div>
+  {% endif %}
+
+  {% if application.warrantSuspension %}
+    <div data-decision-shows="grant" {%- if not draftChecked(name, "grant") %} hidden{% endif %}>
+      {{ conditions.paymentConditions(prefix + "-warrant", "Warrant suspended on condition of") }}
+    </div>
+    <div data-decision-shows="dismiss" {%- if not draftChecked(name, "dismiss") %} hidden{% endif %}>
+      <div class="pcs-inline-date">
+        <span class="govuk-label govuk-label--s pcs-inline-date__label" aria-hidden="true">Eviction may take place on</span>
+        {{ compact.date({ id: prefix + "-eviction-date", legend: "Eviction may take place on", legendHidden: true }) }}
+      </div>
+    </div>
+  {% endif %}
+
+  <div data-decision-shows="list" data-application-listing {%- if not draftChecked(name, "list") %} hidden{% endif %}>
+    {{ listing.listing(prefix + "-list", "When the hearing is", [
+      "Next available possession list after",
+      "Next available date (non-possession list) after",
+      "Specific date"
+    ]) }}
+  </div>
+{% endmacro %}
+
+{% macro row(application, boxWork) %}
+  {% set prefix = application.prefix %}
+  <section class="pcs-application{% if not boxWork %} pcs-application--row{% endif %}" aria-labelledby="{{ prefix }}-heading"
+           data-application
+           data-application-id="{{ application.id }}"
+           data-application-prefix="{{ prefix }}"
+           data-application-reference="{{ application.reference }}"
+           data-application-type="{{ application.type }}"
+           data-application-applicant="{{ application.applicant or 'the applicant' }}"
+           data-application-submitted="{{ application.submittedOnDisplay or '' }}"
+           data-application-wording-html="{{ application.whatOrderWantedHtml }}"
+           {%- if application.warrantSuspension %} data-application-warrant{% endif %}>
+    {% if boxWork %}
+      <h2 class="govuk-heading-l govuk-!-margin-top-6" id="{{ prefix }}-heading">
+        Application {{ application.reference }}: {{ application.type }}
+      </h2>
+      {{ details(application) }}
+      <h2 class="govuk-heading-l govuk-!-margin-top-6">Decision</h2>
+    {% else %}
+      <h3 class="govuk-heading-m govuk-!-margin-bottom-1" id="{{ prefix }}-heading">
+        {{ application.reference }}: {{ application.type }}{% if application.somethingElseDetails %} – {{ application.somethingElseDetails }}{% endif %}
+      </h3>
+      <p class="govuk-body-s govuk-!-margin-bottom-2">
+        {{ application.applicant or "Applicant not known" }}{% if application.submittedOnDisplay %}, {{ application.submittedOnDisplay }}{% endif %}
+        {%- if application.withoutNotice == "YES" %}, without notice{% endif %}
+        {%- if application.referralNote %}, referred by court staff{% endif %}
+      </p>
+      {{ govukDetails({
+        summaryText: "Application details and the order asked for",
+        html: details(application),
+        classes: "govuk-!-margin-bottom-3",
+        attributes: { id: prefix + "-more" }
+      }) }}
+    {% endif %}
+    {{ decision(application, boxWork) }}
+  </section>
+{% endmacro %}

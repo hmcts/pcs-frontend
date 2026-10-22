@@ -13,16 +13,28 @@ export interface AttendanceEntry {
   representativeName: string;
 }
 
-/** The general application an order decides, as its panel on the page gives it. */
+/** An open application the order can decide, as its row on the page gives it. */
 export interface OrderApplication {
+  id: string;
+  /** What its answers on the form start with: `app-<id>`. */
+  prefix: string;
   reference: string;
   type: string;
   applicant: string;
   submittedOn: string;
+  /** Whether the applicant asked for an order, which granting the application puts in the order as HTML. */
+  wordingHtml: string;
+  /** An application to suspend the warrant of possession, granted on conditions or dismissed with an eviction date. */
+  warrantSuspension: boolean;
+  /** What the judge decides about it: "none" while they leave it as it is. */
+  decision: string;
 }
 
 export interface OrderData {
-  application?: OrderApplication;
+  /** The applications the order can decide, in the order they were made. */
+  applications: readonly OrderApplication[];
+  /** An order made on one application, as box work, which is the order's whole subject. */
+  boxWork: boolean;
   answers: Readonly<Record<string, readonly string[]>>;
   selectedControlIds: Readonly<Record<string, string>>;
   propertyAddress: string;
@@ -73,18 +85,25 @@ export function readOrderData(form: HTMLFormElement): OrderData {
     });
   });
 
-  const panel = form.querySelector<HTMLElement>('[data-application]');
-  const application = panel
-    ? {
-        reference: panel.dataset.applicationReference ?? '',
-        type: panel.dataset.applicationType ?? '',
-        applicant: panel.dataset.applicationApplicant ?? 'the applicant',
-        submittedOn: panel.dataset.applicationSubmitted ?? '',
-      }
-    : undefined;
+  const applications: OrderApplication[] = [];
+  form.querySelectorAll<HTMLElement>('[data-application]').forEach(row => {
+    const prefix = row.dataset.applicationPrefix ?? '';
+    applications.push({
+      id: row.dataset.applicationId ?? '',
+      prefix,
+      reference: row.dataset.applicationReference ?? '',
+      type: row.dataset.applicationType ?? '',
+      applicant: row.dataset.applicationApplicant ?? 'the applicant',
+      submittedOn: row.dataset.applicationSubmitted ?? '',
+      wordingHtml: row.dataset.applicationWordingHtml ?? '',
+      warrantSuspension: row.dataset.applicationWarrant !== undefined,
+      decision: answers[`${prefix}-decision`]?.[0] ?? 'none',
+    });
+  });
 
   return {
-    application,
+    applications,
+    boxWork: form.dataset.boxWork !== undefined,
     answers,
     selectedControlIds,
     propertyAddress: form.dataset.propertyAddress ?? '',

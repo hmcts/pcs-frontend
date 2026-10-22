@@ -26,7 +26,9 @@ export interface OrderCaseContext {
   defendants: OrderParty[];
   openCounterclaim?: boolean;
   openApplication?: boolean;
-  /** The general application an order on one decides. */
+  /** The case's open applications, each of which an order made at a hearing can decide, oldest first. */
+  applications?: OrderApplication[];
+  /** The general application an order made on one, as box work, decides. */
   application?: OrderApplication | null;
   /** The case bundle, once one has been generated: every document on the case in one PDF. */
   caseBundle?: OrderCaseBundle | null;
@@ -41,6 +43,8 @@ export interface OrderCaseBundle {
 /** A general application as the judge deciding it reads it, with what court staff said when they referred it. */
 export interface OrderApplication {
   id: string;
+  /** An application to suspend the warrant of possession: granted on conditions, or dismissed with an eviction date. */
+  warrantSuspension?: boolean;
   reference: string;
   type: string;
   somethingElseDetails?: string | null;

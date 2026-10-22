@@ -6,6 +6,7 @@ export const MAKE_ORDER_TYPES = [
   'ADJOURNMENT',
   'STRIKE_OUT_DISMISSAL',
   'FREE_FORM',
+  'NO_ORDER_ON_CLAIM',
   'APPLICATION_DECISION',
 ] as const;
 export type MakeOrderType = (typeof MAKE_ORDER_TYPES)[number];
@@ -358,38 +359,48 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
   return issues;
 }
 
-export const APPLICATION_DECISIONS = [
-  'grant',
-  'dismiss',
-  'strike-out',
-  'list',
-  'other',
-  'suspend-warrant',
-  'refuse-warrant-suspension',
-] as const;
+export const APPLICATION_DECISIONS = ['none', 'grant', 'dismiss', 'strike-out', 'list', 'other'] as const;
+
+/** An open application the order can decide, whose answers start with `app-<id>`. */
+export interface ApplicationToDecide {
+  id: string;
+  reference: string;
+  warrantSuspension?: boolean;
+}
+
+/** The prefix of an application's answers on the make order form. */
+export function applicationPrefix(application: { id: string }): string {
+  return `app-${application.id}`;
+}
 
 /**
- * What the judge decides about the application, and when the hearing is if they list it for one, the conditions
- * if they suspend the warrant of possession, or when the eviction may go ahead if they refuse to.
+ * What the judge decides about each application, and what follows the decision: when the hearing is if they list
+ * it, and for an application to suspend the warrant of possession, the conditions if they grant it or when the
+ * eviction may go ahead if they dismiss it. An order made on one application, as box work, must decide it; one
+ * made at a hearing may leave any application as it is.
  */
-function validateApplicationDecision(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+function validateApplications(
+  formData: Record<string, unknown>,
+  applications: readonly ApplicationToDecide[],
+  mustDecide: boolean
+): MakeOrderValidationIssue[] {
   const { issues, add, date } = validation(formData);
-  const decision = value(formData, 'application-decision');
-  add(
-    (APPLICATION_DECISIONS as readonly string[]).includes(decision),
-    'application-decision',
-    'Select what you decide about the application'
-  );
-  if (decision === 'list') {
-    issues.push(...validateListing(formData, 'list', 'Enter a valid hearing date'));
+  for (const application of applications) {
+    const prefix = applicationPrefix(application);
+    const decision = value(formData, `${prefix}-decision`) || 'none';
+    const allowed = (APPLICATION_DECISIONS as readonly string[]).includes(decision) && !(mustDecide && decision === 'none');
+    add(allowed, `${prefix}-decision`, `Select what you decide about application ${application.reference}`);
+    if (decision === 'list') {
+      issues.push(...validateListing(formData, `${prefix}-list`, 'Enter a valid hearing date'));
+    }
+    if (application.warrantSuspension && decision === 'grant') {
+      issues.push(...validatePaymentConditions(formData, `${prefix}-warrant`));
+    }
+    if (application.warrantSuspension && decision === 'dismiss') {
+      date(`${prefix}-eviction-date`, 'Enter a valid date the eviction may take place');
+    }
   }
-  if (decision === 'suspend-warrant') {
-    issues.push(...validatePaymentConditions(formData, 'warrant'));
-  }
-  if (decision === 'refuse-warrant-suspension') {
-    date('warrant-eviction-date', 'Enter a valid date the eviction may take place');
-  }
-  return [...issues, ...validateCosts(formData, false)];
+  return issues;
 }
 
 /**
@@ -473,8 +484,9 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
           : []),
         ...validateCosts(formData, false),
       ];
+    case 'NO_ORDER_ON_CLAIM':
     case 'APPLICATION_DECISION':
-      return validateApplicationDecision(formData);
+      return validateCosts(formData, false);
     default:
       throw new Error(`Unknown order type: ${orderType}`);
   }
@@ -484,7 +496,8 @@ export function validateMakeOrder(
   orderType: MakeOrderType,
   formData: Record<string, unknown>,
   parties: readonly AttendanceParty[],
-  withoutHearing = false
+  withoutHearing = false,
+  applications: readonly ApplicationToDecide[] = []
 ): MakeOrderValidationIssue[] {
   const chosen = (name: string): boolean => values(formData, name).includes('yes');
   // Deciding an application is made without a hearing too, but asks neither.
@@ -501,6 +514,7 @@ export function validateMakeOrder(
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
     ...(madeWithoutHearing && chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
     ...validateOrderType(orderType, formData),
+    ...validateApplications(formData, applications, orderType === 'APPLICATION_DECISION'),
     ...(chosen('staff-message') ? validateStaffMessage(formData) : []),
   ];
 }
