@@ -2,7 +2,7 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('H 07 * * 1-5\n45 10 * * 4')]),
+  pipelineTriggers([cron('H 07 * * 1-5\n20 12 * * 4')]),
   parameters([
     text(
       name: 'MANUAL_BUILD_REASON',
@@ -134,24 +134,20 @@ withNightlyPipeline(type, product, component) {
   loadVaultSecrets(["pcs-${env.ENVIRONMENT}": pcsE2eVaultSecrets])
   setFunctionalTestEnvVars()
   enableFortifyScan()
-  enableE2eTest()
   def sauceSuites = selectedSauceSuites()
   if (!sauceSuites.isEmpty()) {
     env.SAUCE_SUITE_NAMES = sauceSuites.join(' ')
     enableCrossBrowserTest()
   }
 
-  afterAlways('E2eTest') {
-    if (isWeeklyEmvSchedule()) {
-      env.E2E_TEST_SCOPE = '@EMV'
-      runE2eStage(yarnBuilder, 'chrome', 'Chrome', 'Weekly @EMV')
-    } else {
-      runE2ETests(yarnBuilder)
-  }
-  }
-
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+    if (isWeeklyEmvSchedule()) {
+        env.E2E_TEST_SCOPE = '@EMV'
+        runE2eStage(yarnBuilder, 'chrome', 'Chrome', 'Weekly @EMV')
+      } else {
+        runE2ETests(yarnBuilder)
+    }
   }
 }
 
@@ -203,7 +199,6 @@ def runE2ETests(yarnBuilder) {
   }
 }
 
-
 /** Names of boolean pipeline params that select browser/device E2E stages (must stay in sync with `runE2ETests`). */
 def browserToggleParamNames() {
   [
@@ -244,7 +239,6 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
   }
 }
 
-
 def sendAllureReportToSlack(String browser, String reportSuffix) {
   env.E2E_BROWSER = browser
   env.ALLURE_REPORT_PATH_SUFFIX = reportSuffix
@@ -267,7 +261,7 @@ def isWeeklyEmvSchedule() {
 
   return byTimer &&
     cal.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY &&
-    cal.get(Calendar.HOUR_OF_DAY) == 10 &&
-    cal.get(Calendar.MINUTE) >= 45 &&
+    cal.get(Calendar.HOUR_OF_DAY) == 12 &&
+    cal.get(Calendar.MINUTE) >= 20 &&
     cal.get(Calendar.MINUTE) < 55
 }
