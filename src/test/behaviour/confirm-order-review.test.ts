@@ -40,11 +40,21 @@ function errors(html: string): string[] {
  * The order a judge sends for review from the make order page, an outright order unless a tab is named, with the
  * Docweave document the page built; `edit` changes that document as the judge would in the preview.
  */
-async function judgesOrder(options: { tab?: string; staffMessage?: string; edit?: () => void } = {}): Promise<Order> {
-  const judgeApp = await bootApp();
+async function judgesOrder(
+  options: {
+    tab?: string;
+    staffMessage?: string;
+    edit?: () => void;
+    applications?: (Record<string, unknown> & { id: string })[];
+    decide?: () => void;
+  } = {}
+): Promise<Order> {
+  const judgeApp = await bootApp({ applications: options.applications });
   try {
     const page = await openPage((await judgeApp.get(MAKE_ORDER)).text);
-    if (options.tab) {
+    if (options.decide) {
+      options.decide();
+    } else if (options.tab) {
       selectTab(options.tab);
     } else {
       // An outright order the make order page would send: possession forthwith, on mandatory grounds.
@@ -100,9 +110,35 @@ async function awaitingReview(order?: Order) {
   return { id: 'order-awaiting-review', version: 3, ...(order ?? (await (plainOrder ??= judgesOrder()))) };
 }
 
-async function caseworkerReviewing(order?: Order): Promise<TestApp> {
-  return bootApp({ caseworker: true, order: await awaitingReview(order) });
+async function caseworkerReviewing(
+  order?: Order,
+  applications?: (Record<string, unknown> & { id: string })[]
+): Promise<TestApp> {
+  return bootApp({ caseworker: true, order: await awaitingReview(order), applications });
 }
+
+const APPLICATIONS = [
+  {
+    id: 'gen-app-1',
+    reference: 'GA1',
+    type: 'Something else',
+    somethingElseDetails: 'Relief from sanctions',
+    applicant: 'Alex Example (Defendant 1)',
+    submittedOn: '2026-10-19',
+    whatOrderWanted:
+      '<ol><li><p>The defendant has relief from sanctions.</p></li><li><p>No order as to costs.</p></li></ol>',
+    documents: [],
+  },
+  {
+    id: 'gen-app-2',
+    reference: 'GA2',
+    type: 'Adjourn the hearing',
+    applicant: 'Example Housing (Claimant 1)',
+    submittedOn: '2026-10-21',
+    whatOrderWanted: null,
+    documents: [],
+  },
+];
 
 /** Opens the review of the order, as the caseworker reaches it from the introduction. */
 async function openReview(app: TestApp): Promise<Page> {
@@ -136,6 +172,50 @@ const proceedToIssueAnswers = (answers: Record<string, string> = {}) =>
 describe('confirm order review', () => {
   let app: TestApp;
   afterEach(() => app?.close());
+
+  describe('an order on the applications alone', () => {
+    it("shows the applications first with the claim untouched, the judge's inserted wording, and issues", async () => {
+      app = await caseworkerReviewing(
+        await judgesOrder({
+          applications: APPLICATIONS,
+          decide: () => {
+            check('app-gen-app-1-decision', 'grant');
+            control<HTMLButtonElement>('[data-application-reference="GA1"] [data-insert-requested-wording]').click();
+            check('app-gen-app-2-decision', 'dismiss');
+          },
+        }),
+        APPLICATIONS
+      );
+      const page = await openReview(app);
+
+      // The judge's order as submitted, with the wording they inserted marked as theirs.
+      const preview = document.querySelector('[data-order-preview]')!;
+      expect(preview.textContent).toContain("The defendant's application dated 19 October 2026 is granted.");
+      expect(preview.querySelector('.docweave-clause--inserted')?.textContent).toContain(
+        'The defendant has relief from sanctions.'
+      );
+      expect(preview.textContent).toContain("The claimant's application dated 21 October 2026 is dismissed.");
+      expect(preview.textContent).not.toContain('possession');
+
+      // Below it, the same screen the judge had: applications first, the claim behind its unticked box.
+      expect(control('input[name="claim-order"]').checked).toBe(false);
+      expect(control<HTMLElement>('[data-claim-order]').hidden).toBe(true);
+      expect(control('#order-type').value).toBe('NO_ORDER_ON_CLAIM');
+      expect(control('[name="app-gen-app-1-decision"][value="grant"]').checked).toBe(true);
+      expect(control('[name="app-gen-app-2-decision"][value="dismiss"]').checked).toBe(true);
+      const lines = page.documentText().split('\n');
+      expect(lines.slice(lines.indexOf('IT IS ORDERED THAT:'))).toEqual([
+        'IT IS ORDERED THAT:',
+        "The defendant's application dated 19 October 2026 is granted.",
+        'The defendant has relief from sanctions.',
+        'No order as to costs.',
+        "The claimant's application dated 21 October 2026 is dismissed.",
+      ]);
+
+      // The caseworker can go on to issue it as it is.
+      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(REVIEW_DATES);
+    });
+  });
 
   describe('introduction', () => {
     it('shows the case and what the caseworker needs to do, starting the review event', async () => {

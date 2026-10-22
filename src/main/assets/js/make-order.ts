@@ -240,13 +240,6 @@ export function initApplicationDecisions(form: HTMLFormElement): void {
   });
 }
 
-/** The decisions on the applications, in their order, which with the order type name the document the editor shows. */
-function applicationDecisions(form: HTMLFormElement): string {
-  return readOrderData(form)
-    .applications.map(application => application.decision)
-    .join(',');
-}
-
 /**
  * Puts the applicant's wording in the order as the judge's own, to change or delete as they would their own, when
  * the judge asks for it with the application's button (judicial feedback, 22 October 2026: never automatically). It goes in
@@ -294,9 +287,10 @@ export function initMakeOrder(): void {
 
   let orderType: OrderType | undefined;
   let key: string | undefined;
-  // One document per order type and set of decisions on the applications, so switching and back keeps any edits.
+  // One document per order type, so switching and back keeps any edits. A decision on an application changes the
+  // generated clauses in place, so wording the judge inserted after them stays.
   const documents: Record<string, DocWeaveSnapshot> = {};
-  const documentKey = (type: OrderType): string => `${type}:${applicationDecisions(form)}`;
+  const documentKey = (type: OrderType): string => type;
   const editor = createDocEditor({
     mount,
     label: 'Order',
@@ -389,11 +383,6 @@ export function initMakeOrder(): void {
         insertRequestedWording(form, editor, id);
       }
     });
-  });
-  form.addEventListener('change', event => {
-    if (isDecision(event.target)) {
-      selectDocument();
-    }
   });
   form.addEventListener('input', render);
   form.addEventListener('change', render);
