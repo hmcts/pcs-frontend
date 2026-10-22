@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { MAX_MONEY, exceedsMaxMoney, parseDate, parseMoney, parseTime } from './makeOrderFormat';
+import { MAX_MONEY, exceedsMaxMoney, parseDate, parseMoney, parseTime, registryName } from './makeOrderFormat';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -475,7 +475,7 @@ function validateEnforcementTransfer(formData: Record<string, unknown>): MakeOrd
   );
   if (court === 'district-registry') {
     // The order adds "District Registry" after the name, so that alone names no registry.
-    if (!value(formData, 'transfer-enforcement-registry').replace(/\s*district registry$/i, '')) {
+    if (!registryName(value(formData, 'transfer-enforcement-registry'))) {
       add(false, 'transfer-enforcement-registry', 'Enter the District Registry');
     } else {
       maxLength(
