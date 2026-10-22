@@ -103,7 +103,7 @@ function addTenancyTypeRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   rows.push(detailRow);
 }
 
-function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure }: RowContext): void {
+function addTenancyStartDateRow({ rows, responses, req, t, lang, change, yesNoNotSure }: RowContext): void {
   const date = responses.tenancyStartDate;
   const confirmation = responses.tenancyStartDateConfirmation;
 
@@ -129,7 +129,7 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
     // Corrected date is optional - show "No answer provided" if they said No but left it blank.
     const detailRow: SummaryListRow = {
       key: { text: t('rows.tenancyStartDate.correctDate.label') },
-      value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
+      value: { text: date ? formatIsoDate(date, lang) : t('noAnswerProvided') },
       actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.correctDate.changeHidden')] },
     };
     groupQuestionAndDetail(questionRow, detailRow);
@@ -141,7 +141,7 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
   // CYA row echoes the step page question.
   rows.push({
     key: { text: t('rows.tenancyStartDate.labelEntered') },
-    value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
+    value: { text: date ? formatIsoDate(date, lang) : t('noAnswerProvided') },
     actions: { items: [change('tenancy-date-unknown', 'rows.tenancyStartDate.changeHidden')] },
   });
 }
@@ -153,12 +153,12 @@ function addPossessionNoticeReceivedRow({ rows, validatedCase, t, change }: RowC
   }
   rows.push({
     key: { text: t('rows.possessionNoticeReceived.label', { claimantName: validatedCase.claimantName }) },
-    value: { text: t(`options.${value}`) },
+    value: { text: t(`rows.possessionNoticeReceived.options.${value}`) },
     actions: { items: [change('confirmation-of-notice-given', 'rows.possessionNoticeReceived.changeHidden')] },
   });
 }
 
-function addNoticeReceivedDateRow({ rows, validatedCase, responses, req, t, change }: RowContext): void {
+function addNoticeReceivedDateRow({ rows, validatedCase, responses, req, t, lang, change }: RowContext): void {
   // The notice-received date is optional and asked on one of the two notice-date pages.
   // Render the row when the citizen is on either branch; "No answer provided" when blank.
   if (!isNoticeDateConfirmedAndProvided(req) && !isNoticeDateConfirmedAndNotProvided(req)) {
@@ -172,7 +172,7 @@ function addNoticeReceivedDateRow({ rows, validatedCase, responses, req, t, chan
   rows.push({
     key: { text: t('rows.noticeReceivedDate.label', { claimantName: validatedCase.claimantName }) },
     value: {
-      text: responses.noticeReceivedDate ? formatIsoDate(responses.noticeReceivedDate) : t('noAnswerProvided'),
+      text: responses.noticeReceivedDate ? formatIsoDate(responses.noticeReceivedDate, lang) : t('noAnswerProvided'),
     },
     actions: { items: [change(editStep, 'rows.noticeReceivedDate.changeHidden')] },
   });
