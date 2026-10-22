@@ -794,7 +794,6 @@ describe('viewTheResponse route', () => {
     expect(rowKeys).not.toContain('viewTheResponse:defendant.email');
   });
 
-
   it('should show persons unknown when additional defendant name is redacted with no name fields', async () => {
     mockIsRespondToClaimEnabledForRelease.mockResolvedValue(false);
     mockCaseById({
