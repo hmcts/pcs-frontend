@@ -2,11 +2,11 @@ import { resolveIdamPassword } from '../../utils/idamPassword';
 
 export const user = {
   localAuthority: {
-    email: 'pcs.local.auth1user1@test.com',
+    email: 'pcs_other_accfood_user01@test.com',
     get password() {
       return resolveIdamPassword();
     },
-    uid: process.env.PCS_LOCAL_AUTH_AUTOMATION_UID,
+    uid: process.env.PCS_OTHERACCFOOD_AUTOMATION_UID,
   },
   caseworker: {
     email: 'pcs-caseworker@test.com',
