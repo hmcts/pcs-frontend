@@ -132,7 +132,7 @@ export function buildApplicationOrder(data: OrderData): DocWeaveDocument {
     if (application) {
       order.paragraph(
         'application-upon',
-        `UPON ${describeApplication(data, application)} to ${application.type.toLowerCase()}`
+        `UPON ${describeApplication(data, application)} to ${application.type.charAt(0).toLowerCase()}${application.type.slice(1)}`
       );
       order.paragraph('application-considered', 'AND UPON the Court considering the application without a hearing');
     }

@@ -33,6 +33,8 @@ function applicationModel(application: OrderApplication, caseReference: number) 
   return {
     ...application,
     prefix: applicationPrefix(application),
+    // What a "something else" application is for, in the applicant's words, which its order recites.
+    purpose: application.somethingElseDetails || application.type,
     whatOrderWantedHtml: richTextHtml(application.whatOrderWanted),
     documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
     submittedOnDisplay: displayDate(application.submittedOn),
@@ -228,6 +230,8 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     draftSelect: (items: Record<string, unknown>[], name: string, defaultValue?: string) =>
       items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) })),
     attendanceParties: attendanceParties(start),
+    // Every party, for the wording of an order made without anyone's attendance to name them.
+    orderParties: attendanceParties(start).map(({ partyId, name, type }) => ({ id: partyId, name, type })),
     openCounterclaim: caseContext.openCounterclaim === true,
     // Made on one application, the order decides that one; otherwise it may decide any that are open.
     application: caseContext.application
