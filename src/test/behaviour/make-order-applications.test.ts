@@ -116,12 +116,11 @@ describe('make an order at a hearing: deciding the applications', () => {
     typeDate('app-gen-app-2-eviction-date', '23', '10', '2026');
 
     const text = page.documentText();
-    expect(text).toContain('UPON considering the application of Alex Example (Defendant 1) dated 9 October 2026 (GA2)');
-    expect(text).not.toContain('(GA1)');
+    expect(text).toContain("UPON considering the defendant's application dated 9 October 2026");
+    expect(text).not.toContain('1 October 2026');
     expect(text.split('\n').slice(text.split('\n').indexOf('IT IS ORDERED THAT:'))).toEqual([
       'IT IS ORDERED THAT:',
       'The claim is adjourned generally with liberty to restore by application by any party on notice to all other parties.',
-      'On the application of Alex Example (Defendant 1) dated 9 October 2026 (GA2):',
       'The application to suspend the execution of the warrant of possession is dismissed.',
       'For the avoidance of doubt subject to any further order of the court, the execution of the warrant of possession on 23 October 2026 may take place.',
     ]);
@@ -135,21 +134,21 @@ describe('make an order at a hearing: deciding the applications', () => {
     expect(submitted.order.formData['app-gen-app-2-decision']).toBe('dismiss');
   });
 
-  it("granting an application puts the applicant's wording under its own lead-in", async () => {
+  it("granting an application names it in a clause, and a button puts the applicant's wording after that clause", async () => {
     const page = await openPage((await app.get(PAGE)).text);
     check('app-gen-app-1-decision', 'grant');
     check('app-gen-app-2-decision', 'list');
+    control<HTMLButtonElement>('[data-application-reference="GA1"] [data-insert-requested-wording]').click();
     type('app-gen-app-2-list-time-estimate', '30');
     typeDate('app-gen-app-2-list-hearing-date-next-list', '1', '12', '2026');
 
     const lines = page.documentText().split('\n');
     expect(lines.slice(lines.indexOf('IT IS ORDERED THAT:'))).toEqual([
       'IT IS ORDERED THAT:',
-      'On the application of Alex Example (Defendant 1) dated 1 October 2026 (GA1):',
+      "The defendant's application dated 1 October 2026 is granted.",
       'The hearing on 14 October is adjourned.',
       'Costs in the case.',
-      'On the application of Alex Example (Defendant 1) dated 9 October 2026 (GA2):',
-      'The application shall be listed for a hearing on notice to all parties on the next available possession list after 1 December 2026 with a time estimate of 30 minutes. Further details of the hearing will be provided by the court.',
+      "The defendant's application dated 9 October 2026 shall be listed for a hearing on notice to all parties on the next available possession list after 1 December 2026 with a time estimate of 30 minutes. Further details of the hearing will be provided by the court.",
     ]);
     expect(
       lines.filter(line => line.startsWith('AND UPON considering')).length +

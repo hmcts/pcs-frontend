@@ -6,7 +6,7 @@ import { selected, selectedControlId, value } from './common';
 
 /**
  * Whether an order made without a hearing transfers enforcement of the possession order to the High Court, as
- * DJ Daley worded it. A possession order made at a hearing transfers it with its own option.
+ * the judges worded it. A possession order made at a hearing transfers it with its own option.
  */
 export function transfersEnforcement(data: OrderData): boolean {
   return data.withoutHearing && selected(data, 'transfer-enforcement', 'yes');

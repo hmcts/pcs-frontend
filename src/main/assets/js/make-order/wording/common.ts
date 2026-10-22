@@ -3,6 +3,8 @@ import { type DocBuilder, type InlineBuilder } from '@hmcts-cft/docweave';
 import { formatDate, formatMoney, parseDate, parseMoney } from '../../../../utils/makeOrderFormat';
 import { type AttendanceEntry, type OrderData, type OrderParty } from '../data';
 
+import { describeApplication } from './application';
+
 export function value(data: OrderData, name: string): string {
   return data.answers[name]?.[0]?.trim() ?? '';
 }
@@ -80,8 +82,8 @@ const ATTENDANCE_ROLES: Record<string, (party: string) => string> = {
 };
 
 /**
- * A recital for each application the order decides, as DJ Daley suggested (22 October 2026): "AND UPON
- * considering the application of ... dated ... (GA1)", the first "UPON" unless a recital came before it.
+ * A recital for each application the order decides, as the judges asked (22 October 2026):
+ * "AND UPON considering the first claimant's application dated ...", the first "UPON" unless a recital came before it.
  */
 function addApplicationRecitals(order: DocBuilder, data: OrderData, after: boolean): void {
   let upon = after;
@@ -89,10 +91,9 @@ function addApplicationRecitals(order: DocBuilder, data: OrderData, after: boole
     if (application.decision === 'none') {
       continue;
     }
-    const dated = application.submittedOn ? ` dated ${application.submittedOn}` : '';
     order.paragraph(
       `${application.prefix}-upon`,
-      `${upon ? 'AND UPON' : 'UPON'} considering the application of ${application.applicant}${dated} (${application.reference})`
+      `${upon ? 'AND UPON' : 'UPON'} considering ${describeApplication(data, application)}`
     );
     upon = true;
   }

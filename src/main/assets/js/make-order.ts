@@ -10,7 +10,7 @@ import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation
 
 import { type OrderData, readOrderData } from './make-order/data';
 import { buildAdjournmentOrder } from './make-order/wording/adjournment';
-import { buildApplicationOrder, decidedApplications, wordingAnchor } from './make-order/wording/application';
+import { buildApplicationOrder, decidedApplications, wordingAnchors } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildFreeFormOrder } from './make-order/wording/free-form';
 import { buildNoOrderOnClaim } from './make-order/wording/no-order';
@@ -244,7 +244,7 @@ export function initApplicationDecisions(form: HTMLFormElement): void {
 const FINAL_ORDER_TYPES = new Set<OrderType>(['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION', 'STRIKE_OUT_DISMISSAL']);
 
 /**
- * Reminds the judge, as DJ Daley asked (22 October 2026), when a final order on the claim leaves an application
+ * Reminds the judge, as the judges asked (22 October 2026), when a final order on the claim leaves an application
  * not dealt with. A reminder only: a judge may have a reason to leave it open.
  */
 export function syncUndecidedWarning(form: HTMLFormElement): void {
@@ -265,19 +265,26 @@ function applicationDecisions(form: HTMLFormElement): string {
 }
 
 /**
- * Adds the applicant's wording to the order as the judge's own, for each application granted that asked for one,
- * to change or delete as they would their own. It goes in as the application's row shows it: rich text as the
- * applicant formatted it, so the clauses keep the numbers the applicant's cross-references use, and plain text as
- * its lines. In an order on the claim it follows the lead-in naming the application; made on the one application,
- * it follows "IT IS ORDERED THAT".
+ * Puts the applicant's wording in the order as the judge's own, to change or delete as they would their own, when
+ * the judge asks for it with the application's button (judicial feedback, 22 October 2026: never automatically). It goes in
+ * as the application's row shows it, after the clauses the decision generated, or at the end of the order when
+ * the decision generated none.
  */
-function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController): void {
+function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController, applicationId: string): void {
   const data = readOrderData(form);
-  for (const application of decidedApplications(data)) {
-    if (application.decision === 'grant' && application.wordingHtml) {
-      editor.insertHtml(application.wordingHtml, { at: { after: wordingAnchor(data, application) } });
+  const application = data.applications.find(candidate => candidate.id === applicationId);
+  if (!application?.wordingHtml) {
+    return;
+  }
+  for (const anchor of wordingAnchors(data, application)) {
+    try {
+      editor.insertHtml(application.wordingHtml, { at: { after: anchor } });
+      return;
+    } catch {
+      // Not a clause this decision generated: try the next.
     }
   }
+  editor.insertHtml(application.wordingHtml, { at: 'end' });
 }
 
 export function initMakeOrder(): void {
@@ -327,11 +334,9 @@ export function initMakeOrder(): void {
     documents[documentKey(orderTypeField.value as OrderType)] = editor.getSnapshot();
   }
   const render = (): void => editor.render(buildOrderDocument(form));
-  // Granting an application starts its document with the applicant's wording, which a reset puts back.
   const startDocument = (): void => {
     editor.load();
     render();
-    insertRequestedWording(form, editor);
   };
   const selectDocument = (): void => {
     const next = documentKey(orderType!);
@@ -362,7 +367,7 @@ export function initMakeOrder(): void {
   const tabType = (): OrderType | undefined =>
     tabs.find(tab => tab.hash === window.location.hash)?.dataset.orderType as OrderType | undefined;
   // With an application open, the claim's tabs wait behind a tick box; until it is ticked the order is on the
-  // applications alone, and the open tab is what ticking it goes to (HHJ Pema, 22 October 2026).
+  // applications alone, and the open tab is what ticking it goes to (judicial feedback, 22 October 2026).
   const claimOrder = form.querySelector<HTMLInputElement>('input[name="claim-order"]');
   const claimTabs = form.querySelector<HTMLElement>('[data-claim-order]');
   const orderingOnClaim = (): boolean => !claimOrder || claimOrder.checked;
@@ -394,8 +399,13 @@ export function initMakeOrder(): void {
     }
     followTab();
   });
-  form.querySelectorAll<HTMLButtonElement>('[data-restore-requested-wording]').forEach(reset => {
-    reset.addEventListener('click', startDocument);
+  form.querySelectorAll<HTMLButtonElement>('[data-insert-requested-wording]').forEach(insert => {
+    insert.addEventListener('click', () => {
+      const id = insert.closest<HTMLElement>('[data-application]')?.dataset.applicationId;
+      if (id) {
+        insertRequestedWording(form, editor, id);
+      }
+    });
   });
   form.addEventListener('change', event => {
     if (isDecision(event.target)) {
