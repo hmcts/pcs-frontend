@@ -35,6 +35,9 @@ async function closedPort(): Promise<number> {
 
 const PUBLIC_DIR = path.resolve(__dirname, '../../main/public');
 const ASSET = 'guide-test-asset.css';
+// The application needs a favicon to start, which CI's tests run without building.
+const FAVICON = path.join(PUBLIC_DIR, 'assets/images/favicon.ico');
+const faviconBuilt = fs.existsSync(FAVICON);
 
 let app: Express;
 let server: http.Server;
@@ -76,8 +79,11 @@ beforeAll(async () => {
   process.env.REDIS_CONNECTION_STRING = `redis://127.0.0.1:${await closedPort()}`;
   issuer = `http://localhost:${(idam.address() as AddressInfo).port}/o`;
   process.env.OIDC_ISSUER = issuer;
-  fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+  fs.mkdirSync(path.dirname(FAVICON), { recursive: true });
   fs.writeFileSync(path.join(PUBLIC_DIR, ASSET), 'body {}');
+  if (!faviconBuilt) {
+    fs.writeFileSync(FAVICON, '');
+  }
 
   // config reads the environment when first loaded, so import the application after setting it.
   ({ app } = await import('../../main/app'));
@@ -89,6 +95,9 @@ beforeAll(async () => {
 
 afterAll(async () => {
   fs.rmSync(path.join(PUBLIC_DIR, ASSET), { force: true });
+  if (!faviconBuilt) {
+    fs.rmSync(FAVICON);
+  }
   server.closeAllConnections();
   await new Promise(resolve => server.close(resolve));
   // Let the application finish starting, as it would once IDAM is back.
