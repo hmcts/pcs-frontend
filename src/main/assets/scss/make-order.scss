@@ -462,6 +462,16 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   min-width: 0;
 }
 
+// An application the order can decide, one row of the applications section at a hearing.
+.pcs-application--row {
+  padding-top: govuk-spacing(3);
+  border-top: 1px solid $govuk-border-colour;
+}
+
+.pcs-application--row .govuk-details__text .govuk-summary-list {
+  @include govuk-font($size: 16);
+}
+
 // The order an applicant asked for, as they formatted it in XUI's rich text box.
 .pcs-rich-text {
   @include govuk-font($size: 19);

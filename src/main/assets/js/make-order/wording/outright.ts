@@ -3,6 +3,7 @@ import { type DocWeaveDocument, buildDoc } from '@hmcts-cft/docweave';
 import { formatMoney, parseMoney } from '../../../../utils/makeOrderFormat';
 import { type OrderData } from '../data';
 
+import { addApplicationDecisions } from './application';
 import {
   AMOUNT_NOT_PROVIDED,
   type CostsWording,
@@ -153,5 +154,6 @@ export function buildOutrightOrder(data: OrderData): DocWeaveDocument {
         );
       }
     });
+    addApplicationDecisions(order, data);
   });
 }

@@ -1,7 +1,12 @@
 import { DateTime } from 'luxon';
 
 import { parseDate, parseMoney } from '@utils/makeOrderFormat';
-import { AT_HEARING_ORDER_TYPES, type AttendanceParty, type MakeOrderType } from '@utils/makeOrderValidation';
+import {
+  AT_HEARING_ORDER_TYPES,
+  type AttendanceParty,
+  type MakeOrderType,
+  applicationPrefix,
+} from '@utils/makeOrderValidation';
 import type {
   FormData,
   OrderApplication,
@@ -24,13 +29,15 @@ function displayDate(iso?: string | null): string | undefined {
 }
 
 /**
- * The application as its panel shows it: its answers in words, and its dates as the court writes them. The order
- * it asks for is shown as the applicant formatted it, and is HTML to use only when they wrote rich text.
+ * The application as its row shows it: its answers in words, and its dates as the court writes them. The order
+ * it asks for is shown as the applicant formatted it, and is HTML to use only when they wrote rich text. Its
+ * answers on the form start with its prefix, so each application the order can decide keeps its own.
  */
 function applicationModel(application: OrderApplication, caseReference: number) {
   const href = (id: string): string => `/case/${caseReference}/view-documents/${encodeURIComponent(id)}`;
   return {
     ...application,
+    prefix: applicationPrefix(application),
     whatOrderWantedHtml: richTextHtml(application.whatOrderWanted),
     documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
     submittedOnDisplay: displayDate(application.submittedOn),
@@ -159,6 +166,14 @@ export function recordsAttendance(hearing: OrderHearing | null | undefined, form
   return Boolean(hearing) || Object.keys(formData).some(field => field.endsWith('-attendance'));
 }
 
+/**
+ * The applications the order can decide: the one it is made on as box work, or every open application for an
+ * order made at a hearing, or without one on the case.
+ */
+export function applicationsToDecide({ caseContext }: Pick<OrderStart, 'caseContext'>): OrderApplication[] {
+  return caseContext.application ? [caseContext.application] : (caseContext.applications ?? []);
+}
+
 export function attendanceParties({ caseContext }: OrderStart): AttendanceRow[] {
   const parties = (type: AttendanceParty['type'], list: OrderParty[]): AttendanceRow[] =>
     list.map((party, index) => ({
@@ -213,10 +228,13 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
       items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) })),
     attendanceParties: attendanceParties(start),
     openCounterclaim: caseContext.openCounterclaim === true,
-    openApplication: caseContext.openApplication === true,
+    // Made on one application, the order decides that one; otherwise it may decide any that are open.
     application: caseContext.application
       ? applicationModel(caseContext.application, caseContext.caseReference)
       : undefined,
+    applications: applicationsToDecide(start).map(application =>
+      applicationModel(application, caseContext.caseReference)
+    ),
     ...hearingModel(hearing),
     caseBundle: caseContext.caseBundle ? caseBundleModel(caseContext.caseBundle, caseContext.caseReference) : undefined,
   };

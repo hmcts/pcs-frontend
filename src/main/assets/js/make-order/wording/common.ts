@@ -79,6 +79,25 @@ const ATTENDANCE_ROLES: Record<string, (party: string) => string> = {
   'litigant-in-person': party => `${party} acting in person`,
 };
 
+/**
+ * A recital for each application the order decides, as DJ Daley suggested (22 October 2026): "AND UPON
+ * considering the application of ... dated ... (GA1)", the first "UPON" unless a recital came before it.
+ */
+function addApplicationRecitals(order: DocBuilder, data: OrderData, after: boolean): void {
+  let upon = after;
+  for (const application of data.applications) {
+    if (application.decision === 'none') {
+      continue;
+    }
+    const dated = application.submittedOn ? ` dated ${application.submittedOn}` : '';
+    order.paragraph(
+      `${application.prefix}-upon`,
+      `${upon ? 'AND UPON' : 'UPON'} considering the application of ${application.applicant}${dated} (${application.reference})`
+    );
+    upon = true;
+  }
+}
+
 export function addPreamble(order: DocBuilder, data: OrderData): void {
   if (data.withoutHearing) {
     order.paragraph('papers-considered', 'UPON the Court considering the papers without a hearing');
@@ -115,6 +134,7 @@ export function addPreamble(order: DocBuilder, data: OrderData): void {
   if (selected(data, 'recitals', 'yes')) {
     order.text('recital', value(data, 'recitals-text'), { sourceId: 'recitals-text' });
   }
+  addApplicationRecitals(order, data, data.withoutHearing);
   order.paragraph('ordered-that', 'IT IS ORDERED THAT:');
 }
 

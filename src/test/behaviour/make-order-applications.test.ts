@@ -1,0 +1,160 @@
+import {
+  CASE_REFERENCE,
+  type TestApp,
+  bootApp,
+  check,
+  control,
+  openPage,
+  recordAttendance,
+  selectTab,
+  submittedOrders,
+  type,
+  typeDate,
+} from './harness';
+
+const PAGE = `/case/${CASE_REFERENCE}/make-order`;
+
+const ADJOURN = {
+  id: 'gen-app-1',
+  reference: 'GA1',
+  type: 'Adjourn the hearing',
+  applicant: 'Alex Example (Defendant 1)',
+  submittedOn: '2026-10-01',
+  whatOrderWanted: '<ol><li><p>The hearing on 14 October is adjourned.</p></li><li><p>Costs in the case.</p></li></ol>',
+  documents: [{ id: '3f2a6c1e-0000-4000-8000-000000000001', fileName: 'hospital-letter.pdf' }],
+  referralNote: 'The hearing is next week',
+};
+
+const WARRANT = {
+  id: 'gen-app-2',
+  reference: 'GA2',
+  type: 'Something else',
+  somethingElseDetails: 'Suspend the warrant of possession',
+  warrantSuspension: true,
+  applicant: 'Alex Example (Defendant 1)',
+  submittedOn: '2026-10-09',
+  whatOrderWanted: null,
+  documents: [],
+};
+
+/** Whether the reminder about applications left open is showing. */
+function warningShowing(): boolean {
+  return !control<HTMLElement>('[data-undecided-warning]').hidden;
+}
+
+describe('make an order at a hearing: deciding the applications', () => {
+  let app: TestApp;
+  beforeEach(async () => {
+    app = await bootApp({ applications: [ADJOURN, WARRANT] });
+  });
+  afterEach(() => app.close());
+
+  it('lists every open application after the claim, folded away, with nothing decided', async () => {
+    await openPage((await app.get(PAGE)).text);
+    expect(document.querySelector('h1')?.textContent).toBe('Make an order');
+    const rows = [...document.querySelectorAll<HTMLElement>('[data-application]')];
+    expect(rows.map(row => row.dataset.applicationReference)).toEqual(['GA1', 'GA2']);
+    expect(rows[0].querySelector('h3')?.textContent?.trim()).toBe('GA1: Adjourn the hearing');
+    expect(rows[1].querySelector('h3')?.textContent?.trim()).toBe(
+      'GA2: Something else – Suspend the warrant of possession'
+    );
+    // The details are in an expander the judge, who has the file, need not open.
+    expect(document.querySelector('#app-gen-app-1-more details, details#app-gen-app-1-more')).not.toBeNull();
+    expect(document.querySelector('#app-gen-app-1-referral-note')?.textContent).toContain('The hearing is next week');
+    expect(control('[name="app-gen-app-1-decision"][value="none"]').checked).toBe(true);
+    expect(control('[name="app-gen-app-2-decision"][value="none"]').checked).toBe(true);
+    // The claim's tabs no longer offer the application as a subject.
+    expect(document.querySelector('[name="adj-subjects"]')).toBeNull();
+    expect(document.querySelector('[name="strike-subjects"][value="application"]')).toBeNull();
+  });
+
+  it('shows no applications section when the case has none open', async () => {
+    await app.close();
+    app = await bootApp();
+    await openPage((await app.get(PAGE)).text);
+    expect(document.querySelector('[data-applications]')).toBeNull();
+  });
+
+  it('puts each decided application after the claim, with a recital, and leaves the rest alone', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    recordAttendance();
+    selectTab('tab-adjournment');
+    check('adj-type', 'generally');
+    check('app-gen-app-2-decision', 'dismiss');
+    typeDate('app-gen-app-2-eviction-date', '23', '10', '2026');
+
+    const text = page.documentText();
+    expect(text).toContain('UPON considering the application of Alex Example (Defendant 1) dated 9 October 2026 (GA2)');
+    expect(text).not.toContain('(GA1)');
+    expect(text.split('\n').slice(text.split('\n').indexOf('IT IS ORDERED THAT:'))).toEqual([
+      'IT IS ORDERED THAT:',
+      'The claim is adjourned generally with liberty to restore by application by any party on notice to all other parties.',
+      'On the application of Alex Example (Defendant 1) dated 9 October 2026 (GA2):',
+      'The application to suspend the execution of the warrant of possession is dismissed.',
+      'For the avoidance of doubt subject to any further order of the court, the execution of the warrant of possession on 23 October 2026 may take place.',
+    ]);
+
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    expect((await app.post(PAGE, body)).status).toBe(302);
+    const [submitted] = submittedOrders() as { order: { formData: Record<string, unknown>; genAppId: unknown } }[];
+    expect(submitted.order.genAppId).toBeNull();
+    expect(submitted.order.formData['app-gen-app-1-decision']).toBe('none');
+    expect(submitted.order.formData['app-gen-app-2-decision']).toBe('dismiss');
+  });
+
+  it("granting an application puts the applicant's wording under its own lead-in", async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-no-order');
+    check('app-gen-app-1-decision', 'grant');
+    check('app-gen-app-2-decision', 'list');
+    type('app-gen-app-2-list-time-estimate', '30');
+    typeDate('app-gen-app-2-list-hearing-date-next-list', '1', '12', '2026');
+
+    const lines = page.documentText().split('\n');
+    expect(lines.slice(lines.indexOf('IT IS ORDERED THAT:'))).toEqual([
+      'IT IS ORDERED THAT:',
+      'On the application of Alex Example (Defendant 1) dated 1 October 2026 (GA1):',
+      'The hearing on 14 October is adjourned.',
+      'Costs in the case.',
+      'On the application of Alex Example (Defendant 1) dated 9 October 2026 (GA2):',
+      'The application shall be listed for a hearing on notice to all parties on the next available possession list after 1 December 2026 with a time estimate of 30 minutes. Further details of the hearing will be provided by the court.',
+    ]);
+    expect(
+      lines.filter(line => line.startsWith('AND UPON considering')).length +
+        lines.filter(line => line.startsWith('UPON considering')).length
+    ).toBe(2);
+  });
+
+  it('reminds the judge when a final order on the claim leaves an application not dealt with', async () => {
+    await openPage((await app.get(PAGE)).text);
+    // The page opens on outright possession, which ends the claim.
+    expect(warningShowing()).toBe(true);
+    selectTab('tab-adjournment');
+    expect(warningShowing()).toBe(false);
+    selectTab('tab-strike-out');
+    expect(warningShowing()).toBe(true);
+    check('app-gen-app-1-decision', 'dismiss');
+    expect(warningShowing()).toBe(true);
+    check('app-gen-app-2-decision', 'list');
+    expect(warningShowing()).toBe(false);
+    check('app-gen-app-2-decision', 'none');
+    expect(warningShowing()).toBe(true);
+    selectTab('tab-no-order');
+    expect(warningShowing()).toBe(false);
+  });
+
+  it('needs what follows a decision, naming the application', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    recordAttendance();
+    selectTab('tab-no-order');
+    check('app-gen-app-2-decision', 'grant');
+    const body = page.body();
+    body.set('action', 'SUBMIT_FOR_REVIEW');
+    body.set('app-gen-app-1-decision', 'nonsense');
+    const rejected = await app.post(PAGE, body);
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Select what you decide about application GA1');
+    expect(rejected.text).toContain('Enter valid arrears');
+  });
+});

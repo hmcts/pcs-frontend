@@ -8,6 +8,7 @@ import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 import { ccdCaseService } from '@services/ccdCaseService';
 import {
   type OrderFormSubmission,
+  applicationsToDecide,
   attendanceParties,
   caseFactsFromForm,
   orderFormModel,
@@ -168,7 +169,13 @@ export default function makeOrderRoutes(app: Application): void {
       const atHearing = recordsAttendance(startedHearing, formData);
       const validationIssues =
         action === 'SUBMIT_FOR_REVIEW'
-          ? validateMakeOrder(orderType, formData, atHearing ? attendanceParties(started.envelope) : [], !atHearing)
+          ? validateMakeOrder(
+              orderType,
+              formData,
+              atHearing ? attendanceParties(started.envelope) : [],
+              !atHearing,
+              applicationsToDecide(started.envelope)
+            )
           : startedHearing
             ? validateHearingRecord(formData)
             : [];
