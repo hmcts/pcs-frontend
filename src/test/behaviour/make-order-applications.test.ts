@@ -10,6 +10,7 @@ import {
   submittedOrders,
   type,
   typeDate,
+  uncheck,
 } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
@@ -49,9 +50,18 @@ describe('make an order at a hearing: deciding the applications', () => {
   });
   afterEach(() => app.close());
 
-  it('lists every open application after the claim, folded away, with nothing decided', async () => {
+  it('lists every open application before the claim, folded away, with nothing decided', async () => {
     await openPage((await app.get(PAGE)).text);
     expect(document.querySelector('h1')?.textContent).toBe('Make an order');
+    // The applications come first; the claim's order types wait behind a tick box, so the order starts as one on
+    // the applications alone.
+    const claimTabs = control<HTMLElement>('[data-claim-order]');
+    expect(
+      control<HTMLElement>('[data-applications]').compareDocumentPosition(claimTabs) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+    expect(control('input[name="claim-order"]').checked).toBe(false);
+    expect(claimTabs.hidden).toBe(true);
+    expect(control('#order-type').value).toBe('NO_ORDER_ON_CLAIM');
     const rows = [...document.querySelectorAll<HTMLElement>('[data-application]')];
     expect(rows.map(row => row.dataset.applicationReference)).toEqual(['GA1', 'GA2']);
     expect(rows[0].querySelector('h3')?.textContent?.trim()).toBe('GA1: Adjourn the hearing');
@@ -68,16 +78,38 @@ describe('make an order at a hearing: deciding the applications', () => {
     expect(document.querySelector('[name="strike-subjects"][value="application"]')).toBeNull();
   });
 
-  it('shows no applications section when the case has none open', async () => {
+  it('shows no applications section, and the claim without a tick box, when the case has none open', async () => {
     await app.close();
     app = await bootApp();
     await openPage((await app.get(PAGE)).text);
     expect(document.querySelector('[data-applications]')).toBeNull();
+    expect(document.querySelector('input[name="claim-order"]')).toBeNull();
+    expect(control<HTMLElement>('[data-claim-order]').hidden).toBe(false);
+    expect(control('#order-type').value).toBe('OUTRIGHT_POSSESSION');
+  });
+
+  it('offers the claim once the judge ticks to order on it, and takes it away again', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    recordAttendance();
+    check('claim-order', 'yes');
+    expect(control<HTMLElement>('[data-claim-order]').hidden).toBe(false);
+    expect(control('#order-type').value).toBe('OUTRIGHT_POSSESSION');
+    selectTab('tab-adjournment');
+    check('adj-type', 'generally');
+    expect(page.documentText()).toContain('The claim is adjourned generally');
+    uncheck('claim-order', 'yes');
+    expect(control<HTMLElement>('[data-claim-order]').hidden).toBe(true);
+    expect(control('#order-type').value).toBe('NO_ORDER_ON_CLAIM');
+    expect(page.documentText()).not.toContain('The claim is adjourned generally');
+    // Ticking again goes back to the tab the judge had open.
+    check('claim-order', 'yes');
+    expect(control('#order-type').value).toBe('ADJOURNMENT');
   });
 
   it('puts each decided application after the claim, with a recital, and leaves the rest alone', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     recordAttendance();
+    check('claim-order', 'yes');
     selectTab('tab-adjournment');
     check('adj-type', 'generally');
     check('app-gen-app-2-decision', 'dismiss');
@@ -105,7 +137,6 @@ describe('make an order at a hearing: deciding the applications', () => {
 
   it("granting an application puts the applicant's wording under its own lead-in", async () => {
     const page = await openPage((await app.get(PAGE)).text);
-    selectTab('tab-no-order');
     check('app-gen-app-1-decision', 'grant');
     check('app-gen-app-2-decision', 'list');
     type('app-gen-app-2-list-time-estimate', '30');
@@ -128,7 +159,10 @@ describe('make an order at a hearing: deciding the applications', () => {
 
   it('reminds the judge when a final order on the claim leaves an application not dealt with', async () => {
     await openPage((await app.get(PAGE)).text);
-    // The page opens on outright possession, which ends the claim.
+    // The page opens on the applications alone, so nothing ends the claim.
+    expect(warningShowing()).toBe(false);
+    check('claim-order', 'yes');
+    // Ordering on the claim opens on outright possession, which ends it.
     expect(warningShowing()).toBe(true);
     selectTab('tab-adjournment');
     expect(warningShowing()).toBe(false);
@@ -140,14 +174,13 @@ describe('make an order at a hearing: deciding the applications', () => {
     expect(warningShowing()).toBe(false);
     check('app-gen-app-2-decision', 'none');
     expect(warningShowing()).toBe(true);
-    selectTab('tab-no-order');
+    uncheck('claim-order', 'yes');
     expect(warningShowing()).toBe(false);
   });
 
   it('needs what follows a decision, naming the application', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     recordAttendance();
-    selectTab('tab-no-order');
     check('app-gen-app-2-decision', 'grant');
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
