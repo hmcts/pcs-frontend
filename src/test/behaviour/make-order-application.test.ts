@@ -30,10 +30,12 @@ const APPLICATION = {
   referralNote: 'The hearing is next week',
 };
 
-/** Whether the button putting the applicant's wording back is showing. */
-function resetShowing(): boolean {
-  return !control<HTMLButtonElement>('[data-restore-requested-wording]').closest<HTMLElement>('[hidden]');
+/** Puts the applicant's wording in the order, as the judge does with the application's button. */
+function insertWording(): void {
+  control<HTMLButtonElement>('[data-insert-requested-wording]').click();
 }
+
+const GRANTED = "The defendant's application dated 1 October 2026 is granted.";
 
 /** The number of clauses in each numbered list of the order the page will submit. */
 function clauseLists(): number[] {
@@ -105,22 +107,23 @@ describe('make an order: deciding an application', () => {
     expect(document.querySelector(`#${P}-more`)).toBeNull();
   });
 
-  it("uses the applicant's wording as the order's numbered clauses, with no decision clause of its own", async () => {
+  it("grants the application in a clause naming it, and puts the applicant's wording after it only on request", async () => {
     const page = await openPage((await app.get(PAGE)).text);
-    expect(resetShowing()).toBe(false);
     check('app-gen-app-1-decision', 'grant');
+    expect(page.documentText()).not.toContain('The hearing on 14 October is adjourned.');
+    insertWording();
 
     expect(page.documentText()).toBe(
       [
-        'UPON the application of Jane Doe (Defendant) dated 1 October 2026 (GA2) to adjourn the hearing',
+        "UPON the defendant's application dated 1 October 2026 to adjourn the hearing",
         'AND UPON the Court considering the application without a hearing',
         'IT IS ORDERED THAT:',
+        GRANTED,
         'The hearing on 14 October is adjourned.',
         'Costs in the case.',
       ].join('\n')
     );
-    expect(clauseLists()).toEqual([2]);
-    expect(resetShowing()).toBe(true);
+    expect(clauseLists()).toEqual([3]);
 
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
@@ -133,12 +136,14 @@ describe('make an order: deciding an application', () => {
   it("puts a costs order after the applicant's wording", async () => {
     const page = await openPage((await app.get(PAGE)).text);
     check('app-gen-app-1-decision', 'grant');
+    insertWording();
     check('costs', 'yes');
     check('costs-choice', 'other');
     type('costs-other-text', 'No order as to costs.');
 
     expect(page.documentText().split('\n').slice(2)).toEqual([
       'IT IS ORDERED THAT:',
+      GRANTED,
       'The hearing on 14 October is adjourned.',
       'Costs in the case.',
       'No order as to costs.',
@@ -152,31 +157,42 @@ describe('make an order: deciding an application', () => {
     });
     const page = await openPage((await app.get(PAGE)).text);
     check('app-gen-app-1-decision', 'grant');
+    insertWording();
 
     expect(page.documentText()).toContain('1. The hearing is adjourned.\n2. Costs reserved.\n\nWhy.');
-    expect(clauseLists()).toEqual([]);
+    expect(clauseLists()).toEqual([1]);
   });
 
   it('keeps a separate order preview for each decision', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     check('app-gen-app-1-decision', 'grant');
+    insertWording();
     check('app-gen-app-1-decision', 'dismiss');
-    expect(page.documentText()).toContain('The application is dismissed.');
+    expect(page.documentText()).toContain("The defendant's application dated 1 October 2026 is dismissed.");
     expect(page.documentText()).not.toContain('The hearing on 14 October is adjourned.');
-    expect(resetShowing()).toBe(false);
 
     check('app-gen-app-1-decision', 'grant');
     expect(page.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
-    expect(page.documentText()).not.toContain('The application is dismissed.');
+    expect(page.documentText()).not.toContain('is dismissed.');
   });
 
-  it("keeps the judge's deletions when they reopen the order, until they reset to the applicant's wording", async () => {
+  it("keeps the judge's deletions when they reopen the order, until they insert the applicant's wording again", async () => {
     await openPage((await app.get(PAGE)).text);
     check('app-gen-app-1-decision', 'grant');
-    // The judge deletes the applicant's clause about costs.
+    insertWording();
+    // The judge deletes the applicant's clause about costs: the inserted clause, with no id, that holds it.
     const snapshot = JSON.parse(control<HTMLTextAreaElement>('#order-document').value);
-    const wording = snapshot.current.content.find((node: { attrs?: { id?: string | null } }) => !node.attrs?.id);
-    wording.content.pop();
+    const dropCosts = (node: { attrs?: { id?: string | null }; content?: unknown[] }): void => {
+      node.content = node.content?.filter(
+        child =>
+          !(
+            (child as { attrs?: { id?: string | null } }).attrs?.id === undefined &&
+            JSON.stringify(child).includes('Costs in the case')
+          )
+      );
+      node.content?.forEach(child => dropCosts(child as typeof node));
+    };
+    dropCosts(snapshot.current);
     await app.close();
     app = await bootApp({
       application: APPLICATION,
@@ -193,15 +209,15 @@ describe('make an order: deciding an application', () => {
     expect(reopened.documentText()).toContain('The hearing on 14 October is adjourned.');
     expect(reopened.documentText()).not.toContain('Costs in the case.');
 
-    control<HTMLButtonElement>('[data-restore-requested-wording]').click();
+    insertWording();
     expect(reopened.documentText()).toContain('Costs in the case.');
-    expect(reopened.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
+    expect(reopened.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(2);
   });
 
   it('orders the application dismissed', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     check('app-gen-app-1-decision', 'dismiss');
-    expect(page.orderText()).toContain('The application is dismissed.');
+    expect(page.orderText()).toContain("The defendant's application dated 1 October 2026 is dismissed.");
   });
 
   it('lists the application for a hearing on notice, asking when as an adjournment does', async () => {
@@ -219,7 +235,7 @@ describe('make an order: deciding an application', () => {
     typeDate('app-gen-app-1-list-defence-date', '20', '10', '2026');
 
     expect(page.orderText().split('\n').slice(3)).toEqual([
-      'The application shall be listed for a hearing on notice to all parties on 2 November 2026 at 10:30am with a time estimate of 30 minutes.',
+      "The defendant's application dated 1 October 2026 shall be listed for a hearing on notice to all parties on 2 November 2026 at 10:30am with a time estimate of 30 minutes.",
       'The defendant must by 4pm on 20 October 2026 submit to the court and all other parties a defence.',
     ]);
   });
@@ -266,17 +282,19 @@ describe('make an order: deciding an application', () => {
     it("keeps the applicant's paragraphs, numbering and bold text in the order, so paragraph 1 is still clause 1", async () => {
       const page = await openPage((await app.get(PAGE)).text);
       check('app-gen-app-1-decision', 'grant');
+      insertWording();
 
       expect(page.documentText().split('\n').slice(2)).toEqual([
         'IT IS ORDERED THAT:',
+        GRANTED,
         'The defendant asks that:',
         'The hearing on 14 October is adjourned.',
         'to a date after 28 days;',
         'Unless the defendant complies with paragraph 1 above, costs are reserved.',
         'Why: counsel is unwell.',
       ]);
-      // One numbered list of two clauses, the first with its own subclause, and the first of the order's lists.
-      expect(clauseLists()).toEqual([2]);
+      // One numbered list: the granted clause, then the applicant's two, the first with its own subclause.
+      expect(clauseLists()).toEqual([3]);
       const snapshot = JSON.stringify(JSON.parse(control<HTMLTextAreaElement>('#order-document').value).current);
       expect(snapshot).toContain('"marks":[{"type":"strong"}],"text":"adjourned"');
       expect(snapshot).toMatch(/"type":"list_item".*"type":"ordered_list".*to a date after 28 days/);
@@ -296,7 +314,9 @@ describe('make an order: deciding an application', () => {
       });
       const page = await openPage((await app.get(PAGE)).text);
       check('app-gen-app-1-decision', 'grant');
+      insertWording();
       expect(page.documentText().split('\n').slice(3)).toEqual([
+        GRANTED,
         'Adjourn the hearing.',
         'Costs reserved.',
         '\u2022 The defendant is in hospital.',
@@ -322,7 +342,9 @@ describe('make an order: deciding an application', () => {
       });
       const page = await openPage((await app.get(PAGE)).text);
       check('app-gen-app-1-decision', 'grant');
+      insertWording();
       expect(page.documentText().split('\n').slice(3)).toEqual([
+        GRANTED,
         'The defendant must:',
         'pay the rent;',
         'by 4pm.',
@@ -413,9 +435,9 @@ describe('make an order: deciding an application', () => {
     await app.close();
     app = await bootApp({ application: { ...APPLICATION, whatOrderWanted: null } });
     const page = await openPage((await app.get(PAGE)).text);
-    expect(document.querySelector('[data-restore-requested-wording]')).toBeNull();
+    expect(document.querySelector('[data-insert-requested-wording]')).toBeNull();
     check('app-gen-app-1-decision', 'grant');
-    expect(page.orderText().split('\n').slice(2)).toEqual(['IT IS ORDERED THAT:', 'The application is granted.']);
+    expect(page.orderText().split('\n').slice(2)).toEqual(['IT IS ORDERED THAT:', GRANTED]);
   });
 
   it('needs a decision before review', async () => {
