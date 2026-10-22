@@ -1,4 +1,8 @@
+import { DateTime } from 'luxon';
+
 import { MAX_MONEY, exceedsMaxMoney, parseDate, parseMoney, parseTime } from './makeOrderFormat';
+
+const DAY = 24 * 60 * 60 * 1000;
 
 export const MAKE_ORDER_TYPES = [
   'OUTRIGHT_POSSESSION',
@@ -79,13 +83,12 @@ function moneyError(formData: Record<string, unknown>, name: string, message: st
   return `${amount[0].toUpperCase()}${amount.slice(1)} must be £${MAX_MONEY.toLocaleString('en-GB')} or less`;
 }
 
-function hasValidDate(formData: Record<string, unknown>, prefix: string): boolean {
-  return (
-    parseDate(
-      value(formData, `${prefix}-day`),
-      value(formData, `${prefix}-month`),
-      value(formData, `${prefix}-year`)
-    ) !== undefined
+/** The date the judge gave in the day, month and year fields, if it is a real one. */
+function dateOf(formData: Record<string, unknown>, prefix: string): Date | undefined {
+  return parseDate(
+    value(formData, `${prefix}-day`),
+    value(formData, `${prefix}-month`),
+    value(formData, `${prefix}-year`)
   );
 }
 
@@ -105,7 +108,16 @@ function validation(formData: Record<string, unknown>) {
     /** An amount the judge need not give, but which must be valid if they do. */
     optionalMoney: (id: string, message: string): void =>
       addMoney(id, value(formData, id) ? moneyError(formData, id, message) : undefined),
-    date: (prefix: string, message: string): void => add(hasValidDate(formData, prefix), `${prefix}-day`, message),
+    date: (prefix: string, message: string): void =>
+      add(dateOf(formData, prefix) !== undefined, `${prefix}-day`, message),
+    /** A date the judge need not give, but which must be valid if they start one. */
+    optionalDate: (prefix: string, message: string): void =>
+      add(
+        !['day', 'month', 'year'].some(part => value(formData, `${prefix}-${part}`)) ||
+          dateOf(formData, prefix) !== undefined,
+        `${prefix}-day`,
+        message
+      ),
     frequency: (id: string, message: string): void =>
       add(PAYMENT_FREQUENCIES.includes(value(formData, id)), id, message),
   };
@@ -139,7 +151,6 @@ function validateCosts(formData: Record<string, unknown>, suspended: boolean): M
 function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add, money, date, frequency } = validation(formData);
   const terms = values(formData, 'suspended-payment-terms');
-  const options = values(formData, 'suspended-options');
 
   date('suspended-by-date', 'Enter a valid possession date');
   money('suspended-arrears', 'Enter valid arrears');
@@ -156,10 +167,6 @@ function validateSuspended(formData: Record<string, unknown>): MakeOrderValidati
     money('suspended-instalment-amount', 'Enter a valid instalment amount');
     frequency('suspended-instalment-frequency', 'Select weekly, fortnightly or monthly instalments');
     date('suspended-instalment-date', 'Enter a valid first instalment date');
-  }
-  if (options.includes('use-occupation')) {
-    money('suspended-use-occupation-rate', 'Enter a valid daily rate for use and occupation');
-    date('suspended-use-occupation-from-date', 'Enter a valid start date for use and occupation');
   }
 
   return [...issues, ...validateCosts(formData, true)];
@@ -306,11 +313,15 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
 
 function validateStrikeOut(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add } = validation(formData);
-  add(
-    ['struck-out', 'dismissed'].includes(value(formData, 'strike-claim-outcome')),
-    'strike-claim-outcome',
-    'Select whether the claim is struck out or dismissed'
-  );
+  const subjects = values(formData, 'strike-subjects').filter(subject => subject !== 'none');
+  add(subjects.length > 0, 'strike-subjects', 'Select what is struck out or dismissed');
+  for (const subject of ['claim', 'counterclaim'].filter(chosen => subjects.includes(chosen))) {
+    add(
+      ['struck-out', 'dismissed'].includes(value(formData, `strike-${subject}-outcome`)),
+      `strike-${subject}-outcome`,
+      `Select whether the ${subject} is struck out or dismissed`
+    );
+  }
   return [...issues, ...validateCosts(formData, false)];
 }
 
@@ -332,15 +343,38 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
   return issues;
 }
 
-/** The judge's own figures for the case, which they need not give. */
-function validateCaseFacts(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
-  const { issues, optionalMoney } = validation(formData);
+/**
+ * The hearing's record: the judge's own figures for the case and their note, which they need not give, but
+ * which pcs-api records whenever they save, so are checked on every save.
+ */
+export function validateHearingRecord(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const { issues, add, optionalMoney, optionalDate } = validation(formData);
+  const today = DateTime.now().setZone('Europe/London');
+  const tomorrow = Date.UTC(today.year, today.month - 1, today.day + 1);
+  /** A date the judge need not give, which cannot be in the future, nor today unless `orToday`. */
+  const pastDate = (prefix: string, invalid: string, notPast: string, orToday = false): void => {
+    optionalDate(prefix, invalid);
+    const date = dateOf(formData, prefix)?.getTime();
+    add(date === undefined || date < tomorrow - (orToday ? 0 : DAY), `${prefix}-day`, notPast);
+  };
+  pastDate(
+    'date-tenancy',
+    'Enter a valid date of tenancy or contract',
+    'Date of tenancy or contract must be in the past'
+  );
+  pastDate('date-notice', 'Enter a valid date of service of notice', 'Date of service of notice must be in the past');
   optionalMoney('arrears-notice', 'Enter valid arrears at notice');
   optionalMoney('current-rent', 'Enter a valid current rent');
   optionalMoney('arrears-issue', 'Enter valid arrears on issue');
+  pastDate(
+    'date-last-payment',
+    'Enter a valid date of last payment',
+    'Date of last payment must be today or in the past',
+    true
+  );
   optionalMoney('last-payment', 'Enter a valid last payment');
   optionalMoney('arrears-today', 'Enter valid arrears today');
-  return issues;
+  return [...issues, ...validateText(formData, 'hearing-notes', 'Hearing notes')];
 }
 
 /** A long text box the page has whatever the order type: hearing notes, recitals or the staff message. */
@@ -388,8 +422,7 @@ export function validateMakeOrder(
   const chosen = (name: string): boolean => values(formData, name).includes('yes');
   // In the order the page asks, so the error summary follows the page.
   return [
-    ...validateCaseFacts(formData),
-    ...validateText(formData, 'hearing-notes', 'Hearing notes'),
+    ...validateHearingRecord(formData),
     ...validateAttendance(formData, parties),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
     ...validateOrderType(orderType, formData),

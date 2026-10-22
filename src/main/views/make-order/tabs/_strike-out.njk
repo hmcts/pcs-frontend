@@ -2,11 +2,27 @@
 
 <h3 class="govuk-heading-m">Strike out/dismiss</h3>
 
-{{ compact.radios("strike-claim-outcome", {
-  legend: "Outcome",
-  classes: "govuk-radios--small govuk-radios--inline",
-  items: [
-    { value: "struck-out", text: "Claim struck out" },
-    { value: "dismissed", text: "Claim dismissed" }
-  ]
-}) }}
+{% macro outcome(subject, legend) %}
+  {{ compact.radios("strike-" + subject + "-outcome", {
+    legend: legend,
+    classes: "govuk-radios--small govuk-radios--inline",
+    optional: true,
+    items: [
+      { value: "struck-out", text: legend + " struck out" },
+      { value: "dismissed", text: legend + " dismissed" }
+    ]
+  }) }}
+{% endmacro %}
+
+{% set strikeItems = [{ value: "claim", text: "Claim", conditional: { html: outcome("claim", "Claim") } }] %}
+{% if openCounterclaim %}
+  {% set strikeItems = strikeItems.concat([
+    { value: "counterclaim", text: "Counterclaim", conditional: { html: outcome("counterclaim", "Counterclaim") } }
+  ]) %}
+{% endif %}
+{% if openApplication %}
+  {% set strikeItems = strikeItems.concat([{ value: "application", text: "Application dismissed" }]) %}
+{% endif %}
+{# Always posted, so a form with nothing ticked is not mistaken for one saved before this question, which ticks the claim. #}
+<input type="hidden" name="strike-subjects" value="none">
+{{ compact.checkboxes("strike-subjects", { legend: "Outcome", default: "claim", items: strikeItems }) }}
