@@ -361,12 +361,30 @@ export function initMakeOrder(): void {
   const savedTab = tabs.find(tab => tab.dataset.orderType === orderTypeField.value);
   const tabType = (): OrderType | undefined =>
     tabs.find(tab => tab.hash === window.location.hash)?.dataset.orderType as OrderType | undefined;
+  // With an application open, the claim's tabs wait behind a tick box; until it is ticked the order is on the
+  // applications alone, and the open tab is what ticking it goes to (HHJ Pema, 22 October 2026).
+  const claimOrder = form.querySelector<HTMLInputElement>('input[name="claim-order"]');
+  const claimTabs = form.querySelector<HTMLElement>('[data-claim-order]');
+  const orderingOnClaim = (): boolean => !claimOrder || claimOrder.checked;
+  const openTabType = (): OrderType =>
+    (tabType() ??
+      form.querySelector<HTMLAnchorElement>('.govuk-tabs__list-item--selected [data-order-type]')?.dataset.orderType ??
+      tabs[0]?.dataset.orderType) as OrderType;
   const followTab = (): void => {
+    if (!orderingOnClaim()) {
+      return;
+    }
     const type = tabType();
     if (type) {
       selectOrderType(type);
     }
   };
+  claimOrder?.addEventListener('change', () => {
+    if (claimTabs) {
+      claimTabs.hidden = !claimOrder.checked;
+    }
+    selectOrderType(claimOrder.checked ? openTabType() : 'NO_ORDER_ON_CLAIM');
+  });
   window.addEventListener('hashchange', () => {
     // The page opened without a fragment (see startWithSavedOrderTab), so going back to it reopens the saved tab.
     if (!window.location.hash && savedTab) {
@@ -390,7 +408,7 @@ export function initMakeOrder(): void {
   window.addEventListener('hashchange', () => syncUndecidedWarning(form));
   form.addEventListener('submit', followTab);
 
-  selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
+  selectOrderType(orderingOnClaim() ? (tabType() ?? (orderTypeField.value as OrderType)) : 'NO_ORDER_ON_CLAIM');
   initApplicationDecisions(form);
   syncUndecidedWarning(form);
 }

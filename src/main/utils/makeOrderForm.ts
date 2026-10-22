@@ -20,6 +20,8 @@ import { richTextHtml } from '@utils/richText';
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 const APPLICATION_ORDER_TYPE: MakeOrderType = 'APPLICATION_DECISION';
 const WITHOUT_HEARING_ORDER_TYPE: MakeOrderType = 'FREE_FORM';
+/** An order on the applications alone, which with one open is where the screen starts. */
+const NO_CLAIM_ORDER_TYPE: MakeOrderType = 'NO_ORDER_ON_CLAIM';
 
 const YES_NO: Record<string, string> = { YES: 'Yes', NO: 'No' };
 
@@ -205,10 +207,18 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     : {};
   const draft: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
   const atHearing = recordsAttendance(hearing, draft);
+  // With an application open the order starts as one on the applications alone, the claim's order types waiting
+  // behind a tick box (HHJ Pema, 22 October 2026).
   const orderType =
     submission?.orderType ??
     order.orderType ??
-    (caseContext.application ? APPLICATION_ORDER_TYPE : atHearing ? DEFAULT_ORDER_TYPE : WITHOUT_HEARING_ORDER_TYPE);
+    (caseContext.application
+      ? APPLICATION_ORDER_TYPE
+      : applicationsToDecide(start).length
+        ? NO_CLAIM_ORDER_TYPE
+        : atHearing
+          ? DEFAULT_ORDER_TYPE
+          : WITHOUT_HEARING_ORDER_TYPE);
   return {
     draft,
     // A possession order saved without a hearing, from before the screen stopped offering one, opens on free form.

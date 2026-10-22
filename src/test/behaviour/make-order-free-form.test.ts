@@ -115,6 +115,8 @@ describe('make an order: free form and strike out', () => {
       applications: [{ id: 'gen-app-1', reference: 'GA1', type: 'Adjourn the hearing', documents: [] }],
     });
     const page = await openPage((await app.get(PAGE)).text);
+    // With an application open, the claim waits behind a tick box.
+    check('claim-order', 'yes');
     selectTab('tab-strike-out');
     check('strike-claim-outcome', 'struck-out');
     check('strike-subjects', 'counterclaim');

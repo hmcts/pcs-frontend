@@ -31,6 +31,8 @@ describe('make an order: adjournment', () => {
       applications: [{ id: 'gen-app-1', reference: 'GA1', type: 'Adjourn the hearing', documents: [] }],
     });
     const page = await openPage((await app.get(PAGE)).text);
+    // With an application open, the claim waits behind a tick box.
+    check('claim-order', 'yes');
     selectTab('tab-adjournment');
     check('adj-type', 'generally');
     expect(page.orderText()).toContain('The claim is adjourned generally with liberty to restore');
