@@ -218,7 +218,7 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
       sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
         withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
-          yarnBuilder.yarn('test:E2e')
+          yarnBuilder.yarn('test:E2e:browser')
         }
       }
       publishHTML([
