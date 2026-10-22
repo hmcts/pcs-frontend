@@ -48,7 +48,7 @@ function addWarrantSuspensionRefused(list: OrderedListBuilder, data: OrderData):
 export function buildApplicationOrder(data: OrderData): DocWeaveDocument {
   const application = data.application;
   const { claimant, defendant } = partyLabels(data);
-  const costs = caseManCosts(claimant, defendant);
+  const costs = caseManCosts(claimant, defendant, 'application');
   const decision = value(data, 'application-decision');
   const clause = decisionClause(data);
   const warrant = decision === 'suspend-warrant' || decision === 'refuse-warrant-suspension';

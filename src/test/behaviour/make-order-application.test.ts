@@ -177,6 +177,15 @@ describe('make an order: deciding an application', () => {
     expect(reopened.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);
   });
 
+  it('orders fixed costs of the application, not of the claim', async () => {
+    const page = await openPage((await app.get(PAGE)).text);
+    check('application-decision', 'dismiss');
+    check('costs', 'yes');
+    check('costs-choice', 'def-pay-cl-fixed');
+    type('costs-def-pay-cl-fixed-amount', '150');
+    expect(page.orderText()).toContain('costs of the application in the fixed sum of £150.00.');
+  });
+
   it('orders the application dismissed', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     check('application-decision', 'dismiss');
