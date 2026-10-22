@@ -17,3 +17,4 @@ export * from './youNeedToApplyForHelpWithYourApplicationFee.page.data';
 export * from './viewAllApplications.page.data';
 export * from './payForYourApplication.page.data';
 export * from './paymentDetails.page.data';
+export * from './confirmYourPayment.page.data';

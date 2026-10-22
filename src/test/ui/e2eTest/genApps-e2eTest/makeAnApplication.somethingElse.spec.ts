@@ -17,6 +17,8 @@ import { finaliseAllValidations, initializeExecutor, performAction, performValid
 
 const home_url = process.env.TEST_URL;
 
+let doYouNeedHelpPayingTheFeeSuspend: ReturnType<typeof doYouNeedHelpPayingTheFee>;
+
 test.beforeEach(async ({ page }) => {
   initializeExecutor(page);
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
@@ -34,6 +36,8 @@ test.beforeEach(async ({ page }) => {
   await performValidation('mainHeader', dashboard.mainHeader);
   await performAction('clickLink', dashboard.askTheCourtToMakeAnOrderLink);
   await performValidation('mainHeader', chooseAnApplication.mainHeader);
+
+  doYouNeedHelpPayingTheFeeSuspend = doYouNeedHelpPayingTheFee(test.info().title);
 });
 
 test.afterEach(async () => {
@@ -48,10 +52,11 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     });
     await performValidation('mainHeader', askTheCourtToMakeAnOrder.mainHeader);
     await performAction('clickButton', askTheCourtToMakeAnOrder.startNowButton);
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFeeSuspend.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
-      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-      option: doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption,
+      question: doYouNeedHelpPayingTheFeeSuspend.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFeeSuspend.iNeedHelpPayingTheFeeRadioOption,
+      continueButton: doYouNeedHelpPayingTheFeeSuspend.continueButton,
     });
     await performValidation('mainHeader', haveYouAlreadyAppliedForHelpWithFees.mainHeader);
     await performAction('confirmYouHaveAppliedForFeeHelp', {
