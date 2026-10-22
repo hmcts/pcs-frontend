@@ -18,7 +18,7 @@ import {
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
-import { orderRedirect } from '@utils/orderRedirect';
+import { orderErrors, orderRedirect } from '@utils/orderResponses';
 import {
   MAX_QUERY_LENGTH,
   MAX_REVIEW_DATES,
@@ -272,6 +272,9 @@ function render(
   issues: ValidationIssue[] = [],
   status = issues.length ? 400 : 200
 ): void {
+  if (issues.length && orderErrors(req, res, issues, status)) {
+    return;
+  }
   const review = reviewOf(req)!;
   res.status(status).render(`confirm-order-review/${view}`, {
     ...pageModel(req, review, issues),
@@ -280,14 +283,22 @@ function render(
 }
 
 /** Shows the page a submission came from again, with why pcs-api refused it. */
-const showRefusal = (req: Request, res: Response, view: View) => (error: CallbackRejectedError) =>
-  render(
-    req,
-    res,
-    view,
-    error.reasons.map(message => ({ id: 'confirm-order-review-form', message })),
-    error.status
-  );
+const showRefusal = (req: Request, res: Response, view: View) => (error: CallbackRejectedError) => {
+  const issues = error.reasons.map(message => ({ id: 'confirm-order-review-form', message }));
+  const review = reviewOf(req)!;
+  const query = new URLSearchParams();
+  if (review.order.id) {
+    query.set('orderId', review.order.id);
+  }
+  if (review.taskId) {
+    query.set('taskId', review.taskId);
+  }
+  // Any refused event must be started again before these answers can be submitted.
+  const reloadUrl = `${pageUrl(caseReferenceOf(req), 'intro')}?${query}`;
+  if (!orderErrors(req, res, issues, error.status, reloadUrl)) {
+    render(req, res, view, issues, error.status);
+  }
+};
 
 /** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
 function orderIssues(review: OrderReviewSession): ValidationIssue[] {

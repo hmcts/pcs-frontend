@@ -11,9 +11,11 @@ import {
   control,
   openPage,
   recordAttendance,
+  refuseNextEvent,
   selectTab,
   submittedOrders,
   submittedReviews,
+  type,
   writeInPreview,
 } from './harness';
 
@@ -87,12 +89,30 @@ describe('order JSON submissions', () => {
     expect(JSON.stringify(submittedReviews())).toContain('defendant-id');
   });
 
+  it('restarts a stale caseworker review with its order and task rather than reusing the old event', async () => {
+    app = await bootApp({ caseworker: true, order: { id: 'order-1', orderType: 'FREE_FORM', formData: {} } });
+    const intro = `${BASE}?orderId=order-1&taskId=task-1`;
+    await app.get(intro);
+    const page = await openPage((await app.get(REVIEW)).text);
+    check('send-query', 'yes');
+    type('query-to-judge', 'Please check this order');
+    refuseNextEvent('The order changed elsewhere');
+    const response = await app.postJson(REVIEW, json(page.body('RETURN_TO_JUDGE')));
+    expect(response.status).toBe(422);
+    expect(JSON.parse(response.text)).toEqual({
+      errors: [{ id: 'confirm-order-review-form', message: 'The order changed elsewhere' }],
+      reloadUrl: intro,
+    });
+  });
+
   it('posts the clicked action, checkbox arrays and CSRF token, prevents duplicates and displays server validation', async () => {
     app = await bootApp();
     await openPage((await app.get(MAKE)).text);
     writeInPreview('Edited wording — café £100');
     check('outright-options', 'money-judgment');
     check('outright-options', 'use-occupation');
+    const originalForm = control<HTMLFormElement>('#make-order-form');
+    const editor = control<HTMLElement>('#order-editor');
     const expectedDocument = control<HTMLTextAreaElement>('#order-document').value;
     // jsdom has no fetch; bridge to Node's real HTTP fetch and the running Express slice.
     const nodeFetch = runInThisContext('fetch') as typeof fetch;
@@ -109,19 +129,24 @@ describe('order JSON submissions', () => {
       return response;
     };
     try {
-      let stoppedOldPage = false;
-      initOrderSubmissions(() => (stoppedOldPage = true));
+      initOrderSubmissions();
       const form = control<HTMLFormElement>('#make-order-form');
       const button = control<HTMLButtonElement>('[value="SUBMIT_FOR_REVIEW"]');
       form.requestSubmit(button);
       form.requestSubmit(button);
       await finished;
-      // Wait for the response's HTML stream and the document replacement.
+      // Wait for JSON validation to update the mounted page.
       for (let n = 0; n < 100 && !document.querySelector('.govuk-error-summary'); n++) {
         await new Promise(resolve => setTimeout(resolve, 10));
       }
       expect(calls).toBe(1);
-      expect(stoppedOldPage).toBe(true);
+      expect(control<HTMLFormElement>('#make-order-form')).toBe(originalForm);
+      expect(control<HTMLElement>('#order-editor')).toBe(editor);
+      expect(button.disabled).toBe(false);
+      expect(document.activeElement).toBe(document.querySelector('.govuk-error-summary'));
+      expect(control('#claimant-claimant-id-attendance').getAttribute('aria-describedby')).toContain(
+        '-attendance-error'
+      );
       expect(sent?.headers).toEqual({ 'Content-Type': 'application/json' });
       expect(JSON.parse(sent!.body as string)).toMatchObject({
         _csrf: 'csrf-test',
@@ -132,6 +157,21 @@ describe('order JSON submissions', () => {
       expect(control<HTMLTextAreaElement>('#order-document').value).toBe(expectedDocument);
       expect(document.querySelector('form[data-order-json]')).not.toBeNull();
       expect(submittedOrders()).toHaveLength(0);
+
+      recordAttendance();
+      check('outright-options', 'money-judgment', false);
+      check('outright-options', 'use-occupation', false);
+      check('outright-possession', 'forthwith');
+      check('outright-grounds-type', 'mandatory');
+      refuseNextEvent('The draft changed elsewhere');
+      form.requestSubmit(button);
+      for (let n = 0; n < 100 && !document.querySelector(`.govuk-error-summary a[href="${MAKE}"]`); n++) {
+        await new Promise(resolve => setTimeout(resolve, 10));
+      }
+      expect(document.querySelector('.govuk-error-summary')?.textContent).toContain('The draft changed elsewhere');
+      expect(document.querySelector('.govuk-error-summary a')?.textContent).toContain('discards unsaved changes');
+      expect(button.disabled).toBe(true);
+      expect(control<HTMLFormElement>('#make-order-form')).toBe(originalForm);
     } finally {
       globalThis.fetch = oldFetch;
     }

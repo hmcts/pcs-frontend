@@ -20,3 +20,18 @@ export function orderRedirect(req: Request, res: Response, url: string): void {
     res.redirect(url);
   }
 }
+
+/** Keep JSON validation on the mounted form; ordinary form posts still render their page. */
+export function orderErrors(
+  req: Request,
+  res: Response,
+  errors: { id: string; message: string }[],
+  status = 400,
+  reloadUrl?: string
+): boolean {
+  if (!req.is('application/json')) {
+    return false;
+  }
+  res.status(status).json({ errors, reloadUrl });
+  return true;
+}

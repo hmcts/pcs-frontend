@@ -24,7 +24,7 @@ import {
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
-import { orderRedirect } from '@utils/orderRedirect';
+import { orderErrors, orderRedirect } from '@utils/orderResponses';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
 
@@ -149,18 +149,16 @@ export default function makeOrderRoutes(app: Application): void {
       const currentHearing = started.envelope.hearing;
       const hearingChanged = !!currentHearing && hearingRecordChanged(currentHearing, formData);
       if (hearingChanged && hearingVersion !== String(currentHearing.version ?? '')) {
-        // Reload stale facts rather than silently applying the judge's edits to a newer version.
-        return res.status(409).render(
-          'make-order',
-          pageModel(req, started, {
-            validationIssues: [
-              {
-                id: 'make-order-form',
-                message: 'The hearing facts or notes have changed. Check the reloaded details before saving again.',
-              },
-            ],
-          })
-        );
+        const validationIssues = [
+          {
+            id: 'make-order-form',
+            message: 'The hearing facts or notes have changed. Check the latest details before saving again.',
+          },
+        ];
+        if (orderErrors(req, res, validationIssues, 409, req.originalUrl)) {
+          return;
+        }
+        return res.status(409).render('make-order', pageModel(req, started, { validationIssues }));
       }
       // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
       const validationIssues =
@@ -170,6 +168,9 @@ export default function makeOrderRoutes(app: Application): void {
             ? validateHearingRecord(formData)
             : [];
       if (validationIssues.length) {
+        if (orderErrors(req, res, validationIssues)) {
+          return;
+        }
         // Nothing was submitted, so keep the token and versions the answers were made against.
         const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
         const submission = { orderType, formData, orderDocumentJson: orderDocument, validationIssues, hearingVersion };
@@ -209,8 +210,11 @@ export default function makeOrderRoutes(app: Application): void {
         }
         // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
         // tab: show the judge the order as it now stands, and why.
-        const current = await startOrderEvent(accessToken, caseReference, chosen(req));
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
+        if (orderErrors(req, res, reasons, error.status, req.originalUrl)) {
+          return;
+        }
+        const current = await startOrderEvent(accessToken, caseReference, chosen(req));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }
       if (action === 'SUBMIT_FOR_REVIEW') {
