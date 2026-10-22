@@ -30,7 +30,7 @@ type FeeApplicationFormData = Pick<
   'getApplicationTypeField' | 'getHearingInNext14DaysField' | 'getOtherPartiesAgreedField'
 >;
 
-export function doesApplicationFeeApply(visibleFormData: FeeApplicationFormData, release1bEnabled = false): boolean {
+export function doesApplicationFeeApply(visibleFormData: FeeApplicationFormData, release1bEnabled: boolean): boolean {
   return (
     visibleFormData.getApplicationTypeField()?.fieldValue !== GenAppType.ADJOURN ||
     visibleFormData.getHearingInNext14DaysField()?.fieldValue === 'yes' ||

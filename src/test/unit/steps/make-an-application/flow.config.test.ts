@@ -14,7 +14,7 @@ function requestWithFormData(formData: Record<string, Record<string, unknown>>):
     params: { caseReference: '1111222233334444' },
     res: {
       locals: {
-        release1bEnabled: true,
+        features: { release1bEnabled: true },
         step: { journey: 'makeAnApplication' },
         validatedCase: { id: '1111222233334444' },
       },
@@ -50,7 +50,7 @@ describe('release 1B disabled', () => {
       'is-the-court-hearing-in-the-next-14-days': { hearingInNext14Days: 'no' },
       'do-you-need-help-paying-the-fee': { helpWithFeesNeeded: 'yes' },
     });
-    req.res!.locals.release1bEnabled = false;
+    req.res!.locals.features = { release1bEnabled: false };
     for (const name of [
       'do-you-need-help-paying-the-fee',
       'have-you-already-applied-for-help-with-fees',
@@ -69,7 +69,7 @@ describe.each([false, true])('existing Help with Fees routes with release 1B = %
       'do-you-need-help-paying-the-fee': { helpWithFeesNeeded: 'yes' },
       'have-you-already-applied-for-help-with-fees': { alreadyAppliedForHwf: 'no' },
     });
-    req.res!.locals.release1bEnabled = enabled;
+    req.res!.locals.features = { release1bEnabled: enabled };
     for (const name of [
       'do-you-need-help-paying-the-fee',
       'have-you-already-applied-for-help-with-fees',

@@ -21,7 +21,7 @@ async function createRequest(stepName: string, enabled: boolean, lang = 'en') {
   const render = jest.fn<void, [string, BuiltFormContent]>();
   const res = {
     locals: {
-      release1bEnabled: enabled,
+      features: { release1bEnabled: enabled },
       step: { name: stepName, journey: 'makeAnApplication' },
       validatedCase: { id: '1111222233334444' },
     },

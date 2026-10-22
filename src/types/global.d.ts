@@ -57,6 +57,9 @@ declare module 'express' {
 
   interface Response {
     locals: {
+      features?: {
+        release1bEnabled?: boolean;
+      };
       validatedCase?: CcdCaseModel;
       t?: TFunction;
       lang?: string;
