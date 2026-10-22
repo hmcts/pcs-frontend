@@ -5,6 +5,7 @@
 @use 'timeout-modal';
 @use 'multi-file-upload';
 @use 'make-order';
+@use 'confirm-order-review';
 @use '@hmcts-cft/docweave/styles/editor';
 
 .section-border {
