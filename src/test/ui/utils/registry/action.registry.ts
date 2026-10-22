@@ -1,5 +1,6 @@
 import {
   CitizenCreateGenAppAPIAction,
+  ClaimantCreateGenAppAPIAction,
   CreateCaseAPIAction,
   DocumentsAction,
   FetchPINsAndValidateAccessCodeAPIAction,
@@ -52,6 +53,7 @@ export class ActionRegistry {
     ['createCaseAPI', new CreateCaseAPIAction()],
     ['submitCaseAPI', new CreateCaseAPIAction()],
     ['citizenCreateGenAppAPI', new CitizenCreateGenAppAPIAction()],
+    ['claimantCreateGenAppApi', new ClaimantCreateGenAppAPIAction()],
     ['respondPossessionClaimAPI', new respondPossessionClaimAPIAction()],
     ['deleteCaseRole', new CreateCaseAPIAction()],
     ['updatePaymentAPI', new CreateCaseAPIAction()],
