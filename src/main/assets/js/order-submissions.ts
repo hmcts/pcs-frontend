@@ -25,7 +25,7 @@ export function initOrderSubmissions(beforeReplace: () => void = () => {}): void
         enabledButtons.forEach(button => (button.disabled = true));
         const response = await fetch(form.getAttribute('action') || window.location.href, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-csrf-token': String(body._csrf ?? '') },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
           redirect: 'error',
         });

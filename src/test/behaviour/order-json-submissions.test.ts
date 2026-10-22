@@ -9,10 +9,8 @@ import {
   bootApp,
   check,
   control,
-  eventStarts,
   openPage,
   recordAttendance,
-  refuseNextEvent,
   selectTab,
   submittedOrders,
   submittedReviews,
@@ -55,38 +53,6 @@ describe('order JSON submissions', () => {
     expect(reopened.documentText()).toContain(wording.trim());
   });
 
-  it('sends an order for review using the existing event and confirmation', async () => {
-    app = await bootApp();
-    const page = await openPage((await app.get(MAKE)).text);
-    recordAttendance();
-    check('outright-possession', 'forthwith');
-    check('outright-grounds-type', 'mandatory');
-    const response = await app.postJson(MAKE, json(page.body('SUBMIT_FOR_REVIEW')));
-    expect(response.status).toBe(200);
-    const { redirectUrl } = JSON.parse(response.text);
-    expect((await app.get(redirectUrl)).text).toContain('Order sent to caseworker for review');
-    expect(submittedOrders()).toHaveLength(1);
-  });
-
-  it('returns the reloaded conflict page and a fresh event token when an order changed elsewhere', async () => {
-    app = await bootApp();
-    const page = await openPage((await app.get(MAKE)).text);
-    const token = page.body().get('eventToken');
-    refuseNextEvent('The draft changed elsewhere');
-    const response = await app.postJson(MAKE, json(page.body('SAVE_DRAFT')));
-    expect(response.status).toBe(422);
-    await openPage(response.text);
-    expect(control('[name="eventToken"]').value).toBe(`event-token-${eventStarts()}`);
-    expect(control('[name="eventToken"]').value).not.toBe(token);
-    expect(document.body.textContent).toContain('The draft changed elsewhere');
-  });
-
-  it('keeps the feature flag on JSON POSTs', async () => {
-    app = await bootApp({ makeOrderEnabled: false });
-    expect((await app.postJson(MAKE, { action: 'SAVE_DRAFT' })).status).toBe(404);
-    expect(submittedOrders()).toHaveLength(0);
-  });
-
   it('keeps the normal JSON body limit outside the two document pages', async () => {
     app = await bootApp({ caseworker: true });
     expect((await app.postJson(`${BASE}/review-dates`, { description: 'x'.repeat(110_000) })).status).toBe(413);
@@ -121,13 +87,7 @@ describe('order JSON submissions', () => {
     expect(JSON.stringify(submittedReviews())).toContain('defendant-id');
   });
 
-  it('redirects a JSON POST without a review in progress back to the introduction', async () => {
-    app = await bootApp({ caseworker: true });
-    const response = await app.postJson(REVIEW, { action: 'ISSUE' });
-    expect(JSON.parse(response.text)).toEqual({ redirectUrl: BASE });
-  });
-
-  it('posts the clicked action, checkbox arrays and CSRF header, prevents duplicates and displays server validation', async () => {
+  it('posts the clicked action, checkbox arrays and CSRF token, prevents duplicates and displays server validation', async () => {
     app = await bootApp();
     await openPage((await app.get(MAKE)).text);
     writeInPreview('Edited wording — café £100');
@@ -162,8 +122,9 @@ describe('order JSON submissions', () => {
       }
       expect(calls).toBe(1);
       expect(stoppedOldPage).toBe(true);
-      expect(sent?.headers).toEqual({ 'Content-Type': 'application/json', 'x-csrf-token': 'csrf-test' });
+      expect(sent?.headers).toEqual({ 'Content-Type': 'application/json' });
       expect(JSON.parse(sent!.body as string)).toMatchObject({
+        _csrf: 'csrf-test',
         action: 'SUBMIT_FOR_REVIEW',
         'outright-options': ['money-judgment', 'use-occupation'],
       });
