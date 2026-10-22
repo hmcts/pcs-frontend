@@ -18,6 +18,7 @@
   <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
         data-property-address="{{ propertyAddressDisplay }}">
     {{ csrfProtection(csrfToken) }}
+    <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
 
     {% if edits.added or edits.changed %}
       {% set editsHtml %}

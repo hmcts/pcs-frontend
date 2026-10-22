@@ -93,8 +93,20 @@ function reviewOf(req: Request): OrderReviewSession | undefined {
 const reviewInProgress: RequestHandler = (req, res, next) =>
   reviewOf(req) ? next() : res.redirect(pageUrl(caseReferenceOf(req), 'intro'));
 
+export const ANOTHER_REVIEW_OPENED =
+  'You opened the review of another order on this case after this page. Open this order again from its task';
+
+/**
+ * The review is kept for the case, so a page left open in another tab is for whichever order was opened last:
+ * a page posted for another order is refused, rather than its answers going to the order now open.
+ */
+const sameOrder: RequestHandler = (req, res, next) =>
+  req.method !== 'POST' || req.body.reviewOrderId === reviewOf(req)!.order.id
+    ? next()
+    : refusalPage(req, res)(new CallbackRejectedError([ANOTHER_REVIEW_OPENED], 409));
+
 const journey = [oidcMiddleware, makeOrderFeatureMiddleware];
-const inJourney = [...journey, reviewInProgress];
+const inJourney = [...journey, reviewInProgress, sameOrder];
 
 function errorSummary(issues: ValidationIssue[]) {
   return issues.length
@@ -111,6 +123,7 @@ function pageModel(req: Request, review: OrderStart, issues: ValidationIssue[] =
     headerModel: xuiHeaderModel(req),
     footerModel: buildFooterModel(),
     formAction: req.originalUrl,
+    reviewOrderId: review.order.id,
     ...caseHeader(review.caseContext),
     errorSummary: errorSummary(issues),
     validationErrors: Object.fromEntries(issues.map(issue => [issue.id, { text: issue.message }])),
@@ -367,6 +380,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       orderDocument,
       'send-query': sendQuery,
       'query-to-judge': queryToJudge,
+      reviewOrderId: _reviewOrderId,
       ...formData
     } = req.body;
     review.answers.sendQuery = ticked(sendQuery);
