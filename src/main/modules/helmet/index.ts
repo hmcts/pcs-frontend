@@ -6,7 +6,7 @@ const googleAnalyticsDomain = '*.google-analytics.com';
 const self = "'self'";
 
 /**
- * The application's security headers. Shared with the public routes, which are mounted before the modules.
+ * The application's security headers, applied before the public routes and the modules so every response has them.
  */
 export function securityHeaders(developmentMode: boolean): express.RequestHandler {
   // include default helmet functions
@@ -63,18 +63,4 @@ export function securityHeaders(developmentMode: boolean): express.RequestHandle
     },
     referrerPolicy: { policy: 'origin' },
   });
-}
-
-/**
- * Module that enables helmet in the application
- */
-export class Helmet {
-  private readonly developmentMode: boolean;
-  constructor(developmentMode: boolean) {
-    this.developmentMode = developmentMode;
-  }
-
-  public enableFor(app: express.Express): void {
-    app.use(securityHeaders(this.developmentMode));
-  }
 }

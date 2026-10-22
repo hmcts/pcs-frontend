@@ -37,7 +37,16 @@ export const GUIDE_SECTIONS = [
  */
 export function welshAvailable(): boolean {
   const welsh = i18next.getResourceBundle('cy', NAMESPACE);
-  return Boolean(welsh) && !/"cy(?=[A-Z<])/.test(JSON.stringify(welsh));
+  return Boolean(welsh) && !hasPlaceholder(i18next.getResourceBundle('en', NAMESPACE), welsh);
+}
+
+function hasPlaceholder(english: unknown, welsh: unknown): boolean {
+  if (typeof english === 'string') {
+    return welsh === `cy${english}`;
+  }
+  return Object.entries(english as object).some(([key, value]) =>
+    hasPlaceholder(value, (welsh as Record<string, unknown> | undefined)?.[key])
+  );
 }
 
 function language(requested: unknown): AllowedLang {

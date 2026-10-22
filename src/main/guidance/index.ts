@@ -3,8 +3,6 @@ import i18next from 'i18next';
 
 import { PREPARE_TO_RESPOND_PATH, prepareToRespondPage } from './prepareToRespond';
 
-import { securityHeaders } from '@modules/helmet';
-
 /** i18next loads the locale files after the I18n module starts it, so a request can arrive first. */
 function i18nReady(): Promise<void> {
   if (i18next.isInitialized) {
@@ -19,11 +17,10 @@ function i18nReady(): Promise<void> {
  * user's role middleware. Only exact GET and HEAD paths are handled here; everything else falls through
  * to the application as before.
  */
-export function publicRouter(developmentMode: boolean, publicDir: string): Router {
+export function publicRouter(publicDir: string): Router {
   const router = Router();
-  const headers = securityHeaders(developmentMode);
 
-  router.get(PREPARE_TO_RESPOND_PATH, headers, async (req: Request, res: Response, next: NextFunction) => {
+  router.get(PREPARE_TO_RESPOND_PATH, async (req: Request, res: Response, next: NextFunction) => {
     try {
       await i18nReady();
       res.set('X-Robots-Tag', 'noindex');
@@ -34,8 +31,7 @@ export function publicRouter(developmentMode: boolean, publicDir: string): Route
   });
 
   // The application's built styles, scripts, fonts and images, so the page renders without the services above.
-  // Requests that are not for a file carry on to the application, which sets the same headers again.
-  router.use(headers, express.static(publicDir));
+  router.use(express.static(publicDir));
 
   return router;
 }

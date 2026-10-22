@@ -62,7 +62,6 @@ const KEY_DRIFT_ALLOWLIST = new Set([
  * stay in English until the translation replaces them all. Must only ever shrink.
  */
 const AWAITING_TRANSLATION = new Set([
-  // TODO: Jira reference for the Welsh Language Unit translation of the Requirement 10 preparation guide.
   'prepareToRespond.json',
 ]);
 
