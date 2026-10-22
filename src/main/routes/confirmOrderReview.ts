@@ -7,7 +7,7 @@ import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { attendanceParties, orderFormModel } from '@utils/makeOrderForm';
+import { applicationsToDecide, attendanceParties, orderFormModel, recordsAttendance } from '@utils/makeOrderForm';
 import { MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   type OrderStart,
@@ -316,7 +316,14 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   if (!order.orderDocumentJson) {
     return [{ id: 'make-order-form', message: NO_WORDING }];
   }
-  return validateMakeOrder(order.orderType, order.formData, attendanceParties(review));
+  const atHearing = recordsAttendance(null, order.formData);
+  return validateMakeOrder(
+    order.orderType,
+    order.formData,
+    atHearing ? attendanceParties(review) : [],
+    !atHearing,
+    applicationsToDecide(review)
+  );
 }
 
 /**

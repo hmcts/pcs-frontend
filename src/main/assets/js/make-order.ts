@@ -10,9 +10,10 @@ import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation
 
 import { type OrderData, readOrderData } from './make-order/data';
 import { buildAdjournmentOrder } from './make-order/wording/adjournment';
-import { buildApplicationOrder } from './make-order/wording/application';
+import { buildApplicationOrder, wordingAnchors } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildFreeFormOrder } from './make-order/wording/free-form';
+import { buildNoOrderOnClaim } from './make-order/wording/no-order';
 import { buildOutrightOrder } from './make-order/wording/outright';
 import { buildStrikeOutDismissalOrder } from './make-order/wording/strike-out';
 import { buildSuspendedOrder } from './make-order/wording/suspended';
@@ -205,6 +206,7 @@ const builders: Record<OrderType, (data: OrderData) => DocWeaveDocument> = {
   ADJOURNMENT: buildAdjournmentOrder,
   STRIKE_OUT_DISMISSAL: buildStrikeOutDismissalOrder,
   FREE_FORM: buildFreeFormOrder,
+  NO_ORDER_ON_CLAIM: buildNoOrderOnClaim,
   APPLICATION_DECISION: buildApplicationOrder,
 };
 
@@ -214,31 +216,51 @@ export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
   return builders[type](readOrderData(form));
 }
 
-/** What follows a decision on an application, such as whether a hearing is on notice, asked only while it is chosen. */
-export function initApplicationDecision(form: HTMLFormElement): void {
+/** Whether a form control is an application's decision, whose row shows what follows the decision chosen. */
+function isDecision(control: EventTarget | null): control is HTMLInputElement {
+  return (
+    control instanceof HTMLInputElement &&
+    control.name.endsWith('-decision') &&
+    Boolean(control.closest('[data-application]'))
+  );
+}
+
+/** What follows a decision on an application, shown in its row while that decision is chosen. */
+export function initApplicationDecisions(form: HTMLFormElement): void {
   form.addEventListener('change', event => {
-    const decision = event.target as HTMLInputElement;
-    if (decision.name === 'application-decision') {
-      form.querySelectorAll<HTMLElement>('[data-decision-shows]').forEach(follows => {
-        follows.hidden = follows.dataset.decisionShows !== decision.value;
-      });
+    const decision = event.target;
+    if (isDecision(decision)) {
+      decision
+        .closest('[data-application]')!
+        .querySelectorAll<HTMLElement>('[data-decision-shows]')
+        .forEach(follows => {
+          follows.hidden = follows.dataset.decisionShows !== decision.value;
+        });
     }
   });
 }
 
-/** The decision chosen on an application, which has its own document as each order type does. */
-function applicationDecision(form: HTMLFormElement): string {
-  return form.querySelector<HTMLInputElement>('input[name="application-decision"]:checked')?.value ?? '';
-}
-
 /**
- * Adds the applicant's wording to the order as the judge's own, straight after "IT IS ORDERED THAT", to
- * change or delete as they would their own. It goes in as the application panel shows it: rich text as the applicant
- * formatted it, so the clauses keep the numbers the applicant's cross-references use, and plain text as its lines.
+ * Puts the applicant's wording in the order as the judge's own, to change or delete as they would their own, when
+ * the judge asks for it with the application's button (judicial feedback, 22 October 2026: never automatically). It goes in
+ * as the application's row shows it, after the clauses the decision generated, or at the end of the order when
+ * the decision generated none.
  */
-function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController): void {
-  const panel = form.querySelector<HTMLElement>('[data-application]');
-  editor.insertHtml(panel?.dataset.applicationWordingHtml ?? '', { at: { after: 'paragraph:ordered-that' } });
+function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController, applicationId: string): void {
+  const data = readOrderData(form);
+  const application = data.applications.find(candidate => candidate.id === applicationId);
+  if (!application?.wordingHtml) {
+    return;
+  }
+  for (const anchor of wordingAnchors(data, application)) {
+    try {
+      editor.insertHtml(application.wordingHtml, { at: { after: anchor } });
+      return;
+    } catch {
+      // Not a clause this decision generated: try the next.
+    }
+  }
+  editor.insertHtml(application.wordingHtml, { at: 'end' });
 }
 
 export function initMakeOrder(): void {
@@ -265,10 +287,10 @@ export function initMakeOrder(): void {
 
   let orderType: OrderType | undefined;
   let key: string | undefined;
-  // One document per order type, and per decision on an application, so switching and back keeps any edits.
+  // One document per order type, so switching and back keeps any edits. A decision on an application changes the
+  // generated clauses in place, so wording the judge inserted after them stays.
   const documents: Record<string, DocWeaveSnapshot> = {};
-  const documentKey = (type: OrderType): string =>
-    type === 'APPLICATION_DECISION' ? `${type}:${applicationDecision(form)}` : type;
+  const documentKey = (type: OrderType): string => type;
   const editor = createDocEditor({
     mount,
     label: 'Order',
@@ -289,13 +311,9 @@ export function initMakeOrder(): void {
     documents[documentKey(orderTypeField.value as OrderType)] = editor.getSnapshot();
   }
   const render = (): void => editor.render(buildOrderDocument(form));
-  // Using the applicant's wording starts its document with their wording, which a reset puts back.
   const startDocument = (): void => {
     editor.load();
     render();
-    if (key === 'APPLICATION_DECISION:grant') {
-      insertRequestedWording(form, editor);
-    }
   };
   const selectDocument = (): void => {
     const next = documentKey(orderType!);
@@ -325,12 +343,30 @@ export function initMakeOrder(): void {
   const savedTab = tabs.find(tab => tab.dataset.orderType === orderTypeField.value);
   const tabType = (): OrderType | undefined =>
     tabs.find(tab => tab.hash === window.location.hash)?.dataset.orderType as OrderType | undefined;
+  // With an application open, the claim's tabs wait behind a tick box; until it is ticked the order is on the
+  // applications alone, and the open tab is what ticking it goes to (judicial feedback, 22 October 2026).
+  const claimOrder = form.querySelector<HTMLInputElement>('input[name="claim-order"]');
+  const claimTabs = form.querySelector<HTMLElement>('[data-claim-order]');
+  const orderingOnClaim = (): boolean => !claimOrder || claimOrder.checked;
+  const openTabType = (): OrderType =>
+    (tabType() ??
+      form.querySelector<HTMLAnchorElement>('.govuk-tabs__list-item--selected [data-order-type]')?.dataset.orderType ??
+      tabs[0]?.dataset.orderType) as OrderType;
   const followTab = (): void => {
+    if (!orderingOnClaim()) {
+      return;
+    }
     const type = tabType();
     if (type) {
       selectOrderType(type);
     }
   };
+  claimOrder?.addEventListener('change', () => {
+    if (claimTabs) {
+      claimTabs.hidden = !claimOrder.checked;
+    }
+    selectOrderType(claimOrder.checked ? openTabType() : 'NO_ORDER_ON_CLAIM');
+  });
   window.addEventListener('hashchange', () => {
     // The page opened without a fragment (see startWithSavedOrderTab), so going back to it reopens the saved tab.
     if (!window.location.hash && savedTab) {
@@ -340,15 +376,13 @@ export function initMakeOrder(): void {
     }
     followTab();
   });
-  const reset = form.querySelector<HTMLButtonElement>('[data-restore-requested-wording]');
-  reset?.addEventListener('click', startDocument);
-  form.addEventListener('change', event => {
-    if ((event.target as HTMLInputElement).name === 'application-decision') {
-      selectDocument();
-      if (reset) {
-        reset.hidden = applicationDecision(form) !== 'grant';
+  form.querySelectorAll<HTMLButtonElement>('[data-insert-requested-wording]').forEach(insert => {
+    insert.addEventListener('click', () => {
+      const id = insert.closest<HTMLElement>('[data-application]')?.dataset.applicationId;
+      if (id) {
+        insertRequestedWording(form, editor, id);
       }
-    }
+    });
   });
   form.addEventListener('input', event => {
     // A new decision is rendered once its own document is selected, on change, so it cannot overwrite the last one's.
@@ -359,8 +393,8 @@ export function initMakeOrder(): void {
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
 
-  selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
-  initApplicationDecision(form);
+  selectOrderType(orderingOnClaim() ? (tabType() ?? (orderTypeField.value as OrderType)) : 'NO_ORDER_ON_CLAIM');
+  initApplicationDecisions(form);
 }
 
 /**

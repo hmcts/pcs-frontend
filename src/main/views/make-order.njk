@@ -17,7 +17,9 @@
 
   {# The explicit action leaves out the tab fragment, so a refused submission opens at the error summary. #}
   <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
-        data-property-address="{{ propertyAddressDisplay }}">
+        data-property-address="{{ propertyAddressDisplay }}"
+        {%- if withoutHearing and not application %} data-without-hearing{% endif %}
+        {%- if application %} data-box-work{% endif %}>
   <input type="hidden" name="eventToken" value="{{ eventToken }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="taskId" value="{{ taskId }}">
@@ -36,6 +38,7 @@
     {{ claimantNames }} vs {{ defendantNames }}
   </p>
 
+
   {% if order.queryFromCaseworker %}
     {# An order a caseworker returned: their query. #}
     <h2 class="govuk-heading-m">Query from the caseworker</h2>
@@ -46,10 +49,6 @@
       html: '<p class="govuk-body pcs-preserve-lines">' + (order.queryFromCaseworker | escape) + '</p>',
       attributes: { id: "caseworker-query" }
     }) }}
-  {% endif %}
-
-  {% if not application %}
-    <p class="govuk-body">Answer every question unless it says it is optional.</p>
   {% endif %}
 
   {% include "make-order/_form.njk" %}
