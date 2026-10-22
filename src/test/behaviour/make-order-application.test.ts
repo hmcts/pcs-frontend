@@ -109,7 +109,10 @@ describe('make an order: deciding an application', () => {
 
   it("grants the application in a clause naming it, and puts the applicant's wording after it only on request", async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    const button = control<HTMLButtonElement>('[data-insert-requested-wording]');
+    expect(button.closest<HTMLElement>('[hidden]')).not.toBeNull();
     check('app-gen-app-1-decision', 'grant');
+    expect(button.closest<HTMLElement>('[hidden]')).toBeNull();
     expect(page.documentText()).not.toContain('The hearing on 14 October is adjourned.');
     insertWording();
 

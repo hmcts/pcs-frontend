@@ -6,7 +6,7 @@
   Made on one application, as box work, the order shows that application in full and must decide it. Made at a
   hearing, the judge has the file, so the details are folded away and an application may be left as it is.
 
-  Whatever the decision, a button puts the applicant's wording in the order preview as the judge's own clauses, after
+  Granting reveals a button that puts the applicant's wording in the order preview as the judge's own clauses, after
   the clauses the decision generated, to amend or delete. Listing it for a hearing on notice asks when, as the adjournment tab
   does, and leaves the application open. For an application to suspend the warrant of possession, granting it
   suspends the warrant on the conditions a suspended possession order has, and dismissing it says when the eviction
@@ -105,10 +105,12 @@
   }) }}
 
   {% if application.whatOrderWanted %}
-    {# Independent of the decision, as the judges asked (22 October 2026): the wording goes in only when the judge wants it. #}
-    <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3" data-insert-requested-wording>
-      Insert applicant’s wording
-    </button>
+    {# Revealed by granting; the wording goes in only when the judge asks (judicial feedback, 22 October 2026). #}
+    <div data-decision-shows="grant" {%- if not draftChecked(name, "grant") %} hidden{% endif %}>
+      <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3" data-insert-requested-wording>
+        Insert applicant’s wording
+      </button>
+    </div>
   {% endif %}
 
   {% if application.warrantSuspension %}
