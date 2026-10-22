@@ -316,13 +316,18 @@ export function initMakeOrder(): void {
     if (orderType) {
       documents[orderType] = editor.getSnapshot();
     }
-    // A type not opened yet starts from the order as it stands when applications are being decided, so the
-    // applicant's wording the judge inserted comes with it; its own clauses replace the last type's.
-    const carried = orderType && readOrderData(form).applications.length ? documents[orderType] : undefined;
+    // While applications are decided, the order as it stands goes with the judge to a type not opened yet, or to and
+    // from ordering on the claim, so the applicant's wording they inserted comes with it; the type's own clauses
+    // replace the last type's. Between the claim's tabs, each keeps its own.
+    const carries =
+      orderType &&
+      readOrderData(form).applications.length &&
+      (!documents[type] || type === 'NO_ORDER_ON_CLAIM' || orderType === 'NO_ORDER_ON_CLAIM');
+    const next = carries ? documents[orderType!] : documents[type];
     orderType = type;
     orderTypeField.value = type;
     syncSuspendedOnlyCosts(form, type);
-    editor.load(documents[type] ?? carried);
+    editor.load(next);
     render();
   };
 
