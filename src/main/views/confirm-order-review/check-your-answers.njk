@@ -7,7 +7,7 @@
 {% set pageHeading = "Check your answers" %}
 
 {% block page %}
-  <form method="post" action="{{ formAction }}" novalidate>
+  <form data-order-json method="post" action="{{ formAction }}" novalidate>
     {{ csrfProtection(csrfToken) }}
 
     {% for section in sections %}

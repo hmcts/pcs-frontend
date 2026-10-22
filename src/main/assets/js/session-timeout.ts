@@ -1,4 +1,4 @@
-export function initSessionTimeout(): void {
+export function initSessionTimeout(): () => void {
   const body = document.body;
   const sessionTimeoutMinutes = parseInt(body.dataset.sessionTimeout!, 10);
   const sessionWarningMinutes = parseInt(body.dataset.sessionWarning!, 10);
@@ -202,5 +202,9 @@ export function initSessionTimeout(): void {
   checkSessionStatus();
 
   // check at configurable interval
-  setInterval(checkSessionStatus, sessionCheckIntervalSeconds * 1000);
+  const checkInterval = window.setInterval(checkSessionStatus, sessionCheckIntervalSeconds * 1000);
+  return () => {
+    window.clearInterval(checkInterval);
+    stopCountdown();
+  };
 }

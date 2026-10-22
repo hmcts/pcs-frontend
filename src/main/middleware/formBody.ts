@@ -8,9 +8,16 @@ import type { RequestHandler } from 'express';
  */
 const ORDER_DOCUMENT_PAGES = /^\/case\/\d{16}\/(?:make-order|confirm-order-review\/review)\/?$/i;
 
+const orderDocumentJson = bodyParser.json({ limit: '2mb' });
+const json = bodyParser.json();
 const orderDocumentForms = bodyParser.urlencoded({ extended: false, limit: '2mb' });
 const forms = bodyParser.urlencoded({ extended: false });
 
-/** Parses posted forms, allowing the pages that post an order document a larger body. */
-export const formBodyMiddleware: RequestHandler = (req, res, next) =>
-  (ORDER_DOCUMENT_PAGES.test(req.path) ? orderDocumentForms : forms)(req, res, next);
+/** Parses JSON and forms, keeping the larger body limit local to order document pages. */
+export const formBodyMiddleware: RequestHandler = (req, res, next) => {
+  const documentPage = ORDER_DOCUMENT_PAGES.test(req.path);
+  if (req.is('application/json')) {
+    return (documentPage ? orderDocumentJson : json)(req, res, next);
+  }
+  (documentPage ? orderDocumentForms : forms)(req, res, next);
+};

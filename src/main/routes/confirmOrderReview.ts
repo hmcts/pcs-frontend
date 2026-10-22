@@ -18,6 +18,7 @@ import {
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
+import { orderRedirect } from '@utils/orderRedirect';
 import {
   MAX_QUERY_LENGTH,
   MAX_REVIEW_DATES,
@@ -90,7 +91,7 @@ function reviewOf(req: Request): OrderReviewSession | undefined {
  * after a cancel, a submission or in a new session, the caseworker starts again from the introduction.
  */
 const reviewInProgress: RequestHandler = (req, res, next) =>
-  reviewOf(req) ? next() : res.redirect(pageUrl(caseReferenceOf(req), 'intro'));
+  reviewOf(req) ? next() : orderRedirect(req, res, pageUrl(caseReferenceOf(req), 'intro'));
 
 const journey = [oidcMiddleware, makeOrderFeatureMiddleware];
 const inJourney = [...journey, reviewInProgress];
@@ -381,13 +382,17 @@ export default function confirmOrderReviewRoutes(app: Application): void {
           return render(req, res, 'review', issues);
         }
         await submitReview(req, review, 'RETURN_TO_JUDGE');
-        return res.redirect(pageUrl(caseReferenceOf(req), 'confirmed'));
+        return orderRedirect(req, res, pageUrl(caseReferenceOf(req), 'confirmed'));
       }
       const issues = orderIssues(review);
       if (issues.length) {
         return render(req, res, 'review', issues);
       }
-      return res.redirect(pageUrl(caseReferenceOf(req), firstIncompletePage(review, 'review') ?? 'checkYourAnswers'));
+      return orderRedirect(
+        req,
+        res,
+        pageUrl(caseReferenceOf(req), firstIncompletePage(review, 'review') ?? 'checkYourAnswers')
+      );
     } catch (error) {
       refusedOrderEvent(res, next, error, showRefusal(req, res, 'review'));
     }
@@ -405,24 +410,28 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     }
     const action = text(req.body.action);
     if (action === 'previous') {
-      return res.redirect(pageUrl(caseReference, 'review'));
+      return orderRedirect(req, res, pageUrl(caseReference, 'review'));
     }
     if (action === 'add') {
       if (answers.reviewDates.length < MAX_REVIEW_DATES) {
         answers.reviewDates.push(blankReviewDate());
       }
-      return res.redirect(`${req.originalUrl}#review-date-${answers.reviewDates.length}`);
+      return orderRedirect(req, res, `${req.originalUrl}#review-date-${answers.reviewDates.length}`);
     }
     const removing = /^remove-(\d+)$/.exec(action);
     if (removing) {
       answers.reviewDates.splice(Number(removing[1]) - 1, 1);
-      return res.redirect(pageUrl(caseReference, 'reviewDates'));
+      return orderRedirect(req, res, pageUrl(caseReference, 'reviewDates'));
     }
     const issues = validateReviewDates(answers);
     if (issues.length) {
       return render(req, res, 'review-dates', issues);
     }
-    return res.redirect(pageUrl(caseReference, firstIncompletePage(review, 'reviewDates') ?? 'checkYourAnswers'));
+    return orderRedirect(
+      req,
+      res,
+      pageUrl(caseReference, firstIncompletePage(review, 'reviewDates') ?? 'checkYourAnswers')
+    );
   });
 
   app.get(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => render(req, res, 'proceed-to-issue'));
@@ -437,13 +446,13 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     answers.partiesToServe = list(req.body['parties-to-serve']).filter(id => parties.has(id));
     answers.seal = text(req.body.seal) || undefined;
     if (req.body.action === 'previous') {
-      return res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'));
+      return orderRedirect(req, res, pageUrl(caseReferenceOf(req), 'reviewDates'));
     }
     const issues = validateProceedToIssue(answers);
     if (issues.length) {
       return render(req, res, 'proceed-to-issue', issues);
     }
-    return res.redirect(pageUrl(caseReferenceOf(req), 'checkYourAnswers'));
+    return orderRedirect(req, res, pageUrl(caseReferenceOf(req), 'checkYourAnswers'));
   });
 
   app.get(route('checkYourAnswers'), ...inJourney, (req: Request, res: Response) => {
@@ -458,16 +467,16 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     const review = reviewOf(req)!;
     const caseReference = caseReferenceOf(req);
     if (req.body.action === 'previous') {
-      return res.redirect(pageUrl(caseReference, 'proceedToIssue'));
+      return orderRedirect(req, res, pageUrl(caseReference, 'proceedToIssue'));
     }
     // The answers may have changed since the page showed them, such as in another tab.
     const incomplete = firstIncompletePage(review);
     if (incomplete) {
-      return res.redirect(pageUrl(caseReference, incomplete));
+      return orderRedirect(req, res, pageUrl(caseReference, incomplete));
     }
     try {
       await submitReview(req, review, 'ISSUE');
-      return res.redirect(pageUrl(caseReference, 'confirmed'));
+      return orderRedirect(req, res, pageUrl(caseReference, 'confirmed'));
     } catch (error) {
       refusedOrderEvent(res, next, error, showRefusal(req, res, 'check-your-answers'));
     }

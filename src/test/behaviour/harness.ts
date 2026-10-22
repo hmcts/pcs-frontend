@@ -224,8 +224,10 @@ export interface HttpResponse {
 }
 
 export interface TestApp {
+  url: string;
   get(path: string): Promise<HttpResponse>;
   post(path: string, body: URLSearchParams): Promise<HttpResponse>;
+  postJson(path: string, body: Record<string, unknown>): Promise<HttpResponse>;
   close(): Promise<void>;
 }
 
@@ -321,11 +323,16 @@ export async function bootApp(
   const server = await listen(app);
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
 
-  const request = (method: string, path: string, body?: string): Promise<HttpResponse> =>
+  const request = (
+    method: string,
+    path: string,
+    body?: string,
+    contentType = 'application/x-www-form-urlencoded'
+  ): Promise<HttpResponse> =>
     new Promise((resolve, reject) => {
       const req = http.request(
         `${baseUrl}${path}`,
-        { method, agent: false, headers: body ? { 'content-type': 'application/x-www-form-urlencoded' } : {} },
+        { method, agent: false, headers: body ? { 'content-type': contentType } : {} },
         res => {
           let text = '';
           res.setEncoding('utf8');
@@ -338,8 +345,10 @@ export async function bootApp(
     });
 
   return {
+    url: baseUrl,
     get: path => request('GET', path),
     post: (path, body) => request('POST', path, body.toString()),
+    postJson: (path, body) => request('POST', path, JSON.stringify(body), 'application/json'),
     close: () => {
       server.closeAllConnections();
       return new Promise<void>(resolve => server.close(() => resolve()));

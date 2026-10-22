@@ -1,6 +1,5 @@
 import * as path from 'path';
 
-import * as bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import { glob } from 'glob';
@@ -29,7 +28,6 @@ setupDev(app, developmentMode);
 
 app.use(cookieParser());
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
-app.use(bodyParser.json());
 app.use(formBodyMiddleware);
 
 modules.modules.forEach(async moduleName => {

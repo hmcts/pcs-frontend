@@ -10,7 +10,7 @@
 {% set pageHeading = "Review dates" %}
 
 {% block page %}
-  <form method="post" action="{{ formAction }}" novalidate>
+  <form data-order-json method="post" action="{{ formAction }}" novalidate>
     {{ csrfProtection(csrfToken) }}
 
     {% set reviewDatesHtml %}

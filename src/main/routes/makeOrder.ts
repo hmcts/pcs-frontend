@@ -24,6 +24,7 @@ import {
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
+import { orderRedirect } from '@utils/orderRedirect';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
 
@@ -218,9 +219,9 @@ export default function makeOrderRoutes(app: Application): void {
           ...req.session.ordersSentForReview,
           [caseReference]: confirmationHeader(caseReference, started.envelope.caseContext),
         };
-        return res.redirect(MAKE_ORDER_SENT_FOR_REVIEW_ROUTE.replace(':caseReference', caseReference));
+        return orderRedirect(req, res, MAKE_ORDER_SENT_FOR_REVIEW_ROUTE.replace(':caseReference', caseReference));
       }
-      return res.redirect(manageCaseDetailsUrl(caseReference));
+      return orderRedirect(req, res, manageCaseDetailsUrl(caseReference));
     } catch (error) {
       refusedOrderEvent(res, next, error);
     }

@@ -52,6 +52,15 @@ describe('initSessionTimeout', () => {
     </div>
   `;
 
+  it('stops checking the old page when an order validation response replaces it', () => {
+    document.body.innerHTML = buildSessionTimeoutComponent();
+    const stop = initSessionTimeout();
+    stop();
+    mockDateNow.mockReturnValue(60000);
+    jest.advanceTimersByTime(10000);
+    expect(document.getElementById('timeout-modal-container')?.hasAttribute('hidden')).toBe(true);
+  });
+
   it('initializes without throwing errors', () => {
     document.body.innerHTML = buildSessionTimeoutComponent();
     document.body.dataset.sessionTimeout = '6';
