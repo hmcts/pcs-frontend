@@ -19,6 +19,8 @@ import {
   writeInPreview,
 } from './harness';
 
+// The routes read config as they load, so the test does not import them for the message.
+const NO_WORDING = "The order's wording did not load. Reload the page and review the order again";
 const MAKE_ORDER = `/case/${CASE_REFERENCE}/make-order`;
 const BASE = `/case/${CASE_REFERENCE}/confirm-order-review`;
 const INTRO = `${BASE}?orderId=order-awaiting-review&taskId=task-1`;
@@ -293,6 +295,20 @@ describe('confirm order review', () => {
       expect(errors(refused.text)).toEqual(['Enter a valid current rent']);
       await openPage(refused.text);
       expect(control('[name="current-rent"]').value).toBe('a lot');
+    });
+
+    it('does not go on to issue an order whose wording the page did not send, as when its script did not load', async () => {
+      app = await caseworkerReviewing();
+      const page = await openReview(app);
+      const body = page.body('ISSUE');
+      body.set('orderDocument', '');
+
+      const refused = await app.post(REVIEW, body);
+
+      expect(refused.status).toBe(400);
+      expect(errors(refused.text)).toEqual([NO_WORDING]);
+      expect((await app.get(CHECK_YOUR_ANSWERS)).location).toBe(REVIEW);
+      expect(submittedReviews()).toEqual([]);
     });
 
     it('returns the order to the judge with the query, submitting the event the introduction started', async () => {
