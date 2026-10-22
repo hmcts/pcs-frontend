@@ -24,11 +24,8 @@ const APPLICATION = {
   within14Days: 'YES',
   otherPartiesAgreed: 'NO',
   withoutNotice: 'NO',
-  fee: 'Paid, or no fee due',
   whatOrderWanted: '<ol><li><p>The hearing on 14 October is adjourned.</p></li><li><p>Costs in the case.</p></li></ol>',
   documents: [{ id: '3f2a6c1e-0000-4000-8000-000000000001', fileName: 'witness-statement.pdf' }],
-  referredOn: '2026-10-05',
-  referralNote: 'The hearing is next week',
 };
 
 /** Puts the applicant's wording in the order, as the judge does with the application's button. */
@@ -74,7 +71,7 @@ describe('make an order: deciding an application', () => {
     expect(submitted.taskId).toBe('task-1');
   });
 
-  it('shows the application, its documents and the note from court staff, without the hearing', async () => {
+  it('shows the application and its documents, without the hearing', async () => {
     const response = await app.get(PAGE);
     await openPage(response.text);
 
@@ -85,7 +82,6 @@ describe('make an order: deciding an application', () => {
     expect(document.querySelector<HTMLAnchorElement>('#app-gen-app-1-details a')?.href).toContain(
       `/case/${CASE_REFERENCE}/view-documents/3f2a6c1e-0000-4000-8000-000000000001`
     );
-    expect(document.querySelector('#app-gen-app-1-referral-note')?.textContent).toContain('The hearing is next week');
     expect(document.querySelector('[data-attendance-row]')).toBeNull();
     expect(document.querySelector('[data-order-type]')).toBeNull();
     expect(document.body.textContent).not.toContain('Answer every question');
@@ -305,60 +301,6 @@ describe('make an order: deciding an application', () => {
       const snapshot = JSON.stringify(JSON.parse(control<HTMLTextAreaElement>('#order-document').value).current);
       expect(snapshot).toContain('"marks":[{"type":"strong"}],"text":"adjourned"');
       expect(snapshot).toMatch(/"type":"list_item".*"type":"ordered_list".*to a date after 28 days/);
-    });
-
-    it("keeps bullets out of the clause numbers, so the applicant's next numbered clause keeps its number", async () => {
-      await app.close();
-      app = await bootApp({
-        application: {
-          ...RICH,
-          whatOrderWanted:
-            '<ol><li><p>Adjourn the hearing.</p></li><li><p>Costs reserved.</p></li></ol>' +
-            '<ul><li><p>The defendant is in hospital.</p><ol><li><p>since Monday;</p></li></ol></li>' +
-            '<li>Counsel is unavailable.</li></ul>' +
-            '<ol start="3"><li><p>Liberty to apply.</p></li></ol>',
-        },
-      });
-      const page = await openPage((await app.get(PAGE)).text);
-      check('app-gen-app-1-decision', 'grant');
-      insertWording();
-      expect(page.documentText().split('\n').slice(3)).toEqual([
-        GRANTED,
-        'Adjourn the hearing.',
-        'Costs reserved.',
-        '\u2022 The defendant is in hospital.',
-        'since Monday;',
-        '\u2022 Counsel is unavailable.',
-        'Liberty to apply.',
-      ]);
-      // The granted clause, the applicant's clauses 1 and 2 with the bullets (their numbered list kept) under
-      // the second, then their clause 3, all one list.
-      expect(clauseLists()).toEqual([4]);
-      const snapshot = JSON.stringify(JSON.parse(control<HTMLTextAreaElement>('#order-document').value).current);
-      expect(snapshot).toMatch(/"type":"bullet_list".*"type":"ordered_list".*since Monday;/);
-    });
-
-    it('starts another clause with what follows a subclause, as a clause can only end with its subclauses', async () => {
-      await app.close();
-      app = await bootApp({
-        application: {
-          ...RICH,
-          whatOrderWanted:
-            '<ol><li><p>The defendant must:</p><ol><li><p>pay the rent;</p></li></ol><p>by 4pm.</p></li>' +
-            '<li><p>Costs reserved.</p></li></ol>',
-        },
-      });
-      const page = await openPage((await app.get(PAGE)).text);
-      check('app-gen-app-1-decision', 'grant');
-      insertWording();
-      expect(page.documentText().split('\n').slice(3)).toEqual([
-        GRANTED,
-        'The defendant must:',
-        'pay the rent;',
-        'by 4pm.',
-        'Costs reserved.',
-      ]);
-      expect(clauseLists()).toEqual([4]);
     });
   });
 

@@ -25,7 +25,6 @@ export interface OrderCaseContext {
   claimants: OrderParty[];
   defendants: OrderParty[];
   openCounterclaim?: boolean;
-  openApplication?: boolean;
   /** The case's open applications, each of which an order made at a hearing can decide, oldest first. */
   applications?: OrderApplication[];
   /** The general application an order made on one, as box work, decides. */
@@ -46,11 +45,8 @@ export interface OrderApplication {
   otherPartiesAgreed?: 'YES' | 'NO' | null;
   withoutNotice?: 'YES' | 'NO' | null;
   withoutNoticeReason?: string | null;
-  fee?: string | null;
   whatOrderWanted?: string | null;
   documents: { id: string; fileName: string }[];
-  referredOn?: string | null;
-  referralNote?: string | null;
 }
 
 /** A judicial note on the case, with the hearing it was made at, if any. */

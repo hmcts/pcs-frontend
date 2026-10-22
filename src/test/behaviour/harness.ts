@@ -248,7 +248,6 @@ export async function bootApp(
     defendants?: { id: string; name: string }[];
     /** Whether the case has an open counterclaim or application. */
     openCounterclaim?: boolean;
-    openApplication?: boolean;
     /** The order pcs-api starts the event with, over a blank one. */
     order?: Partial<Envelope['order']>;
     /** The general application court staff referred to the judge, which the judge's order decides. */
@@ -264,7 +263,6 @@ export async function bootApp(
     envelope.caseContext.defendants = options.defendants;
   }
   envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
-  envelope.caseContext.openApplication = options.openApplication ?? false;
   envelope.order = { ...envelope.order, ...options.order };
   if (options.applications) {
     envelope.caseContext.applications = options.applications;
