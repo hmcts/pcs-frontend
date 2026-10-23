@@ -21,11 +21,11 @@
       classes: 'pcs-fee-summary-list',
       rows: [
         {
-          key: { text: counterClaimAmountLabel },
+          key: { text: counterClaimAmountLabel or notApplicable},
           value: { text: formattedCounterClaimAmount or notApplicable }
         },
         {
-          key: { text: counterClaimFeeLabel },
+          key: { text: counterClaimFeeLabel},
           value: { text: formattedCounterClaimFee }
         }
       ]
