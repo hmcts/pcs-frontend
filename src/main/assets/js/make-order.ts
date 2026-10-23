@@ -380,6 +380,13 @@ export function initMakeOrder(): void {
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
+  // Keep JSON in the editor field; encode only the value in the outgoing form data.
+  form.addEventListener('formdata', ({ formData }) => {
+    formData.set(
+      'orderDocument',
+      new TextEncoder().encode(documentField.value).toBase64({ alphabet: 'base64url', omitPadding: true })
+    );
+  });
 
   selectOrderType(orderingOnClaim() ? (tabType() ?? (orderTypeField.value as OrderType)) : 'NO_ORDER_ON_CLAIM');
   initApplicationDecisions(form);

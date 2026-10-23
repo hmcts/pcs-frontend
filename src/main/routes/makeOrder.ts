@@ -21,6 +21,7 @@ import {
   type OrderStart,
   caseHeader,
   confirmationHeader,
+  decodeOrderDocument,
   manageCaseDetailsUrl,
   postedSnapshot,
   refusalPage,
@@ -151,9 +152,10 @@ export default function makeOrderRoutes(app: Application): void {
       hearing: _hearing,
       hearingVersion = '',
       orderType,
-      orderDocument,
+      orderDocument: encodedDocument,
       ...formData
     } = req.body;
+    const orderDocument = decodeOrderDocument(encodedDocument);
 
     try {
       // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
