@@ -435,6 +435,19 @@ describe('confirm order review', () => {
       expect(submittedReviews()).toEqual([]);
     });
 
+    it('returns the order to the judge with a query of 30,000 characters, as typed', async () => {
+      app = await caseworkerReviewing();
+      const page = await openReview(app);
+      const query = 'Which defendant; paragraph 2 & "costs" (£250)?\n'.repeat(700).slice(0, 30000);
+      check('send-query', 'yes');
+      type('query-to-judge', query);
+
+      const returned = await app.post(REVIEW, page.body('RETURN_TO_JUDGE'));
+
+      expect(returned.location).toBe(`${BASE}/confirmed`);
+      expect(submittedReviews()).toMatchObject([{ action: 'RETURN_TO_JUDGE', queryToJudge: query }]);
+    });
+
     it('does not return the order to the judge with a query of more than 30,000 characters', async () => {
       app = await caseworkerReviewing();
       await app.get(INTRO);
