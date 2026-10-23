@@ -249,9 +249,10 @@ describe('confirm order review', () => {
       expect(page.querySelector('#edited-warning')).toBeNull();
     });
 
-    it('does not ask staff to match fields to the preview of an order deciding an application', async () => {
-      const order = await judgesOrder({ edit: () => writeInPreview('Adjourn the hearing for 28 days.') });
-      app = await caseworkerReviewing({ ...order, orderType: 'APPLICATION_DECISION' });
+    it('does not ask staff to match fields to wording the judge only added', async () => {
+      app = await caseworkerReviewing(
+        await judgesOrder({ edit: () => writeInPreview('Adjourn the hearing for 28 days.') })
+      );
 
       const page = parse((await app.get(INTRO)).text);
 

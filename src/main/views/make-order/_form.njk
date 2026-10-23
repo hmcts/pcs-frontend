@@ -10,17 +10,13 @@
 {% import "make-order/_application.njk" as applicationRow with context %}
 
 {#
-  The screen follows what the order is for. Made on one application, as box work: that application and the decision
-  on it, without the possession order types. Otherwise the hearing's facts and who attended for an order made at a
-  hearing, neither for one made without a hearing, then each open application the order may decide, then every order
-  type for the claim. With an application open, the claim's order types wait behind a tick box: the judges (22 October
-  2026) said an application is nearly always decided without the claim being, so the judge chooses to order on it.
+  One screen, whatever the order is for: the hearing's facts and who attended for an order made at a hearing, then
+  each open application the order may decide, then every order type for the claim. With an application open, the
+  claim's order types wait behind a tick box: the judges (22 October 2026) said an application is nearly always
+  decided without the claim being, so the judge chooses to order on it.
 #}
-{% if application %}
-  {{ applicationRow.row(application, true) }}
-{% else %}
-{# Only an order made for a hearing has the case's facts and the hearing's note. #}
-{% if hearing %}
+{# Only the judge making an order for a hearing records its facts and note. #}
+{% if hearing.caseFacts %}
   {% include "make-order/_case-facts.njk" %}
 {% endif %}
 {% if not withoutHearing %}
@@ -63,7 +59,7 @@
   <section class="pcs-applications" aria-labelledby="applications-heading" data-applications>
     <h2 class="govuk-heading-l govuk-!-margin-top-6" id="applications-heading">Applications</h2>
     {% for item in applications %}
-      {{ applicationRow.row(item, false) }}
+      {{ applicationRow.row(item) }}
     {% endfor %}
   </section>
 {% endif %}
@@ -121,7 +117,6 @@
   {% endfor %}
 </div>
 </div>
-{% endif %}
 
 {% include "make-order/_costs.njk" %}
 

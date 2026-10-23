@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 
 import { parseDate, parseMoney } from '@utils/makeOrderFormat';
 import {
-  AT_HEARING_ORDER_TYPES,
+  type ApplicationToDecide,
   type AttendanceParty,
   type MakeOrderType,
   applicationPrefix,
@@ -11,7 +11,6 @@ import type { FormData, OrderApplication, OrderHearing, OrderParty, OrderStart }
 import { richTextHtml } from '@utils/richText';
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
-const APPLICATION_ORDER_TYPE: MakeOrderType = 'APPLICATION_DECISION';
 const WITHOUT_HEARING_ORDER_TYPE: MakeOrderType = 'FREE_FORM';
 /** An order on the applications alone, which with one open is where the screen starts. */
 const NO_CLAIM_ORDER_TYPE: MakeOrderType = 'NO_ORDER_ON_CLAIM';
@@ -28,13 +27,11 @@ function displayDate(iso?: string | null): string | undefined {
  * it asks for is shown as the applicant formatted it, and is HTML to use only when they wrote rich text. Its
  * answers on the form start with its prefix, so each application the order can decide keeps its own.
  */
-function applicationModel(application: OrderApplication, caseReference: number) {
+function applicationModel(application: OrderApplication & ApplicationToDecide, caseReference: number) {
   const href = (id: string): string => `/case/${caseReference}/view-documents/${encodeURIComponent(id)}`;
   return {
     ...application,
     prefix: applicationPrefix(application),
-    // What a "something else" application is for, in the applicant's words, which its order recites.
-    purpose: application.somethingElseDetails || application.type,
     whatOrderWantedHtml: richTextHtml(application.whatOrderWanted),
     documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
     submittedOnDisplay: displayDate(application.submittedOn),
@@ -153,19 +150,18 @@ interface AttendanceRow extends AttendanceParty {
 }
 
 /**
- * Whether the order records who attended a hearing: one made for a hearing, or one that already says who attended,
- * as an order a caseworker reviews does. Any other order is made without a hearing, so asks no one's attendance.
+ * The case's open applications the order can decide, the one the judge's task asked them to decide first: that
+ * one they must decide, and the others they may leave as they are.
  */
-export function recordsAttendance(hearing: OrderHearing | null | undefined, formData: FormData = {}): boolean {
-  return Boolean(hearing) || Object.keys(formData).some(field => field.endsWith('-attendance'));
-}
-
-/**
- * The applications the order can decide: the one it is made on as box work, or every open application for an
- * order made at a hearing, or without one on the case.
- */
-export function applicationsToDecide({ caseContext }: Pick<OrderStart, 'caseContext'>): OrderApplication[] {
-  return caseContext.application ? [caseContext.application] : (caseContext.applications ?? []);
+export function applicationsToDecide({
+  caseContext,
+  taskGenAppId,
+}: Pick<OrderStart, 'caseContext' | 'taskGenAppId'>): (OrderApplication & ApplicationToDecide)[] {
+  const applications = (caseContext.applications ?? []).map(application => ({
+    ...application,
+    required: application.id === taskGenAppId,
+  }));
+  return [...applications.filter(a => a.required), ...applications.filter(a => !a.required)];
 }
 
 export function attendanceParties({ caseContext }: OrderStart): AttendanceRow[] {
@@ -193,31 +189,25 @@ export interface OrderFormSubmission {
  */
 export function orderFormModel(start: OrderStart, submission?: OrderFormSubmission): Record<string, unknown> {
   const { caseContext, order, hearing } = start;
-  // A hearing's facts and note are pcs-api's record of the hearing, kept apart from the order.
-  const recorded: FormData = hearing
+  const applications = applicationsToDecide(start);
+  // A hearing's facts and note are pcs-api's record of the hearing, kept apart from the order. The caseworker's
+  // review is sent the hearing without them.
+  const recorded: FormData = hearing?.caseFacts
     ? { ...caseFactsFormData(hearing.caseFacts), 'hearing-notes': hearing.note ?? '' }
     : {};
   const draft: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
-  const atHearing = recordsAttendance(hearing, draft);
   // With an application open the order starts as one on the applications alone, the claim's order types waiting
   // behind a tick box (judicial feedback, 22 October 2026).
-  const orderType =
-    submission?.orderType ??
-    order.orderType ??
-    (caseContext.application
-      ? APPLICATION_ORDER_TYPE
-      : applicationsToDecide(start).length
-        ? NO_CLAIM_ORDER_TYPE
-        : atHearing
-          ? DEFAULT_ORDER_TYPE
-          : WITHOUT_HEARING_ORDER_TYPE);
+  const defaultOrderType = applications.length
+    ? NO_CLAIM_ORDER_TYPE
+    : hearing
+      ? DEFAULT_ORDER_TYPE
+      : WITHOUT_HEARING_ORDER_TYPE;
   return {
     draft,
-    // A possession order saved without a hearing, from before the screen stopped offering one, opens on free form.
-    draftOrderType: !atHearing && AT_HEARING_ORDER_TYPES.includes(orderType) ? WITHOUT_HEARING_ORDER_TYPE : orderType,
-    // The screen follows what the order is for: an application's decision, a hearing's record and every order type,
-    // or every order type made without a hearing, with no one's attendance.
-    withoutHearing: !atHearing,
+    draftOrderType: submission?.orderType ?? order.orderType ?? defaultOrderType,
+    // Made at a hearing, the order records its facts and who attended, and may order possession.
+    withoutHearing: !hearing,
     orderDocumentJson:
       submission?.orderDocumentJson ?? (order.docweaveSnapshot ? JSON.stringify(order.docweaveSnapshot) : ''),
     draftValue: (name: string): unknown => draft[name],
@@ -232,13 +222,7 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     // Every party, for the wording of an order made without anyone's attendance to name them.
     orderParties: attendanceParties(start).map(({ partyId, name, type }) => ({ id: partyId, name, type })),
     openCounterclaim: caseContext.openCounterclaim === true,
-    // Made on one application, the order decides that one; otherwise it may decide any that are open.
-    application: caseContext.application
-      ? applicationModel(caseContext.application, caseContext.caseReference)
-      : undefined,
-    applications: applicationsToDecide(start).map(application =>
-      applicationModel(application, caseContext.caseReference)
-    ),
+    applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
     ...hearingModel(hearing),
   };
 }

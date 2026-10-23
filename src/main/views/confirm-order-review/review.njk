@@ -18,8 +18,7 @@
   <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
         data-property-address="{{ propertyAddressDisplay }}"
         data-parties="{{ orderParties | dump }}"
-        {%- if withoutHearing and not application %} data-without-hearing{% endif %}
-        {%- if application %} data-box-work{% endif %}>
+        {%- if withoutHearing %} data-without-hearing{% endif %}>
     {{ csrfProtection(csrfToken) }}
     <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
 

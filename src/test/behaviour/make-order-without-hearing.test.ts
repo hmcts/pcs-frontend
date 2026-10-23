@@ -50,7 +50,6 @@ describe('make an order: without a hearing or an application', () => {
     expect((await app.post(PAGE, body)).status).toBe(302);
     const [submitted] = submittedOrders() as { order: Record<string, unknown> }[];
     expect(submitted.order.orderType).toBe('FREE_FORM');
-    expect(submitted.order.genAppId).toBeNull();
   });
 
   it('refuses a possession order sent without a hearing', async () => {
@@ -110,15 +109,25 @@ describe('make an order: without a hearing or an application', () => {
     ]);
   });
 
-  it('transfers enforcement from an order that decides only applications', async () => {
+  it('transfers enforcement from an order that decides only applications, and keeps it on ordering on the claim', async () => {
     await app.close();
     app = await bootApp({ hearing: null, applications: [APPLICATION] });
     const page = await openPage((await app.get(PAGE)).text);
     check('transfer-enforcement', 'yes');
     check('transfer-enforcement-court', 'kings-bench');
-    expect(page.orderText()).toContain(
-      "Enforcement of the Order of Possession is transferred to the High Court, King's Bench Division, pursuant to section 42 of the County Courts Act 1984."
-    );
+    const transfer =
+      "Enforcement of the Order of Possession is transferred to the High Court, King's Bench Division, pursuant to section 42 of the County Courts Act 1984.";
+    expect(page.documentText()).toContain(transfer);
+
+    check('claim-order', 'yes');
+    selectTab('tab-adjournment');
+    check('adj-type', 'generally');
+    const lines = page.documentText().split('\n');
+    expect(lines.slice(lines.indexOf('IT IS ORDERED THAT:'))).toEqual([
+      'IT IS ORDERED THAT:',
+      'The claim is adjourned generally with liberty to restore by application by any party on notice to all other parties.',
+      transfer,
+    ]);
   });
 
   it('lists a hearing on notice from a free form order, asking when as an adjournment does', async () => {

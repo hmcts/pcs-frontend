@@ -6,21 +6,22 @@ describe('make an order: outright possession', () => {
   let app: TestApp;
   afterEach(() => app.close());
 
-  it('is only available to judges', async () => {
-    app = await bootApp({ judge: false });
+  it.each([
+    ['someone who is not a judge', { judge: false }],
+    ['anyone while its feature flag is off', { makeOrderEnabled: false }],
+    ['a caseworker, whom CCD does not let make an order', { caseworker: true }],
+  ])('does not exist for %s', async (_who, options) => {
+    app = await bootApp(options);
     expect((await app.get(PAGE)).status).toBe(404);
-    expect((await app.get('/docweave/templates')).status).toBe(404);
   });
 
-  it('does not exist while its feature flag is off', async () => {
-    app = await bootApp({ makeOrderEnabled: false });
-    expect((await app.get(PAGE)).status).toBe(404);
-    expect((await app.get('/docweave/templates')).status).toBe(404);
-  });
-
-  it('is refused to a caseworker, whom CCD does not let make an order', async () => {
-    app = await bootApp({ caseworker: true });
-    expect((await app.get(PAGE)).status).toBe(404);
+  it('serves the order templates to neither a citizen nor anyone while the flag is off', async () => {
+    for (const options of [{ judge: false }, { makeOrderEnabled: false }]) {
+      app = await bootApp(options);
+      expect((await app.get('/docweave/templates')).status).toBe(404);
+      await app.close();
+    }
+    app = await bootApp();
   });
 
   it('is launched from the Manage Case event link', async () => {

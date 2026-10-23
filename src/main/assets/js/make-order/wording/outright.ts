@@ -1,15 +1,13 @@
-import { type DocWeaveDocument, buildDoc } from '@hmcts-cft/docweave';
+import { type OrderedListBuilder } from '@hmcts-cft/docweave';
 
 import { formatMoney, parseMoney } from '../../../../utils/makeOrderFormat';
 import { type OrderData } from '../data';
 
-import { addApplicationDecisions } from './application';
 import {
   AMOUNT_NOT_PROVIDED,
   type CostsWording,
   addCosts,
   addPaymentTerm,
-  addPreamble,
   date,
   hasCosts,
   money,
@@ -35,7 +33,7 @@ const OUTRIGHT_COSTS: CostsWording = {
   missing: '[costs order not provided]',
 };
 
-export function buildOutrightOrder(data: OrderData): DocWeaveDocument {
+export function addOutrightClauses(list: OrderedListBuilder, data: OrderData): void {
   const address = data.propertyAddress || '[property address not provided]';
   const claimants = partyNames(data.claimants, 'the claimant(s)');
   const defendants = partyNames(data.defendants, 'the defendant(s)');
@@ -43,117 +41,111 @@ export function buildOutrightOrder(data: OrderData): DocWeaveDocument {
   const sections = options.includes('money-judgment') ? values(data, 'outright-mj-sections') : [];
   const plans = sections.includes('payment-plan') ? values(data, 'outright-mj-plan') : [];
 
-  return buildDoc(order => {
-    addPreamble(order, data);
-    order.orderedList('outright-clauses', list => {
-      const possession = value(data, 'outright-possession');
-      if (possession) {
-        list.item('possession', content => {
-          content
-            .text('The defendant(s) must give up possession of ')
-            .fact('address', address)
-            .text(' to the claimant(s) ');
-          if (possession === 'forthwith') {
-            content.fact('deadline', 'forthwith', { sourceId: 'outright-possession' });
-          } else {
-            content
-              .text('on or before ')
-              .fact('deadline', date(data, 'outright-by-date'), { sourceId: 'outright-by-date' });
-          }
-          content.text('.');
-        });
+  const possession = value(data, 'outright-possession');
+  if (possession) {
+    list.item('possession', content => {
+      content
+        .text('The defendant(s) must give up possession of ')
+        .fact('address', address)
+        .text(' to the claimant(s) ');
+      if (possession === 'forthwith') {
+        content.fact('deadline', 'forthwith', { sourceId: 'outright-possession' });
+      } else {
+        content
+          .text('on or before ')
+          .fact('deadline', date(data, 'outright-by-date'), { sourceId: 'outright-by-date' });
       }
-      const groundsType = value(data, 'outright-grounds-type');
-      if (groundsType) {
-        list.item('grounds', content => {
-          const details = value(data, 'outright-grounds-details');
-          content
-            .text('This order for possession was made on ')
-            .fact('type', groundsType, { sourceId: 'outright-grounds-type' })
-            .text(' grounds');
-          if (details) {
-            content.text(', namely ').fact('details', details, { sourceId: 'outright-grounds-details' });
-          }
-          content.text('.');
-        });
-      }
-      if (sections.includes('arrears')) {
-        list.item('money-judgment', content => {
-          const arrears = parseMoney(value(data, 'outright-mj-arrears'));
-          const interestText = value(data, 'outright-mj-interest');
-          const interest = parseMoney(interestText);
-          // Interest the judge gave but the order cannot read leaves the total unknown, not the arrears alone.
-          const total =
-            arrears !== undefined && (!interestText || interest !== undefined)
-              ? formatMoney(arrears + (interest ?? 0))
-              : AMOUNT_NOT_PROVIDED;
-          content
-            .text(`Judgment for the claimant(s) in the ${interestText ? 'total ' : ''}sum of £`)
-            .fact('amount', total, { sourceId: 'outright-mj-amounts' })
-            .text('.');
-        });
-      }
-      if (options.includes('use-occupation')) {
-        list.item('use-occupation', content => {
-          content
-            .fact('defendants', defendants)
-            .text(' must pay to ')
-            .fact('claimants', claimants)
-            .text(' £')
-            .fact('rate', money(value(data, 'outright-use-occupation-rate')), {
-              sourceId: 'outright-use-occupation-rate',
-            })
-            .text(' per day for damages for unlawful occupation from ')
-            .fact('date', date(data, 'outright-use-occupation-from-date'), {
-              sourceId: 'outright-use-occupation-from-date',
-            })
-            .text(` until possession of the property is given to ${claimants}.`);
-        });
-      }
-      if (hasCosts(data, OUTRIGHT_COSTS)) {
-        list.item('costs', content => addCosts(content, data, OUTRIGHT_COSTS));
-      }
-      if (plans.includes('lump') || plans.includes('instalments')) {
-        list.item('payment-terms', content => {
-          content.text('The above sums must be paid by the defendant(s) to the claimant(s) ');
-          if (plans.includes('lump')) {
-            addPaymentTerm(content, data, {
-              kind: 'one-off',
-              lead: 'by a payment of £',
-              fields: { amount: 'outright-mj-lump-amount', date: 'outright-mj-lump-date' },
-              facts: 'lump',
-            });
-            if (selected(data, 'outright-mj-balance', 'yes')) {
-              content.text(' and the balance by ').fact('balance-date', date(data, 'outright-mj-balance-date'), {
-                sourceId: 'outright-mj-balance-date',
-              });
-            }
-          }
-          if (plans.includes('lump') && plans.includes('instalments')) {
-            content.text(', and ');
-          }
-          if (plans.includes('instalments')) {
-            addPaymentTerm(content, data, {
-              kind: 'instalments',
-              lead: 'by instalment payments of £',
-              fields: {
-                amount: 'outright-mj-inst-amount',
-                frequency: 'outright-mj-inst-freq',
-                date: 'outright-mj-inst-date',
-              },
-              facts: 'instalment',
-            });
-          }
-          content.text('.');
-        });
-      }
-      if (options.includes('transfer-high-court')) {
-        list.item(
-          'high-court-transfer',
-          'The order for possession is transferred to the High Court solely for the purpose of enforcement.'
-        );
-      }
+      content.text('.');
     });
-    addApplicationDecisions(order, data);
-  });
+  }
+  const groundsType = value(data, 'outright-grounds-type');
+  if (groundsType) {
+    list.item('grounds', content => {
+      const details = value(data, 'outright-grounds-details');
+      content
+        .text('This order for possession was made on ')
+        .fact('type', groundsType, { sourceId: 'outright-grounds-type' })
+        .text(' grounds');
+      if (details) {
+        content.text(', namely ').fact('details', details, { sourceId: 'outright-grounds-details' });
+      }
+      content.text('.');
+    });
+  }
+  if (sections.includes('arrears')) {
+    list.item('money-judgment', content => {
+      const arrears = parseMoney(value(data, 'outright-mj-arrears'));
+      const interestText = value(data, 'outright-mj-interest');
+      const interest = parseMoney(interestText);
+      // Interest the judge gave but the order cannot read leaves the total unknown, not the arrears alone.
+      const total =
+        arrears !== undefined && (!interestText || interest !== undefined)
+          ? formatMoney(arrears + (interest ?? 0))
+          : AMOUNT_NOT_PROVIDED;
+      content
+        .text(`Judgment for the claimant(s) in the ${interestText ? 'total ' : ''}sum of £`)
+        .fact('amount', total, { sourceId: 'outright-mj-amounts' })
+        .text('.');
+    });
+  }
+  if (options.includes('use-occupation')) {
+    list.item('use-occupation', content => {
+      content
+        .fact('defendants', defendants)
+        .text(' must pay to ')
+        .fact('claimants', claimants)
+        .text(' £')
+        .fact('rate', money(value(data, 'outright-use-occupation-rate')), {
+          sourceId: 'outright-use-occupation-rate',
+        })
+        .text(' per day for damages for unlawful occupation from ')
+        .fact('date', date(data, 'outright-use-occupation-from-date'), {
+          sourceId: 'outright-use-occupation-from-date',
+        })
+        .text(` until possession of the property is given to ${claimants}.`);
+    });
+  }
+  if (hasCosts(data, OUTRIGHT_COSTS)) {
+    list.item('costs', content => addCosts(content, data, OUTRIGHT_COSTS));
+  }
+  if (plans.includes('lump') || plans.includes('instalments')) {
+    list.item('payment-terms', content => {
+      content.text('The above sums must be paid by the defendant(s) to the claimant(s) ');
+      if (plans.includes('lump')) {
+        addPaymentTerm(content, data, {
+          kind: 'one-off',
+          lead: 'by a payment of £',
+          fields: { amount: 'outright-mj-lump-amount', date: 'outright-mj-lump-date' },
+          facts: 'lump',
+        });
+        if (selected(data, 'outright-mj-balance', 'yes')) {
+          content.text(' and the balance by ').fact('balance-date', date(data, 'outright-mj-balance-date'), {
+            sourceId: 'outright-mj-balance-date',
+          });
+        }
+      }
+      if (plans.includes('lump') && plans.includes('instalments')) {
+        content.text(', and ');
+      }
+      if (plans.includes('instalments')) {
+        addPaymentTerm(content, data, {
+          kind: 'instalments',
+          lead: 'by instalment payments of £',
+          fields: {
+            amount: 'outright-mj-inst-amount',
+            frequency: 'outright-mj-inst-freq',
+            date: 'outright-mj-inst-date',
+          },
+          facts: 'instalment',
+        });
+      }
+      content.text('.');
+    });
+  }
+  if (options.includes('transfer-high-court')) {
+    list.item(
+      'high-court-transfer',
+      'The order for possession is transferred to the High Court solely for the purpose of enforcement.'
+    );
+  }
 }
