@@ -83,8 +83,16 @@ describe('make an order: drafting', () => {
     const page = await openPage((await app.get(PAGE)).text);
     const body = page.body();
     body.set('action', 'SAVE_DRAFT');
-    body.set('orderDocument', '{"schema":"docweave-document","version":1}');
+    body.set('orderDocument', Buffer.from('{"schema":"docweave-document","version":1}').toString('base64url'));
 
+    expect((await app.post(PAGE, body)).status).toBe(400);
+    expect(submittedOrders()).toHaveLength(0);
+  });
+
+  it.each(['not-base64!', 'a', '_w'])('rejects malformed or non-UTF8 document encoding: %s', async value => {
+    const page = await openPage((await app.get(PAGE)).text);
+    const body = page.body('SAVE_DRAFT');
+    body.set('orderDocument', value);
     expect((await app.post(PAGE, body)).status).toBe(400);
     expect(submittedOrders()).toHaveLength(0);
   });
@@ -182,10 +190,14 @@ describe('make an order: drafting', () => {
     const page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-free-form');
     // The wording goes once into the document now, rather than also in a text box.
-    const wording = 'The parties shall exchange evidence within fourteen days. '.repeat(2000).trim();
+    const wording = 'The parties shall exchange evidence — café £100 🏠. '.repeat(2000).trim();
     writeInPreview(wording);
 
+    const original = control<HTMLTextAreaElement>('#order-document').value;
     const body = page.body();
+    expect(body.get('orderDocument')).toBe(Buffer.from(original).toString('base64url'));
+    expect(control<HTMLTextAreaElement>('#order-document').value).toBe(original);
+    expect(page.body().get('orderDocument')).toBe(body.get('orderDocument'));
     body.set('action', 'SAVE_DRAFT');
     // Well past the 100kb that the application's other forms are held to.
     expect(body.toString().length).toBeGreaterThan(100 * 1024);
