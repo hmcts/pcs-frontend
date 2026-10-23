@@ -1,0 +1,32 @@
+{% extends "confirm-order-review/_layout.njk" %}
+
+{% from "macros/csrf.njk" import csrfProtection %}
+{% import "confirm-order-review/_buttons.njk" as buttons with context %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set pageHeading = "Check your answers" %}
+
+{% block page %}
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+
+    {% for section in sections %}
+      <h2 class="govuk-heading-m">{{ section.heading }}</h2>
+      {% set rows = [] %}
+      {% for row in section.rows %}
+        {# Answers come from the caseworker and the claim, so each line is escaped. #}
+        {% set valueHtml %}
+          <span class="pcs-preserve-lines">{% for line in row.lines %}{{ line }}{% if not loop.last %}<br>{% endif %}{% endfor %}</span>
+        {% endset %}
+        {% set rows = (rows.push({
+          key: { text: row.key },
+          value: { html: valueHtml },
+          actions: { items: [{ href: section.href, text: "Change", visuallyHiddenText: row.hiddenText }] }
+        }), rows) %}
+      {% endfor %}
+      {{ govukSummaryList({ rows: rows, attributes: { id: section.id } }) }}
+    {% endfor %}
+
+    {{ buttons.eventButtons("Submit") }}
+  </form>
+{% endblock %}

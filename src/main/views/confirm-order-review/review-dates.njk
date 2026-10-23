@@ -1,0 +1,84 @@
+{% extends "confirm-order-review/_layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% import "confirm-order-review/_buttons.njk" as buttons with context %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% set pageHeading = "Review dates" %}
+
+{% block page %}
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+
+    {% set reviewDatesHtml %}
+      {% for reviewDate in reviewDates %}
+        {% set n = loop.index %}
+        {% set prefix = "review-date-" + n %}
+        <fieldset class="govuk-fieldset pcs-review-date" id="{{ prefix }}">
+          <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Review date {{ n }}</legend>
+          {{ govukDateInput({
+            id: prefix + "-date",
+            namePrefix: prefix + "-date",
+            fieldset: { legend: { text: "Date of review", classes: "govuk-fieldset__legend--s" } },
+            hint: { text: "For example, 27 3 2027" },
+            errorMessage: validationErrors[prefix + "-date-day"],
+            items: [
+              { id: prefix + "-date-day", name: "day", label: "Day", classes: "govuk-input--width-2", value: reviewDate.day },
+              { name: "month", label: "Month", classes: "govuk-input--width-2", value: reviewDate.month },
+              { name: "year", label: "Year", classes: "govuk-input--width-4", value: reviewDate.year }
+            ]
+          }) }}
+          {% set reasonItems = [] %}
+          {% for reason in reasons %}
+            {% set reasonItems = (reasonItems.push({ value: reason.value, text: reason.text, checked: reviewDate.reason == reason.value }), reasonItems) %}
+          {% endfor %}
+          {{ govukRadios({
+            name: prefix + "-reason",
+            idPrefix: prefix + "-reason",
+            fieldset: { legend: { text: "Reason", classes: "govuk-fieldset__legend--s" } },
+            errorMessage: validationErrors[prefix + "-reason"],
+            items: reasonItems
+          }) }}
+          {{ govukCharacterCount({
+            name: prefix + "-description",
+            id: prefix + "-description",
+            maxlength: maxDescriptionLength,
+            label: { text: "Description of review", classes: "govuk-label--s" },
+            value: reviewDate.description,
+            errorMessage: validationErrors[prefix + "-description"]
+          }) }}
+          {% if answers.reviewDates.length %}
+            {{ govukButton({
+              text: "Remove",
+              classes: "govuk-button--secondary",
+              name: "action",
+              value: "remove-" + n,
+              attributes: { "aria-label": "Remove review date " + n }
+            }) }}
+          {% endif %}
+        </fieldset>
+      {% endfor %}
+      {% if canAddReviewDate %}
+        {{ govukButton({ text: "Add new", classes: "govuk-button--secondary", name: "action", value: "add" }) }}
+      {% else %}
+        <p class="govuk-body">You can add up to 10 review dates.</p>
+      {% endif %}
+    {% endset %}
+
+    {{ govukRadios({
+      name: "has-review-dates",
+      idPrefix: "has-review-dates",
+      fieldset: { legend: { text: "Are there any review dates to add?", classes: "govuk-fieldset__legend--m" } },
+      errorMessage: validationErrors["has-review-dates"],
+      items: [
+        { value: "yes", text: "Yes", checked: answers.hasReviewDates == "yes", conditional: { html: reviewDatesHtml } },
+        { value: "no", text: "No", checked: answers.hasReviewDates == "no" }
+      ]
+    }) }}
+
+    {{ buttons.eventButtons() }}
+  </form>
+{% endblock %}
