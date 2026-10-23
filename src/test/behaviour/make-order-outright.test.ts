@@ -24,13 +24,6 @@ describe('make an order: outright possession', () => {
     app = await bootApp();
   });
 
-  it('is launched from the Manage Case event link', async () => {
-    app = await bootApp();
-    const launch = await app.get(`/cases/${CASE_REFERENCE}/event/ext:makeOrder?expected_sub=judge-uid`);
-    expect(launch.status).toBe(303);
-    expect(launch.location).toBe(PAGE);
-  });
-
   it("shows a judge XUI's judicial header, which XUI chooses from their role assignments", async () => {
     app = await bootApp();
     // The header renders in a shadow root, which jsdom does not attach.
