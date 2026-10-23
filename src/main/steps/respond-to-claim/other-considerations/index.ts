@@ -1,8 +1,19 @@
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
+import { RadioFormField } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CaseData, YesNoValue } from '@services/ccdCase.interface';
+
+type RadioFormFieldWithClasses = RadioFormField & {
+  component: RadioFormField['component'] & {
+    fieldset: {
+      legend: {
+        classes?: string
+      }
+    };
+  };
+};
 
 export const step: StepDefinition = createRespondToClaimFormStep({
   stepName: 'other-considerations',
@@ -56,12 +67,30 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return { otherConsiderations: 'NO' };
   },
+  extendGetContent: (req, formContent) => {
+    const radioField = formContent.fields.find(f => f.componentType === 'radios') as
+      ((typeof formContent.fields)[number] & RadioFormFieldWithClasses) | undefined;
+    const legalRep = req.res?.locals.isLegalRepresentative === true;
+
+    if (radioField?.component) {
+      radioField.component.fieldset.legend.isPageHeading = !legalRep;
+      if (legalRep) {
+        radioField.component.fieldset.legend.classes = 'govuk-fieldset__legend--m';
+        radioField.component.fieldset.legend.text = (formContent.question as string);
+        formContent.question = '';
+      } else {
+        formContent.heading = '';
+      }
+    }
+    formContent.isPageHeading = !legalRep;
+
+    return {};
+  },
   fields: [
     {
       name: 'otherConsiderations',
       type: 'radio',
       required: true,
-      isPageHeading: true,
       legendClasses: 'govuk-fieldset__legend--l',
       translationKey: {
         label: 'heading',
