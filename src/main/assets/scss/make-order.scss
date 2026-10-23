@@ -132,21 +132,69 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   }
 }
 
-// Match the notes field to the facts grid on desktop.
-@include govuk-media-query($from: desktop) {
-  .pcs-case-facts__layout > .govuk-form-group {
-    display: flex;
-    flex-direction: column;
+// The hearing the facts are for, and whose facts they started from.
+.pcs-case-facts__source {
+  margin: govuk-spacing(1) 0 0;
+  color: $govuk-secondary-text-colour;
+}
+
+// The notes column takes the facts grid's height, and its stack of notes scrolls within it.
+.pcs-hearing-notes {
+  display: flex;
+  flex-direction: column;
+  gap: govuk-spacing(2);
+  min-height: 0;
+
+  // Beside the facts, the facts set the row's height, and the notes run on down to the panel's bottom border, which
+  // closes their box; on its own row the stack takes its full height.
+  @include govuk-media-query($from: desktop) {
+    contain: size;
+    margin-bottom: - govuk-spacing(3);
+
+    .pcs-hearing-notes__stack {
+      border-bottom: 0;
+    }
   }
+}
 
-  .pcs-case-facts__layout textarea {
-    flex: 1 1 auto;
+// The earlier notes scroll in their own box, under this hearing's note. A shadow at the bottom shows there are more,
+// until the white cover that scrolls with the notes reaches it.
+.pcs-hearing-notes__stack {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 0 govuk-spacing(2);
+  overflow-y: auto;
+  border: 1px solid $govuk-border-colour;
+  background:
+    linear-gradient(rgb(govuk-colour('white'), 0), govuk-colour('white') 70%) bottom / 100% govuk-spacing(4) no-repeat
+      local,
+    radial-gradient(farthest-side at 50% 100%, rgb(govuk-colour('black'), 0.2), transparent) bottom / 100%
+      govuk-spacing(2) no-repeat scroll,
+    govuk-colour('white');
+}
 
-    margin-bottom: 0;
+.pcs-hearing-notes__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-    // Resizing remains available below desktop where the field no longer tracks the grid.
-    resize: none;
+.pcs-hearing-notes__note {
+  padding: govuk-spacing(2) 0;
+
+  & + & {
+    border-top: 1px solid $govuk-border-colour;
   }
+}
+
+.pcs-hearing-notes__text {
+  white-space: pre-wrap;
+}
+
+.pcs-hearing-notes__empty {
+  margin: 0;
+  padding: govuk-spacing(2) 0;
+  color: $govuk-secondary-text-colour;
 }
 
 // Divide distinct tab questions, excluding fields that continue the previous question.
