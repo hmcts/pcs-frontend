@@ -272,15 +272,35 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
   });
 
   // This test will be skipped until the bugs HDPI-7401 & HDPI-7360 get fixed
-  test.skip('Validate View the response page data @regression @crossbrowser', async () => {
-    await performAction('skipTestIfLdFlagDisabled', 'release-1.2-enabled');
+  test('Validate View the response page data @regression @crossbrowser', async () => {
+    //await performAction('skipTestIfLdFlagDisabled', 'release-1.2-enabled');
     await performValidation('mainHeader', dashboard.mainHeader);
     await performAction('reloadPage');
     await performAction('respondPossessionClaimAPI', {
-      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+      data: respondPossessionClaimMidEventApiData.respondPossessionClaimEventName,
       type: 'both',
     });
     await performAction('reloadPage');
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: dashboard.counterClaimAmount,
+      fee: dashboard.counterClaimFee,
+    });
+    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
+
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
+    await performAction('clickButton', paymentDetails.confirmPaymentButton);
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: counterClaimPaymentSuccessful.paymentConfirmationParagraph,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
+
     await performAction('clickButton', dashboard.viewTheResponseSubHeader);
     await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
     await performAction('verifyResponseDetailsOnViewTheResponsePage');

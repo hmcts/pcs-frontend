@@ -1,3 +1,10 @@
+const getCurrentResponseDate = (): string =>
+  new Date().toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
 export const viewTheResponse = {
   mainHeader: `View the response`,
   theResponseCaption: `The response`,
@@ -16,6 +23,7 @@ export const viewTheResponse = {
   ifYouCannotFindLink: `If you cannot find a document that you are looking for in this section`,
   downloadPDFLink: `Download a PDF copy of the response`,
   responsePDFLink: `Response (PDF)`,
+  counterClaimPDFLink: `Counterclaim (PDF)`,
   iBelieveTheFactsParagraph: `I believe the facts stated in this defence form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in the truth.`,
   claimantDetails: {
     Name: 'Possession Claims Solicitor Org',
@@ -23,6 +31,8 @@ export const viewTheResponse = {
   },
   defendant1Details: {
     Name: 'Test John',
+    'Phone number': '07700900000',
+    'SMS mobile number': '07700900980',
     'Postal address': '10 Second Avenue, London, W3 7RX',
     'Date of birth': '20 May 1990',
   },
@@ -36,9 +46,10 @@ export const viewTheResponse = {
     'Do you dispute any other parts of the claim?': 'No',
   },
   paymentsOrAgreementsDetails: {
-    'Have you paid any money to Possession Claims Solicitor Org since ?': 'Yes',
+    [`Have you paid any money to Possession Claims Solicitor Org since ${getCurrentResponseDate()}?`]: 'Yes',
     'Details of payments made': 'Paid £200 on 1 March 2026 by bank transfer.',
-    'Have you come to any agreement with Possession Claims Solicitor Org to repay the arrears since ?': 'Yes',
+    [`Have you come to any agreement with Possession Claims Solicitor Org to repay the arrears since ${getCurrentResponseDate()}?`]:
+      'Yes',
     'Details of repayment agreement': 'Agreed to pay £50 per week until arrears cleared.',
     'Would you like to offer to pay your arrears in instalments?': 'Yes',
     'How much could you afford to pay in addition to the current rent?': '£50.00',
