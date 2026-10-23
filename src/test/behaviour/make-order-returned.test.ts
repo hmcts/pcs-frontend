@@ -73,10 +73,19 @@ describe('make an order: an order a caseworker returned', () => {
     expect(control<HTMLTextAreaElement>('[name="staff-message-text"]').value).toBe('Serve this by post.');
 
     control<HTMLTextAreaElement>('[name="staff-message-text"]').value = 'Serve this on both defendants.';
+    // An order that cannot be sent yet keeps the message as the judge left it.
+    const incomplete = parse((await app.post(RETURNED, page.body('SUBMIT_FOR_REVIEW'))).text);
+    expect(incomplete.querySelector<HTMLInputElement>('[name="staff-message"][value="yes"]')?.checked).toBe(true);
+    expect(incomplete.querySelector<HTMLTextAreaElement>('[name="staff-message-text"]')?.value).toBe(
+      'Serve this on both defendants.'
+    );
     recordAttendance();
     const sent = await app.post(RETURNED, page.body('SUBMIT_FOR_REVIEW'));
     expect(sent.location).toBe(`${PAGE}/sent-for-review`);
     const [submitted] = submittedOrders() as { order: { formData: Record<string, unknown> } }[];
-    expect(submitted.order.formData).toMatchObject({ 'staff-message-text': 'Serve this on both defendants.' });
+    expect(submitted.order.formData).toMatchObject({
+      'staff-message': 'yes',
+      'staff-message-text': 'Serve this on both defendants.',
+    });
   });
 });
