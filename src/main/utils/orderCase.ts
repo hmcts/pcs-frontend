@@ -25,10 +25,8 @@ export interface OrderCaseContext {
   claimants: OrderParty[];
   defendants: OrderParty[];
   openCounterclaim?: boolean;
-  /** The case's open applications, each of which an order made at a hearing can decide, oldest first. */
+  /** The case's open applications, any of which the order can decide, oldest first. */
   applications?: OrderApplication[];
-  /** The general application an order made on one, as box work, decides. */
-  application?: OrderApplication | null;
 }
 
 /** A general application as the judge deciding it reads it, with what court staff said when they referred it. */
@@ -86,12 +84,15 @@ export interface OrderStart {
     formData?: FormData;
     docweaveSnapshot?: DocWeaveSnapshot | null;
     queryFromCaseworker?: string | null;
-    /** The general application the order decides, if it decides one. */
-    genAppId?: string | null;
   };
   caseContext: OrderCaseContext;
-  /** The hearing the order is made for, if it is made for one. */
+  /**
+   * The hearing the order is made for, if it is made for one. The caseworker's review is sent only which hearing it
+   * is, without its facts and notes, which are the judge's to record.
+   */
   hearing?: OrderHearing | null;
+  /** The application the judge's task asked them to decide, which the order must decide. */
+  taskGenAppId?: string | null;
 }
 
 export function formatAddress(address: Record<string, string | undefined> = {}): string {

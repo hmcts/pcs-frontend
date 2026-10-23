@@ -1,22 +1,12 @@
-import {
-  type DocEditorController,
-  type DocWeaveDocument,
-  type DocWeaveSnapshot,
-  createDocEditor,
-} from '@hmcts-cft/docweave';
+import { type DocEditorController, type DocWeaveDocument, createDocEditor } from '@hmcts-cft/docweave';
 
 import { parseMoney } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
-import { type OrderData, readOrderData } from './make-order/data';
-import { buildAdjournmentOrder } from './make-order/wording/adjournment';
-import { buildApplicationOrder, wordingAnchors } from './make-order/wording/application';
+import { readOrderData } from './make-order/data';
+import { wordingAnchors } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
-import { buildFreeFormOrder } from './make-order/wording/free-form';
-import { buildNoOrderOnClaim } from './make-order/wording/no-order';
-import { buildOutrightOrder } from './make-order/wording/outright';
-import { buildStrikeOutDismissalOrder } from './make-order/wording/strike-out';
-import { buildSuspendedOrder } from './make-order/wording/suspended';
+import { buildOrder } from './make-order/wording/order';
 
 type DateParts = [HTMLInputElement, HTMLInputElement, HTMLInputElement];
 
@@ -200,20 +190,10 @@ export function syncSuspendedOnlyCosts(form: HTMLFormElement, type: OrderType): 
   });
 }
 
-const builders: Record<OrderType, (data: OrderData) => DocWeaveDocument> = {
-  OUTRIGHT_POSSESSION: buildOutrightOrder,
-  SUSPENDED_POSSESSION: buildSuspendedOrder,
-  ADJOURNMENT: buildAdjournmentOrder,
-  STRIKE_OUT_DISMISSAL: buildStrikeOutDismissalOrder,
-  FREE_FORM: buildFreeFormOrder,
-  NO_ORDER_ON_CLAIM: buildNoOrderOnClaim,
-  APPLICATION_DECISION: buildApplicationOrder,
-};
-
 /** The generated order for the form's current answers and selected order type. */
 export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
   const type = form.querySelector<HTMLInputElement>('#order-type')?.value as OrderType;
-  return builders[type](readOrderData(form));
+  return buildOrder(type, readOrderData(form));
 }
 
 /** Whether a form control is an application's decision, whose row shows what follows the decision chosen. */
@@ -252,7 +232,7 @@ function insertRequestedWording(form: HTMLFormElement, editor: DocEditorControll
   if (!application?.wordingHtml) {
     return;
   }
-  for (const anchor of wordingAnchors(data, application)) {
+  for (const anchor of wordingAnchors(application)) {
     try {
       editor.insertHtml(application.wordingHtml, { at: { after: anchor } });
       return;
@@ -285,10 +265,8 @@ export function initMakeOrder(): void {
     return;
   }
 
-  let orderType: OrderType | undefined;
-  // One document per order type, so switching and back keeps any edits. A decision on an application changes the
-  // generated clauses in place, so wording the judge inserted after them stays.
-  const documents: Partial<Record<OrderType, DocWeaveSnapshot>> = {};
+  // One document whatever the order type: switching type changes the generated clauses in place, so wording the
+  // judge inserted stays, but their edits to a type's own clauses go with them.
   const editor = createDocEditor({
     mount,
     label: 'Order',
@@ -299,35 +277,11 @@ export function initMakeOrder(): void {
     field: documentField,
     // A document the field cannot hold is regenerated from the form.
     onError: () => (documentField.value = ''),
-    onChange: snapshot => {
-      if (orderType) {
-        documents[orderType] = snapshot;
-      }
-    },
   });
-  if (documentField.value) {
-    documents[orderTypeField.value as OrderType] = editor.getSnapshot();
-  }
   const render = (): void => editor.render(buildOrderDocument(form));
   const selectOrderType = (type: OrderType): void => {
-    if (orderType === type) {
-      return;
-    }
-    if (orderType) {
-      documents[orderType] = editor.getSnapshot();
-    }
-    // While applications are decided, the order as it stands goes with the judge to a type not opened yet, or to and
-    // from ordering on the claim, so the applicant's wording they inserted comes with it; the type's own clauses
-    // replace the last type's. Between the claim's tabs, each keeps its own.
-    const carries =
-      orderType &&
-      readOrderData(form).applications.length &&
-      (!documents[type] || type === 'NO_ORDER_ON_CLAIM' || orderType === 'NO_ORDER_ON_CLAIM');
-    const next = carries ? documents[orderType!] : documents[type];
-    orderType = type;
     orderTypeField.value = type;
     syncSuspendedOnlyCosts(form, type);
-    editor.load(next);
     render();
   };
 

@@ -13,7 +13,6 @@ import {
   caseFactsFromForm,
   hearingRecordChanged,
   orderFormModel,
-  recordsAttendance,
   withoutHearingRecord,
 } from '@utils/makeOrderForm';
 import { type MakeOrderValidationIssue, validateHearingRecord, validateMakeOrder } from '@utils/makeOrderValidation';
@@ -148,7 +147,7 @@ export default function makeOrderRoutes(app: Application): void {
       orderId,
       taskId,
       orderVersion,
-      genAppId,
+      // The hearing's record goes to pcs-api apart from the order, so a posted one is never the order's.
       hearing: _hearing,
       hearingVersion = '',
       orderType,
@@ -179,14 +178,13 @@ export default function makeOrderRoutes(app: Application): void {
         );
       }
       // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
-      const atHearing = recordsAttendance(currentHearing, formData);
       const validationIssues =
         action === 'SUBMIT_FOR_REVIEW'
           ? validateMakeOrder(
               orderType,
               formData,
-              atHearing ? attendanceParties(started.envelope) : [],
-              !atHearing,
+              currentHearing ? attendanceParties(started.envelope) : [],
+              !currentHearing,
               applicationsToDecide(started.envelope)
             )
           : currentHearing
@@ -208,7 +206,6 @@ export default function makeOrderRoutes(app: Application): void {
           orderType,
           formData: withoutHearingRecord(formData),
           docweaveSnapshot: postedSnapshot(orderDocument),
-          genAppId: genAppId || null,
         },
         taskId: taskId || null,
         // Only send facts and a note when they differ; pcs-api checks the version again when saving.

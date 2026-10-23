@@ -11,7 +11,6 @@ export const MAKE_ORDER_TYPES = [
   'STRIKE_OUT_DISMISSAL',
   'FREE_FORM',
   'NO_ORDER_ON_CLAIM',
-  'APPLICATION_DECISION',
 ] as const;
 export type MakeOrderType = (typeof MAKE_ORDER_TYPES)[number];
 
@@ -334,7 +333,7 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
 
 function validateStrikeOut(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add } = validation(formData);
-  const subjects = values(formData, 'strike-subjects').filter(subject => subject !== 'none');
+  const subjects = values(formData, 'strike-subjects');
   add(subjects.length > 0, 'strike-subjects', 'Select what is struck out or dismissed');
   for (const subject of ['claim', 'counterclaim'].filter(chosen => subjects.includes(chosen))) {
     add(
@@ -371,6 +370,8 @@ export interface ApplicationToDecide {
   id: string;
   reference: string;
   warrantSuspension?: boolean;
+  /** The application the judge's task asked them to decide, which the order may not leave as it is. */
+  required?: boolean;
 }
 
 /** The prefix of an application's answers on the make order form. */
@@ -381,20 +382,19 @@ export function applicationPrefix(application: { id: string }): string {
 /**
  * What the judge decides about each application, and what follows the decision: when the hearing is if they list
  * it, and for an application to suspend the warrant of possession, the conditions if they grant it or when the
- * eviction may go ahead if they dismiss it. An order made on one application, as box work, must decide it; one
- * made at a hearing may leave any application as it is.
+ * eviction may go ahead if they dismiss it. The order may leave any application as it is but the one the judge's
+ * task asked them to decide.
  */
 function validateApplications(
   formData: Record<string, unknown>,
-  applications: readonly ApplicationToDecide[],
-  mustDecide: boolean
+  applications: readonly ApplicationToDecide[]
 ): MakeOrderValidationIssue[] {
   const { issues, add, date } = validation(formData);
   for (const application of applications) {
     const prefix = applicationPrefix(application);
     const decision = value(formData, `${prefix}-decision`) || 'none';
     const allowed =
-      (APPLICATION_DECISIONS as readonly string[]).includes(decision) && !(mustDecide && decision === 'none');
+      (APPLICATION_DECISIONS as readonly string[]).includes(decision) && !(application.required && decision === 'none');
     add(allowed, `${prefix}-decision`, `Select what you decide about application ${application.reference}`);
     if (decision === 'list') {
       issues.push(...validateListing(formData, `${prefix}-list`, 'Enter a valid hearing date'));
@@ -508,7 +508,6 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
         ...validateCosts(formData, false),
       ];
     case 'NO_ORDER_ON_CLAIM':
-    case 'APPLICATION_DECISION':
       return validateCosts(formData, false);
     default:
       throw new Error(`Unknown order type: ${orderType}`);
@@ -523,21 +522,18 @@ export function validateMakeOrder(
   applications: readonly ApplicationToDecide[] = []
 ): MakeOrderValidationIssue[] {
   const chosen = (name: string): boolean => values(formData, name).includes('yes');
-  // Deciding an application is made without a hearing too, but asks neither.
-  const madeWithoutHearing = withoutHearing && orderType !== 'APPLICATION_DECISION';
-  if (madeWithoutHearing && AT_HEARING_ORDER_TYPES.includes(orderType)) {
+  if (withoutHearing && AT_HEARING_ORDER_TYPES.includes(orderType)) {
     return [{ id: 'order-type', message: 'Select an order type made without a hearing' }];
   }
   // In the order the page asks, so the error summary follows the page.
   return [
     ...validateHearingRecord(formData),
-    // An order deciding an application has no hearing, so no one attended; nor does one made without a hearing,
-    // whose parties the caller leaves out.
-    ...(orderType === 'APPLICATION_DECISION' ? [] : validateAttendance(formData, parties)),
+    // No one attended an order made without a hearing, whose parties the caller leaves out.
+    ...validateAttendance(formData, parties),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
-    ...(madeWithoutHearing && chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
+    ...(withoutHearing && chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
     ...validateOrderType(orderType, formData),
-    ...validateApplications(formData, applications, orderType === 'APPLICATION_DECISION'),
+    ...validateApplications(formData, applications),
     ...(chosen('staff-message') ? validateStaffMessage(formData) : []),
   ];
 }

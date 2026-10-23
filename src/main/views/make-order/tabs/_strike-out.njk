@@ -20,6 +20,4 @@
     { value: "counterclaim", text: "Counterclaim", conditional: { html: outcome("counterclaim", "Counterclaim") } }
   ]) %}
 {% endif %}
-{# Always posted, so a form with nothing ticked is not mistaken for one saved before this question, which ticks the claim. #}
-<input type="hidden" name="strike-subjects" value="none">
 {{ compact.checkboxes("strike-subjects", { legend: "Outcome", default: "claim", items: strikeItems }) }}

@@ -9,9 +9,9 @@ import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('decentralisedEventRoutes');
 
-/** The query an event's page needs from what XUI hands over: its order, application and task. */
+/** The query an event's page needs from what XUI hands over: its order, application, hearing and task. */
 const HANDED_OVER_PARAMS = new Map<unknown, readonly string[]>([
-  ['ext:makeOrder', ['orderId', 'taskId', 'genAppId']],
+  ['ext:makeOrder', ['orderId', 'taskId', 'genAppId', 'hearingId']],
   ['ext:confirmOrderReview', ['orderId', 'taskId']],
 ]);
 

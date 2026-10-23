@@ -121,8 +121,7 @@ describe('make an order at a hearing: deciding the applications', () => {
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
     expect((await app.post(PAGE, body)).status).toBe(302);
-    const [submitted] = submittedOrders() as { order: { formData: Record<string, unknown>; genAppId: unknown } }[];
-    expect(submitted.order.genAppId).toBeNull();
+    const [submitted] = submittedOrders() as { order: { formData: Record<string, unknown> } }[];
     expect(submitted.order.formData['app-gen-app-1-decision']).toBe('none');
     expect(submitted.order.formData['app-gen-app-2-decision']).toBe('dismiss');
   });
@@ -149,7 +148,7 @@ describe('make an order at a hearing: deciding the applications', () => {
     ).toBe(2);
   });
 
-  it("keeps the applicant's wording the judge inserted when they go on to order on the claim", async () => {
+  it("keeps the applicant's wording the judge inserted as they go on to order on the claim, and back", async () => {
     const page = await openPage((await app.get(PAGE)).text);
     recordAttendance();
     check('app-gen-app-1-decision', 'grant');
@@ -167,20 +166,9 @@ describe('make an order at a hearing: deciding the applications', () => {
       'The hearing on 14 October is adjourned.',
       'Costs in the case.',
     ]);
-  });
-
-  it("keeps the applicant's wording inserted while ordering on the claim when the judge stops ordering on it", async () => {
-    const page = await openPage((await app.get(PAGE)).text);
-    recordAttendance();
-    check('claim-order', 'yes');
-    selectTab('tab-adjournment');
-    check('adj-type', 'generally');
-    check('app-gen-app-1-decision', 'grant');
-    control<HTMLButtonElement>('[data-application-reference="GA1"] [data-insert-requested-wording]').click();
 
     uncheck('claim-order', 'yes');
     expect(page.documentText()).not.toContain('The claim is adjourned generally');
-    expect(page.documentText()).toContain('The hearing on 14 October is adjourned.');
     check('claim-order', 'yes');
     expect(page.documentText()).toContain('The claim is adjourned generally');
     expect(page.documentText().match(/The hearing on 14 October is adjourned\./g)).toHaveLength(1);

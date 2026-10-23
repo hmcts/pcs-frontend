@@ -7,7 +7,7 @@ import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { applicationsToDecide, attendanceParties, orderFormModel, recordsAttendance } from '@utils/makeOrderForm';
+import { applicationsToDecide, attendanceParties, orderFormModel } from '@utils/makeOrderForm';
 import { MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   type OrderStart,
@@ -147,8 +147,6 @@ function orderModel(review: OrderReviewSession) {
   const snapshot = review.order.docweaveSnapshot;
   return {
     freeForm: review.order.orderType === 'FREE_FORM',
-    // A decision on an application is worded in the preview, not in fields staff could bring into line with it.
-    applicationDecision: review.order.orderType === 'APPLICATION_DECISION',
     edits: judgeEdits(snapshot),
     staffMessage: staffMessage(review.order.formData),
     orderPreviewHtml: snapshot ? renderHtml(snapshot, { changes: true }) : undefined,
@@ -317,12 +315,11 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   if (!order.orderDocumentJson) {
     return [{ id: 'make-order-form', message: NO_WORDING }];
   }
-  const atHearing = recordsAttendance(null, order.formData);
   return validateMakeOrder(
     order.orderType,
     order.formData,
-    atHearing ? attendanceParties(review) : [],
-    !atHearing,
+    review.hearing ? attendanceParties(review) : [],
+    !review.hearing,
     applicationsToDecide(review)
   );
 }

@@ -18,8 +18,6 @@ export interface OrderApplication {
   id: string;
   /** What its answers on the form start with: `app-<id>`. */
   prefix: string;
-  reference: string;
-  type: string;
   applicant: string;
   submittedOn: string;
   /** Whether the applicant asked for an order, which granting the application puts in the order as HTML. */
@@ -33,8 +31,6 @@ export interface OrderApplication {
 export interface OrderData {
   /** The applications the order can decide, in the order they were made. */
   applications: readonly OrderApplication[];
-  /** An order made on one application, as box work, which is the order's whole subject. */
-  boxWork: boolean;
   answers: Readonly<Record<string, readonly string[]>>;
   selectedControlIds: Readonly<Record<string, string>>;
   propertyAddress: string;
@@ -60,18 +56,12 @@ export function readOrderData(form: HTMLFormElement): OrderData {
     }
   });
 
-  const claimants = new Map<string, OrderParty>();
-  const defendants = new Map<string, OrderParty>();
   const parties: { id: string; name: string; type: string }[] = JSON.parse(form.dataset.parties || '[]');
-  parties.forEach(({ id, name, type }) => (type === 'claimant' ? claimants : defendants).set(id, { id, name }));
+  const party = ({ id, name }: OrderParty): OrderParty => ({ id, name });
   const attendance: AttendanceEntry[] = [];
   form.querySelectorAll<HTMLElement>('[data-attendance-row]').forEach((row, rowIndex) => {
     const partyKind = row.dataset.partyKind === 'claimant' ? 'claimant' : 'defendant';
-    const partyId = row.dataset.partyId;
     const partyName = row.dataset.partyName;
-    if (partyId && partyName !== undefined) {
-      (partyKind === 'claimant' ? claimants : defendants).set(partyId, { id: partyId, name: partyName });
-    }
 
     const choice = row.querySelector<HTMLInputElement>('input[type="radio"]:checked')?.value;
     if (!choice) {
@@ -93,8 +83,6 @@ export function readOrderData(form: HTMLFormElement): OrderData {
     applications.push({
       id: row.dataset.applicationId ?? '',
       prefix,
-      reference: row.dataset.applicationReference ?? '',
-      type: row.dataset.applicationType ?? '',
       applicant: row.dataset.applicationApplicant ?? 'the applicant',
       submittedOn: row.dataset.applicationSubmitted ?? '',
       wordingHtml: row.dataset.applicationWordingHtml ?? '',
@@ -105,13 +93,12 @@ export function readOrderData(form: HTMLFormElement): OrderData {
 
   return {
     applications,
-    boxWork: form.dataset.boxWork !== undefined,
     answers,
     selectedControlIds,
     propertyAddress: form.dataset.propertyAddress ?? '',
     withoutHearing: form.dataset.withoutHearing !== undefined,
-    claimants: [...claimants.values()],
-    defendants: [...defendants.values()],
+    claimants: parties.filter(({ type }) => type === 'claimant').map(party),
+    defendants: parties.filter(({ type }) => type !== 'claimant').map(party),
     attendance,
   };
 }
