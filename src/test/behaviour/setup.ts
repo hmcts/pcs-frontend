@@ -5,6 +5,16 @@ import { TextDecoder, TextEncoder } from 'node:util';
 // setImmediate because the application runs in the same process as the page.
 Object.assign(globalThis, { TextDecoder, TextEncoder, setImmediate, clearImmediate });
 
+// Node's TextEncoder returns Node byte arrays, whose older runtimes lack this browser API.
+Object.getPrototypeOf(new TextEncoder().encode('')).toBase64 ??= function (
+  this: Uint8Array,
+  { alphabet = 'base64', omitPadding = false } = {}
+): string {
+  const encoded = Buffer.from(this).toString('base64');
+  const result = alphabet === 'base64url' ? encoded.replace(/\+/g, '-').replace(/\//g, '_') : encoded;
+  return omitPadding ? result.replace(/=+$/, '') : result;
+};
+
 process.env.LOG_LEVEL ??= 'error';
 
 // jest.behaviour.config.js's testTimeout is not honoured when this project runs

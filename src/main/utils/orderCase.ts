@@ -188,3 +188,22 @@ export function postedSnapshot(json: string | undefined): DocWeaveSnapshot | nul
     throw error instanceof InvalidSnapshotError ? new HTTPError(error.message, 400) : error;
   }
 }
+
+/** Decode the form's base64url document before the existing snapshot validation. */
+export function decodeOrderDocument(value: unknown): string {
+  if (value === undefined || value === '') {
+    return '';
+  }
+  try {
+    if (typeof value !== 'string') {
+      throw new Error('Expected a single document');
+    }
+    const bytes = Buffer.from(value, 'base64url');
+    if (bytes.toString('base64url') !== value) {
+      throw new Error('Invalid base64url');
+    }
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    throw new HTTPError('Invalid order document encoding', 400);
+  }
+}
