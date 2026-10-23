@@ -127,8 +127,7 @@ const APPLICATIONS = [
     somethingElseDetails: 'Relief from sanctions',
     applicant: 'Alex Example (Defendant 1)',
     submittedOn: '2026-10-19',
-    whatOrderWanted:
-      '<ol><li><p>The defendant has relief from sanctions.</p></li><li><p>No order as to costs.</p></li></ol>',
+    whatOrderWanted: 'The defendant has relief from sanctions.\nNo order as to costs.',
     documents: [],
   },
   {

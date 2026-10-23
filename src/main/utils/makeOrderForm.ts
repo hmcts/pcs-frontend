@@ -1,3 +1,4 @@
+import escapeHtml from 'escape-html';
 import { DateTime } from 'luxon';
 
 import { parseDate, parseMoney } from '@utils/makeOrderFormat';
@@ -8,7 +9,6 @@ import {
   applicationPrefix,
 } from '@utils/makeOrderValidation';
 import type { FormData, OrderApplication, OrderHearing, OrderParty, OrderStart } from '@utils/orderCase';
-import { richTextHtml } from '@utils/richText';
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 const WITHOUT_HEARING_ORDER_TYPE: MakeOrderType = 'FREE_FORM';
@@ -23,16 +23,18 @@ function displayDate(iso?: string | null): string | undefined {
 }
 
 /**
- * The application as its row shows it: its answers in words, and its dates as the court writes them. The order
- * it asks for is shown as the applicant formatted it, and is HTML to use only when they wrote rich text. Its
- * answers on the form start with its prefix, so each application the order can decide keeps its own.
+ * The application as its row shows it: its answers in words, and its dates as the court writes them. Its answers on
+ * the form start with its prefix, so each application the order can decide keeps its own.
  */
 function applicationModel(application: OrderApplication & ApplicationToDecide, caseReference: number) {
   const href = (id: string): string => `/case/${caseReference}/view-documents/${encodeURIComponent(id)}`;
   return {
     ...application,
     prefix: applicationPrefix(application),
-    whatOrderWantedHtml: richTextHtml(application.whatOrderWanted),
+    // As its lines, which the judge can put in the order.
+    whatOrderWantedHtml: application.whatOrderWanted
+      ? `<p>${escapeHtml(application.whatOrderWanted).replace(/\r?\n/g, '<br>')}</p>`
+      : '',
     documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
     submittedOnDisplay: displayDate(application.submittedOn),
     within14DaysDisplay: YES_NO[application.within14Days ?? ''],
