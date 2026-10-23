@@ -1,3 +1,15 @@
+{% import "make-order/_compact.njk" as compact with context %}
+{% import "make-order/_listing.njk" as listing with context %}
+
 <h3 class="govuk-heading-m">Free form</h3>
 
 <p class="govuk-body">Write the order in the <a class="govuk-link" href="#order-editor">order preview</a>, after "IT IS ORDERED THAT:".</p>
+
+{# Made without a hearing, the order can list one, asked as the adjournment tab asks it. #}
+{% if withoutHearing %}
+  {{ compact.reveal("list-on-notice", "List for a hearing on notice", listing.listing("list", "When the hearing is", [
+    "Next available possession list after",
+    "Next available date (non-possession list) after",
+    "Specific date"
+  ])) }}
+{% endif %}

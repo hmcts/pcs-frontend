@@ -8,6 +8,7 @@ import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 import { ccdCaseService } from '@services/ccdCaseService';
 import {
   type OrderFormSubmission,
+  applicationsToDecide,
   attendanceParties,
   caseFactsFromForm,
   hearingRecordChanged,
@@ -22,6 +23,7 @@ import {
   decodeOrderDocument,
   manageCaseDetailsUrl,
   postedSnapshot,
+  refusalPage,
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
@@ -35,20 +37,31 @@ interface StartedOrder {
 }
 
 /**
+ * What the page's URL names: an order from the orders tab, the application a task asks the judge to decide, or the
+ * hearing the judge's link names.
+ */
+interface Chosen {
+  orderId?: string;
+  genAppId?: string;
+  hearingId?: string;
+}
+
+/**
  * Starts the judge's working order, or the order they chose on the case's orders tab: one a
  * caseworker returned to them, which pcs-api starts with the caseworker's query. A new order is
- * made for the hearing the judge's link named, if it named one.
+ * made for the hearing the judge's link named, if it named one. A task to decide an application
+ * starts the judge's order on that application.
  */
 async function startOrderEvent(
   accessToken: string,
   caseReference: string,
-  { orderId, hearingId }: { orderId?: string; hearingId?: string } = {}
+  { orderId, hearingId, genAppId }: Chosen = {}
 ): Promise<StartedOrder> {
   const started = await ccdCaseService.startCaseEvent(
     accessToken,
     caseReference,
     MAKE_ORDER_EVENT_ID,
-    orderId || hearingId ? { orderId, hearingId } : undefined
+    orderId || hearingId || genAppId ? { orderId, hearingId, genAppId } : undefined
   );
   const payload = started.data.sdkEventPayload;
   if (!payload) {
@@ -102,10 +115,10 @@ function pageModel(
  * The order the orders tab linked to, or the hearing the judge's link named, which the page's URL keeps for as long
  * as the judge works on the order.
  */
-function chosen(req: Request): { orderId?: string; hearingId?: string } {
+function chosen(req: Request): Chosen {
   const named = (name: string): string | undefined =>
     typeof req.query[name] === 'string' ? (req.query[name] as string) : undefined;
-  return { orderId: named('orderId'), hearingId: named('hearingId') };
+  return { orderId: named('orderId'), hearingId: named('hearingId'), genAppId: named('genAppId') };
 }
 
 export default function makeOrderRoutes(app: Application): void {
@@ -120,7 +133,7 @@ export default function makeOrderRoutes(app: Application): void {
       );
       res.render('make-order', pageModel(req, started));
     } catch (error) {
-      refusedOrderEvent(res, next, error);
+      refusedOrderEvent(res, next, error, refusalPage(req, res, ['judge']));
     }
   });
 
@@ -134,6 +147,7 @@ export default function makeOrderRoutes(app: Application): void {
       orderId,
       taskId,
       orderVersion,
+      // The hearing's record goes to pcs-api apart from the order, so a posted one is never the order's.
       hearing: _hearing,
       hearingVersion = '',
       orderType,
@@ -166,7 +180,13 @@ export default function makeOrderRoutes(app: Application): void {
       // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
       const validationIssues =
         action === 'SUBMIT_FOR_REVIEW'
-          ? validateMakeOrder(orderType, formData, attendanceParties(started.envelope))
+          ? validateMakeOrder(
+              orderType,
+              formData,
+              currentHearing ? attendanceParties(started.envelope) : [],
+              !currentHearing,
+              applicationsToDecide(started.envelope)
+            )
           : currentHearing
             ? validateHearingRecord(formData)
             : [];
