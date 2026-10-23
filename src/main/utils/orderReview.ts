@@ -64,7 +64,7 @@ export interface ValidationIssue {
   message: string;
 }
 
-export const MAX_QUERY_LENGTH = 500;
+export const MAX_QUERY_LENGTH = 30000;
 export const MAX_REVIEW_DATES = 10;
 export const MAX_REVIEW_DESCRIPTION_LENGTH = 500;
 
@@ -111,7 +111,7 @@ export function validateQuery(answers: OrderReviewAnswers): ValidationIssue[] {
     return [{ id: 'query-to-judge', message: 'Enter your query for the Judge' }];
   }
   if (query.length > MAX_QUERY_LENGTH) {
-    return [{ id: 'query-to-judge', message: 'Your query for the Judge must be 500 characters or less' }];
+    return [{ id: 'query-to-judge', message: 'Your query for the Judge must be 30,000 characters or less' }];
   }
   return [];
 }
