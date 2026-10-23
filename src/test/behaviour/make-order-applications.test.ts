@@ -36,8 +36,8 @@ const ADJOURN = {
 const WARRANT = {
   id: 'gen-app-2',
   reference: 'GA2',
-  type: 'Something else',
-  somethingElseDetails: 'Suspend the warrant of possession',
+  type: 'Suspend',
+  somethingElseDetails: null,
   warrantSuspension: true,
   applicant: 'Alex Example (Defendant 1)',
   submittedOn: '2026-10-09',
@@ -89,7 +89,7 @@ describe('make an order: deciding applications', () => {
       const rows = [...document.querySelectorAll<HTMLElement>('[data-application]')];
       expect(rows.map(row => row.querySelector('h3')?.textContent?.trim())).toEqual([
         'GA1: Adjourn the hearing',
-        'GA2: Something else – Suspend the warrant of possession',
+        'GA2: Suspend',
       ]);
       expect(control<HTMLDetailsElement>(`details#${P}-more`).open).toBe(false);
       expect(control(`[name="${P}-decision"][value="none"]`).checked).toBe(true);
