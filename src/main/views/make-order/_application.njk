@@ -57,9 +57,9 @@
 
   <h4 class="govuk-heading-s">The order the applicant asked for</h4>
   {% if application.whatOrderWanted %}
-    {# As the applicant formatted it, so their numbering is the numbering they refer to. #}
+    {# As the applicant wrote it, line by line, so their numbering is the numbering they refer to. #}
     {{ govukInsetText({
-      html: '<div class="pcs-rich-text">' + application.whatOrderWantedHtml + '</div>',
+      html: application.whatOrderWantedHtml,
       attributes: { id: application.prefix + "-requested" }
     }) }}
   {% else %}
