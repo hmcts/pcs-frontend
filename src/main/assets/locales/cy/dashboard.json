@@ -107,5 +107,13 @@
       "correspondence": "Gohebiaeth",
       "uncategorisedDocuments": "Di-ddosbarth"
     }
+  },
+  "viewOrdersAndNotices": {
+    "pageTitle": "Gweld gorchmynion a hysbysiadau",
+    "noDocuments": "Nid oes unrhyw orchmynion na hysbysiadau i’w harddangos.",
+    "submittedOn": "Cyflwynwyd ar",
+    "folders": {
+      "enforcement": "Gorfodi"
+    }
   }
 }
