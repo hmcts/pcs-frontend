@@ -61,7 +61,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       name: 'otherConsiderations',
       type: 'radio',
       required: true,
-      legendClasses: 'govuk-visually-hidden',
+      isPageHeading: true,
+      legendClasses: 'govuk-fieldset__legend--l',
       translationKey: {
         label: 'heading',
       },
