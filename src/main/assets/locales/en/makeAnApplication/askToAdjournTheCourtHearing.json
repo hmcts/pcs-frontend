@@ -29,5 +29,8 @@
   "ifPreferToRespondByPost": "If you’d prefer to respond by post:",
   "fillInFormForPost": "fill in the <a href=\"https://www.gov.uk/government/publications/form-n244-application-notice\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">N244 form</a>",
   "findYourLocalCourt": "find your local court",
-  "sendTheCompletedFormToTheCourt": "send the completed form to the court"
+  "sendTheCompletedFormToTheCourt": "send the completed form to the court",
+  "release1b": {
+    "freeIfAtLeast14DaysAway": "It’s free to apply if your court hearing is at least 14 days away and the other parties have already agreed to it."
+  }
 }

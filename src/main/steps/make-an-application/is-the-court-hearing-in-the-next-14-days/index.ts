@@ -1,7 +1,8 @@
-import { createFormStep } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { isRelease1BEnabled } from '@utils/isRelease1BEnabled';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'is-the-court-hearing-in-the-next-14-days',
@@ -29,9 +30,21 @@ export const step: StepDefinition = createFormStep({
       ],
     },
   ],
+  extendGetContent: (req, content) => {
+    const release1bEnabled = isRelease1BEnabled(req);
+    const field = content.fields.find(item => item.componentType === 'radios');
+    if (field?.component) {
+      field.component.hint = {
+        text: getTranslationFunction(req)(release1bEnabled ? 'release1b.hintText' : 'hintText'),
+      };
+    }
+    return { release1bEnabled };
+  },
   translationKeys: {
     pageTitle: 'pageTitle',
     caption: 'caption',
     heading: 'heading',
+    otherParties: 'otherParties',
+    everyOtherPartyWillNeedToAgree: 'everyOtherPartyWillNeedToAgree',
   },
 });
