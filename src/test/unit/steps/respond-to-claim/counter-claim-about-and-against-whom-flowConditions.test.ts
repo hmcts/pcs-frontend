@@ -65,7 +65,7 @@ describe('shouldShowCounterClaimAboutStep', () => {
     expect(shouldShowCounterClaimAboutStep(req)).toBe(true);
   });
 
-  it('returns true when user does not need help with fees (without appliedForHwf in CCD)', () => {
+  it('returns true when user does not need Help with Fees (without appliedForHwf in CCD)', () => {
     const req = makeReq({ needHelpWithFees: 'NO' });
     expect(shouldShowCounterClaimAboutStep(req)).toBe(true);
   });
