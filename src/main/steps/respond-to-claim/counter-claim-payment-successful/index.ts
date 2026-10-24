@@ -1,3 +1,4 @@
+import { isLegalRepresentativeUser } from '../../utils';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import { getTranslationFunction } from '@modules/steps';
@@ -32,7 +33,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
 
     return {
       paymentReferenceLine: paymentReference ? t('paymentReference', { paymentReference }) : undefined,
-      redirectOnBack: true,
+      redirectOnBack: !isLegalRepresentativeUser(req),
       closeUrl: getCaseManagementUrl(req),
       dashboardUrl: getDashboardUrl(caseId),
     };
