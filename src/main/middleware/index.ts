@@ -12,3 +12,4 @@ export * from './footerAccessMiddleware';
 export * from './staffAccess';
 export * from './judgeXuiRedirect';
 export * from './makeOrderFeature';
+export * from './formBody';
