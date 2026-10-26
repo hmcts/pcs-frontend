@@ -172,6 +172,7 @@
     "webpack-hot-middleware": "2.26.1"
   },
   "resolutions": {
+    "@azure/msal-node": "^7.1.0",
     "@eslint/plugin-kit": "0.7.3",
     "@grpc/grpc-js": "^1.14.5",
     "@opentelemetry/core": "2.10.0",
