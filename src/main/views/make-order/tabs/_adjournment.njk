@@ -85,9 +85,9 @@
 
   {% set directionItems = [] %}
   {% for direction in [
-    { value: "defence", text: "The defendant must send a defence" },
-    { value: "counterclaim", text: "The defendant must send a defence and any counterclaim" },
-    { value: "claimant-reply", text: "The claimant must send a defence to the counterclaim and any reply" }
+    { value: "defence", text: "The defendant must submit a defence" },
+    { value: "counterclaim", text: "The defendant must submit a defence and any counterclaim" },
+    { value: "claimant-reply", text: "The claimant must submit a defence to the counterclaim and any reply" }
   ] %}
     {% set directionItems = directionItems.concat([{
       value: direction.value,
@@ -134,6 +134,18 @@
     ]
   }) }}
 {% endset %}
+
+{# Only a case with an open counterclaim or application has more than its claim to adjourn. #}
+{% if openCounterclaim or openApplication %}
+  {% set adjournedItems = [{ value: "claim", text: "Claim" }] %}
+  {% if openCounterclaim %}
+    {% set adjournedItems = adjournedItems.concat([{ value: "counterclaim", text: "Counterclaim" }]) %}
+  {% endif %}
+  {% if openApplication %}
+    {% set adjournedItems = adjournedItems.concat([{ value: "application", text: "Application" }]) %}
+  {% endif %}
+  {{ compact.checkboxes("adj-subjects", { legend: "What is adjourned", items: adjournedItems }) }}
+{% endif %}
 
 {{ compact.radios("adj-type", {
   legend: "Adjournment type",
