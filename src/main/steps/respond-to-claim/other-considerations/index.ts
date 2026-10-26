@@ -9,8 +9,8 @@ type RadioFormFieldWithClasses = RadioFormField & {
   component: RadioFormField['component'] & {
     fieldset: {
       legend: {
-        classes?: string
-      }
+        classes?: string;
+      };
     };
   };
 };
@@ -76,7 +76,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       radioField.component.fieldset.legend.isPageHeading = !legalRep;
       if (legalRep) {
         radioField.component.fieldset.legend.classes = 'govuk-fieldset__legend--m';
-        radioField.component.fieldset.legend.text = (formContent.question as string);
+        radioField.component.fieldset.legend.text = formContent.question as string;
         formContent.question = '';
       } else {
         formContent.heading = '';
