@@ -67,7 +67,7 @@
     "@opentelemetry/api": "1.9.1",
     "@opentelemetry/winston-transport": "0.31.0",
     "axios": "1.20.0",
-    "body-parser": "2.3.0",
+    "body-parser": "2.4.0",
     "config": "4.4.2",
     "connect-redis": "8.1.0",
     "cookie-parser": "1.4.7",
@@ -99,7 +99,7 @@
     "validator": "13.15.35",
     "winston": "3.19.0",
     "xss": "^1.0.15",
-    "zod": "4.5.4",
+    "zod": "4.6.6",
     "zod-i18n-map": "2.27.0"
   },
   "devDependencies": {
@@ -172,6 +172,7 @@
     "webpack-hot-middleware": "2.26.1"
   },
   "resolutions": {
+    "@azure/msal-node": "^7.1.0",
     "@eslint/plugin-kit": "0.7.3",
     "@grpc/grpc-js": "^1.14.5",
     "@opentelemetry/core": "2.10.0",
