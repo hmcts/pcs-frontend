@@ -8,7 +8,7 @@
     },
     "defendantName": {
       "label": "Enw",
-      "changeHidden": "enw wedi'i gywiro"
+      "changeHidden": "enw wedi’i gywiro"
     },
     "defendantNameCapture": {
       "label": "Beth yw enw eich cleient?",
@@ -19,17 +19,17 @@
       "changeHidden": "dyddiad geni"
     },
     "correspondenceAddressConfirmation": {
-      "label": "cy Is the defendant’s postal address {{address}}?",
+      "label": "Ai {{address}} yw cyfeiriad post y diffynnydd?",
       "fallbackLabel": "Beth yw eu cyfeiriad?",
       "changeHidden": "cyfeiriad post"
     },
     "emailConfirmation": {
-      "label": "cy Do you know the defendant’s email address?",
-      "changeHidden": "cy whether you know the defendant’s email address"
+      "label": "Ydych chi’n gwybod cyfeiriad e-bost y diffynnydd?",
+      "changeHidden": "p’un a ydych yn gwybod cyfeiriad e-bost y diffynnydd"
     },
     "emailAddress": {
-      "label": "cy Defendant’s email address",
-      "changeHidden": "cy defendant’s email address"
+      "label": "Cyfeiriad e-bost y diffynnydd",
+      "changeHidden": "cyfeiriad e-bost y diffynnydd"
     }
   }
 }

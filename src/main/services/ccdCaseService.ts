@@ -34,7 +34,7 @@ import { AxiosError } from 'axios';
 import config from 'config';
 
 import { ClientContextHeaders } from '../../types/global';
-import { HTTPError } from '../HttpError';
+import { CallbackRejectedError, HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
@@ -163,7 +163,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const callbackMessages = [...(responseData?.callbackErrors ?? []), ...(responseData?.callbackWarnings ?? [])];
   if (callbackMessages.length > 0) {
-    return new HTTPError(`CCD callback rejected request: ${callbackMessages.join('; ')}`, status || 422);
+    return new CallbackRejectedError(callbackMessages, status || 422);
   }
 
   const retryAfterHeader = axiosError.response?.headers?.['retry-after'];
@@ -289,6 +289,36 @@ export const ccdCaseService = {
     }
   },
 
+  /**
+   * Starts an event, for a later `submitCaseEvent` with the token it returns. CCD passes the client
+   * context on to the event's start, as it passes no parameters.
+   */
+  async startCaseEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string,
+    clientContext?: ClientContextHeaders
+  ): Promise<CcdCase & { eventToken: string }> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    try {
+      const caseHeaders = getCaseHeaders(accessToken);
+      if (clientContext) {
+        caseHeaders.headers['Client-Context'] = JSON.stringify(clientContext);
+      }
+      const response = await http.get<StartCallbackData>(
+        `${getBaseUrl()}/cases/${safeCaseId}/event-triggers/${eventId}?ignore-warning=false`,
+        caseHeaders
+      );
+      return { id: safeCaseId, data: response.data.case_details?.case_data ?? {}, eventToken: response.data.token };
+    } catch (error) {
+      throw convertReadErrorToHttpError(error, 'startCaseEvent');
+    }
+  },
+
   async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
     const safeCaseId = sanitiseCaseReference(caseId);
     if (!safeCaseId) {
@@ -399,6 +429,21 @@ export const ccdCaseService = {
     const url = `${getBaseUrl()}/cases/${ccdCase.id}/events`;
 
     return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
+  },
+
+  /** Submits an event with the token from the `startCaseEvent` the change was based on. */
+  async submitCaseEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string,
+    eventToken: string,
+    data: Record<string, unknown>
+  ): Promise<CcdCase> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+    return submitEvent(accessToken, `${getBaseUrl()}/cases/${safeCaseId}/events`, eventId, eventToken, data);
   },
 
   async getExistingCaseData(

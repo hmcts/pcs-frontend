@@ -292,6 +292,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         townOrCity: t('labels.townOrCity'),
         county: t('labels.county'),
         postcode: t('labels.postcode'),
+        errorPrefix: t('common:errorPrefix'),
+        oneAddressFound: t('common:addressLookup.oneFound'),
+        manyAddressesFound: t('common:addressLookup.manyFound'),
+        noAddressesFound: t('common:addressLookup.noneFound'),
       },
       buttons: {
         findAddress: t('buttons.findAddress'),
@@ -317,13 +321,13 @@ function getExistingAddress(req: Request): { formattedAddress: string } {
 
   if (originalAddress && 'AddressLine1' in originalAddress && originalAddress.AddressLine1) {
     // Drop Country for this caller — the legend is a UK-only correspondence address.
-    return { formattedAddress: formatCcdAddress({ ...originalAddress, Country: undefined }) + '?' };
+    return { formattedAddress: formatCcdAddress({ ...originalAddress, Country: undefined }) };
   }
 
   const propertyAddress = caseData?.propertyAddress;
   if (propertyAddress?.AddressLine1) {
-    return { formattedAddress: formatCcdAddress({ ...propertyAddress, Country: undefined }) + '?' };
+    return { formattedAddress: formatCcdAddress({ ...propertyAddress, Country: undefined }) };
   }
 
-  return { formattedAddress: '?' };
+  return { formattedAddress: '' };
 }

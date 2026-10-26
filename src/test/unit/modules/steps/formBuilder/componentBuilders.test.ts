@@ -180,7 +180,10 @@ describe('componentBuilders', () => {
           })
         );
 
-        expect(result.component.errorMessage).toEqual({ text: 'This field is required' });
+        expect(result.component.errorMessage).toEqual({
+          text: 'This field is required',
+          visuallyHiddenText: 'common:errorPrefix',
+        });
       });
 
       it('should include custom classes when provided', () => {

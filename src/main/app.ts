@@ -9,6 +9,8 @@ import favicon from 'serve-favicon';
 import { setupDev } from './development';
 import {
   caseReferenceParamMiddleware,
+  formBodyMiddleware,
+  judgeXuiRedirectMiddleware,
   legalRepresentativeAccessMiddleware,
   pageTrackingUrlMiddleware,
 } from './middleware';
@@ -28,7 +30,7 @@ setupDev(app, developmentMode);
 app.use(cookieParser());
 app.use(favicon(path.join(__dirname, '/public/assets/images/favicon.ico')));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(formBodyMiddleware);
 
 modules.modules.forEach(async moduleName => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,6 +50,7 @@ app.use((req, res, next) => {
 
 app.use(pageTrackingUrlMiddleware);
 app.use(legalRepresentativeAccessMiddleware);
+app.use(judgeXuiRedirectMiddleware);
 
 // param middleware for caseReference
 app.param('caseReference', caseReferenceParamMiddleware);
