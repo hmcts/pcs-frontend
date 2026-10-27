@@ -175,10 +175,12 @@ function partyChoices(review: OrderReviewSession) {
 async function submitReview(req: Request, review: OrderReviewSession, action: 'RETURN_TO_JUDGE' | 'ISSUE') {
   await ccdCaseService.submitCaseEvent(
     req.session.user!.accessToken,
-    caseReferenceOf(req),
     CONFIRM_ORDER_REVIEW_EVENT_ID,
     review.eventToken,
-    { sdkEventPayload: JSON.stringify(reviewRequest(review, action)) }
+    {
+      id: caseReferenceOf(req),
+      data: { sdkEventPayload: JSON.stringify(reviewRequest(review, action)) },
+    }
   );
   review.outcome = action === 'ISSUE' ? 'ISSUED' : 'RETURNED_TO_JUDGE';
 }
