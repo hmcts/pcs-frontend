@@ -31,12 +31,8 @@ export const GUIDE_SECTIONS = [
   { key: 'checkYourAnswers', describes: ['checkYourAnswersAndSubmit'] },
 ] as const satisfies readonly { key: string; describes: readonly RespondToClaimSectionId[] }[];
 
-/**
- * Off until the Welsh Language Unit's translation replaces the "cy" placeholders in the cy locale (HDPI-9653), so the
- * guide is English only rather than a mix of the two. Turn on with the translation, and take the file off
- * AWAITING_TRANSLATION in localeParity.test.ts.
- */
-const WELSH_AVAILABLE = false;
+/** The Welsh Language Unit's translation is in the cy locale (HDPI-9653), so the guide is offered in both languages. */
+const WELSH_AVAILABLE = true;
 
 export function prepareToRespondPage(requestedLang: unknown): Record<string, unknown> {
   const lang: AllowedLang = requestedLang === 'cy' && WELSH_AVAILABLE ? 'cy' : 'en';

@@ -61,9 +61,7 @@ const KEY_DRIFT_ALLOWLIST = new Set([
  * Files written ahead of their Welsh, holding a "cy" marker on every value. Their pages stay in English until the
  * translation replaces them all. Must only ever shrink.
  */
-const AWAITING_TRANSLATION = new Set([
-  'prepareToRespond.json', // HDPI-9653
-]);
+const AWAITING_TRANSLATION = new Set<string>([]);
 
 type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
 

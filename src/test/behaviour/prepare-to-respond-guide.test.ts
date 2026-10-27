@@ -15,6 +15,7 @@ import * as path from 'node:path';
 import type { Express } from 'express';
 import { JSDOM } from 'jsdom';
 
+import cyGuide from '../../main/assets/locales/cy/prepareToRespond.json';
 import enGuide from '../../main/assets/locales/en/prepareToRespond.json';
 import { GUIDE_SECTIONS, PREPARE_TO_RESPOND_PATH } from '../../main/guidance/prepareToRespond';
 
@@ -213,13 +214,28 @@ describe('the guide to preparing a response to a possession claim', () => {
     expect(page.body.dataset.sessionTimeout).toBeUndefined();
   });
 
-  it('is in English, and stays in English until the Welsh translation is added', async () => {
+  it('offers Welsh from the English page, and English back from the Welsh one', async () => {
     const english = parse((await get(PREPARE_TO_RESPOND_PATH)).text);
     const welsh = parse((await get(`${PREPARE_TO_RESPOND_PATH}?lang=cy`)).text);
 
     expect(english.documentElement.lang).toBe('en');
-    expect(welsh.documentElement.lang).toBe('en');
-    expect(welsh.querySelector('h1')?.textContent).toContain(enGuide.heading);
-    expect(english.querySelector('.govuk-language-toggle')).toBeNull();
+    expect(welsh.documentElement.lang).toBe('cy');
+    expect(english.querySelector('.govuk-language-toggle a')?.getAttribute('href')).toBe('?lang=cy');
+    expect(welsh.querySelector('.govuk-language-toggle a')?.getAttribute('href')).toBe('?lang=en');
+  });
+
+  it('is in Welsh in Welsh, down to the section headings and accordion controls', async () => {
+    const page = parse((await get(`${PREPARE_TO_RESPOND_PATH}?lang=cy`)).text);
+
+    expect(page.querySelector('h1')?.textContent).toContain(cyGuide.heading);
+    expect(page.body.textContent).toContain(cyGuide.pilotScope);
+    const headings = [...page.querySelectorAll('.govuk-accordion__section-heading')].map(h => h.textContent!.trim());
+    expect(headings).toEqual(
+      GUIDE_SECTIONS.map(({ key }, index) => `Cam ${index + 1}: ${cyGuide.sections[key].title}`)
+    );
+    const accordion = page.querySelector('.govuk-accordion')!;
+    expect(accordion.getAttribute('data-i18n.show-all-sections')).toBe(cyGuide.accordion.showAllSections);
+    expect(accordion.getAttribute('data-i18n.hide-section')).toBe(cyGuide.accordion.hideSection);
+    expect(page.body.textContent).not.toContain(enGuide.intro);
   });
 });

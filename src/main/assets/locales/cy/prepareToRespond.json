@@ -1,177 +1,179 @@
 {
-  "pageTitle": "cyPrepare to respond to a claim for possession of a rented property",
-  "serviceName": "cyRespond to a claim for possession of a rented property",
-  "caption": "cyPrepare to:",
-  "heading": "cyRespond to a claim for possession of a rented property",
-  "pilotBanner": "cyThis guide is for the online possession service, which is only available in some courts.",
-  "beforeYouStart": "cyBefore you start",
-  "intro": "cyThis step-by-step guide can help you prepare to respond to a claim for possession of a rented property.",
-  "sectionCount": "cyEach section explains what you will be asked and any documents you may need. There are {{number}} sections. Some are optional and may not apply to you.",
-  "pilotScope": "cyYou can only respond online if the letter about your claim tells you to. If it does not, follow the instructions in the letter.",
-  "readyHeading": "cyWhen you are ready to complete the form",
-  "readyText": "cyOnce you are ready to complete the form, you can",
-  "readyLink": "cyrespond to a property possession claim online",
-  "claimantCanSeeAnswers": "cyThe claimant will be able to see your answers.",
-  "stepHeading": "cyStep {{number}}: {{title}}",
+  "pageTitle": "Paratoi ar gyfer ymateb i hawliad i feddiannu eiddo ar rent",
+  "serviceName": "Ymateb i hawliad i feddiannu eiddo ar rent",
+  "caption": "Paratoi ar gyfer:",
+  "heading": "Ymateb i hawliad i feddiannu eiddo ar rent",
+  "pilotBanner": "Mae’r canllaw hwn ar gyfer y gwasasanarth meddiannu ar-lein, sydd ond ar gael mewn rhai llysoedd.",
+  "beforeYouStart": "Cyn ichi ddechrau",
+  "intro": "Gall y canllaw cam wrth gam hwn eich helpu i ymateb i hawliad i feddiannu eiddo ar rent.",
+  "sectionCount": "Mae pob adran yn esbonio’r hyn y gofynnir i chi ac unrhyw ddogfennau y gall fod angen arnoch. Mae yna {{number}} adran. Mae rhai yn ddewisol ac efallai na fyddant yn berthnasol i chi.",
+  "pilotScope": "Gallwch ond ymateb ar-lein os yw’r llythyr am yr hawliad yn dweud wrthych i wneud hynny. Os nad yw’n gwneud hynny, dilynwch y cyfarwyddiadau yn y llythyr.",
+  "readyHeading": "Pan fyddwch yn barod i lenwi’r ffurflen",
+  "readyText": "Unwaith y byddwch yn barod i lenwi’r ffurflen, gallwch",
+  "readyLink": "ymateb i hawliad i feddiannu eiddo ar-lein",
+  "claimantCanSeeAnswers": "Bydd yr hawlydd yn gallu gweld eich atebion.",
+  "stepHeading": "Cam {{number}}: {{title}}",
   "accordion": {
-    "showAllSections": "cyShow all sections",
-    "hideAllSections": "cyHide all sections",
-    "showSection": "cyShow",
-    "hideSection": "cyHide",
-    "showSectionAriaLabel": "cyShow this section",
-    "hideSectionAriaLabel": "cyHide this section"
+    "showAllSections": "Dangos pob adran",
+    "hideAllSections": "Cuddio pob adran",
+    "showSection": "Dangos",
+    "hideSection": "Cuddio",
+    "showSectionAriaLabel": "Dangos yr adran hon",
+    "hideSectionAriaLabel": "Cuddio’r adran hon"
   },
   "sections": {
     "yourDetails": {
-      "title": "cyYour details",
+      "title": "Eich manylion",
       "content": [
         {
-          "text": "cyWe will ask you to confirm your:"
+          "text": "Byddwn yn gofyn i chi gadarnhau eich:"
         },
         {
-          "items": ["cyname", "cyaddress", "cydate of birth", "cycontact preferences"]
+          "items": ["enw", "cyfeiriad", "dyddiad geni", "dewisiadau cyswllt"]
         }
       ]
     },
     "tenancy": {
-      "title": "cyTenancy, occupation contract or licence agreement",
+      "title": "Tenantiaeth, contract meddiannaeth neu gytundeb trwydded",
       "content": [
         {
-          "text": "cyWhen your landlord (the claimant) made their claim, they provided information about your agreement."
+          "text": "Pan wnaeth eich landlord (yr hawlydd) eu hawliad, bu iddynt ddarparu gwybodaeth am eich cytundeb."
         },
         {
-          "text": "cyWe will ask you to confirm:"
+          "text": "Byddwn yn gofyn i chi gadarnhau:"
         },
         {
           "items": [
-            "cyyour tenancy, occupation contract, or licence agreement and when it started",
-            "cywhether your landlord gave you notice before starting possession proceedings, and when you received it"
+            "eich tenantiaeth, contract meddiannaeth, neu eich cytundeb trwydded a phryd wnaeth o ddechrau",
+            "p’un a wnaeth eich landlord roi rhybudd i chi cyn cychwyn achos meddiannu, a phryd gawsoch y rhybudd"
           ]
         }
       ]
     },
     "payments": {
-      "title": "cyPayments or agreements since the claim was made",
+      "title": "Taliadau neu gytundebau ers gwneud yr hawliad",
       "content": [
         {
-          "text": "cyIf the claim against you is based on rent arrears, we will ask you to confirm:"
+          "text": "Os yw’r hawliad yn eich erbyn yn seiliedig ar ôl-ddyledion rhent, byddwn yn gofyn i chi gadarnhau:"
         },
         {
           "items": [
-            "cyhow much money you owe",
-            "cywhether you have paid any money since the claim was made – if you have, you will be asked how much you paid and when",
-            "cywhether you have made an agreement with your landlord to repay what you owe – if you have, you will be asked how much you agreed to pay, how often you will pay and when you made this agreement"
+            "faint o arian sy’n ddyledus gennych",
+            "p’un a ydych wedi talu unrhyw arian ers i’r hawliad gael ei wneud - os ydych, gofynnir i chi faint a dalwyd gennych a phryd",
+            "p’un a ydych wedi gwneud cytundeb gyda’ch landlord i ad-dalu’r hyn sy’n ddyledus gennych - os ydych wedi gwneud hyn, gofynnir i chi ddweud faint bu i chi gytuno i dalu, pa mor aml byddwch yn talu a phryd wnaethoch chi wneud y cytundeb hwn"
           ]
         },
         {
-          "text": "cyIf you have not made an agreement with your landlord, you can offer to pay what you owe in instalments. We will ask:"
+          "text": "Os nad ydych wedi gwneud cytundeb gyda’ch landlord, gallwch gynnig i dalu’r hyn sy’n ddyledus gennych mewn rhandaliadau. Byddwn yn gofyn:"
         },
         {
           "items": [
-            "cyhow much you could afford to pay in addition to your current rent",
-            "cyhow often you can make this payment"
+            "faint allwch chi fforddio’i dalu ar ben eich rhent cyfredol",
+            "pa mor aml y gallwch wneud y taliad hwn"
           ]
         }
       ]
     },
     "household": {
-      "title": "cyYour household and circumstances",
+      "title": "Eich cartref a’ch amgylchiadau",
       "content": [
         {
-          "text": "cyWe will ask you about:"
+          "text": "Byddwn yn gofyn i chi am:"
         },
         {
           "items": [
-            "cyany dependants you have (people you look after financially)",
-            "cyother adults that live in your home",
-            "cywhether you would have anywhere else to live if you were asked to leave your home",
-            "cyany personal circumstances that have led to your case that you think a judge should know about",
-            "cyany exceptional hardship you would experience if you were asked to leave your home"
+            "unrhyw ddibynyddion sydd gennych (pobl rydych yn gofalu amdanynt yn ariannol)",
+            "oedolion eraill sy’n byw yn eich cartref",
+            "pa un a fyddai gennych rywle arall i fyw os gofynnir i chi adael eich cartref",
+            "unrhyw amgylchiadau personol sydd wedi arwain at eich achos yr ydych yn meddwl y dylai barnwr wybod amdanynt",
+            "unrhyw galedi eithriadol a brofir gennych os gofynnir i chi adael eich cartref"
           ]
         }
       ]
     },
     "incomeAndExpenses": {
-      "title": "cyYour income and expenses",
+      "title": "Eich incwm a’ch costau",
       "content": [
         {
-          "text": "cyA judge can use details about your income and expenses to reach a decision on your case, and to decide how much you could afford to repay if you owe any money in rent payments."
+          "text": "Gall barnwr ddefnyddio manylion am eich incwm a chostau i ddod i benderfyniad ar eich achos ac i benderfynu faint y gallwch fforddio ei ad-dalu os oes unrhyw arian yn ddyledus gennych mewn taliadau rhent."
         },
         {
-          "text": "cyIf you choose to give any details, we will ask you about:"
+          "text": "Os byddwch yn dewis rhoi unrhyw fanylion, byddwn yn gofyn i chi am:"
         },
         {
           "items": [
-            "cyyour regular income",
-            "cyany benefits you receive",
-            "cyif you have applied for Universal Credit",
-            "cyany priority debts",
-            "cyother regular expenses"
+            "eich incwm rheolaidd",
+            "unrhyw fudd-daliadau rydych chi’n eu cael",
+            "a ydych chi wedi gwneud cais am Gredyd Cynhwysol",
+            "unrhyw ddyledion sy’n flaenoriaeth",
+            "costau rheolaidd eraill"
           ]
         },
         {
-          "text": "cyWe may also ask you to upload financial documents or other supporting evidence."
+          "text": "Efallai y byddwn hefyd yn gofyn i chi uwchlwytho dogfennau ariannol neu dystiolaeth ategol arall."
         }
       ]
     },
     "disputing": {
-      "title": "cyDisputing other parts of the claim",
+      "title": "Gwrthwynebu rhannau eraill o’r hawliad",
       "content": [
         {
-          "text": "cyIf any part of the claim against you is not about rent arrears, we will ask you to:"
+          "text": "Os yw unrhyw ran o’r hawliad ddim yn ymwneud ag ôl-ddyledion rhent, byddwn yn gofyn i chi:"
         },
         {
-          "items": ["cyreview the claim", "cytell us if you disagree with any part of it"]
+          "items": ["adolygu’r hawliad", "dweud wrthym os ydych yn anghytuno ag unrhyw ran ohono"]
         },
         {
-          "text": "cyYou can dispute part of the claim if you think the claimant has provided incorrect information or you disagree with what they have said. For example, you may think they did not follow the correct legal procedure, or a document they uploaded is not valid."
+          "text": "Gallwch herio rhan o’r hawliad os ydych yn meddwl bod yr hawlydd wedi rhoi’r wybodaeth anghywir neu os ydych yn anghytuno â rhywbeth maen nhw wedi dweud. Er enghraifft, gallwch feddwl na wnaethant ddilyn yr weithdrefn gyfreithiol gywir neu fod dogfen a uwchlwythwyd ganddynt yn annilys."
         }
       ]
     },
     "counterclaim": {
-      "title": "cyMaking a counterclaim",
+      "title": "Gwneud gwrth-hawliad",
       "content": [
         {
-          "text": "cyA counterclaim is a separate claim that you can make alongside your response to the claim against you. In a counterclaim, you say that a party owes you something. This can be money or something else."
+          "text": "Mae gwrth-hawliad yn hawliad ar wahân y gallwch ei wneud ynghyd â’ch ymateb i’r hawliad yn eich erbyn. Mewn gwrth-hawliad, rydych yn dweud bod gan barti rywbeth yn ddyledus i chi. Gall hwn fod yn arian neu’n rhywbeth arall."
         },
         {
-          "text": "cyWe will ask you:"
+          "text": "Byddwn yn gofyn i chi:"
         },
         {
           "items": [
-            "cyif you want to make a counterclaim",
-            "cyto pay a fee to make a counterclaim, unless you are eligible for help with fees"
+            "os ydych eisiau gwneud gwrth-hawliad",
+            "talu ffi i wneud gwrth-hawliad, oni bai eich bod yn gymwys i gael help i dalu ffioedd"
           ]
         }
       ]
     },
     "support": {
-      "title": "cyTell us if you need support",
+      "title": "Dweud wrthym os oes arnoch angen cymorth",
       "content": [
         {
-          "text": "cySome people need support to use HMCTS services."
+          "text": "Mae rhai pobl angen cymorth i ddefnyddio gwasanaethau GLlTEF."
         },
         {
-          "text": "cyYou can ask for support such as:"
+          "text": "Gallwch ofyn am gymorth fel:"
         },
         {
           "items": [
-            "cya language interpreter",
-            "cyreasonable adjustments if you have a health condition or disability",
-            "cyspecial measures to help you feel safe at court"
+            "cyfieithydd",
+            "addasiadau rhesymol os oes gennych gyflwr iechyd neu anabledd",
+            "mesurau arbennig i’ch helpu i deimlo’n ddiogel yn y llys"
           ]
         },
-        { "text": "cyTo ask for an interpreter or special measures, contact the court dealing with your case." },
         {
-          "text": "cyYou may also be able to choose to answer equality and diversity questions."
+          "text": "I ofyn am gyfieithydd neu fesurau arbennig, cysylltwch â’r llys sy’n ymdrin â’ch achos."
+        },
+        {
+          "text": "Gallwch hefyd ddewis i ateb cwestiynau cydraddoldeb a chynhwysiant."
         }
       ]
     },
     "checkYourAnswers": {
-      "title": "cyCheck your answers",
+      "title": "Gwiriwch eich atebion",
       "content": [
         {
-          "text": "cyYou will be able to review all your answers and make any changes before you submit your response."
+          "text": "Byddwch yn gallu adolygu’ch atebion i gyd a gwneud unrhyw newidiadau cyn cyflwyno’ch ymateb."
         }
       ]
     }
