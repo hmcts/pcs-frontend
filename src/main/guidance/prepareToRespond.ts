@@ -34,8 +34,24 @@ export const GUIDE_SECTIONS = [
 /** The Welsh Language Unit's translation is in the cy locale (HDPI-9653), so the guide is offered in both languages. */
 const WELSH_AVAILABLE = true;
 
-export function prepareToRespondPage(requestedLang: unknown): Record<string, unknown> {
-  const lang: AllowedLang = requestedLang === 'cy' && WELSH_AVAILABLE ? 'cy' : 'en';
+/** The first usable string, so `?lang=cy&lang=en` and a missing value behave as they do in the i18n module. */
+const firstString = (value: unknown): string | undefined => {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  return typeof candidate === 'string' && candidate.trim() !== '' ? candidate.toLowerCase().trim() : undefined;
+};
+
+/**
+ * The guide is mounted before the i18n middleware, so it resolves the language itself, in that middleware's order:
+ * the query string, then the `lang` cookie the rest of the service caches the choice in. Without the cookie, someone
+ * who chose Welsh elsewhere in the service would arrive here in English.
+ */
+function guideLanguage(queryLang: unknown, cookieLang: unknown): AllowedLang {
+  const requested = firstString(queryLang) ?? firstString(cookieLang);
+  return requested === 'cy' && WELSH_AVAILABLE ? 'cy' : 'en';
+}
+
+export function prepareToRespondPage(queryLang: unknown, cookieLang?: unknown): Record<string, unknown> {
+  const lang = guideLanguage(queryLang, cookieLang);
   const t: TFunction = i18next.getFixedT(lang, [NAMESPACE, 'common']);
 
   const sections = GUIDE_SECTIONS.map(({ key }, index) => ({

@@ -224,6 +224,17 @@ describe('the guide to preparing a response to a possession claim', () => {
     expect(welsh.querySelector('.govuk-language-toggle a')?.getAttribute('href')).toBe('?lang=en');
   });
 
+  it('follows the lang cookie someone picked up elsewhere in the service, and lets the query override it', async () => {
+    const cookie = 'lang=cy';
+    const fromCookie = parse((await get(PREPARE_TO_RESPOND_PATH, { cookie })).text);
+    const overridden = parse((await get(`${PREPARE_TO_RESPOND_PATH}?lang=en`, { cookie })).text);
+
+    expect(fromCookie.documentElement.lang).toBe('cy');
+    expect(fromCookie.querySelector('h1')?.textContent).toContain(cyGuide.heading);
+    expect(overridden.documentElement.lang).toBe('en');
+    expect(overridden.querySelector('h1')?.textContent).toContain(enGuide.heading);
+  });
+
   it('is in Welsh in Welsh, down to the section headings and accordion controls', async () => {
     const page = parse((await get(`${PREPARE_TO_RESPOND_PATH}?lang=cy`)).text);
 

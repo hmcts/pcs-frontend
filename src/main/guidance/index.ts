@@ -20,7 +20,7 @@ export function publicRouter(publicDir: string): Router {
     try {
       await i18nReady;
       res.set('X-Robots-Tag', 'noindex');
-      res.render('guidance/prepare-to-respond', prepareToRespondPage(req.query.lang));
+      res.render('guidance/prepare-to-respond', prepareToRespondPage(req.query.lang, req.cookies?.lang));
     } catch (error) {
       next(error);
     }
