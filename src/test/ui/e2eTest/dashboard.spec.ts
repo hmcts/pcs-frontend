@@ -37,7 +37,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   const submitPayload = testInfo.title.includes('withoutNotice = NO')
-    ? { ...submitCaseApiData.submitCasePayload, claimantContactEmail: user.claimantSolicitor.email }
+    ? { ...submitCaseApiData.submitCasePayload, claimantContactEmail: user.localAuthority.email }
     : submitCaseApiData.submitCasePayload;
   await performAction('submitCaseAPI', { data: submitPayload });
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
@@ -271,8 +271,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
   });
 
-  // This test will be skipped until the bugs HDPI-7401 & HDPI-7360 get fixed
-  test.skip('Validate View the response page data @regression @crossbrowser', async () => {
+  test('Validate View the response page data @regression @crossbrowser', async () => {
     await performAction('skipTestIfLdFlagDisabled', 'release-1.2-enabled');
     await performValidation('mainHeader', dashboard.mainHeader);
     await performAction('reloadPage');
@@ -281,6 +280,24 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       type: 'both',
     });
     await performAction('reloadPage');
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('validateCounterClaimApplicationFee', {
+      amount: `£${dashboard.counterClaimAmount}`,
+      fee: dashboard.counterClaimFee,
+    });
+    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
+    await performAction('clickButton', paymentDetails.confirmPaymentButton);
+    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: counterClaimPaymentSuccessful.paymentConfirmationParagraph,
+    });
+    await performAction(
+      'clickButton',
+      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
+    );
     await performAction('clickButton', dashboard.viewTheResponseSubHeader);
     await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
     await performAction('verifyResponseDetailsOnViewTheResponsePage');

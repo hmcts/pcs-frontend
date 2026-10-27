@@ -1248,9 +1248,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hmcts-cft/docweave@npm:0.8.0":
-  version: 0.8.0
-  resolution: "@hmcts-cft/docweave@npm:0.8.0"
+"@hmcts-cft/docweave@npm:0.9.0":
+  version: 0.9.0
+  resolution: "@hmcts-cft/docweave@npm:0.9.0"
   dependencies:
     prosemirror-commands: "npm:1.7.2"
     prosemirror-dropcursor: "npm:1.8.4"
@@ -1269,7 +1269,7 @@ __metadata:
   peerDependenciesMeta:
     express:
       optional: true
-  checksum: 10/a024a2356bcc13deb55013113607d2b86e8a67a39444967edb8a4831d4142c9235cfe1bef2f4ca31ec4074f109e9b4e97cc2690fe8e128fb7e0b38da39f43d71
+  checksum: 10/b914c16e38b9ab6e55191acad0870c98d0b1beddb0938b7c2dc68479c089be5a0ad50be39890ea21ff4613a44c29837c02d30e666c4f17373238cfcfe1476b88
   languageName: node
   linkType: hard
 
@@ -2223,31 +2223,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-sdk-common@npm:2.29.0":
-  version: 2.29.0
-  resolution: "@launchdarkly/js-sdk-common@npm:2.29.0"
-  checksum: 10/24cdcb5785df7c3e462cd06c1ca0819acb379c4a574ecb87b6f53da8c244eeead9fdbb7eb1bf3fa7ef21b4188901ed4eae7846b7f2fa7d9ac90b100590e445a2
+"@launchdarkly/js-sdk-common@npm:2.31.0":
+  version: 2.31.0
+  resolution: "@launchdarkly/js-sdk-common@npm:2.31.0"
+  checksum: 10/a91146200c70a82c852f2b9864d30faa0b9eac58cf9b8d7e11d4f7e01838a7ef4c218f80cef9e63d66e3a38c07c2c562c28b705b87c3bca0a0577d7dc2145f53
   languageName: node
   linkType: hard
 
-"@launchdarkly/js-server-sdk-common@npm:2.24.1":
-  version: 2.24.1
-  resolution: "@launchdarkly/js-server-sdk-common@npm:2.24.1"
+"@launchdarkly/js-server-sdk-common@npm:2.25.0":
+  version: 2.25.0
+  resolution: "@launchdarkly/js-server-sdk-common@npm:2.25.0"
   dependencies:
-    "@launchdarkly/js-sdk-common": "npm:2.29.0"
+    "@launchdarkly/js-sdk-common": "npm:2.31.0"
     semver: "npm:7.5.4"
-  checksum: 10/95ce421a47ddeeba7d4a5a6d056462d3811f5c9ac541345c287bde04a0404b482bb476b131240a68c580038cc0cd27df693a78667819eef0579249510bf0b6aa
+  checksum: 10/cd19484437605c2e6e7c4735119bc54d1257c00eac4c93f1f3a1e639a410208116332aba9358f8b091aa5c3817870ac9db91f9babd2f3c066c8ebe77462d66e3
   languageName: node
   linkType: hard
 
-"@launchdarkly/node-server-sdk@npm:9.14.4":
-  version: 9.14.4
-  resolution: "@launchdarkly/node-server-sdk@npm:9.14.4"
+"@launchdarkly/node-server-sdk@npm:9.15.0":
+  version: 9.15.0
+  resolution: "@launchdarkly/node-server-sdk@npm:9.15.0"
   dependencies:
-    "@launchdarkly/js-server-sdk-common": "npm:2.24.1"
+    "@launchdarkly/js-server-sdk-common": "npm:2.25.0"
     https-proxy-agent: "npm:^7.0.6"
     launchdarkly-eventsource: "npm:2.3.0"
-  checksum: 10/b8568eae026bd4300cbd12324f2b09ea431dbff00de001d049b9d5012d2571cdba318c98208d5383460c4a8aa6ced71fb18e0687eb7ef6d3199adc3c3119ffb7
+  checksum: 10/aeaf4c452ef1c2d0ab1cf550e94a06661a80796af7170ac6435b1e061d635168f208fe1116ae84c073b5aba3f0fb3b4f3cd8ffab4b8be8e3dde72fb3d079f785
   languageName: node
   linkType: hard
 
@@ -12152,12 +12152,12 @@ __metadata:
     "@eslint/js": "npm:10.0.1"
     "@eslint/plugin-kit": "npm:0.7.3"
     "@hmcts-cft/cft-ui-component-lib": "npm:0.1.0-alpha.4"
-    "@hmcts-cft/docweave": "npm:0.8.0"
+    "@hmcts-cft/docweave": "npm:0.9.0"
     "@hmcts/info-provider": "npm:1.4.0"
     "@hmcts/nodejs-healthcheck": "npm:1.8.6"
     "@hmcts/playwright-common": "npm:1.1.7"
     "@hmcts/properties-volume": "npm:1.4.1"
-    "@launchdarkly/node-server-sdk": "npm:9.14.4"
+    "@launchdarkly/node-server-sdk": "npm:9.15.0"
     "@ministryofjustice/frontend": "npm:^11.0.0"
     "@opentelemetry/api": "npm:1.9.1"
     "@opentelemetry/winston-transport": "npm:0.31.0"
@@ -12231,9 +12231,9 @@ __metadata:
     openid-client: "npm:6.8.8"
     playwright: "npm:1.62.1"
     playwright-core: "npm:1.62.1"
-    postcss: "npm:8.5.30"
+    postcss: "npm:8.5.31"
     prettier: "npm:3.9.10"
-    sass: "npm:1.105.1"
+    sass: "npm:1.106.1"
     sass-loader: "npm:17.0.1"
     saucectl: "npm:^0.214.0"
     serve-favicon: "npm:2.5.1"
@@ -12555,14 +12555,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.5.30":
-  version: 8.5.30
-  resolution: "postcss@npm:8.5.30"
+"postcss@npm:8.5.31":
+  version: 8.5.31
+  resolution: "postcss@npm:8.5.31"
   dependencies:
     nanoid: "npm:^3.3.20"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.2"
-  checksum: 10/f7c7fdb1fc69d73d88522da220ecf99ef8de9b2eb7df2d0ceb1e8c42d7a7cc44864c98cb89dc145a79a59187a63f986af466ec6fd642c8365ad276f71c052efe
+  checksum: 10/d2a3415681570c4687cbb34d7a9cdb570619da73b764229260f7c7337d2359cffa1045f4081a4599bd0b9320bd23b05f9915057f7b13ad9534b0121c2e9de564
   languageName: node
   linkType: hard
 
@@ -12806,12 +12806,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prosemirror-transform@npm:1.12.2":
-  version: 1.12.2
-  resolution: "prosemirror-transform@npm:1.12.2"
+"prosemirror-transform@npm:1.12.4":
+  version: 1.12.4
+  resolution: "prosemirror-transform@npm:1.12.4"
   dependencies:
     prosemirror-model: "npm:^1.21.0"
-  checksum: 10/9e859789c11509e7dc46402b12edfb98bc11f8144a833dab0b4a6f83a84cae7df4066e3f03e6074f2a0e8d0ae870651d11ad5aa36609dd34543f439b91d68dd3
+  checksum: 10/0e2164433b07883e281c6125d7e867871602deaebe3459b3445d679bb4fc98c69fb679bcf6f090e01c4125f5da1a221bbeb1481062e3629ea33951a746b45254
   languageName: node
   linkType: hard
 
@@ -13382,9 +13382,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:1.105.1":
-  version: 1.105.1
-  resolution: "sass@npm:1.105.1"
+"sass@npm:1.106.1":
+  version: 1.106.1
+  resolution: "sass@npm:1.106.1"
   dependencies:
     "@parcel/watcher": "npm:^2.4.1"
     chokidar: "npm:^5.0.0"
@@ -13395,7 +13395,7 @@ __metadata:
       optional: true
   bin:
     sass: sass.js
-  checksum: 10/772b8943117cb9badaa1a3d3dda888acc456de859820ab7ac401d03e095f8d88de1e6a39dc969baa850efbbc6ed1a5e4eeb288d0ae4d0d7d99b6efffcf9ec050
+  checksum: 10/8138ca5abfd6713130a1e28814eb695578d9916a77a9d585651b2bb9f5f6219ce513b7fde58acb49a0634f29b1ffb0a7a4a4988865acb4d508d4e329b1ffd452
   languageName: node
   linkType: hard
 
