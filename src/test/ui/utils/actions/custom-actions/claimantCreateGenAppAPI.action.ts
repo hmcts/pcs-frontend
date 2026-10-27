@@ -24,6 +24,7 @@ export class ClaimantCreateGenAppAPIAction implements IAction {
     const caseApi = Axios.create(createCaseEventTokenApiData.createCaseApiInstance());
     const caseResponse = await caseApi.get(getCaseApiData.getCaseApiEndPoint());
     const applicantPartyId = caseResponse.data?.data?.allClaimants?.[0]?.id;
+    const genAppCountBeforeSubmission = caseResponse.data?.data?.genApps?.length ?? 0;
     if (!applicantPartyId) {
       throw new Error(`No claimant party ID found for case ${process.env.CASE_NUMBER}`);
     }
@@ -79,6 +80,15 @@ export class ClaimantCreateGenAppAPIAction implements IAction {
         paymentApiData.updatePaymentApiEndPoint,
         paymentApiData.paymentUpdatePayload(unpaid.serviceRequestReference, Number(unpaid.amount))
       );
+
+      // The event and payment callback update genApps asynchronously.
+      for (let attempt = 1; attempt <= 15; attempt++) {
+        const updatedCase = await claimantApi.get(getCaseApiData.getCaseApiEndPoint());
+        if ((updatedCase.data?.data?.genApps?.length ?? 0) > genAppCountBeforeSubmission) {
+          break;
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
       console.log(`\n CLAIMANT GENAPP SUBMITTED AND FEE PAID: case ${process.env.CASE_NUMBER}`);
     } catch (error: unknown) {
       if (Axios.isAxiosError(error)) {
