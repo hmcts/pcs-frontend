@@ -125,8 +125,6 @@ export class CitizenDashboardAction implements IAction {
     await performValidations(
       'View the response page validation',
       ['viewClaimOrResponseTable', viewTheResponse.claimantDetailsSubHeader, viewTheResponse.claimantDetails],
-      // The line below will be commented until the bug HDPI-7360 gets fixed
-      //['viewClaimOrResponseTable', viewTheResponse.defendant1SubHeader, viewTheResponse.defendant1Details],
       ['viewClaimOrResponseTable', viewTheResponse.responseToClaimSubHeader, viewTheResponse.responseToClaimDetails],
       [
         'viewClaimOrResponseTable',
@@ -144,7 +142,15 @@ export class CitizenDashboardAction implements IAction {
       ],
       ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails]
     );
-    await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
+    await expect(async () => {
+      await performAction('reloadPage');
+      await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
+      await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
+      await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.counterClaimPDFLink });
+    }).toPass({
+      timeout: 30_000,
+      intervals: [1_000, 2_000, 3_000],
+    });
   }
 
   private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {
