@@ -37,7 +37,7 @@ test.beforeEach(async ({ page }, testInfo) => {
   process.env.GROUNDS = 'RENT_ARREARS_GROUND10';
   await performAction('createCaseAPI', { data: createCaseApiData.createCasePayload });
   const submitPayload = testInfo.title.includes('withoutNotice = NO')
-    ? { ...submitCaseApiData.submitCasePayload, claimantContactEmail: user.claimantSolicitor.email }
+    ? { ...submitCaseApiData.submitCasePayload, claimantContactEmail: user.localAuthority.email }
     : submitCaseApiData.submitCasePayload;
   await performAction('submitCaseAPI', { data: submitPayload });
   logTestEnvAfterBeforeEach(testInfo.title, DASHBOARD_BEFORE_EACH_ENV_KEYS);
