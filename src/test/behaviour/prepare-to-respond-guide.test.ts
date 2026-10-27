@@ -224,6 +224,14 @@ describe('the guide to preparing a response to a possession claim', () => {
     expect(welsh.querySelector('.govuk-language-toggle a')?.getAttribute('href')).toBe('?lang=en');
   });
 
+  it('titles the page the way the rest of the service does, in each language', async () => {
+    const english = parse((await get(PREPARE_TO_RESPOND_PATH)).text);
+    const welsh = parse((await get(`${PREPARE_TO_RESPOND_PATH}?lang=cy`)).text);
+
+    expect(english.title).toBe(`${enGuide.pageTitle} - HM Courts & Tribunals Service – GOV.UK`);
+    expect(welsh.title).toBe(`${cyGuide.pageTitle} - Gwasanaeth Llysoedd a Thribiwnlysoedd EF – GOV.UK`);
+  });
+
   it('follows the lang cookie someone picked up elsewhere in the service, and lets the query override it', async () => {
     const cookie = 'lang=cy';
     const fromCookie = parse((await get(PREPARE_TO_RESPOND_PATH, { cookie })).text);

@@ -31,9 +31,6 @@ export const GUIDE_SECTIONS = [
   { key: 'checkYourAnswers', describes: ['checkYourAnswersAndSubmit'] },
 ] as const satisfies readonly { key: string; describes: readonly RespondToClaimSectionId[] }[];
 
-/** The Welsh Language Unit's translation is in the cy locale (HDPI-9653), so the guide is offered in both languages. */
-const WELSH_AVAILABLE = true;
-
 /** The first usable string, so `?lang=cy&lang=en` and a missing value behave as they do in the i18n module. */
 const firstString = (value: unknown): string | undefined => {
   const candidate = Array.isArray(value) ? value[0] : value;
@@ -47,7 +44,7 @@ const firstString = (value: unknown): string | undefined => {
  */
 function guideLanguage(queryLang: unknown, cookieLang: unknown): AllowedLang {
   const requested = firstString(queryLang) ?? firstString(cookieLang);
-  return requested === 'cy' && WELSH_AVAILABLE ? 'cy' : 'en';
+  return requested === 'cy' ? 'cy' : 'en';
 }
 
 export function prepareToRespondPage(queryLang: unknown, cookieLang?: unknown): Record<string, unknown> {
@@ -63,7 +60,7 @@ export function prepareToRespondPage(queryLang: unknown, cookieLang?: unknown): 
     t,
     lang,
     htmlLang: lang,
-    showLanguageToggle: WELSH_AVAILABLE,
+    showLanguageToggle: true,
     respondOnlineUrl: RESPOND_ONLINE_PATH,
     sectionCount: t('sectionCount', { number: sections.length }),
     sections,
