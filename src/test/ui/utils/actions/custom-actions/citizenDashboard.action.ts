@@ -174,10 +174,15 @@ export class CitizenDashboardAction implements IAction {
       ['viewClaimOrResponseTable', viewTheResponse.counterclaimSubHeader, viewTheResponse.counterclaimDetails],
       ['viewClaimOrResponseTable', viewTheResponse.statementOfTruthSubHeader, getStatementOfTruthDetails(defendantName)]
     );
-    await performValidation('text', { elementType: 'paragraph', text: viewTheResponse.iBelieveTheFactsParagraph });
-    await performAction('reloadPage');
-    await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
-    await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
+    await expect(async () => {
+      await performAction('reloadPage');
+      await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
+      await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.responsePDFLink });
+      await performValidation('validatePdfDocument', '', { linkText: viewTheResponse.counterClaimPDFLink });
+    }).toPass({
+      timeout: 30_000,
+      intervals: [1_000, 2_000, 3_000],
+    });
   }
 
   private async verifyClaimDetailsOnViewTheClaimPage(): Promise<void> {

@@ -23,6 +23,7 @@ export const viewTheResponse = {
   ifYouCannotFindLink: `If you cannot find a document that you are looking for in this section`,
   downloadPDFLink: `Download a PDF copy of the response`,
   responsePDFLink: `Response (PDF)`,
+  counterClaimPDFLink: `Counterclaim (PDF)`,
   iBelieveTheFactsParagraph: `I believe the facts stated in this defence form are true. I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in the truth.`,
   claimantDetails: {
     Name: 'Possession Claims Solicitor Org',
