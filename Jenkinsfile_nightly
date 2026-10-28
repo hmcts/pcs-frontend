@@ -149,6 +149,8 @@ withNightlyPipeline(type, product, component) {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
 
   }
+
+}
   
 def selectedSauceSuites() {
   [
