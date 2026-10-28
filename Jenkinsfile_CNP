@@ -2,7 +2,7 @@
 
 @Library("Infrastructure@2.10.1")
 
-import uk.gov.hmcts.contino.AppPipelineConfig
+import uk.gov.hmcts.contino.AppPipelineConf
 import uk.gov.hmcts.contino.AppPipelineDsl
 import uk.gov.hmcts.contino.GithubAPI
 
@@ -145,12 +145,8 @@ withPipeline(type, product, component) {
     onPerftest {
       runPerftestSmokeTests(yarnBuilder, secrets, product)
     }
-    onIthc {
-      runIthcSmokeTests(yarnBuilder, secrets, product)
-    }
   }
 }
-
 
 /** First PR label matching prefix → value after prefix (e.g. e2e-tag:@smoke → @smoke) */
 def prLabelSuffix(githubApi, String prefix) {
@@ -191,33 +187,6 @@ def runPerftestSmokeTests(yarnBuilder, Map secrets, String product) {
     }
   }
 }
-
-def runIthcSmokeTests(yarnBuilder, Map secrets, String product) {
-  def vaultConfig = new AppPipelineConfig()
-  vaultConfig.vaultSecrets = secrets
-
-  stageWithEnvironmentAgent('Smoke Test - ithc', product, 'ithc') {
-    withTeamSecrets(vaultConfig, 'ithc', product) {
-      withEnv([
-        "ENVIRONMENT=ithc",
-        "TEST_URL=https://pcs.ithc.platform.hmcts.net/",
-        "PCS_API_URL=http://pcs-api-ithc.service.core-compute-ithc.internal",
-        "CDAM_URL=http://ccd-case-document-am-api-ithc.service.core-compute-ithc.internal",
-        "DATA_STORE_URL_BASE=http://ccd-data-store-api-ithc.service.core-compute-ithc.internal",
-        "CASE_TYPE_ID=PCS",
-        "NODE_CONFIG_ENV=test"
-      ]) {
-        echo "Running smoke tests against ${env.TEST_URL}"
-        try {
-          yarnBuilder.yarn('test:smoke')
-        } finally {
-          archiveSmokeTestReports()
-        }
-      }
-    }
-  }
-}
-
 
 def archiveAllureReport(String reportName) {
   try {
