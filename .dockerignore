@@ -20,6 +20,16 @@ config/fortify-client.properties
 !src/types/**
 !bin/**
 
+!.yarn/
+!.yarn/plugins/
+!.yarn/releases/
+!src/
+!src/main/
+!src/types/
+!config/
+!webpack/
+!bin/
+
 # ACR reads both of these from inside the uploaded context tarball, so the `*`
 # rule above must not exclude them or the remote build cannot start.
 !acb.yaml
