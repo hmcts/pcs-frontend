@@ -191,6 +191,7 @@
     "prosemirror-model": "1.25.12",
     "prosemirror-transform": "1.12.4",
     "prosemirror-view": "1.42.6",
+    "qs": "^6.16.1",
     "semver": "^7.5.2",
     "uuid": "14.0.3"
   },
