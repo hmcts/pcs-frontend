@@ -49,4 +49,6 @@ export const dashboard = {
   inProgressTag: `In progress`,
   completedTag: `Completed`,
   availableTag: `Available`,
+  counterClaimAmount: '1,500.00',
+  counterClaimFee: '80.00',
 };

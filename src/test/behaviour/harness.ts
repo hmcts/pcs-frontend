@@ -382,7 +382,11 @@ export async function openPage(html: string): Promise<Page> {
     documentText: () => renderText(JSON.parse(control<HTMLTextAreaElement>('#order-document').value)),
     body: action => {
       const body = new URLSearchParams();
-      new FormData(form).forEach((value, name) => body.append(name, String(value)));
+      form.dispatchEvent(new Event('submit', { cancelable: true }));
+      const data = new FormData(form);
+      // jsdom does not emit the native formdata event.
+      form.dispatchEvent(Object.assign(new Event('formdata'), { formData: data }));
+      data.forEach((value, name) => body.append(name, String(value)));
       if (action) {
         body.set('action', action);
       }
