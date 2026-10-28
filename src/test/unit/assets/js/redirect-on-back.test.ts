@@ -120,6 +120,20 @@ describe('initRedirectOnBack', () => {
     expect(redirectToMock).toHaveBeenCalledWith(dashboardUrl);
   });
 
+  it('redirects to the case summary when the marker carries that url', () => {
+    const caseSummaryUrl = 'https://manage-case.example/cases/case-details/PCS/PCS/123';
+    const span = document.createElement('span');
+    span.id = 'redirect-on-back';
+    span.dataset.redirectUrl = caseSummaryUrl;
+    document.body.appendChild(span);
+
+    initRedirectOnBack();
+    pageshow();
+    window.dispatchEvent(new PopStateEvent('popstate'));
+
+    expect(redirectToMock).toHaveBeenCalledWith(caseSummaryUrl);
+  });
+
   it('re-pushes the guard on every Back so deeper history stacks stay trapped', () => {
     addMarker(dashboardUrl);
 
