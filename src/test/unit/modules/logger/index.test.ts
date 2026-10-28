@@ -1,4 +1,5 @@
 import { logs } from '@opentelemetry/api-logs';
+import { AxiosError } from 'axios';
 import winston from 'winston';
 
 import { Logger } from '@modules/logger';
@@ -53,6 +54,31 @@ describe('logger module', () => {
     expect(output).toContain('Connecting to redis');
     expect(output).toContain('"healthy":true');
     expect(output).not.toContain('Connecting to redis redis');
+  });
+
+  it('keeps the caller message and logger name when an error carries its own message property', () => {
+    const logger = Logger.getLogger(`logger-own-message-${Date.now()}`);
+
+    logger.error(
+      'Failed to create payment request for case 1234567890123456',
+      new AxiosError('Request failed with status code 500')
+    );
+
+    const output = stripAnsiCodes(formattedLines.join('\n'));
+    expect(output).toContain('logger-own-message-');
+    expect(output).toContain('Failed to create payment request for case 1234567890123456');
+    expect(output).toContain('Request failed with status code 500');
+  });
+
+  it('still logs a plain error with its stack', () => {
+    const logger = Logger.getLogger(`logger-plain-error-${Date.now()}`);
+
+    logger.error('Error quitting Redis client', new Error('boom'));
+
+    const output = stripAnsiCodes(formattedLines.join('\n'));
+    expect(output).toContain('logger-plain-error-');
+    expect(output).toContain('Error quitting Redis client');
+    expect(output).toContain('Error: boom');
   });
 
   it('exports logs from loggers created before and after telemetry starts', () => {

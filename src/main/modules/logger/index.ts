@@ -84,10 +84,30 @@ const myFormat = printf((info: Record<string, unknown> & { [key: symbol]: unknow
 
 const isColorizable = process.stdout.isTTY === true && process.env.CI !== 'true';
 
+/**
+ * Moves any Error passed as a trailing argument into `stack`. Must run before splat(), which merges a trailing
+ * argument's own enumerable properties into the record: AxiosError has an own enumerable `message`, which would
+ * replace the caller's message and the logger name with it.
+ */
+const errorSplatToStack = winston.format(info => {
+  const splatValues = info[splatSymbol];
+  if (!Array.isArray(splatValues)) {
+    return info;
+  }
+  const errors = splatValues.filter((value): value is Error => value instanceof Error);
+  if (errors.length === 0) {
+    return info;
+  }
+  info[splatSymbol] = splatValues.filter(value => !(value instanceof Error));
+  info.stack = errors.map(error => error.stack ?? `${error.name}: ${error.message}`).join('\n');
+  return info;
+});
+
 function transport(name: string) {
   const formatParts = [
     label({ label: name, message: true }),
     timestamp(),
+    errorSplatToStack(),
     splat(),
     ...(isColorizable ? [colorize({ all: true })] : []),
     process.env.JSON_PRINT ? json() : myFormat,
