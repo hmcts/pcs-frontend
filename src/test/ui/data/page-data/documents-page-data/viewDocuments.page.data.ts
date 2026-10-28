@@ -26,6 +26,7 @@ export const viewDocuments = {
 
   claimFormLink: `Claim - Claimant 1.pdf`,
   noticeServiceJurisdictionLink: `NoticeServiceJurisdiction - Claimant 1.docx`,
+  counterclaimFormLink: `Counterclaim (PDF)`,
   rentStatementLink: `RentStatement - Claimant 1.pdf`,
   witnessStatementLink: `WitnessStatement - Claimant 1.png`,
   certificateOfSuitabilityLink: `CertificateOfSuitability - Claimant 1.xlsx`,

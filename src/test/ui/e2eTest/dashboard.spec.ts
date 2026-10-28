@@ -239,6 +239,18 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       type: 'submit',
     });
     await performAction('reloadPage');
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: dashboard.noHearingNotificationParagraph,
+    });
+    await performValidation('text', {
+      elementType: 'paragraphWithLink',
+      text: dashboard.counterClaimFeeUnpaidNotificationParagraph,
+    });
+    await performValidation('text', {
+      elementType: 'link',
+      text: dashboard.counterClaimFeeUnpaidNotificationLink,
+    });
     await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
     await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
     await performValidation('mainHeader', paymentDetails.mainHeader);
@@ -249,6 +261,17 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
     );
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
+    await performAction('validateViewDocuments', {
+      documents: [
+        {
+          sectionHeader: viewDocuments.statementsOfCaseSubHeader,
+          documentName: viewDocuments.counterclaimFormLink,
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
+      ],
+    });
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
     for (let i = 0; i < 12; i++) {
       await performAction('reloadPage');
       const respondedNotification = page.locator('p.govuk-body', {
@@ -268,6 +291,32 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       viewResponseHeader: dashboard.viewTheResponseSubHeader,
       tag: dashboard.completedTag,
       viewResponseTag: dashboard.availableTag,
+    });
+  });
+
+  test('Unsuccessful counterclaim payment leaves dashboard notification unchanged @regression', async () => {
+    await performAction('respondPossessionClaimAPI', {
+      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+      type: 'submit',
+    });
+    await performAction('reloadPage');
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.declinedCardNumber });
+    await performValidation('mainHeader', 'Your payment has been declined');
+    await performAction('clickButton', paymentDetails.startDynamicButton);
+    await performValidation('errorMessage', {
+      message: counterClaimApplicationFeeAmount.paymentFailedDynamicErrorMessage,
+    });
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
+    await performValidation('text', {
+      elementType: 'paragraphWithLink',
+      text: dashboard.counterClaimFeeUnpaidNotificationParagraph,
+    });
+    await performValidation('text', {
+      elementType: 'link',
+      text: dashboard.counterClaimFeeUnpaidNotificationLink,
     });
   });
 
