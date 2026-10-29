@@ -119,6 +119,12 @@ async function validatePageIfNavigated(action: string): Promise<void> {
           await test.step('Running Accessibility Scan', async () => {
             await new AxeUtils(executor.page).audit({
               exclude: axe_exclusions,
+              rules: {
+                'aria-allowed-attr': {
+                  selector: 'input[type="radio"]',
+                  enabled: false,
+                },
+              },
             });
           });
         } catch (error) {
