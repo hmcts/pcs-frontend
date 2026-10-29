@@ -29,13 +29,6 @@ export const viewTheResponse = {
     Name: 'Possession Claims Solicitor Org',
     'Address for service': 'Ministry Of Justice, Seventh Floor 102 Petty France, London, SW1H 9AJ',
   },
-  defendant1Details: {
-    Name: 'Test John',
-    'Phone number': '07700900000',
-    'SMS mobile number': '07700900980',
-    'Postal address': '10 Second Avenue, London, W3 7RX',
-    'Date of birth': '20 May 1990',
-  },
   responseToClaimDetails: {
     'Is the tenancy, occupation contract or licence agreement type given by the claimant correct?': 'Yes',
     'Is the tenancy, occupation contract or licence agreement start date given by the claimant correct?': 'Yes',
@@ -99,4 +92,19 @@ export const viewTheResponse = {
     'What are your reasons for making the counterclaim?': 'Landlord withheld deposit without valid reason',
     'Do you need help paying the counterclaim fee?': 'I do not need help paying the fee',
   },
+  statementOfTruthDetails: {
+    'Completed by': 'Test John',
+  },
 };
+
+export const getDefendantDetails = (firstName: string, lastName: string, address: string) => ({
+  Name: `${firstName} ${lastName}`,
+  'Phone number': '07700900000',
+  'SMS mobile number': '07700900980',
+  'Postal address': address,
+  'Date of birth': '20 May 1990',
+});
+
+export const getStatementOfTruthDetails = (defendantName: string) => ({
+  'Completed by': defendantName,
+});

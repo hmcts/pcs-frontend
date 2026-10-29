@@ -134,18 +134,22 @@ withNightlyPipeline(type, product, component) {
   loadVaultSecrets(["pcs-${env.ENVIRONMENT}": pcsE2eVaultSecrets])
   setFunctionalTestEnvVars()
   enableFortifyScan()
+  enableE2eTest()
   def sauceSuites = selectedSauceSuites()
   if (!sauceSuites.isEmpty()) {
     env.SAUCE_SUITE_NAMES = sauceSuites.join(' ')
     enableCrossBrowserTest()
   }
 
-  afterAlways('fortify-scan') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+  afterAlways('E2eTest') {
     runE2ETests(yarnBuilder)
   }
-}
 
+  afterAlways('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+
+  }
+  
 def selectedSauceSuites() {
   [
     params.SAUCE_MAC13_CHROME ? 'pcs-frontend-mac13-chrome' : null,
@@ -214,7 +218,7 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
       sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
         withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
-          yarnBuilder.yarn('test:E2e')
+          yarnBuilder.yarn('test:EndToEnd')
         }
       }
       publishHTML([
