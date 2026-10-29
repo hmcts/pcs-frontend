@@ -10,6 +10,7 @@ import { setupDev } from './development';
 import { publicRouter } from './guidance';
 import {
   caseReferenceParamMiddleware,
+  footerAccessMiddleware,
   formBodyMiddleware,
   judgeXuiRedirectMiddleware,
   legalRepresentativeAccessMiddleware,
@@ -53,6 +54,7 @@ app.use((req, res, next) => {
 });
 
 app.use(pageTrackingUrlMiddleware);
+app.use(footerAccessMiddleware);
 app.use(legalRepresentativeAccessMiddleware);
 app.use(judgeXuiRedirectMiddleware);
 
