@@ -100,6 +100,7 @@ export const viewTheResponse = {
 export const getDefendantDetails = (firstName: string, lastName: string, address: string) => ({
   Name: `${firstName} ${lastName}`,
   'Phone number': '07700900000',
+  'SMS mobile number': '07700900980',
   'Postal address': address,
   'Date of birth': '20 May 1990',
 });

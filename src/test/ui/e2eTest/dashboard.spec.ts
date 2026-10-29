@@ -276,7 +276,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performAction('reloadPage');
     await performAction('respondPossessionClaimAPI', {
-      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+      data: respondPossessionClaimMidEventApiData.respondPossessionClaimEventName,
       type: 'both',
     });
     await performAction('reloadPage');
