@@ -100,7 +100,7 @@
     "validator": "13.15.35",
     "winston": "3.19.0",
     "xss": "^1.0.15",
-    "zod": "4.6.6",
+    "zod": "4.6.7",
     "zod-i18n-map": "2.27.0"
   },
   "devDependencies": {
@@ -191,6 +191,7 @@
     "prosemirror-model": "1.25.12",
     "prosemirror-transform": "1.12.4",
     "prosemirror-view": "1.42.6",
+    "qs": "^6.16.1",
     "semver": "^7.5.2",
     "uuid": "14.0.3"
   },

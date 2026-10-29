@@ -1,4 +1,7 @@
 {
+  "launchdarkly": {
+    "offline": true
+  },
   "e2e": {
     "testUrl": "http://localhost:3209/",
     "idamUrl": "https://idam-api.aat.platform.hmcts.net",
