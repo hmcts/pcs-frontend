@@ -301,7 +301,7 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
   });
 
-  test('Unsuccessful counterclaim payment leaves dashboard notification unchanged @regression', async () => {
+  test('Unsuccessful counterclaim payment leaves dashboard notification unchanged', async () => {
     await performAction('respondPossessionClaimAPI', {
       data: respondPossessionClaimApiData.respondPossessionClaimPayload,
       type: 'both',
