@@ -37,7 +37,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       response
     );
   },
-
   translationKeys: {
     pageTitle: 'pageTitle',
     infoParagraph1: 'infoParagraph1',

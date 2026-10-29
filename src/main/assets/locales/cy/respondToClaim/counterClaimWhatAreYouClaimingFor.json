@@ -1,14 +1,14 @@
 {
-  "pageTitle": "cyWhat is your counterclaim?",
-  "heading": "cyWhat are you claiming for?",
+  "pageTitle": "Beth yw eich gwrth-hawliad?",
+  "heading": "Beth ydych chi’n ei hawlio?",
   "options": {
-    "paymentOrCompensation": "cyA sum of money or compensation",
+    "paymentOrCompensation": "Swm o arian neu iawndal",
     "somethingElse": "Rhywbeth arall",
-    "both": "cyBoth"
+    "both": "Y ddau"
   },
   "errors": {
     "claimType": {
-      "required": "cySelect if you’re claiming for a sum of money or compensation, both or something else"
+      "required": "Dewiswch os ydych yn hawlio am swm o arian neu iawndal, y ddau neu rywbeth arall"
     }
   }
 }

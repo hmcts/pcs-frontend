@@ -180,7 +180,10 @@ describe('componentBuilders', () => {
           })
         );
 
-        expect(result.component.errorMessage).toEqual({ text: 'This field is required' });
+        expect(result.component.errorMessage).toEqual({
+          text: 'This field is required',
+          visuallyHiddenText: 'common:errorPrefix',
+        });
       });
 
       it('should include custom classes when provided', () => {
@@ -241,6 +244,39 @@ describe('componentBuilders', () => {
 
         expect(result.component.rows).toBe(10);
         expect(result.component.maxlength).toBe(500);
+      });
+    });
+
+    describe('select field', () => {
+      it('should build select component with translated options and selected value', () => {
+        const field: FormFieldConfig = {
+          name: 'pbaAccount',
+          type: 'select',
+          options: [{ value: '' }, { value: 'PBA1234567' }],
+        };
+
+        const result = buildComponentConfig(
+          buildArgs(field, {
+            label: 'PBA account',
+            fieldValue: 'PBA1234567',
+            translatedOptions: [
+              { value: '', text: 'Select a PBA account' },
+              { value: 'PBA1234567', text: 'PBA1234567' },
+            ],
+          })
+        );
+
+        expect(result.componentType).toBe('select');
+        expect(result.component).toMatchObject({
+          id: 'pbaAccount',
+          name: 'pbaAccount',
+          label: { text: 'PBA account' },
+          value: 'PBA1234567',
+          items: [
+            { value: '', text: 'Select a PBA account', selected: false },
+            { value: 'PBA1234567', text: 'PBA1234567', selected: true },
+          ],
+        });
       });
     });
 

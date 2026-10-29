@@ -18,8 +18,19 @@ import { buildSectionCyaRows as buildDisputeRows } from '../../../../main/steps/
 // before the P1/P2 refactor. Identity `t` so assertions can match translation keys.
 const t = ((key: string) => key) as unknown as TFunction;
 
-const reqWith = (validatedCase: CcdCaseModel | undefined): Request =>
-  ({ res: { locals: { validatedCase } } }) as unknown as Request;
+const reqWith = (
+  validatedCase: CcdCaseModel | undefined,
+  options: { release12Enabled?: boolean; language?: string } = {}
+): Request =>
+  ({
+    language: options.language,
+    res: {
+      locals: {
+        validatedCase,
+        release12Enabled: options.release12Enabled ?? false,
+      },
+    },
+  }) as unknown as Request;
 
 const model = (defendantResponses: Record<string, unknown>, extraData: Record<string, unknown> = {}): CcdCaseModel =>
   new CcdCaseModel({
@@ -83,7 +94,7 @@ describe('section-CYA row builders — characterisation', () => {
       expect(keys).toContain('rows.contactByPhone.label');
     });
 
-    it('contact-by-phone: preference row stands alone; phone number lives in the Contact details row', () => {
+    it('contact-by-phone: displays the phone number under the Yes value', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
@@ -94,36 +105,76 @@ describe('section-CYA row builders — characterisation', () => {
         },
       });
       const rows = buildPersonalRows(reqWith(validatedCase), t);
-      const questionRow = rows.find(r => r.key.text === 'rows.contactByPhone.label');
-      const contactDetailsRow = rows.find(r => r.key.text === 'rows.contactDetails.label');
-      // Preference row no longer groups a detail row underneath it.
-      expect(questionRow?.classes).toBeUndefined();
-      expect(contactDetailsRow?.value.html).toContain('<p class="govuk-body">07123456789</p>');
-      // Phone-only: Change link targets the telephone step.
-      expect(contactDetailsRow?.actions?.items[0].href).toContain(
-        '/contact-preferences-telephone?edit=personalDetails'
+      const questionRowIndex = rows.findIndex(r => r.key.text === 'rows.contactByPhone.label');
+      const questionRow = rows[questionRowIndex];
+      const phoneNumberRow = rows[questionRowIndex + 1];
+
+      expect(questionRow.value.text).toBe('options.yes');
+      expect(questionRow.classes).toBe('govuk-summary-list__row--no-border');
+      expect(phoneNumberRow.key).toEqual({
+        text: 'rows.phoneNumber.label',
+        classes: 'govuk-!-font-weight-regular',
+      });
+      expect(phoneNumberRow.value.html).toBe('07123456789');
+      expect(phoneNumberRow.actions?.items[0].href).toContain('/contact-preferences-telephone?edit=personalDetails');
+    });
+
+    it('contact-by-text: displays the text message number under the Yes value', () => {
+      const validatedCase = new CcdCaseModel({
+        id: '1234123412341234',
+        data: {
+          possessionClaimResponse: {
+            defendantResponses: { contactByPhone: 'YES', contactByText: 'YES' },
+            defendantContactDetails: { party: { textMessageNumber: '07700900982' } },
+          },
+        },
+      });
+      const rows = buildPersonalRows(reqWith(validatedCase), t);
+      const questionRowIndex = rows.findIndex(r => r.key.text === 'rows.contactByText.label');
+      const questionRow = rows[questionRowIndex];
+      const textMessageNumberRow = rows[questionRowIndex + 1];
+
+      expect(questionRow.value.text).toBe('options.yes');
+      expect(questionRow.classes).toBe('govuk-summary-list__row--no-border');
+      expect(textMessageNumberRow.key).toEqual({
+        text: 'rows.textMessageNumber.label',
+        classes: 'govuk-!-font-weight-regular',
+      });
+      expect(textMessageNumberRow.value.html).toBe('07700900982');
+      expect(textMessageNumberRow.actions?.items[0].href).toContain(
+        '/contact-preferences-text-message?edit=personalDetails'
       );
     });
 
-    it('contact-by-email: preference row stands alone; email lives in the Contact details row', () => {
+    it('email-confirmation: renders email confirmation question and detail row for legal representative user', () => {
       const validatedCase = new CcdCaseModel({
         id: '1234123412341234',
         data: {
           possessionClaimResponse: {
             defendantResponses: { contactByEmail: 'YES' },
-            defendantContactDetails: { party: { emailAddress: 'alice@example.com' } },
+            defendantContactDetails: { party: { emailAddress: 'aa@gmail.com' } },
           },
         },
       });
-      const rows = buildPersonalRows(reqWith(validatedCase), t);
-      const questionRow = rows.find(r => r.key.text === 'rows.contactByEmailOrPost.label');
-      const contactDetailsRow = rows.find(r => r.key.text === 'rows.contactDetails.label');
-      expect(questionRow?.classes).toBeUndefined();
-      expect(contactDetailsRow?.value.html).toContain('<p class="govuk-body">alice@example.com</p>');
-      // Email present: Change link targets the email-or-post step.
-      expect(contactDetailsRow?.actions?.items[0].href).toContain(
-        '/contact-preferences-email-or-post?edit=personalDetails'
-      );
+      const req = reqWith(validatedCase);
+      req.session = {
+        user: {
+          roles: ['caseworker-pcs-solicitor'],
+        },
+      } as unknown as Request['session'];
+
+      const rows = buildPersonalRows(req, t);
+      const questionRow = rows.find(r => r.key.text === 'rows.emailConfirmation.label');
+      const detailRow = rows.find(r => r.key.text === 'rows.emailAddress.label');
+
+      expect(questionRow).toBeDefined();
+      expect(questionRow?.value.text).toBe('options.yes');
+      expect(detailRow).toBeDefined();
+      expect(detailRow?.value.html).toBe('aa@gmail.com');
+
+      expect(rows.find(r => r.key.text === 'rows.contactByEmailOrPost.label')).toBeUndefined();
+      expect(rows.find(r => r.key.text === 'rows.contactByPhone.label')).toBeUndefined();
+      expect(rows.find(r => r.key.text === 'rows.contactByText.label')).toBeUndefined();
     });
 
     it('contact details row: stacks phone and email as separate paragraphs when both are selected', () => {
@@ -320,11 +371,41 @@ describe('section-CYA row builders — characterisation', () => {
       expect(buildDisputeRows(reqWith(undefined), t)).toEqual([]);
     });
 
+    it('renders exempt-landlord row when exemptLandlord is answered and release 1.2 is enabled', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ exemptLandlord: 'NO' }, { legislativeCountry: 'Wales' }), { release12Enabled: true }),
+        t
+      );
+      const row = rows.find(r => r.key.text === 'rows.exemptLandlord.label');
+      expect(row?.value).toEqual({ text: 'options.no' });
+      expect(row?.actions?.items[0].href).toBe(
+        '/case/1234123412341234/respond-to-claim/exempt-landlord?edit=disputeAndTenancy'
+      );
+    });
+
+    it('does not render exempt-landlord row when release 1.2 is disabled', () => {
+      const rows = buildDisputeRows(
+        reqWith(model({ exemptLandlord: 'NO' }, { legislativeCountry: 'Wales' }), { release12Enabled: false }),
+        t
+      );
+      expect(rows.some(r => r.key.text === 'rows.exemptLandlord.label')).toBe(false);
+    });
+
+    it('does not render licensed-landlord row', () => {
+      const rows = buildDisputeRows(reqWith(model({ landlordLicensed: 'YES', exemptLandlord: 'YES' })), t);
+      expect(rows.some(r => r.key.text === 'rows.landlordLicensed.label')).toBe(false);
+    });
+
     it('renders tenancy-type and counterclaim rows from defendant responses', () => {
-      const rows = buildDisputeRows(reqWith(model({ tenancyTypeConfirmation: 'YES', makeCounterClaim: 'NO' })), t);
+      const mockT = jest.fn((key: string, _options?: Record<string, unknown>) => key) as unknown as TFunction;
+      const rows = buildDisputeRows(
+        reqWith(model({ tenancyTypeConfirmation: 'YES', makeCounterClaim: 'NO' }, { claimantName: 'Acme Housing' })),
+        mockT
+      );
       const keys = rows.map(r => r.key.text);
       expect(keys).toContain('rows.tenancyTypeCorrect.label');
       expect(keys).toContain('rows.makeCounterClaim.label');
+      expect(mockT).toHaveBeenCalledWith('rows.makeCounterClaim.label', { claimantName: 'Acme Housing' });
     });
 
     it('tenancy-date row: "known" branch renders the confirmation row plus a grouped corrected-date row when answered No', () => {
@@ -344,6 +425,21 @@ describe('section-CYA row builders — characterisation', () => {
       expect(confirmRow?.classes).toContain('govuk-summary-list__row--no-border');
       expect(dateRow?.value).toEqual({ text: '1 January 2023' });
       expect(dateRow?.actions?.items[0].href).toContain('/tenancy-date-details?edit=disputeAndTenancy');
+    });
+
+    it('tenancy-date row: shows the corrected date in Welsh when the request language is cy', () => {
+      const rows = buildDisputeRows(
+        reqWith(
+          model(
+            { tenancyStartDateConfirmation: 'NO', tenancyStartDate: '2023-01-01' },
+            { tenancy_TenancyLicenceDate: '2023-01-01' }
+          ),
+          { language: 'cy' }
+        ),
+        t
+      );
+      const dateRow = rows.find(r => r.key.text === 'rows.tenancyStartDate.correctDate.label');
+      expect(dateRow?.value).toEqual({ text: '1 Ionawr 2023' });
     });
 
     it('tenancy-date row: "unknown" branch links to tenancy-date-unknown and uses the entered label', () => {
@@ -413,6 +509,12 @@ describe('section-CYA row builders — characterisation', () => {
       const row = rows.find(r => r.key.text === 'rows.tenancyStartDate.labelEntered');
       expect(row?.value).toEqual({ text: 'noAnswerProvided' });
       expect(row?.actions?.items[0].href).toContain('/tenancy-date-unknown?edit=disputeAndTenancy');
+    });
+
+    it('notice-received row uses its own question’s answer wording', () => {
+      const rows = buildDisputeRows(reqWith(model({ possessionNoticeReceived: 'YES' })), t);
+      const row = rows.find(r => r.key.text === 'rows.possessionNoticeReceived.label');
+      expect(row?.value).toEqual({ text: 'rows.possessionNoticeReceived.options.yes' });
     });
 
     it('notice-date row: "not-provided" branch shows "No answer provided" when the optional date is blank', () => {
@@ -745,6 +847,20 @@ describe('section-CYA row builders — characterisation', () => {
         t
       );
       expect(rows.some(r => r.key.text === 'rows.alternativeAccommodationDate.label')).toBe(false);
+    });
+
+    it('alternative accommodation NOT_SURE: renders options.imNotSure for citizen and options.notSure for legal representative', () => {
+      const citizenCase = model({ householdCircumstances: { alternativeAccommodation: 'NOT_SURE' } });
+      const citizenReq = reqWith(citizenCase);
+      const citizenRows = buildSituationRows(citizenReq, t);
+      const citizenRow = citizenRows.find(r => r.key.text === 'rows.alternativeAccommodation.label');
+      expect(citizenRow?.value.text).toBe('options.imNotSure');
+
+      const lrReq = reqWith(citizenCase);
+      lrReq.session = { user: { roles: ['caseworker-pcs-solicitor'] } } as unknown as Request['session'];
+      const lrRows = buildSituationRows(lrReq, t);
+      const lrRow = lrRows.find(r => r.key.text === 'rows.alternativeAccommodation.label');
+      expect(lrRow?.value.text).toBe('options.notSure');
     });
   });
 

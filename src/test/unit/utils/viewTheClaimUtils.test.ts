@@ -36,6 +36,7 @@ const translations: Record<string, string> = {
   'viewTheClaim:sections.statementOfTruth': 'Statement of truth',
   'viewTheClaim:labels.statementOfTruthCompletedBy': 'Completed by',
   'viewTheClaim:personsUnknown': 'Persons unknown',
+  'viewTheClaim:addressUnknown': 'Address unknown',
   'viewTheClaim:sections.tenancyDetails': 'Tenancy, occupation contract or licence details',
   'viewTheClaim:labels.tenancyType':
     'What type of tenancy, occupation contract or licence is in place, or was in place?',
@@ -55,6 +56,10 @@ const translations: Record<string, string> = {
 const t = ((key: string, options?: Record<string, unknown>) => {
   if (key === 'viewTheClaim:sections.additionalDefendantDetails') {
     return `Additional defendant ${options?.number} details`;
+  }
+
+  if (key === 'viewTheClaim:sections.rankedDefendantDetails') {
+    return `Defendant ${options?.number ?? ''} details`;
   }
 
   if (key === 'viewTheClaim:sections.additionalUnderlesseeDetails') {
@@ -195,7 +200,9 @@ describe('viewTheClaimUtils', () => {
       '10 Second Avenue<br>London<br>W3 7RX'
     );
     expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
-    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBeUndefined();
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
+      'Address unknown'
+    );
     expect(rowText(sectionByTitle(page, 'Claim details'), 'Does the claimant have grounds for possession?')).toBe(
       'Yes'
     );
@@ -227,6 +234,33 @@ describe('viewTheClaimUtils', () => {
     );
 
     expect(page.sections.some(section => section.title.startsWith('Additional defendant'))).toBe(false);
+  });
+
+  it('numbers defendant sections by rank rather than position when ranked numbering is enabled', () => {
+    const page = buildViewTheClaimPageData(
+      '1234567890123456',
+      {
+        allDefendants: [
+          {
+            id: 'def-2',
+            value: { rank: 2, nameKnown: 'YES', firstName: 'Bob', lastName: 'Tenant' },
+          },
+          {
+            id: 'def-1',
+            value: { rank: 1, nameKnown: 'YES', firstName: 'Alex', lastName: 'Tenant' },
+          },
+        ],
+      } as never,
+      t,
+      undefined,
+      true
+    );
+
+    const defendantTitles = page.sections.map(section => section.title).filter(title => title.startsWith('Defendant '));
+
+    expect(defendantTitles).toEqual(['Defendant 2 details', 'Defendant 1 details']);
+    expect(rowText(sectionByTitle(page, 'Defendant 2 details'), 'Name')).toBe('Bob Tenant');
+    expect(rowText(sectionByTitle(page, 'Defendant 1 details'), 'Name')).toBe('Alex Tenant');
   });
 
   it('uses pcs-api returned party collections for claimant and defendant details', () => {
@@ -283,7 +317,9 @@ describe('viewTheClaimUtils', () => {
       '2 Second Avenue<br>London<br>W3 7RX'
     );
     expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
-    expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBeUndefined();
+    expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBe(
+      'Address unknown'
+    );
   });
 
   it('uses casePartiesTab_ClaimantDetails.serviceAddress when detailsTab_ClaimantAddress is empty', () => {
@@ -443,7 +479,7 @@ describe('viewTheClaimUtils', () => {
     );
   });
 
-  it('does not show other defendant addresses from tab paths when allDefendants is redacted on citizen read', () => {
+  it('shows other defendant address from party data', () => {
     const propertyAddress = {
       AddressLine1: '2 Pentre Street',
       PostTown: 'Caerdydd',
@@ -466,7 +502,16 @@ describe('viewTheClaimUtils', () => {
             },
           },
           { id: '129fbbfc-3677-46a5-bd88-eb286e3f8792', value: {} },
-          { id: 'b4b7e79c-8ef8-4a3b-a330-2d4597bf8525', value: { firstName: 'y', lastName: 'test' } },
+          {
+            id: 'b4b7e79c-8ef8-4a3b-a330-2d4597bf8525',
+            value: {
+              firstName: 'y',
+              lastName: 'test',
+              nameKnown: 'YES',
+              addressKnown: 'YES',
+              addressSameAsProperty: 'YES',
+            },
+          },
         ],
         detailsTab_DefendantInformationDetails: {
           nameKnown: 'Yes',
@@ -479,8 +524,8 @@ describe('viewTheClaimUtils', () => {
         casePartiesTab_DefendantsDetails: [
           {
             value: {
-              firstName: 'Person unknown',
-              lastName: 'Person unknown',
+              firstName: 'z',
+              lastName: 'test',
               serviceAddress: propertyAddress,
             },
           },
@@ -503,7 +548,9 @@ describe('viewTheClaimUtils', () => {
     expect(rowText(sectionByTitle(page, 'Additional defendant 1 details'), 'Name')).toBe('Persons unknown');
     expect(rowHtml(sectionByTitle(page, 'Additional defendant 1 details'), 'Address for service')).toBeUndefined();
     expect(rowText(sectionByTitle(page, 'Additional defendant 2 details'), 'Name')).toBe('y test');
-    expect(rowHtml(sectionByTitle(page, 'Additional defendant 2 details'), 'Address for service')).toBeUndefined();
+    expect(rowHtml(sectionByTitle(page, 'Additional defendant 2 details'), 'Address for service')).toBe(
+      '2 Pentre Street<br>Caerdydd<br>CF11 6QX'
+    );
   });
 
   it('uses detailsTab_RentArrearsDetails.rentFrequency for Wales rent calculation', () => {

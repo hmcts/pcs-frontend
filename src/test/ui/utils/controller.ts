@@ -85,7 +85,7 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-  const testPages = ['start-now', 'choose-an-application', 'start-evidence-upload', 'claims'];
+  const testPages = ['start-now', 'choose-an-application', 'start-evidence-upload', 'claims', 'make-order'];
   if (!startAxeAudit && testPages.some(page => currentUrl.includes(page))) {
     startAxeAudit = true;
     startFunctionalTests = true;
@@ -138,6 +138,12 @@ async function validatePageIfNavigated(action: string): Promise<void> {
   }
 }
 
+function isPage(actionResult: unknown): actionResult is Page {
+  return (
+    typeof actionResult === 'object' && actionResult !== null && 'locator' in actionResult && 'url' in actionResult
+  );
+}
+
 export async function performAction(
   action: string,
   fieldName?: actionData | actionRecord,
@@ -175,10 +181,13 @@ export async function performAction(
   }`;
 
   await test.step(stepText, async () => {
-    await actionInstance.execute(executor.page, action, fieldName, value);
+    const actionResult = await actionInstance.execute(executor.page, action, fieldName, value);
+    if (isPage(actionResult)) {
+      testExecutor.page = actionResult;
+    }
   });
   await validatePageIfNavigated(action);
-  await attachSauceJourneyStepScreenshot(executor.page);
+  await attachSauceJourneyStepScreenshot(getExecutor().page);
 }
 
 export async function performValidation(

@@ -8,6 +8,7 @@ export const counterClaimSpecificSumOfMoney = {
   ifYouWantToCheckHiddenParagraph: `If you want to check how much your fee will be, you can estimate how much it will cost you to make your counterclaim (opens in new tab) `,
   howMuchAreYouClaimingHiddenQuestion: `How much are you claiming?`,
   claimInput: `80.00`,
+  claimInputText: `80`,
   enterHowMuchYouAreClaimingErrorMessage: `Enter how much you are claiming for`,
   ifYouDontKnowHiddenParagraph: `If you do not know the specific sum you’re claiming for, the court needs to know what you believe the maximum value of your claim will be.`,
   ifYouDontKnowExactAmountHiddenParagraph: `If you do not know the exact amount, give an estimate.`,
@@ -27,4 +28,6 @@ export const counterClaimSpecificSumOfMoney = {
   pageSlug: `counter-claim-specific-sum`,
   backLink: `Back`,
   feeHiddenAmount: `35.00`,
+  threeDecimalIncorrectFormatTextInput: `20.003`,
+  threeDecimalErrorMessage: `Enter the maximum value of your claim in the correct format, for example 148 or 148.50`,
 };

@@ -17,7 +17,7 @@ export const counterClaim = {
   findALegalAdviserLink: `find a legal adviser service (opens in new tab)`,
   youWillHaveToPayAFeeParagraph: `You will have to pay a fee to make a counterclaim, unless you’re eligible for help with fees.`,
   checkIfYouCanGetHelpLink: `Check if you can get help with court fees (opens in new tab)`,
-  theAmountYouPaidParagraph: `The amount you pay depends on what you’re claiming. If it’s a claim for an amount of money, the fee depends on the value of your claim. If your claim is about something else, the fee is £377.`,
+  theAmountYouPaidParagraph: `The amount you pay depends on what you’re claiming. If it’s a claim for an amount of money, the fee depends on the value of your claim. If your claim is about something else, the fee is £387.`,
   findOutAboutCourtFeeLink: `Find out about court fees (opens in new tab)`,
   doYouWantToMakeACounterclaim: `Do you want to make a counterclaim?`,
   selectIfYouArePlanningToMakeClaimErrorMessage: `Select if you’re planning to make a counterclaim`,

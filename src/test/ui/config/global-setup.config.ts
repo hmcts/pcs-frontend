@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { user } from '../data/user-data';
+import { uploadTestDocuments } from '../utils/common/uploadDocument.utils';
 
 /** CNP environment names where IdAM/S2S URLs follow the standard `*.platform.hmcts.net` pattern (matches Jenkins `E2E_TARGET_ENV`). */
 const KNOWN_CNP_ENVIRONMENT_NAMES = new Set(['aat', 'demo', 'perftest', 'ithc']);
@@ -15,14 +16,14 @@ export function applyPlaywrightServiceUrls(): void {
     process.env.IDAM_TESTING_SUPPORT_URL ||= `https://idam-testing-support-api.${normalizedCnpEnvironment}.platform.hmcts.net`;
     process.env.S2S_URL ||= `http://rpe-service-auth-provider-${normalizedCnpEnvironment}.service.core-compute-${normalizedCnpEnvironment}.internal/testing-support/lease`;
     process.env.DM_STORE_URL ||= `http://dm-store-${normalizedCnpEnvironment}.service.core-compute-${normalizedCnpEnvironment}.internal`;
-    process.env.CASE_API_URL ||= ` https://pcs-api-${normalizedCnpEnvironment}.service.core-compute-${normalizedCnpEnvironment}.internal`;
+    process.env.CDAM_URL ||= `http://ccd-case-document-am-api-${normalizedCnpEnvironment}.service.core-compute-${normalizedCnpEnvironment}.internal`;
   } else {
     process.env.IDAM_WEB_URL ||= 'https://idam-api.aat.platform.hmcts.net';
     process.env.IDAM_TESTING_SUPPORT_URL ||= 'https://idam-testing-support-api.aat.platform.hmcts.net';
     process.env.S2S_URL ||=
       'http://rpe-service-auth-provider-aat.service.core-compute-aat.internal/testing-support/lease';
     process.env.DM_STORE_URL ||= 'http://dm-store-aat.service.core-compute-aat.internal';
-    process.env.CASE_API_URL ||= 'http://pcs-api-aat.service.core-compute-aat.internal';
+    process.env.CDAM_URL ||= 'http://ccd-case-document-am-api-aat.service.core-compute-aat.internal';
   }
 }
 
@@ -71,8 +72,8 @@ export const getAccessToken = async (): Promise<void> => {
     );
   }
   process.env.BEARER_TOKEN = await new IdamUtils().generateIdamToken({
-    username: user.claimantSolicitor.email,
-    password: user.claimantSolicitor.password,
+    username: user.localAuthority.email,
+    password: user.localAuthority.password,
     grantType: 'password',
     clientId: 'pcs-frontend',
     clientSecret: process.env.PCS_FRONTEND_IDAM_SECRET as string,
@@ -82,6 +83,10 @@ export const getAccessToken = async (): Promise<void> => {
 
 async function globalSetupConfig(): Promise<void> {
   clearEmvLocksIfLocal();
+  applyPlaywrightServiceUrls();
+  await getS2SToken();
+  await getAccessToken();
+  await uploadTestDocuments();
 }
 
 export default globalSetupConfig;

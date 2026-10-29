@@ -33,7 +33,8 @@
 import { AxiosError } from 'axios';
 import config from 'config';
 
-import { HTTPError } from '../HttpError';
+import { ClientContextHeaders } from '../../types/global';
+import { CallbackRejectedError, HTTPError } from '../HttpError';
 
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
@@ -44,6 +45,7 @@ import type {
   DashboardRelatedApplication,
   DashboardTaskGroup,
 } from '@services/dashboard.interface';
+import { sanitiseCaseReference } from '@utils/caseReference';
 import {
   formatAddress,
   unwrapNotifications,
@@ -78,7 +80,17 @@ function getCaseTypeId(): string {
   return config.get('ccd.caseTypeId');
 }
 
-function getCaseHeaders(token: string) {
+export type CaseHeaders = {
+  headers: {
+    Authorization: string;
+    experimental: boolean;
+    Accept: string;
+    'Content-Type': string;
+    'Client-Context'?: string;
+  };
+};
+
+function getCaseHeaders(token: string): CaseHeaders {
   return {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -122,11 +134,23 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const axiosError = error as AxiosError;
   const status = axiosError.response?.status;
-  const responseData = axiosError.response?.data as CcdErrorResponseData | undefined;
+  const rawBody: unknown = axiosError.response?.data;
+  const responseData = rawBody as CcdErrorResponseData | undefined;
+  // Every CCD URL carries the case reference, so take it from the request that failed rather
+  // than threading it through each call site. Logged as a field: the span exception picks it up.
+  const caseReference = /\/cases\/(\d{16})/.exec(axiosError.config?.url ?? '')?.[1];
 
-  logger.error(`Error in ${context}: ${axiosError.message}`);
-  if (responseData) {
-    logger.error(`Error response data: ${JSON.stringify(responseData, null, 2)}`);
+  logger.error(`Error in ${context}: ${axiosError.message}`, { caseReference });
+  if (rawBody) {
+    // CCD error bodies can carry case data - log only what identifies the failure. `details` is
+    // left out deliberately: it echoes the submitted field values.
+    const summary =
+      typeof rawBody === 'string'
+        ? `body=${rawBody.slice(0, 200)}`
+        : `message=${responseData?.message ?? 'none'} exception=${responseData?.exception ?? 'none'}`;
+    logger.error(`Error response from CCD in ${context}: status=${status ?? 'unknown'} ${summary}`, {
+      caseReference,
+    });
   }
 
   if (status === 403) {
@@ -139,7 +163,7 @@ function convertAxiosErrorToHttpError(error: unknown, context: string): HTTPErro
 
   const callbackMessages = [...(responseData?.callbackErrors ?? []), ...(responseData?.callbackWarnings ?? [])];
   if (callbackMessages.length > 0) {
-    return new HTTPError(`CCD callback rejected request: ${callbackMessages.join('; ')}`, status || 422);
+    return new CallbackRejectedError(callbackMessages, status || 422);
   }
 
   const retryAfterHeader = axiosError.response?.headers?.['retry-after'];
@@ -178,7 +202,6 @@ async function getEventToken(userToken: string, url: string): Promise<string> {
   try {
     logger.info(`Calling getEventToken with URL: ${url}`);
     const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data.token;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'getEventToken');
@@ -222,10 +245,8 @@ async function submitEvent(
   };
 
   try {
-    logger.info(`Calling submitEvent with URL: ${url}`);
-    logger.info(`Payload: ${JSON.stringify(payload, null, 2)}`);
+    logger.info(`Calling submitEvent with URL: ${url}, eventId: ${eventId}`);
     const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
-    logger.info(`Response data: ${JSON.stringify(response.data, null, 2)}`);
     return response.data;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'submitEvent');
@@ -233,17 +254,34 @@ async function submitEvent(
 }
 
 export const ccdCaseService = {
-  async getCaseByIdForEvent(accessToken: string, caseId: string, eventId: string): Promise<CcdCase> {
-    const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false`;
+  async getCaseByIdForEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string = 'respondPossessionClaim',
+    clientContextHeaders?: ClientContextHeaders
+  ): Promise<CcdCase> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const eventUrl = `${getBaseUrl()}/cases/${safeCaseId}/event-triggers/${eventId}?ignore-warning=false`;
 
     try {
-      logger.info(`Validating case access for caseId: ${caseId}, eventId: ${eventId}`);
-      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken));
-      logger.info(`Case access validated successfully for caseId: ${caseId}`);
+      logger.info(`Validating case access for caseId: ${safeCaseId}, eventId: ${eventId}`);
+      const caseHeaders: CaseHeaders = getCaseHeaders(accessToken);
+
+      if (clientContextHeaders) {
+        caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+      }
+
+      const response = await http.get<StartCallbackData>(eventUrl, caseHeaders);
+      logger.info(`Case access validated successfully for caseId: ${safeCaseId}`);
 
       const caseData: CcdCaseData = response.data.case_details?.case_data ?? {};
+
       return {
-        id: caseId,
+        id: safeCaseId,
         data: caseData,
       };
     } catch (error) {
@@ -251,17 +289,51 @@ export const ccdCaseService = {
     }
   },
 
-  async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
-    const caseUrl = `${getBaseUrl()}/cases/${caseId}`;
+  /**
+   * Starts an event, for a later `submitCaseEvent` with the token it returns. CCD passes the client
+   * context on to the event's start, as it passes no parameters.
+   */
+  async startCaseEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string,
+    clientContext?: ClientContextHeaders
+  ): Promise<CcdCase & { eventToken: string }> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
 
     try {
-      logger.debug(`Fetching case by id for read view: ${caseId}`);
+      const caseHeaders = getCaseHeaders(accessToken);
+      if (clientContext) {
+        caseHeaders.headers['Client-Context'] = JSON.stringify(clientContext);
+      }
+      const response = await http.get<StartCallbackData>(
+        `${getBaseUrl()}/cases/${safeCaseId}/event-triggers/${eventId}?ignore-warning=false`,
+        caseHeaders
+      );
+      return { id: safeCaseId, data: response.data.case_details?.case_data ?? {}, eventToken: response.data.token };
+    } catch (error) {
+      throw convertReadErrorToHttpError(error, 'startCaseEvent');
+    }
+  },
+
+  async getCaseById(accessToken: string, caseId: string): Promise<CcdCase> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const caseUrl = `${getBaseUrl()}/cases/${safeCaseId}`;
+
+    try {
+      logger.debug(`Fetching case by id for read view: ${safeCaseId}`);
       const response = await http.get<CcdCase>(caseUrl, getCaseHeaders(accessToken));
-      logger.debug(`Read case response for ${caseId}: ${JSON.stringify(response.data, null, 2)}`);
       const caseData = response.data.data ?? {};
 
       return {
-        id: String(response.data.id ?? caseId),
+        id: String(response.data.id ?? safeCaseId),
         data: caseData,
       };
     } catch (error) {
@@ -359,11 +431,36 @@ export const ccdCaseService = {
     return submitEvent(accessToken || '', url, eventId, eventToken, ccdCase.data);
   },
 
-  async getExistingCaseData(accessToken: string | undefined, ccdCaseId: string): Promise<StartCallbackData> {
+  /** Submits an event with the token from the `startCaseEvent` the change was based on. */
+  async submitCaseEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string,
+    eventToken: string,
+    data: Record<string, unknown>
+  ): Promise<CcdCase> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+    return submitEvent(accessToken, `${getBaseUrl()}/cases/${safeCaseId}/events`, eventId, eventToken, data);
+  },
+
+  async getExistingCaseData(
+    accessToken: string | undefined,
+    ccdCaseId: string,
+    clientContextHeaders?: ClientContextHeaders
+  ): Promise<StartCallbackData> {
     const eventUrl = `${getBaseUrl()}/cases/${ccdCaseId}/event-triggers/respondPossessionClaim?ignore-warning=false`;
     logger.info('getExistingCaseData event URL', { eventUrl });
+
+    const caseHeaders: CaseHeaders = getCaseHeaders(accessToken || '');
+    if (clientContextHeaders) {
+      caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+    }
+
     try {
-      const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(accessToken || ''));
+      const response = await http.get<StartCallbackData>(eventUrl, caseHeaders);
       return response.data;
     } catch (error) {
       throw convertReadErrorToHttpError(error, 'getExistingCaseDataError');
@@ -374,7 +471,8 @@ export const ccdCaseService = {
     draftEvent: { id: string; pageId: string },
     accessToken: string | undefined,
     caseId: string,
-    data: Record<string, unknown>
+    data: Record<string, unknown>,
+    clientContextHeaders?: ClientContextHeaders
   ): Promise<CcdCase> {
     if (!caseId) {
       throw new HTTPError('Cannot UPDATE draft, Case Id not specified', 500);
@@ -394,8 +492,14 @@ export const ccdCaseService = {
       ignore_warning: false,
     };
 
+    const caseHeaders: CaseHeaders = getCaseHeaders(accessToken || '');
+
+    if (clientContextHeaders) {
+      caseHeaders.headers['Client-Context'] = JSON.stringify(clientContextHeaders);
+    }
+
     try {
-      const response = await http.post<{ data: CcdCaseData }>(url, payload, getCaseHeaders(accessToken || ''));
+      const response = await http.post<{ data: CcdCaseData }>(url, payload, caseHeaders);
       return {
         id: caseId,
         data: response.data?.data ?? {},

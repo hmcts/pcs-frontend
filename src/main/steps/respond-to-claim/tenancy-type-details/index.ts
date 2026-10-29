@@ -3,10 +3,16 @@ import type { Request } from 'express';
 import { getTranslationFunction } from '../../../modules/steps';
 import { fromYesNoNotSureEnum, isWalesProperty, toYesNoNotSureEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
+import { isRelease12Enabled } from '../../utils/isRelease12Enabled';
+import { isLegalRepresentativeUser } from '../../utils/userRole';
 import { createRespondToClaimFormStep } from '../formStep';
+import { getTenancyDocumentInfo, resolveStepDocumentId } from '../utils/stepDocumentUtils';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+
+export { getTenancyDocumentInfo };
+
 // Testing builds
 const fieldsConfig: FormFieldConfig[] = [
   {
@@ -53,6 +59,7 @@ const fieldsConfig: FormFieldConfig[] = [
 
 const STEP_NAME = 'tenancy-type-details';
 
+// English fallback; the page text comes from tenancyTypeAgreementTypes.* in the step's locale file.
 const TENANCY_TYPE_TO_TEXT: Record<string, string> = {
   ASSURED_TENANCY: 'an assured',
   SECURE_TENANCY: 'a secure',
@@ -75,6 +82,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     detailsHeading: 'detailsHeading',
     tenancyType: 'tenancyType',
     tenancyTypeOther: 'tenancyTypeOther',
+    tenancyAgreementDocumentLinkText: 'tenancyAgreementDocumentLinkText',
   },
   customTemplate: 'respond-to-claim/tenancy-type-details/tenancyTypeDetails.njk',
   fields: fieldsConfig,
@@ -135,10 +143,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       (req.body?.correctType as string) ||
       (tenancyTypeConfirm === 'no' ? existingCorrectedTenancyType : '') ||
       '';
-
+    const claimantName = req.res?.locals.validatedCase?.claimantName;
     const caseData = req.res?.locals.validatedCase?.data;
     const walesProperty = isWalesProperty(caseData);
-    const orgName = caseData?.possessionClaimResponse?.claimantOrganisations?.[0]?.value as string;
+    const orgName = req.res?.locals.validatedCase?.orgName;
     const tenancyTypeOfTenancyLicence = caseData?.tenancy_TypeOfTenancyLicence as string;
     const occupationLicenceTypeWales = caseData?.occupationLicenceTypeWales;
     // Wales: flat keys from OccupationLicenceDetailsWales.
@@ -146,13 +154,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ? caseData?.otherLicenceTypeDetails
       : caseData?.tenancy_DetailsOfOtherTypeOfTenancyLicence;
     // England: tenancy_* (TenancyLicenceDetails).
-    const tenancyTypeAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
-    const detailsHeading =
-      typeof formContent.detailsHeading === 'string'
-        ? `${formContent.detailsHeading}${orgName}${':'}`
-        : formContent.detailsHeading;
-
     const t = getTranslationFunction(req);
+    const englishAgreementType = TENANCY_TYPE_TO_TEXT[tenancyTypeOfTenancyLicence];
+    const tenancyTypeAgreementType = englishAgreementType
+      ? t(`tenancyTypeAgreementTypes.${tenancyTypeOfTenancyLicence}`, { defaultValue: englishAgreementType })
+      : undefined;
+    const senderName = isLegalRepresentativeUser(req) ? claimantName : orgName;
+    const release12Enabled = isRelease12Enabled(req);
+
     let tenancyType: unknown;
     if (walesProperty) {
       if (occupationLicenceTypeWales === 'OTHER') {
@@ -168,9 +177,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyType = tenancyTypeOfTenancyLicence === 'OTHER' ? formContent.tenancyTypeOther : formContent.tenancyType;
     }
 
+    const documentId = await resolveStepDocumentId(req, getTenancyDocumentInfo, 'tenancyTypeDetails');
+    const tenancyDocument = documentId ? { id: documentId } : '';
+
     return {
       ...formContent,
-      detailsHeading,
+      senderName,
       tenancyType,
       organisationName: orgName,
       orgname: orgName,
@@ -178,6 +190,8 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       tenancyTypeAgreementType,
       tenancyTypeConfirm,
       correctType,
+      tenancyDocument,
+      isRelease12Enabled: release12Enabled,
     };
   },
 });

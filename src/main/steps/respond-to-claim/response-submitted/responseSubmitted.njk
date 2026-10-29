@@ -18,11 +18,12 @@
     <li>{{ responseSubmittedListItem1 }}</li>
     <li>{{ responseSubmittedListItem2 | safe }}</li>
   </ol>
+
   <h2 class="govuk-heading-s">{{ responseSubmittedHeading2 }}</h2>
   <p class="govuk-body">{{ responseSubmittedParagraph2 | safe }}</p>
   {{ govukButton({
     text: closeAndReturnToCaseOverview,
-    href: dashboardUrl,
+    href: closeUrl or dashboardUrl,
     classes: "govuk-!-margin-top-6"
   }) }}
 {% endblock %}

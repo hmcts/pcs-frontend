@@ -4,6 +4,7 @@ import {
   CcdCaseData,
   CcdClaimGroundSummaryItem,
   CcdClaimantEnteredDefendantDetails,
+  CcdCollectionItem,
   CcdCounterClaim,
   CcdDefendantParty,
   CcdDefendantResponses,
@@ -28,8 +29,8 @@ export class CcdCaseModel {
     return this.validatedCase.id ?? '';
   }
 
-  get claimIssueDate(): string {
-    return this.data.claimIssueDate ?? '';
+  get dateIssued(): Date | undefined {
+    return this.data.dateIssued ? new Date(this.data.dateIssued) : undefined;
   }
 
   get defendantName(): string {
@@ -96,6 +97,26 @@ export class CcdCaseModel {
     return this.data.notice_OtherDateTime;
   }
 
+  get notice_ServiceMethod(): string | undefined {
+    return this.data.notice_ServiceMethod;
+  }
+
+  get notice_PersonName(): string | undefined {
+    return this.data.notice_PersonName;
+  }
+
+  get notice_EmailAddress(): string | undefined {
+    return this.data.notice_EmailAddress;
+  }
+
+  get notice_OtherExplanation(): string | undefined {
+    return this.data.notice_OtherExplanation;
+  }
+
+  get notice_OtherElectronicExplanation(): string | undefined {
+    return this.data.notice_OtherElectronicExplanation;
+  }
+
   get tenancy_TypeOfTenancyLicence(): string | undefined {
     return this.data.tenancy_TypeOfTenancyLicence;
   }
@@ -144,6 +165,10 @@ export class CcdCaseModel {
       return this.data.claimantName.trim();
     }
 
+    return this.orgName;
+  }
+
+  get orgName(): string {
     return this.data.possessionClaimResponse?.claimantOrganisations?.[0]?.value ?? '';
   }
 
@@ -271,6 +296,10 @@ export class CcdCaseModel {
     return this.defendantContactDetailsParty.phoneNumber ?? undefined;
   }
 
+  get defendantContactDetailsPartyTextMessageNumber(): string | undefined {
+    return this.defendantContactDetailsParty.textMessageNumber ?? undefined;
+  }
+
   get defendantContactDetailsPartyName(): string {
     const { firstName, lastName } = this.defendantContactDetailsParty;
     return firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || '';
@@ -310,5 +339,9 @@ export class CcdCaseModel {
     ].find(Boolean);
 
     return populatedNoticeField?.slice(0, 10);
+  }
+
+  get allLinkedDefendants(): CcdCollectionItem<CcdDefendantParty>[] | undefined {
+    return this.data.allLinkedDefendants;
   }
 }

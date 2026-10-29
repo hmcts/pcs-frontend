@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { formatIsoDate, penceToPounds } from '../../utils';
+import { penceToPounds } from '../../utils';
 import {
   type BaseRowContext,
   type SummaryListRow,
@@ -20,7 +20,7 @@ const SECTION_ID: RespondToClaimSectionId = 'payments';
 interface RowContext extends BaseRowContext {
   paymentAgreement: PaymentAgreement;
   claimantName: string;
-  claimIssueDate: string;
+  dateIssued: Date | undefined;
 }
 
 export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[] {
@@ -34,7 +34,7 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     ...base,
     paymentAgreement: validatedCase.defendantResponses?.paymentAgreement ?? {},
     claimantName: validatedCase.claimantName ?? '',
-    claimIssueDate: validatedCase.claimIssueDate ? formatIsoDate(validatedCase.claimIssueDate) : '',
+    dateIssued: validatedCase.dateIssued,
   };
 
   addAnyPaymentsMadeRows(ctx);
@@ -49,7 +49,7 @@ function addAnyPaymentsMadeRows({
   rows,
   paymentAgreement,
   claimantName,
-  claimIssueDate,
+  dateIssued,
   t,
   change,
   yesNoNotSure,
@@ -57,11 +57,9 @@ function addAnyPaymentsMadeRows({
   if (!paymentAgreement.anyPaymentsMade) {
     return;
   }
-  // TODO HDPI-5157: hardcode fallback matching the repayments-made step until claimIssueDate is wired from START callback
-  const issueDate = claimIssueDate || '16 June 2025';
   const questionRow: SummaryListRow = {
-    key: { text: t('rows.anyPaymentsMade.label', { claimantName, claimIssueDate: issueDate }) },
-    value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade) },
+    key: { text: t('rows.anyPaymentsMade.label', { claimantName, dateIssued }) },
+    value: { text: yesNoNotSure(paymentAgreement.anyPaymentsMade, 'repayments-made') },
     actions: { items: [change('repayments-made', 'rows.anyPaymentsMade.changeHidden')] },
   };
   rows.push(questionRow);
@@ -83,7 +81,7 @@ function addRepaymentPlanAgreedRows({
   rows,
   paymentAgreement,
   claimantName,
-  claimIssueDate,
+  dateIssued,
   t,
   change,
   yesNoNotSure,
@@ -91,11 +89,9 @@ function addRepaymentPlanAgreedRows({
   if (!paymentAgreement.repaymentPlanAgreed) {
     return;
   }
-  // TODO HDPI-5157: hardcode fallback matching the repayments-agreed step until claimIssueDate is wired from START callback
-  const issueDate = claimIssueDate || '20 May 2025';
   const questionRow: SummaryListRow = {
-    key: { text: t('rows.repaymentPlanAgreed.label', { claimantName, claimIssueDate: issueDate }) },
-    value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed) },
+    key: { text: t('rows.repaymentPlanAgreed.label', { claimantName, dateIssued }) },
+    value: { text: yesNoNotSure(paymentAgreement.repaymentPlanAgreed, 'repayments-agreed') },
     actions: { items: [change('repayments-agreed', 'rows.repaymentPlanAgreed.changeHidden')] },
   };
   rows.push(questionRow);
@@ -121,7 +117,7 @@ function addRepayArrearsInstalmentsRow({ rows, paymentAgreement, t, change, yesN
     rows,
     'rows.repayArrearsInstalments',
     paymentAgreement.repayArrearsInstalments,
-    'installment-payments',
+    'instalment-payments',
     t,
     yesNoNotSure,
     change

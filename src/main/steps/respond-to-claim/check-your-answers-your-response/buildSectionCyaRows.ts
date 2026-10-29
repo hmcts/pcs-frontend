@@ -2,7 +2,13 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { formatIsoDate, isTenancyStartDateKnown, normalizeYesNoValue, penceToPounds } from '../../utils';
+import {
+  formatIsoDate,
+  isTenancyStartDateKnown,
+  normalizeYesNoValue,
+  penceToPounds,
+  shouldShowExemptLandlordStep,
+} from '../../utils';
 import { isNoticeDateConfirmedAndNotProvided, isNoticeDateConfirmedAndProvided } from '../flowConditions';
 import {
   type BaseRowContext,
@@ -39,11 +45,10 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
     req,
   };
 
-  addLandlordRegisteredRow(ctx);
-  addLandlordLicensedRow(ctx);
-  addWrittenTermsRow(ctx);
+  addExemptLandlordRow(ctx);
   addTenancyTypeRow(ctx);
   addTenancyStartDateRow(ctx);
+  addWrittenTermsRow(ctx);
   addPossessionNoticeReceivedRow(ctx);
   addNoticeReceivedDateRow(ctx);
   addRentArrearsRow(ctx);
@@ -54,26 +59,11 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   return ctx.rows;
 }
 
-function addLandlordRegisteredRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
-  if (!responses.landlordRegistered) {
+function addExemptLandlordRow({ rows, responses, t, change, yesNoNotSure, req }: RowContext): void {
+  if (!shouldShowExemptLandlordStep(req) || !responses.exemptLandlord) {
     return;
   }
-  pushYesNoRow(
-    rows,
-    'rows.landlordRegistered',
-    responses.landlordRegistered,
-    'landlord-registered',
-    t,
-    yesNoNotSure,
-    change
-  );
-}
-
-function addLandlordLicensedRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
-  if (!responses.landlordLicensed) {
-    return;
-  }
-  pushYesNoRow(rows, 'rows.landlordLicensed', responses.landlordLicensed, 'landlord-licensed', t, yesNoNotSure, change);
+  pushYesNoRow(rows, 'rows.exemptLandlord', responses.exemptLandlord, 'exempt-landlord', t, yesNoNotSure, change);
 }
 
 function addWrittenTermsRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
@@ -113,7 +103,7 @@ function addTenancyTypeRow({ rows, responses, t, change, yesNoNotSure }: RowCont
   rows.push(detailRow);
 }
 
-function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure }: RowContext): void {
+function addTenancyStartDateRow({ rows, responses, req, t, lang, change, yesNoNotSure }: RowContext): void {
   const date = responses.tenancyStartDate;
   const confirmation = responses.tenancyStartDateConfirmation;
 
@@ -139,7 +129,7 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
     // Corrected date is optional - show "No answer provided" if they said No but left it blank.
     const detailRow: SummaryListRow = {
       key: { text: t('rows.tenancyStartDate.correctDate.label') },
-      value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
+      value: { text: date ? formatIsoDate(date, lang) : t('noAnswerProvided') },
       actions: { items: [change('tenancy-date-details', 'rows.tenancyStartDate.correctDate.changeHidden')] },
     };
     groupQuestionAndDetail(questionRow, detailRow);
@@ -151,7 +141,7 @@ function addTenancyStartDateRow({ rows, responses, req, t, change, yesNoNotSure 
   // CYA row echoes the step page question.
   rows.push({
     key: { text: t('rows.tenancyStartDate.labelEntered') },
-    value: { text: date ? formatIsoDate(date) : t('noAnswerProvided') },
+    value: { text: date ? formatIsoDate(date, lang) : t('noAnswerProvided') },
     actions: { items: [change('tenancy-date-unknown', 'rows.tenancyStartDate.changeHidden')] },
   });
 }
@@ -163,12 +153,12 @@ function addPossessionNoticeReceivedRow({ rows, validatedCase, t, change }: RowC
   }
   rows.push({
     key: { text: t('rows.possessionNoticeReceived.label', { claimantName: validatedCase.claimantName }) },
-    value: { text: t(`options.${value}`) },
+    value: { text: t(`rows.possessionNoticeReceived.options.${value}`) },
     actions: { items: [change('confirmation-of-notice-given', 'rows.possessionNoticeReceived.changeHidden')] },
   });
 }
 
-function addNoticeReceivedDateRow({ rows, validatedCase, responses, req, t, change }: RowContext): void {
+function addNoticeReceivedDateRow({ rows, validatedCase, responses, req, t, lang, change }: RowContext): void {
   // The notice-received date is optional and asked on one of the two notice-date pages.
   // Render the row when the citizen is on either branch; "No answer provided" when blank.
   if (!isNoticeDateConfirmedAndProvided(req) && !isNoticeDateConfirmedAndNotProvided(req)) {
@@ -182,7 +172,7 @@ function addNoticeReceivedDateRow({ rows, validatedCase, responses, req, t, chan
   rows.push({
     key: { text: t('rows.noticeReceivedDate.label', { claimantName: validatedCase.claimantName }) },
     value: {
-      text: responses.noticeReceivedDate ? formatIsoDate(responses.noticeReceivedDate) : t('noAnswerProvided'),
+      text: responses.noticeReceivedDate ? formatIsoDate(responses.noticeReceivedDate, lang) : t('noAnswerProvided'),
     },
     actions: { items: [change(editStep, 'rows.noticeReceivedDate.changeHidden')] },
   });
@@ -249,11 +239,13 @@ function addDisputeClaimRows({ rows, responses, t, change, yesNoNotSure }: RowCo
   rows.push(detailRow);
 }
 
-function addCounterClaimRow({ rows, responses, t, change, yesNoNotSure }: RowContext): void {
+function addCounterClaimRow({ rows, responses, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   if (!responses.makeCounterClaim) {
     return;
   }
-  pushYesNoRow(rows, 'rows.makeCounterClaim', responses.makeCounterClaim, 'counter-claim', t, yesNoNotSure, change);
+  pushYesNoRow(rows, 'rows.makeCounterClaim', responses.makeCounterClaim, 'counter-claim', t, yesNoNotSure, change, {
+    claimantName: validatedCase.claimantName,
+  });
 }
 
 function addCounterClaimDetailsRows(ctx: RowContext): void {

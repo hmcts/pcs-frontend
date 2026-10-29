@@ -1,0 +1,15 @@
+export const adjustmentToGetIntoBuilding = {
+  mainHeader: `I need adjustments to get to, into and around our buildings`,
+  backLink: `Back`,
+  continueButton: `Continue`,
+  cancelLink: `Cancel`,
+  differentTypeOfChairCheckbox: `A different type of chair`,
+  accessibleToiletCheckbox: `Accessible toilet`,
+  guidingInTheBuildingCheckbox: `Guiding in the building`,
+  helpUsingALiftCheckbox: `Help using a lift`,
+  parkingSpaceCloseToTheVenueCheckbox: `Parking space close to the venue`,
+  stepFreeWheelchairAccessCheckbox: `Step free / wheelchair access`,
+  useOfVenueWheelchairCheckbox: `Use of venue wheelchair`,
+  otherCheckbox: `Other`,
+  noHelpTravellingOrMovingAroundCheckbox: `I do not need any help travelling or moving around at this time`,
+};

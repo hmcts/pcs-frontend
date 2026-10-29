@@ -1,3 +1,6 @@
+// Below exclusions will be addressed as part of below bugs
+// https://hmcts.atlassian.net/browse/HDPI-6146
+// https://hmcts.atlassian.net/browse/HDPI-9505
 export const axe_exclusions = [
   '#correspondenceAddressConfirm-2', //page: correspondenceAddress, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#confirmRepaymentsMade', //page: repaymentsMade, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
@@ -25,5 +28,15 @@ export const axe_exclusions = [
   '#reasonsAppShouldNotBeShared', //page : reasonsAppShouldNotBeShared,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#isClaimAmountKnown-2', //page: claimAmountKnown, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#isClaimAmountKnown', //,page: claimAmountKnown, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#paymentOptions', //page: counterClaimApplicationFeeAmount, element: 'Pay fee using Payment by Account (PBA)', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
   '#address-country', //page: yourAddress, element: 'Country', element_type: select, reason_for_exclusion: 'aria-expanded' attribute is expected for this select
+  '#emailConfirmation', //page:emailConfirmation, element: 'Yes', element_type: radioOption,reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#dob_provided', // page: dateOfBirth, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#gender_different-2', // page: gender, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#sexuality-4', // page: sexuality, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#religion-8', // page: religion, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
+  '#ethnicity-4', // page: ethnicity, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is not allowed for this radio button
+  // govuk-frontend adds aria-expanded to conditional-reveal radios, which axe rejects for role=radio.
+  // Scope the exclusion to affected radios on this page; checkbox reveals remain in the audit.
+  '.pcs-make-order .govuk-radios__input[aria-expanded]',
 ];

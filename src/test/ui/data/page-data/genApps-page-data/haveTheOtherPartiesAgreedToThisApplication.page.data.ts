@@ -3,7 +3,7 @@ export const haveTheOtherPartiesAgreedToThisApplication = {
   theOtherPartyParagraph: `The ‘other party’ is the other side involved in your case. For example your landlord, housing association, or mortgage lender.`,
   everyOtherPartyParagraph: `Every other party will need to agree to let you make this application, if they don’t agree you may need to pay a higher fee.`,
   ifTheOtherPartiesHeader: `If the other parties do not agree`,
-  yourAppFeeParagraph: `Your application fee will increase to £313, if:`,
+  yourAppFeeParagraph: `Your application fee will increase to £321, if:`,
   youHaveAlreadyToldList: `you have already told the other party that you are making this application, and`,
   theyDidNotAgreeList: `they did not agree to it (this means that they have objected to it)`,
   youWillSeeParagraph: `You’ll see the final application fee before you pay.`,

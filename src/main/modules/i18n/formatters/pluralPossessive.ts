@@ -1,8 +1,6 @@
 import type i18next from 'i18next';
 
 export const pluralPossessive = (i18n: typeof i18next): void => {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore - i18next formatter is not typed
   i18n.services?.formatter?.add(
     'pluralPossessive',
     (value: string, lng: string | undefined, options: { format?: string }): string => {
@@ -12,7 +10,8 @@ export const pluralPossessive = (i18n: typeof i18next): void => {
 
       const trimmedValue = value.trim();
 
-      if (lng === 'en' || lng === 'cy') {
+      // Welsh shows possession by word order ("Hawliad {{name}}"), not an apostrophe.
+      if (lng === 'en') {
         return trimmedValue.toLowerCase().endsWith('s')
           ? `${trimmedValue}${options.format}`
           : `${trimmedValue}${options.format}s`;

@@ -11,7 +11,11 @@ describe('sessionHelper', () => {
     const req = {
       session: {
         formData: {
-          step1: { answer: 'Yes' },
+          default: {
+            default: {
+              step1: { answer: 'Yes' },
+            },
+          },
         },
       },
     } as unknown as Request;
@@ -28,6 +32,6 @@ describe('sessionHelper', () => {
 
     setFormData(req, 'step2', { answer: 'No' });
 
-    expect(req.session.formData?.step2).toEqual({ answer: 'No' });
+    expect(req.session.formData?.default?.default?.step2).toEqual({ answer: 'No' });
   });
 });

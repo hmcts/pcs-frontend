@@ -1,3 +1,4 @@
+import { validateAmount } from '../../../constants/validation';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -61,27 +62,14 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         label: 'amountQuestion',
         hint: 'amountHint',
       },
-      labelClasses: 'govuk-label--s govuk-!-font-weight-bold',
+      labelClasses: 'govuk-label--m govuk-!-font-weight-bold',
       errorMessage: 'errors.installmentAmount',
-      validator: value => {
-        const amountString = String(value).trim();
-        if (!/^-?\d+(\.\d{1,2})?$/.test(amountString)) {
-          return 'errors.installmentAmountFormat';
-        }
-
-        const amount = Number(amountString);
-        if (Number.isNaN(amount)) {
-          return 'errors.installmentAmountFormat';
-        }
-        if (amount < 0) {
-          return 'errors.installmentAmountMin';
-        }
-        if (amount >= 1000000000) {
-          return 'errors.installmentAmountMax';
-        }
-
-        return true;
-      },
+      validator: (value: unknown): boolean | string =>
+        validateAmount(value, {
+          invalidAmountFormatError: 'errors.installmentAmountFormat',
+          minAmountError: 'errors.installmentAmountMin',
+          maxAmountError: 'errors.installmentAmountMax',
+        }),
     },
     {
       name: 'installmentFrequency',
@@ -91,7 +79,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         label: 'frequencyQuestion',
       },
       errorMessage: 'errors.installmentFrequency',
-      legendClasses: 'govuk-fieldset__legend--m govuk-!-font-size-19',
+      legendClasses: 'govuk-fieldset__legend--m govuk-!-font-size-24',
       options: [
         { value: 'weekly', translationKey: 'frequencyOptions.weekly' },
         { value: 'every2Weeks', translationKey: 'frequencyOptions.every2Weeks' },

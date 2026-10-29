@@ -25,36 +25,42 @@
   {% endif %}
 
   {% if secondaryHeading %}
-    <h2 class="govuk-heading-m govuk-!-margin-bottom-0 claim-journey-secondary-heading">{{ secondaryHeading }}</h2>
+    <h2 class="govuk-heading-s govuk-!-margin-bottom-0 claim-journey-secondary-heading">{{ secondaryHeading }}</h2>
   {% endif %}
 
   <h1 class="govuk-heading-l">{{ title }}</h1>
 
-  <p class="govuk-body">{{ description | safe }}</p>
+  {% if description %}
+    <p class="govuk-body">{{ description | safe }}</p>
+  {% endif %}
 
-  {% if not isLegalRepresentative %}
-    <h2 class="govuk-heading-m">{{completingYourResponse}}</h2>
+  {% if completingYourResponse %}
+    <h2 class="govuk-heading-s">{{completingYourResponse}}</h2>
   {% endif %}
 
   <p class="govuk-body">
-  {{saveDraftInfo}}
+    {{saveDraftInfo}}
   </p>
+
+  {% if completingYourResponse %}
+    <p class="govuk-body">
+      {{uploadDocumentsInfo}}
+    </p>
+  {% endif %}
 
   <p class="govuk-body">
-  {{uploadDocumentsInfo}}
+    {{claimantVisibilityInfo}}
   </p>
 
+  {% if whatYouWillNeed %}
+    <h2 class="govuk-heading-s">{{whatYouWillNeed}}</h2>
+  {% endif %}
+
+    <p class="govuk-body">
+    {{provideDetailsInfo | safe}}
+    </p>
+
   {% if not isLegalRepresentative %}
-    <p class="govuk-body">
-    {{claimantVisibilityInfo}}
-    </p>
-
-    <h2 class="govuk-heading-m">{{whatYouWillNeed}}</h2>
-
-    <p class="govuk-body">
-    {{provideDetailsInfo}}
-    </p>
-
     <ul class="govuk-list govuk-list--bullet">
       <li>{{listItemName}}</li>
       <li>{{listItemDateOfBirth}}</li>
@@ -75,7 +81,7 @@
     {{financialSituationInfo}}
     </p>
 
-    <h2 class="govuk-heading-m">{{supportToUseHmctsServices}}</h2>
+    <h2 class="govuk-heading-s">{{supportToUseHmctsServices}}</h2>
 
   {% endif %}
 

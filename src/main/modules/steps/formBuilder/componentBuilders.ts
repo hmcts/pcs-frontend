@@ -114,7 +114,7 @@ export function buildComponentConfig({
           ...(field.hintClasses ? { classes: field.hintClasses } : {}),
         }
       : null,
-    errorMessage: hasError && errorText ? { text: errorText } : null,
+    errorMessage: hasError && errorText ? { text: errorText, visuallyHiddenText: t('common:errorPrefix') } : null,
     classes: field.classes || (field.type === 'text' ? 'govuk-!-width-three-quarters' : undefined),
     attributes: field.attributes || {},
   };
@@ -146,6 +146,18 @@ export function buildComponentConfig({
       component.maxlength = field.maxLength || null;
       component.attributes = textareaAttributes;
       componentType = 'textarea';
+      break;
+    }
+    case 'select': {
+      const selectValue = (fieldValue as string) || '';
+      component.value = selectValue;
+      component.items =
+        field.options?.map((option, optionIndex) => ({
+          value: option.value,
+          text: option.text || translatedOptions?.[optionIndex]?.text || option.value,
+          selected: selectValue === option.value,
+        })) || [];
+      componentType = 'select';
       break;
     }
     case 'character-count': {
@@ -232,6 +244,10 @@ export function buildComponentConfig({
       component.uploadButtonText = t('uploadButton');
       component.filesAddedHeading = t('filesAddedHeading');
       component.deleteButtonText = t('deleteButton');
+      component.errorPrefix = t('common:errorPrefix');
+      component.dropzoneHintText = t('common:fileUpload.dropzoneHint');
+      component.dropzoneButtonText = t('common:fileUpload.dropzoneButton');
+      component.uploadStatusText = t('common:fileUpload.uploadStatus');
       componentType = 'fileUpload';
       break;
     }

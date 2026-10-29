@@ -1,0 +1,10 @@
+{
+  "pageTitle": "Dechrau cytundeb rhent",
+  "bulletPoint": "Dechreuodd y denantiaeth, contract meddiannaeth neu drwydded ar {{tenancyStartDate}}",
+  "options": {
+    "yes": "Ydy",
+    "no": "Nac ydy",
+    "or": "neu",
+    "notSure": "Diffynnydd ddim yn siŵr"
+  }
+}

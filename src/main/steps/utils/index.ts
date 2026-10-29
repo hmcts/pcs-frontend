@@ -1,6 +1,9 @@
 export { isSomethingElseCounterClaim } from './isSomethingElseCounterClaim';
 export { isDefendantNameKnown } from './isDefendantNameKnown';
+export { doesDefendantHaveDraftResponse } from './doesDefendantHaveDraftResponse';
 export { isWalesProperty } from './isWalesProperty';
+export { isRelease12Enabled } from './isRelease12Enabled';
+export { shouldShowExemptLandlordStep } from './shouldShowExemptLandlordStep';
 export { isNoticeDateProvided } from './isNoticeDateProvided';
 export { isRentArrearsClaim } from './isRentArrearsClaim';
 export { hasAnyRentArrearsGround } from './hasAnyRentArrearsGround';
@@ -12,6 +15,7 @@ export { isUniversalCreditSelected } from './isUniversalCreditSelected';
 export { hasSelectedUniversalCredit } from './hasSelectedUniversalCredit';
 export { isPriorityDebtsSelected } from './isPriorityDebtsSelected';
 export { hasSelectedPriorityDebts } from './hasSelectedPriorityDebts';
+export { hasMandatoryPriorityDebtDetailFields } from './hasMandatoryPriorityDebtDetailFields';
 export {
   getFirstStepInSection,
   getSectionCoverage,
@@ -30,17 +34,15 @@ export {
   shouldRouteToPriorityDebtDetails,
   shouldRouteToOtherRegularExpenses,
 } from './respondToClaimRouteConditions';
-export {
-  poundsStringToPence,
-  ccdPenceToPoundsString,
-  additionalRentContributionToPoundsString,
-} from './moneyAmountTransforms';
+export { ccdPenceToPoundsString, additionalRentContributionToPoundsString } from './moneyAmountTransforms';
 export { penceToPounds, poundsToPence } from './currencyConversion';
 export {
+  STAFF_USER_ROLES,
   LEGAL_REPRESENTATIVE_USER_ROLES,
   getUserRoles,
   getUserToken,
   getUserType,
+  isStaffUser,
   isLegalRepresentativeUser,
 } from './userRole';
 export { getPreviousStepForCounterClaimAbout } from './getPreviousStepForCounterClaimAbout';
@@ -57,3 +59,4 @@ export {
   shouldShowResponseAndCounterClaimSubmittedConfirmationStep,
   shouldShowResponseSubmittedConfirmationStep,
 } from './postSubmissionRouting';
+export { isSingleLinkedDefendant } from './isSingleLinkedDefendant';

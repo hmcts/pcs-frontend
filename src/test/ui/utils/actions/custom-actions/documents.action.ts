@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 
 import {
+  checkYourAnswers,
   confirmIfTheseDocumentsRelateToAnApplication,
   uploadYourDocuments,
 } from '../../../data/page-data/documents-page-data';
@@ -12,6 +13,7 @@ export class DocumentsAction implements IAction {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['startEvidenceUpload', () => this.startEvidenceUpload(fieldName)],
       ['uploadDocuments', () => this.uploadDocuments(fieldName)],
+      ['verifyCheckYourAnswers', () => this.verifyCheckYourAnswers(fieldName)],
       ['validateViewDocuments', () => this.validateViewDocuments(fieldName)],
       [
         'verifyDocumentRelatesToApplication',
@@ -35,6 +37,25 @@ export class DocumentsAction implements IAction {
       await performAction('uploadFile', data.files);
     }
     await performAction('clickButton', uploadYourDocuments.continueButton);
+  }
+
+  private async verifyCheckYourAnswers(data: actionRecord): Promise<void> {
+    await performValidation('mainHeader', checkYourAnswers.mainHeader);
+
+    if (data.relatedApplication) {
+      await performValidation('summaryRow', checkYourAnswers.relatedApplicationKey, {
+        value: data.relatedApplication,
+        linkText: 'Change',
+      });
+    }
+    await performValidation('summaryRow', checkYourAnswers.uploadedDocumentsKey, {
+      value: data.fileName,
+      linkText: 'Change',
+    });
+    await performValidation('text', {
+      elementType: 'link',
+      text: 'Cancel',
+    });
   }
 
   private async validateViewDocuments(data: actionRecord): Promise<void> {
@@ -78,7 +99,7 @@ export class DocumentsAction implements IAction {
     }
 
     // 3rd radio -> noOption (always visible)
-    expectedOptions.push(confirmIfTheseDocumentsRelateToAnApplication.noRadioOption);
+    expectedOptions.push(confirmIfTheseDocumentsRelateToAnApplication.noMainClaimRadioOption);
 
     console.log('Expected radio order:', expectedOptions);
 
@@ -102,7 +123,7 @@ Actual: "${actualText}"`
     }
 
     const selectOption =
-      confirmDocumentData.option === confirmIfTheseDocumentsRelateToAnApplication.noRadioOption
+      confirmDocumentData.option === confirmIfTheseDocumentsRelateToAnApplication.noMainClaimRadioOption
         ? confirmDocumentData.option
         : `${confirmDocumentData.option} ${formattedDate}`;
 

@@ -6,58 +6,61 @@ const googleAnalyticsDomain = '*.google-analytics.com';
 const self = "'self'";
 
 /**
- * Module that enables helmet in the application
+ * The application's security headers, applied before the public routes and the modules so every response has them.
  */
-export class Helmet {
-  private readonly developmentMode: boolean;
-  constructor(developmentMode: boolean) {
-    this.developmentMode = developmentMode;
+export function securityHeaders(developmentMode: boolean): express.RequestHandler {
+  // include default helmet functions
+  const scriptSrc = [self, googleAnalyticsDomain];
+
+  if (developmentMode) {
+    // Uncaught EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval'
+    // is not an allowed source of script in the following Content Security Policy directive:
+    // "script-src 'self' *.google-analytics.com 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='".
+    // seems to be related to webpack
+    scriptSrc.push("'unsafe-eval'");
+    scriptSrc.push("'unsafe-inline'");
+  } else {
+    scriptSrc.push("'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='");
   }
 
-  public enableFor(app: express.Express): void {
-    // include default helmet functions
-    const scriptSrc = [self, googleAnalyticsDomain];
+  const formAction = [self];
 
-    if (this.developmentMode) {
-      // Uncaught EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval'
-      // is not an allowed source of script in the following Content Security Policy directive:
-      // "script-src 'self' *.google-analytics.com 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='".
-      // seems to be related to webpack
-      scriptSrc.push("'unsafe-eval'");
-      scriptSrc.push("'unsafe-inline'");
-    } else {
-      scriptSrc.push("'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='");
-    }
-
-    const formAction = [self];
-
-    const pcqDomain: string = config.get('pcq.url');
-    if (pcqDomain) {
-      formAction.push(pcqDomain);
-    }
-    // this is required if user is submitting a form when they need to be logged in
-    const idamDomain: string = new URL(config.get('oidc.issuer')).origin;
-    if (idamDomain) {
-      formAction.push(idamDomain);
-    }
-
-    app.use(
-      helmet({
-        contentSecurityPolicy: {
-          directives: {
-            connectSrc: [self],
-            defaultSrc: ["'none'"],
-            fontSrc: [self, 'data:'],
-            imgSrc: [self, googleAnalyticsDomain],
-            objectSrc: [self],
-            scriptSrc,
-            styleSrc: [self],
-            manifestSrc: [self],
-            formAction,
-          },
-        },
-        referrerPolicy: { policy: 'origin' },
-      })
-    );
+  const pcqDomain: string = config.get('pcq.url');
+  if (pcqDomain) {
+    formAction.push(pcqDomain);
   }
+  // this is required if user is submitting a form when they need to be logged in
+  const idamDomain: string = new URL(config.get('oidc.issuer')).origin;
+  if (idamDomain) {
+    formAction.push(idamDomain);
+  }
+
+  const manageCaseReturnURL: string = new URL(config.get<string>('redirects.manageCaseReturnURL')).origin;
+  if (manageCaseReturnURL) {
+    formAction.push(manageCaseReturnURL);
+  }
+
+  // Required so the browser allows the post-submit 303 redirect out to the CUI Your
+  // Support (cui-ra) microsite. form-action is enforced against redirect targets too.
+  const cuiRaDomain: string = new URL(config.get<string>('cuiRa.url')).origin;
+  if (cuiRaDomain) {
+    formAction.push(cuiRaDomain);
+  }
+
+  return helmet({
+    contentSecurityPolicy: {
+      directives: {
+        connectSrc: [self],
+        defaultSrc: ["'none'"],
+        fontSrc: [self, 'data:'],
+        imgSrc: [self, googleAnalyticsDomain],
+        objectSrc: [self],
+        scriptSrc,
+        styleSrc: [self],
+        manifestSrc: [self],
+        formAction,
+      },
+    },
+    referrerPolicy: { policy: 'origin' },
+  });
 }

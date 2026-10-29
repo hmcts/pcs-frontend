@@ -4,19 +4,19 @@
   "rows": {
     "freeLegalAdvice": {
       "label": "A ydych wedi cael unrhyw gyngor cyfreithiol am ddim?",
-      "changeHidden": "cy free legal advice",
+      "changeHidden": "cyngor cyfreithiol am ddim",
       "options": {
-        "YES": "Ydy",
-        "NO": "Nac ydy",
-        "PREFER_NOT_TO_SAY": "Mae'n well gen i beidio dweud"
+        "YES": "Do",
+        "NO": "Naddo",
+        "PREFER_NOT_TO_SAY": "Mae’n well gen i beidio dweud"
       }
     },
     "hasSolicitor": {
-      "label": "cy Do you have a solicitor?",
-      "changeHidden": "cy do you have a solicitor",
+      "label": "A oes gennych gyfreithiwr?",
+      "changeHidden": "a oes gennych gyfreithiwr",
       "options": {
-        "YES": "Ydy",
-        "NO": "Nac ydy"
+        "YES": "Oes",
+        "NO": "Nac oes"
       }
     }
   }

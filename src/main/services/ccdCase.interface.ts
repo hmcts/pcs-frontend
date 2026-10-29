@@ -1,5 +1,7 @@
 import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
 
+import type { CcdFlags } from './cuiRa/cuiRa.interface';
+
 export type YesNoValue = 'YES' | 'NO' | null;
 export type YesNoNotSureValue = 'YES' | 'NO' | 'NOT_SURE' | null;
 export enum YesNoEnum {
@@ -108,6 +110,7 @@ export interface Party {
   idamId: string;
   firstName: string;
   lastName: string;
+  orgName?: string;
 }
 
 export interface Document {
@@ -139,6 +142,12 @@ export interface CcdParty {
   firstName?: string;
   lastName?: string;
   orgName?: string;
+  nameKnown?: string;
+  address?: CcdCaseAddress;
+  addressKnown?: string;
+  addressSameAsProperty?: string;
+  dateOfBirth?: string;
+  rank?: number;
 }
 
 /** Claimant-entered defendant details captured when the claim was created. */
@@ -146,7 +155,7 @@ export interface CcdClaimantEnteredDefendantDetails {
   nameKnown?: YesNoValue;
   firstName?: string;
   lastName?: string;
-  address?: CcdCaseAddress | Record<string, never>;
+  address?: CcdCaseAddress;
   addressKnown?: YesNoValue;
   addressSameAsProperty?: YesNoValue;
 }
@@ -157,15 +166,18 @@ export interface CcdDefendantParty {
   lastName?: string;
   nameKnown?: string;
   emailAddress?: string;
-  address?: CcdCaseAddress | Record<string, never>;
+  address?: CcdCaseAddress;
   addressKnown?: string;
   addressSameAsProperty?: string;
   phoneNumberProvided?: YesNoValue;
   phoneNumber?: string;
+  textMessageNumber?: string;
+  pcqId?: string;
 }
 
 /** Counter-claim data captured across the counterclaim journey screens. */
 export interface CcdCounterClaim {
+  status?: string;
   needHelpWithFees?: YesNoValue;
   appliedForHwf?: YesNoValue;
   hwfReferenceNumber?: string;
@@ -218,7 +230,7 @@ export interface CcdDefendantResponses {
   contactByText?: YesNoValue;
   rentArrearsAmountConfirmation?: string;
   rentArrearsAmount?: string;
-  landlordRegistered?: YesNoNotSureValue;
+  exemptLandlord?: YesNoNotSureValue;
   landlordLicensed?: YesNoNotSureValue;
   writtenTerms?: YesNoNotSureValue;
   disputeClaim?: YesNoValue;
@@ -246,6 +258,9 @@ export interface CcdDefendantResponses {
 export interface StatementOfTruth {
   accepted?: YesNoValue;
   fullName?: string;
+  nameOfFirm?: string;
+  positionHeld?: string;
+  hasLegalRepresentation?: YesNoValue;
 }
 
 export interface PossessionClaimResponse {
@@ -258,13 +273,19 @@ export interface PossessionClaimResponse {
   claimantEnteredDefendantDetails?: CcdClaimantEnteredDefendantDetails;
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
+  responseDocumentId?: string;
+  counterclaimDocumentId?: string;
+  draftVersion?: number;
   claimIssuedDate?: string;
+
+  defendantFlags?: CcdFlags;
 }
 
 export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
+  dateIssued?: string;
   claimIssueDate?: string;
   dateSubmitted?: string;
   claimantName?: string;
@@ -290,6 +311,12 @@ export interface CcdCaseData {
   notice_EmailSentDateTime?: string;
   notice_OtherElectronicDateTime?: string;
   notice_OtherDateTime?: string;
+  notice_ServiceMethod?: string;
+  notice_PersonName?: string;
+  notice_EmailAddress?: string;
+  notice_OtherExplanation?: string;
+  notice_OtherElectronicExplanation?: string;
+  notice_Documents?: CcdCollectionItem<Document>[];
   tenancy_TypeOfTenancyLicence?: string;
   tenancy_DetailsOfOtherTypeOfTenancyLicence?: string;
   occupationLicenceTypeWales?: string;
@@ -300,6 +327,7 @@ export interface CcdCaseData {
   genApps?: CcdCollectionItem<GenApp>[];
   allClaimants?: CcdCollectionItem<CcdParty>[];
   allDefendants?: CcdCollectionItem<CcdParty>[];
+  allLinkedDefendants?: CcdCollectionItem<CcdDefendantParty>[];
   citizenGenAppRequest?: CitizenGenAppRequest;
   uploadedAdditionalDocuments?: CcdCollectionItem<CcdUploadedDocument>[];
   // Populated by the uploadDocuments START handler (@JsonUnwrapped on PCSCase).
@@ -310,7 +338,14 @@ export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
+  sdkEventPayload?: string;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
+  detailsTab_TenancyLicenceDetails?: DetailsTab_TenancyLicenceDetails;
+  detailsTab_RentArrearsDetails?: DetailsTab_RentArrearsDetails;
+  detailsTab_OccupationContractLicenceDetails?: DetailsTab_OccupationContractLicenceDetails;
+  detailsTab_NoticeDetails?: {
+    noticeDocuments?: CcdCollectionItem<Document>[];
+  };
 }
 
 export interface CcdCaseDocument {
@@ -325,10 +360,11 @@ export type DocumentUploadCategoryCode =
   | 'SUSPEND_EVICTION_APPLICATION'
   | 'SET_ASIDE_ORDER_APPLICATION'
   | 'GENERAL_APPLICATION'
-  | 'MAIN_CLAIM_OR_COUNTERCLAIM';
+  | 'COUNTERCLAIM';
 
 export interface RelatedApplicationOption {
   genAppId?: string;
+  counterClaimId?: string;
   category: DocumentUploadCategoryCode;
   submittedDate?: string;
 }
@@ -452,4 +488,28 @@ export interface MakeAnApplicationResponse {
   state?: GenAppState;
   serviceRequestReference?: string;
   feeAmount?: number;
+}
+
+export interface DetailsTab_TenancyLicenceDetails {
+  typeOfTenancyLicence: string;
+  tenancyLicenceDate: string;
+  hasCopyOfTenancyLicence: string;
+  tenancyLicenceDocuments: CcdCollectionItem<CcdCaseDocument>[];
+}
+
+export interface DetailsTab_RentArrearsDetails {
+  rentAmount: string;
+  calculationFrequency: string;
+  dailyRate: string;
+  stepsToRecoverArrears: string;
+  rentStatement: CcdCollectionItem<CcdCaseDocument>[];
+  arrearsTotal: string;
+  judgmentRequested: string;
+}
+
+export interface DetailsTab_OccupationContractLicenceDetails {
+  agreementType: string;
+  agreementTypeDescription: string;
+  agreementStartDate: string;
+  documents: CcdCollectionItem<CcdCaseDocument>[];
 }

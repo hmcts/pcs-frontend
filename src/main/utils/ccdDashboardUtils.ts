@@ -48,12 +48,10 @@ export function unwrapNotifications(
 export function unwrapTaskGroups(raw: CcdCollectionItem<CcdDashboardTaskGroup>[] | undefined): DashboardTaskGroup[] {
   return unwrapCollection(raw).map(g => ({
     groupId: g.groupId as DashboardTaskGroup['groupId'],
-    tasks: unwrapCollection(g.tasks).map(
-      (t): DashboardTask => ({
-        templateId: t.templateId,
-        status: t.status,
-      })
-    ),
+    tasks: unwrapCollection(g.tasks).map((t): DashboardTask => ({
+      templateId: t.templateId,
+      status: t.status,
+    })),
   }));
 }
 

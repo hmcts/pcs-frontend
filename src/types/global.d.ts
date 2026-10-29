@@ -1,4 +1,3 @@
-import { PaymentSessionState } from '@services/paymentSessionService';
 import { type Session, type SessionData } from 'express-session';
 import { type UserInfoResponse } from 'openid-client';
 import { type Redis } from 'ioredis';
@@ -17,22 +16,34 @@ export interface UserInfoResponseWithToken extends UserInfoResponse {
   refreshToken: string;
 }
 
+export interface ClientContextHeaders {
+  selectedPartyId?: string;
+  /** The order a caseworker chose to review, from the case's draft orders tab. */
+  orderId?: string;
+  /** The hearing a judge is making an order for, from the link they followed. */
+  hearingId?: string;
+}
+
 interface CustomSessionData extends SessionData {
   codeVerifier?: string;
   nonce?: string;
   user?: UserInfoResponseWithToken;
   returnTo?: string;
-  formData?: Record<string, any>;
+  // Step form data keyed by journey name, then case reference (or 'default'), then step name.
+  formData?: Record<string, Record<string, Record<string, any>>>;
   uploadedDocs?: Record<string, Record<string, unknown[]>>;
   returnToCya?: string;
   respondToClaimPostSubmitRedirect?: string;
+  respondToClaimSubmitRejection?: string;
   ccdCase?: CcdCase;
-  genApp?: {
-    applicationId?: string;
-    showDuplicateSubmissionPage?: boolean;
-  };
+  // Generated application ID for the make-an-application journey, keyed by case reference.
+  applicationIds?: Record<string, string>;
+  // The case an order was last sent for review on, keyed by case reference, for its confirmation page.
+  ordersSentForReview?: Record<string, { caseReference: string; propertyAddress: string; caseName: string }>;
+  orderReviews?: Record<string, import('../main/utils/orderReview').OrderReviewSession>;
   payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
+  clientContext?: ClientContextHeaders;
 }
 
 declare module 'express-session' {

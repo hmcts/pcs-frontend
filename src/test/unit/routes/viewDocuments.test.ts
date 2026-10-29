@@ -5,12 +5,21 @@ import type { Application, Request, Response } from 'express';
 import viewDocumentsRoute from '@routes/viewDocuments';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getDocumentBinary } from '@services/cdamService';
+import { isUncategorisedDocumentsEnabled } from '@utils/isUncategorisedDocumentsEnabled';
 
 type RouteHandler = (req: Request, res: Response, next: jest.Mock) => Promise<void>;
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn((req, res, next) => next()),
 }));
+
+jest.mock('@utils/isUncategorisedDocumentsEnabled', () => ({
+  isUncategorisedDocumentsEnabled: jest.fn(),
+}));
+
+const mockIsUncategorisedDocumentsEnabled = isUncategorisedDocumentsEnabled as jest.MockedFunction<
+  typeof isUncategorisedDocumentsEnabled
+>;
 
 jest.mock('@services/cdamService', () => ({
   getDocumentBinary: jest.fn(),
@@ -39,6 +48,7 @@ describe('viewDocuments route', () => {
     app = {
       get: jest.fn(),
     } as unknown as Application;
+    mockIsUncategorisedDocumentsEnabled.mockResolvedValue(false);
     viewDocumentsRoute(app);
   });
 
@@ -99,6 +109,7 @@ describe('viewDocuments route', () => {
                 'dashboard:viewDocuments.folders.propertyDocuments': 'Property documents',
                 'dashboard:viewDocuments.folders.evidence': 'Evidence',
                 'dashboard:viewDocuments.folders.correspondence': 'Correspondence',
+                'dashboard:viewDocuments.folders.uncategorisedDocuments': 'Uncategorised',
               }) as Record<string, string>
             )[key],
         } as unknown as Request,
@@ -125,6 +136,99 @@ describe('viewDocuments route', () => {
           ],
         })
       );
+    });
+
+    it('renders an Uncategorised folder for uncategorised documents when the feature flag is on', async () => {
+      mockIsUncategorisedDocumentsEnabled.mockResolvedValue(true);
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          allDocuments: [
+            {
+              id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+              value: {
+                document_filename: 'loose-doc.pdf',
+                document_binary_url: 'http://doc-store/loose-doc/binary',
+                upload_timestamp: '2026-06-24',
+                category_id: 'uncategorisedDocuments',
+              },
+            },
+          ],
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents');
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        {
+          params: { caseReference: '1777570813792018' },
+          language: 'en',
+          session: { user: { accessToken: 'token' } },
+          t: (key: string) =>
+            (
+              ({
+                'dashboard:viewDocuments.folders.uncategorisedDocuments': 'Uncategorised',
+              }) as Record<string, string>
+            )[key] ?? key,
+        } as unknown as Request,
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith(
+        'view-documents',
+        expect.objectContaining({
+          documentFolders: [
+            expect.objectContaining({
+              title: 'Uncategorised',
+              documents: [
+                expect.objectContaining({
+                  id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+                  filename: 'loose-doc.pdf',
+                  submittedOn: '2026-06-24',
+                }),
+              ],
+            }),
+          ],
+        })
+      );
+    });
+
+    it('omits the Uncategorised folder when the feature flag is off', async () => {
+      mockIsUncategorisedDocumentsEnabled.mockResolvedValue(false);
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          allDocuments: [
+            {
+              id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+              value: {
+                document_filename: 'loose-doc.pdf',
+                document_binary_url: 'http://doc-store/loose-doc/binary',
+                upload_timestamp: '2026-06-24',
+                category_id: 'uncategorisedDocuments',
+              },
+            },
+          ],
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents');
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await handler(
+        {
+          params: { caseReference: '1777570813792018' },
+          language: 'en',
+          session: { user: { accessToken: 'token' } },
+          t: (key: string) => key,
+        } as unknown as Request,
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith('view-documents', expect.objectContaining({ documentFolders: [] }));
     });
 
     it('returns 401 when access token is missing', async () => {
@@ -217,6 +321,53 @@ describe('viewDocuments route', () => {
         'Content-Disposition',
         'inline; filename="claim-form.pdf"; filename*=UTF-8\'\'claim-form.pdf'
       );
+      expect(pipeSpy).toHaveBeenCalledWith(res);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('streams a Case Details tab document by its collection id', async () => {
+      const stream = new PassThrough();
+      const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
+      (getDocumentBinary as jest.Mock).mockResolvedValue({
+        stream,
+        contentType: 'application/pdf',
+        contentLength: '2048',
+      });
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          allDocuments: [],
+          detailsTab_TenancyLicenceDetails: {
+            tenancyLicenceDocuments: [
+              {
+                id: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+                value: {
+                  document_filename: 'tenancy-agreement.pdf',
+                  document_binary_url: 'http://dm-store/documents/tenancy-1/binary',
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents/:documentId');
+      const res = { setHeader: jest.fn() } as unknown as Response;
+      const next = jest.fn();
+
+      await handler(
+        {
+          params: {
+            caseReference: '1777570813792018',
+            documentId: '181c89a0-ae0a-4b6b-aff4-36bd8b8122aa',
+          },
+          session: { user: { accessToken: 'token' } },
+        } as unknown as Request,
+        res,
+        next
+      );
+
+      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/tenancy-1/binary', 'token');
       expect(pipeSpy).toHaveBeenCalledWith(res);
       expect(next).not.toHaveBeenCalled();
     });
@@ -346,6 +497,104 @@ describe('viewDocuments route', () => {
 
       stream.emit('error', new Error('stream failed'));
       expect(next).toHaveBeenCalledWith(expect.objectContaining({ message: 'Failed to stream document', status: 502 }));
+    });
+
+    it('streams document binary from detailsTab_NoticeDetails.noticeDocuments when not in allDocuments', async () => {
+      const stream = new PassThrough();
+      const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
+      (getDocumentBinary as jest.Mock).mockResolvedValue({
+        stream,
+        contentType: 'application/rtf',
+      });
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          allDocuments: [],
+          notice_Documents: [],
+          detailsTab_NoticeDetails: {
+            noticeDocuments: [
+              {
+                id: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+                value: {
+                  document_filename: 'DocUploaded - Claimant 1.rtf',
+                  document_binary_url: 'http://dm-store/documents/notice-52/binary',
+                },
+              },
+            ],
+          },
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents/:documentId');
+      const res = {
+        setHeader: jest.fn(),
+      } as unknown as Response;
+      const next = jest.fn();
+
+      await handler(
+        {
+          params: {
+            caseReference: '1777570813792018',
+            documentId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+          },
+          session: { user: { accessToken: 'token' } },
+        } as unknown as Request,
+        res,
+        next
+      );
+
+      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/notice-52/binary', 'token');
+      expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/rtf');
+      expect(pipeSpy).toHaveBeenCalledWith(res);
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it('streams document binary from notice_Documents when allDocuments and details tab are empty', async () => {
+      const stream = new PassThrough();
+      const pipeSpy = jest.spyOn(stream, 'pipe').mockReturnValue({} as unknown as PassThrough);
+      (getDocumentBinary as jest.Mock).mockResolvedValue({
+        stream,
+        contentType: 'application/pdf',
+      });
+      mockGetCaseById.mockResolvedValue({
+        id: '1777570813792018',
+        data: {
+          allDocuments: [],
+          notice_Documents: [
+            {
+              id: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+              value: {
+                document_filename: 'notice-served.pdf',
+                document_binary_url: 'http://dm-store/documents/notice-ccd/binary',
+              },
+            },
+          ],
+          detailsTab_NoticeDetails: {},
+        },
+      });
+
+      const handler = getHandler('/case/:caseReference/view-documents/:documentId');
+      const res = {
+        setHeader: jest.fn(),
+      } as unknown as Response;
+      const next = jest.fn();
+
+      await handler(
+        {
+          params: {
+            caseReference: '1777570813792018',
+            documentId: 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+          },
+          session: { user: { accessToken: 'token' } },
+        } as unknown as Request,
+        res,
+        next
+      );
+
+      expect(getDocumentBinary).toHaveBeenCalledWith('http://dm-store/documents/notice-ccd/binary', 'token');
+      expect(res.setHeader).toHaveBeenCalledWith('Content-Type', 'application/pdf');
+      expect(pipeSpy).toHaveBeenCalledWith(res);
+      expect(next).not.toHaveBeenCalled();
     });
   });
 });

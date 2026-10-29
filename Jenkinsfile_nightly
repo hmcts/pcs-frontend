@@ -102,7 +102,7 @@ properties([
   ])
 ])
 
-@Library("Infrastructure")
+@Library("Infrastructure@2.10.1")
 
 def type = "nodejs"
 def product = "pcs"
@@ -122,8 +122,9 @@ def pcsE2eVaultSecrets = [
   secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
   secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
   secret('idam-pcs-user-password-b64', 'IDAM_PCS_USER_PASSWORD_B64'),
-  secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID'),
+  secret('pcs-local-auth-automation-uid', 'PCS_LOCAL_AUTH_AUTOMATION_UID'),
   secret('pcs-api-idam-secret', 'PCS_API_IDAM_SECRET'),
+  secret('launchdarkly-sdk-key', 'LAUNCHDARKLY_SDK_KEY'),
 ]
 
 withNightlyPipeline(type, product, component) {
@@ -133,18 +134,24 @@ withNightlyPipeline(type, product, component) {
   loadVaultSecrets(["pcs-${env.ENVIRONMENT}": pcsE2eVaultSecrets])
   setFunctionalTestEnvVars()
   enableFortifyScan()
+  enableE2eTest()
   def sauceSuites = selectedSauceSuites()
   if (!sauceSuites.isEmpty()) {
     env.SAUCE_SUITE_NAMES = sauceSuites.join(' ')
     enableCrossBrowserTest()
   }
 
-  afterAlways('fortify-scan') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+  afterAlways('E2eTest') {
     runE2ETests(yarnBuilder)
   }
-}
 
+  afterAlways('fortify-scan') {
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
+
+  }
+
+}
+  
 def selectedSauceSuites() {
   [
     params.SAUCE_MAC13_CHROME ? 'pcs-frontend-mac13-chrome' : null,
@@ -213,7 +220,7 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
       sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
         withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
-          yarnBuilder.yarn('test:E2e')
+          yarnBuilder.yarn('test:EndToEnd')
         }
       }
       publishHTML([

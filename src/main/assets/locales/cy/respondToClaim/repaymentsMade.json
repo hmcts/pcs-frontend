@@ -1,15 +1,15 @@
 {
   "pageTitle": "Taliadau a wnaed",
-  "question": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{claimIssueDate}}?",
+  "question": "A ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}?",
   "options": {
-    "yes": "Ydy",
-    "no": "Nac ydy"
+    "yes": "Do",
+    "no": "Naddo"
   },
   "textAreaLabel": "Rhowch fanylion faint rydych wedi’i dalu a phryd",
-  "textAreaHint": "Gallwch nodi hyd at 500 o nodau.",
+  "textAreaHint": "Gallwch nodi hyd at 500 o nodau",
   "errors": {
     "repaymentsInfo": "Rhowch fanylion faint rydych wedi’i dalu a phryd",
-    "repaymentsInfoMaxLength": "cyPayment details must be 500 characters or less",
-    "confirmRepaymentsMade": "Dewiswch a ydych wedi talu unrhyw arian i {{claimantName}} ers {{claimIssueDate}}"
+    "repaymentsInfoMaxLength": "Rhaid i’r manylion talu fod yn 500 nod neu lai",
+    "confirmRepaymentsMade": "Dewiswch a ydych wedi talu unrhyw arian i {{claimantName}} ers {{dateIssued, ordinalDate}}"
   }
 }

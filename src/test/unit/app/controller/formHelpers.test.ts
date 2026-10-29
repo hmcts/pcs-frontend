@@ -18,9 +18,13 @@ describe('formHelpers', () => {
       const req = {
         session: {
           formData: {
-            'test-step': {
-              field1: 'value1',
-              field2: 'value2',
+            default: {
+              default: {
+                'test-step': {
+                  field1: 'value1',
+                  field2: 'value2',
+                },
+              },
             },
           },
         },
@@ -62,8 +66,8 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'value1' });
 
-      const session = req.session as { formData?: Record<string, unknown> };
-      expect(session.formData).toEqual({
+      const session = req.session as { formData?: Record<string, Record<string, Record<string, unknown>>> };
+      expect(session.formData?.default?.default).toEqual({
         'test-step': {
           field1: 'value1',
         },
@@ -74,8 +78,12 @@ describe('formHelpers', () => {
       const req = {
         session: {
           formData: {
-            'test-step': {
-              field1: 'old-value',
+            default: {
+              default: {
+                'test-step': {
+                  field1: 'old-value',
+                },
+              },
             },
           },
         },
@@ -83,8 +91,8 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'new-value', field2: 'value2' });
 
-      const session = req.session as { formData?: Record<string, unknown> };
-      expect(session.formData).toEqual({
+      const session = req.session as { formData?: Record<string, Record<string, Record<string, unknown>>> };
+      expect(session.formData?.default?.default).toEqual({
         'test-step': {
           field1: 'new-value',
           field2: 'value2',
@@ -99,9 +107,9 @@ describe('formHelpers', () => {
 
       setFormData(req, 'test-step', { field1: 'value1' });
 
-      const session = req.session as { formData?: Record<string, unknown> };
+      const session = req.session as { formData?: Record<string, Record<string, Record<string, unknown>>> };
       expect(session.formData).toBeDefined();
-      expect(session.formData?.['test-step']).toEqual({ field1: 'value1' });
+      expect(session.formData?.default?.default?.['test-step']).toEqual({ field1: 'value1' });
     });
   });
 
@@ -781,7 +789,8 @@ describe('formHelpers', () => {
         validateForm(req, fields);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1', field2: 'value2' }),
-          expect.objectContaining({ field1: 'value1', field2: 'value2' })
+          expect.objectContaining({ field1: 'value1', field2: 'value2' }),
+          req
         );
       });
 
@@ -792,8 +801,12 @@ describe('formHelpers', () => {
           },
           session: {
             formData: {
-              step1: { previousField: 'previousValue' },
-              step2: { anotherField: 'anotherValue' },
+              default: {
+                default: {
+                  step1: { previousField: 'previousValue' },
+                  step2: { anotherField: 'anotherValue' },
+                },
+              },
             },
           },
         } as unknown as Request;
@@ -813,7 +826,8 @@ describe('formHelpers', () => {
         validateForm(req, fields);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1' }),
-          expect.objectContaining({ previousField: 'previousValue', anotherField: 'anotherValue', field1: 'value1' })
+          expect.objectContaining({ previousField: 'previousValue', anotherField: 'anotherValue', field1: 'value1' }),
+          req
         );
       });
 
@@ -865,7 +879,8 @@ describe('formHelpers', () => {
         validateForm(req, fields, undefined, allFormData);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1' }),
-          expect.objectContaining({ customData: 'customValue', field1: 'value1' })
+          expect.objectContaining({ customData: 'customValue', field1: 'value1' }),
+          req
         );
       });
     });
@@ -932,7 +947,11 @@ describe('formHelpers', () => {
           },
           session: {
             formData: {
-              step1: { previousField: 'previousValue' },
+              default: {
+                default: {
+                  step1: { previousField: 'previousValue' },
+                },
+              },
             },
           },
         } as unknown as Request;
@@ -2338,7 +2357,8 @@ describe('formHelpers', () => {
         validateForm(req, fields);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1', field2: 'value2' }),
-          expect.objectContaining({ field1: 'value1', field2: 'value2' })
+          expect.objectContaining({ field1: 'value1', field2: 'value2' }),
+          req
         );
       });
 
@@ -2349,8 +2369,12 @@ describe('formHelpers', () => {
           },
           session: {
             formData: {
-              step1: { previousField: 'previousValue' },
-              step2: { anotherField: 'anotherValue' },
+              default: {
+                default: {
+                  step1: { previousField: 'previousValue' },
+                  step2: { anotherField: 'anotherValue' },
+                },
+              },
             },
           },
         } as unknown as Request;
@@ -2370,7 +2394,8 @@ describe('formHelpers', () => {
         validateForm(req, fields);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1' }),
-          expect.objectContaining({ previousField: 'previousValue', anotherField: 'anotherValue', field1: 'value1' })
+          expect.objectContaining({ previousField: 'previousValue', anotherField: 'anotherValue', field1: 'value1' }),
+          req
         );
       });
 
@@ -2422,7 +2447,8 @@ describe('formHelpers', () => {
         validateForm(req, fields, undefined, allFormData);
         expect(requiredFn).toHaveBeenCalledWith(
           expect.objectContaining({ field1: 'value1' }),
-          expect.objectContaining({ customData: 'customValue', field1: 'value1' })
+          expect.objectContaining({ customData: 'customValue', field1: 'value1' }),
+          req
         );
       });
     });
@@ -2489,7 +2515,11 @@ describe('formHelpers', () => {
           },
           session: {
             formData: {
-              step1: { previousField: 'previousValue' },
+              default: {
+                default: {
+                  step1: { previousField: 'previousValue' },
+                },
+              },
             },
           },
         } as unknown as Request;

@@ -28,8 +28,8 @@ jest.mock('@steps', () => ({
   getFlowConfigForJourney: jest.fn(),
 }));
 
-jest.mock('@modules/nunjucks/filters/date', () => ({
-  date: jest.fn((input: string) => `formatted(${input})`),
+jest.mock('@utils/formatLocalisedDate', () => ({
+  formatLocalisedDate: jest.fn((input: string) => `formatted(${input})`),
 }));
 
 jest.mock('@routes/dashboard', () => ({
@@ -39,11 +39,18 @@ jest.mock('@routes/dashboard', () => ({
 import type { Request, Response } from 'express';
 
 import { step } from '../../../../../main/steps/case-tasks/upload-additional-documents/confirm-if-these-documents-relate-to-an-application';
+import { MAIN_CLAIM_OPTION_VALUE } from '../../../../../main/steps/case-tasks/upload-additional-documents/flow.config';
 
-import { date } from '@modules/nunjucks/filters/date';
-import { createGetController, getFormData, getTranslationFunction, setFormData } from '@modules/steps';
+import {
+  createGetController,
+  getFormData,
+  getTranslationFunction,
+  loadStepNamespace,
+  setFormData,
+} from '@modules/steps';
 import type { CcdCase, CcdCollectionItem, RelatedApplicationOption } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 
 const mockGetCaseByIdForEvent = ccdCaseService.getCaseByIdForEvent as jest.Mock;
 const mockGetCaseById = ccdCaseService.getCaseById as jest.Mock;
@@ -57,8 +64,21 @@ const TOKEN = 'access-token-1';
 const GEN_APP_1 = '11111111-1111-1111-1111-111111111111';
 const GEN_APP_2 = '22222222-2222-2222-2222-222222222222';
 const GEN_APP_NO_ID = '';
+const MAIN_CLAIM_TEXT = 'No, the documents I’m uploading relate to the main claim';
+const COUNTERCLAIM_TEXT = 'No, the documents I’m uploading relate to the counterclaim';
+const COUNTER_CLAIM_ID = '33333333-3333-3333-3333-333333333333';
 
-const t = (key: string, vars?: Record<string, string>) => (vars ? `${key}|${JSON.stringify(vars)}` : key);
+const t = (key: string, vars?: Record<string, string>) => {
+  if (key === 'optionMainClaim') {
+    return MAIN_CLAIM_TEXT;
+  }
+
+  if (key === 'optionCounterclaim') {
+    return COUNTERCLAIM_TEXT;
+  }
+
+  return vars ? `${key}|${JSON.stringify(vars)}` : key;
+};
 
 const buildReq = (
   overrides: Partial<{ formData: Record<string, unknown>; body: Record<string, unknown> }> = {}
@@ -85,6 +105,11 @@ const item = (
 ): CcdCollectionItem<RelatedApplicationOption> => ({
   id: genAppId,
   value: { genAppId, category, submittedDate },
+});
+
+const counterClaimItem = (counterClaimId = COUNTER_CLAIM_ID): CcdCollectionItem<RelatedApplicationOption> => ({
+  id: counterClaimId,
+  value: { counterClaimId, category: 'COUNTERCLAIM', submittedDate: '2026-06-01' },
 });
 
 const startResponseWithOptions = (options: CcdCollectionItem<RelatedApplicationOption>[]): CcdCase => ({
@@ -134,7 +159,7 @@ beforeEach(() => {
       return content;
     },
   }));
-  (date as jest.Mock).mockImplementation((input: string) => `formatted(${input})`);
+  (formatLocalisedDate as jest.Mock).mockImplementation((input: string) => `formatted(${input})`);
 });
 
 describe('confirm-if-these-documents-relate-to-an-application GET', () => {
@@ -157,6 +182,7 @@ describe('confirm-if-these-documents-relate-to-an-application GET', () => {
 
     const result = await invokeGet();
 
+    expect(formatLocalisedDate).toHaveBeenCalledWith('2026-05-01', 'en', 'weekday');
     expect(result.applications).toEqual([
       {
         value: GEN_APP_1,
@@ -175,8 +201,8 @@ describe('confirm-if-these-documents-relate-to-an-application GET', () => {
         },
       },
       {
-        value: 'MAIN_CLAIM_OR_COUNTERCLAIM',
-        text: 'optionClaimOrCounterclaim',
+        value: MAIN_CLAIM_OPTION_VALUE,
+        text: MAIN_CLAIM_TEXT,
         checked: false,
       },
     ]);
@@ -196,11 +222,11 @@ describe('confirm-if-these-documents-relate-to-an-application GET', () => {
     const apps = result.applications as { value: string; checked: boolean }[];
     expect(apps.find(a => a.value === GEN_APP_2)?.checked).toBe(true);
     expect(apps.find(a => a.value === GEN_APP_1)?.checked).toBe(false);
-    expect(apps.find(a => a.value === 'MAIN_CLAIM_OR_COUNTERCLAIM')?.checked).toBe(false);
+    expect(apps.find(a => a.value === MAIN_CLAIM_OPTION_VALUE)?.checked).toBe(false);
   });
 
   it('marks the sentinel as checked when previously selected', async () => {
-    mockGetFormData.mockReturnValue({ relatedApplicationId: 'MAIN_CLAIM_OR_COUNTERCLAIM' });
+    mockGetFormData.mockReturnValue({ relatedApplicationId: MAIN_CLAIM_OPTION_VALUE });
     mockGetCaseByIdForEvent.mockResolvedValue(startResponseWithOptions([]));
 
     const result = await invokeGet();
@@ -208,8 +234,8 @@ describe('confirm-if-these-documents-relate-to-an-application GET', () => {
     const apps = result.applications as { value: string; checked: boolean }[];
     expect(apps).toHaveLength(1);
     expect(apps[0]).toEqual({
-      value: 'MAIN_CLAIM_OR_COUNTERCLAIM',
-      text: 'optionClaimOrCounterclaim',
+      value: MAIN_CLAIM_OPTION_VALUE,
+      text: MAIN_CLAIM_TEXT,
       checked: true,
     });
   });
@@ -225,7 +251,41 @@ describe('confirm-if-these-documents-relate-to-an-application GET', () => {
     const result = await invokeGet();
 
     const apps = result.applications as { value: string }[];
-    expect(apps.map(a => a.value)).toEqual([GEN_APP_1, 'MAIN_CLAIM_OR_COUNTERCLAIM']);
+    expect(apps.map(a => a.value)).toEqual([GEN_APP_1, MAIN_CLAIM_OPTION_VALUE]);
+  });
+
+  it('renders the counterclaim option keyed by counterClaimId, between the gen-apps and main claim', async () => {
+    mockGetCaseByIdForEvent.mockResolvedValue(
+      startResponseWithOptions([item(GEN_APP_1, 'ADJOURN_HEARING_APPLICATION', '2026-05-01'), counterClaimItem()])
+    );
+
+    const result = await invokeGet();
+
+    const apps = result.applications as { value: string; text: string }[];
+    expect(apps.map(a => a.value)).toEqual([GEN_APP_1, COUNTER_CLAIM_ID, MAIN_CLAIM_OPTION_VALUE]);
+    expect(apps[1]).toEqual({ value: COUNTER_CLAIM_ID, text: COUNTERCLAIM_TEXT, checked: false });
+  });
+
+  it('omits the counterclaim option when no counterclaim is returned', async () => {
+    mockGetCaseByIdForEvent.mockResolvedValue(
+      startResponseWithOptions([item(GEN_APP_1, 'ADJOURN_HEARING_APPLICATION', '2026-05-01')])
+    );
+
+    const result = await invokeGet();
+
+    const apps = result.applications as { value: string }[];
+    expect(apps.map(a => a.value)).toEqual([GEN_APP_1, MAIN_CLAIM_OPTION_VALUE]);
+  });
+
+  it('marks the counterclaim option as checked when previously selected', async () => {
+    mockGetFormData.mockReturnValue({ relatedApplicationId: COUNTER_CLAIM_ID });
+    mockGetCaseByIdForEvent.mockResolvedValue(startResponseWithOptions([counterClaimItem()]));
+
+    const result = await invokeGet();
+
+    const apps = result.applications as { value: string; checked: boolean }[];
+    expect(apps.find(a => a.value === COUNTER_CLAIM_ID)?.checked).toBe(true);
+    expect(apps.find(a => a.value === MAIN_CLAIM_OPTION_VALUE)?.checked).toBe(false);
   });
 });
 
@@ -239,17 +299,18 @@ describe('confirm-if-these-documents-relate-to-an-application POST', () => {
   };
 
   it('saves the sentinel selection with category + text', async () => {
-    await invokePost({ relatedApplicationId: 'MAIN_CLAIM_OR_COUNTERCLAIM' });
+    await invokePost({ relatedApplicationId: MAIN_CLAIM_OPTION_VALUE });
 
     expect(mockSetFormData).toHaveBeenCalledWith(
       expect.anything(),
       'confirm-if-these-documents-relate-to-an-application',
       {
-        relatedApplicationId: 'MAIN_CLAIM_OR_COUNTERCLAIM',
-        relatedApplicationCategory: 'MAIN_CLAIM_OR_COUNTERCLAIM',
-        relatedApplicationText: 'optionClaimOrCounterclaim',
+        relatedApplicationId: MAIN_CLAIM_OPTION_VALUE,
+        relatedApplicationCategory: MAIN_CLAIM_OPTION_VALUE,
+        relatedApplicationText: MAIN_CLAIM_TEXT,
       }
     );
+    expect(loadStepNamespace).toHaveBeenCalled();
     expect(mockGetCaseByIdForEvent).not.toHaveBeenCalled();
   });
 
@@ -267,6 +328,22 @@ describe('confirm-if-these-documents-relate-to-an-application POST', () => {
         relatedApplicationId: GEN_APP_1,
         relatedApplicationCategory: 'ADJOURN_HEARING_APPLICATION',
         relatedApplicationText: 'applicationOptionAdjourn|{"date":"formatted(2026-05-01)"}',
+      }
+    );
+  });
+
+  it('saves a counterclaim selection matched on counterClaimId', async () => {
+    mockGetCaseByIdForEvent.mockResolvedValue(startResponseWithOptions([counterClaimItem()]));
+
+    await invokePost({ relatedApplicationId: COUNTER_CLAIM_ID });
+
+    expect(mockSetFormData).toHaveBeenCalledWith(
+      expect.anything(),
+      'confirm-if-these-documents-relate-to-an-application',
+      {
+        relatedApplicationId: COUNTER_CLAIM_ID,
+        relatedApplicationCategory: 'COUNTERCLAIM',
+        relatedApplicationText: COUNTERCLAIM_TEXT,
       }
     );
   });
@@ -300,7 +377,7 @@ describe('confirm-if-these-documents-relate-to-an-application POST', () => {
         errorSummary: expect.objectContaining({
           titleText: 'errors.title',
         }),
-        radioErrorMessage: { text: 'errors.relatedApplicationId.required' },
+        radioErrorMessage: { text: 'errors.relatedApplicationId.required', visuallyHiddenText: 'common:errorPrefix' },
       })
     );
   });

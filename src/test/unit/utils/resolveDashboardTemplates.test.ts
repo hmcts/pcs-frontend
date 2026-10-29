@@ -42,6 +42,57 @@ describe('resolveDashboardTemplates', () => {
   });
 
   describe('resolveNotification', () => {
+    describe('date values', () => {
+      const t = createT({
+        'dashboard:notifications.Defendant.CaseIssued.title': 'Case issued',
+        'dashboard:notifications.Defendant.CaseIssued.body': opts => `Respond by ${opts.responseEndDate as string}.`,
+      });
+
+      it('shows an ISO date in Welsh on a Welsh page', () => {
+        expect(
+          resolveNotification(t, 'Defendant.CaseIssued', { responseEndDate: '2026-11-12' }, '1234567890123456', 'cy')
+            ?.body
+        ).toBe('Respond by 12 Tachwedd 2026.');
+      });
+
+      it('leaves dates exactly as sent on an English page', () => {
+        expect(
+          resolveNotification(t, 'Defendant.CaseIssued', { responseEndDate: '2026-11-12' }, '1234567890123456', 'en')
+            ?.body
+        ).toBe('Respond by 2026-11-12.');
+      });
+
+      it('leaves date-times exactly as sent so the time is not lost', () => {
+        expect(
+          resolveNotification(
+            t,
+            'Defendant.CaseIssued',
+            { responseEndDate: '2026-11-12T14:30:00Z' },
+            '1234567890123456',
+            'cy'
+          )?.body
+        ).toBe('Respond by 2026-11-12T14:30:00Z.');
+      });
+
+      it('leaves values that are not ISO dates exactly as sent', () => {
+        expect(
+          resolveNotification(
+            t,
+            'Defendant.CaseIssued',
+            { responseEndDate: '12 November 2026' },
+            '1234567890123456',
+            'cy'
+          )?.body
+        ).toBe('Respond by 12 November 2026.');
+      });
+
+      it('changes nothing when no page language is given', () => {
+        expect(
+          resolveNotification(t, 'Defendant.CaseIssued', { responseEndDate: '2026-11-12' }, '1234567890123456')?.body
+        ).toBe('Respond by 2026-11-12.');
+      });
+    });
+
     it('returns null when title is missing', () => {
       const t = createT({
         'dashboard:notifications.Defendant.Foo.body': 'Body only',
@@ -66,6 +117,30 @@ describe('resolveDashboardTemplates', () => {
         title: 'Title',
         body: 'Case ref in body: 999',
       });
+    });
+
+    it('parses feeAmount as a number and includes payCounterclaimFeeUrl for unpaid counterclaim notification', () => {
+      const t = jest.fn((key: string, opts?: Record<string, unknown>) => {
+        if (key === 'dashboard:notifications.Defendant.CounterClaimFeeUnpaid.title') {
+          return 'Your response';
+        }
+        if (key === 'dashboard:notifications.Defendant.CounterClaimFeeUnpaid.body') {
+          return `Fee ${String(opts?.feeAmount)} link ${String(opts?.payCounterclaimFeeUrl)}`;
+        }
+        return MISSING;
+      }) as unknown as TFunction;
+
+      expect(resolveNotification(t, 'Defendant.CounterClaimFeeUnpaid', { feeAmount: '404.00' }, '1234')).toEqual({
+        title: 'Your response',
+        body: 'Fee 404 link /case/1234/respond-to-claim/counter-claim-application-fee-amount?from=dashboard',
+      });
+      expect(t).toHaveBeenCalledWith(
+        'dashboard:notifications.Defendant.CounterClaimFeeUnpaid.body',
+        expect.objectContaining({
+          feeAmount: 404,
+          payCounterclaimFeeUrl: '/case/1234/respond-to-claim/counter-claim-application-fee-amount?from=dashboard',
+        })
+      );
     });
   });
 

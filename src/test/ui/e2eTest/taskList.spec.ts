@@ -44,6 +44,7 @@ let claimantName: string;
 
 test.beforeEach(async ({ page }, testInfo) => {
   initializeExecutor(page);
+  await performAction('skipTestIfLdFlagDisabled', 'cui-respond-to-claim-enabled');
   process.env.WALES_POSTCODE = 'NO';
   claimantName = submitCaseApiData.submitCasePayload.claimantName;
   process.env.CLAIMANT_NAME = claimantName;
@@ -91,7 +92,7 @@ test.afterEach(async () => {
 
 test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () => {
   //Income and expenses - yes - Only Universal CREDIT - Priority debt
-  test('Respond to a claim - TaskList @noDefendants @regression @crossbrowser @NonAutomaticEMV', async () => {
+  test('Respond to a claim - TaskList @noDefendants @crossbrowser @NonAutomaticEMV', async () => {
     //Counterclaim - yes - What are you claiming for - sum of money - Select counterclaim fee - I do not need help
     await performAction('taskList', { subSection: taskList.readInformationAboutLink });
     await performAction('clickButton', startNow.startNowButton);
@@ -184,7 +185,10 @@ test.describe('Respond to a claim - TaskList - e2e Journey @nightly', async () =
       radioOption: contactPreferencesTelephone.yesRadioOption,
       phoneNumber: contactPreferencesTelephone.ukPhoneNumberTextInput,
     });
-    await performAction('selectContactByTextMessage', contactPreferencesTextMessage.yesRadioOption);
+    await performAction('selectContactByTextMessage', {
+      radioOption: contactPreferencesTextMessage.yesRadioOption,
+      mobileNumber: contactPreferencesTextMessage.ukMobileNumberTextInput,
+    });
     await performAction('clickButton', 'Save and continue');
     await performAction('taskList', { subSection: taskList.respondToSpecificPartsOfClaimantsClaimLink });
     await performAction(

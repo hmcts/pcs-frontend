@@ -19,6 +19,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   customTemplate: `${__dirname}/confirmationOfNoticeDateWhenNotProvided.njk`,
   translationKeys: {
     pageTitle: 'pageTitle',
+    caseNumber: 'caseNumber',
     subTitle: 'subTitle',
     question: 'question',
     paragraph: 'paragraph',

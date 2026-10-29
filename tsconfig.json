@@ -3,6 +3,7 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "module": "commonjs",
+    "ignoreDeprecations": "6.0",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -15,7 +16,7 @@
     "experimentalDecorators": true,
     "useUnknownInCatchVariables": false,
     "skipLibCheck": true,
-    "lib": ["es2020", "dom", "dom.iterable"],
+    "lib": ["es2020", "dom", "dom.iterable", "esnext.typedarrays"],
     "baseUrl": "src/main",
     "paths": {
       "@app/*": ["app/*"],

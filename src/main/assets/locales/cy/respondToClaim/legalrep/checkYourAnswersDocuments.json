@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Gwirio eich atebion",
+  "cardTitle": "Uwchlwytho ffeiliau",
+  "rows": {
+    "uploadedDocuments": {
+      "label": "Ffeiliau wedi’u huwchlwytho",
+      "changeHidden": "ffeiliau wedi’u huwchlwytho",
+      "none": "Nid oes ffeiliau wedi cael eu huwchlwytho"
+    }
+  }
+}

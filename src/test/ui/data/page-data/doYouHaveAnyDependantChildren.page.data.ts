@@ -1,6 +1,7 @@
 export const doYouHaveAnyDependantChildren = {
   mainHeader: `Do you have any dependent children?`,
-  dependantChildrenParagraph: `Dependent children are children you look after financially.`,
+  //uncomment the below line when BUG HDPI-7697 is fixed
+  //dependantChildrenParagraph: `Dependent children are children you look after financially.`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
   giveDetailsHiddenTextLabel: `Give details about your dependent children`,

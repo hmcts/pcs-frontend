@@ -4,6 +4,7 @@ import type { TFunction } from 'i18next';
 
 import { formatIsoDate, normalizeYesNoValue } from '../../utils';
 import { formatCcdAddressLines } from '../../utils/ccdAddress';
+import { isLegalRepresentativeUser } from '../../utils/userRole';
 import {
   type BaseRowContext,
   type SummaryListRow,
@@ -11,7 +12,6 @@ import {
   groupQuestionAndDetail,
   isYes,
   multiSelectValue,
-  pushYesNoRow,
 } from '../section-cya/cyaRow';
 import type { RespondToClaimSectionId } from '../sections.config';
 
@@ -28,24 +28,34 @@ export function buildSectionCyaRows(req: Request, t: TFunction): SummaryListRow[
   addNameRow(ctx);
   addDateOfBirthRow(ctx);
   addCorrespondenceAddressRow(ctx);
-  addContactByEmailOrPostRow(ctx);
-  addContactByPhoneRow(ctx);
-  addContactByTextRow(ctx);
-  addContactDetailsRow(ctx);
+
+  if (isLegalRepresentativeUser(req)) {
+    addEmailConfirmationRow(ctx);
+  } else {
+    addContactByEmailOrPostRow(ctx);
+    addContactByPhoneRow(ctx);
+    addContactByTextRow(ctx);
+    addContactDetailsRow(ctx);
+  }
 
   return ctx.rows;
 }
 
 function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
   const nameConfirmation = validatedCase.defendantResponsesDefendantNameConfirmation;
-  const claimDefendantName = validatedCase.claimantEnteredDefendantDetailsName;
+  const claimDefendantName = validatedCase.claimantEnteredDefendantDetailsName || validatedCase.defendantName?.trim();
   if (nameConfirmation && claimDefendantName) {
     // Branch 1: claim recorded the defendant name — user confirmed (Y/N).
     // When "No", the corrected name is rendered as a separate follow-up row so each
     // answer keeps its own Change link (matches disputeClaim + disputeClaimDetails).
     const questionRow: SummaryListRow = {
-      key: { text: t('rows.defendantNameConfirmation.label', { name: claimDefendantName }) },
-      value: { text: yesNoNotSure(nameConfirmation) },
+      key: {
+        text: t('rows.defendantNameConfirmation.label', {
+          name: claimDefendantName,
+          defendantName: claimDefendantName,
+        }),
+      },
+      value: { text: yesNoNotSure(nameConfirmation, 'defendant-name-confirmation') },
       actions: { items: [change('defendant-name-confirmation', 'rows.defendantNameConfirmation.changeHidden')] },
     };
     rows.push(questionRow);
@@ -70,7 +80,7 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
   // The row stands alone with no confirmation question above it, so it mirrors the
   // capture page's own question ("What's your name?") rather than the bare "Name" noun
   // label used for the corrected-name row in branch 1.
-  const partyName = validatedCase.defendantContactDetailsPartyName?.trim();
+  const partyName = validatedCase.defendantContactDetailsPartyName?.trim() || validatedCase.defendantName?.trim();
   if (!partyName) {
     return;
   }
@@ -81,12 +91,12 @@ function addNameRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext
   });
 }
 
-function addDateOfBirthRow({ rows, validatedCase, t, change }: RowContext): void {
+function addDateOfBirthRow({ rows, validatedCase, t, lang, change }: RowContext): void {
   // DOB page has no showCondition and the field is optional, so always render the row.
   const dateOfBirth = validatedCase.defendantResponsesDateOfBirth;
   rows.push({
     key: { text: t('rows.dateOfBirth.label') },
-    value: { text: dateOfBirth ? formatIsoDate(dateOfBirth) : t('noAnswerProvided') },
+    value: { text: dateOfBirth ? formatIsoDate(dateOfBirth, lang) : t('noAnswerProvided') },
     actions: { items: [change('defendant-date-of-birth', 'rows.dateOfBirth.changeHidden')] },
   });
 }
@@ -127,7 +137,7 @@ function addCorrespondenceAddressRow({ rows, validatedCase, t, change, yesNoNotS
     // YES: question carries the address, value is just "Yes" (same shape as the name row).
     rows.push({
       key: { text: t('rows.correspondenceAddressConfirmation.label', { address: lines.join(', ') }) },
-      value: { text: yesNoNotSure(activeConfirmation) },
+      value: { text: yesNoNotSure(activeConfirmation, 'correspondence-address') },
       actions: { items: [change('correspondence-address', 'rows.correspondenceAddressConfirmation.changeHidden')] },
     });
     return;
@@ -167,7 +177,30 @@ function addContactByPhoneRow({ rows, validatedCase, t, change, yesNoNotSure }: 
   if (!contactByPhone) {
     return;
   }
-  pushYesNoRow(rows, 'rows.contactByPhone', contactByPhone, 'contact-preferences-telephone', t, yesNoNotSure, change);
+
+  const questionRow: SummaryListRow = {
+    key: { text: t('rows.contactByPhone.label') },
+    value: { text: yesNoNotSure(contactByPhone) },
+    actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhone.changeHidden')] },
+  };
+  rows.push(questionRow);
+
+  if (normalizeYesNoValue(contactByPhone) !== 'YES') {
+    return;
+  }
+
+  const phoneNumber = validatedCase.defendantContactDetailsPartyPhoneNumber?.replace(/\s+/g, '');
+  if (!phoneNumber) {
+    return;
+  }
+
+  const detailRow: SummaryListRow = {
+    key: { text: t('rows.phoneNumber.label') },
+    value: { html: escapeHtml(phoneNumber) },
+    actions: { items: [change('contact-preferences-telephone', 'rows.contactByPhone.changeHidden')] },
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 function addContactByTextRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
@@ -180,7 +213,30 @@ function addContactByTextRow({ rows, validatedCase, t, change, yesNoNotSure }: R
   if (!contactByText) {
     return;
   }
-  pushYesNoRow(rows, 'rows.contactByText', contactByText, 'contact-preferences-text-message', t, yesNoNotSure, change);
+
+  const questionRow: SummaryListRow = {
+    key: { text: t('rows.contactByText.label') },
+    value: { text: yesNoNotSure(contactByText) },
+    actions: { items: [change('contact-preferences-text-message', 'rows.contactByText.changeHidden')] },
+  };
+  rows.push(questionRow);
+
+  if (normalizeYesNoValue(contactByText) !== 'YES') {
+    return;
+  }
+
+  const textMessageNumber = validatedCase.defendantContactDetailsPartyTextMessageNumber?.replace(/\s+/g, '');
+  if (!textMessageNumber) {
+    return;
+  }
+
+  const detailRow: SummaryListRow = {
+    key: { text: t('rows.textMessageNumber.label') },
+    value: { html: escapeHtml(textMessageNumber) },
+    actions: { items: [change('contact-preferences-text-message', 'rows.contactByText.changeHidden')] },
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }
 
 // Per the GOV.UK check-answers contact-details example: a single row that stacks
@@ -210,4 +266,35 @@ function addContactDetailsRow({ rows, validatedCase, t, change }: RowContext): v
     value: { html: lines.map(line => `<p class="govuk-body">${escapeHtml(line)}</p>`).join('') },
     actions: { items: [change(changeStep, 'rows.contactDetails.changeHidden')] },
   });
+}
+
+function addEmailConfirmationRow({ rows, validatedCase, t, change, yesNoNotSure }: RowContext): void {
+  const contactByEmail = validatedCase.defendantResponsesContactByEmail;
+  if (!contactByEmail) {
+    return;
+  }
+
+  const questionRow: SummaryListRow = {
+    key: { text: t('rows.emailConfirmation.label') },
+    value: { text: yesNoNotSure(contactByEmail, 'email-confirmation') },
+    actions: { items: [change('email-confirmation', 'rows.emailConfirmation.changeHidden')] },
+  };
+  rows.push(questionRow);
+
+  if (normalizeYesNoValue(contactByEmail) !== 'YES') {
+    return;
+  }
+
+  const emailAddress = validatedCase.defendantContactDetailsPartyEmailAddress?.trim();
+  if (!emailAddress) {
+    return;
+  }
+
+  const detailRow: SummaryListRow = {
+    key: { text: t('rows.emailAddress.label') },
+    value: { html: escapeHtml(emailAddress) },
+    actions: { items: [change('email-confirmation', 'rows.emailAddress.changeHidden')] },
+  };
+  groupQuestionAndDetail(questionRow, detailRow);
+  rows.push(detailRow);
 }

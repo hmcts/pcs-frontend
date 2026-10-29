@@ -13,7 +13,7 @@ import {
 import { getNextStep, getPreviousStep } from '@modules/steps/flow';
 
 describe('respond-to-claim navigation from CCD case data', () => {
-  const createReq = (validatedCase: Record<string, unknown>): Request => {
+  const createReq = (validatedCase: Record<string, unknown>, options: { release12Enabled?: boolean } = {}): Request => {
     const includesNestedData =
       'data' in validatedCase &&
       typeof validatedCase['data'] === 'object' &&
@@ -26,6 +26,7 @@ describe('respond-to-claim navigation from CCD case data', () => {
       res: {
         locals: {
           validatedCase: normalizedValidatedCase,
+          release12Enabled: options.release12Enabled ?? false,
         },
       },
     } as unknown as Request;
@@ -81,13 +82,30 @@ describe('respond-to-claim navigation from CCD case data', () => {
   });
 
   it('derives tenancy type back navigation from validated case data only', async () => {
-    const welshReq = createReq({ legislativeCountry: 'Wales' });
+    const welshReq = createReq({ legislativeCountry: 'Wales' }, { release12Enabled: true });
     const englishReq = createReq({ legislativeCountry: 'England' });
 
     await expect(getPreviousStep(welshReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe('written-terms');
     // dispute-claim-interstitial is now the first step of disputeAndTenancy; the
-    // non-Wales back-walk lands on it after the hidden landlord-* steps are skipped.
+    // non-Wales back-walk lands on it after the hidden exempt-landlord step is skipped.
     await expect(getPreviousStep(englishReq, 'tenancy-type-details', flowConfig, {})).resolves.toBe(
+      'dispute-claim-interstitial'
+    );
+  });
+
+  it('routes Wales dispute interstitial forward to exempt landlord and then written terms when release 1.2 is enabled', async () => {
+    const welshReq = createReq({ legislativeCountry: 'Wales' }, { release12Enabled: true });
+
+    await expect(getNextStep(welshReq, 'dispute-claim-interstitial', flowConfig, {})).resolves.toBe('exempt-landlord');
+    await expect(getNextStep(welshReq, 'exempt-landlord', flowConfig, {})).resolves.toBe('written-terms');
+    await expect(getPreviousStep(welshReq, 'written-terms', flowConfig, {})).resolves.toBe('exempt-landlord');
+  });
+
+  it('skips exempt landlord for Wales when release 1.2 is disabled', async () => {
+    const welshReq = createReq({ legislativeCountry: 'Wales' }, { release12Enabled: false });
+
+    await expect(getNextStep(welshReq, 'dispute-claim-interstitial', flowConfig, {})).resolves.toBe('written-terms');
+    await expect(getPreviousStep(welshReq, 'written-terms', flowConfig, {})).resolves.toBe(
       'dispute-claim-interstitial'
     );
   });
@@ -190,16 +208,14 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(rentArrearsReq, 'repayments-agreed', flowConfig, {})).resolves.toBe(
-      'installment-payments'
-    );
+    await expect(getNextStep(rentArrearsReq, 'repayments-agreed', flowConfig, {})).resolves.toBe('instalment-payments');
 
     await expect(getNextStep(noArrearsReq, 'repayments-agreed', flowConfig, {})).resolves.toBe(
       'your-household-and-circumstances'
     );
   });
 
-  it('routes installment-payments forward from CCD state', async () => {
+  it('routes instalment-payments forward from CCD state', async () => {
     const req = createReq({
       data: {
         ...rentArrearsData,
@@ -211,14 +227,14 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
+    await expect(getNextStep(req, 'instalment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
 
-    await expect(getNextStep(createReq({}), 'installment-payments', flowConfig, {})).resolves.toBe(
+    await expect(getNextStep(createReq({}), 'instalment-payments', flowConfig, {})).resolves.toBe(
       'your-household-and-circumstances'
     );
   });
 
-  it('routes installment-payments forward when repayArrearsInstalments is stored at possessionClaimResponse.paymentAgreement', async () => {
+  it('routes instalment-payments forward when repayArrearsInstalments is stored at possessionClaimResponse.paymentAgreement', async () => {
     const req = createReq({
       data: {
         ...rentArrearsData,
@@ -228,14 +244,14 @@ describe('respond-to-claim navigation from CCD case data', () => {
       },
     });
 
-    await expect(getNextStep(req, 'installment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
+    await expect(getNextStep(req, 'instalment-payments', flowConfig, {})).resolves.toBe('how-much-afford-to-pay');
   });
 
-  it('routes installment-payments forward from the submitted answer before CCD state is refreshed', async () => {
+  it('routes instalment-payments forward from the submitted answer before CCD state is refreshed', async () => {
     const req = createReq({ data: rentArrearsData });
     req.body = { confirmInstallmentOffer: 'yes' };
 
-    await expect(getNextStep(req, 'installment-payments', flowConfig, {}, req.body)).resolves.toBe(
+    await expect(getNextStep(req, 'instalment-payments', flowConfig, {}, req.body)).resolves.toBe(
       'how-much-afford-to-pay'
     );
   });

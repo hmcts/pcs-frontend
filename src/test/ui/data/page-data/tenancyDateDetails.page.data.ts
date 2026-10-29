@@ -3,9 +3,7 @@ import { submitCaseApiDataWales } from '../api-data/submitCaseWales.api.data';
 
 export const tenancyDateDetails = {
   mainHeader: `Tenancy, occupation contract or licence start date`,
-  getDetailsGivenByParagraph: (claimantName: string): string => {
-    return `Details given by ${claimantName}:`;
-  },
+  getDetailsGivenByParagraph: () => `Details given by ${process.env.CLAIMANT_NAME}:`,
   yourTenancyOccupationContractOrLicenceDateList: `Your tenancy, occupation contract or licence began on ${
     process.env.WALES_POSTCODE === 'YES'
       ? convertDateFormatTenancyDate(submitCaseApiDataWales.submitCasePayload.licenceStartDate)

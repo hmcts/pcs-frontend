@@ -1,4 +1,4 @@
-# pcs-frontend
+# PCS-Frontend
 
 ## Getting Started
 
@@ -204,7 +204,7 @@ By default, the tests will run against http://localhost:3209/, please update the
 There are also several custom test scripts available:
 
 - `yarn test:changed` - runs only changed spec files
-- `yarn test:E2e` - runs Playwright tests tagged `@nightly` for one browser/device project. Set `PLAYWRIGHT_PROJECT` (defaults to `chrome` if unset), for example: `PLAYWRIGHT_PROJECT=firefox yarn test:E2e`. Projects: `chrome`, `firefox`, `webkit`, `edge`, `mobile-android`, `mobile-ios`, `mobile-ipad`.
+- `yarn test:EndToEnd` - runs Playwright tests tagged `@nightly` for one browser/device project. Set `PLAYWRIGHT_PROJECT` (defaults to `chrome` if unset), for example: `PLAYWRIGHT_PROJECT=firefox yarn test:EndToEnd`. Projects: `chrome`, `firefox`, `webkit`, `edge`, `mobile-android`, `mobile-ios`, `mobile-ipad`.
 
 ### Stubbing Wiremock for local development
 
@@ -290,6 +290,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - IDAM_SYSTEM_PASSWORD
 - IDAM_SYSTEM_USERNAME
 - IDAM_PCS_USER_PASSWORD
+- PCS_LOCAL_AUTH_AUTOMATION_UID
 - DATA_STORE_URL_BASE
 - PCS_API_URL
 - PCS_API_CHANGE_ID

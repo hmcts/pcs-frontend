@@ -1,6 +1,7 @@
 import config from 'config';
 
 import { HTTPError } from '../../../main/HttpError';
+import { ClientContextHeaders } from '../../../types/global';
 
 import { http } from '@modules/http';
 import { CcdCase, CitizenGenAppRequest, GenAppState, GenAppType } from '@services/ccdCase.interface';
@@ -8,9 +9,16 @@ import { ccdCaseService } from '@services/ccdCaseService';
 
 jest.mock('config');
 jest.mock('@modules/http');
+jest.mock('@modules/logger', () => {
+  const logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+  return { Logger: { getLogger: () => logger } };
+});
 
 const mockPost = http.post as jest.Mock;
 const mockGet = http.get as jest.Mock;
+const mockLoggerError = (
+  jest.requireMock('@modules/logger') as { Logger: { getLogger: () => { error: jest.Mock } } }
+).Logger.getLogger().error;
 
 const accessToken = 'token';
 const mockUrl = 'http://ccd.example.com';
@@ -115,6 +123,73 @@ describe('ccdCaseService', () => {
       });
     });
 
+    it('should throw HTTPError with 404 status for an invalid case id before calling CCD', async () => {
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, '../evil', eventId)).rejects.toMatchObject({
+        message: 'Invalid case reference format',
+        status: 404,
+      });
+      expect(mockGet).not.toHaveBeenCalled();
+    });
+
+    it('logs what identifies a CCD failure without the response payload (HDPI-8953)', async () => {
+      mockGet.mockRejectedValue({
+        response: {
+          status: 422,
+          data: {
+            message: 'Case data validation failed',
+            exception: 'uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException',
+            details: { applicantForename: 'John', applicantSurname: 'Doe' },
+          },
+        },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      const logged = mockLoggerError.mock.calls.map(([line]) => String(line)).join('\n');
+      expect(logged).toContain(
+        'status=422 message=Case data validation failed ' +
+          'exception=uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException'
+      );
+      expect(logged).not.toContain('John');
+    });
+
+    it('keeps the body of a CCD error that is not JSON, which has no message field', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 502, data: '<html>502 Bad Gateway</html>' },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      const logged = mockLoggerError.mock.calls.map(([line]) => String(line)).join('\n');
+      expect(logged).toContain('status=502 body=<html>502 Bad Gateway</html>');
+    });
+
+    it('reports which case failed, taken from the request URL', async () => {
+      mockGet.mockRejectedValue({
+        config: { url: `${mockUrl}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false` },
+        response: { status: 502, data: { message: 'Callback failed' } },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      expect(mockLoggerError).toHaveBeenCalledWith(expect.any(String), { caseReference: caseId });
+    });
+
+    it('leaves the case reference undefined when the failing request has no case in its URL', async () => {
+      mockGet.mockRejectedValue({
+        config: { url: `${mockUrl}/case-types/PCS` },
+        response: { status: 500, data: { message: 'Boom' } },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      expect(mockLoggerError).toHaveBeenCalledWith(expect.any(String), { caseReference: undefined });
+    });
+
     it('should throw HTTPError with 403 status on unauthorized access', async () => {
       mockGet.mockRejectedValue({
         response: { status: 403, data: { message: 'Forbidden' } },
@@ -201,6 +276,14 @@ describe('ccdCaseService', () => {
         id: caseId,
         data: {},
       });
+    });
+
+    it('should throw HTTPError with 404 status for an invalid case id before calling CCD', async () => {
+      await expect(ccdCaseService.getCaseById(accessToken, '../evil')).rejects.toMatchObject({
+        message: 'Invalid case reference format',
+        status: 404,
+      });
+      expect(mockGet).not.toHaveBeenCalled();
     });
 
     it('should throw HTTPError with 403 status on case not found (404)', async () => {
@@ -321,6 +404,43 @@ describe('ccdCaseService', () => {
 
       await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow(HTTPError);
       await expect(ccdCaseService.getExistingCaseData(accessToken, caseId)).rejects.toThrow('Access denied');
+    });
+
+    it('should retrieve case by ID with client context headers', async () => {
+      const mockCaseData = { applicantForename: 'John', applicantSurname: 'Doe' };
+
+      mockGet.mockResolvedValue({
+        data: {
+          case_details: {
+            case_data: mockCaseData,
+          },
+        },
+      });
+
+      const clientContextHeaders: ClientContextHeaders = {
+        selectedPartyId: 'abc',
+      };
+
+      const result = await ccdCaseService.getCaseByIdForEvent(
+        accessToken,
+        caseId,
+        'respondPossessionClaim',
+        clientContextHeaders
+      );
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/respondPossessionClaim?ignore-warning=false`,
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: `Bearer ${accessToken}`,
+            'Client-Context': '{"selectedPartyId":"abc"}',
+          }),
+        })
+      );
+      expect(result).toEqual({
+        id: caseId,
+        data: mockCaseData,
+      });
     });
   });
 
@@ -707,5 +827,42 @@ describe('updateCase', () => {
     await expect(ccdCaseService.updateDraft(draftEvent, accessToken, caseId, { foo: 'bar' })).rejects.toThrow(
       'CCD callback rejected request: Invalid submission: immutable field nameKnown'
     );
+  });
+
+  it('should call CCD validate endpoint with client context headers and return merged data with caller-supplied id', async () => {
+    const mockData = { defendantName: 'John Doe' };
+
+    mockPost.mockResolvedValue({
+      data: { data: mockData, _links: { self: { href: 'self' } } },
+    });
+
+    const clientContextHeaders: ClientContextHeaders = {
+      selectedPartyId: 'abc',
+    };
+
+    const result = await ccdCaseService.updateDraft(draftEvent, accessToken, caseId, mockData, clientContextHeaders);
+
+    expect(mockPost).toHaveBeenCalledWith(
+      `${mockUrl}/case-types/PCS/validate?pageId=respondPossessionClaimrespondToPossessionDraftSavePage`,
+      {
+        event: {
+          id: 'respondPossessionClaim',
+          summary: 'Citizen respondPossessionClaim draft save summary',
+          description: 'Citizen respondPossessionClaim draft save description',
+        },
+        case_reference: caseId,
+        event_data: mockData,
+        ignore_warning: false,
+      },
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: `Bearer ${accessToken}`,
+          experimental: true,
+          'Client-Context': '{"selectedPartyId":"abc"}',
+        }),
+      })
+    );
+
+    expect(result).toEqual({ id: caseId, data: mockData });
   });
 });
