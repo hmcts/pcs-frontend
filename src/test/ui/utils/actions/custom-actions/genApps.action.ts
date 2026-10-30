@@ -2,11 +2,13 @@ import path from 'path';
 
 import { Page, expect, test } from '@playwright/test';
 
+import { dashboard } from '../../../data/page-data';
 import {
   applicationSubmitted,
   areThereAnyReasonsThatThisApplicationShouldNotBeShared,
   checkYourAnswersGenApps,
   chooseAnApplication,
+  confirmYourPayment,
   doYouNeedHelpPayingTheFee,
   doYouWantToUploadDocumentsToSupportYourApplication,
   haveTheOtherPartiesAgreedToThisApplication,
@@ -18,7 +20,6 @@ import {
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
 } from '../../../data/page-data/genApps-page-data';
-import { confirmYourPayment } from '../../../data/page-data/genApps-page-data/confirmYourPayment.page.data';
 import { compareMaps } from '../../common/compareMaps.util';
 import { generateRandomString, stringToCamelCase } from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
@@ -55,6 +56,7 @@ export class GenAppsAction implements IAction {
       ['inputPaymentDetails', () => this.inputPaymentDetails(fieldName as actionRecord)],
       ['confirmPayment', () => this.confirmPayment()],
       ['verifyApplicationSubmitted', () => this.verifyApplicationSubmitted()],
+      ['validateCompletedApplication', () => this.validateCompletedApplication(page, fieldName as actionRecord)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -88,7 +90,7 @@ export class GenAppsAction implements IAction {
       question: feeHelp.question,
       option: feeHelp.option,
     });
-    await performAction('clickButton', doYouNeedHelpPayingTheFee.continueButton);
+    await performAction('clickButton', feeHelp.continueButton);
   }
 
   private async confirmYouHaveAppliedForFeeHelp(confirmFeeHelp: actionRecord) {
@@ -233,6 +235,35 @@ export class GenAppsAction implements IAction {
     await performAction('clickButton', applicationSubmitted.closeAndReturnToCaseOverviewButton);
   }
 
+  private async validateCompletedApplication(page: Page, apps: actionRecord): Promise<void> {
+    await performValidation('text', { elementType: 'link', text: dashboard.viewAllApplicationsLink });
+    await performAction('clickLink', dashboard.viewAllApplicationsLink);
+    await performValidation('mainHeader', dashboard.viewAllApplicationsLink);
+    await this.verifyDocumentLink(page, apps.app as string, apps.subDate as string);
+    if (apps.doc) {
+      await this.verifyDocumentLink(page, apps.doc as string, apps.subDate as string, true);
+    }
+  }
+
+  public async verifyDocumentLink(
+    page: Page,
+    documentName: string,
+    expectedDate: string,
+    docInclude?: boolean
+  ): Promise<void> {
+    const applicationsCard = page.locator('.govuk-summary-card');
+    await expect(applicationsCard.getByText(`Submitted on ${expectedDate}`)).toBeVisible();
+
+    if (docInclude) {
+      const baseName = documentName.replace(/\.[^.]+$/, '');
+      await expect(
+        page.getByText(dashboard.docsAddedHiddenText).locator('..').getByRole('link').filter({ hasText: baseName })
+      ).toBeVisible();
+    } else {
+      await expect(applicationsCard.getByRole('link', { name: new RegExp(documentName, 'i') })).toBeVisible();
+    }
+  }
+
   private async inputErrorValidationGenApp(validationArr: actionRecord) {
     const inputs = Array.isArray(validationArr.inputArray) ? validationArr.inputArray : [validationArr.inputArray];
 
@@ -361,6 +392,7 @@ export class GenAppsAction implements IAction {
   }
 
   private async reviewAndUpdateCYA(page: Page, review: actionRecord) {
+    const feePage = review.feeData as ReturnType<typeof doYouNeedHelpPayingTheFee>;
     const rows = page.locator('.govuk-summary-list__row');
     const rowCount = await rows.count();
 
@@ -376,7 +408,7 @@ export class GenAppsAction implements IAction {
         break;
       }
     }
-    await this.updatePreviouslyAnsweredPage(page);
+    await this.updatePreviouslyAnsweredPage(page, feePage);
     const pagesForThisQuestion = journeys[String(review.journey)] ?? defaultJourney;
 
     await this.followJourneyBackToCya(page, pagesForThisQuestion);
@@ -384,7 +416,7 @@ export class GenAppsAction implements IAction {
     await expect(page).toHaveURL(/check-your-answers/);
   }
 
-  private async updatePreviouslyAnsweredPage(page: Page) {
+  private async updatePreviouslyAnsweredPage(page: Page, testPage: actionRecord) {
     const currentPage = stringToCamelCase(
       await page
         .locator(
@@ -405,15 +437,16 @@ export class GenAppsAction implements IAction {
           option: option1,
         });
         if (option1 === 'Yes') {
-          await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+          await performValidation('mainHeader', testPage.mainHeader);
           await performAction('doYouNeedHelpPayingFee', {
-            question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-            option: doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption,
+            question: testPage.doYouNeedHelpPayingTheFeeQuestion,
+            option: testPage.iDoNotNeedHelpPayingTheFeeRadioOption,
+            continueButton: testPage.continueButton,
           });
         } else {
           await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
           FieldsStore.deleteKeys([
-            doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+            testPage.doYouNeedHelpPayingTheFeeQuestion as string,
             haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
             'What is your Help with Fees reference number?',
           ]);
@@ -423,13 +456,13 @@ export class GenAppsAction implements IAction {
       }
       case 'doYouNeedHelpPayingTheFeeForThisApplication': {
         const feeOption1 =
-          FieldsStore.get(doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion as string) ===
-          'I need help paying the fee'
-            ? doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption
-            : doYouNeedHelpPayingTheFee.iNeedHelpPayingTheFeeRadioOption;
+          FieldsStore.get(testPage.doYouNeedHelpPayingTheFeeQuestion as string) === 'I need help paying the fee'
+            ? testPage.iDoNotNeedHelpPayingTheFeeRadioOption
+            : testPage.iNeedHelpPayingTheFeeRadioOption;
         await performAction('doYouNeedHelpPayingFee', {
-          question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+          question: testPage.doYouNeedHelpPayingTheFeeQuestion,
           option: feeOption1,
+          continueButton: testPage.continueButton,
         });
         if (feeOption1 !== 'I need help paying the fee') {
           FieldsStore.deleteKeys([
