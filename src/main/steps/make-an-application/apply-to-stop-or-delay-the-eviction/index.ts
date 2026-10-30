@@ -6,7 +6,7 @@ import { getSuspendApplicationFee } from '../suspendFee';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
-import { RELEASE_1B_ENABLED } from '@utils/respondToClaimFlags';
+import { ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS } from '@utils/respondToClaimFlags';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'apply-to-stop-or-delay-the-eviction',
@@ -45,8 +45,8 @@ export const step: StepDefinition = createFormStep({
     sendTheCompletedFormToTheCourt: 'sendTheCompletedFormToTheCourt',
   },
   beforeGet: async req => {
-    const release1bEnabled = await getLaunchDarklyFlag(req, RELEASE_1B_ENABLED, false);
-    if (!release1bEnabled) {
+    const generalApplicationsEnabled = await getLaunchDarklyFlag(req, ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS, false);
+    if (!generalApplicationsEnabled) {
       const caseReference = req.res?.locals.validatedCase?.id;
       throw new Error(
         `Suspend general applications are not enabled for ${getStepUrl('choose-an-application', flowConfig, caseReference)}`

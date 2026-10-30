@@ -8,9 +8,10 @@ import { getApplicationId, setApplicationId } from '../session';
 import { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
-import { RELEASE_1B_ENABLED } from '@utils/respondToClaimFlags';
+import { ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS } from '@utils/respondToClaimFlags';
 
-const isRelease1bEnabled = (req: Request): Promise<boolean> => getLaunchDarklyFlag(req, RELEASE_1B_ENABLED, false);
+const isDefendantGeneralApplicationsEnabled = (req: Request): Promise<boolean> =>
+  getLaunchDarklyFlag(req, ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS, false);
 
 function removeSuspendOption(formContent: BuiltFormContent): void {
   const typeOfApplicationField = formContent.fields.find(field => field.name === 'typeOfApplication');
@@ -64,14 +65,17 @@ export const step: StepDefinition = createFormStep({
     }
   },
   extendGetContent: async (req: Request, formContent: BuiltFormContent) => {
-    if (!(await isRelease1bEnabled(req))) {
+    if (!(await isDefendantGeneralApplicationsEnabled(req))) {
       removeSuspendOption(formContent);
     }
 
     return {};
   },
   beforeRedirect: async (req: Request) => {
-    if (getFormData(req, 'choose-an-application').typeOfApplication === 'SUSPEND' && !(await isRelease1bEnabled(req))) {
+    if (
+      getFormData(req, 'choose-an-application').typeOfApplication === 'SUSPEND' &&
+      !(await isDefendantGeneralApplicationsEnabled(req))
+    ) {
       throw new Error('Suspend general applications are not enabled');
     }
   },
