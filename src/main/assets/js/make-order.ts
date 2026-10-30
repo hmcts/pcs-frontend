@@ -229,17 +229,9 @@ export function initMakeOrder(): void {
     return;
   }
 
+  let orderType: OrderType | undefined;
   // One document per order type, so switching tabs and back keeps any edits.
   const documents: Partial<Record<OrderType, DocWeaveSnapshot>> = {};
-  try {
-    const saved = JSON.parse(documentField.value) as DocWeaveSnapshot | null;
-    if (saved) {
-      documents[orderTypeField.value as OrderType] = saved;
-    }
-  } catch {
-    // A document that does not parse is regenerated from the form.
-  }
-  let orderType: OrderType | undefined;
   const editor = createDocEditor({
     mount,
     label: 'Order',
@@ -247,13 +239,18 @@ export function initMakeOrder(): void {
       url: '/docweave/templates',
       csrfToken: () => form.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value,
     },
+    field: documentField,
+    // A document the field cannot hold is regenerated from the form.
+    onError: () => (documentField.value = ''),
     onChange: snapshot => {
       if (orderType) {
         documents[orderType] = snapshot;
-        documentField.value = JSON.stringify(snapshot);
       }
     },
   });
+  if (documentField.value) {
+    documents[orderTypeField.value as OrderType] = editor.getSnapshot();
+  }
   const render = (): void => editor.render(buildOrderDocument(form));
   const selectOrderType = (type: OrderType): void => {
     if (orderType === type) {
@@ -289,6 +286,13 @@ export function initMakeOrder(): void {
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
+  // Keep JSON in the editor field; encode only the value in the outgoing form data.
+  form.addEventListener('formdata', ({ formData }) => {
+    formData.set(
+      'orderDocument',
+      new TextEncoder().encode(documentField.value).toBase64({ alphabet: 'base64url', omitPadding: true })
+    );
+  });
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
 }
