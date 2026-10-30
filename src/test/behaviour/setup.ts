@@ -27,3 +27,11 @@ jest.setTimeout(30000);
 // jsdom's XMLHttpRequest and its CORS rules; the server should talk to CCD as Node does.
 
 require('axios').defaults.adapter = 'http';
+
+// Nor does jsdom measure text, which ProseMirror does to scroll to text the page inserts into the order preview.
+if (typeof Range !== 'undefined' && !Range.prototype.getClientRects) {
+  Object.assign(Range.prototype, {
+    getClientRects: () => [],
+    getBoundingClientRect: () => ({ x: 0, y: 0, width: 0, height: 0, top: 0, right: 0, bottom: 0, left: 0 }),
+  });
+}

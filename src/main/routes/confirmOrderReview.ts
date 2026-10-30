@@ -7,7 +7,7 @@ import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { attendanceParties, orderFormModel } from '@utils/makeOrderForm';
+import { applicationsToDecide, attendanceParties, orderFormModel } from '@utils/makeOrderForm';
 import { MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   type OrderStart,
@@ -16,6 +16,7 @@ import {
   decodeOrderDocument,
   manageCaseDetailsUrl,
   postedSnapshot,
+  refusalPage,
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
@@ -93,8 +94,20 @@ function reviewOf(req: Request): OrderReviewSession | undefined {
 const reviewInProgress: RequestHandler = (req, res, next) =>
   reviewOf(req) ? next() : res.redirect(pageUrl(caseReferenceOf(req), 'intro'));
 
+export const ANOTHER_REVIEW_OPENED =
+  'You opened the review of another order on this case after this page. Open this order again from its task';
+
+/**
+ * The review is kept for the case, so a page left open in another tab is for whichever order was opened last:
+ * a page posted for another order is refused, rather than its answers going to the order now open.
+ */
+const sameOrder: RequestHandler = (req, res, next) =>
+  req.method !== 'POST' || req.body.reviewOrderId === reviewOf(req)!.order.id
+    ? next()
+    : refusalPage(req, res)(new CallbackRejectedError([ANOTHER_REVIEW_OPENED], 409));
+
 const journey = [oidcMiddleware, makeOrderFeatureMiddleware];
-const inJourney = [...journey, reviewInProgress];
+const inJourney = [...journey, reviewInProgress, sameOrder];
 
 function errorSummary(issues: ValidationIssue[]) {
   return issues.length
@@ -111,6 +124,7 @@ function pageModel(req: Request, review: OrderStart, issues: ValidationIssue[] =
     headerModel: xuiHeaderModel(req),
     footerModel: buildFooterModel(),
     formAction: req.originalUrl,
+    reviewOrderId: review.order.id,
     ...caseHeader(review.caseContext),
     errorSummary: errorSummary(issues),
     validationErrors: Object.fromEntries(issues.map(issue => [issue.id, { text: issue.message }])),
@@ -290,12 +304,24 @@ const showRefusal = (req: Request, res: Response, view: View) => (error: Callbac
   );
 
 /** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
+export const NO_WORDING = "The order's wording did not load. Reload the page and review the order again";
+
 function orderIssues(review: OrderReviewSession): ValidationIssue[] {
   const { order } = review.answers;
   if (!order) {
     return [{ id: 'order-type', message: 'Select the type of order' }];
   }
-  return validateMakeOrder(order.orderType, order.formData, attendanceParties(review));
+  // The page's script builds the wording to issue; without it, as when the script did not load, there is none.
+  if (!order.orderDocumentJson) {
+    return [{ id: 'make-order-form', message: NO_WORDING }];
+  }
+  return validateMakeOrder(
+    order.orderType,
+    order.formData,
+    review.hearing ? attendanceParties(review) : [],
+    !review.hearing,
+    applicationsToDecide(review)
+  );
 }
 
 /**
@@ -344,7 +370,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
         continueUrl: pageUrl(caseReference, 'review'),
       });
     } catch (error) {
-      refusedOrderEvent(res, next, error);
+      refusedOrderEvent(res, next, error, refusalPage(req, res));
     }
   });
 
@@ -365,6 +391,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       orderDocument: encodedDocument,
       'send-query': sendQuery,
       'query-to-judge': queryToJudge,
+      reviewOrderId: _reviewOrderId,
       ...formData
     } = req.body;
     const orderDocument = decodeOrderDocument(encodedDocument);

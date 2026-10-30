@@ -1,15 +1,12 @@
-import { type DocWeaveDocument, type DocWeaveSnapshot, createDocEditor } from '@hmcts-cft/docweave';
+import { type DocEditorController, type DocWeaveDocument, createDocEditor } from '@hmcts-cft/docweave';
 
 import { parseMoney } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
-import { type OrderData, readOrderData } from './make-order/data';
-import { buildAdjournmentOrder } from './make-order/wording/adjournment';
+import { readOrderData } from './make-order/data';
+import { wordingAnchors } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
-import { buildFreeFormOrder } from './make-order/wording/free-form';
-import { buildOutrightOrder } from './make-order/wording/outright';
-import { buildStrikeOutDismissalOrder } from './make-order/wording/strike-out';
-import { buildSuspendedOrder } from './make-order/wording/suspended';
+import { buildOrder } from './make-order/wording/order';
 
 type DateParts = [HTMLInputElement, HTMLInputElement, HTMLInputElement];
 
@@ -144,7 +141,7 @@ const DAYS_PER_RENT_PERIOD: Record<string, number> = { WEEKLY: 7, FORTNIGHTLY: 1
 export function initCaseFactDefaults(form: HTMLFormElement): void {
   const field = (name: string): string =>
     form.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${name}"]`)?.value.trim() ?? '';
-  fillFromCaseFacts(form, ['arrears-today'], ['outright-mj-arrears', 'suspended-arrears'], () =>
+  fillFromCaseFacts(form, ['arrears-today'], ['outright-mj-arrears', 'suspended-arrears', 'warrant-arrears'], () =>
     field('arrears-today')
   );
   fillFromCaseFacts(form, ['current-rent', 'rent-frequency'], ['outright-use-occupation-rate'], () => {
@@ -193,18 +190,57 @@ export function syncSuspendedOnlyCosts(form: HTMLFormElement, type: OrderType): 
   });
 }
 
-const builders: Record<OrderType, (data: OrderData) => DocWeaveDocument> = {
-  OUTRIGHT_POSSESSION: buildOutrightOrder,
-  SUSPENDED_POSSESSION: buildSuspendedOrder,
-  ADJOURNMENT: buildAdjournmentOrder,
-  STRIKE_OUT_DISMISSAL: buildStrikeOutDismissalOrder,
-  FREE_FORM: buildFreeFormOrder,
-};
-
 /** The generated order for the form's current answers and selected order type. */
 export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
   const type = form.querySelector<HTMLInputElement>('#order-type')?.value as OrderType;
-  return builders[type](readOrderData(form));
+  return buildOrder(type, readOrderData(form));
+}
+
+/** Whether a form control is an application's decision, whose row shows what follows the decision chosen. */
+function isDecision(control: EventTarget | null): control is HTMLInputElement {
+  return (
+    control instanceof HTMLInputElement &&
+    control.name.endsWith('-decision') &&
+    Boolean(control.closest('[data-application]'))
+  );
+}
+
+/** What follows a decision on an application, shown in its row while that decision is chosen. */
+export function initApplicationDecisions(form: HTMLFormElement): void {
+  form.addEventListener('change', event => {
+    const decision = event.target;
+    if (isDecision(decision)) {
+      decision
+        .closest('[data-application]')!
+        .querySelectorAll<HTMLElement>('[data-decision-shows]')
+        .forEach(follows => {
+          follows.hidden = follows.dataset.decisionShows !== decision.value;
+        });
+    }
+  });
+}
+
+/**
+ * Puts the applicant's wording in the order as the judge's own, to change or delete as they would their own, when
+ * the judge asks for it with the application's button (judicial feedback, 22 October 2026: never automatically). It goes in
+ * as the application's row shows it, after the clauses the decision generated, or at the end of the order when
+ * the decision generated none.
+ */
+function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController, applicationId: string): void {
+  const data = readOrderData(form);
+  const application = data.applications.find(candidate => candidate.id === applicationId);
+  if (!application?.wordingHtml) {
+    return;
+  }
+  for (const anchor of wordingAnchors(application)) {
+    try {
+      editor.insertHtml(application.wordingHtml, { at: { after: anchor } });
+      return;
+    } catch {
+      // Not a clause this decision generated: try the next.
+    }
+  }
+  editor.insertHtml(application.wordingHtml, { at: 'end' });
 }
 
 export function initMakeOrder(): void {
@@ -229,9 +265,8 @@ export function initMakeOrder(): void {
     return;
   }
 
-  let orderType: OrderType | undefined;
-  // One document per order type, so switching tabs and back keeps any edits.
-  const documents: Partial<Record<OrderType, DocWeaveSnapshot>> = {};
+  // One document whatever the order type: switching type changes the generated clauses in place, so wording the
+  // judge inserted stays, but their edits to a type's own clauses go with them.
   const editor = createDocEditor({
     mount,
     label: 'Order',
@@ -242,24 +277,11 @@ export function initMakeOrder(): void {
     field: documentField,
     // A document the field cannot hold is regenerated from the form.
     onError: () => (documentField.value = ''),
-    onChange: snapshot => {
-      if (orderType) {
-        documents[orderType] = snapshot;
-      }
-    },
   });
-  if (documentField.value) {
-    documents[orderTypeField.value as OrderType] = editor.getSnapshot();
-  }
   const render = (): void => editor.render(buildOrderDocument(form));
   const selectOrderType = (type: OrderType): void => {
-    if (orderType === type) {
-      return;
-    }
-    orderType = type;
     orderTypeField.value = type;
     syncSuspendedOnlyCosts(form, type);
-    editor.load(documents[type]);
     render();
   };
 
@@ -268,12 +290,30 @@ export function initMakeOrder(): void {
   const savedTab = tabs.find(tab => tab.dataset.orderType === orderTypeField.value);
   const tabType = (): OrderType | undefined =>
     tabs.find(tab => tab.hash === window.location.hash)?.dataset.orderType as OrderType | undefined;
+  // With an application open, the claim's tabs wait behind a tick box; until it is ticked the order is on the
+  // applications alone, and the open tab is what ticking it goes to (judicial feedback, 22 October 2026).
+  const claimOrder = form.querySelector<HTMLInputElement>('input[name="claim-order"]');
+  const claimTabs = form.querySelector<HTMLElement>('[data-claim-order]');
+  const orderingOnClaim = (): boolean => !claimOrder || claimOrder.checked;
+  const openTabType = (): OrderType =>
+    (tabType() ??
+      form.querySelector<HTMLAnchorElement>('.govuk-tabs__list-item--selected [data-order-type]')?.dataset.orderType ??
+      tabs[0]?.dataset.orderType) as OrderType;
   const followTab = (): void => {
+    if (!orderingOnClaim()) {
+      return;
+    }
     const type = tabType();
     if (type) {
       selectOrderType(type);
     }
   };
+  claimOrder?.addEventListener('change', () => {
+    if (claimTabs) {
+      claimTabs.hidden = !claimOrder.checked;
+    }
+    selectOrderType(claimOrder.checked ? openTabType() : 'NO_ORDER_ON_CLAIM');
+  });
   window.addEventListener('hashchange', () => {
     // The page opened without a fragment (see startWithSavedOrderTab), so going back to it reopens the saved tab.
     if (!window.location.hash && savedTab) {
@@ -282,6 +322,14 @@ export function initMakeOrder(): void {
       return;
     }
     followTab();
+  });
+  form.querySelectorAll<HTMLButtonElement>('[data-insert-requested-wording]').forEach(insert => {
+    insert.addEventListener('click', () => {
+      const id = insert.closest<HTMLElement>('[data-application]')?.dataset.applicationId;
+      if (id) {
+        insertRequestedWording(form, editor, id);
+      }
+    });
   });
   form.addEventListener('input', render);
   form.addEventListener('change', render);
@@ -294,7 +342,8 @@ export function initMakeOrder(): void {
     );
   });
 
-  selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
+  selectOrderType(orderingOnClaim() ? (tabType() ?? (orderTypeField.value as OrderType)) : 'NO_ORDER_ON_CLAIM');
+  initApplicationDecisions(form);
 }
 
 /**
