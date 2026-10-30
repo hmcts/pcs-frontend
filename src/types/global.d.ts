@@ -20,6 +20,8 @@ export interface ClientContextHeaders {
   selectedPartyId?: string;
   /** The order a caseworker chose to review, from the case's draft orders tab. */
   orderId?: string;
+  /** The hearing a judge is making an order for, from the link they followed. */
+  hearingId?: string;
 }
 
 interface CustomSessionData extends SessionData {

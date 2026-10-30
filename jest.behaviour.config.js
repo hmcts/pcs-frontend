@@ -25,5 +25,5 @@ module.exports = {
     '^@utils/(.*)$': '<rootDir>/src/main/utils/$1',
   },
   // These dependencies ship ESM only; compile them rather than mock them.
-  transformIgnorePatterns: ['node_modules/(?!(jose|@hmcts-cft/docweave)/)'],
+  transformIgnorePatterns: ['node_modules/(?!(jose|@hmcts-cft/docweave|openid-client|oauth4webapi|uuid)/)'],
 };
