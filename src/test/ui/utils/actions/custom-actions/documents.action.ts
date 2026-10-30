@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
 import {
   checkYourAnswers,
@@ -60,13 +60,20 @@ export class DocumentsAction implements IAction {
 
   private async validateViewDocuments(data: actionRecord): Promise<void> {
     if (Array.isArray(data.documents)) {
-      for (const document of data.documents) {
-        await performValidation('validateDocumentUnderSection', {
-          sectionHeader: document.sectionHeader,
-          documentName: document.documentName,
-          submittedDate: document.submittedDate,
-        });
-      }
+      const documents = data.documents as actionRecord[];
+      await expect(async () => {
+        await performAction('reloadPage');
+        for (const document of documents) {
+          await performValidation('validateDocumentUnderSection', {
+            sectionHeader: document.sectionHeader,
+            documentName: document.documentName,
+            submittedDate: document.submittedDate,
+          });
+        }
+      }).toPass({
+        timeout: 60_000,
+        intervals: [1_000, 2_000, 3_000, 5_000, 10_000],
+      });
     }
   }
 

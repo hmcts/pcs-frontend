@@ -1,39 +1,4 @@
-export const axe_exclusions = [
-  '#correspondenceAddressConfirm-2', //page: correspondenceAddress, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#confirmRepaymentsMade', //page: repaymentsMade, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#contactByTelephone', //page: contactByTelephone, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#nameConfirmation-2', //page: DefendantNameConfirmation, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#confirmTenancyDate-2', //page: tenancyStartDateKnown, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#disputeOtherParts', //page: nonRentArrearsDispute, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#tenancyTypeConfirm-2', //page: tenancyOccupationContractLicenseAgreement, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#repaymentsAgreed', //page: repaymentsAgreed, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#contactByEmailOrPost', //page: contactPreferenceEmailOrPost, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#confirmAlternativeAccommodation', // page: wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#confirmOtherAdults', //page: doAnyOtherAdultsLiveInYourHome, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#dependantChildren', //page: doYouHaveAnyDependantChildren, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#otherDependants', //page: doYouHaveAnyOtherDependants, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#rentArrears-2', //page: rentArrears, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#confirmOtherAdults', ////page: doYouHaveAnyOtherAdults, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#disputeOtherParts', //page: disputePartOfClaim, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#shareCircumstances', //page: yourCircumstances, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#exceptionalHardship', //page: exceptionalHardship, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#alreadyAppliedForHelp', //page : alreadyAppliedForHelp,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#haveAppliedForUniversalCredit', //page : haveYouAppliedForUniversalCredit,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#alreadyAppliedForHwf', //page : alreadyAppliedForHwf,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#otherConsiderations', //page: otherConsiderations, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#alreadyAppliedForHwf', //page : alreadyAppliedForHelp,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#reasonsAppShouldNotBeShared', //page : reasonsAppShouldNotBeShared,element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#isClaimAmountKnown-2', //page: claimAmountKnown, element: 'No', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#isClaimAmountKnown', //,page: claimAmountKnown, element: 'Yes', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#paymentOptions', //page: counterClaimApplicationFeeAmount, element: 'Pay fee using Payment by Account (PBA)', element_type: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#address-country', //page: yourAddress, element: 'Country', element_type: select, reason_for_exclusion: 'aria-expanded' attribute is expected for this select
-  '#emailConfirmation', //page:emailConfirmation, element: 'Yes', element_type: radioOption,reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#dob_provided', // page: dateOfBirth, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#gender_different-2', // page: gender, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#sexuality-4', // page: sexuality, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#religion-8', // page: religion, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is expected for this radio button
-  '#ethnicity-4', // page: ethnicity, element: radioOption, reason_for_exclusion: 'aria-expanded' attribute is not allowed for this radio button
-  // govuk-frontend adds aria-expanded to conditional-reveal radios, which axe rejects for role=radio.
-  // Scope the exclusion to affected radios on this page; checkbox reveals remain in the audit.
-  '.pcs-make-order .govuk-radios__input[aria-expanded]',
-];
+// Below exclusions will be addressed as part of below bugs
+// https://hmcts.atlassian.net/browse/HDPI-6146
+// https://hmcts.atlassian.net/browse/HDPI-9505
+export const axe_exclusions: string[] = [];

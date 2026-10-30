@@ -1,5 +1,6 @@
 import { type DocWeaveDocument, type DocWeaveSnapshot, createDocEditor } from '@hmcts-cft/docweave';
 
+import { parseMoney } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
 import { type OrderData, readOrderData } from './make-order/data';
@@ -114,6 +115,45 @@ export function initCaseFactsToggle(form: HTMLFormElement): void {
   });
 }
 
+/**
+ * Fills targets with a value worked out from the case facts, while each target is empty or still
+ * holds the value last filled in, so the judge's own figure is never overwritten.
+ */
+function fillFromCaseFacts(form: HTMLFormElement, sources: string[], targets: string[], derive: () => string): void {
+  let filled = '';
+  const fill = (): void => {
+    const next = derive();
+    targets.forEach(name => {
+      const target = form.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+      if (target && (target.value === '' || target.value === filled)) {
+        target.value = next;
+      }
+    });
+    filled = next;
+  };
+  form.addEventListener('input', event => {
+    if (sources.includes((event.target as HTMLInputElement).name)) {
+      fill();
+    }
+  });
+  fill();
+}
+
+const DAYS_PER_RENT_PERIOD: Record<string, number> = { WEEKLY: 7, FORTNIGHTLY: 14, MONTHLY: 365 / 12 };
+
+export function initCaseFactDefaults(form: HTMLFormElement): void {
+  const field = (name: string): string =>
+    form.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${name}"]`)?.value.trim() ?? '';
+  fillFromCaseFacts(form, ['arrears-today'], ['outright-mj-arrears', 'suspended-arrears'], () =>
+    field('arrears-today')
+  );
+  fillFromCaseFacts(form, ['current-rent', 'rent-frequency'], ['outright-use-occupation-rate'], () => {
+    const rent = parseMoney(field('current-rent'));
+    const days = DAYS_PER_RENT_PERIOD[field('rent-frequency')];
+    return rent === undefined || !days ? '' : (rent / days).toFixed(2);
+  });
+}
+
 /** A money judgment and an adjourned money claim are alternatives; same terms only applies to a judgment. */
 export function initSuspendedMoneyOptions(form: HTMLFormElement): void {
   const option = (value: string): HTMLInputElement | null =>
@@ -175,6 +215,7 @@ export function initMakeOrder(): void {
   initDatePills(form);
   initOptionRows(form);
   initCaseFactsToggle(form);
+  initCaseFactDefaults(form);
   initSuspendedMoneyOptions(form);
   const suspendedBy = dateParts(form, 'suspended-by-date');
   if (suspendedBy && !suspendedBy.some(part => part.value)) {
@@ -188,17 +229,9 @@ export function initMakeOrder(): void {
     return;
   }
 
+  let orderType: OrderType | undefined;
   // One document per order type, so switching tabs and back keeps any edits.
   const documents: Partial<Record<OrderType, DocWeaveSnapshot>> = {};
-  try {
-    const saved = JSON.parse(documentField.value) as DocWeaveSnapshot | null;
-    if (saved) {
-      documents[orderTypeField.value as OrderType] = saved;
-    }
-  } catch {
-    // A document that does not parse is regenerated from the form.
-  }
-  let orderType: OrderType | undefined;
   const editor = createDocEditor({
     mount,
     label: 'Order',
@@ -206,13 +239,18 @@ export function initMakeOrder(): void {
       url: '/docweave/templates',
       csrfToken: () => form.querySelector<HTMLInputElement>('input[name="_csrf"]')?.value,
     },
+    field: documentField,
+    // A document the field cannot hold is regenerated from the form.
+    onError: () => (documentField.value = ''),
     onChange: snapshot => {
       if (orderType) {
         documents[orderType] = snapshot;
-        documentField.value = JSON.stringify(snapshot);
       }
     },
   });
+  if (documentField.value) {
+    documents[orderTypeField.value as OrderType] = editor.getSnapshot();
+  }
   const render = (): void => editor.render(buildOrderDocument(form));
   const selectOrderType = (type: OrderType): void => {
     if (orderType === type) {
@@ -248,6 +286,13 @@ export function initMakeOrder(): void {
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
+  // Keep JSON in the editor field; encode only the value in the outgoing form data.
+  form.addEventListener('formdata', ({ formData }) => {
+    formData.set(
+      'orderDocument',
+      new TextEncoder().encode(documentField.value).toBase64({ alphabet: 'base64url', omitPadding: true })
+    );
+  });
 
   selectOrderType(tabType() ?? (orderTypeField.value as OrderType));
 }
