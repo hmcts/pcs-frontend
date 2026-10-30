@@ -9,7 +9,7 @@
   "errors": {
     "inNext14Days": "Cadarnhewch a yw’r gwrandawiad llys yn ystod y 14 diwrnod nesaf"
   },
-  "release1b": {
+  "genAppCuiSetAside": {
     "hintText": "This will affect the fee you will pay. You do not need to pay a fee if your court hearing is (at least) 14 days away and all the other parties have agreed to it."
   }
 }

@@ -9,7 +9,7 @@
   "errors": {
     "inNext14Days": "Confirm whether the court hearing is in the next 14 days"
   },
-  "release1b": {
+  "genAppCuiSetAside": {
     "hintText": "This will affect the fee you will pay. You do not need to pay a fee if your court hearing is (at least) 14 days away and all the other parties have agreed to it."
   }
 }

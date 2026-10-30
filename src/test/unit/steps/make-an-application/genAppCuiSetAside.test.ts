@@ -21,7 +21,7 @@ async function createRequest(stepName: string, enabled: boolean, lang = 'en') {
   const render = jest.fn<void, [string, BuiltFormContent]>();
   const res = {
     locals: {
-      features: { release1bEnabled: enabled },
+      features: { genAppCuiSetAsideEnabled: enabled },
       step: { name: stepName, journey: 'makeAnApplication' },
       validatedCase: { id: '1111222233334444' },
     },
@@ -61,7 +61,7 @@ beforeEach(() => {
   jest.mocked(getFee).mockResolvedValue(126);
 });
 
-describe.each([false, true])('adjourn content with release 1B = %s', enabled => {
+describe.each([false, true])('adjourn content with genapp-cui-set-aside = %s', enabled => {
   it('selects the correct introduction copy', async () => {
     const { getContent } = await createRequest('ask-to-adjourn-the-court-hearing', enabled);
     const content = await getContent();
@@ -100,7 +100,7 @@ describe.each([false, true])('adjourn content with release 1B = %s', enabled => 
   });
 });
 
-it('keeps the existing Welsh hearing hint when release 1B is disabled', async () => {
+it('keeps the existing Welsh hearing hint when genapp-cui-set-aside is disabled', async () => {
   const { getContent } = await createRequest('is-the-court-hearing-in-the-next-14-days', false, 'cy');
   const content = await getContent();
   expect(content.fields[0].component?.hint).toEqual({
@@ -108,7 +108,7 @@ it('keeps the existing Welsh hearing hint when release 1B is disabled', async ()
   });
 });
 
-describe.each([false, true])('adjourn payment with release 1B = %s', enabled => {
+describe.each([false, true])('adjourn payment with genapp-cui-set-aside = %s', enabled => {
   it('shows Submit when the hearing is not in the next 14 days and the other parties agreed', async () => {
     const { req, getContent } = await createRequest('check-your-answers', enabled);
     setFormData(req, 'have-the-other-parties-agreed-to-this-application', { otherPartiesAgreed: 'yes' });

@@ -5,7 +5,7 @@ import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { FeeType, getFee } from '@services/feeLookupService';
-import { isRelease1BEnabled } from '@utils/isRelease1BEnabled';
+import { isGenAppCuiSetAsideEnabled } from '@utils/isGenAppCuiSetAsideEnabled';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'ask-to-adjourn-the-court-hearing',
@@ -53,7 +53,7 @@ export const step: StepDefinition = createFormStep({
     const [standardFee, maxFee] = await Promise.all([standardFeePromise, maxFeePromise]);
     return {
       freeIfAtLeast14DaysAway: getTranslationFunction(req)(
-        isRelease1BEnabled(req) ? 'release1b.freeIfAtLeast14DaysAway' : 'freeIfAtLeast14DaysAway'
+        isGenAppCuiSetAsideEnabled(req) ? 'genAppCuiSetAside.freeIfAtLeast14DaysAway' : 'freeIfAtLeast14DaysAway'
       ),
       standardFee,
       maxFee,

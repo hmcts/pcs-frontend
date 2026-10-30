@@ -14,7 +14,7 @@ function requestWithFormData(formData: Record<string, Record<string, unknown>>):
     params: { caseReference: '1111222233334444' },
     res: {
       locals: {
-        features: { release1bEnabled: true },
+        features: { genAppCuiSetAsideEnabled: true },
         step: { journey: 'makeAnApplication' },
         validatedCase: { id: '1111222233334444' },
       },
@@ -43,14 +43,14 @@ describe('make-an-application flow config', () => {
   });
 });
 
-describe('release 1B disabled', () => {
+describe('genapp-cui-set-aside disabled', () => {
   it('hides all Help with Fees steps outside 14 days, including stale answers', () => {
     const req = requestWithFormData({
       'choose-an-application': { typeOfApplication: 'ADJOURN' },
       'is-the-court-hearing-in-the-next-14-days': { hearingInNext14Days: 'no' },
       'do-you-need-help-paying-the-fee': { helpWithFeesNeeded: 'yes' },
     });
-    req.res!.locals.features = { release1bEnabled: false };
+    req.res!.locals.features = { genAppCuiSetAsideEnabled: false };
     for (const name of [
       'do-you-need-help-paying-the-fee',
       'have-you-already-applied-for-help-with-fees',
@@ -61,7 +61,7 @@ describe('release 1B disabled', () => {
   });
 });
 
-describe.each([false, true])('existing Help with Fees routes with release 1B = %s', enabled => {
+describe.each([false, true])('existing Help with Fees routes with genapp-cui-set-aside = %s', enabled => {
   it.each(['ADJOURN', 'SET_ASIDE', 'SOMETHING_ELSE'])('preserves Help with Fees for %s', applicationType => {
     const req = requestWithFormData({
       'choose-an-application': { typeOfApplication: applicationType },
@@ -69,7 +69,7 @@ describe.each([false, true])('existing Help with Fees routes with release 1B = %
       'do-you-need-help-paying-the-fee': { helpWithFeesNeeded: 'yes' },
       'have-you-already-applied-for-help-with-fees': { alreadyAppliedForHwf: 'no' },
     });
-    req.res!.locals.features = { release1bEnabled: enabled };
+    req.res!.locals.features = { genAppCuiSetAsideEnabled: enabled };
     for (const name of [
       'do-you-need-help-paying-the-fee',
       'have-you-already-applied-for-help-with-fees',

@@ -3,7 +3,7 @@ import type { Request } from 'express';
 import { getFormData } from '@modules/steps';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import { getPaymentSessionState } from '@services/paymentSessionService';
-import { isRelease1BEnabled } from '@utils/isRelease1BEnabled';
+import { isGenAppCuiSetAsideEnabled } from '@utils/isGenAppCuiSetAsideEnabled';
 
 export const MAKE_AN_APPLICATION_ROUTE = '/case/:caseReference/make-an-application';
 
@@ -88,7 +88,7 @@ function alreadyAppliedForHwf(req: Request): boolean {
 }
 
 function canApplicationNeedFee(req: Request): boolean {
-  if (!isRelease1BEnabled(req)) {
+  if (!isGenAppCuiSetAsideEnabled(req)) {
     return (
       getTypeOfApplication(req) !== 'ADJOURN' ||
       getFormData(req, 'is-the-court-hearing-in-the-next-14-days').hearingInNext14Days === 'yes'
