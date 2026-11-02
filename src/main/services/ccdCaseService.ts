@@ -367,9 +367,14 @@ export const ccdCaseService = {
     return this.startAndSubmitEvent(accessToken, ccdCase.id, 'uploadDocuments', ccdCase.data);
   },
 
-  async startAndSubmitEvent(accessToken: string, caseId: string, eventId: string, data: CcdCaseData): Promise<CcdCase> {
+  async startAndSubmitEvent(
+    accessToken: string,
+    caseId: string,
+    eventId: string,
+    eventData: CcdCaseData
+  ): Promise<CcdCase> {
     const eventToken = await startEvent(accessToken, caseId, eventId);
-    return submitEvent(accessToken, caseId, eventId, eventToken, data);
+    return submitEvent(accessToken, caseId, eventId, eventToken, eventData);
   },
 
   /** Submits an event with the token from the `startCaseEvent` the change was based on. */
