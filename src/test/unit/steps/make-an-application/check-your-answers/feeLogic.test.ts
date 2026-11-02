@@ -20,20 +20,20 @@ function visibleFormData(
 }
 
 describe('make-an-application check your answers fee logic', () => {
-  describe.each([false, true])('genapp-cui-set-aside = %s', genAppCuiSetAsideEnabled => {
+  describe.each([false, true])('cui-genapp-set-aside = %s', cuiGenAppSetAsideEnabled => {
     it.each([
       ['yes', 'yes', true],
       ['yes', 'no', true],
       ['no', 'yes', false],
-      ['no', 'no', genAppCuiSetAsideEnabled],
+      ['no', 'no', cuiGenAppSetAsideEnabled],
     ] as const)('adjourn: within 14 days = %s, consent = %s, fee = %s', (within14Days, consent, expected) => {
       expect(
-        doesApplicationFeeApply(visibleFormData(GenAppType.ADJOURN, within14Days, consent), genAppCuiSetAsideEnabled)
+        doesApplicationFeeApply(visibleFormData(GenAppType.ADJOURN, within14Days, consent), cuiGenAppSetAsideEnabled)
       ).toBe(expected);
     });
 
     it.each([GenAppType.SET_ASIDE, GenAppType.SOMETHING_ELSE])('keeps the fee for %s', applicationType => {
-      expect(doesApplicationFeeApply(visibleFormData(applicationType), genAppCuiSetAsideEnabled)).toBe(true);
+      expect(doesApplicationFeeApply(visibleFormData(applicationType), cuiGenAppSetAsideEnabled)).toBe(true);
     });
   });
 });

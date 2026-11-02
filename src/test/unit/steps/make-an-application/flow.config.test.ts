@@ -43,7 +43,7 @@ describe('make-an-application flow config', () => {
   });
 });
 
-describe('genapp-cui-set-aside disabled', () => {
+describe('cui-genapp-set-aside disabled', () => {
   it('hides all Help with Fees steps outside 14 days, including stale answers', () => {
     const req = requestWithFormData({
       'choose-an-application': { typeOfApplication: 'ADJOURN' },
@@ -61,7 +61,7 @@ describe('genapp-cui-set-aside disabled', () => {
   });
 });
 
-describe.each([false, true])('existing Help with Fees routes with genapp-cui-set-aside = %s', enabled => {
+describe.each([false, true])('existing Help with Fees routes with cui-genapp-set-aside = %s', enabled => {
   it.each(['ADJOURN', 'SET_ASIDE', 'SOMETHING_ELSE'])('preserves Help with Fees for %s', applicationType => {
     const req = requestWithFormData({
       'choose-an-application': { typeOfApplication: applicationType },
