@@ -224,7 +224,7 @@ async function startEvent(userToken: string, caseId: string, eventId: string): P
  * @param caseId - CCD case reference
  * @param eventId - CCD event identifier (e.g., 'respondPossessionClaim')
  * @param eventToken - One-time token from START phase
- * @param eventData - Incremental changes only (not full case data)
+ * @param data - Incremental changes only (not full case data)
  * @returns Merged case data from CCD (authoritative source of truth)
  */
 async function submitEvent(
@@ -232,10 +232,10 @@ async function submitEvent(
   caseId: string,
   eventId: string,
   eventToken: string,
-  eventData: CcdCaseData | Record<string, unknown>
+  data: CcdCaseData | Record<string, unknown>
 ): Promise<CcdCase> {
   const payload = {
-    data: eventData as Record<string, unknown>,
+    data: data as Record<string, unknown>,
     event: {
       id: eventId,
     },
@@ -347,10 +347,7 @@ export const ccdCaseService = {
     }
   },
 
-  async submitGeneralApplication(
-    accessToken: string | undefined,
-    ccdCase: CcdCase
-  ): Promise<MakeAnApplicationResponse> {
+  async submitGeneralApplication(accessToken: string, ccdCase: CcdCase): Promise<MakeAnApplicationResponse> {
     return this.startAndSubmitEvent(accessToken, ccdCase.id, 'makeAnApplication', ccdCase.data).then(
       (responseData: CcdCase) => {
         const confirmationBodyJson = responseData.after_submit_callback_response?.confirmation_body;
