@@ -142,7 +142,12 @@ withNightlyPipeline(type, product, component) {
   }
 
   afterAlways('E2eTest') {
-    runE2ETests(yarnBuilder)
+    if (isWeeklyEmvSchedule()) {
+      env.E2E_TEST_SCOPE = '@EMV'
+      runE2eStage(yarnBuilder, 'chrome', 'Chrome', 'Weekly @EMV')
+    } else {
+      runE2ETests(yarnBuilder)
+    }
   }
 
   afterAlways('fortify-scan') {
@@ -151,7 +156,7 @@ withNightlyPipeline(type, product, component) {
   }
 
 }
-  
+
 def selectedSauceSuites() {
   [
     params.SAUCE_MAC13_CHROME ? 'pcs-frontend-mac13-chrome' : null,
