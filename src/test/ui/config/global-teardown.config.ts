@@ -1,5 +1,7 @@
+import { deleteUploadedTestDocuments } from '../utils/common/deleteDocument.util';
+
 async function globalTeardownConfig(): Promise<void> {
-  //Placeholder for global teardown functions
+  await deleteUploadedTestDocuments();
 }
 
 export default globalTeardownConfig;

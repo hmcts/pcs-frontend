@@ -1,3 +1,5 @@
+import { testDocument } from '../../utils/common/uploadDocument.utils';
+
 export const submitCaseApiDataWales = {
   submitCaseEventName: 'resumePossessionClaim',
 
@@ -88,9 +90,7 @@ export const submitCaseApiDataWales = {
     rentArrears_StatementDocuments: [
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/98864bc5-edd5-4773-ac98-284ad0a74392`,
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/98864bc5-edd5-4773-ac98-284ad0a74392/binary`,
-          document_filename: 'RentArrearsStatement.pdf',
+          ...testDocument('RentArrearsStatement.pdf'),
         },
       },
     ],
@@ -517,9 +517,7 @@ export const submitCaseApiDataWales = {
     rentArrears_StatementDocuments: [
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/43841fd8-c041-4135-944e-221abbed7e02`,
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/43841fd8-c041-4135-944e-221abbed7e02/binary`,
-          document_filename: 'Screenshot 2026-08-12 at 15.42.08.png',
+          ...testDocument('RentArrearsStatement.pdf'),
         },
       },
     ],
@@ -658,9 +656,7 @@ export const submitCaseApiDataWales = {
     rentArrears_StatementDocuments: [
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/0ef459aa-898e-445c-ad0e-76e0452d0fd7`,
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/0ef459aa-898e-445c-ad0e-76e0452d0fd7/binary`,
-          document_filename: 'Screenshot 2026-08-06 at 15.45.49.png',
+          ...testDocument('RentArrearsStatement.pdf'),
         },
       },
     ],
@@ -779,9 +775,7 @@ export const submitCaseApiDataWales = {
     rentArrears_StatementDocuments: [
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/6a4d6aad-5ef2-44f3-84aa-b3d9087f0522`,
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/6a4d6aad-5ef2-44f3-84aa-b3d9087f0522/binary`,
-          document_filename: 'Screenshot 2026-08-13 at 11.35.20.png',
+          ...testDocument('RentArrearsStatement.pdf'),
         },
       },
     ],
@@ -999,9 +993,7 @@ export const submitCaseApiDataWales = {
     licenceDocuments: [
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/dc9ae874-f1d2-4fba-b99d-c3a0ca977847`,
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/dc9ae874-f1d2-4fba-b99d-c3a0ca977847/binary`,
-          document_filename: 'Screenshot 2026-08-19 at 11.18.50.png',
+          ...testDocument('RentArrearsStatement.pdf'),
         },
       },
     ],
@@ -1019,16 +1011,12 @@ export const submitCaseApiDataWales = {
     notice_Documents: [
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/eebbfdd4-4314-4005-a9c7-bd886784fea1`,
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/eebbfdd4-4314-4005-a9c7-bd886784fea1/binary`,
-          document_filename: 'Screenshot 2026-08-19 at 10.07.38.png',
+          ...testDocument('RentArrearsStatement.pdf'),
         },
       },
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/d727d3fc-68a4-4c6b-a364-54c699ed32da`,
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/d727d3fc-68a4-4c6b-a364-54c699ed32da/binary`,
-          document_filename: 'Screenshot 2026-08-18 at 09.21.49.png',
+          ...testDocument('RentArrearsStatement.pdf'),
         },
       },
     ],
@@ -1038,9 +1026,7 @@ export const submitCaseApiDataWales = {
     rentArrears_StatementDocuments: [
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/b1063121-321b-43ac-8972-9bb501329858`,
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/b1063121-321b-43ac-8972-9bb501329858/binary`,
-          document_filename: 'Screenshot 2026-08-18 at 12.15.33.png',
+          ...testDocument('RentArrearsStatement.pdf'),
         },
       },
     ],
@@ -1064,9 +1050,7 @@ export const submitCaseApiDataWales = {
     walesDocs_EnergyPerformance: [
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/b9fb042a-8e6f-4bf2-a44e-5ac9b8af7c1f`,
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/b9fb042a-8e6f-4bf2-a44e-5ac9b8af7c1f/binary`,
-          document_filename: 'Screenshot 2026-08-18 at 09.37.56.png',
+          ...testDocument('RentArrearsStatement.pdf'),
         },
       },
     ],
@@ -1074,9 +1058,7 @@ export const submitCaseApiDataWales = {
     walesDocs_GasSafetyReport: [
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/ac13ddc2-6402-41ad-8878-cf19c6f7b04a`,
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/ac13ddc2-6402-41ad-8878-cf19c6f7b04a/binary`,
-          document_filename: 'Screenshot 2026-08-18 at 09.37.56.png',
+          ...testDocument('RentArrearsStatement.pdf'),
         },
       },
     ],
@@ -1084,9 +1066,7 @@ export const submitCaseApiDataWales = {
     walesDocs_ElectricalInstallation: [
       {
         value: {
-          document_url: `${process.env.DM_STORE_URL}/documents/e6bcd7a5-5220-4e0c-9bc8-2665757db872`,
-          document_binary_url: `${process.env.DM_STORE_URL}/documents/e6bcd7a5-5220-4e0c-9bc8-2665757db872/binary`,
-          document_filename: 'Screenshot 2026-08-18 at 12.38.21.png',
+          ...testDocument('RentArrearsStatement.pdf'),
         },
       },
     ],
@@ -1104,9 +1084,7 @@ export const submitCaseApiDataWales = {
           },
           description: 'Witness Document',
           document: {
-            document_url: `${process.env.DM_STORE_URL}/documents/92d43d06-eeae-4040-a701-cab327ff51f4`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/92d43d06-eeae-4040-a701-cab327ff51f4/binary`,
-            document_filename: 'WitnessStatement.png',
+            ...testDocument('WitnessStatement.png'),
           },
         },
       },
@@ -1122,9 +1100,7 @@ export const submitCaseApiDataWales = {
           },
           description: 'Rent Document',
           document: {
-            document_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78/binary`,
-            document_filename: 'RentStatement.pdf',
+            ...testDocument('RentStatement.pdf'),
           },
         },
       },
@@ -1140,9 +1116,7 @@ export const submitCaseApiDataWales = {
           },
           description: 'Notice Document',
           document: {
-            document_url: `${process.env.DM_STORE_URL}/documents/1fd71cc5-9a91-4d86-85b8-652636cb9b88`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/1fd71cc5-9a91-4d86-85b8-652636cb9b88/binary`,
-            document_filename: 'NoticeServiceJurisdiction.docx',
+            ...testDocument('NoticeServiceJurisdiction.docx'),
           },
         },
       },
@@ -1158,9 +1132,7 @@ export const submitCaseApiDataWales = {
           },
           description: 'Certificate of Suitability',
           document: {
-            document_url: `${process.env.DM_STORE_URL}/documents/5a5ecc30-321d-4a86-8487-059ff04ec480`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/5a5ecc30-321d-4a86-8487-059ff04ec480/binary`,
-            document_filename: 'CertificateOfSuitability.xlsx',
+            ...testDocument('CertificateOfSuitability.xlsx'),
           },
         },
       },
@@ -1176,9 +1148,7 @@ export const submitCaseApiDataWales = {
           },
           description: 'Other Document',
           document: {
-            document_url: `${process.env.DM_STORE_URL}/documents/eb94cf9d-2f5f-4f9e-9744-d734ec358652`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/eb94cf9d-2f5f-4f9e-9744-d734ec358652/binary`,
-            document_filename: 'OtherDocument.png',
+            ...testDocument('OtherDocument.png'),
           },
         },
       },

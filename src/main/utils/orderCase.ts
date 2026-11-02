@@ -1,9 +1,9 @@
 import { buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
-import type { DocWeaveSnapshot } from '@hmcts-cft/docweave';
+import { type DocWeaveSnapshot, InvalidSnapshotError, parseSnapshot } from '@hmcts-cft/docweave';
 import config from 'config';
-import type { Request } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 
-import { HTTPError } from '../HttpError';
+import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { linkSignOutToLogout } from '../middleware/legalRepresentativeHeaders';
 import { getUserRoles } from '../steps/utils';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
@@ -18,20 +18,44 @@ export interface OrderParty {
   name: string;
 }
 
-/** The case an order is made on, as pcs-api sends it to the judge making it. */
+/** The case an order is made on, as pcs-api sends it to the judge making it and the caseworker reviewing it. */
 export interface OrderCaseContext {
   caseReference: number;
   propertyAddress?: Record<string, string | undefined>;
   claimants: OrderParty[];
   defendants: OrderParty[];
-  caseFacts?: Record<string, unknown>;
   openCounterclaim?: boolean;
   openApplication?: boolean;
 }
 
+/** A judicial note on the case, with the hearing it was made at, if any. */
+export interface JudicialNote {
+  by?: string | null;
+  createdOn: string;
+  hearingDate?: string | null;
+  note: string;
+}
+
+/**
+ * The hearing an order is made for. Its facts are this hearing's if they were recorded, otherwise the latest
+ * earlier hearing's, otherwise the claim's, which no judge recorded. The version goes back with the judge's
+ * facts, so pcs-api can refuse them if another judge has since recorded this hearing's.
+ */
+export interface OrderHearing {
+  id: number;
+  date: string;
+  inWales?: boolean;
+  version?: number | null;
+  caseFacts?: Record<string, unknown>;
+  recorded?: { by?: string | null; on: string } | null;
+  note?: string | null;
+  earlierNotes: JudicialNote[];
+}
+
 /**
  * What an order event sends when it starts: the order, and the case it is made on. The make order event
- * sends the judge their working order, if any.
+ * sends the judge their working order, if any, or the order a caseworker returned to them with its query; the
+ * confirm order review event sends the caseworker the order awaiting review.
  */
 export interface OrderStart {
   order: {
@@ -40,8 +64,11 @@ export interface OrderStart {
     orderType?: MakeOrderType;
     formData?: FormData;
     docweaveSnapshot?: DocWeaveSnapshot | null;
+    queryFromCaseworker?: string | null;
   };
   caseContext: OrderCaseContext;
+  /** The hearing the order is made for, if it is made for one. */
+  hearing?: OrderHearing | null;
 }
 
 export function formatAddress(address: Record<string, string | undefined> = {}): string {
@@ -99,9 +126,50 @@ export function manageCaseDetailsUrl(caseReference: string): string {
 }
 
 /**
- * CCD decides who may use an order event from their role assignments: anyone else is not given the
- * event's payload or allowed to submit it, and is shown the page does not exist.
+ * Answers an order event that was refused. pcs-api refuses one with its reasons, which the page answers
+ * if it can; otherwise the error handler logs them and shows a generic error. CCD decides who may use
+ * an order event from their role assignments: anyone else is not given the event's payload or allowed
+ * to submit it, and is shown the page does not exist.
  */
-export function refusedByCcd(error: unknown): boolean {
-  return error instanceof HTTPError && (error.status === 403 || error.status === 404);
+export function refusedOrderEvent(
+  res: Response,
+  next: NextFunction,
+  error: unknown,
+  rejected: (error: CallbackRejectedError) => void = next
+): void {
+  if (error instanceof CallbackRejectedError) {
+    return rejected(error);
+  }
+  if (error instanceof HTTPError && (error.status === 403 || error.status === 404)) {
+    return void res.status(404).send('Not Found');
+  }
+  next(error);
+}
+
+/** The order's document as a page posted it: none, or a snapshot Docweave accepts. Anything else is a bad request. */
+export function postedSnapshot(json: string | undefined): DocWeaveSnapshot | null {
+  try {
+    return json ? parseSnapshot(json) : null;
+  } catch (error) {
+    throw error instanceof InvalidSnapshotError ? new HTTPError(error.message, 400) : error;
+  }
+}
+
+/** Decode the form's base64url document before the existing snapshot validation. */
+export function decodeOrderDocument(value: unknown): string {
+  if (value === undefined || value === '') {
+    return '';
+  }
+  try {
+    if (typeof value !== 'string') {
+      throw new Error('Expected a single document');
+    }
+    const bytes = Buffer.from(value, 'base64url');
+    if (bytes.toString('base64url') !== value) {
+      throw new Error('Invalid base64url');
+    }
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    throw new HTTPError('Invalid order document encoding', 400);
+  }
 }

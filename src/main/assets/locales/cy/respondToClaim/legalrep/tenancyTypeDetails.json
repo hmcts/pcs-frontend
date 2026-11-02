@@ -7,5 +7,13 @@
   "legend": "A yw’r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?",
   "yes": "Ydy",
   "no": "Nac ydy",
-  "correctTypeLabel": "Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded"
+  "correctTypeLabel": "Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded",
+  "tenancyTypeAgreementTypes": {
+    "ASSURED_TENANCY": "sicr",
+    "SECURE_TENANCY": "ddiogel",
+    "INTRODUCTORY_TENANCY": "ragarweiniol",
+    "FLEXIBLE_TENANCY": "hyblyg",
+    "DEMOTED_TENANCY": "isradd",
+    "OTHER": "arall"
+  }
 }

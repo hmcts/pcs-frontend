@@ -110,6 +110,7 @@ export interface Party {
   idamId: string;
   firstName: string;
   lastName: string;
+  orgName?: string;
 }
 
 export interface Document {
@@ -146,6 +147,7 @@ export interface CcdParty {
   addressKnown?: string;
   addressSameAsProperty?: string;
   dateOfBirth?: string;
+  rank?: number;
 }
 
 /** Claimant-entered defendant details captured when the claim was created. */
@@ -175,6 +177,7 @@ export interface CcdDefendantParty {
 
 /** Counter-claim data captured across the counterclaim journey screens. */
 export interface CcdCounterClaim {
+  status?: string;
   needHelpWithFees?: YesNoValue;
   appliedForHwf?: YesNoValue;
   hwfReferenceNumber?: string;
@@ -271,6 +274,7 @@ export interface PossessionClaimResponse {
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
   responseDocumentId?: string;
+  counterclaimDocumentId?: string;
   draftVersion?: number;
   claimIssuedDate?: string;
 

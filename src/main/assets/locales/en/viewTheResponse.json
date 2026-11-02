@@ -14,6 +14,7 @@
     "claimantDetails": "Claimant details",
     "defendant1Details": "Defendant 1 details",
     "additionalDefendantDetails": "Additional defendant {{number}} details",
+    "rankedDefendantDetails": "Defendant {{number}} details",
     "responseToClaim": "Response to the claimant’s claim",
     "paymentsOrAgreements": "Payments or agreements since the claim was made",
     "householdAndCircumstances": "Your household and circumstances",
@@ -184,7 +185,8 @@
 
   "pdf": {
     "heading": "Download a PDF copy of the response",
-    "linkText": "Response (PDF)"
+    "linkText": "Response (PDF)",
+    "counterclaimLinkText": "Counterclaim (PDF)"
   },
 
   "closeAndReturn": "Close and return to case overview",

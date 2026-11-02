@@ -14,6 +14,7 @@ jest.mock('../../../../main/steps/utils/isRelease12Enabled', () => ({
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { getRequestLanguage } from '../../../../main/modules/i18n';
 import { getTranslationFunction } from '../../../../main/modules/steps';
 import { step } from '../../../../main/steps/respond-to-claim/confirmation-of-notice-date-when-provided';
 import { isRelease12Enabled } from '../../../../main/steps/utils/isRelease12Enabled';
@@ -368,6 +369,55 @@ describe('confirmation-of-notice-date-when-provided step', () => {
         expect(legalRep.release12[key]).not.toBe(citizen.release12[key]);
         expect(legalRep.release12[key]).toContain(DEFENDANT_TERM[lang]);
       }
+    });
+  });
+
+  describe('Welsh', () => {
+    beforeEach(() => {
+      (getRequestLanguage as jest.Mock).mockReturnValue('cy');
+    });
+
+    afterEach(() => {
+      (getRequestLanguage as jest.Mock).mockReturnValue('en');
+    });
+
+    it('formats the notice date in Welsh', () => {
+      testedStep.extendGetContent({
+        res: { locals: { validatedCase: makeValidatedCase({ notice_PostedDate: '2024-01-15' }) } },
+      });
+
+      expect(tMock).toHaveBeenCalledWith('release12.listItem1', {
+        returnObjects: true,
+        noticeDate: '15 Ionawr 2024',
+      });
+    });
+
+    it('formats the notice date in Welsh when release 1.2 is off', () => {
+      (isRelease12Enabled as jest.Mock).mockReturnValueOnce(false);
+
+      testedStep.extendGetContent({
+        res: { locals: { validatedCase: makeValidatedCase({ notice_PostedDate: '2024-01-15' }) } },
+      });
+
+      expect(tMock).toHaveBeenCalledWith('listItem1', {
+        returnObjects: true,
+        noticeDate: '15 Ionawr 2024',
+      });
+    });
+
+    it('formats the permitted-place delivery date in Welsh', () => {
+      const content = testedStep.extendGetContent({
+        res: {
+          locals: {
+            validatedCase: makeValidatedCase({
+              notice_ServiceMethod: 'DELIVERED_PERMITTED_PLACE',
+              notice_DeliveredDate: '2024-01-15',
+            }),
+          },
+        },
+      });
+
+      expect(content.noticeMethodText).toBe('DELIVERED_PERMITTED_PLACE[date=15 Ionawr 2024]');
     });
   });
 });

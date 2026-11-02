@@ -37,7 +37,12 @@
     },
     "possessionNoticeReceived": {
       "label": "Did {{claimantName}} give you notice of their intention to begin possession proceedings?",
-      "changeHidden": "notice received"
+      "changeHidden": "notice received",
+      "options": {
+        "yes": "Yes",
+        "no": "No",
+        "imNotSure": "I’m not sure"
+      }
     },
     "noticeReceivedDate": {
       "label": "When did you receive notice from {{claimantName}}?",

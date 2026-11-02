@@ -289,11 +289,15 @@ export const ccdCaseService = {
     }
   },
 
-  /** Starts an event, for a later `submitCaseEvent` with the token it returns. */
+  /**
+   * Starts an event, for a later `submitCaseEvent` with the token it returns. CCD passes the client
+   * context on to the event's start, as it passes no parameters.
+   */
   async startCaseEvent(
     accessToken: string,
     caseId: string,
-    eventId: string
+    eventId: string,
+    clientContext?: ClientContextHeaders
   ): Promise<CcdCase & { eventToken: string }> {
     const safeCaseId = sanitiseCaseReference(caseId);
     if (!safeCaseId) {
@@ -301,9 +305,13 @@ export const ccdCaseService = {
     }
 
     try {
+      const caseHeaders = getCaseHeaders(accessToken);
+      if (clientContext) {
+        caseHeaders.headers['Client-Context'] = JSON.stringify(clientContext);
+      }
       const response = await http.get<StartCallbackData>(
         `${getBaseUrl()}/cases/${safeCaseId}/event-triggers/${eventId}?ignore-warning=false`,
-        getCaseHeaders(accessToken)
+        caseHeaders
       );
       return { id: safeCaseId, data: response.data.case_details?.case_data ?? {}, eventToken: response.data.token };
     } catch (error) {

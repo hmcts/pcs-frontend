@@ -86,6 +86,11 @@ describe('pluralPossessive formatter', () => {
       formatterFn = mockAdd.mock.calls[0][1];
     });
 
+    it('should return value as-is for Welsh (cy), which shows possession by word order', () => {
+      expect(formatterFn('Treetops Housing', 'cy', {})).toBe('Treetops Housing');
+      expect(formatterFn('James', 'cy', {})).toBe('James');
+    });
+
     it('should return value as-is for French (fr)', () => {
       const result = formatterFn('Jean', 'fr', {});
       expect(result).toBe('Jean');
