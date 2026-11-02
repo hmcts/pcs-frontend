@@ -20,6 +20,7 @@ import { chooseAnApplication } from '../data/page-data/genApps-page-data';
 import { viewOrdersAndNotices } from '../data/page-data/ordersNoticesFromCourt-page-data';
 import { viewTheClaim } from '../data/page-data/theClaim-page-data';
 import { user } from '../data/user-data';
+import { getSelectedDefendantNumber } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { DASHBOARD_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
 import { test } from '../utils/common/test-with-case-role-cleanup';
 import { initializeExecutor, performAction, performActions, performValidation } from '../utils/controller';
@@ -236,9 +237,25 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
     });
     await performAction('respondPossessionClaimAPI', {
       data: respondPossessionClaimApiData.respondPossessionClaimPayload,
-      type: 'submit',
+      type: 'both',
     });
     await performAction('reloadPage');
+    await performValidation('text', {
+      elementType: 'paragraph',
+      text: dashboard.noHearingNotificationParagraph,
+    });
+    await performValidation('text', {
+      elementType: 'paragraphWithLink',
+      text: dashboard.counterClaimFeeUnpaidNotificationParagraph,
+    });
+    await performValidation('text', {
+      elementType: 'paragraphWithLink',
+      text: dashboard.counterClaimFeeUnpaidNotificationProgressParagraph,
+    });
+    await performValidation('text', {
+      elementType: 'link',
+      text: dashboard.counterClaimFeeUnpaidNotificationLink,
+    });
     await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
     await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
     await performValidation('mainHeader', paymentDetails.mainHeader);
@@ -249,6 +266,19 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       'clickButton',
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
     );
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
+    await performValidation('mainHeader', viewDocuments.mainHeader);
+    await performAction('validateViewDocuments', {
+      documents: [
+        {
+          sectionHeader: viewDocuments.statementsOfCaseSubHeader,
+          documentName: viewDocuments.counterclaimFormLink(getSelectedDefendantNumber()),
+          submittedDate: viewDocuments.getSubmittedDate(),
+        },
+      ],
+    });
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
     for (let i = 0; i < 12; i++) {
       await performAction('reloadPage');
       const respondedNotification = page.locator('p.govuk-body', {
@@ -268,6 +298,36 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       viewResponseHeader: dashboard.viewTheResponseSubHeader,
       tag: dashboard.completedTag,
       viewResponseTag: dashboard.availableTag,
+    });
+  });
+
+  test('Unsuccessful counterclaim payment leaves dashboard notification unchanged', async () => {
+    await performAction('respondPossessionClaimAPI', {
+      data: respondPossessionClaimApiData.respondPossessionClaimPayload,
+      type: 'both',
+    });
+    await performAction('reloadPage');
+    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
+    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
+    await performValidation('mainHeader', paymentDetails.mainHeader);
+    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.declinedCardNumber });
+    await performValidation('mainHeader', 'Your payment has been declined');
+    await performAction('clickButton', paymentDetails.startDynamicButton);
+    await performValidation('errorMessage', {
+      message: counterClaimApplicationFeeAmount.paymentFailedDynamicErrorMessage,
+    });
+    await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
+    await performValidation('text', {
+      elementType: 'paragraphWithLink',
+      text: dashboard.counterClaimFeeUnpaidNotificationParagraph,
+    });
+    await performValidation('text', {
+      elementType: 'paragraphWithLink',
+      text: dashboard.counterClaimFeeUnpaidNotificationProgressParagraph,
+    });
+    await performValidation('text', {
+      elementType: 'link',
+      text: dashboard.counterClaimFeeUnpaidNotificationLink,
     });
   });
 
