@@ -1,5 +1,7 @@
-import express, { type NextFunction, type Request, type Response, Router } from 'express';
+import { type NextFunction, type Request, type Response, Router } from 'express';
 import i18next from 'i18next';
+
+import { setupStaticAssets } from '../staticAssets';
 
 import { PREPARE_TO_RESPOND_PATH, prepareToRespondPage } from './prepareToRespond';
 
@@ -27,7 +29,7 @@ export function publicRouter(publicDir: string): Router {
   });
 
   // The application's built styles, scripts, fonts and images, so the page renders without the services above.
-  router.use(express.static(publicDir));
+  setupStaticAssets(router, publicDir);
 
   return router;
 }
