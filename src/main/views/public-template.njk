@@ -1,0 +1,41 @@
+{#
+  Layout for pages anyone can read without signing in: no sign out link, no links into the signed-in
+  service and no session timeout. Pages pass `t` for their language rather than using the shared global.
+#}
+{% extends "govuk/template.njk" %}
+{% from "govuk/components/header/macro.njk" import govukHeader %}
+{% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+
+{% block head %}
+  {{ super() }}
+  <meta name="robots" content="noindex">
+  {% include "webpack/css.njk" %}
+{% endblock %}
+
+{% block header %}
+  {{ govukHeader({
+    containerClasses: "govuk-width-container"
+  }) }}
+  {{ govukServiceNavigation({
+    serviceName: serviceName
+  }) }}
+{% endblock %}
+
+{% block beforeContent %}
+  {{ govukPhaseBanner({
+    tag: {
+      text: t('phase')
+    },
+    text: phaseBannerText
+  }) }}
+  {% if showLanguageToggle %}
+    <div class="govuk-language-toggle">
+      {{ t('languageToggle') | safe }}
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block bodyEnd %}
+  {% include "webpack/js.njk" %}
+{% endblock %}
