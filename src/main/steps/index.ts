@@ -32,7 +32,7 @@ export interface JourneyConfig {
   draftEvent?: CcdDraftEvent;
   default: ResolvedJourneyConfig;
   legalrep?: ResolvedJourneyConfig;
-  // Stacked onto the journey's :caseReference param callback (see registerAllJourneys).
+  // Mounted on the journey basePath after requireEventAccess, so validatedCase is loaded (see registerAllJourneys).
   routeMiddleware?: RequestHandler[];
 }
 
