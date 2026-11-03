@@ -29,4 +29,5 @@ export const counterClaim = {
   saveAndContinueButton: `Save and continue`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `counter-claim`,
+  // Regression testing
 };
