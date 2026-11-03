@@ -6,13 +6,14 @@ export const chooseAnApplication = {
   setAsideRadioOption: `Ask the court to set aside (cancel) a decision the court has made`,
   youCanAskTheCourtToSetAsideHintText: `You can ask the court to set aside its order if you have good reason. For example, if you were unable to attend the court hearing because you were ill`,
   somethingElseRadioOption: `Something else`,
+  suspendApplicationRadioOption: `Ask the court to suspend (stop or delay) the eviction`,
+  suspendApplicationHintText: `You can ask the court to ‘suspend the eviction’. This means stopping or delaying the eviction.`,
   makeAnApplicationForSomethingHintText: `Make an application for something that is not listed above`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
   feedbackLink: `feedback (opens in new tab)`,
   pageSlug: `choose-an-application`,
   thereIsAProblemErrorMessageHeader: `There is a problem`,
-  // if the below format is deemed complicated it will replaced as part of https://tools.hmcts.net/jira/browse/HDPI-5815
   errorValidationType: { one: `radioOptions`, two: `textField`, three: `checkBox` },
   errorValidationField: {
     errorRadioOption: { type: `none`, input: ``, errMessage: `Please select an application` },

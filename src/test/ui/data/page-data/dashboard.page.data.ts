@@ -44,8 +44,11 @@ export const dashboard = {
   respondedToClaimParagraph: `You have responded to the claim`,
   respondToTheClaimSubHeader: `Respond to the claim`,
   viewTheResponseSubHeader: `View the response`,
+  docsAddedHiddenText: `The following documents were also included with this application:`,
   notStartedTag: `Not started`,
   inProgressTag: `In progress`,
   completedTag: `Completed`,
   availableTag: `Available`,
+  counterClaimAmount: '1,500.00',
+  counterClaimFee: '80.00',
 };
