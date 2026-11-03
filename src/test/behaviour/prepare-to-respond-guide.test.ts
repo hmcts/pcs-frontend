@@ -35,7 +35,7 @@ async function closedPort(): Promise<number> {
 }
 
 const PUBLIC_DIR = path.resolve(__dirname, '../../main/public');
-const ASSET = 'guide-test-asset.css';
+const ASSET = 'assets/guide-test-asset.css';
 // The application needs a favicon to start, which CI's tests run without building.
 const FAVICON = path.join(PUBLIC_DIR, 'assets/images/favicon.ico');
 const faviconBuilt = fs.existsSync(FAVICON);
