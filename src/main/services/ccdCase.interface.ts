@@ -110,6 +110,7 @@ export interface Party {
   idamId: string;
   firstName: string;
   lastName: string;
+  orgName?: string;
 }
 
 export interface Document {
@@ -146,6 +147,7 @@ export interface CcdParty {
   addressKnown?: string;
   addressSameAsProperty?: string;
   dateOfBirth?: string;
+  rank?: number;
 }
 
 /** Claimant-entered defendant details captured when the claim was created. */

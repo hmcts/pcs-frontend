@@ -24,9 +24,32 @@ export interface OrderCaseContext {
   propertyAddress?: Record<string, string | undefined>;
   claimants: OrderParty[];
   defendants: OrderParty[];
-  caseFacts?: Record<string, unknown>;
   openCounterclaim?: boolean;
   openApplication?: boolean;
+}
+
+/** A judicial note on the case, with the hearing it was made at, if any. */
+export interface JudicialNote {
+  by?: string | null;
+  createdOn: string;
+  hearingDate?: string | null;
+  note: string;
+}
+
+/**
+ * The hearing an order is made for. Its facts are this hearing's if they were recorded, otherwise the latest
+ * earlier hearing's, otherwise the claim's, which no judge recorded. The version goes back with the judge's
+ * facts, so pcs-api can refuse them if another judge has since recorded this hearing's.
+ */
+export interface OrderHearing {
+  id: number;
+  date: string;
+  inWales?: boolean;
+  version?: number | null;
+  caseFacts?: Record<string, unknown>;
+  recorded?: { by?: string | null; on: string } | null;
+  note?: string | null;
+  earlierNotes: JudicialNote[];
 }
 
 /**
@@ -44,6 +67,8 @@ export interface OrderStart {
     queryFromCaseworker?: string | null;
   };
   caseContext: OrderCaseContext;
+  /** The hearing the order is made for, if it is made for one. */
+  hearing?: OrderHearing | null;
 }
 
 export function formatAddress(address: Record<string, string | undefined> = {}): string {
@@ -127,5 +152,24 @@ export function postedSnapshot(json: string | undefined): DocWeaveSnapshot | nul
     return json ? parseSnapshot(json) : null;
   } catch (error) {
     throw error instanceof InvalidSnapshotError ? new HTTPError(error.message, 400) : error;
+  }
+}
+
+/** Decode the form's base64url document before the existing snapshot validation. */
+export function decodeOrderDocument(value: unknown): string {
+  if (value === undefined || value === '') {
+    return '';
+  }
+  try {
+    if (typeof value !== 'string') {
+      throw new Error('Expected a single document');
+    }
+    const bytes = Buffer.from(value, 'base64url');
+    if (bytes.toString('base64url') !== value) {
+      throw new Error('Invalid base64url');
+    }
+    return new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  } catch {
+    throw new HTTPError('Invalid order document encoding', 400);
   }
 }

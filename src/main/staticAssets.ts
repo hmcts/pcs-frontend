@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import express, { type Express, type RequestHandler } from 'express';
+import express, { type RequestHandler, type Router } from 'express';
 import expressStaticGzip from 'express-static-gzip';
 
 const ONE_YEAR = '1y';
@@ -19,7 +19,7 @@ const onlyPlainBundleReads =
     return handler(req, res, next);
   };
 
-export const setupStaticAssets = (app: Express, publicDir = path.join(__dirname, 'public')): void => {
+export const setupStaticAssets = (app: Pick<Router, 'use'>, publicDir = path.join(__dirname, 'public')): void => {
   const bundles = expressStaticGzip(path.join(publicDir, 'bundles'), {
     index: false,
     serveStatic: { immutable: true, maxAge: ONE_YEAR, index: false, redirect: false },

@@ -13,6 +13,7 @@ import {
   type OrderStart,
   caseHeader,
   confirmationHeader,
+  decodeOrderDocument,
   manageCaseDetailsUrl,
   postedSnapshot,
   refusedOrderEvent,
@@ -361,11 +362,12 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       _csrf,
       action,
       orderType,
-      orderDocument,
+      orderDocument: encodedDocument,
       'send-query': sendQuery,
       'query-to-judge': queryToJudge,
       ...formData
     } = req.body;
+    const orderDocument = decodeOrderDocument(encodedDocument);
     review.answers.sendQuery = ticked(sendQuery);
     review.answers.queryToJudge = text(queryToJudge);
     const type = choice(orderType, MAKE_ORDER_TYPES);

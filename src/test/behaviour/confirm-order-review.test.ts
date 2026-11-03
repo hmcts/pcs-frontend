@@ -60,22 +60,17 @@ async function judgesOrder(options: { tab?: string; staffMessage?: string; edit?
     const body = page.body();
     const { orderType, orderDocument } = Object.fromEntries(body);
     const formData: Record<string, unknown> = {};
-    const hidden = [
-      '_csrf',
-      'action',
-      'eventToken',
-      'caseContext',
-      'orderId',
-      'orderVersion',
-      'orderType',
-      'orderDocument',
-    ];
+    const hidden = ['_csrf', 'action', 'eventToken', 'orderId', 'orderVersion', 'orderType', 'orderDocument'];
     body.forEach((value, name) => {
       if (!hidden.includes(name)) {
         formData[name] = value;
       }
     });
-    return { orderType, formData, docweaveSnapshot: JSON.parse(orderDocument) };
+    return {
+      orderType,
+      formData,
+      docweaveSnapshot: JSON.parse(Buffer.from(orderDocument, 'base64url').toString('utf8')),
+    };
   } finally {
     await judgeApp.close();
   }
@@ -503,7 +498,7 @@ describe('confirm order review', () => {
             order: {
               orderType,
               formData: expect.objectContaining({ recitals: 'yes', 'recitals-text': 'Upon hearing the claimant' }),
-              docweaveSnapshot: JSON.parse(orderDocument),
+              docweaveSnapshot: JSON.parse(Buffer.from(orderDocument, 'base64url').toString('utf8')),
               html: expect.stringContaining('<p>Upon hearing the claimant</p>'),
             },
             reviewDates: [{ date: '2027-03-05', reason: 'UNLESS_ORDER', description: 'Check compliance' }],

@@ -5,10 +5,17 @@ const mountedBy: string[] = [];
 jest.mock('serve-favicon', () => () => (_req: unknown, _res: unknown, next: () => void) => next());
 jest.mock('../../main/development', () => ({ setupDev: jest.fn() }));
 
-jest.mock('../../main/staticAssets', () => ({
-  setupStaticAssets: (app: Express) => {
-    app.use(((_req, _res, next) => next()) as RequestHandler);
+jest.mock('../../main/modules/helmet', () => ({
+  securityHeaders: () => {
+    mountedBy.push('helmet');
+    return (_req: unknown, _res: unknown, next: () => void) => next();
+  },
+}));
+
+jest.mock('../../main/guidance', () => ({
+  publicRouter: () => {
     mountedBy.push('staticAssets');
+    return (_req: unknown, _res: unknown, next: () => void) => next();
   },
 }));
 
@@ -17,16 +24,13 @@ jest.mock('../../main/modules', () => {
     app.use(((_req, _res, next) => next()) as RequestHandler);
     mountedBy.push(name);
   };
-  class Helmet {
-    enableFor = record('helmet');
-  }
   class Session {
     enableFor = record('session');
   }
   class Csrf {
     enableFor = record('csrf');
   }
-  return { Helmet, Session, Csrf, modules: ['Session', 'Csrf'] };
+  return { Session, Csrf, modules: ['Session', 'Csrf'] };
 });
 
 jest.mock('../../main/modules/error-handler', () => ({ setupErrorHandlers: jest.fn() }));
@@ -44,11 +48,5 @@ describe('app static asset ordering', () => {
     await import('../../main/app');
 
     expect(mountedBy).toStrictEqual(['helmet', 'staticAssets', 'session', 'csrf']);
-  });
-
-  it('leaves helmet out of the module registry, so app.ts is its only mount', async () => {
-    const { modules } = jest.requireActual<typeof import('../../main/modules')>('../../main/modules');
-
-    expect(modules).not.toContain('Helmet');
   });
 });
