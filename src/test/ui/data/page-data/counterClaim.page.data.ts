@@ -15,7 +15,7 @@ export const counterClaim = {
   youMustHaveAValidReasonParagraph: `You must have a valid legal reason to make a counterclaim.`,
   ifYourNotSureParagraph: `If you’re not sure whether you have a valid reason, you can get free legal advice through the Housing Loss Prevention Advice Service. You can find a provider near you using the`,
   findALegalAdviserLink: `find a legal adviser service (opens in new tab)`,
-  youWillHaveToPayAFeeParagraph: `You will have to pay a fee to make a counterclaim, unless you’re eligible for help with fees.`,
+  youWillHaveToPayAFeeParagraph: `You will have to pay a fee to make a counterclaim, unless you’re eligible for Help with Fees.`,
   checkIfYouCanGetHelpLink: `Check if you can get help with court fees (opens in new tab)`,
   theAmountYouPaidParagraph: `The amount you pay depends on what you’re claiming. If it’s a claim for an amount of money, the fee depends on the value of your claim. If your claim is about something else, the fee is £387.`,
   findOutAboutCourtFeeLink: `Find out about court fees (opens in new tab)`,
