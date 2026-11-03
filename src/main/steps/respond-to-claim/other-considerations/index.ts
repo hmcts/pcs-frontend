@@ -91,7 +91,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       name: 'otherConsiderations',
       type: 'radio',
       required: true,
-      legendClasses: 'govuk-fieldset__legend--l',
+      legendClasses: 'govuk-fieldset__legend--l govuk-!-margin-bottom-6',
       translationKey: {
         label: 'heading',
       },
