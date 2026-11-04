@@ -1,8 +1,9 @@
+import config from 'config';
 import type { NextFunction, Response } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
+
 import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
-import config from 'config';
 
 export interface ValidationIssue {
   id: string;

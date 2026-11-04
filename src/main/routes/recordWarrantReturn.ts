@@ -171,7 +171,7 @@ export default function recordWarrantReturnRoutes(app: Application): void {
     });
   });
 
-  app.post(route('checkYourAnswers'), async (req: Request, res: Response, next) => {
+  app.post(route('checkYourAnswers'), async (req: Request, res: Response, _) => {
     const caseReference = caseReferenceOf(req);
     if (req.body.action === 'previous') {
       return res.redirect(pageUrl(caseReference, 'warrantReturn'));
@@ -235,7 +235,11 @@ function validateEvictionSuccessful(req: Request, caseReference: string): Valida
   return errors;
 }
 
-function validateEvictionUnsuccessful(req: Request, caseReference: string, outcome: EvictionOutcome): ValidationIssue[] {
+function validateEvictionUnsuccessful(
+  req: Request,
+  caseReference: string,
+  outcome: EvictionOutcome
+): ValidationIssue[] {
   const errors: ValidationIssue[] = [];
   const returnName: EvictionUnsuccessfulReturnName = req.body
     .evictionUnsuccessfulReturnName as EvictionUnsuccessfulReturnName;

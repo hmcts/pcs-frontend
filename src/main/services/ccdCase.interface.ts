@@ -1,6 +1,7 @@
 import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
 
 import type { CcdFlags } from './cuiRa/cuiRa.interface';
+
 import { WarrantReturn } from '@utils/warrantReturn';
 
 export type YesNoValue = 'YES' | 'NO' | null;
@@ -214,7 +215,7 @@ export interface CcdClaimantType {
   value: {
     code: string;
     label: string;
-  },
+  };
   valueCode: string;
 }
 

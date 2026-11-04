@@ -59,11 +59,11 @@ export interface EvictionSummaryData {
   rows: {
     key: {
       text: string;
-    },
+    };
     value: {
       text: string;
-    }
-  }[]
+    };
+  }[];
 }
 
 export const warrantReturnTypeList: { value: WarrantReturnType; text: string }[] = [
@@ -84,23 +84,23 @@ export const evictionSuccessfulReturnTypeList: { value: EvictionSuccessfulReturn
 export const evictionUnsuccessfulReturnTypeList: { value: EvictionUnsuccessfulReturnName; text: string }[] = [
   {
     value: EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
-    text: 'Warrant withdrawn'
+    text: 'Warrant withdrawn',
   },
   {
     value: EvictionUnsuccessfulReturnName.WARRANT_SUSPENDED,
-    text: 'Warrant suspended by Order'
+    text: 'Warrant suspended by Order',
   },
   {
     value: EvictionUnsuccessfulReturnName.POSSESSION_ORDER_SET_ASIDE,
-    text: 'Possession Order set aside'
+    text: 'Possession Order set aside',
   },
   {
     value: EvictionUnsuccessfulReturnName.UNABLE_TO_GAIN_ACCESS,
-    text: 'Unable to gain access to the property'
+    text: 'Unable to gain access to the property',
   },
   {
     value: EvictionUnsuccessfulReturnName.EVICTION_NOT_CONFIRMED,
-    text: 'Claimant did not confirm eviction'
+    text: 'Claimant did not confirm eviction',
   },
   {
     value: EvictionUnsuccessfulReturnName.NO_LOCKSMITH,
@@ -256,7 +256,4 @@ export function isAdditionalDetailsMandatoryInterim(returnName: InterimReturnNam
   return mandatoryReturnNames.has(returnName);
 }
 
-
-export function initWarrantReturnForm(): void {
-
-}
+export function initWarrantReturnForm(): void {}
