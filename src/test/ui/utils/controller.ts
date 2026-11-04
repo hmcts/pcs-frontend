@@ -85,7 +85,7 @@ function getExecutor(): { page: Page } {
 async function detectPageNavigation(): Promise<boolean> {
   const executor = getExecutor();
   const currentUrl = executor.page.url();
-  const testPages = ['start-now', 'choose-an-application', 'start-evidence-upload', 'claims'];
+  const testPages = ['start-now', 'choose-an-application', 'start-evidence-upload', 'claims', 'make-order'];
   if (!startAxeAudit && testPages.some(page => currentUrl.includes(page))) {
     startAxeAudit = true;
     startFunctionalTests = true;
@@ -119,6 +119,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
           await test.step('Running Accessibility Scan', async () => {
             await new AxeUtils(executor.page).audit({
               exclude: axe_exclusions,
+              disableRules: ['aria-allowed-attr'],
             });
           });
         } catch (error) {

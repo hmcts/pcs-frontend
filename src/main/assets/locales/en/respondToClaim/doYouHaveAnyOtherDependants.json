@@ -8,5 +8,9 @@
     "otherDependants": "Select if you have any other dependants",
     "otherDependantDetails": "Give details about your other dependants",
     "otherDependantDetailsMaxLength": "Other dependants details must be 500 characters or less"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

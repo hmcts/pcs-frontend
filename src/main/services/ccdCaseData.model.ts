@@ -296,6 +296,10 @@ export class CcdCaseModel {
     return this.defendantContactDetailsParty.phoneNumber ?? undefined;
   }
 
+  get defendantContactDetailsPartyTextMessageNumber(): string | undefined {
+    return this.defendantContactDetailsParty.textMessageNumber ?? undefined;
+  }
+
   get defendantContactDetailsPartyName(): string {
     const { firstName, lastName } = this.defendantContactDetailsParty;
     return firstName && lastName ? `${firstName} ${lastName}` : firstName || lastName || '';

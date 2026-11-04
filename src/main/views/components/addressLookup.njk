@@ -19,7 +19,8 @@
 {% set lookupStore = addressLookup or {} %}
 {% set lookupForField = lookupStore[namePrefix] %}
 
-<div class="pcs-address-component" data-address-component data-name-prefix="{{ namePrefix }}">
+<div class="pcs-address-component" data-address-component data-name-prefix="{{ namePrefix }}"
+     data-one-address-found="{{ t('common:addressLookup.oneFound') }}" data-many-addresses-found="{{ t('common:addressLookup.manyFound') }}" data-no-addresses-found="{{ t('common:addressLookup.noneFound') }}">
 
   {% if fieldConfig.label %}
     {% if fieldConfig.label.text %}
@@ -85,7 +86,7 @@
     label: { text: t('labels.addressLine1', 'Address line 1') },
     value: val.addressLine1,
     classes: 'govuk-!-width-three-quarters',
-    errorMessage: errs[namePrefix ~ '-addressLine1'] and { text: t(errs[namePrefix ~ '-addressLine1'].message) }
+    errorMessage: errs[namePrefix ~ '-addressLine1'] and { text: t(errs[namePrefix ~ '-addressLine1'].message), visuallyHiddenText: t('common:errorPrefix') }
   }) }}
 
   {{ govukInput({
@@ -103,7 +104,7 @@
     label: { text: t('labels.town', 'Town or city') },
     value: val.town,
     classes: 'govuk-!-width-three-quarters',
-    errorMessage: errs[namePrefix ~ '-town'] and { text: t(errs[namePrefix ~ '-town'].message) }
+    errorMessage: errs[namePrefix ~ '-town'] and { text: t(errs[namePrefix ~ '-town'].message), visuallyHiddenText: t('common:errorPrefix') }
   }) }}
 
   {{ govukInput({
@@ -120,7 +121,7 @@
     label: { text: t('labels.postcode', 'Postcode') },
     value: val.postcode,
     classes: 'govuk-!-width-one-quarter',
-    errorMessage: errs[namePrefix ~ '-postcode'] and { text: t(errs[namePrefix ~ '-postcode'].message) }
+    errorMessage: errs[namePrefix ~ '-postcode'] and { text: t(errs[namePrefix ~ '-postcode'].message), visuallyHiddenText: t('common:errorPrefix') }
   }) }}
 
 

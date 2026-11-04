@@ -8,5 +8,5 @@ export const bringSupportToCourtHearing = {
   supportWorkerOrCarerCheckbox: `Support worker or carer`,
   therapyAnimalCheckbox: `Therapy animal`,
   otherCheckbox: `Other`,
-  noSupportToBringWithMeCheckbox: `I do not need any support at this time`,
+  noSupportToBringWithMeCheckbox: `I do not need to bring support with me at this time`,
 };

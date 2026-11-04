@@ -101,6 +101,7 @@ const rtcCyaFailurePreviewLimit = 10;
 
 const rtcCyaLabels = {
   contactDetails: 'Contact details',
+  textMessagePhoneNumber: 'UK phone number',
   counterClaimHelpWithFeesReference: 'Enter your Help with Fees reference number',
   universalCreditApplicationDate: 'When did you apply for Universal Credit?',
 } as const;
@@ -605,6 +606,9 @@ export class RespondToClaimAction implements IAction {
     });
 
     if (contactData.radioOption === 'Yes') {
+      // The text-message number is rendered as its own row on the personal-details CYA.
+      // Record it explicitly so section validation cannot pass without checking it.
+      this.recordAnswer(rtcCyaLabels.textMessagePhoneNumber, String(contactData.mobileNumber));
       await performAction(
         'inputText',
         contactPreferencesTextMessage.ukMobileNumberHiddenTextLabel,
@@ -791,7 +795,7 @@ export class RespondToClaimAction implements IAction {
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
     await performValidation('text', {
-      elementType: 'paragraph',
+      elementType: 'subHeader',
       text: tenancyDateDetails.getDetailsGivenByParagraph(),
     });
     this.recordAnswer(tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion, tenancyStartDateData.option);

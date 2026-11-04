@@ -5,5 +5,9 @@
   "paragraph2": "The claimant will be able to see these files.",
   "errors": {
     "counterClaimWantToUploadFiles": "Select if you want to upload files to support your counterclaim"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }
