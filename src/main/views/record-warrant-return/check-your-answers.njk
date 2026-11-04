@@ -1,0 +1,14 @@
+{% extends "record-warrant-return/_layout.njk" %}
+
+{% from "macros/csrf.njk" import csrfProtection %}
+{% import "macros/xuiButtons.njk" as buttons with context %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+
+{% set pageHeading = "Check your answers" %}
+
+{% block page %}
+  <p>PLACEHOLDER PAGE CYA</p>
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ buttons.eventButtons("Submit") }}
+  </form>
+{% endblock %}

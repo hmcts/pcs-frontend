@@ -1,0 +1,10 @@
+{% macro caseTitle(caseReference, propertyAddress) %}
+    <p class="govuk-body govuk-!-margin-top-0 govuk-!-margin-bottom-1">
+        {{ t('caseTitle:caseReferenceLabel') }}
+        {{ caseReference | caseReferenceDisplay }}
+    </p>
+    <p class="govuk-body govuk-!-margin-bottom-0">
+        {{ t('caseTitle:propertyAddressLabel') }} {{ propertyAddress }}
+    </p>
+    <hr class="govuk-!-margin-bottom-8">
+{% endmacro %}
