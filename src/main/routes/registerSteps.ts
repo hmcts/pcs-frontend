@@ -212,13 +212,7 @@ export function registerAllJourneys(app: Application): void {
     // Apply journey-specific middleware
     // Note: Auto-save is handled via formBuilder's beforeRedirect, not middleware
     journeyRouter.param('caseReference', caseReferenceParamMiddleware);
-    journeyRouter.use(basePath, requireEventAccess(eventId));
-
-    // Stacked onto the :caseReference param callback so handlers fire after
-    // validatedCase loads, before per-step middleware. Mounting via .use() would fire too early.
-    for (const handler of journey.routeMiddleware ?? []) {
-      journeyRouter.param('caseReference', (req, res, next) => handler(req, res, next));
-    }
+    journeyRouter.use(basePath, requireEventAccess(eventId), ...(journey.routeMiddleware ?? []));
 
     // Register all steps for this journey on the journey router
     registerSteps(journeyRouter, journeyName);
