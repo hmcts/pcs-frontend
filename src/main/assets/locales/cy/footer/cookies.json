@@ -1,65 +1,65 @@
 {
-  "pageTitle": "cyCookie Policy - HM Courts & Tribunals Service - GOV.UK",
+  "pageTitle": "Cookie Policy - HM Courts & Tribunals Service - GOV.UK",
   "cookies": {
-    "title": "cyCookies",
-    "description1": "cyA cookie is a small piece of data that’s stored on your computer, tablet, or phone when you visit a website. Most websites need cookies to work properly.",
-    "description2": "cyThis service uses them to:",
-    "description3": "cyFind out more about <a class=\"govuk-link\" target=\"_blank\" href=\"http://www.aboutcookies.org/\">how to manage cookies</a>.",
+    "title": "Cookies",
+    "description1": "A cookie is a small piece of data that’s stored on your computer, tablet, or phone when you visit a website. Most websites need cookies to work properly.",
+    "description2": "This service uses them to:",
+    "description3": "Find out more about <a class=\"govuk-link\" target=\"_blank\" href=\"http://www.aboutcookies.org/\">how to manage cookies</a>.",
     "list": {
-      "item1": "cymeasure how you use the service so it can be improved",
-      "item2": "cyremember the notifications you’ve seen so that you’re not shown them again",
-      "item3": "cytemporarily store the answers you give"
+      "item1": "measure how you use the service so it can be improved",
+      "item2": "remember the notifications you’ve seen so that you’re not shown them again",
+      "item3": "temporarily store the answers you give"
     }
   },
   "howCookiesAreUsedInThisService": {
-    "title": "cyHow cookies are used in this service",
-    "description1": "cyWe use third party services to perform visitor analytics"
+    "title": "How cookies are used in this service",
+    "description1": "We use third party services to perform visitor analytics"
   },
   "cookieTable": {
     "header": {
-      "name": "cyName",
-      "purpose": "cyPurpose",
-      "expires": "cyExpires"
+      "name": "Name",
+      "purpose": "Purpose",
+      "expires": "Expires"
     },
     "row1": {
-      "name": "cylang",
-      "purpose": "cyRemembers user UI language preference.",
-      "expires": "cy1 year"
+      "name": "lang",
+      "purpose": "Remembers user UI language preference.",
+      "expires": "1 year"
     },
     "row2": {
-      "name": "cypcs_session",
-      "purpose": "cyUser session token.",
-      "expires": "cySession ends"
+      "name": "pcs_session",
+      "purpose": "User session token.",
+      "expires": "Session ends"
     },
     "row3": {
-      "name": "cydtCookie",
-      "purpose": "cyTracks a visit across multiple requests.",
-      "expires": "cySession ends"
+      "name": "dtCookie",
+      "purpose": "Tracks a visit across multiple requests.",
+      "expires": "Session ends"
     },
     "row4": {
-      "name": "cydtLatC",
-      "purpose": "cyMeasures server latency for performance monitoring.",
-      "expires": "cySession ends"
+      "name": "dtLatC",
+      "purpose": "Measures server latency for performance monitoring.",
+      "expires": "Session ends"
     },
     "row5": {
-      "name": "cydtPC",
-      "purpose": "cyRequired to identify proper endpoints for beacon transmission; includes session ID for correlation.",
-      "expires": "cySession ends"
+      "name": "dtPC",
+      "purpose": "Required to identify proper endpoints for beacon transmission; includes session ID for correlation.",
+      "expires": "Session ends"
     },
     "row6": {
-      "name": "cydtSa",
-      "purpose": "cyIntermediate store for page-spanning actions",
-      "expires": "cySession ends"
+      "name": "dtSa",
+      "purpose": "Intermediate store for page-spanning actions",
+      "expires": "Session ends"
     },
     "row7": {
-      "name": "cyrxVisitor",
-      "purpose": "cyGenerated user ID for usage tracking (Dynatrace)",
-      "expires": "cySession ends"
+      "name": "rxVisitor",
+      "purpose": "Generated user ID for usage tracking (Dynatrace)",
+      "expires": "Session ends"
     },
     "row8": {
-      "name": "cyrxvt",
-      "purpose": "cySession timeout",
-      "expires": "cySession ends"
+      "name": "rxvt",
+      "purpose": "Session timeout",
+      "expires": "Session ends"
     }
   }
 }
