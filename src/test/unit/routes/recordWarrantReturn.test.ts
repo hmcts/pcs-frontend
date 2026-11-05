@@ -76,11 +76,9 @@ describe('recordWarrantReturnRoutes', () => {
   });
 
   describe('GET warrantReturn', () => {
-
     const mockStartCaseEvent = ccdCaseService.startCaseEvent as jest.Mock;
 
     it('renders the warrant return page', async () => {
-
       const handler = getHandler('/case/:caseReference/record-warrant-return');
 
       const res = {
