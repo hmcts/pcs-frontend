@@ -149,7 +149,7 @@ withPipeline(type, product, component) {
       runPerftestSmokeTests(yarnBuilder, secrets, product)
     }
     onDemo
-      runPerftestSmokeTests(yarnBuilder, secrets, product)
+      runDemoSmokeTests(yarnBuilder, secrets, product)
   }
 }
 
