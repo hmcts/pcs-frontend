@@ -1,4 +1,7 @@
+import nodePath from 'path';
+
 import type { Application, Request, RequestHandler, Response } from 'express';
+import nunjucks from 'nunjucks';
 
 import { legalRepresentativeHeaderMiddleware } from '../../../main/middleware';
 
@@ -15,6 +18,22 @@ const footerPages = [
   ['/terms-and-conditions', 'footer/terms-and-conditions'],
   ['/get-help', 'footer/get-help'],
 ] as const;
+
+const viewsRoot = nodePath.resolve(__dirname, '../../../main/views');
+const govukTemplatePath = require.resolve('govuk-frontend/dist/govuk/template.njk');
+const govukRoot = nodePath.resolve(nodePath.dirname(govukTemplatePath), '..');
+const cftMacroPath = nodePath.dirname(require.resolve('@hmcts-cft/cft-ui-component-lib/nunjucks/xui-header/macro.njk'));
+const cftRoot = nodePath.resolve(cftMacroPath, '..');
+const environment = new nunjucks.Environment(
+  new nunjucks.FileSystemLoader([viewsRoot, govukRoot, cftRoot], { noCache: true }),
+  { autoescape: true }
+);
+
+const legalRepresentativeFooterModel = {
+  navigation: {
+    items: [{ text: 'Legal representative footer link', href: '/legal-representative-footer-link' }],
+  },
+};
 
 function buildApp(): Application {
   return {
@@ -63,7 +82,7 @@ describe('footer page routes', () => {
   it('renders the citizen footer when the user is not a legal representative', async () => {
     const app = buildApp();
     const req = {} as Request;
-    const res = { locals: { release1dot4Enabled: true }, render: jest.fn() } as unknown as Response;
+    const res = { locals: {}, render: jest.fn() } as unknown as Response;
     const next = jest.fn();
 
     (legalRepresentativeHeaderMiddleware as jest.Mock).mockImplementationOnce((_req, response, nextHandler) => {
@@ -86,22 +105,39 @@ describe('footer page routes', () => {
     });
   });
 
-  it('returns not found for citizens when release 1.4 is disabled', async () => {
+  it('renders the HMCTS footer when legal representative is true', async () => {
     const app = buildApp();
     const req = {} as Request;
     const render = jest.fn();
-    const status = jest.fn().mockReturnValue({ render });
     const res = {
-      locals: { isLegalRepresentative: false, release1dot4Enabled: false },
-      status,
+      locals: {},
+      render,
     } as unknown as Response;
+    const next = jest.fn();
+
+    (legalRepresentativeHeaderMiddleware as jest.Mock).mockImplementationOnce((_req, response, nextHandler) => {
+      response.locals.isLegalRepresentative = true;
+      response.locals.footerModel = legalRepresentativeFooterModel;
+      nextHandler();
+    });
 
     footerPagesRoutes(app);
 
-    const handler = (app.get as jest.Mock).mock.calls[0][1] as RequestHandler;
-    await handler(req, res, jest.fn());
+    const middleware = (app.use as jest.Mock).mock.calls[0][1] as RequestHandler;
+    middleware(req, res, next);
 
-    expect(status).toHaveBeenCalledWith(404);
-    expect(render).toHaveBeenCalledWith('not-found');
+    const handler = (app.get as jest.Mock).mock.calls[0][1] as RequestHandler;
+    await handler(req, res, next);
+
+    expect(render).toHaveBeenCalledWith('footer/accessibility', {
+      t: expect.any(Function),
+    });
+
+    const html = environment.renderString(
+      '{% from "components/pcs-footer.njk" import pcsFooter %}{{ pcsFooter(isLegalRepresentative, footerModel) }}',
+      res.locals
+    );
+    expect(html).toContain('ui-component-lib-footer');
+    expect(html).toContain('href="/legal-representative-footer-link"');
   });
 });

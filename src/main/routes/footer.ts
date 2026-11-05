@@ -38,10 +38,6 @@ export default function footerPagesRoutes(app: Application): void {
 
   footerPages.forEach(page => {
     app.get(page.path, async (req: Request, res: Response) => {
-      if (!res.locals.isLegalRepresentative && !res.locals.release1dot4Enabled) {
-        return res.status(404).render('not-found');
-      }
-
       await req.i18n?.loadNamespaces([page.namespace]);
 
       res.render(page.view, {

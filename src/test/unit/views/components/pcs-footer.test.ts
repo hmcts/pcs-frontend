@@ -15,7 +15,7 @@ const environment = new nunjucks.Environment(
 
 const footerTemplate = `
   {% from "components/pcs-footer.njk" import pcsFooter %}
-  {{ pcsFooter(isLegalRepresentative, footerModel, release1dot4Enabled) }}
+  {{ pcsFooter(isLegalRepresentative, footerModel) }}
 `;
 
 const legalRepresentativeFooterModel = {
@@ -31,37 +31,27 @@ const legalRepresentativeFooterModel = {
 
 const citizenFooterLinks = ['/accessibility', '/cookies', '/privacy-policy', '/terms-and-conditions', '/get-help'];
 
-function renderFooter(isLegalRepresentative: boolean, release1dot4Enabled: boolean): string {
+function renderFooter(isLegalRepresentative: boolean): string {
   return environment.renderString(footerTemplate, {
     isLegalRepresentative,
-    release1dot4Enabled,
     footerModel: legalRepresentativeFooterModel,
   });
 }
 
 describe('pcs footer', () => {
-  it('displays the HMCTS footer for a legal representative', () => {
-    const html = renderFooter(true, false);
+  it('displays the HMCTS footer when legal representative is true', () => {
+    const html = renderFooter(true);
 
     expect(html).toContain('ui-component-lib-footer');
     expect(html).toContain('Legal representative footer link');
     expect(html).toContain('href="/legal-representative-footer-link"');
   });
 
-  it('displays footer links for a citizen when release 1.4 is enabled', () => {
-    const html = renderFooter(false, true);
+  it('displays the citizen footer links when legal representative is false', () => {
+    const html = renderFooter(false);
 
     citizenFooterLinks.forEach(link => {
       expect(html).toContain(`href="${link}"`);
-    });
-    expect(html).not.toContain('ui-component-lib-footer');
-  });
-
-  it('does not display footer links for a citizen when release 1.4 is disabled', () => {
-    const html = renderFooter(false, false);
-
-    citizenFooterLinks.forEach(link => {
-      expect(html).not.toContain(`href="${link}"`);
     });
     expect(html).not.toContain('ui-component-lib-footer');
   });
