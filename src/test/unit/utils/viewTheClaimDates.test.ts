@@ -14,6 +14,7 @@ const copyFor = (language: string): ViewTheClaimCopy => ({
   personsUnknown: '',
   addressUnknown: '',
   locale: toDateLocale(language),
+  rankedDefendantNumbering: false,
 });
 
 const rowText = (rows: { key: { text: string }; value: { text?: string } }[] | undefined, label: string) =>

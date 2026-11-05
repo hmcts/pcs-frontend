@@ -1,11 +1,15 @@
 {#
-  The make order form and the order it generates, which a judge fills in to make an order. The page's form wraps it, as #make-order-form.
+  The make order form and the order it generates, which a judge fills in to make an order and a
+  caseworker may change before issuing it. The page's form wraps it, as #make-order-form.
 #}
 {% import "make-order/_compact.njk" as compact with context %}
 
 <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
 
-{% include "make-order/_case-facts.njk" %}
+{# Only an order made for a hearing has the case's facts and the hearing's note. #}
+{% if hearing %}
+  {% include "make-order/_case-facts.njk" %}
+{% endif %}
 {% include "make-order/_attendance.njk" %}
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>
@@ -46,7 +50,7 @@
 {% include "make-order/_costs.njk" %}
 
 <section class="govuk-!-margin-top-6" aria-labelledby="order-preview-heading">
-  <h2 class="govuk-heading-l" id="order-preview-heading">Order preview</h2>
+  <h2 class="govuk-heading-l" id="order-preview-heading">{{ orderPreviewHeading | default("Order preview") }}</h2>
   <div id="order-editor" tabindex="-1"></div>
   <textarea hidden id="order-document" name="orderDocument">{{ orderDocumentJson }}</textarea>
 </section>
