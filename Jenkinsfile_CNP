@@ -148,6 +148,8 @@ withPipeline(type, product, component) {
     onPerftest {
       runPerftestSmokeTests(yarnBuilder, secrets, product)
     }
+    onDemo
+      runPerftestSmokeTests(yarnBuilder, secrets, product)
   }
 }
 
@@ -177,6 +179,32 @@ def runPerftestSmokeTests(yarnBuilder, Map secrets, String product) {
         "PCS_API_URL=http://pcs-api-perftest.service.core-compute-perftest.internal",
         "CDAM_URL=http://ccd-case-document-am-api-perftest.service.core-compute-perftest.internal",
         "DATA_STORE_URL_BASE=http://ccd-data-store-api-perftest.service.core-compute-perftest.internal",
+        "CASE_TYPE_ID=PCS",
+        "NODE_CONFIG_ENV=test"
+      ]) {
+        echo "Running smoke tests against ${env.TEST_URL}"
+        try {
+          yarnBuilder.yarn('test:smoke')
+        } finally {
+          archiveSmokeTestReports()
+        }
+      }
+    }
+  }
+}
+
+def runDemoSmokeTests(yarnBuilder, Map secrets, String product) {
+  def vaultConfig = new AppPipelineConfig()
+  vaultConfig.vaultSecrets = secrets
+
+  stageWithEnvironmentAgent('Smoke Test - demo', product, 'demo') {
+    withTeamSecrets(vaultConfig, 'demo', product) {
+      withEnv([
+        "ENVIRONMENT=demo",
+        "TEST_URL=https://pcs.demo.platform.hmcts.net/",
+        "PCS_API_URL=http://pcs-api-demo.service.core-compute-demo.internal",
+        "CDAM_URL=http://ccd-case-document-am-api-demo.service.core-compute-demo.internal",
+        "DATA_STORE_URL_BASE=http://ccd-data-store-api-demo.service.core-compute-demo.internal",
         "CASE_TYPE_ID=PCS",
         "NODE_CONFIG_ENV=test"
       ]) {
