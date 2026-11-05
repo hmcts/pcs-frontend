@@ -4,6 +4,7 @@ import { Application, Request, Response } from 'express';
 import { RECORD_WARRANT_RETURN_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
 
+import { Logger } from '@modules/logger';
 import { CcdCaseData } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import {
@@ -47,6 +48,9 @@ const RETURN_NAME_ERROR_MESSAGE: string = 'Return name is required';
 const FINAL_OUTCOME_ERROR_MESSAGE: string = 'Final outcome is required';
 const ADDITIONAL_DETAILS_ERROR_MESSAGE: string = 'Additional details is required';
 
+
+const logger = Logger.getLogger('recordWarrantReturn');
+
 function route(page: Page): string {
   return `${RECORD_WARRANT_RETURN_ROUTE}${PAGES[page]}`;
 }
@@ -85,6 +89,8 @@ export default function recordWarrantReturnRoutes(app: Application): void {
 
       const ccdCase: CcdCaseData = started.data;
 
+      logger.info('claimantType data', ccdCase.claimantType);
+
       const evictionData: EvictionSummaryData = {
         rows: [
           {
@@ -92,7 +98,7 @@ export default function recordWarrantReturnRoutes(app: Application): void {
               text: 'Claimant type',
             },
             value: {
-              text: ccdCase.claimantType!.value.label,
+              text: 'CLAIMANT TYPE PLACEHOLDER', //ccdCase.claimantType!.value.label
             },
           },
           {
