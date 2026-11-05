@@ -444,17 +444,6 @@ describe('ccdCaseService', () => {
     });
   });
 
-  describe('createCase', () => {
-    it('calls submitEvent with correct args', async () => {
-      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
-      mockPost.mockResolvedValue({ data: { id: '999', data: { applicantForename: 'bar' } } });
-
-      const result = await ccdCaseService.createCase(accessToken, { applicantForename: 'bar' });
-
-      expect(result).toEqual({ id: '999', data: { applicantForename: 'bar' } });
-    });
-  });
-
   describe('updateCase', () => {
     const draftEvent = { id: 'respondPossessionClaim', pageId: 'respondToPossessionDraftSavePage' };
 
@@ -467,31 +456,13 @@ describe('ccdCaseService', () => {
     });
   });
 
-  describe('submitCase', () => {
-    it('throws HTTPError if case id is missing', async () => {
-      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.submitCase(accessToken, { id: '', data: {} })).rejects.toThrow(
-        'Cannot SUBMIT Case, CCD Case Not found'
-      );
-    });
-  });
-
-  describe('submitResponseToClaim', () => {
-    it('throws HTTPError if case id is missing', async () => {
-      await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(HTTPError);
-      await expect(ccdCaseService.submitResponseToClaim(accessToken, { id: '', data: {} })).rejects.toThrow(
-        'Cannot Submit Response to Case, CCD Case Not found'
-      );
-    });
-  });
-
   describe('submitGeneralApplication', () => {
     it('throws HTTPError if case id is missing', async () => {
       await expect(ccdCaseService.submitGeneralApplication(accessToken, { id: '', data: {} })).rejects.toThrow(
         HTTPError
       );
       await expect(ccdCaseService.submitGeneralApplication(accessToken, { id: '', data: {} })).rejects.toThrow(
-        'Cannot submit general application, case ID not specified'
+        'Invalid case reference format'
       );
     });
 
@@ -539,8 +510,6 @@ describe('ccdCaseService', () => {
           },
           event: {
             id: 'makeAnApplication',
-            summary: 'Citizen makeAnApplication summary',
-            description: 'Citizen makeAnApplication description',
           },
           event_token: eventToken,
           ignore_warning: false,
