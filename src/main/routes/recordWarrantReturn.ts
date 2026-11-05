@@ -32,6 +32,7 @@ import {
   mapXuiValidation,
   refusedXUIEvent,
 } from '@utils/xuiUtils';
+import { formatAddress } from '@utils/ccdDashboardUtils';
 
 const RECORD_WARRANT_RETURN_EVENT_ID: string = 'ext:recordWarrantReturn';
 
@@ -128,6 +129,8 @@ export default function recordWarrantReturnRoutes(app: Application): void {
         evictionUnsuccessfulReturnTypeList,
         interimReturnTypeList,
         evictionData,
+        propertyAddress: formatAddress(ccdCase.propertyAddress),
+        caseReference,
       });
     } catch (error) {
       refusedXUIEvent(res, next, error);
