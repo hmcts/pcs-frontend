@@ -1,9 +1,9 @@
 import { CcdCaseData } from '@services/ccdCase.interface';
 import {
   EvictionUnsuccessfulReturnName,
+  InterimReturnName,
   formatClaimants,
   formatDefendants,
-  InterimReturnName,
   isAdditionalDetailsMandatoryEvictionUnsuccessful,
   isAdditionalDetailsMandatoryInterim,
 } from '@utils/warrantReturn';
@@ -36,30 +36,26 @@ describe('warrantReturn', () => {
         ],
       } as unknown as CcdCaseData;
 
-      expect(formatDefendants(ccdCase)).toBe(
-        '<ul class="govuk-list"><li>John Smith</li><li>Jane Doe</li></ul>'
-      );
+      expect(formatDefendants(ccdCase)).toBe('<ul class="govuk-list"><li>John Smith</li><li>Jane Doe</li></ul>');
     });
 
     it('should include only "person(s) unknown" when all defendants are unknown', () => {
       const ccdCase = {
-          allDefendants: [
-              {
-                  value: {
-                      nameKnown: false,
-                  },
-              },
-              {
-                  value: {
-                      nameKnown: false,
-                  },
-              },
-          ],
+        allDefendants: [
+          {
+            value: {
+              nameKnown: false,
+            },
+          },
+          {
+            value: {
+              nameKnown: false,
+            },
+          },
+        ],
       } as unknown as CcdCaseData;
 
-      expect(formatDefendants(ccdCase)).toBe(
-        '<ul class="govuk-list"><li>person(s) unknown</li></ul>'
-      );
+      expect(formatDefendants(ccdCase)).toBe('<ul class="govuk-list"><li>person(s) unknown</li></ul>');
     });
 
     it('should format known defendants and include a single unknown defendants entry', () => {
@@ -117,9 +113,7 @@ describe('warrantReturn', () => {
         ],
       } as CcdCaseData;
 
-      expect(formatClaimants(ccdCase)).toBe(
-        '<ul class="govuk-list"><li>John Smith</li></ul>'
-      );
+      expect(formatClaimants(ccdCase)).toBe('<ul class="govuk-list"><li>John Smith</li></ul>');
     });
 
     it('should format an organisation claimant', () => {
@@ -133,9 +127,7 @@ describe('warrantReturn', () => {
         ],
       } as CcdCaseData;
 
-      expect(formatClaimants(ccdCase)).toBe(
-        '<ul class="govuk-list"><li>ABC Housing Association</li></ul>'
-      );
+      expect(formatClaimants(ccdCase)).toBe('<ul class="govuk-list"><li>ABC Housing Association</li></ul>');
     });
 
     it('should format both individual and organisation claimants', () => {

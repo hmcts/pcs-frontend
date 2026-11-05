@@ -146,7 +146,6 @@ describe('xuiUtils', () => {
   });
 
   describe('manageCaseDetailsUrl', () => {
-
     it('should return the generated manage case URL', () => {
       jest.spyOn(config, 'get').mockReturnValue('https://example.com');
       jest.spyOn(manageCaseRedirect, 'buildManageCaseDetailsRedirect').mockReturnValue('https://example.com/case/123');
@@ -167,5 +166,4 @@ describe('xuiUtils', () => {
       expect(() => manageCaseDetailsUrl('123')).toThrow('The Manage Case return URL is not configured');
     });
   });
-
 });
