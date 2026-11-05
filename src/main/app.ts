@@ -15,7 +15,6 @@ import {
   legalRepresentativeAccessMiddleware,
   pageTrackingUrlMiddleware,
 } from './middleware';
-import { staffXuiRedirectMiddleware } from './middleware/staffXuiRedirect';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import { securityHeaders } from './modules/helmet';
@@ -56,7 +55,6 @@ app.use((req, res, next) => {
 app.use(pageTrackingUrlMiddleware);
 app.use(legalRepresentativeAccessMiddleware);
 app.use(judgeXuiRedirectMiddleware);
-app.use(staffXuiRedirectMiddleware);
 
 // param middleware for caseReference
 app.param('caseReference', caseReferenceParamMiddleware);
