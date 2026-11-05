@@ -7,7 +7,7 @@
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% import "macros/xuiButtons.njk" as buttons with context %}
-{% import "macros/dateTimeInput.njk" as dateTimeInput with context %}
+{% from "macros/dateTimeInput.njk" import dateInput %}
 
 {% block mainContent %}
   {{ govukSummaryList(evictionData) }}
@@ -47,7 +47,7 @@
       }}
 
       {{
-        dateTimeInput(
+        dateInput(
           "eviction-date",
           "Eviction date and time",
           "For example, 27 3 2026 14 30. Use the 24-hour clock."
