@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/order
 import { EvictionOutcome, EvictionSuccessfulReturnName, WarrantReturnType } from '@utils/warrantReturn';
 
 jest.mock('@services/ccdCaseService', () => ({
