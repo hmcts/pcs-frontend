@@ -48,7 +48,6 @@ const RETURN_NAME_ERROR_MESSAGE: string = 'Return name is required';
 const FINAL_OUTCOME_ERROR_MESSAGE: string = 'Final outcome is required';
 const ADDITIONAL_DETAILS_ERROR_MESSAGE: string = 'Additional details is required';
 
-
 const logger = Logger.getLogger('recordWarrantReturn');
 
 function route(page: Page): string {
