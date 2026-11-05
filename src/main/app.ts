@@ -15,11 +15,11 @@ import {
   legalRepresentativeAccessMiddleware,
   pageTrackingUrlMiddleware,
 } from './middleware';
+import { staffXuiRedirectMiddleware } from './middleware/staffXuiRedirect';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
 import { securityHeaders } from './modules/helmet';
 import { registerAllJourneys } from './routes/registerSteps';
-import { staffXuiRedirectMiddleware } from './middleware/staffXuiRedirect';
 
 const env = process.env.NODE_ENV || 'development';
 const developmentMode = env === 'development';
