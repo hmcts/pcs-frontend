@@ -3,6 +3,7 @@
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% from "components/pcs-footer.njk" import pcsFooter %}
 
 {% set bodyAttributes = {
   "data-session-timeout": sessionTimeout.sessionTimeoutMinutes,
@@ -62,6 +63,10 @@
       {{ (languageToggle or t('languageToggle') or '') | safe }}
     </div>
   </div>
+{% endblock %}
+
+{% block footer %}
+  {{ pcsFooter(isLegalRepresentative, footerModel) }}
 {% endblock %}
 
 {% block bodyEnd %}
