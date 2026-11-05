@@ -32,7 +32,7 @@ import {
   refusedXUIEvent,
 } from '@utils/xuiUtils';
 
-const RECORD_WARRANT_RETURN_EVENT_ID: string = 'ext:record-warrant-return';
+const RECORD_WARRANT_RETURN_EVENT_ID: string = 'ext:recordWarrantReturn';
 
 const PAGES = {
   warrantReturn: '',
