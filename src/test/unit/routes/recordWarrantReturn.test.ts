@@ -1,6 +1,3 @@
-// eslint-disable-next-line import/order
-import { EvictionOutcome, EvictionSuccessfulReturnName, WarrantReturnType } from '@utils/warrantReturn';
-
 jest.mock('@services/ccdCaseService', () => ({
   ccdCaseService: {
     startCaseEvent: jest.fn().mockReturnValue({
@@ -15,10 +12,12 @@ jest.mock('@services/ccdCaseService', () => ({
     }),
   },
 }));
+
 import { Application } from 'express';
 
 import recordWarrantReturnRoutes from '@routes/recordWarrantReturn';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { EvictionOutcome, EvictionSuccessfulReturnName, WarrantReturnType } from '@utils/warrantReturn';
 
 type RouteHandler = (req: Request, res: Response, next: jest.Mock) => Promise<void> | void;
 
