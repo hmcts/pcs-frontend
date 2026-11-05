@@ -211,7 +211,7 @@ export function formatDefendants(ccdCase: CcdCaseData): string {
 }
 
 export function formatClaimants(ccdCase: CcdCaseData): string {
-  const allClaimants: CcdCollectionItem<CcdParty>[] | undefined = ccdCase.allDefendants;
+  const allClaimants: CcdCollectionItem<CcdParty>[] | undefined = ccdCase.allClaimants;
   if (allClaimants === undefined) {
     return '';
   }
