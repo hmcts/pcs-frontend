@@ -1,7 +1,7 @@
 import { buildFooterModel } from '@hmcts-cft/cft-ui-component-lib';
 import { Application, Request, Response } from 'express';
 
-import { RECORD_WARRANT_REVIEW_ROUTE } from '../constants/caseRoutes';
+import { RECORD_WARRANT_RETURN_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
 
 import { CcdCaseData } from '@services/ccdCase.interface';
@@ -48,7 +48,7 @@ const FINAL_OUTCOME_ERROR_MESSAGE: string = 'Final outcome is required';
 const ADDITIONAL_DETAILS_ERROR_MESSAGE: string = 'Additional details is required';
 
 function route(page: Page): string {
-  return `${RECORD_WARRANT_REVIEW_ROUTE}${PAGES[page]}`;
+  return `${RECORD_WARRANT_RETURN_ROUTE}${PAGES[page]}`;
 }
 
 function pageUrl(caseReference: string, page: Page): string {
@@ -195,11 +195,11 @@ function validateFinalWarrantReturn(req: Request, caseReference: string): Valida
   const finalOutcome: EvictionOutcome = req.query.finalOutcome as EvictionOutcome;
   switch (finalOutcome) {
     case EvictionOutcome.SUCCESSFUL:
-      errors.concat(validateEvictionSuccessful(req, caseReference));
+      errors.push(...validateEvictionSuccessful(req, caseReference));
       break;
     case EvictionOutcome.UNSUCCESSFUL:
     case EvictionOutcome.CANCELLED:
-      errors.concat(validateEvictionUnsuccessful(req, caseReference, finalOutcome));
+      errors.push(...validateEvictionUnsuccessful(req, caseReference, finalOutcome));
       break;
     default:
       errors.push({
@@ -250,7 +250,7 @@ function validateEvictionUnsuccessful(
     });
   }
 
-  if (isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName)) {
+  if (isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName) && !req.body.additionalDetails) {
     errors.push({
       id: 'additional-details-mandatory',
       message: ADDITIONAL_DETAILS_ERROR_MESSAGE,
@@ -280,7 +280,7 @@ function validateInterimWarrantReturn(req: Request, caseReference: string): Vali
     });
   }
 
-  if (isAdditionalDetailsMandatoryInterim(returnName)) {
+  if (isAdditionalDetailsMandatoryInterim(returnName) && !req.body.additionalDetails) {
     errors.push({
       id: 'additional-details-mandatory',
       message: ADDITIONAL_DETAILS_ERROR_MESSAGE,

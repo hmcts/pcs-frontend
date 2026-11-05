@@ -33,4 +33,4 @@ export const MAKE_ORDER_SENT_FOR_REVIEW_ROUTE = `${MAKE_ORDER_ROUTE}/sent-for-re
 
 export const CONFIRM_ORDER_REVIEW_ROUTE = '/case/:caseReference/confirm-order-review';
 
-export const RECORD_WARRANT_REVIEW_ROUTE = '/case/:caseReference/record-warrant-review';
+export const RECORD_WARRANT_RETURN_ROUTE = '/case/:caseReference/record-warrant-return';
