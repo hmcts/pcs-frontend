@@ -7,6 +7,7 @@ import { oidcMiddleware } from '../middleware';
 import { Logger } from '@modules/logger';
 import { CcdCaseData } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import { formatAddress } from '@utils/ccdDashboardUtils';
 import {
   EvictionOutcome,
   EvictionSuccessfulReturnName,
@@ -32,7 +33,6 @@ import {
   mapXuiValidation,
   refusedXUIEvent,
 } from '@utils/xuiUtils';
-import { formatAddress } from '@utils/ccdDashboardUtils';
 
 const RECORD_WARRANT_RETURN_EVENT_ID: string = 'ext:recordWarrantReturn';
 
