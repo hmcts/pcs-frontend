@@ -187,7 +187,7 @@ test.afterEach(async () => {
   clearErrorMessageValidationFailures();
 });
 
-test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @nightly @EMV', () => {
+test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @EMV', () => {
   test('ErrMsg - NonRentArrears - AssuredTenancy - LR @smoke @nonRent @LR', async () => {
     await softErrorMessageValidation('selectDefendant', selectDefendantErrorValidation);
     const pin2User = await getPinUserAt(1);
