@@ -121,7 +121,7 @@ az login            # if not already logged in
 az acr login --name hmctsprod
 ```
 
-You only need to do this once per Azure CLI session.
+You only need to do this once per Azure CLI session. @@@
 
 Create docker image:
 
