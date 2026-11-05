@@ -8,7 +8,7 @@ import { oidcMiddleware } from '../middleware/oidc';
 import { forgetYourSupportOrigin } from '../steps/respond-to-claim/yourSupportSection';
 import { getUserType } from '../steps/utils';
 
-import { getTranslationFunction } from '@modules/i18n';
+import { getRequestLanguage, getTranslationFunction } from '@modules/i18n';
 import { Logger } from '@modules/logger';
 import { ccdCaseService } from '@services/ccdCaseService';
 import type { DashboardTaskGroup } from '@services/dashboard.interface';
@@ -193,7 +193,8 @@ export default function dashboardRoutes(app: Application): void {
             t,
             n.templateId,
             n.templateValues as Record<string, unknown>,
-            caseReference
+            caseReference,
+            getRequestLanguage(req)
           );
           if (!resolved) {
             logger.warn(`No dashboard translation for notification templateId=${n.templateId}`);

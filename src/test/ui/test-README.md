@@ -135,6 +135,7 @@ await performValidationGroup(
 - IDAM_SYSTEM_PASSWORD
 - IDAM_SYSTEM_USERNAME
 - IDAM_PCS_USER_PASSWORD
+- PCS_LOCAL_AUTH_AUTOMATION_UID
 - PCS_API_CHANGE_ID
 - DATA_STORE_URL_BASE
 - PCS_API_URL
@@ -216,7 +217,7 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 ### Nightly (Jenkinsfile_nightly)
 
-- **Runs:** `yarn test:E2e` for each selected browser/device stage.
+- **Runs:** `yarn test:EndToEnd` for each selected browser/device stage.
 - **Tag/scope logic:** `PLAYWRIGHT_GREP_TAG` maps to `E2E_TEST_SCOPE` (`@nightly`, `@smoke`, `@e2e`, `@regression`, or `@healthCheck`).
 - **Spec logic:** `PLAYWRIGHT_SPEC` maps to `E2E_SPEC` (path filter, case-sensitive).
 - **Defaults:** Chrome is enabled by default; other platforms are optional.

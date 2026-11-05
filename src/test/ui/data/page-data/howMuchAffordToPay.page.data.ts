@@ -1,7 +1,7 @@
 export const howMuchAffordToPay = {
   mainHeader: `Instalments`,
   howMuchCouldYouAffordToPayTextLabel: `How much could you afford to pay in addition to the current rent?`,
-  forExampleHintText: `For example, £148.00 or £148.50`,
+  forExampleHintText: `For example, £148 or £148.50`,
   howFrequentlyCouldYouAffordToPayQuestion: `How frequently could you afford to pay this amount?`,
   weeklyRadioOption: `Weekly`,
   every2WeeksRadioOption: `Every 2 weeks`,
@@ -18,7 +18,7 @@ export const howMuchAffordToPay = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   enterHowMuchYouCouldAffordErrorMessage: `Enter how much you could afford to pay in addition to the current rent`,
   selectHowFrequentlyYouCouldAffordErrorMessage: `Select how frequently you could afford to pay this amount`,
-  enterAmountInTheCorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148.00 or 148.50`,
+  enterAmountInTheCorrectFormatErrorMessage: `Enter an amount in the correct format, for example 148 or 148.50`,
   mustBeLessThanBillionErrorMessage: `The amount you could afford to pay in addition to the current rent must be less than £1 billion`,
   negativeValueErrorMessage: `The amount you could afford to pay in addition to the current rent must be £0.00 or above`,
   feedbackLink: `feedback (opens in new tab)`,

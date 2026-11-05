@@ -1,6 +1,6 @@
 {
   "pageTitle": "Your postal address",
-  "legend": "Is your postal address {{ formattedAddressStr }}",
+  "legend": "Is your postal address {{ formattedAddressStr }}?",
   "legend.hint": "This is the address provided by {{claimantName}}",
   "labels": {
     "yes": "Yes",

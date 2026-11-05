@@ -2,7 +2,7 @@
 
 properties([
   // H allow predefined but random minute see https://en.wikipedia.org/wiki/Cron#Non-standard_characters
-  pipelineTriggers([cron('H 07 * * 1-5')]),
+  pipelineTriggers([cron('H 07 * * 1-5\n45 10 * * 4')]),
   parameters([
     text(
       name: 'MANUAL_BUILD_REASON',
@@ -102,7 +102,7 @@ properties([
   ])
 ])
 
-@Library("Infrastructure@2.10.1")
+@Library("Infrastructure@2.13.5")
 
 def type = "nodejs"
 def product = "pcs"
@@ -122,7 +122,7 @@ def pcsE2eVaultSecrets = [
   secret('pcs-frontend-idam-secret', 'PCS_FRONTEND_IDAM_SECRET'),
   secret('idam-pcs-user-password', 'IDAM_PCS_USER_PASSWORD'),
   secret('idam-pcs-user-password-b64', 'IDAM_PCS_USER_PASSWORD_B64'),
-  secret('pcs-solicitor-automation-uid', 'PCS_SOLICITOR_AUTOMATION_UID'),
+  secret('pcs-local-auth-automation-uid', 'PCS_LOCAL_AUTH_AUTOMATION_UID'),
   secret('pcs-api-idam-secret', 'PCS_API_IDAM_SECRET'),
   secret('launchdarkly-sdk-key', 'LAUNCHDARKLY_SDK_KEY'),
 ]
@@ -134,16 +134,27 @@ withNightlyPipeline(type, product, component) {
   loadVaultSecrets(["pcs-${env.ENVIRONMENT}": pcsE2eVaultSecrets])
   setFunctionalTestEnvVars()
   enableFortifyScan()
+  enableE2eTest()
   def sauceSuites = selectedSauceSuites()
   if (!sauceSuites.isEmpty()) {
     env.SAUCE_SUITE_NAMES = sauceSuites.join(' ')
     enableCrossBrowserTest()
   }
 
+  afterAlways('E2eTest') {
+    if (isWeeklyEmvSchedule()) {
+      env.E2E_TEST_SCOPE = '@EMV'
+      runE2eStage(yarnBuilder, 'chrome', 'Chrome', 'Weekly @EMV')
+    } else {
+      runE2ETests(yarnBuilder)
+    }
+  }
+
   afterAlways('fortify-scan') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'
-    runE2ETests(yarnBuilder)
+
   }
+
 }
 
 def selectedSauceSuites() {
@@ -214,7 +225,7 @@ def runE2eStage(yarnBuilder, String playwrightProject, String browser, String st
       sh 'rm -rf allure-results allure-report'
       catchError(buildResult: 'UNSTABLE', stageResult: 'FAILURE') {
         withEnv(["PLAYWRIGHT_PROJECT=${playwrightProject}"]) {
-          yarnBuilder.yarn('test:E2e')
+          yarnBuilder.yarn('test:EndToEnd')
         }
       }
       publishHTML([
@@ -244,4 +255,19 @@ def sendAllureReportToSlack(String browser, String reportSuffix) {
   } catch (Exception e) {
     echo "WARNING: Slack notification failed: ${e.message}"
   }
+}
+
+def isWeeklyEmvSchedule() {
+  def byTimer = !currentBuild.getBuildCauses(
+    'hudson.triggers.TimerTrigger$TimerTriggerCause'
+  ).isEmpty()
+
+  def cal = Calendar.getInstance()
+  cal.setTime(new Date(currentBuild.startTimeInMillis))
+
+  return byTimer &&
+    cal.get(Calendar.DAY_OF_WEEK) == Calendar.THURSDAY &&
+    cal.get(Calendar.HOUR_OF_DAY) == 10 &&
+    cal.get(Calendar.MINUTE) >= 45 &&
+    cal.get(Calendar.MINUTE) < 55
 }

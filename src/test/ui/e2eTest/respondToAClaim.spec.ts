@@ -398,7 +398,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       regularIncomeOptions: [
         [
           whatRegularIncomeDoYouReceive.universalCreditParagraph,
-          whatRegularIncomeDoYouReceive.universalCreditTextInput,
+          whatRegularIncomeDoYouReceive.universalCreditWithoutPenceTextInput,
           whatRegularIncomeDoYouReceive.monthHiddenRadioOption,
         ],
       ],
@@ -417,12 +417,12 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       regularIncomeOptions: [
         [
           whatOtherRegularExpensesDoYouHave.groceryShoppingParagraph,
-          whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.groceryShoppingTotalAmountTextInput,
           whatOtherRegularExpensesDoYouHave.groceryShoppingWeekHiddenRadioOption,
         ],
         [
           whatOtherRegularExpensesDoYouHave.loanPaymentsParagraph,
-          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountInput,
+          whatOtherRegularExpensesDoYouHave.loanPaymentsTotalAmountTextInput,
           whatOtherRegularExpensesDoYouHave.loanPaymentsMonthHiddenRadioOption,
         ],
       ],
@@ -1571,7 +1571,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     });
     await performAction('rentArrears', {
       option: rentArrears.noRadioOption,
-      rentAmount: rentArrears.rentAmountTextInput,
+      rentAmount: rentArrears.incorrectFormatTextInput,
     });
     await performAction('selectCounterClaim', {
       option: counterClaim.yesRadioOption,
@@ -1583,12 +1583,13 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('counterClaimSpecificSumOfMoney', {
       question: counterClaimSpecificSumOfMoney.mainHeader,
       option: counterClaimSpecificSumOfMoney.yesRadioOption,
-      amount: counterClaimSpecificSumOfMoney.claimInput,
+      // amount: counterClaimSpecificSumOfMoney.claimInput,
+      amount: counterClaimSpecificSumOfMoney.claimInputText,
     });
     await performAction('selectCounterClaimFee', {
       radioOption: counterClaimFee.iDoNotNeedHelpRadioOption,
       typeOfClaim: counterClaimWhatAreYouClaimingFor.sumOfMoneyOrCompensationRadioOption,
-      amount: counterClaimSpecificSumOfMoney.claimInput,
+      amount: counterClaimSpecificSumOfMoney.claimInputText,
     });
     const pin2User = await getPinUserAt(1);
     await performAction('selectClaimAgainstWhom', {
@@ -1663,8 +1664,8 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
       option: priorityDebts.yesRadioOption,
     });
     await performAction('enterPriorityDebtDetails', {
-      totalAmount: priorityDebtDetails.totalAmountTextInput,
-      payAmount: priorityDebtDetails.amountYouPayTextInput,
+      totalAmount: priorityDebtDetails.DebtTotalAmountWithoutPenceTextInput,
+      payAmount: priorityDebtDetails.AmountYouPayWithoutPenceTextInput,
       question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetails.weekRadioOption,
     });

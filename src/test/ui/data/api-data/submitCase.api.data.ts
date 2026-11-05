@@ -1,3 +1,5 @@
+import { testDocument } from '../../utils/common/uploadDocument.utils';
+
 export const submitCaseApiData = {
   submitCaseEventName: 'resumePossessionClaim',
   //Introductory and Demoted tenancy with Tenancy Licence date known for Rent arrears only
@@ -92,9 +94,7 @@ export const submitCaseApiData = {
       tenancy_TenancyLicenceDocuments: [
         {
           value: {
-            document_url: `${process.env.DM_STORE_URL}/documents/01bff0de-53a4-4883-ac6b-a34cbf12a9f9`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/01bff0de-53a4-4883-ac6b-a34cbf12a9f9/binary`,
-            document_filename: 'tenancyLicenceDocuments.pdf',
+            ...testDocument('tenancyLicenceDocuments.pdf'),
           },
         },
       ],
@@ -112,9 +112,7 @@ export const submitCaseApiData = {
       rentArrears_StatementDocuments: [
         {
           value: {
-            document_url: `${process.env.DM_STORE_URL}/documents/98864bc5-edd5-4773-ac98-284ad0a74392`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/98864bc5-edd5-4773-ac98-284ad0a74392/binary`,
-            document_filename: 'RentArrearsStatement.pdf',
+            ...testDocument('RentArrearsStatement.pdf'),
           },
         },
       ],
@@ -125,9 +123,7 @@ export const submitCaseApiData = {
       notice_Documents: [
         {
           value: {
-            document_url: `${process.env.DM_STORE_URL}/documents/b73212c2-1133-4953-9f41-fa40c53112de`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/b73212c2-1133-4953-9f41-fa40c53112de/binary`,
-            document_filename: 'rentArrears.pdf',
+            ...testDocument('rentArrears.pdf'),
           },
         },
       ],
@@ -160,9 +156,7 @@ export const submitCaseApiData = {
             },
             description: 'Witness Document',
             document: {
-              document_url: `${process.env.DM_STORE_URL}/documents/92d43d06-eeae-4040-a701-cab327ff51f4`,
-              document_binary_url: `${process.env.DM_STORE_URL}/documents/92d43d06-eeae-4040-a701-cab327ff51f4/binary`,
-              document_filename: 'WitnessStatement.png',
+              ...testDocument('WitnessStatement.png'),
             },
           },
           id: '1dcfc731-e227-4ff6-8e9d-7cac99d3766b',
@@ -179,9 +173,7 @@ export const submitCaseApiData = {
             },
             description: 'Rent Document',
             document: {
-              document_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78`,
-              document_binary_url: `${process.env.DM_STORE_URL}/documents/7bcfc112-fe5a-49b7-81dc-807bfa0ffd78/binary`,
-              document_filename: 'RentStatement.pdf',
+              ...testDocument('RentStatement.pdf'),
             },
           },
           id: '900165ec-9475-40ab-b9af-e1aa00ae03fb',
@@ -198,9 +190,7 @@ export const submitCaseApiData = {
             },
             description: 'Notice Document',
             document: {
-              document_url: `${process.env.DM_STORE_URL}/documents/1fd71cc5-9a91-4d86-85b8-652636cb9b88`,
-              document_binary_url: `${process.env.DM_STORE_URL}/documents/1fd71cc5-9a91-4d86-85b8-652636cb9b88/binary`,
-              document_filename: 'NoticeServiceJurisdiction.docx',
+              ...testDocument('NoticeServiceJurisdiction.docx'),
             },
           },
           id: '6bb963c4-c8d5-4f5e-9559-3cf414cb6483',
@@ -217,9 +207,7 @@ export const submitCaseApiData = {
             },
             description: 'Certificate of Suitability',
             document: {
-              document_url: `${process.env.DM_STORE_URL}/documents/5a5ecc30-321d-4a86-8487-059ff04ec480`,
-              document_binary_url: `${process.env.DM_STORE_URL}/documents/5a5ecc30-321d-4a86-8487-059ff04ec480/binary`,
-              document_filename: 'CertificateOfSuitability.xlsx',
+              ...testDocument('CertificateOfSuitability.xlsx'),
             },
           },
           id: '6b38e3e8-eae8-442f-9355-ca5e479c45e4',
@@ -236,9 +224,7 @@ export const submitCaseApiData = {
             },
             description: 'Other Document',
             document: {
-              document_url: `${process.env.DM_STORE_URL}/documents/eb94cf9d-2f5f-4f9e-9744-d734ec358652`,
-              document_binary_url: `${process.env.DM_STORE_URL}/documents/eb94cf9d-2f5f-4f9e-9744-d734ec358652/binary`,
-              document_filename: 'OtherDocument.png',
+              ...testDocument('OtherDocument.png'),
             },
           },
           id: '4a9c9596-8ffa-43dc-b284-558c1d70a449',
@@ -621,9 +607,7 @@ export const submitCaseApiData = {
         {
           id: 'ecabebc6-2fc0-46a6-9bf0-f2e7aa17b0e4',
           value: {
-            document_filename: 'tenancyAgreement.pdf',
-            document_url: `${process.env.DM_STORE_URL}/documents/3a5f6cba-2ecd-4960-8859-22f2118da0bf`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/3a5f6cba-2ecd-4960-8859-22f2118da0bf/binary`,
+            ...testDocument('tentency.pdf'),
           },
         },
       ],
@@ -643,9 +627,7 @@ export const submitCaseApiData = {
       notice_Documents: [
         {
           value: {
-            document_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/f7d17c90-ebea-450f-a7c7-c9c76c1e9503/binary`,
-            document_filename: 'rentArrears.pdf',
+            ...testDocument('rentArrears.pdf'),
           },
         },
       ],
@@ -1046,9 +1028,7 @@ export const submitCaseApiData = {
       rentArrears_StatementDocuments: [
         {
           value: {
-            document_url: `${process.env.DM_STORE_URL}/documents/60de46a0-7e5c-4e87-8b74-dc7b498e9a07`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/60de46a0-7e5c-4e87-8b74-dc7b498e9a07/binary`,
-            document_filename: 'Screenshot 2026-06-24 at 13.54.56.png',
+            ...testDocument('RentArrearsStatement.pdf'),
           },
         },
       ],
@@ -1160,9 +1140,7 @@ export const submitCaseApiData = {
       rentArrears_StatementDocuments: [
         {
           value: {
-            document_url: `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f`,
-            document_binary_url: `${process.env.DM_STORE_URL}/documents/ff027141-0cd0-4dd9-a0f6-5503d3266e2f/binary`,
-            document_filename: 'Screenshot 2026-06-23 at 10.40.44.png',
+            ...testDocument('RentArrearsStatement.pdf'),
           },
         },
       ],
@@ -1283,11 +1261,7 @@ export const submitCaseApiData = {
       rentArrears_StatementDocuments: [
         {
           value: {
-            document_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/94bdbbe5-44fa-442d-8109-627af191f2d8',
-            document_binary_url:
-              'http://dm-store-aat.service.core-compute-aat.internal/documents/94bdbbe5-44fa-442d-8109-627af191f2d8/binary',
-            document_filename: 'Screenshot 2026-08-05 at 15.54.17.png',
+            ...testDocument('RentArrearsStatement.pdf'),
           },
         },
       ],

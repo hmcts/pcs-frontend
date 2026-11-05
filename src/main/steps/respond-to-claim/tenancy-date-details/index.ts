@@ -6,8 +6,10 @@ import { formatDatePartsToISODate, fromYesNoNotSureEnum, toYesNoNotSureEnum } fr
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
+import { getRequestLanguage } from '@modules/i18n';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import type { CcdCaseData } from '@services/ccdCase.interface';
+import { formatLocalisedDate } from '@utils/formatLocalisedDate';
 
 function getTenancyStartDate(caseData: CcdCaseData | undefined): string | undefined {
   return caseData?.tenancy_TenancyLicenceDate ?? caseData?.licenceStartDate;
@@ -119,8 +121,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const claimantName = claimantNameFromValidatedCase || claimantNameFromSession;
     const existingStartDate = getTenancyStartDate(caseData);
 
-    // Format tenancy date with ordinal
-    const tenancyStartDate = existingStartDate ? format(parseISO(existingStartDate), 'do LLLL yyyy') : undefined;
+    const tenancyStartDate = existingStartDate
+      ? (formatLocalisedDate(existingStartDate, getRequestLanguage(req), 'ordinal') ?? existingStartDate)
+      : undefined;
 
     const t = getTranslationFunction(req);
     const bulletPoint = t('bulletPoint', { returnObjects: true, tenancyStartDate });

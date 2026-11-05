@@ -5,5 +5,9 @@
   "paragraph2": "Bydd yr hawlydd yn gallu gweld y ffeiliau hyn.",
   "errors": {
     "counterClaimWantToUploadFiles": "Dewiswch os ydych eisiau uwchlwytho ffeiliau i gefnogi eich gwrth-hawliad"
+  },
+  "options": {
+    "yes": "Ydw",
+    "no": "Nac ydw"
   }
 }
