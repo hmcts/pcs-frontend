@@ -294,6 +294,12 @@ const KEY_DRIFT_ALLOWLIST = new Set([
   'uploadAdditionalDocuments/checkYourAnswers.json',
 ]);
 
+/**
+ * Files written ahead of their Welsh, holding a "cy" marker on every value. Their pages stay in English until the
+ * translation replaces them all. Must only ever shrink.
+ */
+const AWAITING_TRANSLATION = new Set<string>([]);
+
 type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
 
 const jsonFiles = (dir: string): string[] =>
@@ -347,7 +353,8 @@ describe('en/cy locale parity', () => {
     });
 
     it('has no untranslated "cy" markers', () => {
-      const untranslated = pairs
+      const awaiting = AWAITING_TRANSLATION.has(file);
+      const untranslated = (awaiting ? [] : pairs)
         .filter(([, value]) => value.trim() !== '')
         .filter(([key]) => PLACEHOLDER.test(cy[key] as string))
         .map(([key]) => `${file}::${key}`)
