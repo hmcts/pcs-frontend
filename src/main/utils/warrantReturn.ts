@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { normalizeYesNoValue } from '../steps/utils';
+import { normalizeYesNoValue } from '../steps/utils/normalizeYesNoValue';
 
 import { CcdCaseData, CcdCollectionItem, CcdParty } from '@services/ccdCase.interface';
 
