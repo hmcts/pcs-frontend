@@ -1,4 +1,4 @@
-import { penceToPounds, poundsToPence } from '../../../../main/steps/utils/currencyConversion';
+import { penceToPounds, poundsToPence, strictPoundsToPence } from '../../../../main/steps/utils/currencyConversion';
 
 describe('currencyConversion', () => {
   describe('penceToPounds', () => {
@@ -126,5 +126,24 @@ describe('currencyConversion', () => {
       const backToPounds = penceToPounds(pence as string);
       expect(backToPounds).toBe('1234.56'); // Commas removed but value preserved
     });
+  });
+});
+
+describe('strictPoundsToPence', () => {
+  it.each([
+    ['148.50', '14850'],
+    ['£1,250.5', '125050'],
+    ['  1000 ', '100000'],
+    ['0', '0'],
+  ])('reads %p as %p pence', (pounds, pence) => {
+    expect(strictPoundsToPence(pounds)).toBe(pence);
+  });
+
+  it.each(['12abc', '1.234', '-5', '', 'lots', undefined])('refuses %p', value => {
+    expect(strictPoundsToPence(value)).toBeUndefined();
+  });
+
+  it('leaves the lenient conversion respond to a claim uses as it was', () => {
+    expect(poundsToPence('12abc')).toBe('1200');
   });
 });

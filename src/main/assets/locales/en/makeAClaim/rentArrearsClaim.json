@@ -1,0 +1,8 @@
+{
+  "pageTitle": "Are you claiming possession because you’re owed rent?",
+  "question": "Are you claiming possession because you’re owed rent?",
+  "hint": "This is known as ‘rent arrears’",
+  "errors": {
+    "hasRentArrearsGrounds": "Select whether you’re claiming possession because you’re owed rent"
+  }
+}

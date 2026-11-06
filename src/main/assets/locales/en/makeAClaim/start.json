@@ -1,0 +1,18 @@
+{
+  "pageTitle": "Make a property possession claim online",
+  "heading": "Make a property possession claim online",
+  "paragraphs": [
+    "It costs £404 to make a claim. You can pay using a debit or credit card.",
+    "If you’re on a low income, have limited savings or are claiming benefits, you may be able to get help with your fee. <a class=\"govuk-link\" href=\"https://www.gov.uk/get-help-with-court-fees\" target=\"_blank\" rel=\"noopener noreferrer\">Check if you can get help with fees (opens in new tab)</a>."
+  ],
+  "eligibilityHeading": "Before you start",
+  "eligibilityIntro": "You can use this service if:",
+  "bullets": ["you’re a private landlord", "you’re claiming possession of a property in England", "you’re 18 or over"],
+  "afterBullets": [
+    "We’ll ask some questions to check you’re eligible to use this service.",
+    "You cannot take court action to repossess a property if you’re told that someone is temporarily protected from creditors through the ‘Breathing Space’ scheme. Find out <a class=\"govuk-link\" href=\"https://www.gov.uk/guidance/debt-respite-breathing-space-scheme-creditors-responsibilities-to-the-court\" target=\"_blank\" rel=\"noopener noreferrer\">what to do when someone is using the ‘Breathing Space’ scheme (opens in new tab)</a>."
+  ],
+  "afterClaimHeading": "What will happen after your claim is made",
+  "afterClaimText": "A court hearing will be scheduled where a judge will decide whether to grant possession.",
+  "startButton": "Start now"
+}

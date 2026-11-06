@@ -1,0 +1,11 @@
+{% extends "make-a-claim/templates/layout.njk" %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
+
+{% block mainContent %}
+  {{ govukPanel({ titleText: panelTitle, html: panelText }) }}
+  <h2 class="govuk-heading-m">{{ whatHappensNextHeading }}</h2>
+  {% for paragraph in whatHappensNext %}
+    <p class="govuk-body">{{ paragraph }}</p>
+  {% endfor %}
+  <p class="govuk-body"><a class="govuk-link" href="{{ feedbackUrl }}" target="_blank" rel="noopener noreferrer">{{ feedbackLink }}</a></p>
+{% endblock %}

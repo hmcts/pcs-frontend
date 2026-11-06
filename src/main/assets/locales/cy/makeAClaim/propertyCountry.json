@@ -1,0 +1,12 @@
+{
+  "pageTitle": "cyIs the property in England or Wales?",
+  "question": "cyIs the property in England or Wales?",
+  "hint": "cyThe postcode you gave covers an area on both sides of the border",
+  "options": {
+    "England": "cyEngland",
+    "Wales": "cyWales"
+  },
+  "errors": {
+    "legislativeCountry": "cySelect whether the property is in England or Wales"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "pageTitle": "Notice details",
+  "heading": "Notice details",
+  "paragraphs": [
+    "You will now be asked about the notice you served to the defendants. A notice is a formal communication telling the defendants that you intend to repossess the property, like form 3A.",
+    "You will be asked:"
+  ],
+  "bullets": ["if you served notice", "how you served the notice", "the date you served the notice"],
+  "afterBullets": [
+    "You will also be asked to upload a copy of the notice.",
+    "The defendants will be able to see your answers and any documents you upload."
+  ]
+}

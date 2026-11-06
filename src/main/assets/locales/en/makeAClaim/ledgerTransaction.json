@@ -1,0 +1,41 @@
+{
+  "pageTitle": "Enter a rent statement transaction",
+  "heading": "Enter a rent statement transaction",
+  "paragraphs": [
+    "Add a date, type and amount for each transaction, starting with the oldest. You can also include a description or reference."
+  ],
+  "labels": {
+    "transactionDate": "Transaction date",
+    "transactionTypes": "What type of transaction was it?",
+    "amountCharged": "Amount charged",
+    "amountPaid": "Amount paid",
+    "description": "Description or reference (optional)"
+  },
+  "hints": {
+    "transactionDate": "For example, 27 3 2025",
+    "transactionTypes": "Select all that apply",
+    "description": "For example, ‘Rent charge for January 2025’"
+  },
+  "options": {
+    "RENT_CHARGE": "Rent charge",
+    "TENANT_PAYMENT": "Tenant payment"
+  },
+  "errors": {
+    "transactionTypes": "Select the type of transaction",
+    "amountCharged": "Enter the amount charged",
+    "amountChargedInvalid": "Enter the amount charged as an amount of money, like 500 or 500.50",
+    "amountPaid": "Enter the amount paid",
+    "amountPaidInvalid": "Enter the amount paid as an amount of money, like 500 or 500.50",
+    "date": {
+      "required": "Enter the transaction date",
+      "notRealDate": "The transaction date must be a real date",
+      "invalidValue": "The transaction date must be a real date",
+      "futureDate": "The transaction date must be today or in the past",
+      "missingOne": "The transaction date must include a {{missingField}}",
+      "missingTwo": "The transaction date must include a {{first}} and {{second}}",
+      "day": "Day",
+      "month": "Month",
+      "year": "Year"
+    }
+  }
+}

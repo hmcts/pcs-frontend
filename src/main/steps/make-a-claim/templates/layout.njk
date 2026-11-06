@@ -1,0 +1,13 @@
+{% extends "stepsTemplate.njk" %}
+
+{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+
+{% block serviceNavigation %}
+  {{ govukServiceNavigation({
+    serviceName: t('serviceName', 'Possession Claims'),
+    serviceUrl: "/claims" if signedIn else "/make-a-claim",
+    navigation: [{ text: t('logout', 'Sign out'), href: "/logout" }] if signedIn else [],
+    navigationLabel: t('navigationLabel', 'Service navigation'),
+    navigationClasses: "pcs-service-navigation-wrapper"
+  }) }}
+{% endblock %}

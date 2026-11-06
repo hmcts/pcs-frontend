@@ -1,0 +1,9 @@
+{
+  "pageTitle": "cyDefendant details",
+  "heading": "cyDefendant details",
+  "paragraphs": [
+    "cyYou will now be asked about the people you’re making the claim against. They will be known as the defendants.",
+    "cyYou must provide:"
+  ],
+  "bullets": ["cytheir name", "cytheir address for service (the address where they should receive post)"]
+}

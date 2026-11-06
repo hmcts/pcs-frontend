@@ -445,14 +445,59 @@ describe('ccdCaseService', () => {
     });
   });
 
-  describe('createCase', () => {
-    it('calls submitEvent with correct args', async () => {
+  describe('createPossessionClaim', () => {
+    const data = {
+      citizenPossessionClaim: {
+        propertyAddress: { AddressLine1: '1 High Street', PostTown: 'Luton', PostCode: 'LU1 1AB' },
+        eligibility: {
+          claimantType: 'PRIVATE_LANDLORD' as const,
+          isTrespass: 'NO' as const,
+          whoIsClaiming: 'MYSELF' as const,
+        },
+      },
+    };
+
+    it('starts and submits the citizen create event for the case type', async () => {
       mockGet.mockResolvedValue({ data: { token: 'event-token' } });
-      mockPost.mockResolvedValue({ data: { id: '999', data: { applicantForename: 'bar' } } });
+      mockPost.mockResolvedValue({ data: { id: '1777000000000001', data: {} } });
 
-      const result = await ccdCaseService.createCase(accessToken, { applicantForename: 'bar' });
+      const result = await ccdCaseService.createPossessionClaim(accessToken, data);
 
-      expect(result).toEqual({ id: '999', data: { applicantForename: 'bar' } });
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/case-types/PCS/event-triggers/citizenCreatePossessionClaim`,
+        expect.anything()
+      );
+      expect(mockPost).toHaveBeenCalledWith(
+        `${mockUrl}/case-types/PCS/cases`,
+        expect.objectContaining({
+          data,
+          event: expect.objectContaining({ id: 'citizenCreatePossessionClaim' }),
+          event_token: 'event-token',
+        }),
+        expect.anything()
+      );
+      expect(result).toEqual({ id: '1777000000000001', data: {} });
+    });
+
+    it('gives each call of the create a timeout', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
+      mockPost.mockResolvedValue({ data: { id: '1777000000000001', data: {} } });
+      await ccdCaseService.createPossessionClaim(accessToken, data);
+      expect(mockGet.mock.calls[0][1]).toMatchObject({ timeout: 30_000 });
+      expect(mockPost.mock.calls[0][2]).toMatchObject({ timeout: 30_000 });
+    });
+
+    it('reports pcs-api refusing the claim with its reasons', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
+      mockPost.mockRejectedValue({
+        message: 'Unprocessable',
+        response: { status: 422, data: { callbackErrors: ['PROPERTY_NOT_IN_ENGLAND'] } },
+      });
+
+      await expect(ccdCaseService.createPossessionClaim(accessToken, data)).rejects.toMatchObject({
+        reasons: ['PROPERTY_NOT_IN_ENGLAND'],
+        status: 422,
+      });
     });
   });
 

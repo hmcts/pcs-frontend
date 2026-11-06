@@ -13,6 +13,7 @@ import {
   formBodyMiddleware,
   judgeXuiRedirectMiddleware,
   legalRepresentativeAccessMiddleware,
+  makeAClaimPathsFeatureMiddleware,
   pageTrackingUrlMiddleware,
 } from './middleware';
 import * as modules from './modules';
@@ -55,6 +56,7 @@ app.use((req, res, next) => {
 app.use(pageTrackingUrlMiddleware);
 app.use(legalRepresentativeAccessMiddleware);
 app.use(judgeXuiRedirectMiddleware);
+app.use(makeAClaimPathsFeatureMiddleware);
 
 // param middleware for caseReference
 app.param('caseReference', caseReferenceParamMiddleware);

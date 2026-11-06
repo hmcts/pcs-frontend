@@ -1,0 +1,12 @@
+{
+  "pageTitle": "cyHave you served notice?",
+  "question": "cyHave you served notice?",
+  "hint": "cyA notice is a formal communication telling the defendants that you intend to repossess the property, like form 3A.",
+  "labels": {
+    "noNoticeReason": "cyWhy have you not served notice to the defendants?"
+  },
+  "errors": {
+    "noticeServed": "cySelect whether you have served notice",
+    "noNoticeReason": "cyExplain why you have not served notice"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "pageTitle": "Do you have any other grounds for possession?",
+  "question": "Do you have any other grounds for possession?",
+  "errors": {
+    "hasOtherGrounds": "Select whether you have any other grounds for possession"
+  }
+}

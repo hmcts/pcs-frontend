@@ -1,0 +1,10 @@
+{
+  "pageTitle": "Rent statement",
+  "heading": "Rent statement",
+  "paragraphs": [
+    "A rent statement has been created from the rent you told us about.",
+    "If a payment was made for a period, select ‘Add a payment’ in that row. If no payments were made, select ‘Save and continue’."
+  ],
+  "totalArrearsLabel": "Total arrears:",
+  "emptyTable": "There are no rent periods to show. Check the rent and the period the statement covers."
+}

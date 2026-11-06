@@ -1,0 +1,14 @@
+{
+  "pageTitle": "cyUpload the notice",
+  "heading": "cyUpload the notice",
+  "paragraphs": ["cyUpload a copy of the notice you served."],
+  "beforeUploadHeading": "cyBefore you upload your file",
+  "beforeUploadText": "cyGive your file a name that explains what it is. For example, ‘Notice for 15 Garden Drive’.",
+  "uploadLabel": "cyUpload a file",
+  "uploadButton": "cyUpload file",
+  "filesAddedHeading": "cyFiles added",
+  "deleteButton": "cyRemove",
+  "errors": {
+    "documents": "cyUpload the notice you served"
+  }
+}

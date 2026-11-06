@@ -1,0 +1,8 @@
+{
+  "pageTitle": "cyDo you want a money judgment for the outstanding rent arrears?",
+  "question": "cyDo you want the court to make a money judgment for the outstanding rent arrears?",
+  "hint": "cyA money judgment is a court order for the defendants to pay you the money you’re owed. It can be enforced in the same way as any County Court judgment.",
+  "errors": {
+    "moneyJudgmentWanted": "cySelect whether you want a money judgment"
+  }
+}

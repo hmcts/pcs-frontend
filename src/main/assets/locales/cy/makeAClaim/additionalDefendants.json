@@ -1,0 +1,9 @@
+{
+  "pageTitle": "cyDo you need to add another defendant?",
+  "listHeading": "cyDefendants you’ve added",
+  "question": "cyDo you need to add another defendant?",
+  "hint": "cyYou do not need to include anyone under the age of 18 living in the property.",
+  "errors": {
+    "additionalDefendants": "cySelect whether you need to add another defendant"
+  }
+}

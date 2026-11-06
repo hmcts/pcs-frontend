@@ -1,0 +1,46 @@
+{
+  "pageTitle": "How did you serve notice?",
+  "question": "How did you serve notice?",
+  "hint": "Select all that apply",
+  "options": {
+    "FIRST_CLASS_POST": "By first class post or a next business day delivery service",
+    "PERMITTED_PLACE": "By delivering it to or leaving it at a permitted place",
+    "PERSONALLY_HANDED": "By personally handing it to or leaving it with someone",
+    "EMAIL": "By email",
+    "OTHER_ELECTRONIC": "By another electronic method",
+    "OTHER": "Another way"
+  },
+  "labels": {
+    "postedDate": "When was the notice posted?",
+    "deliveredDate": "When was the notice delivered?",
+    "handedToName": "Who was the notice left with?",
+    "handedDate": "When was the notice handed over?",
+    "emailedTo": "What email address was the notice sent to?",
+    "emailedDate": "When was the email sent?",
+    "otherElectronicDetails": "How was the notice sent?",
+    "otherElectronicDate": "When was the notice sent?",
+    "otherMethodDetails": "How did you serve the notice?",
+    "otherMethodDate": "When was the notice served?"
+  },
+  "hints": {
+    "otherElectronicDetails": "For example, in a group text message"
+  },
+  "errors": {
+    "noticeMethods": "Select how you served notice",
+    "handedToName": "Enter who the notice was left with",
+    "emailedTo": "Enter the email address the notice was sent to",
+    "otherElectronicDetails": "Enter how the notice was sent",
+    "otherMethodDetails": "Enter how you served the notice",
+    "date": {
+      "required": "Enter the date",
+      "notRealDate": "The date must be a real date",
+      "invalidValue": "The date must be a real date",
+      "futureDate": "The date must be today or in the past",
+      "missingOne": "The date must include a {{missingField}}",
+      "missingTwo": "The date must include a {{first}} and {{second}}",
+      "day": "Day",
+      "month": "Month",
+      "year": "Year"
+    }
+  }
+}

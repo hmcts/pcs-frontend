@@ -1,0 +1,41 @@
+{
+  "pageTitle": "cyEnter a rent statement transaction",
+  "heading": "cyEnter a rent statement transaction",
+  "paragraphs": [
+    "cyAdd a date, type and amount for each transaction, starting with the oldest. You can also include a description or reference."
+  ],
+  "labels": {
+    "transactionDate": "cyTransaction date",
+    "transactionTypes": "cyWhat type of transaction was it?",
+    "amountCharged": "cyAmount charged",
+    "amountPaid": "cyAmount paid",
+    "description": "cyDescription or reference (optional)"
+  },
+  "hints": {
+    "transactionDate": "cyFor example, 27 3 2025",
+    "transactionTypes": "cySelect all that apply",
+    "description": "cyFor example, ‘Rent charge for January 2025’"
+  },
+  "options": {
+    "RENT_CHARGE": "cyRent charge",
+    "TENANT_PAYMENT": "cyTenant payment"
+  },
+  "errors": {
+    "transactionTypes": "cySelect the type of transaction",
+    "amountCharged": "cyEnter the amount charged",
+    "amountChargedInvalid": "cyEnter the amount charged as an amount of money, like 500 or 500.50",
+    "amountPaid": "cyEnter the amount paid",
+    "amountPaidInvalid": "cyEnter the amount paid as an amount of money, like 500 or 500.50",
+    "date": {
+      "required": "cyEnter the transaction date",
+      "notRealDate": "cyThe transaction date must be a real date",
+      "invalidValue": "cyThe transaction date must be a real date",
+      "futureDate": "cyThe transaction date must be today or in the past",
+      "missingOne": "cyThe transaction date must include a {{missingField}}",
+      "missingTwo": "cyThe transaction date must include a {{first}} and {{second}}",
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "pageTitle": "cyOther information about your reasons for possession",
+  "question": "cyIs there any other information you’d like to give about your reasons for possession?",
+  "labels": {
+    "otherReasonsDetail": "cyGive other information about your reasons for possession"
+  },
+  "errors": {
+    "hasOtherReasons": "cySelect whether there is any other information about your reasons for possession",
+    "otherReasonsDetail": "cyEnter the other information about your reasons for possession"
+  }
+}

@@ -1,0 +1,30 @@
+{% extends "make-a-claim/templates/layout.njk" %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-l">{{ propertyAddress }}</h1>
+  <p class="govuk-body-l">{{ caseNumberLabel }} {{ caseNumber }}</p>
+  <p class="govuk-body">{{ introText }}</p>
+
+  {% for group in groups %}
+    {% if group.items.length %}
+      <h2 class="govuk-heading-m">{{ group.number }}. {{ group.title }}</h2>
+      <ul class="govuk-task-list" id="task-list-{{ group.id }}">
+        {% for item in group.items %}
+          {% set statusId = group.id + '-' + loop.index + '-status' %}
+          <li class="govuk-task-list__item{% if item.href %} govuk-task-list__item--with-link{% endif %}">
+            <div class="govuk-task-list__name-and-hint">
+              {% if item.href %}
+                <a class="govuk-link govuk-task-list__link" href="{{ item.href }}" aria-describedby="{{ statusId }}">{{ item.title.text }}</a>
+              {% else %}
+                <div>{{ item.title.text }}</div>
+              {% endif %}
+            </div>
+            <div class="govuk-task-list__status" id="{{ statusId }}">
+              <strong class="govuk-tag{% if item.status.tag.classes %} {{ item.status.tag.classes }}{% endif %}">{{ item.status.tag.text }}</strong>
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endfor %}
+{% endblock %}

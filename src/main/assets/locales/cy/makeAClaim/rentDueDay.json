@@ -1,0 +1,9 @@
+{
+  "pageTitle": "cyWhich day of the month is rent due?",
+  "question": "cyWhich day of the month is rent due?",
+  "hint": "cyFor example, if rent is due on the 28th of each month, enter 28",
+  "errors": {
+    "rentDueDay": "cyEnter the day of the month the rent is due",
+    "rentDueDayInvalid": "cyEnter a day of the month from 1 to 31"
+  }
+}

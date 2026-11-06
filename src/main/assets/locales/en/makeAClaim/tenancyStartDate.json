@@ -1,0 +1,18 @@
+{
+  "pageTitle": "When did the tenancy or licence begin?",
+  "question": "When did the tenancy or licence begin?",
+  "hint": "For example, 27 9 2022",
+  "errors": {
+    "date": {
+      "required": "Enter the date the tenancy or licence began",
+      "notRealDate": "The date the tenancy or licence began must be a real date",
+      "invalidValue": "The date the tenancy or licence began must be a real date",
+      "futureDate": "The date the tenancy or licence began must be today or in the past",
+      "missingOne": "The date the tenancy or licence began must include a {{missingField}}",
+      "missingTwo": "The date the tenancy or licence began must include a {{first}} and {{second}}",
+      "day": "Day",
+      "month": "Month",
+      "year": "Year"
+    }
+  }
+}
