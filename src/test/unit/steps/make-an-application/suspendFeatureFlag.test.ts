@@ -16,7 +16,7 @@ const suspendConfig = suspendStep as unknown as FormBuilderConfig;
 
 function createReq(defendantGeneralApplicationsR2Enabled: boolean | undefined): Request {
   const flags: Record<string, boolean | undefined> = {
-    'cui-defendant-general-applications-r2': defendantGeneralApplicationsR2Enabled,
+    'cui-defendant-general-applications-r-2': defendantGeneralApplicationsR2Enabled,
   };
   return {
     app: {
