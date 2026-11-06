@@ -1,12 +1,47 @@
 {% extends "template.njk" %}
+{% from "govuk/components/service-navigation/macro.njk" import govukServiceNavigation %}
+{% from "macros/documentList.njk" import pcsDocumentList %}
 
+{% block serviceNavigation %}
+  {{ govukServiceNavigation({
+    serviceName: t('dashboard:serviceName'),
+    serviceUrl: "/claims",
+    navigation: [
+      {
+        text: t('logout', 'Log out'),
+        href: "/logout"
+      }
+    ],
+    navigationLabel: t('navigationLabel', 'Service navigation'),
+    navigationClasses: "pcs-service-navigation-wrapper"
+  }) }}
+{% endblock %}
 
 {% block pageTitle %}
-View orders and notices
+{{ t('dashboard:viewOrdersAndNotices.pageTitle') }}
 {% endblock %}
 
 {% block content %}
-  <h1 class="govuk-heading-l">View orders and notices</h1>
+  {% set submittedOnLabel = t('dashboard:viewOrdersAndNotices.submittedOn') %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h1 class="govuk-heading-l">{{ t('dashboard:viewOrdersAndNotices.pageTitle') }}</h1>
+      <p class="govuk-body-m">
+        {{ t('dashboard:caseReferenceLabel') }}
+        {{ caseReference | caseReferenceDisplay }}
+      </p>
+    </div>
 
+    <div class="govuk-grid-column-two-thirds">
+      {% if documentFolders | length > 0 %}
+        {% for folder in documentFolders %}
+          {{ pcsDocumentList(folder, caseReference, submittedOnLabel) }}
+        {% endfor %}
+      {% else %}
+        <p class="govuk-body">{{ t('dashboard:viewOrdersAndNotices.noDocuments') }}</p>
+      {% endif %}
+    </div>
 
+    <div class="govuk-grid-column-one-third"></div>
+  </div>
 {% endblock %}

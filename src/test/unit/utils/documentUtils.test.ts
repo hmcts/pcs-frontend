@@ -1,5 +1,10 @@
 import { formatCaseReferenceForDisplay } from '@utils/caseReference';
-import { extractCaseDocuments, extractViewDocumentFolders, findCaseDocumentById } from '@utils/documentUtils';
+import {
+  ORDERS_AND_NOTICES_FOLDER_KEYS,
+  extractCaseDocuments,
+  extractViewDocumentFolders,
+  findCaseDocumentById,
+} from '@utils/documentUtils';
 
 describe('documentUtils', () => {
   it('extracts documents only from supported categories', () => {
@@ -55,6 +60,95 @@ describe('documentUtils', () => {
             submittedOn: '2026-06-25',
           },
         ],
+      },
+    ]);
+  });
+
+  it('groups enforcement documents into the Enforcement folder for the orders and notices page', () => {
+    const folders = extractViewDocumentFolders(
+      {
+        allDocuments: [
+          {
+            id: '1',
+            value: {
+              document_filename: 'notice-of-eviction.pdf',
+              document_binary_url: 'http://doc-store/notice-of-eviction/binary',
+              category_id: 'enforcement',
+              upload_timestamp: '2026-07-01T09:00:00.000Z',
+            },
+          },
+          {
+            id: '2',
+            value: {
+              document_filename: 'claim-form.pdf',
+              document_binary_url: 'http://doc-store/claim-form/binary',
+              category_id: 'statementsOfCase',
+            },
+          },
+        ],
+      },
+      { folderKeys: ORDERS_AND_NOTICES_FOLDER_KEYS }
+    );
+
+    expect(folders).toEqual([
+      {
+        title: 'Enforcement',
+        documents: [{ id: '1', filename: 'notice-of-eviction.pdf', submittedOn: '2026-07-01T09:00:00.000Z' }],
+      },
+    ]);
+  });
+
+  it('uses the supplied Enforcement folder title', () => {
+    const folders = extractViewDocumentFolders(
+      {
+        allDocuments: [
+          {
+            id: '1',
+            value: {
+              document_filename: 'notice-of-eviction.pdf',
+              document_binary_url: 'http://doc-store/notice-of-eviction/binary',
+              category_id: 'enforcement',
+            },
+          },
+        ],
+      },
+      { folderKeys: ORDERS_AND_NOTICES_FOLDER_KEYS, folderTitles: { enforcement: 'Gorfodi' } }
+    );
+
+    expect(folders).toEqual([
+      {
+        title: 'Gorfodi',
+        documents: [{ id: '1', filename: 'notice-of-eviction.pdf', submittedOn: null }],
+      },
+    ]);
+  });
+
+  it('omits enforcement documents from the View documents folders', () => {
+    const folders = extractViewDocumentFolders({
+      allDocuments: [
+        {
+          id: '1',
+          value: {
+            document_filename: 'notice-of-eviction.pdf',
+            document_binary_url: 'http://doc-store/notice-of-eviction/binary',
+            category_id: 'enforcement',
+          },
+        },
+        {
+          id: '2',
+          value: {
+            document_filename: 'claim-form.pdf',
+            document_binary_url: 'http://doc-store/claim-form/binary',
+            category_id: 'statementsOfCase',
+          },
+        },
+      ],
+    });
+
+    expect(folders).toEqual([
+      {
+        title: 'Statements of case',
+        documents: [{ id: '2', filename: 'claim-form.pdf', submittedOn: null }],
       },
     ]);
   });

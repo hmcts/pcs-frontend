@@ -89,5 +89,13 @@
       "correspondence": "Correspondence",
       "uncategorisedDocuments": "Uncategorised"
     }
+  },
+  "viewOrdersAndNotices": {
+    "pageTitle": "View orders and notices",
+    "noDocuments": "There are no orders or notices to display.",
+    "submittedOn": "Submitted on",
+    "folders": {
+      "enforcement": "Enforcement"
+    }
   }
 }
