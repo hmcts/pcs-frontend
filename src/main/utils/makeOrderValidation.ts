@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
 
-import { MAX_MONEY, exceedsMaxMoney, parseDate, parseMoney, parseTime } from './makeOrderFormat';
+import { MAX_MONEY, exceedsMaxMoney, parseDate, parseMoney, parseTime, registryName } from './makeOrderFormat';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -10,8 +10,12 @@ export const MAKE_ORDER_TYPES = [
   'ADJOURNMENT',
   'STRIKE_OUT_DISMISSAL',
   'FREE_FORM',
+  'NO_ORDER_ON_CLAIM',
 ] as const;
 export type MakeOrderType = (typeof MAKE_ORDER_TYPES)[number];
+
+/** Order types the screen offers only at a hearing: the judges asked for no possession orders without one. */
+export const AT_HEARING_ORDER_TYPES: readonly MakeOrderType[] = ['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION'];
 
 export interface MakeOrderValidationIssue {
   id: string;
@@ -148,28 +152,33 @@ function validateCosts(formData: Record<string, unknown>, suspended: boolean): M
   return error ? [{ id, message: error }] : [];
 }
 
-function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+/** The arrears a suspension is conditional on and how they are paid, asked with ids that start with the prefix. */
+function validatePaymentConditions(formData: Record<string, unknown>, prefix: string): MakeOrderValidationIssue[] {
   const { issues, add, money, date, frequency } = validation(formData);
-  const terms = values(formData, 'suspended-payment-terms');
+  const terms = values(formData, `${prefix}-payment-terms`);
 
-  date('suspended-by-date', 'Enter a valid possession date');
-  money('suspended-arrears', 'Enter valid arrears');
+  money(`${prefix}-arrears`, 'Enter valid arrears');
   add(
     terms.includes('one-off') || terms.includes('instalments'),
-    'suspended-payment-terms',
+    `${prefix}-payment-terms`,
     'Select a one-off payment or instalments'
   );
   if (terms.includes('one-off')) {
-    money('suspended-oneoff-amount', 'Enter a valid one-off payment amount');
-    date('suspended-oneoff-date', 'Enter a valid one-off payment date');
+    money(`${prefix}-oneoff-amount`, 'Enter a valid one-off payment amount');
+    date(`${prefix}-oneoff-date`, 'Enter a valid one-off payment date');
   }
   if (terms.includes('instalments')) {
-    money('suspended-instalment-amount', 'Enter a valid instalment amount');
-    frequency('suspended-instalment-frequency', 'Select weekly, fortnightly or monthly instalments');
-    date('suspended-instalment-date', 'Enter a valid first instalment date');
+    money(`${prefix}-instalment-amount`, 'Enter a valid instalment amount');
+    frequency(`${prefix}-instalment-frequency`, 'Select weekly, fortnightly or monthly instalments');
+    date(`${prefix}-instalment-date`, 'Enter a valid first instalment date');
   }
+  return issues;
+}
 
-  return [...issues, ...validateCosts(formData, true)];
+function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const { issues, date } = validation(formData);
+  date('suspended-by-date', 'Enter a valid possession date');
+  return [...issues, ...validatePaymentConditions(formData, 'suspended'), ...validateCosts(formData, true)];
 }
 
 function validateOutright(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
@@ -237,6 +246,52 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
   return [...issues, ...validateCosts(formData, false)];
 }
 
+/** The listing questions the form asks with the prefix: the adjournment's, or a hearing listed without one. */
+function validateListing(
+  formData: Record<string, unknown>,
+  prefix: string,
+  dateMessage: string
+): MakeOrderValidationIssue[] {
+  const { issues, add, date } = validation(formData);
+  const when = value(formData, `${prefix}-when`) || 'next-list';
+  const hearingDate = `${prefix}-hearing-date-${when}`;
+  const directions = values(formData, `${prefix}-directions`);
+  date(hearingDate, dateMessage);
+  add(
+    /^\d+$/.test(value(formData, `${prefix}-time-estimate`)) && Number(value(formData, `${prefix}-time-estimate`)) > 0,
+    `${prefix}-time-estimate`,
+    'Enter the time estimate as a whole number'
+  );
+  add(
+    ['minutes', 'hours'].includes(value(formData, `${prefix}-time-estimate-unit`)),
+    `${prefix}-time-estimate-unit`,
+    'Select minutes or hours for the time estimate'
+  );
+  if (when === 'specific') {
+    const time = value(formData, `${prefix}-specific-time`);
+    if (!time) {
+      add(false, `${prefix}-specific-time`, 'Enter the time of hearing');
+    } else {
+      add(Boolean(parseTime(time)), `${prefix}-specific-time`, 'Enter a valid time of hearing, like 10:30am or 14:30');
+    }
+  }
+  if (directions.includes('defence')) {
+    date(`${prefix}-defence-date`, 'Enter a valid defence date');
+  }
+  if (directions.includes('counterclaim')) {
+    date(`${prefix}-counterclaim-date`, 'Enter a valid counterclaim date');
+  }
+  if (directions.includes('claimant-reply')) {
+    date(`${prefix}-claimant-reply-date`, 'Enter a valid counterclaim reply date');
+  }
+  add(
+    !(directions.includes('defence') && directions.includes('counterclaim')),
+    `${prefix}-directions`,
+    'Select either defence or defence and any counterclaim, not both'
+  );
+  return issues;
+}
+
 function validateAdjournment(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add, money, date, frequency } = validation(formData);
   const type = value(formData, 'adj-type');
@@ -247,42 +302,7 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
     'Select adjourned for further hearing or adjourned generally'
   );
   if (type === 'further-hearing') {
-    const when = value(formData, 'adj-when') || 'next-list';
-    const hearingDate = `adj-hearing-date-${when}`;
-    const directions = values(formData, 'adj-directions');
-    date(hearingDate, 'Enter a valid adjournment date');
-    add(
-      /^\d+$/.test(value(formData, 'adj-time-estimate')) && Number(value(formData, 'adj-time-estimate')) > 0,
-      'adj-time-estimate',
-      'Enter the time estimate as a whole number'
-    );
-    add(
-      ['minutes', 'hours'].includes(value(formData, 'adj-time-estimate-unit')),
-      'adj-time-estimate-unit',
-      'Select minutes or hours for the time estimate'
-    );
-    if (when === 'specific') {
-      const time = value(formData, 'adj-specific-time');
-      if (!time) {
-        add(false, 'adj-specific-time', 'Enter the time of hearing');
-      } else {
-        add(Boolean(parseTime(time)), 'adj-specific-time', 'Enter a valid time of hearing, like 10:30am or 14:30');
-      }
-    }
-    if (directions.includes('defence')) {
-      date('adj-defence-date', 'Enter a valid defence date');
-    }
-    if (directions.includes('counterclaim')) {
-      date('adj-counterclaim-date', 'Enter a valid counterclaim date');
-    }
-    if (directions.includes('claimant-reply')) {
-      date('adj-claimant-reply-date', 'Enter a valid counterclaim reply date');
-    }
-    add(
-      !(directions.includes('defence') && directions.includes('counterclaim')),
-      'adj-directions',
-      'Select either defence or defence and any counterclaim, not both'
-    );
+    issues.push(...validateListing(formData, 'adj', 'Enter a valid adjournment date'));
   }
   if (type === 'generally') {
     const conditions = values(formData, 'adj-gen');
@@ -313,7 +333,7 @@ function validateAdjournment(formData: Record<string, unknown>): MakeOrderValida
 
 function validateStrikeOut(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add } = validation(formData);
-  const subjects = values(formData, 'strike-subjects').filter(subject => subject !== 'none');
+  const subjects = values(formData, 'strike-subjects');
   add(subjects.length > 0, 'strike-subjects', 'Select what is struck out or dismissed');
   for (const subject of ['claim', 'counterclaim'].filter(chosen => subjects.includes(chosen))) {
     add(
@@ -339,6 +359,52 @@ function validateAttendance(formData: Record<string, unknown>, parties: readonly
       `${party.id}-name`,
       `Name for ${party.label} must be ${MAX_ATTENDANCE_NAME_LENGTH} characters or less`
     );
+  }
+  return issues;
+}
+
+export const APPLICATION_DECISIONS = ['none', 'grant', 'dismiss', 'strike-out', 'list', 'other'] as const;
+
+/** An open application the order can decide, whose answers start with `app-<id>`. */
+export interface ApplicationToDecide {
+  id: string;
+  reference: string;
+  warrantSuspension?: boolean;
+  /** The application the judge's task asked them to decide, which the order may not leave as it is. */
+  required?: boolean;
+}
+
+/** The prefix of an application's answers on the make order form. */
+export function applicationPrefix(application: { id: string }): string {
+  return `app-${application.id}`;
+}
+
+/**
+ * What the judge decides about each application, and what follows the decision: when the hearing is if they list
+ * it, and for an application to suspend the warrant of possession, the conditions if they grant it or when the
+ * eviction may go ahead if they dismiss it. The order may leave any application as it is but the one the judge's
+ * task asked them to decide.
+ */
+function validateApplications(
+  formData: Record<string, unknown>,
+  applications: readonly ApplicationToDecide[]
+): MakeOrderValidationIssue[] {
+  const { issues, add, date } = validation(formData);
+  for (const application of applications) {
+    const prefix = applicationPrefix(application);
+    const decision = value(formData, `${prefix}-decision`) || 'none';
+    const allowed =
+      (APPLICATION_DECISIONS as readonly string[]).includes(decision) && !(application.required && decision === 'none');
+    add(allowed, `${prefix}-decision`, `Select what you decide about application ${application.reference}`);
+    if (decision === 'list') {
+      issues.push(...validateListing(formData, `${prefix}-list`, 'Enter a valid hearing date'));
+    }
+    if (application.warrantSuspension && decision === 'grant') {
+      issues.push(...validatePaymentConditions(formData, `${prefix}-warrant`));
+    }
+    if (application.warrantSuspension && decision === 'dismiss') {
+      date(`${prefix}-eviction-date`, 'Enter a valid date the eviction may take place');
+    }
   }
   return issues;
 }
@@ -396,6 +462,32 @@ function validateStaffMessage(formData: Record<string, unknown>): MakeOrderValid
   return validateText(formData, 'staff-message-text', 'Staff message');
 }
 
+const MAX_REGISTRY_LENGTH = 60;
+
+/** Where enforcement of the possession order goes, when an order made without a hearing transfers it. */
+function validateEnforcementTransfer(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const { issues, add, maxLength } = validation(formData);
+  const court = value(formData, 'transfer-enforcement-court');
+  add(
+    ['kings-bench', 'district-registry'].includes(court),
+    'transfer-enforcement-court',
+    "Select King's Bench Division or a District Registry"
+  );
+  if (court === 'district-registry') {
+    // The order adds "District Registry" after the name, so that alone names no registry.
+    if (!registryName(value(formData, 'transfer-enforcement-registry'))) {
+      add(false, 'transfer-enforcement-registry', 'Enter the District Registry');
+    } else {
+      maxLength(
+        'transfer-enforcement-registry',
+        MAX_REGISTRY_LENGTH,
+        `District Registry must be ${MAX_REGISTRY_LENGTH} characters or less`
+      );
+    }
+  }
+  return issues;
+}
+
 /** The checks particular to one kind of order. A switch, so an order type from the request only reaches these. */
 function validateOrderType(orderType: MakeOrderType, formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   switch (orderType) {
@@ -408,6 +500,14 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
     case 'STRIKE_OUT_DISMISSAL':
       return validateStrikeOut(formData);
     case 'FREE_FORM':
+      return [
+        // Made without a hearing, a free form order can list one.
+        ...(values(formData, 'list-on-notice').includes('yes')
+          ? validateListing(formData, 'list', 'Enter a valid hearing date')
+          : []),
+        ...validateCosts(formData, false),
+      ];
+    case 'NO_ORDER_ON_CLAIM':
       return validateCosts(formData, false);
     default:
       throw new Error(`Unknown order type: ${orderType}`);
@@ -417,15 +517,23 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
 export function validateMakeOrder(
   orderType: MakeOrderType,
   formData: Record<string, unknown>,
-  parties: readonly AttendanceParty[]
+  parties: readonly AttendanceParty[],
+  withoutHearing = false,
+  applications: readonly ApplicationToDecide[] = []
 ): MakeOrderValidationIssue[] {
   const chosen = (name: string): boolean => values(formData, name).includes('yes');
+  if (withoutHearing && AT_HEARING_ORDER_TYPES.includes(orderType)) {
+    return [{ id: 'order-type', message: 'Select an order type made without a hearing' }];
+  }
   // In the order the page asks, so the error summary follows the page.
   return [
     ...validateHearingRecord(formData),
+    // No one attended an order made without a hearing, whose parties the caller leaves out.
     ...validateAttendance(formData, parties),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
+    ...(withoutHearing && chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
     ...validateOrderType(orderType, formData),
+    ...validateApplications(formData, applications),
     ...(chosen('staff-message') ? validateStaffMessage(formData) : []),
   ];
 }

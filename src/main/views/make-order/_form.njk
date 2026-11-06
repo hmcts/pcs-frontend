@@ -2,30 +2,100 @@
   The make order form and the order it generates, which a judge fills in to make an order and a
   caseworker may change before issuing it. The page's form wraps it, as #make-order-form.
 #}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% import "make-order/_compact.njk" as compact with context %}
 
 <input type="hidden" id="order-type" name="orderType" value="{{ draftOrderType }}">
 
-{# Only an order made for a hearing has the case's facts and the hearing's note. #}
-{% if hearing %}
+{% import "make-order/_application.njk" as applicationRow with context %}
+
+{#
+  One screen, whatever the order is for: the hearing's facts and who attended for an order made at a hearing, then
+  each open application the order may decide, then every order type for the claim. With an application open, the
+  claim's order types wait behind a tick box: the judges (22 October 2026) said an application is nearly always
+  decided without the claim being, so the judge chooses to order on it.
+#}
+{# Only the judge making an order for a hearing records its facts and note. #}
+{% if hearing.caseFacts %}
   {% include "make-order/_case-facts.njk" %}
 {% endif %}
-{% include "make-order/_attendance.njk" %}
+{% if not withoutHearing %}
+  {% include "make-order/_attendance.njk" %}
+{% endif %}
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Recitals</h2>
 
 {{ compact.reveal("recitals", "Recitals", compact.textarea("recitals-text", { label: "Recital paragraphs", optional: true })) }}
 
-<h2 class="govuk-heading-l govuk-!-margin-top-6">Order type</h2>
+{#
+  Made without a hearing, the order is not offered the possession tabs, but can transfer enforcement of the case's
+  possession order to the High Court, whatever else it orders. An order made at a hearing transfers it with outright possession.
+#}
+{% if withoutHearing %}
+  {% set registryHtml %}
+    {{ compact.text("transfer-enforcement-registry", {
+      label: "District Registry",
+      hint: "For example, Bristol",
+      classes: "govuk-input--width-20"
+    }) }}
+  {% endset %}
+  <h2 class="govuk-heading-l govuk-!-margin-top-6">Enforcement</h2>
 
-{# One list drives both the tabs and their panels. #}
+  {{ compact.reveal("transfer-enforcement", "Transfer to High Court for enforcement", compact.radios("transfer-enforcement-court", {
+    legend: "Transfer enforcement to",
+    items: [
+      { value: "kings-bench", text: "King's Bench Division" },
+      { value: "district-registry", text: "A District Registry", conditional: { html: registryHtml } }
+    ]
+  })) }}
+{% endif %}
+
+{#
+  Every open application, each decided on its own, so one order can decide any of them and the claim. Shown only
+  while the case has one: the judges asked for nothing about applications otherwise. First, as the judges asked: with
+  an application open, the claim is the exception.
+#}
+{% if applications | length %}
+  <section class="pcs-applications" aria-labelledby="applications-heading" data-applications>
+    <h2 class="govuk-heading-l govuk-!-margin-top-6" id="applications-heading">Applications</h2>
+    {% for item in applications %}
+      {{ applicationRow.row(item) }}
+    {% endfor %}
+  </section>
+{% endif %}
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Claim</h2>
+
+{#
+  With an application open the claim's order types wait behind a tick box, unticked until the judge decides to
+  order on the claim (order type NO_ORDER_ON_CLAIM meanwhile). Without one, the hearing is the claim's, so they show.
+#}
+{% if applications | length %}
+  {{ govukCheckboxes({
+    idPrefix: "claim-order",
+    name: "claim-order",
+    classes: "govuk-checkboxes--small",
+    fieldset: { legend: { text: "Do you wish to make an order on the main claim?", classes: "govuk-fieldset__legend--s" } },
+    hint: { text: "Leave this unticked to decide only the applications." },
+    items: [{ value: "yes", text: "Yes, make an order on the claim", checked: draftOrderType != "NO_ORDER_ON_CLAIM" }]
+  }) }}
+{% endif %}
+
+<div data-claim-order {%- if applications | length and draftOrderType == "NO_ORDER_ON_CLAIM" %} hidden{% endif %}>
+{#
+  One list drives both the tabs and their panels: what the order does about the claim, which the order types
+  exclude one another over. The judges asked for no possession tabs without a hearing.
+#}
 {% set orderTypeTabs = [
-  { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk" },
-  { id: "tab-suspended", type: "SUSPENDED_POSSESSION", label: "Suspended possession", template: "make-order/tabs/_suspended.njk" },
+  { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk", atHearingOnly: true },
+  { id: "tab-suspended", type: "SUSPENDED_POSSESSION", label: "Suspended possession", template: "make-order/tabs/_suspended.njk", atHearingOnly: true },
   { id: "tab-adjournment", type: "ADJOURNMENT", label: "Adjournment", template: "make-order/tabs/_adjournment.njk" },
   { id: "tab-strike-out", type: "STRIKE_OUT_DISMISSAL", label: "Strike out/dismiss", template: "make-order/tabs/_strike-out.njk" },
   { id: "tab-free-form", type: "FREE_FORM", label: "Free form", template: "make-order/tabs/_free-form.njk" }
 ] %}
+{% if withoutHearing %}
+  {% set orderTypeTabs = orderTypeTabs | rejectattr("atHearingOnly") %}
+{% endif %}
 
 {# The macro hardcodes an h2 tab-list heading, so use its markup directly to preserve heading order. #}
 <div class="govuk-tabs" data-module="govuk-tabs">
@@ -45,6 +115,7 @@
       {% include tab.template %}
     </div>
   {% endfor %}
+</div>
 </div>
 
 {% include "make-order/_costs.njk" %}

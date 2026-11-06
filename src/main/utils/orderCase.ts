@@ -1,4 +1,4 @@
-import { buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
+import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import { type DocWeaveSnapshot, InvalidSnapshotError, parseSnapshot } from '@hmcts-cft/docweave';
 import config from 'config';
 import type { NextFunction, Request, Response } from 'express';
@@ -25,7 +25,26 @@ export interface OrderCaseContext {
   claimants: OrderParty[];
   defendants: OrderParty[];
   openCounterclaim?: boolean;
-  openApplication?: boolean;
+  /** The case's open applications, any of which the order can decide, oldest first. */
+  applications?: OrderApplication[];
+}
+
+/** A general application as the judge deciding it reads it, with what court staff said when they referred it. */
+export interface OrderApplication {
+  id: string;
+  /** An application to suspend the warrant of possession: granted on conditions, or dismissed with an eviction date. */
+  warrantSuspension?: boolean;
+  reference: string;
+  type: string;
+  somethingElseDetails?: string | null;
+  applicant?: string | null;
+  submittedOn?: string | null;
+  within14Days?: 'YES' | 'NO' | null;
+  otherPartiesAgreed?: 'YES' | 'NO' | null;
+  withoutNotice?: 'YES' | 'NO' | null;
+  withoutNoticeReason?: string | null;
+  whatOrderWanted?: string | null;
+  documents: { id: string; fileName: string }[];
 }
 
 /** A judicial note on the case, with the hearing it was made at, if any. */
@@ -67,8 +86,13 @@ export interface OrderStart {
     queryFromCaseworker?: string | null;
   };
   caseContext: OrderCaseContext;
-  /** The hearing the order is made for, if it is made for one. */
+  /**
+   * The hearing the order is made for, if it is made for one. The caseworker's review is sent only which hearing it
+   * is, without its facts and notes, which are the judge's to record.
+   */
   hearing?: OrderHearing | null;
+  /** The application the judge's task asked them to decide, which the order must decide. */
+  taskGenAppId?: string | null;
 }
 
 export function formatAddress(address: Record<string, string | undefined> = {}): string {
@@ -144,6 +168,17 @@ export function refusedOrderEvent(
     return void res.status(404).send('Not Found');
   }
   next(error);
+}
+
+/** Shows the user why pcs-api would not start an order event, in XUI's page, with the way back to the case. */
+export function refusalPage(req: Request, res: Response, roleAssignments: string[] = []) {
+  return (error: CallbackRejectedError): void =>
+    res.status(error.status).render('order-refused', {
+      headerModel: xuiHeaderModel(req, roleAssignments),
+      footerModel: buildFooterModel(),
+      reasons: error.reasons,
+      closeUrl: manageCaseDetailsUrl(req.params.caseReference as string),
+    });
 }
 
 /** The order's document as a page posted it: none, or a snapshot Docweave accepts. Anything else is a bad request. */
