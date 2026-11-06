@@ -7,6 +7,7 @@ import { oidcMiddleware } from '../middleware';
 import { Logger } from '@modules/logger';
 import { persistPaymentSessionState } from '@services/paymentSessionService';
 import { getPaymentOutcome, paymentService } from '@services/pcsApi/paymentService';
+import { toCaseReference16 } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('counterClaimPaymentStart');
@@ -16,9 +17,13 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
     '/case/:caseReference/respond-to-claim/counter-claim-payment/start',
     oidcMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
-      const caseReference = String(req.params.caseReference || '');
+      const caseReference = toCaseReference16(req.params.caseReference);
       const accessToken = req.session.user?.accessToken;
       const { serviceRequestReference, feeAmount } = req.session.payment ?? {};
+
+      if (!caseReference) {
+        return rejectInvalidCaseReference(req.params.caseReference, next);
+      }
 
       if (!accessToken) {
         return redirectOnMissingAccessToken(caseReference, next);
@@ -71,9 +76,13 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
     '/case/:caseReference/respond-to-claim/counter-claim-pba-payment/start',
     oidcMiddleware,
     async (req: Request, res: Response, next: NextFunction) => {
-      const caseReference = String(req.params.caseReference || '');
+      const caseReference = toCaseReference16(req.params.caseReference);
       const accessToken = req.session.user?.accessToken;
       const { serviceRequestReference, feeAmount, customerReference, pbaAccount } = req.session.payment ?? {};
+
+      if (!caseReference) {
+        return rejectInvalidCaseReference(req.params.caseReference, next);
+      }
 
       if (!accessToken) {
         return redirectOnMissingAccessToken(caseReference, next);
@@ -133,6 +142,11 @@ export default function counterClaimPaymentStartRoutes(app: Application): void {
       }
     }
   );
+}
+
+function rejectInvalidCaseReference(caseReference: unknown, next: NextFunction) {
+  logger.error('Invalid case reference when starting counterclaim payment', { caseReference });
+  return next(new HTTPError('Invalid case reference format', 404));
 }
 
 function redirectOnMissingAccessToken(caseReference: string, next: NextFunction) {
