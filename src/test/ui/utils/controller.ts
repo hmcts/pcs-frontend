@@ -26,6 +26,7 @@ const sauceStepScreenshots = process.env.PLAYWRIGHT_SAUCE_STEP_SCREENSHOTS === '
 
 let testExecutor: { page: Page };
 let previousUrl: string = '';
+let skipAxeAuditForCurrentPage = false;
 let startFunctionalTests = false;
 let startAxeAudit = false;
 let sauceJourneyScreenshotStep = 0;
@@ -58,6 +59,7 @@ class SoftErrorMessageStepFailed extends Error {
 export function initializeExecutor(page: Page): void {
   testExecutor = { page };
   previousUrl = page.url();
+  skipAxeAuditForCurrentPage = false;
   sauceJourneyScreenshotStep = 0;
 }
 
@@ -93,10 +95,20 @@ async function detectPageNavigation(): Promise<boolean> {
   const pageNavigated = currentUrl !== previousUrl;
 
   if (pageNavigated) {
+    skipAxeAuditForCurrentPage = isExternalPage(previousUrl, currentUrl);
     previousUrl = currentUrl;
   }
 
   return pageNavigated;
+}
+
+/** Third-party payment pages are outside this application's accessibility-test scope. */
+function isExternalPage(previousPageUrl: string, currentPageUrl: string): boolean {
+  try {
+    return new URL(previousPageUrl).origin !== new URL(currentPageUrl).origin;
+  } catch {
+    return false;
+  }
 }
 
 async function validatePageIfNavigated(action: string): Promise<void> {
@@ -113,7 +125,7 @@ async function validatePageIfNavigated(action: string): Promise<void> {
       ) {
         await performAction('triggerFunctionalTests');
       }
-      if (startAxeAudit && enable_axe_audit === 'true') {
+      if (startAxeAudit && enable_axe_audit === 'true' && !skipAxeAuditForCurrentPage) {
         try {
           const { AxeUtils } = await import('@hmcts/playwright-common');
           await test.step('Running Accessibility Scan', async () => {
