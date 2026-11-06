@@ -10,10 +10,11 @@ import {
   makeAClaimPath,
 } from '../constants/makeAClaimRoutes';
 import { oidcMiddleware } from '../middleware';
+import { taskListPath } from '../steps/make-a-claim/flow.config';
 import { formatPence } from '../steps/make-a-claim/rentHistory';
 import { startFlowConfig } from '../steps/make-a-claim/start/flow.config';
 import { startStepRegistry } from '../steps/make-a-claim/start/stepRegistry';
-import { AWAITING_SUBMISSION, submittedClaimRedirect, taskListPath } from '../steps/make-a-claim/submittedClaim';
+import { AWAITING_SUBMISSION, submittedClaimRedirect } from '../steps/make-a-claim/submittedClaim';
 import { penceToPounds } from '../steps/utils/currencyConversion';
 
 import { Logger } from '@modules/logger';

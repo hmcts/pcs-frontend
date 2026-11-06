@@ -168,6 +168,8 @@ export interface CitizenPossessionClaim {
   };
   defendants?: CcdCollectionItem<CitizenDefendant>[];
   additionalDefendants?: YesNo;
+  /** Draft only: YES once the claimant has said there are no more defendants to add. */
+  defendantsConfirmed?: YesNo;
   tenancy?: {
     tenancyType?: CitizenTenancyType;
     otherTenancyTypeDetails?: string;

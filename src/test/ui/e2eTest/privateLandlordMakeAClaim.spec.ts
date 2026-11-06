@@ -142,6 +142,7 @@ test.describe('Private landlord cannot use the service @privateLandlord', () => 
     await page.getByRole('button', { name: 'Save and continue', exact: true }).click();
     await answer(page, 'Yes');
     await answer(page, 'No');
+    await answer(page, 'No');
     await answer(page, 'Yes');
     await expect(page.getByText('You cannot make a claim with other claimants using this service yet.')).toBeVisible();
   });

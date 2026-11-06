@@ -17,7 +17,10 @@ export const isIndividual = (req: Request): boolean =>
 export const isOrganisation = (req: Request): boolean =>
   readClaim(req).claimant?.individualOrOrganisation === 'ORGANISATION';
 
-export const wantsPhoneContact = (req: Request): boolean => readClaim(req).claimant?.contactByPhone === 'YES';
+export const hasPhoneNumber = (req: Request): boolean => {
+  const claimant = readClaim(req).claimant;
+  return claimant?.contactByPhone === 'YES' && Boolean(claimant.phoneNumber);
+};
 
 export const hasTenancyAgreement = (req: Request): boolean =>
   readClaim(req).tenancy?.tenancyAgreementAvailable === 'YES';

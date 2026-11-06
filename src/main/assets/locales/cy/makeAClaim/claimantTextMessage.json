@@ -2,10 +2,13 @@
   "pageTitle": "cyDo you want to be contacted by text message?",
   "question": "cyDo you want to be contacted by text message?",
   "hint": "cyWe might also send you updates about your case by text message to the number you gave",
+  "hint_noPhone": "cyWe might also send you updates about your case by text message to this number",
   "labels": {
-    "textMessageNumber": "cyMobile phone number, if different from the number you gave (optional)"
+    "textMessageNumber": "cyMobile phone number, if different from the number you gave (optional)",
+    "textMessageNumber_noPhone": "cyMobile phone number"
   },
   "errors": {
-    "contactByText": "cySelect whether you want to be contacted by text message"
+    "contactByText": "cySelect whether you want to be contacted by text message",
+    "textMessageNumber": "cyEnter a mobile phone number"
   }
 }

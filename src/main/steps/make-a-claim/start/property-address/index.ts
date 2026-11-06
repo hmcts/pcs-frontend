@@ -8,6 +8,7 @@ export const step: StepDefinition = createStartStep({
   stepName: 'property-address',
   stepDir: __dirname,
   customTemplate: ADDRESS_TEMPLATE,
+  invalidates: ['property-country'],
   fields: addressFields('property'),
   extendGetContent: (req, formContent) => ({
     ...addressContent(req, 'property'),

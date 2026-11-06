@@ -67,6 +67,12 @@ describe('normaliseClaim', () => {
     });
   });
 
+  it('keeps the text message answers of a claimant who does not want calls', () => {
+    expect(
+      normaliseClaim({ claimant: { contactByPhone: 'NO', contactByText: 'YES', textMessageNumber: '07700900111' } })
+    ).toEqual({ claimant: { contactByPhone: 'NO', contactByText: 'YES', textMessageNumber: '07700900111' } });
+  });
+
   it('drops details that went with answers since changed', () => {
     expect(
       normaliseClaim({

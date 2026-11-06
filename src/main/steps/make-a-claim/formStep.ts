@@ -4,14 +4,15 @@ import { parseDraftVersion } from '../utils/buildDraftDefendantResponse';
 
 import { answeredClaim, readClaim, saveClaimDraft } from './claimDraft';
 import { claimMappings } from './claimMapping';
-import { MAKE_A_CLAIM_JOURNEY, MAKE_A_CLAIM_ROUTE, flowConfig } from './flow.config';
+import { MAKE_A_CLAIM_JOURNEY, MAKE_A_CLAIM_ROUTE, flowConfig, taskListPath } from './flow.config';
 import { SECTION_SUMMARY_STEPS } from './sections.config';
 import { draftChangedUrl, isDraftChanged } from './submitErrors';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
-import { getStepUrl } from '@modules/steps/flow';
 import type { BuiltFormContent, FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+
+export const caseReferenceOf = (req: Request): string => req.res?.locals.validatedCase?.id ?? '';
 
 export const QUESTION_TEMPLATE = 'make-a-claim/templates/question.njk';
 
@@ -21,10 +22,6 @@ type MakeAClaimStepConfig = Omit<FormBuilderConfig, 'journeyFolder' | 'flowConfi
   interstitial?: boolean;
 };
 
-export function taskListUrl(req: Request): string {
-  return getStepUrl('task-list', flowConfig, req.res?.locals.validatedCase?.id);
-}
-
 /** Labels and links every make a claim page uses, so templates need no knowledge of the journey's routes. */
 export function sharedPageContent(req: Request, interstitial = false): Record<string, unknown> {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
@@ -32,7 +29,7 @@ export function sharedPageContent(req: Request, interstitial = false): Record<st
     saveAndContinue: interstitial ? t('makeAClaim:buttons.continue') : t('makeAClaim:buttons.saveAndContinue'),
     saveForLater: interstitial ? undefined : t('makeAClaim:buttons.saveForLater'),
     cancel: t('makeAClaim:buttons.cancel'),
-    dashboardUrl: req.res?.locals.validatedCase?.id ? taskListUrl(req) : '/',
+    dashboardUrl: req.res?.locals.validatedCase?.id ? taskListPath(req.res.locals.validatedCase.id) : '/',
     signedIn: Boolean(req.session?.user),
     contactUsForHelp: t('contactUsForHelp'),
     draftVersion:
@@ -91,7 +88,7 @@ export function createMakeAClaimStep(config: MakeAClaimStepConfig): StepDefiniti
         }
       : undefined,
     isAnswered: mapping?.isAnswered ? req => mapping.isAnswered!(readClaim(req), req) : undefined,
-    resolveRedirectAfterPost: isSummary ? async req => taskListUrl(req) : undefined,
+    resolveRedirectAfterPost: isSummary ? async req => taskListPath(caseReferenceOf(req)) : undefined,
     ...config,
     extendGetContent: async (req: Request, formContent: BuiltFormContent) => {
       labelTextQuestionsAsPageHeading(formContent);

@@ -1,3 +1,6 @@
+import type { Request } from 'express';
+
+import { hasPhoneNumber } from '../conditions';
 import { textField, yesNoQuestion } from '../fieldBuilders';
 import { FIELD_LIMITS } from '../fieldLimits';
 import { createMakeAClaimStep } from '../formStep';
@@ -12,8 +15,9 @@ export const step: StepDefinition = createMakeAClaimStep({
       subFields: {
         yes: {
           textMessageNumber: textField('textMessageNumber', {
-            required: false,
+            required: (_formData, _allData, req) => !req || !hasPhoneNumber(req),
             maxLength: FIELD_LIMITS.textMessageNumber,
+            errorMessage: 'errors.textMessageNumber',
             classes: 'govuk-input--width-20',
             attributes: { autocomplete: 'tel', type: 'tel' },
           }),
@@ -21,4 +25,5 @@ export const step: StepDefinition = createMakeAClaimStep({
       },
     }),
   ],
+  extendGetContent: (req: Request) => (hasPhoneNumber(req) ? {} : { context: 'noPhone' }),
 });

@@ -46,6 +46,7 @@ const ANSWERED_CLAIM = {
     },
   ],
   additionalDefendants: 'NO',
+  defendantsConfirmed: 'YES',
   tenancy: { tenancyType: 'ASSURED', tenancyStartDate: '2018-01-15', tenancyAgreementAvailable: 'NO' },
   grounds: { hasRentArrearsGrounds: 'YES', rentArrearsGrounds: ['GROUND_8'], hasOtherGrounds: 'NO' },
   notice: {
@@ -239,6 +240,18 @@ describe('before a claim exists', () => {
       expect(ccd.createRequests).toHaveLength(1);
     });
 
+    it('reuses the claim when the claimant goes back and submits again', async () => {
+      app = await bootMakeAClaim({ redis: true });
+      await app.get('/make-a-claim');
+      await answerStartQuestions();
+      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
+      expect(text((await app.get('/make-a-claim/who-is-claiming')).text)).toContain('Myself');
+      expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
+        claimPath('eligible')
+      );
+      expect(ccd.createRequests).toHaveLength(1);
+    });
+
     it('goes back to the claim just made while it is still a draft', async () => {
       app = await bootMakeAClaim({ redis: true });
       await answerStartQuestions();
@@ -323,7 +336,6 @@ describe('the task list', () => {
   it('opens checking your answers once every section is done', async () => {
     app = await bootMakeAClaim();
     givenClaim(ANSWERED_CLAIM);
-    await app.post(claimPath('additional-defendants'), { additionalDefendants: 'no' });
     const page = text((await app.get(claimPath('task-list'))).text);
     expect(page).toContain('Proof of rent arrears In progress');
     givenClaim({
@@ -381,12 +393,46 @@ describe('answering questions', () => {
     expect(storedClaim().claimant.emailAddress).toBe('pl-ledger-0001@example.test');
 
     expect((await app.post(claimPath('claimant-phone'), { contactByPhone: 'no' })).location).toBe(
-      `${claimPath('multiple-claimants')}?nav=1`
+      `${claimPath('claimant-text-message')}?nav=1`
     );
     expect((await app.post(claimPath('multiple-claimants'), { multipleClaimants: 'yes' })).location).toBe(
       claimPath('multiple-claimants-ineligible')
     );
     expect((await app.post(claimPath('claimant-cya'), {})).location).toBe(claimPath('task-list'));
+  });
+
+  describe('the text message number', () => {
+    const page = async (): Promise<string> => text((await app.get(claimPath('claimant-text-message'))).text);
+
+    it('is optional when the claimant gave a phone number', async () => {
+      app = await bootMakeAClaim();
+      givenClaim({ claimant: { contactByPhone: 'YES', phoneNumber: '07700900982' } });
+      expect(await page()).toContain('Mobile phone number, if different from the number you gave (optional)');
+      const saved = await app.post(claimPath('claimant-text-message'), { contactByText: 'yes' });
+      expect(saved.status).toBe(303);
+      expect(storedClaim().claimant).toMatchObject({ contactByText: 'YES', phoneNumber: '07700900982' });
+    });
+
+    it('is required when the claimant does not want calls', async () => {
+      app = await bootMakeAClaim();
+      givenClaim({ claimant: { contactByPhone: 'NO' } });
+      expect(await page()).toContain('to this number');
+      expect(await page()).not.toContain('if different');
+
+      const refused = await app.post(claimPath('claimant-text-message'), { contactByText: 'yes' });
+      expect(text(refused.text)).toContain('Enter a mobile phone number');
+      expect(storedClaim().claimant).toEqual({ contactByPhone: 'NO' });
+
+      await app.post(claimPath('claimant-text-message'), {
+        contactByText: 'yes',
+        'contactByText.textMessageNumber': '07700900111',
+      });
+      expect(storedClaim().claimant).toEqual({
+        contactByPhone: 'NO',
+        contactByText: 'YES',
+        textMessageNumber: '07700900111',
+      });
+    });
   });
 
   it('refuses an individual’s name longer together than pcs-api can keep', async () => {
@@ -442,10 +488,30 @@ describe('answering questions', () => {
     expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants In progress');
 
     await app.post(claimPath('additional-defendants'), { additionalDefendants: 'no' });
+    expect(storedClaim().defendantsConfirmed).toBe('YES');
     expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants Done');
 
     await app.post(claimPath('additional-defendants'), { additionalDefendants: 'yes' });
     await app.post(`${claimPath('defendant-name')}?index=1`, { nameKnown: 'no' });
+    expect(storedClaim().defendantsConfirmed).toBe('NO');
+    expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants In progress');
+  });
+
+  it('keeps the defendants done when the claimant comes back in a new session', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants Done');
+    const form = new JSDOM((await app.get(claimPath('additional-defendants'))).text).window.document;
+    expect(form.querySelector<HTMLInputElement>('input[name="additionalDefendants"][value="no"]')?.checked).toBe(true);
+  });
+
+  it('leaves the defendants in progress while another defendant’s address is unanswered', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...ANSWERED_CLAIM,
+      defendants: [...ANSWERED_CLAIM.defendants, { value: { nameKnown: 'NO' } }],
+      additionalDefendants: 'YES',
+    });
     expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants In progress');
   });
 });
@@ -764,6 +830,7 @@ describe('review fixes', () => {
       claimPath('defendant-cya')
     );
     expect(storedClaim().defendants).toHaveLength(1);
+    expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants Done');
   });
 
   it('removes a ledger transaction after asking', async () => {

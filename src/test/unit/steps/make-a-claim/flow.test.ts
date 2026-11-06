@@ -45,7 +45,7 @@ describe('the claim journey', () => {
     ['individual-or-organisation', { claimant: { individualOrOrganisation: 'ORGANISATION' } }, 'organisation-name'],
     ['claimant-name', { claimant: { individualOrOrganisation: 'INDIVIDUAL' } }, 'claimant-address'],
     ['claimant-phone', { claimant: { contactByPhone: 'YES' } }, 'claimant-text-message'],
-    ['claimant-phone', { claimant: { contactByPhone: 'NO' } }, 'multiple-claimants'],
+    ['claimant-phone', { claimant: { contactByPhone: 'NO' } }, 'claimant-text-message'],
     ['multiple-claimants', {}, 'claimant-cya'],
     ['tenancy-agreement', { tenancy: { tenancyAgreementAvailable: 'YES' } }, 'upload-tenancy-agreement'],
     ['tenancy-agreement', { tenancy: { tenancyAgreementAvailable: 'NO' } }, 'rent-arrears-claim'],

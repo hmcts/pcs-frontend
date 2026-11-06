@@ -105,6 +105,7 @@ export async function completeAboutYou(page: Page): Promise<void> {
   await answer(page, 'Yes');
   await answer(page, 'No');
   await answer(page, 'No');
+  await answer(page, 'No');
   await expect(page.getByRole('heading', { level: 1, name: 'Check your answers' })).toBeVisible();
   await saveAndContinue(page);
   await expectTaskStatus(page, 'About you and your contact preferences', 'Done');

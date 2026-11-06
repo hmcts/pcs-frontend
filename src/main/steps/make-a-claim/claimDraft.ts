@@ -78,8 +78,6 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
   }
   if (claimant?.contactByPhone === 'NO') {
     delete claimant.phoneNumber;
-    delete claimant.contactByText;
-    delete claimant.textMessageNumber;
   }
   if (tenancy?.tenancyType && tenancy.tenancyType !== 'OTHER') {
     delete tenancy.otherTenancyTypeDetails;

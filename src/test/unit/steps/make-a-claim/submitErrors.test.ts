@@ -61,6 +61,10 @@ describe('submitErrorItems', () => {
   it.each([
     ['REQUIRED:claimant.address', claimPage('claimant-address')],
     ['REQUIRED:claimant.firstName', claimPage('claimant-name')],
+    ['REQUIRED:claimant.phoneNumber', claimPage('claimant-phone')],
+    ['REQUIRED:claimant.textMessageNumber', claimPage('claimant-text-message')],
+    ['REQUIRED:claimant.emailAddress', claimPage('claimant-email')],
+    ['TOO_LONG:notice.noNoticeReason', claimPage('notice-served')],
     ['TOO_LONG:claimant.name', claimPage('claimant-name')],
     ['REQUIRED:defendants[1].nameKnown', `${claimPage('defendant-name')}?index=1`],
     ['REQUIRED:defendants[0].addressKnown', claimPage('defendant-address')],

@@ -3,7 +3,7 @@ import type { Request } from 'express';
 import { CallbackRejectedError } from '../../HttpError';
 import { MAKE_A_CLAIM_START_ROUTE, PROPERTY_INELIGIBLE_URL } from '../../constants/makeAClaimRoutes';
 
-import { flowConfig } from './flow.config';
+import { flowConfig, taskListPath } from './flow.config';
 
 import { getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
@@ -30,7 +30,7 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^rentArrears\.otherFrequencyDetails$/, 'rent-frequency'],
   [/^rentArrears\.recoverySteps$/, 'recovery-steps'],
   [/^rentArrears\.rentHistoryLedger\[\d+\](\.[A-Za-z]+)?$/, 'ledger-transaction'],
-  [/^notice\.noticeServed$/, 'notice-served'],
+  [/^notice\.(noticeServed|noNoticeReason)$/, 'notice-served'],
   [/^notice\.(noticeType|noticeTypeOther)$/, 'notice-type'],
   [/^notice\.noticeDate$/, 'notice-date'],
   [/^notice\.noticeUnavailableReason$/, 'notice-available'],
@@ -124,7 +124,7 @@ export function submitErrorItems(req: Request, codes: string[]): ErrorSummaryIte
           href: target.href,
         };
       }
-      return { text: t('makeAClaim:submitErrors.checkAnswers'), href: getStepUrl('task-list', flowConfig, caseId) };
+      return { text: t('makeAClaim:submitErrors.checkAnswers'), href: taskListPath(caseId) };
     }
     if (code === 'DRAFT_NOT_FOUND') {
       return { text: t('makeAClaim:submitErrors.draftNotFound'), href: MAKE_A_CLAIM_START_ROUTE };

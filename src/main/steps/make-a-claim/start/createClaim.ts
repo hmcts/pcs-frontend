@@ -11,7 +11,7 @@ import { AWAITING_SUBMISSION, caseStateOf } from '../submittedClaim';
 
 import { MAKE_A_CLAIM_START_ROUTE } from './flow.config';
 
-import { clearFormData, getAllFormData, setFormData } from '@modules/steps';
+import { getAllFormData, setFormData } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
 import { ccdCaseService } from '@services/ccdCaseService';
 import type { LegislativeCountry } from '@services/citizenPossessionClaim.interface';
@@ -24,8 +24,8 @@ export const PROPERTY_ADDRESS_TOO_LONG_URL = `${MAKE_A_CLAIM_START_ROUTE}/proper
 /** How long a claim creation holds its lock, and how long a repeated submission waits for it. */
 const CREATION_LOCK_MS = 15_000;
 const WAIT_INTERVAL_MS = 200;
-/** How long what came of a set of answers is replayed: long enough for a double click or a concurrent repeat. */
-const OUTCOME_TTL_SECONDS = 60;
+/** How long what came of a set of answers is remembered, so going back and submitting them again reuses it. */
+const OUTCOME_TTL_SECONDS = 60 * 60;
 
 /** The pre-case answers that name this pass through the start questions, renewed each time the start page is shown. */
 const START_ATTEMPT = 'start-attempt';
@@ -73,15 +73,14 @@ export function refusedClaimRedirect(error: unknown): string | undefined {
 }
 
 /**
- * The answers a claim is created from, as a key: the same answers in the same session make the same claim, and
- * different ones (another property, say) make a new claim.
+ * The answers a claim is created from, as a key: the same answers in the same session and pass through the start
+ * questions make the same claim, and different ones (another property, say) or a new pass make a new claim.
  */
 function answersKey(req: Request): string {
   const answers = getAllFormData(req);
   const digest = createHash('sha256')
     .update(
       JSON.stringify([
-        answers[START_ATTEMPT]?.id,
         answers['claimant-type']?.claimantType,
         answers.trespass?.isTrespass,
         addressFromBody(answers['property-address'] ?? {}, 'property'),
@@ -89,7 +88,7 @@ function answersKey(req: Request): string {
       ])
     )
     .digest('hex');
-  return `${req.sessionID}:${digest}`;
+  return `${req.sessionID}:${answers[START_ATTEMPT]?.id ?? ''}:${digest}`;
 }
 
 function outcomeUrl(outcome: CreationOutcome): string | undefined {
@@ -137,12 +136,16 @@ async function readOutcome(store: CreationGuardStore, outcomeKey: string): Promi
   return recorded ? (JSON.parse(recorded) as CreationOutcome) : undefined;
 }
 
-/** A repeat reuses the claim made for the same answers only while it is still a draft; a refusal always replays. */
+/**
+ * A repeat reuses the claim made for the same answers unless it is known to have been submitted since; a claim whose
+ * state cannot be read is reused rather than risk a second one. A refusal always replays.
+ */
 async function stillReusable(req: Request, outcome: CreationOutcome): Promise<boolean> {
   if (!outcome.caseReference) {
     return true;
   }
-  return (await caseStateOf(getUserToken(req), outcome.caseReference)) === AWAITING_SUBMISSION;
+  const state = await caseStateOf(getUserToken(req), outcome.caseReference);
+  return state === undefined || state === AWAITING_SUBMISSION;
 }
 
 /** Forgets what came of earlier passes through the start questions, so starting again makes a new claim. */
@@ -190,7 +193,6 @@ async function createClaim(req: Request): Promise<{ next: string; caseReference?
       },
     });
     const caseReference = String(created.id);
-    clearFormData(req);
     return { next: eligibleUrl(caseReference), caseReference };
   } catch (error) {
     const redirect = refusedClaimRedirect(error);

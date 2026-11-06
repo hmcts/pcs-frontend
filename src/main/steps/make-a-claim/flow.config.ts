@@ -18,10 +18,10 @@ import {
   uploadsRentStatement,
   usesLedger,
   usesTable,
-  wantsPhoneContact,
 } from './conditions';
 import { makeAClaimSections } from './sections.config';
 
+import { getStepUrl } from '@modules/steps/flow';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
 export { MAKE_A_CLAIM_ROUTE };
@@ -40,7 +40,6 @@ export const flowConfig: JourneyFlowConfig = {
   steps: {
     'claimant-name': { showCondition: (req: Request) => isIndividual(req) },
     'organisation-name': { showCondition: (req: Request) => isOrganisation(req) },
-    'claimant-text-message': { showCondition: (req: Request) => wantsPhoneContact(req) },
     'upload-tenancy-agreement': { showCondition: (req: Request) => hasTenancyAgreement(req) },
     'rent-arrears-grounds': { showCondition: (req: Request) => hasRentArrearsGrounds(req) },
     'other-grounds-claim': { showCondition: (req: Request) => hasRentArrearsGrounds(req) },
@@ -66,3 +65,7 @@ export const flowConfig: JourneyFlowConfig = {
     'remove-ledger-entry': { showCondition: () => false },
   },
 };
+
+export function taskListPath(caseReference: string): string {
+  return getStepUrl('task-list', flowConfig, caseReference);
+}

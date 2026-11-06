@@ -159,11 +159,11 @@ describe('createClaimFromStartAnswers', () => {
     expect(create).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps what came of the answers only long enough for a double click or a concurrent repeat', async () => {
+  it('remembers what came of the answers for an hour', async () => {
     create.mockResolvedValue({ id: 1777027600017761, data: {} });
     const redis = fakeRedis();
     await createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
-    expect(createdKeys(redis).map(key => redis.expiries.get(key))).toEqual([60]);
+    expect(createdKeys(redis).map(key => redis.expiries.get(key))).toEqual([3600]);
   });
 
   it('creates a new claim for the same answers once the first has expired from the guard', async () => {
@@ -204,11 +204,43 @@ describe('createClaimFromStartAnswers', () => {
     await expect(createClaimFromStartAnswers(again)).resolves.toBe('/case/1777027600017762/make-a-claim/eligible');
   });
 
-  it('forgets the answers once the claim is created, so the next claim asks them again', async () => {
+  it('keeps the answers once the claim is created, so going back and submitting again reuses it', async () => {
     create.mockResolvedValue({ id: 1777027600017761, data: {} });
-    const req = request({ ...ELIGIBLE, 'property-country': { legislativeCountry: 'England' } });
+    const redis = fakeRedis();
+    const req = request(ELIGIBLE, 'session-1', redis);
+    startNewAttempt(req);
     await createClaimFromStartAnswers(req);
-    expect(req.session.formData?.makeAClaim?.default ?? {}).toEqual({});
+    expect(req.session.formData?.makeAClaim?.default).toMatchObject(ELIGIBLE);
+    await expect(createClaimFromStartAnswers(req)).resolves.toBe('/case/1777027600017761/make-a-claim/eligible');
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it('reuses the claim rather than create another when its state cannot be read', async () => {
+    create.mockResolvedValue({ id: 1777027600017761, data: {} });
+    const redis = fakeRedis();
+    await createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    getCase.mockRejectedValue(new HTTPError('CCD down', 502));
+    await expect(createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis))).resolves.toBe(
+      '/case/1777027600017761/make-a-claim/eligible'
+    );
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it('creates one claim for a double click whichever copy of the session is saved last', async () => {
+    let finish: (value: unknown) => void = () => undefined;
+    create.mockReturnValue(new Promise(resolve => (finish = resolve)));
+    const redis = fakeRedis();
+    const first = request(ELIGIBLE, 'session-1', redis);
+    startNewAttempt(first);
+    const stale = { ...first, session: structuredClone(first.session) } as Request;
+    const clicks = [createClaimFromStartAnswers(first), createClaimFromStartAnswers(stale)];
+    await new Promise(resolve => setTimeout(resolve, 10));
+    finish({ id: 1777027600017761, data: {} });
+    await Promise.all(clicks);
+
+    const later = { ...first, session: structuredClone(stale.session) } as Request;
+    await expect(createClaimFromStartAnswers(later)).resolves.toBe('/case/1777027600017761/make-a-claim/eligible');
+    expect(create).toHaveBeenCalledTimes(1);
   });
 
   it('creates a new claim when the claimant answers again for another property', async () => {
