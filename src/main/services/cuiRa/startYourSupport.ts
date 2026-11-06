@@ -10,7 +10,9 @@ import { toCuiRaFlags } from './flagMapping';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { getValidatedLanguage } from '@modules/steps';
+import { isDefendantResponseSubmitted } from '@services/ccdCaseData.model';
 import type { CcdCaseModel } from '@services/ccdCaseData.model';
+import { ccdCaseService } from '@services/ccdCaseService';
 
 const logger = Logger.getLogger('startYourSupport');
 
@@ -49,18 +51,11 @@ export async function startYourSupport(req: Request): Promise<string> {
   }
 
   const caseReference = validatedCase.id;
-  const partyName = resolveDefendantPartyName(validatedCase);
-  if (!partyName) {
+
+  const existingFlags = await resolveExistingFlags(accessToken, validatedCase);
+  if (!existingFlags.partyName) {
     logger.warn(`Starting Your Support for case ${caseReference} with an empty defendant party name`);
   }
-
-  // Pre-populate the microsite with any adjustments already captured for this defendant
-  const storedFlags = validatedCase.data?.possessionClaimResponse?.defendantFlags;
-  const existingFlags: CuiRaFlags = {
-    partyName,
-    roleOnCase: DEFENDANT_ROLE_ON_CASE,
-    details: storedFlags ? toCuiRaFlags(storedFlags).details : [],
-  };
 
   // Derive the callback/logout URLs from the request host (like startPcq's returnUrl), NOT a static
   // config value.
@@ -77,4 +72,25 @@ export async function startYourSupport(req: Request): Promise<string> {
   };
 
   return cuiRaService.invokePayload({ accessToken, serviceToken, body });
+}
+
+// Adjustments already captured for this defendant, used to pre-populate the microsite.
+async function resolveExistingFlags(accessToken: string, validatedCase: CcdCaseModel): Promise<CuiRaFlags> {
+  const partyName = resolveDefendantPartyName(validatedCase);
+
+  if (isDefendantResponseSubmitted(validatedCase.data)) {
+    const { supportFlags } = await ccdCaseService.getDefendantSupport(accessToken, validatedCase.id);
+    return {
+      partyName: supportFlags?.partyName || partyName,
+      roleOnCase: DEFENDANT_ROLE_ON_CASE,
+      details: supportFlags ? toCuiRaFlags(supportFlags).details : [],
+    };
+  }
+
+  const storedFlags = validatedCase.data?.possessionClaimResponse?.defendantFlags;
+  return {
+    partyName,
+    roleOnCase: DEFENDANT_ROLE_ON_CASE,
+    details: storedFlags ? toCuiRaFlags(storedFlags).details : [],
+  };
 }
