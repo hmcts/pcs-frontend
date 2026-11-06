@@ -180,6 +180,7 @@ export class CreateCaseAPIAction implements IAction {
     throw new Error('Submit case API failed after multiple retries');
   }
 
+  // Following method needs to be revisited if required once https://hmcts.atlassian.net/browse/HDPI-9887 is resolved.
   private async updatePaymentAPI(): Promise<void> {
     const paymentApi = Axios.create(paymentApiData.paymentApiInstance());
     const caseNumber = process.env.CASE_NUMBER;
