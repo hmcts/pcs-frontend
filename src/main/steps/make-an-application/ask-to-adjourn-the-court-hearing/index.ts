@@ -1,10 +1,11 @@
 import { Request } from 'express';
 
-import { createFormStep } from '../../../modules/steps';
+import { createFormStep, getTranslationFunction } from '../../../modules/steps';
 import { flowConfig } from '../flow.config';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { FeeType, getFee } from '@services/feeLookupService';
+import { isGenAppCuiSetAsideEnabled } from '@utils/isGenAppCuiSetAsideEnabled';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'ask-to-adjourn-the-court-hearing',
@@ -46,11 +47,14 @@ export const step: StepDefinition = createFormStep({
     findYourLocalCourt: 'findYourLocalCourt',
     sendTheCompletedFormToTheCourt: 'sendTheCompletedFormToTheCourt',
   },
-  extendGetContent: async (_req: Request) => {
+  extendGetContent: async (req: Request) => {
     const standardFeePromise = getFee(FeeType.genAppStandardFee);
     const maxFeePromise = getFee(FeeType.genAppMaxFee);
     const [standardFee, maxFee] = await Promise.all([standardFeePromise, maxFeePromise]);
     return {
+      freeIfAtLeast14DaysAway: getTranslationFunction(req)(
+        isGenAppCuiSetAsideEnabled(req) ? 'genAppCuiSetAside.freeIfAtLeast14DaysAway' : 'freeIfAtLeast14DaysAway'
+      ),
       standardFee,
       maxFee,
     };

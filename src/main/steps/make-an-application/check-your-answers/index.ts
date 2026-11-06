@@ -21,8 +21,25 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { CitizenGenAppRequest, GenAppState, GenAppType } from '@services/ccdCase.interface';
 import { PaymentSessionState, clearPaymentSessionState, setPaymentSessionState } from '@services/paymentSessionService';
 import { toCaseReference16 } from '@utils/caseReference';
+import { isGenAppCuiSetAsideEnabled } from '@utils/isGenAppCuiSetAsideEnabled';
 
 const STEP_NAME = 'check-your-answers';
+
+type FeeApplicationFormData = Pick<
+  VisibleFormDataView,
+  'getApplicationTypeField' | 'getHearingInNext14DaysField' | 'getOtherPartiesAgreedField'
+>;
+
+export function doesApplicationFeeApply(
+  visibleFormData: FeeApplicationFormData,
+  genAppCuiSetAsideEnabled: boolean
+): boolean {
+  return (
+    visibleFormData.getApplicationTypeField()?.fieldValue !== GenAppType.ADJOURN ||
+    visibleFormData.getHearingInNext14DaysField()?.fieldValue === 'yes' ||
+    (genAppCuiSetAsideEnabled && visibleFormData.getOtherPartiesAgreedField()?.fieldValue === 'no')
+  );
+}
 
 export const step: StepDefinition = createFormStep({
   stepName: STEP_NAME,
@@ -71,9 +88,7 @@ export const step: StepDefinition = createFormStep({
 
     const visibleFormData = new VisibleFormDataView(req);
 
-    const feeApplies =
-      visibleFormData.getApplicationTypeField()?.fieldValue !== GenAppType.ADJOURN ||
-      visibleFormData.getHearingInNext14DaysField()?.fieldValue === 'yes';
+    const feeApplies = doesApplicationFeeApply(visibleFormData, isGenAppCuiSetAsideEnabled(req));
 
     const hwfApplies = visibleFormData.getHwfReferenceField()?.fieldValue;
     const paymentNeeded = feeApplies && !hwfApplies;
