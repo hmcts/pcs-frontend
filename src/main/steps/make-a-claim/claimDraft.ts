@@ -34,13 +34,28 @@ export function draftClaim(req: Request): CitizenPossessionClaim {
   return cloneDeep(readClaim(req));
 }
 
+/** The rent history each way of proving the arrears keeps; the evidence of the others is dropped. */
+const PROOF_EVIDENCE = {
+  UPLOAD_STATEMENT: 'rentStatementDocuments',
+  LEDGER: 'rentHistoryLedger',
+  TABLE: 'rentHistoryTable',
+} as const;
+
+function keepOnlyProof(rentArrears: NonNullable<CitizenPossessionClaim['rentArrears']>): void {
+  for (const [proofType, evidence] of Object.entries(PROOF_EVIDENCE)) {
+    if (proofType !== rentArrears.proofType) {
+      delete rentArrears[evidence];
+    }
+  }
+}
+
 /**
  * Drops answers a later change made unreachable, so the saved claim never holds details for a question the
  * claimant no longer sees.
  */
 export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossessionClaim {
   const normalised = cloneDeep(claim);
-  const { claimant, tenancy, grounds, notice, rentArrears, circumstances, otherInformation } = normalised;
+  const { claimant, tenancy, grounds, notice, circumstances, otherInformation } = normalised;
 
   if (claimant?.individualOrOrganisation === 'INDIVIDUAL') {
     delete claimant.organisationName;
@@ -80,6 +95,7 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
     delete grounds.hasOtherGrounds;
     delete normalised.rentArrears;
   }
+  const { rentArrears } = normalised;
   if (grounds?.otherGrounds && !grounds.otherGrounds.includes(OTHER_GROUND)) {
     delete grounds.otherGroundsDetails;
   }
@@ -120,7 +136,17 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
   if (rentArrears?.rentFrequency && rentArrears.rentFrequency !== 'MONTHLY') {
     delete rentArrears.rentDueDay;
   }
-  if (circumstances?.underlesseeExists === 'NO') {
+  if (rentArrears?.rentFrequency === 'OTHER' && rentArrears.proofType === 'TABLE') {
+    delete rentArrears.proofType;
+    delete rentArrears.rentHistoryTable;
+  }
+  if (rentArrears?.proofType) {
+    keepOnlyProof(rentArrears);
+  }
+  if (normalised.defendants?.length) {
+    normalised.additionalDefendants = normalised.defendants.length > 1 ? 'YES' : 'NO';
+  }
+  if (circumstances && circumstances.underlesseeExists !== 'YES') {
     delete circumstances.underlesseeName;
     delete circumstances.underlesseeAddress;
   }
@@ -201,13 +227,17 @@ export async function saveClaimDraftForCase(
   return sendDraft(accessToken, caseId, normaliseClaim(claim));
 }
 
-/** The claimant's answers alone: without what pcs-api owns, and without collection ids, which each request makes. */
+/**
+ * The claimant's answers alone: without what pcs-api owns and without collection ids, which each request makes,
+ * and with lists of choices in a fixed order, since pcs-api keeps them as sets and returns them in any order.
+ */
 function answersOf(claim: CitizenPossessionClaim | undefined): unknown {
   const { draftVersion: _version, propertyAddress: _address, submission, ...answers } = claim ?? {};
   const { serviceRequestReference: _reference, feeAmount: _fee, paymentStatus: _status, ...signed } = submission ?? {};
   const withoutIds = (value: unknown): unknown => {
     if (Array.isArray(value)) {
-      return value.map(withoutIds);
+      const items = value.map(withoutIds);
+      return items.every(item => typeof item === 'string') ? [...(items as string[])].sort() : items;
     }
     if (value && typeof value === 'object') {
       return Object.fromEntries(

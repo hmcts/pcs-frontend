@@ -1,3 +1,5 @@
+import { createHash, randomUUID } from 'crypto';
+
 import type { Request } from 'express';
 
 import { CallbackRejectedError } from '../../../HttpError';
@@ -8,7 +10,7 @@ import { addressFromBody } from '../formValues';
 
 import { MAKE_A_CLAIM_START_ROUTE } from './flow.config';
 
-import { clearFormData, getAllFormData } from '@modules/steps';
+import { getAllFormData } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
 import { ccdCaseService } from '@services/ccdCaseService';
 import type { LegislativeCountry } from '@services/citizenPossessionClaim.interface';
@@ -20,22 +22,31 @@ export const PROPERTY_ADDRESS_TOO_LONG_URL = `${MAKE_A_CLAIM_START_ROUTE}/proper
 
 /** How long a claim creation holds its lock, and how long a repeated submission waits for it. */
 const CREATION_LOCK_MS = 15_000;
-const CREATED_CLAIM_TTL_SECONDS = 60 * 60;
 const WAIT_INTERVAL_MS = 200;
+/** How long the claim created for a set of answers is reused, and a refusal of them replayed. */
+const CREATED_CLAIM_TTL_SECONDS = 60 * 60;
+const REFUSED_CLAIM_TTL_SECONDS = 60;
+
+/** Deletes the lock only if it still holds this request's token, so a lock that expired and was retaken survives. */
+const RELEASE_OWN_LOCK =
+  "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end";
 
 /** The part of the Redis client the creation guard uses. */
 export interface CreationGuardStore {
   set(key: string, value: string, ...options: (string | number)[]): Promise<string | null>;
   get(key: string): Promise<string | null>;
-  del(key: string): Promise<number>;
+  eval(script: string, numberOfKeys: number, ...args: string[]): Promise<unknown>;
+}
+
+/** What a creation for a set of answers came to: the claim made, or where its refusal sent the claimant. */
+interface CreationOutcome {
+  caseReference?: string;
+  redirect?: string;
 }
 
 function guardStoreOf(req: Request): CreationGuardStore | undefined {
   return req.app?.locals?.redisClient as CreationGuardStore | undefined;
 }
-
-const lockKey = (sessionId: string) => `make-a-claim:creating:${sessionId}`;
-const createdKey = (sessionId: string) => `make-a-claim:created:${sessionId}`;
 
 const eligibleUrl = (caseReference: string) => getStepUrl('eligible', flowConfig, caseReference);
 
@@ -59,63 +70,85 @@ export function refusedClaimRedirect(error: unknown): string | undefined {
 }
 
 /**
+ * The answers a claim is created from, as a key: the same answers in the same session make the same claim, and
+ * different ones (another property, say) make a new claim.
+ */
+function answersKey(req: Request): string {
+  const answers = getAllFormData(req);
+  const digest = createHash('sha256')
+    .update(
+      JSON.stringify([
+        answers['claimant-type']?.claimantType,
+        answers.trespass?.isTrespass,
+        addressFromBody(answers['property-address'] ?? {}, 'property'),
+        answers['property-country']?.legislativeCountry,
+      ])
+    )
+    .digest('hex');
+  return `${req.sessionID}:${digest}`;
+}
+
+function outcomeUrl(outcome: CreationOutcome): string | undefined {
+  return outcome.caseReference ? eligibleUrl(outcome.caseReference) : outcome.redirect;
+}
+
+/**
  * Creates the claim from the answers given before it existed, which pcs-api keeps as the claim's first draft,
  * and gives the page to continue on. Answers that do not make the claimant eligible start them again.
  *
- * A double-clicked submission can reach two pods at once, so the guard lives in Redis beside the sessions: one
- * request takes a short lock and creates the claim, and the claim it created is kept outside the session, where
- * a stale session save cannot undo it. A repeated submission waits for that claim and continues with it.
+ * A double-clicked submission can reach two pods at once, so the guard lives in Redis beside the sessions. One
+ * request takes a short lock, with a token only it can release, and creates the claim. What came of it (the claim,
+ * or the page a refusal sends the claimant to) is kept against the answers, outside the session where a stale
+ * session save cannot undo it, and a repeat of the same answers gets the same outcome.
  */
 export async function createClaimFromStartAnswers(req: Request): Promise<string> {
   const store = guardStoreOf(req);
-  const sessionId = req.sessionID;
-  if (!store || !sessionId) {
+  if (!store || !req.sessionID) {
     return (await createClaim(req)).next;
   }
-  const created = await store.get(createdKey(sessionId));
-  if (created) {
-    return eligibleUrl(created);
+  const key = answersKey(req);
+  const outcomeKey = `make-a-claim:created:${key}`;
+  const lockKey = `make-a-claim:creating:${key}`;
+  const recorded = await readOutcome(store, outcomeKey);
+  if (recorded) {
+    return recorded;
   }
-  if ((await store.set(lockKey(sessionId), '1', 'PX', CREATION_LOCK_MS, 'NX')) !== 'OK') {
-    return waitForCreatedClaim(store, sessionId);
+  const token = randomUUID();
+  if ((await store.set(lockKey, token, 'PX', CREATION_LOCK_MS, 'NX')) !== 'OK') {
+    return waitForOutcome(store, outcomeKey, lockKey);
   }
   try {
     const { next, caseReference } = await createClaim(req);
-    if (caseReference) {
-      await store.set(createdKey(sessionId), caseReference, 'EX', CREATED_CLAIM_TTL_SECONDS);
-    }
+    const outcome: CreationOutcome = caseReference ? { caseReference } : { redirect: next };
+    await store.set(
+      outcomeKey,
+      JSON.stringify(outcome),
+      'EX',
+      caseReference ? CREATED_CLAIM_TTL_SECONDS : REFUSED_CLAIM_TTL_SECONDS
+    );
     return next;
   } finally {
-    await store.del(lockKey(sessionId));
+    await store.eval(RELEASE_OWN_LOCK, 1, lockKey, token);
   }
 }
 
-async function waitForCreatedClaim(store: CreationGuardStore, sessionId: string): Promise<string> {
+async function readOutcome(store: CreationGuardStore, outcomeKey: string): Promise<string | undefined> {
+  const recorded = await store.get(outcomeKey);
+  return recorded ? outcomeUrl(JSON.parse(recorded) as CreationOutcome) : undefined;
+}
+
+async function waitForOutcome(store: CreationGuardStore, outcomeKey: string, lockKey: string): Promise<string> {
   for (let waited = 0; waited < CREATION_LOCK_MS; waited += WAIT_INTERVAL_MS) {
     await new Promise(resolve => setTimeout(resolve, WAIT_INTERVAL_MS));
-    const created = await store.get(createdKey(sessionId));
-    if (created) {
-      return eligibleUrl(created);
+    const outcome = await readOutcome(store, outcomeKey);
+    if (outcome) {
+      return outcome;
     }
-    if (!(await store.get(lockKey(sessionId)))) {
+    if (!(await store.get(lockKey))) {
       break;
     }
   }
   return `${MAKE_A_CLAIM_START_ROUTE}/who-is-claiming`;
-}
-
-/** The claim this pass through the start questions created, which a repeated submission continues with. */
-export async function createdCaseReference(req: Request): Promise<string | undefined> {
-  const store = guardStoreOf(req);
-  return (store && req.sessionID ? await store.get(createdKey(req.sessionID)) : null) ?? undefined;
-}
-
-/** Forgets the claim the start questions created, so starting again makes a new one. */
-export async function forgetCreatedClaim(req: Request): Promise<void> {
-  const store = guardStoreOf(req);
-  if (store && req.sessionID) {
-    await store.del(createdKey(req.sessionID));
-  }
 }
 
 async function createClaim(req: Request): Promise<{ next: string; caseReference?: string }> {
@@ -143,7 +176,6 @@ async function createClaim(req: Request): Promise<{ next: string; caseReference?
       },
     });
     const caseReference = String(created.id);
-    clearFormData(req);
     return { next: eligibleUrl(caseReference), caseReference };
   } catch (error) {
     const redirect = refusedClaimRedirect(error);

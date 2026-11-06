@@ -388,6 +388,7 @@ export interface RelatedApplicationOption {
 export interface CcdCase {
   id: string;
   data: CcdCaseData;
+  state?: string;
   after_submit_callback_response?: {
     confirmation_header?: string | null;
     confirmation_body?: string | null;

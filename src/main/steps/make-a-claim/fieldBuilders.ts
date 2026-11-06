@@ -77,6 +77,7 @@ export function dateField(name: string, extra: Partial<FormFieldConfig> = {}): F
     type: 'date',
     required: true,
     noFutureDate: true,
+    noCurrentDate: false,
     translationKey: { label: `labels.${name.split('.').pop()}`, hint: `hints.${name.split('.').pop()}` },
     legendClasses: 'govuk-fieldset__legend--s',
     ...extra,

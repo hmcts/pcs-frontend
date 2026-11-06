@@ -2,6 +2,8 @@ import { randomUUID } from 'crypto';
 
 import type { Request } from 'express';
 
+import { penceToPounds, strictPoundsToPence } from '../utils/currencyConversion';
+
 import { offeredProofTypes } from './conditions';
 import { todayInLondon } from './dates';
 import { FIELD_LIMITS } from './fieldLimits';
@@ -12,7 +14,6 @@ import {
   addressToForm,
   checkedValues,
   dateFromBody,
-  fromPenceString,
   fromYesNo,
   indexFromQuery,
   isReadable,
@@ -21,7 +22,6 @@ import {
   readPence,
   text,
   toDateParts,
-  toPenceString,
   toYesNo,
 } from './formValues';
 import {
@@ -167,7 +167,7 @@ function withReason<K extends 'tenancy' | 'notice'>(
 
 function moneyStep(field: 'rentAmount' | 'arrearsAtNoticeDate' | 'currentArrears'): StepMapping {
   return {
-    toForm: claim => ({ [field]: fromPenceString(claim.rentArrears?.[field]) }),
+    toForm: claim => ({ [field]: penceToPounds(claim.rentArrears?.[field]) }),
     fromForm: (claim, body) =>
       setNested(claim, 'rentArrears', rentArrears => {
         rentArrears[field] = readPence(body[field]);
@@ -358,11 +358,9 @@ export const claimMappings: Record<string, StepMapping> = {
   },
 
   'additional-defendants': {
-    toForm: claim => (claim.additionalDefendants === 'NO' ? { additionalDefendants: 'no' } : {}),
-    fromForm: (claim, body) => {
-      claim.additionalDefendants = toYesNo(body.additionalDefendants);
-    },
-    isAnswered: claim => claim.additionalDefendants === 'NO',
+    isAnswered: claim =>
+      Boolean(claim.defendants?.length) &&
+      (claim.defendants ?? []).every(defendant => defendant.value.addressSameAsProperty !== undefined),
   },
 
   'tenancy-type': {
@@ -598,8 +596,8 @@ export const claimMappings: Record<string, StepMapping> = {
       return {
         transactionDate: toDateParts(entry.transactionDate),
         transactionTypes: entry.transactionTypes ?? [],
-        'transactionTypes.amountCharged': fromPenceString(entry.amountCharged),
-        'transactionTypes.amountPaid': fromPenceString(entry.amountPaid),
+        'transactionTypes.amountCharged': penceToPounds(entry.amountCharged),
+        'transactionTypes.amountPaid': penceToPounds(entry.amountPaid),
         description: entry.description,
       };
     },
@@ -664,11 +662,11 @@ export const claimMappings: Record<string, StepMapping> = {
   'rent-statement-payment': {
     toForm: (claim, req) => {
       const row = claim.rentArrears?.rentHistoryTable?.[indexFromQuery(req.query?.row) ?? -1]?.value;
-      return row ? { datePaid: toDateParts(row.datePaid), amountPaid: fromPenceString(row.amountPaid) } : {};
+      return row ? { datePaid: toDateParts(row.datePaid), amountPaid: penceToPounds(row.amountPaid) } : {};
     },
     fromForm: (claim, body, req) => {
       const datePaid = dateFromBody(body, 'datePaid');
-      const amountPaid = toPenceString(body.amountPaid);
+      const amountPaid = strictPoundsToPence(body.amountPaid);
       if (!datePaid || !amountPaid) {
         return;
       }

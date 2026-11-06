@@ -176,7 +176,6 @@ export function defendantsCard(req: Request): SummaryCard {
       );
     }
   });
-  builder.add('additional-defendants', 'additionalDefendants', yesNo(t, claim.additionalDefendants));
   return { id: 'defendants', title: t('makeAClaim:summary.cards.defendants'), rows: builder.build() };
 }
 

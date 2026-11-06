@@ -1,7 +1,7 @@
 {% extends "make-a-claim/templates/layout.njk" %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "macros/stepButtons.njk" import stepButtons %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% from "make-a-claim/templates/fields.njk" import formField %}
 
@@ -52,7 +52,21 @@
     {% endblock %}
 
     {% block buttons %}
-      {{ stepButtons(saveAndContinue, saveForLater) }}
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: saveAndContinue,
+          preventDoubleClick: true,
+          attributes: { name: 'action', value: 'continue' }
+        }) }}
+        {% if saveForLater %}
+          {{ govukButton({
+            text: saveForLater,
+            classes: 'govuk-button--secondary',
+            preventDoubleClick: true,
+            attributes: { name: 'action', value: 'saveForLater' }
+          }) }}
+        {% endif %}
+      </div>
       {% if not saveForLater and dashboardUrl %}
         <p class="govuk-body"><a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a></p>
       {% endif %}

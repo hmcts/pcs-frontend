@@ -11,6 +11,7 @@ import express, { type Express, type Request, type Response } from 'express';
 export const CASE_REFERENCE = '1777027600017761';
 
 export interface StoredCase {
+  state?: string;
   propertyAddress?: Record<string, string>;
   citizenPossessionClaim?: Record<string, unknown>;
 }
@@ -49,7 +50,10 @@ function ccdStub(): Express {
     if (ccd.refuseCreate) {
       return res.status(422).json({ callbackErrors: [ccd.refuseCreate] });
     }
-    ccd.stored = { citizenPossessionClaim: { ...req.body.data.citizenPossessionClaim, draftVersion: 1 } };
+    ccd.stored = {
+      state: 'AWAITING_SUBMISSION_TO_HMCTS',
+      citizenPossessionClaim: { ...req.body.data.citizenPossessionClaim, draftVersion: 1 },
+    };
     res.status(201).json({ id: Number(CASE_REFERENCE), data: {} });
   });
   stub.post('/case-types/:caseType/validate', (req: Request, res: Response) => {
@@ -80,13 +84,16 @@ function ccdStub(): Express {
     if (!ccd.stored || req.params.id !== CASE_REFERENCE) {
       return res.status(404).json({ message: 'Case not found' });
     }
+    if (req.params.event === 'citizenMakePossessionClaim' && ccd.stored.state !== 'AWAITING_SUBMISSION_TO_HMCTS') {
+      return res.status(422).json({ message: 'The case status did not qualify for the event' });
+    }
     res.json({ token: `${req.params.event}-token`, case_details: { case_data: ccd.stored } });
   });
   stub.get('/cases/:id', (req: Request, res: Response) => {
     if (!ccd.stored || req.params.id !== CASE_REFERENCE) {
       return res.status(404).json({ message: 'Case not found' });
     }
-    res.json({ id: CASE_REFERENCE, data: ccd.stored });
+    res.json({ id: CASE_REFERENCE, state: ccd.stored.state, data: ccd.stored });
   });
   stub.post('/cases/:id/events', (req: Request, res: Response) => {
     ccd.submissions.push(req.body);
@@ -100,6 +107,7 @@ function ccdStub(): Express {
     const fee = { serviceRequestReference: '2026-1777027600017', feeAmount: '40400' };
     ccd.stored = {
       ...ccd.stored,
+      state: 'PENDING_CASE_ISSUED',
       citizenPossessionClaim: { ...draft, submission: { ...(draft.submission as object), ...fee } },
     };
     res.json({
@@ -272,8 +280,9 @@ export function storedClaim(): Record<string, any> {
 }
 
 /** Puts a case with this claim in CCD, as if the claimant had already answered these questions. */
-export function givenClaim(claim: Record<string, unknown>): void {
+export function givenClaim(claim: Record<string, unknown>, state = 'AWAITING_SUBMISSION_TO_HMCTS'): void {
   ccd.stored = {
+    state,
     citizenPossessionClaim: {
       propertyAddress: { AddressLine1: '15 Garden Drive', PostTown: 'Luton', PostCode: 'LU1 1AB' },
       draftVersion: 1,

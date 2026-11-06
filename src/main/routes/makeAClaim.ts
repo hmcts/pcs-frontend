@@ -1,9 +1,10 @@
 import config from 'config';
-import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
+import type { Application, ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
 import {
   CLAIM_SUBMITTED_ROUTE,
+  MAKE_A_CLAIM_ROUTE,
   PAY_CLAIM_FEE_ROUTE,
   PAY_CLAIM_FEE_START_ROUTE,
   makeAClaimPath,
@@ -12,6 +13,8 @@ import { oidcMiddleware } from '../middleware';
 import { formatPence } from '../steps/make-a-claim/rentHistory';
 import { startFlowConfig } from '../steps/make-a-claim/start/flow.config';
 import { startStepRegistry } from '../steps/make-a-claim/start/stepRegistry';
+import { AWAITING_SUBMISSION, submittedClaimRedirect, taskListPath } from '../steps/make-a-claim/submittedClaim';
+import { penceToPounds } from '../steps/utils/currencyConversion';
 
 import { Logger } from '@modules/logger';
 import { getTranslationFunction, stepDependencyCheckMiddleware, withStepContext } from '@modules/steps';
@@ -151,7 +154,7 @@ function registerSubmittedClaimRoutes(app: Application): void {
       const payment = await paymentService.startCardPaymentRequest({
         accessToken: req.session.user?.accessToken as string,
         serviceRequestReference: fee.serviceRequestReference,
-        amount: Number(fee.feeAmountInPence) / 100,
+        amount: Number(penceToPounds(fee.feeAmountInPence)),
         requestLanguage: req.language,
         returnUrl: config.get<string>('payment.returnUrl'),
       });
@@ -179,7 +182,10 @@ function registerSubmittedClaimRoutes(app: Application): void {
   app.get(CLAIM_SUBMITTED_ROUTE, oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const caseReference = caseReferenceOf(req);
-      await ccdCaseService.getCaseById(req.session.user?.accessToken as string, caseReference);
+      const state = (await ccdCaseService.getCaseById(req.session.user?.accessToken as string, caseReference)).state;
+      if (state === AWAITING_SUBMISSION) {
+        return res.redirect(303, taskListPath(caseReference));
+      }
       const content = pageContent(
         req,
         ['pageTitle', 'whatHappensNextHeading', 'whatHappensNext', 'feedbackLink'],
@@ -201,7 +207,19 @@ function registerSubmittedClaimRoutes(app: Application): void {
   });
 }
 
+/**
+ * A journey page fails once the claim is submitted, because its event only runs on a draft: a second click on
+ * Submit, or a page opened in another tab. Send the claimant on to the claim's fee instead of an error page.
+ */
+const submittedClaimErrorHandler: ErrorRequestHandler = async (error, req, res, next) => {
+  const caseReference = sanitiseCaseReference(String(req.params.caseReference ?? ''));
+  const accessToken = req.session?.user?.accessToken;
+  const redirect = caseReference && accessToken ? await submittedClaimRedirect(accessToken, caseReference) : undefined;
+  return redirect ? res.redirect(303, redirect) : next(error);
+};
+
 export default function makeAClaimRoutes(app: Application): void {
   registerStartSteps(app);
   registerSubmittedClaimRoutes(app);
+  app.use(MAKE_A_CLAIM_ROUTE, submittedClaimErrorHandler);
 }

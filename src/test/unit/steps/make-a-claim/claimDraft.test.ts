@@ -79,10 +79,61 @@ describe('normaliseClaim', () => {
       })
     ).toEqual({
       defendants: [{ value: { nameKnown: 'NO', addressSameAsProperty: 'YES' } }],
+      additionalDefendants: 'NO',
       notice: { noticeServed: 'YES', noticeMethods: ['EMAIL'], emailedTo: 'a@b.test' },
       grounds: { otherGrounds: ['GROUND_1'] },
       claimant: { contactByPhone: 'YES', contactByText: 'NO' },
     });
+  });
+
+  it.each([
+    ['UPLOAD_STATEMENT', 'rentStatementDocuments'],
+    ['LEDGER', 'rentHistoryLedger'],
+    ['TABLE', 'rentHistoryTable'],
+  ] as const)('keeps only the rent history %s proves the arrears with', (proofType, kept) => {
+    const rentArrears = normaliseClaim({
+      rentArrears: {
+        proofType,
+        rentFrequency: 'MONTHLY',
+        rentStatementDocuments: [],
+        rentHistoryLedger: [],
+        rentHistoryTable: [],
+      },
+    }).rentArrears as Record<string, unknown>;
+    expect(Object.keys(rentArrears).filter(key => key.startsWith('rent') && key !== 'rentFrequency')).toEqual([kept]);
+  });
+
+  it('keeps the ledger of a claim whose design flipped to the table until the claimant chooses again', () => {
+    expect(
+      normaliseClaim({ rentArrears: { proofType: 'LEDGER', rentHistoryLedger: [{ value: {} }] } }).rentArrears
+    ).toEqual({ proofType: 'LEDGER', rentHistoryLedger: [{ value: {} }] });
+    expect(
+      normaliseClaim({ rentArrears: { proofType: 'TABLE', rentHistoryLedger: [{ value: {} }] } }).rentArrears
+    ).toEqual({ proofType: 'TABLE' });
+  });
+
+  it('drops a rent statement table for rent paid at another frequency, which cannot have one', () => {
+    expect(
+      normaliseClaim({ rentArrears: { rentFrequency: 'OTHER', proofType: 'TABLE', rentHistoryTable: [{ value: {} }] } })
+        .rentArrears
+    ).toEqual({ rentFrequency: 'OTHER' });
+  });
+
+  it('drops grounds and an underlessee the claimant said no to, or never said yes to', () => {
+    expect(
+      normaliseClaim({
+        grounds: { hasRentArrearsGrounds: 'NO', rentArrearsGrounds: ['GROUND_8'], otherGrounds: ['GROUND_1'] },
+        circumstances: { underlesseeName: 'X', underlesseeAddress: { AddressLine1: '1' } },
+      })
+    ).toEqual({ grounds: { hasRentArrearsGrounds: 'NO', otherGrounds: ['GROUND_1'] }, circumstances: {} });
+  });
+
+  it('says there are additional defendants exactly when there is more than one', () => {
+    expect(normaliseClaim({ defendants: [{ value: {} }] }).additionalDefendants).toBe('NO');
+    expect(
+      normaliseClaim({ defendants: [{ value: {} }, { value: {} }], additionalDefendants: 'NO' }).additionalDefendants
+    ).toBe('YES');
+    expect(normaliseClaim({}).additionalDefendants).toBeUndefined();
   });
 
   it('keeps the rent due day only for monthly rent', () => {
@@ -203,11 +254,38 @@ describe('saveClaimDraft', () => {
     service.updateDraft.mockRejectedValue(new CallbackRejectedError(['DRAFT_CHANGED'], 422));
     service.getCaseByIdForEvent.mockResolvedValue({
       id: CASE,
-      data: { citizenPossessionClaim: { draftVersion: 5, defendants: [{ id: 'kept', value: { nameKnown: 'NO' } }] } },
+      data: {
+        citizenPossessionClaim: {
+          draftVersion: 5,
+          defendants: [{ id: 'kept', value: { nameKnown: 'NO' } }],
+          additionalDefendants: 'NO',
+        },
+      },
     });
     const req = request();
     await saveClaimDraft(req, { draftVersion: 4, defendants: [{ id: 'another', value: { nameKnown: 'NO' } }] });
     expect(req.res?.locals.validatedCase?.data?.citizenPossessionClaim?.draftVersion).toBe(5);
+  });
+
+  it('takes the repeat as done when pcs-api returns the chosen grounds and methods in another order', async () => {
+    service.updateDraft.mockRejectedValue(new CallbackRejectedError(['DRAFT_CHANGED'], 422));
+    service.getCaseByIdForEvent.mockResolvedValue({
+      id: CASE,
+      data: {
+        citizenPossessionClaim: {
+          draftVersion: 5,
+          grounds: { otherGrounds: ['GROUND_14', 'GROUND_1A'] },
+          notice: { noticeServed: 'YES', noticeMethods: ['EMAIL', 'FIRST_CLASS_POST'] },
+        },
+      },
+    });
+    await expect(
+      saveClaimDraft(request(), {
+        draftVersion: 4,
+        grounds: { otherGrounds: ['GROUND_1A', 'GROUND_14'] },
+        notice: { noticeServed: 'YES', noticeMethods: ['FIRST_CLASS_POST', 'EMAIL'] },
+      })
+    ).resolves.toBeUndefined();
   });
 
   it('refuses a save after another tab saved different answers', async () => {

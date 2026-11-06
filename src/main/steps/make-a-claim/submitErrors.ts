@@ -156,8 +156,8 @@ export function submitErrorCodes(query: unknown): string[] {
 }
 
 /**
- * Whether a draft save or submit was refused because another tab or window saved the claim after this page was
- * shown: the version the page posted is no longer the stored one, and the answers differ.
+ * Whether pcs-api refused a draft save or submit with DRAFT_CHANGED, meaning the draft version sent is no longer
+ * the stored one. A repeat of a save that already went through never gets here: saveClaimDraft takes that as done.
  */
 export function isDraftChanged(error: unknown): boolean {
   return error instanceof CallbackRejectedError && error.reasons.includes(DRAFT_CHANGED);

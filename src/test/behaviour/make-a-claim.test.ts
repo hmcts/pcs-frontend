@@ -3,6 +3,8 @@
  */
 import { JSDOM } from 'jsdom';
 
+import { todayInLondon } from '../../main/utils/formatLocalisedDate';
+
 import {
   CASE_REFERENCE,
   type TestApp,
@@ -725,12 +727,62 @@ describe('review fixes', () => {
     );
   });
 
+  it('sends a second click on Submit to the claim fee rather than an error', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(SUBMITTABLE);
+    expect((await app.post(claimPath('check-your-answers'), SIGNED)).location).toBe(
+      `/case/${CASE_REFERENCE}/pay-claim-fee`
+    );
+    expect((await app.post(claimPath('check-your-answers'), SIGNED)).location).toBe(
+      `/case/${CASE_REFERENCE}/pay-claim-fee`
+    );
+    expect(ccd.submissions).toHaveLength(1);
+  });
+
+  it('shows a draft claim’s task list, not the submitted confirmation', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(SUBMITTABLE);
+    expect((await app.get(`/case/${CASE_REFERENCE}/claim-submitted`)).location).toBe(claimPath('task-list'));
+  });
+
+  it('accepts today on every date that has to be today or in the past', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...ANSWERED_CLAIM,
+      rentArrears: {
+        ...ANSWERED_CLAIM.rentArrears,
+        proofType: 'TABLE',
+        rentHistoryTable: [{ value: { periodStart: '2026-06-01', dateDue: '2026-06-01', amountDue: '100000' } }],
+      },
+    });
+    const [year, month, day] = todayInLondon().split('-');
+    const today = { day, month, year };
+    const parts = (name: string) => ({
+      [`${name}-day`]: today.day,
+      [`${name}-month`]: today.month,
+      [`${name}-year`]: today.year,
+    });
+    const pages: [string, Record<string, string | string[]>][] = [
+      ['tenancy-start-date', parts('tenancyStartDate')],
+      ['notice-date', parts('noticeDate')],
+      [
+        'ledger-transaction',
+        { ...parts('transactionDate'), transactionTypes: 'RENT_CHARGE', 'transactionTypes.amountCharged': '10' },
+      ],
+      ['rent-statement-payment?period=2026-06-01', { ...parts('datePaid'), amountPaid: '10' }],
+    ];
+    for (const [page, body] of pages) {
+      expect([page, (await app.post(claimPath(page), body)).status]).toEqual([page, 303]);
+    }
+  });
+
   describe('back from GOV.UK Pay', () => {
     const FEE = { submission: { serviceRequestReference: 'SR-1', feeAmount: '40400' } };
+    const SUBMITTED = 'PENDING_CASE_ISSUED';
 
     it('shows the claim submitted once the card payment went through, and never offers the fee again', async () => {
       app = await bootMakeAClaim();
-      givenClaim(FEE);
+      givenClaim(FEE, SUBMITTED);
       await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee/start`);
       const back = await app.get('/payment/return/RC-1111/confirmation');
       expect(back.location).toBe(`/case/${CASE_REFERENCE}/claim-submitted?status=success`);
@@ -744,7 +796,7 @@ describe('review fixes', () => {
 
     it('says the payment is being processed while GOV.UK Pay has not finished it', async () => {
       app = await bootMakeAClaim();
-      givenClaim(FEE);
+      givenClaim(FEE, SUBMITTED);
       ccd.cardPaymentStatus = 'Initiated';
       await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee/start`);
       const back = await app.get('/payment/return/RC-1111/confirmation');
@@ -755,7 +807,7 @@ describe('review fixes', () => {
 
     it('offers the payment again after a declined card', async () => {
       app = await bootMakeAClaim();
-      givenClaim(FEE);
+      givenClaim(FEE, SUBMITTED);
       ccd.cardPaymentStatus = 'Failed';
       await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee/start`);
       const back = await app.get('/payment/return/RC-1111/confirmation');
@@ -768,7 +820,10 @@ describe('review fixes', () => {
 
   it('never starts a second payment for a claim already paid', async () => {
     app = await bootMakeAClaim();
-    givenClaim({ submission: { serviceRequestReference: 'SR-1', feeAmount: '40400', paymentStatus: 'PAID' } });
+    givenClaim(
+      { submission: { serviceRequestReference: 'SR-1', feeAmount: '40400', paymentStatus: 'PAID' } },
+      'CASE_ISSUED'
+    );
     expect((await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee`)).location).toBe(
       `/case/${CASE_REFERENCE}/claim-submitted`
     );

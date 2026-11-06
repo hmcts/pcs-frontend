@@ -386,6 +386,7 @@ export const ccdCaseService = {
       return {
         id: String(response.data.id ?? safeCaseId),
         data: caseData,
+        ...(response.data.state ? { state: response.data.state } : {}),
       };
     } catch (error) {
       throw convertReadErrorToHttpError(error, 'getCaseById');

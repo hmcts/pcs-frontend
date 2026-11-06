@@ -1,3 +1,4 @@
+import { strictPoundsToPence } from '../utils/currencyConversion';
 import { formatDatePartsToISODate, parseISOToDateParts } from '../utils/dateUtils';
 
 import type { CcdCaseAddress } from '@services/ccdCase.interface';
@@ -39,33 +40,12 @@ export function fromYesNo(value: YesNo | undefined): 'yes' | 'no' | undefined {
   return undefined;
 }
 
-const MONEY = /^\d{1,10}(?:\.\d{1,2})?$/;
-
-/** Pounds as typed (commas allowed) to pence as a string, or undefined when it is not an amount. */
-export function toPenceString(value: unknown): string | undefined {
-  const amount = text(value)?.replace(/,/g, '').replace(/^£/, '');
-  if (!amount || !MONEY.test(amount)) {
-    return undefined;
-  }
-  const [pounds, pennies = ''] = amount.split('.');
-  return String(Number(pounds) * 100 + Number(pennies.padEnd(2, '0')));
-}
-
-/** Pence as a string to pounds for an input, e.g. 150000 as 1500.00. */
-export function fromPenceString(value: string | undefined): string | undefined {
-  if (value === undefined || value === '' || !/^\d+$/.test(value)) {
-    return undefined;
-  }
-  const pence = Number(value);
-  return `${Math.floor(pence / 100)}.${String(pence % 100).padStart(2, '0')}`;
-}
-
 export function amountValidator(errorKey: string) {
   return (value: unknown): boolean | string => {
     if (text(value) === undefined) {
       return true;
     }
-    return toPenceString(value) === undefined ? errorKey : true;
+    return strictPoundsToPence(value) === undefined ? errorKey : true;
   };
 }
 
@@ -154,7 +134,7 @@ export function readPence(value: unknown): string | undefined {
   if (text(value) === undefined) {
     return undefined;
   }
-  return toPenceString(value) ?? UNREADABLE;
+  return strictPoundsToPence(value) ?? UNREADABLE;
 }
 
 /** A yyyy-MM-dd date, undefined when every part was left empty, or {@link UNREADABLE}. */

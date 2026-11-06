@@ -12,6 +12,7 @@ import {
   submitErrorItems,
   submitRefusalOutcome,
 } from '../submitErrors';
+import { submittedClaimRedirect } from '../submittedClaim';
 import { allCards } from '../summary';
 
 import { Logger } from '@modules/logger';
@@ -89,6 +90,10 @@ export const step: StepDefinition = createMakeAClaimStep({
         error: error instanceof Error ? error.message : String(error),
         reasons: error instanceof CallbackRejectedError ? error.reasons : undefined,
       });
+      const submitted = await submittedClaimRedirect(req.session.user?.accessToken as string, caseId);
+      if (submitted) {
+        return req.res?.redirect(303, submitted);
+      }
       const outcome = submitRefusalOutcome(error, caseId);
       return req.res?.redirect(
         303,
