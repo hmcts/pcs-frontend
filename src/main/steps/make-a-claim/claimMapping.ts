@@ -186,6 +186,22 @@ export function rentStatementRange(claim: CitizenPossessionClaim, req: Request):
   return statementRangeOf(claim.rentArrears?.rentHistoryTable, claim.rentArrears ?? {});
 }
 
+/**
+ * Whether the claimant has answered that there are no more defendants to add. pcs-api only needs whether there is
+ * more than one, so the answer is kept for the task list in the session, and forgotten when the defendants change.
+ */
+export function defendantsConfirmed(req: Request): boolean {
+  const caseId = req.res?.locals.validatedCase?.id;
+  return Boolean(caseId && req.session?.defendantsConfirmed?.[caseId]);
+}
+
+function confirmDefendants(req: Request, confirmed: boolean): void {
+  const caseId = req.res?.locals.validatedCase?.id;
+  if (caseId && req.session) {
+    req.session.defendantsConfirmed = { ...req.session.defendantsConfirmed, [caseId]: confirmed };
+  }
+}
+
 /** Remembers the period the claimant gave for this claim's rent statement, which the claim itself has no field for. */
 function rememberStatementPeriod(req: Request, range: StatementRange): void {
   const caseId = req.res?.locals.validatedCase?.id;
@@ -329,12 +345,16 @@ export const claimMappings: Record<string, StepMapping> = {
         'nameKnown.lastName': defendant?.lastName,
       };
     },
-    fromForm: (claim, body, req) =>
+    fromForm: (claim, body, req) => {
+      if (defendantIndexOf(req) >= (claim.defendants?.length ?? 0)) {
+        confirmDefendants(req, false);
+      }
       updateDefendant(claim, defendantIndexOf(req), defendant => {
         defendant.nameKnown = toYesNo(body.nameKnown);
         defendant.firstName = defendant.nameKnown === 'YES' ? text(body['nameKnown.firstName']) : undefined;
         defendant.lastName = defendant.nameKnown === 'YES' ? text(body['nameKnown.lastName']) : undefined;
-      }),
+      });
+    },
     isAnswered: claim => defendantAt(claim, 0)?.nameKnown !== undefined,
   },
 
@@ -358,9 +378,9 @@ export const claimMappings: Record<string, StepMapping> = {
   },
 
   'additional-defendants': {
-    isAnswered: claim =>
-      Boolean(claim.defendants?.length) &&
-      (claim.defendants ?? []).every(defendant => defendant.value.addressSameAsProperty !== undefined),
+    toForm: (_claim, req) => (defendantsConfirmed(req) ? { additionalDefendants: 'no' } : {}),
+    fromForm: (_claim, body, req) => confirmDefendants(req, body.additionalDefendants === 'no'),
+    isAnswered: (claim, req) => Boolean(claim.defendants?.length) && defendantsConfirmed(req),
   },
 
   'tenancy-type': {
@@ -778,6 +798,7 @@ export const claimMappings: Record<string, StepMapping> = {
       const index = itemIndexOf(req, claim.defendants, 'index');
       if (body.confirmRemove === 'yes' && index !== undefined) {
         removeDefendant(claim, index);
+        confirmDefendants(req, false);
       }
     },
   },

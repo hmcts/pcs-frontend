@@ -7,10 +7,11 @@ import { PROPERTY_INELIGIBLE_URL } from '../../../constants/makeAClaimRoutes';
 import { getUserToken } from '../../utils/userRole';
 import { flowConfig } from '../flow.config';
 import { addressFromBody } from '../formValues';
+import { AWAITING_SUBMISSION, caseStateOf } from '../submittedClaim';
 
 import { MAKE_A_CLAIM_START_ROUTE } from './flow.config';
 
-import { getAllFormData } from '@modules/steps';
+import { clearFormData, getAllFormData, setFormData } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
 import { ccdCaseService } from '@services/ccdCaseService';
 import type { LegislativeCountry } from '@services/citizenPossessionClaim.interface';
@@ -23,9 +24,11 @@ export const PROPERTY_ADDRESS_TOO_LONG_URL = `${MAKE_A_CLAIM_START_ROUTE}/proper
 /** How long a claim creation holds its lock, and how long a repeated submission waits for it. */
 const CREATION_LOCK_MS = 15_000;
 const WAIT_INTERVAL_MS = 200;
-/** How long the claim created for a set of answers is reused, and a refusal of them replayed. */
-const CREATED_CLAIM_TTL_SECONDS = 60 * 60;
-const REFUSED_CLAIM_TTL_SECONDS = 60;
+/** How long what came of a set of answers is replayed: long enough for a double click or a concurrent repeat. */
+const OUTCOME_TTL_SECONDS = 60;
+
+/** The pre-case answers that name this pass through the start questions, renewed each time the start page is shown. */
+const START_ATTEMPT = 'start-attempt';
 
 /** Deletes the lock only if it still holds this request's token, so a lock that expired and was retaken survives. */
 const RELEASE_OWN_LOCK =
@@ -78,6 +81,7 @@ function answersKey(req: Request): string {
   const digest = createHash('sha256')
     .update(
       JSON.stringify([
+        answers[START_ATTEMPT]?.id,
         answers['claimant-type']?.claimantType,
         answers.trespass?.isTrespass,
         addressFromBody(answers['property-address'] ?? {}, 'property'),
@@ -110,8 +114,9 @@ export async function createClaimFromStartAnswers(req: Request): Promise<string>
   const outcomeKey = `make-a-claim:created:${key}`;
   const lockKey = `make-a-claim:creating:${key}`;
   const recorded = await readOutcome(store, outcomeKey);
-  if (recorded) {
-    return recorded;
+  const recordedUrl = recorded && outcomeUrl(recorded);
+  if (recorded && recordedUrl && (await stillReusable(req, recorded))) {
+    return recordedUrl;
   }
   const token = randomUUID();
   if ((await store.set(lockKey, token, 'PX', CREATION_LOCK_MS, 'NX')) !== 'OK') {
@@ -120,29 +125,38 @@ export async function createClaimFromStartAnswers(req: Request): Promise<string>
   try {
     const { next, caseReference } = await createClaim(req);
     const outcome: CreationOutcome = caseReference ? { caseReference } : { redirect: next };
-    await store.set(
-      outcomeKey,
-      JSON.stringify(outcome),
-      'EX',
-      caseReference ? CREATED_CLAIM_TTL_SECONDS : REFUSED_CLAIM_TTL_SECONDS
-    );
+    await store.set(outcomeKey, JSON.stringify(outcome), 'EX', OUTCOME_TTL_SECONDS);
     return next;
   } finally {
     await store.eval(RELEASE_OWN_LOCK, 1, lockKey, token);
   }
 }
 
-async function readOutcome(store: CreationGuardStore, outcomeKey: string): Promise<string | undefined> {
+async function readOutcome(store: CreationGuardStore, outcomeKey: string): Promise<CreationOutcome | undefined> {
   const recorded = await store.get(outcomeKey);
-  return recorded ? outcomeUrl(JSON.parse(recorded) as CreationOutcome) : undefined;
+  return recorded ? (JSON.parse(recorded) as CreationOutcome) : undefined;
+}
+
+/** A repeat reuses the claim made for the same answers only while it is still a draft; a refusal always replays. */
+async function stillReusable(req: Request, outcome: CreationOutcome): Promise<boolean> {
+  if (!outcome.caseReference) {
+    return true;
+  }
+  return (await caseStateOf(getUserToken(req), outcome.caseReference)) === AWAITING_SUBMISSION;
+}
+
+/** Forgets what came of earlier passes through the start questions, so starting again makes a new claim. */
+export function startNewAttempt(req: Request): void {
+  setFormData(req, START_ATTEMPT, { id: randomUUID() });
 }
 
 async function waitForOutcome(store: CreationGuardStore, outcomeKey: string, lockKey: string): Promise<string> {
   for (let waited = 0; waited < CREATION_LOCK_MS; waited += WAIT_INTERVAL_MS) {
     await new Promise(resolve => setTimeout(resolve, WAIT_INTERVAL_MS));
     const outcome = await readOutcome(store, outcomeKey);
-    if (outcome) {
-      return outcome;
+    const url = outcome && outcomeUrl(outcome);
+    if (url) {
+      return url;
     }
     if (!(await store.get(lockKey))) {
       break;
@@ -176,6 +190,7 @@ async function createClaim(req: Request): Promise<{ next: string; caseReference?
       },
     });
     const caseReference = String(created.id);
+    clearFormData(req);
     return { next: eligibleUrl(caseReference), caseReference };
   } catch (error) {
     const redirect = refusedClaimRedirect(error);

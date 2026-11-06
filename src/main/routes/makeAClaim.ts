@@ -1,5 +1,5 @@
 import config from 'config';
-import type { Application, ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from 'express';
+import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
 import {
@@ -211,12 +211,17 @@ function registerSubmittedClaimRoutes(app: Application): void {
  * A journey page fails once the claim is submitted, because its event only runs on a draft: a second click on
  * Submit, or a page opened in another tab. Send the claimant on to the claim's fee instead of an error page.
  */
-const submittedClaimErrorHandler: ErrorRequestHandler = async (error, req, res, next) => {
+async function submittedClaimErrorHandler(
+  error: unknown,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
   const caseReference = sanitiseCaseReference(String(req.params.caseReference ?? ''));
   const accessToken = req.session?.user?.accessToken;
   const redirect = caseReference && accessToken ? await submittedClaimRedirect(accessToken, caseReference) : undefined;
   return redirect ? res.redirect(303, redirect) : next(error);
-};
+}
 
 export default function makeAClaimRoutes(app: Application): void {
   registerStartSteps(app);

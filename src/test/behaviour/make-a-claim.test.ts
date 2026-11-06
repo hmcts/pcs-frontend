@@ -201,6 +201,77 @@ describe('before a claim exists', () => {
     expect(ccd.createRequests[1].data.citizenPossessionClaim.eligibility.legislativeCountry).toBe('England');
   });
 
+  it('asks the country again for a cross-border property in a later claim', async () => {
+    app = await bootMakeAClaim({ redis: true });
+    ccd.refuseCreate = 'LEGISLATIVE_COUNTRY_REQUIRED';
+    await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+    await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+    await app.post('/make-a-claim/property-address', PROPERTY);
+    await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
+    expect((await app.post('/make-a-claim/property-country', { legislativeCountry: 'England' })).location).toBe(
+      claimPath('eligible')
+    );
+
+    await app.get('/make-a-claim');
+    await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+    await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+    await app.post('/make-a-claim/property-address', { ...PROPERTY, 'property-addressLine1': '17 Garden Drive' });
+    expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
+      '/make-a-claim/property-country'
+    );
+  });
+
+  describe('when the same answers are given again', () => {
+    const answerStartQuestions = async (): Promise<void> => {
+      await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+      await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+      await app.post('/make-a-claim/property-address', PROPERTY);
+    };
+
+    it('creates one claim for a double click', async () => {
+      app = await bootMakeAClaim({ redis: true });
+      await answerStartQuestions();
+      const clicks = await Promise.all([
+        app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' }),
+        app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' }),
+      ]);
+      expect(clicks.map(click => click.location)).toEqual([claimPath('eligible'), claimPath('eligible')]);
+      expect(ccd.createRequests).toHaveLength(1);
+    });
+
+    it('goes back to the claim just made while it is still a draft', async () => {
+      app = await bootMakeAClaim({ redis: true });
+      await answerStartQuestions();
+      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
+      await answerStartQuestions();
+      expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
+        claimPath('eligible')
+      );
+      expect(ccd.createRequests).toHaveLength(1);
+    });
+
+    it('creates a new claim for the same property once the first is submitted', async () => {
+      app = await bootMakeAClaim({ redis: true });
+      await answerStartQuestions();
+      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
+      ccd.stored!.state = 'PENDING_CASE_ISSUED';
+      await answerStartQuestions();
+      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
+      expect(ccd.createRequests).toHaveLength(2);
+    });
+
+    it('creates a new claim when the claimant starts again from the start page', async () => {
+      app = await bootMakeAClaim({ redis: true });
+      await app.get('/make-a-claim');
+      await answerStartQuestions();
+      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
+      await app.get('/make-a-claim');
+      await answerStartQuestions();
+      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
+      expect(ccd.createRequests).toHaveLength(2);
+    });
+  });
+
   it('turns away a cross-border property in Wales without creating the claim', async () => {
     app = await bootMakeAClaim();
     await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
@@ -252,6 +323,7 @@ describe('the task list', () => {
   it('opens checking your answers once every section is done', async () => {
     app = await bootMakeAClaim();
     givenClaim(ANSWERED_CLAIM);
+    await app.post(claimPath('additional-defendants'), { additionalDefendants: 'no' });
     const page = text((await app.get(claimPath('task-list'))).text);
     expect(page).toContain('Proof of rent arrears In progress');
     givenClaim({
@@ -360,6 +432,21 @@ describe('answering questions', () => {
       address: { AddressLine1: '2 Other Road', PostTown: 'Luton', PostCode: 'LU2 2BB' },
     });
     expect(text((await app.get(claimPath('defendant-cya'))).text)).toContain('Defendant 2 name Persons unknown');
+  });
+
+  it('leaves the defendants in progress until the claimant says there are no more to add', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ eligibility: ANSWERED_CLAIM.eligibility });
+    await app.post(claimPath('defendant-name'), { nameKnown: 'no' });
+    await app.post(claimPath('defendant-address'), { sameAsProperty: 'yes', action: 'saveForLater' });
+    expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants In progress');
+
+    await app.post(claimPath('additional-defendants'), { additionalDefendants: 'no' });
+    expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants Done');
+
+    await app.post(claimPath('additional-defendants'), { additionalDefendants: 'yes' });
+    await app.post(`${claimPath('defendant-name')}?index=1`, { nameKnown: 'no' });
+    expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants In progress');
   });
 });
 

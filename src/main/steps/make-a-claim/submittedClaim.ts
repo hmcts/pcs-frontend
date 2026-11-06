@@ -1,5 +1,8 @@
-import { MAKE_A_CLAIM_ROUTE, PAY_CLAIM_FEE_ROUTE, makeAClaimPath } from '../../constants/makeAClaimRoutes';
+import { PAY_CLAIM_FEE_ROUTE, makeAClaimPath } from '../../constants/makeAClaimRoutes';
 
+import { flowConfig } from './flow.config';
+
+import { getStepUrl } from '@modules/steps/flow';
 import { ccdCaseService } from '@services/ccdCaseService';
 
 /** The state a private landlord claim is in until it is submitted. */
@@ -24,5 +27,5 @@ export async function submittedClaimRedirect(accessToken: string, caseReference:
 }
 
 export function taskListPath(caseReference: string): string {
-  return `${makeAClaimPath(MAKE_A_CLAIM_ROUTE, caseReference)}/task-list`;
+  return getStepUrl('task-list', flowConfig, caseReference);
 }

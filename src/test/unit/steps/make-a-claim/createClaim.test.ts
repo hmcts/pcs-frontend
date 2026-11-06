@@ -8,22 +8,29 @@ import {
   PROPERTY_NOT_COVERED_URL,
   createClaimFromStartAnswers,
   refusedClaimRedirect,
+  startNewAttempt,
 } from '../../../../main/steps/make-a-claim/start/createClaim';
 
-jest.mock('../../../../main/services/ccdCaseService', () => ({ ccdCaseService: { createPossessionClaim: jest.fn() } }));
+jest.mock('../../../../main/services/ccdCaseService', () => ({
+  ccdCaseService: { createPossessionClaim: jest.fn(), getCaseById: jest.fn() },
+}));
 
 const create = ccdCaseService.createPossessionClaim as jest.Mock;
+const getCase = ccdCaseService.getCaseById as jest.Mock;
 
 /** The Redis commands the guard uses, against an in-memory map, shared by every request given it. */
 function fakeRedis() {
   const values = new Map<string, string>();
+  const expiries = new Map<string, unknown>();
   return {
     values,
+    expiries,
     async set(key: string, value: string, ...options: (string | number)[]) {
       if (options.includes('NX') && values.has(key)) {
         return null;
       }
       values.set(key, value);
+      expiries.set(key, options[options.indexOf('EX') + 1]);
       return 'OK';
     },
     async get(key: string) {
@@ -94,7 +101,13 @@ describe('refusedClaimRedirect', () => {
 });
 
 describe('createClaimFromStartAnswers', () => {
-  beforeEach(() => create.mockReset());
+  beforeEach(() => {
+    create.mockReset();
+    getCase.mockReset().mockResolvedValue({ state: 'AWAITING_SUBMISSION_TO_HMCTS' });
+  });
+
+  const createdKeys = (redis: ReturnType<typeof fakeRedis>) =>
+    [...redis.values.keys()].filter(key => key.startsWith('make-a-claim:created:'));
 
   it('creates the claim with the property and eligibility answers inside the claim', async () => {
     create.mockResolvedValue({ id: 1777027600017761, data: {} });
@@ -144,6 +157,58 @@ describe('createClaimFromStartAnswers', () => {
       '/case/1777027600017761/make-a-claim/eligible'
     );
     expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps what came of the answers only long enough for a double click or a concurrent repeat', async () => {
+    create.mockResolvedValue({ id: 1777027600017761, data: {} });
+    const redis = fakeRedis();
+    await createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    expect(createdKeys(redis).map(key => redis.expiries.get(key))).toEqual([60]);
+  });
+
+  it('creates a new claim for the same answers once the first has expired from the guard', async () => {
+    create
+      .mockResolvedValueOnce({ id: 1777027600017761, data: {} })
+      .mockResolvedValueOnce({ id: 1777027600017762, data: {} });
+    const redis = fakeRedis();
+    await createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    createdKeys(redis).forEach(key => redis.values.delete(key));
+    await expect(createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis))).resolves.toBe(
+      '/case/1777027600017762/make-a-claim/eligible'
+    );
+  });
+
+  it('creates a new claim for the same answers once the first claim is submitted', async () => {
+    create
+      .mockResolvedValueOnce({ id: 1777027600017761, data: {} })
+      .mockResolvedValueOnce({ id: 1777027600017762, data: {} });
+    const redis = fakeRedis();
+    await createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    getCase.mockResolvedValue({ state: 'PENDING_CASE_ISSUED' });
+    await expect(createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis))).resolves.toBe(
+      '/case/1777027600017762/make-a-claim/eligible'
+    );
+    expect(getCase).toHaveBeenCalledWith('token', '1777027600017761');
+  });
+
+  it('creates a new claim for the same answers given after the start page is shown again', async () => {
+    create
+      .mockResolvedValueOnce({ id: 1777027600017761, data: {} })
+      .mockResolvedValueOnce({ id: 1777027600017762, data: {} });
+    const redis = fakeRedis();
+    const first = request(ELIGIBLE, 'session-1', redis);
+    startNewAttempt(first);
+    await createClaimFromStartAnswers(first);
+    const again = request(ELIGIBLE, 'session-1', redis);
+    startNewAttempt(again);
+    await expect(createClaimFromStartAnswers(again)).resolves.toBe('/case/1777027600017762/make-a-claim/eligible');
+  });
+
+  it('forgets the answers once the claim is created, so the next claim asks them again', async () => {
+    create.mockResolvedValue({ id: 1777027600017761, data: {} });
+    const req = request({ ...ELIGIBLE, 'property-country': { legislativeCountry: 'England' } });
+    await createClaimFromStartAnswers(req);
+    expect(req.session.formData?.makeAClaim?.default ?? {}).toEqual({});
   });
 
   it('creates a new claim when the claimant answers again for another property', async () => {

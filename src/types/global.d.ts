@@ -48,6 +48,8 @@ interface CustomSessionData extends SessionData {
   rentStatementPeriods?: Record<string, { statementStart: string; statementEnd: string }>;
   // The last card payment started for each private landlord claim's fee, keyed by case reference.
   claimFeePayments?: Record<string, string>;
+  // Whether the claimant has said they have no more defendants to add, keyed by case reference.
+  defendantsConfirmed?: Record<string, boolean>;
   destroy(callback: (err?: Error) => void): void;
   clientContext?: ClientContextHeaders;
 }
