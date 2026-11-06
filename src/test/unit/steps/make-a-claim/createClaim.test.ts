@@ -12,6 +12,7 @@ import {
 } from '../../../../main/steps/make-a-claim/start/createClaim';
 
 jest.mock('../../../../main/services/ccdCaseService', () => ({
+  ...jest.requireActual('../../../../main/services/ccdCaseService'),
   ccdCaseService: { createPossessionClaim: jest.fn(), getCaseById: jest.fn() },
 }));
 
@@ -30,7 +31,8 @@ function fakeRedis() {
         return null;
       }
       values.set(key, value);
-      expiries.set(key, options[options.indexOf('EX') + 1]);
+      const expiry = options.findIndex(option => option === 'EX' || option === 'PX');
+      expiries.set(key, expiry >= 0 ? options[expiry + 1] : undefined);
       return 'OK';
     },
     async get(key: string) {
@@ -268,6 +270,94 @@ describe('createClaimFromStartAnswers', () => {
     await new Promise(resolve => setTimeout(resolve, 10));
     refuse(new CallbackRejectedError(['PROPERTY_NOT_IN_ENGLAND'], 422));
     await expect(Promise.all([first, second])).resolves.toEqual([PROPERTY_INELIGIBLE_URL, PROPERTY_INELIGIBLE_URL]);
+    expect(create).toHaveBeenCalledTimes(1);
+  });
+
+  it('holds the lock for longer than both create calls can take, and a waiter waits while it is held', async () => {
+    jest.useFakeTimers();
+    try {
+      let finish: (value: unknown) => void = () => undefined;
+      create.mockReturnValue(new Promise(resolve => (finish = resolve)));
+      const redis = fakeRedis();
+      const holder = createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+      await jest.advanceTimersByTimeAsync(10);
+      const [lockKey] = [...redis.values.keys()].filter(key => key.startsWith('make-a-claim:creating:'));
+      expect(redis.expiries.get(lockKey)).toBe(90_000);
+
+      let waited: string | undefined;
+      const waiter = createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis)).then(url => (waited = url));
+      await jest.advanceTimersByTimeAsync(20_000);
+      expect(waited).toBeUndefined();
+
+      finish({ id: 1777027600017761, data: {} });
+      await jest.advanceTimersByTimeAsync(400);
+      await expect(Promise.all([holder, waiter])).resolves.toEqual([
+        '/case/1777027600017761/make-a-claim/eligible',
+        '/case/1777027600017761/make-a-claim/eligible',
+      ]);
+      expect(create).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('makes one new claim for a double click after the earlier claim was submitted, never replaying the old one', async () => {
+    create.mockResolvedValueOnce({ id: 1777027600017761, data: {} });
+    const redis = fakeRedis();
+    await createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    getCase.mockResolvedValue({ state: 'PENDING_CASE_ISSUED' });
+
+    let finish: (value: unknown) => void = () => undefined;
+    create.mockReturnValueOnce(new Promise(resolve => (finish = resolve)));
+    const clicks = [
+      createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis)),
+      createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis)),
+    ];
+    await new Promise(resolve => setTimeout(resolve, 10));
+    expect(createdKeys(redis)).toEqual([]);
+    finish({ id: 1777027600017762, data: {} });
+
+    await expect(Promise.all(clicks)).resolves.toEqual([
+      '/case/1777027600017762/make-a-claim/eligible',
+      '/case/1777027600017762/make-a-claim/eligible',
+    ]);
+    expect(create).toHaveBeenCalledTimes(2);
+  });
+
+  it('has a waiter take only the outcome of the creation it waited for', async () => {
+    let finish: (value: unknown) => void = () => undefined;
+    create.mockReturnValue(new Promise(resolve => (finish = resolve)));
+    const redis = fakeRedis();
+    const holder = createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    await new Promise(resolve => setTimeout(resolve, 10));
+    const waiter = createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    await new Promise(resolve => setTimeout(resolve, 10));
+    const [outcomeKey] = [...redis.values.keys()]
+      .filter(key => key.startsWith('make-a-claim:creating:'))
+      .map(key => key.replace('creating', 'created'));
+    redis.values.set(outcomeKey, JSON.stringify({ token: 'another-creation', caseReference: '1777027600017769' }));
+    await new Promise(resolve => setTimeout(resolve, 300));
+    finish({ id: 1777027600017761, data: {} });
+
+    await expect(Promise.all([holder, waiter])).resolves.toEqual([
+      '/case/1777027600017761/make-a-claim/eligible',
+      '/case/1777027600017761/make-a-claim/eligible',
+    ]);
+  });
+
+  it('fails a waiter with the error the creation it waited for failed with', async () => {
+    let fail: (error: unknown) => void = () => undefined;
+    create.mockReturnValue(new Promise((_resolve, reject) => (fail = reject)));
+    const redis = fakeRedis();
+    const holder = createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    const waiter = createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    await new Promise(resolve => setTimeout(resolve, 10));
+    fail(new HTTPError('CCD down', 503, '120'));
+
+    await expect(holder).rejects.toMatchObject({ message: 'CCD down', status: 503 });
+    await expect(waiter).rejects.toEqual(new HTTPError('CCD down', 503, '120'));
+    await expect(waiter).rejects.toBeInstanceOf(HTTPError);
+    expect(createdKeys(redis).map(key => redis.expiries.get(key))).toEqual([60]);
     expect(create).toHaveBeenCalledTimes(1);
   });
 

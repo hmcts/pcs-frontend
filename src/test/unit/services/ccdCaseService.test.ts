@@ -479,6 +479,14 @@ describe('ccdCaseService', () => {
       expect(result).toEqual({ id: '1777000000000001', data: {} });
     });
 
+    it('gives each call of the create a timeout', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'event-token' } });
+      mockPost.mockResolvedValue({ data: { id: '1777000000000001', data: {} } });
+      await ccdCaseService.createPossessionClaim(accessToken, data);
+      expect(mockGet.mock.calls[0][1]).toMatchObject({ timeout: 30_000 });
+      expect(mockPost.mock.calls[0][2]).toMatchObject({ timeout: 30_000 });
+    });
+
     it('reports pcs-api refusing the claim with its reasons', async () => {
       mockGet.mockResolvedValue({ data: { token: 'event-token' } });
       mockPost.mockRejectedValue({

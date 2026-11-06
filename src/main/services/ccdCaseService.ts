@@ -200,10 +200,10 @@ function convertReadErrorToHttpError(error: unknown, context: string): HTTPError
  * @param url - CCD event trigger URL
  * @returns Event token for SUBMIT phase
  */
-async function getEventToken(userToken: string, url: string): Promise<string> {
+async function getEventToken(userToken: string, url: string, timeout?: number): Promise<string> {
   try {
     logger.info(`Calling getEventToken with URL: ${url}`);
-    const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
+    const response = await http.get<EventTokenResponse>(url, { ...getCaseHeaders(userToken), timeout });
     return response.data.token;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'getEventToken');
@@ -233,7 +233,8 @@ async function submitEvent(
   url: string,
   eventId: string,
   eventToken: string,
-  data: CcdCaseData | Record<string, unknown>
+  data: CcdCaseData | Record<string, unknown>,
+  timeout?: number
 ): Promise<CcdCase> {
   const payload = {
     data: data as Record<string, unknown>,
@@ -248,7 +249,7 @@ async function submitEvent(
 
   try {
     logger.info(`Calling submitEvent with URL: ${url}, eventId: ${eventId}`);
-    const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
+    const response = await http.post<CcdCase>(url, payload, { ...getCaseHeaders(userToken), timeout });
     return response.data;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'submitEvent');
@@ -258,6 +259,9 @@ async function submitEvent(
 export const DEFENDANT_SUPPORT_EVENT_ID = 'requestSupport';
 
 export const CITIZEN_CREATE_POSSESSION_CLAIM_EVENT_ID = 'citizenCreatePossessionClaim';
+
+/** The longest each of the create event's two CCD calls may take, so a claim creation cannot outlive its lock. */
+export const CREATE_POSSESSION_CLAIM_TIMEOUT_MS = 30_000;
 
 /** What the citizen create event takes: the property and eligibility answers, inside the claim pcs-api starts. */
 export interface CitizenCreatePossessionClaimData {
@@ -399,10 +403,17 @@ export const ccdCaseService = {
    */
   async createPossessionClaim(accessToken: string, data: CitizenCreatePossessionClaimData): Promise<CcdCase> {
     const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/${CITIZEN_CREATE_POSSESSION_CLAIM_EVENT_ID}`;
-    const eventToken = await getEventToken(accessToken, eventUrl);
+    const eventToken = await getEventToken(accessToken, eventUrl, CREATE_POSSESSION_CLAIM_TIMEOUT_MS);
 
     const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/cases`;
-    return submitEvent(accessToken, url, CITIZEN_CREATE_POSSESSION_CLAIM_EVENT_ID, eventToken, { ...data });
+    return submitEvent(
+      accessToken,
+      url,
+      CITIZEN_CREATE_POSSESSION_CLAIM_EVENT_ID,
+      eventToken,
+      { ...data },
+      CREATE_POSSESSION_CLAIM_TIMEOUT_MS
+    );
   },
 
   /**
