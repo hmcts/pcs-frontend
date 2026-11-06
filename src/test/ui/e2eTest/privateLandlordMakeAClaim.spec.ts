@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
 import {
+  ENGLISH_PROPERTY,
   WELSH_PROPERTY,
   answer,
   becomeEligible,
@@ -88,7 +89,7 @@ test.describe('Private landlord cannot use the service @privateLandlord', () => 
     await startAsPrivateLandlord(page, startUrl);
     await page.getByRole('radio', { name: /^No – my claim is against a tenant/ }).check();
     await continueOn(page);
-    await enterAddress(page, 'property', { line1: '10 Downing Street', town: 'London', postcode: 'SW1A 2AA' });
+    await enterAddress(page, 'property', ENGLISH_PROPERTY);
     await continueOn(page);
     await page.getByRole('radio', { name: 'A client – I’m their solicitor', exact: true }).check();
     await continueOn(page);

@@ -9,8 +9,9 @@ export type RentHistoryDesign = 'ledger' | 'table';
 
 export const MAKE_A_CLAIM_FLAG = 'private-landlord-make-a-claim-enabled';
 
-export const ENGLISH_PROPERTY = { line1: '10 Downing Street', town: 'London', postcode: 'SW1A 2AA' };
-export const WELSH_PROPERTY = { line1: '1 Cathays Park', town: 'Cardiff', postcode: 'CF10 3NQ' };
+/** Postcodes pcs-api maps to a court (V026__pilot_postcodes.sql): Bradford in England, Betws-y-Coed in Wales. */
+export const ENGLISH_PROPERTY = { line1: '1 Test Street', town: 'Bradford', postcode: 'BD10 0JB' };
+export const WELSH_PROPERTY = { line1: '1 Test Street', town: 'Betws-y-Coed', postcode: 'LL24 0BE' };
 
 /** Whether the private landlord journey is switched on for the environment under test. */
 export async function isMakeAClaimEnabled(): Promise<boolean> {
