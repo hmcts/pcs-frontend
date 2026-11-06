@@ -50,6 +50,7 @@ export async function createClaimFromStartAnswers(req: Request): Promise<string>
   if (
     answers['claimant-type']?.claimantType !== 'PRIVATE_LANDLORD' ||
     answers.trespass?.isTrespass !== 'no' ||
+    answers['who-is-claiming']?.whoIsClaiming !== 'MYSELF' ||
     !propertyAddress?.AddressLine1
   ) {
     return MAKE_A_CLAIM_START_ROUTE;

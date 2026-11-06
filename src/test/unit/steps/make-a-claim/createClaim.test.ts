@@ -30,6 +30,7 @@ const ELIGIBLE = {
     'property-town': 'Luton',
     'property-postcode': 'lu1 1ab',
   },
+  'who-is-claiming': { whoIsClaiming: 'MYSELF' },
 };
 
 const ELIGIBILITY = { claimantType: 'PRIVATE_LANDLORD', isTrespass: 'NO', whoIsClaiming: 'MYSELF' };
@@ -102,10 +103,21 @@ describe('createClaimFromStartAnswers', () => {
     await expect(createClaimFromStartAnswers(request(ELIGIBLE))).rejects.toThrow('CCD down');
   });
 
+  it('creates no claim from the country answer once the claimant says a solicitor is claiming', async () => {
+    const answers = {
+      ...ELIGIBLE,
+      'who-is-claiming': { whoIsClaiming: 'SOLICITOR' },
+      'property-country': { legislativeCountry: 'England' },
+    };
+    await expect(createClaimFromStartAnswers(request(answers))).resolves.toBe('/make-a-claim');
+    expect(create).not.toHaveBeenCalled();
+  });
+
   it.each([
     ['not a private landlord', { ...ELIGIBLE, 'claimant-type': { claimantType: 'MORTGAGE_LENDER' } }],
     ['claiming against trespassers', { ...ELIGIBLE, trespass: { isTrespass: 'yes' } }],
     ['without a property', { ...ELIGIBLE, 'property-address': {} }],
+    ['without saying they are claiming for themselves', { ...ELIGIBLE, 'who-is-claiming': {} }],
   ])('starts again a claimant %s', async (_case, answers) => {
     await expect(createClaimFromStartAnswers(request(answers))).resolves.toBe('/make-a-claim');
     expect(create).not.toHaveBeenCalled();

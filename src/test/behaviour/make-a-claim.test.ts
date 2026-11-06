@@ -227,6 +227,8 @@ describe('before a claim exists', () => {
     await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
     await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
     await app.post('/make-a-claim/property-address', PROPERTY);
+    ccd.refuseCreate = 'LEGISLATIVE_COUNTRY_REQUIRED';
+    await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
     for (const page of ['/make-a-claim/who-is-claiming', '/make-a-claim/property-country']) {
       const shown = await app.get(page);
       expect(shown.status).toBe(200);

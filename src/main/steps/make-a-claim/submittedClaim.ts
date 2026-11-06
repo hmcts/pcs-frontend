@@ -6,7 +6,7 @@ import { ccdCaseService } from '@services/ccdCaseService';
 export const AWAITING_SUBMISSION = 'AWAITING_SUBMISSION_TO_HMCTS';
 
 /** The claim's case state, or undefined when the case cannot be read. */
-export async function caseStateOf(accessToken: string, caseReference: string): Promise<string | undefined> {
+async function caseStateOf(accessToken: string, caseReference: string): Promise<string | undefined> {
   try {
     return (await ccdCaseService.getCaseById(accessToken, caseReference)).state;
   } catch {
