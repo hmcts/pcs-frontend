@@ -1,7 +1,10 @@
+import { buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import config from 'config';
-import type { NextFunction, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
+import { linkSignOutToLogout } from '../middleware/legalRepresentativeHeaders';
+import { getUserRoles } from '../steps/utils';
 
 import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 
@@ -37,7 +40,7 @@ export function errorSummary(issues: ValidationIssue[]): ErrorSummary | undefine
  * an event from their role assignments: anyone else is not given the event's payload or allowed
  * to submit it, and is shown the page does not exist.
  */
-export function refusedXUIEvent(
+export function refusedXuiEvent(
   res: Response,
   next: NextFunction,
   error: unknown,
@@ -58,4 +61,16 @@ export function manageCaseDetailsUrl(caseReference: string): string {
     throw new HTTPError('The Manage Case return URL is not configured', 500);
   }
   return url;
+}
+
+/**
+ * XUI's header as it shows it to the user. XUI adds a user's role assignments, such as judge, to their
+ * IDAM roles to choose the header; pass the role assignment the page's CCD event is limited to.
+ */
+export function xuiHeaderModel(req: Request, roleAssignments: string[] = []): ReturnType<typeof buildHeaderModel> {
+  const roles = [...getUserRoles(req), ...roleAssignments];
+  const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles } });
+  headerModel.assetsPath = '/assets/ui-component-lib';
+  linkSignOutToLogout(headerModel);
+  return headerModel;
 }

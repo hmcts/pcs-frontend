@@ -9,7 +9,7 @@ import {
   errorSummary,
   manageCaseDetailsUrl,
   mapXuiValidation,
-  refusedXUIEvent,
+  refusedXuiEvent,
 } from '@utils/xuiUtils';
 
 describe('xuiUtils', () => {
@@ -31,7 +31,7 @@ describe('xuiUtils', () => {
       const error = new CallbackRejectedError(['Rejected'], 400);
       const rejected = jest.fn();
 
-      refusedXUIEvent(res, next as NextFunction, error, rejected);
+      refusedXuiEvent(res, next as NextFunction, error, rejected);
 
       expect(rejected).toHaveBeenCalledWith(error);
       expect(next).not.toHaveBeenCalled();
@@ -41,7 +41,7 @@ describe('xuiUtils', () => {
     it('should handle 403 error message', () => {
       const error = new HTTPError('Forbidden', 403);
 
-      refusedXUIEvent(res, next as NextFunction, error);
+      refusedXuiEvent(res, next as NextFunction, error);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.send).toHaveBeenCalledWith('Not Found');
@@ -51,7 +51,7 @@ describe('xuiUtils', () => {
     it('should handle 404 error message', () => {
       const error = new HTTPError('Not Found', 404);
 
-      refusedXUIEvent(res, next as NextFunction, error);
+      refusedXuiEvent(res, next as NextFunction, error);
 
       expect(res.status).toHaveBeenCalledWith(404);
       expect(res.send).toHaveBeenCalledWith('Not Found');
@@ -61,7 +61,7 @@ describe('xuiUtils', () => {
     it('should pass any other error to next', () => {
       const error = new Error('Something went wrong');
 
-      refusedXUIEvent(res, next as NextFunction, error);
+      refusedXuiEvent(res, next as NextFunction, error);
 
       expect(next).toHaveBeenCalledWith(error);
       expect(res.status).not.toHaveBeenCalled();

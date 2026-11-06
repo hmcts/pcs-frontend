@@ -31,7 +31,8 @@ import {
   errorSummary,
   manageCaseDetailsUrl,
   mapXuiValidation,
-  refusedXUIEvent,
+  refusedXuiEvent,
+  xuiHeaderModel,
 } from '@utils/xuiUtils';
 
 const RECORD_WARRANT_RETURN_EVENT_ID: string = 'ext:recordWarrantReturn';
@@ -131,9 +132,11 @@ export default function recordWarrantReturnRoutes(app: Application): void {
         evictionData,
         propertyAddress: formatAddress(ccdCase.propertyAddress),
         caseReference,
+        footerModel: buildFooterModel(),
+        headerModel: xuiHeaderModel(req),
       });
     } catch (error) {
-      refusedXUIEvent(res, next, error);
+      refusedXuiEvent(res, next, error);
     }
   });
 
@@ -167,6 +170,8 @@ export default function recordWarrantReturnRoutes(app: Application): void {
         evictionSuccessfulReturnTypeList,
         evictionUnsuccessfulReturnTypeList,
         interimReturnTypeList,
+        footerModel: buildFooterModel(),
+        headerModel: xuiHeaderModel(req),
       });
     } else {
       res.redirect(pageUrl(caseReference, 'checkYourAnswers'));
