@@ -79,29 +79,19 @@
       }}
     </div>
 
-    <div id="additional-details-mandatory" class="govuk-!-display-none">
-      {{ govukCharacterCount({
-          name: "additional-details-mandatory",
-          id: "additional-details-mandatory",
-          maxLength: 6800,
-          label: {
-            text: "Additional details"
+    {{ govukCharacterCount({
+        name: "additional-details",
+        id: "additional-details",
+        maxLength: 6800,
+        label: {
+          text: "Additional details",
+          classes: "",
+          attributes: {
+            id: "additional-details-label"
           }
-        })
-      }}
-    </div>
-
-    <div id="additional-details-optional" class="govuk-!-display-none">
-      {{ govukCharacterCount({
-      name: "additional-details-mandatory",
-          id: "additional-details-mandatory",
-          maxLength: 6800,
-          label: {
-            text: "Additional details (Optional)"
-          }
-        })
-      }}
-    </div>
+        }
+      })
+    }}
 
     {{ buttons.eventButtons() }}
   </form>

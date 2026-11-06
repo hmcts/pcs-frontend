@@ -66,22 +66,29 @@ export interface EvictionSummaryData {
   }[];
 }
 
-export const warrantReturnTypeList: { value: WarrantReturnType; text: string }[] = [
+export const warrantReturnTypeList: { value: WarrantReturnType | null; text: string }[] = [
+  { value: null, text: '--Select a value--' },
   { value: WarrantReturnType.FINAL, text: 'Final' },
   { value: WarrantReturnType.INTERIM, text: 'Interim' },
 ];
 
-export const evictionOutcomeList: { value: EvictionOutcome; text: string }[] = [
+export const evictionOutcomeList: { value: EvictionOutcome | null; text: string }[] = [
+  { value: null, text: '--Select a value--' },
   { value: EvictionOutcome.SUCCESSFUL, text: 'Eviction successful' },
   { value: EvictionOutcome.UNSUCCESSFUL, text: 'Eviction unsuccessful' },
   { value: EvictionOutcome.CANCELLED, text: 'Eviction cancelled' },
 ];
 
-export const evictionSuccessfulReturnTypeList: { value: EvictionSuccessfulReturnName; text: string }[] = [
+export const evictionSuccessfulReturnTypeList: { value: EvictionSuccessfulReturnName | null; text: string }[] = [
+  { value: null, text: '--Select a value--' },
   { value: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL, text: 'Eviction successful' },
 ];
 
-export const evictionUnsuccessfulReturnTypeList: { value: EvictionUnsuccessfulReturnName; text: string }[] = [
+export const evictionUnsuccessfulReturnTypeList: { value: EvictionUnsuccessfulReturnName | null; text: string }[] = [
+  {
+    value: null,
+    text: '--Select a value--'
+  },
   {
     value: EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
     text: 'Warrant withdrawn',
@@ -132,7 +139,11 @@ export const evictionUnsuccessfulReturnTypeList: { value: EvictionUnsuccessfulRe
   },
 ];
 
-export const interimReturnTypeList: { value: InterimReturnName; text: string }[] = [
+export const interimReturnTypeList: { value: InterimReturnName | null; text: string }[] = [
+  {
+    value: null,
+    text: '--Select a value--'
+  },
   {
     value: InterimReturnName.APPLICATION_UNSUCCESSFUL,
     text: 'Application unsuccessful & warrant returned to bailiff',
@@ -256,4 +267,143 @@ export function isAdditionalDetailsMandatoryInterim(returnName: InterimReturnNam
   return mandatoryReturnNames.has(returnName);
 }
 
-export function initWarrantReturnForm(): void {}
+export function initWarrantReturn(): void {
+  const returnTypeList = document.querySelector<HTMLSelectElement>('#return-type');
+  if (!returnTypeList) {
+    return;
+  }
+
+  returnTypeList.addEventListener('change', _ => {
+    handleReturnTypeShowConditions(returnTypeList);
+  });
+
+  const finalOutcomeList = document.querySelector<HTMLSelectElement>('#final-outcome');
+  finalOutcomeList?.addEventListener('change', _ => {
+    handleFinalOutcomeShowConditions(finalOutcomeList);
+  });
+
+  const evictionSuccessfulReturnNameList = document.querySelector<HTMLSelectElement>(
+    '#eviction-successful-return-name'
+  );
+  evictionSuccessfulReturnNameList?.addEventListener('change', _ => {
+    handleEvictionSuccessfulShowConditions(evictionSuccessfulReturnNameList);
+  });
+
+  const evictionUnsuccessfulReturnNameList = document.querySelector<HTMLSelectElement>(
+    '#eviction-unsuccessful-return-name'
+  );
+  evictionUnsuccessfulReturnNameList?.addEventListener('change', _ => {
+    handleEvictionUnsuccessfulShowConditions(evictionUnsuccessfulReturnNameList);
+  });
+
+  const interimReturnNameList = document.querySelector<HTMLSelectElement>('#interim-return-name');
+  interimReturnNameList?.addEventListener('change', _ => {
+    handleInterimShowConditions(interimReturnNameList);
+  });
+}
+
+function handleReturnTypeShowConditions(returnTypeList: HTMLSelectElement) {
+  const finalOutcome = document.querySelector<HTMLDivElement>('#final-outcome');
+  const interim = document.querySelector<HTMLDivElement>('#interim');
+
+  if (returnTypeList.value === WarrantReturnType.FINAL) {
+    finalOutcome!.classList.remove('govuk-!-display-none');
+    interim?.classList.add('govuk-!-display-none');
+    resetInterimReturnNames();
+  } else if (returnTypeList.value === WarrantReturnType.INTERIM) {
+    finalOutcome!.classList.add('govuk-!-display-none');
+    interim?.classList.remove('govuk-!-display-none');
+    resetFinalOutcomeInputs();
+    resetEvictionSuccessfulInput();
+    resetEvictionUnsuccessfulInput();
+  } else {
+    finalOutcome?.classList.remove('govuk-!-display-none');
+    interim?.classList.remove('govuk-!-display-none');
+    resetAllInputs();
+  }
+}
+
+function handleFinalOutcomeShowConditions(finalOutcomeList: HTMLSelectElement): void {
+  const evictionSuccessful = document.querySelector<HTMLDivElement>('#eviction-successful');
+  const evictionUnsuccessfulCancelled = document.querySelector<HTMLDivElement>('#eviction-unsuccessful-cancelled');
+  if (finalOutcomeList?.value === EvictionOutcome.SUCCESSFUL) {
+    evictionSuccessful?.classList.remove('govuk-!-display-none');
+    evictionUnsuccessfulCancelled?.classList.add('govuk-!-display-none');
+    resetEvictionUnsuccessfulInput();
+  } else if (
+    finalOutcomeList?.value === EvictionOutcome.UNSUCCESSFUL ||
+    finalOutcomeList?.value === EvictionOutcome.CANCELLED
+  ) {
+    evictionSuccessful?.classList.add('govuk-!-display-none');
+    evictionUnsuccessfulCancelled?.classList.remove('govuk-!-display-none');
+    resetEvictionSuccessfulInput();
+  } else {
+    evictionSuccessful?.classList.remove('govuk-!-display-none');
+    evictionUnsuccessfulCancelled?.classList.remove('govuk-!-display-none');
+    resetEvictionSuccessfulInput();
+    resetEvictionUnsuccessfulInput();
+  }
+
+  handleAdditionalDetailsShowConditions(true);
+}
+
+function handleEvictionSuccessfulShowConditions(evictionSuccessfulReturnNameList: HTMLSelectElement): void {
+  if (evictionSuccessfulReturnNameList.value === EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL) {
+    handleAdditionalDetailsShowConditions(true);
+  } else {
+    handleAdditionalDetailsShowConditions(false);
+  }
+}
+
+function handleEvictionUnsuccessfulShowConditions(evictionUnsuccessfulReturnNameList: HTMLSelectElement): void {
+  if (isAdditionalDetailsMandatoryEvictionUnsuccessful(evictionUnsuccessfulReturnNameList.value as EvictionUnsuccessfulReturnName)) {
+    handleAdditionalDetailsShowConditions(true);
+  } else {
+    handleAdditionalDetailsShowConditions(false);
+  }
+}
+
+function handleInterimShowConditions(interimReturnNameList: HTMLSelectElement): void {
+  if (isAdditionalDetailsMandatoryInterim(interimReturnNameList.value as InterimReturnName)) {
+    handleAdditionalDetailsShowConditions(true);
+  } else {
+    handleAdditionalDetailsShowConditions(false);
+  }
+}
+
+function handleAdditionalDetailsShowConditions(isMandatory: boolean) {
+  const label = document.getElementById('additional-details-label');
+  label!.textContent = isMandatory ? 'Additional details' :'Additional details (Optional)';
+}
+
+function resetAllInputs(): void {
+  resetInterimReturnNames();
+  resetFinalOutcomeInputs();
+  resetEvictionSuccessfulInput();
+  resetEvictionUnsuccessfulInput();
+  handleAdditionalDetailsShowConditions(true);
+}
+
+function resetFinalOutcomeInputs(): void {
+  const finalOutcomeList = document.querySelector<HTMLSelectElement>('[final-outcome]');
+  finalOutcomeList!.value = '';
+}
+
+function resetInterimReturnNames(): void {
+  const interimReturnNameList = document.querySelector<HTMLSelectElement>('[interim-return-name]');
+  interimReturnNameList!.value = '';
+}
+
+function resetEvictionSuccessfulInput(): void {
+  const evictionSuccessfulReturnNameList = document.querySelector<HTMLSelectElement>(
+    '#eviction-successful-return-name'
+  );
+  evictionSuccessfulReturnNameList!.value = '';
+}
+
+function resetEvictionUnsuccessfulInput(): void {
+  const evictionUnsuccessfulReturnNameList = document.querySelector<HTMLSelectElement>(
+    '#eviction-unsuccessful-return-nameß'
+  );
+  evictionUnsuccessfulReturnNameList!.value = '';
+}

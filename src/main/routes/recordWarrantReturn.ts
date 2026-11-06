@@ -260,7 +260,7 @@ function validateEvictionUnsuccessful(
 
   if (isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName) && !req.body.additionalDetails) {
     errors.push({
-      id: 'additional-details-mandatory',
+      id: 'additional-details',
       message: ADDITIONAL_DETAILS_ERROR_MESSAGE,
     });
   }
@@ -290,7 +290,7 @@ function validateInterimWarrantReturn(req: Request, caseReference: string): Vali
 
   if (isAdditionalDetailsMandatoryInterim(returnName) && !req.body.additionalDetails) {
     errors.push({
-      id: 'additional-details-mandatory',
+      id: 'additional-details',
       message: ADDITIONAL_DETAILS_ERROR_MESSAGE,
     });
   }
