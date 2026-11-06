@@ -203,7 +203,7 @@ describe('before a claim exists', () => {
   });
 
   it('asks the country again for a cross-border property in a later claim', async () => {
-    app = await bootMakeAClaim({ redis: true });
+    app = await bootMakeAClaim();
     ccd.refuseCreate = 'LEGISLATIVE_COUNTRY_REQUIRED';
     await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
     await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
@@ -222,67 +222,17 @@ describe('before a claim exists', () => {
     );
   });
 
-  describe('when the same answers are given again', () => {
-    const answerStartQuestions = async (): Promise<void> => {
-      await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
-      await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
-      await app.post('/make-a-claim/property-address', PROPERTY);
-    };
-
-    it('creates one claim for a double click', async () => {
-      app = await bootMakeAClaim({ redis: true });
-      await answerStartQuestions();
-      const clicks = await Promise.all([
-        app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' }),
-        app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' }),
-      ]);
-      expect(clicks.map(click => click.location)).toEqual([claimPath('eligible'), claimPath('eligible')]);
-      expect(ccd.createRequests).toHaveLength(1);
-    });
-
-    it('reuses the claim when the claimant goes back and submits again', async () => {
-      app = await bootMakeAClaim({ redis: true });
-      await app.get('/make-a-claim');
-      await answerStartQuestions();
-      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
-      expect(text((await app.get('/make-a-claim/who-is-claiming')).text)).toContain('Myself');
-      expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
-        claimPath('eligible')
-      );
-      expect(ccd.createRequests).toHaveLength(1);
-    });
-
-    it('goes back to the claim just made while it is still a draft', async () => {
-      app = await bootMakeAClaim({ redis: true });
-      await answerStartQuestions();
-      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
-      await answerStartQuestions();
-      expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
-        claimPath('eligible')
-      );
-      expect(ccd.createRequests).toHaveLength(1);
-    });
-
-    it('creates a new claim for the same property once the first is submitted', async () => {
-      app = await bootMakeAClaim({ redis: true });
-      await answerStartQuestions();
-      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
-      ccd.stored!.state = 'PENDING_CASE_ISSUED';
-      await answerStartQuestions();
-      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
-      expect(ccd.createRequests).toHaveLength(2);
-    });
-
-    it('creates a new claim when the claimant starts again from the start page', async () => {
-      app = await bootMakeAClaim({ redis: true });
-      await app.get('/make-a-claim');
-      await answerStartQuestions();
-      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
-      await app.get('/make-a-claim');
-      await answerStartQuestions();
-      await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
-      expect(ccd.createRequests).toHaveLength(2);
-    });
+  it('stops a double click on the buttons that create the claim', async () => {
+    app = await bootMakeAClaim();
+    await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+    await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+    await app.post('/make-a-claim/property-address', PROPERTY);
+    for (const page of ['/make-a-claim/who-is-claiming', '/make-a-claim/property-country']) {
+      const shown = await app.get(page);
+      expect(shown.status).toBe(200);
+      const form = new JSDOM(shown.text).window.document;
+      expect(form.querySelector('button[value="continue"]')?.getAttribute('data-prevent-double-click')).toBe('true');
+    }
   });
 
   it('turns away a cross-border property in Wales without creating the claim', async () => {

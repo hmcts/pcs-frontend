@@ -148,28 +148,8 @@ export interface TestApp {
 let backend: http.Server | undefined;
 afterAll(() => backend?.close());
 
-/** The Redis commands the claim creation guard uses, against an in-memory map. */
-function fakeRedis() {
-  const values = new Map<string, string>();
-  return {
-    async set(key: string, value: string, ...options: (string | number)[]) {
-      if (options.includes('NX') && values.has(key)) {
-        return null;
-      }
-      values.set(key, value);
-      return 'OK';
-    },
-    async get(key: string) {
-      return values.get(key) ?? null;
-    },
-    async eval(_script: string, _keys: number, key: string, token: string) {
-      return values.get(key) === token && values.delete(key) ? 1 : 0;
-    },
-  };
-}
-
 export async function bootMakeAClaim(
-  options: { enabled?: boolean; email?: string; rentHistoryDesign?: unknown; signedIn?: boolean; redis?: boolean } = {}
+  options: { enabled?: boolean; email?: string; rentHistoryDesign?: unknown; signedIn?: boolean } = {}
 ): Promise<TestApp> {
   ccd.stored = undefined;
   ccd.createRequests = [];
@@ -212,9 +192,6 @@ export async function bootMakeAClaim(
   new Nunjucks(false).enableFor(app);
   app.locals.nunjucksEnv.addGlobal('sessionTimeout', {});
   new I18n().enableFor(app);
-  if (options.redis) {
-    app.locals.redisClient = fakeRedis();
-  }
   // LaunchDarkly as the Test environment is set up: the journey on, and the table design for pl-table- users.
   app.locals.launchDarklyClient = {
     variation: async (flag: string, context: { email?: string }, fallback: unknown) => {
@@ -241,7 +218,7 @@ export async function bootMakeAClaim(
       : { user: { ...user, accessToken: jwt({ ...user, exp: Math.floor(Date.now() / 1000) + 3600 }) } }),
   };
   app.use((req: Request, res: Response, next) => {
-    Object.assign(req, { session, sessionID: 'session-1' });
+    Object.assign(req, { session });
     res.locals.csrfToken = 'csrf-test';
     next();
   });

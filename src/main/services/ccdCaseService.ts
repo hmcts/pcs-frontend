@@ -260,7 +260,7 @@ export const DEFENDANT_SUPPORT_EVENT_ID = 'requestSupport';
 
 export const CITIZEN_CREATE_POSSESSION_CLAIM_EVENT_ID = 'citizenCreatePossessionClaim';
 
-/** The longest each of the create event's two CCD calls may take, so a claim creation cannot outlive its lock. */
+/** The longest each of the create event's two CCD calls may take, so a stuck creation fails rather than hangs. */
 export const CREATE_POSSESSION_CLAIM_TIMEOUT_MS = 30_000;
 
 /** What the citizen create event takes: the property and eligibility answers, inside the claim pcs-api starts. */
