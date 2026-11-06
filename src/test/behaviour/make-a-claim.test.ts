@@ -725,6 +725,47 @@ describe('review fixes', () => {
     );
   });
 
+  describe('back from GOV.UK Pay', () => {
+    const FEE = { submission: { serviceRequestReference: 'SR-1', feeAmount: '40400' } };
+
+    it('shows the claim submitted once the card payment went through, and never offers the fee again', async () => {
+      app = await bootMakeAClaim();
+      givenClaim(FEE);
+      await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee/start`);
+      const back = await app.get('/payment/return/RC-1111/confirmation');
+      expect(back.location).toBe(`/case/${CASE_REFERENCE}/claim-submitted?status=success`);
+      const page = text((await app.get(back.location as string)).text);
+      expect(page).toContain('Claim submitted');
+      expect(page).toContain('1777 0276 0001 7761');
+      expect((await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee`)).location).toBe(
+        `/case/${CASE_REFERENCE}/claim-submitted`
+      );
+    });
+
+    it('says the payment is being processed while GOV.UK Pay has not finished it', async () => {
+      app = await bootMakeAClaim();
+      givenClaim(FEE);
+      ccd.cardPaymentStatus = 'Initiated';
+      await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee/start`);
+      const back = await app.get('/payment/return/RC-1111/confirmation');
+      expect(back.location).toBe(`/case/${CASE_REFERENCE}/claim-submitted?status=pending`);
+      expect(text((await app.get(back.location as string)).text)).toContain('Your payment is being processed');
+      expect((await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee`)).status).toBe(200);
+    });
+
+    it('offers the payment again after a declined card', async () => {
+      app = await bootMakeAClaim();
+      givenClaim(FEE);
+      ccd.cardPaymentStatus = 'Failed';
+      await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee/start`);
+      const back = await app.get('/payment/return/RC-1111/confirmation');
+      expect(back.location).toBe(`/case/${CASE_REFERENCE}/pay-claim-fee?payment=failed`);
+      const page = text((await app.get(back.location as string)).text);
+      expect(page).toContain('Your payment was not successful');
+      expect(page).toContain('Pay your claim fee');
+    });
+  });
+
   it('never starts a second payment for a claim already paid', async () => {
     app = await bootMakeAClaim();
     givenClaim({ submission: { serviceRequestReference: 'SR-1', feeAmount: '40400', paymentStatus: 'PAID' } });

@@ -46,6 +46,8 @@ interface CustomSessionData extends SessionData {
   payment?: PaymentSessionState;
   // The period each private landlord claim's rent statement covers, keyed by case reference.
   rentStatementPeriods?: Record<string, { statementStart: string; statementEnd: string }>;
+  // The last card payment started for each private landlord claim's fee, keyed by case reference.
+  claimFeePayments?: Record<string, string>;
   destroy(callback: (err?: Error) => void): void;
   clientContext?: ClientContextHeaders;
 }

@@ -19,7 +19,7 @@ import type { GetController } from '@modules/steps/controller';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getPaymentSessionState, persistPaymentSessionState } from '@services/paymentSessionService';
-import { paymentService } from '@services/pcsApi/paymentService';
+import { getPaymentOutcome, paymentService } from '@services/pcsApi/paymentService';
 import { formatCaseReferenceForDisplay, sanitiseCaseReference } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
@@ -77,6 +77,28 @@ async function claimFeeFor(req: Request, caseReference: string): Promise<ClaimFe
   return undefined;
 }
 
+/**
+ * Whether the card payment last started for this claim's fee went through. pcs-api learns of it from Payments a
+ * little later, so until then the claim's own payment status would still offer to take the fee again. A payment
+ * not yet finished, or one the claimant abandoned, does not count, so they can always pay.
+ */
+async function cardPaymentSucceeded(req: Request, caseReference: string): Promise<boolean> {
+  const paymentReference = req.session.claimFeePayments?.[caseReference];
+  if (!paymentReference) {
+    return false;
+  }
+  try {
+    const { status } = await paymentService.getCardPaymentStatus(
+      req.session.user?.accessToken as string,
+      paymentReference
+    );
+    return getPaymentOutcome(status) === 'success';
+  } catch (error) {
+    logger.warn('Could not read the claim fee card payment status', error);
+    return false;
+  }
+}
+
 function caseReferenceOf(req: Request): string {
   const caseReference = sanitiseCaseReference(String(req.params.caseReference ?? ''));
   if (!caseReference) {
@@ -99,7 +121,7 @@ function registerSubmittedClaimRoutes(app: Application): void {
     try {
       const caseReference = caseReferenceOf(req);
       const fee = await claimFeeFor(req, caseReference);
-      if (!fee || fee.paid) {
+      if (!fee || fee.paid || (await cardPaymentSucceeded(req, caseReference))) {
         return res.redirect(303, makeAClaimPath(CLAIM_SUBMITTED_ROUTE, caseReference));
       }
       const content = pageContent(
@@ -123,7 +145,7 @@ function registerSubmittedClaimRoutes(app: Application): void {
     try {
       const caseReference = caseReferenceOf(req);
       const fee = await claimFeeFor(req, caseReference);
-      if (!fee || fee.paid) {
+      if (!fee || fee.paid || (await cardPaymentSucceeded(req, caseReference))) {
         return res.redirect(303, makeAClaimPath(CLAIM_SUBMITTED_ROUTE, caseReference));
       }
       const payment = await paymentService.startCardPaymentRequest({
@@ -134,6 +156,7 @@ function registerSubmittedClaimRoutes(app: Application): void {
         returnUrl: config.get<string>('payment.returnUrl'),
       });
       const submitted = makeAClaimPath(CLAIM_SUBMITTED_ROUTE, caseReference);
+      req.session.claimFeePayments = { ...req.session.claimFeePayments, [caseReference]: payment.paymentReference };
       await persistPaymentSessionState(req, {
         caseReference,
         serviceRequestReference: fee.serviceRequestReference,

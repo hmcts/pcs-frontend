@@ -2,8 +2,10 @@ import { randomUUID } from 'crypto';
 
 import { type Page, expect } from '@playwright/test';
 
+import { formatCaseReferenceForDisplay } from '../../../../main/utils/caseReference';
+import { paymentDetails } from '../../data/page-data/paymentDetails.page.data';
 import { LaunchDarklyAction } from '../actions/custom-actions/launchDarkly.action';
-import { performAction } from '../controller';
+import { performAction, performValidation } from '../controller';
 
 export type RentHistoryDesign = 'ledger' | 'table';
 
@@ -291,5 +293,46 @@ export async function submitClaim(page: Page): Promise<void> {
   await page.getByLabel('Your full name').fill('Billy Wright');
   await page.getByRole('button', { name: 'Submit claim' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Pay your claim fee' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Pay your claim fee' })).toBeVisible();
+}
+
+/** The claim the browser is on, from the page's address. */
+function caseReferenceOnPage(page: Page): string {
+  const caseReference = /\/case\/(\d{16})\//.exec(page.url())?.[1];
+  expect(caseReference, `a case reference in ${page.url()}`).toBeDefined();
+  return caseReference as string;
+}
+
+/** From the claim fee page to GOV.UK Pay's test service, with the card details entered. */
+async function enterClaimFeeCard(page: Page, cardNumber: string): Promise<void> {
+  await page.getByRole('button', { name: 'Pay your claim fee' }).click();
+  await performValidation('mainHeader', paymentDetails.mainHeader);
+  await performAction('inputCounterClaimPaymentDetails', { cardNumber });
+}
+
+/**
+ * Pays the claim fee by card and checks the confirmation. Payments tells pcs-api about the payment a little later,
+ * so the page may still say the payment is being processed; either way it names the claim.
+ */
+export async function payClaimFee(page: Page): Promise<void> {
+  const caseReference = caseReferenceOnPage(page);
+  await enterClaimFeeCard(page, paymentDetails.validCardNumber);
+  await performValidation('mainHeader', paymentDetails.confirmPaymentHeader);
+  await performAction('clickButton', paymentDetails.confirmPaymentButton);
+  await expect(page).toHaveURL(new RegExp(`/case/${caseReference}/claim-submitted`));
+  await expect(page.locator('.govuk-panel__title')).toHaveText(
+    /^\s*(Claim submitted|Your payment is being processed)\s*$/
+  );
+  await expect(page.locator('.govuk-panel__body')).toContainText(formatCaseReferenceForDisplay(caseReference));
+}
+
+/** A declined card returns the claimant to the claim fee page, told it failed, with the payment to try again. */
+export async function declineClaimFeeCard(page: Page): Promise<void> {
+  const caseReference = caseReferenceOnPage(page);
+  await enterClaimFeeCard(page, paymentDetails.declinedCardNumber);
+  await performValidation('mainHeader', 'Your payment has been declined');
+  await performAction('clickButton', paymentDetails.startDynamicButton);
+  await expect(page).toHaveURL(new RegExp(`/case/${caseReference}/pay-claim-fee\\?payment=failed$`));
+  await expect(page.getByText('Your payment was not successful. You have not been charged. Try again.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Pay your claim fee' })).toBeVisible();
 }

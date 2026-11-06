@@ -25,6 +25,7 @@ export const ccd = {
   refuseCreate: undefined as string | undefined,
   refuseSubmit: undefined as string[] | undefined,
   changeDraftBeforeNextSave: false,
+  cardPaymentStatus: 'Success',
 };
 
 /** pcs-api's draft version: every save that names the stored version moves it on; a stale one is refused. */
@@ -107,6 +108,9 @@ function ccdStub(): Express {
       after_submit_callback_response: { confirmation_body: JSON.stringify(fee) },
     });
   });
+  stub.get('/payment/card-payment/:reference/status', (_req: Request, res: Response) => {
+    res.json({ status: ccd.cardPaymentStatus });
+  });
   stub.post('/payment/service-request/:reference/card-payment', (req: Request, res: Response) => {
     ccd.cardPayments.push({ reference: req.params.reference, ...req.body });
     res.json({ paymentReference: 'RC-1111', status: 'Initiated', nextUrl: 'https://card.payments.test/pay/1' });
@@ -146,6 +150,7 @@ export async function bootMakeAClaim(
   ccd.refuseCreate = undefined;
   ccd.refuseSubmit = undefined;
   ccd.changeDraftBeforeNextSave = false;
+  ccd.cardPaymentStatus = 'Success';
   backend ??= await listen(ccdStub());
   const backendUrl = `http://127.0.0.1:${(backend.address() as AddressInfo).port}`;
   process.env.CCD_URL = backendUrl;
@@ -159,6 +164,7 @@ export async function bootMakeAClaim(
     { setupErrorHandlers },
     { registerAllJourneys },
     { default: makeAClaimRoutes },
+    { default: paymentReturnRoutes },
     middleware,
   ] = await Promise.all([
     import('../../main/modules/nunjucks'),
@@ -167,6 +173,7 @@ export async function bootMakeAClaim(
     import('../../main/modules/error-handler'),
     import('../../main/routes/registerSteps'),
     import('../../main/routes/makeAClaim'),
+    import('../../main/routes/paymentReturn'),
     import('../../main/middleware'),
   ]);
   httpService.setToken('s2s-token', Date.now() + 60 * 60 * 1000);
@@ -211,6 +218,7 @@ export async function bootMakeAClaim(
   app.param('caseReference', middleware.caseReferenceParamMiddleware);
   registerAllJourneys(app);
   makeAClaimRoutes(app);
+  paymentReturnRoutes(app);
   setupErrorHandlers(app, 'test');
   const server = await listen(app);
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;

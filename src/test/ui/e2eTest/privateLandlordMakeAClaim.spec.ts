@@ -15,9 +15,11 @@ import {
   completeTenancyGroundsAndNotice,
   continueOn,
   createLandlord,
+  declineClaimFeeCard,
   enterAddress,
   isMakeAClaimEnabled,
   openTask,
+  payClaimFee,
   startAsPrivateLandlord,
   submitClaim,
 } from '../utils/common/privateLandlordClaim.journey';
@@ -46,6 +48,7 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
     await completeCircumstances(page);
     await completeOtherInformation(page);
     await submitClaim(page);
+    await payClaimFee(page);
   });
 
   test('Rent arrears claim with the rent statement created as a table', async ({ page }) => {
@@ -59,6 +62,28 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
     await completeCircumstances(page);
     await completeOtherInformation(page);
     await submitClaim(page);
+    await payClaimFee(page);
+  });
+});
+
+test.describe('Private landlord claim fee card declined @privateLandlord', () => {
+  test.beforeEach(async ({ page }) => {
+    initializeExecutor(page);
+    test.skip(!(await isMakeAClaimEnabled()), 'private-landlord-make-a-claim-enabled is off');
+  });
+
+  test('A declined card returns to the claim fee page to try again', async ({ page }) => {
+    await createLandlord('ledger');
+    await becomeEligible(page, startUrl);
+    await continueOn(page);
+    await completeAboutYou(page);
+    await completeDefendants(page);
+    await completeTenancyGroundsAndNotice(page);
+    await completeRentArrearsWithLedger(page);
+    await completeCircumstances(page);
+    await completeOtherInformation(page);
+    await submitClaim(page);
+    await declineClaimFeeCard(page);
   });
 });
 
