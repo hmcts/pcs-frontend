@@ -83,6 +83,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     fields,
     beforeRedirect,
     resolveRedirectAfterPost,
+    resolveSaveForLaterRedirect,
     beforeGet,
     extendGetContent,
     getInitialFormData,
@@ -192,7 +193,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       showCancelButton,
       extendGetContent,
       documentStorage,
-      resolveRedirectAfterPost
+      resolveRedirectAfterPost,
+      resolveSaveForLaterRedirect
     ),
   };
 }
