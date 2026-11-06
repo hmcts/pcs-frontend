@@ -191,7 +191,7 @@
     "protobufjs": "^8.0.0",
     "prosemirror-dropcursor": "1.8.4",
     "prosemirror-model": "1.25.12",
-    "prosemirror-transform": "1.12.4",
+    "prosemirror-transform": "1.12.5",
     "prosemirror-view": "1.42.9",
     "qs": "^6.16.1",
     "semver": "^7.5.2",
