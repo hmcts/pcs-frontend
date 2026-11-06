@@ -77,7 +77,7 @@ import {
   whatRegularIncomeDoYouReceive,
   wouldYouHaveSomewhereElseToLiveIfYouHadToLeaveYourHome,
   yourCircumstances,
-  yourHouseholdAndCircumstances
+  yourHouseholdAndCircumstances,
 } from '../data/page-data';
 import { overview } from '../data/page-data/overview.page.data';
 import { supportNeedsChanged } from '../data/page-data/supportNeedsChanged.page.data';
