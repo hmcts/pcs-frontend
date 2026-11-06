@@ -1,0 +1,16 @@
+{% extends "xui-layout.njk" %}
+
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/caseTitle.njk" import caseTitle %}
+
+{% block content %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  <div id="record-warrant-return-form">
+    {{ caseTitle(caseReference, propertyAddress, 'Record warrant return', claimantNames, defendantNames) }}
+  </div>
+
+  {% block mainContent %}{% endblock %}
+{% endblock %}

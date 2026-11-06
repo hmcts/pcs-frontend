@@ -1,0 +1,53 @@
+{% macro dateInput(id, label, hint) %}
+
+<fieldset class="govuk-fieldset" role="group">
+    <legend class="govuk-fieldset__legend">
+      {{ label }}
+    </legend>
+    <div id="{{ id }}-hint" class="govuk-hint">
+      {{ hint }}
+    </div>
+    <div class="govuk-date-input" id="{{ id }}">
+      <div class="govuk-date-input__item">
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-date-input__label" for="{{ id }}-day">
+            Day
+          </label>
+          <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="{{ id }}-day" name="{{ id }}-day" type="text" inputmode="numeric">
+        </div>
+      </div>
+      <div class="govuk-date-input__item">
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-date-input__label" for="{{ id }}-month">
+            Month
+          </label>
+          <input class="govuk-input govuk-date-input__input govuk-input--width-2" id="{{ id }}-month" name="{{ id }}-month" type="text" inputmode="numeric">
+        </div>
+      </div>
+      <div class="govuk-date-input__item">
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-date-input__label" for="{{ id }}-year">
+            Year
+          </label>
+          <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="{{ id }}-year" name="{{ id }}-year" type="text" inputmode="numeric">
+        </div>
+      </div>
+      <div class="govuk-date-input__item">
+        <div class="govuk-form-group">
+          <label class="govuk-label govuk-date-input__label" for="{{ id }}-hour">
+            Hour
+          </label>
+          <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="{{ id }}-hour" name="{{ id }}-hour" type="text" inputmode="numeric">
+        </div>
+      </div>
+      <div class="govuk-date-input__item">
+          <div class="govuk-form-group">
+            <label class="govuk-label govuk-date-input__label" for="{{ id }}-minute">
+              Minute
+            </label>
+            <input class="govuk-input govuk-date-input__input govuk-input--width-4" id="{{ id }}-minute" name="{{ id }}-minute" type="text" inputmode="numeric">
+          </div>
+        </div>
+    </div>
+  </fieldset>
+{% endmacro %}

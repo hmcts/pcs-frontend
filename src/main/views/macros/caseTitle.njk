@@ -1,0 +1,9 @@
+{% macro caseTitle(caseReference, propertyAddress, eventName, claimantNames, defendantNames) %}
+    <span class="govuk-caption-l">{{ eventName }}</span>
+    <p class="govuk-body govuk-!-margin-bottom-1">
+        {{ t('caseTitle:caseReferenceLabel') }}
+        {{ caseReference | caseReferenceDisplay }}
+    </p>
+    <p class="govuk-body govuk-!-margin-bottom-0">{{ propertyAddress }}</p>
+    <p class="govuk-body">{{ claimantNames }} vs {{ defendantNames }}</p>
+{% endmacro %}

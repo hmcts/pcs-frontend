@@ -9,6 +9,7 @@ import { type TFunction } from 'i18next';
 import { type CcdCaseModel } from '@services/ccdCaseData.model';
 import { type PaymentSessionState } from '@services/paymentSessionService';
 import { type StepContext } from '../main/modules/steps/stepContext';
+import { WarrantReturn } from '@utils/warrantReturn';
 
 export interface UserInfoResponseWithToken extends UserInfoResponse {
   accessToken: string;
@@ -41,6 +42,7 @@ interface CustomSessionData extends SessionData {
   // The case an order was last sent for review on, keyed by case reference, for its confirmation page.
   ordersSentForReview?: Record<string, { caseReference: string; propertyAddress: string; caseName: string }>;
   orderReviews?: Record<string, import('../main/utils/orderReview').OrderReviewSession>;
+  warrantReturn?: Record<string, WarrantReturn>;
   payment?: PaymentSessionState;
   destroy(callback: (err?: Error) => void): void;
   clientContext?: ClientContextHeaders;

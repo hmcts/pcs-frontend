@@ -276,6 +276,7 @@ export async function bootApp(
     { http: httpService },
     { default: makeOrderRoutes },
     { default: confirmOrderReviewRoutes },
+    { default: recordWarrantReturnRoutes },
     { default: decentralisedEventRoutes },
     { default: docweaveTemplateRoutes },
     { setupErrorHandlers },
@@ -285,6 +286,7 @@ export async function bootApp(
     import('../../main/modules/http'),
     import('../../main/routes/makeOrder'),
     import('../../main/routes/confirmOrderReview'),
+    import('../../main/routes/recordWarrantReturn'),
     import('../../main/routes/decentralisedEvent'),
     import('../../main/routes/docweaveTemplates'),
     import('../../main/modules/error-handler'),
@@ -315,6 +317,7 @@ export async function bootApp(
   app.param('caseReference', middleware.caseReferenceParamMiddleware);
   makeOrderRoutes(app);
   confirmOrderReviewRoutes(app);
+  recordWarrantReturnRoutes(app);
   decentralisedEventRoutes(app);
   docweaveTemplateRoutes(app);
   setupErrorHandlers(app, 'test');
