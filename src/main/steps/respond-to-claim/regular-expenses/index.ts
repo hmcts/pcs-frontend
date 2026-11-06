@@ -47,6 +47,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'householdBills',
           translationKey: 'options.householdBills',
+          subFieldsLegendKey: 'subFieldsLegend.householdBills',
           subFields: {
             householdBillsAmount: {
               name: 'householdBillsAmount',
@@ -76,8 +77,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.householdBillsFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.householdBills',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -89,6 +91,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'loanPayments',
           translationKey: 'options.loanPayments',
+          subFieldsLegendKey: 'subFieldsLegend.loanPayments',
           subFields: {
             loanPaymentsAmount: {
               name: 'loanPaymentsAmount',
@@ -118,8 +121,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.loanPaymentsFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.loanPayments',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -131,6 +135,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'childSpousalMaintenance',
           translationKey: 'options.childSpousalMaintenance',
+          subFieldsLegendKey: 'subFieldsLegend.childSpousalMaintenance',
           subFields: {
             childSpousalMaintenanceAmount: {
               name: 'childSpousalMaintenanceAmount',
@@ -160,8 +165,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.childSpousalMaintenanceFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.childSpousalMaintenance',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -173,6 +179,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'mobilePhone',
           translationKey: 'options.mobilePhone',
+          subFieldsLegendKey: 'subFieldsLegend.mobilePhone',
           subFields: {
             mobilePhoneAmount: {
               name: 'mobilePhoneAmount',
@@ -202,8 +209,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.mobilePhoneFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.mobilePhone',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -215,6 +223,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'groceryShopping',
           translationKey: 'options.groceryShopping',
+          subFieldsLegendKey: 'subFieldsLegend.groceryShopping',
           subFields: {
             groceryShoppingAmount: {
               name: 'groceryShoppingAmount',
@@ -244,8 +253,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.groceryShoppingFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.groceryShopping',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -257,6 +267,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'fuelParkingTransport',
           translationKey: 'options.fuelParkingTransport',
+          subFieldsLegendKey: 'subFieldsLegend.fuelParkingTransport',
           subFields: {
             fuelParkingTransportAmount: {
               name: 'fuelParkingTransportAmount',
@@ -286,8 +297,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.fuelParkingTransportFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.fuelParkingTransport',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -299,6 +311,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'schoolCosts',
           translationKey: 'options.schoolCosts',
+          subFieldsLegendKey: 'subFieldsLegend.schoolCosts',
           subFields: {
             schoolCostsAmount: {
               name: 'schoolCostsAmount',
@@ -328,8 +341,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.schoolCostsFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.schoolCosts',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -341,6 +355,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'clothing',
           translationKey: 'options.clothing',
+          subFieldsLegendKey: 'subFieldsLegend.clothing',
           subFields: {
             clothingAmount: {
               name: 'clothingAmount',
@@ -370,8 +385,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.clothingFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.clothing',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
@@ -383,6 +399,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         {
           value: 'otherExpenses',
           translationKey: 'options.otherExpenses',
+          subFieldsLegendKey: 'subFieldsLegend.otherExpenses',
           subFields: {
             otherExpensesAmount: {
               name: 'otherExpensesAmount',
@@ -412,8 +429,9 @@ export const step: StepDefinition = createRespondToClaimFormStep({
               type: 'radio',
               required: true,
               errorMessage: 'errors.otherExpensesFrequency.required',
+              legendClasses: 'govuk-visually-hidden',
               translationKey: {
-                label: 'subFields.frequency',
+                label: 'frequencyLegend.otherExpenses',
               },
               options: [
                 { value: 'WEEKLY', translationKey: 'frequency.week' },
