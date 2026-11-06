@@ -64,9 +64,17 @@ export type OtherGround =
 /** The grounds that need no reason: the rent arrears ones, and other grounds, which have their own details. */
 const GROUNDS_WITHOUT_REASON: readonly string[] = [...RENT_ARREARS_GROUNDS, OTHER_GROUND];
 
-/** The grounds pcs-api needs a reason for, in the order the claimant chose them. */
+/** Every other ground in the order the grounds page lists them. */
+const LISTED_GROUNDS: readonly string[] = [...MANDATORY_OTHER_GROUNDS, ...DISCRETIONARY_OTHER_GROUNDS, OTHER_GROUND];
+
+/**
+ * The grounds pcs-api needs a reason for, in the order the grounds page lists them, whatever order the saved
+ * claim holds them in.
+ */
 export function groundsNeedingReasons(grounds: CitizenPossessionClaim['grounds']): OtherGround[] {
-  return (grounds?.otherGrounds ?? []).filter(ground => !GROUNDS_WITHOUT_REASON.includes(ground));
+  return (grounds?.otherGrounds ?? [])
+    .filter(ground => !GROUNDS_WITHOUT_REASON.includes(ground))
+    .sort((a, b) => LISTED_GROUNDS.indexOf(a) - LISTED_GROUNDS.indexOf(b));
 }
 
 export type NoticeType = 'NOTICE_SEEKING_POSSESSION' | 'NOTICE_TO_QUIT' | 'OTHER';

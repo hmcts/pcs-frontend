@@ -8,12 +8,14 @@ const REASON = 500;
 const CIRCUMSTANCES = 950;
 const OTHER_REASONS = 6400;
 const STATEMENT_OF_TRUTH = 100;
+const ADDRESS_LINE = 100;
+const POSTCODE = 14;
 
 export const FIELD_LIMITS = {
   claimantFirstName: NAME,
   claimantLastName: NAME,
   organisationName: NAME,
-  emailAddress: NAME,
+  emailAddress: 254,
   phoneNumber: 20,
   textMessageNumber: 20,
   defendantFirstName: NAME,
@@ -29,8 +31,8 @@ export const FIELD_LIMITS = {
   emailedTo: SHORT_TEXT,
   otherElectronicDetails: SHORT_TEXT,
   otherMethodDetails: SHORT_TEXT,
-  otherFrequencyDetails: 100,
-  ledgerDescription: 100,
+  otherFrequencyDetails: NAME,
+  ledgerDescription: REASON,
   recoverySteps: REASON,
   defendantCircumstances: CIRCUMSTANCES,
   claimantCircumstances: CIRCUMSTANCES,
@@ -38,8 +40,8 @@ export const FIELD_LIMITS = {
   otherReasonsDetail: OTHER_REASONS,
   statementOfTruthFullName: STATEMENT_OF_TRUTH,
   statementOfTruthPosition: STATEMENT_OF_TRUTH,
-  addressLine1: 150,
-  addressLine: 50,
+  addressLine: ADDRESS_LINE,
+  postcode: POSTCODE,
   defaultText: 100,
   defaultLongText: REASON,
 } as const;

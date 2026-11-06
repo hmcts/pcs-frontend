@@ -44,6 +44,8 @@ interface CustomSessionData extends SessionData {
   ordersSentForReview?: Record<string, { caseReference: string; propertyAddress: string; caseName: string }>;
   orderReviews?: Record<string, import('../main/utils/orderReview').OrderReviewSession>;
   payment?: PaymentSessionState;
+  // The period each private landlord claim's rent statement covers, keyed by case reference.
+  rentStatementPeriods?: Record<string, { statementStart: string; statementEnd: string }>;
   destroy(callback: (err?: Error) => void): void;
   clientContext?: ClientContextHeaders;
 }

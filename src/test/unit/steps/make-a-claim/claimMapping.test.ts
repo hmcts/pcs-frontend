@@ -6,20 +6,27 @@ import {
   groundForReasonOf,
   removeDefendant,
   removeLedgerEntry,
+  rentStatementRange,
 } from '../../../../main/steps/make-a-claim/claimMapping';
+import { UNREADABLE } from '../../../../main/steps/make-a-claim/formValues';
 
+const CASE = '1777027600017761';
 const PROPERTY = { AddressLine1: '15 Garden Drive', PostTown: 'Luton', PostCode: 'LU1 1AB' };
 
 function request(
   query: Record<string, string> = {},
   rentHistoryDesign = 'ledger',
-  citizenPossessionClaim: CitizenPossessionClaim = {}
+  citizenPossessionClaim: CitizenPossessionClaim = {},
+  caseId = CASE
 ): Request {
   return {
     query,
     session: { user: { email: 'landlord@example.test' } },
     res: {
-      locals: { rentHistoryDesign, validatedCase: { data: { propertyAddress: PROPERTY, citizenPossessionClaim } } },
+      locals: {
+        rentHistoryDesign,
+        validatedCase: { id: caseId, data: { propertyAddress: PROPERTY, citizenPossessionClaim } },
+      },
     },
   } as unknown as Request;
 }
@@ -133,8 +140,8 @@ describe('claim mappings', () => {
     }).saved;
     const { saved, form } = roundTrip('defendant-name', { nameKnown: 'no' }, first, request({ index: '1' }));
     expect(saved.defendants).toEqual([
-      { value: { nameKnown: 'YES', firstName: 'Brian', lastName: 'Springford' } },
-      { value: { nameKnown: 'NO', firstName: undefined, lastName: undefined } },
+      { id: expect.any(String), value: { nameKnown: 'YES', firstName: 'Brian', lastName: 'Springford' } },
+      { id: expect.any(String), value: { nameKnown: 'NO', firstName: undefined, lastName: undefined } },
     ]);
     expect(form).toEqual({ nameKnown: 'no', 'nameKnown.firstName': undefined, 'nameKnown.lastName': undefined });
   });
@@ -228,6 +235,11 @@ describe('claim mappings', () => {
       expect(groundForReasonOf(request({ ground: 'GROUND_8' }), chosen)).toBeUndefined();
     });
 
+    it('asks in the order the grounds page lists them, whatever order the claim holds them in', () => {
+      const reordered: CitizenPossessionClaim = { grounds: { otherGrounds: ['GROUND_14', 'OTHER', 'GROUND_1A'] } };
+      expect(groundForReasonOf(request(), reordered)).toBe('GROUND_1A');
+    });
+
     it('saves each reason against its ground in the order the grounds were chosen', () => {
       const second = roundTrip(
         'ground-reason',
@@ -242,8 +254,8 @@ describe('claim mappings', () => {
         request({ ground: 'GROUND_1A' })
       );
       expect(first.saved.grounds?.groundReasons).toEqual([
-        { value: { ground: 'GROUND_1A', reason: 'Selling' } },
-        { value: { ground: 'GROUND_2', reason: 'Mortgage default' } },
+        { id: expect.any(String), value: { ground: 'GROUND_1A', reason: 'Selling' } },
+        { id: expect.any(String), value: { ground: 'GROUND_2', reason: 'Mortgage default' } },
       ]);
       expect(first.form).toEqual({ groundReason: 'Selling' });
       expect(first.answered).toBe(false);
@@ -362,6 +374,7 @@ describe('claim mappings', () => {
     const added = roundTrip('ledger-transaction', body).saved;
     expect(added.rentArrears?.rentHistoryLedger).toEqual([
       {
+        id: expect.any(String),
         value: {
           transactionDate: '2026-06-01',
           transactionTypes: ['RENT_CHARGE'],
@@ -426,6 +439,18 @@ describe('claim mappings', () => {
       expect(dueDates(moved)).toEqual(['2026-06-15', '2026-07-15', '2026-08-15']);
     });
 
+    it('uses the dates given only for the claim they were given for', () => {
+      const req = request();
+      const { saved } = roundTrip('statement-period', period, monthly, req);
+      const otherClaim = request({}, 'ledger', {}, '1777027600019999');
+      otherClaim.session = req.session;
+      expect(rentStatementRange({ rentArrears: { rentFrequency: 'WEEKLY' } }, otherClaim)).toBeUndefined();
+      expect(rentStatementRange(saved, req)).toEqual({ statementStart: '2026-06-01', statementEnd: '2026-08-31' });
+      expect(req.session.rentStatementPeriods).toEqual({
+        [CASE]: { statementStart: '2026-06-01', statementEnd: '2026-08-31' },
+      });
+    });
+
     it('keeps the period its rows cover when the dates given are no longer in the session', () => {
       const { saved } = roundTrip('statement-period', period, monthly);
       const { saved: moved } = roundTrip('rent-due-day', { rentDueDay: '15' }, saved, request());
@@ -459,6 +484,44 @@ describe('claim mappings', () => {
 
   it('adds no ledger entry for a transaction page saved for later empty', () => {
     expect(roundTrip('ledger-transaction', { transactionTypes: [] }).saved).toEqual({});
+  });
+
+  it('removes an item by its id, so repeating the removal changes nothing', () => {
+    const claim: CitizenPossessionClaim = {
+      defendants: [
+        { id: 'first', value: { nameKnown: 'NO' } },
+        { id: 'second', value: { nameKnown: 'YES' } },
+        { id: 'third', value: { nameKnown: 'YES' } },
+      ],
+      rentArrears: {
+        rentHistoryLedger: [
+          { id: 'june', value: {} },
+          { id: 'july', value: {} },
+        ],
+      },
+    };
+    const once = roundTrip('remove-defendant', { confirmRemove: 'yes' }, claim, request({ id: 'second' })).saved;
+    expect(once.defendants?.map(item => item.id)).toEqual(['first', 'third']);
+    const twice = roundTrip('remove-defendant', { confirmRemove: 'yes' }, once, request({ id: 'second' })).saved;
+    expect(twice.defendants?.map(item => item.id)).toEqual(['first', 'third']);
+    expect(roundTrip('remove-defendant', { confirmRemove: 'yes' }, claim, request({ id: 'first' })).saved).toEqual(
+      claim
+    );
+    expect(roundTrip('remove-defendant', { confirmRemove: 'yes' }, claim, request({ index: '1' })).saved).toEqual(
+      claim
+    );
+    const ledger = roundTrip('remove-ledger-entry', { confirmRemove: 'yes' }, claim, request({ id: 'june' })).saved;
+    expect(ledger.rentArrears?.rentHistoryLedger?.map(item => item.id)).toEqual(['july']);
+  });
+
+  it('keeps an unreadable date or amount as the saved one, and a cleared answer cleared', () => {
+    const saved: CitizenPossessionClaim = { rentArrears: { rentAmount: '100000', recoverySteps: 'Letters' } };
+    expect(roundTrip('rent-amount', { rentAmount: 'lots' }, saved).saved.rentArrears?.rentAmount).toBe(UNREADABLE);
+    expect(roundTrip('rent-amount', { rentAmount: '' }, saved).saved.rentArrears?.rentAmount).toBeUndefined();
+    expect(
+      roundTrip('tenancy-start-date', { tenancyStartDate: { day: '31', month: '2', year: '2020' } }).saved.tenancy
+        ?.tenancyStartDate
+    ).toBe(UNREADABLE);
   });
 
   it('removes a defendant after the first, and a ledger entry, only when confirmed', () => {

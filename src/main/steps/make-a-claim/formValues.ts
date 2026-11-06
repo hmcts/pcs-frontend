@@ -137,3 +137,35 @@ export function indexFromQuery(value: unknown): number | undefined {
   }
   return Number(raw);
 }
+
+/**
+ * Stands in for an answer that was given but could not be read, such as a date that does not exist or an
+ * amount with letters in it. Before a save it becomes the answer saved before, so a Save for later (which skips
+ * validation) never wipes out a good answer. An empty answer is a cleared one and is not marked.
+ */
+export const UNREADABLE = '\u0000unreadable';
+
+export function isReadable<T>(value: T | typeof UNREADABLE | undefined): value is T {
+  return value !== undefined && value !== UNREADABLE;
+}
+
+/** An amount in pence, undefined when left empty, or {@link UNREADABLE}. */
+export function readPence(value: unknown): string | undefined {
+  if (text(value) === undefined) {
+    return undefined;
+  }
+  return toPenceString(value) ?? UNREADABLE;
+}
+
+/** A yyyy-MM-dd date, undefined when every part was left empty, or {@link UNREADABLE}. */
+export function readDate(body: FormBody, name: string): string | undefined {
+  const consolidated = body[name];
+  const parts =
+    consolidated && typeof consolidated === 'object' && !Array.isArray(consolidated)
+      ? Object.values(consolidated as Record<string, unknown>)
+      : [body[`${name}-day`], body[`${name}-month`], body[`${name}-year`]];
+  if (parts.every(part => text(part) === undefined)) {
+    return undefined;
+  }
+  return dateFromBody(body, name) ?? UNREADABLE;
+}

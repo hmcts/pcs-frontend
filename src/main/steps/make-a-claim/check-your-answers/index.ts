@@ -4,7 +4,7 @@ import { answeredClaim, saveClaimDraft, submitClaim } from '../claimDraft';
 import { claimMappings } from '../claimMapping';
 import { textField } from '../fieldBuilders';
 import { FIELD_LIMITS } from '../fieldLimits';
-import { createMakeAClaimStep } from '../formStep';
+import { createMakeAClaimStep, isRendering } from '../formStep';
 import {
   draftChangedUrl,
   isDraftChanged,
@@ -51,7 +51,7 @@ export const step: StepDefinition = createMakeAClaimStep({
     const t = getTranslationFunction(req);
     const submitErrors = submitErrorItems(req, submitErrorCodes(req.query?.submitError));
     return {
-      cards: allCards(req),
+      ...(isRendering(formContent) ? { cards: allCards(req) } : {}),
       saveAndContinue: t('submitButton'),
       ...(submitErrors.length > 0 && !formContent.errorSummary
         ? { errorSummary: { titleText: t('makeAClaim:summary.problem'), errorList: submitErrors } }

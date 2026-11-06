@@ -1,16 +1,15 @@
 import type { Request } from 'express';
-import type { TFunction } from 'i18next';
 
 import { readClaim } from './claimDraft';
 import { formatClaimDate } from './dates';
 import { flowConfig } from './flow.config';
-import { formatPence, ledgerWithArrears, rentTableWithArrears } from './rentHistory';
+import { type LedgerLine, formatPence, ledgerWithArrears, rentTableWithArrears } from './rentHistory';
 
 import { getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
 
-function ledgerLink(href: string, text: string, entryIndex: number, t: TFunction): string {
-  return `<a class="govuk-link" href="${href}">${text}<span class="govuk-visually-hidden"> ${t('makeAClaim:ledgerTable.transaction')} ${entryIndex + 1}</span></a>`;
+function actionLink(href: string, text: string, hidden: string): string {
+  return `<a class="govuk-link" href="${href}">${text}<span class="govuk-visually-hidden"> ${hidden}</span></a>`;
 }
 
 export function ledgerTable(req: Request, withActions: boolean): Record<string, unknown> {
@@ -18,6 +17,7 @@ export function ledgerTable(req: Request, withActions: boolean): Record<string, 
   const transactionUrl = getStepUrl('ledger-transaction', flowConfig, req.res?.locals.validatedCase?.id);
   const removeUrl = getStepUrl('remove-ledger-entry', flowConfig, req.res?.locals.validatedCase?.id);
   const lines = ledgerWithArrears(readClaim(req).rentArrears?.rentHistoryLedger);
+  const transaction = (line: LedgerLine) => `${t('makeAClaim:ledgerTable.transaction')} ${line.entryIndex + 1}`;
   return {
     caption: t('makeAClaim:ledgerTable.caption'),
     captionClasses: 'govuk-table__caption--m',
@@ -44,17 +44,15 @@ export function ledgerTable(req: Request, withActions: boolean): Record<string, 
         ? [
             {
               html: [
-                ledgerLink(
+                actionLink(
                   `${transactionUrl}?entry=${line.entryIndex}`,
                   t('makeAClaim:ledgerTable.change'),
-                  line.entryIndex,
-                  t
+                  transaction(line)
                 ),
-                ledgerLink(
-                  `${removeUrl}?entry=${line.entryIndex}`,
+                actionLink(
+                  `${removeUrl}?${line.id ? `id=${line.id}` : `entry=${line.entryIndex}`}`,
                   t('makeAClaim:ledgerTable.remove'),
-                  line.entryIndex,
-                  t
+                  transaction(line)
                 ),
               ].join('<br>'),
             },
@@ -68,8 +66,6 @@ export function rentStatementTable(req: Request, withActions: boolean): Record<s
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const paymentUrl = getStepUrl('rent-statement-payment', flowConfig, req.res?.locals.validatedCase?.id);
   const lines = rentTableWithArrears(readClaim(req).rentArrears?.rentHistoryTable);
-  const link = (href: string, text: string, hidden: string) =>
-    `<a class="govuk-link" href="${href}">${text}<span class="govuk-visually-hidden"> ${hidden}</span></a>`;
   return {
     caption: t('makeAClaim:rentTable.caption'),
     captionClasses: 'govuk-visually-hidden',
@@ -90,7 +86,7 @@ export function rentStatementTable(req: Request, withActions: boolean): Record<s
       const actions = [
         ...(line.amountPaid !== undefined
           ? [
-              link(
+              actionLink(
                 `${paymentUrl}?row=${line.rowIndex}`,
                 t('makeAClaim:rentTable.change'),
                 `${t('makeAClaim:rentTable.paymentFor')} ${due}`
@@ -99,7 +95,7 @@ export function rentStatementTable(req: Request, withActions: boolean): Record<s
           : []),
         ...(!line.isAdditionalPayment
           ? [
-              link(
+              actionLink(
                 `${paymentUrl}?period=${line.periodStart}`,
                 t('makeAClaim:rentTable.addPayment'),
                 `${t('makeAClaim:rentTable.paymentFor')} ${due}`

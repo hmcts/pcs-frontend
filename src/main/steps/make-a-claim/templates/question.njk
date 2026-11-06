@@ -57,6 +57,9 @@
         <p class="govuk-body"><a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a></p>
       {% endif %}
     {% endblock %}
+    {% if draftVersion is defined and draftVersion !== null %}
+      <input type="hidden" name="draftVersion" value="{{ draftVersion }}">
+    {% endif %}
     {{ csrfProtection(csrfToken) }}
   </form>
 

@@ -222,6 +222,7 @@ export function addRentTablePayment(
 
 export interface LedgerLine {
   entryIndex: number;
+  id?: string;
   transactionDate?: string;
   transactionTypes: TransactionType[];
   description?: string;
@@ -234,15 +235,16 @@ export interface LedgerLine {
 export function ledgerWithArrears(entries: CcdCollectionItem<RentLedgerEntry>[] | undefined): LedgerLine[] {
   let arrears = 0;
   return (entries ?? [])
-    .map((entry, entryIndex) => ({ entry: entry.value, entryIndex }))
+    .map((entry, entryIndex) => ({ entry: entry.value, entryIndex, id: entry.id ?? undefined }))
     .sort((a, b) => (a.entry.transactionDate ?? '').localeCompare(b.entry.transactionDate ?? ''))
-    .map(({ entry, entryIndex }) => {
+    .map(({ entry, entryIndex, id }) => {
       const types = entry.transactionTypes ?? [];
       const amountCharged = types.includes('RENT_CHARGE') ? toPence(entry.amountCharged) : undefined;
       const amountPaid = types.includes('TENANT_PAYMENT') ? toPence(entry.amountPaid) : undefined;
       arrears += (amountCharged ?? 0) - (amountPaid ?? 0);
       return {
         entryIndex,
+        ...(id ? { id } : {}),
         transactionDate: entry.transactionDate,
         transactionTypes: types,
         description: entry.description,

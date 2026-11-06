@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 import { CallbackRejectedError } from '../../HttpError';
-import { MAKE_A_CLAIM_START_ROUTE } from '../../constants/makeAClaimRoutes';
+import { MAKE_A_CLAIM_START_ROUTE, PROPERTY_INELIGIBLE_URL } from '../../constants/makeAClaimRoutes';
 
 import { flowConfig } from './flow.config';
 
@@ -13,18 +13,23 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^claimant(\.individualOrOrganisation)?$/, 'individual-or-organisation'],
   [/^claimant\.(firstName|lastName)$/, 'claimant-name'],
   [/^claimant\.organisationName$/, 'organisation-name'],
-  [/^claimant\.address$/, 'claimant-address'],
+  [/^claimant\.address(\.[A-Za-z0-9]+)?$/, 'claimant-address'],
   [/^claimant\.emailAddress$/, 'claimant-email'],
   [/^claimant\.phoneNumber$/, 'claimant-phone'],
   [/^claimant\.textMessageNumber$/, 'claimant-text-message'],
   [/^defendants(\[\d+\](\.(firstName|lastName))?)?$/, 'defendant-name'],
-  [/^defendants\[\d+\]\.address$/, 'defendant-address'],
+  [/^defendants\[\d+\]\.address(\.[A-Za-z0-9]+)?$/, 'defendant-address'],
   [/^tenancy\.(tenancyType|otherTenancyTypeDetails)$/, 'tenancy-type'],
   [/^tenancy\.noTenancyAgreementReason$/, 'tenancy-agreement'],
   [/^grounds$/, 'rent-arrears-claim'],
+  [/^grounds\.rentArrearsGrounds$/, 'rent-arrears-grounds'],
+  [/^grounds\.otherGrounds$/, 'other-grounds'],
   [/^grounds\.otherGroundsDetails$/, 'other-grounds'],
   [/^grounds\.groundReasons(\.[A-Z0-9_]+|\.reason)?$/, 'ground-reason'],
   [/^rentArrears\.currentArrears$/, 'current-arrears'],
+  [/^rentArrears\.otherFrequencyDetails$/, 'rent-frequency'],
+  [/^rentArrears\.recoverySteps$/, 'recovery-steps'],
+  [/^rentArrears\.rentHistoryLedger\[\d+\](\.[A-Za-z]+)?$/, 'ledger-transaction'],
   [/^notice\.noticeServed$/, 'notice-served'],
   [/^notice\.noticeTypeOther$/, 'notice-type'],
   [/^notice\.noticeUnavailableReason$/, 'notice-available'],
@@ -32,6 +37,7 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^circumstances\.defendantCircumstances$/, 'defendant-circumstances'],
   [/^circumstances\.claimantCircumstances$/, 'claimant-circumstances'],
   [/^circumstances\.underlesseeName$/, 'underlessee-name'],
+  [/^circumstances\.underlesseeAddress(\.[A-Za-z0-9]+)?$/, 'underlessee-address'],
   [/^otherInformation\.languageUsed$/, 'language-used'],
   [/^otherInformation\.otherReasonsDetail$/, 'other-reasons'],
   [/^submission\./, 'check-your-answers'],
@@ -40,14 +46,16 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
 /** Refusals that mean the claimant cannot use the service, by where they are told so. */
 const INELIGIBLE_REDIRECTS: Record<string, (caseId: string) => string> = {
   MULTIPLE_CLAIMANTS_NOT_ELIGIBLE: caseId => getStepUrl('multiple-claimants-ineligible', flowConfig, caseId),
-  PROPERTY_NOT_IN_ENGLAND: () => `${MAKE_A_CLAIM_START_ROUTE}/property-ineligible`,
+  PROPERTY_NOT_IN_ENGLAND: () => PROPERTY_INELIGIBLE_URL,
 };
 
-const ANSWER_REFUSAL = /^(REQUIRED|TOO_LONG):([A-Za-z]+(?:\[\d+\])?(?:\.[A-Za-z0-9_]+)*)$/;
+const ANSWER_REFUSAL = /^(REQUIRED|TOO_LONG):([A-Za-z]+(?:\[\d+\])?(?:\.[A-Za-z0-9_]+(?:\[\d+\])?)*)$/;
 
 export const DRAFT_CHANGED = 'DRAFT_CHANGED';
 
-const MESSAGE_REFUSALS = ['DRAFT_NOT_FOUND', DRAFT_CHANGED, 'PAYMENT_SERVICE_UNAVAILABLE'];
+const OTHER_GROUND_NOT_ALLOWED = 'OTHER_GROUND_NOT_ALLOWED';
+
+const MESSAGE_REFUSALS = ['DRAFT_NOT_FOUND', DRAFT_CHANGED, 'PAYMENT_SERVICE_UNAVAILABLE', OTHER_GROUND_NOT_ALLOWED];
 
 export const SUBMIT_FAILED = 'failed';
 
@@ -80,10 +88,21 @@ function stepForPath(path: string, caseId: string): { step: string; href: string
   if (step === 'check-your-answers') {
     return { step, href: path.endsWith('Agreed') ? '#statementOfTruth' : `#${path.split('.').pop()}` };
   }
-  const index = Number(/^defendants\[(\d+)\]/.exec(path)?.[1] ?? 0);
+  return { step, href: `${getStepUrl(step, flowConfig, caseId)}${queryForPath(path)}` };
+}
+
+/** Which defendant, ledger entry or ground a refused path is about, as the page that asks it expects. */
+function queryForPath(path: string): string {
+  const defendant = Number(/^defendants\[(\d+)\]/.exec(path)?.[1] ?? 0);
+  const entry = /^rentArrears\.rentHistoryLedger\[(\d+)\]/.exec(path)?.[1];
   const ground = /^grounds\.groundReasons\.(GROUND_[A-Z0-9]+)$/.exec(path)?.[1];
-  const query = ground ? `?ground=${ground}` : step.startsWith('defendant-') && index > 0 ? `?index=${index}` : '';
-  return { step, href: `${getStepUrl(step, flowConfig, caseId)}${query}` };
+  if (ground) {
+    return `?ground=${ground}`;
+  }
+  if (entry !== undefined) {
+    return `?entry=${entry}`;
+  }
+  return defendant > 0 ? `?index=${defendant}` : '';
 }
 
 /** The error summary for the problems the check your answers page was sent back with, one line each. */
@@ -109,6 +128,12 @@ export function submitErrorItems(req: Request, codes: string[]): ErrorSummaryIte
     if (code === DRAFT_CHANGED) {
       return { text: t('makeAClaim:submitErrors.draftChanged') };
     }
+    if (code === OTHER_GROUND_NOT_ALLOWED) {
+      return {
+        text: t('makeAClaim:submitErrors.otherGroundNotAllowed'),
+        href: getStepUrl('other-grounds', flowConfig, caseId),
+      };
+    }
     if (code === 'PAYMENT_SERVICE_UNAVAILABLE') {
       return { text: t('makeAClaim:submitErrors.paymentServiceUnavailable') };
     }
@@ -126,7 +151,10 @@ export function submitErrorCodes(query: unknown): string[] {
     .slice(0, 20);
 }
 
-/** Whether a draft save or submit was refused because the claim had been saved since this page loaded it. */
+/**
+ * Whether a draft save or submit was refused because another tab or window saved the claim after this page was
+ * shown: the version the page posted is no longer the stored one, and the answers differ.
+ */
 export function isDraftChanged(error: unknown): boolean {
   return error instanceof CallbackRejectedError && error.reasons.includes(DRAFT_CHANGED);
 }

@@ -32,11 +32,12 @@ export function addressFields(prefix: string, required: IsRequired = () => true)
     ...extra,
   });
   return [
-    field('addressLine1', true, { maxLength: FIELD_LIMITS.addressLine1 }),
+    field('addressLine1', true, { maxLength: FIELD_LIMITS.addressLine }),
     field('addressLine2', false, { maxLength: FIELD_LIMITS.addressLine }),
     field('town', true, { maxLength: FIELD_LIMITS.addressLine }),
     field('county', false, { maxLength: FIELD_LIMITS.addressLine }),
     field('postcode', true, {
+      maxLength: FIELD_LIMITS.postcode,
       validator: (value: unknown): boolean | string =>
         typeof value === 'string' && value.trim() && !UK_POSTCODE.test(value.trim()) ? 'errors.postcodeInvalid' : true,
     }),

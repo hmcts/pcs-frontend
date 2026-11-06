@@ -3,16 +3,23 @@ import type { Request } from 'express';
 import { CallbackRejectedError } from '../../../../main/HttpError';
 import { CcdCaseModel } from '../../../../main/services/ccdCaseData.model';
 import { ccdCaseService } from '../../../../main/services/ccdCaseService';
+import type { CitizenPossessionClaim } from '../../../../main/services/citizenPossessionClaim.interface';
 import {
   answeredClaim,
-  keepSavedAnswers,
   normaliseClaim,
+  restoreUnreadable,
   saveClaimDraft,
   submitClaim,
 } from '../../../../main/steps/make-a-claim/claimDraft';
+import { UNREADABLE } from '../../../../main/steps/make-a-claim/formValues';
 
 jest.mock('../../../../main/services/ccdCaseService', () => ({
-  ccdCaseService: { updateDraft: jest.fn(), startCaseEvent: jest.fn(), submitCaseEvent: jest.fn() },
+  ccdCaseService: {
+    updateDraft: jest.fn(),
+    startCaseEvent: jest.fn(),
+    submitCaseEvent: jest.fn(),
+    getCaseByIdForEvent: jest.fn(),
+  },
 }));
 
 const service = ccdCaseService as jest.Mocked<typeof ccdCaseService>;
@@ -85,42 +92,88 @@ describe('normaliseClaim', () => {
   });
 });
 
-describe('keepSavedAnswers', () => {
-  it('keeps a saved answer the page could not read, and takes every answer it could', () => {
+describe('restoreUnreadable', () => {
+  it('puts back a saved answer the page could not read, and takes every answer it could', () => {
     expect(
-      keepSavedAnswers(
+      restoreUnreadable(
         { rentArrears: { rentAmount: '100000', currentArrears: '5000' }, claimant: { firstName: 'Billy' } },
-        { rentArrears: { rentAmount: undefined, currentArrears: '6000' }, claimant: { firstName: 'Bill' } }
+        { rentArrears: { rentAmount: UNREADABLE, currentArrears: '6000' }, claimant: { firstName: 'Bill' } }
       )
     ).toEqual({ rentArrears: { rentAmount: '100000', currentArrears: '6000' }, claimant: { firstName: 'Bill' } });
   });
 
-  it('takes a changed list whole', () => {
-    expect(keepSavedAnswers({ grounds: { otherGrounds: ['GROUND_1'] } }, { grounds: { otherGrounds: [] } })).toEqual({
+  it('leaves an answer the claimant cleared cleared', () => {
+    expect(
+      restoreUnreadable({ rentArrears: { recoverySteps: 'Letters' } }, { rentArrears: { recoverySteps: undefined } })
+    ).toEqual({ rentArrears: { recoverySteps: undefined } });
+  });
+
+  it('drops an unreadable answer that had nothing saved', () => {
+    expect(restoreUnreadable({}, { notice: { noticeDate: UNREADABLE } })).toEqual({
+      notice: { noticeDate: undefined },
+    });
+  });
+
+  it('restores field by field inside the edited collection item, matched by id, by ground, or else by position', () => {
+    const saved = {
+      defendants: [
+        { id: 'a', value: { firstName: 'Ann' } },
+        { id: 'b', value: { firstName: 'Bob', lastName: 'Smith' } },
+      ],
+      rentArrears: { rentHistoryLedger: [{ value: { transactionDate: '2026-06-01', amountCharged: '100' } }] },
+      grounds: { groundReasons: [{ value: { ground: 'GROUND_2', reason: 'Mortgage' } }] },
+    };
+    const updated = {
+      defendants: [
+        { id: 'b', value: { firstName: 'Robert', lastName: UNREADABLE } },
+        { id: 'a', value: { firstName: 'Ann' } },
+      ],
+      rentArrears: { rentHistoryLedger: [{ value: { transactionDate: UNREADABLE, amountCharged: '200' } }] },
+      grounds: {
+        groundReasons: [{ value: { ground: 'GROUND_1' } }, { value: { ground: 'GROUND_2', reason: UNREADABLE } }],
+      },
+    };
+    expect(restoreUnreadable(saved, updated)).toEqual({
+      defendants: [
+        { id: 'b', value: { firstName: 'Robert', lastName: 'Smith' } },
+        { id: 'a', value: { firstName: 'Ann' } },
+      ],
+      rentArrears: { rentHistoryLedger: [{ value: { transactionDate: '2026-06-01', amountCharged: '200' } }] },
+      grounds: {
+        groundReasons: [{ value: { ground: 'GROUND_1' } }, { value: { ground: 'GROUND_2', reason: 'Mortgage' } }],
+      },
+    });
+  });
+
+  it('takes a changed list of choices whole', () => {
+    expect(restoreUnreadable({ grounds: { otherGrounds: ['GROUND_1'] } }, { grounds: { otherGrounds: [] } })).toEqual({
       grounds: { otherGrounds: [] },
     });
   });
 });
 
 describe('answeredClaim', () => {
-  const claimWith = (action: string) => {
+  const answered = (body: Record<string, unknown>, apply: (claim: CitizenPossessionClaim) => void) => {
     const req = request();
-    req.body = { action };
+    req.body = body;
     req.res!.locals.validatedCase = new CcdCaseModel({
       id: CASE,
-      data: { citizenPossessionClaim: { rentArrears: { rentAmount: '100000' } } },
+      data: { citizenPossessionClaim: { draftVersion: 4, rentArrears: { rentAmount: '100000' } } },
     });
-    return answeredClaim(req, claim => {
-      claim.rentArrears = { rentAmount: undefined };
-    });
+    return answeredClaim(req, apply);
   };
 
-  it('keeps the saved value on a Save for later', () => {
-    expect(claimWith('saveForLater').rentArrears).toEqual({ rentAmount: '100000' });
+  it('keeps the saved amount when the one given cannot be read', () => {
+    expect(
+      answered({ action: 'saveForLater' }, claim => (claim.rentArrears = { rentAmount: UNREADABLE })).rentArrears
+    ).toEqual({
+      rentAmount: '100000',
+    });
   });
 
-  it('takes the page’s answers on Save and continue', () => {
-    expect(claimWith('continue').rentArrears).toEqual({ rentAmount: undefined });
+  it('takes the version the page was showing over the one the request loaded', () => {
+    expect(answered({ draftVersion: '3' }, () => undefined).draftVersion).toBe(3);
+    expect(answered({}, () => undefined).draftVersion).toBe(4);
   });
 });
 
@@ -143,6 +196,38 @@ describe('saveClaimDraft', () => {
     expect(req.res?.locals.validatedCase?.data).toEqual({
       propertyAddress: { AddressLine1: '1' },
       citizenPossessionClaim: { claimant: { firstName: 'Billy' } },
+    });
+  });
+
+  it('takes a repeat of a save that already went through as done', async () => {
+    service.updateDraft.mockRejectedValue(new CallbackRejectedError(['DRAFT_CHANGED'], 422));
+    service.getCaseByIdForEvent.mockResolvedValue({
+      id: CASE,
+      data: { citizenPossessionClaim: { draftVersion: 5, defendants: [{ id: 'kept', value: { nameKnown: 'NO' } }] } },
+    });
+    const req = request();
+    await saveClaimDraft(req, { draftVersion: 4, defendants: [{ id: 'another', value: { nameKnown: 'NO' } }] });
+    expect(req.res?.locals.validatedCase?.data?.citizenPossessionClaim?.draftVersion).toBe(5);
+  });
+
+  it('refuses a save after another tab saved different answers', async () => {
+    service.updateDraft.mockRejectedValue(new CallbackRejectedError(['DRAFT_CHANGED'], 422));
+    service.getCaseByIdForEvent.mockResolvedValue({
+      id: CASE,
+      data: { citizenPossessionClaim: { draftVersion: 5, claimant: { firstName: 'Other tab' } } },
+    });
+    await expect(
+      saveClaimDraft(request(), { draftVersion: 4, claimant: { firstName: 'This tab' } })
+    ).rejects.toMatchObject({
+      reasons: ['DRAFT_CHANGED'],
+    });
+  });
+
+  it('normalises the claim once', async () => {
+    service.updateDraft.mockResolvedValue({ id: CASE, data: {} });
+    await saveClaimDraft(request(), { claimant: { individualOrOrganisation: 'ORGANISATION', firstName: 'A' } });
+    expect(service.updateDraft).toHaveBeenLastCalledWith(expect.anything(), 'token', CASE, {
+      citizenPossessionClaim: { claimant: { individualOrOrganisation: 'ORGANISATION' } },
     });
   });
 

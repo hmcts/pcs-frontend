@@ -5,6 +5,8 @@
     "property-addressLine1": "Enter the first line of the property’s address",
     "property-town": "Enter the town or city of the property’s address",
     "property-postcode": "Enter the postcode of the property’s address",
-    "postcodeInvalid": "Enter a real postcode, like LU1 1AB"
+    "postcodeInvalid": "Enter a real postcode, like LU1 1AB",
+    "title": "There is a problem",
+    "tooLong": "Part of the address is too long. Address lines can be up to 100 characters and the postcode up to 14"
   }
 }

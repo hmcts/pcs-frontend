@@ -156,8 +156,11 @@ export async function completeTenancyGroundsAndNotice(
       await page.getByRole('checkbox', { name: ground }).check();
     }
     await saveAndContinue(page);
-    for (const { heading, reason } of otherGrounds) {
-      await page.getByLabel(`Why are you making a claim for possession under ${heading}?`).fill(reason);
+    for (let asked = 0; asked < otherGrounds.length; asked++) {
+      const question = (await page.locator('h1').innerText()).trim();
+      const ground = otherGrounds.find(({ heading }) => question.includes(heading));
+      expect(ground, `a reason for "${question}"`).toBeDefined();
+      await page.getByLabel(question).fill(ground!.reason);
       await saveAndContinue(page);
     }
   } else {

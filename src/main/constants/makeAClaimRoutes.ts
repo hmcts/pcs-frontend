@@ -1,6 +1,8 @@
 /** Path patterns of the private landlord make a claim journey, for its routes and its feature gate. */
 export const MAKE_A_CLAIM_START_ROUTE = '/make-a-claim';
 
+export const PROPERTY_INELIGIBLE_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-ineligible`;
+
 export const MAKE_A_CLAIM_ROUTE = '/case/:caseReference/make-a-claim';
 
 export const PAY_CLAIM_FEE_ROUTE = '/case/:caseReference/pay-claim-fee';

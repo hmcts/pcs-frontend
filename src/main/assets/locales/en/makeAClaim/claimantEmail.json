@@ -5,6 +5,11 @@
   "labels": {
     "emailAddress": "What email address do you want updates to be sent to?"
   },
+  "accountEmailTooLong": {
+    "question": "What email address do you want updates to be sent to?",
+    "option": "Another email address",
+    "explanation": "The email address on your account is too long for us to use. Email addresses can be up to {{limit}} characters."
+  },
   "errors": {
     "useAccountEmail": "Select whether you want email updates to this address",
     "emailAddress": "Enter the email address you want updates to be sent to",

@@ -5,6 +5,11 @@
   "labels": {
     "emailAddress": "cyWhat email address do you want updates to be sent to?"
   },
+  "accountEmailTooLong": {
+    "question": "cyWhat email address do you want updates to be sent to?",
+    "option": "cyAnother email address",
+    "explanation": "cyThe email address on your account is too long for us to use. Email addresses can be up to {{limit}} characters."
+  },
   "errors": {
     "useAccountEmail": "cySelect whether you want email updates to this address",
     "emailAddress": "cyEnter the email address you want updates to be sent to",

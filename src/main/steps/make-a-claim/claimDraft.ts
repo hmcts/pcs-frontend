@@ -1,7 +1,10 @@
 import type { Request } from 'express';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
-import { HTTPError } from '../../HttpError';
+import { CallbackRejectedError, HTTPError } from '../../HttpError';
+import { parseDraftVersion } from '../utils/buildDraftDefendantResponse';
+
+import { UNREADABLE } from './formValues';
 
 import type { CcdDraftEvent } from '@modules/documents/storage';
 import type { CcdCase } from '@services/ccdCase.interface';
@@ -131,26 +134,62 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/**
- * The claim a Save for later leaves: the page's answers that could be read, and the saved answer wherever the
- * page's could not. Save for later skips validation, so an unreadable answer must not wipe out a good one.
- */
-export function keepSavedAnswers<T>(saved: T, updated: T): T {
-  if (!isPlainObject(saved) || !isPlainObject(updated)) {
-    return updated === undefined ? saved : updated;
+/** The saved collection item an edited one stands for: the same id, the same ground, or else the same position. */
+function savedItemFor(saved: unknown[], item: unknown, index: number): unknown {
+  if (isPlainObject(item)) {
+    const value = isPlainObject(item.value) ? item.value : {};
+    const match = saved.find(
+      candidate =>
+        isPlainObject(candidate) &&
+        ((item.id && candidate.id === item.id) ||
+          (value.ground && isPlainObject(candidate.value) && candidate.value.ground === value.ground))
+    );
+    if (match) {
+      return match;
+    }
   }
-  const merged: Record<string, unknown> = { ...updated };
-  for (const [key, value] of Object.entries(saved)) {
-    merged[key] = keepSavedAnswers(value, updated[key]);
-  }
-  return merged as T;
+  return saved[index];
 }
 
-/** Applies a page's answers to a copy of the saved claim, keeping saved answers on a Save for later. */
+/**
+ * Puts the saved answer back wherever the page's answer could not be read ({@link UNREADABLE}), field by field,
+ * inside edited collection items too. Answers left empty stay cleared.
+ */
+export function restoreUnreadable<T>(saved: unknown, updated: T): T {
+  if (updated === UNREADABLE) {
+    return (saved === UNREADABLE ? undefined : saved) as T;
+  }
+  if (Array.isArray(updated)) {
+    const savedItems = Array.isArray(saved) ? saved : [];
+    return updated.map((item, index) => restoreUnreadable(savedItemFor(savedItems, item, index), item)) as T;
+  }
+  if (isPlainObject(updated)) {
+    const savedObject = isPlainObject(saved) ? saved : {};
+    return Object.fromEntries(
+      Object.entries(updated).map(([key, value]) => [key, restoreUnreadable(savedObject[key], value)])
+    ) as T;
+  }
+  return updated;
+}
+
+/**
+ * Applies a page's answers to a copy of the saved claim, keeping saved answers the page's could not replace. The
+ * claim keeps the draft version the page was showing, so a save after another tab's is refused.
+ */
 export function answeredClaim(req: Request, apply: (claim: CitizenPossessionClaim) => void): CitizenPossessionClaim {
   const claim = draftClaim(req);
   apply(claim);
-  return req.body?.action === 'saveForLater' ? keepSavedAnswers(readClaim(req), claim) : claim;
+  const shownVersion = parseDraftVersion(req.body?.draftVersion);
+  return {
+    ...restoreUnreadable(readClaim(req), claim),
+    ...(shownVersion !== undefined ? { draftVersion: shownVersion } : {}),
+  };
+}
+
+function sendDraft(accessToken: string, caseId: string, normalised: CitizenPossessionClaim): Promise<CcdCase> {
+  return ccdCaseService.updateDraft(MAKE_A_CLAIM_DRAFT_EVENT, accessToken, caseId, {
+    citizenPossessionClaim: normalised,
+  });
 }
 
 /** Saves the whole claim as the case's draft. The draft save replaces what was saved before. */
@@ -159,12 +198,34 @@ export async function saveClaimDraftForCase(
   caseId: string,
   claim: CitizenPossessionClaim
 ): Promise<CcdCase> {
-  return ccdCaseService.updateDraft(MAKE_A_CLAIM_DRAFT_EVENT, accessToken, caseId, {
-    citizenPossessionClaim: normaliseClaim(claim),
-  });
+  return sendDraft(accessToken, caseId, normaliseClaim(claim));
 }
 
-/** Saves the claim and keeps the request's case in step with it, for whatever the request renders next. */
+/** The claimant's answers alone: without what pcs-api owns, and without collection ids, which each request makes. */
+function answersOf(claim: CitizenPossessionClaim | undefined): unknown {
+  const { draftVersion: _version, propertyAddress: _address, submission, ...answers } = claim ?? {};
+  const { serviceRequestReference: _reference, feeAmount: _fee, paymentStatus: _status, ...signed } = submission ?? {};
+  const withoutIds = (value: unknown): unknown => {
+    if (Array.isArray(value)) {
+      return value.map(withoutIds);
+    }
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(
+        Object.entries(value)
+          .filter(([key, item]) => key !== 'id' && item !== undefined)
+          .map(([key, item]) => [key, withoutIds(item)])
+      );
+    }
+    return value;
+  };
+  return withoutIds({ ...answers, submission: signed });
+}
+
+/**
+ * Saves the claim as the version the page was showing, and keeps the request's case in step with it. A save
+ * refused because another tab saved first stays refused, but a repeat of a save that already went through (a
+ * double click) is taken as done.
+ */
 export async function saveClaimDraft(req: Request, claim: CitizenPossessionClaim): Promise<void> {
   const accessToken = req.session?.user?.accessToken;
   const validatedCase = req.res?.locals.validatedCase;
@@ -172,14 +233,24 @@ export async function saveClaimDraft(req: Request, claim: CitizenPossessionClaim
     throw new HTTPError('Cannot save the claim without a signed-in user and a case', 500);
   }
   const normalised = normaliseClaim(claim);
-  const saved = await saveClaimDraftForCase(accessToken, validatedCase.id, normalised);
+  let saved: CitizenPossessionClaim | undefined;
+  try {
+    saved = (await sendDraft(accessToken, validatedCase.id, normalised)).data?.citizenPossessionClaim;
+  } catch (error) {
+    if (!(error instanceof CallbackRejectedError && error.reasons.includes('DRAFT_CHANGED'))) {
+      throw error;
+    }
+    const stored = (await ccdCaseService.getCaseByIdForEvent(accessToken, validatedCase.id, MAKE_A_CLAIM_EVENT_ID)).data
+      ?.citizenPossessionClaim;
+    if (!isEqual(answersOf(stored), answersOf(normalised))) {
+      throw error;
+    }
+    saved = stored;
+  }
   if (req.res?.locals) {
     req.res.locals.validatedCase = new CcdCaseModel({
       id: validatedCase.id,
-      data: {
-        ...validatedCase.data,
-        citizenPossessionClaim: saved.data?.citizenPossessionClaim ?? normalised,
-      },
+      data: { ...validatedCase.data, citizenPossessionClaim: saved ?? normalised },
     });
   }
 }

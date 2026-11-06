@@ -16,9 +16,35 @@ jest.mock('../../../../main/services/ccdCaseService', () => ({ ccdCaseService: {
 
 const create = ccdCaseService.createPossessionClaim as jest.Mock;
 
-function request(answers: Record<string, Record<string, unknown>>, sessionID = 'session-1'): Request {
+/** The Redis commands the guard uses, against an in-memory map, shared by every request given it. */
+function fakeRedis() {
+  const values = new Map<string, string>();
+  return {
+    values,
+    async set(key: string, value: string, ...options: (string | number)[]) {
+      if (options.includes('NX') && values.has(key)) {
+        return null;
+      }
+      values.set(key, value);
+      return 'OK';
+    },
+    async get(key: string) {
+      return values.get(key) ?? null;
+    },
+    async del(key: string) {
+      return values.delete(key) ? 1 : 0;
+    },
+  };
+}
+
+function request(
+  answers: Record<string, Record<string, unknown>>,
+  sessionID = 'session-1',
+  redisClient?: ReturnType<typeof fakeRedis>
+): Request {
   return {
     sessionID,
+    app: { locals: { redisClient } },
     session: { user: { accessToken: 'token' }, formData: { makeAClaim: { default: answers } } },
     params: {},
     res: { locals: { step: { name: 'who-is-claiming', journey: 'makeAClaim' } } },
@@ -45,6 +71,12 @@ describe('refusedClaimRedirect', () => {
     ['PROPERTY_NOT_ELIGIBLE', PROPERTY_NOT_COVERED_URL],
   ])('sends %s to %s', (reason, url) => {
     expect(refusedClaimRedirect(new CallbackRejectedError([reason], 422))).toBe(url);
+  });
+
+  it('sends an address pcs-api found too long back to the address page', () => {
+    expect(refusedClaimRedirect(new CallbackRejectedError(['TOO_LONG:propertyAddress.AddressLine1'], 422))).toBe(
+      '/make-a-claim/property-address?problem=tooLong'
+    );
   });
 
   it('finds the reason among several', () => {
@@ -89,24 +121,49 @@ describe('createClaimFromStartAnswers', () => {
     });
   });
 
-  it('creates one claim for a double-clicked submission and continues with it after', async () => {
+  it('creates one claim when the same session submits twice at once, as two pods would see it', async () => {
     let finish: (value: unknown) => void = () => undefined;
     create.mockReturnValue(new Promise(resolve => (finish = resolve)));
-    const req = request(ELIGIBLE);
-    const first = createClaimFromStartAnswers(req);
-    const second = createClaimFromStartAnswers(req);
+    const redis = fakeRedis();
+    const first = createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    const second = createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    await new Promise(resolve => setTimeout(resolve, 10));
     finish({ id: 1777027600017761, data: {} });
 
     await expect(Promise.all([first, second])).resolves.toEqual([
       '/case/1777027600017761/make-a-claim/eligible',
       '/case/1777027600017761/make-a-claim/eligible',
     ]);
-    await expect(createClaimFromStartAnswers(req)).resolves.toBe('/case/1777027600017761/make-a-claim/eligible');
     expect(create).toHaveBeenCalledTimes(1);
-    expect(createdCaseReference(req)).toBe('1777027600017761');
+    expect(redis.values.has('make-a-claim:creating:session-1')).toBe(false);
+  });
 
-    forgetCreatedClaim(req);
-    expect(createdCaseReference(req)).toBeUndefined();
+  it('continues with the claim already created, even from a session saved without it', async () => {
+    create.mockResolvedValue({ id: 1777027600017761, data: {} });
+    const redis = fakeRedis();
+    await createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    const stale = request(ELIGIBLE, 'session-1', redis);
+    await expect(createdCaseReference(stale)).resolves.toBe('1777027600017761');
+    await expect(createClaimFromStartAnswers(stale)).resolves.toBe('/case/1777027600017761/make-a-claim/eligible');
+    expect(create).toHaveBeenCalledTimes(1);
+
+    await forgetCreatedClaim(stale);
+    await expect(createdCaseReference(stale)).resolves.toBeUndefined();
+  });
+
+  it('lets another session create its own claim', async () => {
+    create.mockResolvedValue({ id: 1777027600017761, data: {} });
+    const redis = fakeRedis();
+    await createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis));
+    await createClaimFromStartAnswers(request(ELIGIBLE, 'session-2', redis));
+    expect(create).toHaveBeenCalledTimes(2);
+  });
+
+  it('releases the lock when the creation fails', async () => {
+    create.mockRejectedValue(new HTTPError('CCD down', 502));
+    const redis = fakeRedis();
+    await expect(createClaimFromStartAnswers(request(ELIGIBLE, 'session-1', redis))).rejects.toThrow('CCD down');
+    expect(redis.values.size).toBe(0);
   });
 
   it('maps the not in England refusal to the property ineligible page', async () => {

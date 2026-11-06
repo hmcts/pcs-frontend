@@ -1,5 +1,7 @@
 import type { Request } from 'express';
 
+import { parseDraftVersion } from '../utils/buildDraftDefendantResponse';
+
 import { answeredClaim, readClaim, saveClaimDraft } from './claimDraft';
 import { claimMappings } from './claimMapping';
 import { MAKE_A_CLAIM_JOURNEY, MAKE_A_CLAIM_ROUTE, flowConfig } from './flow.config';
@@ -33,7 +35,20 @@ export function sharedPageContent(req: Request, interstitial = false): Record<st
     dashboardUrl: req.res?.locals.validatedCase?.id ? taskListUrl(req) : '/',
     signedIn: Boolean(req.session?.user),
     contactUsForHelp: t('contactUsForHelp'),
+    draftVersion:
+      req.method === 'POST'
+        ? parseDraftVersion(req.body?.draftVersion)
+        : req.res?.locals.validatedCase?.data?.citizenPossessionClaim?.draftVersion,
   };
+}
+
+/**
+ * Whether the page is being rendered. The form builder first asks a step's extendGetContent for interpolation
+ * values with a bare `{ fields: [] }`, including on a POST that goes on to redirect, so content only a rendered
+ * page shows is built when the built form is passed.
+ */
+export function isRendering(formContent: BuiltFormContent): boolean {
+  return 'allFieldsHaveOwnFieldset' in formContent;
 }
 
 /** The form builder only lets choice and date questions be the page heading; text inputs need it set here. */
@@ -48,7 +63,8 @@ function labelTextQuestionsAsPageHeading(formContent: BuiltFormContent): void {
 }
 
 /**
- * A page of the make a claim journey. Its answers are read from and saved to the claim draft through the
+ * A page of the make a claim journey. Its form carries the draft version it was shown with, which its save sends,
+ * so a save after another tab's is refused. Its answers are read from and saved to the claim draft through the
  * page's entry in {@link claimMappings}, unless the page supplies its own.
  */
 export function createMakeAClaimStep(config: MakeAClaimStepConfig): StepDefinition {

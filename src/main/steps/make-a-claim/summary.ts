@@ -170,7 +170,7 @@ export function defendantsCard(req: Request): SummaryCard {
     if (index > 0) {
       const name = defendantDisplayName(defendant.value, req);
       builder.withAction(
-        `${getStepUrl('remove-defendant', flowConfig, req.res?.locals.validatedCase?.id)}?index=${index}`,
+        `${getStepUrl('remove-defendant', flowConfig, req.res?.locals.validatedCase?.id)}?${defendant.id ? `id=${defendant.id}` : `index=${index}`}`,
         t('makeAClaim:summary.remove'),
         t('makeAClaim:summary.labels.defendantName', number) + ` ${name}`
       );
@@ -325,7 +325,7 @@ export function otherInformationCard(req: Request): SummaryCard {
 /** The property, which cannot be changed once the claim exists. */
 export function propertyCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
-  const lines = address(propertyAddressOf(req)).map(line => escapeHtml(line));
+
   return {
     id: 'property',
     title: t('makeAClaim:summary.cards.property'),
@@ -333,7 +333,7 @@ export function propertyCard(req: Request): SummaryCard {
       {
         key: { text: t('makeAClaim:summary.labels.propertyAddress') },
         value: {
-          html: `${lines.join('<br>')}<p class="govuk-hint govuk-!-margin-top-2 govuk-!-margin-bottom-0">${escapeHtml(
+          html: `${linesHtml(address(propertyAddressOf(req)))}<p class="govuk-hint govuk-!-margin-top-2 govuk-!-margin-bottom-0">${escapeHtml(
             t('makeAClaim:summary.propertyCannotChange')
           )}</p>`,
         },

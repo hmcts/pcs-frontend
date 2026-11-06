@@ -59,7 +59,11 @@ function ccdStub(): Express {
     const sent = req.body.event_data.citizenPossessionClaim;
     if (ccd.changeDraftBeforeNextSave) {
       ccd.changeDraftBeforeNextSave = false;
-      ccd.stored.citizenPossessionClaim = { ...ccd.stored.citizenPossessionClaim, draftVersion: draftVersion() + 1 };
+      ccd.stored.citizenPossessionClaim = {
+        ...ccd.stored.citizenPossessionClaim,
+        otherInformation: { languageUsed: 'WELSH' },
+        draftVersion: draftVersion() + 1,
+      };
     }
     if (sent.draftVersion !== undefined && sent.draftVersion !== draftVersion()) {
       return res.status(422).json({ callbackErrors: ['DRAFT_CHANGED'] });

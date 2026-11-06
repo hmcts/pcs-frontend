@@ -8,6 +8,6 @@ export const step: StepDefinition = createStartStep({
   stepDir: __dirname,
   fields: [],
   customTemplate: 'make-a-claim/templates/start.njk',
-  beforeGet: req => forgetCreatedClaim(req),
+  beforeGet: async req => forgetCreatedClaim(req),
   extendGetContent: () => ({ startUrl: '/make-a-claim/claimant-type' }),
 });

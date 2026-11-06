@@ -380,6 +380,7 @@ describe('proof of rent arrears with the ledger design', () => {
 
     expect(storedClaim().rentArrears.rentHistoryLedger).toEqual([
       {
+        id: expect.any(String),
         value: {
           transactionDate: '2026-06-01',
           transactionTypes: ['RENT_CHARGE'],
@@ -387,7 +388,10 @@ describe('proof of rent arrears with the ledger design', () => {
           amountCharged: '50000',
         },
       },
-      { value: { transactionDate: '2026-06-03', transactionTypes: ['TENANT_PAYMENT'], amountPaid: '12000' } },
+      {
+        id: expect.any(String),
+        value: { transactionDate: '2026-06-03', transactionTypes: ['TENANT_PAYMENT'], amountPaid: '12000' },
+      },
     ]);
     const summary = text((await app.get(claimPath('ledger-summary'))).text);
     expect(summary).toContain('£500.00 £500.00');
@@ -521,6 +525,47 @@ describe('review fixes', () => {
     statementOfTruthFullName: 'Billy Wright',
     statementOfTruthPosition: '',
   };
+
+  it('refuses a save from a page loaded before another tab saved, by the version the page showed', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    const page = new JSDOM((await app.get(claimPath('rent-amount'))).text).window.document;
+    const shown = page.querySelector<HTMLInputElement>('input[name="draftVersion"]')?.value;
+    expect(shown).toBe('1');
+    await app.post(claimPath('language-used'), { languageUsed: 'WELSH', draftVersion: '1' });
+    const stale = await app.post(claimPath('rent-amount'), { rentAmount: '1200', draftVersion: shown as string });
+    expect(stale.location).toBe(`${claimPath('check-your-answers')}?submitError=DRAFT_CHANGED`);
+    expect(storedClaim().rentArrears.rentAmount).toBe('100000');
+  });
+
+  it('takes a double-clicked page as one save, not a change made elsewhere', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    const [first, second] = await Promise.all([
+      app.post(claimPath('rent-amount'), { rentAmount: '1200', draftVersion: '1' }),
+      app.post(claimPath('rent-amount'), { rentAmount: '1200', draftVersion: '1' }),
+    ]);
+    expect([first.location, second.location]).toEqual([
+      `${claimPath('rent-frequency')}?nav=1`,
+      `${claimPath('rent-frequency')}?nav=1`,
+    ]);
+    expect(storedClaim().rentArrears.rentAmount).toBe('120000');
+  });
+
+  it('asks for a different email address up front when the account one is too long to keep', async () => {
+    app = await bootMakeAClaim({ email: `pl-ledger-${'x'.repeat(250)}@example.test` });
+    givenClaim(ANSWERED_CLAIM);
+    const page = new JSDOM((await app.get(claimPath('claimant-email'))).text).window.document;
+    expect(page.body.textContent).toContain('The email address on your account is too long for us to use');
+    expect(
+      [...page.querySelectorAll('input[name="useAccountEmail"]')].map(input => (input as HTMLInputElement).value)
+    ).toEqual(['no']);
+    await app.post(claimPath('claimant-email'), {
+      useAccountEmail: 'no',
+      'useAccountEmail.emailAddress': 'short@example.test',
+    });
+    expect(storedClaim().claimant).toMatchObject({ contactByEmail: 'NO', emailAddress: 'short@example.test' });
+  });
 
   it('sends the claimant back to check their answers when the claim changed elsewhere', async () => {
     app = await bootMakeAClaim();
@@ -660,8 +705,8 @@ describe('review fixes', () => {
       `${claimPath('tenancy-cya')}?nav=1`
     );
     expect(storedClaim().grounds.groundReasons).toEqual([
-      { value: { ground: 'GROUND_1A', reason: 'Selling' } },
-      { value: { ground: 'GROUND_14', reason: 'Noise' } },
+      { id: expect.any(String), value: { ground: 'GROUND_1A', reason: 'Selling' } },
+      { id: expect.any(String), value: { ground: 'GROUND_14', reason: 'Noise' } },
     ]);
     expect(text((await app.get(claimPath('tenancy-cya'))).text)).toContain(
       'Why you are claiming under Antisocial behaviour (Ground 14) Noise'

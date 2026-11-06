@@ -1,9 +1,13 @@
+import { randomUUID } from 'crypto';
+
 import type { Request } from 'express';
 
 import { offeredProofTypes } from './conditions';
 import { todayInLondon } from './dates';
+import { FIELD_LIMITS } from './fieldLimits';
 import {
   type FormBody,
+  UNREADABLE,
   addressFromBody,
   addressToForm,
   checkedValues,
@@ -11,7 +15,10 @@ import {
   fromPenceString,
   fromYesNo,
   indexFromQuery,
+  isReadable,
   oneOf,
+  readDate,
+  readPence,
   text,
   toDateParts,
   toPenceString,
@@ -25,7 +32,6 @@ import {
   statementRangeOf,
 } from './rentHistory';
 
-import { getFormData, setFormData } from '@modules/steps';
 import type { CcdCaseAddress, CcdCollectionItem } from '@services/ccdCase.interface';
 import {
   type CitizenDefendant,
@@ -75,6 +81,12 @@ export function accountEmailOf(req: Request): string | undefined {
   return text(req.session?.user?.email);
 }
 
+/** The account's email when it is short enough for pcs-api to keep. */
+export function usableAccountEmailOf(req: Request): string | undefined {
+  const email = accountEmailOf(req);
+  return email && email.length <= FIELD_LIMITS.emailAddress ? email : undefined;
+}
+
 /** The defendant a defendant page is about: ?index=n, or the first. */
 export function defendantIndexOf(req: Request): number {
   return indexFromQuery(req.query?.index) ?? 0;
@@ -87,7 +99,7 @@ function defendantAt(claim: CitizenPossessionClaim, index: number): CitizenDefen
 function updateDefendant(claim: CitizenPossessionClaim, index: number, update: (d: CitizenDefendant) => void): void {
   const defendants = [...(claim.defendants ?? [])];
   const position = Math.min(index, defendants.length);
-  const existing = defendants[position] ?? { value: {} };
+  const existing = defendants[position] ?? { id: newItemId(), value: {} };
   const value = { ...existing.value };
   update(value);
   defendants[position] = { ...existing, value };
@@ -158,7 +170,7 @@ function moneyStep(field: 'rentAmount' | 'arrearsAtNoticeDate' | 'currentArrears
     toForm: claim => ({ [field]: fromPenceString(claim.rentArrears?.[field]) }),
     fromForm: (claim, body) =>
       setNested(claim, 'rentArrears', rentArrears => {
-        rentArrears[field] = toPenceString(body[field]);
+        rentArrears[field] = readPence(body[field]);
       }),
     isAnswered: claim => claim.rentArrears?.[field] !== undefined,
   };
@@ -166,17 +178,32 @@ function moneyStep(field: 'rentAmount' | 'arrearsAtNoticeDate' | 'currentArrears
 
 /** The period the rent statement covers: the dates the claimant gave, or else as its rows show it. */
 export function rentStatementRange(claim: CitizenPossessionClaim, req: Request): StatementRange | undefined {
-  const given = getFormData(req, 'statement-period') as Partial<StatementRange>;
-  if (given.statementStart && given.statementEnd) {
-    return { statementStart: given.statementStart, statementEnd: given.statementEnd };
+  const caseId = req.res?.locals.validatedCase?.id;
+  const given = caseId ? req.session?.rentStatementPeriods?.[caseId] : undefined;
+  if (given) {
+    return given;
   }
   return statementRangeOf(claim.rentArrears?.rentHistoryTable, claim.rentArrears ?? {});
+}
+
+/** Remembers the period the claimant gave for this claim's rent statement, which the claim itself has no field for. */
+function rememberStatementPeriod(req: Request, range: StatementRange): void {
+  const caseId = req.res?.locals.validatedCase?.id;
+  if (caseId && req.session) {
+    req.session.rentStatementPeriods = { ...req.session.rentStatementPeriods, [caseId]: range };
+  }
 }
 
 /** Lays the rent statement out again over the same period after the rent, how often or the due day changed. */
 function regenerateRentTable(claim: CitizenPossessionClaim, range: StatementRange | undefined): void {
   const rentArrears = claim.rentArrears;
-  if (!range || !rentArrears?.rentAmount || !rentArrears.rentFrequency || !rentArrears.rentHistoryTable?.length) {
+  if (
+    !range ||
+    !isReadable(rentArrears?.rentAmount) ||
+    !rentArrears?.rentFrequency ||
+    (rentArrears.rentDueDay as unknown) === UNREADABLE ||
+    !rentArrears.rentHistoryTable?.length
+  ) {
     return;
   }
   const generated = generateRentPeriods({
@@ -242,18 +269,21 @@ export const claimMappings: Record<string, StepMapping> = {
   },
 
   'claimant-email': {
-    toForm: claim => {
+    toForm: (claim, req) => {
       const { contactByEmail, emailAddress } = claim.claimant ?? {};
-      return contactByEmail === 'NO'
+      return contactByEmail === 'NO' || !usableAccountEmailOf(req)
         ? { useAccountEmail: 'no', 'useAccountEmail.emailAddress': emailAddress }
         : { useAccountEmail: fromYesNo(contactByEmail) };
     },
     fromForm: (claim, body, req) =>
       setNested(claim, 'claimant', claimant => {
         claimant.contactByEmail = toYesNo(body.useAccountEmail);
+        if (claimant.contactByEmail === 'YES' && !usableAccountEmailOf(req)) {
+          claimant.contactByEmail = undefined;
+        }
         claimant.emailAddress =
           claimant.contactByEmail === 'YES'
-            ? accountEmailOf(req)
+            ? usableAccountEmailOf(req)
             : claimant.contactByEmail === 'NO'
               ? text(body['useAccountEmail.emailAddress'])
               : undefined;
@@ -353,7 +383,7 @@ export const claimMappings: Record<string, StepMapping> = {
     toForm: claim => ({ tenancyStartDate: toDateParts(claim.tenancy?.tenancyStartDate) }),
     fromForm: (claim, body) =>
       setNested(claim, 'tenancy', tenancy => {
-        tenancy.tenancyStartDate = dateFromBody(body, 'tenancyStartDate');
+        tenancy.tenancyStartDate = readDate(body, 'tenancyStartDate');
       }),
     isAnswered: claim => claim.tenancy?.tenancyStartDate !== undefined,
   },
@@ -419,7 +449,7 @@ export const claimMappings: Record<string, StepMapping> = {
       setNested(claim, 'grounds', grounds => {
         const existing = grounds.groundReasons?.find(item => item.value.ground === ground);
         const reason: CcdCollectionItem<GroundReason> = {
-          ...(existing?.id ? { id: existing.id } : {}),
+          id: existing?.id ?? newItemId(),
           value: { ground, reason: text(body.groundReason) },
         };
         const order = groundsNeedingReasons(grounds);
@@ -454,7 +484,7 @@ export const claimMappings: Record<string, StepMapping> = {
     toForm: claim => ({ noticeDate: toDateParts(claim.notice?.noticeDate) }),
     fromForm: (claim, body) =>
       setNested(claim, 'notice', notice => {
-        notice.noticeDate = dateFromBody(body, 'noticeDate');
+        notice.noticeDate = readDate(body, 'noticeDate');
       }),
     isAnswered: claim => claim.notice?.noticeDate !== undefined,
   },
@@ -478,7 +508,7 @@ export const claimMappings: Record<string, StepMapping> = {
         const writable = notice as Record<string, string | undefined>;
         for (const [method, { date, details }] of Object.entries(NOTICE_METHOD_DETAILS)) {
           const chosen = methods.includes(method as NoticeMethod);
-          writable[date] = chosen ? dateFromBody(body, `noticeMethods.${date}`) : undefined;
+          writable[date] = chosen ? readDate(body, `noticeMethods.${date}`) : undefined;
           if (details) {
             writable[details] = chosen ? text(body[`noticeMethods.${details}`]) : undefined;
           }
@@ -498,7 +528,7 @@ export const claimMappings: Record<string, StepMapping> = {
     fromForm: (claim, body, req) =>
       changeRent(claim, req, () =>
         setNested(claim, 'rentArrears', rentArrears => {
-          rentArrears.rentAmount = toPenceString(body.rentAmount);
+          rentArrears.rentAmount = readPence(body.rentAmount);
         })
       ),
   },
@@ -525,7 +555,8 @@ export const claimMappings: Record<string, StepMapping> = {
       changeRent(claim, req, () =>
         setNested(claim, 'rentArrears', rentArrears => {
           const day = text(body.rentDueDay);
-          rentArrears.rentDueDay = day && /^\d{1,2}$/.test(day) ? Number(day) : undefined;
+          rentArrears.rentDueDay =
+            day === undefined ? undefined : /^\d{1,2}$/.test(day) ? Number(day) : (UNREADABLE as unknown as number);
         })
       ),
     isAnswered: claim => claim.rentArrears?.rentDueDay !== undefined,
@@ -537,7 +568,7 @@ export const claimMappings: Record<string, StepMapping> = {
     ...moneyStep('currentArrears'),
     fromForm: (claim, body) =>
       setNested(claim, 'rentArrears', rentArrears => {
-        rentArrears.currentArrears = toPenceString(body.currentArrears);
+        rentArrears.currentArrears = readPence(body.currentArrears);
         rentArrears.currentArrearsDate = todayInLondon();
       }),
   },
@@ -576,20 +607,18 @@ export const claimMappings: Record<string, StepMapping> = {
       const index = ledgerEntryIndexOf(req, claim);
       const types = checkedValues(body.transactionTypes, TRANSACTION_TYPES);
       const entry: RentLedgerEntry = {
-        transactionDate: dateFromBody(body, 'transactionDate'),
+        transactionDate: readDate(body, 'transactionDate'),
         transactionTypes: types,
         description: text(body.description),
-        amountCharged: types.includes('RENT_CHARGE')
-          ? toPenceString(body['transactionTypes.amountCharged'])
-          : undefined,
-        amountPaid: types.includes('TENANT_PAYMENT') ? toPenceString(body['transactionTypes.amountPaid']) : undefined,
+        amountCharged: types.includes('RENT_CHARGE') ? readPence(body['transactionTypes.amountCharged']) : undefined,
+        amountPaid: types.includes('TENANT_PAYMENT') ? readPence(body['transactionTypes.amountPaid']) : undefined,
       };
       if (Object.values(entry).every(value => value === undefined || (Array.isArray(value) && value.length === 0))) {
         return;
       }
       setNested(claim, 'rentArrears', rentArrears => {
         const ledger: CcdCollectionItem<RentLedgerEntry>[] = [...(rentArrears.rentHistoryLedger ?? [])];
-        ledger[index] = { ...(ledger[index]?.id ? { id: ledger[index].id } : {}), value: entry };
+        ledger[index] = { id: ledger[index]?.id ?? newItemId(), value: entry };
         rentArrears.rentHistoryLedger = ledger;
       });
     },
@@ -610,7 +639,7 @@ export const claimMappings: Record<string, StepMapping> = {
       if (!statementStart || !statementEnd || statementEnd < statementStart) {
         return;
       }
-      setFormData(req, 'statement-period', { statementStart, statementEnd });
+      rememberStatementPeriod(req, { statementStart, statementEnd });
       setNested(claim, 'rentArrears', rentArrears => {
         if (!rentArrears.rentAmount || !rentArrears.rentFrequency) {
           return;
@@ -748,15 +777,16 @@ export const claimMappings: Record<string, StepMapping> = {
 
   'remove-defendant': {
     fromForm: (claim, body, req) => {
-      if (body.confirmRemove === 'yes') {
-        removeDefendant(claim, defendantIndexOf(req));
+      const index = itemIndexOf(req, claim.defendants, 'index');
+      if (body.confirmRemove === 'yes' && index !== undefined) {
+        removeDefendant(claim, index);
       }
     },
   },
 
   'remove-ledger-entry': {
     fromForm: (claim, body, req) => {
-      const index = indexFromQuery(req.query?.entry);
+      const index = itemIndexOf(req, claim.rentArrears?.rentHistoryLedger, 'entry');
       if (body.confirmRemove === 'yes' && index !== undefined) {
         removeLedgerEntry(claim, index);
       }
@@ -787,6 +817,29 @@ export function groundForReasonOf(req: Request, claim: CitizenPossessionClaim): 
   const grounds = groundsNeedingReasons(claim.grounds);
   const asked = Array.isArray(req.query?.ground) ? req.query.ground[0] : req.query?.ground;
   return grounds.find(ground => ground === asked) ?? (asked === undefined ? grounds[0] : undefined);
+}
+
+/** A new collection item's id, which pcs-api keeps, so a page can name the item rather than its position. */
+export function newItemId(): string {
+  return randomUUID();
+}
+
+/**
+ * The item a remove page is about: by ?id=, so repeating the request once it is gone changes nothing, or by
+ * position for an item saved before it had an id.
+ */
+export function itemIndexOf(
+  req: Request,
+  items: CcdCollectionItem<unknown>[] | undefined,
+  positionParam: 'index' | 'entry'
+): number | undefined {
+  const id = Array.isArray(req.query?.id) ? req.query.id[0] : req.query?.id;
+  if (typeof id === 'string') {
+    const index = (items ?? []).findIndex(item => item.id === id);
+    return index === -1 ? undefined : index;
+  }
+  const index = indexFromQuery(req.query?.[positionParam]);
+  return index !== undefined && index < (items ?? []).length && !items?.[index]?.id ? index : undefined;
 }
 
 /** Removes a ledger entry, for the ledger's remove link. */
