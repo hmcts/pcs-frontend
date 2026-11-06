@@ -3,10 +3,13 @@ import { NextFunction } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../../../main/HttpError';
 
+import type { CcdCaseData } from '@services/ccdCase.interface';
 import * as manageCaseRedirect from '@utils/manageCaseRedirect';
 import {
   ValidationIssue,
   errorSummary,
+  getClaimantNames,
+  getDefendantNames,
   manageCaseDetailsUrl,
   mapXuiValidation,
   refusedXuiEvent,
@@ -164,6 +167,73 @@ describe('xuiUtils', () => {
       expect(() => manageCaseDetailsUrl('123')).toThrow(HTTPError);
 
       expect(() => manageCaseDetailsUrl('123')).toThrow('The Manage Case return URL is not configured');
+    });
+  });
+
+  describe('getClaimantNames', () => {
+    it('should return an empty string when there are no claimants', () => {
+      expect(getClaimantNames({} as CcdCaseData)).toBe('');
+      expect(getClaimantNames({ allClaimants: [] } as unknown as CcdCaseData)).toBe('');
+    });
+
+    it('should name a single individual claimant', () => {
+      const ccdCase = { allClaimants: [{ value: { firstName: 'John', lastName: 'Smith' } }] } as CcdCaseData;
+
+      expect(getClaimantNames(ccdCase)).toBe('John Smith');
+    });
+
+    it('should list individual and organisation claimants separated by commas', () => {
+      const ccdCase = {
+        allClaimants: [
+          { value: { firstName: 'John', lastName: 'Smith' } },
+          { value: { orgName: 'ABC Housing Association' } },
+          { value: { firstName: 'Jane', lastName: 'Doe' } },
+        ],
+      } as CcdCaseData;
+
+      expect(getClaimantNames(ccdCase)).toBe('John Smith, ABC Housing Association, Jane Doe');
+    });
+  });
+
+  describe('getDefendantNames', () => {
+    it('should return an empty string when there are no defendants', () => {
+      expect(getDefendantNames({} as CcdCaseData)).toBe('');
+      expect(getDefendantNames({ allDefendants: [] } as unknown as CcdCaseData)).toBe('');
+    });
+
+    it('should name a single individual defendant', () => {
+      const ccdCase = { allDefendants: [{ value: { firstName: 'John', lastName: 'Smith' } }] } as CcdCaseData;
+
+      expect(getDefendantNames(ccdCase)).toBe('John Smith');
+    });
+
+    it('should only list multiple defendants separated by commas', () => {
+      const ccdCase = {
+        allDefendants: [
+          { value: { firstName: 'John', lastName: 'Smith' } },
+          { value: { firstName: 'Jane', lastName: 'Doe' } },
+        ],
+      } as CcdCaseData;
+
+      expect(getDefendantNames(ccdCase)).toBe('John Smith, Jane Doe');
+    });
+
+    it('should list defendants with unknown names once as persons unknown, at the end', () => {
+      const ccdCase = {
+        allDefendants: [
+          { value: { nameKnown: 'NO' } },
+          { value: { nameKnown: 'YES', firstName: 'John', lastName: 'Smith' } },
+          { value: { nameKnown: 'No' } },
+        ],
+      } as CcdCaseData;
+
+      expect(getDefendantNames(ccdCase)).toBe('John Smith, Persons unknown');
+    });
+
+    it('should show only persons unknown when no defendant names are known', () => {
+      const ccdCase = { allDefendants: [{ value: { nameKnown: 'NO' } }] } as CcdCaseData;
+
+      expect(getDefendantNames(ccdCase)).toBe('Persons unknown');
     });
   });
 });

@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 
 import { CcdCaseData, CcdCollectionItem, CcdParty } from '@services/ccdCase.interface';
+import { normalizeYesNoValue } from '../steps/utils';
 
 export enum WarrantReturnType {
   FINAL = 'FINAL',
@@ -56,12 +57,18 @@ export interface WarrantReturn {
 }
 
 export interface EvictionSummaryData {
+  card: {
+    title: {
+      text: string;
+    };
+  };
   rows: {
     key: {
       text: string;
     };
     value: {
-      text: string;
+      text?: string;
+      html?: string;
     };
   }[];
 }
@@ -205,7 +212,7 @@ export function formatDefendants(ccdCase: CcdCaseData): string {
   let defendantHtml = '<ul class="govuk-list">';
   for (const defendant of allDefendants) {
     const party: CcdParty = defendant.value;
-    if (party.nameKnown) {
+    if (normalizeYesNoValue(party.nameKnown) === 'NO') {
       defendantHtml += `<li>${party.firstName} ${party.lastName}</li>`;
     } else {
       hasUnknownDefendants = true;

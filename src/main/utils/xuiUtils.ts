@@ -4,8 +4,9 @@ import type { NextFunction, Request, Response } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { linkSignOutToLogout } from '../middleware/legalRepresentativeHeaders';
-import { getUserRoles } from '../steps/utils';
+import { getUserRoles, normalizeYesNoValue } from '../steps/utils';
 
+import type { CcdCaseData, CcdParty } from '@services/ccdCase.interface';
 import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 
 export interface ValidationIssue {
@@ -73,4 +74,25 @@ export function xuiHeaderModel(req: Request, roleAssignments: string[] = []): Re
   headerModel.assetsPath = '/assets/ui-component-lib';
   linkSignOutToLogout(headerModel);
   return headerModel;
+}
+
+export function getClaimantNames(ccdCase: CcdCaseData): string {
+  return (ccdCase.allClaimants ?? [])
+    .map(({ value: party }) => party.orgName ?? `${party.firstName} ${party.lastName}`)
+    .join(', ');
+}
+
+export function getDefendantNames(ccdCase: CcdCaseData): string {
+  const defendants = (ccdCase.allDefendants ?? []).map(({ value: party }) => party);
+  const isNameUnknown = (party: CcdParty) => normalizeYesNoValue(party.nameKnown) === 'NO';
+
+  const names = defendants
+    .filter(party => !isNameUnknown(party))
+    .map(party => `${party.firstName} ${party.lastName}`);
+
+  if (defendants.some(isNameUnknown)) {
+    names.push('Persons unknown');
+  }
+
+  return names.join(', ');
 }

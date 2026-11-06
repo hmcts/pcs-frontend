@@ -33,6 +33,8 @@ import {
   mapXuiValidation,
   refusedXuiEvent,
   xuiHeaderModel,
+  getClaimantNames,
+  getDefendantNames,
 } from '@utils/xuiUtils';
 
 const RECORD_WARRANT_RETURN_EVENT_ID: string = 'ext:recordWarrantReturn';
@@ -93,6 +95,11 @@ export default function recordWarrantReturnRoutes(app: Application): void {
       logger.info('claimantType data', ccdCase.claimantType);
 
       const evictionData: EvictionSummaryData = {
+        card: {
+          title: {
+            text: 'Eviction details',
+          },
+        },
         rows: [
           {
             key: {
@@ -115,7 +122,7 @@ export default function recordWarrantReturnRoutes(app: Application): void {
               text: 'Defendant(s) name(s)',
             },
             value: {
-              text: formatDefendants(ccdCase),
+              html: formatDefendants(ccdCase),
             },
           },
         ],
@@ -134,6 +141,8 @@ export default function recordWarrantReturnRoutes(app: Application): void {
         caseReference,
         footerModel: buildFooterModel(),
         headerModel: xuiHeaderModel(req),
+        claimantNames: getClaimantNames(ccdCase),
+        defendantNames: getDefendantNames(ccdCase),
       });
     } catch (error) {
       refusedXuiEvent(res, next, error);
