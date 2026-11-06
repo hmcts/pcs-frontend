@@ -11,7 +11,7 @@ jest.mock('../../../../main/assets/js/navigate', () => ({
 
 const redirectToMock = redirectTo as jest.Mock;
 
-// One push as pageshow fires, then one every 200ms until the cap.
+// The immediate push plus the re-pushes scheduled per arm.
 const REARM_MAX_TICKS = 30;
 const PUSHES_PER_ARM = 1 + REARM_MAX_TICKS;
 
