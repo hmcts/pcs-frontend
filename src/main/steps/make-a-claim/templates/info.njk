@@ -1,0 +1,12 @@
+{% extends "make-a-claim/templates/layout.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-l">{{ heading }}</h1>
+  {% for paragraph in paragraphs %}
+    <p class="govuk-body">{{ paragraph | safe }}</p>
+  {% endfor %}
+  {% if exitUrl %}
+    {{ govukButton({ text: exitText, href: exitUrl }) }}
+  {% endif %}
+{% endblock %}

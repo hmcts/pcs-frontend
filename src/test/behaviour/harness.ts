@@ -296,10 +296,14 @@ export async function bootApp(
   app.use(middleware.formBodyMiddleware);
   new Nunjucks(false).enableFor(app);
   app.locals.nunjucksEnv.addGlobal('sessionTimeout', {});
-  // LaunchDarkly, with the make order flag on unless a test turns it off.
+  // LaunchDarkly, with the make order flag on unless a test turns it off, and the private landlord journey off.
+  const flags: Record<string, unknown> = {
+    'make-order-enabled': options.makeOrderEnabled !== false,
+    'private-landlord-make-a-claim-enabled': false,
+    'private-landlord-rent-history-design': 'ledger',
+  };
   app.locals.launchDarklyClient = {
-    variation: async (flag: string, _context: unknown, fallback: unknown) =>
-      flag === 'make-order-enabled' ? options.makeOrderEnabled !== false : fallback,
+    variation: async (flag: string, _context: unknown, fallback: unknown) => (flag in flags ? flags[flag] : fallback),
   };
   app.locals.nunjucksEnv.addGlobal('t', (key: string, fallback?: unknown) =>
     typeof fallback === 'string' ? fallback : key

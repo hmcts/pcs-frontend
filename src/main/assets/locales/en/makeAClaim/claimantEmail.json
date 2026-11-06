@@ -1,0 +1,13 @@
+{
+  "pageTitle": "Email updates",
+  "question": "Do you want to receive email updates to {{accountEmail}}?",
+  "hint": "Important documents like orders will always be sent by post",
+  "labels": {
+    "emailAddress": "What email address do you want updates to be sent to?"
+  },
+  "errors": {
+    "useAccountEmail": "Select whether you want email updates to this address",
+    "emailAddress": "Enter the email address you want updates to be sent to",
+    "emailAddressInvalid": "Enter an email address in the correct format, like name@example.com"
+  }
+}

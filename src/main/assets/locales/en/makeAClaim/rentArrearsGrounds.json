@@ -1,0 +1,8 @@
+{
+  "pageTitle": "What are the rent arrears grounds for possession?",
+  "question": "What are the rent arrears grounds for possession?",
+  "hint": "Select all the grounds you want to use for this claim. These may be the same grounds you included in the notice you served.",
+  "errors": {
+    "rentArrearsGrounds": "Select at least one rent arrears ground"
+  }
+}

@@ -1,5 +1,6 @@
 import type { RespondToClaimSectionEnum } from '../steps/respond-to-claim/sections.config';
 
+import type { CitizenPossessionClaim } from './citizenPossessionClaim.interface';
 import type { CcdFlags } from './cuiRa/cuiRa.interface';
 
 export type YesNoValue = 'YES' | 'NO' | null;
@@ -334,6 +335,7 @@ export interface CcdCaseData {
   otherLicenceTypeDetails?: string;
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
+  citizenPossessionClaim?: CitizenPossessionClaim;
   // Narrowed by pcs-api to the defendant parties the logged-in user owns (requestSupport START).
   partySupport?: CcdPartySupportEntry[];
   submitDraftAnswers?: string;

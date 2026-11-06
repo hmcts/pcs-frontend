@@ -1,0 +1,10 @@
+{
+  "pageTitle": "What is the sub-tenant or mortgage lender’s name?",
+  "heading": "What is the sub-tenant or mortgage lender’s name?",
+  "labels": {
+    "underlesseeName": "Name"
+  },
+  "errors": {
+    "underlesseeName": "Enter the sub-tenant or mortgage lender’s name"
+  }
+}

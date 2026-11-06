@@ -1,0 +1,12 @@
+{
+  "pageTitle": "cyWhat is your name?",
+  "heading": "cyWhat is your name?",
+  "labels": {
+    "firstName": "cyFirst name",
+    "lastName": "cyLast name"
+  },
+  "errors": {
+    "firstName": "cyEnter your first name",
+    "lastName": "cyEnter your last name"
+  }
+}

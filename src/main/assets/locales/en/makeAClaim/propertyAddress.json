@@ -1,0 +1,10 @@
+{
+  "pageTitle": "What is the address of the property you’re claiming possession of?",
+  "heading": "What is the address of the property you’re claiming possession of?",
+  "errors": {
+    "property-addressLine1": "Enter the first line of the property’s address",
+    "property-town": "Enter the town or city of the property’s address",
+    "property-postcode": "Enter the postcode of the property’s address",
+    "postcodeInvalid": "Enter a real postcode, like LU1 1AB"
+  }
+}

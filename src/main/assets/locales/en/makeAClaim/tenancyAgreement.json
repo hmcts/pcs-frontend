@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Can you upload a copy of the tenancy or licence agreement?",
+  "question": "Can you upload a copy of the tenancy or licence agreement?",
+  "hint": "You’ll be able to upload it on the next screen",
+  "labels": {
+    "noTenancyAgreementReason": "Explain why you cannot upload a copy of the tenancy or licence agreement"
+  },
+  "errors": {
+    "tenancyAgreementAvailable": "Select whether you can upload a copy of the agreement",
+    "noTenancyAgreementReason": "Explain why you cannot upload a copy of the agreement"
+  }
+}

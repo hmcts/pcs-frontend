@@ -1,0 +1,21 @@
+{% extends "make-a-claim/templates/question.njk" %}
+{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% block beforeForm %}
+  {% if submitError %}
+    <div class="govuk-error-summary" data-module="govuk-error-summary">
+      <div role="alert">
+        <h2 class="govuk-error-summary__title">{{ t('makeAClaim:summary.problem') }}</h2>
+        <div class="govuk-error-summary__body"><p class="govuk-body">{{ submitError }}</p></div>
+      </div>
+    </div>
+  {% endif %}
+  {% for card in cards %}
+    {{ govukSummaryList({ card: { title: { text: card.title } }, rows: card.rows, attributes: { id: 'summary-' + card.id } }) }}
+    {% if card.table %}
+      {{ govukTable(card.table) }}
+      <p class="govuk-body govuk-!-margin-bottom-8"><a class="govuk-link" href="{{ card.tableChange.href }}">{{ card.tableChange.text }}</a></p>
+    {% endif %}
+  {% endfor %}
+{% endblock %}

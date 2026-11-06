@@ -1,0 +1,82 @@
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "macros/fileUploadMoj.njk" import fileUploadMoj %}
+
+{% macro formField(field) %}
+  {% if field.component and field.componentType %}
+    {% if field.componentType == 'input' %}
+      {{ govukInput(field.component) }}
+    {% elif field.componentType == 'textarea' %}
+      {{ govukTextarea(field.component) }}
+    {% elif field.componentType == 'characterCount' %}
+      {{ govukCharacterCount(field.component) }}
+    {% elif field.componentType == 'radios' %}
+      {{ govukRadios(field.component) }}
+    {% elif field.componentType == 'checkboxes' %}
+      {{ govukCheckboxes(field.component) }}
+    {% elif field.componentType == 'dateInput' %}
+      {{ govukDateInput(field.component) }}
+    {% elif field.componentType == 'select' %}
+      {{ govukSelect(field.component) }}
+    {% elif field.componentType == 'fileUpload' %}
+      {{ fileUploadMoj(field.component, field.component.uploadButtonText, field.component.filesAddedHeading, field.component.value) }}
+    {% endif %}
+  {% endif %}
+{% endmacro %}
+
+{#
+  The postcode finder and manual address fields for one address. `fields` are the page's built fields; the
+  address ones are named `<prefix>-addressLine1` … `<prefix>-postcode`, which assets/js/postcode-lookup.ts
+  fills in from the selected address.
+#}
+{% macro addressFinder(prefix, fields, labels, open) %}
+  {% from "govuk/components/details/macro.njk" import govukDetails %}
+  <div class="govuk-!-margin-top-4" data-address-component data-name-prefix="{{ prefix }}"
+    data-one-address-found="{{ labels.oneAddressFound }}" data-many-addresses-found="{{ labels.manyAddressesFound }}" data-no-addresses-found="{{ labels.noAddressesFound }}">
+    <div class="govuk-form-group" id="{{ prefix }}-postcode-form-group">
+      <label class="govuk-label" for="{{ prefix }}-lookupPostcode">{{ labels.enterPostcode }}</label>
+      <p class="govuk-error-message govuk-!-display-none" id="{{ prefix }}-lookup-postcode-error">
+        <span class="govuk-visually-hidden">{{ labels.errorPrefix }}:</span> {{ labels.lookupPostcodeError }}
+      </p>
+      <p class="govuk-error-message govuk-!-display-none" id="{{ prefix }}-postcode-not-found-error">
+        <span class="govuk-visually-hidden">{{ labels.errorPrefix }}:</span> {{ labels.postcodeNotFoundError }}
+      </p>
+      <div class="govuk-input__wrapper">
+        <input class="govuk-input govuk-input--width-10" id="{{ prefix }}-lookupPostcode" name="lookupPostcode" type="text"
+          autocomplete="postal-code" aria-describedby="{{ prefix }}-lookup-postcode-error {{ prefix }}-postcode-not-found-error">
+        <button class="govuk-button govuk-button--secondary govuk-!-margin-left-2 govuk-!-margin-bottom-0"
+          id="{{ prefix }}-findAddressBtn" data-module="govuk-button" type="button">{{ labels.findAddress }}</button>
+      </div>
+    </div>
+    <div id="{{ prefix }}-addressSelectContainer" hidden>
+      <div class="govuk-form-group" id="{{ prefix }}-selectedAddress-form-group">
+        <label class="govuk-label" for="{{ prefix }}-selectedAddress">{{ labels.selectAddress }}</label>
+        <p class="govuk-error-message govuk-!-display-none" id="{{ prefix }}-selectedAddress-error">
+          <span class="govuk-visually-hidden">{{ labels.errorPrefix }}:</span> {{ labels.selectAddressError }}
+        </p>
+        <select class="govuk-select govuk-!-width-full" id="{{ prefix }}-selectedAddress" name="addressList">
+          <option value="" selected>{{ labels.selectAddress }}</option>
+        </select>
+      </div>
+    </div>
+    <input type="hidden" id="{{ prefix }}-addressesFoundFlag" name="addressesFoundFlag" value="false">
+    {% set manualFields %}
+      {% for field in fields %}
+        {% if field.name.indexOf(prefix + '-') == 0 %}
+          {{ formField(field) }}
+        {% endif %}
+      {% endfor %}
+    {% endset %}
+    {{ govukDetails({
+      summaryText: labels.enterManually,
+      html: manualFields,
+      id: prefix + "-enterManuallyDetails",
+      open: open
+    }) }}
+  </div>
+{% endmacro %}

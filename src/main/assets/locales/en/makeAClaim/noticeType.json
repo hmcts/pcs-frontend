@@ -1,0 +1,16 @@
+{
+  "pageTitle": "Which type of notice did you serve?",
+  "question": "Which type of notice did you serve?",
+  "options": {
+    "NOTICE_SEEKING_POSSESSION": "Notice seeking possession",
+    "NOTICE_TO_QUIT": "Notice to quit",
+    "OTHER": "Other"
+  },
+  "labels": {
+    "noticeTypeOther": "Give the type of notice"
+  },
+  "errors": {
+    "noticeType": "Select the type of notice you served",
+    "noticeTypeOther": "Enter the type of notice"
+  }
+}

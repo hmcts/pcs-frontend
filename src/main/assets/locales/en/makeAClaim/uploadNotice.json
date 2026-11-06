@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Upload the notice",
+  "heading": "Upload the notice",
+  "paragraphs": ["Upload a copy of the notice you served."],
+  "beforeUploadHeading": "Before you upload your file",
+  "beforeUploadText": "Give your file a name that explains what it is. For example, ‘Notice for 15 Garden Drive’.",
+  "uploadLabel": "Upload a file",
+  "uploadButton": "Upload file",
+  "filesAddedHeading": "Files added",
+  "deleteButton": "Remove",
+  "errors": {
+    "documents": "Upload the notice you served"
+  }
+}

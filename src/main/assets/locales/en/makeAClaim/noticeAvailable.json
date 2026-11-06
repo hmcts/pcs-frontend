@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Can you upload a copy of the notice you served?",
+  "question": "Can you upload a copy of the notice you served?",
+  "hint": "If you served more than one notice, upload one now. You can upload the others later. You’ll be able to upload it on the next screen.",
+  "labels": {
+    "noticeUnavailableReason": "Explain why you cannot upload a copy of the notice"
+  },
+  "errors": {
+    "noticeAvailable": "Select whether you can upload a copy of the notice",
+    "noticeUnavailableReason": "Explain why you cannot upload a copy of the notice"
+  }
+}

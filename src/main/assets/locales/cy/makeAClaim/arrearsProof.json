@@ -1,0 +1,26 @@
+{
+  "pageTitle": "cyProof of rent arrears",
+  "heading": "cyProof of rent arrears",
+  "paragraphs": [
+    "cyYou must provide proof of how the rent arrears have built up over time. You can upload a rent statement, or create one now.",
+    "cyA bank statement will not be accepted. A rent statement must show:"
+  ],
+  "bullets": [
+    "cyevery date when a payment was supposed to be made",
+    "cythe amount that was due on each of those dates",
+    "cythe payments that were made, and when they were made",
+    "cythe running total of rent arrears"
+  ],
+  "afterBullets": [
+    "cyIt must cover the time from the first date the defendants missed a payment, or the last 2 years of payments if the first missed payment was more than 2 years ago."
+  ],
+  "question": "cyHow do you want to provide proof of rent arrears?",
+  "options": {
+    "UPLOAD_STATEMENT": "cyUpload a rent statement that follows the guidelines",
+    "LEDGER": "cyEnter the rent statement transactions one at a time",
+    "TABLE": "cyCreate a rent statement from the rent due each period"
+  },
+  "errors": {
+    "proofType": "cySelect how you want to provide proof of rent arrears"
+  }
+}

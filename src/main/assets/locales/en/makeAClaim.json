@@ -1,0 +1,252 @@
+{
+  "buttons": {
+    "continue": "Continue",
+    "saveAndContinue": "Save and continue",
+    "saveForLater": "Save for later",
+    "cancel": "Cancel"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
+  },
+  "address": {
+    "labels": {
+      "addressLine1": "Address line 1",
+      "addressLine2": "Address line 2 (optional)",
+      "town": "Town or city",
+      "county": "County (optional)",
+      "postcode": "Postcode"
+    },
+    "finder": {
+      "enterPostcode": "Enter a UK postcode",
+      "findAddress": "Find address",
+      "selectAddress": "Select an address",
+      "enterManually": "Enter the address manually",
+      "lookupPostcodeError": "Enter a postcode to find an address",
+      "postcodeNotFoundError": "We could not find any addresses for that postcode",
+      "selectAddressError": "Select an address"
+    }
+  },
+  "grounds": {
+    "GROUND_1": "Occupation by landlord or family (Ground 1)",
+    "GROUND_1A": "Sale of dwelling house (Ground 1A)",
+    "GROUND_1B": "Sale of dwelling house that is part of Rent to Buy (Ground 1B)",
+    "GROUND_2": "Sale by mortgagee (Ground 2)",
+    "GROUND_2ZA": "Possession when superior lease ends (Ground 2ZA)",
+    "GROUND_2ZB": "Possession when fixed term superior lease ends (Ground 2ZB)",
+    "GROUND_2ZC": "Possession by superior landlord (Ground 2ZC)",
+    "GROUND_2ZD": "Possession by superior landlord (fixed term) (Ground 2ZD)",
+    "GROUND_4": "Student accommodation (Ground 4)",
+    "GROUND_4A": "Properties rented to students for occupation by new students (Ground 4A)",
+    "GROUND_5": "Ministers of religion (Ground 5)",
+    "GROUND_5A": "Occupation by agricultural worker (Ground 5A)",
+    "GROUND_5B": "Occupation by person who meets employment requirements (Ground 5B)",
+    "GROUND_5C": "End of employment by the landlord (Ground 5C)",
+    "GROUND_5D": "End of employment requirements (Ground 5D)",
+    "GROUND_5E": "Occupation as supported accommodation (Ground 5E)",
+    "GROUND_5F": "Dwelling-house occupied as supported accommodation (Ground 5F)",
+    "GROUND_5G": "Tenancy granted for homelessness duty (Ground 5G)",
+    "GROUND_5H": "Occupation as ‘stepping stone accommodation’ (Ground 5H)",
+    "GROUND_6": "Redevelopment (Ground 6)",
+    "GROUND_6A": "Decant accommodation (Ground 6A)",
+    "GROUND_6B": "Compliance with enforcement action (Ground 6B)",
+    "GROUND_7": "Death of tenant (Ground 7)",
+    "GROUND_7A": "Severe antisocial or criminal behaviour (Ground 7A)",
+    "GROUND_7B": "No right to rent (Ground 7B)",
+    "OTHER": "Other grounds",
+    "GROUND_8": "The defendant had rent arrears of more than 13 weeks or 3 months at the date of service of notice and on the date of the hearing (Ground 8)",
+    "GROUND_9": "Suitable alternative accommodation (Ground 9)",
+    "GROUND_10": "The defendant has some unpaid rent (Ground 10)",
+    "GROUND_11": "The defendant is persistently late paying rent (Ground 11)",
+    "GROUND_12": "Breach of tenancy (Ground 12)",
+    "GROUND_13": "Deterioration of property (Ground 13)",
+    "GROUND_14": "Antisocial behaviour (Ground 14)",
+    "GROUND_14A": "Domestic abuse (Ground 14A)",
+    "GROUND_14ZA": "Rioting (Ground 14ZA)",
+    "GROUND_15": "Deterioration of furniture (Ground 15)",
+    "GROUND_17": "False statement (Ground 17)",
+    "GROUND_18": "Supported accommodation (Ground 18)"
+  },
+  "values": {
+    "individualOrOrganisation": {
+      "INDIVIDUAL": "An individual",
+      "ORGANISATION": "A registered company or organisation"
+    },
+    "tenancyType": {
+      "ASSURED": "Assured or assured periodic tenancy",
+      "EXCLUDED": "Excluded tenancy or licence",
+      "REGULATED": "Regulated tenancy",
+      "OTHER": "Other"
+    },
+    "noticeType": {
+      "NOTICE_SEEKING_POSSESSION": "Notice seeking possession",
+      "NOTICE_TO_QUIT": "Notice to quit",
+      "OTHER": "Other"
+    },
+    "noticeMethod": {
+      "FIRST_CLASS_POST": "By first class post or a next business day delivery service",
+      "PERMITTED_PLACE": "By delivering it to or leaving it at a permitted place",
+      "PERSONALLY_HANDED": "By personally handing it to or leaving it with someone",
+      "EMAIL": "By email",
+      "OTHER_ELECTRONIC": "By another electronic method",
+      "OTHER": "Another way"
+    },
+    "rentFrequency": {
+      "WEEKLY": "Weekly",
+      "FORTNIGHTLY": "Fortnightly",
+      "MONTHLY": "Monthly",
+      "OTHER": "Other"
+    },
+    "proofType": {
+      "UPLOAD_STATEMENT": "Upload a rent statement",
+      "LEDGER": "Enter the rent statement transactions",
+      "TABLE": "Create a rent statement"
+    },
+    "languageUsed": {
+      "ENGLISH": "English",
+      "WELSH": "Welsh",
+      "ENGLISH_AND_WELSH": "English and Welsh"
+    }
+  },
+  "taskList": {
+    "groups": {
+      "beforeYouStart": "Before you start",
+      "yourClaim": "Your claim",
+      "otherInformation": "Other information",
+      "reviewAndSubmit": "Review and submit"
+    },
+    "sections": {
+      "eligibility": "Check you’re eligible to use this service",
+      "aboutYou": "About you and your contact preferences",
+      "defendants": "About the defendants",
+      "tenancyGroundsAndNotice": "About the tenancy, your grounds and notice served",
+      "rentArrears": "Proof of rent arrears",
+      "circumstances": "Circumstances",
+      "otherInformation": "Upload files and other information",
+      "checkAndSubmit": "Check your answers and submit"
+    },
+    "status": {
+      "AVAILABLE": "Available",
+      "IN_PROGRESS": "In progress",
+      "DONE": "Done",
+      "NOT_AVAILABLE_YET": "Not available yet"
+    }
+  },
+  "summary": {
+    "change": "Change",
+    "changeStatement": "Change the rent statement",
+    "notAnswered": "Not answered",
+    "personsUnknown": "Persons unknown",
+    "problem": "There is a problem",
+    "cards": {
+      "aboutYou": "Your details and contact preferences",
+      "defendants": "Defendant details",
+      "tenancy": "Tenancy or licence and grounds for possession",
+      "notice": "Notice details",
+      "rentArrears": "Rent arrears",
+      "circumstances": "Circumstances",
+      "otherInformation": "Other information"
+    },
+    "labels": {
+      "individualOrOrganisation": "Are you claiming as an individual or a registered company?",
+      "claimantName": "Your name",
+      "organisationName": "Company or organisation name",
+      "claimantAddress": "Your postal address",
+      "emailAddress": "Email address for updates",
+      "contactByPhone": "Do you want to be contacted by telephone?",
+      "contactByText": "Do you want to be contacted by text message?",
+      "multipleClaimants": "Do you want to add another claimant?",
+      "defendantName": "Defendant {{number}} name",
+      "defendantAddress": "Defendant {{number}} address for service",
+      "additionalDefendants": "Do you need to add another defendant?",
+      "tenancyType": "Type of tenancy or licence",
+      "tenancyStartDate": "When the tenancy or licence began",
+      "tenancyAgreementAvailable": "Can you upload a copy of the tenancy or licence agreement?",
+      "tenancyAgreementDocuments": "Tenancy or licence agreement",
+      "hasRentArrearsGrounds": "Are you claiming possession because you’re owed rent?",
+      "rentArrearsGrounds": "Rent arrears grounds",
+      "hasOtherGrounds": "Do you have any other grounds for possession?",
+      "otherGrounds": "Other grounds for possession",
+      "ground1AReason": "Why you are claiming under Ground 1A",
+      "noticeServed": "Have you served notice?",
+      "noticeType": "Type of notice",
+      "noticeDate": "When the notice was served",
+      "noticeMethods": "How the notice was served",
+      "noticeAvailable": "Can you upload a copy of the notice?",
+      "noticeDocuments": "Notice",
+      "rentAmount": "Rent",
+      "rentFrequency": "How often the rent should be paid",
+      "rentDueDay": "Day of the month the rent is due",
+      "arrearsAtNoticeDate": "Rent arrears on the date notice was served",
+      "currentArrears": "Rent arrears today",
+      "proofType": "Proof of rent arrears",
+      "rentStatementDocuments": "Rent statement",
+      "moneyJudgmentWanted": "Do you want a money judgment for the rent arrears?",
+      "recoverySteps": "Steps taken to recover the arrears",
+      "defendantCircumstances": "The defendants’ circumstances",
+      "claimantCircumstances": "Your circumstances",
+      "underlesseeExists": "Is there a sub-tenant or mortgage lender?",
+      "underlesseeName": "Sub-tenant or mortgage lender’s name",
+      "underlesseeAddress": "Sub-tenant or mortgage lender’s address",
+      "otherDocuments": "Other files",
+      "hasOtherReasons": "Other information about your reasons for possession",
+      "generalApplicationIntent": "Do you need to make a general application before a hearing is scheduled?",
+      "languageUsed": "Language used to complete this claim"
+    }
+  },
+  "ledgerTable": {
+    "caption": "Rent statement transactions",
+    "date": "Date",
+    "type": "Transaction type",
+    "description": "Description or reference",
+    "amountCharged": "Amount charged",
+    "amountPaid": "Amount paid",
+    "arrears": "Arrears",
+    "actions": "Actions",
+    "change": "Change",
+    "transaction": "transaction",
+    "types": {
+      "RENT_CHARGE": "Rent charge",
+      "TENANT_PAYMENT": "Tenant payment"
+    }
+  },
+  "rentTable": {
+    "caption": "Rent statement",
+    "dateDue": "Date due",
+    "amountDue": "Amount due",
+    "datePaid": "Date paid",
+    "amountPaid": "Amount paid",
+    "arrears": "Total arrears",
+    "actions": "Actions",
+    "change": "Change",
+    "addPayment": "Add a payment",
+    "paymentFor": "payment for rent due on",
+    "additionalPayment": "Additional payment"
+  },
+  "payClaimFee": {
+    "pageTitle": "Pay your claim fee",
+    "heading": "Pay your claim fee",
+    "feeHeading": "Fee",
+    "amountHeading": "Amount",
+    "feeName": "Claim fee",
+    "redirectText": "You’ll be taken to GOV.UK Pay to pay by debit or credit card.",
+    "payButton": "Pay your claim fee",
+    "problemTitle": "There is a problem",
+    "payment": {
+      "failed": "Your payment was not successful. You have not been charged. Try again.",
+      "pending": "Your payment is still being processed. Check again later before you try to pay again."
+    }
+  },
+  "claimSubmitted": {
+    "pageTitle": "Claim submitted",
+    "panelTitle": "Claim submitted",
+    "pendingTitle": "Your payment is being processed",
+    "panelText": "Your case number<br><strong>{{caseNumber}}</strong>",
+    "whatHappensNextHeading": "What happens next",
+    "whatHappensNext": [
+      "We’ll check your claim. When it has been issued, we’ll send it to the defendants and tell you the date of the court hearing.",
+      "If you said you need to make a general application, you must make it within 24 hours of submitting this claim."
+    ],
+    "feedbackLink": "What did you think of this service? (opens in new tab)"
+  }
+}

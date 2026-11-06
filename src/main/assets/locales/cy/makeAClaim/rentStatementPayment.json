@@ -1,0 +1,27 @@
+{
+  "pageTitle": "cyAdd a payment",
+  "heading": "cyAdd a payment",
+  "paragraphs": ["cyEnter a payment the defendants made towards the rent due on {{periodDue}} ({{periodAmount}})."],
+  "labels": {
+    "datePaid": "cyDate paid",
+    "amountPaid": "cyAmount paid"
+  },
+  "hints": {
+    "datePaid": "cyFor example, 5 6 2025"
+  },
+  "errors": {
+    "amountPaid": "cyEnter the amount paid",
+    "amountPaidInvalid": "cyEnter the amount paid as an amount of money, like 500 or 500.50",
+    "date": {
+      "required": "cyEnter the date the payment was made",
+      "notRealDate": "cyThe date the payment was made must be a real date",
+      "invalidValue": "cyThe date the payment was made must be a real date",
+      "futureDate": "cyThe date the payment was made must be today or in the past",
+      "missingOne": "cyThe date the payment was made must include a {{missingField}}",
+      "missingTwo": "cyThe date the payment was made must include a {{first}} and {{second}}",
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear"
+    }
+  }
+}

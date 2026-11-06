@@ -40,6 +40,7 @@ import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { GenAppType, MakeAnApplicationResponse } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, CcdPartySupportEntry, StartCallbackData } from '@services/ccdCase.interface';
+import type { CitizenPossessionClaim } from '@services/citizenPossessionClaim.interface';
 import type { CcdFlags } from '@services/cuiRa/cuiRa.interface';
 import type {
   DashboardNotification,
@@ -256,6 +257,13 @@ async function submitEvent(
 
 export const DEFENDANT_SUPPORT_EVENT_ID = 'requestSupport';
 
+export const CITIZEN_CREATE_POSSESSION_CLAIM_EVENT_ID = 'citizenCreatePossessionClaim';
+
+/** What the citizen create event takes: the property and eligibility answers, inside the claim pcs-api starts. */
+export interface CitizenCreatePossessionClaimData {
+  citizenPossessionClaim: Required<Pick<CitizenPossessionClaim, 'propertyAddress' | 'eligibility'>>;
+}
+
 export interface DefendantSupport {
   partyId: string;
   supportFlags?: CcdFlags;
@@ -385,22 +393,15 @@ export const ccdCaseService = {
   },
 
   /**
-   * Create a new case in CCD
-   *
-   * Follows CCD's two-phase START → SUBMIT pattern.
-   *
-   * @param accessToken - User's OIDC access token
-   * @param data - Initial case data
-   * @returns Created case with merged data from CCD
+   * Creates a private landlord's possession claim through the case-type-level citizen create event. The
+   * creating citizen holds the case's [CREATOR] role as soon as CCD answers.
    */
-  async createCase(accessToken: string | undefined, data: Record<string, unknown>): Promise<CcdCase> {
-    // Phase 1: START - Get event token
-    const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/citizenCreateApplication`;
-    const eventToken = await getEventToken(accessToken || '', eventUrl);
+  async createPossessionClaim(accessToken: string, data: CitizenCreatePossessionClaimData): Promise<CcdCase> {
+    const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/${CITIZEN_CREATE_POSSESSION_CLAIM_EVENT_ID}`;
+    const eventToken = await getEventToken(accessToken, eventUrl);
 
-    // Phase 2: SUBMIT - Create case and receive result
     const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/cases`;
-    return submitEvent(accessToken || '', url, 'citizenCreateApplication', eventToken, data);
+    return submitEvent(accessToken, url, CITIZEN_CREATE_POSSESSION_CLAIM_EVENT_ID, eventToken, { ...data });
   },
 
   /**

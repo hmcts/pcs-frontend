@@ -1,0 +1,13 @@
+{
+  "pageTitle": "cyEmail updates",
+  "question": "cyDo you want to receive email updates to {{accountEmail}}?",
+  "hint": "cyImportant documents like orders will always be sent by post",
+  "labels": {
+    "emailAddress": "cyWhat email address do you want updates to be sent to?"
+  },
+  "errors": {
+    "useAccountEmail": "cySelect whether you want email updates to this address",
+    "emailAddress": "cyEnter the email address you want updates to be sent to",
+    "emailAddressInvalid": "cyEnter an email address in the correct format, like name@example.com"
+  }
+}

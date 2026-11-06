@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Do you want to be contacted by text message?",
+  "question": "Do you want to be contacted by text message?",
+  "hint": "We might also send you updates about your case by text message to the number you gave",
+  "labels": {
+    "textMessageNumber": "Mobile phone number, if different from the number you gave (optional)"
+  },
+  "errors": {
+    "contactByText": "Select whether you want to be contacted by text message"
+  }
+}

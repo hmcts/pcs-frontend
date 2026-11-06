@@ -1,0 +1,29 @@
+{
+  "pageTitle": "cyWhat period do you want the rent statement to cover?",
+  "heading": "cyWhat period do you want the rent statement to cover?",
+  "paragraphs": [
+    "cyWe’ll create a rent statement with the rent due for each period between these dates. You can then add the payments the defendants made."
+  ],
+  "labels": {
+    "statementStart": "cyStart date",
+    "statementEnd": "cyEnd date"
+  },
+  "hints": {
+    "statementStart": "cyFor example, 1 6 2025",
+    "statementEnd": "cyFor example, 31 8 2025"
+  },
+  "errors": {
+    "statementEnd": "cyThe end date must be the same as or after the start date",
+    "date": {
+      "required": "cyEnter the date",
+      "notRealDate": "cyThe date must be a real date",
+      "invalidValue": "cyThe date must be a real date",
+      "futureDate": "cyThe date must be today or in the past",
+      "missingOne": "cyThe date must include a {{missingField}}",
+      "missingTwo": "cyThe date must include a {{first}} and {{second}}",
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear"
+    }
+  }
+}

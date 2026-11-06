@@ -1,0 +1,10 @@
+{
+  "pageTitle": "What is the sub-tenant or mortgage lender’s postal address?",
+  "heading": "What is the sub-tenant or mortgage lender’s postal address?",
+  "errors": {
+    "underlessee-addressLine1": "Enter the first line of their address",
+    "underlessee-town": "Enter the town or city of their address",
+    "underlessee-postcode": "Enter the postcode of their address",
+    "postcodeInvalid": "Enter a real postcode, like LU1 1AB"
+  }
+}

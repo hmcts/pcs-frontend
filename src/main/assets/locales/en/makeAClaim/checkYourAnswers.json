@@ -1,0 +1,20 @@
+{
+  "pageTitle": "Check your answers before submitting your claim",
+  "heading": "Check your answers before submitting your claim",
+  "submitButton": "Submit claim",
+  "statementOfTruth": {
+    "legend": "Statement of truth",
+    "hint": "Check all the details you have entered are accurate",
+    "contempt": "I understand that proceedings for contempt of court may be brought against anyone who makes, or causes to be made, a false statement in a document verified by a statement of truth without an honest belief in its truth.",
+    "belief": "I believe that the facts stated in this claim form are true."
+  },
+  "labels": {
+    "statementOfTruthFullName": "Your full name",
+    "statementOfTruthPosition": "If signing on behalf of a company, give the position or office you hold (optional)"
+  },
+  "errors": {
+    "statementOfTruth": "Confirm both parts of the statement of truth",
+    "statementOfTruthFullName": "Enter your full name",
+    "submitFailed": "Your claim could not be submitted. Try again."
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Do you know the defendant’s name?",
+  "question": "Do you know the defendant’s name?",
+  "hint": "If you do not know their name, the claim will be made against ‘persons unknown’.",
+  "labels": {
+    "firstName": "First name",
+    "lastName": "Last name"
+  },
+  "errors": {
+    "nameKnown": "Select whether you know the defendant’s name",
+    "firstName": "Enter the defendant’s first name",
+    "lastName": "Enter the defendant’s last name"
+  }
+}
