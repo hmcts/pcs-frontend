@@ -148,11 +148,11 @@ withPipeline(type, product, component) {
     onPerftest {
       runPerftestSmokeTests(yarnBuilder, secrets, product)
     }
-    onDemo
+    onDemo {
       runDemoSmokeTests(yarnBuilder, secrets, product)
   }
 }
-
+}
 /** First PR label matching prefix → value after prefix (e.g. e2e-tag:@smoke → @smoke) */
 def prLabelSuffix(githubApi, String prefix) {
   def labels = githubApi.getLabelsbyPattern(env.BRANCH_NAME, prefix)
