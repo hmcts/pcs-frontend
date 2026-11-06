@@ -45,7 +45,11 @@ export const step: StepDefinition = createFormStep({
     sendTheCompletedFormToTheCourt: 'sendTheCompletedFormToTheCourt',
   },
   beforeGet: async req => {
-    const generalApplicationsEnabled = await getLaunchDarklyFlag(req, ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS_R2, false);
+    const generalApplicationsEnabled = await getLaunchDarklyFlag(
+      req,
+      ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS_R2,
+      false
+    );
     if (!generalApplicationsEnabled) {
       const caseReference = req.res?.locals.validatedCase?.id;
       throw new Error(
