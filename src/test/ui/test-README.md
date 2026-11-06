@@ -217,8 +217,12 @@ Please follow this confluence page for detailed instructions and guidelines- htt
 
 ### Nightly (Jenkinsfile_nightly)
 
-- **Runs:** `yarn test:E2e` for each selected browser/device stage.
+- **Runs:** `yarn test:EndToEnd` for each selected browser/device stage.
 - **Tag/scope logic:** `PLAYWRIGHT_GREP_TAG` maps to `E2E_TEST_SCOPE` (`@nightly`, `@smoke`, `@e2e`, `@regression`, or `@healthCheck`).
 - **Spec logic:** `PLAYWRIGHT_SPEC` maps to `E2E_SPEC` (path filter, case-sensitive).
 - **Defaults:** Chrome is enabled by default; other platforms are optional.
 - **Reporting:** Each stage publishes its own Allure report and Slack message. Failed stages do not stop later stages.
+
+## 11. Accessibility Audits
+
+Accessibility audits run on PCS application pages. When a journey navigates to a page on a different origin, such as the third-party payment page, the axe audit is skipped for that external page because its markup is outside PCS automation ownership. Audits resume when the journey returns to a PCS page.

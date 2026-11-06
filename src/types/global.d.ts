@@ -20,6 +20,8 @@ export interface ClientContextHeaders {
   selectedPartyId?: string;
   /** The order a caseworker chose to review, from the case's draft orders tab. */
   orderId?: string;
+  /** The hearing a judge is making an order for, from the link they followed. */
+  hearingId?: string;
 }
 
 interface CustomSessionData extends SessionData {
@@ -33,6 +35,8 @@ interface CustomSessionData extends SessionData {
   returnToCya?: string;
   respondToClaimPostSubmitRedirect?: string;
   respondToClaimSubmitRejection?: string;
+  // Where the citizen launched Your Support from, keyed by case reference (see yourSupportSection.ts).
+  yourSupportReturnTo?: Record<string, 'dashboard' | 'task-list'>;
   ccdCase?: CcdCase;
   // Generated application ID for the make-an-application journey, keyed by case reference.
   applicationIds?: Record<string, string>;
