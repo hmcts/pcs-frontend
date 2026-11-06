@@ -1,10 +1,11 @@
 import { type Request } from 'express';
 
+import { MAKE_A_CLAIM_ROUTE } from '../../constants/makeAClaimRoutes';
+
 import { MAKE_A_CLAIM_EVENT_ID } from './claimDraft';
 import {
   asksOtherGrounds,
   asksRentDueDay,
-  claimsGround1A,
   hasNoticeCopy,
   hasRentArrearsGrounds,
   hasTenancyAgreement,
@@ -12,6 +13,7 @@ import {
   isIndividual,
   isOrganisation,
   ledgerIsEmpty,
+  needsGroundReasons,
   noticeServed,
   uploadsRentStatement,
   usesLedger,
@@ -22,7 +24,7 @@ import { makeAClaimSections } from './sections.config';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
-export const MAKE_A_CLAIM_ROUTE = '/case/:caseReference/make-a-claim';
+export { MAKE_A_CLAIM_ROUTE };
 
 export const MAKE_A_CLAIM_JOURNEY = 'makeAClaim';
 
@@ -33,7 +35,7 @@ export const flowConfig: JourneyFlowConfig = {
   useSessionFormData: false,
   eventId: MAKE_A_CLAIM_EVENT_ID,
   sections: makeAClaimSections,
-  nonSectionStepOrder: ['task-list', 'multiple-claimants-ineligible'],
+  nonSectionStepOrder: ['task-list', 'multiple-claimants-ineligible', 'remove-defendant', 'remove-ledger-entry'],
   hubStepName: 'task-list',
   steps: {
     'claimant-name': { showCondition: (req: Request) => isIndividual(req) },
@@ -43,7 +45,7 @@ export const flowConfig: JourneyFlowConfig = {
     'rent-arrears-grounds': { showCondition: (req: Request) => hasRentArrearsGrounds(req) },
     'other-grounds-claim': { showCondition: (req: Request) => hasRentArrearsGrounds(req) },
     'other-grounds': { showCondition: (req: Request) => asksOtherGrounds(req) },
-    'ground-1a-reason': { showCondition: (req: Request) => claimsGround1A(req) },
+    'ground-reason': { showCondition: (req: Request) => needsGroundReasons(req) },
     'notice-type': { showCondition: (req: Request) => noticeServed(req) },
     'notice-date': { showCondition: (req: Request) => noticeServed(req) },
     'notice-method': { showCondition: (req: Request) => noticeServed(req) },
@@ -60,5 +62,7 @@ export const flowConfig: JourneyFlowConfig = {
     'underlessee-name': { showCondition: (req: Request) => hasUnderlessee(req) },
     'underlessee-address': { showCondition: (req: Request) => hasUnderlessee(req) },
     'multiple-claimants-ineligible': { showCondition: () => false, preventBack: true },
+    'remove-defendant': { showCondition: () => false },
+    'remove-ledger-entry': { showCondition: () => false },
   },
 };

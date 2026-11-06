@@ -1,8 +1,15 @@
 import type { Request } from 'express';
 
+import { CallbackRejectedError } from '../../../../main/HttpError';
 import { CcdCaseModel } from '../../../../main/services/ccdCaseData.model';
 import { ccdCaseService } from '../../../../main/services/ccdCaseService';
-import { normaliseClaim, saveClaimDraft, submitClaim } from '../../../../main/steps/make-a-claim/claimDraft';
+import {
+  answeredClaim,
+  keepSavedAnswers,
+  normaliseClaim,
+  saveClaimDraft,
+  submitClaim,
+} from '../../../../main/steps/make-a-claim/claimDraft';
 
 jest.mock('../../../../main/services/ccdCaseService', () => ({
   ccdCaseService: { updateDraft: jest.fn(), startCaseEvent: jest.fn(), submitCaseEvent: jest.fn() },
@@ -53,10 +60,67 @@ describe('normaliseClaim', () => {
     });
   });
 
+  it('drops details that went with answers since changed', () => {
+    expect(
+      normaliseClaim({
+        defendants: [
+          { value: { nameKnown: 'NO', firstName: 'A', addressSameAsProperty: 'YES', address: { AddressLine1: '1' } } },
+        ],
+        notice: { noticeServed: 'YES', noticeMethods: ['EMAIL'], emailedTo: 'a@b.test', postedDate: '2026-01-01' },
+        grounds: { otherGrounds: ['GROUND_1'], otherGroundsDetails: 'x' },
+        claimant: { contactByPhone: 'YES', contactByText: 'NO', textMessageNumber: '07700900000' },
+      })
+    ).toEqual({
+      defendants: [{ value: { nameKnown: 'NO', addressSameAsProperty: 'YES' } }],
+      notice: { noticeServed: 'YES', noticeMethods: ['EMAIL'], emailedTo: 'a@b.test' },
+      grounds: { otherGrounds: ['GROUND_1'] },
+      claimant: { contactByPhone: 'YES', contactByText: 'NO' },
+    });
+  });
+
   it('keeps the rent due day only for monthly rent', () => {
     expect(normaliseClaim({ rentArrears: { rentFrequency: 'WEEKLY', rentDueDay: 1 } }).rentArrears).toEqual({
       rentFrequency: 'WEEKLY',
     });
+  });
+});
+
+describe('keepSavedAnswers', () => {
+  it('keeps a saved answer the page could not read, and takes every answer it could', () => {
+    expect(
+      keepSavedAnswers(
+        { rentArrears: { rentAmount: '100000', currentArrears: '5000' }, claimant: { firstName: 'Billy' } },
+        { rentArrears: { rentAmount: undefined, currentArrears: '6000' }, claimant: { firstName: 'Bill' } }
+      )
+    ).toEqual({ rentArrears: { rentAmount: '100000', currentArrears: '6000' }, claimant: { firstName: 'Bill' } });
+  });
+
+  it('takes a changed list whole', () => {
+    expect(keepSavedAnswers({ grounds: { otherGrounds: ['GROUND_1'] } }, { grounds: { otherGrounds: [] } })).toEqual({
+      grounds: { otherGrounds: [] },
+    });
+  });
+});
+
+describe('answeredClaim', () => {
+  const claimWith = (action: string) => {
+    const req = request();
+    req.body = { action };
+    req.res!.locals.validatedCase = new CcdCaseModel({
+      id: CASE,
+      data: { citizenPossessionClaim: { rentArrears: { rentAmount: '100000' } } },
+    });
+    return answeredClaim(req, claim => {
+      claim.rentArrears = { rentAmount: undefined };
+    });
+  };
+
+  it('keeps the saved value on a Save for later', () => {
+    expect(claimWith('saveForLater').rentArrears).toEqual({ rentAmount: '100000' });
+  });
+
+  it('takes the page’s answers on Save and continue', () => {
+    expect(claimWith('continue').rentArrears).toEqual({ rentAmount: undefined });
   });
 });
 
@@ -91,7 +155,7 @@ describe('saveClaimDraft', () => {
 
 describe('submitClaim', () => {
   beforeEach(() => {
-    service.updateDraft.mockResolvedValue({ id: CASE, data: {} });
+    service.updateDraft.mockResolvedValue({ id: CASE, data: { citizenPossessionClaim: { draftVersion: 8 } } });
     service.startCaseEvent.mockResolvedValue({ id: CASE, data: {}, eventToken: 'event-token' });
   });
 
@@ -104,23 +168,26 @@ describe('submitClaim', () => {
       },
     });
 
-    await expect(submitClaim(request(), { submission: { statementOfTruthAgreed: 'YES' } })).resolves.toEqual({
+    await expect(
+      submitClaim(request(), { draftVersion: 7, submission: { statementOfTruthAgreed: 'YES' } })
+    ).resolves.toEqual({
       serviceRequestReference: 'SR-1',
       feeAmount: '40400',
     });
     expect(service.updateDraft).toHaveBeenCalledWith(expect.anything(), 'token', CASE, {
-      citizenPossessionClaim: { submission: { statementOfTruthAgreed: 'YES' } },
+      citizenPossessionClaim: { draftVersion: 7, submission: { statementOfTruthAgreed: 'YES' } },
     });
     expect(service.updateDraft.mock.invocationCallOrder[0]).toBeLessThan(
       service.submitCaseEvent.mock.invocationCallOrder[0]
     );
-    expect(service.submitCaseEvent).toHaveBeenCalledWith(
-      'token',
-      CASE,
-      'citizenMakePossessionClaim',
-      'event-token',
-      {}
-    );
+    expect(service.submitCaseEvent).toHaveBeenCalledWith('token', CASE, 'citizenMakePossessionClaim', 'event-token', {
+      citizenPossessionClaim: { draftVersion: 8 },
+    });
+  });
+
+  it('passes on a refusal because the draft changed elsewhere', async () => {
+    service.submitCaseEvent.mockRejectedValue(new CallbackRejectedError(['DRAFT_CHANGED'], 422));
+    await expect(submitClaim(request(), {})).rejects.toMatchObject({ reasons: ['DRAFT_CHANGED'] });
   });
 
   it('reads the fee from the claim when the confirmation has none', async () => {

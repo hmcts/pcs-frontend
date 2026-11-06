@@ -3,7 +3,7 @@ import type { Request } from 'express';
 import { readClaim } from './claimDraft';
 import { TABLE_FREQUENCIES } from './rentHistory';
 
-import type { ProofType } from '@services/citizenPossessionClaim.interface';
+import { type ProofType, groundsNeedingReasons } from '@services/citizenPossessionClaim.interface';
 import type { RentHistoryDesign } from '@utils/makeAClaimFlags';
 
 /** The rent history design the journey's route middleware resolved for this request. */
@@ -63,5 +63,5 @@ export function offeredProofTypes(req: Request): ProofType[] {
   return ['UPLOAD_STATEMENT', 'LEDGER'];
 }
 
-export const claimsGround1A = (req: Request): boolean =>
-  asksOtherGrounds(req) && Boolean(readClaim(req).grounds?.otherGrounds?.includes('GROUND_1A'));
+export const needsGroundReasons = (req: Request): boolean =>
+  asksOtherGrounds(req) && groundsNeedingReasons(readClaim(req).grounds).length > 0;

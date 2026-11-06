@@ -55,7 +55,7 @@ export const makeAClaimSections: readonly SectionConfig[] = [
       'rent-arrears-grounds',
       'other-grounds-claim',
       'other-grounds',
-      'ground-1a-reason',
+      'ground-reason',
       'tenancy-cya',
       'notice-details',
       'notice-served',

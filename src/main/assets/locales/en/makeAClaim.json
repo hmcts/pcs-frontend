@@ -53,7 +53,7 @@
     "GROUND_7": "Death of tenant (Ground 7)",
     "GROUND_7A": "Severe antisocial or criminal behaviour (Ground 7A)",
     "GROUND_7B": "No right to rent (Ground 7B)",
-    "OTHER": "Other grounds",
+    "OTHER": "Other grounds not listed here",
     "GROUND_8": "The defendant had rent arrears of more than 13 weeks or 3 months at the date of service of notice and on the date of the hearing (Ground 8)",
     "GROUND_9": "Suitable alternative accommodation (Ground 9)",
     "GROUND_10": "The defendant has some unpaid rent (Ground 10)",
@@ -134,11 +134,14 @@
   },
   "summary": {
     "change": "Change",
+    "remove": "Remove",
     "changeStatement": "Change the rent statement",
     "notAnswered": "Not answered",
     "personsUnknown": "Persons unknown",
+    "propertyCannotChange": "You cannot change the property once the claim has been started. If it is wrong, start a new claim.",
     "problem": "There is a problem",
     "cards": {
+      "property": "The property",
       "aboutYou": "Your details and contact preferences",
       "defendants": "Defendant details",
       "tenancy": "Tenancy or licence and grounds for possession",
@@ -167,7 +170,8 @@
       "rentArrearsGrounds": "Rent arrears grounds",
       "hasOtherGrounds": "Do you have any other grounds for possession?",
       "otherGrounds": "Other grounds for possession",
-      "ground1AReason": "Why you are claiming under Ground 1A",
+      "groundReason": "Why you are claiming under {{ground}}",
+      "propertyAddress": "Address of the property",
       "noticeServed": "Have you served notice?",
       "noticeType": "Type of notice",
       "noticeDate": "When the notice was served",
@@ -204,6 +208,7 @@
     "arrears": "Arrears",
     "actions": "Actions",
     "change": "Change",
+    "remove": "Remove",
     "transaction": "transaction",
     "types": {
       "RENT_CHARGE": "Rent charge",
@@ -223,6 +228,42 @@
     "paymentFor": "payment for rent due on",
     "additionalPayment": "Additional payment"
   },
+  "submitErrors": {
+    "required": "Answer the question on ‘{{page}}’",
+    "tooLong": "Your answer on ‘{{page}}’ is too long. Make it shorter",
+    "checkAnswers": "Some of your answers are missing. Check each section of your claim",
+    "draftNotFound": "We could not find your saved answers. Start your claim again",
+    "draftChanged": "Your claim was changed in another tab or window. Check your answers below, then submit your claim again",
+    "paymentServiceUnavailable": "Your claim could not be submitted because the payment service is not available. Try again later",
+    "failed": "Your claim could not be submitted. Try again",
+    "pages": {
+      "individual-or-organisation": "Are you claiming as an individual or a registered company?",
+      "claimant-name": "What is your name?",
+      "organisation-name": "What is your company or organisation name?",
+      "claimant-address": "What is your postal address?",
+      "claimant-email": "Email updates",
+      "claimant-phone": "Do you want to be contacted by telephone?",
+      "claimant-text-message": "Do you want to be contacted by text message?",
+      "defendant-name": "Do you know the defendant’s name?",
+      "defendant-address": "Defendant’s address for service",
+      "tenancy-type": "What type of tenancy or licence is in place?",
+      "tenancy-agreement": "Can you upload a copy of the tenancy or licence agreement?",
+      "rent-arrears-claim": "Are you claiming possession because you’re owed rent?",
+      "other-grounds": "What are your grounds for possession?",
+      "ground-reason": "Why are you making a claim on this ground?",
+      "current-arrears": "What are the rent arrears today?",
+      "notice-served": "Have you served notice?",
+      "notice-type": "Which type of notice did you serve?",
+      "notice-available": "Can you upload a copy of the notice you served?",
+      "notice-method": "How did you serve notice?",
+      "defendant-circumstances": "The defendants’ circumstances",
+      "claimant-circumstances": "Your circumstances",
+      "underlessee-name": "What is the sub-tenant or mortgage lender’s name?",
+      "language-used": "Which language did you use to complete this claim?",
+      "other-reasons": "Other information about your reasons for possession",
+      "check-your-answers": "Statement of truth"
+    }
+  },
   "payClaimFee": {
     "pageTitle": "Pay your claim fee",
     "heading": "Pay your claim fee",
@@ -232,10 +273,7 @@
     "redirectText": "You’ll be taken to GOV.UK Pay to pay by debit or credit card.",
     "payButton": "Pay your claim fee",
     "problemTitle": "There is a problem",
-    "payment": {
-      "failed": "Your payment was not successful. You have not been charged. Try again.",
-      "pending": "Your payment is still being processed. Check again later before you try to pay again."
-    }
+    "paymentFailed": "Your payment was not successful. You have not been charged. Try again."
   },
   "claimSubmitted": {
     "pageTitle": "Claim submitted",

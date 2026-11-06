@@ -2,6 +2,12 @@ import config from 'config';
 import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
+import {
+  CLAIM_SUBMITTED_ROUTE,
+  PAY_CLAIM_FEE_ROUTE,
+  PAY_CLAIM_FEE_START_ROUTE,
+  makeAClaimPath,
+} from '../constants/makeAClaimRoutes';
 import { oidcMiddleware } from '../middleware';
 import { formatPence } from '../steps/make-a-claim/rentHistory';
 import { startFlowConfig } from '../steps/make-a-claim/start/flow.config';
@@ -14,7 +20,7 @@ import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getPaymentSessionState, persistPaymentSessionState } from '@services/paymentSessionService';
 import { paymentService } from '@services/pcsApi/paymentService';
-import { sanitiseCaseReference } from '@utils/caseReference';
+import { formatCaseReferenceForDisplay, sanitiseCaseReference } from '@utils/caseReference';
 import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('makeAClaim');
@@ -40,22 +46,32 @@ function registerStartSteps(app: Application): void {
 
 interface ClaimFeeDetails {
   serviceRequestReference: string;
-  feeAmount: number;
+  feeAmountInPence: string;
+  paid: boolean;
 }
 
-/** The fee to pay for a submitted claim: from the session the submission set, or from the case as pcs-api saved it. */
+/**
+ * The fee for a submitted claim, as pcs-api keeps it on the case, or as the submit gave it when the case does
+ * not show it yet. Reading the case each time also confirms the claimant can see it.
+ */
 async function claimFeeFor(req: Request, caseReference: string): Promise<ClaimFeeDetails | undefined> {
-  const session = getPaymentSessionState(req);
-  if (session?.caseReference === caseReference && session.serviceRequestReference && session.feeAmount !== undefined) {
-    return { serviceRequestReference: session.serviceRequestReference, feeAmount: session.feeAmount };
-  }
   const accessToken = req.session.user?.accessToken as string;
   const submission = (await ccdCaseService.getCaseById(accessToken, caseReference)).data.citizenPossessionClaim
     ?.submission;
+  const paid = submission?.paymentStatus === 'PAID';
   if (submission?.serviceRequestReference && submission.feeAmount) {
     return {
       serviceRequestReference: submission.serviceRequestReference,
-      feeAmount: Number(submission.feeAmount) / 100,
+      feeAmountInPence: submission.feeAmount,
+      paid,
+    };
+  }
+  const session = getPaymentSessionState(req);
+  if (session?.caseReference === caseReference && session.serviceRequestReference && session.feeAmountInPence) {
+    return {
+      serviceRequestReference: session.serviceRequestReference,
+      feeAmountInPence: session.feeAmountInPence,
+      paid,
     };
   }
   return undefined;
@@ -79,109 +95,87 @@ function pageContent(req: Request, keys: string[], prefix: string): Record<strin
 }
 
 function registerSubmittedClaimRoutes(app: Application): void {
-  app.get(
-    '/case/:caseReference/pay-claim-fee',
-    oidcMiddleware,
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        const caseReference = caseReferenceOf(req);
-        const fee = await claimFeeFor(req, caseReference);
-        if (!fee) {
-          return res.redirect(303, `/case/${caseReference}/claim-submitted`);
-        }
-        await persistPaymentSessionState(req, { ...getPaymentSessionState(req), caseReference, ...fee });
-        const content = pageContent(
-          req,
-          [
-            'pageTitle',
-            'heading',
-            'feeHeading',
-            'amountHeading',
-            'feeName',
-            'redirectText',
-            'payButton',
-            'problemTitle',
-          ],
-          'payClaimFee'
-        );
-        const t = content.t as ReturnType<typeof getTranslationFunction>;
-        res.render('make-a-claim/templates/payClaimFee.njk', {
-          ...content,
-          feeAmount: formatPence(Math.round(fee.feeAmount * 100)),
-          payUrl: `/case/${caseReference}/pay-claim-fee/start`,
-          paymentProblem: ['failed', 'pending'].includes(String(req.query.payment))
-            ? t(`makeAClaim:payClaimFee.payment.${req.query.payment}`)
-            : undefined,
-        });
-      } catch (error) {
-        next(error);
+  app.get(PAY_CLAIM_FEE_ROUTE, oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const caseReference = caseReferenceOf(req);
+      const fee = await claimFeeFor(req, caseReference);
+      if (!fee || fee.paid) {
+        return res.redirect(303, makeAClaimPath(CLAIM_SUBMITTED_ROUTE, caseReference));
       }
+      const content = pageContent(
+        req,
+        ['pageTitle', 'heading', 'feeHeading', 'amountHeading', 'feeName', 'redirectText', 'payButton', 'problemTitle'],
+        'payClaimFee'
+      );
+      const t = content.t as ReturnType<typeof getTranslationFunction>;
+      res.render('make-a-claim/templates/payClaimFee.njk', {
+        ...content,
+        feeAmount: formatPence(fee.feeAmountInPence),
+        payUrl: makeAClaimPath(PAY_CLAIM_FEE_START_ROUTE, caseReference),
+        paymentProblem: req.query.payment === 'failed' ? t('makeAClaim:payClaimFee.paymentFailed') : undefined,
+      });
+    } catch (error) {
+      next(error);
     }
-  );
+  });
 
-  app.get(
-    '/case/:caseReference/pay-claim-fee/start',
-    oidcMiddleware,
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        const caseReference = caseReferenceOf(req);
-        const fee = await claimFeeFor(req, caseReference);
-        if (!fee) {
-          return res.redirect(303, `/case/${caseReference}/claim-submitted`);
-        }
-        const payment = await paymentService.startCardPaymentRequest({
-          accessToken: req.session.user?.accessToken as string,
-          serviceRequestReference: fee.serviceRequestReference,
-          amount: fee.feeAmount,
-          requestLanguage: req.language,
-          returnUrl: config.get<string>('payment.returnUrl'),
-        });
-        await persistPaymentSessionState(req, {
-          caseReference,
-          ...fee,
-          paymentReference: payment.paymentReference,
-          successRedirectUrl: `/case/${caseReference}/claim-submitted?status=success`,
-          pendingRedirectUrl: `/case/${caseReference}/claim-submitted?status=pending`,
-          failureRedirectUrl: `/case/${caseReference}/pay-claim-fee?payment=failed`,
-        });
-        return res.redirect(303, payment.nextUrl);
-      } catch (error) {
-        logger.error('Failed to start the claim fee card payment', error);
-        const caseReference = sanitiseCaseReference(String(req.params.caseReference ?? ''));
-        return caseReference
-          ? safeRedirect303(res, `/case/${caseReference}/pay-claim-fee?payment=failed`, '/', ['/case'])
-          : next(error);
+  app.get(PAY_CLAIM_FEE_START_ROUTE, oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const caseReference = caseReferenceOf(req);
+      const fee = await claimFeeFor(req, caseReference);
+      if (!fee || fee.paid) {
+        return res.redirect(303, makeAClaimPath(CLAIM_SUBMITTED_ROUTE, caseReference));
       }
+      const payment = await paymentService.startCardPaymentRequest({
+        accessToken: req.session.user?.accessToken as string,
+        serviceRequestReference: fee.serviceRequestReference,
+        amount: Number(fee.feeAmountInPence) / 100,
+        requestLanguage: req.language,
+        returnUrl: config.get<string>('payment.returnUrl'),
+      });
+      const submitted = makeAClaimPath(CLAIM_SUBMITTED_ROUTE, caseReference);
+      await persistPaymentSessionState(req, {
+        caseReference,
+        serviceRequestReference: fee.serviceRequestReference,
+        feeAmountInPence: fee.feeAmountInPence,
+        paymentReference: payment.paymentReference,
+        successRedirectUrl: `${submitted}?status=success`,
+        pendingRedirectUrl: `${submitted}?status=pending`,
+        failureRedirectUrl: `${makeAClaimPath(PAY_CLAIM_FEE_ROUTE, caseReference)}?payment=failed`,
+      });
+      return res.redirect(303, payment.nextUrl);
+    } catch (error) {
+      logger.error('Failed to start the claim fee card payment', error);
+      const caseReference = sanitiseCaseReference(String(req.params.caseReference ?? ''));
+      return caseReference
+        ? safeRedirect303(res, `${makeAClaimPath(PAY_CLAIM_FEE_ROUTE, caseReference)}?payment=failed`, '/', ['/case'])
+        : next(error);
     }
-  );
+  });
 
-  app.get(
-    '/case/:caseReference/claim-submitted',
-    oidcMiddleware,
-    async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        const caseReference = caseReferenceOf(req);
-        await ccdCaseService.getCaseById(req.session.user?.accessToken as string, caseReference);
-        const content = pageContent(
-          req,
-          ['pageTitle', 'whatHappensNextHeading', 'whatHappensNext', 'feedbackLink'],
-          'claimSubmitted'
-        );
-        const t = content.t as ReturnType<typeof getTranslationFunction>;
-        const pending = req.query.status === 'pending';
-        res.render('make-a-claim/templates/claimSubmitted.njk', {
-          ...content,
-          panelTitle: t(pending ? 'makeAClaim:claimSubmitted.pendingTitle' : 'makeAClaim:claimSubmitted.panelTitle'),
-          panelText: t('makeAClaim:claimSubmitted.panelText', {
-            caseNumber: caseReference.replace(/(\d{4})(?=\d)/g, '$1 '),
-          }),
-          feedbackUrl: 'https://www.smartsurvey.co.uk/s/Poss_feedback/',
-        });
-      } catch (error) {
-        next(error);
-      }
+  app.get(CLAIM_SUBMITTED_ROUTE, oidcMiddleware, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const caseReference = caseReferenceOf(req);
+      await ccdCaseService.getCaseById(req.session.user?.accessToken as string, caseReference);
+      const content = pageContent(
+        req,
+        ['pageTitle', 'whatHappensNextHeading', 'whatHappensNext', 'feedbackLink'],
+        'claimSubmitted'
+      );
+      const t = content.t as ReturnType<typeof getTranslationFunction>;
+      const pending = req.query.status === 'pending';
+      res.render('make-a-claim/templates/claimSubmitted.njk', {
+        ...content,
+        panelTitle: t(pending ? 'makeAClaim:claimSubmitted.pendingTitle' : 'makeAClaim:claimSubmitted.panelTitle'),
+        panelText: t('makeAClaim:claimSubmitted.panelText', {
+          caseNumber: formatCaseReferenceForDisplay(caseReference),
+        }),
+        feedbackUrl: 'https://www.smartsurvey.co.uk/s/Poss_feedback/',
+      });
+    } catch (error) {
+      next(error);
     }
-  );
+  });
 }
 
 export default function makeAClaimRoutes(app: Application): void {

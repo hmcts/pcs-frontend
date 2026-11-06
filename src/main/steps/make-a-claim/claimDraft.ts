@@ -7,7 +7,12 @@ import type { CcdDraftEvent } from '@modules/documents/storage';
 import type { CcdCase } from '@services/ccdCase.interface';
 import { CcdCaseModel } from '@services/ccdCaseData.model';
 import { ccdCaseService } from '@services/ccdCaseService';
-import type { CitizenPossessionClaim } from '@services/citizenPossessionClaim.interface';
+import {
+  type CitizenPossessionClaim,
+  NOTICE_METHOD_DETAILS,
+  type NoticeMethod,
+  OTHER_GROUND,
+} from '@services/citizenPossessionClaim.interface';
 
 export const MAKE_A_CLAIM_EVENT_ID = 'citizenMakePossessionClaim';
 
@@ -41,6 +46,18 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
     delete claimant.firstName;
     delete claimant.lastName;
   }
+  for (const defendant of normalised.defendants ?? []) {
+    if (defendant.value.nameKnown === 'NO') {
+      delete defendant.value.firstName;
+      delete defendant.value.lastName;
+    }
+    if (defendant.value.addressSameAsProperty === 'YES') {
+      delete defendant.value.address;
+    }
+  }
+  if (claimant?.contactByText === 'NO') {
+    delete claimant.textMessageNumber;
+  }
   if (claimant?.contactByPhone === 'NO') {
     delete claimant.phoneNumber;
     delete claimant.contactByText;
@@ -60,6 +77,9 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
     delete grounds.hasOtherGrounds;
     delete normalised.rentArrears;
   }
+  if (grounds?.otherGrounds && !grounds.otherGrounds.includes(OTHER_GROUND)) {
+    delete grounds.otherGroundsDetails;
+  }
   if (grounds?.hasOtherGrounds === 'NO') {
     delete grounds.otherGrounds;
     delete grounds.otherGroundsDetails;
@@ -69,6 +89,17 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
     normalised.notice = { noticeServed: 'NO', noNoticeReason: notice.noNoticeReason };
     if (normalised.rentArrears) {
       delete normalised.rentArrears.arrearsAtNoticeDate;
+    }
+  }
+  if (notice?.noticeMethods) {
+    const details = notice as Record<string, unknown>;
+    for (const [method, { date, details: detail }] of Object.entries(NOTICE_METHOD_DETAILS)) {
+      if (!notice.noticeMethods.includes(method as NoticeMethod)) {
+        delete details[date];
+        if (detail) {
+          delete details[detail];
+        }
+      }
     }
   }
   if (notice?.noticeType && notice.noticeType !== 'OTHER') {
@@ -94,6 +125,32 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
     delete otherInformation.otherReasonsDetail;
   }
   return normalised;
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+/**
+ * The claim a Save for later leaves: the page's answers that could be read, and the saved answer wherever the
+ * page's could not. Save for later skips validation, so an unreadable answer must not wipe out a good one.
+ */
+export function keepSavedAnswers<T>(saved: T, updated: T): T {
+  if (!isPlainObject(saved) || !isPlainObject(updated)) {
+    return updated === undefined ? saved : updated;
+  }
+  const merged: Record<string, unknown> = { ...updated };
+  for (const [key, value] of Object.entries(saved)) {
+    merged[key] = keepSavedAnswers(value, updated[key]);
+  }
+  return merged as T;
+}
+
+/** Applies a page's answers to a copy of the saved claim, keeping saved answers on a Save for later. */
+export function answeredClaim(req: Request, apply: (claim: CitizenPossessionClaim) => void): CitizenPossessionClaim {
+  const claim = draftClaim(req);
+  apply(claim);
+  return req.body?.action === 'saveForLater' ? keepSavedAnswers(readClaim(req), claim) : claim;
 }
 
 /** Saves the whole claim as the case's draft. The draft save replaces what was saved before. */
@@ -132,7 +189,6 @@ export interface ClaimFee {
   feeAmount: string;
 }
 
-/** Submits the claim. pcs-api answers with the claim fee's service request when there is a fee to pay. */
 /** The claim fee pcs-api's submit created, from the confirmation it answers with or the claim it returns. */
 export function claimFeeFrom(submitted: CcdCase): ClaimFee | undefined {
   const body = submitted.after_submit_callback_response?.confirmation_body;
@@ -152,7 +208,7 @@ export function claimFeeFrom(submitted: CcdCase): ClaimFee | undefined {
 
 /**
  * Submits the claim. pcs-api submits the saved draft, not what the submit sends, so the last answers are saved
- * first. It answers with the claim fee's service request when there is a fee to pay.
+ * first and the submit names the draft version that save left. It answers with the claim fee's service request when there is a fee to pay.
  */
 export async function submitClaim(req: Request, claim: CitizenPossessionClaim): Promise<ClaimFee | undefined> {
   const accessToken = req.session?.user?.accessToken;
@@ -167,7 +223,7 @@ export async function submitClaim(req: Request, claim: CitizenPossessionClaim): 
     caseId,
     MAKE_A_CLAIM_EVENT_ID,
     started.eventToken,
-    {}
+    { citizenPossessionClaim: { draftVersion: readClaim(req).draftVersion } }
   );
   return claimFeeFrom(submitted);
 }

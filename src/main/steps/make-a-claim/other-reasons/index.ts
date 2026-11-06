@@ -1,4 +1,5 @@
 import { longTextField, yesNoQuestion } from '../fieldBuilders';
+import { FIELD_LIMITS } from '../fieldLimits';
 import { createMakeAClaimStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -12,6 +13,7 @@ export const step: StepDefinition = createMakeAClaimStep({
         yes: {
           otherReasonsDetail: longTextField('otherReasonsDetail', {
             required: true,
+            maxLength: FIELD_LIMITS.otherReasonsDetail,
             errorMessage: 'errors.otherReasonsDetail',
           }),
         },

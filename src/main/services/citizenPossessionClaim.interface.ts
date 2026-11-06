@@ -41,8 +41,10 @@ export const MANDATORY_OTHER_GROUNDS = [
   'GROUND_7',
   'GROUND_7A',
   'GROUND_7B',
-  'OTHER',
 ] as const;
+
+/** Grounds the claimant describes themselves, filed in their own category. */
+export const OTHER_GROUND = 'OTHER';
 
 export const DISCRETIONARY_OTHER_GROUNDS = [
   'GROUND_9',
@@ -56,7 +58,16 @@ export const DISCRETIONARY_OTHER_GROUNDS = [
   'GROUND_18',
 ] as const;
 
-export type OtherGround = (typeof MANDATORY_OTHER_GROUNDS)[number] | (typeof DISCRETIONARY_OTHER_GROUNDS)[number];
+export type OtherGround =
+  (typeof MANDATORY_OTHER_GROUNDS)[number] | (typeof DISCRETIONARY_OTHER_GROUNDS)[number] | typeof OTHER_GROUND;
+
+/** The grounds that need no reason: the rent arrears ones, and other grounds, which have their own details. */
+const GROUNDS_WITHOUT_REASON: readonly string[] = [...RENT_ARREARS_GROUNDS, OTHER_GROUND];
+
+/** The grounds pcs-api needs a reason for, in the order the claimant chose them. */
+export function groundsNeedingReasons(grounds: CitizenPossessionClaim['grounds']): OtherGround[] {
+  return (grounds?.otherGrounds ?? []).filter(ground => !GROUNDS_WITHOUT_REASON.includes(ground));
+}
 
 export type NoticeType = 'NOTICE_SEEKING_POSSESSION' | 'NOTICE_TO_QUIT' | 'OTHER';
 
@@ -70,6 +81,16 @@ export const NOTICE_METHODS = [
 ] as const;
 
 export type NoticeMethod = (typeof NOTICE_METHODS)[number];
+
+/** The date and details fields under each way of serving notice. */
+export const NOTICE_METHOD_DETAILS: Record<NoticeMethod, { date: string; details?: string }> = {
+  FIRST_CLASS_POST: { date: 'postedDate' },
+  PERMITTED_PLACE: { date: 'deliveredDate' },
+  PERSONALLY_HANDED: { date: 'handedDate', details: 'handedToName' },
+  EMAIL: { date: 'emailedDate', details: 'emailedTo' },
+  OTHER_ELECTRONIC: { date: 'otherElectronicDate', details: 'otherElectronicDetails' },
+  OTHER: { date: 'otherMethodDate', details: 'otherMethodDetails' },
+};
 
 export type RentFrequency = 'WEEKLY' | 'FORTNIGHTLY' | 'MONTHLY' | 'OTHER';
 
@@ -115,6 +136,7 @@ export interface RentTableRow {
 }
 
 export interface CitizenPossessionClaim {
+  draftVersion?: number;
   propertyAddress?: CcdCaseAddress;
   eligibility?: {
     claimantType?: CitizenClaimantType;

@@ -1,20 +1,28 @@
-import { NOTICE_METHOD_DETAILS } from '../claimMapping';
 import { dateField, longTextField, textField } from '../fieldBuilders';
+import { FIELD_LIMITS } from '../fieldLimits';
 import { createMakeAClaimStep } from '../formStep';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-import { NOTICE_METHODS, type NoticeMethod } from '@services/citizenPossessionClaim.interface';
+import { NOTICE_METHODS, NOTICE_METHOD_DETAILS, type NoticeMethod } from '@services/citizenPossessionClaim.interface';
 
 function detailsField(method: NoticeMethod, name: string): FormFieldConfig {
   const common = { errorMessage: `errors.${name}` };
   if (method === 'EMAIL') {
-    return textField(name, { ...common, maxLength: 100, attributes: { type: 'email', spellcheck: false } });
+    return textField(name, {
+      ...common,
+      maxLength: FIELD_LIMITS.emailedTo,
+      attributes: { type: 'email', spellcheck: false },
+    });
   }
   if (method === 'PERSONALLY_HANDED') {
-    return textField(name, { ...common, maxLength: 100 });
+    return textField(name, { ...common, maxLength: FIELD_LIMITS.handedToName });
   }
-  return longTextField(name, { ...common, required: true, maxLength: 300 });
+  return longTextField(name, {
+    ...common,
+    required: true,
+    maxLength: method === 'OTHER_ELECTRONIC' ? FIELD_LIMITS.otherElectronicDetails : FIELD_LIMITS.otherMethodDetails,
+  });
 }
 
 function methodSubFields(method: NoticeMethod): Record<string, FormFieldConfig> {

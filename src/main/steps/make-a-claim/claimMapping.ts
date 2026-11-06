@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 
 import { offeredProofTypes } from './conditions';
+import { todayInLondon } from './dates';
 import {
   type FormBody,
   addressFromBody,
@@ -16,21 +17,33 @@ import {
   toPenceString,
   toYesNo,
 } from './formValues';
-import { addRentTablePayment, generateRentPeriods, mergeRentPeriods } from './rentHistory';
+import {
+  type StatementRange,
+  addRentTablePayment,
+  generateRentPeriods,
+  mergeRentPeriods,
+  statementRangeOf,
+} from './rentHistory';
 
+import { getFormData, setFormData } from '@modules/steps';
 import type { CcdCaseAddress, CcdCollectionItem } from '@services/ccdCase.interface';
 import {
   type CitizenDefendant,
   type CitizenPossessionClaim,
   DISCRETIONARY_OTHER_GROUNDS,
+  type GroundReason,
   MANDATORY_OTHER_GROUNDS,
   NOTICE_METHODS,
+  NOTICE_METHOD_DETAILS,
   type NoticeMethod,
+  OTHER_GROUND,
+  type OtherGround,
   type ProofType,
   RENT_ARREARS_GROUNDS,
   type RentFrequency,
   type RentLedgerEntry,
   type TransactionType,
+  groundsNeedingReasons,
 } from '@services/citizenPossessionClaim.interface';
 
 /**
@@ -50,16 +63,6 @@ export const PROOF_TYPES: readonly ProofType[] = ['UPLOAD_STATEMENT', 'LEDGER', 
 export const TRANSACTION_TYPES: readonly TransactionType[] = ['RENT_CHARGE', 'TENANT_PAYMENT'];
 export const LANGUAGES = ['ENGLISH', 'WELSH', 'ENGLISH_AND_WELSH'] as const;
 export const ORGANISATION_TYPES = ['INDIVIDUAL', 'ORGANISATION'] as const;
-
-/** The date and details fields under each way of serving notice. */
-export const NOTICE_METHOD_DETAILS: Record<NoticeMethod, { date: string; details?: string }> = {
-  FIRST_CLASS_POST: { date: 'postedDate' },
-  PERMITTED_PLACE: { date: 'deliveredDate' },
-  PERSONALLY_HANDED: { date: 'handedDate', details: 'handedToName' },
-  EMAIL: { date: 'emailedDate', details: 'emailedTo' },
-  OTHER_ELECTRONIC: { date: 'otherElectronicDate', details: 'otherElectronicDetails' },
-  OTHER: { date: 'otherMethodDate', details: 'otherMethodDetails' },
-};
 
 type NoticeDetailKey = 'postedDate' | 'deliveredDate' | 'handedDate' | 'handedToName' | 'emailedDate' | 'emailedTo';
 
@@ -161,26 +164,35 @@ function moneyStep(field: 'rentAmount' | 'arrearsAtNoticeDate' | 'currentArrears
   };
 }
 
-function regenerateRentTable(claim: CitizenPossessionClaim): void {
+/** The period the rent statement covers: the dates the claimant gave, or else as its rows show it. */
+export function rentStatementRange(claim: CitizenPossessionClaim, req: Request): StatementRange | undefined {
+  const given = getFormData(req, 'statement-period') as Partial<StatementRange>;
+  if (given.statementStart && given.statementEnd) {
+    return { statementStart: given.statementStart, statementEnd: given.statementEnd };
+  }
+  return statementRangeOf(claim.rentArrears?.rentHistoryTable, claim.rentArrears ?? {});
+}
+
+/** Lays the rent statement out again over the same period after the rent, how often or the due day changed. */
+function regenerateRentTable(claim: CitizenPossessionClaim, range: StatementRange | undefined): void {
   const rentArrears = claim.rentArrears;
-  const rows = rentArrears?.rentHistoryTable;
-  if (!rentArrears?.rentAmount || !rentArrears.rentFrequency || !rows?.length) {
+  if (!range || !rentArrears?.rentAmount || !rentArrears.rentFrequency || !rentArrears.rentHistoryTable?.length) {
     return;
   }
-  const periodStarts = rows
-    .map(row => row.value.periodStart ?? '')
-    .filter(Boolean)
-    .sort();
   const generated = generateRentPeriods({
     rentAmount: rentArrears.rentAmount,
     rentFrequency: rentArrears.rentFrequency,
     rentDueDay: rentArrears.rentDueDay,
-    statementStart: periodStarts[0],
-    statementEnd: periodStarts[periodStarts.length - 1],
+    ...range,
   });
-  if (generated.length > 0) {
-    rentArrears.rentHistoryTable = mergeRentPeriods(generated, rows);
-  }
+  rentArrears.rentHistoryTable = mergeRentPeriods(generated, rentArrears.rentHistoryTable);
+}
+
+/** Applies a change to the rent, then lays out again the statement it was the basis of. */
+function changeRent(claim: CitizenPossessionClaim, req: Request, change: () => void): void {
+  const range = rentStatementRange(claim, req);
+  change();
+  regenerateRentTable(claim, range);
 }
 
 function documentsAnswered(documents: unknown[] | undefined): boolean {
@@ -370,7 +382,8 @@ export const claimMappings: Record<string, StepMapping> = {
       const selected = claim.grounds?.otherGrounds ?? [];
       return {
         mandatoryGrounds: selected.filter(ground => (MANDATORY_OTHER_GROUNDS as readonly string[]).includes(ground)),
-        'mandatoryGrounds.otherGroundsDetails': claim.grounds?.otherGroundsDetails,
+        otherGround: selected.filter(ground => ground === OTHER_GROUND),
+        'otherGround.otherGroundsDetails': claim.grounds?.otherGroundsDetails,
         discretionaryGrounds: selected.filter(ground =>
           (DISCRETIONARY_OTHER_GROUNDS as readonly string[]).includes(ground)
         ),
@@ -381,9 +394,10 @@ export const claimMappings: Record<string, StepMapping> = {
         grounds.otherGrounds = [
           ...checkedValues(body.mandatoryGrounds, MANDATORY_OTHER_GROUNDS),
           ...checkedValues(body.discretionaryGrounds, DISCRETIONARY_OTHER_GROUNDS),
+          ...checkedValues(body.otherGround, [OTHER_GROUND] as const),
         ];
-        grounds.otherGroundsDetails = grounds.otherGrounds.includes('OTHER')
-          ? text(body['mandatoryGrounds.otherGroundsDetails'])
+        grounds.otherGroundsDetails = grounds.otherGrounds.includes(OTHER_GROUND)
+          ? text(body['otherGround.otherGroundsDetails'])
           : undefined;
         grounds.groundReasons = (grounds.groundReasons ?? []).filter(
           item => item.value.ground && grounds.otherGrounds?.includes(item.value.ground)
@@ -392,24 +406,33 @@ export const claimMappings: Record<string, StepMapping> = {
     isAnswered: claim => Boolean(claim.grounds?.otherGrounds?.length),
   },
 
-  'ground-1a-reason': {
-    toForm: claim => ({
-      ground1AReason: claim.grounds?.groundReasons?.find(item => item.value.ground === 'GROUND_1A')?.value.reason,
-    }),
-    fromForm: (claim, body) =>
+  'ground-reason': {
+    toForm: (claim, req) => {
+      const ground = groundForReasonOf(req, claim);
+      return { groundReason: claim.grounds?.groundReasons?.find(item => item.value.ground === ground)?.value.reason };
+    },
+    fromForm: (claim, body, req) => {
+      const ground = groundForReasonOf(req, claim);
+      if (!ground) {
+        return;
+      }
       setNested(claim, 'grounds', grounds => {
-        const others = (grounds.groundReasons ?? []).filter(item => item.value.ground !== 'GROUND_1A');
-        const existing = grounds.groundReasons?.find(item => item.value.ground === 'GROUND_1A');
+        const existing = grounds.groundReasons?.find(item => item.value.ground === ground);
+        const reason: CcdCollectionItem<GroundReason> = {
+          ...(existing?.id ? { id: existing.id } : {}),
+          value: { ground, reason: text(body.groundReason) },
+        };
+        const order = groundsNeedingReasons(grounds);
         grounds.groundReasons = [
-          ...others,
-          {
-            ...(existing?.id ? { id: existing.id } : {}),
-            value: { ground: 'GROUND_1A', reason: text(body.ground1AReason) },
-          },
-        ];
-      }),
+          ...(grounds.groundReasons ?? []).filter(item => item.value.ground !== ground),
+          reason,
+        ].sort((x, y) => order.indexOf(x.value.ground as OtherGround) - order.indexOf(y.value.ground as OtherGround));
+      });
+    },
     isAnswered: claim =>
-      Boolean(claim.grounds?.groundReasons?.some(item => item.value.ground === 'GROUND_1A' && item.value.reason)),
+      groundsNeedingReasons(claim.grounds).every(ground =>
+        claim.grounds?.groundReasons?.some(item => item.value.ground === ground && item.value.reason)
+      ),
   },
 
   'notice-served': withReason('notice', 'noticeServed', 'noNoticeReason', 'no'),
@@ -472,12 +495,12 @@ export const claimMappings: Record<string, StepMapping> = {
 
   'rent-amount': {
     ...moneyStep('rentAmount'),
-    fromForm: (claim, body) => {
-      setNested(claim, 'rentArrears', rentArrears => {
-        rentArrears.rentAmount = toPenceString(body.rentAmount);
-      });
-      regenerateRentTable(claim);
-    },
+    fromForm: (claim, body, req) =>
+      changeRent(claim, req, () =>
+        setNested(claim, 'rentArrears', rentArrears => {
+          rentArrears.rentAmount = toPenceString(body.rentAmount);
+        })
+      ),
   },
 
   'rent-frequency': {
@@ -485,26 +508,26 @@ export const claimMappings: Record<string, StepMapping> = {
       rentFrequency: claim.rentArrears?.rentFrequency,
       'rentFrequency.otherFrequencyDetails': claim.rentArrears?.otherFrequencyDetails,
     }),
-    fromForm: (claim, body) => {
-      setNested(claim, 'rentArrears', rentArrears => {
-        rentArrears.rentFrequency = oneOf(body.rentFrequency, RENT_FREQUENCIES);
-        rentArrears.otherFrequencyDetails =
-          rentArrears.rentFrequency === 'OTHER' ? text(body['rentFrequency.otherFrequencyDetails']) : undefined;
-      });
-      regenerateRentTable(claim);
-    },
+    fromForm: (claim, body, req) =>
+      changeRent(claim, req, () =>
+        setNested(claim, 'rentArrears', rentArrears => {
+          rentArrears.rentFrequency = oneOf(body.rentFrequency, RENT_FREQUENCIES);
+          rentArrears.otherFrequencyDetails =
+            rentArrears.rentFrequency === 'OTHER' ? text(body['rentFrequency.otherFrequencyDetails']) : undefined;
+        })
+      ),
     isAnswered: claim => claim.rentArrears?.rentFrequency !== undefined,
   },
 
   'rent-due-day': {
     toForm: claim => ({ rentDueDay: claim.rentArrears?.rentDueDay?.toString() }),
-    fromForm: (claim, body) => {
-      setNested(claim, 'rentArrears', rentArrears => {
-        const day = text(body.rentDueDay);
-        rentArrears.rentDueDay = day && /^\d{1,2}$/.test(day) ? Number(day) : undefined;
-      });
-      regenerateRentTable(claim);
-    },
+    fromForm: (claim, body, req) =>
+      changeRent(claim, req, () =>
+        setNested(claim, 'rentArrears', rentArrears => {
+          const day = text(body.rentDueDay);
+          rentArrears.rentDueDay = day && /^\d{1,2}$/.test(day) ? Number(day) : undefined;
+        })
+      ),
     isAnswered: claim => claim.rentArrears?.rentDueDay !== undefined,
   },
 
@@ -515,7 +538,7 @@ export const claimMappings: Record<string, StepMapping> = {
     fromForm: (claim, body) =>
       setNested(claim, 'rentArrears', rentArrears => {
         rentArrears.currentArrears = toPenceString(body.currentArrears);
-        rentArrears.currentArrearsDate = new Date().toISOString().slice(0, 10);
+        rentArrears.currentArrearsDate = todayInLondon();
       }),
   },
 
@@ -561,6 +584,9 @@ export const claimMappings: Record<string, StepMapping> = {
           : undefined,
         amountPaid: types.includes('TENANT_PAYMENT') ? toPenceString(body['transactionTypes.amountPaid']) : undefined,
       };
+      if (Object.values(entry).every(value => value === undefined || (Array.isArray(value) && value.length === 0))) {
+        return;
+      }
       setNested(claim, 'rentArrears', rentArrears => {
         const ledger: CcdCollectionItem<RentLedgerEntry>[] = [...(rentArrears.rentHistoryLedger ?? [])];
         ledger[index] = { ...(ledger[index]?.id ? { id: ledger[index].id } : {}), value: entry };
@@ -574,18 +600,19 @@ export const claimMappings: Record<string, StepMapping> = {
   },
 
   'statement-period': {
-    toForm: claim => {
-      const starts = (claim.rentArrears?.rentHistoryTable ?? [])
-        .map(row => row.value.periodStart ?? '')
-        .filter(Boolean)
-        .sort();
-      return { statementStart: toDateParts(starts[0]), statementEnd: toDateParts(starts[starts.length - 1]) };
+    toForm: (claim, req) => {
+      const range = rentStatementRange(claim, req);
+      return { statementStart: toDateParts(range?.statementStart), statementEnd: toDateParts(range?.statementEnd) };
     },
-    fromForm: (claim, body) =>
+    fromForm: (claim, body, req) => {
+      const statementStart = dateFromBody(body, 'statementStart');
+      const statementEnd = dateFromBody(body, 'statementEnd');
+      if (!statementStart || !statementEnd || statementEnd < statementStart) {
+        return;
+      }
+      setFormData(req, 'statement-period', { statementStart, statementEnd });
       setNested(claim, 'rentArrears', rentArrears => {
-        const statementStart = dateFromBody(body, 'statementStart');
-        const statementEnd = dateFromBody(body, 'statementEnd');
-        if (!statementStart || !statementEnd || !rentArrears.rentAmount || !rentArrears.rentFrequency) {
+        if (!rentArrears.rentAmount || !rentArrears.rentFrequency) {
           return;
         }
         const generated = generateRentPeriods({
@@ -596,7 +623,8 @@ export const claimMappings: Record<string, StepMapping> = {
           statementEnd,
         });
         rentArrears.rentHistoryTable = mergeRentPeriods(generated, rentArrears.rentHistoryTable);
-      }),
+      });
+    },
     isAnswered: claim => Boolean(claim.rentArrears?.rentHistoryTable?.length),
   },
 
@@ -718,6 +746,23 @@ export const claimMappings: Record<string, StepMapping> = {
     isAnswered: claim => claim.otherInformation?.languageUsed !== undefined,
   },
 
+  'remove-defendant': {
+    fromForm: (claim, body, req) => {
+      if (body.confirmRemove === 'yes') {
+        removeDefendant(claim, defendantIndexOf(req));
+      }
+    },
+  },
+
+  'remove-ledger-entry': {
+    fromForm: (claim, body, req) => {
+      const index = indexFromQuery(req.query?.entry);
+      if (body.confirmRemove === 'yes' && index !== undefined) {
+        removeLedgerEntry(claim, index);
+      }
+    },
+  },
+
   'check-your-answers': {
     fromForm: (claim, body) =>
       setNested(claim, 'submission', submission => {
@@ -735,6 +780,13 @@ export function rentStatementPeriodOf(req: Request, claim: CitizenPossessionClai
   const period = Array.isArray(req.query?.period) ? req.query.period[0] : req.query?.period;
   const rows = claim.rentArrears?.rentHistoryTable ?? [];
   return typeof period === 'string' && rows.some(row => row.value.periodStart === period) ? period : undefined;
+}
+
+/** The ground a reason page is about: ?ground=, or the first that needs a reason. */
+export function groundForReasonOf(req: Request, claim: CitizenPossessionClaim): OtherGround | undefined {
+  const grounds = groundsNeedingReasons(claim.grounds);
+  const asked = Array.isArray(req.query?.ground) ? req.query.ground[0] : req.query?.ground;
+  return grounds.find(ground => ground === asked) ?? (asked === undefined ? grounds[0] : undefined);
 }
 
 /** Removes a ledger entry, for the ledger's remove link. */

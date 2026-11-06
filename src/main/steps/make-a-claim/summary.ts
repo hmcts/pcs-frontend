@@ -1,10 +1,11 @@
+import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
 import { formatCcdAddressLines } from '../utils/ccdAddress';
 
 import { readClaim } from './claimDraft';
-import { NOTICE_METHOD_DETAILS } from './claimMapping';
+import { propertyAddressOf } from './claimMapping';
 import { usesLedger, usesTable } from './conditions';
 import { formatClaimDate } from './dates';
 import { flowConfig } from './flow.config';
@@ -14,7 +15,13 @@ import { ledgerTable, rentStatementTable } from './rentTables';
 import { getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
 import type { CcdCaseAddress } from '@services/ccdCase.interface';
-import type { CitizenDefendant, ClaimDocuments, YesNo } from '@services/citizenPossessionClaim.interface';
+import {
+  type CitizenDefendant,
+  type ClaimDocuments,
+  NOTICE_METHOD_DETAILS,
+  type YesNo,
+  groundsNeedingReasons,
+} from '@services/citizenPossessionClaim.interface';
 
 export interface SummaryRow {
   key: { text: string };
@@ -43,12 +50,8 @@ function isStepShown(req: Request, stepName: string): boolean {
   return !showCondition || showCondition(req);
 }
 
-function escapeHtml(value: string): string {
-  return value.replace(/[&<>"']/g, char => `&#${char.charCodeAt(0)};`);
-}
-
 function linesHtml(lines: string[]): string {
-  return lines.map(escapeHtml).join('<br>');
+  return lines.map(line => escapeHtml(line)).join('<br>');
 }
 
 class CardBuilder {
@@ -72,6 +75,12 @@ class CardBuilder {
       value: Array.isArray(value) ? { html: value.length ? linesHtml(value) : empty } : { text: value || empty },
       actions: { items: [{ href, text: this.t('makeAClaim:summary.change'), visuallyHiddenText: text }] },
     });
+    return this;
+  }
+
+  /** Adds another action, such as Remove, to the row added last. */
+  withAction(href: string, text: string, visuallyHiddenText: string): this {
+    this.rows[this.rows.length - 1]?.actions?.items.push({ href, text, visuallyHiddenText });
     return this;
   }
 
@@ -154,10 +163,18 @@ export function defendantsCard(req: Request): SummaryCard {
       .add(
         'defendant-address',
         'defendantAddress',
-        address(defendant.value.address),
+        address(defendant.value.addressSameAsProperty === 'YES' ? propertyAddressOf(req) : defendant.value.address),
         query,
         t('makeAClaim:summary.labels.defendantAddress', number)
       );
+    if (index > 0) {
+      const name = defendantDisplayName(defendant.value, req);
+      builder.withAction(
+        `${getStepUrl('remove-defendant', flowConfig, req.res?.locals.validatedCase?.id)}?index=${index}`,
+        t('makeAClaim:summary.remove'),
+        t('makeAClaim:summary.labels.defendantName', number) + ` ${name}`
+      );
+    }
   });
   builder.add('additional-defendants', 'additionalDefendants', yesNo(t, claim.additionalDefendants));
   return { id: 'defendants', title: t('makeAClaim:summary.cards.defendants'), rows: builder.build() };
@@ -166,7 +183,7 @@ export function defendantsCard(req: Request): SummaryCard {
 export function tenancyCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const { tenancy = {}, grounds = {} } = readClaim(req);
-  const rows = new CardBuilder(req, t)
+  const builder = new CardBuilder(req, t)
     .add(
       'tenancy-type',
       'tenancyType',
@@ -188,12 +205,18 @@ export function tenancyCard(req: Request): SummaryCard {
       (grounds.rentArrearsGrounds ?? []).map(g => t(`makeAClaim:grounds.${g}`))
     )
     .add('other-grounds-claim', 'hasOtherGrounds', yesNo(t, grounds.hasOtherGrounds))
-    .add(
-      'other-grounds',
-      'otherGrounds',
-      (grounds.otherGrounds ?? []).map(g => t(`makeAClaim:grounds.${g}`))
-    )
-    .build();
+    .add('other-grounds', 'otherGrounds', [
+      ...(grounds.otherGrounds ?? []).map(g => t(`makeAClaim:grounds.${g}`)),
+      ...(grounds.otherGroundsDetails ? [grounds.otherGroundsDetails] : []),
+    ]);
+  if (isStepShown(req, 'ground-reason')) {
+    for (const ground of groundsNeedingReasons(grounds)) {
+      const label = t('makeAClaim:summary.labels.groundReason', { ground: t(`makeAClaim:grounds.${ground}`) });
+      const reason = grounds.groundReasons?.find(item => item.value.ground === ground)?.value.reason;
+      builder.add('ground-reason', 'groundReason', reason, `?ground=${ground}`, label);
+    }
+  }
+  const rows = builder.build();
   return { id: 'tenancy', title: t('makeAClaim:summary.cards.tenancy'), rows };
 }
 
@@ -299,9 +322,29 @@ export function otherInformationCard(req: Request): SummaryCard {
   return { id: 'otherInformation', title: t('makeAClaim:summary.cards.otherInformation'), rows };
 }
 
+/** The property, which cannot be changed once the claim exists. */
+export function propertyCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const lines = address(propertyAddressOf(req)).map(line => escapeHtml(line));
+  return {
+    id: 'property',
+    title: t('makeAClaim:summary.cards.property'),
+    rows: [
+      {
+        key: { text: t('makeAClaim:summary.labels.propertyAddress') },
+        value: {
+          html: `${lines.join('<br>')}<p class="govuk-hint govuk-!-margin-top-2 govuk-!-margin-bottom-0">${escapeHtml(
+            t('makeAClaim:summary.propertyCannotChange')
+          )}</p>`,
+        },
+      },
+    ],
+  };
+}
+
 /** Every card the final check your answers page shows, in journey order. */
 export function allCards(req: Request): SummaryCard[] {
-  const cards = [aboutYouCard(req), defendantsCard(req), tenancyCard(req), noticeCard(req)];
+  const cards = [propertyCard(req), aboutYouCard(req), defendantsCard(req), tenancyCard(req), noticeCard(req)];
   if (readClaim(req).grounds?.hasRentArrearsGrounds === 'YES') {
     cards.push(rentArrearsCard(req));
   }

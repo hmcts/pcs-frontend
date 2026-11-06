@@ -121,7 +121,22 @@ export async function completeDefendants(page: Page): Promise<void> {
   await expectTaskStatus(page, 'About the defendants', 'Done');
 }
 
-export async function completeTenancyGroundsAndNotice(page: Page): Promise<void> {
+/** Other grounds to claim on as well as rent arrears, each with the reason the claimant gives for it. */
+export type OtherGroundReasons = { ground: RegExp; heading: string; reason: string }[];
+
+export const GROUND_1A_AND_14: OtherGroundReasons = [
+  { ground: /\(Ground 1A\)$/, heading: 'Sale of dwelling house (Ground 1A)', reason: 'I am selling the property' },
+  {
+    ground: /^Antisocial behaviour \(Ground 14\)$/,
+    heading: 'Antisocial behaviour (Ground 14)',
+    reason: 'Noise complaints',
+  },
+];
+
+export async function completeTenancyGroundsAndNotice(
+  page: Page,
+  otherGrounds: OtherGroundReasons = []
+): Promise<void> {
   await openTask(page, 'About the tenancy, your grounds and notice served');
   await continueOn(page);
   await answer(page, 'Assured or assured periodic tenancy');
@@ -135,7 +150,20 @@ export async function completeTenancyGroundsAndNotice(page: Page): Promise<void>
   await answer(page, 'Yes');
   await page.getByRole('checkbox', { name: /\(Ground 8\)$/ }).check();
   await saveAndContinue(page);
-  await answer(page, 'No');
+  if (otherGrounds.length > 0) {
+    await answer(page, 'Yes');
+    for (const { ground } of otherGrounds) {
+      await page.getByRole('checkbox', { name: ground }).check();
+    }
+    await saveAndContinue(page);
+    for (const { heading, reason } of otherGrounds) {
+      await page.getByLabel(`Why are you making a claim for possession under ${heading}?`).fill(reason);
+      await saveAndContinue(page);
+    }
+  } else {
+    await answer(page, 'No');
+  }
+  await expect(page.getByRole('heading', { level: 1, name: 'Check your answers' })).toBeVisible();
   await saveAndContinue(page);
 
   await continueOn(page);

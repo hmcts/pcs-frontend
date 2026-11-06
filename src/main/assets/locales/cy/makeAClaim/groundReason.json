@@ -1,0 +1,8 @@
+{
+  "pageTitle": "cyWhy are you making a claim on this ground?",
+  "question": "cyWhy are you making a claim for possession under {{ground}}?",
+  "hint": "cyYou should include any information that you think is relevant to your possession claim. You can upload any files that support your reasons later on.",
+  "errors": {
+    "groundReason": "cyExplain why you are making a claim on this ground"
+  }
+}

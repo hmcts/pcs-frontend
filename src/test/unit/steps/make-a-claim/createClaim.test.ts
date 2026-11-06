@@ -7,6 +7,8 @@ import {
   PROPERTY_INELIGIBLE_URL,
   PROPERTY_NOT_COVERED_URL,
   createClaimFromStartAnswers,
+  createdCaseReference,
+  forgetCreatedClaim,
   refusedClaimRedirect,
 } from '../../../../main/steps/make-a-claim/start/createClaim';
 
@@ -14,8 +16,9 @@ jest.mock('../../../../main/services/ccdCaseService', () => ({ ccdCaseService: {
 
 const create = ccdCaseService.createPossessionClaim as jest.Mock;
 
-function request(answers: Record<string, Record<string, unknown>>): Request {
+function request(answers: Record<string, Record<string, unknown>>, sessionID = 'session-1'): Request {
   return {
+    sessionID,
     session: { user: { accessToken: 'token' }, formData: { makeAClaim: { default: answers } } },
     params: {},
     res: { locals: { step: { name: 'who-is-claiming', journey: 'makeAClaim' } } },
@@ -84,6 +87,26 @@ describe('createClaimFromStartAnswers', () => {
       ...ELIGIBILITY,
       legislativeCountry: 'England',
     });
+  });
+
+  it('creates one claim for a double-clicked submission and continues with it after', async () => {
+    let finish: (value: unknown) => void = () => undefined;
+    create.mockReturnValue(new Promise(resolve => (finish = resolve)));
+    const req = request(ELIGIBLE);
+    const first = createClaimFromStartAnswers(req);
+    const second = createClaimFromStartAnswers(req);
+    finish({ id: 1777027600017761, data: {} });
+
+    await expect(Promise.all([first, second])).resolves.toEqual([
+      '/case/1777027600017761/make-a-claim/eligible',
+      '/case/1777027600017761/make-a-claim/eligible',
+    ]);
+    await expect(createClaimFromStartAnswers(req)).resolves.toBe('/case/1777027600017761/make-a-claim/eligible');
+    expect(create).toHaveBeenCalledTimes(1);
+    expect(createdCaseReference(req)).toBe('1777027600017761');
+
+    forgetCreatedClaim(req);
+    expect(createdCaseReference(req)).toBeUndefined();
   });
 
   it('maps the not in England refusal to the property ineligible page', async () => {

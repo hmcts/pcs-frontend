@@ -1,8 +1,17 @@
 import { CallbackRejectedError } from '../../../HttpError';
-import { draftClaim, submitClaim } from '../claimDraft';
+import { CLAIM_SUBMITTED_ROUTE, PAY_CLAIM_FEE_ROUTE, makeAClaimPath } from '../../../constants/makeAClaimRoutes';
+import { answeredClaim, saveClaimDraft, submitClaim } from '../claimDraft';
 import { claimMappings } from '../claimMapping';
 import { textField } from '../fieldBuilders';
+import { FIELD_LIMITS } from '../fieldLimits';
 import { createMakeAClaimStep } from '../formStep';
+import {
+  draftChangedUrl,
+  isDraftChanged,
+  submitErrorCodes,
+  submitErrorItems,
+  submitRefusalOutcome,
+} from '../submitErrors';
 import { allCards } from '../summary';
 
 import { Logger } from '@modules/logger';
@@ -32,41 +41,61 @@ export const step: StepDefinition = createMakeAClaimStep({
         { value: 'belief', translationKey: 'statementOfTruth.belief' },
       ],
     },
-    textField('statementOfTruthFullName', { maxLength: 100, attributes: { autocomplete: 'name' } }),
-    textField('statementOfTruthPosition', { required: false, maxLength: 100 }),
+    textField('statementOfTruthFullName', {
+      maxLength: FIELD_LIMITS.statementOfTruthFullName,
+      attributes: { autocomplete: 'name' },
+    }),
+    textField('statementOfTruthPosition', { required: false, maxLength: FIELD_LIMITS.statementOfTruthPosition }),
   ],
-  extendGetContent: req => {
+  extendGetContent: (req, formContent) => {
     const t = getTranslationFunction(req);
+    const submitErrors = submitErrorItems(req, submitErrorCodes(req.query?.submitError));
     return {
       cards: allCards(req),
       saveAndContinue: t('submitButton'),
-      submitError: req.query?.submitError === 'failed' ? t('errors.submitFailed') : undefined,
+      ...(submitErrors.length > 0 && !formContent.errorSummary
+        ? { errorSummary: { titleText: t('makeAClaim:summary.problem'), errorList: submitErrors } }
+        : {}),
     };
   },
   beforeRedirect: async req => {
-    if (req.body?.action === 'saveForLater') {
-      return;
-    }
-    const claim = draftClaim(req);
-    claimMappings['check-your-answers'].fromForm?.(claim, req.body ?? {}, req);
+    const claim = answeredClaim(req, draft =>
+      claimMappings['check-your-answers'].fromForm?.(draft, req.body ?? {}, req)
+    );
     const caseId = req.res?.locals.validatedCase?.id as string;
+    if (req.body?.action === 'saveForLater') {
+      try {
+        return await saveClaimDraft(req, claim);
+      } catch (error) {
+        if (!isDraftChanged(error)) {
+          throw error;
+        }
+        return req.res?.redirect(303, draftChangedUrl(caseId));
+      }
+    }
     try {
       const fee = await submitClaim(req, claim);
       if (fee) {
         await persistPaymentSessionState(req, {
           caseReference: caseId,
           serviceRequestReference: fee.serviceRequestReference,
-          feeAmount: Number(fee.feeAmount) / 100,
+          feeAmountInPence: fee.feeAmount,
         });
-        return req.res?.redirect(303, `/case/${caseId}/pay-claim-fee`);
+        return req.res?.redirect(303, makeAClaimPath(PAY_CLAIM_FEE_ROUTE, caseId));
       }
-      return req.res?.redirect(303, `/case/${caseId}/claim-submitted`);
+      return req.res?.redirect(303, makeAClaimPath(CLAIM_SUBMITTED_ROUTE, caseId));
     } catch (error) {
       logger.error(`Failed to submit private landlord claim for case ${caseId}`, {
         error: error instanceof Error ? error.message : String(error),
         reasons: error instanceof CallbackRejectedError ? error.reasons : undefined,
       });
-      return req.res?.redirect(303, `${req.originalUrl.split('?')[0]}?submitError=failed`);
+      const outcome = submitRefusalOutcome(error, caseId);
+      return req.res?.redirect(
+        303,
+        'redirect' in outcome
+          ? outcome.redirect
+          : `${req.originalUrl.split('?')[0]}?submitError=${encodeURIComponent(outcome.codes.join(','))}`
+      );
     }
   },
 });

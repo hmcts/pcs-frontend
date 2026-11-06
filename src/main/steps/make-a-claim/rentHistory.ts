@@ -97,27 +97,73 @@ export function generateRentPeriods(input: RentPeriodsInput): RentTableRow[] {
 }
 
 /**
- * Regenerates the periods for a changed rent or statement period, keeping every payment already entered
- * against a period that still exists.
+ * Lays the statement out again for a changed rent or statement period, carrying every payment already entered
+ * over by its date: to the latest period due on or before it was paid, or the first period for one paid earlier.
+ * No payment is dropped, even one outside the new statement period.
  */
 export function mergeRentPeriods(
   generated: RentTableRow[],
   existing: CcdCollectionItem<RentTableRow>[] | undefined
 ): CcdCollectionItem<RentTableRow>[] {
   const existingRows = existing ?? [];
+  if (generated.length === 0) {
+    return existingRows;
+  }
+  const payments = existingRows
+    .filter(row => row.value.amountPaid)
+    .map(row => ({ datePaid: row.value.datePaid, amountPaid: row.value.amountPaid as string }))
+    .sort((a, b) => (a.datePaid ?? '').localeCompare(b.datePaid ?? ''));
+  const periodFor = (datePaid: string | undefined): string => {
+    const due = [...generated].reverse().find(period => datePaid && (period.dateDue ?? '') <= datePaid);
+    return (due ?? generated[0]).periodStart as string;
+  };
   return generated.flatMap(period => {
-    const rowsForPeriod = existingRows.filter(row => row.value.periodStart === period.periodStart);
-    const [primary, ...additional] = rowsForPeriod;
-    const primaryRow: CcdCollectionItem<RentTableRow> = {
-      ...(primary?.id ? { id: primary.id } : {}),
-      value: {
-        ...period,
-        ...(primary?.value.datePaid ? { datePaid: primary.value.datePaid } : {}),
-        ...(primary?.value.amountPaid ? { amountPaid: primary.value.amountPaid } : {}),
-      },
-    };
-    return [primaryRow, ...additional];
+    const primary = existingRows.find(row => row.value.periodStart === period.periodStart && row.value.amountDue);
+    const [first, ...others] = payments.filter(payment => periodFor(payment.datePaid) === period.periodStart);
+    const paid = (payment: (typeof payments)[number]) => ({
+      ...(payment.datePaid ? { datePaid: payment.datePaid } : {}),
+      amountPaid: payment.amountPaid,
+    });
+    return [
+      { ...(primary?.id ? { id: primary.id } : {}), value: { ...period, ...(first ? paid(first) : {}) } },
+      ...others.map(payment => ({ value: { periodStart: period.periodStart, ...paid(payment) } })),
+    ];
   });
+}
+
+export interface StatementRange {
+  statementStart: string;
+  statementEnd: string;
+}
+
+/**
+ * The period a rent statement covers, read back from its rows when the dates the claimant gave are not to hand:
+ * from the first period to the day before the period after the last one would have been due.
+ */
+export function statementRangeOf(
+  rows: CcdCollectionItem<RentTableRow>[] | undefined,
+  schedule: { rentFrequency?: RentFrequency; rentDueDay?: number }
+): StatementRange | undefined {
+  const starts = (rows ?? [])
+    .map(row => row.value.periodStart ?? '')
+    .filter(start => toDayNumber(start) !== undefined)
+    .sort();
+  if (starts.length === 0) {
+    return undefined;
+  }
+  const last = starts[starts.length - 1];
+  const lastDay = toDayNumber(last) as number;
+  let nextDue: number;
+  if (schedule.rentFrequency === 'MONTHLY') {
+    const year = Number(last.slice(0, 4));
+    const monthIndex = Number(last.slice(5, 7));
+    nextDue = toDayNumber(monthlyDueDate(year, monthIndex, schedule.rentDueDay ?? Number(last.slice(8, 10)))) as number;
+  } else if (schedule.rentFrequency === 'WEEKLY' || schedule.rentFrequency === 'FORTNIGHTLY') {
+    nextDue = lastDay + (schedule.rentFrequency === 'WEEKLY' ? 7 : 14);
+  } else {
+    nextDue = lastDay + 1;
+  }
+  return { statementStart: starts[0], statementEnd: fromDayNumber(Math.max(lastDay, nextDue - 1)) };
 }
 
 export interface RentTableLine {

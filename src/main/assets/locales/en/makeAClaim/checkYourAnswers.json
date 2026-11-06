@@ -14,7 +14,6 @@
   },
   "errors": {
     "statementOfTruth": "Confirm both parts of the statement of truth",
-    "statementOfTruthFullName": "Enter your full name",
-    "submitFailed": "Your claim could not be submitted. Try again."
+    "statementOfTruthFullName": "Enter your full name"
   }
 }

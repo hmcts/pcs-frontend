@@ -5,6 +5,7 @@ import {
   ledgerWithArrears,
   mergeRentPeriods,
   rentTableWithArrears,
+  statementRangeOf,
 } from '../../../../main/steps/make-a-claim/rentHistory';
 
 describe('generateRentPeriods', () => {
@@ -118,50 +119,70 @@ describe('generateRentPeriods', () => {
 });
 
 describe('mergeRentPeriods', () => {
-  it('keeps payments for periods that still exist and drops those that do not', () => {
+  const july = { periodStart: '2026-07-15', dateDue: '2026-07-15', amountDue: '120000' };
+  const august = { periodStart: '2026-08-15', dateDue: '2026-08-15', amountDue: '120000' };
+  const row = (periodStart: string, datePaid: string, amountPaid: string, amountDue?: string) => ({
+    value: { periodStart, ...(amountDue ? { dateDue: periodStart, amountDue } : {}), datePaid, amountPaid },
+  });
+
+  it('carries each payment to the latest period due on or before it was paid', () => {
     const merged = mergeRentPeriods(
-      [
-        { periodStart: '2026-07-01', dateDue: '2026-07-01', amountDue: '120000' },
-        { periodStart: '2026-08-01', dateDue: '2026-08-01', amountDue: '120000' },
-      ],
-      [
-        {
-          id: 'a',
-          value: {
-            periodStart: '2026-06-01',
-            dateDue: '2026-06-01',
-            amountDue: '100000',
-            datePaid: '2026-06-02',
-            amountPaid: '100',
-          },
-        },
-        {
-          id: 'b',
-          value: {
-            periodStart: '2026-07-01',
-            dateDue: '2026-07-01',
-            amountDue: '100000',
-            datePaid: '2026-07-02',
-            amountPaid: '200',
-          },
-        },
-        { id: 'c', value: { periodStart: '2026-07-01', datePaid: '2026-07-20', amountPaid: '300' } },
-      ]
+      [july, august],
+      [row('2026-07-01', '2026-07-20', '200', '100000'), row('2026-08-01', '2026-08-20', '300', '100000')]
     );
     expect(merged).toEqual([
-      {
-        id: 'b',
-        value: {
-          periodStart: '2026-07-01',
-          dateDue: '2026-07-01',
-          amountDue: '120000',
-          datePaid: '2026-07-02',
-          amountPaid: '200',
-        },
-      },
-      { id: 'c', value: { periodStart: '2026-07-01', datePaid: '2026-07-20', amountPaid: '300' } },
-      { value: { periodStart: '2026-08-01', dateDue: '2026-08-01', amountDue: '120000' } },
+      { value: { ...july, datePaid: '2026-07-20', amountPaid: '200' } },
+      { value: { ...august, datePaid: '2026-08-20', amountPaid: '300' } },
     ]);
+  });
+
+  it('keeps payments made before or after the statement, and several in one period', () => {
+    const merged = mergeRentPeriods(
+      [july, august],
+      [
+        row('2026-06-01', '2026-06-02', '100', '100000'),
+        row('2026-07-01', '2026-07-16', '200', '100000'),
+        row('2026-07-01', '2026-07-30', '250'),
+        row('2026-09-01', '2026-09-05', '400', '100000'),
+      ]
+    );
+    expect(merged.map(item => [item.value.periodStart, item.value.amountPaid])).toEqual([
+      ['2026-07-15', '100'],
+      ['2026-07-15', '200'],
+      ['2026-07-15', '250'],
+      ['2026-08-15', '400'],
+    ]);
+    expect(merged.reduce((total, item) => total + Number(item.value.amountPaid ?? 0), 0)).toBe(950);
+  });
+
+  it('keeps the rows of the period that keeps its due date', () => {
+    const merged = mergeRentPeriods([july], [{ id: 'keep', value: { ...july, amountDue: '100000' } }]);
+    expect(merged).toEqual([{ id: 'keep', value: july }]);
+  });
+
+  it('leaves the statement alone when there are no periods to lay it out in', () => {
+    const existing = [row('2026-07-01', '2026-07-02', '1', '1')];
+    expect(mergeRentPeriods([], existing)).toBe(existing);
+  });
+});
+
+describe('statementRangeOf', () => {
+  const rows = ['2026-06-01', '2026-07-01', '2026-08-01'].map(periodStart => ({ value: { periodStart } }));
+
+  it('covers up to the day before the next monthly due date', () => {
+    expect(statementRangeOf(rows, { rentFrequency: 'MONTHLY', rentDueDay: 1 })).toEqual({
+      statementStart: '2026-06-01',
+      statementEnd: '2026-08-31',
+    });
+  });
+
+  it('covers the last week or fortnight', () => {
+    expect(statementRangeOf(rows, { rentFrequency: 'WEEKLY' })?.statementEnd).toBe('2026-08-07');
+    expect(statementRangeOf(rows, { rentFrequency: 'FORTNIGHTLY' })?.statementEnd).toBe('2026-08-14');
+  });
+
+  it('has no range without periods', () => {
+    expect(statementRangeOf([], { rentFrequency: 'MONTHLY' })).toBeUndefined();
   });
 });
 

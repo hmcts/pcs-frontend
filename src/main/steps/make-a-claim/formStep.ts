@@ -1,9 +1,10 @@
 import type { Request } from 'express';
 
-import { draftClaim, readClaim, saveClaimDraft } from './claimDraft';
+import { answeredClaim, readClaim, saveClaimDraft } from './claimDraft';
 import { claimMappings } from './claimMapping';
 import { MAKE_A_CLAIM_JOURNEY, MAKE_A_CLAIM_ROUTE, flowConfig } from './flow.config';
 import { SECTION_SUMMARY_STEPS } from './sections.config';
+import { draftChangedUrl, isDraftChanged } from './submitErrors';
 
 import { createFormStep, getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
@@ -60,9 +61,17 @@ export function createMakeAClaimStep(config: MakeAClaimStepConfig): StepDefiniti
     getInitialFormData: mapping?.toForm ? req => mapping.toForm!(readClaim(req), req) : undefined,
     beforeRedirect: mapping?.fromForm
       ? async req => {
-          const claim = draftClaim(req);
-          mapping.fromForm!(claim, req.body ?? {}, req);
-          await saveClaimDraft(req, claim);
+          try {
+            await saveClaimDraft(
+              req,
+              answeredClaim(req, claim => mapping.fromForm!(claim, req.body ?? {}, req))
+            );
+          } catch (error) {
+            if (!isDraftChanged(error)) {
+              throw error;
+            }
+            req.res?.redirect(303, draftChangedUrl(req.res.locals.validatedCase?.id ?? ''));
+          }
         }
       : undefined,
     isAnswered: mapping?.isAnswered ? req => mapping.isAnswered!(readClaim(req), req) : undefined,

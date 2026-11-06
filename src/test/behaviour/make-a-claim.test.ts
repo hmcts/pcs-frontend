@@ -170,10 +170,12 @@ describe('before a claim exists', () => {
       case_reference: CASE_REFERENCE,
       event: { id: 'citizenMakePossessionClaim' },
     });
+    expect(ccd.draftSaves[0].event_data.citizenPossessionClaim.draftVersion).toBe(1);
     expect(storedClaim()).toEqual({
       propertyAddress: { AddressLine1: '15 Garden Drive', PostTown: 'Luton', PostCode: 'LU1 1AB' },
       eligibility: { claimantType: 'PRIVATE_LANDLORD', isTrespass: 'NO', whoIsClaiming: 'MYSELF' },
       claimant: { individualOrOrganisation: 'INDIVIDUAL' },
+      draftVersion: 2,
     });
   });
 
@@ -481,7 +483,10 @@ describe('submitting the claim', () => {
         },
       },
     });
-    expect(ccd.submissions[0]).toMatchObject({ event: { id: 'citizenMakePossessionClaim' }, data: {} });
+    expect(ccd.submissions[0]).toMatchObject({
+      event: { id: 'citizenMakePossessionClaim' },
+      data: { citizenPossessionClaim: { draftVersion: storedClaim().draftVersion } },
+    });
 
     const pay = text((await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee`)).text);
     expect(pay).toContain('Claim fee £404.00');
@@ -498,5 +503,180 @@ describe('submitting the claim', () => {
     const confirmation = text((await app.get(`/case/${CASE_REFERENCE}/claim-submitted?status=success`)).text);
     expect(confirmation).toContain('Claim submitted');
     expect(confirmation).toContain('1777 0276 0001 7761');
+  });
+});
+
+describe('review fixes', () => {
+  const SUBMITTABLE = {
+    ...ANSWERED_CLAIM,
+    rentArrears: {
+      ...ANSWERED_CLAIM.rentArrears,
+      proofType: 'UPLOAD_STATEMENT',
+      moneyJudgmentWanted: 'NO',
+      recoverySteps: '',
+    },
+  };
+  const SIGNED = {
+    statementOfTruth: ['contempt', 'belief'],
+    statementOfTruthFullName: 'Billy Wright',
+    statementOfTruthPosition: '',
+  };
+
+  it('sends the claimant back to check their answers when the claim changed elsewhere', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    ccd.changeDraftBeforeNextSave = true;
+    const saved = await app.post(claimPath('rent-amount'), { rentAmount: '1200' });
+    expect(saved.location).toBe(`${claimPath('check-your-answers')}?submitError=DRAFT_CHANGED`);
+    const page = text((await app.get(saved.location as string)).text);
+    expect(page).toContain('Your claim was changed in another tab or window');
+  });
+
+  it('shows each answer pcs-api refused at submit, linked to the page that asks it', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(SUBMITTABLE);
+    ccd.refuseSubmit = ['REQUIRED:claimant.address', 'REQUIRED:grounds.groundReasons.GROUND_14'];
+    const refused = await app.post(claimPath('check-your-answers'), SIGNED);
+    expect(refused.location).toBe(
+      `${claimPath('check-your-answers')}?submitError=${encodeURIComponent('REQUIRED:claimant.address,REQUIRED:grounds.groundReasons.GROUND_14')}`
+    );
+    const page = new JSDOM((await app.get(refused.location as string)).text).window.document;
+    const links = [...page.querySelectorAll('.govuk-error-summary a')].map(link => [
+      link.textContent?.trim(),
+      link.getAttribute('href'),
+    ]);
+    expect(links).toEqual([
+      ['Answer the question on ‘What is your postal address?’', claimPath('claimant-address')],
+      [
+        'Answer the question on ‘Why are you making a claim on this ground?’',
+        `${claimPath('ground-reason')}?ground=GROUND_14`,
+      ],
+    ]);
+  });
+
+  it('turns away a claim with other claimants at submit', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(SUBMITTABLE);
+    ccd.refuseSubmit = ['MULTIPLE_CLAIMANTS_NOT_ELIGIBLE'];
+    expect((await app.post(claimPath('check-your-answers'), SIGNED)).location).toBe(
+      claimPath('multiple-claimants-ineligible')
+    );
+  });
+
+  it('keeps the statement of truth on Save for later', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(SUBMITTABLE);
+    await app.post(claimPath('check-your-answers'), { ...SIGNED, action: 'saveForLater' });
+    expect(storedClaim().submission).toMatchObject({
+      statementOfTruthAgreed: 'YES',
+      statementOfTruthFullName: 'Billy Wright',
+    });
+    expect(ccd.submissions).toEqual([]);
+  });
+
+  it('keeps a saved answer when Save for later is pressed with an unreadable one', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    await app.post(claimPath('rent-amount'), { rentAmount: 'lots', action: 'saveForLater' });
+    expect(storedClaim().rentArrears.rentAmount).toBe('100000');
+  });
+
+  it('shows the property without a way to change it', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(SUBMITTABLE);
+    const page = new JSDOM((await app.get(claimPath('check-your-answers'))).text).window.document;
+    const property = page.querySelector('#summary-property');
+    expect(property?.textContent).toContain('15 Garden Drive');
+    expect(property?.textContent).toContain('You cannot change the property');
+    expect(property?.querySelector('a')).toBeNull();
+  });
+
+  it('removes a defendant after asking, from a Remove link on the defendants summary', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...ANSWERED_CLAIM,
+      defendants: [
+        ...ANSWERED_CLAIM.defendants,
+        {
+          value: {
+            nameKnown: 'YES',
+            firstName: 'Jo',
+            lastName: 'Bloggs',
+            addressSameAsProperty: 'YES',
+            addressKnown: 'YES',
+          },
+        },
+      ],
+    });
+    const summary = new JSDOM((await app.get(claimPath('defendant-cya'))).text).window.document;
+    const remove = [...summary.querySelectorAll('a')].find(link => link.textContent?.startsWith('Remove'));
+    expect(remove?.getAttribute('href')).toBe(`${claimPath('remove-defendant')}?index=1`);
+    expect(text((await app.get(`${claimPath('remove-defendant')}?index=1`)).text)).toContain(
+      'Are you sure you want to remove Jo Bloggs from the claim?'
+    );
+    expect((await app.post(`${claimPath('remove-defendant')}?index=1`, { confirmRemove: 'yes' })).location).toBe(
+      claimPath('defendant-cya')
+    );
+    expect(storedClaim().defendants).toHaveLength(1);
+  });
+
+  it('removes a ledger transaction after asking', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...ANSWERED_CLAIM,
+      rentArrears: {
+        ...ANSWERED_CLAIM.rentArrears,
+        proofType: 'LEDGER',
+        rentHistoryLedger: [
+          { value: { transactionDate: '2026-06-01', transactionTypes: ['RENT_CHARGE'], amountCharged: '100000' } },
+          { value: { transactionDate: '2026-06-03', transactionTypes: ['TENANT_PAYMENT'], amountPaid: '12000' } },
+        ],
+      },
+    });
+    const ledger = text((await app.get(claimPath('ledger-summary'))).text);
+    expect(ledger).toContain('Remove transaction 2');
+    await app.post(`${claimPath('remove-ledger-entry')}?entry=1`, { confirmRemove: 'no' });
+    expect(storedClaim().rentArrears.rentHistoryLedger).toHaveLength(2);
+    expect((await app.post(`${claimPath('remove-ledger-entry')}?entry=1`, { confirmRemove: 'yes' })).location).toBe(
+      claimPath('ledger-summary')
+    );
+    expect(storedClaim().rentArrears.rentHistoryLedger).toHaveLength(1);
+  });
+
+  it('asks for a reason for each ground chosen, one page each, and shows them on the summary', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...ANSWERED_CLAIM, grounds: { hasRentArrearsGrounds: 'NO' } });
+    expect(
+      (await app.post(claimPath('other-grounds'), { mandatoryGrounds: 'GROUND_1A', discretionaryGrounds: 'GROUND_14' }))
+        .location
+    ).toBe(`${claimPath('ground-reason')}?nav=1`);
+    expect(text((await app.get(claimPath('ground-reason'))).text)).toContain(
+      'Why are you making a claim for possession under Sale of dwelling house (Ground 1A)?'
+    );
+    expect((await app.post(claimPath('ground-reason'), { groundReason: 'Selling' })).location).toBe(
+      `${claimPath('ground-reason')}?ground=GROUND_14`
+    );
+    expect((await app.post(`${claimPath('ground-reason')}?ground=GROUND_14`, { groundReason: 'Noise' })).location).toBe(
+      `${claimPath('tenancy-cya')}?nav=1`
+    );
+    expect(storedClaim().grounds.groundReasons).toEqual([
+      { value: { ground: 'GROUND_1A', reason: 'Selling' } },
+      { value: { ground: 'GROUND_14', reason: 'Noise' } },
+    ]);
+    expect(text((await app.get(claimPath('tenancy-cya'))).text)).toContain(
+      'Why you are claiming under Antisocial behaviour (Ground 14) Noise'
+    );
+  });
+
+  it('never starts a second payment for a claim already paid', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ submission: { serviceRequestReference: 'SR-1', feeAmount: '40400', paymentStatus: 'PAID' } });
+    expect((await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee`)).location).toBe(
+      `/case/${CASE_REFERENCE}/claim-submitted`
+    );
+    expect((await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee/start`)).location).toBe(
+      `/case/${CASE_REFERENCE}/claim-submitted`
+    );
+    expect(ccd.cardPayments).toEqual([]);
   });
 });

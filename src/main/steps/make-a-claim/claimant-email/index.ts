@@ -1,5 +1,6 @@
 import { accountEmailOf } from '../claimMapping';
 import { textField, yesNoQuestion } from '../fieldBuilders';
+import { FIELD_LIMITS } from '../fieldLimits';
 import { createMakeAClaimStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -14,7 +15,7 @@ export const step: StepDefinition = createMakeAClaimStep({
       subFields: {
         no: {
           emailAddress: textField('emailAddress', {
-            maxLength: 100,
+            maxLength: FIELD_LIMITS.emailAddress,
             errorMessage: 'errors.emailAddress',
             attributes: { autocomplete: 'email', spellcheck: false, type: 'email' },
             validator: (value: unknown): boolean | string =>

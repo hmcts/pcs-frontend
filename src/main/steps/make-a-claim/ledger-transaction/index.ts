@@ -1,4 +1,5 @@
 import { dateField, moneyField, textField } from '../fieldBuilders';
+import { FIELD_LIMITS } from '../fieldLimits';
 import { flowConfig } from '../flow.config';
 import { createMakeAClaimStep } from '../formStep';
 
@@ -29,7 +30,7 @@ export const step: StepDefinition = createMakeAClaimStep({
         },
       ],
     },
-    textField('description', { required: false, maxLength: 100 }),
+    textField('description', { required: false, maxLength: FIELD_LIMITS.ledgerDescription }),
   ],
   resolveRedirectAfterPost: async req => getStepUrl('ledger-summary', flowConfig, req.res?.locals.validatedCase?.id),
 });

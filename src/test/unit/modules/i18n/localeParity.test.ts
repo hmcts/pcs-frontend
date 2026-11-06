@@ -339,7 +339,7 @@ const AWAITING_TRANSLATION = new Set<string>([
   'makeAClaim/rentArrearsGrounds.json',
   'makeAClaim/otherGroundsClaim.json',
   'makeAClaim/otherGrounds.json',
-  'makeAClaim/ground1aReason.json',
+  'makeAClaim/groundReason.json',
   'makeAClaim/tenancyCya.json',
   'makeAClaim/noticeDetails.json',
   'makeAClaim/noticeServed.json',
@@ -379,6 +379,8 @@ const AWAITING_TRANSLATION = new Set<string>([
   'makeAClaim/yourSupport.json',
   'makeAClaim/equalityAndDiversity.json',
   'makeAClaim/languageUsed.json',
+  'makeAClaim/removeDefendant.json',
+  'makeAClaim/removeLedgerEntry.json',
   'makeAClaim/checkYourAnswers.json',
 ]);
 

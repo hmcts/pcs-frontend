@@ -1,3 +1,4 @@
+import { FIELD_LIMITS } from './fieldLimits';
 import { amountValidator } from './formValues';
 
 import type { FormFieldConfig, FormFieldOption } from '@modules/steps/formBuilder/formFieldConfig.interface';
@@ -47,7 +48,7 @@ export function textField(name: string, extra: Partial<FormFieldConfig> = {}): F
     name,
     type: 'text',
     required: true,
-    maxLength: 100,
+    maxLength: FIELD_LIMITS.defaultText,
     translationKey: { label: `labels.${name}`, hint: `hints.${name}` },
     classes: 'govuk-!-width-two-thirds',
     labelClasses: 'govuk-label--s',
@@ -87,7 +88,7 @@ export function longTextField(name: string, extra: Partial<FormFieldConfig> = {}
     name,
     type: 'character-count',
     required: false,
-    maxLength: 500,
+    maxLength: FIELD_LIMITS.defaultLongText,
     translationKey: { label: `labels.${name.split('.').pop()}`, hint: `hints.${name.split('.').pop()}` },
     labelClasses: 'govuk-label--s',
     ...extra,

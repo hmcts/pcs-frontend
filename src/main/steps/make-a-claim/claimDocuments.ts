@@ -22,11 +22,6 @@ async function freshClaim(req: Request): Promise<{ caseId: string; claim: Citize
   return { caseId, claim: fresh.data?.citizenPossessionClaim ?? {} };
 }
 
-/**
- * Where an upload page keeps its documents in the claim. Uploads and deletes arrive outside the journey's
- * event start, so each save reads the claim afresh and saves it whole: saving only the documents would wipe
- * every other answer.
- */
 type UploadedDocuments = CcdCollectionItem<CcdUploadedDocument>[];
 
 /** The claim's documents as the upload path handles them. */

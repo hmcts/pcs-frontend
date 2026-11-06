@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import {
   ENGLISH_PROPERTY,
+  GROUND_1A_AND_14,
   WELSH_PROPERTY,
   answer,
   becomeEligible,
@@ -40,7 +41,7 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
     await continueOn(page);
     await completeAboutYou(page);
     await completeDefendants(page);
-    await completeTenancyGroundsAndNotice(page);
+    await completeTenancyGroundsAndNotice(page, GROUND_1A_AND_14);
     await completeRentArrearsWithLedger(page);
     await completeCircumstances(page);
     await completeOtherInformation(page);

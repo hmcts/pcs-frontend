@@ -1,5 +1,6 @@
 import type { Request } from 'express';
 
+import { FIELD_LIMITS } from './fieldLimits';
 import { type AddressPart, addressFieldName } from './formValues';
 
 import { getTranslationFunction } from '@modules/steps';
@@ -31,10 +32,10 @@ export function addressFields(prefix: string, required: IsRequired = () => true)
     ...extra,
   });
   return [
-    field('addressLine1', true, { maxLength: 150 }),
-    field('addressLine2', false, { maxLength: 50 }),
-    field('town', true, { maxLength: 50 }),
-    field('county', false, { maxLength: 50 }),
+    field('addressLine1', true, { maxLength: FIELD_LIMITS.addressLine1 }),
+    field('addressLine2', false, { maxLength: FIELD_LIMITS.addressLine }),
+    field('town', true, { maxLength: FIELD_LIMITS.addressLine }),
+    field('county', false, { maxLength: FIELD_LIMITS.addressLine }),
     field('postcode', true, {
       validator: (value: unknown): boolean | string =>
         typeof value === 'string' && value.trim() && !UK_POSTCODE.test(value.trim()) ? 'errors.postcodeInvalid' : true,

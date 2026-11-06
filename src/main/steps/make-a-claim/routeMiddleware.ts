@@ -5,9 +5,9 @@ import { getRentHistoryDesign } from '@utils/makeAClaimFlags';
 /** Resolves the rent history design once per request, for the journey's show conditions to read. */
 export const resolveRentHistoryDesign: RequestHandler = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> => {
-  res.locals.rentHistoryDesign = await getRentHistoryDesign(req);
+  await getRentHistoryDesign(req);
   next();
 };

@@ -1,5 +1,6 @@
 import { defendantIndexOf } from '../claimMapping';
 import { textField, yesNoQuestion } from '../fieldBuilders';
+import { FIELD_LIMITS } from '../fieldLimits';
 import { flowConfig } from '../flow.config';
 import { createMakeAClaimStep } from '../formStep';
 
@@ -13,8 +14,14 @@ export const step: StepDefinition = createMakeAClaimStep({
     yesNoQuestion('nameKnown', {
       subFields: {
         yes: {
-          firstName: textField('firstName', { maxLength: 60, errorMessage: 'errors.firstName' }),
-          lastName: textField('lastName', { maxLength: 60, errorMessage: 'errors.lastName' }),
+          firstName: textField('firstName', {
+            maxLength: FIELD_LIMITS.defendantFirstName,
+            errorMessage: 'errors.firstName',
+          }),
+          lastName: textField('lastName', {
+            maxLength: FIELD_LIMITS.defendantLastName,
+            errorMessage: 'errors.lastName',
+          }),
         },
       },
     }),

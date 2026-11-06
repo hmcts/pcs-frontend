@@ -20,7 +20,7 @@ import { step as defendantName } from './defendant-name';
 import { step as eligible } from './eligible';
 import { step as equalityAndDiversity } from './equality-and-diversity';
 import { step as generalApplication } from './general-application';
-import { step as ground1aReason } from './ground-1a-reason';
+import { step as groundReason } from './ground-reason';
 import { step as individualOrOrganisation } from './individual-or-organisation';
 import { step as languageUsed } from './language-used';
 import { step as ledgerSummary } from './ledger-summary';
@@ -41,6 +41,8 @@ import { step as otherGroundsClaim } from './other-grounds-claim';
 import { step as otherInformation } from './other-information';
 import { step as otherReasons } from './other-reasons';
 import { step as recoverySteps } from './recovery-steps';
+import { step as removeDefendant } from './remove-defendant';
+import { step as removeLedgerEntry } from './remove-ledger-entry';
 import { step as rentAmount } from './rent-amount';
 import { step as rentArrears } from './rent-arrears';
 import { step as rentArrearsClaim } from './rent-arrears-claim';
@@ -95,7 +97,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'rent-arrears-grounds': rentArrearsGrounds,
   'other-grounds-claim': otherGroundsClaim,
   'other-grounds': otherGrounds,
-  'ground-1a-reason': ground1aReason,
+  'ground-reason': groundReason,
   'tenancy-cya': tenancyCya,
   'notice-details': noticeDetails,
   'notice-served': noticeServed,
@@ -137,5 +139,7 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'language-used': languageUsed,
   'check-your-answers': checkYourAnswers,
   'task-list': taskList,
+  'remove-defendant': removeDefendant,
+  'remove-ledger-entry': removeLedgerEntry,
   'multiple-claimants-ineligible': multipleClaimantsIneligible,
 };

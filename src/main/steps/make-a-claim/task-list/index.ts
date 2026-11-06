@@ -13,6 +13,7 @@ import { getStepUrl } from '@modules/steps/flow';
 import type { SectionStatus } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getAllSectionStatuses, getFirstVisibleStep, getStatusTagClasses } from '@services/sectionStatus';
+import { formatCaseReferenceForDisplay } from '@utils/caseReference';
 
 const stepName = 'task-list';
 const VIEW = 'make-a-claim/templates/taskList.njk';
@@ -60,7 +61,7 @@ export const step: StepDefinition = {
         ...sharedPageContent(req),
         backUrl: undefined,
         propertyAddress: formatCcdAddress({ ...propertyAddressOf(req), Country: undefined }),
-        caseNumber: (validatedCase?.id ?? '').replace(/(\d{4})(?=\d)/g, '$1 '),
+        caseNumber: formatCaseReferenceForDisplay(validatedCase?.id ?? ''),
         groups: await buildGroups(req, t),
       };
     }),

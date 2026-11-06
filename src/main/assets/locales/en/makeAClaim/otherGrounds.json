@@ -9,6 +9,9 @@
     "legend": "Mandatory grounds",
     "hint": "If you make a claim on mandatory grounds, the court will accept your reasons for possession if they can be proven. Select all that apply."
   },
+  "other": {
+    "legend": "Other grounds"
+  },
   "discretionary": {
     "legend": "Discretionary grounds",
     "hint": "If you make a claim on discretionary grounds, a judge will decide whether possession is reasonable. Select all that apply."

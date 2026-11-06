@@ -9,6 +9,7 @@ function requestWith(variation?: jest.Mock): Request {
   return {
     app: { locals: { launchDarklyClient: variation ? { variation } : undefined } },
     session: { user: { uid: 'uid', email: 'pl-table-1@example.test' } },
+    res: { locals: {} },
   } as unknown as Request;
 }
 
@@ -21,6 +22,14 @@ describe('isMakeAClaimEnabled', () => {
       expect.objectContaining({ email: 'pl-table-1@example.test' }),
       false
     );
+  });
+
+  it('asks LaunchDarkly once however many gates check it in a request', async () => {
+    const variation = jest.fn().mockResolvedValue(true);
+    const req = requestWith(variation);
+    await isMakeAClaimEnabled(req);
+    await isMakeAClaimEnabled(req);
+    expect(variation).toHaveBeenCalledTimes(1);
   });
 
   it('is off when LaunchDarkly is not there', async () => {
@@ -44,10 +53,22 @@ describe('rent history design', () => {
     expect(toRentHistoryDesign(value)).toBe(design);
   });
 
-  it('asks LaunchDarkly with the ledger as its default', async () => {
-    const variation = jest.fn().mockResolvedValue('table');
-    await expect(getRentHistoryDesign(requestWith(variation))).resolves.toBe('table');
+  it('asks LaunchDarkly with the ledger as its default, once per request, reusing the journey flag', async () => {
+    const variation = jest.fn(async (flag: string) =>
+      flag === 'private-landlord-rent-history-design' ? 'table' : true
+    );
+    const req = requestWith(variation);
+    await expect(getRentHistoryDesign(req)).resolves.toBe('table');
+    await expect(getRentHistoryDesign(req)).resolves.toBe('table');
+    await isMakeAClaimEnabled(req);
     expect(variation).toHaveBeenCalledWith('private-landlord-rent-history-design', expect.anything(), 'ledger');
+    expect(variation).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not ask for the design while the journey is off', async () => {
+    const variation = jest.fn().mockResolvedValue(false);
+    await expect(getRentHistoryDesign(requestWith(variation))).resolves.toBe('ledger');
+    expect(variation).toHaveBeenCalledTimes(1);
   });
 
   it('is the ledger without LaunchDarkly', async () => {

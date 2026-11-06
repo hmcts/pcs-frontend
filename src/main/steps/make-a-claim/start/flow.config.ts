@@ -1,10 +1,11 @@
 import type { Request } from 'express';
 
+import { MAKE_A_CLAIM_START_ROUTE } from '../../../constants/makeAClaimRoutes';
 import { MAKE_A_CLAIM_JOURNEY } from '../flow.config';
 
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 
-export const MAKE_A_CLAIM_START_ROUTE = '/make-a-claim';
+export { MAKE_A_CLAIM_START_ROUTE };
 
 const answered =
   (field: string, value: string) =>

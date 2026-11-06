@@ -5,6 +5,7 @@ export interface PaymentSessionState {
   serviceRequestReference?: string;
   paymentReference?: string;
   feeAmount?: number;
+  feeAmountInPence?: string;
   counterClaimAmountInPence?: string;
   counterClaimType?: string;
   successRedirectUrl?: string;

@@ -1,15 +1,13 @@
 import type { NextFunction, Request, RequestHandler, Response } from 'express';
 
+import { MAKE_A_CLAIM_ROUTES } from '../constants/makeAClaimRoutes';
 import { isLegalRepresentativeUser, isStaffUser } from '../steps/utils/userRole';
 import { isMakeAClaimEnabled } from '../utils/makeAClaimFlags';
 
 /** Every path the private landlord make a claim journey serves, with or without a case. */
-export const MAKE_A_CLAIM_PATHS = [
-  /^\/make-a-claim(?:\/.*)?$/,
-  /^\/case\/[^/]+\/make-a-claim(?:\/.*)?$/,
-  /^\/case\/[^/]+\/pay-claim-fee(?:\/.*)?$/,
-  /^\/case\/[^/]+\/claim-submitted(?:\/.*)?$/,
-] as const;
+export const MAKE_A_CLAIM_PATHS: readonly RegExp[] = MAKE_A_CLAIM_ROUTES.map(
+  route => new RegExp(`^${route.replace(/:[A-Za-z]+/g, '[^/]+')}(?:/.*)?$`)
+);
 
 export function isMakeAClaimPath(path: string): boolean {
   return MAKE_A_CLAIM_PATHS.some(pattern => pattern.test(path));

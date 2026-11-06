@@ -23,7 +23,14 @@ export const ccd = {
   submissions: [] as Record<string, unknown>[],
   cardPayments: [] as Record<string, unknown>[],
   refuseCreate: undefined as string | undefined,
+  refuseSubmit: undefined as string[] | undefined,
+  changeDraftBeforeNextSave: false,
 };
+
+/** pcs-api's draft version: every save that names the stored version moves it on; a stale one is refused. */
+function draftVersion(): number {
+  return Number(ccd.stored?.citizenPossessionClaim?.draftVersion ?? 0);
+}
 
 function jwt(claims: Record<string, unknown>): string {
   const encode = (value: unknown): string => Buffer.from(JSON.stringify(value)).toString('base64url');
@@ -41,7 +48,7 @@ function ccdStub(): Express {
     if (ccd.refuseCreate) {
       return res.status(422).json({ callbackErrors: [ccd.refuseCreate] });
     }
-    ccd.stored = { citizenPossessionClaim: req.body.data.citizenPossessionClaim };
+    ccd.stored = { citizenPossessionClaim: { ...req.body.data.citizenPossessionClaim, draftVersion: 1 } };
     res.status(201).json({ id: Number(CASE_REFERENCE), data: {} });
   });
   stub.post('/case-types/:caseType/validate', (req: Request, res: Response) => {
@@ -49,7 +56,19 @@ function ccdStub(): Express {
     if (!ccd.stored) {
       return res.status(404).json({ message: 'No case' });
     }
-    ccd.stored.citizenPossessionClaim = req.body.event_data.citizenPossessionClaim;
+    const sent = req.body.event_data.citizenPossessionClaim;
+    if (ccd.changeDraftBeforeNextSave) {
+      ccd.changeDraftBeforeNextSave = false;
+      ccd.stored.citizenPossessionClaim = { ...ccd.stored.citizenPossessionClaim, draftVersion: draftVersion() + 1 };
+    }
+    if (sent.draftVersion !== undefined && sent.draftVersion !== draftVersion()) {
+      return res.status(422).json({ callbackErrors: ['DRAFT_CHANGED'] });
+    }
+    ccd.stored.citizenPossessionClaim = {
+      ...sent,
+      propertyAddress: ccd.stored.citizenPossessionClaim?.propertyAddress,
+      draftVersion: draftVersion() + 1,
+    };
     res.json({ data: { citizenPossessionClaim: ccd.stored.citizenPossessionClaim } });
   });
   stub.get('/cases/:id/event-triggers/:event', (req: Request, res: Response) => {
@@ -66,6 +85,12 @@ function ccdStub(): Express {
   });
   stub.post('/cases/:id/events', (req: Request, res: Response) => {
     ccd.submissions.push(req.body);
+    if (ccd.refuseSubmit) {
+      return res.status(422).json({ callbackErrors: ccd.refuseSubmit });
+    }
+    if (req.body.data?.citizenPossessionClaim?.draftVersion !== draftVersion()) {
+      return res.status(422).json({ callbackErrors: ['DRAFT_CHANGED'] });
+    }
     const draft = ccd.stored?.citizenPossessionClaim ?? {};
     const fee = { serviceRequestReference: '2026-1777027600017', feeAmount: '40400' };
     ccd.stored = {
@@ -115,6 +140,8 @@ export async function bootMakeAClaim(
   ccd.submissions = [];
   ccd.cardPayments = [];
   ccd.refuseCreate = undefined;
+  ccd.refuseSubmit = undefined;
+  ccd.changeDraftBeforeNextSave = false;
   backend ??= await listen(ccdStub());
   const backendUrl = `http://127.0.0.1:${(backend.address() as AddressInfo).port}`;
   process.env.CCD_URL = backendUrl;
@@ -237,6 +264,7 @@ export function givenClaim(claim: Record<string, unknown>): void {
   ccd.stored = {
     citizenPossessionClaim: {
       propertyAddress: { AddressLine1: '15 Garden Drive', PostTown: 'Luton', PostCode: 'LU1 1AB' },
+      draftVersion: 1,
       ...claim,
     },
   };

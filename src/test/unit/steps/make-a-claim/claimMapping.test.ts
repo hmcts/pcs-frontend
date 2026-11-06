@@ -1,7 +1,12 @@
 import type { Request } from 'express';
 
 import type { CitizenPossessionClaim } from '../../../../main/services/citizenPossessionClaim.interface';
-import { claimMappings, removeDefendant, removeLedgerEntry } from '../../../../main/steps/make-a-claim/claimMapping';
+import {
+  claimMappings,
+  groundForReasonOf,
+  removeDefendant,
+  removeLedgerEntry,
+} from '../../../../main/steps/make-a-claim/claimMapping';
 
 const PROPERTY = { AddressLine1: '15 Garden Drive', PostTown: 'Luton', PostCode: 'LU1 1AB' };
 
@@ -191,29 +196,79 @@ describe('claim mappings', () => {
 
   it('saves the grounds as pcs-api’s codes, splitting other grounds back into their groups', () => {
     const { saved, form } = roundTrip('other-grounds', {
-      mandatoryGrounds: ['GROUND_1A', 'GROUND_99'],
+      mandatoryGrounds: ['GROUND_1A', 'GROUND_99', 'OTHER'],
       discretionaryGrounds: 'GROUND_14',
+      otherGround: ['OTHER'],
+      'otherGround.otherGroundsDetails': 'Subletting',
     });
-    expect(saved.grounds?.otherGrounds).toEqual(['GROUND_1A', 'GROUND_14']);
-    expect(form).toEqual({ mandatoryGrounds: ['GROUND_1A'], discretionaryGrounds: ['GROUND_14'] });
+    expect(saved.grounds).toMatchObject({
+      otherGrounds: ['GROUND_1A', 'GROUND_14', 'OTHER'],
+      otherGroundsDetails: 'Subletting',
+    });
+    expect(form).toEqual({
+      mandatoryGrounds: ['GROUND_1A'],
+      discretionaryGrounds: ['GROUND_14'],
+      otherGround: ['OTHER'],
+      'otherGround.otherGroundsDetails': 'Subletting',
+    });
   });
 
-  it('keeps details for other grounds and the Ground 1A reason only while those grounds are chosen', () => {
+  describe('ground reasons', () => {
     const chosen = roundTrip('other-grounds', {
-      mandatoryGrounds: ['GROUND_1A', 'OTHER'],
-      'mandatoryGrounds.otherGroundsDetails': 'Subletting',
+      mandatoryGrounds: ['GROUND_1A', 'GROUND_2'],
+      discretionaryGrounds: ['GROUND_14'],
+      otherGround: ['OTHER'],
+      'otherGround.otherGroundsDetails': 'Subletting',
     }).saved;
-    expect(chosen.grounds?.otherGroundsDetails).toBe('Subletting');
-    const reasoned = roundTrip('ground-1a-reason', { ground1AReason: 'Selling the house' }, chosen);
-    expect(reasoned.saved.grounds?.groundReasons).toEqual([
-      { value: { ground: 'GROUND_1A', reason: 'Selling the house' } },
-    ]);
-    expect(reasoned.form).toEqual({ ground1AReason: 'Selling the house' });
-    const dropped = roundTrip('other-grounds', { mandatoryGrounds: ['GROUND_2'] }, reasoned.saved).saved;
-    expect(dropped.grounds).toMatchObject({
-      otherGrounds: ['GROUND_2'],
-      otherGroundsDetails: undefined,
-      groundReasons: [],
+
+    it('asks for a reason for every chosen ground but the rent arrears ones and other grounds, first one first', () => {
+      expect(groundForReasonOf(request(), chosen)).toBe('GROUND_1A');
+      expect(groundForReasonOf(request({ ground: 'GROUND_14' }), chosen)).toBe('GROUND_14');
+      expect(groundForReasonOf(request({ ground: 'OTHER' }), chosen)).toBeUndefined();
+      expect(groundForReasonOf(request({ ground: 'GROUND_8' }), chosen)).toBeUndefined();
+    });
+
+    it('saves each reason against its ground in the order the grounds were chosen', () => {
+      const second = roundTrip(
+        'ground-reason',
+        { groundReason: 'Mortgage default' },
+        chosen,
+        request({ ground: 'GROUND_2' })
+      );
+      const first = roundTrip(
+        'ground-reason',
+        { groundReason: 'Selling' },
+        second.saved,
+        request({ ground: 'GROUND_1A' })
+      );
+      expect(first.saved.grounds?.groundReasons).toEqual([
+        { value: { ground: 'GROUND_1A', reason: 'Selling' } },
+        { value: { ground: 'GROUND_2', reason: 'Mortgage default' } },
+      ]);
+      expect(first.form).toEqual({ groundReason: 'Selling' });
+      expect(first.answered).toBe(false);
+      const all = roundTrip(
+        'ground-reason',
+        { groundReason: 'Nuisance' },
+        first.saved,
+        request({ ground: 'GROUND_14' })
+      );
+      expect(all.answered).toBe(true);
+    });
+
+    it('drops the reasons and details of grounds no longer chosen', () => {
+      const reasoned = roundTrip(
+        'ground-reason',
+        { groundReason: 'Selling' },
+        chosen,
+        request({ ground: 'GROUND_1A' })
+      ).saved;
+      const dropped = roundTrip('other-grounds', { mandatoryGrounds: ['GROUND_2'] }, reasoned).saved;
+      expect(dropped.grounds).toMatchObject({
+        otherGrounds: ['GROUND_2'],
+        otherGroundsDetails: undefined,
+        groundReasons: [],
+      });
     });
   });
 
@@ -346,10 +401,82 @@ describe('claim mappings', () => {
     ]);
     expect(form).toEqual({
       statementStart: { day: '1', month: '6', year: '2026' },
-      statementEnd: { day: '1', month: '7', year: '2026' },
+      statementEnd: { day: '31', month: '7', year: '2026' },
     });
     const { saved: rentRise } = roundTrip('rent-amount', { rentAmount: '1100' }, saved);
     expect(rentRise.rentArrears?.rentHistoryTable?.map(row => row.value.amountDue)).toEqual(['110000', '110000']);
+  });
+
+  describe('changing the due day of a rent statement', () => {
+    const monthly: CitizenPossessionClaim = {
+      rentArrears: { rentAmount: '100000', rentFrequency: 'MONTHLY', rentDueDay: 1 },
+    };
+    const period = {
+      statementStart: { day: '1', month: '6', year: '2026' },
+      statementEnd: { day: '31', month: '8', year: '2026' },
+    };
+    const dueDates = (claim: CitizenPossessionClaim) =>
+      claim.rentArrears?.rentHistoryTable?.filter(row => row.value.amountDue).map(row => row.value.dateDue);
+
+    it('keeps the end date the claimant gave', () => {
+      const req = request();
+      const { saved } = roundTrip('statement-period', period, monthly, req);
+      expect(dueDates(saved)).toEqual(['2026-06-01', '2026-07-01', '2026-08-01']);
+      const { saved: moved } = roundTrip('rent-due-day', { rentDueDay: '15' }, saved, req);
+      expect(dueDates(moved)).toEqual(['2026-06-15', '2026-07-15', '2026-08-15']);
+    });
+
+    it('keeps the period its rows cover when the dates given are no longer in the session', () => {
+      const { saved } = roundTrip('statement-period', period, monthly);
+      const { saved: moved } = roundTrip('rent-due-day', { rentDueDay: '15' }, saved, request());
+      expect(dueDates(moved)).toEqual(['2026-06-15', '2026-07-15', '2026-08-15']);
+    });
+
+    it('carries the payments entered over to the new periods by date', () => {
+      const req = request();
+      const { saved } = roundTrip('statement-period', period, monthly, req);
+      const paid = roundTrip(
+        'rent-statement-payment',
+        { datePaid: { day: '20', month: '8', year: '2026' }, amountPaid: '500' },
+        saved,
+        request({ period: '2026-08-01' })
+      ).saved;
+      const { saved: moved } = roundTrip('rent-due-day', { rentDueDay: '15' }, paid, req);
+      expect(moved.rentArrears?.rentHistoryTable?.find(row => row.value.amountPaid)?.value).toMatchObject({
+        periodStart: '2026-08-15',
+        datePaid: '2026-08-20',
+        amountPaid: '50000',
+      });
+    });
+
+    it('lays weekly rent out again over the same period when the frequency changes', () => {
+      const req = request();
+      const { saved } = roundTrip('statement-period', period, monthly, req);
+      const { saved: weekly } = roundTrip('rent-frequency', { rentFrequency: 'WEEKLY' }, saved, req);
+      expect(dueDates(weekly)?.slice(-1)).toEqual(['2026-08-31']);
+    });
+  });
+
+  it('adds no ledger entry for a transaction page saved for later empty', () => {
+    expect(roundTrip('ledger-transaction', { transactionTypes: [] }).saved).toEqual({});
+  });
+
+  it('removes a defendant after the first, and a ledger entry, only when confirmed', () => {
+    const claim: CitizenPossessionClaim = {
+      defendants: [{ value: { nameKnown: 'NO' } }, { value: { nameKnown: 'YES' } }],
+      rentArrears: { rentHistoryLedger: [{ value: { transactionDate: '2026-06-01' } }] },
+    };
+    expect(roundTrip('remove-defendant', { confirmRemove: 'no' }, claim, request({ index: '1' })).saved).toEqual(claim);
+    expect(
+      roundTrip('remove-defendant', { confirmRemove: 'yes' }, claim, request({ index: '1' })).saved.defendants
+    ).toEqual([{ value: { nameKnown: 'NO' } }]);
+    expect(
+      roundTrip('remove-defendant', { confirmRemove: 'yes' }, claim, request({ index: '0' })).saved.defendants
+    ).toHaveLength(2);
+    expect(
+      roundTrip('remove-ledger-entry', { confirmRemove: 'yes' }, claim, request({ entry: '0' })).saved.rentArrears
+        ?.rentHistoryLedger
+    ).toEqual([]);
   });
 
   it('records a payment against a rent period and edits it by row', () => {

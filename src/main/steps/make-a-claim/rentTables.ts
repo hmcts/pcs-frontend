@@ -1,4 +1,5 @@
 import type { Request } from 'express';
+import type { TFunction } from 'i18next';
 
 import { readClaim } from './claimDraft';
 import { formatClaimDate } from './dates';
@@ -8,9 +9,14 @@ import { formatPence, ledgerWithArrears, rentTableWithArrears } from './rentHist
 import { getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
 
+function ledgerLink(href: string, text: string, entryIndex: number, t: TFunction): string {
+  return `<a class="govuk-link" href="${href}">${text}<span class="govuk-visually-hidden"> ${t('makeAClaim:ledgerTable.transaction')} ${entryIndex + 1}</span></a>`;
+}
+
 export function ledgerTable(req: Request, withActions: boolean): Record<string, unknown> {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const transactionUrl = getStepUrl('ledger-transaction', flowConfig, req.res?.locals.validatedCase?.id);
+  const removeUrl = getStepUrl('remove-ledger-entry', flowConfig, req.res?.locals.validatedCase?.id);
   const lines = ledgerWithArrears(readClaim(req).rentArrears?.rentHistoryLedger);
   return {
     caption: t('makeAClaim:ledgerTable.caption'),
@@ -37,7 +43,20 @@ export function ledgerTable(req: Request, withActions: boolean): Record<string, 
       ...(withActions
         ? [
             {
-              html: `<a class="govuk-link" href="${transactionUrl}?entry=${line.entryIndex}">${t('makeAClaim:ledgerTable.change')}<span class="govuk-visually-hidden"> ${t('makeAClaim:ledgerTable.transaction')} ${line.entryIndex + 1}</span></a>`,
+              html: [
+                ledgerLink(
+                  `${transactionUrl}?entry=${line.entryIndex}`,
+                  t('makeAClaim:ledgerTable.change'),
+                  line.entryIndex,
+                  t
+                ),
+                ledgerLink(
+                  `${removeUrl}?entry=${line.entryIndex}`,
+                  t('makeAClaim:ledgerTable.remove'),
+                  line.entryIndex,
+                  t
+                ),
+              ].join('<br>'),
             },
           ]
         : []),

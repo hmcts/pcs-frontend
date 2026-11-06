@@ -1,5 +1,6 @@
 import { TENANCY_TYPES } from '../claimMapping';
 import { radioQuestion, textField } from '../fieldBuilders';
+import { FIELD_LIMITS } from '../fieldLimits';
 import { createMakeAClaimStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -12,7 +13,7 @@ export const step: StepDefinition = createMakeAClaimStep({
       subFields: {
         OTHER: {
           otherTenancyTypeDetails: textField('otherTenancyTypeDetails', {
-            maxLength: 250,
+            maxLength: FIELD_LIMITS.otherTenancyTypeDetails,
             errorMessage: 'errors.otherTenancyTypeDetails',
           }),
         },
