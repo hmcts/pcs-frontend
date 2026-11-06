@@ -315,6 +315,18 @@ describe('answering questions', () => {
     expect((await app.post(claimPath('claimant-cya'), {})).location).toBe(claimPath('task-list'));
   });
 
+  it('refuses an individual’s name longer together than pcs-api can keep', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ eligibility: ANSWERED_CLAIM.eligibility });
+    const saves = ccd.draftSaves.length;
+    const page = await app.post(claimPath('claimant-name'), { firstName: 'A'.repeat(30), lastName: 'B'.repeat(30) });
+    expect(text(page.text)).toContain('Your first and last name together must be 60 characters or fewer');
+    expect(ccd.draftSaves).toHaveLength(saves);
+    expect(
+      (await app.post(claimPath('claimant-name'), { firstName: 'A'.repeat(29), lastName: 'B'.repeat(30) })).status
+    ).toBe(303);
+  });
+
   it('shows the errors for a page left unanswered and saves nothing', async () => {
     app = await bootMakeAClaim();
     givenClaim({ eligibility: ANSWERED_CLAIM.eligibility });

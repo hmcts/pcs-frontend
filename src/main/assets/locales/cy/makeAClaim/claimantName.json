@@ -7,6 +7,7 @@
   },
   "errors": {
     "firstName": "cyEnter your first name",
-    "lastName": "cyEnter your last name"
+    "lastName": "cyEnter your last name",
+    "nameTooLong": "cyYour first and last name together must be 60 characters or fewer, including the space between them"
   }
 }

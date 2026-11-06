@@ -235,7 +235,7 @@
     "draftNotFound": "We could not find your saved answers. Start your claim again",
     "draftChanged": "Your claim was changed in another tab or window. Check your answers below, then submit your claim again",
     "otherGroundNotAllowed": "Choose rent arrears grounds on the rent arrears question, not as other grounds",
-    "paymentServiceUnavailable": "Your claim could not be submitted because the payment service is not available. Try again later",
+    "paymentServiceUnavailable": "Your claim could not be submitted because a service we need is not available. Try again later",
     "failed": "Your claim could not be submitted. Try again",
     "pages": {
       "individual-or-organisation": "Are you claiming as an individual or a registered company?",
@@ -260,6 +260,7 @@
       "current-arrears": "What are the rent arrears today?",
       "notice-served": "Have you served notice?",
       "notice-type": "Which type of notice did you serve?",
+      "notice-date": "When was the notice served?",
       "notice-available": "Can you upload a copy of the notice you served?",
       "notice-method": "How did you serve notice?",
       "defendant-circumstances": "The defendants’ circumstances",

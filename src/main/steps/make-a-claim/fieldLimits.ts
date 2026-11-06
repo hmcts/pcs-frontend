@@ -14,6 +14,7 @@ const POSTCODE = 14;
 export const FIELD_LIMITS = {
   claimantFirstName: NAME,
   claimantLastName: NAME,
+  claimantName: NAME,
   organisationName: NAME,
   emailAddress: 254,
   phoneNumber: 20,

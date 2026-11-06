@@ -15,6 +15,10 @@ export const step: StepDefinition = createMakeAClaimStep({
     textField('lastName', {
       maxLength: FIELD_LIMITS.claimantLastName,
       attributes: { autocomplete: 'family-name', spellcheck: false },
+      validator: (value: unknown, formData?: Record<string, unknown>): boolean | string =>
+        `${String(formData?.firstName ?? '').trim()} ${String(value ?? '').trim()}`.length > FIELD_LIMITS.claimantName
+          ? 'errors.nameTooLong'
+          : true,
     }),
   ],
 });
