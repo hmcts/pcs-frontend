@@ -102,7 +102,6 @@ async function detectPageNavigation(): Promise<boolean> {
   return pageNavigated;
 }
 
-/** Third-party payment pages are outside this application's accessibility-test scope. */
 function isExternalPage(previousPageUrl: string, currentPageUrl: string): boolean {
   try {
     return new URL(previousPageUrl).origin !== new URL(currentPageUrl).origin;
