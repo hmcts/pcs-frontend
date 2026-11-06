@@ -66,27 +66,27 @@ export interface EvictionSummaryData {
   }[];
 }
 
-export const warrantReturnTypeList: { value: WarrantReturnType | null; text: string }[] = [
-  { value: null, text: '--Select a value--' },
+export const warrantReturnTypeList: { value: WarrantReturnType | string; text: string }[] = [
+  { value: '', text: '--Select a value--' },
   { value: WarrantReturnType.FINAL, text: 'Final' },
   { value: WarrantReturnType.INTERIM, text: 'Interim' },
 ];
 
-export const evictionOutcomeList: { value: EvictionOutcome | null; text: string }[] = [
-  { value: null, text: '--Select a value--' },
+export const evictionOutcomeList: { value: EvictionOutcome | string; text: string }[] = [
+  { value: '', text: '--Select a value--' },
   { value: EvictionOutcome.SUCCESSFUL, text: 'Eviction successful' },
   { value: EvictionOutcome.UNSUCCESSFUL, text: 'Eviction unsuccessful' },
   { value: EvictionOutcome.CANCELLED, text: 'Eviction cancelled' },
 ];
 
-export const evictionSuccessfulReturnTypeList: { value: EvictionSuccessfulReturnName | null; text: string }[] = [
-  { value: null, text: '--Select a value--' },
+export const evictionSuccessfulReturnTypeList: { value: EvictionSuccessfulReturnName | string; text: string }[] = [
+  { value: '', text: '--Select a value--' },
   { value: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL, text: 'Eviction successful' },
 ];
 
-export const evictionUnsuccessfulReturnTypeList: { value: EvictionUnsuccessfulReturnName | null; text: string }[] = [
+export const evictionUnsuccessfulReturnTypeList: { value: EvictionUnsuccessfulReturnName | string; text: string }[] = [
   {
-    value: null,
+    value: '',
     text: '--Select a value--',
   },
   {
@@ -139,9 +139,9 @@ export const evictionUnsuccessfulReturnTypeList: { value: EvictionUnsuccessfulRe
   },
 ];
 
-export const interimReturnTypeList: { value: InterimReturnName | null; text: string }[] = [
+export const interimReturnTypeList: { value: InterimReturnName | string; text: string }[] = [
   {
-    value: null,
+    value: '',
     text: '--Select a value--',
   },
   {
