@@ -85,7 +85,7 @@ export const step: StepDefinition = {
         relatedApplicationId && relatedApplicationId !== MAIN_CLAIM_OPTION_VALUE ? relatedApplicationId : undefined;
 
       try {
-        await ccdCaseService.submitUploadDocuments(req.session?.user?.accessToken, {
+        await ccdCaseService.submitUploadDocuments(req.session?.user!.accessToken, {
           id: caseId,
           data: { uploadedAdditionalDocuments, selectedRelatedApplicationId },
         });
