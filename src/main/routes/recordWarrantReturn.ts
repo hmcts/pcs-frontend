@@ -29,12 +29,12 @@ import {
 import {
   ValidationIssue,
   errorSummary,
+  getClaimantNames,
+  getDefendantNames,
   manageCaseDetailsUrl,
   mapXuiValidation,
   refusedXuiEvent,
   xuiHeaderModel,
-  getClaimantNames,
-  getDefendantNames,
 } from '@utils/xuiUtils';
 
 const RECORD_WARRANT_RETURN_EVENT_ID: string = 'ext:recordWarrantReturn';

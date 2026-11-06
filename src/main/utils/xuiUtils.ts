@@ -86,9 +86,7 @@ export function getDefendantNames(ccdCase: CcdCaseData): string {
   const defendants = (ccdCase.allDefendants ?? []).map(({ value: party }) => party);
   const isNameUnknown = (party: CcdParty) => normalizeYesNoValue(party.nameKnown) === 'NO';
 
-  const names = defendants
-    .filter(party => !isNameUnknown(party))
-    .map(party => `${party.firstName} ${party.lastName}`);
+  const names = defendants.filter(party => !isNameUnknown(party)).map(party => `${party.firstName} ${party.lastName}`);
 
   if (defendants.some(isNameUnknown)) {
     names.push('Persons unknown');

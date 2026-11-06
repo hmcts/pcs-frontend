@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon';
 
-import { CcdCaseData, CcdCollectionItem, CcdParty } from '@services/ccdCase.interface';
 import { normalizeYesNoValue } from '../steps/utils';
+
+import { CcdCaseData, CcdCollectionItem, CcdParty } from '@services/ccdCase.interface';
 
 export enum WarrantReturnType {
   FINAL = 'FINAL',
