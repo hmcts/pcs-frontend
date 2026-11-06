@@ -87,7 +87,7 @@ export const evictionSuccessfulReturnTypeList: { value: EvictionSuccessfulReturn
 export const evictionUnsuccessfulReturnTypeList: { value: EvictionUnsuccessfulReturnName | null; text: string }[] = [
   {
     value: null,
-    text: '--Select a value--'
+    text: '--Select a value--',
   },
   {
     value: EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
@@ -142,7 +142,7 @@ export const evictionUnsuccessfulReturnTypeList: { value: EvictionUnsuccessfulRe
 export const interimReturnTypeList: { value: InterimReturnName | null; text: string }[] = [
   {
     value: null,
-    text: '--Select a value--'
+    text: '--Select a value--',
   },
   {
     value: InterimReturnName.APPLICATION_UNSUCCESSFUL,
@@ -356,7 +356,11 @@ function handleEvictionSuccessfulShowConditions(evictionSuccessfulReturnNameList
 }
 
 function handleEvictionUnsuccessfulShowConditions(evictionUnsuccessfulReturnNameList: HTMLSelectElement): void {
-  if (isAdditionalDetailsMandatoryEvictionUnsuccessful(evictionUnsuccessfulReturnNameList.value as EvictionUnsuccessfulReturnName)) {
+  if (
+    isAdditionalDetailsMandatoryEvictionUnsuccessful(
+      evictionUnsuccessfulReturnNameList.value as EvictionUnsuccessfulReturnName
+    )
+  ) {
     handleAdditionalDetailsShowConditions(true);
   } else {
     handleAdditionalDetailsShowConditions(false);
@@ -373,7 +377,7 @@ function handleInterimShowConditions(interimReturnNameList: HTMLSelectElement): 
 
 function handleAdditionalDetailsShowConditions(isMandatory: boolean) {
   const label = document.getElementById('additional-details-label');
-  label!.textContent = isMandatory ? 'Additional details' :'Additional details (Optional)';
+  label!.textContent = isMandatory ? 'Additional details' : 'Additional details (Optional)';
 }
 
 function resetAllInputs(): void {
