@@ -213,7 +213,7 @@ export function formatDefendants(ccdCase: CcdCaseData): string {
   let defendantHtml = '<ul class="govuk-list">';
   for (const defendant of allDefendants) {
     const party: CcdParty = defendant.value;
-    if (normalizeYesNoValue(party.nameKnown) === 'NO') {
+    if (normalizeYesNoValue(party.nameKnown) === 'YES') {
       defendantHtml += `<li>${party.firstName} ${party.lastName}</li>`;
     } else {
       hasUnknownDefendants = true;

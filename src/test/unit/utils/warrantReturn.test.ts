@@ -21,20 +21,20 @@ describe('warrantReturn', () => {
         allDefendants: [
           {
             value: {
-              nameKnown: true,
+              nameKnown: 'YES',
               firstName: 'John',
               lastName: 'Smith',
             },
           },
           {
             value: {
-              nameKnown: true,
+              nameKnown: 'YES',
               firstName: 'Jane',
               lastName: 'Doe',
             },
           },
         ],
-      } as unknown as CcdCaseData;
+      } as CcdCaseData;
 
       expect(formatDefendants(ccdCase)).toBe('<ul class="govuk-list"><li>John Smith</li><li>Jane Doe</li></ul>');
     });
@@ -44,16 +44,16 @@ describe('warrantReturn', () => {
         allDefendants: [
           {
             value: {
-              nameKnown: false,
+              nameKnown: 'NO',
             },
           },
           {
             value: {
-              nameKnown: false,
+              nameKnown: 'NO',
             },
           },
         ],
-      } as unknown as CcdCaseData;
+      } as CcdCaseData;
 
       expect(formatDefendants(ccdCase)).toBe('<ul class="govuk-list"><li>person(s) unknown</li></ul>');
     });
@@ -63,7 +63,7 @@ describe('warrantReturn', () => {
         allDefendants: [
           {
             value: {
-              nameKnown: true,
+              nameKnown: 'YES',
               firstName: 'John',
               lastName: 'Smith',
             },
@@ -75,14 +75,14 @@ describe('warrantReturn', () => {
           },
           {
             value: {
-              nameKnown: true,
+              nameKnown: 'YES',
               firstName: 'Jane',
               lastName: 'Doe',
             },
           },
           {
             value: {
-              nameKnown: false,
+              nameKnown: 'NO',
             },
           },
         ],
