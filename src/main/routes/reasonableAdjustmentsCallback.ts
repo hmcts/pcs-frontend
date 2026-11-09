@@ -84,7 +84,7 @@ export default function reasonableAdjustmentsCallbackRoutes(app: Application): v
         // `getCaseByIdForEvent` triggers the citizen respondPossessionClaim event (the same call the
         // journey uses to resume): it enforces access (throws → error page if the user cannot access
         // this case) and returns the in-progress draft response we preserve when persisting flags.
-        const accessToken = req.session.user?.accessToken;
+        const accessToken = req.session.user!.accessToken;
         const existing = await ccdCaseService.getCaseByIdForEvent(
           accessToken ?? '',
           caseReference,

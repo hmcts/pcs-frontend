@@ -434,21 +434,16 @@ export const ccdCaseService = {
   /**
    * Write a defendant's support flags straight to their party via the citizen requestSupport event
    */
-  async submitDefendantSupportFlags(
-    accessToken: string | undefined,
-    caseId: string,
-    supportFlags: CcdFlags
-  ): Promise<CcdCase> {
+  async submitDefendantSupportFlags(accessToken: string, caseId: string, supportFlags: CcdFlags): Promise<CcdCase> {
     const safeCaseId = sanitiseCaseReference(caseId);
     if (!safeCaseId) {
       throw new HTTPError('Invalid case reference format', 404);
     }
 
-    const { eventToken, partyId } = await startDefendantSupport(accessToken || '', safeCaseId);
-    const url = `${getBaseUrl()}/cases/${safeCaseId}/events`;
+    const { eventToken, partyId } = await startDefendantSupport(accessToken, safeCaseId);
     const partySupport: CcdPartySupportEntry[] = [{ id: partyId, value: { supportFlags } }];
 
-    return submitEvent(accessToken || '', url, DEFENDANT_SUPPORT_EVENT_ID, eventToken, { partySupport });
+    return submitEvent(accessToken, caseId, DEFENDANT_SUPPORT_EVENT_ID, eventToken, { partySupport });
   },
 
   /** Submits an event with the token from the `startCaseEvent` the change was based on. */
