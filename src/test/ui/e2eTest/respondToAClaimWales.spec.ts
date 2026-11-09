@@ -321,7 +321,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('verifyYourSupportLink', {
       ysSubHeader: taskList.yourSupportLink,
       respondTag: dashboard.inProgressTag,
-      ysTag: taskList.doneTag,
+      ysTag: taskList.doneDynamicTag,
     });
     await performAction('taskList', { subSection: taskList.uploadDocumentsLink });
     await performAction('uploadFiles');
@@ -1082,7 +1082,7 @@ test.describe('Common Component YS And PCQ Respond to a claim - e2e Journey @nig
     await performAction('verifyYourSupportLink', {
       ysSubHeader: taskList.yourSupportLink,
       respondTag: dashboard.inProgressTag,
-      ysTag: taskList.doneTag,
+      ysTag: taskList.doneDynamicTag,
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
