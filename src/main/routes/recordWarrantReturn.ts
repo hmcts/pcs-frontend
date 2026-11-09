@@ -1,5 +1,6 @@
 import { buildFooterModel } from '@hmcts-cft/cft-ui-component-lib';
-import { Application, Request, Response } from 'express';
+import { Application, NextFunction, Request, Response } from 'express';
+import { DateTime } from 'luxon';
 
 import { RECORD_WARRANT_RETURN_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
@@ -48,9 +49,36 @@ const PAGES = {
 
 type Page = keyof typeof PAGES;
 
+const RETURN_TYPE_ERROR_MESSAGE: string = 'Return is required';
 const RETURN_NAME_ERROR_MESSAGE: string = 'Return name is required';
 const FINAL_OUTCOME_ERROR_MESSAGE: string = 'Final outcome is required';
 const ADDITIONAL_DETAILS_ERROR_MESSAGE: string = 'Additional details is required';
+export const ADDITIONAL_DETAILS_MAX_LENGTH: number = 6800;
+const ADDITIONAL_DETAILS_TOO_LONG_ERROR_MESSAGE: string = `Additional details must be ${ADDITIONAL_DETAILS_MAX_LENGTH.toLocaleString('en-GB')} characters or fewer`;
+
+const EVICTION_DATE_ID = 'eviction-date';
+const EVICTION_DATE_PARTS = ['day', 'month', 'year', 'hour', 'minute'] as const;
+type EvictionDatePart = (typeof EVICTION_DATE_PARTS)[number];
+const EVICTION_DATE_ZONE = 'Europe/London';
+const EVICTION_DATE_REQUIRED_ERROR_MESSAGE: string = 'Eviction date and time is required';
+const EVICTION_DATE_ERROR_MESSAGE: string = 'The data entered is not valid for Eviction date and time';
+const EVICTION_DATE_FUTURE_ERROR_MESSAGE: string = 'Eviction date and time must be in the past';
+
+/** The answers as the page posts them, keyed as the template names its fields. */
+export interface WarrantReturnAnswers {
+  returnType: string;
+  finalOutcome: string;
+  evictionSuccessfulReturnName: string;
+  evictionUnsuccessfulReturnName: string;
+  interimReturnName: string;
+  additionalDetails: string;
+  evictionDate: Record<EvictionDatePart, string>;
+}
+
+interface ValidationResult {
+  issues: ValidationIssue[];
+  warrantReturn?: WarrantReturn;
+}
 
 const logger = Logger.getLogger('recordWarrantReturn');
 
@@ -79,112 +107,117 @@ function pageModel(req: Request, issues: ValidationIssue[] = []): Record<string,
   };
 }
 
+function evictionSummary(ccdCase: CcdCaseData): EvictionSummaryData {
+  return {
+    card: {
+      title: {
+        text: 'Eviction details',
+      },
+    },
+    rows: [
+      {
+        key: {
+          text: 'Claimant type',
+        },
+        value: {
+          text: 'CLAIMANT TYPE PLACEHOLDER', //ccdCase.claimantType!.value.label
+        },
+      },
+      {
+        key: {
+          text: 'Claimant name',
+        },
+        value: {
+          text: formatClaimants(ccdCase),
+        },
+      },
+      {
+        key: {
+          text: 'Defendant(s) name(s)',
+        },
+        value: {
+          html: formatDefendants(ccdCase),
+        },
+      },
+    ],
+  };
+}
+
+/** The case details the page shows above the form, from a new start of the event. */
+async function caseModel(req: Request, caseReference: string): Promise<Record<string, unknown>> {
+  const started = await ccdCaseService.startCaseEvent(
+    req.session.user!.accessToken,
+    caseReference,
+    RECORD_WARRANT_RETURN_EVENT_ID,
+    {}
+  );
+
+  const ccdCase: CcdCaseData = started.data;
+
+  logger.info('claimantType data', ccdCase.claimantType);
+
+  return {
+    evictionData: evictionSummary(ccdCase),
+    propertyAddress: formatAddress(ccdCase.propertyAddress),
+    caseReference,
+    claimantNames: getClaimantNames(ccdCase),
+    defendantNames: getDefendantNames(ccdCase),
+  };
+}
+
+function formModel(
+  req: Request,
+  answers: WarrantReturnAnswers,
+  issues: ValidationIssue[] = []
+): Record<string, unknown> {
+  return {
+    ...pageModel(req, issues),
+    continueUrl: pageUrl(caseReferenceOf(req), 'checkYourAnswers'),
+    warrantReturnTypeList,
+    evictionOutcomeList,
+    evictionSuccessfulReturnTypeList,
+    evictionUnsuccessfulReturnTypeList,
+    interimReturnTypeList,
+    headerModel: xuiHeaderModel(req),
+    additionalDetailsMaxLength: ADDITIONAL_DETAILS_MAX_LENGTH,
+    answers,
+    evictionDateError: issues.find(issue => issue.id.startsWith(`${EVICTION_DATE_ID}-`))?.message,
+  };
+}
+
 export default function recordWarrantReturnRoutes(app: Application): void {
-  app.get(route('warrantReturn'), ...journey, async (req: Request, res: Response, next) => {
+  app.get(route('warrantReturn'), ...journey, async (req: Request, res: Response, next: NextFunction) => {
     try {
       const caseReference = caseReferenceOf(req);
-      const started = await ccdCaseService.startCaseEvent(
-        req.session.user!.accessToken,
-        caseReference,
-        RECORD_WARRANT_RETURN_EVENT_ID,
-        {}
-      );
-
-      const ccdCase: CcdCaseData = started.data;
-
-      logger.info('claimantType data', ccdCase.claimantType);
-
-      const evictionData: EvictionSummaryData = {
-        card: {
-          title: {
-            text: 'Eviction details',
-          },
-        },
-        rows: [
-          {
-            key: {
-              text: 'Claimant type',
-            },
-            value: {
-              text: 'CLAIMANT TYPE PLACEHOLDER', //ccdCase.claimantType!.value.label
-            },
-          },
-          {
-            key: {
-              text: 'Claimant name',
-            },
-            value: {
-              text: formatClaimants(ccdCase),
-            },
-          },
-          {
-            key: {
-              text: 'Defendant(s) name(s)',
-            },
-            value: {
-              html: formatDefendants(ccdCase),
-            },
-          },
-        ],
-      };
+      const answers = answersFromSession(req.session.warrantReturn?.[caseReference]);
 
       res.render('record-warrant-return/warrant-return', {
-        ...pageModel(req),
-        continueUrl: pageUrl(caseReference, 'checkYourAnswers'),
-        warrantReturnTypeList,
-        evictionOutcomeList,
-        evictionSuccessfulReturnTypeList,
-        evictionUnsuccessfulReturnTypeList,
-        interimReturnTypeList,
-        evictionData,
-        propertyAddress: formatAddress(ccdCase.propertyAddress),
-        caseReference,
-        footerModel: buildFooterModel(),
-        headerModel: xuiHeaderModel(req),
-        claimantNames: getClaimantNames(ccdCase),
-        defendantNames: getDefendantNames(ccdCase),
+        ...formModel(req, answers),
+        ...(await caseModel(req, caseReference)),
       });
     } catch (error) {
       refusedXuiEvent(res, next, error);
     }
   });
 
-  app.post(route('warrantReturn'), ...journey, async (req: Request, res: Response, _) => {
-    const returnType: WarrantReturnType = req.body.returnType;
-    let errors: ValidationIssue[];
+  app.post(route('warrantReturn'), ...journey, async (req: Request, res: Response, next: NextFunction) => {
     const caseReference = caseReferenceOf(req);
+    const answers = answersFromBody(req.body);
+    const { issues, warrantReturn } = validateWarrantReturn(answers);
 
-    switch (returnType) {
-      case WarrantReturnType.FINAL:
-        errors = validateFinalWarrantReturn(req, caseReference);
-        break;
-      case WarrantReturnType.INTERIM:
-        errors = validateInterimWarrantReturn(req, caseReference);
-        break;
-      default:
-        errors = [
-          {
-            id: 'return-type',
-            message: 'Return is required',
-          },
-        ];
+    if (issues.length > 0 || !warrantReturn) {
+      try {
+        return res.status(400).render('record-warrant-return/warrant-return', {
+          ...formModel(req, answers, issues),
+          ...(await caseModel(req, caseReference)),
+        });
+      } catch (error) {
+        return refusedXuiEvent(res, next, error);
+      }
     }
 
-    if (errors.length > 0) {
-      res.status(400).render('record-warrant-return/warrant-return', {
-        ...pageModel(req, errors),
-        continueUrl: pageUrl(caseReference, 'checkYourAnswers'),
-        warrantReturnTypeList,
-        evictionOutcomeList,
-        evictionSuccessfulReturnTypeList,
-        evictionUnsuccessfulReturnTypeList,
-        interimReturnTypeList,
-        footerModel: buildFooterModel(),
-        headerModel: xuiHeaderModel(req),
-      });
-    } else {
-      res.redirect(pageUrl(caseReference, 'checkYourAnswers'));
-    }
+    req.session.warrantReturn = { ...req.session.warrantReturn, [caseReference]: warrantReturn };
+    req.session.save(error => (error ? next(error) : res.redirect(pageUrl(caseReference, 'checkYourAnswers'))));
   });
 
   app.get(route('checkYourAnswers'), ...journey, (req: Request, res: Response) => {
@@ -211,111 +244,212 @@ export default function recordWarrantReturnRoutes(app: Application): void {
   });
 }
 
-function validateFinalWarrantReturn(req: Request, caseReference: string): ValidationIssue[] {
-  const errors: ValidationIssue[] = [];
+function text(body: Record<string, unknown> | undefined, name: string): string {
+  const value = body?.[name];
+  return typeof value === 'string' ? value : '';
+}
 
-  const finalOutcome: EvictionOutcome = req.query.finalOutcome as EvictionOutcome;
-  switch (finalOutcome) {
+function answersFromBody(body: Record<string, unknown> | undefined): WarrantReturnAnswers {
+  return {
+    returnType: text(body, 'return-type').trim(),
+    finalOutcome: text(body, 'final-outcome').trim(),
+    evictionSuccessfulReturnName: text(body, 'eviction-successful-return-name').trim(),
+    evictionUnsuccessfulReturnName: text(body, 'eviction-unsuccessful-return-name').trim(),
+    interimReturnName: text(body, 'interim-return-name').trim(),
+    additionalDetails: text(body, 'additional-details'),
+    evictionDate: Object.fromEntries(
+      EVICTION_DATE_PARTS.map(part => [part, text(body, `${EVICTION_DATE_ID}-${part}`).trim()])
+    ) as Record<EvictionDatePart, string>,
+  };
+}
+
+function answersFromSession(warrantReturn: WarrantReturn | undefined): WarrantReturnAnswers {
+  const evictionDate = warrantReturn?.evictionDate
+    ? DateTime.fromISO(warrantReturn.evictionDate, { zone: EVICTION_DATE_ZONE })
+    : undefined;
+  const isFinal = warrantReturn?.returnType === WarrantReturnType.FINAL;
+  const outcome = warrantReturn?.outcome;
+
+  return {
+    returnType: warrantReturn?.returnType ?? '',
+    finalOutcome: (isFinal && outcome) || '',
+    evictionSuccessfulReturnName:
+      (isFinal && outcome === EvictionOutcome.SUCCESSFUL && warrantReturn?.returnName) || '',
+    evictionUnsuccessfulReturnName:
+      (isFinal && outcome !== EvictionOutcome.SUCCESSFUL && warrantReturn?.returnName) || '',
+    interimReturnName: (warrantReturn?.returnType === WarrantReturnType.INTERIM && warrantReturn.returnName) || '',
+    additionalDetails: warrantReturn?.additionalDetails ?? '',
+    evictionDate: Object.fromEntries(
+      EVICTION_DATE_PARTS.map(part => [
+        part,
+        evictionDate?.isValid ? String(part === 'minute' ? evictionDate.toFormat('mm') : evictionDate[part]) : '',
+      ])
+    ) as Record<EvictionDatePart, string>,
+  };
+}
+
+function oneOf<T extends string>(values: Record<string, T>, value: string): T | undefined {
+  return (Object.values(values) as string[]).includes(value) ? (value as T) : undefined;
+}
+
+export function validateWarrantReturn(answers: WarrantReturnAnswers): ValidationResult {
+  switch (answers.returnType) {
+    case WarrantReturnType.FINAL:
+      return validateFinalWarrantReturn(answers);
+    case WarrantReturnType.INTERIM:
+      return validateInterimWarrantReturn(answers);
+    default:
+      return { issues: [{ id: 'return-type', message: RETURN_TYPE_ERROR_MESSAGE }] };
+  }
+}
+
+function validateFinalWarrantReturn(answers: WarrantReturnAnswers): ValidationResult {
+  const outcome = oneOf(EvictionOutcome, answers.finalOutcome);
+  switch (outcome) {
     case EvictionOutcome.SUCCESSFUL:
-      errors.push(...validateEvictionSuccessful(req, caseReference));
-      break;
+      return validateEvictionSuccessful(answers);
     case EvictionOutcome.UNSUCCESSFUL:
     case EvictionOutcome.CANCELLED:
-      errors.push(...validateEvictionUnsuccessful(req, caseReference, finalOutcome));
-      break;
+      return validateEvictionUnsuccessful(answers, outcome);
     default:
-      errors.push({
-        id: 'final-outcome',
-        message: FINAL_OUTCOME_ERROR_MESSAGE,
-      });
+      return { issues: [{ id: 'final-outcome', message: FINAL_OUTCOME_ERROR_MESSAGE }] };
   }
-
-  return errors;
 }
 
-function validateEvictionSuccessful(req: Request, caseReference: string): ValidationIssue[] {
-  const errors: ValidationIssue[] = [];
-  const returnName: EvictionSuccessfulReturnName = req.body
-    .evictionSuccessfulReturnName as EvictionSuccessfulReturnName;
+function validateEvictionSuccessful(answers: WarrantReturnAnswers): ValidationResult {
+  const issues: ValidationIssue[] = [];
+
+  const returnName = oneOf(EvictionSuccessfulReturnName, answers.evictionSuccessfulReturnName);
   if (!returnName) {
-    errors.push({
-      id: 'eviction-successful-return-name',
-      message: RETURN_NAME_ERROR_MESSAGE,
-    });
+    issues.push({ id: 'eviction-successful-return-name', message: RETURN_NAME_ERROR_MESSAGE });
   }
 
-  if (errors.length === 0) {
-    const warrantReturn: WarrantReturn = {
+  const evictionDate = validateEvictionDate(answers.evictionDate, issues);
+
+  // The only successful return name, Eviction successful, needs additional details.
+  issues.push(...validateAdditionalDetails(answers.additionalDetails, true));
+
+  if (issues.length > 0) {
+    return { issues };
+  }
+
+  return {
+    issues,
+    warrantReturn: {
       returnType: WarrantReturnType.FINAL,
-      returnName,
       outcome: EvictionOutcome.SUCCESSFUL,
-      additionalDetails: req.body.additionalDetails,
-    };
-    req.session.warrantReturn = { ...req.session.warrantReturn, [caseReference]: warrantReturn };
-  }
-
-  return errors;
-}
-
-function validateEvictionUnsuccessful(
-  req: Request,
-  caseReference: string,
-  outcome: EvictionOutcome
-): ValidationIssue[] {
-  const errors: ValidationIssue[] = [];
-  const returnName: EvictionUnsuccessfulReturnName = req.body
-    .evictionUnsuccessfulReturnName as EvictionUnsuccessfulReturnName;
-  if (!returnName) {
-    errors.push({
-      id: 'eviction-unsuccessful-return-name',
-      message: RETURN_NAME_ERROR_MESSAGE,
-    });
-  }
-
-  if (isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName) && !req.body.additionalDetails) {
-    errors.push({
-      id: 'additional-details',
-      message: ADDITIONAL_DETAILS_ERROR_MESSAGE,
-    });
-  }
-
-  if (errors.length === 0) {
-    const warrantReturn: WarrantReturn = {
-      returnType: WarrantReturnType.FINAL,
       returnName,
-      outcome,
-      additionalDetails: req.body.additionalDetails,
-    };
-    req.session.warrantReturn = { ...req.session.warrantReturn, [caseReference]: warrantReturn };
-  }
-  return errors;
+      evictionDate,
+      additionalDetails: answers.additionalDetails,
+    },
+  };
 }
 
-function validateInterimWarrantReturn(req: Request, caseReference: string): ValidationIssue[] {
-  const errors: ValidationIssue[] = [];
-  const returnName: InterimReturnName = req.body.interimReturnName as InterimReturnName;
+function validateEvictionUnsuccessful(answers: WarrantReturnAnswers, outcome: EvictionOutcome): ValidationResult {
+  const issues: ValidationIssue[] = [];
 
+  const returnName = oneOf(EvictionUnsuccessfulReturnName, answers.evictionUnsuccessfulReturnName);
   if (!returnName) {
-    errors.push({
-      id: 'interim-return-name',
-      message: RETURN_NAME_ERROR_MESSAGE,
-    });
+    issues.push({ id: 'eviction-unsuccessful-return-name', message: RETURN_NAME_ERROR_MESSAGE });
   }
 
-  if (isAdditionalDetailsMandatoryInterim(returnName) && !req.body.additionalDetails) {
-    errors.push({
-      id: 'additional-details',
-      message: ADDITIONAL_DETAILS_ERROR_MESSAGE,
-    });
+  issues.push(
+    ...validateAdditionalDetails(
+      answers.additionalDetails,
+      !!returnName && isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName)
+    )
+  );
+
+  if (issues.length > 0) {
+    return { issues };
   }
 
-  if (errors.length === 0) {
-    const warrantReturn: WarrantReturn = {
+  return {
+    issues,
+    warrantReturn: {
+      returnType: WarrantReturnType.FINAL,
+      outcome,
+      returnName,
+      additionalDetails: answers.additionalDetails || undefined,
+    },
+  };
+}
+
+function validateInterimWarrantReturn(answers: WarrantReturnAnswers): ValidationResult {
+  const issues: ValidationIssue[] = [];
+
+  const returnName = oneOf(InterimReturnName, answers.interimReturnName);
+  if (!returnName) {
+    issues.push({ id: 'interim-return-name', message: RETURN_NAME_ERROR_MESSAGE });
+  }
+
+  issues.push(
+    ...validateAdditionalDetails(
+      answers.additionalDetails,
+      !!returnName && isAdditionalDetailsMandatoryInterim(returnName)
+    )
+  );
+
+  if (issues.length > 0) {
+    return { issues };
+  }
+
+  return {
+    issues,
+    warrantReturn: {
       returnType: WarrantReturnType.INTERIM,
       returnName,
-      additionalDetails: req.body.additionalDetails,
-    };
-    req.session.warrantReturn = { ...req.session.warrantReturn, [caseReference]: warrantReturn };
+      additionalDetails: answers.additionalDetails || undefined,
+    },
+  };
+}
+
+function validateAdditionalDetails(additionalDetails: string, isMandatory: boolean): ValidationIssue[] {
+  if (isMandatory && !additionalDetails.trim()) {
+    return [{ id: 'additional-details', message: ADDITIONAL_DETAILS_ERROR_MESSAGE }];
   }
-  return errors;
+  if (additionalDetails.length > ADDITIONAL_DETAILS_MAX_LENGTH) {
+    return [{ id: 'additional-details', message: ADDITIONAL_DETAILS_TOO_LONG_ERROR_MESSAGE }];
+  }
+  return [];
+}
+
+function validateEvictionDate(
+  parts: Record<EvictionDatePart, string>,
+  issues: ValidationIssue[],
+  now: DateTime = DateTime.now()
+): string | undefined {
+  const fieldId = (part: EvictionDatePart) => `${EVICTION_DATE_ID}-${part}`;
+
+  const missing = EVICTION_DATE_PARTS.filter(part => !parts[part]);
+  if (missing.length === EVICTION_DATE_PARTS.length) {
+    issues.push({ id: fieldId('day'), message: EVICTION_DATE_REQUIRED_ERROR_MESSAGE });
+    return undefined;
+  }
+  if (missing.length > 0) {
+    issues.push({ id: fieldId(missing[0]), message: EVICTION_DATE_ERROR_MESSAGE });
+    return undefined;
+  }
+
+  const notNumeric = EVICTION_DATE_PARTS.find(part =>
+    part === 'year' ? !/^\d{4}$/.test(parts[part]) : !/^\d{1,2}$/.test(parts[part])
+  );
+  if (notNumeric) {
+    issues.push({ id: fieldId(notNumeric), message: EVICTION_DATE_ERROR_MESSAGE });
+    return undefined;
+  }
+
+  const [day, month, year, hour, minute] = EVICTION_DATE_PARTS.map(part => Number(parts[part]));
+  const evictionDate = DateTime.fromObject({ day, month, year, hour, minute }, { zone: EVICTION_DATE_ZONE });
+  if (!evictionDate.isValid || evictionDate.hour !== hour || evictionDate.minute !== minute) {
+    issues.push({ id: fieldId('day'), message: EVICTION_DATE_ERROR_MESSAGE });
+    return undefined;
+  }
+
+  if (evictionDate > now) {
+    issues.push({ id: fieldId('day'), message: EVICTION_DATE_FUTURE_ERROR_MESSAGE });
+    return undefined;
+  }
+
+  return evictionDate.toISO() ?? undefined;
 }

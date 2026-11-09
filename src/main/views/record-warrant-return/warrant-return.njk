@@ -19,7 +19,9 @@
         label: {
           text: "Return"
         },
-        items: warrantReturnTypeList
+        items: warrantReturnTypeList,
+        value: answers.returnType,
+        errorMessage: validationErrors["return-type"]
       })
      }}
 
@@ -30,7 +32,9 @@
           label: {
             text: "Final outcome"
           },
-          items: evictionOutcomeList
+          items: evictionOutcomeList,
+          value: answers.finalOutcome,
+          errorMessage: validationErrors["final-outcome"]
         })
       }}
     </div>
@@ -42,7 +46,9 @@
           label: {
             text: "Return name"
           },
-          items: evictionSuccessfulReturnTypeList
+          items: evictionSuccessfulReturnTypeList,
+          value: answers.evictionSuccessfulReturnName,
+          errorMessage: validationErrors["eviction-successful-return-name"]
         })
       }}
 
@@ -50,7 +56,9 @@
         dateInput(
           "eviction-date",
           "Eviction date and time",
-          "For example, 27 3 2026 14 30. Use the 24-hour clock."
+          "For example, 27 3 2026 14 30. Use the 24-hour clock.",
+          answers.evictionDate,
+          evictionDateError
         )
       }}
     </div>
@@ -62,7 +70,9 @@
           label: {
             text: "Return name"
           },
-          items: evictionUnsuccessfulReturnTypeList
+          items: evictionUnsuccessfulReturnTypeList,
+          value: answers.evictionUnsuccessfulReturnName,
+          errorMessage: validationErrors["eviction-unsuccessful-return-name"]
         })
       }}
     </div>
@@ -74,7 +84,9 @@
           label: {
             text: "Return name"
           },
-          items: interimReturnTypeList
+          items: interimReturnTypeList,
+          value: answers.interimReturnName,
+          errorMessage: validationErrors["interim-return-name"]
         })
       }}
     </div>
@@ -82,7 +94,9 @@
     {{ govukCharacterCount({
         name: "additional-details",
         id: "additional-details",
-        maxLength: 6800,
+        maxlength: additionalDetailsMaxLength,
+        value: answers.additionalDetails,
+        errorMessage: validationErrors["additional-details"],
         label: {
           text: "Additional details",
           classes: "",

@@ -1,5 +1,3 @@
-import { DateTime } from 'luxon';
-
 import { normalizeYesNoValue } from '../steps/utils/normalizeYesNoValue';
 
 import { CcdCaseData, CcdCollectionItem, CcdParty } from '@services/ccdCase.interface';
@@ -54,7 +52,7 @@ export interface WarrantReturn {
   returnName?: InterimReturnName | EvictionSuccessfulReturnName | EvictionUnsuccessfulReturnName;
   outcome?: EvictionOutcome;
   additionalDetails?: string;
-  evictionDate?: DateTime;
+  evictionDate?: string;
 }
 
 export interface EvictionSummaryData {

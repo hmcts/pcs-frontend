@@ -17,7 +17,13 @@ import { Application } from 'express';
 
 import recordWarrantReturnRoutes from '@routes/recordWarrantReturn';
 import { ccdCaseService } from '@services/ccdCaseService';
-import { EvictionOutcome, EvictionSuccessfulReturnName, WarrantReturnType } from '@utils/warrantReturn';
+import {
+  EvictionOutcome,
+  EvictionSuccessfulReturnName,
+  EvictionUnsuccessfulReturnName,
+  InterimReturnName,
+  WarrantReturnType,
+} from '@utils/warrantReturn';
 
 type RouteHandler = (req: Request, res: Response, next: jest.Mock) => Promise<void> | void;
 
@@ -111,54 +117,245 @@ describe('recordWarrantReturnRoutes', () => {
   });
 
   describe('POST warrantReturn', () => {
-    it('renders validation errors when no return type is supplied', async () => {
-      const handler = postHandler('/case/:caseReference/record-warrant-return');
+    const path = '/case/:caseReference/record-warrant-return';
 
+    const evictionDate = { day: '1', month: '3', year: '2026', hour: '14', minute: '05' };
+    const evictionDateFields = (parts: Record<string, string> = evictionDate) =>
+      Object.fromEntries(Object.entries(parts).map(([part, value]) => [`eviction-date-${part}`, value]));
+
+    const post = async (body: Record<string, unknown>, session: Record<string, unknown> = {}) => {
       const res = {
         status: jest.fn().mockReturnThis(),
         render: jest.fn(),
+        redirect: jest.fn(),
       };
+      const req = {
+        params: { caseReference: '123' },
+        originalUrl: '/case/123/record-warrant-return',
+        body,
+        session: {
+          warrantReturn: undefined as Record<string, unknown> | undefined,
+          user: { accessToken: 'token' },
+          save: jest.fn((callback: (error?: Error) => void) => callback()),
+          ...session,
+        },
+      };
+      const next = jest.fn();
+      await postHandler(path)(req as unknown as Request, res as unknown as Response, next);
+      return { req, res, next };
+    };
 
-      await handler(
+    const errorIds = (res: { render: jest.Mock }): string[] =>
+      Object.keys(res.render.mock.calls[0][1].validationErrors);
+
+    it('renders validation errors when no return type is supplied', async () => {
+      const { res } = await post({});
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(errorIds(res)).toEqual(['return-type']);
+      expect(res.render).toHaveBeenCalledWith(
+        'record-warrant-return/warrant-return',
+        expect.objectContaining({ evictionData: expect.any(Object), caseReference: '123' })
+      );
+    });
+
+    it('requires a final outcome for a final return', async () => {
+      const { res } = await post({ 'return-type': WarrantReturnType.FINAL });
+
+      expect(errorIds(res)).toEqual(['final-outcome']);
+    });
+
+    it('saves a successful eviction to the session and redirects to check your answers', async () => {
+      const { req, res } = await post({
+        'return-type': WarrantReturnType.FINAL,
+        'final-outcome': EvictionOutcome.SUCCESSFUL,
+        'eviction-successful-return-name': EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+        'additional-details': 'Keys handed to claimant',
+        ...evictionDateFields(),
+      });
+
+      expect(req.session.warrantReturn).toEqual({
+        '123': {
+          returnType: WarrantReturnType.FINAL,
+          outcome: EvictionOutcome.SUCCESSFUL,
+          returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+          evictionDate: '2026-03-01T14:05:00.000+00:00',
+          additionalDetails: 'Keys handed to claimant',
+        },
+      });
+      expect(req.session.save).toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return/check-your-answers');
+    });
+
+    it('keeps the answers and shows errors for a successful eviction with nothing filled in', async () => {
+      const { res, req } = await post({
+        'return-type': WarrantReturnType.FINAL,
+        'final-outcome': EvictionOutcome.SUCCESSFUL,
+      });
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(errorIds(res)).toEqual(['eviction-successful-return-name', 'eviction-date-day', 'additional-details']);
+      expect(res.render.mock.calls[0][1]).toEqual(
+        expect.objectContaining({
+          evictionDateError: 'Eviction date and time is required',
+          answers: expect.objectContaining({ returnType: 'FINAL', finalOutcome: 'SUCCESSFUL' }),
+        })
+      );
+      expect(req.session.warrantReturn).toBeUndefined();
+    });
+
+    it.each([
+      [
+        { ...evictionDate, month: '', minute: '' },
+        'eviction-date-month',
+        'The data entered is not valid for Eviction date and time',
+      ],
+      [{ ...evictionDate, day: 'x' }, 'eviction-date-day', 'The data entered is not valid for Eviction date and time'],
+      [
+        { ...evictionDate, year: '26' },
+        'eviction-date-year',
+        'The data entered is not valid for Eviction date and time',
+      ],
+      [
+        { ...evictionDate, day: '30', month: '2' },
+        'eviction-date-day',
+        'The data entered is not valid for Eviction date and time',
+      ],
+      [
+        { ...evictionDate, hour: '24' },
+        'eviction-date-day',
+        'The data entered is not valid for Eviction date and time',
+      ],
+      [
+        { ...evictionDate, minute: '60' },
+        'eviction-date-day',
+        'The data entered is not valid for Eviction date and time',
+      ],
+      [
+        { ...evictionDate, day: '29', month: '3', hour: '1', minute: '30' },
+        'eviction-date-day',
+        'The data entered is not valid for Eviction date and time',
+      ],
+      [{ ...evictionDate, year: '2999' }, 'eviction-date-day', 'Eviction date and time must be in the past'],
+    ])('rejects eviction date %o', async (parts, id, message) => {
+      const { res } = await post({
+        'return-type': WarrantReturnType.FINAL,
+        'final-outcome': EvictionOutcome.SUCCESSFUL,
+        'eviction-successful-return-name': EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+        'additional-details': 'Details',
+        ...evictionDateFields(parts),
+      });
+
+      expect(res.render.mock.calls[0][1].validationErrors).toEqual({ [id]: { text: message } });
+      expect(res.render.mock.calls[0][1].evictionDateError).toBe(message);
+    });
+
+    it('requires additional details for an unsuccessful return name that needs them', async () => {
+      const { res } = await post({
+        'return-type': WarrantReturnType.FINAL,
+        'final-outcome': EvictionOutcome.UNSUCCESSFUL,
+        'eviction-unsuccessful-return-name': EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
+        'additional-details': '   ',
+      });
+
+      expect(errorIds(res)).toEqual(['additional-details']);
+    });
+
+    it('saves a cancelled eviction without an eviction date', async () => {
+      const { req, res } = await post({
+        'return-type': WarrantReturnType.FINAL,
+        'final-outcome': EvictionOutcome.CANCELLED,
+        'eviction-unsuccessful-return-name': EvictionUnsuccessfulReturnName.WARRANT_EXPIRED,
+        ...evictionDateFields(),
+      });
+
+      expect(req.session.warrantReturn).toEqual({
+        '123': {
+          returnType: WarrantReturnType.FINAL,
+          outcome: EvictionOutcome.CANCELLED,
+          returnName: EvictionUnsuccessfulReturnName.WARRANT_EXPIRED,
+          additionalDetails: undefined,
+        },
+      });
+      expect(res.redirect).toHaveBeenCalled();
+    });
+
+    it('rejects a return name that is not one of the options', async () => {
+      const { res } = await post({
+        'return-type': WarrantReturnType.INTERIM,
+        'interim-return-name': 'NOT_A_RETURN_NAME',
+      });
+
+      expect(errorIds(res)).toEqual(['interim-return-name']);
+    });
+
+    it('rejects additional details over the maximum length', async () => {
+      const { res } = await post({
+        'return-type': WarrantReturnType.INTERIM,
+        'interim-return-name': InterimReturnName.CROWDS_OR_PROTESTS,
+        'additional-details': 'a'.repeat(6801),
+      });
+
+      expect(res.render.mock.calls[0][1].validationErrors).toEqual({
+        'additional-details': { text: 'Additional details must be 6,800 characters or fewer' },
+      });
+    });
+
+    it('saves an interim return and keeps the answers of other cases', async () => {
+      const otherCase = { returnType: WarrantReturnType.INTERIM, returnName: InterimReturnName.CROWDS_OR_PROTESTS };
+      const { req } = await post(
         {
-          params: {
-            caseReference: '123',
+          'return-type': WarrantReturnType.INTERIM,
+          'interim-return-name': InterimReturnName.REOPEN_WARRANT,
+          'additional-details': 'Reopen it',
+        },
+        { warrantReturn: { '456': otherCase } }
+      );
+
+      expect(req.session.warrantReturn).toEqual({
+        '456': otherCase,
+        '123': {
+          returnType: WarrantReturnType.INTERIM,
+          returnName: InterimReturnName.REOPEN_WARRANT,
+          additionalDetails: 'Reopen it',
+        },
+      });
+    });
+  });
+
+  describe('GET warrantReturn with saved answers', () => {
+    it('shows the answers saved in the session for a successful eviction', async () => {
+      const res = { render: jest.fn() };
+
+      await getHandler('/case/:caseReference/record-warrant-return')(
+        {
+          params: { caseReference: '123' },
+          session: {
+            user: { accessToken: 'token' },
+            warrantReturn: {
+              '123': {
+                returnType: WarrantReturnType.FINAL,
+                outcome: EvictionOutcome.SUCCESSFUL,
+                returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+                evictionDate: '2026-07-01T09:05:00.000+01:00',
+                additionalDetails: 'Details',
+              },
+            },
           },
-          body: {},
         } as unknown as Request,
         res as unknown as Response,
         jest.fn()
       );
 
-      expect(res.status).toHaveBeenCalledWith(400);
-
-      expect(res.render).toHaveBeenCalled();
-    });
-
-    it('redirects to check your answers for a valid final return', async () => {
-      const res = {
-        redirect: jest.fn(),
-      };
-
-      const req = {
-        params: {
-          caseReference: '123',
-        },
-        query: {
-          finalOutcome: EvictionOutcome.SUCCESSFUL,
-        },
-        body: {
-          returnType: WarrantReturnType.FINAL,
-          evictionSuccessfulReturnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
-        },
-        session: {},
-      };
-
-      const handler = postHandler('/case/:caseReference/record-warrant-return');
-
-      await handler(req as unknown as Request, res as unknown as Response, jest.fn());
-
-      expect(res.redirect).toHaveBeenCalled();
+      expect(res.render.mock.calls[0][1].answers).toEqual({
+        returnType: 'FINAL',
+        finalOutcome: 'SUCCESSFUL',
+        evictionSuccessfulReturnName: 'EVICTION_SUCCESSFUL',
+        evictionUnsuccessfulReturnName: '',
+        interimReturnName: '',
+        additionalDetails: 'Details',
+        evictionDate: { day: '1', month: '7', year: '2026', hour: '9', minute: '05' },
+      });
     });
   });
 });
