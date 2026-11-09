@@ -13,7 +13,7 @@ const JUDGE_JOURNEY_PATHS = [
   /^\/case\/\d+\/confirm-order-review(?:\/.*)?$/,
   /^\/docweave\/templates(?:\/.*)?$/,
   /^\/cases\/\d+\/event\/ext:recordWarrantReturn$/,
-  /^\/case\/\d+\/record-warrant-return$(?:\/.*)?$/,
+  /^\/case\/\d+\/record-warrant-return(?:\/.*)?$/,
 ] as const;
 
 const NON_PAGE_PATHS = [
