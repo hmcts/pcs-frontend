@@ -20,6 +20,10 @@ import { Logger } from '@modules/logger';
 
 jest.mock('config');
 jest.mock('jose');
+const mockGetLaunchDarklyFlag = jest.fn();
+jest.mock('../../../../main/utils/getLaunchDarklyFlag', () => ({
+  getLaunchDarklyFlag: (...args: unknown[]) => mockGetLaunchDarklyFlag(...args),
+}));
 jest.mock('openid-client', () => ({
   discovery: jest.fn(),
   randomPKCECodeVerifier: jest.fn(),
@@ -629,6 +633,46 @@ describe('OIDCModule', () => {
         expect(buildEndSessionUrl).not.toHaveBeenCalled();
         expect(mockRequest.session.destroy).toHaveBeenCalled();
         expect(mockResponse.redirect).toHaveBeenCalledWith('https://manage-case.aat.platform.hmcts.net/auth/logout');
+      });
+
+      it('should redirect directly to XUI logout URL for staff users while make order is enabled', async () => {
+        mockGetLaunchDarklyFlag.mockResolvedValue(true);
+        mockRequest.session = createMockSession({
+          user: {
+            idToken: 'test-id-token',
+            roles: ['caseworker', 'caseworker-pcs'],
+          },
+          destroy: jest.fn().mockImplementation(function (callback) {
+            callback(null);
+          }),
+        });
+
+        oidcModule.enableFor(mockApp);
+        const logoutHandler = (mockApp.get as jest.Mock).mock.calls[2][1];
+        await logoutHandler(mockRequest, mockResponse, mockNext);
+
+        expect(buildEndSessionUrl).not.toHaveBeenCalled();
+        expect(mockResponse.redirect).toHaveBeenCalledWith('https://manage-case.aat.platform.hmcts.net/auth/logout');
+      });
+
+      it('should log staff users out through IDAM while make order is disabled', async () => {
+        mockGetLaunchDarklyFlag.mockResolvedValue(false);
+        (buildEndSessionUrl as jest.Mock).mockReturnValue({ href: 'http://test-issuer/logout' });
+        mockRequest.session = createMockSession({
+          user: {
+            idToken: 'test-id-token',
+            roles: ['caseworker', 'caseworker-pcs'],
+          },
+          destroy: jest.fn().mockImplementation(function (callback) {
+            callback(null);
+          }),
+        });
+
+        oidcModule.enableFor(mockApp);
+        const logoutHandler = (mockApp.get as jest.Mock).mock.calls[2][1];
+        await logoutHandler(mockRequest, mockResponse, mockNext);
+
+        expect(mockResponse.redirect).toHaveBeenCalledWith('http://test-issuer/logout');
       });
     });
 

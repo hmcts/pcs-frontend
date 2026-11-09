@@ -14,6 +14,10 @@ import {
 
 export type { CcdCase, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
 
+export function isDefendantResponseSubmitted(data: CcdCaseData | undefined): boolean {
+  return data?.possessionClaimResponse?.defendantResponses?.status === 'SUBMITTED';
+}
+
 export class CcdCaseModel {
   protected readonly validatedCase: CcdCase;
 
@@ -294,6 +298,10 @@ export class CcdCaseModel {
 
   get defendantContactDetailsPartyPhoneNumber(): string | undefined {
     return this.defendantContactDetailsParty.phoneNumber ?? undefined;
+  }
+
+  get defendantContactDetailsPartyTextMessageNumber(): string | undefined {
+    return this.defendantContactDetailsParty.textMessageNumber ?? undefined;
   }
 
   get defendantContactDetailsPartyName(): string {

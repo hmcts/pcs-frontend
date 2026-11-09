@@ -6,6 +6,7 @@
 
   "options": {
     "yes": "Yes",
+    "no": "No",
     "noOption": "No"
   },
 

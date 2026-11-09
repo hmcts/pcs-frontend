@@ -15,11 +15,11 @@
   },
   "rows": {
     "shareIncomeExpenseDetails": {
-      "label": "Ydy'r diffynnydd eisiau rhoi manylion eu hincwm a threuliau?",
+      "label": "Ydy’r diffynnydd eisiau rhoi manylion eu hincwm a threuliau?",
       "changeHidden": "rhannu manylion incwm a threuliau"
     },
     "regularIncome": {
-      "label": "Pa incwm rheolaidd mae'r diffynnydd yn ei dderbyn?",
+      "label": "Pa incwm rheolaidd mae’r diffynnydd yn ei dderbyn?",
       "changeHidden": "incwm rheolaidd",
       "options": {
         "incomeFromJobs": "Incwm o bob swydd a wneir ganddynt",
@@ -30,7 +30,7 @@
       }
     },
     "hasAppliedForUniversalCredit": {
-      "label": "A yw'r diffynnydd wedi gwneud cais am Gredyd Cynhwysol?",
+      "label": "A yw’r diffynnydd wedi gwneud cais am Gredyd Cynhwysol?",
       "changeHidden": "wedi gwneud cais am Gredyd Cynhwysol"
     },
     "universalCreditApplicationDate": {
@@ -42,18 +42,18 @@
       "changeHidden": "dyledion blaenoriaeth"
     },
     "priorityDebtTotal": {
-      "label": "Beth yw'r cyfanswm sy'n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth?",
+      "label": "Beth yw’r cyfanswm sy’n ddyledus gan y diffynnydd ar gyfer eu holl ddyledion blaenoriaeth?",
       "changeHidden": "cyfanswm dyled flaenoriaeth"
     },
     "priorityDebtContribution": {
-      "label": "Faint mae'r diffynnydd yn ei dalu tuag at eu dyledion blaenoriaeth bob wythnos neu fis?",
+      "label": "Faint mae’r diffynnydd yn ei dalu tuag at eu dyledion blaenoriaeth bob wythnos neu fis?",
       "changeHidden": "cyfraniad dyled flaenoriaeth"
     },
     "regularExpenses": {
       "label": "Pa dreuliau misol rheolaidd sydd gan y diffynnydd?",
       "changeHidden": "costau rheolaidd",
       "options": {
-        "householdBills": "Biliau'r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
+        "householdBills": "Biliau’r cartref (e.e. treth y cyngor, nwy, trydan, dŵr, rhyngrwyd)",
         "loanPayments": "Taliadau benthyciadau",
         "childSpousalMaintenance": "Cynhaliaeth plant neu ŵr/wraig",
         "mobilePhone": "Ffôn symudol",
@@ -65,11 +65,11 @@
       }
     },
     "otherConsiderations": {
-      "label": "Oes yna unrhyw beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys fel rhan o'u hymateb?",
+      "label": "Oes yna unrhyw beth arall mae’r diffynnydd eisiau ei ddweud wrth y llys fel rhan o’u hymateb?",
       "changeHidden": "ystyriaethau eraill"
     },
     "otherConsiderationsDetails": {
-      "label": "Rhowch fanylion beth arall mae'r diffynnydd eisiau ei ddweud wrth y llys",
+      "label": "Rhowch fanylion beth arall mae’r diffynnydd eisiau ei ddweud wrth y llys",
       "changeHidden": "manylion ystyriaethau eraill"
     }
   }

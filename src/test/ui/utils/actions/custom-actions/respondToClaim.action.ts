@@ -1,4 +1,4 @@
-import { Locator, Page, expect } from '@playwright/test';
+import { Locator, Page, expect, test } from '@playwright/test';
 
 import { submitCaseApiData } from '../../../data/api-data';
 import { submitCaseApiDataWales } from '../../../data/api-data/submitCaseWales.api.data';
@@ -101,6 +101,7 @@ const rtcCyaFailurePreviewLimit = 10;
 
 const rtcCyaLabels = {
   contactDetails: 'Contact details',
+  textMessagePhoneNumber: 'UK phone number',
   counterClaimHelpWithFeesReference: 'Enter your Help with Fees reference number',
   universalCreditApplicationDate: 'When did you apply for Universal Credit?',
 } as const;
@@ -249,6 +250,9 @@ export class RespondToClaimAction implements IAction {
       ['counterClaimOrderOtherThanSum', () => this.counterClaimOrderOtherThanSum(fieldName as actionRecord)],
       ['selectReasonableAdjustments', () => this.selectReasonableAdjustments(fieldName as actionRecord, page)],
       ['selectEqualityAndDiversity', () => this.selectEqualityAndDiversity(fieldName as actionRecord)],
+      ['verifyYourSupportLink', () => this.verifyYourSupportLink(fieldName as actionRecord, page)],
+      ['verifySupportAdjustments', () => this.verifySupportAdjustments(fieldName as actionRecord, page)],
+      ['changeSupport', () => this.changeSupport(fieldName as actionRecord, page)],
     ]);
     const actionToPerform = actionsMap.get(action);
     if (!actionToPerform) {
@@ -605,6 +609,9 @@ export class RespondToClaimAction implements IAction {
     });
 
     if (contactData.radioOption === 'Yes') {
+      // The text-message number is rendered as its own row on the personal-details CYA.
+      // Record it explicitly so section validation cannot pass without checking it.
+      this.recordAnswer(rtcCyaLabels.textMessagePhoneNumber, String(contactData.mobileNumber));
       await performAction(
         'inputText',
         contactPreferencesTextMessage.ukMobileNumberHiddenTextLabel,
@@ -791,7 +798,7 @@ export class RespondToClaimAction implements IAction {
 
   private async selectTenancyStartDateKnown(tenancyStartDateData: actionRecord): Promise<void> {
     await performValidation('text', {
-      elementType: 'paragraph',
+      elementType: 'subHeader',
       text: tenancyDateDetails.getDetailsGivenByParagraph(),
     });
     this.recordAnswer(tenancyDateDetails.isTheTenancyLicenceOrOccupationContractQuestion, tenancyStartDateData.option);
@@ -1831,5 +1838,65 @@ export class RespondToClaimAction implements IAction {
       option: diversityData.radioOption,
     });
     await performAction('clickButton', diversityData.button);
+  }
+
+  private async verifyYourSupportLink(ysData: actionRecord, page: Page) {
+    const isResponseCompleted = String(ysData.respondTag).toLowerCase() === 'completed';
+    const isResponseInProgress = String(ysData.respondTag).toLowerCase() === 'in progress';
+    const yourSupportText = String(ysData.ysSubHeader);
+    const yourSupportTask = page.locator('li.govuk-task-list__item').filter({ hasText: yourSupportText });
+    if (isResponseCompleted || isResponseInProgress) {
+      await expect(yourSupportTask.getByRole('link', { name: yourSupportText })).toBeVisible();
+      await expect(yourSupportTask.locator('.govuk-task-list__status')).toHaveText(String(ysData.ysTag));
+    } else {
+      await expect(yourSupportTask.getByRole('link', { name: yourSupportText })).toHaveCount(0);
+      await expect(yourSupportTask.getByText(yourSupportText, { exact: true })).toBeVisible();
+      await expect(yourSupportTask.locator('.govuk-task-list__status')).toBeEmpty();
+    }
+    if (ysData.rtcSubHeader && isResponseCompleted) {
+      const rtcHeader = String(ysData.rtcSubHeader);
+      const rtcTask = page.locator('li.govuk-task-list__item').filter({ hasText: rtcHeader });
+      await expect(rtcTask.getByText(rtcHeader, { exact: true })).toBeVisible();
+      await expect(rtcTask.getByRole('link', { name: rtcHeader })).toHaveCount(0);
+    }
+  }
+
+  private async verifySupportAdjustments(expectedData: actionRecord, page: Page): Promise<void> {
+    const expectedAdjustments = expectedData.expectedAdjustments as { type: string; status: string }[] | undefined;
+    if (!expectedAdjustments) {
+      throw new Error('expectedAdjustments data is required');
+    }
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Support for');
+    const adjustmentItems = page.locator('.govuk-task-list__item');
+    await expect(adjustmentItems).toHaveCount(expectedAdjustments.length);
+    for (const { type, status } of expectedAdjustments) {
+      await test.step(`Verify adjustment: ${type} (${status})`, async () => {
+        const adjustment = adjustmentItems.filter({ hasText: type });
+        await expect(adjustment).toHaveCount(1);
+        await expect(adjustment.locator('.overview-col1')).toHaveText(type);
+        await expect(adjustment.locator('.govuk-tag')).toHaveText(status);
+      });
+    }
+  }
+
+  private async changeSupport(changeData: actionRecord, page: Page): Promise<void> {
+    const adjustments = changeData.expectedAdjustments as string[];
+    const notNeededLink = String(changeData.notNeededLink);
+    const stillNeeded = String(changeData.stillNeeded);
+    for (const adjustmentType of adjustments) {
+      const adjustment = page.locator('.govuk-task-list__item', {
+        has: page.getByText(adjustmentType, { exact: true }),
+      });
+      await expect(adjustment).toHaveCount(1);
+      await adjustment.getByRole('link', { name: notNeededLink }).click();
+      await expect(
+        page.getByRole('heading', { level: 3, name: String(changeData.supportYouNoLongerNeedHeader) })
+      ).toBeVisible();
+      const noLongerNeededAdjustment = page.locator('.govuk-task-list__item', {
+        has: page.getByText(adjustmentType, { exact: true }),
+      });
+      await expect(noLongerNeededAdjustment).toHaveCount(1);
+      await expect(noLongerNeededAdjustment.getByRole('link', { name: stillNeeded })).toBeVisible();
+    }
   }
 }

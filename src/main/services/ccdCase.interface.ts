@@ -110,6 +110,7 @@ export interface Party {
   idamId: string;
   firstName: string;
   lastName: string;
+  orgName?: string;
 }
 
 export interface Document {
@@ -146,6 +147,7 @@ export interface CcdParty {
   addressKnown?: string;
   addressSameAsProperty?: string;
   dateOfBirth?: string;
+  rank?: number;
 }
 
 /** Claimant-entered defendant details captured when the claim was created. */
@@ -175,6 +177,7 @@ export interface CcdDefendantParty {
 
 /** Counter-claim data captured across the counterclaim journey screens. */
 export interface CcdCounterClaim {
+  status?: string;
   needHelpWithFees?: YesNoValue;
   appliedForHwf?: YesNoValue;
   hwfReferenceNumber?: string;
@@ -271,10 +274,22 @@ export interface PossessionClaimResponse {
   defendantResponses?: CcdDefendantResponses;
   currentDefendantPartyId?: string;
   responseDocumentId?: string;
+  counterclaimDocumentId?: string;
   draftVersion?: number;
   claimIssuedDate?: string;
 
   defendantFlags?: CcdFlags;
+}
+
+/** One party's external ("support") flags, as exposed by pcs-api's requestSupport / manageSupport events. */
+export interface CcdPartySupport {
+  supportFlags?: CcdFlags;
+}
+
+/** `partySupport` collection item. `id` is the party id pcs-api binds the flags to. */
+export interface CcdPartySupportEntry {
+  id: string;
+  value: CcdPartySupport;
 }
 
 export type CaseData = CcdCaseData;
@@ -319,6 +334,8 @@ export interface CcdCaseData {
   otherLicenceTypeDetails?: string;
   licenceStartDate?: string;
   possessionClaimResponse?: PossessionClaimResponse;
+  // Narrowed by pcs-api to the defendant parties the logged-in user owns (requestSupport START).
+  partySupport?: CcdPartySupportEntry[];
   submitDraftAnswers?: string;
   genApps?: CcdCollectionItem<GenApp>[];
   allClaimants?: CcdCollectionItem<CcdParty>[];
@@ -334,6 +351,7 @@ export interface CcdCaseData {
   applicantForename?: string;
   applicantSurname?: string;
   dashboardData?: CcdDashboardData;
+  sdkEventPayload?: string;
   allDocuments?: CcdCollectionItem<CcdCaseDocument>[];
   detailsTab_TenancyLicenceDetails?: DetailsTab_TenancyLicenceDetails;
   detailsTab_RentArrearsDetails?: DetailsTab_RentArrearsDetails;

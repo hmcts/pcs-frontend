@@ -16,5 +16,9 @@
   "question": "Do you have any priority debts?",
   "errors": {
     "havePriorityDebts": "Select if you have any priority debts"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

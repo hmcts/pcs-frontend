@@ -1,3 +1,4 @@
+import { validateAmount } from '../../../constants/validation';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { penceToPounds, poundsToPence } from '../../utils/currencyConversion';
 import { createRespondToClaimFormStep } from '../formStep';
@@ -63,25 +64,12 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       },
       labelClasses: 'govuk-label--m govuk-!-font-weight-bold',
       errorMessage: 'errors.installmentAmount',
-      validator: value => {
-        const amountString = String(value).trim();
-        if (!/^-?\d+(\.\d{1,2})?$/.test(amountString)) {
-          return 'errors.installmentAmountFormat';
-        }
-
-        const amount = Number(amountString);
-        if (Number.isNaN(amount)) {
-          return 'errors.installmentAmountFormat';
-        }
-        if (amount < 0) {
-          return 'errors.installmentAmountMin';
-        }
-        if (amount >= 1000000000) {
-          return 'errors.installmentAmountMax';
-        }
-
-        return true;
-      },
+      validator: (value: unknown): boolean | string =>
+        validateAmount(value, {
+          invalidAmountFormatError: 'errors.installmentAmountFormat',
+          minAmountError: 'errors.installmentAmountMin',
+          maxAmountError: 'errors.installmentAmountMax',
+        }),
     },
     {
       name: 'installmentFrequency',

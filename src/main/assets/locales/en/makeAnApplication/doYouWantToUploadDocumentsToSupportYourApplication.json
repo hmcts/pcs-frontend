@@ -6,5 +6,9 @@
   "multipleApplicationsText": "If you've selected multiple applications, you should upload documents that relate to all of them.",
   "errors": {
     "uploadDocuments": "Confirm if you want to upload documents to support your application"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

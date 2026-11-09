@@ -32,7 +32,7 @@ describe('paymentService', () => {
 
     const response = await paymentService.createCardPaymentRequest('token-123', 'SR 123', {
       amount: 10.99,
-      language: 'English',
+      language: 'en',
       returnUrl: 'https://frontend/payment/return',
     });
 
@@ -41,7 +41,7 @@ describe('paymentService', () => {
       `${testApiBase}/payment/service-request/SR%20123/card-payment`,
       {
         amount: 10.99,
-        language: 'English',
+        language: 'en',
         returnUrl: 'https://frontend/payment/return',
       },
       {
@@ -89,7 +89,7 @@ describe('paymentService', () => {
 
     expect(mockHttp.post).toHaveBeenCalledWith(
       `${testApiBase}/payment/service-request/SR-123/card-payment`,
-      { amount: 10.99, language: 'Welsh', returnUrl: 'https://frontend/payment/return' },
+      { amount: 10.99, language: 'cy', returnUrl: 'https://frontend/payment/return' },
       {
         headers: {
           Authorization: 'Bearer token-123',
@@ -162,10 +162,10 @@ describe('paymentService', () => {
 
 describe('payment helpers', () => {
   it.each([
-    ['cy', 'Welsh'],
-    ['CY', 'Welsh'],
-    ['en', 'English'],
-    [undefined, 'English'],
+    ['cy', 'cy'],
+    ['CY', 'cy'],
+    ['en', 'en'],
+    [undefined, 'en'],
   ])('maps request language %s to %s', (input, expected) => {
     expect(mapRequestLanguageToPaymentLanguage(input)).toBe(expected);
   });

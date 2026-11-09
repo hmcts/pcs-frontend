@@ -13,7 +13,7 @@ export const taskList = {
   informTheCourtLink: `Inform the court of a breathing space debt respite`,
   getFreeHelpLink: `Get free help from a legal adviser`,
   helpAndSupportHeader: `Help and support`,
-  helpWithFeesLink: `Help with fees`,
+  helpWithFeesLink: `Help with Fees`,
   findOutAboutMediationLink: `Find out about mediation`,
   whatToExpectLink: `What to expect at a hearing`,
   representMyselfLink: `Represent myself at a hearing`,
@@ -30,4 +30,6 @@ export const taskList = {
   checkYourAnswersAndSubmitHiddenLink: `Check your answers and submit`,
   declareRecentPaymentsHiddenLink: `Declare recent payments or agreements made`,
   yourSupportLink: `Your support`,
+  doneTag: `Done`,
+  availableTag: `Available`,
 };
