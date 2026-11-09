@@ -12,6 +12,7 @@ import { hydrateUploadedDocumentsFromBody, wireFileUploadOnPostError } from './f
 import { type FormBuilderFlowConfig, resolveFormBuilderFlowConfig } from './flowConfig';
 import { buildFormContent } from './formContent';
 import {
+  getAllFormData,
   getCustomErrorTranslations,
   getTranslationErrors,
   normalizeCheckboxFields,
@@ -37,7 +38,7 @@ function shouldUseSessionFormData(flowConfig?: JourneyFlowConfig): boolean {
   return flowConfig?.useSessionFormData !== false;
 }
 
-function resolveSaveForLaterRedirect(req: Request, flowConfig: JourneyFlowConfig | undefined): string {
+function defaultSaveForLaterRedirect(req: Request, flowConfig: JourneyFlowConfig | undefined): string {
   const caseId = req.res?.locals.validatedCase?.id;
   if (flowConfig?.hubStepName && caseId) {
     return getStepUrl(flowConfig.hubStepName, flowConfig, caseId);
@@ -56,7 +57,8 @@ export function createPostHandler(
   showCancelButton?: boolean,
   extendGetContent?: ExtendGetContent,
   documentStorage?: DocumentStorage,
-  resolveRedirectAfterPost?: (req: Request) => Promise<string | undefined | void>
+  resolveRedirectAfterPost?: (req: Request) => Promise<string | undefined | void>,
+  resolveSaveForLaterRedirect?: (req: Request) => Promise<string | undefined | void>
 ): { post: (req: Request, res: Response, next: NextFunction) => Promise<void | Response> } {
   // Validate config in development mode
   if (process.env.NODE_ENV !== 'production') {
@@ -86,9 +88,7 @@ export function createPostHandler(
       const resolvedFlowConfig = await resolveFormBuilderFlowConfig(req, flowConfig);
 
       const allFormData = shouldUseSessionFormData(resolvedFlowConfig)
-        ? req.session.formData
-          ? Object.values(req.session.formData).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
-          : {}
+        ? Object.values(getAllFormData(req)).reduce((acc, stepData) => ({ ...acc, ...stepData }), {})
         : {};
 
       // Normalize checkbox fields BEFORE validation to ensure checkbox values are arrays
@@ -199,7 +199,13 @@ export function createPostHandler(
             return res.redirect(303, caseDetailsUrl);
           }
         }
-        return safeRedirect303(res, resolveSaveForLaterRedirect(req, resolvedFlowConfig), '/', ['/']);
+        const customSaveForLaterPath = resolveSaveForLaterRedirect ? await resolveSaveForLaterRedirect(req) : undefined;
+        return safeRedirect303(
+          res,
+          customSaveForLaterPath || defaultSaveForLaterRedirect(req, resolvedFlowConfig),
+          '/',
+          ['/']
+        );
       }
 
       if (resolveRedirectAfterPost) {

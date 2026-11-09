@@ -1,4 +1,9 @@
 export function initSessionTimeout(): void {
+  // Public pages are not signed in, so have no timeout.
+  if (!document.getElementById('timeout-modal-container')) {
+    return;
+  }
+
   const body = document.body;
   const sessionTimeoutMinutes = parseInt(body.dataset.sessionTimeout!, 10);
   const sessionWarningMinutes = parseInt(body.dataset.sessionWarning!, 10);

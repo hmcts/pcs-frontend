@@ -34,10 +34,21 @@ describe('date filter', () => {
     });
   });
 
-  it('should handle invalid date input', () => {
-    const invalidDate = 'invalid-date';
-    const result = date(invalidDate);
-    // Luxon returns 'Invalid DateTime' for invalid dates
-    expect(result).toBe('Invalid DateTime');
+  it('should render nothing for an invalid date', () => {
+    expect(date('invalid-date')).toBe('');
+  });
+
+  it('should format in Welsh when the template language is cy', () => {
+    expect(date.call({ ctx: { lang: 'cy' } }, '2024-03-20T12:00:00Z')).toBe('20 Mawrth 2024');
+  });
+
+  it('should format in English when the template language is en', () => {
+    expect(date.call({ ctx: { lang: 'en' } }, '2024-03-20T12:00:00Z')).toBe('20 March 2024');
+  });
+
+  it('should prefer an explicit language over the template language', () => {
+    expect(date.call({ ctx: { lang: 'en' } }, '2024-03-20T12:00:00Z', 'cccc d MMMM yyyy', 'cy')).toBe(
+      'Dydd Mercher 20 Mawrth 2024'
+    );
   });
 });

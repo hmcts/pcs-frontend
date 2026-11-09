@@ -6,12 +6,20 @@ import { ClientContextHeaders } from '../../../types/global';
 import { http } from '@modules/http';
 import { CcdCase, CitizenGenAppRequest, GenAppState, GenAppType } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
+import type { CcdFlags } from '@services/cuiRa/cuiRa.interface';
 
 jest.mock('config');
 jest.mock('@modules/http');
+jest.mock('@modules/logger', () => {
+  const logger = { error: jest.fn(), info: jest.fn(), warn: jest.fn(), debug: jest.fn() };
+  return { Logger: { getLogger: () => logger } };
+});
 
 const mockPost = http.post as jest.Mock;
 const mockGet = http.get as jest.Mock;
+const mockLoggerError = (
+  jest.requireMock('@modules/logger') as { Logger: { getLogger: () => { error: jest.Mock } } }
+).Logger.getLogger().error;
 
 const accessToken = 'token';
 const mockUrl = 'http://ccd.example.com';
@@ -122,6 +130,65 @@ describe('ccdCaseService', () => {
         status: 404,
       });
       expect(mockGet).not.toHaveBeenCalled();
+    });
+
+    it('logs what identifies a CCD failure without the response payload (HDPI-8953)', async () => {
+      mockGet.mockRejectedValue({
+        response: {
+          status: 422,
+          data: {
+            message: 'Case data validation failed',
+            exception: 'uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException',
+            details: { applicantForename: 'John', applicantSurname: 'Doe' },
+          },
+        },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      const logged = mockLoggerError.mock.calls.map(([line]) => String(line)).join('\n');
+      expect(logged).toContain(
+        'status=422 message=Case data validation failed ' +
+          'exception=uk.gov.hmcts.ccd.endpoint.exceptions.ValidationException'
+      );
+      expect(logged).not.toContain('John');
+    });
+
+    it('keeps the body of a CCD error that is not JSON, which has no message field', async () => {
+      mockGet.mockRejectedValue({
+        response: { status: 502, data: '<html>502 Bad Gateway</html>' },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      const logged = mockLoggerError.mock.calls.map(([line]) => String(line)).join('\n');
+      expect(logged).toContain('status=502 body=<html>502 Bad Gateway</html>');
+    });
+
+    it('reports which case failed, taken from the request URL', async () => {
+      mockGet.mockRejectedValue({
+        config: { url: `${mockUrl}/cases/${caseId}/event-triggers/${eventId}?ignore-warning=false` },
+        response: { status: 502, data: { message: 'Callback failed' } },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      expect(mockLoggerError).toHaveBeenCalledWith(expect.any(String), { caseReference: caseId });
+    });
+
+    it('leaves the case reference undefined when the failing request has no case in its URL', async () => {
+      mockGet.mockRejectedValue({
+        config: { url: `${mockUrl}/case-types/PCS` },
+        response: { status: 500, data: { message: 'Boom' } },
+        message: 'Request failed',
+      });
+
+      await expect(ccdCaseService.getCaseByIdForEvent(accessToken, caseId, eventId)).rejects.toThrow(HTTPError);
+
+      expect(mockLoggerError).toHaveBeenCalledWith(expect.any(String), { caseReference: undefined });
     });
 
     it('should throw HTTPError with 403 status on unauthorized access', async () => {
@@ -512,6 +579,113 @@ describe('ccdCaseService', () => {
       await expect(ccdCaseService.submitGeneralApplication(accessToken, ccdData)).rejects.toThrow(
         'No confirmation body found in response data'
       );
+    });
+  });
+
+  describe('getDefendantSupport', () => {
+    const supportFlags = { partyName: 'Jo Bloggs', roleOnCase: 'Defendant', details: [] } as unknown as CcdFlags;
+
+    it('starts requestSupport and returns the defendant party id and its support flags', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          token: 'support-token',
+          case_details: { case_data: { partySupport: [{ id: 'party-1', value: { supportFlags } }] } },
+        },
+      });
+
+      const result = await ccdCaseService.getDefendantSupport(accessToken, caseId);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/requestSupport?ignore-warning=false`,
+        expect.objectContaining({ headers: expect.objectContaining({ Authorization: `Bearer ${accessToken}` }) })
+      );
+      expect(result).toEqual({ partyId: 'party-1', supportFlags });
+    });
+
+    it('throws 403 when the user owns no defendant party on the case', async () => {
+      mockGet.mockResolvedValue({
+        data: { token: 'support-token', case_details: { case_data: { partySupport: [] } } },
+      });
+
+      await expect(ccdCaseService.getDefendantSupport(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
+    });
+
+    it('throws 403 rather than choosing when more than one party is eligible (guard bypass or bad data)', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          token: 'support-token',
+          case_details: {
+            case_data: {
+              partySupport: [
+                { id: 'party-1', value: { supportFlags } },
+                { id: 'party-2', value: { supportFlags } },
+              ],
+            },
+          },
+        },
+      });
+
+      await expect(ccdCaseService.getDefendantSupport(accessToken, caseId)).rejects.toMatchObject({ status: 403 });
+      await expect(ccdCaseService.submitDefendantSupportFlags(accessToken, caseId, supportFlags)).rejects.toMatchObject(
+        {
+          status: 403,
+        }
+      );
+      expect(mockPost).not.toHaveBeenCalled();
+    });
+
+    it('throws 404 for an invalid case reference without calling CCD', async () => {
+      await expect(ccdCaseService.getDefendantSupport(accessToken, 'not-a-case')).rejects.toMatchObject({
+        status: 404,
+      });
+      expect(mockGet).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('submitDefendantSupportFlags', () => {
+    const existingSupport = { partyName: 'Jo Bloggs', roleOnCase: 'Defendant', details: [] };
+    const supportFlags = {
+      partyName: 'Jo Bloggs',
+      roleOnCase: 'Defendant',
+      details: [{ id: 'f1', value: { flagCode: 'RA0042', path: [] } }],
+    } as unknown as CcdFlags;
+
+    it('submits the flags under the defendant party via the requestSupport event', async () => {
+      mockGet.mockResolvedValue({
+        data: {
+          token: 'support-token',
+          case_details: {
+            case_data: { partySupport: [{ id: 'party-1', value: { supportFlags: existingSupport } }] },
+          },
+        },
+      });
+      mockPost.mockResolvedValue({ data: { id: caseId, data: {} } });
+
+      const result = await ccdCaseService.submitDefendantSupportFlags(accessToken, caseId, supportFlags);
+
+      expect(mockGet).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/event-triggers/requestSupport?ignore-warning=false`,
+        expect.anything()
+      );
+      expect(mockPost).toHaveBeenCalledWith(
+        `${mockUrl}/cases/${caseId}/events`,
+        expect.objectContaining({
+          event: expect.objectContaining({ id: 'requestSupport' }),
+          event_token: 'support-token',
+          data: { partySupport: [{ id: 'party-1', value: { supportFlags } }] },
+        }),
+        expect.objectContaining({ headers: expect.objectContaining({ Authorization: `Bearer ${accessToken}` }) })
+      );
+      expect(result).toEqual({ id: caseId, data: {} });
+    });
+
+    it('does not submit when the START phase finds no eligible party', async () => {
+      mockGet.mockResolvedValue({ data: { token: 'support-token', case_details: { case_data: {} } } });
+
+      await expect(ccdCaseService.submitDefendantSupportFlags(accessToken, caseId, supportFlags)).rejects.toMatchObject(
+        { status: 403 }
+      );
+      expect(mockPost).not.toHaveBeenCalled();
     });
   });
 

@@ -4,7 +4,8 @@ import * as jose from 'jose';
 import type { Configuration, TokenEndpointResponse, UserInfoResponse } from 'openid-client';
 import * as client from 'openid-client';
 
-import { isLegalRepresentativeUser } from '../../steps/utils/userRole';
+import { isLegalRepresentativeUser, isStaffUser } from '../../steps/utils/userRole';
+import { getLaunchDarklyFlag } from '../../utils/getLaunchDarklyFlag';
 
 import type { OIDCConfig } from './config.interface';
 import { OIDCAuthenticationError, OIDCCallbackError } from './errors';
@@ -17,6 +18,19 @@ export interface RefreshTokenResult {
 }
 
 import { Logger } from '@modules/logger';
+
+// Node's fetch reports every network failure as "fetch failed" and puts the real reason on `cause`.
+export function describeCause(cause: unknown): string | undefined {
+  if (!(cause instanceof Error)) {
+    return cause ? String(cause) : undefined;
+  }
+  // undici reports a multi-address connect failure as an AggregateError whose own message is
+  // empty and whose detail sits in `errors`. Checked structurally: AggregateError is ES2021.
+  const { errors } = cause as { errors?: unknown[] };
+  const root = Array.isArray(errors) && errors[0] instanceof Error ? errors[0] : cause;
+  const { code } = root as NodeJS.ErrnoException;
+  return `${root.name}: ${root.message}${code ? ` (${code})` : ''}`;
+}
 
 export class OIDCModule {
   private clientConfig!: Configuration;
@@ -75,6 +89,20 @@ export class OIDCModule {
       return this.clientConfig;
     }
     return this.setupClient();
+  }
+
+  private describeAuthSession(req: Request): Record<string, unknown> {
+    const cookie = req.cookies?.[config.get<string>('session.cookieName')];
+    const presentedSessionId = typeof cookie === 'string' ? cookie.replace(/^s:/, '').split('.')[0] : undefined;
+
+    return {
+      sessionCookiePresented: presentedSessionId !== undefined,
+      sessionMatchesCookie: presentedSessionId === req.sessionID,
+      hasCodeVerifier: Boolean(req.session?.codeVerifier),
+      hasNonce: Boolean(req.session?.nonce),
+      alreadyAuthenticated: Boolean(req.session?.user),
+      sessionKeys: req.session ? Object.keys(req.session) : [],
+    };
   }
 
   public static getCurrentUrl(req: Request): URL {
@@ -170,6 +198,11 @@ export class OIDCModule {
             return next(new OIDCAuthenticationError('Failed to initiate authentication'));
           }
 
+          this.logger.info('Stored PKCE code verifier and redirecting to IDAM', {
+            event: 'authorization_request',
+            ...this.describeAuthSession(req),
+          });
+
           res.redirect(redirectTo.href);
         });
       } catch (error) {
@@ -180,9 +213,17 @@ export class OIDCModule {
 
     // Callback route
     app.get('/oauth2/callback', async (req: Request, res: Response, next: NextFunction) => {
-      try {
-        const { codeVerifier, nonce } = req.session;
+      const { codeVerifier, nonce } = req.session;
 
+      if (!codeVerifier) {
+        this.logger.error('Callback reached with no PKCE code verifier in session', {
+          event: 'pkce_verifier_missing',
+          ...this.describeAuthSession(req),
+        });
+        return res.redirect('/login');
+      }
+
+      try {
         const callbackUrl = OIDCModule.getCurrentUrl(req);
 
         const authorizationChecks: Parameters<typeof client.authorizationCodeGrant>[2] = {
@@ -231,6 +272,7 @@ export class OIDCModule {
         this.logger.error('Authentication error details:', {
           description: error.error_description || 'Authentication error details',
           error: error.message,
+          cause: describeCause(error.cause),
           code: error.code,
           status: error.status,
           name: error.name,
@@ -239,20 +281,25 @@ export class OIDCModule {
           redirectUri: this.oidcConfig.redirectUri,
           issuer: this.oidcConfig.issuer,
           clientId: this.oidcConfig.clientId,
+          ...this.describeAuthSession(req),
         });
         next(new OIDCCallbackError('Failed to complete authentication'));
       }
     });
 
     // Logout route
-    app.get('/logout', (req: Request, res: Response) => {
+    app.get('/logout', async (req: Request, res: Response) => {
       // build the logout url
       const callbackUrl = OIDCModule.getCurrentUrl(req);
 
-      // For Legal Representative users, redirect directly to XUI /auth/logout.
+      // For Legal Representative and staff users, redirect directly to XUI /auth/logout.
       // This clears the XUI session and XUI handles the IDAM end session itself.
       // PCS session is destroyed below, so the user is fully logged out of both.
-      if (isLegalRepresentativeUser(req) && config.has('xui.uri')) {
+      // Staff only come from XUI once make order is enabled.
+      const usesXui =
+        isLegalRepresentativeUser(req) ||
+        (isStaffUser(req) && (await getLaunchDarklyFlag(req, 'make-order-enabled', false)));
+      if (usesXui && config.has('xui.uri')) {
         const xuiUri: string = config.get('xui.uri');
         if (xuiUri) {
           const xuiLogoutUrl = `${xuiUri.replace(/\/+$/, '')}/auth/logout`;

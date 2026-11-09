@@ -49,6 +49,8 @@ export interface SectionConfig {
   steps: readonly string[];
   isApplicable?: SectionApplicabilityCondition;
   dependsOn?: readonly string[];
+  // Query string (without the leading '?') appended to the row's link
+  entryQuery?: string;
 }
 
 export interface JourneyFlowConfig {

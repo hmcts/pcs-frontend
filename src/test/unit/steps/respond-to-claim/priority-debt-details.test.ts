@@ -99,4 +99,38 @@ describe('respond-to-claim priority-debt-details step', () => {
       })
     );
   });
+
+  it('stores comma-formatted amounts as pence instead of deleting them', async () => {
+    (validateForm as jest.Mock).mockReturnValue({});
+    const req = createReq({
+      body: {
+        action: 'continue',
+        priorityDebtTotal: '1,234.56',
+        priorityDebtContribution: '1,000.00',
+        priorityDebtContributionFrequency: 'weekly',
+      },
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const res = { redirect: jest.fn() } as any;
+    const next = jest.fn();
+
+    if (!step.postController) {
+      throw new Error('expected postController');
+    }
+
+    await step.postController.post(req, res, next);
+
+    expect(mockSaveDraftDefendantResponse).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({
+        defendantResponses: expect.objectContaining({
+          householdCircumstances: expect.objectContaining({
+            debtTotal: '123456',
+            debtContribution: '100000',
+            debtContributionFrequency: 'WEEKLY',
+          }),
+        }),
+      })
+    );
+  });
 });

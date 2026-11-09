@@ -17,6 +17,7 @@ import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import {
   buildDraftDefendantResponse,
   saveDraftDefendantResponse,
+  toDefendantDraftSlice,
 } from '../../../../main/steps/utils/buildDraftDefendantResponse';
 import { ClientContextHeaders } from '../../../../types/global';
 
@@ -292,5 +293,103 @@ describe('buildDraftDefendantResponse — carries reasonable-adjustment flags fo
   it('omits defendantFlags entirely when there are none in the existing draft', () => {
     const draft = buildDraftDefendantResponse(reqWithFlags());
     expect('defendantFlags' in draft).toBe(false);
+  });
+});
+
+// HDPI-8866 W05 — the review page posts the draft version it rendered; the save forwards it so pcs-api can check it.
+describe('saveDraftDefendantResponse — reviewed draft version', () => {
+  const reqWithBody = (body: Record<string, unknown>): Request =>
+    ({
+      body,
+      session: { user: { accessToken: 'tok' } },
+      res: { locals: { validatedCase: { id: '123', data: {} } } },
+    }) as unknown as Request;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('forwards the draftVersion posted by the review page as a number', async () => {
+    await saveDraftDefendantResponse(reqWithBody({ draftVersion: '4' }), { defendantResponses: {} });
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      expect.anything(),
+      'tok',
+      '123',
+      { possessionClaimResponse: { defendantResponses: {}, draftVersion: 4 } },
+      undefined
+    );
+  });
+
+  it('omits draftVersion when the form did not post one (ordinary steps)', async () => {
+    await saveDraftDefendantResponse(reqWithBody({}), { defendantResponses: {} });
+
+    expect(ccdCaseService.updateDraft).toHaveBeenCalledWith(
+      expect.anything(),
+      'tok',
+      '123',
+      { possessionClaimResponse: { defendantResponses: {} } },
+      undefined
+    );
+  });
+
+  it('ignores a draftVersion that is not a whole number', async () => {
+    await saveDraftDefendantResponse(reqWithBody({ draftVersion: 'abc' }), { defendantResponses: {} });
+
+    const [, , , payload] = (ccdCaseService.updateDraft as jest.Mock).mock.calls[0];
+    expect(payload.possessionClaimResponse).not.toHaveProperty('draftVersion');
+  });
+});
+
+describe('saveDraftDefendantResponse — draft version returned by the save', () => {
+  it('carries the version pcs-api echoes into validatedCase so the submit posts it', async () => {
+    (ccdCaseService.updateDraft as jest.Mock).mockResolvedValueOnce({
+      id: '123',
+      data: { possessionClaimResponse: { defendantResponses: {}, draftVersion: 5 } },
+    });
+    const req = {
+      body: { draftVersion: '4' },
+      session: { user: { accessToken: 'tok' } },
+      res: { locals: { validatedCase: { id: '123', data: { possessionClaimResponse: { draftVersion: 4 } } } } },
+    } as unknown as Request;
+
+    await saveDraftDefendantResponse(req, { defendantResponses: {} });
+
+    expect(req.res?.locals.validatedCase?.data?.possessionClaimResponse?.draftVersion).toBe(5);
+  });
+});
+
+describe('toDefendantDraftSlice — the defendant slice every draft save sends', () => {
+  it('pre-initialises the nested objects when there is no existing response', () => {
+    expect(toDefendantDraftSlice(undefined)).toEqual({
+      defendantResponses: {},
+      defendantContactDetails: { party: {} },
+    });
+  });
+
+  it('narrows to the defendant slice and carries flags forward', () => {
+    const existing = {
+      claimantName: 'Acme Landlord',
+      defendantResponses: { situation_HasMoved: 'NO' },
+      defendantContactDetails: { party: { emailAddress: 'defendant@example.com' } },
+      defendantFlags: { partyName: 'Jo', roleOnCase: 'Defendant', details: [] },
+    } as never;
+
+    expect(toDefendantDraftSlice(existing)).toEqual({
+      defendantResponses: { situation_HasMoved: 'NO' },
+      defendantContactDetails: { party: { emailAddress: 'defendant@example.com' } },
+      defendantFlags: { partyName: 'Jo', roleOnCase: 'Defendant', details: [] },
+    });
+  });
+
+  it('deep-clones so callers can mutate the slice without touching the source', () => {
+    const existing = { defendantResponses: { completedSections: ['PERSONAL_DETAILS'] } } as never;
+
+    const slice = toDefendantDraftSlice(existing);
+    slice.defendantResponses.completedSections?.push('YOUR_SUPPORT' as never);
+
+    expect(
+      (existing as { defendantResponses: { completedSections: string[] } }).defendantResponses.completedSections
+    ).toEqual(['PERSONAL_DETAILS']);
   });
 });

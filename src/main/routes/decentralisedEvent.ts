@@ -9,6 +9,26 @@ import { safeRedirect303 } from '@utils/safeRedirect';
 
 const logger = Logger.getLogger('decentralisedEventRoutes');
 
+/** The query an event's page needs from what XUI hands over: the order and task an order event is for. */
+const HANDED_OVER_PARAMS = new Map<unknown, readonly string[]>([
+  ['ext:makeOrder', ['orderId', 'taskId']],
+  ['ext:confirmOrderReview', ['orderId', 'taskId']],
+]);
+
+// Ids only, which the redirect passes on unchanged.
+const ID = /^[A-Za-z0-9-]{1,64}$/;
+
+function handedOverQuery(eventId: unknown, query: Request['query']): string {
+  const handedOver = new URLSearchParams();
+  for (const name of HANDED_OVER_PARAMS.get(eventId) ?? []) {
+    const value = query[name];
+    if (typeof value === 'string' && ID.test(value)) {
+      handedOver.append(name, value);
+    }
+  }
+  return handedOver.toString();
+}
+
 export default function decentralisedEventRoutes(app: Application): void {
   const router = Router({ mergeParams: true });
 
@@ -62,7 +82,8 @@ export default function decentralisedEventRoutes(app: Application): void {
     const redirectRoute = config
       .get<string>('decentralisedEventRoutes.' + eventId)
       .replace(':caseReference', caseReference);
-    return safeRedirect303(res, redirectRoute);
+    const query = handedOverQuery(eventId, req.query);
+    return safeRedirect303(res, query ? `${redirectRoute}?${query}` : redirectRoute);
   });
 
   // Mount at /cases

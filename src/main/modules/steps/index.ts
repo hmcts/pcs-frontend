@@ -15,6 +15,9 @@ export type { FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConf
 
 // Export form builder helpers (for use in custom step implementations)
 export {
+  clearFormData,
+  getAllFormData,
+  getCaseReference,
   getFormData,
   setFormData,
   validateForm,

@@ -48,6 +48,5 @@ export * from './endOfJourneyCYA.page.data.lr';
 export * from './exemptLandlord.page.data.lr';
 export * from './writtenTerms.page.data.lr';
 export * from './tenancyDateDetails.page.data.lr';
-export * from './installmentPayments.page.data.lr';
 export * from './doYouWantToUploadFilesToSupportYourCounterclaim.page.data.lr';
 export * from './responseSubmittedCounterclaimFeePaymentNeeded.page.data.lr';

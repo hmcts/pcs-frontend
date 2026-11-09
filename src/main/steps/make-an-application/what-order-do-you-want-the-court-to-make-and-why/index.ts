@@ -2,7 +2,7 @@ import type { Request } from 'express';
 
 import { flowConfig } from '../flow.config';
 
-import { createFormStep, getTranslationFunction } from '@modules/steps';
+import { createFormStep, getFormData, getTranslationFunction } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 const STEP_NAME = 'what-order-do-you-want-the-court-to-make-and-why';
@@ -33,7 +33,7 @@ export const step: StepDefinition = createFormStep({
     listHeading: 'list.heading',
   },
   extendGetContent: (req: Request) => {
-    const typeOfApplication = req.session.formData?.['choose-an-application']?.['typeOfApplication'] ?? '';
+    const typeOfApplication = getFormData(req, 'choose-an-application').typeOfApplication ?? '';
 
     let contentList: string[] = [];
     const t = getTranslationFunction(req);

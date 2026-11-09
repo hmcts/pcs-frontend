@@ -14,5 +14,9 @@
   "errors": {
     "confirmIfThereIsAReason": "Confirm whether there is a reason why this application should not be shared with the other parties",
     "provideAReason": "Confirm why the other parties should not be informed"
+  },
+  "options": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

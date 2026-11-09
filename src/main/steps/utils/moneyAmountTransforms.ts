@@ -25,14 +25,6 @@ function parseOptionalFiniteNumber(value: unknown): number | undefined {
   return undefined;
 }
 
-export function poundsStringToPence(value: string): number | undefined {
-  const parsed = parseOptionalFiniteNumber(value);
-  if (parsed === undefined) {
-    return undefined;
-  }
-  return Math.round(parsed * 100);
-}
-
 /** MoneyGBP-style values stored as whole pence (digit-only string or numeric pence). */
 export function ccdPenceToPoundsString(value: unknown): string | undefined {
   if (value === undefined || value === null) {
