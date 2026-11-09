@@ -4,8 +4,8 @@ import { DateTime } from 'luxon';
 
 import { RECORD_WARRANT_RETURN_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
+import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 
-import { Logger } from '@modules/logger';
 import { CcdCaseData } from '@services/ccdCase.interface';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { formatAddress } from '@utils/ccdDashboardUtils';
@@ -80,8 +80,6 @@ interface ValidationResult {
   warrantReturn?: WarrantReturn;
 }
 
-const logger = Logger.getLogger('recordWarrantReturn');
-
 function route(page: Page): string {
   return `${RECORD_WARRANT_RETURN_ROUTE}${PAGES[page]}`;
 }
@@ -120,7 +118,7 @@ function evictionSummary(ccdCase: CcdCaseData): EvictionSummaryData {
           text: 'Claimant type',
         },
         value: {
-          text: ccdCase.claimantType?.value.label
+          text: ccdCase.claimantType?.value.label,
         },
       },
       {
@@ -143,6 +141,7 @@ function evictionSummary(ccdCase: CcdCaseData): EvictionSummaryData {
   };
 }
 
+/** The case heading and eviction details the pages show, from a new start of the event. */
 async function caseModel(req: Request, caseReference: string): Promise<Record<string, unknown>> {
   const started = await ccdCaseService.startCaseEvent(
     req.session.user!.accessToken,
@@ -153,10 +152,11 @@ async function caseModel(req: Request, caseReference: string): Promise<Record<st
 
   const ccdCase: CcdCaseData = started.data;
 
+  // The case heading matches Confirm order review's.
   return {
     evictionData: evictionSummary(ccdCase),
-    propertyAddress: formatAddress(ccdCase.propertyAddress),
-    caseReference,
+    caseReferenceDisplay: caseNumberFormatter(caseReference),
+    propertyAddressDisplay: formatAddress(ccdCase.propertyAddress),
     claimantNames: getClaimantNames(ccdCase),
     defendantNames: getDefendantNames(ccdCase),
   };
@@ -217,10 +217,15 @@ export default function recordWarrantReturnRoutes(app: Application): void {
     req.session.save(error => (error ? next(error) : res.redirect(pageUrl(caseReference, 'checkYourAnswers'))));
   });
 
-  app.get(route('checkYourAnswers'), ...journey, (req: Request, res: Response) => {
-    res.render('record-warrant-return/check-your-answers', {
-      ...pageModel(req),
-    });
+  app.get(route('checkYourAnswers'), ...journey, async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.render('record-warrant-return/check-your-answers', {
+        ...pageModel(req),
+        ...(await caseModel(req, caseReferenceOf(req))),
+      });
+    } catch (error) {
+      refusedXuiEvent(res, next, error);
+    }
   });
 
   app.post(route('checkYourAnswers'), async (req: Request, res: Response, _) => {

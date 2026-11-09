@@ -3,14 +3,22 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/caseTitle.njk" import caseTitle %}
 
+{# The case heading is shared with Make an order and Confirm order review, so XUI's external events look alike. #}
 {% block content %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
   {% endif %}
 
   <div id="record-warrant-return-form">
-    {{ caseTitle(caseReference, propertyAddress, 'Record warrant return', claimantNames, defendantNames) }}
+    {{ caseTitle({
+      eventName: "Record warrant return",
+      heading: pageHeading,
+      caseReference: caseReferenceDisplay,
+      propertyAddress: propertyAddressDisplay,
+      claimantNames: claimantNames,
+      defendantNames: defendantNames
+    }) }}
   </div>
 
-  {% block mainContent %}{% endblock %}
+  {% block page %}{% endblock %}
 {% endblock %}

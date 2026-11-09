@@ -2,17 +2,20 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
-{% from "macros/caseTitle.njk" import caseTitle %}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% import "macros/xuiButtons.njk" as buttons with context %}
 {% from "macros/dateTimeInput.njk" import dateInput %}
+{% from "macros/csrf.njk" import csrfProtection %}
 
-{% block mainContent %}
+{% set pageHeading = "Record warrant return" %}
+
+{% block page %}
   {{ govukSummaryList(evictionData) }}
 
   <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
     {{ govukSelect({
         id: "return-type",
         name: "return-type",

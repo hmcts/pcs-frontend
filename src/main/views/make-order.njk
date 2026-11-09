@@ -5,6 +5,7 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% import "make-order/_compact.njk" as compact with context %}
+{% from "macros/caseTitle.njk" import caseTitle %}
 
 {% set htmlClasses = "pcs-make-order" %}
 
@@ -25,15 +26,13 @@
   <input type="hidden" name="hearingVersion" value="{{ hearingVersion }}">
   {{ csrfProtection(csrfToken) }}
 
-  <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">Make an order</h1>
-
-  <p class="govuk-body govuk-!-margin-bottom-1">
-    <span class="govuk-!-font-weight-bold">Case reference:</span> {{ caseReferenceDisplay }}
-  </p>
-  <p class="govuk-body govuk-!-margin-bottom-1">{{ propertyAddressDisplay }}</p>
-  <p class="govuk-body govuk-!-font-weight-bold">
-    {{ claimantNames }} vs {{ defendantNames }}
-  </p>
+  {{ caseTitle({
+    heading: pageHeading,
+    caseReference: caseReferenceDisplay,
+    propertyAddress: propertyAddressDisplay,
+    claimantNames: claimantNames,
+    defendantNames: defendantNames
+  }) }}
 
   {% if order.queryFromCaseworker %}
     {# An order a caseworker returned: their query. #}

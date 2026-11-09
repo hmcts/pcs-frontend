@@ -116,6 +116,39 @@ describe('recordWarrantReturnRoutes', () => {
     });
   });
 
+  describe('GET checkYourAnswers', () => {
+    it('shows the case heading as Confirm order review does', async () => {
+      (ccdCaseService.startCaseEvent as jest.Mock).mockReturnValueOnce({
+        data: {
+          propertyAddress: { AddressLine1: '1 High Street', PostTown: 'London', PostCode: 'SW1A 1AA' },
+          allClaimants: [{ value: { orgName: 'Housing Ltd' } }],
+          allDefendants: [{ value: { nameKnown: 'YES', firstName: 'Sam', lastName: 'Smith' } }],
+        },
+      });
+      const res = { render: jest.fn() };
+
+      await getHandler('/case/:caseReference/record-warrant-return/check-your-answers')(
+        {
+          params: { caseReference: '1794231546115667' },
+          originalUrl: '/case/1794231546115667/record-warrant-return/check-your-answers',
+          session: { user: { accessToken: 'token' } },
+        } as unknown as Request,
+        res as unknown as Response,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith(
+        'record-warrant-return/check-your-answers',
+        expect.objectContaining({
+          caseReferenceDisplay: '1794-2315-4611-5667',
+          propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
+          claimantNames: 'Housing Ltd',
+          defendantNames: 'Sam Smith',
+        })
+      );
+    });
+  });
+
   describe('POST warrantReturn', () => {
     const path = '/case/:caseReference/record-warrant-return';
 
@@ -155,7 +188,7 @@ describe('recordWarrantReturnRoutes', () => {
       expect(errorIds(res)).toEqual(['return-type']);
       expect(res.render).toHaveBeenCalledWith(
         'record-warrant-return/warrant-return',
-        expect.objectContaining({ evictionData: expect.any(Object), caseReference: '123' })
+        expect.objectContaining({ evictionData: expect.any(Object), caseReferenceDisplay: '123' })
       );
     });
 
