@@ -52,7 +52,7 @@ export interface WarrantReturn {
   returnName?: InterimReturnName | EvictionSuccessfulReturnName | EvictionUnsuccessfulReturnName;
   outcome?: EvictionOutcome;
   additionalDetails?: string;
-  evictionDate?: string;
+  outcomeDate?: string;
 }
 
 export interface EvictionSummaryData {

@@ -9,11 +9,15 @@ jest.mock('@services/ccdCaseService', () => ({
         },
         allDefendants: [],
       },
+      eventToken: 'event-token',
     }),
+    submitCaseEvent: jest.fn().mockResolvedValue({}),
   },
 }));
 
 import { Application } from 'express';
+
+import { CallbackRejectedError, HTTPError } from '../../../main/HttpError';
 
 import recordWarrantReturnRoutes from '@routes/recordWarrantReturn';
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -212,7 +216,7 @@ describe('recordWarrantReturnRoutes', () => {
           returnType: WarrantReturnType.FINAL,
           outcome: EvictionOutcome.SUCCESSFUL,
           returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
-          evictionDate: '2026-03-01T14:05:00.000+00:00',
+          outcomeDate: '2026-03-01T14:05:00.000+00:00',
           additionalDetails: 'Keys handed to claimant',
         },
       });
@@ -378,6 +382,109 @@ describe('recordWarrantReturnRoutes', () => {
     });
   });
 
+  describe('POST checkYourAnswers', () => {
+    const path = '/case/:caseReference/record-warrant-return/check-your-answers';
+    const mockSubmitCaseEvent = ccdCaseService.submitCaseEvent as jest.Mock;
+
+    const successful = {
+      returnType: WarrantReturnType.FINAL,
+      outcome: EvictionOutcome.SUCCESSFUL,
+      returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+      outcomeDate: '2026-07-01T09:05:00.000+01:00',
+      additionalDetails: 'Keys handed over',
+    };
+
+    const post = async (body: Record<string, unknown>, warrantReturn?: Record<string, unknown>) => {
+      const res = { status: jest.fn().mockReturnThis(), render: jest.fn(), redirect: jest.fn() };
+      const req = {
+        params: { caseReference: '123' },
+        originalUrl: '/case/123/record-warrant-return/check-your-answers',
+        body,
+        session: {
+          user: { accessToken: 'token' },
+          warrantReturn: warrantReturn ? { '123': warrantReturn, '456': { returnType: 'INTERIM' } } : undefined,
+          save: jest.fn((callback: (error?: Error) => void) => callback()),
+        },
+      };
+      const next = jest.fn();
+      await postHandler(path)(req as unknown as Request, res as unknown as Response, next);
+      // A refusal renders once the case details load.
+      await new Promise(setImmediate);
+      return { req, res, next };
+    };
+
+    it('goes back to the warrant return page for previous', async () => {
+      const { res } = await post({ action: 'previous' }, successful);
+
+      expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return');
+      expect(mockSubmitCaseEvent).not.toHaveBeenCalled();
+    });
+
+    it('asks for the answers again when the session has none', async () => {
+      const { res } = await post({ action: 'continue' });
+
+      expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return');
+      expect(mockSubmitCaseEvent).not.toHaveBeenCalled();
+    });
+
+    it('submits the answers as pcs-api takes them, forgets them and shows the confirmation', async () => {
+      const { req, res } = await post({ action: 'continue' }, successful);
+
+      expect(ccdCaseService.startCaseEvent).toHaveBeenCalledWith('token', '123', 'ext:recordWarrantReturn');
+      expect(mockSubmitCaseEvent).toHaveBeenCalledWith('token', '123', 'ext:recordWarrantReturn', 'event-token', {
+        warrantReturn: {
+          returnType: 'FINAL',
+          returnName: 'EVICTION_SUCCESSFUL',
+          evictionOutcome: 'SUCCESSFUL',
+          additionalDetails: 'Keys handed over',
+          outcomeDate: '2026-07-01T08:05:00',
+        },
+      });
+      expect(req.session.warrantReturn).toEqual({ '456': { returnType: 'INTERIM' } });
+      expect(req.session.save).toHaveBeenCalled();
+      expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return/confirmed');
+    });
+
+    it('submits a return without an eviction date', async () => {
+      await post(
+        { action: 'continue' },
+        { returnType: WarrantReturnType.INTERIM, returnName: InterimReturnName.CROWDS_OR_PROTESTS }
+      );
+
+      expect(mockSubmitCaseEvent.mock.calls[0][4]).toEqual({
+        warrantReturn: { returnType: 'INTERIM', returnName: 'CROWDS_OR_PROTESTS' },
+      });
+      expect(JSON.stringify(mockSubmitCaseEvent.mock.calls[0][4])).not.toContain('outcomeDate');
+    });
+
+    it('shows why pcs-api refused the return and keeps the answers', async () => {
+      mockSubmitCaseEvent.mockRejectedValueOnce(new CallbackRejectedError(['There is no warrant on this case'], 422));
+
+      const { req, res } = await post({ action: 'continue' }, successful);
+
+      expect(res.status).toHaveBeenCalledWith(422);
+      expect(res.render).toHaveBeenCalledWith(
+        'record-warrant-return/check-your-answers',
+        expect.objectContaining({
+          validationErrors: { 'record-warrant-return-form': { text: 'There is no warrant on this case' } },
+          caseReferenceDisplay: '123',
+        })
+      );
+      expect(req.session.warrantReturn?.['123']).toEqual(successful);
+      expect(res.redirect).not.toHaveBeenCalled();
+    });
+
+    it('passes any other failure to the error handler', async () => {
+      const failure = new HTTPError('CCD is down', 502);
+      mockSubmitCaseEvent.mockRejectedValueOnce(failure);
+
+      const { next, res } = await post({ action: 'continue' }, successful);
+
+      expect(next).toHaveBeenCalledWith(failure);
+      expect(res.redirect).not.toHaveBeenCalled();
+    });
+  });
+
   describe('GET warrantReturn with saved answers', () => {
     it('shows the answers saved in the session for a successful eviction', async () => {
       const res = { render: jest.fn() };
@@ -392,7 +499,7 @@ describe('recordWarrantReturnRoutes', () => {
                 returnType: WarrantReturnType.FINAL,
                 outcome: EvictionOutcome.SUCCESSFUL,
                 returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
-                evictionDate: '2026-07-01T09:05:00.000+01:00',
+                outcomeDate: '2026-07-01T09:05:00.000+01:00',
                 additionalDetails: 'Details',
               },
             },

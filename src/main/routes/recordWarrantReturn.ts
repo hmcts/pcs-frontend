@@ -2,6 +2,7 @@ import { buildFooterModel } from '@hmcts-cft/cft-ui-component-lib';
 import { Application, NextFunction, Request, Response } from 'express';
 import { DateTime } from 'luxon';
 
+import { CallbackRejectedError } from '../HttpError';
 import { RECORD_WARRANT_RETURN_ROUTE } from '../constants/caseRoutes';
 import { oidcMiddleware } from '../middleware';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
@@ -224,15 +225,37 @@ export default function recordWarrantReturnRoutes(app: Application): void {
     }
   });
 
-  app.post(route('checkYourAnswers'), async (req: Request, res: Response, _) => {
+  app.post(route('checkYourAnswers'), ...journey, async (req: Request, res: Response, next: NextFunction) => {
     const caseReference = caseReferenceOf(req);
     if (req.body.action === 'previous') {
       return res.redirect(pageUrl(caseReference, 'warrantReturn'));
     }
+
+    const warrantReturn = req.session.warrantReturn?.[caseReference];
+    if (!warrantReturn) {
+      return res.redirect(pageUrl(caseReference, 'warrantReturn'));
+    }
+
+    try {
+      const accessToken = req.session.user!.accessToken;
+      const started = await ccdCaseService.startCaseEvent(accessToken, caseReference, RECORD_WARRANT_RETURN_EVENT_ID);
+      await ccdCaseService.submitCaseEvent(
+        accessToken,
+        caseReference,
+        RECORD_WARRANT_RETURN_EVENT_ID,
+        started.eventToken,
+        { warrantReturn: ccdWarrantReturn(warrantReturn) }
+      );
+    } catch (error) {
+      return refusedXuiEvent(res, next, error, rejected => void showFailedSubmit(req, res, next, rejected));
+    }
+
+    delete req.session.warrantReturn![caseReference];
+    req.session.save(error => (error ? next(error) : res.redirect(pageUrl(caseReference, 'confirmed'))));
   });
 
   app.get(route('confirmed'), ...journey, (req: Request, res: Response) => {
-    res.render('record-warrant-return/confirmed', {
+    res.render('record-warrant-return/confirmation', {
       ...pageModel(req),
     });
   });
@@ -240,6 +263,35 @@ export default function recordWarrantReturnRoutes(app: Application): void {
   app.get(route('cancel'), ...journey, (req: Request, res: Response) => {
     res.redirect(manageCaseDetailsUrl(caseReferenceOf(req)));
   });
+}
+
+async function showFailedSubmit(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+  error: CallbackRejectedError
+): Promise<void> {
+  try {
+    const issues = error.reasons.map(message => ({ id: 'record-warrant-return-form', message }));
+    res.status(error.status).render('record-warrant-return/check-your-answers', {
+      ...pageModel(req, issues),
+      ...(await caseModel(req, caseReferenceOf(req))),
+    });
+  } catch (renderError) {
+    next(renderError);
+  }
+}
+
+export function ccdWarrantReturn(warrantReturn: WarrantReturn): Record<string, unknown> {
+  return {
+    returnType: warrantReturn.returnType,
+    returnName: warrantReturn.returnName,
+    evictionOutcome: warrantReturn.outcome,
+    additionalDetails: warrantReturn.additionalDetails,
+    outcomeDate: warrantReturn.outcomeDate
+      ? DateTime.fromISO(warrantReturn.outcomeDate, { setZone: true }).toUTC().toFormat("yyyy-MM-dd'T'HH:mm:ss")
+      : undefined,
+  };
 }
 
 function text(body: Record<string, unknown> | undefined, name: string): string {
@@ -262,8 +314,8 @@ function answersFromBody(body: Record<string, unknown> | undefined): WarrantRetu
 }
 
 function answersFromSession(warrantReturn: WarrantReturn | undefined): WarrantReturnAnswers {
-  const evictionDate = warrantReturn?.evictionDate
-    ? DateTime.fromISO(warrantReturn.evictionDate, { zone: EVICTION_DATE_ZONE })
+  const evictionDate = warrantReturn?.outcomeDate
+    ? DateTime.fromISO(warrantReturn.outcomeDate, { zone: EVICTION_DATE_ZONE })
     : undefined;
   const isFinal = warrantReturn?.returnType === WarrantReturnType.FINAL;
   const outcome = warrantReturn?.outcome;
@@ -343,7 +395,7 @@ function validateEvictionSuccessful(answers: WarrantReturnAnswers): ValidationRe
       returnType: WarrantReturnType.FINAL,
       outcome: EvictionOutcome.SUCCESSFUL,
       returnName,
-      evictionDate,
+      outcomeDate: evictionDate,
       additionalDetails: answers.additionalDetails,
     },
   };
