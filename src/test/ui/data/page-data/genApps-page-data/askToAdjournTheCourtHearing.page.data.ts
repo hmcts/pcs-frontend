@@ -14,7 +14,7 @@ export const askToAdjournTheCourtHearing = {
   onceYouStartYourApplicationParagraph: `Once you start your application, you cannot save your progress as a draft.`,
   thisMeansThatIfYouLeaveYourApplicationParagraph: `This means that if you leave your application before submitting, we will not save your answers so that you can return to them later.`,
   howLongItTakesHeader: `How long it takes`,
-  itsFreeToApplyParagraph: `It’s free to apply if your court hearing is at least 14 days away.`,
+  itsFreeToApplyParagraph: `It’s free to apply if your court hearing is at least 14 days away and the other parties have already agreed to it.`,
   ifYourCourtHearingIsSoonerParagraph: `If your court hearing is sooner, you will need to pay £126.`,
   theFeeWillIncreaseParagraph: `The fee will increase to £321 if:`,
   youHaveAlreadyToldList: `you have already told the other party that you are making this application, and`,
