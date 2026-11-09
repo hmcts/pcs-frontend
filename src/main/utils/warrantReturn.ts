@@ -291,7 +291,10 @@ export function isAdditionalDetailsMandatory(selection: WarrantReturnSelection):
       const returnName = selection.evictionSuccessfulReturnName;
       return !returnName || returnName === EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL;
     }
-    if (selection.finalOutcome === EvictionOutcome.UNSUCCESSFUL || selection.finalOutcome === EvictionOutcome.CANCELLED) {
+    if (
+      selection.finalOutcome === EvictionOutcome.UNSUCCESSFUL ||
+      selection.finalOutcome === EvictionOutcome.CANCELLED
+    ) {
       const returnName = selection.evictionUnsuccessfulReturnName;
       return (
         !returnName || isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName as EvictionUnsuccessfulReturnName)
