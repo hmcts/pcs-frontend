@@ -120,7 +120,7 @@ function evictionSummary(ccdCase: CcdCaseData): EvictionSummaryData {
           text: 'Claimant type',
         },
         value: {
-          text: 'CLAIMANT TYPE PLACEHOLDER', //ccdCase.claimantType!.value.label
+          text: ccdCase.claimantType?.value.label
         },
       },
       {
@@ -128,7 +128,7 @@ function evictionSummary(ccdCase: CcdCaseData): EvictionSummaryData {
           text: 'Claimant name',
         },
         value: {
-          text: formatClaimants(ccdCase),
+          html: formatClaimants(ccdCase),
         },
       },
       {
@@ -143,7 +143,6 @@ function evictionSummary(ccdCase: CcdCaseData): EvictionSummaryData {
   };
 }
 
-/** The case details the page shows above the form, from a new start of the event. */
 async function caseModel(req: Request, caseReference: string): Promise<Record<string, unknown>> {
   const started = await ccdCaseService.startCaseEvent(
     req.session.user!.accessToken,
@@ -153,8 +152,6 @@ async function caseModel(req: Request, caseReference: string): Promise<Record<st
   );
 
   const ccdCase: CcdCaseData = started.data;
-
-  logger.info('claimantType data', ccdCase.claimantType);
 
   return {
     evictionData: evictionSummary(ccdCase),
