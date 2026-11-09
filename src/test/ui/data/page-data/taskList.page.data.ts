@@ -30,6 +30,6 @@ export const taskList = {
   checkYourAnswersAndSubmitHiddenLink: `Check your answers and submit`,
   declareRecentPaymentsHiddenLink: `Declare recent payments or agreements made`,
   yourSupportLink: `Your support`,
-  doneTag: `Done`,
+  doneDynamicTag: `Done`,
   availableTag: `Available`,
 };
