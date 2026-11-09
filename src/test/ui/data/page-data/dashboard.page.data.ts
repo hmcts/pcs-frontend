@@ -48,10 +48,13 @@ export const dashboard = {
   counterClaimFeeUnpaidNotificationLink: `Pay your counterclaim fee`,
   respondToTheClaimSubHeader: `Respond to the claim`,
   viewTheResponseSubHeader: `View the response`,
+  yourSupportSubHeader: `Your support`,
   notStartedTag: `Not started`,
   inProgressTag: `In progress`,
   completedTag: `Completed`,
   availableTag: `Available`,
+  blankTag: ``,
+  backLink: `Back`,
   counterClaimAmount: '1,500.00',
   counterClaimFee: '80.00',
 };

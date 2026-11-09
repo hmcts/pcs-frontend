@@ -11507,10 +11507,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"module-alias@npm:2.3.4":
-  version: 2.3.4
-  resolution: "module-alias@npm:2.3.4"
-  checksum: 10/32386c3dc8de3527aa636dfa5bfa75339929296562468491445768b5607310586856f510bea32a179a5425f21f484cc50ba2727f3ee96acb0d30d032dbb2bc11
+"module-alias@npm:2.3.5":
+  version: 2.3.5
+  resolution: "module-alias@npm:2.3.5"
+  checksum: 10/87786ca4a24bbdc6461529fb4503113b2fa1e948080de91629696e40207d4ed02ca824f43382828b1282ab9612bbb00dd78c687a444dfcaa3d340d465fea774d
   languageName: node
   linkType: hard
 
@@ -12242,7 +12242,7 @@ __metadata:
     lodash: "npm:4.18.1"
     luxon: "npm:3.7.2"
     mini-css-extract-plugin: "npm:2.10.2"
-    module-alias: "npm:2.3.4"
+    module-alias: "npm:2.3.5"
     multer: "npm:^2.4.0"
     nodemon: "npm:3.1.14"
     nunjucks: "npm:3.2.4"
