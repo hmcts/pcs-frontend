@@ -185,7 +185,7 @@ describe('recordWarrantReturnRoutes', () => {
       const { res } = await post({});
 
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(errorIds(res)).toEqual(['return-type']);
+      expect(errorIds(res)).toEqual(['return-type', 'additional-details']);
       expect(res.render).toHaveBeenCalledWith(
         'record-warrant-return/warrant-return',
         expect.objectContaining({ evictionData: expect.any(Object), caseReferenceDisplay: '123' })
@@ -195,7 +195,7 @@ describe('recordWarrantReturnRoutes', () => {
     it('requires a final outcome for a final return', async () => {
       const { res } = await post({ 'return-type': WarrantReturnType.FINAL });
 
-      expect(errorIds(res)).toEqual(['final-outcome']);
+      expect(errorIds(res)).toEqual(['final-outcome', 'additional-details']);
     });
 
     it('saves a successful eviction to the session and redirects to check your answers', async () => {
@@ -292,6 +292,28 @@ describe('recordWarrantReturnRoutes', () => {
       });
 
       expect(errorIds(res)).toEqual(['additional-details']);
+    });
+
+    it.each([
+      [WarrantReturnType.FINAL, EvictionOutcome.UNSUCCESSFUL, 'eviction-unsuccessful-return-name'],
+      [WarrantReturnType.FINAL, EvictionOutcome.CANCELLED, 'eviction-unsuccessful-return-name'],
+      [WarrantReturnType.INTERIM, '', 'interim-return-name'],
+    ])(
+      'requires additional details for a %s %s return while no return name is chosen',
+      async (returnType, finalOutcome, returnNameId) => {
+        const { res } = await post({ 'return-type': returnType, 'final-outcome': finalOutcome });
+
+        expect(errorIds(res)).toEqual([returnNameId, 'additional-details']);
+      }
+    );
+
+    it('does not require additional details for a return name that makes it optional', async () => {
+      const { res } = await post({
+        'return-type': WarrantReturnType.INTERIM,
+        'interim-return-name': InterimReturnName.CROWDS_OR_PROTESTS,
+      });
+
+      expect(res.redirect).toHaveBeenCalled();
     });
 
     it('saves a cancelled eviction without an eviction date', async () => {

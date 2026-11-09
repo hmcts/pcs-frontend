@@ -273,6 +273,34 @@ export function isAdditionalDetailsMandatoryInterim(returnName: InterimReturnNam
   return mandatoryReturnNames.has(returnName);
 }
 
+export interface WarrantReturnSelection {
+  returnType: string;
+  finalOutcome: string;
+  evictionSuccessfulReturnName: string;
+  evictionUnsuccessfulReturnName: string;
+  interimReturnName: string;
+}
+
+export function isAdditionalDetailsMandatory(selection: WarrantReturnSelection): boolean {
+  if (selection.returnType === WarrantReturnType.INTERIM) {
+    const returnName = selection.interimReturnName;
+    return !returnName || isAdditionalDetailsMandatoryInterim(returnName as InterimReturnName);
+  }
+  if (selection.returnType === WarrantReturnType.FINAL) {
+    if (selection.finalOutcome === EvictionOutcome.SUCCESSFUL) {
+      const returnName = selection.evictionSuccessfulReturnName;
+      return !returnName || returnName === EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL;
+    }
+    if (selection.finalOutcome === EvictionOutcome.UNSUCCESSFUL || selection.finalOutcome === EvictionOutcome.CANCELLED) {
+      const returnName = selection.evictionUnsuccessfulReturnName;
+      return (
+        !returnName || isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName as EvictionUnsuccessfulReturnName)
+      );
+    }
+  }
+  return true;
+}
+
 const HIDDEN_CLASS = 'govuk-!-display-none';
 const DEFAULT_ADDITIONAL_DETAILS_LABEL = 'Additional details';
 const OPTIONAL_ADDITIONAL_DETAILS_LABEL = 'Additional details (Optional)';
@@ -327,30 +355,22 @@ function updateWarrantReturnVisibility(): void {
   const isInterim = returnType === WarrantReturnType.INTERIM;
   setSectionVisible('interim', isInterim, () => resetSelect('interim-return-name'));
 
-  updateAdditionalDetailsLabel({ isEvictionSuccessful, isEvictionUnsuccessfulOrCancelled, isInterim });
+  updateAdditionalDetailsLabel();
 }
 
-function updateAdditionalDetailsLabel(visible: {
-  isEvictionSuccessful: boolean;
-  isEvictionUnsuccessfulOrCancelled: boolean;
-  isInterim: boolean;
-}): void {
+function updateAdditionalDetailsLabel(): void {
   const label = document.getElementById('additional-details-label');
   if (!label) {
     return;
   }
 
-  let isMandatory = true;
-  if (visible.isEvictionSuccessful) {
-    const value = getSelect('eviction-successful-return-name')?.value;
-    isMandatory = !value || value === EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL;
-  } else if (visible.isEvictionUnsuccessfulOrCancelled) {
-    const value = getSelect('eviction-unsuccessful-return-name')?.value;
-    isMandatory = !value || isAdditionalDetailsMandatoryEvictionUnsuccessful(value as EvictionUnsuccessfulReturnName);
-  } else if (visible.isInterim) {
-    const value = getSelect('interim-return-name')?.value;
-    isMandatory = !value || isAdditionalDetailsMandatoryInterim(value as InterimReturnName);
-  }
+  const isMandatory = isAdditionalDetailsMandatory({
+    returnType: getSelect('return-type')?.value ?? '',
+    finalOutcome: getSelect('final-outcome')?.value ?? '',
+    evictionSuccessfulReturnName: getSelect('eviction-successful-return-name')?.value ?? '',
+    evictionUnsuccessfulReturnName: getSelect('eviction-unsuccessful-return-name')?.value ?? '',
+    interimReturnName: getSelect('interim-return-name')?.value ?? '',
+  });
 
   label.textContent = isMandatory ? DEFAULT_ADDITIONAL_DETAILS_LABEL : OPTIONAL_ADDITIONAL_DETAILS_LABEL;
 }

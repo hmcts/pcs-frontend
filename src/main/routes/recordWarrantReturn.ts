@@ -23,8 +23,7 @@ import {
   formatClaimants,
   formatDefendants,
   interimReturnTypeList,
-  isAdditionalDetailsMandatoryEvictionUnsuccessful,
-  isAdditionalDetailsMandatoryInterim,
+  isAdditionalDetailsMandatory,
   warrantReturnTypeList,
 } from '@utils/warrantReturn';
 import {
@@ -64,7 +63,6 @@ const EVICTION_DATE_REQUIRED_ERROR_MESSAGE: string = 'Eviction date and time is 
 const EVICTION_DATE_ERROR_MESSAGE: string = 'The data entered is not valid for Eviction date and time';
 const EVICTION_DATE_FUTURE_ERROR_MESSAGE: string = 'Eviction date and time must be in the past';
 
-/** The answers as the page posts them, keyed as the template names its fields. */
 export interface WarrantReturnAnswers {
   returnType: string;
   finalOutcome: string;
@@ -141,7 +139,6 @@ function evictionSummary(ccdCase: CcdCaseData): EvictionSummaryData {
   };
 }
 
-/** The case heading and eviction details the pages show, from a new start of the event. */
 async function caseModel(req: Request, caseReference: string): Promise<Record<string, unknown>> {
   const started = await ccdCaseService.startCaseEvent(
     req.session.user!.accessToken,
@@ -152,7 +149,6 @@ async function caseModel(req: Request, caseReference: string): Promise<Record<st
 
   const ccdCase: CcdCaseData = started.data;
 
-  // The case heading matches Confirm order review's.
   return {
     evictionData: evictionSummary(ccdCase),
     caseReferenceDisplay: caseNumberFormatter(caseReference),
@@ -295,6 +291,15 @@ function oneOf<T extends string>(values: Record<string, T>, value: string): T | 
 }
 
 export function validateWarrantReturn(answers: WarrantReturnAnswers): ValidationResult {
+  const result = validateReturn(answers);
+  const issues = [
+    ...result.issues,
+    ...validateAdditionalDetails(answers.additionalDetails, isAdditionalDetailsMandatory(answers)),
+  ];
+  return issues.length > 0 ? { issues } : result;
+}
+
+function validateReturn(answers: WarrantReturnAnswers): ValidationResult {
   switch (answers.returnType) {
     case WarrantReturnType.FINAL:
       return validateFinalWarrantReturn(answers);
@@ -328,9 +333,6 @@ function validateEvictionSuccessful(answers: WarrantReturnAnswers): ValidationRe
 
   const evictionDate = validateEvictionDate(answers.evictionDate, issues);
 
-  // The only successful return name, Eviction successful, needs additional details.
-  issues.push(...validateAdditionalDetails(answers.additionalDetails, true));
-
   if (issues.length > 0) {
     return { issues };
   }
@@ -355,13 +357,6 @@ function validateEvictionUnsuccessful(answers: WarrantReturnAnswers, outcome: Ev
     issues.push({ id: 'eviction-unsuccessful-return-name', message: RETURN_NAME_ERROR_MESSAGE });
   }
 
-  issues.push(
-    ...validateAdditionalDetails(
-      answers.additionalDetails,
-      !!returnName && isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName)
-    )
-  );
-
   if (issues.length > 0) {
     return { issues };
   }
@@ -384,13 +379,6 @@ function validateInterimWarrantReturn(answers: WarrantReturnAnswers): Validation
   if (!returnName) {
     issues.push({ id: 'interim-return-name', message: RETURN_NAME_ERROR_MESSAGE });
   }
-
-  issues.push(
-    ...validateAdditionalDetails(
-      answers.additionalDetails,
-      !!returnName && isAdditionalDetailsMandatoryInterim(returnName)
-    )
-  );
 
   if (issues.length > 0) {
     return { issues };

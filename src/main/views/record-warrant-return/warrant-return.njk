@@ -28,7 +28,7 @@
       })
      }}
 
-    <div id="final-outcome-section" class="govuk-!-display-none">
+    <div id="final-outcome-section" class="govuk-checkboxes__conditional govuk-!-display-none">
       {{ govukSelect({
           id: "final-outcome",
           name: "final-outcome",
@@ -40,47 +40,47 @@
           errorMessage: validationErrors["final-outcome"]
         })
       }}
+
+      <div id="eviction-successful" class="govuk-checkboxes__conditional govuk-!-display-none">
+        {{ govukSelect({
+            id: "eviction-successful-return-name",
+            name: "eviction-successful-return-name",
+            label: {
+              text: "Return name"
+            },
+            items: evictionSuccessfulReturnTypeList,
+            value: answers.evictionSuccessfulReturnName,
+            errorMessage: validationErrors["eviction-successful-return-name"]
+          })
+        }}
+
+        {{
+          dateInput(
+            "eviction-date",
+            "Eviction date and time",
+            "For example, 27 3 2026 14 30. Use the 24-hour clock.",
+            answers.evictionDate,
+            evictionDateError
+          )
+        }}
+      </div>
+
+      <div id="eviction-unsuccessful-cancelled" class="govuk-checkboxes__conditional govuk-!-display-none">
+        {{ govukSelect({
+            id: "eviction-unsuccessful-return-name",
+            name: "eviction-unsuccessful-return-name",
+            label: {
+              text: "Return name"
+            },
+            items: evictionUnsuccessfulReturnTypeList,
+            value: answers.evictionUnsuccessfulReturnName,
+            errorMessage: validationErrors["eviction-unsuccessful-return-name"]
+          })
+        }}
+      </div>
     </div>
 
-    <div id="eviction-successful" class="govuk-!-display-none">
-      {{ govukSelect({
-          id: "eviction-successful-return-name",
-          name: "eviction-successful-return-name",
-          label: {
-            text: "Return name"
-          },
-          items: evictionSuccessfulReturnTypeList,
-          value: answers.evictionSuccessfulReturnName,
-          errorMessage: validationErrors["eviction-successful-return-name"]
-        })
-      }}
-
-      {{
-        dateInput(
-          "eviction-date",
-          "Eviction date and time",
-          "For example, 27 3 2026 14 30. Use the 24-hour clock.",
-          answers.evictionDate,
-          evictionDateError
-        )
-      }}
-    </div>
-
-    <div id="eviction-unsuccessful-cancelled" class="govuk-!-display-none">
-      {{ govukSelect({
-          id: "eviction-unsuccessful-return-name",
-          name: "eviction-unsuccessful-return-name",
-          label: {
-            text: "Return name"
-          },
-          items: evictionUnsuccessfulReturnTypeList,
-          value: answers.evictionUnsuccessfulReturnName,
-          errorMessage: validationErrors["eviction-unsuccessful-return-name"]
-        })
-      }}
-    </div>
-
-    <div id="interim" class="govuk-!-display-none">
+    <div id="interim" class="govuk-checkboxes__conditional govuk-!-display-none">
       {{ govukSelect({
           id: "interim-return-name",
           name: "interim-return-name",

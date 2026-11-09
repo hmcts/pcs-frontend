@@ -1,9 +1,13 @@
 import { CcdCaseData } from '@services/ccdCase.interface';
 import {
+  EvictionOutcome,
+  EvictionSuccessfulReturnName,
   EvictionUnsuccessfulReturnName,
   InterimReturnName,
+  WarrantReturnType,
   formatClaimants,
   formatDefendants,
+  isAdditionalDetailsMandatory,
   isAdditionalDetailsMandatoryEvictionUnsuccessful,
   isAdditionalDetailsMandatoryInterim,
 } from '@utils/warrantReturn';
@@ -156,6 +160,74 @@ describe('warrantReturn', () => {
       expect(formatClaimants(ccdCase)).toBe(
         '<ul class="govuk-list"><li>John Smith</li><li>ABC Housing Association</li><li>Jane Doe</li></ul>'
       );
+    });
+  });
+
+  describe('isAdditionalDetailsMandatory', () => {
+    const none = {
+      returnType: '',
+      finalOutcome: '',
+      evictionSuccessfulReturnName: '',
+      evictionUnsuccessfulReturnName: '',
+      interimReturnName: '',
+    };
+
+    it.each([
+      ['nothing is chosen', none, true],
+      ['a final return has no outcome', { ...none, returnType: WarrantReturnType.FINAL }, true],
+      [
+        'a successful eviction has no return name',
+        { ...none, returnType: WarrantReturnType.FINAL, finalOutcome: EvictionOutcome.SUCCESSFUL },
+        true,
+      ],
+      [
+        'the eviction was successful',
+        {
+          ...none,
+          returnType: WarrantReturnType.FINAL,
+          finalOutcome: EvictionOutcome.SUCCESSFUL,
+          evictionSuccessfulReturnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+        },
+        true,
+      ],
+      [
+        'an unsuccessful eviction has no return name',
+        { ...none, returnType: WarrantReturnType.FINAL, finalOutcome: EvictionOutcome.UNSUCCESSFUL },
+        true,
+      ],
+      [
+        'an unsuccessful eviction has a return name that needs details',
+        {
+          ...none,
+          returnType: WarrantReturnType.FINAL,
+          finalOutcome: EvictionOutcome.UNSUCCESSFUL,
+          evictionUnsuccessfulReturnName: EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
+        },
+        true,
+      ],
+      [
+        'a cancelled eviction has a return name that does not need details',
+        {
+          ...none,
+          returnType: WarrantReturnType.FINAL,
+          finalOutcome: EvictionOutcome.CANCELLED,
+          evictionUnsuccessfulReturnName: EvictionUnsuccessfulReturnName.WARRANT_EXPIRED,
+        },
+        false,
+      ],
+      ['an interim return has no return name', { ...none, returnType: WarrantReturnType.INTERIM }, true],
+      [
+        'an interim return has a return name that needs details',
+        { ...none, returnType: WarrantReturnType.INTERIM, interimReturnName: InterimReturnName.REOPEN_WARRANT },
+        true,
+      ],
+      [
+        'an interim return has a return name that does not need details',
+        { ...none, returnType: WarrantReturnType.INTERIM, interimReturnName: InterimReturnName.CROWDS_OR_PROTESTS },
+        false,
+      ],
+    ])('when %s, mandatory is %s', (_, choices, expected) => {
+      expect(isAdditionalDetailsMandatory(choices)).toBe(expected);
     });
   });
 
