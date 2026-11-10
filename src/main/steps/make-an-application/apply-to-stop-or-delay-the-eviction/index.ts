@@ -6,7 +6,7 @@ import { getSuspendApplicationFee } from '../suspendFee';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
-import { ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS } from '@utils/respondToClaimFlags';
+import { ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS_R2 } from '@utils/respondToClaimFlags';
 
 export const step: StepDefinition = createFormStep({
   stepName: 'apply-to-stop-or-delay-the-eviction',
@@ -45,7 +45,11 @@ export const step: StepDefinition = createFormStep({
     sendTheCompletedFormToTheCourt: 'sendTheCompletedFormToTheCourt',
   },
   beforeGet: async req => {
-    const generalApplicationsEnabled = await getLaunchDarklyFlag(req, ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS, false);
+    const generalApplicationsEnabled = await getLaunchDarklyFlag(
+      req,
+      ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS_R2,
+      false
+    );
     if (!generalApplicationsEnabled) {
       const caseReference = req.res?.locals.validatedCase?.id;
       throw new Error(
