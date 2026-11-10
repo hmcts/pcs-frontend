@@ -85,6 +85,16 @@ describe('cdamService', () => {
       });
     });
 
+    it('keeps the hash token CDAM issued, so pcs-api can attach the draft upload to the case', async () => {
+      mockPost.mockResolvedValue({
+        data: { documents: [{ ...cdamResponse.data.documents[0], hashToken: 'hash-123' }] },
+      });
+
+      const result = await uploadDocument(createMockFile(), userToken);
+
+      expect(result.document_hash).toBe('hash-123');
+    });
+
     it('uses file originalname when CDAM returns no document name', async () => {
       const response = {
         data: {

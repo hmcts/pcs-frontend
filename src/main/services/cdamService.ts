@@ -46,6 +46,7 @@ export async function uploadDocument(file: Express.Multer.File, userToken: strin
     document_url: raw._links.self.href,
     document_binary_url: raw._links.binary.href,
     document_filename: filename,
+    document_hash: raw.hashToken,
     content_type: raw.mimeType || file.mimetype,
     size: raw.size ?? file.size,
   };

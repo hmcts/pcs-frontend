@@ -556,6 +556,33 @@ describe('documentProxyRoutes', () => {
       expect(body.document.index).toBe(1);
     });
 
+    it('saves the CDAM hash token with the new document, and leaves it out when CDAM sent none', async () => {
+      const res = { json: jest.fn() } as unknown as Response;
+      const upload = {
+        file: { originalname: 'new.pdf', mimetype: 'application/pdf', buffer: Buffer.from(''), size: 1 },
+      };
+      const cdamDoc = {
+        document_url: 'http://dm/doc/new-uuid',
+        document_binary_url: 'http://dm/doc/new-uuid/binary',
+        document_filename: 'new.pdf',
+      };
+
+      // makeReqWithDocs wires its own storage mock, so the one asserted on is made after it.
+      const reqWithHash = makeReqWithDocs(upload, []);
+      const withHash = makeStorageMock([]);
+      mockUploadDocument.mockResolvedValue({ ...cdamDoc, document_hash: 'hash-123' });
+      await handler(reqWithHash, res);
+
+      expect(withHash.mockSave.mock.calls[0][1][0].value.document.document_hash).toBe('hash-123');
+
+      const reqWithoutHash = makeReqWithDocs(upload, []);
+      const withoutHash = makeStorageMock([]);
+      mockUploadDocument.mockResolvedValue(cdamDoc);
+      await handler(reqWithoutHash, res);
+
+      expect(withoutHash.mockSave.mock.calls[0][1][0].value.document).not.toHaveProperty('document_hash');
+    });
+
     it('assigns a generated UUID id to the new collection item', async () => {
       mockUploadDocument.mockResolvedValue({
         document_url: 'http://dm/doc/new-uuid',
