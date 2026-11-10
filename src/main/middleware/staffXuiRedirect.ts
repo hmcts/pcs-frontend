@@ -37,7 +37,7 @@ function isAllowedJudgePath(path: string): boolean {
   return [...STAFF_JOURNEY_PATHS, ...NON_PAGE_PATHS].some(pattern => pattern.test(path));
 }
 
-function getJudgeRedirectUrl(path: string): string {
+function getStaffRedirectUrl(path: string): string {
   const caseReference = CASE_PATH.exec(path)?.[1];
   if (caseReference) {
     const caseDetailsUrl = buildManageCaseDetailsRedirect(
@@ -71,5 +71,5 @@ export const staffXuiRedirectMiddleware: RequestHandler = async (
     return next();
   }
 
-  return res.redirect(303, getJudgeRedirectUrl(path));
+  return res.redirect(303, getStaffRedirectUrl(path));
 };

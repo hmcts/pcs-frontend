@@ -1,5 +1,5 @@
 import config from 'config';
-import { NextFunction } from 'express';
+import { NextFunction, Request } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../../../main/HttpError';
 
@@ -13,6 +13,7 @@ import {
   manageCaseDetailsUrl,
   mapXuiValidation,
   refusedXuiEvent,
+  xuiHeaderModel,
 } from '@utils/xuiUtils';
 
 describe('xuiUtils', () => {
@@ -63,6 +64,25 @@ describe('xuiUtils', () => {
 
     it('should pass any other error to next', () => {
       const error = new Error('Something went wrong');
+
+      refusedXuiEvent(res, next as NextFunction, error);
+
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.send).not.toHaveBeenCalled();
+    });
+
+    it('should pass a CallbackRejectedError to next', () => {
+      const error = new CallbackRejectedError(['Rejected'], 422);
+
+      refusedXuiEvent(res, next as NextFunction, error);
+
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+    });
+
+    it.each([400, 401, 500, 502])('should pass an HTTPError with status %s to next', status => {
+      const error = new HTTPError('Failed', status);
 
       refusedXuiEvent(res, next as NextFunction, error);
 
@@ -149,6 +169,10 @@ describe('xuiUtils', () => {
   });
 
   describe('manageCaseDetailsUrl', () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
     it('should return the generated manage case URL', () => {
       jest.spyOn(config, 'get').mockReturnValue('https://example.com');
       jest.spyOn(manageCaseRedirect, 'buildManageCaseDetailsRedirect').mockReturnValue('https://example.com/case/123');
@@ -156,17 +180,22 @@ describe('xuiUtils', () => {
       const result = manageCaseDetailsUrl('123');
 
       expect(config.get).toHaveBeenCalledWith('redirects.manageCaseReturnURL');
+      expect(manageCaseRedirect.buildManageCaseDetailsRedirect).toHaveBeenCalledWith('https://example.com', '123');
       expect(result).toBe('https://example.com/case/123');
     });
 
     it('should throw an HTTPError when the manage case URL is not configured', () => {
-      jest.spyOn(config, 'get').mockReturnValue(undefined as never);
-
-      jest.spyOn(manageCaseRedirect, 'buildManageCaseDetailsRedirect').mockReturnValue('');
+      jest.spyOn(manageCaseRedirect, 'buildManageCaseDetailsRedirect').mockReturnValue(undefined);
 
       expect(() => manageCaseDetailsUrl('123')).toThrow(HTTPError);
 
       expect(() => manageCaseDetailsUrl('123')).toThrow('The Manage Case return URL is not configured');
+    });
+
+    it('should build the case details URL from the configured Manage Case URL', () => {
+      expect(manageCaseDetailsUrl('1794231546115667')).toBe(
+        `${config.get<string>('redirects.manageCaseReturnURL')}/1794231546115667`
+      );
     });
   });
 
@@ -192,6 +221,40 @@ describe('xuiUtils', () => {
       } as CcdCaseData;
 
       expect(getClaimantNames(ccdCase)).toBe('John Smith, ABC Housing Association, Jane Doe');
+    });
+
+    it('prioritise org name over individual name', () => {
+      const ccdCase = {
+        allClaimants: [{ value: { orgName: 'ABC Housing Association', firstName: 'John', lastName: 'Smith' } }],
+      } as CcdCaseData;
+
+      expect(getClaimantNames(ccdCase)).toBe('ABC Housing Association');
+    });
+  });
+
+  describe('xuiHeaderModel', () => {
+    const request = (roles?: unknown): Request =>
+      ({ session: roles === undefined ? {} : { user: { roles } } }) as unknown as Request;
+
+    it('should get xui assets and configure header config', () => {
+      const headerModel = xuiHeaderModel(request(['caseworker-pcs']));
+      const xuiUri = config.get<string>('xui.uri');
+
+      expect(headerModel.title.href).toBe(`${xuiUri}/`);
+      expect(headerModel.assetsPath).toBe('/assets/ui-component-lib');
+      expect(headerModel.accountNav.items).toEqual([{ id: 'sign-out', text: 'Sign out', href: '/logout' }]);
+    });
+
+    it('should choose the header from the user’s roles, ignoring case and spaces', () => {
+      expect(xuiHeaderModel(request([' CASEWORKER-PCS-JUDGE '])).theme.key).toBe('judicial');
+      expect(xuiHeaderModel(request(['caseworker-pcs'])).theme.key).toBe('default');
+    });
+
+    it('should add the role assignments the event is limited to', () => {
+      const headerModel = xuiHeaderModel(request(['caseworker-pcs']), ['judge']);
+
+      expect(headerModel.theme.key).toBe('judicial');
+      expect(headerModel.title.text).toBe('Judicial Case Manager');
     });
   });
 

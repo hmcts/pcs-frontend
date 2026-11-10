@@ -11,9 +11,9 @@ import { publicRouter } from './guidance';
 import {
   caseReferenceParamMiddleware,
   formBodyMiddleware,
-  staffXuiRedirectMiddleware,
   legalRepresentativeAccessMiddleware,
   pageTrackingUrlMiddleware,
+  staffXuiRedirectMiddleware,
 } from './middleware';
 import * as modules from './modules';
 import { setupErrorHandlers } from './modules/error-handler';
