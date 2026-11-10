@@ -3,7 +3,6 @@
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "macros/caseTitle.njk" import caseTitle %}
 
-{# The case heading is shared with Make an order and Confirm order review, so XUI's external events look alike. #}
 {% block content %}
   {% if errorSummary %}
     {{ govukErrorSummary(errorSummary) }}
