@@ -6,7 +6,7 @@ import { getLaunchDarklyFlag } from '../utils/getLaunchDarklyFlag';
 
 import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 
-const JUDGE_JOURNEY_PATHS = [
+const STAFF_JOURNEY_PATHS = [
   /^\/cases\/\d+\/event\/ext:makeOrder$/,
   /^\/case\/\d+\/make-order(?:\/.*)?$/,
   /^\/cases\/\d+\/event\/ext:confirmOrderReview$/,
@@ -34,7 +34,7 @@ function decodePath(path: string): string {
 }
 
 function isAllowedJudgePath(path: string): boolean {
-  return [...JUDGE_JOURNEY_PATHS, ...NON_PAGE_PATHS].some(pattern => pattern.test(path));
+  return [...STAFF_JOURNEY_PATHS, ...NON_PAGE_PATHS].some(pattern => pattern.test(path));
 }
 
 function getJudgeRedirectUrl(path: string): string {
@@ -58,7 +58,7 @@ function getJudgeRedirectUrl(path: string): string {
  * unless the request is part of a supported judicial or caseworker order journey. Only while make order is
  * enabled.
  */
-export const judgeXuiRedirectMiddleware: RequestHandler = async (
+export const staffXuiRedirectMiddleware: RequestHandler = async (
   req: Request,
   res: Response,
   next: NextFunction

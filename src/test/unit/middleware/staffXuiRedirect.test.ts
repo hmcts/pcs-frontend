@@ -16,7 +16,7 @@ jest.mock('config', () => ({
   get: (...args: unknown[]) => mockConfigGet(...args),
 }));
 
-import { judgeXuiRedirectMiddleware } from '../../../main/middleware/judgeXuiRedirect';
+import { staffXuiRedirectMiddleware } from '../../../main/middleware/staffXuiRedirect';
 
 const XUI_URL = 'https://manage-case.aat.platform.hmcts.net';
 const CASE_DETAILS_BASE_URL = 'https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS';
@@ -27,7 +27,7 @@ describe('judgeXuiRedirectMiddleware', () => {
 
   const invokeMiddleware = async (path: string): Promise<void> => {
     const req = { path } as unknown as Request;
-    await judgeXuiRedirectMiddleware(req, res as Response, next);
+    await staffXuiRedirectMiddleware(req, res as Response, next);
   };
 
   beforeEach(() => {

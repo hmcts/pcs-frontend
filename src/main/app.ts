@@ -11,7 +11,7 @@ import { publicRouter } from './guidance';
 import {
   caseReferenceParamMiddleware,
   formBodyMiddleware,
-  judgeXuiRedirectMiddleware,
+  staffXuiRedirectMiddleware,
   legalRepresentativeAccessMiddleware,
   pageTrackingUrlMiddleware,
 } from './middleware';
@@ -54,7 +54,7 @@ app.use((req, res, next) => {
 
 app.use(pageTrackingUrlMiddleware);
 app.use(legalRepresentativeAccessMiddleware);
-app.use(judgeXuiRedirectMiddleware);
+app.use(staffXuiRedirectMiddleware);
 
 // param middleware for caseReference
 app.param('caseReference', caseReferenceParamMiddleware);
