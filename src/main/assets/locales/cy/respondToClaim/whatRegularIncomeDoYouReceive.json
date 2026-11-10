@@ -13,6 +13,7 @@
   },
   "subFields": {
     "amount": "Cyfanswm a dderbynnir",
+    "frequency": "Derbynnir bob:",
     "moneyFromElsewhereDetailsLabel": "Rhowch fanylion",
     "moneyFromElsewhereDetailsHint": "Rhowch fanylion y ffynonellau eraill o incwm a faint rydych fel arfer yn ei gael"
   },
@@ -32,6 +33,10 @@
   "frequency": {
     "week": "cyReceived every week",
     "month": "cyReceived every month"
+  },
+  "previousFrequency": {
+    "week": "Wythnos",
+    "month": "Mis"
   },
   "errors": {
     "incomeFromJobsAmount": {

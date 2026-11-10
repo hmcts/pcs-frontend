@@ -7,6 +7,7 @@ import { noEmojiValidator } from '../../utils/fieldValidators';
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { release14RadioWording } from '@utils/respondToClaimFlags';
 
 const validateMoneyFromElsewhereDetails = noEmojiValidator('errors.moneyFromElsewhereDetails.invalidCharacters');
 
@@ -19,9 +20,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
   // Show the question as the legend heading for citizens so screen readers read it with the checkboxes.
   // Legal reps: no change.
   extendGetContent: (req, formContent) => {
+    const wording = release14RadioWording(req);
     const checkboxField = formContent.fields.find(f => f.componentType === 'checkboxes');
     if (isLegalRepresentativeUser(req) || !checkboxField?.component) {
-      return {};
+      return wording;
     }
     checkboxField.component.fieldset = {
       legend: {
@@ -30,7 +32,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
         classes: 'govuk-fieldset__legend--l govuk-!-margin-bottom-6',
       },
     };
-    return { heading: '' };
+    return { ...wording, heading: '' };
   },
 
   getInitialFormData: (req: Request) => {

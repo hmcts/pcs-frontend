@@ -15,7 +15,8 @@
     "otherExpenses": "Other"
   },
   "subFields": {
-    "amount": "Amount paid"
+    "amount": "Amount paid",
+    "frequency": "Paid every:"
   },
   "subFieldsLegend": {
     "householdBills": "Household bills details",
@@ -42,6 +43,10 @@
   "frequency": {
     "week": "Paid every week",
     "month": "Paid every month"
+  },
+  "previousFrequency": {
+    "week": "Week",
+    "month": "Month"
   },
   "errors": {
     "householdBillsAmount": {

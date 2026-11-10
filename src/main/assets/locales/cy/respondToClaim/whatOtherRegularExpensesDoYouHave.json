@@ -15,7 +15,8 @@
     "otherExpenses": "Arall"
   },
   "subFields": {
-    "amount": "Swm a dalwyd"
+    "amount": "Swm a dalwyd",
+    "frequency": "Ei dalu:"
   },
   "subFieldsLegend": {
     "householdBills": "cyHousehold bills details",
@@ -42,6 +43,10 @@
   "frequency": {
     "week": "cyPaid every week",
     "month": "cyPaid every month"
+  },
+  "previousFrequency": {
+    "week": "Wythnos",
+    "month": "Mis"
   },
   "errors": {
     "householdBillsAmount": {

@@ -9,6 +9,11 @@
     "week": "cyPaid every week",
     "month": "cyPaid every month"
   },
+  "previousFrequencyQuestion": "Talu pob:",
+  "previousFrequency": {
+    "week": "Wythnos",
+    "month": "Mis"
+  },
   "errors": {
     "priorityDebtTotal": "Rhowch y cyfanswm sy’n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth",
     "priorityDebtTotalMin": "Rhaid i’r cyfanswm sy’n ddyledus gennych ar gyfer eich holl ddyledion blaenoriaeth fod yn £0.00 neu fwy",

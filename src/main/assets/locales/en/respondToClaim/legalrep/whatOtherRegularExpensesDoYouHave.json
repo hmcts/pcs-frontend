@@ -15,7 +15,8 @@
     "otherExpenses": "Other"
   },
   "subFields": {
-    "amount": "Amount paid"
+    "amount": "Amount paid",
+    "frequency": "Paid every:"
   },
   "frequencyLegend": {
     "householdBills": "How often does the defendant pay household bills?",

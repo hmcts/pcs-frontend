@@ -15,7 +15,8 @@
     "otherExpenses": "Arall"
   },
   "subFields": {
-    "amount": "Swm a dalwyd"
+    "amount": "Swm a dalwyd",
+    "frequency": "Talu pob:"
   },
   "frequencyLegend": {
     "householdBills": "cyHow often does the defendant pay household bills?",

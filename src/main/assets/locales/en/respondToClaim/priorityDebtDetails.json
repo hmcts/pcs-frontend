@@ -9,6 +9,11 @@
     "week": "Paid every week",
     "month": "Paid every month"
   },
+  "previousFrequencyQuestion": "Paid every:",
+  "previousFrequency": {
+    "week": "Week",
+    "month": "Month"
+  },
   "errors": {
     "priorityDebtTotal": "Enter the total amount you owe for all your priority debts",
     "priorityDebtTotalMin": "The total amount you owe for all your priority debts must be £0.00 or above",

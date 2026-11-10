@@ -10,6 +10,7 @@ import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../u
 import { createRespondToClaimFormStep } from '../formStep';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { release14RadioWording } from '@utils/respondToClaimFlags';
 
 type FrequencyFormValue = Lowercase<FrequencyValue>;
 const FREQUENCY_MAP: Record<FrequencyValue, FrequencyFormValue> = {
@@ -146,5 +147,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ],
     },
   ],
+  extendGetContent: req => release14RadioWording(req),
   customTemplate: `${__dirname}/priorityDebtDetails.njk`,
 });

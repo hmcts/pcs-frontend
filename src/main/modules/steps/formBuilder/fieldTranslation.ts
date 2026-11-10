@@ -130,6 +130,25 @@ function resolveOptionText(t: TFunction, option: FormFieldOption, interpolation?
 /**
  * Processes options with label functions, conditionalText, and subFields
  */
+function radioCopyKey(key: string, interpolation?: Record<string, unknown>): string {
+  if (interpolation?.release14RadioWording !== false) {
+    return key;
+  }
+  if (key === 'frequency.week') {
+    return 'previousFrequency.week';
+  }
+  if (key === 'frequency.month') {
+    return 'previousFrequency.month';
+  }
+  if (key === 'frequencyQuestion') {
+    return 'previousFrequencyQuestion';
+  }
+  if (key.startsWith('frequencyLegend.')) {
+    return 'subFields.frequency';
+  }
+  return key;
+}
+
 function processOptions(
   options: FormFieldOption[] | undefined,
   t: TFunction,
@@ -147,7 +166,17 @@ function processOptions(
     }
 
     // Resolve label (function or string)
-    const optionLabel = resolveLabel(option.label, translations, resolveOptionText(t, option, interpolation));
+    const optionLabel = resolveLabel(
+      option.label,
+      translations,
+      resolveOptionText(
+        t,
+        option.translationKey
+          ? { ...option, translationKey: radioCopyKey(option.translationKey, interpolation) }
+          : option,
+        interpolation
+      )
+    );
 
     // Process conditionalText if provided
     let resolvedConditionalText: string | undefined;
@@ -185,9 +214,10 @@ function processOptions(
       text: optionLabel,
       conditionalText: resolvedConditionalText,
       subFields: processedSubFields,
-      subFieldsLegend: option.subFieldsLegendKey
-        ? getTranslation(t, option.subFieldsLegendKey, undefined, interpolation)
-        : undefined,
+      subFieldsLegend:
+        interpolation?.release14RadioWording !== false && option.subFieldsLegendKey
+          ? getTranslation(t, option.subFieldsLegendKey, undefined, interpolation)
+          : undefined,
     };
   });
 }
@@ -207,7 +237,7 @@ function processField(
 
   // Resolve label (function or string)
   const translatedFieldLabel = field.translationKey?.label
-    ? getTranslation(t, field.translationKey.label, undefined, interpolation)
+    ? getTranslation(t, radioCopyKey(field.translationKey.label, interpolation), undefined, interpolation)
     : undefined;
   let label = resolveLabel(field.label, translations, translatedFieldLabel ?? fieldName);
 
@@ -234,6 +264,10 @@ function processField(
     label,
     hint,
     options: processedOptions,
+    legendClasses:
+      interpolation?.release14RadioWording === false && field.legendClasses === 'govuk-visually-hidden'
+        ? undefined
+        : field.legendClasses,
   };
 }
 

@@ -13,6 +13,7 @@
   },
   "subFields": {
     "amount": "Total amount received",
+    "frequency": "Received every:",
     "moneyFromElsewhereDetailsLabel": "Give details",
     "moneyFromElsewhereDetailsHint": "Give details about the other sources of income and how much you usually receive"
   },
@@ -32,6 +33,10 @@
   "frequency": {
     "week": "Received every week",
     "month": "Received every month"
+  },
+  "previousFrequency": {
+    "week": "Week",
+    "month": "Month"
   },
   "errors": {
     "incomeFromJobsAmount": {

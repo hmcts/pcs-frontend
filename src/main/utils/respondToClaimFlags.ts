@@ -1,3 +1,5 @@
+import type { Request } from 'express';
+
 export const ENABLE_CUI_RESPOND_TO_CLAIM = 'cui-respond-to-claim-enabled';
 
 export const ENABLE_CUI_RESPOND_TO_CLAIM_LR = 'cui-respond-to-claim-lr-enabled';
@@ -11,3 +13,7 @@ export const RELEASE_1_4_ENABLED = 'release-1.4-enabled';
 export const ENABLE_UNCATEGORISED_DOCUMENTS = 'uncategorised-documents-enabled';
 
 export const ENABLE_CUI_PCQ = 'cui-pcq-enabled';
+
+export function release14RadioWording(req: Request): { release14RadioWording?: false } {
+  return req.res?.locals.release14Enabled === false ? { release14RadioWording: false } : {};
+}
