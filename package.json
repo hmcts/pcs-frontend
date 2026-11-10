@@ -190,7 +190,7 @@
     "moment": "^2.31.0",
     "protobufjs": "^8.0.0",
     "prosemirror-dropcursor": "1.8.4",
-    "prosemirror-model": "1.25.12",
+    "prosemirror-model": "1.25.13",
     "prosemirror-transform": "1.12.4",
     "prosemirror-view": "1.42.9",
     "qs": "^6.16.1",
