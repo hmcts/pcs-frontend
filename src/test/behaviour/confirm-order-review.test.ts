@@ -25,6 +25,7 @@ const MAKE_ORDER = `/case/${CASE_REFERENCE}/make-order`;
 const BASE = `/case/${CASE_REFERENCE}/confirm-order-review`;
 const INTRO = `${BASE}?orderId=order-awaiting-review&taskId=task-1`;
 const REVIEW = `${BASE}/review`;
+const ORDER_DETAILS = `${BASE}/order-details`;
 const REVIEW_DATES = `${BASE}/review-dates`;
 const PROCEED_TO_ISSUE = `${BASE}/proceed-to-issue`;
 const CHECK_YOUR_ANSWERS = `${BASE}/check-your-answers`;
@@ -473,6 +474,106 @@ describe('confirm order review', () => {
       expect((await app.get(REVIEW_DATES)).location).toBe(BASE);
       expect(submittedReviews()).toEqual([]);
     });
+  });
+
+  describe('what a free-form order does', () => {
+    const freeFormOrder = () =>
+      judgesOrder({ tab: 'tab-free-form', edit: () => writeInPreview('Possession of the property forthwith.') });
+
+    beforeEach(async () => {
+      app = await caseworkerReviewing(await freeFormOrder());
+      const page = await openReview(app);
+      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(ORDER_DETAILS);
+    });
+
+    it('asks what the order does, and the details of what it does', async () => {
+      expect(errors((await app.post(ORDER_DETAILS, form({ action: 'continue' }))).text)).toEqual([
+        'Select what the order does',
+      ]);
+
+      const outright = await app.post(ORDER_DETAILS, form({ 'order-does': 'outright', action: 'continue' }));
+      expect(errors(outright.text)).toEqual([
+        'Select when possession is ordered',
+        'Select the grounds possession is ordered on',
+        'Enter details of the grounds',
+        'Select if the order makes a money judgment',
+        'Select if the order transfers enforcement to the High Court',
+      ]);
+      // What was answered is kept.
+      expect(parse(outright.text).querySelector<HTMLInputElement>('#order-does')?.checked).toBe(true);
+
+      const noDate = await app.post(
+        ORDER_DETAILS,
+        form({ 'order-does': 'suspended', 'suspended-date-day': '31', 'suspended-date-month': '2', action: 'continue' })
+      );
+      expect(errors(noDate.text)).toContain('Enter a real date possession is ordered by');
+
+      const generally = await app.post(
+        ORDER_DETAILS,
+        form({ 'order-does': 'adjournment', adjournment: 'generally', action: 'continue' })
+      );
+      expect(generally.location).toBe(REVIEW_DATES);
+      const back = await app.post(REVIEW_DATES, form({ action: 'previous' }));
+      expect(back.location).toBe(ORDER_DETAILS);
+    });
+
+    it('lists what the order does to check, and issues it with them, leaving the wording as the judge wrote it', async () => {
+      await app.post(
+        ORDER_DETAILS,
+        form({
+          'order-does': 'outright',
+          'outright-possession': 'by',
+          'outright-date-day': '4',
+          'outright-date-month': '12',
+          'outright-date-year': '2026',
+          'outright-grounds': 'mandatory',
+          'outright-grounds-details': ' Ground 8 ',
+          'outright-money-judgment': 'yes',
+          'outright-transfer': 'no',
+          action: 'continue',
+        })
+      );
+      await app.post(REVIEW_DATES, form({ 'has-review-dates': 'no', action: 'continue' }));
+      await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers());
+
+      const page = parse((await app.get(CHECK_YOUR_ANSWERS)).text);
+      const rows = [...page.querySelectorAll('#order-details-answers .govuk-summary-list__row')].map(row => [
+        row.querySelector('.govuk-summary-list__key')?.textContent?.trim(),
+        row.querySelector('.govuk-summary-list__value')?.textContent?.trim(),
+      ]);
+      expect(rows).toEqual([
+        ['What does the order do?', 'Outright possession'],
+        ['Possession', 'On or before 4 December 2026'],
+        ['Grounds', 'Mandatory'],
+        ['Details of the grounds', 'Ground 8'],
+        ['Money judgment', 'Yes'],
+        ['Transfer to the High Court for enforcement', 'No'],
+      ]);
+
+      await app.post(CHECK_YOUR_ANSWERS, form({ action: 'continue' }));
+      const [review] = submittedReviews() as {
+        issue: { freeFormDetails: unknown; order: { orderType: string; html: string } };
+      }[];
+      expect(review.issue.freeFormDetails).toEqual({
+        category: 'OUTRIGHT_POSSESSION',
+        possessionForthwith: false,
+        possessionDate: '2026-12-04',
+        grounds: 'MANDATORY',
+        groundsDetails: 'Ground 8',
+        moneyJudgment: true,
+        transferToHighCourt: false,
+      });
+      expect(review.issue.order.orderType).toBe('FREE_FORM');
+      expect(review.issue.order.html).toContain('Possession of the property forthwith.');
+    });
+  });
+
+  it('does not ask what an order the judge made from its answers does', async () => {
+    app = await caseworkerReviewing();
+    await issueFromReview(app);
+
+    expect((await app.get(ORDER_DETAILS)).location).toBe(REVIEW_DATES);
+    expect((await app.post(REVIEW_DATES, form({ action: 'previous' }))).location).toBe(REVIEW);
   });
 
   describe('review dates', () => {

@@ -3,6 +3,7 @@ import { parseSnapshot, renderHtml } from '@hmcts-cft/docweave';
 import type { OrderFormSubmission } from '@utils/makeOrderForm';
 import { parseDate } from '@utils/makeOrderFormat';
 import type { FormData, OrderStart } from '@utils/orderCase';
+import { type OrderDetailsAnswers, orderDetailsRequest } from '@utils/orderDetails';
 
 export const REVIEW_REASONS = [
   { value: 'UNLESS_ORDER', text: 'Unless order' },
@@ -36,6 +37,8 @@ export interface OrderReviewAnswers {
   /** The order to issue, as the review page last sent it: the judge's form and document with the caseworker's changes. */
   order?: Required<OrderFormSubmission>;
   sendQuery?: boolean;
+  /** What a free-form order does, as court staff record it; none in a review started before it was asked. */
+  orderDetails?: OrderDetailsAnswers;
   queryToJudge?: string;
   hasReviewDates?: 'yes' | 'no';
   reviewDates: ReviewDateAnswer[];
@@ -75,6 +78,7 @@ export function newAnswers(): OrderReviewAnswers {
   // Orders are served on all parties under the County Court seal, without permission for restitution, unless the
   // caseworker changes it.
   return {
+    orderDetails: {},
     reviewDates: [],
     partiesToServe: [],
     restitutionPermission: 'no',
@@ -85,6 +89,11 @@ export function newAnswers(): OrderReviewAnswers {
 
 export function blankReviewDate(): ReviewDateAnswer {
   return { day: '', month: '', year: '', reason: '', description: '' };
+}
+
+/** Whether the order to issue is free-form, whose wording is the judge's, so court staff record what it does. */
+export function issuesFreeForm(answers: OrderReviewAnswers): boolean {
+  return answers.order?.orderType === 'FREE_FORM';
 }
 
 // Posted form values, which a browser sends as a string, several strings, or nothing.
@@ -219,6 +228,7 @@ export function reviewRequest(
       nextStepsComplete: answers.nextSteps === 'complete',
       finalOrder: answers.finalOrder === 'yes',
       restitutionPermission: answers.restitutionPermission === 'yes',
+      freeFormDetails: issuesFreeForm(answers) ? orderDetailsRequest(answers.orderDetails) : undefined,
       serveAllParties,
       partiesToServe: serveAllParties ? [] : answers.partiesToServe,
       seal: answers.seal,

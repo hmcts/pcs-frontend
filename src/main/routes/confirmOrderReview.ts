@@ -21,6 +21,18 @@ import {
   xuiHeaderModel,
 } from '@utils/orderCase';
 import {
+  ADJOURNMENT,
+  CONDITION,
+  GROUNDS,
+  MAX_GROUNDS_DETAILS_LENGTH,
+  ORDER_DETAILS_FIELDS,
+  ORDER_DOES,
+  OUTRIGHT_POSSESSION,
+  STRIKE_OUT,
+  orderDetailsRows,
+  validateOrderDetails,
+} from '@utils/orderDetails';
+import {
   MAX_QUERY_LENGTH,
   MAX_REVIEW_DATES,
   MAX_REVIEW_DESCRIPTION_LENGTH,
@@ -33,6 +45,7 @@ import {
   type ValidationIssue,
   blankReviewDate,
   choice,
+  issuesFreeForm,
   list,
   newAnswers,
   reviewRequest,
@@ -56,6 +69,7 @@ const CONFIRM_ORDER_REVIEW_EVENT_ID = 'ext:confirmOrderReview';
 const PAGES = {
   intro: '',
   review: '/review',
+  orderDetails: '/order-details',
   reviewDates: '/review-dates',
   proceedToIssue: '/proceed-to-issue',
   checkYourAnswers: '/check-your-answers',
@@ -209,6 +223,16 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
   const partiesToServe = answers.partiesToServe.map(id => partyNames.get(id) ?? id);
   return {
     sections: [
+      ...(issuesFreeForm(answers)
+        ? [
+            {
+              heading: 'What the order does',
+              id: 'order-details-answers',
+              href: pageUrl(caseReferenceOf(req), 'orderDetails'),
+              rows: orderDetailsRows(answers.orderDetails).map(([key, value]) => row(key, key, value)),
+            },
+          ]
+        : []),
       {
         heading: 'Review dates',
         id: 'review-dates-answers',
@@ -269,6 +293,20 @@ const VIEWS = {
     ...orderFormModel(review, review.answers.order),
     answers: review.answers,
     maxQueryLength: MAX_QUERY_LENGTH,
+  }),
+  'order-details': (_req: Request, review: OrderReviewSession) => ({
+    answers: review.answers.orderDetails ?? {},
+    orderDoes: ORDER_DOES,
+    outrightPossession: OUTRIGHT_POSSESSION,
+    grounds: GROUNDS,
+    condition: CONDITION,
+    adjournment: ADJOURNMENT,
+    strikeOut: STRIKE_OUT,
+    yesNo: [
+      { value: 'yes', text: 'Yes' },
+      { value: 'no', text: 'No' },
+    ],
+    maxGroundsDetailsLength: MAX_GROUNDS_DETAILS_LENGTH,
   }),
   'review-dates': (_req: Request, review: OrderReviewSession) => ({
     answers: review.answers,
@@ -342,6 +380,7 @@ function firstIncompletePage(review: OrderReviewSession, after?: Page): Page | u
   const { answers } = review;
   const pages: [Page, ValidationIssue[]][] = [
     ['review', orderIssues(review)],
+    ['orderDetails', issuesFreeForm(answers) ? validateOrderDetails(answers.orderDetails) : []],
     ['reviewDates', validateReviewDates(answers)],
     ['proceedToIssue', validateProceedToIssue(answers)],
   ];
@@ -431,6 +470,27 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     }
   });
 
+  app.get(route('orderDetails'), ...inJourney, (req: Request, res: Response) =>
+    issuesFreeForm(reviewOf(req)!.answers)
+      ? render(req, res, 'order-details')
+      : res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'))
+  );
+
+  app.post(route('orderDetails'), ...inJourney, (req: Request, res: Response) => {
+    const review = reviewOf(req)!;
+    review.answers.orderDetails = Object.fromEntries(ORDER_DETAILS_FIELDS.map(field => [field, text(req.body[field])]));
+    if (req.body.action === 'previous') {
+      return res.redirect(pageUrl(caseReferenceOf(req), 'review'));
+    }
+    const issues = validateOrderDetails(review.answers.orderDetails);
+    if (issues.length) {
+      return render(req, res, 'order-details', issues);
+    }
+    return res.redirect(
+      pageUrl(caseReferenceOf(req), firstIncompletePage(review, 'orderDetails') ?? 'checkYourAnswers')
+    );
+  });
+
   app.get(route('reviewDates'), ...inJourney, (req: Request, res: Response) => render(req, res, 'review-dates'));
 
   app.post(route('reviewDates'), ...inJourney, (req: Request, res: Response) => {
@@ -443,7 +503,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     }
     const action = text(req.body.action);
     if (action === 'previous') {
-      return res.redirect(pageUrl(caseReference, 'review'));
+      return res.redirect(pageUrl(caseReference, issuesFreeForm(answers) ? 'orderDetails' : 'review'));
     }
     if (action === 'add') {
       if (answers.reviewDates.length < MAX_REVIEW_DATES) {
