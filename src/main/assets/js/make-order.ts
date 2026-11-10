@@ -141,7 +141,7 @@ const DAYS_PER_RENT_PERIOD: Record<string, number> = { WEEKLY: 7, FORTNIGHTLY: 1
 export function initCaseFactDefaults(form: HTMLFormElement): void {
   const field = (name: string): string =>
     form.querySelector<HTMLInputElement | HTMLSelectElement>(`[name="${name}"]`)?.value.trim() ?? '';
-  fillFromCaseFacts(form, ['arrears-today'], ['outright-mj-arrears', 'suspended-arrears', 'warrant-arrears'], () =>
+  fillFromCaseFacts(form, ['arrears-today'], ['outright-mj-arrears', 'suspended-arrears'], () =>
     field('arrears-today')
   );
   fillFromCaseFacts(form, ['current-rent', 'rent-frequency'], ['outright-use-occupation-rate'], () => {
