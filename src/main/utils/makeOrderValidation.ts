@@ -369,7 +369,7 @@ export const APPLICATION_DECISIONS = ['none', 'grant', 'dismiss', 'strike-out', 
 export interface ApplicationToDecide {
   id: string;
   reference: string;
-  warrantSuspension?: boolean;
+  enforcementSuspension?: boolean;
   /** The application the judge's task asked them to decide, which the order may not leave as it is. */
   required?: boolean;
 }
@@ -381,15 +381,14 @@ export function applicationPrefix(application: { id: string }): string {
 
 /**
  * What the judge decides about each application, and what follows the decision: when the hearing is if they list
- * it, and for an application to suspend the warrant of possession, the conditions if they grant it or when the
- * eviction may go ahead if they dismiss it. The order may leave any application as it is but the one the judge's
- * task asked them to decide.
+ * it, and for an application to suspend enforcement, the conditions if they grant it. The order may leave any
+ * application as it is but the one the judge's task asked them to decide.
  */
 function validateApplications(
   formData: Record<string, unknown>,
   applications: readonly ApplicationToDecide[]
 ): MakeOrderValidationIssue[] {
-  const { issues, add, date } = validation(formData);
+  const { issues, add } = validation(formData);
   for (const application of applications) {
     const prefix = applicationPrefix(application);
     const decision = value(formData, `${prefix}-decision`) || 'none';
@@ -399,11 +398,8 @@ function validateApplications(
     if (decision === 'list') {
       issues.push(...validateListing(formData, `${prefix}-list`, 'Enter a valid hearing date'));
     }
-    if (application.warrantSuspension && decision === 'grant') {
-      issues.push(...validatePaymentConditions(formData, `${prefix}-warrant`));
-    }
-    if (application.warrantSuspension && decision === 'dismiss') {
-      date(`${prefix}-eviction-date`, 'Enter a valid date the eviction may take place');
+    if (application.enforcementSuspension && decision === 'grant') {
+      issues.push(...validatePaymentConditions(formData, `${prefix}-suspension`));
     }
   }
   return issues;

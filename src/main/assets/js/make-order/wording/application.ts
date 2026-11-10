@@ -2,7 +2,7 @@ import { type DocBuilder, type OrderedListBuilder } from '@hmcts-cft/docweave';
 
 import { type OrderApplication, type OrderData } from '../data';
 
-import { date, sentenceCase } from './common';
+import { sentenceCase } from './common';
 import { addListing } from './listing';
 import { addPaymentConditions } from './payment-conditions';
 
@@ -32,40 +32,28 @@ export function describeApplication(data: OrderData, application: OrderApplicati
 
 /** The generated clauses after which the "Insert applicant's wording" button puts the applicant's wording. */
 export function wordingAnchors({ prefix }: OrderApplication): string[] {
-  return [`item:${prefix}-decision`, `item:${prefix}-listing`, `item:${prefix}-warrant-execution`];
-}
-
-/** Dismissing an application to suspend the warrant of possession, in the words the judges gave (20 October 2026). */
-function addWarrantSuspensionRefused(list: OrderedListBuilder, data: OrderData, prefix: string): void {
-  list.item(
-    `${prefix}-warrant-suspension-dismissed`,
-    'The application to suspend the execution of the warrant of possession is dismissed.'
-  );
-  list.item(`${prefix}-warrant-execution`, content => {
-    content
-      .text(
-        'For the avoidance of doubt subject to any further order of the court, the execution of the warrant of possession on '
-      )
-      .fact(`${prefix}-eviction-date`, date(data, `${prefix}-eviction-date`), { sourceId: `${prefix}-eviction-date` })
-      .text(' may take place.');
-  });
+  return [`item:${prefix}-decision`, `item:${prefix}-listing`];
 }
 
 /**
  * The clauses the decision on an application generates, each naming the application. The
- * applicant's wording is never generated: the judge inserts it with a button if they want it. Listing it for a hearing says when, as an adjournment does. For an application to suspend the warrant of possession, granting it sets
- * the suspension's conditions as a suspended possession order does, and dismissing it says when the eviction may
- * go ahead.
+ * applicant's wording is never generated: the judge inserts it with a button if they want it. Listing it for a
+ * hearing says when, as an adjournment does. For an application to suspend enforcement, granting it sets the
+ * suspension's conditions as a suspended possession order does.
  */
 function addApplicationClauses(list: OrderedListBuilder, data: OrderData, application: OrderApplication): void {
   const { decision, prefix } = application;
-  const described = sentenceCase(describeApplication(data, application));
-  if (decision === 'grant' && application.warrantSuspension) {
-    addPaymentConditions(list, data, `${prefix}-warrant`, 'The warrant of possession is suspended on condition that');
+  const suspension = application.enforcementSuspension ? ' to suspend enforcement' : '';
+  const described = sentenceCase(describeApplication(data, application)) + suspension;
+  if (decision === 'grant' && application.enforcementSuspension) {
+    addPaymentConditions(
+      list,
+      data,
+      `${prefix}-suspension`,
+      'Enforcement of the possession order is suspended on condition that'
+    );
   } else if (decision === 'grant') {
     list.item(`${prefix}-decision`, `${described} is granted.`);
-  } else if (decision === 'dismiss' && application.warrantSuspension) {
-    addWarrantSuspensionRefused(list, data, prefix);
   } else if (decision === 'dismiss') {
     list.item(`${prefix}-decision`, `${described} is dismissed.`);
   } else if (decision === 'strike-out') {

@@ -6,8 +6,8 @@ import { type PaymentTerm, addPaymentTerm, money, partyLabels, value, values } f
 
 /**
  * The condition a suspension is on: the rent as it falls due plus the arrears, paid by a one-off payment,
- * instalments or both, then which debt payments go to first. A suspended possession order and a suspended warrant
- * ask it with the same questions, whose ids start with the prefix, as do the clauses and facts it adds.
+ * instalments or both, then which debt payments go to first. A suspended possession order and a suspended
+ * enforcement ask it with the same questions, whose ids start with the prefix, as do the clauses and facts it adds.
  */
 export function addPaymentConditions(
   list: OrderedListBuilder,

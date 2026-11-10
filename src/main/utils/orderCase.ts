@@ -32,8 +32,8 @@ export interface OrderCaseContext {
 /** A general application as the judge deciding it reads it, with what court staff said when they referred it. */
 export interface OrderApplication {
   id: string;
-  /** An application to suspend the warrant of possession: granted on conditions, or dismissed with an eviction date. */
-  warrantSuspension?: boolean;
+  /** An application to suspend enforcement, which granting suspends on conditions. */
+  enforcementSuspension?: boolean;
   reference: string;
   type: string;
   somethingElseDetails?: string | null;

@@ -22,8 +22,8 @@ export interface OrderApplication {
   submittedOn: string;
   /** Whether the applicant asked for an order, which granting the application puts in the order as HTML. */
   wordingHtml: string;
-  /** An application to suspend the warrant of possession, granted on conditions or dismissed with an eviction date. */
-  warrantSuspension: boolean;
+  /** An application to suspend enforcement, which granting suspends on conditions. */
+  enforcementSuspension: boolean;
   /** What the judge decides about it: "none" while they leave it as it is. */
   decision: string;
 }
@@ -86,7 +86,7 @@ export function readOrderData(form: HTMLFormElement): OrderData {
       applicant: row.dataset.applicationApplicant ?? 'the applicant',
       submittedOn: row.dataset.applicationSubmitted ?? '',
       wordingHtml: row.dataset.applicationWordingHtml ?? '',
-      warrantSuspension: row.dataset.applicationWarrant !== undefined,
+      enforcementSuspension: row.dataset.applicationSuspension !== undefined,
       decision: answers[`${prefix}-decision`]?.[0] ?? 'none',
     });
   });

@@ -36,9 +36,9 @@ const ADJOURN = {
 const WARRANT = {
   id: 'gen-app-2',
   reference: 'GA2',
-  type: 'Suspend',
+  type: 'Suspend enforcement',
   somethingElseDetails: null,
-  warrantSuspension: true,
+  enforcementSuspension: true,
   applicant: 'Alex Example (Defendant 1)',
   submittedOn: '2026-10-09',
   whatOrderWanted: null,
@@ -89,7 +89,7 @@ describe('make an order: deciding applications', () => {
       const rows = [...document.querySelectorAll<HTMLElement>('[data-application]')];
       expect(rows.map(row => row.querySelector('h3')?.textContent?.trim())).toEqual([
         'GA1: Adjourn the hearing',
-        'GA2: Suspend',
+        'GA2: Suspend enforcement',
       ]);
       expect(control<HTMLDetailsElement>(`details#${P}-more`).open).toBe(false);
       expect(control(`[name="${P}-decision"][value="none"]`).checked).toBe(true);
@@ -113,7 +113,6 @@ describe('make an order: deciding applications', () => {
       selectTab('tab-adjournment');
       check('adj-type', 'generally');
       check('app-gen-app-2-decision', 'dismiss');
-      typeDate('app-gen-app-2-eviction-date', '23', '10', '2026');
 
       const text = page.documentText();
       expect(text).toContain("UPON considering the defendant's application dated 9 October 2026");
@@ -121,8 +120,7 @@ describe('make an order: deciding applications', () => {
       expect(ordered(text)).toEqual([
         'IT IS ORDERED THAT:',
         'The claim is adjourned generally with liberty to restore by application by any party on notice to all other parties.',
-        'The application to suspend the execution of the warrant of possession is dismissed.',
-        'For the avoidance of doubt subject to any further order of the court, the execution of the warrant of possession on 23 October 2026 may take place.',
+        "The defendant's application dated 9 October 2026 to suspend enforcement is dismissed.",
       ]);
 
       expect((await app.post(PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
@@ -315,7 +313,7 @@ describe('make an order: deciding applications', () => {
     });
   });
 
-  describe('on an application to suspend the warrant of possession', () => {
+  describe('on an application to suspend enforcement', () => {
     const WARRANT_PAGE = `${PAGE}?genAppId=gen-app-2`;
     const W = 'app-gen-app-2';
 
@@ -340,33 +338,28 @@ describe('make an order: deciding applications', () => {
       expect(rejected.text).toContain('Enter valid arrears');
       expect(rejected.text).toContain('Select a one-off payment or instalments');
 
-      type(`${W}-warrant-arrears`, '850');
-      check(`${W}-warrant-payment-terms`, 'instalments');
-      type(`${W}-warrant-instalment-amount`, '25');
-      type(`${W}-warrant-instalment-frequency`, 'weekly');
-      typeDate(`${W}-warrant-instalment-date`, '6', '11', '2026');
+      type(`${W}-suspension-arrears`, '850');
+      check(`${W}-suspension-payment-terms`, 'instalments');
+      type(`${W}-suspension-instalment-amount`, '25');
+      type(`${W}-suspension-instalment-frequency`, 'weekly');
+      typeDate(`${W}-suspension-instalment-date`, '6', '11', '2026');
       expect(page.orderText().split('\n')).toEqual([
         'UPON the Court considering the papers without a hearing',
         "AND UPON considering the second defendant's application dated 9 October 2026",
         'IT IS ORDERED THAT:',
-        'The warrant of possession is suspended on condition that the defendants pay (i) the rent as it falls due plus (ii) the arrears of £850.00 by payments of £25.00 to the claimant every week, the first instalment to be paid on or before 6 November 2026.',
+        'Enforcement of the possession order is suspended on condition that the defendants pay (i) the rent as it falls due plus (ii) the arrears of £850.00 by payments of £25.00 to the claimant every week, the first instalment to be paid on or before 6 November 2026.',
         'Payment of the above instalments made to the claimant shall be applied first to any arrears prior to any order for costs.',
       ]);
       expect((await app.post(WARRANT_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
     });
 
-    it('dismisses it saying when the eviction may go ahead, which it needs', async () => {
+    it('dismisses it with nothing more to answer', async () => {
       const page = await openPage((await app.get(WARRANT_PAGE)).text);
       check(`${W}-decision`, 'dismiss');
-      expect(control<HTMLElement>('[data-decision-shows="dismiss"]').hidden).toBe(false);
-      const rejected = await app.post(WARRANT_PAGE, page.body('SUBMIT_FOR_REVIEW'));
-      expect(rejected.text).toContain('Enter a valid date the eviction may take place');
-
-      typeDate(`${W}-eviction-date`, '23', '10', '2026');
       expect(ordered(page.orderText()).slice(1)).toEqual([
-        'The application to suspend the execution of the warrant of possession is dismissed.',
-        'For the avoidance of doubt subject to any further order of the court, the execution of the warrant of possession on 23 October 2026 may take place.',
+        "The second defendant's application dated 9 October 2026 to suspend enforcement is dismissed.",
       ]);
+      expect((await app.post(WARRANT_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
     });
   });
 });
