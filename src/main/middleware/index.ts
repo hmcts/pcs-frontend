@@ -12,3 +12,4 @@ export * from './staffAccess';
 export * from './staffXuiRedirect';
 export * from './makeOrderFeature';
 export * from './formBody';
+export * from './citizenOnlyStepsAccess';
