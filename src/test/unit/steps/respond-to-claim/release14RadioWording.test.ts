@@ -5,8 +5,8 @@ import { buildFormContent } from '@modules/steps/formBuilder/formContent';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 const copy: Record<string, string> = {
-  'frequencyQuestion': 'How often do you pay towards your priority debts?',
-  'previousFrequencyQuestion': 'Paid every:',
+  frequencyQuestion: 'How often do you pay towards your priority debts?',
+  previousFrequencyQuestion: 'Paid every:',
   'frequency.week': 'Paid every week',
   'frequency.month': 'Paid every month',
   'previousFrequency.week': 'Week',
