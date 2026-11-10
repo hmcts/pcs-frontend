@@ -236,7 +236,16 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
             'next steps',
             label(NEXT_STEPS, answers.nextSteps)
           ),
-          row('Is this a final order?', 'whether this is a final order', yesNo(answers.finalOrder)),
+          row(
+            'Does this order finally resolve any part of the case?',
+            'whether this order finally resolves any part of the case',
+            yesNo(answers.finalOrder)
+          ),
+          row(
+            'Has permission been given to issue a warrant/writ of restitution?',
+            'whether permission has been given to issue restitution',
+            yesNo(answers.restitutionPermission)
+          ),
           row(
             'Should this order be served on all parties?',
             'whether to serve all parties',
@@ -461,6 +470,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     const { answers } = review;
     answers.nextSteps = text(req.body['next-steps']) || undefined;
     answers.finalOrder = choice(req.body['final-order'], ['yes', 'no'] as const);
+    answers.restitutionPermission = choice(req.body['restitution-permission'], ['yes', 'no'] as const);
     answers.serveAllParties = choice(req.body['serve-all-parties'], ['yes', 'no'] as const);
     const parties = new Set(partyChoices(review).map(party => party.value));
     answers.partiesToServe = list(req.body['parties-to-serve']).filter(id => parties.has(id));

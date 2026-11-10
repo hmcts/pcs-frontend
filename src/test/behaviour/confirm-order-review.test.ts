@@ -164,6 +164,7 @@ const proceedToIssueAnswers = (answers: Record<string, string> = {}) =>
   form({
     'next-steps': 'complete',
     'final-order': 'no',
+    'restitution-permission': 'no',
     'serve-all-parties': 'yes',
     seal: 'COUNTY_COURT',
     action: 'continue',
@@ -548,15 +549,21 @@ describe('confirm order review', () => {
       await reachProceedToIssue(app);
     });
 
-    it('serves the order on all parties, in claim order, under the County Court seal unless changed', async () => {
+    it('serves the order on all parties, in claim order, under the County Court seal, without permission for restitution, unless changed', async () => {
       const page = parse((await app.get(PROCEED_TO_ISSUE)).text);
 
+      expect(page.querySelector<HTMLInputElement>('input[name="restitution-permission"][value="no"]')?.checked).toBe(
+        true
+      );
+      expect(page.querySelector('#final-order-hint')?.textContent?.trim()).toBe(
+        'Select Yes if this order brings the main claim, a general application, counterclaim or enforcement action to an end. The whole case does not need to be concluded.'
+      );
       expect(page.querySelector<HTMLInputElement>('input[name="serve-all-parties"][value="yes"]')?.checked).toBe(true);
       expect(page.querySelector<HTMLInputElement>('input[name="seal"][value="COUNTY_COURT"]')?.checked).toBe(true);
       expect(page.querySelector<HTMLInputElement>('input[name="next-steps"]:checked')).toBeNull();
       expect(page.querySelector<HTMLInputElement>('input[name="final-order"]:checked')).toBeNull();
       expect(page.querySelector('#outstanding-tasks-guidance')?.textContent).toBe(
-        'You should complete all outstanding tasks'
+        'You must complete all outstanding tasks before issuing this order and serving it on the parties'
       );
       // The parties to serve, in claim order.
       expect(
@@ -571,9 +578,18 @@ describe('confirm order review', () => {
 
       expect(errors(unanswered.text)).toEqual([
         'Select if all the next steps for court staff have been completed',
-        'Select if this is a final order',
+        'Select if this order finally resolves any part of the case',
+        'Select if permission has been given to issue a warrant or writ of restitution',
         'Select who to serve the order on',
         'Select which seal this order should have',
+      ]);
+    });
+
+    it('does not go on while court staff still have tasks to do', async () => {
+      const outstanding = await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers({ 'next-steps': 'outstanding' }));
+
+      expect(errors(outstanding.text)).toEqual([
+        'You must complete all outstanding tasks before issuing this order and serving it on the parties',
       ]);
     });
   });
@@ -598,7 +614,8 @@ describe('confirm order review', () => {
       expect(rows).toEqual([
         ['Are there any review dates to add?', 'No'],
         ['Have all the next steps for court staff been completed?', 'There are no other tasks to complete'],
-        ['Is this a final order?', 'No'],
+        ['Does this order finally resolve any part of the case?', 'No'],
+        ['Has permission been given to issue a warrant/writ of restitution?', 'No'],
         ['Should this order be served on all parties?', 'No'],
         ['Who should the order be served on?', 'Defendant 1: Alex Example'],
         ['Which seal should this order have?', 'High Court seal'],
@@ -629,7 +646,10 @@ describe('confirm order review', () => {
           action: 'continue',
         })
       );
-      await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers({ 'final-order': 'yes' }));
+      await app.post(
+        PROCEED_TO_ISSUE,
+        proceedToIssueAnswers({ 'final-order': 'yes', 'restitution-permission': 'yes' })
+      );
 
       const submitted = await app.post(CHECK_YOUR_ANSWERS, form({ action: 'continue' }));
 
@@ -650,6 +670,7 @@ describe('confirm order review', () => {
             reviewDates: [{ date: '2027-03-05', reason: 'UNLESS_ORDER', description: 'Check compliance' }],
             nextStepsComplete: true,
             finalOrder: true,
+            restitutionPermission: true,
             serveAllParties: true,
             partiesToServe: [],
             seal: 'COUNTY_COURT',

@@ -41,6 +41,7 @@ export interface OrderReviewAnswers {
   reviewDates: ReviewDateAnswer[];
   nextSteps?: string;
   finalOrder?: 'yes' | 'no';
+  restitutionPermission?: 'yes' | 'no';
   serveAllParties?: 'yes' | 'no';
   partiesToServe: string[];
   seal?: string;
@@ -65,12 +66,21 @@ export interface ValidationIssue {
 }
 
 export const MAX_QUERY_LENGTH = 30000;
+export const TASKS_OUTSTANDING =
+  'You must complete all outstanding tasks before issuing this order and serving it on the parties';
 export const MAX_REVIEW_DATES = 10;
 export const MAX_REVIEW_DESCRIPTION_LENGTH = 500;
 
 export function newAnswers(): OrderReviewAnswers {
-  // Orders are served on all parties under the County Court seal unless the caseworker changes it.
-  return { reviewDates: [], partiesToServe: [], serveAllParties: 'yes', seal: 'COUNTY_COURT' };
+  // Orders are served on all parties under the County Court seal, without permission for restitution, unless the
+  // caseworker changes it.
+  return {
+    reviewDates: [],
+    partiesToServe: [],
+    restitutionPermission: 'no',
+    serveAllParties: 'yes',
+    seal: 'COUNTY_COURT',
+  };
 }
 
 export function blankReviewDate(): ReviewDateAnswer {
@@ -153,9 +163,17 @@ export function validateProceedToIssue(answers: OrderReviewAnswers): ValidationI
   const issues: ValidationIssue[] = [];
   if (!NEXT_STEPS.some(step => step.value === answers.nextSteps)) {
     issues.push({ id: 'next-steps', message: 'Select if all the next steps for court staff have been completed' });
+  } else if (answers.nextSteps === 'outstanding') {
+    issues.push({ id: 'next-steps', message: TASKS_OUTSTANDING });
   }
   if (!answers.finalOrder) {
-    issues.push({ id: 'final-order', message: 'Select if this is a final order' });
+    issues.push({ id: 'final-order', message: 'Select if this order finally resolves any part of the case' });
+  }
+  if (!answers.restitutionPermission) {
+    issues.push({
+      id: 'restitution-permission',
+      message: 'Select if permission has been given to issue a warrant or writ of restitution',
+    });
   }
   if (!answers.serveAllParties) {
     issues.push({ id: 'serve-all-parties', message: 'Select if this order should be served on all parties' });
@@ -200,6 +218,7 @@ export function reviewRequest(
       reviewDates,
       nextStepsComplete: answers.nextSteps === 'complete',
       finalOrder: answers.finalOrder === 'yes',
+      restitutionPermission: answers.restitutionPermission === 'yes',
       serveAllParties,
       partiesToServe: serveAllParties ? [] : answers.partiesToServe,
       seal: answers.seal,
