@@ -49,6 +49,7 @@ import {
   haveYouAppliedForUniversalCredit,
   helpWithForms,
   helpcommunicatingAndUnderstanding,
+  home,
   howMuchAffordToPay,
   incomeAndExpenses,
   installmentPayments,
@@ -260,6 +261,9 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  if (process.env.RUN_E2E_IN_WELSH === 'true') {
+    await performAction('clickLink', home.cymraegLink);
+  }
   await performAction('navigateToUrl', home_url + `/access-your-case`);
   await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
@@ -455,7 +459,7 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('verifyYourSupportLink', {
       ysSubHeader: taskList.yourSupportLink,
       respondTag: dashboard.inProgressTag,
-      ysTag: taskList.doneTag,
+      ysTag: taskList.doneDynamicTag,
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
@@ -2469,7 +2473,7 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performAction('verifyYourSupportLink', {
       ysSubHeader: taskList.yourSupportLink,
       respondTag: dashboard.inProgressTag,
-      ysTag: taskList.doneTag,
+      ysTag: taskList.doneDynamicTag,
     });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
