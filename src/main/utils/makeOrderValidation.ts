@@ -14,7 +14,7 @@ export const MAKE_ORDER_TYPES = [
 ] as const;
 export type MakeOrderType = (typeof MAKE_ORDER_TYPES)[number];
 
-/** Order types the screen offers only at a hearing: the judges asked for no possession orders without one. */
+/** Order types the screen offers only at a hearing: no possession orders are made without one. */
 export const AT_HEARING_ORDER_TYPES: readonly MakeOrderType[] = ['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION'];
 
 export interface MakeOrderValidationIssue {

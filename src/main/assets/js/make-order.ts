@@ -222,7 +222,7 @@ export function initApplicationDecisions(form: HTMLFormElement): void {
 
 /**
  * Puts the applicant's wording in the order as the judge's own, to change or delete as they would their own, when
- * the judge asks for it with the application's button (judicial feedback, 22 October 2026: never automatically). It goes in
+ * the judge asks for it with the application's button, never automatically. It goes in
  * as the application's row shows it, after the clauses the decision generated, or at the end of the order when
  * the decision generated none.
  */
@@ -291,7 +291,7 @@ export function initMakeOrder(): void {
   const tabType = (): OrderType | undefined =>
     tabs.find(tab => tab.hash === window.location.hash)?.dataset.orderType as OrderType | undefined;
   // With an application open, the claim's tabs wait behind a tick box; until it is ticked the order is on the
-  // applications alone, and the open tab is what ticking it goes to (judicial feedback, 22 October 2026).
+  // applications alone, and the open tab is what ticking it goes to.
   const claimOrder = form.querySelector<HTMLInputElement>('input[name="claim-order"]');
   const claimTabs = form.querySelector<HTMLElement>('[data-claim-order]');
   const orderingOnClaim = (): boolean => !claimOrder || claimOrder.checked;

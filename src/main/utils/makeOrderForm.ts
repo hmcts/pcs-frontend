@@ -199,7 +199,7 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     : {};
   const draft: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
   // With an application open the order starts as one on the applications alone, the claim's order types waiting
-  // behind a tick box (judicial feedback, 22 October 2026).
+  // behind a tick box.
   const defaultOrderType = applications.length
     ? NO_CLAIM_ORDER_TYPE
     : hearing

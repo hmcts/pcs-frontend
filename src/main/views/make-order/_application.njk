@@ -89,7 +89,7 @@
   }) }}
 
   {% if application.whatOrderWanted %}
-    {# Revealed by granting; the wording goes in only when the judge asks (judicial feedback, 22 October 2026). #}
+    {# Revealed by granting; the wording goes in only when the judge asks. #}
     <div data-decision-shows="grant" {%- if not draftChecked(name, "grant") %} hidden{% endif %}>
       <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3" data-insert-requested-wording>
         Insert applicant’s wording

@@ -12,8 +12,8 @@
 {#
   One screen, whatever the order is for: the hearing's facts and who attended for an order made at a hearing, then
   each open application the order may decide, then every order type for the claim. With an application open, the
-  claim's order types wait behind a tick box: the judges (22 October 2026) said an application is nearly always
-  decided without the claim being, so the judge chooses to order on it.
+  claim's order types wait behind a tick box: an application is nearly always decided without the claim being, so
+  the judge chooses to order on it.
 #}
 {# Only the judge making an order for a hearing records its facts and note. #}
 {% if hearing.caseFacts %}
@@ -52,8 +52,7 @@
 
 {#
   Every open application, each decided on its own, so one order can decide any of them and the claim. Shown only
-  while the case has one: the judges asked for nothing about applications otherwise. First, as the judges asked: with
-  an application open, the claim is the exception.
+  while the case has one. First: with an application open, the claim is the exception.
 #}
 {% if applications | length %}
   <section class="pcs-applications" aria-labelledby="applications-heading" data-applications>

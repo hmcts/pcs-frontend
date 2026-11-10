@@ -14,7 +14,7 @@ export function decidedApplications(data: OrderData): OrderApplication[] {
 }
 
 /**
- * "the first claimant's application dated 3 October 2026", as the judges write it (22 October 2026): the
+ * "the first claimant's application dated 3 October 2026": the
  * party by role, numbered only where the case has more than one of that role, and never the GA reference.
  */
 export function describeApplication(data: OrderData, application: OrderApplication): string {
@@ -53,8 +53,7 @@ function addWarrantSuspensionRefused(list: OrderedListBuilder, data: OrderData, 
 
 /**
  * The clauses the decision on an application generates, each naming the application. The
- * applicant's wording is never generated: the judge inserts it with a button if they want it (judicial feedback,
- * 22 October 2026). Listing it for a hearing says when, as an adjournment does. For an application to suspend the warrant of possession, granting it sets
+ * applicant's wording is never generated: the judge inserts it with a button if they want it. Listing it for a hearing says when, as an adjournment does. For an application to suspend the warrant of possession, granting it sets
  * the suspension's conditions as a suspended possession order does, and dismissing it says when the eviction may
  * go ahead.
  */
@@ -83,8 +82,8 @@ function addApplicationClauses(list: OrderedListBuilder, data: OrderData, applic
 }
 
 /**
- * Each application the order decides, after the claim's clauses: its clauses name the application, so no lead-in
- * (judicial feedback, 22 October 2026). The clause numbers run on from the claim's.
+ * Each application the order decides, after the claim's clauses: its clauses name the application, so no lead-in.
+ * The clause numbers run on from the claim's.
  */
 export function addApplicationDecisions(order: DocBuilder, data: OrderData): void {
   for (const application of decidedApplications(data)) {

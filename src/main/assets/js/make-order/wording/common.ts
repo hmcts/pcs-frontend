@@ -82,7 +82,7 @@ const ATTENDANCE_ROLES: Record<string, (party: string) => string> = {
 };
 
 /**
- * A recital for each application the order decides, as the judges asked (22 October 2026):
+ * A recital for each application the order decides:
  * "AND UPON considering the first claimant's application dated ...", the first "UPON" unless a recital came before it.
  */
 function addApplicationRecitals(order: DocBuilder, data: OrderData, after: boolean): void {
