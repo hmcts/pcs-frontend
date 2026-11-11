@@ -1,6 +1,7 @@
 {% extends "xui-layout.njk" %}
 
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "macros/caseTitle.njk" import caseTitle %}
 
 {% block content %}
   {% if errorSummary %}
@@ -8,16 +9,14 @@
   {% endif %}
 
   <div id="confirm-order-review-form">
-    <span class="govuk-caption-l">Confirm order review</span>
-    <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ pageHeading }}</h1>
-
-    <p class="govuk-body govuk-!-margin-bottom-1">
-      <span class="govuk-!-font-weight-bold">Case reference:</span> {{ caseReferenceDisplay }}
-    </p>
-    <p class="govuk-body govuk-!-margin-bottom-1">{{ propertyAddressDisplay }}</p>
-    <p class="govuk-body govuk-!-font-weight-bold">
-      {{ claimantNames }} vs {{ defendantNames }}
-    </p>
+    {{ caseTitle({
+      eventName: "Confirm order review",
+      heading: pageHeading,
+      caseReference: caseReferenceDisplay,
+      propertyAddress: propertyAddressDisplay,
+      claimantNames: claimantNames,
+      defendantNames: defendantNames
+    }) }}
   </div>
 
   {% block page %}{% endblock %}

@@ -1,15 +1,19 @@
 import config from 'config';
-import { NextFunction } from 'express';
+import { NextFunction, Request } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../../../main/HttpError';
 
+import type { CcdCaseData } from '@services/ccdCase.interface';
 import * as manageCaseRedirect from '@utils/manageCaseRedirect';
 import {
   ValidationIssue,
   errorSummary,
+  getClaimantNames,
+  getDefendantNames,
   manageCaseDetailsUrl,
   mapXuiValidation,
   refusedXuiEvent,
+  xuiHeaderModel,
 } from '@utils/xuiUtils';
 
 describe('xuiUtils', () => {
@@ -60,6 +64,25 @@ describe('xuiUtils', () => {
 
     it('should pass any other error to next', () => {
       const error = new Error('Something went wrong');
+
+      refusedXuiEvent(res, next as NextFunction, error);
+
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.send).not.toHaveBeenCalled();
+    });
+
+    it('should pass a CallbackRejectedError to next', () => {
+      const error = new CallbackRejectedError(['Rejected'], 422);
+
+      refusedXuiEvent(res, next as NextFunction, error);
+
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+    });
+
+    it.each([400, 401, 500, 502])('should pass an HTTPError with status %s to next', status => {
+      const error = new HTTPError('Failed', status);
 
       refusedXuiEvent(res, next as NextFunction, error);
 
@@ -146,6 +169,10 @@ describe('xuiUtils', () => {
   });
 
   describe('manageCaseDetailsUrl', () => {
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
     it('should return the generated manage case URL', () => {
       jest.spyOn(config, 'get').mockReturnValue('https://example.com');
       jest.spyOn(manageCaseRedirect, 'buildManageCaseDetailsRedirect').mockReturnValue('https://example.com/case/123');
@@ -153,17 +180,123 @@ describe('xuiUtils', () => {
       const result = manageCaseDetailsUrl('123');
 
       expect(config.get).toHaveBeenCalledWith('redirects.manageCaseReturnURL');
+      expect(manageCaseRedirect.buildManageCaseDetailsRedirect).toHaveBeenCalledWith('https://example.com', '123');
       expect(result).toBe('https://example.com/case/123');
     });
 
     it('should throw an HTTPError when the manage case URL is not configured', () => {
-      jest.spyOn(config, 'get').mockReturnValue(undefined as never);
-
-      jest.spyOn(manageCaseRedirect, 'buildManageCaseDetailsRedirect').mockReturnValue('');
+      jest.spyOn(manageCaseRedirect, 'buildManageCaseDetailsRedirect').mockReturnValue(undefined);
 
       expect(() => manageCaseDetailsUrl('123')).toThrow(HTTPError);
 
       expect(() => manageCaseDetailsUrl('123')).toThrow('The Manage Case return URL is not configured');
+    });
+
+    it('should build the case details URL from the configured Manage Case URL', () => {
+      expect(manageCaseDetailsUrl('1794231546115667')).toBe(
+        `${config.get<string>('redirects.manageCaseReturnURL')}/1794231546115667`
+      );
+    });
+  });
+
+  describe('getClaimantNames', () => {
+    it('should return an empty string when there are no claimants', () => {
+      expect(getClaimantNames({} as CcdCaseData)).toBe('');
+      expect(getClaimantNames({ allClaimants: [] } as unknown as CcdCaseData)).toBe('');
+    });
+
+    it('should name a single individual claimant', () => {
+      const ccdCase = { allClaimants: [{ value: { firstName: 'John', lastName: 'Smith' } }] } as CcdCaseData;
+
+      expect(getClaimantNames(ccdCase)).toBe('John Smith');
+    });
+
+    it('should list individual and organisation claimants separated by commas', () => {
+      const ccdCase = {
+        allClaimants: [
+          { value: { firstName: 'John', lastName: 'Smith' } },
+          { value: { orgName: 'ABC Housing Association' } },
+          { value: { firstName: 'Jane', lastName: 'Doe' } },
+        ],
+      } as CcdCaseData;
+
+      expect(getClaimantNames(ccdCase)).toBe('John Smith, ABC Housing Association, Jane Doe');
+    });
+
+    it('prioritise org name over individual name', () => {
+      const ccdCase = {
+        allClaimants: [{ value: { orgName: 'ABC Housing Association', firstName: 'John', lastName: 'Smith' } }],
+      } as CcdCaseData;
+
+      expect(getClaimantNames(ccdCase)).toBe('ABC Housing Association');
+    });
+  });
+
+  describe('xuiHeaderModel', () => {
+    const request = (roles?: unknown): Request =>
+      ({ session: roles === undefined ? {} : { user: { roles } } }) as unknown as Request;
+
+    it('should get xui assets and configure header config', () => {
+      const headerModel = xuiHeaderModel(request(['caseworker-pcs']));
+      const xuiUri = config.get<string>('xui.uri');
+
+      expect(headerModel.title.href).toBe(`${xuiUri}/`);
+      expect(headerModel.assetsPath).toBe('/assets/ui-component-lib');
+      expect(headerModel.accountNav.items).toEqual([{ id: 'sign-out', text: 'Sign out', href: '/logout' }]);
+    });
+
+    it('should choose the header from the user’s roles, ignoring case and spaces', () => {
+      expect(xuiHeaderModel(request([' CASEWORKER-PCS-JUDGE '])).theme.key).toBe('judicial');
+      expect(xuiHeaderModel(request(['caseworker-pcs'])).theme.key).toBe('default');
+    });
+
+    it('should add the role assignments the event is limited to', () => {
+      const headerModel = xuiHeaderModel(request(['caseworker-pcs']), ['judge']);
+
+      expect(headerModel.theme.key).toBe('judicial');
+      expect(headerModel.title.text).toBe('Judicial Case Manager');
+    });
+  });
+
+  describe('getDefendantNames', () => {
+    it('should return an empty string when there are no defendants', () => {
+      expect(getDefendantNames({} as CcdCaseData)).toBe('');
+      expect(getDefendantNames({ allDefendants: [] } as unknown as CcdCaseData)).toBe('');
+    });
+
+    it('should name a single individual defendant', () => {
+      const ccdCase = { allDefendants: [{ value: { firstName: 'John', lastName: 'Smith' } }] } as CcdCaseData;
+
+      expect(getDefendantNames(ccdCase)).toBe('John Smith');
+    });
+
+    it('should only list multiple defendants separated by commas', () => {
+      const ccdCase = {
+        allDefendants: [
+          { value: { firstName: 'John', lastName: 'Smith' } },
+          { value: { firstName: 'Jane', lastName: 'Doe' } },
+        ],
+      } as CcdCaseData;
+
+      expect(getDefendantNames(ccdCase)).toBe('John Smith, Jane Doe');
+    });
+
+    it('should list defendants with unknown names once as persons unknown, at the end', () => {
+      const ccdCase = {
+        allDefendants: [
+          { value: { nameKnown: 'NO' } },
+          { value: { nameKnown: 'YES', firstName: 'John', lastName: 'Smith' } },
+          { value: { nameKnown: 'No' } },
+        ],
+      } as CcdCaseData;
+
+      expect(getDefendantNames(ccdCase)).toBe('John Smith, Persons unknown');
+    });
+
+    it('should show only persons unknown when no defendant names are known', () => {
+      const ccdCase = { allDefendants: [{ value: { nameKnown: 'NO' } }] } as CcdCaseData;
+
+      expect(getDefendantNames(ccdCase)).toBe('Persons unknown');
     });
   });
 });

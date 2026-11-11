@@ -9,6 +9,7 @@
 {% block page %}
   <p>PLACEHOLDER PAGE CYA</p>
   <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
     {{ buttons.eventButtons("Submit") }}
   </form>
 {% endblock %}

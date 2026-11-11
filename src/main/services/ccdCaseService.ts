@@ -39,7 +39,8 @@ import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { MakeAnApplicationResponse } from '@services/ccdCase.interface';
-import type { CcdCase, CcdCaseData, StartCallbackData } from '@services/ccdCase.interface';
+import type { CcdCase, CcdCaseData, CcdPartySupportEntry, StartCallbackData } from '@services/ccdCase.interface';
+import type { CcdFlags } from '@services/cuiRa/cuiRa.interface';
 import type {
   DashboardNotification,
   DashboardRelatedApplication,
@@ -259,6 +260,48 @@ async function submitEvent(
   }
 }
 
+export const DEFENDANT_SUPPORT_EVENT_ID = 'requestSupport';
+
+export interface DefendantSupport {
+  partyId: string;
+  supportFlags?: CcdFlags;
+}
+
+interface DefendantSupportStart extends DefendantSupport {
+  eventToken: string;
+}
+
+/**
+ * START the citizen `requestSupport` event. pcs-api's about-to-start narrows `partySupport` to the
+ * defendant parties the logged-in user owns, so for a citizen defendant it holds their own party id
+ * and that party's current external flags
+ */
+async function startDefendantSupport(userToken: string, caseId: string): Promise<DefendantSupportStart> {
+  const eventUrl = `${getBaseUrl()}/cases/${caseId}/event-triggers/${DEFENDANT_SUPPORT_EVENT_ID}?ignore-warning=false`;
+
+  try {
+    const response = await http.get<StartCallbackData>(eventUrl, getCaseHeaders(userToken));
+
+    const partySupport = (response.data.case_details?.case_data?.partySupport ?? []).filter(entry => entry?.id);
+    const [party] = partySupport;
+    if (!party) {
+      throw new HTTPError('No defendant party eligible for support on this case', 403);
+    }
+    // Your Support is citizen-only: citizenOnlyStepsAccessMiddleware keeps legal representatives off every
+    // route that reaches here, and a citizen defendant owns exactly one party. More than one entry can
+    // therefore only mean malformed data or a bypassed guard, and choosing one could attach flags to the
+    // wrong defendant, so refuse rather than guess.
+    if (partySupport.length > 1) {
+      logger.error(`Case ${caseId}: user owns ${partySupport.length} support parties; refusing to choose one`);
+      throw new HTTPError('More than one defendant party eligible for support on this case', 403);
+    }
+
+    return { eventToken: response.data.token, partyId: party.id, supportFlags: party.value?.supportFlags };
+  } catch (error) {
+    throw convertReadErrorToHttpError(error, 'startDefendantSupport');
+  }
+}
+
 export const ccdCaseService = {
   async getCaseByIdForEvent(
     accessToken: string,
@@ -372,6 +415,35 @@ export const ccdCaseService = {
   ): Promise<CcdCase> {
     const eventToken = await startEvent(accessToken, caseId, eventId);
     return submitEvent(accessToken, caseId, eventId, eventToken, eventData);
+  },
+
+  /**
+   * The logged-in defendant's party id and current external ("support") flags, read through the
+   * requestSupport START callback.
+   */
+  async getDefendantSupport(accessToken: string | undefined, caseId: string): Promise<DefendantSupport> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const { partyId, supportFlags } = await startDefendantSupport(accessToken || '', safeCaseId);
+    return { partyId, supportFlags };
+  },
+
+  /**
+   * Write a defendant's support flags straight to their party via the citizen requestSupport event
+   */
+  async submitDefendantSupportFlags(accessToken: string, caseId: string, supportFlags: CcdFlags): Promise<CcdCase> {
+    const safeCaseId = sanitiseCaseReference(caseId);
+    if (!safeCaseId) {
+      throw new HTTPError('Invalid case reference format', 404);
+    }
+
+    const { eventToken, partyId } = await startDefendantSupport(accessToken, safeCaseId);
+    const partySupport: CcdPartySupportEntry[] = [{ id: partyId, value: { supportFlags } }];
+
+    return submitEvent(accessToken, caseId, DEFENDANT_SUPPORT_EVENT_ID, eventToken, { partySupport });
   },
 
   /** Submits an event with the token from the `startCaseEvent` the change was based on. */

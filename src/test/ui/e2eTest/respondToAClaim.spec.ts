@@ -49,6 +49,7 @@ import {
   haveYouAppliedForUniversalCredit,
   helpWithForms,
   helpcommunicatingAndUnderstanding,
+  home,
   howMuchAffordToPay,
   incomeAndExpenses,
   installmentPayments,
@@ -79,6 +80,8 @@ import {
   yourCircumstances,
   yourHouseholdAndCircumstances,
 } from '../data/page-data';
+import { overview } from '../data/page-data/overview.page.data';
+import { supportNeedsChanged } from '../data/page-data/supportNeedsChanged.page.data';
 import { getPinUserAt } from '../utils/actions/custom-actions/fetchPINsAndValidateAccessCodeAPI.action';
 import { getRelativeDate } from '../utils/common/date.utils';
 import { RESPOND_TO_CLAIM_BEFORE_EACH_ENV_KEYS, logTestEnvAfterBeforeEach } from '../utils/common/log-test-env';
@@ -258,6 +261,9 @@ test.beforeEach(async ({ page }, testInfo) => {
   await performAction('createUser', 'citizen', ['citizen']);
   await performAction('navigateToUrl', home_url);
   await performAction('login');
+  if (process.env.RUN_E2E_IN_WELSH === 'true') {
+    await performAction('clickLink', home.cymraegLink);
+  }
   await performAction('navigateToUrl', home_url + `/access-your-case`);
   await performAction('accessYourCase', { caseNumber: process.env.CASE_NUMBER });
   await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/respond-to-claim/start-now`);
@@ -451,6 +457,11 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
     await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.iDoNotWantToAnswerButton);
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: taskList.yourSupportLink,
+      respondTag: dashboard.inProgressTag,
+      ysTag: taskList.doneDynamicTag,
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.idontWantToAnswerQuestions);
@@ -2238,6 +2249,16 @@ test.describe('Respond to a claim - e2e Journey @nightly', async () => {
 test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Journey @nightly ', async () => {
   test('YourSupport Request Sent To Court And PCQ NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @regression @assured @nightly', async () => {
     //incomeAndExpenses - no - Upload docs - Multiple named party - Both - No - iDoNotNeedHelp
+    await performAction('clickLink', freeLegalAdvice.backLink);
+    await performAction('clickLink', startNow.backLink);
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: dashboard.yourSupportSubHeader,
+      respondTag: dashboard.notStartedTag,
+      ysTag: dashboard.blankTag,
+    });
+    await performAction('clickLink', dashboard.respondToTheClaimSubHeader);
+    await performAction('clickLink', taskList.readInformationAboutLink);
+    await performAction('clickButton', startNow.startNowButton);
     await performAction('selectLegalAdvice', freeLegalAdvice.yesRadioOption);
     await performAction('selectDoYouHaveASolicitor', doYouHaveASolicitor.noRadioOption);
     await performAction('retrieveCYATableDataRTC', 'startNowAndDetails');
@@ -2378,6 +2399,11 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       ],
       status: 'Done',
     });
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: taskList.yourSupportLink,
+      respondTag: dashboard.inProgressTag,
+      ysTag: taskList.availableTag,
+    });
     await performAction('taskList', { subSection: taskList.yourSupportLink });
     await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
     await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
@@ -2447,6 +2473,11 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
     await performAction('clickButton', reviewSupport.submitButton);
     await performValidation('mainHeader', supportRequest.mainHeader);
     await performAction('clickButton', supportRequest.continueButton);
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: taskList.yourSupportLink,
+      respondTag: dashboard.inProgressTag,
+      ysTag: taskList.doneDynamicTag,
+    });
     await performAction('taskList', { subSection: taskList.checkYourAnswersAndSubmitHiddenLink });
     await performValidation('mainHeader', equalityAndDiversityStart.mainHeader);
     await performAction('clickButton', equalityAndDiversityStart.continueButton);
@@ -2531,6 +2562,38 @@ test.describe('Common Component Your Support and PCQ Respond to a claim - e2e Jo
       responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
     );
     await performValidation('mainHeader', dashboard.mainHeader);
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: dashboard.yourSupportSubHeader,
+      respondTag: dashboard.completedTag,
+      ysTag: dashboard.availableTag,
+      rtcSubHeader: dashboard.respondToTheClaimSubHeader,
+    });
+    await performAction('clickLink', dashboard.yourSupportSubHeader);
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
+    await performAction('verifySupportAdjustments', { expectedAdjustments: overview.expectedAdjustments });
+    await performAction('clickLink', overview.changeLink);
+    await performValidation('mainHeader', supportNeedsChanged.mainHeader);
+    await performAction('clickButton', supportNeedsChanged.startNowButton);
+    await performValidation('mainHeader', reviewSupport.mainHeader);
+    await performAction('changeSupport', {
+      expectedAdjustments: ['Accessible toilet', 'Audio translation of documents'],
+      supportYouNoLongerNeedHeader: reviewSupport.supportYouNoLongerNeedSubHeader,
+      notNeededLink: reviewSupport.noLongerNeededLink,
+      stillNeeded: reviewSupport.stillNeedThisLink,
+    });
+    await performAction('clickButton', reviewSupport.submitButton);
+    await performValidation('mainHeader', supportRequest.mainHeader);
+    await performAction('clickButton', supportRequest.continueButton);
+    await performAction('verifyYourSupportLink', {
+      ysSubHeader: dashboard.yourSupportSubHeader,
+      respondTag: dashboard.completedTag,
+      ysTag: dashboard.availableTag,
+    });
+    await performAction('clickLink', dashboard.yourSupportSubHeader);
+    await performValidation('mainHeader', reasonableAdjustmentsTriage.mainHeader);
+    await performAction('clickButton', reasonableAdjustmentsTriage.continueToQuestionsButton);
+    await performAction('verifySupportAdjustments', { expectedAdjustments: overview.remaningAdjustments });
   });
 
   test('YourSupport Request NOT Sent To Court NonRentArrears- Assured- NoticeServed - Yes and NoticeDateProvided - No - NoticeDetails- Yes - Notice date unknown - Income - no - SelectCounterClaim - Yes @regression @assured @nightly', async () => {

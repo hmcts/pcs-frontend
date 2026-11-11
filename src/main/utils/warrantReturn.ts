@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import { normalizeYesNoValue } from '../steps/utils/normalizeYesNoValue';
 
 import { CcdCaseData, CcdCollectionItem, CcdParty } from '@services/ccdCase.interface';
 
@@ -52,16 +52,22 @@ export interface WarrantReturn {
   returnName?: InterimReturnName | EvictionSuccessfulReturnName | EvictionUnsuccessfulReturnName;
   outcome?: EvictionOutcome;
   additionalDetails?: string;
-  evictionDate?: DateTime;
+  outcomeDate?: string;
 }
 
 export interface EvictionSummaryData {
+  card: {
+    title: {
+      text: string;
+    };
+  };
   rows: {
     key: {
       text: string;
     };
     value: {
-      text: string;
+      text?: string;
+      html?: string;
     };
   }[];
 }
@@ -205,7 +211,7 @@ export function formatDefendants(ccdCase: CcdCaseData): string {
   let defendantHtml = '<ul class="govuk-list">';
   for (const defendant of allDefendants) {
     const party: CcdParty = defendant.value;
-    if (party.nameKnown) {
+    if (normalizeYesNoValue(party.nameKnown) === 'YES') {
       defendantHtml += `<li>${party.firstName} ${party.lastName}</li>`;
     } else {
       hasUnknownDefendants = true;
@@ -267,147 +273,132 @@ export function isAdditionalDetailsMandatoryInterim(returnName: InterimReturnNam
   return mandatoryReturnNames.has(returnName);
 }
 
+export interface WarrantReturnSelection {
+  returnType: string;
+  finalOutcome: string;
+  evictionSuccessfulReturnName: string;
+  evictionUnsuccessfulReturnName: string;
+  interimReturnName: string;
+}
+
+export function isAdditionalDetailsMandatory(selection: WarrantReturnSelection): boolean {
+  if (selection.returnType === WarrantReturnType.INTERIM) {
+    const returnName = selection.interimReturnName;
+    return !returnName || isAdditionalDetailsMandatoryInterim(returnName as InterimReturnName);
+  }
+  if (selection.returnType === WarrantReturnType.FINAL) {
+    if (selection.finalOutcome === EvictionOutcome.SUCCESSFUL) {
+      const returnName = selection.evictionSuccessfulReturnName;
+      return !returnName || returnName === EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL;
+    }
+    if (
+      selection.finalOutcome === EvictionOutcome.UNSUCCESSFUL ||
+      selection.finalOutcome === EvictionOutcome.CANCELLED
+    ) {
+      const returnName = selection.evictionUnsuccessfulReturnName;
+      return (
+        !returnName || isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName as EvictionUnsuccessfulReturnName)
+      );
+    }
+  }
+  return true;
+}
+
+const HIDDEN_CLASS = 'govuk-!-display-none';
+const DEFAULT_ADDITIONAL_DETAILS_LABEL = 'Additional details';
+const OPTIONAL_ADDITIONAL_DETAILS_LABEL = 'Additional details (Optional)';
+const EVICTION_DATE_INPUT_IDS = [
+  'eviction-date-day',
+  'eviction-date-month',
+  'eviction-date-year',
+  'eviction-date-hour',
+  'eviction-date-minute',
+];
+
 export function initWarrantReturn(): void {
-  const returnTypeList = document.querySelector<HTMLSelectElement>('#return-type');
+  const returnTypeList = document.querySelector<HTMLSelectElement>('select#return-type');
   if (!returnTypeList) {
     return;
   }
 
-  returnTypeList.addEventListener('change', _ => {
-    handleReturnTypeShowConditions(returnTypeList);
+  const selectIds = [
+    'return-type',
+    'final-outcome',
+    'eviction-successful-return-name',
+    'eviction-unsuccessful-return-name',
+    'interim-return-name',
+  ];
+  for (const id of selectIds) {
+    getSelect(id)?.addEventListener('change', updateWarrantReturnVisibility);
+  }
+
+  updateWarrantReturnVisibility();
+}
+
+function updateWarrantReturnVisibility(): void {
+  const returnType = getSelect('return-type')?.value;
+
+  const isFinal = returnType === WarrantReturnType.FINAL;
+  setSectionVisible('final-outcome-section', isFinal, () => resetSelect('final-outcome'));
+
+  const finalOutcome = getSelect('final-outcome')?.value;
+
+  const isEvictionSuccessful = isFinal && finalOutcome === EvictionOutcome.SUCCESSFUL;
+  setSectionVisible('eviction-successful', isEvictionSuccessful, () => {
+    resetSelect('eviction-successful-return-name');
+    EVICTION_DATE_INPUT_IDS.forEach(resetInput);
   });
 
-  const finalOutcomeList = document.querySelector<HTMLSelectElement>('#final-outcome');
-  finalOutcomeList?.addEventListener('change', _ => {
-    handleFinalOutcomeShowConditions(finalOutcomeList);
-  });
-
-  const evictionSuccessfulReturnNameList = document.querySelector<HTMLSelectElement>(
-    '#eviction-successful-return-name'
+  const isEvictionUnsuccessfulOrCancelled =
+    isFinal && (finalOutcome === EvictionOutcome.UNSUCCESSFUL || finalOutcome === EvictionOutcome.CANCELLED);
+  setSectionVisible('eviction-unsuccessful-cancelled', isEvictionUnsuccessfulOrCancelled, () =>
+    resetSelect('eviction-unsuccessful-return-name')
   );
-  evictionSuccessfulReturnNameList?.addEventListener('change', _ => {
-    handleEvictionSuccessfulShowConditions(evictionSuccessfulReturnNameList);
-  });
 
-  const evictionUnsuccessfulReturnNameList = document.querySelector<HTMLSelectElement>(
-    '#eviction-unsuccessful-return-name'
-  );
-  evictionUnsuccessfulReturnNameList?.addEventListener('change', _ => {
-    handleEvictionUnsuccessfulShowConditions(evictionUnsuccessfulReturnNameList);
-  });
+  const isInterim = returnType === WarrantReturnType.INTERIM;
+  setSectionVisible('interim', isInterim, () => resetSelect('interim-return-name'));
 
-  const interimReturnNameList = document.querySelector<HTMLSelectElement>('#interim-return-name');
-  interimReturnNameList?.addEventListener('change', _ => {
-    handleInterimShowConditions(interimReturnNameList);
-  });
+  updateAdditionalDetailsLabel();
 }
 
-function handleReturnTypeShowConditions(returnTypeList: HTMLSelectElement) {
-  const finalOutcome = document.querySelector<HTMLDivElement>('#final-outcome');
-  const interim = document.querySelector<HTMLDivElement>('#interim');
-
-  if (returnTypeList.value === WarrantReturnType.FINAL) {
-    finalOutcome!.classList.remove('govuk-!-display-none');
-    interim?.classList.add('govuk-!-display-none');
-    resetInterimReturnNames();
-  } else if (returnTypeList.value === WarrantReturnType.INTERIM) {
-    finalOutcome!.classList.add('govuk-!-display-none');
-    interim?.classList.remove('govuk-!-display-none');
-    resetFinalOutcomeInputs();
-    resetEvictionSuccessfulInput();
-    resetEvictionUnsuccessfulInput();
-  } else {
-    finalOutcome?.classList.remove('govuk-!-display-none');
-    interim?.classList.remove('govuk-!-display-none');
-    resetAllInputs();
-  }
-}
-
-function handleFinalOutcomeShowConditions(finalOutcomeList: HTMLSelectElement): void {
-  const evictionSuccessful = document.querySelector<HTMLDivElement>('#eviction-successful');
-  const evictionUnsuccessfulCancelled = document.querySelector<HTMLDivElement>('#eviction-unsuccessful-cancelled');
-  if (finalOutcomeList?.value === EvictionOutcome.SUCCESSFUL) {
-    evictionSuccessful?.classList.remove('govuk-!-display-none');
-    evictionUnsuccessfulCancelled?.classList.add('govuk-!-display-none');
-    resetEvictionUnsuccessfulInput();
-  } else if (
-    finalOutcomeList?.value === EvictionOutcome.UNSUCCESSFUL ||
-    finalOutcomeList?.value === EvictionOutcome.CANCELLED
-  ) {
-    evictionSuccessful?.classList.add('govuk-!-display-none');
-    evictionUnsuccessfulCancelled?.classList.remove('govuk-!-display-none');
-    resetEvictionSuccessfulInput();
-  } else {
-    evictionSuccessful?.classList.remove('govuk-!-display-none');
-    evictionUnsuccessfulCancelled?.classList.remove('govuk-!-display-none');
-    resetEvictionSuccessfulInput();
-    resetEvictionUnsuccessfulInput();
-  }
-
-  handleAdditionalDetailsShowConditions(true);
-}
-
-function handleEvictionSuccessfulShowConditions(evictionSuccessfulReturnNameList: HTMLSelectElement): void {
-  if (evictionSuccessfulReturnNameList.value === EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL) {
-    handleAdditionalDetailsShowConditions(true);
-  } else {
-    handleAdditionalDetailsShowConditions(false);
-  }
-}
-
-function handleEvictionUnsuccessfulShowConditions(evictionUnsuccessfulReturnNameList: HTMLSelectElement): void {
-  if (
-    isAdditionalDetailsMandatoryEvictionUnsuccessful(
-      evictionUnsuccessfulReturnNameList.value as EvictionUnsuccessfulReturnName
-    )
-  ) {
-    handleAdditionalDetailsShowConditions(true);
-  } else {
-    handleAdditionalDetailsShowConditions(false);
-  }
-}
-
-function handleInterimShowConditions(interimReturnNameList: HTMLSelectElement): void {
-  if (isAdditionalDetailsMandatoryInterim(interimReturnNameList.value as InterimReturnName)) {
-    handleAdditionalDetailsShowConditions(true);
-  } else {
-    handleAdditionalDetailsShowConditions(false);
-  }
-}
-
-function handleAdditionalDetailsShowConditions(isMandatory: boolean) {
+function updateAdditionalDetailsLabel(): void {
   const label = document.getElementById('additional-details-label');
-  label!.textContent = isMandatory ? 'Additional details' : 'Additional details (Optional)';
+  if (!label) {
+    return;
+  }
+
+  const isMandatory = isAdditionalDetailsMandatory({
+    returnType: getSelect('return-type')?.value ?? '',
+    finalOutcome: getSelect('final-outcome')?.value ?? '',
+    evictionSuccessfulReturnName: getSelect('eviction-successful-return-name')?.value ?? '',
+    evictionUnsuccessfulReturnName: getSelect('eviction-unsuccessful-return-name')?.value ?? '',
+    interimReturnName: getSelect('interim-return-name')?.value ?? '',
+  });
+
+  label.textContent = isMandatory ? DEFAULT_ADDITIONAL_DETAILS_LABEL : OPTIONAL_ADDITIONAL_DETAILS_LABEL;
 }
 
-function resetAllInputs(): void {
-  resetInterimReturnNames();
-  resetFinalOutcomeInputs();
-  resetEvictionSuccessfulInput();
-  resetEvictionUnsuccessfulInput();
-  handleAdditionalDetailsShowConditions(true);
+function setSectionVisible(sectionId: string, isVisible: boolean, resetInputs: () => void): void {
+  document.getElementById(sectionId)?.classList.toggle(HIDDEN_CLASS, !isVisible);
+  if (!isVisible) {
+    resetInputs();
+  }
 }
 
-function resetFinalOutcomeInputs(): void {
-  const finalOutcomeList = document.querySelector<HTMLSelectElement>('[final-outcome]');
-  finalOutcomeList!.value = '';
+function getSelect(id: string): HTMLSelectElement | null {
+  return document.querySelector<HTMLSelectElement>(`select#${id}`);
 }
 
-function resetInterimReturnNames(): void {
-  const interimReturnNameList = document.querySelector<HTMLSelectElement>('[interim-return-name]');
-  interimReturnNameList!.value = '';
+function resetSelect(id: string): void {
+  const select = getSelect(id);
+  if (select) {
+    select.value = '';
+  }
 }
 
-function resetEvictionSuccessfulInput(): void {
-  const evictionSuccessfulReturnNameList = document.querySelector<HTMLSelectElement>(
-    '#eviction-successful-return-name'
-  );
-  evictionSuccessfulReturnNameList!.value = '';
-}
-
-function resetEvictionUnsuccessfulInput(): void {
-  const evictionUnsuccessfulReturnNameList = document.querySelector<HTMLSelectElement>(
-    '#eviction-unsuccessful-return-nameß'
-  );
-  evictionUnsuccessfulReturnNameList!.value = '';
+function resetInput(id: string): void {
+  const input = document.querySelector<HTMLInputElement>(`input#${id}`);
+  if (input) {
+    input.value = '';
+  }
 }
