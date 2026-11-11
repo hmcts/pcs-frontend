@@ -41,7 +41,6 @@ export default function footerPagesRoutes(app: Application): void {
 
   footerPages.forEach(page => {
     app.get(page.path, async (req: Request, res: Response) => {
-      res.locals.isLegalRepresentative = true;
       if (res.locals.isLegalRepresentative) {
         const redirectUrl = new URL(page.exuiPath, xuiBaseUri).toString();
         return res.redirect(redirectUrl);
