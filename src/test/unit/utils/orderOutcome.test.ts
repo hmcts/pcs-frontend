@@ -38,11 +38,9 @@ describe('orderOutcome', () => {
       possessionDate: '2026-12-09',
       grounds: 'DISCRETIONARY',
       groundsDetails: 'Ground 10',
-      moneyJudgment: true,
-      transferToHighCourt: true,
     });
     expect(claimOutcome('OUTRIGHT_POSSESSION', { 'outright-possession': 'forthwith' })).toEqual(
-      expect.objectContaining({ possessionForthwith: true, possessionDate: undefined, moneyJudgment: false })
+      expect.objectContaining({ possessionForthwith: true, possessionDate: undefined })
     );
   });
 
@@ -57,8 +55,6 @@ describe('orderOutcome', () => {
     ).toEqual({
       kind: 'SUSPENDED_POSSESSION',
       possessionDate: '2027-02-01',
-      condition: 'MONEY',
-      moneyJudgment: false,
       warrantOnNotice: true,
     });
   });

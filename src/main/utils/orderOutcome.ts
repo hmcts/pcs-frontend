@@ -22,9 +22,6 @@ export interface ClaimOutcome {
   possessionDate?: string;
   grounds?: 'MANDATORY' | 'DISCRETIONARY';
   groundsDetails?: string;
-  moneyJudgment?: boolean;
-  transferToHighCourt?: boolean;
-  condition?: 'MONEY' | 'NON_MONEY';
   warrantOnNotice?: boolean;
 }
 
@@ -64,7 +61,6 @@ export function applicationDecisions(formData: FormData = {}): ApplicationDecisi
 export function claimOutcome(orderType: string, formData: FormData = {}): ClaimOutcome {
   switch (orderType) {
     case 'OUTRIGHT_POSSESSION': {
-      const options = all(formData['outright-options']);
       const grounds = first(formData['outright-grounds-type']);
       return {
         kind: 'OUTRIGHT_POSSESSION',
@@ -73,8 +69,6 @@ export function claimOutcome(orderType: string, formData: FormData = {}): ClaimO
           first(formData['outright-possession']) === 'by' ? isoDate(formData, 'outright-by-date') : undefined,
         grounds: grounds === 'mandatory' ? 'MANDATORY' : grounds === 'discretionary' ? 'DISCRETIONARY' : undefined,
         groundsDetails: first(formData['outright-grounds-details']) || undefined,
-        moneyJudgment: options.includes('money-judgment'),
-        transferToHighCourt: options.includes('transfer-high-court'),
       };
     }
     case 'SUSPENDED_POSSESSION': {
@@ -82,9 +76,6 @@ export function claimOutcome(orderType: string, formData: FormData = {}): ClaimO
       return {
         kind: 'SUSPENDED_POSSESSION',
         possessionDate: isoDate(formData, 'suspended-by-date'),
-        // The form suspends possession on payment terms.
-        condition: 'MONEY',
-        moneyJudgment: options.includes('money-judgment-arrears'),
         warrantOnNotice: options.includes('warrant-on-notice'),
       };
     }

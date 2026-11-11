@@ -585,8 +585,6 @@ describe('confirm order review', () => {
         possessionDate: '2026-12-04',
         grounds: 'MANDATORY',
         groundsDetails: 'Ground 8',
-        moneyJudgment: true,
-        transferToHighCourt: false,
       });
       expect(review.issue.order.orderType).toBe('FREE_FORM');
       expect(review.issue.order.html).toContain('Possession of the property on or before 4 December 2026.');

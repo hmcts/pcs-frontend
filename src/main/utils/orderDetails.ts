@@ -188,16 +188,12 @@ export function orderDetailsRequest(answers: OrderDetailsAnswers = {}): ClaimOut
         possessionDate: answers['outright-possession'] === 'by' ? isoDate(answers, 'outright-date') : undefined,
         grounds: upper(answers['outright-grounds']) as ClaimOutcome['grounds'],
         groundsDetails: answers['outright-grounds-details'].trim(),
-        moneyJudgment: yes(answers['outright-money-judgment']),
-        transferToHighCourt: yes(answers['outright-transfer']),
       };
     case 'suspended':
       return {
         kind: 'SUSPENDED_POSSESSION',
         possessionDate: isoDate(answers, 'suspended-date'),
-        condition: upper(answers['suspended-condition']) as ClaimOutcome['condition'],
         warrantOnNotice: yes(answers['suspended-warrant-on-notice']),
-        moneyJudgment: yes(answers['suspended-money-judgment']),
       };
     // Asked as the free-form categories agree, but an adjournment manages the case without deciding the claim.
     case 'adjournment':
