@@ -45,12 +45,12 @@ export const validateAccessCode = async (
     }
 
     switch (response.status) {
-      case 404:
-        return { valid: false, error: 'not_found' };
       case 410:
         return { valid: false, error: 'expired' };
       case 409:
         return { valid: false, error: 'already_used' };
+      // 404 is treated like a wrong code, so the page never reveals whether a claim number exists.
+      case 404:
       case 422:
       case 400:
         return { valid: false, error: 'mismatch' };

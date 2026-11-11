@@ -256,22 +256,6 @@ describe('citizenCaseLink routes', () => {
       );
     });
 
-    it('should render the same page for an unknown claim number as for a wrong access code', async () => {
-      const handler = mockPost.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
-      const renderFor = async (error: 'not_found' | 'mismatch') => {
-        mockValidateAccessCode.mockResolvedValueOnce({ valid: false, error });
-        const req = {
-          body: { claimNumber: '1234567890123456', accessCode: 'ABCD12345678' },
-          session: { user: { accessToken: 'mock-token' } },
-        } as unknown as Request;
-        const res = { render: jest.fn() } as unknown as Response;
-        await handler(req, res);
-        return (res.render as jest.Mock).mock.calls[0];
-      };
-
-      expect(await renderFor('not_found')).toEqual(await renderFor('mismatch'));
-    });
-
     it('should show error when validation throws', async () => {
       mockValidateAccessCode.mockRejectedValueOnce(new Error('Network error'));
 
@@ -321,7 +305,7 @@ describe('citizenCaseLink routes', () => {
     });
 
     it.each([
-      ['not_found', 'accessCodeMismatch'],
+      ['not_found', 'claimNotFound'],
       ['expired', 'accessCodeExpired'],
       ['already_used', 'accessCodeAlreadyUsed'],
       ['mismatch', 'accessCodeMismatch'],

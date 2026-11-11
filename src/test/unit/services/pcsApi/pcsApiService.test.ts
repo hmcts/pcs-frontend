@@ -62,10 +62,14 @@ describe('pcsApiService', () => {
       expect(result).toEqual({ valid: true });
     });
 
-    test('should return not_found error on 404 response', async () => {
-      mockHttp.post.mockResolvedValue({ status: 404 });
-      const result = await validateAccessCode(accessToken, caseId, accessCode);
-      expect(result).toEqual({ valid: false, error: 'not_found' });
+    test('should return the same mismatch error on 404 as on 400, so an unknown claim number is not revealed', async () => {
+      mockHttp.post.mockResolvedValueOnce({ status: 404 });
+      const notFound = await validateAccessCode(accessToken, caseId, accessCode);
+      mockHttp.post.mockResolvedValueOnce({ status: 400 });
+      const wrongCode = await validateAccessCode(accessToken, caseId, accessCode);
+
+      expect(notFound).toEqual({ valid: false, error: 'mismatch' });
+      expect(notFound).toEqual(wrongCode);
     });
 
     test('should return expired error on 410 response', async () => {
