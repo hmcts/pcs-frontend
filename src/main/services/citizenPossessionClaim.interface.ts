@@ -145,6 +145,8 @@ export interface RentTableRow {
 
 export interface CitizenPossessionClaim {
   draftVersion?: number;
+  /** The section check your answers pages the claimant has continued from since last changing those answers. */
+  confirmedSections?: string[];
   propertyAddress?: CcdCaseAddress;
   eligibility?: {
     claimantType?: CitizenClaimantType;

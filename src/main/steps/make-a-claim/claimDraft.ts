@@ -226,11 +226,18 @@ export async function saveClaimDraftForCase(
 }
 
 /**
- * The claimant's answers alone: without what pcs-api owns and without collection ids, which each request makes,
- * and with lists of choices in a fixed order, since pcs-api keeps them as sets and returns them in any order.
+ * The claimant's answers alone: without what pcs-api owns, without which summaries they confirmed and without
+ * collection ids, which each request makes, and with lists of choices in a fixed order, since pcs-api keeps them as
+ * sets and returns them in any order.
  */
 function answersOf(claim: CitizenPossessionClaim | undefined): unknown {
-  const { draftVersion: _version, propertyAddress: _address, submission, ...answers } = claim ?? {};
+  const {
+    draftVersion: _version,
+    propertyAddress: _address,
+    confirmedSections: _confirmed,
+    submission,
+    ...answers
+  } = claim ?? {};
   const { serviceRequestReference: _reference, feeAmount: _fee, paymentStatus: _status, ...signed } = submission ?? {};
   const withoutIds = (value: unknown): unknown => {
     if (Array.isArray(value)) {
@@ -249,18 +256,31 @@ function answersOf(claim: CitizenPossessionClaim | undefined): unknown {
   return withoutIds({ ...answers, submission: signed });
 }
 
+/** Whether saving `updated` over `saved` would change any of the claimant's answers. */
+export function answersChanged(saved: CitizenPossessionClaim, updated: CitizenPossessionClaim): boolean {
+  return !isEqual(answersOf(normaliseClaim(saved)), answersOf(normaliseClaim(updated)));
+}
+
 /**
  * Saves the claim as the version the page was showing, and keeps the request's case in step with it. A save
  * refused because another tab saved first stays refused, but a repeat of a save that already went through (a
- * double click) is taken as done.
+ * double click) is taken as done. The summaries the claimant has confirmed are kept as saved unless
+ * `confirmedSections` gives them, never as `claim` holds them.
  */
-export async function saveClaimDraft(req: Request, claim: CitizenPossessionClaim): Promise<void> {
+export async function saveClaimDraft(
+  req: Request,
+  claim: CitizenPossessionClaim,
+  confirmedSections: readonly string[] | undefined = readClaim(req).confirmedSections
+): Promise<void> {
   const accessToken = req.session?.user?.accessToken;
   const validatedCase = req.res?.locals.validatedCase;
   if (!accessToken || !validatedCase?.id) {
     throw new HTTPError('Cannot save the claim without a signed-in user and a case', 500);
   }
-  const normalised = normaliseClaim(claim);
+  const normalised = normaliseClaim({
+    ...claim,
+    confirmedSections: confirmedSections?.length ? [...new Set(confirmedSections)] : undefined,
+  });
   let saved: CitizenPossessionClaim | undefined;
   try {
     saved = (await sendDraft(accessToken, validatedCase.id, normalised)).data?.citizenPossessionClaim;

@@ -15,7 +15,7 @@ export function createUploadStep(
   set: (claim: CitizenPossessionClaim, documents: ClaimDocuments) => void,
   required: boolean
 ): StepDefinition {
-  const documentStorage = claimDocumentStorage(get, set);
+  const documentStorage = claimDocumentStorage(stepName, get, set);
   return createMakeAClaimStep({
     stepName,
     stepDir,

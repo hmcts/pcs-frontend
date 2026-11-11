@@ -1,9 +1,11 @@
 import type { Request } from 'express';
+import { cloneDeep } from 'lodash';
 
 import { HTTPError } from '../../HttpError';
 import { getUserToken } from '../utils/userRole';
 
 import { MAKE_A_CLAIM_EVENT_ID, readClaim, saveClaimDraftForCase } from './claimDraft';
+import { confirmationsAfterSave } from './sectionConfirmation';
 
 import type { DocumentStorage } from '@modules/documents/storage';
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
@@ -37,9 +39,10 @@ export function toClaimDocuments(documents: UploadedDocuments): ClaimDocuments {
 /**
  * Where an upload page keeps its documents in the claim. Uploads and deletes arrive outside the journey's
  * event start, so each save reads the claim afresh and saves it whole: saving only the documents would wipe
- * every other answer.
+ * every other answer. A change to the documents withdraws the confirmation of the summary showing them.
  */
 export function claimDocumentStorage(
+  stepName: string,
   get: (claim: CitizenPossessionClaim) => ClaimDocuments | undefined,
   set: (claim: CitizenPossessionClaim, documents: ClaimDocuments) => void
 ): DocumentStorage {
@@ -54,8 +57,10 @@ export function claimDocumentStorage(
     },
 
     async save(req: Request, documents: UploadedDocuments): Promise<void> {
-      const { caseId, claim } = await freshClaim(req);
+      const { caseId, claim: saved } = await freshClaim(req);
+      const claim = cloneDeep(saved);
       set(claim, toClaimDocuments(documents));
+      claim.confirmedSections = confirmationsAfterSave(saved, claim, stepName);
       await saveClaimDraftForCase(getUserToken(req), caseId, claim);
     },
   };

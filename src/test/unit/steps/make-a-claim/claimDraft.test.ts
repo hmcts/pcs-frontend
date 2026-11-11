@@ -6,6 +6,7 @@ import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import type { CitizenPossessionClaim } from '../../../../main/services/citizenPossessionClaim.interface';
 import {
   answeredClaim,
+  answersChanged,
   normaliseClaim,
   restoreUnreadable,
   saveClaimDraft,
@@ -319,6 +320,56 @@ describe('saveClaimDraft', () => {
     const req = request();
     delete req.res!.locals.validatedCase;
     await expect(saveClaimDraft(req, {})).rejects.toThrow('Cannot save the claim');
+  });
+
+  it('keeps the saved confirmations rather than the claim’s own', async () => {
+    service.updateDraft.mockResolvedValue({ id: CASE, data: {} });
+    const req = request();
+    req.res!.locals.validatedCase!.data.citizenPossessionClaim = { confirmedSections: ['claimant-cya'] };
+    await saveClaimDraft(req, { confirmedSections: ['claimant-cya', 'defendant-cya'] });
+    expect(service.updateDraft).toHaveBeenLastCalledWith(expect.anything(), 'token', CASE, {
+      citizenPossessionClaim: { confirmedSections: ['claimant-cya'] },
+    });
+  });
+
+  it('saves the confirmations it is given once each, and none when there are none', async () => {
+    service.updateDraft.mockResolvedValue({ id: CASE, data: {} });
+    await saveClaimDraft(request(), {}, ['notice-cya', 'notice-cya']);
+    expect(service.updateDraft.mock.lastCall?.[3]).toEqual({
+      citizenPossessionClaim: { confirmedSections: ['notice-cya'] },
+    });
+    await saveClaimDraft(request(), { confirmedSections: ['notice-cya'] }, []);
+    expect(service.updateDraft.mock.lastCall?.[3].citizenPossessionClaim).not.toHaveProperty(
+      'confirmedSections',
+      expect.anything()
+    );
+  });
+});
+
+describe('answersChanged', () => {
+  it('ignores confirmations, draft versions, collection ids and the order of choices', () => {
+    expect(
+      answersChanged(
+        { draftVersion: 1, confirmedSections: ['claimant-cya'], defendants: [{ id: 'a', value: { nameKnown: 'NO' } }] },
+        { draftVersion: 2, defendants: [{ id: 'b', value: { nameKnown: 'NO' } }] }
+      )
+    ).toBe(false);
+    expect(
+      answersChanged(
+        { notice: { noticeServed: 'YES', noticeMethods: ['EMAIL', 'FIRST_CLASS_POST'] } },
+        { notice: { noticeServed: 'YES', noticeMethods: ['FIRST_CLASS_POST', 'EMAIL'] } }
+      )
+    ).toBe(false);
+  });
+
+  it('compares the answers as they would be saved', () => {
+    expect(
+      answersChanged(
+        { claimant: { individualOrOrganisation: 'INDIVIDUAL', firstName: 'A' } },
+        { claimant: { individualOrOrganisation: 'INDIVIDUAL', firstName: 'A', organisationName: 'Gone Ltd' } }
+      )
+    ).toBe(false);
+    expect(answersChanged({ claimant: { firstName: 'A' } }, { claimant: { firstName: 'B' } })).toBe(true);
   });
 });
 

@@ -8,6 +8,8 @@ import { textField } from '../fieldBuilders';
 import { FIELD_LIMITS } from '../fieldLimits';
 import { flowConfig, taskListPath } from '../flow.config';
 import { caseReferenceOf, createMakeAClaimStep, isRendering, unansweredStepUrl } from '../formStep';
+import { withReturnTo } from '../returnTo';
+import { makeAClaimSectionConfirmation, unconfirmedCya } from '../sectionConfirmation';
 import { makeAClaimSections } from '../sections.config';
 import { stepRegistry } from '../stepRegistry';
 import {
@@ -33,14 +35,15 @@ const logger = Logger.getLogger('makeAClaimCheckYourAnswers');
 
 /**
  * Where to send a claimant who opens check your answers before it is available: the first question not yet
- * answered in the first section that is not done, or that section's first page. A page sent back with submit
- * errors, such as a claim changed in another tab, is still shown, so the claimant is told what happened.
+ * answered in the first section that is not done, else the first of its summaries not yet confirmed, which then
+ * returns here, or else that section's first page. A page sent back with submit errors, such as a claim changed in
+ * another tab, is still shown, so the claimant is told what happened.
  */
 async function firstUnfinishedQuestion(req: Request): Promise<string | undefined> {
   if (req.method !== 'GET' || submitErrorCodes(req.query?.submitError).length > 0) {
     return undefined;
   }
-  const statuses = await getAllSectionStatuses(flowConfig, stepRegistry, req);
+  const statuses = await getAllSectionStatuses(flowConfig, stepRegistry, req, makeAClaimSectionConfirmation);
   if (statuses.get(CHECK_AND_SUBMIT) !== 'NOT_AVAILABLE_YET') {
     return undefined;
   }
@@ -58,6 +61,10 @@ async function firstUnfinishedQuestion(req: Request): Promise<string | undefined
   });
   if (unanswered) {
     return unansweredStepUrl(req, unanswered);
+  }
+  const cya = unconfirmedCya(section, req);
+  if (cya) {
+    return withReturnTo(getStepUrl(cya, flowConfig, caseReference), 'check-your-answers');
   }
   const target = getFirstVisibleStep(section, flowConfig, req);
   return target ? getStepUrl(target, flowConfig, caseReference) : taskListPath(caseReference);

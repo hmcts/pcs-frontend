@@ -5,6 +5,7 @@ import { formatCcdAddress } from '../../utils/ccdAddress';
 import { propertyAddressOf } from '../claimMapping';
 import { MAKE_A_CLAIM_JOURNEY, MAKE_A_CLAIM_ROUTE, flowConfig } from '../flow.config';
 import { sharedPageContent } from '../formStep';
+import { makeAClaimSectionConfirmation } from '../sectionConfirmation';
 import { MAKE_A_CLAIM_SECTION_GROUPS, makeAClaimSections } from '../sections.config';
 import { stepRegistry } from '../stepRegistry';
 
@@ -27,7 +28,7 @@ interface TaskListItem {
 }
 
 async function buildGroups(req: Request, t: TFunction) {
-  const statuses = await getAllSectionStatuses(flowConfig, stepRegistry, req);
+  const statuses = await getAllSectionStatuses(flowConfig, stepRegistry, req, makeAClaimSectionConfirmation);
   const caseId = req.res?.locals.validatedCase?.id;
   return MAKE_A_CLAIM_SECTION_GROUPS.map((group, index) => ({
     id: group.id,

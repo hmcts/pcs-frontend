@@ -136,6 +136,17 @@ export const makeAClaimSections: readonly SectionConfig[] = [
   },
 ];
 
+/** The check your answers pages the claimant must continue from before each section is done. */
+export const SECTION_CYAS = {
+  aboutYou: ['claimant-cya'],
+  defendants: ['defendant-cya'],
+  tenancyGroundsAndNotice: ['tenancy-cya', 'notice-cya'],
+  rentArrears: ['arrears-cya'],
+  circumstances: ['situation-cya'],
+} as const satisfies Partial<Record<string, readonly string[]>>;
+
+export type SectionCya = (typeof SECTION_CYAS)[keyof typeof SECTION_CYAS][number];
+
 /** The summary pages that end a section: Save and continue on them returns to the task list. */
 export const SECTION_SUMMARY_STEPS = [
   'claimant-cya',

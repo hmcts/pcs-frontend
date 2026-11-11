@@ -13,7 +13,8 @@ import {
   stepNameOfUrl,
   withReturnTo,
 } from './returnTo';
-import { SECTION_SUMMARY_STEPS } from './sections.config';
+import { confirmationsAfterSave, confirmedCyas, confirmingCya, isSectionCya } from './sectionConfirmation';
+import { SECTION_SUMMARY_STEPS, type SectionCya } from './sections.config';
 import { draftChangedUrl, isDraftChanged } from './submitErrors';
 import type { SummaryCard } from './summary';
 
@@ -21,6 +22,7 @@ import { createFormStep, getStepTranslations, getTranslationFunction } from '@mo
 import { getNextStep, getStepUrl } from '@modules/steps/flow';
 import type { BuiltFormContent, FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import type { CitizenPossessionClaim } from '@services/citizenPossessionClaim.interface';
 
 export const caseReferenceOf = (req: Request): string => req.res?.locals.validatedCase?.id ?? '';
 
@@ -150,6 +152,41 @@ async function returnAfterChange(
   return summaryUrl;
 }
 
+/** Saves the claim, sending the claimant to the draft changed page when another tab saved first. */
+async function saveFromPage(
+  req: Request,
+  claim: CitizenPossessionClaim,
+  confirmedSections: readonly string[]
+): Promise<void> {
+  try {
+    await saveClaimDraft(req, claim, confirmedSections);
+  } catch (error) {
+    if (!isDraftChanged(error)) {
+      throw error;
+    }
+    req.res?.redirect(303, draftChangedUrl(req.res.locals.validatedCase?.id ?? ''));
+  }
+}
+
+/** Continuing from a section's check your answers page confirms it; Save for later does not. */
+async function confirmSection(req: Request, cya: SectionCya): Promise<void> {
+  const saved = readClaim(req);
+  if (req.body?.action === 'saveForLater' || confirmedCyas(saved).includes(cya)) {
+    return;
+  }
+  await saveFromPage(
+    req,
+    answeredClaim(req, () => undefined),
+    confirmingCya(saved, cya)
+  );
+}
+
+/** Saves a page's answers, withdrawing the confirmation of the summary showing them when they changed. */
+async function saveAnswers(req: Request, stepName: string, apply: (claim: CitizenPossessionClaim) => void) {
+  const claim = answeredClaim(req, apply);
+  await saveFromPage(req, claim, confirmationsAfterSave(readClaim(req), claim, stepName));
+}
+
 /**
  * A page of the make a claim journey. Its form carries the draft version it was shown with, which its save sends,
  * so a save after another tab's is refused. Its answers are read from and saved to the claim draft through the
@@ -158,7 +195,9 @@ async function returnAfterChange(
 export function createMakeAClaimStep(config: MakeAClaimStepConfig): StepDefinition {
   const mapping = claimMappings[config.stepName];
   const isSummary = (SECTION_SUMMARY_STEPS as readonly string[]).includes(config.stepName);
-  const { redirectWhen, keepsOwnRedirectOnReturn, ...stepConfig } = config;
+  const sectionCya = isSectionCya(config.stepName) ? config.stepName : undefined;
+  const { redirectWhen, keepsOwnRedirectOnReturn: keepsOwnRedirect, ...stepConfig } = config;
+  const keepsOwnRedirectOnReturn = keepsOwnRedirect ?? (sectionCya ? () => false : undefined);
   const ownRedirectAfterPost =
     config.resolveRedirectAfterPost ??
     (isSummary ? async (req: Request) => taskListPath(caseReferenceOf(req)) : undefined);
@@ -168,20 +207,10 @@ export function createMakeAClaimStep(config: MakeAClaimStepConfig): StepDefiniti
     stepDir: __dirname,
     getInitialFormData: mapping?.toForm ? req => mapping.toForm!(readClaim(req), req) : undefined,
     beforeRedirect: mapping?.fromForm
-      ? async req => {
-          try {
-            await saveClaimDraft(
-              req,
-              answeredClaim(req, claim => mapping.fromForm!(claim, req.body ?? {}, req))
-            );
-          } catch (error) {
-            if (!isDraftChanged(error)) {
-              throw error;
-            }
-            req.res?.redirect(303, draftChangedUrl(req.res.locals.validatedCase?.id ?? ''));
-          }
-        }
-      : undefined,
+      ? req => saveAnswers(req, config.stepName, claim => mapping.fromForm!(claim, req.body ?? {}, req))
+      : sectionCya
+        ? req => confirmSection(req, sectionCya)
+        : undefined,
     isAnswered: mapping?.isAnswered ? req => mapping.isAnswered!(readClaim(req), req) : undefined,
     ...stepConfig,
     resolveRedirectAfterPost: async (req: Request) => {

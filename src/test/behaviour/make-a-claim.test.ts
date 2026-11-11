@@ -21,7 +21,11 @@ const PROPERTY = {
   'property-postcode': 'LU1 1AB',
 };
 
+const ALL_SECTION_CYAS = ['claimant-cya', 'defendant-cya', 'tenancy-cya', 'notice-cya', 'arrears-cya', 'situation-cya'];
+
+/** Every question answered but the proof of rent arrears, and every section summary continued from. */
 const ANSWERED_CLAIM = {
+  confirmedSections: ALL_SECTION_CYAS,
   eligibility: { isTrespass: 'NO', whoIsClaiming: 'MYSELF' },
   claimant: {
     individualOrOrganisation: 'INDIVIDUAL',
@@ -561,7 +565,7 @@ describe('answering questions', () => {
     expect(text((await app.get(claimPath('defendant-cya'))).text)).toContain('Defendant 2 name Persons unknown');
   });
 
-  it('leaves the defendants in progress until the claimant says there are no more to add', async () => {
+  it('leaves the defendants in progress until the claimant says there are no more to add and confirms them', async () => {
     app = await bootMakeAClaim();
     givenClaim({ eligibility: ANSWERED_CLAIM.eligibility });
     await app.post(claimPath('defendant-name'), { nameKnown: 'no' });
@@ -570,6 +574,8 @@ describe('answering questions', () => {
 
     await app.post(claimPath('additional-defendants'), { additionalDefendants: 'no' });
     expect(storedClaim().defendantsConfirmed).toBe('YES');
+    expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants In progress');
+    await app.post(claimPath('defendant-cya'), {});
     expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants Done');
 
     await app.post(claimPath('additional-defendants'), { additionalDefendants: 'yes' });
@@ -898,6 +904,8 @@ describe('review fixes', () => {
       claimPath('defendant-cya')
     );
     expect(storedClaim().defendants).toHaveLength(1);
+    expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants In progress');
+    await app.post(claimPath('defendant-cya'), {});
     expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants Done');
   });
 
@@ -918,10 +926,13 @@ describe('review fixes', () => {
     expect(ledger).toContain('Remove transaction 2');
     await app.post(`${claimPath('remove-ledger-entry')}?entry=1`, { confirmRemove: 'no' });
     expect(storedClaim().rentArrears.rentHistoryLedger).toHaveLength(2);
+    expect(storedClaim().confirmedSections).toContain('arrears-cya');
     expect((await app.post(`${claimPath('remove-ledger-entry')}?entry=1`, { confirmRemove: 'yes' })).location).toBe(
       claimPath('ledger-summary')
     );
     expect(storedClaim().rentArrears.rentHistoryLedger).toHaveLength(1);
+    expect(storedClaim().confirmedSections).not.toContain('arrears-cya');
+    expect(storedClaim().confirmedSections).toContain('defendant-cya');
   });
 
   it('asks for a reason for each ground chosen, one page each, and shows them on the summary', async () => {
@@ -1290,6 +1301,7 @@ describe('build observation fixes', () => {
     );
     const rows = storedClaim().rentArrears.rentHistoryTable;
     expect(rows).toHaveLength(2);
+    expect(storedClaim().confirmedSections).not.toContain('arrears-cya');
     expect(rows[0].value).toMatchObject({ dateDue: '2026-06-01', datePaid: '2026-06-15', amountPaid: '20000' });
 
     const repeated = await app.post(removePaymentPath(0, '2026-06-05', '5000'), { confirmRemove: 'yes' });
@@ -1464,5 +1476,127 @@ describe('build observation fixes', () => {
     const shown = await page(`/case/${CASE_REFERENCE}/pay-claim-fee?payment=constructor`);
     expect(shown.title).not.toMatch(/^Error: /);
     expect(shown.querySelector('.govuk-error-summary')).toBeNull();
+  });
+});
+
+describe('confirming each section on its check your answers page', () => {
+  const taskList = async () => text((await app.get(claimPath('task-list'))).text);
+  const unconfirmed = (...cyas: string[]) => ({
+    ...COMPLETE_CLAIM,
+    confirmedSections: ALL_SECTION_CYAS.filter(cya => !cyas.includes(cya)),
+  });
+
+  it('shows a section with every question answered as in progress until its summary is confirmed', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...COMPLETE_CLAIM, confirmedSections: [] });
+    const page = await taskList();
+    expect(page).toContain('About you and your contact preferences In progress');
+    expect(page).toContain('About the defendants In progress');
+    expect(page).toContain('About the tenancy, your grounds and notice served In progress');
+    expect(page).toContain('Proof of rent arrears In progress');
+    expect(page).toContain('Circumstances In progress');
+    expect(page).toContain('Upload files and other information Done');
+    expect(page).toContain('Check your answers and submit Not available yet');
+  });
+
+  it('shows the section as done once the claimant continues from its summary, confirming it once', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(unconfirmed('claimant-cya'));
+    expect((await app.post(claimPath('claimant-cya'), {})).location).toBe(claimPath('task-list'));
+    expect(storedClaim().confirmedSections).toEqual(expect.arrayContaining(ALL_SECTION_CYAS));
+    expect(await taskList()).toContain('About you and your contact preferences Done');
+    expect(await taskList()).toContain('Check your answers and submit Available');
+
+    const saves = ccd.draftSaves.length;
+    await app.post(claimPath('claimant-cya'), {});
+    expect(ccd.draftSaves).toHaveLength(saves);
+    expect(storedClaim().confirmedSections.filter((cya: string) => cya === 'claimant-cya')).toHaveLength(1);
+  });
+
+  it('needs both the tenancy and the notice summaries confirmed for the tenancy, grounds and notice', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(unconfirmed('tenancy-cya', 'notice-cya'));
+    await app.post(claimPath('tenancy-cya'), {});
+    expect(await taskList()).toContain('About the tenancy, your grounds and notice served In progress');
+    await app.post(claimPath('notice-cya'), {});
+    expect(await taskList()).toContain('About the tenancy, your grounds and notice served Done');
+  });
+
+  it('does not confirm a summary on Save for later', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(unconfirmed('situation-cya'));
+    await app.post(claimPath('situation-cya'), { action: 'saveForLater' });
+    expect(storedClaim().confirmedSections).not.toContain('situation-cya');
+    expect(await taskList()).toContain('Circumstances In progress');
+  });
+
+  it('asks for the summary again after an answer changes, returning to it from a Change link', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(COMPLETE_CLAIM);
+    const changed = await app.post(`${claimPath('claimant-name')}?returnTo=claimant-cya`, {
+      firstName: 'Bill',
+      lastName: 'Wright',
+    });
+    expect(changed.location).toBe(claimPath('claimant-cya'));
+    expect(storedClaim().confirmedSections).not.toContain('claimant-cya');
+    expect(await taskList()).toContain('About you and your contact preferences In progress');
+
+    await app.post(claimPath('claimant-cya'), {});
+    expect(await taskList()).toContain('About you and your contact preferences Done');
+  });
+
+  it('keeps the summary confirmed when a page is saved without a change', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(COMPLETE_CLAIM);
+    await app.post(claimPath('tenancy-type'), { tenancyType: 'ASSURED', action: 'saveForLater' });
+    await app.post(claimPath('tenancy-type'), { tenancyType: 'ASSURED' });
+    expect(storedClaim().confirmedSections).toEqual(ALL_SECTION_CYAS);
+  });
+
+  it('withdraws only the confirmation of the summary that shows the changed answer', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(COMPLETE_CLAIM);
+    await app.post(claimPath('tenancy-type'), { tenancyType: 'EXCLUDED', action: 'saveForLater' });
+    expect(storedClaim().confirmedSections).not.toContain('tenancy-cya');
+    expect(storedClaim().confirmedSections).toContain('notice-cya');
+    expect(storedClaim().confirmedSections).toContain('claimant-cya');
+  });
+
+  it('ignores confirmations sent in the form', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...COMPLETE_CLAIM, confirmedSections: [] });
+    await app.post(claimPath('claimant-name'), {
+      firstName: 'Billy',
+      lastName: 'Wright',
+      confirmedSections: ALL_SECTION_CYAS,
+    });
+    expect(storedClaim().confirmedSections).toBeUndefined();
+    await app.post(claimPath('claimant-cya'), { confirmedSections: ALL_SECTION_CYAS });
+    expect(storedClaim().confirmedSections).toEqual(['claimant-cya']);
+  });
+
+  it('sends check your answers to an unconfirmed summary, which returns there once confirmed', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(unconfirmed('notice-cya'));
+    expect((await app.get(claimPath('check-your-answers'))).location).toBe(
+      `${claimPath('notice-cya')}?returnTo=check-your-answers`
+    );
+    expect((await app.post(`${claimPath('notice-cya')}?returnTo=check-your-answers`, {})).location).toBe(
+      claimPath('check-your-answers')
+    );
+    expect((await app.get(claimPath('check-your-answers'))).status).toBe(200);
+  });
+
+  it('sends a change made from check your answers through the section summary before returning', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(COMPLETE_CLAIM);
+    const changed = await app.post(`${claimPath('claimant-name')}?returnTo=check-your-answers`, {
+      firstName: 'Bill',
+      lastName: 'Wright',
+    });
+    expect(changed.location).toBe(claimPath('check-your-answers'));
+    expect((await app.get(claimPath('check-your-answers'))).location).toBe(
+      `${claimPath('claimant-cya')}?returnTo=check-your-answers`
+    );
   });
 });

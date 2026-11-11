@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 
-import { getSectionStatus } from '../../../../main/services/sectionStatus';
+import { type SectionConfirmation, getSectionStatus } from '../../../../main/services/sectionStatus';
 
 import type { JourneyFlowConfig, SectionConfig, SectionStatus } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -220,6 +220,53 @@ describe('getSectionStatus', () => {
       };
       const status = await getSectionStatus(sec, flow(), registry, reqWithCompleted([]), new Map());
       expect(status).toBe('DONE');
+    });
+  });
+
+  describe('with a confirmation that does not complete the section by itself', () => {
+    const confirmation = (confirmed: boolean): SectionConfirmation => ({
+      hasCya: candidate => candidate.steps.includes('summary'),
+      isConfirmed: () => confirmed,
+      confirmationCompletes: false,
+    });
+    const sec = section({ steps: ['stepA', 'stepB', 'summary'] });
+    const registry = (bAnswered: boolean) => ({
+      stepA: stub({ isAnswered: () => true }),
+      stepB: stub({ isAnswered: () => bAnswered }),
+      summary: { ...stub(), isAnswered: undefined },
+    });
+
+    it('is IN_PROGRESS with every question answered but the summary not confirmed', async () => {
+      expect(await getSectionStatus(sec, flow(), registry(true), reqStub, new Map(), confirmation(false))).toBe(
+        'IN_PROGRESS'
+      );
+    });
+
+    it('is DONE with every question answered and the summary confirmed', async () => {
+      expect(await getSectionStatus(sec, flow(), registry(true), reqStub, new Map(), confirmation(true))).toBe('DONE');
+    });
+
+    it('stays IN_PROGRESS while a question is unanswered, even once confirmed', async () => {
+      expect(await getSectionStatus(sec, flow(), registry(false), reqStub, new Map(), confirmation(true))).toBe(
+        'IN_PROGRESS'
+      );
+    });
+
+    it('is DONE without the summary for a section that has none', async () => {
+      const plain = section({ steps: ['stepA'] });
+      const answered = { stepA: stub({ isAnswered: () => true }) };
+      expect(await getSectionStatus(plain, flow(), answered, reqStub, new Map(), confirmation(false))).toBe('DONE');
+    });
+
+    it('is gated on the confirmation alone when there is nothing to answer', async () => {
+      const summaryOnly = section({ steps: ['summary'] });
+      const onlySummary = { summary: { ...stub(), isAnswered: undefined } };
+      expect(await getSectionStatus(summaryOnly, flow(), onlySummary, reqStub, new Map(), confirmation(false))).toBe(
+        'AVAILABLE'
+      );
+      expect(await getSectionStatus(summaryOnly, flow(), onlySummary, reqStub, new Map(), confirmation(true))).toBe(
+        'DONE'
+      );
     });
   });
 });
