@@ -4,6 +4,7 @@ import type { OrderFormSubmission } from '@utils/makeOrderForm';
 import { parseDate } from '@utils/makeOrderFormat';
 import type { FormData, OrderStart } from '@utils/orderCase';
 import { type OrderDetailsAnswers, orderDetailsRequest } from '@utils/orderDetails';
+import { applicationDecisions, claimOutcome } from '@utils/orderOutcome';
 
 export const REVIEW_REASONS = [
   { value: 'UNLESS_ORDER', text: 'Unless order' },
@@ -228,7 +229,11 @@ export function reviewRequest(
       nextStepsComplete: answers.nextSteps === 'complete',
       finalOrder: answers.finalOrder === 'yes',
       restitutionPermission: answers.restitutionPermission === 'yes',
-      freeFormDetails: issuesFreeForm(answers) ? orderDetailsRequest(answers.orderDetails) : undefined,
+      claimOutcome:
+        answers.order &&
+        (issuesFreeForm(answers)
+          ? orderDetailsRequest(answers.orderDetails)
+          : claimOutcome(answers.order.orderType, answers.order.formData)),
       serveAllParties,
       partiesToServe: serveAllParties ? [] : answers.partiesToServe,
       seal: answers.seal,
@@ -241,6 +246,7 @@ function issuedOrder(order: Required<OrderFormSubmission>): Record<string, unkno
   return {
     orderType: order.orderType,
     formData: order.formData,
+    applicationDecisions: applicationDecisions(order.formData),
     docweaveSnapshot,
     // Its wording exported to HTML, which pcs-api issues as the order's document.
     html: docweaveSnapshot ? renderHtml(docweaveSnapshot) : undefined,

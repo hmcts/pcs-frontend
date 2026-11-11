@@ -1,5 +1,5 @@
 import { buildFooterModel } from '@hmcts-cft/cft-ui-component-lib';
-import { type DocWeaveSnapshot, describeChanges, renderHtml } from '@hmcts-cft/docweave';
+import { type DocWeaveSnapshot, describeChanges, parseSnapshot, renderHtml } from '@hmcts-cft/docweave';
 import { Application, Request, RequestHandler, Response } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
@@ -297,6 +297,10 @@ const VIEWS = {
   }),
   'order-details': (_req: Request, review: OrderReviewSession) => ({
     answers: review.answers.orderDetails ?? {},
+    // The order as it will be issued, with any changes court staff made, for them to say what it does.
+    issuingHtml: review.answers.order?.orderDocumentJson
+      ? renderHtml(parseSnapshot(review.answers.order.orderDocumentJson))
+      : undefined,
     orderDoes: ORDER_DOES,
     outrightPossession: OUTRIGHT_POSSESSION,
     grounds: GROUNDS,

@@ -1,4 +1,5 @@
 import { formatDate, parseDate } from '@utils/makeOrderFormat';
+import type { ClaimOutcome } from '@utils/orderOutcome';
 
 /*
  * What a judge's free-form order does, as court staff record it when they issue it, so the case can act on it
@@ -177,32 +178,32 @@ export function orderDetailsRows(answers: OrderDetailsAnswers = {}): [string, st
 const upper = (value: string) => value.toUpperCase().replace(/-/g, '_');
 const yes = (value: string) => value === 'yes';
 
-/** The answers as pcs-api records them: only those for what the order does. */
-export function orderDetailsRequest(answers: OrderDetailsAnswers = {}): Record<string, unknown> {
+/** What court staff record a free-form order does, as the claim outcome every issued order gives pcs-api. */
+export function orderDetailsRequest(answers: OrderDetailsAnswers = {}): ClaimOutcome {
   switch (answers['order-does']) {
     case 'outright':
       return {
-        category: 'OUTRIGHT_POSSESSION',
+        kind: 'OUTRIGHT_POSSESSION',
         possessionForthwith: answers['outright-possession'] === 'forthwith',
         possessionDate: answers['outright-possession'] === 'by' ? isoDate(answers, 'outright-date') : undefined,
-        grounds: upper(answers['outright-grounds']),
+        grounds: upper(answers['outright-grounds']) as ClaimOutcome['grounds'],
         groundsDetails: answers['outright-grounds-details'].trim(),
         moneyJudgment: yes(answers['outright-money-judgment']),
         transferToHighCourt: yes(answers['outright-transfer']),
       };
     case 'suspended':
       return {
-        category: 'SUSPENDED_POSSESSION',
+        kind: 'SUSPENDED_POSSESSION',
         possessionDate: isoDate(answers, 'suspended-date'),
-        condition: upper(answers['suspended-condition']),
+        condition: upper(answers['suspended-condition']) as ClaimOutcome['condition'],
         warrantOnNotice: yes(answers['suspended-warrant-on-notice']),
         moneyJudgment: yes(answers['suspended-money-judgment']),
       };
     case 'adjournment':
-      return { category: 'ADJOURNMENT', adjournment: upper(answers.adjournment) };
+      return { kind: 'ADJOURNMENT', adjournment: upper(answers.adjournment) as ClaimOutcome['adjournment'] };
     case 'strike-out':
-      return { category: 'STRIKE_OUT', outcome: upper(answers['strike-out']) };
+      return { kind: upper(answers['strike-out']) as ClaimOutcome['kind'] };
     default:
-      return { category: 'OTHER' };
+      return { kind: 'OTHER' };
   }
 }

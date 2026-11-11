@@ -27,6 +27,7 @@ import {
   refusedOrderEvent,
   xuiHeaderModel,
 } from '@utils/orderCase';
+import { applicationDecisions } from '@utils/orderOutcome';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
 
@@ -205,6 +206,7 @@ export default function makeOrderRoutes(app: Application): void {
           version: Number(orderVersion),
           orderType,
           formData: withoutHearingRecord(formData),
+          applicationDecisions: applicationDecisions(formData),
           docweaveSnapshot: postedSnapshot(orderDocument),
         },
         taskId: taskId || null,

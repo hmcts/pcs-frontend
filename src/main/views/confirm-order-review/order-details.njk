@@ -48,6 +48,13 @@
     {{ csrfProtection(csrfToken) }}
     <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
 
+    {% if issuingHtml %}
+      <h2 class="govuk-heading-m">The order to issue</h2>
+      <div class="pcs-order-preview govuk-!-margin-bottom-6" id="issuing-order" aria-label="The order to issue" role="region">
+        {{ issuingHtml | safe }}
+      </div>
+    {% endif %}
+
     {% set outrightHtml %}
       {% set byDateHtml %}{{ date("outright-date", "Date possession is ordered by") }}{% endset %}
       {{ govukRadios({

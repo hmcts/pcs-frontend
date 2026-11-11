@@ -497,7 +497,10 @@ describe('confirm order review', () => {
 
   describe('what a free-form order does', () => {
     const freeFormOrder = () =>
-      judgesOrder({ tab: 'tab-free-form', edit: () => writeInPreview('Possession of the property forthwith.') });
+      judgesOrder({
+        tab: 'tab-free-form',
+        edit: () => writeInPreview('Possession of the property on or before 4 December 2026.'),
+      });
 
     beforeEach(async () => {
       app = await caseworkerReviewing(await freeFormOrder());
@@ -574,10 +577,10 @@ describe('confirm order review', () => {
 
       await app.post(CHECK_YOUR_ANSWERS, form({ action: 'continue' }));
       const [review] = submittedReviews() as {
-        issue: { freeFormDetails: unknown; order: { orderType: string; html: string } };
+        issue: { claimOutcome: unknown; order: { orderType: string; html: string } };
       }[];
-      expect(review.issue.freeFormDetails).toEqual({
-        category: 'OUTRIGHT_POSSESSION',
+      expect(review.issue.claimOutcome).toEqual({
+        kind: 'OUTRIGHT_POSSESSION',
         possessionForthwith: false,
         possessionDate: '2026-12-04',
         grounds: 'MANDATORY',
@@ -586,7 +589,7 @@ describe('confirm order review', () => {
         transferToHighCourt: false,
       });
       expect(review.issue.order.orderType).toBe('FREE_FORM');
-      expect(review.issue.order.html).toContain('Possession of the property forthwith.');
+      expect(review.issue.order.html).toContain('Possession of the property on or before 4 December 2026.');
     });
   });
 
@@ -789,7 +792,9 @@ describe('confirm order review', () => {
               formData: expect.objectContaining({ recitals: 'yes', 'recitals-text': 'Upon hearing the claimant' }),
               docweaveSnapshot: JSON.parse(Buffer.from(orderDocument, 'base64url').toString('utf8')),
               html: expect.stringContaining('<p>Upon hearing the claimant</p>'),
+              applicationDecisions: [],
             },
+            claimOutcome: expect.objectContaining({ kind: expect.any(String) }),
             reviewDates: [{ date: '2027-03-05', reason: 'UNLESS_ORDER', description: 'Check compliance' }],
             nextStepsComplete: true,
             finalOrder: true,
