@@ -1,11 +1,11 @@
 ### Jira link
 
 <!--
-Replace PROJ-XXXXXX with your Jira key
+Replace HDPI-XXXXXX with your Jira key
 Remove this section if its not applicable, or replace it with another reference link
 -->
 
-See [PROJ-XXXXXX](https://tools.hmcts.net/jira/browse/PROJ-XXXXXX)
+See [HDPI-XXXXXX](https://hmcts.atlassian.net/browse/HDPI-XXXXXX)
 
 ### Change description
 
@@ -59,4 +59,5 @@ If No, give a short reason (e.g. infra-only, already gated, no user-facing behav
 - [ ] commit messages are meaningful and follow good commit message guidelines
 - [ ] README and other documentation has been updated / added (if needed)
 - [ ] tests have been updated / new tests has been added (if needed)
+- [ ] if this changes what defendants are asked when responding to a claim, the public preparation guide (`src/main/guidance/prepareToRespond.ts`) has been checked and its content owner told
 - [ ] Does this PR introduce a breaking change
