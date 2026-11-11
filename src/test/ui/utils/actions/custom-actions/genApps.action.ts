@@ -404,21 +404,6 @@ export class GenAppsAction implements IAction {
           question: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
           option: option1,
         });
-        if (option1 === 'Yes') {
-          await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
-          await performAction('doYouNeedHelpPayingFee', {
-            question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-            option: doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption,
-          });
-        } else {
-          await performValidation('mainHeader', haveTheOtherPartiesAgreedToThisApplication.mainHeader);
-          FieldsStore.deleteKeys([
-            doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-            haveYouAlreadyAppliedForHelpWithFees.haveYouAlreadyAppliedForHelpQuestion,
-            'What is your Help with Fees reference number?',
-          ]);
-        }
-
         break;
       }
       case 'doYouNeedHelpPayingTheFeeForThisApplication': {
