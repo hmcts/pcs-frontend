@@ -542,7 +542,7 @@ describe('confirm order review', () => {
       expect(back.location).toBe(ORDER_DETAILS);
     });
 
-    it('lists what the order does to check, and issues it with them, leaving the wording as the judge wrote it', async () => {
+    it('lists what the order does to check, and issues it with what pcs-api records, leaving the wording as the judge wrote it', async () => {
       await app.post(
         ORDER_DETAILS,
         form({
