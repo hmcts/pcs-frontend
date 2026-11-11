@@ -272,6 +272,71 @@ describe('before a claim exists', () => {
     expect(refused.location).toBe('/make-a-claim/property-ineligible');
     expect(text((await app.get('/make-a-claim/property-ineligible')).text)).toContain('property in England');
   });
+
+  describe('checking the property as soon as the claimant gives it', () => {
+    const giveProperty = async (): Promise<string | undefined> => {
+      await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+      await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+      return (await app.post('/make-a-claim/property-address', PROPERTY)).location;
+    };
+
+    it.each([
+      ['ELIGIBLE', '/make-a-claim/who-is-claiming'],
+      ['NOT_COVERED', '/make-a-claim/property-not-covered'],
+      ['NOT_ENGLAND', '/make-a-claim/property-ineligible'],
+      ['LEGISLATIVE_COUNTRY_REQUIRED', '/make-a-claim/property-country'],
+    ])('sends a property pcs-api finds %s to %s', async (status, page) => {
+      app = await bootMakeAClaim();
+      ccd.propertyEligibility = status;
+      expect(await giveProperty()).toBe(page);
+      expect(ccd.eligibilityChecks).toEqual([{ postcode: 'LU1 1AB' }]);
+      expect(ccd.createRequests).toEqual([]);
+    });
+
+    it('goes on to who is claiming when the check fails, leaving it to the claim’s creation', async () => {
+      app = await bootMakeAClaim();
+      ccd.propertyEligibility = 503;
+      expect(await giveProperty()).toBe('/make-a-claim/who-is-claiming');
+    });
+
+    it('checks a cross-border property again once the claimant says it is in England', async () => {
+      app = await bootMakeAClaim();
+      ccd.propertyEligibility = 'LEGISLATIVE_COUNTRY_REQUIRED';
+      await giveProperty();
+      ccd.propertyEligibility = 'NOT_COVERED';
+      expect((await app.post('/make-a-claim/property-country', { legislativeCountry: 'England' })).location).toBe(
+        '/make-a-claim/property-not-covered'
+      );
+      expect(ccd.eligibilityChecks[1]).toEqual({ postcode: 'LU1 1AB', legislativeCountry: 'England' });
+      expect(ccd.createRequests).toEqual([]);
+    });
+
+    it('asks who is claiming after an eligible cross-border property in England, then creates the claim', async () => {
+      app = await bootMakeAClaim();
+      ccd.propertyEligibility = 'LEGISLATIVE_COUNTRY_REQUIRED';
+      expect(await giveProperty()).toBe('/make-a-claim/property-country');
+      expect((await app.get('/make-a-claim/property-country')).status).toBe(200);
+      ccd.propertyEligibility = 'ELIGIBLE';
+      expect((await app.post('/make-a-claim/property-country', { legislativeCountry: 'England' })).location).toBe(
+        '/make-a-claim/who-is-claiming'
+      );
+      expect(ccd.createRequests).toEqual([]);
+      expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
+        claimPath('eligible')
+      );
+      expect(ccd.createRequests[0].data.citizenPossessionClaim.eligibility.legislativeCountry).toBe('England');
+    });
+
+    it('turns away a property in Wales without checking it again', async () => {
+      app = await bootMakeAClaim();
+      ccd.propertyEligibility = 'LEGISLATIVE_COUNTRY_REQUIRED';
+      await giveProperty();
+      expect((await app.post('/make-a-claim/property-country', { legislativeCountry: 'Wales' })).location).toBe(
+        '/make-a-claim/property-ineligible'
+      );
+      expect(ccd.eligibilityChecks).toHaveLength(1);
+    });
+  });
 });
 
 describe('the task list', () => {

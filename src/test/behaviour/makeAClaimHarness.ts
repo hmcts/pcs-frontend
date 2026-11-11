@@ -27,6 +27,9 @@ export const ccd = {
   refuseSubmit: undefined as string[] | undefined,
   changeDraftBeforeNextSave: false,
   cardPaymentStatus: 'Success',
+  /** pcs-api's answer to the property eligibility check: a status, or an HTTP error code it fails with. */
+  propertyEligibility: 'ELIGIBLE' as string | number,
+  eligibilityChecks: [] as Record<string, unknown>[],
 };
 
 /** pcs-api's draft version: every save that names the stored version moves it on; a stale one is refused. */
@@ -42,6 +45,12 @@ function jwt(claims: Record<string, unknown>): string {
 function ccdStub(): Express {
   const stub = express();
   stub.use(express.json({ limit: '10mb' }));
+  stub.get('/cases/citizen-claims/property-eligibility', (req: Request, res: Response) => {
+    ccd.eligibilityChecks.push(req.query);
+    return typeof ccd.propertyEligibility === 'number'
+      ? res.status(ccd.propertyEligibility).json({ message: 'Unavailable' })
+      : res.json({ status: ccd.propertyEligibility });
+  });
   stub.get('/case-types/:caseType/event-triggers/citizenCreatePossessionClaim', (_req, res) => {
     res.json({ token: 'create-token' });
   });
@@ -160,6 +169,8 @@ export async function bootMakeAClaim(
   ccd.refuseSubmit = undefined;
   ccd.changeDraftBeforeNextSave = false;
   ccd.cardPaymentStatus = 'Success';
+  ccd.propertyEligibility = 'ELIGIBLE';
+  ccd.eligibilityChecks = [];
   backend ??= await listen(ccdStub());
   const backendUrl = `http://127.0.0.1:${(backend.address() as AddressInfo).port}`;
   process.env.CCD_URL = backendUrl;

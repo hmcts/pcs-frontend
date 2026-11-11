@@ -62,7 +62,7 @@ export const startFlowConfig: JourneyFlowConfig = {
     },
     'not-litigant-in-person': { previousStep: 'who-is-claiming' },
     'property-country': {
-      dependencies: ['property-address', 'who-is-claiming'],
+      dependencies: ['property-address'],
       previousStep: 'property-address',
       routes: [{ condition: answered('legislativeCountry', 'Wales'), nextStep: 'property-ineligible' }],
     },

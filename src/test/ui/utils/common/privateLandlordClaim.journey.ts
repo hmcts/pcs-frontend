@@ -82,13 +82,18 @@ export async function startAsPrivateLandlord(page: Page, startUrl: string): Prom
   await performAction('login');
 }
 
-/** Answers the questions asked before the claim exists, ending on "You're eligible" for a new claim. */
-export async function becomeEligible(page: Page, startUrl: string, property = ENGLISH_PROPERTY): Promise<void> {
+/** Answers the start questions up to the property, which is checked as soon as it is given. */
+export async function giveProperty(page: Page, startUrl: string, property = ENGLISH_PROPERTY): Promise<void> {
   await startAsPrivateLandlord(page, startUrl);
   await page.getByRole('radio', { name: /^No – my claim is against a tenant/ }).check();
   await continueOn(page);
   await enterAddress(page, 'property', property);
   await continueOn(page);
+}
+
+/** Answers the questions asked before the claim exists, ending on "You're eligible" for a new claim. */
+export async function becomeEligible(page: Page, startUrl: string): Promise<void> {
+  await giveProperty(page, startUrl);
   await page.getByRole('radio', { name: 'Myself – I’m the claimant', exact: true }).check();
   await continueOn(page);
 }

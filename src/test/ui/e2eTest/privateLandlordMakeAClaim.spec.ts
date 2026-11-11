@@ -17,6 +17,7 @@ import {
   createLandlord,
   declineClaimFeeCard,
   enterAddress,
+  giveProperty,
   isMakeAClaimEnabled,
   openTask,
   payClaimFee,
@@ -124,7 +125,7 @@ test.describe('Private landlord cannot use the service @privateLandlord', () => 
 
   test('A property outside England cannot be claimed', async ({ page }) => {
     await createLandlord();
-    await becomeEligible(page, startUrl, WELSH_PROPERTY);
+    await giveProperty(page, startUrl, WELSH_PROPERTY);
     await expect(page).toHaveURL(/\/make-a-claim\/property-ineligible$/);
     await expect(page.getByText('You can only make a possession claim against a property in England')).toBeVisible();
   });

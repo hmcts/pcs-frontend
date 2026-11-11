@@ -16,6 +16,7 @@ import type { LegislativeCountry } from '@services/citizenPossessionClaim.interf
 export { PROPERTY_INELIGIBLE_URL };
 export const PROPERTY_COUNTRY_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-country`;
 export const PROPERTY_NOT_COVERED_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-not-covered`;
+export const WHO_IS_CLAIMING_URL = `${MAKE_A_CLAIM_START_ROUTE}/who-is-claiming`;
 export const PROPERTY_ADDRESS_TOO_LONG_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-address?problem=tooLong`;
 
 const eligibleUrl = (caseReference: string) => getStepUrl('eligible', flowConfig, caseReference);
