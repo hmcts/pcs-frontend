@@ -280,6 +280,25 @@ describe('confirm order review', () => {
   });
 
   describe('reviewing the order', () => {
+    it('links the whole file download when pcs-api gives the reviewer the case bundle', async () => {
+      const order = await judgesOrder();
+      app = await caseworkerReviewing(order);
+      await openReview(app);
+      expect(document.querySelector('#case-bundle-link')).toBeNull();
+      await app.close();
+
+      app = await bootApp({
+        caseworker: true,
+        order: await awaitingReview(order),
+        caseBundle: { id: 'b0b0b0b0-0000-4000-8000-000000000002', fileName: 'bundle.pdf' },
+      });
+      await openReview(app);
+
+      expect(document.querySelector<HTMLAnchorElement>('#case-bundle-link')?.href).toContain(
+        `/case/${CASE_REFERENCE}/view-documents/b0b0b0b0-0000-4000-8000-000000000002`
+      );
+    });
+
     it("shows the judge's message and their order", async () => {
       app = await caseworkerReviewing(await judgesOrder({ staffMessage: 'Please list for a review in 28 days.' }));
 

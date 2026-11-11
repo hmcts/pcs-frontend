@@ -8,7 +8,14 @@ import {
   type MakeOrderType,
   applicationPrefix,
 } from '@utils/makeOrderValidation';
-import type { FormData, OrderApplication, OrderHearing, OrderParty, OrderStart } from '@utils/orderCase';
+import type {
+  FormData,
+  OrderApplication,
+  OrderCaseBundle,
+  OrderHearing,
+  OrderParty,
+  OrderStart,
+} from '@utils/orderCase';
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
 const WITHOUT_HEARING_ORDER_TYPE: MakeOrderType = 'FREE_FORM';
@@ -20,6 +27,21 @@ const YES_NO: Record<string, string> = { YES: 'Yes', NO: 'No' };
 function displayDate(iso?: string | null): string | undefined {
   const date = DateTime.fromISO(String(iso ?? ''), { zone: 'Europe/London' });
   return date.isValid ? date.setLocale('en-GB').toFormat('d MMMM yyyy') : undefined;
+}
+
+/** The case bundle as the order pages link it, with when it was last brought up to date. */
+function caseBundleModel(bundle: OrderCaseBundle, caseReference: number) {
+  const updated = DateTime.fromISO(String(bundle.updatedAt ?? ''));
+  return {
+    href: `/case/${caseReference}/view-documents/${encodeURIComponent(bundle.id)}`,
+    updatedDisplay: updated.isValid
+      ? updated
+          .setZone('Europe/London')
+          .setLocale('en-GB')
+          .toFormat("d MMMM yyyy 'at' h:mma")
+          .replace(/AM|PM/, m => m.toLowerCase())
+      : undefined,
+  };
 }
 
 /**
@@ -226,5 +248,6 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     openCounterclaim: caseContext.openCounterclaim === true,
     applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
     ...hearingModel(hearing),
+    caseBundle: caseContext.caseBundle ? caseBundleModel(caseContext.caseBundle, caseContext.caseReference) : undefined,
   };
 }

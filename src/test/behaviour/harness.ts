@@ -255,6 +255,8 @@ export async function bootApp(
     application?: Record<string, unknown> & { id: string };
     /** The hearing pcs-api starts the event for, over the default one, or null for an order made without one. */
     hearing?: Record<string, unknown> | null;
+    /** The case bundle pcs-api gives a judge, once the case has one. */
+    caseBundle?: Record<string, unknown>;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -270,6 +272,9 @@ export async function bootApp(
   if (options.application) {
     envelope.taskGenAppId = options.application.id;
     envelope.hearing = null;
+  }
+  if (options.caseBundle) {
+    envelope.caseContext.caseBundle = options.caseBundle;
   }
   if (options.hearing !== undefined) {
     envelope.hearing = options.hearing && { ...envelope.hearing, ...options.hearing };

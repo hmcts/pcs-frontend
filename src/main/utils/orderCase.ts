@@ -27,6 +27,14 @@ export interface OrderCaseContext {
   openCounterclaim?: boolean;
   /** The case's open applications, any of which the order can decide, oldest first. */
   applications?: OrderApplication[];
+  /** The case bundle, every document on the case in one PDF, for a judge once one has been made. */
+  caseBundle?: OrderCaseBundle | null;
+}
+
+export interface OrderCaseBundle {
+  id: string;
+  fileName: string;
+  updatedAt?: string | null;
 }
 
 /** A general application as the judge deciding it reads it, with what court staff said when they referred it. */

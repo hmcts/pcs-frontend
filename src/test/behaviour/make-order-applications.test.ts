@@ -19,6 +19,12 @@ const PAGE = `/case/${CASE_REFERENCE}/make-order`;
 const TASK_PAGE = `${PAGE}?genAppId=gen-app-1`;
 /** What the first application's answers start with. */
 const P = 'app-gen-app-1';
+/** The case bundle pcs-api gives a judge. */
+const CASE_BUNDLE = {
+  id: 'b0b0b0b0-0000-4000-8000-000000000002',
+  fileName: '1234-case-bundle.pdf',
+  updatedAt: '2026-10-07T22:24:17Z',
+};
 
 const ADJOURN = {
   id: 'gen-app-1',
@@ -70,6 +76,22 @@ function clauseLists(): number[] {
 describe('make an order: deciding applications', () => {
   let app: TestApp;
   afterEach(() => app.close());
+
+  it('links the whole file download once the case has a bundle', async () => {
+    app = await bootApp();
+    await openPage((await app.get(PAGE)).text);
+    expect(document.querySelector('#case-bundle-link')).toBeNull();
+    await app.close();
+
+    app = await bootApp({ caseBundle: CASE_BUNDLE });
+    await openPage((await app.get(PAGE)).text);
+
+    const link = document.querySelector<HTMLAnchorElement>('#case-bundle-link');
+    expect(link?.href).toContain(`/case/${CASE_REFERENCE}/view-documents/${CASE_BUNDLE.id}`);
+    expect(link?.textContent).toBe('Whole file download (opens in new tab)');
+    expect(link?.target).toBe('_blank');
+    expect(document.body.textContent).toContain('Last updated 7 October 2026 at 11:24pm');
+  });
 
   describe('at a hearing', () => {
     beforeEach(async () => {
