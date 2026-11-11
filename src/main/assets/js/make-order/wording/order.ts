@@ -6,7 +6,7 @@ import { type OrderData } from '../data';
 import { addAdjournmentClauses } from './adjournment';
 import { addApplicationDecisions } from './application';
 import { addCosts, addPreamble, caseManCosts, hasCosts, partyLabels } from './common';
-import { addEnforcementTransfer, transfersEnforcement } from './enforcement-transfer';
+import { addEnforcementTransfer } from './enforcement-transfer';
 import { addFreeFormClauses } from './free-form';
 import { addOutrightClauses } from './outright';
 import { addStrikeOutDismissalClauses } from './strike-out';
@@ -40,9 +40,7 @@ export function buildOrder(type: MakeOrderType, data: OrderData): DocWeaveDocume
     addPreamble(order, data);
     order.orderedList('claim-clauses', list => {
       CLAIM_CLAUSES[type](list, data);
-      if (transfersEnforcement(data)) {
-        addEnforcementTransfer(list, data);
-      }
+      addEnforcementTransfer(list, data);
       if (onClaim && ordersCosts) {
         list.item('costs', content => addCosts(content, data, costs));
       }

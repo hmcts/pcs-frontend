@@ -196,27 +196,18 @@ export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
   return buildOrder(type, readOrderData(form));
 }
 
-/** Whether a form control is an application's decision, whose row shows what follows the decision chosen. */
-function isDecision(control: EventTarget | null): control is HTMLInputElement {
-  return (
-    control instanceof HTMLInputElement &&
-    control.name.endsWith('-decision') &&
-    Boolean(control.closest('[data-application]'))
-  );
-}
-
 /** What follows a decision on an application, shown in its row while that decision is chosen. */
 export function initApplicationDecisions(form: HTMLFormElement): void {
-  form.addEventListener('change', event => {
-    const decision = event.target;
-    if (isDecision(decision)) {
-      decision
-        .closest('[data-application]')!
-        .querySelectorAll<HTMLElement>('[data-decision-shows]')
-        .forEach(follows => {
-          follows.hidden = follows.dataset.decisionShows !== decision.value;
-        });
+  form.addEventListener('change', ({ target }) => {
+    if (!(target instanceof HTMLInputElement) || !target.name.endsWith('-decision')) {
+      return;
     }
+    target
+      .closest('[data-application]')
+      ?.querySelectorAll<HTMLElement>('[data-decision-shows]')
+      .forEach(follows => {
+        follows.hidden = follows.dataset.decisionShows !== target.value;
+      });
   });
 }
 
@@ -226,21 +217,20 @@ export function initApplicationDecisions(form: HTMLFormElement): void {
  * as the application's row shows it, after the clauses the decision generated, or at the end of the order when
  * the decision generated none.
  */
-function insertRequestedWording(form: HTMLFormElement, editor: DocEditorController, applicationId: string): void {
-  const data = readOrderData(form);
-  const application = data.applications.find(candidate => candidate.id === applicationId);
-  if (!application?.wordingHtml) {
+function insertRequestedWording(editor: DocEditorController, row: HTMLElement): void {
+  const html = row.dataset.applicationWordingHtml;
+  if (!html) {
     return;
   }
-  for (const anchor of wordingAnchors(application)) {
+  for (const anchor of wordingAnchors(row.dataset.applicationPrefix ?? '')) {
     try {
-      editor.insertHtml(application.wordingHtml, { at: { after: anchor } });
+      editor.insertHtml(html, { at: { after: anchor } });
       return;
     } catch {
       // Not a clause this decision generated: try the next.
     }
   }
-  editor.insertHtml(application.wordingHtml, { at: 'end' });
+  editor.insertHtml(html, { at: 'end' });
 }
 
 export function initMakeOrder(): void {
@@ -325,9 +315,9 @@ export function initMakeOrder(): void {
   });
   form.querySelectorAll<HTMLButtonElement>('[data-insert-requested-wording]').forEach(insert => {
     insert.addEventListener('click', () => {
-      const id = insert.closest<HTMLElement>('[data-application]')?.dataset.applicationId;
-      if (id) {
-        insertRequestedWording(form, editor, id);
+      const row = insert.closest<HTMLElement>('[data-application]');
+      if (row) {
+        insertRequestedWording(editor, row);
       }
     });
   });

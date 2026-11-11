@@ -5,14 +5,6 @@ import { type OrderData } from '../data';
 
 import { selected, selectedControlId, value } from './common';
 
-/**
- * Whether an order made without a hearing transfers enforcement of the possession order to the High Court.
- * A possession order made at a hearing transfers it with its own option.
- */
-export function transfersEnforcement(data: OrderData): boolean {
-  return data.withoutHearing && selected(data, 'transfer-enforcement', 'yes');
-}
-
 /** The High Court's division or registry, without "District Registry" if the judge typed it after the name. */
 function destination(data: OrderData): string {
   if (value(data, 'transfer-enforcement-court') === 'kings-bench') {
@@ -25,7 +17,14 @@ function destination(data: OrderData): string {
   return "[King's Bench Division or District Registry not provided]";
 }
 
+/**
+ * An order made without a hearing can transfer enforcement of the possession order to the High Court. A
+ * possession order made at a hearing transfers it with its own option.
+ */
 export function addEnforcementTransfer(list: OrderedListBuilder, data: OrderData): void {
+  if (!data.withoutHearing || !selected(data, 'transfer-enforcement', 'yes')) {
+    return;
+  }
   list.item('enforcement-transfer', content => {
     content
       .text('Enforcement of the Order of Possession is transferred to the High Court, ')

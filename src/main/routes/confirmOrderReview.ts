@@ -29,6 +29,7 @@ import {
   ORDER_DOES,
   OUTRIGHT_POSSESSION,
   STRIKE_OUT,
+  YES_NO,
   orderDetailsRows,
   validateOrderDetails,
 } from '@utils/orderDetails';
@@ -302,10 +303,7 @@ const VIEWS = {
     condition: CONDITION,
     adjournment: ADJOURNMENT,
     strikeOut: STRIKE_OUT,
-    yesNo: [
-      { value: 'yes', text: 'Yes' },
-      { value: 'no', text: 'No' },
-    ],
+    yesNo: YES_NO,
     maxGroundsDetailsLength: MAX_GROUNDS_DETAILS_LENGTH,
   }),
   'review-dates': (_req: Request, review: OrderReviewSession) => ({

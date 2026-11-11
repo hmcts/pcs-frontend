@@ -15,13 +15,10 @@ export interface AttendanceEntry {
 
 /** An open application the order can decide, as its row on the page gives it. */
 export interface OrderApplication {
-  id: string;
   /** What its answers on the form start with: `app-<id>`. */
   prefix: string;
   applicant: string;
   submittedOn: string;
-  /** Whether the applicant asked for an order, which granting the application puts in the order as HTML. */
-  wordingHtml: string;
   /** An application to suspend enforcement, which granting suspends on conditions. */
   enforcementSuspension: boolean;
   /** What the judge decides about it: "none" while they leave it as it is. */
@@ -81,11 +78,9 @@ export function readOrderData(form: HTMLFormElement): OrderData {
   form.querySelectorAll<HTMLElement>('[data-application]').forEach(row => {
     const prefix = row.dataset.applicationPrefix ?? '';
     applications.push({
-      id: row.dataset.applicationId ?? '',
       prefix,
       applicant: row.dataset.applicationApplicant ?? 'the applicant',
       submittedOn: row.dataset.applicationSubmitted ?? '',
-      wordingHtml: row.dataset.applicationWordingHtml ?? '',
       enforcementSuspension: row.dataset.applicationSuspension !== undefined,
       decision: answers[`${prefix}-decision`]?.[0] ?? 'none',
     });

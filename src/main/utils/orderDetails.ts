@@ -39,7 +39,7 @@ export const STRIKE_OUT: readonly Option[] = [
   { value: 'struck-out', text: 'Claim struck out' },
   { value: 'dismissed', text: 'Claim dismissed' },
 ];
-const YES_NO: readonly Option[] = [
+export const YES_NO: readonly Option[] = [
   { value: 'yes', text: 'Yes' },
   { value: 'no', text: 'No' },
 ];

@@ -31,7 +31,7 @@ export function describeApplication(data: OrderData, application: OrderApplicati
 }
 
 /** The generated clauses after which the "Insert applicant's wording" button puts the applicant's wording. */
-export function wordingAnchors({ prefix }: OrderApplication): string[] {
+export function wordingAnchors(prefix: string): string[] {
   return [`item:${prefix}-decision`, `item:${prefix}-listing`];
 }
 
