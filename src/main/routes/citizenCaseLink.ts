@@ -37,7 +37,8 @@ interface RenderFormOptions {
 
 // Keys under accessCode:errors.* in the en and cy locale files.
 const API_ERROR_MESSAGES: Record<AccessCodeValidationError, { field: 'claimNumber' | 'accessCode'; key: string }> = {
-  not_found: { field: 'claimNumber', key: 'claimNotFound' },
+  // not_found must look the same as mismatch, so the page never reveals whether a claim number exists.
+  not_found: { field: 'accessCode', key: 'accessCodeMismatch' },
   expired: { field: 'accessCode', key: 'accessCodeExpired' },
   already_used: { field: 'accessCode', key: 'accessCodeAlreadyUsed' },
   mismatch: { field: 'accessCode', key: 'accessCodeMismatch' },
