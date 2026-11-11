@@ -164,6 +164,5 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: checkYourAnswersGenApps.yourFullNameTextLabel,
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
+  });
 });
-});
-

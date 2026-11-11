@@ -12,7 +12,7 @@ export const journeys: Record<string, string[]> = {
     'which-language-did-you-use-to-complete-this-service',
     'check-your-answers',
   ],
-  journey2: [    
+  journey2: [
     'do-you-need-help-paying-the-fee',
     'have-you-already-applied-for-help-with-fees',
     'have-the-other-parties-agreed-to-this-application',
@@ -45,7 +45,6 @@ export const journeys: Record<string, string[]> = {
     'which-language-did-you-use-to-complete-this-service',
     'check-your-answers',
   ],
-  
 };
 
 export const defaultJourney: string[] = [
