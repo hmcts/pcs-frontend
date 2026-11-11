@@ -4,10 +4,13 @@ import * as path from 'path';
 import { Page, test } from '@playwright/test';
 
 import { contactUs } from '../../../data/section-data/contactUs.section.data';
+import { contactUsCy } from '../../../data/section-data/contactUs.section.data.cy';
 import { takeValidationFailureScreenshot } from '../../common/pft-validation-screenshot';
 import { escapeForRegex, exactTextWithOptionalWhitespaceRegex } from '../../common/string.utils';
 import { performAction } from '../../controller';
 import { IValidation } from '../../interfaces';
+
+const isWelsh = process.env.RUN_E2E_IN_WELSH === 'true';
 
 const ELEMENT_TYPES = [
   'Button',
@@ -39,6 +42,7 @@ export class PageContentValidation implements IValidation {
 
   private static readonly PAGE_DATA_DIR = path.join(__dirname, '../../../data/page-data');
   private static readonly PAGE_DATA_LR_DIR = path.join(__dirname, '../../../data/page-data/lr-page-data');
+  private static readonly PAGE_DATA_CY_DIR = path.join(__dirname, '../../../data/page-data-cy');
 
   private readonly locatorPatterns = {
     Button: (page: Page, value: string) =>
@@ -194,7 +198,10 @@ export class PageContentValidation implements IValidation {
     if (!(pageName === 'home' || pageName === 'claims') && !test.info().title.includes('@LR')) {
       const contactUsData = this.loadSectionDataFile('contactUs');
       if (contactUsData) {
-        await performAction('clickSummary', contactUs.contactUsForHelpParagraph);
+        await performAction(
+          'clickSummary',
+          isWelsh ? contactUsCy.contactUsForHelpParagraph : contactUs.contactUsForHelpParagraph
+        );
         return { ...pageData, ...contactUsData };
       }
     }
@@ -202,9 +209,14 @@ export class PageContentValidation implements IValidation {
   }
 
   private loadPageDataFile(fileName: string): object | null {
-    const isLR = test.info().title.includes('@LR') || false;
-    const baseDir = isLR ? PageContentValidation.PAGE_DATA_LR_DIR : PageContentValidation.PAGE_DATA_DIR;
-    const filePath = this.resolveDataFilePath(baseDir, `${fileName}${isLR ? '.page.data.lr.ts' : '.page.data.ts'}`);
+    const isLR = !isWelsh && (test.info().title.includes('@LR') || false);
+    const baseDir = isWelsh
+      ? PageContentValidation.PAGE_DATA_CY_DIR
+      : isLR
+        ? PageContentValidation.PAGE_DATA_LR_DIR
+        : PageContentValidation.PAGE_DATA_DIR;
+    const suffix = isWelsh ? '.page.data.cy.ts' : isLR ? '.page.data.lr.ts' : '.page.data.ts';
+    const filePath = this.resolveDataFilePath(baseDir, `${fileName}${suffix}`);
 
     if (!filePath || !fs.existsSync(filePath)) {
       console.warn(`Path not found for the file ${fileName}`);
@@ -222,7 +234,11 @@ export class PageContentValidation implements IValidation {
   }
 
   private loadSectionDataFile(fileName: string): object | null {
-    const filePath = path.join(__dirname, '../../../data/section-data', `${fileName}.section.data.ts`);
+    const filePath = path.join(
+      __dirname,
+      '../../../data/section-data',
+      `${fileName}.section.data${isWelsh ? '.cy' : ''}.ts`
+    );
     if (!fs.existsSync(filePath)) {
       return null;
     }
