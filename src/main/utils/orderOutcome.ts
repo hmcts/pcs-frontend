@@ -14,7 +14,7 @@ export interface ApplicationDecision {
 }
 
 export type ClaimOutcomeKind =
-  'OUTRIGHT_POSSESSION' | 'SUSPENDED_POSSESSION' | 'ADJOURNMENT' | 'STRUCK_OUT' | 'DISMISSED' | 'NO_ORDER' | 'OTHER';
+  'OUTRIGHT_POSSESSION' | 'SUSPENDED_POSSESSION' | 'STRUCK_OUT' | 'DISMISSED' | 'NO_ORDER' | 'OTHER';
 
 export interface ClaimOutcome {
   kind: ClaimOutcomeKind;
@@ -26,7 +26,6 @@ export interface ClaimOutcome {
   transferToHighCourt?: boolean;
   condition?: 'MONEY' | 'NON_MONEY';
   warrantOnNotice?: boolean;
-  adjournment?: 'FURTHER_HEARING' | 'GENERALLY';
 }
 
 const DECISIONS: Record<string, GenAppDecision> = {
@@ -89,15 +88,12 @@ export function claimOutcome(orderType: string, formData: FormData = {}): ClaimO
         warrantOnNotice: options.includes('warrant-on-notice'),
       };
     }
-    case 'ADJOURNMENT':
-      return {
-        kind: 'ADJOURNMENT',
-        adjournment: first(formData['adj-type']) === 'generally' ? 'GENERALLY' : 'FURTHER_HEARING',
-      };
     case 'STRIKE_OUT_DISMISSAL': {
       const outcome = all(formData['strike-subjects']).includes('claim') ? first(formData['strike-claim-outcome']) : '';
       return { kind: outcome === 'struck-out' ? 'STRUCK_OUT' : outcome === 'dismissed' ? 'DISMISSED' : 'NO_ORDER' };
     }
+    // An adjournment manages the case without deciding the claim.
+    case 'ADJOURNMENT':
     case 'NO_ORDER_ON_CLAIM':
       return { kind: 'NO_ORDER' };
     default:

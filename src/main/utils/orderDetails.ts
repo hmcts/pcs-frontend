@@ -199,8 +199,9 @@ export function orderDetailsRequest(answers: OrderDetailsAnswers = {}): ClaimOut
         warrantOnNotice: yes(answers['suspended-warrant-on-notice']),
         moneyJudgment: yes(answers['suspended-money-judgment']),
       };
+    // Asked as the free-form categories agree, but an adjournment manages the case without deciding the claim.
     case 'adjournment':
-      return { kind: 'ADJOURNMENT', adjournment: upper(answers.adjournment) as ClaimOutcome['adjournment'] };
+      return { kind: 'NO_ORDER' };
     case 'strike-out':
       return { kind: upper(answers['strike-out']) as ClaimOutcome['kind'] };
     default:

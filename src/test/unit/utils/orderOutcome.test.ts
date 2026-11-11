@@ -64,8 +64,8 @@ describe('orderOutcome', () => {
   });
 
   it.each([
-    ['ADJOURNMENT', { 'adj-type': 'generally' }, { kind: 'ADJOURNMENT', adjournment: 'GENERALLY' }],
-    ['ADJOURNMENT', { 'adj-type': 'further-hearing' }, { kind: 'ADJOURNMENT', adjournment: 'FURTHER_HEARING' }],
+    // An adjournment manages the case without deciding the claim.
+    ['ADJOURNMENT', { 'adj-type': 'generally' }, { kind: 'NO_ORDER' }],
     [
       'STRIKE_OUT_DISMISSAL',
       { 'strike-subjects': 'claim', 'strike-claim-outcome': 'struck-out' },
