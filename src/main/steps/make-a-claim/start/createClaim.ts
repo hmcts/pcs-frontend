@@ -3,11 +3,13 @@ import type { Request } from 'express';
 import { CallbackRejectedError } from '../../../HttpError';
 import { PROPERTY_INELIGIBLE_URL } from '../../../constants/makeAClaimRoutes';
 import { getUserToken } from '../../utils/userRole';
-import { flowConfig } from '../flow.config';
+import { flowConfig, taskListPath } from '../flow.config';
 import { addressFromBody } from '../formValues';
+import { AWAITING_SUBMISSION } from '../submittedClaim';
 
 import { MAKE_A_CLAIM_START_ROUTE } from './flow.config';
 
+import { Logger } from '@modules/logger';
 import { getAllFormData } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
 import { ccdCaseService } from '@services/ccdCaseService';
@@ -19,7 +21,22 @@ export const PROPERTY_NOT_COVERED_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-no
 export const WHO_IS_CLAIMING_URL = `${MAKE_A_CLAIM_START_ROUTE}/who-is-claiming`;
 export const PROPERTY_ADDRESS_TOO_LONG_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-address?problem=tooLong`;
 
+const logger = Logger.getLogger('makeAClaimCreateClaim');
+
 const eligibleUrl = (caseReference: string) => getStepUrl('eligible', flowConfig, caseReference);
+
+/** The claimant's own claim not yet submitted, to carry on with instead of starting another. */
+async function existingDraftClaim(req: Request): Promise<string | undefined> {
+  try {
+    const [caseReference] = await ccdCaseService.searchOwnCasesInState(getUserToken(req), AWAITING_SUBMISSION);
+    return caseReference;
+  } catch (error) {
+    logger.warn('Could not search for an existing draft claim; creating a new one', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return undefined;
+  }
+}
 
 /** Where pcs-api's reasons for refusing to create the claim send the claimant. */
 const REFUSAL_REDIRECTS: [reason: string, redirect: string][] = [
@@ -55,6 +72,11 @@ export async function createClaimFromStartAnswers(req: Request): Promise<string>
     !propertyAddress?.AddressLine1
   ) {
     return MAKE_A_CLAIM_START_ROUTE;
+  }
+
+  const existing = await existingDraftClaim(req);
+  if (existing) {
+    return taskListPath(existing);
   }
 
   try {

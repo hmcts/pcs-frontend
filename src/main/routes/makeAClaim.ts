@@ -103,6 +103,12 @@ async function cardPaymentSucceeded(req: Request, caseReference: string): Promis
   }
 }
 
+/** The message the pay page shows for each way a payment did not go through. */
+const PAYMENT_PROBLEMS = new Map([
+  ['failed', 'paymentFailed'],
+  ['declined', 'paymentDeclined'],
+]);
+
 function caseReferenceOf(req: Request): string {
   const caseReference = sanitiseCaseReference(String(req.params.caseReference ?? ''));
   if (!caseReference) {
@@ -134,11 +140,12 @@ function registerSubmittedClaimRoutes(app: Application): void {
         'payClaimFee'
       );
       const t = content.t as ReturnType<typeof getTranslationFunction>;
+      const paymentProblem = PAYMENT_PROBLEMS.get(String(req.query.payment));
       res.render('make-a-claim/templates/payClaimFee.njk', {
         ...content,
         feeAmount: formatPence(fee.feeAmountInPence),
         payUrl: makeAClaimPath(PAY_CLAIM_FEE_START_ROUTE, caseReference),
-        paymentProblem: req.query.payment === 'failed' ? t('makeAClaim:payClaimFee.paymentFailed') : undefined,
+        paymentProblem: paymentProblem ? t(`makeAClaim:payClaimFee.${paymentProblem}`) : undefined,
       });
     } catch (error) {
       next(error);
@@ -169,6 +176,7 @@ function registerSubmittedClaimRoutes(app: Application): void {
         successRedirectUrl: `${submitted}?status=success`,
         pendingRedirectUrl: `${submitted}?status=pending`,
         failureRedirectUrl: `${makeAClaimPath(PAY_CLAIM_FEE_ROUTE, caseReference)}?payment=failed`,
+        declinedRedirectUrl: `${makeAClaimPath(PAY_CLAIM_FEE_ROUTE, caseReference)}?payment=declined`,
       });
       return res.redirect(303, payment.nextUrl);
     } catch (error) {

@@ -22,5 +22,8 @@
   "errors": {
     "mandatoryGrounds": "cySelect at least one ground for possession",
     "otherGroundsDetails": "cyGive details of your other grounds for possession"
+  },
+  "fieldNames": {
+    "otherGroundsDetails": "cyThe details of your other grounds"
   }
 }

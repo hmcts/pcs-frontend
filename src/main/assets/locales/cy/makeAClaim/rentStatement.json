@@ -6,5 +6,8 @@
     "cyIf a payment was made for a period, select ‘Add a payment’ in that row. If no payments were made, select ‘Save and continue’."
   ],
   "totalArrearsLabel": "cyTotal arrears:",
-  "emptyTable": "cyThere are no rent periods to show. Check the rent and the period the statement covers."
+  "emptyTable": "cyThere are no rent periods to show. Check the rent and the period the statement covers.",
+  "problems": {
+    "periodNotFound": "cyThat rent period is not in the statement"
+  }
 }

@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../../../../main/HttpError';
+import { withReturnTo } from '../../../../main/steps/make-a-claim/returnTo';
 import {
   draftChangedUrl,
   isDraftChanged,
@@ -30,6 +31,14 @@ describe('submitRefusalOutcome', () => {
         redirect: claimPage('multiple-claimants-ineligible'),
       }
     );
+  });
+
+  it.each([
+    ['CLAIMANT_TYPE_NOT_ELIGIBLE', '/make-a-claim/not-private-landlord'],
+    ['CLAIM_AGAINST_TRESPASSERS_NOT_ELIGIBLE', '/make-a-claim/trespass-ineligible'],
+    ['WHO_IS_CLAIMING_NOT_ELIGIBLE', '/make-a-claim/not-litigant-in-person'],
+  ])('sends %s to %s', (code, redirect) => {
+    expect(submitRefusalOutcome(refused(code), CASE)).toEqual({ redirect });
   });
 
   it('sends a property outside England to the property ineligible page', () => {
@@ -102,8 +111,19 @@ describe('submitErrorItems', () => {
     ['REQUIRED:otherInformation.languageUsed', claimPage('language-used')],
     ['REQUIRED:submission.statementOfTruthAgreed', '#statementOfTruth'],
     ['TOO_LONG:submission.statementOfTruthFullName', '#statementOfTruthFullName'],
+    ['REQUIRED:rentArrears.rentAmount', claimPage('rent-amount')],
+    ['TOO_LONG:rentArrears.arrearsAtNoticeDate', claimPage('arrears-at-notice')],
+    ['REQUIRED:rentArrears.rentHistoryTable', claimPage('rent-statement')],
+    ['REQUIRED:rentArrears.rentHistoryTable[2].dateDue', claimPage('rent-statement')],
+    ['REQUIRED:rentArrears.rentHistoryTable[2].amountPaid', `${claimPage('rent-statement-payment')}?row=2`],
+    ['REQUIRED:tenancy.tenancyAgreementDocuments', claimPage('upload-tenancy-agreement')],
+    ['REQUIRED:notice.noticeDocuments', claimPage('upload-notice')],
+    ['REQUIRED:rentArrears.rentStatementDocuments', claimPage('upload-rent-statement')],
+    ['TOO_LONG:otherInformation.otherDocuments[0]', claimPage('upload-other-documents')],
   ])('links %s to %s', (code, href) => {
-    expect(items(code)).toEqual([{ text: expect.any(String), href }]);
+    expect(items(code)).toEqual([
+      { text: expect.any(String), href: href.startsWith('#') ? href : withReturnTo(href, 'check-your-answers') },
+    ]);
   });
 
   it('says whether an answer is missing or too long', () => {
@@ -121,10 +141,25 @@ describe('submitErrorItems', () => {
 
   it('sends rent arrears grounds given as other grounds back to the grounds page', () => {
     expect(items('OTHER_GROUND_NOT_ALLOWED')).toEqual([
-      { text: 'makeAClaim:submitErrors.otherGroundNotAllowed', href: claimPage('other-grounds') },
+      {
+        text: 'makeAClaim:submitErrors.otherGroundNotAllowed',
+        href: withReturnTo(claimPage('other-grounds'), 'check-your-answers'),
+      },
     ]);
     expect(submitRefusalOutcome(refused('OTHER_GROUND_NOT_ALLOWED'), CASE)).toEqual({
       codes: ['OTHER_GROUND_NOT_ALLOWED'],
+    });
+  });
+
+  it('sends other grounds given as rent arrears grounds back to the rent arrears grounds page', () => {
+    expect(items('RENT_ARREARS_GROUND_NOT_ALLOWED')).toEqual([
+      {
+        text: 'makeAClaim:submitErrors.rentArrearsGroundNotAllowed',
+        href: withReturnTo(claimPage('rent-arrears-grounds'), 'check-your-answers'),
+      },
+    ]);
+    expect(submitRefusalOutcome(refused('RENT_ARREARS_GROUND_NOT_ALLOWED'), CASE)).toEqual({
+      codes: ['RENT_ARREARS_GROUND_NOT_ALLOWED'],
     });
   });
 

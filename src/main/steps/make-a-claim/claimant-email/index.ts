@@ -4,12 +4,11 @@ import { accountEmailOf, usableAccountEmailOf } from '../claimMapping';
 import { textField, yesNoQuestion } from '../fieldBuilders';
 import { FIELD_LIMITS } from '../fieldLimits';
 import { createMakeAClaimStep } from '../formStep';
+import { emailValidator } from '../formValues';
 
 import { getTranslationFunction } from '@modules/steps';
 import type { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
-
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const step: StepDefinition = createMakeAClaimStep({
   stepName: 'claimant-email',
@@ -22,10 +21,7 @@ export const step: StepDefinition = createMakeAClaimStep({
             maxLength: FIELD_LIMITS.emailAddress,
             errorMessage: 'errors.emailAddress',
             attributes: { autocomplete: 'email', spellcheck: false, type: 'email' },
-            validator: (value: unknown): boolean | string =>
-              typeof value === 'string' && value.trim() && !EMAIL.test(value.trim())
-                ? 'errors.emailAddressInvalid'
-                : true,
+            validator: emailValidator('errors.emailAddressInvalid'),
           }),
         },
       },

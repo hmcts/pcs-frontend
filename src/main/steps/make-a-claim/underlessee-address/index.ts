@@ -8,5 +8,5 @@ export const step: StepDefinition = createMakeAClaimStep({
   stepDir: __dirname,
   customTemplate: ADDRESS_TEMPLATE,
   fields: addressFields('underlessee'),
-  extendGetContent: req => addressContent(req, 'underlessee'),
+  extendGetContent: (req, formContent) => addressContent(req, 'underlessee', formContent),
 });

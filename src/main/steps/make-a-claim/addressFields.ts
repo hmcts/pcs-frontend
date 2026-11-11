@@ -1,10 +1,10 @@
 import type { Request } from 'express';
 
 import { FIELD_LIMITS } from './fieldLimits';
-import { type AddressPart, addressFieldName } from './formValues';
+import { ADDRESS_PARTS, type AddressPart, addressFieldName } from './formValues';
 
 import { getTranslationFunction } from '@modules/steps';
-import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
+import type { BuiltFormContent, FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 
 export const ADDRESS_TEMPLATE = 'make-a-claim/templates/address.njk';
 
@@ -44,14 +44,22 @@ export function addressFields(prefix: string, required: IsRequired = () => true)
   ];
 }
 
+/** Whether the page shows an address in the manual fields for `prefix`, saved or pre-filled. */
+function holdsAddress(formContent: BuiltFormContent | undefined, prefix: string): boolean {
+  const names = ADDRESS_PARTS.map(part => addressFieldName(prefix, part));
+  return (formContent?.fields ?? []).some(field => {
+    const value = (field.component as { value?: unknown } | undefined)?.value;
+    return names.includes(field.name) && typeof value === 'string' && value.trim() !== '';
+  });
+}
+
 /** What the address template needs to render the finder for `prefix`. */
-export function addressContent(req: Request, prefix: string): Record<string, unknown> {
+export function addressContent(req: Request, prefix: string, formContent?: BuiltFormContent): Record<string, unknown> {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const label = (key: string) => t(`makeAClaim:address.finder.${key}`);
-  const posted = req.method === 'POST' ? (req.body ?? {}) : {};
   return {
     addressPrefix: prefix,
-    addressOpen: Boolean(posted[addressFieldName(prefix, 'addressLine1')]) || req.method === 'POST',
+    addressOpen: req.method === 'POST' || holdsAddress(formContent, prefix),
     addressLabels: {
       enterPostcode: label('enterPostcode'),
       findAddress: label('findAddress'),

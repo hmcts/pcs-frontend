@@ -12,5 +12,8 @@
   "errors": {
     "noticeType": "cySelect the type of notice you served",
     "noticeTypeOther": "cyEnter the type of notice"
+  },
+  "fieldNames": {
+    "noticeTypeOther": "cyThe type of notice"
   }
 }

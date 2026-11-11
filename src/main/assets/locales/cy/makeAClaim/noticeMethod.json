@@ -41,6 +41,62 @@
       "day": "cyDay",
       "month": "cyMonth",
       "year": "cyYear"
+    },
+    "emailedToInvalid": "cyEnter an email address in the correct format, like name@example.com"
+  },
+  "dateErrors": {
+    "postedDate": {
+      "required": "cyEnter the date the notice was posted",
+      "notRealDate": "cyThe date the notice was posted must be a real date",
+      "invalidValue": "cyThe date the notice was posted must be a real date",
+      "futureDate": "cyThe date the notice was posted must be today or in the past",
+      "missingOne": "cyThe date the notice was posted must include a {{missingField}}",
+      "missingTwo": "cyThe date the notice was posted must include a {{first}} and {{second}}"
+    },
+    "deliveredDate": {
+      "required": "cyEnter the date the notice was delivered",
+      "notRealDate": "cyThe date the notice was delivered must be a real date",
+      "invalidValue": "cyThe date the notice was delivered must be a real date",
+      "futureDate": "cyThe date the notice was delivered must be today or in the past",
+      "missingOne": "cyThe date the notice was delivered must include a {{missingField}}",
+      "missingTwo": "cyThe date the notice was delivered must include a {{first}} and {{second}}"
+    },
+    "handedDate": {
+      "required": "cyEnter the date the notice was handed over",
+      "notRealDate": "cyThe date the notice was handed over must be a real date",
+      "invalidValue": "cyThe date the notice was handed over must be a real date",
+      "futureDate": "cyThe date the notice was handed over must be today or in the past",
+      "missingOne": "cyThe date the notice was handed over must include a {{missingField}}",
+      "missingTwo": "cyThe date the notice was handed over must include a {{first}} and {{second}}"
+    },
+    "emailedDate": {
+      "required": "cyEnter the date the email was sent",
+      "notRealDate": "cyThe date the email was sent must be a real date",
+      "invalidValue": "cyThe date the email was sent must be a real date",
+      "futureDate": "cyThe date the email was sent must be today or in the past",
+      "missingOne": "cyThe date the email was sent must include a {{missingField}}",
+      "missingTwo": "cyThe date the email was sent must include a {{first}} and {{second}}"
+    },
+    "otherElectronicDate": {
+      "required": "cyEnter the date the notice was sent",
+      "notRealDate": "cyThe date the notice was sent must be a real date",
+      "invalidValue": "cyThe date the notice was sent must be a real date",
+      "futureDate": "cyThe date the notice was sent must be today or in the past",
+      "missingOne": "cyThe date the notice was sent must include a {{missingField}}",
+      "missingTwo": "cyThe date the notice was sent must include a {{first}} and {{second}}"
+    },
+    "otherMethodDate": {
+      "required": "cyEnter the date the notice was served",
+      "notRealDate": "cyThe date the notice was served must be a real date",
+      "invalidValue": "cyThe date the notice was served must be a real date",
+      "futureDate": "cyThe date the notice was served must be today or in the past",
+      "missingOne": "cyThe date the notice was served must include a {{missingField}}",
+      "missingTwo": "cyThe date the notice was served must include a {{first}} and {{second}}"
     }
+  },
+  "fieldNames": {
+    "handedToName": "cyThe name of who the notice was left with",
+    "otherElectronicDetails": "cyHow the notice was sent",
+    "otherMethodDetails": "cyHow you served the notice"
   }
 }

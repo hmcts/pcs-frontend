@@ -13,6 +13,10 @@ export const step: StepDefinition = createMakeAClaimStep({
   stepDir: __dirname,
   interstitial: true,
   fields: [yesNoQuestion('confirmRemove')],
+  redirectWhen: req =>
+    itemIndexOf(req, readClaim(req).defendants, 'index') === undefined
+      ? getStepUrl('defendant-cya', flowConfig, req.res?.locals.validatedCase?.id)
+      : undefined,
   extendGetContent: req => ({
     defendantName: defendantDisplayName(
       readClaim(req).defendants?.[itemIndexOf(req, readClaim(req).defendants, 'index') ?? -1]?.value,

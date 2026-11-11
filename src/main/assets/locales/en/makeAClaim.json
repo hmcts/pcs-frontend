@@ -226,7 +226,8 @@
     "change": "Change",
     "addPayment": "Add a payment",
     "paymentFor": "payment for rent due on",
-    "additionalPayment": "Additional payment"
+    "additionalPayment": "Additional payment",
+    "remove": "Remove"
   },
   "submitErrors": {
     "required": "Answer the question on ‘{{page}}’",
@@ -268,8 +269,17 @@
       "underlessee-name": "What is the sub-tenant or mortgage lender’s name?",
       "language-used": "Which language did you use to complete this claim?",
       "other-reasons": "Other information about your reasons for possession",
-      "check-your-answers": "Statement of truth"
-    }
+      "check-your-answers": "Statement of truth",
+      "rent-amount": "How much is the rent?",
+      "arrears-at-notice": "What were the rent arrears on the date you served the notice?",
+      "rent-statement": "Rent statement",
+      "rent-statement-payment": "Add a payment",
+      "upload-tenancy-agreement": "Upload the tenancy or licence agreement",
+      "upload-notice": "Upload the notice",
+      "upload-rent-statement": "Upload rent statement",
+      "upload-other-documents": "Upload files"
+    },
+    "rentArrearsGroundNotAllowed": "Choose only rent arrears grounds on the rent arrears grounds question"
   },
   "payClaimFee": {
     "pageTitle": "Pay your claim fee",
@@ -280,7 +290,8 @@
     "redirectText": "You’ll be taken to GOV.UK Pay to pay by debit or credit card.",
     "payButton": "Pay your claim fee",
     "problemTitle": "There is a problem",
-    "paymentFailed": "Your payment was not successful. You have not been charged. Try again."
+    "paymentFailed": "Your payment was not successful. You have not been charged. Try again.",
+    "paymentDeclined": "Your card was declined. You have not been charged. Try again or use a different card."
   },
   "claimSubmitted": {
     "pageTitle": "Claim submitted",

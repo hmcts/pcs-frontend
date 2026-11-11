@@ -226,7 +226,8 @@
     "change": "cyChange",
     "addPayment": "cyAdd a payment",
     "paymentFor": "cypayment for rent due on",
-    "additionalPayment": "cyAdditional payment"
+    "additionalPayment": "cyAdditional payment",
+    "remove": "cyRemove"
   },
   "submitErrors": {
     "required": "cyAnswer the question on ‘{{page}}’",
@@ -268,8 +269,17 @@
       "underlessee-name": "cyWhat is the sub-tenant or mortgage lender’s name?",
       "language-used": "cyWhich language did you use to complete this claim?",
       "other-reasons": "cyOther information about your reasons for possession",
-      "check-your-answers": "cyStatement of truth"
-    }
+      "check-your-answers": "cyStatement of truth",
+      "rent-amount": "cyHow much is the rent?",
+      "arrears-at-notice": "cyWhat were the rent arrears on the date you served the notice?",
+      "rent-statement": "cyRent statement",
+      "rent-statement-payment": "cyAdd a payment",
+      "upload-tenancy-agreement": "cyUpload the tenancy or licence agreement",
+      "upload-notice": "cyUpload the notice",
+      "upload-rent-statement": "cyUpload rent statement",
+      "upload-other-documents": "cyUpload files"
+    },
+    "rentArrearsGroundNotAllowed": "cyChoose only rent arrears grounds on the rent arrears grounds question"
   },
   "payClaimFee": {
     "pageTitle": "cyPay your claim fee",
@@ -280,7 +290,8 @@
     "redirectText": "cyYou’ll be taken to GOV.UK Pay to pay by debit or credit card.",
     "payButton": "cyPay your claim fee",
     "problemTitle": "cyThere is a problem",
-    "paymentFailed": "cyYour payment was not successful. You have not been charged. Try again."
+    "paymentFailed": "cyYour payment was not successful. You have not been charged. Try again.",
+    "paymentDeclined": "cyYour card was declined. You have not been charged. Try again or use a different card."
   },
   "claimSubmitted": {
     "pageTitle": "cyClaim submitted",

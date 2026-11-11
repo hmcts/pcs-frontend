@@ -3,7 +3,7 @@
 
 {% block beforeForm %}
   {% if rentTable %}
-    {{ govukTable(rentTable) }}
+    <div id="rent-statement">{{ govukTable(rentTable) }}</div>
     <p class="govuk-body govuk-!-font-weight-bold">{{ totalArrearsLabel }} {{ totalArrears }}</p>
   {% else %}
     <p class="govuk-body">{{ emptyTable }}</p>

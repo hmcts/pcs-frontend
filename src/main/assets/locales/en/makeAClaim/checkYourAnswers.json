@@ -15,5 +15,8 @@
   "errors": {
     "statementOfTruth": "Confirm both parts of the statement of truth",
     "statementOfTruthFullName": "Enter your full name"
+  },
+  "fieldNames": {
+    "statementOfTruthPosition": "Your position or office"
   }
 }

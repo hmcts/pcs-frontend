@@ -13,5 +13,8 @@
   "errors": {
     "tenancyType": "Select the type of tenancy or licence",
     "otherTenancyTypeDetails": "Enter the type of tenancy or licence"
+  },
+  "fieldNames": {
+    "otherTenancyTypeDetails": "The type of tenancy or licence"
   }
 }

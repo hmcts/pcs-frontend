@@ -1,10 +1,14 @@
 import {
   addRentTablePayment,
+  exceedsRentPeriodLimit,
   formatPence,
   generateRentPeriods,
   ledgerWithArrears,
   mergeRentPeriods,
+  removeRentTablePayment,
+  rentPeriodsWithinLimit,
   rentTableWithArrears,
+  rowHoldsPayment,
   statementRangeOf,
 } from '../../../../main/steps/make-a-claim/rentHistory';
 
@@ -281,5 +285,76 @@ describe('formatPence', () => {
     expect(formatPence(123456)).toBe('£1,234.56');
     expect(formatPence('5')).toBe('£0.05');
     expect(formatPence(undefined)).toBe('');
+  });
+});
+
+describe('exceedsRentPeriodLimit', () => {
+  const weekly = (statementEnd: string) =>
+    exceedsRentPeriodLimit({
+      rentAmount: '10000',
+      rentFrequency: 'WEEKLY',
+      statementStart: '2020-01-01',
+      statementEnd,
+    });
+
+  it('allows 260 periods and refuses a 261st', () => {
+    expect(weekly('2024-12-24')).toBe(false);
+    expect(weekly('2024-12-25')).toBe(true);
+  });
+
+  it('gives the periods laid out once they are within the limit', () => {
+    const input = { rentAmount: '10000', rentFrequency: 'WEEKLY' as const, statementStart: '2020-01-01' };
+    expect(rentPeriodsWithinLimit({ ...input, statementEnd: '2024-12-24' })).toHaveLength(260);
+    expect(rentPeriodsWithinLimit({ ...input, statementEnd: '2024-12-25' })).toBeUndefined();
+  });
+});
+
+describe('rowHoldsPayment', () => {
+  it('takes a payment with no date as the same however the missing date is given', () => {
+    expect(rowHoldsPayment({ amountPaid: '500' }, { datePaid: '', amountPaid: '500' })).toBe(true);
+    expect(rowHoldsPayment({ datePaid: '', amountPaid: '500' }, { amountPaid: '500' })).toBe(true);
+    expect(rowHoldsPayment({ amountPaid: '500' }, { datePaid: '2026-06-01', amountPaid: '500' })).toBe(false);
+  });
+});
+
+describe('removeRentTablePayment', () => {
+  const rows = [
+    {
+      id: 'p',
+      value: {
+        periodStart: '2026-06-01',
+        dateDue: '2026-06-01',
+        amountDue: '100',
+        datePaid: '2026-06-02',
+        amountPaid: '10',
+      },
+    },
+    { value: { periodStart: '2026-06-01', datePaid: '2026-06-09', amountPaid: '20' } },
+    { value: { periodStart: '2026-07-01', dateDue: '2026-07-01', amountDue: '100' } },
+  ];
+
+  it('moves the period’s next payment up onto its own row', () => {
+    expect(removeRentTablePayment(rows, 0)).toEqual([
+      {
+        id: 'p',
+        value: {
+          periodStart: '2026-06-01',
+          dateDue: '2026-06-01',
+          amountDue: '100',
+          datePaid: '2026-06-09',
+          amountPaid: '20',
+        },
+      },
+      rows[2],
+    ]);
+  });
+
+  it('drops an additional payment’s row', () => {
+    expect(removeRentTablePayment(rows, 1)).toEqual([rows[0], rows[2]]);
+  });
+
+  it('clears a period’s only payment and keeps the period', () => {
+    const [period] = removeRentTablePayment([rows[0]], 0);
+    expect(period.value).toEqual({ periodStart: '2026-06-01', dateDue: '2026-06-01', amountDue: '100' });
   });
 });

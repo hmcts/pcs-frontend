@@ -4,6 +4,7 @@ import { CallbackRejectedError } from '../../HttpError';
 import { MAKE_A_CLAIM_START_ROUTE, PROPERTY_INELIGIBLE_URL } from '../../constants/makeAClaimRoutes';
 
 import { flowConfig, taskListPath } from './flow.config';
+import { withReturnTo } from './returnTo';
 
 import { getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
@@ -21,12 +22,18 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^defendants\[\d+\]\.(addressKnown|addressSameAsProperty|address(\.[A-Za-z0-9]+)?)$/, 'defendant-address'],
   [/^tenancy\.(tenancyType|otherTenancyTypeDetails)$/, 'tenancy-type'],
   [/^tenancy\.noTenancyAgreementReason$/, 'tenancy-agreement'],
+  [/^tenancy\.tenancyAgreementDocuments(\[\d+\])?$/, 'upload-tenancy-agreement'],
   [/^grounds$/, 'rent-arrears-claim'],
   [/^grounds\.rentArrearsGrounds$/, 'rent-arrears-grounds'],
   [/^grounds\.otherGrounds$/, 'other-grounds'],
   [/^grounds\.otherGroundsDetails$/, 'other-grounds'],
   [/^grounds\.groundReasons(\.[A-Z0-9_]+|\.reason)?$/, 'ground-reason'],
   [/^rentArrears\.currentArrears$/, 'current-arrears'],
+  [/^rentArrears\.rentAmount$/, 'rent-amount'],
+  [/^rentArrears\.arrearsAtNoticeDate$/, 'arrears-at-notice'],
+  [/^rentArrears\.rentStatementDocuments(\[\d+\])?$/, 'upload-rent-statement'],
+  [/^rentArrears\.rentHistoryTable\[\d+\]\.(datePaid|amountPaid)$/, 'rent-statement-payment'],
+  [/^rentArrears\.rentHistoryTable(\[\d+\](\.[A-Za-z]+)?)?$/, 'rent-statement'],
   [/^rentArrears\.otherFrequencyDetails$/, 'rent-frequency'],
   [/^rentArrears\.recoverySteps$/, 'recovery-steps'],
   [/^rentArrears\.rentHistoryLedger\[\d+\](\.[A-Za-z]+)?$/, 'ledger-transaction'],
@@ -34,6 +41,7 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^notice\.(noticeType|noticeTypeOther)$/, 'notice-type'],
   [/^notice\.noticeDate$/, 'notice-date'],
   [/^notice\.noticeUnavailableReason$/, 'notice-available'],
+  [/^notice\.noticeDocuments(\[\d+\])?$/, 'upload-notice'],
   [
     /^notice\.(noticeMethods|postedDate|deliveredDate|handedToName|handedDate|emailedTo|emailedDate|otherElectronicDetails|otherElectronicDate|otherMethodDetails|otherMethodDate)$/,
     'notice-method',
@@ -44,6 +52,7 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^circumstances\.underlesseeAddress(\.[A-Za-z0-9]+)?$/, 'underlessee-address'],
   [/^otherInformation\.languageUsed$/, 'language-used'],
   [/^otherInformation\.otherReasonsDetail$/, 'other-reasons'],
+  [/^otherInformation\.otherDocuments(\[\d+\])?$/, 'upload-other-documents'],
   [/^submission\./, 'check-your-answers'],
 ];
 
@@ -51,6 +60,9 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
 const INELIGIBLE_REDIRECTS: Record<string, (caseId: string) => string> = {
   MULTIPLE_CLAIMANTS_NOT_ELIGIBLE: caseId => getStepUrl('multiple-claimants-ineligible', flowConfig, caseId),
   PROPERTY_NOT_IN_ENGLAND: () => PROPERTY_INELIGIBLE_URL,
+  CLAIMANT_TYPE_NOT_ELIGIBLE: () => `${MAKE_A_CLAIM_START_ROUTE}/not-private-landlord`,
+  CLAIM_AGAINST_TRESPASSERS_NOT_ELIGIBLE: () => `${MAKE_A_CLAIM_START_ROUTE}/trespass-ineligible`,
+  WHO_IS_CLAIMING_NOT_ELIGIBLE: () => `${MAKE_A_CLAIM_START_ROUTE}/not-litigant-in-person`,
 };
 
 const ANSWER_REFUSAL = /^(REQUIRED|TOO_LONG):([A-Za-z]+(?:\[\d+\])?(?:\.[A-Za-z0-9_]+(?:\[\d+\])?)*)$/;
@@ -59,7 +71,15 @@ export const DRAFT_CHANGED = 'DRAFT_CHANGED';
 
 const OTHER_GROUND_NOT_ALLOWED = 'OTHER_GROUND_NOT_ALLOWED';
 
-const MESSAGE_REFUSALS = ['DRAFT_NOT_FOUND', DRAFT_CHANGED, 'PAYMENT_SERVICE_UNAVAILABLE', OTHER_GROUND_NOT_ALLOWED];
+const RENT_ARREARS_GROUND_NOT_ALLOWED = 'RENT_ARREARS_GROUND_NOT_ALLOWED';
+
+const MESSAGE_REFUSALS = [
+  'DRAFT_NOT_FOUND',
+  DRAFT_CHANGED,
+  'PAYMENT_SERVICE_UNAVAILABLE',
+  OTHER_GROUND_NOT_ALLOWED,
+  RENT_ARREARS_GROUND_NOT_ALLOWED,
+];
 
 export const SUBMIT_FAILED = 'failed';
 
@@ -92,19 +112,28 @@ function stepForPath(path: string, caseId: string): { step: string; href: string
   if (step === 'check-your-answers') {
     return { step, href: path.endsWith('Agreed') ? '#statementOfTruth' : `#${path.split('.').pop()}` };
   }
-  return { step, href: `${getStepUrl(step, flowConfig, caseId)}${queryForPath(path)}` };
+  return { step, href: answerUrl(step, caseId, queryForPath(path)) };
+}
+
+/** A page the check your answers page links to, which returns to check your answers once answered. */
+function answerUrl(step: string, caseId: string, query = ''): string {
+  return withReturnTo(`${getStepUrl(step, flowConfig, caseId)}${query}`, 'check-your-answers');
 }
 
 /** Which defendant, ledger entry or ground a refused path is about, as the page that asks it expects. */
 function queryForPath(path: string): string {
   const defendant = Number(/^defendants\[(\d+)\]/.exec(path)?.[1] ?? 0);
   const entry = /^rentArrears\.rentHistoryLedger\[(\d+)\]/.exec(path)?.[1];
+  const row = /^rentArrears\.rentHistoryTable\[(\d+)\]\.(datePaid|amountPaid)$/.exec(path)?.[1];
   const ground = /^grounds\.groundReasons\.(GROUND_[A-Z0-9]+)$/.exec(path)?.[1];
   if (ground) {
     return `?ground=${ground}`;
   }
   if (entry !== undefined) {
     return `?entry=${entry}`;
+  }
+  if (row !== undefined) {
+    return `?row=${row}`;
   }
   return defendant > 0 ? `?index=${defendant}` : '';
 }
@@ -135,7 +164,13 @@ export function submitErrorItems(req: Request, codes: string[]): ErrorSummaryIte
     if (code === OTHER_GROUND_NOT_ALLOWED) {
       return {
         text: t('makeAClaim:submitErrors.otherGroundNotAllowed'),
-        href: getStepUrl('other-grounds', flowConfig, caseId),
+        href: answerUrl('other-grounds', caseId),
+      };
+    }
+    if (code === RENT_ARREARS_GROUND_NOT_ALLOWED) {
+      return {
+        text: t('makeAClaim:submitErrors.rentArrearsGroundNotAllowed'),
+        href: answerUrl('rent-arrears-grounds', caseId),
       };
     }
     if (code === 'PAYMENT_SERVICE_UNAVAILABLE') {

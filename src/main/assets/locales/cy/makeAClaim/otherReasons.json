@@ -7,5 +7,8 @@
   "errors": {
     "hasOtherReasons": "cySelect whether there is any other information about your reasons for possession",
     "otherReasonsDetail": "cyEnter the other information about your reasons for possession"
+  },
+  "fieldNames": {
+    "otherReasonsDetail": "cyYour other information"
   }
 }

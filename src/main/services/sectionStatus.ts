@@ -184,7 +184,7 @@ function scoreAnsweredness(questionSteps: RegisteredStep[], req: Request): Secti
   return 'DONE';
 }
 
-function isStepVisible(stepName: string, flowConfig: JourneyFlowConfig, req: Request): boolean {
+export function isStepVisible(stepName: string, flowConfig: JourneyFlowConfig, req: Request): boolean {
   const stepConfig = flowConfig.steps[stepName];
   if (!stepConfig?.showCondition) {
     return true;

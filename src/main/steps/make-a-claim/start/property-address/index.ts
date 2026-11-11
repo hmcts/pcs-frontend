@@ -18,7 +18,7 @@ export const step: StepDefinition = createStartStep({
     }
   },
   extendGetContent: (req, formContent) => ({
-    ...addressContent(req, 'property'),
+    ...addressContent(req, 'property', formContent),
     ...(req.query?.problem === 'tooLong' && !formContent.errorSummary
       ? {
           errorSummary: {

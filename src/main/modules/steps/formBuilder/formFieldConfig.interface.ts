@@ -80,13 +80,15 @@ export interface FormFieldConfig {
   validate?: (
     value: unknown,
     formData: Record<string, unknown>,
-    allData: Record<string, unknown>
+    allData: Record<string, unknown>,
+    req?: Request
   ) => string | undefined;
   // Simpler field-level validation that returns boolean or error message
   validator?: (
     value: unknown,
     formData?: Record<string, unknown>,
-    allData?: Record<string, unknown>
+    allData?: Record<string, unknown>,
+    req?: Request
   ) => boolean | string;
   // File upload configuration
   accept?: string;

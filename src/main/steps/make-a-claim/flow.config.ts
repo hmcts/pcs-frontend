@@ -35,7 +35,13 @@ export const flowConfig: JourneyFlowConfig = {
   useSessionFormData: false,
   eventId: MAKE_A_CLAIM_EVENT_ID,
   sections: makeAClaimSections,
-  nonSectionStepOrder: ['task-list', 'multiple-claimants-ineligible', 'remove-defendant', 'remove-ledger-entry'],
+  nonSectionStepOrder: [
+    'task-list',
+    'multiple-claimants-ineligible',
+    'remove-defendant',
+    'remove-ledger-entry',
+    'remove-rent-payment',
+  ],
   hubStepName: 'task-list',
   steps: {
     'claimant-name': { showCondition: (req: Request) => isIndividual(req) },
@@ -63,6 +69,7 @@ export const flowConfig: JourneyFlowConfig = {
     'multiple-claimants-ineligible': { showCondition: () => false, preventBack: true },
     'remove-defendant': { showCondition: () => false },
     'remove-ledger-entry': { showCondition: () => false },
+    'remove-rent-payment': { showCondition: () => false },
   },
 };
 

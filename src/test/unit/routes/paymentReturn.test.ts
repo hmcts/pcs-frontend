@@ -21,6 +21,7 @@ jest.mock('../../../main/services/pcsApi/paymentService', () => ({
     getCardPaymentStatus: mockGetCardPaymentStatus,
   },
   getPaymentOutcome: jest.requireActual('../../../main/services/pcsApi/paymentService').getPaymentOutcome,
+  isDeclinedPaymentStatus: jest.requireActual('../../../main/services/pcsApi/paymentService').isDeclinedPaymentStatus,
 }));
 
 import type { Application, Request, Response } from 'express';
@@ -215,6 +216,36 @@ describe('paymentReturn routes', () => {
         caseReference: '1234567890123456',
         failureRedirectUrl: '/case/1234567890123456/respond-to-claim/payment-failed',
       });
+    });
+
+    it.each([
+      ['a declined card to the declined URL when the journey gives one', 'Declined', '/pay?payment=declined'],
+      ['any other failure to the failure URL', 'Failed', '/pay?payment=failed'],
+    ])('sends %s', async (_case, status, expected) => {
+      const handler = mockRouterGet.mock.calls[0][2] as (req: Request, res: Response) => Promise<void>;
+      mockGetCardPaymentStatus.mockResolvedValue({ status });
+      const req = {
+        session: {
+          user: { accessToken: 'token-123' },
+          payment: {
+            paymentReference: 'RC-123',
+            caseReference: '1234567890123456',
+            failureRedirectUrl: '/case/1234567890123456/pay?payment=failed',
+            declinedRedirectUrl: '/case/1234567890123456/pay?payment=declined',
+          },
+          save: jest.fn(callback => {
+            callback?.(undefined);
+            return req.session;
+          }),
+        },
+        params: { internalReference: 'e44c5090-e207-48ac-b8dd-344a63829deb' },
+      } as unknown as Request;
+      const res = { redirect: jest.fn() } as unknown as Response;
+
+      await handler(req, res);
+
+      expect(res.redirect).toHaveBeenCalledWith(303, `/case/1234567890123456${expected}`);
+      expect(req.session.payment?.paymentReference).toBeUndefined();
     });
 
     it('redirects to pending URL and keeps session state on pending status', async () => {

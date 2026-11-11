@@ -1,6 +1,6 @@
 {% extends "stepsTemplate.njk" %}
 
-{% block pageTitle %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
+{% block pageTitle %}{% if errorSummary or paymentProblem %}{{ t('common:errorPrefix') }}: {% endif %}{{ pageTitle }} &ndash; HM Courts &amp; Tribunals Service &ndash; GOV.UK{% endblock %}
 
 {% block serviceNavigation %}
   {{ govukServiceNavigation({

@@ -4,5 +4,8 @@
   "hint": "cyYou should include any information that you think is relevant to your possession claim. You can upload any files that support your reasons later on.",
   "errors": {
     "groundReason": "cyExplain why you are making a claim on this ground"
+  },
+  "fieldNames": {
+    "groundReason": "cyYour reason for this ground"
   }
 }

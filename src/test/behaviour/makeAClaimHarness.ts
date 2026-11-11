@@ -30,6 +30,9 @@ export const ccd = {
   /** pcs-api's answer to the property eligibility check: a status, or an HTTP error code it fails with. */
   propertyEligibility: 'ELIGIBLE' as string | number,
   eligibilityChecks: [] as Record<string, unknown>[],
+  searches: [] as Record<string, unknown>[],
+  /** Whether CCD's case search fails rather than answering. */
+  searchFails: false,
 };
 
 /** pcs-api's draft version: every save that names the stored version moves it on; a stale one is refused. */
@@ -53,6 +56,16 @@ function ccdStub(): Express {
   });
   stub.get('/case-types/:caseType/event-triggers/citizenCreatePossessionClaim', (_req, res) => {
     res.json({ token: 'create-token' });
+  });
+  stub.post('/searchCases', (req: Request, res: Response) => {
+    ccd.searches.push({ ctid: req.query.ctid, ...req.body });
+    if (ccd.searchFails) {
+      return res.status(500).json({ message: 'Search unavailable' });
+    }
+    const state = req.body?.query?.bool?.filter?.[0]?.match?.state;
+    const cases =
+      ccd.stored && ccd.stored.state === state ? [{ id: Number(CASE_REFERENCE), state: ccd.stored.state }] : [];
+    res.json({ total: cases.length, cases });
   });
   stub.post('/case-types/:caseType/cases', (req: Request, res: Response) => {
     ccd.createRequests.push(req.body);
@@ -171,6 +184,8 @@ export async function bootMakeAClaim(
   ccd.cardPaymentStatus = 'Success';
   ccd.propertyEligibility = 'ELIGIBLE';
   ccd.eligibilityChecks = [];
+  ccd.searches = [];
+  ccd.searchFails = false;
   backend ??= await listen(ccdStub());
   const backendUrl = `http://127.0.0.1:${(backend.address() as AddressInfo).port}`;
   process.env.CCD_URL = backendUrl;

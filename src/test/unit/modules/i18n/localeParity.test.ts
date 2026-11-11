@@ -380,6 +380,7 @@ const AWAITING_TRANSLATION = new Set<string>([
   'makeAClaim/equalityAndDiversity.json',
   'makeAClaim/languageUsed.json',
   'makeAClaim/removeDefendant.json',
+  'makeAClaim/removeRentPayment.json',
   'makeAClaim/removeLedgerEntry.json',
   'makeAClaim/checkYourAnswers.json',
 ]);

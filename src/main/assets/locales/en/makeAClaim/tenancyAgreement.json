@@ -8,5 +8,8 @@
   "errors": {
     "tenancyAgreementAvailable": "Select whether you can upload a copy of the agreement",
     "noTenancyAgreementReason": "Explain why you cannot upload a copy of the agreement"
+  },
+  "fieldNames": {
+    "noTenancyAgreementReason": "Your reason for not uploading the agreement"
   }
 }

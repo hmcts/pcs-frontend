@@ -16,6 +16,8 @@ export const step: StepDefinition = createMakeAClaimStep({
     radioQuestion('proofType', PROOF_TYPES, {
       isPageHeading: false,
       legendClasses: 'govuk-fieldset__legend--m',
+      validator: (value, _formData, _allData, req) =>
+        !req || offeredProofTypes(req).includes(value as ProofType) ? true : 'errors.proofType',
     }),
   ],
   extendGetContent: (req: Request, formContent: BuiltFormContent) => {

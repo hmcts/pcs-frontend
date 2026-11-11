@@ -308,7 +308,33 @@ async function startDefendantSupport(userToken: string, caseId: string): Promise
   }
 }
 
+interface CaseSearchResponse {
+  total?: number;
+  cases?: { id?: number | string; state?: string }[];
+}
+
 export const ccdCaseService = {
+  /**
+   * The references of the signed-in user's own PCS cases in `state`, newest first, from CCD's case search. CCD only
+   * returns cases the user can read, which for a citizen are those they hold a case role on.
+   */
+  async searchOwnCasesInState(accessToken: string, state: string, size = 1): Promise<string[]> {
+    const url = `${getBaseUrl()}/searchCases?ctid=${encodeURIComponent(getCaseTypeId())}`;
+    const query = {
+      query: { bool: { filter: [{ match: { state } }] } },
+      sort: [{ created_date: { order: 'desc' } }],
+      size,
+    };
+    try {
+      const response = await http.post<CaseSearchResponse>(url, query, getCaseHeaders(accessToken));
+      return (response.data.cases ?? [])
+        .filter(found => found.id !== undefined && (found.state === undefined || found.state === state))
+        .map(found => String(found.id));
+    } catch (error) {
+      throw convertAxiosErrorToHttpError(error, 'searchOwnCasesInState');
+    }
+  },
+
   async getCaseByIdForEvent(
     accessToken: string,
     caseId: string,

@@ -28,12 +28,18 @@ export const step: StepDefinition = createMakeAClaimStep({
     yesNoQuestion('sameAsProperty'),
     ...addressFields('defendant', formData => formData.sameAsProperty === 'no'),
   ],
-  extendGetContent: req => ({
-    ...addressContent(req, 'defendant'),
+  extendGetContent: (req, formContent) => ({
+    ...addressContent(req, 'defendant', formContent),
     addressQuestion: 'sameAsProperty',
     defendantName: defendantNameForQuestion(req),
     propertyAddress: formatCcdAddress(propertyAddressOf(req)),
+    ...(defendantIndexOf(req) > 0
+      ? {
+          backUrl: `${getStepUrl('defendant-name', flowConfig, req.res?.locals.validatedCase?.id)}?index=${defendantIndexOf(req)}`,
+        }
+      : {}),
   }),
+  keepsOwnRedirectOnReturn: () => false,
   resolveRedirectAfterPost: async req =>
     defendantIndexOf(req) > 0
       ? getStepUrl('additional-defendants', flowConfig, req.res?.locals.validatedCase?.id)

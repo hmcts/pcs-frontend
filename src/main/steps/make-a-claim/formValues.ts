@@ -49,6 +49,14 @@ export function amountValidator(errorKey: string) {
   };
 }
 
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Checks an email address's format, when one is given. */
+export function emailValidator(errorKey: string) {
+  return (value: unknown): boolean | string =>
+    typeof value === 'string' && value.trim() && !EMAIL.test(value.trim()) ? errorKey : true;
+}
+
 /** A date field from the submitted body: top level fields arrive as {day, month, year}, nested ones as parts. */
 export function dateFromBody(body: FormBody, name: string): string | undefined {
   const consolidated = body[name];

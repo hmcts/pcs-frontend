@@ -74,6 +74,20 @@ const ANSWERED_CLAIM = {
   },
 };
 
+const STATEMENT_DOCUMENTS = [{ value: { document: { document_filename: 'statement.pdf' } } }];
+
+/** A claim with every section done, so check your answers is open. */
+const COMPLETE_CLAIM = {
+  ...ANSWERED_CLAIM,
+  rentArrears: {
+    ...ANSWERED_CLAIM.rentArrears,
+    proofType: 'UPLOAD_STATEMENT',
+    rentStatementDocuments: STATEMENT_DOCUMENTS,
+    moneyJudgmentWanted: 'NO',
+    recoverySteps: '',
+  },
+};
+
 function text(html: string): string {
   return new JSDOM(html).window.document.body.textContent?.replace(/\s+/g, ' ') ?? '';
 }
@@ -212,6 +226,7 @@ describe('before a claim exists', () => {
     expect((await app.post('/make-a-claim/property-country', { legislativeCountry: 'England' })).location).toBe(
       claimPath('eligible')
     );
+    ccd.stored!.state = 'PENDING_CASE_ISSUED';
 
     await app.get('/make-a-claim');
     await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
@@ -220,6 +235,39 @@ describe('before a claim exists', () => {
     expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
       '/make-a-claim/property-country'
     );
+  });
+
+  it("carries on with the claimant's own draft claim instead of creating another", async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+    await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+    await app.post('/make-a-claim/property-address', PROPERTY);
+
+    expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
+      claimPath('task-list')
+    );
+    expect(ccd.createRequests).toEqual([]);
+    expect(ccd.searches).toEqual([
+      expect.objectContaining({
+        ctid: 'PCS',
+        query: { bool: { filter: [{ match: { state: 'AWAITING_SUBMISSION_TO_HMCTS' } }] } },
+      }),
+    ]);
+  });
+
+  it('creates the claim anyway when the search for a draft claim fails', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    ccd.searchFails = true;
+    await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+    await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+    await app.post('/make-a-claim/property-address', PROPERTY);
+
+    expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
+      claimPath('eligible')
+    );
+    expect(ccd.createRequests).toHaveLength(1);
   });
 
   it('stops a double click on the buttons that create the claim', async () => {
@@ -360,7 +408,7 @@ describe('the task list', () => {
       rentArrears: {
         ...ANSWERED_CLAIM.rentArrears,
         proofType: 'UPLOAD_STATEMENT',
-        rentStatementDocuments: [{ value: { document: { document_filename: 'statement.pdf' } } }],
+        rentStatementDocuments: STATEMENT_DOCUMENTS,
         moneyJudgmentWanted: 'NO',
         recoverySteps: '',
       },
@@ -378,17 +426,33 @@ describe('every page renders', () => {
         ...ANSWERED_CLAIM.rentArrears,
         proofType: design === 'table' ? 'TABLE' : 'LEDGER',
         rentDueDay: 1,
+        moneyJudgmentWanted: 'NO',
+        recoverySteps: '',
         rentHistoryLedger: [
           { value: { transactionDate: '2026-06-01', transactionTypes: ['RENT_CHARGE'], amountCharged: '100000' } },
         ],
-        rentHistoryTable: [{ value: { periodStart: '2026-06-01', dateDue: '2026-06-01', amountDue: '100000' } }],
+        rentHistoryTable: [
+          {
+            value: {
+              periodStart: '2026-06-01',
+              dateDue: '2026-06-01',
+              amountDue: '100000',
+              datePaid: '2026-06-02',
+              amountPaid: '50000',
+            },
+          },
+        ],
       },
     });
     const { stepRegistry } = await import('../../main/steps/make-a-claim/stepRegistry');
+    // No ground needs a reason in this claim, so the reason page sends the claimant to the grounds instead.
+    const redirected: Record<string, string> = { 'ground-reason': claimPath('other-grounds') };
     const failures: string[] = [];
     for (const name of Object.keys(stepRegistry)) {
-      const response = await app.get(`${claimPath(name)}?period=2026-06-01`);
-      if (response.status !== 200) {
+      const response = await app.get(
+        `${claimPath(name)}?period=2026-06-01&row=0&datePaid=2026-06-02&amountPaid=50000&index=0&entry=0`
+      );
+      if (redirected[name] ? response.location !== redirected[name] : response.status !== 200) {
         failures.push(`${name}: ${response.status} ${text(response.text).slice(0, 200)}`);
       }
     }
@@ -640,15 +704,7 @@ describe('proof of rent arrears with the table design', () => {
 describe('submitting the claim', () => {
   it('submits the whole claim with the statement of truth, then takes the claim fee by card', async () => {
     app = await bootMakeAClaim();
-    givenClaim({
-      ...ANSWERED_CLAIM,
-      rentArrears: {
-        ...ANSWERED_CLAIM.rentArrears,
-        proofType: 'UPLOAD_STATEMENT',
-        moneyJudgmentWanted: 'NO',
-        recoverySteps: '',
-      },
-    });
+    givenClaim(COMPLETE_CLAIM);
     const cya = text((await app.get(claimPath('check-your-answers'))).text);
     expect(cya).toContain('Your name Billy Wright');
     expect(cya).toContain('Rent £1,000.00');
@@ -695,15 +751,7 @@ describe('submitting the claim', () => {
 });
 
 describe('review fixes', () => {
-  const SUBMITTABLE = {
-    ...ANSWERED_CLAIM,
-    rentArrears: {
-      ...ANSWERED_CLAIM.rentArrears,
-      proofType: 'UPLOAD_STATEMENT',
-      moneyJudgmentWanted: 'NO',
-      recoverySteps: '',
-    },
-  };
+  const SUBMITTABLE = COMPLETE_CLAIM;
   const SIGNED = {
     statementOfTruth: ['contempt', 'belief'],
     statementOfTruthFullName: 'Billy Wright',
@@ -775,10 +823,13 @@ describe('review fixes', () => {
       link.getAttribute('href'),
     ]);
     expect(links).toEqual([
-      ['Answer the question on ‘What is your postal address?’', claimPath('claimant-address')],
+      [
+        'Answer the question on ‘What is your postal address?’',
+        `${claimPath('claimant-address')}?returnTo=check-your-answers`,
+      ],
       [
         'Answer the question on ‘Why are you making a claim on this ground?’',
-        `${claimPath('ground-reason')}?ground=GROUND_14`,
+        `${claimPath('ground-reason')}?ground=GROUND_14&returnTo=check-your-answers`,
       ],
     ]);
   });
@@ -839,7 +890,7 @@ describe('review fixes', () => {
     });
     const summary = new JSDOM((await app.get(claimPath('defendant-cya'))).text).window.document;
     const remove = [...summary.querySelectorAll('a')].find(link => link.textContent?.startsWith('Remove'));
-    expect(remove?.getAttribute('href')).toBe(`${claimPath('remove-defendant')}?index=1`);
+    expect(remove?.getAttribute('href')).toBe(`${claimPath('remove-defendant')}?index=1&returnTo=defendant-cya`);
     expect(text((await app.get(`${claimPath('remove-defendant')}?index=1`)).text)).toContain(
       'Are you sure you want to remove Jo Bloggs from the claim?'
     );
@@ -1002,5 +1053,416 @@ describe('review fixes', () => {
       `/case/${CASE_REFERENCE}/claim-submitted`
     );
     expect(ccd.cardPayments).toEqual([]);
+  });
+});
+
+describe('build observation fixes', () => {
+  const page = async (path: string) => new JSDOM((await app.get(path)).text).window.document;
+  const backLink = (document: Document) => document.querySelector('.govuk-back-link')?.getAttribute('href');
+  const TABLE_CLAIM = {
+    ...ANSWERED_CLAIM,
+    rentArrears: {
+      ...ANSWERED_CLAIM.rentArrears,
+      rentDueDay: 1,
+      proofType: 'TABLE',
+      rentHistoryTable: [
+        {
+          value: {
+            periodStart: '2026-06-01',
+            dateDue: '2026-06-01',
+            amountDue: '100000',
+            datePaid: '2026-06-05',
+            amountPaid: '5000',
+          },
+        },
+        { value: { periodStart: '2026-06-01', datePaid: '2026-06-15', amountPaid: '20000' } },
+        { value: { periodStart: '2026-07-01', dateDue: '2026-07-01', amountDue: '100000' } },
+      ],
+    },
+  };
+  const removePaymentPath = (row: number, datePaid: string, amountPaid: string) =>
+    `${claimPath('remove-rent-payment')}?row=${row}&datePaid=${datePaid}&amountPaid=${amountPaid}`;
+
+  it('prefixes the page title with "Error: " only when the page shows errors', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    expect((await page(claimPath('tenancy-start-date'))).title).toMatch(/^When did the tenancy or licence begin\?/);
+    const refused = await app.post(claimPath('tenancy-start-date'), {});
+    expect(new JSDOM(refused.text).window.document.title).toMatch(/^Error: When did the tenancy or licence begin\?/);
+  });
+
+  it('returns to the summary a Change link came from, unless the change asks a new question', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    const summary = await page(claimPath('claimant-cya'));
+    const change = [...summary.querySelectorAll('.govuk-summary-list a')].map(link => link.getAttribute('href'));
+    expect(change).toContain(`${claimPath('claimant-name')}?returnTo=claimant-cya`);
+
+    const changed = await app.post(`${claimPath('claimant-name')}?returnTo=claimant-cya`, {
+      firstName: 'Bill',
+      lastName: 'Wright',
+    });
+    expect(changed.location).toBe(claimPath('claimant-cya'));
+
+    const opened = await app.post(`${claimPath('tenancy-agreement')}?returnTo=tenancy-cya`, {
+      tenancyAgreementAvailable: 'yes',
+    });
+    expect(opened.location).toBe(`${claimPath('upload-tenancy-agreement')}?returnTo=tenancy-cya`);
+  });
+
+  it("returns to the defendants summary after changing a later defendant, but asks a new one's address", async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...ANSWERED_CLAIM,
+      defendants: [
+        ...ANSWERED_CLAIM.defendants,
+        { value: { nameKnown: 'NO', addressKnown: 'YES', addressSameAsProperty: 'YES' } },
+      ],
+    });
+    const changed = await app.post(`${claimPath('defendant-name')}?index=1&returnTo=defendant-cya`, {
+      nameKnown: 'no',
+    });
+    expect(changed.location).toBe(claimPath('defendant-cya'));
+    const added = await app.post(`${claimPath('defendant-name')}?index=2&returnTo=defendant-cya`, { nameKnown: 'no' });
+    expect(added.location).toBe(`${claimPath('defendant-address')}?index=2&returnTo=defendant-cya`);
+  });
+
+  it('ignores a returnTo that is not one of the journey summaries', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    const changed = await app.post(`${claimPath('claimant-name')}?returnTo=https://example.com`, {
+      firstName: 'Bill',
+      lastName: 'Wright',
+    });
+    expect(changed.location).toBe(`${claimPath('claimant-address')}?nav=1`);
+  });
+
+  it('sends check your answers to the first unanswered question while sections are unfinished', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    expect((await app.get(claimPath('check-your-answers'))).location).toBe(claimPath('arrears-proof'));
+    givenClaim(COMPLETE_CLAIM);
+    expect((await app.get(claimPath('check-your-answers'))).status).toBe(200);
+  });
+
+  it('shows the statement of truth again after Save for later', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...COMPLETE_CLAIM,
+      submission: {
+        statementOfTruthAgreed: 'YES',
+        statementOfTruthFullName: 'Billy Wright',
+        statementOfTruthPosition: 'Director',
+      },
+    });
+    const document = await page(claimPath('check-your-answers'));
+    expect(
+      [...document.querySelectorAll<HTMLInputElement>('input[name="statementOfTruth"]')].map(box => box.checked)
+    ).toEqual([true, true]);
+    expect(document.querySelector<HTMLInputElement>('input[name="statementOfTruthFullName"]')?.value).toBe(
+      'Billy Wright'
+    );
+    expect(document.querySelector<HTMLInputElement>('input[name="statementOfTruthPosition"]')?.value).toBe('Director');
+  });
+
+  it('keeps a blank optional answer unanswered on Save for later, and answered on Save and continue', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    await app.post(claimPath('recovery-steps'), { recoverySteps: '', action: 'saveForLater' });
+    expect(storedClaim().rentArrears.recoverySteps).toBeUndefined();
+    await app.post(claimPath('recovery-steps'), { recoverySteps: '' });
+    expect(storedClaim().rentArrears.recoverySteps).toBe('');
+
+    await app.post(claimPath('upload-other-documents'), { action: 'saveForLater' });
+    expect(storedClaim().otherInformation.otherDocuments).toEqual([]);
+    givenClaim({
+      ...ANSWERED_CLAIM,
+      otherInformation: { ...ANSWERED_CLAIM.otherInformation, otherDocuments: undefined },
+    });
+    await app.post(claimPath('upload-other-documents'), { action: 'saveForLater' });
+    expect(storedClaim().otherInformation.otherDocuments).toBeUndefined();
+  });
+
+  it('names a field briefly in the emoji error', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    const refused = await app.post(claimPath('defendant-circumstances'), { defendantCircumstances: 'Fine 😀' });
+    expect(text(refused.text)).toContain(
+      'The defendants’ circumstances must only include letters a to z, and special characters such as hyphens, spaces and apostrophes'
+    );
+  });
+
+  it('checks the format of the email address the notice was sent to, and names each method in its date errors', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    const refused = text(
+      (
+        await app.post(claimPath('notice-method'), {
+          noticeMethods: ['FIRST_CLASS_POST', 'EMAIL'],
+          'noticeMethods.emailedTo': 'not-an-email',
+        })
+      ).text
+    );
+    expect(refused).toContain('Enter an email address in the correct format, like name@example.com');
+    expect(refused).toContain('Enter the date the notice was posted');
+    expect(refused).toContain('Enter the date the email was sent');
+  });
+
+  it('keeps the defendant on the Back links of a later defendant, and lists defendants under the H1', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    expect(backLink(await page(`${claimPath('defendant-name')}?index=1`))).toBe(claimPath('additional-defendants'));
+    expect(backLink(await page(`${claimPath('defendant-address')}?index=1`))).toBe(
+      `${claimPath('defendant-name')}?index=1`
+    );
+    const additional = await page(claimPath('additional-defendants'));
+    const headings = [...additional.querySelectorAll('h1, h2')].map(heading => heading.textContent?.trim());
+    expect(headings.indexOf('Do you need to add another defendant?')).toBeLessThan(
+      headings.indexOf('Defendants you’ve added')
+    );
+  });
+
+  it('opens the manual address when it holds a saved address', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    expect(
+      (await page(claimPath('claimant-address'))).querySelector('#claimant-enterManuallyDetails')?.hasAttribute('open')
+    ).toBe(true);
+  });
+
+  it('sends a stale remove link or an unchosen ground back to a page that can be shown', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    expect((await app.get(`${claimPath('remove-defendant')}?id=gone`)).location).toBe(claimPath('defendant-cya'));
+    expect((await app.get(`${claimPath('ground-reason')}?ground=GROUND_1`)).location).toBe(claimPath('other-grounds'));
+  });
+
+  it('refuses a proof of arrears option the design does not offer', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    const refused = await app.post(claimPath('arrears-proof'), { proofType: 'TABLE' });
+    expect(text(refused.text)).toContain('Select how you want to provide proof of rent arrears');
+  });
+
+  it('goes back and cancels to the transaction history from the ledger pages', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...ANSWERED_CLAIM,
+      rentArrears: {
+        ...ANSWERED_CLAIM.rentArrears,
+        proofType: 'LEDGER',
+        rentHistoryLedger: [
+          {
+            id: 'b',
+            value: { transactionDate: '2026-07-01', transactionTypes: ['RENT_CHARGE'], amountCharged: '100' },
+          },
+          {
+            id: 'a',
+            value: { transactionDate: '2026-06-01', transactionTypes: ['RENT_CHARGE'], amountCharged: '100' },
+          },
+        ],
+      },
+    });
+    expect(backLink(await page(`${claimPath('ledger-transaction')}?entry=0`))).toBe(claimPath('ledger-summary'));
+    const remove = await page(`${claimPath('remove-ledger-entry')}?id=a`);
+    expect([...remove.querySelectorAll('a')].find(link => link.textContent === 'Cancel')?.getAttribute('href')).toBe(
+      claimPath('ledger-summary')
+    );
+    const history = (await page(claimPath('ledger-summary'))).querySelectorAll('tbody tr');
+    expect(history[0].textContent).toContain('1 June 2026');
+    expect(history[0].textContent).toContain('transaction 1');
+  });
+
+  it('removes a payment from the rent statement after asking, once only', async () => {
+    app = await bootMakeAClaim({ email: 'pl-table-0004@example.test' });
+    givenClaim(TABLE_CLAIM);
+    const statement = await page(claimPath('rent-statement'));
+    const removeLinks = [...statement.querySelectorAll('a')].filter(link => link.textContent?.startsWith('Remove'));
+    expect(removeLinks.map(link => link.getAttribute('href'))).toEqual([
+      removePaymentPath(0, '2026-06-05', '5000'),
+      removePaymentPath(1, '2026-06-15', '20000'),
+    ]);
+    expect(text((await app.get(removePaymentPath(0, '2026-06-05', '5000'))).text)).toContain(
+      'Are you sure you want to remove the payment of £50.00 made on 5 June 2026?'
+    );
+    expect((await app.post(removePaymentPath(0, '2026-06-05', '5000'), { confirmRemove: 'yes' })).location).toBe(
+      claimPath('rent-statement')
+    );
+    const rows = storedClaim().rentArrears.rentHistoryTable;
+    expect(rows).toHaveLength(2);
+    expect(rows[0].value).toMatchObject({ dateDue: '2026-06-01', datePaid: '2026-06-15', amountPaid: '20000' });
+
+    const repeated = await app.post(removePaymentPath(0, '2026-06-05', '5000'), { confirmRemove: 'yes' });
+    expect(repeated.location).toBe(claimPath('rent-statement'));
+    expect(storedClaim().rentArrears.rentHistoryTable).toHaveLength(2);
+  });
+
+  it('sends a payment page for a period not in the statement back to the statement with an error', async () => {
+    app = await bootMakeAClaim({ email: 'pl-table-0005@example.test' });
+    givenClaim(TABLE_CLAIM);
+    const missing = await app.get(`${claimPath('rent-statement-payment')}?period=2024-01-01`);
+    expect(missing.location).toBe(`${claimPath('rent-statement')}?problem=periodNotFound`);
+    expect((await app.get(`${claimPath('rent-statement-payment')}?row=9`)).location).toBe(missing.location);
+    const shown = await page(missing.location as string);
+    expect(shown.title).toMatch(/^Error: Rent statement/);
+    expect(shown.querySelector('.govuk-error-summary')?.textContent).toContain(
+      'That rent period is not in the statement'
+    );
+  });
+
+  it('refuses a payment made before its rent was due', async () => {
+    app = await bootMakeAClaim({ email: 'pl-table-0006@example.test' });
+    givenClaim(TABLE_CLAIM);
+    const refused = await app.post(`${claimPath('rent-statement-payment')}?period=2026-07-01`, {
+      'datePaid-day': '30',
+      'datePaid-month': '6',
+      'datePaid-year': '2026',
+      amountPaid: '10',
+    });
+    expect(text(refused.text)).toContain(
+      'The date the payment was made must be the same as or after 1 July 2026, the date this rent was due'
+    );
+    expect(text(refused.text)).toContain('towards the rent due on 1 July 2026 (£1,000.00).');
+  });
+
+  it('refuses a statement period that ends in the future or holds more than 260 rent periods', async () => {
+    app = await bootMakeAClaim({ email: 'pl-table-0007@example.test' });
+    givenClaim({ ...TABLE_CLAIM, rentArrears: { ...TABLE_CLAIM.rentArrears, rentFrequency: 'WEEKLY' } });
+    const nextYear = String(Number(todayInLondon().slice(0, 4)) + 1);
+    const future = await app.post(claimPath('statement-period'), {
+      'statementStart-day': '1',
+      'statementStart-month': '6',
+      'statementStart-year': '2026',
+      'statementEnd-day': '1',
+      'statementEnd-month': '1',
+      'statementEnd-year': nextYear,
+    });
+    expect(text(future.text)).toContain('The end date must be today or in the past');
+    const tooLong = await app.post(claimPath('statement-period'), {
+      'statementStart-day': '1',
+      'statementStart-month': '1',
+      'statementStart-year': '2020',
+      'statementEnd-day': '31',
+      'statementEnd-month': '12',
+      'statementEnd-year': '2025',
+    });
+    expect(text(tooLong.text)).toContain(
+      'The statement period is too long. Choose dates that cover no more than 260 rent periods'
+    );
+  });
+
+  it('explains a declined card apart from other failed payments', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ submission: { serviceRequestReference: 'SR-1', feeAmount: '40400' } }, 'PENDING_CASE_ISSUED');
+    ccd.cardPaymentStatus = 'Declined';
+    await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee/start`);
+    const back = await app.get('/payment/return/RC-1111/confirmation');
+    expect(back.location).toBe(`/case/${CASE_REFERENCE}/pay-claim-fee?payment=declined`);
+    const declined = await page(back.location as string);
+    expect(declined.body.textContent).toContain(
+      'Your card was declined. You have not been charged. Try again or use a different card.'
+    );
+    expect(declined.title).toMatch(/^Error: /);
+  });
+
+  it('sends pcs-api eligibility refusals at submit to the page that explains them', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(COMPLETE_CLAIM);
+    ccd.refuseSubmit = ['CLAIM_AGAINST_TRESPASSERS_NOT_ELIGIBLE'];
+    expect(
+      (
+        await app.post(claimPath('check-your-answers'), {
+          statementOfTruth: ['contempt', 'belief'],
+          statementOfTruthFullName: 'Billy Wright',
+        })
+      ).location
+    ).toBe('/make-a-claim/trespass-ineligible');
+  });
+
+  it('refuses a change to how often or on which day rent is due that gives the statement more than 260 periods', async () => {
+    app = await bootMakeAClaim({ email: 'pl-table-0008@example.test' });
+    givenClaim(TABLE_CLAIM);
+    await app.post(claimPath('statement-period'), {
+      'statementStart-day': '10',
+      'statementStart-month': '1',
+      'statementStart-year': '2004',
+      'statementEnd-day': '15',
+      'statementEnd-month': '9',
+      'statementEnd-year': '2025',
+    });
+    const laidOut = storedClaim().rentArrears.rentHistoryTable;
+    expect(laidOut.filter((row: { value: { amountDue?: string } }) => row.value.amountDue)).toHaveLength(260);
+    const tooMany = 'The rent statement would then cover more than 260 rent periods';
+    expect(text((await app.post(claimPath('rent-frequency'), { rentFrequency: 'WEEKLY' })).text)).toContain(tooMany);
+    expect(text((await app.post(claimPath('rent-due-day'), { rentDueDay: '12' })).text)).toContain(tooMany);
+    expect(storedClaim().rentArrears).toMatchObject({ rentFrequency: 'MONTHLY', rentDueDay: 1 });
+    expect(storedClaim().rentArrears.rentHistoryTable).toEqual(laidOut);
+  });
+
+  it('takes a payment made before the first rent was due on the first period', async () => {
+    app = await bootMakeAClaim({ email: 'pl-table-0009@example.test' });
+    givenClaim(TABLE_CLAIM);
+    const saved = await app.post(`${claimPath('rent-statement-payment')}?row=0`, {
+      'datePaid-day': '20',
+      'datePaid-month': '5',
+      'datePaid-year': '2026',
+      amountPaid: '50',
+    });
+    expect(saved.location).toBe(claimPath('rent-statement'));
+    expect(storedClaim().rentArrears.rentHistoryTable[0].value).toMatchObject({ datePaid: '2026-05-20' });
+  });
+
+  it('removes a payment that has no date', async () => {
+    app = await bootMakeAClaim({ email: 'pl-table-0010@example.test' });
+    givenClaim({
+      ...TABLE_CLAIM,
+      rentArrears: {
+        ...TABLE_CLAIM.rentArrears,
+        rentHistoryTable: [
+          { value: { periodStart: '2026-06-01', dateDue: '2026-06-01', amountDue: '100000', amountPaid: '5000' } },
+        ],
+      },
+    });
+    const statement = await page(claimPath('rent-statement'));
+    const remove = [...statement.querySelectorAll('a')].find(link => link.textContent?.startsWith('Remove'));
+    expect(remove?.getAttribute('href')).toBe(removePaymentPath(0, '', '5000'));
+    expect((await app.post(removePaymentPath(0, '', '5000'), { confirmRemove: 'yes' })).location).toBe(
+      claimPath('rent-statement')
+    );
+    expect(storedClaim().rentArrears.rentHistoryTable[0].value.amountPaid).toBeUndefined();
+  });
+
+  it('sends a remove link for a ledger transaction that has gone back to the transactions', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...ANSWERED_CLAIM, rentArrears: { ...ANSWERED_CLAIM.rentArrears, proofType: 'LEDGER' } });
+    expect((await app.get(`${claimPath('remove-ledger-entry')}?entry=3`)).location).toBe(claimPath('ledger-summary'));
+    expect((await app.post(`${claimPath('remove-ledger-entry')}?entry=3`, { confirmRemove: 'yes' })).location).toBe(
+      claimPath('ledger-summary')
+    );
+  });
+
+  it('asks the reason for a ground added from a summary, not one already given', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...ANSWERED_CLAIM,
+      grounds: {
+        hasRentArrearsGrounds: 'NO',
+        otherGrounds: ['GROUND_1A'],
+        groundReasons: [{ value: { ground: 'GROUND_1A', reason: 'Selling' } }],
+      },
+    });
+    const changed = await app.post(`${claimPath('other-grounds')}?returnTo=tenancy-cya`, {
+      mandatoryGrounds: 'GROUND_1A',
+      discretionaryGrounds: 'GROUND_14',
+    });
+    expect(changed.location).toBe(`${claimPath('ground-reason')}?ground=GROUND_14&returnTo=tenancy-cya`);
+  });
+
+  it('shows no payment problem for a payment query it does not know', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ submission: { serviceRequestReference: 'SR-1', feeAmount: '40400' } }, 'PENDING_CASE_ISSUED');
+    const shown = await page(`/case/${CASE_REFERENCE}/pay-claim-fee?payment=constructor`);
+    expect(shown.title).not.toMatch(/^Error: /);
+    expect(shown.querySelector('.govuk-error-summary')).toBeNull();
   });
 });

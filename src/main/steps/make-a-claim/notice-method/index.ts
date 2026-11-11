@@ -1,6 +1,7 @@
 import { dateField, longTextField, textField } from '../fieldBuilders';
 import { FIELD_LIMITS } from '../fieldLimits';
 import { createMakeAClaimStep } from '../formStep';
+import { emailValidator } from '../formValues';
 
 import type { FormFieldConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
@@ -13,6 +14,7 @@ function detailsField(method: NoticeMethod, name: string): FormFieldConfig {
       ...common,
       maxLength: FIELD_LIMITS.emailedTo,
       attributes: { type: 'email', spellcheck: false },
+      validator: emailValidator('errors.emailedToInvalid'),
     });
   }
   if (method === 'PERSONALLY_HANDED') {

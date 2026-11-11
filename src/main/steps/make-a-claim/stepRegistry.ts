@@ -43,6 +43,7 @@ import { step as otherReasons } from './other-reasons';
 import { step as recoverySteps } from './recovery-steps';
 import { step as removeDefendant } from './remove-defendant';
 import { step as removeLedgerEntry } from './remove-ledger-entry';
+import { step as removeRentPayment } from './remove-rent-payment';
 import { step as rentAmount } from './rent-amount';
 import { step as rentArrears } from './rent-arrears';
 import { step as rentArrearsClaim } from './rent-arrears-claim';
@@ -141,5 +142,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'task-list': taskList,
   'remove-defendant': removeDefendant,
   'remove-ledger-entry': removeLedgerEntry,
+  'remove-rent-payment': removeRentPayment,
   'multiple-claimants-ineligible': multipleClaimantsIneligible,
 };

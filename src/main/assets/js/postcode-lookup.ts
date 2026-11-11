@@ -516,6 +516,11 @@ export function initPostcodeLookup(): void {
     if (!form) {
       return;
     }
+    // Save for later keeps whatever was entered without checking it, so an unchosen address must not stop it.
+    const submitter = (evt as SubmitEvent).submitter as HTMLButtonElement | null | undefined;
+    if (submitter?.name === 'action' && submitter.value === 'saveForLater') {
+      return;
+    }
 
     // Find all address components within this form
     const addressComponents = Array.from(form.querySelectorAll<HTMLElement>('[data-address-component]'));

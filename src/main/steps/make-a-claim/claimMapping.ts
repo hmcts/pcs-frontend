@@ -25,10 +25,14 @@ import {
   toYesNo,
 } from './formValues';
 import {
+  type RentPeriodsInput,
   type StatementRange,
   addRentTablePayment,
-  generateRentPeriods,
+  exceedsRentPeriodLimit,
   mergeRentPeriods,
+  removeRentTablePayment,
+  rentPeriodsWithinLimit,
+  rowHoldsPayment,
   statementRangeOf,
 } from './rentHistory';
 
@@ -48,6 +52,7 @@ import {
   RENT_ARREARS_GROUNDS,
   type RentFrequency,
   type RentLedgerEntry,
+  type RentTableRow,
   type TransactionType,
   groundsNeedingReasons,
 } from '@services/citizenPossessionClaim.interface';
@@ -60,6 +65,8 @@ export interface StepMapping {
   toForm?: (claim: CitizenPossessionClaim, req: Request) => FormBody;
   fromForm?: (claim: CitizenPossessionClaim, body: FormBody, req: Request) => void;
   isAnswered?: (claim: CitizenPossessionClaim, req: Request) => boolean;
+  /** For a page asked once for each of several items, the query naming the first item not yet answered. */
+  unansweredQuery?: (claim: CitizenPossessionClaim) => string | undefined;
 }
 
 export const TENANCY_TYPES = ['ASSURED', 'EXCLUDED', 'REGULATED', 'OTHER'] as const;
@@ -123,8 +130,16 @@ function setNested<K extends keyof CitizenPossessionClaim>(
   claim[key] = value;
 }
 
-function optionalText(value: unknown): string {
-  return text(value) ?? '';
+/**
+ * An optional answer: Save and continue with it blank answers it with nothing to add (an empty string), while
+ * Save for later with it blank leaves it unanswered.
+ */
+function optionalText(value: unknown, body: FormBody): string | undefined {
+  return isSaveForLater(body) ? text(value) : (text(value) ?? '');
+}
+
+function isSaveForLater(body: FormBody): boolean {
+  return body.action === 'saveForLater';
 }
 
 function yesNoStep<K extends keyof CitizenPossessionClaim>(
@@ -186,8 +201,8 @@ export function rentStatementRange(claim: CitizenPossessionClaim, req: Request):
   return statementRangeOf(claim.rentArrears?.rentHistoryTable, claim.rentArrears ?? {});
 }
 
-const defendantAddressAnswered = (defendant: CitizenDefendant): boolean =>
-  defendant.addressKnown !== undefined &&
+export const defendantAddressAnswered = (defendant: CitizenDefendant | undefined): boolean =>
+  defendant?.addressKnown !== undefined &&
   (defendant.addressKnown === 'NO' || defendant.addressSameAsProperty !== undefined);
 
 /** Remembers the period the claimant gave for this claim's rent statement, which the claim itself has no field for. */
@@ -198,9 +213,13 @@ function rememberStatementPeriod(req: Request, range: StatementRange): void {
   }
 }
 
-/** Lays the rent statement out again over the same period after the rent, how often or the due day changed. */
-function regenerateRentTable(claim: CitizenPossessionClaim, range: StatementRange | undefined): void {
-  const rentArrears = claim.rentArrears;
+type RentArrears = NonNullable<CitizenPossessionClaim['rentArrears']>;
+
+/** What to lay a rent statement out again from, or undefined when there is no statement to lay out again. */
+function regenerationInput(
+  rentArrears: RentArrears | undefined,
+  range: StatementRange | undefined
+): RentPeriodsInput | undefined {
   if (
     !range ||
     !isReadable(rentArrears?.rentAmount) ||
@@ -208,22 +227,55 @@ function regenerateRentTable(claim: CitizenPossessionClaim, range: StatementRang
     (rentArrears.rentDueDay as unknown) === UNREADABLE ||
     !rentArrears.rentHistoryTable?.length
   ) {
-    return;
+    return undefined;
   }
-  const generated = generateRentPeriods({
+  return {
     rentAmount: rentArrears.rentAmount,
     rentFrequency: rentArrears.rentFrequency,
     rentDueDay: rentArrears.rentDueDay,
     ...range,
-  });
-  rentArrears.rentHistoryTable = mergeRentPeriods(generated, rentArrears.rentHistoryTable);
+  };
 }
 
-/** Applies a change to the rent, then lays out again the statement it was the basis of. */
+/**
+ * Lays the rent statement out again over the same period after the rent, how often or the due day changed.
+ * False, leaving the statement as it was, when the period would then hold more rent periods than it can show.
+ */
+function regenerateRentTable(claim: CitizenPossessionClaim, range: StatementRange | undefined): boolean {
+  const rentArrears = claim.rentArrears;
+  const input = regenerationInput(rentArrears, range);
+  if (!rentArrears || !input) {
+    return true;
+  }
+  const generated = rentPeriodsWithinLimit(input);
+  if (!generated) {
+    return false;
+  }
+  rentArrears.rentHistoryTable = mergeRentPeriods(generated, rentArrears.rentHistoryTable);
+  return true;
+}
+
+/**
+ * Applies a change to the rent, then lays out again the statement it was the basis of. A change that would give
+ * the statement more rent periods than it can show is not kept, since Save for later skips the page's check.
+ */
 function changeRent(claim: CitizenPossessionClaim, req: Request, change: () => void): void {
   const range = rentStatementRange(claim, req);
+  const before = claim.rentArrears;
   change();
-  regenerateRentTable(claim, range);
+  if (!regenerateRentTable(claim, range)) {
+    claim.rentArrears = before;
+  }
+}
+
+/** Whether changing how often or on which day rent is due would give the rent statement too many periods. */
+export function rentChangeExceedsLimit(
+  claim: CitizenPossessionClaim,
+  req: Request,
+  change: Pick<RentArrears, 'rentFrequency'> | Pick<RentArrears, 'rentDueDay'>
+): boolean {
+  const input = regenerationInput({ ...claim.rentArrears, ...change }, rentStatementRange(claim, req));
+  return input !== undefined && exceedsRentPeriodLimit(input);
 }
 
 function documentsAnswered(documents: unknown[] | undefined): boolean {
@@ -473,10 +525,11 @@ export const claimMappings: Record<string, StepMapping> = {
         ].sort((x, y) => order.indexOf(x.value.ground as OtherGround) - order.indexOf(y.value.ground as OtherGround));
       });
     },
-    isAnswered: claim =>
-      groundsNeedingReasons(claim.grounds).every(ground =>
-        claim.grounds?.groundReasons?.some(item => item.value.ground === ground && item.value.reason)
-      ),
+    isAnswered: claim => groundWithoutReasonOf(claim) === undefined,
+    unansweredQuery: claim => {
+      const ground = groundWithoutReasonOf(claim);
+      return ground ? `?ground=${ground}` : undefined;
+    },
   },
 
   'notice-served': withReason('notice', 'noticeServed', 'noNoticeReason', 'no'),
@@ -653,20 +706,23 @@ export const claimMappings: Record<string, StepMapping> = {
       if (!statementStart || !statementEnd || statementEnd < statementStart) {
         return;
       }
-      rememberStatementPeriod(req, { statementStart, statementEnd });
-      setNested(claim, 'rentArrears', rentArrears => {
-        if (!rentArrears.rentAmount || !rentArrears.rentFrequency) {
-          return;
-        }
-        const generated = generateRentPeriods({
-          rentAmount: rentArrears.rentAmount,
-          rentFrequency: rentArrears.rentFrequency,
-          rentDueDay: rentArrears.rentDueDay,
+      const { rentAmount, rentFrequency, rentDueDay } = claim.rentArrears ?? {};
+      if (rentAmount && rentFrequency) {
+        const generated = rentPeriodsWithinLimit({
+          rentAmount,
+          rentFrequency,
+          rentDueDay,
           statementStart,
           statementEnd,
         });
-        rentArrears.rentHistoryTable = mergeRentPeriods(generated, rentArrears.rentHistoryTable);
-      });
+        if (!generated) {
+          return;
+        }
+        setNested(claim, 'rentArrears', rentArrears => {
+          rentArrears.rentHistoryTable = mergeRentPeriods(generated, rentArrears.rentHistoryTable);
+        });
+      }
+      rememberStatementPeriod(req, { statementStart, statementEnd });
     },
     isAnswered: claim => Boolean(claim.rentArrears?.rentHistoryTable?.length),
   },
@@ -677,7 +733,7 @@ export const claimMappings: Record<string, StepMapping> = {
 
   'rent-statement-payment': {
     toForm: (claim, req) => {
-      const row = claim.rentArrears?.rentHistoryTable?.[indexFromQuery(req.query?.row) ?? -1]?.value;
+      const row = claim.rentArrears?.rentHistoryTable?.[rentStatementRowOf(req, claim) ?? -1]?.value;
       return row ? { datePaid: toDateParts(row.datePaid), amountPaid: penceToPounds(row.amountPaid) } : {};
     },
     fromForm: (claim, body, req) => {
@@ -688,8 +744,8 @@ export const claimMappings: Record<string, StepMapping> = {
       }
       setNested(claim, 'rentArrears', rentArrears => {
         const rows = rentArrears.rentHistoryTable ?? [];
-        const rowIndex = indexFromQuery(req.query?.row);
-        if (rowIndex !== undefined && rows[rowIndex]) {
+        const rowIndex = rentStatementRowOf(req, claim);
+        if (rowIndex !== undefined) {
           rentArrears.rentHistoryTable = rows.map((row, i) =>
             i === rowIndex ? { ...row, value: { ...row.value, datePaid, amountPaid } } : row
           );
@@ -709,7 +765,7 @@ export const claimMappings: Record<string, StepMapping> = {
     toForm: claim => ({ recoverySteps: claim.rentArrears?.recoverySteps }),
     fromForm: (claim, body) =>
       setNested(claim, 'rentArrears', rentArrears => {
-        rentArrears.recoverySteps = optionalText(body.recoverySteps);
+        rentArrears.recoverySteps = optionalText(body.recoverySteps, body);
       }),
     isAnswered: claim => claim.rentArrears?.recoverySteps !== undefined,
   },
@@ -718,7 +774,7 @@ export const claimMappings: Record<string, StepMapping> = {
     toForm: claim => ({ defendantCircumstances: claim.circumstances?.defendantCircumstances }),
     fromForm: (claim, body) =>
       setNested(claim, 'circumstances', circumstances => {
-        circumstances.defendantCircumstances = optionalText(body.defendantCircumstances);
+        circumstances.defendantCircumstances = optionalText(body.defendantCircumstances, body);
       }),
     isAnswered: claim => claim.circumstances?.defendantCircumstances !== undefined,
   },
@@ -727,7 +783,7 @@ export const claimMappings: Record<string, StepMapping> = {
     toForm: claim => ({ claimantCircumstances: claim.circumstances?.claimantCircumstances }),
     fromForm: (claim, body) =>
       setNested(claim, 'circumstances', circumstances => {
-        circumstances.claimantCircumstances = optionalText(body.claimantCircumstances);
+        circumstances.claimantCircumstances = optionalText(body.claimantCircumstances, body);
       }),
     isAnswered: claim => claim.circumstances?.claimantCircumstances !== undefined,
   },
@@ -753,10 +809,13 @@ export const claimMappings: Record<string, StepMapping> = {
   },
 
   'upload-other-documents': {
-    fromForm: claim =>
-      setNested(claim, 'otherInformation', otherInformation => {
-        otherInformation.otherDocuments = otherInformation.otherDocuments ?? [];
-      }),
+    fromForm: (claim, body) => {
+      if (!isSaveForLater(body)) {
+        setNested(claim, 'otherInformation', otherInformation => {
+          otherInformation.otherDocuments = otherInformation.otherDocuments ?? [];
+        });
+      }
+    },
     isAnswered: claim => Array.isArray(claim.otherInformation?.otherDocuments),
   },
 
@@ -798,6 +857,17 @@ export const claimMappings: Record<string, StepMapping> = {
     },
   },
 
+  'remove-rent-payment': {
+    fromForm: (claim, body, req) => {
+      const index = rentPaymentToRemoveOf(req, claim);
+      if (body.confirmRemove === 'yes' && index !== undefined) {
+        setNested(claim, 'rentArrears', rentArrears => {
+          rentArrears.rentHistoryTable = removeRentTablePayment(rentArrears.rentHistoryTable ?? [], index);
+        });
+      }
+    },
+  },
+
   'remove-ledger-entry': {
     fromForm: (claim, body, req) => {
       const index = itemIndexOf(req, claim.rentArrears?.rentHistoryLedger, 'entry');
@@ -808,6 +878,11 @@ export const claimMappings: Record<string, StepMapping> = {
   },
 
   'check-your-answers': {
+    toForm: claim => ({
+      statementOfTruth: claim.submission?.statementOfTruthAgreed === 'YES' ? ['contempt', 'belief'] : [],
+      statementOfTruthFullName: claim.submission?.statementOfTruthFullName,
+      statementOfTruthPosition: claim.submission?.statementOfTruthPosition,
+    }),
     fromForm: (claim, body) =>
       setNested(claim, 'submission', submission => {
         const agreed = checkedValues(body.statementOfTruth, ['contempt', 'belief'] as const);
@@ -826,11 +901,68 @@ export function rentStatementPeriodOf(req: Request, claim: CitizenPossessionClai
   return typeof period === 'string' && rows.some(row => row.value.periodStart === period) ? period : undefined;
 }
 
+/** The rent statement row a payment page changes: ?row=n, when the statement has that row. */
+export function rentStatementRowOf(req: Request, claim: CitizenPossessionClaim): number | undefined {
+  const index = indexFromQuery(req.query?.row);
+  return index !== undefined && claim.rentArrears?.rentHistoryTable?.[index] ? index : undefined;
+}
+
+/** The period a payment page is for, from ?row= or ?period=, or undefined when the statement does not have it. */
+export function rentPaymentPeriodOf(req: Request, claim: CitizenPossessionClaim): RentTableRow | undefined {
+  const rows = claim.rentArrears?.rentHistoryTable ?? [];
+  const rowIndex = rentStatementRowOf(req, claim);
+  const periodStart =
+    req.query?.row !== undefined
+      ? rowIndex !== undefined
+        ? rows[rowIndex].value.periodStart
+        : undefined
+      : rentStatementPeriodOf(req, claim);
+  return periodStart
+    ? rows.find(row => row.value.periodStart === periodStart && row.value.amountDue)?.value
+    : undefined;
+}
+
+/** The `?problem=` the rent statement is sent back with when a payment page names a period it does not have. */
+export const PERIOD_NOT_FOUND = 'periodNotFound';
+
+/**
+ * The due date a payment for a period cannot be before, or undefined for the first period, which holds every
+ * payment made before the statement's rent was first due, as mergeRentPeriods lays them out.
+ */
+export function paymentDueDateLimitOf(req: Request, claim: CitizenPossessionClaim): string | undefined {
+  const period = rentPaymentPeriodOf(req, claim);
+  const firstPeriod = (claim.rentArrears?.rentHistoryTable ?? [])
+    .filter(row => row.value.amountDue)
+    .map(row => row.value.periodStart ?? '')
+    .sort()[0];
+  return period && period.periodStart !== firstPeriod ? period.dateDue : undefined;
+}
+
+/** The payment a remove link names: ?row=n, with the date and amount it was made for, while the row still holds it. */
+export function rentPaymentToRemoveOf(req: Request, claim: CitizenPossessionClaim): number | undefined {
+  const index = rentStatementRowOf(req, claim);
+  const first = (value: unknown) => (Array.isArray(value) ? value[0] : value);
+  const payment = { datePaid: first(req.query?.datePaid), amountPaid: first(req.query?.amountPaid) };
+  return index !== undefined &&
+    typeof payment.datePaid === 'string' &&
+    typeof payment.amountPaid === 'string' &&
+    rowHoldsPayment(claim.rentArrears?.rentHistoryTable?.[index]?.value, payment)
+    ? index
+    : undefined;
+}
+
 /** The ground a reason page is about: ?ground=, or the first that needs a reason. */
 export function groundForReasonOf(req: Request, claim: CitizenPossessionClaim): OtherGround | undefined {
   const grounds = groundsNeedingReasons(claim.grounds);
   const asked = Array.isArray(req.query?.ground) ? req.query.ground[0] : req.query?.ground;
   return grounds.find(ground => ground === asked) ?? (asked === undefined ? grounds[0] : undefined);
+}
+
+/** The first chosen ground that needs a reason and has none yet. */
+export function groundWithoutReasonOf(claim: CitizenPossessionClaim): OtherGround | undefined {
+  return groundsNeedingReasons(claim.grounds).find(
+    ground => !claim.grounds?.groundReasons?.some(item => item.value.ground === ground && item.value.reason)
+  );
 }
 
 /** A new collection item's id, which pcs-api keeps, so a page can name the item rather than its position. */

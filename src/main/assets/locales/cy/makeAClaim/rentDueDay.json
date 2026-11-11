@@ -4,6 +4,7 @@
   "hint": "cyFor example, if rent is due on the 28th of each month, enter 28",
   "errors": {
     "rentDueDay": "cyEnter the day of the month the rent is due",
-    "rentDueDayInvalid": "cyEnter a day of the month from 1 to 31"
+    "rentDueDayInvalid": "cyEnter a day of the month from 1 to 31",
+    "tooManyPeriods": "cyThe rent statement would then cover more than {{limit}} rent periods. Change the statement period to a shorter one first"
   }
 }

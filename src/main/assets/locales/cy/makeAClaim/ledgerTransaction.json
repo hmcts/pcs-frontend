@@ -37,5 +37,8 @@
       "month": "cyMonth",
       "year": "cyYear"
     }
+  },
+  "fieldNames": {
+    "description": "cyThe description or reference"
   }
 }

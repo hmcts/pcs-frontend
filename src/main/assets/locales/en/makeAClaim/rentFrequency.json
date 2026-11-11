@@ -12,6 +12,10 @@
   },
   "errors": {
     "rentFrequency": "Select how often the rent should be paid",
-    "otherFrequencyDetails": "Enter how often the rent should be paid"
+    "otherFrequencyDetails": "Enter how often the rent should be paid",
+    "tooManyPeriods": "The rent statement would then cover more than {{limit}} rent periods. Change the statement period to a shorter one first"
+  },
+  "fieldNames": {
+    "otherFrequencyDetails": "How often the rent should be paid"
   }
 }

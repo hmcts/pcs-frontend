@@ -6,5 +6,8 @@
     "If a payment was made for a period, select ‘Add a payment’ in that row. If no payments were made, select ‘Save and continue’."
   ],
   "totalArrearsLabel": "Total arrears:",
-  "emptyTable": "There are no rent periods to show. Check the rent and the period the statement covers."
+  "emptyTable": "There are no rent periods to show. Check the rent and the period the statement covers.",
+  "problems": {
+    "periodNotFound": "That rent period is not in the statement"
+  }
 }

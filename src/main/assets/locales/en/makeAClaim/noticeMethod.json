@@ -41,6 +41,62 @@
       "day": "Day",
       "month": "Month",
       "year": "Year"
+    },
+    "emailedToInvalid": "Enter an email address in the correct format, like name@example.com"
+  },
+  "dateErrors": {
+    "postedDate": {
+      "required": "Enter the date the notice was posted",
+      "notRealDate": "The date the notice was posted must be a real date",
+      "invalidValue": "The date the notice was posted must be a real date",
+      "futureDate": "The date the notice was posted must be today or in the past",
+      "missingOne": "The date the notice was posted must include a {{missingField}}",
+      "missingTwo": "The date the notice was posted must include a {{first}} and {{second}}"
+    },
+    "deliveredDate": {
+      "required": "Enter the date the notice was delivered",
+      "notRealDate": "The date the notice was delivered must be a real date",
+      "invalidValue": "The date the notice was delivered must be a real date",
+      "futureDate": "The date the notice was delivered must be today or in the past",
+      "missingOne": "The date the notice was delivered must include a {{missingField}}",
+      "missingTwo": "The date the notice was delivered must include a {{first}} and {{second}}"
+    },
+    "handedDate": {
+      "required": "Enter the date the notice was handed over",
+      "notRealDate": "The date the notice was handed over must be a real date",
+      "invalidValue": "The date the notice was handed over must be a real date",
+      "futureDate": "The date the notice was handed over must be today or in the past",
+      "missingOne": "The date the notice was handed over must include a {{missingField}}",
+      "missingTwo": "The date the notice was handed over must include a {{first}} and {{second}}"
+    },
+    "emailedDate": {
+      "required": "Enter the date the email was sent",
+      "notRealDate": "The date the email was sent must be a real date",
+      "invalidValue": "The date the email was sent must be a real date",
+      "futureDate": "The date the email was sent must be today or in the past",
+      "missingOne": "The date the email was sent must include a {{missingField}}",
+      "missingTwo": "The date the email was sent must include a {{first}} and {{second}}"
+    },
+    "otherElectronicDate": {
+      "required": "Enter the date the notice was sent",
+      "notRealDate": "The date the notice was sent must be a real date",
+      "invalidValue": "The date the notice was sent must be a real date",
+      "futureDate": "The date the notice was sent must be today or in the past",
+      "missingOne": "The date the notice was sent must include a {{missingField}}",
+      "missingTwo": "The date the notice was sent must include a {{first}} and {{second}}"
+    },
+    "otherMethodDate": {
+      "required": "Enter the date the notice was served",
+      "notRealDate": "The date the notice was served must be a real date",
+      "invalidValue": "The date the notice was served must be a real date",
+      "futureDate": "The date the notice was served must be today or in the past",
+      "missingOne": "The date the notice was served must include a {{missingField}}",
+      "missingTwo": "The date the notice was served must include a {{first}} and {{second}}"
     }
+  },
+  "fieldNames": {
+    "handedToName": "The name of who the notice was left with",
+    "otherElectronicDetails": "How the notice was sent",
+    "otherMethodDetails": "How you served the notice"
   }
 }

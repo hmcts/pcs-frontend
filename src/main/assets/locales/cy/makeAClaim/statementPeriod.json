@@ -24,6 +24,12 @@
       "day": "cyDay",
       "month": "cyMonth",
       "year": "cyYear"
+    },
+    "tooManyPeriods": "cyThe statement period is too long. Choose dates that cover no more than {{limit}} rent periods"
+  },
+  "dateErrors": {
+    "statementEnd": {
+      "futureDate": "cyThe end date must be today or in the past"
     }
   }
 }

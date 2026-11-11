@@ -1,10 +1,15 @@
+import type { Request } from 'express';
+
 import { CallbackRejectedError } from '../../../HttpError';
 import { CLAIM_SUBMITTED_ROUTE, PAY_CLAIM_FEE_ROUTE, makeAClaimPath } from '../../../constants/makeAClaimRoutes';
 import { answeredClaim, saveClaimDraft, submitClaim } from '../claimDraft';
 import { claimMappings } from '../claimMapping';
 import { textField } from '../fieldBuilders';
 import { FIELD_LIMITS } from '../fieldLimits';
-import { createMakeAClaimStep, isRendering } from '../formStep';
+import { flowConfig, taskListPath } from '../flow.config';
+import { caseReferenceOf, createMakeAClaimStep, isRendering, unansweredStepUrl } from '../formStep';
+import { makeAClaimSections } from '../sections.config';
+import { stepRegistry } from '../stepRegistry';
 import {
   draftChangedUrl,
   isDraftChanged,
@@ -17,15 +22,52 @@ import { allCards } from '../summary';
 
 import { Logger } from '@modules/logger';
 import { getTranslationFunction } from '@modules/steps';
+import { getStepUrl } from '@modules/steps/flow';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { persistPaymentSessionState } from '@services/paymentSessionService';
+import { getAllSectionStatuses, getFirstVisibleStep, isStepVisible, safeIsAnswered } from '@services/sectionStatus';
+
+const CHECK_AND_SUBMIT = 'checkAndSubmit';
 
 const logger = Logger.getLogger('makeAClaimCheckYourAnswers');
+
+/**
+ * Where to send a claimant who opens check your answers before it is available: the first question not yet
+ * answered in the first section that is not done, or that section's first page. A page sent back with submit
+ * errors, such as a claim changed in another tab, is still shown, so the claimant is told what happened.
+ */
+async function firstUnfinishedQuestion(req: Request): Promise<string | undefined> {
+  if (req.method !== 'GET' || submitErrorCodes(req.query?.submitError).length > 0) {
+    return undefined;
+  }
+  const statuses = await getAllSectionStatuses(flowConfig, stepRegistry, req);
+  if (statuses.get(CHECK_AND_SUBMIT) !== 'NOT_AVAILABLE_YET') {
+    return undefined;
+  }
+  const caseReference = caseReferenceOf(req);
+  const section = makeAClaimSections.find(
+    candidate =>
+      candidate.id !== CHECK_AND_SUBMIT && !['DONE', 'NOT_APPLICABLE'].includes(statuses.get(candidate.id) ?? '')
+  );
+  if (!section) {
+    return taskListPath(caseReference);
+  }
+  const unanswered = section.steps.find(stepName => {
+    const step = stepRegistry[stepName];
+    return step?.isAnswered !== undefined && isStepVisible(stepName, flowConfig, req) && !safeIsAnswered(step, req);
+  });
+  if (unanswered) {
+    return unansweredStepUrl(req, unanswered);
+  }
+  const target = getFirstVisibleStep(section, flowConfig, req);
+  return target ? getStepUrl(target, flowConfig, caseReference) : taskListPath(caseReference);
+}
 
 export const step: StepDefinition = createMakeAClaimStep({
   stepName: 'check-your-answers',
   stepDir: __dirname,
   customTemplate: 'make-a-claim/templates/summary.njk',
+  redirectWhen: firstUnfinishedQuestion,
   fields: [
     {
       name: 'statementOfTruth',

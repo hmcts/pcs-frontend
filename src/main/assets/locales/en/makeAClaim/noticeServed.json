@@ -8,5 +8,8 @@
   "errors": {
     "noticeServed": "Select whether you have served notice",
     "noNoticeReason": "Explain why you have not served notice"
+  },
+  "fieldNames": {
+    "noNoticeReason": "Your reason for not serving notice"
   }
 }

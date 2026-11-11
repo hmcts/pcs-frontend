@@ -4,8 +4,11 @@ import type { CitizenPossessionClaim } from '../../../../main/services/citizenPo
 import {
   claimMappings,
   groundForReasonOf,
+  paymentDueDateLimitOf,
   removeDefendant,
   removeLedgerEntry,
+  rentChangeExceedsLimit,
+  rentPaymentToRemoveOf,
   rentStatementRange,
 } from '../../../../main/steps/make-a-claim/claimMapping';
 import { UNREADABLE } from '../../../../main/steps/make-a-claim/formValues';
@@ -233,6 +236,14 @@ describe('claim mappings', () => {
       expect(groundForReasonOf(request({ ground: 'GROUND_14' }), chosen)).toBe('GROUND_14');
       expect(groundForReasonOf(request({ ground: 'OTHER' }), chosen)).toBeUndefined();
       expect(groundForReasonOf(request({ ground: 'GROUND_8' }), chosen)).toBeUndefined();
+    });
+
+    it('names the first ground still without a reason', () => {
+      const mapping = claimMappings['ground-reason'];
+      expect(mapping.unansweredQuery?.(chosen)).toBe('?ground=GROUND_1A');
+      const first = roundTrip('ground-reason', { groundReason: 'Selling' }, chosen, request({ ground: 'GROUND_1A' }));
+      expect(mapping.unansweredQuery?.(first.saved)).toBe('?ground=GROUND_2');
+      expect(first.answered).toBe(false);
     });
 
     it('asks in the order the grounds page lists them, whatever order the claim holds them in', () => {
@@ -479,6 +490,68 @@ describe('claim mappings', () => {
       const { saved } = roundTrip('statement-period', period, monthly, req);
       const { saved: weekly } = roundTrip('rent-frequency', { rentFrequency: 'WEEKLY' }, saved, req);
       expect(dueDates(weekly)?.slice(-1)).toEqual(['2026-08-31']);
+    });
+  });
+
+  describe('a statement period with as many rent periods as a statement can show', () => {
+    const monthly: CitizenPossessionClaim = {
+      rentArrears: { rentAmount: '100000', rentFrequency: 'MONTHLY', rentDueDay: 1 },
+    };
+    const fullPeriod = {
+      statementStart: { day: '10', month: '1', year: '2004' },
+      statementEnd: { day: '15', month: '9', year: '2025' },
+    };
+
+    it('refuses a change of frequency or due day that would add more, rather than dropping the later ones', () => {
+      const req = request();
+      const { saved } = roundTrip('statement-period', fullPeriod, monthly, req);
+      expect(saved.rentArrears?.rentHistoryTable).toHaveLength(260);
+      expect(rentChangeExceedsLimit(saved, req, { rentFrequency: 'WEEKLY' })).toBe(true);
+      expect(rentChangeExceedsLimit(saved, req, { rentDueDay: 12 })).toBe(true);
+      expect(rentChangeExceedsLimit(saved, req, { rentDueDay: 5 })).toBe(false);
+      expect(rentChangeExceedsLimit(saved, req, { rentFrequency: 'OTHER' })).toBe(false);
+    });
+
+    it('keeps the rent as it was when such a change is saved for later', () => {
+      const req = request();
+      const { saved } = roundTrip('statement-period', fullPeriod, monthly, req);
+      expect(roundTrip('rent-frequency', { rentFrequency: 'WEEKLY' }, saved, req).saved).toEqual(saved);
+      expect(roundTrip('rent-due-day', { rentDueDay: '12' }, saved, req).saved).toEqual(saved);
+    });
+
+    it('neither lays out nor remembers a period with more', () => {
+      const req = request();
+      const { saved } = roundTrip(
+        'statement-period',
+        { ...fullPeriod, statementEnd: { day: '15', month: '10', year: '2025' } },
+        monthly,
+        req
+      );
+      expect(saved).toEqual(monthly);
+      expect(req.session.rentStatementPeriods).toBeUndefined();
+    });
+  });
+
+  describe('payments on a rent statement', () => {
+    const claim: CitizenPossessionClaim = {
+      rentArrears: {
+        rentHistoryTable: [
+          { value: { periodStart: '2026-07-01', dateDue: '2026-07-01', amountDue: '100000' } },
+          { value: { periodStart: '2026-06-01', dateDue: '2026-06-01', amountDue: '100000', amountPaid: '5000' } },
+        ],
+      },
+    };
+
+    it('takes a payment made before the rent was due only on the first period', () => {
+      expect(paymentDueDateLimitOf(request({ period: '2026-06-01' }), claim)).toBeUndefined();
+      expect(paymentDueDateLimitOf(request({ period: '2026-07-01' }), claim)).toBe('2026-07-01');
+    });
+
+    it('removes a payment that has no date', () => {
+      expect(rentPaymentToRemoveOf(request({ row: '1', datePaid: '', amountPaid: '5000' }), claim)).toBe(1);
+      expect(rentPaymentToRemoveOf(request({ row: '1', datePaid: '2026-06-02', amountPaid: '5000' }), claim)).toBe(
+        undefined
+      );
     });
   });
 

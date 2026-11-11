@@ -22,6 +22,7 @@
       "day": "cyDay",
       "month": "cyMonth",
       "year": "cyYear"
-    }
+    },
+    "beforeDateDue": "cyThe date the payment was made must be the same as or after {{dateDue}}, the date this rent was due"
   }
 }

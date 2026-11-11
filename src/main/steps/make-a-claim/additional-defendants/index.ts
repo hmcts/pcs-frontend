@@ -4,14 +4,17 @@ import { flowConfig } from '../flow.config';
 import { createMakeAClaimStep } from '../formStep';
 import { defendantDisplayName } from '../summary';
 
+import { getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createMakeAClaimStep({
   stepName: 'additional-defendants',
   stepDir: __dirname,
-  fields: [yesNoQuestion('additionalDefendants')],
+  // The question is the page's H1, shown above the defendants list, so the radios' legend repeats it unseen.
+  fields: [yesNoQuestion('additionalDefendants', { isPageHeading: false, legendClasses: 'govuk-visually-hidden' })],
   extendGetContent: req => ({
+    heading: getTranslationFunction(req)('question'),
     listItems: (readClaim(req).defendants ?? []).map(defendant => defendantDisplayName(defendant.value, req)),
   }),
   resolveRedirectAfterPost: async req => {

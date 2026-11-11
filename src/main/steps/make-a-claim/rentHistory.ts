@@ -64,7 +64,7 @@ export interface RentPeriodsInput {
  * is due every 7 or 14 days from the start date; monthly rent on the due day of each month, or that month's
  * last day when it is shorter.
  */
-export function generateRentPeriods(input: RentPeriodsInput): RentTableRow[] {
+export function generateRentPeriods(input: RentPeriodsInput, limit = MAX_RENT_PERIODS): RentTableRow[] {
   const start = toDayNumber(input.statementStart);
   const end = toDayNumber(input.statementEnd);
   if (start === undefined || end === undefined || end < start || !TABLE_FREQUENCIES.includes(input.rentFrequency)) {
@@ -81,19 +81,30 @@ export function generateRentPeriods(input: RentPeriodsInput): RentTableRow[] {
       monthIndex++;
       due = monthlyDueDate(startYear, monthIndex, dueDay);
     }
-    while ((toDayNumber(due) as number) <= end && dueDates.length < MAX_RENT_PERIODS) {
+    while ((toDayNumber(due) as number) <= end && dueDates.length < limit) {
       dueDates.push(due);
       monthIndex++;
       due = monthlyDueDate(startYear, monthIndex, dueDay);
     }
   } else {
     const step = input.rentFrequency === 'WEEKLY' ? 7 : 14;
-    for (let day = start; day <= end && dueDates.length < MAX_RENT_PERIODS; day += step) {
+    for (let day = start; day <= end && dueDates.length < limit; day += step) {
       dueDates.push(fromDayNumber(day));
     }
   }
 
   return dueDates.map(dateDue => ({ periodStart: dateDue, dateDue, amountDue: input.rentAmount }));
+}
+
+/** The rent periods between two dates, or undefined when there are more than a statement can lay out. */
+export function rentPeriodsWithinLimit(input: RentPeriodsInput): RentTableRow[] | undefined {
+  const periods = generateRentPeriods(input, MAX_RENT_PERIODS + 1);
+  return periods.length > MAX_RENT_PERIODS ? undefined : periods;
+}
+
+/** Whether the statement period holds more rent periods than a statement can lay out. */
+export function exceedsRentPeriodLimit(input: RentPeriodsInput): boolean {
+  return rentPeriodsWithinLimit(input) === undefined;
 }
 
 /**
@@ -218,6 +229,55 @@ export function addRentTablePayment(
     return updated;
   }
   return [...updated, { value: { periodStart, ...payment } }];
+}
+
+/** Whether a rent statement row still holds the payment a link to it was made for. */
+export function rowHoldsPayment(
+  row: RentTableRow | undefined,
+  payment: { datePaid?: string; amountPaid?: string }
+): boolean {
+  const dateOf = (datePaid: string | undefined) => datePaid || undefined;
+  return (
+    Boolean(row?.amountPaid) &&
+    dateOf(row?.datePaid) === dateOf(payment.datePaid) &&
+    row?.amountPaid === payment.amountPaid
+  );
+}
+
+/**
+ * Removes the payment on a rent statement row. A period keeps its own row, so its payment is cleared and the
+ * period's next payment, if it has another, moves up onto it; an additional payment's row goes.
+ */
+export function removeRentTablePayment(
+  rows: CcdCollectionItem<RentTableRow>[],
+  rowIndex: number
+): CcdCollectionItem<RentTableRow>[] {
+  const target = rows[rowIndex];
+  if (!target) {
+    return rows;
+  }
+  if (!target.value.amountDue) {
+    return rows.filter((_, i) => i !== rowIndex);
+  }
+  const { datePaid: _date, amountPaid: _amount, ...period } = target.value;
+  const nextIndex = rows.findIndex(
+    (row, i) =>
+      i !== rowIndex && row.value.periodStart === period.periodStart && !row.value.amountDue && row.value.amountPaid
+  );
+  const next = nextIndex === -1 ? undefined : rows[nextIndex].value;
+  const updated = rows.map((row, i) =>
+    i === rowIndex
+      ? {
+          ...row,
+          value: {
+            ...period,
+            ...(next?.datePaid ? { datePaid: next.datePaid } : {}),
+            ...(next?.amountPaid ? { amountPaid: next.amountPaid } : {}),
+          },
+        }
+      : row
+  );
+  return nextIndex === -1 ? updated : updated.filter((_, i) => i !== nextIndex);
 }
 
 export interface LedgerLine {
