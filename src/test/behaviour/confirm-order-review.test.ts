@@ -483,7 +483,10 @@ describe('confirm order review', () => {
     beforeEach(async () => {
       app = await caseworkerReviewing(await freeFormOrder());
       const page = await openReview(app);
-      expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(ORDER_DETAILS);
+      const issuing = await app.post(REVIEW, page.body('ISSUE'));
+      if (issuing.location !== ORDER_DETAILS) {
+        throw new Error(`Issuing a free-form order went to ${issuing.location}, not ${ORDER_DETAILS}`);
+      }
     });
 
     it('asks what the order does, and the details of what it does', async () => {
