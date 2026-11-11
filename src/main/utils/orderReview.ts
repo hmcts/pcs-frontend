@@ -44,6 +44,7 @@ export interface OrderReviewAnswers {
   hasReviewDates?: 'yes' | 'no';
   reviewDates: ReviewDateAnswer[];
   nextSteps?: string;
+  /** Asked on proceed to issue, but not yet sent to pcs-api: nothing uses them until each says what it applies to. */
   finalOrder?: 'yes' | 'no';
   restitutionPermission?: 'yes' | 'no';
   serveAllParties?: 'yes' | 'no';
@@ -227,8 +228,6 @@ export function reviewRequest(
       order: answers.order && issuedOrder(answers.order),
       reviewDates,
       nextStepsComplete: answers.nextSteps === 'complete',
-      finalOrder: answers.finalOrder === 'yes',
-      restitutionPermission: answers.restitutionPermission === 'yes',
       claimOutcome:
         answers.order &&
         (issuesFreeForm(answers)

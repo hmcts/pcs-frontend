@@ -797,8 +797,6 @@ describe('confirm order review', () => {
             claimOutcome: expect.objectContaining({ kind: expect.any(String) }),
             reviewDates: [{ date: '2027-03-05', reason: 'UNLESS_ORDER', description: 'Check compliance' }],
             nextStepsComplete: true,
-            finalOrder: true,
-            restitutionPermission: true,
             serveAllParties: true,
             partiesToServe: [],
             seal: 'COUNTY_COURT',
