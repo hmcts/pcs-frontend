@@ -136,11 +136,12 @@ describe('opentelemetry module', () => {
       );
     });
 
-    it('records the route without creating a span for every Express layer', async () => {
+    // Routers stay instrumented; express-route-names.test.ts checks the routes that depend on it.
+    it('records the route without creating a span for every middleware and handler', async () => {
       await initializeAndGetTelemetryConfig();
 
       expect(mockExpressInstrumentation).toHaveBeenCalledWith({
-        ignoreLayersType: ['router', 'middleware', 'request_handler'],
+        ignoreLayersType: ['middleware', 'request_handler'],
       });
     });
 

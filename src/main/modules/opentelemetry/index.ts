@@ -1,6 +1,10 @@
 import { shutdownAzureMonitor, useAzureMonitor } from '@azure/monitor-opentelemetry';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { ExpressInstrumentation, ExpressLayerType } from '@opentelemetry/instrumentation-express';
+import {
+  ExpressInstrumentation,
+  type ExpressInstrumentationConfig,
+  ExpressLayerType,
+} from '@opentelemetry/instrumentation-express';
 import config from 'config';
 
 import { Logger } from '@modules/logger';
@@ -72,6 +76,14 @@ const httpTelemetryConfig: HttpTelemetryConfig = {
   },
 };
 
+// Middleware and request handlers are ignored so they do not each get a span, which App Insights
+// would store as an InProc dependency. Routers are not: an ignored router that is mounted on a
+// path and does not handle the request leaves that path behind, so a later route would be named
+// /case/case/:caseReference/... and a 404 would be named GET /case. A router span ends at once.
+export const expressInstrumentationConfig: ExpressInstrumentationConfig = {
+  ignoreLayersType: [ExpressLayerType.MIDDLEWARE, ExpressLayerType.REQUEST_HANDLER],
+};
+
 export function initializeTelemetry(): void {
   if (isTelemetryInitialized || !config.get('appInsights.enabled')) {
     return;
@@ -98,15 +110,10 @@ export function initializeTelemetry(): void {
   });
   // Without this, App Insights names every request by its method alone (HDPI-9884). The
   // instrumentation records the matched route template as http.route, which the exporter uses for
-  // the operation name. Ignoring every layer type keeps the route but skips a span per middleware,
-  // each of which would be stored as an InProc dependency. It is registered on the tracer provider
-  // useAzureMonitor() has just set up; bootstrap.ts loads express only after this.
+  // the operation name. It is registered on the tracer provider useAzureMonitor() has just set up;
+  // bootstrap.ts loads express only after this.
   registerInstrumentations({
-    instrumentations: [
-      new ExpressInstrumentation({
-        ignoreLayersType: [ExpressLayerType.ROUTER, ExpressLayerType.MIDDLEWARE, ExpressLayerType.REQUEST_HANDLER],
-      }),
-    ],
+    instrumentations: [new ExpressInstrumentation(expressInstrumentationConfig)],
   });
   Logger.enableTelemetry();
 
