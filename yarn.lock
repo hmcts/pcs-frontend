@@ -9236,10 +9236,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i18next-fs-backend@npm:2.6.10":
-  version: 2.6.10
-  resolution: "i18next-fs-backend@npm:2.6.10"
-  checksum: 10/c74feb11eebf8923c53651f617f30e51eb7f6b697944ce61ac1446bb30cf4abc6a105d336824a39f637aafcda4b2153e10ccc0dfe7a195c917ba81adc7dc6acb
+"i18next-fs-backend@npm:2.6.11":
+  version: 2.6.11
+  resolution: "i18next-fs-backend@npm:2.6.11"
+  checksum: 10/7b27c481fd87e38b841b84b43e7127f6911c8bec4e2a30d5008b7a7a0b7a28a6e29f77c2cfdbe9dab7765a24d0c6fd4933aa20eb8eb6b731d29eaceae85401bd
   languageName: node
   linkType: hard
 
@@ -10556,7 +10556,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:6.2.16, jose@npm:^6.2.15":
+"jose@npm:6.2.17":
+  version: 6.2.17
+  resolution: "jose@npm:6.2.17"
+  checksum: 10/df6ae5da42e71a4c3bd1483534c5579ed32f5806ec362ea472f309e8e57aef42afa1dbac62289596975d3587f7ac38deefe4313e1434ce76972ea0f029070bc9
+  languageName: node
+  linkType: hard
+
+"jose@npm:^6.2.15":
   version: 6.2.16
   resolution: "jose@npm:6.2.16"
   checksum: 10/328b4f6dbd213248996aec8aa8c27696cd6f15ef20f5d775b036ebc7f2029c89b6f0241c3d2a206167bdfccd3477693822fa0ba5df88b9201b3806ce3b156c4d
@@ -12213,14 +12220,14 @@ __metadata:
     http-terminator: "npm:3.2.0"
     husky: "npm:9.1.7"
     i18next: "npm:26.7.2"
-    i18next-fs-backend: "npm:2.6.10"
+    i18next-fs-backend: "npm:2.6.11"
     i18next-http-middleware: "npm:3.9.11"
     ioredis: "npm:6.0.0"
     jest: "npm:30.5.2"
     jest-environment-jsdom: "npm:30.5.2"
     jest-html-reporter: "npm:4.4.3"
     jest-pact: "npm:0.14.0"
-    jose: "npm:6.2.16"
+    jose: "npm:6.2.17"
     lint-staged: "npm:17.5.1"
     lodash: "npm:4.18.1"
     luxon: "npm:3.7.2"
