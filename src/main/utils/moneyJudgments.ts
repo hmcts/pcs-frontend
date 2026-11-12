@@ -157,8 +157,12 @@ export function judgmentsFromOrder(orderType: string, formData: FormData, sides:
   }
   const costsChoice = all(formData.costs).includes('yes') ? first(formData['costs-choice']) : '';
   const costsAmount = first(formData[`costs-${costsChoice}-amount`]);
-  if (costsAmount) {
-    const claimantPays = costsChoice === 'cl-pay-def-summary';
+  const claimantPays = costsChoice === 'cl-pay-def-summary';
+  // An outright order's payment terms are for "the above sums", the defendant's costs among them.
+  const outrightJudgment = orderType === 'OUTRIGHT_POSSESSION' && !claimantPays ? judgments[0] : undefined;
+  if (costsAmount && outrightJudgment) {
+    outrightJudgment.costs = costsAmount;
+  } else if (costsAmount) {
     judgments.push({
       ...blankJudgment(sides),
       debtors: [...(claimantPays ? sides.claimants : sides.defendants)],
@@ -329,7 +333,9 @@ export function moneyJudgmentRows(
       ...(judgment.oneOffAmount
         ? [`One-off payment: ${pounds(judgment.oneOffAmount)} by ${displayDate(judgment.oneOffDate)}`]
         : []),
-      ...(given(judgment.payBy) ? [`To be paid in full by ${displayDate(judgment.payBy)}`] : []),
+      ...(given(judgment.payBy)
+        ? [`${judgment.oneOffAmount ? 'Balance' : 'To be paid in full'} by ${displayDate(judgment.payBy)}`]
+        : []),
       ...(judgment.instalmentAmount
         ? [
             `Instalments: ${pounds(judgment.instalmentAmount)} ${label(FREQUENCIES, judgment.instalmentFrequency).toLowerCase()}, ` +

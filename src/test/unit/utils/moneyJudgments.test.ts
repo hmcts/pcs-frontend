@@ -9,7 +9,7 @@ import {
 const sides = { claimants: ['c1'], defendants: ['d1', 'd2'] };
 
 describe('moneyJudgments', () => {
-  it('starts an outright order from the judge’s judgment for arrears and how it is paid, against all the defendants', () => {
+  it('starts an outright order from the judge’s judgment for arrears, with the costs it orders paid on the same terms, against all the defendants', () => {
     const answers = judgmentsFromOrder(
       'OUTRIGHT_POSSESSION',
       {
@@ -47,10 +47,10 @@ describe('moneyJudgments', () => {
           instalmentFrequency: 'MONTHLY',
           firstInstalmentDate: '2027-01-01',
           suspended: false,
+          costs: 355,
           debtors: ['d1', 'd2'],
           creditors: ['c1'],
         },
-        { costs: 355, suspended: false, debtors: ['d1', 'd2'], creditors: ['c1'] },
       ],
     });
     expect(validateMoneyJudgments(answers)).toEqual([]);
@@ -131,6 +131,19 @@ describe('moneyJudgments', () => {
     expect(
       validateMoneyJudgments({ costs: 'NONE', hasMoneyJudgments: 'yes', judgments: [judgment] }).map(issue => issue.id)
     ).toEqual(['judgment-1-instalment-amount', 'judgment-1-first-instalment-date-day']);
+  });
+
+  it('says the date after a one-off payment is for the balance', () => {
+    const judgment = {
+      ...blankJudgment(sides),
+      arrears: '900',
+      oneOffAmount: '100',
+      oneOffDate: { day: '1', month: '12', year: '2026' },
+      payBy: { day: '1', month: '6', year: '2027' },
+    };
+    expect(
+      moneyJudgmentRows({ costs: 'NONE', hasMoneyJudgments: 'yes', judgments: [judgment] }, id => id)[2][1]
+    ).toEqual(expect.arrayContaining(['One-off payment: £100.00 by 1 December 2026', 'Balance by 1 June 2027']));
   });
 
   it('lists each judgment to check, naming its parties', () => {
