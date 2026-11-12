@@ -98,10 +98,8 @@ export function validateOrderDetails(answers: OrderDetailsAnswers = {}): Issue[]
         date('outright-date', 'Enter a real date possession is ordered by');
       }
       chosen('outright-grounds', GROUNDS, 'Select the grounds possession is ordered on');
-      const details = answers['outright-grounds-details']?.trim() ?? '';
-      if (!details) {
-        issues.push({ id: 'outright-grounds-details', message: 'Enter details of the grounds' });
-      } else if (details.length > MAX_GROUNDS_DETAILS_LENGTH) {
+      // Many orders say only whether the grounds are mandatory or discretionary.
+      if ((answers['outright-grounds-details']?.trim() ?? '').length > MAX_GROUNDS_DETAILS_LENGTH) {
         issues.push({
           id: 'outright-grounds-details',
           message: 'Details of the grounds must be 500 characters or less',
@@ -152,7 +150,7 @@ export function orderDetailsRows(answers: OrderDetailsAnswers = {}): [string, st
             : label(OUTRIGHT_POSSESSION, answers['outright-possession']),
         ],
         ['Grounds', label(GROUNDS, answers['outright-grounds'])],
-        ['Details of the grounds', answers['outright-grounds-details'].trim()],
+        ['Details of the grounds', answers['outright-grounds-details']?.trim() || 'None'],
         ['Money judgment', label(YES_NO, answers['outright-money-judgment'])],
         ['Transfer to the High Court for enforcement', label(YES_NO, answers['outright-transfer'])]
       );
@@ -187,7 +185,7 @@ export function orderDetailsRequest(answers: OrderDetailsAnswers = {}): ClaimOut
         possessionForthwith: answers['outright-possession'] === 'forthwith',
         possessionDate: answers['outright-possession'] === 'by' ? isoDate(answers, 'outright-date') : undefined,
         grounds: upper(answers['outright-grounds']) as ClaimOutcome['grounds'],
-        groundsDetails: answers['outright-grounds-details'].trim(),
+        groundsDetails: answers['outright-grounds-details']?.trim() || undefined,
       };
     case 'suspended':
       return {

@@ -520,7 +520,6 @@ describe('confirm order review', () => {
       expect(errors(outright.text)).toEqual([
         'Select when possession is ordered',
         'Select the grounds possession is ordered on',
-        'Enter details of the grounds',
         'Select if the order makes a money judgment',
         'Select if the order transfers enforcement to the High Court',
       ]);
