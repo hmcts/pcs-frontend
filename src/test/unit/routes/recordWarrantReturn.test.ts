@@ -349,11 +349,13 @@ describe('recordWarrantReturnRoutes', () => {
           'final-outcome': EvictionOutcome.UNSUCCESSFUL,
           'eviction-unsuccessful-return-name': EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
           'additional-details': 'Withdrawn by the claimant',
+          ...evictionDateFields(),
         },
         {
           returnType: WarrantReturnType.FINAL,
           outcome: EvictionOutcome.UNSUCCESSFUL,
           returnName: EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
+          outcomeDate: '2026-03-01T14:05:00.000+00:00',
           additionalDetails: 'Withdrawn by the claimant',
         },
       ],
@@ -363,11 +365,13 @@ describe('recordWarrantReturnRoutes', () => {
           'return-type': WarrantReturnType.FINAL,
           'final-outcome': EvictionOutcome.CANCELLED,
           'eviction-unsuccessful-return-name': EvictionUnsuccessfulReturnName.WARRANT_EXPIRED,
+          ...evictionDateFields(),
         },
         {
           returnType: WarrantReturnType.FINAL,
           outcome: EvictionOutcome.CANCELLED,
           returnName: EvictionUnsuccessfulReturnName.WARRANT_EXPIRED,
+          outcomeDate: '2026-03-01T14:05:00.000+00:00',
           additionalDetails: undefined,
         },
       ],
@@ -377,10 +381,12 @@ describe('recordWarrantReturnRoutes', () => {
           'return-type': WarrantReturnType.INTERIM,
           'interim-return-name': InterimReturnName.REOPEN_WARRANT,
           'additional-details': 'Reopen it',
+          ...evictionDateFields(),
         },
         {
           returnType: WarrantReturnType.INTERIM,
           returnName: InterimReturnName.REOPEN_WARRANT,
+          outcomeDate: '2026-03-01T14:05:00.000+00:00',
           additionalDetails: 'Reopen it',
         },
       ],
@@ -389,10 +395,12 @@ describe('recordWarrantReturnRoutes', () => {
         {
           'return-type': WarrantReturnType.INTERIM,
           'interim-return-name': InterimReturnName.CROWDS_OR_PROTESTS,
+          ...evictionDateFields(),
         },
         {
           returnType: WarrantReturnType.INTERIM,
           returnName: InterimReturnName.CROWDS_OR_PROTESTS,
+          outcomeDate: '2026-03-01T14:05:00.000+00:00',
           additionalDetails: undefined,
         },
       ],
@@ -475,23 +483,28 @@ describe('recordWarrantReturnRoutes', () => {
           'return-type': WarrantReturnType.FINAL,
           'final-outcome': EvictionOutcome.UNSUCCESSFUL,
           'eviction-unsuccessful-return-name': EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
+          ...evictionDateFields(),
           'additional-details': '   ',
         },
         ['additional-details'],
       ],
       [
         'an unsuccessful eviction with no return name',
-        { 'return-type': WarrantReturnType.FINAL, 'final-outcome': EvictionOutcome.UNSUCCESSFUL },
+        {
+          'return-type': WarrantReturnType.FINAL,
+          'final-outcome': EvictionOutcome.UNSUCCESSFUL,
+          ...evictionDateFields(),
+        },
         ['eviction-unsuccessful-return-name', 'additional-details'],
       ],
       [
         'a cancelled eviction with no return name',
-        { 'return-type': WarrantReturnType.FINAL, 'final-outcome': EvictionOutcome.CANCELLED },
+        { 'return-type': WarrantReturnType.FINAL, 'final-outcome': EvictionOutcome.CANCELLED, ...evictionDateFields() },
         ['eviction-unsuccessful-return-name', 'additional-details'],
       ],
       [
         'an interim return with no return name',
-        { 'return-type': WarrantReturnType.INTERIM },
+        { 'return-type': WarrantReturnType.INTERIM, ...evictionDateFields() },
         ['interim-return-name', 'additional-details'],
       ],
     ])('requires additional details for %s', async (_name, body, ids) => {
@@ -511,12 +524,14 @@ describe('recordWarrantReturnRoutes', () => {
     const unsuccessfulEviction = {
       'return-type': WarrantReturnType.FINAL,
       'final-outcome': EvictionOutcome.UNSUCCESSFUL,
+      ...evictionDateFields(),
     };
     const cancelledEviction = {
       'return-type': WarrantReturnType.FINAL,
       'final-outcome': EvictionOutcome.CANCELLED,
+      ...evictionDateFields(),
     };
-    const interimReturn = { 'return-type': WarrantReturnType.INTERIM };
+    const interimReturn = { 'return-type': WarrantReturnType.INTERIM, ...evictionDateFields() };
 
     it.each([
       ['a successful eviction', successfulEviction, 'eviction-successful-return-name'],
@@ -538,6 +553,7 @@ describe('recordWarrantReturnRoutes', () => {
       const { res } = await post({
         'return-type': WarrantReturnType.INTERIM,
         'interim-return-name': InterimReturnName.CROWDS_OR_PROTESTS,
+        ...evictionDateFields(),
         'additional-details': 'a'.repeat(6801),
       });
 
@@ -562,6 +578,7 @@ describe('recordWarrantReturnRoutes', () => {
         {
           'return-type': WarrantReturnType.INTERIM,
           'interim-return-name': InterimReturnName.CROWDS_OR_PROTESTS,
+          ...evictionDateFields(),
         },
         { save: jest.fn((callback: (error?: Error) => void) => callback(failure)) }
       );
