@@ -2,10 +2,16 @@ const mockUseAzureMonitor = jest.fn();
 const mockShutdownAzureMonitor = jest.fn();
 const mockConfigGet = jest.fn();
 const mockEnableTelemetry = jest.fn();
+const mockExpressInstrumentation = jest.fn();
 
 jest.mock('@azure/monitor-opentelemetry', () => ({
   useAzureMonitor: mockUseAzureMonitor,
   shutdownAzureMonitor: mockShutdownAzureMonitor,
+}));
+
+jest.mock('@opentelemetry/instrumentation-express', () => ({
+  ExpressInstrumentation: mockExpressInstrumentation,
+  ExpressLayerType: { ROUTER: 'router', MIDDLEWARE: 'middleware', REQUEST_HANDLER: 'request_handler' },
 }));
 
 jest.mock('config', () => ({
@@ -109,6 +115,45 @@ describe('opentelemetry module', () => {
 
     expect(telemetryConfig.instrumentationOptions.winston).toEqual({ enabled: false });
     expect(mockEnableTelemetry).toHaveBeenCalledTimes(1);
+  });
+
+  describe('request names in App Insights (HDPI-9884)', () => {
+    it('instruments Express after Azure Monitor, so requests are named by route template', async () => {
+      await initializeAndGetTelemetryConfig();
+
+      expect(mockExpressInstrumentation).toHaveBeenCalledTimes(1);
+      // The instrumentation picks up the global tracer provider, which useAzureMonitor() registers.
+      expect(mockUseAzureMonitor.mock.invocationCallOrder[0]).toBeLessThan(
+        mockExpressInstrumentation.mock.invocationCallOrder[0]
+      );
+    });
+
+    it('records the route without creating a span for every Express layer', async () => {
+      await initializeAndGetTelemetryConfig();
+
+      expect(mockExpressInstrumentation).toHaveBeenCalledWith({
+        ignoreLayersType: ['router', 'middleware', 'request_handler'],
+      });
+    });
+
+    it('does not instrument Express when App Insights is disabled', async () => {
+      mockConfigGet.mockImplementation((key: string) => key !== 'appInsights.enabled');
+      const telemetryModule = await getTelemetryModule();
+
+      telemetryModule.initializeTelemetry();
+
+      expect(mockExpressInstrumentation).not.toHaveBeenCalled();
+    });
+
+    it('leaves secretRedactingSpanProcessor as the only span processor', async () => {
+      const telemetryModule = await getTelemetryModule();
+
+      telemetryModule.initializeTelemetry();
+
+      const { spanProcessors } = mockUseAzureMonitor.mock.calls[0][0] as TelemetryConfig;
+      expect(spanProcessors).toHaveLength(1);
+      expect(spanProcessors[0]).toBe(telemetryModule.secretRedactingSpanProcessor);
+    });
   });
 
   it('returns early when flushing before initialization', async () => {

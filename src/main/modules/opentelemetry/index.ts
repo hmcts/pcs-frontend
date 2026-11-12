@@ -1,4 +1,5 @@
 import { shutdownAzureMonitor, useAzureMonitor } from '@azure/monitor-opentelemetry';
+import { ExpressInstrumentation, ExpressLayerType } from '@opentelemetry/instrumentation-express';
 import config from 'config';
 
 import { Logger } from '@modules/logger';
@@ -93,6 +94,14 @@ export function initializeTelemetry(): void {
     },
     spanProcessors: [secretRedactingSpanProcessor],
     enableLiveMetrics: true,
+  });
+  // Without this, App Insights names every request by its method alone (HDPI-9884). The
+  // instrumentation records the matched route template as http.route, which the exporter uses for
+  // the operation name. Ignoring every layer type keeps the route but skips a span per middleware,
+  // each of which would be stored as an InProc dependency. Constructing it enables it on the tracer
+  // provider useAzureMonitor() has just registered; bootstrap.ts loads express only after this.
+  new ExpressInstrumentation({
+    ignoreLayersType: [ExpressLayerType.ROUTER, ExpressLayerType.MIDDLEWARE, ExpressLayerType.REQUEST_HANDLER],
   });
   Logger.enableTelemetry();
 
