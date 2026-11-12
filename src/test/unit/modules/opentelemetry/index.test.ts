@@ -106,6 +106,19 @@ describe('opentelemetry module', () => {
     expect(ignoreIncomingRequestHook({ method: 'GET', url: '/case/123' })).toBe(false);
   });
 
+  it('ignores incoming health checks and probes, but not pages that only start with /health', async () => {
+    const telemetryConfig = await initializeAndGetTelemetryConfig();
+    const { ignoreIncomingRequestHook } = telemetryConfig.instrumentationOptions.http;
+
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/health' })).toBe(true);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/health?check=true' })).toBe(true);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/health/liveness' })).toBe(true);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/health/readiness' })).toBe(true);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/healthz' })).toBe(false);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/health/other' })).toBe(false);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/case/123/health' })).toBe(false);
+  });
+
   it('ignores health outgoing requests', async () => {
     const telemetryConfig = await initializeAndGetTelemetryConfig();
     const { ignoreOutgoingRequestHook } = telemetryConfig.instrumentationOptions.http;

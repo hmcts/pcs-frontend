@@ -17,6 +17,8 @@ export { redactQueryValues };
 let isTelemetryInitialized = false;
 let telemetryShutdownPromise: Promise<void> | null = null;
 const ignoredIncomingUrlPattern = /\/assets\/|\.js(?:$|\?)|\.css(?:$|\?)/;
+// The health check and the Kubernetes probes: /health, /health/liveness and /health/readiness.
+const incomingHealthCheckPattern = /^\/health(?:\/(?:liveness|readiness))?(?:$|\?)/;
 
 interface HttpTelemetryConfig {
   enabled: boolean;
@@ -69,7 +71,7 @@ const httpTelemetryConfig: HttpTelemetryConfig = {
       return true;
     }
     const requestUrl = request.url ?? '';
-    return ignoredIncomingUrlPattern.test(requestUrl);
+    return ignoredIncomingUrlPattern.test(requestUrl) || incomingHealthCheckPattern.test(requestUrl);
   },
   ignoreOutgoingRequestHook: options => {
     const requestPath = typeof options.path === 'string' ? options.path : '';
