@@ -1,6 +1,11 @@
 import config from 'config';
 
-import { getCitizenClaims, getRootGreeting, validateAccessCode } from '@services/pcsApi/pcsApiService';
+import {
+  getCitizenClaims,
+  getPropertyEligibility,
+  getRootGreeting,
+  validateAccessCode,
+} from '@services/pcsApi/pcsApiService';
 
 jest.mock('config', () => ({
   get: jest.fn(),
@@ -117,6 +122,30 @@ describe('pcsApiService', () => {
     test('throws when response data is not an array', async () => {
       mockHttp.get.mockResolvedValue({ data: null });
       await expect(getCitizenClaims(accessToken)).rejects.toThrow('Unexpected response from citizen-claims endpoint');
+    });
+  });
+
+  describe('getPropertyEligibility', () => {
+    test('asks about the postcode as the citizen, with the country when given', async () => {
+      mockHttp.get.mockResolvedValue({ data: { status: 'NOT_COVERED' } });
+      await expect(getPropertyEligibility('token', 'LU1 1AB', 'England')).resolves.toBe('NOT_COVERED');
+      expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/cases/citizen-claims/property-eligibility`, {
+        headers: { Authorization: 'Bearer token' },
+        params: { postcode: 'LU1 1AB', legislativeCountry: 'England' },
+      });
+    });
+
+    test('sends only the postcode when no country is given', async () => {
+      mockHttp.get.mockResolvedValue({ data: { status: 'ELIGIBLE' } });
+      await getPropertyEligibility('token', 'LU1 1AB');
+      expect(mockHttp.get.mock.calls[0][1].params).toEqual({ postcode: 'LU1 1AB' });
+    });
+
+    test('throws on a status it does not know', async () => {
+      mockHttp.get.mockResolvedValue({ data: { status: 'MAYBE' } });
+      await expect(getPropertyEligibility('token', 'LU1 1AB')).rejects.toThrow(
+        'Unexpected response from property-eligibility endpoint'
+      );
     });
   });
 });

@@ -93,6 +93,11 @@ const PAYMENT_OUTCOME_BY_STATUS: Record<string, PaymentOutcome> = {
   created: 'pending',
 };
 
+/** Whether the card was declined, as one way a payment fails that a journey may explain on its own. */
+export function isDeclinedPaymentStatus(status?: string): boolean {
+  return status?.trim().toLowerCase() === 'declined';
+}
+
 export function getPaymentOutcome(status?: string): PaymentOutcome {
   const normalizedStatus = status?.trim().toLowerCase() ?? '';
   return PAYMENT_OUTCOME_BY_STATUS[normalizedStatus] ?? 'pending';

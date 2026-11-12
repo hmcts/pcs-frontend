@@ -1,0 +1,9 @@
+{
+  "pageTitle": "You cannot use this service",
+  "heading": "You cannot use this service",
+  "paragraphs": [
+    "You can only make a possession claim against a property in England using this service.",
+    "If your property is in Wales, use <a class=\"govuk-link\" href=\"https://www.gov.uk/government/publications/form-n5-claim-form-for-possession-of-property\" target=\"_blank\" rel=\"noopener noreferrer\">form N5 (opens in new tab)</a>. If your property is in Scotland, you can use your local sheriff court. There’s a different process in Northern Ireland."
+  ],
+  "exitText": "Close and return to the GOV.UK homepage"
+}

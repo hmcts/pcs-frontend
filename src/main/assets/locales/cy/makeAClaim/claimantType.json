@@ -1,0 +1,12 @@
+{
+  "pageTitle": "cyWhat type of claimant are you?",
+  "question": "cyWhat type of claimant are you?",
+  "options": {
+    "PRIVATE_LANDLORD": "cyPrivate landlord",
+    "SOCIAL_LANDLORD": "cyRegistered provider of social housing (housing association or local authority)",
+    "MORTGAGE_LENDER": "cyMortgage provider"
+  },
+  "errors": {
+    "claimantType": "cySelect what type of claimant you are"
+  }
+}

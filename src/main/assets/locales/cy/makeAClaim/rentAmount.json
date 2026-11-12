@@ -1,0 +1,9 @@
+{
+  "pageTitle": "cyHow much is the rent?",
+  "question": "cyHow much is the rent?",
+  "hint": "cyYou can say how often this amount is paid on the next screen",
+  "errors": {
+    "rentAmount": "cyEnter how much the rent is",
+    "rentAmountInvalid": "cyEnter the rent as an amount of money, like 1000 or 1000.50"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "pageTitle": "Have you served notice?",
+  "question": "Have you served notice?",
+  "hint": "A notice is a formal communication telling the defendants that you intend to repossess the property, like form 3A.",
+  "labels": {
+    "noNoticeReason": "Why have you not served notice to the defendants?"
+  },
+  "errors": {
+    "noticeServed": "Select whether you have served notice",
+    "noNoticeReason": "Explain why you have not served notice"
+  },
+  "fieldNames": {
+    "noNoticeReason": "Your reason for not serving notice"
+  }
+}

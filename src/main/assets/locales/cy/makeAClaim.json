@@ -1,0 +1,308 @@
+{
+  "buttons": {
+    "continue": "cyContinue",
+    "saveAndContinue": "cySave and continue",
+    "saveForLater": "cySave for later",
+    "cancel": "cyCancel"
+  },
+  "options": {
+    "yes": "cyYes",
+    "no": "cyNo"
+  },
+  "address": {
+    "labels": {
+      "addressLine1": "cyAddress line 1",
+      "addressLine2": "cyAddress line 2 (optional)",
+      "town": "cyTown or city",
+      "county": "cyCounty (optional)",
+      "postcode": "cyPostcode"
+    },
+    "finder": {
+      "enterPostcode": "cyEnter a UK postcode",
+      "findAddress": "cyFind address",
+      "selectAddress": "cySelect an address",
+      "enterManually": "cyEnter the address manually",
+      "lookupPostcodeError": "cyEnter a postcode to find an address",
+      "postcodeNotFoundError": "cyWe could not find any addresses for that postcode",
+      "selectAddressError": "cySelect an address"
+    }
+  },
+  "grounds": {
+    "GROUND_1": "cyOccupation by landlord or family (Ground 1)",
+    "GROUND_1A": "cySale of dwelling house (Ground 1A)",
+    "GROUND_1B": "cySale of dwelling house that is part of Rent to Buy (Ground 1B)",
+    "GROUND_2": "cySale by mortgagee (Ground 2)",
+    "GROUND_2ZA": "cyPossession when superior lease ends (Ground 2ZA)",
+    "GROUND_2ZB": "cyPossession when fixed term superior lease ends (Ground 2ZB)",
+    "GROUND_2ZC": "cyPossession by superior landlord (Ground 2ZC)",
+    "GROUND_2ZD": "cyPossession by superior landlord (fixed term) (Ground 2ZD)",
+    "GROUND_4": "cyStudent accommodation (Ground 4)",
+    "GROUND_4A": "cyProperties rented to students for occupation by new students (Ground 4A)",
+    "GROUND_5": "cyMinisters of religion (Ground 5)",
+    "GROUND_5A": "cyOccupation by agricultural worker (Ground 5A)",
+    "GROUND_5B": "cyOccupation by person who meets employment requirements (Ground 5B)",
+    "GROUND_5C": "cyEnd of employment by the landlord (Ground 5C)",
+    "GROUND_5D": "cyEnd of employment requirements (Ground 5D)",
+    "GROUND_5E": "cyOccupation as supported accommodation (Ground 5E)",
+    "GROUND_5F": "cyDwelling-house occupied as supported accommodation (Ground 5F)",
+    "GROUND_5G": "cyTenancy granted for homelessness duty (Ground 5G)",
+    "GROUND_5H": "cyOccupation as ‘stepping stone accommodation’ (Ground 5H)",
+    "GROUND_6": "cyRedevelopment (Ground 6)",
+    "GROUND_6A": "cyDecant accommodation (Ground 6A)",
+    "GROUND_6B": "cyCompliance with enforcement action (Ground 6B)",
+    "GROUND_7": "cyDeath of tenant (Ground 7)",
+    "GROUND_7A": "cySevere antisocial or criminal behaviour (Ground 7A)",
+    "GROUND_7B": "cyNo right to rent (Ground 7B)",
+    "OTHER": "cyOther grounds not listed here",
+    "GROUND_8": "cyThe defendant had rent arrears of more than 13 weeks or 3 months at the date of service of notice and on the date of the hearing (Ground 8)",
+    "GROUND_9": "cySuitable alternative accommodation (Ground 9)",
+    "GROUND_10": "cyThe defendant has some unpaid rent (Ground 10)",
+    "GROUND_11": "cyThe defendant is persistently late paying rent (Ground 11)",
+    "GROUND_12": "cyBreach of tenancy (Ground 12)",
+    "GROUND_13": "cyDeterioration of property (Ground 13)",
+    "GROUND_14": "cyAntisocial behaviour (Ground 14)",
+    "GROUND_14A": "cyDomestic abuse (Ground 14A)",
+    "GROUND_14ZA": "cyRioting (Ground 14ZA)",
+    "GROUND_15": "cyDeterioration of furniture (Ground 15)",
+    "GROUND_17": "cyFalse statement (Ground 17)",
+    "GROUND_18": "cySupported accommodation (Ground 18)"
+  },
+  "values": {
+    "individualOrOrganisation": {
+      "INDIVIDUAL": "cyAn individual",
+      "ORGANISATION": "cyA registered company or organisation"
+    },
+    "tenancyType": {
+      "ASSURED": "cyAssured or assured periodic tenancy",
+      "EXCLUDED": "cyExcluded tenancy or licence",
+      "REGULATED": "cyRegulated tenancy",
+      "OTHER": "cyOther"
+    },
+    "noticeType": {
+      "NOTICE_SEEKING_POSSESSION": "cyNotice seeking possession",
+      "NOTICE_TO_QUIT": "cyNotice to quit",
+      "OTHER": "cyOther"
+    },
+    "noticeMethod": {
+      "FIRST_CLASS_POST": "cyBy first class post or a next business day delivery service",
+      "PERMITTED_PLACE": "cyBy delivering it to or leaving it at a permitted place",
+      "PERSONALLY_HANDED": "cyBy personally handing it to or leaving it with someone",
+      "EMAIL": "cyBy email",
+      "OTHER_ELECTRONIC": "cyBy another electronic method",
+      "OTHER": "cyAnother way"
+    },
+    "rentFrequency": {
+      "WEEKLY": "cyWeekly",
+      "FORTNIGHTLY": "cyFortnightly",
+      "MONTHLY": "cyMonthly",
+      "OTHER": "cyOther"
+    },
+    "proofType": {
+      "UPLOAD_STATEMENT": "cyUpload a rent statement",
+      "LEDGER": "cyEnter the rent statement transactions",
+      "TABLE": "cyCreate a rent statement"
+    },
+    "languageUsed": {
+      "ENGLISH": "cyEnglish",
+      "WELSH": "cyWelsh",
+      "ENGLISH_AND_WELSH": "cyEnglish and Welsh"
+    }
+  },
+  "taskList": {
+    "groups": {
+      "beforeYouStart": "cyBefore you start",
+      "yourClaim": "cyYour claim",
+      "otherInformation": "cyOther information",
+      "reviewAndSubmit": "cyReview and submit"
+    },
+    "sections": {
+      "eligibility": "cyCheck you’re eligible to use this service",
+      "aboutYou": "cyAbout you and your contact preferences",
+      "defendants": "cyAbout the defendants",
+      "tenancyGroundsAndNotice": "cyAbout the tenancy, your grounds and notice served",
+      "rentArrears": "cyProof of rent arrears",
+      "circumstances": "cyCircumstances",
+      "otherInformation": "cyUpload files and other information",
+      "checkAndSubmit": "cyCheck your answers and submit"
+    },
+    "status": {
+      "AVAILABLE": "cyAvailable",
+      "IN_PROGRESS": "cyIn progress",
+      "DONE": "cyDone",
+      "NOT_AVAILABLE_YET": "cyNot available yet"
+    }
+  },
+  "summary": {
+    "change": "cyChange",
+    "remove": "cyRemove",
+    "changeStatement": "cyChange the rent statement",
+    "notAnswered": "cyNot answered",
+    "personsUnknown": "cyPersons unknown",
+    "propertyCannotChange": "cyYou cannot change the property once the claim has been started. If it is wrong, start a new claim.",
+    "problem": "cyThere is a problem",
+    "cards": {
+      "property": "cyThe property",
+      "aboutYou": "cyYour details and contact preferences",
+      "defendants": "cyDefendant details",
+      "tenancy": "cyTenancy or licence and grounds for possession",
+      "notice": "cyNotice details",
+      "rentArrears": "cyRent arrears",
+      "circumstances": "cyCircumstances",
+      "otherInformation": "cyOther information"
+    },
+    "labels": {
+      "individualOrOrganisation": "cyAre you claiming as an individual or a registered company?",
+      "claimantName": "cyYour name",
+      "organisationName": "cyCompany or organisation name",
+      "claimantAddress": "cyYour postal address",
+      "emailAddress": "cyEmail address for updates",
+      "contactByPhone": "cyDo you want to be contacted by telephone?",
+      "contactByText": "cyDo you want to be contacted by text message?",
+      "multipleClaimants": "cyDo you want to add another claimant?",
+      "defendantName": "cyDefendant {{number}} name",
+      "defendantAddress": "cyDefendant {{number}} address for service",
+      "additionalDefendants": "cyDo you need to add another defendant?",
+      "tenancyType": "cyType of tenancy or licence",
+      "tenancyStartDate": "cyWhen the tenancy or licence began",
+      "tenancyAgreementAvailable": "cyCan you upload a copy of the tenancy or licence agreement?",
+      "tenancyAgreementDocuments": "cyTenancy or licence agreement",
+      "hasRentArrearsGrounds": "cyAre you claiming possession because you’re owed rent?",
+      "rentArrearsGrounds": "cyRent arrears grounds",
+      "hasOtherGrounds": "cyDo you have any other grounds for possession?",
+      "otherGrounds": "cyOther grounds for possession",
+      "groundReason": "cyWhy you are claiming under {{ground}}",
+      "propertyAddress": "cyAddress of the property",
+      "noticeServed": "cyHave you served notice?",
+      "noticeType": "cyType of notice",
+      "noticeDate": "cyWhen the notice was served",
+      "noticeMethods": "cyHow the notice was served",
+      "noticeAvailable": "cyCan you upload a copy of the notice?",
+      "noticeDocuments": "cyNotice",
+      "rentAmount": "cyRent",
+      "rentFrequency": "cyHow often the rent should be paid",
+      "rentDueDay": "cyDay of the month the rent is due",
+      "arrearsAtNoticeDate": "cyRent arrears on the date notice was served",
+      "currentArrears": "cyRent arrears today",
+      "proofType": "cyProof of rent arrears",
+      "rentStatementDocuments": "cyRent statement",
+      "moneyJudgmentWanted": "cyDo you want a money judgment for the rent arrears?",
+      "recoverySteps": "cySteps taken to recover the arrears",
+      "defendantCircumstances": "cyThe defendants’ circumstances",
+      "claimantCircumstances": "cyYour circumstances",
+      "underlesseeExists": "cyIs there a sub-tenant or mortgage lender?",
+      "underlesseeName": "cySub-tenant or mortgage lender’s name",
+      "underlesseeAddress": "cySub-tenant or mortgage lender’s address",
+      "otherDocuments": "cyOther files",
+      "hasOtherReasons": "cyOther information about your reasons for possession",
+      "generalApplicationIntent": "cyDo you need to make a general application before a hearing is scheduled?",
+      "languageUsed": "cyLanguage used to complete this claim"
+    }
+  },
+  "ledgerTable": {
+    "caption": "cyRent statement transactions",
+    "date": "cyDate",
+    "type": "cyTransaction type",
+    "description": "cyDescription or reference",
+    "amountCharged": "cyAmount charged",
+    "amountPaid": "cyAmount paid",
+    "arrears": "cyArrears",
+    "actions": "cyActions",
+    "change": "cyChange",
+    "remove": "cyRemove",
+    "transaction": "cytransaction",
+    "types": {
+      "RENT_CHARGE": "cyRent charge",
+      "TENANT_PAYMENT": "cyTenant payment"
+    }
+  },
+  "rentTable": {
+    "caption": "cyRent statement",
+    "dateDue": "cyDate due",
+    "amountDue": "cyAmount due",
+    "datePaid": "cyDate paid",
+    "amountPaid": "cyAmount paid",
+    "arrears": "cyTotal arrears",
+    "actions": "cyActions",
+    "change": "cyChange",
+    "addPayment": "cyAdd a payment",
+    "paymentFor": "cypayment for rent due on",
+    "additionalPayment": "cyAdditional payment",
+    "remove": "cyRemove"
+  },
+  "submitErrors": {
+    "required": "cyAnswer the question on ‘{{page}}’",
+    "tooLong": "cyYour answer on ‘{{page}}’ is too long. Make it shorter",
+    "checkAnswers": "cySome of your answers are missing. Check each section of your claim",
+    "draftNotFound": "cyWe could not find your saved answers. Start your claim again",
+    "draftChanged": "cyYour claim was changed in another tab or window. Check your answers below, then submit your claim again",
+    "otherGroundNotAllowed": "cyChoose rent arrears grounds on the rent arrears question, not as other grounds",
+    "paymentServiceUnavailable": "cyYour claim could not be submitted because a service we need is not available. Try again later",
+    "failed": "cyYour claim could not be submitted. Try again",
+    "pages": {
+      "individual-or-organisation": "cyAre you claiming as an individual or a registered company?",
+      "claimant-name": "cyWhat is your name?",
+      "organisation-name": "cyWhat is your company or organisation name?",
+      "claimant-address": "cyWhat is your postal address?",
+      "claimant-email": "cyEmail updates",
+      "claimant-phone": "cyDo you want to be contacted by telephone?",
+      "claimant-text-message": "cyDo you want to be contacted by text message?",
+      "defendant-name": "cyDo you know the defendant’s name?",
+      "defendant-address": "cyDefendant’s address for service",
+      "tenancy-type": "cyWhat type of tenancy or licence is in place?",
+      "tenancy-agreement": "cyCan you upload a copy of the tenancy or licence agreement?",
+      "rent-arrears-claim": "cyAre you claiming possession because you’re owed rent?",
+      "other-grounds": "cyWhat are your grounds for possession?",
+      "rent-arrears-grounds": "cyWhat are the rent arrears grounds for possession?",
+      "rent-frequency": "cyHow often should the rent be paid?",
+      "recovery-steps": "cyWhat steps have you already taken to recover the arrears?",
+      "ledger-transaction": "cyEnter a rent statement transaction",
+      "underlessee-address": "cyWhat is the sub-tenant or mortgage lender’s postal address?",
+      "ground-reason": "cyWhy are you making a claim on this ground?",
+      "current-arrears": "cyWhat are the rent arrears today?",
+      "notice-served": "cyHave you served notice?",
+      "notice-type": "cyWhich type of notice did you serve?",
+      "notice-date": "cyWhen was the notice served?",
+      "notice-available": "cyCan you upload a copy of the notice you served?",
+      "notice-method": "cyHow did you serve notice?",
+      "defendant-circumstances": "cyThe defendants’ circumstances",
+      "claimant-circumstances": "cyYour circumstances",
+      "underlessee-name": "cyWhat is the sub-tenant or mortgage lender’s name?",
+      "language-used": "cyWhich language did you use to complete this claim?",
+      "other-reasons": "cyOther information about your reasons for possession",
+      "check-your-answers": "cyStatement of truth",
+      "rent-amount": "cyHow much is the rent?",
+      "arrears-at-notice": "cyWhat were the rent arrears on the date you served the notice?",
+      "rent-statement": "cyRent statement",
+      "rent-statement-payment": "cyAdd a payment",
+      "upload-tenancy-agreement": "cyUpload the tenancy or licence agreement",
+      "upload-notice": "cyUpload the notice",
+      "upload-rent-statement": "cyUpload rent statement",
+      "upload-other-documents": "cyUpload files"
+    },
+    "rentArrearsGroundNotAllowed": "cyChoose only rent arrears grounds on the rent arrears grounds question"
+  },
+  "payClaimFee": {
+    "pageTitle": "cyPay your claim fee",
+    "heading": "cyPay your claim fee",
+    "feeHeading": "cyFee",
+    "amountHeading": "cyAmount",
+    "feeName": "cyClaim fee",
+    "redirectText": "cyYou’ll be taken to GOV.UK Pay to pay by debit or credit card.",
+    "payButton": "cyPay your claim fee",
+    "problemTitle": "cyThere is a problem",
+    "paymentFailed": "cyYour payment was not successful. You have not been charged. Try again.",
+    "paymentDeclined": "cyYour card was declined. You have not been charged. Try again or use a different card."
+  },
+  "claimSubmitted": {
+    "pageTitle": "cyClaim submitted",
+    "panelTitle": "cyClaim submitted",
+    "pendingTitle": "cyYour payment is being processed",
+    "panelText": "cyYour case number<br><strong>{{caseNumber}}</strong>",
+    "whatHappensNextHeading": "cyWhat happens next",
+    "whatHappensNext": [
+      "cyWe’ll check your claim. When it has been issued, we’ll send it to the defendants and tell you the date of the court hearing.",
+      "cyIf you said you need to make a general application, you must make it within 24 hours of submitting this claim."
+    ],
+    "feedbackLink": "cyWhat did you think of this service? (opens in new tab)"
+  }
+}

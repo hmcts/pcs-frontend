@@ -1,0 +1,21 @@
+{
+  "pageTitle": "cyHow often should the rent be paid?",
+  "question": "cyHow often should this amount be paid?",
+  "options": {
+    "WEEKLY": "cyWeekly",
+    "FORTNIGHTLY": "cyFortnightly",
+    "MONTHLY": "cyMonthly",
+    "OTHER": "cyOther"
+  },
+  "labels": {
+    "otherFrequencyDetails": "cyHow often should the rent be paid?"
+  },
+  "errors": {
+    "rentFrequency": "cySelect how often the rent should be paid",
+    "otherFrequencyDetails": "cyEnter how often the rent should be paid",
+    "tooManyPeriods": "cyThe rent statement would then cover more than {{limit}} rent periods. Change the statement period to a shorter one first"
+  },
+  "fieldNames": {
+    "otherFrequencyDetails": "cyHow often the rent should be paid"
+  }
+}

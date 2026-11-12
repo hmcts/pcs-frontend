@@ -1,0 +1,7 @@
+{
+  "pageTitle": "cyRemove a payment",
+  "question": "cyAre you sure you want to remove the payment of {{amountPaid}} made on {{datePaid}}?",
+  "errors": {
+    "confirmRemove": "cySelect whether you want to remove this payment"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "pageTitle": "cyWhen was the notice served?",
+  "question": "cyWhen was the notice served?",
+  "hint": "cyFor example, 27 9 2022",
+  "errors": {
+    "date": {
+      "required": "cyEnter the date the notice was served",
+      "notRealDate": "cyThe date the notice was served must be a real date",
+      "invalidValue": "cyThe date the notice was served must be a real date",
+      "futureDate": "cyThe date the notice was served must be today or in the past",
+      "missingOne": "cyThe date the notice was served must include a {{missingField}}",
+      "missingTwo": "cyThe date the notice was served must include a {{first}} and {{second}}",
+      "day": "cyDay",
+      "month": "cyMonth",
+      "year": "cyYear"
+    }
+  }
+}

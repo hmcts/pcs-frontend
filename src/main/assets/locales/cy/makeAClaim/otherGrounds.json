@@ -1,0 +1,29 @@
+{
+  "pageTitle": "cyWhat are your grounds for possession?",
+  "heading": "cyWhat are your grounds for possession?",
+  "paragraphs": [
+    "cySelect the grounds you want to use for this claim. These may be the same grounds you included in the notice you served, or additional grounds you want to rely on since serving it.",
+    "cyRead <a class=\"govuk-link\" href=\"https://www.gov.uk/government/publications/grounds-for-possession-guidance-for-landlords-and-letting-agents\" target=\"_blank\" rel=\"noopener noreferrer\">guidance about possession grounds (opens in new tab)</a>."
+  ],
+  "mandatory": {
+    "legend": "cyMandatory grounds",
+    "hint": "cyIf you make a claim on mandatory grounds, the court will accept your reasons for possession if they can be proven. Select all that apply."
+  },
+  "other": {
+    "legend": "cyOther grounds"
+  },
+  "discretionary": {
+    "legend": "cyDiscretionary grounds",
+    "hint": "cyIf you make a claim on discretionary grounds, a judge will decide whether possession is reasonable. Select all that apply."
+  },
+  "labels": {
+    "otherGroundsDetails": "cyGive details of your other grounds for possession"
+  },
+  "errors": {
+    "mandatoryGrounds": "cySelect at least one ground for possession",
+    "otherGroundsDetails": "cyGive details of your other grounds for possession"
+  },
+  "fieldNames": {
+    "otherGroundsDetails": "cyThe details of your other grounds"
+  }
+}

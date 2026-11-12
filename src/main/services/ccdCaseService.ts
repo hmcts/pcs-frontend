@@ -40,6 +40,7 @@ import { http } from '@modules/http';
 import { Logger } from '@modules/logger';
 import { GenAppType, MakeAnApplicationResponse } from '@services/ccdCase.interface';
 import type { CcdCase, CcdCaseData, CcdPartySupportEntry, StartCallbackData } from '@services/ccdCase.interface';
+import type { CitizenPossessionClaim } from '@services/citizenPossessionClaim.interface';
 import type { CcdFlags } from '@services/cuiRa/cuiRa.interface';
 import type {
   DashboardNotification,
@@ -199,10 +200,10 @@ function convertReadErrorToHttpError(error: unknown, context: string): HTTPError
  * @param url - CCD event trigger URL
  * @returns Event token for SUBMIT phase
  */
-async function getEventToken(userToken: string, url: string): Promise<string> {
+async function getEventToken(userToken: string, url: string, timeout?: number): Promise<string> {
   try {
     logger.info(`Calling getEventToken with URL: ${url}`);
-    const response = await http.get<EventTokenResponse>(url, getCaseHeaders(userToken));
+    const response = await http.get<EventTokenResponse>(url, { ...getCaseHeaders(userToken), timeout });
     return response.data.token;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'getEventToken');
@@ -232,7 +233,8 @@ async function submitEvent(
   url: string,
   eventId: string,
   eventToken: string,
-  data: CcdCaseData | Record<string, unknown>
+  data: CcdCaseData | Record<string, unknown>,
+  timeout?: number
 ): Promise<CcdCase> {
   const payload = {
     data: data as Record<string, unknown>,
@@ -247,7 +249,7 @@ async function submitEvent(
 
   try {
     logger.info(`Calling submitEvent with URL: ${url}, eventId: ${eventId}`);
-    const response = await http.post<CcdCase>(url, payload, getCaseHeaders(userToken));
+    const response = await http.post<CcdCase>(url, payload, { ...getCaseHeaders(userToken), timeout });
     return response.data;
   } catch (error) {
     throw convertAxiosErrorToHttpError(error, 'submitEvent');
@@ -255,6 +257,16 @@ async function submitEvent(
 }
 
 export const DEFENDANT_SUPPORT_EVENT_ID = 'requestSupport';
+
+export const CITIZEN_CREATE_POSSESSION_CLAIM_EVENT_ID = 'citizenCreatePossessionClaim';
+
+/** The longest each of the create event's two CCD calls may take, so a stuck creation fails rather than hangs. */
+const CREATE_POSSESSION_CLAIM_TIMEOUT_MS = 30_000;
+
+/** What the citizen create event takes: the property and eligibility answers, inside the claim pcs-api starts. */
+export interface CitizenCreatePossessionClaimData {
+  citizenPossessionClaim: Required<Pick<CitizenPossessionClaim, 'propertyAddress' | 'eligibility'>>;
+}
 
 export interface DefendantSupport {
   partyId: string;
@@ -296,7 +308,33 @@ async function startDefendantSupport(userToken: string, caseId: string): Promise
   }
 }
 
+interface CaseSearchResponse {
+  total?: number;
+  cases?: { id?: number | string; state?: string }[];
+}
+
 export const ccdCaseService = {
+  /**
+   * The references of the signed-in user's own PCS cases in `state`, newest first, from CCD's case search. CCD only
+   * returns cases the user can read, which for a citizen are those they hold a case role on.
+   */
+  async searchOwnCasesInState(accessToken: string, state: string, size = 1): Promise<string[]> {
+    const url = `${getBaseUrl()}/searchCases?ctid=${encodeURIComponent(getCaseTypeId())}`;
+    const query = {
+      query: { bool: { filter: [{ match: { state } }] } },
+      sort: [{ created_date: { order: 'desc' } }],
+      size,
+    };
+    try {
+      const response = await http.post<CaseSearchResponse>(url, query, getCaseHeaders(accessToken));
+      return (response.data.cases ?? [])
+        .filter(found => found.id !== undefined && (found.state === undefined || found.state === state))
+        .map(found => String(found.id));
+    } catch (error) {
+      throw convertAxiosErrorToHttpError(error, 'searchOwnCasesInState');
+    }
+  },
+
   async getCaseByIdForEvent(
     accessToken: string,
     caseId: string,
@@ -378,6 +416,7 @@ export const ccdCaseService = {
       return {
         id: String(response.data.id ?? safeCaseId),
         data: caseData,
+        ...(response.data.state ? { state: response.data.state } : {}),
       };
     } catch (error) {
       throw convertReadErrorToHttpError(error, 'getCaseById');
@@ -385,22 +424,22 @@ export const ccdCaseService = {
   },
 
   /**
-   * Create a new case in CCD
-   *
-   * Follows CCD's two-phase START → SUBMIT pattern.
-   *
-   * @param accessToken - User's OIDC access token
-   * @param data - Initial case data
-   * @returns Created case with merged data from CCD
+   * Creates a private landlord's possession claim through the case-type-level citizen create event. The
+   * creating citizen holds the case's [CREATOR] role as soon as CCD answers.
    */
-  async createCase(accessToken: string | undefined, data: Record<string, unknown>): Promise<CcdCase> {
-    // Phase 1: START - Get event token
-    const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/citizenCreateApplication`;
-    const eventToken = await getEventToken(accessToken || '', eventUrl);
+  async createPossessionClaim(accessToken: string, data: CitizenCreatePossessionClaimData): Promise<CcdCase> {
+    const eventUrl = `${getBaseUrl()}/case-types/${getCaseTypeId()}/event-triggers/${CITIZEN_CREATE_POSSESSION_CLAIM_EVENT_ID}`;
+    const eventToken = await getEventToken(accessToken, eventUrl, CREATE_POSSESSION_CLAIM_TIMEOUT_MS);
 
-    // Phase 2: SUBMIT - Create case and receive result
     const url = `${getBaseUrl()}/case-types/${getCaseTypeId()}/cases`;
-    return submitEvent(accessToken || '', url, 'citizenCreateApplication', eventToken, data);
+    return submitEvent(
+      accessToken,
+      url,
+      CITIZEN_CREATE_POSSESSION_CLAIM_EVENT_ID,
+      eventToken,
+      { ...data },
+      CREATE_POSSESSION_CLAIM_TIMEOUT_MS
+    );
   },
 
   /**

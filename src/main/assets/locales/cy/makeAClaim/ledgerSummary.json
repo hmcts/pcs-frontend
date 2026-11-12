@@ -1,0 +1,10 @@
+{
+  "pageTitle": "cyRent statement transaction history",
+  "heading": "cyRent statement transaction history",
+  "totalArrearsLabel": "cyTotal arrears:",
+  "emptyTable": "cyYou have not added any transactions yet.",
+  "question": "cyDo you want to add another transaction?",
+  "errors": {
+    "addAnother": "cySelect whether you want to add another transaction"
+  }
+}

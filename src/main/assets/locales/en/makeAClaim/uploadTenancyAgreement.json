@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Upload the tenancy or licence agreement",
+  "heading": "Upload the tenancy or licence agreement",
+  "paragraphs": ["Upload a signed copy of the tenancy or licence agreement."],
+  "beforeUploadHeading": "Before you upload your file",
+  "beforeUploadText": "Give your file a name that explains what it is. For example, ‘Tenancy agreement – 15 Garden Drive’.",
+  "uploadLabel": "Upload a file",
+  "uploadButton": "Upload file",
+  "filesAddedHeading": "Files added",
+  "deleteButton": "Remove",
+  "errors": {
+    "documents": "Upload the tenancy or licence agreement"
+  }
+}

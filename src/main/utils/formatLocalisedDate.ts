@@ -14,6 +14,11 @@ const FORMATS: Record<Exclude<DateStyle, 'ordinal'>, string> = {
 
 const ENGLISH_ORDINAL_SUFFIXES: Record<string, string> = { one: 'st', two: 'nd', few: 'rd', other: 'th' };
 
+/** Today's date in the UK, as yyyy-MM-dd, whatever the server's time zone. */
+export function todayInLondon(now: Date = new Date()): string {
+  return DateTime.fromJSDate(now).setZone(UK_ZONE).toISODate() as string;
+}
+
 /** Maps an application language code to the Luxon locale used for date formatting. */
 export function toDateLocale(language?: string): string {
   return language?.toLowerCase() === 'cy' ? 'cy' : 'en-gb';

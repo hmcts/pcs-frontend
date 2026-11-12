@@ -1,0 +1,8 @@
+{
+  "pageTitle": "The defendants’ circumstances",
+  "question": "Give information about the defendants’ circumstances (optional)",
+  "hint": "If you have any information about the defendants’ circumstances that you think the court should be aware of, you can share it here.",
+  "fieldNames": {
+    "defendantCircumstances": "The defendants’ circumstances"
+  }
+}

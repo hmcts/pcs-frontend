@@ -1,0 +1,9 @@
+{
+  "pageTitle": "What are the rent arrears today?",
+  "question": "What are the rent arrears on today’s date?",
+  "hint": "Give the total amount of rent the defendants owe today",
+  "errors": {
+    "currentArrears": "Enter the rent arrears today",
+    "currentArrearsInvalid": "Enter the arrears as an amount of money, like 3000 or 3000.50"
+  }
+}

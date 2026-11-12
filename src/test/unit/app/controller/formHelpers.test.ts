@@ -975,7 +975,8 @@ describe('formHelpers', () => {
         expect(validateFn).toHaveBeenCalledWith(
           'value1',
           expect.objectContaining({ field1: 'value1', field2: 'value2' }),
-          expect.objectContaining({ previousField: 'previousValue', field1: 'value1', field2: 'value2' })
+          expect.objectContaining({ previousField: 'previousValue', field1: 'value1', field2: 'value2' }),
+          req
         );
       });
 
@@ -2543,7 +2544,8 @@ describe('formHelpers', () => {
         expect(validateFn).toHaveBeenCalledWith(
           'value1',
           expect.objectContaining({ field1: 'value1', field2: 'value2' }),
-          expect.objectContaining({ previousField: 'previousValue', field1: 'value1', field2: 'value2' })
+          expect.objectContaining({ previousField: 'previousValue', field1: 'value1', field2: 'value2' }),
+          req
         );
       });
 

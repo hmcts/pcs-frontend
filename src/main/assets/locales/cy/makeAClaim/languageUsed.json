@@ -1,0 +1,13 @@
+{
+  "pageTitle": "cyWhich language did you use to complete this claim?",
+  "question": "cyWhich language did you use to complete this claim?",
+  "hint": "cyIf someone else helped you to answer a question, ask them if they answered any questions in Welsh. We’ll use this to make sure your claim is processed correctly.",
+  "options": {
+    "ENGLISH": "cyEnglish",
+    "WELSH": "cyWelsh",
+    "ENGLISH_AND_WELSH": "cyEnglish and Welsh"
+  },
+  "errors": {
+    "languageUsed": "cySelect which language you used to complete this claim"
+  }
+}

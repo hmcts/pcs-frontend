@@ -1,0 +1,102 @@
+{
+  "pageTitle": "How did you serve notice?",
+  "question": "How did you serve notice?",
+  "hint": "Select all that apply",
+  "options": {
+    "FIRST_CLASS_POST": "By first class post or a next business day delivery service",
+    "PERMITTED_PLACE": "By delivering it to or leaving it at a permitted place",
+    "PERSONALLY_HANDED": "By personally handing it to or leaving it with someone",
+    "EMAIL": "By email",
+    "OTHER_ELECTRONIC": "By another electronic method",
+    "OTHER": "Another way"
+  },
+  "labels": {
+    "postedDate": "When was the notice posted?",
+    "deliveredDate": "When was the notice delivered?",
+    "handedToName": "Who was the notice left with?",
+    "handedDate": "When was the notice handed over?",
+    "emailedTo": "What email address was the notice sent to?",
+    "emailedDate": "When was the email sent?",
+    "otherElectronicDetails": "How was the notice sent?",
+    "otherElectronicDate": "When was the notice sent?",
+    "otherMethodDetails": "How did you serve the notice?",
+    "otherMethodDate": "When was the notice served?"
+  },
+  "hints": {
+    "otherElectronicDetails": "For example, in a group text message"
+  },
+  "errors": {
+    "noticeMethods": "Select how you served notice",
+    "handedToName": "Enter who the notice was left with",
+    "emailedTo": "Enter the email address the notice was sent to",
+    "otherElectronicDetails": "Enter how the notice was sent",
+    "otherMethodDetails": "Enter how you served the notice",
+    "date": {
+      "required": "Enter the date",
+      "notRealDate": "The date must be a real date",
+      "invalidValue": "The date must be a real date",
+      "futureDate": "The date must be today or in the past",
+      "missingOne": "The date must include a {{missingField}}",
+      "missingTwo": "The date must include a {{first}} and {{second}}",
+      "day": "Day",
+      "month": "Month",
+      "year": "Year"
+    },
+    "emailedToInvalid": "Enter an email address in the correct format, like name@example.com"
+  },
+  "dateErrors": {
+    "postedDate": {
+      "required": "Enter the date the notice was posted",
+      "notRealDate": "The date the notice was posted must be a real date",
+      "invalidValue": "The date the notice was posted must be a real date",
+      "futureDate": "The date the notice was posted must be today or in the past",
+      "missingOne": "The date the notice was posted must include a {{missingField}}",
+      "missingTwo": "The date the notice was posted must include a {{first}} and {{second}}"
+    },
+    "deliveredDate": {
+      "required": "Enter the date the notice was delivered",
+      "notRealDate": "The date the notice was delivered must be a real date",
+      "invalidValue": "The date the notice was delivered must be a real date",
+      "futureDate": "The date the notice was delivered must be today or in the past",
+      "missingOne": "The date the notice was delivered must include a {{missingField}}",
+      "missingTwo": "The date the notice was delivered must include a {{first}} and {{second}}"
+    },
+    "handedDate": {
+      "required": "Enter the date the notice was handed over",
+      "notRealDate": "The date the notice was handed over must be a real date",
+      "invalidValue": "The date the notice was handed over must be a real date",
+      "futureDate": "The date the notice was handed over must be today or in the past",
+      "missingOne": "The date the notice was handed over must include a {{missingField}}",
+      "missingTwo": "The date the notice was handed over must include a {{first}} and {{second}}"
+    },
+    "emailedDate": {
+      "required": "Enter the date the email was sent",
+      "notRealDate": "The date the email was sent must be a real date",
+      "invalidValue": "The date the email was sent must be a real date",
+      "futureDate": "The date the email was sent must be today or in the past",
+      "missingOne": "The date the email was sent must include a {{missingField}}",
+      "missingTwo": "The date the email was sent must include a {{first}} and {{second}}"
+    },
+    "otherElectronicDate": {
+      "required": "Enter the date the notice was sent",
+      "notRealDate": "The date the notice was sent must be a real date",
+      "invalidValue": "The date the notice was sent must be a real date",
+      "futureDate": "The date the notice was sent must be today or in the past",
+      "missingOne": "The date the notice was sent must include a {{missingField}}",
+      "missingTwo": "The date the notice was sent must include a {{first}} and {{second}}"
+    },
+    "otherMethodDate": {
+      "required": "Enter the date the notice was served",
+      "notRealDate": "The date the notice was served must be a real date",
+      "invalidValue": "The date the notice was served must be a real date",
+      "futureDate": "The date the notice was served must be today or in the past",
+      "missingOne": "The date the notice was served must include a {{missingField}}",
+      "missingTwo": "The date the notice was served must include a {{first}} and {{second}}"
+    }
+  },
+  "fieldNames": {
+    "handedToName": "The name of who the notice was left with",
+    "otherElectronicDetails": "How the notice was sent",
+    "otherMethodDetails": "How you served the notice"
+  }
+}

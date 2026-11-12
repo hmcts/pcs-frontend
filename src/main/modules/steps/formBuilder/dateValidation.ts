@@ -1,5 +1,7 @@
 import type { TFunction } from 'i18next';
 
+import { todayInLondon } from '@utils/formatLocalisedDate';
+
 /**
  * Date validation utilities for form fields
  */
@@ -211,10 +213,9 @@ function checkDateRestrictions(
     return null;
   }
 
-  const inputDate = new Date(yearNum, monthNum - 1, dayNum);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  inputDate.setHours(0, 0, 0, 0);
+  const pad = (value: number, length: number) => String(value).padStart(length, '0');
+  const inputDate = `${pad(yearNum, 4)}-${pad(monthNum, 2)}-${pad(dayNum, 2)}`;
+  const today = todayInLondon();
 
   if (noFutureDate) {
     // noCurrentDate determines whether to include todays date in the valid range

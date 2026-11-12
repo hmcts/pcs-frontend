@@ -5,10 +5,13 @@ export interface PaymentSessionState {
   serviceRequestReference?: string;
   paymentReference?: string;
   feeAmount?: number;
+  feeAmountInPence?: string;
   counterClaimAmountInPence?: string;
   counterClaimType?: string;
   successRedirectUrl?: string;
   failureRedirectUrl?: string;
+  // Where a declined card goes when the journey explains it apart from other failures; otherwise failureRedirectUrl.
+  declinedRedirectUrl?: string;
   pendingRedirectUrl?: string;
   customerReference?: string;
   pbaAccount?: string;

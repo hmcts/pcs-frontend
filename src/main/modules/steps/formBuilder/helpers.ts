@@ -14,6 +14,29 @@ import type { StepFormData } from '@modules/steps/stepFormData.interface';
 
 const logger = Logger.getLogger('form-builder-helpers');
 
+const DATE_ERROR_PREFIX = 'errors.date.';
+
+/**
+ * A translation function for one date field, which uses the step's `dateErrors.<field>.<key>` message in place of
+ * `errors.date.<key>` when it has one, so pages with several dates can word each one's errors.
+ */
+function dateFieldTranslation(t: TFunction | undefined, fieldName: string): TFunction | undefined {
+  if (!t) {
+    return t;
+  }
+  const baseName = fieldName.split('.').pop() ?? fieldName;
+  return ((key: string | string[], options?: unknown) => {
+    if (typeof key === 'string' && key.startsWith(DATE_ERROR_PREFIX)) {
+      const scopedKey = `dateErrors.${baseName}.${key.slice(DATE_ERROR_PREFIX.length)}`;
+      const scoped = (t as (k: string, o?: unknown) => unknown)(scopedKey, options);
+      if (typeof scoped === 'string' && scoped !== scopedKey) {
+        return scoped;
+      }
+    }
+    return (t as (k: string | string[], o?: unknown) => unknown)(key, options);
+  }) as TFunction;
+}
+
 export function getTranslation(
   t: TFunction,
   key: string,
@@ -380,7 +403,7 @@ export function validateForm(
         month,
         year,
         isRequired || anyValueProvided,
-        t,
+        dateFieldTranslation(t, fieldName),
         field.noFutureDate,
         field.noCurrentDate,
         field.noPastDate,
@@ -396,7 +419,7 @@ export function validateForm(
       // Run validator function if provided
       if (field.validator && value !== undefined && !errors[fieldName]) {
         try {
-          const validatorResult = field.validator(dateValue, formData, validationAllData);
+          const validatorResult = field.validator(dateValue, formData, validationAllData, req);
           if (validatorResult !== true) {
             const errorMsg = typeof validatorResult === 'string' ? validatorResult : 'Invalid date';
             if (!errors[fieldName]) {
@@ -411,7 +434,7 @@ export function validateForm(
       // Run validate function if provided
       if (field.validate && !errors[fieldName]) {
         try {
-          const customError = field.validate(dateValue, formData, validationAllData);
+          const customError = field.validate(dateValue, formData, validationAllData, req);
           if (customError) {
             errors[fieldName] = customError.startsWith('errors.')
               ? translations?.[customError.replace('errors.', '')] || customError
@@ -455,7 +478,7 @@ export function validateForm(
 
       if (field.validator && value !== undefined && value !== null && value !== '') {
         try {
-          const validatorResult = field.validator(value, formData, validationAllData);
+          const validatorResult = field.validator(value, formData, validationAllData, req);
 
           if (validatorResult !== true) {
             let errorMsg: string;
@@ -525,8 +548,9 @@ export function validateForm(
             if (!errors[fieldName]) {
               const translationLabelKey =
                 typeof field.translationKey === 'object' ? field.translationKey.label : field.translationKey;
+              const shortName = t ? getTranslation(t, `fieldNames.${fieldName.split('.').pop()}`) : undefined;
               const resolvedLabel = translationLabelKey && t ? getTranslation(t, translationLabelKey) : undefined;
-              const displayName = resolvedLabel ?? toSentenceCase(fieldName);
+              const displayName = shortName ?? resolvedLabel ?? toSentenceCase(fieldName);
               const defaultSpecialCharacterMsg = translations?.defaultSpecialCharacter?.replace(
                 '{fieldName}',
                 displayName
@@ -541,7 +565,7 @@ export function validateForm(
         // Run validate function if provided (cross-field validation)
         if (field.validate) {
           try {
-            const customError = field.validate(value, formData, validationAllData);
+            const customError = field.validate(value, formData, validationAllData, req);
             if (customError) {
               if (!errors[fieldName]) {
                 errors[fieldName] = customError.startsWith('errors.')
@@ -556,7 +580,7 @@ export function validateForm(
       } else if (!isRequired && field.validate) {
         // Run validate function even for empty values if field is not required
         try {
-          const customError = field.validate(value, formData, validationAllData);
+          const customError = field.validate(value, formData, validationAllData, req);
           if (customError) {
             if (!errors[fieldName]) {
               errors[fieldName] = customError.startsWith('errors.')

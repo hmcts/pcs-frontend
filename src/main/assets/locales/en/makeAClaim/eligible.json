@@ -1,0 +1,20 @@
+{
+  "pageTitle": "You’re eligible to use this service",
+  "heading": "You’re eligible to use this service",
+  "paragraphs": [
+    "Based on the information you’ve provided, you’re eligible to use this service.",
+    "To finish making your claim, you’ll need:"
+  ],
+  "bullets": [
+    "information about the tenancy or licence",
+    "information about your grounds for possession",
+    "details about the notice you served",
+    "details of the people who are in possession of the property (the defendants)",
+    "copies of relevant documents, including the tenancy agreement, notice and a rent statement (if the claim is on the grounds of rent arrears)"
+  ],
+  "afterBullets": [
+    "The defendants will be able to see your answers and any documents you upload.",
+    "Your claim will save as you go, so you can stop and return to it if you need to. You can review and edit your answers before you submit your claim.",
+    "You must sign a statement of truth before you submit your claim. This certifies that you believe the information you’re providing is true."
+  ]
+}

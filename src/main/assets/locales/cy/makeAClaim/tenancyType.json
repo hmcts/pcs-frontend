@@ -1,0 +1,20 @@
+{
+  "pageTitle": "cyWhat type of tenancy or licence is in place?",
+  "question": "cyWhat type of tenancy or licence is in place, or was in place?",
+  "options": {
+    "ASSURED": "cyAssured or assured periodic tenancy",
+    "EXCLUDED": "cyExcluded tenancy or licence",
+    "REGULATED": "cyRegulated tenancy",
+    "OTHER": "cyOther"
+  },
+  "labels": {
+    "otherTenancyTypeDetails": "cyGive details of the type of tenancy or licence"
+  },
+  "errors": {
+    "tenancyType": "cySelect the type of tenancy or licence",
+    "otherTenancyTypeDetails": "cyEnter the type of tenancy or licence"
+  },
+  "fieldNames": {
+    "otherTenancyTypeDetails": "cyThe type of tenancy or licence"
+  }
+}
