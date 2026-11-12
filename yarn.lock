@@ -12181,6 +12181,7 @@ __metadata:
     "@launchdarkly/node-server-sdk": "npm:9.15.0"
     "@ministryofjustice/frontend": "npm:^11.0.0"
     "@opentelemetry/api": "npm:1.9.1"
+    "@opentelemetry/instrumentation": "npm:0.221.0"
     "@opentelemetry/instrumentation-express": "npm:0.69.0"
     "@opentelemetry/winston-transport": "npm:0.31.0"
     "@pact-foundation/pact": "npm:17.1.4"

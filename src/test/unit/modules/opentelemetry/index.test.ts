@@ -3,10 +3,15 @@ const mockShutdownAzureMonitor = jest.fn();
 const mockConfigGet = jest.fn();
 const mockEnableTelemetry = jest.fn();
 const mockExpressInstrumentation = jest.fn();
+const mockRegisterInstrumentations = jest.fn();
 
 jest.mock('@azure/monitor-opentelemetry', () => ({
   useAzureMonitor: mockUseAzureMonitor,
   shutdownAzureMonitor: mockShutdownAzureMonitor,
+}));
+
+jest.mock('@opentelemetry/instrumentation', () => ({
+  registerInstrumentations: mockRegisterInstrumentations,
 }));
 
 jest.mock('@opentelemetry/instrumentation-express', () => ({
@@ -122,9 +127,12 @@ describe('opentelemetry module', () => {
       await initializeAndGetTelemetryConfig();
 
       expect(mockExpressInstrumentation).toHaveBeenCalledTimes(1);
+      expect(mockRegisterInstrumentations).toHaveBeenCalledWith({
+        instrumentations: [mockExpressInstrumentation.mock.instances[0]],
+      });
       // The instrumentation picks up the global tracer provider, which useAzureMonitor() registers.
       expect(mockUseAzureMonitor.mock.invocationCallOrder[0]).toBeLessThan(
-        mockExpressInstrumentation.mock.invocationCallOrder[0]
+        mockRegisterInstrumentations.mock.invocationCallOrder[0]
       );
     });
 
