@@ -15,15 +15,6 @@
   <span class="govuk-caption-xl">{{ caption }}</span>
   <h1 class="govuk-heading-l">{{ heading }}</h1>
 
-  <p class="govuk-body">{{ noticeText }}
-  <br />{{ noticeTextByPost }}</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>{{ readTheGuidance | safe }}</li>
-    <li>{{ fillInTheForm | safe }}</li>
-    <li>{{ findYourLocalCourt | safe }}</li>
-    <li>{{ sendTheFormToTheCourt | safe }}</li>
-  </ul>
-
   <form method="post" action="{{ url }}" novalidate>
 
     {% for field in fields %}
