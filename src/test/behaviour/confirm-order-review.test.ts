@@ -26,6 +26,7 @@ const BASE = `/case/${CASE_REFERENCE}/confirm-order-review`;
 const INTRO = `${BASE}?orderId=order-awaiting-review&taskId=task-1`;
 const REVIEW = `${BASE}/review`;
 const ORDER_DETAILS = `${BASE}/order-details`;
+const MONEY_JUDGMENTS = `${BASE}/money-judgments`;
 const REVIEW_DATES = `${BASE}/review-dates`;
 const PROCEED_TO_ISSUE = `${BASE}/proceed-to-issue`;
 const CHECK_YOUR_ANSWERS = `${BASE}/check-your-answers`;
@@ -520,7 +521,6 @@ describe('confirm order review', () => {
       expect(errors(outright.text)).toEqual([
         'Select when possession is ordered',
         'Select the grounds possession is ordered on',
-        'Select if the order makes a money judgment',
         'Select if the order transfers enforcement to the High Court',
       ]);
       // What was answered is kept.
@@ -536,8 +536,8 @@ describe('confirm order review', () => {
         ORDER_DETAILS,
         form({ 'order-does': 'adjournment', adjournment: 'generally', action: 'continue' })
       );
-      expect(generally.location).toBe(REVIEW_DATES);
-      const back = await app.post(REVIEW_DATES, form({ action: 'previous' }));
+      expect(generally.location).toBe(MONEY_JUDGMENTS);
+      const back = await app.post(MONEY_JUDGMENTS, form({ action: 'previous' }));
       expect(back.location).toBe(ORDER_DETAILS);
     });
 
@@ -552,11 +552,38 @@ describe('confirm order review', () => {
           'outright-date-year': '2026',
           'outright-grounds': 'mandatory',
           'outright-grounds-details': ' Ground 8 ',
-          'outright-money-judgment': 'yes',
           'outright-transfer': 'no',
           action: 'continue',
         })
       );
+      // A free-form order's money judgments are recorded from nothing, against all the defendants by default.
+      const judgments = parse((await app.get(MONEY_JUDGMENTS)).text);
+      // The claimant is listed first, then the defendant.
+      expect(judgments.querySelector<HTMLInputElement>('#judgment-1-debtors')?.checked).toBe(false);
+      expect(judgments.querySelector<HTMLInputElement>('#judgment-1-debtors-2')?.checked).toBe(true);
+      const unanswered = await app.post(MONEY_JUDGMENTS, form({ action: 'continue' }));
+      expect(errors(unanswered.text)).toEqual([
+        'Select what the order says about costs',
+        'Select if the order makes a money judgment',
+      ]);
+      const recorded = await app.post(
+        MONEY_JUDGMENTS,
+        form({
+          costs: 'DEFENDANT_PAYS_FIXED',
+          'has-money-judgments': 'yes',
+          'judgment-1-debtors': 'defendant-id',
+          'judgment-1-creditors': 'claimant-id',
+          'judgment-1-arrears': '2,450',
+          'judgment-1-costs': '355',
+          'judgment-1-instalment-amount': '50',
+          'judgment-1-instalment-frequency': 'MONTHLY',
+          'judgment-1-first-instalment-date-day': '1',
+          'judgment-1-first-instalment-date-month': '1',
+          'judgment-1-first-instalment-date-year': '2027',
+          action: 'continue',
+        })
+      );
+      expect(recorded.location).toBe(REVIEW_DATES);
       await app.post(REVIEW_DATES, form({ 'has-review-dates': 'no', action: 'continue' }));
       await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers());
 
@@ -570,14 +597,31 @@ describe('confirm order review', () => {
         ['Possession', 'On or before 4 December 2026'],
         ['Grounds', 'Mandatory'],
         ['Details of the grounds', 'Ground 8'],
-        ['Money judgment', 'Yes'],
         ['Transfer to the High Court for enforcement', 'No'],
       ]);
 
       await app.post(CHECK_YOUR_ANSWERS, form({ action: 'continue' }));
       const [review] = submittedReviews() as {
-        issue: { claimOutcome: unknown; order: { orderType: string; html: string } };
+        issue: {
+          claimOutcome: unknown;
+          costs: string;
+          moneyJudgments: unknown[];
+          order: { orderType: string; html: string };
+        };
       }[];
+      expect(review.issue.costs).toBe('DEFENDANT_PAYS_FIXED');
+      expect(review.issue.moneyJudgments).toEqual([
+        {
+          arrears: 2450,
+          costs: 355,
+          instalmentAmount: 50,
+          instalmentFrequency: 'MONTHLY',
+          firstInstalmentDate: '2027-01-01',
+          suspended: false,
+          debtors: ['defendant-id'],
+          creditors: ['claimant-id'],
+        },
+      ]);
       expect(review.issue.claimOutcome).toEqual({
         kind: 'OUTRIGHT_POSSESSION',
         possessionForthwith: false,
@@ -594,8 +638,82 @@ describe('confirm order review', () => {
     app = await caseworkerReviewing();
     await issueFromReview(app);
 
-    expect((await app.get(ORDER_DETAILS)).location).toBe(REVIEW_DATES);
-    expect((await app.post(REVIEW_DATES, form({ action: 'previous' }))).location).toBe(REVIEW);
+    expect((await app.get(ORDER_DETAILS)).location).toBe(MONEY_JUDGMENTS);
+    expect((await app.post(REVIEW_DATES, form({ action: 'previous' }))).location).toBe(MONEY_JUDGMENTS);
+  });
+
+  it("takes the money judgment from the judge's answers for court staff to check, and issues it as they leave it", async () => {
+    app = await caseworkerReviewing(
+      await judgesOrder({
+        edit: () => {
+          check('outright-options', 'money-judgment');
+          check('outright-mj-sections', 'arrears');
+          type('outright-mj-arrears', '400');
+          type('outright-mj-interest', '45');
+        },
+      })
+    );
+    const page = await openReview(app);
+    expect((await app.post(REVIEW, page.body('ISSUE'))).location).toBe(MONEY_JUDGMENTS);
+
+    const judgments = parse((await app.get(MONEY_JUDGMENTS)).text);
+    expect(judgments.querySelector<HTMLInputElement>('#judgment-1-arrears')?.value).toBe('400');
+    expect(judgments.querySelector<HTMLInputElement>('#judgment-1-other-amount')?.value).toBe('45');
+    // Against the defendant, listed after the claimant, in favour of the claimant.
+    expect(judgments.querySelector<HTMLInputElement>('#judgment-1-debtors-2')?.checked).toBe(true);
+    expect(judgments.querySelector<HTMLInputElement>('#judgment-1-creditors')?.checked).toBe(true);
+
+    // Court staff split it: the arrears stay with the defendant, and the claimant pays the defendant's costs.
+    const add = await app.post(
+      MONEY_JUDGMENTS,
+      form({
+        costs: 'CLAIMANT_PAYS_SUMMARY',
+        'has-money-judgments': 'yes',
+        'judgment-1-debtors': 'defendant-id',
+        'judgment-1-creditors': 'claimant-id',
+        'judgment-1-arrears': '400',
+        'judgment-1-other-amount': '45',
+        action: 'add',
+      })
+    );
+    expect(add.location).toBe(`${MONEY_JUDGMENTS}#judgment-2`);
+    const saved = await app.post(
+      MONEY_JUDGMENTS,
+      form({
+        costs: 'CLAIMANT_PAYS_SUMMARY',
+        'has-money-judgments': 'yes',
+        'judgment-1-debtors': 'defendant-id',
+        'judgment-1-creditors': 'claimant-id',
+        'judgment-1-arrears': '400',
+        'judgment-1-other-amount': '45',
+        'judgment-2-debtors': 'claimant-id',
+        'judgment-2-creditors': 'defendant-id',
+        'judgment-2-costs': '120',
+        action: 'continue',
+      })
+    );
+    expect(saved.location).toBe(REVIEW_DATES);
+    await app.post(REVIEW_DATES, form({ 'has-review-dates': 'no', action: 'continue' }));
+    await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers());
+
+    const answers = parse((await app.get(CHECK_YOUR_ANSWERS)).text);
+    expect(
+      [...answers.querySelectorAll('#money-judgments-answers .govuk-summary-list__value')].map(value =>
+        value.textContent?.trim()
+      )
+    ).toEqual([
+      "Claimant pays the defendant's summarily assessed costs",
+      'Yes',
+      'Paid by: Defendant 1: Alex ExamplePaid to: Claimant 1: Example HousingArrears: £400.00Interest or other sum: £45.00',
+      'Paid by: Claimant 1: Example HousingPaid to: Defendant 1: Alex ExampleCosts: £120.00',
+    ]);
+    await app.post(CHECK_YOUR_ANSWERS, form({ action: 'continue' }));
+    const [review] = submittedReviews() as { issue: { costs: string; moneyJudgments: unknown[] } }[];
+    expect(review.issue.costs).toBe('CLAIMANT_PAYS_SUMMARY');
+    expect(review.issue.moneyJudgments).toEqual([
+      { arrears: 400, otherAmount: 45, suspended: false, debtors: ['defendant-id'], creditors: ['claimant-id'] },
+      { costs: 120, suspended: false, debtors: ['claimant-id'], creditors: ['defendant-id'] },
+    ]);
   });
 
   describe('review dates', () => {
@@ -735,6 +853,8 @@ describe('confirm order review', () => {
         row.querySelector('.govuk-summary-list__value')?.textContent?.trim(),
       ]);
       expect(rows).toEqual([
+        ['What does the order say about costs?', 'The order says nothing about costs'],
+        ['Does the order make a money judgment?', 'No'],
         ['Are there any review dates to add?', 'No'],
         ['Have all the next steps for court staff been completed?', 'There are no other tasks to complete'],
         ['Does this order finally resolve any part of the case?', 'No'],
@@ -793,6 +913,7 @@ describe('confirm order review', () => {
             },
             claimOutcome: expect.objectContaining({ kind: expect.any(String) }),
             reviewDates: [{ date: '2027-03-05', reason: 'UNLESS_ORDER', description: 'Check compliance' }],
+            moneyJudgments: [],
             nextStepsComplete: true,
             serveAllParties: true,
             partiesToServe: [],

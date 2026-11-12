@@ -10,6 +10,17 @@ import { ccdCaseService } from '@services/ccdCaseService';
 import { applicationsToDecide, attendanceParties, orderFormModel } from '@utils/makeOrderForm';
 import { MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
+  COSTS,
+  FREQUENCIES,
+  MAX_MONEY_JUDGMENTS,
+  type MoneyJudgmentAnswer,
+  type Sides,
+  blankJudgment,
+  moneyJudgmentRows,
+  postedJudgments,
+  validateMoneyJudgments,
+} from '@utils/moneyJudgments';
+import {
   type OrderStart,
   caseHeader,
   confirmationHeader,
@@ -51,6 +62,7 @@ import {
   newAnswers,
   reviewRequest,
   staffMessage,
+  startMoneyJudgments,
   text,
   ticked,
   validateProceedToIssue,
@@ -71,6 +83,7 @@ const PAGES = {
   intro: '',
   review: '/review',
   orderDetails: '/order-details',
+  moneyJudgments: '/money-judgments',
   reviewDates: '/review-dates',
   proceedToIssue: '/proceed-to-issue',
   checkYourAnswers: '/check-your-answers',
@@ -187,6 +200,30 @@ function shownReviewDates(answers: OrderReviewAnswers): ReviewDateAnswer[] {
   return answers.reviewDates.length ? answers.reviewDates : [blankReviewDate()];
 }
 
+function sidesOf(review: OrderReviewSession): Sides {
+  return {
+    claimants: review.caseContext.claimants.map(party => party.id),
+    defendants: review.caseContext.defendants.map(party => party.id),
+  };
+}
+
+/** The money judgments the page shows: at least one to fill in once the caseworker says there are some. */
+function shownJudgments(review: OrderReviewSession): MoneyJudgmentAnswer[] {
+  const judgments = review.answers.moneyJudgments?.judgments ?? [];
+  return judgments.length ? judgments : [blankJudgment(sidesOf(review))];
+}
+
+/**
+ * Why the money judgments page is not done: an answer missing, or judgments made from the judge's answers that court
+ * staff have not yet checked.
+ */
+function moneyJudgmentIssues(answers: OrderReviewAnswers): ValidationIssue[] {
+  const issues = validateMoneyJudgments(answers.moneyJudgments);
+  return issues.length || answers.moneyJudgmentsSaved || answers.moneyJudgments?.hasMoneyJudgments !== 'yes'
+    ? issues
+    : [{ id: 'has-money-judgments', message: 'Check the money judgments' }];
+}
+
 function partyChoices(review: OrderReviewSession) {
   const { claimants, defendants } = review.caseContext;
   // In claim order: the claimants, then the defendants in the order they were added to the claim.
@@ -234,6 +271,14 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
             },
           ]
         : []),
+      {
+        heading: 'Money judgments and costs',
+        id: 'money-judgments-answers',
+        href: pageUrl(caseReferenceOf(req), 'moneyJudgments'),
+        rows: moneyJudgmentRows(answers.moneyJudgments, id => partyNames.get(id) ?? id).map(([key, lines]) =>
+          row(key, key, ...lines)
+        ),
+      },
       {
         heading: 'Review dates',
         id: 'review-dates-answers',
@@ -310,6 +355,17 @@ const VIEWS = {
     yesNo: YES_NO,
     maxGroundsDetailsLength: MAX_GROUNDS_DETAILS_LENGTH,
   }),
+  'money-judgments': (_req: Request, review: OrderReviewSession) => ({
+    answers: review.answers.moneyJudgments ?? { judgments: [] },
+    judgments: shownJudgments(review),
+    parties: partyChoices(review),
+    costsOptions: COSTS,
+    frequencies: FREQUENCIES,
+    canAddJudgment: (review.answers.moneyJudgments?.judgments.length ?? 0) < MAX_MONEY_JUDGMENTS,
+    issuingHtml: review.answers.order?.orderDocumentJson
+      ? renderHtml(parseSnapshot(review.answers.order.orderDocumentJson))
+      : undefined,
+  }),
   'review-dates': (_req: Request, review: OrderReviewSession) => ({
     answers: review.answers,
     reviewDates: shownReviewDates(review.answers),
@@ -383,6 +439,7 @@ function firstIncompletePage(review: OrderReviewSession, after?: Page): Page | u
   const pages: [Page, ValidationIssue[]][] = [
     ['review', orderIssues(review)],
     ['orderDetails', issuesFreeForm(answers) ? validateOrderDetails(answers.orderDetails) : []],
+    ['moneyJudgments', moneyJudgmentIssues(answers)],
     ['reviewDates', validateReviewDates(answers)],
     ['proceedToIssue', validateProceedToIssue(answers)],
   ];
@@ -466,6 +523,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       if (issues.length) {
         return render(req, res, 'review', issues);
       }
+      startMoneyJudgments(review);
       return res.redirect(pageUrl(caseReferenceOf(req), firstIncompletePage(review, 'review') ?? 'checkYourAnswers'));
     } catch (error) {
       refusedOrderEvent(res, next, error, showRefusal(req, res, 'review'));
@@ -475,7 +533,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
   app.get(route('orderDetails'), ...inJourney, (req: Request, res: Response) =>
     issuesFreeForm(reviewOf(req)!.answers)
       ? render(req, res, 'order-details')
-      : res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'))
+      : res.redirect(pageUrl(caseReferenceOf(req), 'moneyJudgments'))
   );
 
   app.post(route('orderDetails'), ...inJourney, (req: Request, res: Response) => {
@@ -493,6 +551,50 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     );
   });
 
+  app.get(route('moneyJudgments'), ...inJourney, (req: Request, res: Response) =>
+    reviewOf(req)!.answers.moneyJudgments
+      ? render(req, res, 'money-judgments')
+      : res.redirect(pageUrl(caseReferenceOf(req), 'review'))
+  );
+
+  app.post(route('moneyJudgments'), ...inJourney, (req: Request, res: Response) => {
+    const review = reviewOf(req)!;
+    const { answers } = review;
+    const caseReference = caseReferenceOf(req);
+    if (!answers.moneyJudgments) {
+      return res.redirect(pageUrl(caseReference, 'review'));
+    }
+    const judgments = answers.moneyJudgments;
+    judgments.costs = text(req.body.costs) || undefined;
+    judgments.hasMoneyJudgments = choice(req.body['has-money-judgments'], ['yes', 'no'] as const);
+    if (judgments.hasMoneyJudgments === 'yes') {
+      const parties = new Set(partyChoices(review).map(party => party.value));
+      judgments.judgments = postedJudgments(req.body, shownJudgments(review).length, parties);
+    }
+    // Saved, they are court staff's: a change to the judge's answers no longer changes them.
+    answers.moneyJudgmentsSaved = true;
+    const action = text(req.body.action);
+    if (action === 'previous') {
+      return res.redirect(pageUrl(caseReference, issuesFreeForm(answers) ? 'orderDetails' : 'review'));
+    }
+    if (action === 'add') {
+      if (judgments.judgments.length < MAX_MONEY_JUDGMENTS) {
+        judgments.judgments.push(blankJudgment(sidesOf(review)));
+      }
+      return res.redirect(`${req.originalUrl}#judgment-${judgments.judgments.length}`);
+    }
+    const removing = /^remove-(\d+)$/.exec(action);
+    if (removing) {
+      judgments.judgments.splice(Number(removing[1]) - 1, 1);
+      return res.redirect(pageUrl(caseReference, 'moneyJudgments'));
+    }
+    const issues = validateMoneyJudgments(judgments);
+    if (issues.length) {
+      return render(req, res, 'money-judgments', issues);
+    }
+    return res.redirect(pageUrl(caseReference, firstIncompletePage(review, 'moneyJudgments') ?? 'checkYourAnswers'));
+  });
+
   app.get(route('reviewDates'), ...inJourney, (req: Request, res: Response) => render(req, res, 'review-dates'));
 
   app.post(route('reviewDates'), ...inJourney, (req: Request, res: Response) => {
@@ -505,7 +607,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     }
     const action = text(req.body.action);
     if (action === 'previous') {
-      return res.redirect(pageUrl(caseReference, issuesFreeForm(answers) ? 'orderDetails' : 'review'));
+      return res.redirect(pageUrl(caseReference, 'moneyJudgments'));
     }
     if (action === 'add') {
       if (answers.reviewDates.length < MAX_REVIEW_DATES) {

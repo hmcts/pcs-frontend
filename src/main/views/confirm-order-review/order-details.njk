@@ -76,7 +76,6 @@
         value: answers["outright-grounds-details"],
         errorMessage: validationErrors["outright-grounds-details"]
       }) }}
-      {{ choose("outright-money-judgment", "Does the order make a money judgment?", yesNo, true) }}
       {{ choose("outright-transfer", "Does the order transfer enforcement to the High Court?", yesNo, true) }}
     {% endset %}
 
@@ -84,7 +83,6 @@
       {{ date("suspended-date", "Date possession is ordered by") }}
       {{ choose("suspended-condition", "Is the condition money or non-money?", condition, true) }}
       {{ choose("suspended-warrant-on-notice", "Must any application for a warrant be made on notice to all parties?", yesNo, true) }}
-      {{ choose("suspended-money-judgment", "Does the order make a money judgment?", yesNo, true) }}
     {% endset %}
 
     {% set conditionals = {

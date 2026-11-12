@@ -56,12 +56,10 @@ export const ORDER_DETAILS_FIELDS = [
   ...DATE_PARTS.map(part => `outright-date-${part}`),
   'outright-grounds',
   'outright-grounds-details',
-  'outright-money-judgment',
   'outright-transfer',
   ...DATE_PARTS.map(part => `suspended-date-${part}`),
   'suspended-condition',
   'suspended-warrant-on-notice',
-  'suspended-money-judgment',
   'adjournment',
   'strike-out',
 ];
@@ -105,7 +103,6 @@ export function validateOrderDetails(answers: OrderDetailsAnswers = {}): Issue[]
           message: 'Details of the grounds must be 500 characters or less',
         });
       }
-      chosen('outright-money-judgment', YES_NO, 'Select if the order makes a money judgment');
       chosen('outright-transfer', YES_NO, 'Select if the order transfers enforcement to the High Court');
       break;
     }
@@ -117,7 +114,6 @@ export function validateOrderDetails(answers: OrderDetailsAnswers = {}): Issue[]
         YES_NO,
         'Select if any application for a warrant must be made on notice to all parties'
       );
-      chosen('suspended-money-judgment', YES_NO, 'Select if the order makes a money judgment');
       break;
     case 'adjournment':
       chosen('adjournment', ADJOURNMENT, 'Select how the claim is adjourned');
@@ -151,7 +147,6 @@ export function orderDetailsRows(answers: OrderDetailsAnswers = {}): [string, st
         ],
         ['Grounds', label(GROUNDS, answers['outright-grounds'])],
         ['Details of the grounds', answers['outright-grounds-details']?.trim() || 'None'],
-        ['Money judgment', label(YES_NO, answers['outright-money-judgment'])],
         ['Transfer to the High Court for enforcement', label(YES_NO, answers['outright-transfer'])]
       );
       break;
@@ -159,8 +154,7 @@ export function orderDetailsRows(answers: OrderDetailsAnswers = {}): [string, st
       rows.push(
         ['Possession on or before', displayDate(answers, 'suspended-date')],
         ['Condition', label(CONDITION, answers['suspended-condition'])],
-        ['Any application for a warrant on notice', label(YES_NO, answers['suspended-warrant-on-notice'])],
-        ['Money judgment', label(YES_NO, answers['suspended-money-judgment'])]
+        ['Any application for a warrant on notice', label(YES_NO, answers['suspended-warrant-on-notice'])]
       );
       break;
     case 'adjournment':

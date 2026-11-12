@@ -2,6 +2,7 @@ import { parseSnapshot, renderHtml } from '@hmcts-cft/docweave';
 
 import type { OrderFormSubmission } from '@utils/makeOrderForm';
 import { parseDate } from '@utils/makeOrderFormat';
+import { type MoneyJudgmentsAnswers, judgmentsFromOrder, moneyJudgmentsRequest } from '@utils/moneyJudgments';
 import type { FormData, OrderStart } from '@utils/orderCase';
 import { type OrderDetailsAnswers, orderDetailsRequest } from '@utils/orderDetails';
 import { applicationDecisions, claimOutcome } from '@utils/orderOutcome';
@@ -40,6 +41,12 @@ export interface OrderReviewAnswers {
   sendQuery?: boolean;
   /** What a free-form order does, as court staff record it; none in a review started before it was asked. */
   orderDetails?: OrderDetailsAnswers;
+  /**
+   * The order's costs and money judgments: for an order its form generated, as the judge's answers make them until
+   * court staff save the page they are checked on; for a free-form order, as court staff record them.
+   */
+  moneyJudgments?: MoneyJudgmentsAnswers;
+  moneyJudgmentsSaved?: boolean;
   queryToJudge?: string;
   hasReviewDates?: 'yes' | 'no';
   reviewDates: ReviewDateAnswer[];
@@ -236,8 +243,27 @@ export function reviewRequest(
       serveAllParties,
       partiesToServe: serveAllParties ? [] : answers.partiesToServe,
       seal: answers.seal,
+      ...moneyJudgmentsRequest(answers.moneyJudgments),
     },
   };
+}
+
+/**
+ * The costs and money judgments as the order to issue makes them, until court staff save their own: a generated
+ * order's from the judge's answers, so a change to them changes these; a free-form order's to record from nothing.
+ */
+export function startMoneyJudgments(review: OrderReviewSession): void {
+  const { answers, caseContext } = review;
+  if (answers.moneyJudgmentsSaved || !answers.order) {
+    return;
+  }
+  const sides = {
+    claimants: caseContext.claimants.map(party => party.id),
+    defendants: caseContext.defendants.map(party => party.id),
+  };
+  answers.moneyJudgments = issuesFreeForm(answers)
+    ? { judgments: [] }
+    : judgmentsFromOrder(answers.order.orderType, answers.order.formData, sides);
 }
 
 function issuedOrder(order: Required<OrderFormSubmission>): Record<string, unknown> {
