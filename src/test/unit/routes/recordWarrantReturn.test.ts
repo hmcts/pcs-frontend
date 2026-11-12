@@ -586,6 +586,48 @@ describe('recordWarrantReturnRoutes', () => {
       expect(next).toHaveBeenCalledWith(failure);
       expect(res.redirect).not.toHaveBeenCalled();
     });
+
+    const successfulEvictionNoDate = {
+      'return-type': WarrantReturnType.FINAL,
+      'final-outcome': EvictionOutcome.SUCCESSFUL,
+      'eviction-successful-return-name': EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+      'additional-details': 'Keys handed to claimant',
+    };
+    const unsuccessfulEvictionNoDate = {
+      'return-type': WarrantReturnType.FINAL,
+      'final-outcome': EvictionOutcome.UNSUCCESSFUL,
+      'eviction-unsuccessful-return-name': EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
+      'additional-details': 'Withdrawn',
+    };
+    const cancelledEvictionNoDate = {
+      'return-type': WarrantReturnType.FINAL,
+      'final-outcome': EvictionOutcome.CANCELLED,
+      'eviction-unsuccessful-return-name': EvictionUnsuccessfulReturnName.WARRANT_EXPIRED,
+      'additional-details': 'Cancelled',
+    };
+    const interimReturnNoDate = {
+      'return-type': WarrantReturnType.INTERIM,
+      'interim-return-name': InterimReturnName.REOPEN_WARRANT,
+      'additional-details': 'Reopen it',
+    };
+
+    it.each([
+      ['a successful eviction', successfulEvictionNoDate, 'eviction-date-day'],
+      ['an unsuccessful eviction', unsuccessfulEvictionNoDate, 'eviction-date-day'],
+      ['a cancelled eviction', cancelledEvictionNoDate, 'eviction-date-day'],
+      ['an interim return', interimReturnNoDate, 'eviction-date-day'],
+    ])('requires an eviction date for %s', async (_name, body, id) => {
+      const { req, res } = await post(body);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.render.mock.calls[0][1].validationErrors).toEqual({
+        [id]: { text: 'Eviction date and time is required' },
+      });
+      expect(res.render.mock.calls[0][1].errorSummary.errorList).toEqual([
+        { text: 'Eviction date and time is required', href: `#${id}` },
+      ]);
+      expect(req.session.warrantReturn).toBeUndefined();
+    });
   });
 
   describe('POST checkYourAnswers', () => {
