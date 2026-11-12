@@ -2,7 +2,7 @@ import { formatPoundsValue } from '../../utils/common/string.utils';
 
 export const counterClaimApplicationFeeAmount = {
   mainHeader: `Talu eich ffi gwrth-hawliad`,
-  counterClaimAmountLabel: `Counterclaim amount`,
+  counterClaimAmountLabel: `Swm gwrth-hawliad`,
   counterClaimAmountNotApplicable: `Not applicable`,
   counterClaimFeeLabel: `Ffi gwrth-hawliad`,
   somethingElseCounterClaimFee: `387.00`,
