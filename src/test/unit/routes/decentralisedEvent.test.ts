@@ -99,6 +99,12 @@ describe('decentralisedEvent route', () => {
       );
     });
 
+    it("hands the make order page the hearing a judge's task names", () => {
+      const redirect = launch('ext:makeOrder', { hearingId: '10000010', taskId: 'task-1' });
+
+      expect(redirect).toHaveBeenCalledWith(303, '/case/1234567890123456/make-order?taskId=task-1&hearingId=10000010');
+    });
+
     it.each(['a%26lang%3Dcy', 'a#tail', 'a\nb', 'a&lang=cy', ''])(
       'does not hand an order page an id that is not one (%j)',
       orderId => {

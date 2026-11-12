@@ -139,16 +139,13 @@ describe('make an order: limits', () => {
       'adj-hearing-date-specific-year': '2026',
       'adj-time-estimate': '30',
     };
-    for (const time of ['10:30am', '2 p.m.', '14:30', '09.15', '12am']) {
-      expect(await errors('tab-adjournment', { ...hearing, 'adj-specific-time': time })).toEqual([]);
-    }
+    // The times parseTime reads are its unit test's; here, that the page asks for one it can read.
+    expect(await errors('tab-adjournment', { ...hearing, 'adj-specific-time': '2 p.m.' })).toEqual([]);
     expect(await errors('tab-adjournment', { ...hearing, 'adj-specific-time': '' })).toEqual([
       'Enter the time of hearing',
     ]);
-    for (const time of ['25:00', '13pm', '0:30am', '1030', 'after lunch']) {
-      expect(await errors('tab-adjournment', { ...hearing, 'adj-specific-time': time })).toEqual([
-        'Enter a valid time of hearing, like 10:30am or 14:30',
-      ]);
-    }
+    expect(await errors('tab-adjournment', { ...hearing, 'adj-specific-time': 'after lunch' })).toEqual([
+      'Enter a valid time of hearing, like 10:30am or 14:30',
+    ]);
   });
 });
