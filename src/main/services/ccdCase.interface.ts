@@ -211,12 +211,11 @@ export interface CcdUploadedDocument {
   sizeInBytes?: number;
 }
 
-export interface CcdClaimantType {
+export interface CcdDynamicStringListType {
   value: {
     code: string;
     label: string;
   };
-  valueCode: string;
 }
 
 export interface CcdCollectionItem<T> {
@@ -370,7 +369,7 @@ export interface CcdCaseData {
     noticeDocuments?: CcdCollectionItem<Document>[];
   };
   warrantReturn?: WarrantReturn;
-  claimantType?: CcdClaimantType;
+  claimantType?: CcdDynamicStringListType;
 }
 
 export interface CcdCaseDocument {
