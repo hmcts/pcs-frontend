@@ -7,74 +7,65 @@ export const whatOtherRegularExpensesDoYouHave = {
   householdBillsParagraph: `Household bills (for example, council tax, gas, electricity, water, internet)`,
   householdBillsAmountPaidHiddenLabel: `Amount paid`,
   householdBillsTotalAmountInput: `450.00`,
-  householdBillsPaidEveryHiddenLabel: `Paid every:`,
-  householdBillsWeekHiddenRadioOption: `Week`,
-  householdBillsMonthHiddenRadioOption: `Month`,
+  householdBillsWeekHiddenRadioOption: `Paid every week`,
+  householdBillsMonthHiddenRadioOption: `Paid every month`,
   amountReceivedHiddenTextLabel: 'Amount paid',
 
   // Loan Payments
   loanPaymentsParagraph: `Loan payments`,
   loanPaymentsAmountPaidHiddenLabel: `Amount paid`,
   loanPaymentsTotalAmountInput: `200.00`,
-  loanPaymentsPaidEveryHiddenLabel: `Paid every:`,
-  loanPaymentsWeekHiddenRadioOption: `Week`,
-  loanPaymentsMonthHiddenRadioOption: `Month`,
+  loanPaymentsWeekHiddenRadioOption: `Paid every week`,
+  loanPaymentsMonthHiddenRadioOption: `Paid every month`,
 
   // Child or Spousal Maintenance
   childSpousalMaintenanceParagraph: `Child or spousal maintenance`,
   childSpousalMaintenanceAmountHiddenPaidLabel: `Amount paid`,
   childSpousalMaintenanceTotalAmountInput: `150.00`,
-  childSpousalMaintenancePaidHiddenEveryLabel: `Paid every:`,
-  childSpousalMaintenanceWeekHiddenRadioOption: `Week`,
-  childSpousalMaintenanceMonthHiddenRadioOption: `Month`,
+  childSpousalMaintenanceWeekHiddenRadioOption: `Paid every week`,
+  childSpousalMaintenanceMonthHiddenRadioOption: `Paid every month`,
 
   // Mobile Phone
   mobilePhoneParagraph: `Mobile phone`,
   mobilePhoneAmountPaidHiddenLabel: `Amount paid`,
   mobilePhoneTotalAmountInput: `50.00`,
-  mobilePhonePaidEveryHiddenLabel: `Paid every:`,
-  mobilePhoneWeekHiddenRadioOption: `Week`,
-  mobilePhoneMonthHiddenRadioOption: `Month`,
+  mobilePhoneWeekHiddenRadioOption: `Paid every week`,
+  mobilePhoneMonthHiddenRadioOption: `Paid every month`,
 
   // Grocery Shopping
   groceryShoppingParagraph: `Grocery shopping`,
   groceryShoppingAmountPaidHiddenLabel: `Amount paid`,
   groceryShoppingTotalAmountInput: `300.00`,
-  groceryShoppingPaidEveryHiddenLabel: `Paid every:`,
-  groceryShoppingWeekHiddenRadioOption: `Week`,
-  groceryShoppingMonthHiddenRadioOption: `Month`,
+  groceryShoppingWeekHiddenRadioOption: `Paid every week`,
+  groceryShoppingMonthHiddenRadioOption: `Paid every month`,
 
   // Fuel, Parking and Transport
   fuelParkingTransportParagraph: `Fuel, parking and transport`,
   fuelParkingTransportAmountPaidHiddenLabel: `Amount paid`,
   fuelParkingTransportTotalAmountInput: `250.00`,
-  fuelParkingTransportPaidEveryHiddenLabel: `Paid every:`,
-  fuelParkingTransportWeekHiddenRadioOption: `Week`,
-  fuelParkingTransportMonthHiddenRadioOption: `Month`,
+  fuelParkingTransportWeekHiddenRadioOption: `Paid every week`,
+  fuelParkingTransportMonthHiddenRadioOption: `Paid every month`,
 
   // School Costs
   schoolCostsParagraph: `School costs (for example, uniform and school dinners)`,
   schoolCostsAmountPaidHiddenLabel: `Amount paid`,
   schoolCostsTotalAmountInput: `180.00`,
-  schoolCostsPaidEveryHiddenLabel: `Paid every:`,
-  schoolCostsWeekHiddenRadioOption: `Week`,
-  schoolCostsMonthHiddenRadioOption: `Month`,
+  schoolCostsWeekHiddenRadioOption: `Paid every week`,
+  schoolCostsMonthHiddenRadioOption: `Paid every month`,
 
   // Clothing
   clothingParagraph: `Clothing`,
   clothingAmountPaidHiddenLabel: `Amount paid`,
   clothingTotalAmountInput: `100.00`,
-  clothingPaidEveryHiddenLabel: `Paid every:`,
-  clothingWeekHiddenRadioOption: `Week`,
-  clothingMonthHiddenRadioOption: `Month`,
+  clothingWeekHiddenRadioOption: `Paid every week`,
+  clothingMonthHiddenRadioOption: `Paid every month`,
 
   // Other
   otherExpensesParagraph: `Other`,
   otherExpensesAmountPaidHiddenLabel: `Amount paid`,
   otherExpensesTotalAmountInput: `75.00`,
-  otherExpensesPaidEveryHiddenLabel: `Paid every:`,
-  otherExpensesWeekHiddenRadioOption: `Week`,
-  otherExpensesMonthHiddenRadioOption: `Month`,
+  otherExpensesWeekHiddenRadioOption: `Paid every week`,
+  otherExpensesMonthHiddenRadioOption: `Paid every month`,
 
   errorValidationHeader: `There is a problem`,
   // Mandatory Field Errors - Amount Missing

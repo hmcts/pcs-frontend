@@ -6,6 +6,10 @@
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 
+{% if legend %}
+<fieldset class="govuk-fieldset">
+  <legend class="govuk-fieldset__legend govuk-visually-hidden">{{ legend }}</legend>
+{% endif %}
 {% for subField in subFields %}
   {% if subField.component and subField.componentType %}
     {% if subField.componentType == 'input' %}
@@ -30,4 +34,7 @@
     {% endif %}
   {% endif %}
 {% endfor %}
+{% if legend %}
+</fieldset>
+{% endif %}
 
