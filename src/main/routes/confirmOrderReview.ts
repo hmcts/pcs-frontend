@@ -565,15 +565,18 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       return res.redirect(pageUrl(caseReference, 'review'));
     }
     const judgments = answers.moneyJudgments;
+    const before = JSON.stringify(judgments);
     judgments.costs = text(req.body.costs) || undefined;
     judgments.hasMoneyJudgments = choice(req.body['has-money-judgments'], ['yes', 'no'] as const);
     if (judgments.hasMoneyJudgments === 'yes') {
       const parties = new Set(partyChoices(review).map(party => party.value));
       judgments.judgments = postedJudgments(req.body, shownJudgments(review).length, parties);
     }
-    // Saved, they are court staff's: a change to the judge's answers no longer changes them.
-    answers.moneyJudgmentsSaved = true;
     const action = text(req.body.action);
+    // Once court staff change or confirm them, they are theirs: a change to the judge's answers no longer changes them.
+    if (action !== 'previous' || JSON.stringify(judgments) !== before) {
+      answers.moneyJudgmentsSaved = true;
+    }
     if (action === 'previous') {
       return res.redirect(pageUrl(caseReference, issuesFreeForm(answers) ? 'orderDetails' : 'review'));
     }

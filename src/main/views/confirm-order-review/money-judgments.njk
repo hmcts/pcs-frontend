@@ -63,6 +63,8 @@
   <form method="post" action="{{ formAction }}" novalidate>
     {{ csrfProtection(csrfToken) }}
     <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
+    {# Enter in a field submits the form's first button: this one continues, rather than removing or adding a judgment. #}
+    <button type="submit" name="action" value="continue" class="govuk-visually-hidden" tabindex="-1" aria-hidden="true">Continue</button>
 
     {% if issuingHtml %}
       <h2 class="govuk-heading-m">The order to issue</h2>

@@ -126,6 +126,13 @@ describe('moneyJudgments', () => {
     ]);
   });
 
+  it('asks for the rest of the instalment terms when only how often is given', () => {
+    const judgment = { ...blankJudgment(sides), arrears: '10', instalmentFrequency: 'WEEKLY' };
+    expect(
+      validateMoneyJudgments({ costs: 'NONE', hasMoneyJudgments: 'yes', judgments: [judgment] }).map(issue => issue.id)
+    ).toEqual(['judgment-1-instalment-amount', 'judgment-1-first-instalment-date-day']);
+  });
+
   it('lists each judgment to check, naming its parties', () => {
     const names: Record<string, string> = {
       c1: 'Claimant 1: Housing Ltd',

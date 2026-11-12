@@ -259,7 +259,7 @@ export function validateMoneyJudgments(answers: MoneyJudgmentsAnswers | undefine
     if (given(judgment.payBy)) {
       date('pay-by', judgment.payBy, 'it must be paid by');
     }
-    if (judgment.instalmentAmount || given(judgment.firstInstalmentDate)) {
+    if (judgment.instalmentAmount || judgment.instalmentFrequency || given(judgment.firstInstalmentDate)) {
       if (!parseMoney(judgment.instalmentAmount)) {
         add('instalment-amount', `Enter a valid instalment for money judgment ${n}`);
       }
