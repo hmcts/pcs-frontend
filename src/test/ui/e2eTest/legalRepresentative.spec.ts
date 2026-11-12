@@ -629,7 +629,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickButton', responseAndCounterClaimSubmitted.closeAndReturnToCaseOverviewButton);
   });
 
-  test('RentArrears - NonRentArrears - AssuredTenancy - LR @PR @rentNonRent @LR', async () => {
+  test('RentArrears - NonRentArrears - AssuredTenancy - LR @rentNonRent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -776,7 +776,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     );
   });
 
-  test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @PR @rentNonRent @LR @regression @healthCheck', async () => {
+  test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @rentNonRent @LR @regression @healthCheck', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
@@ -1205,7 +1205,7 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
     await performAction('clickLink', selectDefendant.signOutLink);
   });
 
-  test('RentArrears - Defendant address known - No - LR @smoke @defendantAddressKnown @LR', async () => {
+  test('RentArrears - Defendant address known - No - LR @defendantAddressKnown @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
