@@ -6,7 +6,6 @@ const selectedData = process.env.RUN_E2E_IN_WELSH?.toLowerCase() === 'true' ? we
 const data = selectedData as typeof englishData;
 
 export const {
-
   home,
   claims,
   startNow,
