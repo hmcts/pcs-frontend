@@ -1,4 +1,5 @@
 import { shutdownAzureMonitor, useAzureMonitor } from '@azure/monitor-opentelemetry';
+import { TraceFlags } from '@opentelemetry/api';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import {
   ExpressInstrumentation,
@@ -76,12 +77,27 @@ const httpTelemetryConfig: HttpTelemetryConfig = {
   },
 };
 
-// Middleware and request handlers are ignored so they do not each get a span, which App Insights
-// would store as an InProc dependency. Routers are not: an ignored router that is mounted on a
-// path and does not handle the request leaves that path behind, so a later route would be named
-// /case/case/:caseReference/... and a 404 would be named GET /case. A router span ends at once.
+// Routers are not ignored: if they were, a route registered after a router mounted on a path
+// would get that path twice (/case/case/...). Ignoring the other two saves a span per layer.
 export const expressInstrumentationConfig: ExpressInstrumentationConfig = {
   ignoreLayersType: [ExpressLayerType.MIDDLEWARE, ExpressLayerType.REQUEST_HANDLER],
+};
+
+interface SampledSpan extends EndedSpan {
+  spanContext: () => { traceFlags: number };
+}
+
+// Router spans are only there to get the route right, so they are not sent to App Insights.
+// The exporter skips a span that is not marked as sampled.
+export const routerSpanDroppingSpanProcessor = {
+  onStart: (): void => {},
+  onEnd: (span: SampledSpan): void => {
+    if (span.attributes?.['express.type'] === ExpressLayerType.ROUTER) {
+      span.spanContext().traceFlags = TraceFlags.NONE;
+    }
+  },
+  forceFlush: (): Promise<void> => Promise.resolve(),
+  shutdown: (): Promise<void> => Promise.resolve(),
 };
 
 export function initializeTelemetry(): void {
@@ -105,13 +121,11 @@ export function initializeTelemetry(): void {
         enabled: false,
       },
     },
-    spanProcessors: [secretRedactingSpanProcessor],
+    spanProcessors: [secretRedactingSpanProcessor, routerSpanDroppingSpanProcessor],
     enableLiveMetrics: true,
   });
-  // Without this, App Insights names every request by its method alone (HDPI-9884). The
-  // instrumentation records the matched route template as http.route, which the exporter uses for
-  // the operation name. It is registered on the tracer provider useAzureMonitor() has just set up;
-  // bootstrap.ts loads express only after this.
+  // Records the route template, so App Insights names a request by its route, not just its method.
+  // This has to run after useAzureMonitor() and before express is loaded, as bootstrap.ts does.
   registerInstrumentations({
     instrumentations: [new ExpressInstrumentation(expressInstrumentationConfig)],
   });

@@ -130,14 +130,12 @@ describe('opentelemetry module', () => {
       expect(mockRegisterInstrumentations).toHaveBeenCalledWith({
         instrumentations: [mockExpressInstrumentation.mock.instances[0]],
       });
-      // The instrumentation picks up the global tracer provider, which useAzureMonitor() registers.
       expect(mockUseAzureMonitor.mock.invocationCallOrder[0]).toBeLessThan(
         mockRegisterInstrumentations.mock.invocationCallOrder[0]
       );
     });
 
-    // Routers stay instrumented; express-route-names.test.ts checks the routes that depend on it.
-    it('records the route without creating a span for every middleware and handler', async () => {
+    it('creates no span for middleware and handlers, but keeps routers instrumented', async () => {
       await initializeAndGetTelemetryConfig();
 
       expect(mockExpressInstrumentation).toHaveBeenCalledWith({
@@ -154,14 +152,47 @@ describe('opentelemetry module', () => {
       expect(mockExpressInstrumentation).not.toHaveBeenCalled();
     });
 
-    it('leaves secretRedactingSpanProcessor as the only span processor', async () => {
+    it('still redacts URLs first, then drops router spans', async () => {
       const telemetryModule = await getTelemetryModule();
 
       telemetryModule.initializeTelemetry();
 
       const { spanProcessors } = mockUseAzureMonitor.mock.calls[0][0] as TelemetryConfig;
-      expect(spanProcessors).toHaveLength(1);
+      expect(spanProcessors).toHaveLength(2);
       expect(spanProcessors[0]).toBe(telemetryModule.secretRedactingSpanProcessor);
+      expect(spanProcessors[1]).toBe(telemetryModule.routerSpanDroppingSpanProcessor);
+    });
+
+    describe('routerSpanDroppingSpanProcessor', () => {
+      const SAMPLED = 1;
+      const spanOfType = (expressType?: string) => {
+        const spanContext = { traceFlags: SAMPLED };
+        return {
+          attributes: expressType ? { 'express.type': expressType } : {},
+          spanContext: () => spanContext,
+        };
+      };
+
+      it('marks a router span as not sampled, so it is not exported', async () => {
+        const { routerSpanDroppingSpanProcessor } = await getTelemetryModule();
+        const span = spanOfType('router');
+
+        routerSpanDroppingSpanProcessor.onEnd(span);
+
+        expect(span.spanContext().traceFlags).toBe(0);
+      });
+
+      it.each([
+        ['a request or dependency', undefined],
+        ['any other Express layer', 'request_handler'],
+      ])('leaves %s sampled', async (_description, expressType) => {
+        const { routerSpanDroppingSpanProcessor } = await getTelemetryModule();
+        const span = spanOfType(expressType);
+
+        routerSpanDroppingSpanProcessor.onEnd(span);
+
+        expect(span.spanContext().traceFlags).toBe(SAMPLED);
+      });
     });
   });
 

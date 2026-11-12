@@ -10,12 +10,12 @@
     {
       "groupName": "OpenTelemetry",
       "matchPackageNames": ["@azure/monitor-opentelemetry", "@opentelemetry/**"],
-      "description": "HDPI-9884: upgrade the Azure Monitor distro and the @opentelemetry packages, including the resolutions pins for @opentelemetry/core and @opentelemetry/instrumentation, in one PR."
+      "description": "HDPI-9884: upgrade the Azure Monitor distro and the @opentelemetry packages in one PR, so their versions stay in step."
     },
     {
       "matchPackageNames": ["@opentelemetry/instrumentation-express"],
-      "allowedVersions": "<0.72",
-      "description": "HDPI-9884: 0.72+ is built on @opentelemetry/core 3, but @azure/monitor-opentelemetry 1.20.x and the resolutions pins are on core 2.10 / instrumentation 0.221. The unit tests mock this package, so CI would not catch the mismatch and automerge would ship it. Lift this when the distro moves to core 3."
+      "allowedVersions": "<0.70",
+      "description": "HDPI-9884: 0.70+ needs a newer @opentelemetry/instrumentation than the 0.221 that @azure/monitor-opentelemetry 1.20.x uses and resolutions pins. Raise this when the distro is upgraded."
     }
   ],
   "platformAutomerge": false,

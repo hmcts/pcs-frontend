@@ -23,8 +23,7 @@ jest.mock('@azure/monitor-opentelemetry', () => ({
 jest.mock('config', () => ({ get: jest.fn() }));
 jest.mock('@modules/logger', () => ({ Logger: { enableTelemetry: jest.fn() } }));
 
-// The real Express instrumentation, with the configuration the app registers, against the real
-// Express. index.test.ts mocks both, so it cannot tell whether the route recorded is the right one.
+// Runs the real Express instrumentation with the app's settings.
 
 const CASE_REFERENCE = '1234567890123456';
 
@@ -73,8 +72,7 @@ describe('route recorded for App Insights request names (HDPI-9884)', () => {
 
   const pass = (req: Request, res: Response, next: NextFunction): void => next();
 
-  // Stands in for the HTTP instrumentation: it opens the request span and reads the route the
-  // Express instrumentation leaves on the RPC metadata, which becomes http.route.
+  // Stands in for the HTTP instrumentation: opens the request span and reads the recorded route.
   const httpInstrumentationStandIn = (req: Request, res: Response, next: NextFunction): void => {
     const span = trace.wrapSpanContext(INVALID_SPAN_CONTEXT);
     const metadata: RPCMetadata = { type: RPCType.HTTP, span };
@@ -82,8 +80,7 @@ describe('route recorded for App Insights request names (HDPI-9884)', () => {
     context.with(setRPCMetadata(trace.setSpan(context.active(), span), metadata), next);
   };
 
-  // The same shapes, in the same order, as app.ts: the guidance router, a journey router mounted at
-  // the root, the dashboard router mounted on /case, then routes registered after it.
+  // Routers in the same order as app.ts: guidance, a journey, the dashboard on /case, then the rest.
   const buildApp = (): express.Express => {
     const app = express();
     app.use(httpInstrumentationStandIn);
@@ -133,7 +130,8 @@ describe('route recorded for App Insights request names (HDPI-9884)', () => {
 
   beforeAll(async () => {
     context.setGlobalContextManager(new AsyncLocalStorageContextManager());
-    // Jest loads modules itself, so the instrumentation's require hook never sees express.
+    // In the app, the instrumentation attaches itself to express when express is first loaded.
+    // That does not happen under Jest, which loads modules its own way, so attach it by hand.
     expressModule.patch?.(express);
     server = buildApp().listen(0);
     await new Promise(resolve => server.once('listening', resolve));
@@ -164,7 +162,7 @@ describe('route recorded for App Insights request names (HDPI-9884)', () => {
   });
 
   it('does not repeat the mount path of a router the request only passed through', async () => {
-    // The dashboard router is mounted on /case and comes first, but does not handle this request.
+    // The dashboard router on /case sees this request first, but does not handle it.
     expect(await recordedRouteFor('GET', `/case/${CASE_REFERENCE}/view-hearing-documents`)).toBe(
       '/case/:caseReference/view-hearing-documents'
     );
