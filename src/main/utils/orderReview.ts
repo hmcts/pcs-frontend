@@ -51,7 +51,7 @@ export interface OrderReviewAnswers {
   hasReviewDates?: 'yes' | 'no';
   reviewDates: ReviewDateAnswer[];
   nextSteps?: string;
-  /** Asked on proceed to issue, but not yet sent to pcs-api: nothing uses them until each says what it applies to. */
+  /** Asked on proceed to issue, but not yet sent to pcs-api: nothing uses it until it says what it applies to. */
   finalOrder?: 'yes' | 'no';
   restitutionPermission?: 'yes' | 'no';
   serveAllParties?: 'yes' | 'no';
@@ -243,6 +243,7 @@ export function reviewRequest(
       serveAllParties,
       partiesToServe: serveAllParties ? [] : answers.partiesToServe,
       seal: answers.seal,
+      restitutionPermitted: answers.restitutionPermission === 'yes',
       ...moneyJudgmentsRequest(answers.moneyJudgments),
     },
   };
