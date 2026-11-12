@@ -30,8 +30,6 @@ import {
 import {
   ValidationIssue,
   errorSummary,
-  getClaimantNames,
-  getDefendantNames,
   manageCaseDetailsUrl,
   mapXuiValidation,
   refusedXuiEvent,
@@ -154,8 +152,7 @@ async function caseModel(req: Request, caseReference: string): Promise<Record<st
     evictionData: evictionSummary(ccdCase),
     caseReferenceDisplay: caseNumberFormatter(caseReference),
     propertyAddressDisplay: formatAddress(ccdCase.propertyAddress),
-    claimantNames: getClaimantNames(ccdCase),
-    defendantNames: getDefendantNames(ccdCase),
+    caseName: ccdCase.caseNameHmctsInternal,
   };
 }
 

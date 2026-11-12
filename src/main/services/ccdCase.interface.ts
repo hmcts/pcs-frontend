@@ -305,6 +305,7 @@ export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
+  caseNameHmctsInternal?: string;
   dateIssued?: string;
   claimIssueDate?: string;
   dateSubmitted?: string;

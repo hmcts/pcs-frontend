@@ -103,6 +103,7 @@ describe('recordWarrantReturnRoutes', () => {
             value: { code: 'PROVIDER_OF_SOCIAL_HOUSING', label: 'Registered provider of social housing' },
           },
           propertyAddress: { AddressLine1: '1 High Street', PostTown: 'London', PostCode: 'SW1A 1AA' },
+          caseNameHmctsInternal: 'Housing Ltd vs Sam Smith',
           allClaimants: [{ value: { orgName: 'Housing Ltd' } }],
           allDefendants: [
             { value: { nameKnown: 'YES', firstName: 'Sam', lastName: 'Smith' } },
@@ -164,8 +165,7 @@ describe('recordWarrantReturnRoutes', () => {
         },
         caseReferenceDisplay: '1794-2315-4611-5667',
         propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
-        claimantNames: 'Housing Ltd',
-        defendantNames: 'Sam Smith, Persons unknown',
+        caseName: 'Housing Ltd vs Sam Smith',
       });
     });
 
@@ -190,8 +190,7 @@ describe('recordWarrantReturnRoutes', () => {
             ],
           },
           propertyAddressDisplay: undefined,
-          claimantNames: '',
-          defendantNames: '',
+          caseName: undefined,
         })
       );
     });
@@ -249,8 +248,7 @@ describe('recordWarrantReturnRoutes', () => {
       (ccdCaseService.startCaseEvent as jest.Mock).mockReturnValueOnce({
         data: {
           propertyAddress: { AddressLine1: '1 High Street', PostTown: 'London', PostCode: 'SW1A 1AA' },
-          allClaimants: [{ value: { orgName: 'Housing Ltd' } }],
-          allDefendants: [{ value: { nameKnown: 'YES', firstName: 'Sam', lastName: 'Smith' } }],
+          caseNameHmctsInternal: 'Housing Ltd vs Sam Smith',
         },
       });
       const res = { render: jest.fn() };
@@ -270,8 +268,7 @@ describe('recordWarrantReturnRoutes', () => {
         expect.objectContaining({
           caseReferenceDisplay: '1794-2315-4611-5667',
           propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
-          claimantNames: 'Housing Ltd',
-          defendantNames: 'Sam Smith',
+          caseName: 'Housing Ltd vs Sam Smith',
         })
       );
     });
