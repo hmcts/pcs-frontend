@@ -229,9 +229,7 @@ describe("make an order: the judge's one draft on a case", () => {
     expect(errors()).toContain('Tick the box to discard this draft order');
     expect(madeAt()).toBe('2');
     expect(control('[name="current-rent"]').value).toBe('875');
-    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe(
-      'A note for the hearing already shown'
-    );
+    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('A note for the hearing already shown');
     expect(submittedOrders()).toHaveLength(1);
     expect(discardedDrafts()).toEqual([]);
   });
