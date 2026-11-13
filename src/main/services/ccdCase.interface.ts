@@ -211,12 +211,11 @@ export interface CcdUploadedDocument {
   sizeInBytes?: number;
 }
 
-export interface CcdClaimantType {
+export interface CcdDynamicStringListType {
   value: {
     code: string;
     label: string;
   };
-  valueCode: string;
 }
 
 export interface CcdCollectionItem<T> {
@@ -306,6 +305,7 @@ export type CaseData = CcdCaseData;
 
 /** Case data payload from CCD (START callback case_data or CcdCase.data). */
 export interface CcdCaseData {
+  caseNameHmctsInternal?: string;
   dateIssued?: string;
   claimIssueDate?: string;
   dateSubmitted?: string;
@@ -370,7 +370,7 @@ export interface CcdCaseData {
     noticeDocuments?: CcdCollectionItem<Document>[];
   };
   warrantReturn?: WarrantReturn;
-  claimantType?: CcdClaimantType;
+  claimantType?: CcdDynamicStringListType;
 }
 
 export interface CcdCaseDocument {

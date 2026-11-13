@@ -11,7 +11,7 @@ jest.mock('@services/ccdCaseService', () => ({
       },
       eventToken: 'event-token',
     }),
-    submitCaseEvent: jest.fn().mockResolvedValue({}),
+    startAndSubmitEvent: jest.fn().mockResolvedValue({}),
   },
 }));
 
@@ -103,6 +103,7 @@ describe('recordWarrantReturnRoutes', () => {
             value: { code: 'PROVIDER_OF_SOCIAL_HOUSING', label: 'Registered provider of social housing' },
           },
           propertyAddress: { AddressLine1: '1 High Street', PostTown: 'London', PostCode: 'SW1A 1AA' },
+          caseNameHmctsInternal: 'Housing Ltd vs Sam Smith',
           allClaimants: [{ value: { orgName: 'Housing Ltd' } }],
           allDefendants: [
             { value: { nameKnown: 'YES', firstName: 'Sam', lastName: 'Smith' } },
@@ -164,8 +165,7 @@ describe('recordWarrantReturnRoutes', () => {
         },
         caseReferenceDisplay: '1794-2315-4611-5667',
         propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
-        claimantNames: 'Housing Ltd',
-        defendantNames: 'Sam Smith, Persons unknown',
+        caseName: 'Housing Ltd vs Sam Smith',
       });
     });
 
@@ -190,8 +190,7 @@ describe('recordWarrantReturnRoutes', () => {
             ],
           },
           propertyAddressDisplay: undefined,
-          claimantNames: '',
-          defendantNames: '',
+          caseName: undefined,
         })
       );
     });
@@ -249,8 +248,7 @@ describe('recordWarrantReturnRoutes', () => {
       (ccdCaseService.startCaseEvent as jest.Mock).mockReturnValueOnce({
         data: {
           propertyAddress: { AddressLine1: '1 High Street', PostTown: 'London', PostCode: 'SW1A 1AA' },
-          allClaimants: [{ value: { orgName: 'Housing Ltd' } }],
-          allDefendants: [{ value: { nameKnown: 'YES', firstName: 'Sam', lastName: 'Smith' } }],
+          caseNameHmctsInternal: 'Housing Ltd vs Sam Smith',
         },
       });
       const res = { render: jest.fn() };
@@ -270,8 +268,7 @@ describe('recordWarrantReturnRoutes', () => {
         expect.objectContaining({
           caseReferenceDisplay: '1794-2315-4611-5667',
           propertyAddressDisplay: '1 High Street, London, SW1A 1AA',
-          claimantNames: 'Housing Ltd',
-          defendantNames: 'Sam Smith',
+          caseName: 'Housing Ltd vs Sam Smith',
         })
       );
     });
@@ -632,7 +629,7 @@ describe('recordWarrantReturnRoutes', () => {
 
   describe('POST checkYourAnswers', () => {
     const path = '/case/:caseReference/record-warrant-return/check-your-answers';
-    const mockSubmitCaseEvent = ccdCaseService.submitCaseEvent as jest.Mock;
+    const mockStartAndSubmitEvent = ccdCaseService.startAndSubmitEvent as jest.Mock;
 
     const successful = {
       returnType: WarrantReturnType.FINAL,
@@ -665,28 +662,21 @@ describe('recordWarrantReturnRoutes', () => {
       const { res } = await post({ action: 'previous' }, successful);
 
       expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return');
-      expect(mockSubmitCaseEvent).not.toHaveBeenCalled();
+      expect(mockStartAndSubmitEvent).not.toHaveBeenCalled();
     });
 
     it('asks for the answers again when the session has none', async () => {
       const { res } = await post({ action: 'continue' });
 
       expect(res.redirect).toHaveBeenCalledWith('/case/123/record-warrant-return');
-      expect(mockSubmitCaseEvent).not.toHaveBeenCalled();
+      expect(mockStartAndSubmitEvent).not.toHaveBeenCalled();
     });
 
-    it('submits the answers as pcs-api takes them, forgets them and shows the confirmation', async () => {
+    it('submits the answers, forgets them and shows the confirmation', async () => {
       const { req, res } = await post({ action: 'continue' }, successful);
 
-      expect(ccdCaseService.startCaseEvent).toHaveBeenCalledWith('token', '123', 'ext:recordWarrantReturn');
-      expect(mockSubmitCaseEvent).toHaveBeenCalledWith('token', '123', 'ext:recordWarrantReturn', 'event-token', {
-        warrantReturn: {
-          returnType: 'FINAL',
-          returnName: 'EVICTION_SUCCESSFUL',
-          evictionOutcome: 'SUCCESSFUL',
-          additionalDetails: 'Keys handed over',
-          outcomeDate: '2026-07-01T08:05:00',
-        },
+      expect(mockStartAndSubmitEvent).toHaveBeenCalledWith('token', '123', 'ext:recordWarrantReturn', {
+        warrantReturn: successful,
       });
       expect(req.session.warrantReturn).toEqual({ '456': { returnType: 'INTERIM' } });
       expect(req.session.save).toHaveBeenCalled();
@@ -699,14 +689,16 @@ describe('recordWarrantReturnRoutes', () => {
         { returnType: WarrantReturnType.INTERIM, returnName: InterimReturnName.CROWDS_OR_PROTESTS }
       );
 
-      expect(mockSubmitCaseEvent.mock.calls[0][4]).toEqual({
+      expect(mockStartAndSubmitEvent.mock.calls[0][3]).toEqual({
         warrantReturn: { returnType: 'INTERIM', returnName: 'CROWDS_OR_PROTESTS' },
       });
-      expect(JSON.stringify(mockSubmitCaseEvent.mock.calls[0][4])).not.toContain('outcomeDate');
+      expect(JSON.stringify(mockStartAndSubmitEvent.mock.calls[0][3])).not.toContain('outcomeDate');
     });
 
     it('shows why pcs-api refused the return and keeps the answers', async () => {
-      mockSubmitCaseEvent.mockRejectedValueOnce(new CallbackRejectedError(['There is no warrant on this case'], 422));
+      mockStartAndSubmitEvent.mockRejectedValueOnce(
+        new CallbackRejectedError(['There is no warrant on this case'], 422)
+      );
 
       const { req, res } = await post({ action: 'continue' }, successful);
 
@@ -724,21 +716,10 @@ describe('recordWarrantReturnRoutes', () => {
 
     it('passes any other failure to the error handler', async () => {
       const failure = new HTTPError('CCD is down', 502);
-      mockSubmitCaseEvent.mockRejectedValueOnce(failure);
+      mockStartAndSubmitEvent.mockRejectedValueOnce(failure);
 
-      const { next, res } = await post({ action: 'continue' }, successful);
+      const { req, next, res } = await post({ action: 'continue' }, successful);
 
-      expect(next).toHaveBeenCalledWith(failure);
-      expect(res.redirect).not.toHaveBeenCalled();
-    });
-
-    it('does not submit when the event cannot be started', async () => {
-      const failure = new HTTPError('CCD is down', 502);
-      (ccdCaseService.startCaseEvent as jest.Mock).mockRejectedValueOnce(failure);
-
-      const { req, res, next } = await post({ action: 'continue' }, successful);
-
-      expect(mockSubmitCaseEvent).not.toHaveBeenCalled();
       expect(next).toHaveBeenCalledWith(failure);
       expect(req.session.warrantReturn?.['123']).toEqual(successful);
       expect(res.redirect).not.toHaveBeenCalled();
@@ -746,10 +727,10 @@ describe('recordWarrantReturnRoutes', () => {
 
     it('passes a failure to load the case after a refusal to the error handler', async () => {
       const failure = new HTTPError('CCD is down', 502);
-      mockSubmitCaseEvent.mockRejectedValueOnce(new CallbackRejectedError(['There is no warrant on this case'], 422));
-      (ccdCaseService.startCaseEvent as jest.Mock)
-        .mockReturnValueOnce({ data: {}, eventToken: 'event-token' })
-        .mockRejectedValueOnce(failure);
+      mockStartAndSubmitEvent.mockRejectedValueOnce(
+        new CallbackRejectedError(['There is no warrant on this case'], 422)
+      );
+      (ccdCaseService.startCaseEvent as jest.Mock).mockRejectedValueOnce(failure);
 
       const { res, next } = await post({ action: 'continue' }, successful);
 
@@ -776,7 +757,7 @@ describe('recordWarrantReturnRoutes', () => {
         next
       );
 
-      expect(mockSubmitCaseEvent).toHaveBeenCalled();
+      expect(mockStartAndSubmitEvent).toHaveBeenCalled();
       expect(next).toHaveBeenCalledWith(failure);
       expect(res.redirect).not.toHaveBeenCalled();
     });

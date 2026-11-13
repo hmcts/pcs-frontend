@@ -30,8 +30,6 @@ import {
 import {
   ValidationIssue,
   errorSummary,
-  getClaimantNames,
-  getDefendantNames,
   manageCaseDetailsUrl,
   mapXuiValidation,
   refusedXuiEvent,
@@ -154,8 +152,7 @@ async function caseModel(req: Request, caseReference: string): Promise<Record<st
     evictionData: evictionSummary(ccdCase),
     caseReferenceDisplay: caseNumberFormatter(caseReference),
     propertyAddressDisplay: formatAddress(ccdCase.propertyAddress),
-    claimantNames: getClaimantNames(ccdCase),
-    defendantNames: getDefendantNames(ccdCase),
+    caseName: ccdCase.caseNameHmctsInternal,
   };
 }
 
@@ -238,14 +235,9 @@ export default function recordWarrantReturnRoutes(app: Application): void {
 
     try {
       const accessToken = req.session.user!.accessToken;
-      const started = await ccdCaseService.startCaseEvent(accessToken, caseReference, RECORD_WARRANT_RETURN_EVENT_ID);
-      await ccdCaseService.submitCaseEvent(
-        accessToken,
-        caseReference,
-        RECORD_WARRANT_RETURN_EVENT_ID,
-        started.eventToken,
-        { warrantReturn: ccdWarrantReturn(warrantReturn) }
-      );
+      await ccdCaseService.startAndSubmitEvent(accessToken, caseReference, RECORD_WARRANT_RETURN_EVENT_ID, {
+        warrantReturn,
+      });
     } catch (error) {
       return refusedXuiEvent(res, next, error, rejected => void showFailedSubmit(req, res, next, rejected));
     }
@@ -280,18 +272,6 @@ async function showFailedSubmit(
   } catch (renderError) {
     next(renderError);
   }
-}
-
-export function ccdWarrantReturn(warrantReturn: WarrantReturn): Record<string, unknown> {
-  return {
-    returnType: warrantReturn.returnType,
-    returnName: warrantReturn.returnName,
-    evictionOutcome: warrantReturn.outcome,
-    additionalDetails: warrantReturn.additionalDetails,
-    outcomeDate: warrantReturn.outcomeDate
-      ? DateTime.fromISO(warrantReturn.outcomeDate, { setZone: true }).toUTC().toFormat("yyyy-MM-dd'T'HH:mm:ss")
-      : undefined,
-  };
 }
 
 function text(body: Record<string, unknown> | undefined, name: string): string {

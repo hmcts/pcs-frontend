@@ -9,6 +9,10 @@
   </p>
   <p class="govuk-body govuk-!-margin-bottom-1">{{ params.propertyAddress }}</p>
   <p class="govuk-body govuk-!-font-weight-bold">
-    {{ params.claimantNames }} vs {{ params.defendantNames }}
+    {% if params.caseName %}
+      {{ params.caseName }}
+    {% elif params.claimantNames is defined %}
+      {{ params.claimantNames }} vs {{ params.defendantNames }}
+    {% endif %}
   </p>
 {% endmacro %}

@@ -21,7 +21,7 @@ import { staffXuiRedirectMiddleware } from '../../../main/middleware/staffXuiRed
 const XUI_URL = 'https://manage-case.aat.platform.hmcts.net';
 const CASE_DETAILS_BASE_URL = 'https://manage-case.aat.platform.hmcts.net/cases/case-details/PCS/PCS';
 
-describe('judgeXuiRedirectMiddleware', () => {
+describe('staffXuiRedirectMiddleware', () => {
   let res: Partial<Response>;
   let next: NextFunction;
 
@@ -60,6 +60,7 @@ describe('judgeXuiRedirectMiddleware', () => {
 
     await invokeMiddleware(path);
 
+    expect(mockGetLaunchDarklyFlag).not.toHaveBeenCalled();
     expect(res.redirect).toHaveBeenCalledWith(
       303,
       path.startsWith('/case/') ? `${CASE_DETAILS_BASE_URL}/1234567890123456` : XUI_URL
@@ -67,12 +68,93 @@ describe('judgeXuiRedirectMiddleware', () => {
     expect(next).not.toHaveBeenCalled();
   });
 
-  it('leaves staff where they are while make order is disabled', async () => {
+  it.each([
+    '/case/1234567890123456/make-order',
+    '/case/1234567890123456/make-order/sent-for-review',
+    '/cases/1234567890123456/event/ext:makeOrder',
+    '/cases/1234567890123456/event/ext%3AmakeOrder',
+    '/case/1234567890123456/confirm-order-review',
+    '/case/1234567890123456/confirm-order-review/check-your-answers',
+    '/cases/1234567890123456/event/ext:confirmOrderReview',
+    '/cases/1234567890123456/event/ext%3AconfirmOrderReview',
+  ])('returns staff to the case from %s while make order is disabled', async path => {
     mockIsStaffUser.mockReturnValue(true);
     mockGetLaunchDarklyFlag.mockResolvedValue(false);
 
-    await invokeMiddleware('/claims');
+    await invokeMiddleware(path);
 
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(expect.anything(), 'make-order-enabled', false);
+    expect(res.redirect).toHaveBeenCalledWith(303, `${CASE_DETAILS_BASE_URL}/1234567890123456`);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it.each(['/docweave/templates', '/docweave/templates/order-template'])(
+    'returns staff to XUI from %s while make order is disabled',
+    async path => {
+      mockIsStaffUser.mockReturnValue(true);
+      mockGetLaunchDarklyFlag.mockResolvedValue(false);
+
+      await invokeMiddleware(path);
+
+      expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(expect.anything(), 'make-order-enabled', false);
+      expect(res.redirect).toHaveBeenCalledWith(303, XUI_URL);
+      expect(next).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each([
+    '/case/1234567890123456/record-warrant-return',
+    '/case/1234567890123456/record-warrant-return/check-your-answers',
+    '/case/1234567890123456/record-warrant-return/confirmed',
+    '/cases/1234567890123456/event/ext:recordWarrantReturn',
+    '/cases/1234567890123456/event/ext%3ArecordWarrantReturn',
+  ])('returns staff to the case from %s while record warrant return is disabled', async path => {
+    mockIsStaffUser.mockReturnValue(true);
+    mockGetLaunchDarklyFlag.mockResolvedValue(false);
+
+    await invokeMiddleware(path);
+
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(expect.anything(), 'record-warrant-return-enabled', false);
+    expect(res.redirect).toHaveBeenCalledWith(303, `${CASE_DETAILS_BASE_URL}/1234567890123456`);
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    '/case/1234567890123456/record-warrant-return',
+    '/case/1234567890123456/record-warrant-return/check-your-answers',
+    '/case/1234567890123456/record-warrant-return/confirmed',
+    '/cases/1234567890123456/event/ext:recordWarrantReturn',
+    '/cases/1234567890123456/event/ext%3ArecordWarrantReturn',
+  ])('does not redirect user back to XUI when record warrant return flag is enabled on %s', async path => {
+    mockIsStaffUser.mockReturnValue(true);
+    mockGetLaunchDarklyFlag.mockImplementation(async (_req: unknown, flag: string) => flag !== 'make-order-enabled');
+
+    await invokeMiddleware(path);
+
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledTimes(1);
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(expect.anything(), 'record-warrant-return-enabled', false);
+    expect(next).toHaveBeenCalled();
+    expect(res.redirect).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    '/case/1234567890123456/make-order',
+    '/case/1234567890123456/make-order/sent-for-review',
+    '/cases/1234567890123456/event/ext:makeOrder',
+    '/cases/1234567890123456/event/ext%3AmakeOrder',
+    '/case/1234567890123456/confirm-order-review',
+    '/case/1234567890123456/confirm-order-review/check-your-answers',
+    '/cases/1234567890123456/event/ext:confirmOrderReview',
+    '/cases/1234567890123456/event/ext%3AconfirmOrderReview',
+    '/docweave/templates',
+    '/docweave/templates/order-template',
+  ])('does not redirect user back to XUI when make order flag is enabled on %s', async path => {
+    mockIsStaffUser.mockReturnValue(true);
+    mockGetLaunchDarklyFlag.mockImplementation(async (_req: unknown, flag: string) => flag === 'make-order-enabled');
+
+    await invokeMiddleware(path);
+
+    expect(mockGetLaunchDarklyFlag).toHaveBeenCalledTimes(1);
     expect(mockGetLaunchDarklyFlag).toHaveBeenCalledWith(expect.anything(), 'make-order-enabled', false);
     expect(next).toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
@@ -92,37 +174,6 @@ describe('judgeXuiRedirectMiddleware', () => {
     await invokeMiddleware('/claims%E0%A4%A');
 
     expect(res.redirect).toHaveBeenCalledWith(303, XUI_URL);
-  });
-
-  it.each([
-    '/case/1234567890123456/make-order',
-    '/case/1234567890123456/make-order/sent-for-review',
-    '/cases/1234567890123456/event/ext:makeOrder',
-    // How XUI builds the hand-off: encodeURIComponent(eventId)
-    '/cases/1234567890123456/event/ext%3AmakeOrder',
-    '/case/1234567890123456/confirm-order-review',
-    '/case/1234567890123456/confirm-order-review/check-your-answers',
-    '/cases/1234567890123456/event/ext%3AconfirmOrderReview',
-    '/case/1234567890123456/record-warrant-return',
-    '/case/1234567890123456/record-warrant-return/check-your-answers',
-    '/case/1234567890123456/record-warrant-return/confirmed',
-    '/cases/1234567890123456/event/ext%3ArecordWarrantReturn',
-  ])('allows the %s staff order journey through', async path => {
-    mockIsStaffUser.mockReturnValue(true);
-
-    await invokeMiddleware(path);
-
-    expect(next).toHaveBeenCalled();
-    expect(res.redirect).not.toHaveBeenCalled();
-  });
-
-  it('allows Docweave template requests made by the make-order journey through', async () => {
-    mockIsStaffUser.mockReturnValue(true);
-
-    await invokeMiddleware('/docweave/templates/order-template');
-
-    expect(next).toHaveBeenCalled();
-    expect(res.redirect).not.toHaveBeenCalled();
   });
 
   it('allows the session heartbeat through for an active judicial journey', async () => {
