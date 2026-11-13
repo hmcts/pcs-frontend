@@ -1,4 +1,11 @@
 import { shutdownAzureMonitor, useAzureMonitor } from '@azure/monitor-opentelemetry';
+import { TraceFlags } from '@opentelemetry/api';
+import { registerInstrumentations } from '@opentelemetry/instrumentation';
+import {
+  ExpressInstrumentation,
+  type ExpressInstrumentationConfig,
+  ExpressLayerType,
+} from '@opentelemetry/instrumentation-express';
 import config from 'config';
 
 import { Logger } from '@modules/logger';
@@ -10,6 +17,8 @@ export { redactQueryValues };
 let isTelemetryInitialized = false;
 let telemetryShutdownPromise: Promise<void> | null = null;
 const ignoredIncomingUrlPattern = /\/assets\/|\.js(?:$|\?)|\.css(?:$|\?)/;
+// The health check and the Kubernetes probes: /health, /health/liveness and /health/readiness.
+const incomingHealthCheckPattern = /^\/health(?:\/(?:liveness|readiness))?(?:$|\?)/;
 
 interface HttpTelemetryConfig {
   enabled: boolean;
@@ -62,12 +71,35 @@ const httpTelemetryConfig: HttpTelemetryConfig = {
       return true;
     }
     const requestUrl = request.url ?? '';
-    return ignoredIncomingUrlPattern.test(requestUrl);
+    return ignoredIncomingUrlPattern.test(requestUrl) || incomingHealthCheckPattern.test(requestUrl);
   },
   ignoreOutgoingRequestHook: options => {
     const requestPath = typeof options.path === 'string' ? options.path : '';
     return requestPath === '/health' || requestPath.startsWith('/health?');
   },
+};
+
+// Routers are not ignored: if they were, a route registered after a router mounted on a path
+// would get that path twice (/case/case/...). Ignoring the other two saves a span per layer.
+export const expressInstrumentationConfig: ExpressInstrumentationConfig = {
+  ignoreLayersType: [ExpressLayerType.MIDDLEWARE, ExpressLayerType.REQUEST_HANDLER],
+};
+
+interface SampledSpan extends EndedSpan {
+  spanContext: () => { traceFlags: number };
+}
+
+// Router spans are only there to get the route right, so they are not sent to App Insights.
+// The exporter skips a span that is not marked as sampled.
+export const routerSpanDroppingSpanProcessor = {
+  onStart: (): void => {},
+  onEnd: (span: SampledSpan): void => {
+    if (span.attributes?.['express.type'] === ExpressLayerType.ROUTER) {
+      span.spanContext().traceFlags = TraceFlags.NONE;
+    }
+  },
+  forceFlush: (): Promise<void> => Promise.resolve(),
+  shutdown: (): Promise<void> => Promise.resolve(),
 };
 
 export function initializeTelemetry(): void {
@@ -91,8 +123,13 @@ export function initializeTelemetry(): void {
         enabled: false,
       },
     },
-    spanProcessors: [secretRedactingSpanProcessor],
+    spanProcessors: [secretRedactingSpanProcessor, routerSpanDroppingSpanProcessor],
     enableLiveMetrics: true,
+  });
+  // Records the route template, so App Insights names a request by its route, not just its method.
+  // This has to run after useAzureMonitor() and before express is loaded, as bootstrap.ts does.
+  registerInstrumentations({
+    instrumentations: [new ExpressInstrumentation(expressInstrumentationConfig)],
   });
   Logger.enableTelemetry();
 

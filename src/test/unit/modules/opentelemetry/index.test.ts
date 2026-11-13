@@ -2,10 +2,21 @@ const mockUseAzureMonitor = jest.fn();
 const mockShutdownAzureMonitor = jest.fn();
 const mockConfigGet = jest.fn();
 const mockEnableTelemetry = jest.fn();
+const mockExpressInstrumentation = jest.fn();
+const mockRegisterInstrumentations = jest.fn();
 
 jest.mock('@azure/monitor-opentelemetry', () => ({
   useAzureMonitor: mockUseAzureMonitor,
   shutdownAzureMonitor: mockShutdownAzureMonitor,
+}));
+
+jest.mock('@opentelemetry/instrumentation', () => ({
+  registerInstrumentations: mockRegisterInstrumentations,
+}));
+
+jest.mock('@opentelemetry/instrumentation-express', () => ({
+  ExpressInstrumentation: mockExpressInstrumentation,
+  ExpressLayerType: { ROUTER: 'router', MIDDLEWARE: 'middleware', REQUEST_HANDLER: 'request_handler' },
 }));
 
 jest.mock('config', () => ({
@@ -95,6 +106,19 @@ describe('opentelemetry module', () => {
     expect(ignoreIncomingRequestHook({ method: 'GET', url: '/case/123' })).toBe(false);
   });
 
+  it('ignores incoming health checks and probes, but not pages that only start with /health', async () => {
+    const telemetryConfig = await initializeAndGetTelemetryConfig();
+    const { ignoreIncomingRequestHook } = telemetryConfig.instrumentationOptions.http;
+
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/health' })).toBe(true);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/health?check=true' })).toBe(true);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/health/liveness' })).toBe(true);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/health/readiness' })).toBe(true);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/healthz' })).toBe(false);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/health/other' })).toBe(false);
+    expect(ignoreIncomingRequestHook({ method: 'GET', url: '/case/123/health' })).toBe(false);
+  });
+
   it('ignores health outgoing requests', async () => {
     const telemetryConfig = await initializeAndGetTelemetryConfig();
     const { ignoreOutgoingRequestHook } = telemetryConfig.instrumentationOptions.http;
@@ -109,6 +133,80 @@ describe('opentelemetry module', () => {
 
     expect(telemetryConfig.instrumentationOptions.winston).toEqual({ enabled: false });
     expect(mockEnableTelemetry).toHaveBeenCalledTimes(1);
+  });
+
+  describe('request names in App Insights (HDPI-9884)', () => {
+    it('instruments Express after Azure Monitor, so requests are named by route template', async () => {
+      await initializeAndGetTelemetryConfig();
+
+      expect(mockExpressInstrumentation).toHaveBeenCalledTimes(1);
+      expect(mockRegisterInstrumentations).toHaveBeenCalledWith({
+        instrumentations: [mockExpressInstrumentation.mock.instances[0]],
+      });
+      expect(mockUseAzureMonitor.mock.invocationCallOrder[0]).toBeLessThan(
+        mockRegisterInstrumentations.mock.invocationCallOrder[0]
+      );
+    });
+
+    it('creates no span for middleware and handlers, but keeps routers instrumented', async () => {
+      await initializeAndGetTelemetryConfig();
+
+      expect(mockExpressInstrumentation).toHaveBeenCalledWith({
+        ignoreLayersType: ['middleware', 'request_handler'],
+      });
+    });
+
+    it('does not instrument Express when App Insights is disabled', async () => {
+      mockConfigGet.mockImplementation((key: string) => key !== 'appInsights.enabled');
+      const telemetryModule = await getTelemetryModule();
+
+      telemetryModule.initializeTelemetry();
+
+      expect(mockExpressInstrumentation).not.toHaveBeenCalled();
+    });
+
+    it('still redacts URLs first, then drops router spans', async () => {
+      const telemetryModule = await getTelemetryModule();
+
+      telemetryModule.initializeTelemetry();
+
+      const { spanProcessors } = mockUseAzureMonitor.mock.calls[0][0] as TelemetryConfig;
+      expect(spanProcessors).toHaveLength(2);
+      expect(spanProcessors[0]).toBe(telemetryModule.secretRedactingSpanProcessor);
+      expect(spanProcessors[1]).toBe(telemetryModule.routerSpanDroppingSpanProcessor);
+    });
+
+    describe('routerSpanDroppingSpanProcessor', () => {
+      const SAMPLED = 1;
+      const spanOfType = (expressType?: string) => {
+        const spanContext = { traceFlags: SAMPLED };
+        return {
+          attributes: expressType ? { 'express.type': expressType } : {},
+          spanContext: () => spanContext,
+        };
+      };
+
+      it('marks a router span as not sampled, so it is not exported', async () => {
+        const { routerSpanDroppingSpanProcessor } = await getTelemetryModule();
+        const span = spanOfType('router');
+
+        routerSpanDroppingSpanProcessor.onEnd(span);
+
+        expect(span.spanContext().traceFlags).toBe(0);
+      });
+
+      it.each([
+        ['a request or dependency', undefined],
+        ['any other Express layer', 'request_handler'],
+      ])('leaves %s sampled', async (_description, expressType) => {
+        const { routerSpanDroppingSpanProcessor } = await getTelemetryModule();
+        const span = spanOfType(expressType);
+
+        routerSpanDroppingSpanProcessor.onEnd(span);
+
+        expect(span.spanContext().traceFlags).toBe(SAMPLED);
+      });
+    });
   });
 
   it('returns early when flushing before initialization', async () => {
