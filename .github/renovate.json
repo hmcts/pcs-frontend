@@ -6,16 +6,6 @@
       "matchPackageNames": ["typescript"],
       "allowedVersions": "<7",
       "description": "TypeScript 7 is the native (Go) port which does not yet expose the full compiler API used by @typescript-eslint, ts-jest, ts-loader and ts-node. #1697 auto-merged the v7 bump and broke the lint stage on master (ESLint crash: 'Cannot read properties of undefined (reading Cjs)'). Hold on v6 until the toolchain supports the native port."
-    },
-    {
-      "groupName": "OpenTelemetry",
-      "matchPackageNames": ["@azure/monitor-opentelemetry", "@opentelemetry/**"],
-      "description": "HDPI-9884: upgrade the Azure Monitor distro and the @opentelemetry packages in one PR, so their versions stay in step."
-    },
-    {
-      "matchPackageNames": ["@opentelemetry/instrumentation-express"],
-      "allowedVersions": "<0.70",
-      "description": "HDPI-9884: 0.70+ needs a newer @opentelemetry/instrumentation than the 0.221 that @azure/monitor-opentelemetry 1.20.x uses and resolutions pins. Raise this when the distro is upgraded."
     }
   ],
   "platformAutomerge": false,
