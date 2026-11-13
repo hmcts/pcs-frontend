@@ -41,13 +41,6 @@
         })
       }}
 
-      {{ dateInput(
-            "eviction-date",
-            "Eviction date and time",
-            "For example, 27 3 2026 14 30. Use the 24-hour clock."
-          )
-      }}
-
       <div id="eviction-successful" class="govuk-checkboxes__conditional govuk-!-display-none">
         {{ govukSelect({
             id: "eviction-successful-return-name",
@@ -87,14 +80,6 @@
           items: evictionUnsuccessfulReturnTypeList
         })
       }}
-
-      {{
-        dateInput(
-          "eviction-date",
-          "Eviction date and time",
-          "For example, 27 3 2026 14 30. Use the 24-hour clock."
-        )
-      }}
     </div>
 
     <div id="interim" class="govuk-checkboxes__conditional govuk-!-display-none">
@@ -108,6 +93,15 @@
           value: answers.interimReturnName,
           errorMessage: validationErrors["interim-return-name"]
         })
+      }}
+    </div>
+
+    <div id="final-outcome-section" class="govuk-checkboxes__conditional govuk-!-display-none">
+      {{ dateInput(
+            "eviction-date",
+            "Eviction date and time",
+            "For example, 27 3 2026 14 30. Use the 24-hour clock."
+          )
       }}
     </div>
 
