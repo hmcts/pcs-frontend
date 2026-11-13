@@ -1,5 +1,7 @@
 import type { Request, RequestHandler } from 'express';
 
+import { genAppCuiSetAsideFeatureMiddleware } from '../middleware/genAppCuiSetAsideFeatureMiddleware';
+
 import { flowConfig as uploadAdditionalDocumentsFlowConfig } from './case-tasks/upload-additional-documents/flow.config';
 import { stepRegistry as uploadAdditionalDocumentsStepRegistry } from './case-tasks/upload-additional-documents/stepRegistry';
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
@@ -60,6 +62,7 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
   },
   makeAnApplication: {
     name: 'makeAnApplication',
+    routeMiddleware: [genAppCuiSetAsideFeatureMiddleware],
     slug: 'make-an-application',
     // draftEvent omitted until BE confirms gen-app draft event/page id.
     // Activating gen-app uploads also requires teaching caseReferenceParamMiddleware

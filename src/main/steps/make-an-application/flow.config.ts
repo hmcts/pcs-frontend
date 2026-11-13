@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import { getFormData } from '@modules/steps';
 import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import { getPaymentSessionState } from '@services/paymentSessionService';
+import { isGenAppCuiSetAsideEnabled } from '@utils/isGenAppCuiSetAsideEnabled';
 
 export const MAKE_AN_APPLICATION_ROUTE = '/case/:caseReference/make-an-application';
 
@@ -45,13 +46,14 @@ export const flowConfig: JourneyFlowConfig = {
       showCondition: (req: Request) => getTypeOfApplication(req) === 'ADJOURN',
     },
     'do-you-need-help-paying-the-fee': {
-      showCondition: (req: Request) => doesFeeApply(req),
+      showCondition: (req: Request) => canApplicationNeedFee(req),
     },
     'have-you-already-applied-for-help-with-fees': {
-      showCondition: (req: Request) => doesFeeApply(req) && needHelpPayingTheFee(req),
+      showCondition: (req: Request) => canApplicationNeedFee(req) && needHelpPayingTheFee(req),
     },
     'you-need-to-apply-for-help-with-your-application-fee': {
-      showCondition: (req: Request) => doesFeeApply(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHwf(req),
+      showCondition: (req: Request) =>
+        canApplicationNeedFee(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHwf(req),
     },
     'are-there-any-reasons-that-this-application-should-not-be-shared': {
       showCondition: (req: Request) => !otherPartiesAgreed(req),
@@ -77,10 +79,6 @@ function getTypeOfApplication(req: Request): string {
   return getFormData(req, 'choose-an-application').typeOfApplication as string;
 }
 
-function isHearingInNext14Days(req: Request): boolean {
-  return getFormData(req, 'is-the-court-hearing-in-the-next-14-days').hearingInNext14Days === 'yes';
-}
-
 function needHelpPayingTheFee(req: Request): boolean {
   return getFormData(req, 'do-you-need-help-paying-the-fee').helpWithFeesNeeded === 'yes';
 }
@@ -89,8 +87,14 @@ function alreadyAppliedForHwf(req: Request): boolean {
   return getFormData(req, 'have-you-already-applied-for-help-with-fees').alreadyAppliedForHwf === 'yes';
 }
 
-function doesFeeApply(req: Request): boolean {
-  return getTypeOfApplication(req) !== 'ADJOURN' || isHearingInNext14Days(req);
+function canApplicationNeedFee(req: Request): boolean {
+  if (!isGenAppCuiSetAsideEnabled(req)) {
+    return (
+      getTypeOfApplication(req) !== 'ADJOURN' ||
+      getFormData(req, 'is-the-court-hearing-in-the-next-14-days').hearingInNext14Days === 'yes'
+    );
+  }
+  return ['ADJOURN', 'SET_ASIDE', 'SOMETHING_ELSE'].includes(getTypeOfApplication(req));
 }
 
 function otherPartiesAgreed(req: Request): boolean {

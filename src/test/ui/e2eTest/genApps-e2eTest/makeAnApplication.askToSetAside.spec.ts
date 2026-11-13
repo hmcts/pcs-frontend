@@ -85,7 +85,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
     await performAction('validateCYA');
     await performAction('reviewAndUpdateCYA', {
       changeOption: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-      journey: 'journey2',
+      journey: 'journey5',
     });
     await performAction('retrieveCYATableData');
     await performAction('validateCYA');
