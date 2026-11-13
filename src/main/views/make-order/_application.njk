@@ -121,14 +121,9 @@
            data-application-submitted="{{ application.submittedOnDisplay or '' }}"
            data-application-wording-html="{{ application.whatOrderWantedHtml }}"
            {%- if application.enforcementSuspension %} data-application-suspension{% endif %}>
-    <div class="pcs-application__title govuk-!-margin-bottom-1">
-      <h3 class="govuk-heading-m govuk-!-margin-bottom-0" id="{{ prefix }}-heading">
-        {{ application.reference }}: {{ application.type }}{% if application.somethingElseDetails %} – {{ application.somethingElseDetails }}{% endif %}
-      </h3>
-      {% if application.withoutNotice == "YES" %}
-        <strong class="govuk-tag pcs-application__tag" id="{{ prefix }}-notice-request">{{ application.noticeRequest }}</strong>
-      {% endif %}
-    </div>
+    <h3 class="govuk-heading-m govuk-!-margin-bottom-1" id="{{ prefix }}-heading">
+      {{ application.reference }}: {{ application.type }}{% if application.somethingElseDetails %} – {{ application.somethingElseDetails }}{% endif %}
+    </h3>
     <p class="govuk-body-s govuk-!-margin-bottom-2">
       {{ application.applicant or "Applicant not known" }}{% if application.submittedOnDisplay %}, {{ application.submittedOnDisplay }}{% endif %}
     </p>

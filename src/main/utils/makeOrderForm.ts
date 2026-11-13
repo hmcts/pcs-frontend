@@ -85,7 +85,6 @@ function applicationModel(application: OrderApplication & ApplicationToDecide, c
     within14DaysDisplay: YES_NO[application.within14Days ?? ''],
     otherPartiesAgreedDisplay: YES_NO[application.otherPartiesAgreed ?? ''],
     withoutNoticeDisplay: YES_NO[application.withoutNotice ?? ''],
-    noticeRequest: noticeRequestLabel(application.withoutNotice),
   };
 }
 

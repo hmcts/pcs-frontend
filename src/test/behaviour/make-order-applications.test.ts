@@ -407,19 +407,12 @@ describe('make an order: deciding applications', () => {
         ?.textContent?.trim();
     }
 
-    it('labels only applications requesting without notice and retains every recorded status in the details', async () => {
+    it('retains the recorded notice status and request warning in the details without a header label', async () => {
       // GA1 asked not to be without notice, GA2 was made before the question was asked, GA3 asked to be.
       app = await bootApp({ applications: [ADJOURN, WARRANT, WITHOUT_NOTICE] });
       await openPage((await app.get(PAGE)).text);
 
-      const labels = ['app-gen-app-1', 'app-gen-app-2', 'app-gen-app-3'].map(prefix =>
-        document.querySelector(`#${prefix}-notice-request`)?.textContent?.trim()
-      );
-      expect(labels).toEqual([undefined, undefined, 'Without notice requested']);
-      // Inline after the title, outside the heading itself, before the details are opened.
-      const heading = control('#app-gen-app-3-heading');
-      expect(heading.nextElementSibling).toBe(control('#app-gen-app-3-notice-request'));
-      expect(heading.textContent).not.toContain('Without notice');
+      expect(document.querySelector('[id$="-notice-request"]')).toBeNull();
       expect([detailsRow('app-gen-app-1'), detailsRow('app-gen-app-2'), detailsRow('app-gen-app-3')]).toEqual([
         'No',
         'Not recorded',

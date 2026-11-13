@@ -995,12 +995,7 @@ describe('confirm order review', () => {
         MIXED
       );
       const review = await openReview(app);
-      // The reused form labels only applications requesting without notice.
-      expect(
-        ['app-gen-app-1', 'app-gen-app-2', 'app-gen-app-3'].map(prefix =>
-          document.querySelector(`#${prefix}-notice-request`)?.textContent?.trim()
-        )
-      ).toEqual(['Without notice requested', undefined, undefined]);
+      expect(document.querySelector('[id$="-notice-request"]')).toBeNull();
       expect(control<HTMLButtonElement>('button[value="ISSUE"]').textContent?.trim()).toBe('Continue');
 
       const staffDate = futureDate(21);
