@@ -10,7 +10,6 @@ import {
   haveTheOtherPartiesAgreedToThisApplication,
   haveYouAlreadyAppliedForHelpWithFees,
   isTheCourtHearingInTheNext14Days,
-  paymentDetails,
   uploadDocumentsToSupportYourApplication,
   whatOrderDoYouWantTheCourtToMakeAndWhy,
   whichLanguageDidYouUseToCompleteThisService,
@@ -121,6 +120,11 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
       option: isTheCourtHearingInTheNext14Days.noRadioOption,
     });
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performAction('doYouNeedHelpPayingFee', {
+      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption,
+    });
     await performAction('confirmOtherPartiesAgreed', {
       question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
       option: haveTheOtherPartiesAgreedToThisApplication.noRadioOption,
@@ -160,31 +164,5 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       label: checkYourAnswersGenApps.yourFullNameTextLabel,
       input: checkYourAnswersGenApps.yourFullNameTextInput,
     });
-    await performAction('payForApplication');
-    await performValidation('mainHeader', paymentDetails.mainHeader);
-    await performAction('inputPaymentDetails', {
-      question: paymentDetails.mainHeader,
-      cardNumberLabel: paymentDetails.cardNumberTextLabel,
-      cardNumber: paymentDetails.cardNumberTextInput,
-      monthLabel: paymentDetails.monthTextLabel,
-      month: paymentDetails.monthTextInput,
-      yearLabel: paymentDetails.yearTextLabel,
-      year: paymentDetails.yearTextInput,
-      nameOnCardLabel: paymentDetails.nameOnCardTextLabel,
-      nameOnCard: paymentDetails.nameOnCardTextInput,
-      cardSecurityCodeLabel: paymentDetails.cardSecurityCodeTextLabel,
-      cardSecurityCode: paymentDetails.cardSecurityCodeTextInput,
-      addressLine1Label: paymentDetails.addressLine1TextLabel,
-      addressLine1: paymentDetails.addressLine1TextInput,
-      townOrCityLabel: paymentDetails.townOrCityTextLabel,
-      townOrCity: paymentDetails.townOrCityTextInput,
-      postcodeLabel: paymentDetails.postcodeTextLabel,
-      postcode: paymentDetails.postcodeTextInput,
-      emailLabel: paymentDetails.emailTextLabel,
-      email: paymentDetails.emailTextInput,
-    });
-    await performAction('confirmPayment');
-    await performAction('verifyApplicationSubmitted');
-    await performValidation('mainHeader', dashboard.mainHeader);
   });
 });

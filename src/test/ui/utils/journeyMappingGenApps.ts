@@ -13,6 +13,8 @@ export const journeys: Record<string, string[]> = {
     'check-your-answers',
   ],
   journey2: [
+    'do-you-need-help-paying-the-fee',
+    'have-you-already-applied-for-help-with-fees',
     'have-the-other-parties-agreed-to-this-application',
     'what-order-do-you-want-the-court-to-make-and-why',
     'do-you-want-to-upload-documents-to-support-your-application',
@@ -21,6 +23,7 @@ export const journeys: Record<string, string[]> = {
     'check-your-answers',
   ],
   journey3: [
+    'do-you-need-help-paying-the-fee',
     'have-the-other-parties-agreed-to-this-application',
     'are-there-any-reasons-that-this-application-should-not-be-shared',
     'what-order-do-you-want-the-court-to-make-and-why',
@@ -29,6 +32,14 @@ export const journeys: Record<string, string[]> = {
     'check-your-answers',
   ],
   journey4: [
+    'do-you-want-to-upload-documents-to-support-your-application',
+    'upload-documents-to-support-your-application',
+    'which-language-did-you-use-to-complete-this-service',
+    'check-your-answers',
+  ],
+  journey5: [
+    'have-the-other-parties-agreed-to-this-application',
+    'what-order-do-you-want-the-court-to-make-and-why',
     'do-you-want-to-upload-documents-to-support-your-application',
     'upload-documents-to-support-your-application',
     'which-language-did-you-use-to-complete-this-service',
