@@ -335,7 +335,7 @@ describe('recordWarrantReturnRoutes', () => {
           returnType: WarrantReturnType.FINAL,
           outcome: EvictionOutcome.SUCCESSFUL,
           returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
-          outcomeDate: '2026-03-01T14:05:00.000+00:00',
+          outcomeDate: '2026-03-01T14:05:00.000',
           additionalDetails: 'Keys handed to claimant',
         },
       ],
@@ -635,7 +635,7 @@ describe('recordWarrantReturnRoutes', () => {
       returnType: WarrantReturnType.FINAL,
       outcome: EvictionOutcome.SUCCESSFUL,
       returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
-      outcomeDate: '2026-07-01T09:05:00.000+01:00',
+      outcomeDate: '2026-07-01T08:05:00.000',
       additionalDetails: 'Keys handed over',
     };
 
@@ -807,7 +807,7 @@ describe('recordWarrantReturnRoutes', () => {
           returnType: WarrantReturnType.FINAL,
           outcome: EvictionOutcome.SUCCESSFUL,
           returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
-          outcomeDate: '2026-07-01T09:05:00.000+01:00',
+          outcomeDate: '2026-07-01T08:05:00.000',
           additionalDetails: 'Details',
         },
         {
