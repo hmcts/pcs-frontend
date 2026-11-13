@@ -333,7 +333,7 @@ describe('recordWarrantReturnRoutes', () => {
         },
         {
           returnType: WarrantReturnType.FINAL,
-          outcome: EvictionOutcome.SUCCESSFUL,
+          evictionOutcome: EvictionOutcome.SUCCESSFUL,
           returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
           outcomeDate: '2026-03-01T14:05:00.000',
           additionalDetails: 'Keys handed to claimant',
@@ -350,7 +350,7 @@ describe('recordWarrantReturnRoutes', () => {
         },
         {
           returnType: WarrantReturnType.FINAL,
-          outcome: EvictionOutcome.UNSUCCESSFUL,
+          evictionOutcome: EvictionOutcome.UNSUCCESSFUL,
           returnName: EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
           outcomeDate: '2026-03-01T14:05:00.000',
           additionalDetails: 'Withdrawn by the claimant',
@@ -366,7 +366,7 @@ describe('recordWarrantReturnRoutes', () => {
         },
         {
           returnType: WarrantReturnType.FINAL,
-          outcome: EvictionOutcome.CANCELLED,
+          evictionOutcome: EvictionOutcome.CANCELLED,
           returnName: EvictionUnsuccessfulReturnName.WARRANT_EXPIRED,
           outcomeDate: '2026-03-01T14:05:00.000',
           additionalDetails: undefined,
@@ -633,7 +633,7 @@ describe('recordWarrantReturnRoutes', () => {
 
     const successful = {
       returnType: WarrantReturnType.FINAL,
-      outcome: EvictionOutcome.SUCCESSFUL,
+      evictionOutcome: EvictionOutcome.SUCCESSFUL,
       returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
       outcomeDate: '2026-07-01T08:05:00.000',
       additionalDetails: 'Keys handed over',
@@ -805,7 +805,7 @@ describe('recordWarrantReturnRoutes', () => {
         'a successful eviction',
         {
           returnType: WarrantReturnType.FINAL,
-          outcome: EvictionOutcome.SUCCESSFUL,
+          evictionOutcome: EvictionOutcome.SUCCESSFUL,
           returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
           outcomeDate: '2026-07-01T08:05:00.000',
           additionalDetails: 'Details',
@@ -824,7 +824,7 @@ describe('recordWarrantReturnRoutes', () => {
         'an unsuccessful eviction',
         {
           returnType: WarrantReturnType.FINAL,
-          outcome: EvictionOutcome.UNSUCCESSFUL,
+          evictionOutcome: EvictionOutcome.UNSUCCESSFUL,
           returnName: EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
           additionalDetails: 'Withdrawn',
         },
@@ -842,7 +842,7 @@ describe('recordWarrantReturnRoutes', () => {
         'a cancelled eviction',
         {
           returnType: WarrantReturnType.FINAL,
-          outcome: EvictionOutcome.CANCELLED,
+          evictionOutcome: EvictionOutcome.CANCELLED,
           returnName: EvictionUnsuccessfulReturnName.WARRANT_EXPIRED,
         },
         {
