@@ -84,14 +84,12 @@
       }}
     </div>
 
-    <div id="eviction-date-section" class="govuk-checkboxes__conditional govuk-!-display-none">
       {{ dateInput(
             "eviction-date",
             "Eviction date and time",
             "For example, 27 3 2026 14 30. Use the 24-hour clock."
           )
       }}
-    </div>
 
     {{ govukCharacterCount({
         name: "additional-details",
