@@ -1,0 +1,18 @@
+{% macro caseTitle(params) %}
+  {% if params.eventName %}
+    <span class="govuk-caption-l">{{ params.eventName }}</span>
+  {% endif %}
+  <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ params.heading }}</h1>
+
+  <p class="govuk-body govuk-!-margin-bottom-1">
+    <span class="govuk-!-font-weight-bold">Case reference:</span> {{ params.caseReference }}
+  </p>
+  <p class="govuk-body govuk-!-margin-bottom-1">{{ params.propertyAddress }}</p>
+  <p class="govuk-body govuk-!-font-weight-bold">
+    {% if params.caseName %}
+      {{ params.caseName }}
+    {% elif params.claimantNames is defined %}
+      {{ params.claimantNames }} vs {{ params.defendantNames }}
+    {% endif %}
+  </p>
+{% endmacro %}

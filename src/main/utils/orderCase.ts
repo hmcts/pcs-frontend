@@ -1,11 +1,7 @@
-import { buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import { type DocWeaveSnapshot, InvalidSnapshotError, parseSnapshot } from '@hmcts-cft/docweave';
 import config from 'config';
-import type { NextFunction, Request, Response } from 'express';
 
-import { CallbackRejectedError, HTTPError } from '../HttpError';
-import { linkSignOutToLogout } from '../middleware/legalRepresentativeHeaders';
-import { getUserRoles } from '../steps/utils';
+import { HTTPError } from '../HttpError';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 
 import type { MakeOrderType } from '@utils/makeOrderValidation';
@@ -105,45 +101,12 @@ export function caseHeader(caseContext: OrderCaseContext): Record<string, string
   };
 }
 
-/**
- * XUI's header as it shows it to the user. XUI adds a user's role assignments, such as judge, to their
- * IDAM roles to choose the header; pass the role assignment the page's CCD event is limited to.
- */
-export function xuiHeaderModel(req: Request, roleAssignments: string[] = []): ReturnType<typeof buildHeaderModel> {
-  const roles = [...getUserRoles(req), ...roleAssignments];
-  const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles } });
-  headerModel.assetsPath = '/assets/ui-component-lib';
-  linkSignOutToLogout(headerModel);
-  return headerModel;
-}
-
 export function manageCaseDetailsUrl(caseReference: string): string {
   const url = buildManageCaseDetailsRedirect(config.get('redirects.manageCaseReturnURL'), caseReference);
   if (!url) {
     throw new HTTPError('The Manage Case return URL is not configured', 500);
   }
   return url;
-}
-
-/**
- * Answers an order event that was refused. pcs-api refuses one with its reasons, which the page answers
- * if it can; otherwise the error handler logs them and shows a generic error. CCD decides who may use
- * an order event from their role assignments: anyone else is not given the event's payload or allowed
- * to submit it, and is shown the page does not exist.
- */
-export function refusedOrderEvent(
-  res: Response,
-  next: NextFunction,
-  error: unknown,
-  rejected: (error: CallbackRejectedError) => void = next
-): void {
-  if (error instanceof CallbackRejectedError) {
-    return rejected(error);
-  }
-  if (error instanceof HTTPError && (error.status === 403 || error.status === 404)) {
-    return void res.status(404).send('Not Found');
-  }
-  next(error);
 }
 
 /** The order's document as a page posted it: none, or a snapshot Docweave accepts. Anything else is a bad request. */

@@ -13,6 +13,7 @@ const logger = Logger.getLogger('decentralisedEventRoutes');
 const HANDED_OVER_PARAMS = new Map<unknown, readonly string[]>([
   ['ext:makeOrder', ['orderId', 'taskId']],
   ['ext:confirmOrderReview', ['orderId', 'taskId']],
+  ['ext:recordWarrantReturn', []],
 ]);
 
 // Ids only, which the redirect passes on unchanged.
