@@ -2,6 +2,21 @@ import { formatCaseReferenceForDisplay } from '@utils/caseReference';
 import { extractCaseDocuments, extractViewDocumentFolders, findCaseDocumentById } from '@utils/documentUtils';
 
 describe('documentUtils', () => {
+  it("finds the case bundle a judge's case data carries", () => {
+    const bundle = findCaseDocumentById(
+      {
+        bundleTab_Bundle: {
+          document_url: 'http://dm-store/documents/b0b0b0b0-0000-4000-8000-000000000002',
+          document_binary_url: 'http://dm-store/documents/b0b0b0b0-0000-4000-8000-000000000002/binary',
+          document_filename: 'bundle.pdf',
+        },
+      },
+      'b0b0b0b0-0000-4000-8000-000000000002'
+    );
+
+    expect(bundle?.binaryUrl).toBe('http://dm-store/documents/b0b0b0b0-0000-4000-8000-000000000002/binary');
+  });
+
   it('extracts documents only from supported categories', () => {
     const folders = extractViewDocumentFolders({
       allDocuments: [

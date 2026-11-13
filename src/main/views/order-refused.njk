@@ -1,0 +1,18 @@
+{# An order event pcs-api would not start, such as a review opened from the case's events rather than its task. #}
+{% extends "xui-layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% set pageHeading = "You cannot continue" %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h1 class="govuk-heading-l">{{ pageHeading }}</h1>
+      {% for reason in reasons %}
+        <p class="govuk-body" data-refusal>{{ reason }}</p>
+      {% endfor %}
+      {{ govukButton({ text: "Return to case details", href: closeUrl }) }}
+    </div>
+  </div>
+{% endblock %}

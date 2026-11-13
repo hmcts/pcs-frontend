@@ -10,6 +10,7 @@
 {% block page %}
   <form method="post" action="{{ formAction }}" novalidate>
     {{ csrfProtection(csrfToken) }}
+    <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
 
     {{ govukRadios({
       name: "next-steps",
@@ -24,7 +25,7 @@
           value: nextSteps[1].value,
           text: nextSteps[1].text,
           checked: answers.nextSteps == nextSteps[1].value,
-          conditional: { html: '<p class="govuk-body" id="outstanding-tasks-guidance">You should complete all outstanding tasks</p>' }
+          conditional: { html: '<p class="govuk-body" id="outstanding-tasks-guidance">You must complete all outstanding tasks before issuing this order and serving it on the parties</p>' }
         }
       ]
     }) }}
@@ -33,11 +34,24 @@
       name: "final-order",
       idPrefix: "final-order",
       classes: "govuk-radios--inline",
-      fieldset: { legend: { text: "Is this a final order?", classes: "govuk-fieldset__legend--m" } },
+      fieldset: { legend: { text: "Does this order finally resolve any part of the case?", classes: "govuk-fieldset__legend--m" } },
+      hint: { text: "Select Yes if this order brings the main claim, a general application, counterclaim or enforcement action to an end. The whole case does not need to be concluded." },
       errorMessage: validationErrors["final-order"],
       items: [
         { value: "yes", text: "Yes", checked: answers.finalOrder == "yes" },
         { value: "no", text: "No", checked: answers.finalOrder == "no" }
+      ]
+    }) }}
+
+    {{ govukRadios({
+      name: "restitution-permission",
+      idPrefix: "restitution-permission",
+      classes: "govuk-radios--inline",
+      fieldset: { legend: { text: "Has permission been given to issue a warrant/writ of restitution?", classes: "govuk-fieldset__legend--m" } },
+      errorMessage: validationErrors["restitution-permission"],
+      items: [
+        { value: "yes", text: "Yes", checked: answers.restitutionPermission == "yes" },
+        { value: "no", text: "No", checked: answers.restitutionPermission == "no" }
       ]
     }) }}
 

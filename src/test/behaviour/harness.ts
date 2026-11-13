@@ -34,6 +34,7 @@ interface Envelope {
   };
   caseContext: Record<string, unknown>;
   hearing?: Record<string, unknown> | null;
+  taskGenAppId?: string;
 }
 
 const blankCase = (): Envelope => ({
@@ -106,6 +107,11 @@ let refusal: string | undefined;
 /** Has the next order event's start refused, as pcs-api does when the chosen order is not waiting for the user. */
 export function refuseNextStart(reason: string): void {
   startRefusal = reason;
+}
+
+/** Has pcs-api start events with another order from now on, as it does when the user opens another order's task. */
+export function startWithOrder(order: Partial<Envelope['order']>): void {
+  envelope.order = { ...envelope.order, ...order };
 }
 
 /** Has the next order event refused, as pcs-api does when the order changed elsewhere. */
@@ -242,11 +248,16 @@ export async function bootApp(
     defendants?: { id: string; name: string }[];
     /** Whether the case has an open counterclaim or application. */
     openCounterclaim?: boolean;
-    openApplication?: boolean;
     /** The order pcs-api starts the event with, over a blank one. */
     order?: Partial<Envelope['order']>;
+    /** The case's open applications, any of which the order can decide. */
+    applications?: (Record<string, unknown> & { id: string })[];
+    /** The application the judge's task, from court staff's message, asks them to decide, without a hearing. */
+    application?: Record<string, unknown> & { id: string };
     /** The hearing pcs-api starts the event for, over the default one, or null for an order made without one. */
     hearing?: Record<string, unknown> | null;
+    /** The case bundle pcs-api gives a judge, once the case has one. */
+    caseBundle?: Record<string, unknown>;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -254,8 +265,18 @@ export async function bootApp(
     envelope.caseContext.defendants = options.defendants;
   }
   envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
-  envelope.caseContext.openApplication = options.openApplication ?? false;
   envelope.order = { ...envelope.order, ...options.order };
+  envelope.caseContext.applications = [
+    ...(options.application ? [options.application] : []),
+    ...(options.applications ?? []),
+  ];
+  if (options.application) {
+    envelope.taskGenAppId = options.application.id;
+    envelope.hearing = null;
+  }
+  if (options.caseBundle) {
+    envelope.caseContext.caseBundle = options.caseBundle;
+  }
   if (options.hearing !== undefined) {
     envelope.hearing = options.hearing && { ...envelope.hearing, ...options.hearing };
   }

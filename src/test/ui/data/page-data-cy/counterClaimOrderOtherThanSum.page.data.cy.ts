@@ -1,0 +1,17 @@
+export const counterClaimOrderOtherThanSum = {
+  mainHeader: `Gwrth-hawliad am orchymyn heblaw swm o arian`,
+  youWillBeParagraph: `Byddwch yn gallu uwchlwytho unrhyw dystiolaeth sydd gennych ar y dudalen nesaf.`,
+  theClaimantWillBeParagraph: `Bydd yr hawlydd yn gallu gweld eich atebion.`,
+  whatOrdersAreYouAskingLabelText: `Pa orchymyn ydych chi’n gofyn i’r tribiwnlys ei wneud?`,
+  forExampleHintText: `Er enghraifft, 'i'r landlord wneud gwaith adfer'`,
+  youHaveHintText: `Mae gennych 6,800 nod ar ôl`,
+  whatFactsWouldYouLikeLabelText: `Pa ffeithiau hoffech chi i'r llys eu hystyried wrth benderfynu ar yr hawliad?`,
+  saveAndContinueButton: `Cadw a pharhau`,
+  saveForLaterButton: `Cadw at hwyrach ymlaen`,
+  backLink: `Yn ôl`,
+  enterWhatFactsErrorMessage: `Nodwch pa ffeithiau yr hoffech i'r llys eu hystyried wrth benderfynu ar yr hawliad`,
+  enterWhatOrdersErrorMessage: `Nodwch pa orchmynion yr ydych yn gofyn i’r llys eu gwneud`,
+  thereIsAProblemErrorMessageHeader: `Mae yna broblem`,
+  whatOrdersInput: `for the landlord to conduct remedial works`,
+  whatFactsInput: `electricity and windows not repaired`,
+};

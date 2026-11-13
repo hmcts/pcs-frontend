@@ -66,6 +66,8 @@ export const {
   counterclaimYouNeedToApplyForHelpWithYourFees,
   reasonableAdjustmentsTriage,
   counterClaimFee,
+  counterClaimApplicationFeeAmount,
+  counterClaimPaymentSuccessful,
   counterClaimSpecificSumOfMoney,
   counterClaimWhatAreYouClaimingFor,
   counterClaimAgainstWhom,

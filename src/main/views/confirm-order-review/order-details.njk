@@ -1,0 +1,115 @@
+{% extends "confirm-order-review/_layout.njk" %}
+
+{% from "macros/csrf.njk" import csrfProtection %}
+{% import "confirm-order-review/_buttons.njk" as buttons with context %}
+{% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+{% set pageHeading = "What the order does" %}
+
+{#
+  A free-form order's wording is the judge's, so court staff record what it does here instead, for the case to act
+  on. Nothing here changes the order.
+#}
+
+{% macro choose(name, legend, options, inline=false) %}
+  {% set items = [] %}
+  {% for option in options %}
+    {% set items = (items.push({ value: option.value, text: option.text, checked: answers[name] == option.value }), items) %}
+  {% endfor %}
+  {{ govukRadios({
+    name: name,
+    idPrefix: name,
+    classes: "govuk-radios--inline" if inline else "",
+    fieldset: { legend: { text: legend, classes: "govuk-fieldset__legend--s" } },
+    errorMessage: validationErrors[name],
+    items: items
+  }) }}
+{% endmacro %}
+
+{% macro date(prefix, legend) %}
+  {{ govukDateInput({
+    id: prefix,
+    namePrefix: prefix,
+    fieldset: { legend: { text: legend, classes: "govuk-fieldset__legend--s" } },
+    hint: { text: "For example, 27 3 2027" },
+    errorMessage: validationErrors[prefix + "-day"],
+    items: [
+      { id: prefix + "-day", name: "day", label: "Day", classes: "govuk-input--width-2", value: answers[prefix + "-day"] },
+      { id: prefix + "-month", name: "month", label: "Month", classes: "govuk-input--width-2", value: answers[prefix + "-month"] },
+      { id: prefix + "-year", name: "year", label: "Year", classes: "govuk-input--width-4", value: answers[prefix + "-year"] }
+    ]
+  }) }}
+{% endmacro %}
+
+{% block page %}
+  <form method="post" action="{{ formAction }}" novalidate>
+    {{ csrfProtection(csrfToken) }}
+    <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
+
+    {% if issuingHtml %}
+      <h2 class="govuk-heading-m">The order to issue</h2>
+      <div class="pcs-order-preview govuk-!-margin-bottom-6" id="issuing-order" aria-label="The order to issue" role="region">
+        {{ issuingHtml | safe }}
+      </div>
+    {% endif %}
+
+    {% set outrightHtml %}
+      {% set byDateHtml %}{{ date("outright-date", "Date possession is ordered by") }}{% endset %}
+      {{ govukRadios({
+        name: "outright-possession",
+        idPrefix: "outright-possession",
+        fieldset: { legend: { text: "When is possession ordered?", classes: "govuk-fieldset__legend--s" } },
+        errorMessage: validationErrors["outright-possession"],
+        items: [
+          { value: outrightPossession[0].value, text: outrightPossession[0].text, checked: answers["outright-possession"] == outrightPossession[0].value },
+          { value: outrightPossession[1].value, text: outrightPossession[1].text, checked: answers["outright-possession"] == outrightPossession[1].value, conditional: { html: byDateHtml } }
+        ]
+      }) }}
+      {{ choose("outright-grounds", "Which grounds is possession ordered on?", grounds, true) }}
+      {{ govukCharacterCount({
+        name: "outright-grounds-details",
+        id: "outright-grounds-details",
+        maxlength: maxGroundsDetailsLength,
+        label: { text: "Details of the grounds (optional)", classes: "govuk-label--s" },
+        value: answers["outright-grounds-details"],
+        errorMessage: validationErrors["outright-grounds-details"]
+      }) }}
+      {{ choose("outright-transfer", "Does the order transfer enforcement to the High Court?", yesNo, true) }}
+    {% endset %}
+
+    {% set suspendedHtml %}
+      {{ date("suspended-date", "Date possession is ordered by") }}
+      {{ choose("suspended-condition", "Is the condition money or non-money?", condition, true) }}
+      {{ choose("suspended-warrant-on-notice", "Must any application for a warrant be made on notice to all parties?", yesNo, true) }}
+    {% endset %}
+
+    {% set conditionals = {
+      outright: outrightHtml,
+      suspended: suspendedHtml,
+      adjournment: choose("adjournment", "How is the claim adjourned?", adjournment),
+      "strike-out": choose("strike-out", "Is the claim struck out or dismissed?", strikeOut)
+    } %}
+    {% set items = [] %}
+    {% for option in orderDoes %}
+      {# The macro shows no conditional for "None of these", whose html is undefined. #}
+      {% set items = (items.push({
+        value: option.value,
+        text: option.text,
+        checked: answers["order-does"] == option.value,
+        conditional: { html: conditionals[option.value] }
+      }), items) %}
+    {% endfor %}
+    {{ govukRadios({
+      name: "order-does",
+      idPrefix: "order-does",
+      fieldset: { legend: { text: "What does the order do?", classes: "govuk-fieldset__legend--m" } },
+      hint: { text: "The Judge made a custom order. Record what it does. This does not change the order." },
+      errorMessage: validationErrors["order-does"],
+      items: items
+    }) }}
+
+    {{ buttons.eventButtons() }}
+  </form>
+{% endblock %}
