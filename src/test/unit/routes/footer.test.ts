@@ -70,8 +70,16 @@ describe('footer page routes', () => {
     const getFixedT = jest.fn().mockReturnValue(fixedTranslate);
     const loadNamespaces = jest.fn().mockResolvedValue(undefined);
     const req = { language: 'en', i18n: { getFixedT, loadNamespaces } } as unknown as Request;
-    const res = { locals: { isLegalRepresentative: false }, render: jest.fn(), redirect: jest.fn() } as unknown as Response;
-    const fallbackRes = { locals: { isLegalRepresentative: false }, render: jest.fn(), redirect: jest.fn() } as unknown as Response;
+    const res = {
+      locals: { isLegalRepresentative: false },
+      render: jest.fn(),
+      redirect: jest.fn(),
+    } as unknown as Response;
+    const fallbackRes = {
+      locals: { isLegalRepresentative: false },
+      render: jest.fn(),
+      redirect: jest.fn(),
+    } as unknown as Response;
 
     footerPagesRoutes(app);
 
