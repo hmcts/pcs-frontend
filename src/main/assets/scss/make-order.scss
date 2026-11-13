@@ -475,6 +475,28 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
   border: 1px solid $govuk-border-colour;
 }
 
+// The title with any without-notice label beside it; on narrow screens the label moves below.
+.pcs-application__title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: govuk-spacing(1) govuk-spacing(3);
+
+  @include govuk-media-query($from: tablet) {
+    flex-wrap: nowrap;
+  }
+}
+
+.pcs-application__title .govuk-heading-m {
+  min-width: 0;
+}
+
+.pcs-application__tag {
+  flex: none;
+  max-width: none;
+  white-space: nowrap;
+}
+
 .pcs-application .govuk-details__text .govuk-summary-list {
   @include govuk-font($size: 16);
 }
