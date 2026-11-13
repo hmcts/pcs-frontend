@@ -35,6 +35,7 @@ interface Envelope {
   caseContext: Record<string, unknown>;
   hearing?: Record<string, unknown> | null;
   taskGenAppId?: string;
+  otherDraftId?: string;
 }
 
 const blankCase = (): Envelope => ({
@@ -59,6 +60,12 @@ const blankCase = (): Envelope => ({
 
 /** Minimal CCD: hands out the stored envelope and applies posted make order events to it. */
 let envelope = blankCase();
+
+/** The case's hearings by id, as pcs-api starts an order at the one the judge chooses. */
+let hearings = new Map<number, Record<string, unknown>>();
+
+/** Where the judge already has another draft: at a hearing, by id, or without one. */
+let otherDraftAt: number | 'without-hearing' | undefined;
 
 /** The tokens CCD has handed out for starting the make order event, in order. */
 let startTokens: string[] = [];
@@ -156,7 +163,22 @@ function ccdStub(): Express {
       startRefusal = undefined;
       return res.status(422).json({ callbackErrors: [reason] });
     }
-    const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
+    // The judge's choice of hearing, or of none, on the page, over the one the order was made at.
+    const madeAt = startContexts.at(-1)?.madeAt as { hearingId?: number } | undefined;
+    const hearing = madeAt
+      ? madeAt.hearingId === undefined
+        ? null
+        : hearings.get(madeAt.hearingId)
+      : envelope.hearing;
+    if (hearing === undefined) {
+      return res.status(422).json({ callbackErrors: ["The hearing is not one of this case's hearings"] });
+    }
+    const started = {
+      ...envelope,
+      hearing,
+      otherDraftId: otherDraftAt === (hearing ? hearing.id : 'without-hearing') ? 'other-draft' : undefined,
+    };
+    const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(started) } : {};
     const token = `event-token-${startTokens.length + 1}`;
     startTokens.push(token);
     res.json({ token, case_details: { case_data: caseData } });
@@ -188,7 +210,9 @@ function ccdStub(): Express {
       return res.json(answers.get(req.body.event_token));
     }
     orderRequests.push(posted);
-    // pcs-api records the hearing's facts and note only when changed, apart from the order.
+    // The order is made at the hearing the judge chose, or none. pcs-api records the hearing's facts and note only
+    // when changed, apart from the order.
+    envelope.hearing = posted.hearing ? (hearings.get(posted.hearing.id) ?? envelope.hearing) : null;
     if (posted.hearing?.caseFacts && envelope.hearing) {
       envelope.hearing = {
         ...envelope.hearing,
@@ -196,6 +220,7 @@ function ccdStub(): Express {
         caseFacts: posted.hearing.caseFacts,
         note: posted.hearing.note,
       };
+      hearings.set(Number(envelope.hearing.id), envelope.hearing);
     }
     envelope = {
       ...envelope,
@@ -257,6 +282,10 @@ export async function bootApp(
     hearing?: Record<string, unknown> | null;
     /** The case bundle pcs-api gives a judge, once the case has one. */
     caseBundle?: Record<string, unknown>;
+    /** The case's hearings, over the one the order is made at, which the judge can choose to make it at. */
+    hearings?: (Record<string, unknown> & { id: number; date: string })[];
+    /** Where the judge already has another draft order: at a hearing, by id, or without one. */
+    otherDraftAt?: number | 'without-hearing';
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -279,6 +308,16 @@ export async function bootApp(
   if (options.hearing !== undefined) {
     envelope.hearing = options.hearing && { ...envelope.hearing, ...options.hearing };
   }
+  hearings = new Map(
+    [...(envelope.hearing ? [envelope.hearing] : []), ...(options.hearings ?? [])].map(hearing => [
+      Number(hearing.id),
+      { ...blankCase().hearing, ...hearing },
+    ])
+  );
+  if (options.hearings) {
+    envelope.caseContext.hearings = [...hearings.values()].map(({ id, date }) => ({ id, date }));
+  }
+  otherDraftAt = options.otherDraftAt;
   startTokens = [];
   startContexts = [];
   submittedTokens = [];

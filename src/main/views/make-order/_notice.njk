@@ -1,0 +1,23 @@
+{#
+  Whether the order was made on the court's own initiative or without notice to a party, which the order then ends
+  with a statement about, giving the date by which a party may apply to set it aside, vary or stay it.
+#}
+{% import "make-order/_compact.njk" as compact with context %}
+
+{% macro applyBy(prefix) %}
+  {{ compact.date({ id: prefix, legend: "Application to be made by 4pm on" }) }}
+  <p class="govuk-hint">This starts at 7 days from today, or the next weekday after that. It is not worked out from when the order is served and does not allow for bank holidays, so check it.</p>
+{% endmacro %}
+
+<h2 class="govuk-heading-l govuk-!-margin-top-6">Own initiative or without notice</h2>
+
+{{ compact.radios("order-notice", {
+  legend: "Was this order made on the court's own initiative or without notice?",
+  classes: "govuk-radios--small",
+  default: "none",
+  items: [
+    { value: "own-initiative", text: "Order on court's own initiative", conditional: { html: applyBy("own-initiative-by") } },
+    { value: "without-notice", text: "Order without notice", conditional: { html: applyBy("without-notice-by") } },
+    { value: "none", text: "Neither" }
+  ]
+}) }}

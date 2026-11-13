@@ -29,6 +29,8 @@ export interface OrderCaseContext {
   applications?: OrderApplication[];
   /** The case bundle, every document on the case in one PDF, for a judge once one has been made. */
   caseBundle?: OrderCaseBundle | null;
+  /** The case's hearings that have not been cancelled, earliest first, which a judge can make the order at. */
+  hearings?: { id: number; date: string }[];
 }
 
 export interface OrderCaseBundle {
@@ -101,6 +103,11 @@ export interface OrderStart {
   hearing?: OrderHearing | null;
   /** The application the judge's task asked them to decide, which the order must decide. */
   taskGenAppId?: string | null;
+  /**
+   * The judge's other draft already made at the order's hearing, or without one, which pcs-api will not let them
+   * save this order as a draft alongside.
+   */
+  otherDraftId?: string | null;
 }
 
 export function formatAddress(address: Record<string, string | undefined> = {}): string {

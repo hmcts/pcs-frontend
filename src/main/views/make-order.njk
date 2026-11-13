@@ -3,6 +3,8 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% import "make-order/_compact.njk" as compact with context %}
 
@@ -51,6 +53,37 @@
       attributes: { id: "caseworker-query" }
     }) }}
   {% endif %}
+
+  {#
+    The judge says when the order is made, whatever task or link brought them here: without a hearing, or at one of the
+    case's hearings, which brings up who attended and the hearing's facts and notes. Changing it shows the page again
+    with everything the judge has written so far, and saves nothing.
+  #}
+  <h2 class="govuk-heading-l govuk-!-margin-top-6">When the order is made</h2>
+  {% if otherDraft %}
+    {{ govukWarningText({
+      text: "You already have another draft order " + ("for this hearing" if hearing else "made without a hearing") + ". You can send this order for review, but not save it as a draft as well.",
+      iconFallbackText: "Warning",
+      attributes: { id: "other-draft-warning" }
+    }) }}
+  {% endif %}
+  <input type="hidden" name="shown-made-at" value="{{ madeAt }}">
+  {{ govukRadios({
+    idPrefix: "made-at",
+    name: "made-at",
+    classes: "govuk-radios--small",
+    fieldset: { legend: { text: "Is this order made at a hearing?", classes: "govuk-fieldset__legend--s" } },
+    hint: { text: "Choose a hearing to record who attended and the case facts and notes for it." },
+    items: madeAtItems,
+    errorMessage: validationErrors["made-at"]
+  }) }}
+  {{ govukButton({
+    text: "Change when the order is made",
+    name: "action",
+    value: "CHANGE_MADE_AT",
+    classes: "govuk-button--secondary",
+    attributes: { id: "change-made-at" }
+  }) }}
 
   {% include "make-order/_form.njk" %}
 

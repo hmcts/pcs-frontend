@@ -167,6 +167,79 @@ function hearingModel(hearing: OrderHearing | null | undefined): Record<string, 
   };
 }
 
+/**
+ * The date a party may apply by, as an order made on the court's own initiative or without notice starts: 7 days from
+ * today, or the next weekday after that, which the judge checks and changes.
+ */
+export function defaultApplyByDate(today: DateTime = DateTime.now().setZone('Europe/London')): DateTime {
+  const date = today.startOf('day').plus({ days: 7 });
+  return date.weekday > 5 ? date.plus({ days: 8 - date.weekday }) : date;
+}
+
+const NOTICE_DATE_PREFIXES = ['own-initiative-by', 'without-notice-by'];
+
+/** The apply-by dates an order not yet given them starts with. */
+function noticeDateDefaults(formData: FormData): FormData {
+  const date = defaultApplyByDate();
+  return Object.fromEntries(
+    NOTICE_DATE_PREFIXES.filter(prefix =>
+      ['day', 'month', 'year'].every(part => !formData[`${prefix}-${part}`])
+    ).flatMap(prefix => [
+      [`${prefix}-day`, String(date.day)],
+      [`${prefix}-month`, String(date.month)],
+      [`${prefix}-year`, String(date.year)],
+    ])
+  );
+}
+
+/** What the page's choice of when the order is made posts for an order made without a hearing. */
+export const WITHOUT_HEARING = 'without-hearing';
+
+/** The page's choice of when the order is made, for the hearing it is made at, or none. */
+export function madeAtValue(hearing: OrderHearing | null | undefined): string {
+  return hearing ? String(hearing.id) : WITHOUT_HEARING;
+}
+
+/** The judge's choice the page posted, as pcs-api is told it: one of the case's hearings, or none. */
+export function madeAtChoice(posted: unknown): { hearingId?: number } | undefined {
+  if (posted === WITHOUT_HEARING) {
+    return {};
+  }
+  return typeof posted === 'string' && /^\d{1,9}$/.test(posted) ? { hearingId: Number(posted) } : undefined;
+}
+
+/**
+ * The judge's choice of when the order is made: without a hearing, or at one of the case's hearings, whatever task or
+ * link brought them to it, with the one the order is now made at chosen.
+ */
+export function madeAtModel({ caseContext, hearing, otherDraftId }: OrderStart): Record<string, unknown> {
+  const hearingTime = (iso: string): string => {
+    const date = DateTime.fromISO(iso, { zone: 'Europe/London' });
+    return date.isValid
+      ? date
+          .setLocale('en-GB')
+          .toFormat("d MMMM yyyy 'at' h:mma")
+          .replace(/AM|PM/, m => m.toLowerCase())
+      : iso;
+  };
+  const current = madeAtValue(hearing);
+  return {
+    madeAt: current,
+    madeAtItems: [
+      { value: WITHOUT_HEARING, text: 'Without a hearing (box work)' },
+      // The order's own hearing, even if it is no longer one the case lists.
+      ...[
+        ...(hearing && !caseContext.hearings?.some(option => option.id === hearing.id) ? [hearing] : []),
+        ...(caseContext.hearings ?? []),
+      ].map(option => ({
+        value: String(option.id),
+        text: `At the hearing on ${hearingTime(option.date)}`,
+      })),
+    ].map(item => ({ ...item, checked: item.value === current })),
+    otherDraft: Boolean(otherDraftId),
+  };
+}
+
 /** A row of the attendance register. */
 interface AttendanceRow extends AttendanceParty {
   partyId: string;
@@ -219,7 +292,8 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
   const recorded: FormData = hearing?.caseFacts
     ? { ...caseFactsFormData(hearing.caseFacts), 'hearing-notes': hearing.note ?? '' }
     : {};
-  const draft: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
+  const answers: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
+  const draft: FormData = { ...noticeDateDefaults(answers), ...answers };
   // With an application open the order starts as one on the applications alone, the claim's order types waiting
   // behind a tick box.
   const defaultOrderType = applications.length

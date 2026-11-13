@@ -12,10 +12,18 @@ import {
   attendanceParties,
   caseFactsFromForm,
   hearingRecordChanged,
+  madeAtChoice,
+  madeAtModel,
+  madeAtValue,
   orderFormModel,
   withoutHearingRecord,
 } from '@utils/makeOrderForm';
-import { type MakeOrderValidationIssue, validateHearingRecord, validateMakeOrder } from '@utils/makeOrderValidation';
+import {
+  AT_HEARING_ORDER_TYPES,
+  type MakeOrderValidationIssue,
+  validateHearingRecord,
+  validateMakeOrder,
+} from '@utils/makeOrderValidation';
 import {
   type OrderStart,
   caseHeader,
@@ -45,6 +53,8 @@ interface Chosen {
   orderId?: string;
   genAppId?: string;
   hearingId?: string;
+  /** The judge's own choice on the page of the hearing the order is made at, or of none. */
+  madeAt?: { hearingId?: number };
 }
 
 /**
@@ -56,13 +66,13 @@ interface Chosen {
 async function startOrderEvent(
   accessToken: string,
   caseReference: string,
-  { orderId, hearingId, genAppId }: Chosen = {}
+  { orderId, hearingId, genAppId, madeAt }: Chosen = {}
 ): Promise<StartedOrder> {
   const started = await ccdCaseService.startCaseEvent(
     accessToken,
     caseReference,
     MAKE_ORDER_EVENT_ID,
-    orderId || hearingId || genAppId ? { orderId, hearingId, genAppId } : undefined
+    orderId || hearingId || genAppId || madeAt ? { orderId, hearingId, genAppId, madeAt } : undefined
   );
   const payload = started.data.sdkEventPayload;
   if (!payload) {
@@ -100,6 +110,7 @@ function pageModel(
     // The task the judge came from, if a caseworker's query brought them here, which pcs-api closes on resubmission.
     taskId: typeof req.query.taskId === 'string' ? req.query.taskId : '',
     ...orderFormModel(envelope, submission),
+    ...madeAtModel(envelope),
     ...caseHeader(caseContext),
     validationErrors: Object.fromEntries(issues.map(issue => [issue.id, { text: issue.message }])),
     errorSummary: issues.length
@@ -114,12 +125,102 @@ function pageModel(
 
 /**
  * The order the orders tab linked to, or the hearing the judge's link named, which the page's URL keeps for as long
- * as the judge works on the order.
+ * as the judge works on the order, with the hearing, or none, the judge chose on the page, if given.
  */
-function chosen(req: Request): Chosen {
+function chosen(req: Request, madeAt?: unknown): Chosen {
   const named = (name: string): string | undefined =>
     typeof req.query[name] === 'string' ? (req.query[name] as string) : undefined;
-  return { orderId: named('orderId'), hearingId: named('hearingId'), genAppId: named('genAppId') };
+  return {
+    orderId: named('orderId'),
+    hearingId: named('hearingId'),
+    genAppId: named('genAppId'),
+    madeAt: madeAtChoice(madeAt),
+  };
+}
+
+const OTHER_DRAFT =
+  'You already have another draft order made there. Send this order for review, or choose when it is made again';
+
+/** What the judge had on the page when they chose to change when the order is made. */
+interface MadeAtChange extends OrderFormSubmission {
+  madeAt?: string;
+  shownMadeAt?: string;
+}
+
+/**
+ * Shows the page again for the hearing the judge chose, or for none, with everything they have written so far kept
+ * and nothing saved: the order's answers and wording, which then follow the choice. A hearing's facts and notes are
+ * that hearing's, so the judge saves or undoes changes to them before choosing another; and possession orders are
+ * only made at a hearing.
+ */
+async function changeMadeAt(
+  req: Request,
+  res: Response,
+  { madeAt, shownMadeAt, orderType, formData = {}, orderDocumentJson }: MadeAtChange
+): Promise<void> {
+  const accessToken = req.session.user!.accessToken;
+  const caseReference = req.params.caseReference as string;
+  const { eventToken, orderId, orderVersion, hearingVersion } = req.body;
+  const order = (started: StartedOrder) => ({ ...started.envelope.order, id: orderId, version: Number(orderVersion) });
+  const shown = await startOrderEvent(accessToken, caseReference, chosen(req, shownMadeAt));
+  const submission = { orderType, formData, orderDocumentJson, hearingVersion };
+  const refuse = (message: string) =>
+    res.status(400).render(
+      'make-order',
+      pageModel(
+        req,
+        { eventToken, envelope: { ...shown.envelope, order: order(shown) } },
+        {
+          ...submission,
+          validationIssues: [{ id: 'made-at', message }],
+        }
+      )
+    );
+  const choice = madeAtChoice(madeAt);
+  if (!choice) {
+    return refuse('Select whether the order is made at a hearing');
+  }
+  if (madeAt === madeAtValue(shown.envelope.hearing)) {
+    return res.render(
+      'make-order',
+      pageModel(
+        req,
+        { eventToken, envelope: { ...shown.envelope, order: order(shown) } },
+        {
+          ...submission,
+          validationIssues: [],
+        }
+      )
+    );
+  }
+  if (shown.envelope.hearing && hearingRecordChanged(shown.envelope.hearing, formData)) {
+    return refuse(
+      'Save the order as a draft to keep your changes to the case facts and notes for this hearing, or undo them, ' +
+        'before choosing when the order is made'
+    );
+  }
+  if (choice.hearingId === undefined && orderType && AT_HEARING_ORDER_TYPES.includes(orderType)) {
+    return refuse('Possession orders are only made at a hearing. Choose another type of order first');
+  }
+  const changed = await startOrderEvent(accessToken, caseReference, chosen(req, madeAt));
+  // Changed with another button than its own, nothing was saved or sent, which the judge is told.
+  const pressedChange = req.body.action === 'CHANGE_MADE_AT';
+  res.status(pressedChange ? 200 : 400).render(
+    'make-order',
+    // The chosen hearing's facts and notes, never those shown for the last one.
+    pageModel(
+      req,
+      { eventToken, envelope: { ...changed.envelope, order: order(changed) } },
+      {
+        orderType,
+        formData: withoutHearingRecord(formData),
+        orderDocumentJson,
+        validationIssues: pressedChange
+          ? []
+          : [{ id: 'made-at', message: 'You changed when the order is made. Check the order, then save or send it' }],
+      }
+    )
+  );
 }
 
 export default function makeOrderRoutes(app: Application): void {
@@ -153,15 +254,26 @@ export default function makeOrderRoutes(app: Application): void {
       hearingVersion = '',
       orderType,
       orderDocument: encodedDocument,
+      'made-at': madeAt,
+      'shown-made-at': shownMadeAt,
       ...formData
     } = req.body;
     const orderDocument = decodeOrderDocument(encodedDocument);
 
     try {
+      if (action === 'CHANGE_MADE_AT' || (madeAt !== undefined && madeAt !== shownMadeAt)) {
+        return await changeMadeAt(req, res, {
+          madeAt,
+          shownMadeAt,
+          orderType,
+          formData,
+          orderDocumentJson: orderDocument,
+        });
+      }
       // The case comes from a new start rather than the page, which would have to post it as JSON the WAF
       // blocks, and could change it. The event token, order id and version stay the page's: CCD takes a
       // repeated submission as the one already made, and pcs-api refuses the change if the order has moved on.
-      const started = await startOrderEvent(accessToken, caseReference, chosen(req));
+      const started = await startOrderEvent(accessToken, caseReference, chosen(req, madeAt));
       const currentHearing = started.envelope.hearing;
       const hearingChanged = !!currentHearing && hearingRecordChanged(currentHearing, formData);
       if (hearingChanged && hearingVersion !== String(currentHearing.version ?? '')) {
@@ -178,7 +290,8 @@ export default function makeOrderRoutes(app: Application): void {
           })
         );
       }
-      // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
+      // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records,
+      // and that the judge has no other draft where this one is made.
       const validationIssues =
         action === 'SUBMIT_FOR_REVIEW'
           ? validateMakeOrder(
@@ -188,9 +301,10 @@ export default function makeOrderRoutes(app: Application): void {
               !currentHearing,
               applicationsToDecide(started.envelope)
             )
-          : currentHearing
-            ? validateHearingRecord(formData)
-            : [];
+          : [
+              ...(currentHearing ? validateHearingRecord(formData) : []),
+              ...(started.envelope.otherDraftId ? [{ id: 'made-at', message: OTHER_DRAFT }] : []),
+            ];
       if (validationIssues.length) {
         // Nothing was submitted, so keep the token and versions the answers were made against.
         const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
@@ -232,7 +346,7 @@ export default function makeOrderRoutes(app: Application): void {
         }
         // pcs-api refused the change, e.g. because the draft was saved or sent for review in another
         // tab: show the judge the order as it now stands, and why.
-        const current = await startOrderEvent(accessToken, caseReference, chosen(req));
+        const current = await startOrderEvent(accessToken, caseReference, chosen(req, madeAt));
         const reasons = error.reasons.map(message => ({ id: 'make-order-form', message }));
         return res.status(error.status).render('make-order', pageModel(req, current, { validationIssues: reasons }));
       }

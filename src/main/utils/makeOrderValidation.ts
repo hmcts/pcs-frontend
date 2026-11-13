@@ -510,6 +510,22 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
   }
 }
 
+/** The date a party may apply by, which an order made on the court's own initiative or without notice gives. */
+const NOTICE_DATE_PREFIXES: Record<string, string> = {
+  'own-initiative': 'own-initiative-by',
+  'without-notice': 'without-notice-by',
+};
+
+function validateNotice(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const prefix = NOTICE_DATE_PREFIXES[value(formData, 'order-notice')];
+  if (!prefix) {
+    return [];
+  }
+  const { issues, date } = validation(formData);
+  date(prefix, 'Enter a real date by which a party may apply to set aside, vary or stay the order');
+  return issues;
+}
+
 export function validateMakeOrder(
   orderType: MakeOrderType,
   formData: Record<string, unknown>,
@@ -530,6 +546,7 @@ export function validateMakeOrder(
     ...(withoutHearing && chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
     ...validateOrderType(orderType, formData),
     ...validateApplications(formData, applications),
+    ...validateNotice(formData),
     ...(chosen('staff-message') ? validateStaffMessage(formData) : []),
   ];
 }
