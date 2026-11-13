@@ -3,8 +3,9 @@ import { Application, Request, Response } from 'express';
 
 export default function (app: Application): void {
   app.get('/active', (req: Request, res: Response) => {
-    // check session exists
-    if (!req.session || !req.session.cookie) {
+    // Only extend a session that has completed sign-in. Express creates an empty
+    // session object for a new request even when saveUninitialized is disabled.
+    if (!req.session?.user || !req.session.cookie) {
       return res.status(401).send('No active session');
     }
 
