@@ -255,7 +255,7 @@ export function isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName: Evi
     EvictionUnsuccessfulReturnName.NO_ANIMAL_HANDLER,
     EvictionUnsuccessfulReturnName.NO_REPLY_TO_ADDITIONAL_INFORMATION_REQUEST,
     EvictionUnsuccessfulReturnName.EVICTION_UNSUCCESSFUL_OTHER,
-    EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
+    EvictionUnsuccessfulReturnName.WARRANT_ISSUED_IN_ERROR,
   ]);
 
   return mandatoryReturnNames.has(returnName);
