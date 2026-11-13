@@ -42,6 +42,7 @@ const blankCase = (): Envelope => ({
   caseContext: {
     caseReference: Number(CASE_REFERENCE),
     propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
+    caseName: 'Test case name',
     claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
     defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
   },

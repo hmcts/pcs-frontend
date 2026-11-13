@@ -22,6 +22,7 @@ export interface OrderParty {
 export interface OrderCaseContext {
   caseReference: number;
   propertyAddress?: Record<string, string | undefined>;
+  caseName: string;
   claimants: OrderParty[];
   defendants: OrderParty[];
   openCounterclaim?: boolean;
@@ -132,8 +133,7 @@ export function caseHeader(caseContext: OrderCaseContext): Record<string, string
   return {
     caseReferenceDisplay: caseNumberFormatter(caseContext.caseReference),
     propertyAddressDisplay: formatAddress(caseContext.propertyAddress),
-    claimantNames: caseContext.claimants.map(party => party.name).join(', '),
-    defendantNames: caseContext.defendants.map(party => party.name).join(', '),
+    caseName: caseContext.caseName,
   };
 }
 

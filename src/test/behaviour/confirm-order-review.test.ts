@@ -232,7 +232,7 @@ describe('confirm order review', () => {
       expect(page.querySelector('h1')?.textContent?.trim()).toBe('Confirm order review');
       expect(page.body.textContent).toContain('1777-0276-0001-7760');
       expect(page.body.textContent).toContain('10 Test Street, Bristol, BS1 1AA');
-      expect(page.body.textContent).toContain('Example Housing vs Alex Example');
+      expect(page.body.textContent).toContain('Test case name');
       expect(page.querySelector('.govuk-warning-text')).toBeNull();
       expect(page.querySelector<HTMLAnchorElement>('a.govuk-button')?.getAttribute('href')).toBe(REVIEW);
       expect(eventStarts()).toBe(1);
