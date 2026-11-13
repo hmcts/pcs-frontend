@@ -50,7 +50,7 @@ export enum EvictionUnsuccessfulReturnName {
 export interface WarrantReturn {
   returnType: WarrantReturnType;
   returnName?: InterimReturnName | EvictionSuccessfulReturnName | EvictionUnsuccessfulReturnName;
-  outcome?: EvictionOutcome;
+  evictionOutcome?: EvictionOutcome;
   additionalDetails?: string;
   outcomeDate?: string;
 }
