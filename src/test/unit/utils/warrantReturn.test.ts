@@ -242,6 +242,7 @@ describe('warrantReturn', () => {
       EvictionUnsuccessfulReturnName.NO_ANIMAL_HANDLER,
       EvictionUnsuccessfulReturnName.NO_REPLY_TO_ADDITIONAL_INFORMATION_REQUEST,
       EvictionUnsuccessfulReturnName.EVICTION_UNSUCCESSFUL_OTHER,
+      EvictionUnsuccessfulReturnName.WARRANT_ISSUED_IN_ERROR,
     ])('should return true for %s', returnName => {
       expect(isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName)).toBe(true);
     });
@@ -253,7 +254,6 @@ describe('warrantReturn', () => {
       EvictionUnsuccessfulReturnName.NO_LOCKSMITH,
       EvictionUnsuccessfulReturnName.NO_CLAIMANT_OR_AGENT,
       EvictionUnsuccessfulReturnName.WARRANT_EXPIRED,
-      EvictionUnsuccessfulReturnName.WARRANT_ISSUED_IN_ERROR,
     ])('should return false for %s', returnName => {
       expect(isAdditionalDetailsMandatoryEvictionUnsuccessful(returnName)).toBe(false);
     });
