@@ -516,6 +516,9 @@ const NOTICE_DATE_PREFIXES: Record<string, string> = {
   'without-notice': 'without-notice-by',
 };
 
+export const APPLY_BY_PASSED =
+  'The date by which a party may apply to set aside, vary or stay the order must be today or in the future';
+
 function validateNotice(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const prefix = NOTICE_DATE_PREFIXES[value(formData, 'order-notice')];
   if (!prefix) {
@@ -526,11 +529,7 @@ function validateNotice(formData: Record<string, unknown>): MakeOrderValidationI
   const applyBy = dateOf(formData, prefix);
   // Parsed dates are UTC midnights, so today is the court's date as one too.
   const today = new Date(`${DateTime.now().setZone('Europe/London').toISODate()}T00:00:00Z`);
-  add(
-    !applyBy || applyBy >= today,
-    `${prefix}-day`,
-    'The date by which a party may apply to set aside, vary or stay the order must be today or in the future'
-  );
+  add(!applyBy || applyBy >= today, `${prefix}-day`, APPLY_BY_PASSED);
   return issues;
 }
 

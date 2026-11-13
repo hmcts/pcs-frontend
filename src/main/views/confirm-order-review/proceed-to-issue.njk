@@ -69,10 +69,13 @@
         items: partyItems
       }) }}
     {% endset %}
+    {% include "confirm-order-review/_issue-summary.njk" %}
+
     {{ govukRadios({
       name: "serve-all-parties",
       idPrefix: "serve-all-parties",
       fieldset: { legend: { text: "Should this order be served on all parties?", classes: "govuk-fieldset__legend--m" } },
+      hint: { text: "If you select No, only the parties you select, court staff and judges will see this order on the case. If you are not sure, go back to the review and send a query to the Judge." },
       errorMessage: validationErrors["serve-all-parties"],
       items: [
         { value: "yes", text: "Yes", checked: answers.serveAllParties == "yes" },

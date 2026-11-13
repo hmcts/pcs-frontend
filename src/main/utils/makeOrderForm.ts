@@ -24,6 +24,29 @@ const NO_CLAIM_ORDER_TYPE: MakeOrderType = 'NO_ORDER_ON_CLAIM';
 
 const YES_NO: Record<string, string> = { YES: 'Yes', NO: 'No' };
 
+/**
+ * Whether the applicant asked for the application to be made without notice, as they recorded it when making it. It
+ * says nothing of who was in fact told of the application before the order.
+ */
+export function noticeRequestLabel(withoutNotice?: string | null): string {
+  return withoutNotice === 'YES'
+    ? 'Without notice requested'
+    : withoutNotice === 'NO'
+      ? 'Without notice not requested'
+      : 'Notice request not recorded';
+}
+
+/** A hearing's date and time as the order pages give it. */
+export function hearingTime(iso: string): string {
+  const date = DateTime.fromISO(iso, { zone: 'Europe/London' });
+  return date.isValid
+    ? date
+        .setLocale('en-GB')
+        .toFormat("d MMMM yyyy 'at' h:mma")
+        .replace(/AM|PM/, m => m.toLowerCase())
+    : iso;
+}
+
 function displayDate(iso?: string | null): string | undefined {
   const date = DateTime.fromISO(String(iso ?? ''), { zone: 'Europe/London' });
   return date.isValid ? date.setLocale('en-GB').toFormat('d MMMM yyyy') : undefined;
@@ -62,6 +85,7 @@ function applicationModel(application: OrderApplication & ApplicationToDecide, c
     within14DaysDisplay: YES_NO[application.within14Days ?? ''],
     otherPartiesAgreedDisplay: YES_NO[application.otherPartiesAgreed ?? ''],
     withoutNoticeDisplay: YES_NO[application.withoutNotice ?? ''],
+    noticeRequest: noticeRequestLabel(application.withoutNotice),
   };
 }
 
@@ -206,15 +230,6 @@ export function madeAtChoice(posted: unknown): { hearingId?: number } | undefine
  * link brought them to it, with the one the order is now made at chosen.
  */
 export function madeAtModel({ caseContext, hearing }: OrderStart): Record<string, unknown> {
-  const hearingTime = (iso: string): string => {
-    const date = DateTime.fromISO(iso, { zone: 'Europe/London' });
-    return date.isValid
-      ? date
-          .setLocale('en-GB')
-          .toFormat("d MMMM yyyy 'at' h:mma")
-          .replace(/AM|PM/, m => m.toLowerCase())
-      : iso;
-  };
   const current = madeAtValue(hearing);
   return {
     madeAt: current,

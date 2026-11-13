@@ -7,6 +7,7 @@ import {
   check,
   control,
   eventStarts,
+  futureDate,
   openPage,
   recordAttendance,
   refuseNextEvent,
@@ -16,6 +17,7 @@ import {
   submittedEventTokens,
   submittedReviews,
   type,
+  typeDate,
   writeInPreview,
 } from './harness';
 
@@ -790,7 +792,7 @@ describe('confirm order review', () => {
       await reachProceedToIssue(app);
     });
 
-    it('serves the order on all parties, in claim order, under the County Court seal, without permission for restitution, unless changed', async () => {
+    it('asks who to serve the order on with no answer chosen, under the County Court seal, without permission for restitution, unless changed', async () => {
       const page = parse((await app.get(PROCEED_TO_ISSUE)).text);
 
       expect(page.querySelector<HTMLInputElement>('input[name="restitution-permission"][value="no"]')?.checked).toBe(
@@ -799,7 +801,10 @@ describe('confirm order review', () => {
       expect(page.querySelector('#final-order-hint')?.textContent?.trim()).toBe(
         'Select Yes if this order brings the main claim, a general application, counterclaim or enforcement action to an end. The whole case does not need to be concluded.'
       );
-      expect(page.querySelector<HTMLInputElement>('input[name="serve-all-parties"][value="yes"]')?.checked).toBe(true);
+      expect(page.querySelector<HTMLInputElement>('input[name="serve-all-parties"]:checked')).toBeNull();
+      expect(page.querySelector('#serve-all-parties-hint')?.textContent?.trim()).toBe(
+        'If you select No, only the parties you select, court staff and judges will see this order on the case. If you are not sure, go back to the review and send a query to the Judge.'
+      );
       expect(page.querySelector<HTMLInputElement>('input[name="seal"][value="COUNTY_COURT"]')?.checked).toBe(true);
       expect(page.querySelector<HTMLInputElement>('input[name="next-steps"]:checked')).toBeNull();
       expect(page.querySelector<HTMLInputElement>('input[name="final-order"]:checked')).toBeNull();
@@ -826,6 +831,18 @@ describe('confirm order review', () => {
       ]);
     });
 
+    it('does not go on until court staff say whether the order is served on all parties', async () => {
+      const unanswered = await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers({ 'serve-all-parties': '' }));
+
+      expect(errors(unanswered.text)).toEqual(['Select if this order should be served on all parties']);
+      // An order with neither statement may still be served on only some parties.
+      const some = await app.post(
+        PROCEED_TO_ISSUE,
+        proceedToIssueAnswers({ 'serve-all-parties': 'no', 'parties-to-serve': 'defendant-id' })
+      );
+      expect(some.location).toBe(CHECK_YOUR_ANSWERS);
+    });
+
     it('does not go on while court staff still have tasks to do', async () => {
       const outstanding = await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers({ 'next-steps': 'outstanding' }));
 
@@ -848,7 +865,8 @@ describe('confirm order review', () => {
       );
 
       const page = parse((await app.get(CHECK_YOUR_ANSWERS)).text);
-      const rows = [...page.querySelectorAll('.govuk-summary-list__row')].map(row => [
+      expect(page.querySelector('button[value="continue"]')?.textContent?.trim()).toBe('Issue order');
+      const rows = [...page.querySelectorAll('[id$="-answers"] .govuk-summary-list__row')].map(row => [
         row.querySelector('.govuk-summary-list__key')?.textContent?.trim(),
         row.querySelector('.govuk-summary-list__value')?.textContent?.trim(),
       ]);
@@ -941,6 +959,98 @@ describe('confirm order review', () => {
 
       expect(refused.status).toBe(422);
       expect(errors(refused.text)).toEqual(['The order has been updated by another user. Reload it and try again']);
+    });
+  });
+
+  describe('what court staff check before choosing who to serve', () => {
+    const MIXED = [
+      { ...APPLICATIONS[0], withoutNotice: 'YES' },
+      { ...APPLICATIONS[1], withoutNotice: 'NO' },
+      { ...APPLICATIONS[1], id: 'gen-app-3', reference: 'GA3', withoutNotice: null },
+    ];
+
+    function summary(html: string): string[][] {
+      return [...parse(html).querySelectorAll('#issue-summary .govuk-summary-list__row')].map(row => [
+        row.querySelector('.govuk-summary-list__key')!.textContent!.trim(),
+        ...row
+          .querySelector('.govuk-summary-list__value span')!
+          .innerHTML.split('<br>')
+          .map(line => line.trim()),
+      ]);
+    }
+
+    it("shows the order's answers as staff left them, the Judge's where staff changed them, and the order to issue", async () => {
+      const judgeDate = futureDate(20);
+      app = await caseworkerReviewing(
+        await judgesOrder({
+          applications: MIXED,
+          staffMessage: 'Serve the defendant by hand',
+          decide: () => {
+            check('app-gen-app-1-decision', 'grant');
+            check('app-gen-app-2-decision', 'dismiss');
+            check('order-notice', 'without-notice');
+            typeDate('without-notice-by', judgeDate.day, judgeDate.month, judgeDate.year);
+          },
+        }),
+        MIXED
+      );
+      const review = await openReview(app);
+      // The reused form says beside each application what its applicant asked for.
+      expect(
+        ['app-gen-app-1', 'app-gen-app-2', 'app-gen-app-3'].map(prefix =>
+          control(`#${prefix}-notice-request`).textContent?.trim()
+        )
+      ).toEqual(['Without notice requested', 'Without notice not requested', 'Notice request not recorded']);
+      expect(control<HTMLButtonElement>('button[value="ISSUE"]').textContent?.trim()).toBe('Continue');
+
+      const staffDate = futureDate(21);
+      typeDate('without-notice-by', staffDate.day, staffDate.month, staffDate.year);
+      expect((await app.post(REVIEW, review.body('ISSUE'))).location).toBe(REVIEW_DATES);
+      await app.post(REVIEW_DATES, form({ 'has-review-dates': 'no', action: 'continue' }));
+
+      const asDate = ({ day, month, year }: { day: string; month: string; year: string }) =>
+        new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))).toLocaleDateString('en-GB', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+          timeZone: 'UTC',
+        });
+      const expected = [
+        ['Order made', 'At the hearing on 13 October 2026 at 10:00am'],
+        ['Statement selected', 'Order without notice'],
+        ['Apply-by date entered', asDate(staffDate), `The Judge entered: ${asDate(judgeDate)}`],
+        [
+          'Applications this order decides',
+          'GA1: Something else – Granted – Without notice requested',
+          'GA2: Adjourn the hearing – Dismissed – Without notice not requested',
+        ],
+        ['Message from the Judge', 'Serve the defendant by hand'],
+      ];
+      const proceed = (await app.get(PROCEED_TO_ISSUE)).text;
+      expect(summary(proceed)).toEqual(expected);
+      const issuing = parse(proceed).querySelector('details#issuing-order');
+      expect(issuing?.querySelector('summary')?.textContent?.trim()).toBe('Order to issue');
+      expect(issuing?.textContent).toContain(asDate(staffDate));
+      // The original judge snapshot is not what the issuing preview shows.
+      expect(issuing?.textContent).not.toContain(asDate(judgeDate));
+
+      // Without notice, the order may still be served on every party.
+      expect((await app.post(PROCEED_TO_ISSUE, proceedToIssueAnswers())).location).toBe(CHECK_YOUR_ANSWERS);
+      const answers = (await app.get(CHECK_YOUR_ANSWERS)).text;
+      expect(summary(answers)).toEqual(expected);
+      expect(parse(answers).querySelector('details#issuing-order')?.textContent).toContain(asDate(staffDate));
+    });
+
+    it('does not take a statement the Judge never recorded to be neither', async () => {
+      const order = await (plainOrder ??= judgesOrder());
+      const { 'order-notice': _notice, ...legacy } = order.formData;
+      app = await caseworkerReviewing({ ...order, formData: legacy });
+      await reachProceedToIssue(app);
+
+      expect(summary((await app.get(PROCEED_TO_ISSUE)).text)).toEqual([
+        ['Order made', 'At the hearing on 13 October 2026 at 10:00am'],
+        ['Statement selected', 'Neither', 'The Judge selected: Not recorded'],
+      ]);
     });
   });
 });

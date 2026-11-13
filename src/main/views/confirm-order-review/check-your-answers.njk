@@ -12,6 +12,9 @@
     <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
 
     {% for section in sections %}
+      {% if section.id == "issue-answers" %}
+        {% include "confirm-order-review/_issue-summary.njk" %}
+      {% endif %}
       <h2 class="govuk-heading-m">{{ section.heading }}</h2>
       {% set rows = [] %}
       {% for row in section.rows %}
@@ -28,6 +31,6 @@
       {{ govukSummaryList({ rows: rows, attributes: { id: section.id } }) }}
     {% endfor %}
 
-    {{ buttons.eventButtons("Submit") }}
+    {{ buttons.eventButtons("Issue order") }}
   </form>
 {% endblock %}

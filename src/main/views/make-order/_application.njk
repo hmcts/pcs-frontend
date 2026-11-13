@@ -22,7 +22,7 @@
 
 {% macro details(application) %}
   {% if application.withoutNotice == "YES" %}
-    {{ govukWarningText({ text: "The applicant asked for this application to be made without notice. Only the applicant will be told of it." }) }}
+    {{ govukWarningText({ text: "The applicant asked for this application to be made without notice." }) }}
   {% endif %}
 
   {% set documentLinks %}
@@ -49,7 +49,7 @@
   {% endif %}
   {% set rows = rows.concat([
     { key: { text: "Other parties agree" }, value: { text: application.otherPartiesAgreedDisplay or "Not answered" } },
-    { key: { text: "Without notice" }, value: { text: (application.withoutNoticeDisplay or "No") + ((": " + application.withoutNoticeReason) if application.withoutNoticeReason else "") } },
+    { key: { text: "Without notice requested" }, value: { text: (application.withoutNoticeDisplay or "Not recorded") + ((": " + application.withoutNoticeReason) if application.withoutNoticeReason else "") } },
     { key: { text: "Application documents" }, value: { html: documentLinks } }
   ]) %}
   {{ govukSummaryList({ rows: rows, classes: "govuk-!-margin-bottom-4", attributes: { id: application.prefix + "-details" } }) }}
@@ -126,7 +126,7 @@
     </h3>
     <p class="govuk-body-s govuk-!-margin-bottom-2">
       {{ application.applicant or "Applicant not known" }}{% if application.submittedOnDisplay %}, {{ application.submittedOnDisplay }}{% endif %}
-      {%- if application.withoutNotice == "YES" %}, without notice{% endif %}
+      <strong class="govuk-tag {{ '' if application.withoutNotice == 'YES' else 'govuk-tag--grey' }} govuk-!-margin-left-1" id="{{ prefix }}-notice-request">{{ application.noticeRequest }}</strong>
     </p>
     {{ govukDetails({
       summaryText: "Application details and the order asked for",

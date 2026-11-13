@@ -1,11 +1,11 @@
 import { parseSnapshot, renderHtml } from '@hmcts-cft/docweave';
 
-import type { OrderFormSubmission } from '@utils/makeOrderForm';
+import { type OrderFormSubmission, hearingTime, noticeRequestLabel } from '@utils/makeOrderForm';
 import { parseDate } from '@utils/makeOrderFormat';
 import { type MoneyJudgmentsAnswers, judgmentsFromOrder, moneyJudgmentsRequest } from '@utils/moneyJudgments';
 import type { FormData, OrderStart } from '@utils/orderCase';
 import { type OrderDetailsAnswers, orderDetailsRequest } from '@utils/orderDetails';
-import { applicationDecisions, claimOutcome } from '@utils/orderOutcome';
+import { type GenAppDecision, applicationDecisions, claimOutcome } from '@utils/orderOutcome';
 
 export const REVIEW_REASONS = [
   { value: 'UNLESS_ORDER', text: 'Unless order' },
@@ -84,14 +84,13 @@ export const MAX_REVIEW_DATES = 10;
 export const MAX_REVIEW_DESCRIPTION_LENGTH = 500;
 
 export function newAnswers(): OrderReviewAnswers {
-  // Orders are served on all parties under the County Court seal, without permission for restitution, unless the
-  // caseworker changes it.
+  // Orders are under the County Court seal, without permission for restitution, unless the caseworker changes it.
+  // Who the order is served on has no default: the caseworker chooses.
   return {
     orderDetails: {},
     reviewDates: [],
     partiesToServe: [],
     restitutionPermission: 'no',
-    serveAllParties: 'yes',
     seal: 'COUNTY_COURT',
   };
 }
@@ -277,4 +276,100 @@ function issuedOrder(order: Required<OrderFormSubmission>): Record<string, unkno
     // Its wording exported to HTML, which pcs-api issues as the order's document.
     html: docweaveSnapshot ? renderHtml(docweaveSnapshot) : undefined,
   };
+}
+
+// The make order form's choice of statement, as the judge's form words it.
+const NOTICE_STATEMENTS: Record<string, string> = {
+  'own-initiative': "Order on court's own initiative",
+  'without-notice': 'Order without notice',
+  none: 'Neither',
+};
+
+const DECISION_LABELS: Record<GenAppDecision, string> = {
+  GRANT: 'Granted',
+  DISMISS: 'Dismissed',
+  STRIKE_OUT: 'Struck out',
+  LIST: 'Listed for a hearing on notice',
+  OTHER: 'Something else',
+};
+
+function firstValue(formData: FormData, field: string): string {
+  const value = formData[field];
+  return String((Array.isArray(value) ? value[0] : value) ?? '').trim();
+}
+
+function statementSelected(formData: FormData): string {
+  return NOTICE_STATEMENTS[firstValue(formData, 'order-notice')] ?? 'Not recorded';
+}
+
+/** The apply-by date the form gives, for a statement that has one. */
+function applyByEntered(formData: FormData): string | undefined {
+  const statement = firstValue(formData, 'order-notice');
+  if (statement !== 'own-initiative' && statement !== 'without-notice') {
+    return undefined;
+  }
+  const [day, month, year] = ['day', 'month', 'year'].map(part => firstValue(formData, `${statement}-by-${part}`));
+  if (!day && !month && !year) {
+    return 'Not entered';
+  }
+  const date = /^\d{4}$/.test(year) ? parseDate(day, month, year) : undefined;
+  return date
+    ? date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+    : [day, month, year].join('/');
+}
+
+/**
+ * What court staff check before choosing who the order is served on, from the order's answers as they now are: where
+ * it was made, the statement and apply-by date chosen, with the judge's own where staff changed them, the applications
+ * it decides with whether each applicant asked for it to be made without notice, and the judge's message. These are
+ * answers, not the wording, which may have been edited.
+ */
+export function issueSummary(review: OrderReviewSession): { key: string; lines: string[] }[] {
+  const current = review.answers.order?.formData ?? review.order.formData ?? {};
+  const original = review.order.formData ?? {};
+  const rows: { key: string; lines: string[] }[] = [
+    {
+      key: 'Order made',
+      lines: [
+        review.hearing ? `At the hearing on ${hearingTime(review.hearing.date)}` : 'Without a hearing (box work)',
+      ],
+    },
+  ];
+  const withOriginal = (now: string, judge: string, prefix: string) =>
+    now === judge ? [now] : [now, `${prefix}: ${judge}`];
+
+  rows.push({
+    key: 'Statement selected',
+    lines: withOriginal(statementSelected(current), statementSelected(original), 'The Judge selected'),
+  });
+  const applyBy = applyByEntered(current);
+  const judgeApplyBy = applyByEntered(original);
+  if (applyBy || judgeApplyBy) {
+    rows.push({
+      key: 'Apply-by date entered',
+      lines: withOriginal(applyBy ?? 'Not applicable', judgeApplyBy ?? 'Not applicable', 'The Judge entered'),
+    });
+  }
+
+  const applications = new Map(
+    (review.caseContext.applications ?? []).map(application => [application.id, application])
+  );
+  const decided = applicationDecisions(current).flatMap(({ genAppId, decision }) => {
+    const application = applications.get(genAppId);
+    return application
+      ? [
+          `${application.reference}: ${application.type} – ${DECISION_LABELS[decision]} – ` +
+            noticeRequestLabel(application.withoutNotice),
+        ]
+      : [];
+  });
+  if (decided.length) {
+    rows.push({ key: 'Applications this order decides', lines: decided });
+  }
+
+  const message = staffMessage(original);
+  if (message) {
+    rows.push({ key: 'Message from the Judge', lines: [message] });
+  }
+  return rows;
 }

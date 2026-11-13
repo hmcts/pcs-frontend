@@ -13,7 +13,7 @@ import {
   orderFormModel,
   withoutUnchosenNoticeDates,
 } from '@utils/makeOrderForm';
-import { MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
+import { APPLY_BY_PASSED, MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   COSTS,
   FREQUENCIES,
@@ -62,6 +62,7 @@ import {
   type ValidationIssue,
   blankReviewDate,
   choice,
+  issueSummary,
   issuesFreeForm,
   list,
   newAnswers,
@@ -265,6 +266,8 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
   const partyNames = new Map(partyChoices(review).map(party => [party.value, party.text]));
   const partiesToServe = answers.partiesToServe.map(id => partyNames.get(id) ?? id);
   return {
+    issueSummary: issueSummary(review),
+    issuingHtml: issuingHtml(review),
     sections: [
       ...(issuesFreeForm(answers)
         ? [
@@ -336,6 +339,13 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
   };
 }
 
+/** The order as it will be issued, with any changes court staff made. */
+function issuingHtml(review: OrderReviewSession): string | undefined {
+  return review.answers.order?.orderDocumentJson
+    ? renderHtml(parseSnapshot(review.answers.order.orderDocumentJson))
+    : undefined;
+}
+
 /** What each question page shows besides the case and any errors. */
 const VIEWS = {
   review: (_req: Request, review: OrderReviewSession) => ({
@@ -348,9 +358,7 @@ const VIEWS = {
   'order-details': (_req: Request, review: OrderReviewSession) => ({
     answers: review.answers.orderDetails ?? {},
     // The order as it will be issued, with any changes court staff made, for them to say what it does.
-    issuingHtml: review.answers.order?.orderDocumentJson
-      ? renderHtml(parseSnapshot(review.answers.order.orderDocumentJson))
-      : undefined,
+    issuingHtml: issuingHtml(review),
     orderDoes: ORDER_DOES,
     outrightPossession: OUTRIGHT_POSSESSION,
     grounds: GROUNDS,
@@ -367,9 +375,7 @@ const VIEWS = {
     costsOptions: COSTS,
     frequencies: FREQUENCIES,
     canAddJudgment: (review.answers.moneyJudgments?.judgments.length ?? 0) < MAX_MONEY_JUDGMENTS,
-    issuingHtml: review.answers.order?.orderDocumentJson
-      ? renderHtml(parseSnapshot(review.answers.order.orderDocumentJson))
-      : undefined,
+    issuingHtml: issuingHtml(review),
   }),
   'review-dates': (_req: Request, review: OrderReviewSession) => ({
     answers: review.answers,
@@ -383,6 +389,8 @@ const VIEWS = {
     nextSteps: NEXT_STEPS,
     seals: SEALS,
     parties: partyChoices(review),
+    issueSummary: issueSummary(review),
+    issuingHtml: issuingHtml(review),
   }),
   'check-your-answers': checkYourAnswersContent,
 } as const;
@@ -413,6 +421,9 @@ const showRefusal = (req: Request, res: Response, view: View) => (error: Callbac
     error.status
   );
 
+const APPLY_BY_PASSED_REVIEW =
+  'If the date needs to change, you can send a query to the Judge to return the order to them';
+
 /** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
 export const NO_WORDING = "The order's wording did not load. Reload the page and review the order again";
 
@@ -431,6 +442,9 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
     review.hearing ? attendanceParties(review) : [],
     !review.hearing,
     applicationsToDecide(review)
+  ).map(issue =>
+    // Court staff may not know what date the Judge would give instead, which they can ask with a query.
+    issue.message === APPLY_BY_PASSED ? { ...issue, message: `${APPLY_BY_PASSED}. ${APPLY_BY_PASSED_REVIEW}` } : issue
   );
 }
 

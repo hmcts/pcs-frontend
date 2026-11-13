@@ -384,4 +384,56 @@ describe('make an order: deciding applications', () => {
       expect((await app.post(WARRANT_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
     });
   });
+
+  describe('whether each applicant asked for their application to be made without notice', () => {
+    const WITHOUT_NOTICE = {
+      id: 'gen-app-3',
+      reference: 'GA3',
+      type: 'Something else',
+      somethingElseDetails: 'Stop the eviction',
+      applicant: 'Alex Example (Defendant 1)',
+      submittedOn: '2026-10-11',
+      withoutNotice: 'YES',
+      withoutNoticeReason: 'Risk of harm',
+      whatOrderWanted: null,
+      documents: [],
+    };
+
+    /** What an application's details say of its request, by the row's key. */
+    function detailsRow(prefix: string): string | undefined {
+      return [...document.querySelectorAll(`#${prefix}-details .govuk-summary-list__row`)]
+        .find(row => row.querySelector('dt')?.textContent?.trim() === 'Without notice requested')
+        ?.querySelector('dd')
+        ?.textContent?.trim();
+    }
+
+    it('says beside each application what its applicant asked for, and not recorded when they were not asked', async () => {
+      // GA1 asked not to be without notice, GA2 was made before the question was asked, GA3 asked to be.
+      app = await bootApp({ applications: [ADJOURN, WARRANT, WITHOUT_NOTICE] });
+      await openPage((await app.get(PAGE)).text);
+
+      const labels = ['app-gen-app-1', 'app-gen-app-2', 'app-gen-app-3'].map(prefix =>
+        control<HTMLElement>(`#${prefix}-notice-request`).textContent?.trim()
+      );
+      expect(labels).toEqual([
+        'Without notice not requested',
+        'Notice request not recorded',
+        'Without notice requested',
+      ]);
+      // Beside the heading, before the details are opened.
+      expect(
+        control('#app-gen-app-3-heading').nextElementSibling?.contains(control('#app-gen-app-3-notice-request'))
+      ).toBe(true);
+      expect([detailsRow('app-gen-app-1'), detailsRow('app-gen-app-2'), detailsRow('app-gen-app-3')]).toEqual([
+        'No',
+        'Not recorded',
+        'Yes: Risk of harm',
+      ]);
+      // A request is not a promise of who is told.
+      expect(control('#app-gen-app-3-more').textContent).toContain(
+        'The applicant asked for this application to be made without notice.'
+      );
+      expect(document.body.textContent).not.toContain('will be told');
+    });
+  });
 });
