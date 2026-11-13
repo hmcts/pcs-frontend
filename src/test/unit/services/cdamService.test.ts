@@ -242,68 +242,30 @@ describe('cdamService', () => {
         headers: {},
       });
 
-      const result = await getDocumentBinary('http://some-url/binary', userToken);
+      const result = await getDocumentBinary('http://dm-store/documents/test-123/binary', userToken);
 
       expect(result.contentType).toBe('application/octet-stream');
       expect(result.contentLength).toBeUndefined();
       expect(result.contentDisposition).toBeUndefined();
     });
 
-    it('falls back to direct DM-Store binaryUrl when CDAM returns 403 Forbidden', async () => {
-      const mockStream = { pipe: jest.fn(), on: jest.fn() };
+    it('does not bypass CDAM when document access is denied', async () => {
       const cdamError = {
         response: { status: 403 },
         message: 'Forbidden',
       };
-      mockGet.mockRejectedValueOnce(cdamError).mockResolvedValueOnce({
-        data: mockStream,
-        headers: {
-          'content-type': 'application/pdf',
-        },
-      });
+      mockGet.mockRejectedValue(cdamError);
 
       const binaryUrl = 'http://dm-store/documents/test-123/binary';
-      const result = await getDocumentBinary(binaryUrl, userToken);
+      await expect(getDocumentBinary(binaryUrl, userToken)).rejects.toEqual(cdamError);
 
-      expect(mockGet).toHaveBeenNthCalledWith(
-        1,
+      expect(mockGet).toHaveBeenCalledWith(
         `${mockCdamUrl}/cases/documents/test-123/binary`,
         expect.objectContaining({
           headers: expect.objectContaining({ Authorization: `Bearer ${userToken}` }),
         })
       );
-      expect(mockGet).toHaveBeenNthCalledWith(
-        2,
-        binaryUrl,
-        expect.objectContaining({
-          headers: expect.objectContaining({ Authorization: `Bearer ${userToken}` }),
-        })
-      );
-      expect(result.stream).toBe(mockStream);
-    });
-
-    it('does not retry with a service identity when the user-token fallback is denied', async () => {
-      const cdamError = {
-        response: { status: 403 },
-        message: 'Forbidden',
-      };
-      const userError = {
-        response: { status: 403 },
-        message: 'User forbidden',
-      };
-      mockGet.mockRejectedValueOnce(cdamError).mockRejectedValueOnce(userError);
-
-      const binaryUrl = 'http://dm-store/documents/test-123/binary';
-      await expect(getDocumentBinary(binaryUrl, userToken)).rejects.toEqual(cdamError);
-
-      expect(mockGet).toHaveBeenNthCalledWith(
-        2,
-        binaryUrl,
-        expect.objectContaining({
-          headers: expect.objectContaining({ Authorization: `Bearer ${userToken}` }),
-        })
-      );
-      expect(mockGet).toHaveBeenCalledTimes(2);
+      expect(mockGet).toHaveBeenCalledTimes(1);
     });
 
     it('rethrows fetch errors from CDAM', async () => {
