@@ -1,10 +1,10 @@
 {% extends "xui-layout.njk" %}
 
 {% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
-{% from "govuk/components/warning-text/macro.njk" import govukWarningText %}
 {% from "macros/csrf.njk" import csrfProtection %}
 {% import "make-order/_compact.njk" as compact with context %}
 
@@ -66,13 +66,6 @@
     with everything the judge has written so far, and saves nothing.
   #}
   <h2 class="govuk-heading-l govuk-!-margin-top-6">When the order is made</h2>
-  {% if otherDraft %}
-    {{ govukWarningText({
-      text: "You already have another draft order " + ("for this hearing" if hearing else "made without a hearing") + ". You can send this order for review, but not save it as a draft as well.",
-      iconFallbackText: "Warning",
-      attributes: { id: "other-draft-warning" }
-    }) }}
-  {% endif %}
   <input type="hidden" name="shown-made-at" value="{{ madeAt }}">
   {{ govukRadios({
     idPrefix: "made-at",
@@ -111,5 +104,32 @@
       classes: "govuk-button--secondary"
     }) }}
   </div>
+
+  {#
+    A judge has one draft order on a case, which every link to make an order opens until they send or discard it.
+    Discarding takes a tick and then its own button, so neither alone loses the draft; unticking leaves the page as
+    it was.
+  #}
+  {% if order.id and order.state == "DRAFT" %}
+    {% set discardButton %}
+      <p class="govuk-body">You will not be able to open or change this draft again, and your next order on this case will start blank. Tasks and messages on the case stay as they are.</p>
+      {{ govukButton({
+        text: "Discard draft order",
+        name: "action",
+        value: "DISCARD_DRAFT",
+        preventDoubleClick: true,
+        classes: "govuk-button--warning govuk-!-margin-bottom-0",
+        attributes: { id: "discard-draft-order" }
+      }) }}
+    {% endset %}
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">Discard this draft</h2>
+    {{ govukCheckboxes({
+      idPrefix: "discard-draft",
+      name: "discard-draft",
+      classes: "govuk-checkboxes--small",
+      items: [{ value: "yes", text: "I want to discard this draft order", conditional: { html: discardButton } }],
+      errorMessage: validationErrors["discard-draft"]
+    }) }}
+  {% endif %}
   </form>
 {% endblock %}

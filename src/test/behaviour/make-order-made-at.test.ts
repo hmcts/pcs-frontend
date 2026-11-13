@@ -154,25 +154,6 @@ describe('make an order: choosing when it is made', () => {
     expect(control('[name="current-rent"]').value).toBe('800');
   });
 
-  it('sends, but does not save as a draft, an order made where the judge already has a draft', async () => {
-    app = await bootApp({ hearing: null, hearings: [LATER_HEARING], otherDraftAt: 2 });
-    let page = await openPage((await app.get(PAGE)).text);
-    expect(document.querySelector('#other-draft-warning')).toBeNull();
-    check('made-at', '2');
-    page = await openPage((await app.post(PAGE, page.body('CHANGE_MADE_AT'))).text);
-    expect(control('#other-draft-warning').textContent).toContain(
-      'You already have another draft order for this hearing'
-    );
-
-    const refused = await app.post(PAGE, page.body('SAVE_DRAFT'));
-    expect(refused.status).toBe(400);
-    expect(submittedOrders()).toEqual([]);
-
-    page = await openPage(refused.text);
-    recordAttendance();
-    expect((await app.post(PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
-    expect((submittedOrders()[0] as { hearing: { id: number } }).hearing.id).toBe(2);
-  });
   it('keeps what the judge wrote, where they had it, when the hearing they choose has been cancelled', async () => {
     app = await bootApp({ hearings: [LATER_HEARING] });
     const page = await openPage((await app.get(PAGE)).text);

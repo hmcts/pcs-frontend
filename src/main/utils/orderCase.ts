@@ -83,13 +83,15 @@ export interface OrderHearing {
 
 /**
  * What an order event sends when it starts: the order, and the case it is made on. The make order event
- * sends the judge their working order, if any, or the order a caseworker returned to them with its query; the
- * confirm order review event sends the caseworker the order awaiting review.
+ * sends the judge their one draft on the case, if they have one, or the order a caseworker returned to them with its
+ * query; the confirm order review event sends the caseworker the order awaiting review.
  */
 export interface OrderStart {
   order: {
     id?: string;
     version: number;
+    /** Where the order is; none until it is first saved. Only a draft can be discarded. */
+    state?: 'DRAFT' | 'SUBMITTED_FOR_REVIEW' | 'RETURNED_TO_JUDGE' | 'ISSUED' | 'DISCARDED' | null;
     orderType?: MakeOrderType;
     formData?: FormData;
     docweaveSnapshot?: DocWeaveSnapshot | null;
@@ -103,11 +105,6 @@ export interface OrderStart {
   hearing?: OrderHearing | null;
   /** The application the judge's task asked them to decide, which the order must decide. */
   taskGenAppId?: string | null;
-  /**
-   * The judge's other draft already made at the order's hearing, or without one, which pcs-api will not let them
-   * save this order as a draft alongside.
-   */
-  otherDraftId?: string | null;
 }
 
 export function formatAddress(address: Record<string, string | undefined> = {}): string {

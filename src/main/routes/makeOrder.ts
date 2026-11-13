@@ -139,9 +139,6 @@ function chosen(req: Request, madeAt?: unknown): Chosen {
   };
 }
 
-const OTHER_DRAFT =
-  'You already have another draft order made there. Send this order for review, or choose when it is made again';
-
 /** What the judge had on the page when they chose to change when the order is made. */
 interface MadeAtChange extends OrderFormSubmission {
   madeAt?: string;
@@ -153,7 +150,8 @@ interface MadeAtChange extends OrderFormSubmission {
  * where the first of the given choices pcs-api still starts the order, or else where the order was saved, as when the
  * hearing chosen has since been cancelled. A hearing's facts and notes come back only on the hearing they were
  * written for. The order's id and version stay those the judge worked from, so a change made elsewhere since is
- * refused again rather than overwritten.
+ * refused again rather than overwritten; a page with no order of its own, opened before the judge's draft was saved
+ * elsewhere, stays without one, and saves nothing over that draft.
  */
 async function showRefused(
   req: Request,
@@ -290,6 +288,51 @@ async function changeMadeAt(
   );
 }
 
+/**
+ * Discards the judge's saved draft once they have ticked that they want to, as they last saw it: pcs-api keeps it as
+ * it was last saved, and it is no longer their draft on the case. Without the tick, or refused by pcs-api, the page
+ * comes back with everything the judge had on it.
+ */
+async function discardDraft(req: Request, res: Response, confirmed: boolean, sent: MadeAtChange): Promise<void> {
+  const accessToken = req.session.user!.accessToken;
+  const caseReference = req.params.caseReference as string;
+  const { eventToken, orderId, orderVersion, hearingVersion } = req.body;
+  try {
+    if (!confirmed) {
+      const started = await startOrderEvent(accessToken, caseReference, chosen(req, sent.shownMadeAt));
+      const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
+      return res.status(400).render(
+        'make-order',
+        pageModel(
+          req,
+          { eventToken, envelope: { ...started.envelope, order } },
+          {
+            orderType: sent.orderType,
+            formData: sent.formData,
+            orderDocumentJson: sent.orderDocumentJson,
+            hearingVersion,
+            validationIssues: [{ id: 'discard-draft', message: 'Tick the box to discard this draft order' }],
+          }
+        )
+      );
+    }
+    await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
+      sdkEventPayload: JSON.stringify({
+        action: 'DISCARD_DRAFT',
+        order: { id: orderId || null, version: Number(orderVersion) },
+        taskId: null,
+        hearing: null,
+      }),
+    });
+  } catch (error) {
+    if (!(error instanceof CallbackRejectedError)) {
+      throw error;
+    }
+    return showRefused(req, res, error, sent, [sent.madeAt]);
+  }
+  res.redirect(manageCaseDetailsUrl(caseReference));
+}
+
 export default function makeOrderRoutes(app: Application): void {
   app.get(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     try {
@@ -323,11 +366,22 @@ export default function makeOrderRoutes(app: Application): void {
       orderDocument: encodedDocument,
       'made-at': madeAt,
       'shown-made-at': shownMadeAt,
+      // The judge's tick to discard their draft is about the draft, never one of the order's answers.
+      'discard-draft': discardConfirmed,
       ...formData
     } = req.body;
     const orderDocument = decodeOrderDocument(encodedDocument);
 
     try {
+      if (action === 'DISCARD_DRAFT') {
+        return await discardDraft(req, res, [discardConfirmed].flat().includes('yes'), {
+          madeAt,
+          shownMadeAt,
+          orderType,
+          formData,
+          orderDocumentJson: orderDocument,
+        });
+      }
       if (action === 'CHANGE_MADE_AT' || (madeAt !== undefined && madeAt !== shownMadeAt)) {
         return await changeMadeAt(req, res, {
           madeAt,
@@ -375,8 +429,7 @@ export default function makeOrderRoutes(app: Application): void {
           )
         );
       }
-      // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records,
-      // and that the judge has no other draft where this one is made.
+      // Sending checks the whole order; saving a draft checks only the hearing's record, which every save records.
       const validationIssues =
         action === 'SUBMIT_FOR_REVIEW'
           ? validateMakeOrder(
@@ -386,10 +439,9 @@ export default function makeOrderRoutes(app: Application): void {
               !currentHearing,
               applicationsToDecide(started.envelope)
             )
-          : [
-              ...(currentHearing ? validateHearingRecord(formData) : []),
-              ...(started.envelope.otherDraftId ? [{ id: 'made-at', message: OTHER_DRAFT }] : []),
-            ];
+          : currentHearing
+            ? validateHearingRecord(formData)
+            : [];
       if (validationIssues.length) {
         // Nothing was submitted, so keep the token and versions the answers were made against.
         const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };

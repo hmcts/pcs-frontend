@@ -27,6 +27,7 @@ interface Envelope {
   order: {
     id?: string;
     version: number;
+    state?: string;
     orderType?: string;
     formData?: Record<string, unknown>;
     docweaveSnapshot?: unknown;
@@ -35,7 +36,6 @@ interface Envelope {
   caseContext: Record<string, unknown>;
   hearing?: Record<string, unknown> | null;
   taskGenAppId?: string;
-  otherDraftId?: string;
 }
 
 const blankCase = (): Envelope => ({
@@ -58,14 +58,24 @@ const blankCase = (): Envelope => ({
   },
 });
 
-/** Minimal CCD: hands out the stored envelope and applies posted make order events to it. */
+/**
+ * Minimal CCD and pcs-api: hands out the stored envelope and applies posted make order events to it, by pcs-api's
+ * rules. The judge has one draft on the case, which every link opens where it was saved, whatever hearing the link
+ * names; a link's hearing is only where a new order starts. A change must name that order and the version last
+ * handed out, so a page opened before the draft was saved elsewhere starts no second one; and sending or discarding
+ * the draft leaves the judge's next order a new one.
+ */
 let envelope = blankCase();
 
 /** The case's hearings by id, as pcs-api starts an order at the one the judge chooses. */
 let hearings = new Map<number, Record<string, unknown>>();
 
-/** Where the judge already has another draft: at a hearing, by id, or without one. */
-let otherDraftAt: number | 'without-hearing' | undefined;
+/** The hearing a new order starts at when the link names none, as the test booted the case. */
+let newOrderHearing: Record<string, unknown> | null | undefined;
+
+const ALREADY_DRAFTING =
+  'You already have a draft order on this case, saved since this page was opened. Nothing on this page was saved. ' +
+  'Copy anything you want to keep, then reload the page to open your draft';
 
 /** The tokens CCD has handed out for starting the make order event, in order. */
 let startTokens: string[] = [];
@@ -106,6 +116,13 @@ export function submittedReviews(): Record<string, unknown>[] {
   return reviewRequests;
 }
 
+/** The drafts the judge has discarded, each as pcs-api keeps it: as it was last saved. */
+let discarded: Envelope['order'][] = [];
+
+export function discardedDrafts(): Envelope['order'][] {
+  return discarded;
+}
+
 /** The reasons pcs-api gives for refusing the next event start and submission, if a test has asked it to. */
 let startRefusal: string | undefined;
 let refusal: string | undefined;
@@ -123,6 +140,19 @@ export function startWithOrder(order: Partial<Envelope['order']>): void {
 /** Cancels one of the case's hearings, which pcs-api then refuses to start an order at. */
 export function cancelHearing(id: number): void {
   hearings.delete(id);
+}
+
+/** Another judge records the hearing's note, as saving their own order for it does, which moves its facts on. */
+export function recordHearingNoteElsewhere(id: number, note: string): void {
+  const recorded = hearings.get(id)!;
+  const changed = { ...recorded, version: Number(recorded.version ?? -1) + 1, note };
+  hearings.set(id, changed);
+  if (envelope.hearing?.id === id) {
+    envelope.hearing = changed;
+  }
+  if (newOrderHearing?.id === id) {
+    newOrderHearing = changed;
+  }
 }
 
 /** Has the next order event refused, as pcs-api does when the order changed elsewhere. */
@@ -168,20 +198,26 @@ function ccdStub(): Express {
       startRefusal = undefined;
       return res.status(422).json({ callbackErrors: [reason] });
     }
-    // The judge's choice of hearing, or of none, on the page, over the one the order was made at.
-    const madeAt = startContexts.at(-1)?.madeAt as { hearingId?: number } | undefined;
+    // The judge's choice of hearing, or of none, on the page, over the one a saved order is made at; the link's
+    // hearing is only a new order's.
+    const context = startContexts.at(-1) ?? {};
+    const madeAt = context.madeAt as { hearingId?: number } | undefined;
+    const linked = context.hearingId === undefined ? envelope.hearing : hearings.get(Number(context.hearingId));
     const hearing = madeAt
       ? madeAt.hearingId === undefined
         ? null
         : hearings.get(madeAt.hearingId)
-      : envelope.hearing;
+      : envelope.order.id
+        ? envelope.hearing
+        : linked;
     if (hearing === undefined) {
       return res.status(422).json({ callbackErrors: ["The hearing is not one of this case's hearings"] });
     }
     const started = {
       ...envelope,
       hearing,
-      otherDraftId: otherDraftAt === (hearing ? hearing.id : 'without-hearing') ? 'other-draft' : undefined,
+      // The application the link names is the one the order must decide, opened new or as the saved draft.
+      taskGenAppId: (context.genAppId as string | undefined) ?? envelope.taskGenAppId,
     };
     const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(started) } : {};
     const token = `event-token-${startTokens.length + 1}`;
@@ -214,7 +250,33 @@ function ccdStub(): Express {
       answers.set(req.body.event_token, { id: req.params.id, data: {} });
       return res.json(answers.get(req.body.event_token));
     }
+    // A change is to the order as last handed out, and only one already saved has an id.
+    const refused = !posted.order.id
+      ? envelope.order.id && ALREADY_DRAFTING
+      : posted.order.id !== envelope.order.id
+        ? 'The order draft does not exist for this case'
+        : posted.order.version !== envelope.order.version &&
+          'The order has been updated by another user. Reload it and try again';
+    if (refused) {
+      return res.status(422).json({ callbackErrors: [refused] });
+    }
     orderRequests.push(posted);
+    answers.set(req.body.event_token, { id: req.params.id, data: {} });
+    if (posted.action === 'DISCARD_DRAFT') {
+      if (envelope.order.state !== 'DRAFT') {
+        answers.delete(req.body.event_token);
+        return res.status(422).json({ callbackErrors: ['Only a saved draft order can be discarded'] });
+      }
+      // Kept by pcs-api as last saved, it is no longer the judge's draft: their next order is a new one.
+      discarded.push(envelope.order);
+      envelope = { ...envelope, order: { version: 0 }, hearing: newOrderHearing };
+      return res.json(answers.get(req.body.event_token));
+    }
+    if (posted.action === 'SUBMIT_FOR_REVIEW') {
+      // Out of the judge's hands, it is no longer their draft either.
+      envelope = { ...envelope, order: { version: 0 }, hearing: newOrderHearing };
+      return res.json(answers.get(req.body.event_token));
+    }
     // The order is made at the hearing the judge chose, or none. pcs-api records the hearing's facts and note only
     // when changed, apart from the order.
     envelope.hearing = posted.hearing ? (hearings.get(posted.hearing.id) ?? envelope.hearing) : null;
@@ -232,12 +294,14 @@ function ccdStub(): Express {
       order: {
         id: posted.order.id ?? `order-${randomUUID()}`,
         version: posted.order.version + 1,
+        // A saved order stays a draft, or returned to its judge, until it is sent.
+        state: envelope.order.state ?? 'DRAFT',
+        queryFromCaseworker: envelope.order.queryFromCaseworker,
         orderType: posted.order.orderType,
         formData: posted.order.formData,
         docweaveSnapshot: posted.order.docweaveSnapshot,
       },
     };
-    answers.set(req.body.event_token, { id: req.params.id, data: {} });
     res.json(answers.get(req.body.event_token));
   });
   return ccd;
@@ -289,8 +353,6 @@ export async function bootApp(
     caseBundle?: Record<string, unknown>;
     /** The case's hearings, over the one the order is made at, which the judge can choose to make it at. */
     hearings?: (Record<string, unknown> & { id: number; date: string })[];
-    /** Where the judge already has another draft order: at a hearing, by id, or without one. */
-    otherDraftAt?: number | 'without-hearing';
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -299,6 +361,10 @@ export async function bootApp(
   }
   envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
   envelope.order = { ...envelope.order, ...options.order };
+  if (envelope.order.id && !options.caseworker) {
+    // An order the judge's link opens is their draft, or one a caseworker returned to them with a query.
+    envelope.order.state ??= envelope.order.queryFromCaseworker ? 'RETURNED_TO_JUDGE' : 'DRAFT';
+  }
   envelope.caseContext.applications = [
     ...(options.application ? [options.application] : []),
     ...(options.applications ?? []),
@@ -322,7 +388,8 @@ export async function bootApp(
   if (options.hearings) {
     envelope.caseContext.hearings = [...hearings.values()].map(({ id, date }) => ({ id, date }));
   }
-  otherDraftAt = options.otherDraftAt;
+  newOrderHearing = envelope.hearing;
+  discarded = [];
   startTokens = [];
   startContexts = [];
   submittedTokens = [];

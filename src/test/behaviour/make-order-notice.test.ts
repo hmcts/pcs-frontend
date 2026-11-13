@@ -87,19 +87,23 @@ describe("make an order: made on the court's own initiative or without notice", 
     const corrected = await openPage(refused.text);
     expect(control('[name="order-notice"][value="own-initiative"]').checked).toBe(true);
     typeDate('own-initiative-by', due.day, due.month, due.year);
-    expect((await app.post(PAGE, corrected.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
-    const [sent] = submittedOrders() as { order: { formData: Record<string, unknown> } }[];
-    expect(sent.order.formData).toMatchObject({
+    expect((await app.post(PAGE, corrected.body('SAVE_DRAFT'))).status).toBe(302);
+    const [saved] = submittedOrders() as { order: { formData: Record<string, unknown> } }[];
+    expect(saved.order.formData).toMatchObject({
       'order-notice': 'own-initiative',
       'own-initiative-by-day': due.day,
       'own-initiative-by-month': due.month,
       'own-initiative-by-year': due.year,
     });
-    expect(Object.keys(sent.order.formData).filter(field => field.startsWith('without-notice-by'))).toEqual([]);
+    expect(Object.keys(saved.order.formData).filter(field => field.startsWith('without-notice-by'))).toEqual([]);
 
     const reopened = await openPage((await app.get(PAGE)).text);
     expect(control('[name="order-notice"][value="own-initiative"]').checked).toBe(true);
     expect(reopened.documentText()).toContain(`${OWN_INITIATIVE} ${shown(due)}.`);
+    expect((await app.post(PAGE, reopened.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
+    const sent = submittedOrders().at(-1) as { action: string; order: { formData: Record<string, unknown> } };
+    expect(sent.action).toBe('SUBMIT_FOR_REVIEW');
+    expect(sent.order.formData).toMatchObject({ 'order-notice': 'own-initiative', 'own-initiative-by-day': due.day });
   });
 
   it("keeps the judge's own wording on an order deciding an application without notice, which court staff review", async () => {

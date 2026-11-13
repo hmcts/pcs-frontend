@@ -205,7 +205,7 @@ export function madeAtChoice(posted: unknown): { hearingId?: number } | undefine
  * The judge's choice of when the order is made: without a hearing, or at one of the case's hearings, whatever task or
  * link brought them to it, with the one the order is now made at chosen.
  */
-export function madeAtModel({ caseContext, hearing, otherDraftId }: OrderStart): Record<string, unknown> {
+export function madeAtModel({ caseContext, hearing }: OrderStart): Record<string, unknown> {
   const hearingTime = (iso: string): string => {
     const date = DateTime.fromISO(iso, { zone: 'Europe/London' });
     return date.isValid
@@ -229,7 +229,6 @@ export function madeAtModel({ caseContext, hearing, otherDraftId }: OrderStart):
         text: `At the hearing on ${hearingTime(option.date)}`,
       })),
     ].map(item => ({ ...item, checked: item.value === current })),
-    otherDraft: Boolean(otherDraftId),
   };
 }
 

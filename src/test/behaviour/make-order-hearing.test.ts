@@ -7,6 +7,7 @@ import {
   control,
   openPage,
   recordAttendance,
+  recordHearingNoteElsewhere,
   refuseNextEvent,
   selectTab,
   startClientContexts,
@@ -108,19 +109,16 @@ describe('make an order: for a hearing', () => {
 
   it('reloads stale hearing edits and lets the judge save against the new version', async () => {
     app = await bootApp({ hearing: { ...HEARING, version: 3 } });
-    const firstTab = (await app.get(FOR_HEARING)).text;
-    const second = await openPage((await app.get(FOR_HEARING)).text);
-    type('hearing-notes', 'Changed in the other tab.');
-    await app.post(FOR_HEARING, second.body('SAVE_DRAFT'));
+    const first = await openPage((await app.get(FOR_HEARING)).text);
+    recordHearingNoteElsewhere(7, 'Changed by another judge.');
 
-    const first = await openPage(firstTab);
     type('current-rent', '950.50');
     const stale = await app.post(FOR_HEARING, first.body('SAVE_DRAFT'));
     expect(stale.status).toBe(409);
-    expect(submittedOrders()).toHaveLength(1);
+    expect(submittedOrders()).toHaveLength(0);
     const retry = await openPage(stale.text);
     expect(control('#make-order-error-summary').textContent).toContain('hearing facts or notes have changed');
-    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('Changed in the other tab.');
+    expect(control<HTMLTextAreaElement>('#hearing-notes').value).toBe('Changed by another judge.');
     expect(retry.body().get('hearingVersion')).toBe('4');
     type('current-rent', '950.50');
     expect((await app.post(FOR_HEARING, retry.body('SAVE_DRAFT'))).status).toBe(302);
@@ -128,18 +126,15 @@ describe('make an order: for a hearing', () => {
       id: 7,
       version: 4,
       caseFacts: { currentRent: 950.5 },
-      note: 'Changed in the other tab.',
+      note: 'Changed by another judge.',
     });
   });
 
   it('does not update hearing values that already match, even from an older version', async () => {
     app = await bootApp({ hearing: { ...HEARING, version: 3 } });
-    const firstTab = (await app.get(FOR_HEARING)).text;
-    const second = await openPage((await app.get(FOR_HEARING)).text);
-    type('hearing-notes', 'The same note.');
-    await app.post(FOR_HEARING, second.body('SAVE_DRAFT'));
+    const first = await openPage((await app.get(FOR_HEARING)).text);
+    recordHearingNoteElsewhere(7, 'The same note.');
 
-    const first = await openPage(firstTab);
     type('hearing-notes', 'The same note.');
     expect((await app.post(FOR_HEARING, first.body('SAVE_DRAFT'))).status).toBe(302);
     expect(submittedOrders().at(-1)?.hearing).toEqual({ id: 7, version: 4 });
