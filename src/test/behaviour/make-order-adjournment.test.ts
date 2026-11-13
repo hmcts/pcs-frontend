@@ -20,24 +20,26 @@ describe('make an order: adjournment', () => {
   });
   afterEach(() => app.close());
 
-  it('adjourns whichever of the claim, counterclaim and application is chosen', async () => {
-    // What is adjourned is only asked once the case has an open counterclaim or application.
+  it('adjourns whichever of the claim and counterclaim is chosen', async () => {
+    // What is adjourned is only asked once the case has an open counterclaim; applications have their own section.
     await openPage((await app.get(PAGE)).text);
     expect(document.querySelector('[name="adj-subjects"]')).toBeNull();
 
     await app.close();
-    app = await bootApp({ openCounterclaim: true, openApplication: true });
+    app = await bootApp({
+      openCounterclaim: true,
+      applications: [{ id: 'gen-app-1', reference: 'GA1', type: 'Adjourn the hearing', documents: [] }],
+    });
     const page = await openPage((await app.get(PAGE)).text);
+    // With an application open, the claim waits behind a tick box.
+    check('claim-order', 'yes');
     selectTab('tab-adjournment');
     check('adj-type', 'generally');
     expect(page.orderText()).toContain('The claim is adjourned generally with liberty to restore');
     check('adj-subjects', 'counterclaim');
-    check('adj-subjects', 'application');
-    expect(page.orderText()).toContain(
-      'The counterclaim and the application are adjourned generally with liberty to restore'
-    );
+    expect(page.orderText()).toContain('The counterclaim is adjourned generally with liberty to restore');
+    expect(document.querySelector('[name="adj-subjects"][value="application"]')).toBeNull();
 
-    uncheck('adj-subjects', 'application');
     check('adj-gen', 'oneoff');
     check('adj-gen', 'restore');
     typeDate('adj-gen-restore-date', '1', '3', '2027');
