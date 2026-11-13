@@ -12,6 +12,8 @@ const JUDGE_JOURNEY_PATHS = [
   /^\/cases\/\d+\/event\/ext:confirmOrderReview$/,
   /^\/case\/\d+\/confirm-order-review(?:\/.*)?$/,
   /^\/docweave\/templates(?:\/.*)?$/,
+  // The documents filed with an application the judge is deciding, which its panel links to.
+  /^\/case\/\d+\/view-documents\/[0-9a-fA-F-]+$/,
 ] as const;
 
 const NON_PAGE_PATHS = [
