@@ -239,6 +239,9 @@ function cdamToCcdDocument(cdamDoc: CdamDocument): CcdCollectionItem<CcdUploaded
         document_url: cdamDoc.document_url,
         document_binary_url: cdamDoc.document_binary_url,
         document_filename: cdamDoc.document_filename,
+        // Sent with the draft so pcs-api can attach the file to the case; unattached, CDAM stops serving it
+        // after a day.
+        ...(cdamDoc.document_hash ? { document_hash: cdamDoc.document_hash } : {}),
       },
       contentType: cdamDoc.content_type,
       sizeInBytes: cdamDoc.size,

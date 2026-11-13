@@ -7,6 +7,7 @@ export interface CdamRawDocument {
   mimeType: string;
   size: number;
   classification: string;
+  hashToken?: string;
   _links: {
     self: { href: string };
     binary: { href: string };
@@ -25,6 +26,8 @@ export interface CdamDocument {
   document_url: string;
   document_binary_url: string;
   document_filename: string;
+  /** CDAM's proof that this is a fresh upload. pcs-api needs it to attach the file to the case. */
+  document_hash?: string;
   content_type?: string;
   size?: number;
 }
