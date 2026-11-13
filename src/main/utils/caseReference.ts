@@ -2,6 +2,7 @@
  * valid case reference must be exactly 16 digits.
  * @param caseReference - The case reference to validate (string or number)
  * @returns sanitised case reference as a string, or null if invalid
+ * Test PR for 9007
  */
 export function sanitiseCaseReference(caseReference: string | number): string | null {
   const caseRefStr = String(caseReference);
@@ -19,7 +20,7 @@ export function sanitiseCaseReference(caseReference: string | number): string | 
  * @example
  * toCaseReference16('1234567890123456') // '1234567890123456'
  * toCaseReference16(null) // null
- * toCaseReference16('invalid') // null
+ * toCaseReference16('invalid') // null`
  */
 export function toCaseReference16(value: unknown): string | null {
   // Only accept string or number types
