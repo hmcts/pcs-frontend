@@ -389,6 +389,8 @@ function validateEvictionUnsuccessful(answers: WarrantReturnAnswers, outcome: Ev
     issues.push({ id: 'eviction-unsuccessful-return-name', message: RETURN_NAME_ERROR_MESSAGE });
   }
 
+  const evictionDate = validateEvictionDate(answers.evictionDate, issues);
+
   if (issues.length > 0) {
     return { issues };
   }
@@ -399,6 +401,7 @@ function validateEvictionUnsuccessful(answers: WarrantReturnAnswers, outcome: Ev
       returnType: WarrantReturnType.FINAL,
       evictionOutcome: outcome,
       returnName,
+      outcomeDate: evictionDate,
       additionalDetails: answers.additionalDetails || undefined,
     },
   };
@@ -412,6 +415,8 @@ function validateInterimWarrantReturn(answers: WarrantReturnAnswers): Validation
     issues.push({ id: 'interim-return-name', message: RETURN_NAME_ERROR_MESSAGE });
   }
 
+  const evictionDate = validateEvictionDate(answers.evictionDate, issues);
+
   if (issues.length > 0) {
     return { issues };
   }
@@ -421,6 +426,7 @@ function validateInterimWarrantReturn(answers: WarrantReturnAnswers): Validation
     warrantReturn: {
       returnType: WarrantReturnType.INTERIM,
       returnName,
+      outcomeDate: evictionDate,
       additionalDetails: answers.additionalDetails || undefined,
     },
   };

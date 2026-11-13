@@ -346,7 +346,6 @@ function updateWarrantReturnVisibility(): void {
   const isEvictionSuccessful = isFinal && finalOutcome === EvictionOutcome.SUCCESSFUL;
   setSectionVisible('eviction-successful', isEvictionSuccessful, () => {
     resetSelect('eviction-successful-return-name');
-    EVICTION_DATE_INPUT_IDS.forEach(resetInput);
   });
 
   const isEvictionUnsuccessfulOrCancelled =
@@ -357,6 +356,9 @@ function updateWarrantReturnVisibility(): void {
 
   const isInterim = returnType === WarrantReturnType.INTERIM;
   setSectionVisible('interim', isInterim, () => resetSelect('interim-return-name'));
+
+  const isEvictionDateVisible = isEvictionSuccessful || isEvictionUnsuccessfulOrCancelled || isInterim;
+  setSectionVisible('eviction-date-section', isEvictionDateVisible, () => EVICTION_DATE_INPUT_IDS.forEach(resetInput));
 
   updateAdditionalDetailsLabel();
 }
