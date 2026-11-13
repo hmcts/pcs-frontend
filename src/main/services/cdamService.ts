@@ -109,29 +109,11 @@ export async function getDocumentBinary(
         });
         logger.info('Fallback document binary fetch from DM-Store succeeded with user token');
       } catch (userFallbackError) {
-        logger.warn('DM-Store with user token failed, attempting S2S service fallback', {
+        logger.warn('DM-Store fallback with user token failed', {
           binaryUrl,
           userError: (userFallbackError as AxiosError).message,
         });
-        try {
-          response = await http.get(binaryUrl, {
-            headers: {
-              'user-id': 'pcs-frontend-service',
-              'user-roles': 'caseworker-civil,caseworker-civil-solicitor,pui-case-manager',
-            },
-            responseType: 'stream',
-          });
-          logger.info('S2S service fallback fetch from DM-Store succeeded');
-        } catch (s2sFallbackError) {
-          logger.error('All document binary fetch attempts failed (CDAM, DM-Store user token, DM-Store S2S service)', {
-            requestUrl,
-            binaryUrl,
-            cdamError: axiosError.message,
-            userFallbackError: (userFallbackError as AxiosError).message,
-            s2sFallbackError: (s2sFallbackError as AxiosError).message,
-          });
-          throw error;
-        }
+        throw error;
       }
     } else {
       logger.error('CDAM document binary fetch failed', {
