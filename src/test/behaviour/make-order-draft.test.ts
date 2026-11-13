@@ -144,7 +144,7 @@ describe('make an order: drafting', () => {
     expect(submittedOrders()).toHaveLength(0);
   });
 
-  it('shows the saved order, and why, when pcs-api refuses a save', async () => {
+  it('keeps what the judge sent, and says why, when pcs-api refuses a save', async () => {
     const saved = await openPage((await app.get(PAGE)).text);
     type('hearing-notes', 'Saved earlier');
     const first = saved.body();
@@ -166,7 +166,9 @@ describe('make an order: drafting', () => {
     expect(control('#make-order-error-summary').textContent).toContain(
       'The order draft has been updated by another user. Reload it and try again'
     );
-    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Saved earlier');
+    // What the judge typed stays, against the version they worked from, so it is never saved over the newer one.
+    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Typed since');
+    expect(control('[name="orderVersion"]').value).toBe(body.get('orderVersion'));
   });
 
   it('keeps the version the answers were made against when review validation fails', async () => {

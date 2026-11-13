@@ -7,7 +7,12 @@ import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { applicationsToDecide, attendanceParties, orderFormModel } from '@utils/makeOrderForm';
+import {
+  applicationsToDecide,
+  attendanceParties,
+  orderFormModel,
+  withoutUnchosenNoticeDates,
+} from '@utils/makeOrderForm';
 import { MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   COSTS,
@@ -508,7 +513,11 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     if (type) {
       // Kept whichever button was pressed, so the page shows the caseworker's changes again.
       postedSnapshot(text(orderDocument));
-      review.answers.order = { orderType: type, formData, orderDocumentJson: text(orderDocument) };
+      review.answers.order = {
+        orderType: type,
+        formData: withoutUnchosenNoticeDates(formData),
+        orderDocumentJson: text(orderDocument),
+      };
     }
     try {
       if (action === 'RETURN_TO_JUDGE') {

@@ -120,6 +120,11 @@ export function startWithOrder(order: Partial<Envelope['order']>): void {
   envelope.order = { ...envelope.order, ...order };
 }
 
+/** Cancels one of the case's hearings, which pcs-api then refuses to start an order at. */
+export function cancelHearing(id: number): void {
+  hearings.delete(id);
+}
+
 /** Has the next order event refused, as pcs-api does when the order changed elsewhere. */
 export function refuseNextEvent(reason: string): void {
   refusal = reason;

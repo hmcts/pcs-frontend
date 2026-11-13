@@ -2,10 +2,12 @@ import {
   CASE_REFERENCE,
   type TestApp,
   bootApp,
+  cancelHearing,
   check,
   control,
   openPage,
   recordAttendance,
+  refuseNextEvent,
   selectTab,
   startClientContexts,
   submittedOrders,
@@ -170,5 +172,66 @@ describe('make an order: choosing when it is made', () => {
     recordAttendance();
     expect((await app.post(PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
     expect((submittedOrders()[0] as { hearing: { id: number } }).hearing.id).toBe(2);
+  });
+  it('keeps what the judge wrote, where they had it, when the hearing they choose has been cancelled', async () => {
+    app = await bootApp({ hearings: [LATER_HEARING] });
+    const page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-free-form');
+    check('recitals', 'yes');
+    type('recitals-text', 'UPON hearing the claimant');
+    check('made-at', '2');
+    cancelHearing(2);
+
+    const refused = await app.post(PAGE, page.body('CHANGE_MADE_AT'));
+
+    expect(refused.status).toBe(422);
+    const shown = await openPage(refused.text);
+    expect(errors()).toContain("The hearing is not one of this case's hearings");
+    expect(control('[name="made-at"][value="1"]').checked).toBe(true);
+    expect(control<HTMLTextAreaElement>('[name="recitals-text"]').value).toBe('UPON hearing the claimant');
+    expect(shown.documentText()).toContain('UPON hearing the claimant');
+  });
+
+  it('keeps the chosen hearing and what the judge wrote when pcs-api refuses the save', async () => {
+    app = await bootApp({ hearings: [LATER_HEARING] });
+    let page = await openPage((await app.get(PAGE)).text);
+    selectTab('tab-free-form');
+    check('made-at', '2');
+    page = await openPage((await app.post(PAGE, page.body('CHANGE_MADE_AT'))).text);
+    check('recitals', 'yes');
+    type('recitals-text', 'UPON hearing the defendant');
+    type('hearing-notes', 'Adjourned for advice');
+
+    refuseNextEvent('The order has been updated by another user. Reload it and try again');
+    const refused = await app.post(PAGE, page.body('SAVE_DRAFT'));
+
+    expect(refused.status).toBe(422);
+    const shown = await openPage(refused.text);
+    expect(errors()).toContain('The order has been updated by another user');
+    expect(control('[name="made-at"][value="2"]').checked).toBe(true);
+    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('Adjourned for advice');
+    expect(control<HTMLTextAreaElement>('[name="recitals-text"]').value).toBe('UPON hearing the defendant');
+    expect(shown.documentText()).toContain('UPON hearing the defendant');
+
+    // Cancelled before the judge saves again, the order comes back where it was saved, still as they wrote it,
+    // without the cancelled hearing's notes against another hearing.
+    cancelHearing(2);
+    const again = await app.post(PAGE, shown.body('SAVE_DRAFT'));
+    expect(again.status).toBe(422);
+    await openPage(again.text);
+    expect(errors()).toContain("The hearing is not one of this case's hearings");
+    expect(control('[name="made-at"][value="1"]').checked).toBe(true);
+    expect(control<HTMLTextAreaElement>('[name="recitals-text"]').value).toBe('UPON hearing the defendant');
+    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('');
+    expect(submittedOrders()).toEqual([]);
+  });
+
+  it('keeps Enter in a field sending the order, not changing when it is made', async () => {
+    app = await bootApp({ hearings: [LATER_HEARING] });
+    const { form } = await openPage((await app.get(PAGE)).text);
+    // The form's first submit button is the one implicit submission uses.
+    const first = form.querySelector<HTMLButtonElement>('button[type="submit"], button:not([type])');
+    expect(first?.value).toBe('SUBMIT_FOR_REVIEW');
+    expect(form.querySelectorAll('button[value="CHANGE_MADE_AT"]')).toHaveLength(1);
   });
 });

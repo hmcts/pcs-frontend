@@ -521,8 +521,16 @@ function validateNotice(formData: Record<string, unknown>): MakeOrderValidationI
   if (!prefix) {
     return [];
   }
-  const { issues, date } = validation(formData);
+  const { issues, add, date } = validation(formData);
   date(prefix, 'Enter a real date by which a party may apply to set aside, vary or stay the order');
+  const applyBy = dateOf(formData, prefix);
+  // Parsed dates are UTC midnights, so today is the court's date as one too.
+  const today = new Date(`${DateTime.now().setZone('Europe/London').toISODate()}T00:00:00Z`);
+  add(
+    !applyBy || applyBy >= today,
+    `${prefix}-day`,
+    'The date by which a party may apply to set aside, vary or stay the order must be today or in the future'
+  );
   return issues;
 }
 

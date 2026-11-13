@@ -167,28 +167,21 @@ function hearingModel(hearing: OrderHearing | null | undefined): Record<string, 
   };
 }
 
+/** The date each choice of how the order was made gives for applying to set it aside, vary or stay it. */
+const NOTICE_DATE_PREFIXES: Record<string, string> = {
+  'own-initiative': 'own-initiative-by',
+  'without-notice': 'without-notice-by',
+};
+
 /**
- * The date a party may apply by, as an order made on the court's own initiative or without notice starts: 7 days from
- * today, or the next weekday after that, which the judge checks and changes.
+ * The order's answers without the apply-by dates of the choices not made, so neither an order made with notice nor
+ * one made on the other basis keeps a date it does not give, to come back as a stale default.
  */
-export function defaultApplyByDate(today: DateTime = DateTime.now().setZone('Europe/London')): DateTime {
-  const date = today.startOf('day').plus({ days: 7 });
-  return date.weekday > 5 ? date.plus({ days: 8 - date.weekday }) : date;
-}
-
-const NOTICE_DATE_PREFIXES = ['own-initiative-by', 'without-notice-by'];
-
-/** The apply-by dates an order not yet given them starts with. */
-function noticeDateDefaults(formData: FormData): FormData {
-  const date = defaultApplyByDate();
+export function withoutUnchosenNoticeDates(formData: FormData): FormData {
+  const chosen = NOTICE_DATE_PREFIXES[String(formData['order-notice'] ?? '')];
+  const unchosen = Object.values(NOTICE_DATE_PREFIXES).filter(prefix => prefix !== chosen);
   return Object.fromEntries(
-    NOTICE_DATE_PREFIXES.filter(prefix =>
-      ['day', 'month', 'year'].every(part => !formData[`${prefix}-${part}`])
-    ).flatMap(prefix => [
-      [`${prefix}-day`, String(date.day)],
-      [`${prefix}-month`, String(date.month)],
-      [`${prefix}-year`, String(date.year)],
-    ])
+    Object.entries(formData).filter(([field]) => !unchosen.some(prefix => field.startsWith(`${prefix}-`)))
   );
 }
 
@@ -292,8 +285,8 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
   const recorded: FormData = hearing?.caseFacts
     ? { ...caseFactsFormData(hearing.caseFacts), 'hearing-notes': hearing.note ?? '' }
     : {};
-  const answers: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
-  const draft: FormData = { ...noticeDateDefaults(answers), ...answers };
+  // A date the order does not give is left blank, for the page to start afresh if the judge chooses it.
+  const draft: FormData = withoutUnchosenNoticeDates({ ...recorded, ...(submission?.formData ?? order.formData) });
   // With an application open the order starts as one on the applications alone, the claim's order types waiting
   // behind a tick box.
   const defaultOrderType = applications.length

@@ -196,6 +196,31 @@ export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
   return buildOrder(type, readOrderData(form));
 }
 
+/** Seven days from today, or the Monday after when that is a weekend. */
+function sevenDaysOn(): Date {
+  const date = daysFromToday(7);
+  const day = date.getDay();
+  date.setDate(date.getDate() + (day === 6 ? 2 : day === 0 ? 1 : 0));
+  return date;
+}
+
+/**
+ * Choosing that the order was made on the court's own initiative or without notice starts its blank apply-by date at
+ * seven days on, for the judge to check. A date already given, or one the judge cleared with the choice made, is left.
+ */
+export function initNoticeDates(form: HTMLFormElement): void {
+  form.addEventListener('change', ({ target }) => {
+    if (!(target instanceof HTMLInputElement) || target.name !== 'order-notice' || !target.checked) {
+      return;
+    }
+    const parts = dateParts(form, `${target.value}-by`);
+    if (parts && parts.every(part => !part.value)) {
+      setDate(parts, sevenDaysOn());
+      parts[0].dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
+}
+
 /** What follows a decision on an application, shown in its row while that decision is chosen. */
 export function initApplicationDecisions(form: HTMLFormElement): void {
   form.addEventListener('change', ({ target }) => {
@@ -243,6 +268,7 @@ export function initMakeOrder(): void {
   initCaseFactsToggle(form);
   initCaseFactDefaults(form);
   initSuspendedMoneyOptions(form);
+  initNoticeDates(form);
   const suspendedBy = dateParts(form, 'suspended-by-date');
   if (suspendedBy && !suspendedBy.some(part => part.value)) {
     setDate(suspendedBy, daysFromToday(14));

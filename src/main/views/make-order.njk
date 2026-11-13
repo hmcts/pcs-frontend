@@ -28,6 +28,12 @@
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
   <input type="hidden" name="hearingVersion" value="{{ hearingVersion }}">
   {{ csrfProtection(csrfToken) }}
+  {#
+    A form's first button is the one pressing Enter in a field uses: this keeps that sending the order, as the page's
+    own send button does, rather than the button for changing when the order is made, which comes first on the page.
+  #}
+  <button type="submit" name="action" value="SUBMIT_FOR_REVIEW" class="govuk-visually-hidden" tabindex="-1"
+          aria-hidden="true" data-enter-key-default>Send order to caseworker for review</button>
 
   <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ pageHeading }}</h1>
 
