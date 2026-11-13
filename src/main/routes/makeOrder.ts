@@ -288,51 +288,6 @@ async function changeMadeAt(
   );
 }
 
-/**
- * Discards the judge's saved draft once they have ticked that they want to, as they last saw it: pcs-api keeps it as
- * it was last saved, and it is no longer their draft on the case. Without the tick, or refused by pcs-api, the page
- * comes back with everything the judge had on it.
- */
-async function discardDraft(req: Request, res: Response, confirmed: boolean, sent: MadeAtChange): Promise<void> {
-  const accessToken = req.session.user!.accessToken;
-  const caseReference = req.params.caseReference as string;
-  const { eventToken, orderId, orderVersion, hearingVersion } = req.body;
-  try {
-    if (!confirmed) {
-      const started = await startOrderEvent(accessToken, caseReference, chosen(req, sent.shownMadeAt));
-      const order = { ...started.envelope.order, id: orderId, version: Number(orderVersion) };
-      return res.status(400).render(
-        'make-order',
-        pageModel(
-          req,
-          { eventToken, envelope: { ...started.envelope, order } },
-          {
-            orderType: sent.orderType,
-            formData: sent.formData,
-            orderDocumentJson: sent.orderDocumentJson,
-            hearingVersion,
-            validationIssues: [{ id: 'discard-draft', message: 'Tick the box to discard this draft order' }],
-          }
-        )
-      );
-    }
-    await ccdCaseService.submitCaseEvent(accessToken, caseReference, MAKE_ORDER_EVENT_ID, eventToken, {
-      sdkEventPayload: JSON.stringify({
-        action: 'DISCARD_DRAFT',
-        order: { id: orderId || null, version: Number(orderVersion) },
-        taskId: null,
-        hearing: null,
-      }),
-    });
-  } catch (error) {
-    if (!(error instanceof CallbackRejectedError)) {
-      throw error;
-    }
-    return showRefused(req, res, error, sent, [sent.madeAt]);
-  }
-  res.redirect(manageCaseDetailsUrl(caseReference));
-}
-
 export default function makeOrderRoutes(app: Application): void {
   app.get(MAKE_ORDER_ROUTE, oidcMiddleware, makeOrderFeatureMiddleware, async (req: Request, res: Response, next) => {
     try {
@@ -366,21 +321,13 @@ export default function makeOrderRoutes(app: Application): void {
       orderDocument: encodedDocument,
       'made-at': madeAt,
       'shown-made-at': shownMadeAt,
-      // The judge's tick to discard their draft is about the draft, never one of the order's answers.
-      'discard-draft': discardConfirmed,
       ...formData
     } = req.body;
     const orderDocument = decodeOrderDocument(encodedDocument);
 
     try {
-      if (action === 'DISCARD_DRAFT') {
-        return await discardDraft(req, res, [discardConfirmed].flat().includes('yes'), {
-          madeAt,
-          shownMadeAt,
-          orderType,
-          formData,
-          orderDocumentJson: orderDocument,
-        });
+      if (!['SAVE_DRAFT', 'SUBMIT_FOR_REVIEW', 'CHANGE_MADE_AT'].includes(action)) {
+        throw new HTTPError('This order action is no longer available. Reload the page and try again', 400);
       }
       if (action === 'CHANGE_MADE_AT' || (madeAt !== undefined && madeAt !== shownMadeAt)) {
         return await changeMadeAt(req, res, {

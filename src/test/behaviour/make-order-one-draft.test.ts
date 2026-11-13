@@ -1,12 +1,9 @@
 import {
   CASE_REFERENCE,
-  MANAGE_CASE_URL,
   type TestApp,
   bootApp,
-  cancelHearing,
   check,
   control,
-  discardedDrafts,
   futureDate,
   openPage,
   selectTab,
@@ -153,135 +150,20 @@ describe("make an order: the judge's one draft on a case", () => {
     expect(control<HTMLTextAreaElement>('[name="recitals-text"]').value).toBe('UPON reading the first draft');
   });
 
-  it('discards the saved draft only once the judge ticks that they want to, then starts their next order new', async () => {
-    app = await bootApp({ hearing: null, hearings: [HEARING] });
-    let page = await openPage((await app.get(PAGE)).text);
-    expect(document.querySelector('#discard-draft')).toBeNull();
-    selectTab('tab-free-form');
-    check('recitals', 'yes');
-    type('recitals-text', 'UPON reading the papers');
-    expect((await app.post(PAGE, page.body('SAVE_DRAFT'))).status).toBe(302);
-
-    // Its button alone discards nothing, and what the judge has changed since stays on the page.
-    page = await openPage((await app.get(PAGE)).text);
-    const draftId = orderId();
-    type('recitals-text', 'UPON reading the papers again');
-    writeInPreview(OWN_WORDING);
-    const unconfirmed = await app.post(PAGE, page.body('DISCARD_DRAFT'));
-    expect(unconfirmed.status).toBe(400);
-    expect(submittedOrders()).toHaveLength(1);
-    page = await openPage(unconfirmed.text);
-    expect(errors()).toContain('Tick the box to discard this draft order');
-    expect(orderId()).toBe(draftId);
-    expect(control<HTMLTextAreaElement>('[name="recitals-text"]').value).toBe('UPON reading the papers again');
-    expect(page.documentText()).toContain(OWN_WORDING);
-
-    // The tick is not one of the order's answers: saved with it, the draft is as it was, and not discarded.
-    check('discard-draft', 'yes');
-    expect((await app.post(PAGE, page.body('SAVE_DRAFT'))).status).toBe(302);
-    const resaved = submittedOrders().at(-1) as unknown as Saved;
-    expect(resaved.action).toBe('SAVE_DRAFT');
-    expect(resaved.order.formData).not.toHaveProperty('discard-draft');
-    page = await openPage((await app.get(PAGE)).text);
-    expect(orderId()).toBe(draftId);
-    expect(control('[name="discard-draft"]').checked).toBe(false);
-
-    // Ticked, its button discards the draft as last saved, whatever is on the page, and returns to the case.
-    type('recitals-text', 'never saved');
-    check('discard-draft', 'yes');
-    const discarded = await app.post(PAGE, page.body('DISCARD_DRAFT'));
-    expect(discarded.status).toBe(302);
-    expect(discarded.location).toBe(MANAGE_CASE_URL);
-    expect(submittedOrders().at(-1)).toEqual({
-      action: 'DISCARD_DRAFT',
-      order: { id: draftId, version: resaved.order.version + 1 },
-      taskId: null,
-      hearing: null,
-    });
-    expect(discardedDrafts().map(draft => [draft.id, draft.formData?.['recitals-text']])).toEqual([
-      [draftId, 'UPON reading the papers again'],
-    ]);
-
-    // The judge's next order is a new one, with nothing yet to discard.
-    await openPage((await app.get(PAGE)).text);
-    expect(orderId()).toBe('');
-    expect(document.querySelector('[name="recitals"]:checked')).toBeNull();
-    expect(document.querySelector('#discard-draft')).toBeNull();
-  });
-
-  it('keeps the shown hearing and its unsaved facts when discard is not confirmed', async () => {
-    app = await bootApp({
-      hearing: HEARING,
-      hearings: [{ ...HEARING, id: 3, date: '2026-11-21T14:00:00', caseFacts: { currentRent: 950 } }],
-    });
-    let page = await openPage((await app.get(PAGE)).text);
-    selectTab('tab-free-form');
-    expect((await app.post(PAGE, page.body('SAVE_DRAFT'))).status).toBe(302);
-    page = await openPage((await app.get(PAGE)).text);
-    type('current-rent', '875');
-    type('hearing-notes', 'A note for the hearing already shown');
-    check('made-at', '3');
-
-    const unconfirmed = await app.post(PAGE, page.body('DISCARD_DRAFT'));
-
-    expect(unconfirmed.status).toBe(400);
-    await openPage(unconfirmed.text);
-    expect(errors()).toContain('Tick the box to discard this draft order');
-    expect(madeAt()).toBe('2');
-    expect(control('[name="current-rent"]').value).toBe('875');
-    expect(control<HTMLTextAreaElement>('[name="hearing-notes"]').value).toBe('A note for the hearing already shown');
-    expect(submittedOrders()).toHaveLength(1);
-    expect(discardedDrafts()).toEqual([]);
-  });
-
-  it('discards a confirmed draft even when its hearing has since been cancelled', async () => {
-    app = await bootApp({ hearing: HEARING });
-    let page = await openPage((await app.get(PAGE)).text);
-    selectTab('tab-free-form');
-    expect((await app.post(PAGE, page.body('SAVE_DRAFT'))).status).toBe(302);
-    page = await openPage((await app.get(PAGE)).text);
-    const draftId = orderId();
-    const starts = startClientContexts().length;
-    cancelHearing(2);
-    check('discard-draft', 'yes');
-
-    const response = await app.post(PAGE, page.body('DISCARD_DRAFT'));
-
-    expect(response.status).toBe(302);
-    expect(discardedDrafts().map(draft => draft.id)).toEqual([draftId]);
-    expect(startClientContexts()).toHaveLength(starts);
-  });
-
-  it('keeps the page and the draft when pcs-api refuses to discard it, and offers no discarding of a returned order', async () => {
+  it('keeps the saved draft when an old page tries to discard it', async () => {
     app = await bootApp({ hearing: null });
     let page = await openPage((await app.get(PAGE)).text);
     selectTab('tab-free-form');
-    check('recitals', 'yes');
-    type('recitals-text', 'UPON reading the papers');
-    await app.post(PAGE, page.body('SAVE_DRAFT'));
-    // Open in two tabs, the draft is saved again in one and discarded from the other, which has an older copy.
-    const olderCopy = (await app.get(PAGE)).text;
+    writeInPreview(OWN_WORDING);
+    expect((await app.post(PAGE, page.body('SAVE_DRAFT'))).status).toBe(302);
     page = await openPage((await app.get(PAGE)).text);
-    type('recitals-text', 'UPON reading the papers twice');
-    await app.post(PAGE, page.body('SAVE_DRAFT'));
-
-    page = await openPage(olderCopy);
-    type('recitals-text', 'typed in the older copy');
-    check('discard-draft', 'yes');
-    const refused = await app.post(PAGE, page.body('DISCARD_DRAFT'));
-
-    expect(refused.status).toBe(422);
-    expect(discardedDrafts()).toEqual([]);
-    await openPage(refused.text);
-    expect(errors()).toContain('The order has been updated by another user');
-    expect(control<HTMLTextAreaElement>('[name="recitals-text"]').value).toBe('typed in the older copy');
-    await openPage((await app.get(PAGE)).text);
-    expect(control<HTMLTextAreaElement>('[name="recitals-text"]').value).toBe('UPON reading the papers twice');
-    await app.close();
-
-    app = await bootApp({ order: { id: 'returned-order', version: 4, queryFromCaseworker: 'Which defendant?' } });
-    await openPage((await app.get(`${PAGE}?orderId=returned-order`)).text);
-    expect(orderId()).toBe('returned-order');
+    const savedId = orderId();
     expect(document.querySelector('#discard-draft')).toBeNull();
+    const refused = await app.post(PAGE, { ...page.body('DISCARD_DRAFT'), 'discard-draft': 'yes' });
+    expect(refused.status).toBe(400);
+    expect(submittedOrders()).toHaveLength(1);
+    page = await openPage((await app.get(PAGE)).text);
+    expect(orderId()).toBe(savedId);
+    expect(page.documentText()).toContain(OWN_WORDING);
   });
 });

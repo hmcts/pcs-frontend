@@ -62,7 +62,7 @@ const blankCase = (): Envelope => ({
  * Minimal CCD and pcs-api: hands out the stored envelope and applies posted make order events to it, by pcs-api's
  * rules. The judge has one draft on the case, which every link opens where it was saved, whatever hearing the link
  * names; a link's hearing is only where a new order starts. A change must name that order and the version last
- * handed out, so a page opened before the draft was saved elsewhere starts no second one; and sending or discarding
+ * handed out, so a page opened before the draft was saved elsewhere starts no second one; and sending
  * the draft leaves the judge's next order a new one.
  */
 let envelope = blankCase();
@@ -114,13 +114,6 @@ export function submittedOrders(): Record<string, unknown>[] {
 
 export function submittedReviews(): Record<string, unknown>[] {
   return reviewRequests;
-}
-
-/** The drafts the judge has discarded, each as pcs-api keeps it: as it was last saved. */
-let discarded: Envelope['order'][] = [];
-
-export function discardedDrafts(): Envelope['order'][] {
-  return discarded;
 }
 
 /** The reasons pcs-api gives for refusing the next event start and submission, if a test has asked it to. */
@@ -262,16 +255,6 @@ function ccdStub(): Express {
     }
     orderRequests.push(posted);
     answers.set(req.body.event_token, { id: req.params.id, data: {} });
-    if (posted.action === 'DISCARD_DRAFT') {
-      if (envelope.order.state !== 'DRAFT') {
-        answers.delete(req.body.event_token);
-        return res.status(422).json({ callbackErrors: ['Only a saved draft order can be discarded'] });
-      }
-      // Kept by pcs-api as last saved, it is no longer the judge's draft: their next order is a new one.
-      discarded.push(envelope.order);
-      envelope = { ...envelope, order: { version: 0 }, hearing: newOrderHearing };
-      return res.json(answers.get(req.body.event_token));
-    }
     if (posted.action === 'SUBMIT_FOR_REVIEW') {
       // Out of the judge's hands, it is no longer their draft either.
       envelope = { ...envelope, order: { version: 0 }, hearing: newOrderHearing };
@@ -389,7 +372,6 @@ export async function bootApp(
     envelope.caseContext.hearings = [...hearings.values()].map(({ id, date }) => ({ id, date }));
   }
   newOrderHearing = envelope.hearing;
-  discarded = [];
   startTokens = [];
   startContexts = [];
   submittedTokens = [];
