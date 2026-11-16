@@ -1,12 +1,20 @@
-export const doYouNeedHelpPayingTheFee = {
+export const doYouNeedHelpPayingTheFee = (testTitle: string) => ({
   mainHeader: `Do you need help paying the fee for this application?`,
   doYouNeedHelpPayingTheFeeQuestion: `Do you need help paying the fee for this application?`,
   iNeedHelpPayingTheFeeRadioOption: `I need help paying the fee`,
   iDoNotNeedHelpPayingTheFeeRadioOption: `I do not need help paying the fee`,
-  itUsuallyCostParagraph: `It usually costs £126 to apply. The fee will increase to £321 if:`,
-  youHaveAlreadyToldList: `you have already told the other party that you are making this application, and`,
-  theyDidNotAgreeList: `they did not agree to it (this means that they have objected to it)`,
-  youSeeFinalApplicationFeeParagraph: `You’ll see the final application fee before you pay.`,
+  itUsuallyCostParagraph: testTitle.toLowerCase().includes('suspend')
+    ? `It costs £16 to apply to suspend the eviction.`
+    : `It usually costs £126 to apply. The fee will increase to £321 if:`,
+  youHaveAlreadyToldList: testTitle.toLowerCase().includes('suspend')
+    ? ``
+    : `you have already told the other party that you are making this application, and`,
+  theyDidNotAgreeList: testTitle.toLowerCase().includes('suspend')
+    ? ``
+    : `they did not agree to it (this means that they have objected to it)`,
+  youSeeFinalApplicationFeeParagraph: testTitle.toLowerCase().includes('suspend')
+    ? ``
+    : `You’ll see the final application fee before you pay.`,
   youMayBeAbleToGetHelpParagraph: `You may be able to get help paying the fee if you (one or more of the following):`,
   areOnCertainBenefitsList: `are on certain benefits`,
   haveLittleOrNoSavingsList: `have little or no savings`,
@@ -18,4 +26,4 @@ export const doYouNeedHelpPayingTheFee = {
   errorValidationField: {
     errorRadioOption: { type: `none`, input: ``, errMessage: `Confirm whether you need help paying the fee` },
   },
-};
+});
