@@ -1,81 +1,82 @@
 import type { Request } from 'express';
 
+import { getNextStep, getPreviousStep } from '../../../../main/modules/steps/flow';
+import { setFormData } from '../../../../main/modules/steps/formBuilder/helpers';
 import { flowConfig } from '../../../../main/steps/make-an-application/flow.config';
 
-function requestWithFormData(formData: Record<string, Record<string, unknown>>): Request {
+function createReq(): Request {
   return {
-    session: {
-      formData: {
-        makeAnApplication: {
-          '1111222233334444': formData,
-        },
-      },
+    session: {},
+    params: {
+      caseReference: '1111222233334444',
     },
-    params: { caseReference: '1111222233334444' },
     res: {
       locals: {
-        features: { genAppCuiSetAsideEnabled: true },
-        step: { journey: 'makeAnApplication' },
-        validatedCase: { id: '1111222233334444' },
+        step: {
+          journey: 'makeAnApplication',
+        },
+        validatedCase: {
+          id: '1111222233334444',
+        },
       },
     },
   } as unknown as Request;
 }
 
 describe('make-an-application flow config', () => {
-  it('shows the Help with Fees question for adjourn applications when hearing is not in the next 14 days', () => {
-    const req = requestWithFormData({
-      'choose-an-application': { typeOfApplication: 'ADJOURN' },
-      'is-the-court-hearing-in-the-next-14-days': { hearingInNext14Days: 'no' },
-    });
+  it('routes suspend applications through the suspend start page and then help with fees', async () => {
+    const req = createReq();
+    setFormData(req, 'choose-an-application', { typeOfApplication: 'SUSPEND' });
 
-    expect(flowConfig.steps['do-you-need-help-paying-the-fee']?.showCondition?.(req)).toBe(true);
+    await expect(getNextStep(req, 'choose-an-application', flowConfig, {})).resolves.toBe(
+      'apply-to-stop-or-delay-the-eviction'
+    );
+    await expect(getNextStep(req, 'apply-to-stop-or-delay-the-eviction', flowConfig, {})).resolves.toBe(
+      'do-you-need-help-paying-the-fee'
+    );
   });
 
-  it('continues to show the existing Help with Fees follow-up when help is needed', () => {
-    const req = requestWithFormData({
-      'choose-an-application': { typeOfApplication: 'ADJOURN' },
-      'is-the-court-hearing-in-the-next-14-days': { hearingInNext14Days: 'no' },
-      'do-you-need-help-paying-the-fee': { helpWithFeesNeeded: 'yes' },
-    });
+  it('skips consent and notice pages for suspend applications when help with fees is not needed', async () => {
+    const req = createReq();
+    setFormData(req, 'choose-an-application', { typeOfApplication: 'SUSPEND' });
+    setFormData(req, 'do-you-need-help-paying-the-fee', { helpWithFeesNeeded: 'no' });
 
-    expect(flowConfig.steps['have-you-already-applied-for-help-with-fees']?.showCondition?.(req)).toBe(true);
+    await expect(getNextStep(req, 'do-you-need-help-paying-the-fee', flowConfig, {})).resolves.toBe(
+      'what-order-do-you-want-the-court-to-make-and-why'
+    );
   });
-});
 
-describe('cui-genapp-set-aside disabled', () => {
-  it('hides all Help with Fees steps outside 14 days, including stale answers', () => {
-    const req = requestWithFormData({
-      'choose-an-application': { typeOfApplication: 'ADJOURN' },
-      'is-the-court-hearing-in-the-next-14-days': { hearingInNext14Days: 'no' },
-      'do-you-need-help-paying-the-fee': { helpWithFeesNeeded: 'yes' },
+  it('skips consent and notice pages for suspend applications after a help with fees reference', async () => {
+    const req = createReq();
+    setFormData(req, 'choose-an-application', { typeOfApplication: 'SUSPEND' });
+    setFormData(req, 'do-you-need-help-paying-the-fee', { helpWithFeesNeeded: 'yes' });
+    setFormData(req, 'have-you-already-applied-for-help-with-fees', {
+      alreadyAppliedForHwf: 'yes',
+      'alreadyAppliedForHwf.hwfReference': 'HWF-123-456',
     });
-    req.res!.locals.features = { genAppCuiSetAsideEnabled: false };
-    for (const name of [
-      'do-you-need-help-paying-the-fee',
-      'have-you-already-applied-for-help-with-fees',
-      'you-need-to-apply-for-help-with-your-application-fee',
-    ]) {
-      expect(flowConfig.steps[name]?.showCondition?.(req)).toBe(false);
-    }
+
+    await expect(getNextStep(req, 'have-you-already-applied-for-help-with-fees', flowConfig, {})).resolves.toBe(
+      'what-order-do-you-want-the-court-to-make-and-why'
+    );
   });
-});
 
-describe.each([false, true])('existing Help with Fees routes with cui-genapp-set-aside = %s', enabled => {
-  it.each(['ADJOURN', 'SET_ASIDE', 'SOMETHING_ELSE'])('preserves Help with Fees for %s', applicationType => {
-    const req = requestWithFormData({
-      'choose-an-application': { typeOfApplication: applicationType },
-      'is-the-court-hearing-in-the-next-14-days': { hearingInNext14Days: 'yes' },
-      'do-you-need-help-paying-the-fee': { helpWithFeesNeeded: 'yes' },
-      'have-you-already-applied-for-help-with-fees': { alreadyAppliedForHwf: 'no' },
-    });
-    req.res!.locals.features = { genAppCuiSetAsideEnabled: enabled };
-    for (const name of [
-      'do-you-need-help-paying-the-fee',
-      'have-you-already-applied-for-help-with-fees',
-      'you-need-to-apply-for-help-with-your-application-fee',
-    ]) {
-      expect(flowConfig.steps[name]?.showCondition?.(req)).toBe(true);
-    }
+  it('keeps consent and notice pages for non-suspend applications', async () => {
+    const req = createReq();
+    setFormData(req, 'choose-an-application', { typeOfApplication: 'SET_ASIDE' });
+    setFormData(req, 'do-you-need-help-paying-the-fee', { helpWithFeesNeeded: 'no' });
+
+    await expect(getNextStep(req, 'do-you-need-help-paying-the-fee', flowConfig, {})).resolves.toBe(
+      'have-the-other-parties-agreed-to-this-application'
+    );
+  });
+
+  it('uses help with fees as the previous visible page for suspend order details', async () => {
+    const req = createReq();
+    setFormData(req, 'choose-an-application', { typeOfApplication: 'SUSPEND' });
+    setFormData(req, 'do-you-need-help-paying-the-fee', { helpWithFeesNeeded: 'no' });
+
+    await expect(
+      getPreviousStep(req, 'what-order-do-you-want-the-court-to-make-and-why', flowConfig, {})
+    ).resolves.toBe('do-you-need-help-paying-the-fee');
   });
 });
