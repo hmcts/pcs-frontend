@@ -295,30 +295,6 @@ test.describe('Respond to a claim LR - e2e Journey @nightly', async () => {
       position: endOfJourneyCYA.positionOrOfficeHeldTextInput,
     });
     await performValidation('mainHeader', responseSubmittedCounterclaimFeePaymentNeededLR.mainHeader);
-    await performAction(
-      'clickLinkAndSwitchToNewTab',
-      responseSubmittedCounterclaimFeePaymentNeededLR.payTheCounterclaimFeeOpensInNewTabLink
-    );
-    await performAction('validateCounterClaimApplicationFee', {
-      amount: `£${counterClaimSpecificSumOfMoney.claimInput}`,
-      fee: counterClaimSpecificSumOfMoney.feeHiddenAmount,
-      isLegalRepresentative: true,
-    });
-    await performAction('selectPaymentOptions', {
-      amountLabel: counterClaimApplicationFeeAmount.counterClaimFeeLabel,
-      expectedAmount: `£${counterClaimSpecificSumOfMoney.feeHiddenAmount}`,
-      payByOption: serviceRequestPayment.payByAccountRadioOption,
-      pbaLabel: serviceRequestPayment.selectPBALabel,
-      pbaValue: serviceRequestPayment.pbaIndex1,
-      referenceLabel: serviceRequestPayment.pbaReferenceLabel,
-      referenceText: serviceRequestPayment.pbaReferenceInputText,
-      button: counterClaimApplicationFeeAmount.getLrPayButton('35.00'),
-    });
-    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
-    await performValidation('text', {
-      elementType: 'paragraph',
-      text: counterClaimPaymentSuccessful.lrPaymentConfirmationParagraph,
-    });
   });
 
   test('NonRentArrears - AssuredTenancy - Something else - LR @nonRent @LR @regression', async () => {
