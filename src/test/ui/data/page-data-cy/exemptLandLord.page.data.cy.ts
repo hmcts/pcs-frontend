@@ -1,0 +1,17 @@
+export const exemptLandLord = {
+  mainHeader: `Landlord wedi’i eithrio`,
+  backLink: `Yn ôl`,
+  underTheHousingParagraph: `O dan Ddeddf Tai (Cymru) 2014, mae’n rhaid i’r rhan fwyaf o landlordiaid preifat fod wedi eu cofrestru a’u trwyddedu. Mae landlordiaid cymunedol cofrestredig wedi eu heithrio o ofynion i fod wedi’u cofrestru a’u trwyddedu.`,
+  youCanCheckYourLandlordParagraph: `Gallwch wirio a yw eich landlord wedi’i gofrestru drwy chwilio drwy Cofrestr Gyhoeddus Rhentu Doeth Cymru (yn agor mewn tab newydd).`,
+  isYourLandlordAnExemptSubHeader: `A yw eich landlord yn landlord wedi’i eithrio o dan Ran 1 o Ddeddf Tai (Cymru) 2014?`,
+  yesRadioOption: `Ydy`,
+  noRadioOption: `Nac ydy`,
+  imNotSureRadioOption: `Nid wyf yn siŵr`,
+  saveAndContinueButton: `Cadw a pharhau`,
+  saveForLaterButton: `Cadw at hwyrach ymlaen`,
+  cymraegLink: `Cymraeg`,
+  thereIsAProblemErrorMessageHeader: `Mae yna broblem`,
+  selectIfYouAgreeWithExemptLandLordErrorMessage: `Dewiswch a yw eich landlord yn landlord wedi’i eithrio o dan Ran 1 o Ddeddf Tai (Cymru) 2014`,
+  feedbackLink: `adborth (yn agor mewn tab newydd)`,
+  pageSlug: `exempt-landlord`,
+};
