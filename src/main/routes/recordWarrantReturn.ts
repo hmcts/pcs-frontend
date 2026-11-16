@@ -303,7 +303,7 @@ function answersFromSession(warrantReturn: WarrantReturn | undefined): WarrantRe
     ? DateTime.fromISO(warrantReturn.outcomeDate, { zone: 'utc' }).setZone(EVICTION_DATE_ZONE)
     : undefined;
   const isFinal = warrantReturn?.returnType === WarrantReturnType.FINAL;
-  const outcome = warrantReturn?.outcome;
+  const outcome = warrantReturn?.evictionOutcome;
 
   return {
     returnType: warrantReturn?.returnType ?? '',
@@ -378,7 +378,7 @@ function validateEvictionSuccessful(answers: WarrantReturnAnswers): ValidationRe
     issues,
     warrantReturn: {
       returnType: WarrantReturnType.FINAL,
-      outcome: EvictionOutcome.SUCCESSFUL,
+      evictionOutcome: EvictionOutcome.SUCCESSFUL,
       returnName,
       outcomeDate: evictionDate,
       additionalDetails: answers.additionalDetails,
@@ -404,7 +404,7 @@ function validateEvictionUnsuccessful(answers: WarrantReturnAnswers, outcome: Ev
     issues,
     warrantReturn: {
       returnType: WarrantReturnType.FINAL,
-      outcome,
+      evictionOutcome: outcome,
       returnName,
       outcomeDate: evictionDate,
       additionalDetails: answers.additionalDetails || undefined,
