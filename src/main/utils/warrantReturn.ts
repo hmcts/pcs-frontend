@@ -307,6 +307,8 @@ export function isAdditionalDetailsMandatory(selection: WarrantReturnSelection):
 const HIDDEN_CLASS = 'govuk-!-display-none';
 const DEFAULT_ADDITIONAL_DETAILS_LABEL = 'Additional details';
 const OPTIONAL_ADDITIONAL_DETAILS_LABEL = 'Additional details (Optional)';
+const EVICTION_DATE_LABEL = 'Eviction date and time';
+const RETURN_DATE_LABEL = 'Return date and time';
 const EVICTION_DATE_INPUT_IDS = [
   'eviction-date-day',
   'eviction-date-month',
@@ -358,8 +360,9 @@ function updateWarrantReturnVisibility(): void {
   setSectionVisible('interim', isInterim, () => resetSelect('interim-return-name'));
 
   const isEvictionDateVisible = isEvictionSuccessful || isEvictionUnsuccessfulOrCancelled || isInterim;
-  setSectionVisible('eviction-date-section', isEvictionDateVisible, () => EVICTION_DATE_INPUT_IDS.forEach(resetInput));
+  setSectionVisible('date-section', isEvictionDateVisible, () => EVICTION_DATE_INPUT_IDS.forEach(resetInput));
 
+  updateDateLabel(isEvictionSuccessful);
   updateAdditionalDetailsLabel();
 }
 
@@ -378,6 +381,14 @@ function updateAdditionalDetailsLabel(): void {
   });
 
   label.textContent = isMandatory ? DEFAULT_ADDITIONAL_DETAILS_LABEL : OPTIONAL_ADDITIONAL_DETAILS_LABEL;
+}
+
+function updateDateLabel(isEvictionSuccessful: boolean): void {
+  const label = document.getElementById('date-section');
+  if (!label) {
+    return;
+  }
+  label.textContent = isEvictionSuccessful ? EVICTION_DATE_LABEL : RETURN_DATE_LABEL;
 }
 
 function setSectionVisible(sectionId: string, isVisible: boolean, resetInputs: () => void): void {

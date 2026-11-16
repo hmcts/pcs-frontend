@@ -151,6 +151,7 @@ describe('recordWarrantReturnRoutes', () => {
           additionalDetails: '',
           evictionDate: { day: '', month: '', year: '', hour: '', minute: '' },
         },
+        dateLabel: 'Return date and time',
         evictionDateError: undefined,
         evictionData: {
           card: { title: { text: 'Eviction details' } },
@@ -826,6 +827,7 @@ describe('recordWarrantReturnRoutes', () => {
           returnType: WarrantReturnType.FINAL,
           outcome: EvictionOutcome.UNSUCCESSFUL,
           returnName: EvictionUnsuccessfulReturnName.WARRANT_WITHDRAWN,
+          outcomeDate: '2026-07-01T08:05:00.000',
           additionalDetails: 'Withdrawn',
         },
         {
@@ -835,7 +837,7 @@ describe('recordWarrantReturnRoutes', () => {
           evictionUnsuccessfulReturnName: 'WARRANT_WITHDRAWN',
           interimReturnName: '',
           additionalDetails: 'Withdrawn',
-          evictionDate: noEvictionDate,
+          evictionDate: { day: '1', month: '7', year: '2026', hour: '9', minute: '05' },
         },
       ],
       [
@@ -844,6 +846,7 @@ describe('recordWarrantReturnRoutes', () => {
           returnType: WarrantReturnType.FINAL,
           outcome: EvictionOutcome.CANCELLED,
           returnName: EvictionUnsuccessfulReturnName.WARRANT_EXPIRED,
+          outcomeDate: '2026-07-01T08:05:00.000',
         },
         {
           returnType: 'FINAL',
@@ -852,12 +855,16 @@ describe('recordWarrantReturnRoutes', () => {
           evictionUnsuccessfulReturnName: 'WARRANT_EXPIRED',
           interimReturnName: '',
           additionalDetails: '',
-          evictionDate: noEvictionDate,
+          evictionDate: { day: '1', month: '7', year: '2026', hour: '9', minute: '05' },
         },
       ],
       [
         'an interim return',
-        { returnType: WarrantReturnType.INTERIM, returnName: InterimReturnName.REOPEN_WARRANT },
+        {
+          returnType: WarrantReturnType.INTERIM,
+          returnName: InterimReturnName.REOPEN_WARRANT,
+          outcomeDate: '2026-07-01T08:05:00.000',
+        },
         {
           returnType: 'INTERIM',
           finalOutcome: '',
@@ -865,7 +872,7 @@ describe('recordWarrantReturnRoutes', () => {
           evictionUnsuccessfulReturnName: '',
           interimReturnName: 'REOPEN_WARRANT',
           additionalDetails: '',
-          evictionDate: noEvictionDate,
+          evictionDate: { day: '1', month: '7', year: '2026', hour: '9', minute: '05' },
         },
       ],
       [

@@ -61,6 +61,8 @@ const EVICTION_DATE_ZONE = 'Europe/London';
 const EVICTION_DATE_REQUIRED_ERROR_MESSAGE: string = 'Eviction date and time is required';
 const EVICTION_DATE_ERROR_MESSAGE: string = 'The data entered is not valid for Eviction date and time';
 const EVICTION_DATE_FUTURE_ERROR_MESSAGE: string = 'Eviction date and time must be in the past';
+const EVICTION_DATE_LABEL: string = 'Eviction date and time';
+const RETURN_DATE_LABEL: string = 'Return date and time';
 
 export interface WarrantReturnAnswers {
   returnType: string;
@@ -161,6 +163,8 @@ function formModel(
   answers: WarrantReturnAnswers,
   issues: ValidationIssue[] = []
 ): Record<string, unknown> {
+  const isEvictionSuccessful =
+    answers.returnType === WarrantReturnType.FINAL && answers.finalOutcome === EvictionOutcome.SUCCESSFUL;
   return {
     ...pageModel(req, issues),
     continueUrl: pageUrl(caseReferenceOf(req), 'checkYourAnswers'),
@@ -172,6 +176,7 @@ function formModel(
     headerModel: xuiHeaderModel(req),
     additionalDetailsMaxLength: ADDITIONAL_DETAILS_MAX_LENGTH,
     answers,
+    dateLabel: isEvictionSuccessful ? EVICTION_DATE_LABEL : RETURN_DATE_LABEL,
     evictionDateError: issues.find(issue => issue.id.startsWith(`${EVICTION_DATE_ID}-`))?.message,
   };
 }
