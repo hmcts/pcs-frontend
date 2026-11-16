@@ -1,13 +1,40 @@
 import type { Request } from 'express';
 
+import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { flowConfig } from '../flow.config';
+import {
+  addYourSupportToCompletedSections,
+  getYourSupportReturnUrl,
+  isYourSupportSectionComplete,
+  rememberYourSupportOrigin,
+} from '../yourSupportSection';
 
 import { Logger } from '@modules/logger';
 import { createFormStep } from '@modules/steps';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
+import { isDefendantResponseSubmitted } from '@services/ccdCaseData.model';
 import { startYourSupport } from '@services/cuiRa/startYourSupport';
 import { isCuiYourSupportEnabled } from '@utils/isCuiYourSupportEnabled';
+
 const logger = Logger.getLogger('reasonableAdjustmentsTriage');
+
+// "I do not need any support at this time" is an explicit answer. Record it on the draft
+async function recordNoSupportNeeded(req: Request): Promise<void> {
+  const validatedCase = req.res?.locals.validatedCase;
+  // Nothing to write once the response is submitted (no draft) or when Your Support is already recorded
+  if (
+    isDefendantResponseSubmitted(validatedCase?.data) ||
+    isYourSupportSectionComplete(validatedCase?.possessionClaimResponse)
+  ) {
+    return;
+  }
+
+  const draft = buildDraftDefendantResponse(req);
+  draft.defendantResponses.completedSections = addYourSupportToCompletedSections(
+    draft.defendantResponses.completedSections
+  );
+  await saveDraftDefendantResponse(req, draft);
+}
 
 export const step: StepDefinition = createFormStep({
   stepName: 'reasonable-adjustments-triage',
@@ -15,20 +42,29 @@ export const step: StepDefinition = createFormStep({
   stepDir: __dirname,
   flowConfig,
   customTemplate: `${__dirname}/reasonableAdjustmentsTriage.njk`,
-  // Drives the task-list "Your support" row status: DONE once the defendant has captured
-  // adjustments (defendantFlags persisted in draft), AVAILABLE otherwise.
-  isAnswered: (req: Request) =>
-    Boolean(req.res?.locals.validatedCase?.possessionClaimResponse?.defendantFlags?.details?.length),
+  // Remember whether the citizen came from the dashboard (?from=dashboard) or the task list; the back
+  // link, the skip redirect and the confirmation/cancelled pages all return there.
+  beforeGet: async (req: Request) => {
+    rememberYourSupportOrigin(req);
+  },
+  // Drives the task-list "Your support" row status: DONE once the defendant has captured adjustments
+  // (defendantFlags persisted in draft) or explicitly said none are needed (recordNoSupportNeeded, or a
+  // trip through the microsite that changed nothing); AVAILABLE otherwise. A cancel in the microsite
+  // writes nothing, so it leaves the status as it was.
+  isAnswered: (req: Request) => {
+    const response = req.res?.locals.validatedCase?.possessionClaimResponse;
+    return isYourSupportSectionComplete(response) || Boolean(response?.defendantFlags?.details?.length);
+  },
   // "Continue to the questions" (reasonableAdjustmentsChoice=questions) launches the Your Support
   // microsite;
   beforeRedirect: async (req: Request) => {
     if (req.body?.reasonableAdjustmentsChoice !== 'questions') {
-      // Your Support is an optional task, so
-      // resolveRedirectAfterPost returns the citizen to the task list.
+      await recordNoSupportNeeded(req);
       return;
     }
 
     if (!(await isCuiYourSupportEnabled(req))) {
+      // Flag off: the button is hidden, so this is a stale tab or a crafted POST
       return;
     }
     const caseReference = req.res?.locals.validatedCase?.id;
@@ -46,17 +82,16 @@ export const step: StepDefinition = createFormStep({
     }
   },
   // The "I do not need any support at this time" button (and the flag-off fall-through) lands here.
-  // Your Support is now an optional task launched from the task list, so return the citizen there
-  // rather than walking forward into the next section. The "questions" path 303s to the microsite
-  // inside beforeRedirect (postHandler short-circuits on headersSent) and never reaches this hook.
-  resolveRedirectAfterPost: async (req: Request) => {
-    const caseReference = req.res?.locals.validatedCase?.id;
-    return caseReference ? `/case/${caseReference}/respond-to-claim/task-list` : undefined;
-  },
+  // Your Support is an optional task, so return the citizen to wherever they launched it from (task
+  // list or dashboard) rather than walking forward into the next section. The "questions" path 303s to
+  // the microsite inside beforeRedirect (postHandler short-circuits on headersSent) and never gets here.
+  resolveRedirectAfterPost: async (req: Request) => getYourSupportReturnUrl(req),
   // When the Your Support feature flag is off, hide the "Continue to the questions" button so the
-  // page doesn't advertise a microsite that won't launch (beforeRedirect also treats it as skip).
+  // page doesn't advertise a microsite that won't launch (see the flag-off branch in beforeRedirect).
+  // backUrl points back to wherever the citizen launched Your Support from.
   extendGetContent: async (req: Request) => ({
     cuiYourSupportEnabled: await isCuiYourSupportEnabled(req),
+    backUrl: getYourSupportReturnUrl(req),
   }),
   translationKeys: {
     pageTitle: 'pageTitle',

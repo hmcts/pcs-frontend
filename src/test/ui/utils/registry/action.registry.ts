@@ -136,6 +136,9 @@ export class ActionRegistry {
     ['changeAnswerOnFinalCYA', new RespondToClaimAction()],
     ['selectStatementOfTruthRTC', new RespondToClaimAction()],
     ['validateRTCSectionCYA', new RespondToClaimAction()],
+    ['verifyYourSupportLink', new RespondToClaimAction()],
+    ['verifySupportAdjustments', new RespondToClaimAction()],
+    ['changeSupport', new RespondToClaimAction()],
     ['getCaseAPI', new CreateCaseAPIAction()],
     ['linkSolicitorAPI', new LinkSolicitorAPIAction()],
     ['doYouWantToUploadFiles', new RespondToClaimAction()],
@@ -178,6 +181,7 @@ export class ActionRegistry {
     ['inputPaymentDetails', new GenAppsAction()],
     ['confirmPayment', new GenAppsAction()],
     ['verifyApplicationSubmitted', new GenAppsAction()],
+    ['validateCompletedApplication', new GenAppsAction()],
 
     //LR details below
     ['selectNoticeDetailsLR', new RespondToClaimLRAction()],

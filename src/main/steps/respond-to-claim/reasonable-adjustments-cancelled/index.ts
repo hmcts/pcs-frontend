@@ -1,6 +1,7 @@
 import type { Request } from 'express';
 
 import { createRespondToClaimFormStep } from '../formStep';
+import { getYourSupportReturnUrl } from '../yourSupportSection';
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
@@ -16,9 +17,7 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     heading: 'heading',
     continueButton: 'continueButton',
   },
-  // Shown when the citizen cancelled / made no changes in the microsite (payload action = 'cancel').
-  extendGetContent: (req: Request) => {
-    const caseReference = req.res?.locals.validatedCase?.id;
-    return { taskListUrl: `/case/${caseReference}/respond-to-claim/task-list` };
-  },
+  // Shown when the citizen cancelled / made no changes in the microsite. "Continue" returns them to
+  // wherever they launched Your Support from (task list or dashboard).
+  extendGetContent: (req: Request) => ({ continueUrl: getYourSupportReturnUrl(req) }),
 });
