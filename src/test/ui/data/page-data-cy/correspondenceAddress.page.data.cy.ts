@@ -74,11 +74,19 @@ export const correspondenceAddress = {
     errorRadioMsg: [{ errMessage: `Cadarnhewch eich cyfeiriad drwy ddewis yr opsiynau isod` }],
     errorTextField1: [{ type: `empty`, label: `Nodwch god post yn y DU`, errMessage: `Nodwch god post dilys yn y DU` }],
     errorTextField2: [
-      { type: `empty`, label: `Nodwch god post yn y DU`, errMessage: `Heb ddod o hyd i god post. Gwiriwch y manylion a rhowch gynnig arall arni.` },
+      {
+        type: `empty`,
+        label: `Nodwch god post yn y DU`,
+        errMessage: `Heb ddod o hyd i god post. Gwiriwch y manylion a rhowch gynnig arall arni.`,
+      },
     ],
     errorTextField3: [{ type: `empty`, label: `Dewiswch gyfeiriad`, errMessage: `Dewiswch gyfeiriad` }],
     errorTextField4: [
-      { type: `empty`, label: `Llinell cyfeiriad 1`, errMessage: `Rhowch linell cyfeiriad 1, fel arfer yr adeilad a’r stryd` },
+      {
+        type: `empty`,
+        label: `Llinell cyfeiriad 1`,
+        errMessage: `Rhowch linell cyfeiriad 1, fel arfer yr adeilad a’r stryd`,
+      },
       { type: `empty`, label: `Tref neu ddinas`, errMessage: `Nodwch tref neu ddinas` },
       { type: `empty`, label: `Cod post`, errMessage: `Nodwch god post dilys yn y DU` },
     ],
