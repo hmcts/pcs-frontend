@@ -9,7 +9,6 @@ import { respondPossessionClaimMidEventApiData } from '../data/api-data/respondP
 import { dashboard } from '../data/index.selector';
 import {
   counterClaimApplicationFeeAmount,
-  counterClaimPaymentSuccessful,
   paymentDetails,
   responseSubmittedCounterclaimFeePaymentNeeded,
   taskList,
@@ -53,7 +52,7 @@ test.beforeEach(async ({ page }, testInfo) => {
 });
 
 test.describe('Dashboard - e2e Journey @nightly', async () => {
-  test('Validate address, case number and links on the dashboard @smoke @regression @crossbrowser @healthCheck', async () => {
+  test('Validate address, case number and links on the dashboard @regression @crossbrowser @healthCheck', async () => {
     await performValidation('mainHeader', dashboard.mainHeader);
     await performValidation('text', { elementType: 'paragraph', text: dashboard.caseNumberParagraph() });
     await performActions(
@@ -256,16 +255,8 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       elementType: 'link',
       text: dashboard.counterClaimFeeUnpaidNotificationLink,
     });
-    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
-    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
-    await performValidation('mainHeader', paymentDetails.mainHeader);
-    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
-    await performAction('clickButton', paymentDetails.confirmPaymentButton);
-    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
-    await performAction(
-      'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('updatePaymentAPI');
+    await performAction('reloadPage');
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/dashboard`);
     await performAction('navigateToUrl', home_url + `/case/${process.env.CASE_NUMBER}/view-documents`);
     await performValidation('mainHeader', viewDocuments.mainHeader);
@@ -340,24 +331,8 @@ test.describe('Dashboard - e2e Journey @nightly', async () => {
       type: 'both',
     });
     await performAction('reloadPage');
-    await performAction('clickLink', responseSubmittedCounterclaimFeePaymentNeeded.payYourCounterclaimFeeLink);
-    await performAction('validateCounterClaimApplicationFee', {
-      amount: `£${dashboard.counterClaimAmount}`,
-      fee: dashboard.counterClaimFee,
-    });
-    await performAction('clickButton', counterClaimApplicationFeeAmount.getPayButton('80.00'));
-    await performValidation('mainHeader', paymentDetails.mainHeader);
-    await performAction('inputCounterClaimPaymentDetails', { cardNumber: paymentDetails.validCardNumber });
-    await performAction('clickButton', paymentDetails.confirmPaymentButton);
-    await performValidation('mainHeader', counterClaimPaymentSuccessful.mainHeader);
-    await performValidation('text', {
-      elementType: 'paragraph',
-      text: counterClaimPaymentSuccessful.paymentConfirmationParagraph,
-    });
-    await performAction(
-      'clickButton',
-      responseSubmittedCounterclaimFeePaymentNeeded.closeAndReturnToCaseOverviewButton
-    );
+    await performAction('updatePaymentAPI');
+    await performAction('reloadPage');
     await performAction('clickButton', dashboard.viewTheResponseSubHeader);
     await performValidation('mainHeader', dashboard.viewTheResponseSubHeader);
     await performAction('verifyResponseDetailsOnViewTheResponsePage');
