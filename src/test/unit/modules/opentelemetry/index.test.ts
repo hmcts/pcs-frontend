@@ -165,15 +165,16 @@ describe('opentelemetry module', () => {
       expect(mockExpressInstrumentation).not.toHaveBeenCalled();
     });
 
-    it('still redacts URLs first, then drops router spans', async () => {
+    it('still redacts URLs first, then drops router spans and templates case references', async () => {
       const telemetryModule = await getTelemetryModule();
 
       telemetryModule.initializeTelemetry();
 
       const { spanProcessors } = mockUseAzureMonitor.mock.calls[0][0] as TelemetryConfig;
-      expect(spanProcessors).toHaveLength(2);
+      expect(spanProcessors).toHaveLength(3);
       expect(spanProcessors[0]).toBe(telemetryModule.secretRedactingSpanProcessor);
       expect(spanProcessors[1]).toBe(telemetryModule.routerSpanDroppingSpanProcessor);
+      expect(spanProcessors[2]).toBe(telemetryModule.caseReferenceTemplatingSpanProcessor);
     });
 
     describe('routerSpanDroppingSpanProcessor', () => {
@@ -205,6 +206,65 @@ describe('opentelemetry module', () => {
         routerSpanDroppingSpanProcessor.onEnd(span);
 
         expect(span.spanContext().traceFlags).toBe(SAMPLED);
+      });
+    });
+
+    describe('caseReferenceTemplatingSpanProcessor', () => {
+      const CLIENT = 2;
+      const SERVER = 1;
+      const CCD = 'http://ccd-data-store';
+
+      it.each([
+        ['onStart', 'url.full'],
+        ['onEnd', 'url.full'],
+        ['onEnd', 'http.url'],
+      ] as const)('replaces the case reference in an outgoing call at %s (%s)', async (hook, attribute) => {
+        const { caseReferenceTemplatingSpanProcessor } = await getTelemetryModule();
+        const span = {
+          kind: CLIENT,
+          attributes: {
+            [attribute]: `${CCD}/cases/1234567890123456/event-triggers/respondPossessionClaim?ignore-warning=***`,
+          },
+        };
+
+        caseReferenceTemplatingSpanProcessor[hook](span);
+
+        expect(span.attributes).toEqual({
+          [attribute]: `${CCD}/cases/:caseReference/event-triggers/respondPossessionClaim?ignore-warning=***`,
+        });
+      });
+
+      it('replaces a case reference at the end of the path', async () => {
+        const { caseReferenceTemplatingSpanProcessor } = await getTelemetryModule();
+        const span = { kind: CLIENT, attributes: { 'url.full': `${CCD}/cases/1234567890123456` } };
+
+        caseReferenceTemplatingSpanProcessor.onEnd(span);
+
+        expect(span.attributes['url.full']).toBe(`${CCD}/cases/:caseReference`);
+      });
+
+      it.each([
+        ['a path with no case reference', `${CCD}/case-types/PCS/cases`],
+        ['a longer number', `${CCD}/cases/12345678901234567`],
+        ['a shorter number', `${CCD}/cases/123456789012345`],
+        ['16 digits inside a longer segment', `${CCD}/documents/abc1234567890123456`],
+      ])('leaves %s alone', async (_description, url) => {
+        const { caseReferenceTemplatingSpanProcessor } = await getTelemetryModule();
+        const span = { kind: CLIENT, attributes: { 'url.full': url } };
+
+        caseReferenceTemplatingSpanProcessor.onEnd(span);
+
+        expect(span.attributes).toEqual({ 'url.full': url });
+      });
+
+      it('leaves incoming requests alone, which are named by their route', async () => {
+        const { caseReferenceTemplatingSpanProcessor } = await getTelemetryModule();
+        const attributes = { 'url.full': 'https://pcs/case/1234567890123456/dashboard' };
+        const span = { kind: SERVER, attributes: { ...attributes } };
+
+        caseReferenceTemplatingSpanProcessor.onEnd(span);
+
+        expect(span.attributes).toEqual(attributes);
       });
     });
   });

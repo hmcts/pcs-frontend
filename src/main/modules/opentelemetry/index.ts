@@ -1,5 +1,5 @@
 import { shutdownAzureMonitor, useAzureMonitor } from '@azure/monitor-opentelemetry';
-import { TraceFlags } from '@opentelemetry/api';
+import { SpanKind, TraceFlags } from '@opentelemetry/api';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import {
   ExpressInstrumentation,
@@ -102,6 +102,35 @@ export const routerSpanDroppingSpanProcessor = {
   shutdown: (): Promise<void> => Promise.resolve(),
 };
 
+interface OutgoingSpan extends EndedSpan {
+  kind?: number;
+}
+
+const OUTGOING_URL_ATTRIBUTES = ['http.url', 'url.full', 'http.target'];
+// A case reference is 16 digits and takes up a whole path segment.
+const caseReferenceSegmentPattern = /\/\d{16}(?=[/?#]|$)/g;
+
+const templateCaseReference = (span: OutgoingSpan): void => {
+  if (span.kind !== SpanKind.CLIENT) {
+    return;
+  }
+  for (const attribute of OUTGOING_URL_ATTRIBUTES) {
+    const value = span.attributes?.[attribute];
+    if (typeof value === 'string') {
+      span.attributes[attribute] = value.replace(caseReferenceSegmentPattern, '/:caseReference');
+    }
+  }
+};
+
+// App Insights names an outgoing call by its URL path, so a call to CCD would get a new name for
+// every case. Replacing the case reference in the URL gives one name per endpoint.
+export const caseReferenceTemplatingSpanProcessor = {
+  onStart: (span: OutgoingSpan): void => templateCaseReference(span),
+  onEnd: (span: OutgoingSpan): void => templateCaseReference(span),
+  forceFlush: (): Promise<void> => Promise.resolve(),
+  shutdown: (): Promise<void> => Promise.resolve(),
+};
+
 export function initializeTelemetry(): void {
   if (isTelemetryInitialized || !config.get('appInsights.enabled')) {
     return;
@@ -123,7 +152,11 @@ export function initializeTelemetry(): void {
         enabled: false,
       },
     },
-    spanProcessors: [secretRedactingSpanProcessor, routerSpanDroppingSpanProcessor],
+    spanProcessors: [
+      secretRedactingSpanProcessor,
+      routerSpanDroppingSpanProcessor,
+      caseReferenceTemplatingSpanProcessor,
+    ],
     enableLiveMetrics: true,
   });
   // Records the route template, so App Insights names a request by its route, not just its method.
