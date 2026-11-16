@@ -1,7 +1,11 @@
+import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import { type DocWeaveSnapshot, InvalidSnapshotError, parseSnapshot } from '@hmcts-cft/docweave';
 import config from 'config';
+import type { Request, Response } from 'express';
 
-import { HTTPError } from '../HttpError';
+import { CallbackRejectedError, HTTPError } from '../HttpError';
+import { linkSignOutToLogout } from '../middleware/legalRepresentativeHeaders';
+import { getUserRoles } from '../steps/utils';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 
 import type { MakeOrderType } from '@utils/makeOrderValidation';
@@ -21,7 +25,34 @@ export interface OrderCaseContext {
   claimants: OrderParty[];
   defendants: OrderParty[];
   openCounterclaim?: boolean;
-  openApplication?: boolean;
+  /** The case's open applications, any of which the order can decide, oldest first. */
+  applications?: OrderApplication[];
+  /** The case bundle, every document on the case in one PDF, for a judge once one has been made. */
+  caseBundle?: OrderCaseBundle | null;
+}
+
+export interface OrderCaseBundle {
+  id: string;
+  fileName: string;
+  updatedAt?: string | null;
+}
+
+/** A general application as the judge deciding it reads it, with what court staff said when they referred it. */
+export interface OrderApplication {
+  id: string;
+  /** An application to suspend enforcement, which granting suspends on conditions. */
+  enforcementSuspension?: boolean;
+  reference: string;
+  type: string;
+  somethingElseDetails?: string | null;
+  applicant?: string | null;
+  submittedOn?: string | null;
+  within14Days?: 'YES' | 'NO' | null;
+  otherPartiesAgreed?: 'YES' | 'NO' | null;
+  withoutNotice?: 'YES' | 'NO' | null;
+  withoutNoticeReason?: string | null;
+  whatOrderWanted?: string | null;
+  documents: { id: string; fileName: string }[];
 }
 
 /** A judicial note on the case, with the hearing it was made at, if any. */
@@ -63,8 +94,13 @@ export interface OrderStart {
     queryFromCaseworker?: string | null;
   };
   caseContext: OrderCaseContext;
-  /** The hearing the order is made for, if it is made for one. */
+  /**
+   * The hearing the order is made for, if it is made for one. The caseworker's review is sent only which hearing it
+   * is, without its facts and notes, which are the judge's to record.
+   */
   hearing?: OrderHearing | null;
+  /** The application the judge's task asked them to decide, which the order must decide. */
+  taskGenAppId?: string | null;
 }
 
 export function formatAddress(address: Record<string, string | undefined> = {}): string {
@@ -101,12 +137,35 @@ export function caseHeader(caseContext: OrderCaseContext): Record<string, string
   };
 }
 
+/**
+ * XUI's header as it shows it to the user. XUI adds a user's role assignments, such as judge, to their
+ * IDAM roles to choose the header; pass the role assignment the page's CCD event is limited to.
+ */
+export function xuiHeaderModel(req: Request, roleAssignments: string[] = []): ReturnType<typeof buildHeaderModel> {
+  const roles = [...getUserRoles(req), ...roleAssignments];
+  const headerModel = buildHeaderModel({ xuiBaseUrl: config.get('xui.uri'), user: { roles } });
+  headerModel.assetsPath = '/assets/ui-component-lib';
+  linkSignOutToLogout(headerModel);
+  return headerModel;
+}
+
 export function manageCaseDetailsUrl(caseReference: string): string {
   const url = buildManageCaseDetailsRedirect(config.get('redirects.manageCaseReturnURL'), caseReference);
   if (!url) {
     throw new HTTPError('The Manage Case return URL is not configured', 500);
   }
   return url;
+}
+
+/** Shows the user why pcs-api would not start an order event, in XUI's page, with the way back to the case. */
+export function refusalPage(req: Request, res: Response, roleAssignments: string[] = []) {
+  return (error: CallbackRejectedError): void =>
+    res.status(error.status).render('order-refused', {
+      headerModel: xuiHeaderModel(req, roleAssignments),
+      footerModel: buildFooterModel(),
+      reasons: error.reasons,
+      closeUrl: manageCaseDetailsUrl(req.params.caseReference as string),
+    });
 }
 
 /** The order's document as a page posted it: none, or a snapshot Docweave accepts. Anything else is a bad request. */

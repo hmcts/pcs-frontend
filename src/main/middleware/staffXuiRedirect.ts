@@ -15,6 +15,8 @@ const FLAGGED_STAFF_JOURNEYS: readonly { flag: string; paths: readonly RegExp[] 
       /^\/cases\/\d+\/event\/ext:confirmOrderReview$/,
       /^\/case\/\d+\/confirm-order-review(?:\/.*)?$/,
       /^\/docweave\/templates(?:\/.*)?$/,
+      // The documents filed with an application the judge is deciding, which its panel links to.
+      /^\/case\/\d+\/view-documents\/[0-9a-fA-F-]+$/,
     ],
   },
   {

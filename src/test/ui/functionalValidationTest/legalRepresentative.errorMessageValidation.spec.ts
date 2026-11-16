@@ -188,7 +188,7 @@ test.afterEach(async () => {
 });
 
 test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @EMV', () => {
-  test('ErrMsg - NonRentArrears - AssuredTenancy - LR @smoke @nonRent @LR', async () => {
+  test('ErrMsg - NonRentArrears - AssuredTenancy - LR @nonRent @LR', async () => {
     await softErrorMessageValidation('selectDefendant', selectDefendantErrorValidation);
     const pin2User = await getPinUserAt(1);
     await performAction('representationLR', {
@@ -870,7 +870,7 @@ test.describe('Respond to claim — LR ErrorMessageValidation(EMV) journey @EMV'
     assertAllErrorMessageValidations();
   });
 
-  test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @PR @rentNonRent @LR @regression', async () => {
+  test('RentArrears - NonRentArrears - AssuredTenancy - Instalments - LR @rentNonRent @LR', async () => {
     const pinUser = await getPinUserAt(0);
     await performAction('confirmDefendantDetailsLR', {
       question: defendantNameConfirmation.mainHeader(pinUser.firstName, pinUser.lastName),
