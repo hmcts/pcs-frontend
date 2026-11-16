@@ -8,10 +8,10 @@ import { getApplicationId, setApplicationId } from '../session';
 import { BuiltFormContent } from '@modules/steps/formBuilder/formFieldConfig.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
-import { ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS_R2 } from '@utils/respondToClaimFlags';
+import { ENABLE_DEFENDANT_GENERAL_APPLICATIONS_R2 } from '@utils/respondToClaimFlags';
 
 const isDefendantGeneralApplicationsR2Enabled = (req: Request): Promise<boolean> =>
-  getLaunchDarklyFlag(req, ENABLE_CUI_DEFENDANT_GENERAL_APPLICATIONS_R2, false);
+  getLaunchDarklyFlag(req, ENABLE_DEFENDANT_GENERAL_APPLICATIONS_R2, false);
 
 function removeSuspendOption(formContent: BuiltFormContent): void {
   const typeOfApplicationField = formContent.fields.find(field => field.name === 'typeOfApplication');
