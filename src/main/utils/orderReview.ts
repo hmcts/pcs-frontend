@@ -2,7 +2,10 @@ import { parseSnapshot, renderHtml } from '@hmcts-cft/docweave';
 
 import type { OrderFormSubmission } from '@utils/makeOrderForm';
 import { parseDate } from '@utils/makeOrderFormat';
+import { type MoneyJudgmentsAnswers, judgmentsFromOrder, moneyJudgmentsRequest } from '@utils/moneyJudgments';
 import type { FormData, OrderStart } from '@utils/orderCase';
+import { type OrderDetailsAnswers, orderDetailsRequest } from '@utils/orderDetails';
+import { applicationDecisions, claimOutcome } from '@utils/orderOutcome';
 
 export const REVIEW_REASONS = [
   { value: 'UNLESS_ORDER', text: 'Unless order' },
@@ -36,11 +39,21 @@ export interface OrderReviewAnswers {
   /** The order to issue, as the review page last sent it: the judge's form and document with the caseworker's changes. */
   order?: Required<OrderFormSubmission>;
   sendQuery?: boolean;
+  /** What a free-form order does, as court staff record it; none in a review started before it was asked. */
+  orderDetails?: OrderDetailsAnswers;
+  /**
+   * The order's costs and money judgments: for an order its form generated, as the judge's answers make them until
+   * court staff save the page they are checked on; for a free-form order, as court staff record them.
+   */
+  moneyJudgments?: MoneyJudgmentsAnswers;
+  moneyJudgmentsSaved?: boolean;
   queryToJudge?: string;
   hasReviewDates?: 'yes' | 'no';
   reviewDates: ReviewDateAnswer[];
   nextSteps?: string;
+  /** Asked on proceed to issue, but not yet sent to pcs-api: nothing uses it until it says what it applies to. */
   finalOrder?: 'yes' | 'no';
+  restitutionPermission?: 'yes' | 'no';
   serveAllParties?: 'yes' | 'no';
   partiesToServe: string[];
   seal?: string;
@@ -64,17 +77,32 @@ export interface ValidationIssue {
   message: string;
 }
 
-export const MAX_QUERY_LENGTH = 500;
+export const MAX_QUERY_LENGTH = 30000;
+export const TASKS_OUTSTANDING =
+  'You must complete all outstanding tasks before issuing this order and serving it on the parties';
 export const MAX_REVIEW_DATES = 10;
 export const MAX_REVIEW_DESCRIPTION_LENGTH = 500;
 
 export function newAnswers(): OrderReviewAnswers {
-  // Orders are served on all parties under the County Court seal unless the caseworker changes it.
-  return { reviewDates: [], partiesToServe: [], serveAllParties: 'yes', seal: 'COUNTY_COURT' };
+  // Orders are served on all parties under the County Court seal, without permission for restitution, unless the
+  // caseworker changes it.
+  return {
+    orderDetails: {},
+    reviewDates: [],
+    partiesToServe: [],
+    restitutionPermission: 'no',
+    serveAllParties: 'yes',
+    seal: 'COUNTY_COURT',
+  };
 }
 
 export function blankReviewDate(): ReviewDateAnswer {
   return { day: '', month: '', year: '', reason: '', description: '' };
+}
+
+/** Whether the order to issue is free-form, whose wording is the judge's, so court staff record what it does. */
+export function issuesFreeForm(answers: OrderReviewAnswers): boolean {
+  return answers.order?.orderType === 'FREE_FORM';
 }
 
 // Posted form values, which a browser sends as a string, several strings, or nothing.
@@ -111,7 +139,7 @@ export function validateQuery(answers: OrderReviewAnswers): ValidationIssue[] {
     return [{ id: 'query-to-judge', message: 'Enter your query for the Judge' }];
   }
   if (query.length > MAX_QUERY_LENGTH) {
-    return [{ id: 'query-to-judge', message: 'Your query for the Judge must be 500 characters or less' }];
+    return [{ id: 'query-to-judge', message: 'Your query for the Judge must be 30,000 characters or less' }];
   }
   return [];
 }
@@ -153,9 +181,17 @@ export function validateProceedToIssue(answers: OrderReviewAnswers): ValidationI
   const issues: ValidationIssue[] = [];
   if (!NEXT_STEPS.some(step => step.value === answers.nextSteps)) {
     issues.push({ id: 'next-steps', message: 'Select if all the next steps for court staff have been completed' });
+  } else if (answers.nextSteps === 'outstanding') {
+    issues.push({ id: 'next-steps', message: TASKS_OUTSTANDING });
   }
   if (!answers.finalOrder) {
-    issues.push({ id: 'final-order', message: 'Select if this is a final order' });
+    issues.push({ id: 'final-order', message: 'Select if this order finally resolves any part of the case' });
+  }
+  if (!answers.restitutionPermission) {
+    issues.push({
+      id: 'restitution-permission',
+      message: 'Select if permission has been given to issue a warrant or writ of restitution',
+    });
   }
   if (!answers.serveAllParties) {
     issues.push({ id: 'serve-all-parties', message: 'Select if this order should be served on all parties' });
@@ -199,12 +235,36 @@ export function reviewRequest(
       order: answers.order && issuedOrder(answers.order),
       reviewDates,
       nextStepsComplete: answers.nextSteps === 'complete',
-      finalOrder: answers.finalOrder === 'yes',
+      claimOutcome:
+        answers.order &&
+        (issuesFreeForm(answers)
+          ? orderDetailsRequest(answers.orderDetails)
+          : claimOutcome(answers.order.orderType, answers.order.formData)),
       serveAllParties,
       partiesToServe: serveAllParties ? [] : answers.partiesToServe,
       seal: answers.seal,
+      restitutionPermitted: answers.restitutionPermission === 'yes',
+      ...moneyJudgmentsRequest(answers.moneyJudgments),
     },
   };
+}
+
+/**
+ * The costs and money judgments as the order to issue makes them, until court staff save their own: a generated
+ * order's from the judge's answers, so a change to them changes these; a free-form order's to record from nothing.
+ */
+export function startMoneyJudgments(review: OrderReviewSession): void {
+  const { answers, caseContext } = review;
+  if (answers.moneyJudgmentsSaved || !answers.order) {
+    return;
+  }
+  const sides = {
+    claimants: caseContext.claimants.map(party => party.id),
+    defendants: caseContext.defendants.map(party => party.id),
+  };
+  answers.moneyJudgments = issuesFreeForm(answers)
+    ? { judgments: [] }
+    : judgmentsFromOrder(answers.order.orderType, answers.order.formData, sides);
 }
 
 function issuedOrder(order: Required<OrderFormSubmission>): Record<string, unknown> {
@@ -212,6 +272,7 @@ function issuedOrder(order: Required<OrderFormSubmission>): Record<string, unkno
   return {
     orderType: order.orderType,
     formData: order.formData,
+    applicationDecisions: applicationDecisions(order.formData),
     docweaveSnapshot,
     // Its wording exported to HTML, which pcs-api issues as the order's document.
     html: docweaveSnapshot ? renderHtml(docweaveSnapshot) : undefined,
