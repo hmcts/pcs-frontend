@@ -25,8 +25,8 @@ import {
   postedSnapshot,
   refusalPage,
 } from '@utils/orderCase';
-import { refusedXuiEvent, xuiHeaderModel } from '@utils/xuiUtils';
 import { applicationDecisions } from '@utils/orderOutcome';
+import { refusedXuiEvent, xuiHeaderModel } from '@utils/xuiUtils';
 
 const MAKE_ORDER_EVENT_ID = 'ext:makeOrder';
 
