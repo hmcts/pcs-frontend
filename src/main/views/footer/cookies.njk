@@ -1,0 +1,70 @@
+{% extends "footer/layout.njk" %}
+
+{% block pageTitle %}
+  {{ t('footer/cookies:pageTitle') }}
+{% endblock %}
+
+{% block mainContent %}
+  <h1 id="cookies" class="govuk-heading-xl">{{ t('footer/cookies:cookies.title') }}</h1>
+  <p class="govuk-body">{{ t('footer/cookies:cookies.description1') }}</p>
+  <p class="govuk-body">{{ t('footer/cookies:cookies.description2') }}</p>
+  <ul class="govuk-list govuk-list--bullet">
+      <li>{{ t('footer/cookies:cookies.list.item1') }}</li>
+      <li>{{ t('footer/cookies:cookies.list.item2') }}</li>
+      <li>{{ t('footer/cookies:cookies.list.item3') }}</li>
+  </ul>
+  <p class="govuk-body">{{ t('footer/cookies:cookies.description3') | safe }}</p>
+  <h2 id="how-cookies-are-used-in-this-service" class="govuk-heading-l">{{ t('footer/cookies:howCookiesAreUsedInThisService.title') }}</h2>
+  <p class="govuk-body">{{ t('footer/cookies:howCookiesAreUsedInThisService.description1') }}</p>
+  <table class="govuk-table">
+      <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+              <th scope="col" class="govuk-table__header">{{ t('footer/cookies:cookieTable.header.name') }}</th>
+              <th scope="col" class="govuk-table__header">{{ t('footer/cookies:cookieTable.header.purpose') }}</th>
+              <th scope="col" class="govuk-table__header">{{ t('footer/cookies:cookieTable.header.expires') }}</th>
+          </tr>
+      </thead>
+      <tbody>
+         <tr scope="col" class="govuk-table__row">
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row1.name') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row1.purpose') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row1.expires') }}</td>
+          </tr>
+          <tr scope="col" class="govuk-table__row">
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row2.name') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row2.purpose') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row2.expires') }}</td>
+          </tr>
+          <tr scope="col" class="govuk-table__row">
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row3.name') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row3.purpose') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row3.expires') }}</td>
+          </tr>
+          <tr scope="col" class="govuk-table__row">
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row4.name') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row4.purpose') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row4.expires') }}</td>
+          </tr>
+          <tr scope="col" class="govuk-table__row">
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row5.name') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row5.purpose') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row5.expires') }}</td>
+          </tr>
+          <tr scope="col" class="govuk-table__row">
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row6.name') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row6.purpose') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row6.expires') }}</td>
+          </tr>
+          <tr scope="col" class="govuk-table__row">
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row7.name') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row7.purpose') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row7.expires') }}</td>
+          </tr>
+          <tr scope="col" class="govuk-table__row">
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row8.name') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row8.purpose') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row8.expires') }}</td>
+          </tr>
+      </tbody>
+  </table>
+{% endblock %}

@@ -142,7 +142,8 @@
     "masterFlagCode": "RA0001"
   },
   "launchdarkly": {
-    "env": "AAAAAAAA"
+    "env": "AAAAAAAA",
+    "offline": false
   },
   "decentralisedEventRoutes": {
     "ext:respondPossessionClaim": "/case/:caseReference/respond-to-claim/start-now",

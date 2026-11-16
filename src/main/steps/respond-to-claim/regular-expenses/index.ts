@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 import { validateAmount } from '../../../constants/validation';
-import { fromYesNoEnum, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
+import { fromYesNoEnum, isLegalRepresentativeUser, penceToPounds, poundsToPence, toYesNoEnum } from '../../utils';
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../utils/buildDraftDefendantResponse';
 import { createRespondToClaimFormStep } from '../formStep';
 
@@ -425,6 +425,22 @@ export const step: StepDefinition = createRespondToClaimFormStep({
       ],
     },
   ],
+  // Show the question as the legend heading for citizens so screen readers read it with the checkboxes.
+  // No change for legal reps
+  extendGetContent: (req, formContent) => {
+    const checkboxField = formContent.fields.find(f => f.componentType === 'checkboxes');
+    if (isLegalRepresentativeUser(req) || !checkboxField?.component) {
+      return {};
+    }
+    checkboxField.component.fieldset = {
+      legend: {
+        text: formContent.heading,
+        isPageHeading: true,
+        classes: 'govuk-fieldset__legend--l govuk-!-margin-bottom-6',
+      },
+    };
+    return { heading: '' };
+  },
   getInitialFormData: (req: Request) => {
     const caseData = req.res?.locals.validatedCase?.data;
     const draftHc = caseData?.possessionClaimResponse?.defendantResponses?.householdCircumstances as

@@ -238,8 +238,6 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const t = getTranslationFunction(req);
     const possessionClaimResponse = req.res?.locals?.validatedCase?.possessionClaimResponse;
     const partyAddress = possessionClaimResponse?.defendantContactDetails?.party?.address;
-    const propertyAddress = req.res?.locals?.validatedCase?.data?.propertyAddress;
-    const addressSource = partyAddress ?? propertyAddress;
     const { formattedAddress: formattedAddressStr } = getExistingAddress(req);
 
     const addressKnown = req.res?.locals.validatedCase?.claimantEnteredDefendantDetailsAddressKnown;
@@ -262,6 +260,10 @@ export const step: StepDefinition = createRespondToClaimFormStep({
     const savedValue = wasPropertyFallback
       ? possessionClaimResponse?.defendantResponses?.propertyAddressConfirmation
       : possessionClaimResponse?.defendantResponses?.correspondenceAddressConfirmation;
+
+    // Only prefill the manual address fields from an address the citizen entered themselves.
+    // Before any answer, party.address still holds the claim-time address, which is not theirs.
+    const addressSource = savedValue === 'NO' ? partyAddress : undefined;
 
     const addressConfirmedRadioSelection =
       req.body?.['correspondenceAddressConfirm'] !== undefined
