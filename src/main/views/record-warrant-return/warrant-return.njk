@@ -85,12 +85,14 @@
     </div>
 
     <div id="date-section" class="govuk-checkboxes__conditional govuk-!-display-none">
+      <div id="date-section-nested" class="{{ 'govuk-checkboxes__conditional' if answers.returnType === 'FINAL' }}">
       {{ dateInput(
             "eviction-date",
             dateLabel,
             "For example, 27 3 2026 14 30. Use the 24-hour clock."
           )
       }}
+      </div>
     </div>
 
     {{ govukCharacterCount({
