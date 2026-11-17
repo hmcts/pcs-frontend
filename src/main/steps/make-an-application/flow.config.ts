@@ -101,7 +101,7 @@ function canApplicationNeedFee(req: Request): boolean {
       getFormData(req, 'is-the-court-hearing-in-the-next-14-days').hearingInNext14Days === 'yes'
     );
   }
-  return ['ADJOURN', 'SET_ASIDE', 'SOMETHING_ELSE'].includes(getTypeOfApplication(req));
+  return ['ADJOURN', 'SET_ASIDE', 'SOMETHING_ELSE', 'SUSPEND'].includes(getTypeOfApplication(req));
 }
 
 function otherPartiesAgreed(req: Request): boolean {
