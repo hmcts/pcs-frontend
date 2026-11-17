@@ -8,7 +8,7 @@ export const writtenTerms = {
   iamNotSureRadioOption: `Nid wyf yn siŵr`,
   saveAndContinueButton: `Cadw a pharhau`,
   saveForLaterButton: `Cadw at hwyrach ymlaen`,
-  cymraegLink: `Cymraeg`,
+  cymraegLink: `English`,
   thereIsAProblemErrorMessageHeader: `Mae yna broblem`,
   selectIfTheLandlordHasSentYouWrittenTermsOfTheOccupationContractErrorMessage: `Dewiswch a yw’r landlord wedi anfon telerau ysgrifenedig atoch o’r contract meddiannaeth`,
 };

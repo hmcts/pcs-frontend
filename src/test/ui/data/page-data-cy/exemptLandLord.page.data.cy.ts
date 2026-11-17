@@ -9,7 +9,7 @@ export const exemptLandLord = {
   imNotSureRadioOption: `Nid wyf yn siŵr`,
   saveAndContinueButton: `Cadw a pharhau`,
   saveForLaterButton: `Cadw at hwyrach ymlaen`,
-  cymraegLink: `Cymraeg`,
+  cymraegLink: `English`,
   thereIsAProblemErrorMessageHeader: `Mae yna broblem`,
   selectIfYouAgreeWithExemptLandLordErrorMessage: `Dewiswch a yw eich landlord yn landlord wedi’i eithrio o dan Ran 1 o Ddeddf Tai (Cymru) 2014`,
   feedbackLink: `adborth (yn agor mewn tab newydd)`,

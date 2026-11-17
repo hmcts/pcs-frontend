@@ -1,5 +1,6 @@
 import { submitCaseApiData } from '../api-data';
 import { submitCaseApiDataWales } from '../api-data/submitCaseWales.api.data';
+import { convertDateFormatTenancyDate } from '../page-data';
 
 export const tenancyDateDetails = {
   mainHeader: `Dyddiad dechrau tenantiaeth, contract meddiannaeth neu drwydded`,
@@ -21,7 +22,7 @@ export const tenancyDateDetails = {
   saveAndContinueButton: `Cadw a pharhau`,
   saveForLaterButton: `Cadw at hwyrach ymlaen`,
   signOutLink: `Allgofnodi`,
-  cymraegLink: `Cymraeg`,
+  cymraegLink: `English`,
   errorValidationHeader: `There is a problem`,
   selectIfTheseTenancyDetailsAreCorrectErrorMessage: `Dewiswch a yw manylion y denantiaeth, drwydded neu gontract meddiannaeth yn gywir`,
   realDateErrorMessage: `Rhaid i ddyddiad dechrau’r denantiaeth fod yn ddyddiad go iawn`,
@@ -32,23 +33,3 @@ export const tenancyDateDetails = {
   feedbackLink: `adborth (yn agor mewn tab newydd)`,
   pageSlug: `tenancy-date-details`,
 };
-
-export function convertDateFormatTenancyDate(dateString: string): string {
-  const cleanedDate = dateString.replace(/(\d+)(st|nd|rd|th)/, `$1`);
-  const date = new Date(cleanedDate);
-
-  const day = date.getDate();
-  const month = date.toLocaleString(`en-US`, { month: `long` });
-  const year = date.getFullYear();
-
-  const suffix =
-    day % 10 === 1 && day !== 11
-      ? `st`
-      : day % 10 === 2 && day !== 12
-        ? `nd`
-        : day % 10 === 3 && day !== 13
-          ? `rd`
-          : `th`;
-
-  return `${day}${suffix} ${month} ${year}`;
-}
