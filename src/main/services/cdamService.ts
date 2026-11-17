@@ -40,7 +40,12 @@ export async function uploadDocument(file: Express.Multer.File, userToken: strin
 
   const filename = raw.originalDocumentName || file.originalname;
 
-  logger.info('Document uploaded to CDAM', { filename });
+  // hasHashToken shows whether pcs-api will be able to attach the draft upload; never log the token itself.
+  logger.info('Document uploaded to CDAM', {
+    filename,
+    documentUrl: raw._links.self.href,
+    hasHashToken: Boolean(raw.hashToken),
+  });
 
   return {
     document_url: raw._links.self.href,
