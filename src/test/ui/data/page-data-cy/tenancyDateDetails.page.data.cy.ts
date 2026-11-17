@@ -23,7 +23,7 @@ export const tenancyDateDetails = {
   saveForLaterButton: `Cadw at hwyrach ymlaen`,
   signOutLink: `Allgofnodi`,
   cymraegLink: `English`,
-  errorValidationHeader: `There is a problem`,
+  errorValidationHeader: `Mae yna broblem`,
   selectIfTheseTenancyDetailsAreCorrectErrorMessage: `Dewiswch a yw manylion y denantiaeth, drwydded neu gontract meddiannaeth yn gywir`,
   realDateErrorMessage: `Rhaid i ddyddiad dechrau’r denantiaeth fod yn ddyddiad go iawn`,
   dayMissingErrorMessage: `Rhaid i ddyddiad dechrau eich tenantiaeth gynnwys day`,

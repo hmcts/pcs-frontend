@@ -28,5 +28,5 @@ export const nonRentArrearsDispute = {
   thereIsAProblemErrorMessageHeader: `Mae yna broblem`,
   selectIfYouWantToDisputeErrorMessage: `Dewiswch a ydych eisiau gwrthwynebu unrhyw rannau eraill o’r hawliad`,
   partsOfClaimDoNotAgreeErrorMessage: `Nodwch y rhannau o’r hawliad nad ydych yn cytuno â nhw`,
-  charLimitErrorMessage: `Explanation must be 6500 characters or less`,
+  charLimitErrorMessage: `Rhaid i’r disgrifiad fod yn 6500 llythyren neu lai`,
 };
