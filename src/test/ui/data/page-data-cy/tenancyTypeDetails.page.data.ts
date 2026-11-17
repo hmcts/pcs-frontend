@@ -1,0 +1,23 @@
+export const tenancyTypeDetails = {
+  mainHeader: `Tenantiaeth, contract meddiannaeth neu gytundeb trwydded`,
+  whenTheyMadeClaimParagraph: `Pan wnaethant wneud eu hawliad, roedd yn rhaid i ${process.env.CLAIMANT_NAME} roi manylion am y math o denantiaeth, contract meddiannaeth neu gytundeb trwydded a lofnodwyd gennych i rentu eich eiddo, a’r dyddiad dechrau, os yn hysbys.`,
+  detailsGivenByClaimantParagraph: `Manylion a roddwyd gan ${process.env.CLAIMANT_NAME}:`,
+  isTenancyTypeCorrectQuestion: `A yw’r math o denantiaeth, contract meddiannaeth neu gytundeb trwydded yn gywir?`,
+  giveCorrectTenancyTypeHiddenTextLabel: `Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded`,
+  giveCorrectTenancyTypeTextInput: `Short term tenancy`,
+  imNotSureRadioOption: `Nid wyf yn siŵr`,
+  noRadioOption: `Nac ydy`,
+  orHintText: `neu`,
+  yesRadioOption: `Ydy`,
+  saveForLaterButton: `Cadw at hwyrach ymlaen`,
+  saveAndContinueButton: `Cadw a pharhau`,
+  backLink: `Yn ôl`,
+  thereIsAProblemErrorMessageHeader: `Mae yna broblem`,
+  emojiTextInput: `👉 😄`,
+  emojiGiveTheCorrectTenancyTypeErrorMessage: `Dylai Rhowch y math cywir o denantiaeth, contract meddiannaeth neu drwydded ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnod, bylchau a chollnod`,
+  selectIfTenancyDetailsErrorMessage: `Dewiswch ydy, nac ydy neu ddim yn siŵr`,
+  enterCorrectTenancyDetailsErrorMessage: `Rhowch y manylion cywir ar gyfer y denantiaeth, drwydded neu gontract meddiannaeth`,
+  characterLimitErrorMessage: `Rhaid i’r math cywir o denantiaeth, contract meddiannaeth neu drwydded fod yn 60 nod neu lai`,
+  tenancyDocumentDynamicLink:
+    'Gweld copi o’r denantiaeth, y contract meddiannaeth neu’r cytundeb trwydded (yn agor mewn tab newydd)',
+};

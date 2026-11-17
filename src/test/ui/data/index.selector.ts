@@ -18,6 +18,7 @@ export const {
   correspondenceAddress,
   tenancyTypeDetails,
   landlordRegistered,
+  exemptLandLord,
   defendantNameConfirmation,
   contactPreferencesTelephone,
   contactPreferencesTextMessage,

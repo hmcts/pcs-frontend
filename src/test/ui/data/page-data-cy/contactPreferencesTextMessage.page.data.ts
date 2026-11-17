@@ -1,0 +1,17 @@
+export const contactPreferencesTextMessage = {
+  mainHeader: `Cysylltu drwy neges testun`,
+  contactByTextMessageParagraph: `Mae’n bosib y byddwn hefyd yn anfon diweddariadau am eich achos atoch drwy negeseuon testun.`,
+  contactByTextMessageQuestion: `Ydych chi’n hapus i ni gysylltu â chi drwy neges testun?`,
+  yesRadioOption: `Ydy`,
+  noRadioOption: `Nac ydy`,
+  saveAndContinueButton: `Cadw a pharhau`,
+  ukMobileNumberHiddenTextLabel: `Rhif ffôn symudol yn y DU`,
+  ukMobileNumberTextInput: `07459444434`,
+  saveForLaterButton: `Cadw at hwyrach ymlaen`,
+  cymraegLink: `English`,
+  backLink: `Yn ôl`,
+  thereIsAProblemErrorMessageHeader: `Mae yna broblem`,
+  selectIfYouWantErrorMessage: `Dewiswch a ydych chi eisiau i ni gysylltu â chi drwy neges testun.`,
+  feedbackLink: `adborth (yn agor mewn tab newydd)`,
+  pageSlug: `contact-preferences-text-message`,
+};
