@@ -384,7 +384,7 @@ function updateAdditionalDetailsLabel(): void {
 }
 
 function updateDateLabel(isEvictionSuccessful: boolean): void {
-  const label = document.getElementById('date-section');
+  const label = document.querySelector('#date-section legend');
   if (!label) {
     return;
   }
