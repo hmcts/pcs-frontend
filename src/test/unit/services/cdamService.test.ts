@@ -1,10 +1,18 @@
 import config from 'config';
 
 import { http } from '@modules/http';
+import { Logger } from '@modules/logger';
 import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cdamService';
 
 jest.mock('config');
 jest.mock('@modules/http');
+// Built inside the factory: @modules/http asks for a logger while it is imported, before this file's own consts exist.
+jest.mock('@modules/logger', () => {
+  const logger = { info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() };
+  return { Logger: { getLogger: jest.fn(() => logger) } };
+});
+
+const mockLogger = Logger.getLogger('cdamService') as unknown as Record<'info' | 'warn' | 'error' | 'debug', jest.Mock>;
 
 const mockPost = http.post as jest.Mock;
 const mockDelete = http.delete as jest.Mock;
@@ -93,6 +101,23 @@ describe('cdamService', () => {
       const result = await uploadDocument(createMockFile(), userToken);
 
       expect(result.document_hash).toBe('hash-123');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Document uploaded to CDAM',
+        expect.objectContaining({ hasHashToken: true })
+      );
+      expect(JSON.stringify(mockLogger.info.mock.calls)).not.toContain('hash-123');
+      expect(mockLogger.warn).not.toHaveBeenCalled();
+    });
+
+    it('warns when CDAM returns no hash token, so an upload pcs-api cannot attach reaches App Insights', async () => {
+      mockPost.mockResolvedValue(cdamResponse);
+
+      await uploadDocument(createMockFile(), userToken);
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        'CDAM returned no hash token, so the upload will not be attached to the case',
+        { documentUrl: 'http://dm-store/documents/abc-123' }
+      );
     });
 
     it('uses file originalname when CDAM returns no document name', async () => {

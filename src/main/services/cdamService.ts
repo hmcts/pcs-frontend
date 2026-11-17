@@ -46,6 +46,13 @@ export async function uploadDocument(file: Express.Multer.File, userToken: strin
     documentUrl: raw._links.self.href,
     hasHashToken: Boolean(raw.hashToken),
   });
+  // A warning, so it reaches App Insights (info does not): without the token pcs-api cannot attach the file,
+  // and CDAM stops serving it a day after upload.
+  if (!raw.hashToken) {
+    logger.warn('CDAM returned no hash token, so the upload will not be attached to the case', {
+      documentUrl: raw._links.self.href,
+    });
+  }
 
   return {
     document_url: raw._links.self.href,
