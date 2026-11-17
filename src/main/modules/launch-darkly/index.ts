@@ -10,6 +10,7 @@ export class LaunchDarkly {
   public async enableFor(app: express.Express): Promise<void> {
     const client: ld.LDClient = ld.init(config.get<string>('secrets.pcs.launchdarkly-sdk-key'), {
       logger: this.logger,
+      offline: config.get<boolean>('launchdarkly.offline'),
     });
 
     // Register before waiting: the SDK retries in the background, so a slow init self-heals.

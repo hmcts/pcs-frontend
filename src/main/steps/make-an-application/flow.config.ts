@@ -13,6 +13,7 @@ export const flowConfig: JourneyFlowConfig = {
   eventId: 'makeAnApplication',
   stepOrder: [
     'choose-an-application',
+    'apply-to-stop-or-delay-the-eviction',
     'ask-to-adjourn-the-court-hearing',
     'ask-the-court-to-set-aside-the-order',
     'ask-the-court-to-make-an-order',
@@ -32,6 +33,9 @@ export const flowConfig: JourneyFlowConfig = {
     'application-submitted',
   ],
   steps: {
+    'apply-to-stop-or-delay-the-eviction': {
+      showCondition: (req: Request) => getTypeOfApplication(req) === 'SUSPEND',
+    },
     'ask-to-adjourn-the-court-hearing': {
       showCondition: (req: Request) => getTypeOfApplication(req) === 'ADJOURN',
     },
@@ -53,8 +57,11 @@ export const flowConfig: JourneyFlowConfig = {
     'you-need-to-apply-for-help-with-your-application-fee': {
       showCondition: (req: Request) => doesFeeApply(req) && needHelpPayingTheFee(req) && !alreadyAppliedForHwf(req),
     },
+    'have-the-other-parties-agreed-to-this-application': {
+      showCondition: (req: Request) => getTypeOfApplication(req) !== 'SUSPEND',
+    },
     'are-there-any-reasons-that-this-application-should-not-be-shared': {
-      showCondition: (req: Request) => !otherPartiesAgreed(req),
+      showCondition: (req: Request) => getTypeOfApplication(req) !== 'SUSPEND' && !otherPartiesAgreed(req),
     },
     'upload-documents-to-support-your-application': {
       showCondition: (req: Request) => documentUploadWanted(req),

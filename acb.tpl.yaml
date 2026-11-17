@@ -17,7 +17,7 @@
 version: 1.0-preview-1
 steps:
   - id: pull-hmcts-base
-    cmd: docker pull --platform linux/amd64 hmctsprod.azurecr.io/base/node:20-alpine
+    cmd: docker pull --platform linux/amd64 hmctsprod.azurecr.io/base/node:24-alpine
     when: ["-"]
     retries: 3
     retryDelay: 5

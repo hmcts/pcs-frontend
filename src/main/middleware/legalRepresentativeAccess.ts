@@ -8,6 +8,11 @@ const LEGAL_REPRESENTATIVE_ALLOWED_PATHS = [
   /^\/cases\/[^/]+\/event\/[^/]+(?:\/.*)?$/,
   /^\/payment\/return\/[^/]+(?:\/.*)?$/,
   /^\/api\/postcode-lookup(?:\/.*)?$/,
+  /^\/accessibility$/,
+  /^\/privacy-policy$/,
+  /^\/cookies$/,
+  /^\/terms-and-conditions$/,
+  /^\/get-help$/,
 ];
 
 export const legalRepresentativeAccessMiddleware: RequestHandler = (

@@ -19,6 +19,8 @@ import type { JourneyFlowConfig } from '@modules/steps/stepFlow.interface';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 import { getDashboardUrl } from '@routes/dashboard';
 import { type UploadValidationOptions, bytesToMb } from '@utils/documentUploadValidation';
+import { getLaunchDarklyFlag } from '@utils/getLaunchDarklyFlag';
+import { RELEASE_1_4_ENABLED } from '@utils/respondToClaimFlags';
 
 export function applyUploadValidationToComponent(
   component: Record<string, unknown>,
@@ -81,6 +83,7 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
     fields,
     beforeRedirect,
     resolveRedirectAfterPost,
+    resolveSaveForLaterRedirect,
     beforeGet,
     extendGetContent,
     getInitialFormData,
@@ -148,6 +151,11 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
           const fileField = formContent.fields?.find(f => f.componentType === 'fileUpload');
           if (fileField?.component) {
             applyUploadValidationToComponent(fileField.component, uploadValidation, t);
+            fileField.component.disableContinueWhileUploading = await getLaunchDarklyFlag(
+              req,
+              RELEASE_1_4_ENABLED,
+              false
+            );
           }
         }
 
@@ -185,7 +193,8 @@ export function createFormStep(config: FormBuilderConfig): StepDefinition {
       showCancelButton,
       extendGetContent,
       documentStorage,
-      resolveRedirectAfterPost
+      resolveRedirectAfterPost,
+      resolveSaveForLaterRedirect
     ),
   };
 }

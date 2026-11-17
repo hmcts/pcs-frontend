@@ -1,0 +1,360 @@
+{% extends "footer/layout.njk" %}
+
+{% block pageTitle %}
+  {{ t('footer/privacy-policy:pageTitle') }}
+{% endblock %}
+
+{% block mainContent %}
+  <h1 class="govuk-heading-xl">{{ t('footer/privacy-policy:privacyPolicy.title') }}</h1>
+  <div id="tabs" class="ui-tabs ui-corner-all ui-widget ui-widget-content">
+      <div id="nav-links">
+          <ul class="govuk-list govuk-list--bullets">
+              <li>{{ t('footer/privacy-policy:privacyPolicy.list.item1') | safe }}</li>
+              <li>{{ t('footer/privacy-policy:privacyPolicy.list.item2') | safe }}</li>
+              <li>{{ t('footer/privacy-policy:privacyPolicy.list.item3') | safe }}</li>
+              <li>{{ t('footer/privacy-policy:privacyPolicy.list.item4') | safe }}</li>
+              <li>{{ t('footer/privacy-policy:privacyPolicy.list.item5') | safe }}</li>
+              <li>{{ t('footer/privacy-policy:privacyPolicy.list.item6') | safe }}</li>
+              <li>{{ t('footer/privacy-policy:privacyPolicy.list.item7') | safe }}</li>
+              <li>{{ t('footer/privacy-policy:privacyPolicy.list.item8') | safe }}</li>
+          </ul>
+          <hr />
+          <div id="tabs-1">
+              <h2 id="overview" class="govuk-heading-l">{{ t('footer/privacy-policy:overview.overview.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.overview.description1') | safe }}</p>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:overview.whoManagesThisService.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.whoManagesThisService.description1') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.whoManagesThisService.description2') | safe }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.whoManagesThisService.description3') }}</p>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:overview.whyWeCollectYourPersonalData.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.whyWeCollectYourPersonalData.description1') }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('footer/privacy-policy:overview.whyWeCollectYourPersonalData.list.item1') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.whyWeCollectYourPersonalData.list.item2') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.whyWeCollectYourPersonalData.list.item3') }}</li>
+              </ul>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.whyWeCollectYourPersonalData.description2') }}</p>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:overview.typesOfPersonalDataWeCollect.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.typesOfPersonalDataWeCollect.description1') }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('footer/privacy-policy:overview.typesOfPersonalDataWeCollect.list.item1') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.typesOfPersonalDataWeCollect.list.item2') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.typesOfPersonalDataWeCollect.list.item3') }}</li>
+              </ul>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.typesOfPersonalDataWeCollect.description2') | safe }}</p>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:overview.usingYourData.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.usingYourData.description1') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.usingYourData.description2') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.usingYourData.description3') }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('footer/privacy-policy:overview.usingYourData.list.item1') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.usingYourData.list.item2') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.usingYourData.list.item3') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.usingYourData.list.item4') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.usingYourData.list.item5') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.usingYourData.list.item6') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.usingYourData.list.item7') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.usingYourData.list.item8') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.usingYourData.list.item9') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.usingYourData.list.item10') }}</li>
+              </ul>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:overview.storingYourData.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.storingYourData.description1') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.storingYourData.description2') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.storingYourData.description3') | safe }}</p>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:overview.sharingYourData.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.sharingYourData.description1') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.sharingYourData.description2') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.sharingYourData.description3') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.sharingYourData.description4') | safe }}</p>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:overview.storingAndSharingYourDataInternationally.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.storingAndSharingYourDataInternationally.description1') }}</p>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:overview.yourRights.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.yourRights.description1') }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list1.item1') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list1.item2') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list1.item3') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list1.item4') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list1.item5') }}</li>
+              </ul>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.yourRights.description2') }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list2.item1') | safe }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list2.item2') }}</li>
+              </ul>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.yourRights.description3') }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list3.item1') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list3.item2') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list3.item3') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list3.item4') }}</li>
+              </ul>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.yourRights.description4') }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list4.item1') }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.yourRights.list4.item2') | safe }}</li>
+              </ul>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:overview.howToComplain.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.howToComplain.description1') | safe }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.howToComplain.description2') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.howToComplain.description3') | safe }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.howToComplain.description4') | safe }}</p>
+              <h2 id="otherservices" class="govuk-heading-m">{{ t('footer/privacy-policy:overview.theServiceYouAreUsing.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:overview.theServiceYouAreUsing.description1') }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('footer/privacy-policy:overview.theServiceYouAreUsing.list.item1') | safe }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.theServiceYouAreUsing.list.item2') | safe }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.theServiceYouAreUsing.list.item3') | safe }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.theServiceYouAreUsing.list.item4') | safe }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.theServiceYouAreUsing.list.item5') | safe }}</li>
+                  <li>{{ t('footer/privacy-policy:overview.theServiceYouAreUsing.list.item6') | safe }}</li>
+              </ul>
+          </div>
+          <div id="tabs-3">
+              <h2 id="divorce" class="govuk-heading-l">{{ t('footer/privacy-policy:applyForDivorceService.usingTheApplyForADivorceService.title') }}</h2>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.description1') }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item1') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item2') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item3') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item4') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item5') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item6') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item7') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item8') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item9') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item10') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item11') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item12') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item13') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item14') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item15') }}</li>
+                  <li>{{ t('footer/privacy-policy:applyForDivorceService.thePersonalDataWeNeed.list.item16') }}</li>
+              </ul>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:applyForDivorceService.receivingNotifications.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:applyForDivorceService.receivingNotifications.description1') }}</p>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:applyForDivorceService.storingYourData2.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:applyForDivorceService.storingYourData2.description1') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:applyForDivorceService.storingYourData2.description2') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:applyForDivorceService.storingYourData2.description3') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:applyForDivorceService.storingYourData2.description4') }}</p>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:applyForDivorceService.sharingYourData2.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:applyForDivorceService.sharingYourData2.description1') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:applyForDivorceService.sharingYourData2.description2') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:applyForDivorceService.sharingYourData2.description3') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:applyForDivorceService.sharingYourData2.description4') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:applyForDivorceService.sharingYourData2.description5') }}</p>
+          </div>
+          <div id="tabs-2">
+              <h2 class="govuk-heading-l">{{ t('footer/privacy-policy:moneyClaimsService.usingTheMoneyClaimsService.title') }}</h2>
+              <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.title') }}</h2>
+              <p class="govuk-body">{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.description1') }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list1.item1') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list1.item2') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list1.item3') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list1.item4') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list1.item5') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list1.item6') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list1.item7') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list1.item8') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list1.item9') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list1.item10') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list1.item11') }}</li>
+              </ul>
+              <p class="govuk-body">{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.description2') }}</p>
+              <p class="govuk-body">{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.description3') }}</p>
+              <ul class="govuk-list govuk-list--bullet">
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list2.item1') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list2.item2') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list2.item3') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list2.item4') }}</li>
+                  <li>{{ t('footer/privacy-policy:moneyClaimsService.thePersonalDataWeNeed2.list2.item5') }}</li>
+              </ul>
+          </div>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:moneyClaimsService.storingYourData3.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:moneyClaimsService.storingYourData3.description1') }}</p>
+          <h2 class="govuk-heading-s">{{ t('footer/privacy-policy:moneyClaimsService.beforeYouSubmitYourInformation.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:moneyClaimsService.beforeYouSubmitYourInformation.description1') }}</p>
+          <h2 class="govuk-heading-s">{{ t('footer/privacy-policy:moneyClaimsService.afterYouSubmitYourInformation.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:moneyClaimsService.afterYouSubmitYourInformation.description1') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:moneyClaimsService.afterYouSubmitYourInformation.description2') }}</p>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:moneyClaimsService.sharingYourData3.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:moneyClaimsService.sharingYourData3.description1') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:moneyClaimsService.sharingYourData3.description2') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:moneyClaimsService.sharingYourData3.description3') }}</p>
+      </div>
+      <div id="tabs-4">
+          <h2 id="probate" class="govuk-heading-l">{{ t('footer/privacy-policy:appealABenefitDecisionService.usingTheAppealABenefitDecisionService.title') }}</h2>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.description1') }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.list1.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.list1.item2') }}</li>
+              <li>{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.list1.item3') }}</li>
+              <li>{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.list1.item4') }}</li>
+              <li>{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.list1.item5') }}</li>
+              <li>{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.list1.item6') }}</li>
+              <li>{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.list1.item7') }}</li>
+          </ul>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.description2') }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.list2.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.list2.item2') }}</li>
+          </ul>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.description3') }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.list3.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:appealABenefitDecisionService.thePersonalDataWeNeed3.list3.item2') }}</li>
+          </ul>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:appealABenefitDecisionService.receivingNotifications2.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealABenefitDecisionService.receivingNotifications2.description1') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealABenefitDecisionService.receivingNotifications2.description2') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealABenefitDecisionService.receivingNotifications2.description3') | safe }}</p>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:appealABenefitDecisionService.storingAndSharingYourData.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealABenefitDecisionService.storingAndSharingYourData.description1') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealABenefitDecisionService.storingAndSharingYourData.description2') }}</p>
+      </div>
+      <div id="tabs-5">
+          <h2 class="govuk-heading-l">{{ t('footer/privacy-policy:applyForProbateService.usingTheApplyForProbateService.title') }}</h2>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:applyForProbateService.thePersonalDataWeCollect.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.thePersonalDataWeCollect.description1') }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:applyForProbateService.thePersonalDataWeCollect.list.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:applyForProbateService.thePersonalDataWeCollect.list.item2') }}</li>
+              <li>{{ t('footer/privacy-policy:applyForProbateService.thePersonalDataWeCollect.list.item3') }}</li>
+              <li>{{ t('footer/privacy-policy:applyForProbateService.thePersonalDataWeCollect.list.item4') }}</li>
+              <li>{{ t('footer/privacy-policy:applyForProbateService.thePersonalDataWeCollect.list.item5') }}</li>
+              <li>{{ t('footer/privacy-policy:applyForProbateService.thePersonalDataWeCollect.list.item6') }}</li>
+          </ul>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:applyForProbateService.storingYourData4.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.storingYourData4.description1') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.storingYourData4.description2') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.storingYourData4.description3') | safe }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:applyForProbateService.storingYourData4.list.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:applyForProbateService.storingYourData4.list.item2') }}</li>
+              <li>{{ t('footer/privacy-policy:applyForProbateService.storingYourData4.list.item3') }}</li>
+              <li>{{ t('footer/privacy-policy:applyForProbateService.storingYourData4.list.item4') }}</li>
+          </ul>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:applyForProbateService.storingYourData5.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.storingYourData5.description1') }}</p>
+          <h2 class="govuk-heading-s">{{ t('footer/privacy-policy:applyForProbateService.beforeYouSubmitYourInformation2.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.beforeYouSubmitYourInformation2.description1') }}</p>
+          <h2 class="govuk-heading-s">{{ t('footer/privacy-policy:applyForProbateService.afterYouSubmitYourInformation2.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.afterYouSubmitYourInformation2.description1') }}</p>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:applyForProbateService.sharingYourData4.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.sharingYourData4.description1') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.sharingYourData4.description2') | safe }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.sharingYourData4.description3') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.sharingYourData4.description4') | safe }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.sharingYourData4.description5') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:applyForProbateService.sharingYourData4.description6') }}</p>
+      </div>
+      <div id="tabs-6">
+          <h2 class="govuk-heading-l">{{ t('footer/privacy-policy:familyPublicLawService.usingTheFamilyPublicLawService.title') }}</h2>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.description1') }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.list1.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.list1.item2') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.list1.item3') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.list1.item4') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.list1.item5') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.list1.item6') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.list1.item7') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.list1.item8') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.list1.item9') }}</li>
+          </ul>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.description2') }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.list2.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatIsThePersonalDataThatWe.list2.item2') | safe }}</li>
+          </ul>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:familyPublicLawService.whatWeDoWithYourData.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.whatWeDoWithYourData.description1') }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatWeDoWithYourData.list.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatWeDoWithYourData.list.item2') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.whatWeDoWithYourData.list.item3') }}</li>
+          </ul>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.whatWeDoWithYourData.description2') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.whatWeDoWithYourData.description3') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.whatWeDoWithYourData.description4') }}</p>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:familyPublicLawService.yourRights2.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.yourRights2.description1') }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.yourRights2.list.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.yourRights2.list.item2') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.yourRights2.list.item3') }}</li>
+              <li>{{ t('footer/privacy-policy:familyPublicLawService.yourRights2.list.item4') }}</li>
+          </ul>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.yourRights2.description2') | safe }}</p>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:familyPublicLawService.sharingYourData5.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.sharingYourData5.description1') | safe }}</p>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:familyPublicLawService.receivingNotifications3.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.receivingNotifications3.description1') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.receivingNotifications3.description2') | safe }}</p>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:familyPublicLawService.howToComplain2.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.howToComplain2.description1') | safe }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:familyPublicLawService.howToComplain2.description2') | safe }}</p>
+      </div>
+      <div id="tabs-7">
+          <h2 class="govuk-heading-l">{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.usingTheAppealAnImmigrationOrAsylum.title') }}</h2>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.thePersonalDataWeNeed4.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.thePersonalDataWeNeed4.description1') }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.thePersonalDataWeNeed4.list.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.thePersonalDataWeNeed4.list.item2') }}</li>
+              <li>{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.thePersonalDataWeNeed4.list.item3') }}</li>
+              <li>{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.thePersonalDataWeNeed4.list.item4') }}</li>
+              <li>{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.thePersonalDataWeNeed4.list.item5') }}</li>
+              <li>{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.thePersonalDataWeNeed4.list.item6') }}</li>
+              <li>{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.thePersonalDataWeNeed4.list.item7') }}</li>
+              <li>{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.thePersonalDataWeNeed4.list.item8') }}</li>
+          </ul>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.storingAndSharingYourData2.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.storingAndSharingYourData2.description1') }}</p>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.afterYouSubmitYourInformation3.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.afterYouSubmitYourInformation3.description1') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.afterYouSubmitYourInformation3.description2') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:appealAnImmigrationOrAsylumDecisionService.afterYouSubmitYourInformation3.description3') }}</p>
+      </div>
+      <div id="tabs-8">
+          <h2 class="govuk-heading-l">{{ t('footer/privacy-policy:possessionClaimsService.usingThePossessionClaimsService.title') }}</h2>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.description1') }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list1.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list1.item2') }}</li>
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list1.item3') }}</li>
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list1.item4') }}</li>
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list1.item5') }}</li>
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list1.item6') }}</li>
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list1.item7') }}</li>
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list1.item8') }}</li>
+          </ul>
+          <p class="govuk-body">{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.description2') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.description3') }}</p>
+          <ul class="govuk-list govuk-list--bullet">
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list2.item1') }}</li>
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list2.item2') }}</li>
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list2.item3') }}</li>
+              <li>{{ t('footer/privacy-policy:possessionClaimsService.thePersonalDataWeNeed5.list2.item4') }}</li>
+          </ul>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:possessionClaimsService.storingYourData6.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:possessionClaimsService.storingYourData6.description1') }}</p>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:possessionClaimsService.beforeYouSubmitYourInformation3.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:possessionClaimsService.beforeYouSubmitYourInformation3.description1') }}</p>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:possessionClaimsService.afterYouSubmitYourInformation4.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:possessionClaimsService.afterYouSubmitYourInformation4.description1') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:possessionClaimsService.afterYouSubmitYourInformation4.description2') }}</p>
+          <h2 class="govuk-heading-m">{{ t('footer/privacy-policy:possessionClaimsService.sharingYourData6.title') }}</h2>
+          <p class="govuk-body">{{ t('footer/privacy-policy:possessionClaimsService.sharingYourData6.description1') }}</p>
+          <p class="govuk-body">{{ t('footer/privacy-policy:possessionClaimsService.sharingYourData6.description2') }}</p>
+      </div>
+  </div>
+
+{% endblock %}

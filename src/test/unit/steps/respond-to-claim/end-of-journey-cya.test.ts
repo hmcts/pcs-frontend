@@ -227,7 +227,9 @@ describe('respond-to-claim end-of-journey-cya step — draft changed after revie
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const content = (await getEndOfJourneyCyaContent(req, {} as never)) as any;
 
-    expect(content.errorSummary.errorList[0].href).toBe(`/case/${CASE_REF}/respond-to-claim/correspondence-address`);
+    expect(content.errorSummary.errorList[0].href).toBe(
+      `/case/${CASE_REF}/respond-to-claim/correspondence-address?nav=1`
+    );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect((req as any).session.respondToClaimSubmitRejection).toBeUndefined();
   });

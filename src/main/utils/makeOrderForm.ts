@@ -1,40 +1,191 @@
+import escapeHtml from 'escape-html';
 import { DateTime } from 'luxon';
 
-import type { AttendanceParty, MakeOrderType } from '@utils/makeOrderValidation';
-import type { FormData, OrderParty, OrderStart } from '@utils/orderCase';
+import { parseDate, parseMoney } from '@utils/makeOrderFormat';
+import {
+  type ApplicationToDecide,
+  type AttendanceParty,
+  type MakeOrderType,
+  applicationPrefix,
+} from '@utils/makeOrderValidation';
+import type {
+  FormData,
+  OrderApplication,
+  OrderCaseBundle,
+  OrderHearing,
+  OrderParty,
+  OrderStart,
+} from '@utils/orderCase';
 
 const DEFAULT_ORDER_TYPE: MakeOrderType = 'OUTRIGHT_POSSESSION';
+const WITHOUT_HEARING_ORDER_TYPE: MakeOrderType = 'FREE_FORM';
+/** An order on the applications alone, which with one open is where the screen starts. */
+const NO_CLAIM_ORDER_TYPE: MakeOrderType = 'NO_ORDER_ON_CLAIM';
 
-/** Pre-fills the case facts fields from the claim, in the form's field names. */
+const YES_NO: Record<string, string> = { YES: 'Yes', NO: 'No' };
+
+function displayDate(iso?: string | null): string | undefined {
+  const date = DateTime.fromISO(String(iso ?? ''), { zone: 'Europe/London' });
+  return date.isValid ? date.setLocale('en-GB').toFormat('d MMMM yyyy') : undefined;
+}
+
+/** The case bundle as the order pages link it, with when it was last brought up to date. */
+function caseBundleModel(bundle: OrderCaseBundle, caseReference: number) {
+  const updated = DateTime.fromISO(String(bundle.updatedAt ?? ''));
+  return {
+    href: `/case/${caseReference}/view-documents/${encodeURIComponent(bundle.id)}`,
+    updatedDisplay: updated.isValid
+      ? updated
+          .setZone('Europe/London')
+          .setLocale('en-GB')
+          .toFormat("d MMMM yyyy 'at' h:mma")
+          .replace(/AM|PM/, m => m.toLowerCase())
+      : undefined,
+  };
+}
+
+/**
+ * The application as its row shows it: its answers in words, and its dates as the court writes them. Its answers on
+ * the form start with its prefix, so each application the order can decide keeps its own.
+ */
+function applicationModel(application: OrderApplication & ApplicationToDecide, caseReference: number) {
+  const href = (id: string): string => `/case/${caseReference}/view-documents/${encodeURIComponent(id)}`;
+  return {
+    ...application,
+    prefix: applicationPrefix(application),
+    // As its lines, which the judge can put in the order.
+    whatOrderWantedHtml: application.whatOrderWanted
+      ? `<p>${escapeHtml(application.whatOrderWanted).replace(/\r?\n/g, '<br>')}</p>`
+      : '',
+    documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
+    submittedOnDisplay: displayDate(application.submittedOn),
+    within14DaysDisplay: YES_NO[application.within14Days ?? ''],
+    otherPartiesAgreedDisplay: YES_NO[application.otherPartiesAgreed ?? ''],
+    withoutNoticeDisplay: YES_NO[application.withoutNotice ?? ''],
+  };
+}
+
+// The case facts as pcs-api names them, against the form's fields.
+const FACT_FIELDS: Record<string, string> = {
+  tenancyType: 'tenancy-type',
+  currentRent: 'current-rent',
+  rentFrequency: 'rent-frequency',
+  groundsPleaded: 'grounds-pleaded',
+  arrearsAtNotice: 'arrears-notice',
+  arrearsAtIssue: 'arrears-issue',
+  lastPayment: 'last-payment',
+  arrearsToday: 'arrears-today',
+};
+const MONEY_FACTS = new Set(['currentRent', 'arrearsAtNotice', 'arrearsAtIssue', 'lastPayment', 'arrearsToday']);
+const DATE_FACTS: Record<string, string> = {
+  tenancyStartDate: 'date-tenancy',
+  noticeDate: 'date-notice',
+  lastPaymentDate: 'date-last-payment',
+};
+
+/** The case facts panel's fields: the hearing's record, which is never part of the order. */
+const HEARING_RECORD_FIELDS = new Set([
+  ...Object.values(FACT_FIELDS),
+  ...Object.values(DATE_FACTS).flatMap(field => ['day', 'month', 'year'].map(part => `${field}-${part}`)),
+  'hearing-notes',
+]);
+
+/** The order's answers, without the hearing's facts and note. */
+export function withoutHearingRecord(formData: FormData): FormData {
+  return Object.fromEntries(Object.entries(formData).filter(([field]) => !HEARING_RECORD_FIELDS.has(field)));
+}
+
+/** Pre-fills the case facts fields, in the form's field names. */
 function caseFactsFormData(caseFacts: Record<string, unknown> = {}): FormData {
   const formData: FormData = {};
-  const fields: Record<string, string> = {
-    tenancyType: 'tenancy-type',
-    currentRent: 'current-rent',
-    rentFrequency: 'rent-frequency',
-    groundsPleaded: 'grounds-pleaded',
-  };
-  const dates: Record<string, string> = { tenancyStartDate: 'date-tenancy', noticeDate: 'date-notice' };
-  for (const [fact, field] of Object.entries(fields)) {
+  for (const [fact, field] of Object.entries(FACT_FIELDS)) {
     if (caseFacts[fact] !== undefined && caseFacts[fact] !== null) {
       formData[field] = String(caseFacts[fact]);
     }
   }
-  for (const [fact, field] of Object.entries(dates)) {
+  for (const [fact, field] of Object.entries(DATE_FACTS)) {
     const date = DateTime.fromISO(String(caseFacts[fact] ?? ''));
     if (date.isValid) {
-      formData[`${field}-day`] = String(date.day);
-      formData[`${field}-month`] = String(date.month);
-      formData[`${field}-year`] = String(date.year);
+      Object.assign(formData, {
+        [`${field}-day`]: String(date.day),
+        [`${field}-month`]: String(date.month),
+        [`${field}-year`]: String(date.year),
+      });
     }
   }
   return formData;
+}
+
+/** The case facts as the judge left them in the form, as pcs-api records them for the hearing. */
+export function caseFactsFromForm(formData: FormData): Record<string, unknown> {
+  const text = (field: string): string => String(formData[field] ?? '').trim();
+  const facts: Record<string, unknown> = {};
+  for (const [fact, field] of Object.entries(FACT_FIELDS)) {
+    facts[fact] = MONEY_FACTS.has(fact) ? (parseMoney(text(field)) ?? null) : text(field) || null;
+  }
+  for (const [fact, field] of Object.entries(DATE_FACTS)) {
+    const date = parseDate(text(`${field}-day`), text(`${field}-month`), text(`${field}-year`));
+    facts[fact] = date ? date.toISOString().slice(0, 10) : null;
+  }
+  return facts;
+}
+
+const noteText = (note: unknown): string =>
+  String(note ?? '')
+    .replace(/\r\n/g, '\n')
+    .trim();
+
+/** Whether the judge changed the hearing's facts or note from those the page started with. */
+export function hearingRecordChanged(started: OrderHearing, formData: FormData): boolean {
+  const startedFacts = caseFactsFromForm(caseFactsFormData(started.caseFacts));
+  return (
+    JSON.stringify(caseFactsFromForm(formData)) !== JSON.stringify(startedFacts) ||
+    noteText(formData['hearing-notes']) !== noteText(started.note)
+  );
+}
+
+/**
+ * The hearing as the case facts panel shows it: its date, whose facts the judge starts from, and the case's
+ * earlier judicial notes, newest first. An order made without a hearing has none of these.
+ */
+function hearingModel(hearing: OrderHearing | null | undefined): Record<string, unknown> {
+  if (!hearing) {
+    return { hearing: null };
+  }
+  const recorded = hearing.recorded;
+  return {
+    hearing,
+    hearingDateDisplay: displayDate(hearing.date),
+    factsRecordedDisplay: recorded
+      ? `Last updated by ${recorded.by ?? 'a judge'} on ${displayDate(recorded.on)}`
+      : 'From the claim',
+    earlierNotes: hearing.earlierNotes.map(note => ({
+      by: note.by ?? 'A judge',
+      when: displayDate(note.hearingDate ?? note.createdOn),
+      note: note.note,
+    })),
+  };
 }
 
 /** A row of the attendance register. */
 interface AttendanceRow extends AttendanceParty {
   partyId: string;
   name: string;
+}
+
+/**
+ * The case's open applications the order can decide, the one the judge's task asked them to decide first: that
+ * one they must decide, and the others they may leave as they are.
+ */
+export function applicationsToDecide({
+  caseContext,
+  taskGenAppId,
+}: Pick<OrderStart, 'caseContext' | 'taskGenAppId'>): (OrderApplication & ApplicationToDecide)[] {
+  const applications = (caseContext.applications ?? []).map(application => ({
+    ...application,
+    required: application.id === taskGenAppId,
+  }));
+  return [...applications.filter(a => a.required), ...applications.filter(a => !a.required)];
 }
 
 export function attendanceParties({ caseContext }: OrderStart): AttendanceRow[] {
@@ -57,19 +208,32 @@ export interface OrderFormSubmission {
 }
 
 /**
- * What the make order form shows: the order's answers and document, or those last sent, over the facts
- * of the case.
+ * What the make order form shows, for the judge making an order and the caseworker reviewing it: the
+ * order's answers and document, or those last sent, over the facts of the case.
  */
 export function orderFormModel(start: OrderStart, submission?: OrderFormSubmission): Record<string, unknown> {
-  const { caseContext, order } = start;
-  const draft: FormData = {
-    ...caseFactsFormData(caseContext.caseFacts),
-    ...(submission?.formData ?? order.formData),
-  };
+  const { caseContext, order, hearing } = start;
+  const applications = applicationsToDecide(start);
+  // A hearing's facts and note are pcs-api's record of the hearing, kept apart from the order. The caseworker's
+  // review is sent the hearing without them.
+  const recorded: FormData = hearing?.caseFacts
+    ? { ...caseFactsFormData(hearing.caseFacts), 'hearing-notes': hearing.note ?? '' }
+    : {};
+  const draft: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
+  // With an application open the order starts as one on the applications alone, the claim's order types waiting
+  // behind a tick box.
+  const defaultOrderType = applications.length
+    ? NO_CLAIM_ORDER_TYPE
+    : hearing
+      ? DEFAULT_ORDER_TYPE
+      : WITHOUT_HEARING_ORDER_TYPE;
   return {
     draft,
-    draftOrderType: submission?.orderType ?? order.orderType ?? DEFAULT_ORDER_TYPE,
-    orderDocumentJson: submission?.orderDocumentJson ?? JSON.stringify(order.docweaveSnapshot ?? null),
+    draftOrderType: submission?.orderType ?? order.orderType ?? defaultOrderType,
+    // Made at a hearing, the order records its facts and who attended, and may order possession.
+    withoutHearing: !hearing,
+    orderDocumentJson:
+      submission?.orderDocumentJson ?? (order.docweaveSnapshot ? JSON.stringify(order.docweaveSnapshot) : ''),
     draftValue: (name: string): unknown => draft[name],
     draftChecked: (name: string, value: string): boolean => {
       const saved = draft[name];
@@ -79,7 +243,11 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     draftSelect: (items: Record<string, unknown>[], name: string, defaultValue?: string) =>
       items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) })),
     attendanceParties: attendanceParties(start),
+    // Every party, for the wording of an order made without anyone's attendance to name them.
+    orderParties: attendanceParties(start).map(({ partyId, name, type }) => ({ id: partyId, name, type })),
     openCounterclaim: caseContext.openCounterclaim === true,
-    openApplication: caseContext.openApplication === true,
+    applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
+    ...hearingModel(hearing),
+    caseBundle: caseContext.caseBundle ? caseBundleModel(caseContext.caseBundle, caseContext.caseReference) : undefined,
   };
 }

@@ -32,7 +32,7 @@
       {% endif %}
 
       {% if defendant1Details.rows.length %}
-        <h2 class="govuk-heading-m">{{ t('viewTheResponse:sections.defendant1Details') }}</h2>
+        <h2 class="govuk-heading-m">{{ defendant1Details.sectionTitle }}</h2>
         {{ govukSummaryList({ rows: defendant1Details.rows }) }}
       {% endif %}
 
