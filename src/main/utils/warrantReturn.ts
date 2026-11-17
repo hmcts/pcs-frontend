@@ -305,7 +305,7 @@ export function isAdditionalDetailsMandatory(selection: WarrantReturnSelection):
 }
 
 const HIDDEN_CLASS = 'govuk-!-display-none';
-const CONDITIONAL_CLASS = 'govuk-checkboxes__conditional'
+const CONDITIONAL_CLASS = 'govuk-checkboxes__conditional';
 const DEFAULT_ADDITIONAL_DETAILS_LABEL = 'Additional details';
 const OPTIONAL_ADDITIONAL_DETAILS_LABEL = 'Additional details (Optional)';
 const EVICTION_DATE_LABEL = 'Eviction date and time';
@@ -362,7 +362,7 @@ function updateWarrantReturnVisibility(): void {
 
   const isEvictionDateVisible = isEvictionSuccessful || isEvictionUnsuccessfulOrCancelled || isInterim;
   setSectionVisible('date-section', isEvictionDateVisible, () => EVICTION_DATE_INPUT_IDS.forEach(resetInput));
-   document.getElementById('date-section-nested')?.classList.toggle(CONDITIONAL_CLASS, isFinal)
+  document.getElementById('date-section-nested')?.classList.toggle(CONDITIONAL_CLASS, isFinal);
 
   updateDateLabel(isEvictionSuccessful);
   updateAdditionalDetailsLabel();
