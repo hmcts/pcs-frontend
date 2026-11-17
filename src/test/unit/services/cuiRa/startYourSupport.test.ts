@@ -2,11 +2,16 @@ import config from 'config';
 import type { Request } from 'express';
 
 import { http } from '@modules/http';
+import { ccdCaseService } from '@services/ccdCaseService';
 import { cuiRaService } from '@services/cuiRa/cuiRaService';
 import { startYourSupport } from '@services/cuiRa/startYourSupport';
 
 jest.mock('config', () => ({
   get: jest.fn(),
+}));
+
+jest.mock('@services/ccdCaseService', () => ({
+  ccdCaseService: { getDefendantSupport: jest.fn() },
 }));
 
 jest.mock('@services/cuiRa/cuiRaService', () => ({
@@ -162,6 +167,90 @@ describe('startYourSupport', () => {
         }),
       })
     );
+  });
+
+  it('does not read party support while the response is still being prepared', async () => {
+    const { req } = buildReq();
+
+    await startYourSupport(req);
+
+    expect(ccdCaseService.getDefendantSupport).not.toHaveBeenCalled();
+  });
+
+  describe('once the response has been submitted', () => {
+    // Post-submit the respond START carries only the SUBMITTED marker (the draft is gone), so the
+    // party's flags and pcs-api's name for the party come from the requestSupport START instead.
+    const submittedCase = {
+      id: '1234123412341234',
+      defendantContactDetailsPartyName: '',
+      claimantEnteredDefendantDetailsName: '',
+      defendantName: 'John Doe',
+      data: { possessionClaimResponse: { defendantResponses: { status: 'SUBMITTED' } } },
+    };
+
+    it('pre-populates existingFlags and partyName from the party support flags', async () => {
+      (ccdCaseService.getDefendantSupport as jest.Mock).mockResolvedValue({
+        partyId: 'party-1',
+        supportFlags: {
+          partyName: 'Jo Bloggs',
+          roleOnCase: 'Defendant',
+          details: [
+            {
+              id: 'f1',
+              value: { name: 'Hearing loop', flagCode: 'RA0043', path: [{ id: 'p1', value: 'Reasonable adjustment' }] },
+            },
+          ],
+        },
+      });
+      const { req } = buildReq({ res: { locals: { validatedCase: submittedCase } } });
+
+      await startYourSupport(req);
+
+      expect(ccdCaseService.getDefendantSupport).toHaveBeenCalledWith('idam-access-token', '1234123412341234');
+      expect(cuiRaService.invokePayload).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({
+            existingFlags: {
+              partyName: 'Jo Bloggs',
+              roleOnCase: 'Defendant',
+              details: [
+                {
+                  id: 'f1',
+                  value: {
+                    name: 'Hearing loop',
+                    flagCode: 'RA0043',
+                    path: [{ id: 'p1', name: 'Reasonable adjustment' }],
+                  },
+                },
+              ],
+            },
+          }),
+        })
+      );
+    });
+
+    it('falls back to the case defendant name when the party has no support flags yet', async () => {
+      (ccdCaseService.getDefendantSupport as jest.Mock).mockResolvedValue({ partyId: 'party-1' });
+      const { req } = buildReq({ res: { locals: { validatedCase: submittedCase } } });
+
+      await startYourSupport(req);
+
+      expect(cuiRaService.invokePayload).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.objectContaining({
+            existingFlags: { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] },
+          }),
+        })
+      );
+    });
+
+    it('surfaces a failure to read party support so the caller can show the error page', async () => {
+      (ccdCaseService.getDefendantSupport as jest.Mock).mockRejectedValue(new Error('ccd down'));
+      const { req } = buildReq({ res: { locals: { validatedCase: submittedCase } } });
+
+      await expect(startYourSupport(req)).rejects.toThrow('ccd down');
+      expect(cuiRaService.invokePayload).not.toHaveBeenCalled();
+    });
   });
 
   it('throws 401 when there is no access token', async () => {

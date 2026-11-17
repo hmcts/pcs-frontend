@@ -14,6 +14,10 @@ import {
 
 export type { CcdCase, PossessionClaimResponse, YesNoNotSureValue } from '@services/ccdCase.interface';
 
+export function isDefendantResponseSubmitted(data: CcdCaseData | undefined): boolean {
+  return data?.possessionClaimResponse?.defendantResponses?.status === 'SUBMITTED';
+}
+
 export class CcdCaseModel {
   protected readonly validatedCase: CcdCase;
 

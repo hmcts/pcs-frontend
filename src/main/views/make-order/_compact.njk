@@ -42,6 +42,7 @@
       value: item.value,
       text: item.text,
       html: item.html,
+      hint: item.hint,
       conditional: item.conditional,
       checked: draftChecked(name, item.value) or (item.value == params.default and not draftValue(name)),
       attributes: { required: true } if not params.optional
@@ -51,7 +52,10 @@
     idPrefix: params.idPrefix or name,
     name: name,
     classes: params.classes,
-    fieldset: { legend: { text: params.legend, classes: "govuk-fieldset__legend--s" } } if params.legend,
+    fieldset: {
+      legend: { text: params.legend, classes: "govuk-visually-hidden" if params.legendHidden else "govuk-fieldset__legend--s" }
+    } if params.legend,
+    hint: { text: params.hint } if params.hint,
     errorMessage: validationErrors[name],
     items: items
   }) }}
@@ -64,6 +68,7 @@
       value: item.value,
       text: item.text,
       html: item.html,
+      hint: item.hint,
       conditional: item.conditional,
       disabled: item.disabled,
       checked: draftChecked(name, item.value) or (item.value == params.default and not draftValue(name))

@@ -15,6 +15,11 @@ jest.mock('../../../main/middleware/oidc', () => ({
   oidcMiddleware: mockOidcMiddleware,
 }));
 
+const mockCitizenOnlyMiddleware = jest.fn((req, res, next) => next());
+jest.mock('../../../main/middleware/citizenOnlyStepsAccess', () => ({
+  citizenOnlyStepsAccessMiddleware: mockCitizenOnlyMiddleware,
+}));
+
 const mockFeatureMiddleware = jest.fn((req, res, next) => next());
 jest.mock('../../../main/middleware/respondToClaimFeatureMiddleware', () => ({
   respondToClaimFeatureMiddleware: mockFeatureMiddleware,
@@ -32,8 +37,13 @@ jest.mock('@services/cuiRa/cuiRaService', () => ({
 
 const mockUpdateDraft = jest.fn();
 const mockGetCaseByIdForEvent = jest.fn();
+const mockSubmitDefendantSupportFlags = jest.fn();
 jest.mock('@services/ccdCaseService', () => ({
-  ccdCaseService: { updateDraft: mockUpdateDraft, getCaseByIdForEvent: mockGetCaseByIdForEvent },
+  ccdCaseService: {
+    updateDraft: mockUpdateDraft,
+    getCaseByIdForEvent: mockGetCaseByIdForEvent,
+    submitDefendantSupportFlags: mockSubmitDefendantSupportFlags,
+  },
 }));
 
 const mockGetValidS2SToken = jest.fn();
@@ -77,10 +87,11 @@ describe('reasonableAdjustmentsCallback routes', () => {
     claimantName: 'Acme Landlord',
     claimantEnteredDefendantDetails: { firstName: 'Jo' },
   };
-  // Only the defendant slice should be re-sent (defendantContactDetails + defendantResponses).
+  // Only the defendant slice should be re-sent (defendantContactDetails + defendantResponses), and
+  // every pre-submission write records Your Support as complete.
   const expectedDefendantSlice = {
     defendantContactDetails: { party: { emailAddress: 'defendant@example.com' } },
-    defendantResponses: { situation_HasMoved: 'NO' },
+    defendantResponses: { situation_HasMoved: 'NO', completedSections: ['YOUR_SUPPORT'] },
   };
 
   beforeEach(() => {
@@ -91,10 +102,11 @@ describe('reasonableAdjustmentsCallback routes', () => {
     reasonableAdjustmentsCallbackRoutes({ get: mockAppGet } as unknown as Application);
   });
 
-  it('registers the callback route behind oidc, the respond-to-claim and the Your Support feature-flag middleware', () => {
+  it('registers the callback route behind oidc, the citizen-only guard, the respond-to-claim and the Your Support feature-flag middleware', () => {
     expect(mockAppGet).toHaveBeenCalledWith(
       ROUTE,
       mockOidcMiddleware,
+      mockCitizenOnlyMiddleware,
       mockFeatureMiddleware,
       mockCuiYsMiddleware,
       expect.any(Function)
@@ -162,6 +174,7 @@ describe('reasonableAdjustmentsCallback routes', () => {
       },
       { context: 'x' }
     );
+    expect(mockSubmitDefendantSupportFlags).not.toHaveBeenCalled();
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
   });
 
@@ -194,37 +207,140 @@ describe('reasonableAdjustmentsCallback routes', () => {
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
   });
 
-  it('routes to the "no request sent" page (no persist) when a submit carries no flags at all', async () => {
+  describe('submitted the microsite without adding or changing anything', () => {
+    // Both flag collections come back empty. That is an explicit "no support needed", so the draft is
+    // marked complete (task-list row Done) and the citizen still sees the "not changed" page.
+    const noSupportNeededSlice = {
+      defendantContactDetails: expectedDefendantSlice.defendantContactDetails,
+      defendantResponses: { situation_HasMoved: 'NO', completedSections: ['YOUR_SUPPORT'] },
+    };
+
+    it('records YOUR_SUPPORT as a completed section when the payload carries no flags at all', async () => {
+      mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
+      const res = {} as unknown as Response;
+
+      await getHandler()(buildReq(), res);
+
+      expect(mockUpdateDraft).toHaveBeenCalledWith(
+        RESPOND_TO_CLAIM_DRAFT_EVENT,
+        'user-tok',
+        '123',
+        { possessionClaimResponse: noSupportNeededSlice },
+        { context: 'x' }
+      );
+      expect(mockSubmitDefendantSupportFlags).not.toHaveBeenCalled();
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
+    });
+
+    it('records YOUR_SUPPORT when replacementFlags is present but its details are empty', async () => {
+      mockGetPayload.mockResolvedValue({
+        action: 'submit',
+        correlationId: '123',
+        replacementFlags: { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] },
+      });
+      const res = {} as unknown as Response;
+
+      await getHandler()(buildReq(), res);
+
+      expect(mockUpdateDraft).toHaveBeenCalledWith(
+        RESPOND_TO_CLAIM_DRAFT_EVENT,
+        'user-tok',
+        '123',
+        { possessionClaimResponse: noSupportNeededSlice },
+        { context: 'x' }
+      );
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
+    });
+
+    it('keeps flags already on the draft when recording "no support needed"', async () => {
+      const storedFlags = {
+        partyName: 'John Doe',
+        roleOnCase: 'Defendant',
+        details: [{ id: 'd1', value: { flagCode: 'RA0042', path: [] } }],
+      };
+      mockGetCaseByIdForEvent.mockResolvedValue({
+        id: '123',
+        data: { possessionClaimResponse: { ...existingResponse, defendantFlags: storedFlags } },
+      });
+      mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
+      const res = {} as unknown as Response;
+
+      await getHandler()(buildReq(), res);
+
+      expect(mockUpdateDraft).toHaveBeenCalledWith(
+        RESPOND_TO_CLAIM_DRAFT_EVENT,
+        'user-tok',
+        '123',
+        { possessionClaimResponse: { ...noSupportNeededSlice, defendantFlags: storedFlags } },
+        { context: 'x' }
+      );
+    });
+
+    it('writes nothing when Your Support is already recorded as complete (the write would be identical)', async () => {
+      mockGetCaseByIdForEvent.mockResolvedValue({
+        id: '123',
+        data: {
+          possessionClaimResponse: {
+            ...existingResponse,
+            defendantResponses: { situation_HasMoved: 'NO', completedSections: ['YOUR_SUPPORT'] },
+          },
+        },
+      });
+      mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
+      const res = {} as unknown as Response;
+
+      await getHandler()(buildReq(), res);
+
+      expect(mockUpdateDraft).not.toHaveBeenCalled();
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
+    });
+
+    it('redirects to the error page when recording "no support needed" fails', async () => {
+      mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
+      mockUpdateDraft.mockRejectedValueOnce(new Error('ccd down'));
+      const res = {} as unknown as Response;
+
+      await getHandler()(buildReq(), res);
+
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
+    });
+  });
+
+  it('normalises the draft like every other draft save before writing (stale answers are dropped)', async () => {
+    // contactByText is only reachable when contactByPhone is YES; the shared normaliser removes the
+    // stale answer, and the callback must go through it rather than re-persisting the draft verbatim.
+    mockGetCaseByIdForEvent.mockResolvedValue({
+      id: '123',
+      data: {
+        possessionClaimResponse: {
+          ...existingResponse,
+          defendantResponses: { situation_HasMoved: 'NO', contactByPhone: 'NO', contactByText: 'YES' },
+        },
+      },
+    });
     mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
     const res = {} as unknown as Response;
 
     await getHandler()(buildReq(), res);
 
-    expect(mockUpdateDraft).not.toHaveBeenCalled();
-    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
-  });
-
-  it('routes to the "no request sent" page (no persist) when replacementFlags is present but its details are empty', async () => {
-    mockGetPayload.mockResolvedValue({
-      action: 'submit',
-      correlationId: '123',
-      replacementFlags: { partyName: 'John Doe', roleOnCase: 'Defendant', details: [] },
+    const saved = mockUpdateDraft.mock.calls[0][3] as {
+      possessionClaimResponse: { defendantResponses: Record<string, unknown> };
+    };
+    expect(saved.possessionClaimResponse.defendantResponses).toEqual({
+      situation_HasMoved: 'NO',
+      contactByPhone: 'NO',
+      completedSections: ['YOUR_SUPPORT'],
     });
-    const res = {} as unknown as Response;
-
-    await getHandler()(buildReq(), res);
-
-    expect(mockUpdateDraft).not.toHaveBeenCalled();
-    expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
   });
 
-  it('redirects to the "no request sent" page (and does not persist) when the action is cancel', async () => {
+  it('redirects to the "not changed" page and writes nothing when the action is cancel', async () => {
     mockGetPayload.mockResolvedValue({ action: 'cancel', correlationId: '123' });
     const res = {} as unknown as Response;
 
     await getHandler()(buildReq(), res);
 
     expect(mockUpdateDraft).not.toHaveBeenCalled();
+    expect(mockSubmitDefendantSupportFlags).not.toHaveBeenCalled();
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
   });
 
@@ -272,5 +388,56 @@ describe('reasonableAdjustmentsCallback routes', () => {
     await getHandler()(buildReq(), res);
 
     expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
+  });
+
+  describe('after the response has been submitted', () => {
+    // Post-submit the respondPossessionClaim START returns only the SUBMITTED marker: the draft has
+    // been deleted, so there is nothing to re-send and the flags must go to the party instead.
+    const submittedResponse = { defendantResponses: { status: 'SUBMITTED' } };
+    const flags = {
+      partyName: 'John Doe',
+      roleOnCase: 'Defendant',
+      details: [{ id: 'd1', value: { flagCode: 'RA0042', path: [{ id: 'p1', name: 'Reasonable adjustment' }] } }],
+    };
+
+    beforeEach(() => {
+      mockGetCaseByIdForEvent.mockResolvedValue({ id: '123', data: { possessionClaimResponse: submittedResponse } });
+      mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123', replacementFlags: flags });
+    });
+
+    it('writes the flags to the party through requestSupport instead of the respond draft', async () => {
+      const res = {} as unknown as Response;
+
+      await getHandler()(buildReq(), res);
+
+      expect(mockSubmitDefendantSupportFlags).toHaveBeenCalledWith('user-tok', '123', {
+        partyName: 'John Doe',
+        roleOnCase: 'Defendant',
+        details: [{ id: 'd1', value: { flagCode: 'RA0042', path: [{ id: 'p1', value: 'Reasonable adjustment' }] } }],
+      });
+      expect(mockUpdateDraft).not.toHaveBeenCalled();
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, confirmationUrl, '/case/123', ['/case']);
+    });
+
+    it('shows the "not changed" page and writes nothing when nothing was changed (no draft to mark)', async () => {
+      mockGetPayload.mockResolvedValue({ action: 'submit', correlationId: '123' });
+      const res = {} as unknown as Response;
+
+      await getHandler()(buildReq(), res);
+
+      expect(mockUpdateDraft).not.toHaveBeenCalled();
+      expect(mockSubmitDefendantSupportFlags).not.toHaveBeenCalled();
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, cancelledUrl, '/case/123', ['/case']);
+    });
+
+    it('redirects to the error page when the requestSupport write fails', async () => {
+      mockSubmitDefendantSupportFlags.mockRejectedValue(new Error('ccd down'));
+      const res = {} as unknown as Response;
+
+      await getHandler()(buildReq(), res);
+
+      expect(mockUpdateDraft).not.toHaveBeenCalled();
+      expect(mockSafeRedirect303).toHaveBeenCalledWith(res, errorUrl, '/case/123', ['/case']);
+    });
   });
 });

@@ -2,6 +2,7 @@
   "pageTitle": "Application submitted",
   "applicationSubmitted": "Application submitted",
   "paymentBeingProcessed": "Payment being processed",
+  "suspendRequestReceived": "We have received your request to suspend the eviction.",
   "adjournRequestReceived": "We have received your request to adjourn (delay) the court hearing.",
   "setAsideRequestReceived": "We have received your request to set aside (cancel) the order.",
   "somethingElseRequestReceived": "We have received your request to ask the court to make an order.",
