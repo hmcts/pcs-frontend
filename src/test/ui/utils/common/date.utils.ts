@@ -88,3 +88,12 @@ export function convertDateFormat(dateString: string): string {
     month: 'long',
   })} ${date.getFullYear()}`;
 }
+
+export const getFormattedDate = (date = new Date()): string =>
+  new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+    .format(date)
+    .replace(',', '');
