@@ -1,7 +1,18 @@
 {
-  "pageTitle": "Choose your application",
-  "caption": "Stop or delay an eviction",
-  "heading": "Choose your application",
+  "pageTitle": "Choose an application",
+  "pageTitle_r2": "Choose your application",
+  "caption": "Make an application",
+  "caption_r2": "Stop or delay an eviction",
+  "heading": "Choose an application",
+  "heading_r2": "Choose your application",
+  "noticeText": "You cannot apply to suspend (stop or delay) the eviction online.",
+  "noticeTextByPost": "You must apply by post: ",
+  "noticeTextList": {
+    "readTheGuidance": "<a href=\"https://www.gov.uk/repossession/delay-eviction\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">read the guidance explaining how to suspend the eviction (GOV.UK, opens in a new tab)</a>",
+    "fillInTheForm": "<a href=\"https://www.gov.uk/government/publications/form-n244-application-notice\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">fill in the N244a form</a>",
+    "findYourLocalCourt": "<a href=\"https://www.gov.uk/find-court-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">find your local court</a>",
+    "sendTheFormToTheCourt": "send the completed form to the court, or deliver it by hand"
+  },
   "question": "What do you want to apply for?",
   "hintText": "Some optional hint text here (placeholder)",
   "options": {
@@ -23,6 +34,7 @@
     }
   },
   "errors": {
-    "typeOfApplication": "Please select an application"
+    "typeOfApplication": "Choose what you want to apply for",
+    "typeOfApplication_r2": "Please select an application"
   }
 }
