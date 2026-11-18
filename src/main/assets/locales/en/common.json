@@ -7,6 +7,8 @@
   "languageToggle": "<a href=\"?lang=cy\" class=\"govuk-link language\">Cymraeg</a>",
   "logout": "Sign out",
   "navigationLabel": "Service navigation",
+  "menuButtonText": "Menu",
+  "footerContentLicence": "All content is available under the <a class=\"govuk-footer__link\" href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\" rel=\"license\">Open Government Licence v3.0</a>, except where otherwise stated",
   "supportAndContactInformation": "Support and contact information",
   "contactUsForHelp": "Contact us for help",
   "contactUsForHelpText": "If you need help using this service, contact us.",

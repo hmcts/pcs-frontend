@@ -7,6 +7,8 @@
   "languageToggle": "<a href=\"?lang=en\" class=\"govuk-link language\">English</a>",
   "logout": "Allgofnodi",
   "navigationLabel": "Llywio’r gwasanaeth",
+  "menuButtonText": "Dewislen",
+  "footerContentLicence": "Mae’r holl gynnwys ar gael o dan <a class=\"govuk-footer__link\" href=\"https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/\" rel=\"license\">Drwydded Llywodraeth Agored f3.0</a>, oni bai pan nodir fel arall",
   "supportAndContactInformation": "Cymorth a gwybodaeth gyswllt",
   "contactUsForHelp": "Cysylltu â ni i gael cymorth",
   "contactUsForHelpText": "Os oes angen help arnoch i ddefnyddio’r gwasanaeth hwn, cysylltwch â ni.",
@@ -213,9 +215,9 @@
   },
   "errorPrefix": "Gwall",
   "fileUpload": {
-    "dropzoneHint": "Drag and drop files here or",
+    "dropzoneHint": "Llusgwch a gollyngwch ffeiliau yma neu",
     "dropzoneButton": "Choose files",
-    "uploadStatus": "Uploading files, please wait"
+    "uploadStatus": "Uwchlwytho ffeiliau, arhoswch os gwelwch yn dda"
   },
   "addressLookup": {
     "oneFound": "1 address found",
