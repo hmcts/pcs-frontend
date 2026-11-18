@@ -34,7 +34,6 @@ export * from './contactPreferenceEmailOrPost.page.data';
 export * from './contactPreferencesTelephone.page.data';
 export * from './contactPreferencesTextMessage.page.data';
 export * from './defendantNameConfirmation.page.data';
-export * from './exemptLandLord.page.data';
 export * from './landlordRegistered.page.data';
 export * from './noticeDateWhenNotProvided.page.data';
 export * from './noticeDateWhenProvided.page.data';
