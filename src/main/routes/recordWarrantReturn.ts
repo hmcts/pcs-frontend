@@ -60,7 +60,7 @@ type EvictionDatePart = (typeof EVICTION_DATE_PARTS)[number];
 const EVICTION_DATE_ZONE = 'Europe/London';
 const EVICTION_DATE_REQUIRED_ERROR_MESSAGE: string = 'Eviction date and time is required';
 const EVICTION_DATE_ERROR_MESSAGE: string = 'The data entered is not valid for Eviction date and time';
-const EVICTION_DATE_FUTURE_ERROR_MESSAGE: string = 'Eviction date and time must be in the past';
+const EVICTION_DATE_FUTURE_ERROR_MESSAGE: string = 'Eviction time cannot be in the future';
 
 export interface WarrantReturnAnswers {
   returnType: string;
@@ -376,7 +376,7 @@ function validateEvictionSuccessful(answers: WarrantReturnAnswers): ValidationRe
       evictionOutcome: EvictionOutcome.SUCCESSFUL,
       returnName,
       outcomeDate: evictionDate,
-      additionalDetails: answers.additionalDetails,
+      additionalDetails: answers.additionalDetails || undefined,
     },
   };
 }

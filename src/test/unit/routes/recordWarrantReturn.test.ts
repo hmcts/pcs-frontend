@@ -340,6 +340,22 @@ describe('recordWarrantReturnRoutes', () => {
         },
       ],
       [
+        'a successful eviction with no additional details',
+        {
+          'return-type': WarrantReturnType.FINAL,
+          'final-outcome': EvictionOutcome.SUCCESSFUL,
+          'eviction-successful-return-name': EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+          ...evictionDateFields(),
+        },
+        {
+          returnType: WarrantReturnType.FINAL,
+          evictionOutcome: EvictionOutcome.SUCCESSFUL,
+          returnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
+          outcomeDate: '2026-03-01T14:05:00.000',
+          additionalDetails: undefined,
+        },
+      ],
+      [
         'an unsuccessful eviction',
         {
           'return-type': WarrantReturnType.FINAL,
@@ -451,7 +467,7 @@ describe('recordWarrantReturnRoutes', () => {
         'eviction-date-day',
         'The data entered is not valid for Eviction date and time',
       ],
-      [{ ...evictionDate, year: '2999' }, 'eviction-date-day', 'Eviction date and time must be in the past'],
+      [{ ...evictionDate, year: '2999' }, 'eviction-date-day', 'Eviction time cannot be in the future'],
     ])('rejects eviction date %o', async (parts, id, message) => {
       const { res } = await post({
         'return-type': WarrantReturnType.FINAL,

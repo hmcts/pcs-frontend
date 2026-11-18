@@ -289,7 +289,7 @@ export function isAdditionalDetailsMandatory(selection: WarrantReturnSelection):
   if (selection.returnType === WarrantReturnType.FINAL) {
     if (selection.finalOutcome === EvictionOutcome.SUCCESSFUL) {
       const returnName = selection.evictionSuccessfulReturnName;
-      return !returnName || returnName === EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL;
+      return !returnName;
     }
     if (
       selection.finalOutcome === EvictionOutcome.UNSUCCESSFUL ||
