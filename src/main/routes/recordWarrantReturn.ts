@@ -60,9 +60,9 @@ type EvictionDatePart = (typeof EVICTION_DATE_PARTS)[number];
 const EVICTION_DATE_ZONE = 'Europe/London';
 const EVICTION_DATE_REQUIRED_ERROR_MESSAGE: string = 'Eviction date and time is required';
 const EVICTION_DATE_ERROR_MESSAGE: string = 'The data entered is not valid for Eviction date and time';
-const EVICTION_DATE_FUTURE_ERROR_MESSAGE: string = 'Eviction date and time must be in the past';
 const EVICTION_DATE_LABEL: string = 'Eviction date and time';
 const RETURN_DATE_LABEL: string = 'Return date and time';
+const EVICTION_DATE_FUTURE_ERROR_MESSAGE: string = 'Eviction time cannot be in the future';
 
 export interface WarrantReturnAnswers {
   returnType: string;
@@ -257,8 +257,10 @@ export default function recordWarrantReturnRoutes(app: Application): void {
     });
   });
 
-  app.get(route('cancel'), ...journey, (req: Request, res: Response) => {
-    res.redirect(manageCaseDetailsUrl(caseReferenceOf(req)));
+  app.get(route('cancel'), ...journey, (req: Request, res: Response, next: NextFunction) => {
+    const caseReference = caseReferenceOf(req);
+    delete req.session.warrantReturn?.[caseReference];
+    req.session.save(error => (error ? next(error) : res.redirect(manageCaseDetailsUrl(caseReference))));
   });
 }
 
@@ -381,7 +383,7 @@ function validateEvictionSuccessful(answers: WarrantReturnAnswers): ValidationRe
       evictionOutcome: EvictionOutcome.SUCCESSFUL,
       returnName,
       outcomeDate: evictionDate,
-      additionalDetails: answers.additionalDetails,
+      additionalDetails: answers.additionalDetails || undefined,
     },
   };
 }

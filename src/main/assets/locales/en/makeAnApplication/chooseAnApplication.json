@@ -1,18 +1,14 @@
 {
-  "pageTitle": "Choose an application",
-  "caption": "Make an application",
-  "heading": "Choose an application",
-  "noticeText": "You cannot apply to suspend (stop or delay) the eviction online.",
-  "noticeTextByPost": "You must apply by post: ",
-  "noticeTextList": {
-    "readTheGuidance": "<a href=\"https://www.gov.uk/repossession/delay-eviction\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">read the guidance explaining how to suspend the eviction (GOV.UK, opens in a new tab)</a>",
-    "fillInTheForm": "<a href=\"https://www.gov.uk/government/publications/form-n244-application-notice\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">fill in the N244a form</a>",
-    "findYourLocalCourt": "<a href=\"https://www.gov.uk/find-court-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"govuk-link\">find your local court</a>",
-    "sendTheFormToTheCourt": "send the completed form to the court, or deliver it by hand"
-  },
+  "pageTitle": "Choose your application",
+  "caption": "Stop or delay an eviction",
+  "heading": "Choose your application",
   "question": "What do you want to apply for?",
   "hintText": "Some optional hint text here (placeholder)",
   "options": {
+    "suspend": {
+      "label": "Ask the court to suspend (stop or delay) the eviction",
+      "hint": "You can ask the court to ‘suspend the eviction’. This means stopping or delaying the eviction."
+    },
     "adjourn": {
       "label": "Ask to adjourn the hearing (move it to a later time or date)",
       "hint": "You can apply to change the court hearing until a later time or date"
@@ -27,6 +23,6 @@
     }
   },
   "errors": {
-    "typeOfApplication": "Choose what you want to apply for"
+    "typeOfApplication": "Please select an application"
   }
 }

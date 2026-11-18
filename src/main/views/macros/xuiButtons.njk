@@ -5,11 +5,14 @@
   continues rather than going back.
 #}
 {% macro eventButtons(continueText="Continue", previous=true) %}
+  <button type="submit" name="action" value="continue" class="govuk-visually-hidden" tabindex="-1" aria-hidden="true">{{ continueText }}</button>
   <div class="govuk-button-group">
-    {{ govukButton({ text: continueText, name: "action", value: "continue", preventDoubleClick: true }) }}
     {% if previous %}
       {{ govukButton({ text: "Previous", classes: "govuk-button--secondary", name: "action", value: "previous" }) }}
     {% endif %}
-    <a class="govuk-link" href="{{ cancelUrl }}">Cancel</a>
+    {{ govukButton({ text: continueText, name: "action", value: "continue", preventDoubleClick: true }) }}
   </div>
+  <p class="govuk-body">
+    <a class="govuk-link" href="{{ cancelUrl }}">Cancel</a>
+  </p>
 {% endmacro %}

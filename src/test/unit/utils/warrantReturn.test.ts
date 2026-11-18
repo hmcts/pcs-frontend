@@ -185,14 +185,14 @@ describe('warrantReturn', () => {
         true,
       ],
       [
-        'the eviction was successful',
+        'a successful eviction with a return name that does not need details',
         {
           ...empty,
           returnType: WarrantReturnType.FINAL,
           finalOutcome: EvictionOutcome.SUCCESSFUL,
           evictionSuccessfulReturnName: EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL,
         },
-        true,
+        false,
       ],
       [
         'an unsuccessful eviction with no return name',
@@ -467,7 +467,7 @@ describe('warrantReturn', () => {
           ['final-outcome', EvictionOutcome.SUCCESSFUL],
           ['eviction-successful-return-name', EvictionSuccessfulReturnName.EVICTION_SUCCESSFUL],
         ],
-        'Additional details',
+        'Additional details (Optional)',
       ],
       [
         'an unsuccessful return name that requires additional details',
