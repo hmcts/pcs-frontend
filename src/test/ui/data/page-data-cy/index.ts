@@ -29,3 +29,8 @@ export * from './defendantNameCapture.page.data.cy';
 export * from './disputeClaimInterstitial.page.data.cy';
 export * from './doYouHaveASolicitor.page.data.cy';
 export * from './home.page.data.cy';
+export * from './confirmationOfNoticeGiven.page.data.cy';
+export * from './contactPreferenceEmailOrPost.page.data.cy';
+export * from './contactPreferencesTelephone.page.data.cy';
+export * from './contactPreferencesTextMessage.page.data.cy';
+export * from './defendantNameConfirmation.page.data.cy';
