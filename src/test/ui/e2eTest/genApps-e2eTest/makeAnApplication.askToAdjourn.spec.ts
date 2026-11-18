@@ -126,10 +126,10 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
       question: isTheCourtHearingInTheNext14Days.isTheCourtHearingInTheNext14DaysQuestion,
       option: isTheCourtHearingInTheNext14Days.noRadioOption,
     });
-    await performValidation('mainHeader', doYouNeedHelpPayingTheFee.mainHeader);
+    await performValidation('mainHeader', doYouNeedHelpPayingTheFeeSuspend.mainHeader);
     await performAction('doYouNeedHelpPayingFee', {
-      question: doYouNeedHelpPayingTheFee.doYouNeedHelpPayingTheFeeQuestion,
-      option: doYouNeedHelpPayingTheFee.iDoNotNeedHelpPayingTheFeeRadioOption,
+      question: doYouNeedHelpPayingTheFeeSuspend.doYouNeedHelpPayingTheFeeQuestion,
+      option: doYouNeedHelpPayingTheFeeSuspend.iDoNotNeedHelpPayingTheFeeRadioOption,
     });
     await performAction('confirmOtherPartiesAgreed', {
       question: haveTheOtherPartiesAgreedToThisApplication.haveTheOtherPartiesAgreedQuestion,
