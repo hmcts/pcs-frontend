@@ -36,6 +36,7 @@ export const {
   tenancyDateDetails,
   dashboard,
   landlordLicensed,
+  exemptLandLord,
   writtenTerms,
   installmentPayments,
   howMuchAffordToPay,
