@@ -268,6 +268,12 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'footer/terms-and-conditions.json::howToUseThisServiceResponsibly.description14',
   'footer/terms-and-conditions.json::howToUseThisServiceResponsibly.description15',
   'footer/terms-and-conditions.json::howToUseThisServiceResponsibly.description16',
+
+  // HDPI-4622 - suspend eviction (defendant-general-applications-r-2), translations to be done as part of HDPI-9561
+  'makeAnApplication/chooseAnApplication.json::pageTitle_r2',
+  'makeAnApplication/chooseAnApplication.json::caption_r2',
+  'makeAnApplication/chooseAnApplication.json::heading_r2',
+  'makeAnApplication/chooseAnApplication.json::errors.typeOfApplication_r2',
 ]);
 
 /**

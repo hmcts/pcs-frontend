@@ -3,7 +3,7 @@ import i18next, { type TFunction } from 'i18next';
 
 import cyChooseAnApplication from '../../../../../main/assets/locales/cy/makeAnApplication/chooseAnApplication.json';
 import enChooseAnApplication from '../../../../../main/assets/locales/en/makeAnApplication/chooseAnApplication.json';
-import { getTranslation, getTranslationErrors } from'../../../../../main/modules/steps/formBuilder/helpers';
+import { getTranslation, getTranslationErrors } from '../../../../../main/modules/steps/formBuilder/helpers';
 import { step } from '../../../../../main/steps/make-an-application/choose-an-application';
 
 import type { BuiltFormContent, FormBuilderConfig } from '@modules/steps/formBuilder/formFieldConfig.interface';
