@@ -741,16 +741,34 @@ describe('recordWarrantReturnRoutes', () => {
   });
 
   describe('GET cancel', () => {
-    it('returns the user to the case in XUI', () => {
+    const path = '/case/:caseReference/record-warrant-return/cancel';
+    const saved = { returnType: WarrantReturnType.INTERIM, returnName: InterimReturnName.CROWDS_OR_PROTESTS };
+
+    const cancel = (save = jest.fn((callback: (error?: Error) => void) => callback())) => {
       const res = { redirect: jest.fn() };
+      const next = jest.fn();
+      const req = {
+        params: { caseReference: '123' },
+        session: { warrantReturn: { '123': saved, '456': saved }, save },
+      };
+      void getHandler(path)(req as unknown as Request, res as unknown as Response, next);
+      return { req, res, next };
+    };
 
-      void getHandler('/case/:caseReference/record-warrant-return/cancel')(
-        { params: { caseReference: '123' } } as unknown as Request,
-        res as unknown as Response,
-        jest.fn()
-      );
+    it('returns the user to the case in XUI and clears the progress', () => {
+      const { req, res } = cancel();
 
+      expect(req.session.warrantReturn).toEqual({ '456': saved });
+      expect(req.session.save).toHaveBeenCalled();
       expect(res.redirect).toHaveBeenCalledWith(expect.stringMatching(/\/cases\/case-details\/PCS\/PCS\/123$/));
+    });
+
+    it('passes a failure to save the session to the error handler', () => {
+      const failure = new Error('Redis is down');
+      const { res, next } = cancel(jest.fn((callback: (error?: Error) => void) => callback(failure)));
+
+      expect(next).toHaveBeenCalledWith(failure);
+      expect(res.redirect).not.toHaveBeenCalled();
     });
   });
 

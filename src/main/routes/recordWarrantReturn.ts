@@ -252,8 +252,10 @@ export default function recordWarrantReturnRoutes(app: Application): void {
     });
   });
 
-  app.get(route('cancel'), ...journey, (req: Request, res: Response) => {
-    res.redirect(manageCaseDetailsUrl(caseReferenceOf(req)));
+  app.get(route('cancel'), ...journey, (req: Request, res: Response, next: NextFunction) => {
+    const caseReference = caseReferenceOf(req);
+    delete req.session.warrantReturn?.[caseReference];
+    req.session.save(error => (error ? next(error) : res.redirect(manageCaseDetailsUrl(caseReference))));
   });
 }
 
