@@ -146,7 +146,7 @@ test.describe('Make an Application - e2e Journey @nightly', async () => {
   test(
     'As a Defendant, I successfully apply to Suspend eviction without a request for help with fees',
     {
-      tag: ['@CM'],
+      tag: ['@nightly'],
       annotation: [
         { type: 'jira', description: `The corresponding jira ticket : https://hmcts.atlassian.net/browse/HDPI-4622` },
       ],
