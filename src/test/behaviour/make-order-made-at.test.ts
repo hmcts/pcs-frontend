@@ -84,8 +84,14 @@ describe('make an order: choosing when it is made', () => {
     expect(document.querySelector('[data-attendance-row]')).toBeNull();
     check('app-gen-app-1-decision', 'grant');
 
+    let submissions = 0;
+    page.form.addEventListener('submit', () => submissions++);
     check('made-at', '2');
-    page = await openPage((await app.post(taskPage, page.body('CHANGE_MADE_AT'))).text);
+    expect(submissions).toBe(1);
+    const changed = await app.post(taskPage, page.body());
+    expect(changed.status).toBe(200);
+    expect(submittedOrders()).toEqual([]);
+    page = await openPage(changed.text);
 
     expect(startClientContexts().at(-1)).toEqual({ genAppId: 'gen-app-1', madeAt: { hearingId: 2 } });
     expect(document.querySelectorAll('[data-attendance-row]')).toHaveLength(2);
@@ -207,12 +213,12 @@ describe('make an order: choosing when it is made', () => {
     expect(submittedOrders()).toEqual([]);
   });
 
-  it('keeps Enter in a field sending the order, not changing when it is made', async () => {
+  it('uses Send order for implicit submission and removes the separate hearing change button', async () => {
     app = await bootApp({ hearings: [LATER_HEARING] });
     const { form } = await openPage((await app.get(PAGE)).text);
     // The form's first submit button is the one implicit submission uses.
     const first = form.querySelector<HTMLButtonElement>('button[type="submit"], button:not([type])');
     expect(first?.value).toBe('SUBMIT_FOR_REVIEW');
-    expect(form.querySelectorAll('button[value="CHANGE_MADE_AT"]')).toHaveLength(1);
+    expect(form.querySelector('button[value="CHANGE_MADE_AT"]')).toBeNull();
   });
 });

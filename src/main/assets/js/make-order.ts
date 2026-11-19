@@ -324,12 +324,19 @@ export function initMakeOrder(): void {
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
-  // Keep JSON in the editor field; encode only the value in the outgoing form data.
   form.addEventListener('formdata', ({ formData }) => {
+    // A radio change submits without a submit button. Give that submission its own action.
+    if (!formData.has('action') && formData.get('made-at') !== formData.get('shown-made-at')) {
+      formData.set('action', 'CHANGE_MADE_AT');
+    }
+    // Keep JSON in the editor field; encode only the outgoing value.
     formData.set(
       'orderDocument',
       new TextEncoder().encode(documentField.value).toBase64({ alphabet: 'base64url', omitPadding: true })
     );
+  });
+  form.querySelectorAll<HTMLInputElement>('input[name="made-at"]').forEach(choice => {
+    choice.addEventListener('change', () => form.requestSubmit());
   });
 
   selectOrderType(orderingOnClaim() ? (tabType() ?? (orderTypeField.value as OrderType)) : 'NO_ORDER_ON_CLAIM');

@@ -27,13 +27,6 @@
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
   <input type="hidden" name="hearingVersion" value="{{ hearingVersion }}">
   {{ csrfProtection(csrfToken) }}
-  {#
-    A form's first button is the one pressing Enter in a field uses: this keeps that sending the order, as the page's
-    own send button does, rather than the button for changing when the order is made, which comes first on the page.
-  #}
-  <button type="submit" name="action" value="SUBMIT_FOR_REVIEW" class="govuk-visually-hidden" tabindex="-1"
-          aria-hidden="true" data-enter-key-default>Send order to caseworker for review</button>
-
   <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ pageHeading }}</h1>
 
   <p class="govuk-body govuk-!-margin-bottom-1">
@@ -71,16 +64,9 @@
     name: "made-at",
     classes: "govuk-radios--small",
     fieldset: { legend: { text: "Is this order made at a hearing?", classes: "govuk-fieldset__legend--s" } },
-    hint: { text: "Choose a hearing to record who attended and the case facts and notes for it." },
+    hint: { text: "Changing your selection reloads this page. Choose a hearing to record who attended and the case facts and notes for it." },
     items: madeAtItems,
     errorMessage: validationErrors["made-at"]
-  }) }}
-  {{ govukButton({
-    text: "Change when the order is made",
-    name: "action",
-    value: "CHANGE_MADE_AT",
-    classes: "govuk-button--secondary",
-    attributes: { id: "change-made-at" }
   }) }}
 
   {% include "make-order/_form.njk" %}

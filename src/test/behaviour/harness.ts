@@ -490,6 +490,8 @@ export async function openPage(html: string): Promise<Page> {
   if (!form) {
     throw new Error(`The make order form is not on the page: ${document.body?.textContent?.trim().slice(0, 200)}`);
   }
+  // Tests post the submitted form through the app harness, since jsdom cannot navigate.
+  form.addEventListener('submit', event => event.preventDefault());
   return {
     form,
     orderText: () => buildOrderDocument(form).textContent,
