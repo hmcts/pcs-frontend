@@ -182,7 +182,7 @@
     "@opentelemetry/instrumentation-http": "0.222.0",
     "@opentelemetry/instrumentation-redis-4": "npm:@opentelemetry/instrumentation-redis@^0.70.0",
     "@opentelemetry/sdk-node": "0.222.0",
-    "@sentry/node/minimatch": "11.0.8",
+    "@sentry/node/minimatch": "11.0.9",
     "brace-expansion": "^5.0.8",
     "diff": "^9.0.0",
     "follow-redirects": "1.16.3",
