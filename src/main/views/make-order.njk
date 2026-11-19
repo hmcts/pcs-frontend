@@ -27,37 +27,31 @@
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
   <input type="hidden" name="hearingVersion" value="{{ hearingVersion }}">
   {{ csrfProtection(csrfToken) }}
-  {% set canChooseHearing = madeAtItems | length > 1 %}
+  <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ pageHeading }}</h1>
+  <p class="govuk-body govuk-!-margin-bottom-1">
+    <span class="govuk-!-font-weight-bold">Case reference:</span> {{ caseReferenceDisplay }}
+  </p>
+  <p class="govuk-body govuk-!-margin-bottom-1">{{ propertyAddressDisplay }}</p>
+  <p class="govuk-body govuk-!-font-weight-bold">
+    {{ claimantNames }} vs {{ defendantNames }}
+  </p>
+  {% include "make-order/_whole-file.njk" %}
+
   <input type="hidden" name="shown-made-at" value="{{ madeAt }}">
-  <div{% if canChooseHearing %} class="pcs-make-order-header"{% endif %}>
-    <div>
-      <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ pageHeading }}</h1>
-      <p class="govuk-body govuk-!-margin-bottom-1">
-        <span class="govuk-!-font-weight-bold">Case reference:</span> {{ caseReferenceDisplay }}
-      </p>
-      <p class="govuk-body govuk-!-margin-bottom-1">{{ propertyAddressDisplay }}</p>
-      <p class="govuk-body govuk-!-font-weight-bold">
-        {{ claimantNames }} vs {{ defendantNames }}
-      </p>
-      {% include "make-order/_whole-file.njk" %}
-    </div>
-    {% if canChooseHearing %}
-      <div>
-        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">When the order is made</h2>
-        {{ govukRadios({
-          idPrefix: "made-at",
-          name: "made-at",
-          classes: "govuk-radios--small",
-          fieldset: { legend: { text: "Is this order made at a hearing?", classes: "govuk-fieldset__legend--s" } },
-          hint: { text: "Choose a hearing to record who attended and the case facts and notes for it." },
-          items: madeAtItems,
-          errorMessage: validationErrors["made-at"]
-        }) }}
-      </div>
-    {% else %}
-      <input type="hidden" name="made-at" value="{{ madeAt }}">
-    {% endif %}
-  </div>
+  {% if madeAtItems | length > 1 %}
+    <h2 class="govuk-heading-l govuk-!-margin-top-6">When the order is made</h2>
+    {{ govukRadios({
+      idPrefix: "made-at",
+      name: "made-at",
+      classes: "govuk-radios--small",
+      fieldset: { legend: { text: "Is this order made at a hearing?", classes: "govuk-fieldset__legend--s" } },
+      hint: { text: "Choose a hearing to record who attended and the case facts and notes for it." },
+      items: madeAtItems,
+      errorMessage: validationErrors["made-at"]
+    }) }}
+  {% else %}
+    <input type="hidden" name="made-at" value="{{ madeAt }}">
+  {% endif %}
 
   {% if order.queryFromCaseworker %}
     {# An order a caseworker returned: their query. #}
