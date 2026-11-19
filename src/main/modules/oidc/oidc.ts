@@ -183,6 +183,9 @@ export class OIDCModule {
           code_challenge: codeChallenge,
           code_challenge_method: 'S256',
         };
+        if (req.session.handoffReauthentication && req.session.handoffReauthentication === req.session.returnTo) {
+          parameters.prompt = 'login';
+        }
 
         if (!this.clientConfig.serverMetadata().supportsPKCE()) {
           req.session.nonce = client.randomNonce();
