@@ -1,4 +1,6 @@
 {% extends "footer/layout.njk" %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
 
 {% block pageTitle %}
   {{ t('footer/cookies:pageTitle') }}
@@ -65,6 +67,69 @@
               <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row8.purpose') }}</td>
               <td class="govuk-table__cell">{{ t('footer/cookies:cookieTable.row8.expires') }}</td>
           </tr>
+          {% if tracking and tracking.enabled %}
+          {% for row in ['preferences', 'ga', 'gaContainer'] %}
+          <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{ t('footer/cookies:trackingCookieTable.' + row + '.name') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:trackingCookieTable.' + row + '.purpose') }}</td>
+              <td class="govuk-table__cell">{{ t('footer/cookies:trackingCookieTable.' + row + '.expires') }}</td>
+          </tr>
+          {% endfor %}
+          {% endif %}
       </tbody>
   </table>
+  {% if tracking and tracking.enabled %}
+  <h2 id="cookie-settings" class="govuk-heading-l">{{ t('footer/cookies:cookieSettings.title') }}</h2>
+  <form class="cookie-preferences-form">
+    {{ govukRadios({
+      classes: 'govuk-radios',
+      idPrefix: 'analytics',
+      name: 'analytics',
+      fieldset: {
+        legend: {
+          text: t('footer/cookies:cookiePage.analytics.legend'),
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      items: [
+        {
+          value: 'on',
+          text: t('footer/cookies:cookiePage.analytics.items.on')
+        },
+        {
+          value: 'off',
+          text: t('footer/cookies:cookiePage.analytics.items.off'),
+          checked: true
+        }
+      ]
+    }) }}
+
+    {{ govukRadios({
+      classes: 'govuk-radios',
+      idPrefix: 'apm',
+      name: 'apm',
+      fieldset: {
+        legend: {
+          text: t('footer/cookies:cookiePage.apm.legend'),
+          classes: "govuk-fieldset__legend--s"
+        }
+      },
+      items: [
+        {
+          value: 'on',
+          text: t('footer/cookies:cookiePage.apm.items.on')
+        },
+        {
+          value: 'off',
+          text: t('footer/cookies:cookiePage.apm.items.off'),
+          checked: true
+        }
+      ]
+    }) }}
+
+    {{ govukButton({
+      text: t('footer/cookies:cookiePage.submit')
+    }) }}
+  </form>
+  {% endif %}
 {% endblock %}

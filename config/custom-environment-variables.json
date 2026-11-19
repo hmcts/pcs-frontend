@@ -20,6 +20,13 @@
   "api": {
     "url": "PCS_API_URL"
   },
+  "tracking": {
+    "enabled": {
+      "__name": "ENABLE_TRACKING",
+      "__format": "boolean"
+    },
+    "gtmContainerId": "GTM_CONTAINER_ID"
+  },
   "node-env": "NODE_ENV",
   "use-ssl": "USE_SSL",
   "appInsights": {

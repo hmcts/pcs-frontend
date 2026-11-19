@@ -13,15 +13,18 @@
 
 {% block head %}
   {{super()}}
+  {% include "tagmanager/head.njk" %}
   {% include "webpack/css.njk" %}
 {% endblock %}
 
 {% block bodyStart %}
   {# Start inert container wrapper for all page content #}
   <div class="govuk-modal-dialogue-inert-container">
+  {% include "tagmanager/body.njk" %}
 {% endblock %}
 
 {% block header %}
+  {% include "cookies-banner.njk" %}
   {{ govukHeader({
     containerClasses: "govuk-width-container"
   }) }}
@@ -75,7 +78,7 @@
 
   {# Timeout modal - outside inert container #}
   {% include "components/timeout-modal.njk" %}
-  
+
   {# Run JavaScript at end of the <body>, to avoid blocking the initial render. #}
   {% include "webpack/js.njk" %}
 {% endblock %}
