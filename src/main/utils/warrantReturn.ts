@@ -308,14 +308,20 @@ const HIDDEN_CLASS = 'govuk-!-display-none';
 const CONDITIONAL_CLASS = 'govuk-checkboxes__conditional';
 const DEFAULT_ADDITIONAL_DETAILS_LABEL = 'Additional details';
 const OPTIONAL_ADDITIONAL_DETAILS_LABEL = 'Additional details (Optional)';
-const EVICTION_DATE_LABEL = 'Eviction date and time';
-const RETURN_DATE_LABEL = 'Return date and time';
 const EVICTION_DATE_INPUT_IDS = [
   'eviction-date-day',
   'eviction-date-month',
   'eviction-date-year',
   'eviction-date-hour',
   'eviction-date-minute',
+];
+
+const RETURN_DATE_INPUT_IDS = [
+  'return-date-day',
+  'return-date-month',
+  'return-date-year',
+  'return-date-hour',
+  'return-date-minute',
 ];
 
 export function initWarrantReturn(): void {
@@ -349,22 +355,28 @@ function updateWarrantReturnVisibility(): void {
   const isEvictionSuccessful = isFinal && finalOutcome === EvictionOutcome.SUCCESSFUL;
   setSectionVisible('eviction-successful', isEvictionSuccessful, () => {
     resetSelect('eviction-successful-return-name');
+    EVICTION_DATE_INPUT_IDS.forEach(resetInput);
   });
 
   const isEvictionUnsuccessfulOrCancelled =
     isFinal && (finalOutcome === EvictionOutcome.UNSUCCESSFUL || finalOutcome === EvictionOutcome.CANCELLED);
-  setSectionVisible('eviction-unsuccessful-cancelled', isEvictionUnsuccessfulOrCancelled, () =>
-    resetSelect('eviction-unsuccessful-return-name')
-  );
+  setSectionVisible('eviction-unsuccessful-cancelled', isEvictionUnsuccessfulOrCancelled, () => {
+    resetSelect('eviction-unsuccessful-return-name');
+  });
 
   const isInterim = returnType === WarrantReturnType.INTERIM;
-  setSectionVisible('interim', isInterim, () => resetSelect('interim-return-name'));
+  setSectionVisible('interim', isInterim, () => {
+    resetSelect('interim-return-name');
+  });
 
-  const isEvictionDateVisible = isEvictionSuccessful || isEvictionUnsuccessfulOrCancelled || isInterim;
-  setSectionVisible('date-section', isEvictionDateVisible, () => EVICTION_DATE_INPUT_IDS.forEach(resetInput));
-  document.getElementById('date-section-nested')?.classList.toggle(CONDITIONAL_CLASS, isFinal);
+  setSectionVisible('return-type-conditional', isInterim || isFinal, () => undefined);
 
-  updateDateLabel(isEvictionSuccessful);
+  const isReturnDateVisible = isEvictionUnsuccessfulOrCancelled || isInterim;
+  const returnDateSection = document.getElementById('return-date-section');
+  setSectionVisible('return-date-section', isReturnDateVisible, () => RETURN_DATE_INPUT_IDS.forEach(resetInput));
+
+  returnDateSection?.classList.toggle(CONDITIONAL_CLASS, isFinal);
+
   updateAdditionalDetailsLabel();
 }
 
@@ -383,14 +395,6 @@ function updateAdditionalDetailsLabel(): void {
   });
 
   label.textContent = isMandatory ? DEFAULT_ADDITIONAL_DETAILS_LABEL : OPTIONAL_ADDITIONAL_DETAILS_LABEL;
-}
-
-function updateDateLabel(isEvictionSuccessful: boolean): void {
-  const label = document.querySelector('#date-section legend');
-  if (!label) {
-    return;
-  }
-  label.textContent = isEvictionSuccessful ? EVICTION_DATE_LABEL : RETURN_DATE_LABEL;
 }
 
 function setSectionVisible(sectionId: string, isVisible: boolean, resetInputs: () => void): void {
