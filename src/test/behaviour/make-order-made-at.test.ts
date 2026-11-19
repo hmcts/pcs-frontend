@@ -38,6 +38,18 @@ describe('make an order: choosing when it is made', () => {
   let app: TestApp;
   afterEach(() => app.close());
 
+  it('saves as box work without asking when the case has no hearings', async () => {
+    app = await bootApp({ hearing: null, hearings: [] });
+    const page = await openPage((await app.get(PAGE)).text);
+
+    expect(page.form.textContent).not.toContain('When the order is made');
+    expect(page.form.querySelector('input[type="radio"][name="made-at"]')).toBeNull();
+
+    expect((await app.post(PAGE, page.body('SAVE_DRAFT'))).status).toBe(302);
+    expect(startClientContexts().at(-1)).toEqual({ madeAt: {} });
+    expect(submittedOrders().at(-1)?.hearing).toBeNull();
+  });
+
   it("offers box work and each of the case's hearings, and moves a hearing's order to box work keeping its wording", async () => {
     app = await bootApp({ hearings: [LATER_HEARING] });
     const page = await openPage((await app.get(PAGE)).text);

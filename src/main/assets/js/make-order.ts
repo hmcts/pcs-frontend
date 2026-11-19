@@ -335,7 +335,7 @@ export function initMakeOrder(): void {
       new TextEncoder().encode(documentField.value).toBase64({ alphabet: 'base64url', omitPadding: true })
     );
   });
-  form.querySelectorAll<HTMLInputElement>('input[name="made-at"]').forEach(choice => {
+  form.querySelectorAll<HTMLInputElement>('input[type="radio"][name="made-at"]').forEach(choice => {
     choice.addEventListener('change', () => form.requestSubmit());
   });
 

@@ -27,7 +27,9 @@
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
   <input type="hidden" name="hearingVersion" value="{{ hearingVersion }}">
   {{ csrfProtection(csrfToken) }}
-  <div class="pcs-make-order-header">
+  {% set canChooseHearing = madeAtItems | length > 1 %}
+  <input type="hidden" name="shown-made-at" value="{{ madeAt }}">
+  <div{% if canChooseHearing %} class="pcs-make-order-header"{% endif %}>
     <div>
       <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ pageHeading }}</h1>
       <p class="govuk-body govuk-!-margin-bottom-1">
@@ -39,19 +41,22 @@
       </p>
       {% include "make-order/_whole-file.njk" %}
     </div>
-    <div>
-      <h2 class="govuk-heading-m govuk-!-margin-bottom-2">When the order is made</h2>
-      <input type="hidden" name="shown-made-at" value="{{ madeAt }}">
-      {{ govukRadios({
-        idPrefix: "made-at",
-        name: "made-at",
-        classes: "govuk-radios--small",
-        fieldset: { legend: { text: "Is this order made at a hearing?", classes: "govuk-fieldset__legend--s" } },
-        hint: { text: "Changing your selection reloads this page. Choose a hearing to record who attended and the case facts and notes for it." },
-        items: madeAtItems,
-        errorMessage: validationErrors["made-at"]
-      }) }}
-    </div>
+    {% if canChooseHearing %}
+      <div>
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">When the order is made</h2>
+        {{ govukRadios({
+          idPrefix: "made-at",
+          name: "made-at",
+          classes: "govuk-radios--small",
+          fieldset: { legend: { text: "Is this order made at a hearing?", classes: "govuk-fieldset__legend--s" } },
+          hint: { text: "Changing your selection reloads this page. Choose a hearing to record who attended and the case facts and notes for it." },
+          items: madeAtItems,
+          errorMessage: validationErrors["made-at"]
+        }) }}
+      </div>
+    {% else %}
+      <input type="hidden" name="made-at" value="{{ madeAt }}">
+    {% endif %}
   </div>
 
   {% if order.queryFromCaseworker %}
