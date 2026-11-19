@@ -27,18 +27,32 @@
   <input type="hidden" name="orderVersion" value="{{ order.version }}">
   <input type="hidden" name="hearingVersion" value="{{ hearingVersion }}">
   {{ csrfProtection(csrfToken) }}
-  <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ pageHeading }}</h1>
-
-  <p class="govuk-body govuk-!-margin-bottom-1">
-    <span class="govuk-!-font-weight-bold">Case reference:</span> {{ caseReferenceDisplay }}
-  </p>
-  <p class="govuk-body govuk-!-margin-bottom-1">{{ propertyAddressDisplay }}</p>
-  <p class="govuk-body govuk-!-font-weight-bold">
-    {{ claimantNames }} vs {{ defendantNames }}
-  </p>
-
-  {% include "make-order/_whole-file.njk" %}
-
+  <div class="pcs-make-order-header">
+    <div>
+      <h1 class="govuk-heading-xl govuk-!-margin-bottom-2">{{ pageHeading }}</h1>
+      <p class="govuk-body govuk-!-margin-bottom-1">
+        <span class="govuk-!-font-weight-bold">Case reference:</span> {{ caseReferenceDisplay }}
+      </p>
+      <p class="govuk-body govuk-!-margin-bottom-1">{{ propertyAddressDisplay }}</p>
+      <p class="govuk-body govuk-!-font-weight-bold">
+        {{ claimantNames }} vs {{ defendantNames }}
+      </p>
+      {% include "make-order/_whole-file.njk" %}
+    </div>
+    <div>
+      <h2 class="govuk-heading-m govuk-!-margin-bottom-2">When the order is made</h2>
+      <input type="hidden" name="shown-made-at" value="{{ madeAt }}">
+      {{ govukRadios({
+        idPrefix: "made-at",
+        name: "made-at",
+        classes: "govuk-radios--small",
+        fieldset: { legend: { text: "Is this order made at a hearing?", classes: "govuk-fieldset__legend--s" } },
+        hint: { text: "Changing your selection reloads this page. Choose a hearing to record who attended and the case facts and notes for it." },
+        items: madeAtItems,
+        errorMessage: validationErrors["made-at"]
+      }) }}
+    </div>
+  </div>
 
   {% if order.queryFromCaseworker %}
     {# An order a caseworker returned: their query. #}
@@ -51,23 +65,6 @@
       attributes: { id: "caseworker-query" }
     }) }}
   {% endif %}
-
-  {#
-    The judge says when the order is made, whatever task or link brought them here: without a hearing, or at one of the
-    case's hearings, which brings up who attended and the hearing's facts and notes. Changing it shows the page again
-    with everything the judge has written so far, and saves nothing.
-  #}
-  <h2 class="govuk-heading-l govuk-!-margin-top-6">When the order is made</h2>
-  <input type="hidden" name="shown-made-at" value="{{ madeAt }}">
-  {{ govukRadios({
-    idPrefix: "made-at",
-    name: "made-at",
-    classes: "govuk-radios--small",
-    fieldset: { legend: { text: "Is this order made at a hearing?", classes: "govuk-fieldset__legend--s" } },
-    hint: { text: "Changing your selection reloads this page. Choose a hearing to record who attended and the case facts and notes for it." },
-    items: madeAtItems,
-    errorMessage: validationErrors["made-at"]
-  }) }}
 
   {% include "make-order/_form.njk" %}
 
