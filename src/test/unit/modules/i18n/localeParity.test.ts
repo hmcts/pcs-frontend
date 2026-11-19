@@ -322,6 +322,12 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'respondToClaim/whatRegularIncomeDoYouReceive.json::frequencyLegend.otherBenefits',
   'respondToClaim/whatRegularIncomeDoYouReceive.json::frequency.week',
   'respondToClaim/whatRegularIncomeDoYouReceive.json::frequency.month',
+
+  // HDPI-4622 - suspend eviction (defendant-general-applications-r-2), translations to be done as part of HDPI-9561
+  'makeAnApplication/chooseAnApplication.json::pageTitle_r2',
+  'makeAnApplication/chooseAnApplication.json::caption_r2',
+  'makeAnApplication/chooseAnApplication.json::heading_r2',
+  'makeAnApplication/chooseAnApplication.json::errors.typeOfApplication_r2',
 ]);
 
 /**
