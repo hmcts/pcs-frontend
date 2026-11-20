@@ -1,11 +1,12 @@
 {% from "govuk/components/footer/macro.njk" import govukFooter %}
 {% from "footer/macro.njk" import hmctsUiFooter %}
 
-{% macro pcsFooter(isLegalRepresentative, footerModel) %}
+{% macro pcsFooter(isLegalRepresentative, footerModel, contentLicenceHtml) %}
   {% if isLegalRepresentative %}
     {{ hmctsUiFooter(footerModel) }}
   {% else %}
     {{ govukFooter({
+      contentLicence: { html: contentLicenceHtml },
       meta: {
         visuallyHiddenTitle: "Support links",
         items: [

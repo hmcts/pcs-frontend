@@ -50,6 +50,7 @@
             }
           ],
           navigationLabel: t('navigationLabel', 'Service navigation'),
+          menuButtonText: t('menuButtonText', 'Menu'),
           navigationClasses: "pcs-service-navigation-wrapper"
         }) }}
       {% endblock %}
@@ -101,7 +102,7 @@
 {% endblock %}
 
 {% block footer %}
-  {{ pcsFooter(isLegalRepresentative, footerModel) }}
+  {{ pcsFooter(isLegalRepresentative, footerModel, t('footerContentLicence')) }}
 {% endblock %}
 
 {% block bodyEnd %}
