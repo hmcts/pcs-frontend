@@ -4,8 +4,12 @@
 #}
 {% import "make-order/_compact.njk" as compact with context %}
 
-{% macro applyBy(prefix) %}
-  {{ compact.date({ id: prefix, legend: "Application to be made by 4pm on" }) }}
+{#
+  An order on the court's own initiative starts with 7 days to apply by, as the judges asked, which the judge may
+  change. One without notice has no default.
+#}
+{% macro applyBy(prefix, default) %}
+  {{ compact.date({ id: prefix, legend: "Application to be made by 4pm on", default: default, pills: [7, 14, 28] }) }}
 {% endmacro %}
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Own initiative or without notice</h2>
@@ -15,7 +19,7 @@
   classes: "govuk-radios--small",
   default: "none",
   items: [
-    { value: "own-initiative", text: "Order on court's own initiative", conditional: { html: applyBy("own-initiative-by") } },
+    { value: "own-initiative", text: "Order on court's own initiative", conditional: { html: applyBy("own-initiative-by", ownInitiativeApplyBy) } },
     { value: "without-notice", text: "Order without notice", conditional: { html: applyBy("without-notice-by") } },
     { value: "none", text: "Neither" }
   ]

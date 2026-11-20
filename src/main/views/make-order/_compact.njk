@@ -155,11 +155,18 @@
 {# Date with quick-fill pills. #}
 {% macro date(params={}) %}
   {# Suffixed: govukDateInput derives its item ids from params.id, so it keeps that id. #}
+  {#
+    params.default ({ day, month, year }) fills a date the form has never had; one the judge cleared stays clear.
+    params.pills gives the quick dates in days from today.
+  #}
+  {% set saved = draftDate(params.id) %}
+  {% set unsaved = true %}
+  {% for item in saved %}{% if item.value is defined %}{% set unsaved = false %}{% endif %}{% endfor %}
   {% set dateItems = [] %}
-  {% for item in draftDate(params.id) %}
+  {% for item in saved %}
     {% set dateItems = dateItems.concat([{
       name: item.name,
-      value: item.value,
+      value: params.default[item.name] if (unsaved and params.default) else item.value,
       attributes: { required: true } if not params.optional
     }]) %}
   {% endfor %}
@@ -177,7 +184,7 @@
       errorMessage: validationErrors[params.id + "-day"]
     }) }}
     <div class="pcs-date-pills" role="group" aria-label="Quick date for {{ params.legend | lower }}">
-      {% for days in [14, 28, 42] %}
+      {% for days in params.pills or [14, 28, 42] %}
         <button type="button" class="pcs-date-pill" data-date-pill-days="{{ days }}">{{ days }} days</button>
       {% endfor %}
     </div>

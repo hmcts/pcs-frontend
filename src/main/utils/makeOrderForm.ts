@@ -208,6 +208,16 @@ export function withoutUnchosenNoticeDates(formData: FormData): FormData {
   );
 }
 
+/** The days an order on the court's own initiative gives to apply to set it aside, vary or stay it, unless changed. */
+export const OWN_INITIATIVE_APPLY_BY_DAYS = 7;
+
+/** A date some days from today in London, as the parts of a date input. */
+export function daysFromToday(days: number, now = DateTime.now()): { day: string; month: string; year: string } {
+  const date = now.setZone('Europe/London').plus({ days });
+  // Padded as the page's quick dates fill them.
+  return { day: date.toFormat('dd'), month: date.toFormat('MM'), year: date.toFormat('yyyy') };
+}
+
 /** What the page's choice of when the order is made posts for an order made without a hearing. */
 export const WITHOUT_HEARING = 'without-hearing';
 
@@ -343,6 +353,7 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     openCounterclaim: caseContext.openCounterclaim === true,
     applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
     upcomingHearings: upcoming,
+    ownInitiativeApplyBy: daysFromToday(OWN_INITIATIVE_APPLY_BY_DAYS),
     upcomingHearingsJson: JSON.stringify(Object.fromEntries(upcoming.map(({ id, text }) => [id, text]))),
     ...hearingModel(hearing),
     caseBundle: caseContext.caseBundle ? caseBundleModel(caseContext.caseBundle, caseContext.caseReference) : undefined,
