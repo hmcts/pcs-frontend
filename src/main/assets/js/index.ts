@@ -9,6 +9,8 @@ import { initPostcodeSelection } from './postcode-select';
 import { initRedirectOnBack } from './redirect-on-back';
 import { initSessionTimeout } from './session-timeout';
 
+import { initWarrantReturn } from '@utils/warrantReturn';
+
 // The order editor is large, so only the make order page loads it.
 if (document.querySelector('#make-order-form')) {
   void import(/* webpackChunkName: "make-order" */ './make-order').then(({ initMakeOrder, startWithSavedOrderTab }) => {
@@ -24,3 +26,4 @@ initSessionTimeout();
 initMultiFileUpload();
 initRedirectOnBack();
 initCounterClaimPaymentChoice();
+initWarrantReturn();

@@ -1,7 +1,7 @@
 import { buildFooterModel, buildHeaderModel } from '@hmcts-cft/cft-ui-component-lib';
 import { type DocWeaveSnapshot, InvalidSnapshotError, parseSnapshot } from '@hmcts-cft/docweave';
 import config from 'config';
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 import { CallbackRejectedError, HTTPError } from '../HttpError';
 import { linkSignOutToLogout } from '../middleware/legalRepresentativeHeaders';
@@ -155,27 +155,6 @@ export function manageCaseDetailsUrl(caseReference: string): string {
     throw new HTTPError('The Manage Case return URL is not configured', 500);
   }
   return url;
-}
-
-/**
- * Answers an order event that was refused. pcs-api refuses one with its reasons, which the page answers
- * if it can; otherwise the error handler logs them and shows a generic error. CCD decides who may use
- * an order event from their role assignments: anyone else is not given the event's payload or allowed
- * to submit it, and is shown the page does not exist.
- */
-export function refusedOrderEvent(
-  res: Response,
-  next: NextFunction,
-  error: unknown,
-  rejected: (error: CallbackRejectedError) => void = next
-): void {
-  if (error instanceof CallbackRejectedError) {
-    return rejected(error);
-  }
-  if (error instanceof HTTPError && (error.status === 403 || error.status === 404)) {
-    return void res.status(404).send('Not Found');
-  }
-  next(error);
 }
 
 /** Shows the user why pcs-api would not start an order event, in XUI's page, with the way back to the case. */
