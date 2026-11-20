@@ -4,7 +4,12 @@
   "heading": "Is the court hearing in the next 14 days?",
   "question": "Is the court hearing in the next 14 days?",
   "hintText": "This will affect the fee you will pay. You do not need to pay a fee if your court hearing is (at least) 14 days away.",
+  "otherParties": "The ‘other parties’ are the other people or organisations named on the claim form. For example a tenant, landlord, housing association, or mortgage lender.",
+  "everyOtherPartyWillNeedToAgree": "Every other party will need to agree to let you make this application, if they don’t agree, you may need to pay a higher fee.",
   "errors": {
     "inNext14Days": "Confirm whether the court hearing is in the next 14 days"
+  },
+  "genAppCuiSetAside": {
+    "hintText": "This will affect the fee you will pay. You do not need to pay a fee if your court hearing is (at least) 14 days away and all the other parties have agreed to it."
   }
 }

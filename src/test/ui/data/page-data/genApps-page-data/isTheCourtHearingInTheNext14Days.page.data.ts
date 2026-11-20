@@ -3,7 +3,7 @@ export const isTheCourtHearingInTheNext14Days = {
   isTheCourtHearingInTheNext14DaysQuestion: `Is the court hearing in the next 14 days?`,
   yesRadioOption: `Yes`,
   noRadioOption: `No`,
-  thisWillAffectTheFeeHintText: `This will affect the fee you will pay. You do not need to pay a fee if your court hearing is (at least) 14 days away.`,
+  thisWillAffectTheFeeHintText: `This will affect the fee you will pay. You do not need to pay a fee if your court hearing is (at least) 14 days away and all the other parties have agreed to it.`,
   continueButton: `Continue`,
   cancelLink: `Cancel`,
   backLink: `Back`,
