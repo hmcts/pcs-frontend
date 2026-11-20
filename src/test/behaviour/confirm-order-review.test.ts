@@ -94,8 +94,10 @@ async function judgesOrder(
 function changeGeneratedWording(): void {
   const field = document.querySelector<HTMLTextAreaElement>('#order-document')!;
   const snapshot = JSON.parse(field.value);
+  // A generated paragraph of plain text: one with facts, as the order's opening line, must keep them.
   const paragraph = snapshot.current.content.find(
-    (node: { type: string; attrs?: { id?: string | null } }) => node.type === 'paragraph' && node.attrs?.id
+    (node: { type: string; attrs?: { id?: string | null }; content?: { type: string }[] }) =>
+      node.type === 'paragraph' && node.attrs?.id && node.content?.every(child => child.type === 'text')
   );
   paragraph.content = [{ type: 'text', text: 'Wording the judge rewrote' }];
   field.value = JSON.stringify(snapshot);

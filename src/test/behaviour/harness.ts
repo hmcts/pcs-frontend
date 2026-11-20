@@ -9,6 +9,7 @@ import { type AddressInfo } from 'node:net';
 
 import { renderText } from '@hmcts-cft/docweave';
 import express, { type Express, type Request, type Response } from 'express';
+import { DateTime } from 'luxon';
 
 export const CASE_REFERENCE = '1777027600017760';
 export const MANAGE_CASE_URL = `http://manage-case.test/cases/case-details/PCS/PCS/${CASE_REFERENCE}`;
@@ -36,6 +37,7 @@ interface Envelope {
   caseContext: Record<string, unknown>;
   hearing?: Record<string, unknown> | null;
   taskGenAppId?: string;
+  judgeName?: string | null;
 }
 
 const blankCase = (): Envelope => ({
@@ -45,7 +47,9 @@ const blankCase = (): Envelope => ({
     propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
     claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
     defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
+    court: { name: 'County Court at Bristol', venueShortName: null },
   },
+  judgeName: 'Sam Judge',
   // The hearing the order is made for, starting from the claim's facts.
   hearing: {
     id: 1,
@@ -336,9 +340,19 @@ export async function bootApp(
     caseBundle?: Record<string, unknown>;
     /** The case's hearings, over the one the order is made at, which the judge can choose to make it at. */
     hearings?: (Record<string, unknown> & { id: number; date: string })[];
+    /** The judge pcs-api names the order made by, over the default, or null when it names none. */
+    judgeName?: string | null;
+    /** The court managing the case, over the default, or null when location reference data has none. */
+    court?: Record<string, unknown> | null;
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
+  if (options.judgeName !== undefined) {
+    envelope.judgeName = options.judgeName;
+  }
+  if (options.court !== undefined) {
+    envelope.caseContext.court = options.court;
+  }
   if (options.defendants) {
     envelope.caseContext.defendants = options.defendants;
   }
@@ -463,12 +477,19 @@ export async function bootApp(
 
 export interface Page {
   form: HTMLFormElement;
-  /** The order document the page builds from the current form state, as plain text. */
+  /** The order the form's answers build, after its opening line, which openingText gives. */
   orderText(): string;
+  /** The order's opening line: before whom, where and when it was made. */
+  openingText(): string;
   /** The order document the page will submit (the editor's current snapshot), as plain text. */
   documentText(): string;
   /** The form as the browser would submit it, with the named button if the page has several. */
   body(action?: string): URLSearchParams;
+}
+
+/** An order's text after its opening line, "Before …", which the clauses' tests leave to make-order-before's. */
+function withoutOpening(text: string): string {
+  return text.startsWith('Before ') ? text.slice(text.indexOf('\n') + 1) : text;
 }
 
 /**
@@ -494,8 +515,9 @@ export async function openPage(html: string): Promise<Page> {
   form.addEventListener('submit', event => event.preventDefault());
   return {
     form,
-    orderText: () => buildOrderDocument(form).textContent,
-    documentText: () => renderText(JSON.parse(control<HTMLTextAreaElement>('#order-document').value)),
+    orderText: () => withoutOpening(buildOrderDocument(form).textContent),
+    documentText: () => withoutOpening(renderText(JSON.parse(control<HTMLTextAreaElement>('#order-document').value))),
+    openingText: () => buildOrderDocument(form).textContent.split('\n')[0],
     body: action => {
       const body = new URLSearchParams();
       form.dispatchEvent(new Event('submit', { cancelable: true }));
@@ -584,4 +606,17 @@ export function futureDate(days: number): { day: string; month: string; year: st
     month: String(date.getMonth() + 1).padStart(2, '0'),
     year: String(date.getFullYear()),
   };
+}
+
+/** The order's first sentence, before the judge the harness signs in, at its court, on the date given. */
+export function before(date: string): string {
+  return `Before District Judge Sam Judge sitting at the County Court at Bristol on ${date}`;
+}
+
+/** The first sentence of an order made at the harness's hearing. */
+export const BEFORE_HEARING = before('13 October 2026');
+
+/** The first sentence of an order made today without a hearing. */
+export function beforeToday(): string {
+  return before(DateTime.now().setZone('Europe/London').toFormat('d MMMM yyyy'));
 }

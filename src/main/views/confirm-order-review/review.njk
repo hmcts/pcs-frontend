@@ -29,6 +29,7 @@
     {# The make order page's script runs the Judge's form and its order editor, which it finds by this id. #}
     <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
           data-property-address="{{ propertyAddressDisplay }}"
+          data-order-before="{{ orderBefore | dump }}"
           data-parties="{{ orderParties | dump }}"
           {%- if withoutHearing %} data-without-hearing{% endif %}>
       {{ csrfProtection(csrfToken) }}

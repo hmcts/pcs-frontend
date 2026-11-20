@@ -35,11 +35,23 @@ export interface OrderData {
   answers: Readonly<Record<string, readonly string[]>>;
   selectedControlIds: Readonly<Record<string, string>>;
   propertyAddress: string;
+  /** Before whom, where and when the order says it was made. */
+  before: { judge: string; court: string; date: string };
   /** An order made without a hearing, which says so instead of who attended. */
   withoutHearing: boolean;
   claimants: readonly OrderParty[];
   defendants: readonly OrderParty[];
   attendance: readonly AttendanceEntry[];
+}
+
+const NOT_KNOWN = { judge: '[judge’s name and title]', court: '[court]', date: '[date]' };
+
+function readBefore(json: string | undefined): OrderData['before'] {
+  try {
+    return { ...NOT_KNOWN, ...JSON.parse(json || '{}') };
+  } catch {
+    return NOT_KNOWN;
+  }
 }
 
 export function readOrderData(form: HTMLFormElement): OrderData {
@@ -103,6 +115,7 @@ export function readOrderData(form: HTMLFormElement): OrderData {
     answers,
     selectedControlIds,
     propertyAddress: form.dataset.propertyAddress ?? '',
+    before: readBefore(form.dataset.orderBefore),
     withoutHearing: form.dataset.withoutHearing !== undefined,
     claimants: parties.filter(({ type }) => type === 'claimant').map(party),
     defendants: parties.filter(({ type }) => type !== 'claimant').map(party),

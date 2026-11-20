@@ -19,6 +19,7 @@
   {# The explicit action leaves out the tab fragment, so a refused submission opens at the error summary. #}
   <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
         data-property-address="{{ propertyAddressDisplay }}"
+        data-order-before="{{ orderBefore | dump }}"
         data-parties="{{ orderParties | dump }}"
         {%- if withoutHearing %} data-without-hearing{% endif %}>
   <input type="hidden" name="eventToken" value="{{ eventToken }}">

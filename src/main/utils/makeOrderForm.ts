@@ -36,6 +36,29 @@ export function noticeRequestLabel(withoutNotice?: string | null): string {
       : 'Notice request not recorded';
 }
 
+/** Before whom, where and when the order says it was made, as its first sentence gives them. */
+export interface OrderBefore {
+  judge: string;
+  court: string;
+  date: string;
+}
+
+/**
+ * Before whom, where and when the order was made: the judge, at the court managing the case, on the hearing's date,
+ * or today for an order made without one. A part not known is a placeholder for the judge to fill in.
+ */
+export function orderBefore({ caseContext, hearing, judgeName }: OrderStart, now = DateTime.now()): OrderBefore {
+  const court = [caseContext.court?.name, caseContext.court?.venueShortName].filter(Boolean).join(' ');
+  const date = hearing ? DateTime.fromISO(hearing.date, { zone: 'Europe/London' }) : now.setZone('Europe/London');
+  return {
+    // TODO: the judge's title from Judicial Reference Data. Until then every judge is a District Judge.
+    judge: judgeName ? `District Judge ${judgeName}` : '[judge’s name and title]',
+    court: court || '[court]',
+    // TODO: what date and court an order made without a hearing names, once the Service team have said.
+    date: date.isValid ? date.setLocale('en-GB').toFormat('d MMMM yyyy') : '[date]',
+  };
+}
+
 /** A hearing's date and time as the order pages give it. */
 export function hearingTime(iso: string): string {
   const date = DateTime.fromISO(iso, { zone: 'Europe/London' });
@@ -377,6 +400,7 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     openCounterclaim: caseContext.openCounterclaim === true,
     applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
     upcomingHearings: upcoming,
+    orderBefore: orderBefore(start),
     ownInitiativeApplyBy: daysFromToday(OWN_INITIATIVE_APPLY_BY_DAYS),
     upcomingHearingsJson: JSON.stringify(Object.fromEntries(upcoming.map(({ id, text }) => [id, text]))),
     ...hearingModel(hearing),
