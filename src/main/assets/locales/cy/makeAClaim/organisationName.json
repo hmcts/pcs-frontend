@@ -1,0 +1,10 @@
+{
+  "pageTitle": "cyWhat is your company or organisation name?",
+  "heading": "cyWhat is your company or organisation name?",
+  "labels": {
+    "organisationName": "cyRegistered company or organisation name"
+  },
+  "errors": {
+    "organisationName": "cyEnter your company or organisation name"
+  }
+}

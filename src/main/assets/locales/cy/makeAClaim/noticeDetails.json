@@ -1,0 +1,13 @@
+{
+  "pageTitle": "cyNotice details",
+  "heading": "cyNotice details",
+  "paragraphs": [
+    "cyYou will now be asked about the notice you served to the defendants. A notice is a formal communication telling the defendants that you intend to repossess the property, like form 3A.",
+    "cyYou will be asked:"
+  ],
+  "bullets": ["cyif you served notice", "cyhow you served the notice", "cythe date you served the notice"],
+  "afterBullets": [
+    "cyYou will also be asked to upload a copy of the notice.",
+    "cyThe defendants will be able to see your answers and any documents you upload."
+  ]
+}

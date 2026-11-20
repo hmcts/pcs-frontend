@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Defendant and claimant circumstances",
+  "heading": "Defendant and claimant circumstances",
+  "paragraphs": ["You will now be asked about:"],
+  "bullets": ["the defendants’ circumstances", "your circumstances"],
+  "afterBullets": [
+    "A judge will use this to understand each party’s financial and personal situation.",
+    "You will also be asked if there are any sub-tenants or mortgage lenders with an interest in the property.",
+    "The defendants will be able to see your answers."
+  ]
+}

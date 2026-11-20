@@ -1,0 +1,13 @@
+{
+  "pageTitle": "Sub-tenants and mortgage lenders",
+  "heading": "Sub-tenants and mortgage lenders",
+  "paragraphs": [
+    "You must give details of any sub-tenants or mortgage lenders connected to the property. The court will tell them about this claim.",
+    "If your tenant has rented the property to someone else, that person is called an ‘underlessee’. If you have a mortgage on the property, your lender is called a ‘mortgagee’.",
+    "An underlessee or mortgagee may be able to ask the court to cancel a possession order. This is called ‘relief from forfeiture’."
+  ],
+  "question": "Do you need to give details of a sub-tenant or a mortgage lender?",
+  "errors": {
+    "underlesseeExists": "Select whether you need to give details of a sub-tenant or mortgage lender"
+  }
+}

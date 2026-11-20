@@ -1,0 +1,9 @@
+{
+  "pageTitle": "Defendant details",
+  "heading": "Defendant details",
+  "paragraphs": [
+    "You will now be asked about the people you’re making the claim against. They will be known as the defendants.",
+    "You must provide:"
+  ],
+  "bullets": ["their name", "their address for service (the address where they should receive post)"]
+}

@@ -1,0 +1,12 @@
+{
+  "pageTitle": "What type of claimant are you?",
+  "question": "What type of claimant are you?",
+  "options": {
+    "PRIVATE_LANDLORD": "Private landlord",
+    "SOCIAL_LANDLORD": "Registered provider of social housing (housing association or local authority)",
+    "MORTGAGE_LENDER": "Mortgage provider"
+  },
+  "errors": {
+    "claimantType": "Select what type of claimant you are"
+  }
+}

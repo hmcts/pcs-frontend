@@ -1,0 +1,9 @@
+{
+  "pageTitle": "How much is the rent?",
+  "question": "How much is the rent?",
+  "hint": "You can say how often this amount is paid on the next screen",
+  "errors": {
+    "rentAmount": "Enter how much the rent is",
+    "rentAmountInvalid": "Enter the rent as an amount of money, like 1000 or 1000.50"
+  }
+}

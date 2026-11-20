@@ -1,0 +1,10 @@
+{
+  "pageTitle": "What is your postal address?",
+  "heading": "What is your postal address?",
+  "errors": {
+    "claimant-addressLine1": "Enter the first line of your address",
+    "claimant-town": "Enter the town or city of your address",
+    "claimant-postcode": "Enter the postcode of your address",
+    "postcodeInvalid": "Enter a real postcode, like LU1 1AB"
+  }
+}

@@ -1,0 +1,81 @@
+{% extends "make-a-claim/templates/layout.njk" %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% from "make-a-claim/templates/fields.njk" import formField %}
+
+{% block mainContent %}
+  {% if errorSummary %}
+    {{ govukErrorSummary(errorSummary) }}
+  {% endif %}
+
+  {% if caption %}
+    <span class="govuk-caption-l">{{ caption }}</span>
+  {% endif %}
+  {% if heading %}
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+  {% endif %}
+
+  {% for paragraph in paragraphs %}
+    <p class="govuk-body">{{ paragraph | safe }}</p>
+  {% endfor %}
+  {% if bullets %}
+    <ul class="govuk-list govuk-list--bullet">
+      {% for bullet in bullets %}
+        <li>{{ bullet | safe }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  {% for paragraph in afterBullets %}
+    <p class="govuk-body">{{ paragraph | safe }}</p>
+  {% endfor %}
+  {% if listItems and listItems.length %}
+    <h2 class="govuk-heading-m">{{ listHeading }}</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      {% for item in listItems %}
+        <li>{{ item }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  {% if inset %}
+    {{ govukInsetText({ html: inset }) }}
+  {% endif %}
+
+  {% block beforeForm %}{% endblock %}
+
+  <form method="post" action="{{ url }}" novalidate>
+    {% block formFields %}
+      {% for field in fields %}
+        {{ formField(field) }}
+      {% endfor %}
+    {% endblock %}
+
+    {% block buttons %}
+      <div class="govuk-button-group">
+        {{ govukButton({
+          text: saveAndContinue,
+          preventDoubleClick: true,
+          attributes: { name: 'action', value: 'continue' }
+        }) }}
+        {% if saveForLater %}
+          {{ govukButton({
+            text: saveForLater,
+            classes: 'govuk-button--secondary',
+            preventDoubleClick: true,
+            attributes: { name: 'action', value: 'saveForLater' }
+          }) }}
+        {% endif %}
+      </div>
+      {% if not saveForLater and dashboardUrl %}
+        <p class="govuk-body"><a href="{{ dashboardUrl }}" class="govuk-link">{{ cancel }}</a></p>
+      {% endif %}
+    {% endblock %}
+    {% if draftVersion is defined and draftVersion !== null %}
+      <input type="hidden" name="draftVersion" value="{{ draftVersion }}">
+    {% endif %}
+    {{ csrfProtection(csrfToken) }}
+  </form>
+
+  {% block afterForm %}{% endblock %}
+{% endblock %}

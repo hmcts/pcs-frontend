@@ -1,7 +1,13 @@
 import type { Request, RequestHandler } from 'express';
 
+import { makeAClaimFeatureMiddleware } from '../middleware/makeAClaimFeature';
+
 import { flowConfig as uploadAdditionalDocumentsFlowConfig } from './case-tasks/upload-additional-documents/flow.config';
 import { stepRegistry as uploadAdditionalDocumentsStepRegistry } from './case-tasks/upload-additional-documents/stepRegistry';
+import { MAKE_A_CLAIM_DRAFT_EVENT } from './make-a-claim/claimDraft';
+import { flowConfig as makeAClaimFlowConfig } from './make-a-claim/flow.config';
+import { resolveRentHistoryDesign } from './make-a-claim/routeMiddleware';
+import { stepRegistry as makeAClaimStepRegistry } from './make-a-claim/stepRegistry';
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
 import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
 import { respondToClaimAccessGuard } from './respond-to-claim/accessGuard';
@@ -34,6 +40,8 @@ export interface JourneyConfig {
   legalrep?: ResolvedJourneyConfig;
   // Mounted on the journey basePath after requireEventAccess, so validatedCase is loaded (see registerAllJourneys).
   routeMiddleware?: RequestHandler[];
+  // Gates each step in place of respondToClaimFeatureMiddleware, for journeys that are not part of responding.
+  featureMiddleware?: RequestHandler;
 }
 
 // JourneyVariant intentionally diverges from UserType ('citizen' | 'legalrep').
@@ -68,6 +76,17 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
       flowConfig: makeAnApplicationFlowConfig,
       stepRegistry: makeAnApplicationStepRegistry,
     },
+  },
+  makeAClaim: {
+    name: 'makeAClaim',
+    slug: 'make-a-claim',
+    draftEvent: MAKE_A_CLAIM_DRAFT_EVENT,
+    default: {
+      flowConfig: makeAClaimFlowConfig,
+      stepRegistry: makeAClaimStepRegistry,
+    },
+    routeMiddleware: [resolveRentHistoryDesign],
+    featureMiddleware: makeAClaimFeatureMiddleware,
   },
   uploadAdditionalDocuments: {
     name: 'uploadAdditionalDocuments',

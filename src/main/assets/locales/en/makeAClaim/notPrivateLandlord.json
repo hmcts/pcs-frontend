@@ -1,0 +1,9 @@
+{
+  "pageTitle": "You cannot use this service",
+  "heading": "You cannot use this service",
+  "paragraphs": [
+    "Only private landlords can use this service.",
+    "If you’re a registered provider of social housing or a mortgage provider, use <a class=\"govuk-link\" href=\"https://manage-case.platform.hmcts.net\">MyHMCTS</a> instead."
+  ],
+  "exitText": "Close and return to the GOV.UK homepage"
+}

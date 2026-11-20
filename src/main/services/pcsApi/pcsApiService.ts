@@ -62,6 +62,35 @@ export const validateAccessCode = async (
   }
 };
 
+/** Whether pcs-api can take a private landlord's claim for a property, by its postcode. */
+export type PropertyEligibilityStatus = 'ELIGIBLE' | 'NOT_ENGLAND' | 'NOT_COVERED' | 'LEGISLATIVE_COUNTRY_REQUIRED';
+
+const PROPERTY_ELIGIBILITY_STATUSES: PropertyEligibilityStatus[] = [
+  'ELIGIBLE',
+  'NOT_ENGLAND',
+  'NOT_COVERED',
+  'LEGISLATIVE_COUNTRY_REQUIRED',
+];
+
+export const getPropertyEligibility = async (
+  accessToken: string,
+  postcode: string,
+  legislativeCountry?: 'England'
+): Promise<PropertyEligibilityStatus> => {
+  const response = await http.get<{ status?: PropertyEligibilityStatus }>(
+    `${getBaseUrl()}/cases/citizen-claims/property-eligibility`,
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      params: { postcode, ...(legislativeCountry ? { legislativeCountry } : {}) },
+    }
+  );
+  const status = response.data?.status;
+  if (!status || !PROPERTY_ELIGIBILITY_STATUSES.includes(status)) {
+    throw new Error('Unexpected response from property-eligibility endpoint');
+  }
+  return status;
+};
+
 export const getCitizenClaims = async (accessToken: string): Promise<ClaimSummary[]> => {
   const response = await http.get<ClaimSummary[]>(`${getBaseUrl()}/cases/citizen-claims`, {
     headers: { Authorization: `Bearer ${accessToken}` },

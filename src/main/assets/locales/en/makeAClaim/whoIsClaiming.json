@@ -1,0 +1,13 @@
+{
+  "pageTitle": "Who are you making this claim for?",
+  "question": "Who are you making this claim for?",
+  "options": {
+    "MYSELF": "Myself – I’m the claimant",
+    "SOLICITOR": "A client – I’m their solicitor",
+    "LITIGATION_FRIEND": "Someone else – I’m their litigation friend",
+    "AGENT": "Someone else – I’m their agent"
+  },
+  "errors": {
+    "whoIsClaiming": "Select who you’re making this claim for"
+  }
+}

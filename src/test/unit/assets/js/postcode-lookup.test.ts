@@ -947,6 +947,31 @@ describe('initPostcodeLookup', () => {
   });
 
   describe('Form submission validation', () => {
+    it('lets Save for later through when addresses were found but none selected', () => {
+      document.body.innerHTML = `
+        <form id="testForm">
+          ${buildErrorSummary()}
+          ${buildComponent()}
+          <button type="submit" name="action" value="saveForLater">Save for later</button>
+        </form>
+      `;
+      initPostcodeLookup();
+      (document.getElementById('address-addressesFoundFlag') as HTMLInputElement).value = 'true';
+      (document.getElementById('address-addressSelectContainer') as HTMLDivElement).hidden = false;
+      const select = document.getElementById('address-selectedAddress') as HTMLSelectElement;
+      select.innerHTML = '<option value="">2 addresses found</option><option value="0">Address 1</option>';
+
+      const preventDefaultSpy = jest.fn();
+      const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+      Object.defineProperty(submitEvent, 'preventDefault', { value: preventDefaultSpy });
+      Object.defineProperty(submitEvent, 'submitter', {
+        value: document.querySelector('button[value="saveForLater"]'),
+      });
+      (document.getElementById('testForm') as HTMLFormElement).dispatchEvent(submitEvent);
+
+      expect(preventDefaultSpy).not.toHaveBeenCalled();
+    });
+
     it('prevents submission when addresses found but none selected', () => {
       const formHtml = `
         <form id="testForm">

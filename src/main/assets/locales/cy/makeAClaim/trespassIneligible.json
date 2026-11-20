@@ -1,0 +1,9 @@
+{
+  "pageTitle": "cyYou cannot use this service yet",
+  "heading": "cyYou cannot use this service yet",
+  "paragraphs": [
+    "cyYou cannot make a claim against trespassers using this service yet.",
+    "cyUse <a class=\"govuk-link\" href=\"https://www.gov.uk/government/publications/form-n5-claim-form-for-possession-of-property\" target=\"_blank\" rel=\"noopener noreferrer\">form N5 (opens in new tab)</a> with <a class=\"govuk-link\" href=\"https://www.gov.uk/government/publications/form-n121-particulars-of-claim-for-possession-trespassers\" target=\"_blank\" rel=\"noopener noreferrer\">form N121 (opens in new tab)</a> to make your claim instead."
+  ],
+  "exitText": "cyClose and return to the GOV.UK homepage"
+}

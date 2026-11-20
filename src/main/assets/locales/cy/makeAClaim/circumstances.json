@@ -1,0 +1,11 @@
+{
+  "pageTitle": "cyDefendant and claimant circumstances",
+  "heading": "cyDefendant and claimant circumstances",
+  "paragraphs": ["cyYou will now be asked about:"],
+  "bullets": ["cythe defendants’ circumstances", "cyyour circumstances"],
+  "afterBullets": [
+    "cyA judge will use this to understand each party’s financial and personal situation.",
+    "cyYou will also be asked if there are any sub-tenants or mortgage lenders with an interest in the property.",
+    "cyThe defendants will be able to see your answers."
+  ]
+}

@@ -48,7 +48,8 @@ function buildGetMiddleware(
   requiresAuth: boolean,
   flowConfig: JourneyFlowConfig | ((req: Request) => JourneyFlowConfig),
   stepContext: RequestHandler,
-  stepMiddleware?: RequestHandler[]
+  stepMiddleware: RequestHandler[] | undefined,
+  featureMiddleware: RequestHandler
 ): RequestHandler[] {
   const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
   const dependencyCheck = stepDependencyCheckMiddleware(flowConfig);
@@ -62,7 +63,7 @@ function buildGetMiddleware(
         legalRepresentativeSpecificStepsAccessMiddleware,
         citizenOnlyStepsAccessMiddleware,
         legalRepresentativeHeaderMiddleware,
-        respondToClaimFeatureMiddleware,
+        featureMiddleware,
       ]
     : [
         stepContext,
@@ -71,7 +72,7 @@ function buildGetMiddleware(
         legalRepresentativeSpecificStepsAccessMiddleware,
         citizenOnlyStepsAccessMiddleware,
         legalRepresentativeHeaderMiddleware,
-        respondToClaimFeatureMiddleware,
+        featureMiddleware,
       ];
 }
 
@@ -117,9 +118,16 @@ function registerStepRoutes(
   const requiresAuth = stepConfig?.requiresAuth !== false;
   const authMiddlewares = requiresAuth ? [oidcMiddleware] : [];
   const stepContext = withStepContext({ name: step.name, journey: journeyName });
+  const featureMiddleware = journeyRegistry[journeyName]?.featureMiddleware ?? respondToClaimFeatureMiddleware;
 
   if (step.getController) {
-    const allGetMiddleware = buildGetMiddleware(requiresAuth, flowConfigResolver, stepContext, step.middleware);
+    const allGetMiddleware = buildGetMiddleware(
+      requiresAuth,
+      flowConfigResolver,
+      stepContext,
+      step.middleware,
+      featureMiddleware
+    );
     router.get(step.url, ...allGetMiddleware, createGetHandler(step, journeyName));
   }
 
@@ -131,7 +139,7 @@ function registerStepRoutes(
       legalRepresentativeSpecificStepsAccessMiddleware,
       citizenOnlyStepsAccessMiddleware,
       legalRepresentativeHeaderMiddleware,
-      respondToClaimFeatureMiddleware,
+      featureMiddleware,
       (req, res, next) => {
         const resolvedStep = getStepForJourney(journeyName, step.name, req) || step;
         return resolvedStep.postController?.post ? resolvedStep.postController.post(req, res, next) : next();

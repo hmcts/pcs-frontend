@@ -1,0 +1,13 @@
+{
+  "pageTitle": "cyWho are you making this claim for?",
+  "question": "cyWho are you making this claim for?",
+  "options": {
+    "MYSELF": "cyMyself – I’m the claimant",
+    "SOLICITOR": "cyA client – I’m their solicitor",
+    "LITIGATION_FRIEND": "cySomeone else – I’m their litigation friend",
+    "AGENT": "cySomeone else – I’m their agent"
+  },
+  "errors": {
+    "whoIsClaiming": "cySelect who you’re making this claim for"
+  }
+}

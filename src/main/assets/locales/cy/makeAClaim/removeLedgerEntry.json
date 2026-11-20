@@ -1,0 +1,7 @@
+{
+  "pageTitle": "cyRemove a transaction",
+  "question": "cyAre you sure you want to remove the transaction on {{transactionDate}}?",
+  "errors": {
+    "confirmRemove": "cySelect whether you want to remove this transaction"
+  }
+}

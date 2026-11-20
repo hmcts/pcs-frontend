@@ -1,0 +1,10 @@
+{
+  "pageTitle": "cyWhat is the sub-tenant or mortgage lender’s name?",
+  "heading": "cyWhat is the sub-tenant or mortgage lender’s name?",
+  "labels": {
+    "underlesseeName": "cyName"
+  },
+  "errors": {
+    "underlesseeName": "cyEnter the sub-tenant or mortgage lender’s name"
+  }
+}

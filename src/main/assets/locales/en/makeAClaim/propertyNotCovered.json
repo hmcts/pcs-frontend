@@ -1,0 +1,9 @@
+{
+  "pageTitle": "You cannot use this service yet",
+  "heading": "You cannot use this service for this property yet",
+  "paragraphs": [
+    "You cannot make a claim for a property in this area using this service yet.",
+    "Use <a class=\"govuk-link\" href=\"https://www.gov.uk/government/publications/form-n5-claim-form-for-possession-of-property\" target=\"_blank\" rel=\"noopener noreferrer\">form N5 (opens in new tab)</a> to make your claim instead."
+  ],
+  "exitText": "Close and return to the GOV.UK homepage"
+}

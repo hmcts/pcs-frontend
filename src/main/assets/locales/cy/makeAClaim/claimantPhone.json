@@ -1,0 +1,13 @@
+{
+  "pageTitle": "cyDo you want to be contacted by telephone?",
+  "question": "cyDo you want to be contacted by telephone?",
+  "hint": "cyWe might need to contact you by telephone with urgent updates about your case",
+  "labels": {
+    "phoneNumber": "cyUK phone number"
+  },
+  "errors": {
+    "contactByPhone": "cySelect whether you want to be contacted by telephone",
+    "phoneNumber": "cyEnter your phone number",
+    "phoneNumberInvalid": "cyEnter a UK phone number, like 01632 960 001 or 07700 900 982"
+  }
+}

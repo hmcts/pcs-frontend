@@ -1,0 +1,14 @@
+{
+  "pageTitle": "Other information about your reasons for possession",
+  "question": "Is there any other information you’d like to give about your reasons for possession?",
+  "labels": {
+    "otherReasonsDetail": "Give other information about your reasons for possession"
+  },
+  "errors": {
+    "hasOtherReasons": "Select whether there is any other information about your reasons for possession",
+    "otherReasonsDetail": "Enter the other information about your reasons for possession"
+  },
+  "fieldNames": {
+    "otherReasonsDetail": "Your other information"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "pageTitle": "Upload rent statement",
+  "heading": "Upload rent statement",
+  "paragraphs": [
+    "Upload a document that shows the dates and amounts of missed payments and a running total of the arrears.",
+    "You must bring a paper copy of the latest rent statement to the hearing."
+  ],
+  "beforeUploadHeading": "Before you upload your file",
+  "beforeUploadText": "Give your file a name that explains what it is. For example, ‘Rent statement for 15 Garden Drive’.",
+  "uploadLabel": "Upload a file",
+  "uploadButton": "Upload file",
+  "filesAddedHeading": "Files added",
+  "deleteButton": "Remove",
+  "errors": {
+    "documents": "Upload a rent statement"
+  }
+}

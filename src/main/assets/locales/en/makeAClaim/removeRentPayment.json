@@ -1,0 +1,7 @@
+{
+  "pageTitle": "Remove a payment",
+  "question": "Are you sure you want to remove the payment of {{amountPaid}} made on {{datePaid}}?",
+  "errors": {
+    "confirmRemove": "Select whether you want to remove this payment"
+  }
+}

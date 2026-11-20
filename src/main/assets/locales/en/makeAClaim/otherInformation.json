@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Other information about the claim",
+  "heading": "Other information about the claim",
+  "paragraphs": ["You will now be asked:"],
+  "bullets": [
+    "to upload any files you have not uploaded yet",
+    "whether there is anything else about your reasons for possession you want to tell the court",
+    "whether you intend to make a general application with this claim",
+    "whether you need any support to use HMCTS services",
+    "which language you used to complete this claim"
+  ]
+}

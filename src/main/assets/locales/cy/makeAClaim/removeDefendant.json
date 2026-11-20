@@ -1,0 +1,7 @@
+{
+  "pageTitle": "cyRemove a defendant",
+  "question": "cyAre you sure you want to remove {{defendantName}} from the claim?",
+  "errors": {
+    "confirmRemove": "cySelect whether you want to remove this defendant"
+  }
+}

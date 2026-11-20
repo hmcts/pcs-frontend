@@ -1,0 +1,18 @@
+{
+  "pageTitle": "When was the notice served?",
+  "question": "When was the notice served?",
+  "hint": "For example, 27 9 2022",
+  "errors": {
+    "date": {
+      "required": "Enter the date the notice was served",
+      "notRealDate": "The date the notice was served must be a real date",
+      "invalidValue": "The date the notice was served must be a real date",
+      "futureDate": "The date the notice was served must be today or in the past",
+      "missingOne": "The date the notice was served must include a {{missingField}}",
+      "missingTwo": "The date the notice was served must include a {{first}} and {{second}}",
+      "day": "Day",
+      "month": "Month",
+      "year": "Year"
+    }
+  }
+}
