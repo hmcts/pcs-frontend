@@ -1,12 +1,11 @@
 {#
   What court staff check before choosing who the order is served on: its answers as they now are, with the Judge's own
-  where staff changed them, and the order to issue. The answers do not show that the wording matches them.
+  where staff changed them. The answers do not show that the wording matches them, so staff check the order too.
 #}
 {% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
-{% from "govuk/components/details/macro.njk" import govukDetails %}
 
-<h2 class="govuk-heading-m">About this order</h2>
-<p class="govuk-body">From the order's answers. The wording may have been edited, so check the order to issue.</p>
+<h3 class="govuk-heading-s govuk-!-margin-bottom-1">About this order</h3>
+<p class="govuk-body-s">From the order's answers. The wording may have been edited, so check the order to issue.</p>
 {% set rows = [] %}
 {% for row in issueSummary %}
   {% set valueHtml %}
@@ -14,11 +13,4 @@
   {% endset %}
   {% set rows = (rows.push({ key: { text: row.key }, value: { html: valueHtml } }), rows) %}
 {% endfor %}
-{{ govukSummaryList({ rows: rows, attributes: { id: "issue-summary" } }) }}
-
-{% if issuingHtml %}
-  {% set issuingOrderHtml %}
-    <div class="pcs-order-preview" aria-label="Order to issue" role="region">{{ issuingHtml | safe }}</div>
-  {% endset %}
-  {{ govukDetails({ summaryText: "Order to issue", html: issuingOrderHtml, attributes: { id: "issuing-order" } }) }}
-{% endif %}
+{{ govukSummaryList({ rows: rows, classes: "pcs-compact-summary", attributes: { id: "issue-summary" } }) }}

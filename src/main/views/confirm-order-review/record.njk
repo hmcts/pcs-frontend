@@ -1,0 +1,358 @@
+{% extends "confirm-order-review/_layout.njk" %}
+
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "macros/csrf.njk" import csrfProtection %}
+{% import "confirm-order-review/_buttons.njk" as buttons with context %}
+{% import "confirm-order-review/_order-panel.njk" as orderPanel %}
+
+{% set pageHeading = "Record and issue" %}
+
+{#
+  What court staff record from the order to issue it, read off the order beside the questions: what a free-form order
+  does, its costs and money judgments, its review dates, and who it is served on under which seal. Nothing here changes
+  the order. Court staff are experts using it all day, so the controls are the small ones, with related fields on a
+  row, and every set of radios is on one line, as on the Judge's form; money judgments are summed up a row each,
+  opening to change them, and review dates are a row each.
+#}
+
+{% macro radios(name, legend, options, value, params={}) %}
+  {% set items = [] %}
+  {% for option in options %}
+    {% set items = (items.push({
+      value: option.value,
+      text: option.text,
+      checked: value == option.value,
+      conditional: { html: params.conditionals[option.value] } if params.conditionals and params.conditionals[option.value]
+    }), items) %}
+  {% endfor %}
+  {{ govukRadios({
+    name: name,
+    idPrefix: name,
+    classes: "govuk-radios--small pcs-inline-radios",
+    fieldset: { legend: { text: legend, classes: params.legendClasses or "govuk-fieldset__legend--s" } },
+    hint: { text: params.hint } if params.hint,
+    errorMessage: validationErrors[name],
+    items: items
+  }) }}
+{% endmacro %}
+
+{% macro partyChoices(name, legend, chosen) %}
+  {% set items = [] %}
+  {% for party in parties %}
+    {% set items = (items.push({ value: party.value, text: party.text, checked: party.value in chosen }), items) %}
+  {% endfor %}
+  {{ govukCheckboxes({
+    name: name,
+    idPrefix: name,
+    classes: "govuk-checkboxes--small",
+    fieldset: { legend: { text: legend, classes: "govuk-fieldset__legend--s" } },
+    errorMessage: validationErrors[name],
+    items: items
+  }) }}
+{% endmacro %}
+
+{# A date as its day, month and year, GOV.UK's way; an error on it is on its day. #}
+{% macro date(id, legend, value) %}
+  {{ govukDateInput({
+    id: id,
+    namePrefix: id,
+    fieldset: { legend: { text: legend, classes: "govuk-fieldset__legend--s" } },
+    errorMessage: validationErrors[id + "-day"],
+    items: [
+      { name: "day", classes: "govuk-input--width-2" + (" govuk-input--error" if validationErrors[id + "-day"]), value: value.day },
+      { name: "month", classes: "govuk-input--width-2" + (" govuk-input--error" if validationErrors[id + "-day"]), value: value.month },
+      { name: "year", classes: "govuk-input--width-4" + (" govuk-input--error" if validationErrors[id + "-day"]), value: value.year }
+    ]
+  }) }}
+{% endmacro %}
+
+{# A free-form order's date, which its answers keep as a field each for its day, month and year. #}
+{% macro detailsDate(id, legend) %}
+  {{ date(id, legend, { day: orderDetails[id + "-day"], month: orderDetails[id + "-month"], year: orderDetails[id + "-year"] }) }}
+{% endmacro %}
+
+{# The time stated in the order, which court staff record as the order states it, with no default. #}
+{% macro detailsTime(id) %}
+  {{ govukInput({
+    id: id,
+    name: id,
+    label: { text: "Time possession is ordered by (optional)", classes: "govuk-label--s" },
+    hint: { text: "As the order states it, for example 16:00. Leave blank if it gives none." },
+    classes: "govuk-input--width-5",
+    spellcheck: false,
+    value: orderDetails[id],
+    errorMessage: validationErrors[id]
+  }) }}
+{% endmacro %}
+
+{% macro money(id, label, value) %}
+  {{ govukInput({
+    id: id,
+    name: id,
+    label: { text: label, classes: "govuk-label--s" },
+    prefix: { text: "£" },
+    classes: "govuk-input--width-5",
+    inputmode: "decimal",
+    spellcheck: false,
+    value: value,
+    errorMessage: validationErrors[id]
+  }) }}
+{% endmacro %}
+
+{% block page %}
+  <div class="pcs-review-page">
+    {% call orderPanel.panel("Order to issue", staffMessage) %}
+      {{ orderPanel.issuing(issuingHtml) }}
+    {% endcall %}
+
+    <form method="post" action="{{ formAction }}" novalidate class="pcs-record">
+      {{ csrfProtection(csrfToken) }}
+      <input type="hidden" name="reviewOrderId" value="{{ reviewOrderId }}">
+      {# Enter in a field submits the form's first button: this one continues, rather than adding or removing a row. #}
+      <button type="submit" name="action" value="continue" class="govuk-visually-hidden" tabindex="-1" aria-hidden="true">Continue</button>
+
+      {% if freeForm %}
+        <section class="pcs-record__section" id="{{ sections.orderDetails }}" aria-labelledby="order-details-heading">
+          <h2 class="govuk-heading-m" id="order-details-heading">What the order does</h2>
+          {% set outrightHtml %}
+            {{ radios("outright-possession", "When is possession ordered?", outrightPossession, orderDetails["outright-possession"], {
+              conditionals: { by: detailsDate("outright-date", "Date possession is ordered by") + detailsTime("outright-time") }
+            }) }}
+            {{ radios("outright-grounds", "Grounds", grounds, orderDetails["outright-grounds"]) }}
+            {{ govukInput({
+              name: "outright-grounds-details",
+              id: "outright-grounds-details",
+              label: { text: "Details of the grounds (optional)", classes: "govuk-label--s" },
+              value: orderDetails["outright-grounds-details"],
+              errorMessage: validationErrors["outright-grounds-details"]
+            }) }}
+            {{ radios("outright-transfer", "Transfers enforcement to the High Court?", yesNo, orderDetails["outright-transfer"]) }}
+          {% endset %}
+          {% set suspendedHtml %}
+            {{ detailsDate("suspended-date", "Date possession is ordered by") }}
+            {{ detailsTime("suspended-time") }}
+            {{ radios("suspended-condition", "Condition", condition, orderDetails["suspended-condition"]) }}
+            {{ radios("suspended-warrant-on-notice", "Any application for a warrant on notice to all parties?", yesNo, orderDetails["suspended-warrant-on-notice"]) }}
+          {% endset %}
+          {{ radios("order-does", "What does the order do?", orderDoes, orderDetails["order-does"], {
+            hint: "The Judge wrote this order. Record what it does. This does not change the order.",
+            conditionals: {
+              outright: outrightHtml,
+              suspended: suspendedHtml,
+              adjournment: radios("adjournment", "How is the claim adjourned?", adjournment, orderDetails.adjournment),
+              "strike-out": radios("strike-out", "Is the claim struck out or dismissed?", strikeOut, orderDetails["strike-out"])
+            }
+          }) }}
+        </section>
+      {% endif %}
+
+      <section class="pcs-record__section" id="{{ sections.moneyJudgments }}" aria-labelledby="money-judgments-heading">
+        <h2 class="govuk-heading-m" id="money-judgments-heading">Money judgments and costs</h2>
+
+        {% set costsItems = [{ value: "", text: "Select what the order says" }] %}
+        {% for option in costsOptions %}
+          {% set costsItems = (costsItems.push({ value: option.value, text: option.text, selected: moneyAnswers.costs == option.value }), costsItems) %}
+        {% endfor %}
+        {{ govukSelect({
+          id: "costs",
+          name: "costs",
+          label: { text: "What does the order say about costs?", classes: "govuk-label--s" },
+          hint: { text: "Record any sum of costs to be paid as a money judgment." },
+          errorMessage: validationErrors["costs"],
+          items: costsItems
+        }) }}
+
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Money judgments</h3>
+        <p class="govuk-hint">Different sums or terms for different parties are separate judgments.</p>
+        {% for judgment in judgments %}
+          {% set n = loop.index %}
+          {% set prefix = "judgment-" + n %}
+          {% set frequencyItems = [{ value: "", text: "How often" }] %}
+          {% for option in frequencies %}
+            {% set frequencyItems = (frequencyItems.push({ value: option.value, text: option.text, selected: judgment.instalmentFrequency == option.value }), frequencyItems) %}
+          {% endfor %}
+          <details class="govuk-details pcs-list-row" id="{{ prefix }}" {%- if judgment.open %} open{% endif %}>
+            <summary class="govuk-details__summary">
+              <span class="govuk-details__summary-text">Money judgment {{ n }}</span>
+              <span class="pcs-list-row__summary" data-judgment-summary>{{ judgment.summary }}</span>
+            </summary>
+            <div class="govuk-details__text pcs-list-row__body">
+              <div class="pcs-field-row">
+                {{ partyChoices(prefix + "-debtors", "Who must pay?", judgment.debtors) }}
+                {{ partyChoices(prefix + "-creditors", "Who is paid?", judgment.creditors) }}
+              </div>
+              {# A judgment needs at least one amount, which none of them alone does: the error is the group's. #}
+              {% set amountsId = prefix + "-amounts" %}
+              {% set amountsError = validationErrors[amountsId] %}
+              <div class="govuk-form-group{% if amountsError %} govuk-form-group--error{% endif %}">
+                <fieldset class="govuk-fieldset" id="{{ amountsId }}" tabindex="-1" aria-describedby="{{ amountsId }}-hint{% if amountsError %} {{ amountsId }}-error{% endif %}">
+                  <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Judgment amounts</legend>
+                  <p class="govuk-hint" id="{{ amountsId }}-hint">Enter at least one amount.</p>
+                  {% if amountsError %}
+                    {{ govukErrorMessage({ id: amountsId + "-error", text: amountsError.text }) }}
+                  {% endif %}
+                  <div class="pcs-field-row">
+                    {{ money(prefix + "-arrears", "Arrears", judgment.arrears) }}
+                    {{ money(prefix + "-other-amount", "Interest or other", judgment.otherAmount) }}
+                    {{ money(prefix + "-costs", "Costs", judgment.costs) }}
+                  </div>
+                </fieldset>
+              </div>
+              <p class="govuk-hint govuk-!-margin-bottom-2">How it is paid. Leave blank if the order does not say: it is then due within 14 days.</p>
+              <div class="pcs-field-row">
+                {{ money(prefix + "-one-off-amount", "One-off payment", judgment.oneOffAmount) }}
+                {{ date(prefix + "-one-off-date", "One-off due by", judgment.oneOffDate) }}
+                {{ date(prefix + "-pay-by", "Whole sum or balance by", judgment.payBy) }}
+              </div>
+              <div class="pcs-field-row">
+                {{ money(prefix + "-instalment-amount", "Instalment", judgment.instalmentAmount) }}
+                {{ govukSelect({
+                  id: prefix + "-instalment-frequency",
+                  name: prefix + "-instalment-frequency",
+                  label: { text: "Paid", classes: "govuk-label--s" },
+                  errorMessage: validationErrors[prefix + "-instalment-frequency"],
+                  items: frequencyItems
+                }) }}
+                {{ date(prefix + "-first-instalment-date", "First instalment by", judgment.firstInstalmentDate) }}
+              </div>
+              <div class="pcs-field-row pcs-field-row--split">
+                {{ govukCheckboxes({
+                  name: prefix + "-suspended",
+                  idPrefix: prefix + "-suspended",
+                  classes: "govuk-checkboxes--small",
+                  items: [{ value: "yes", text: "Enforcement is suspended on the terms of the possession order", checked: judgment.suspended }]
+                }) }}
+                {{ govukButton({
+                  text: "Remove",
+                  classes: "govuk-button--warning pcs-small-button",
+                  name: "action",
+                  value: "remove-" + prefix,
+                  attributes: { "aria-label": "Remove money judgment " + n }
+                }) }}
+              </div>
+            </div>
+          </details>
+        {% endfor %}
+        {% if not judgments.length %}
+          {{ govukCheckboxes({
+            name: "has-money-judgments",
+            idPrefix: "has-money-judgments",
+            classes: "govuk-checkboxes--small",
+            errorMessage: validationErrors["has-money-judgments"],
+            items: [{ value: "no", text: "The order makes no money judgment", checked: moneyAnswers.hasMoneyJudgments == "no" }]
+          }) }}
+        {% endif %}
+        {% if canAddJudgment %}
+          {{ govukButton({ text: "Add money judgment", classes: "govuk-button--secondary pcs-small-button", name: "action", value: "add-judgment" }) }}
+        {% else %}
+          <p class="govuk-body-s">You can add up to {{ maxJudgments }} money judgments.</p>
+        {% endif %}
+      </section>
+
+      <section class="pcs-record__section" id="{{ sections.reviewDates }}" aria-labelledby="review-dates-heading">
+        <h2 class="govuk-heading-m" id="review-dates-heading">Review dates</h2>
+        {% if reviewDates.length %}
+          {% for reviewDate in reviewDates %}
+            {% set n = loop.index %}
+            {% set prefix = "review-date-" + n %}
+            {% set reasonItems = [{ value: "", text: "Select a reason" }] %}
+            {% for reason in reasons %}
+              {% set reasonItems = (reasonItems.push({ value: reason.value, text: reason.text, selected: reviewDate.reason == reason.value }), reasonItems) %}
+            {% endfor %}
+            <div class="pcs-field-row pcs-review-date" id="{{ prefix }}" role="group" aria-label="Review date {{ n }}">
+              {{ date(prefix + "-date", "Date of review " + n, reviewDate) }}
+              {{ govukSelect({
+                id: prefix + "-reason",
+                name: prefix + "-reason",
+                label: { text: "Reason", classes: "govuk-label--s" },
+                errorMessage: validationErrors[prefix + "-reason"],
+                items: reasonItems
+              }) }}
+              {{ govukInput({
+                id: prefix + "-description",
+                name: prefix + "-description",
+                label: { text: "Description", classes: "govuk-label--s" },
+                value: reviewDate.description,
+                classes: "govuk-input--width-20",
+                attributes: { maxlength: maxDescriptionLength },
+                formGroup: { classes: "pcs-review-date__description" },
+                errorMessage: validationErrors[prefix + "-description"]
+              }) }}
+              {{ govukButton({
+                text: "Remove",
+                classes: "govuk-button--warning pcs-small-button pcs-review-date__remove",
+                name: "action",
+                value: "remove-" + prefix,
+                attributes: { "aria-label": "Remove review date " + n }
+              }) }}
+            </div>
+          {% endfor %}
+        {% else %}
+          {{ govukCheckboxes({
+            name: "has-review-dates",
+            idPrefix: "has-review-dates",
+            classes: "govuk-checkboxes--small",
+            errorMessage: validationErrors["has-review-dates"],
+            items: [{ value: "no", text: "The order needs no review dates", checked: answers.hasReviewDates == "no" }]
+          }) }}
+        {% endif %}
+        {% if canAddReviewDate %}
+          {{ govukButton({ text: "Add review date", classes: "govuk-button--secondary pcs-small-button", name: "action", value: "add-review-date" }) }}
+        {% else %}
+          <p class="govuk-body-s">You can add up to {{ maxReviewDates }} review dates.</p>
+        {% endif %}
+      </section>
+
+      <section class="pcs-record__section" id="{{ sections.service }}" aria-labelledby="service-heading">
+        <h2 class="govuk-heading-m" id="service-heading">Service and seal</h2>
+
+        {% include "confirm-order-review/_issue-summary.njk" %}
+
+        {% set partyItems = [] %}
+        {% for party in parties %}
+          {% set partyItems = (partyItems.push({ value: party.value, text: party.text, checked: party.value in answers.partiesToServe }), partyItems) %}
+        {% endfor %}
+        {% set partiesHtml %}
+          {{ govukCheckboxes({
+            name: "parties-to-serve",
+            idPrefix: "parties-to-serve",
+            classes: "govuk-checkboxes--small",
+            fieldset: { legend: { text: "Who should the order be served on?", classes: "govuk-fieldset__legend--s" } },
+            errorMessage: validationErrors["parties-to-serve"],
+            items: partyItems
+          }) }}
+        {% endset %}
+        {{ radios("serve-all-parties", "Should this order be served on all parties?", yesNo, answers.serveAllParties, {
+          hint: "If you select No, only the parties you select, court staff and judges will see this order on the case. If you are not sure, go back to the review and send a query to the Judge.",
+          conditionals: { no: partiesHtml }
+        }) }}
+        {{ radios("final-order", "Does this order finally resolve any part of the case?", yesNo, answers.finalOrder, {
+          hint: "Select Yes if this order brings the main claim, a general application, counterclaim or enforcement action to an end. The whole case does not need to be concluded."
+        }) }}
+        {{ radios("restitution-permission", "Has permission been given to issue a warrant/writ of restitution?", yesNo, answers.restitutionPermission) }}
+        {{ radios("seal", "Which seal should this order have?", seals, answers.seal) }}
+        {{ govukCheckboxes({
+          name: "next-steps",
+          idPrefix: "next-steps",
+          classes: "govuk-checkboxes--small",
+          fieldset: { legend: { text: "Next steps for court staff", classes: "govuk-fieldset__legend--s" } },
+          errorMessage: validationErrors["next-steps"],
+          items: [{
+            value: "complete",
+            text: "I have completed all the next steps for court staff",
+            hint: { text: tasksOutstanding },
+            checked: answers.nextSteps == "complete"
+          }]
+        }) }}
+      </section>
+
+      {{ buttons.eventButtons() }}
+    </form>
+  </div>
+{% endblock %}

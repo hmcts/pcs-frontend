@@ -21,11 +21,6 @@ export const SEALS = [
   { value: 'HIGH_COURT', text: 'High Court seal' },
 ] as const;
 
-export const NEXT_STEPS = [
-  { value: 'complete', text: 'There are no other tasks to complete' },
-  { value: 'outstanding', text: 'There are still tasks to do' },
-] as const;
-
 export interface ReviewDateAnswer {
   day: string;
   month: string;
@@ -48,9 +43,11 @@ export interface OrderReviewAnswers {
   moneyJudgments?: MoneyJudgmentsAnswers;
   moneyJudgmentsSaved?: boolean;
   queryToJudge?: string;
+  /** Yes once there is a review date; no once court staff confirm the order needs none. */
   hasReviewDates?: 'yes' | 'no';
   reviewDates: ReviewDateAnswer[];
-  nextSteps?: string;
+  /** Complete once court staff confirm they have done every next step, which issuing the order needs. */
+  nextSteps?: 'complete';
   /** Asked on proceed to issue, but not yet sent to pcs-api: nothing uses it until it says what it applies to. */
   finalOrder?: 'yes' | 'no';
   restitutionPermission?: 'yes' | 'no';
@@ -60,7 +57,7 @@ export interface OrderReviewAnswers {
 }
 
 /**
- * A caseworker's review of an order, from the event's start on the introductory page to its submission:
+ * A caseworker's review of an order, from the event's start as it opens to its submission:
  * the judge's order and the case it started with, the token to submit it with, and the answers given so far.
  */
 export interface OrderReviewSession extends OrderStart {
@@ -145,7 +142,7 @@ export function validateQuery(answers: OrderReviewAnswers): ValidationIssue[] {
 
 export function validateReviewDates(answers: OrderReviewAnswers): ValidationIssue[] {
   if (!answers.hasReviewDates) {
-    return [{ id: 'has-review-dates', message: 'Select if there are any review dates to add' }];
+    return [{ id: 'has-review-dates', message: 'Add the review dates the order needs, or select that it needs none' }];
   }
   if (answers.hasReviewDates === 'no') {
     return [];
@@ -178,10 +175,8 @@ export function validateReviewDates(answers: OrderReviewAnswers): ValidationIssu
 
 export function validateProceedToIssue(answers: OrderReviewAnswers): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
-  if (!NEXT_STEPS.some(step => step.value === answers.nextSteps)) {
-    issues.push({ id: 'next-steps', message: 'Select if all the next steps for court staff have been completed' });
-  } else if (answers.nextSteps === 'outstanding') {
-    issues.push({ id: 'next-steps', message: TASKS_OUTSTANDING });
+  if (answers.nextSteps !== 'complete') {
+    issues.push({ id: 'next-steps', message: 'Confirm all the next steps for court staff have been completed' });
   }
   if (!answers.finalOrder) {
     issues.push({ id: 'final-order', message: 'Select if this order finally resolves any part of the case' });

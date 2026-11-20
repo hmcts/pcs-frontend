@@ -99,7 +99,7 @@ describe('moneyJudgments', () => {
   it('asks who pays and is paid each judgment, its sum, and each way it is paid in full', () => {
     expect(validateMoneyJudgments({ judgments: [] }).map(issue => issue.message)).toEqual([
       'Select what the order says about costs',
-      'Select if the order makes a money judgment',
+      'Add the money judgments the order makes, or select that it makes none',
     ]);
 
     const incomplete = {
