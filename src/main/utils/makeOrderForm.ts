@@ -1,5 +1,6 @@
 import escapeHtml from 'escape-html';
 import { DateTime } from 'luxon';
+import { filterXSS } from 'xss';
 
 import { parseDate, parseMoney } from '@utils/makeOrderFormat';
 import {
@@ -90,6 +91,33 @@ function caseBundleModel(bundle: OrderCaseBundle, caseReference: number) {
   };
 }
 
+/** The rich text an applicant's draft order may hold: its paragraphs, lists and emphasis, nothing that runs. */
+const DRAFT_ORDER_TAGS = ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'strike', 'ul', 'ol', 'li', 'blockquote'];
+
+const draftOrderHtml = (html: string): string =>
+  filterXSS(html, {
+    whiteList: { ...Object.fromEntries(DRAFT_ORDER_TAGS.map(tag => [tag, []])), ol: ['start'], li: ['value'] },
+    stripIgnoreTag: true,
+    stripIgnoreTagBody: ['script', 'style'],
+  });
+
+const lines = (text: string): string => `<p>${escapeHtml(text).replace(/\r?\n/g, '<br>')}</p>`;
+
+/**
+ * The order the applicant asked for, which the judge can put in the order: their draft order as the rich text they
+ * wrote it in, with their explanation of it apart; or, for an application made before they could give a draft, what
+ * they wrote of the order they want, as its lines.
+ */
+function requestedWording({ draftOrderWording, whatOrderWanted }: OrderApplication) {
+  if (draftOrderWording) {
+    return {
+      requestedWordingHtml: draftOrderHtml(draftOrderWording),
+      explanationHtml: whatOrderWanted ? lines(whatOrderWanted) : '',
+    };
+  }
+  return { requestedWordingHtml: whatOrderWanted ? lines(whatOrderWanted) : '', explanationHtml: '' };
+}
+
 /**
  * The application as its row shows it: its answers in words, and its dates as the court writes them. Its answers on
  * the form start with its prefix, so each application the order can decide keeps its own.
@@ -99,10 +127,7 @@ function applicationModel(application: OrderApplication & ApplicationToDecide, c
   return {
     ...application,
     prefix: applicationPrefix(application),
-    // As its lines, which the judge can put in the order.
-    whatOrderWantedHtml: application.whatOrderWanted
-      ? `<p>${escapeHtml(application.whatOrderWanted).replace(/\r?\n/g, '<br>')}</p>`
-      : '',
+    ...requestedWording(application),
     documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
     submittedOnDisplay: displayDate(application.submittedOn),
     within14DaysDisplay: YES_NO[application.within14Days ?? ''],

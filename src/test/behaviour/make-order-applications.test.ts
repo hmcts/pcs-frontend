@@ -120,7 +120,9 @@ describe('make an order: deciding applications', () => {
 
     it('offers no striking out at a hearing, and refuses it', async () => {
       const page = await openPage((await app.get(PAGE)).text);
-      const offered = [...document.querySelectorAll<HTMLInputElement>(`[name="${P}-decision"]`)].map(input => input.value);
+      const offered = [...document.querySelectorAll<HTMLInputElement>(`[name="${P}-decision"]`)].map(
+        input => input.value
+      );
       expect(offered).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
       recordAttendance();
       const body = page.body('SUBMIT_FOR_REVIEW');
@@ -269,6 +271,41 @@ describe('make an order: deciding applications', () => {
       expect(clauseLists()).toEqual([2, 1]);
     });
 
+    it("shows the applicant's draft order as they formatted it, apart from why they want it, and inserts it as such", async () => {
+      await app.close();
+      app = await bootApp({
+        application: {
+          ...ADJOURN,
+          whatOrderWanted: 'I am in hospital that week.',
+          draftOrderWording:
+            '<ol><li>The hearing on 14 October is <strong>adjourned</strong>.</li><li>Costs in the case.</li></ol>' +
+            '<img src="x" onerror="alert(1)"><script>alert(2)</script>',
+        },
+      });
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      const requested = control<HTMLElement>(`#${P}-requested`);
+      expect(requested.querySelectorAll('ol > li')).toHaveLength(2);
+      expect(requested.querySelector('strong')?.textContent).toBe('adjourned');
+      // Nothing that would run or load.
+      expect(requested.querySelector('img, script')).toBeNull();
+      expect(control(`#${P}-explanation`).textContent?.trim()).toBe('I am in hospital that week.');
+
+      check(`${P}-decision`, 'grant');
+      insertWording();
+      expect(ordered(page.documentText())).toEqual([
+        'IT IS ORDERED THAT:',
+        GRANTED,
+        'The hearing on 14 October is adjourned.',
+        'Costs in the case.',
+      ]);
+      // Their numbered paragraphs are clauses after the granted one, with their emphasis.
+      expect(clauseLists()).toEqual([3]);
+      expect(control<HTMLTextAreaElement>('#order-document').value).toContain(
+        '{"type":"text","marks":[{"type":"strong"}],"text":"adjourned"}'
+      );
+      expect(page.documentText()).not.toContain('I am in hospital');
+    });
+
     it('offers no wording to insert when the applicant asked for no order', async () => {
       await app.close();
       app = await bootApp({ application: { ...ADJOURN, whatOrderWanted: null } });
@@ -334,7 +371,9 @@ describe('make an order: deciding applications', () => {
       expect(listing.hidden).toBe(false);
       const rejected = await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'));
       expect(rejected.text).toContain('Enter a valid hearing date');
-      expect(rejected.text).toContain('Enter the time estimate in whole days, hours and minutes, with minutes under 60');
+      expect(rejected.text).toContain(
+        'Enter the time estimate in whole days, hours and minutes, with minutes under 60'
+      );
 
       check(`${P}-list-when`, 'specific');
       typeDate(`${P}-list-hearing-date-specific`, '2', '11', '2026');
@@ -437,7 +476,9 @@ describe('make an order: deciding applications', () => {
 
     it('offers no striking out, and refuses it', async () => {
       const page = await openPage((await app.get(WARRANT_PAGE)).text);
-      const offered = [...document.querySelectorAll<HTMLInputElement>(`[name="${W}-decision"]`)].map(input => input.value);
+      const offered = [...document.querySelectorAll<HTMLInputElement>(`[name="${W}-decision"]`)].map(
+        input => input.value
+      );
       expect(offered).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
       const body = page.body('SUBMIT_FOR_REVIEW');
       body.set(`${W}-decision`, 'strike-out');
