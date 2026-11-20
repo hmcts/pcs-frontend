@@ -141,8 +141,7 @@ describe('make an order: without a hearing or an application', () => {
     expect(rejected.text).toContain('Enter a valid hearing date');
 
     typeDate('list-hearing-date-next-list', '2', '11', '2026');
-    type('list-time-estimate', '1');
-    type('list-time-estimate-unit', 'hours');
+    type('list-time-estimate-hours', '1');
     expect(page.orderText().split('\n').slice(2)).toEqual([
       'The claim shall be listed for a hearing on notice to all parties on the next available possession list after 2 November 2026 with a time estimate of 1 hour. Further details of the hearing will be provided by the court.',
     ]);

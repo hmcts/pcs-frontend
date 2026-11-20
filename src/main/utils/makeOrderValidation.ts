@@ -1,6 +1,16 @@
 import { DateTime } from 'luxon';
 
-import { MAX_MONEY, exceedsMaxMoney, parseDate, parseMoney, parseTime, registryName } from './makeOrderFormat';
+import {
+  MAX_MONEY,
+  TIME_ESTIMATE_PARTS,
+  type TimeEstimatePart,
+  exceedsMaxMoney,
+  parseDate,
+  parseMoney,
+  parseTime,
+  parseTimeEstimate,
+  registryName,
+} from './makeOrderFormat';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -254,6 +264,13 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
   return [...issues, ...validateCosts(formData, false)];
 }
 
+/** The time estimate's three fields as the form posts them for the listing with the prefix. */
+function timeEstimateFields(formData: Record<string, unknown>, prefix: string): Record<TimeEstimatePart, string> {
+  return Object.fromEntries(
+    TIME_ESTIMATE_PARTS.map(part => [part, value(formData, `${prefix}-time-estimate-${part}`)])
+  ) as Record<TimeEstimatePart, string>;
+}
+
 /** The listing questions the form asks with the prefix: the adjournment's, or a hearing listed without one. */
 function validateListing(
   formData: Record<string, unknown>,
@@ -266,14 +283,9 @@ function validateListing(
   const directions = values(formData, `${prefix}-directions`);
   date(hearingDate, dateMessage);
   add(
-    /^\d+$/.test(value(formData, `${prefix}-time-estimate`)) && Number(value(formData, `${prefix}-time-estimate`)) > 0,
-    `${prefix}-time-estimate`,
-    'Enter the time estimate as a whole number'
-  );
-  add(
-    ['minutes', 'hours'].includes(value(formData, `${prefix}-time-estimate-unit`)),
-    `${prefix}-time-estimate-unit`,
-    'Select minutes or hours for the time estimate'
+    Boolean(parseTimeEstimate(timeEstimateFields(formData, prefix))),
+    `${prefix}-time-estimate-days`,
+    'Enter the time estimate in whole days, hours and minutes, with minutes under 60'
   );
   if (when === 'specific') {
     const time = value(formData, `${prefix}-specific-time`);

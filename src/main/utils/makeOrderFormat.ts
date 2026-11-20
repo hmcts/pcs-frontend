@@ -86,3 +86,32 @@ export function registryName(typed: string): string {
   const name = typed.trim();
   return name.toLowerCase().endsWith(DISTRICT_REGISTRY) ? name.slice(0, -DISTRICT_REGISTRY.length).trim() : name;
 }
+
+/** A hearing's time estimate as HMC and List Assist give it: days, hours and minutes. */
+export const TIME_ESTIMATE_PARTS = ['days', 'hours', 'minutes'] as const;
+export type TimeEstimatePart = (typeof TIME_ESTIMATE_PARTS)[number];
+export type TimeEstimate = Record<TimeEstimatePart, number>;
+
+/**
+ * The time estimate the three fields give, each blank or a whole number, and minutes under an hour; none when a
+ * field is not one or every one is blank or nought.
+ */
+export function parseTimeEstimate(typed: Record<TimeEstimatePart, string>): TimeEstimate | undefined {
+  const parts = {} as TimeEstimate;
+  for (const part of TIME_ESTIMATE_PARTS) {
+    const raw = typed[part].trim();
+    if (raw && !/^\d{1,3}$/.test(raw)) {
+      return undefined;
+    }
+    parts[part] = Number(raw || 0);
+  }
+  return parts.minutes < 60 && TIME_ESTIMATE_PARTS.some(part => parts[part] > 0) ? parts : undefined;
+}
+
+/** "3 days, 4 hours and 30 minutes", leaving out the parts that are nought. */
+export function formatTimeEstimate(estimate: TimeEstimate): string {
+  const named = TIME_ESTIMATE_PARTS.filter(part => estimate[part] > 0).map(part =>
+    estimate[part] === 1 ? `1 ${part.slice(0, -1)}` : `${estimate[part]} ${part}`
+  );
+  return named.length > 1 ? `${named.slice(0, -1).join(', ')} and ${named[named.length - 1]}` : named[0];
+}

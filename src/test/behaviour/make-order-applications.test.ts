@@ -334,12 +334,12 @@ describe('make an order: deciding applications', () => {
       expect(listing.hidden).toBe(false);
       const rejected = await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'));
       expect(rejected.text).toContain('Enter a valid hearing date');
-      expect(rejected.text).toContain('Enter the time estimate as a whole number');
+      expect(rejected.text).toContain('Enter the time estimate in whole days, hours and minutes, with minutes under 60');
 
       check(`${P}-list-when`, 'specific');
       typeDate(`${P}-list-hearing-date-specific`, '2', '11', '2026');
       type(`${P}-list-specific-time`, '10:30');
-      type(`${P}-list-time-estimate`, '30');
+      type(`${P}-list-time-estimate-minutes`, '30');
       check(`${P}-list-directions`, 'defence');
       typeDate(`${P}-list-defence-date`, '20', '10', '2026');
       expect(ordered(page.orderText()).slice(1)).toEqual([
@@ -388,7 +388,7 @@ describe('make an order: deciding applications', () => {
       check(`${P}-decision`, 'list');
       check(`${P}-list-without-notice`, 'yes');
       typeDate(`${P}-list-hearing-date-next-list`, '2', '11', '2026');
-      type(`${P}-list-time-estimate`, '30');
+      type(`${P}-list-time-estimate-minutes`, '30');
       expect(ordered(page.orderText()).slice(1)).toEqual([
         "The defendant's application dated 1 October 2026 shall be listed for a hearing without notice to the other parties on the next available possession list after 2 November 2026 with a time estimate of 30 minutes. Further details of the hearing will be provided by the court.",
       ]);

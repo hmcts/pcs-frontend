@@ -218,6 +218,28 @@ export function daysFromToday(days: number, now = DateTime.now()): { day: string
   return { day: date.toFormat('dd'), month: date.toFormat('MM'), year: date.toFormat('yyyy') };
 }
 
+/**
+ * The order's answers with any time estimate saved as a number and a unit, before it was asked as days, hours and
+ * minutes, given as those, so a draft saved then still says how long its hearing is.
+ */
+export function withTimeEstimateParts(formData: FormData): FormData {
+  const converted: FormData = { ...formData };
+  for (const [field, amount] of Object.entries(formData)) {
+    const prefix = field.endsWith('-time-estimate') ? field.slice(0, -'-time-estimate'.length) : undefined;
+    if (!prefix || typeof amount !== 'string' || !/^\d+$/.test(amount.trim())) {
+      continue;
+    }
+    const minutes = Number(amount) * (formData[`${field}-unit`] === 'hours' ? 60 : 1);
+    if (!(`${field}-hours` in formData || `${field}-minutes` in formData || `${field}-days` in formData)) {
+      converted[`${field}-hours`] = minutes >= 60 ? String(Math.floor(minutes / 60)) : '';
+      converted[`${field}-minutes`] = minutes % 60 ? String(minutes % 60) : '';
+    }
+    delete converted[field];
+    delete converted[`${field}-unit`];
+  }
+  return converted;
+}
+
 /** What the page's choice of when the order is made posts for an order made without a hearing. */
 export const WITHOUT_HEARING = 'without-hearing';
 
@@ -324,7 +346,9 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     ? { ...caseFactsFormData(hearing.caseFacts), 'hearing-notes': hearing.note ?? '' }
     : {};
   // A date the order does not give is left blank, for the page to start afresh if the judge chooses it.
-  const draft: FormData = withoutUnchosenNoticeDates({ ...recorded, ...(submission?.formData ?? order.formData) });
+  const draft: FormData = withTimeEstimateParts(
+    withoutUnchosenNoticeDates({ ...recorded, ...(submission?.formData ?? order.formData) })
+  );
   // With an application open the order starts as one on the applications alone, the claim's order types waiting
   // behind a tick box.
   const defaultOrderType = applications.length
