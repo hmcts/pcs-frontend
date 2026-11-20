@@ -25,8 +25,12 @@ const nonceSource = (_req: unknown, res: ServerResponse): string =>
  * The application's security headers, applied before the public routes and the modules so every response has them.
  */
 export function securityHeaders(developmentMode: boolean): express.RequestHandler[] {
+  // Google Tag Manager and the Google Analytics tags it loads, only when tracking is on (HDPI-8934).
+  const trackingEnabled = config.get<boolean>('tracking.enabled');
+  const tagManagerSources = trackingEnabled ? [googleTagManagerDomain] : [];
+
   // include default helmet functions
-  const scriptSrc: (string | typeof nonceSource)[] = [self, googleAnalyticsDomain, googleTagManagerDomain, nonceSource];
+  const scriptSrc: (string | typeof nonceSource)[] = [self, googleAnalyticsDomain, ...tagManagerSources, nonceSource];
 
   if (developmentMode) {
     // webpack's development build evaluates strings as JavaScript. Browsers ignore 'unsafe-inline' when the
@@ -64,14 +68,16 @@ export function securityHeaders(developmentMode: boolean): express.RequestHandle
     helmet({
       contentSecurityPolicy: {
         directives: {
-          // As cui-ra: Google Tag Manager and the Google Analytics tags it loads. www.google.com is from HDPI-8934.
-          connectSrc: [self, googleAnalyticsDomain, googleTagManagerDomain, 'www.google.com'],
+          // As cui-ra, when tracking is on. www.google.com is from HDPI-8934.
+          connectSrc: trackingEnabled
+            ? [self, googleAnalyticsDomain, googleTagManagerDomain, 'www.google.com']
+            : [self],
           defaultSrc: ["'none'"],
           fontSrc: [self, 'data:'],
-          imgSrc: [self, googleAnalyticsDomain, googleTagManagerDomain],
+          imgSrc: [self, googleAnalyticsDomain, ...tagManagerSources],
           objectSrc: [self],
           scriptSrc,
-          styleSrc: [self, googleTagManagerDomain],
+          styleSrc: [self, ...tagManagerSources],
           manifestSrc: [self],
           formAction,
         },

@@ -1,7 +1,7 @@
 {% from "govuk/components/cookie-banner/macro.njk" import govukCookieBanner %}
 
 {% if tracking and tracking.enabled %}
-{% set cookieBannerTitle = t('cookieBanner.title', { serviceName: t('serviceName') }) %}
+{% set cookieBannerTitle = t('cookieBanner.title', { serviceName: t('cookieBanner.serviceName') }) %}
 
 {% set html %}
   <p class="govuk-body">{{ t('cookieBanner.message.base') | safe }}</p>
@@ -34,10 +34,6 @@
           classes: 'cookie-banner-reject-button',
           text: t('cookieBanner.buttons.reject'),
           type: "button"
-        },
-        {
-          text: t('cookieBanner.buttons.viewCookies'),
-          href: "/cookies"
         }
       ]
     },

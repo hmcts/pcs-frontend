@@ -223,17 +223,17 @@
     "noneFound": "Heb ganfod cyfeiriad"
   },
   "cookieBanner": {
-    "title": "Cwcis ar gyfer {{serviceName}}",
+    "serviceName": "Gwasanaeth Hawliadau Meddiant",
+    "title": "Cwcis ar {{serviceName}}",
     "message": {
-      "base": "Rydym yn defnyddio rhai cwcis hanfodol i wneud i’r gwasanaeth hwn weithio. Hoffwn hefyd ddefnyddio cwcis dadansoddol fel y gallwn ddeall sut rydych chi’n defnyddio’r gwasanaeth ac i wneud gwelliannau.",
-      "accept": "Rydych wedi derbyn cwcis dadansoddol. Gallwch <a class=\"govuk-link\" href=\"/cookies\">newid eich gosodiadau cwcis</a> ar unrhyw adeg.",
-      "reject": "Rydych wedi gwrthod cwcis dadansoddol. Gallwch <a class=\"govuk-link\" href=\"/cookies\">newid eich gosodiadau cwcis</a> ar unrhyw adeg."
+      "base": "Rydym yn defnyddio cwcis hanfodol i wneud i’r gwasanaeth hwn weithio. Rydym hefyd yn defnyddio cwcis dadansoddol fel y gallwn ddeall sut rydych yn defnyddio’r gwasanaeth a pha welliannau y gallwn eu gwneud.",
+      "accept": "Rydych wedi derbyn cwcis ychwanegol.",
+      "reject": "Rydych chi wedi gwrthod cwcis ychwanegol."
     },
     "buttons": {
-      "accept": "Derbyn cwcis dadansoddol",
-      "reject": "Gwrthod cwcis dadansoddol",
-      "viewCookies": "Gweld cwcis",
-      "hide": "Cuddio’r neges hon"
+      "accept": "Derbyn cwcis ychwanegol",
+      "reject": "Gwrthod cwcis ychwanegol",
+      "hide": "Cuddio’r neges cwcihon"
     }
   }
 }

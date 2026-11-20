@@ -63,6 +63,12 @@ describe('cookies-banner.njk', () => {
     }
     expect(html).toContain('t(cookieBanner.buttons.accept)');
     expect(html).toContain('t(cookieBanner.buttons.hide)');
-    expect(html).toContain('href="/cookies"');
+  });
+
+  it('leaves out the View cookies link, as the ticket asks', () => {
+    const html = render('cookies-banner.njk', enabled);
+
+    expect(html).not.toContain('href="/cookies"');
+    expect(html).not.toContain('viewCookies');
   });
 });

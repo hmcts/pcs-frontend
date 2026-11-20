@@ -15,14 +15,14 @@ const helmetMock = helmet as unknown as jest.Mock;
 type Directive = string | ((req: unknown, res: unknown) => string);
 type Directives = Record<string, Directive[]>;
 
-const validConfig: Record<string, string> = {
+const validConfig: Record<string, string | boolean | undefined> = {
   'pcq.url': 'https://pcq.example.com',
   'oidc.issuer': 'https://idam.example.com/oauth2',
   'redirects.manageCaseReturnURL': 'https://manage.example.com/return',
   'cuiRa.url': 'https://cui-ra.example.com',
 };
 
-function useConfig(values: Record<string, string | undefined>): void {
+function useConfig(values: Record<string, string | boolean | undefined>): void {
   (config.get as jest.Mock).mockImplementation((key: string) => values[key]);
 }
 
@@ -81,8 +81,8 @@ describe('securityHeaders', () => {
     expect(nonceSource({}, { locals: { cspNonce: 'abc123' } })).toBe("'nonce-abc123'");
   });
 
-  it('allows Google Tag Manager and Google Analytics', () => {
-    useConfig(validConfig);
+  it('allows Google Tag Manager and Google Analytics when tracking is enabled', () => {
+    useConfig({ ...validConfig, 'tracking.enabled': true });
     securityHeaders(false);
     const directives = helmetDirectives();
 
@@ -95,6 +95,17 @@ describe('securityHeaders', () => {
       'www.google.com',
     ]);
     expect(directives.styleSrc).toEqual(["'self'", '*.googletagmanager.com']);
+  });
+
+  it.each([false, undefined])('leaves the Google Tag Manager sources out when tracking.enabled is %s', enabled => {
+    useConfig({ ...validConfig, 'tracking.enabled': enabled });
+    securityHeaders(false);
+    const directives = helmetDirectives();
+
+    expect(stringSources(directives.scriptSrc)).toEqual(["'self'", '*.google-analytics.com']);
+    expect(directives.imgSrc).toEqual(["'self'", '*.google-analytics.com']);
+    expect(directives.connectSrc).toEqual(["'self'"]);
+    expect(directives.styleSrc).toEqual(["'self'"]);
   });
 
   it('adds unsafe-eval and unsafe-inline in development', () => {
