@@ -253,6 +253,20 @@ interface AttendanceRow extends AttendanceParty {
 }
 
 /**
+ * The case's hearings still to come, but for the one the order is made at, at any of which the order can list an
+ * application to be heard, by id with when each is.
+ */
+export function upcomingHearings(
+  { caseContext, hearing }: Pick<OrderStart, 'caseContext' | 'hearing'>,
+  now: DateTime = DateTime.now()
+): { id: string; text: string }[] {
+  const today = now.setZone('Europe/London').startOf('day');
+  return (caseContext.hearings ?? [])
+    .filter(option => option.id !== hearing?.id && DateTime.fromISO(option.date, { zone: 'Europe/London' }) >= today)
+    .map(option => ({ id: String(option.id), text: hearingTime(option.date) }));
+}
+
+/**
  * The case's open applications the order can decide, the one the judge's task asked them to decide first: that
  * one they must decide, and the others they may leave as they are.
  */
@@ -293,6 +307,7 @@ export interface OrderFormSubmission {
 export function orderFormModel(start: OrderStart, submission?: OrderFormSubmission): Record<string, unknown> {
   const { caseContext, order, hearing } = start;
   const applications = applicationsToDecide(start);
+  const upcoming = upcomingHearings(start);
   // A hearing's facts and note are pcs-api's record of the hearing, kept apart from the order. The caseworker's
   // review is sent the hearing without them.
   const recorded: FormData = hearing?.caseFacts
@@ -327,6 +342,8 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     orderParties: attendanceParties(start).map(({ partyId, name, type }) => ({ id: partyId, name, type })),
     openCounterclaim: caseContext.openCounterclaim === true,
     applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
+    upcomingHearings: upcoming,
+    upcomingHearingsJson: JSON.stringify(Object.fromEntries(upcoming.map(({ id, text }) => [id, text]))),
     ...hearingModel(hearing),
     caseBundle: caseContext.caseBundle ? caseBundleModel(caseContext.caseBundle, caseContext.caseReference) : undefined,
   };

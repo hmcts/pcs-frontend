@@ -82,7 +82,7 @@
       { value: "grant", text: "Granted" },
       { value: "dismiss", text: "Dismissed" },
       { value: "strike-out", text: "Struck out" },
-      { value: "list", text: "Listed for a hearing on notice" },
+      { value: "list", text: "Listed for a hearing" },
       { value: "other", text: "Something else" }
     ]
   }) }}
@@ -102,12 +102,34 @@
     </div>
   {% endif %}
 
+  {#
+    Listed at a new hearing, the judge says when and whether the other parties are given notice of it; listed at one of
+    the case's hearings still to come, which already has its parties, the order only says which.
+  #}
+  {% set listAt = prefix + "-list-at" %}
   <div data-decision-shows="list" data-application-listing {%- if not draftChecked(name, "list") %} hidden{% endif %}>
-    {{ listing.listing(prefix + "-list", "When the hearing is", [
-      "Next available possession list after",
-      "Next available date (non-possession list) after",
-      "Specific date"
-    ]) }}
+    {% if upcomingHearings | length %}
+      {% set atItems = [{ value: "new", text: "A new hearing" }] %}
+      {% for option in upcomingHearings %}
+        {% set atItems = atItems.concat([{ value: option.id, text: "The hearing on " + option.text }]) %}
+      {% endfor %}
+      {{ compact.radios(listAt, {
+        legend: "Which hearing?",
+        classes: "govuk-radios--small",
+        default: "new",
+        items: atItems
+      }) }}
+    {% endif %}
+    <div data-list-new {%- if draftValue(listAt) and not draftChecked(listAt, "new") %} hidden{% endif %}>
+      {{ compact.checkboxes(prefix + "-list-without-notice", {
+        items: [{ value: "yes", text: "Without notice to the other parties" }]
+      }) }}
+      {{ listing.listing(prefix + "-list", "When the hearing is", [
+        "Next available possession list after",
+        "Next available date (non-possession list) after",
+        "Specific date"
+      ]) }}
+    </div>
   </div>
 {% endmacro %}
 
@@ -120,6 +142,7 @@
            data-application-applicant="{{ application.applicant or 'the applicant' }}"
            data-application-submitted="{{ application.submittedOnDisplay or '' }}"
            data-application-wording-html="{{ application.whatOrderWantedHtml }}"
+           data-application-hearings="{{ upcomingHearingsJson }}"
            {%- if application.enforcementSuspension %} data-application-suspension{% endif %}>
     <h3 class="govuk-heading-m govuk-!-margin-bottom-1" id="{{ prefix }}-heading">
       {{ application.reference }}: {{ application.type }}{% if application.somethingElseDetails %} – {{ application.somethingElseDetails }}{% endif %}

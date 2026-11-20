@@ -395,7 +395,8 @@ function validateApplications(
     const allowed =
       (APPLICATION_DECISIONS as readonly string[]).includes(decision) && !(application.required && decision === 'none');
     add(allowed, `${prefix}-decision`, `Select what you decide about application ${application.reference}`);
-    if (decision === 'list') {
+    // Listed at one of the case's hearings, the order only says which, so only a new hearing asks when.
+    if (decision === 'list' && (value(formData, `${prefix}-list-at`) || 'new') === 'new') {
       issues.push(...validateListing(formData, `${prefix}-list`, 'Enter a valid hearing date'));
     }
     if (application.enforcementSuspension && decision === 'grant') {

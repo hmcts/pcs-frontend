@@ -199,6 +199,13 @@ export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
 /** What follows a decision on an application, shown in its row while that decision is chosen. */
 export function initApplicationDecisions(form: HTMLFormElement): void {
   form.addEventListener('change', ({ target }) => {
+    if (target instanceof HTMLInputElement && target.name.endsWith('-list-at')) {
+      const listNew = target.closest('[data-application]')?.querySelector<HTMLElement>('[data-list-new]');
+      if (listNew) {
+        listNew.hidden = target.value !== 'new';
+      }
+      return;
+    }
     if (!(target instanceof HTMLInputElement) || !target.name.endsWith('-decision')) {
       return;
     }

@@ -289,7 +289,7 @@ const DECISION_LABELS: Record<GenAppDecision, string> = {
   GRANT: 'Granted',
   DISMISS: 'Dismissed',
   STRIKE_OUT: 'Struck out',
-  LIST: 'Listed for a hearing on notice',
+  LIST: 'Listed for a hearing',
   OTHER: 'Something else',
 };
 

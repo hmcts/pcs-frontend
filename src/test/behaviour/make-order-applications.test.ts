@@ -335,6 +335,52 @@ describe('make an order: deciding applications', () => {
     });
   });
 
+  describe('listing an application when the case has hearings to come', () => {
+    beforeEach(async () => {
+      app = await bootApp({
+        application: ADJOURN,
+        hearings: [
+          { id: 7, date: '2020-03-02T10:00:00' },
+          { id: 8, date: '2099-01-12T10:00:00' },
+        ],
+      });
+    });
+
+    it('lists it to be heard at a hearing the case already has, which asks nothing more', async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      check(`${P}-decision`, 'list');
+      const choices = [...document.querySelectorAll<HTMLInputElement>(`input[name="${P}-list-at"]`)];
+      // A hearing already held is not one to list it at.
+      expect(choices.map(choice => choice.labels?.[0]?.textContent?.trim())).toEqual([
+        'A new hearing',
+        'The hearing on 12 January 2099 at 10:00am',
+      ]);
+      const listNew = control<HTMLElement>('[data-application-reference="GA1"] [data-list-new]');
+      expect(listNew.hidden).toBe(false);
+
+      check(`${P}-list-at`, '8');
+      expect(listNew.hidden).toBe(true);
+      expect(ordered(page.orderText()).slice(1)).toEqual([
+        "The defendant's application dated 1 October 2026 shall be heard at the hearing on 12 January 2099 at 10:00am.",
+      ]);
+      const accepted = await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'));
+      expect(accepted.text).not.toContain('Enter a valid hearing date');
+      const [submitted] = submittedOrders() as { order: { formData: Record<string, unknown> } }[];
+      expect(submitted.order.formData[`${P}-list-at`]).toBe('8');
+    });
+
+    it('lists it at a new hearing without notice to the other parties', async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      check(`${P}-decision`, 'list');
+      check(`${P}-list-without-notice`, 'yes');
+      typeDate(`${P}-list-hearing-date-next-list`, '2', '11', '2026');
+      type(`${P}-list-time-estimate`, '30');
+      expect(ordered(page.orderText()).slice(1)).toEqual([
+        "The defendant's application dated 1 October 2026 shall be listed for a hearing without notice to the other parties on the next available possession list after 2 November 2026 with a time estimate of 30 minutes. Further details of the hearing will be provided by the court.",
+      ]);
+    });
+  });
+
   describe('on an application to suspend enforcement', () => {
     const WARRANT_PAGE = `${PAGE}?genAppId=gen-app-2`;
     const W = 'app-gen-app-2';

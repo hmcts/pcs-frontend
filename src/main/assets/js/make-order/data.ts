@@ -23,6 +23,10 @@ export interface OrderApplication {
   enforcementSuspension: boolean;
   /** What the judge decides about it: "none" while they leave it as it is. */
   decision: string;
+  /** When the case's hearing the judge lists it to be heard at is, if they list it at one rather than a new one. */
+  listedAt?: string;
+  /** Whether a new hearing it is listed for is without notice to the other parties. */
+  listWithoutNotice: boolean;
 }
 
 export interface OrderData {
@@ -77,12 +81,20 @@ export function readOrderData(form: HTMLFormElement): OrderData {
   const applications: OrderApplication[] = [];
   form.querySelectorAll<HTMLElement>('[data-application]').forEach(row => {
     const prefix = row.dataset.applicationPrefix ?? '';
+    let hearings: Record<string, string> = {};
+    try {
+      hearings = JSON.parse(row.dataset.applicationHearings || '{}');
+    } catch {
+      // No hearings to list it at.
+    }
     applications.push({
       prefix,
       applicant: row.dataset.applicationApplicant ?? 'the applicant',
       submittedOn: row.dataset.applicationSubmitted ?? '',
       enforcementSuspension: row.dataset.applicationSuspension !== undefined,
       decision: answers[`${prefix}-decision`]?.[0] ?? 'none',
+      listedAt: hearings[answers[`${prefix}-list-at`]?.[0] ?? ''],
+      listWithoutNotice: answers[`${prefix}-list-without-notice`]?.includes('yes') ?? false,
     });
   });
 
