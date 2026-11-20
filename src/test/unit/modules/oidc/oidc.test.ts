@@ -228,7 +228,7 @@ describe('OIDCModule', () => {
     });
 
     describe('login route', () => {
-      it('should redirect to authorization URL', async () => {
+      it.each([false, true])('redirects to authorization URL (fresh sign-in: %s)', async freshSignIn => {
         const mockAuthUrl = 'http://test-issuer/auth';
         (buildAuthorizationUrl as jest.Mock).mockReturnValue({ href: mockAuthUrl });
         (randomPKCECodeVerifier as jest.Mock).mockReturnValue('test-verifier');
@@ -236,6 +236,8 @@ describe('OIDCModule', () => {
         (calculatePKCECodeChallenge as jest.Mock).mockResolvedValue('test-challenge');
         mockRequest.session = createMockSession({
           save: jest.fn().mockImplementation(callback => callback(null)),
+          returnTo: '/cases/1234567890123456/event/ext:makeOrder',
+          handoffReauthentication: freshSignIn ? '/cases/1234567890123456/event/ext:makeOrder' : undefined,
         });
 
         oidcModule.enableFor(mockApp);
@@ -244,6 +246,7 @@ describe('OIDCModule', () => {
 
         expect(mockResponse.redirect).toHaveBeenCalledWith(mockAuthUrl);
         expect(mockRequest.session).toHaveProperty('codeVerifier', 'test-verifier');
+        expect((buildAuthorizationUrl as jest.Mock).mock.lastCall?.[1].prompt).toBe(freshSignIn ? 'login' : undefined);
       });
 
       it('should handle login errors', async () => {

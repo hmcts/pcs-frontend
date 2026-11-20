@@ -57,6 +57,7 @@ export interface MoneyJudgmentAnswer {
 
 export interface MoneyJudgmentsAnswers {
   costs?: string;
+  /** Yes once there is a judgment; no once court staff confirm the order makes none. */
   hasMoneyJudgments?: 'yes' | 'no';
   judgments: MoneyJudgmentAnswer[];
 }
@@ -181,7 +182,7 @@ export function judgmentsFromOrder(orderType: string, formData: FormData, sides:
 // The page's own fields, a judgment's prefixed with its number.
 
 function postedDate(body: Record<string, unknown>, prefix: string): DateAnswer {
-  const [day, month, year] = ['day', 'month', 'year'].map(part => first(body[`${prefix}-${part}`]));
+  const [day, month, year] = ['day', 'month', 'year'].map(part => first(body[`${prefix}-${part}`]).trim());
   return { day, month, year };
 }
 
@@ -221,7 +222,10 @@ export function validateMoneyJudgments(answers: MoneyJudgmentsAnswers | undefine
     issues.push({ id: 'costs', message: 'Select what the order says about costs' });
   }
   if (!answers?.hasMoneyJudgments) {
-    issues.push({ id: 'has-money-judgments', message: 'Select if the order makes a money judgment' });
+    issues.push({
+      id: 'has-money-judgments',
+      message: 'Add the money judgments the order makes, or select that it makes none',
+    });
   }
   if (answers?.hasMoneyJudgments !== 'yes') {
     return issues;
@@ -249,7 +253,7 @@ export function validateMoneyJudgments(answers: MoneyJudgmentsAnswers | undefine
       add('creditors', `A party cannot both pay and be paid money judgment ${n}`);
     }
     if (!judgment.arrears && !judgment.otherAmount && !judgment.costs) {
-      add('arrears', `Enter the sum of money judgment ${n}`);
+      add('amounts', `Enter at least one amount for money judgment ${n}`);
     }
     amount('arrears', judgment.arrears, 'arrears');
     amount('other-amount', judgment.otherAmount, 'interest or other sum');
@@ -324,27 +328,42 @@ export function moneyJudgmentRows(
     return rows;
   }
   answers.judgments.forEach((judgment, index) => {
-    const lines = [
-      `Paid by: ${judgment.debtors.map(partyName).join(', ')}`,
-      `Paid to: ${judgment.creditors.map(partyName).join(', ')}`,
-      ...(judgment.arrears ? [`Arrears: ${pounds(judgment.arrears)}`] : []),
-      ...(judgment.otherAmount ? [`Interest or other sum: ${pounds(judgment.otherAmount)}`] : []),
-      ...(judgment.costs ? [`Costs: ${pounds(judgment.costs)}`] : []),
-      ...(judgment.oneOffAmount
-        ? [`One-off payment: ${pounds(judgment.oneOffAmount)} by ${displayDate(judgment.oneOffDate)}`]
-        : []),
-      ...(given(judgment.payBy)
-        ? [`${judgment.oneOffAmount ? 'Balance' : 'To be paid in full'} by ${displayDate(judgment.payBy)}`]
-        : []),
-      ...(judgment.instalmentAmount
-        ? [
-            `Instalments: ${pounds(judgment.instalmentAmount)} ${label(FREQUENCIES, judgment.instalmentFrequency).toLowerCase()}, ` +
-              `the first by ${displayDate(judgment.firstInstalmentDate)}`,
-          ]
-        : []),
-      ...(judgment.suspended ? ['Enforcement suspended on the terms of the possession order'] : []),
-    ];
-    rows.push([`Money judgment ${index + 1}`, lines]);
+    rows.push([`Money judgment ${index + 1}`, judgmentLines(judgment, partyName)]);
   });
   return rows;
 }
+
+/** A judgment as check your answers lists it: who pays whom, each sum, and how it is paid. */
+export function judgmentLines(judgment: MoneyJudgmentAnswer, partyName: (id: string) => string): string[] {
+  return [
+    `Paid by: ${judgment.debtors.map(partyName).join(', ')}`,
+    `Paid to: ${judgment.creditors.map(partyName).join(', ')}`,
+    ...(judgment.arrears ? [`Arrears: ${pounds(judgment.arrears)}`] : []),
+    ...(judgment.otherAmount ? [`Interest or other sum: ${pounds(judgment.otherAmount)}`] : []),
+    ...(judgment.costs ? [`Costs: ${pounds(judgment.costs)}`] : []),
+    ...(judgment.oneOffAmount
+      ? [`One-off payment: ${pounds(judgment.oneOffAmount)} by ${displayDate(judgment.oneOffDate)}`]
+      : []),
+    ...(given(judgment.payBy)
+      ? [`${judgment.oneOffAmount ? 'Balance' : 'To be paid in full'} by ${displayDate(judgment.payBy)}`]
+      : []),
+    ...(judgment.instalmentAmount
+      ? [
+          `Instalments: ${pounds(judgment.instalmentAmount)} ${label(FREQUENCIES, judgment.instalmentFrequency).toLowerCase()}, ` +
+            `the first by ${displayDate(judgment.firstInstalmentDate)}`,
+        ]
+      : []),
+    ...(judgment.suspended ? ['Enforcement suspended on the terms of the possession order'] : []),
+  ];
+}
+
+/** A judgment in a line, as its row of the page sums it up: who pays whom, and the total. */
+export function judgmentSummary(judgment: MoneyJudgmentAnswer, partyName: (id: string) => string): string {
+  const total = [judgment.arrears, judgment.otherAmount, judgment.costs].reduce(
+    (sum, value) => sum + (parseMoney(value) ?? 0),
+    0
+  );
+  const names = (ids: string[]) => ids.map(partyName).join(', ') || 'No one chosen';
+  return `${names(judgment.debtors)} to pay ${names(judgment.creditors)} £${formatMoney(total)}`;
+}
+

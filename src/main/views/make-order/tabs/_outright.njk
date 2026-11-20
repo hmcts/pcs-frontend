@@ -4,6 +4,14 @@
 
 {% set byDateHtml %}
   {{ compact.date({ id: "outright-by-date", legend: "Date possession is ordered by", legendHidden: true }) }}
+  {{ compact.text("outright-by-time", {
+    label: "Time (optional)",
+    hint: "For example, 16:00. Clear it to give no time.",
+    classes: "govuk-input--width-5",
+    spellcheck: false,
+    optional: true,
+    default: "16:00"
+  }) }}
 {% endset %}
 {{ compact.radios("outright-possession", {
   legend: "Possession",

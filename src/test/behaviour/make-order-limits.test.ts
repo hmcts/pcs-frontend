@@ -137,7 +137,7 @@ describe('make an order: limits', () => {
       'adj-hearing-date-specific-day': '1',
       'adj-hearing-date-specific-month': '10',
       'adj-hearing-date-specific-year': '2026',
-      'adj-time-estimate': '30',
+      'adj-time-estimate-minutes': '30',
     };
     // The times parseTime reads are its unit test's; here, that the page asks for one it can read.
     expect(await errors('tab-adjournment', { ...hearing, 'adj-specific-time': '2 p.m.' })).toEqual([]);

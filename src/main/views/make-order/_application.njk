@@ -22,7 +22,7 @@
 
 {% macro details(application) %}
   {% if application.withoutNotice == "YES" %}
-    {{ govukWarningText({ text: "The applicant asked for this application to be made without notice. Only the applicant will be told of it." }) }}
+    {{ govukWarningText({ text: "The applicant asked for this application to be made without notice." }) }}
   {% endif %}
 
   {% set documentLinks %}
@@ -49,20 +49,25 @@
   {% endif %}
   {% set rows = rows.concat([
     { key: { text: "Other parties agree" }, value: { text: application.otherPartiesAgreedDisplay or "Not answered" } },
-    { key: { text: "Without notice" }, value: { text: (application.withoutNoticeDisplay or "No") + ((": " + application.withoutNoticeReason) if application.withoutNoticeReason else "") } },
+    { key: { text: "Without notice requested" }, value: { text: (application.withoutNoticeDisplay or "Not recorded") + ((": " + application.withoutNoticeReason) if application.withoutNoticeReason else "") } },
     { key: { text: "Application documents" }, value: { html: documentLinks } }
   ]) %}
   {{ govukSummaryList({ rows: rows, classes: "govuk-!-margin-bottom-4", attributes: { id: application.prefix + "-details" } }) }}
 
   <h4 class="govuk-heading-s">The order the applicant asked for</h4>
-  {% if application.whatOrderWanted %}
-    {# As the applicant wrote it, line by line, so their numbering is the numbering they refer to. #}
+  {% if application.requestedWordingHtml %}
+    {# As the applicant wrote it: their draft order's lists and emphasis, or their lines, so their numbering is the
+       numbering they refer to. #}
     {{ govukInsetText({
-      html: application.whatOrderWantedHtml,
+      html: application.requestedWordingHtml,
       attributes: { id: application.prefix + "-requested" }
     }) }}
   {% else %}
     <p class="govuk-body">The applicant did not say what order they want. Read the application documents.</p>
+  {% endif %}
+  {% if application.explanationHtml %}
+    <h4 class="govuk-heading-s">Why they want it</h4>
+    <div class="govuk-body" id="{{ application.prefix }}-explanation">{{ application.explanationHtml | safe }}</div>
   {% endif %}
 {% endmacro %}
 
@@ -73,21 +78,30 @@
 {% macro decision(application) %}
   {% set prefix = application.prefix %}
   {% set name = prefix + "-decision" %}
+  {#
+    Striking out is a decision on the papers, so an order made at a hearing offers none, and an application to
+    suspend enforcement is never struck out (judicial feedback, November 2026).
+  #}
+  {% set items = [
+    { value: "none", text: "Not dealt with" },
+    { value: "grant", text: "Granted" },
+    { value: "dismiss", text: "Dismissed" }
+  ] %}
+  {% if withoutHearing and not application.enforcementSuspension %}
+    {% set items = items.concat([{ value: "strike-out", text: "Struck out" }]) %}
+  {% endif %}
+  {% set items = items.concat([
+    { value: "list", text: "Listed for a hearing" },
+    { value: "other", text: "Something else" }
+  ]) %}
   {{ compact.radios(name, {
     legend: "What do you decide about application " + application.reference + "?",
     classes: "govuk-radios--small govuk-radios--inline",
     default: none if application.required else "none",
-    items: [
-      { value: "none", text: "Not dealt with" },
-      { value: "grant", text: "Granted" },
-      { value: "dismiss", text: "Dismissed" },
-      { value: "strike-out", text: "Struck out" },
-      { value: "list", text: "Listed for a hearing on notice" },
-      { value: "other", text: "Something else" }
-    ]
+    items: items
   }) }}
 
-  {% if application.whatOrderWanted %}
+  {% if application.requestedWordingHtml %}
     {# Revealed by granting; the wording goes in only when the judge asks. #}
     <div data-decision-shows="grant" {%- if not draftChecked(name, "grant") %} hidden{% endif %}>
       <button type="button" class="govuk-button govuk-button--secondary govuk-!-margin-bottom-3" data-insert-requested-wording>
@@ -102,12 +116,34 @@
     </div>
   {% endif %}
 
+  {#
+    Listed at a new hearing, the judge says when and whether the other parties are given notice of it; listed at one of
+    the case's hearings still to come, which already has its parties, the order only says which.
+  #}
+  {% set listAt = prefix + "-list-at" %}
   <div data-decision-shows="list" data-application-listing {%- if not draftChecked(name, "list") %} hidden{% endif %}>
-    {{ listing.listing(prefix + "-list", "When the hearing is", [
-      "Next available possession list after",
-      "Next available date (non-possession list) after",
-      "Specific date"
-    ]) }}
+    {% if upcomingHearings | length %}
+      {% set atItems = [{ value: "new", text: "A new hearing" }] %}
+      {% for option in upcomingHearings %}
+        {% set atItems = atItems.concat([{ value: option.id, text: "The hearing on " + option.text }]) %}
+      {% endfor %}
+      {{ compact.radios(listAt, {
+        legend: "Which hearing?",
+        classes: "govuk-radios--small",
+        default: "new",
+        items: atItems
+      }) }}
+    {% endif %}
+    <div data-list-new {%- if draftValue(listAt) and not draftChecked(listAt, "new") %} hidden{% endif %}>
+      {{ compact.checkboxes(prefix + "-list-without-notice", {
+        items: [{ value: "yes", text: "Without notice to the other parties" }]
+      }) }}
+      {{ listing.listing(prefix + "-list", "When the hearing is", [
+        "Next available possession list after",
+        "Next available date (non-possession list) after",
+        "Specific date"
+      ]) }}
+    </div>
   </div>
 {% endmacro %}
 
@@ -119,14 +155,14 @@
            data-application-reference="{{ application.reference }}"
            data-application-applicant="{{ application.applicant or 'the applicant' }}"
            data-application-submitted="{{ application.submittedOnDisplay or '' }}"
-           data-application-wording-html="{{ application.whatOrderWantedHtml }}"
+           data-application-wording-html="{{ application.requestedWordingHtml }}"
+           data-application-hearings="{{ upcomingHearingsJson }}"
            {%- if application.enforcementSuspension %} data-application-suspension{% endif %}>
     <h3 class="govuk-heading-m govuk-!-margin-bottom-1" id="{{ prefix }}-heading">
       {{ application.reference }}: {{ application.type }}{% if application.somethingElseDetails %} – {{ application.somethingElseDetails }}{% endif %}
     </h3>
     <p class="govuk-body-s govuk-!-margin-bottom-2">
       {{ application.applicant or "Applicant not known" }}{% if application.submittedOnDisplay %}, {{ application.submittedOnDisplay }}{% endif %}
-      {%- if application.withoutNotice == "YES" %}, without notice{% endif %}
     </p>
     {{ govukDetails({
       summaryText: "Application details and the order asked for",

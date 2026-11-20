@@ -38,7 +38,8 @@ export function wordingAnchors(prefix: string): string[] {
 /**
  * The clauses the decision on an application generates, each naming the application. The
  * applicant's wording is never generated: the judge inserts it with a button if they want it. Listing it for a
- * hearing says when, as an adjournment does. For an application to suspend enforcement, granting it sets the
+ * new hearing says when, as an adjournment does, and whether the other parties are given notice; listing it at one of
+ * the case's hearings says which. For an application to suspend enforcement, granting it sets the
  * suspension's conditions as a suspended possession order does.
  */
 function addApplicationClauses(list: OrderedListBuilder, data: OrderData, application: OrderApplication): void {
@@ -58,14 +59,16 @@ function addApplicationClauses(list: OrderedListBuilder, data: OrderData, applic
     list.item(`${prefix}-decision`, `${described} is dismissed.`);
   } else if (decision === 'strike-out') {
     list.item(`${prefix}-decision`, `${described} is struck out.`);
+  } else if (decision === 'list' && application.listedAt) {
+    list.item(`${prefix}-listing`, content => {
+      content
+        .text(`${described} shall be heard at the hearing on `)
+        .fact(`${prefix}-hearing-date`, application.listedAt!, { sourceId: `${prefix}-list-at` })
+        .text('.');
+    });
   } else if (decision === 'list') {
-    addListing(
-      list,
-      data,
-      `${prefix}-list`,
-      prefix,
-      `${described} shall be listed for a hearing on notice to all parties`
-    );
+    const notice = application.listWithoutNotice ? 'without notice to the other parties' : 'on notice to all parties';
+    addListing(list, data, `${prefix}-list`, prefix, `${described} shall be listed for a hearing ${notice}`);
   }
 }
 

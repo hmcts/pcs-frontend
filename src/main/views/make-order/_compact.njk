@@ -103,6 +103,7 @@
   }) }}
 {% endmacro %}
 
+{# A default fills only a field the order has never had: a judge who cleared it keeps it clear. #}
 {% macro text(id, params) %}
   {{ govukInput({
     id: id,
@@ -113,7 +114,7 @@
     formGroup: { classes: params.formGroupClasses },
     spellcheck: params.spellcheck,
     inputmode: params.inputmode,
-    value: draftValue(id),
+    value: params.default if draftValue(id) is undefined else draftValue(id),
     attributes: { required: true } if not params.optional,
     errorMessage: validationErrors[id]
   }) }}
@@ -154,15 +155,24 @@
 {# Date with quick-fill pills. #}
 {% macro date(params={}) %}
   {# Suffixed: govukDateInput derives its item ids from params.id, so it keeps that id. #}
+  {#
+    params.default ({ day, month, year }) fills a date the form has never had; one the judge cleared stays clear.
+    params.pills gives the quick dates in days from today. params.workingDays, the bank holidays, makes a date filled
+    in quickly the next working day on or after it.
+  #}
+  {% set saved = draftDate(params.id) %}
+  {% set unsaved = true %}
+  {% for item in saved %}{% if item.value is defined %}{% set unsaved = false %}{% endif %}{% endfor %}
   {% set dateItems = [] %}
-  {% for item in draftDate(params.id) %}
+  {% for item in saved %}
     {% set dateItems = dateItems.concat([{
       name: item.name,
-      value: item.value,
+      value: params.default[item.name] if (unsaved and params.default) else item.value,
       attributes: { required: true } if not params.optional
     }]) %}
   {% endfor %}
-  <div id="{{ params.id }}-pills" class="pcs-date-with-pills">
+  <div id="{{ params.id }}-pills" class="pcs-date-with-pills"
+    {%- if params.workingDays %} data-working-days="{{ params.workingDays | dump }}"{% endif %}>
     {{ govukDateInput({
       id: params.id,
       namePrefix: params.id,
@@ -176,7 +186,7 @@
       errorMessage: validationErrors[params.id + "-day"]
     }) }}
     <div class="pcs-date-pills" role="group" aria-label="Quick date for {{ params.legend | lower }}">
-      {% for days in [14, 28, 42] %}
+      {% for days in params.pills or [14, 28, 42] %}
         <button type="button" class="pcs-date-pill" data-date-pill-days="{{ days }}">{{ days }} days</button>
       {% endfor %}
     </div>

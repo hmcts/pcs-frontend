@@ -24,6 +24,8 @@ export interface ClientContextHeaders {
   genAppId?: string;
   /** The hearing a judge is making an order for, from the link they followed. */
   hearingId?: string;
+  /** The judge's own choice on the page of the hearing the order is made at, or of none, over the link's. */
+  madeAt?: { hearingId?: number };
 }
 
 interface CustomSessionData extends SessionData {
@@ -31,6 +33,7 @@ interface CustomSessionData extends SessionData {
   nonce?: string;
   user?: UserInfoResponseWithToken;
   returnTo?: string;
+  handoffReauthentication?: string;
   // Step form data keyed by journey name, then case reference (or 'default'), then step name.
   formData?: Record<string, Record<string, Record<string, any>>>;
   uploadedDocs?: Record<string, Record<string, unknown[]>>;

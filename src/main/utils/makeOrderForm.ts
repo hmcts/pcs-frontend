@@ -1,7 +1,8 @@
 import escapeHtml from 'escape-html';
 import { DateTime } from 'luxon';
+import { filterXSS } from 'xss';
 
-import { parseDate, parseMoney } from '@utils/makeOrderFormat';
+import { parseDate, parseMoney, workingDayOnOrAfter } from '@utils/makeOrderFormat';
 import {
   type ApplicationToDecide,
   type AttendanceParty,
@@ -24,6 +25,52 @@ const NO_CLAIM_ORDER_TYPE: MakeOrderType = 'NO_ORDER_ON_CLAIM';
 
 const YES_NO: Record<string, string> = { YES: 'Yes', NO: 'No' };
 
+/**
+ * Whether the applicant asked for the application to be made without notice, as they recorded it when making it. It
+ * says nothing of who was in fact told of the application before the order.
+ */
+export function noticeRequestLabel(withoutNotice?: string | null): string {
+  return withoutNotice === 'YES'
+    ? 'Without notice requested'
+    : withoutNotice === 'NO'
+      ? 'Without notice not requested'
+      : 'Notice request not recorded';
+}
+
+/** Before whom, where and when the order says it was made, as its first sentence gives them. */
+export interface OrderBefore {
+  judge: string;
+  court: string;
+  date: string;
+}
+
+/**
+ * Before whom, where and when the order was made: the judge, at the court managing the case, on the hearing's date,
+ * or today for an order made without one. A part not known is a placeholder for the judge to fill in.
+ */
+export function orderBefore({ caseContext, hearing, judgeName }: OrderStart, now = DateTime.now()): OrderBefore {
+  const court = [caseContext.court?.name, caseContext.court?.venueShortName].filter(Boolean).join(' ');
+  const date = hearing ? DateTime.fromISO(hearing.date, { zone: 'Europe/London' }) : now.setZone('Europe/London');
+  return {
+    // TODO: the judge's title from Judicial Reference Data. Until then every judge is a District Judge.
+    judge: judgeName ? `District Judge ${judgeName}` : '[judge’s name and title]',
+    court: court || '[court]',
+    // TODO: what date and court an order made without a hearing names, once the Service team have said.
+    date: date.isValid ? date.setLocale('en-GB').toFormat('d MMMM yyyy') : '[date]',
+  };
+}
+
+/** A hearing's date and time as the order pages give it. */
+export function hearingTime(iso: string): string {
+  const date = DateTime.fromISO(iso, { zone: 'Europe/London' });
+  return date.isValid
+    ? date
+        .setLocale('en-GB')
+        .toFormat("d MMMM yyyy 'at' h:mma")
+        .replace(/AM|PM/, m => m.toLowerCase())
+    : iso;
+}
+
 function displayDate(iso?: string | null): string | undefined {
   const date = DateTime.fromISO(String(iso ?? ''), { zone: 'Europe/London' });
   return date.isValid ? date.setLocale('en-GB').toFormat('d MMMM yyyy') : undefined;
@@ -44,6 +91,33 @@ function caseBundleModel(bundle: OrderCaseBundle, caseReference: number) {
   };
 }
 
+/** The rich text an applicant's draft order may hold: its paragraphs, lists and emphasis, nothing that runs. */
+const DRAFT_ORDER_TAGS = ['p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'strike', 'ul', 'ol', 'li', 'blockquote'];
+
+const draftOrderHtml = (html: string): string =>
+  filterXSS(html, {
+    whiteList: { ...Object.fromEntries(DRAFT_ORDER_TAGS.map(tag => [tag, []])), ol: ['start'], li: ['value'] },
+    stripIgnoreTag: true,
+    stripIgnoreTagBody: ['script', 'style'],
+  });
+
+const lines = (text: string): string => `<p>${escapeHtml(text).replace(/\r?\n/g, '<br>')}</p>`;
+
+/**
+ * The order the applicant asked for, which the judge can put in the order: their draft order as the rich text they
+ * wrote it in, with their explanation of it apart; or, for an application made before they could give a draft, what
+ * they wrote of the order they want, as its lines.
+ */
+function requestedWording({ draftOrderWording, whatOrderWanted }: OrderApplication) {
+  if (draftOrderWording) {
+    return {
+      requestedWordingHtml: draftOrderHtml(draftOrderWording),
+      explanationHtml: whatOrderWanted ? lines(whatOrderWanted) : '',
+    };
+  }
+  return { requestedWordingHtml: whatOrderWanted ? lines(whatOrderWanted) : '', explanationHtml: '' };
+}
+
 /**
  * The application as its row shows it: its answers in words, and its dates as the court writes them. Its answers on
  * the form start with its prefix, so each application the order can decide keeps its own.
@@ -53,10 +127,7 @@ function applicationModel(application: OrderApplication & ApplicationToDecide, c
   return {
     ...application,
     prefix: applicationPrefix(application),
-    // As its lines, which the judge can put in the order.
-    whatOrderWantedHtml: application.whatOrderWanted
-      ? `<p>${escapeHtml(application.whatOrderWanted).replace(/\r?\n/g, '<br>')}</p>`
-      : '',
+    ...requestedWording(application),
     documents: application.documents.map(document => ({ ...document, href: href(document.id) })),
     submittedOnDisplay: displayDate(application.submittedOn),
     within14DaysDisplay: YES_NO[application.within14Days ?? ''],
@@ -161,9 +232,107 @@ function hearingModel(hearing: OrderHearing | null | undefined): Record<string, 
       : 'From the claim',
     earlierNotes: hearing.earlierNotes.map(note => ({
       by: note.by ?? 'A judge',
-      when: displayDate(note.hearingDate ?? note.createdOn),
+      dateMade: displayDate(note.createdOn),
       note: note.note,
     })),
+  };
+}
+
+/** The date each choice of how the order was made gives for applying to set it aside, vary or stay it. */
+const NOTICE_DATE_PREFIXES: Record<string, string> = {
+  'own-initiative': 'own-initiative-by',
+  'without-notice': 'without-notice-by',
+};
+
+/**
+ * The order's answers without the apply-by dates of the choices not made, so neither an order made with notice nor
+ * one made on the other basis keeps a date it does not give, to come back as a stale default.
+ */
+export function withoutUnchosenNoticeDates(formData: FormData): FormData {
+  const chosen = NOTICE_DATE_PREFIXES[String(formData['order-notice'] ?? '')];
+  const unchosen = Object.values(NOTICE_DATE_PREFIXES).filter(prefix => prefix !== chosen);
+  return Object.fromEntries(
+    Object.entries(formData).filter(([field]) => !unchosen.some(prefix => field.startsWith(`${prefix}-`)))
+  );
+}
+
+/** The days an order on the court's own initiative gives to apply to set it aside, vary or stay it, unless changed. */
+export const OWN_INITIATIVE_APPLY_BY_DAYS = 7;
+
+/**
+ * A date some days from today in London, as the parts of a date input, moved to the next working day when the
+ * bank holidays are given.
+ */
+export function daysFromToday(
+  days: number,
+  now = DateTime.now(),
+  bankHolidays?: readonly string[]
+): { day: string; month: string; year: string } {
+  const later = now.setZone('Europe/London').plus({ days });
+  const date = bankHolidays
+    ? DateTime.fromJSDate(workingDayOnOrAfter(new Date(later.year, later.month - 1, later.day), bankHolidays))
+    : later;
+  // Padded as the page's quick dates fill them.
+  return { day: date.toFormat('dd'), month: date.toFormat('MM'), year: date.toFormat('yyyy') };
+}
+
+/**
+ * The order's answers with any time estimate saved as a number and a unit, before it was asked as days, hours and
+ * minutes, given as those, so a draft saved then still says how long its hearing is.
+ */
+export function withTimeEstimateParts(formData: FormData): FormData {
+  const converted: FormData = { ...formData };
+  for (const [field, amount] of Object.entries(formData)) {
+    const prefix = field.endsWith('-time-estimate') ? field.slice(0, -'-time-estimate'.length) : undefined;
+    if (!prefix || typeof amount !== 'string' || !/^\d+$/.test(amount.trim())) {
+      continue;
+    }
+    const minutes = Number(amount) * (formData[`${field}-unit`] === 'hours' ? 60 : 1);
+    if (!(`${field}-hours` in formData || `${field}-minutes` in formData || `${field}-days` in formData)) {
+      converted[`${field}-hours`] = minutes >= 60 ? String(Math.floor(minutes / 60)) : '';
+      converted[`${field}-minutes`] = minutes % 60 ? String(minutes % 60) : '';
+    }
+    delete converted[field];
+    delete converted[`${field}-unit`];
+  }
+  return converted;
+}
+
+/** What the page's choice of when the order is made posts for an order made without a hearing. */
+export const WITHOUT_HEARING = 'without-hearing';
+
+/** The page's choice of when the order is made, for the hearing it is made at, or none. */
+export function madeAtValue(hearing: OrderHearing | null | undefined): string {
+  return hearing ? String(hearing.id) : WITHOUT_HEARING;
+}
+
+/** The judge's choice the page posted, as pcs-api is told it: one of the case's hearings, or none. */
+export function madeAtChoice(posted: unknown): { hearingId?: number } | undefined {
+  if (posted === WITHOUT_HEARING) {
+    return {};
+  }
+  return typeof posted === 'string' && /^\d{1,9}$/.test(posted) ? { hearingId: Number(posted) } : undefined;
+}
+
+/**
+ * The judge's choice of when the order is made: without a hearing, or at one of the case's hearings, whatever task or
+ * link brought them to it, with the one the order is now made at chosen.
+ */
+export function madeAtModel({ caseContext, hearing }: OrderStart): Record<string, unknown> {
+  const current = madeAtValue(hearing);
+  return {
+    madeAt: current,
+    madeAtItems: [
+      { value: WITHOUT_HEARING, text: 'Without a hearing (box work)' },
+      // The order's own hearing, even if it is no longer one the case lists.
+      ...[
+        ...(hearing && !caseContext.hearings?.some(option => option.id === hearing.id) ? [hearing] : []),
+        ...(caseContext.hearings ?? []),
+      ].map(option => ({
+        value: String(option.id),
+        text: `At the hearing on ${hearingTime(option.date)}`,
+      })),
+    ].map(item => ({ ...item, checked: item.value === current })),
   };
 }
 
@@ -171,6 +340,20 @@ function hearingModel(hearing: OrderHearing | null | undefined): Record<string, 
 interface AttendanceRow extends AttendanceParty {
   partyId: string;
   name: string;
+}
+
+/**
+ * The case's hearings still to come, but for the one the order is made at, at any of which the order can list an
+ * application to be heard, by id with when each is.
+ */
+export function upcomingHearings(
+  { caseContext, hearing }: Pick<OrderStart, 'caseContext' | 'hearing'>,
+  now: DateTime = DateTime.now()
+): { id: string; text: string }[] {
+  const today = now.setZone('Europe/London').startOf('day');
+  return (caseContext.hearings ?? [])
+    .filter(option => option.id !== hearing?.id && DateTime.fromISO(option.date, { zone: 'Europe/London' }) >= today)
+    .map(option => ({ id: String(option.id), text: hearingTime(option.date) }));
 }
 
 /**
@@ -214,12 +397,16 @@ export interface OrderFormSubmission {
 export function orderFormModel(start: OrderStart, submission?: OrderFormSubmission): Record<string, unknown> {
   const { caseContext, order, hearing } = start;
   const applications = applicationsToDecide(start);
+  const upcoming = upcomingHearings(start);
   // A hearing's facts and note are pcs-api's record of the hearing, kept apart from the order. The caseworker's
   // review is sent the hearing without them.
   const recorded: FormData = hearing?.caseFacts
     ? { ...caseFactsFormData(hearing.caseFacts), 'hearing-notes': hearing.note ?? '' }
     : {};
-  const draft: FormData = { ...recorded, ...(submission?.formData ?? order.formData) };
+  // A date the order does not give is left blank, for the page to start afresh if the judge chooses it.
+  const draft: FormData = withTimeEstimateParts(
+    withoutUnchosenNoticeDates({ ...recorded, ...(submission?.formData ?? order.formData) })
+  );
   // With an application open the order starts as one on the applications alone, the claim's order types waiting
   // behind a tick box.
   const defaultOrderType = applications.length
@@ -247,6 +434,12 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     orderParties: attendanceParties(start).map(({ partyId, name, type }) => ({ id: partyId, name, type })),
     openCounterclaim: caseContext.openCounterclaim === true,
     applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
+    upcomingHearings: upcoming,
+    orderBefore: orderBefore(start),
+    // A date to apply by is a working day, as are the page's quick dates for it.
+    ownInitiativeApplyBy: daysFromToday(OWN_INITIATIVE_APPLY_BY_DAYS, DateTime.now(), start.bankHolidays ?? []),
+    bankHolidays: start.bankHolidays ?? [],
+    upcomingHearingsJson: JSON.stringify(Object.fromEntries(upcoming.map(({ id, text }) => [id, text]))),
     ...hearingModel(hearing),
     caseBundle: caseContext.caseBundle ? caseBundleModel(caseContext.caseBundle, caseContext.caseReference) : undefined,
   };

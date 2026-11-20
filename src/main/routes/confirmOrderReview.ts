@@ -7,8 +7,13 @@ import { CONFIRM_ORDER_REVIEW_ROUTE } from '../constants/caseRoutes';
 import { makeOrderFeatureMiddleware, oidcMiddleware } from '../middleware';
 
 import { ccdCaseService } from '@services/ccdCaseService';
-import { applicationsToDecide, attendanceParties, orderFormModel } from '@utils/makeOrderForm';
-import { MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
+import {
+  applicationsToDecide,
+  attendanceParties,
+  orderFormModel,
+  withoutUnchosenNoticeDates,
+} from '@utils/makeOrderForm';
+import { APPLY_BY_PASSED, MAKE_ORDER_TYPES, validateMakeOrder } from '@utils/makeOrderValidation';
 import {
   COSTS,
   FREQUENCIES,
@@ -16,6 +21,7 @@ import {
   type MoneyJudgmentAnswer,
   type Sides,
   blankJudgment,
+  judgmentSummary,
   moneyJudgmentRows,
   postedJudgments,
   validateMoneyJudgments,
@@ -33,7 +39,6 @@ import {
 } from '@utils/orderCase';
 import {
   ADJOURNMENT,
-  CONDITION,
   GROUNDS,
   MAX_GROUNDS_DETAILS_LENGTH,
   ORDER_DETAILS_FIELDS,
@@ -48,15 +53,16 @@ import {
   MAX_QUERY_LENGTH,
   MAX_REVIEW_DATES,
   MAX_REVIEW_DESCRIPTION_LENGTH,
-  NEXT_STEPS,
   type OrderReviewAnswers,
   type OrderReviewSession,
   REVIEW_REASONS,
   type ReviewDateAnswer,
   SEALS,
+  TASKS_OUTSTANDING,
   type ValidationIssue,
   blankReviewDate,
   choice,
+  issueSummary,
   issuesFreeForm,
   list,
   newAnswers,
@@ -73,8 +79,10 @@ import {
 /*
  * A caseworker's review of a judge's order, reached from their Work Allocation task through XUI. Like the
  * make order page, it is plain Express rather than a citizen steps journey: its pages are a CCD event
- * started on the introduction and submitted with that start's token, its first page embeds the make
- * order form and its editor, and its forms post several buttons.
+ * started as the review opens and submitted with that start's token, and its forms post several buttons.
+ * Three pages, each with the order beside it: the review of the judge's order, which embeds the make order
+ * form and its editor and can return the order to the judge; what court staff record from the order to
+ * issue it; and their answers to check before they issue it.
  */
 
 const CONFIRM_ORDER_REVIEW_EVENT_ID = 'ext:confirmOrderReview';
@@ -82,10 +90,7 @@ const CONFIRM_ORDER_REVIEW_EVENT_ID = 'ext:confirmOrderReview';
 const PAGES = {
   intro: '',
   review: '/review',
-  orderDetails: '/order-details',
-  moneyJudgments: '/money-judgments',
-  reviewDates: '/review-dates',
-  proceedToIssue: '/proceed-to-issue',
+  record: '/record',
   checkYourAnswers: '/check-your-answers',
   cancel: '/cancel',
   confirmed: '/confirmed',
@@ -109,15 +114,15 @@ function endReview(req: Request): void {
   delete req.session.orderReviews?.[caseReferenceOf(req)];
 }
 
-/** The review in progress on the case, if the introduction started one that has not ended. */
+/** The review in progress on the case, if opening it started one that has not ended. */
 function reviewOf(req: Request): OrderReviewSession | undefined {
   const review = req.session.orderReviews?.[caseReferenceOf(req)];
   return review && !review.outcome ? review : undefined;
 }
 
 /**
- * The pages after the introduction continue the review the introduction started; without one, such as
- * after a cancel, a submission or in a new session, the caseworker starts again from the introduction.
+ * The pages continue the review opening it started; without one, such as after a cancel, a submission or in
+ * a new session, the caseworker opens it again, which starts it afresh.
  */
 const reviewInProgress: RequestHandler = (req, res, next) =>
   reviewOf(req) ? next() : res.redirect(pageUrl(caseReferenceOf(req), 'intro'));
@@ -195,11 +200,6 @@ function postedReviewDates(body: Record<string, unknown>, shown: number): Review
   });
 }
 
-/** The review dates the page shows: at least one to fill in once the caseworker says there are some. */
-function shownReviewDates(answers: OrderReviewAnswers): ReviewDateAnswer[] {
-  return answers.reviewDates.length ? answers.reviewDates : [blankReviewDate()];
-}
-
 function sidesOf(review: OrderReviewSession): Sides {
   return {
     claimants: review.caseContext.claimants.map(party => party.id),
@@ -207,14 +207,8 @@ function sidesOf(review: OrderReviewSession): Sides {
   };
 }
 
-/** The money judgments the page shows: at least one to fill in once the caseworker says there are some. */
-function shownJudgments(review: OrderReviewSession): MoneyJudgmentAnswer[] {
-  const judgments = review.answers.moneyJudgments?.judgments ?? [];
-  return judgments.length ? judgments : [blankJudgment(sidesOf(review))];
-}
-
 /**
- * Why the money judgments page is not done: an answer missing, or judgments made from the judge's answers that court
+ * Why the money judgments are not done: an answer missing, or judgments made from the judge's answers that court
  * staff have not yet checked.
  */
 function moneyJudgmentIssues(answers: OrderReviewAnswers): ValidationIssue[] {
@@ -233,10 +227,15 @@ function partyChoices(review: OrderReviewSession) {
   ];
 }
 
+function partyNamesOf(review: OrderReviewSession): (id: string) => string {
+  const names = new Map(partyChoices(review).map(party => [party.value, party.text]));
+  return id => names.get(id) ?? id;
+}
+
 /**
- * Submits the caseworker's review with the token the introduction's start gave; pcs-api refuses it if
- * the order changed since. The review then ends with its outcome, which its confirmation shows and which
- * survives a refresh, which cannot submit it again.
+ * Submits the caseworker's review with the token its start gave; pcs-api refuses it if the order changed
+ * since. The review then ends with its outcome, which its confirmation shows and which survives a refresh,
+ * which cannot submit it again.
  */
 async function submitReview(req: Request, review: OrderReviewSession, action: 'RETURN_TO_JUDGE' | 'ISSUE') {
   await ccdCaseService.submitCaseEvent(
@@ -249,7 +248,15 @@ async function submitReview(req: Request, review: OrderReviewSession, action: 'R
   review.outcome = action === 'ISSUE' ? 'ISSUED' : 'RETURNED_TO_JUDGE';
 }
 
-/** The caseworker's answers in the order asked, in a section per page, which each is changed on. */
+/** Where each section of the record page starts, which check your answers changes it at. */
+const SECTIONS = {
+  orderDetails: 'order-details',
+  moneyJudgments: 'money-judgments',
+  reviewDates: 'review-dates',
+  service: 'service',
+} as const;
+
+/** The caseworker's answers in the order asked, in a section for each part of the record page. */
 function checkYourAnswersContent(req: Request, review: OrderReviewSession): Record<string, unknown> {
   const { answers } = review;
   const label = (options: readonly { value: string; text: string }[], value?: string) =>
@@ -257,16 +264,17 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
   const yesNo = (value?: string) => (value === 'yes' ? 'Yes' : 'No');
   const row = (key: string, hiddenText: string, ...lines: string[]) => ({ key, hiddenText, lines });
   const reviewDates = answers.hasReviewDates === 'yes' ? answers.reviewDates : [];
-  const partyNames = new Map(partyChoices(review).map(party => [party.value, party.text]));
-  const partiesToServe = answers.partiesToServe.map(id => partyNames.get(id) ?? id);
+  const partyName = partyNamesOf(review);
+  const change = (section: string) => `${pageUrl(caseReferenceOf(req), 'record')}#${section}`;
   return {
+    issueSummary: issueSummary(review),
     sections: [
       ...(issuesFreeForm(answers)
         ? [
             {
               heading: 'What the order does',
               id: 'order-details-answers',
-              href: pageUrl(caseReferenceOf(req), 'orderDetails'),
+              href: change(SECTIONS.orderDetails),
               rows: orderDetailsRows(answers.orderDetails).map(([key, value]) => row(key, key, value)),
             },
           ]
@@ -274,38 +282,31 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
       {
         heading: 'Money judgments and costs',
         id: 'money-judgments-answers',
-        href: pageUrl(caseReferenceOf(req), 'moneyJudgments'),
-        rows: moneyJudgmentRows(answers.moneyJudgments, id => partyNames.get(id) ?? id).map(([key, lines]) =>
-          row(key, key, ...lines)
-        ),
+        href: change(SECTIONS.moneyJudgments),
+        rows: moneyJudgmentRows(answers.moneyJudgments, partyName).map(([key, lines]) => row(key, key, ...lines)),
       },
       {
         heading: 'Review dates',
         id: 'review-dates-answers',
-        href: pageUrl(caseReferenceOf(req), 'reviewDates'),
-        rows: [
-          row('Are there any review dates to add?', 'whether there are review dates', yesNo(answers.hasReviewDates)),
-          ...reviewDates.map(({ day, month, year, reason, description }, index) =>
-            row(
-              `Review date ${index + 1}`,
-              `review date ${index + 1}`,
-              `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`,
-              label(REVIEW_REASONS, reason),
-              description.trim()
+        href: change(SECTIONS.reviewDates),
+        rows: reviewDates.length
+          ? reviewDates.map(({ day, month, year, reason, description }, index) =>
+              row(
+                `Review date ${index + 1}`,
+                `review date ${index + 1}`,
+                `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`,
+                label(REVIEW_REASONS, reason),
+                description.trim()
+              )
             )
-          ),
-        ],
+          : [row('Review dates', 'review dates', 'None')],
       },
       {
-        heading: 'Proceed to issue',
+        heading: 'Service and seal',
         id: 'issue-answers',
-        href: pageUrl(caseReferenceOf(req), 'proceedToIssue'),
+        href: change(SECTIONS.service),
         rows: [
-          row(
-            'Have all the next steps for court staff been completed?',
-            'next steps',
-            label(NEXT_STEPS, answers.nextSteps)
-          ),
+          row('Next steps for court staff completed', 'next steps', answers.nextSteps === 'complete' ? 'Yes' : 'No'),
           row(
             'Does this order finally resolve any part of the case?',
             'whether this order finally resolves any part of the case',
@@ -322,7 +323,7 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
             yesNo(answers.serveAllParties)
           ),
           ...(answers.serveAllParties === 'no'
-            ? [row('Who should the order be served on?', 'who to serve', ...partiesToServe)]
+            ? [row('Who should the order be served on?', 'who to serve', ...answers.partiesToServe.map(partyName))]
             : []),
           row('Which seal should this order have?', 'the seal', label(SEALS, answers.seal)),
         ],
@@ -331,7 +332,26 @@ function checkYourAnswersContent(req: Request, review: OrderReviewSession): Reco
   };
 }
 
-/** What each question page shows besides the case and any errors. */
+/** The order as it will be issued, with any changes court staff made. */
+function issuingHtml(review: OrderReviewSession): string | undefined {
+  return review.answers.order?.orderDocumentJson
+    ? renderHtml(parseSnapshot(review.answers.order.orderDocumentJson))
+    : undefined;
+}
+
+/** A money judgment as its row of the record page shows it: summed up, with its answers as typed. */
+function judgmentModel(review: OrderReviewSession, judgment: MoneyJudgmentAnswer, n: number, issues: ValidationIssue[]) {
+  const prefix = `judgment-${n}`;
+  const blank = !judgment.arrears && !judgment.otherAmount && !judgment.costs;
+  return {
+    ...judgment,
+    summary: judgmentSummary(judgment, partyNamesOf(review)),
+    // Shut once it is summed up, unless it is still to fill in or has an answer to put right.
+    open: blank || issues.some(issue => issue.id.startsWith(`${prefix}-`)),
+  };
+}
+
+/** What each page shows besides the case and any errors. */
 const VIEWS = {
   review: (_req: Request, review: OrderReviewSession) => ({
     ...orderModel(review),
@@ -340,46 +360,46 @@ const VIEWS = {
     answers: review.answers,
     maxQueryLength: MAX_QUERY_LENGTH,
   }),
-  'order-details': (_req: Request, review: OrderReviewSession) => ({
-    answers: review.answers.orderDetails ?? {},
-    // The order as it will be issued, with any changes court staff made, for them to say what it does.
-    issuingHtml: review.answers.order?.orderDocumentJson
-      ? renderHtml(parseSnapshot(review.answers.order.orderDocumentJson))
-      : undefined,
-    orderDoes: ORDER_DOES,
-    outrightPossession: OUTRIGHT_POSSESSION,
-    grounds: GROUNDS,
-    condition: CONDITION,
-    adjournment: ADJOURNMENT,
-    strikeOut: STRIKE_OUT,
-    yesNo: YES_NO,
-    maxGroundsDetailsLength: MAX_GROUNDS_DETAILS_LENGTH,
+  record: (_req: Request, review: OrderReviewSession, issues: ValidationIssue[]) => {
+    const { answers } = review;
+    const judgments = answers.moneyJudgments?.judgments ?? [];
+    return {
+      staffMessage: staffMessage(review.order.formData),
+      // The order as it will be issued, with any changes court staff made, to record from.
+      issuingHtml: issuingHtml(review),
+      sections: SECTIONS,
+      freeForm: issuesFreeForm(answers),
+      orderDetails: answers.orderDetails ?? {},
+      orderDoes: ORDER_DOES,
+      outrightPossession: OUTRIGHT_POSSESSION,
+      grounds: GROUNDS,
+      adjournment: ADJOURNMENT,
+      strikeOut: STRIKE_OUT,
+      yesNo: YES_NO,
+      maxGroundsDetailsLength: MAX_GROUNDS_DETAILS_LENGTH,
+      moneyAnswers: answers.moneyJudgments ?? { judgments: [] },
+      judgments: judgments.map((judgment, index) => judgmentModel(review, judgment, index + 1, issues)),
+      costsOptions: COSTS,
+      frequencies: FREQUENCIES,
+      canAddJudgment: judgments.length < MAX_MONEY_JUDGMENTS,
+      maxJudgments: MAX_MONEY_JUDGMENTS,
+      answers,
+      reviewDates: answers.reviewDates,
+      reasons: REVIEW_REASONS,
+      canAddReviewDate: answers.reviewDates.length < MAX_REVIEW_DATES,
+      maxReviewDates: MAX_REVIEW_DATES,
+      maxDescriptionLength: MAX_REVIEW_DESCRIPTION_LENGTH,
+      tasksOutstanding: TASKS_OUTSTANDING,
+      seals: SEALS,
+      parties: partyChoices(review),
+      issueSummary: issueSummary(review),
+    };
+  },
+  'check-your-answers': (req: Request, review: OrderReviewSession) => ({
+    ...checkYourAnswersContent(req, review),
+    staffMessage: staffMessage(review.order.formData),
+    issuingHtml: issuingHtml(review),
   }),
-  'money-judgments': (_req: Request, review: OrderReviewSession) => ({
-    answers: review.answers.moneyJudgments ?? { judgments: [] },
-    judgments: shownJudgments(review),
-    parties: partyChoices(review),
-    costsOptions: COSTS,
-    frequencies: FREQUENCIES,
-    canAddJudgment: (review.answers.moneyJudgments?.judgments.length ?? 0) < MAX_MONEY_JUDGMENTS,
-    issuingHtml: review.answers.order?.orderDocumentJson
-      ? renderHtml(parseSnapshot(review.answers.order.orderDocumentJson))
-      : undefined,
-  }),
-  'review-dates': (_req: Request, review: OrderReviewSession) => ({
-    answers: review.answers,
-    reviewDates: shownReviewDates(review.answers),
-    reasons: REVIEW_REASONS,
-    canAddReviewDate: review.answers.reviewDates.length < MAX_REVIEW_DATES,
-    maxDescriptionLength: MAX_REVIEW_DESCRIPTION_LENGTH,
-  }),
-  'proceed-to-issue': (_req: Request, review: OrderReviewSession) => ({
-    answers: review.answers,
-    nextSteps: NEXT_STEPS,
-    seals: SEALS,
-    parties: partyChoices(review),
-  }),
-  'check-your-answers': checkYourAnswersContent,
 } as const;
 
 type View = keyof typeof VIEWS;
@@ -394,7 +414,7 @@ function render(
   const review = reviewOf(req)!;
   res.status(status).render(`confirm-order-review/${view}`, {
     ...pageModel(req, review, issues),
-    ...VIEWS[view](req, review),
+    ...VIEWS[view](req, review, issues),
   });
 }
 
@@ -407,6 +427,9 @@ const showRefusal = (req: Request, res: Response, view: View) => (error: Callbac
     error.reasons.map(message => ({ id: 'confirm-order-review-form', message })),
     error.status
   );
+
+const APPLY_BY_PASSED_REVIEW =
+  'If the date needs to change, you can send a query to the Judge to return the order to them';
 
 /** What stops the order being issued as the review page last sent it, by the rules the judge's order met. */
 export const NO_WORDING = "The order's wording did not load. Reload the page and review the order again";
@@ -426,7 +449,21 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
     review.hearing ? attendanceParties(review) : [],
     !review.hearing,
     applicationsToDecide(review)
+  ).map(issue =>
+    // Court staff may not know what date the Judge would give instead, which they can ask with a query.
+    issue.message === APPLY_BY_PASSED ? { ...issue, message: `${APPLY_BY_PASSED}. ${APPLY_BY_PASSED_REVIEW}` } : issue
   );
+}
+
+/** What stops the order being issued from the record page's answers, in the order the page asks them. */
+function recordIssues(review: OrderReviewSession): ValidationIssue[] {
+  const { answers } = review;
+  return [
+    ...(issuesFreeForm(answers) ? validateOrderDetails(answers.orderDetails) : []),
+    ...moneyJudgmentIssues(answers),
+    ...validateReviewDates(answers),
+    ...validateProceedToIssue(answers),
+  ];
 }
 
 /**
@@ -435,16 +472,85 @@ function orderIssues(review: OrderReviewSession): ValidationIssue[] {
  * your answers, to change an answer, returns there.
  */
 function firstIncompletePage(review: OrderReviewSession, after?: Page): Page | undefined {
-  const { answers } = review;
   const pages: [Page, ValidationIssue[]][] = [
     ['review', orderIssues(review)],
-    ['orderDetails', issuesFreeForm(answers) ? validateOrderDetails(answers.orderDetails) : []],
-    ['moneyJudgments', moneyJudgmentIssues(answers)],
-    ['reviewDates', validateReviewDates(answers)],
-    ['proceedToIssue', validateProceedToIssue(answers)],
+    ['record', recordIssues(review)],
   ];
   const remaining = pages.slice(pages.findIndex(([page]) => page === after) + 1);
   return remaining.find(([, issues]) => issues.length)?.[0];
+}
+
+/** Takes the record page's answers, every section's, as it posted them. */
+function takeRecordAnswers(review: OrderReviewSession, body: Record<string, unknown>): void {
+  const { answers } = review;
+  if (issuesFreeForm(answers)) {
+    answers.orderDetails = Object.fromEntries(ORDER_DETAILS_FIELDS.map(field => [field, text(body[field])]));
+  }
+
+  const judgments = answers.moneyJudgments!;
+  const before = JSON.stringify(judgments);
+  const parties = new Set(partyChoices(review).map(party => party.value));
+  judgments.costs = text(body.costs) || undefined;
+  judgments.judgments = postedJudgments(body, judgments.judgments.length, parties);
+  judgments.hasMoneyJudgments = judgments.judgments.length
+    ? 'yes'
+    : list(body['has-money-judgments']).includes('no')
+      ? 'no'
+      : undefined;
+  // Once court staff change or confirm them, they are theirs: a change to the judge's answers no longer changes them.
+  if (body.action !== 'previous' || JSON.stringify(judgments) !== before) {
+    answers.moneyJudgmentsSaved = true;
+  }
+
+  answers.reviewDates = postedReviewDates(body, answers.reviewDates.length);
+  answers.hasReviewDates = answers.reviewDates.length
+    ? 'yes'
+    : list(body['has-review-dates']).includes('no')
+      ? 'no'
+      : undefined;
+
+  answers.nextSteps = list(body['next-steps']).includes('complete') ? 'complete' : undefined;
+  answers.finalOrder = choice(body['final-order'], ['yes', 'no'] as const);
+  answers.restitutionPermission = choice(body['restitution-permission'], ['yes', 'no'] as const);
+  answers.serveAllParties = choice(body['serve-all-parties'], ['yes', 'no'] as const);
+  answers.partiesToServe = list(body['parties-to-serve']).filter(id => parties.has(id));
+  answers.seal = text(body.seal) || undefined;
+}
+
+/**
+ * Adds or removes a money judgment or review date as the record page's button asked, returning where the page
+ * should open again, or nothing for another button.
+ */
+function changeList(review: OrderReviewSession, action: string): string | undefined {
+  const { answers } = review;
+  const judgments = answers.moneyJudgments!;
+  if (action === 'add-judgment') {
+    if (judgments.judgments.length < MAX_MONEY_JUDGMENTS) {
+      judgments.judgments.push(blankJudgment(sidesOf(review)));
+      judgments.hasMoneyJudgments = 'yes';
+    }
+    return `judgment-${judgments.judgments.length}`;
+  }
+  if (action === 'add-review-date') {
+    if (answers.reviewDates.length < MAX_REVIEW_DATES) {
+      answers.reviewDates.push(blankReviewDate());
+      answers.hasReviewDates = 'yes';
+    }
+    return `review-date-${answers.reviewDates.length}`;
+  }
+  const removing = /^remove-(judgment|review-date)-(\d+)$/.exec(action);
+  if (!removing) {
+    return undefined;
+  }
+  const rows = removing[1] === 'judgment' ? judgments.judgments : answers.reviewDates;
+  rows.splice(Number(removing[2]) - 1, 1);
+  // With none left, court staff say again whether the order has any.
+  if (removing[1] === 'judgment' && !rows.length) {
+    judgments.hasMoneyJudgments = undefined;
+  } else if (!rows.length) {
+    answers.hasReviewDates = undefined;
+  }
+  return removing[1] === 'judgment' ? SECTIONS.moneyJudgments : SECTIONS.reviewDates;
 }
 
 export default function confirmOrderReviewRoutes(app: Application): void {
@@ -471,11 +577,8 @@ export default function confirmOrderReviewRoutes(app: Application): void {
       const start = JSON.parse(payload as string) as OrderStart;
       const review: OrderReviewSession = { ...start, eventToken: started.eventToken, answers: newAnswers(), taskId };
       req.session.orderReviews = { ...req.session.orderReviews, [caseReference]: review };
-      res.render('confirm-order-review/intro', {
-        ...pageModel(req, review),
-        ...orderModel(review),
-        continueUrl: pageUrl(caseReference, 'review'),
-      });
+      // The review page, which a refresh shows again rather than starting the review afresh.
+      res.redirect(pageUrl(caseReference, 'review'));
     } catch (error) {
       refusedOrderEvent(res, next, error, refusalPage(req, res));
     }
@@ -508,7 +611,11 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     if (type) {
       // Kept whichever button was pressed, so the page shows the caseworker's changes again.
       postedSnapshot(text(orderDocument));
-      review.answers.order = { orderType: type, formData, orderDocumentJson: text(orderDocument) };
+      review.answers.order = {
+        orderType: type,
+        formData: withoutUnchosenNoticeDates(formData),
+        orderDocumentJson: text(orderDocument),
+      };
     }
     try {
       if (action === 'RETURN_TO_JUDGE') {
@@ -530,126 +637,32 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     }
   });
 
-  app.get(route('orderDetails'), ...inJourney, (req: Request, res: Response) =>
-    issuesFreeForm(reviewOf(req)!.answers)
-      ? render(req, res, 'order-details')
-      : res.redirect(pageUrl(caseReferenceOf(req), 'moneyJudgments'))
-  );
-
-  app.post(route('orderDetails'), ...inJourney, (req: Request, res: Response) => {
-    const review = reviewOf(req)!;
-    review.answers.orderDetails = Object.fromEntries(ORDER_DETAILS_FIELDS.map(field => [field, text(req.body[field])]));
-    if (req.body.action === 'previous') {
-      return res.redirect(pageUrl(caseReferenceOf(req), 'review'));
-    }
-    const issues = validateOrderDetails(review.answers.orderDetails);
-    if (issues.length) {
-      return render(req, res, 'order-details', issues);
-    }
-    return res.redirect(
-      pageUrl(caseReferenceOf(req), firstIncompletePage(review, 'orderDetails') ?? 'checkYourAnswers')
-    );
-  });
-
-  app.get(route('moneyJudgments'), ...inJourney, (req: Request, res: Response) =>
+  app.get(route('record'), ...inJourney, (req: Request, res: Response) =>
     reviewOf(req)!.answers.moneyJudgments
-      ? render(req, res, 'money-judgments')
+      ? render(req, res, 'record')
       : res.redirect(pageUrl(caseReferenceOf(req), 'review'))
   );
 
-  app.post(route('moneyJudgments'), ...inJourney, (req: Request, res: Response) => {
+  app.post(route('record'), ...inJourney, (req: Request, res: Response) => {
     const review = reviewOf(req)!;
-    const { answers } = review;
     const caseReference = caseReferenceOf(req);
-    if (!answers.moneyJudgments) {
+    if (!review.answers.moneyJudgments) {
       return res.redirect(pageUrl(caseReference, 'review'));
     }
-    const judgments = answers.moneyJudgments;
-    const before = JSON.stringify(judgments);
-    judgments.costs = text(req.body.costs) || undefined;
-    judgments.hasMoneyJudgments = choice(req.body['has-money-judgments'], ['yes', 'no'] as const);
-    if (judgments.hasMoneyJudgments === 'yes') {
-      const parties = new Set(partyChoices(review).map(party => party.value));
-      judgments.judgments = postedJudgments(req.body, shownJudgments(review).length, parties);
-    }
-    const action = text(req.body.action);
-    // Once court staff change or confirm them, they are theirs: a change to the judge's answers no longer changes them.
-    if (action !== 'previous' || JSON.stringify(judgments) !== before) {
-      answers.moneyJudgmentsSaved = true;
-    }
-    if (action === 'previous') {
-      return res.redirect(pageUrl(caseReference, issuesFreeForm(answers) ? 'orderDetails' : 'review'));
-    }
-    if (action === 'add') {
-      if (judgments.judgments.length < MAX_MONEY_JUDGMENTS) {
-        judgments.judgments.push(blankJudgment(sidesOf(review)));
-      }
-      return res.redirect(`${req.originalUrl}#judgment-${judgments.judgments.length}`);
-    }
-    const removing = /^remove-(\d+)$/.exec(action);
-    if (removing) {
-      judgments.judgments.splice(Number(removing[1]) - 1, 1);
-      return res.redirect(pageUrl(caseReference, 'moneyJudgments'));
-    }
-    const issues = validateMoneyJudgments(judgments);
-    if (issues.length) {
-      return render(req, res, 'money-judgments', issues);
-    }
-    return res.redirect(pageUrl(caseReference, firstIncompletePage(review, 'moneyJudgments') ?? 'checkYourAnswers'));
-  });
-
-  app.get(route('reviewDates'), ...inJourney, (req: Request, res: Response) => render(req, res, 'review-dates'));
-
-  app.post(route('reviewDates'), ...inJourney, (req: Request, res: Response) => {
-    const review = reviewOf(req)!;
-    const { answers } = review;
-    const caseReference = caseReferenceOf(req);
-    answers.hasReviewDates = choice(req.body['has-review-dates'], ['yes', 'no'] as const);
-    if (answers.hasReviewDates === 'yes') {
-      answers.reviewDates = postedReviewDates(req.body, shownReviewDates(answers).length);
-    }
+    takeRecordAnswers(review, req.body);
     const action = text(req.body.action);
     if (action === 'previous') {
-      return res.redirect(pageUrl(caseReference, 'moneyJudgments'));
+      return res.redirect(pageUrl(caseReference, 'review'));
     }
-    if (action === 'add') {
-      if (answers.reviewDates.length < MAX_REVIEW_DATES) {
-        answers.reviewDates.push(blankReviewDate());
-      }
-      return res.redirect(`${req.originalUrl}#review-date-${answers.reviewDates.length}`);
+    const changed = changeList(review, action);
+    if (changed) {
+      return res.redirect(`${pageUrl(caseReference, 'record')}#${changed}`);
     }
-    const removing = /^remove-(\d+)$/.exec(action);
-    if (removing) {
-      answers.reviewDates.splice(Number(removing[1]) - 1, 1);
-      return res.redirect(pageUrl(caseReference, 'reviewDates'));
-    }
-    const issues = validateReviewDates(answers);
+    const issues = recordIssues(review);
     if (issues.length) {
-      return render(req, res, 'review-dates', issues);
+      return render(req, res, 'record', issues);
     }
-    return res.redirect(pageUrl(caseReference, firstIncompletePage(review, 'reviewDates') ?? 'checkYourAnswers'));
-  });
-
-  app.get(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => render(req, res, 'proceed-to-issue'));
-
-  app.post(route('proceedToIssue'), ...inJourney, (req: Request, res: Response) => {
-    const review = reviewOf(req)!;
-    const { answers } = review;
-    answers.nextSteps = text(req.body['next-steps']) || undefined;
-    answers.finalOrder = choice(req.body['final-order'], ['yes', 'no'] as const);
-    answers.restitutionPermission = choice(req.body['restitution-permission'], ['yes', 'no'] as const);
-    answers.serveAllParties = choice(req.body['serve-all-parties'], ['yes', 'no'] as const);
-    const parties = new Set(partyChoices(review).map(party => party.value));
-    answers.partiesToServe = list(req.body['parties-to-serve']).filter(id => parties.has(id));
-    answers.seal = text(req.body.seal) || undefined;
-    if (req.body.action === 'previous') {
-      return res.redirect(pageUrl(caseReferenceOf(req), 'reviewDates'));
-    }
-    const issues = validateProceedToIssue(answers);
-    if (issues.length) {
-      return render(req, res, 'proceed-to-issue', issues);
-    }
-    return res.redirect(pageUrl(caseReferenceOf(req), 'checkYourAnswers'));
+    return res.redirect(pageUrl(caseReference, 'checkYourAnswers'));
   });
 
   app.get(route('checkYourAnswers'), ...inJourney, (req: Request, res: Response) => {
@@ -664,7 +677,7 @@ export default function confirmOrderReviewRoutes(app: Application): void {
     const review = reviewOf(req)!;
     const caseReference = caseReferenceOf(req);
     if (req.body.action === 'previous') {
-      return res.redirect(pageUrl(caseReference, 'proceedToIssue'));
+      return res.redirect(pageUrl(caseReference, 'record'));
     }
     // The answers may have changed since the page showed them, such as in another tab.
     const incomplete = firstIncompletePage(review);

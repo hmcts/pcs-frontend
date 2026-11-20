@@ -1,6 +1,6 @@
 import { type DocEditorController, type DocWeaveDocument, createDocEditor } from '@hmcts-cft/docweave';
 
-import { parseMoney } from '../../utils/makeOrderFormat';
+import { parseMoney, workingDayOnOrAfter } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
 import { readOrderData } from './make-order/data';
@@ -21,6 +21,19 @@ function setDate([day, month, year]: DateParts, date: Date): void {
   day.value = String(date.getDate()).padStart(2, '0');
   month.value = String(date.getMonth() + 1).padStart(2, '0');
   year.value = String(date.getFullYear());
+}
+
+/** A date filled in quickly in the control: the next working day on or after it when the control asks for one. */
+function quickDate(control: Element | null, date: Date): Date {
+  const json = control?.closest<HTMLElement>('[data-working-days]')?.dataset.workingDays;
+  if (!json) {
+    return date;
+  }
+  try {
+    return workingDayOnOrAfter(date, JSON.parse(json));
+  } catch {
+    return workingDayOnOrAfter(date, []);
+  }
 }
 
 function daysFromToday(days: number): Date {
@@ -52,7 +65,10 @@ export function initDatePills(form: HTMLFormElement): void {
     }
     const amount = Number(shorthand[1]);
     const unit = shorthand[2].toLowerCase();
-    setDate(parts, unit === 'm' ? monthsFromToday(amount) : daysFromToday(amount * (unit === 'w' ? 7 : 1)));
+    setDate(
+      parts,
+      quickDate(day, unit === 'm' ? monthsFromToday(amount) : daysFromToday(amount * (unit === 'w' ? 7 : 1)))
+    );
   });
 
   form.addEventListener('click', event => {
@@ -63,7 +79,7 @@ export function initDatePills(form: HTMLFormElement): void {
     if (!pill || !parts) {
       return;
     }
-    setDate(parts, daysFromToday(Number(pill.dataset.datePillDays)));
+    setDate(parts, quickDate(pill, daysFromToday(Number(pill.dataset.datePillDays))));
     parts[0].dispatchEvent(new Event('input', { bubbles: true }));
   });
 }
@@ -199,6 +215,13 @@ export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
 /** What follows a decision on an application, shown in its row while that decision is chosen. */
 export function initApplicationDecisions(form: HTMLFormElement): void {
   form.addEventListener('change', ({ target }) => {
+    if (target instanceof HTMLInputElement && target.name.endsWith('-list-at')) {
+      const listNew = target.closest('[data-application]')?.querySelector<HTMLElement>('[data-list-new]');
+      if (listNew) {
+        listNew.hidden = target.value !== 'new';
+      }
+      return;
+    }
     if (!(target instanceof HTMLInputElement) || !target.name.endsWith('-decision')) {
       return;
     }
@@ -324,12 +347,19 @@ export function initMakeOrder(): void {
   form.addEventListener('input', render);
   form.addEventListener('change', render);
   form.addEventListener('submit', followTab);
-  // Keep JSON in the editor field; encode only the value in the outgoing form data.
   form.addEventListener('formdata', ({ formData }) => {
+    // A radio change submits without a submit button. Give that submission its own action.
+    if (!formData.has('action') && formData.get('made-at') !== formData.get('shown-made-at')) {
+      formData.set('action', 'CHANGE_MADE_AT');
+    }
+    // Keep JSON in the editor field; encode only the outgoing value.
     formData.set(
       'orderDocument',
       new TextEncoder().encode(documentField.value).toBase64({ alphabet: 'base64url', omitPadding: true })
     );
+  });
+  form.querySelectorAll<HTMLInputElement>('input[type="radio"][name="made-at"]').forEach(choice => {
+    choice.addEventListener('change', () => form.requestSubmit());
   });
 
   selectOrderType(orderingOnClaim() ? (tabType() ?? (orderTypeField.value as OrderType)) : 'NO_ORDER_ON_CLAIM');

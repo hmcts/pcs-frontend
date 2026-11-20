@@ -29,13 +29,14 @@ $pcs-case-facts-collapsed-reserve: calc(24px + #{govuk-spacing(3) * 2 + 2px});
 }
 
 // Match GOV.UK's selector specificity and reserve the sticky panel on the root scrollport.
-.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)) {
+// Court staff reviewing an order reserve room for the order panel instead (_confirm-order-review.scss).
+.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page, .pcs-order-panel)) {
   @include pcs-case-facts-sticky {
     scroll-padding-top: $pcs-case-facts-reserve;
   }
 }
 
-.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page)):has(.pcs-case-facts--collapsed) {
+.govuk-template.pcs-make-order:not(:has(.govuk-exit-this-page, .pcs-order-panel)):has(.pcs-case-facts--collapsed) {
   @include pcs-case-facts-sticky {
     scroll-padding-top: $pcs-case-facts-collapsed-reserve;
   }

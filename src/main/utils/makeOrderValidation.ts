@@ -1,6 +1,16 @@
 import { DateTime } from 'luxon';
 
-import { MAX_MONEY, exceedsMaxMoney, parseDate, parseMoney, parseTime, registryName } from './makeOrderFormat';
+import {
+  MAX_MONEY,
+  TIME_ESTIMATE_PARTS,
+  type TimeEstimatePart,
+  exceedsMaxMoney,
+  parseDate,
+  parseMoney,
+  parseTime,
+  parseTimeEstimate,
+  registryName,
+} from './makeOrderFormat';
 
 const DAY = 24 * 60 * 60 * 1000;
 
@@ -175,9 +185,16 @@ function validatePaymentConditions(formData: Record<string, unknown>, prefix: st
   return issues;
 }
 
+/** The time possession is ordered by, which the judge may leave blank. */
+function possessionTime(formData: Record<string, unknown>, id: string): MakeOrderValidationIssue[] {
+  const time = value(formData, id);
+  return time && !parseTime(time) ? [{ id, message: 'Enter a valid time possession is ordered by, like 16:00' }] : [];
+}
+
 function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, date } = validation(formData);
   date('suspended-by-date', 'Enter a valid possession date');
+  issues.push(...possessionTime(formData, 'suspended-by-time'));
   return [...issues, ...validatePaymentConditions(formData, 'suspended'), ...validateCosts(formData, true)];
 }
 
@@ -193,6 +210,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
   );
   if (possession === 'by') {
     date('outright-by-date', 'Enter a valid possession date');
+    issues.push(...possessionTime(formData, 'outright-by-time'));
   }
   add(
     ['mandatory', 'discretionary'].includes(value(formData, 'outright-grounds-type')),
@@ -246,6 +264,13 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
   return [...issues, ...validateCosts(formData, false)];
 }
 
+/** The time estimate's three fields as the form posts them for the listing with the prefix. */
+function timeEstimateFields(formData: Record<string, unknown>, prefix: string): Record<TimeEstimatePart, string> {
+  return Object.fromEntries(
+    TIME_ESTIMATE_PARTS.map(part => [part, value(formData, `${prefix}-time-estimate-${part}`)])
+  ) as Record<TimeEstimatePart, string>;
+}
+
 /** The listing questions the form asks with the prefix: the adjournment's, or a hearing listed without one. */
 function validateListing(
   formData: Record<string, unknown>,
@@ -258,14 +283,9 @@ function validateListing(
   const directions = values(formData, `${prefix}-directions`);
   date(hearingDate, dateMessage);
   add(
-    /^\d+$/.test(value(formData, `${prefix}-time-estimate`)) && Number(value(formData, `${prefix}-time-estimate`)) > 0,
-    `${prefix}-time-estimate`,
-    'Enter the time estimate as a whole number'
-  );
-  add(
-    ['minutes', 'hours'].includes(value(formData, `${prefix}-time-estimate-unit`)),
-    `${prefix}-time-estimate-unit`,
-    'Select minutes or hours for the time estimate'
+    Boolean(parseTimeEstimate(timeEstimateFields(formData, prefix))),
+    `${prefix}-time-estimate-days`,
+    'Enter the time estimate in whole days, hours and minutes, with minutes under 60'
   );
   if (when === 'specific') {
     const time = value(formData, `${prefix}-specific-time`);
@@ -386,16 +406,21 @@ export function applicationPrefix(application: { id: string }): string {
  */
 function validateApplications(
   formData: Record<string, unknown>,
-  applications: readonly ApplicationToDecide[]
+  applications: readonly ApplicationToDecide[],
+  withoutHearing: boolean
 ): MakeOrderValidationIssue[] {
   const { issues, add } = validation(formData);
   for (const application of applications) {
     const prefix = applicationPrefix(application);
     const decision = value(formData, `${prefix}-decision`) || 'none';
     const allowed =
-      (APPLICATION_DECISIONS as readonly string[]).includes(decision) && !(application.required && decision === 'none');
+      (APPLICATION_DECISIONS as readonly string[]).includes(decision) &&
+      !(application.required && decision === 'none') &&
+      // Striking out is a decision on the papers, and never one on an application to suspend enforcement.
+      !(decision === 'strike-out' && (!withoutHearing || application.enforcementSuspension));
     add(allowed, `${prefix}-decision`, `Select what you decide about application ${application.reference}`);
-    if (decision === 'list') {
+    // Listed at one of the case's hearings, the order only says which, so only a new hearing asks when.
+    if (decision === 'list' && (value(formData, `${prefix}-list-at`) || 'new') === 'new') {
       issues.push(...validateListing(formData, `${prefix}-list`, 'Enter a valid hearing date'));
     }
     if (application.enforcementSuspension && decision === 'grant') {
@@ -510,6 +535,29 @@ function validateOrderType(orderType: MakeOrderType, formData: Record<string, un
   }
 }
 
+/** The date a party may apply by, which an order made on the court's own initiative or without notice gives. */
+const NOTICE_DATE_PREFIXES: Record<string, string> = {
+  'own-initiative': 'own-initiative-by',
+  'without-notice': 'without-notice-by',
+};
+
+export const APPLY_BY_PASSED =
+  'The date by which a party may apply to set aside, vary or stay the order must be today or in the future';
+
+function validateNotice(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
+  const prefix = NOTICE_DATE_PREFIXES[value(formData, 'order-notice')];
+  if (!prefix) {
+    return [];
+  }
+  const { issues, add, date } = validation(formData);
+  date(prefix, 'Enter a real date by which a party may apply to set aside, vary or stay the order');
+  const applyBy = dateOf(formData, prefix);
+  // Parsed dates are UTC midnights, so today is the court's date as one too.
+  const today = new Date(`${DateTime.now().setZone('Europe/London').toISODate()}T00:00:00Z`);
+  add(!applyBy || applyBy >= today, `${prefix}-day`, APPLY_BY_PASSED);
+  return issues;
+}
+
 export function validateMakeOrder(
   orderType: MakeOrderType,
   formData: Record<string, unknown>,
@@ -529,7 +577,8 @@ export function validateMakeOrder(
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
     ...(withoutHearing && chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
     ...validateOrderType(orderType, formData),
-    ...validateApplications(formData, applications),
+    ...validateApplications(formData, applications, withoutHearing),
+    ...validateNotice(formData),
     ...(chosen('staff-message') ? validateStaffMessage(formData) : []),
   ];
 }

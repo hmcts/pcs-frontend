@@ -1,11 +1,11 @@
 import { parseSnapshot, renderHtml } from '@hmcts-cft/docweave';
 
-import type { OrderFormSubmission } from '@utils/makeOrderForm';
+import { type OrderFormSubmission, hearingTime, noticeRequestLabel } from '@utils/makeOrderForm';
 import { parseDate } from '@utils/makeOrderFormat';
 import { type MoneyJudgmentsAnswers, judgmentsFromOrder, moneyJudgmentsRequest } from '@utils/moneyJudgments';
 import type { FormData, OrderStart } from '@utils/orderCase';
 import { type OrderDetailsAnswers, orderDetailsRequest } from '@utils/orderDetails';
-import { applicationDecisions, claimOutcome } from '@utils/orderOutcome';
+import { type GenAppDecision, applicationDecisions, claimOutcome } from '@utils/orderOutcome';
 
 export const REVIEW_REASONS = [
   { value: 'UNLESS_ORDER', text: 'Unless order' },
@@ -19,11 +19,6 @@ export const REVIEW_REASONS = [
 export const SEALS = [
   { value: 'COUNTY_COURT', text: 'County Court seal' },
   { value: 'HIGH_COURT', text: 'High Court seal' },
-] as const;
-
-export const NEXT_STEPS = [
-  { value: 'complete', text: 'There are no other tasks to complete' },
-  { value: 'outstanding', text: 'There are still tasks to do' },
 ] as const;
 
 export interface ReviewDateAnswer {
@@ -48,9 +43,11 @@ export interface OrderReviewAnswers {
   moneyJudgments?: MoneyJudgmentsAnswers;
   moneyJudgmentsSaved?: boolean;
   queryToJudge?: string;
+  /** Yes once there is a review date; no once court staff confirm the order needs none. */
   hasReviewDates?: 'yes' | 'no';
   reviewDates: ReviewDateAnswer[];
-  nextSteps?: string;
+  /** Complete once court staff confirm they have done every next step, which issuing the order needs. */
+  nextSteps?: 'complete';
   /** Asked on proceed to issue, but not yet sent to pcs-api: nothing uses it until it says what it applies to. */
   finalOrder?: 'yes' | 'no';
   restitutionPermission?: 'yes' | 'no';
@@ -60,7 +57,7 @@ export interface OrderReviewAnswers {
 }
 
 /**
- * A caseworker's review of an order, from the event's start on the introductory page to its submission:
+ * A caseworker's review of an order, from the event's start as it opens to its submission:
  * the judge's order and the case it started with, the token to submit it with, and the answers given so far.
  */
 export interface OrderReviewSession extends OrderStart {
@@ -84,14 +81,13 @@ export const MAX_REVIEW_DATES = 10;
 export const MAX_REVIEW_DESCRIPTION_LENGTH = 500;
 
 export function newAnswers(): OrderReviewAnswers {
-  // Orders are served on all parties under the County Court seal, without permission for restitution, unless the
-  // caseworker changes it.
+  // Orders are under the County Court seal, without permission for restitution, unless the caseworker changes it.
+  // Who the order is served on has no default: the caseworker chooses.
   return {
     orderDetails: {},
     reviewDates: [],
     partiesToServe: [],
     restitutionPermission: 'no',
-    serveAllParties: 'yes',
     seal: 'COUNTY_COURT',
   };
 }
@@ -146,7 +142,7 @@ export function validateQuery(answers: OrderReviewAnswers): ValidationIssue[] {
 
 export function validateReviewDates(answers: OrderReviewAnswers): ValidationIssue[] {
   if (!answers.hasReviewDates) {
-    return [{ id: 'has-review-dates', message: 'Select if there are any review dates to add' }];
+    return [{ id: 'has-review-dates', message: 'Add the review dates the order needs, or select that it needs none' }];
   }
   if (answers.hasReviewDates === 'no') {
     return [];
@@ -179,10 +175,8 @@ export function validateReviewDates(answers: OrderReviewAnswers): ValidationIssu
 
 export function validateProceedToIssue(answers: OrderReviewAnswers): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
-  if (!NEXT_STEPS.some(step => step.value === answers.nextSteps)) {
-    issues.push({ id: 'next-steps', message: 'Select if all the next steps for court staff have been completed' });
-  } else if (answers.nextSteps === 'outstanding') {
-    issues.push({ id: 'next-steps', message: TASKS_OUTSTANDING });
+  if (answers.nextSteps !== 'complete') {
+    issues.push({ id: 'next-steps', message: 'Confirm all the next steps for court staff have been completed' });
   }
   if (!answers.finalOrder) {
     issues.push({ id: 'final-order', message: 'Select if this order finally resolves any part of the case' });
@@ -277,4 +271,100 @@ function issuedOrder(order: Required<OrderFormSubmission>): Record<string, unkno
     // Its wording exported to HTML, which pcs-api issues as the order's document.
     html: docweaveSnapshot ? renderHtml(docweaveSnapshot) : undefined,
   };
+}
+
+// The make order form's choice of statement, as the judge's form words it.
+const NOTICE_STATEMENTS: Record<string, string> = {
+  'own-initiative': "Order on court's own initiative",
+  'without-notice': 'Order without notice',
+  none: 'Neither',
+};
+
+const DECISION_LABELS: Record<GenAppDecision, string> = {
+  GRANT: 'Granted',
+  DISMISS: 'Dismissed',
+  STRIKE_OUT: 'Struck out',
+  LIST: 'Listed for a hearing',
+  OTHER: 'Something else',
+};
+
+function firstValue(formData: FormData, field: string): string {
+  const value = formData[field];
+  return String((Array.isArray(value) ? value[0] : value) ?? '').trim();
+}
+
+function statementSelected(formData: FormData): string {
+  return NOTICE_STATEMENTS[firstValue(formData, 'order-notice')] ?? 'Not recorded';
+}
+
+/** The apply-by date the form gives, for a statement that has one. */
+function applyByEntered(formData: FormData): string | undefined {
+  const statement = firstValue(formData, 'order-notice');
+  if (statement !== 'own-initiative' && statement !== 'without-notice') {
+    return undefined;
+  }
+  const [day, month, year] = ['day', 'month', 'year'].map(part => firstValue(formData, `${statement}-by-${part}`));
+  if (!day && !month && !year) {
+    return 'Not entered';
+  }
+  const date = /^\d{4}$/.test(year) ? parseDate(day, month, year) : undefined;
+  return date
+    ? date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+    : [day, month, year].join('/');
+}
+
+/**
+ * What court staff check before choosing who the order is served on, from the order's answers as they now are: where
+ * it was made, the statement and apply-by date chosen, with the judge's own where staff changed them, the applications
+ * it decides with whether each applicant asked for it to be made without notice, and the judge's message. These are
+ * answers, not the wording, which may have been edited.
+ */
+export function issueSummary(review: OrderReviewSession): { key: string; lines: string[] }[] {
+  const current = review.answers.order?.formData ?? review.order.formData ?? {};
+  const original = review.order.formData ?? {};
+  const rows: { key: string; lines: string[] }[] = [
+    {
+      key: 'Order made',
+      lines: [
+        review.hearing ? `At the hearing on ${hearingTime(review.hearing.date)}` : 'Without a hearing (box work)',
+      ],
+    },
+  ];
+  const withOriginal = (now: string, judge: string, prefix: string) =>
+    now === judge ? [now] : [now, `${prefix}: ${judge}`];
+
+  rows.push({
+    key: 'Statement selected',
+    lines: withOriginal(statementSelected(current), statementSelected(original), 'The Judge selected'),
+  });
+  const applyBy = applyByEntered(current);
+  const judgeApplyBy = applyByEntered(original);
+  if (applyBy || judgeApplyBy) {
+    rows.push({
+      key: 'Apply-by date entered',
+      lines: withOriginal(applyBy ?? 'Not applicable', judgeApplyBy ?? 'Not applicable', 'The Judge entered'),
+    });
+  }
+
+  const applications = new Map(
+    (review.caseContext.applications ?? []).map(application => [application.id, application])
+  );
+  const decided = applicationDecisions(current).flatMap(({ genAppId, decision }) => {
+    const application = applications.get(genAppId);
+    return application
+      ? [
+          `${application.reference}: ${application.type} – ${DECISION_LABELS[decision]} – ` +
+            noticeRequestLabel(application.withoutNotice),
+        ]
+      : [];
+  });
+  if (decided.length) {
+    rows.push({ key: 'Applications this order decides', lines: decided });
+  }
+
+  const message = staffMessage(original);
+  if (message) {
+    rows.push({ key: 'Message from the Judge', lines: [message] });
+  }
+  return rows;
 }

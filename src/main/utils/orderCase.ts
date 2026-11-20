@@ -29,6 +29,10 @@ export interface OrderCaseContext {
   applications?: OrderApplication[];
   /** The case bundle, every document on the case in one PDF, for a judge once one has been made. */
   caseBundle?: OrderCaseBundle | null;
+  /** The case's hearings that have not been cancelled, earliest first, which a judge can make the order at. */
+  hearings?: { id: number; date: string }[];
+  /** The court managing the case, as location reference data names it, if it can be found. */
+  court?: { name?: string | null; venueShortName?: string | null } | null;
 }
 
 export interface OrderCaseBundle {
@@ -52,6 +56,8 @@ export interface OrderApplication {
   withoutNotice?: 'YES' | 'NO' | null;
   withoutNoticeReason?: string | null;
   whatOrderWanted?: string | null;
+  /** The applicant's draft order as the rich text they wrote it in, cleaned by pcs-api; none before they could. */
+  draftOrderWording?: string | null;
   documents: { id: string; fileName: string }[];
 }
 
@@ -81,13 +87,15 @@ export interface OrderHearing {
 
 /**
  * What an order event sends when it starts: the order, and the case it is made on. The make order event
- * sends the judge their working order, if any, or the order a caseworker returned to them with its query; the
- * confirm order review event sends the caseworker the order awaiting review.
+ * sends the judge their one draft on the case, if they have one, or the order a caseworker returned to them with its
+ * query; the confirm order review event sends the caseworker the order awaiting review.
  */
 export interface OrderStart {
   order: {
     id?: string;
     version: number;
+    /** Where the order is; none until it is first saved. Only a draft can be discarded. */
+    state?: 'DRAFT' | 'SUBMITTED_FOR_REVIEW' | 'RETURNED_TO_JUDGE' | 'ISSUED' | 'DISCARDED' | null;
     orderType?: MakeOrderType;
     formData?: FormData;
     docweaveSnapshot?: DocWeaveSnapshot | null;
@@ -101,6 +109,10 @@ export interface OrderStart {
   hearing?: OrderHearing | null;
   /** The application the judge's task asked them to decide, which the order must decide. */
   taskGenAppId?: string | null;
+  /** The judge the order is made by: the judge making it, or the one who made the order under review. */
+  judgeName?: string | null;
+  /** The coming year's England and Wales bank holidays, as ISO days, which a date to apply by moves off. */
+  bankHolidays?: string[] | null;
 }
 
 export function formatAddress(address: Record<string, string | undefined> = {}): string {

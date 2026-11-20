@@ -23,6 +23,10 @@ export interface OrderApplication {
   enforcementSuspension: boolean;
   /** What the judge decides about it: "none" while they leave it as it is. */
   decision: string;
+  /** When the case's hearing the judge lists it to be heard at is, if they list it at one rather than a new one. */
+  listedAt?: string;
+  /** Whether a new hearing it is listed for is without notice to the other parties. */
+  listWithoutNotice: boolean;
 }
 
 export interface OrderData {
@@ -31,11 +35,23 @@ export interface OrderData {
   answers: Readonly<Record<string, readonly string[]>>;
   selectedControlIds: Readonly<Record<string, string>>;
   propertyAddress: string;
+  /** Before whom, where and when the order says it was made. */
+  before: { judge: string; court: string; date: string };
   /** An order made without a hearing, which says so instead of who attended. */
   withoutHearing: boolean;
   claimants: readonly OrderParty[];
   defendants: readonly OrderParty[];
   attendance: readonly AttendanceEntry[];
+}
+
+const NOT_KNOWN = { judge: '[judge’s name and title]', court: '[court]', date: '[date]' };
+
+function readBefore(json: string | undefined): OrderData['before'] {
+  try {
+    return { ...NOT_KNOWN, ...JSON.parse(json || '{}') };
+  } catch {
+    return NOT_KNOWN;
+  }
 }
 
 export function readOrderData(form: HTMLFormElement): OrderData {
@@ -77,12 +93,20 @@ export function readOrderData(form: HTMLFormElement): OrderData {
   const applications: OrderApplication[] = [];
   form.querySelectorAll<HTMLElement>('[data-application]').forEach(row => {
     const prefix = row.dataset.applicationPrefix ?? '';
+    let hearings: Record<string, string> = {};
+    try {
+      hearings = JSON.parse(row.dataset.applicationHearings || '{}');
+    } catch {
+      // No hearings to list it at.
+    }
     applications.push({
       prefix,
       applicant: row.dataset.applicationApplicant ?? 'the applicant',
       submittedOn: row.dataset.applicationSubmitted ?? '',
       enforcementSuspension: row.dataset.applicationSuspension !== undefined,
       decision: answers[`${prefix}-decision`]?.[0] ?? 'none',
+      listedAt: hearings[answers[`${prefix}-list-at`]?.[0] ?? ''],
+      listWithoutNotice: answers[`${prefix}-list-without-notice`]?.includes('yes') ?? false,
     });
   });
 
@@ -91,6 +115,7 @@ export function readOrderData(form: HTMLFormElement): OrderData {
     answers,
     selectedControlIds,
     propertyAddress: form.dataset.propertyAddress ?? '',
+    before: readBefore(form.dataset.orderBefore),
     withoutHearing: form.dataset.withoutHearing !== undefined,
     claimants: parties.filter(({ type }) => type === 'claimant').map(party),
     defendants: parties.filter(({ type }) => type !== 'claimant').map(party),

@@ -68,6 +68,9 @@ describe('make an order: without a hearing or an application', () => {
 
   it('transfers enforcement of the possession order to the High Court, whatever else the order is', async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    // Last on the form, after own initiative or without notice, as the judges seldom need it.
+    const headings = [...document.querySelectorAll('h2.govuk-heading-l')].map(heading => heading.textContent?.trim());
+    expect(headings.slice(-3)).toEqual(['Own initiative or without notice', 'Enforcement', 'Order preview']);
     check('transfer-enforcement', 'yes');
 
     const unchosen = page.body();
@@ -141,8 +144,7 @@ describe('make an order: without a hearing or an application', () => {
     expect(rejected.text).toContain('Enter a valid hearing date');
 
     typeDate('list-hearing-date-next-list', '2', '11', '2026');
-    type('list-time-estimate', '1');
-    type('list-time-estimate-unit', 'hours');
+    type('list-time-estimate-hours', '1');
     expect(page.orderText().split('\n').slice(2)).toEqual([
       'The claim shall be listed for a hearing on notice to all parties on the next available possession list after 2 November 2026 with a time estimate of 1 hour. Further details of the hearing will be provided by the court.',
     ]);

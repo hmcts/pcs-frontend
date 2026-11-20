@@ -118,6 +118,20 @@ describe('make an order: deciding applications', () => {
       expect(control('[name="app-gen-app-2-decision"][value="none"]').checked).toBe(true);
     });
 
+    it('offers no striking out at a hearing, and refuses it', async () => {
+      const page = await openPage((await app.get(PAGE)).text);
+      const offered = [...document.querySelectorAll<HTMLInputElement>(`[name="${P}-decision"]`)].map(
+        input => input.value
+      );
+      expect(offered).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
+      recordAttendance();
+      const body = page.body('SUBMIT_FOR_REVIEW');
+      body.set(`${P}-decision`, 'strike-out');
+      const rejected = await app.post(PAGE, body);
+      expect(rejected.status).toBe(400);
+      expect(rejected.text).toContain('Select what you decide about application GA1');
+    });
+
     it('shows no applications section, and the claim without a tick box, when the case has none open', async () => {
       await app.close();
       app = await bootApp();
@@ -197,6 +211,8 @@ describe('make an order: deciding applications', () => {
       expect(control<HTMLDetailsElement>(`details#${P}-more`).open).toBe(true);
       expect(control<HTMLDetailsElement>('details#app-gen-app-2-more').open).toBe(false);
       expect(document.querySelector(`[name="${P}-decision"]:checked`)).toBeNull();
+      // On the papers it may be struck out.
+      expect(document.querySelector(`[name="${P}-decision"][value="strike-out"]`)).not.toBeNull();
       expect(control(`#${P}-details`).textContent).toContain('Alex Example (Defendant 1)');
       expect(control<HTMLAnchorElement>(`#${P}-details a`).href).toContain(
         `/case/${CASE_REFERENCE}/view-documents/3f2a6c1e-0000-4000-8000-000000000001`
@@ -253,6 +269,41 @@ describe('make an order: deciding applications', () => {
       ]);
       // The applicant's lines are one clause after the granted one, as they wrote them, then the costs.
       expect(clauseLists()).toEqual([2, 1]);
+    });
+
+    it("shows the applicant's draft order as they formatted it, apart from why they want it, and inserts it as such", async () => {
+      await app.close();
+      app = await bootApp({
+        application: {
+          ...ADJOURN,
+          whatOrderWanted: 'I am in hospital that week.',
+          draftOrderWording:
+            '<ol><li>The hearing on 14 October is <strong>adjourned</strong>.</li><li>Costs in the case.</li></ol>' +
+            '<img src="x" onerror="alert(1)"><script>alert(2)</script>',
+        },
+      });
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      const requested = control<HTMLElement>(`#${P}-requested`);
+      expect(requested.querySelectorAll('ol > li')).toHaveLength(2);
+      expect(requested.querySelector('strong')?.textContent).toBe('adjourned');
+      // Nothing that would run or load.
+      expect(requested.querySelector('img, script')).toBeNull();
+      expect(control(`#${P}-explanation`).textContent?.trim()).toBe('I am in hospital that week.');
+
+      check(`${P}-decision`, 'grant');
+      insertWording();
+      expect(ordered(page.documentText())).toEqual([
+        'IT IS ORDERED THAT:',
+        GRANTED,
+        'The hearing on 14 October is adjourned.',
+        'Costs in the case.',
+      ]);
+      // Their numbered paragraphs are clauses after the granted one, with their emphasis.
+      expect(clauseLists()).toEqual([3]);
+      expect(control<HTMLTextAreaElement>('#order-document').value).toContain(
+        '{"type":"text","marks":[{"type":"strong"}],"text":"adjourned"}'
+      );
+      expect(page.documentText()).not.toContain('I am in hospital');
     });
 
     it('offers no wording to insert when the applicant asked for no order', async () => {
@@ -320,17 +371,65 @@ describe('make an order: deciding applications', () => {
       expect(listing.hidden).toBe(false);
       const rejected = await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'));
       expect(rejected.text).toContain('Enter a valid hearing date');
-      expect(rejected.text).toContain('Enter the time estimate as a whole number');
+      expect(rejected.text).toContain(
+        'Enter the time estimate in whole days, hours and minutes, with minutes under 60'
+      );
 
       check(`${P}-list-when`, 'specific');
       typeDate(`${P}-list-hearing-date-specific`, '2', '11', '2026');
       type(`${P}-list-specific-time`, '10:30');
-      type(`${P}-list-time-estimate`, '30');
+      type(`${P}-list-time-estimate-minutes`, '30');
       check(`${P}-list-directions`, 'defence');
       typeDate(`${P}-list-defence-date`, '20', '10', '2026');
       expect(ordered(page.orderText()).slice(1)).toEqual([
         "The defendant's application dated 1 October 2026 shall be listed for a hearing on notice to all parties on 2 November 2026 at 10:30am with a time estimate of 30 minutes.",
         'The defendant must by 4pm on 20 October 2026 submit to the court and all other parties a defence.',
+      ]);
+    });
+  });
+
+  describe('listing an application when the case has hearings to come', () => {
+    beforeEach(async () => {
+      app = await bootApp({
+        application: ADJOURN,
+        hearings: [
+          { id: 7, date: '2020-03-02T10:00:00' },
+          { id: 8, date: '2099-01-12T10:00:00' },
+        ],
+      });
+    });
+
+    it('lists it to be heard at a hearing the case already has, which asks nothing more', async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      check(`${P}-decision`, 'list');
+      const choices = [...document.querySelectorAll<HTMLInputElement>(`input[name="${P}-list-at"]`)];
+      // A hearing already held is not one to list it at.
+      expect(choices.map(choice => choice.labels?.[0]?.textContent?.trim())).toEqual([
+        'A new hearing',
+        'The hearing on 12 January 2099 at 10:00am',
+      ]);
+      const listNew = control<HTMLElement>('[data-application-reference="GA1"] [data-list-new]');
+      expect(listNew.hidden).toBe(false);
+
+      check(`${P}-list-at`, '8');
+      expect(listNew.hidden).toBe(true);
+      expect(ordered(page.orderText()).slice(1)).toEqual([
+        "The defendant's application dated 1 October 2026 shall be heard at the hearing on 12 January 2099 at 10:00am.",
+      ]);
+      const accepted = await app.post(TASK_PAGE, page.body('SUBMIT_FOR_REVIEW'));
+      expect(accepted.text).not.toContain('Enter a valid hearing date');
+      const [submitted] = submittedOrders() as { order: { formData: Record<string, unknown> } }[];
+      expect(submitted.order.formData[`${P}-list-at`]).toBe('8');
+    });
+
+    it('lists it at a new hearing without notice to the other parties', async () => {
+      const page = await openPage((await app.get(TASK_PAGE)).text);
+      check(`${P}-decision`, 'list');
+      check(`${P}-list-without-notice`, 'yes');
+      typeDate(`${P}-list-hearing-date-next-list`, '2', '11', '2026');
+      type(`${P}-list-time-estimate-minutes`, '30');
+      expect(ordered(page.orderText()).slice(1)).toEqual([
+        "The defendant's application dated 1 October 2026 shall be listed for a hearing without notice to the other parties on the next available possession list after 2 November 2026 with a time estimate of 30 minutes. Further details of the hearing will be provided by the court.",
       ]);
     });
   });
@@ -375,6 +474,19 @@ describe('make an order: deciding applications', () => {
       expect((await app.post(WARRANT_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
     });
 
+    it('offers no striking out, and refuses it', async () => {
+      const page = await openPage((await app.get(WARRANT_PAGE)).text);
+      const offered = [...document.querySelectorAll<HTMLInputElement>(`[name="${W}-decision"]`)].map(
+        input => input.value
+      );
+      expect(offered).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
+      const body = page.body('SUBMIT_FOR_REVIEW');
+      body.set(`${W}-decision`, 'strike-out');
+      const rejected = await app.post(WARRANT_PAGE, body);
+      expect(rejected.status).toBe(400);
+      expect(rejected.text).toContain('Select what you decide about application GA2');
+    });
+
     it('dismisses it with nothing more to answer', async () => {
       const page = await openPage((await app.get(WARRANT_PAGE)).text);
       check(`${W}-decision`, 'dismiss');
@@ -382,6 +494,47 @@ describe('make an order: deciding applications', () => {
         "The second defendant's application dated 9 October 2026 to suspend enforcement is dismissed.",
       ]);
       expect((await app.post(WARRANT_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
+    });
+  });
+
+  describe('whether each applicant asked for their application to be made without notice', () => {
+    const WITHOUT_NOTICE = {
+      id: 'gen-app-3',
+      reference: 'GA3',
+      type: 'Something else',
+      somethingElseDetails: 'Stop the eviction',
+      applicant: 'Alex Example (Defendant 1)',
+      submittedOn: '2026-10-11',
+      withoutNotice: 'YES',
+      withoutNoticeReason: 'Risk of harm',
+      whatOrderWanted: null,
+      documents: [],
+    };
+
+    /** What an application's details say of its request, by the row's key. */
+    function detailsRow(prefix: string): string | undefined {
+      return [...document.querySelectorAll(`#${prefix}-details .govuk-summary-list__row`)]
+        .find(row => row.querySelector('dt')?.textContent?.trim() === 'Without notice requested')
+        ?.querySelector('dd')
+        ?.textContent?.trim();
+    }
+
+    it('retains the recorded notice status and request warning in the details without a header label', async () => {
+      // GA1 asked not to be without notice, GA2 was made before the question was asked, GA3 asked to be.
+      app = await bootApp({ applications: [ADJOURN, WARRANT, WITHOUT_NOTICE] });
+      await openPage((await app.get(PAGE)).text);
+
+      expect(document.querySelector('[id$="-notice-request"]')).toBeNull();
+      expect([detailsRow('app-gen-app-1'), detailsRow('app-gen-app-2'), detailsRow('app-gen-app-3')]).toEqual([
+        'No',
+        'Not recorded',
+        'Yes: Risk of harm',
+      ]);
+      // A request is not a promise of who is told.
+      expect(control('#app-gen-app-3-more').textContent).toContain(
+        'The applicant asked for this application to be made without notice.'
+      );
+      expect(document.body.textContent).not.toContain('will be told');
     });
   });
 });

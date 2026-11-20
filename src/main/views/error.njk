@@ -80,6 +80,9 @@
 
     <h1 class="govuk-heading-l">{{ errorTitle or t('errorPages.technicalError.title') or "Something went wrong" }}</h1>
     <p class="govuk-body">{{ errorParagraph or t('errorPages.technicalError.paragraph') or "An error occurred while processing your request." }}</p>
+    {% if errorReturnUrl %}
+      <p class="govuk-body"><a class="govuk-link" href="{{ errorReturnUrl }}">Return to Manage cases</a></p>
+    {% endif %}
 
   {% endif %}
 {% endblock %}

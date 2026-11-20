@@ -64,6 +64,12 @@ export function formatDate(date: Date): string {
 }
 
 /** A time as GOV.UK writes it: 10:30am, 2pm, midday or midnight. */
+/** A time as typed, as pcs-api is sent it (HH:mm), or undefined if it is blank or not a time. */
+export function isoTime(raw: string): string | undefined {
+  const time = parseTime(raw);
+  return time && `${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`;
+}
+
 export function formatTime({ hours, minutes }: TimeOfDay): string {
   if (minutes === 0 && (hours === 0 || hours === 12)) {
     return hours === 0 ? 'midnight' : 'midday';
@@ -79,4 +85,51 @@ const DISTRICT_REGISTRY = 'district registry';
 export function registryName(typed: string): string {
   const name = typed.trim();
   return name.toLowerCase().endsWith(DISTRICT_REGISTRY) ? name.slice(0, -DISTRICT_REGISTRY.length).trim() : name;
+}
+
+/** A hearing's time estimate as HMC and List Assist give it: days, hours and minutes. */
+export const TIME_ESTIMATE_PARTS = ['days', 'hours', 'minutes'] as const;
+export type TimeEstimatePart = (typeof TIME_ESTIMATE_PARTS)[number];
+export type TimeEstimate = Record<TimeEstimatePart, number>;
+
+/**
+ * The time estimate the three fields give, each blank or a whole number, and minutes under an hour; none when a
+ * field is not one or every one is blank or nought.
+ */
+export function parseTimeEstimate(typed: Record<TimeEstimatePart, string>): TimeEstimate | undefined {
+  const parts = {} as TimeEstimate;
+  for (const part of TIME_ESTIMATE_PARTS) {
+    const raw = typed[part].trim();
+    if (raw && !/^\d{1,3}$/.test(raw)) {
+      return undefined;
+    }
+    parts[part] = Number(raw || 0);
+  }
+  return parts.minutes < 60 && TIME_ESTIMATE_PARTS.some(part => parts[part] > 0) ? parts : undefined;
+}
+
+/** "3 days, 4 hours and 30 minutes", leaving out the parts that are nought. */
+export function formatTimeEstimate(estimate: TimeEstimate): string {
+  const named = TIME_ESTIMATE_PARTS.filter(part => estimate[part] > 0).map(part =>
+    estimate[part] === 1 ? `1 ${part.slice(0, -1)}` : `${estimate[part]} ${part}`
+  );
+  return named.length > 1 ? `${named.slice(0, -1).join(', ')} and ${named[named.length - 1]}` : named[0];
+}
+
+/** A date as an ISO day, "2026-12-25", from its local parts. */
+function isoDay(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * The date, or the first after it that is a working day: not a Saturday, Sunday or one of the bank holidays (ISO
+ * days). A date to do something by that falls when the court office is closed runs to the next day it is open.
+ */
+export function workingDayOnOrAfter(date: Date, bankHolidays: readonly string[]): Date {
+  const holidays = new Set(bankHolidays);
+  const working = new Date(date);
+  while (working.getDay() === 0 || working.getDay() === 6 || holidays.has(isoDay(working))) {
+    working.setDate(working.getDate() + 1);
+  }
+  return working;
 }

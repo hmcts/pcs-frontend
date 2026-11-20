@@ -9,6 +9,9 @@ import { type AddressInfo } from 'node:net';
 
 import { renderText } from '@hmcts-cft/docweave';
 import express, { type Express, type Request, type Response } from 'express';
+import { DateTime } from 'luxon';
+
+import { workingDayOnOrAfter } from '../../main/utils/makeOrderFormat';
 
 export const CASE_REFERENCE = '1777027600017760';
 export const MANAGE_CASE_URL = `http://manage-case.test/cases/case-details/PCS/PCS/${CASE_REFERENCE}`;
@@ -27,6 +30,7 @@ interface Envelope {
   order: {
     id?: string;
     version: number;
+    state?: string;
     orderType?: string;
     formData?: Record<string, unknown>;
     docweaveSnapshot?: unknown;
@@ -35,6 +39,8 @@ interface Envelope {
   caseContext: Record<string, unknown>;
   hearing?: Record<string, unknown> | null;
   taskGenAppId?: string;
+  judgeName?: string | null;
+  bankHolidays?: string[];
 }
 
 const blankCase = (): Envelope => ({
@@ -44,7 +50,9 @@ const blankCase = (): Envelope => ({
     propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
     claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
     defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
+    court: { name: 'County Court at Bristol', venueShortName: null },
   },
+  judgeName: 'Sam Judge',
   // The hearing the order is made for, starting from the claim's facts.
   hearing: {
     id: 1,
@@ -57,8 +65,24 @@ const blankCase = (): Envelope => ({
   },
 });
 
-/** Minimal CCD: hands out the stored envelope and applies posted make order events to it. */
+/**
+ * Minimal CCD and pcs-api: hands out the stored envelope and applies posted make order events to it, by pcs-api's
+ * rules. The judge has one draft on the case, which every link opens where it was saved, whatever hearing the link
+ * names; a link's hearing is only where a new order starts. A change must name that order and the version last
+ * handed out, so a page opened before the draft was saved elsewhere starts no second one; and sending
+ * the draft leaves the judge's next order a new one.
+ */
 let envelope = blankCase();
+
+/** The case's hearings by id, as pcs-api starts an order at the one the judge chooses. */
+let hearings = new Map<number, Record<string, unknown>>();
+
+/** The hearing a new order starts at when the link names none, as the test booted the case. */
+let newOrderHearing: Record<string, unknown> | null | undefined;
+
+const ALREADY_DRAFTING =
+  'You already have a draft order on this case, saved since this page was opened. Nothing on this page was saved. ' +
+  'Copy anything you want to keep, then reload the page to open your draft';
 
 /** The tokens CCD has handed out for starting the make order event, in order. */
 let startTokens: string[] = [];
@@ -113,6 +137,24 @@ export function startWithOrder(order: Partial<Envelope['order']>): void {
   envelope.order = { ...envelope.order, ...order };
 }
 
+/** Cancels one of the case's hearings, which pcs-api then refuses to start an order at. */
+export function cancelHearing(id: number): void {
+  hearings.delete(id);
+}
+
+/** Another judge records the hearing's note, as saving their own order for it does, which moves its facts on. */
+export function recordHearingNoteElsewhere(id: number, note: string): void {
+  const recorded = hearings.get(id)!;
+  const changed = { ...recorded, version: Number(recorded.version ?? -1) + 1, note };
+  hearings.set(id, changed);
+  if (envelope.hearing?.id === id) {
+    envelope.hearing = changed;
+  }
+  if (newOrderHearing?.id === id) {
+    newOrderHearing = changed;
+  }
+}
+
 /** Has the next order event refused, as pcs-api does when the order changed elsewhere. */
 export function refuseNextEvent(reason: string): void {
   refusal = reason;
@@ -156,7 +198,28 @@ function ccdStub(): Express {
       startRefusal = undefined;
       return res.status(422).json({ callbackErrors: [reason] });
     }
-    const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(envelope) } : {};
+    // The judge's choice of hearing, or of none, on the page, over the one a saved order is made at; the link's
+    // hearing is only a new order's.
+    const context = startContexts.at(-1) ?? {};
+    const madeAt = context.madeAt as { hearingId?: number } | undefined;
+    const linked = context.hearingId === undefined ? envelope.hearing : hearings.get(Number(context.hearingId));
+    const hearing = madeAt
+      ? madeAt.hearingId === undefined
+        ? null
+        : hearings.get(madeAt.hearingId)
+      : envelope.order.id
+        ? envelope.hearing
+        : linked;
+    if (hearing === undefined) {
+      return res.status(422).json({ callbackErrors: ["The hearing is not one of this case's hearings"] });
+    }
+    const started = {
+      ...envelope,
+      hearing,
+      // The application the link names is the one the order must decide, opened new or as the saved draft.
+      taskGenAppId: (context.genAppId as string | undefined) ?? envelope.taskGenAppId,
+    };
+    const caseData = mayUse(req, event) ? { sdkEventPayload: JSON.stringify(started) } : {};
     const token = `event-token-${startTokens.length + 1}`;
     startTokens.push(token);
     res.json({ token, case_details: { case_data: caseData } });
@@ -187,8 +250,26 @@ function ccdStub(): Express {
       answers.set(req.body.event_token, { id: req.params.id, data: {} });
       return res.json(answers.get(req.body.event_token));
     }
+    // A change is to the order as last handed out, and only one already saved has an id.
+    const refused = !posted.order.id
+      ? envelope.order.id && ALREADY_DRAFTING
+      : posted.order.id !== envelope.order.id
+        ? 'The order draft does not exist for this case'
+        : posted.order.version !== envelope.order.version &&
+          'The order has been updated by another user. Reload it and try again';
+    if (refused) {
+      return res.status(422).json({ callbackErrors: [refused] });
+    }
     orderRequests.push(posted);
-    // pcs-api records the hearing's facts and note only when changed, apart from the order.
+    answers.set(req.body.event_token, { id: req.params.id, data: {} });
+    if (posted.action === 'SUBMIT_FOR_REVIEW') {
+      // Out of the judge's hands, it is no longer their draft either.
+      envelope = { ...envelope, order: { version: 0 }, hearing: newOrderHearing };
+      return res.json(answers.get(req.body.event_token));
+    }
+    // The order is made at the hearing the judge chose, or none. pcs-api records the hearing's facts and note only
+    // when changed, apart from the order.
+    envelope.hearing = posted.hearing ? (hearings.get(posted.hearing.id) ?? envelope.hearing) : null;
     if (posted.hearing?.caseFacts && envelope.hearing) {
       envelope.hearing = {
         ...envelope.hearing,
@@ -196,18 +277,21 @@ function ccdStub(): Express {
         caseFacts: posted.hearing.caseFacts,
         note: posted.hearing.note,
       };
+      hearings.set(Number(envelope.hearing.id), envelope.hearing);
     }
     envelope = {
       ...envelope,
       order: {
         id: posted.order.id ?? `order-${randomUUID()}`,
         version: posted.order.version + 1,
+        // A saved order stays a draft, or returned to its judge, until it is sent.
+        state: envelope.order.state ?? 'DRAFT',
+        queryFromCaseworker: envelope.order.queryFromCaseworker,
         orderType: posted.order.orderType,
         formData: posted.order.formData,
         docweaveSnapshot: posted.order.docweaveSnapshot,
       },
     };
-    answers.set(req.body.event_token, { id: req.params.id, data: {} });
     res.json(answers.get(req.body.event_token));
   });
   return ccd;
@@ -257,14 +341,33 @@ export async function bootApp(
     hearing?: Record<string, unknown> | null;
     /** The case bundle pcs-api gives a judge, once the case has one. */
     caseBundle?: Record<string, unknown>;
+    /** The case's hearings, over the one the order is made at, which the judge can choose to make it at. */
+    hearings?: (Record<string, unknown> & { id: number; date: string })[];
+    /** The judge pcs-api names the order made by, over the default, or null when it names none. */
+    judgeName?: string | null;
+    /** The court managing the case, over the default, or null when location reference data has none. */
+    court?: Record<string, unknown> | null;
+    /** The bank holidays pcs-api sends, as ISO days; none by default. */
+    bankHolidays?: string[];
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
+  if (options.judgeName !== undefined) {
+    envelope.judgeName = options.judgeName;
+  }
+  if (options.court !== undefined) {
+    envelope.caseContext.court = options.court;
+  }
+  envelope.bankHolidays = options.bankHolidays ?? [];
   if (options.defendants) {
     envelope.caseContext.defendants = options.defendants;
   }
   envelope.caseContext.openCounterclaim = options.openCounterclaim ?? false;
   envelope.order = { ...envelope.order, ...options.order };
+  if (envelope.order.id && !options.caseworker) {
+    // An order the judge's link opens is their draft, or one a caseworker returned to them with a query.
+    envelope.order.state ??= envelope.order.queryFromCaseworker ? 'RETURNED_TO_JUDGE' : 'DRAFT';
+  }
   envelope.caseContext.applications = [
     ...(options.application ? [options.application] : []),
     ...(options.applications ?? []),
@@ -279,6 +382,16 @@ export async function bootApp(
   if (options.hearing !== undefined) {
     envelope.hearing = options.hearing && { ...envelope.hearing, ...options.hearing };
   }
+  hearings = new Map(
+    [...(envelope.hearing ? [envelope.hearing] : []), ...(options.hearings ?? [])].map(hearing => [
+      Number(hearing.id),
+      { ...blankCase().hearing, ...hearing },
+    ])
+  );
+  if (options.hearings) {
+    envelope.caseContext.hearings = [...hearings.values()].map(({ id, date }) => ({ id, date }));
+  }
+  newOrderHearing = envelope.hearing;
   startTokens = [];
   startContexts = [];
   submittedTokens = [];
@@ -370,12 +483,19 @@ export async function bootApp(
 
 export interface Page {
   form: HTMLFormElement;
-  /** The order document the page builds from the current form state, as plain text. */
+  /** The order the form's answers build, after its opening line, which openingText gives. */
   orderText(): string;
+  /** The order's opening line: before whom, where and when it was made. */
+  openingText(): string;
   /** The order document the page will submit (the editor's current snapshot), as plain text. */
   documentText(): string;
   /** The form as the browser would submit it, with the named button if the page has several. */
   body(action?: string): URLSearchParams;
+}
+
+/** An order's text after its opening line, "Before …", which the clauses' tests leave to make-order-before's. */
+function withoutOpening(text: string): string {
+  return text.startsWith('Before ') ? text.slice(text.indexOf('\n') + 1) : text;
 }
 
 /**
@@ -397,10 +517,13 @@ export async function openPage(html: string): Promise<Page> {
   if (!form) {
     throw new Error(`The make order form is not on the page: ${document.body?.textContent?.trim().slice(0, 200)}`);
   }
+  // Tests post the submitted form through the app harness, since jsdom cannot navigate.
+  form.addEventListener('submit', event => event.preventDefault());
   return {
     form,
-    orderText: () => buildOrderDocument(form).textContent,
-    documentText: () => renderText(JSON.parse(control<HTMLTextAreaElement>('#order-document').value)),
+    orderText: () => withoutOpening(buildOrderDocument(form).textContent),
+    documentText: () => withoutOpening(renderText(JSON.parse(control<HTMLTextAreaElement>('#order-document').value))),
+    openingText: () => buildOrderDocument(form).textContent.split('\n')[0],
     body: action => {
       const body = new URLSearchParams();
       form.dispatchEvent(new Event('submit', { cancelable: true }));
@@ -488,5 +611,30 @@ export function futureDate(days: number): { day: string; month: string; year: st
     day: String(date.getDate()).padStart(2, '0'),
     month: String(date.getMonth() + 1).padStart(2, '0'),
     year: String(date.getFullYear()),
+  };
+}
+
+/** The order's first sentence, before the judge the harness signs in, at its court, on the date given. */
+export function before(date: string): string {
+  return `Before District Judge Sam Judge sitting at the County Court at Bristol on ${date}`;
+}
+
+/** The first sentence of an order made at the harness's hearing. */
+export const BEFORE_HEARING = before('13 October 2026');
+
+/** The first sentence of an order made today without a hearing. */
+export function beforeToday(): string {
+  return before(DateTime.now().setZone('Europe/London').toFormat('d MMMM yyyy'));
+}
+
+/** The working day on or after a number of days from today, skipping the bank holidays, as a date input's parts. */
+export function workingDate(days: number, bankHolidays: string[] = []): { day: string; month: string; year: string } {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  const working = workingDayOnOrAfter(date, bankHolidays);
+  return {
+    day: String(working.getDate()).padStart(2, '0'),
+    month: String(working.getMonth() + 1).padStart(2, '0'),
+    year: String(working.getFullYear()),
   };
 }

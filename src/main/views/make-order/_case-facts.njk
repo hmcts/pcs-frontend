@@ -155,7 +155,7 @@
           <ol class="pcs-hearing-notes__list" aria-label="Earlier judicial notes, newest first">
             {% for note in earlierNotes %}
               <li class="pcs-hearing-notes__note">
-                <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ note.when }} &ndash; {{ note.by }}</p>
+                <p class="govuk-body-s govuk-!-font-weight-bold govuk-!-margin-bottom-1">{{ note.by }}{% if note.dateMade %} on {{ note.dateMade }}{% endif %}</p>
                 <p class="govuk-body-s govuk-!-margin-bottom-0 pcs-hearing-notes__text">{{ note.note }}</p>
               </li>
             {% endfor %}
