@@ -175,9 +175,16 @@ function validatePaymentConditions(formData: Record<string, unknown>, prefix: st
   return issues;
 }
 
+/** The time possession is ordered by, which the judge may leave blank. */
+function possessionTime(formData: Record<string, unknown>, id: string): MakeOrderValidationIssue[] {
+  const time = value(formData, id);
+  return time && !parseTime(time) ? [{ id, message: 'Enter a valid time possession is ordered by, like 16:00' }] : [];
+}
+
 function validateSuspended(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, date } = validation(formData);
   date('suspended-by-date', 'Enter a valid possession date');
+  issues.push(...possessionTime(formData, 'suspended-by-time'));
   return [...issues, ...validatePaymentConditions(formData, 'suspended'), ...validateCosts(formData, true)];
 }
 
@@ -193,6 +200,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
   );
   if (possession === 'by') {
     date('outright-by-date', 'Enter a valid possession date');
+    issues.push(...possessionTime(formData, 'outright-by-time'));
   }
   add(
     ['mandatory', 'discretionary'].includes(value(formData, 'outright-grounds-type')),

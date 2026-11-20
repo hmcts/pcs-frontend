@@ -1,4 +1,4 @@
-import { formatDate, parseDate } from '@utils/makeOrderFormat';
+import { formatDate, formatTime, isoTime, parseDate, parseTime } from '@utils/makeOrderFormat';
 import type { ClaimOutcome } from '@utils/orderOutcome';
 
 /*
@@ -54,10 +54,12 @@ export const ORDER_DETAILS_FIELDS = [
   'order-does',
   'outright-possession',
   ...DATE_PARTS.map(part => `outright-date-${part}`),
+  'outright-time',
   'outright-grounds',
   'outright-grounds-details',
   'outright-transfer',
   ...DATE_PARTS.map(part => `suspended-date-${part}`),
+  'suspended-time',
   'suspended-condition',
   'suspended-warrant-on-notice',
   'adjournment',
@@ -88,12 +90,20 @@ export function validateOrderDetails(answers: OrderDetailsAnswers = {}): Issue[]
       issues.push({ id: `${prefix}-day`, message });
     }
   };
+  // The order may give no time, so a blank one is fine.
+  const time = (id: string) => {
+    const typed = answers[id]?.trim() ?? '';
+    if (typed && !parseTime(typed)) {
+      issues.push({ id, message: 'Enter a valid time possession is ordered by, like 16:00' });
+    }
+  };
   chosen('order-does', ORDER_DOES, 'Select what the order does');
   switch (answers['order-does']) {
     case 'outright': {
       chosen('outright-possession', OUTRIGHT_POSSESSION, 'Select when possession is ordered');
       if (answers['outright-possession'] === 'by') {
         date('outright-date', 'Enter a real date possession is ordered by');
+        time('outright-time');
       }
       chosen('outright-grounds', GROUNDS, 'Select the grounds possession is ordered on');
       // Many orders say only whether the grounds are mandatory or discretionary.
@@ -108,6 +118,7 @@ export function validateOrderDetails(answers: OrderDetailsAnswers = {}): Issue[]
     }
     case 'suspended':
       date('suspended-date', 'Enter a real date possession is ordered by');
+      time('suspended-time');
       chosen('suspended-condition', CONDITION, 'Select if the condition is money or non-money');
       chosen(
         'suspended-warrant-on-notice',
@@ -133,6 +144,12 @@ function displayDate(answers: OrderDetailsAnswers, prefix: string): string {
   return date ? formatDate(date) : '';
 }
 
+/** The day possession is ordered by, after the time on it the order gives, if any: "4pm on 4 December 2026". */
+function displayDeadline(answers: OrderDetailsAnswers, prefix: string, timeId: string): string {
+  const time = parseTime(answers[timeId]?.trim() ?? '');
+  return (time ? `${formatTime(time)} on ` : '') + displayDate(answers, prefix);
+}
+
 /** The answers as check your answers lists them: each question asked and its answer. */
 export function orderDetailsRows(answers: OrderDetailsAnswers = {}): [string, string][] {
   const rows: [string, string][] = [['What does the order do?', label(ORDER_DOES, answers['order-does'])]];
@@ -142,7 +159,7 @@ export function orderDetailsRows(answers: OrderDetailsAnswers = {}): [string, st
         [
           'Possession',
           answers['outright-possession'] === 'by'
-            ? `On or before ${displayDate(answers, 'outright-date')}`
+            ? `On or before ${displayDeadline(answers, 'outright-date', 'outright-time')}`
             : label(OUTRIGHT_POSSESSION, answers['outright-possession']),
         ],
         ['Grounds', label(GROUNDS, answers['outright-grounds'])],
@@ -152,7 +169,7 @@ export function orderDetailsRows(answers: OrderDetailsAnswers = {}): [string, st
       break;
     case 'suspended':
       rows.push(
-        ['Possession on or before', displayDate(answers, 'suspended-date')],
+        ['Possession on or before', displayDeadline(answers, 'suspended-date', 'suspended-time')],
         ['Condition', label(CONDITION, answers['suspended-condition'])],
         ['Any application for a warrant on notice', label(YES_NO, answers['suspended-warrant-on-notice'])]
       );
@@ -178,6 +195,7 @@ export function orderDetailsRequest(answers: OrderDetailsAnswers = {}): ClaimOut
         kind: 'OUTRIGHT_POSSESSION',
         possessionForthwith: answers['outright-possession'] === 'forthwith',
         possessionDate: answers['outright-possession'] === 'by' ? isoDate(answers, 'outright-date') : undefined,
+        possessionTime: answers['outright-possession'] === 'by' ? isoTime(answers['outright-time'] ?? '') : undefined,
         grounds: upper(answers['outright-grounds']) as ClaimOutcome['grounds'],
         groundsDetails: answers['outright-grounds-details']?.trim() || undefined,
       };
@@ -185,6 +203,7 @@ export function orderDetailsRequest(answers: OrderDetailsAnswers = {}): ClaimOut
       return {
         kind: 'SUSPENDED_POSSESSION',
         possessionDate: isoDate(answers, 'suspended-date'),
+        possessionTime: isoTime(answers['suspended-time'] ?? ''),
         warrantOnNotice: yes(answers['suspended-warrant-on-notice']),
       };
     // Asked as the free-form categories agree, but an adjournment manages the case without deciding the claim.

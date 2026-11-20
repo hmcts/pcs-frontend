@@ -121,6 +121,39 @@ describe('make an order: outright possession', () => {
     expect(page.orderText()).toContain('This order for possession was made on mandatory grounds.');
   });
 
+  it('gives possession by 4pm unless the judge changes or clears the time', async () => {
+    app = await bootApp();
+    const page = await openPage((await app.get(PAGE)).text);
+    check('outright-possession', 'by');
+    typeDate('outright-by-date', '1', '10', '2026');
+    expect(control('[name="outright-by-time"]').value).toBe('16:00');
+    expect(page.orderText()).toContain('on or before 4pm on 1 October 2026.');
+
+    type('outright-by-time', '10:30');
+    expect(page.orderText()).toContain('on or before 10:30am on 1 October 2026.');
+    type('outright-by-time', '');
+    expect(page.orderText()).toContain('on or before 1 October 2026.');
+
+    type('outright-by-time', '25:00');
+    check('outright-grounds-type', 'mandatory');
+    const rejected = await app.post(PAGE, page.body('SUBMIT_FOR_REVIEW'));
+    expect(rejected.status).toBe(400);
+    expect(rejected.text).toContain('Enter a valid time possession is ordered by, like 16:00');
+  });
+
+  it('keeps a time the judge cleared when the draft is opened again', async () => {
+    app = await bootApp({
+      order: {
+        id: 'order-saved',
+        version: 1,
+        orderType: 'OUTRIGHT_POSSESSION',
+        formData: { 'outright-possession': 'by', 'outright-by-time': '' },
+      },
+    });
+    await openPage((await app.get(`${PAGE}?orderId=order-saved`)).text);
+    expect(control('[name="outright-by-time"]').value).toBe('');
+  });
+
   it('starts a blank draft, builds the order from the form and sends it for review', async () => {
     app = await bootApp();
     const response = await app.get(PAGE);
@@ -169,7 +202,7 @@ describe('make an order: outright possession', () => {
         'The Court heard from Sam Solicitor, solicitor for the claimant.',
         'Alex Example did not attend the hearing, but the Court was satisfied they had received notice of the hearing, and it was reasonable to proceed in their absence.',
         'IT IS ORDERED THAT:',
-        'The defendant(s) must give up possession of 10 Test Street, Bristol, BS1 1AA to the claimant(s) on or before 1 October 2026.',
+        'The defendant(s) must give up possession of 10 Test Street, Bristol, BS1 1AA to the claimant(s) on or before 4pm on 1 October 2026.',
         'This order for possession was made on mandatory grounds, namely Ground 8.',
         'Judgment for the claimant(s) in the total sum of £2,500.00.',
         "The defendant(s) must pay the claimant(s)' fixed costs of £300.00.",

@@ -552,6 +552,7 @@ describe('confirm order review', () => {
           'outright-date-day': '4',
           'outright-date-month': '12',
           'outright-date-year': '2026',
+          'outright-time': '16:00',
           'outright-grounds': 'mandatory',
           'outright-grounds-details': ' Ground 8 ',
           'outright-transfer': 'no',
@@ -613,7 +614,7 @@ describe('confirm order review', () => {
       ]);
       expect(rows).toEqual([
         ['What does the order do?', 'Outright possession'],
-        ['Possession', 'On or before 4 December 2026'],
+        ['Possession', 'On or before 4pm on 4 December 2026'],
         ['Grounds', 'Mandatory'],
         ['Details of the grounds', 'Ground 8'],
         ['Transfer to the High Court for enforcement', 'No'],
@@ -645,6 +646,7 @@ describe('confirm order review', () => {
         kind: 'OUTRIGHT_POSSESSION',
         possessionForthwith: false,
         possessionDate: '2026-12-04',
+        possessionTime: '16:00',
         grounds: 'MANDATORY',
         groundsDetails: 'Ground 8',
       });

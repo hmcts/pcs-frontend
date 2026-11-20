@@ -103,6 +103,7 @@
   }) }}
 {% endmacro %}
 
+{# A default fills only a field the order has never had: a judge who cleared it keeps it clear. #}
 {% macro text(id, params) %}
   {{ govukInput({
     id: id,
@@ -113,7 +114,7 @@
     formGroup: { classes: params.formGroupClasses },
     spellcheck: params.spellcheck,
     inputmode: params.inputmode,
-    value: draftValue(id),
+    value: params.default if draftValue(id) is undefined else draftValue(id),
     attributes: { required: true } if not params.optional,
     errorMessage: validationErrors[id]
   }) }}

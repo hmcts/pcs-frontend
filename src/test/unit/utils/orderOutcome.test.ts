@@ -28,6 +28,7 @@ describe('orderOutcome', () => {
         'outright-by-date-day': '9',
         'outright-by-date-month': '12',
         'outright-by-date-year': '2026',
+        'outright-by-time': '4pm',
         'outright-grounds-type': 'discretionary',
         'outright-grounds-details': 'Ground 10',
         'outright-options': ['money-judgment', 'transfer-high-court'],
@@ -36,12 +37,14 @@ describe('orderOutcome', () => {
       kind: 'OUTRIGHT_POSSESSION',
       possessionForthwith: false,
       possessionDate: '2026-12-09',
+      possessionTime: '16:00',
       grounds: 'DISCRETIONARY',
       groundsDetails: 'Ground 10',
     });
-    expect(claimOutcome('OUTRIGHT_POSSESSION', { 'outright-possession': 'forthwith' })).toEqual(
-      expect.objectContaining({ possessionForthwith: true, possessionDate: undefined })
-    );
+    // Forthwith has no day, so no time, whatever the hidden time field still holds.
+    expect(
+      claimOutcome('OUTRIGHT_POSSESSION', { 'outright-possession': 'forthwith', 'outright-by-time': '16:00' })
+    ).toEqual(expect.objectContaining({ possessionForthwith: true, possessionDate: undefined, possessionTime: undefined }));
   });
 
   it('says what a suspended possession order decides', () => {
@@ -50,11 +53,13 @@ describe('orderOutcome', () => {
         'suspended-by-date-day': '1',
         'suspended-by-date-month': '2',
         'suspended-by-date-year': '2027',
+        'suspended-by-time': '',
         'suspended-options': 'warrant-on-notice',
       })
     ).toEqual({
       kind: 'SUSPENDED_POSSESSION',
       possessionDate: '2027-02-01',
+      possessionTime: undefined,
       warrantOnNotice: true,
     });
   });

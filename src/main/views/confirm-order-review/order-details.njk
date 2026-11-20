@@ -4,6 +4,7 @@
 {% import "confirm-order-review/_buttons.njk" as buttons with context %}
 {% from "govuk/components/character-count/macro.njk" import govukCharacterCount %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 
 {% set pageHeading = "What the order does" %}
@@ -43,6 +44,20 @@
   }) }}
 {% endmacro %}
 
+{# The time stated in the order, which court staff record as the order states it, with no default. #}
+{% macro time(id) %}
+  {{ govukInput({
+    id: id,
+    name: id,
+    label: { text: "Time possession is ordered by (optional)", classes: "govuk-label--s" },
+    hint: { text: "As the order states it, for example 16:00. Leave blank if it gives none." },
+    classes: "govuk-input--width-5",
+    spellcheck: false,
+    value: answers[id],
+    errorMessage: validationErrors[id]
+  }) }}
+{% endmacro %}
+
 {% block page %}
   <form method="post" action="{{ formAction }}" novalidate>
     {{ csrfProtection(csrfToken) }}
@@ -56,7 +71,7 @@
     {% endif %}
 
     {% set outrightHtml %}
-      {% set byDateHtml %}{{ date("outright-date", "Date possession is ordered by") }}{% endset %}
+      {% set byDateHtml %}{{ date("outright-date", "Date possession is ordered by") }}{{ time("outright-time") }}{% endset %}
       {{ govukRadios({
         name: "outright-possession",
         idPrefix: "outright-possession",
@@ -81,6 +96,7 @@
 
     {% set suspendedHtml %}
       {{ date("suspended-date", "Date possession is ordered by") }}
+      {{ time("suspended-time") }}
       {{ choose("suspended-condition", "Is the condition money or non-money?", condition, true) }}
       {{ choose("suspended-warrant-on-notice", "Must any application for a warrant be made on notice to all parties?", yesNo, true) }}
     {% endset %}

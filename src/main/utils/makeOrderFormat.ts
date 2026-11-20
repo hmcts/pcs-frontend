@@ -64,6 +64,12 @@ export function formatDate(date: Date): string {
 }
 
 /** A time as GOV.UK writes it: 10:30am, 2pm, midday or midnight. */
+/** A time as typed, as pcs-api is sent it (HH:mm), or undefined if it is blank or not a time. */
+export function isoTime(raw: string): string | undefined {
+  const time = parseTime(raw);
+  return time && `${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`;
+}
+
 export function formatTime({ hours, minutes }: TimeOfDay): string {
   if (minutes === 0 && (hours === 0 || hours === 12)) {
     return hours === 0 ? 'midnight' : 'midday';

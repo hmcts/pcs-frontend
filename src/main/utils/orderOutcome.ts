@@ -1,4 +1,4 @@
-import { parseDate } from '@utils/makeOrderFormat';
+import { isoTime, parseDate } from '@utils/makeOrderFormat';
 import type { FormData } from '@utils/orderCase';
 
 /*
@@ -20,6 +20,8 @@ export interface ClaimOutcome {
   kind: ClaimOutcomeKind;
   possessionForthwith?: boolean;
   possessionDate?: string;
+  /** The time on that day, HH:mm, if the order gives one. */
+  possessionTime?: string;
   grounds?: 'MANDATORY' | 'DISCRETIONARY';
   groundsDetails?: string;
   warrantOnNotice?: boolean;
@@ -62,11 +64,12 @@ export function claimOutcome(orderType: string, formData: FormData = {}): ClaimO
   switch (orderType) {
     case 'OUTRIGHT_POSSESSION': {
       const grounds = first(formData['outright-grounds-type']);
+      const by = first(formData['outright-possession']) === 'by';
       return {
         kind: 'OUTRIGHT_POSSESSION',
         possessionForthwith: first(formData['outright-possession']) === 'forthwith',
-        possessionDate:
-          first(formData['outright-possession']) === 'by' ? isoDate(formData, 'outright-by-date') : undefined,
+        possessionDate: by ? isoDate(formData, 'outright-by-date') : undefined,
+        possessionTime: by ? isoTime(first(formData['outright-by-time'])) : undefined,
         grounds: grounds === 'mandatory' ? 'MANDATORY' : grounds === 'discretionary' ? 'DISCRETIONARY' : undefined,
         groundsDetails: first(formData['outright-grounds-details']) || undefined,
       };
@@ -76,6 +79,7 @@ export function claimOutcome(orderType: string, formData: FormData = {}): ClaimO
       return {
         kind: 'SUSPENDED_POSSESSION',
         possessionDate: isoDate(formData, 'suspended-by-date'),
+        possessionTime: isoTime(first(formData['suspended-by-time'])),
         warrantOnNotice: options.includes('warrant-on-notice'),
       };
     }
