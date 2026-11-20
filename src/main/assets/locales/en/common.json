@@ -221,5 +221,19 @@
     "oneFound": "1 address found",
     "manyFound": "{count} addresses found",
     "noneFound": "No addresses found"
+  },
+  "cookieBanner": {
+    "serviceName": "Possession Claims Service",
+    "title": "Cookies on {{serviceName}}",
+    "message": {
+      "base": "We use some essential cookies to make this service work. We’d also like to use analytics cookies so we can understand how you use the service and make improvements.",
+      "accept": "You’ve accepted analytics cookies.",
+      "reject": "You’ve rejected analytics cookies."
+    },
+    "buttons": {
+      "accept": "Accept analytics cookies",
+      "reject": "Reject analytics cookies",
+      "hide": "Hide this message"
+    }
   }
 }

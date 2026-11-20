@@ -61,5 +61,42 @@
       "purpose": "Session timeout",
       "expires": "Session ends"
     }
+  },
+  "trackingCookieTable": {
+    "preferences": {
+      "name": "pcs-cookie-preferences",
+      "purpose": "Saves your cookie consent settings",
+      "expires": "1 year"
+    },
+    "ga": {
+      "name": "_ga",
+      "purpose": "Checks if you’ve visited the service before. This helps us count how many people visit the service (Google Analytics)",
+      "expires": "2 years"
+    },
+    "gaContainer": {
+      "name": "_ga_<container-id>",
+      "purpose": "Used to keep the state of your visit (Google Analytics)",
+      "expires": "2 years"
+    }
+  },
+  "cookieSettings": {
+    "title": "Cookie settings"
+  },
+  "cookiePage": {
+    "analytics": {
+      "legend": "Allow cookies that measure website use?",
+      "items": {
+        "on": "Use cookies that measure my website use",
+        "off": "Do not use cookies that measure my website use"
+      }
+    },
+    "apm": {
+      "legend": "Allow cookies that measure website application performance monitoring?",
+      "items": {
+        "on": "Use cookies that measure website application performance monitoring",
+        "off": "Do not use cookies that measure website application performance monitoring"
+      }
+    },
+    "submit": "Save"
   }
 }

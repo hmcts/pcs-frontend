@@ -1,26 +1,42 @@
+import { randomBytes } from 'crypto';
+import type { ServerResponse } from 'http';
+
 import config from 'config';
 import * as express from 'express';
 import helmet from 'helmet';
 
 const googleAnalyticsDomain = '*.google-analytics.com';
+const googleTagManagerDomain = '*.googletagmanager.com';
 const self = "'self'";
+
+/**
+ * Gives each response a fresh nonce in res.locals.cspNonce. The CSP allows inline scripts carrying it, and the
+ * GOV.UK template and the Google Tag Manager snippets put it on their inline scripts.
+ */
+export const cspNonceMiddleware: express.RequestHandler = (_req, res, next) => {
+  res.locals.cspNonce = randomBytes(16).toString('base64');
+  next();
+};
+
+const nonceSource = (_req: unknown, res: ServerResponse): string =>
+  `'nonce-${(res as express.Response).locals.cspNonce}'`;
 
 /**
  * The application's security headers, applied before the public routes and the modules so every response has them.
  */
-export function securityHeaders(developmentMode: boolean): express.RequestHandler {
+export function securityHeaders(developmentMode: boolean): express.RequestHandler[] {
+  // Google Tag Manager and the Google Analytics tags it loads, only when tracking is on (HDPI-8934).
+  const trackingEnabled = config.get<boolean>('tracking.enabled');
+  const tagManagerSources = trackingEnabled ? [googleTagManagerDomain] : [];
+
   // include default helmet functions
-  const scriptSrc = [self, googleAnalyticsDomain];
+  const scriptSrc: (string | typeof nonceSource)[] = [self, googleAnalyticsDomain, ...tagManagerSources, nonceSource];
 
   if (developmentMode) {
-    // Uncaught EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval'
-    // is not an allowed source of script in the following Content Security Policy directive:
-    // "script-src 'self' *.google-analytics.com 'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='".
-    // seems to be related to webpack
+    // webpack's development build evaluates strings as JavaScript. Browsers ignore 'unsafe-inline' when the
+    // policy has a nonce, so inline scripts need the nonce in development too.
     scriptSrc.push("'unsafe-eval'");
     scriptSrc.push("'unsafe-inline'");
-  } else {
-    scriptSrc.push("'sha256-GUQ5ad8JK5KmEWmROf3LZd9ge94daqNvd8xy9YS1iDw='");
   }
 
   const formAction = [self];
@@ -47,20 +63,26 @@ export function securityHeaders(developmentMode: boolean): express.RequestHandle
     formAction.push(cuiRaDomain);
   }
 
-  return helmet({
-    contentSecurityPolicy: {
-      directives: {
-        connectSrc: [self],
-        defaultSrc: ["'none'"],
-        fontSrc: [self, 'data:'],
-        imgSrc: [self, googleAnalyticsDomain],
-        objectSrc: [self],
-        scriptSrc,
-        styleSrc: [self],
-        manifestSrc: [self],
-        formAction,
+  return [
+    cspNonceMiddleware,
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          // As cui-ra, when tracking is on. www.google.com is from HDPI-8934.
+          connectSrc: trackingEnabled
+            ? [self, googleAnalyticsDomain, googleTagManagerDomain, 'www.google.com']
+            : [self],
+          defaultSrc: ["'none'"],
+          fontSrc: [self, 'data:'],
+          imgSrc: [self, googleAnalyticsDomain, ...tagManagerSources],
+          objectSrc: [self],
+          scriptSrc,
+          styleSrc: [self, ...tagManagerSources],
+          manifestSrc: [self],
+          formAction,
+        },
       },
-    },
-    referrerPolicy: { policy: 'origin' },
-  });
+      referrerPolicy: { policy: 'origin' },
+    }),
+  ];
 }

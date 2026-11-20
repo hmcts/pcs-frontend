@@ -9,11 +9,17 @@
 
 {% block head %}
   {{ super() }}
+  {% include "tagmanager/head.njk" %}
   <meta name="robots" content="noindex">
   {% include "webpack/css.njk" %}
 {% endblock %}
 
+{% block bodyStart %}
+  {% include "tagmanager/body.njk" %}
+{% endblock %}
+
 {% block header %}
+  {% include "cookies-banner.njk" %}
   {{ govukHeader({
     containerClasses: "govuk-width-container"
   }) }}

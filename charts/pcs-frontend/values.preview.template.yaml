@@ -22,6 +22,10 @@ nodejs:
     REDIRECTS_MANAGE_CASE_RETURN_URL: '${REDIRECTS_MANAGE_CASE_RETURN_URL}'
     PAYMENT_RETURN_URL: 'https://${SERVICE_FQDN}/payment/return'
     LAUNCHDARKLY_ENV: '${SERVICE_FQDN}'
+    # Google Tag Manager and the cookie banner (HDPI-8934). Off by default until the analytics setup is confirmed.
+    # TODO HDPI-8934: set to 'false' before merge. Previews load the production GTM container, and GA could fire
+    # without consent until the container's consent triggers are set up.
+    ENABLE_TRACKING: 'true'
     CUI_RA_CALLBACK_URL: 'https://${SERVICE_FQDN}/case/:caseReference/respond-to-claim/reasonable-adjustments/callback/:id'
     CUI_RA_LOGOUT_URL: 'https://${SERVICE_FQDN}/logout'
 redis:

@@ -1,6 +1,7 @@
 import * as path from 'path';
 
 import * as bodyParser from 'body-parser';
+import config from 'config';
 import cookieParser from 'cookie-parser';
 import express from 'express';
 import { glob } from 'glob';
@@ -26,6 +27,11 @@ const developmentMode = env === 'development';
 export const app = express();
 
 app.locals.ENV = env;
+// Google Tag Manager and the cookie banner, on every page when tracking is enabled.
+app.locals.tracking = {
+  enabled: config.get<boolean>('tracking.enabled'),
+  gtmContainerId: config.get<string>('tracking.gtmContainerId'),
+};
 
 setupDev(app, developmentMode);
 
