@@ -2,6 +2,7 @@ import config from 'config';
 import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
+import { VIEW_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import {
   CLAIM_SUBMITTED_ROUTE,
   MAKE_A_CLAIM_ROUTE,
@@ -197,7 +198,15 @@ function registerSubmittedClaimRoutes(app: Application): void {
       }
       const content = pageContent(
         req,
-        ['pageTitle', 'whatHappensNextHeading', 'whatHappensNext', 'feedbackLink'],
+        [
+          'pageTitle',
+          'whatHappensNextHeading',
+          'whatHappensNext',
+          'claimFormHeading',
+          'claimFormText',
+          'claimFormLink',
+          'feedbackLink',
+        ],
         'claimSubmitted'
       );
       const t = content.t as ReturnType<typeof getTranslationFunction>;
@@ -208,6 +217,7 @@ function registerSubmittedClaimRoutes(app: Application): void {
         panelText: t('makeAClaim:claimSubmitted.panelText', {
           caseNumber: formatCaseReferenceForDisplay(caseReference),
         }),
+        viewDocumentsUrl: makeAClaimPath(VIEW_DOCUMENTS_ROUTE, caseReference),
         feedbackUrl: 'https://www.smartsurvey.co.uk/s/Poss_feedback/',
       });
     } catch (error) {

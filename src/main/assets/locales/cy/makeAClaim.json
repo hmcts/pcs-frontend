@@ -303,6 +303,9 @@
       "cyWe’ll check your claim. When it has been issued, we’ll send it to the defendants and tell you the date of the court hearing.",
       "cyIf you said you need to make a general application, you must make it within 24 hours of submitting this claim."
     ],
+    "claimFormHeading": "cyYour claim form",
+    "claimFormText": "cyYour claim form will be ready a few minutes after your payment has gone through. You can view it with the documents you uploaded.",
+    "claimFormLink": "cyView your claim form",
     "feedbackLink": "cyWhat did you think of this service? (opens in new tab)"
   }
 }

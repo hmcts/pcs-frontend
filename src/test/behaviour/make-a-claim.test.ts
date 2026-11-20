@@ -1009,6 +1009,14 @@ describe('review fixes', () => {
     }
   });
 
+  it('asks the general application question without promising guidance after submission', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    const page = new JSDOM((await app.get(claimPath('general-application'))).text).window.document;
+    expect(page.querySelector('#generalApplicationIntent-hint')).toBeNull();
+    expect(page.body.textContent).not.toContain('We’ll tell you how to make a general application');
+  });
+
   describe('back from GOV.UK Pay', () => {
     const FEE = { submission: { serviceRequestReference: 'SR-1', feeAmount: '40400' } };
     const SUBMITTED = 'PENDING_CASE_ISSUED';
@@ -1025,6 +1033,16 @@ describe('review fixes', () => {
       expect((await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee`)).location).toBe(
         `/case/${CASE_REFERENCE}/claim-submitted`
       );
+    });
+
+    it('links the claim submitted page to the case documents, where the claim form appears', async () => {
+      app = await bootMakeAClaim();
+      givenClaim(FEE, 'CASE_ISSUED');
+      const page = new JSDOM((await app.get(`/case/${CASE_REFERENCE}/claim-submitted?status=success`)).text).window
+        .document;
+      const link = [...page.querySelectorAll('a.govuk-link')].find(a => a.textContent === 'View your claim form');
+      expect(link?.getAttribute('href')).toBe(`/case/${CASE_REFERENCE}/view-documents`);
+      expect(text(page.body.innerHTML)).toContain('Your claim form will be ready a few minutes after your payment');
     });
 
     it('says the payment is being processed while GOV.UK Pay has not finished it', async () => {

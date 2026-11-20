@@ -12,7 +12,6 @@
     "cyTo stop the court scheduling a hearing automatically, you must make a general application within 24 hours of submitting this claim."
   ],
   "question": "cyDo you need to make a general application before the court schedules a hearing?",
-  "hint": "cyWe’ll tell you how to make a general application after you’ve submitted your claim",
   "errors": {
     "generalApplicationIntent": "cySelect whether you need to make a general application"
   }
