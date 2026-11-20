@@ -16,4 +16,13 @@
 
 .govuk-language-toggle {
   text-align: right;
+
+  .language,
+  .govuk-link,
+  a {
+    display: inline-flex;
+    align-items: center;
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
 }
