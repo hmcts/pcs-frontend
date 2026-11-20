@@ -418,7 +418,7 @@ describe('warrantReturn', () => {
       expect(dateValues()).toEqual(['', '', '', '', '']);
     });
 
-    it('clears the eviction date and return name when the final outcome changes', () => {
+    it('clears the return name when the final outcome changes', () => {
       renderPage(
         {
           returnType: WarrantReturnType.FINAL,

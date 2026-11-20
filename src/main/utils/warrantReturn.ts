@@ -305,6 +305,7 @@ export function isAdditionalDetailsMandatory(selection: WarrantReturnSelection):
 }
 
 const HIDDEN_CLASS = 'govuk-!-display-none';
+const CONDITIONAL_CLASS = 'govuk-checkboxes__conditional';
 const DEFAULT_ADDITIONAL_DETAILS_LABEL = 'Additional details';
 const OPTIONAL_ADDITIONAL_DETAILS_LABEL = 'Additional details (Optional)';
 const EVICTION_DATE_INPUT_IDS = [
@@ -313,6 +314,14 @@ const EVICTION_DATE_INPUT_IDS = [
   'eviction-date-year',
   'eviction-date-hour',
   'eviction-date-minute',
+];
+
+const RETURN_DATE_INPUT_IDS = [
+  'return-date-day',
+  'return-date-month',
+  'return-date-year',
+  'return-date-hour',
+  'return-date-minute',
 ];
 
 export function initWarrantReturn(): void {
@@ -351,12 +360,27 @@ function updateWarrantReturnVisibility(): void {
 
   const isEvictionUnsuccessfulOrCancelled =
     isFinal && (finalOutcome === EvictionOutcome.UNSUCCESSFUL || finalOutcome === EvictionOutcome.CANCELLED);
-  setSectionVisible('eviction-unsuccessful-cancelled', isEvictionUnsuccessfulOrCancelled, () =>
-    resetSelect('eviction-unsuccessful-return-name')
-  );
+  setSectionVisible('eviction-unsuccessful-cancelled', isEvictionUnsuccessfulOrCancelled, () => {
+    resetSelect('eviction-unsuccessful-return-name');
+  });
 
   const isInterim = returnType === WarrantReturnType.INTERIM;
-  setSectionVisible('interim', isInterim, () => resetSelect('interim-return-name'));
+  setSectionVisible('interim', isInterim, () => {
+    resetSelect('interim-return-name');
+  });
+
+  setSectionVisible('return-type-conditional', isInterim || isFinal, () => undefined);
+  setSectionVisible(
+    'final-outcome-conditional',
+    isEvictionSuccessful || isEvictionUnsuccessfulOrCancelled,
+    () => undefined
+  );
+
+  const isReturnDateVisible = isEvictionUnsuccessfulOrCancelled || isInterim;
+  const returnDateSection = document.getElementById('return-date-section');
+  setSectionVisible('return-date-section', isReturnDateVisible, () => RETURN_DATE_INPUT_IDS.forEach(resetInput));
+
+  returnDateSection?.classList.toggle(CONDITIONAL_CLASS, isFinal);
 
   updateAdditionalDetailsLabel();
 }
