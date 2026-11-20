@@ -111,6 +111,8 @@ export interface OrderStart {
   taskGenAppId?: string | null;
   /** The judge the order is made by: the judge making it, or the one who made the order under review. */
   judgeName?: string | null;
+  /** The coming year's England and Wales bank holidays, as ISO days, which a date to apply by moves off. */
+  bankHolidays?: string[] | null;
 }
 
 export function formatAddress(address: Record<string, string | undefined> = {}): string {

@@ -68,6 +68,9 @@ describe('make an order: without a hearing or an application', () => {
 
   it('transfers enforcement of the possession order to the High Court, whatever else the order is', async () => {
     const page = await openPage((await app.get(PAGE)).text);
+    // Last on the form, after own initiative or without notice, as the judges seldom need it.
+    const headings = [...document.querySelectorAll('h2.govuk-heading-l')].map(heading => heading.textContent?.trim());
+    expect(headings.slice(-3)).toEqual(['Own initiative or without notice', 'Enforcement', 'Order preview']);
     check('transfer-enforcement', 'yes');
 
     const unchosen = page.body();

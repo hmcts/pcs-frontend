@@ -11,6 +11,7 @@ import {
   recordAttendance,
   submittedOrders,
   typeDate,
+  workingDate,
 } from './harness';
 
 const PAGE = `/case/${CASE_REFERENCE}/make-order`;
@@ -54,9 +55,9 @@ describe("make an order: made on the court's own initiative or without notice", 
     expect(control('[name="order-notice"][value="none"]').checked).toBe(true);
     expect(page.orderText()).not.toContain('set aside');
 
-    // An order on the court's own initiative gives 7 days unless the judge changes it.
+    // An order on the court's own initiative gives 7 days, to the next working day, unless the judge changes it.
     check('order-notice', 'own-initiative');
-    const week = futureDate(7);
+    const week = workingDate(7);
     expect(dateValues('own-initiative-by')).toEqual([week.day, week.month, week.year]);
     expect(page.orderText().split('\n').at(-1)).toBe(`${OWN_INITIATIVE} ${shown(week)}.`);
     const pills = [...document.querySelectorAll<HTMLElement>('#own-initiative-by-pills [data-date-pill-days]')];
@@ -72,6 +73,25 @@ describe("make an order: made on the court's own initiative or without notice", 
     expect(page.orderText().split('\n').at(-1)).toBe(`${WITHOUT_NOTICE} 7 December 2026.`);
     check('order-notice', 'none');
     expect(page.orderText()).not.toContain('set aside');
+  });
+
+  it('moves a date to apply by off a weekend or bank holiday, as the court office is closed then', async () => {
+    // A bank holiday on the working day 7 days would give, so the date runs to the next one.
+    const due = workingDate(7);
+    const holiday = `${due.year}-${due.month}-${due.day}`;
+    app = await bootApp({ bankHolidays: [holiday] });
+    await openPage((await app.get(PAGE)).text);
+    check('order-notice', 'own-initiative');
+    const after = workingDate(7, [holiday]);
+    expect(dateValues('own-initiative-by')).toEqual([after.day, after.month, after.year]);
+
+    // The quick dates for it are working days too.
+    control<HTMLButtonElement>('#own-initiative-by-pills [data-date-pill-days="14"]').click();
+    const fortnight = workingDate(14, [holiday]);
+    expect(dateValues('own-initiative-by')).toEqual([fortnight.day, fortnight.month, fortnight.year]);
+    expect([0, 6]).not.toContain(
+      new Date(Number(fortnight.year), Number(fortnight.month) - 1, Number(fortnight.day)).getDay()
+    );
   });
 
   it('needs a real date to apply by before review, and keeps the choice and date on the saved order', async () => {
@@ -161,7 +181,7 @@ describe("make an order: made on the court's own initiative or without notice", 
       },
     });
     const page = await openPage((await app.get(PAGE)).text);
-    const week = futureDate(7);
+    const week = workingDate(7);
     expect(dateValues('own-initiative-by')).toEqual([week.day, week.month, week.year]);
     expect(dateValues('without-notice-by')).toEqual(['', '', '']);
 

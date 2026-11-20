@@ -1,6 +1,6 @@
 import { type DocEditorController, type DocWeaveDocument, createDocEditor } from '@hmcts-cft/docweave';
 
-import { parseMoney } from '../../utils/makeOrderFormat';
+import { parseMoney, workingDayOnOrAfter } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
 import { readOrderData } from './make-order/data';
@@ -21,6 +21,19 @@ function setDate([day, month, year]: DateParts, date: Date): void {
   day.value = String(date.getDate()).padStart(2, '0');
   month.value = String(date.getMonth() + 1).padStart(2, '0');
   year.value = String(date.getFullYear());
+}
+
+/** A date filled in quickly in the control: the next working day on or after it when the control asks for one. */
+function quickDate(control: Element | null, date: Date): Date {
+  const json = control?.closest<HTMLElement>('[data-working-days]')?.dataset.workingDays;
+  if (!json) {
+    return date;
+  }
+  try {
+    return workingDayOnOrAfter(date, JSON.parse(json));
+  } catch {
+    return workingDayOnOrAfter(date, []);
+  }
 }
 
 function daysFromToday(days: number): Date {
@@ -52,7 +65,10 @@ export function initDatePills(form: HTMLFormElement): void {
     }
     const amount = Number(shorthand[1]);
     const unit = shorthand[2].toLowerCase();
-    setDate(parts, unit === 'm' ? monthsFromToday(amount) : daysFromToday(amount * (unit === 'w' ? 7 : 1)));
+    setDate(
+      parts,
+      quickDate(day, unit === 'm' ? monthsFromToday(amount) : daysFromToday(amount * (unit === 'w' ? 7 : 1)))
+    );
   });
 
   form.addEventListener('click', event => {
@@ -63,7 +79,7 @@ export function initDatePills(form: HTMLFormElement): void {
     if (!pill || !parts) {
       return;
     }
-    setDate(parts, daysFromToday(Number(pill.dataset.datePillDays)));
+    setDate(parts, quickDate(pill, daysFromToday(Number(pill.dataset.datePillDays))));
     parts[0].dispatchEvent(new Event('input', { bubbles: true }));
   });
 }

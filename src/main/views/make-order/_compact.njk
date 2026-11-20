@@ -157,7 +157,8 @@
   {# Suffixed: govukDateInput derives its item ids from params.id, so it keeps that id. #}
   {#
     params.default ({ day, month, year }) fills a date the form has never had; one the judge cleared stays clear.
-    params.pills gives the quick dates in days from today.
+    params.pills gives the quick dates in days from today. params.workingDays, the bank holidays, makes a date filled
+    in quickly the next working day on or after it.
   #}
   {% set saved = draftDate(params.id) %}
   {% set unsaved = true %}
@@ -170,7 +171,8 @@
       attributes: { required: true } if not params.optional
     }]) %}
   {% endfor %}
-  <div id="{{ params.id }}-pills" class="pcs-date-with-pills">
+  <div id="{{ params.id }}-pills" class="pcs-date-with-pills"
+    {%- if params.workingDays %} data-working-days="{{ params.workingDays | dump }}"{% endif %}>
     {{ govukDateInput({
       id: params.id,
       namePrefix: params.id,

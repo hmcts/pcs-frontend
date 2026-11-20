@@ -6,10 +6,16 @@
 
 {#
   An order on the court's own initiative starts with 7 days to apply by, as the judges asked, which the judge may
-  change. One without notice has no default.
+  change. One without notice has no default. Either date filled in quickly is a working day.
 #}
 {% macro applyBy(prefix, default) %}
-  {{ compact.date({ id: prefix, legend: "Application to be made by 4pm on", default: default, pills: [7, 14, 28] }) }}
+  {{ compact.date({
+    id: prefix,
+    legend: "Application to be made by 4pm on",
+    default: default,
+    pills: [7, 14, 28],
+    workingDays: bankHolidays
+  }) }}
 {% endmacro %}
 
 <h2 class="govuk-heading-l govuk-!-margin-top-6">Own initiative or without notice</h2>

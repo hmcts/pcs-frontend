@@ -1,4 +1,4 @@
-import { formatTimeEstimate, parseTime, parseTimeEstimate } from '@utils/makeOrderFormat';
+import { formatTimeEstimate, parseTime, parseTimeEstimate, workingDayOnOrAfter } from '@utils/makeOrderFormat';
 
 describe('parseTime', () => {
   it.each([
@@ -35,5 +35,17 @@ describe('a hearing time estimate in days, hours and minutes', () => {
     expect(formatTimeEstimate({ days: 3, hours: 4, minutes: 30 })).toBe('3 days, 4 hours and 30 minutes');
     expect(formatTimeEstimate({ days: 1, hours: 0, minutes: 30 })).toBe('1 day and 30 minutes');
     expect(formatTimeEstimate({ days: 0, hours: 1, minutes: 0 })).toBe('1 hour');
+  });
+});
+
+describe('workingDayOnOrAfter', () => {
+  const day = (iso: string) => new Date(`${iso}T12:00:00`);
+  const iso = (date: Date) => date.toISOString().slice(0, 10);
+
+  it('keeps a working day, and moves a weekend or bank holiday to the next working day', () => {
+    expect(iso(workingDayOnOrAfter(day('2026-11-27'), []))).toBe('2026-11-27');
+    expect(iso(workingDayOnOrAfter(day('2026-11-28'), []))).toBe('2026-11-30');
+    // Christmas Day is a Friday, Boxing Day a Saturday, so its holiday is the Monday.
+    expect(iso(workingDayOnOrAfter(day('2026-12-25'), ['2026-12-25', '2026-12-28']))).toBe('2026-12-29');
   });
 });

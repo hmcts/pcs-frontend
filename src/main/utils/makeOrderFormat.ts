@@ -115,3 +115,21 @@ export function formatTimeEstimate(estimate: TimeEstimate): string {
   );
   return named.length > 1 ? `${named.slice(0, -1).join(', ')} and ${named[named.length - 1]}` : named[0];
 }
+
+/** A date as an ISO day, "2026-12-25", from its local parts. */
+function isoDay(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * The date, or the first after it that is a working day: not a Saturday, Sunday or one of the bank holidays (ISO
+ * days). A date to do something by that falls when the court office is closed runs to the next day it is open.
+ */
+export function workingDayOnOrAfter(date: Date, bankHolidays: readonly string[]): Date {
+  const holidays = new Set(bankHolidays);
+  const working = new Date(date);
+  while (working.getDay() === 0 || working.getDay() === 6 || holidays.has(isoDay(working))) {
+    working.setDate(working.getDate() + 1);
+  }
+  return working;
+}

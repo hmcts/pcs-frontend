@@ -11,6 +11,8 @@ import { renderText } from '@hmcts-cft/docweave';
 import express, { type Express, type Request, type Response } from 'express';
 import { DateTime } from 'luxon';
 
+import { workingDayOnOrAfter } from '../../main/utils/makeOrderFormat';
+
 export const CASE_REFERENCE = '1777027600017760';
 export const MANAGE_CASE_URL = `http://manage-case.test/cases/case-details/PCS/PCS/${CASE_REFERENCE}`;
 
@@ -38,6 +40,7 @@ interface Envelope {
   hearing?: Record<string, unknown> | null;
   taskGenAppId?: string;
   judgeName?: string | null;
+  bankHolidays?: string[];
 }
 
 const blankCase = (): Envelope => ({
@@ -344,6 +347,8 @@ export async function bootApp(
     judgeName?: string | null;
     /** The court managing the case, over the default, or null when location reference data has none. */
     court?: Record<string, unknown> | null;
+    /** The bank holidays pcs-api sends, as ISO days; none by default. */
+    bankHolidays?: string[];
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
@@ -353,6 +358,7 @@ export async function bootApp(
   if (options.court !== undefined) {
     envelope.caseContext.court = options.court;
   }
+  envelope.bankHolidays = options.bankHolidays ?? [];
   if (options.defendants) {
     envelope.caseContext.defendants = options.defendants;
   }
@@ -619,4 +625,16 @@ export const BEFORE_HEARING = before('13 October 2026');
 /** The first sentence of an order made today without a hearing. */
 export function beforeToday(): string {
   return before(DateTime.now().setZone('Europe/London').toFormat('d MMMM yyyy'));
+}
+
+/** The working day on or after a number of days from today, skipping the bank holidays, as a date input's parts. */
+export function workingDate(days: number, bankHolidays: string[] = []): { day: string; month: string; year: string } {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  const working = workingDayOnOrAfter(date, bankHolidays);
+  return {
+    day: String(working.getDate()).padStart(2, '0'),
+    month: String(working.getMonth() + 1).padStart(2, '0'),
+    year: String(working.getFullYear()),
+  };
 }

@@ -2,7 +2,7 @@ import escapeHtml from 'escape-html';
 import { DateTime } from 'luxon';
 import { filterXSS } from 'xss';
 
-import { parseDate, parseMoney } from '@utils/makeOrderFormat';
+import { parseDate, parseMoney, workingDayOnOrAfter } from '@utils/makeOrderFormat';
 import {
   type ApplicationToDecide,
   type AttendanceParty,
@@ -259,9 +259,19 @@ export function withoutUnchosenNoticeDates(formData: FormData): FormData {
 /** The days an order on the court's own initiative gives to apply to set it aside, vary or stay it, unless changed. */
 export const OWN_INITIATIVE_APPLY_BY_DAYS = 7;
 
-/** A date some days from today in London, as the parts of a date input. */
-export function daysFromToday(days: number, now = DateTime.now()): { day: string; month: string; year: string } {
-  const date = now.setZone('Europe/London').plus({ days });
+/**
+ * A date some days from today in London, as the parts of a date input, moved to the next working day when the
+ * bank holidays are given.
+ */
+export function daysFromToday(
+  days: number,
+  now = DateTime.now(),
+  bankHolidays?: readonly string[]
+): { day: string; month: string; year: string } {
+  const later = now.setZone('Europe/London').plus({ days });
+  const date = bankHolidays
+    ? DateTime.fromJSDate(workingDayOnOrAfter(new Date(later.year, later.month - 1, later.day), bankHolidays))
+    : later;
   // Padded as the page's quick dates fill them.
   return { day: date.toFormat('dd'), month: date.toFormat('MM'), year: date.toFormat('yyyy') };
 }
@@ -426,7 +436,9 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
     upcomingHearings: upcoming,
     orderBefore: orderBefore(start),
-    ownInitiativeApplyBy: daysFromToday(OWN_INITIATIVE_APPLY_BY_DAYS),
+    // A date to apply by is a working day, as are the page's quick dates for it.
+    ownInitiativeApplyBy: daysFromToday(OWN_INITIATIVE_APPLY_BY_DAYS, DateTime.now(), start.bankHolidays ?? []),
+    bankHolidays: start.bankHolidays ?? [],
     upcomingHearingsJson: JSON.stringify(Object.fromEntries(upcoming.map(({ id, text }) => [id, text]))),
     ...hearingModel(hearing),
     caseBundle: caseContext.caseBundle ? caseBundleModel(caseContext.caseBundle, caseContext.caseReference) : undefined,
