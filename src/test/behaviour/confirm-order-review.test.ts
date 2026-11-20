@@ -568,6 +568,23 @@ describe('confirm order review', () => {
         'Select what the order says about costs',
         'Select if the order makes a money judgment',
       ]);
+      const judgmentAnswers = {
+        costs: 'DEFENDANT_PAYS_FIXED',
+        'has-money-judgments': 'yes',
+        'judgment-1-debtors': 'defendant-id',
+        'judgment-1-creditors': 'claimant-id',
+        action: 'continue',
+      };
+      const missingAmounts = parse((await app.post(MONEY_JUDGMENTS, form(judgmentAnswers))).text);
+      expect(missingAmounts.querySelector('.govuk-error-summary a')?.getAttribute('href')).toBe('#judgment-1-amounts');
+      expect(missingAmounts.querySelector('#judgment-1-amounts-error')?.textContent).toContain(
+        'Enter at least one amount for money judgment 1'
+      );
+      expect(missingAmounts.querySelector('#judgment-1-arrears-error')).toBeNull();
+
+      const costsOnly = await app.post(MONEY_JUDGMENTS, form({ ...judgmentAnswers, 'judgment-1-costs': '355' }));
+      expect(costsOnly.location).toBe(REVIEW_DATES);
+
       const recorded = await app.post(
         MONEY_JUDGMENTS,
         form({

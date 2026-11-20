@@ -249,7 +249,7 @@ export function validateMoneyJudgments(answers: MoneyJudgmentsAnswers | undefine
       add('creditors', `A party cannot both pay and be paid money judgment ${n}`);
     }
     if (!judgment.arrears && !judgment.otherAmount && !judgment.costs) {
-      add('arrears', `Enter the sum of money judgment ${n}`);
+      add('amounts', `Enter at least one amount for money judgment ${n}`);
     }
     amount('arrears', judgment.arrears, 'arrears');
     amount('other-amount', judgment.otherAmount, 'interest or other sum');

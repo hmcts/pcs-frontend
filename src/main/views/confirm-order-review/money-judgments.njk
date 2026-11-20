@@ -4,6 +4,7 @@
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/date-input/macro.njk" import govukDateInput %}
 {% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/error-message/macro.njk" import govukErrorMessage %}
 {% from "govuk/components/radios/macro.njk" import govukRadios %}
 {% from "govuk/components/select/macro.njk" import govukSelect %}
 {% from "macros/csrf.njk" import csrfProtection %}
@@ -98,9 +99,20 @@
           <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">Money judgment {{ n }}</legend>
           {{ partyChoices(prefix + "-debtors", "Who must pay?", judgment.debtors) }}
           {{ partyChoices(prefix + "-creditors", "Who is paid?", judgment.creditors) }}
-          {{ money(prefix + "-arrears", "Arrears (optional)", judgment.arrears) }}
-          {{ money(prefix + "-other-amount", "Interest or other sum (optional)", judgment.otherAmount) }}
-          {{ money(prefix + "-costs", "Costs (optional)", judgment.costs) }}
+          {% set amountsId = prefix + "-amounts" %}
+          {% set amountsError = validationErrors[amountsId] %}
+          <div class="govuk-form-group{% if amountsError %} govuk-form-group--error{% endif %}">
+            <fieldset class="govuk-fieldset" id="{{ amountsId }}" tabindex="-1" aria-describedby="{{ amountsId }}-hint{% if amountsError %} {{ amountsId }}-error{% endif %}">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Judgment amounts</legend>
+              <p class="govuk-hint" id="{{ amountsId }}-hint">Enter at least one amount.</p>
+              {% if amountsError %}
+                {{ govukErrorMessage({ id: amountsId + "-error", text: amountsError.text }) }}
+              {% endif %}
+              {{ money(prefix + "-arrears", "Arrears (optional)", judgment.arrears) }}
+              {{ money(prefix + "-other-amount", "Interest or other sum (optional)", judgment.otherAmount) }}
+              {{ money(prefix + "-costs", "Costs (optional)", judgment.costs) }}
+            </fieldset>
+          </div>
 
           <h3 class="govuk-heading-s">How it is paid</h3>
           <p class="govuk-hint">Leave these blank if the order does not say. It is then due within 14 days.</p>
