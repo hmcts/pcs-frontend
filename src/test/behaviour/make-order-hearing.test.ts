@@ -37,7 +37,7 @@ const HEARING = {
   earlierNotes: [
     {
       by: 'DJ Pat Example',
-      createdOn: '2026-09-01T15:30:00Z',
+      createdOn: '2026-09-02T15:30:00Z',
       hearingDate: '2026-09-01T10:00:00',
       note: 'Turned up with x and y.\nMade clear needs to do x and y.',
     },
@@ -74,9 +74,9 @@ describe('make an order: for a hearing', () => {
     // The earlier notes, newest first, are for reading only.
     const earlier = [...document.querySelectorAll('.pcs-hearing-notes__note')].map(note => note.textContent);
     expect(earlier).toHaveLength(2);
-    expect(earlier[0]).toContain('1 September 2026 – DJ Pat Example');
+    expect(earlier[0]).toContain('DJ Pat Example on 2 September 2026');
     expect(earlier[0]).toContain('Made clear needs to do x and y.');
-    expect(earlier[1]).toContain('20 July 2026 – HHJ Sam Example');
+    expect(earlier[1]).toContain('HHJ Sam Example on 20 July 2026');
     expect(document.querySelector('.pcs-hearing-notes__list')?.querySelector('input, textarea')).toBeNull();
     expect(tenancyTypes()).toEqual([
       'Assured tenancy',

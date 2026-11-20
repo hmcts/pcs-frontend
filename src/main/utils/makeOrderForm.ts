@@ -184,7 +184,7 @@ function hearingModel(hearing: OrderHearing | null | undefined): Record<string, 
       : 'From the claim',
     earlierNotes: hearing.earlierNotes.map(note => ({
       by: note.by ?? 'A judge',
-      when: displayDate(note.hearingDate ?? note.createdOn),
+      dateMade: displayDate(note.createdOn),
       note: note.note,
     })),
   };
