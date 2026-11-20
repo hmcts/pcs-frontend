@@ -137,8 +137,6 @@
           {% set suspendedHtml %}
             {{ detailsDate("suspended-date", "Date possession is ordered by") }}
             {{ detailsTime("suspended-time") }}
-            {{ radios("suspended-condition", "Condition", condition, orderDetails["suspended-condition"]) }}
-            {{ radios("suspended-warrant-on-notice", "Any application for a warrant on notice to all parties?", yesNo, orderDetails["suspended-warrant-on-notice"]) }}
           {% endset %}
           {{ radios("order-does", "What does the order do?", orderDoes, orderDetails["order-does"], {
             hint: "The Judge wrote this order. Record what it does. This does not change the order.",

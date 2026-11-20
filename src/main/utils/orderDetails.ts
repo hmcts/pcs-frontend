@@ -18,7 +18,7 @@ export const ORDER_DOES: readonly Option[] = [
   { value: 'suspended', text: 'Suspended possession' },
   { value: 'adjournment', text: 'Adjournment' },
   { value: 'strike-out', text: 'Strike out or dismiss' },
-  { value: 'other', text: 'None of these' },
+  { value: 'other', text: 'General order' },
 ];
 export const OUTRIGHT_POSSESSION: readonly Option[] = [
   { value: 'forthwith', text: 'Possession forthwith' },
@@ -27,10 +27,6 @@ export const OUTRIGHT_POSSESSION: readonly Option[] = [
 export const GROUNDS: readonly Option[] = [
   { value: 'mandatory', text: 'Mandatory' },
   { value: 'discretionary', text: 'Discretionary' },
-];
-export const CONDITION: readonly Option[] = [
-  { value: 'money', text: 'Money' },
-  { value: 'non-money', text: 'Non-money' },
 ];
 export const ADJOURNMENT: readonly Option[] = [
   { value: 'further-hearing', text: 'Adjourned for a further hearing' },
@@ -60,8 +56,6 @@ export const ORDER_DETAILS_FIELDS = [
   'outright-transfer',
   ...DATE_PARTS.map(part => `suspended-date-${part}`),
   'suspended-time',
-  'suspended-condition',
-  'suspended-warrant-on-notice',
   'adjournment',
   'strike-out',
 ];
@@ -119,12 +113,6 @@ export function validateOrderDetails(answers: OrderDetailsAnswers = {}): Issue[]
     case 'suspended':
       date('suspended-date', 'Enter a real date possession is ordered by');
       time('suspended-time');
-      chosen('suspended-condition', CONDITION, 'Select if the condition is money or non-money');
-      chosen(
-        'suspended-warrant-on-notice',
-        YES_NO,
-        'Select if any application for a warrant must be made on notice to all parties'
-      );
       break;
     case 'adjournment':
       chosen('adjournment', ADJOURNMENT, 'Select how the claim is adjourned');
@@ -168,11 +156,7 @@ export function orderDetailsRows(answers: OrderDetailsAnswers = {}): [string, st
       );
       break;
     case 'suspended':
-      rows.push(
-        ['Possession on or before', displayDeadline(answers, 'suspended-date', 'suspended-time')],
-        ['Condition', label(CONDITION, answers['suspended-condition'])],
-        ['Any application for a warrant on notice', label(YES_NO, answers['suspended-warrant-on-notice'])]
-      );
+      rows.push(['Possession on or before', displayDeadline(answers, 'suspended-date', 'suspended-time')]);
       break;
     case 'adjournment':
       rows.push(['Adjournment', label(ADJOURNMENT, answers.adjournment)]);
@@ -185,7 +169,6 @@ export function orderDetailsRows(answers: OrderDetailsAnswers = {}): [string, st
 }
 
 const upper = (value: string) => value.toUpperCase().replace(/-/g, '_');
-const yes = (value: string) => value === 'yes';
 
 /** What court staff record a free-form order does, as the claim outcome every issued order gives pcs-api. */
 export function orderDetailsRequest(answers: OrderDetailsAnswers = {}): ClaimOutcome {
@@ -204,7 +187,6 @@ export function orderDetailsRequest(answers: OrderDetailsAnswers = {}): ClaimOut
         kind: 'SUSPENDED_POSSESSION',
         possessionDate: isoDate(answers, 'suspended-date'),
         possessionTime: isoTime(answers['suspended-time'] ?? ''),
-        warrantOnNotice: yes(answers['suspended-warrant-on-notice']),
       };
     // Asked as the free-form categories agree, but an adjournment manages the case without deciding the claim.
     case 'adjournment':

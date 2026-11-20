@@ -39,7 +39,6 @@ import {
 } from '@utils/orderCase';
 import {
   ADJOURNMENT,
-  CONDITION,
   GROUNDS,
   MAX_GROUNDS_DETAILS_LENGTH,
   ORDER_DETAILS_FIELDS,
@@ -374,7 +373,6 @@ const VIEWS = {
       orderDoes: ORDER_DOES,
       outrightPossession: OUTRIGHT_POSSESSION,
       grounds: GROUNDS,
-      condition: CONDITION,
       adjournment: ADJOURNMENT,
       strikeOut: STRIKE_OUT,
       yesNo: YES_NO,

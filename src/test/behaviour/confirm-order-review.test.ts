@@ -538,6 +538,10 @@ describe('confirm order review', () => {
       const noDate = await app.post(RECORD, recordAnswers({ 'order-does': 'suspended', ...dateFields('suspended-date', '31/2/') }));
       expect(errors(noDate.text)).toContain('Enter a real date possession is ordered by');
       expect(parse(noDate.text).querySelector<HTMLInputElement>('#suspended-date-month')?.value).toBe('2');
+      // Suspended possession asks only for the date, with no condition or warrant question.
+      expect(parse(noDate.text).querySelector('[name="suspended-condition"], [name="suspended-warrant-on-notice"]')).toBeNull();
+      const suspended = await app.post(RECORD, recordAnswers({ 'order-does': 'suspended', ...dateFields('suspended-date', '1/2/2099') }));
+      expect(errors(suspended.text)).not.toContain('Select if the condition is money or non-money');
 
       const generally = await app.post(RECORD, recordAnswers({ 'order-does': 'adjournment', adjournment: 'generally' }));
       expect(generally.location).toBe(CHECK_YOUR_ANSWERS);

@@ -1,4 +1,4 @@
-import { orderDetailsRequest, orderDetailsRows, validateOrderDetails } from '@utils/orderDetails';
+import { ORDER_DOES, orderDetailsRequest, orderDetailsRows, validateOrderDetails } from '@utils/orderDetails';
 
 const OUTRIGHT_BY = {
   'order-does': 'outright',
@@ -46,5 +46,28 @@ describe('orderDetails: the time possession is ordered by in a free-form order',
       'Possession',
       'On or before 4pm on 4 December 2026',
     ]);
+  });
+});
+
+describe('orderDetails: what court staff record a free-form order does', () => {
+  const SUSPENDED = {
+    'order-does': 'suspended',
+    'suspended-date-day': '1',
+    'suspended-date-month': '2',
+    'suspended-date-year': '2027',
+  };
+
+  it('calls an order none of the others describes a general order', () => {
+    expect(ORDER_DOES.find(option => option.value === 'other')?.text).toBe('General order');
+    expect(orderDetailsRows({ 'order-does': 'other' })).toEqual([['What does the order do?', 'General order']]);
+  });
+
+  it('asks only when possession is ordered by for suspended possession', () => {
+    expect(validateOrderDetails(SUSPENDED)).toEqual([]);
+    expect(orderDetailsRows(SUSPENDED)).toEqual([
+      ['What does the order do?', 'Suspended possession'],
+      ['Possession on or before', '1 February 2027'],
+    ]);
+    expect(orderDetailsRequest(SUSPENDED)).toEqual({ kind: 'SUSPENDED_POSSESSION', possessionDate: '2027-02-01' });
   });
 });
