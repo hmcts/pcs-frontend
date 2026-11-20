@@ -394,7 +394,8 @@ export function applicationPrefix(application: { id: string }): string {
  */
 function validateApplications(
   formData: Record<string, unknown>,
-  applications: readonly ApplicationToDecide[]
+  applications: readonly ApplicationToDecide[],
+  withoutHearing: boolean
 ): MakeOrderValidationIssue[] {
   const { issues, add } = validation(formData);
   for (const application of applications) {
@@ -403,8 +404,8 @@ function validateApplications(
     const allowed =
       (APPLICATION_DECISIONS as readonly string[]).includes(decision) &&
       !(application.required && decision === 'none') &&
-      // An application to suspend enforcement is never struck out.
-      !(application.enforcementSuspension && decision === 'strike-out');
+      // Striking out is a decision on the papers, and never one on an application to suspend enforcement.
+      !(decision === 'strike-out' && (!withoutHearing || application.enforcementSuspension));
     add(allowed, `${prefix}-decision`, `Select what you decide about application ${application.reference}`);
     // Listed at one of the case's hearings, the order only says which, so only a new hearing asks when.
     if (decision === 'list' && (value(formData, `${prefix}-list-at`) || 'new') === 'new') {
@@ -564,7 +565,7 @@ export function validateMakeOrder(
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
     ...(withoutHearing && chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
     ...validateOrderType(orderType, formData),
-    ...validateApplications(formData, applications),
+    ...validateApplications(formData, applications, withoutHearing),
     ...validateNotice(formData),
     ...(chosen('staff-message') ? validateStaffMessage(formData) : []),
   ];

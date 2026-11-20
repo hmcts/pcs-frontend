@@ -118,6 +118,18 @@ describe('make an order: deciding applications', () => {
       expect(control('[name="app-gen-app-2-decision"][value="none"]').checked).toBe(true);
     });
 
+    it('offers no striking out at a hearing, and refuses it', async () => {
+      const page = await openPage((await app.get(PAGE)).text);
+      const offered = [...document.querySelectorAll<HTMLInputElement>(`[name="${P}-decision"]`)].map(input => input.value);
+      expect(offered).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
+      recordAttendance();
+      const body = page.body('SUBMIT_FOR_REVIEW');
+      body.set(`${P}-decision`, 'strike-out');
+      const rejected = await app.post(PAGE, body);
+      expect(rejected.status).toBe(400);
+      expect(rejected.text).toContain('Select what you decide about application GA1');
+    });
+
     it('shows no applications section, and the claim without a tick box, when the case has none open', async () => {
       await app.close();
       app = await bootApp();
@@ -197,6 +209,8 @@ describe('make an order: deciding applications', () => {
       expect(control<HTMLDetailsElement>(`details#${P}-more`).open).toBe(true);
       expect(control<HTMLDetailsElement>('details#app-gen-app-2-more').open).toBe(false);
       expect(document.querySelector(`[name="${P}-decision"]:checked`)).toBeNull();
+      // On the papers it may be struck out.
+      expect(document.querySelector(`[name="${P}-decision"][value="strike-out"]`)).not.toBeNull();
       expect(control(`#${P}-details`).textContent).toContain('Alex Example (Defendant 1)');
       expect(control<HTMLAnchorElement>(`#${P}-details a`).href).toContain(
         `/case/${CASE_REFERENCE}/view-documents/3f2a6c1e-0000-4000-8000-000000000001`

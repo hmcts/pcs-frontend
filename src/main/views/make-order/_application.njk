@@ -73,13 +73,16 @@
 {% macro decision(application) %}
   {% set prefix = application.prefix %}
   {% set name = prefix + "-decision" %}
-  {# An application to suspend enforcement is granted, dismissed or listed, never struck out (judicial feedback, 10 November). #}
+  {#
+    Striking out is a decision on the papers, so an order made at a hearing offers none, and an application to
+    suspend enforcement is never struck out (judicial feedback, November 2026).
+  #}
   {% set items = [
     { value: "none", text: "Not dealt with" },
     { value: "grant", text: "Granted" },
     { value: "dismiss", text: "Dismissed" }
   ] %}
-  {% if not application.enforcementSuspension %}
+  {% if withoutHearing and not application.enforcementSuspension %}
     {% set items = items.concat([{ value: "strike-out", text: "Struck out" }]) %}
   {% endif %}
   {% set items = items.concat([
