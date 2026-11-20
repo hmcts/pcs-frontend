@@ -370,6 +370,7 @@ function updateWarrantReturnVisibility(): void {
   });
 
   setSectionVisible('return-type-conditional', isInterim || isFinal, () => undefined);
+  setSectionVisible('final-outcome-conditional', isEvictionSuccessful || isEvictionUnsuccessfulOrCancelled, () => undefined);
 
   const isReturnDateVisible = isEvictionUnsuccessfulOrCancelled || isInterim;
   const returnDateSection = document.getElementById('return-date-section');
