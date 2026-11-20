@@ -73,18 +73,24 @@
 {% macro decision(application) %}
   {% set prefix = application.prefix %}
   {% set name = prefix + "-decision" %}
+  {# An application to suspend enforcement is granted, dismissed or listed, never struck out (judicial feedback, 10 November). #}
+  {% set items = [
+    { value: "none", text: "Not dealt with" },
+    { value: "grant", text: "Granted" },
+    { value: "dismiss", text: "Dismissed" }
+  ] %}
+  {% if not application.enforcementSuspension %}
+    {% set items = items.concat([{ value: "strike-out", text: "Struck out" }]) %}
+  {% endif %}
+  {% set items = items.concat([
+    { value: "list", text: "Listed for a hearing" },
+    { value: "other", text: "Something else" }
+  ]) %}
   {{ compact.radios(name, {
     legend: "What do you decide about application " + application.reference + "?",
     classes: "govuk-radios--small govuk-radios--inline",
     default: none if application.required else "none",
-    items: [
-      { value: "none", text: "Not dealt with" },
-      { value: "grant", text: "Granted" },
-      { value: "dismiss", text: "Dismissed" },
-      { value: "strike-out", text: "Struck out" },
-      { value: "list", text: "Listed for a hearing" },
-      { value: "other", text: "Something else" }
-    ]
+    items: items
   }) }}
 
   {% if application.whatOrderWanted %}

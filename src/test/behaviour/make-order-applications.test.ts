@@ -421,6 +421,17 @@ describe('make an order: deciding applications', () => {
       expect((await app.post(WARRANT_PAGE, page.body('SUBMIT_FOR_REVIEW'))).status).toBe(302);
     });
 
+    it('offers no striking out, and refuses it', async () => {
+      const page = await openPage((await app.get(WARRANT_PAGE)).text);
+      const offered = [...document.querySelectorAll<HTMLInputElement>(`[name="${W}-decision"]`)].map(input => input.value);
+      expect(offered).toEqual(['none', 'grant', 'dismiss', 'list', 'other']);
+      const body = page.body('SUBMIT_FOR_REVIEW');
+      body.set(`${W}-decision`, 'strike-out');
+      const rejected = await app.post(WARRANT_PAGE, body);
+      expect(rejected.status).toBe(400);
+      expect(rejected.text).toContain('Select what you decide about application GA2');
+    });
+
     it('dismisses it with nothing more to answer', async () => {
       const page = await openPage((await app.get(WARRANT_PAGE)).text);
       check(`${W}-decision`, 'dismiss');

@@ -401,7 +401,10 @@ function validateApplications(
     const prefix = applicationPrefix(application);
     const decision = value(formData, `${prefix}-decision`) || 'none';
     const allowed =
-      (APPLICATION_DECISIONS as readonly string[]).includes(decision) && !(application.required && decision === 'none');
+      (APPLICATION_DECISIONS as readonly string[]).includes(decision) &&
+      !(application.required && decision === 'none') &&
+      // An application to suspend enforcement is never struck out.
+      !(application.enforcementSuspension && decision === 'strike-out');
     add(allowed, `${prefix}-decision`, `Select what you decide about application ${application.reference}`);
     // Listed at one of the case's hearings, the order only says which, so only a new hearing asks when.
     if (decision === 'list' && (value(formData, `${prefix}-list-at`) || 'new') === 'new') {
