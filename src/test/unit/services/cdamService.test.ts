@@ -190,7 +190,7 @@ describe('cdamService', () => {
       mockDelete.mockResolvedValue({});
       const uuid = 'abc12345-1234-1234-1234-123456789abc';
 
-      await deleteDocument(`http://dm-store-aat.service.core-compute-aat.internal/documents/${uuid}`, userToken);
+      await deleteDocument(`http://dm-store.example.com/documents/${uuid}`, userToken);
 
       expect(mockDelete).toHaveBeenCalledWith(
         `${mockCdamUrl}/cases/documents/${uuid}`,
