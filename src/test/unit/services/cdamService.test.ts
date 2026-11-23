@@ -1,10 +1,18 @@
 import config from 'config';
 
 import { http } from '@modules/http';
+import { Logger } from '@modules/logger';
 import { deleteDocument, getDocumentBinary, uploadDocument } from '@services/cdamService';
 
 jest.mock('config');
 jest.mock('@modules/http');
+// Built inside the factory: @modules/http asks for a logger while it is imported, before this file's own consts exist.
+jest.mock('@modules/logger', () => {
+  const logger = { info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() };
+  return { Logger: { getLogger: jest.fn(() => logger) } };
+});
+
+const mockLogger = Logger.getLogger('cdamService') as unknown as Record<'info' | 'warn' | 'error' | 'debug', jest.Mock>;
 
 const mockPost = http.post as jest.Mock;
 const mockDelete = http.delete as jest.Mock;
@@ -83,6 +91,33 @@ describe('cdamService', () => {
         content_type: 'application/pdf',
         size: 1024,
       });
+    });
+
+    it('keeps the hash token CDAM issued, so pcs-api can attach the draft upload to the case', async () => {
+      mockPost.mockResolvedValue({
+        data: { documents: [{ ...cdamResponse.data.documents[0], hashToken: 'hash-123' }] },
+      });
+
+      const result = await uploadDocument(createMockFile(), userToken);
+
+      expect(result.document_hash).toBe('hash-123');
+      expect(mockLogger.info).toHaveBeenCalledWith(
+        'Document uploaded to CDAM',
+        expect.objectContaining({ hasHashToken: true })
+      );
+      expect(JSON.stringify(mockLogger.info.mock.calls)).not.toContain('hash-123');
+      expect(mockLogger.warn).not.toHaveBeenCalled();
+    });
+
+    it('warns when CDAM returns no hash token, so an upload pcs-api cannot attach reaches App Insights', async () => {
+      mockPost.mockResolvedValue(cdamResponse);
+
+      await uploadDocument(createMockFile(), userToken);
+
+      expect(mockLogger.warn).toHaveBeenCalledWith(
+        'CDAM returned no hash token, so the upload will not be attached to the case',
+        { documentUrl: 'http://dm-store/documents/abc-123' }
+      );
     });
 
     it('uses file originalname when CDAM returns no document name', async () => {
@@ -242,95 +277,30 @@ describe('cdamService', () => {
         headers: {},
       });
 
-      const result = await getDocumentBinary('http://some-url/binary', userToken);
+      const result = await getDocumentBinary('http://dm-store/documents/test-123/binary', userToken);
 
       expect(result.contentType).toBe('application/octet-stream');
       expect(result.contentLength).toBeUndefined();
       expect(result.contentDisposition).toBeUndefined();
     });
 
-    it('falls back to direct DM-Store binaryUrl when CDAM returns 403 Forbidden', async () => {
-      const mockStream = { pipe: jest.fn(), on: jest.fn() };
+    it('does not bypass CDAM when document access is denied', async () => {
       const cdamError = {
         response: { status: 403 },
         message: 'Forbidden',
       };
-      mockGet.mockRejectedValueOnce(cdamError).mockResolvedValueOnce({
-        data: mockStream,
-        headers: {
-          'content-type': 'application/pdf',
-        },
-      });
+      mockGet.mockRejectedValue(cdamError);
 
       const binaryUrl = 'http://dm-store/documents/test-123/binary';
-      const result = await getDocumentBinary(binaryUrl, userToken);
+      await expect(getDocumentBinary(binaryUrl, userToken)).rejects.toEqual(cdamError);
 
-      expect(mockGet).toHaveBeenNthCalledWith(
-        1,
+      expect(mockGet).toHaveBeenCalledWith(
         `${mockCdamUrl}/cases/documents/test-123/binary`,
         expect.objectContaining({
           headers: expect.objectContaining({ Authorization: `Bearer ${userToken}` }),
         })
       );
-      expect(mockGet).toHaveBeenNthCalledWith(
-        2,
-        binaryUrl,
-        expect.objectContaining({
-          headers: expect.objectContaining({ Authorization: `Bearer ${userToken}` }),
-        })
-      );
-      expect(result.stream).toBe(mockStream);
-    });
-
-    it('falls back to S2S service headers when DM-Store user token fetch also returns 403 Forbidden', async () => {
-      const mockStream = { pipe: jest.fn(), on: jest.fn() };
-      const cdamError = {
-        response: { status: 403 },
-        message: 'Forbidden',
-      };
-      const userError = {
-        response: { status: 403 },
-        message: 'User forbidden',
-      };
-      mockGet
-        .mockRejectedValueOnce(cdamError)
-        .mockRejectedValueOnce(userError)
-        .mockResolvedValueOnce({
-          data: mockStream,
-          headers: {
-            'content-type': 'application/pdf',
-          },
-        });
-
-      const binaryUrl = 'http://dm-store/documents/test-123/binary';
-      const result = await getDocumentBinary(binaryUrl, userToken);
-
-      expect(mockGet).toHaveBeenNthCalledWith(
-        3,
-        binaryUrl,
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            'user-id': 'pcs-frontend-service',
-            'user-roles': 'caseworker-civil,caseworker-civil-solicitor,pui-case-manager',
-          }),
-        })
-      );
-      expect(result.stream).toBe(mockStream);
-    });
-
-    it('rethrows original CDAM error if all 403 fallbacks fail', async () => {
-      const cdamError = {
-        response: { status: 403 },
-        message: 'Forbidden',
-      };
-      const fallbackError = new Error('Fallback failed');
-      mockGet
-        .mockRejectedValueOnce(cdamError)
-        .mockRejectedValueOnce(fallbackError)
-        .mockRejectedValueOnce(fallbackError);
-
-      const binaryUrl = 'http://dm-store/documents/test-123/binary';
-      await expect(getDocumentBinary(binaryUrl, userToken)).rejects.toEqual(cdamError);
+      expect(mockGet).toHaveBeenCalledTimes(1);
     });
 
     it('rethrows fetch errors from CDAM', async () => {
