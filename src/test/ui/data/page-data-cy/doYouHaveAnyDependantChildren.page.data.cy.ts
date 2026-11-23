@@ -1,0 +1,23 @@
+export const doYouHaveAnyDependantChildren = {
+  mainHeader: `A oes gennych chi unrhyw blant sy’n ddibynnol arnoch?`,
+  //uncomment the below line when BUG HDPI-7697 is fixed
+  //dependantChildrenParagraph: `Dependent children are children you look after financially.`,
+  yesRadioOption: `Oes`,
+  noRadioOption: `Nac oes`,
+  giveDetailsHiddenTextLabel: `Rhowch fanylion eich plant dibynnol`,
+  detailsTextInput: `1 dependant child - Name:Samuel and Age:7`,
+  saveAndContinueButton: `Cadw a pharhau`,
+  youShouldIncludeHiddenHintText: `Dylech gynnwys manylion am faint o blant dibynnol sydd gennych a faint yw eu hoed`,
+  tooManyCharacterHiddenHintText: `You have 1 character too many`,
+  youHave500CharactersHiddenHintText: `Gallwch nodi hyd at 500 o nodau`,
+  thereIsAProblemErrorMessageHeader: `Mae yna broblem`,
+  selectIfYouHaveAnyDependentChildrenErrorMessage: `Dewiswch a oes gennych chi unrhyw blant sy’n ddibynnol arnoch`,
+  giveDetailsAboutYourDependentChildrenErrorMessage: `Rhowch fanylion eich plant dibynnol`,
+  mustBeUnderCharacterLimitErrorMessage: `Rhaid i fanylion plant dibynnol fod yn 500 o nodau neu lai`,
+  saveForLaterButton: `Cadw at hwyrach ymlaen`,
+  backLink: `Yn ôl`,
+  emojiTextInput: `👉 😄`,
+  emojiErrorMessage: `Dylai Rhowch fanylion eich plant dibynnol ond cynnwys llythrennau a i z, a nodau arbennig fel cysylltnod, bylchau a chollnod`,
+  feedbackLink: `adborth (yn agor mewn tab newydd)`,
+  pageSlug: `do-you-have-any-dependant-children`,
+};
