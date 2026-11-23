@@ -1,5 +1,4 @@
 export const chooseAnApplication = {
-  // defendant-general-applications-r-2 OFF copy (as on AAT); with the flag ON the heading is "Choose your application".
   mainHeader: `Choose an application`,
   whatDoYouWantToApplyForQuestion: `What do you want to apply for?`,
   adjournTheHearingRadioOption: `Ask to adjourn the hearing (move it to a later time or date)`,
