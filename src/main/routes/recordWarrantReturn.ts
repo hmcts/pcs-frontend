@@ -55,9 +55,9 @@ export const ADDITIONAL_DETAILS_MAX_LENGTH: number = 6800;
 const ADDITIONAL_DETAILS_TOO_LONG_ERROR_MESSAGE: string = `Additional details must be ${ADDITIONAL_DETAILS_MAX_LENGTH.toLocaleString('en-GB')} characters or fewer`;
 
 const EVICTION_DATE_ID = 'eviction-date';
-const EVICTION_DATE_PARTS = ['day', 'month', 'year', 'hour', 'minute'] as const;
-type EvictionDatePart = (typeof EVICTION_DATE_PARTS)[number];
-const EVICTION_DATE_ZONE = 'Europe/London';
+const OUTCOME_DATE_PARTS = ['day', 'month', 'year', 'hour', 'minute'] as const;
+type EvictionDatePart = (typeof OUTCOME_DATE_PARTS)[number];
+const OUTCOME_DATE_ZONE = 'Europe/London';
 const EVICTION_DATE_REQUIRED_ERROR_MESSAGE: string = 'Eviction date and time is required';
 const EVICTION_DATE_ERROR_MESSAGE: string = 'The data entered is not valid for Eviction date and time';
 const EVICTION_DATE_FUTURE_ERROR_MESSAGE: string = 'Eviction time cannot be in the future';
@@ -300,32 +300,32 @@ function answersFromBody(body: Record<string, unknown> | undefined): WarrantRetu
     interimReturnName: text(body, 'interim-return-name').trim(),
     additionalDetails: text(body, 'additional-details'),
     evictionDate: Object.fromEntries(
-      EVICTION_DATE_PARTS.map(part => [part, text(body, `${EVICTION_DATE_ID}-${part}`).trim()])
+      OUTCOME_DATE_PARTS.map(part => [part, text(body, `${EVICTION_DATE_ID}-${part}`).trim()])
     ) as Record<EvictionDatePart, string>,
     returnDateFinal: Object.fromEntries(
-      EVICTION_DATE_PARTS.map(part => [part, text(body, `${RETURN_DATE_FINAL_ID}-${part}`).trim()])
+      OUTCOME_DATE_PARTS.map(part => [part, text(body, `${RETURN_DATE_FINAL_ID}-${part}`).trim()])
     ) as Record<EvictionDatePart, string>,
     returnDateInterim: Object.fromEntries(
-      EVICTION_DATE_PARTS.map(part => [part, text(body, `${RETURN_DATE_INTERIM_ID}-${part}`).trim()])
+      OUTCOME_DATE_PARTS.map(part => [part, text(body, `${RETURN_DATE_INTERIM_ID}-${part}`).trim()])
     ) as Record<EvictionDatePart, string>,
   };
 }
 
 function answersFromSession(warrantReturn: WarrantReturn | undefined): WarrantReturnAnswers {
   const outcomeDate = warrantReturn?.outcomeDate
-    ? DateTime.fromISO(warrantReturn.outcomeDate, { zone: 'utc' }).setZone(EVICTION_DATE_ZONE)
+    ? DateTime.fromISO(warrantReturn.outcomeDate, { zone: 'utc' }).setZone(OUTCOME_DATE_ZONE)
     : undefined;
   const isFinal = warrantReturn?.returnType === WarrantReturnType.FINAL;
   const outcome = warrantReturn?.evictionOutcome;
 
   const formattedDateParts = Object.fromEntries(
-    EVICTION_DATE_PARTS.map(part => [
+    OUTCOME_DATE_PARTS.map(part => [
       part,
       outcomeDate?.isValid ? String(part === 'minute' ? outcomeDate.toFormat('mm') : outcomeDate[part]) : '',
     ])
   ) as Record<EvictionDatePart, string>;
 
-  const emptyDateParts = Object.fromEntries(EVICTION_DATE_PARTS.map(part => [part, ''])) as Record<
+  const emptyDateParts = Object.fromEntries(OUTCOME_DATE_PARTS.map(part => [part, ''])) as Record<
     EvictionDatePart,
     string
   >;
@@ -513,8 +513,8 @@ function validateDate(
 ): string | undefined {
   const fieldId = (part: EvictionDatePart) => `${id}-${part}`;
 
-  const missing = EVICTION_DATE_PARTS.filter(part => !parts[part]);
-  if (missing.length === EVICTION_DATE_PARTS.length) {
+  const missing = OUTCOME_DATE_PARTS.filter(part => !parts[part]);
+  if (missing.length === OUTCOME_DATE_PARTS.length) {
     issues.push({ id: fieldId('day'), message: requiredErrorMessage });
     return undefined;
   }
@@ -523,7 +523,7 @@ function validateDate(
     return undefined;
   }
 
-  const notNumeric = EVICTION_DATE_PARTS.find(part =>
+  const notNumeric = OUTCOME_DATE_PARTS.find(part =>
     part === 'year' ? !/^\d{4}$/.test(parts[part]) : !/^\d{1,2}$/.test(parts[part])
   );
   if (notNumeric) {
@@ -531,8 +531,8 @@ function validateDate(
     return undefined;
   }
 
-  const [day, month, year, hour, minute] = EVICTION_DATE_PARTS.map(part => Number(parts[part]));
-  const evictionDate = DateTime.fromObject({ day, month, year, hour, minute }, { zone: EVICTION_DATE_ZONE });
+  const [day, month, year, hour, minute] = OUTCOME_DATE_PARTS.map(part => Number(parts[part]));
+  const evictionDate = DateTime.fromObject({ day, month, year, hour, minute }, { zone: OUTCOME_DATE_ZONE });
   if (!evictionDate.isValid || evictionDate.hour !== hour || evictionDate.minute !== minute) {
     issues.push({ id: fieldId('day'), message: invalidErrorMessage });
     return undefined;
