@@ -445,11 +445,11 @@ describe('warrantReturn', () => {
     });
 
     it('clears the interim return name and return date when the return changes to final and successful', () => {
-      renderPage({ returnType: WarrantReturnType.INTERIM, interim: InterimReturnName.REOPEN_WARRANT }, "1");
+      renderPage({ returnType: WarrantReturnType.INTERIM, interim: InterimReturnName.REOPEN_WARRANT }, '1');
       initWarrantReturn();
 
       choose('return-type', WarrantReturnType.FINAL);
-      choose('final-outcome', EvictionOutcome.SUCCESSFUL)
+      choose('final-outcome', EvictionOutcome.SUCCESSFUL);
 
       expect(visibleSections()).toEqual(['final-outcome-section', 'eviction-successful']);
       expect(select('interim-return-name').value).toBe('');
@@ -461,7 +461,7 @@ describe('warrantReturn', () => {
         {
           returnType: WarrantReturnType.FINAL,
           finalOutcome: EvictionOutcome.UNSUCCESSFUL,
-          unsuccessful: EvictionUnsuccessfulReturnName.EVICTION_NOT_CONFIRMED
+          unsuccessful: EvictionUnsuccessfulReturnName.EVICTION_NOT_CONFIRMED,
         },
         '1'
       );
@@ -474,7 +474,6 @@ describe('warrantReturn', () => {
       expect(select('eviction-unsuccessful-return-name').value).toBe('');
       expect(returnDateValuesFinal()).toEqual(['', '', '', '', '']);
     });
-
 
     it('keeps sections hidden and answers clear when the return is unselected', () => {
       renderPage({ returnType: WarrantReturnType.FINAL, finalOutcome: EvictionOutcome.UNSUCCESSFUL });
