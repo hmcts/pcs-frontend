@@ -1,0 +1,17 @@
+export const yourHouseholdAndCircumstances = {
+  mainHeader: `Eich cartref a’ch amgylchiadau`,
+  youMustNowAnswerParagraph: `Rhaid i chi nawr ateb rhai cwestiynau am eich cartref ac amgylchiadau personol. Bydd hyn yn helpu barnwr i ddeall eich sefyllfa.`,
+  youWillBeParagraph: `Gofynnir ichi am:`,
+  anyDependantsList: `unrhyw ddibynyddion sydd gennych (pobl rydych yn gofalu amdanynt yn ariannol)`,
+  otherAdultsList: `oedolion eraill sy’n byw yn eich cartref`,
+  whetherYouWouldList: `pa un a fyddai gennych rywle arall i fyw os gofynnir i chi adael eich cartref`,
+  anyPersonalList: `unrhyw amgylchiadau personol sydd wedi arwain at eich achos yr ydych yn meddwl y dylai barnwr wybod amdanynt`,
+  anyExceptionalHardshipList: `unrhyw galedi eithriadol a brofir gennych os gofynnir i chi adael eich cartref`,
+  theClaimantWillBeParagraph: `Bydd yr hawlydd yn gallu gweld eich atebion.`,
+  continueButton: `Parhau`,
+  cancelLink: `Canslo`,
+  cymraegLink: `English`,
+  backLink: `Yn ôl`,
+  feedbackLink: `adborth (yn agor mewn tab newydd)`,
+  pageSlug: `your-household-and-circumstances`,
+};

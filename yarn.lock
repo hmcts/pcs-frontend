@@ -8725,14 +8725,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:14.0.4":
-  version: 14.0.4
-  resolution: "glob@npm:14.0.4"
+"glob@npm:14.0.6":
+  version: 14.0.6
+  resolution: "glob@npm:14.0.6"
   dependencies:
     minimatch: "npm:^11.0.5"
     minipass: "npm:^7.1.3"
     path-scurry: "npm:^3.0.0"
-  checksum: 10/d43e532cc85bd2e26bc3a0064a809ed57f2581999fb0bf2b6bafe7d394358fac2693331c313d6eccc9952e0f2bfdd78f53c88ad06a657dc47c6bc99745e470e2
+  checksum: 10/6674454c61d4146ce33c9bfa7980273c16f14893538805ca4c38ca4de7fc1823f01ea4db10da8db4e2d18391fa58c9ad6b72b59b0598ac60b8bce746429e84ea
   languageName: node
   linkType: hard
 
@@ -10510,10 +10510,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jose@npm:6.2.17":
-  version: 6.2.17
-  resolution: "jose@npm:6.2.17"
-  checksum: 10/df6ae5da42e71a4c3bd1483534c5579ed32f5806ec362ea472f309e8e57aef42afa1dbac62289596975d3587f7ac38deefe4313e1434ce76972ea0f029070bc9
+"jose@npm:6.2.18":
+  version: 6.2.18
+  resolution: "jose@npm:6.2.18"
+  checksum: 10/6a3962e4d09599dc359129bf2b29eefcd0436e1a8b1002f53b9e672e7f21df546736d4a5ac53e3cfbfcea9f4126354247d5efcb860e267fda82924e8bd19a8b6
   languageName: node
   linkType: hard
 
@@ -11269,13 +11269,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:11.0.8":
-  version: 11.0.8
-  resolution: "minimatch@npm:11.0.8"
+"minimatch@npm:11.0.9":
+  version: 11.0.9
+  resolution: "minimatch@npm:11.0.9"
   dependencies:
     "@isaacs/nonrecursive-glob-match": "npm:^1.1.0"
     brace-expansion: "npm:^5.0.12"
-  checksum: 10/c72623c8c38bf28a8c01634fbceab5bb3be1b68af5bc21cd32bc41968cd356bed570a88feb4c7da3a70322604d5d9afc9d8a96a799aeecafb7d2784ee3d7f2d4
+  checksum: 10/5a17bd87033371c50dbabead4b461d3a40ffedb496939a2da14f67f1381813db959ec0d32716cfe4eaa83f3ae945cdee2343398be20f7d195799d8b12981565d
   languageName: node
   linkType: hard
 
@@ -12169,7 +12169,7 @@ __metadata:
     express: "npm:5.3.0"
     express-session: "npm:1.19.0"
     git-rev-sync: "npm:3.0.2"
-    glob: "npm:14.0.4"
+    glob: "npm:14.0.6"
     globals: "npm:17.12.0"
     govuk-frontend: "npm:6.5.1"
     helmet: "npm:8.3.0"
@@ -12184,7 +12184,7 @@ __metadata:
     jest-environment-jsdom: "npm:30.5.2"
     jest-html-reporter: "npm:4.4.3"
     jest-pact: "npm:0.14.0"
-    jose: "npm:6.2.17"
+    jose: "npm:6.2.18"
     lint-staged: "npm:17.5.1"
     lodash: "npm:4.18.1"
     luxon: "npm:3.7.2"
@@ -12196,7 +12196,7 @@ __metadata:
     openid-client: "npm:6.8.9"
     playwright: "npm:1.62.1"
     playwright-core: "npm:1.62.1"
-    postcss: "npm:8.5.32"
+    postcss: "npm:8.5.33"
     prettier: "npm:3.9.10"
     sass: "npm:1.106.1"
     sass-loader: "npm:17.0.1"
@@ -12520,14 +12520,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.5.32":
-  version: 8.5.32
-  resolution: "postcss@npm:8.5.32"
+"postcss@npm:8.5.33":
+  version: 8.5.33
+  resolution: "postcss@npm:8.5.33"
   dependencies:
     nanoid: "npm:^3.3.20"
     picocolors: "npm:^1.1.1"
     source-map-js: "npm:^1.2.2"
-  checksum: 10/c86fd279d9f29d34bbec6482e01f54effe00eaf8f4dadbe17f8345d11eac68439da45d642b04bfb5d704886f665d2c31f9a0904f2a3f1b9f8098ee0894f76cea
+  checksum: 10/89136a68865e151c06635707d04e147d0e13d61210927246acfef1ff189663dc6fdb77341a167bf0ac235c0683e7c2af21ac43672660795d22d759cb66134406
   languageName: node
   linkType: hard
 
@@ -12771,12 +12771,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prosemirror-transform@npm:1.12.5":
-  version: 1.12.5
-  resolution: "prosemirror-transform@npm:1.12.5"
+"prosemirror-transform@npm:1.12.6":
+  version: 1.12.6
+  resolution: "prosemirror-transform@npm:1.12.6"
   dependencies:
     prosemirror-model: "npm:^1.21.0"
-  checksum: 10/75aefa8701a1e7f625b4c2b1cdcacdaf1a3ebaae71cadb50d53370d2065e47ef0919a135f0bbd44a35559aed966a9d750869664daa9f2aeecc47d7336301d41f
+  checksum: 10/d0980bdb1e5d6a6a9cb58b06af4b3acf90d3cba0ea1a990e06af28f17f4799d71ba05976e544e7cbd4057fd0e1ae16e6964d4d3b0b4a9c9171b498f39fd26b7e
   languageName: node
   linkType: hard
 
