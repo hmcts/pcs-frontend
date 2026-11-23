@@ -60,12 +60,11 @@ type EvictionDatePart = (typeof EVICTION_DATE_PARTS)[number];
 const EVICTION_DATE_ZONE = 'Europe/London';
 const EVICTION_DATE_REQUIRED_ERROR_MESSAGE: string = 'Eviction date and time is required';
 const EVICTION_DATE_ERROR_MESSAGE: string = 'The data entered is not valid for Eviction date and time';
-const EVICTION_DATE_LABEL: string = 'Eviction date and time';
 const EVICTION_DATE_FUTURE_ERROR_MESSAGE: string = 'Eviction time cannot be in the future';
 
-const RETURN_DATE_ID = 'return-date';
-const RETURN_DATE_LABEL: string = 'Return date and time';
-const RETURN_DATE_REQUIRED_ERROR_MESSAGE: string = 'Eviction date and time is required';
+const RETURN_DATE_FINAL_ID = 'return-date-final';
+const RETURN_DATE_INTERIM_ID = 'return-date-interim';
+const RETURN_DATE_REQUIRED_ERROR_MESSAGE: string = 'Return date and time is required';
 const RETURN_DATE_ERROR_MESSAGE: string = 'Return time must be a real time, using the 24-hour clock';
 const RETURN_DATE_FUTURE_ERROR_MESSAGE: string = 'Return date must be today or in the past';
 
@@ -77,7 +76,8 @@ export interface WarrantReturnAnswers {
   interimReturnName: string;
   additionalDetails: string;
   evictionDate: Record<EvictionDatePart, string>;
-  returnDate: Record<EvictionDatePart, string>;
+  returnDateFinal: Record<EvictionDatePart, string>;
+  returnDateInterim: Record<EvictionDatePart, string>;
 }
 
 interface ValidationResult {
@@ -180,10 +180,9 @@ function formModel(
     headerModel: xuiHeaderModel(req),
     additionalDetailsMaxLength: ADDITIONAL_DETAILS_MAX_LENGTH,
     answers,
-    evictionDateLabel: EVICTION_DATE_LABEL,
-    returnDateLabel: RETURN_DATE_LABEL,
     evictionDateError: issues.find(issue => issue.id.startsWith(`${EVICTION_DATE_ID}-`))?.message,
-    returnDateError: issues.find(issue => issue.id.startsWith(`${RETURN_DATE_ID}-`))?.message,
+    returnDateFinalError: issues.find(issue => issue.id.startsWith(`${RETURN_DATE_FINAL_ID}-`))?.message,
+    returnDateInterimError: issues.find(issue => issue.id.startsWith(`${RETURN_DATE_INTERIM_ID}-`))?.message,
   };
 }
 
@@ -303,8 +302,11 @@ function answersFromBody(body: Record<string, unknown> | undefined): WarrantRetu
     evictionDate: Object.fromEntries(
       EVICTION_DATE_PARTS.map(part => [part, text(body, `${EVICTION_DATE_ID}-${part}`).trim()])
     ) as Record<EvictionDatePart, string>,
-    returnDate: Object.fromEntries(
-      EVICTION_DATE_PARTS.map(part => [part, text(body, `${RETURN_DATE_ID}-${part}`).trim()])
+    returnDateFinal: Object.fromEntries(
+      EVICTION_DATE_PARTS.map(part => [part, text(body, `${RETURN_DATE_FINAL_ID}-${part}`).trim()])
+    ) as Record<EvictionDatePart, string>,
+    returnDateInterim: Object.fromEntries(
+      EVICTION_DATE_PARTS.map(part => [part, text(body, `${RETURN_DATE_INTERIM_ID}-${part}`).trim()])
     ) as Record<EvictionDatePart, string>,
   };
 }
@@ -338,7 +340,8 @@ function answersFromSession(warrantReturn: WarrantReturn | undefined): WarrantRe
     interimReturnName: (warrantReturn?.returnType === WarrantReturnType.INTERIM && warrantReturn.returnName) || '',
     additionalDetails: warrantReturn?.additionalDetails ?? '',
     evictionDate: isFinal && outcome === EvictionOutcome.SUCCESSFUL ? formattedDateParts : emptyDateParts,
-    returnDate: !isFinal || outcome !== EvictionOutcome.SUCCESSFUL ? formattedDateParts : emptyDateParts,
+    returnDateFinal: isFinal && outcome !== EvictionOutcome.SUCCESSFUL ? formattedDateParts : emptyDateParts,
+    returnDateInterim: !isFinal ? formattedDateParts : emptyDateParts,
   };
 }
 
@@ -413,7 +416,7 @@ function validateEvictionUnsuccessful(answers: WarrantReturnAnswers, outcome: Ev
     issues.push({ id: 'eviction-unsuccessful-return-name', message: RETURN_NAME_ERROR_MESSAGE });
   }
 
-  const returnDate = validateReturnDate(answers.returnDate, issues);
+  const returnDate = validateReturnDate(answers.returnDateFinal, RETURN_DATE_FINAL_ID, issues);
 
   if (issues.length > 0) {
     return { issues };
@@ -439,7 +442,7 @@ function validateInterimWarrantReturn(answers: WarrantReturnAnswers): Validation
     issues.push({ id: 'interim-return-name', message: RETURN_NAME_ERROR_MESSAGE });
   }
 
-  const returnDate = validateReturnDate(answers.returnDate, issues);
+  const returnDate = validateReturnDate(answers.returnDateInterim, RETURN_DATE_INTERIM_ID, issues);
 
   if (issues.length > 0) {
     return { issues };
@@ -484,12 +487,13 @@ function validateEvictionDate(
 
 function validateReturnDate(
   parts: Record<EvictionDatePart, string>,
+  id: string,
   issues: ValidationIssue[],
   now: DateTime = DateTime.now()
 ): string | undefined {
   return validateDate(
     parts,
-    RETURN_DATE_ID,
+    id,
     RETURN_DATE_REQUIRED_ERROR_MESSAGE,
     RETURN_DATE_ERROR_MESSAGE,
     RETURN_DATE_FUTURE_ERROR_MESSAGE,

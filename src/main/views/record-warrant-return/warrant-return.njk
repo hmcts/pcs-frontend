@@ -58,7 +58,7 @@
 
             {{ dateInput(
                 "eviction-date",
-                evictionDateLabel,
+                "Eviction date and time",
                 "For example, 27 3 2026 14 30. Use the 24-hour clock.",
                 answers.evictionDate,
                 evictionDateError
@@ -78,6 +78,15 @@
                 errorMessage: validationErrors["eviction-unsuccessful-return-name"]
               })
             }}
+
+            {{ dateInput(
+              "return-date-final",
+              "Return date and time",
+              "For example, 27 3 2026 14 30. Use the 24-hour clock.",
+              answers.returnDateFinal,
+              returnDateFinalError
+              )
+            }}
           </div>
         </div>
       </div>
@@ -94,15 +103,13 @@
               errorMessage: validationErrors["interim-return-name"]
             })
           }}
-        </div>
 
-        <div id="return-date-section" class="govuk-!-display-none">
           {{ dateInput(
-              "return-date",
-              returnDateLabel,
+              "return-date-interim",
+              "Return date and time",
               "For example, 27 3 2026 14 30. Use the 24-hour clock.",
-              answers.returnDate,
-              returnDateError
+              answers.returnDateInterim,
+              returnDateInterimError
             )
           }}
         </div>

@@ -305,7 +305,6 @@ export function isAdditionalDetailsMandatory(selection: WarrantReturnSelection):
 }
 
 const HIDDEN_CLASS = 'govuk-!-display-none';
-const CONDITIONAL_CLASS = 'govuk-checkboxes__conditional';
 const DEFAULT_ADDITIONAL_DETAILS_LABEL = 'Additional details';
 const OPTIONAL_ADDITIONAL_DETAILS_LABEL = 'Additional details (Optional)';
 const EVICTION_DATE_INPUT_IDS = [
@@ -316,12 +315,20 @@ const EVICTION_DATE_INPUT_IDS = [
   'eviction-date-minute',
 ];
 
-const RETURN_DATE_INPUT_IDS = [
-  'return-date-day',
-  'return-date-month',
-  'return-date-year',
-  'return-date-hour',
-  'return-date-minute',
+const RETURN_DATE_FINAL_INPUT_IDS = [
+  'return-date-final-day',
+  'return-date-final-month',
+  'return-date-final-year',
+  'return-date-final-hour',
+  'return-date-final-minute',
+];
+
+const RETURN_DATE_INPUT_INTERIM_IDS = [
+  'return-date-interim-day',
+  'return-date-interim-month',
+  'return-date-interim-year',
+  'return-date-interim-hour',
+  'return-date-interim-minute',
 ];
 
 export function initWarrantReturn(): void {
@@ -362,11 +369,13 @@ function updateWarrantReturnVisibility(): void {
     isFinal && (finalOutcome === EvictionOutcome.UNSUCCESSFUL || finalOutcome === EvictionOutcome.CANCELLED);
   setSectionVisible('eviction-unsuccessful-cancelled', isEvictionUnsuccessfulOrCancelled, () => {
     resetSelect('eviction-unsuccessful-return-name');
+    RETURN_DATE_FINAL_INPUT_IDS.forEach(resetInput);
   });
 
   const isInterim = returnType === WarrantReturnType.INTERIM;
   setSectionVisible('interim', isInterim, () => {
     resetSelect('interim-return-name');
+    RETURN_DATE_INPUT_INTERIM_IDS.forEach(resetInput);
   });
 
   setSectionVisible('return-type-conditional', isInterim || isFinal, () => undefined);
@@ -375,12 +384,6 @@ function updateWarrantReturnVisibility(): void {
     isEvictionSuccessful || isEvictionUnsuccessfulOrCancelled,
     () => undefined
   );
-
-  const isReturnDateVisible = isEvictionUnsuccessfulOrCancelled || isInterim;
-  const returnDateSection = document.getElementById('return-date-section');
-  setSectionVisible('return-date-section', isReturnDateVisible, () => RETURN_DATE_INPUT_IDS.forEach(resetInput));
-
-  returnDateSection?.classList.toggle(CONDITIONAL_CLASS, isFinal);
 
   updateAdditionalDetailsLabel();
 }
