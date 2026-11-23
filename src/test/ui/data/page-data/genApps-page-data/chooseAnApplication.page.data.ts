@@ -1,5 +1,6 @@
 export const chooseAnApplication = {
-  mainHeader: `Choose your application`,
+  // defendant-general-applications-r-2 OFF copy (as on AAT); with the flag ON the heading is "Choose your application".
+  mainHeader: `Choose an application`,
   whatDoYouWantToApplyForQuestion: `What do you want to apply for?`,
   adjournTheHearingRadioOption: `Ask to adjourn the hearing (move it to a later time or date)`,
   youCanApplyToChangeHintText: `You can apply to change the court hearing until a later time or date`,
@@ -16,6 +17,6 @@ export const chooseAnApplication = {
   thereIsAProblemErrorMessageHeader: `There is a problem`,
   errorValidationType: { one: `radioOptions`, two: `textField`, three: `checkBox` },
   errorValidationField: {
-    errorRadioOption: { type: `none`, input: ``, errMessage: `Please select an application` },
+    errorRadioOption: { type: `none`, input: ``, errMessage: `Choose what you want to apply for` },
   },
 };
