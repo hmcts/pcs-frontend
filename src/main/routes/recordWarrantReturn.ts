@@ -469,11 +469,7 @@ function validateAdditionalDetails(additionalDetails: string, isMandatory: boole
   return [];
 }
 
-function validateEvictionDate(
-  parts: Record<EvictionDatePart, string>,
-  issues: ValidationIssue[],
-  now: DateTime = DateTime.now()
-): string | undefined {
+function validateEvictionDate(parts: Record<EvictionDatePart, string>, issues: ValidationIssue[]): string | undefined {
   return validateDate(
     parts,
     EVICTION_DATE_ID,
@@ -487,8 +483,7 @@ function validateEvictionDate(
 function validateReturnDate(
   parts: Record<EvictionDatePart, string>,
   id: string,
-  issues: ValidationIssue[],
-  now: DateTime = DateTime.now()
+  issues: ValidationIssue[]
 ): string | undefined {
   return validateDate(
     parts,
