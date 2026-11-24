@@ -1,0 +1,14 @@
+{
+  "pageTitle": "cyCan you upload a copy of the Electrical Installation Condition Report (EICR)?",
+  "question": "cyCan you upload a copy of the Electrical Installation Condition Report (EICR)?",
+  "labels": {
+    "noElectricalInstallationConditionReason": "cyExplain why you cannot upload a copy of the Electrical Installation Condition Report (EICR)."
+  },
+  "errors": {
+    "hasElectricalInstallationConditionReport": "cySelect whether you can upload a copy of the Electrical Installation Condition Report (EICR)",
+    "noElectricalInstallationConditionReason": "cyExplain why you cannot upload a copy of the Electrical Installation Condition Report (EICR)"
+  },
+  "fieldNames": {
+    "noElectricalInstallationConditionReason": "cyYour reason for not uploading the Electrical Installation Condition Report (EICR)"
+  }
+}

@@ -741,7 +741,7 @@ describe('the occupation contract for a property in Wales', () => {
           'tenancyAgreementAvailable.noTenancyAgreementReason': 'Lost in a flood',
         })
       ).location
-    ).toMatch(new RegExp(`^${claimPath('rent-arrears-claim')}`));
+    ).toMatch(new RegExp(`^${claimPath('mandatory-documents')}`));
     expect(storedClaim().tenancy).toEqual({
       occupationContractType: 'STANDARD_CONTRACT',
       tenancyStartDate: '2022-09-27',
@@ -773,6 +773,203 @@ describe('the occupation contract for a property in Wales', () => {
       /Can you upload a copy of the occupation contract or licence agreement\? No\s*Lost in a flood/
     );
     expect(summary).not.toContain('What type of tenancy or licence is in place');
+  });
+});
+
+describe('the mandatory documents and grounds for a property in Wales', () => {
+  const WALES_CLAIM = {
+    ...ANSWERED_CLAIM,
+    eligibility: { ...ANSWERED_CLAIM.eligibility, legislativeCountry: 'Wales' },
+  };
+  const page = async (path: string) => new JSDOM((await app.get(path)).text).window.document;
+  const heading = (document: Document) => document.querySelector('h1')?.textContent?.trim();
+  const toStep = (name: string) => new RegExp(`^${claimPath(name)}`);
+
+  it('explains the mandatory documents, then asks about each in turn', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...WALES_CLAIM, tenancy: { occupationContractType: 'STANDARD_CONTRACT' } });
+
+    const interstitial = await page(claimPath('mandatory-documents'));
+    expect(heading(interstitial)).toBe('Mandatory documents');
+    const body = text(interstitial.body.innerHTML);
+    expect(body).toContain('Under Welsh law, you must have provided a contract holder with certain documents.');
+    expect(body).toContain('energy performance certificate');
+    expect(body).toContain('current gas safety report');
+    expect(body).toContain('current Electrical Installation Condition Report (EICR)');
+    expect(body).toContain('If you cannot upload a copy of a document, you must explain why.');
+    expect((await app.post(claimPath('mandatory-documents'), {})).location).toMatch(toStep('epc-available'));
+
+    const epc = await page(claimPath('epc-available'));
+    expect(heading(epc)).toBe('Can you upload a copy of the energy performance certificate?');
+    expect(text(epc.body.innerHTML)).toContain(
+      'Explain why you cannot upload a copy of the energy performance certificate.'
+    );
+    expect((await page(claimPath('gas-safety-available'))).querySelector('h1')?.textContent?.trim()).toBe(
+      'Can you upload a copy of the current gas safety report?'
+    );
+    expect(heading(await page(claimPath('eicr-available')))).toBe(
+      'Can you upload a copy of the Electrical Installation Condition Report (EICR)?'
+    );
+  });
+
+  it('uploads each document that can be uploaded and explains why for each that cannot', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...WALES_CLAIM, tenancy: { occupationContractType: 'STANDARD_CONTRACT' } });
+
+    expect((await app.post(claimPath('epc-available'), {})).status).toBe(400);
+    expect((await app.post(claimPath('epc-available'), { hasEnergyPerformanceCertificate: 'yes' })).location).toMatch(
+      toStep('upload-epc')
+    );
+    const upload = await page(claimPath('upload-epc'));
+    expect(heading(upload)).toBe('Upload energy performance certificate');
+    expect(text(upload.body.innerHTML)).toContain('Upload a copy of the energy performance certificate.');
+    expect(text(upload.body.innerHTML)).toContain(
+      "Give your document a name that explains what it is. For example, 'Receipt of payment from Jane Smith'"
+    );
+
+    const noReason = await app.post(claimPath('gas-safety-available'), { hasGasSafetyReport: 'no' });
+    expect(text(noReason.text)).toContain('Explain why you cannot upload a copy of the current gas safety report');
+    expect(
+      (
+        await app.post(claimPath('gas-safety-available'), {
+          hasGasSafetyReport: 'no',
+          'hasGasSafetyReport.noGasSafetyReportReason': 'No gas at the property',
+        })
+      ).location
+    ).toMatch(toStep('eicr-available'));
+    expect(
+      (await app.post(claimPath('eicr-available'), { hasElectricalInstallationConditionReport: 'yes' })).location
+    ).toMatch(toStep('upload-eicr'));
+    expect(heading(await page(claimPath('upload-eicr')))).toBe(
+      'Upload Electrical Installation Condition Report (EICR)'
+    );
+    expect(storedClaim().tenancy).toMatchObject({
+      hasEnergyPerformanceCertificate: 'YES',
+      hasGasSafetyReport: 'NO',
+      noGasSafetyReportReason: 'No gas at the property',
+      hasElectricalInstallationConditionReport: 'YES',
+    });
+    expect(storedClaim().tenancy.energyPerformanceDocuments).toBeUndefined();
+  });
+
+  it('shows the required documents on the tenancy summary', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...WALES_CLAIM,
+      tenancy: {
+        occupationContractType: 'STANDARD_CONTRACT',
+        tenancyStartDate: '2022-09-27',
+        tenancyAgreementAvailable: 'NO',
+        noTenancyAgreementReason: 'Lost',
+        hasEnergyPerformanceCertificate: 'NO',
+        noEnergyPerformanceCertificateReason: 'Not issued',
+        hasGasSafetyReport: 'YES',
+        gasSafetyReportDocuments: STATEMENT_DOCUMENTS.map(({ value }) => ({ value: value.document })),
+      },
+      grounds: { hasRentArrearsGrounds: 'NO', walesMandatoryGrounds: ['LANDLORD_BREAK_CLAUSE_S199'] },
+    });
+
+    const summary = text((await app.get(claimPath('tenancy-cya'))).text);
+    expect(summary).toMatch(/Can you upload a copy of the energy performance certificate\? No\s*Not issued/);
+    expect(summary).toContain('Can you upload a copy of the current gas safety report? Yes');
+    expect(summary).toContain('Notice given under a landlord’s break clause (section 199)');
+  });
+
+  it('lists the Wales grounds, discretionary first, in place of the England ones', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...WALES_CLAIM, tenancy: { occupationContractType: 'STANDARD_CONTRACT' } });
+
+    const grounds = await page(claimPath('wales-grounds'));
+    expect(heading(grounds)).toBe('What are your grounds for possession?');
+    const legends = [...grounds.querySelectorAll('legend')].map(legend => legend.textContent?.trim());
+    expect(legends).toEqual(['Discretionary grounds', 'Mandatory grounds']);
+    const labels = [...grounds.querySelectorAll('.govuk-checkboxes__label')].map(label => label.textContent?.trim());
+    expect(labels).toEqual([
+      'Rent arrears (breach of contract) (section 157)',
+      'Antisocial behaviour (breach of contract) (section 157)',
+      'Other breach of contract (section 157)',
+      'Estate management grounds (section 160)',
+      'Others',
+      'Failure to give up possession on date specified in contract-holder’s notice (section 170)',
+      'Landlord’s notice given in relation to periodic standard contract (section 178)',
+      'Contract-holder under a periodic standard contract seriously in arrears with rent (section 181)',
+      'Landlord’s notice in connection with end of fixed term given (section 186)',
+      'Contract-holder under a fixed term standard contract seriously in arrears with rent (section 187)',
+      'Failure to give up possession on date specified in contract-holder’s break clause notice (section 191)',
+      'Notice given under a landlord’s break clause (section 199)',
+      'Notice given in relation to end of converted fixed term standard contract (paragraph 25B(2) of Schedule 12)',
+    ]);
+    expect(text(grounds.body.innerHTML)).toContain(
+      'On the notice you served, you should have already selected your possession grounds.'
+    );
+  });
+
+  it('asks a property in Wales for its grounds on one page, not the England questions', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...WALES_CLAIM, tenancy: { occupationContractType: 'STANDARD_CONTRACT' } });
+
+    expect(
+      (await app.post(claimPath('eicr-available'), { hasElectricalInstallationConditionReport: 'yes' })).location
+    ).toMatch(toStep('upload-eicr'));
+    const empty = await app.post(claimPath('wales-grounds'), {});
+    expect(text(empty.text)).toContain('Select at least one ground for possession');
+    const missing = await app.post(claimPath('wales-grounds'), { walesDiscretionaryGrounds: ['OTHER'] });
+    expect(text(missing.text)).toContain('Give details of your other grounds for possession');
+  });
+
+  it('leads a Wales rent arrears ground into the rent arrears task, and asks a reason for the others', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...WALES_CLAIM, tenancy: { occupationContractType: 'STANDARD_CONTRACT' } });
+
+    const saved = await app.post(claimPath('wales-grounds'), {
+      walesDiscretionaryGrounds: ['RENT_ARREARS_S157', 'ESTATE_MANAGEMENT_GROUNDS_S160'],
+      walesMandatoryGrounds: ['SERIOUS_ARREARS_PERIODIC_S181', 'LANDLORD_BREAK_CLAUSE_S199'],
+    });
+    expect(saved.location).toBe(`${claimPath('ground-reason')}?nav=1`);
+    expect(storedClaim().grounds).toMatchObject({
+      hasRentArrearsGrounds: 'YES',
+      walesDiscretionaryGrounds: ['RENT_ARREARS_S157', 'ESTATE_MANAGEMENT_GROUNDS_S160'],
+      walesMandatoryGrounds: ['SERIOUS_ARREARS_PERIODIC_S181', 'LANDLORD_BREAK_CLAUSE_S199'],
+    });
+
+    const reason = await page(`${claimPath('ground-reason')}?ground=ESTATE_MANAGEMENT_GROUNDS_S160`);
+    expect(heading(reason)).toBe(
+      'Why are you making a claim for possession under Estate management grounds (section 160)?'
+    );
+    expect(
+      (
+        await app.post(`${claimPath('ground-reason')}?ground=ESTATE_MANAGEMENT_GROUNDS_S160`, {
+          groundReason: 'Building works',
+        })
+      ).location
+    ).toBe(`${claimPath('ground-reason')}?ground=LANDLORD_BREAK_CLAUSE_S199`);
+    expect(
+      (
+        await app.post(`${claimPath('ground-reason')}?ground=LANDLORD_BREAK_CLAUSE_S199`, {
+          groundReason: 'Break clause used',
+        })
+      ).location
+    ).toMatch(toStep('tenancy-cya'));
+    expect(storedClaim().grounds.walesGroundReasons).toEqual([
+      expect.objectContaining({ value: { ground: 'ESTATE_MANAGEMENT_GROUNDS_S160', reason: 'Building works' } }),
+      expect.objectContaining({ value: { ground: 'LANDLORD_BREAK_CLAUSE_S199', reason: 'Break clause used' } }),
+    ]);
+    expect(storedClaim().grounds.groundReasons).toBeUndefined();
+  });
+
+  it('shows the rent arrears task for a Wales rent arrears ground, and not for the other grounds', async () => {
+    app = await bootMakeAClaim();
+    const tasks = async () => text((await app.get(claimPath('task-list'))).text);
+    givenClaim({
+      ...WALES_CLAIM,
+      grounds: { hasRentArrearsGrounds: 'YES', walesMandatoryGrounds: ['SERIOUS_ARREARS_FIXED_TERM_S187'] },
+    });
+    expect(await tasks()).toContain('Proof of rent arrears');
+    givenClaim({
+      ...WALES_CLAIM,
+      grounds: { hasRentArrearsGrounds: 'NO', walesMandatoryGrounds: ['LANDLORD_BREAK_CLAUSE_S199'] },
+    });
+    expect(await tasks()).not.toContain('Proof of rent arrears');
   });
 });
 

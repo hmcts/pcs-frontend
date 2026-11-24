@@ -39,6 +39,8 @@ function request(): Request {
   return req;
 }
 
+const DOCUMENT = { document_url: 'u', document_binary_url: 'b', document_filename: 'f.pdf' };
+
 describe('normaliseClaim', () => {
   it('drops the details of an occupation contract that is not Other', () => {
     expect(
@@ -70,6 +72,28 @@ describe('normaliseClaim', () => {
       claimant: { individualOrOrganisation: 'ORGANISATION', organisationName: 'Lets Ltd', contactByPhone: 'NO' },
       grounds: { hasRentArrearsGrounds: 'NO', otherGrounds: ['GROUND_1'] },
       notice: { noticeServed: 'NO', noNoticeReason: 'Abandoned' },
+    });
+  });
+
+  it('drops the documents or the reason of a required document question for a property in Wales', () => {
+    expect(
+      normaliseClaim({
+        tenancy: {
+          hasEnergyPerformanceCertificate: 'NO',
+          noEnergyPerformanceCertificateReason: 'Lost',
+          energyPerformanceDocuments: [{ id: 'a', value: DOCUMENT }],
+          hasGasSafetyReport: 'YES',
+          noGasSafetyReportReason: 'Stale',
+          gasSafetyReportDocuments: [{ id: 'b', value: DOCUMENT }],
+        },
+      })
+    ).toEqual({
+      tenancy: {
+        hasEnergyPerformanceCertificate: 'NO',
+        noEnergyPerformanceCertificateReason: 'Lost',
+        hasGasSafetyReport: 'YES',
+        gasSafetyReportDocuments: [{ id: 'b', value: DOCUMENT }],
+      },
     });
   });
 

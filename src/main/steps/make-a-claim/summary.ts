@@ -19,7 +19,9 @@ import {
   type CitizenDefendant,
   type ClaimDocuments,
   NOTICE_METHOD_DETAILS,
+  OTHER_GROUND,
   type YesNo,
+  groundReasonsOf,
   groundsNeedingReasons,
 } from '@services/citizenPossessionClaim.interface';
 
@@ -181,7 +183,8 @@ export function defendantsCard(req: Request): SummaryCard {
 
 export function tenancyCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
-  const { tenancy = {}, grounds = {} } = readClaim(req);
+  const claim = readClaim(req);
+  const { tenancy = {}, grounds = {} } = claim;
   const builder = new CardBuilder(req, t)
     .add(
       'tenancy-type',
@@ -215,6 +218,27 @@ export function tenancyCard(req: Request): SummaryCard {
       withDetail(yesNo(t, tenancy.tenancyAgreementAvailable), tenancy.noTenancyAgreementReason)
     )
     .add('upload-occupation-contract', 'occupationContractDocuments', documents(tenancy.tenancyAgreementDocuments))
+    .add(
+      'epc-available',
+      'hasEnergyPerformanceCertificate',
+      withDetail(yesNo(t, tenancy.hasEnergyPerformanceCertificate), tenancy.noEnergyPerformanceCertificateReason)
+    )
+    .add('upload-epc', 'energyPerformanceDocuments', documents(tenancy.energyPerformanceDocuments))
+    .add(
+      'gas-safety-available',
+      'hasGasSafetyReport',
+      withDetail(yesNo(t, tenancy.hasGasSafetyReport), tenancy.noGasSafetyReportReason)
+    )
+    .add('upload-gas-safety', 'gasSafetyReportDocuments', documents(tenancy.gasSafetyReportDocuments))
+    .add(
+      'eicr-available',
+      'hasElectricalInstallationConditionReport',
+      withDetail(
+        yesNo(t, tenancy.hasElectricalInstallationConditionReport),
+        tenancy.noElectricalInstallationConditionReason
+      )
+    )
+    .add('upload-eicr', 'electricalInstallationDocuments', documents(tenancy.electricalInstallationDocuments))
     .add('rent-arrears-claim', 'hasRentArrearsGrounds', yesNo(t, grounds.hasRentArrearsGrounds))
     .add(
       'rent-arrears-grounds',
@@ -222,14 +246,22 @@ export function tenancyCard(req: Request): SummaryCard {
       (grounds.rentArrearsGrounds ?? []).map(g => t(`makeAClaim:grounds.${g}`))
     )
     .add('other-grounds-claim', 'hasOtherGrounds', yesNo(t, grounds.hasOtherGrounds))
+    .add('wales-grounds', 'walesGrounds', [
+      ...[...(grounds.walesDiscretionaryGrounds ?? []), ...(grounds.walesMandatoryGrounds ?? [])].map(g =>
+        t(`makeAClaim:grounds.${g}`)
+      ),
+      ...(grounds.otherGrounds?.includes(OTHER_GROUND)
+        ? [t('makeAClaim:grounds.WALES_OTHER'), grounds.otherGroundsDetails ?? '']
+        : []),
+    ])
     .add('other-grounds', 'otherGrounds', [
       ...(grounds.otherGrounds ?? []).map(g => t(`makeAClaim:grounds.${g}`)),
       ...(grounds.otherGroundsDetails ? [grounds.otherGroundsDetails] : []),
     ]);
   if (isStepShown(req, 'ground-reason')) {
-    for (const ground of groundsNeedingReasons(grounds)) {
+    for (const ground of groundsNeedingReasons(claim)) {
       const label = t('makeAClaim:summary.labels.groundReason', { ground: t(`makeAClaim:grounds.${ground}`) });
-      const reason = grounds.groundReasons?.find(item => item.value.ground === ground)?.value.reason;
+      const reason = groundReasonsOf(claim).find(item => item.value.ground === ground)?.value.reason;
       builder.add('ground-reason', 'groundReason', reason, `?ground=${ground}`, label);
     }
   }

@@ -52,6 +52,13 @@ function keepOnlyProof(rentArrears: NonNullable<CitizenPossessionClaim['rentArre
  * Drops answers a later change made unreachable, so the saved claim never holds details for a question the
  * claimant no longer sees.
  */
+/** Each required document question for a property in Wales, its documents and its reason for having none. */
+const REQUIRED_DOCUMENTS = [
+  ['hasEnergyPerformanceCertificate', 'energyPerformanceDocuments', 'noEnergyPerformanceCertificateReason'],
+  ['hasGasSafetyReport', 'gasSafetyReportDocuments', 'noGasSafetyReportReason'],
+  ['hasElectricalInstallationConditionReport', 'electricalInstallationDocuments', 'noElectricalInstallationConditionReason'],
+] as const;
+
 export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossessionClaim {
   const normalised = cloneDeep(claim);
   const { claimant, tenancy, grounds, notice, otherInformation } = normalised;
@@ -89,6 +96,14 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
   }
   if (tenancy?.tenancyAgreementAvailable === 'YES') {
     delete tenancy.noTenancyAgreementReason;
+  }
+  for (const [answer, documents, reason] of REQUIRED_DOCUMENTS) {
+    if (tenancy?.[answer] === 'NO') {
+      delete tenancy[documents];
+    }
+    if (tenancy?.[answer] === 'YES') {
+      delete tenancy[reason];
+    }
   }
   if (grounds?.hasRentArrearsGrounds === 'NO') {
     delete grounds.rentArrearsGrounds;

@@ -177,7 +177,52 @@ export async function completeOccupationContractAndGrounds(page: Page): Promise<
     .getByLabel('Explain why you cannot upload a copy of the occupation contract or licence agreement')
     .fill('The contract was lost');
   await saveAndContinue(page);
-  await completeGrounds(page);
+  await completeMandatoryDocuments(page);
+  await completeWalesGrounds(page);
+}
+
+/** The documents a property in Wales must have given the contract holder: two uploaded, one explained. */
+async function completeMandatoryDocuments(page: Page): Promise<void> {
+  await expect(page.getByRole('heading', { level: 1, name: 'Mandatory documents' })).toBeVisible();
+  await continueOn(page);
+  await answer(page, 'Yes');
+  await saveAndContinue(page);
+  await expect(page.getByRole('heading', { level: 1, name: 'Upload energy performance certificate' })).toBeVisible();
+  await performAction('uploadFile', 'NoticeServiceJurisdiction.docx');
+  await saveAndContinue(page);
+  await page.getByRole('radio', { name: 'No', exact: true }).check();
+  await page
+    .getByLabel('Explain why you cannot upload a copy of the current gas safety report.')
+    .fill('The property has no gas supply');
+  await saveAndContinue(page);
+  await answer(page, 'Yes');
+  await saveAndContinue(page);
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Upload Electrical Installation Condition Report (EICR)' })
+  ).toBeVisible();
+  await performAction('uploadFile', 'NoticeServiceJurisdiction.docx');
+  await saveAndContinue(page);
+}
+
+/** Rent arrears (section 157) leads into the rent arrears task; the other breach of contract needs a reason. */
+async function completeWalesGrounds(page: Page): Promise<void> {
+  await expect(page.getByRole('heading', { level: 1, name: 'What are your grounds for possession?' })).toBeVisible();
+  await page.getByRole('checkbox', { name: 'Rent arrears (breach of contract) (section 157)' }).check();
+  await page.getByRole('checkbox', { name: 'Other breach of contract (section 157)' }).check();
+  await saveAndContinue(page);
+  await expect(
+    page.getByRole('heading', {
+      level: 1,
+      name: 'Why are you making a claim for possession under Other breach of contract (section 157)?',
+    })
+  ).toBeVisible();
+  await page
+    .getByLabel('Why are you making a claim for possession under Other breach of contract (section 157)?')
+    .fill('The tenant keeps a dog against the contract');
+  await saveAndContinue(page);
+  await expect(page.getByRole('heading', { level: 1, name: 'Check your answers' })).toBeVisible();
+  await saveAndContinue(page);
+  await expectTaskStatus(page, 'About the tenancy and your grounds for possession', 'Done');
 }
 
 async function completeGrounds(page: Page, otherGrounds: OtherGroundReasons = []): Promise<void> {
