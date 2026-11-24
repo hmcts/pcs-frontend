@@ -245,6 +245,17 @@ export function buildOrderDocument(form: HTMLFormElement): DocWeaveDocument {
   return buildOrder(type, readOrderData(form));
 }
 
+/** Limiting the costs of a transfer to the High Court goes with the transfer. */
+export function initEnforcementTransfer(form: HTMLFormElement): void {
+  const transfer = form.querySelector<HTMLInputElement>('input[name="transfer-enforcement"]');
+  const limitCosts = form.querySelector<HTMLInputElement>('input[name="transfer-enforcement-costs"]');
+  transfer?.addEventListener('change', () => {
+    if (!transfer.checked && limitCosts) {
+      limitCosts.checked = false;
+    }
+  });
+}
+
 /** What follows a decision on an application, shown in its row while that decision is chosen. */
 export function initApplicationDecisions(form: HTMLFormElement): void {
   form.addEventListener('change', ({ target }) => {
@@ -272,6 +283,7 @@ export function initMakeOrder(): void {
   initCaseFactsToggle(form);
   initCaseFactDefaults(form);
   initSuspendedMoneyOptions(form);
+  initEnforcementTransfer(form);
   const suspendedBy = dateParts(form, 'suspended-by-date');
   if (suspendedBy && !suspendedBy.some(part => part.value)) {
     setDate(suspendedBy, daysFromToday(14));
