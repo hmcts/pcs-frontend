@@ -11,6 +11,9 @@ export type IndividualOrOrganisation = 'INDIVIDUAL' | 'ORGANISATION';
 
 export type CitizenTenancyType = 'ASSURED' | 'EXCLUDED' | 'REGULATED' | 'OTHER';
 
+/** The occupation contract or licence asked about instead of the tenancy for a property in Wales. */
+export type OccupationContractType = 'STANDARD_CONTRACT' | 'SECURE_CONTRACT' | 'OTHER';
+
 export const RENT_ARREARS_GROUNDS = ['GROUND_8', 'GROUND_10', 'GROUND_11'] as const;
 
 export type RentArrearsGround = (typeof RENT_ARREARS_GROUNDS)[number];
@@ -165,6 +168,8 @@ export interface CitizenPossessionClaim {
   tenancy?: {
     tenancyType?: CitizenTenancyType;
     otherTenancyTypeDetails?: string;
+    occupationContractType?: OccupationContractType;
+    otherOccupationContractDetails?: string;
     tenancyStartDate?: string;
     tenancyAgreementAvailable?: YesNo;
     noTenancyAgreementReason?: string;

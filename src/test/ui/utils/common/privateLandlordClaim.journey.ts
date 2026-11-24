@@ -12,6 +12,8 @@ export const MAKE_A_CLAIM_FLAG = 'private-landlord-make-a-claim-enabled';
 /** Postcodes pcs-api maps to a court (V026__pilot_postcodes.sql): Bradford in England, Betws-y-Coed in Wales. */
 export const ENGLISH_PROPERTY = { line1: '1 Test Street', town: 'Bradford', postcode: 'BD10 0JB' };
 export const WELSH_PROPERTY = { line1: '1 Test Street', town: 'Betws-y-Coed', postcode: 'LL24 0BE' };
+/** Outside England and Wales, so never claimable however pcs-api maps it. */
+export const SCOTTISH_PROPERTY = { line1: '1 Union Street', town: 'Aberdeen', postcode: 'AB10 1XG' };
 
 /** Whether the private landlord journey is switched on for the environment under test. */
 export async function isMakeAClaimEnabled(): Promise<boolean> {
@@ -85,9 +87,17 @@ export async function giveProperty(page: Page, startUrl: string, property = ENGL
   await continueOn(page);
 }
 
-/** Answers the questions asked before the claim exists, ending on "You're eligible" for a new claim. */
-export async function becomeEligible(page: Page, startUrl: string): Promise<void> {
-  await giveProperty(page, startUrl);
+/**
+ * Answers the questions asked before the claim exists, ending on "You're eligible" for a new claim. A property in
+ * Wales is asked the Wales claimant type first.
+ */
+export async function becomeEligible(page: Page, startUrl: string, property = ENGLISH_PROPERTY): Promise<void> {
+  await giveProperty(page, startUrl, property);
+  if (property === WELSH_PROPERTY) {
+    await expect(page.getByRole('radio', { name: 'Registered community landlord', exact: true })).toBeVisible();
+    await page.getByRole('radio', { name: 'Private landlord', exact: true }).check();
+    await continueOn(page);
+  }
   await page.getByRole('radio', { name: 'Myself – I’m the claimant', exact: true }).check();
   await continueOn(page);
 }
@@ -146,6 +156,31 @@ export async function completeTenancyAndGrounds(page: Page, otherGrounds: OtherG
     .getByLabel('Why can you not upload a copy of the tenancy or licence agreement?')
     .fill('The agreement was verbal');
   await saveAndContinue(page);
+  await completeGrounds(page, otherGrounds);
+}
+
+/** The tenancy task for a property in Wales, which asks about the occupation contract instead of the tenancy. */
+export async function completeOccupationContractAndGrounds(page: Page): Promise<void> {
+  await openTask(page, 'About the tenancy and your grounds for possession');
+  await continueOn(page);
+  await expect(
+    page.getByRole('heading', {
+      level: 1,
+      name: 'What type of occupation contract or licence is in place, or was in place?',
+    })
+  ).toBeVisible();
+  await answer(page, 'Standard contract');
+  await fillDate(page, 'occupationContractStartDate', '27', '9', '2022');
+  await saveAndContinue(page);
+  await page.getByRole('radio', { name: 'No', exact: true }).check();
+  await page
+    .getByLabel('Explain why you cannot upload a copy of the occupation contract or licence agreement')
+    .fill('The contract was lost');
+  await saveAndContinue(page);
+  await completeGrounds(page);
+}
+
+async function completeGrounds(page: Page, otherGrounds: OtherGroundReasons = []): Promise<void> {
   await answer(page, 'Yes');
   await page.getByRole('checkbox', { name: /\(Ground 8\)$/ }).check();
   await saveAndContinue(page);

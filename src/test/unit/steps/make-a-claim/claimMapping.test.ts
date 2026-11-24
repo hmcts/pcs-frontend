@@ -192,6 +192,32 @@ describe('claim mappings', () => {
     ).toEqual({ tenancyType: 'ASSURED', otherTenancyTypeDetails: undefined });
   });
 
+  it('saves the occupation contract type with its details only for another type', () => {
+    expect(
+      roundTrip('occupation-contract-type', {
+        occupationContractType: 'OTHER',
+        'occupationContractType.otherOccupationContractDetails': 'Supported standard contract',
+      }).saved.tenancy
+    ).toEqual({ occupationContractType: 'OTHER', otherOccupationContractDetails: 'Supported standard contract' });
+    const { saved, form } = roundTrip('occupation-contract-type', {
+      occupationContractType: 'STANDARD_CONTRACT',
+      'occupationContractType.otherOccupationContractDetails': 'Left behind',
+    });
+    expect(saved.tenancy).toEqual({
+      occupationContractType: 'STANDARD_CONTRACT',
+      otherOccupationContractDetails: undefined,
+    });
+    expect(form?.occupationContractType).toBe('STANDARD_CONTRACT');
+  });
+
+  it('saves the occupation contract start date as the tenancy start date', () => {
+    const { saved, form } = roundTrip('occupation-contract-start-date', {
+      occupationContractStartDate: { day: '27', month: '9', year: '2022' },
+    });
+    expect(saved.tenancy?.tenancyStartDate).toBe('2022-09-27');
+    expect(form).toEqual({ occupationContractStartDate: { day: '27', month: '9', year: '2022' } });
+  });
+
   it('saves dates as yyyy-MM-dd and reads them back as parts', () => {
     const { saved, form } = roundTrip('tenancy-start-date', {
       tenancyStartDate: { day: '15', month: '1', year: '2018' },

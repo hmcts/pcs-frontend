@@ -105,6 +105,11 @@
       "ENGLISH": "cyEnglish",
       "WELSH": "cyWelsh",
       "ENGLISH_AND_WELSH": "cyEnglish and Welsh"
+    },
+    "occupationContractType": {
+      "STANDARD_CONTRACT": "cyStandard contract",
+      "SECURE_CONTRACT": "cySecure contract",
+      "OTHER": "cyOther"
     }
   },
   "taskList": {
@@ -164,6 +169,10 @@
       "tenancyStartDate": "cyWhen did the tenancy or licence begin?",
       "tenancyAgreementAvailable": "cyCan you upload a copy of the tenancy or licence agreement?",
       "tenancyAgreementDocuments": "cyUpload tenancy or licence agreement",
+      "occupationContractType": "cyWhat type of occupation contract or licence is in place, or was in place?",
+      "occupationContractStartDate": "cyWhen did the occupation contract or licence begin?",
+      "occupationContractAgreementAvailable": "cyCan you upload a copy of the occupation contract or licence agreement?",
+      "occupationContractDocuments": "cyUpload occupation contract or licence agreement",
       "hasRentArrearsGrounds": "cyAre you claiming possession because you’re owed rent?",
       "rentArrearsGrounds": "cyWhat are your rent arrears grounds for possession?",
       "hasOtherGrounds": "cyDo you have any other grounds for possession?",
@@ -228,6 +237,8 @@
       "defendant-address": "cyDefendant’s address for service",
       "tenancy-type": "cyWhat type of tenancy or licence is in place?",
       "tenancy-agreement": "cyCan you upload a copy of the tenancy or licence agreement?",
+      "occupation-contract-type": "cyWhat type of occupation contract or licence is in place?",
+      "occupation-contract-agreement": "cyCan you upload a copy of the occupation contract or licence agreement?",
       "rent-arrears-claim": "cyAre you claiming possession because you’re owed rent?",
       "other-grounds": "cyWhat are your grounds for possession?",
       "rent-arrears-grounds": "cyWhat are your rent arrears grounds for possession?",
@@ -249,6 +260,7 @@
       "rent-statement": "cyRent statement",
       "rent-statement-payment": "cyAdd a payment",
       "upload-tenancy-agreement": "cyUpload tenancy or licence agreement",
+      "upload-occupation-contract": "cyUpload occupation contract or licence agreement",
       "upload-notice": "cyUpload notice",
       "upload-rent-statement": "cyUpload rent statement",
       "upload-other-documents": "cyUpload files"

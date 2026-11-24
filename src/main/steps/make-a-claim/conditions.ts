@@ -16,6 +16,11 @@ export const hasPhoneNumber = (req: Request): boolean => {
   return claimant?.contactByPhone === 'YES' && Boolean(claimant.phoneNumber);
 };
 
+/** Whether the claim is for a property in Wales, which asks about the occupation contract instead of the tenancy. */
+export const isWalesClaim = (req: Request): boolean => readClaim(req).eligibility?.legislativeCountry === 'Wales';
+
+export const isEnglandClaim = (req: Request): boolean => !isWalesClaim(req);
+
 export const hasTenancyAgreement = (req: Request): boolean =>
   readClaim(req).tenancy?.tenancyAgreementAvailable === 'YES';
 

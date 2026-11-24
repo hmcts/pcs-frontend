@@ -105,6 +105,11 @@
       "ENGLISH": "English",
       "WELSH": "Welsh",
       "ENGLISH_AND_WELSH": "English and Welsh"
+    },
+    "occupationContractType": {
+      "STANDARD_CONTRACT": "Standard contract",
+      "SECURE_CONTRACT": "Secure contract",
+      "OTHER": "Other"
     }
   },
   "taskList": {
@@ -164,6 +169,10 @@
       "tenancyStartDate": "When did the tenancy or licence begin?",
       "tenancyAgreementAvailable": "Can you upload a copy of the tenancy or licence agreement?",
       "tenancyAgreementDocuments": "Upload tenancy or licence agreement",
+      "occupationContractType": "What type of occupation contract or licence is in place, or was in place?",
+      "occupationContractStartDate": "When did the occupation contract or licence begin?",
+      "occupationContractAgreementAvailable": "Can you upload a copy of the occupation contract or licence agreement?",
+      "occupationContractDocuments": "Upload occupation contract or licence agreement",
       "hasRentArrearsGrounds": "Are you claiming possession because you’re owed rent?",
       "rentArrearsGrounds": "What are your rent arrears grounds for possession?",
       "hasOtherGrounds": "Do you have any other grounds for possession?",
@@ -228,6 +237,8 @@
       "defendant-address": "Defendant’s address for service",
       "tenancy-type": "What type of tenancy or licence is in place?",
       "tenancy-agreement": "Can you upload a copy of the tenancy or licence agreement?",
+      "occupation-contract-type": "What type of occupation contract or licence is in place?",
+      "occupation-contract-agreement": "Can you upload a copy of the occupation contract or licence agreement?",
       "rent-arrears-claim": "Are you claiming possession because you’re owed rent?",
       "other-grounds": "What are your grounds for possession?",
       "rent-arrears-grounds": "What are your rent arrears grounds for possession?",
@@ -249,6 +260,7 @@
       "rent-statement": "Rent statement",
       "rent-statement-payment": "Add a payment",
       "upload-tenancy-agreement": "Upload tenancy or licence agreement",
+      "upload-occupation-contract": "Upload occupation contract or licence agreement",
       "upload-notice": "Upload notice",
       "upload-rent-statement": "Upload rent statement",
       "upload-other-documents": "Upload files"

@@ -127,8 +127,10 @@ describe('pcsApiService', () => {
 
   describe('getPropertyEligibility', () => {
     test('asks about the postcode as the citizen, with the country when given', async () => {
-      mockHttp.get.mockResolvedValue({ data: { status: 'NOT_COVERED' } });
-      await expect(getPropertyEligibility('token', 'LU1 1AB', 'England')).resolves.toBe('NOT_COVERED');
+      mockHttp.get.mockResolvedValue({ data: { status: 'NOT_ENGLAND_OR_WALES' } });
+      await expect(getPropertyEligibility('token', 'LU1 1AB', 'England')).resolves.toEqual({
+        status: 'NOT_ENGLAND_OR_WALES',
+      });
       expect(mockHttp.get).toHaveBeenCalledWith(`${testApiBase}/cases/citizen-claims/property-eligibility`, {
         headers: { Authorization: 'Bearer token' },
         params: { postcode: 'LU1 1AB', legislativeCountry: 'England' },
@@ -136,9 +138,24 @@ describe('pcsApiService', () => {
     });
 
     test('sends only the postcode when no country is given', async () => {
-      mockHttp.get.mockResolvedValue({ data: { status: 'ELIGIBLE' } });
+      mockHttp.get.mockResolvedValue({ data: { status: 'ELIGIBLE', legislativeCountry: 'England' } });
       await getPropertyEligibility('token', 'LU1 1AB');
       expect(mockHttp.get.mock.calls[0][1].params).toEqual({ postcode: 'LU1 1AB' });
+    });
+
+    test.each(['England', 'Wales'])('gives the country an eligible property is in: %s', async country => {
+      mockHttp.get.mockResolvedValue({ data: { status: 'ELIGIBLE', legislativeCountry: country } });
+      await expect(getPropertyEligibility('token', 'LU1 1AB')).resolves.toEqual({
+        status: 'ELIGIBLE',
+        legislativeCountry: country,
+      });
+    });
+
+    test('throws on an eligible property without a country it knows', async () => {
+      mockHttp.get.mockResolvedValue({ data: { status: 'ELIGIBLE', legislativeCountry: 'Scotland' } });
+      await expect(getPropertyEligibility('token', 'LU1 1AB')).rejects.toThrow(
+        'Unexpected response from property-eligibility endpoint'
+      );
     });
 
     test('throws on a status it does not know', async () => {

@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import {
   ENGLISH_PROPERTY,
   GROUND_1A_AND_14,
+  SCOTTISH_PROPERTY,
   WELSH_PROPERTY,
   answer,
   answerFinalQuestions,
@@ -11,6 +12,7 @@ import {
   completeCircumstances,
   completeDefendants,
   completeNotice,
+  completeOccupationContractAndGrounds,
   completeRentArrearsWithTable,
   completeRentArrearsWithUpload,
   completeTenancyAndGrounds,
@@ -47,6 +49,22 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
     await completeAboutYou(page);
     await completeDefendants(page);
     await completeTenancyAndGrounds(page, GROUND_1A_AND_14);
+    await completeNotice(page);
+    await completeRentArrearsWithUpload(page);
+    await completeCircumstances(page);
+    await completeUploadDocuments(page);
+    await answerFinalQuestions(page);
+    await submitClaim(page);
+    await payClaimFee(page);
+  });
+
+  test('Rent arrears claim for a property in Wales, with the occupation contract', async ({ page }) => {
+    await createLandlord();
+    await becomeEligible(page, startUrl, WELSH_PROPERTY);
+    await continueOn(page);
+    await completeAboutYou(page);
+    await completeDefendants(page);
+    await completeOccupationContractAndGrounds(page);
     await completeNotice(page);
     await completeRentArrearsWithUpload(page);
     await completeCircumstances(page);
@@ -131,11 +149,24 @@ test.describe('Private landlord cannot use the service @privateLandlord', () => 
     await expect(page.getByText('Only people making a claim for themselves can use this service.')).toBeVisible();
   });
 
-  test('A property outside England cannot be claimed', async ({ page }) => {
+  test('A property outside England and Wales cannot be claimed', async ({ page }) => {
+    await createLandlord();
+    await giveProperty(page, startUrl, SCOTTISH_PROPERTY);
+    await expect(page).toHaveURL(/\/make-a-claim\/property-ineligible$/);
+    await expect(
+      page.getByText('You can only make a possession claim against a property in England or Wales using this service.')
+    ).toBeVisible();
+  });
+
+  test('A registered community landlord with a property in Wales is sent to MyHMCTS', async ({ page }) => {
     await createLandlord();
     await giveProperty(page, startUrl, WELSH_PROPERTY);
-    await expect(page).toHaveURL(/\/make-a-claim\/property-ineligible$/);
-    await expect(page.getByText('You can only make a possession claim against a property in England')).toBeVisible();
+    await expect(page).toHaveURL(/\/make-a-claim\/wales-claimant-type$/);
+    await page.getByRole('radio', { name: 'Registered community landlord', exact: true }).check();
+    await continueOn(page);
+    await expect(
+      page.getByText('If you’re a registered community landlord or a mortgage provider, use MyHMCTS instead.')
+    ).toBeVisible();
   });
 
   test('A claim with more than one claimant cannot be made yet', async ({ page }) => {

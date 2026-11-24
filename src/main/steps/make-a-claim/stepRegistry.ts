@@ -32,6 +32,9 @@ import { step as noticeDetails } from './notice-details';
 import { step as noticeMethod } from './notice-method';
 import { step as noticeServed } from './notice-served';
 import { step as noticeType } from './notice-type';
+import { step as occupationContractAgreement } from './occupation-contract-agreement';
+import { step as occupationContractStartDate } from './occupation-contract-start-date';
+import { step as occupationContractType } from './occupation-contract-type';
 import { step as organisationName } from './organisation-name';
 import { step as otherGrounds } from './other-grounds';
 import { step as otherGroundsClaim } from './other-grounds-claim';
@@ -56,6 +59,7 @@ import { step as tenancyDetails } from './tenancy-details';
 import { step as tenancyStartDate } from './tenancy-start-date';
 import { step as tenancyType } from './tenancy-type';
 import { step as uploadNotice } from './upload-notice';
+import { step as uploadOccupationContract } from './upload-occupation-contract';
 import { step as uploadOtherDocuments } from './upload-other-documents';
 import { step as uploadRentStatement } from './upload-rent-statement';
 import { step as uploadTenancyAgreement } from './upload-tenancy-agreement';
@@ -85,6 +89,10 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'tenancy-start-date': tenancyStartDate,
   'tenancy-agreement': tenancyAgreement,
   'upload-tenancy-agreement': uploadTenancyAgreement,
+  'occupation-contract-type': occupationContractType,
+  'occupation-contract-start-date': occupationContractStartDate,
+  'occupation-contract-agreement': occupationContractAgreement,
+  'upload-occupation-contract': uploadOccupationContract,
   'rent-arrears-claim': rentArrearsClaim,
   'rent-arrears-grounds': rentArrearsGrounds,
   'other-grounds-claim': otherGroundsClaim,

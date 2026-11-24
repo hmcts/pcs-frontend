@@ -8,6 +8,7 @@ import { addressFromBody } from '../formValues';
 import { AWAITING_SUBMISSION } from '../submittedClaim';
 
 import { MAKE_A_CLAIM_START_ROUTE } from './flow.config';
+import { isWelshProperty } from './propertyCountry';
 
 import { Logger } from '@modules/logger';
 import { getAllFormData } from '@modules/steps';
@@ -17,7 +18,7 @@ import type { LegislativeCountry } from '@services/citizenPossessionClaim.interf
 
 export { PROPERTY_INELIGIBLE_URL };
 export const PROPERTY_COUNTRY_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-country`;
-export const PROPERTY_NOT_COVERED_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-not-covered`;
+export const WALES_CLAIMANT_TYPE_URL = `${MAKE_A_CLAIM_START_ROUTE}/wales-claimant-type`;
 export const WHO_IS_CLAIMING_URL = `${MAKE_A_CLAIM_START_ROUTE}/who-is-claiming`;
 export const PROPERTY_ADDRESS_TOO_LONG_URL = `${MAKE_A_CLAIM_START_ROUTE}/property-address?problem=tooLong`;
 
@@ -40,10 +41,9 @@ async function existingDraftClaim(req: Request): Promise<string | undefined> {
 
 /** Where pcs-api's reasons for refusing to create the claim send the claimant. */
 const REFUSAL_REDIRECTS: [reason: string, redirect: string][] = [
-  ['PROPERTY_NOT_IN_ENGLAND', PROPERTY_INELIGIBLE_URL],
+  ['PROPERTY_NOT_IN_ENGLAND_OR_WALES', PROPERTY_INELIGIBLE_URL],
   ['LEGISLATIVE_COUNTRY_REQUIRED', PROPERTY_COUNTRY_URL],
-  ['POSTCODE_NOT_ASSIGNED_TO_COURT', PROPERTY_NOT_COVERED_URL],
-  ['PROPERTY_NOT_ELIGIBLE', PROPERTY_NOT_COVERED_URL],
+  ['POSTCODE_NOT_ASSIGNED_TO_COURT', PROPERTY_INELIGIBLE_URL],
 ];
 
 /** Where to send a claimant whose claim pcs-api refused to create, or undefined when the refusal is unexpected. */
@@ -73,6 +73,9 @@ export async function createClaimFromStartAnswers(req: Request): Promise<string>
   ) {
     return MAKE_A_CLAIM_START_ROUTE;
   }
+  if (isWelshProperty(req) && answers['wales-claimant-type']?.walesClaimantType !== 'PRIVATE_LANDLORD') {
+    return WALES_CLAIMANT_TYPE_URL;
+  }
 
   const existing = await existingDraftClaim(req);
   if (existing) {
@@ -87,7 +90,7 @@ export async function createClaimFromStartAnswers(req: Request): Promise<string>
           claimantType: 'PRIVATE_LANDLORD',
           isTrespass: 'NO',
           whoIsClaiming: 'MYSELF',
-          ...(legislativeCountry === 'England' ? { legislativeCountry } : {}),
+          ...(legislativeCountry === 'England' || legislativeCountry === 'Wales' ? { legislativeCountry } : {}),
         },
       },
     });

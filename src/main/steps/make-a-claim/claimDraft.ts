@@ -81,6 +81,9 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
   if (tenancy?.tenancyType && tenancy.tenancyType !== 'OTHER') {
     delete tenancy.otherTenancyTypeDetails;
   }
+  if (tenancy?.occupationContractType && tenancy.occupationContractType !== 'OTHER') {
+    delete tenancy.otherOccupationContractDetails;
+  }
   if (tenancy?.tenancyAgreementAvailable === 'NO') {
     delete tenancy.tenancyAgreementDocuments;
   }

@@ -2,6 +2,7 @@ import config from 'config';
 
 import { http } from '@modules/http';
 import type { ClaimSummary } from '@services/ccdCase.interface';
+import type { LegislativeCountry } from '@services/citizenPossessionClaim.interface';
 
 function getBaseUrl(): string {
   return config.get('api.url');
@@ -63,21 +64,30 @@ export const validateAccessCode = async (
 };
 
 /** Whether pcs-api can take a private landlord's claim for a property, by its postcode. */
-export type PropertyEligibilityStatus = 'ELIGIBLE' | 'NOT_ENGLAND' | 'NOT_COVERED' | 'LEGISLATIVE_COUNTRY_REQUIRED';
+export type PropertyEligibilityStatus =
+  'ELIGIBLE' | 'NOT_ENGLAND_OR_WALES' | 'NO_COURT' | 'LEGISLATIVE_COUNTRY_REQUIRED';
 
 const PROPERTY_ELIGIBILITY_STATUSES: PropertyEligibilityStatus[] = [
   'ELIGIBLE',
-  'NOT_ENGLAND',
-  'NOT_COVERED',
+  'NOT_ENGLAND_OR_WALES',
+  'NO_COURT',
   'LEGISLATIVE_COUNTRY_REQUIRED',
 ];
+
+export interface PropertyEligibility {
+  status: PropertyEligibilityStatus;
+  /** The country an eligible property is in. */
+  legislativeCountry?: LegislativeCountry;
+}
+
+const LEGISLATIVE_COUNTRIES: LegislativeCountry[] = ['England', 'Wales'];
 
 export const getPropertyEligibility = async (
   accessToken: string,
   postcode: string,
-  legislativeCountry?: 'England'
-): Promise<PropertyEligibilityStatus> => {
-  const response = await http.get<{ status?: PropertyEligibilityStatus }>(
+  legislativeCountry?: LegislativeCountry
+): Promise<PropertyEligibility> => {
+  const response = await http.get<{ status?: PropertyEligibilityStatus; legislativeCountry?: LegislativeCountry }>(
     `${getBaseUrl()}/cases/citizen-claims/property-eligibility`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -85,10 +95,15 @@ export const getPropertyEligibility = async (
     }
   );
   const status = response.data?.status;
-  if (!status || !PROPERTY_ELIGIBILITY_STATUSES.includes(status)) {
+  const country = response.data?.legislativeCountry;
+  if (
+    !status ||
+    !PROPERTY_ELIGIBILITY_STATUSES.includes(status) ||
+    (status === 'ELIGIBLE' && (!country || !LEGISLATIVE_COUNTRIES.includes(country)))
+  ) {
     throw new Error('Unexpected response from property-eligibility endpoint');
   }
-  return status;
+  return status === 'ELIGIBLE' ? { status, legislativeCountry: country } : { status };
 };
 
 export const getCitizenClaims = async (accessToken: string): Promise<ClaimSummary[]> => {

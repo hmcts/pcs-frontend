@@ -9,7 +9,7 @@ export const step: StepDefinition = createStartStep({
   stepName: 'property-address',
   stepDir: __dirname,
   customTemplate: ADDRESS_TEMPLATE,
-  invalidates: ['property-country'],
+  invalidates: ['property-country', 'wales-claimant-type'],
   fields: addressFields('property'),
   beforeRedirect: async req => {
     const redirect = await propertyEligibilityRedirect(req);

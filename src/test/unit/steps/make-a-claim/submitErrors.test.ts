@@ -41,8 +41,8 @@ describe('submitRefusalOutcome', () => {
     expect(submitRefusalOutcome(refused(code), CASE)).toEqual({ redirect });
   });
 
-  it('sends a property outside England to the property ineligible page', () => {
-    expect(submitRefusalOutcome(refused('PROPERTY_NOT_IN_ENGLAND'), CASE)).toEqual({
+  it('sends a property outside England and Wales to the property ineligible page', () => {
+    expect(submitRefusalOutcome(refused('PROPERTY_NOT_IN_ENGLAND_OR_WALES'), CASE)).toEqual({
       redirect: '/make-a-claim/property-ineligible',
     });
   });
@@ -66,6 +66,25 @@ describe('submitRefusalOutcome', () => {
 
 describe('submitErrorItems', () => {
   const items = (...codes: string[]) => submitErrorItems(request(), codes);
+
+  it.each([
+    ['REQUIRED:tenancy.occupationContractType', 'occupation-contract-type'],
+    ['REQUIRED:tenancy.otherOccupationContractDetails', 'occupation-contract-type'],
+    ['TOO_LONG:tenancy.noTenancyAgreementReason', 'occupation-contract-agreement'],
+    ['REQUIRED:tenancy.tenancyAgreementDocuments', 'upload-occupation-contract'],
+  ])('links %s on a claim for a property in Wales to the %s page', (code, step) => {
+    const wales = {
+      res: {
+        locals: {
+          validatedCase: {
+            id: CASE,
+            data: { citizenPossessionClaim: { eligibility: { legislativeCountry: 'Wales' } } },
+          },
+        },
+      },
+    } as unknown as Request;
+    expect(submitErrorItems(wales, [code])[0].href).toBe(withReturnTo(claimPage(step), 'check-your-answers'));
+  });
 
   it.each([
     ['REQUIRED:claimant.address', claimPage('claimant-address')],

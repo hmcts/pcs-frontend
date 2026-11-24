@@ -68,6 +68,7 @@ export interface StepMapping {
 }
 
 export const TENANCY_TYPES = ['ASSURED', 'EXCLUDED', 'REGULATED', 'OTHER'] as const;
+export const OCCUPATION_CONTRACT_TYPES = ['STANDARD_CONTRACT', 'SECURE_CONTRACT', 'OTHER'] as const;
 export const NOTICE_TYPES = ['NOTICE_SEEKING_POSSESSION', 'NOTICE_TO_QUIT', 'OTHER'] as const;
 export const RENT_FREQUENCIES: readonly RentFrequency[] = ['WEEKLY', 'FORTNIGHTLY', 'MONTHLY', 'OTHER'];
 export const PROOF_TYPES: readonly ProofType[] = ['UPLOAD_STATEMENT', 'TABLE'];
@@ -443,6 +444,37 @@ export const claimMappings: Record<string, StepMapping> = {
   'tenancy-agreement': withReason('tenancy', 'tenancyAgreementAvailable', 'noTenancyAgreementReason', 'no'),
 
   'upload-tenancy-agreement': {
+    isAnswered: claim => documentsAnswered(claim.tenancy?.tenancyAgreementDocuments),
+  },
+
+  'occupation-contract-type': {
+    toForm: claim => ({
+      occupationContractType: claim.tenancy?.occupationContractType,
+      'occupationContractType.otherOccupationContractDetails': claim.tenancy?.otherOccupationContractDetails,
+    }),
+    fromForm: (claim, body) =>
+      setNested(claim, 'tenancy', tenancy => {
+        tenancy.occupationContractType = oneOf(body.occupationContractType, OCCUPATION_CONTRACT_TYPES);
+        tenancy.otherOccupationContractDetails =
+          tenancy.occupationContractType === 'OTHER'
+            ? text(body['occupationContractType.otherOccupationContractDetails'])
+            : undefined;
+      }),
+    isAnswered: claim => claim.tenancy?.occupationContractType !== undefined,
+  },
+
+  'occupation-contract-start-date': {
+    toForm: claim => ({ occupationContractStartDate: toDateParts(claim.tenancy?.tenancyStartDate) }),
+    fromForm: (claim, body) =>
+      setNested(claim, 'tenancy', tenancy => {
+        tenancy.tenancyStartDate = readDate(body, 'occupationContractStartDate');
+      }),
+    isAnswered: claim => claim.tenancy?.tenancyStartDate !== undefined,
+  },
+
+  'occupation-contract-agreement': withReason('tenancy', 'tenancyAgreementAvailable', 'noTenancyAgreementReason', 'no'),
+
+  'upload-occupation-contract': {
     isAnswered: claim => documentsAnswered(claim.tenancy?.tenancyAgreementDocuments),
   },
 

@@ -5,7 +5,7 @@ import { ccdCaseService } from '../../../../main/services/ccdCaseService';
 import {
   PROPERTY_COUNTRY_URL,
   PROPERTY_INELIGIBLE_URL,
-  PROPERTY_NOT_COVERED_URL,
+  WALES_CLAIMANT_TYPE_URL,
   createClaimFromStartAnswers,
   refusedClaimRedirect,
 } from '../../../../main/steps/make-a-claim/start/createClaim';
@@ -37,10 +37,9 @@ const ELIGIBILITY = { claimantType: 'PRIVATE_LANDLORD', isTrespass: 'NO', whoIsC
 
 describe('refusedClaimRedirect', () => {
   it.each([
-    ['PROPERTY_NOT_IN_ENGLAND', PROPERTY_INELIGIBLE_URL],
+    ['PROPERTY_NOT_IN_ENGLAND_OR_WALES', PROPERTY_INELIGIBLE_URL],
     ['LEGISLATIVE_COUNTRY_REQUIRED', PROPERTY_COUNTRY_URL],
-    ['POSTCODE_NOT_ASSIGNED_TO_COURT', PROPERTY_NOT_COVERED_URL],
-    ['PROPERTY_NOT_ELIGIBLE', PROPERTY_NOT_COVERED_URL],
+    ['POSTCODE_NOT_ASSIGNED_TO_COURT', PROPERTY_INELIGIBLE_URL],
   ])('sends %s to %s', (reason, url) => {
     expect(refusedClaimRedirect(new CallbackRejectedError([reason], 422))).toBe(url);
   });
@@ -52,7 +51,7 @@ describe('refusedClaimRedirect', () => {
   });
 
   it('finds the reason among several', () => {
-    expect(refusedClaimRedirect(new CallbackRejectedError(['X', 'PROPERTY_NOT_IN_ENGLAND'], 422))).toBe(
+    expect(refusedClaimRedirect(new CallbackRejectedError(['X', 'PROPERTY_NOT_IN_ENGLAND_OR_WALES'], 422))).toBe(
       PROPERTY_INELIGIBLE_URL
     );
   });
@@ -93,9 +92,49 @@ describe('createClaimFromStartAnswers', () => {
     });
   });
 
-  it('maps the not in England refusal to the property ineligible page', async () => {
-    create.mockRejectedValue(new CallbackRejectedError(['PROPERTY_NOT_IN_ENGLAND'], 422));
-    await expect(createClaimFromStartAnswers(request(ELIGIBLE))).resolves.toBe(PROPERTY_INELIGIBLE_URL);
+  it.each(['PROPERTY_NOT_IN_ENGLAND_OR_WALES', 'POSTCODE_NOT_ASSIGNED_TO_COURT'])(
+    'maps the %s refusal to the property ineligible page',
+    async reason => {
+      create.mockRejectedValue(new CallbackRejectedError([reason], 422));
+      await expect(createClaimFromStartAnswers(request(ELIGIBLE))).resolves.toBe(PROPERTY_INELIGIBLE_URL);
+    }
+  );
+
+  it('says the property is in Wales when the claimant has said so for a cross-border postcode', async () => {
+    create.mockResolvedValue({ id: 1777027600017761, data: {} });
+    await createClaimFromStartAnswers(
+      request({
+        ...ELIGIBLE,
+        'property-country': { legislativeCountry: 'Wales' },
+        'wales-claimant-type': { walesClaimantType: 'PRIVATE_LANDLORD' },
+      })
+    );
+    expect(create.mock.calls[0][1].citizenPossessionClaim.eligibility).toEqual({
+      ...ELIGIBILITY,
+      legislativeCountry: 'Wales',
+    });
+  });
+
+  it.each([
+    ['has not answered', {}],
+    ['is a community landlord', { 'wales-claimant-type': { walesClaimantType: 'COMMUNITY_LANDLORD' } }],
+  ])('asks the Wales claimant type of a claimant with a property in Wales who %s', async (_case, extra) => {
+    const answers = { ...ELIGIBLE, 'property-eligibility': { legislativeCountry: 'Wales' }, ...extra };
+    await expect(createClaimFromStartAnswers(request(answers))).resolves.toBe(WALES_CLAIMANT_TYPE_URL);
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('creates the claim for a private landlord with a property in Wales', async () => {
+    create.mockResolvedValue({ id: 1777027600017761, data: {} });
+    const answers = {
+      ...ELIGIBLE,
+      'property-eligibility': { legislativeCountry: 'Wales' },
+      'wales-claimant-type': { walesClaimantType: 'PRIVATE_LANDLORD' },
+    };
+    await expect(createClaimFromStartAnswers(request(answers))).resolves.toBe(
+      '/case/1777027600017761/make-a-claim/eligible'
+    );
+    expect(create.mock.calls[0][1].citizenPossessionClaim.eligibility).toEqual(ELIGIBILITY);
   });
 
   it('lets any other failure through', async () => {

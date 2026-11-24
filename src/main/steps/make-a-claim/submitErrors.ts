@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import { CallbackRejectedError } from '../../HttpError';
 import { MAKE_A_CLAIM_START_ROUTE, PROPERTY_INELIGIBLE_URL } from '../../constants/makeAClaimRoutes';
 
+import { isWalesClaim } from './conditions';
 import { flowConfig, taskListPath } from './flow.config';
 import { withReturnTo } from './returnTo';
 
@@ -21,6 +22,7 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^defendants(\[\d+\](\.(nameKnown|firstName|lastName))?)?$/, 'defendant-name'],
   [/^defendants\[\d+\]\.(addressKnown|addressSameAsProperty|address(\.[A-Za-z0-9]+)?)$/, 'defendant-address'],
   [/^tenancy\.(tenancyType|otherTenancyTypeDetails)$/, 'tenancy-type'],
+  [/^tenancy\.(occupationContractType|otherOccupationContractDetails)$/, 'occupation-contract-type'],
   [/^tenancy\.noTenancyAgreementReason$/, 'tenancy-agreement'],
   [/^tenancy\.tenancyAgreementDocuments(\[\d+\])?$/, 'upload-tenancy-agreement'],
   [/^grounds$/, 'rent-arrears-claim'],
@@ -52,10 +54,16 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^submission\./, 'check-your-answers'],
 ];
 
+/** The pages that ask a property in Wales the tenancy answers the England pages ask. */
+const WALES_STEPS: Record<string, string> = {
+  'tenancy-agreement': 'occupation-contract-agreement',
+  'upload-tenancy-agreement': 'upload-occupation-contract',
+};
+
 /** Refusals that mean the claimant cannot use the service, by where they are told so. */
 const INELIGIBLE_REDIRECTS: Record<string, (caseId: string) => string> = {
   MULTIPLE_CLAIMANTS_NOT_ELIGIBLE: caseId => getStepUrl('multiple-claimants-ineligible', flowConfig, caseId),
-  PROPERTY_NOT_IN_ENGLAND: () => PROPERTY_INELIGIBLE_URL,
+  PROPERTY_NOT_IN_ENGLAND_OR_WALES: () => PROPERTY_INELIGIBLE_URL,
   CLAIMANT_TYPE_NOT_ELIGIBLE: () => `${MAKE_A_CLAIM_START_ROUTE}/not-private-landlord`,
   CLAIM_AGAINST_TRESPASSERS_NOT_ELIGIBLE: () => `${MAKE_A_CLAIM_START_ROUTE}/trespass-ineligible`,
   WHO_IS_CLAIMING_NOT_ELIGIBLE: () => `${MAKE_A_CLAIM_START_ROUTE}/not-litigant-in-person`,
@@ -100,11 +108,12 @@ export interface ErrorSummaryItem {
   href?: string;
 }
 
-function stepForPath(path: string, caseId: string): { step: string; href: string } | undefined {
-  const step = STEP_FOR_PATH.find(([pattern]) => pattern.test(path))?.[1];
-  if (!step) {
+function stepForPath(path: string, caseId: string, wales: boolean): { step: string; href: string } | undefined {
+  const englandStep = STEP_FOR_PATH.find(([pattern]) => pattern.test(path))?.[1];
+  if (!englandStep) {
     return undefined;
   }
+  const step = (wales && WALES_STEPS[englandStep]) || englandStep;
   if (step === 'check-your-answers') {
     return { step, href: path.endsWith('Agreed') ? '#statementOfTruth' : `#${path.split('.').pop()}` };
   }
@@ -137,7 +146,7 @@ export function submitErrorItems(req: Request, codes: string[]): ErrorSummaryIte
   const items = codes.map((code): ErrorSummaryItem => {
     const answer = ANSWER_REFUSAL.exec(code);
     if (answer) {
-      const target = stepForPath(answer[2], caseId);
+      const target = stepForPath(answer[2], caseId, isWalesClaim(req));
       if (target) {
         const page = t(`makeAClaim:submitErrors.pages.${target.step}`);
         return {

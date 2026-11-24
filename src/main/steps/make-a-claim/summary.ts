@@ -197,6 +197,24 @@ export function tenancyCard(req: Request): SummaryCard {
       withDetail(yesNo(t, tenancy.tenancyAgreementAvailable), tenancy.noTenancyAgreementReason)
     )
     .add('upload-tenancy-agreement', 'tenancyAgreementDocuments', documents(tenancy.tenancyAgreementDocuments))
+    .add(
+      'occupation-contract-type',
+      'occupationContractType',
+      tenancy.occupationContractType === 'OTHER'
+        ? [valueOf(t, 'occupationContractType', 'OTHER') ?? '', tenancy.otherOccupationContractDetails ?? '']
+        : valueOf(t, 'occupationContractType', tenancy.occupationContractType)
+    )
+    .add(
+      'occupation-contract-start-date',
+      'occupationContractStartDate',
+      formatClaimDate(tenancy.tenancyStartDate, req)
+    )
+    .add(
+      'occupation-contract-agreement',
+      'occupationContractAgreementAvailable',
+      withDetail(yesNo(t, tenancy.tenancyAgreementAvailable), tenancy.noTenancyAgreementReason)
+    )
+    .add('upload-occupation-contract', 'occupationContractDocuments', documents(tenancy.tenancyAgreementDocuments))
     .add('rent-arrears-claim', 'hasRentArrearsGrounds', yesNo(t, grounds.hasRentArrearsGrounds))
     .add(
       'rent-arrears-grounds',

@@ -40,6 +40,13 @@ function request(): Request {
 }
 
 describe('normaliseClaim', () => {
+  it('drops the details of an occupation contract that is not Other', () => {
+    expect(
+      normaliseClaim({ tenancy: { occupationContractType: 'SECURE_CONTRACT', otherOccupationContractDetails: 'Old' } })
+        .tenancy
+    ).toEqual({ occupationContractType: 'SECURE_CONTRACT' });
+  });
+
   it('drops answers the claimant can no longer reach', () => {
     expect(
       normaliseClaim({

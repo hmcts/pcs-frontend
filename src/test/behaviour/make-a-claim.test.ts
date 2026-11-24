@@ -193,7 +193,12 @@ describe('before a claim exists', () => {
     expect(ccd.draftSaves[0].event_data.citizenPossessionClaim.draftVersion).toBe(1);
     expect(storedClaim()).toEqual({
       propertyAddress: { AddressLine1: '15 Garden Drive', PostTown: 'Luton', PostCode: 'LU1 1AB' },
-      eligibility: { claimantType: 'PRIVATE_LANDLORD', isTrespass: 'NO', whoIsClaiming: 'MYSELF' },
+      eligibility: {
+        claimantType: 'PRIVATE_LANDLORD',
+        isTrespass: 'NO',
+        whoIsClaiming: 'MYSELF',
+        legislativeCountry: 'England',
+      },
       claimant: { individualOrOrganisation: 'INDIVIDUAL' },
       draftVersion: 2,
     });
@@ -288,40 +293,60 @@ describe('before a claim exists', () => {
     }
   });
 
-  it('turns away a cross-border property in Wales without creating the claim', async () => {
+  it('asks the Wales claimant type of a cross-border property in Wales before creating the claim', async () => {
     app = await bootMakeAClaim();
     await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
     await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
     await app.post('/make-a-claim/property-address', PROPERTY);
     expect((await app.post('/make-a-claim/property-country', { legislativeCountry: 'Wales' })).location).toBe(
-      '/make-a-claim/property-ineligible'
+      '/make-a-claim/wales-claimant-type'
     );
     expect(ccd.createRequests).toEqual([]);
   });
 
-  it('turns away a property whose court does not take claims through this service yet', async () => {
+  it.each(['PROPERTY_NOT_IN_ENGLAND_OR_WALES', 'POSTCODE_NOT_ASSIGNED_TO_COURT'])(
+    'sends a property pcs-api refuses with %s to the property ineligible page',
+    async refusal => {
+      app = await bootMakeAClaim();
+      ccd.refuseCreate = refusal;
+      ccd.propertyEligibility = 503;
+      await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+      await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+      await app.post('/make-a-claim/property-address', { ...PROPERTY, 'property-postcode': 'AB10 1XG' });
+
+      const refused = await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
+
+      expect(refused.location).toBe('/make-a-claim/property-ineligible');
+    }
+  );
+
+  it('explains that only a property in England or Wales can be claimed for', async () => {
     app = await bootMakeAClaim();
-    ccd.refuseCreate = 'PROPERTY_NOT_ELIGIBLE';
-    await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
-    await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
-    await app.post('/make-a-claim/property-address', PROPERTY);
-    expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
-      '/make-a-claim/property-not-covered'
+    const page = new JSDOM((await app.get('/make-a-claim/property-ineligible')).text).window.document;
+
+    expect(page.title).toMatch(/^You cannot use this service –/);
+    expect(page.querySelector('h1')?.textContent?.trim()).toBe('You cannot use this service');
+    const paragraphs = [...page.querySelectorAll('main p.govuk-body')].map(p =>
+      p.textContent?.replace(/\s+/g, ' ').trim()
     );
-    expect((await app.get('/make-a-claim/property-not-covered')).status).toBe(200);
+    expect(paragraphs.slice(0, 2)).toEqual([
+      'You can only make a possession claim against a property in England or Wales using this service.',
+      'If your property is in Scotland you can use your local sheriff court (opens in new tab). There’s a different process in Northern Ireland (opens in new tab).',
+    ]);
+    expect(
+      [...page.querySelectorAll('main p.govuk-body a[target="_blank"]')].slice(0, 2).map(a => a.textContent)
+    ).toEqual([
+      'your local sheriff court (opens in new tab)',
+      'a different process in Northern Ireland (opens in new tab)',
+    ]);
+    const exit = page.querySelector('main a.govuk-button');
+    expect(exit?.textContent?.trim()).toBe('Close and return to the GOV.UK homepage');
+    expect(exit?.getAttribute('href')).toBe('https://www.gov.uk');
   });
 
-  it('sends a property outside England to the property ineligible page', async () => {
+  it('no longer has a page for a property outside the pilot courts', async () => {
     app = await bootMakeAClaim();
-    ccd.refuseCreate = 'PROPERTY_NOT_IN_ENGLAND';
-    await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
-    await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
-    await app.post('/make-a-claim/property-address', { ...PROPERTY, 'property-postcode': 'CF10 1AA' });
-
-    const refused = await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' });
-
-    expect(refused.location).toBe('/make-a-claim/property-ineligible');
-    expect(text((await app.get('/make-a-claim/property-ineligible')).text)).toContain('property in England');
+    expect((await app.get('/make-a-claim/property-not-covered')).status).toBe(404);
   });
 
   describe('checking the property as soon as the claimant gives it', () => {
@@ -332,13 +357,14 @@ describe('before a claim exists', () => {
     };
 
     it.each([
-      ['ELIGIBLE', '/make-a-claim/who-is-claiming'],
-      ['NOT_COVERED', '/make-a-claim/property-not-covered'],
-      ['NOT_ENGLAND', '/make-a-claim/property-ineligible'],
-      ['LEGISLATIVE_COUNTRY_REQUIRED', '/make-a-claim/property-country'],
-    ])('sends a property pcs-api finds %s to %s', async (status, page) => {
+      [{ status: 'ELIGIBLE', legislativeCountry: 'England' }, '/make-a-claim/who-is-claiming'],
+      [{ status: 'ELIGIBLE', legislativeCountry: 'Wales' }, '/make-a-claim/wales-claimant-type'],
+      [{ status: 'NOT_ENGLAND_OR_WALES' }, '/make-a-claim/property-ineligible'],
+      [{ status: 'NO_COURT' }, '/make-a-claim/property-ineligible'],
+      [{ status: 'LEGISLATIVE_COUNTRY_REQUIRED' }, '/make-a-claim/property-country'],
+    ])('sends a property pcs-api finds %j to %s', async (eligibility, page) => {
       app = await bootMakeAClaim();
-      ccd.propertyEligibility = status;
+      ccd.propertyEligibility = eligibility;
       expect(await giveProperty()).toBe(page);
       expect(ccd.eligibilityChecks).toEqual([{ postcode: 'LU1 1AB' }]);
       expect(ccd.createRequests).toEqual([]);
@@ -352,11 +378,11 @@ describe('before a claim exists', () => {
 
     it('checks a cross-border property again once the claimant says it is in England', async () => {
       app = await bootMakeAClaim();
-      ccd.propertyEligibility = 'LEGISLATIVE_COUNTRY_REQUIRED';
+      ccd.propertyEligibility = { status: 'LEGISLATIVE_COUNTRY_REQUIRED' };
       await giveProperty();
-      ccd.propertyEligibility = 'NOT_COVERED';
+      ccd.propertyEligibility = { status: 'NO_COURT' };
       expect((await app.post('/make-a-claim/property-country', { legislativeCountry: 'England' })).location).toBe(
-        '/make-a-claim/property-not-covered'
+        '/make-a-claim/property-ineligible'
       );
       expect(ccd.eligibilityChecks[1]).toEqual({ postcode: 'LU1 1AB', legislativeCountry: 'England' });
       expect(ccd.createRequests).toEqual([]);
@@ -364,10 +390,10 @@ describe('before a claim exists', () => {
 
     it('asks who is claiming after an eligible cross-border property in England, then creates the claim', async () => {
       app = await bootMakeAClaim();
-      ccd.propertyEligibility = 'LEGISLATIVE_COUNTRY_REQUIRED';
+      ccd.propertyEligibility = { status: 'LEGISLATIVE_COUNTRY_REQUIRED' };
       expect(await giveProperty()).toBe('/make-a-claim/property-country');
       expect((await app.get('/make-a-claim/property-country')).status).toBe(200);
-      ccd.propertyEligibility = 'ELIGIBLE';
+      ccd.propertyEligibility = { status: 'ELIGIBLE', legislativeCountry: 'England' };
       expect((await app.post('/make-a-claim/property-country', { legislativeCountry: 'England' })).location).toBe(
         '/make-a-claim/who-is-claiming'
       );
@@ -378,14 +404,155 @@ describe('before a claim exists', () => {
       expect(ccd.createRequests[0].data.citizenPossessionClaim.eligibility.legislativeCountry).toBe('England');
     });
 
-    it('turns away a property in Wales without checking it again', async () => {
+    it('checks a cross-border property again in Wales, then asks the Wales claimant type', async () => {
       app = await bootMakeAClaim();
-      ccd.propertyEligibility = 'LEGISLATIVE_COUNTRY_REQUIRED';
+      ccd.propertyEligibility = { status: 'LEGISLATIVE_COUNTRY_REQUIRED' };
       await giveProperty();
+      ccd.propertyEligibility = { status: 'ELIGIBLE', legislativeCountry: 'Wales' };
       expect((await app.post('/make-a-claim/property-country', { legislativeCountry: 'Wales' })).location).toBe(
-        '/make-a-claim/property-ineligible'
+        '/make-a-claim/wales-claimant-type'
       );
-      expect(ccd.eligibilityChecks).toHaveLength(1);
+      expect(ccd.eligibilityChecks[1]).toEqual({ postcode: 'LU1 1AB', legislativeCountry: 'Wales' });
+      expect(
+        new JSDOM((await app.get('/make-a-claim/wales-claimant-type')).text).window.document
+          .querySelector('.govuk-back-link')
+          ?.getAttribute('href')
+      ).toBe('/make-a-claim/property-country');
+
+      await app.post('/make-a-claim/wales-claimant-type', { walesClaimantType: 'PRIVATE_LANDLORD' });
+      expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
+        claimPath('eligible')
+      );
+      expect(ccd.createRequests[0].data.citizenPossessionClaim.eligibility.legislativeCountry).toBe('Wales');
+    });
+
+    it('sends a Scottish property to the property ineligible page without creating the claim', async () => {
+      app = await bootMakeAClaim();
+      ccd.propertyEligibility = { status: 'NOT_ENGLAND_OR_WALES' };
+      await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+      await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+      const given = await app.post('/make-a-claim/property-address', {
+        'property-addressLine1': '1 Union Street',
+        'property-town': 'Aberdeen',
+        'property-postcode': 'AB10 1XG',
+      });
+      expect(given.location).toBe('/make-a-claim/property-ineligible');
+      expect(ccd.eligibilityChecks).toEqual([{ postcode: 'AB10 1XG' }]);
+      expect(ccd.createRequests).toEqual([]);
+    });
+
+    it('takes a property in England whose court is not in the pilot', async () => {
+      app = await bootMakeAClaim();
+      ccd.propertyEligibility = { status: 'ELIGIBLE', legislativeCountry: 'England' };
+      await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+      await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+      const given = await app.post('/make-a-claim/property-address', {
+        'property-addressLine1': '1 Oxford Road',
+        'property-town': 'Manchester',
+        'property-postcode': 'M13 9PL',
+      });
+      expect(given.location).toBe('/make-a-claim/who-is-claiming');
+      expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
+        claimPath('eligible')
+      );
+      expect(storedClaim().eligibility.legislativeCountry).toBe('England');
+    });
+  });
+
+  describe('a property in Wales', () => {
+    const giveWelshProperty = async (): Promise<string | undefined> => {
+      ccd.propertyEligibility = { status: 'ELIGIBLE', legislativeCountry: 'Wales' };
+      await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+      await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+      return (
+        await app.post('/make-a-claim/property-address', {
+          'property-addressLine1': '1 Test Street',
+          'property-town': 'Betws-y-Coed',
+          'property-postcode': 'LL24 0BE',
+        })
+      ).location;
+    };
+
+    it('asks the Wales claimant type, with the Welsh landlord types', async () => {
+      app = await bootMakeAClaim();
+      expect(await giveWelshProperty()).toBe('/make-a-claim/wales-claimant-type');
+      const page = new JSDOM((await app.get('/make-a-claim/wales-claimant-type')).text).window.document;
+
+      expect(page.title).toMatch(/^What type of claimant are you\? –/);
+      expect(page.querySelector('h1')?.textContent?.trim()).toBe('What type of claimant are you?');
+      expect([...page.querySelectorAll('.govuk-radios__label')].map(label => label.textContent?.trim())).toEqual([
+        'Private landlord',
+        'Registered community landlord',
+        'Mortgage provider',
+      ]);
+      expect(page.querySelector('input[name="walesClaimantType"]:checked')).toBeNull();
+      expect(page.querySelector('.govuk-back-link')?.getAttribute('href')).toBe('/make-a-claim/property-address');
+    });
+
+    it('asks a private landlord who is claiming, then creates the claim for the property in Wales', async () => {
+      app = await bootMakeAClaim();
+      await giveWelshProperty();
+      expect(
+        (await app.post('/make-a-claim/wales-claimant-type', { walesClaimantType: 'PRIVATE_LANDLORD' })).location
+      ).toBe('/make-a-claim/who-is-claiming');
+      expect(
+        new JSDOM((await app.get('/make-a-claim/who-is-claiming')).text).window.document
+          .querySelector('.govuk-back-link')
+          ?.getAttribute('href')
+      ).toBe('/make-a-claim/wales-claimant-type');
+      expect(
+        new JSDOM((await app.get('/make-a-claim/wales-claimant-type')).text).window.document
+          .querySelector('input[name="walesClaimantType"]:checked')
+          ?.getAttribute('value')
+      ).toBe('PRIVATE_LANDLORD');
+
+      expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'MYSELF' })).location).toBe(
+        claimPath('eligible')
+      );
+      expect(ccd.createRequests[0].data.citizenPossessionClaim.eligibility).toEqual({
+        claimantType: 'PRIVATE_LANDLORD',
+        isTrespass: 'NO',
+        whoIsClaiming: 'MYSELF',
+      });
+      expect(storedClaim().eligibility.legislativeCountry).toBe('Wales');
+    });
+
+    it.each(['COMMUNITY_LANDLORD', 'MORTGAGE_LENDER'])('turns away a %s with the Wales wording', async type => {
+      app = await bootMakeAClaim();
+      await giveWelshProperty();
+      expect((await app.post('/make-a-claim/wales-claimant-type', { walesClaimantType: type })).location).toBe(
+        '/make-a-claim/not-private-landlord'
+      );
+      const page = new JSDOM((await app.get('/make-a-claim/not-private-landlord')).text).window.document;
+      expect(text(page.body.innerHTML)).toContain(
+        'If you’re a registered community landlord or a mortgage provider, use MyHMCTS instead.'
+      );
+      expect(page.querySelector('.govuk-back-link')?.getAttribute('href')).toBe('/make-a-claim/wales-claimant-type');
+      expect(ccd.createRequests).toEqual([]);
+    });
+
+    it('asks a claimant to choose a Wales claimant type', async () => {
+      app = await bootMakeAClaim();
+      await giveWelshProperty();
+      const refused = await app.post('/make-a-claim/wales-claimant-type', {});
+      const page = new JSDOM(refused.text).window.document;
+      expect(page.title).toMatch(/^Error: /);
+      expect(text(page.body.innerHTML)).toContain('Select what type of claimant you are');
+    });
+
+    it('is not asked about a property in England', async () => {
+      app = await bootMakeAClaim();
+      await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+      await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+      expect((await app.post('/make-a-claim/property-address', PROPERTY)).location).toBe(
+        '/make-a-claim/who-is-claiming'
+      );
+      expect((await app.get('/make-a-claim/wales-claimant-type')).location).toBe('/make-a-claim/property-address');
+    });
+
+    it('needs the claimant to be signed in', async () => {
+      app = await bootMakeAClaim({ signedIn: false });
+      expect((await app.get('/make-a-claim/wales-claimant-type')).location).toBe('/login');
     });
   });
 });
@@ -483,6 +650,129 @@ describe('every page renders', () => {
       }
     }
     expect(failures).toEqual([]);
+  });
+});
+
+describe('the occupation contract for a property in Wales', () => {
+  const WALES_ELIGIBILITY = { ...ANSWERED_CLAIM.eligibility, legislativeCountry: 'Wales' };
+  const page = async (path: string) => new JSDOM((await app.get(path)).text).window.document;
+  const radios = (document: Document) =>
+    [...document.querySelectorAll('.govuk-radios__label')].map(label => label.textContent?.trim());
+
+  it('asks about the occupation contract instead of the tenancy', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ eligibility: WALES_ELIGIBILITY });
+
+    expect((await app.post(claimPath('tenancy-details'), {})).location).toMatch(
+      new RegExp(`^${claimPath('occupation-contract-type')}`)
+    );
+    const contractType = await page(claimPath('occupation-contract-type'));
+    expect(contractType.title).toMatch(/^What type of occupation contract or licence is in place, or was in place\? –/);
+    expect(contractType.querySelector('h1')?.textContent?.trim()).toBe(
+      'What type of occupation contract or licence is in place, or was in place?'
+    );
+    expect(radios(contractType)).toEqual(['Standard contract', 'Secure contract', 'Other']);
+    expect(contractType.querySelector('input[name="occupationContractType"]:checked')).toBeNull();
+    expect(
+      contractType
+        .querySelector('label[for="occupationContractType.otherOccupationContractDetails"]')
+        ?.textContent?.trim()
+    ).toBe('Give details of the type of occupation contract or licence');
+  });
+
+  it('asks a property in England about the tenancy', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ eligibility: { ...ANSWERED_CLAIM.eligibility, legislativeCountry: 'England' } });
+    expect((await app.post(claimPath('tenancy-details'), {})).location).toMatch(
+      new RegExp(`^${claimPath('tenancy-type')}`)
+    );
+  });
+
+  it('saves the occupation contract, its start date and whether the agreement can be uploaded', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ eligibility: WALES_ELIGIBILITY });
+
+    const missingDetails = await app.post(claimPath('occupation-contract-type'), { occupationContractType: 'OTHER' });
+    expect(text(missingDetails.text)).toContain('Enter the type of occupation contract or licence');
+    expect(
+      (await app.post(claimPath('occupation-contract-type'), { occupationContractType: 'STANDARD_CONTRACT' })).location
+    ).toMatch(new RegExp(`^${claimPath('occupation-contract-start-date')}`));
+    expect(storedClaim().tenancy).toEqual({ occupationContractType: 'STANDARD_CONTRACT' });
+
+    const startDate = await page(claimPath('occupation-contract-start-date'));
+    expect(startDate.querySelector('h1')?.textContent?.trim()).toBe(
+      'When did the occupation contract or licence begin?'
+    );
+    expect(text(startDate.body.innerHTML)).toContain('For example, 27 9 2022');
+    expect(
+      (
+        await app.post(claimPath('occupation-contract-start-date'), {
+          'occupationContractStartDate-day': '27',
+          'occupationContractStartDate-month': '9',
+          'occupationContractStartDate-year': '2022',
+        })
+      ).location
+    ).toMatch(new RegExp(`^${claimPath('occupation-contract-agreement')}`));
+    expect(storedClaim().tenancy.tenancyStartDate).toBe('2022-09-27');
+
+    const agreement = await page(claimPath('occupation-contract-agreement'));
+    expect(agreement.querySelector('h1')?.textContent?.trim()).toBe(
+      'Can you upload a copy of the occupation contract or licence agreement?'
+    );
+    expect(text(agreement.body.innerHTML)).toContain('You’ll be able to upload it on the next screen');
+    expect(text(agreement.body.innerHTML)).toContain(
+      'Explain why you cannot upload a copy of the occupation contract or licence agreement'
+    );
+    expect(
+      (await app.post(claimPath('occupation-contract-agreement'), { tenancyAgreementAvailable: 'yes' })).location
+    ).toMatch(new RegExp(`^${claimPath('upload-occupation-contract')}`));
+
+    const upload = await page(claimPath('upload-occupation-contract'));
+    expect(upload.querySelector('h1')?.textContent?.trim()).toBe('Upload occupation contract or licence agreement');
+    expect(text(upload.body.innerHTML)).toContain(
+      'Upload a signed copy of the occupation contract or licence agreement.'
+    );
+    expect(text(upload.body.innerHTML)).toContain("For example, 'licence agreement - 15 Garden Drive'");
+
+    expect(
+      (
+        await app.post(claimPath('occupation-contract-agreement'), {
+          tenancyAgreementAvailable: 'no',
+          'tenancyAgreementAvailable.noTenancyAgreementReason': 'Lost in a flood',
+        })
+      ).location
+    ).toMatch(new RegExp(`^${claimPath('rent-arrears-claim')}`));
+    expect(storedClaim().tenancy).toEqual({
+      occupationContractType: 'STANDARD_CONTRACT',
+      tenancyStartDate: '2022-09-27',
+      tenancyAgreementAvailable: 'NO',
+      noTenancyAgreementReason: 'Lost in a flood',
+    });
+  });
+
+  it('shows the occupation contract answers, not the tenancy ones, on the summary', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...ANSWERED_CLAIM,
+      eligibility: WALES_ELIGIBILITY,
+      tenancy: {
+        occupationContractType: 'OTHER',
+        otherOccupationContractDetails: 'Supported standard contract',
+        tenancyStartDate: '2022-09-27',
+        tenancyAgreementAvailable: 'NO',
+        noTenancyAgreementReason: 'Lost in a flood',
+      },
+    });
+
+    const summary = text((await app.get(claimPath('tenancy-cya'))).text);
+    expect(summary).toMatch(
+      /What type of occupation contract or licence is in place, or was in place\? Other\s*Supported standard contract/
+    );
+    expect(summary).toContain('When did the occupation contract or licence begin? 27 September 2022');
+    expect(summary).toMatch(
+      /Can you upload a copy of the occupation contract or licence agreement\? No\s*Lost in a flood/
+    );
+    expect(summary).not.toContain('What type of tenancy or licence is in place');
   });
 });
 

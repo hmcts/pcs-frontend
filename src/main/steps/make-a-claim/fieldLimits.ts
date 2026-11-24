@@ -22,6 +22,7 @@ export const FIELD_LIMITS = {
   defendantFirstName: NAME,
   defendantLastName: NAME,
   otherTenancyTypeDetails: REASON,
+  otherOccupationContractDetails: REASON,
   noTenancyAgreementReason: REASON,
   otherGroundsDetails: REASON,
   groundReason: REASON,

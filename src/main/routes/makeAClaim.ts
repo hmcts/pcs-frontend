@@ -40,8 +40,13 @@ function registerStartSteps(app: Application): void {
     const requiresAuth = startFlowConfig.steps[step.name]?.requiresAuth !== false;
     const auth: RequestHandler[] = requiresAuth ? [oidcMiddleware] : [];
     const context = withStepContext({ name: step.name, journey: 'makeAClaim' });
-    app.get(step.url, context, ...auth, stepDependencyCheckMiddleware(startFlowConfig), (req, res) =>
-      controllerOf(step).get(req, res)
+    app.get(
+      step.url,
+      context,
+      ...auth,
+      stepDependencyCheckMiddleware(startFlowConfig),
+      ...(step.middleware ?? []),
+      (req, res) => controllerOf(step).get(req, res)
     );
     if (step.postController) {
       app.post(step.url, context, ...auth, step.postController.post);
