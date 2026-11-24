@@ -5,6 +5,7 @@ import type { Application, Request, Response } from 'express';
 import viewDocumentsRoute from '@routes/viewDocuments';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getDocumentBinary } from '@services/cdamService';
+import { isClaimantOfCase } from '@utils/claimantClaims';
 import { isUncategorisedDocumentsEnabled } from '@utils/isUncategorisedDocumentsEnabled';
 
 type RouteHandler = (req: Request, res: Response, next: jest.Mock) => Promise<void>;
@@ -20,6 +21,10 @@ jest.mock('@utils/isUncategorisedDocumentsEnabled', () => ({
 const mockIsUncategorisedDocumentsEnabled = isUncategorisedDocumentsEnabled as jest.MockedFunction<
   typeof isUncategorisedDocumentsEnabled
 >;
+
+jest.mock('@utils/claimantClaims', () => ({
+  isClaimantOfCase: jest.fn().mockResolvedValue(false),
+}));
 
 jest.mock('@services/cdamService', () => ({
   getDocumentBinary: jest.fn(),
@@ -75,6 +80,27 @@ describe('viewDocuments route', () => {
   });
 
   describe('GET /case/:caseReference/view-documents', () => {
+    it.each([
+      [true, '/case/1777570813792018/claimant-dashboard'],
+      [false, '/case/1777570813792018/dashboard'],
+    ])('when the user is the claimant (%s), goes back to %s', async (claimant, backUrl) => {
+      mockGetCaseById.mockResolvedValue({ id: '1777570813792018', data: {} });
+      (isClaimantOfCase as jest.Mock).mockResolvedValueOnce(claimant);
+      const res = { render: jest.fn() } as unknown as Response;
+
+      await getHandler('/case/:caseReference/view-documents')(
+        {
+          params: { caseReference: '1777570813792018' },
+          session: { user: { accessToken: 'token' } },
+          t: (key: string) => key,
+        } as unknown as Request,
+        res,
+        jest.fn()
+      );
+
+      expect(res.render).toHaveBeenCalledWith('view-documents', expect.objectContaining({ backUrl }));
+    });
+
     it('fetches the case via getCaseById and renders the view-documents template', async () => {
       mockGetCaseById.mockResolvedValue({
         id: '1777570813792018',

@@ -2,8 +2,8 @@ import config from 'config';
 import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
-import { VIEW_DOCUMENTS_ROUTE } from '../constants/caseRoutes';
 import {
+  CLAIMANT_DASHBOARD_ROUTE,
   CLAIM_SUBMITTED_ROUTE,
   MAKE_A_CLAIM_ROUTE,
   PAY_CLAIM_FEE_ROUTE,
@@ -234,7 +234,7 @@ function registerSubmittedClaimRoutes(app: Application): void {
         panelText: t('makeAClaim:claimSubmitted.panelText', {
           caseNumber: formatCaseReferenceForDisplay(caseReference),
         }),
-        viewDocumentsUrl: makeAClaimPath(VIEW_DOCUMENTS_ROUTE, caseReference),
+        claimFormUrl: makeAClaimPath(CLAIMANT_DASHBOARD_ROUTE, caseReference),
         feedbackUrl: 'https://www.smartsurvey.co.uk/s/Poss_feedback/',
       });
     } catch (error) {

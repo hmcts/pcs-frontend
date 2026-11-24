@@ -27,6 +27,7 @@ import {
   payClaimFee,
   startAsPrivateLandlord,
   submitClaim,
+  viewClaimantDashboardAndAccount,
 } from '../utils/common/privateLandlordClaim.journey';
 import { finaliseAllValidations, initializeExecutor } from '../utils/controller';
 
@@ -56,6 +57,7 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
     await answerFinalQuestions(page);
     await submitClaim(page);
     await payClaimFee(page);
+    await viewClaimantDashboardAndAccount(page);
   });
 
   test('Rent arrears claim for a property in Wales, with the occupation contract', async ({ page }) => {

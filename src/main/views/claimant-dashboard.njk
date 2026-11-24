@@ -1,0 +1,50 @@
+{% extends "template.njk" %}
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "components/taskGroup/macro.njk" import taskGroup %}
+
+{% block pageTitle %}{{ propertyAddress }} - {{ t('claimantDashboard:pageTitle') }} - GOV.UK{% endblock %}
+
+{% block content %}
+  {{ govukBreadcrumbs({
+    items: [{ text: t('claimantDashboard:home'), href: '/' }]
+  }) }}
+
+  {% if propertyAddress %}
+    <h1 class="govuk-heading-l govuk-!-margin-bottom-4">{{ propertyAddress }}</h1>
+  {% endif %}
+  <p class="govuk-body-l">{{ t('claimantDashboard:caseNumberLabel') }} {{ caseNumber }}</p>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible section-border" aria-hidden="true"/>
+
+      {% if claimMade %}
+        {{ govukNotificationBanner({
+          titleText: t('claimantDashboard:claimMade.title'),
+          titleId: 'claim-state-title',
+          html: '<p class="govuk-body">' + t('claimantDashboard:claimMade.text') + '</p>'
+        }) }}
+      {% endif %}
+
+      {% for group in taskGroups %}
+        {{ taskGroup(group) }}
+      {% endfor %}
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+      <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible section-border" aria-hidden="true"/>
+      <aside class="app-related-items" role="complementary">
+        <h2 class="govuk-heading-m">{{ t('claimantDashboard:helpAndSupport') }}</h2>
+        <ul class="govuk-list">
+          {% for link in helpAndSupportLinks %}
+            <li><a class="govuk-link" href="{{ link.href }}">{{ t('claimantDashboard:links.' ~ link.key) }}</a></li>
+          {% endfor %}
+        </ul>
+        <nav role="navigation" aria-label="{{ t('supportAndContactInformation') }}">
+          {% include "components/contact-us-details.njk" %}
+        </nav>
+      </aside>
+    </div>
+  </div>
+{% endblock %}

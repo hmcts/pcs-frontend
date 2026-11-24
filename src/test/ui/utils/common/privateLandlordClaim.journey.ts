@@ -369,6 +369,34 @@ export async function payClaimFee(page: Page): Promise<void> {
   await expect(page.locator('.govuk-panel__body')).toContainText(formatCaseReferenceForDisplay(caseReference));
 }
 
+/**
+ * From the claim submitted page, follows the claim form link to the claimant dashboard, then finds the claim in the
+ * account page as a submitted claim that leads back to the dashboard.
+ */
+export async function viewClaimantDashboardAndAccount(page: Page): Promise<void> {
+  const caseReference = caseReferenceOnPage(page);
+  await page.getByRole('link', { name: 'View your claim form' }).click();
+  await expect(page).toHaveURL(new RegExp(`/case/${caseReference}/claimant-dashboard$`));
+  await expect(page.getByText(`Case number: ${formatCaseReferenceForDisplay(caseReference)}`)).toBeVisible();
+  await expect(page.getByText('You’ve made a property possession claim')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'View the claim form' })).toHaveAttribute(
+    'href',
+    `/case/${caseReference}/view-documents`
+  );
+  await expect(page.getByRole('link', { name: 'View documents' })).toBeVisible();
+  await expect(page.getByText('Contact us for help')).toBeVisible();
+
+  await page.goto(`${process.env.TEST_URL}/claims`);
+  await expect(page.getByRole('heading', { level: 1, name: 'Your property possession account' })).toBeVisible();
+  await expect(page.getByRole('row', { name: new RegExp(`Submitted claim ${caseReference}`) })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Make a housing possession claim' })).toHaveAttribute(
+    'href',
+    '/make-a-claim'
+  );
+  await page.getByRole('link', { name: 'Submitted claim' }).click();
+  await expect(page).toHaveURL(new RegExp(`/case/${caseReference}/claimant-dashboard$`));
+}
+
 /** A declined card returns the claimant to the claim fee page, told it failed, with the payment to try again. */
 export async function declineClaimFeeCard(page: Page): Promise<void> {
   const caseReference = caseReferenceOnPage(page);

@@ -1,12 +1,14 @@
 import { Application, NextFunction, Request, Response } from 'express';
 
 import { HTTPError } from '../HttpError';
+import { CLAIMANT_DASHBOARD_ROUTE, makeAClaimPath } from '../constants/makeAClaimRoutes';
 import { oidcMiddleware } from '../middleware';
 import { Logger } from '../modules/logger';
 
 import { getDashboardUrl } from '@routes/dashboard';
 import { ccdCaseService } from '@services/ccdCaseService';
 import { getDocumentBinary } from '@services/cdamService';
+import { isClaimantOfCase } from '@utils/claimantClaims';
 import { extractCaseDocuments, extractViewDocumentFolders, findCaseDocumentById } from '@utils/documentUtils';
 import { asHeaderString } from '@utils/httpHeaders';
 import { isUncategorisedDocumentsEnabled } from '@utils/isUncategorisedDocumentsEnabled';
@@ -49,7 +51,9 @@ export default function viewDocumentsRoutes(app: Application): void {
 
         res.render('view-documents', {
           dashboardUrl: getDashboardUrl(caseReference),
-          backUrl: getDashboardUrl(caseReference),
+          backUrl: (await isClaimantOfCase(req, caseReference))
+            ? makeAClaimPath(CLAIMANT_DASHBOARD_ROUTE, caseReference)
+            : getDashboardUrl(caseReference),
           caseReference,
           documentFolders: extractViewDocumentFolders((ccdCase.data ?? {}) as Record<string, unknown>, {
             includeUncategorised: uncategorisedEnabled,

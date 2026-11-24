@@ -1,7 +1,7 @@
 import config from 'config';
 
 import { http } from '@modules/http';
-import type { ClaimSummary } from '@services/ccdCase.interface';
+import type { ClaimSummary, ClaimantClaimSummary } from '@services/ccdCase.interface';
 import type { LegislativeCountry } from '@services/citizenPossessionClaim.interface';
 
 function getBaseUrl(): string {
@@ -112,6 +112,16 @@ export const getCitizenClaims = async (accessToken: string): Promise<ClaimSummar
   });
   if (!Array.isArray(response.data)) {
     throw new Error('Unexpected response from citizen-claims endpoint');
+  }
+  return response.data;
+};
+
+export const getClaimantClaims = async (accessToken: string): Promise<ClaimantClaimSummary[]> => {
+  const response = await http.get<ClaimantClaimSummary[]>(`${getBaseUrl()}/cases/citizen-claims/as-claimant`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!Array.isArray(response.data)) {
+    throw new Error('Unexpected response from citizen-claims as-claimant endpoint');
   }
   return response.data;
 };

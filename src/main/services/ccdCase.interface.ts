@@ -496,6 +496,20 @@ export interface ClaimSummary {
   propertyPostcode?: string;
 }
 
+export interface ClaimantClaimSummary {
+  caseReference?: string;
+  /** The CCD case state; AWAITING_SUBMISSION_TO_HMCTS while the claim is a draft. */
+  state?: string;
+  propertyAddress?: {
+    addressLine1?: string;
+    addressLine2?: string;
+    addressLine3?: string;
+    postTown?: string;
+    county?: string;
+    postcode?: string;
+  };
+}
+
 export enum GenAppState {
   PENDING_GEN_APP_ISSUED = 'PENDING_GEN_APP_ISSUED',
   GEN_APP_ISSUED = 'GEN_APP_ISSUED',

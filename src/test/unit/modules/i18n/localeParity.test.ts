@@ -32,6 +32,16 @@ const UNTRANSLATED_ALLOWLIST = new Set([
   'respondToClaim/legalrep/tenancyDateDetails.json::question',
   'respondToClaim/legalrep/tenancyTypeDetails.json::tenancyTypeOther',
 
+  // Private landlord claimant account page, behind private-landlord-make-a-claim-enabled
+  'claimList.json::claimantHeading',
+  'claimList.json::claimsMade.heading',
+  'claimList.json::claimsMade.claimState',
+  'claimList.json::claimsMade.claimNumber',
+  'claimList.json::claimsMade.draftClaim',
+  'claimList.json::claimsMade.submittedClaim',
+  'claimList.json::claimsMade.noClaims',
+  'claimList.json::claimsMade.makeAClaim',
+
   // HDPI-8858 - waiting on translations for these pages
   'footer/cookies.json::pageTitle',
   'footer/cookies.json::cookies.title',
@@ -439,6 +449,7 @@ const AWAITING_TRANSLATION = new Set<string>([
   'makeAClaim/languageUsed.json',
   'makeAClaim/removeDefendant.json',
   'makeAClaim/checkYourAnswers.json',
+  'claimantDashboard.json',
 ]);
 
 type Json = string | number | boolean | null | Json[] | { [k: string]: Json };

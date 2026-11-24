@@ -1,7 +1,8 @@
 import type { Application, NextFunction, Request, RequestHandler, Response } from 'express';
 
 import claimListRoutes, { CLAIM_LIST_ROUTE } from '@routes/claimList';
-import { getCitizenClaims } from '@services/pcsApi/pcsApiService';
+import { getCitizenClaims, getClaimantClaims } from '@services/pcsApi/pcsApiService';
+import { isMakeAClaimEnabled } from '@utils/makeAClaimFlags';
 
 jest.mock('../../../main/middleware', () => ({
   oidcMiddleware: jest.fn(),
@@ -13,6 +14,11 @@ jest.mock('@modules/i18n', () => ({
 
 jest.mock('@services/pcsApi/pcsApiService', () => ({
   getCitizenClaims: jest.fn(),
+  getClaimantClaims: jest.fn(),
+}));
+
+jest.mock('@utils/makeAClaimFlags', () => ({
+  isMakeAClaimEnabled: jest.fn().mockResolvedValue(false),
 }));
 
 jest.mock('../../../main/modules/logger', () => ({
@@ -191,5 +197,91 @@ describe('claimList route', () => {
     expect(next).toHaveBeenCalledWith(error);
     expect(res.render).not.toHaveBeenCalled();
     expect(res.redirect).not.toHaveBeenCalled();
+  });
+
+  describe('claimant account', () => {
+    const CLAIMS_MADE = [
+      { caseReference: '2222333344445555', state: 'AWAITING_SUBMISSION_TO_HMCTS' },
+      { caseReference: '1111222233334444', state: 'CASE_ISSUED' },
+    ];
+
+    beforeEach(() => {
+      (isMakeAClaimEnabled as jest.Mock).mockResolvedValue(true);
+      (getCitizenClaims as jest.Mock).mockResolvedValue([]);
+      (getClaimantClaims as jest.Mock).mockResolvedValue(CLAIMS_MADE);
+    });
+
+    async function renderPage(roles: string[] = ['citizen']): Promise<Record<string, unknown>> {
+      const app = buildApp();
+      claimListRoutes(app);
+      const req = buildReq({ user: { accessToken: 'test-token', roles } });
+      const res = buildRes();
+      await getHandler(app)(req, res, next);
+      return (res.render as jest.Mock).mock.calls[0][1];
+    }
+
+    it('lists a draft linking to its task list and a submitted claim linking to its dashboard', async () => {
+      const view = await renderPage();
+
+      expect(view.claimantAccount).toBe(true);
+      expect(getClaimantClaims).toHaveBeenCalledWith('test-token');
+      expect(view.claimsMadeRows).toEqual([
+        [
+          {
+            html: '<a href="/case/2222333344445555/make-a-claim/task-list" class="govuk-link">claimList:claimsMade.draftClaim</a>',
+          },
+          { text: '2222333344445555' },
+        ],
+        [
+          {
+            html: '<a href="/case/1111222233334444/claimant-dashboard" class="govuk-link">claimList:claimsMade.submittedClaim</a>',
+          },
+          { text: '1111222233334444' },
+        ],
+      ]);
+      expect(view.makeAClaimUrl).toBe('/make-a-claim');
+    });
+
+    it('still lists the claims made against the citizen', async () => {
+      (getCitizenClaims as jest.Mock).mockResolvedValue([
+        { caseReference: '9876543210987654', claimantName: 'Jane Smith', propertyPostcode: 'EC1A 1BB' },
+      ]);
+
+      const view = await renderPage();
+
+      expect(view.tableRows).toHaveLength(1);
+    });
+
+    it.each([['caseworker-pcs-solicitor'], ['caseworker']])(
+      'is not shown to the %s role, which is never asked for its claims',
+      async role => {
+        const view = await renderPage([role]);
+
+        expect(view.claimantAccount).toBe(false);
+        expect(getClaimantClaims).not.toHaveBeenCalled();
+      }
+    );
+
+    it('is not shown while the journey is switched off', async () => {
+      (isMakeAClaimEnabled as jest.Mock).mockResolvedValue(false);
+
+      const view = await renderPage();
+
+      expect(view.claimantAccount).toBe(false);
+      expect(getClaimantClaims).not.toHaveBeenCalled();
+    });
+
+    it('propagates a failure listing the claims made', async () => {
+      const error = new Error('API failure');
+      (getClaimantClaims as jest.Mock).mockRejectedValue(error);
+      const app = buildApp();
+      claimListRoutes(app);
+      const res = buildRes();
+
+      await getHandler(app)(buildReq(), res, next);
+
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.render).not.toHaveBeenCalled();
+    });
   });
 });

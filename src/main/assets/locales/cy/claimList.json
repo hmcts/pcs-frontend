@@ -10,5 +10,15 @@
     "actions": "Camau Gweithredu",
     "viewClaim": "Gweld yr hawliad"
   },
-  "noClaimsFound": "Nid oes unrhyw hawliadau yn eich erbyn chi."
+  "noClaimsFound": "Nid oes unrhyw hawliadau yn eich erbyn chi.",
+  "claimantHeading": "cyYour property possession account",
+  "claimsMade": {
+    "heading": "cyClaims you’ve made",
+    "claimState": "cyClaim state",
+    "claimNumber": "cyClaim number",
+    "draftClaim": "cyDraft claim",
+    "submittedClaim": "cySubmitted claim",
+    "noClaims": "cyYou have not made any claims.",
+    "makeAClaim": "cyMake a housing possession claim"
+  }
 }

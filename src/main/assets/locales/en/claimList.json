@@ -10,5 +10,15 @@
     "actions": "Actions",
     "viewClaim": "View claim"
   },
-  "noClaimsFound": "There are no claims against you."
+  "noClaimsFound": "There are no claims against you.",
+  "claimantHeading": "Your property possession account",
+  "claimsMade": {
+    "heading": "Claims you’ve made",
+    "claimState": "Claim state",
+    "claimNumber": "Claim number",
+    "draftClaim": "Draft claim",
+    "submittedClaim": "Submitted claim",
+    "noClaims": "You have not made any claims.",
+    "makeAClaim": "Make a housing possession claim"
+  }
 }

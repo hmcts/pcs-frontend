@@ -1403,13 +1403,13 @@ describe('review fixes', () => {
       );
     });
 
-    it('links the claim submitted page to the case documents, where the claim form appears', async () => {
+    it('links the claim submitted page to the claimant dashboard, which links to the claim form', async () => {
       app = await bootMakeAClaim();
       givenClaim(FEE, 'CASE_ISSUED');
       const page = new JSDOM((await app.get(`/case/${CASE_REFERENCE}/claim-submitted?status=success`)).text).window
         .document;
       const link = [...page.querySelectorAll('a.govuk-link')].find(a => a.textContent === 'View your claim form');
-      expect(link?.getAttribute('href')).toBe(`/case/${CASE_REFERENCE}/view-documents`);
+      expect(link?.getAttribute('href')).toBe(`/case/${CASE_REFERENCE}/claimant-dashboard`);
       expect(text(page.body.innerHTML)).toContain('Your claim form will be ready a few minutes after your payment');
     });
 

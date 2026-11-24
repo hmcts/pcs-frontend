@@ -11,12 +11,15 @@ export const PAY_CLAIM_FEE_START_ROUTE = `${PAY_CLAIM_FEE_ROUTE}/start`;
 
 export const CLAIM_SUBMITTED_ROUTE = '/case/:caseReference/claim-submitted';
 
+export const CLAIMANT_DASHBOARD_ROUTE = '/case/:caseReference/claimant-dashboard';
+
 /** Every path pattern the journey serves; each also covers the paths below it. */
 export const MAKE_A_CLAIM_ROUTES = [
   MAKE_A_CLAIM_START_ROUTE,
   MAKE_A_CLAIM_ROUTE,
   PAY_CLAIM_FEE_ROUTE,
   CLAIM_SUBMITTED_ROUTE,
+  CLAIMANT_DASHBOARD_ROUTE,
 ] as const;
 
 export function makeAClaimPath(route: string, caseReference: string): string {
