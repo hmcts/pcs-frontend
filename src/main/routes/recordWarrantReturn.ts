@@ -480,7 +480,7 @@ function validateEvictionDate(
     EVICTION_DATE_REQUIRED_ERROR_MESSAGE,
     EVICTION_DATE_ERROR_MESSAGE,
     EVICTION_DATE_FUTURE_ERROR_MESSAGE,
-    issues,
+    issues
   );
 }
 
@@ -496,7 +496,7 @@ function validateReturnDate(
     RETURN_DATE_REQUIRED_ERROR_MESSAGE,
     RETURN_DATE_ERROR_MESSAGE,
     RETURN_DATE_FUTURE_ERROR_MESSAGE,
-    issues,
+    issues
   );
 }
 
@@ -506,7 +506,7 @@ function validateDate(
   requiredDateErrorMessage: string,
   invalidDateErrorMessage: string,
   futureDateErrorMessage: string,
-  issues: ValidationIssue[],
+  issues: ValidationIssue[]
 ): string | undefined {
   const fieldId = (part: EvictionDatePart) => `${id}-${part}`;
 
@@ -535,7 +535,7 @@ function validateDate(
     return undefined;
   }
 
-  const now = DateTime.now().setZone(OUTCOME_DATE_ZONE)
+  const now = DateTime.now().setZone(OUTCOME_DATE_ZONE);
   if (outcomeDate > now) {
     issues.push({ id: fieldId('day'), message: futureDateErrorMessage });
     return undefined;
