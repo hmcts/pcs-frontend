@@ -65,20 +65,65 @@ export const DISCRETIONARY_OTHER_GROUNDS = [
 export type OtherGround =
   (typeof MANDATORY_OTHER_GROUNDS)[number] | (typeof DISCRETIONARY_OTHER_GROUNDS)[number] | typeof OTHER_GROUND;
 
+export const WALES_DISCRETIONARY_GROUNDS = [
+  'RENT_ARREARS_S157',
+  'ANTISOCIAL_BEHAVIOUR_S157',
+  'OTHER_BREACH_OF_CONTRACT_S157',
+  'ESTATE_MANAGEMENT_GROUNDS_S160',
+] as const;
+
+export const WALES_MANDATORY_GROUNDS = [
+  'FAILURE_TO_GIVE_UP_POSSESSION_S170',
+  'LANDLORD_NOTICE_PERIODIC_S178',
+  'SERIOUS_ARREARS_PERIODIC_S181',
+  'LANDLORD_NOTICE_FT_END_S186',
+  'SERIOUS_ARREARS_FIXED_TERM_S187',
+  'FAIL_TO_GIVE_UP_BREAK_NOTICE_S191',
+  'LANDLORD_BREAK_CLAUSE_S199',
+  'CONVERTED_FIXED_TERM_SCH12_25B2',
+] as const;
+
+export type WalesGround = (typeof WALES_DISCRETIONARY_GROUNDS)[number] | (typeof WALES_MANDATORY_GROUNDS)[number];
+
+/** The Wales grounds that are claimed for rent arrears, and so lead into the rent arrears task. */
+export const WALES_RENT_ARREARS_GROUNDS: readonly string[] = [
+  'RENT_ARREARS_S157',
+  'SERIOUS_ARREARS_PERIODIC_S181',
+  'SERIOUS_ARREARS_FIXED_TERM_S187',
+];
+
 /** The grounds that need no reason: the rent arrears ones, and other grounds, which have their own details. */
 const GROUNDS_WITHOUT_REASON: readonly string[] = [...RENT_ARREARS_GROUNDS, OTHER_GROUND];
 
 /** Every other ground in the order the grounds page lists them. */
 const LISTED_GROUNDS: readonly string[] = [...MANDATORY_OTHER_GROUNDS, ...DISCRETIONARY_OTHER_GROUNDS, OTHER_GROUND];
 
+/** Every Wales ground in the order the Wales grounds page lists them. */
+const LISTED_WALES_GROUNDS: readonly string[] = [...WALES_DISCRETIONARY_GROUNDS, ...WALES_MANDATORY_GROUNDS];
+
+/** Whether the claim is for a property in Wales, which asks the Wales grounds instead of the England ones. */
+export const isWalesClaimData = (claim: CitizenPossessionClaim): boolean =>
+  claim.eligibility?.legislativeCountry === 'Wales';
+
 /**
  * The grounds pcs-api needs a reason for, in the order the grounds page lists them, whatever order the saved
  * claim holds them in.
  */
-export function groundsNeedingReasons(grounds: CitizenPossessionClaim['grounds']): OtherGround[] {
+export function groundsNeedingReasons(claim: CitizenPossessionClaim): string[] {
+  const grounds = claim.grounds;
+  if (isWalesClaimData(claim)) {
+    return [...(grounds?.walesDiscretionaryGrounds ?? []), ...(grounds?.walesMandatoryGrounds ?? [])]
+      .filter(ground => !WALES_RENT_ARREARS_GROUNDS.includes(ground))
+      .sort((a, b) => LISTED_WALES_GROUNDS.indexOf(a) - LISTED_WALES_GROUNDS.indexOf(b));
+  }
   return (grounds?.otherGrounds ?? [])
     .filter(ground => !GROUNDS_WITHOUT_REASON.includes(ground))
     .sort((a, b) => LISTED_GROUNDS.indexOf(a) - LISTED_GROUNDS.indexOf(b));
+}
+
+/** The reasons the claimant has given, kept where pcs-api keeps them for the country the property is in. */
+export function groundReasonsOf(claim: CitizenPossessionClaim): CcdCollectionItem<GroundReason>[] {
+  return (isWalesClaimData(claim) ? claim.grounds?.walesGroundReasons : claim.grounds?.groundReasons) ?? [];
 }
 
 export type NoticeType = 'NOTICE_SEEKING_POSSESSION' | 'NOTICE_TO_QUIT' | 'OTHER';
@@ -151,7 +196,7 @@ export interface CitizenAdditionalClaimant {
 }
 
 export interface GroundReason {
-  ground?: OtherGround;
+  ground?: string;
   reason?: string;
 }
 
@@ -202,6 +247,15 @@ export interface CitizenPossessionClaim {
     tenancyAgreementAvailable?: YesNo;
     noTenancyAgreementReason?: string;
     tenancyAgreementDocuments?: ClaimDocuments;
+    hasEnergyPerformanceCertificate?: YesNo;
+    energyPerformanceDocuments?: ClaimDocuments;
+    noEnergyPerformanceCertificateReason?: string;
+    hasGasSafetyReport?: YesNo;
+    gasSafetyReportDocuments?: ClaimDocuments;
+    noGasSafetyReportReason?: string;
+    hasElectricalInstallationConditionReport?: YesNo;
+    electricalInstallationDocuments?: ClaimDocuments;
+    noElectricalInstallationConditionReason?: string;
   };
   grounds?: {
     hasRentArrearsGrounds?: YesNo;
@@ -214,6 +268,9 @@ export interface CitizenPossessionClaim {
     excludedGrounds?: ExcludedGround[];
     excludedOtherGroundDetails?: string;
     excludedReason?: string;
+    walesDiscretionaryGrounds?: (typeof WALES_DISCRETIONARY_GROUNDS)[number][];
+    walesMandatoryGrounds?: (typeof WALES_MANDATORY_GROUNDS)[number][];
+    walesGroundReasons?: CcdCollectionItem<GroundReason>[];
   };
   notice?: {
     noticeServed?: YesNo;

@@ -24,15 +24,19 @@ import { step as defendantCircumstances } from './defendant-circumstances';
 import { step as defendantCya } from './defendant-cya';
 import { step as defendantDetails } from './defendant-details';
 import { step as defendantName } from './defendant-name';
+import { step as eicrAvailable } from './eicr-available';
 import { step as eligible } from './eligible';
+import { step as epcAvailable } from './epc-available';
 import { step as equalityAndDiversity } from './equality-and-diversity';
 import { step as excludedGrounds } from './excluded-grounds';
 import { step as excludedGroundsClaim } from './excluded-grounds-claim';
 import { step as excludedReason } from './excluded-reason';
+import { step as gasSafetyAvailable } from './gas-safety-available';
 import { step as generalApplication } from './general-application';
 import { step as groundReason } from './ground-reason';
 import { step as individualOrOrganisation } from './individual-or-organisation';
 import { step as languageUsed } from './language-used';
+import { step as mandatoryDocuments } from './mandatory-documents';
 import { step as moneyJudgment } from './money-judgment';
 import { step as multipleClaimants } from './multiple-claimants';
 import { step as noticeAvailable } from './notice-available';
@@ -67,13 +71,18 @@ import { step as tenancyCya } from './tenancy-cya';
 import { step as tenancyDetails } from './tenancy-details';
 import { step as tenancyStartDate } from './tenancy-start-date';
 import { step as tenancyType } from './tenancy-type';
+import { step as uploadEicr } from './upload-eicr';
+import { step as uploadEpc } from './upload-epc';
+import { step as uploadGasSafety } from './upload-gas-safety';
 import { step as uploadNotice } from './upload-notice';
 import { step as uploadOccupationContract } from './upload-occupation-contract';
 import { step as uploadOtherDocuments } from './upload-other-documents';
 import { step as uploadRentStatement } from './upload-rent-statement';
 import { step as uploadTenancyAgreement } from './upload-tenancy-agreement';
+import { step as walesGrounds } from './wales-grounds';
 import { step as yourDetails } from './your-details';
 import { step as yourSupport } from './your-support';
+
 
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
@@ -116,6 +125,14 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'rent-arrears-grounds': rentArrearsGrounds,
   'other-grounds-claim': otherGroundsClaim,
   'other-grounds': otherGrounds,
+  'eicr-available': eicrAvailable,
+  'epc-available': epcAvailable,
+  'gas-safety-available': gasSafetyAvailable,
+  'mandatory-documents': mandatoryDocuments,
+  'upload-eicr': uploadEicr,
+  'upload-epc': uploadEpc,
+  'upload-gas-safety': uploadGasSafety,
+  'wales-grounds': walesGrounds,
   'ground-reason': groundReason,
   'tenancy-cya': tenancyCya,
   'notice-details': noticeDetails,

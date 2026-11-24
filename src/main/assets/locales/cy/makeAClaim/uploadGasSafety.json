@@ -1,0 +1,16 @@
+{
+  "pageTitle": "cyUpload gas safety report",
+  "heading": "cyUpload gas safety report",
+  "paragraphs": [
+    "cyUpload a copy of the gas safety report."
+  ],
+  "beforeUploadHeading": "cyBefore you upload your documents",
+  "beforeUploadText": "cyGive your document a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "cyUpload files",
+  "uploadButton": "cyUpload file",
+  "filesAddedHeading": "cyFiles added",
+  "deleteButton": "cyRemove",
+  "errors": {
+    "documents": "cyUpload the gas safety report"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "pageTitle": "Upload Electrical Installation Condition Report (EICR)",
+  "heading": "Upload Electrical Installation Condition Report (EICR)",
+  "paragraphs": [
+    "Upload a copy of the Electrical Installation Condition Report (EICR)."
+  ],
+  "beforeUploadHeading": "Before you upload your documents",
+  "beforeUploadText": "Give your document a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "Upload files",
+  "uploadButton": "Upload file",
+  "filesAddedHeading": "Files added",
+  "deleteButton": "Remove",
+  "errors": {
+    "documents": "Upload the Electrical Installation Condition Report (EICR)"
+  }
+}

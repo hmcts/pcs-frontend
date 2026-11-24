@@ -54,7 +54,12 @@ import {
   RENT_ARREARS_GROUNDS,
   type RentFrequency,
   type RentTableRow,
+  WALES_DISCRETIONARY_GROUNDS,
+  WALES_MANDATORY_GROUNDS,
+  WALES_RENT_ARREARS_GROUNDS,
+  groundReasonsOf,
   groundsNeedingReasons,
+  isWalesClaimData,
 } from '@services/citizenPossessionClaim.interface';
 
 /**
@@ -636,6 +641,34 @@ export const claimMappings: Record<string, StepMapping> = {
     isAnswered: claim => documentsAnswered(claim.tenancy?.tenancyAgreementDocuments),
   },
 
+  'epc-available': withReason(
+    'tenancy',
+    'hasEnergyPerformanceCertificate',
+    'noEnergyPerformanceCertificateReason',
+    'no'
+  ),
+
+  'upload-epc': {
+    isAnswered: claim => documentsAnswered(claim.tenancy?.energyPerformanceDocuments),
+  },
+
+  'gas-safety-available': withReason('tenancy', 'hasGasSafetyReport', 'noGasSafetyReportReason', 'no'),
+
+  'upload-gas-safety': {
+    isAnswered: claim => documentsAnswered(claim.tenancy?.gasSafetyReportDocuments),
+  },
+
+  'eicr-available': withReason(
+    'tenancy',
+    'hasElectricalInstallationConditionReport',
+    'noElectricalInstallationConditionReason',
+    'no'
+  ),
+
+  'upload-eicr': {
+    isAnswered: claim => documentsAnswered(claim.tenancy?.electricalInstallationDocuments),
+  },
+
   'rent-arrears-claim': yesNoStep('grounds', 'hasRentArrearsGrounds', claim => claim.grounds?.hasRentArrearsGrounds),
 
   'rent-arrears-grounds': {
@@ -672,16 +705,56 @@ export const claimMappings: Record<string, StepMapping> = {
           ? text(body['otherGround.otherGroundsDetails'])
           : undefined;
         grounds.groundReasons = (grounds.groundReasons ?? []).filter(
-          item => item.value.ground && grounds.otherGrounds?.includes(item.value.ground)
+          item => item.value.ground && grounds.otherGrounds?.includes(item.value.ground as OtherGround)
         );
       }),
     isAnswered: claim => Boolean(claim.grounds?.otherGrounds?.length),
   },
 
+  'wales-grounds': {
+    toForm: claim => {
+      const grounds = claim.grounds;
+      return {
+        walesDiscretionaryGrounds: [
+          ...(grounds?.walesDiscretionaryGrounds ?? []),
+          ...(grounds?.otherGrounds?.includes(OTHER_GROUND) ? [OTHER_GROUND] : []),
+        ],
+        'walesDiscretionaryGrounds.otherGroundsDetails': grounds?.otherGroundsDetails,
+        walesMandatoryGrounds: grounds?.walesMandatoryGrounds ?? [],
+      };
+    },
+    fromForm: (claim, body) =>
+      setNested(claim, 'grounds', grounds => {
+        const discretionary = checkedValues(body.walesDiscretionaryGrounds, [
+          ...WALES_DISCRETIONARY_GROUNDS,
+          OTHER_GROUND,
+        ] as const);
+        grounds.walesDiscretionaryGrounds = discretionary.filter(ground => ground !== OTHER_GROUND);
+        grounds.walesMandatoryGrounds = checkedValues(body.walesMandatoryGrounds, WALES_MANDATORY_GROUNDS);
+        grounds.otherGrounds = discretionary.includes(OTHER_GROUND) ? [OTHER_GROUND] : [];
+        grounds.otherGroundsDetails = discretionary.includes(OTHER_GROUND)
+          ? text(body['walesDiscretionaryGrounds.otherGroundsDetails'])
+          : undefined;
+        const chosen = [...grounds.walesDiscretionaryGrounds, ...grounds.walesMandatoryGrounds];
+        grounds.hasRentArrearsGrounds = chosen.some(ground => WALES_RENT_ARREARS_GROUNDS.includes(ground))
+          ? 'YES'
+          : 'NO';
+        grounds.walesGroundReasons = (grounds.walesGroundReasons ?? []).filter(
+          item => item.value.ground && chosen.includes(item.value.ground as (typeof chosen)[number])
+        );
+      }),
+    isAnswered: claim =>
+      Boolean(
+        claim.grounds?.walesDiscretionaryGrounds?.length ||
+        claim.grounds?.walesMandatoryGrounds?.length ||
+        claim.grounds?.otherGrounds?.length
+      ),
+  },
+
   'ground-reason': {
     toForm: (claim, req) => {
       const ground = groundForReasonOf(req, claim);
-      return { groundReason: claim.grounds?.groundReasons?.find(item => item.value.ground === ground)?.value.reason };
+      return { groundReason: groundReasonsOf(claim).find(item => item.value.ground === ground)?.value.reason };
     },
     fromForm: (claim, body, req) => {
       const ground = groundForReasonOf(req, claim);
@@ -689,16 +762,16 @@ export const claimMappings: Record<string, StepMapping> = {
         return;
       }
       setNested(claim, 'grounds', grounds => {
-        const existing = grounds.groundReasons?.find(item => item.value.ground === ground);
+        const existing = groundReasonsOf(claim).find(item => item.value.ground === ground);
         const reason: CcdCollectionItem<GroundReason> = {
           id: existing?.id ?? newItemId(),
           value: { ground, reason: text(body.groundReason) },
         };
-        const order = groundsNeedingReasons(grounds);
-        grounds.groundReasons = [
-          ...(grounds.groundReasons ?? []).filter(item => item.value.ground !== ground),
-          reason,
-        ].sort((x, y) => order.indexOf(x.value.ground as OtherGround) - order.indexOf(y.value.ground as OtherGround));
+        const order = groundsNeedingReasons(claim);
+        const key = isWalesClaimData(claim) ? 'walesGroundReasons' : 'groundReasons';
+        grounds[key] = [...(grounds[key] ?? []).filter(item => item.value.ground !== ground), reason].sort(
+          (x, y) => order.indexOf(x.value.ground as string) - order.indexOf(y.value.ground as string)
+        );
       });
     },
     isAnswered: claim => groundWithoutReasonOf(claim) === undefined,
@@ -1073,16 +1146,16 @@ export function paymentDateLimitsOf(
 }
 
 /** The ground a reason page is about: ?ground=, or the first that needs a reason. */
-export function groundForReasonOf(req: Request, claim: CitizenPossessionClaim): OtherGround | undefined {
-  const grounds = groundsNeedingReasons(claim.grounds);
+export function groundForReasonOf(req: Request, claim: CitizenPossessionClaim): string | undefined {
+  const grounds = groundsNeedingReasons(claim);
   const asked = Array.isArray(req.query?.ground) ? req.query.ground[0] : req.query?.ground;
   return grounds.find(ground => ground === asked) ?? (asked === undefined ? grounds[0] : undefined);
 }
 
 /** The first chosen ground that needs a reason and has none yet. */
-export function groundWithoutReasonOf(claim: CitizenPossessionClaim): OtherGround | undefined {
-  return groundsNeedingReasons(claim.grounds).find(
-    ground => !claim.grounds?.groundReasons?.some(item => item.value.ground === ground && item.value.reason)
+export function groundWithoutReasonOf(claim: CitizenPossessionClaim): string | undefined {
+  return groundsNeedingReasons(claim).find(
+    ground => !groundReasonsOf(claim).some(item => item.value.ground === ground && item.value.reason)
   );
 }
 

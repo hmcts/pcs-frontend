@@ -65,7 +65,20 @@
     "GROUND_14ZA": "Rioting (Ground 14ZA)",
     "GROUND_15": "Deterioration of furniture (Ground 15)",
     "GROUND_17": "False statement (Ground 17)",
-    "GROUND_18": "Supported accommodation (Ground 18)"
+    "GROUND_18": "Supported accommodation (Ground 18)",
+    "RENT_ARREARS_S157": "Rent arrears (breach of contract) (section 157)",
+    "ANTISOCIAL_BEHAVIOUR_S157": "Antisocial behaviour (breach of contract) (section 157)",
+    "OTHER_BREACH_OF_CONTRACT_S157": "Other breach of contract (section 157)",
+    "ESTATE_MANAGEMENT_GROUNDS_S160": "Estate management grounds (section 160)",
+    "WALES_OTHER": "Others",
+    "FAILURE_TO_GIVE_UP_POSSESSION_S170": "Failure to give up possession on date specified in contract-holder’s notice (section 170)",
+    "LANDLORD_NOTICE_PERIODIC_S178": "Landlord’s notice given in relation to periodic standard contract (section 178)",
+    "SERIOUS_ARREARS_PERIODIC_S181": "Contract-holder under a periodic standard contract seriously in arrears with rent (section 181)",
+    "LANDLORD_NOTICE_FT_END_S186": "Landlord’s notice in connection with end of fixed term given (section 186)",
+    "SERIOUS_ARREARS_FIXED_TERM_S187": "Contract-holder under a fixed term standard contract seriously in arrears with rent (section 187)",
+    "FAIL_TO_GIVE_UP_BREAK_NOTICE_S191": "Failure to give up possession on date specified in contract-holder’s break clause notice (section 191)",
+    "LANDLORD_BREAK_CLAUSE_S199": "Notice given under a landlord’s break clause (section 199)",
+    "CONVERTED_FIXED_TERM_SCH12_25B2": "Notice given in relation to end of converted fixed term standard contract (paragraph 25B(2) of Schedule 12)"
   },
   "values": {
     "individualOrOrganisation": {
@@ -213,7 +226,14 @@
       "excludedGrounds": "What are your grounds for possession?",
       "excludedReason": "Why are you making a possession claim?",
       "supportRequests": "Reasonable adjustment requests",
-      "equalityQuestions": "Equality and diversity questions"
+      "equalityQuestions": "Equality and diversity questions",
+      "walesGrounds": "What are your grounds for possession?",
+      "hasEnergyPerformanceCertificate": "Can you upload a copy of the energy performance certificate?",
+      "energyPerformanceDocuments": "Upload energy performance certificate",
+      "hasGasSafetyReport": "Can you upload a copy of the current gas safety report?",
+      "gasSafetyReportDocuments": "Upload gas safety report",
+      "hasElectricalInstallationConditionReport": "Can you upload a copy of the Electrical Installation Condition Report (EICR)?",
+      "electricalInstallationDocuments": "Upload Electrical Installation Condition Report (EICR)"
     },
     "notProvided": "Not provided",
     "provided": "Provided",
@@ -301,7 +321,14 @@
       "multiple-claimants": "Do you want to add another claimant to this claim?",
       "excluded-grounds-claim": "Do you have grounds for possession?",
       "excluded-grounds": "What are your grounds for possession?",
-      "excluded-reason": "Why are you making a possession claim?"
+      "excluded-reason": "Why are you making a possession claim?",
+      "wales-grounds": "What are your grounds for possession?",
+      "epc-available": "Can you upload a copy of the energy performance certificate?",
+      "upload-epc": "Upload energy performance certificate",
+      "gas-safety-available": "Can you upload a copy of the current gas safety report?",
+      "upload-gas-safety": "Upload gas safety report",
+      "eicr-available": "Can you upload a copy of the Electrical Installation Condition Report (EICR)?",
+      "upload-eicr": "Upload Electrical Installation Condition Report (EICR)"
     },
     "rentArrearsGroundNotAllowed": "Choose only rent arrears grounds on the rent arrears grounds question"
   },

@@ -22,7 +22,7 @@ function redirectForUnknownGround(req: Request): string | undefined {
   if (groundForReasonOf(req, claim)) {
     return undefined;
   }
-  const first = groundsNeedingReasons(claim.grounds)[0];
+  const first = groundsNeedingReasons(claim)[0];
   const url = first
     ? reasonUrl(req, first)
     : getStepUrl('other-grounds', flowConfig, req.res?.locals.validatedCase?.id);
@@ -37,7 +37,7 @@ export const step: StepDefinition = createMakeAClaimStep({
   fields: [pageHeadingLongText('groundReason', { required: true, maxLength: FIELD_LIMITS.groundReason })],
   redirectWhen: redirectForUnknownGround,
   extendGetContent: req => {
-    const grounds = groundsNeedingReasons(readClaim(req).grounds);
+    const grounds = groundsNeedingReasons(readClaim(req));
     const ground = groundForReasonOf(req, readClaim(req));
     const position = ground ? grounds.indexOf(ground) : -1;
     return {
@@ -47,7 +47,7 @@ export const step: StepDefinition = createMakeAClaimStep({
   },
   keepsOwnRedirectOnReturn: req => !claimMappings['ground-reason'].isAnswered?.(readClaim(req), req),
   resolveRedirectAfterPost: async req => {
-    const grounds = groundsNeedingReasons(readClaim(req).grounds);
+    const grounds = groundsNeedingReasons(readClaim(req));
     const ground = groundForReasonOf(req, readClaim(req));
     const next = ground ? grounds[grounds.indexOf(ground) + 1] : undefined;
     return next ? reasonUrl(req, next) : undefined;

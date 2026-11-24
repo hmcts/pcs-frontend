@@ -68,9 +68,76 @@ describe('the claim journey', () => {
     [
       'occupation-contract-agreement',
       { eligibility: { legislativeCountry: 'Wales' }, tenancy: { tenancyAgreementAvailable: 'NO' } },
-      'rent-arrears-claim',
+      'mandatory-documents',
     ],
-    ['upload-occupation-contract', { eligibility: { legislativeCountry: 'Wales' } }, 'rent-arrears-claim'],
+    ['upload-occupation-contract', { eligibility: { legislativeCountry: 'Wales' } }, 'mandatory-documents'],
+    ['mandatory-documents', { eligibility: { legislativeCountry: 'Wales' } }, 'epc-available'],
+    [
+      'epc-available',
+      { eligibility: { legislativeCountry: 'Wales' }, tenancy: { hasEnergyPerformanceCertificate: 'YES' } },
+      'upload-epc',
+    ],
+    [
+      'epc-available',
+      { eligibility: { legislativeCountry: 'Wales' }, tenancy: { hasEnergyPerformanceCertificate: 'NO' } },
+      'gas-safety-available',
+    ],
+    [
+      'upload-epc',
+      { eligibility: { legislativeCountry: 'Wales' }, tenancy: { hasEnergyPerformanceCertificate: 'YES' } },
+      'gas-safety-available',
+    ],
+    [
+      'gas-safety-available',
+      { eligibility: { legislativeCountry: 'Wales' }, tenancy: { hasGasSafetyReport: 'YES' } },
+      'upload-gas-safety',
+    ],
+    [
+      'gas-safety-available',
+      { eligibility: { legislativeCountry: 'Wales' }, tenancy: { hasGasSafetyReport: 'NO' } },
+      'eicr-available',
+    ],
+    [
+      'upload-gas-safety',
+      { eligibility: { legislativeCountry: 'Wales' }, tenancy: { hasGasSafetyReport: 'YES' } },
+      'eicr-available',
+    ],
+    [
+      'eicr-available',
+      { eligibility: { legislativeCountry: 'Wales' }, tenancy: { hasElectricalInstallationConditionReport: 'YES' } },
+      'upload-eicr',
+    ],
+    ['eicr-available', { eligibility: { legislativeCountry: 'Wales' } }, 'wales-grounds'],
+    ['upload-eicr', { eligibility: { legislativeCountry: 'Wales' } }, 'wales-grounds'],
+    [
+      'wales-grounds',
+      {
+        eligibility: { legislativeCountry: 'Wales' },
+        grounds: { walesDiscretionaryGrounds: ['OTHER_BREACH_OF_CONTRACT_S157'] },
+      },
+      'ground-reason',
+    ],
+    [
+      'wales-grounds',
+      {
+        eligibility: { legislativeCountry: 'Wales' },
+        grounds: { walesDiscretionaryGrounds: ['RENT_ARREARS_S157'], hasRentArrearsGrounds: 'YES' },
+      },
+      'tenancy-cya',
+    ],
+    [
+      'wales-grounds',
+      { eligibility: { legislativeCountry: 'Wales' }, grounds: { otherGrounds: ['OTHER'] } },
+      'tenancy-cya',
+    ],
+    [
+      'notice-cya',
+      {
+        eligibility: { legislativeCountry: 'Wales' },
+        grounds: { walesMandatoryGrounds: ['SERIOUS_ARREARS_PERIODIC_S181'], hasRentArrearsGrounds: 'YES' },
+      },
+      'rent-arrears',
+    ],
     ['tenancy-start-date', {}, 'tenancy-agreement'],
     ['rent-arrears-claim', { grounds: { hasRentArrearsGrounds: 'YES' } }, 'rent-arrears-grounds'],
     ['rent-arrears-claim', { grounds: { hasRentArrearsGrounds: 'NO' } }, 'other-grounds'],

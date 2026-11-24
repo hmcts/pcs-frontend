@@ -32,6 +32,12 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^tenancy\.(tenancyType|otherTenancyTypeDetails)$/, 'tenancy-type'],
   [/^tenancy\.(occupationContractType|otherOccupationContractDetails)$/, 'occupation-contract-type'],
   [/^tenancy\.noTenancyAgreementReason$/, 'tenancy-agreement'],
+  [/^tenancy\.(hasEnergyPerformanceCertificate|noEnergyPerformanceCertificateReason)$/, 'epc-available'],
+  [/^tenancy\.energyPerformanceDocuments(\[\d+\])?$/, 'upload-epc'],
+  [/^tenancy\.(hasGasSafetyReport|noGasSafetyReportReason)$/, 'gas-safety-available'],
+  [/^tenancy\.gasSafetyReportDocuments(\[\d+\])?$/, 'upload-gas-safety'],
+  [/^tenancy\.(hasElectricalInstallationConditionReport|noElectricalInstallationConditionReason)$/, 'eicr-available'],
+  [/^tenancy\.electricalInstallationDocuments(\[\d+\])?$/, 'upload-eicr'],
   [/^tenancy\.tenancyAgreementDocuments(\[\d+\])?$/, 'upload-tenancy-agreement'],
   [/^grounds$/, 'rent-arrears-claim'],
   [/^grounds\.rentArrearsGrounds$/, 'rent-arrears-grounds'],
@@ -40,7 +46,8 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^grounds\.hasExcludedGrounds$/, 'excluded-grounds-claim'],
   [/^grounds\.(excludedGrounds|excludedOtherGroundDetails)$/, 'excluded-grounds'],
   [/^grounds\.excludedReason$/, 'excluded-reason'],
-  [/^grounds\.groundReasons(\.[A-Z0-9_]+|\.reason)?$/, 'ground-reason'],
+  [/^grounds\.(groundReasons|walesGroundReasons)(\.[A-Z0-9_]+|\.reason)?$/, 'ground-reason'],
+  [/^grounds\.(walesDiscretionaryGrounds|walesMandatoryGrounds)$/, 'wales-grounds'],
   [/^rentArrears\.currentArrears$/, 'current-arrears'],
   [/^rentArrears\.rentAmount$/, 'rent-amount'],
   [/^rentArrears\.arrearsAtNoticeDate$/, 'arrears-at-notice'],
@@ -69,6 +76,8 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
 const WALES_STEPS: Record<string, string> = {
   'tenancy-agreement': 'occupation-contract-agreement',
   'upload-tenancy-agreement': 'upload-occupation-contract',
+  'rent-arrears-claim': 'wales-grounds',
+  'other-grounds': 'wales-grounds',
 };
 
 /** Refusals that mean the claimant cannot use the service, by where they are told so. */
@@ -139,7 +148,7 @@ function answerUrl(step: string, caseId: string, query = ''): string {
 function queryForPath(path: string): string {
   const defendant = Number(/^(?:defendants|additionalClaimants)\[(\d+)\]/.exec(path)?.[1] ?? 0);
   const row = /^rentArrears\.rentHistoryTable\[(\d+)\]\.(datePaid|amountPaid)$/.exec(path)?.[1];
-  const ground = /^grounds\.groundReasons\.(GROUND_[A-Z0-9]+)$/.exec(path)?.[1];
+  const ground = /^grounds\.(?:groundReasons|walesGroundReasons)\.([A-Z0-9_]+)$/.exec(path)?.[1];
   if (ground) {
     return `?ground=${ground}`;
   }

@@ -158,6 +158,7 @@ describe('excluded tenancy grounds', () => {
     expect(answered).toBe(true);
   });
 });
+const DOCUMENT = { document_url: 'u', document_binary_url: 'b', document_filename: 'f.pdf' };
 
 describe('claim mappings', () => {
   it('saves the claimant type and reads it back', () => {
@@ -432,6 +433,97 @@ describe('claim mappings', () => {
         groundReasons: [],
       });
     });
+  });
+
+  describe('Wales grounds', () => {
+    const wales: CitizenPossessionClaim = { eligibility: { legislativeCountry: 'Wales' } };
+    const chosen = roundTrip(
+      'wales-grounds',
+      {
+        walesDiscretionaryGrounds: ['RENT_ARREARS_S157', 'ESTATE_MANAGEMENT_GROUNDS_S160', 'OTHER', 'NOT_A_GROUND'],
+        'walesDiscretionaryGrounds.otherGroundsDetails': 'Subletting',
+        walesMandatoryGrounds: ['FAILURE_TO_GIVE_UP_POSSESSION_S170', 'LANDLORD_BREAK_CLAUSE_S199'],
+      },
+      wales
+    );
+
+    it('saves the Wales grounds as pcs-api’s codes, keeping Others with its details', () => {
+      expect(chosen.saved.grounds).toMatchObject({
+        walesDiscretionaryGrounds: ['RENT_ARREARS_S157', 'ESTATE_MANAGEMENT_GROUNDS_S160'],
+        walesMandatoryGrounds: ['FAILURE_TO_GIVE_UP_POSSESSION_S170', 'LANDLORD_BREAK_CLAUSE_S199'],
+        otherGrounds: ['OTHER'],
+        otherGroundsDetails: 'Subletting',
+        hasRentArrearsGrounds: 'YES',
+      });
+      expect(chosen.form).toEqual({
+        walesDiscretionaryGrounds: ['RENT_ARREARS_S157', 'ESTATE_MANAGEMENT_GROUNDS_S160', 'OTHER'],
+        'walesDiscretionaryGrounds.otherGroundsDetails': 'Subletting',
+        walesMandatoryGrounds: ['FAILURE_TO_GIVE_UP_POSSESSION_S170', 'LANDLORD_BREAK_CLAUSE_S199'],
+      });
+      expect(chosen.answered).toBe(true);
+    });
+
+    it.each([
+      [{ walesDiscretionaryGrounds: ['RENT_ARREARS_S157'] }, 'YES'],
+      [{ walesMandatoryGrounds: ['SERIOUS_ARREARS_PERIODIC_S181'] }, 'YES'],
+      [{ walesMandatoryGrounds: ['SERIOUS_ARREARS_FIXED_TERM_S187'] }, 'YES'],
+      [{ walesDiscretionaryGrounds: ['ANTISOCIAL_BEHAVIOUR_S157'] }, 'NO'],
+    ])('works out from %j whether the claim is for rent arrears: %s', (body, expected) => {
+      expect(roundTrip('wales-grounds', body, wales).saved.grounds?.hasRentArrearsGrounds).toBe(expected);
+    });
+
+    it('asks a reason for each ground but the rent arrears ones and Others, in the order the page lists them', () => {
+      expect(groundForReasonOf(request(), chosen.saved)).toBe('ESTATE_MANAGEMENT_GROUNDS_S160');
+      expect(groundForReasonOf(request({ ground: 'LANDLORD_BREAK_CLAUSE_S199' }), chosen.saved)).toBe(
+        'LANDLORD_BREAK_CLAUSE_S199'
+      );
+      expect(groundForReasonOf(request({ ground: 'RENT_ARREARS_S157' }), chosen.saved)).toBeUndefined();
+      expect(groundForReasonOf(request({ ground: 'OTHER' }), chosen.saved)).toBeUndefined();
+    });
+
+    it('keeps the reasons with the Wales grounds, and drops those of grounds no longer chosen', () => {
+      const first = roundTrip(
+        'ground-reason',
+        { groundReason: 'Building works' },
+        chosen.saved,
+        request({ ground: 'ESTATE_MANAGEMENT_GROUNDS_S160' })
+      );
+      expect(first.saved.grounds?.walesGroundReasons).toEqual([
+        { id: expect.any(String), value: { ground: 'ESTATE_MANAGEMENT_GROUNDS_S160', reason: 'Building works' } },
+      ]);
+      expect(first.saved.grounds?.groundReasons).toBeUndefined();
+      expect(first.form).toEqual({ groundReason: 'Building works' });
+      expect(first.answered).toBe(false);
+
+      const dropped = roundTrip(
+        'wales-grounds',
+        { walesMandatoryGrounds: ['LANDLORD_BREAK_CLAUSE_S199'] },
+        first.saved
+      );
+      expect(dropped.saved.grounds?.walesGroundReasons).toEqual([]);
+    });
+  });
+
+  it.each([
+    ['epc-available', 'hasEnergyPerformanceCertificate', 'noEnergyPerformanceCertificateReason'],
+    ['gas-safety-available', 'hasGasSafetyReport', 'noGasSafetyReportReason'],
+    ['eicr-available', 'hasElectricalInstallationConditionReport', 'noElectricalInstallationConditionReason'],
+  ] as const)('asks %s why not on a no, and forgets it on a yes', (step, field, reason) => {
+    const no = roundTrip(step, { [field]: 'no', [`${field}.${reason}`]: 'Not to hand' });
+    expect(no.saved.tenancy).toEqual({ [field]: 'NO', [reason]: 'Not to hand' });
+    expect(no.answered).toBe(true);
+    const yes = roundTrip(step, { [field]: 'yes', [`${field}.${reason}`]: 'Stale' });
+    expect(yes.saved.tenancy).toEqual({ [field]: 'YES', [reason]: undefined });
+  });
+
+  it.each([
+    ['upload-epc', 'energyPerformanceDocuments'],
+    ['upload-gas-safety', 'gasSafetyReportDocuments'],
+    ['upload-eicr', 'electricalInstallationDocuments'],
+  ] as const)('answers %s once a document is uploaded', (step, field) => {
+    const answered = claimMappings[step].isAnswered!;
+    expect(answered({}, request())).toBe(false);
+    expect(answered({ tenancy: { [field]: [{ id: 'a', value: DOCUMENT }] } }, request())).toBe(true);
   });
 
   it.each([

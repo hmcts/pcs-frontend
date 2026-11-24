@@ -60,7 +60,9 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
     await viewClaimantDashboardAndAccount(page);
   });
 
-  test('Rent arrears claim for a property in Wales, with the occupation contract', async ({ page }) => {
+  test('Rent arrears claim for a property in Wales, with the occupation contract, mandatory documents and Wales grounds', async ({
+    page,
+  }) => {
     await createLandlord();
     await becomeEligible(page, startUrl, WELSH_PROPERTY);
     await continueOn(page);

@@ -34,10 +34,23 @@ export const asksAssuredGrounds = (req: Request): boolean => !isExcludedTenancy(
 export const hasRentArrearsGrounds = (req: Request): boolean =>
   asksAssuredGrounds(req) && readClaim(req).grounds?.hasRentArrearsGrounds === 'YES';
 
+/** The England grounds page is asked when no rent arrears grounds were claimed, or other grounds were. A Wales claim answers all its grounds on one page. */
 export const asksOtherGrounds = (req: Request): boolean => {
   const grounds = readClaim(req).grounds;
-  return asksAssuredGrounds(req) && (grounds?.hasRentArrearsGrounds === 'NO' || grounds?.hasOtherGrounds === 'YES');
+  return (
+    isWalesClaim(req) ||
+    (asksAssuredGrounds(req) && (grounds?.hasRentArrearsGrounds === 'NO' || grounds?.hasOtherGrounds === 'YES'))
+  );
 };
+
+export const asksEnglandRentArrearsGrounds = (req: Request): boolean => isEnglandClaim(req) && hasRentArrearsGrounds(req);
+
+export const asksEnglandOtherGrounds = (req: Request): boolean => isEnglandClaim(req) && asksOtherGrounds(req);
+
+export const hasWalesDocument =
+  (answer: 'hasEnergyPerformanceCertificate' | 'hasGasSafetyReport' | 'hasElectricalInstallationConditionReport') =>
+  (req: Request): boolean =>
+    isWalesClaim(req) && readClaim(req).tenancy?.[answer] === 'YES';
 
 export const noticeServed = (req: Request): boolean => readClaim(req).notice?.noticeServed === 'YES';
 
@@ -66,4 +79,4 @@ export const asksRentDueDay = (req: Request): boolean =>
   usesTable(req) && readClaim(req).rentArrears?.rentFrequency === 'MONTHLY';
 
 export const needsGroundReasons = (req: Request): boolean =>
-  asksOtherGrounds(req) && groundsNeedingReasons(readClaim(req).grounds).length > 0;
+  asksOtherGrounds(req) && groundsNeedingReasons(readClaim(req)).length > 0;

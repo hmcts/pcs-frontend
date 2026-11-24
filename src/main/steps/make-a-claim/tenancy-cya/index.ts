@@ -13,7 +13,7 @@ export const step: StepDefinition = createMakeAClaimStep({
   customTemplate: 'make-a-claim/templates/summary.njk',
   fields: [],
   extendGetContent: (req, formContent) => {
-    const grounds = needsGroundReasons(req) ? groundsNeedingReasons(readClaim(req).grounds) : [];
+    const grounds = needsGroundReasons(req) ? groundsNeedingReasons(readClaim(req)) : [];
     return {
       ...(isRendering(formContent) ? { cards: [tenancyCard(req)] } : {}),
       ...(grounds.length > 0 ? { backUrl: reasonUrl(req, grounds[grounds.length - 1]) } : {}),
