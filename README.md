@@ -269,15 +269,6 @@ in [health.ts](src/main/routes/health.ts) file and currently checks the followin
 - Redis
 - pcs-api
 
-### Info endpoint
-
-The application also exposes an info endpoint (http://localhost:3209/info), created with the use of
-[nodejs-info-provider](https://github.com/hmcts/nodejs-info-provider) library. This endpoint is defined
-in [info.ts](src/main/routes/info.ts) file and currently displays info from:
-
-- This service
-- pcs-api
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
