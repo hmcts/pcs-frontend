@@ -283,7 +283,7 @@ describe('make an order: deciding applications', () => {
           draftOrderWording:
             '<p>Upon reading the papers:<br>by consent</p>' +
             '<ol><li>The hearing on 14 October is <strong>adjourned</strong>.</li>' +
-            '<li>The defendant shall:<ol><li>file a defence;</li><li>pay the costs.</li></ol></li></ol>' +
+            '<li>The defendant shall:<ol><li>file a defence;</li><li>pay the costs &amp; fees.</li></ol></li></ol>' +
             '<img src="x" onerror="alert(1)"><script>alert(2)</script>',
         },
       });
@@ -303,7 +303,7 @@ describe('make an order: deciding applications', () => {
         'The hearing on 14 October is adjourned.',
         'The defendant shall:',
         'file a defence;',
-        'pay the costs.',
+        'pay the costs & fees.',
       ]);
       // Each line and item a clause, the nested list nested, without their emphasis.
       expect(clauseLists()).toEqual([4]);

@@ -1,4 +1,4 @@
-import type { OrderBefore, OrderContext } from '../../../utils/makeOrderForm';
+import type { DraftClause, OrderBefore, OrderContext } from '../../../utils/makeOrderForm';
 
 export interface OrderParty {
   id: string;
@@ -13,50 +13,6 @@ export interface AttendanceEntry {
   partyName: string;
   choice: string;
   representativeName: string;
-}
-
-/** A paragraph or list item of an applicant's draft order, as plain text, with any list nested in it. */
-export interface DraftClause {
-  text: string;
-  children: readonly DraftClause[];
-}
-
-const LISTS = new Set(['OL', 'UL']);
-
-/** The text of an element without the lists nested in it, its lines apart. */
-function lines(element: Element): string[] {
-  let text = '';
-  element.childNodes.forEach(node => {
-    if (node.nodeName === 'BR') {
-      text += '\n';
-    } else if (!LISTS.has(node.nodeName)) {
-      text += node.nodeName === '#text' ? node.textContent : lines(node as Element).join('\n');
-    }
-  });
-  return text
-    .split('\n')
-    .map(line => line.replace(/\s+/g, ' ').trim())
-    .filter(Boolean);
-}
-
-/**
- * An applicant's draft order as plain clauses: each line of a paragraph one, and each list item one with the list
- * nested in it; their emphasis is not kept.
- */
-export function draftClauses(html: string): DraftClause[] {
-  // Parsed into a document of its own, which runs and loads nothing.
-  const { body } = new DOMParser().parseFromString(html, 'text/html');
-  const blocks = (parent: Element): DraftClause[] =>
-    [...parent.children].flatMap(element => {
-      if (LISTS.has(element.tagName)) {
-        return [...element.children].map(item => ({
-          text: lines(item).join(' '),
-          children: [...item.children].filter(child => LISTS.has(child.tagName)).flatMap(list => blocks(list)),
-        }));
-      }
-      return lines(element).map(text => ({ text, children: [] }));
-    });
-  return blocks(body);
 }
 
 /** An open application the order can decide, with what the judge decides about it. */
@@ -152,7 +108,6 @@ export function readOrderData(form: HTMLFormElement): OrderData {
   return {
     applications: context.applications.map(application => ({
       ...application,
-      draftOrder: draftClauses(application.draftOrderHtml),
       decision: answers[`${application.prefix}-decision`]?.[0] ?? 'none',
       listedAt: hearings.get(answers[`${application.prefix}-list-at`]?.[0] ?? ''),
       listWithoutNotice: answers[`${application.prefix}-list-without-notice`]?.includes('yes') ?? false,

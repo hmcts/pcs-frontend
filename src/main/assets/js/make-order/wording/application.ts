@@ -1,6 +1,7 @@
 import { type DocBuilder, type OrderedListBuilder } from '@hmcts-cft/docweave';
 
-import { type DraftClause, type OrderApplication, type OrderData } from '../data';
+import type { DraftClause } from '../../../../utils/makeOrderForm';
+import { type OrderApplication, type OrderData } from '../data';
 
 import { sentenceCase } from './common';
 import { addListing } from './listing';
