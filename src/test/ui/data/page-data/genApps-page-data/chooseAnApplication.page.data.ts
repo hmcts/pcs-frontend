@@ -1,5 +1,5 @@
 export const chooseAnApplication = {
-  mainHeader: `Choose an application`,
+  mainHeader: `Choose your application`,
   whatDoYouWantToApplyForQuestion: `What do you want to apply for?`,
   adjournTheHearingRadioOption: `Ask to adjourn the hearing (move it to a later time or date)`,
   youCanApplyToChangeHintText: `You can apply to change the court hearing until a later time or date`,
