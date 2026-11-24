@@ -2,7 +2,7 @@ import escapeHtml from 'escape-html';
 import { DateTime } from 'luxon';
 import { filterXSS } from 'xss';
 
-import { parseDate, parseMoney, workingDayOnOrAfter } from '@utils/makeOrderFormat';
+import { formatAddress, parseDate, parseMoney, workingDayOnOrAfter } from '@utils/makeOrderFormat';
 import {
   type ApplicationToDecide,
   type AttendanceParty,
@@ -383,6 +383,39 @@ export function attendanceParties({ caseContext }: OrderStart): AttendanceRow[] 
   return [...parties('claimant', caseContext.claimants), ...parties('defendant', caseContext.defendants)];
 }
 
+/**
+ * The case's facts the page's script words the order from, sent once in the page as JSON. The judge's answers are the
+ * form's own.
+ */
+export interface OrderContext {
+  propertyAddress: string;
+  before: OrderBefore;
+  /** An order made without a hearing, which says so instead of who attended. */
+  withoutHearing: boolean;
+  /** Every party, for the wording of an order made without anyone's attendance to name them. */
+  parties: { id: string; name: string; kind: AttendanceParty['type'] }[];
+  /** The applications the order can decide, in the order the page shows them. */
+  applications: { prefix: string; applicant: string; submittedOn: string; enforcementSuspension: boolean }[];
+  /** The case's hearings still to come that an application can be listed at. */
+  upcomingHearings: { id: string; text: string }[];
+}
+
+export function orderContext(start: OrderStart): OrderContext {
+  return {
+    propertyAddress: formatAddress(start.caseContext.propertyAddress),
+    before: orderBefore(start),
+    withoutHearing: !start.hearing,
+    parties: attendanceParties(start).map(({ partyId, name, type }) => ({ id: partyId, name, kind: type })),
+    applications: applicationsToDecide(start).map(application => ({
+      prefix: applicationPrefix(application),
+      applicant: application.applicant || 'the applicant',
+      submittedOn: displayDate(application.submittedOn) ?? '',
+      enforcementSuspension: application.enforcementSuspension === true,
+    })),
+    upcomingHearings: upcomingHearings(start),
+  };
+}
+
 /** The make order form as it was last sent, which the page shows in place of the saved order. */
 export interface OrderFormSubmission {
   orderType?: MakeOrderType;
@@ -430,16 +463,13 @@ export function orderFormModel(start: OrderStart, submission?: OrderFormSubmissi
     draftSelect: (items: Record<string, unknown>[], name: string, defaultValue?: string) =>
       items.map(item => ({ ...item, selected: item.value === (draft[name] ?? defaultValue) })),
     attendanceParties: attendanceParties(start),
-    // Every party, for the wording of an order made without anyone's attendance to name them.
-    orderParties: attendanceParties(start).map(({ partyId, name, type }) => ({ id: partyId, name, type })),
     openCounterclaim: caseContext.openCounterclaim === true,
     applications: applications.map(application => applicationModel(application, caseContext.caseReference)),
     upcomingHearings: upcoming,
-    orderBefore: orderBefore(start),
+    orderContext: orderContext(start),
     // A date to apply by is a working day, as are the page's quick dates for it.
     ownInitiativeApplyBy: daysFromToday(OWN_INITIATIVE_APPLY_BY_DAYS, DateTime.now(), start.bankHolidays ?? []),
     bankHolidays: start.bankHolidays ?? [],
-    upcomingHearingsJson: JSON.stringify(Object.fromEntries(upcoming.map(({ id, text }) => [id, text]))),
     ...hearingModel(hearing),
     caseBundle: caseContext.caseBundle ? caseBundleModel(caseContext.caseBundle, caseContext.caseReference) : undefined,
   };

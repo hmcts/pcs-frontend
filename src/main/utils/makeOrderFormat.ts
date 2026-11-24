@@ -133,3 +133,11 @@ export function workingDayOnOrAfter(date: Date, bankHolidays: readonly string[])
   }
   return working;
 }
+
+/** A postal address on one line, as the order gives the property. */
+export function formatAddress(address: Record<string, string | undefined> = {}): string {
+  return ['AddressLine1', 'AddressLine2', 'AddressLine3', 'PostTown', 'County', 'PostCode', 'Country']
+    .map(key => address[key])
+    .filter(Boolean)
+    .join(', ');
+}

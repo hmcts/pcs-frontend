@@ -17,11 +17,8 @@
   {% endif %}
 
   {# The explicit action leaves out the tab fragment, so a refused submission opens at the error summary. #}
-  <form method="post" action="{{ formAction }}" novalidate id="make-order-form"
-        data-property-address="{{ propertyAddressDisplay }}"
-        data-order-before="{{ orderBefore | dump }}"
-        data-parties="{{ orderParties | dump }}"
-        {%- if withoutHearing %} data-without-hearing{% endif %}>
+  <form method="post" action="{{ formAction }}" novalidate id="make-order-form">
+  <script type="application/json" id="order-context">{{ orderContext | jsonScript | safe }}</script>
   <input type="hidden" name="eventToken" value="{{ eventToken }}">
   <input type="hidden" name="orderId" value="{{ order.id }}">
   <input type="hidden" name="taskId" value="{{ taskId }}">

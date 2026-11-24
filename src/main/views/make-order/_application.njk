@@ -153,11 +153,7 @@
            data-application
            data-application-prefix="{{ prefix }}"
            data-application-reference="{{ application.reference }}"
-           data-application-applicant="{{ application.applicant or 'the applicant' }}"
-           data-application-submitted="{{ application.submittedOnDisplay or '' }}"
-           data-application-wording-html="{{ application.requestedWordingHtml }}"
-           data-application-hearings="{{ upcomingHearingsJson }}"
-           {%- if application.enforcementSuspension %} data-application-suspension{% endif %}>
+           data-application-wording-html="{{ application.requestedWordingHtml }}">
     <h3 class="govuk-heading-m govuk-!-margin-bottom-1" id="{{ prefix }}-heading">
       {{ application.reference }}: {{ application.type }}{% if application.somethingElseDetails %} – {{ application.somethingElseDetails }}{% endif %}
     </h3>

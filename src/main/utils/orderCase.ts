@@ -8,6 +8,7 @@ import { linkSignOutToLogout } from '../middleware/legalRepresentativeHeaders';
 import { getUserRoles } from '../steps/utils';
 import { caseNumberFormatter } from '../steps/utils/caseNumberFormatter';
 
+import { formatAddress } from '@utils/makeOrderFormat';
 import type { MakeOrderType } from '@utils/makeOrderValidation';
 import { buildManageCaseDetailsRedirect } from '@utils/manageCaseRedirect';
 
@@ -113,13 +114,6 @@ export interface OrderStart {
   judgeName?: string | null;
   /** The coming year's England and Wales bank holidays, as ISO days, which a date to apply by moves off. */
   bankHolidays?: string[] | null;
-}
-
-export function formatAddress(address: Record<string, string | undefined> = {}): string {
-  return ['AddressLine1', 'AddressLine2', 'AddressLine3', 'PostTown', 'County', 'PostCode', 'Country']
-    .map(key => address[key])
-    .filter(Boolean)
-    .join(', ');
 }
 
 export interface OrderConfirmationHeader {

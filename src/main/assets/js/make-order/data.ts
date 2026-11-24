@@ -1,3 +1,5 @@
+import type { OrderContext } from '../../../utils/makeOrderForm';
+
 export interface OrderParty {
   id: string;
   name: string;
@@ -13,7 +15,7 @@ export interface AttendanceEntry {
   representativeName: string;
 }
 
-/** An open application the order can decide, as its row on the page gives it. */
+/** An open application the order can decide, with what the judge decides about it. */
 export interface OrderApplication {
   /** What its answers on the form start with: `app-<id>`. */
   prefix: string;
@@ -36,7 +38,7 @@ export interface OrderData {
   selectedControlIds: Readonly<Record<string, string>>;
   propertyAddress: string;
   /** Before whom, where and when the order says it was made. */
-  before: { judge: string; court: string; date: string };
+  before: OrderContext['before'];
   /** An order made without a hearing, which says so instead of who attended. */
   withoutHearing: boolean;
   claimants: readonly OrderParty[];
@@ -44,17 +46,14 @@ export interface OrderData {
   attendance: readonly AttendanceEntry[];
 }
 
-const NOT_KNOWN = { judge: '[judge’s name and title]', court: '[court]', date: '[date]' };
-
-function readBefore(json: string | undefined): OrderData['before'] {
-  try {
-    return { ...NOT_KNOWN, ...JSON.parse(json || '{}') };
-  } catch {
-    return NOT_KNOWN;
-  }
+/** The case's facts the server sent with the page. */
+function readOrderContext(form: HTMLFormElement): OrderContext {
+  return JSON.parse(form.querySelector('#order-context')!.textContent!);
 }
 
 export function readOrderData(form: HTMLFormElement): OrderData {
+  const context = readOrderContext(form);
+
   const answers: Record<string, string[]> = {};
   new FormData(form).forEach((entry, name) => {
     if (typeof entry === 'string') {
@@ -69,8 +68,6 @@ export function readOrderData(form: HTMLFormElement): OrderData {
     }
   });
 
-  const parties: { id: string; name: string; type: string }[] = JSON.parse(form.dataset.parties || '[]');
-  const party = ({ id, name }: OrderParty): OrderParty => ({ id, name });
   const attendance: AttendanceEntry[] = [];
   form.querySelectorAll<HTMLElement>('[data-attendance-row]').forEach((row, rowIndex) => {
     const partyKind = row.dataset.partyKind === 'claimant' ? 'claimant' : 'defendant';
@@ -90,35 +87,23 @@ export function readOrderData(form: HTMLFormElement): OrderData {
     });
   });
 
-  const applications: OrderApplication[] = [];
-  form.querySelectorAll<HTMLElement>('[data-application]').forEach(row => {
-    const prefix = row.dataset.applicationPrefix ?? '';
-    let hearings: Record<string, string> = {};
-    try {
-      hearings = JSON.parse(row.dataset.applicationHearings || '{}');
-    } catch {
-      // No hearings to list it at.
-    }
-    applications.push({
-      prefix,
-      applicant: row.dataset.applicationApplicant ?? 'the applicant',
-      submittedOn: row.dataset.applicationSubmitted ?? '',
-      enforcementSuspension: row.dataset.applicationSuspension !== undefined,
-      decision: answers[`${prefix}-decision`]?.[0] ?? 'none',
-      listedAt: hearings[answers[`${prefix}-list-at`]?.[0] ?? ''],
-      listWithoutNotice: answers[`${prefix}-list-without-notice`]?.includes('yes') ?? false,
-    });
-  });
+  const hearings = new Map(context.upcomingHearings.map(({ id, text }) => [id, text]));
+  const party = ({ id, name }: OrderParty): OrderParty => ({ id, name });
 
   return {
-    applications,
+    applications: context.applications.map(application => ({
+      ...application,
+      decision: answers[`${application.prefix}-decision`]?.[0] ?? 'none',
+      listedAt: hearings.get(answers[`${application.prefix}-list-at`]?.[0] ?? ''),
+      listWithoutNotice: answers[`${application.prefix}-list-without-notice`]?.includes('yes') ?? false,
+    })),
     answers,
     selectedControlIds,
-    propertyAddress: form.dataset.propertyAddress ?? '',
-    before: readBefore(form.dataset.orderBefore),
-    withoutHearing: form.dataset.withoutHearing !== undefined,
-    claimants: parties.filter(({ type }) => type === 'claimant').map(party),
-    defendants: parties.filter(({ type }) => type !== 'claimant').map(party),
+    propertyAddress: context.propertyAddress,
+    before: context.before,
+    withoutHearing: context.withoutHearing,
+    claimants: context.parties.filter(({ kind }) => kind === 'claimant').map(party),
+    defendants: context.parties.filter(({ kind }) => kind === 'defendant').map(party),
     attendance,
   };
 }
