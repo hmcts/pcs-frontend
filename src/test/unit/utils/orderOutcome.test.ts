@@ -44,7 +44,9 @@ describe('orderOutcome', () => {
     // Forthwith has no day, so no time, whatever the hidden time field still holds.
     expect(
       claimOutcome('OUTRIGHT_POSSESSION', { 'outright-possession': 'forthwith', 'outright-by-time': '16:00' })
-    ).toEqual(expect.objectContaining({ possessionForthwith: true, possessionDate: undefined, possessionTime: undefined }));
+    ).toEqual(
+      expect.objectContaining({ possessionForthwith: true, possessionDate: undefined, possessionTime: undefined })
+    );
   });
 
   it('says what a suspended possession order decides', () => {

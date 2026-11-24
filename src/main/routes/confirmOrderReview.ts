@@ -340,7 +340,12 @@ function issuingHtml(review: OrderReviewSession): string | undefined {
 }
 
 /** A money judgment as its row of the record page shows it: summed up, with its answers as typed. */
-function judgmentModel(review: OrderReviewSession, judgment: MoneyJudgmentAnswer, n: number, issues: ValidationIssue[]) {
+function judgmentModel(
+  review: OrderReviewSession,
+  judgment: MoneyJudgmentAnswer,
+  n: number,
+  issues: ValidationIssue[]
+) {
   const prefix = `judgment-${n}`;
   const blank = !judgment.arrears && !judgment.otherAmount && !judgment.costs;
   return {

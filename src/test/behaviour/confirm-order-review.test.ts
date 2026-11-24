@@ -537,15 +537,26 @@ describe('confirm order review', () => {
       // What was answered is kept.
       expect(parse(outright.text).querySelector<HTMLInputElement>('#order-does')?.checked).toBe(true);
 
-      const noDate = await app.post(RECORD, recordAnswers({ 'order-does': 'suspended', ...dateFields('suspended-date', '31/2/') }));
+      const noDate = await app.post(
+        RECORD,
+        recordAnswers({ 'order-does': 'suspended', ...dateFields('suspended-date', '31/2/') })
+      );
       expect(errors(noDate.text)).toContain('Enter a real date possession is ordered by');
       expect(parse(noDate.text).querySelector<HTMLInputElement>('#suspended-date-month')?.value).toBe('2');
       // Suspended possession asks only for the date, with no condition or warrant question.
-      expect(parse(noDate.text).querySelector('[name="suspended-condition"], [name="suspended-warrant-on-notice"]')).toBeNull();
-      const suspended = await app.post(RECORD, recordAnswers({ 'order-does': 'suspended', ...dateFields('suspended-date', '1/2/2099') }));
+      expect(
+        parse(noDate.text).querySelector('[name="suspended-condition"], [name="suspended-warrant-on-notice"]')
+      ).toBeNull();
+      const suspended = await app.post(
+        RECORD,
+        recordAnswers({ 'order-does': 'suspended', ...dateFields('suspended-date', '1/2/2099') })
+      );
       expect(errors(suspended.text)).not.toContain('Select if the condition is money or non-money');
 
-      const generally = await app.post(RECORD, recordAnswers({ 'order-does': 'adjournment', adjournment: 'generally' }));
+      const generally = await app.post(
+        RECORD,
+        recordAnswers({ 'order-does': 'adjournment', adjournment: 'generally' })
+      );
       expect(generally.location).toBe(CHECK_YOUR_ANSWERS);
       expect((await app.post(RECORD, recordAnswers({ action: 'previous' }))).location).toBe(REVIEW);
     });
@@ -765,7 +776,10 @@ describe('confirm order review', () => {
       );
       const incomplete = await app.post(
         RECORD,
-        recordAnswers({ ...dateFields('review-date-1-date', '31/2/2027'), 'review-date-1-description': 'x'.repeat(501) })
+        recordAnswers({
+          ...dateFields('review-date-1-date', '31/2/2027'),
+          'review-date-1-description': 'x'.repeat(501),
+        })
       );
 
       expect(errors(incomplete.text)).toEqual([
