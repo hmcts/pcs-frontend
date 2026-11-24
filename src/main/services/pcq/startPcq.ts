@@ -1,11 +1,10 @@
-import axios from 'axios';
 import config from 'config';
 import type { Request } from 'express';
 import { v4 as uuid } from 'uuid';
 
 import { buildDraftDefendantResponse, saveDraftDefendantResponse } from '../../steps/utils/buildDraftDefendantResponse';
 
-import { createSecureToken } from './createSecureToken';
+import { isPcqHealthy, pcqUrlFor } from './pcqLink';
 
 import { getValidatedLanguage } from '@modules/i18n';
 import { Logger } from '@modules/logger';
@@ -33,10 +32,6 @@ export async function startPcq(req: Request): Promise<string | null> {
     return null;
   }
 
-  const tokenKey = config.get<string>('secrets.pcs.pcs-pcq-token-key');
-  const pcqUrl = config.get<string>('pcq.url');
-  const pcqPath = config.get<string>('pcq.path');
-  const healthUrl = `${pcqUrl}/health`;
   const serviceId = config.get<string>('pcq.serviceId');
   const actor = config.get<string>('pcq.actor');
 
@@ -57,15 +52,7 @@ export async function startPcq(req: Request): Promise<string | null> {
     return null;
   }
 
-  try {
-    logger.info(`Checking Pcq health url: ${healthUrl}`);
-    const health = await axios.get(healthUrl, { timeout: config.get<number>('pcq.healthTimeoutMs') });
-    if (health.data.status !== 'UP') {
-      logger.warn('PCQ service is not available, skipping');
-      return null;
-    }
-  } catch (err) {
-    logger.warn('PCQ health check failed:', err.message);
+  if (!(await isPcqHealthy())) {
     return null;
   }
 
@@ -95,8 +82,6 @@ export async function startPcq(req: Request): Promise<string | null> {
     language: getValidatedLanguage(req),
     ccdCaseId: ccdCase.id,
   };
-
-  const secureToken = createSecureToken(params, tokenKey);
 
   // The step controller writes this page's form data to the session immediately before calling us,
   // so flush it explicitly rather than letting the implicit end-of-response save race the citizen's
@@ -130,10 +115,7 @@ export async function startPcq(req: Request): Promise<string | null> {
     return null;
   }
 
-  // `secureToken` contributes token/authTag/iv/salt. URLSearchParams escapes the base64 padding and
-  // '+' characters; PCQ's query parser reverses that, so nothing may be pre-encoded here.
-  const qs = new URLSearchParams({ ...params, ...secureToken }).toString();
-  const redirectUrl = `${pcqUrl}${pcqPath}?${qs}`;
+  const redirectUrl = pcqUrlFor(params);
   logger.info('Redirecting to PCQ');
 
   return redirectUrl;

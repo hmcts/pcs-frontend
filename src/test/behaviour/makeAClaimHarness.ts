@@ -33,6 +33,11 @@ export const ccd = {
   searches: [] as Record<string, unknown>[],
   /** Whether CCD's case search fails rather than answering. */
   searchFails: false,
+  /** What Your Support (cui-ra) was asked, and what it returns for a payload id. */
+  cuiRaRequests: [] as Record<string, unknown>[],
+  cuiRaPayload: undefined as Record<string, unknown> | undefined,
+  /** The status PCQ's health check answers with. */
+  pcqStatus: 'UP',
 };
 
 /** pcs-api's draft version: every save that names the stored version moves it on; a stale one is refused. */
@@ -145,6 +150,16 @@ function ccdStub(): Express {
       after_submit_callback_response: { confirmation_body: JSON.stringify(fee) },
     });
   });
+  stub.post('/api/payload', (req: Request, res: Response) => {
+    ccd.cuiRaRequests.push(req.body);
+    res.json({ url: 'https://cui-ra.test/start' });
+  });
+  stub.get('/api/payload/:id', (_req: Request, res: Response) => {
+    res.json(ccd.cuiRaPayload ?? { action: 'cancel', correlationId: CASE_REFERENCE });
+  });
+  stub.get('/pcq/health', (_req: Request, res: Response) => {
+    res.json({ status: ccd.pcqStatus });
+  });
   stub.get('/payment/card-payment/:reference/status', (_req: Request, res: Response) => {
     res.json({ status: ccd.cardPaymentStatus });
   });
@@ -177,7 +192,7 @@ let backend: http.Server | undefined;
 afterAll(() => backend?.close());
 
 export async function bootMakeAClaim(
-  options: { enabled?: boolean; email?: string; signedIn?: boolean } = {}
+  options: { enabled?: boolean; email?: string; signedIn?: boolean; flags?: Record<string, boolean> } = {}
 ): Promise<TestApp> {
   ccd.stored = undefined;
   ccd.createRequests = [];
@@ -192,10 +207,15 @@ export async function bootMakeAClaim(
   ccd.eligibilityChecks = [];
   ccd.searches = [];
   ccd.searchFails = false;
+  ccd.cuiRaRequests = [];
+  ccd.cuiRaPayload = undefined;
+  ccd.pcqStatus = 'UP';
   backend ??= await listen(ccdStub());
   const backendUrl = `http://127.0.0.1:${(backend.address() as AddressInfo).port}`;
   process.env.CCD_URL = backendUrl;
   process.env.PCS_API_URL = backendUrl;
+  process.env.CUI_RA_URL = backendUrl;
+  process.env.PCQ_URL = `${backendUrl}/pcq`;
   process.env.PAYMENT_RETURN_URL = 'https://pcs.test/payment/return';
 
   const [
@@ -206,6 +226,7 @@ export async function bootMakeAClaim(
     { registerAllJourneys },
     { default: makeAClaimRoutes },
     { default: paymentReturnRoutes },
+    { default: reasonableAdjustmentsCallbackRoutes },
     middleware,
   ] = await Promise.all([
     import('../../main/modules/nunjucks'),
@@ -215,6 +236,7 @@ export async function bootMakeAClaim(
     import('../../main/routes/registerSteps'),
     import('../../main/routes/makeAClaim'),
     import('../../main/routes/paymentReturn'),
+    import('../../main/routes/makeAClaimReasonableAdjustmentsCallback'),
     import('../../main/middleware'),
   ]);
   httpService.setToken('s2s-token', Date.now() + 60 * 60 * 1000);
@@ -227,7 +249,9 @@ export async function bootMakeAClaim(
   // LaunchDarkly as the Test environment is set up: the journey on.
   app.locals.launchDarklyClient = {
     variation: async (flag: string, _context: unknown, fallback: unknown) =>
-      flag === 'private-landlord-make-a-claim-enabled' ? (options.enabled ?? true) : fallback,
+      flag === 'private-landlord-make-a-claim-enabled'
+        ? (options.enabled ?? true)
+        : (options.flags?.[flag] ?? fallback),
   };
 
   const user = {
@@ -253,6 +277,7 @@ export async function bootMakeAClaim(
   registerAllJourneys(app);
   makeAClaimRoutes(app);
   paymentReturnRoutes(app);
+  reasonableAdjustmentsCallbackRoutes(app);
   setupErrorHandlers(app, 'test');
   const server = await listen(app);
   const baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;

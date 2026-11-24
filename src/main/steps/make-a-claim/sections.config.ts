@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import { readClaim } from './claimDraft';
 
 import type { SectionConfig } from '@modules/steps/stepFlow.interface';
+import { claimsRentArrears } from '@services/citizenPossessionClaim.interface';
 
 export const MAKE_A_CLAIM_SECTION_GROUPS = [
   { id: 'yourClaim', titleKey: 'taskList.groups.yourClaim' },
@@ -25,6 +26,13 @@ export const makeAClaimSections: readonly SectionConfig[] = [
       'claimant-phone',
       'claimant-text-message',
       'multiple-claimants',
+      'additional-claimant-type',
+      'additional-claimant-name',
+      'additional-claimant-organisation-name',
+      'additional-claimant-address',
+      'additional-claimant-email',
+      'additional-claimant-phone',
+      'additional-claimant-text-message',
       'claimant-cya',
     ],
   },
@@ -48,6 +56,9 @@ export const makeAClaimSections: readonly SectionConfig[] = [
       'occupation-contract-start-date',
       'occupation-contract-agreement',
       'upload-occupation-contract',
+      'excluded-grounds-claim',
+      'excluded-grounds',
+      'excluded-reason',
       'rent-arrears-claim',
       'rent-arrears-grounds',
       'other-grounds-claim',
@@ -90,7 +101,7 @@ export const makeAClaimSections: readonly SectionConfig[] = [
       'recovery-steps',
       'arrears-cya',
     ],
-    isApplicable: async (req: Request) => readClaim(req).grounds?.hasRentArrearsGrounds === 'YES',
+    isApplicable: async (req: Request) => claimsRentArrears(readClaim(req)),
   },
   {
     id: 'circumstances',

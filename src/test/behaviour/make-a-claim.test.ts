@@ -793,7 +793,7 @@ describe('answering questions', () => {
       `${claimPath('claimant-text-message')}?nav=1`
     );
     expect((await app.post(claimPath('multiple-claimants'), { multipleClaimants: 'yes' })).location).toBe(
-      claimPath('multiple-claimants-ineligible')
+      `${claimPath('additional-claimant-type')}?index=0`
     );
     expect((await app.post(claimPath('claimant-cya'), {})).location).toBe(claimPath('task-list'));
   });
@@ -1205,15 +1205,6 @@ describe('review fixes', () => {
         `${claimPath('ground-reason')}?ground=GROUND_14&returnTo=check-your-answers`,
       ],
     ]);
-  });
-
-  it('turns away a claim with other claimants at submit', async () => {
-    app = await bootMakeAClaim();
-    givenClaim(SUBMITTABLE);
-    ccd.refuseSubmit = ['MULTIPLE_CLAIMANTS_NOT_ELIGIBLE'];
-    expect((await app.post(claimPath('check-your-answers'), SIGNED)).location).toBe(
-      claimPath('multiple-claimants-ineligible')
-    );
   });
 
   it('keeps the statement of truth on Save for later', async () => {

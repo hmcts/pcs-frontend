@@ -54,14 +54,20 @@ function holdsAddress(formContent: BuiltFormContent | undefined, prefix: string)
 }
 
 /** What the address template needs to render the finder for `prefix`. */
-export function addressContent(req: Request, prefix: string, formContent?: BuiltFormContent): Record<string, unknown> {
+export function addressContent(
+  req: Request,
+  prefix: string,
+  formContent?: BuiltFormContent,
+  overrides: { enterPostcode?: string; postcodeHint?: string } = {}
+): Record<string, unknown> {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const label = (key: string) => t(`makeAClaim:address.finder.${key}`);
   return {
     addressPrefix: prefix,
     addressOpen: req.method === 'POST' || holdsAddress(formContent, prefix),
     addressLabels: {
-      enterPostcode: label('enterPostcode'),
+      enterPostcode: overrides.enterPostcode ?? label('enterPostcode'),
+      postcodeHint: overrides.postcodeHint,
       findAddress: label('findAddress'),
       selectAddress: label('selectAddress'),
       enterManually: label('enterManually'),

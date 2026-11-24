@@ -1,6 +1,8 @@
 {
   "pageTitle": "cyEquality and diversity questions",
   "heading": "cyEquality and diversity questions",
+  "continueButton": "cyContinue to the questions",
+  "skipButton": "cyI do not want to answer these questions",
   "paragraphs": [
     "cyThese are optional questions about you",
     "cyYour answers won’t affect your application",

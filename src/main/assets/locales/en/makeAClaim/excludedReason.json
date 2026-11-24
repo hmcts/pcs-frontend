@@ -1,0 +1,11 @@
+{
+  "pageTitle": "Why are you making a possession claim?",
+  "question": "Why are you making a possession claim?",
+  "errors": {
+    "excludedReason": "Explain why you are making a possession claim",
+    "excludedReasonMaxLength": "Must be 500 characters or less"
+  },
+  "fieldNames": {
+    "excludedReason": "Your reason for making a possession claim"
+  }
+}

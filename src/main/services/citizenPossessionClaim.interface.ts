@@ -1,4 +1,5 @@
 import type { CcdCaseAddress, CcdCollectionItem, CcdDocumentReference } from './ccdCase.interface';
+import type { CcdFlags } from './cuiRa/cuiRa.interface';
 
 /** The private landlord's possession claim as pcs-api's `citizenPossessionClaim` field holds it. Money is pence. */
 export type YesNo = 'YES' | 'NO';
@@ -107,6 +108,19 @@ export type RentFrequency = 'WEEKLY' | 'FORTNIGHTLY' | 'MONTHLY' | 'OTHER';
 
 export type ProofType = 'UPLOAD_STATEMENT' | 'TABLE';
 
+/** The grounds on an excluded tenancy or licence, as pcs-api's IntroductoryDemotedOrOtherGrounds names them. */
+export const EXCLUDED_GROUNDS = [
+  'RENT_ARREARS',
+  'ANTI_SOCIAL',
+  'BREACH_OF_THE_TENANCY',
+  'ABSOLUTE_GROUNDS',
+  'OTHER',
+] as const;
+
+export type ExcludedGround = (typeof EXCLUDED_GROUNDS)[number];
+
+export type EqualityQuestionsChoice = 'CONTINUE' | 'SKIP';
+
 export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
 
 /** Documents as CCD `Document` collection items, the way pcs-api keeps them in the claim. */
@@ -121,6 +135,19 @@ export interface CitizenDefendant {
   addressKnown?: YesNo;
   addressSameAsProperty?: YesNo;
   address?: CcdCaseAddress;
+}
+
+export interface CitizenAdditionalClaimant {
+  individualOrOrganisation?: IndividualOrOrganisation;
+  firstName?: string;
+  lastName?: string;
+  organisationName?: string;
+  address?: CcdCaseAddress;
+  emailAddress?: string;
+  contactByPhone?: YesNo;
+  phoneNumber?: string;
+  contactByText?: YesNo;
+  textMessageNumber?: string;
 }
 
 export interface GroundReason {
@@ -161,6 +188,7 @@ export interface CitizenPossessionClaim {
     textMessageNumber?: string;
     multipleClaimants?: YesNo;
   };
+  additionalClaimants?: CcdCollectionItem<CitizenAdditionalClaimant>[];
   defendants?: CcdCollectionItem<CitizenDefendant>[];
   additionalDefendants?: YesNo;
   /** Draft only: YES once the claimant has said there are no more defendants to add. */
@@ -182,6 +210,10 @@ export interface CitizenPossessionClaim {
     otherGrounds?: OtherGround[];
     otherGroundsDetails?: string;
     groundReasons?: CcdCollectionItem<GroundReason>[];
+    hasExcludedGrounds?: YesNo;
+    excludedGrounds?: ExcludedGround[];
+    excludedOtherGroundDetails?: string;
+    excludedReason?: string;
   };
   notice?: {
     noticeServed?: YesNo;
@@ -227,6 +259,9 @@ export interface CitizenPossessionClaim {
     otherReasonsDetail?: string;
     generalApplicationIntent?: YesNo;
     languageUsed?: LanguageUsed;
+    supportFlags?: CcdFlags;
+    equalityQuestionsChoice?: EqualityQuestionsChoice;
+    pcqId?: string;
   };
   submission?: {
     statementOfTruthAgreed?: YesNo;
@@ -236,4 +271,19 @@ export interface CitizenPossessionClaim {
     feeAmount?: string;
     paymentStatus?: 'PAID' | 'NOT_PAID' | 'PARTIALLY_PAID';
   };
+}
+
+/** Whether the tenancy is an excluded tenancy or licence in England, whose grounds are asked separately from an assured tenancy's. */
+export function isExcludedClaim(claim: CitizenPossessionClaim): boolean {
+  return claim.tenancy?.tenancyType === 'EXCLUDED' && claim.eligibility?.legislativeCountry !== 'Wales';
+}
+
+/** Whether the claim is for rent arrears, which asks for the rent arrears details and proof. */
+export function claimsRentArrears(claim: CitizenPossessionClaim): boolean {
+  if (isExcludedClaim(claim)) {
+    return (
+      claim.grounds?.hasExcludedGrounds === 'YES' && Boolean(claim.grounds.excludedGrounds?.includes('RENT_ARREARS'))
+    );
+  }
+  return claim.grounds?.hasRentArrearsGrounds === 'YES';
 }

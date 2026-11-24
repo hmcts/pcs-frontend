@@ -19,6 +19,14 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^claimant\.emailAddress$/, 'claimant-email'],
   [/^claimant\.phoneNumber$/, 'claimant-phone'],
   [/^claimant\.textMessageNumber$/, 'claimant-text-message'],
+  [/^additionalClaimants$/, 'multiple-claimants'],
+  [/^additionalClaimants\[\d+\](\.individualOrOrganisation)?$/, 'additional-claimant-type'],
+  [/^additionalClaimants\[\d+\]\.(firstName|lastName|name)$/, 'additional-claimant-name'],
+  [/^additionalClaimants\[\d+\]\.organisationName$/, 'additional-claimant-organisation-name'],
+  [/^additionalClaimants\[\d+\]\.address(\.[A-Za-z0-9]+)?$/, 'additional-claimant-address'],
+  [/^additionalClaimants\[\d+\]\.emailAddress$/, 'additional-claimant-email'],
+  [/^additionalClaimants\[\d+\]\.(contactByPhone|phoneNumber)$/, 'additional-claimant-phone'],
+  [/^additionalClaimants\[\d+\]\.(contactByText|textMessageNumber)$/, 'additional-claimant-text-message'],
   [/^defendants(\[\d+\](\.(nameKnown|firstName|lastName))?)?$/, 'defendant-name'],
   [/^defendants\[\d+\]\.(addressKnown|addressSameAsProperty|address(\.[A-Za-z0-9]+)?)$/, 'defendant-address'],
   [/^tenancy\.(tenancyType|otherTenancyTypeDetails)$/, 'tenancy-type'],
@@ -29,6 +37,9 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^grounds\.rentArrearsGrounds$/, 'rent-arrears-grounds'],
   [/^grounds\.otherGrounds$/, 'other-grounds'],
   [/^grounds\.otherGroundsDetails$/, 'other-grounds'],
+  [/^grounds\.hasExcludedGrounds$/, 'excluded-grounds-claim'],
+  [/^grounds\.(excludedGrounds|excludedOtherGroundDetails)$/, 'excluded-grounds'],
+  [/^grounds\.excludedReason$/, 'excluded-reason'],
   [/^grounds\.groundReasons(\.[A-Z0-9_]+|\.reason)?$/, 'ground-reason'],
   [/^rentArrears\.currentArrears$/, 'current-arrears'],
   [/^rentArrears\.rentAmount$/, 'rent-amount'],
@@ -62,7 +73,6 @@ const WALES_STEPS: Record<string, string> = {
 
 /** Refusals that mean the claimant cannot use the service, by where they are told so. */
 const INELIGIBLE_REDIRECTS: Record<string, (caseId: string) => string> = {
-  MULTIPLE_CLAIMANTS_NOT_ELIGIBLE: caseId => getStepUrl('multiple-claimants-ineligible', flowConfig, caseId),
   PROPERTY_NOT_IN_ENGLAND_OR_WALES: () => PROPERTY_INELIGIBLE_URL,
   CLAIMANT_TYPE_NOT_ELIGIBLE: () => `${MAKE_A_CLAIM_START_ROUTE}/not-private-landlord`,
   CLAIM_AGAINST_TRESPASSERS_NOT_ELIGIBLE: () => `${MAKE_A_CLAIM_START_ROUTE}/trespass-ineligible`,
@@ -125,9 +135,9 @@ function answerUrl(step: string, caseId: string, query = ''): string {
   return withReturnTo(`${getStepUrl(step, flowConfig, caseId)}${query}`, 'check-your-answers');
 }
 
-/** Which defendant, rent statement row or ground a refused path is about, as the page that asks it expects. */
+/** Which defendant or additional claimant, rent statement row or ground a refused path is about, as the page that asks it expects. */
 function queryForPath(path: string): string {
-  const defendant = Number(/^defendants\[(\d+)\]/.exec(path)?.[1] ?? 0);
+  const defendant = Number(/^(?:defendants|additionalClaimants)\[(\d+)\]/.exec(path)?.[1] ?? 0);
   const row = /^rentArrears\.rentHistoryTable\[(\d+)\]\.(datePaid|amountPaid)$/.exec(path)?.[1];
   const ground = /^grounds\.groundReasons\.(GROUND_[A-Z0-9]+)$/.exec(path)?.[1];
   if (ground) {

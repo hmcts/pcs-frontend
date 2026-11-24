@@ -151,7 +151,10 @@
       "notice": "cyAbout the notice you served",
       "rentArrears": "cyProof of rent arrears",
       "circumstances": "cyCircumstances",
-      "otherInformation": "cyOther information"
+      "otherInformation": "cyOther information",
+      "additionalClaimant": "cyAdditional claimant {{number}}",
+      "yourSupport": "cyYour support",
+      "equality": "cyEquality and diversity questions"
     },
     "labels": {
       "individualOrOrganisation": "cyAre you claiming as an individual or a registered company?",
@@ -198,7 +201,31 @@
       "otherDocuments": "cyUpload files (optional)",
       "hasOtherReasons": "cyIs there any other information you want to provide about your reasons for possession?",
       "generalApplicationIntent": "cyDo you need to make a general application?",
-      "languageUsed": "cyWhich language did you use to complete this claim?"
+      "languageUsed": "cyWhich language did you use to complete this claim?",
+      "additionalClaimantType": "cyIs the next claimant an individual or a registered company?",
+      "additionalClaimantName": "cyWhat is their name?",
+      "additionalClaimantOrganisationName": "cyWhat is their company or organisation’s name?",
+      "additionalClaimantAddress": "cyWhat is their postal address?",
+      "additionalClaimantEmail": "cyWhat is their email address?",
+      "additionalClaimantPhone": "cyDo they want to be contacted by telephone?",
+      "additionalClaimantTextMessage": "cyDo they want to be contacted by text message?",
+      "hasExcludedGrounds": "cyDo you have grounds for possession?",
+      "excludedGrounds": "cyWhat are your grounds for possession?",
+      "excludedReason": "cyWhy are you making a possession claim?",
+      "supportRequests": "cyReasonable adjustment requests",
+      "equalityQuestions": "cyEquality and diversity questions"
+    },
+    "notProvided": "cyNot provided",
+    "provided": "cyProvided",
+    "noSupportRequested": "cyNo support requested",
+    "values": {
+      "excludedGround": {
+        "RENT_ARREARS": "cyRent arrears",
+        "ANTI_SOCIAL": "cyAntisocial behaviour",
+        "BREACH_OF_THE_TENANCY": "cyBreach of the tenancy",
+        "ABSOLUTE_GROUNDS": "cyAbsolute grounds",
+        "OTHER": "cyOther"
+      }
     }
   },
   "rentTable": {
@@ -263,7 +290,18 @@
       "upload-occupation-contract": "cyUpload occupation contract or licence agreement",
       "upload-notice": "cyUpload notice",
       "upload-rent-statement": "cyUpload rent statement",
-      "upload-other-documents": "cyUpload files"
+      "upload-other-documents": "cyUpload files",
+      "additional-claimant-type": "cyIs the next claimant an individual or a registered company?",
+      "additional-claimant-name": "cyWhat is their name?",
+      "additional-claimant-organisation-name": "cyWhat is their company or organisation’s name?",
+      "additional-claimant-address": "cyWhat is their postal address?",
+      "additional-claimant-email": "cyWhat is their email address?",
+      "additional-claimant-phone": "cyDo they want to be contacted by telephone?",
+      "additional-claimant-text-message": "cyDo they want to be contacted by text message?",
+      "multiple-claimants": "cyDo you want to add another claimant to this claim?",
+      "excluded-grounds-claim": "cyDo you have grounds for possession?",
+      "excluded-grounds": "cyWhat are your grounds for possession?",
+      "excluded-reason": "cyWhy are you making a possession claim?"
     },
     "rentArrearsGroundNotAllowed": "cyChoose only rent arrears grounds on the rent arrears grounds question"
   },

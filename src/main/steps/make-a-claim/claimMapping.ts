@@ -38,9 +38,11 @@ import {
 
 import type { CcdCaseAddress, CcdCollectionItem } from '@services/ccdCase.interface';
 import {
+  type CitizenAdditionalClaimant,
   type CitizenDefendant,
   type CitizenPossessionClaim,
   DISCRETIONARY_OTHER_GROUNDS,
+  EXCLUDED_GROUNDS,
   type GroundReason,
   MANDATORY_OTHER_GROUNDS,
   NOTICE_METHODS,
@@ -74,6 +76,9 @@ export const RENT_FREQUENCIES: readonly RentFrequency[] = ['WEEKLY', 'FORTNIGHTL
 export const PROOF_TYPES: readonly ProofType[] = ['UPLOAD_STATEMENT', 'TABLE'];
 export const LANGUAGES = ['ENGLISH', 'WELSH', 'ENGLISH_AND_WELSH'] as const;
 export const ORGANISATION_TYPES = ['INDIVIDUAL', 'ORGANISATION'] as const;
+
+/** The prefix of the additional claimant address page's fields. */
+export const ADDITIONAL_CLAIMANT_ADDRESS = 'additionalClaimant';
 
 type NoticeDetailKey = 'postedDate' | 'deliveredDate' | 'handedDate' | 'handedToName' | 'emailedDate' | 'emailedTo';
 
@@ -109,6 +114,54 @@ function updateDefendant(claim: CitizenPossessionClaim, index: number, update: (
   update(value);
   defendants[position] = { ...existing, value };
   claim.defendants = defendants;
+}
+
+/** The additional claimant an additional claimant page is about: ?index=n, or the first. */
+export function additionalClaimantIndexOf(req: Request): number {
+  return indexFromQuery(req.query?.index) ?? 0;
+}
+
+function additionalClaimantAt(claim: CitizenPossessionClaim, index: number): CitizenAdditionalClaimant | undefined {
+  return claim.additionalClaimants?.[index]?.value;
+}
+
+function updateAdditionalClaimant(
+  claim: CitizenPossessionClaim,
+  index: number,
+  update: (claimant: CitizenAdditionalClaimant) => void
+): void {
+  const claimants = [...(claim.additionalClaimants ?? [])];
+  const position = Math.min(index, claimants.length);
+  const existing = claimants[position] ?? { id: newItemId(), value: {} };
+  const value = { ...existing.value };
+  update(value);
+  claimants[position] = { ...existing, value };
+  claim.additionalClaimants = claimants;
+}
+
+/** Whether every question has been answered for an additional claimant. */
+export function additionalClaimantAnswered(claimant: CitizenAdditionalClaimant | undefined): boolean {
+  if (!claimant?.individualOrOrganisation) {
+    return false;
+  }
+  const named =
+    claimant.individualOrOrganisation === 'INDIVIDUAL'
+      ? Boolean(claimant.firstName && claimant.lastName)
+      : Boolean(claimant.organisationName);
+  return (
+    named &&
+    Boolean(claimant.address?.AddressLine1) &&
+    claimant.emailAddress !== undefined &&
+    (claimant.contactByPhone === 'NO' || (claimant.contactByPhone === 'YES' && Boolean(claimant.phoneNumber))) &&
+    (claimant.contactByText === 'NO' || (claimant.contactByText === 'YES' && Boolean(claimant.textMessageNumber)))
+  );
+}
+
+/** The additional claimant to ask about next: the first not fully answered, else a new one. */
+export function nextAdditionalClaimantIndex(claim: CitizenPossessionClaim): number {
+  const claimants = claim.additionalClaimants ?? [];
+  const unanswered = claimants.findIndex(claimant => !additionalClaimantAnswered(claimant.value));
+  return unanswered === -1 ? claimants.length : unanswered;
 }
 
 function setNested<K extends keyof CitizenPossessionClaim>(
@@ -364,7 +417,112 @@ export const claimMappings: Record<string, StepMapping> = {
     },
   },
 
-  'multiple-claimants': yesNoStep('claimant', 'multipleClaimants', claim => claim.claimant?.multipleClaimants),
+  'multiple-claimants': {
+    // Once another claimant has been added the question is asked again, so it starts unanswered
+    toForm: claim =>
+      claim.additionalClaimants?.some(claimant => additionalClaimantAnswered(claimant.value))
+        ? {}
+        : { multipleClaimants: fromYesNo(claim.claimant?.multipleClaimants) },
+    // Answering No after adding claimants means there are no more to add, so the ones added stay
+    fromForm: (claim, body) => {
+      const answered = toYesNo(body.multipleClaimants);
+      if (answered === 'NO') {
+        claim.additionalClaimants = (claim.additionalClaimants ?? []).filter(claimant =>
+          additionalClaimantAnswered(claimant.value)
+        );
+      }
+      setNested(claim, 'claimant', claimant => {
+        claimant.multipleClaimants = answered === 'NO' && claim.additionalClaimants?.length ? 'YES' : answered;
+      });
+    },
+    isAnswered: claim =>
+      claim.claimant?.multipleClaimants === 'NO' ||
+      (claim.claimant?.multipleClaimants === 'YES' &&
+        Boolean(claim.additionalClaimants?.length) &&
+        (claim.additionalClaimants ?? []).every(claimant => additionalClaimantAnswered(claimant.value))),
+  },
+
+  'additional-claimant-type': {
+    toForm: (claim, req) => ({
+      individualOrOrganisation: additionalClaimantAt(claim, additionalClaimantIndexOf(req))?.individualOrOrganisation,
+    }),
+    fromForm: (claim, body, req) =>
+      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+        claimant.individualOrOrganisation = oneOf(body.individualOrOrganisation, ORGANISATION_TYPES);
+      }),
+  },
+
+  'additional-claimant-name': {
+    toForm: (claim, req) => {
+      const claimant = additionalClaimantAt(claim, additionalClaimantIndexOf(req));
+      return { firstName: claimant?.firstName, lastName: claimant?.lastName };
+    },
+    fromForm: (claim, body, req) =>
+      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+        claimant.firstName = text(body.firstName);
+        claimant.lastName = text(body.lastName);
+      }),
+  },
+
+  'additional-claimant-organisation-name': {
+    toForm: (claim, req) => ({
+      organisationName: additionalClaimantAt(claim, additionalClaimantIndexOf(req))?.organisationName,
+    }),
+    fromForm: (claim, body, req) =>
+      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+        claimant.organisationName = text(body.organisationName);
+      }),
+  },
+
+  'additional-claimant-address': {
+    toForm: (claim, req) =>
+      addressToForm(additionalClaimantAt(claim, additionalClaimantIndexOf(req))?.address, ADDITIONAL_CLAIMANT_ADDRESS),
+    fromForm: (claim, body, req) =>
+      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+        claimant.address = addressFromBody(body, ADDITIONAL_CLAIMANT_ADDRESS);
+      }),
+  },
+
+  'additional-claimant-email': {
+    toForm: (claim, req) => ({
+      emailAddress: additionalClaimantAt(claim, additionalClaimantIndexOf(req))?.emailAddress,
+    }),
+    fromForm: (claim, body, req) =>
+      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+        claimant.emailAddress = optionalText(body.emailAddress, body);
+      }),
+  },
+
+  'additional-claimant-phone': {
+    toForm: (claim, req) => {
+      const claimant = additionalClaimantAt(claim, additionalClaimantIndexOf(req));
+      return {
+        contactByPhone: fromYesNo(claimant?.contactByPhone),
+        'contactByPhone.phoneNumber': claimant?.phoneNumber,
+      };
+    },
+    fromForm: (claim, body, req) =>
+      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+        claimant.contactByPhone = toYesNo(body.contactByPhone);
+        claimant.phoneNumber = claimant.contactByPhone === 'YES' ? text(body['contactByPhone.phoneNumber']) : undefined;
+      }),
+  },
+
+  'additional-claimant-text-message': {
+    toForm: (claim, req) => {
+      const claimant = additionalClaimantAt(claim, additionalClaimantIndexOf(req));
+      return {
+        contactByText: fromYesNo(claimant?.contactByText),
+        'contactByText.textMessageNumber': claimant?.textMessageNumber,
+      };
+    },
+    fromForm: (claim, body, req) =>
+      updateAdditionalClaimant(claim, additionalClaimantIndexOf(req), claimant => {
+        claimant.contactByText = toYesNo(body.contactByText);
+        claimant.textMessageNumber =
+          claimant.contactByText === 'YES' ? text(body['contactByText.textMessageNumber']) : undefined;
+      }),
+  },
 
   'defendant-name': {
     toForm: (claim, req) => {
@@ -548,6 +706,32 @@ export const claimMappings: Record<string, StepMapping> = {
       const ground = groundWithoutReasonOf(claim);
       return ground ? `?ground=${ground}` : undefined;
     },
+  },
+
+  'excluded-grounds-claim': yesNoStep('grounds', 'hasExcludedGrounds', claim => claim.grounds?.hasExcludedGrounds),
+
+  'excluded-grounds': {
+    toForm: claim => ({
+      excludedGrounds: claim.grounds?.excludedGrounds ?? [],
+      'excludedGrounds.excludedOtherGroundDetails': claim.grounds?.excludedOtherGroundDetails,
+    }),
+    fromForm: (claim, body) =>
+      setNested(claim, 'grounds', grounds => {
+        grounds.excludedGrounds = checkedValues(body.excludedGrounds, EXCLUDED_GROUNDS);
+        grounds.excludedOtherGroundDetails = grounds.excludedGrounds.includes('OTHER')
+          ? text(body['excludedGrounds.excludedOtherGroundDetails'])
+          : undefined;
+      }),
+    isAnswered: claim => Boolean(claim.grounds?.excludedGrounds?.length),
+  },
+
+  'excluded-reason': {
+    toForm: claim => ({ excludedReason: claim.grounds?.excludedReason }),
+    fromForm: (claim, body) =>
+      setNested(claim, 'grounds', grounds => {
+        grounds.excludedReason = text(body.excludedReason);
+      }),
+    isAnswered: claim => Boolean(claim.grounds?.excludedReason),
   },
 
   'notice-served': withReason('notice', 'noticeServed', 'noNoticeReason', 'no'),

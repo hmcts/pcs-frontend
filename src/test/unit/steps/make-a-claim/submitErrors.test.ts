@@ -25,14 +25,6 @@ function request(): Request {
 const refused = (...reasons: string[]) => new CallbackRejectedError(reasons, 422);
 
 describe('submitRefusalOutcome', () => {
-  it('sends a claim with other claimants to the ineligible page', () => {
-    expect(submitRefusalOutcome(refused('REQUIRED:claimant.address', 'MULTIPLE_CLAIMANTS_NOT_ELIGIBLE'), CASE)).toEqual(
-      {
-        redirect: claimPage('multiple-claimants-ineligible'),
-      }
-    );
-  });
-
   it.each([
     ['CLAIMANT_TYPE_NOT_ELIGIBLE', '/make-a-claim/not-private-landlord'],
     ['CLAIM_AGAINST_TRESPASSERS_NOT_ELIGIBLE', '/make-a-claim/trespass-ineligible'],

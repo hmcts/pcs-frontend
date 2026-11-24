@@ -2,8 +2,10 @@ import type { Request } from 'express';
 
 import type { CitizenPossessionClaim } from '../../../../main/services/citizenPossessionClaim.interface';
 import {
+  additionalClaimantAnswered,
   claimMappings,
   groundForReasonOf,
+  nextAdditionalClaimantIndex,
   paymentDateLimitsOf,
   removeDefendant,
   rentChangeExceedsLimit,
@@ -41,6 +43,121 @@ function roundTrip(step: string, body: Record<string, unknown>, claim: CitizenPo
     answered: mapping.isAnswered?.(saved, req),
   };
 }
+
+const ANSWERED_ADDITIONAL = {
+  individualOrOrganisation: 'INDIVIDUAL',
+  firstName: 'Jo',
+  lastName: 'Smith',
+  address: PROPERTY,
+  emailAddress: '',
+  contactByPhone: 'NO',
+  contactByText: 'NO',
+} as const;
+
+describe('additional claimants', () => {
+  const at = (index: number) => request({ index: String(index) });
+
+  it('saves each page onto the claimant its ?index names, adding a new one at the end', () => {
+    const first = roundTrip('additional-claimant-type', { individualOrOrganisation: 'ORGANISATION' }, {}, at(0));
+    expect(first.saved.additionalClaimants).toEqual([
+      { id: expect.any(String), value: { individualOrOrganisation: 'ORGANISATION' } },
+    ]);
+    const second = roundTrip(
+      'additional-claimant-type',
+      { individualOrOrganisation: 'INDIVIDUAL' },
+      first.saved,
+      at(7)
+    );
+    expect(second.saved.additionalClaimants?.map(claimant => claimant.value.individualOrOrganisation)).toEqual([
+      'ORGANISATION',
+      'INDIVIDUAL',
+    ]);
+  });
+
+  it('reads the details back for the page', () => {
+    const claim = { additionalClaimants: [{ value: { ...ANSWERED_ADDITIONAL, phoneNumber: '0123' } }] };
+    expect(claimMappings['additional-claimant-name'].toForm?.(claim, at(0))).toEqual({
+      firstName: 'Jo',
+      lastName: 'Smith',
+    });
+    expect(claimMappings['additional-claimant-address'].toForm?.(claim, at(0))).toMatchObject({
+      'additionalClaimant-addressLine1': '15 Garden Drive',
+    });
+  });
+
+  it('keeps a blank email as an answer, so the page counts as answered', () => {
+    expect(roundTrip('additional-claimant-email', { emailAddress: ' ' }, {}, at(0)).saved.additionalClaimants).toEqual([
+      { id: expect.any(String), value: { emailAddress: '' } },
+    ]);
+  });
+
+  it('counts a claimant answered once every question is', () => {
+    expect(additionalClaimantAnswered(ANSWERED_ADDITIONAL)).toBe(true);
+    expect(additionalClaimantAnswered({ ...ANSWERED_ADDITIONAL, contactByText: 'YES' })).toBe(false);
+    expect(
+      additionalClaimantAnswered({ ...ANSWERED_ADDITIONAL, contactByText: 'YES', textMessageNumber: '0123' })
+    ).toBe(true);
+    expect(additionalClaimantAnswered({ ...ANSWERED_ADDITIONAL, lastName: undefined })).toBe(false);
+    expect(additionalClaimantAnswered({ ...ANSWERED_ADDITIONAL, emailAddress: undefined })).toBe(false);
+    expect(additionalClaimantAnswered(undefined)).toBe(false);
+  });
+
+  it('asks about the first claimant not yet answered, else a new one', () => {
+    expect(nextAdditionalClaimantIndex({})).toBe(0);
+    expect(nextAdditionalClaimantIndex({ additionalClaimants: [{ value: ANSWERED_ADDITIONAL }] })).toBe(1);
+    expect(
+      nextAdditionalClaimantIndex({
+        additionalClaimants: [{ value: ANSWERED_ADDITIONAL }, { value: {} }, { value: ANSWERED_ADDITIONAL }],
+      })
+    ).toBe(1);
+  });
+
+  it('is answered once there are no others, or every other claimant is answered', () => {
+    const answered = (claim: CitizenPossessionClaim) =>
+      claimMappings['multiple-claimants'].isAnswered?.(claim, request());
+    expect(answered({ claimant: { multipleClaimants: 'NO' } })).toBe(true);
+    expect(answered({ claimant: { multipleClaimants: 'YES' } })).toBe(false);
+    expect(
+      answered({ claimant: { multipleClaimants: 'YES' }, additionalClaimants: [{ value: ANSWERED_ADDITIONAL }] })
+    ).toBe(true);
+    expect(
+      answered({ claimant: { multipleClaimants: 'YES' }, additionalClaimants: [{ value: { firstName: 'Jo' } }] })
+    ).toBe(false);
+  });
+});
+
+describe('excluded tenancy grounds', () => {
+  it('saves the grounds with the details only when Other is ticked', () => {
+    const { saved, form, answered } = roundTrip('excluded-grounds', {
+      excludedGrounds: ['ABSOLUTE_GROUNDS', 'OTHER', 'NOT_A_GROUND'],
+      'excludedGrounds.excludedOtherGroundDetails': ' Unlicensed occupier ',
+    });
+    expect(saved.grounds).toEqual({
+      excludedGrounds: ['ABSOLUTE_GROUNDS', 'OTHER'],
+      excludedOtherGroundDetails: 'Unlicensed occupier',
+    });
+    expect(form).toEqual({
+      excludedGrounds: ['ABSOLUTE_GROUNDS', 'OTHER'],
+      'excludedGrounds.excludedOtherGroundDetails': 'Unlicensed occupier',
+    });
+    expect(answered).toBe(true);
+    expect(
+      roundTrip('excluded-grounds', {
+        excludedGrounds: ['ABSOLUTE_GROUNDS'],
+        'excludedGrounds.excludedOtherGroundDetails': 'x',
+      }).saved.grounds?.excludedOtherGroundDetails
+    ).toBeUndefined();
+  });
+
+  it('saves whether there are grounds, and the reason', () => {
+    expect(roundTrip('excluded-grounds-claim', { hasExcludedGrounds: 'no' }).saved.grounds).toEqual({
+      hasExcludedGrounds: 'NO',
+    });
+    const { saved, answered } = roundTrip('excluded-reason', { excludedReason: 'The occupier is a lodger' });
+    expect(saved.grounds).toEqual({ excludedReason: 'The occupier is a lodger' });
+    expect(answered).toBe(true);
+  });
+});
 
 describe('claim mappings', () => {
   it('saves the claimant type and reads it back', () => {

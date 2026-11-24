@@ -1,0 +1,13 @@
+{
+  "pageTitle": "Do they want to be contacted by telephone?",
+  "question": "Do they want to be contacted by telephone?",
+  "hint": "We might need to contact you by telephone with urgent updates about your case",
+  "labels": {
+    "phoneNumber": "UK phone number"
+  },
+  "errors": {
+    "contactByPhone": "Select whether they want to be contacted by telephone",
+    "phoneNumber": "Enter their phone number",
+    "phoneNumberInvalid": "Enter a UK phone number, like 01632 960 001 or 07700 900 982"
+  }
+}

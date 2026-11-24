@@ -1,0 +1,20 @@
+{% extends "make-a-claim/templates/question.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block buttons %}
+  <div class="govuk-button-group">
+    {% if handOffAvailable %}
+      {{ govukButton({
+        text: continueButton,
+        preventDoubleClick: true,
+        attributes: { name: 'choice', value: 'continue' }
+      }) }}
+    {% endif %}
+    {{ govukButton({
+      text: skipButton,
+      classes: 'govuk-button--secondary',
+      preventDoubleClick: true,
+      attributes: { name: 'choice', value: 'skip' }
+    }) }}
+  </div>
+{% endblock %}

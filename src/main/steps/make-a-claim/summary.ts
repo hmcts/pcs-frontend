@@ -20,6 +20,7 @@ import {
   type ClaimDocuments,
   NOTICE_METHOD_DETAILS,
   type YesNo,
+  claimsRentArrears,
   groundsNeedingReasons,
 } from '@services/citizenPossessionClaim.interface';
 
@@ -145,6 +146,66 @@ export function aboutYouCard(req: Request): SummaryCard {
   return { id: 'aboutYou', title: t('makeAClaim:summary.cards.aboutYou'), rows };
 }
 
+/** One card for each claimant added after the first, with the answers asked for them. */
+export function additionalClaimantCards(req: Request): SummaryCard[] {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  return (readClaim(req).additionalClaimants ?? []).map((item, index) => {
+    const claimant = item.value;
+    const query = `?index=${index}`;
+    const builder = new CardBuilder(req, t).add(
+      'additional-claimant-type',
+      'additionalClaimantType',
+      valueOf(t, 'individualOrOrganisation', claimant.individualOrOrganisation),
+      query
+    );
+    if (claimant.individualOrOrganisation === 'INDIVIDUAL') {
+      builder.add(
+        'additional-claimant-name',
+        'additionalClaimantName',
+        [claimant.firstName, claimant.lastName].filter(Boolean).join(' '),
+        query
+      );
+    } else if (claimant.individualOrOrganisation === 'ORGANISATION') {
+      builder.add(
+        'additional-claimant-organisation-name',
+        'additionalClaimantOrganisationName',
+        claimant.organisationName,
+        query
+      );
+    }
+    const rows = builder
+      .add('additional-claimant-address', 'additionalClaimantAddress', address(claimant.address), query)
+      .add(
+        'additional-claimant-email',
+        'additionalClaimantEmail',
+        claimant.emailAddress === '' ? t('makeAClaim:summary.notProvided') : claimant.emailAddress,
+        query
+      )
+      .add(
+        'additional-claimant-phone',
+        'additionalClaimantPhone',
+        claimant.contactByPhone === 'YES'
+          ? [yesNo(t, 'YES') ?? '', claimant.phoneNumber ?? '']
+          : yesNo(t, claimant.contactByPhone),
+        query
+      )
+      .add(
+        'additional-claimant-text-message',
+        'additionalClaimantTextMessage',
+        claimant.contactByText === 'YES'
+          ? [yesNo(t, 'YES') ?? '', claimant.textMessageNumber ?? '']
+          : yesNo(t, claimant.contactByText),
+        query
+      )
+      .build();
+    return {
+      id: `additionalClaimant${index + 1}`,
+      title: t('makeAClaim:summary.cards.additionalClaimant', { number: index + 1 }),
+      rows,
+    };
+  });
+}
+
 export function defendantsCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const claim = readClaim(req);
@@ -215,6 +276,12 @@ export function tenancyCard(req: Request): SummaryCard {
       withDetail(yesNo(t, tenancy.tenancyAgreementAvailable), tenancy.noTenancyAgreementReason)
     )
     .add('upload-occupation-contract', 'occupationContractDocuments', documents(tenancy.tenancyAgreementDocuments))
+    .add('excluded-grounds-claim', 'hasExcludedGrounds', yesNo(t, grounds.hasExcludedGrounds))
+    .add('excluded-grounds', 'excludedGrounds', [
+      ...(grounds.excludedGrounds ?? []).map(g => t(`makeAClaim:summary.values.excludedGround.${g}`)),
+      ...(grounds.excludedOtherGroundDetails ? [grounds.excludedOtherGroundDetails] : []),
+    ])
+    .add('excluded-reason', 'excludedReason', grounds.excludedReason)
     .add('rent-arrears-claim', 'hasRentArrearsGrounds', yesNo(t, grounds.hasRentArrearsGrounds))
     .add(
       'rent-arrears-grounds',
@@ -329,6 +396,33 @@ export function otherInformationCard(req: Request): SummaryCard {
   return { id: 'otherInformation', title: t('makeAClaim:summary.cards.otherInformation'), rows };
 }
 
+/** The support the claimant asked for through Your Support, one line for each request. */
+export function supportCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const requests = (readClaim(req).otherInformation?.supportFlags?.details ?? [])
+    .map(detail => detail.value)
+    .filter(flag => flag.status?.toLowerCase() !== 'inactive')
+    .map(flag => flag.subTypeValue || flag.name);
+  const rows = new CardBuilder(req, t)
+    .add('your-support', 'supportRequests', requests.length ? requests : [t('makeAClaim:summary.noSupportRequested')])
+    .build();
+  return { id: 'yourSupport', title: t('makeAClaim:summary.cards.yourSupport'), rows };
+}
+
+/** Whether the claimant answered the equality and diversity questions, which pcs-api never shows them back. */
+export function equalityCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const answered = readClaim(req).otherInformation?.equalityQuestionsChoice === 'CONTINUE';
+  const rows = new CardBuilder(req, t)
+    .add(
+      'equality-and-diversity',
+      'equalityQuestions',
+      t(`makeAClaim:summary.${answered ? 'provided' : 'notProvided'}`)
+    )
+    .build();
+  return { id: 'equality', title: t('makeAClaim:summary.cards.equality'), rows };
+}
+
 /** The property, which cannot be changed once the claim exists. */
 export function propertyCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
@@ -351,10 +445,17 @@ export function propertyCard(req: Request): SummaryCard {
 
 /** Every card the final check your answers page shows, in journey order. */
 export function allCards(req: Request): SummaryCard[] {
-  const cards = [propertyCard(req), aboutYouCard(req), defendantsCard(req), tenancyCard(req), noticeCard(req)];
-  if (readClaim(req).grounds?.hasRentArrearsGrounds === 'YES') {
+  const cards = [
+    propertyCard(req),
+    aboutYouCard(req),
+    ...additionalClaimantCards(req),
+    defendantsCard(req),
+    tenancyCard(req),
+    noticeCard(req),
+  ];
+  if (claimsRentArrears(readClaim(req))) {
     cards.push(rentArrearsCard(req));
   }
-  cards.push(circumstancesCard(req), otherInformationCard(req));
+  cards.push(circumstancesCard(req), otherInformationCard(req), supportCard(req), equalityCard(req));
   return cards;
 }
