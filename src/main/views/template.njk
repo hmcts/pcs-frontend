@@ -21,10 +21,10 @@
   {# Start inert container wrapper for all page content #}
   <div class="govuk-modal-dialogue-inert-container">
   {% include "tagmanager/body.njk" %}
+  {% include "cookies-banner.njk" %}
 {% endblock %}
 
 {% block header %}
-  {% include "cookies-banner.njk" %}
   {{ govukHeader({
     containerClasses: "govuk-width-container"
   }) }}

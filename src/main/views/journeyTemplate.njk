@@ -12,10 +12,10 @@
 
 {% block bodyStart %}
   {% include "tagmanager/body.njk" %}
+  {% include "cookies-banner.njk" %}
 {% endblock %}
 
 {% block header %}
-  {% include "cookies-banner.njk" %}
   {{ govukHeader({
     containerClasses: "govuk-width-container"
   }) }}

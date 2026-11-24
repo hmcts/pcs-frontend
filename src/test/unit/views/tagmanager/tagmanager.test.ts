@@ -65,10 +65,11 @@ describe('cookies-banner.njk', () => {
     expect(html).toContain('t(cookieBanner.buttons.hide)');
   });
 
-  it('leaves out the View cookies link, as the ticket asks', () => {
+  it('links to the cookies page from the banner and the confirmation messages', () => {
     const html = render('cookies-banner.njk', enabled);
 
-    expect(html).not.toContain('href="/cookies"');
-    expect(html).not.toContain('viewCookies');
+    expect(html).toContain('t(cookieBanner.buttons.viewCookies)');
+    expect(html).toContain('href="/cookies"');
+    expect(html.match(/t\(cookieBanner\.message\.changeSettings\)/g)).toHaveLength(2);
   });
 });

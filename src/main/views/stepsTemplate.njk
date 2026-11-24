@@ -25,10 +25,10 @@
 
 {% block bodyStart %}
   {% include "tagmanager/body.njk" %}
+  {% include "cookies-banner.njk" %}
 {% endblock %}
 
 {% block header %}
-  {% include "cookies-banner.njk" %}
   {% if isLegalRepresentative %}
       {{ hmctsXuiHeader(headerModel) }}
     {% else %}

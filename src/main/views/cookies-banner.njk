@@ -8,11 +8,11 @@
 {% endset %}
 
 {% set acceptHtml %}
-  <p class="govuk-body">{{ t('cookieBanner.message.accept') | safe }}</p>
+  <p class="govuk-body">{{ t('cookieBanner.message.accept') }} {{ t('cookieBanner.message.changeSettings') | safe }}</p>
 {% endset %}
 
 {% set rejectHtml %}
-  <p class="govuk-body">{{ t('cookieBanner.message.reject') | safe }}</p>
+  <p class="govuk-body">{{ t('cookieBanner.message.reject') }} {{ t('cookieBanner.message.changeSettings') | safe }}</p>
 {% endset %}
 
 {{ govukCookieBanner({
@@ -34,6 +34,10 @@
           classes: 'cookie-banner-reject-button',
           text: t('cookieBanner.buttons.reject'),
           type: "button"
+        },
+        {
+          text: t('cookieBanner.buttons.viewCookies'),
+          href: "/cookies"
         }
       ]
     },
