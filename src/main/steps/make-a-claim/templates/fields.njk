@@ -40,6 +40,7 @@
     data-one-address-found="{{ labels.oneAddressFound }}" data-many-addresses-found="{{ labels.manyAddressesFound }}" data-no-addresses-found="{{ labels.noAddressesFound }}">
     <div class="govuk-form-group" id="{{ prefix }}-postcode-form-group">
       <label class="govuk-label" for="{{ prefix }}-lookupPostcode">{{ labels.enterPostcode }}</label>
+      {% if labels.postcodeHint %}<div class="govuk-hint" id="{{ prefix }}-lookupPostcode-hint">{{ labels.postcodeHint }}</div>{% endif %}
       <p class="govuk-error-message govuk-!-display-none" id="{{ prefix }}-lookup-postcode-error">
         <span class="govuk-visually-hidden">{{ labels.errorPrefix }}:</span> {{ labels.lookupPostcodeError }}
       </p>

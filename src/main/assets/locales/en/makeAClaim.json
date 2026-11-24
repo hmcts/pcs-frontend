@@ -151,7 +151,10 @@
       "notice": "About the notice you served",
       "rentArrears": "Proof of rent arrears",
       "circumstances": "Circumstances",
-      "otherInformation": "Other information"
+      "otherInformation": "Other information",
+      "additionalClaimant": "Additional claimant {{number}}",
+      "yourSupport": "Your support",
+      "equality": "Equality and diversity questions"
     },
     "labels": {
       "individualOrOrganisation": "Are you claiming as an individual or a registered company?",
@@ -198,7 +201,31 @@
       "otherDocuments": "Upload files (optional)",
       "hasOtherReasons": "Is there any other information you want to provide about your reasons for possession?",
       "generalApplicationIntent": "Do you need to make a general application?",
-      "languageUsed": "Which language did you use to complete this claim?"
+      "languageUsed": "Which language did you use to complete this claim?",
+      "additionalClaimantType": "Is the next claimant an individual or a registered company?",
+      "additionalClaimantName": "What is their name?",
+      "additionalClaimantOrganisationName": "What is their company or organisation’s name?",
+      "additionalClaimantAddress": "What is their postal address?",
+      "additionalClaimantEmail": "What is their email address?",
+      "additionalClaimantPhone": "Do they want to be contacted by telephone?",
+      "additionalClaimantTextMessage": "Do they want to be contacted by text message?",
+      "hasExcludedGrounds": "Do you have grounds for possession?",
+      "excludedGrounds": "What are your grounds for possession?",
+      "excludedReason": "Why are you making a possession claim?",
+      "supportRequests": "Reasonable adjustment requests",
+      "equalityQuestions": "Equality and diversity questions"
+    },
+    "notProvided": "Not provided",
+    "provided": "Provided",
+    "noSupportRequested": "No support requested",
+    "values": {
+      "excludedGround": {
+        "RENT_ARREARS": "Rent arrears",
+        "ANTI_SOCIAL": "Antisocial behaviour",
+        "BREACH_OF_THE_TENANCY": "Breach of the tenancy",
+        "ABSOLUTE_GROUNDS": "Absolute grounds",
+        "OTHER": "Other"
+      }
     }
   },
   "rentTable": {
@@ -263,7 +290,18 @@
       "upload-occupation-contract": "Upload occupation contract or licence agreement",
       "upload-notice": "Upload notice",
       "upload-rent-statement": "Upload rent statement",
-      "upload-other-documents": "Upload files"
+      "upload-other-documents": "Upload files",
+      "additional-claimant-type": "Is the next claimant an individual or a registered company?",
+      "additional-claimant-name": "What is their name?",
+      "additional-claimant-organisation-name": "What is their company or organisation’s name?",
+      "additional-claimant-address": "What is their postal address?",
+      "additional-claimant-email": "What is their email address?",
+      "additional-claimant-phone": "Do they want to be contacted by telephone?",
+      "additional-claimant-text-message": "Do they want to be contacted by text message?",
+      "multiple-claimants": "Do you want to add another claimant to this claim?",
+      "excluded-grounds-claim": "Do you have grounds for possession?",
+      "excluded-grounds": "What are your grounds for possession?",
+      "excluded-reason": "Why are you making a possession claim?"
     },
     "rentArrearsGroundNotAllowed": "Choose only rent arrears grounds on the rent arrears grounds question"
   },

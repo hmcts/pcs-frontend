@@ -1,3 +1,10 @@
+import { step as additionalClaimantAddress } from './additional-claimant-address';
+import { step as additionalClaimantEmail } from './additional-claimant-email';
+import { step as additionalClaimantName } from './additional-claimant-name';
+import { step as additionalClaimantOrganisationName } from './additional-claimant-organisation-name';
+import { step as additionalClaimantPhone } from './additional-claimant-phone';
+import { step as additionalClaimantTextMessage } from './additional-claimant-text-message';
+import { step as additionalClaimantType } from './additional-claimant-type';
 import { step as additionalDefendants } from './additional-defendants';
 import { step as arrearsAtNotice } from './arrears-at-notice';
 import { step as arrearsCya } from './arrears-cya';
@@ -19,13 +26,15 @@ import { step as defendantDetails } from './defendant-details';
 import { step as defendantName } from './defendant-name';
 import { step as eligible } from './eligible';
 import { step as equalityAndDiversity } from './equality-and-diversity';
+import { step as excludedGrounds } from './excluded-grounds';
+import { step as excludedGroundsClaim } from './excluded-grounds-claim';
+import { step as excludedReason } from './excluded-reason';
 import { step as generalApplication } from './general-application';
 import { step as groundReason } from './ground-reason';
 import { step as individualOrOrganisation } from './individual-or-organisation';
 import { step as languageUsed } from './language-used';
 import { step as moneyJudgment } from './money-judgment';
 import { step as multipleClaimants } from './multiple-claimants';
-import { step as multipleClaimantsIneligible } from './multiple-claimants-ineligible';
 import { step as noticeAvailable } from './notice-available';
 import { step as noticeCya } from './notice-cya';
 import { step as noticeDetails } from './notice-details';
@@ -78,6 +87,13 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'claimant-phone': claimantPhone,
   'claimant-text-message': claimantTextMessage,
   'multiple-claimants': multipleClaimants,
+  'additional-claimant-type': additionalClaimantType,
+  'additional-claimant-name': additionalClaimantName,
+  'additional-claimant-organisation-name': additionalClaimantOrganisationName,
+  'additional-claimant-address': additionalClaimantAddress,
+  'additional-claimant-email': additionalClaimantEmail,
+  'additional-claimant-phone': additionalClaimantPhone,
+  'additional-claimant-text-message': additionalClaimantTextMessage,
   'claimant-cya': claimantCya,
   'defendant-details': defendantDetails,
   'defendant-name': defendantName,
@@ -93,6 +109,9 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'occupation-contract-start-date': occupationContractStartDate,
   'occupation-contract-agreement': occupationContractAgreement,
   'upload-occupation-contract': uploadOccupationContract,
+  'excluded-grounds-claim': excludedGroundsClaim,
+  'excluded-grounds': excludedGrounds,
+  'excluded-reason': excludedReason,
   'rent-arrears-claim': rentArrearsClaim,
   'rent-arrears-grounds': rentArrearsGrounds,
   'other-grounds-claim': otherGroundsClaim,
@@ -135,5 +154,4 @@ export const stepRegistry: Record<string, StepDefinition> = {
   eligible,
   'task-list': taskList,
   'remove-defendant': removeDefendant,
-  'multiple-claimants-ineligible': multipleClaimantsIneligible,
 };

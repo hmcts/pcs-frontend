@@ -1,0 +1,12 @@
+{
+  "pageTitle": "Is the next claimant an individual or a registered company?",
+  "question": "Is the next claimant an individual or a registered company?",
+  "hint": "If they are registered on Companies House as a landlord, they are a company.",
+  "options": {
+    "INDIVIDUAL": "An individual",
+    "ORGANISATION": "A registered company"
+  },
+  "errors": {
+    "individualOrOrganisation": "Select whether the next claimant is an individual or a registered company"
+  }
+}

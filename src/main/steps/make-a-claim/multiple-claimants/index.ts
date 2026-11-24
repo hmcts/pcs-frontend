@@ -1,8 +1,9 @@
+import { additionalClaimantUrl } from '../additionalClaimantStep';
+import { readClaim } from '../claimDraft';
+import { nextAdditionalClaimantIndex } from '../claimMapping';
 import { yesNoQuestion } from '../fieldBuilders';
-import { flowConfig } from '../flow.config';
 import { createMakeAClaimStep } from '../formStep';
 
-import { getStepUrl } from '@modules/steps/flow';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
 export const step: StepDefinition = createMakeAClaimStep({
@@ -11,6 +12,6 @@ export const step: StepDefinition = createMakeAClaimStep({
   fields: [yesNoQuestion('multipleClaimants')],
   resolveRedirectAfterPost: async req =>
     req.body?.multipleClaimants === 'yes'
-      ? getStepUrl('multiple-claimants-ineligible', flowConfig, req.res?.locals.validatedCase?.id)
+      ? additionalClaimantUrl(req, 'additional-claimant-type', nextAdditionalClaimantIndex(readClaim(req)))
       : undefined,
 });

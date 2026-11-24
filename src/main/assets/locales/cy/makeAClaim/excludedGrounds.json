@@ -1,0 +1,26 @@
+{
+  "pageTitle": "cyWhat are your grounds for possession?",
+  "question": "cyWhat are your grounds for possession?",
+  "hint": "cySelect all that apply",
+  "options": {
+    "RENT_ARREARS": "cyRent arrears",
+    "ANTI_SOCIAL": "cyAntisocial behaviour",
+    "BREACH_OF_THE_TENANCY": "cyBreach of the tenancy",
+    "ABSOLUTE_GROUNDS": "cyAbsolute grounds",
+    "OTHER": "cyOther"
+  },
+  "labels": {
+    "excludedOtherGroundDetails": "cyEnter your grounds for possession"
+  },
+  "hints": {
+    "excludedOtherGroundDetails": "cyYou can explain your reasons for claiming possession under these grounds next"
+  },
+  "errors": {
+    "excludedGrounds": "cySelect at least one ground for possession",
+    "excludedOtherGroundDetails": "cyEnter your grounds for possession",
+    "excludedOtherGroundDetailsMaxLength": "cyMust be 500 characters or less"
+  },
+  "fieldNames": {
+    "excludedOtherGroundDetails": "cyYour grounds for possession"
+  }
+}

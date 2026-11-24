@@ -136,6 +136,83 @@ describe('normaliseClaim', () => {
     expect(normaliseClaim({}).additionalDefendants).toBeUndefined();
   });
 
+  it("drops each additional claimant's answers the claimant turned away from", () => {
+    const { additionalClaimants } = normaliseClaim({
+      claimant: { multipleClaimants: 'YES' },
+      additionalClaimants: [
+        {
+          value: {
+            individualOrOrganisation: 'ORGANISATION',
+            firstName: 'Jo',
+            organisationName: 'Acme Ltd',
+            contactByPhone: 'NO',
+            phoneNumber: '0123',
+            contactByText: 'NO',
+            textMessageNumber: '0456',
+          },
+        },
+      ],
+    });
+    expect(additionalClaimants).toEqual([
+      {
+        value: {
+          individualOrOrganisation: 'ORGANISATION',
+          organisationName: 'Acme Ltd',
+          contactByPhone: 'NO',
+          contactByText: 'NO',
+        },
+      },
+    ]);
+  });
+
+  it('drops the additional claimants when no one else is claiming', () => {
+    expect(
+      normaliseClaim({ claimant: { multipleClaimants: 'NO' }, additionalClaimants: [{ value: {} }] })
+        .additionalClaimants
+    ).toBeUndefined();
+  });
+
+  it('keeps only the grounds that apply to the kind of tenancy', () => {
+    const excluded = {
+      eligibility: { legislativeCountry: 'England' as const },
+      tenancy: { tenancyType: 'EXCLUDED' as const },
+    };
+    expect(
+      normaliseClaim({
+        ...excluded,
+        grounds: {
+          hasRentArrearsGrounds: 'YES',
+          rentArrearsGrounds: ['GROUND_8'],
+          hasExcludedGrounds: 'NO',
+          excludedGrounds: ['OTHER'],
+        },
+        rentArrears: { rentAmount: '100' },
+      })
+    ).toEqual({ ...excluded, grounds: { hasExcludedGrounds: 'NO' } });
+    expect(
+      normaliseClaim({
+        ...excluded,
+        grounds: { hasExcludedGrounds: 'YES', excludedGrounds: ['RENT_ARREARS'], excludedOtherGroundDetails: 'x' },
+        rentArrears: { rentAmount: '100' },
+      })
+    ).toEqual({
+      ...excluded,
+      grounds: { hasExcludedGrounds: 'YES', excludedGrounds: ['RENT_ARREARS'] },
+      rentArrears: { rentAmount: '100' },
+    });
+    expect(
+      normaliseClaim({
+        tenancy: { tenancyType: 'ASSURED' },
+        grounds: {
+          hasRentArrearsGrounds: 'YES',
+          hasExcludedGrounds: 'YES',
+          excludedGrounds: ['OTHER'],
+          excludedReason: 'x',
+        },
+      }).grounds
+    ).toEqual({ hasRentArrearsGrounds: 'YES' });
+  });
+
   it('keeps the rent due day only for monthly rent', () => {
     expect(normaliseClaim({ rentArrears: { rentFrequency: 'WEEKLY', rentDueDay: 1 } }).rentArrears).toEqual({
       rentFrequency: 'WEEKLY',

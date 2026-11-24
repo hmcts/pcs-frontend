@@ -1,6 +1,8 @@
 {
   "pageTitle": "Tell us if you need support",
   "heading": "Tell us if you need support",
+  "continueButton": "Continue to the questions",
+  "skipButton": "I do not need any support at this time",
   "contentBlocks": [
     {
       "heading": "Asking for a reasonable adjustment"
@@ -9,7 +11,7 @@
       "text": "Some people need support to access information and use our services. We call this a reasonable adjustment."
     },
     {
-      "text": "Some examples of reasonable adjustments are:"
+      "text": "Examples:"
     },
     {
       "bullets": [
@@ -32,7 +34,7 @@
       "text": "You must contact the court directly to ask for something else for you or someone else who’s coming to court to support you."
     },
     {
-      "text": "Other support includes asking for:"
+      "text": "Other support includes:"
     },
     {
       "bullets": [
@@ -42,16 +44,10 @@
       ]
     },
     {
-      "text": "You can contact the court by email or telephone. You can also visit the court and speak to someone directly."
-    },
-    {
       "heading": "Contact the court by email"
     },
     {
-      "text": "Use the <a class=\"govuk-link\" href=\"https://www.gov.uk/find-court-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address."
-    },
-    {
-      "text": "If you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it."
+      "text": "Use the <a class=\"govuk-link\" href=\"https://www.gov.uk/find-court-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\">find a court or tribunal service (opens in new tab)</a> to get your local court’s email address. If you do not know the name of your local court, select the ‘Money’ category and then the ‘Housing’ category to find it."
     },
     {
       "heading": "Contact the court by telephone"

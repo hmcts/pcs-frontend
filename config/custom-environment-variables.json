@@ -91,7 +91,8 @@
     "returnUrl": "PAYMENT_RETURN_URL"
   },
   "pcq": {
-    "url": "PCQ_URL"
+    "url": "PCQ_URL",
+    "claimantActor": "PCQ_CLAIMANT_ACTOR"
   },
   "cuiRa": {
     "url": "CUI_RA_URL",

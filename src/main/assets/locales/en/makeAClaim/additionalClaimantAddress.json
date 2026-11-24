@@ -1,0 +1,14 @@
+{
+  "pageTitle": "What is their postal address?",
+  "heading": "What is their postal address?",
+  "finder": {
+    "label": "Enter address details",
+    "hint": "Enter a UK postcode"
+  },
+  "errors": {
+    "additionalClaimant-addressLine1": "Enter the first line of their address",
+    "additionalClaimant-town": "Enter the town or city of their address",
+    "additionalClaimant-postcode": "Enter the postcode of their address",
+    "postcodeInvalid": "Enter a real postcode, like LU1 1AB"
+  }
+}

@@ -153,7 +153,7 @@ async function returnAfterChange(
 }
 
 /** Saves the claim, sending the claimant to the draft changed page when another tab saved first. */
-async function saveFromPage(
+export async function saveFromPage(
   req: Request,
   claim: CitizenPossessionClaim,
   confirmedSections: readonly string[]

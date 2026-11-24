@@ -15,6 +15,8 @@ import {
   NOTICE_METHOD_DETAILS,
   type NoticeMethod,
   OTHER_GROUND,
+  claimsRentArrears,
+  isExcludedClaim,
 } from '@services/citizenPossessionClaim.interface';
 
 export const MAKE_A_CLAIM_EVENT_ID = 'citizenMakePossessionClaim';
@@ -72,6 +74,25 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
       delete defendant.value.address;
     }
   }
+  if (claimant?.multipleClaimants === 'NO') {
+    delete normalised.additionalClaimants;
+  }
+  for (const additional of normalised.additionalClaimants ?? []) {
+    const value = additional.value;
+    if (value.individualOrOrganisation === 'INDIVIDUAL') {
+      delete value.organisationName;
+    }
+    if (value.individualOrOrganisation === 'ORGANISATION') {
+      delete value.firstName;
+      delete value.lastName;
+    }
+    if (value.contactByPhone === 'NO') {
+      delete value.phoneNumber;
+    }
+    if (value.contactByText === 'NO') {
+      delete value.textMessageNumber;
+    }
+  }
   if (claimant?.contactByText === 'NO') {
     delete claimant.textMessageNumber;
   }
@@ -89,6 +110,30 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
   }
   if (tenancy?.tenancyAgreementAvailable === 'YES') {
     delete tenancy.noTenancyAgreementReason;
+  }
+  if (isExcludedClaim(normalised)) {
+    if (grounds) {
+      delete grounds.hasRentArrearsGrounds;
+      delete grounds.rentArrearsGrounds;
+      delete grounds.hasOtherGrounds;
+      delete grounds.otherGrounds;
+      delete grounds.otherGroundsDetails;
+      delete grounds.groundReasons;
+      if (grounds.hasExcludedGrounds !== 'YES') {
+        delete grounds.excludedGrounds;
+      }
+      if (!grounds.excludedGrounds?.includes('OTHER')) {
+        delete grounds.excludedOtherGroundDetails;
+      }
+    }
+    if (!claimsRentArrears(normalised)) {
+      delete normalised.rentArrears;
+    }
+  } else if (grounds) {
+    delete grounds.hasExcludedGrounds;
+    delete grounds.excludedGrounds;
+    delete grounds.excludedOtherGroundDetails;
+    delete grounds.excludedReason;
   }
   if (grounds?.hasRentArrearsGrounds === 'NO') {
     delete grounds.rentArrearsGrounds;

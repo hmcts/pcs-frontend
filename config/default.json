@@ -99,6 +99,7 @@
     "path": "/service-endpoint",
     "serviceId": "PCS",
     "actor": "RESPONDENT",
+    "claimantActor": "APPLICANT",
     "healthTimeoutMs": 3000
   },
   "secrets": {
