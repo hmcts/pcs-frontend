@@ -321,7 +321,6 @@ export async function bootApp(
   const flags: Record<string, unknown> = {
     'make-order-enabled': options.makeOrderEnabled !== false,
     'private-landlord-make-a-claim-enabled': false,
-    'private-landlord-rent-history-design': 'ledger',
   };
   app.locals.launchDarklyClient = {
     variation: async (flag: string, _context: unknown, fallback: unknown) => (flag in flags ? flags[flag] : fallback),

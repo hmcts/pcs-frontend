@@ -3,9 +3,9 @@ import {
   exceedsRentPeriodLimit,
   formatPence,
   generateRentPeriods,
-  ledgerWithArrears,
   mergeRentPeriods,
   removeRentTablePayment,
+  rentPeriodEnd,
   rentPeriodsWithinLimit,
   rentTableWithArrears,
   statementRangeOf,
@@ -241,41 +241,21 @@ describe('addRentTablePayment', () => {
   });
 });
 
-describe('ledgerWithArrears', () => {
-  it('orders transactions by date and keeps a running total of charges less payments', () => {
-    const lines = ledgerWithArrears([
-      { value: { transactionDate: '2026-07-01', transactionTypes: ['RENT_CHARGE'], amountCharged: '50000' } },
-      { value: { transactionDate: '2026-06-01', transactionTypes: ['RENT_CHARGE'], amountCharged: '50000' } },
-      { value: { transactionDate: '2026-06-03', transactionTypes: ['TENANT_PAYMENT'], amountPaid: '12000' } },
-      {
-        value: {
-          transactionDate: '2026-07-01',
-          transactionTypes: ['RENT_CHARGE', 'TENANT_PAYMENT'],
-          amountCharged: '0',
-          amountPaid: '50000',
-        },
-      },
-    ]);
-    expect(lines.map(line => [line.entryIndex, line.arrears])).toEqual([
-      [1, 50000],
-      [2, 38000],
-      [0, 88000],
-      [3, 38000],
-    ]);
+describe('rentPeriodEnd', () => {
+  it.each([
+    ['2026-06-01', { rentFrequency: 'MONTHLY', rentDueDay: 1 }, '2026-06-30'],
+    ['2026-01-31', { rentFrequency: 'MONTHLY', rentDueDay: 31 }, '2026-02-27'],
+    ['2026-02-28', { rentFrequency: 'MONTHLY', rentDueDay: 31 }, '2026-03-30'],
+    ['2026-12-15', { rentFrequency: 'MONTHLY', rentDueDay: 15 }, '2027-01-14'],
+    ['2026-06-01', { rentFrequency: 'WEEKLY' }, '2026-06-07'],
+    ['2026-06-01', { rentFrequency: 'FORTNIGHTLY' }, '2026-06-14'],
+  ] as const)('ends the period from %s (%j) on %s', (dateDue, schedule, end) => {
+    expect(rentPeriodEnd(dateDue, schedule)).toBe(end);
   });
 
-  it('ignores an amount for a type the transaction is not', () => {
-    const [line] = ledgerWithArrears([
-      {
-        value: {
-          transactionDate: '2026-06-01',
-          transactionTypes: ['TENANT_PAYMENT'],
-          amountCharged: '999',
-          amountPaid: '100',
-        },
-      },
-    ]);
-    expect(line).toMatchObject({ amountCharged: undefined, amountPaid: 100, arrears: -100 });
+  it('has no end for rent paid at some other frequency or a date it cannot read', () => {
+    expect(rentPeriodEnd('2026-06-01', { rentFrequency: 'OTHER' })).toBeUndefined();
+    expect(rentPeriodEnd(undefined, { rentFrequency: 'MONTHLY' })).toBeUndefined();
   });
 });
 

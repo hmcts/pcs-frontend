@@ -31,6 +31,7 @@ import {
   exceedsRentPeriodLimit,
   mergeRentPeriods,
   removeRentTablePayment,
+  rentPeriodEnd,
   rentPeriodsWithinLimit,
   statementRangeOf,
 } from './rentHistory';
@@ -50,9 +51,7 @@ import {
   type ProofType,
   RENT_ARREARS_GROUNDS,
   type RentFrequency,
-  type RentLedgerEntry,
   type RentTableRow,
-  type TransactionType,
   groundsNeedingReasons,
 } from '@services/citizenPossessionClaim.interface';
 
@@ -71,8 +70,7 @@ export interface StepMapping {
 export const TENANCY_TYPES = ['ASSURED', 'EXCLUDED', 'REGULATED', 'OTHER'] as const;
 export const NOTICE_TYPES = ['NOTICE_SEEKING_POSSESSION', 'NOTICE_TO_QUIT', 'OTHER'] as const;
 export const RENT_FREQUENCIES: readonly RentFrequency[] = ['WEEKLY', 'FORTNIGHTLY', 'MONTHLY', 'OTHER'];
-export const PROOF_TYPES: readonly ProofType[] = ['UPLOAD_STATEMENT', 'LEDGER', 'TABLE'];
-export const TRANSACTION_TYPES: readonly TransactionType[] = ['RENT_CHARGE', 'TENANT_PAYMENT'];
+export const PROOF_TYPES: readonly ProofType[] = ['UPLOAD_STATEMENT', 'TABLE'];
 export const LANGUAGES = ['ENGLISH', 'WELSH', 'ENGLISH_AND_WELSH'] as const;
 export const ORGANISATION_TYPES = ['INDIVIDUAL', 'ORGANISATION'] as const;
 
@@ -110,13 +108,6 @@ function updateDefendant(claim: CitizenPossessionClaim, index: number, update: (
   update(value);
   defendants[position] = { ...existing, value };
   claim.defendants = defendants;
-}
-
-/** The ledger entry a transaction page edits: ?entry=n, or a new one. */
-export function ledgerEntryIndexOf(req: Request, claim: CitizenPossessionClaim): number {
-  const count = claim.rentArrears?.rentHistoryLedger?.length ?? 0;
-  const index = indexFromQuery(req.query?.entry);
-  return index !== undefined && index < count ? index : count;
 }
 
 function setNested<K extends keyof CitizenPossessionClaim>(
@@ -642,45 +633,6 @@ export const claimMappings: Record<string, StepMapping> = {
     isAnswered: claim => documentsAnswered(claim.rentArrears?.rentStatementDocuments),
   },
 
-  'ledger-transaction': {
-    toForm: (claim, req) => {
-      const entry = claim.rentArrears?.rentHistoryLedger?.[ledgerEntryIndexOf(req, claim)]?.value;
-      if (!entry) {
-        return {};
-      }
-      return {
-        transactionDate: toDateParts(entry.transactionDate),
-        transactionTypes: entry.transactionTypes ?? [],
-        'transactionTypes.amountCharged': penceToPounds(entry.amountCharged),
-        'transactionTypes.amountPaid': penceToPounds(entry.amountPaid),
-        description: entry.description,
-      };
-    },
-    fromForm: (claim, body, req) => {
-      const index = ledgerEntryIndexOf(req, claim);
-      const types = checkedValues(body.transactionTypes, TRANSACTION_TYPES);
-      const entry: RentLedgerEntry = {
-        transactionDate: readDate(body, 'transactionDate'),
-        transactionTypes: types,
-        description: text(body.description),
-        amountCharged: types.includes('RENT_CHARGE') ? readPence(body['transactionTypes.amountCharged']) : undefined,
-        amountPaid: types.includes('TENANT_PAYMENT') ? readPence(body['transactionTypes.amountPaid']) : undefined,
-      };
-      if (Object.values(entry).every(value => value === undefined || (Array.isArray(value) && value.length === 0))) {
-        return;
-      }
-      setNested(claim, 'rentArrears', rentArrears => {
-        const ledger: CcdCollectionItem<RentLedgerEntry>[] = [...(rentArrears.rentHistoryLedger ?? [])];
-        ledger[index] = { id: ledger[index]?.id ?? newItemId(), value: entry };
-        rentArrears.rentHistoryLedger = ledger;
-      });
-    },
-  },
-
-  'ledger-summary': {
-    isAnswered: claim => Boolean(claim.rentArrears?.rentHistoryLedger?.length),
-  },
-
   'statement-period': {
     toForm: (claim, req) => {
       const range = rentStatementRange(claim, req);
@@ -831,15 +783,6 @@ export const claimMappings: Record<string, StepMapping> = {
     },
   },
 
-  'remove-ledger-entry': {
-    fromForm: (claim, body, req) => {
-      const index = itemIndexOf(req, claim.rentArrears?.rentHistoryLedger, 'entry');
-      if (body.confirmRemove === 'yes' && index !== undefined) {
-        removeLedgerEntry(claim, index);
-      }
-    },
-  },
-
   'check-your-answers': {
     toForm: claim => ({
       statementOfTruth: claim.submission?.statementOfTruthAgreed === 'YES' ? ['contempt', 'belief'] : [],
@@ -889,16 +832,28 @@ export function rentPaymentPeriodOf(req: Request, claim: CitizenPossessionClaim)
 export const PERIOD_NOT_FOUND = 'periodNotFound';
 
 /**
- * The due date a payment for a period cannot be before, or undefined for the first period, which holds every
- * payment made before the statement's rent was first due, as mergeRentPeriods lays them out.
+ * The dates a payment in a period must fall between: from when its rent was due to the period's last day. The first
+ * period has no earliest date and the last no latest, since mergeRentPeriods lays out under them the payments made
+ * before the statement's rent was first due and after its last rent period.
  */
-export function paymentDueDateLimitOf(req: Request, claim: CitizenPossessionClaim): string | undefined {
+export function paymentDateLimitsOf(
+  req: Request,
+  claim: CitizenPossessionClaim
+): { earliest?: string; latest?: string } {
   const period = rentPaymentPeriodOf(req, claim);
-  const firstPeriod = (claim.rentArrears?.rentHistoryTable ?? [])
+  if (!period) {
+    return {};
+  }
+  const periodStarts = (claim.rentArrears?.rentHistoryTable ?? [])
     .filter(row => row.value.amountDue)
     .map(row => row.value.periodStart ?? '')
-    .sort()[0];
-  return period && period.periodStart !== firstPeriod ? period.dateDue : undefined;
+    .sort();
+  const isFirst = period.periodStart === periodStarts[0];
+  const isLast = period.periodStart === periodStarts[periodStarts.length - 1];
+  return {
+    ...(isFirst ? {} : { earliest: period.dateDue }),
+    ...(isLast ? {} : { latest: rentPeriodEnd(period.periodStart, claim.rentArrears ?? {}) }),
+  };
 }
 
 /** The ground a reason page is about: ?ground=, or the first that needs a reason. */
@@ -927,7 +882,7 @@ export function newItemId(): string {
 export function itemIndexOf(
   req: Request,
   items: CcdCollectionItem<unknown>[] | undefined,
-  positionParam: 'index' | 'entry'
+  positionParam: 'index'
 ): number | undefined {
   const id = Array.isArray(req.query?.id) ? req.query.id[0] : req.query?.id;
   if (typeof id === 'string') {
@@ -936,13 +891,6 @@ export function itemIndexOf(
   }
   const index = indexFromQuery(req.query?.[positionParam]);
   return index !== undefined && index < (items ?? []).length && !items?.[index]?.id ? index : undefined;
-}
-
-/** Removes a ledger entry, for the ledger's remove link. */
-export function removeLedgerEntry(claim: CitizenPossessionClaim, index: number): void {
-  setNested(claim, 'rentArrears', rentArrears => {
-    rentArrears.rentHistoryLedger = (rentArrears.rentHistoryLedger ?? []).filter((_, i) => i !== index);
-  });
 }
 
 /** Removes a defendant after the first, for the defendants list's remove link. */

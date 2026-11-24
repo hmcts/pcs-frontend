@@ -11,8 +11,8 @@ import {
   completeCircumstances,
   completeDefendants,
   completeNotice,
-  completeRentArrearsWithLedger,
   completeRentArrearsWithTable,
+  completeRentArrearsWithUpload,
   completeTenancyAndGrounds,
   completeUploadDocuments,
   continueOn,
@@ -40,15 +40,15 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
     test.skip(!(await isMakeAClaimEnabled()), 'private-landlord-make-a-claim-enabled is off');
   });
 
-  test('Rent arrears claim with the rent statement entered as a ledger', async ({ page }) => {
-    await createLandlord('ledger');
+  test('Rent arrears claim with a rent statement uploaded', async ({ page }) => {
+    await createLandlord();
     await becomeEligible(page, startUrl);
     await continueOn(page);
     await completeAboutYou(page);
     await completeDefendants(page);
     await completeTenancyAndGrounds(page, GROUND_1A_AND_14);
     await completeNotice(page);
-    await completeRentArrearsWithLedger(page);
+    await completeRentArrearsWithUpload(page);
     await completeCircumstances(page);
     await completeUploadDocuments(page);
     await answerFinalQuestions(page);
@@ -56,8 +56,8 @@ test.describe('Private landlord makes a possession claim @privateLandlord', () =
     await payClaimFee(page);
   });
 
-  test('Rent arrears claim with the rent statement created as a table', async ({ page }) => {
-    await createLandlord('table');
+  test('Rent arrears claim with a rent statement created', async ({ page }) => {
+    await createLandlord();
     await becomeEligible(page, startUrl);
     await continueOn(page);
     await completeAboutYou(page);
@@ -80,14 +80,14 @@ test.describe('Private landlord claim fee card declined @privateLandlord', () =>
   });
 
   test('A declined card returns to the claim fee page to try again', async ({ page }) => {
-    await createLandlord('ledger');
+    await createLandlord();
     await becomeEligible(page, startUrl);
     await continueOn(page);
     await completeAboutYou(page);
     await completeDefendants(page);
     await completeTenancyAndGrounds(page);
     await completeNotice(page);
-    await completeRentArrearsWithLedger(page);
+    await completeRentArrearsWithUpload(page);
     await completeCircumstances(page);
     await completeUploadDocuments(page);
     await answerFinalQuestions(page);

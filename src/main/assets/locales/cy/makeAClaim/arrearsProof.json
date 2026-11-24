@@ -31,8 +31,7 @@
   "question": "cyHow do you want to provide proof of rent arrears?",
   "options": {
     "UPLOAD_STATEMENT": "cyUpload a rent statement that follows the guidelines",
-    "LEDGER": "cyEnter the rent statement transactions one at a time",
-    "TABLE": "cyCreate a rent statement from the rent due each period"
+    "TABLE": "cyCreate a rent statement"
   },
   "errors": {
     "proofType": "cySelect how you want to provide proof of rent arrears"

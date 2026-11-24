@@ -1,19 +1,18 @@
 {
-  "pageTitle": "cyAdd a payment",
-  "heading": "cyAdd a payment",
-  "changePageTitle": "cyChange a payment",
-  "changeHeading": "cyChange a payment",
-  "paragraphs": ["cyEnter a payment the defendants made towards the rent due on {{periodDue}} ({{periodAmount}})."],
+  "heading": "cyAdd a payment in this period ({{periodStart}} to {{periodEnd}})",
+  "changeHeading": "cyChange a payment in this period ({{periodStart}} to {{periodEnd}})",
   "labels": {
     "datePaid": "cyDate paid",
     "amountPaid": "cyAmount paid",
+    "addAnotherPayment": "cyDo you want to add another payment in this period?",
     "removePayment": "cyDo you want to remove this payment from the rent statement?"
   },
   "hints": {
-    "datePaid": "cyFor example, 5 6 2025"
+    "datePaid": "cyFor example, 27 9 2022"
   },
   "errors": {
     "amountPaid": "cyEnter the amount paid",
+    "addAnotherPayment": "cySelect whether you want to add another payment in this period",
     "removePayment": "cySelect whether you want to remove this payment from the rent statement",
     "amountPaidInvalid": "cyEnter the amount paid as an amount of money, like 500 or 500.50",
     "date": {
@@ -27,6 +26,7 @@
       "month": "cyMonth",
       "year": "cyYear"
     },
-    "beforeDateDue": "cyThe date the payment was made must be the same as or after {{dateDue}}, the date this rent was due"
+    "beforeDateDue": "cyThe date the payment was made must be the same as or after {{dateDue}}, the date this rent was due",
+    "afterPeriodEnd": "cyThe date the payment was made must be the same as or before {{periodEnd}}, the last day of this period"
   }
 }

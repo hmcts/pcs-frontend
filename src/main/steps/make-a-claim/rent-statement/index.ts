@@ -1,7 +1,6 @@
 import { readClaim } from '../claimDraft';
 import { PERIOD_NOT_FOUND } from '../claimMapping';
 import { createMakeAClaimStep } from '../formStep';
-import { formatPence, rentTableWithArrears } from '../rentHistory';
 import { rentStatementTable } from '../rentTables';
 
 import { getTranslationFunction } from '@modules/steps';
@@ -15,10 +14,8 @@ export const step: StepDefinition = createMakeAClaimStep({
   extendGetContent: (req, formContent) => {
     const t = getTranslationFunction(req, ['makeAClaim', 'common']);
     const stepT = getTranslationFunction(req);
-    const lines = rentTableWithArrears(readClaim(req).rentArrears?.rentHistoryTable);
     return {
-      rentTable: lines.length > 0 ? rentStatementTable(req, true) : undefined,
-      totalArrears: lines.length > 0 ? formatPence(lines[lines.length - 1].arrears) : undefined,
+      rentTable: readClaim(req).rentArrears?.rentHistoryTable?.length ? rentStatementTable(req, true) : undefined,
       ...(req.query?.problem === PERIOD_NOT_FOUND && !formContent.errorSummary
         ? {
             errorSummary: {

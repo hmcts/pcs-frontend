@@ -99,7 +99,6 @@
     },
     "proofType": {
       "UPLOAD_STATEMENT": "cyUpload a rent statement",
-      "LEDGER": "cyEnter the rent statement transactions",
       "TABLE": "cyCreate a rent statement"
     },
     "languageUsed": {
@@ -178,7 +177,7 @@
       "noticeDocuments": "cyNotice",
       "rentAmount": "cyHow much is the rent?",
       "rentFrequency": "cyHow frequently should the rent be paid?",
-      "rentDueDay": "cyDay of the month the rent is due",
+      "rentDueDay": "cyDate of the month rent is due",
       "arrearsAtNoticeDate": "cyWhat were the rent arrears on the date you served the notice?",
       "currentArrears": "cyWhat are the rent arrears on today’s date?",
       "proofType": "cyProof of rent arrears",
@@ -193,25 +192,10 @@
       "languageUsed": "cyWhich language did you use to complete this claim?"
     }
   },
-  "ledgerTable": {
-    "caption": "cyRent statement transactions",
-    "date": "cyDate",
-    "type": "cyTransaction type",
-    "description": "cyDescription or reference",
-    "amountCharged": "cyAmount charged",
-    "amountPaid": "cyAmount paid",
-    "arrears": "cyArrears",
-    "actions": "cyActions",
-    "change": "cyChange",
-    "remove": "cyRemove",
-    "transaction": "cytransaction",
-    "types": {
-      "RENT_CHARGE": "cyRent charge",
-      "TENANT_PAYMENT": "cyTenant payment"
-    }
-  },
   "rentTable": {
     "caption": "cyRent statement",
+    "period": "cyPeriod",
+    "periodRange": "cy{{start}} to {{end}}",
     "dateDue": "cyDate due",
     "amountDue": "cyAmount due",
     "datePaid": "cyDate paid",
@@ -220,8 +204,8 @@
     "actions": "cyActions",
     "change": "cyChange",
     "addPayment": "cyAdd a payment",
-    "paymentFor": "cypayment for rent due on",
-    "additionalPayment": "cyAdditional payment"
+    "paymentIn": "cyin {{period}}",
+    "paymentPaidOn": "cypayment in {{period}} paid on {{datePaid}}"
   },
   "submitErrors": {
     "required": "cyAnswer the question on ‘{{page}}’",
@@ -249,7 +233,6 @@
       "rent-arrears-grounds": "cyWhat are your rent arrears grounds for possession?",
       "rent-frequency": "cyHow frequently should this amount be paid?",
       "recovery-steps": "cyWhat steps have you already taken to recover any arrears?",
-      "ledger-transaction": "cyEnter a rent statement transaction",
       "ground-reason": "cyWhy are you making a claim on this ground?",
       "current-arrears": "cyHow much are the rent arrears on today’s date?",
       "notice-served": "cyHave you served notice?",

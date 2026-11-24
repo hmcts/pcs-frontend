@@ -33,7 +33,6 @@ export const FIELD_LIMITS = {
   otherElectronicDetails: SHORT_TEXT,
   otherMethodDetails: SHORT_TEXT,
   otherFrequencyDetails: NAME,
-  ledgerDescription: REASON,
   recoverySteps: REASON,
   defendantCircumstances: CIRCUMSTANCES,
   claimantCircumstances: CIRCUMSTANCES,

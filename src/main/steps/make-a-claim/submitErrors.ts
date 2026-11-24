@@ -36,7 +36,6 @@ const STEP_FOR_PATH: [pattern: RegExp, step: string][] = [
   [/^rentArrears\.rentHistoryTable(\[\d+\](\.[A-Za-z]+)?)?$/, 'rent-statement'],
   [/^rentArrears\.otherFrequencyDetails$/, 'rent-frequency'],
   [/^rentArrears\.recoverySteps$/, 'recovery-steps'],
-  [/^rentArrears\.rentHistoryLedger\[\d+\](\.[A-Za-z]+)?$/, 'ledger-transaction'],
   [/^notice\.(noticeServed|noNoticeReason)$/, 'notice-served'],
   [/^notice\.(noticeType|noticeTypeOther)$/, 'notice-type'],
   [/^notice\.noticeUnavailableReason$/, 'notice-available'],
@@ -117,17 +116,13 @@ function answerUrl(step: string, caseId: string, query = ''): string {
   return withReturnTo(`${getStepUrl(step, flowConfig, caseId)}${query}`, 'check-your-answers');
 }
 
-/** Which defendant, ledger entry or ground a refused path is about, as the page that asks it expects. */
+/** Which defendant, rent statement row or ground a refused path is about, as the page that asks it expects. */
 function queryForPath(path: string): string {
   const defendant = Number(/^defendants\[(\d+)\]/.exec(path)?.[1] ?? 0);
-  const entry = /^rentArrears\.rentHistoryLedger\[(\d+)\]/.exec(path)?.[1];
   const row = /^rentArrears\.rentHistoryTable\[(\d+)\]\.(datePaid|amountPaid)$/.exec(path)?.[1];
   const ground = /^grounds\.groundReasons\.(GROUND_[A-Z0-9]+)$/.exec(path)?.[1];
   if (ground) {
     return `?ground=${ground}`;
-  }
-  if (entry !== undefined) {
-    return `?entry=${entry}`;
   }
   if (row !== undefined) {
     return `?row=${row}`;

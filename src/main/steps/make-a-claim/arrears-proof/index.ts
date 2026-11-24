@@ -1,7 +1,7 @@
 import type { Request } from 'express';
 
 import { PROOF_TYPES } from '../claimMapping';
-import { designOf, offeredProofTypes } from '../conditions';
+import { offeredProofTypes } from '../conditions';
 import { radioQuestion } from '../fieldBuilders';
 import { createMakeAClaimStep } from '../formStep';
 
@@ -28,6 +28,6 @@ export const step: StepDefinition = createMakeAClaimStep({
         field.component!.items = items.filter(item => offered.includes(item.value as ProofType));
       }
     }
-    return { design: designOf(req) };
+    return {};
   },
 });

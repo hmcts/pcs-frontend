@@ -410,8 +410,6 @@ const AWAITING_TRANSLATION = new Set<string>([
   'makeAClaim/currentArrears.json',
   'makeAClaim/arrearsProof.json',
   'makeAClaim/uploadRentStatement.json',
-  'makeAClaim/ledgerTransaction.json',
-  'makeAClaim/ledgerSummary.json',
   'makeAClaim/statementPeriod.json',
   'makeAClaim/rentStatement.json',
   'makeAClaim/rentStatementPayment.json',
@@ -430,7 +428,6 @@ const AWAITING_TRANSLATION = new Set<string>([
   'makeAClaim/equalityAndDiversity.json',
   'makeAClaim/languageUsed.json',
   'makeAClaim/removeDefendant.json',
-  'makeAClaim/removeLedgerEntry.json',
   'makeAClaim/checkYourAnswers.json',
 ]);
 

@@ -7,8 +7,6 @@ import { paymentDetails } from '../../data/page-data/paymentDetails.page.data';
 import { LaunchDarklyAction } from '../actions/custom-actions/launchDarkly.action';
 import { performAction, performValidation } from '../controller';
 
-export type RentHistoryDesign = 'ledger' | 'table';
-
 export const MAKE_A_CLAIM_FLAG = 'private-landlord-make-a-claim-enabled';
 
 /** Postcodes pcs-api maps to a court (V026__pilot_postcodes.sql): Bradford in England, Betws-y-Coed in Wales. */
@@ -20,12 +18,8 @@ export async function isMakeAClaimEnabled(): Promise<boolean> {
   return new LaunchDarklyAction().getFlagValue(MAKE_A_CLAIM_FLAG);
 }
 
-/**
- * Creates a citizen whose email picks the rent history design: the Test environment's LaunchDarkly rule serves
- * "table" to emails containing pl-table- and "ledger" to everyone else.
- */
-export async function createLandlord(design: RentHistoryDesign = 'ledger'): Promise<void> {
-  await performAction('createUser', `pl-${design}-${randomUUID()}`, ['citizen']);
+export async function createLandlord(): Promise<void> {
+  await performAction('createUser', `pl-${randomUUID()}`, ['citizen']);
 }
 
 export async function saveAndContinue(page: Page): Promise<void> {
@@ -216,66 +210,58 @@ async function enterArrearsAmounts(page: Page): Promise<void> {
   await saveAndContinue(page);
 }
 
-/** Concept 1: the claimant adds the rent statement's transactions one at a time. */
-export async function completeRentArrearsWithLedger(page: Page): Promise<void> {
+/** The claimant uploads a rent statement of their own. */
+export async function completeRentArrearsWithUpload(page: Page): Promise<void> {
   await startRentArrears(page);
   await enterArrearsAmounts(page);
-  await expect(page.getByRole('radio', { name: 'Create a rent statement from the rent due each period' })).toHaveCount(
-    0
-  );
-  await answer(page, 'Enter the rent statement transactions one at a time');
-
-  await fillDate(page, 'transactionDate', '1', '6', '2026');
-  await page.getByRole('checkbox', { name: 'Rent charge' }).check();
-  await page.getByLabel('Amount charged').fill('1000');
-  await page.getByLabel('Description or reference (optional)').fill('June rent');
+  await answer(page, 'Upload a rent statement that follows the guidelines');
+  await performAction('uploadFile', 'NoticeServiceJurisdiction.docx');
   await saveAndContinue(page);
-  await answer(page, 'Yes');
-
-  await fillDate(page, 'transactionDate', '3', '6', '2026');
-  await page.getByRole('checkbox', { name: 'Tenant payment' }).check();
-  await page.getByLabel('Amount paid').fill('120');
-  await saveAndContinue(page);
-
-  await expect(page.getByText('Total arrears: £880.00')).toBeVisible();
-  await answer(page, 'No');
   await finishRentArrears(page);
 }
 
-/** Concept 2: the service lays out the rent due each period and the claimant adds the payments made. */
+async function addPayment(page: Page, day: string, amount: string, addAnother: 'Yes' | 'No'): Promise<void> {
+  await fillDate(page, 'datePaid', day, '6', '2026');
+  await page.getByLabel('Amount paid').fill(amount);
+  await page
+    .getByRole('group', { name: 'Do you want to add another payment in this period?' })
+    .getByRole('radio', { name: addAnother })
+    .check();
+  await saveAndContinue(page);
+}
+
+/** The service lays out the rent due each period and the claimant adds the payments made in each. */
 export async function completeRentArrearsWithTable(page: Page): Promise<void> {
   await startRentArrears(page);
-  await page.getByLabel('Which day of the month is rent due?').fill('1');
-  await saveAndContinue(page);
   await enterArrearsAmounts(page);
-  await expect(page.getByRole('radio', { name: 'Enter the rent statement transactions one at a time' })).toHaveCount(0);
-  await answer(page, 'Create a rent statement from the rent due each period');
+  await answer(page, 'Create a rent statement');
+  await page.getByLabel('Which date of the month is rent due?').fill('1');
+  await saveAndContinue(page);
 
   await fillDate(page, 'statementStart', '1', '6', '2026');
   await fillDate(page, 'statementEnd', '31', '8', '2026');
   await saveAndContinue(page);
-  await expect(page.locator('table tbody tr')).toHaveCount(3);
-  await expect(page.getByText('Total arrears: £3,000.00')).toBeVisible();
+  const rows = page.locator('table tbody tr');
+  await expect(rows).toHaveCount(3);
+  await expect(rows.last()).toContainText('£3,000.00');
 
-  await page.getByRole('link', { name: 'Add a payment payment for rent due on 1 June 2026' }).click();
-  await fillDate(page, 'datePaid', '5', '6', '2026');
-  await page.getByLabel('Amount paid').fill('120');
-  await saveAndContinue(page);
-  await expect(page.getByText('Total arrears: £2,880.00')).toBeVisible();
+  await page.getByRole('link', { name: 'Add a payment in June 2026' }).click();
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Add a payment in this period (1 June 2026 to 30 June 2026)' })
+  ).toBeVisible();
+  await addPayment(page, '5', '120', 'Yes');
+  await addPayment(page, '15', '200', 'No');
+  await expect(rows).toHaveCount(4);
+  await expect(rows.last()).toContainText('£2,680.00');
 
-  await page.getByRole('link', { name: 'Change payment for rent due on 1 June 2026' }).click();
+  await page.getByRole('link', { name: 'Change payment in June 2026 paid on 15/6/2026' }).click();
   await page
     .getByRole('group', { name: 'Do you want to remove this payment from the rent statement?' })
     .getByRole('radio', { name: 'Yes' })
     .check();
   await saveAndContinue(page);
-  await expect(page.getByText('Total arrears: £3,000.00')).toBeVisible();
-
-  await page.getByRole('link', { name: 'Add a payment payment for rent due on 1 June 2026' }).click();
-  await fillDate(page, 'datePaid', '5', '6', '2026');
-  await page.getByLabel('Amount paid').fill('120');
-  await saveAndContinue(page);
-  await expect(page.getByText('Total arrears: £2,880.00')).toBeVisible();
+  await expect(rows).toHaveCount(3);
+  await expect(rows.last()).toContainText('£2,880.00');
   await saveAndContinue(page);
   await finishRentArrears(page);
 }

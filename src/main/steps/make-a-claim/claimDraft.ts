@@ -37,7 +37,6 @@ export function draftClaim(req: Request): CitizenPossessionClaim {
 /** The rent history each way of proving the arrears keeps; the evidence of the others is dropped. */
 const PROOF_EVIDENCE = {
   UPLOAD_STATEMENT: 'rentStatementDocuments',
-  LEDGER: 'rentHistoryLedger',
   TABLE: 'rentHistoryTable',
 } as const;
 

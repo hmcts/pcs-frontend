@@ -6,19 +6,18 @@ import type { CitizenPossessionClaim } from '../../../../main/services/citizenPo
 import { flowConfig } from '../../../../main/steps/make-a-claim/flow.config';
 import { startFlowConfig } from '../../../../main/steps/make-a-claim/start/flow.config';
 
-function requestFor(claim: CitizenPossessionClaim, rentHistoryDesign = 'ledger'): Request {
+function requestFor(claim: CitizenPossessionClaim): Request {
   const req = {} as Request;
   req.res = {
     locals: {
-      rentHistoryDesign,
       validatedCase: new CcdCaseModel({ id: '1777027600017761', data: { citizenPossessionClaim: claim } }),
     },
   } as unknown as Request['res'];
   return req;
 }
 
-const next = (claim: CitizenPossessionClaim, step: string, design?: string) =>
-  getNextStep(requestFor({ grounds: { hasRentArrearsGrounds: 'YES' }, ...claim }, design), step, flowConfig, {});
+const next = (claim: CitizenPossessionClaim, step: string) =>
+  getNextStep(requestFor({ grounds: { hasRentArrearsGrounds: 'YES' }, ...claim }), step, flowConfig, {});
 
 describe('before the claim exists', () => {
   const nextFrom = (step: string, answers: Record<string, unknown>) =>
@@ -73,40 +72,39 @@ describe('the claim journey', () => {
       'current-arrears',
     ],
     ['arrears-proof', { rentArrears: { proofType: 'UPLOAD_STATEMENT' } }, 'upload-rent-statement'],
-    ['arrears-proof', { rentArrears: { proofType: 'LEDGER' } }, 'ledger-transaction'],
-    [
-      'arrears-proof',
-      { rentArrears: { proofType: 'LEDGER', rentHistoryLedger: [{ value: { transactionDate: '2026-06-01' } }] } },
-      'ledger-summary',
-    ],
-    ['ledger-summary', { rentArrears: { proofType: 'LEDGER' } }, 'money-judgment'],
+    ['upload-rent-statement', { rentArrears: { proofType: 'UPLOAD_STATEMENT' } }, 'money-judgment'],
     ['claimant-circumstances', {}, 'situation-cya'],
     ['language-used', {}, 'check-your-answers'],
   ] as [string, CitizenPossessionClaim, string][])('goes from %s with %j to %s', async (step, claim, expected) => {
     await expect(next(claim, step)).resolves.toBe(expected);
   });
 
-  it('asks the rent due day only with the table design and monthly rent', async () => {
+  it('asks the rent due day after Create a rent statement, and only for monthly rent', async () => {
     const monthly: CitizenPossessionClaim = {
-      rentArrears: { rentFrequency: 'MONTHLY' },
+      rentArrears: { rentFrequency: 'MONTHLY', proofType: 'TABLE' },
       notice: { noticeServed: 'NO' },
     };
-    await expect(next(monthly, 'rent-frequency', 'table')).resolves.toBe('rent-due-day');
-    await expect(
-      next({ ...monthly, rentArrears: { rentFrequency: 'WEEKLY' } }, 'rent-frequency', 'table')
-    ).resolves.toBe('current-arrears');
+    await expect(next(monthly, 'rent-frequency')).resolves.toBe('current-arrears');
+    await expect(next(monthly, 'arrears-proof')).resolves.toBe('rent-due-day');
+    await expect(next(monthly, 'rent-due-day')).resolves.toBe('statement-period');
+    const weekly: CitizenPossessionClaim = { rentArrears: { rentFrequency: 'WEEKLY', proofType: 'TABLE' } };
+    await expect(next(weekly, 'arrears-proof')).resolves.toBe('statement-period');
   });
 
-  it('builds the rent statement table only with the table design', async () => {
-    const table: CitizenPossessionClaim = { rentArrears: { proofType: 'TABLE' } };
-    await expect(next(table, 'arrears-proof', 'table')).resolves.toBe('statement-period');
-    await expect(next(table, 'statement-period', 'table')).resolves.toBe('rent-statement');
-    await expect(next(table, 'rent-statement', 'table')).resolves.toBe('money-judgment');
-    await expect(next(table, 'arrears-proof', 'ledger')).resolves.toBe('money-judgment');
+  it('creates a rent statement from the period, then shows it', async () => {
+    const table: CitizenPossessionClaim = { rentArrears: { rentFrequency: 'WEEKLY', proofType: 'TABLE' } };
+    await expect(next(table, 'statement-period')).resolves.toBe('rent-statement');
+    await expect(next(table, 'rent-statement')).resolves.toBe('money-judgment');
   });
 
-  it('shows no ledger with the table design', async () => {
-    await expect(next({ rentArrears: { proofType: 'LEDGER' } }, 'arrears-proof', 'table')).resolves.toBe(
+  it('asks for an upload, not a created statement, for Upload a rent statement', async () => {
+    const upload: CitizenPossessionClaim = { rentArrears: { rentFrequency: 'MONTHLY', proofType: 'UPLOAD_STATEMENT' } };
+    await expect(next(upload, 'arrears-proof')).resolves.toBe('upload-rent-statement');
+    await expect(next(upload, 'upload-rent-statement')).resolves.toBe('money-judgment');
+  });
+
+  it('skips the created statement once the rent is paid at some other frequency', async () => {
+    await expect(next({ rentArrears: { rentFrequency: 'OTHER', proofType: 'TABLE' } }, 'arrears-proof')).resolves.toBe(
       'money-judgment'
     );
   });

@@ -6,7 +6,6 @@ import { flowConfig as uploadAdditionalDocumentsFlowConfig } from './case-tasks/
 import { stepRegistry as uploadAdditionalDocumentsStepRegistry } from './case-tasks/upload-additional-documents/stepRegistry';
 import { MAKE_A_CLAIM_DRAFT_EVENT } from './make-a-claim/claimDraft';
 import { flowConfig as makeAClaimFlowConfig } from './make-a-claim/flow.config';
-import { resolveRentHistoryDesign } from './make-a-claim/routeMiddleware';
 import { stepRegistry as makeAClaimStepRegistry } from './make-a-claim/stepRegistry';
 import { flowConfig as makeAnApplicationFlowConfig } from './make-an-application/flow.config';
 import { stepRegistry as makeAnApplicationStepRegistry } from './make-an-application/stepRegistry';
@@ -85,7 +84,6 @@ export const journeyRegistry: Record<string, JourneyConfig> = {
       flowConfig: makeAClaimFlowConfig,
       stepRegistry: makeAClaimStepRegistry,
     },
-    routeMiddleware: [resolveRentHistoryDesign],
     featureMiddleware: makeAClaimFeatureMiddleware,
   },
   uploadAdditionalDocuments: {

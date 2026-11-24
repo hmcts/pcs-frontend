@@ -93,7 +93,6 @@ describe('normaliseClaim', () => {
 
   it.each([
     ['UPLOAD_STATEMENT', 'rentStatementDocuments'],
-    ['LEDGER', 'rentHistoryLedger'],
     ['TABLE', 'rentHistoryTable'],
   ] as const)('keeps only the rent history %s proves the arrears with', (proofType, kept) => {
     const rentArrears = normaliseClaim({
@@ -101,20 +100,10 @@ describe('normaliseClaim', () => {
         proofType,
         rentFrequency: 'MONTHLY',
         rentStatementDocuments: [],
-        rentHistoryLedger: [],
         rentHistoryTable: [],
       },
     }).rentArrears as Record<string, unknown>;
     expect(Object.keys(rentArrears).filter(key => key.startsWith('rent') && key !== 'rentFrequency')).toEqual([kept]);
-  });
-
-  it('keeps the ledger of a claim whose design flipped to the table until the claimant chooses again', () => {
-    expect(
-      normaliseClaim({ rentArrears: { proofType: 'LEDGER', rentHistoryLedger: [{ value: {} }] } }).rentArrears
-    ).toEqual({ proofType: 'LEDGER', rentHistoryLedger: [{ value: {} }] });
-    expect(
-      normaliseClaim({ rentArrears: { proofType: 'TABLE', rentHistoryLedger: [{ value: {} }] } }).rentArrears
-    ).toEqual({ proofType: 'TABLE' });
   });
 
   it('drops a rent statement table for rent paid at another frequency, which cannot have one', () => {
@@ -175,7 +164,7 @@ describe('restoreUnreadable', () => {
         { id: 'a', value: { firstName: 'Ann' } },
         { id: 'b', value: { firstName: 'Bob', lastName: 'Smith' } },
       ],
-      rentArrears: { rentHistoryLedger: [{ value: { transactionDate: '2026-06-01', amountCharged: '100' } }] },
+      rentArrears: { rentHistoryTable: [{ value: { datePaid: '2026-06-05', amountPaid: '100' } }] },
       grounds: { groundReasons: [{ value: { ground: 'GROUND_2', reason: 'Mortgage' } }] },
     };
     const updated = {
@@ -183,7 +172,7 @@ describe('restoreUnreadable', () => {
         { id: 'b', value: { firstName: 'Robert', lastName: UNREADABLE } },
         { id: 'a', value: { firstName: 'Ann' } },
       ],
-      rentArrears: { rentHistoryLedger: [{ value: { transactionDate: UNREADABLE, amountCharged: '200' } }] },
+      rentArrears: { rentHistoryTable: [{ value: { datePaid: UNREADABLE, amountPaid: '200' } }] },
       grounds: {
         groundReasons: [{ value: { ground: 'GROUND_1' } }, { value: { ground: 'GROUND_2', reason: UNREADABLE } }],
       },
@@ -193,7 +182,7 @@ describe('restoreUnreadable', () => {
         { id: 'b', value: { firstName: 'Robert', lastName: 'Smith' } },
         { id: 'a', value: { firstName: 'Ann' } },
       ],
-      rentArrears: { rentHistoryLedger: [{ value: { transactionDate: '2026-06-01', amountCharged: '200' } }] },
+      rentArrears: { rentHistoryTable: [{ value: { datePaid: '2026-06-05', amountPaid: '200' } }] },
       grounds: {
         groundReasons: [{ value: { ground: 'GROUND_1' } }, { value: { ground: 'GROUND_2', reason: 'Mortgage' } }],
       },

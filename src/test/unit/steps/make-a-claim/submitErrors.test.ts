@@ -87,7 +87,6 @@ describe('submitErrorItems', () => {
     ['TOO_LONG:defendants[1].address.PostCode', `${claimPage('defendant-address')}?index=1`],
     ['TOO_LONG:rentArrears.otherFrequencyDetails', claimPage('rent-frequency')],
     ['TOO_LONG:rentArrears.recoverySteps', claimPage('recovery-steps')],
-    ['TOO_LONG:rentArrears.rentHistoryLedger[3].description', `${claimPage('ledger-transaction')}?entry=3`],
     ['REQUIRED:notice.noticeTypeOther', claimPage('notice-type')],
     ['REQUIRED:grounds.rentArrearsGrounds', claimPage('rent-arrears-grounds')],
     ['REQUIRED:grounds.otherGrounds', claimPage('other-grounds')],
@@ -186,15 +185,8 @@ describe('draft changed elsewhere', () => {
 describe('submitErrorCodes', () => {
   it('reads only the codes the page explains', () => {
     expect(
-      submitErrorCodes(
-        'REQUIRED:claimant.address,<script>,TOO_LONG:rentArrears.rentHistoryLedger[0].description,DRAFT_NOT_FOUND,failed'
-      )
-    ).toEqual([
-      'REQUIRED:claimant.address',
-      'TOO_LONG:rentArrears.rentHistoryLedger[0].description',
-      'DRAFT_NOT_FOUND',
-      'failed',
-    ]);
+      submitErrorCodes('REQUIRED:claimant.address,<script>,TOO_LONG:rentArrears.recoverySteps,DRAFT_NOT_FOUND,failed')
+    ).toEqual(['REQUIRED:claimant.address', 'TOO_LONG:rentArrears.recoverySteps', 'DRAFT_NOT_FOUND', 'failed']);
     expect(submitErrorCodes(undefined)).toEqual([]);
   });
 });

@@ -102,9 +102,7 @@ export const NOTICE_METHOD_DETAILS: Record<NoticeMethod, { date: string; details
 
 export type RentFrequency = 'WEEKLY' | 'FORTNIGHTLY' | 'MONTHLY' | 'OTHER';
 
-export type ProofType = 'UPLOAD_STATEMENT' | 'LEDGER' | 'TABLE';
-
-export type TransactionType = 'RENT_CHARGE' | 'TENANT_PAYMENT';
+export type ProofType = 'UPLOAD_STATEMENT' | 'TABLE';
 
 export type LanguageUsed = 'ENGLISH' | 'WELSH' | 'ENGLISH_AND_WELSH';
 
@@ -125,14 +123,6 @@ export interface CitizenDefendant {
 export interface GroundReason {
   ground?: OtherGround;
   reason?: string;
-}
-
-export interface RentLedgerEntry {
-  transactionDate?: string;
-  transactionTypes?: TransactionType[];
-  description?: string;
-  amountCharged?: string;
-  amountPaid?: string;
 }
 
 export interface RentTableRow {
@@ -218,7 +208,6 @@ export interface CitizenPossessionClaim {
     currentArrearsDate?: string;
     proofType?: ProofType;
     rentStatementDocuments?: ClaimDocuments;
-    rentHistoryLedger?: CcdCollectionItem<RentLedgerEntry>[];
     rentHistoryTable?: CcdCollectionItem<RentTableRow>[];
     moneyJudgmentWanted?: YesNo;
     recoverySteps?: string;

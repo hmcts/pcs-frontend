@@ -32,7 +32,7 @@ const ANSWERED_CLAIM = {
     firstName: 'Billy',
     lastName: 'Wright',
     address: { AddressLine1: '12 High Street', PostTown: 'London', PostCode: 'NW1 1AA' },
-    emailAddress: 'pl-ledger-0001@example.test',
+    emailAddress: 'pl-0001@example.test',
     contactByPhone: 'YES',
     phoneNumber: '07700900982',
     contactByText: 'NO',
@@ -447,19 +447,16 @@ describe('the task list', () => {
 });
 
 describe('every page renders', () => {
-  it.each(['ledger', 'table'])('with the %s design', async design => {
-    app = await bootMakeAClaim({ email: `pl-${design}-0001@example.test` });
+  it('with a rent statement created', async () => {
+    app = await bootMakeAClaim();
     givenClaim({
       ...ANSWERED_CLAIM,
       rentArrears: {
         ...ANSWERED_CLAIM.rentArrears,
-        proofType: design === 'table' ? 'TABLE' : 'LEDGER',
+        proofType: 'TABLE',
         rentDueDay: 1,
         moneyJudgmentWanted: 'NO',
         recoverySteps: '',
-        rentHistoryLedger: [
-          { value: { transactionDate: '2026-06-01', transactionTypes: ['RENT_CHARGE'], amountCharged: '100000' } },
-        ],
         rentHistoryTable: [
           {
             value: {
@@ -479,7 +476,7 @@ describe('every page renders', () => {
     const failures: string[] = [];
     for (const name of Object.keys(stepRegistry)) {
       const response = await app.get(
-        `${claimPath(name)}?period=2026-06-01&row=0&datePaid=2026-06-02&amountPaid=50000&index=0&entry=0`
+        `${claimPath(name)}?period=2026-06-01&row=0&datePaid=2026-06-02&amountPaid=50000&index=0`
       );
       if (redirected[name] ? response.location !== redirected[name] : response.status !== 200) {
         failures.push(`${name}: ${response.status} ${text(response.text).slice(0, 200)}`);
@@ -500,7 +497,7 @@ describe('answering questions', () => {
     expect(storedClaim().claimant).toEqual({ individualOrOrganisation: 'ORGANISATION' });
 
     await app.post(claimPath('claimant-email'), { useAccountEmail: 'yes' });
-    expect(storedClaim().claimant.emailAddress).toBe('pl-ledger-0001@example.test');
+    expect(storedClaim().claimant.emailAddress).toBe('pl-0001@example.test');
 
     expect((await app.post(claimPath('claimant-phone'), { contactByPhone: 'no' })).location).toBe(
       `${claimPath('claimant-text-message')}?nav=1`
@@ -628,107 +625,162 @@ describe('answering questions', () => {
   });
 });
 
-describe('proof of rent arrears with the ledger design', () => {
-  it('adds transactions one at a time and keeps a running total of the arrears', async () => {
-    app = await bootMakeAClaim({ email: 'pl-ledger-0002@example.test' });
+describe('proof of rent arrears', () => {
+  it('offers Upload a rent statement or Create a rent statement, and Upload asks for the statement', async () => {
+    app = await bootMakeAClaim();
     givenClaim(ANSWERED_CLAIM);
     const proof = text((await app.get(claimPath('arrears-proof'))).text);
-    expect(proof).toContain('Enter the rent statement transactions one at a time');
-    expect(proof).not.toContain('Create a rent statement from the rent due each period');
-
-    expect((await app.post(claimPath('arrears-proof'), { proofType: 'LEDGER' })).location).toBe(
-      `${claimPath('ledger-transaction')}?nav=1`
+    expect(proof).toContain('Upload a rent statement that follows the guidelines');
+    expect(proof).toContain('Create a rent statement');
+    expect((await app.post(claimPath('arrears-proof'), { proofType: 'UPLOAD_STATEMENT' })).location).toBe(
+      `${claimPath('upload-rent-statement')}?nav=1`
     );
-    await app.post(claimPath('ledger-transaction'), {
-      'transactionDate-day': '1',
-      'transactionDate-month': '6',
-      'transactionDate-year': '2026',
-      transactionTypes: 'RENT_CHARGE',
-      'transactionTypes.amountCharged': '500',
-      description: 'June rent',
-    });
-    const another = await app.post(claimPath('ledger-summary'), { addAnother: 'yes' });
-    expect(another.location).toBe(`${claimPath('ledger-transaction')}?entry=1`);
-    await app.post(`${claimPath('ledger-transaction')}?entry=1`, {
-      'transactionDate-day': '3',
-      'transactionDate-month': '6',
-      'transactionDate-year': '2026',
-      transactionTypes: 'TENANT_PAYMENT',
-      'transactionTypes.amountPaid': '120',
-    });
-
-    expect(storedClaim().rentArrears.rentHistoryLedger).toEqual([
-      {
-        id: expect.any(String),
-        value: {
-          transactionDate: '2026-06-01',
-          transactionTypes: ['RENT_CHARGE'],
-          description: 'June rent',
-          amountCharged: '50000',
-        },
-      },
-      {
-        id: expect.any(String),
-        value: { transactionDate: '2026-06-03', transactionTypes: ['TENANT_PAYMENT'], amountPaid: '12000' },
-      },
-    ]);
-    const summary = text((await app.get(claimPath('ledger-summary'))).text);
-    expect(summary).toContain('£500.00 £500.00');
-    expect(summary).toContain('£120.00 £380.00');
-    expect(summary).toContain('Total arrears: £380.00');
-    expect((await app.post(claimPath('ledger-summary'), { addAnother: 'no' })).location).toBe(
-      `${claimPath('money-judgment')}?nav=1`
-    );
+    expect(storedClaim().rentArrears.proofType).toBe('UPLOAD_STATEMENT');
   });
-});
 
-describe('proof of rent arrears with the table design', () => {
-  it('lays out the rent due each month and records payments against them', async () => {
-    app = await bootMakeAClaim({ email: 'pl-table-0003@example.test' });
+  it('offers only Upload for rent paid at some other frequency', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...ANSWERED_CLAIM, rentArrears: { ...ANSWERED_CLAIM.rentArrears, rentFrequency: 'OTHER' } });
+    const proof = text((await app.get(claimPath('arrears-proof'))).text);
+    expect(proof).toContain('Upload a rent statement that follows the guidelines');
+    expect(proof).not.toContain('Create a rent statement');
+  });
+
+  it('creates a statement from the due day and period, then takes payments period by period', async () => {
+    app = await bootMakeAClaim();
     givenClaim(ANSWERED_CLAIM);
-    expect((await app.post(claimPath('rent-frequency'), { rentFrequency: 'MONTHLY' })).location).toBe(
+    expect((await app.post(claimPath('arrears-proof'), { proofType: 'TABLE' })).location).toBe(
       `${claimPath('rent-due-day')}?nav=1`
     );
-    await app.post(claimPath('rent-due-day'), { rentDueDay: 1 });
-    expect(text((await app.get(claimPath('arrears-proof'))).text)).not.toContain('one at a time');
-    expect((await app.post(claimPath('arrears-proof'), { proofType: 'TABLE' })).location).toBe(
+    const dueDay = text((await app.get(claimPath('rent-due-day'))).text);
+    expect(dueDay).toContain('Which date of the month is rent due?');
+    expect(dueDay).toContain('For example, if rent is due on the 28th of each month, enter ‘28’');
+    expect((await app.post(claimPath('rent-due-day'), { rentDueDay: '1' })).location).toBe(
       `${claimPath('statement-period')}?nav=1`
     );
-    await app.post(claimPath('statement-period'), {
-      'statementStart-day': '1',
-      'statementStart-month': '6',
-      'statementStart-year': '2026',
-      'statementEnd-day': '31',
-      'statementEnd-month': '8',
-      'statementEnd-year': '2026',
-    });
+    const periodPage = text((await app.get(claimPath('statement-period'))).text);
+    expect(periodPage).toContain('What period of time do you want the rent statement to cover?');
+    expect(periodPage).toContain('It must cover the time period of either:');
+    expect(
+      (
+        await app.post(claimPath('statement-period'), {
+          'statementStart-day': '1',
+          'statementStart-month': '6',
+          'statementStart-year': '2026',
+          'statementEnd-day': '31',
+          'statementEnd-month': '8',
+          'statementEnd-year': '2026',
+        })
+      ).location
+    ).toBe(`${claimPath('rent-statement')}?nav=1`);
     expect(
       storedClaim().rentArrears.rentHistoryTable.map((row: { value: { dateDue: string } }) => row.value.dateDue)
     ).toEqual(['2026-06-01', '2026-07-01', '2026-08-01']);
 
-    await app.post(`${claimPath('rent-statement-payment')}?period=2026-06-01`, {
+    const empty = new JSDOM((await app.get(claimPath('rent-statement'))).text).window.document;
+    expect(text(empty.body.innerHTML)).toContain(
+      'If a payment has been made for a period, you can add the details of this by selecting ‘Add a payment’ in the relevant row.'
+    );
+    expect([...empty.querySelectorAll('thead th')].map(cell => cell.textContent?.trim())).toEqual([
+      'Period',
+      'Date due',
+      'Amount due',
+      'Date paid',
+      'Amount paid',
+      'Total arrears',
+      'Actions',
+    ]);
+    expect(
+      [...empty.querySelectorAll('tbody tr')].map(row =>
+        [...row.querySelectorAll('a')].map(a => a.getAttribute('href'))
+      )
+    ).toEqual([
+      [`${claimPath('rent-statement-payment')}?period=2026-06-01`],
+      [`${claimPath('rent-statement-payment')}?period=2026-07-01`],
+      [`${claimPath('rent-statement-payment')}?period=2026-08-01`],
+    ]);
+
+    const addPath = `${claimPath('rent-statement-payment')}?period=2026-06-01`;
+    const add = text((await app.get(addPath)).text);
+    expect(add).toContain('Add a payment in this period (1 June 2026 to 30 June 2026)');
+    expect(add).toContain('Do you want to add another payment in this period?');
+    expect(add).not.toContain('Do you want to remove this payment');
+    const another = await app.post(addPath, {
       'datePaid-day': '5',
       'datePaid-month': '6',
       'datePaid-year': '2026',
       amountPaid: '50',
+      addAnotherPayment: 'yes',
     });
-    await app.post(`${claimPath('rent-statement-payment')}?period=2026-06-01`, {
+    expect(another.location).toBe(addPath);
+    const fresh = new JSDOM((await app.get(addPath)).text).window.document;
+    expect(fresh.querySelector<HTMLInputElement>('input[name="amountPaid"]')?.value ?? '').toBe('');
+    const done = await app.post(addPath, {
       'datePaid-day': '15',
       'datePaid-month': '6',
       'datePaid-year': '2026',
       amountPaid: '200',
+      addAnotherPayment: 'no',
     });
+    expect(done.location).toBe(claimPath('rent-statement'));
 
-    const statement = text((await app.get(claimPath('rent-statement'))).text);
-    expect(statement).toContain('1 June 2026 £1,000.00 5 June 2026 £50.00 £950.00');
-    expect(statement).toContain('Additional payment 15 June 2026 £200.00 £750.00');
-    expect(statement).toContain('Total arrears: £2,750.00');
+    const statement = new JSDOM((await app.get(claimPath('rent-statement'))).text).window.document;
+    const rows = [...statement.querySelectorAll('tbody tr')];
+    expect(text(rows[0].innerHTML)).toContain('June 2026 1/6/2026 £1,000.00 5/6/2026 £50.00 £950.00');
+    expect(text(rows[1].innerHTML)).toContain('15/6/2026 £200.00 £750.00');
+    expect(text(rows[3].innerHTML)).toContain('August 2026 1/8/2026 £1,000.00 – – £2,750.00');
+    expect(rows.map(row => [...row.querySelectorAll('a')].map(a => a.textContent?.split(' ')[0]))).toEqual([
+      ['Change', 'Add'],
+      ['Change'],
+      ['Add'],
+      ['Add'],
+    ]);
+
+    const change = text((await app.get(rows[1].querySelector('a')?.getAttribute('href') ?? '')).text);
+    expect(change).toContain('Change a payment in this period (1 June 2026 to 30 June 2026)');
+    expect(change).toContain('Do you want to remove this payment from the rent statement?');
+    expect(change).not.toContain('Do you want to add another payment in this period?');
   });
 
-  it('falls back to the ledger for a design LaunchDarkly does not know', async () => {
-    app = await bootMakeAClaim({ rentHistoryDesign: 'spreadsheet' });
-    givenClaim(ANSWERED_CLAIM);
-    expect(text((await app.get(claimPath('arrears-proof'))).text)).toContain('one at a time');
+  it('asks whether to add another payment, and keeps a payment inside its period', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({
+      ...ANSWERED_CLAIM,
+      rentArrears: {
+        ...ANSWERED_CLAIM.rentArrears,
+        rentDueDay: 1,
+        proofType: 'TABLE',
+        rentHistoryTable: [
+          { value: { periodStart: '2026-06-01', dateDue: '2026-06-01', amountDue: '100000' } },
+          { value: { periodStart: '2026-07-01', dateDue: '2026-07-01', amountDue: '100000' } },
+        ],
+      },
+    });
+    const addPath = `${claimPath('rent-statement-payment')}?period=2026-06-01`;
+    const unanswered = text(
+      (
+        await app.post(addPath, {
+          'datePaid-day': '5',
+          'datePaid-month': '6',
+          'datePaid-year': '2026',
+          amountPaid: '50',
+        })
+      ).text
+    );
+    expect(unanswered).toContain('Select whether you want to add another payment in this period');
+    const late = text(
+      (
+        await app.post(addPath, {
+          'datePaid-day': '2',
+          'datePaid-month': '7',
+          'datePaid-year': '2026',
+          amountPaid: '50',
+          addAnotherPayment: 'no',
+        })
+      ).text
+    );
+    expect(late).toContain('The date the payment was made must be the same as or before 30 June 2026');
+    expect(storedClaim().rentArrears.rentHistoryTable[0].value.amountPaid).toBeUndefined();
   });
 });
 
@@ -816,7 +868,7 @@ describe('review fixes', () => {
   });
 
   it('asks for a different email address up front when the account one is too long to keep', async () => {
-    app = await bootMakeAClaim({ email: `pl-ledger-${'x'.repeat(250)}@example.test` });
+    app = await bootMakeAClaim({ email: `pl-${'x'.repeat(250)}@example.test` });
     givenClaim(ANSWERED_CLAIM);
     const page = new JSDOM((await app.get(claimPath('claimant-email'))).text).window.document;
     expect(page.body.textContent).toContain('The email address on your account is too long for us to use');
@@ -934,28 +986,34 @@ describe('review fixes', () => {
     expect(text((await app.get(claimPath('task-list'))).text)).toContain('About the defendants Done');
   });
 
-  it('removes a ledger transaction after asking', async () => {
+  it('removes a rent statement payment after asking, withdrawing the rent arrears summary', async () => {
     app = await bootMakeAClaim();
     givenClaim({
       ...ANSWERED_CLAIM,
       rentArrears: {
         ...ANSWERED_CLAIM.rentArrears,
-        proofType: 'LEDGER',
-        rentHistoryLedger: [
-          { value: { transactionDate: '2026-06-01', transactionTypes: ['RENT_CHARGE'], amountCharged: '100000' } },
-          { value: { transactionDate: '2026-06-03', transactionTypes: ['TENANT_PAYMENT'], amountPaid: '12000' } },
+        rentDueDay: 1,
+        proofType: 'TABLE',
+        rentHistoryTable: [
+          {
+            value: {
+              periodStart: '2026-06-01',
+              dateDue: '2026-06-01',
+              amountDue: '100000',
+              datePaid: '2026-06-05',
+              amountPaid: '5000',
+            },
+          },
         ],
       },
     });
-    const ledger = text((await app.get(claimPath('ledger-summary'))).text);
-    expect(ledger).toContain('Remove transaction 2');
-    await app.post(`${claimPath('remove-ledger-entry')}?entry=1`, { confirmRemove: 'no' });
-    expect(storedClaim().rentArrears.rentHistoryLedger).toHaveLength(2);
+    const changePath = `${claimPath('rent-statement-payment')}?row=0`;
+    const keep = { 'datePaid-day': '5', 'datePaid-month': '6', 'datePaid-year': '2026', amountPaid: '50' };
+    await app.post(changePath, { ...keep, removePayment: 'no' });
+    expect(storedClaim().rentArrears.rentHistoryTable[0].value.amountPaid).toBe('5000');
     expect(storedClaim().confirmedSections).toContain('arrears-cya');
-    expect((await app.post(`${claimPath('remove-ledger-entry')}?entry=1`, { confirmRemove: 'yes' })).location).toBe(
-      claimPath('ledger-summary')
-    );
-    expect(storedClaim().rentArrears.rentHistoryLedger).toHaveLength(1);
+    expect((await app.post(changePath, { removePayment: 'yes' })).location).toBe(claimPath('rent-statement'));
+    expect(storedClaim().rentArrears.rentHistoryTable[0].value.amountPaid).toBeUndefined();
     expect(storedClaim().confirmedSections).not.toContain('arrears-cya');
     expect(storedClaim().confirmedSections).toContain('defendant-cya');
   });
@@ -1022,11 +1080,7 @@ describe('review fixes', () => {
     });
     const pages: [string, Record<string, string | string[]>][] = [
       ['tenancy-start-date', parts('tenancyStartDate')],
-      [
-        'ledger-transaction',
-        { ...parts('transactionDate'), transactionTypes: 'RENT_CHARGE', 'transactionTypes.amountCharged': '10' },
-      ],
-      ['rent-statement-payment?period=2026-06-01', { ...parts('datePaid'), amountPaid: '10' }],
+      ['rent-statement-payment?period=2026-06-01', { ...parts('datePaid'), amountPaid: '10', addAnotherPayment: 'no' }],
     ];
     for (const [page, body] of pages) {
       expect([page, (await app.post(claimPath(page), body)).status]).toEqual([page, 303]);
@@ -1290,44 +1344,27 @@ describe('build observation fixes', () => {
     expect((await app.get(`${claimPath('ground-reason')}?ground=GROUND_1`)).location).toBe(claimPath('other-grounds'));
   });
 
-  it('refuses a proof of arrears option the design does not offer', async () => {
+  it('refuses a proof of arrears option it does not offer', async () => {
     app = await bootMakeAClaim();
-    givenClaim(ANSWERED_CLAIM);
+    givenClaim({ ...ANSWERED_CLAIM, rentArrears: { ...ANSWERED_CLAIM.rentArrears, rentFrequency: 'OTHER' } });
     const refused = await app.post(claimPath('arrears-proof'), { proofType: 'TABLE' });
     expect(text(refused.text)).toContain('Select how you want to provide proof of rent arrears');
+    expect(text((await app.post(claimPath('arrears-proof'), { proofType: 'LEDGER' })).text)).toContain(
+      'Select how you want to provide proof of rent arrears'
+    );
   });
 
-  it('goes back and cancels to the transaction history from the ledger pages', async () => {
+  it('goes back to the rent statement from the add and change payment pages', async () => {
     app = await bootMakeAClaim();
-    givenClaim({
-      ...ANSWERED_CLAIM,
-      rentArrears: {
-        ...ANSWERED_CLAIM.rentArrears,
-        proofType: 'LEDGER',
-        rentHistoryLedger: [
-          {
-            id: 'b',
-            value: { transactionDate: '2026-07-01', transactionTypes: ['RENT_CHARGE'], amountCharged: '100' },
-          },
-          {
-            id: 'a',
-            value: { transactionDate: '2026-06-01', transactionTypes: ['RENT_CHARGE'], amountCharged: '100' },
-          },
-        ],
-      },
-    });
-    expect(backLink(await page(`${claimPath('ledger-transaction')}?entry=0`))).toBe(claimPath('ledger-summary'));
-    const remove = await page(`${claimPath('remove-ledger-entry')}?id=a`);
-    expect([...remove.querySelectorAll('a')].find(link => link.textContent === 'Cancel')?.getAttribute('href')).toBe(
-      claimPath('ledger-summary')
+    givenClaim(TABLE_CLAIM);
+    expect(backLink(await page(`${claimPath('rent-statement-payment')}?period=2026-06-01`))).toBe(
+      claimPath('rent-statement')
     );
-    const history = (await page(claimPath('ledger-summary'))).querySelectorAll('tbody tr');
-    expect(history[0].textContent).toContain('1 June 2026');
-    expect(history[0].textContent).toContain('transaction 1');
+    expect(backLink(await page(changePaymentPath(0)))).toBe(claimPath('rent-statement'));
   });
 
   it('removes a payment from its change page after asking, once only', async () => {
-    app = await bootMakeAClaim({ email: 'pl-table-0004@example.test' });
+    app = await bootMakeAClaim({ email: 'pl-0004@example.test' });
     givenClaim(TABLE_CLAIM);
     const statement = await page(claimPath('rent-statement'));
     expect([...statement.querySelectorAll('a')].filter(link => link.textContent?.startsWith('Remove'))).toEqual([]);
@@ -1353,7 +1390,7 @@ describe('build observation fixes', () => {
   });
 
   it('changes a payment when the claimant does not remove it, and asks nothing about removing when adding one', async () => {
-    app = await bootMakeAClaim({ email: 'pl-table-0006@example.test' });
+    app = await bootMakeAClaim({ email: 'pl-0006@example.test' });
     givenClaim(TABLE_CLAIM);
     expect((await app.post(changePaymentPath(0), { ...PAYMENT, removePayment: 'no' })).location).toBe(
       claimPath('rent-statement')
@@ -1368,7 +1405,7 @@ describe('build observation fixes', () => {
   });
 
   it('sends a payment page for a period not in the statement back to the statement with an error', async () => {
-    app = await bootMakeAClaim({ email: 'pl-table-0005@example.test' });
+    app = await bootMakeAClaim({ email: 'pl-0005@example.test' });
     givenClaim(TABLE_CLAIM);
     const missing = await app.get(`${claimPath('rent-statement-payment')}?period=2024-01-01`);
     expect(missing.location).toBe(`${claimPath('rent-statement')}?problem=periodNotFound`);
@@ -1381,7 +1418,7 @@ describe('build observation fixes', () => {
   });
 
   it('refuses a payment made before its rent was due', async () => {
-    app = await bootMakeAClaim({ email: 'pl-table-0006@example.test' });
+    app = await bootMakeAClaim({ email: 'pl-0006@example.test' });
     givenClaim(TABLE_CLAIM);
     const refused = await app.post(`${claimPath('rent-statement-payment')}?period=2026-07-01`, {
       'datePaid-day': '30',
@@ -1392,11 +1429,11 @@ describe('build observation fixes', () => {
     expect(text(refused.text)).toContain(
       'The date the payment was made must be the same as or after 1 July 2026, the date this rent was due'
     );
-    expect(text(refused.text)).toContain('towards the rent due on 1 July 2026 (£1,000.00).');
+    expect(text(refused.text)).toContain('Add a payment in this period (1 July 2026 to 31 July 2026)');
   });
 
   it('refuses a statement period that ends in the future or holds more than 260 rent periods', async () => {
-    app = await bootMakeAClaim({ email: 'pl-table-0007@example.test' });
+    app = await bootMakeAClaim({ email: 'pl-0007@example.test' });
     givenClaim({ ...TABLE_CLAIM, rentArrears: { ...TABLE_CLAIM.rentArrears, rentFrequency: 'WEEKLY' } });
     const nextYear = String(Number(todayInLondon().slice(0, 4)) + 1);
     const future = await app.post(claimPath('statement-period'), {
@@ -1450,7 +1487,7 @@ describe('build observation fixes', () => {
   });
 
   it('refuses a change to how often or on which day rent is due that gives the statement more than 260 periods', async () => {
-    app = await bootMakeAClaim({ email: 'pl-table-0008@example.test' });
+    app = await bootMakeAClaim({ email: 'pl-0008@example.test' });
     givenClaim(TABLE_CLAIM);
     await app.post(claimPath('statement-period'), {
       'statementStart-day': '10',
@@ -1470,7 +1507,7 @@ describe('build observation fixes', () => {
   });
 
   it('takes a payment made before the first rent was due on the first period', async () => {
-    app = await bootMakeAClaim({ email: 'pl-table-0009@example.test' });
+    app = await bootMakeAClaim({ email: 'pl-0009@example.test' });
     givenClaim(TABLE_CLAIM);
     const saved = await app.post(`${claimPath('rent-statement-payment')}?row=0`, {
       'datePaid-day': '20',
@@ -1484,7 +1521,7 @@ describe('build observation fixes', () => {
   });
 
   it('removes a payment that has no date', async () => {
-    app = await bootMakeAClaim({ email: 'pl-table-0010@example.test' });
+    app = await bootMakeAClaim({ email: 'pl-0010@example.test' });
     givenClaim({
       ...TABLE_CLAIM,
       rentArrears: {
@@ -1496,15 +1533,6 @@ describe('build observation fixes', () => {
     });
     expect((await app.post(changePaymentPath(0), { removePayment: 'yes' })).location).toBe(claimPath('rent-statement'));
     expect(storedClaim().rentArrears.rentHistoryTable[0].value.amountPaid).toBeUndefined();
-  });
-
-  it('sends a remove link for a ledger transaction that has gone back to the transactions', async () => {
-    app = await bootMakeAClaim();
-    givenClaim({ ...ANSWERED_CLAIM, rentArrears: { ...ANSWERED_CLAIM.rentArrears, proofType: 'LEDGER' } });
-    expect((await app.get(`${claimPath('remove-ledger-entry')}?entry=3`)).location).toBe(claimPath('ledger-summary'));
-    expect((await app.post(`${claimPath('remove-ledger-entry')}?entry=3`, { confirmRemove: 'yes' })).location).toBe(
-      claimPath('ledger-summary')
-    );
   });
 
   it('asks the reason for a ground added from a summary, not one already given', async () => {

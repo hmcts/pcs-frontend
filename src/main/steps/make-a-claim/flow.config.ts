@@ -11,11 +11,9 @@ import {
   hasTenancyAgreement,
   isIndividual,
   isOrganisation,
-  ledgerIsEmpty,
   needsGroundReasons,
   noticeServed,
   uploadsRentStatement,
-  usesLedger,
   usesTable,
 } from './conditions';
 import { makeAClaimSections } from './sections.config';
@@ -34,13 +32,7 @@ export const flowConfig: JourneyFlowConfig = {
   useSessionFormData: false,
   eventId: MAKE_A_CLAIM_EVENT_ID,
   sections: makeAClaimSections,
-  nonSectionStepOrder: [
-    'eligible',
-    'task-list',
-    'multiple-claimants-ineligible',
-    'remove-defendant',
-    'remove-ledger-entry',
-  ],
+  nonSectionStepOrder: ['eligible', 'task-list', 'multiple-claimants-ineligible', 'remove-defendant'],
   hubStepName: 'task-list',
   steps: {
     'claimant-name': { showCondition: (req: Request) => isIndividual(req) },
@@ -54,17 +46,14 @@ export const flowConfig: JourneyFlowConfig = {
     'notice-method': { showCondition: (req: Request) => noticeServed(req) },
     'notice-available': { showCondition: (req: Request) => noticeServed(req) },
     'upload-notice': { showCondition: (req: Request) => hasNoticeCopy(req) },
-    'rent-due-day': { showCondition: (req: Request) => asksRentDueDay(req) },
     'arrears-at-notice': { showCondition: (req: Request) => noticeServed(req) },
     'upload-rent-statement': { showCondition: (req: Request) => uploadsRentStatement(req) },
-    'ledger-transaction': { showCondition: (req: Request) => usesLedger(req) && ledgerIsEmpty(req) },
-    'ledger-summary': { showCondition: (req: Request) => usesLedger(req) },
+    'rent-due-day': { showCondition: (req: Request) => asksRentDueDay(req) },
     'statement-period': { showCondition: (req: Request) => usesTable(req) },
     'rent-statement': { showCondition: (req: Request) => usesTable(req) },
     'rent-statement-payment': { showCondition: () => false },
     'multiple-claimants-ineligible': { showCondition: () => false, preventBack: true },
     'remove-defendant': { showCondition: () => false },
-    'remove-ledger-entry': { showCondition: () => false },
   },
 };
 

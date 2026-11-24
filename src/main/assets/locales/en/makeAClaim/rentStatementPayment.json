@@ -1,19 +1,18 @@
 {
-  "pageTitle": "Add a payment",
-  "heading": "Add a payment",
-  "changePageTitle": "Change a payment",
-  "changeHeading": "Change a payment",
-  "paragraphs": ["Enter a payment the defendants made towards the rent due on {{periodDue}} ({{periodAmount}})."],
+  "heading": "Add a payment in this period ({{periodStart}} to {{periodEnd}})",
+  "changeHeading": "Change a payment in this period ({{periodStart}} to {{periodEnd}})",
   "labels": {
     "datePaid": "Date paid",
     "amountPaid": "Amount paid",
+    "addAnotherPayment": "Do you want to add another payment in this period?",
     "removePayment": "Do you want to remove this payment from the rent statement?"
   },
   "hints": {
-    "datePaid": "For example, 5 6 2025"
+    "datePaid": "For example, 27 9 2022"
   },
   "errors": {
     "amountPaid": "Enter the amount paid",
+    "addAnotherPayment": "Select whether you want to add another payment in this period",
     "removePayment": "Select whether you want to remove this payment from the rent statement",
     "amountPaidInvalid": "Enter the amount paid as an amount of money, like 500 or 500.50",
     "date": {
@@ -27,6 +26,7 @@
       "month": "Month",
       "year": "Year"
     },
-    "beforeDateDue": "The date the payment was made must be the same as or after {{dateDue}}, the date this rent was due"
+    "beforeDateDue": "The date the payment was made must be the same as or after {{dateDue}}, the date this rent was due",
+    "afterPeriodEnd": "The date the payment was made must be the same as or before {{periodEnd}}, the last day of this period"
   }
 }

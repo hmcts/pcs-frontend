@@ -1,10 +1,5 @@
 import type { CcdCollectionItem } from '@services/ccdCase.interface';
-import type {
-  RentFrequency,
-  RentLedgerEntry,
-  RentTableRow,
-  TransactionType,
-} from '@services/citizenPossessionClaim.interface';
+import type { RentFrequency, RentTableRow } from '@services/citizenPossessionClaim.interface';
 
 const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
@@ -147,13 +142,48 @@ export interface StatementRange {
   statementEnd: string;
 }
 
+export interface RentSchedule {
+  rentFrequency?: RentFrequency;
+  rentDueDay?: number;
+}
+
+/** When the rent after the rent due on a date falls due, or undefined for rent paid at some other frequency. */
+function nextDueDayNumber(dateDue: string, schedule: RentSchedule): number | undefined {
+  const day = toDayNumber(dateDue);
+  if (day === undefined) {
+    return undefined;
+  }
+  switch (schedule.rentFrequency) {
+    case 'MONTHLY':
+      return toDayNumber(
+        monthlyDueDate(
+          Number(dateDue.slice(0, 4)),
+          Number(dateDue.slice(5, 7)),
+          schedule.rentDueDay ?? Number(dateDue.slice(8, 10))
+        )
+      );
+    case 'WEEKLY':
+      return day + 7;
+    case 'FORTNIGHTLY':
+      return day + 14;
+    default:
+      return undefined;
+  }
+}
+
+/** The last day of the rent period that starts when rent is due: the day before the next rent is due. */
+export function rentPeriodEnd(dateDue: string | undefined, schedule: RentSchedule): string | undefined {
+  const next = dateDue ? nextDueDayNumber(dateDue, schedule) : undefined;
+  return next === undefined ? undefined : fromDayNumber(next - 1);
+}
+
 /**
  * The period a rent statement covers, read back from its rows when the dates the claimant gave are not to hand:
  * from the first period to the day before the period after the last one would have been due.
  */
 export function statementRangeOf(
   rows: CcdCollectionItem<RentTableRow>[] | undefined,
-  schedule: { rentFrequency?: RentFrequency; rentDueDay?: number }
+  schedule: RentSchedule
 ): StatementRange | undefined {
   const starts = (rows ?? [])
     .map(row => row.value.periodStart ?? '')
@@ -164,16 +194,7 @@ export function statementRangeOf(
   }
   const last = starts[starts.length - 1];
   const lastDay = toDayNumber(last) as number;
-  let nextDue: number;
-  if (schedule.rentFrequency === 'MONTHLY') {
-    const year = Number(last.slice(0, 4));
-    const monthIndex = Number(last.slice(5, 7));
-    nextDue = toDayNumber(monthlyDueDate(year, monthIndex, schedule.rentDueDay ?? Number(last.slice(8, 10)))) as number;
-  } else if (schedule.rentFrequency === 'WEEKLY' || schedule.rentFrequency === 'FORTNIGHTLY') {
-    nextDue = lastDay + (schedule.rentFrequency === 'WEEKLY' ? 7 : 14);
-  } else {
-    nextDue = lastDay + 1;
-  }
+  const nextDue = nextDueDayNumber(last, schedule) ?? lastDay + 1;
   return { statementStart: starts[0], statementEnd: fromDayNumber(Math.max(lastDay, nextDue - 1)) };
 }
 
@@ -265,41 +286,6 @@ export function removeRentTablePayment(
       : row
   );
   return nextIndex === -1 ? updated : updated.filter((_, i) => i !== nextIndex);
-}
-
-export interface LedgerLine {
-  entryIndex: number;
-  id?: string;
-  transactionDate?: string;
-  transactionTypes: TransactionType[];
-  description?: string;
-  amountCharged?: number;
-  amountPaid?: number;
-  arrears: number;
-}
-
-/** The ledger in date order (entries on the same date keep the order they were added in), with the arrears after each. */
-export function ledgerWithArrears(entries: CcdCollectionItem<RentLedgerEntry>[] | undefined): LedgerLine[] {
-  let arrears = 0;
-  return (entries ?? [])
-    .map((entry, entryIndex) => ({ entry: entry.value, entryIndex, id: entry.id ?? undefined }))
-    .sort((a, b) => (a.entry.transactionDate ?? '').localeCompare(b.entry.transactionDate ?? ''))
-    .map(({ entry, entryIndex, id }) => {
-      const types = entry.transactionTypes ?? [];
-      const amountCharged = types.includes('RENT_CHARGE') ? toPence(entry.amountCharged) : undefined;
-      const amountPaid = types.includes('TENANT_PAYMENT') ? toPence(entry.amountPaid) : undefined;
-      arrears += (amountCharged ?? 0) - (amountPaid ?? 0);
-      return {
-        entryIndex,
-        ...(id ? { id } : {}),
-        transactionDate: entry.transactionDate,
-        transactionTypes: types,
-        description: entry.description,
-        amountCharged,
-        amountPaid,
-        arrears,
-      };
-    });
 }
 
 /** Formats pence as pounds for display, e.g. 123456 as £1,234.56. */

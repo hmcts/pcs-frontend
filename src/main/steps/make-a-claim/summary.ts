@@ -6,11 +6,11 @@ import { formatCcdAddressLines } from '../utils/ccdAddress';
 
 import { readClaim } from './claimDraft';
 import { propertyAddressOf } from './claimMapping';
-import { usesLedger, usesTable } from './conditions';
+import { usesTable } from './conditions';
 import { formatClaimDate } from './dates';
 import { flowConfig } from './flow.config';
 import { formatPence } from './rentHistory';
-import { ledgerTable, rentStatementTable } from './rentTables';
+import { rentStatementTable } from './rentTables';
 
 import { getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
@@ -263,23 +263,17 @@ export function rentArrearsCard(req: Request): SummaryCard {
         ? [valueOf(t, 'rentFrequency', 'OTHER') ?? '', rentArrears.otherFrequencyDetails ?? '']
         : valueOf(t, 'rentFrequency', rentArrears.rentFrequency)
     )
-    .add('rent-due-day', 'rentDueDay', rentArrears.rentDueDay?.toString())
     .add('arrears-at-notice', 'arrearsAtNoticeDate', money(rentArrears.arrearsAtNoticeDate))
     .add('current-arrears', 'currentArrears', money(rentArrears.currentArrears))
     .add('arrears-proof', 'proofType', valueOf(t, 'proofType', rentArrears.proofType))
     .add('upload-rent-statement', 'rentStatementDocuments', documents(rentArrears.rentStatementDocuments))
+    .add('rent-due-day', 'rentDueDay', rentArrears.rentDueDay?.toString())
     .add('money-judgment', 'moneyJudgmentWanted', yesNo(t, rentArrears.moneyJudgmentWanted))
     .add('recovery-steps', 'recoverySteps', rentArrears.recoverySteps)
     .build();
   const caseId = req.res?.locals.validatedCase?.id;
   const card: SummaryCard = { id: 'rentArrears', title: t('makeAClaim:summary.cards.rentArrears'), rows };
-  if (usesLedger(req) && rentArrears.rentHistoryLedger?.length) {
-    card.table = ledgerTable(req, false);
-    card.tableChange = {
-      href: getStepUrl('ledger-summary', flowConfig, caseId),
-      text: t('makeAClaim:summary.changeStatement'),
-    };
-  } else if (usesTable(req) && rentArrears.rentHistoryTable?.length) {
+  if (usesTable(req) && rentArrears.rentHistoryTable?.length) {
     card.table = rentStatementTable(req, false);
     card.tableChange = {
       href: getStepUrl('rent-statement', flowConfig, caseId),

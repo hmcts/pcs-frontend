@@ -23,8 +23,6 @@ import { step as generalApplication } from './general-application';
 import { step as groundReason } from './ground-reason';
 import { step as individualOrOrganisation } from './individual-or-organisation';
 import { step as languageUsed } from './language-used';
-import { step as ledgerSummary } from './ledger-summary';
-import { step as ledgerTransaction } from './ledger-transaction';
 import { step as moneyJudgment } from './money-judgment';
 import { step as multipleClaimants } from './multiple-claimants';
 import { step as multipleClaimantsIneligible } from './multiple-claimants-ineligible';
@@ -41,7 +39,6 @@ import { step as otherInformation } from './other-information';
 import { step as otherReasons } from './other-reasons';
 import { step as recoverySteps } from './recovery-steps';
 import { step as removeDefendant } from './remove-defendant';
-import { step as removeLedgerEntry } from './remove-ledger-entry';
 import { step as rentAmount } from './rent-amount';
 import { step as rentArrears } from './rent-arrears';
 import { step as rentArrearsClaim } from './rent-arrears-claim';
@@ -109,8 +106,6 @@ export const stepRegistry: Record<string, StepDefinition> = {
   'current-arrears': currentArrears,
   'arrears-proof': arrearsProof,
   'upload-rent-statement': uploadRentStatement,
-  'ledger-transaction': ledgerTransaction,
-  'ledger-summary': ledgerSummary,
   'statement-period': statementPeriod,
   'rent-statement': rentStatement,
   'rent-statement-payment': rentStatementPayment,
@@ -132,6 +127,5 @@ export const stepRegistry: Record<string, StepDefinition> = {
   eligible,
   'task-list': taskList,
   'remove-defendant': removeDefendant,
-  'remove-ledger-entry': removeLedgerEntry,
   'multiple-claimants-ineligible': multipleClaimantsIneligible,
 };

@@ -171,7 +171,7 @@ let backend: http.Server | undefined;
 afterAll(() => backend?.close());
 
 export async function bootMakeAClaim(
-  options: { enabled?: boolean; email?: string; rentHistoryDesign?: unknown; signedIn?: boolean } = {}
+  options: { enabled?: boolean; email?: string; signedIn?: boolean } = {}
 ): Promise<TestApp> {
   ccd.stored = undefined;
   ccd.createRequests = [];
@@ -218,23 +218,16 @@ export async function bootMakeAClaim(
   new Nunjucks(false).enableFor(app);
   app.locals.nunjucksEnv.addGlobal('sessionTimeout', {});
   new I18n().enableFor(app);
-  // LaunchDarkly as the Test environment is set up: the journey on, and the table design for pl-table- users.
+  // LaunchDarkly as the Test environment is set up: the journey on.
   app.locals.launchDarklyClient = {
-    variation: async (flag: string, context: { email?: string }, fallback: unknown) => {
-      if (flag === 'private-landlord-make-a-claim-enabled') {
-        return options.enabled ?? true;
-      }
-      if (flag === 'private-landlord-rent-history-design') {
-        return options.rentHistoryDesign ?? (context.email?.includes('pl-table-') ? 'table' : 'ledger');
-      }
-      return fallback;
-    },
+    variation: async (flag: string, _context: unknown, fallback: unknown) =>
+      flag === 'private-landlord-make-a-claim-enabled' ? (options.enabled ?? true) : fallback,
   };
 
   const user = {
     uid: 'landlord-uid',
     sub: 'landlord-uid',
-    email: options.email ?? 'pl-ledger-0001@example.test',
+    email: options.email ?? 'pl-0001@example.test',
     roles: ['citizen'],
   };
   const session: Record<string, unknown> = {

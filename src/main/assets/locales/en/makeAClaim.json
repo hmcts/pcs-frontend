@@ -99,7 +99,6 @@
     },
     "proofType": {
       "UPLOAD_STATEMENT": "Upload a rent statement",
-      "LEDGER": "Enter the rent statement transactions",
       "TABLE": "Create a rent statement"
     },
     "languageUsed": {
@@ -178,7 +177,7 @@
       "noticeDocuments": "Notice",
       "rentAmount": "How much is the rent?",
       "rentFrequency": "How frequently should the rent be paid?",
-      "rentDueDay": "Day of the month the rent is due",
+      "rentDueDay": "Date of the month rent is due",
       "arrearsAtNoticeDate": "What were the rent arrears on the date you served the notice?",
       "currentArrears": "What are the rent arrears on today’s date?",
       "proofType": "Proof of rent arrears",
@@ -193,25 +192,10 @@
       "languageUsed": "Which language did you use to complete this claim?"
     }
   },
-  "ledgerTable": {
-    "caption": "Rent statement transactions",
-    "date": "Date",
-    "type": "Transaction type",
-    "description": "Description or reference",
-    "amountCharged": "Amount charged",
-    "amountPaid": "Amount paid",
-    "arrears": "Arrears",
-    "actions": "Actions",
-    "change": "Change",
-    "remove": "Remove",
-    "transaction": "transaction",
-    "types": {
-      "RENT_CHARGE": "Rent charge",
-      "TENANT_PAYMENT": "Tenant payment"
-    }
-  },
   "rentTable": {
     "caption": "Rent statement",
+    "period": "Period",
+    "periodRange": "{{start}} to {{end}}",
     "dateDue": "Date due",
     "amountDue": "Amount due",
     "datePaid": "Date paid",
@@ -220,8 +204,8 @@
     "actions": "Actions",
     "change": "Change",
     "addPayment": "Add a payment",
-    "paymentFor": "payment for rent due on",
-    "additionalPayment": "Additional payment"
+    "paymentIn": "in {{period}}",
+    "paymentPaidOn": "payment in {{period}} paid on {{datePaid}}"
   },
   "submitErrors": {
     "required": "Answer the question on ‘{{page}}’",
@@ -249,7 +233,6 @@
       "rent-arrears-grounds": "What are your rent arrears grounds for possession?",
       "rent-frequency": "How frequently should this amount be paid?",
       "recovery-steps": "What steps have you already taken to recover any arrears?",
-      "ledger-transaction": "Enter a rent statement transaction",
       "ground-reason": "Why are you making a claim on this ground?",
       "current-arrears": "How much are the rent arrears on today’s date?",
       "notice-served": "Have you served notice?",

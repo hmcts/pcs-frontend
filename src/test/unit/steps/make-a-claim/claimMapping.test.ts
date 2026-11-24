@@ -4,9 +4,8 @@ import type { CitizenPossessionClaim } from '../../../../main/services/citizenPo
 import {
   claimMappings,
   groundForReasonOf,
-  paymentDueDateLimitOf,
+  paymentDateLimitsOf,
   removeDefendant,
-  removeLedgerEntry,
   rentChangeExceedsLimit,
   rentStatementRange,
 } from '../../../../main/steps/make-a-claim/claimMapping';
@@ -17,7 +16,6 @@ const PROPERTY = { AddressLine1: '15 Garden Drive', PostTown: 'Luton', PostCode:
 
 function request(
   query: Record<string, string> = {},
-  rentHistoryDesign = 'ledger',
   citizenPossessionClaim: CitizenPossessionClaim = {},
   caseId = CASE
 ): Request {
@@ -26,7 +24,6 @@ function request(
     session: { user: { email: 'landlord@example.test' } },
     res: {
       locals: {
-        rentHistoryDesign,
         validatedCase: { id: caseId, data: { propertyAddress: PROPERTY, citizenPossessionClaim } },
       },
     },
@@ -357,53 +354,23 @@ describe('claim mappings', () => {
     });
   });
 
-  it('only takes a proof type the design offers', () => {
-    expect(roundTrip('arrears-proof', { proofType: 'TABLE' }).saved.rentArrears?.proofType).toBeUndefined();
-    expect(roundTrip('arrears-proof', { proofType: 'LEDGER' }).saved.rentArrears?.proofType).toBe('LEDGER');
+  it('takes upload, or create for rent paid weekly, fortnightly or monthly', () => {
+    expect(roundTrip('arrears-proof', { proofType: 'UPLOAD_STATEMENT' }).saved.rentArrears?.proofType).toBe(
+      'UPLOAD_STATEMENT'
+    );
+    expect(roundTrip('arrears-proof', { proofType: 'LEDGER' }).saved.rentArrears?.proofType).toBeUndefined();
     const monthly: CitizenPossessionClaim = { rentArrears: { rentFrequency: 'MONTHLY' } };
-    const table = request({}, 'table', monthly);
+    const table = request({}, monthly);
     expect(roundTrip('arrears-proof', { proofType: 'TABLE' }, monthly, table).saved.rentArrears?.proofType).toBe(
       'TABLE'
     );
-    const other = request({}, 'table', { rentArrears: { rentFrequency: 'OTHER' } });
+    const other = request({}, { rentArrears: { rentFrequency: 'OTHER' } });
     expect(roundTrip('arrears-proof', { proofType: 'TABLE' }, {}, other).saved.rentArrears?.proofType).toBeUndefined();
   });
 
-  it('counts a proof type from the other design as not answered', () => {
-    expect(claimMappings['arrears-proof'].isAnswered!({ rentArrears: { proofType: 'TABLE' } }, request())).toBe(false);
-  });
-
-  it('adds a ledger transaction and edits it in place', () => {
-    const body = {
-      transactionDate: { day: '1', month: '6', year: '2026' },
-      transactionTypes: ['RENT_CHARGE'],
-      'transactionTypes.amountCharged': '500',
-      'transactionTypes.amountPaid': '20',
-      description: 'June rent',
-    };
-    const added = roundTrip('ledger-transaction', body).saved;
-    expect(added.rentArrears?.rentHistoryLedger).toEqual([
-      {
-        id: expect.any(String),
-        value: {
-          transactionDate: '2026-06-01',
-          transactionTypes: ['RENT_CHARGE'],
-          description: 'June rent',
-          amountCharged: '50000',
-          amountPaid: undefined,
-        },
-      },
-    ]);
-    const { saved, form } = roundTrip(
-      'ledger-transaction',
-      { ...body, transactionTypes: ['TENANT_PAYMENT'] },
-      added,
-      request({ entry: '0' })
-    );
-    expect(saved.rentArrears?.rentHistoryLedger).toHaveLength(1);
-    expect(form).toMatchObject({ transactionTypes: ['TENANT_PAYMENT'], 'transactionTypes.amountPaid': '20.00' });
-    removeLedgerEntry(saved, 0);
-    expect(saved.rentArrears?.rentHistoryLedger).toEqual([]);
+  it('counts creating a rent statement as not answered once the rent is paid at some other frequency', () => {
+    const other: CitizenPossessionClaim = { rentArrears: { rentFrequency: 'OTHER', proofType: 'TABLE' } };
+    expect(claimMappings['arrears-proof'].isAnswered!(other, request({}, other))).toBe(false);
   });
 
   it('generates the rent statement from the period, then regenerates it when the rent changes', () => {
@@ -452,7 +419,7 @@ describe('claim mappings', () => {
     it('uses the dates given only for the claim they were given for', () => {
       const req = request();
       const { saved } = roundTrip('statement-period', period, monthly, req);
-      const otherClaim = request({}, 'ledger', {}, '1777027600019999');
+      const otherClaim = request({}, {}, '1777027600019999');
       otherClaim.session = req.session;
       expect(rentStatementRange({ rentArrears: { rentFrequency: 'WEEKLY' } }, otherClaim)).toBeUndefined();
       expect(rentStatementRange(saved, req)).toEqual({ statementStart: '2026-06-01', statementEnd: '2026-08-31' });
@@ -534,21 +501,25 @@ describe('claim mappings', () => {
   describe('payments on a rent statement', () => {
     const claim: CitizenPossessionClaim = {
       rentArrears: {
+        rentFrequency: 'MONTHLY',
+        rentDueDay: 1,
         rentHistoryTable: [
           { value: { periodStart: '2026-07-01', dateDue: '2026-07-01', amountDue: '100000' } },
           { value: { periodStart: '2026-06-01', dateDue: '2026-06-01', amountDue: '100000', amountPaid: '5000' } },
+          { value: { periodStart: '2026-08-01', dateDue: '2026-08-01', amountDue: '100000' } },
         ],
       },
     };
 
-    it('takes a payment made before the rent was due only on the first period', () => {
-      expect(paymentDueDateLimitOf(request({ period: '2026-06-01' }), claim)).toBeUndefined();
-      expect(paymentDueDateLimitOf(request({ period: '2026-07-01' }), claim)).toBe('2026-07-01');
+    it('takes a payment made in the period, or before the first or after the last', () => {
+      expect(paymentDateLimitsOf(request({ period: '2026-06-01' }), claim)).toEqual({ latest: '2026-06-30' });
+      expect(paymentDateLimitsOf(request({ period: '2026-07-01' }), claim)).toEqual({
+        earliest: '2026-07-01',
+        latest: '2026-07-31',
+      });
+      expect(paymentDateLimitsOf(request({ period: '2026-08-01' }), claim)).toEqual({ earliest: '2026-08-01' });
+      expect(paymentDateLimitsOf(request({ period: '2026-09-01' }), claim)).toEqual({});
     });
-  });
-
-  it('adds no ledger entry for a transaction page saved for later empty', () => {
-    expect(roundTrip('ledger-transaction', { transactionTypes: [] }).saved).toEqual({});
   });
 
   it('removes an item by its id, so repeating the removal changes nothing', () => {
@@ -558,12 +529,6 @@ describe('claim mappings', () => {
         { id: 'second', value: { nameKnown: 'YES' } },
         { id: 'third', value: { nameKnown: 'YES' } },
       ],
-      rentArrears: {
-        rentHistoryLedger: [
-          { id: 'june', value: {} },
-          { id: 'july', value: {} },
-        ],
-      },
     };
     const once = roundTrip('remove-defendant', { confirmRemove: 'yes' }, claim, request({ id: 'second' })).saved;
     expect(once.defendants?.map(item => item.id)).toEqual(['first', 'third']);
@@ -575,8 +540,6 @@ describe('claim mappings', () => {
     expect(roundTrip('remove-defendant', { confirmRemove: 'yes' }, claim, request({ index: '1' })).saved).toEqual(
       claim
     );
-    const ledger = roundTrip('remove-ledger-entry', { confirmRemove: 'yes' }, claim, request({ id: 'june' })).saved;
-    expect(ledger.rentArrears?.rentHistoryLedger?.map(item => item.id)).toEqual(['july']);
   });
 
   it('keeps an unreadable date or amount as the saved one, and a cleared answer cleared', () => {
@@ -589,10 +552,9 @@ describe('claim mappings', () => {
     ).toBe(UNREADABLE);
   });
 
-  it('removes a defendant after the first, and a ledger entry, only when confirmed', () => {
+  it('removes a defendant after the first only when confirmed', () => {
     const claim: CitizenPossessionClaim = {
       defendants: [{ value: { nameKnown: 'NO' } }, { value: { nameKnown: 'YES' } }],
-      rentArrears: { rentHistoryLedger: [{ value: { transactionDate: '2026-06-01' } }] },
     };
     expect(roundTrip('remove-defendant', { confirmRemove: 'no' }, claim, request({ index: '1' })).saved).toEqual(claim);
     expect(
@@ -601,10 +563,6 @@ describe('claim mappings', () => {
     expect(
       roundTrip('remove-defendant', { confirmRemove: 'yes' }, claim, request({ index: '0' })).saved.defendants
     ).toHaveLength(2);
-    expect(
-      roundTrip('remove-ledger-entry', { confirmRemove: 'yes' }, claim, request({ entry: '0' })).saved.rentArrears
-        ?.rentHistoryLedger
-    ).toEqual([]);
   });
 
   it('records a payment against a rent period and edits it by row', () => {
