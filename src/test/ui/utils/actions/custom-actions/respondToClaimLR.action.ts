@@ -51,7 +51,12 @@ import {
   writtenTerms,
   yourCircumstances,
 } from '../../../data/page-data/lr-page-data';
-import { formatCurrency, formatPoundsValue, formatTextToLowercaseSeparatedBySpace } from '../../common/string.utils';
+import {
+  extractFrequencyUnit,
+  formatCurrency,
+  formatPoundsValue,
+  formatTextToLowercaseSeparatedBySpace,
+} from '../../common/string.utils';
 import { performAction, performActions, performValidation } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
@@ -688,7 +693,7 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       await performAction('clickRadioButton', frequency);
       selectedRegularIncomeEntries.push([
         this.getRtcCyaChoiceLabel(option),
-        this.buildRtcCyaAmountAndFrequencyValue(value, frequency, 'received every'),
+        this.buildRtcCyaAmountAndFrequencyValue(value, extractFrequencyUnit(String(frequency)), 'received every'),
       ]);
     }
     this.recordRtcCyaHeadingWithItems(regularIncomeQuestionLabel, selectedRegularIncomeEntries);
@@ -719,7 +724,6 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         'paid every'
       )
     );
-    this.deleteAnswer(priorityDebtDetails.paidEveryParagraph);
     await performAction(
       'inputText',
       priorityDebtDetails.whatIsTheTotalAmountQuestion,
@@ -731,7 +735,6 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
       priorityDebtDetailsData.payAmount
     );
     await performAction('clickRadioButton', {
-      question: priorityDebtDetails.paidEveryParagraph,
       option: priorityDebtDetailsData.option,
     });
     await performAction('clickButton', priorityDebtDetails.saveAndContinueButton);
@@ -772,7 +775,10 @@ export class RespondToClaimLRAction extends RespondToClaimAction implements IAct
         option === whatOtherRegularExpensesDoYouHave.otherExpensesParagraph
           ? 'Other expenses'
           : this.getRtcCyaChoiceLabel(option);
-      selectedRegularExpenseEntries.push([mappedCyaLabel, this.buildRtcCyaAmountAndFrequencyValue(value, frequency)]);
+      selectedRegularExpenseEntries.push([
+        mappedCyaLabel,
+        this.buildRtcCyaAmountAndFrequencyValue(value, extractFrequencyUnit(String(frequency))),
+      ]);
     }
     this.recordRtcCyaHeadingWithItems(regularExpensesQuestionLabel, selectedRegularExpenseEntries);
     await performAction('clickButton', whatOtherRegularExpensesDoYouHave.saveAndContinueButton);
