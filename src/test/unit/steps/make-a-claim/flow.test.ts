@@ -30,7 +30,7 @@ describe('before the claim exists', () => {
     ['trespass', { isTrespass: 'yes' }, 'trespass-ineligible'],
     ['trespass', { isTrespass: 'no' }, 'property-address'],
     ['property-address', {}, 'who-is-claiming'],
-    ['who-is-claiming', { whoIsClaiming: 'AGENT' }, 'not-litigant-in-person'],
+    ['who-is-claiming', { whoIsClaiming: 'AGENT' }, 'agent-ineligible'],
     ['property-country', { legislativeCountry: 'Wales' }, 'wales-claimant-type'],
     ['property-country', { legislativeCountry: 'England' }, 'who-is-claiming'],
     ['wales-claimant-type', { walesClaimantType: 'PRIVATE_LANDLORD' }, 'who-is-claiming'],
@@ -85,16 +85,12 @@ describe('the claim journey', () => {
     ['notice-available', { notice: { noticeServed: 'YES', noticeAvailable: 'NO' } }, 'notice-cya'],
     ['notice-cya', { grounds: { hasRentArrearsGrounds: 'YES' } }, 'rent-arrears'],
     ['notice-cya', { grounds: { hasRentArrearsGrounds: 'NO' } }, 'circumstances'],
-    [
-      'rent-frequency',
-      { rentArrears: { rentFrequency: 'MONTHLY' }, notice: { noticeServed: 'YES' } },
-      'arrears-at-notice',
-    ],
-    [
-      'rent-frequency',
-      { rentArrears: { rentFrequency: 'MONTHLY' }, notice: { noticeServed: 'NO' } },
-      'current-arrears',
-    ],
+    ['rent-arrears', { notice: { noticeServed: 'YES' } }, 'arrears-at-notice'],
+    ['rent-arrears', { notice: { noticeServed: 'NO' } }, 'current-arrears'],
+    ['arrears-at-notice', { notice: { noticeServed: 'YES' } }, 'current-arrears'],
+    ['current-arrears', {}, 'rent-amount'],
+    ['rent-amount', {}, 'rent-frequency'],
+    ['rent-frequency', { rentArrears: { rentFrequency: 'MONTHLY' }, notice: { noticeServed: 'YES' } }, 'arrears-proof'],
     ['arrears-proof', { rentArrears: { proofType: 'UPLOAD_STATEMENT' } }, 'upload-rent-statement'],
     ['upload-rent-statement', { rentArrears: { proofType: 'UPLOAD_STATEMENT' } }, 'money-judgment'],
     ['claimant-circumstances', {}, 'situation-cya'],
@@ -108,7 +104,7 @@ describe('the claim journey', () => {
       rentArrears: { rentFrequency: 'MONTHLY', proofType: 'TABLE' },
       notice: { noticeServed: 'NO' },
     };
-    await expect(next(monthly, 'rent-frequency')).resolves.toBe('current-arrears');
+    await expect(next(monthly, 'rent-frequency')).resolves.toBe('arrears-proof');
     await expect(next(monthly, 'arrears-proof')).resolves.toBe('rent-due-day');
     await expect(next(monthly, 'rent-due-day')).resolves.toBe('statement-period');
     const weekly: CitizenPossessionClaim = { rentArrears: { rentFrequency: 'WEEKLY', proofType: 'TABLE' } };

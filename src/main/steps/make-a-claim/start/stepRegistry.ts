@@ -1,3 +1,4 @@
+import { step as agentIneligible } from './agent-ineligible';
 import { step as claimantType } from './claimant-type';
 import { step as notLitigantInPerson } from './not-litigant-in-person';
 import { step as notPrivateLandlord } from './not-private-landlord';
@@ -23,5 +24,6 @@ export const startStepRegistry: Record<string, StepDefinition> = {
   'wales-claimant-type': walesClaimantType,
   'who-is-claiming': whoIsClaiming,
   'not-litigant-in-person': notLitigantInPerson,
+  'agent-ineligible': agentIneligible,
   'property-country': propertyCountry,
 };

@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import { readClaim } from './claimDraft';
 
 import type { SectionConfig } from '@modules/steps/stepFlow.interface';
+import { claimsRentArrears } from '@services/citizenPossessionClaim.interface';
 
 export const MAKE_A_CLAIM_SECTION_GROUPS = [
   { id: 'yourClaim', titleKey: 'taskList.groups.yourClaim' },
@@ -76,10 +77,10 @@ export const makeAClaimSections: readonly SectionConfig[] = [
     titleKey: 'taskList.sections.rentArrears',
     steps: [
       'rent-arrears',
-      'rent-amount',
-      'rent-frequency',
       'arrears-at-notice',
       'current-arrears',
+      'rent-amount',
+      'rent-frequency',
       'arrears-proof',
       'upload-rent-statement',
       'rent-due-day',
@@ -90,7 +91,7 @@ export const makeAClaimSections: readonly SectionConfig[] = [
       'recovery-steps',
       'arrears-cya',
     ],
-    isApplicable: async (req: Request) => readClaim(req).grounds?.hasRentArrearsGrounds === 'YES',
+    isApplicable: async (req: Request) => claimsRentArrears(readClaim(req)),
   },
   {
     id: 'circumstances',

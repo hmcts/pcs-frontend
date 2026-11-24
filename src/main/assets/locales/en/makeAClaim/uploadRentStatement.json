@@ -1,12 +1,35 @@
 {
   "pageTitle": "Upload rent statement",
   "heading": "Upload rent statement",
-  "paragraphs": [
-    "You must upload a document that follows the guidelines given on the previous page.",
-    "You must bring a paper copy of the latest rent statement to the hearing."
+  "contentBlocks": [
+    {
+      "text": "You must upload a rent statement so the court and the defendant can see the amount of rent arrears you are claiming"
+    },
+    {
+      "text": "The rent statement must show:"
+    },
+    {
+      "bullets": ["the dates and amounts of all missed payments", "a running total of the rent arrears"]
+    },
+    {
+      "text": "You must upload 2 rent statements"
+    },
+    {
+      "text": "<strong>1. Upload your rent statement now:</strong> Upload the rent statement that is up to date today."
+    },
+    {
+      "text": "<strong>2. Upload an updated statement:</strong> You must upload an updated rent statement the day before the hearing. It must include any new payments or arrears that have happened since your first statement."
+    },
+    {
+      "text": "The court will use your updated statement to make sure it has the most up to date information about the rent arrears you are claiming."
+    },
+    {
+      "heading": "Before you upload your documents"
+    },
+    {
+      "text": "Give your document a name that explains what it is. For example, ‘Rent statement up to 16 May 2025’."
+    }
   ],
-  "beforeUploadHeading": "Before you upload your file",
-  "beforeUploadText": "Give your file a name that explains what it is. For example, 'Rent statement for 15 Garden Drive'",
   "uploadLabel": "Upload rent statement",
   "uploadButton": "Upload file",
   "filesAddedHeading": "Files added",

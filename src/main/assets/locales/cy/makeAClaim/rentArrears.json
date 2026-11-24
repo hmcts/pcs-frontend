@@ -3,9 +3,9 @@
   "heading": "cyProof of rent arrears",
   "paragraphs": ["cyAs your claim is on the grounds of rent arrears, you must now answer questions about:"],
   "bullets": [
-    "cyhow much the rent is and how frequently it should be paid",
     "cyhow much the arrears were on the date you served notice, if you served notice",
-    "cyhow much the rent arrears are on today’s date"
+    "cyhow much the rent arrears are on today’s date",
+    "cyhow much the rent is and how frequently it should be paid"
   ],
   "contentBlocks": [
     {

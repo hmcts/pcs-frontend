@@ -15,6 +15,7 @@ import {
   NOTICE_METHOD_DETAILS,
   type NoticeMethod,
   OTHER_GROUND,
+  claimsRentArrears,
 } from '@services/citizenPossessionClaim.interface';
 
 export const MAKE_A_CLAIM_EVENT_ID = 'citizenMakePossessionClaim';
@@ -93,7 +94,9 @@ export function normaliseClaim(claim: CitizenPossessionClaim): CitizenPossession
   if (grounds?.hasRentArrearsGrounds === 'NO') {
     delete grounds.rentArrearsGrounds;
     delete grounds.hasOtherGrounds;
-    delete normalised.rentArrears;
+    if (!claimsRentArrears(normalised)) {
+      delete normalised.rentArrears;
+    }
   }
   const { rentArrears } = normalised;
   if (grounds?.otherGrounds && !grounds.otherGrounds.includes(OTHER_GROUND)) {

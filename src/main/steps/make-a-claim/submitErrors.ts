@@ -73,15 +73,12 @@ const ANSWER_REFUSAL = /^(REQUIRED|TOO_LONG):([A-Za-z]+(?:\[\d+\])?(?:\.[A-Za-z0
 
 export const DRAFT_CHANGED = 'DRAFT_CHANGED';
 
-const OTHER_GROUND_NOT_ALLOWED = 'OTHER_GROUND_NOT_ALLOWED';
-
 const RENT_ARREARS_GROUND_NOT_ALLOWED = 'RENT_ARREARS_GROUND_NOT_ALLOWED';
 
 const MESSAGE_REFUSALS = [
   'DRAFT_NOT_FOUND',
   DRAFT_CHANGED,
   'PAYMENT_SERVICE_UNAVAILABLE',
-  OTHER_GROUND_NOT_ALLOWED,
   RENT_ARREARS_GROUND_NOT_ALLOWED,
 ];
 
@@ -161,12 +158,6 @@ export function submitErrorItems(req: Request, codes: string[]): ErrorSummaryIte
     }
     if (code === DRAFT_CHANGED) {
       return { text: t('makeAClaim:submitErrors.draftChanged') };
-    }
-    if (code === OTHER_GROUND_NOT_ALLOWED) {
-      return {
-        text: t('makeAClaim:submitErrors.otherGroundNotAllowed'),
-        href: answerUrl('other-grounds', caseId),
-      };
     }
     if (code === RENT_ARREARS_GROUND_NOT_ALLOWED) {
       return {

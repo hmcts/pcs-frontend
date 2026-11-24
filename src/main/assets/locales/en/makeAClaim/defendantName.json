@@ -1,6 +1,7 @@
 {
   "pageTitle": "Do you know the defendant’s name?",
-  "question": "Do you know the defendant’s name?",
+  "question": "Do you know the {{next}}defendant’s name?",
+  "nextDefendant": "next ",
   "hint": "If you do not know their name, the claim will be made against ‘persons unknown’.",
   "labels": {
     "firstName": "First name",
@@ -10,5 +11,6 @@
     "nameKnown": "Select whether you know the defendant’s name",
     "firstName": "Enter the defendant’s first name",
     "lastName": "Enter the defendant’s last name"
-  }
+  },
+  "nextPageTitle": "Do you know the next defendant’s name?"
 }

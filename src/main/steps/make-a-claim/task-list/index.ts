@@ -19,6 +19,15 @@ import { formatCaseReferenceForDisplay } from '@utils/caseReference';
 const stepName = 'task-list';
 const VIEW = 'make-a-claim/templates/taskList.njk';
 
+const HELP_LINKS = [
+  { key: 'fees', href: 'https://www.gov.uk/get-help-with-court-fees' },
+  { key: 'mediation', href: 'https://www.gov.uk/guidance/a-guide-to-civil-mediation' },
+  { key: 'hearing', href: 'https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal' },
+  { key: 'representYourself', href: 'https://www.gov.uk/represent-yourself-in-court' },
+  { key: 'findLegalAdvice', href: 'https://www.gov.uk/find-legal-advice' },
+  { key: 'findCourt', href: 'https://www.gov.uk/find-court-tribunal' },
+] as const;
+
 const stepNavigation = createStepNavigation(() => flowConfig);
 
 interface TaskListItem {
@@ -64,6 +73,8 @@ export const step: StepDefinition = {
         propertyAddress: formatCcdAddress({ ...propertyAddressOf(req), Country: undefined }),
         caseNumber: formatCaseReferenceForDisplay(validatedCase?.id ?? ''),
         groups: await buildGroups(req, t),
+        helpAndSupportHeading: t('taskList.helpAndSupport.heading'),
+        helpLinks: HELP_LINKS.map(({ key, href }) => ({ text: t(`taskList.helpAndSupport.${key}`), href })),
       };
     }),
 };

@@ -61,8 +61,33 @@ export const DISCRETIONARY_OTHER_GROUNDS = [
   'GROUND_18',
 ] as const;
 
+/** The mandatory grounds the grounds page lists: the other mandatory grounds, then Ground 8. */
+export const MANDATORY_GROUNDS_LISTED = [...MANDATORY_OTHER_GROUNDS, 'GROUND_8'] as const;
+
+/** The discretionary grounds the grounds page lists, with Grounds 10 and 11 in their place after Ground 9. */
+export const DISCRETIONARY_GROUNDS_LISTED = [
+  'GROUND_9',
+  'GROUND_10',
+  'GROUND_11',
+  ...DISCRETIONARY_OTHER_GROUNDS.slice(1),
+] as const;
+
 export type OtherGround =
-  (typeof MANDATORY_OTHER_GROUNDS)[number] | (typeof DISCRETIONARY_OTHER_GROUNDS)[number] | typeof OTHER_GROUND;
+  | (typeof MANDATORY_OTHER_GROUNDS)[number]
+  | (typeof DISCRETIONARY_OTHER_GROUNDS)[number]
+  | RentArrearsGround
+  | typeof OTHER_GROUND;
+
+export const isRentArrearsGround = (ground: string | undefined): boolean =>
+  (RENT_ARREARS_GROUNDS as readonly string[]).includes(ground ?? '');
+
+/** Whether the claim is on a rent arrears ground, chosen on the rent arrears question or on the grounds list. */
+export function claimsRentArrears(claim: CitizenPossessionClaim): boolean {
+  return (
+    claim.grounds?.hasRentArrearsGrounds === 'YES' ||
+    (claim.grounds?.otherGrounds ?? []).some(ground => isRentArrearsGround(ground))
+  );
+}
 
 /** The grounds that need no reason: the rent arrears ones, and other grounds, which have their own details. */
 const GROUNDS_WITHOUT_REASON: readonly string[] = [...RENT_ARREARS_GROUNDS, OTHER_GROUND];

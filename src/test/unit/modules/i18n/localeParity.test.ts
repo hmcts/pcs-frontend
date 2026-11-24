@@ -372,6 +372,7 @@ const AWAITING_TRANSLATION = new Set<string>([
   'makeAClaim/walesClaimantType.json',
   'makeAClaim/whoIsClaiming.json',
   'makeAClaim/notLitigantInPerson.json',
+  'makeAClaim/agentIneligible.json',
   'makeAClaim/eligible.json',
   'makeAClaim/taskList.json',
   'makeAClaim/yourDetails.json',

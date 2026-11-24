@@ -27,6 +27,12 @@
       "selectAddressError": "Select an address"
     }
   },
+  "groundsOnList": {
+    "GROUND_8": "Rent arrears (Ground 8)",
+    "GROUND_10": "Any rent arrears (Ground 10)",
+    "GROUND_11": "Persistent arrears (Ground 11)",
+    "OTHER": "Others"
+  },
   "grounds": {
     "GROUND_1": "Occupation by landlord or family (Ground 1)",
     "GROUND_1A": "Sale of dwelling house (Ground 1A)",
@@ -133,6 +139,15 @@
       "IN_PROGRESS": "In progress",
       "DONE": "Done",
       "NOT_AVAILABLE_YET": "Not available yet"
+    },
+    "helpAndSupport": {
+      "heading": "Help and support",
+      "fees": "Help with fees",
+      "mediation": "Find out about mediation",
+      "hearing": "What to expect at a hearing",
+      "representYourself": "Represent myself at a hearing",
+      "findLegalAdvice": "Find legal advice",
+      "findCourt": "Find information about my court"
     }
   },
   "summary": {
@@ -141,6 +156,9 @@
     "changeStatement": "Change the rent statement",
     "notAnswered": "No answer provided",
     "personsUnknown": "Persons unknown",
+    "theDefendant": "the defendant",
+    "nextDefendant": "next ",
+    "addressNotAnswered": "Not answered",
     "propertyCannotChange": "You cannot change the property once the claim has been started. If it is wrong, start a new claim.",
     "problem": "There is a problem",
     "cards": {
@@ -151,7 +169,9 @@
       "notice": "About the notice you served",
       "rentArrears": "Proof of rent arrears",
       "circumstances": "Circumstances",
-      "otherInformation": "Other information"
+      "uploadDocuments": "Upload documents",
+      "otherInformation": "Other information",
+      "languageUsed": "Language used"
     },
     "labels": {
       "individualOrOrganisation": "Are you claiming as an individual or a registered company?",
@@ -162,8 +182,9 @@
       "contactByPhone": "Do you want to be contacted by telephone?",
       "contactByText": "Do you want to be contacted by text message?",
       "multipleClaimants": "Do you want to add another claimant?",
-      "defendantName": "Defendant {{number}} name",
-      "defendantAddress": "Defendant {{number}} address for service",
+      "moreThanOneAdult": "Is there more than one adult in possession of the property?",
+      "defendantName": "Do you know the {{next}}defendant’s name?",
+      "defendantAddress": "Is {{name}}’s address for service {{address}}?",
       "additionalDefendants": "Do you need to add another defendant?",
       "tenancyType": "What type of tenancy or licence is in place, or was in place?",
       "tenancyStartDate": "When did the tenancy or licence begin?",
@@ -182,22 +203,32 @@
       "noticeServed": "Have you served notice?",
       "noticeType": "Which type of notice did you serve?",
       "noticeMethods": "How did you serve notice?",
-      "noticeAvailable": "Can you upload a copy of the notice?",
+      "noticeAvailable": "Can you upload a copy of the notice you served?",
       "noticeDocuments": "Notice",
+      "postedDate": "When was the notice posted?",
+      "deliveredDate": "When was the notice delivered?",
+      "handedToName": "Who was the notice left with?",
+      "handedDate": "When was the notice handed over?",
+      "emailedTo": "What email address was the notice sent to?",
+      "emailedDate": "When was the email sent?",
+      "otherElectronicDetails": "How was the notice served by other electronic method?",
+      "otherElectronicDate": "When was the notice sent?",
+      "otherMethodDetails": "How did you serve the notice?",
+      "otherMethodDate": "When was the notice served?",
       "rentAmount": "How much is the rent?",
       "rentFrequency": "How frequently should the rent be paid?",
-      "rentDueDay": "Date of the month rent is due",
+      "rentDueDay": "Which date of the month is rent due?",
       "arrearsAtNoticeDate": "What were the rent arrears on the date you served the notice?",
       "currentArrears": "What are the rent arrears on today’s date?",
-      "proofType": "Proof of rent arrears",
-      "rentStatementDocuments": "Rent statement",
-      "moneyJudgmentWanted": "Do you want a money judgment for the rent arrears?",
-      "recoverySteps": "Steps taken to recover the arrears",
+      "proofType": "How do you want to provide proof of rent arrears?",
+      "rentStatementDocuments": "Upload rent statement",
+      "moneyJudgmentWanted": "Do you want the court to make a money judgment for the outstanding rent arrears?",
+      "recoverySteps": "What steps have you already taken to recover any arrears?",
       "defendantCircumstances": "Provide information about the defendants’ circumstances (optional)",
       "claimantCircumstances": "Provide information about your circumstances (optional)",
       "otherDocuments": "Upload files (optional)",
       "hasOtherReasons": "Is there any other information you want to provide about your reasons for possession?",
-      "generalApplicationIntent": "Do you need to make a general application?",
+      "generalApplicationIntent": "Do you need to make a general application before the court schedules a hearing?",
       "languageUsed": "Which language did you use to complete this claim?"
     }
   },
@@ -222,7 +253,6 @@
     "checkAnswers": "Some of your answers are missing. Check each section of your claim",
     "draftNotFound": "We could not find your saved answers. Start your claim again",
     "draftChanged": "Your claim was changed in another tab or window. Check your answers below, then submit your claim again",
-    "otherGroundNotAllowed": "Choose rent arrears grounds on the rent arrears question, not as other grounds",
     "paymentServiceUnavailable": "Your claim could not be submitted because a service we need is not available. Try again later",
     "failed": "Your claim could not be submitted. Try again",
     "pages": {
@@ -282,16 +312,10 @@
     "paymentDeclined": "Your card was declined. You have not been charged. Try again or use a different card."
   },
   "claimSubmitted": {
-    "pageTitle": "Your payment was successful",
     "panelTitle": "Your payment was successful",
     "pendingTitle": "Your payment is being processed",
     "panelText": "Your case number<br><strong>{{caseNumber}}</strong>",
-    "submittedIntro": [
-      "Your possession claim has been submitted. We’ve sent you a confirmation email.",
-      "If you need to submit a general application as part of this claim, you must do it within 24 hours.",
-      "You can submit a general application by selecting ‘Ask the court to make an order (make a general application)’ on your case overview.",
-      "If you need support to use HMCTS services, either before or during a hearing, you must let us know as soon as possible."
-    ],
+    "submittedIntro": ["Your possession claim has been submitted. We’ve sent you a confirmation email."],
     "whatHappensNextHeading": "What happens next",
     "whatHappensNext": [
       "The claim will be sent to the defendants and they can respond.",
@@ -300,6 +324,18 @@
     "claimFormHeading": "Your claim form",
     "claimFormText": "Your claim form will be ready a few minutes after your payment has gone through. You can view it with the documents you uploaded.",
     "claimFormLink": "View your claim form",
-    "feedbackLink": "What did you think of this service? (opens in new tab)"
+    "feedbackLink": "What did you think of this service? (opens in new tab)",
+    "submittedTitle": "Claim submitted",
+    "paymentReference": "Your payment reference number is <strong>{{paymentReference}}</strong>",
+    "generalApplicationAndSupport": [
+      "If you need to submit a general application as part of this claim, you must do it within 24 hours.",
+      "You can submit a general application by selecting ‘Ask the court to make an order (make a general application)’ on your case overview.",
+      "If you need <a class=\"govuk-link\" href=\"https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\">support to use HMCTS services (opens in a new tab)</a>, either before or during a hearing, you must let us know as soon as possible."
+    ],
+    "paymentSummaryHeading": "Payment summary",
+    "paymentForLabel": "Payment for",
+    "claimFeeName": "Claim fee",
+    "totalAmountLabel": "Total amount",
+    "closeButton": "Close and return to case overview"
   }
 }

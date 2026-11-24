@@ -1,6 +1,9 @@
 import type { Request } from 'express';
 
-import type { CitizenPossessionClaim } from '../../../../main/services/citizenPossessionClaim.interface';
+import {
+  type CitizenPossessionClaim,
+  groundsNeedingReasons,
+} from '../../../../main/services/citizenPossessionClaim.interface';
 import {
   claimMappings,
   groundForReasonOf,
@@ -229,28 +232,68 @@ describe('claim mappings', () => {
   it('saves the grounds as pcs-api’s codes, splitting other grounds back into their groups', () => {
     const { saved, form } = roundTrip('other-grounds', {
       mandatoryGrounds: ['GROUND_1A', 'GROUND_99', 'OTHER'],
+      'mandatoryGrounds.otherGroundsDetails': 'Subletting',
       discretionaryGrounds: 'GROUND_14',
-      otherGround: ['OTHER'],
-      'otherGround.otherGroundsDetails': 'Subletting',
     });
     expect(saved.grounds).toMatchObject({
       otherGrounds: ['GROUND_1A', 'GROUND_14', 'OTHER'],
       otherGroundsDetails: 'Subletting',
     });
     expect(form).toEqual({
-      mandatoryGrounds: ['GROUND_1A'],
-      discretionaryGrounds: ['GROUND_14'],
-      otherGround: ['OTHER'],
-      'otherGround.otherGroundsDetails': 'Subletting',
+      mandatoryGrounds: ['GROUND_1A', 'OTHER'],
+      'mandatoryGrounds.otherGroundsDetails': 'Subletting',
+      discretionaryGrounds: ['GROUND_14', 'OTHER'],
+      'discretionaryGrounds.otherGroundsDetails': 'Subletting',
     });
+  });
+
+  it('keeps the details of Others ticked in both groups once each, and drops them when it is unticked', () => {
+    const both = roundTrip('other-grounds', {
+      mandatoryGrounds: ['OTHER'],
+      'mandatoryGrounds.otherGroundsDetails': 'Subletting',
+      discretionaryGrounds: ['OTHER'],
+      'discretionaryGrounds.otherGroundsDetails': 'Subletting',
+    }).saved;
+    expect(both.grounds?.otherGroundsDetails).toBe('Subletting');
+    const different = roundTrip('other-grounds', {
+      mandatoryGrounds: ['OTHER'],
+      'mandatoryGrounds.otherGroundsDetails': 'Subletting',
+      discretionaryGrounds: ['OTHER'],
+      'discretionaryGrounds.otherGroundsDetails': 'Pets',
+    }).saved;
+    expect(different.grounds?.otherGroundsDetails).toBe('Subletting\nPets');
+    const unticked = roundTrip('other-grounds', { mandatoryGrounds: ['GROUND_1A'] }, both).saved;
+    expect(unticked.grounds?.otherGrounds).toEqual(['GROUND_1A']);
+    expect(unticked.grounds?.otherGroundsDetails).toBeUndefined();
+  });
+
+  it('keeps the rent arrears grounds ticked on the grounds page apart when the claimant is owed rent', () => {
+    const owed: CitizenPossessionClaim = {
+      grounds: { hasRentArrearsGrounds: 'YES', rentArrearsGrounds: ['GROUND_8'] },
+    };
+    const { saved, form } = roundTrip(
+      'other-grounds',
+      { mandatoryGrounds: ['GROUND_8', 'GROUND_1A'], discretionaryGrounds: ['GROUND_10'] },
+      owed
+    );
+    expect(saved.grounds).toMatchObject({ rentArrearsGrounds: ['GROUND_8', 'GROUND_10'], otherGrounds: ['GROUND_1A'] });
+    expect(form).toMatchObject({ mandatoryGrounds: ['GROUND_1A', 'GROUND_8'], discretionaryGrounds: ['GROUND_10'] });
+  });
+
+  it('files the rent arrears grounds with the other grounds when the claimant said they are not owed rent', () => {
+    const { saved } = roundTrip(
+      'other-grounds',
+      { discretionaryGrounds: ['GROUND_11'] },
+      { grounds: { hasRentArrearsGrounds: 'NO' } }
+    );
+    expect(saved.grounds?.otherGrounds).toEqual(['GROUND_11']);
+    expect(groundsNeedingReasons(saved.grounds)).toEqual([]);
   });
 
   describe('ground reasons', () => {
     const chosen = roundTrip('other-grounds', {
       mandatoryGrounds: ['GROUND_1A', 'GROUND_2'],
       discretionaryGrounds: ['GROUND_14'],
-      otherGround: ['OTHER'],
-      'otherGround.otherGroundsDetails': 'Subletting',
     }).saved;
 
     it('asks for a reason for every chosen ground but the rent arrears ones and other grounds, first one first', () => {
@@ -662,9 +705,15 @@ describe('claim mappings', () => {
   });
 
   it('keeps an optional answer the claimant left blank as answered', () => {
-    const { saved, answered } = roundTrip('recovery-steps', { recoverySteps: '   ' });
-    expect(saved.rentArrears?.recoverySteps).toBe('');
+    const { saved, answered } = roundTrip('defendant-circumstances', { defendantCircumstances: '   ' });
+    expect(saved.circumstances?.defendantCircumstances).toBe('');
     expect(answered).toBe(true);
+  });
+
+  it('leaves the steps taken to recover the arrears unanswered when blank', () => {
+    const { saved, answered } = roundTrip('recovery-steps', { recoverySteps: '   ' });
+    expect(saved.rentArrears?.recoverySteps).toBeUndefined();
+    expect(answered).toBe(false);
   });
 
   it('marks the other files page visited even without an upload', () => {

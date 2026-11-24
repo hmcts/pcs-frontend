@@ -109,6 +109,12 @@ async function cardPaymentSucceeded(req: Request, caseReference: string): Promis
   }
 }
 
+/** The panel title the claim submitted page shows for each payment status its URL carries. */
+const SUBMITTED_PANEL_TITLES = new Map([
+  ['success', 'panelTitle'],
+  ['pending', 'pendingTitle'],
+]);
+
 /** The message the pay page shows for each way a payment did not go through. */
 const PAYMENT_PROBLEMS = new Map([
   ['failed', 'paymentFailed'],
@@ -215,22 +221,35 @@ function registerSubmittedClaimRoutes(app: Application): void {
       const content = pageContent(
         req,
         [
-          'pageTitle',
           'submittedIntro',
+          'generalApplicationAndSupport',
           'whatHappensNextHeading',
           'whatHappensNext',
+          'paymentSummaryHeading',
+          'paymentForLabel',
+          'claimFeeName',
+          'totalAmountLabel',
           'claimFormHeading',
           'claimFormText',
           'claimFormLink',
           'feedbackLink',
+          'closeButton',
         ],
         'claimSubmitted'
       );
       const t = content.t as ReturnType<typeof getTranslationFunction>;
-      const pending = req.query.status === 'pending';
+      const panelTitle = t(`makeAClaim:claimSubmitted.${SUBMITTED_PANEL_TITLES.get(String(req.query.status)) ?? 'submittedTitle'}`);
+      const fee = await claimFeeFor(req, caseReference);
+      const paymentReference = req.session.claimFeePayments?.[caseReference];
       res.render('make-a-claim/templates/claimSubmitted.njk', {
         ...content,
-        panelTitle: t(pending ? 'makeAClaim:claimSubmitted.pendingTitle' : 'makeAClaim:claimSubmitted.panelTitle'),
+        pageTitle: panelTitle,
+        panelTitle,
+        paymentReferenceText: paymentReference
+          ? t('makeAClaim:claimSubmitted.paymentReference', { paymentReference })
+          : undefined,
+        totalAmount: fee ? formatPence(fee.feeAmountInPence) : undefined,
+        overviewUrl: '/claims',
         panelText: t('makeAClaim:claimSubmitted.panelText', {
           caseNumber: formatCaseReferenceForDisplay(caseReference),
         }),

@@ -27,6 +27,12 @@
       "selectAddressError": "cySelect an address"
     }
   },
+  "groundsOnList": {
+    "GROUND_8": "cyRent arrears (Ground 8)",
+    "GROUND_10": "cyAny rent arrears (Ground 10)",
+    "GROUND_11": "cyPersistent arrears (Ground 11)",
+    "OTHER": "cyOthers"
+  },
   "grounds": {
     "GROUND_1": "cyOccupation by landlord or family (Ground 1)",
     "GROUND_1A": "cySale of dwelling house (Ground 1A)",
@@ -133,6 +139,15 @@
       "IN_PROGRESS": "cyIn progress",
       "DONE": "cyDone",
       "NOT_AVAILABLE_YET": "cyNot available yet"
+    },
+    "helpAndSupport": {
+      "heading": "cyHelp and support",
+      "fees": "cyHelp with fees",
+      "mediation": "cyFind out about mediation",
+      "hearing": "cyWhat to expect at a hearing",
+      "representYourself": "cyRepresent myself at a hearing",
+      "findLegalAdvice": "cyFind legal advice",
+      "findCourt": "cyFind information about my court"
     }
   },
   "summary": {
@@ -141,6 +156,9 @@
     "changeStatement": "cyChange the rent statement",
     "notAnswered": "cyNo answer provided",
     "personsUnknown": "cyPersons unknown",
+    "theDefendant": "cythe defendant",
+    "nextDefendant": "cynext ",
+    "addressNotAnswered": "cyNot answered",
     "propertyCannotChange": "cyYou cannot change the property once the claim has been started. If it is wrong, start a new claim.",
     "problem": "cyThere is a problem",
     "cards": {
@@ -151,7 +169,9 @@
       "notice": "cyAbout the notice you served",
       "rentArrears": "cyProof of rent arrears",
       "circumstances": "cyCircumstances",
-      "otherInformation": "cyOther information"
+      "uploadDocuments": "cyUpload documents",
+      "otherInformation": "cyOther information",
+      "languageUsed": "cyLanguage used"
     },
     "labels": {
       "individualOrOrganisation": "cyAre you claiming as an individual or a registered company?",
@@ -162,8 +182,9 @@
       "contactByPhone": "cyDo you want to be contacted by telephone?",
       "contactByText": "cyDo you want to be contacted by text message?",
       "multipleClaimants": "cyDo you want to add another claimant?",
-      "defendantName": "cyDefendant {{number}} name",
-      "defendantAddress": "cyDefendant {{number}} address for service",
+      "moreThanOneAdult": "cyIs there more than one adult in possession of the property?",
+      "defendantName": "cyDo you know the {{next}}defendant’s name?",
+      "defendantAddress": "cyIs {{name}}’s address for service {{address}}?",
       "additionalDefendants": "cyDo you need to add another defendant?",
       "tenancyType": "cyWhat type of tenancy or licence is in place, or was in place?",
       "tenancyStartDate": "cyWhen did the tenancy or licence begin?",
@@ -182,22 +203,32 @@
       "noticeServed": "cyHave you served notice?",
       "noticeType": "cyWhich type of notice did you serve?",
       "noticeMethods": "cyHow did you serve notice?",
-      "noticeAvailable": "cyCan you upload a copy of the notice?",
+      "noticeAvailable": "cyCan you upload a copy of the notice you served?",
       "noticeDocuments": "cyNotice",
+      "postedDate": "cyWhen was the notice posted?",
+      "deliveredDate": "cyWhen was the notice delivered?",
+      "handedToName": "cyWho was the notice left with?",
+      "handedDate": "cyWhen was the notice handed over?",
+      "emailedTo": "cyWhat email address was the notice sent to?",
+      "emailedDate": "cyWhen was the email sent?",
+      "otherElectronicDetails": "cyHow was the notice served by other electronic method?",
+      "otherElectronicDate": "cyWhen was the notice sent?",
+      "otherMethodDetails": "cyHow did you serve the notice?",
+      "otherMethodDate": "cyWhen was the notice served?",
       "rentAmount": "cyHow much is the rent?",
       "rentFrequency": "cyHow frequently should the rent be paid?",
-      "rentDueDay": "cyDate of the month rent is due",
+      "rentDueDay": "cyWhich date of the month is rent due?",
       "arrearsAtNoticeDate": "cyWhat were the rent arrears on the date you served the notice?",
       "currentArrears": "cyWhat are the rent arrears on today’s date?",
-      "proofType": "cyProof of rent arrears",
-      "rentStatementDocuments": "cyRent statement",
-      "moneyJudgmentWanted": "cyDo you want a money judgment for the rent arrears?",
-      "recoverySteps": "cySteps taken to recover the arrears",
+      "proofType": "cyHow do you want to provide proof of rent arrears?",
+      "rentStatementDocuments": "cyUpload rent statement",
+      "moneyJudgmentWanted": "cyDo you want the court to make a money judgment for the outstanding rent arrears?",
+      "recoverySteps": "cyWhat steps have you already taken to recover any arrears?",
       "defendantCircumstances": "cyProvide information about the defendants’ circumstances (optional)",
       "claimantCircumstances": "cyProvide information about your circumstances (optional)",
       "otherDocuments": "cyUpload files (optional)",
       "hasOtherReasons": "cyIs there any other information you want to provide about your reasons for possession?",
-      "generalApplicationIntent": "cyDo you need to make a general application?",
+      "generalApplicationIntent": "cyDo you need to make a general application before the court schedules a hearing?",
       "languageUsed": "cyWhich language did you use to complete this claim?"
     }
   },
@@ -222,7 +253,6 @@
     "checkAnswers": "cySome of your answers are missing. Check each section of your claim",
     "draftNotFound": "cyWe could not find your saved answers. Start your claim again",
     "draftChanged": "cyYour claim was changed in another tab or window. Check your answers below, then submit your claim again",
-    "otherGroundNotAllowed": "cyChoose rent arrears grounds on the rent arrears question, not as other grounds",
     "paymentServiceUnavailable": "cyYour claim could not be submitted because a service we need is not available. Try again later",
     "failed": "cyYour claim could not be submitted. Try again",
     "pages": {
@@ -282,16 +312,10 @@
     "paymentDeclined": "cyYour card was declined. You have not been charged. Try again or use a different card."
   },
   "claimSubmitted": {
-    "pageTitle": "cyYour payment was successful",
     "panelTitle": "cyYour payment was successful",
     "pendingTitle": "cyYour payment is being processed",
     "panelText": "cyYour case number<br><strong>{{caseNumber}}</strong>",
-    "submittedIntro": [
-      "cyYour possession claim has been submitted. We’ve sent you a confirmation email.",
-      "cyIf you need to submit a general application as part of this claim, you must do it within 24 hours.",
-      "cyYou can submit a general application by selecting ‘Ask the court to make an order (make a general application)’ on your case overview.",
-      "cyIf you need support to use HMCTS services, either before or during a hearing, you must let us know as soon as possible."
-    ],
+    "submittedIntro": ["cyYour possession claim has been submitted. We’ve sent you a confirmation email."],
     "whatHappensNextHeading": "cyWhat happens next",
     "whatHappensNext": [
       "cyThe claim will be sent to the defendants and they can respond.",
@@ -300,6 +324,18 @@
     "claimFormHeading": "cyYour claim form",
     "claimFormText": "cyYour claim form will be ready a few minutes after your payment has gone through. You can view it with the documents you uploaded.",
     "claimFormLink": "cyView your claim form",
-    "feedbackLink": "cyWhat did you think of this service? (opens in new tab)"
+    "feedbackLink": "cyWhat did you think of this service? (opens in new tab)",
+    "submittedTitle": "cyClaim submitted",
+    "paymentReference": "cyYour payment reference number is <strong>{{paymentReference}}</strong>",
+    "generalApplicationAndSupport": [
+      "cyIf you need to submit a general application as part of this claim, you must do it within 24 hours.",
+      "cyYou can submit a general application by selecting ‘Ask the court to make an order (make a general application)’ on your case overview.",
+      "cyIf you need <a class=\"govuk-link\" href=\"https://www.gov.uk/guidance/what-to-expect-coming-to-a-court-or-tribunal\" target=\"_blank\" rel=\"noopener noreferrer\">support to use HMCTS services (opens in a new tab)</a>, either before or during a hearing, you must let us know as soon as possible."
+    ],
+    "paymentSummaryHeading": "cyPayment summary",
+    "paymentForLabel": "cyPayment for",
+    "claimFeeName": "cyClaim fee",
+    "totalAmountLabel": "cyTotal amount",
+    "closeButton": "cyClose and return to case overview"
   }
 }

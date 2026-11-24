@@ -105,11 +105,11 @@ export const step: StepDefinition = createMakeAClaimStep({
     }),
     textField('statementOfTruthPosition', { required: false, maxLength: FIELD_LIMITS.statementOfTruthPosition }),
   ],
-  extendGetContent: (req, formContent) => {
+  extendGetContent: async (req, formContent) => {
     const t = getTranslationFunction(req);
     const submitErrors = submitErrorItems(req, submitErrorCodes(req.query?.submitError));
     return {
-      ...(isRendering(formContent) ? { cards: allCards(req) } : {}),
+      ...(isRendering(formContent) ? { cards: await allCards(req) } : {}),
       saveAndContinue: t('submitButton'),
       ...(submitErrors.length > 0 && !formContent.errorSummary
         ? { errorSummary: { titleText: t('makeAClaim:summary.problem'), errorList: submitErrors } }
