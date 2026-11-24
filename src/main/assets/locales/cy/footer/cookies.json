@@ -61,42 +61,5 @@
       "purpose": "Session timeout",
       "expires": "Session ends"
     }
-  },
-  "trackingCookieTable": {
-    "preferences": {
-      "name": "pcs-cookie-preferences",
-      "purpose": "Saves your cookie consent settings",
-      "expires": "1 year"
-    },
-    "ga": {
-      "name": "_ga",
-      "purpose": "Checks if you’ve visited the service before. This helps us count how many people visit the service (Google Analytics)",
-      "expires": "2 years"
-    },
-    "gaContainer": {
-      "name": "_ga_<container-id>",
-      "purpose": "Used to keep the state of your visit (Google Analytics)",
-      "expires": "2 years"
-    }
-  },
-  "cookieSettings": {
-    "title": "Gosodiadau cwcis"
-  },
-  "cookiePage": {
-    "analytics": {
-      "legend": "Caniatáu cwcis sy’n mesur y defnydd sydd o’r wefan?",
-      "items": {
-        "on": "Defnyddio cwcis sy’n mesur fy nefnydd i o’r wefan",
-        "off": "Peidio â defnyddio cwcis sy’n mesur fy nefnydd i o’r wefan"
-      }
-    },
-    "apm": {
-      "legend": "Caniatáu cwcis sy’n mesur y broses o fonitro perfformiad gwefannau?",
-      "items": {
-        "on": "Defnyddio cwcis sy’n mesur y broses o fonitro perfformiad gwefannau",
-        "off": "Peidio â defnyddio cwcis sy’n mesur y broses o fonitro perfformiad gwefannau"
-      }
-    },
-    "submit": "Cadw"
   }
 }
