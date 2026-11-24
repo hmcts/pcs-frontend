@@ -139,9 +139,9 @@ function validation(formData: Record<string, unknown>) {
 function validateCosts(formData: Record<string, unknown>, suspended: boolean): MakeOrderValidationIssue[] {
   const amountTypes: Partial<Record<string, string>> = {
     'def-pay-cl-fixed': 'fixed',
-    'def-pay-cl-summary': 'summary assessed',
-    'cl-pay-def-summary': 'summary assessed',
-    ...(suspended ? { 'fixed-same-terms': 'fixed', 'summary-same-terms': 'summary assessed' } : {}),
+    'def-pay-cl-summary': 'summarily assessed',
+    'cl-pay-def-summary': 'summarily assessed',
+    ...(suspended ? { 'fixed-same-terms': 'fixed', 'summary-same-terms': 'summarily assessed' } : {}),
   };
   const choice = value(formData, 'costs-choice');
   const amountType = amountTypes[choice];
@@ -238,7 +238,7 @@ function validateOutright(formData: Record<string, unknown>): MakeOrderValidatio
       add(
         plans.includes('lump') || plans.includes('instalments'),
         'outright-mj-plan',
-        'Select payment to claimant or instalment payments'
+        'Select initial payment or instalment payments'
       );
       if (plans.includes('lump')) {
         money('outright-mj-lump-amount', 'Enter a valid payment amount');

@@ -33,7 +33,7 @@
 
 {# This field continues the Grounds question, so it has no divider. #}
 {{ compact.text("outright-grounds-details", {
-  label: "Details of grounds (optional)",
+  label: "Namely (details of grounds, optional)",
   optional: true,
   formGroupClasses: "pcs-continues-question"
 }) }}
@@ -52,7 +52,7 @@
 {% endset %}
 
 {% set lumpHtml %}
-  {% call compact.row({ groupLabel: "Payment to claimant" }) %}
+  {% call compact.row({ groupLabel: "Initial payment" }) %}
     {{ compact.copy("Initial payment of") }}
     {{ compact.money({ id: "outright-mj-lump-amount", label: "Payment amount", labelHidden: true }) }}
     {{ compact.copy("by") }}
@@ -82,7 +82,7 @@
     legend: "How the sums must be paid",
     legendHidden: true,
     items: [
-      { value: "lump", text: "Payment to claimant", conditional: { html: lumpHtml } },
+      { value: "lump", text: "Initial payment", conditional: { html: lumpHtml } },
       { value: "instalments", text: "Instalment payments", conditional: { html: instalmentsHtml } }
     ]
   }) }}
