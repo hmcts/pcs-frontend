@@ -30,6 +30,19 @@
   {% for paragraph in afterBullets %}
     <p class="govuk-body">{{ paragraph | safe }}</p>
   {% endfor %}
+  {% for block in contentBlocks %}
+    {% if block.heading %}
+      <h2 class="govuk-heading-m">{{ block.heading }}</h2>
+    {% elif block.text %}
+      <p class="govuk-body">{{ block.text | safe }}</p>
+    {% elif block.bullets %}
+      <ul class="govuk-list govuk-list--bullet">
+        {% for bullet in block.bullets %}
+          <li>{{ bullet | safe }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endfor %}
   {% if listItems and listItems.length %}
     <h2 class="govuk-heading-m">{{ listHeading }}</h2>
     <ul class="govuk-list govuk-list--bullet">

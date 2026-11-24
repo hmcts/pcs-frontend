@@ -2,14 +2,17 @@
   "pageTitle": "cyGeneral applications",
   "heading": "cyGeneral applications",
   "paragraphs": [
-    "cyAfter you submit your claim, the court will usually schedule a hearing automatically. Sometimes you might not want it to, or the court needs to know something first. For example, if:"
+    "cyAfter you submit your claim, the court will usually schedule a court hearing automatically.",
+    "cyThere are some instances where you might not want the court to do this or the court needs to be made aware of something beforehand.",
+    "cyFor example:"
   ],
   "bullets": [
     "cythe defendants’ address is not in England or Wales",
-    "cyyou want the court to schedule a hearing that the defendants should not be told about"
+    "cyyou want the court to schedule a hearing that the defendants should not be notified about"
   ],
   "afterBullets": [
-    "cyTo stop the court scheduling a hearing automatically, you must make a general application within 24 hours of submitting this claim."
+    "cyTo stop the court from automatically scheduling a hearing, you must make a general application within 24 hours of submitting this claim.",
+    "cyIf you make a general application after this time period, the court will schedule a hearing automatically and your general application might not be considered until after the hearing."
   ],
   "question": "cyDo you need to make a general application before the court schedules a hearing?",
   "errors": {

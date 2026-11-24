@@ -2,12 +2,12 @@
   "pageTitle": "cyUpload rent statement",
   "heading": "cyUpload rent statement",
   "paragraphs": [
-    "cyUpload a document that shows the dates and amounts of missed payments and a running total of the arrears.",
+    "cyYou must upload a document that follows the guidelines given on the previous page.",
     "cyYou must bring a paper copy of the latest rent statement to the hearing."
   ],
   "beforeUploadHeading": "cyBefore you upload your file",
-  "beforeUploadText": "cyGive your file a name that explains what it is. For example, ‘Rent statement for 15 Garden Drive’.",
-  "uploadLabel": "cyUpload a file",
+  "beforeUploadText": "cyGive your file a name that explains what it is. For example, 'Rent statement for 15 Garden Drive'",
+  "uploadLabel": "cyUpload rent statement",
   "uploadButton": "cyUpload file",
   "filesAddedHeading": "cyFiles added",
   "deleteButton": "cyRemove",

@@ -8,6 +8,8 @@
     {{ govukErrorSummary({ titleText: problemTitle, descriptionText: paymentProblem }) }}
   {% endif %}
   <h1 class="govuk-heading-l">{{ heading }}</h1>
+  <h2 class="govuk-heading-s">{{ makePaymentHeading }}</h2>
+  <p class="govuk-body">{{ payIntro }}</p>
   {{ govukTable({
     firstCellIsHeader: false,
     head: [{ text: feeHeading }, { text: amountHeading, format: 'numeric' }],

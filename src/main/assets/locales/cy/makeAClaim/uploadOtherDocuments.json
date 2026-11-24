@@ -2,11 +2,11 @@
   "pageTitle": "cyUpload files (optional)",
   "heading": "cyUpload files (optional)",
   "paragraphs": [
-    "cyYou can upload any files you have not uploaded yet that you think are relevant to your claim or that a judge should be aware of."
+    "cyYou can upload any files that you believe are relevant to your claim or that a judge should be aware of."
   ],
-  "beforeUploadHeading": "cyBefore you upload your file",
-  "beforeUploadText": "cyGive your file a name that explains what it is. For example, ‘Receipt of payment from Jane Smith’.",
-  "uploadLabel": "cyUpload a file",
+  "beforeUploadHeading": "cyBefore you upload your files",
+  "beforeUploadText": "cyGive each file a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "cyUpload files",
   "uploadButton": "cyUpload file",
   "filesAddedHeading": "cyFiles added",
   "deleteButton": "cyRemove"

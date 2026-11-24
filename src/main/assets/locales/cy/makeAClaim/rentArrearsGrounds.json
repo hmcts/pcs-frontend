@@ -1,7 +1,7 @@
 {
-  "pageTitle": "cyWhat are the rent arrears grounds for possession?",
-  "question": "cyWhat are the rent arrears grounds for possession?",
-  "hint": "cySelect all the grounds you want to use for this claim. These may be the same grounds you included in the notice you served.",
+  "pageTitle": "cyWhat are your rent arrears grounds for possession?",
+  "question": "cyWhat are your rent arrears grounds for possession?",
+  "hint": "cySelect the grounds you want to use for this claim. These may be the same grounds you included in the notice you served. Select all that apply",
   "errors": {
     "rentArrearsGrounds": "cySelect at least one rent arrears ground"
   }

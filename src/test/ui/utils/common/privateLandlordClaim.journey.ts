@@ -63,7 +63,7 @@ export async function enterAddress(
 }
 
 export async function openTask(page: Page, task: string): Promise<void> {
-  await expect(page.getByRole('heading', { level: 2, name: '1. Before you start' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2, name: '1. Your claim' })).toBeVisible();
   await page.getByRole('link', { name: task, exact: true }).click();
 }
 
@@ -149,7 +149,7 @@ export async function completeTenancyAndGrounds(page: Page, otherGrounds: OtherG
   await saveAndContinue(page);
   await page.getByRole('radio', { name: 'No', exact: true }).check();
   await page
-    .getByLabel('Explain why you cannot upload a copy of the tenancy or licence agreement')
+    .getByLabel('Why can you not upload a copy of the tenancy or licence agreement?')
     .fill('The agreement was verbal');
   await saveAndContinue(page);
   await answer(page, 'Yes');
@@ -210,9 +210,9 @@ async function finishRentArrears(page: Page): Promise<void> {
 }
 
 async function enterArrearsAmounts(page: Page): Promise<void> {
-  await page.getByLabel('What were the rent arrears on the date you served the notice?').fill('3000');
+  await page.getByLabel('How much were the rent arrears on the date you served notice?').fill('3000');
   await saveAndContinue(page);
-  await page.getByLabel('What are the rent arrears on today’s date?').fill('2880');
+  await page.getByLabel('How much are the rent arrears on today’s date?').fill('2880');
   await saveAndContinue(page);
 }
 
@@ -308,16 +308,14 @@ export async function answerFinalQuestions(page: Page): Promise<void> {
 
 /** Signs the statement of truth and submits, ending on the claim fee page. */
 export async function submitClaim(page: Page): Promise<void> {
-  await expect(
-    page.getByRole('heading', { level: 1, name: 'Check your answers before submitting your claim' })
-  ).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Check your answers' })).toBeVisible();
   await expect(page.getByText('Billy Wright')).toBeVisible();
   await page.getByRole('checkbox', { name: /^I understand that proceedings for contempt of court/ }).check();
   await page.getByRole('checkbox', { name: 'I believe that the facts stated in this claim form are true.' }).check();
   await page.getByLabel('Your full name').fill('Billy Wright');
-  await page.getByRole('button', { name: 'Submit claim' }).click();
+  await page.getByRole('button', { name: 'Submit', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Pay your claim fee' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Pay your claim fee' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Pay claim fee' })).toBeVisible();
 }
 
 /** The claim the browser is on, from the page's address. */
@@ -329,7 +327,7 @@ function caseReferenceOnPage(page: Page): string {
 
 /** From the claim fee page to GOV.UK Pay's test service, with the card details entered. */
 async function enterClaimFeeCard(page: Page, cardNumber: string): Promise<void> {
-  await page.getByRole('button', { name: 'Pay your claim fee' }).click();
+  await page.getByRole('button', { name: 'Pay claim fee' }).click();
   await performValidation('mainHeader', paymentDetails.mainHeader);
   await performAction('inputCounterClaimPaymentDetails', { cardNumber });
 }
@@ -345,7 +343,7 @@ export async function payClaimFee(page: Page): Promise<void> {
   await performAction('clickButton', paymentDetails.confirmPaymentButton);
   await expect(page).toHaveURL(new RegExp(`/case/${caseReference}/claim-submitted`));
   await expect(page.locator('.govuk-panel__title')).toHaveText(
-    /^\s*(Claim submitted|Your payment is being processed)\s*$/
+    /^\s*(Your payment was successful|Your payment is being processed)\s*$/
   );
   await expect(page.locator('.govuk-panel__body')).toContainText(formatCaseReferenceForDisplay(caseReference));
 }
@@ -358,5 +356,5 @@ export async function declineClaimFeeCard(page: Page): Promise<void> {
   await performAction('clickButton', paymentDetails.startDynamicButton);
   await expect(page).toHaveURL(new RegExp(`/case/${caseReference}/pay-claim-fee\\?payment=failed$`));
   await expect(page.getByText('Your payment was not successful. You have not been charged. Try again.')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Pay your claim fee' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Pay claim fee' })).toBeVisible();
 }

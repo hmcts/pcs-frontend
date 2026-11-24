@@ -1,14 +1,14 @@
 {
   "pageTitle": "cyHow did you serve notice?",
   "question": "cyHow did you serve notice?",
-  "hint": "cySelect all that apply",
+  "hint": "cySelect all options that apply",
   "options": {
-    "FIRST_CLASS_POST": "cyBy first class post or a next business day delivery service",
-    "PERMITTED_PLACE": "cyBy delivering it to or leaving it at a permitted place",
+    "FIRST_CLASS_POST": "cyBy first class post or a different service which provides for delivery on the next business day",
+    "PERMITTED_PLACE": "cyBy delivering to or leaving it at a permitted place",
     "PERSONALLY_HANDED": "cyBy personally handing it to or leaving it with someone",
     "EMAIL": "cyBy email",
-    "OTHER_ELECTRONIC": "cyBy another electronic method",
-    "OTHER": "cyAnother way"
+    "OTHER_ELECTRONIC": "cyBy other electronic method",
+    "OTHER": "cyOther"
   },
   "labels": {
     "postedDate": "cyWhen was the notice posted?",
@@ -17,7 +17,7 @@
     "handedDate": "cyWhen was the notice handed over?",
     "emailedTo": "cyWhat email address was the notice sent to?",
     "emailedDate": "cyWhen was the email sent?",
-    "otherElectronicDetails": "cyHow was the notice sent?",
+    "otherElectronicDetails": "cyHow was the notice served by other electronic method?",
     "otherElectronicDate": "cyWhen was the notice sent?",
     "otherMethodDetails": "cyHow did you serve the notice?",
     "otherMethodDate": "cyWhen was the notice served?"

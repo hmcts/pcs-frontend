@@ -4,7 +4,7 @@ import { formatCcdAddress } from '../../utils/ccdAddress';
 import { ADDRESS_TEMPLATE, addressContent, addressFields } from '../addressFields';
 import { readClaim } from '../claimDraft';
 import { defendantIndexOf, propertyAddressOf } from '../claimMapping';
-import { yesNoQuestion } from '../fieldBuilders';
+import { radioQuestion } from '../fieldBuilders';
 import { flowConfig } from '../flow.config';
 import { createMakeAClaimStep } from '../formStep';
 import { defendantDisplayName } from '../summary';
@@ -25,7 +25,7 @@ export const step: StepDefinition = createMakeAClaimStep({
   stepDir: __dirname,
   customTemplate: ADDRESS_TEMPLATE,
   fields: [
-    yesNoQuestion('sameAsProperty'),
+    radioQuestion('sameAsProperty', ['yes', 'no']),
     ...addressFields('defendant', formData => formData.sameAsProperty === 'no'),
   ],
   extendGetContent: (req, formContent) => ({

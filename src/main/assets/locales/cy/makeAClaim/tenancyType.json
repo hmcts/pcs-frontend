@@ -1,6 +1,7 @@
 {
   "pageTitle": "cyWhat type of tenancy or licence is in place?",
   "question": "cyWhat type of tenancy or licence is in place, or was in place?",
+  "hint": "cyIf you’re not sure what type of tenancy or licence is in place, this should be written on the tenancy or licence agreement you gave to the defendants.",
   "options": {
     "ASSURED": "cyAssured or assured periodic tenancy",
     "EXCLUDED": "cyExcluded tenancy or licence",

@@ -1,7 +1,7 @@
 {
-  "pageTitle": "cyTenancy or licence agreement and grounds for possession",
-  "heading": "cyTenancy or licence agreement and grounds for possession",
-  "paragraphs": ["cyYou will now be asked about:"],
+  "pageTitle": "cyAbout the tenancy and your grounds for possession",
+  "heading": "cyAbout the tenancy and your grounds for possession",
+  "paragraphs": ["cyYou will now be asked questions about:"],
   "bullets": [
     "cythe tenancy or licence type",
     "cythe date the tenancy or licence began",
@@ -9,6 +9,6 @@
   ],
   "afterBullets": [
     "cyYou will be asked to upload a copy of the tenancy or licence agreement.",
-    "cyThe defendants will be able to see your answers and any documents you upload."
+    "cyThe defendant will be able to see your answers and any documents you upload."
   ]
 }

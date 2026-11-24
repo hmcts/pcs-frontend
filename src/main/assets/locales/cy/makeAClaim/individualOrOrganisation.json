@@ -1,10 +1,10 @@
 {
   "pageTitle": "cyAre you claiming as an individual or a registered company?",
   "question": "cyAre you claiming as an individual or a registered company?",
-  "hint": "cyIf you’re registered on Companies House as a landlord, you’re a company",
+  "hint": "cyYou’re a registered company if you’re registered on Companies House as a landlord",
   "options": {
     "INDIVIDUAL": "cyAn individual",
-    "ORGANISATION": "cyA registered company or organisation"
+    "ORGANISATION": "cyA registered company"
   },
   "errors": {
     "individualOrOrganisation": "cySelect whether you’re claiming as an individual or a registered company"

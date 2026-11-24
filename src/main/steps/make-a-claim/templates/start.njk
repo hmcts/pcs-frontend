@@ -6,6 +6,7 @@
   {% for paragraph in paragraphs %}
     <p class="govuk-body">{{ paragraph | safe }}</p>
   {% endfor %}
+  <p class="govuk-body">{{ welshAvailable | safe }}</p>
   <h2 class="govuk-heading-m">{{ eligibilityHeading }}</h2>
   <p class="govuk-body">{{ eligibilityIntro }}</p>
   <ul class="govuk-list govuk-list--bullet">

@@ -3,6 +3,9 @@
 
 {% block mainContent %}
   {{ govukPanel({ titleText: panelTitle, html: panelText }) }}
+  {% for paragraph in submittedIntro %}
+    <p class="govuk-body">{{ paragraph }}</p>
+  {% endfor %}
   <h2 class="govuk-heading-m">{{ whatHappensNextHeading }}</h2>
   {% for paragraph in whatHappensNext %}
     <p class="govuk-body">{{ paragraph }}</p>

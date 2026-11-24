@@ -1,7 +1,7 @@
 {
-  "pageTitle": "What were the rent arrears on the date you served notice?",
-  "question": "What were the rent arrears on the date you served the notice?",
-  "hint": "Give the total amount of rent the defendants owed on the date you served the notice",
+  "pageTitle": "How much were the rent arrears on the date you served notice?",
+  "question": "How much were the rent arrears on the date you served notice?",
+  "hint": "You should give the total amount of rent owed by the defendants on the date you served the notice.",
   "errors": {
     "arrearsAtNoticeDate": "Enter the rent arrears on the date you served the notice",
     "arrearsAtNoticeDateInvalid": "Enter the arrears as an amount of money, like 3000 or 3000.50"

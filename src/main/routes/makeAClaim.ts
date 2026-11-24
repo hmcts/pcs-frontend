@@ -137,7 +137,17 @@ function registerSubmittedClaimRoutes(app: Application): void {
       }
       const content = pageContent(
         req,
-        ['pageTitle', 'heading', 'feeHeading', 'amountHeading', 'feeName', 'redirectText', 'payButton', 'problemTitle'],
+        [
+          'pageTitle',
+          'heading',
+          'makePaymentHeading',
+          'feeHeading',
+          'amountHeading',
+          'feeName',
+          'redirectText',
+          'payButton',
+          'problemTitle',
+        ],
         'payClaimFee'
       );
       const t = content.t as ReturnType<typeof getTranslationFunction>;
@@ -145,6 +155,7 @@ function registerSubmittedClaimRoutes(app: Application): void {
       res.render('make-a-claim/templates/payClaimFee.njk', {
         ...content,
         feeAmount: formatPence(fee.feeAmountInPence),
+        payIntro: t('makeAClaim:payClaimFee.payIntro', { feeAmount: formatPence(fee.feeAmountInPence) }),
         payUrl: makeAClaimPath(PAY_CLAIM_FEE_START_ROUTE, caseReference),
         paymentProblem: paymentProblem ? t(`makeAClaim:payClaimFee.${paymentProblem}`) : undefined,
       });
@@ -200,6 +211,7 @@ function registerSubmittedClaimRoutes(app: Application): void {
         req,
         [
           'pageTitle',
+          'submittedIntro',
           'whatHappensNextHeading',
           'whatHappensNext',
           'claimFormHeading',

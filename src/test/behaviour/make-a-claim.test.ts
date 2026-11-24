@@ -737,8 +737,8 @@ describe('submitting the claim', () => {
     app = await bootMakeAClaim();
     givenClaim(COMPLETE_CLAIM);
     const cya = text((await app.get(claimPath('check-your-answers'))).text);
-    expect(cya).toContain('Your name Billy Wright');
-    expect(cya).toContain('Rent £1,000.00');
+    expect(cya).toContain('What is your name? Billy Wright');
+    expect(cya).toContain('How much is the rent? £1,000.00');
 
     const notAgreed = await app.post(claimPath('check-your-answers'), { statementOfTruth: 'belief' });
     expect(text(notAgreed.text)).toContain('Confirm both parts of the statement of truth');
@@ -776,7 +776,7 @@ describe('submitting the claim', () => {
     ]);
 
     const confirmation = text((await app.get(`/case/${CASE_REFERENCE}/claim-submitted?status=success`)).text);
-    expect(confirmation).toContain('Claim submitted');
+    expect(confirmation).toContain('Your payment was successful');
     expect(confirmation).toContain('1777 0276 0001 7761');
   });
 });
@@ -981,7 +981,7 @@ describe('review fixes', () => {
       { id: expect.any(String), value: { ground: 'GROUND_14', reason: 'Noise' } },
     ]);
     expect(text((await app.get(claimPath('tenancy-cya'))).text)).toContain(
-      'Why you are claiming under Antisocial behaviour (Ground 14) Noise'
+      'Why are you making a claim for possession under Antisocial behaviour (Ground 14)? Noise'
     );
   });
 
@@ -1052,7 +1052,7 @@ describe('review fixes', () => {
       const back = await app.get('/payment/return/RC-1111/confirmation');
       expect(back.location).toBe(`/case/${CASE_REFERENCE}/claim-submitted?status=success`);
       const page = text((await app.get(back.location as string)).text);
-      expect(page).toContain('Claim submitted');
+      expect(page).toContain('Your payment was successful');
       expect(page).toContain('1777 0276 0001 7761');
       expect((await app.get(`/case/${CASE_REFERENCE}/pay-claim-fee`)).location).toBe(
         `/case/${CASE_REFERENCE}/claim-submitted`

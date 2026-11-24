@@ -1,7 +1,7 @@
 {
   "pageTitle": "cyHave you served notice?",
   "question": "cyHave you served notice?",
-  "hint": "cyA notice is a formal communication telling the defendants that you intend to repossess the property, like form 3A.",
+  "hint": "cyA notice is a formal communication informing the defendant that you intend to repossess the property, like form 3A.",
   "labels": {
     "noNoticeReason": "cyWhy have you not served notice to the defendants?"
   },

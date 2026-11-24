@@ -1,14 +1,14 @@
 {
   "pageTitle": "How did you serve notice?",
   "question": "How did you serve notice?",
-  "hint": "Select all that apply",
+  "hint": "Select all options that apply",
   "options": {
-    "FIRST_CLASS_POST": "By first class post or a next business day delivery service",
-    "PERMITTED_PLACE": "By delivering it to or leaving it at a permitted place",
+    "FIRST_CLASS_POST": "By first class post or a different service which provides for delivery on the next business day",
+    "PERMITTED_PLACE": "By delivering to or leaving it at a permitted place",
     "PERSONALLY_HANDED": "By personally handing it to or leaving it with someone",
     "EMAIL": "By email",
-    "OTHER_ELECTRONIC": "By another electronic method",
-    "OTHER": "Another way"
+    "OTHER_ELECTRONIC": "By other electronic method",
+    "OTHER": "Other"
   },
   "labels": {
     "postedDate": "When was the notice posted?",
@@ -17,7 +17,7 @@
     "handedDate": "When was the notice handed over?",
     "emailedTo": "What email address was the notice sent to?",
     "emailedDate": "When was the email sent?",
-    "otherElectronicDetails": "How was the notice sent?",
+    "otherElectronicDetails": "How was the notice served by other electronic method?",
     "otherElectronicDate": "When was the notice sent?",
     "otherMethodDetails": "How did you serve the notice?",
     "otherMethodDate": "When was the notice served?"

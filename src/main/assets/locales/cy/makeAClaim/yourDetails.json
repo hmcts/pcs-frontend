@@ -1,6 +1,9 @@
 {
-  "pageTitle": "cyYour details",
-  "heading": "cyYour details",
+  "pageTitle": "cyAbout you and your contact preferences",
+  "heading": "cyAbout you and your contact preferences",
   "paragraphs": ["cyYou must now provide some details about yourself, including:"],
-  "bullets": ["cyyour name", "cyyour postal address", "cyhow you’d prefer to be contacted"]
+  "bullets": ["cyyour name", "cyyour postal address", "cyhow you’d prefer to be contacted"],
+  "afterBullets": [
+    "cyWe’ll also ask for the name and postal address of any other claimants (other people you’re making this claim with)."
+  ]
 }

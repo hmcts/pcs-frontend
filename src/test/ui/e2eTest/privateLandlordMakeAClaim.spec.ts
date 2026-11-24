@@ -144,8 +144,8 @@ test.describe('Private landlord cannot use the service @privateLandlord', () => 
     await continueOn(page);
     await openTask(page, 'About you and your contact preferences');
     await continueOn(page);
-    await answer(page, 'A registered company or organisation');
-    await page.getByLabel('Registered company or organisation name').fill('Wright Lettings Ltd');
+    await answer(page, 'A registered company');
+    await page.getByLabel('Company or organisation’s name').fill('Wright Lettings Ltd');
     await page.getByRole('button', { name: 'Save and continue', exact: true }).click();
     await enterAddress(page, 'claimant', { line1: '12 High Street', town: 'London', postcode: 'NW1 1AA' });
     await page.getByRole('button', { name: 'Save and continue', exact: true }).click();

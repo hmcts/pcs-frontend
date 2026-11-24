@@ -2,11 +2,11 @@
   "pageTitle": "Upload files (optional)",
   "heading": "Upload files (optional)",
   "paragraphs": [
-    "You can upload any files you have not uploaded yet that you think are relevant to your claim or that a judge should be aware of."
+    "You can upload any files that you believe are relevant to your claim or that a judge should be aware of."
   ],
-  "beforeUploadHeading": "Before you upload your file",
-  "beforeUploadText": "Give your file a name that explains what it is. For example, ‘Receipt of payment from Jane Smith’.",
-  "uploadLabel": "Upload a file",
+  "beforeUploadHeading": "Before you upload your files",
+  "beforeUploadText": "Give each file a name that explains what it is. For example, 'Receipt of payment from Jane Smith'",
+  "uploadLabel": "Upload files",
   "uploadButton": "Upload file",
   "filesAddedHeading": "Files added",
   "deleteButton": "Remove"

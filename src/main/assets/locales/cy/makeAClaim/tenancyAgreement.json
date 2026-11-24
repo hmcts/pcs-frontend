@@ -3,7 +3,7 @@
   "question": "cyCan you upload a copy of the tenancy or licence agreement?",
   "hint": "cyYou’ll be able to upload it on the next screen",
   "labels": {
-    "noTenancyAgreementReason": "cyExplain why you cannot upload a copy of the tenancy or licence agreement"
+    "noTenancyAgreementReason": "cyWhy can you not upload a copy of the tenancy or licence agreement?"
   },
   "errors": {
     "tenancyAgreementAvailable": "cySelect whether you can upload a copy of the agreement",

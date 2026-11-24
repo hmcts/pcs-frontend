@@ -1,10 +1,10 @@
 {
-  "pageTitle": "Defendant and claimant circumstances",
-  "heading": "Defendant and claimant circumstances",
-  "paragraphs": ["You will now be asked about:"],
-  "bullets": ["the defendants’ circumstances", "your circumstances"],
+  "pageTitle": "Circumstances",
+  "heading": "Circumstances",
+  "paragraphs": ["You will now be asked questions about:"],
+  "bullets": ["the defendant’s circumstances", "your circumstances"],
   "afterBullets": [
-    "A judge will use this to understand each party’s financial and personal situation.",
-    "The defendants will be able to see your answers."
+    "This information will be used by judge to understand each party’s financial and personal situation.",
+    "The defendant will be able to see your answers."
   ]
 }
