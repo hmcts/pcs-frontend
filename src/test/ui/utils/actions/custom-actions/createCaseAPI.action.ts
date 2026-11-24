@@ -16,7 +16,21 @@ import { user } from '../../../data/user-data';
 import { performAction } from '../../controller';
 import { IAction, actionData, actionRecord } from '../../interfaces';
 
+type FeePaymentInfo = {
+  serviceRequestReference?: string;
+  amount?: number;
+  paymentStatus?: string;
+};
+
+type ValidFeePaymentInfo = {
+  serviceRequestReference: string;
+  amount: number;
+  paymentStatus?: string;
+};
+
 export class CreateCaseAPIAction implements IAction {
+  private feePaymentReferencesByCase = new Map<string, Set<string>>();
+
   async execute(page: Page, action: string, fieldName: actionData | actionRecord): Promise<void> {
     const actionsMap = new Map<string, () => Promise<void>>([
       ['createCaseAPI', () => this.createCaseAPI(fieldName)],
@@ -166,38 +180,90 @@ export class CreateCaseAPIAction implements IAction {
     throw new Error('Submit case API failed after multiple retries');
   }
 
+  // Following method needs to be revisited if required once https://hmcts.atlassian.net/browse/HDPI-9887 is resolved.
   private async updatePaymentAPI(): Promise<void> {
     const paymentApi = Axios.create(paymentApiData.paymentApiInstance());
+    const caseNumber = process.env.CASE_NUMBER;
+    if (!caseNumber) {
+      throw new Error('Cannot update payment because CASE_NUMBER is not set.');
+    }
     const maxRetries = actionRetries;
     const delayMs = VERY_SHORT_TIMEOUT;
+
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
         const response = await paymentApi.get(paymentApiData.getFeePaymentInfoApiEndPoint());
-        const paymentInfo = response.data;
-        if (!paymentInfo?.length) {
-          throw new Error('No payment information found.');
+        const paymentInfo = response.data as FeePaymentInfo[];
+        if (!Array.isArray(paymentInfo) || paymentInfo.length === 0) {
+          throw new Error('No fee payment information found.');
         }
-        const requestReference = paymentInfo[0].serviceRequestReference;
+
+        const uniqueFeeRequests = [
+          ...new Map(
+            paymentInfo
+              .filter(
+                (fee: FeePaymentInfo): fee is ValidFeePaymentInfo =>
+                  Boolean(fee.serviceRequestReference) && Number.isFinite(Number(fee.amount)) && Number(fee.amount) > 0
+              )
+              .map(fee => [fee.serviceRequestReference, fee] as const)
+          ).values(),
+        ];
+        const references = new Set(uniqueFeeRequests.map(fee => fee.serviceRequestReference));
+        const previousReferences = this.feePaymentReferencesByCase.get(caseNumber);
+        const unpaidFeeRequests = uniqueFeeRequests.filter(fee => fee.paymentStatus !== 'PAID');
+        const payableFeeRequests = previousReferences
+          ? unpaidFeeRequests.filter(fee => !previousReferences.has(fee.serviceRequestReference))
+          : unpaidFeeRequests;
+
+        if (payableFeeRequests.length === 0) {
+          throw new Error('No unpaid fee service request found.');
+        }
+        if (payableFeeRequests.length > 1) {
+          throw new Error(`Expected one unpaid fee service request but found ${payableFeeRequests.length}.`);
+        }
+
+        const feeToPay = payableFeeRequests[0];
+        const requestReference = feeToPay.serviceRequestReference;
+
         const updateResponse = await paymentApi.put(
           paymentApiData.updatePaymentApiEndPoint,
-          paymentApiData.paymentUpdatePayload(requestReference, Number(paymentInfo[0].amount))
+          paymentApiData.paymentUpdatePayload(requestReference, Number(feeToPay.amount))
         );
-        if (updateResponse.status === 200 || updateResponse.status === 204) {
-          return;
+        if (updateResponse.status !== 200 && updateResponse.status !== 204) {
+          throw new Error(`Payment update failed with status ${updateResponse.status}`);
         }
-        throw new Error(`Payment update failed with status ${updateResponse.status}`);
+
+        let paymentConfirmed = false;
+        for (let statusAttempt = 1; statusAttempt <= maxRetries; statusAttempt++) {
+          const statusResponse = await paymentApi.get(paymentApiData.getFeePaymentInfoApiEndPoint());
+          const statusFeeRequests = statusResponse.data as FeePaymentInfo[];
+          const updatedFee = statusFeeRequests.find(
+            fee => fee.serviceRequestReference === requestReference && fee.paymentStatus === 'PAID'
+          );
+          if (updatedFee) {
+            paymentConfirmed = true;
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+        }
+
+        if (!paymentConfirmed) {
+          throw new Error(`Payment status was not updated to PAID for ${requestReference}.`);
+        }
+
+        this.feePaymentReferencesByCase.set(caseNumber, references);
+        return;
       } catch (error: unknown) {
         if (attempt === maxRetries) {
           if (Axios.isAxiosError(error)) {
             const responseDetails = error.response?.data ?? error.message;
             const status = error.response?.status ? ` (HTTP ${error.response.status})` : '';
             throw new Error(
-              `Payment API failed after ${attempt} attempts${status}: ${JSON.stringify(responseDetails)}`,
-              { cause: error }
+              `Payment API failed after ${attempt} attempts${status}: ${JSON.stringify(responseDetails)}`
             );
           }
           const details = error instanceof Error ? error.message : String(error);
-          throw new Error(`Payment API failed after ${attempt} attempts: ${details}`, { cause: error });
+          throw new Error(`Payment API failed after ${attempt} attempts: ${details}`);
         }
         await new Promise(res => setTimeout(res, delayMs));
       }

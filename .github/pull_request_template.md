@@ -43,14 +43,23 @@ Mitigating Factors/Compensating Controls: Describe any measures taken to reduce 
 ### Feature flag assessment
 
 <!-- Comment:
-If Yes, name the LaunchDarkly / app flag(s) and briefly how the work is gated.
+If Yes, name the LaunchDarkly / app flag(s), briefly how the work is gated, and what users see with the flag OFF (normally "no change").
 If No, give a short reason (e.g. infra-only, already gated, no user-facing behaviour).
+With the flag OFF, existing pages must be unchanged: content (EN and CY), titles, captions, error messages, routes and validation.
 -->
 
 **Feature flag:** Does this PR introduce or change user-facing behaviour that should be behind feature flag(s)?
 
 - [ ] Yes — flag(s):
 - [ ] No — reason:
+
+**If Yes:**
+
+- [ ] What users see with the flag OFF is stated above (normally "no change")
+- [ ] Tested with the flag OFF: existing pages, content (EN and CY) and journeys are unchanged
+- [ ] Tested with the flag ON: new behaviour works as described in the ticket
+- [ ] Unit tests cover both flag states, including that existing page content is unchanged when OFF (see `suspendFeatureFlag.test.ts`)
+- [ ] New pages and later steps in the journey can't be reached by direct URL when the flag is OFF
 
 ### Checklist
 

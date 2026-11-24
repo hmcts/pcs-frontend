@@ -6,6 +6,10 @@
   "whatOrderDoYouWantLabel": "Explain what you want the court to do, and why",
   "list": {
     "heading": "For example, tell the court:",
+    "SUSPEND": [
+      "why you are asking the court to suspend the warrant",
+      "what payments you can make towards the rent or mortgage payments you owe"
+    ],
     "SOMETHING_ELSE": [
       "why you want to add someone to your claim",
       "why you should not be sanctioned (punished)",
