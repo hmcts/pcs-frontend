@@ -1,13 +1,6 @@
 import { type OrderedListBuilder } from '@hmcts-cft/docweave';
 
-import {
-  TIME_ESTIMATE_PARTS,
-  type TimeEstimatePart,
-  formatTime,
-  formatTimeEstimate,
-  parseTime,
-  parseTimeEstimate,
-} from '../../../../utils/makeOrderFormat';
+import { formatTime, formatTimeEstimate, parseTime, timeEstimateOf } from '../../../../utils/makeOrderFormat';
 import { type OrderData } from '../data';
 
 import { date, partyLabels, sentenceCase, value, values } from './common';
@@ -32,11 +25,7 @@ const DIRECTIONS: Record<string, { party: 'claimant' | 'defendant'; text: string
 };
 
 function timeEstimate(data: OrderData, prefix: string): string {
-  const estimate = parseTimeEstimate(
-    Object.fromEntries(
-      TIME_ESTIMATE_PARTS.map(part => [part, value(data, `${prefix}-time-estimate-${part}`)])
-    ) as Record<TimeEstimatePart, string>
-  );
+  const estimate = timeEstimateOf(name => value(data, name), prefix);
   return estimate ? formatTimeEstimate(estimate) : '[time not provided]';
 }
 

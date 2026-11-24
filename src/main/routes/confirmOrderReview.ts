@@ -374,7 +374,7 @@ const VIEWS = {
       issuingHtml: issuingHtml(review),
       sections: SECTIONS,
       freeForm: issuesFreeForm(answers),
-      orderDetails: answers.orderDetails ?? {},
+      orderDetails: answers.orderDetails,
       orderDoes: ORDER_DOES,
       outrightPossession: OUTRIGHT_POSSESSION,
       grounds: GROUNDS,

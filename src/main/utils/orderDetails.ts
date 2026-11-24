@@ -72,7 +72,7 @@ function dateOf(answers: OrderDetailsAnswers, prefix: string): Date | undefined 
 
 const isoDate = (answers: OrderDetailsAnswers, prefix: string) => dateOf(answers, prefix)?.toISOString().slice(0, 10);
 
-export function validateOrderDetails(answers: OrderDetailsAnswers = {}): Issue[] {
+export function validateOrderDetails(answers: OrderDetailsAnswers): Issue[] {
   const issues: Issue[] = [];
   const chosen = (id: string, options: readonly Option[], message: string) => {
     if (!options.some(option => option.value === answers[id])) {
@@ -139,7 +139,7 @@ function displayDeadline(answers: OrderDetailsAnswers, prefix: string, timeId: s
 }
 
 /** The answers as check your answers lists them: each question asked and its answer. */
-export function orderDetailsRows(answers: OrderDetailsAnswers = {}): [string, string][] {
+export function orderDetailsRows(answers: OrderDetailsAnswers): [string, string][] {
   const rows: [string, string][] = [['What does the order do?', label(ORDER_DOES, answers['order-does'])]];
   switch (answers['order-does']) {
     case 'outright':
@@ -171,7 +171,7 @@ export function orderDetailsRows(answers: OrderDetailsAnswers = {}): [string, st
 const upper = (value: string) => value.toUpperCase().replace(/-/g, '_');
 
 /** What court staff record a free-form order does, as the claim outcome every issued order gives pcs-api. */
-export function orderDetailsRequest(answers: OrderDetailsAnswers = {}): ClaimOutcome {
+export function orderDetailsRequest(answers: OrderDetailsAnswers): ClaimOutcome {
   switch (answers['order-does']) {
     case 'outright':
       return {

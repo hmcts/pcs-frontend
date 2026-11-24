@@ -141,6 +141,7 @@ function chosen(req: Request, madeAt?: unknown): Chosen {
 
 /** What the judge had on the page when they chose to change when the order is made. */
 interface MadeAtChange extends OrderFormSubmission {
+  formData: NonNullable<OrderFormSubmission['formData']>;
   madeAt?: string;
   shownMadeAt?: string;
 }
@@ -186,7 +187,7 @@ async function showRefused(
       },
       {
         orderType: sent.orderType,
-        formData: factsShown ? sent.formData : withoutHearingRecord(sent.formData ?? {}),
+        formData: factsShown ? sent.formData : withoutHearingRecord(sent.formData),
         orderDocumentJson: sent.orderDocumentJson,
         hearingVersion: factsShown ? hearingVersion : undefined,
         validationIssues: error.reasons.map(message => ({ id: 'make-order-form', message })),
@@ -204,7 +205,7 @@ async function showRefused(
 async function changeMadeAt(
   req: Request,
   res: Response,
-  { madeAt, shownMadeAt, orderType, formData = {}, orderDocumentJson }: MadeAtChange
+  { madeAt, shownMadeAt, orderType, formData, orderDocumentJson }: MadeAtChange
 ): Promise<void> {
   const accessToken = req.session.user!.accessToken;
   const caseReference = req.params.caseReference as string;

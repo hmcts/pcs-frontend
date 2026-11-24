@@ -44,7 +44,7 @@ interface Envelope {
 }
 
 const blankCase = (): Envelope => ({
-  order: { version: 0 },
+  order: { version: 0, formData: {} },
   caseContext: {
     caseReference: Number(CASE_REFERENCE),
     propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
@@ -388,9 +388,8 @@ export async function bootApp(
       { ...blankCase().hearing, ...hearing },
     ])
   );
-  if (options.hearings) {
-    envelope.caseContext.hearings = [...hearings.values()].map(({ id, date }) => ({ id, date }));
-  }
+  // pcs-api always lists the case's hearings, the one the order is made at among them.
+  envelope.caseContext.hearings = [...hearings.values()].map(({ id, date }) => ({ id, date }));
   newOrderHearing = envelope.hearing;
   startTokens = [];
   startContexts = [];

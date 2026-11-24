@@ -47,7 +47,7 @@ export interface OrderData {
 }
 
 /** The case's facts the server sent with the page. */
-function readOrderContext(form: HTMLFormElement): OrderContext {
+export function readOrderContext(form: HTMLFormElement): OrderContext {
   return JSON.parse(form.querySelector('#order-context')!.textContent!);
 }
 

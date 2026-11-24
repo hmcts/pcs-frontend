@@ -63,13 +63,13 @@ export function formatDate(date: Date): string {
   );
 }
 
-/** A time as GOV.UK writes it: 10:30am, 2pm, midday or midnight. */
 /** A time as typed, as pcs-api is sent it (HH:mm), or undefined if it is blank or not a time. */
 export function isoTime(raw: string): string | undefined {
   const time = parseTime(raw);
   return time && `${String(time.hours).padStart(2, '0')}:${String(time.minutes).padStart(2, '0')}`;
 }
 
+/** A time as GOV.UK writes it: 10:30am, 2pm, midday or midnight. */
 export function formatTime({ hours, minutes }: TimeOfDay): string {
   if (minutes === 0 && (hours === 0 || hours === 12)) {
     return hours === 0 ? 'midnight' : 'midday';
@@ -108,6 +108,15 @@ export function parseTimeEstimate(typed: Record<TimeEstimatePart, string>): Time
   return parts.minutes < 60 && TIME_ESTIMATE_PARTS.some(part => parts[part] > 0) ? parts : undefined;
 }
 
+/** The time estimate the listing with the prefix gives, from its days, hours and minutes fields. */
+export function timeEstimateOf(answer: (name: string) => string, prefix: string): TimeEstimate | undefined {
+  return parseTimeEstimate({
+    days: answer(`${prefix}-time-estimate-days`),
+    hours: answer(`${prefix}-time-estimate-hours`),
+    minutes: answer(`${prefix}-time-estimate-minutes`),
+  });
+}
+
 /** "3 days, 4 hours and 30 minutes", leaving out the parts that are nought. */
 export function formatTimeEstimate(estimate: TimeEstimate): string {
   const named = TIME_ESTIMATE_PARTS.filter(part => estimate[part] > 0).map(part =>
@@ -141,3 +150,9 @@ export function formatAddress(address: Record<string, string | undefined> = {}):
     .filter(Boolean)
     .join(', ');
 }
+
+/** The date a party may apply by, which an order made on the court's own initiative or without notice gives. */
+export const NOTICE_DATE_PREFIXES: Record<string, string> = {
+  'own-initiative': 'own-initiative-by',
+  'without-notice': 'without-notice-by',
+};

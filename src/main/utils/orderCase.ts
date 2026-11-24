@@ -25,13 +25,13 @@ export interface OrderCaseContext {
   propertyAddress?: Record<string, string | undefined>;
   claimants: OrderParty[];
   defendants: OrderParty[];
-  openCounterclaim?: boolean;
+  openCounterclaim: boolean;
   /** The case's open applications, any of which the order can decide, oldest first. */
-  applications?: OrderApplication[];
+  applications: OrderApplication[];
   /** The case bundle, every document on the case in one PDF, for a judge once one has been made. */
   caseBundle?: OrderCaseBundle | null;
   /** The case's hearings that have not been cancelled, earliest first, which a judge can make the order at. */
-  hearings?: { id: number; date: string }[];
+  hearings: { id: number; date: string }[];
   /** The court managing the case, as location reference data names it, if it can be found. */
   court?: { name?: string | null; venueShortName?: string | null } | null;
 }
@@ -46,7 +46,7 @@ export interface OrderCaseBundle {
 export interface OrderApplication {
   id: string;
   /** An application to suspend enforcement, which granting suspends on conditions. */
-  enforcementSuspension?: boolean;
+  enforcementSuspension: boolean;
   reference: string;
   type: string;
   somethingElseDetails?: string | null;
@@ -98,7 +98,7 @@ export interface OrderStart {
     /** Where the order is; none until it is first saved. Only a draft can be discarded. */
     state?: 'DRAFT' | 'SUBMITTED_FOR_REVIEW' | 'RETURNED_TO_JUDGE' | 'ISSUED' | 'DISCARDED' | null;
     orderType?: MakeOrderType;
-    formData?: FormData;
+    formData: FormData;
     docweaveSnapshot?: DocWeaveSnapshot | null;
     queryFromCaseworker?: string | null;
   };
@@ -113,7 +113,7 @@ export interface OrderStart {
   /** The judge the order is made by: the judge making it, or the one who made the order under review. */
   judgeName?: string | null;
   /** The coming year's England and Wales bank holidays, as ISO days, which a date to apply by moves off. */
-  bankHolidays?: string[] | null;
+  bankHolidays: string[];
 }
 
 export interface OrderConfirmationHeader {

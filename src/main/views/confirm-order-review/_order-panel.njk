@@ -8,9 +8,8 @@
   <section class="pcs-order-panel" aria-labelledby="order-panel-heading" data-order-panel>
     <div class="pcs-order-panel__header">
       <h2 class="govuk-heading-s" id="order-panel-heading">{{ heading }}</h2>
-      {# Only with the page's script, which hides and shows the order. #}
       <button type="button" class="pcs-order-panel__toggle" aria-expanded="true" aria-controls="order-panel-content"
-              data-order-panel-toggle hidden>Hide order</button>
+              data-order-panel-toggle>Hide order</button>
     </div>
     <div class="pcs-order-panel__content{% if staffMessage %} pcs-order-panel__content--with-message{% endif %}"
          id="order-panel-content">

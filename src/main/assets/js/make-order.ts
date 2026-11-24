@@ -3,7 +3,7 @@ import { type DocEditorController, type DocWeaveDocument, createDocEditor } from
 import { parseMoney, workingDayOnOrAfter } from '../../utils/makeOrderFormat';
 import { type MakeOrderType as OrderType } from '../../utils/makeOrderValidation';
 
-import { readOrderData } from './make-order/data';
+import { readOrderContext, readOrderData } from './make-order/data';
 import { wordingAnchors } from './make-order/wording/application';
 import { SAME_TERMS_COSTS } from './make-order/wording/common';
 import { buildOrder } from './make-order/wording/order';
@@ -24,16 +24,8 @@ function setDate([day, month, year]: DateParts, date: Date): void {
 }
 
 /** A date filled in quickly in the control: the next working day on or after it when the control asks for one. */
-function quickDate(control: Element | null, date: Date): Date {
-  const json = control?.closest<HTMLElement>('[data-working-days]')?.dataset.workingDays;
-  if (!json) {
-    return date;
-  }
-  try {
-    return workingDayOnOrAfter(date, JSON.parse(json));
-  } catch {
-    return workingDayOnOrAfter(date, []);
-  }
+function quickDate(control: Element, date: Date, bankHolidays: readonly string[]): Date {
+  return control.closest('[data-working-days]') ? workingDayOnOrAfter(date, bankHolidays) : date;
 }
 
 function daysFromToday(days: number): Date {
@@ -53,6 +45,7 @@ function monthsFromToday(months: number): Date {
 
 /** Quick dates: "14 days" pills, and shorthand such as 2w or 3m typed into the day field. */
 export function initDatePills(form: HTMLFormElement): void {
+  const { bankHolidays } = readOrderContext(form);
   form.addEventListener('input', event => {
     const day = event.target;
     if (!(day instanceof HTMLInputElement) || !day.name.endsWith('-day')) {
@@ -67,7 +60,11 @@ export function initDatePills(form: HTMLFormElement): void {
     const unit = shorthand[2].toLowerCase();
     setDate(
       parts,
-      quickDate(day, unit === 'm' ? monthsFromToday(amount) : daysFromToday(amount * (unit === 'w' ? 7 : 1)))
+      quickDate(
+        day,
+        unit === 'm' ? monthsFromToday(amount) : daysFromToday(amount * (unit === 'w' ? 7 : 1)),
+        bankHolidays
+      )
     );
   });
 
@@ -79,7 +76,7 @@ export function initDatePills(form: HTMLFormElement): void {
     if (!pill || !parts) {
       return;
     }
-    setDate(parts, quickDate(pill, daysFromToday(Number(pill.dataset.datePillDays))));
+    setDate(parts, quickDate(pill, daysFromToday(Number(pill.dataset.datePillDays)), bankHolidays));
     parts[0].dispatchEvent(new Event('input', { bubbles: true }));
   });
 }

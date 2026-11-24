@@ -1,11 +1,11 @@
 import { parseSnapshot, renderHtml } from '@hmcts-cft/docweave';
 
 import { type OrderFormSubmission, hearingTime, noticeRequestLabel } from '@utils/makeOrderForm';
-import { parseDate } from '@utils/makeOrderFormat';
+import { NOTICE_DATE_PREFIXES, formatDate, parseDate } from '@utils/makeOrderFormat';
 import { type MoneyJudgmentsAnswers, judgmentsFromOrder, moneyJudgmentsRequest } from '@utils/moneyJudgments';
 import type { FormData, OrderStart } from '@utils/orderCase';
 import { type OrderDetailsAnswers, orderDetailsRequest } from '@utils/orderDetails';
-import { type GenAppDecision, applicationDecisions, claimOutcome } from '@utils/orderOutcome';
+import { type GenAppDecision, applicationDecisions, claimOutcome, first } from '@utils/orderOutcome';
 
 export const REVIEW_REASONS = [
   { value: 'UNLESS_ORDER', text: 'Unless order' },
@@ -34,8 +34,8 @@ export interface OrderReviewAnswers {
   /** The order to issue, as the review page last sent it: the judge's form and document with the caseworker's changes. */
   order?: Required<OrderFormSubmission>;
   sendQuery?: boolean;
-  /** What a free-form order does, as court staff record it; none in a review started before it was asked. */
-  orderDetails?: OrderDetailsAnswers;
+  /** What a free-form order does, as court staff record it. */
+  orderDetails: OrderDetailsAnswers;
   /**
    * The order's costs and money judgments: for an order its form generated, as the judge's answers make them until
    * court staff save the page they are checked on; for a free-form order, as court staff record them.
@@ -121,7 +121,7 @@ export function ticked(value: unknown): boolean {
 }
 
 // The judge's staff message, as the make order form holds it.
-export function staffMessage(formData: FormData = {}): string | undefined {
+export function staffMessage(formData: FormData): string | undefined {
   const message = String(formData['staff-message-text'] ?? '').trim();
   return ticked(formData['staff-message']) && message ? message : undefined;
 }
@@ -288,29 +288,22 @@ const DECISION_LABELS: Record<GenAppDecision, string> = {
   OTHER: 'Something else',
 };
 
-function firstValue(formData: FormData, field: string): string {
-  const value = formData[field];
-  return String((Array.isArray(value) ? value[0] : value) ?? '').trim();
-}
-
 function statementSelected(formData: FormData): string {
-  return NOTICE_STATEMENTS[firstValue(formData, 'order-notice')] ?? 'Not recorded';
+  return NOTICE_STATEMENTS[first(formData['order-notice'])] ?? 'Not recorded';
 }
 
 /** The apply-by date the form gives, for a statement that has one. */
 function applyByEntered(formData: FormData): string | undefined {
-  const statement = firstValue(formData, 'order-notice');
-  if (statement !== 'own-initiative' && statement !== 'without-notice') {
+  const prefix = NOTICE_DATE_PREFIXES[first(formData['order-notice'])];
+  if (!prefix) {
     return undefined;
   }
-  const [day, month, year] = ['day', 'month', 'year'].map(part => firstValue(formData, `${statement}-by-${part}`));
+  const [day, month, year] = ['day', 'month', 'year'].map(part => first(formData[`${prefix}-${part}`]));
   if (!day && !month && !year) {
     return 'Not entered';
   }
   const date = /^\d{4}$/.test(year) ? parseDate(day, month, year) : undefined;
-  return date
-    ? date.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
-    : [day, month, year].join('/');
+  return date ? formatDate(date) : [day, month, year].join('/');
 }
 
 /**
@@ -320,8 +313,8 @@ function applyByEntered(formData: FormData): string | undefined {
  * answers, not the wording, which may have been edited.
  */
 export function issueSummary(review: OrderReviewSession): { key: string; lines: string[] }[] {
-  const current = review.answers.order?.formData ?? review.order.formData ?? {};
-  const original = review.order.formData ?? {};
+  const current = review.answers.order?.formData ?? review.order.formData;
+  const original = review.order.formData;
   const rows: { key: string; lines: string[] }[] = [
     {
       key: 'Order made',
@@ -346,9 +339,7 @@ export function issueSummary(review: OrderReviewSession): { key: string; lines: 
     });
   }
 
-  const applications = new Map(
-    (review.caseContext.applications ?? []).map(application => [application.id, application])
-  );
+  const applications = new Map(review.caseContext.applications.map(application => [application.id, application]));
   const decided = applicationDecisions(current).flatMap(({ genAppId, decision }) => {
     const application = applications.get(genAppId);
     return application

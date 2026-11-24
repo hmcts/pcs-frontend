@@ -1,5 +1,6 @@
 import { formatDate, formatMoney, parseDate, parseMoney } from '@utils/makeOrderFormat';
 import type { FormData } from '@utils/orderCase';
+import { all, first } from '@utils/orderOutcome';
 
 /*
  * The money judgments an order makes and what it says about costs, as court staff record them when they issue it:
@@ -94,14 +95,6 @@ export function blankJudgment(sides: Sides): MoneyJudgmentAnswer {
 }
 
 // The judge's make order form, as it holds its answers.
-
-function first(value: unknown): string {
-  return String((Array.isArray(value) ? value[0] : value) ?? '').trim();
-}
-
-function all(value: unknown): string[] {
-  return (Array.isArray(value) ? value : [value]).filter(v => v !== undefined && v !== '').map(String);
-}
 
 function dateOf(formData: FormData, prefix: string): DateAnswer {
   const [day, month, year] = ['day', 'month', 'year'].map(part => first(formData[`${prefix}-${part}`]));

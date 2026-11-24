@@ -7,7 +7,7 @@ import { initOrderPanel } from '../../../../main/assets/js/order-panel';
 const PANEL = `
   <section class="pcs-order-panel" data-order-panel>
     <h2>Order to issue</h2>
-    <button type="button" aria-expanded="true" aria-controls="order-panel-content" data-order-panel-toggle hidden>
+    <button type="button" aria-expanded="true" aria-controls="order-panel-content" data-order-panel-toggle>
       Hide order
     </button>
     <div id="order-panel-content">The order</div>
@@ -26,7 +26,6 @@ describe('initOrderPanel', () => {
   it('shows the order, with a button to hide it', () => {
     initOrderPanel();
 
-    expect(toggle().hidden).toBe(false);
     expect(toggle().textContent).toBe('Hide order');
     expect(content().hidden).toBe(false);
   });

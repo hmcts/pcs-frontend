@@ -37,11 +37,13 @@ const DECISIONS: Record<string, GenAppDecision> = {
 
 const DECISION_FIELD = /^app-(.+)-decision$/;
 
-function first(value: unknown): string {
+/** A posted field's first value, trimmed. */
+export function first(value: unknown): string {
   return String((Array.isArray(value) ? value[0] : value) ?? '').trim();
 }
 
-function all(value: unknown): string[] {
+/** A posted field's values, without blanks. */
+export function all(value: unknown): string[] {
   return (Array.isArray(value) ? value : [value]).filter(v => v !== undefined && v !== '').map(String);
 }
 
