@@ -23,9 +23,6 @@ export const MAKE_ORDER_TYPES = [
 ] as const;
 export type MakeOrderType = (typeof MAKE_ORDER_TYPES)[number];
 
-/** Order types the screen offers only at a hearing: no possession orders are made without one. */
-export const AT_HEARING_ORDER_TYPES: readonly MakeOrderType[] = ['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION'];
-
 export interface MakeOrderValidationIssue {
   id: string;
   message: string;
@@ -490,7 +487,7 @@ function validateStaffMessage(formData: Record<string, unknown>): MakeOrderValid
 
 const MAX_REGISTRY_LENGTH = 60;
 
-/** Where enforcement of the possession order goes, when an order made without a hearing transfers it. */
+/** Where enforcement of the possession order goes, when the order transfers it. */
 function validateEnforcementTransfer(formData: Record<string, unknown>): MakeOrderValidationIssue[] {
   const { issues, add, maxLength } = validation(formData);
   const court = value(formData, 'transfer-enforcement-court');
@@ -565,15 +562,12 @@ export function validateMakeOrder(
   applications: readonly ApplicationToDecide[] = []
 ): MakeOrderValidationIssue[] {
   const chosen = (name: string): boolean => values(formData, name).includes('yes');
-  if (withoutHearing && AT_HEARING_ORDER_TYPES.includes(orderType)) {
-    return [{ id: 'order-type', message: 'Select an order type made without a hearing' }];
-  }
   // In the order the page asks, so the error summary follows the page.
   return [
     // No one attended an order made without a hearing, whose parties the caller leaves out.
     ...validateAttendance(formData, parties),
     ...(chosen('recitals') ? validateText(formData, 'recitals-text', 'Recitals') : []),
-    ...(withoutHearing && chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
+    ...(chosen('transfer-enforcement') ? validateEnforcementTransfer(formData) : []),
     ...validateOrderType(orderType, formData),
     ...validateApplications(formData, applications, withoutHearing),
     ...validateNotice(formData),

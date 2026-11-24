@@ -152,7 +152,7 @@ describe('make an order: choosing when it is made', () => {
     expect(JSON.stringify(submittedOrders())).not.toContain('Defendant asked for time');
   });
 
-  it('offers no possession tabs for box work, where a possession order becomes free form', async () => {
+  it('offers the possession tabs for box work too, keeping the order type the judge chose', async () => {
     app = await bootApp();
     await openPage((await app.get(PAGE)).text);
     const tabs = (): (string | undefined)[] =>
@@ -163,16 +163,15 @@ describe('make an order: choosing when it is made', () => {
 
     check('made-at', 'without-hearing');
 
-    expect(control('#order-type').value).toBe('FREE_FORM');
-    expect(tabs()).toEqual(['ADJOURNMENT', 'STRIKE_OUT_DISMISSAL', 'FREE_FORM']);
+    // A possession order may be made either way, so the judge's order type stays.
+    expect(control('#order-type').value).toBe('OUTRIGHT_POSSESSION');
+    expect(tabs().slice(0, 2)).toEqual(['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION']);
     expect(offered('[name="list-on-notice"]')).toBe(true);
-    expect(offered('[name="transfer-enforcement"]')).toBe(true);
 
     check('made-at', '1');
 
     expect(tabs().slice(0, 2)).toEqual(['OUTRIGHT_POSSESSION', 'SUSPENDED_POSSESSION']);
     expect(offered('[name="list-on-notice"]')).toBe(false);
-    expect(offered('[name="transfer-enforcement"]')).toBe(false);
   });
 
   it('keeps what the judge wrote, where the order was, when the hearing they choose has been cancelled', async () => {

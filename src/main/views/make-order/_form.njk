@@ -65,12 +65,11 @@
 <div data-claim-order {%- if applications | length and draftOrderType == "NO_ORDER_ON_CLAIM" %} hidden{% endif %}>
 {#
   One list drives both the tabs and their panels: what the order does about the claim, which the order types
-  exclude one another over. The judges asked for no possession tabs without a hearing, which the page's script takes
-  out of the list. The tab marked open is the order's, or the first it is offered.
+  exclude one another over, with or without a hearing. The tab marked open is the order's, or the first it is offered.
 #}
 {% set orderTypeTabs = [
-  { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk", atHearingOnly: true },
-  { id: "tab-suspended", type: "SUSPENDED_POSSESSION", label: "Suspended possession", template: "make-order/tabs/_suspended.njk", atHearingOnly: true },
+  { id: "tab-outright", type: "OUTRIGHT_POSSESSION", label: "Outright possession", template: "make-order/tabs/_outright.njk" },
+  { id: "tab-suspended", type: "SUSPENDED_POSSESSION", label: "Suspended possession", template: "make-order/tabs/_suspended.njk" },
   { id: "tab-adjournment", type: "ADJOURNMENT", label: "Adjournment", template: "make-order/tabs/_adjournment.njk" },
   { id: "tab-strike-out", type: "STRIKE_OUT_DISMISSAL", label: "Strike out/dismiss", template: "make-order/tabs/_strike-out.njk" },
   { id: "tab-free-form", type: "FREE_FORM", label: "Free form", template: "make-order/tabs/_free-form.njk" }
@@ -84,7 +83,7 @@
   <ul class="govuk-tabs__list">
     {% for tab in orderTypeTabs %}
       <li class="govuk-tabs__list-item {%- if tab.type == openOrderType %} govuk-tabs__list-item--selected{% endif %}">
-        <a class="govuk-tabs__tab" href="#{{ tab.id }}" data-order-type="{{ tab.type }}" {%- if tab.atHearingOnly %} data-at-hearing-only{% endif %}>{{ tab.label }}</a>
+        <a class="govuk-tabs__tab" href="#{{ tab.id }}" data-order-type="{{ tab.type }}">{{ tab.label }}</a>
       </li>
     {% endfor %}
   </ul>
@@ -103,11 +102,10 @@
 {% include "make-order/_notice.njk" %}
 
 {#
-  Made without a hearing, the order is not offered the possession tabs, but can transfer enforcement of the case's
-  possession order to the High Court, whatever else it orders. An order made at a hearing transfers it with outright possession.
-  Last on the form, as the judges seldom need it.
+  Any order can transfer enforcement of the case's possession order to the High Court, whatever else it orders and
+  whether or not it is made at a hearing. Last on the form, as the judges seldom need it.
 #}
-<fieldset class="govuk-fieldset" data-made-at="without-hearing" {%- if not withoutHearing %} hidden disabled{% endif %}>
+<div>
   {% set registryHtml %}
     {{ compact.text("transfer-enforcement-registry", {
       label: "District Registry",
@@ -117,14 +115,14 @@
   {% endset %}
   <h2 class="govuk-heading-l govuk-!-margin-top-6">Enforcement</h2>
 
-  {{ compact.reveal("transfer-enforcement", "Transfer to High Court for enforcement", compact.radios("transfer-enforcement-court", {
+  {{ compact.reveal("transfer-enforcement", "Transfer enforcement to the High Court", compact.radios("transfer-enforcement-court", {
     legend: "Transfer enforcement to",
     items: [
       { value: "kings-bench", text: "King's Bench Division" },
       { value: "district-registry", text: "A District Registry", conditional: { html: registryHtml } }
     ]
   })) }}
-</fieldset>
+</div>
 
 <section class="govuk-!-margin-top-6" aria-labelledby="order-preview-heading">
   <h2 class="govuk-heading-l" id="order-preview-heading">{{ orderPreviewHeading | default("Order preview") }}</h2>

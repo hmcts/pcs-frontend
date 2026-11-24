@@ -142,10 +142,4 @@ export function addOutrightClauses(list: OrderedListBuilder, data: OrderData): v
       content.text('.');
     });
   }
-  if (options.includes('transfer-high-court')) {
-    list.item(
-      'high-court-transfer',
-      'The order for possession is transferred to the High Court solely for the purpose of enforcement.'
-    );
-  }
 }

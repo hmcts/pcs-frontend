@@ -29,7 +29,8 @@ describe('make an order: drafting', () => {
   it('rejects an incomplete order for review but saves it as a draft and restores it', async () => {
     const page = await openPage((await app.get(PAGE)).text);
     type('hearing-1-notes', 'Defendant asked for time to pay');
-    check('outright-options', 'transfer-high-court');
+    check('transfer-enforcement', 'yes');
+    check('transfer-enforcement-court', 'kings-bench');
 
     const body = page.body();
     body.set('action', 'SUBMIT_FOR_REVIEW');
@@ -51,9 +52,9 @@ describe('make an order: drafting', () => {
 
     const restored = await openPage((await app.get(PAGE)).text);
     expect(control<HTMLTextAreaElement>('[name="hearing-1-notes"]').value).toBe('Defendant asked for time to pay');
-    expect(control('[name="outright-options"][value="transfer-high-court"]').checked).toBe(true);
+    expect(control('[name="transfer-enforcement-court"][value="kings-bench"]').checked).toBe(true);
     expect(restored.orderText()).toContain(
-      'The order for possession is transferred to the High Court solely for the purpose of enforcement.'
+      "Enforcement of the Order of Possession is transferred to the High Court, King's Bench Division, pursuant to section 42 of the County Courts Act 1984."
     );
   });
 

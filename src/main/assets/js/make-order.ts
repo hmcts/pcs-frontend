@@ -342,28 +342,9 @@ export function initMakeOrder(): void {
     }
     followTab();
   });
-  // Possession orders are only made at a hearing. GOV.UK tabs step through their list with the arrow keys, so
-  // without one their tabs are taken out of it, and an order on one of them becomes a free form order.
-  const tabList = form.querySelector<HTMLElement>('.govuk-tabs__list')!;
-  const hearingTabs = tabs.filter(tab => tab.dataset.atHearingOnly !== undefined);
-  const hearingTabItems = hearingTabs.map(tab => tab.parentElement!);
-  const offerHearingTabs = (): void => {
-    if (chosenMadeAt(form) !== WITHOUT_HEARING) {
-      tabList.prepend(...hearingTabItems);
-      return;
-    }
-    if (hearingTabs.some(tab => tab.dataset.orderType === openTabType())) {
-      tabs.find(tab => tab.dataset.orderType === 'FREE_FORM')!.click();
-      if (orderingOnClaim()) {
-        selectOrderType('FREE_FORM');
-      }
-    }
-    hearingTabItems.forEach(item => item.remove());
-  };
   form.addEventListener('change', event => {
     if ((event.target as HTMLInputElement).name === 'made-at') {
       showMadeAt(form);
-      offerHearingTabs();
     }
   });
   form.addEventListener('input', render);
@@ -376,7 +357,6 @@ export function initMakeOrder(): void {
       new TextEncoder().encode(documentField.value).toBase64({ alphabet: 'base64url', omitPadding: true })
     );
   });
-  offerHearingTabs();
 
   selectOrderType(orderingOnClaim() ? (tabType() ?? (orderTypeField.value as OrderType)) : 'NO_ORDER_ON_CLAIM');
   initApplicationDecisions(form);

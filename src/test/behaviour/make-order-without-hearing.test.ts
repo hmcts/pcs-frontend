@@ -30,13 +30,15 @@ describe('make an order: without a hearing or an application', () => {
   });
   afterEach(() => app.close());
 
-  it('offers every order type but possession, starting on free form, without anyone attending', async () => {
+  it('offers every order type, possession too, without anyone attending', async () => {
     const page = await openPage((await app.get(PAGE)).text);
 
     expect(document.querySelector('h1')?.textContent).toBe('Make an order');
     expect(offered('[data-attendance-row]')).toBe(false);
     expect(document.querySelector('[data-application]')).toBeNull();
     expect([...document.querySelectorAll<HTMLElement>('[data-order-type]')].map(tab => tab.dataset.orderType)).toEqual([
+      'OUTRIGHT_POSSESSION',
+      'SUSPENDED_POSSESSION',
       'ADJOURNMENT',
       'STRIKE_OUT_DISMISSAL',
       'FREE_FORM',
@@ -53,18 +55,14 @@ describe('make an order: without a hearing or an application', () => {
     expect(submitted.order.orderType).toBe('FREE_FORM');
   });
 
-  it('refuses a possession order sent without a hearing', async () => {
+  it('makes a possession order on the papers, as the judge decides is right in the case', async () => {
     const page = await openPage((await app.get(PAGE)).text);
-    expect(document.querySelector('[href="#tab-outright"]')).toBeNull();
-    expect(document.querySelector('[href="#tab-suspended"]')).toBeNull();
+    selectTab('tab-outright');
+    check('outright-possession', 'forthwith');
 
-    const body = page.body();
-    body.set('action', 'SUBMIT_FOR_REVIEW');
-    body.set('orderType', 'OUTRIGHT_POSSESSION');
-    const rejected = await app.post(PAGE, body);
-    expect(rejected.status).toBe(400);
-    expect(rejected.text).toContain('Select an order type made without a hearing');
-    expect(submittedOrders()).toEqual([]);
+    const text = page.orderText();
+    expect(text).toContain('UPON the Court considering the papers without a hearing');
+    expect(text).toContain('to the claimant(s) forthwith.');
   });
 
   it('transfers enforcement of the possession order to the High Court, whatever else the order is', async () => {
@@ -155,14 +153,13 @@ describe('make an order: without a hearing or an application', () => {
     expect((await app.post(PAGE, body)).status).toBe(302);
   });
 
-  it('asks who attended a hearing order, and offers it possession but no listing or transfer of its own', async () => {
+  it('asks who attended a hearing order, and offers it possession but no listing', async () => {
     await app.close();
     app = await bootApp();
     const page = await openPage((await app.get(PAGE)).text);
 
     expect(offered('[data-attendance-row]')).toBe(true);
     expect(offered('input[name="list-on-notice"]')).toBe(false);
-    expect(offered('input[name="transfer-enforcement"]')).toBe(false);
     expect(document.querySelector('[href="#tab-outright"]')).not.toBeNull();
     expect(page.orderText()).not.toContain('considering the papers');
   });

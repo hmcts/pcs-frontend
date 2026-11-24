@@ -18,11 +18,10 @@ function destination(data: OrderData): string {
 }
 
 /**
- * An order made without a hearing can transfer enforcement of the possession order to the High Court. A
- * possession order made at a hearing transfers it with its own option.
+ * Any order can transfer enforcement of the possession order to the High Court, with or without a hearing.
  */
 export function addEnforcementTransfer(list: OrderedListBuilder, data: OrderData): void {
-  if (!data.withoutHearing || !selected(data, 'transfer-enforcement', 'yes')) {
+  if (!selected(data, 'transfer-enforcement', 'yes')) {
     return;
   }
   list.item('enforcement-transfer', content => {
