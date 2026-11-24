@@ -313,7 +313,7 @@ function answersFromBody(body: Record<string, unknown> | undefined): WarrantRetu
 
 function answersFromSession(warrantReturn: WarrantReturn | undefined): WarrantReturnAnswers {
   const outcomeDate = warrantReturn?.outcomeDate
-    ? DateTime.fromISO(warrantReturn.outcomeDate, { zone: 'utc' }).setZone(OUTCOME_DATE_ZONE)
+    ? DateTime.fromISO(warrantReturn.outcomeDate, { zone: OUTCOME_DATE_ZONE })
     : undefined;
   const isFinal = warrantReturn?.returnType === WarrantReturnType.FINAL;
   const outcome = warrantReturn?.evictionOutcome;
@@ -536,5 +536,5 @@ function validateDate(
     return undefined;
   }
 
-  return outcomeDate.toUTC().toISO({ includeOffset: false }) ?? undefined;
+  return outcomeDate.toISO({ includeOffset: false }) ?? undefined;
 }
