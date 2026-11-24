@@ -64,7 +64,7 @@ export interface OrderApplication {
 
 /** A judicial note on the case, with the hearing it was made at, if any. */
 export interface JudicialNote {
-  by?: string | null;
+  by: string;
   createdOn: string;
   hearingDate?: string | null;
   note: string;
@@ -81,7 +81,7 @@ export interface OrderHearing {
   inWales?: boolean;
   version?: number | null;
   caseFacts?: Record<string, unknown>;
-  recorded?: { by?: string | null; on: string } | null;
+  recorded?: { by: string; on: string } | null;
   note?: string | null;
   earlierNotes: JudicialNote[];
 }

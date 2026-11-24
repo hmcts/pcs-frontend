@@ -224,10 +224,10 @@ function hearingModel(hearing: OrderHearing | null | undefined): Record<string, 
     hearing,
     hearingDateDisplay: displayDate(hearing.date),
     factsRecordedDisplay: recorded
-      ? `Last updated by ${recorded.by ?? 'a judge'} on ${displayDate(recorded.on)}`
+      ? `Last updated by ${recorded.by} on ${displayDate(recorded.on)}`
       : 'From the claim',
     earlierNotes: hearing.earlierNotes.map(note => ({
-      by: note.by ?? 'A judge',
+      by: note.by,
       dateMade: displayDate(note.createdOn),
       note: note.note,
     })),
