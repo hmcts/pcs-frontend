@@ -32,8 +32,8 @@ export interface OrderCaseContext {
   caseBundle?: OrderCaseBundle | null;
   /** The case's hearings that have not been cancelled, earliest first, which a judge can make the order at. */
   hearings: { id: number; date: string }[];
-  /** The court managing the case, as location reference data names it, if it can be found. */
-  court?: { name?: string | null; venueShortName?: string | null } | null;
+  /** The court managing the case, as an order names where the judge sits, or a placeholder for them to fill in. */
+  court: string;
 }
 
 export interface OrderCaseBundle {
@@ -110,8 +110,10 @@ export interface OrderStart {
   hearing?: OrderHearing | null;
   /** The application the judge's task asked them to decide, which the order must decide. */
   taskGenAppId?: string | null;
-  /** The judge the order is made by: the judge making it, or the one who made the order under review. */
-  judgeName?: string | null;
+  /**
+   * The judge the order is made by, as it names them: the judge making it, or the one who made the order under review.
+   */
+  judge: string;
   /** The coming year's England and Wales bank holidays, as ISO days, which a date to apply by moves off. */
   bankHolidays: string[];
 }

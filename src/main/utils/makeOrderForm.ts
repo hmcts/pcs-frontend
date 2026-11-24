@@ -51,19 +51,13 @@ export interface OrderBefore {
 }
 
 /**
- * Before whom, where and when the order was made: the judge, at the court managing the case, on the hearing's date,
- * or today for an order made without one. A part not known is a placeholder for the judge to fill in.
+ * Before whom, where and when the order was made: the judge and the court managing the case, as pcs-api names them,
+ * on the hearing's date, or today for an order made without one.
  */
-export function orderBefore({ caseContext, hearing, judgeName }: OrderStart, now = DateTime.now()): OrderBefore {
-  const court = [caseContext.court?.name, caseContext.court?.venueShortName].filter(Boolean).join(' ');
+export function orderBefore({ caseContext, hearing, judge }: OrderStart, now = DateTime.now()): OrderBefore {
   const date = hearing ? DateTime.fromISO(hearing.date, { zone: 'Europe/London' }) : now.setZone('Europe/London');
-  return {
-    // TODO: the judge's title from Judicial Reference Data. Until then every judge is a District Judge.
-    judge: judgeName ? `District Judge ${judgeName}` : '[judge’s name and title]',
-    court: court || '[court]',
-    // TODO: what date and court an order made without a hearing names, once the Service team have said.
-    date: date.setLocale('en-GB').toFormat('d MMMM yyyy'),
-  };
+  // TODO: what date and court an order made without a hearing names, once the Service team have said.
+  return { judge, court: caseContext.court, date: date.setLocale('en-GB').toFormat('d MMMM yyyy') };
 }
 
 /** A hearing's date and time as the order pages give it. */

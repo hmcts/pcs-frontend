@@ -39,7 +39,7 @@ interface Envelope {
   caseContext: Record<string, unknown>;
   hearing?: Record<string, unknown> | null;
   taskGenAppId?: string;
-  judgeName?: string | null;
+  judge: string;
   bankHolidays?: string[];
 }
 
@@ -50,9 +50,9 @@ const blankCase = (): Envelope => ({
     propertyAddress: { AddressLine1: '10 Test Street', PostTown: 'Bristol', PostCode: 'BS1 1AA' },
     claimants: [{ id: 'claimant-id', name: 'Example Housing' }],
     defendants: [{ id: 'defendant-id', name: 'Alex Example' }],
-    court: { name: 'County Court at Bristol', venueShortName: null },
+    court: 'County Court at Bristol',
   },
-  judgeName: 'Sam Judge',
+  judge: 'District Judge Sam Judge',
   // The hearing the order is made for, starting from the claim's facts.
   hearing: {
     id: 1,
@@ -344,16 +344,17 @@ export async function bootApp(
     /** The case's hearings, over the one the order is made at, which the judge can choose to make it at. */
     hearings?: (Record<string, unknown> & { id: number; date: string })[];
     /** The judge pcs-api names the order made by, over the default, or null when it names none. */
-    judgeName?: string | null;
-    /** The court managing the case, over the default, or null when location reference data has none. */
-    court?: Record<string, unknown> | null;
+    /** The judge as pcs-api names them, over the default. */
+    judge?: string;
+    /** The court managing the case as pcs-api names it, over the default. */
+    court?: string;
     /** The bank holidays pcs-api sends, as ISO days; none by default. */
     bankHolidays?: string[];
   } = {}
 ): Promise<TestApp> {
   envelope = blankCase();
-  if (options.judgeName !== undefined) {
-    envelope.judgeName = options.judgeName;
+  if (options.judge !== undefined) {
+    envelope.judge = options.judge;
   }
   if (options.court !== undefined) {
     envelope.caseContext.court = options.court;
