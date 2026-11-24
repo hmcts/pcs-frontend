@@ -481,7 +481,6 @@ function validateEvictionDate(
     EVICTION_DATE_ERROR_MESSAGE,
     EVICTION_DATE_FUTURE_ERROR_MESSAGE,
     issues,
-    now
   );
 }
 
@@ -498,28 +497,26 @@ function validateReturnDate(
     RETURN_DATE_ERROR_MESSAGE,
     RETURN_DATE_FUTURE_ERROR_MESSAGE,
     issues,
-    now
   );
 }
 
 function validateDate(
   parts: Record<EvictionDatePart, string>,
   id: string,
-  requiredErrorMessage: string,
-  invalidErrorMessage: string,
-  futureErrorMessage: string,
+  requiredDateErrorMessage: string,
+  invalidDateErrorMessage: string,
+  futureDateErrorMessage: string,
   issues: ValidationIssue[],
-  now: DateTime = DateTime.now()
 ): string | undefined {
   const fieldId = (part: EvictionDatePart) => `${id}-${part}`;
 
   const missing = OUTCOME_DATE_PARTS.filter(part => !parts[part]);
   if (missing.length === OUTCOME_DATE_PARTS.length) {
-    issues.push({ id: fieldId('day'), message: requiredErrorMessage });
+    issues.push({ id: fieldId('day'), message: requiredDateErrorMessage });
     return undefined;
   }
   if (missing.length > 0) {
-    issues.push({ id: fieldId(missing[0]), message: invalidErrorMessage });
+    issues.push({ id: fieldId(missing[0]), message: invalidDateErrorMessage });
     return undefined;
   }
 
@@ -527,21 +524,22 @@ function validateDate(
     part === 'year' ? !/^\d{4}$/.test(parts[part]) : !/^\d{1,2}$/.test(parts[part])
   );
   if (notNumeric) {
-    issues.push({ id: fieldId(notNumeric), message: invalidErrorMessage });
+    issues.push({ id: fieldId(notNumeric), message: invalidDateErrorMessage });
     return undefined;
   }
 
   const [day, month, year, hour, minute] = OUTCOME_DATE_PARTS.map(part => Number(parts[part]));
-  const evictionDate = DateTime.fromObject({ day, month, year, hour, minute }, { zone: OUTCOME_DATE_ZONE });
-  if (!evictionDate.isValid || evictionDate.hour !== hour || evictionDate.minute !== minute) {
-    issues.push({ id: fieldId('day'), message: invalidErrorMessage });
+  const outcomeDate = DateTime.fromObject({ day, month, year, hour, minute }, { zone: OUTCOME_DATE_ZONE });
+  if (!outcomeDate.isValid || outcomeDate.hour !== hour || outcomeDate.minute !== minute) {
+    issues.push({ id: fieldId('day'), message: invalidDateErrorMessage });
     return undefined;
   }
 
-  if (evictionDate > now) {
-    issues.push({ id: fieldId('day'), message: futureErrorMessage });
+  const now = DateTime.now().setZone(OUTCOME_DATE_ZONE)
+  if (outcomeDate > now) {
+    issues.push({ id: fieldId('day'), message: futureDateErrorMessage });
     return undefined;
   }
 
-  return evictionDate.toUTC().toISO({ includeOffset: false }) ?? undefined;
+  return outcomeDate.toUTC().toISO({ includeOffset: false }) ?? undefined;
 }
