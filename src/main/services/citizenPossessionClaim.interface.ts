@@ -62,8 +62,25 @@ export const DISCRETIONARY_OTHER_GROUNDS = [
   'GROUND_18',
 ] as const;
 
+/** The mandatory grounds the grounds page lists: the other mandatory grounds, then Ground 8. */
+export const MANDATORY_GROUNDS_LISTED = [...MANDATORY_OTHER_GROUNDS, 'GROUND_8'] as const;
+
+/** The discretionary grounds the grounds page lists, with Grounds 10 and 11 in their place after Ground 9. */
+export const DISCRETIONARY_GROUNDS_LISTED = [
+  'GROUND_9',
+  'GROUND_10',
+  'GROUND_11',
+  ...DISCRETIONARY_OTHER_GROUNDS.slice(1),
+] as const;
+
 export type OtherGround =
-  (typeof MANDATORY_OTHER_GROUNDS)[number] | (typeof DISCRETIONARY_OTHER_GROUNDS)[number] | typeof OTHER_GROUND;
+  | (typeof MANDATORY_OTHER_GROUNDS)[number]
+  | (typeof DISCRETIONARY_OTHER_GROUNDS)[number]
+  | RentArrearsGround
+  | typeof OTHER_GROUND;
+
+export const isRentArrearsGround = (ground: string | undefined): boolean =>
+  (RENT_ARREARS_GROUNDS as readonly string[]).includes(ground ?? '');
 
 export const WALES_DISCRETIONARY_GROUNDS = [
   'RENT_ARREARS_S157',
@@ -335,12 +352,18 @@ export function isExcludedClaim(claim: CitizenPossessionClaim): boolean {
   return claim.tenancy?.tenancyType === 'EXCLUDED' && claim.eligibility?.legislativeCountry !== 'Wales';
 }
 
-/** Whether the claim is for rent arrears, which asks for the rent arrears details and proof. */
+/**
+ * Whether the claim is for rent arrears, which asks for the rent arrears details and proof: an excluded tenancy's
+ * rent arrears ground, or a rent arrears ground chosen on the rent arrears question or on the grounds list.
+ */
 export function claimsRentArrears(claim: CitizenPossessionClaim): boolean {
   if (isExcludedClaim(claim)) {
     return (
       claim.grounds?.hasExcludedGrounds === 'YES' && Boolean(claim.grounds.excludedGrounds?.includes('RENT_ARREARS'))
     );
   }
-  return claim.grounds?.hasRentArrearsGrounds === 'YES';
+  return (
+    claim.grounds?.hasRentArrearsGrounds === 'YES' ||
+    (claim.grounds?.otherGrounds ?? []).some(ground => isRentArrearsGround(ground))
+  );
 }

@@ -95,10 +95,10 @@ export const makeAClaimSections: readonly SectionConfig[] = [
     titleKey: 'taskList.sections.rentArrears',
     steps: [
       'rent-arrears',
-      'rent-amount',
-      'rent-frequency',
       'arrears-at-notice',
       'current-arrears',
+      'rent-amount',
+      'rent-frequency',
       'arrears-proof',
       'upload-rent-statement',
       'rent-due-day',

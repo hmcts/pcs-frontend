@@ -2,7 +2,7 @@ import escapeHtml from 'escape-html';
 import type { Request } from 'express';
 import type { TFunction } from 'i18next';
 
-import { formatCcdAddressLines } from '../utils/ccdAddress';
+import { formatCcdAddress, formatCcdAddressLines } from '../utils/ccdAddress';
 
 import { readClaim } from './claimDraft';
 import { propertyAddressOf } from './claimMapping';
@@ -11,6 +11,7 @@ import { formatClaimDate } from './dates';
 import { flowConfig } from './flow.config';
 import { formatPence } from './rentHistory';
 import { rentStatementTable } from './rentTables';
+import { makeAClaimSections } from './sections.config';
 
 import { getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
@@ -18,10 +19,10 @@ import type { CcdCaseAddress } from '@services/ccdCase.interface';
 import {
   type CitizenDefendant,
   type ClaimDocuments,
+  NOTICE_METHODS,
   NOTICE_METHOD_DETAILS,
   OTHER_GROUND,
   type YesNo,
-  claimsRentArrears,
   groundReasonsOf,
   groundsNeedingReasons,
 } from '@services/citizenPossessionClaim.interface';
@@ -208,39 +209,60 @@ export function additionalClaimantCards(req: Request): SummaryCard[] {
   });
 }
 
-export function defendantsCard(req: Request): SummaryCard {
+/** The defendants' card; the final check your answers page opens it with the statement about adults in possession. */
+export function defendantsCard(req: Request, opensWithAdultsStatement = false): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const claim = readClaim(req);
+  const defendants = claim.defendants ?? [];
   const builder = new CardBuilder(req, t);
-  (claim.defendants ?? []).forEach((defendant, index) => {
+  if (opensWithAdultsStatement && defendants.length > 0) {
+    builder.add('additional-defendants', 'moreThanOneAdult', yesNo(t, defendants.length > 1 ? 'YES' : 'NO'));
+  }
+  defendants.forEach((defendant, index) => {
     const query = index > 0 ? `?index=${index}` : '';
-    const number = { number: index + 1 };
-    builder
-      .add(
-        'defendant-name',
-        'defendantName',
-        defendantDisplayName(defendant.value, req),
-        query,
-        t('makeAClaim:summary.labels.defendantName', number)
-      )
-      .add(
-        'defendant-address',
-        'defendantAddress',
-        address(defendant.value.addressSameAsProperty === 'YES' ? propertyAddressOf(req) : defendant.value.address),
-        query,
-        t('makeAClaim:summary.labels.defendantAddress', number)
-      );
+    const nameKnown = defendant.value.nameKnown === 'YES' && defendantDisplayName(defendant.value, req);
+    const nameLabel = t('makeAClaim:summary.labels.defendantName', {
+      next: index > 0 ? t('makeAClaim:summary.nextDefendant') : '',
+    });
+    const addressLabel = t('makeAClaim:summary.labels.defendantAddress', {
+      name: nameKnown || t('makeAClaim:summary.theDefendant'),
+      address: formatCcdAddress(propertyAddressOf(req)),
+    });
+    const { addressSameAsProperty, address: otherAddress } = defendant.value;
+    builder.add(
+      'defendant-name',
+      'defendantName',
+      defendant.value.nameKnown === 'YES' && nameKnown
+        ? `${yesNo(t, 'YES')}, ${nameKnown}`
+        : yesNo(t, defendant.value.nameKnown),
+      query,
+      nameLabel
+    );
     if (index > 0) {
-      const name = defendantDisplayName(defendant.value, req);
       builder.withAction(
         `${getStepUrl('remove-defendant', flowConfig, req.res?.locals.validatedCase?.id)}?${defendant.id ? `id=${defendant.id}` : `index=${index}`}`,
         t('makeAClaim:summary.remove'),
-        t('makeAClaim:summary.labels.defendantName', number) + ` ${name}`
+        `${nameLabel} ${defendantDisplayName(defendant.value, req)}`
       );
     }
+    builder.add(
+      'defendant-address',
+      'defendantAddress',
+      addressSameAsProperty === 'NO' && otherAddress
+        ? [yesNo(t, 'NO') ?? '', ...address(otherAddress)]
+        : (yesNo(t, addressSameAsProperty) ?? t('makeAClaim:summary.addressNotAnswered')),
+      query,
+      addressLabel
+    );
   });
+  if (defendants.length > 0) {
+    builder.add('additional-defendants', 'additionalDefendants', yesNo(t, claim.additionalDefendants));
+  }
   return { id: 'defendants', title: t('makeAClaim:summary.cards.defendants'), rows: builder.build() };
 }
+
+/** The grounds the grounds page words on its own. */
+const GROUNDS_ON_LIST: Record<string, true> = { GROUND_8: true, GROUND_10: true, GROUND_11: true, OTHER: true };
 
 export function tenancyCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
@@ -322,7 +344,9 @@ export function tenancyCard(req: Request): SummaryCard {
         : []),
     ])
     .add('other-grounds', 'otherGrounds', [
-      ...(grounds.otherGrounds ?? []).map(g => t(`makeAClaim:grounds.${g}`)),
+      ...(grounds.otherGrounds ?? []).map(g =>
+        t(`makeAClaim:${g in GROUNDS_ON_LIST ? 'groundsOnList' : 'grounds'}.${g}`)
+      ),
       ...(grounds.otherGroundsDetails ? [grounds.otherGroundsDetails] : []),
     ]);
   if (isStepShown(req, 'ground-reason')) {
@@ -340,15 +364,7 @@ export function noticeCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const notice = readClaim(req).notice ?? {};
   const details = notice as Record<string, string | undefined>;
-  const methods = (notice.noticeMethods ?? []).flatMap(method => {
-    const { date, details: detail } = NOTICE_METHOD_DETAILS[method];
-    return [
-      valueOf(t, 'noticeMethod', method) ?? '',
-      ...(detail && details[detail] ? [details[detail] as string] : []),
-      formatClaimDate(details[date], req),
-    ].filter(Boolean);
-  });
-  const rows = new CardBuilder(req, t)
+  const builder = new CardBuilder(req, t)
     .add('notice-served', 'noticeServed', withDetail(yesNo(t, notice.noticeServed), notice.noNoticeReason))
     .add(
       'notice-type',
@@ -357,7 +373,22 @@ export function noticeCard(req: Request): SummaryCard {
         ? [valueOf(t, 'noticeType', 'OTHER') ?? '', notice.noticeTypeOther ?? '']
         : valueOf(t, 'noticeType', notice.noticeType)
     )
-    .add('notice-method', 'noticeMethods', methods)
+    .add(
+      'notice-method',
+      'noticeMethods',
+      (notice.noticeMethods ?? []).map(method => valueOf(t, 'noticeMethod', method) ?? '')
+    );
+  for (const method of NOTICE_METHODS) {
+    if (!notice.noticeMethods?.includes(method)) {
+      continue;
+    }
+    const { date, details: detail } = NOTICE_METHOD_DETAILS[method];
+    if (detail) {
+      builder.add('notice-method', detail, details[detail]);
+    }
+    builder.add('notice-method', date, formatClaimDate(details[date], req));
+  }
+  const rows = builder
     .add(
       'notice-available',
       'noticeAvailable',
@@ -372,6 +403,8 @@ export function rentArrearsCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const rentArrears = readClaim(req).rentArrears ?? {};
   const rows = new CardBuilder(req, t)
+    .add('arrears-at-notice', 'arrearsAtNoticeDate', money(rentArrears.arrearsAtNoticeDate))
+    .add('current-arrears', 'currentArrears', money(rentArrears.currentArrears))
     .add('rent-amount', 'rentAmount', money(rentArrears.rentAmount))
     .add(
       'rent-frequency',
@@ -380,11 +413,9 @@ export function rentArrearsCard(req: Request): SummaryCard {
         ? [valueOf(t, 'rentFrequency', 'OTHER') ?? '', rentArrears.otherFrequencyDetails ?? '']
         : valueOf(t, 'rentFrequency', rentArrears.rentFrequency)
     )
-    .add('arrears-at-notice', 'arrearsAtNoticeDate', money(rentArrears.arrearsAtNoticeDate))
-    .add('current-arrears', 'currentArrears', money(rentArrears.currentArrears))
+    .add('rent-due-day', 'rentDueDay', rentArrears.rentDueDay?.toString())
     .add('arrears-proof', 'proofType', valueOf(t, 'proofType', rentArrears.proofType))
     .add('upload-rent-statement', 'rentStatementDocuments', documents(rentArrears.rentStatementDocuments))
-    .add('rent-due-day', 'rentDueDay', rentArrears.rentDueDay?.toString())
     .add('money-judgment', 'moneyJudgmentWanted', yesNo(t, rentArrears.moneyJudgmentWanted))
     .add('recovery-steps', 'recoverySteps', rentArrears.recoverySteps)
     .build();
@@ -410,11 +441,19 @@ export function circumstancesCard(req: Request): SummaryCard {
   return { id: 'circumstances', title: t('makeAClaim:summary.cards.circumstances'), rows };
 }
 
-export function otherInformationCard(req: Request): SummaryCard {
+export function uploadDocumentsCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
   const otherInformation = readClaim(req).otherInformation ?? {};
   const rows = new CardBuilder(req, t)
     .add('upload-other-documents', 'otherDocuments', documents(otherInformation.otherDocuments))
+    .build();
+  return { id: 'uploadDocuments', title: t('makeAClaim:summary.cards.uploadDocuments'), rows };
+}
+
+export function otherInformationCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const otherInformation = readClaim(req).otherInformation ?? {};
+  const rows = new CardBuilder(req, t)
     .add(
       'other-reasons',
       'hasOtherReasons',
@@ -423,7 +462,6 @@ export function otherInformationCard(req: Request): SummaryCard {
         : yesNo(t, otherInformation.hasOtherReasons)
     )
     .add('general-application', 'generalApplicationIntent', yesNo(t, otherInformation.generalApplicationIntent))
-    .add('language-used', 'languageUsed', valueOf(t, 'languageUsed', otherInformation.languageUsed))
     .build();
   return { id: 'otherInformation', title: t('makeAClaim:summary.cards.otherInformation'), rows };
 }
@@ -455,6 +493,15 @@ export function equalityCard(req: Request): SummaryCard {
   return { id: 'equality', title: t('makeAClaim:summary.cards.equality'), rows };
 }
 
+export function languageUsedCard(req: Request): SummaryCard {
+  const t = getTranslationFunction(req, ['makeAClaim', 'common']);
+  const otherInformation = readClaim(req).otherInformation ?? {};
+  const rows = new CardBuilder(req, t)
+    .add('language-used', 'languageUsed', valueOf(t, 'languageUsed', otherInformation.languageUsed))
+    .build();
+  return { id: 'languageUsed', title: t('makeAClaim:summary.cards.languageUsed'), rows };
+}
+
 /** The property, which cannot be changed once the claim exists. */
 export function propertyCard(req: Request): SummaryCard {
   const t = getTranslationFunction(req, ['makeAClaim', 'common']);
@@ -475,19 +522,26 @@ export function propertyCard(req: Request): SummaryCard {
   };
 }
 
-/** Every card the final check your answers page shows, in journey order. */
-export function allCards(req: Request): SummaryCard[] {
-  const cards = [
-    propertyCard(req),
-    aboutYouCard(req),
-    ...additionalClaimantCards(req),
-    defendantsCard(req),
-    tenancyCard(req),
-    noticeCard(req),
-  ];
-  if (claimsRentArrears(readClaim(req))) {
-    cards.push(rentArrearsCard(req));
+/** The cards each task list section adds to the final check your answers page, in order. */
+const SECTION_CARDS: Record<string, readonly ((req: Request) => SummaryCard | SummaryCard[])[]> = {
+  aboutYou: [aboutYouCard, additionalClaimantCards],
+  defendants: [req => defendantsCard(req, true)],
+  tenancyAndGrounds: [tenancyCard],
+  notice: [noticeCard],
+  rentArrears: [rentArrearsCard],
+  circumstances: [circumstancesCard],
+  uploadDocuments: [uploadDocumentsCard],
+  checkAndSubmit: [otherInformationCard, languageUsedCard, supportCard, equalityCard],
+};
+
+/** Every card the final check your answers page shows: the property, then a card for each task list section. */
+export async function allCards(req: Request): Promise<SummaryCard[]> {
+  const cards = [propertyCard(req)];
+  for (const section of makeAClaimSections) {
+    if (section.isApplicable && !(await section.isApplicable(req))) {
+      continue;
+    }
+    cards.push(...(SECTION_CARDS[section.id] ?? []).flatMap(card => card(req)));
   }
-  cards.push(circumstancesCard(req), otherInformationCard(req), supportCard(req), equalityCard(req));
   return cards;
 }

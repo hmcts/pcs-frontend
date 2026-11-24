@@ -41,10 +41,10 @@ import {
   type CitizenAdditionalClaimant,
   type CitizenDefendant,
   type CitizenPossessionClaim,
-  DISCRETIONARY_OTHER_GROUNDS,
+  DISCRETIONARY_GROUNDS_LISTED,
   EXCLUDED_GROUNDS,
   type GroundReason,
-  MANDATORY_OTHER_GROUNDS,
+  MANDATORY_GROUNDS_LISTED,
   NOTICE_METHODS,
   NOTICE_METHOD_DETAILS,
   type NoticeMethod,
@@ -52,6 +52,7 @@ import {
   type OtherGround,
   type ProofType,
   RENT_ARREARS_GROUNDS,
+  type RentArrearsGround,
   type RentFrequency,
   type RentTableRow,
   WALES_DISCRETIONARY_GROUNDS,
@@ -59,8 +60,21 @@ import {
   WALES_RENT_ARREARS_GROUNDS,
   groundReasonsOf,
   groundsNeedingReasons,
+  isRentArrearsGround,
   isWalesClaimData,
 } from '@services/citizenPossessionClaim.interface';
+
+/** The details of the other grounds under the "Others" ticked in either group, once each, one group's after the other's. */
+function otherGroundsDetailsOf(body: FormBody): string | undefined {
+  const inGroup = (group: 'mandatoryGrounds' | 'discretionaryGrounds') =>
+    checkedValues(body[group], [OTHER_GROUND] as const).length > 0
+      ? text(body[`${group}.otherGroundsDetails`])
+      : undefined;
+  const details = [inGroup('mandatoryGrounds'), inGroup('discretionaryGrounds')].filter(
+    (detail, index, all): detail is string => detail !== undefined && all.indexOf(detail) === index
+  );
+  return details.length ? details.join('\n') : undefined;
+}
 
 /**
  * How each make a claim page reads its answers from the saved claim and writes them back. Every translation
@@ -684,26 +698,36 @@ export const claimMappings: Record<string, StepMapping> = {
 
   'other-grounds': {
     toForm: claim => {
-      const selected = claim.grounds?.otherGrounds ?? [];
+      const selected = [
+        ...(claim.grounds?.otherGrounds ?? []),
+        ...(claim.grounds?.hasRentArrearsGrounds === 'YES' ? (claim.grounds.rentArrearsGrounds ?? []) : []),
+      ];
+      const details = claim.grounds?.otherGroundsDetails;
+      const inGroup = (grounds: readonly string[]) =>
+        selected.filter(ground => ground === OTHER_GROUND || grounds.includes(ground));
       return {
-        mandatoryGrounds: selected.filter(ground => (MANDATORY_OTHER_GROUNDS as readonly string[]).includes(ground)),
-        otherGround: selected.filter(ground => ground === OTHER_GROUND),
-        'otherGround.otherGroundsDetails': claim.grounds?.otherGroundsDetails,
-        discretionaryGrounds: selected.filter(ground =>
-          (DISCRETIONARY_OTHER_GROUNDS as readonly string[]).includes(ground)
-        ),
+        mandatoryGrounds: inGroup(MANDATORY_GROUNDS_LISTED),
+        'mandatoryGrounds.otherGroundsDetails': details,
+        discretionaryGrounds: inGroup(DISCRETIONARY_GROUNDS_LISTED),
+        'discretionaryGrounds.otherGroundsDetails': details,
       };
     },
     fromForm: (claim, body) =>
       setNested(claim, 'grounds', grounds => {
+        const ticked = [
+          ...checkedValues(body.mandatoryGrounds, [...MANDATORY_GROUNDS_LISTED, OTHER_GROUND] as const),
+          ...checkedValues(body.discretionaryGrounds, [...DISCRETIONARY_GROUNDS_LISTED, OTHER_GROUND] as const),
+        ].filter((ground, index, all) => all.indexOf(ground) === index);
+        const rentArrears = ticked.filter(isRentArrearsGround) as RentArrearsGround[];
+        const listed = ticked.filter(ground => !isRentArrearsGround(ground) && ground !== OTHER_GROUND);
+        const keepsRentArrearsApart = grounds.hasRentArrearsGrounds === 'YES';
+        grounds.rentArrearsGrounds = keepsRentArrearsApart ? rentArrears : grounds.rentArrearsGrounds;
         grounds.otherGrounds = [
-          ...checkedValues(body.mandatoryGrounds, MANDATORY_OTHER_GROUNDS),
-          ...checkedValues(body.discretionaryGrounds, DISCRETIONARY_OTHER_GROUNDS),
-          ...checkedValues(body.otherGround, [OTHER_GROUND] as const),
-        ];
-        grounds.otherGroundsDetails = grounds.otherGrounds.includes(OTHER_GROUND)
-          ? text(body['otherGround.otherGroundsDetails'])
-          : undefined;
+          ...(keepsRentArrearsApart ? [] : rentArrears),
+          ...listed,
+          ...(ticked.includes(OTHER_GROUND) ? [OTHER_GROUND] : []),
+        ] as OtherGround[];
+        grounds.otherGroundsDetails = ticked.includes(OTHER_GROUND) ? otherGroundsDetailsOf(body) : undefined;
         grounds.groundReasons = (grounds.groundReasons ?? []).filter(
           item => item.value.ground && grounds.otherGrounds?.includes(item.value.ground as OtherGround)
         );
@@ -1000,9 +1024,9 @@ export const claimMappings: Record<string, StepMapping> = {
     toForm: claim => ({ recoverySteps: claim.rentArrears?.recoverySteps }),
     fromForm: (claim, body) =>
       setNested(claim, 'rentArrears', rentArrears => {
-        rentArrears.recoverySteps = optionalText(body.recoverySteps, body);
+        rentArrears.recoverySteps = text(body.recoverySteps);
       }),
-    isAnswered: claim => claim.rentArrears?.recoverySteps !== undefined,
+    isAnswered: claim => Boolean(claim.rentArrears?.recoverySteps),
   },
 
   'defendant-circumstances': {

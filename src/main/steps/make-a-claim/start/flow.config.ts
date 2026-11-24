@@ -34,6 +34,7 @@ export const startFlowConfig: JourneyFlowConfig = {
     'wales-claimant-type',
     'who-is-claiming',
     'not-litigant-in-person',
+    'agent-ineligible',
     'property-country',
   ],
   steps: {
@@ -73,9 +74,13 @@ export const startFlowConfig: JourneyFlowConfig = {
     'who-is-claiming': {
       dependencies: ['property-address'],
       previousStep: (req: Request) => (isWelshProperty(req) ? 'wales-claimant-type' : 'property-address'),
-      routes: [{ nextStep: 'not-litigant-in-person' }],
+      routes: [
+        { condition: answered('whoIsClaiming', 'AGENT'), nextStep: 'agent-ineligible' },
+        { nextStep: 'not-litigant-in-person' },
+      ],
     },
     'not-litigant-in-person': { previousStep: 'who-is-claiming' },
+    'agent-ineligible': { previousStep: 'who-is-claiming' },
     'property-country': {
       dependencies: ['property-address'],
       previousStep: 'property-address',

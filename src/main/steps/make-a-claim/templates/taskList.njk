@@ -3,7 +3,6 @@
 {% block mainContent %}
   <h1 class="govuk-heading-l">{{ propertyAddress }}</h1>
   <p class="govuk-body-l">{{ caseNumberLabel }} {{ caseNumber }}</p>
-  <p class="govuk-body">{{ introText }}</p>
 
   {% for group in groups %}
     {% if group.items.length %}
@@ -27,4 +26,11 @@
       </ul>
     {% endif %}
   {% endfor %}
+
+  <h2 class="govuk-heading-m">{{ helpAndSupportHeading }}</h2>
+  <ul class="govuk-list">
+    {% for link in helpLinks %}
+      <li><a class="govuk-link" href="{{ link.href }}" target="_blank" rel="noopener noreferrer">{{ link.text }}</a></li>
+    {% endfor %}
+  </ul>
 {% endblock %}

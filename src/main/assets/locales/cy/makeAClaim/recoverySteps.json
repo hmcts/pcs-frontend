@@ -4,5 +4,8 @@
   "hint": "cyEnter details of any action you’ve taken to get payment or come to an agreement to clear the arrears. If there have been previous court proceedings, include the case numbers.",
   "fieldNames": {
     "recoverySteps": "cyThe steps you’ve taken to recover the arrears"
+  },
+  "errors": {
+    "recoverySteps": "cyEnter the steps you’ve taken to recover the arrears"
   }
 }

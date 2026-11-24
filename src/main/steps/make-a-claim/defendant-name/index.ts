@@ -5,6 +5,7 @@ import { FIELD_LIMITS } from '../fieldLimits';
 import { flowConfig } from '../flow.config';
 import { createMakeAClaimStep } from '../formStep';
 
+import { getTranslationFunction } from '@modules/steps';
 import { getStepUrl } from '@modules/steps/flow';
 import type { StepDefinition } from '@modules/steps/stepFormData.interface';
 
@@ -27,10 +28,22 @@ export const step: StepDefinition = createMakeAClaimStep({
       },
     }),
   ],
-  extendGetContent: req =>
-    defendantIndexOf(req) > 0
-      ? { backUrl: getStepUrl('additional-defendants', flowConfig, req.res?.locals.validatedCase?.id) }
-      : {},
+  extendGetContent: (req, formContent) => {
+    if (defendantIndexOf(req) === 0) {
+      return { next: '' };
+    }
+    const question = formContent.fields?.find(field => field.name === 'nameKnown')?.component as
+      { hint?: unknown } | undefined;
+    if (question) {
+      delete question.hint;
+    }
+    const t = getTranslationFunction(req);
+    return {
+      next: t('nextDefendant'),
+      pageTitle: t('nextPageTitle'),
+      backUrl: getStepUrl('additional-defendants', flowConfig, req.res?.locals.validatedCase?.id),
+    };
+  },
   keepsOwnRedirectOnReturn: req => !defendantAddressAnswered(readClaim(req).defendants?.[defendantIndexOf(req)]?.value),
   resolveRedirectAfterPost: async req => {
     const index = defendantIndexOf(req);

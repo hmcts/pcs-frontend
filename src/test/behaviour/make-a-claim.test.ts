@@ -87,7 +87,7 @@ const COMPLETE_CLAIM = {
     proofType: 'UPLOAD_STATEMENT',
     rentStatementDocuments: STATEMENT_DOCUMENTS,
     moneyJudgmentWanted: 'NO',
-    recoverySteps: '',
+    recoverySteps: 'Sent two letters',
   },
 };
 
@@ -158,6 +158,20 @@ describe('before a claim exists', () => {
     await app.post('/make-a-claim/property-address', PROPERTY);
     expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'SOLICITOR' })).location).toBe(
       '/make-a-claim/not-litigant-in-person'
+    );
+    expect(ccd.createRequests).toEqual([]);
+  });
+
+  it('turns away an agent on a page of their own', async () => {
+    app = await bootMakeAClaim();
+    await app.post('/make-a-claim/claimant-type', { claimantType: 'PRIVATE_LANDLORD' });
+    await app.post('/make-a-claim/trespass', { isTrespass: 'no' });
+    await app.post('/make-a-claim/property-address', PROPERTY);
+    expect((await app.post('/make-a-claim/who-is-claiming', { whoIsClaiming: 'AGENT' })).location).toBe(
+      '/make-a-claim/agent-ineligible'
+    );
+    expect(text((await app.get('/make-a-claim/agent-ineligible')).text)).toContain(
+      'Agents cannot make claims on behalf of a landlord. The landlord must make the claim instead.'
     );
     expect(ccd.createRequests).toEqual([]);
   });
@@ -623,7 +637,7 @@ describe('every page renders', () => {
         proofType: 'TABLE',
         rentDueDay: 1,
         moneyJudgmentWanted: 'NO',
-        recoverySteps: '',
+        recoverySteps: 'Sent two letters',
         rentHistoryTable: [
           {
             value: {
@@ -1050,6 +1064,34 @@ describe('answering questions', () => {
     expect(ccd.draftSaves).toHaveLength(saves);
   });
 
+  it('offers the rent arrears grounds and Others in each group of the grounds page', async () => {
+    app = await bootMakeAClaim();
+    givenClaim({ ...ANSWERED_CLAIM, grounds: { hasRentArrearsGrounds: 'NO' } });
+    const document = new JSDOM((await app.get(claimPath('other-grounds'))).text).window.document;
+    const labelsIn = (group: string) =>
+      [...document.querySelectorAll(`input[name="${group}"] + label`)].map(label => label.textContent?.trim());
+    expect(labelsIn('mandatoryGrounds').slice(-2)).toEqual(['Rent arrears (Ground 8)', 'Others']);
+    expect(labelsIn('discretionaryGrounds')).toEqual(
+      expect.arrayContaining(['Any rent arrears (Ground 10)', 'Persistent arrears (Ground 11)', 'Others'])
+    );
+    expect(labelsIn('discretionaryGrounds').at(-1)).toBe('Others');
+    expect(document.querySelectorAll('textarea[name$="otherGroundsDetails"]')).toHaveLength(2);
+  });
+
+  it('asks about a later defendant’s name without the hint', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(ANSWERED_CLAIM);
+    const first = text((await app.get(claimPath('defendant-name'))).text);
+    expect(first).toContain('Do you know the defendant’s name?');
+    expect(first).toContain('If you do not know their name');
+    const next = text((await app.get(`${claimPath('defendant-name')}?index=1`)).text);
+    expect(next).toContain('Do you know the next defendant’s name?');
+    expect(next).not.toContain('If you do not know their name');
+    expect(new JSDOM((await app.get(`${claimPath('defendant-name')}?index=1`)).text).window.document.title).toContain(
+      'Do you know the next defendant’s name? –'
+    );
+  });
+
   it('adds defendants one after another', async () => {
     app = await bootMakeAClaim();
     givenClaim(ANSWERED_CLAIM);
@@ -1071,7 +1113,9 @@ describe('answering questions', () => {
       addressKnown: 'YES',
       address: { AddressLine1: '2 Other Road', PostTown: 'Luton', PostCode: 'LU2 2BB' },
     });
-    expect(text((await app.get(claimPath('defendant-cya'))).text)).toContain('Defendant 2 name Persons unknown');
+    expect(text((await app.get(claimPath('defendant-cya'))).text)).toContain(
+      'Do you know the next defendant’s name? No'
+    );
   });
 
   it('leaves the defendants in progress until the claimant says there are no more to add and confirms them', async () => {
@@ -1317,7 +1361,51 @@ describe('submitting the claim', () => {
     const confirmation = text((await app.get(`/case/${CASE_REFERENCE}/claim-submitted?status=success`)).text);
     expect(confirmation).toContain('Your payment was successful');
     expect(confirmation).toContain('1777 0276 0001 7761');
+    expect(confirmation).toContain('Payment summary Payment for Claim fee Total amount £404.00');
+    expect(confirmation).toContain('What happens next');
+    expect(confirmation).toContain('Close and return to case overview');
   });
+
+  it('titles the claim submitted page by what the claimant has paid', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(COMPLETE_CLAIM);
+    await app.post(claimPath('check-your-answers'), {
+      statementOfTruth: ['contempt', 'belief'],
+      statementOfTruthFullName: 'Billy Wright',
+      statementOfTruthPosition: '',
+    });
+    const titleOf = async (query: string) =>
+      new JSDOM((await app.get(`/case/${CASE_REFERENCE}/claim-submitted${query}`)).text).window.document
+        .querySelector('.govuk-panel__title')
+        ?.textContent?.trim();
+    expect(await titleOf('')).toBe('Claim submitted');
+    expect(await titleOf('?status=success')).toBe('Your payment was successful');
+    expect(await titleOf('?status=pending')).toBe('Your payment is being processed');
+  });
+
+  it('shows one check your answers card for each task list section, in order', async () => {
+    app = await bootMakeAClaim();
+    givenClaim(COMPLETE_CLAIM);
+    const document = new JSDOM((await app.get(claimPath('check-your-answers'))).text).window.document;
+    expect(
+      [...document.querySelectorAll('.govuk-summary-card__title')].map(title => title.textContent?.trim())
+    ).toEqual([
+      'The property',
+      'About you and your contact preferences',
+      'About the defendants',
+      'About the tenancy and your grounds for possession',
+      'About the notice you served',
+      'Proof of rent arrears',
+      'Circumstances',
+      'Upload documents',
+      'Other information',
+      'Language used',
+      'Your support',
+      'Equality and diversity questions',
+    ]);
+    expect(text(document.body.innerHTML)).toContain('Is there more than one adult in possession of the property? No');
+  });
+
 });
 
 describe('review fixes', () => {
@@ -1753,10 +1841,10 @@ describe('build observation fixes', () => {
   it('keeps a blank optional answer unanswered on Save for later, and answered on Save and continue', async () => {
     app = await bootMakeAClaim();
     givenClaim(ANSWERED_CLAIM);
-    await app.post(claimPath('recovery-steps'), { recoverySteps: '', action: 'saveForLater' });
-    expect(storedClaim().rentArrears.recoverySteps).toBeUndefined();
-    await app.post(claimPath('recovery-steps'), { recoverySteps: '' });
-    expect(storedClaim().rentArrears.recoverySteps).toBe('');
+    await app.post(claimPath('defendant-circumstances'), { defendantCircumstances: '', action: 'saveForLater' });
+    expect(storedClaim().circumstances.defendantCircumstances).toBeUndefined();
+    await app.post(claimPath('defendant-circumstances'), { defendantCircumstances: '' });
+    expect(storedClaim().circumstances.defendantCircumstances).toBe('');
 
     await app.post(claimPath('upload-other-documents'), { action: 'saveForLater' });
     expect(storedClaim().otherInformation.otherDocuments).toEqual([]);

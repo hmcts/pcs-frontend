@@ -154,18 +154,6 @@ describe('submitErrorItems', () => {
     ]);
   });
 
-  it('sends rent arrears grounds given as other grounds back to the grounds page', () => {
-    expect(items('OTHER_GROUND_NOT_ALLOWED')).toEqual([
-      {
-        text: 'makeAClaim:submitErrors.otherGroundNotAllowed',
-        href: withReturnTo(claimPage('other-grounds'), 'check-your-answers'),
-      },
-    ]);
-    expect(submitRefusalOutcome(refused('OTHER_GROUND_NOT_ALLOWED'), CASE)).toEqual({
-      codes: ['OTHER_GROUND_NOT_ALLOWED'],
-    });
-  });
-
   it('sends other grounds given as rent arrears grounds back to the rent arrears grounds page', () => {
     expect(items('RENT_ARREARS_GROUND_NOT_ALLOWED')).toEqual([
       {
