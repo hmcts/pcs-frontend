@@ -120,31 +120,34 @@
     Listed at a new hearing, the judge says when and whether the other parties are given notice of it; listed at one of
     the case's hearings still to come, which already has its parties, the order only says which.
   #}
-  {% set listAt = prefix + "-list-at" %}
   <div data-decision-shows="list" data-application-listing {%- if not draftChecked(name, "list") %} hidden{% endif %}>
     {% if upcomingHearings | length %}
-      {% set atItems = [{ value: "new", text: "A new hearing" }] %}
+      {% set atItems = [{ value: "new", text: "A new hearing", conditional: { html: newHearing(prefix) } }] %}
       {% for option in upcomingHearings %}
         {% set atItems = atItems.concat([{ value: option.id, text: "The hearing on " + option.text }]) %}
       {% endfor %}
-      {{ compact.radios(listAt, {
+      {{ compact.radios(prefix + "-list-at", {
         legend: "Which hearing?",
         classes: "govuk-radios--small",
         default: "new",
         items: atItems
       }) }}
+    {% else %}
+      {{ newHearing(prefix) }}
     {% endif %}
-    <div data-list-new {%- if draftValue(listAt) and not draftChecked(listAt, "new") %} hidden{% endif %}>
-      {{ compact.checkboxes(prefix + "-list-without-notice", {
-        items: [{ value: "yes", text: "Without notice to the other parties" }]
-      }) }}
-      {{ listing.listing(prefix + "-list", "When the hearing is", [
-        "Next available possession list after",
-        "Next available date (non-possession list) after",
-        "Specific date"
-      ]) }}
-    </div>
   </div>
+{% endmacro %}
+
+{# When a new hearing the application is listed for is, and whether the other parties are given notice of it. #}
+{% macro newHearing(prefix) %}
+  {{ compact.checkboxes(prefix + "-list-without-notice", {
+    items: [{ value: "yes", text: "Without notice to the other parties" }]
+  }) }}
+  {{ listing.listing(prefix + "-list", "When the hearing is", [
+    "Next available possession list after",
+    "Next available date (non-possession list) after",
+    "Specific date"
+  ]) }}
 {% endmacro %}
 
 {% macro row(application) %}

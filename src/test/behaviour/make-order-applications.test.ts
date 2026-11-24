@@ -408,11 +408,11 @@ describe('make an order: deciding applications', () => {
         'A new hearing',
         'The hearing on 12 January 2099 at 10:00am',
       ]);
-      const listNew = control<HTMLElement>('[data-application-reference="GA1"] [data-list-new]');
-      expect(listNew.hidden).toBe(false);
+      const listNew = control<HTMLElement>(`#conditional-${P}-list-at`);
+      expect(listNew.classList).not.toContain('govuk-radios__conditional--hidden');
 
       check(`${P}-list-at`, '8');
-      expect(listNew.hidden).toBe(true);
+      expect(listNew.classList).toContain('govuk-radios__conditional--hidden');
       expect(ordered(page.orderText()).slice(1)).toEqual([
         "The defendant's application dated 1 October 2026 shall be heard at the hearing on 12 January 2099 at 10:00am.",
       ]);
